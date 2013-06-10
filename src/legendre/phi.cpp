@@ -1,10 +1,11 @@
-#include "phi.h"
 #include "../utils/isqrt.h"
-#include "../utils/PrimeSieveVector.h"
+#include "../utils/Next_N_Primes_Vector.h"
 
+#include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
 #include <vector>
+#include <algorithm>
 #include <limits>
 
 #ifdef _OPENMP
@@ -23,13 +24,28 @@
 
 namespace legendre {
 
+/// This method is an optimized version (binary search) of
+/// int i = 0;
+/// while (i < a && primes_[i] <= sqrt(x))
+///   i++;
+/// return i;
+///
+uint32_t findSqrtIndex(int64_t x, int64_t a, const std::vector<uint32_t>& primes)
+{
+  uint32_t root = isqrt(x);
+  uint32_t index = static_cast<uint32_t>(
+      std::upper_bound(primes.begin(), primes.begin() + a, root)
+      - primes.begin());
+  return index;
+}
+
 class Cache {
 public:
   Cache(const std::vector<uint32_t>& primes)
     : primes_(primes)
   {
     PrimeSieve ps;
-    phiCache_.resize(ps.countPrimes(2, PHI_CACHE_LIMIT));
+    phiCache_.resize(ps.countPrimes(0, PHI_CACHE_LIMIT));
   }
 
   /// Calculate phi(x, a) using the recursive formula
@@ -42,7 +58,7 @@ public:
     int64_t sum = x * SIGN;
     if (a > 0)
     {
-      int64_t limit = findSqrtIndex(primes_, x, a);
+      int64_t limit = findSqrtIndex(x, a, primes_);
       sum += (a - limit) * -SIGN;
 
       for (int64_t a2 = 0; a2 < limit; a2++)
@@ -94,27 +110,21 @@ private:
 
 int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 {
-  int64_t sum = x;
-  if (a > 0)
-  {
-    // store primes up to sqrt(x)
-    PrimeSieveVector<uint32_t> primes;
-    PrimeSieve ps;
-    ps.generatePrimes(0, isqrt(x), &primes);
-    primes.push_back(0);
+  Next_N_Primes_Vector<uint32_t> primes;
+  primes.generatePrimes(/* start = */ 0 , /* n = */ a);
+  int limit = findSqrtIndex(x, a, primes);
+  Cache cache(primes);
+  int64_t sum = x - a + limit;
 
-    int limit = findSqrtIndex(primes, x, a);
-    sum += (a - limit) * -1;
-    Cache cache(primes);
 #ifdef _OPENMP
-    if (threads == MAX_THREADS)
-      threads = omp_get_max_threads();
-    #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
-        num_threads(threads) schedule(static, 128)
+  if (threads == MAX_THREADS)
+    threads = omp_get_max_threads();
+  #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
+      num_threads(threads) schedule(static, 128)
 #endif
-    for (int a = 0; a < limit; a++)
-      sum += cache.phi<-1>(x / primes[a], a);
-  }
+  for (int i = 0; i < limit; i++)
+    sum += cache.phi<-1>(x / primes[i], i);
+
   return sum;
 }
 

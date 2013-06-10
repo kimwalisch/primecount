@@ -1,7 +1,6 @@
-#include "pi.h"
-#include "phi.h"
 #include "../utils/isqrt.h"
 
+#include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
 
 namespace legendre {

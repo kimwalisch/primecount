@@ -1,7 +1,6 @@
-#include "../legendre/pi.h"
-#include "../meissel/pi.h"
-
+#include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>

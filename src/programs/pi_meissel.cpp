@@ -1,6 +1,6 @@
-#include "../meissel/pi.h"
 #include "../utils/ExpressionParser.h"
 
+#include <primecount.h>
 #include <iostream>
 #include <cstdlib>
 #include <stdint.h>

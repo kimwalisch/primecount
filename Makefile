@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   9 June 2013
+# Last modified:   11 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -16,19 +16,29 @@ BINDIR   := bin
 LIBDIR   := lib
 LEGENDRE := src/legendre
 MEISSEL  := src/meissel
+PKXA     := src/Pkxa
 PROGRAMS := src/programs
 TEST     := src/test
 UTILS    := src/utils
 
-HEADERS := \
-  $(wildcard $(LEGENDRE)/*.h) \
-  $(wildcard $(MEISSEL)/*.h) \
-  $(wildcard $(PROGRAMS)/*.h) \
-  $(wildcard $(TEST)/*.h) \
-  $(wildcard $(UTILS)/*.h)
+pi_legendre_objects := \
+  $(PROGRAMS)/pi_legendre.o \
+  $(LEGENDRE)/phi.o \
+  $(LEGENDRE)/pi.o
 
-LEGENDRE_OBJS := $(subst .cpp,.o, $(wildcard $(LEGENDRE)/*.cpp))
-MEISSEL_OBJS  := $(subst .cpp,.o, $(wildcard  $(MEISSEL)/*.cpp))
+pi_meissel_objects := \
+  $(PROGRAMS)/pi_meissel.o \
+  $(MEISSEL)/pi.o \
+  $(PKXA)/P2xa.o \
+  $(LEGENDRE)/phi.o \
+  $(LEGENDRE)/pi.o
+
+pi_test_objects := \
+  $(TEST)/pi_test.o \
+  $(MEISSEL)/pi.o \
+  $(PKXA)/P2xa.o \
+  $(LEGENDRE)/phi.o \
+  $(LEGENDRE)/pi.o
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -88,26 +98,29 @@ bin: bin_dir pi_legendre pi_meissel pi_test
 bin_dir:
 	@mkdir -p $(BINDIR)
 
-pi_legendre: $(PROGRAMS)/pi_legendre.o $(LEGENDRE_OBJS)
+pi_legendre: $(pi_legendre_objects)
 	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_legendre $^ -lprimesieve
 
-pi_meissel: $(PROGRAMS)/pi_meissel.o $(MEISSEL_OBJS) $(LEGENDRE_OBJS)
+pi_meissel: $(pi_meissel_objects)
 	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_meissel $^ -lprimesieve
 
-pi_test: $(TEST)/pi_test.o $(MEISSEL_OBJS) $(LEGENDRE_OBJS)
+pi_test: $(pi_test_objects)
 	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_test $^ -lprimesieve
 
-$(LEGENDRE)/%.o: $(LEGENDRE)/%.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(LEGENDRE)/%.o: $(LEGENDRE)/%.cpp
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
 
-$(MEISSEL)/%.o: $(MEISSEL)/%.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(MEISSEL)/%.o: $(MEISSEL)/%.cpp
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
 
-$(PROGRAMS)/%.o: $(PROGRAMS)/%.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(PKXA)/%.o: $(PKXA)/%.cpp
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
 
-$(TEST)/%.o: $(TEST)/%.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(PROGRAMS)/%.o: $(PROGRAMS)/%.cpp
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+
+$(TEST)/%.o: $(TEST)/%.cpp
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
 
 #-----------------------------------------------------------------------------
 # `make check` runs correctness tests

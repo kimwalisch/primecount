@@ -2,6 +2,7 @@
 #define PRIMESIEVEVECTOR_H
 
 #include <primesieve/soe/PrimeSieveCallback.h>
+#include <stdint.h>
 #include <vector>
 
 template <typename T>
