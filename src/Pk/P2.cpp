@@ -9,20 +9,17 @@
   #include <omp.h>
 #endif
 
-namespace Pkxa {
+namespace primecount {
 
-int64_t P2(int64_t x, int64_t a, int threads)
+int64_t P2(int64_t x, int64_t a, int64_t pa, int64_t pb, int threads)
 {
-  int64_t sqrt2 = isqrt(x);
-  int64_t sqrt3 = isqrt3(x);
-  int64_t b = legendre::pi(sqrt2);
-  int64_t sum = (b + a - 2) * (b - a + 1) / 2;
-
   PrimeSieveVector<uint32_t> primes;
   PrimeSieve ps;
-  if (sqrt3 < sqrt2)
-    ps.generatePrimes(sqrt3 + 1, sqrt2, &primes);
+  if (pa < pb)
+    ps.generatePrimes(pa + 1, pb, &primes);
 
+  int64_t b = a + static_cast<int64_t>( primes.size() );
+  int64_t sum = (b + a - 2) * (b - a + 1) / 2;
   int64_t pix = 0;
   int64_t old = 0;
 
@@ -44,4 +41,4 @@ int64_t P2(int64_t x, int64_t a, int threads)
   return sum;
 }
 
-} // namespace Pkxa
+} // namespace primecount

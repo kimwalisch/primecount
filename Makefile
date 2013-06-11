@@ -14,31 +14,40 @@ CXXFLAGS := -O2
 TARGET   := primecount
 BINDIR   := bin
 LIBDIR   := lib
+INCDIR   := include
 LEGENDRE := src/legendre
 MEISSEL  := src/meissel
-PKXA     := src/Pkxa
-PROGRAMS := src/programs
+PK       := src/Pk
+PROGRAM  := src/program
 TEST     := src/test
 UTILS    := src/utils
 
-pi_legendre_objects := \
-  $(PROGRAMS)/pi_legendre.o \
-  $(LEGENDRE)/phi.o \
-  $(LEGENDRE)/pi.o
+PRIMECOUNT_HEADERS := \
+  $(INCDIR)/primecount.h \
+  $(UTILS)/ExpressionParser.h \
+  $(UTILS)/isqrt.h \
+  $(UTILS)/Next_N_Primes_Vector.h \
+  $(UTILS)/PrimeSieveVector.h
 
-pi_meissel_objects := \
-  $(PROGRAMS)/pi_meissel.o \
-  $(MEISSEL)/pi.o \
-  $(PKXA)/P2xa.o \
-  $(LEGENDRE)/phi.o \
-  $(LEGENDRE)/pi.o
+LIBPRIMECOUNT_OBJECTS := \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
 
-pi_test_objects := \
-  $(TEST)/pi_test.o \
-  $(MEISSEL)/pi.o \
-  $(PKXA)/P2xa.o \
-  $(LEGENDRE)/phi.o \
-  $(LEGENDRE)/pi.o
+PRIMECOUNT_OBJECTS := \
+  primecount.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
+
+TEST_OBJECTS := \
+  primecount_test.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -68,6 +77,19 @@ ifeq ($(call is-openmp),)
 endif
 
 #-----------------------------------------------------------------------------
+# Default installation path
+#-----------------------------------------------------------------------------
+
+PREFIX := /usr
+
+ifneq ($(shell uname | grep -i linux),)
+  PREFIX := /usr/local
+endif
+ifneq ($(shell uname | grep -i mingw),)
+  PREFIX := /mingw
+endif
+
+#-----------------------------------------------------------------------------
 # `make`            -> libprimecount.a
 # `make SHARED=yes` -> libprimecount.(so|dylib)
 #-----------------------------------------------------------------------------
@@ -88,39 +110,82 @@ else
 endif
 
 #-----------------------------------------------------------------------------
-# Build the primesieve console application
+# By default build primecount (command-line program) and libprimecount
 #-----------------------------------------------------------------------------
 
-.PHONY: bin bin_dir pi_legendre pi_meissel pi_test
+.PHONY: all
 
-bin: bin_dir pi_legendre pi_meissel pi_test
+all: bin lib
+
+#-----------------------------------------------------------------------------
+# Build the primecount console application
+#-----------------------------------------------------------------------------
+
+BIN_PRIMECOUNT_OBJECTS := \
+  $(addprefix $(BINDIR)/, $(PRIMECOUNT_OBJECTS))
+
+BIN_TEST_OBJECTS := \
+  $(addprefix $(BINDIR)/, $(TEST_OBJECTS))
+
+.PHONY: bin bin_dir primecount primecount_test
+
+bin: bin_dir primecount primecount_test
 
 bin_dir:
 	@mkdir -p $(BINDIR)
 
-pi_legendre: $(pi_legendre_objects)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_legendre $^ -lprimesieve
+primecount: $(BIN_PRIMECOUNT_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
 
-pi_meissel: $(pi_meissel_objects)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_meissel $^ -lprimesieve
+primecount_test: $(BIN_TEST_OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET)_test $^ -lprimesieve
 
-pi_test: $(pi_test_objects)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_test $^ -lprimesieve
+$(BINDIR)/%.o: $(LEGENDRE)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(LEGENDRE)/%.o: $(LEGENDRE)/%.cpp
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+$(BINDIR)/%.o: $(MEISSEL)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(MEISSEL)/%.o: $(MEISSEL)/%.cpp
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+$(BINDIR)/%.o: $(PK)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(PKXA)/%.o: $(PKXA)/%.cpp
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+$(BINDIR)/%.o: $(PROGRAM)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(PROGRAMS)/%.o: $(PROGRAMS)/%.cpp
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+$(BINDIR)/%.o: $(TEST)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(TEST)/%.o: $(TEST)/%.cpp
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+#-----------------------------------------------------------------------------
+# Build libprimecount
+#-----------------------------------------------------------------------------
+
+LIB_CXXFLAGS := $(strip $(CXXFLAGS) $(FPIC))
+LIB_OBJECTS  := \
+  $(addprefix $(LIBDIR)/, \
+    $(notdir $(LIBPRIMECOUNT_OBJECTS)))
+
+.PHONY: lib lib_dir lib_obj
+
+lib: lib_dir lib_obj
+
+lib_dir:
+	@mkdir -p $(LIBDIR)
+
+lib_obj: $(LIB_OBJECTS)
+ifneq ($(SHARED),)
+	$(CXX) $(LIB_CXXFLAGS) $(SOFLAG) -o $(LIBDIR)/$(LIBRARY) $^
+else
+	ar rcs $(LIBDIR)/$(LIBRARY) $^
+endif
+
+$(LIBDIR)/%.o: $(LEGENDRE)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+
+$(LIBDIR)/%.o: $(MEISSEL)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+
+$(LIBDIR)/%.o: $(PK)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
 # `make check` runs correctness tests
@@ -128,25 +193,23 @@ $(TEST)/%.o: $(TEST)/%.cpp
 
 .PHONY: check test
 
-check test: bin_dir pi_test
-	$(BINDIR)/./pi_test
+check test: bin_dir primecount_test
+	$(BINDIR)/./primecount_test
 
 #-----------------------------------------------------------------------------
-# Common targets (all, clean, install, uninstall)
+# Common targets (clean, install, uninstall)
 #-----------------------------------------------------------------------------
 
-.PHONY: all clean install uninstall
-
-all: bin lib
+.PHONY: clean install uninstall
 
 clean:
-	rm -rf $(BINDIR) $(LIBDIR) $(shell find . -name '*.o*')
+	rm -rf $(BINDIR) $(LIBDIR)
 
 # requires sudo privileges
 install:
-ifneq ($(wildcard $(BINDIR)/pi_*),)
+ifneq ($(wildcard $(BINDIR)/$(TARGET)*),)
 	@mkdir -p $(PREFIX)/bin
-	cp -f $(BINDIR)/pi_* $(PREFIX)/bin
+	cp -f $(BINDIR)/$(TARGET) $(PREFIX)/bin
 endif
 ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
 	@mkdir -p $(PREFIX)/lib
@@ -161,11 +224,9 @@ endif
 
 # requires sudo privileges
 uninstall:
-ifneq ($(wildcard $(PREFIX)/bin/pi_*),)
-	rm -f $(PREFIX)/bin/pi_legendre
-	@rm -f $(PREFIX)/bin/pi_legendre.exe
-	rm -f $(PREFIX)/bin/pi_meissel
-	@rm -f $(PREFIX)/bin/pi_meissel.exe
+ifneq ($(wildcard $(PREFIX)/bin/$(TARGET)*),)
+	rm -f $(PREFIX)/bin/$(TARGET)
+	@rm -f $(PREFIX)/bin/$(TARGET).exe
 endif
 ifneq ($(wildcard $(PREFIX)/include/$(TARGET)),)
 	rm -rf $(PREFIX)/include/$(TARGET)
@@ -180,4 +241,3 @@ ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).*),)
 	rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
   endif
 endif
-

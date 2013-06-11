@@ -4,6 +4,7 @@
 #include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
+#include <cstddef>
 #include <vector>
 #include <algorithm>
 #include <limits>
@@ -22,7 +23,7 @@
   ? static_cast<uint32_t>(x) / (y) : (x) / (y))
 
 
-namespace legendre {
+namespace primecount {
 
 /// This method is an optimized version (binary search) of
 /// int i = 0;
@@ -30,13 +31,12 @@ namespace legendre {
 ///   i++;
 /// return i;
 ///
-uint32_t findSqrtIndex(int64_t x, int64_t a, const std::vector<uint32_t>& primes)
+inline uint32_t findSqrtIndex(int64_t x, int64_t a, const std::vector<uint32_t>& primes)
 {
-  uint32_t root = isqrt(x);
-  uint32_t index = static_cast<uint32_t>(
-      std::upper_bound(primes.begin(), primes.begin() + a, root)
-      - primes.begin());
-  return index;
+  std::size_t index = 
+      std::upper_bound(primes.begin(), primes.begin() + a, isqrt(x)) -
+      primes.begin();
+  return static_cast<uint32_t>(index);
 }
 
 class Cache {
@@ -128,4 +128,4 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
   return sum;
 }
 
-} // namespace legendre
+} // namespace primecount

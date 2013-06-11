@@ -31,7 +31,6 @@ int main (int argc, char* argv[])
     help();
   }
 
-  std::cout << meissel::pi(x) << std::endl;
+  std::cout << primecount::pi_meissel(x) << std::endl;
   return 0;
 }
-
