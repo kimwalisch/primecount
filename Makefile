@@ -36,7 +36,8 @@ PI_LEHMER_OBJECTS := \
   pi_legendre.o \
   pi_lehmer.o \
   phi.o \
-  P2.o
+  P2.o \
+  P3.o
 
 PI_PRIMESIEVE_OBJECTS := \
   pi_primesieve.o

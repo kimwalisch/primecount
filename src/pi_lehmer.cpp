@@ -15,30 +15,12 @@ int64_t pi_lehmer(int64_t x, int threads /* = MAX_THREADS */)
   int64_t c = pi_meissel(isqrt3(x));
   int64_t a = pi_meissel(isqrt4(x));
   int64_t b = pi_meissel(isqrt(x));
-  int64_t pix = 0;
-  int64_t old = 0;
-  int64_t sum = phi(x, a, threads) + ((b + a - 2) * (b - a + 1) / 2);
 
-  PrimeCountVector<uint32_t> primes;
-  PrimeSieve ps;
-  ps.generatePrimes(0, isqrt(x), &primes);
-  
-  // for use as array indexes
-  a--; b--; c--;
+  int64_t sum = 0;
 
-  for (int64_t i = b; i > a; i--)
-  {
-    int64_t x2 = x / primes[i];
-    pix += ps.countPrimes(old + 1, x2);
-    old = x2;
-    sum -= pix;
-
-    if (i <= c) {
-      int64_t bi = primes.pi( isqrt(x2) ) - 1;
-      for (int64_t j = i; j <= bi; j++)
-        sum = sum - primes.pi( x2 / primes[j]) + (j + 1) - 1;
-    }
-  }
+  sum += phi(x, a, threads);
+  sum += P2(x, a, b, isqrt(x), threads);
+  sum += P3(x, a, c, isqrt(x), threads);
 
   return sum;
 }

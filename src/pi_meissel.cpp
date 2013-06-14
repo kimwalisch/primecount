@@ -15,7 +15,7 @@ int64_t pi_meissel(int64_t x, int threads /* = MAX_THREADS */)
   int64_t a = pi_legendre(pa_max);
   int64_t b = pi_legendre(pb_max);
 
-  return phi(x, a, threads) + P2(x, a, b, pa_max, pb_max, threads);
+  return phi(x, a, threads) + P2(x, a, b, pb_max, threads);
 }
 
 } // namespace primecount
