@@ -1,4 +1,28 @@
-#include "../utils/ExpressionParser.h"
+#include "utils/isqrt.h"
+
+#include <primecount.h>
+#include <stdint.h>
+
+namespace primecount {
+
+int64_t pi_meissel(int64_t x, int threads /* = MAX_THREADS */)
+{
+  if (x < 2)
+    return 0;
+
+  int64_t pa_max = isqrt3(x);
+  int64_t pb_max = isqrt(x);
+  int64_t a = pi_legendre(pa_max);
+  int64_t b = pi_legendre(pb_max);
+
+  return phi(x, a, threads) + P2(x, a, b, pa_max, pb_max, threads);
+}
+
+} // namespace primecount
+
+#ifdef MAIN
+
+#include "utils/ExpressionParser.h"
 
 #include <primecount.h>
 #include <iostream>
@@ -34,3 +58,5 @@ int main (int argc, char* argv[])
   std::cout << primecount::pi_meissel(x) << std::endl;
   return 0;
 }
+
+#endif /* MAIN */

@@ -1,8 +1,7 @@
-#include "../utils/isqrt.h"
-#include "../utils/Next_N_Primes_Vector.h"
+#include "utils/isqrt.h"
+#include "utils/Next_N_Primes_Vector.h"
 
 #include <primecount.h>
-#include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
 #include <cstddef>
 #include <vector>
@@ -39,16 +38,15 @@ inline uint32_t findSqrtIndex(int64_t x, int64_t a, const std::vector<uint32_t>&
   return static_cast<uint32_t>(index);
 }
 
-class Cache {
+class PhiCache {
 public:
-  Cache(const std::vector<uint32_t>& primes)
+  PhiCache(const std::vector<uint32_t>& primes)
     : primes_(primes)
   {
-    PrimeSieve ps;
-    phiCache_.resize(ps.countPrimes(0, PHI_CACHE_LIMIT));
+    cache_.resize(pi_primesieve(PHI_CACHE_LIMIT));
   }
 
-  /// Calculate phi(x, a) using the recursive formula
+  /// Calculate phi(x, a) using the recursive formula:
   /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
   /// This implementation caches results of phi(x, a) for
   /// small values of x to speed up the calculations.
@@ -68,10 +66,10 @@ public:
         int64_t phiValue;
 
         if (x2 < PHI_CACHE_LIMIT && x2 < getCacheSize(a2) && 
-            phiCache_[a2][x2] != 0)
+            cache_[a2][x2] != 0)
         {
           // phi(x2, a2) is cached
-          phiValue = phiCache_[a2][x2] * -SIGN;
+          phiValue = cache_[a2][x2] * -SIGN;
         }
         else
         {
@@ -81,10 +79,10 @@ public:
           if (x2 < PHI_CACHE_LIMIT)
           {
             if (x2 >= getCacheSize(a2))
-              phiCache_[a2].resize(x2 + 1, 0);
+              cache_[a2].resize(x2 + 1, 0);
 
             // cache phi(x2, a2)
-            phiCache_[a2][x2] = static_cast<uint16_t>(phiValue * -SIGN);
+            cache_[a2][x2] = static_cast<uint16_t>(phiValue * -SIGN);
           }
         }
         sum += phiValue;
@@ -97,14 +95,14 @@ private:
   const std::vector<uint32_t>& primes_;
 
   /// Cache of phi(x, a) values for small values of x
-  /// The memory usage of phiCache_ is:
+  /// The memory usage of cache_ is:
   /// pi(PHI_CACHE_LIMIT) * PHI_CACHE_LIMIT * sizeof(uint16_t)
   ///
-  std::vector<std::vector<uint16_t> > phiCache_;
+  std::vector<std::vector<uint16_t> > cache_;
 
   int64_t getCacheSize(int64_t a2) const
   {
-    return static_cast<int64_t>(phiCache_[a2].size());
+    return static_cast<int64_t>(cache_[a2].size());
   }
 };
 
@@ -113,7 +111,7 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
   Next_N_Primes_Vector<uint32_t> primes;
   primes.generatePrimes(/* start = */ 0 , /* n = */ a);
   int limit = findSqrtIndex(x, a, primes);
-  Cache cache(primes);
+  PhiCache cache(primes);
   int64_t sum = x - a + limit;
 
 #ifdef _OPENMP

@@ -1,9 +1,10 @@
-#include "../utils/isqrt.h"
-#include "../utils/PrimeSieveVector.h"
+#include "utils/isqrt.h"
+#include "utils/PrimeSieveVector.h"
 
 #include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
 #include <vector>
+#include <stdint.h>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -11,14 +12,13 @@
 
 namespace primecount {
 
-int64_t P2(int64_t x, int64_t a, int64_t pa, int64_t pb, int threads)
+int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pa_max, int64_t pb_max, int threads)
 {
   PrimeSieveVector<uint32_t> primes;
   PrimeSieve ps;
-  if (pa < pb)
-    ps.generatePrimes(pa + 1, pb, &primes);
+  if (pa_max < pb_max)
+    ps.generatePrimes(pa_max + 1, pb_max, &primes);
 
-  int64_t b = a + static_cast<int64_t>( primes.size() );
   int64_t sum = (b + a - 2) * (b - a + 1) / 2;
   int64_t pix = 0;
   int64_t old = 0;

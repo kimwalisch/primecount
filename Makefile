@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   11 June 2013
+# Last modified:   13 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -15,12 +15,45 @@ TARGET   := primecount
 BINDIR   := bin
 LIBDIR   := lib
 INCDIR   := include
-LEGENDRE := src/legendre
-MEISSEL  := src/meissel
-PK       := src/Pk
-PROGRAM  := src/program
-TEST     := src/test
+SRCDIR   := src
 UTILS    := src/utils
+
+PI_LEGENDRE_OBJECTS := \
+  pi_primesieve.o \
+  pi_legendre.o \
+  phi.o
+
+PI_MEISSEL_OBJECTS := \
+  pi_primesieve.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
+
+PI_LEHMER_OBJECTS := \
+  pi_primesieve.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  pi_lehmer.o \
+  phi.o \
+  P2.o
+
+PI_PRIMESIEVE_OBJECTS := \
+  pi_primesieve.o
+
+PI_TEST_OBJECTS := \
+  pi_test.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
+
+LIBPRIMECOUNT_OBJECTS := \
+  pi_primesieve.o \
+  pi_meissel.o \
+  pi_legendre.o \
+  phi.o \
+  P2.o
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
@@ -28,26 +61,6 @@ PRIMECOUNT_HEADERS := \
   $(UTILS)/isqrt.h \
   $(UTILS)/Next_N_Primes_Vector.h \
   $(UTILS)/PrimeSieveVector.h
-
-LIBPRIMECOUNT_OBJECTS := \
-  pi_meissel.o \
-  pi_legendre.o \
-  phi.o \
-  P2.o
-
-PRIMECOUNT_OBJECTS := \
-  primecount.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  phi.o \
-  P2.o
-
-TEST_OBJECTS := \
-  primecount_test.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  phi.o \
-  P2.o
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -110,7 +123,7 @@ else
 endif
 
 #-----------------------------------------------------------------------------
-# By default build primecount (command-line program) and libprimecount
+# By default build command-line programs and libprimecount
 #-----------------------------------------------------------------------------
 
 .PHONY: all
@@ -118,51 +131,27 @@ endif
 all: bin lib
 
 #-----------------------------------------------------------------------------
-# Build the primecount console application
+# Build the command-line programs
 #-----------------------------------------------------------------------------
 
-BIN_PRIMECOUNT_OBJECTS := \
-  $(addprefix $(BINDIR)/, $(PRIMECOUNT_OBJECTS))
+.PHONY: bin bin_dir pi_lehmer
 
-BIN_TEST_OBJECTS := \
-  $(addprefix $(BINDIR)/, $(TEST_OBJECTS))
-
-.PHONY: bin bin_dir primecount primecount_test
-
-bin: bin_dir primecount primecount_test
+bin: bin_dir pi_lehmer
 
 bin_dir:
 	@mkdir -p $(BINDIR)
 
-primecount: $(BIN_PRIMECOUNT_OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
+pi_lehmer: $(addprefix $(BINDIR)/, $(PI_LEHMER_OBJECTS))
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_lehmer $^ -lprimesieve
 
-primecount_test: $(BIN_TEST_OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET)_test $^ -lprimesieve
-
-$(BINDIR)/%.o: $(LEGENDRE)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(BINDIR)/%.o: $(MEISSEL)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(BINDIR)/%.o: $(PK)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(BINDIR)/%.o: $(PROGRAM)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(BINDIR)/%.o: $(TEST)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) -DMAIN3 -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
 # Build libprimecount
 #-----------------------------------------------------------------------------
 
 LIB_CXXFLAGS := $(strip $(CXXFLAGS) $(FPIC))
-LIB_OBJECTS  := \
-  $(addprefix $(LIBDIR)/, \
-    $(notdir $(LIBPRIMECOUNT_OBJECTS)))
 
 .PHONY: lib lib_dir lib_obj
 
@@ -171,20 +160,14 @@ lib: lib_dir lib_obj
 lib_dir:
 	@mkdir -p $(LIBDIR)
 
-lib_obj: $(LIB_OBJECTS)
+lib_obj: $(addprefix $(LIBDIR)/, $(LIBPRIMECOUNT_OBJECTS))
 ifneq ($(SHARED),)
 	$(CXX) $(LIB_CXXFLAGS) $(SOFLAG) -o $(LIBDIR)/$(LIBRARY) $^
 else
 	ar rcs $(LIBDIR)/$(LIBRARY) $^
 endif
 
-$(LIBDIR)/%.o: $(LEGENDRE)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(LIBDIR)/%.o: $(MEISSEL)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
-
-$(LIBDIR)/%.o: $(PK)/%.cpp $(PRIMECOUNT_HEADERS)
+$(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
@@ -193,8 +176,8 @@ $(LIBDIR)/%.o: $(PK)/%.cpp $(PRIMECOUNT_HEADERS)
 
 .PHONY: check test
 
-check test: bin_dir primecount_test
-	$(BINDIR)/./primecount_test
+check test: bin_dir pi_test
+	$(BINDIR)/./pi_test
 
 #-----------------------------------------------------------------------------
 # Common targets (clean, install, uninstall)
@@ -207,9 +190,11 @@ clean:
 
 # requires sudo privileges
 install:
-ifneq ($(wildcard $(BINDIR)/$(TARGET)*),)
+ifneq ($(wildcard $(BINDIR)/pi_*),)
 	@mkdir -p $(PREFIX)/bin
-	cp -f $(BINDIR)/$(TARGET) $(PREFIX)/bin
+	cp -f $(BINDIR)/pi_legendre $(PREFIX)/bin
+	cp -f $(BINDIR)/pi_meissel $(PREFIX)/bin
+	cp -f $(BINDIR)/pi_primesieve $(PREFIX)/bin
 endif
 ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
 	@mkdir -p $(PREFIX)/lib
@@ -225,8 +210,12 @@ endif
 # requires sudo privileges
 uninstall:
 ifneq ($(wildcard $(PREFIX)/bin/$(TARGET)*),)
-	rm -f $(PREFIX)/bin/$(TARGET)
-	@rm -f $(PREFIX)/bin/$(TARGET).exe
+	rm -f $(PREFIX)/bin/pi_legendre
+	@rm -f $(PREFIX)/bin/pi_legendre.exe
+	rm -f $(PREFIX)/bin/pi_meissel
+	@rm -f $(PREFIX)/bin/pi_meissel.exe
+	rm -f $(PREFIX)/bin/pi_primesieve
+	@rm -f $(PREFIX)/bin/pi_primesieve.exe
 endif
 ifneq ($(wildcard $(PREFIX)/include/$(TARGET)),)
 	rm -rf $(PREFIX)/include/$(TARGET)

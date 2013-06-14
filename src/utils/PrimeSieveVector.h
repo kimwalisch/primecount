@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <vector>
 
+namespace primecount {
+
 template <typename T>
 struct PrimeSieveVector : std::vector<T>, PrimeSieveCallback<uint64_t> {
   void callback(uint64_t prime)
@@ -12,5 +14,7 @@ struct PrimeSieveVector : std::vector<T>, PrimeSieveCallback<uint64_t> {
     this->push_back( static_cast<T>(prime) );
   }
 };
+
+} // namespace primecount
 
 #endif
