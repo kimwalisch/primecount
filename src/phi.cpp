@@ -1,6 +1,6 @@
+#include "PrimeSieveVector.h"
 #include "pi_bsearch.h"
-#include "utils/isqrt.h"
-#include "utils/Next_N_Primes_Vector.h"
+#include "isqrt.h"
 
 #include <primecount.h>
 #include <stdint.h>
@@ -95,8 +95,8 @@ private:
 
 int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 {
-  Next_N_Primes_Vector<uint32_t> primes;
-  primes.generatePrimes(/* start = */ 0 , /* n = */ a);
+  PrimeSieveVector<uint32_t> primes;
+  primes.generate_N_Primes(/* start = */ 0 , /* n = */ a);
 
   int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes);

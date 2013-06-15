@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   13 June 2013
+# Last modified:   15 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -16,52 +16,33 @@ BINDIR   := bin
 LIBDIR   := lib
 INCDIR   := include
 SRCDIR   := src
-UTILS    := src/utils
 
-PI_LEGENDRE_OBJECTS := \
-  pi_primesieve.o \
-  pi_legendre.o \
-  phi.o
-
-PI_MEISSEL_OBJECTS := \
-  pi_primesieve.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  phi.o \
-  P2.o
-
-PI_LEHMER_OBJECTS := \
+PRIMECOUNT_OBJECTS := \
+  primecount.o \
   pi_primesieve.o \
   pi_meissel.o \
   pi_legendre.o \
   pi_lehmer.o \
   phi.o \
   P2.o \
-  P3.o
-
-PI_PRIMESIEVE_OBJECTS := \
-  pi_primesieve.o
-
-PI_TEST_OBJECTS := \
-  pi_test.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  phi.o \
-  P2.o
+  P3.o \
+  test.o
 
 LIBPRIMECOUNT_OBJECTS := \
   pi_primesieve.o \
   pi_meissel.o \
   pi_legendre.o \
+  pi_lehmer.o \
   phi.o \
-  P2.o
+  P2.o \
+  P3.o \
+  test.o
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
-  $(UTILS)/ExpressionParser.h \
-  $(UTILS)/isqrt.h \
-  $(UTILS)/Next_N_Primes_Vector.h \
-  $(UTILS)/PrimeSieveVector.h
+  $(SRCDIR)/ExpressionParser.h \
+  $(SRCDIR)/isqrt.h \
+  $(SRCDIR)/PrimeSieveVector.h
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -135,18 +116,18 @@ all: bin lib
 # Build the command-line programs
 #-----------------------------------------------------------------------------
 
-.PHONY: bin bin_dir pi_lehmer
+.PHONY: bin bin_dir bin_obj
 
-bin: bin_dir pi_lehmer
+bin: bin_dir bin_obj
 
 bin_dir:
 	@mkdir -p $(BINDIR)
 
-pi_lehmer: $(addprefix $(BINDIR)/, $(PI_LEHMER_OBJECTS))
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/pi_lehmer $^ -lprimesieve
+bin_obj: $(addprefix $(BINDIR)/, $(PRIMECOUNT_OBJECTS))
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
 
 $(BINDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -DMAIN3 -I$(INCDIR) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
 # Build libprimecount
@@ -177,8 +158,8 @@ $(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
 
 .PHONY: check test
 
-check test: bin_dir pi_test
-	$(BINDIR)/./pi_test
+check test: bin
+	$(BINDIR)/./$(TARGET) --test
 
 #-----------------------------------------------------------------------------
 # Common targets (clean, install, uninstall)
@@ -191,11 +172,9 @@ clean:
 
 # requires sudo privileges
 install:
-ifneq ($(wildcard $(BINDIR)/pi_*),)
+ifneq ($(wildcard $(BINDIR)/$(TARGET)*),)
 	@mkdir -p $(PREFIX)/bin
-	cp -f $(BINDIR)/pi_legendre $(PREFIX)/bin
-	cp -f $(BINDIR)/pi_meissel $(PREFIX)/bin
-	cp -f $(BINDIR)/pi_primesieve $(PREFIX)/bin
+	cp -f $(BINDIR)/$(TARGET) $(PREFIX)/bin
 endif
 ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
 	@mkdir -p $(PREFIX)/lib
@@ -211,12 +190,8 @@ endif
 # requires sudo privileges
 uninstall:
 ifneq ($(wildcard $(PREFIX)/bin/$(TARGET)*),)
-	rm -f $(PREFIX)/bin/pi_legendre
-	@rm -f $(PREFIX)/bin/pi_legendre.exe
-	rm -f $(PREFIX)/bin/pi_meissel
-	@rm -f $(PREFIX)/bin/pi_meissel.exe
-	rm -f $(PREFIX)/bin/pi_primesieve
-	@rm -f $(PREFIX)/bin/pi_primesieve.exe
+	rm -f $(PREFIX)/bin/$(TARGET)
+	@rm -f $(PREFIX)/bin/$(TARGET).exe
 endif
 ifneq ($(wildcard $(PREFIX)/include/$(TARGET)),)
 	rm -rf $(PREFIX)/include/$(TARGET)

@@ -1,4 +1,4 @@
-#include "utils/isqrt.h"
+#include "isqrt.h"
 
 #include <primecount.h>
 #include <stdint.h>
@@ -24,44 +24,3 @@ int64_t pi_lehmer(int64_t x, int threads /* = MAX_THREADS */)
 }
 
 } // namespace primecount
-
-#ifdef MAIN3
-
-#include "utils/ExpressionParser.h"
-
-#include <primecount.h>
-#include <iostream>
-#include <cstdlib>
-#include <stdint.h>
-
-namespace {
-
-void help()
-{
-  std::cerr << "Usage: pi_lehmer x"                                                     << std::endl
-            << "Count the primes up to x < 2^63 using Lehmer0's prime counting formula." << std::endl
-            << "The complexity is O( TODO ) operations and O( TODO ) space."     << std::endl;
-  std::exit(1);
-}
-
-} // end namespace
-
-int main (int argc, char* argv[])
-{
-  if (argc != 2)
-    help();
-
-  ExpressionParser<int64_t> parser;
-  int64_t x = 0;
-  try {
-    x = parser.eval(argv[1]);
-  }
-  catch (parser_error&) {
-    help();
-  }
-
-  std::cout << primecount::pi_lehmer(x) << std::endl;
-  return 0;
-}
-
-#endif /* MAIN */

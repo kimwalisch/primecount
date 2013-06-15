@@ -1,9 +1,8 @@
+#include "PrimeSieveVector.h"
 #include "pi_bsearch.h"
-#include "utils/isqrt.h"
-#include "utils/PrimeSieveVector.h"
+#include "isqrt.h"
 
 #include <primecount.h>
-#include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
 
 #ifdef _OPENMP
@@ -15,8 +14,7 @@ namespace primecount {
 int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads /* = MAX_THREADS */)
 {
     PrimeSieveVector<uint32_t> primes;
-    PrimeSieve ps;
-    ps.generatePrimes(0, pb, &primes);
+    primes.generatePrimes(0, pb);
 
     int64_t sum = 0;
 

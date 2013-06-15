@@ -1,9 +1,7 @@
-#include "utils/PrimeSieveVector.h"
+#include "PrimeSieveVector.h"
 
 #include <primecount.h>
-#include <primesieve/soe/PrimeSieve.h>
 #include <primesieve/soe/ParallelPrimeSieve.h>
-#include <vector>
 #include <stdint.h>
 
 #ifdef _OPENMP
@@ -15,8 +13,7 @@ namespace primecount {
 int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads /* = MAX_THREADS */)
 {
   PrimeSieveVector<uint32_t> primes;
-  PrimeSieve ps;
-  ps.generatePrimes(0, pb, &primes);
+  primes.generatePrimes(0, pb);
 
   int64_t sum = (b + a - 2) * (b - a + 1) / 2;
   int64_t pix = 0;
