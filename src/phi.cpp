@@ -1,3 +1,4 @@
+#include "pi_bsearch.h"
 #include "utils/isqrt.h"
 #include "utils/Next_N_Primes_Vector.h"
 
@@ -24,20 +25,6 @@
 
 namespace primecount {
 
-/// This method is an optimized version (binary search) of
-/// int i = 0;
-/// while (i < a && primes_[i] <= sqrt(x))
-///   i++;
-/// return i;
-///
-inline uint32_t findSqrtIndex(int64_t x, int64_t a, const std::vector<uint32_t>& primes)
-{
-  std::size_t index = 
-      std::upper_bound(primes.begin(), primes.begin() + a, isqrt(x)) -
-      primes.begin();
-  return static_cast<uint32_t>(index);
-}
-
 class PhiCache {
 public:
   PhiCache(const std::vector<uint32_t>& primes)
@@ -56,10 +43,10 @@ public:
     int64_t sum = x * SIGN;
     if (a > 0)
     {
-      int64_t limit = findSqrtIndex(x, a, primes_);
-      sum += (a - limit) * -SIGN;
+      int64_t iters = pi_bsearch(primes_.begin(), primes_.begin() + a, isqrt(x));
+      sum += (a - iters) * -SIGN;
 
-      for (int64_t a2 = 0; a2 < limit; a2++)
+      for (int64_t a2 = 0; a2 < iters; a2++)
       {
         // next x = x / primes_[a2]
         int64_t x2 = FAST_DIV(x, primes_[a2]);
@@ -110,9 +97,10 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 {
   Next_N_Primes_Vector<uint32_t> primes;
   primes.generatePrimes(/* start = */ 0 , /* n = */ a);
-  int limit = findSqrtIndex(x, a, primes);
+
+  int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes);
-  int64_t sum = x - a + limit;
+  int64_t sum = x - a + iters;
 
 #ifdef _OPENMP
   if (threads == MAX_THREADS)
@@ -120,7 +108,7 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
   #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
       num_threads(threads) schedule(static, 128)
 #endif
-  for (int i = 0; i < limit; i++)
+  for (int i = 0; i < iters; i++)
     sum += cache.phi<-1>(x / primes[i], i);
 
   return sum;

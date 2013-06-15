@@ -1,5 +1,6 @@
+#include "pi_bsearch.h"
 #include "utils/isqrt.h"
-#include "utils/PrimeCountVector.h"
+#include "utils/PrimeSieveVector.h"
 
 #include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
@@ -13,7 +14,7 @@ namespace primecount {
 
 int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb_max, int threads /* = MAX_THREADS */)
 {
-    PrimeCountVector<uint32_t> primes;
+    PrimeSieveVector<uint32_t> primes;
     PrimeSieve ps;
     ps.generatePrimes(0, pb_max, &primes);
 
@@ -28,10 +29,10 @@ int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb_max, int threads /* = MAX
     {
       int64_t sum2 = 0;
       int64_t x2 = x / primes[i - 1];
-      int64_t bi = primes.pi( isqrt(x2) );
+      int64_t bi = pi_bsearch(primes.begin(), primes.end(), isqrt(x2));
 
       for (int64_t j = i; j <= bi; j++)
-        sum2 -= primes.pi( x2 / primes[j - 1]) - (j - 1);
+        sum2 -= pi_bsearch(primes.begin(), primes.end(), x2 / primes[j - 1]) - (j - 1);
 
       sum += sum2;
     }

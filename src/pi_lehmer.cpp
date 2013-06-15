@@ -1,7 +1,5 @@
 #include "utils/isqrt.h"
-#include "utils/PrimeCountVector.h"
 
-#include <primesieve/soe/PrimeSieve.h>
 #include <primecount.h>
 #include <stdint.h>
 
