@@ -106,7 +106,7 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
   if (threads == MAX_THREADS)
     threads = omp_get_max_threads();
   #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
-      num_threads(threads) schedule(static, 128)
+      num_threads(threads) schedule(dynamic, 16)
 #endif
   for (int i = 0; i < iters; i++)
     sum += cache.phi<-1>(x / primes[i], i);

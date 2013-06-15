@@ -12,11 +12,11 @@
 
 namespace primecount {
 
-int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb_max, int threads /* = MAX_THREADS */)
+int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads /* = MAX_THREADS */)
 {
     PrimeSieveVector<uint32_t> primes;
     PrimeSieve ps;
-    ps.generatePrimes(0, pb_max, &primes);
+    ps.generatePrimes(0, pb, &primes);
 
     int64_t sum = 0;
 
