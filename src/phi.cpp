@@ -4,9 +4,7 @@
 
 #include <primecount.h>
 #include <stdint.h>
-#include <cstddef>
 #include <vector>
-#include <algorithm>
 #include <limits>
 
 #ifdef _OPENMP

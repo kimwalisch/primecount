@@ -38,7 +38,7 @@ void test1()
 
     pix_lehmer = primecount::pi_lehmer(x);
     if (pix_lehmer != pix_primesieve) {
-      std::cerr << "pi_meissel(" << x << ") = "           << pix_lehmer
+      std::cerr << "pix_lehmer(" << x << ") = "           << pix_lehmer
       << " is an error, the correct result is "           << pix_primesieve << std::endl;
       std::exit(1);
     }
@@ -78,7 +78,7 @@ void test2()
 
     pix_lehmer = primecount::pi_lehmer(x);
     if (pix_lehmer != pix_primesieve) {
-      std::cerr << "pi_meissel(" << x << ") = "           << pix_lehmer
+      std::cerr << "pix_lehmer(" << x << ") = "           << pix_lehmer
       << " is an error, the correct result is "           << pix_primesieve << std::endl;
       std::exit(1);
     }

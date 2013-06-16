@@ -4,10 +4,6 @@
 #include <primesieve/soe/ParallelPrimeSieve.h>
 #include <stdint.h>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 namespace primecount {
 
 int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads /* = MAX_THREADS */)
