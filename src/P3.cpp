@@ -15,7 +15,6 @@ int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads /* = MAX_THR
 {
   PrimeSieveVector<uint32_t> primes;
   primes.generatePrimes(0, pb);
-
   int64_t sum = 0;
 
 #ifdef _OPENMP
