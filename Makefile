@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   15 June 2013
+# Last modified:   16 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -41,8 +41,7 @@ LIBPRIMECOUNT_OBJECTS := \
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
   $(SRCDIR)/ExpressionParser.h \
-  $(SRCDIR)/isqrt.h \
-  $(SRCDIR)/PrimeSieveVector.h
+  $(SRCDIR)/isqrt.h
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features

@@ -86,11 +86,15 @@ void test2()
   std::cout << "All tests passed successfully!" << std::endl;
 }
 
-} // end namespace
+} // namespace
 
-bool test_primecount()
+namespace primecount {
+
+bool test()
 {
   test1();
   test2();
   return true;
 }
+
+} // namespace primecount

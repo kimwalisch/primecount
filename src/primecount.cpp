@@ -29,9 +29,9 @@ int main (int argc, char* argv[])
     x = parser.eval(argv[1]);
   }
   catch (parser_error&) {
-    help();
+    primecount::test();
   }
 
-  std::cout << primecount::pi_lehmer(x) << std::endl;
+  std::cout << primecount::pi(x) << std::endl;
   return 0;
 }

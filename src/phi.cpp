@@ -1,8 +1,8 @@
-#include "PrimeSieveVector.h"
 #include "pi_bsearch.h"
 #include "isqrt.h"
 
 #include <primecount.h>
+#include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
 #include <vector>
 #include <limits>
@@ -28,7 +28,8 @@ public:
   PhiCache(const std::vector<uint32_t>& primes)
     : primes_(primes)
   {
-    cache_.resize(pi_primesieve(PHI_CACHE_LIMIT));
+    PrimeSieve ps;
+    cache_.resize(ps.countPrimes(0, PHI_CACHE_LIMIT));
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -93,8 +94,9 @@ private:
 
 int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 {
-  PrimeSieveVector<uint32_t> primes;
-  primes.generate_N_Primes(/* start = */ 0 , /* n = */ a);
+  std::vector<uint32_t> primes;
+  PrimeSieve ps;
+  ps.generate_N_Primes(/* start = */ 0 , /* n = */ a, &primes);
 
   int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes);
