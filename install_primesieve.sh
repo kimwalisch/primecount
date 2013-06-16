@@ -47,7 +47,7 @@ else
   make install;
 fi
 if [ $? -eq 0 ]; then
-  echo "primesieve and libprimesieve and successfully installed!";
+  echo "primesieve and libprimesieve successfully installed!";
 else
   echo "Error: Failed to install primesieve!";
   exit 1;
