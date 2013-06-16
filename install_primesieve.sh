@@ -1,6 +1,6 @@
 #!/bin/sh
-# This shell script builds and installs the latest primesieve
-# and libprimesieve version.
+# This shell script downloads, compiles and installs the
+# latest primesieve and libprimesieve version.
 # Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 # This file is distributed under the BSD License.
 # Usage: $ sh install_primesieve.sh [GNU make arguments]
