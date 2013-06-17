@@ -14,7 +14,7 @@ if [ $? -ne 0 ]; then
 fi
 command -v c++ > /dev/null 2> /dev/null
 if [ $? -ne 0 ]; then
-  echo "Error: There is no c++ compiler installed!";
+  echo "Error: No c++ compiler installed!";
   exit 1;
 fi
 command -v gmake > /dev/null 2> /dev/null || command -v make > /dev/null 2> /dev/null
