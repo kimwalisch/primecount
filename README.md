@@ -1,8 +1,7 @@
 primecount
 ==========
 
-C++ implementations of various prime counting functions (so far Legendre and Meissel).  
-This project has been started in June 2013 and is work in progress.
+The primecount project contains multiple C++ implementations of the prime counting function. So far I have implemented Legendre's, Meissel's and Lehmer's formulas. All implementations are fully parallelized using OpenMP. primecount can easily be built on any Unix-like operating system (using GNU make) and offers both a command-line program and a C++ library with an intuitive API.
 
 How to build it
 ---------------
