@@ -1,20 +1,20 @@
 primecount
 ==========
-
-The primecount project contains multiple C++ implementations of the prime counting function. So far I have implemented Legendre's, Meissel's and Lehmer's formulas. All implementations are fully parallelized using OpenMP. primecount can easily be built on any Unix-like operating system (using GNU make) and offers both a command-line program and a C++ library with an intuitive API.
+primecount is a command-line program and C++ library that counts the number of primes below an integer x < 2^63. primecount counts primes using an efficient implementation of the prime counting function pi(x) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All implementations are fully parallelized using OpenMP.
 
 ### How to build it
-primecount depends on the author's primesieve libary (version 4.3 or later). To download, build and install the latest primesieve and libprimesieve version run:
+primecount depends on the author's primesieve libary (version 4.3 or later). To download, build and install the latest primesieve and libprimesieve version on a Unix-like operating system run:
 ```
 $ sh install_primesieve.sh
 ```
-Then build primecount using GNU make and optionally install it:
+To build and install primecount using GNU make and the default `c++' compiler run:
 ```
 $ make
 $ sudo make install
 ```
 
-### How to use it
+### Usage Examples
 ```
-$ bin/./primecount 10^13
+$ primecount 10^13
+$ primecount 10^14 --meissel --threads=2
 ```
