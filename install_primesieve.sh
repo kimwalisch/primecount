@@ -44,9 +44,11 @@ command -v sudo > /dev/null 2> /dev/null
 if [ $? -eq 0 ]; then
   echo 
   echo "Installing primesieve requires root privileges."
-  sudo make install;
+  command -v gmake > /dev/null 2> /dev/null
+  if [ $? -eq 0 ]; then sudo gmake install; else sudo make install; fi
 else
-  make install;
+  command -v gmake > /dev/null 2> /dev/null
+  if [ $? -eq 0 ]; then gmake install; else make install; fi
 fi
 if [ $? -eq 0 ]; then
   echo "primesieve and libprimesieve successfully installed!";
