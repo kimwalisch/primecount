@@ -12,14 +12,14 @@ if [ $? -ne 0 ]; then
   echo "Error: Subversion is not installed!";
   exit 1;
 fi
-command -v make > /dev/null 2> /dev/null
-if [ $? -ne 0 ]; then
-  echo "Error: GNU make is not installed!";
-  exit 1;
-fi
 command -v c++ > /dev/null 2> /dev/null
 if [ $? -ne 0 ]; then
   echo "Error: There is no c++ compiler installed!";
+  exit 1;
+fi
+command -v gmake > /dev/null 2> /dev/null || command -v make > /dev/null 2> /dev/null
+if [ $? -ne 0 ]; then
+  echo "Error: GNU make is not installed!";
   exit 1;
 fi
 
@@ -32,7 +32,8 @@ fi
 
 # Compile primesieve and libprimesieve
 cd primesieve
-make all "$@"
+command -v gmake > /dev/null 2> /dev/null
+if [ $? -eq 0 ]; then gmake bin lib "$@"; else make bin lib "$@"; fi
 if [ $? -ne 0 ]; then
   echo "Error: Failed to build primesieve!";
   exit 1;
