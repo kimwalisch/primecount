@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   16 June 2013
+# Last modified:   18 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -23,6 +23,7 @@ PRIMECOUNT_OBJECTS := \
   pi_meissel.o \
   pi_legendre.o \
   pi_lehmer.o \
+  pi.o \
   phi.o \
   P2.o \
   P3.o \
@@ -33,6 +34,7 @@ LIBPRIMECOUNT_OBJECTS := \
   pi_meissel.o \
   pi_legendre.o \
   pi_lehmer.o \
+  pi.o \
   phi.o \
   P2.o \
   P3.o \
