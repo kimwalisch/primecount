@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   18 June 2013
+# Last modified:   20 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -18,6 +18,8 @@ INCDIR   := include
 SRCDIR   := src
 
 PRIMECOUNT_OBJECTS := \
+  cmdoptions.o \
+  help.o \
   primecount.o \
   pi_primesieve.o \
   pi_meissel.o \

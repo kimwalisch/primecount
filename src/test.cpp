@@ -90,11 +90,11 @@ void test2()
 
 namespace primecount {
 
-bool test()
+void test()
 {
   test1();
   test2();
-  return true;
+  std::exit(0);
 }
 
 } // namespace primecount

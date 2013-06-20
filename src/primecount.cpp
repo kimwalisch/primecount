@@ -1,37 +1,23 @@
-#include "ExpressionParser.h"
+#include "cmdoptions.h"
 
 #include <primecount.h>
 #include <iostream>
-#include <cstdlib>
 #include <stdint.h>
-
-namespace {
-
-void help()
-{
-  std::cerr << "Usage: pi_lehmer x"                                                     << std::endl
-            << "Count the primes up to x < 2^63 using Lehmer's prime counting formula." << std::endl
-            << "The computational complexity is O(x/ln(x)^3) operations and"            << std::endl
-            << "O(x^(1/3)/ln(x)) space."                                                << std::endl;
-  std::exit(1);
-}
-
-} // end namespace
 
 int main (int argc, char* argv[])
 {
-  if (argc != 2)
-    help();
+  // process command-line options
+  PrimeCountSettings pcs = processOptions(argc, argv);
+  int64_t pix = 0;
 
-  ExpressionParser<int64_t> parser;
-  int64_t x = 0;
-  try {
-    x = parser.eval(argv[1]);
-  }
-  catch (parser_error&) {
-    primecount::test();
+  switch (pcs.method)
+  {
+    case 0: pix = primecount::pi_primesieve(pcs.x, pcs.threads); break;
+    case 1: pix = primecount::pi_legendre(pcs.x, pcs.threads); break;
+    case 2: pix = primecount::pi_meissel(pcs.x, pcs.threads); break;
+    case 3: pix = primecount::pi_lehmer(pcs.x, pcs.threads); break;
   }
 
-  std::cout << primecount::pi(x) << std::endl;
+  std::cout << pix << std::endl;
   return 0;
 }
