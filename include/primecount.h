@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#define PRIMECOUNT_VERSION "0.1"
+#define PRIMECOUNT_MAJOR_VERSION 0
+#define PRIMECOUNT_MINOR_VERSION 1
+#define PRIMECOUNT_YEAR "2013"
+
 namespace primecount {
 
 enum {
