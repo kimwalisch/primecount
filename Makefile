@@ -20,7 +20,7 @@ SRCDIR   := src
 PRIMECOUNT_OBJECTS := \
   cmdoptions.o \
   help.o \
-  li.o \
+  Li.o \
   primecount.o \
   pi_primesieve.o \
   pi_meissel.o \
@@ -33,7 +33,7 @@ PRIMECOUNT_OBJECTS := \
   test.o
 
 LIBPRIMECOUNT_OBJECTS := \
-  li.o \
+  Li.o \
   pi_primesieve.o \
   pi_meissel.o \
   pi_legendre.o \
@@ -46,6 +46,8 @@ LIBPRIMECOUNT_OBJECTS := \
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
+  $(SRCDIR)/P2.h \
+  $(SRCDIR)/P3.h \
   $(SRCDIR)/pi_bsearch.h \
   $(SRCDIR)/cmdoptions.h \
   $(SRCDIR)/ExpressionParser.h \

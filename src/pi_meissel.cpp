@@ -1,3 +1,4 @@
+#include "P2.h"
 #include "isqrt.h"
 
 #include <primecount.h>

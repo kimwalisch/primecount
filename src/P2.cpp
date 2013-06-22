@@ -1,3 +1,5 @@
+#include "P2.h"
+
 #include <primecount.h>
 #include <primesieve/soe/PrimeSieve.h>
 #include <vector>

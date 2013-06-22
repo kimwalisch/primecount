@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace primecount {
+namespace {
 
 /// This calculates the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
@@ -25,9 +25,6 @@ double li(double x)
   int k = 0;
   int terms = static_cast<int>(logz * 2) + 10;
 
-  if (sizeof(long double) <= 8)
-    terms = min(terms, 150);
-
   for (int n = 1; n < terms; n++)
   {
     factorial *= n;
@@ -42,14 +39,18 @@ double li(double x)
   return static_cast<double>(GAMMA + log(logz) + sqrt(z) * sum);
 }
 
+} // namespace
+
+namespace primecount {
+
 /// This calculates the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x. The
 /// logarithmic integral Li(x) is larger than pi(x) below ~ 10^316.
 /// \mathrm{Li}(x) = \int_2^x \frac{dt}{\log{t}}
 ///
-double Li(double x)
+int64_t Li(int64_t x)
 {
-  return li(x) - /* li(2) = */ 1.04516;
+  return static_cast<int64_t>(li(x) - /* li(2) = */ 1.04516);
 }
 
 } // namespace primecount
