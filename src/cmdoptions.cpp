@@ -49,7 +49,10 @@ enum PrimeCountOptions {
   OPTION_HELP,
   OPTION_LEGENDRE,
   OPTION_LEHMER,
+  OPTION_LI,
+  OPTION_LIINV,
   OPTION_MEISSEL,
+  OPTION_NTHPRIME,
   OPTION_NUMBER,
   OPTION_PRIMESIEVE,
   OPTION_TEST,
@@ -68,9 +71,12 @@ void initCmdOptions()
   cmdOptions["--legendre"]   = OPTION_LEGENDRE;
   cmdOptions["-l"]           = OPTION_LEHMER;
   cmdOptions["--lehmer"]     = OPTION_LEHMER;
+  cmdOptions["--Li"]         = OPTION_LI;
+  cmdOptions["--Li_inverse"] = OPTION_LIINV;
   cmdOptions["-m"]           = OPTION_MEISSEL;
   cmdOptions["--meissel"]    = OPTION_MEISSEL;
-  cmdOptions["-n"]           = OPTION_NUMBER;
+  cmdOptions["-n"]           = OPTION_NTHPRIME;
+  cmdOptions["--nth_prime"]  = OPTION_NTHPRIME;
   cmdOptions["--number"]     = OPTION_NUMBER;
   cmdOptions["-p"]           = OPTION_PRIMESIEVE;
   cmdOptions["--primesieve"] = OPTION_PRIMESIEVE;
@@ -114,8 +120,11 @@ PrimeCountSettings processOptions(int argc, char** argv)
       switch (cmdOptions[option.id]) {
         case OPTION_PRIMESIEVE: pcs.method = 0; break;
         case OPTION_LEGENDRE:   pcs.method = 1; break;
+        case OPTION_LI:         pcs.method = 4; break; pcs.x = option.getValue<int64_t>(); break;
+        case OPTION_LIINV:      pcs.method = 5; break; pcs.x = option.getValue<int64_t>(); break;
         case OPTION_LEHMER:     pcs.method = 3; break;
         case OPTION_MEISSEL:    pcs.method = 2; break;
+        case OPTION_NTHPRIME:   pcs.method = 6; break; pcs.x = option.getValue<int64_t>(); break;
         case OPTION_NUMBER:     pcs.x       = option.getValue<int64_t>(); break;
         case OPTION_THREADS:    pcs.threads = option.getValue<int>(); break;
         case OPTION_HELP:       primecount::help(); break;

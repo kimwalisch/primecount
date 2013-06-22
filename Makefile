@@ -21,6 +21,7 @@ PRIMECOUNT_OBJECTS := \
   cmdoptions.o \
   help.o \
   Li.o \
+  nth_prime.o \
   primecount.o \
   pi_primesieve.o \
   pi_meissel.o \
@@ -34,6 +35,7 @@ PRIMECOUNT_OBJECTS := \
 
 LIBPRIMECOUNT_OBJECTS := \
   Li.o \
+  nth_prime.o \
   pi_primesieve.o \
   pi_meissel.o \
   pi_legendre.o \
