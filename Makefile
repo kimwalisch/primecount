@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   20 June 2013
+# Last modified:   22 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -20,6 +20,7 @@ SRCDIR   := src
 PRIMECOUNT_OBJECTS := \
   cmdoptions.o \
   help.o \
+  li.o \
   primecount.o \
   pi_primesieve.o \
   pi_meissel.o \
@@ -32,6 +33,7 @@ PRIMECOUNT_OBJECTS := \
   test.o
 
 LIBPRIMECOUNT_OBJECTS := \
+  li.o \
   pi_primesieve.o \
   pi_meissel.o \
   pi_legendre.o \
@@ -44,6 +46,8 @@ LIBPRIMECOUNT_OBJECTS := \
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
+  $(SRCDIR)/pi_bsearch.h \
+  $(SRCDIR)/cmdoptions.h \
   $(SRCDIR)/ExpressionParser.h \
   $(SRCDIR)/isqrt.h
 
@@ -209,3 +213,24 @@ ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).*),)
 	rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
   endif
 endif
+
+#-----------------------------------------------------------------------------
+# Makefile help menu
+#-----------------------------------------------------------------------------
+
+.PHONY: help
+
+help:
+	@echo ----------------------------------------------
+	@echo ---------- primecount build options ----------
+	@echo ----------------------------------------------
+	@echo "make                                     Build the primecount console application (using c++)"
+	@echo "make CXX=icpc CXXFLAGS=\"-O2 -openmp\"     Specify a custom C++ compiler, here icpc"
+	@echo "make check                               Test primecount for correctness"
+	@echo "make clean                               Clean the output directories (bin, lib, ...)"
+	@echo "make lib                                 Build a static libprimecount library (using c++)"
+	@echo "make lib SHARED=yes                      Build a shared libprimecount library (using c++)"
+	@echo "sudo make install                        Install primecount and libprimecount to /usr/local or /usr"
+	@echo "sudo make install PREFIX=/path           Specify a custom installation path"
+	@echo "sudo make uninstall                      Completely remove primecount and libprimecount"
+	@echo "make help                                Print this help menu"
