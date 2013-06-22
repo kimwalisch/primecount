@@ -2,7 +2,6 @@
 + Document API in include/primecount.h
 + Add short BSD license text to each file
 + Document sources in ./src
-+ Add boundary checks to all public (API) functions
 + Write better tests
 + Try to compile with sunCC +w2
 + Do performance profiling

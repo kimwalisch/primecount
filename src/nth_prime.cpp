@@ -8,28 +8,28 @@
 
 namespace {
 
-/// This class is used to stop prime generation (by throwing an
-/// exception) once n primes have been generated.
+/// This class is used to generate n primes and
+/// then stop by throwing an exception.
 ///
 class FindNthPrime : public PrimeSieveCallback<uint64_t> {
 public:
-  FindNthPrime(uint64_t n) : n_(n)
+  FindNthPrime(uint64_t n) : n_(n), nthPrime_(0)
   { }
   void callback(uint64_t prime)
   {
     if (--n_ == 0)
     {
-      prime_ = prime;
+      nthPrime_ = prime;
       throw stop_primesieve();
     }
   }
   int64_t getNthPrime() const
   {
-    return prime_;
+    return nthPrime_;
   }
 private:
   uint64_t n_;
-  uint64_t prime_;
+  uint64_t nthPrime_;
 };
 
 } // namespace
@@ -43,7 +43,7 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads /* = MAX_THREADS */)
 {
-  if (n <= 0)
+  if (n < 1)
     return 0;
 
   int64_t nth_prime_approximation = Li_inverse(n);

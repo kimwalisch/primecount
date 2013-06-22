@@ -50,7 +50,9 @@ namespace primecount {
 ///
 int64_t Li(int64_t x)
 {
-  if (x < 2) return 0;
+  if (x < 2)
+    return 0;
+
   long double n = static_cast<long double>(x);
   return static_cast<int64_t>(
       li(n) - /* li(2) = */ 1.04516);
@@ -62,12 +64,15 @@ int64_t Li(int64_t x)
 /// The inverse logarithmic integral Li^{-1}(x) is smaller than the
 /// nth prime below ~ 10^316.
 ///
-int64_t Li_inverse(int64_t n)
+int64_t Li_inverse(int64_t x)
 {
-  double x = static_cast<double>(n);
-  double logx = log(x);
-  int64_t first = n;
-  int64_t last = static_cast<int64_t>(x * logx * 2 + 10000);
+  if (x < 1)
+    return 0;
+
+  double n = static_cast<double>(x);
+  double logn = log(n);
+  int64_t first = x;
+  int64_t last = static_cast<int64_t>(n * logn * 2 + 10000);
   if (last <= first)
     last = std::numeric_limits<int64_t>::max();
   int64_t len = last - first;
@@ -76,7 +81,7 @@ int64_t Li_inverse(int64_t n)
   {
     int64_t len2 = len / 2;
     int64_t guess = first + len2;
-    if (n < Li(guess))
+    if (x < Li(guess))
       len = len2;
     else
     {

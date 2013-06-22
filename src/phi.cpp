@@ -94,6 +94,9 @@ private:
 
 int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 {
+  if (x < 1) return 0;
+  if (a < 1) return x;
+
   std::vector<uint32_t> primes;
   PrimeSieve ps;
   ps.generate_N_Primes(0 , /* n = */ a, &primes);
