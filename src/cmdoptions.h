@@ -12,14 +12,32 @@
 
 #include <primecount.h>
 #include <stdint.h>
+#include <vector>
+
+enum PrimeCountOptions {
+  OPTION_HELP,
+  OPTION_LEGENDRE,
+  OPTION_LEHMER,
+  OPTION_LI,
+  OPTION_LIINV,
+  OPTION_MEISSEL,
+  OPTION_NTHPRIME,
+  OPTION_NUMBER,
+  OPTION_PHI,
+  OPTION_PRIMESIEVE,
+  OPTION_TEST,
+  OPTION_THREADS,
+  OPTION_VERSION
+};
 
 struct PrimeCountSettings
 {
-  int64_t x;
-  int64_t method;
+  std::vector<int64_t> n;
+  int64_t option;
   int threads;
   PrimeCountSettings() :
-    x(-1), method(3), threads(primecount::MAX_THREADS)
+    option(OPTION_LEHMER),
+    threads(primecount::MAX_THREADS)
   { }
 };
 
