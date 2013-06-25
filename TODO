@@ -1,5 +1,3 @@
-+ Li_inverse(x) is erroneous for x < 20
-+ Improve Readme.md
 + Document API in include/primecount.h
 + Add short BSD license text to each file
 + Document sources in ./src

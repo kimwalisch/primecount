@@ -44,9 +44,8 @@ long double li(long double x)
 namespace primecount {
 
 /// This calculates the offset logarithmic integral which is a very
-/// accurate approximation of the number of primes below x. The
-/// logarithmic integral Li(x) is larger than pi(x) below ~ 10^316.
-/// \mathrm{Li}(x) = \int_2^x \frac{dt}{\log{t}}
+/// accurate approximation of the number of primes below x.
+/// @post Li(x) >= pi(x) for 8 <= x <= ~ 10^316
 ///
 int64_t Li(int64_t x)
 {
@@ -58,11 +57,9 @@ int64_t Li(int64_t x)
       li(n) - /* li(2) = */ 1.04516);
 }
 
-/// This calculates the inverse logarithmic integral Li^{-1}(x) using
-/// a binary search over the interval [n, n * log(n) * 2].
-/// This function approximates the nth prime very accurately.
-/// The inverse logarithmic integral Li^{-1}(x) is smaller than the
-/// nth prime below ~ 10^316.
+/// This calculates the inverse logarithmic integral Li^-1(x) which is
+/// a very accurate approximation of the nth prime.
+/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x)
 {
@@ -71,23 +68,20 @@ int64_t Li_inverse(int64_t x)
 
   double n = static_cast<double>(x);
   double logn = log(n);
-  int64_t first = x;
-  int64_t last = static_cast<int64_t>(n * logn * 2 + 10000);
+  int64_t first = static_cast<int64_t>(n * logn);
+  int64_t last  = static_cast<int64_t>(n * logn * 2 + 2);
   if (last <= first)
     last = std::numeric_limits<int64_t>::max();
-  int64_t len = last - first;
 
-  while (len != 0)
+  // find Li^-1(x) using binary search
+  while (first < last)
   {
-    int64_t len2 = len / 2;
-    int64_t guess = first + len2;
-    if (x < Li(guess))
-      len = len2;
+    int64_t mid = first + (last - first) / 2;
+
+    if (Li(mid) < x)
+      first = mid + 1;
     else
-    {
-      first = guess + 1;
-      len -= len2 + 1;
-    }
+      last = mid;
   }
 
   return first;

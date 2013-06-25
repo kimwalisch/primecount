@@ -19,9 +19,9 @@ int64_t nth_prime(int64_t n, int threads /* = MAX_THREADS */)
   int64_t prime_approx = 0;
   int64_t count_approx = 0;
 
-  if (n > 10000)
+  if (n > 100000)
   {
-    // this is < prime[n] up to ~ 10^316
+    // Li_inverse(n) < nth_prime(n) for 7 <= n <= ~ 10^316
     prime_approx = Li_inverse(n);
     count_approx = pi(prime_approx, threads);
   }
@@ -29,7 +29,7 @@ int64_t nth_prime(int64_t n, int threads /* = MAX_THREADS */)
   ParallelPrimeSieve pps;
   if (threads != MAX_THREADS)
     pps.setNumThreads( threads );
-  int64_t prime = pps.nthPrime(prime_approx, n - count_approx);
+  int64_t prime = pps.nthPrime(prime_approx + 1, n - count_approx);
 
   return prime;
 }
