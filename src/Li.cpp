@@ -45,7 +45,7 @@ namespace primecount {
 
 /// This calculates the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x.
-/// @post Li(x) >= pi(x) for 8 <= x <= ~ 10^316
+/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
 int64_t Li(int64_t x)
 {
