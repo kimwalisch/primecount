@@ -1,100 +1,69 @@
 #include <primecount.h>
-#include <primesieve/soe/PrimeSieve.h>
+#include <primesieve/soe/ParallelPrimeSieve.h>
 
+#include <stdint.h>
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <iomanip>
 #include <ctime>
-#include <stdint.h>
 
-namespace {
-
-void test1()
-{
-  std::cout << "Testing pi(x) implementations for 0 <= x < 100000 ..." << std::endl;
-
-  PrimeSieve ps;
-  int64_t pix_primesieve = 0;
-  int64_t pix_legendre = 0;
-  int64_t pix_meissel = 0;
-  int64_t pix_lehmer = 0;
-  
-  for (int64_t x = 0; x < 100000; x++)
-  {
-    pix_primesieve = ps.countPrimes(0, x);
-
-    pix_legendre = primecount::pi_legendre(x);
-    if (pix_legendre != pix_primesieve) {
-      std::cerr << "pi_legendre(" << x << ") = "          << pix_legendre
-                << " is an error, the correct result is " << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-
-    pix_meissel = primecount::pi_meissel(x);
-    if (pix_meissel != pix_primesieve) {
-      std::cerr << "pi_meissel(" << x << ") = "           << pix_meissel
-                << " is an error, the correct result is " << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-
-    pix_lehmer = primecount::pi_lehmer(x);
-    if (pix_lehmer != pix_primesieve) {
-      std::cerr << "pix_lehmer(" << x << ") = "           << pix_lehmer
-      << " is an error, the correct result is "           << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-  }
-  std::cout << "All tests passed successfully!" << std::endl;
-}
-
-void test2()
-{
-  std::cout << "Randomly testing pi(x) implementations up to 2^36 ..." << std::endl;
-
-  PrimeSieve ps;
-  int64_t pix_primesieve = 0;
-  int64_t pix_legendre = 0;
-  int64_t pix_meissel = 0;
-  int64_t pix_lehmer = 0;
-  int64_t old = 0;
-  srand(static_cast<unsigned int>(time(0)));
-
-  for (int64_t x = 0; (x >> 36) == 0; old = x + 1, x += rand())
-  {
-    pix_primesieve += ps.countPrimes(old, x);
-
-    pix_legendre = primecount::pi_legendre(x);
-    if (pix_legendre != pix_primesieve) {
-      std::cerr << "pi_legendre(" << x << ") = "          << pix_legendre
-                << " is an error, the correct result is " << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-
-    pix_meissel = primecount::pi_meissel(x);
-    if (pix_meissel != pix_primesieve) {
-      std::cerr << "pi_meissel(" << x << ") = "           << pix_meissel
-                << " is an error, the correct result is " << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-
-    pix_lehmer = primecount::pi_lehmer(x);
-    if (pix_lehmer != pix_primesieve) {
-      std::cerr << "pix_lehmer(" << x << ") = "           << pix_lehmer
-      << " is an error, the correct result is "           << pix_primesieve << std::endl;
-      std::exit(1);
-    }
-  }
-  std::cout << "All tests passed successfully!" << std::endl;
-}
-
-} // namespace
+using namespace std;
 
 namespace primecount {
 
+void assert_equal(const std::string& f1_name, int64_t x, int64_t f1_res, int64_t f2_res)
+{
+  if (f1_res != f2_res)
+  {
+    cerr << endl << f1_name << "(" << x << ") = "  << f1_res
+         << " is an error, the correct result is " << f2_res << std::endl;
+    exit(1);
+  }
+}
+
+/// 0 <= get_rand() < 10^7
+int get_rand()
+{
+  return (rand() % 32768) * 300;
+}
+
+template <typename F>
+void check_for_equality(const std::string& f1_name, F f1, F f2, int64_t iters)
+{
+  cout << left;
+  cout << "Testing " << setw(15) << (f1_name + "(x)") << flush;
+
+  // test for 0 <= x < iters
+  for (int64_t x = 0; x < iters; x++)
+    assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
+
+  int64_t x = 0;
+  // test using random increment
+  for (int64_t i = 0; i < iters; i++, x += get_rand())
+    assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
+
+  cout << "OK" << endl;
+}
+
+int64_t pps_nth_prime(int64_t x, int)
+{
+  ParallelPrimeSieve pps;
+  int64_t prime = pps.nthPrime(x);
+  return prime;
+}
+
 void test()
 {
-  test1();
-  test2();
-  std::exit(0);
+  srand(static_cast<unsigned int>(time(0)));
+
+  check_for_equality("pi_legendre", pi_legendre, pi_primesieve, 1000);
+  check_for_equality("pi_meissel",  pi_meissel,  pi_legendre,   1000);
+  check_for_equality("pi_lehmer",   pi_lehmer,   pi_meissel,    1000);
+  check_for_equality("nth_prime",   nth_prime,   pps_nth_prime, 100);
+
+  cout << "All tests passed successfully!" << endl;
+  exit(0);
 }
 
 } // namespace primecount
