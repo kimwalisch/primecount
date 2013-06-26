@@ -25,7 +25,7 @@ void assert_equal(const std::string& f1_name, int64_t x, int64_t f1_res, int64_t
 /// 0 <= get_rand() < 10^7
 int get_rand()
 {
-  return (rand() % 32768) * 300;
+  return (rand() % 10000) * 1000;
 }
 
 template <typename F>
@@ -57,9 +57,9 @@ void test()
 {
   srand(static_cast<unsigned int>(time(0)));
 
-  check_for_equality("pi_legendre", pi_legendre, pi_primesieve, 1000);
-  check_for_equality("pi_meissel",  pi_meissel,  pi_legendre,   1000);
-  check_for_equality("pi_lehmer",   pi_lehmer,   pi_meissel,    1000);
+  check_for_equality("pi_legendre", pi_legendre, pi_primesieve, 100);
+  check_for_equality("pi_meissel",  pi_meissel,  pi_legendre,   500);
+  check_for_equality("pi_lehmer",   pi_lehmer,   pi_meissel,    500);
   check_for_equality("nth_prime",   nth_prime,   pps_nth_prime, 100);
 
   cout << "All tests passed successfully!" << endl;
