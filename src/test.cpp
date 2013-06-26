@@ -25,7 +25,7 @@ void assert_equal(const std::string& f1_name, int64_t x, int64_t f1_res, int64_t
 /// 0 <= get_rand() < 10^7
 int get_rand()
 {
-  return (rand() % 10000) * 1000;
+  return (rand() % 10000) * 1000 + 1;
 }
 
 template <typename F>
