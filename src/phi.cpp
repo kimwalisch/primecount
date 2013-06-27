@@ -134,6 +134,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   return sum;
 }
 
+/// Sometimes called P2(x, a)
 int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
 {
   std::vector<int32_t> primes;
@@ -146,6 +147,12 @@ int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   int64_t sum = (b + a - 2) * (b - a + 1) / 2;
   int64_t pix = 0;
 
+  /// This uses a clever trick, instead of calculating
+  /// pi(x / primes[i]) it iterates backwards over the
+  /// primes and for each i counts the primes between
+  /// x / primes[i] and x / primes[i - 1]. When finished
+  /// pi(x / primes[i]) can quickly be calculated for
+  /// all i by summing up the counts.
 #ifdef _OPENMP
   if (threads == MAX_THREADS)
     threads = omp_get_max_threads();
@@ -167,6 +174,7 @@ int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   return sum;
 }
 
+/// Sometimes called P3(x, a)
 int64_t phi3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
 {
   std::vector<int32_t> primes;
