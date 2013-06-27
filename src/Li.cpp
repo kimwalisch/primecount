@@ -1,3 +1,12 @@
+///
+/// @file  Li.cpp
+///
+/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+///
+/// This file is distributed under the BSD License. See the COPYING
+/// file in the top level directory.
+///
+
 #include <stdint.h>
 #include <algorithm>
 #include <cmath>
@@ -9,8 +18,7 @@ namespace {
 
 /// This calculates the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
-/// \mathrm{li}(x) = \gamma + \ln \ln{x} + \sum_{n=0}^{\infty} \frac{(-1)^{n-1}(\ln{x})^n}{n!2^{n-1}} \sum_{k=0}^{\lfloor{(n-1)/2}\rfloor} \frac{1}{2k+1}
-// @see http://mathworld.wolfram.com/LogarithmicIntegral.html, (15)
+// @see http://mathworld.wolfram.com/LogarithmicIntegral.html (15)
 ///
 long double li(long double x)
 {

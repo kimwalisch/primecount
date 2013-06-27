@@ -1,3 +1,12 @@
+///
+/// @file  test.cpp
+///
+/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+///
+/// This file is distributed under the BSD License. See the COPYING
+/// file in the top level directory.
+///
+
 #include <primecount.h>
 #include <primesieve/soe/ParallelPrimeSieve.h>
 

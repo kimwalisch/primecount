@@ -1,3 +1,12 @@
+///
+/// @file  pi_bsearch.h
+///
+/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+///
+/// This file is distributed under the BSD License. See the COPYING
+/// file in the top level directory.
+///
+
 #ifndef PI_BSEARCH_H
 #define PI_BSEARCH_H
 
