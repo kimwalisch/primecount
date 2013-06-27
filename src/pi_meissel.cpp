@@ -1,5 +1,5 @@
-#include "P2.h"
 #include "isqrt.h"
+#include "phi.h"
 
 #include <primecount.h>
 #include <stdint.h>
@@ -17,7 +17,7 @@ int64_t pi_meissel(int64_t x, int threads /* = MAX_THREADS */)
   int64_t sum = 0;
 
   sum += phi(x, a, threads);
-  sum += P2(x, a, b, isqrt(x), threads);
+  sum += phi2(x, a, b, isqrt(x), threads);
 
   return sum;
 }

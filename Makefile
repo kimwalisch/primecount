@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         9 June 2013
-# Last modified:   22 June 2013
+# Last modified:   27 June 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -29,8 +29,6 @@ PRIMECOUNT_OBJECTS := \
   pi_lehmer.o \
   pi.o \
   phi.o \
-  P2.o \
-  P3.o \
   test.o
 
 LIBPRIMECOUNT_OBJECTS := \
@@ -42,14 +40,11 @@ LIBPRIMECOUNT_OBJECTS := \
   pi_lehmer.o \
   pi.o \
   phi.o \
-  P2.o \
-  P3.o \
   test.o
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
-  $(SRCDIR)/P2.h \
-  $(SRCDIR)/P3.h \
+  $(SRCDIR)/phi.h \
   $(SRCDIR)/pi_bsearch.h \
   $(SRCDIR)/cmdoptions.h \
   $(SRCDIR)/ExpressionParser.h \

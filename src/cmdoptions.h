@@ -23,7 +23,6 @@ enum PrimeCountOptions {
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NUMBER,
-  OPTION_PHI,
   OPTION_PRIMESIEVE,
   OPTION_TEST,
   OPTION_THREADS,
@@ -32,10 +31,11 @@ enum PrimeCountOptions {
 
 struct PrimeCountSettings
 {
-  std::vector<int64_t> n;
+  int64_t x;
   int64_t option;
   int threads;
   PrimeCountSettings() :
+    x(-1),
     option(OPTION_LEHMER),
     threads(primecount::MAX_THREADS)
   { }

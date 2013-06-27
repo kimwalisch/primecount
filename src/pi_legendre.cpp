@@ -1,4 +1,5 @@
 #include "isqrt.h"
+#include "phi.h"
 
 #include <primecount.h>
 #include <stdint.h>

@@ -20,23 +20,33 @@
 #define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
   ? static_cast<uint32_t>(x) / (y) : (x) / (y))
 
+namespace {
 
-namespace primecount {
+using std::vector;
+using primecount::pi_bsearch;
+using primecount::isqrt;
 
+/// This class is used to calculate phi(x, a) using the recursive
+/// formula: phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
+/// This implementation is based on an algorithm described in a
+/// paper [1] by Tomas Oliveira e Silva.
+/// On top of that algorithm I have implemented an efficient caching
+/// solution that caches results of small (x, a) pairs in a two
+/// dimensional vector. The memory usage is up to 200 megabytes (per
+/// thread) for PHI_CACHE_LIMIT = 32767.
+///
+/// [1] Tomas Oliveira e Silva, "Computing pi(x): the combinatorial method",
+///     Revista do DETUA, vol. 4, no. 6, pp. 759-768, March 2006
+///
 class PhiCache {
 public:
-  PhiCache(const std::vector<uint32_t>& primes)
+  PhiCache(const vector<uint32_t>& primes)
     : primes_(primes)
   {
     PrimeSieve ps;
     cache_.resize(ps.countPrimes(0, PHI_CACHE_LIMIT));
   }
 
-  /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
-  /// This implementation caches results of phi(x, a) for
-  /// small values of x to speed up the calculations.
-  ///
   template<int64_t SIGN> int64_t phi(int64_t x, int64_t a)
   {
     int64_t sum = x * SIGN;
@@ -78,13 +88,13 @@ public:
   }
 private:
   /// First a primes needed to calculate phi(x, a)
-  const std::vector<uint32_t>& primes_;
+  const vector<uint32_t>& primes_;
 
   /// Cache of phi(x, a) values for small values of x
   /// The memory usage of cache_ is:
   /// pi(PHI_CACHE_LIMIT) * PHI_CACHE_LIMIT * sizeof(uint16_t)
   ///
-  std::vector<std::vector<uint16_t> > cache_;
+  vector<vector<uint16_t> > cache_;
 
   int64_t getCacheSize(int64_t a2) const
   {
@@ -92,7 +102,14 @@ private:
   }
 };
 
-int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
+} // namespace
+
+namespace primecount {
+
+/// This calculates the Legendre-sum phi(x, a) which is the count of
+/// numbers <= x that are coprime to the first a primes.
+///
+int64_t phi(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
   if (a < 1) return x;
@@ -113,6 +130,66 @@ int64_t phi(int64_t x, int64_t a, int threads /* = MAX_THREADS */)
 #endif
   for (int i = 0; i < iters; i++)
     sum += cache.phi<-1>(x / primes[i], i);
+
+  return sum;
+}
+
+int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
+{
+  std::vector<int32_t> primes;
+  std::vector<int64_t> counts;
+  PrimeSieve ps;
+  ps.generatePrimes(0, pb, &primes);
+  counts.resize( primes.size() );
+  int64_t size = static_cast<int64_t>( primes.size() );
+
+  int64_t sum = (b + a - 2) * (b - a + 1) / 2;
+  int64_t pix = 0;
+
+#ifdef _OPENMP
+  if (threads == MAX_THREADS)
+    threads = omp_get_max_threads();
+  #pragma omp parallel for private(ps) schedule(dynamic) num_threads(threads)
+#endif
+  for (int64_t i = size; i > a; i--)
+  {
+    int64_t start = (i < size) ? x / primes[i] : 0;
+    int64_t stop = x / primes[i - 1];
+    counts[i - 1] = ps.countPrimes(start + 1, stop);
+  }
+
+  for (int64_t i = size; i > a; i--)
+  {
+    pix += counts[i - 1];
+    sum -= pix;
+  }
+
+  return sum;
+}
+
+int64_t phi3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
+{
+  std::vector<int32_t> primes;
+  PrimeSieve ps;
+  ps.generatePrimes(0, pb, &primes);
+  int64_t sum = 0;
+
+#ifdef _OPENMP
+  if (threads == MAX_THREADS)
+    threads = omp_get_max_threads();
+  #pragma omp parallel for reduction(+: sum) schedule(dynamic) num_threads(threads)
+#endif
+  for (int64_t i = a + 1; i <= c; i++)
+  {
+    int64_t sum2 = 0;
+    int64_t x2 = x / primes[i - 1];
+    int64_t bi = pi_bsearch(primes.begin(), primes.end(), isqrt(x2));
+
+    for (int64_t j = i; j <= bi; j++)
+      sum2 -= pi_bsearch(primes.begin(), primes.end(), x2 / primes[j - 1]) - (j - 1);
+
+    sum += sum2;
+  }
 
   return sum;
 }

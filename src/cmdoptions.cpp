@@ -63,7 +63,6 @@ void initCmdOptions()
   cmdOptions["-n"]           = OPTION_NTHPRIME;
   cmdOptions["--nth_prime"]  = OPTION_NTHPRIME;
   cmdOptions["--number"]     = OPTION_NUMBER;
-  cmdOptions["--phi"]        = OPTION_PHI;
   cmdOptions["-p"]           = OPTION_PRIMESIEVE;
   cmdOptions["--primesieve"] = OPTION_PRIMESIEVE;
   cmdOptions["--test"]       = OPTION_TEST;
@@ -110,11 +109,10 @@ PrimeCountSettings processOptions(int argc, char** argv)
         case OPTION_LEGENDRE:   pcs.option = OPTION_LEGENDRE; break;
         case OPTION_LI:         pcs.option = OPTION_LI; break;
         case OPTION_LIINV:      pcs.option = OPTION_LIINV; break;
-        case OPTION_PHI:        pcs.option = OPTION_PHI; break;
         case OPTION_LEHMER:     pcs.option = OPTION_LEHMER; break;
         case OPTION_MEISSEL:    pcs.option = OPTION_MEISSEL; break;
         case OPTION_NTHPRIME:   pcs.option = OPTION_NTHPRIME; break;
-        case OPTION_NUMBER:     pcs.n.push_back( option.getValue<int64_t>() ); break;
+        case OPTION_NUMBER:     pcs.x = option.getValue<int64_t>(); break;
         case OPTION_THREADS:    pcs.threads = option.getValue<int>(); break;
         case OPTION_HELP:       primecount::help(); break;
         case OPTION_TEST:       primecount::test(); break;
@@ -124,12 +122,7 @@ PrimeCountSettings processOptions(int argc, char** argv)
   } catch (exception&) {
     primecount::help();
   }
-
-  if (pcs.n.empty())
-    primecount::help();
-
-  // phi(x, a) takes two arguments
-  if (pcs.option == OPTION_PHI && pcs.n.size() != 2)
+  if (pcs.x < 0)
     primecount::help();
 
   return pcs;
