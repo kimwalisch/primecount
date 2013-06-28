@@ -21,7 +21,7 @@
 #endif
 
 /// Results of phi(x, a) are cached for x < PHI_CACHE_LIMIT
-/// @pre PHI_CACHE_LIMIT < 65535
+/// @pre PHI_CACHE_LIMIT <= 32767
 ///
 #define PHI_CACHE_LIMIT 32767
 
@@ -29,11 +29,8 @@
 #define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
   ? static_cast<uint32_t>(x) / (y) : (x) / (y))
 
-namespace {
 
-using std::vector;
-using primecount::pi_bsearch;
-using primecount::isqrt;
+namespace primecount {
 
 /// This class is used to calculate phi(x, a) using the recursive
 /// formula: phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
@@ -49,7 +46,7 @@ using primecount::isqrt;
 ///
 class PhiCache {
 public:
-  PhiCache(const vector<uint32_t>& primes)
+  PhiCache(const std::vector<int32_t>& primes)
     : primes_(primes)
   {
     PrimeSieve ps;
@@ -87,7 +84,7 @@ public:
               cache_[a2].resize(x2 + 1, 0);
 
             // cache phi(x2, a2)
-            cache_[a2][x2] = static_cast<uint16_t>(phiValue * -SIGN);
+            cache_[a2][x2] = static_cast<int16_t>(phiValue * -SIGN);
           }
         }
         sum += phiValue;
@@ -97,23 +94,19 @@ public:
   }
 private:
   /// First a primes needed to calculate phi(x, a)
-  const vector<uint32_t>& primes_;
+  const std::vector<int32_t>& primes_;
 
   /// Cache of phi(x, a) values for small values of x
   /// The memory usage of cache_ is:
-  /// pi(PHI_CACHE_LIMIT) * PHI_CACHE_LIMIT * sizeof(uint16_t)
+  /// pi(PHI_CACHE_LIMIT) * PHI_CACHE_LIMIT * sizeof(int16_t)
   ///
-  vector<vector<uint16_t> > cache_;
+  std::vector<std::vector<int16_t> > cache_;
 
   int64_t getCacheSize(int64_t a2) const
   {
     return static_cast<int64_t>(cache_[a2].size());
   }
 };
-
-} // namespace
-
-namespace primecount {
 
 /// This calculates the Legendre-sum phi(x, a) which is the count of
 /// numbers <= x that are coprime to the first a primes.
@@ -123,7 +116,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (x < 1) return 0;
   if (a < 1) return x;
 
-  std::vector<uint32_t> primes;
+  std::vector<int32_t> primes;
   PrimeSieve ps;
   ps.generate_N_Primes(0 , /* n = */ a, &primes);
 
