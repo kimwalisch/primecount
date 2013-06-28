@@ -158,7 +158,7 @@ int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
 
   // This uses a clever trick, instead of calculating
   // pi(x / primes[i]) for a <= i < size it only counts the primes
-  // between adjacent pairs (x / primes[i], x / primes[i - 1]).
+  // between adjacent values [x / primes[i], x / primes[i - 1]].
   // When finished pi(x / primes[i]) can quickly be calculated
   // by backwards summing up the counts.
 #ifdef _OPENMP
