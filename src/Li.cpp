@@ -7,6 +7,8 @@
 /// file in the top level directory.
 ///
 
+#include <primecount.h>
+
 #include <stdint.h>
 #include <algorithm>
 #include <cmath>
