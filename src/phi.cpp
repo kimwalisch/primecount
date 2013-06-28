@@ -157,20 +157,20 @@ int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   int64_t pix = 0;
 
   // This uses a clever trick, instead of calculating
-  // pi(x / primes[i]) for a <= i < size it counts the primes
-  // between x / primes[i + 1] and x / primes[i]. When finished
-  // pi(x / primes[i]) for a <= i < size can quickly be
-  // calculated by backwards summing up the counts.
+  // pi(x / primes[i]) for a <= i < size it only counts the primes
+  // between adjacent pairs (x / primes[i], x / primes[i - 1]).
+  // When finished pi(x / primes[i]) can quickly be calculated
+  // by backwards summing up the counts.
 #ifdef _OPENMP
   if (threads == MAX_THREADS)
     threads = omp_get_max_threads();
   #pragma omp parallel for private(ps) schedule(dynamic) num_threads(threads)
 #endif
-  for (int64_t i = a; i < size; i++)
+  for (int64_t i = size; i > a; i--)
   {
-    int64_t x2 = (i + 1 < size) ? x / primes[i + 1] : 0;
-    int64_t x3 = x / primes[i];
-    counts[i] = ps.countPrimes(x2 + 1, x3);
+    int64_t x2 = (i < size) ? x / primes[i] : 0;
+    int64_t x3 = x / primes[i - 1];
+    counts[i - 1] = ps.countPrimes(x2 + 1, x3);
   }
 
   for (int64_t i = size; i > a; i--)
