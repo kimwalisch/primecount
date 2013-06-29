@@ -118,7 +118,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
 
   std::vector<int32_t> primes;
   PrimeSieve ps;
-  ps.generate_N_Primes(0 , /* n = */ a, &primes);
+  ps.generate_N_Primes(a, &primes);
 
   int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes);

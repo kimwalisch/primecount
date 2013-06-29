@@ -20,17 +20,13 @@
 #include <cstddef>
 
 
+using std::string;
+
 namespace primecount {
 
 void help();
 void test();
 void version();
-
-}
-
-using namespace std;
-
-namespace {
 
 /// e.g. id = "--threads", value = "4"
 struct Option {
@@ -46,7 +42,7 @@ struct Option {
 };
 
 /// Command-line options
-map<string, PrimeCountOptions> cmdOptions;
+std::map<string, PrimeCountOptions> cmdOptions;
 
 void initCmdOptions()
 {
@@ -92,8 +88,6 @@ Option makeOption(const string& str)
   return option;
 }
 
-} // end namespace
-
 PrimeCountSettings processOptions(int argc, char** argv)
 {
   // skip program name in argv[0]
@@ -114,16 +108,18 @@ PrimeCountSettings processOptions(int argc, char** argv)
         case OPTION_NTHPRIME:   pcs.option = OPTION_NTHPRIME; break;
         case OPTION_NUMBER:     pcs.x = option.getValue<int64_t>(); break;
         case OPTION_THREADS:    pcs.threads = option.getValue<int>(); break;
-        case OPTION_HELP:       primecount::help(); break;
-        case OPTION_TEST:       primecount::test(); break;
-        case OPTION_VERSION:    primecount::version(); break;
+        case OPTION_HELP:       help(); break;
+        case OPTION_TEST:       test(); break;
+        case OPTION_VERSION:    version(); break;
       }
     }
-  } catch (exception&) {
-    primecount::help();
+  } catch (std::exception&) {
+    help();
   }
   if (pcs.x < 0)
-    primecount::help();
+    help();
 
   return pcs;
 }
+
+} // namespace primecount

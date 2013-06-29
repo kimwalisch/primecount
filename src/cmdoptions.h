@@ -14,7 +14,10 @@
 #include <stdint.h>
 #include <vector>
 
-enum PrimeCountOptions {
+namespace primecount {
+
+enum PrimeCountOptions
+{
   OPTION_HELP,
   OPTION_LEGENDRE,
   OPTION_LEHMER,
@@ -42,5 +45,7 @@ struct PrimeCountSettings
 };
 
 PrimeCountSettings processOptions(int, char**);
+
+} // namespace primecount
 
 #endif
