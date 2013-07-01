@@ -18,20 +18,6 @@ LIBDIR   := lib
 OBJDIR   := obj
 SRCDIR   := src
 
-PRIMECOUNT_OBJECTS := \
-  cmdoptions.o \
-  help.o \
-  Li.o \
-  nth_prime.o \
-  primecount.o \
-  pi_primesieve.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  pi_lehmer.o \
-  pi.o \
-  phi.o \
-  test.o
-
 LIBPRIMECOUNT_OBJECTS := \
   Li.o \
   nth_prime.o \
@@ -41,6 +27,13 @@ LIBPRIMECOUNT_OBJECTS := \
   pi_lehmer.o \
   pi.o \
   phi.o
+
+PRIMECOUNT_OBJECTS := \
+  $(LIBPRIMECOUNT_OBJECTS) \
+  cmdoptions.o \
+  help.o \
+  primecount.o \
+  test.o
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
