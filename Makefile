@@ -3,18 +3,19 @@
 #
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
-# Created:         9 June 2013
-# Last modified:   27 June 2013
+# Created:         09 June 2013
+# Last modified:   01 July 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
 
+TARGET   := primecount
 CXX      := c++
 CXXFLAGS := -O2
-TARGET   := primecount
 BINDIR   := bin
-LIBDIR   := lib
 INCDIR   := include
+LIBDIR   := lib
+OBJDIR   := obj
 SRCDIR   := src
 
 PRIMECOUNT_OBJECTS := \
@@ -39,16 +40,12 @@ LIBPRIMECOUNT_OBJECTS := \
   pi_legendre.o \
   pi_lehmer.o \
   pi.o \
-  phi.o \
-  test.o
+  phi.o
 
 PRIMECOUNT_HEADERS := \
   $(INCDIR)/primecount.h \
-  $(SRCDIR)/phi.h \
-  $(SRCDIR)/pi_bsearch.h \
-  $(SRCDIR)/cmdoptions.h \
-  $(SRCDIR)/ExpressionParser.h \
-  $(SRCDIR)/isqrt.h
+  $(wildcard \
+    $(SRCDIR)/*.h)
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -62,12 +59,14 @@ NO_OUTPUT := $(NO_STDOUT) $(NO_STDERR)
 # Find the compiler's OpenMP flag
 #-----------------------------------------------------------------------------
 
+OPENMP_PROGRAM := '\#include <omp.h>\n int main() { return _OPENMP; }'
+
 is-openmp = $(shell command -v $(CXX) $(NO_OUTPUT) && \
-                    echo 'int main() { return _OPENMP; }' | \
+                    printf $(OPENMP_PROGRAM) | \
                     $(CXX) $(CXXFLAGS) $1 -xc++ -c -o /dev/null - $(NO_STDERR) && \
                     echo successfully compiled!)
 
-ifeq ($(call is-openmp),)
+ifeq ($(call is-openmp,),)
   ifneq ($(call is-openmp,-openmp),)
     CXXFLAGS += -openmp
   else
@@ -91,8 +90,8 @@ ifneq ($(shell uname | grep -i mingw),)
 endif
 
 #-----------------------------------------------------------------------------
-# `make`            -> libprimecount.a
-# `make SHARED=yes` -> libprimecount.(so|dylib)
+# make            -> libprimecount.a
+# make SHARED=yes -> libprimecount.(so|dylib)
 #-----------------------------------------------------------------------------
 
 ifeq ($(SHARED),)
@@ -111,7 +110,7 @@ else
 endif
 
 #-----------------------------------------------------------------------------
-# By default build command-line programs and libprimecount
+# Default targets
 #-----------------------------------------------------------------------------
 
 .PHONY: all
@@ -119,44 +118,56 @@ endif
 all: bin lib
 
 #-----------------------------------------------------------------------------
-# Build the command-line programs
+# Create and clean output directories
 #-----------------------------------------------------------------------------
 
-.PHONY: bin bin_dir bin_obj
+.PHONY: make_dir clean
 
-bin: bin_dir bin_obj
+make_dir:
+	@mkdir -p $(BINDIR) $(LIBDIR) $(OBJDIR)
 
-bin_dir:
-	@mkdir -p $(BINDIR)
+clean:
+	rm -rf $(BINDIR) $(LIBDIR) $(OBJDIR)
 
-bin_obj: $(addprefix $(BINDIR)/, $(PRIMECOUNT_OBJECTS))
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
+#-----------------------------------------------------------------------------
+# Compilation rules
+#-----------------------------------------------------------------------------
 
-$(BINDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+
+$(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
+	$(CXX) $(CXXFLAGS) $(FPIC) -I$(INCDIR) -c $< -o $@
+
+#-----------------------------------------------------------------------------
+# Build the command-line program
+#-----------------------------------------------------------------------------
+
+.PHONY: bin bin_obj
+
+bin: make_dir bin_obj
+
+bin_obj: $(addprefix $(OBJDIR)/, $(PRIMECOUNT_OBJECTS))
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
 
 #-----------------------------------------------------------------------------
 # Build libprimecount
 #-----------------------------------------------------------------------------
 
-LIB_CXXFLAGS := $(strip $(CXXFLAGS) $(FPIC))
+LIB_OBJECTS = $(addprefix \
+                $(if $(FPIC),$(LIBDIR)/,$(OBJDIR)/), \
+                  $(LIBPRIMECOUNT_OBJECTS))
 
-.PHONY: lib lib_dir lib_obj
+.PHONY: lib lib_obj
 
-lib: lib_dir lib_obj
+lib: make_dir lib_obj
 
-lib_dir:
-	@mkdir -p $(LIBDIR)
-
-lib_obj: $(addprefix $(LIBDIR)/, $(LIBPRIMECOUNT_OBJECTS))
+lib_obj: $(LIB_OBJECTS)
 ifneq ($(SHARED),)
-	$(CXX) $(LIB_CXXFLAGS) $(SOFLAG) -o $(LIBDIR)/$(LIBRARY) $^
+	$(CXX) $(strip $(CXXFLAGS) $(FPIC) $(SOFLAG)) -o $(LIBDIR)/$(LIBRARY) $^
 else
 	ar rcs $(LIBDIR)/$(LIBRARY) $^
 endif
-
-$(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
 # `make check` runs correctness tests
@@ -168,13 +179,10 @@ check test: bin
 	$(BINDIR)/./$(TARGET) --test
 
 #-----------------------------------------------------------------------------
-# Common targets (clean, install, uninstall)
+# Install & uninstall targets
 #-----------------------------------------------------------------------------
 
-.PHONY: clean install uninstall
-
-clean:
-	rm -rf $(BINDIR) $(LIBDIR)
+.PHONY: install uninstall
 
 # requires sudo privileges
 install:
@@ -227,8 +235,7 @@ help:
 	@echo "make CXX=icpc CXXFLAGS=\"-O2 -openmp\"     Specify a custom C++ compiler, here icpc"
 	@echo "make check                               Test primecount for correctness"
 	@echo "make clean                               Clean the output directories (bin, lib, ...)"
-	@echo "make lib                                 Build a static libprimecount library (using c++)"
-	@echo "make lib SHARED=yes                      Build a shared libprimecount library (using c++)"
+	@echo "make SHARED=yes                          Build a shared libprimecount library (using c++)"
 	@echo "sudo make install                        Install primecount and libprimecount to /usr/local or /usr"
 	@echo "sudo make install PREFIX=/path           Specify a custom installation path"
 	@echo "sudo make uninstall                      Completely remove primecount and libprimecount"
