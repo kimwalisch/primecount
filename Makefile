@@ -102,7 +102,9 @@ endif
 # Default targets
 #-----------------------------------------------------------------------------
 
-.PHONY: all
+.PHONY: default all
+
+default: bin static
 
 all: bin lib
 
@@ -220,13 +222,12 @@ help:
 	@echo ----------------------------------------------
 	@echo ---------- primecount build options ----------
 	@echo ----------------------------------------------
-	@echo "make                                     Build primecount and static & shared libprimecount"
-	@echo "make CXX=icpc CXXFLAGS=\"-O2 -openmp\"     Specify a custom C++ compiler, here icpc"
-	@echo "make static                              Build only static libprimecount"
-	@echo "make shared                              Build only shared libprimecount"
-	@echo "make check                               Run integration tests"
-	@echo "sudo make install                        Install primecount and libprimecount to /usr[/local]"
-	@echo "sudo make install PREFIX=/path           Specify a custom installation path"
-	@echo "sudo make uninstall                      Completely remove primecount and libprimecount"
-	@echo "make clean                               Clean the output directories (bin, lib, ...)"
-	@echo "make help                                Print this help menu"
+	@echo "make                                    Build primecount and static libprimecount"
+	@echo "make shared                             Build shared libprimecount, requires shared libprimesieve"
+	@echo "make CXX=icpc CXXFLAGS=\"-O2 -openmp\"    Specify a custom C++ compiler, here icpc"
+	@echo "make check                              Run integration tests"
+	@echo "sudo make install                       Install primecount and libprimecount to /usr[/local]"
+	@echo "sudo make install PREFIX=/path          Specify a custom installation path"
+	@echo "sudo make uninstall                     Completely remove primecount and libprimecount"
+	@echo "make clean                              Clean the output directories (bin, lib, ...)"
+	@echo "make help                               Print this help menu"
