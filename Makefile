@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         09 June 2013
-# Last modified:   01 July 2013
+# Last modified:   03 July 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -16,29 +16,29 @@ BINDIR   := bin
 INCDIR   := include
 LIBDIR   := lib
 OBJDIR   := obj
+FPICDIR  := obj/fpic
 SRCDIR   := src
 
-LIBPRIMECOUNT_OBJECTS := \
-  Li.o \
-  nth_prime.o \
-  pi_primesieve.o \
-  pi_meissel.o \
-  pi_legendre.o \
-  pi_lehmer.o \
-  pi.o \
-  phi.o
+LIB_OBJECTS := \
+  $(OBJDIR)/Li.o \
+  $(OBJDIR)/nth_prime.o \
+  $(OBJDIR)/pi_primesieve.o \
+  $(OBJDIR)/pi_meissel.o \
+  $(OBJDIR)/pi_legendre.o \
+  $(OBJDIR)/pi_lehmer.o \
+  $(OBJDIR)/pi.o \
+  $(OBJDIR)/phi.o
 
-PRIMECOUNT_OBJECTS := \
-  $(LIBPRIMECOUNT_OBJECTS) \
-  cmdoptions.o \
-  help.o \
-  primecount.o \
-  test.o
+BIN_OBJECTS := \
+  $(LIB_OBJECTS) \
+  $(OBJDIR)/cmdoptions.o \
+  $(OBJDIR)/help.o \
+  $(OBJDIR)/primecount.o \
+  $(OBJDIR)/test.o
 
-PRIMECOUNT_HEADERS := \
+HEADERS := \
   $(INCDIR)/primecount.h \
-  $(wildcard \
-    $(SRCDIR)/*.h)
+  $(wildcard $(SRCDIR)/*.h)
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features
@@ -83,22 +83,18 @@ ifneq ($(shell uname | grep -i mingw),)
 endif
 
 #-----------------------------------------------------------------------------
-# make            -> libprimecount.a
-# make SHARED=yes -> libprimecount.(so|dylib)
+# make        -> libprimesieve.a
+# make shared -> libprimesieve.(so|dylib)
 #-----------------------------------------------------------------------------
 
-ifeq ($(SHARED),)
-  LIBRARY := lib$(TARGET).a
+ifneq ($(shell uname | grep -i darwin),)
+  SOFLAG := -dynamiclib
+  SHARED_LIBRARY := lib$(TARGET).dylib
 else
-  ifneq ($(shell uname | grep -i darwin),)
-    SOFLAG := -dynamiclib
-    LIBRARY := lib$(TARGET).dylib
-  else
-    SOFLAG := -shared
-    LIBRARY := lib$(TARGET).so
-    ifeq ($(shell uname | egrep -i 'mingw|cygwin'),)
-      FPIC := -fPIC
-    endif
+  SOFLAG := -shared
+  SHARED_LIBRARY := lib$(TARGET).so
+  ifeq ($(shell uname | egrep -i 'mingw|cygwin'),)
+    FPIC := -fPIC
   endif
 endif
 
@@ -117,19 +113,19 @@ all: bin lib
 .PHONY: make_dir clean
 
 make_dir:
-	@mkdir -p $(BINDIR) $(LIBDIR) $(OBJDIR)
+	@mkdir -p $(BINDIR) $(LIBDIR) $(OBJDIR) $(FPICDIR)
 
 clean:
-	rm -rf $(BINDIR) $(LIBDIR) $(OBJDIR)
+	rm -rf $(BINDIR) $(LIBDIR) $(OBJDIR) $(FPICDIR)
 
 #-----------------------------------------------------------------------------
 # Compilation rules
 #-----------------------------------------------------------------------------
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-$(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
+$(FPICDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(FPIC) -I$(INCDIR) -c $< -o $@
 
 #-----------------------------------------------------------------------------
@@ -140,30 +136,32 @@ $(LIBDIR)/%.o: $(SRCDIR)/%.cpp $(PRIMECOUNT_HEADERS)
 
 bin: make_dir bin_obj
 
-bin_obj: $(addprefix $(OBJDIR)/, $(PRIMECOUNT_OBJECTS))
+bin_obj: $(BIN_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(TARGET) $^ -lprimesieve
 
 #-----------------------------------------------------------------------------
 # Build libprimecount
 #-----------------------------------------------------------------------------
 
-LIB_OBJECTS = $(addprefix \
-                $(if $(FPIC),$(LIBDIR)/,$(OBJDIR)/), \
-                  $(LIBPRIMECOUNT_OBJECTS))
+SHARED_OBJECTS = $(if $(FPIC), \
+                   $(subst $(OBJDIR),$(FPICDIR),$(LIB_OBJECTS)), \
+                     $(LIB_OBJECTS))
 
-.PHONY: lib lib_obj
+.PHONY: lib static shared static_obj shared_obj
 
-lib: make_dir lib_obj
+lib: static shared
 
-lib_obj: $(LIB_OBJECTS)
-ifneq ($(SHARED),)
-	$(CXX) $(strip $(CXXFLAGS) $(FPIC) $(SOFLAG)) -o $(LIBDIR)/$(LIBRARY) $^
-else
-	ar rcs $(LIBDIR)/$(LIBRARY) $^
-endif
+static: make_dir static_obj
+shared: make_dir shared_obj
+
+static_obj: $(LIB_OBJECTS)
+	$(AR) rcs $(LIBDIR)/lib$(TARGET).a $^
+
+shared_obj: $(SHARED_OBJECTS)
+	$(CXX) $(strip $(CXXFLAGS) $(FPIC) $(SOFLAG)) -o $(LIBDIR)/$(SHARED_LIBRARY) $^ -lprimesieve
 
 #-----------------------------------------------------------------------------
-# `make check` runs correctness tests
+# Run integration tests
 #-----------------------------------------------------------------------------
 
 .PHONY: check test
@@ -177,7 +175,6 @@ check test: bin
 
 .PHONY: install uninstall
 
-# requires sudo privileges
 install:
 ifneq ($(wildcard $(BINDIR)/$(TARGET)*),)
 	@mkdir -p $(PREFIX)/bin
@@ -194,7 +191,6 @@ ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
   endif
 endif
 
-# requires sudo privileges
 uninstall:
 ifneq ($(wildcard $(PREFIX)/bin/$(TARGET)*),)
 	rm -f $(PREFIX)/bin/$(TARGET)
@@ -205,7 +201,7 @@ ifneq ($(wildcard $(PREFIX)/include/$(TARGET)),)
 endif
 ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).*),)
   ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).so),)
-		rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).so)
+		rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
     ifneq ($(shell command -v ldconfig $(NO_STDERR)),)
 		ldconfig $(PREFIX)/lib
     endif
@@ -224,12 +220,13 @@ help:
 	@echo ----------------------------------------------
 	@echo ---------- primecount build options ----------
 	@echo ----------------------------------------------
-	@echo "make                                     Build the primecount console application (using c++)"
+	@echo "make                                     Build primecount and static & shared libprimecount"
 	@echo "make CXX=icpc CXXFLAGS=\"-O2 -openmp\"     Specify a custom C++ compiler, here icpc"
-	@echo "make check                               Test primecount for correctness"
-	@echo "make clean                               Clean the output directories (bin, lib, ...)"
-	@echo "make SHARED=yes                          Build a shared libprimecount library (using c++)"
-	@echo "sudo make install                        Install primecount and libprimecount to /usr/local or /usr"
+	@echo "make static                              Build only static libprimecount"
+	@echo "make shared                              Build only shared libprimecount"
+	@echo "make check                               Run integration tests"
+	@echo "sudo make install                        Install primecount and libprimecount to /usr[/local]"
 	@echo "sudo make install PREFIX=/path           Specify a custom installation path"
 	@echo "sudo make uninstall                      Completely remove primecount and libprimecount"
+	@echo "make clean                               Clean the output directories (bin, lib, ...)"
 	@echo "make help                                Print this help menu"
