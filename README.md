@@ -17,5 +17,5 @@ $ sudo make install
 ```
 $ primecount 10^13
 $ primecount 10^14 --meissel --threads=2
-$ primecount 78498 --nth_prime
+$ primecount 78498 --nthprime
 ```
