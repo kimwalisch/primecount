@@ -16,7 +16,7 @@
 
 namespace primecount {
 
-enum PrimeCountOptions
+enum OptionValues
 {
   OPTION_HELP,
   OPTION_LEGENDRE,
@@ -32,19 +32,19 @@ enum PrimeCountOptions
   OPTION_VERSION
 };
 
-struct PrimeCountSettings
+struct PrimeCountOptions
 {
   int64_t x;
   int64_t option;
   int threads;
-  PrimeCountSettings() :
+  PrimeCountOptions() :
     x(-1),
     option(OPTION_LEHMER),
     threads(primecount::MAX_THREADS)
   { }
 };
 
-PrimeCountSettings processOptions(int, char**);
+PrimeCountOptions parseOptions(int, char**);
 
 } // namespace primecount
 

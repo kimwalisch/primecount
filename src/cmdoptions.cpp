@@ -42,30 +42,30 @@ struct Option {
 };
 
 /// Command-line options
-std::map<string, PrimeCountOptions> cmdOptions;
+std::map<string, OptionValues> optionMap;
 
-void initCmdOptions()
+void initOptionMap()
 {
-  cmdOptions["-h"]           = OPTION_HELP;
-  cmdOptions["--help"]       = OPTION_HELP;
-  cmdOptions["-g"]           = OPTION_LEGENDRE;
-  cmdOptions["--legendre"]   = OPTION_LEGENDRE;
-  cmdOptions["-l"]           = OPTION_LEHMER;
-  cmdOptions["--lehmer"]     = OPTION_LEHMER;
-  cmdOptions["--Li"]         = OPTION_LI;
-  cmdOptions["--Li_inverse"] = OPTION_LIINV;
-  cmdOptions["-m"]           = OPTION_MEISSEL;
-  cmdOptions["--meissel"]    = OPTION_MEISSEL;
-  cmdOptions["-n"]           = OPTION_NTHPRIME;
-  cmdOptions["--nth_prime"]  = OPTION_NTHPRIME;
-  cmdOptions["--number"]     = OPTION_NUMBER;
-  cmdOptions["-p"]           = OPTION_PRIMESIEVE;
-  cmdOptions["--primesieve"] = OPTION_PRIMESIEVE;
-  cmdOptions["--test"]       = OPTION_TEST;
-  cmdOptions["-t"]           = OPTION_THREADS;
-  cmdOptions["--threads"]    = OPTION_THREADS;
-  cmdOptions["-v"]           = OPTION_VERSION;
-  cmdOptions["--version"]    = OPTION_VERSION;
+  optionMap["-h"]           = OPTION_HELP;
+  optionMap["--help"]       = OPTION_HELP;
+  optionMap["-g"]           = OPTION_LEGENDRE;
+  optionMap["--legendre"]   = OPTION_LEGENDRE;
+  optionMap["-l"]           = OPTION_LEHMER;
+  optionMap["--lehmer"]     = OPTION_LEHMER;
+  optionMap["--Li"]         = OPTION_LI;
+  optionMap["--Li_inverse"] = OPTION_LIINV;
+  optionMap["-m"]           = OPTION_MEISSEL;
+  optionMap["--meissel"]    = OPTION_MEISSEL;
+  optionMap["-n"]           = OPTION_NTHPRIME;
+  optionMap["--nthprime"]   = OPTION_NTHPRIME;
+  optionMap["--number"]     = OPTION_NUMBER;
+  optionMap["-p"]           = OPTION_PRIMESIEVE;
+  optionMap["--primesieve"] = OPTION_PRIMESIEVE;
+  optionMap["--test"]       = OPTION_TEST;
+  optionMap["-t"]           = OPTION_THREADS;
+  optionMap["--threads"]    = OPTION_THREADS;
+  optionMap["-v"]           = OPTION_VERSION;
+  optionMap["--version"]    = OPTION_VERSION;
 }
 
 /// e.g. "--threads=8" -> { id = "--threads", value = "8" }
@@ -82,32 +82,32 @@ Option makeOption(const string& str)
   }
   if (option.id.empty() && !option.value.empty())
     option.id = "--number";
-  if (cmdOptions.count(option.id) == 0)
+  if (optionMap.count(option.id) == 0)
     option.id = "--help";
 
   return option;
 }
 
-PrimeCountSettings processOptions(int argc, char** argv)
+PrimeCountOptions parseOptions(int argc, char** argv)
 {
   // skip program name in argv[0]
   argc--; argv++;
-  PrimeCountSettings pcs;
-  initCmdOptions();
+  PrimeCountOptions pco;
+  initOptionMap();
   try {
     for (int i = 0; i < argc; i++) {
       Option option = makeOption(argv[i]);
 
-      switch (cmdOptions[option.id]) {
-        case OPTION_PRIMESIEVE: pcs.option = OPTION_PRIMESIEVE; break;
-        case OPTION_LEGENDRE:   pcs.option = OPTION_LEGENDRE; break;
-        case OPTION_LI:         pcs.option = OPTION_LI; break;
-        case OPTION_LIINV:      pcs.option = OPTION_LIINV; break;
-        case OPTION_LEHMER:     pcs.option = OPTION_LEHMER; break;
-        case OPTION_MEISSEL:    pcs.option = OPTION_MEISSEL; break;
-        case OPTION_NTHPRIME:   pcs.option = OPTION_NTHPRIME; break;
-        case OPTION_NUMBER:     pcs.x = option.getValue<int64_t>(); break;
-        case OPTION_THREADS:    pcs.threads = option.getValue<int>(); break;
+      switch (optionMap[option.id]) {
+        case OPTION_PRIMESIEVE: pco.option = OPTION_PRIMESIEVE; break;
+        case OPTION_LEGENDRE:   pco.option = OPTION_LEGENDRE; break;
+        case OPTION_LI:         pco.option = OPTION_LI; break;
+        case OPTION_LIINV:      pco.option = OPTION_LIINV; break;
+        case OPTION_LEHMER:     pco.option = OPTION_LEHMER; break;
+        case OPTION_MEISSEL:    pco.option = OPTION_MEISSEL; break;
+        case OPTION_NTHPRIME:   pco.option = OPTION_NTHPRIME; break;
+        case OPTION_NUMBER:     pco.x = option.getValue<int64_t>(); break;
+        case OPTION_THREADS:    pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:       help(); break;
         case OPTION_TEST:       test(); break;
         case OPTION_VERSION:    version(); break;
@@ -116,10 +116,10 @@ PrimeCountSettings processOptions(int argc, char** argv)
   } catch (std::exception&) {
     help();
   }
-  if (pcs.x < 0)
+  if (pco.x < 0)
     help();
 
-  return pcs;
+  return pco;
 }
 
 } // namespace primecount

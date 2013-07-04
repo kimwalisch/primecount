@@ -28,7 +28,7 @@ const string helpMenu(
   "         --Li            Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse    Approximate the nth prime using Li^-1(x)\n"
   "  -m,    --meissel       Count primes using Meissel's formula\n"
-  "  -n,    --nth_prime     Calculate the nth prime\n"
+  "  -n,    --nthprime      Calculate the nth prime\n"
   "  -p,    --primesieve    Count primes using the sieve of Eratosthenes\n"
   "         --test          Run various correctness tests and exit\n"
   "  -t<N>, --threads=<N>   Set the number of threads, 1 <= N <= CPU cores\n"
@@ -37,7 +37,7 @@ const string helpMenu(
   "\n"
   "Examples:\n"
   "  primecount 10**13\n"
-  "  primecount 10**13 --nth_prime"
+  "  primecount 10**13 --nthprime"
 );
 
 const string versionInfo(
