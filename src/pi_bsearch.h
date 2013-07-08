@@ -15,11 +15,15 @@
 
 namespace primecount {
 
+/// Given a std::vector with the first n primes and x <= nth prime
+/// calculate the number of primes below x using binary search.
+/// Run time: O(log x)
+///
 template <class ForwardIterator, typename T>
-inline T pi_bsearch(ForwardIterator first, ForwardIterator last, const T& value)
+inline T pi_bsearch(ForwardIterator first, ForwardIterator last, const T& x)
 {
   return static_cast<T>(
-      std::distance(first, std::upper_bound(first, last, value)));
+      std::distance(first, std::upper_bound(first, last, x)));
 }
 
 } // namespace primecount
