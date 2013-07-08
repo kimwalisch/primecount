@@ -15,7 +15,10 @@
 
 namespace primecount {
 
-int64_t pi_meissel(int64_t x, int threads /* = MAX_THREADS */)
+/// Calculate the number of primes below x using Meissel's formula.
+/// Run time: O(x/(log x)^3) operations, O(x^0.5/log x) space.
+///
+int64_t pi_meissel(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
