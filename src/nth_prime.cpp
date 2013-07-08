@@ -15,12 +15,11 @@
 
 namespace primecount {
 
-/// This function calculates the nth prime using a combination of an
-/// efficient implementation of the prime counting function pi(x)
-/// (currently Lehmer's method) and an implementation of the segmented
-/// sieve of Eratosthenes (the author's primesieve library).
+/// Calculate the nth prime using a combination of an efficient prime
+/// counting function implementation and the sieve of Eratosthenes.
+/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
 ///
-int64_t nth_prime(int64_t n, int threads /* = MAX_THREADS */)
+int64_t nth_prime(int64_t n, int threads)
 {
   if (n < 1)
     return 0;
