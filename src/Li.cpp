@@ -20,7 +20,7 @@ namespace {
 
 /// This calculates the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
-// @see http://mathworld.wolfram.com/LogarithmicIntegral.html (15)
+/// @see http://mathworld.wolfram.com/LogarithmicIntegral.html (15)
 ///
 long double li(long double x)
 {
