@@ -18,7 +18,7 @@ using namespace std;
 
 namespace {
 
-/// This calculates the logarithmic integral using Ramanujan's fast
+/// Calculate the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
 /// @see http://mathworld.wolfram.com/LogarithmicIntegral.html (15)
 ///
@@ -53,7 +53,7 @@ long double li(long double x)
 
 namespace primecount {
 
-/// This calculates the offset logarithmic integral which is a very
+/// Calculate the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x.
 /// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
@@ -67,8 +67,8 @@ int64_t Li(int64_t x)
       li(n) - /* li(2) = */ 1.04516);
 }
 
-/// This calculates the inverse logarithmic integral Li^-1(x) which is
-/// a very accurate approximation of the nth prime.
+/// Calculate the inverse logarithmic integral Li^-1(x) which is a
+/// very accurate approximation of the nth prime.
 /// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x)
