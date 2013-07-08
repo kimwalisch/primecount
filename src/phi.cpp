@@ -108,8 +108,9 @@ private:
   }
 };
 
-/// This calculates the Legendre-sum phi(x, a) which is the count of
-/// numbers <= x that are coprime to the first a primes.
+/// Calculate the Legendre-sum phi(x, a) which is the count of
+/// numbers <= x that are not divisible by any of the first
+/// a primes (i.e. coprime to the first a primes).
 ///
 int64_t phi(int64_t x, int64_t a, int threads)
 {
