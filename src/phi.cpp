@@ -108,9 +108,9 @@ private:
   }
 };
 
-/// Calculate the Legendre-sum phi(x, a) which is the count of
-/// numbers <= x that are not divisible by any of the first
-/// a primes (i.e. coprime to the first a primes).
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
 ///
 int64_t phi(int64_t x, int64_t a, int threads)
 {
@@ -137,8 +137,11 @@ int64_t phi(int64_t x, int64_t a, int threads)
   return sum;
 }
 
-/// Sometimes called P2(x, a)
-int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
+/// 2nd partial sieve function.
+/// P2(x, a) counts the numbers <= x that have exactly 2 prime
+/// factors which are all greater than the a-th prime.
+///
+int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
 {
   std::vector<int32_t> primes;
   std::vector<int64_t> counts;
@@ -176,8 +179,11 @@ int64_t phi2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   return sum;
 }
 
-/// Sometimes called P3(x, a)
-int64_t phi3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
+/// 3rd partial sieve function.
+/// P3(x, a) counts the numbers <= x that have exactly 3 prime
+/// factors which are all greater than the a-th prime.
+///
+int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
 {
   std::vector<int32_t> primes;
   PrimeSieve ps;
