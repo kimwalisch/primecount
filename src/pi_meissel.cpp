@@ -29,7 +29,7 @@ int64_t pi_meissel(int64_t x, int threads)
   int64_t sum = 0;
 
   sum += phi(x, a, threads);
-  sum += phi2(x, a, b, isqrt(x), threads);
+  sum += P2(x, a, b, isqrt(x), threads);
 
   return sum;
 }
