@@ -18,6 +18,7 @@
 
 #ifdef _OPENMP
   #include <omp.h>
+  #include "to_omp_threads.h"
 #endif
 
 /// Results of phi(x, a) are cached for x < PHI_CACHE_LIMIT
@@ -126,8 +127,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   int64_t sum = x - a + iters;
 
 #ifdef _OPENMP
-  if (threads == MAX_THREADS)
-    threads = omp_get_max_threads();
+  threads = to_omp_threads(threads);
   #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
       num_threads(threads) schedule(dynamic, 16)
 #endif
@@ -159,8 +159,7 @@ int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   // When finished pi(x / primes[i]) can quickly be calculated
   // by backwards summing up the counts.
 #ifdef _OPENMP
-  if (threads == MAX_THREADS)
-    threads = omp_get_max_threads();
+  threads = to_omp_threads(threads);
   #pragma omp parallel for private(ps) schedule(dynamic) num_threads(threads)
 #endif
   for (int64_t i = size; i > a; i--)
@@ -191,8 +190,7 @@ int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
   int64_t sum = 0;
 
 #ifdef _OPENMP
-  if (threads == MAX_THREADS)
-    threads = omp_get_max_threads();
+  threads = to_omp_threads(threads);
   #pragma omp parallel for reduction(+: sum) schedule(dynamic) num_threads(threads)
 #endif
   for (int64_t i = a + 1; i <= c; i++)
