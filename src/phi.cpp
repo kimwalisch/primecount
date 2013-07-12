@@ -28,7 +28,7 @@
 
 /// Avoids slow 64-bit division if possible
 #define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
-  ? static_cast<uint32_t>(x) / (y) : (x) / (y))
+    ? static_cast<uint32_t>(x) / (y) : (x) / (y))
 
 
 namespace primecount {
@@ -141,20 +141,19 @@ int64_t phi(int64_t x, int64_t a, int threads)
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors which are all greater than the a-th prime.
 ///
-int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
+int64_t P2(int64_t x, int64_t a, int64_t b, int threads)
 {
-  std::vector<int32_t> primes;
-  std::vector<int64_t> counts;
-  PrimeSieve ps;
-  ps.generatePrimes(0, pb, &primes);
-  counts.resize( primes.size() );
-  int64_t size = static_cast<int64_t>( primes.size() );
-
   int64_t sum = (b + a - 2) * (b - a + 1) / 2;
   int64_t pix = 0;
+  std::vector<int32_t> primes;
+  std::vector<int64_t> counts;
+
+  PrimeSieve ps;
+  ps.generate_N_Primes(b, &primes);
+  counts.resize(primes.size());
 
   // This uses a clever trick, instead of calculating
-  // pi(x / primes[i]) for a <= i < size it only counts the primes
+  // pi(x / primes[i]) for a < i <= b it only counts the primes
   // between adjacent values [x / primes[i], x / primes[i - 1]].
   // When finished pi(x / primes[i]) can quickly be calculated
   // by backwards summing up the counts.
@@ -162,14 +161,14 @@ int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
   threads = to_omp_threads(threads);
   #pragma omp parallel for private(ps) schedule(dynamic) num_threads(threads)
 #endif
-  for (int64_t i = size; i > a; i--)
+  for (int64_t i = b; i > a; i--)
   {
-    int64_t x2 = (i < size) ? x / primes[i] : 0;
+    int64_t x2 = (i != b) ? x / primes[i] + 1 : 0;
     int64_t x3 = x / primes[i - 1];
-    counts[i - 1] = ps.countPrimes(x2 + 1, x3);
+    counts[i - 1] = ps.countPrimes(x2, x3);
   }
 
-  for (int64_t i = size; i > a; i--)
+  for (int64_t i = b; i > a; i--)
   {
     pix += counts[i - 1];
     sum -= pix;
@@ -182,11 +181,11 @@ int64_t P2(int64_t x, int64_t a, int64_t b, int64_t pb, int threads)
 /// P3(x, a) counts the numbers <= x that have exactly 3 prime
 /// factors which are all greater than the a-th prime.
 ///
-int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
+int64_t P3(int64_t x, int64_t a, int64_t b, int64_t c, int threads)
 {
   std::vector<int32_t> primes;
   PrimeSieve ps;
-  ps.generatePrimes(0, pb, &primes);
+  ps.generate_N_Primes(b, &primes);
   int64_t sum = 0;
 
 #ifdef _OPENMP
@@ -195,9 +194,9 @@ int64_t P3(int64_t x, int64_t a, int64_t c, int64_t pb, int threads)
 #endif
   for (int64_t i = a + 1; i <= c; i++)
   {
-    int64_t sum2 = 0;
     int64_t x2 = x / primes[i - 1];
     int64_t bi = pi_bsearch(primes.begin(), primes.end(), isqrt(x2));
+    int64_t sum2 = 0;
 
     for (int64_t j = i; j <= bi; j++)
       sum2 -= pi_bsearch(primes.begin(), primes.end(), x2 / primes[j - 1]) - (j - 1);

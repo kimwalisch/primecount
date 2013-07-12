@@ -41,12 +41,12 @@ int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
 int64_t pi_legendre(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using Meissel's formula.
-/// Run time: O(x/(log x)^3) operations, O(x^0.5/log x) space.
+/// Run time: O(x/(log x)^3) operations, O(x^0.5) space.
 ///
 int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using Lehmer's formula.
-/// Run time: O(x/(log x)^4) operations, O(x^0.5/log x) space.
+/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
 ///
 int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 

@@ -16,7 +16,7 @@
 namespace primecount {
 
 /// Calculate the number of primes below x using Lehmer's formula.
-/// Run time: O(x/(log x)^4) operations, O(x^0.5/log x) space.
+/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
 ///
 int64_t pi_lehmer(int64_t x, int threads)
 {
@@ -30,8 +30,8 @@ int64_t pi_lehmer(int64_t x, int threads)
   int64_t sum = 0;
 
   sum += phi(x, a, threads);
-  sum += P2(x, a, b, isqrt(x), threads);
-  sum += P3(x, a, c, isqrt(x), threads);
+  sum += P2 (x, a, b, threads);
+  sum += P3 (x, a, b, c, threads);
 
   return sum;
 }
