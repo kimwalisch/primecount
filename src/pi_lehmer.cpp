@@ -8,6 +8,7 @@
 ///
 
 #include "isqrt.h"
+#include "Pk.h"
 #include "phi.h"
 
 #include <primecount.h>
