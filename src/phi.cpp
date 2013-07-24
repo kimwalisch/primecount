@@ -93,7 +93,7 @@ public:
 private:
   /// First a primes needed to calculate phi(x, a)
   const std::vector<int32_t>& primes_;
-  /// Cache of phi(x, a) values with x < PHI_CACHE_LIMIT
+  /// Cache of phi(x, a) results with x < PHI_CACHE_LIMIT
   std::vector<std::vector<int16_t> > cache_;
 
   bool validIndexes(int64_t a2, int64_t x2) const
