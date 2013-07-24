@@ -4,13 +4,11 @@ primecount is a command-line program and C++ library that counts the number of p
 
 ### Formulas
 
-{|
-|  Legendre's Formula  ||  ![Legendre's Formula](images/pi_legendre.png)
-| -
-|  Meissel's Formula   ||  ![Meissel's Formula](images/pi_meissel.png)
-| -
-|  Lehmer's Formula    ||  ![Lehmer's Formula](images/pi_lehmer.png)
-|}
+|                    |                                               |
+| ------------------ | --------------------------------------------- |
+| Legendre's Formula | ![Legendre's Formula](images/pi_legendre.png) |
+| Meissel's Formula  | ![Meissel's Formula](images/pi_meissel.png)   |
+| Lehmer's Formula   | ![Lehmer's Formula](images/pi_lehmer.png)     |
 
 ### How to build it
 primecount depends on the author's primesieve libary (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
