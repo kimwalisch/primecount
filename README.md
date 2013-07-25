@@ -69,22 +69,22 @@ Up until the early 19th century the most efficent known method for counting prim
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td></td>
+    <td>196.56s</td>
     <td>60.36s</td>
     <td>31.95s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td></td>
+    <td>1598.14s</td>
     <td>504.72s</td>
     <td>204.33s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td></td>
-    <td></td>
+    <td>NaN</td>
+    <td>NaN</td>
     <td>1475.40s</td>
   </tr>
 </table>
