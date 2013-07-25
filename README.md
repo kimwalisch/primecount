@@ -2,7 +2,7 @@ primecount
 ==========
 primecount is a command-line program and C++ library that counts the number of primes below an integer x < 2^63. primecount counts primes using efficient implementations of the prime counting function pi(x) (combinatorial methods) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All pi(x) implementations are fully parallelized using OpenMP.
 
-### Algorithms
+### Algorithms and Complexity
 
 <table>
   <tr>
@@ -18,6 +18,8 @@ primecount is a command-line program and C++ library that counts the number of p
     <td><img src="images/pi_lehmer.png"/></td>
   </tr>
 </table>
+
+Up until the 18th century the fastest known method for counting primes was the sieve of Eratosthenes which has a running time of O(x log log x). The first improvement to this bound was Legendre's formula which uses the inclusion-exclusion principle to calculate the number of primes below an integer x without enumerating them. Legendre's formula has a running time of O(x) and uses O(x^0.5) space. Meissel improved Legendre's formula by setting a=pi(x^(1/3)) and by adding the correction term P2(x, a). Meissel's formula has a running time of O(x/(log x)^3) and uses O(x^0.5/log x) space (my implementation uses O(x^0.5) space). In 1959 Lehmer found an improvement to Meissel's formula that has a running time of O(x/(log x)^4) and uses O(x^0.5/log x) space (my implementation uses O(x^0.5) space).
 
 ### Timings
 
