@@ -98,9 +98,9 @@ $ sudo make install
 
 ### Usage Examples
 ```
-$ primecount 10^13
+$ primecount 10^14
 $ primecount 10^14 --meissel --threads=2
-$ primecount 10^12 --nthprime
+$ primecount 10^14 --nthprime
 ```
 
 ### References
