@@ -1,6 +1,6 @@
 primecount
 ==========
-primecount is a command-line program and C++ library that counts the number of primes below an integer x < 2^63. primecount counts primes using efficient implementations of the prime counting function pi(x) (combinatorial methods) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All pi(x) implementations are fully parallelized using OpenMP.
+primecount is a command-line program and C++ library that counts the number of primes below an integer x < 2^63. primecount counts primes using efficient implementations of the prime counting function <img src="images/pix.png" align="absmiddle"/> (combinatorial methods) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All <img src="images/pix.png" align="absmiddle"/> implementations are fully parallelized using OpenMP.
 
 ### Algorithms and Complexity
 
@@ -19,7 +19,7 @@ primecount is a command-line program and C++ library that counts the number of p
   </tr>
 </table>
 
-Up until the 18th century the fastest known method for counting primes was the sieve of Eratosthenes which has a running time of O(x log log x). The first improvement to this bound was Legendre's formula which uses the inclusion-exclusion principle to calculate the number of primes below an integer x without enumerating them. Legendre's formula has a running time of O(x) and uses O(x^0.5) space. Meissel improved Legendre's formula by setting a=pi(x^(1/3)) and by adding the correction term P2(x, a). Meissel's formula has a running time of O(x/(log x)^3) and uses O(x^0.5/log x) space (my implementation uses O(x^0.5) space). In 1959 Lehmer found an improvement to Meissel's formula that has a running time of O(x/(log x)^4) and uses O(x^0.5/log x) space (my implementation uses O(x^0.5) space).
+Up until the early 19th century the most efficent known method for counting primes was the sieve of Eratosthenes which has a running time of <img src="images/Oxlnlnx.png" align="absmiddle"/>. The first improvement to this bound was Legendre's formula (1830) which uses the inclusion-exclusion principle to calculate the number of primes below x without enumerating the individual primes. Legendre's formula has a running time of <img src="images/Ox.png" align="absmiddle"/> operations and uses <img src="images/Osqrtx.png" align="absmiddle"/> space. Meissel (1870) improved Legendre's formula by setting <img src="images/apisqrt3x.png" align="absmiddle"/> and by adding the correction term <img src="images/P2xa.png" align="absmiddle"/>. Meissel's formula has a running time of <img src="images/Omeissel.png" align="absmiddle"/> operations and uses <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space). In 1959 Lehmer extended Meissel's formula and silghtly improved the running time to <img src="images/Olehmer.png" align="absmiddle"/> operations and <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space).
 
 ### Timings
 
