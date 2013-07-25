@@ -36,3 +36,9 @@ $ primecount 10^13
 $ primecount 10^14 --meissel --threads=2
 $ primecount 78498 --nthprime
 ```
+
+### References
+1. Hans Riesel, Prime Numbers and Computer Methods for Factorization, 2nd ed., Birkhäuser, Boston, 1994.
+2. Raymond Séroul, Programming for Mathematicians, Springer-Verlag, Berlin (2000), pp. 175-181.
+3. R. Crandall and C. Pomerance, Prime numbers: a computational perspective, 2nd ed., Springer, New York, 2005.
+4. Tomas Oliveira e Silva, "Computing pi(x): the combinatorial method", Revista do DETUA, vol. 4, no. 6, pp. 759-768, March 2006
