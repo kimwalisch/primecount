@@ -1,6 +1,6 @@
 2013-07-26  Kim Walisch  <kim.walisch@gmail.com>
 
-	Version 0.3 released.
+  Version 0.3 released.
 
   * README: Text version of README.md for offline reading.
   * README.md: Added algorithms, timings and nth prime sections.
