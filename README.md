@@ -25,7 +25,7 @@ Up until the early 19th century the most efficient known method for counting pri
 
 The most efficient known method for calculating the nth prime is a combination of the prime counting function and a prime sieve. The idea is to closely approximate the nth prime using e.g. the inverse logarithmic integral <img src="images/Li-1n.png" align="absmiddle"/> and count the primes up to this guess using the prime counting function. Once this is done one starts sieving (using e.g. the segmented sieve of Eratosthenes) at the nth prime guess until one finds the actual nth prime.
 
-The author of this software package has implemented primecount::nth_prime(n) this way. In practice most time is spend by the prime counting function so the calculation of the nth prime is about as fast as counting the primes below the nth prime.
+The author of this software package has implemented ```primecount::nth_prime(n)``` this way. In practice most time is spend by the prime counting function so the calculation of the nth prime is about as fast as counting the primes below the nth prime.
 
 ### Timings
 
@@ -98,7 +98,7 @@ The author of this software package has implemented primecount::nth_prime(n) thi
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from 2013 using a 64-bit Linux operating system. primecount was compiled using GCC 4.8 and used 8 threads for each benchmark.
 
 ### How to build it
-primecount depends on the author's primesieve library (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
+primecount depends on the author's [primesieve](https://primesieve.googlecode.com) library (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
 ```
 $ sh install_primesieve.sh
 ```
