@@ -1,5 +1,3 @@
-+ Document API in include/primecount.h
-+ Document sources in ./src
 + Try to compile with sunCC +w2
 + Do performance profiling
 + Add Makefile.msvc for Windows
