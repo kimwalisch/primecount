@@ -1,0 +1,11 @@
+2013-07-26  Kim Walisch  <kim.walisch@gmail.com>
+
+	Version 0.3 released.
+
+  * README: Text version of README.md for offline reading.
+	* README.md: Added algorithms, timings and nth prime sections.
+  * THANKS: List of people that contributed to primecount.
+  * src/Pk.cpp: Partial sieve functions: P2(x, a), P3(x, a).
+  * src/*.cpp: Documented all source files.
+  * include/primecount.h: Updated API documentation.
+	* images/*.png: Math formula images.
