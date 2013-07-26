@@ -24,8 +24,8 @@ int64_t pi_meissel(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t a = pi_legendre(isqrt3(x), 1);
-  int64_t b = pi_legendre(isqrt(x), 1);
+  int64_t a = pi_legendre(isqrt3(x), /* threads = */ 1);
+  int64_t b = pi_legendre(isqrt(x) , /* threads = */ 1);
 
   int64_t sum = 0;
 

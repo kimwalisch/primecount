@@ -24,9 +24,9 @@ int64_t pi_lehmer(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t a = pi_meissel(isqrt4(x), 1);
-  int64_t b = pi_meissel(isqrt(x), 1);
-  int64_t c = pi_meissel(isqrt3(x), 1);
+  int64_t a = pi_meissel(isqrt4(x), /* threads = */ 1);
+  int64_t b = pi_meissel(isqrt(x) , /* threads = */ 1);
+  int64_t c = pi_meissel(isqrt3(x), /* threads = */ 1);
 
   int64_t sum = 0;
 
