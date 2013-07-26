@@ -1,0 +1,15 @@
+primecount THANKS file
+
+primecount has originally been written by Kim Walisch,
+<kim.walisch@gmail.com>.
+
+Many people have further contributed to primecount by reporting
+problems, suggesting various improvements, or submitting actual code.
+Here is a list of these people. Help me keep it complete and exempt
+of errors.
+
+* Dana Jacobsen implemented Legendre's, Meissel's and Lehmer's
+  prime counting formulas a few months earlier than me:
+  https://github.com/danaj/Math-Prime-Util/blob/master/lehmer.c
+  I adopted Dana's idea to count primes using binary search in the
+  P3(x, a) term (in Lehmer's formula).
