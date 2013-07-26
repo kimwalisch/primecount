@@ -1,6 +1,6 @@
 primecount
 ==========
-primecount is a command-line program and C++ library that counts the number of primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes using efficient implementations of the prime counting function <img src="images/pix.png" align="absmiddle"/> (combinatorial methods) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All <img src="images/pix.png" align="absmiddle"/> implementations are fully parallelized using OpenMP.
+primecount is a command-line program and C++ library that counts the number of primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes using efficient implementations of the prime counting function pi(x) (combinatorial methods) which is orders of magnitude faster than counting primes using the sieve of Eratosthenes. So far primecount offers the option to count primes using Legendre's, Meissel's and Lehmer's formulas. All pi(x) implementations are fully parallelized using OpenMP.
 
 ### Algorithms and Complexity
 
@@ -19,7 +19,13 @@ primecount is a command-line program and C++ library that counts the number of p
   </tr>
 </table>
 
-Up until the early 19th century the most efficent known method for counting primes was the sieve of Eratosthenes which has a running time of <img src="images/Oxlnlnx.png" align="absmiddle"/>. The first improvement to this bound was Legendre's formula (1830) which uses the inclusion-exclusion principle to calculate the number of primes below x without enumerating the individual primes. Legendre's formula has a running time of <img src="images/Ox.png" align="absmiddle"/> operations and uses <img src="images/Osqrtx.png" align="absmiddle"/> space. Meissel (1870) improved Legendre's formula by setting <img src="images/apisqrt3x.png" align="absmiddle"/> and by adding the correction term <img src="images/P2xa.png" align="absmiddle"/>. Meissel's formula has a running time of <img src="images/Omeissel.png" align="absmiddle"/> operations and uses <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space). In 1959 Lehmer extended Meissel's formula and silghtly improved the running time to <img src="images/Olehmer.png" align="absmiddle"/> operations and <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space).
+Up until the early 19th century the most efficient known method for counting primes was the sieve of Eratosthenes which has a running time of <img src="images/Oxlnlnx.png" align="absmiddle"/> operations. The first improvement to this bound was Legendre's formula (1830) which uses the inclusion-exclusion principle to calculate the number of primes below x without enumerating the individual primes. Legendre's formula has a running time of <img src="images/Ox.png" align="absmiddle"/> operations and uses <img src="images/Osqrtx.png" align="absmiddle"/> space. Meissel (1870) improved Legendre's formula by setting <img src="images/apisqrt3x.png" align="absmiddle"/> and by adding the correction term <img src="images/P2xa.png" align="absmiddle"/>. Meissel's formula has a running time of <img src="images/Omeissel.png" align="absmiddle"/> operations and uses <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space). In 1959 Lehmer extended Meissel's formula and slightly improved the running time to <img src="images/Olehmer.png" align="absmiddle"/> operations and <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space).
+
+### Fast nth prime calculation
+
+The most efficient known method for calculating the nth prime is a combination of the prime counting function and a prime sieve. The idea is to closely approximate the nth prime using e.g. the inverse logarithmic integral <img src="images/Li-1n.png" align="absmiddle"/> and count the primes up to this guess using the prime counting function. Once this is done one starts sieving (using e.g. the segmented sieve of Eratosthenes) at the nth prime guess until one finds the actual nth prime.
+
+The author of this software package has implemented primecount::nth_prime(n) this way. In practice most time is spend by the prime counting function so the calculation of the nth prime is about as fast as counting the primes below the nth prime.
 
 ### Timings
 
@@ -92,7 +98,7 @@ Up until the early 19th century the most efficent known method for counting prim
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from 2013 using a 64-bit Linux operating system. primecount was compiled using GCC 4.8 and used 8 threads for each benchmark.
 
 ### How to build it
-primecount depends on the author's primesieve libary (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
+primecount depends on the author's primesieve library (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
 ```
 $ sh install_primesieve.sh
 ```
