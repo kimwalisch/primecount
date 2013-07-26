@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <vector>
 #include <limits>
+#include <cstddef>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -49,9 +50,8 @@ public:
   PhiCache(const std::vector<int32_t>& primes)
     : primes_(primes)
   {
-    PrimeSieve ps;
-    int size = ps.countPrimes(0, PHI_CACHE_LIMIT);
-    cache_.resize(size);
+    std::size_t max_size = PHI_CACHE_LIMIT;
+    cache_.resize(std::min(primes.size(), max_size));
   }
 
   template<int64_t SIGN> int64_t phi(int64_t x, int64_t a)
