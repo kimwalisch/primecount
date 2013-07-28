@@ -27,8 +27,8 @@ namespace primecount {
 ///
 int64_t P2(int64_t x, int64_t a, int64_t b, int threads)
 {
-  int64_t sum = -((b + a - 2) * (b - a + 1) / 2);
   int64_t pix = 0;
+  int64_t sum = -((b + a - 2) * (b - a + 1) / 2);
   std::vector<int32_t> primes;
   std::vector<int64_t> counts;
 
@@ -81,12 +81,9 @@ int64_t P3(int64_t x, int64_t a, int64_t b, int64_t c, int threads)
   {
     int64_t x2 = x / primes[i - 1];
     int64_t bi = pi_bsearch(primes.begin(), primes.end(), isqrt(x2));
-    int64_t sum2 = 0;
 
     for (int64_t j = i; j <= bi; j++)
-      sum2 += pi_bsearch(primes.begin(), primes.end(), x2 / primes[j - 1]) - (j - 1);
-
-    sum += sum2;
+      sum += pi_bsearch(primes.begin(), primes.end(), x2 / primes[j - 1]) - (j - 1);
   }
 
   return sum;
