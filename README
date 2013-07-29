@@ -15,8 +15,8 @@ Algorithms and Complexity
 =========================
 
 Legendre's Formula: pi(x) = pi(x^(1/2)) - 1 + phi(x, pi(x^(1/2)))
-Meissel's Formula:  pi(x) = pi(x^(1/3)) - 1 + phi(x, pi(x^(1/3))) + P2(x, pi(x^(1/3)))
-Lehmer's Formula:   pi(x) = pi(x^(1/4)) - 1 + phi(x, pi(x^(1/4))) + P2(x, pi(x^(1/4))) - P3(x, pi(x^(1/4)))
+Meissel's Formula:  pi(x) = pi(x^(1/3)) - 1 + phi(x, pi(x^(1/3))) - P2(x, pi(x^(1/3)))
+Lehmer's Formula:   pi(x) = pi(x^(1/4)) - 1 + phi(x, pi(x^(1/4))) - P2(x, pi(x^(1/4))) - P3(x, pi(x^(1/4)))
 
 Up until the early 19th century the most efficient known method for
 counting primes was the sieve of Eratosthenes which has a running time
