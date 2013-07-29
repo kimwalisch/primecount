@@ -6,16 +6,16 @@ primecount is a command-line program and C++ library that counts the number of p
 
 <table>
   <tr>
-    <td>Legendre's&nbsp;Formula</td>
-    <td><img src="images/pi_legendre.png"/></td>
+    <td>Legendre's Formula</td>
+    <td><img src="images/pi_legendre.png" align="absmiddle"/></td>
   </tr>
   <tr>
     <td>Meissel's Formula</td>
-    <td><img src="images/pi_meissel.png"/></td>
+    <td><img src="images/pi_meissel.png" align="absmiddle"/></td>
   </tr>
   <tr>
     <td>Lehmer's Formula</td>
-    <td><img src="images/pi_lehmer.png"/></td>
+    <td><img src="images/pi_lehmer.png" align="absmiddle"/></td>
   </tr>
 </table>
 
