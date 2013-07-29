@@ -115,7 +115,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
 
-  int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
+  int iters = pi_bsearch(primes.begin(), primes.end(), isqrt(x));
   PhiCache cache(primes);
   int64_t sum = x - a + iters;
 

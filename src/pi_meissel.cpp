@@ -25,12 +25,10 @@ int64_t pi_meissel(int64_t x, int threads)
     return 0;
 
   int64_t a = pi_legendre(isqrt3(x), /* threads = */ 1);
-  int64_t b = pi_legendre(isqrt(x) , /* threads = */ 1);
-
   int64_t sum = 0;
 
-  sum += phi(x, a, threads);
-  sum -= P2 (x, a, b, threads);
+  sum += phi(x, a, threads) + a - 1;
+  sum -= P2 (x, a, threads);
 
   return sum;
 }

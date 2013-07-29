@@ -24,7 +24,7 @@ int64_t pi_legendre(int64_t x, int threads)
     return 0;
 
   int64_t a = pi_primesieve(isqrt(x), /* threads = */ 1);
-  int64_t sum = a + phi(x, a, threads) - 1;
+  int64_t sum = phi(x, a, threads) + a - 1;
 
   return sum;
 }

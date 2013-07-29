@@ -17,35 +17,38 @@ namespace primecount {
 
 inline int32_t isqrt(int64_t x)
 {
-  int64_t root = static_cast<int64_t>(std::sqrt(static_cast<double>(x)));
+  double x2 = static_cast<double>(x);
+  int64_t r = static_cast<int64_t>(std::sqrt(x2));
   // correct rounding errors
-  while (root * root > x)
-    root--;
-  while ((root + 1) * (root + 1) <= x)
-    root++;
-  return static_cast<int32_t>(root);
+  while (r * r > x)
+    r--;
+  while ((r + 1) * (r + 1) <= x)
+    r++;
+  return static_cast<int32_t>(r);
 }
 
 inline int32_t isqrt3(int64_t x)
 {
-  int64_t root = static_cast<int64_t>(std::pow(static_cast<double>(x), 1.0 / 3.0));
+  double x2 = static_cast<double>(x);
+  int64_t r = static_cast<int64_t>(std::pow(x2, 1.0 / 3.0));
   // correct rounding errors
-  while (root * root * root > x)
-    root--;
-  while ((root + 1) * (root + 1) * (root + 1) <= x)
-    root++;
-  return static_cast<int32_t>(root);
+  while (r * r * r > x)
+    r--;
+  while ((r + 1) * (r + 1) * (r + 1) <= x)
+    r++;
+  return static_cast<int32_t>(r);
 }
 
 inline int32_t isqrt4(int64_t x)
 {
-  int64_t root = static_cast<int64_t>(std::pow(static_cast<double>(x), 1.0 / 4.0));
+  double x2 = static_cast<double>(x);
+  int64_t r = static_cast<int64_t>(std::pow(x2, 1.0 / 4.0));
   // correct rounding errors
-  while (root * root * root * root > x)
-    root--;
-  while ((root + 1) * (root + 1) * (root + 1) * (root + 1) <= x)
-    root++;
-  return static_cast<int32_t>(root);
+  while (r * r * r * r > x)
+    r--;
+  while ((r + 1) * (r + 1) * (r + 1) * (r + 1) <= x)
+    r++;
+  return static_cast<int32_t>(r);
 }
 
 } // namespace primecount
