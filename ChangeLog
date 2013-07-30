@@ -1,3 +1,13 @@
+2013-07-30  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.4 released.
+
+  * README.md: High definition math formula images.
+  * src/Pk.cpp: More accurate math formulas.
+  * src/pi_meissel.cpp: Simpler algorithm.
+  * src/pi_lehmer.cpp: Simpler algorithm.
+  * images/*.png: High definition math formula images.
+
 2013-07-26  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.3 released.
