@@ -7,8 +7,6 @@
 /// file in the top level directory.
 ///
 
-#include "isqrt.h"
-
 #include <primecount.h>
 #include <primesieve/soe/ParallelPrimeSieve.h>
 #include <stdint.h>

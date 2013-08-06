@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include "isqrt.h"
+#include "imath.h"
 #include "phi.h"
 
 #include <primecount.h>

@@ -8,7 +8,7 @@
 ///
 
 #include "pi_bsearch.h"
-#include "isqrt.h"
+#include "imath.h"
 
 #include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>

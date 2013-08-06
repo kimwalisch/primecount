@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include "isqrt.h"
+#include "imath.h"
 #include "Pk.h"
 #include "phi.h"
 
@@ -24,7 +24,7 @@ int64_t pi_lehmer(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t a = pi_meissel(isqrt4(x), /* threads = */ 1);
+  int64_t a = pi_meissel(iroot<4>(x), /* threads = */ 1);
   int64_t sum = 0;
 
   sum += phi(x, a, threads) + a - 1;

@@ -8,7 +8,7 @@
 ///
 
 #include "pi_bsearch.h"
-#include "isqrt.h"
+#include "imath.h"
 
 #include <primesieve/soe/PrimeSieve.h>
 #include <stdint.h>
@@ -75,7 +75,7 @@ int64_t P3(int64_t x, int64_t a, int threads)
   PrimeSieve ps;
   ps.generatePrimes(0, isqrt(x), &primes);
 
-  int64_t c = pi_bsearch(primes.begin(), primes.end(), isqrt3(x));
+  int64_t c = pi_bsearch(primes.begin(), primes.end(), iroot<3>(x));
   int64_t sum = 0;
 
 #ifdef _OPENMP
