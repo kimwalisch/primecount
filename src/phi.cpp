@@ -15,6 +15,7 @@
 #include <vector>
 #include <limits>
 #include <cstddef>
+#include <cassert>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -105,6 +106,7 @@ private:
 /// Partial sieve function (a.k.a. Legendre-sum).
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
+/// @pre prime[a] <= sqrt(x)
 ///
 int64_t phi(int64_t x, int64_t a, int threads)
 {
@@ -114,18 +116,17 @@ int64_t phi(int64_t x, int64_t a, int threads)
   std::vector<int32_t> primes;
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
-
-  int iters = pi_bsearch(primes.begin(), primes.end(), isqrt(x));
+  assert(primes[a - 1] <= isqrt(x));
   PhiCache cache(primes);
-  int64_t sum = x - a + iters;
+  int64_t sum = x;
 
 #ifdef _OPENMP
   threads = to_omp_threads(threads);
   #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
       num_threads(threads) schedule(dynamic, 16)
 #endif
-  for (int i = 0; i < iters; i++)
-    sum += cache.phi<-1>(x / primes[i], i);
+  for (int64_t a2 = 0; a2 < a; a2++)
+    sum += cache.phi<-1>(x / primes[a2], a2);
 
   return sum;
 }
