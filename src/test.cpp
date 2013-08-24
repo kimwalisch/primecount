@@ -14,7 +14,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <iomanip>
 #include <ctime>
 
 using namespace std;
@@ -40,8 +39,7 @@ int get_rand()
 template <typename F>
 void check_for_equality(const std::string& f1_name, F f1, F f2, int64_t iters)
 {
-  cout << left;
-  cout << "Testing " << setw(15) << (f1_name + "(x)") << flush;
+  cout << "Testing " << (f1_name + "(x)") << flush;
 
   // test for 0 <= x < iters
   for (int64_t x = 0; x < iters; x++)
@@ -52,7 +50,7 @@ void check_for_equality(const std::string& f1_name, F f1, F f2, int64_t iters)
   for (int64_t i = 0; i < iters; i++, x += get_rand())
     assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
 
-  cout << "OK" << endl;
+  cout << " correct" << endl;
 }
 
 int64_t pps_nth_prime(int64_t x, int)
@@ -66,10 +64,11 @@ void test()
 {
   srand(static_cast<unsigned int>(time(0)));
 
-  check_for_equality("pi_legendre", pi_legendre, pi_primesieve, 100);
-  check_for_equality("pi_meissel",  pi_meissel,  pi_legendre,   500);
-  check_for_equality("pi_lehmer",   pi_lehmer,   pi_meissel,    500);
-  check_for_equality("nth_prime",   nth_prime,   pps_nth_prime, 100);
+  check_for_equality("pi_legendre",   pi_legendre,   pi_primesieve, 100);
+  check_for_equality("pi_meissel",    pi_meissel,    pi_legendre,   500);
+  check_for_equality("pi_lehmer",     pi_lehmer,     pi_meissel,    500);
+  check_for_equality("pi_lmo_simple", pi_lmo_simple, pi_meissel,    200);
+  check_for_equality("nth_prime",     nth_prime,     pps_nth_prime, 100);
 
   cout << "All tests passed successfully!" << endl;
   exit(0);
