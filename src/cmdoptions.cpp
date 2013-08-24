@@ -52,6 +52,8 @@ void initOptionMap()
   optionMap["--legendre"]   = OPTION_LEGENDRE;
   optionMap["-l"]           = OPTION_LEHMER;
   optionMap["--lehmer"]     = OPTION_LEHMER;
+  optionMap["--lmo"]        = OPTION_LMO;
+  optionMap["--lmo_simple"] = OPTION_LMOSIMPLE;
   optionMap["--Li"]         = OPTION_LI;
   optionMap["--Li_inverse"] = OPTION_LIINV;
   optionMap["-m"]           = OPTION_MEISSEL;
@@ -104,6 +106,8 @@ PrimeCountOptions parseOptions(int argc, char** argv)
         case OPTION_LI:         pco.option = OPTION_LI; break;
         case OPTION_LIINV:      pco.option = OPTION_LIINV; break;
         case OPTION_LEHMER:     pco.option = OPTION_LEHMER; break;
+        case OPTION_LMO:        pco.option = OPTION_LMO; break;
+        case OPTION_LMOSIMPLE:  pco.option = OPTION_LMOSIMPLE; break;
         case OPTION_MEISSEL:    pco.option = OPTION_MEISSEL; break;
         case OPTION_NTHPRIME:   pco.option = OPTION_NTHPRIME; break;
         case OPTION_NUMBER:     pco.x = option.getValue<int64_t>(); break;
