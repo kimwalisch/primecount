@@ -1,3 +1,13 @@
+2013-08-24  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.5 work in progress.
+
+  * src/cmdoptions.cpp & h: Added '--lmo', '--lmo_simple' options.
+  * src/help.cpp: Added Lagarias-Miller-Odlyzko options.
+  * src/pi_lmo.cpp: Not yet implemented.
+  * src/pi_lmo_simple.cpp: Simple Lagarias-Miller-Odlyzko implementation.
+  * Makefile: Added pi_lmo.o, pi_lmo_simple.o.
+
 2013-07-30  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.4 released.
