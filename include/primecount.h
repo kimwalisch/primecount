@@ -52,13 +52,13 @@ int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^(1/3)) space.
+/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
 ///
 int64_t pi_lmo_simple(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^(1/3)) space.
+/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
 ///
 int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
 

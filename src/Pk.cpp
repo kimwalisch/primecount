@@ -24,6 +24,7 @@ namespace primecount {
 /// 2nd partial sieve function.
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
+/// Space complexity: O(x^0.5).
 ///
 int64_t P2(int64_t x, int64_t a, int threads)
 {
@@ -39,7 +40,7 @@ int64_t P2(int64_t x, int64_t a, int threads)
 
   // This uses a clever trick, instead of calculating
   // pi(x / primes[i]) for a < i <= b it only counts the primes
-  // between adjacent values [x / primes[i], x / primes[i - 1]].
+  // between adjacent values [x/primes[i], x/primes[i-1]].
   // When finished pi(x / primes[i]) can quickly be calculated
   // by backwards summing up the counts.
   //
@@ -67,7 +68,7 @@ int64_t P2(int64_t x, int64_t a, int threads)
 /// 3rd partial sieve function.
 /// P3(x, a) counts the numbers <= x that have exactly 3 prime
 /// factors each exceeding the a-th prime.
-/// @pre a >= pi( sqrt[4]{x} )
+/// Space complexity: O(x^0.5).
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {
