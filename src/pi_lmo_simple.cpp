@@ -92,7 +92,7 @@ int64_t pi_lmo_simple(int64_t x, int threads)
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
 
-  if (a < c || isqrt(x) < primes[c + 1])
+  if (a < c + 1 || isqrt(x) < primes[c + 1])
     return pi_meissel(x);
 
   std::vector<int32_t> moebius;
