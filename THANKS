@@ -13,3 +13,8 @@ of errors.
   https://github.com/danaj/Math-Prime-Util/blob/master/lehmer.c
   I adopted Dana's idea to count primes using binary search in the
   P3(x, a) term (in Lehmer's formula).
+
+* Christian Bau implemented the Lagarias-Miller-Odlyzko prime counting
+  algorithm in 2003. Up until 2013 this was the only open source
+  implementation of the Lagarias-Miller-Odlyzko algorithm! I studied
+  his implementation in order to get mine working.
