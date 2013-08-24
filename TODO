@@ -1,4 +1,3 @@
++ phi(x, a) is erroneous for prime[a] > sqrt(x)
++ Implement optimized LMO algorithm
 + Try to compile with sunCC +w2
-+ Do performance profiling
-+ Add Makefile.msvc for Windows
-+ Implement extended Meissel-Lehmer algorithm
