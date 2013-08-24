@@ -53,7 +53,7 @@ void init_moebius(std::vector<int32_t>& mu, int64_t max)
 }
 
 /// Initialize a vector with the least prime
-/// factors of all integers <= max.
+/// factors of the integers <= max.
 ///
 void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
 {
