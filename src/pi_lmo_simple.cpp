@@ -82,9 +82,11 @@ void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
 ///
 int64_t pi_lmo_simple(int64_t x, int threads)
 {
+  if (x < 2)
+    return 0;
+
   int64_t x13 = iroot<3>(x); 
   int64_t a = pi_meissel(x13);
-  int64_t c = 7; 
 
   // generate the primes <= x^(1/3)
   std::vector<int32_t> primes;
@@ -92,14 +94,12 @@ int64_t pi_lmo_simple(int64_t x, int threads)
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
 
-  if (a < c + 1 || isqrt(x) < primes[c + 1])
-    return pi_meissel(x);
-
   std::vector<int32_t> moebius;
   std::vector<int32_t> least_factor;
   init_moebius(moebius, x13);
   init_least_factor(least_factor, x13);
 
+  int64_t c = (a < 7) ? a : 7; 
   int64_t S1 = 0;
   int64_t S2 = 0;
 
