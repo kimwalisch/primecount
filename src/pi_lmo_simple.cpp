@@ -83,7 +83,7 @@ void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
 int64_t pi_lmo_simple(int64_t x, int threads)
 {
   int64_t x13 = iroot<3>(x); 
-	int64_t a = pi_meissel(x13);
+  int64_t a = pi_meissel(x13);
   int64_t c = 7; 
 
   // generate the primes <= x^(1/3)
@@ -107,15 +107,15 @@ int64_t pi_lmo_simple(int64_t x, int threads)
     if (least_factor[n] > primes[c])
       S1 += moebius[n] * phi(x / n, c);
 
-	for (int64_t b = c; b + 1 < a; b++)
-		for (int64_t m = (x13 / primes[b + 1]) + 1; m <= x13; m++)
-			if (least_factor[m] > primes[b + 1])
+  for (int64_t b = c; b + 1 < a; b++)
+    for (int64_t m = (x13 / primes[b + 1]) + 1; m <= x13; m++)
+      if (least_factor[m] > primes[b + 1])
         S2 -= moebius[m] * phi(x / (m * primes[b + 1]), b);
 
   int64_t phi = S1 + S2;
-	int64_t sum = phi + a - 1 - P2(x, a);
+  int64_t sum = phi + a - 1 - P2(x, a);
 
-	return sum;
+  return sum;
 }
 
 } // namespace primecount
