@@ -19,8 +19,8 @@ namespace {
 
 const string helpMenu(
   "Usage: primecount x [OPTION]...\n"
-  "Count the primes below x < 2^63 using an efficient implementation of the prime\n"
-  "counting function e.g. Lehmer's (default) or Meissel's formula.\n"
+  "Count the primes below x < 2^63 using an efficient implementation of the\n"
+  "prime counting function e.g. Lehmer's formula (default).\n"
   "\n"
   "Options:\n"
   "         --legendre      Count primes using Legendre's formula\n"
