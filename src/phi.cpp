@@ -21,15 +21,9 @@
   #include "to_omp_threads.h"
 #endif
 
-/// Results of phi(x, a) are cached for x < PHI_CACHE_LIMIT
-/// @pre PHI_CACHE_LIMIT <= 32767
-///
-#define PHI_CACHE_LIMIT 32767
-
 /// Avoids slow 64-bit division if possible
 #define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
     ? static_cast<uint32_t>(x) / (y) : (x) / (y))
-
 
 namespace primecount {
 
@@ -37,20 +31,19 @@ namespace primecount {
 /// formula: phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
 /// This implementation is based on an algorithm from Tomas Oliveira e
 /// Silva [1]. I have added a cache to my implementation in which
-/// results of phi(x, a) are stored if x is small. This cache speeds
-/// up the calculations by at least 3 orders of magnitude near 10^15.
-/// For PHI_CACHE_LIMIT = 32767 the memory usage of the cache is < 200
-/// megabytes per thread.
+/// results of phi(x, a) are stored if x < 2^16 and a < 500. This
+/// cache speeds up the calculations by at least 3 orders of magnitude
+/// near 10^15.
 ///
 /// [1] Tomas Oliveira e Silva, "Computing pi(x): the combinatorial method",
 ///     Revista do DETUA, vol. 4, no. 6, pp. 759-768, March 2006
 ///
 class PhiCache {
 public:
-  PhiCache(const std::vector<int32_t>& primes)
-    : primes_(primes)
+  PhiCache(const std::vector<int32_t>& primes) :
+    primes_(primes), bytes_(0)
   {
-    std::size_t max_size = PHI_CACHE_LIMIT;
+    std::size_t max_size = CACHE_A_LIMIT;
     cache_.resize(std::min(primes.size(), max_size));
   }
 
@@ -67,23 +60,14 @@ public:
         // x2 = x / primes_[a2]
         int64_t x2 = FAST_DIV(x, primes_[a2]);
 
-        if (x2 < PHI_CACHE_LIMIT && validIndexes(a2, x2) && 
-            cache_[a2][x2] != 0)
-        {
-          // phi(x2, a2) is cached
+        if (validIndexes(x2, a2) && cache_[a2][x2] != 0)
           sum += cache_[a2][x2] * -SIGN;
-        }
         else
         {
-          // phi(x2, a2) is not cached, calculate recursively
+          // phi(x2, a2) is not cached
           int64_t phiResult = phi<-SIGN>(x2, a2);
-          // cache phi(x2, a2)
-          if (x2 < PHI_CACHE_LIMIT)
-          {
-            if (!validIndexes(a2, x2))
-              cache_[a2].resize(x2 + 1, 0);
-            cache_[a2][x2] = static_cast<int16_t>(phiResult * -SIGN);
-          }
+          if (validIndexes(x2, a2))
+            cache_[a2][x2] = static_cast<uint16_t>(phiResult * -SIGN);
           sum += phiResult;
         }
       }
@@ -91,14 +75,29 @@ public:
     return sum;
   }
 private:
-  /// First a primes needed to calculate phi(x, a)
+  enum {
+    /// Keep the cache size below CACHE_BYTES_LIMIT per thread
+    CACHE_BYTES_LIMIT = 16 << 20,
+    CACHE_A_LIMIT = 500
+  };
+  /// Cache for phi(x, a) results
+  std::vector<std::vector<uint16_t> > cache_;
   const std::vector<int32_t>& primes_;
-  /// Cache of phi(x, a) results with x < PHI_CACHE_LIMIT
-  std::vector<std::vector<int16_t> > cache_;
+  int64_t bytes_;
 
-  bool validIndexes(int64_t a2, int64_t x2) const
+  bool validIndexes(int64_t x2, int64_t a2)
   {
-    return x2 < static_cast<int64_t>(cache_[a2].size());
+    if (a2 >= CACHE_A_LIMIT || x2 >= std::numeric_limits<uint16_t>::max())
+      return false;
+    // resize cache if necessary
+    if (x2 >= static_cast<int64_t>(cache_[a2].size()))
+    {
+      if (bytes_ > CACHE_BYTES_LIMIT)
+        return false;
+      bytes_ += (x2 + 1 - cache_[a2].size()) * 2;
+      cache_[a2].resize(x2 + 1, 0);
+    }
+    return true;
   }
 };
 
