@@ -21,7 +21,13 @@
   #include "to_omp_threads.h"
 #endif
 
-/// Avoids slow 64-bit division if possible
+/// Keep the cache size below CACHE_BYTES_LIMIT per thread
+#define CACHE_BYTES_LIMIT (16 << 20)
+
+/// Cache phi(x, a) results if a <= CACHE_A_LIMIT
+#define CACHE_A_LIMIT 500
+
+/// Avoid slow 64-bit division if possible
 #define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
     ? static_cast<uint32_t>(x) / (y) : (x) / (y))
 
@@ -43,7 +49,7 @@ public:
   PhiCache(const std::vector<int32_t>& primes) :
     primes_(primes), bytes_(0)
   {
-    std::size_t max_size = CACHE_A_LIMIT;
+    std::size_t max_size = CACHE_A_LIMIT + 1;
     cache_.resize(std::min(primes.size(), max_size));
   }
 
@@ -75,11 +81,6 @@ public:
     return sum;
   }
 private:
-  enum {
-    /// Keep the cache size below CACHE_BYTES_LIMIT per thread
-    CACHE_BYTES_LIMIT = 16 << 20,
-    CACHE_A_LIMIT = 500
-  };
   /// Cache for phi(x, a) results
   std::vector<std::vector<uint16_t> > cache_;
   const std::vector<int32_t>& primes_;
@@ -87,7 +88,7 @@ private:
 
   bool validIndexes(int64_t x2, int64_t a2)
   {
-    if (a2 >= CACHE_A_LIMIT || x2 >= std::numeric_limits<uint16_t>::max())
+    if (a2 > CACHE_A_LIMIT || x2 > std::numeric_limits<uint16_t>::max())
       return false;
     // resize cache if necessary
     if (x2 >= static_cast<int64_t>(cache_[a2].size()))
