@@ -81,7 +81,7 @@ void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
 /// Run time: O(x^(2/3)) operations, O(x^0.5) space.
 /// @note O(x^0.5) space is due to parallel P2(x, a).
 ///
-int64_t pi_lmo_simple(int64_t x, int threads)
+int64_t pi_lmo_simple(int64_t x, int)
 {
   if (x < 2)
     return 0;
