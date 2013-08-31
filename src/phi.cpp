@@ -49,8 +49,13 @@ public:
   PhiCache(const std::vector<int32_t>& primes) :
     primes_(primes), bytes_(0)
   {
+<<<<<<< HEAD
+    std::size_t maxSize = CACHE_A_LIMIT + 1;
+    cache_.resize(std::min(primes.size(), maxSize));
+=======
     std::size_t max_size = CACHE_A_LIMIT + 1;
     cache_.resize(std::min(primes.size(), max_size));
+>>>>>>> branch 'master' of https://github.com/kimwalisch/primecount.git
   }
 
   template<int64_t SIGN> int64_t phi(int64_t x, int64_t a)
@@ -65,17 +70,18 @@ public:
       {
         // x2 = x / primes_[a2]
         int64_t x2 = FAST_DIV(x, primes_[a2]);
+        int64_t phiResult;
 
         if (validIndexes(x2, a2) && cache_[a2][x2] != 0)
-          sum += cache_[a2][x2] * -SIGN;
+          phiResult = cache_[a2][x2] * -SIGN;
         else
         {
-          // phi(x2, a2) is not cached
-          int64_t phiResult = phi<-SIGN>(x2, a2);
+          // phi(x2, a2) not cached, calculate recursively
+          phiResult = phi<-SIGN>(x2, a2);
           if (validIndexes(x2, a2))
             cache_[a2][x2] = static_cast<uint16_t>(phiResult * -SIGN);
-          sum += phiResult;
         }
+        sum += phiResult;
       }
     }
     return sum;
