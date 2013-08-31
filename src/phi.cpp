@@ -67,13 +67,13 @@ public:
         int64_t x2 = FAST_DIV(x, primes_[a2]);
         int64_t phiResult;
 
-        if (validIndexes(x2, a2) && cache_[a2][x2] != 0)
+        if (validIndexes(a2, x2) && cache_[a2][x2] != 0)
           phiResult = cache_[a2][x2] * -SIGN;
         else
         {
           // phi(x2, a2) not cached, calculate recursively
           phiResult = phi<-SIGN>(x2, a2);
-          if (validIndexes(x2, a2))
+          if (validIndexes(a2, x2))
             cache_[a2][x2] = static_cast<uint16_t>(phiResult * -SIGN);
         }
         sum += phiResult;
@@ -87,7 +87,7 @@ private:
   const std::vector<int32_t>& primes_;
   int64_t bytes_;
 
-  bool validIndexes(int64_t x2, int64_t a2)
+  bool validIndexes(int64_t a2, int64_t x2)
   {
     if (a2 > CACHE_A_LIMIT || x2 > std::numeric_limits<uint16_t>::max())
       return false;
