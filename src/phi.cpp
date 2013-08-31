@@ -37,9 +37,9 @@ namespace primecount {
 /// formula: phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
 /// This implementation is based on an algorithm from Tomas Oliveira e
 /// Silva [1]. I have added a cache to my implementation in which
-/// results of phi(x, a) are stored if x < 2^16 and a < 500. This
-/// cache speeds up the calculations by at least 3 orders of magnitude
-/// near 10^15.
+/// results of phi(x, a) are stored if x < 2^16 and a <= 500.
+/// The cache speeds up the calculations by at least 3 orders of
+/// magnitude near 10^15.
 ///
 /// [1] Tomas Oliveira e Silva, "Computing pi(x): the combinatorial method",
 ///     Revista do DETUA, vol. 4, no. 6, pp. 759-768, March 2006
