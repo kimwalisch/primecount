@@ -1,4 +1,4 @@
-2013-08-24  Kim Walisch  <kim.walisch@gmail.com>
+2013-09-01  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.5 work in progress.
 
@@ -6,6 +6,8 @@
   * src/help.cpp: Added Lagarias-Miller-Odlyzko options.
   * src/pi_lmo.cpp: Not yet implemented.
   * src/pi_lmo_simple.cpp: Simple Lagarias-Miller-Odlyzko implementation.
+  * src/phi.cpp: Fixed bug, uses less memory.
+  * include/primecount.h: Added phi(x, a) to the public API.
   * Makefile: Added pi_lmo.o, pi_lmo_simple.o.
 
 2013-07-30  Kim Walisch  <kim.walisch@gmail.com>
