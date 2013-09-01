@@ -53,7 +53,8 @@ public:
     cache_.resize(std::min(primes.size(), max_size));
   }
 
-  template<int64_t SIGN> int64_t phi(int64_t x, int64_t a)
+  template<int64_t SIGN>
+  int64_t phi(int64_t x, int64_t a)
   {
     int64_t sum = x * SIGN;
     if (a > 0)
