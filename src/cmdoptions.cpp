@@ -97,24 +97,17 @@ PrimeCountOptions parseOptions(int argc, char** argv)
   PrimeCountOptions pco;
   initOptionMap();
   try {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < argc; i++)
+    {
       Option option = makeOption(argv[i]);
-
-      switch (optionMap[option.id]) {
-        case OPTION_PRIMESIEVE: pco.option = OPTION_PRIMESIEVE; break;
-        case OPTION_LEGENDRE:   pco.option = OPTION_LEGENDRE; break;
-        case OPTION_LI:         pco.option = OPTION_LI; break;
-        case OPTION_LIINV:      pco.option = OPTION_LIINV; break;
-        case OPTION_LEHMER:     pco.option = OPTION_LEHMER; break;
-        case OPTION_LMO:        pco.option = OPTION_LMO; break;
-        case OPTION_LMOSIMPLE:  pco.option = OPTION_LMOSIMPLE; break;
-        case OPTION_MEISSEL:    pco.option = OPTION_MEISSEL; break;
-        case OPTION_NTHPRIME:   pco.option = OPTION_NTHPRIME; break;
-        case OPTION_NUMBER:     pco.x = option.getValue<int64_t>(); break;
-        case OPTION_THREADS:    pco.threads = option.getValue<int>(); break;
+      switch (optionMap[option.id])
+      {
+        case OPTION_NUMBER:     pco.x       = option.getValue<int64_t>(); break;
+        case OPTION_THREADS:    pco.threads = option.getValue<int>();     break;
         case OPTION_HELP:       help(); break;
         case OPTION_TEST:       test(); break;
         case OPTION_VERSION:    version(); break;
+        default:                pco.option = optionMap[option.id];
       }
     }
   } catch (std::exception&) {
