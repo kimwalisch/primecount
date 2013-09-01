@@ -117,7 +117,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
 
-  if (primes.back() > x)
+  if (primes.back() >= x)
     return 1;
 
   int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
