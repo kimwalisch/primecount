@@ -1,10 +1,10 @@
 2013-09-01  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.5 work in progress.
+  Version 0.5 released.
 
-  * src/cmdoptions.cpp & h: Added '--lmo', '--lmo_simple' options.
-  * src/help.cpp: Added Lagarias-Miller-Odlyzko options.
-  * src/pi_lmo.cpp: Not yet implemented.
+  * src/primecount.cpp: New functions: phi(x, a), pi_lmo_simple(x).
+  * src/cmdoptions.cpp: New command-line options: '--phi', '--lmo_simple'.
+  * src/help.cpp: Added phi and Lagarias-Miller-Odlyzko info.
   * src/pi_lmo_simple.cpp: Simple Lagarias-Miller-Odlyzko implementation.
   * src/phi.cpp: Fixed bug, uses less memory.
   * include/primecount.h: Added phi(x, a) to the public API.

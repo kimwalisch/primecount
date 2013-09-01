@@ -31,6 +31,7 @@ const string helpMenu(
   "         --Li            Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse    Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime      Calculate the nth prime\n"
+  "         --phi           Calculate phi(x, a), requires 2 arguments\n"
   "  -p,    --primesieve    Count primes using the sieve of Eratosthenes\n"
   "         --test          Run various correctness tests and exit\n"
   "  -t<N>, --threads=<N>   Set the number of threads, 1 <= N <= CPU cores\n"

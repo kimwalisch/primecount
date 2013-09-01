@@ -12,7 +12,6 @@
 
 #include <primecount.h>
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
@@ -28,6 +27,7 @@ enum OptionValues
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NUMBER,
+  OPTION_PHI,
   OPTION_PRIMESIEVE,
   OPTION_TEST,
   OPTION_THREADS,
@@ -37,10 +37,12 @@ enum OptionValues
 struct PrimeCountOptions
 {
   int64_t x;
+  int64_t a;
   int64_t option;
   int threads;
   PrimeCountOptions() :
     x(-1),
+    a(-1),
     option(OPTION_LEHMER),
     threads(primecount::MAX_THREADS)
   { }
