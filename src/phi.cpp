@@ -49,8 +49,8 @@ public:
   PhiCache(const std::vector<int32_t>& primes) :
     primes_(primes), bytes_(0)
   {
-    std::size_t maxSize = CACHE_A_LIMIT + 1;
-    cache_.resize(std::min(primes.size(), maxSize));
+    std::size_t max_size = CACHE_A_LIMIT + 1;
+    cache_.resize(std::min(primes.size(), max_size));
   }
 
   template<int64_t SIGN> int64_t phi(int64_t x, int64_t a)
@@ -65,18 +65,18 @@ public:
       {
         // x2 = x / primes_[a2]
         int64_t x2 = FAST_DIV(x, primes_[a2]);
-        int64_t phiResult;
+        int64_t phi_result;
 
         if (validate(a2, x2) && cache_[a2][x2] != 0)
-          phiResult = cache_[a2][x2] * -SIGN;
+          phi_result = cache_[a2][x2] * -SIGN;
         else
         {
           // phi(x2, a2) not cached, calculate recursively
-          phiResult = phi<-SIGN>(x2, a2);
+          phi_result = phi<-SIGN>(x2, a2);
           if (validate(a2, x2))
-            cache_[a2][x2] = static_cast<uint16_t>(phiResult * -SIGN);
+            cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
         }
-        sum += phiResult;
+        sum += phi_result;
       }
     }
     return sum;
