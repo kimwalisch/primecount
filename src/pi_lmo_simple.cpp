@@ -11,7 +11,6 @@
 
 #include "imath.h"
 #include "Pk.h"
-#include "phi.h"
 
 #include <primesieve/soe/PrimeSieve.h>
 #include <primecount.h>

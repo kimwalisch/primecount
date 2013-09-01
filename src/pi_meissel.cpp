@@ -9,7 +9,6 @@
 
 #include "imath.h"
 #include "Pk.h"
-#include "phi.h"
 
 #include <primecount.h>
 #include <stdint.h>

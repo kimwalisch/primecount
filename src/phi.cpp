@@ -106,16 +106,19 @@ private:
 /// Partial sieve function (a.k.a. Legendre-sum).
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
-/// @pre prime[a] <= sqrt(x)
 ///
 int64_t phi(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
+  if (a > x) return 1;
   if (a < 1) return x;
 
   std::vector<int32_t> primes;
   PrimeSieve ps;
   ps.generate_N_Primes(a, &primes);
+
+  if (primes.back() > x)
+    return 1;
 
   int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes);
