@@ -3,6 +3,7 @@
   Version 0.6 work in progress.
 
   * src/phi.cpp: Added phi binary search optimization.
+  * Readme.md: Updated benchmark timings.
   * TODO: Updated.
   * THANKS: Updated.
 

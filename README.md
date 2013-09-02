@@ -38,58 +38,58 @@ The most efficient known method for calculating the nth prime is a combination o
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
-    <td>0.06s</td>
+    <td>0.05s</td>
     <td>0.05s</td>
     <td>0.03s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.15s</td>
-    <td>0.16s</td>
-    <td>0.11s</td>
+    <td>0.10s</td>
+    <td>0.12s</td>
+    <td>0.09s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.60s</td>
-    <td>0.44s</td>
-    <td>0.29s</td>
+    <td>0.37s</td>
+    <td>0.40s</td>
+    <td>0.30s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>3.26s</td>
-    <td>1.84s</td>
-    <td>1.18s</td>
+    <td>1.80s</td>
+    <td>1.73s</td>
+    <td>1.20s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>21.70s</td>
-    <td>9.19s</td>
-    <td>5.60s</td>
+    <td>11.23s</td>
+    <td>9.33s</td>
+    <td>5.66s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>196.56s</td>
-    <td>60.36s</td>
-    <td>31.95s</td>
+    <td>75.19s</td>
+    <td>59.57s</td>
+    <td>31.52s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>1598.14s</td>
-    <td>504.72s</td>
-    <td>204.33s</td>
+    <td>584.31s</td>
+    <td>433.22s</td>
+    <td>203.49s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>14497.90s</td>
-    <td>4552.26s</td>
-    <td>1475.40s</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
   </tr>
 </table>
 
