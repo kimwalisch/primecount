@@ -15,6 +15,11 @@
 
 namespace primecount {
 
+inline int64_t isquare(int64_t x)
+{
+  return x * x;
+}
+
 /// Raise to power using template meta-programming
 template <int N>
 struct ipow_helper

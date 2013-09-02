@@ -53,6 +53,12 @@ public:
     cache_.resize(std::min(primes.size(), max_size));
   }
 
+  int64_t phi_bsearch(int64_t x, int64_t a)
+  {
+    int64_t pi = pi_bsearch(primes_.begin(), primes_.end(), x);
+    return pi - a + 1;
+  }
+
   template<int64_t SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
@@ -72,8 +78,11 @@ public:
           phi_result = cache_[a2][x2] * -SIGN;
         else
         {
-          // phi(x2, a2) not cached, calculate recursively
-          phi_result = phi<-SIGN>(x2, a2);
+          if (x2 <= primes_.back() && x2 < isquare(primes_[a2]))
+            phi_result = phi_bsearch(x2, a2) * -SIGN;
+          else
+            phi_result = phi<-SIGN>(x2, a2);
+
           if (validate(a2, x2))
             cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
         }
