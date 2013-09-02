@@ -55,8 +55,8 @@ public:
 
   int64_t phi_bsearch(int64_t x, int64_t a)
   {
-    int64_t pi = pi_bsearch(primes_.begin(), primes_.end(), x);
-    return pi - a + 1;
+    int64_t pix = pi_bsearch(primes_.begin(), primes_.end(), x);
+    return pix - a + 1;
   }
 
   template<int64_t SIGN>
