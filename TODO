@@ -1,3 +1,2 @@
-+ phi(x, a) is erroneous for prime[a] > sqrt(x)
 + Implement optimized LMO algorithm
 + Try to compile with sunCC +w2

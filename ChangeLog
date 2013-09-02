@@ -1,3 +1,11 @@
+2013-09-02  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.6 work in progress.
+
+  * src/phi.cpp: Added phi binary search optimization.
+  * TODO: Updated.
+  * THANKS: Updated.
+
 2013-09-01  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.5 released.

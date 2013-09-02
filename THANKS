@@ -8,6 +8,10 @@ problems, suggesting various improvements, or submitting actual code.
 Here is a list of these people. Help me keep it complete and exempt
 of errors.
 
+* Andrew Ohana suggested calculating phi(x, a) using binary search if
+  x and a are small. Using this optimization my Legendre prime
+  counting function runs 3 times faster!
+
 * Dana Jacobsen implemented Legendre's, Meissel's and Lehmer's
   prime counting formulas a few months earlier than me:
   https://github.com/danaj/Math-Prime-Util/blob/master/lehmer.c
