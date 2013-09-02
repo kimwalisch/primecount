@@ -53,6 +53,7 @@ public:
     cache_.resize(std::min(primes.size(), max_size));
   }
 
+  /// phi(x, a) = pi(x) - a + 1
   int64_t phi_bsearch(int64_t x, int64_t a)
   {
     int64_t pix = pi_bsearch(primes_.begin(), primes_.end(), x);
