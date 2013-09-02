@@ -89,7 +89,7 @@ The most efficient known method for calculating the nth prime is a combination o
     <td>2,623,557,157,654,233</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>NaN</td>
+    <td>1580.60s</td>
   </tr>
 </table>
 
