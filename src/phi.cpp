@@ -66,6 +66,7 @@ public:
     int64_t sum = x * SIGN;
     if (a > 0)
     {
+      // phi(x, i) = 1 for iters <= i < a
       int64_t iters = pi_bsearch(primes_.begin(), primes_.begin() + a, isqrt(x));
       sum += (a - iters) * -SIGN;
 
