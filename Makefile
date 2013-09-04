@@ -193,7 +193,7 @@ ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
 	cp -Rf $(INCDIR) $(PREFIX)
   ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).so),)
     ifneq ($(shell command -v ldconfig $(NO_STDERR)),)
-      ifneq ($(findstring /usr,$(PREFIX)),)
+      ifeq ($(firstword $(subst /, ,$(PREFIX))),usr)
 			ldconfig $(PREFIX)/lib
       endif
     endif
@@ -212,7 +212,7 @@ ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).*),)
   ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).so),)
 		rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
     ifneq ($(shell command -v ldconfig $(NO_STDERR)),)
-      ifneq ($(findstring /usr,$(PREFIX)),)
+      ifeq ($(firstword $(subst /, ,$(PREFIX))),usr)
 			ldconfig $(PREFIX)/lib
       endif
     endif
