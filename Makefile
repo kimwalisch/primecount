@@ -4,7 +4,7 @@
 # Author:          Kim Walisch
 # Contact:         kim.walisch@gmail.com
 # Created:         09 June 2013
-# Last modified:   24 August 2013
+# Last modified:   04 September 2013
 #
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
@@ -55,6 +55,7 @@ NO_OUTPUT := $(NO_STDOUT) $(NO_STDERR)
 # Find the compiler's OpenMP flag
 #-----------------------------------------------------------------------------
 
+ifneq ($(OPENMP),no)
 OPENMP_PROGRAM := '\#include <omp.h>\n int main() { return _OPENMP; }'
 
 is-openmp = $(shell command -v $(CXX) $(NO_OUTPUT) && \
@@ -70,6 +71,7 @@ ifeq ($(call is-openmp,),)
       CXXFLAGS += -fopenmp
     endif
   endif
+endif
 endif
 
 #-----------------------------------------------------------------------------
@@ -191,7 +193,9 @@ ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).*),)
 	cp -Rf $(INCDIR) $(PREFIX)
   ifneq ($(wildcard $(LIBDIR)/lib$(TARGET).so),)
     ifneq ($(shell command -v ldconfig $(NO_STDERR)),)
-		ldconfig $(PREFIX)/lib
+      ifneq ($(findstring /usr,$(PREFIX)),)
+			ldconfig $(PREFIX)/lib
+      endif
     endif
   endif
 endif
@@ -208,7 +212,9 @@ ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).*),)
   ifneq ($(wildcard $(PREFIX)/lib/lib$(TARGET).so),)
 		rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
     ifneq ($(shell command -v ldconfig $(NO_STDERR)),)
-		ldconfig $(PREFIX)/lib
+      ifneq ($(findstring /usr,$(PREFIX)),)
+			ldconfig $(PREFIX)/lib
+      endif
     endif
   else
 	rm -f $(wildcard $(PREFIX)/lib/lib$(TARGET).*)
