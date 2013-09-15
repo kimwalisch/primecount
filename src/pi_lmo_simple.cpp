@@ -16,64 +16,8 @@
 #include <primecount.h>
 #include <stdint.h>
 #include <vector>
-#include <limits>
 
 namespace primecount {
-
-/// Initialize a vector with Möbius function values.
-/// This implementation is based on code by Rick Sladkey
-/// posted here: http://mathoverflow.net/a/99545
-///
-void init_moebius(std::vector<int32_t>& mu, int64_t max)
-{
-  mu.resize(max + 1, 1);
-
-  for (int32_t i = 2; i * i <= max; i++)
-  {
-    if (mu[i] == 1)
-    {
-      for (int32_t j = i; j <= max; j += i)
-        mu[j] *= -i;
-      for (int32_t j = i * i; j <= max; j += i * i)
-        mu[j] = 0;
-    }
-  }
-  for (int32_t i = 2; i <= max; i++)
-  {
-    if (mu[i] == i)
-      mu[i] = 1;
-    else if (mu[i] == -i)
-      mu[i] = -1;
-    else if (mu[i] < 0)
-      mu[i] = 1;
-    else if (mu[i] > 0)
-      mu[i] = -1;
-  }
-}
-
-/// Initialize a vector with the least prime
-/// factors of the integers <= max.
-///
-void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
-{
-  lpf.resize(max + 1, 1);
-
-  // phi(x / 1, c) contributes to the sum,
-  // lpf[1] = MAX in order to pass
-  // if (least_factor[1] > primes[c])
-  if (lpf.size() > 1)
-    lpf[1] = std::numeric_limits<int32_t>::max();
-
-  for (int32_t i = 2; i * i <= max; i++)
-    if (lpf[i] == 1)
-      for (int32_t j = i * 2; j <= max; j += i)
-        if (lpf[j] == 1)
-          lpf[j] = i;
-
-  for (int32_t i = 2; i <= max; i++)
-    if (lpf[i] == 1)
-      lpf[i] = i;
-}
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
