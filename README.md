@@ -96,7 +96,7 @@ The most efficient known method for calculating the nth prime is a combination o
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from 2013 using a 64-bit Linux operating system. primecount was compiled using GCC 4.8 and used 8 threads for each benchmark.
 
 ### How to build it
-primecount depends on the author's [primesieve](https://primesieve.googlecode.com) library (version 4.3 or later). To download, build and install the latest primesieve version on a Unix-like operating system run:
+primecount depends on the author's [primesieve](https://primesieve.googlecode.com) library (version 4.4). To download, build and install the latest primesieve version on a Unix-like operating system run:
 ```
 $ sh install_primesieve.sh
 ```
