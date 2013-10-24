@@ -131,9 +131,9 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 
 ### How to build it
 primecount depends on the author's
-[primesieve](https://primesieve.googlecode.com) library (version 5.0 or later).
-To download, build and install the latest primesieve version on a Unix-like
-operating system run (requires GNU Autotools and Libtool):
+[primesieve](https://github.com/kimwalisch/primesieve) library (version 5.0 or
+later). To download, build and install the latest primesieve version on a
+Unix-like operating system run (requires GNU Autotools and Libtool):
 ```
 $ git clone git://github.com/kimwalisch/primesieve.git
 $ cd primesieve
