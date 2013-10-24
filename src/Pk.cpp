@@ -10,7 +10,7 @@
 #include "pi_bsearch.h"
 #include "imath.h"
 
-#include <primesieve/soe/PrimeSieve.h>
+#include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
 
@@ -30,8 +30,7 @@ int64_t P2(int64_t x, int64_t a, int threads)
 {
   std::vector<int32_t> primes;
   std::vector<int64_t> counts;
-  PrimeSieve ps;
-  ps.generatePrimes(0 , isqrt(x), &primes);
+  primesieve::generate_primes(isqrt(x), &primes);
   counts.resize(primes.size());
 
   int64_t b = pi_bsearch(primes.begin(), primes.end(), isqrt(x));
@@ -46,13 +45,13 @@ int64_t P2(int64_t x, int64_t a, int threads)
   //
 #ifdef _OPENMP
   threads = to_omp_threads(threads);
-  #pragma omp parallel for private(ps) schedule(dynamic) num_threads(threads)
+  #pragma omp parallel for schedule(dynamic) num_threads(threads)
 #endif
   for (int64_t i = b; i > a; i--)
   {
     int64_t prev = (i != b) ? x / primes[i] + 1 : 0;
     int64_t xi = x / primes[i - 1];
-    counts[i - 1] = ps.countPrimes(prev, xi);
+    counts[i - 1] = primesieve::count_primes(prev, xi);
   }
 
   for (int64_t i = b; i > a; i--)
@@ -73,8 +72,7 @@ int64_t P2(int64_t x, int64_t a, int threads)
 int64_t P3(int64_t x, int64_t a, int threads)
 {
   std::vector<int32_t> primes;
-  PrimeSieve ps;
-  ps.generatePrimes(0, isqrt(x), &primes);
+  primesieve::generate_primes(isqrt(x), &primes);
 
   int64_t c = pi_bsearch(primes.begin(), primes.end(), iroot<3>(x));
   int64_t sum = 0;

@@ -8,7 +8,7 @@
 ///
 
 #include <primecount.h>
-#include <primesieve/soe/ParallelPrimeSieve.h>
+#include <primesieve.hpp>
 #include <stdint.h>
 
 namespace primecount {
@@ -32,11 +32,7 @@ int64_t nth_prime(int64_t n, int threads)
     count_approx = pi(prime_approx, threads);
   }
 
-  ParallelPrimeSieve pps;
-  if (threads != MAX_THREADS)
-    pps.setNumThreads( threads );
-  int64_t prime = pps.nthPrime(prime_approx + 1, n - count_approx);
-
+  int64_t prime = primesieve::parallel_nth_prime(n - count_approx, prime_approx + 1, threads);
   return prime;
 }
 

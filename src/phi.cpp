@@ -10,7 +10,7 @@
 #include "pi_bsearch.h"
 #include "imath.h"
 
-#include <primesieve/soe/PrimeSieve.h>
+#include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
 #include <limits>
@@ -126,8 +126,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a < 1) return x;
 
   std::vector<int32_t> primes;
-  PrimeSieve ps;
-  ps.generate_N_Primes(a, &primes);
+  primesieve::generate_n_primes(a, &primes);
 
   if (primes.back() >= x)
     return 1;

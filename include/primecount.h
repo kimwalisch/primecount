@@ -12,16 +12,16 @@
 
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "0.6"
-#define PRIMECOUNT_MAJOR_VERSION 0
-#define PRIMECOUNT_MINOR_VERSION 6
+#define PRIMECOUNT_VERSION "0.7"
+#define PRIMECOUNT_VERSION_MAJOR 0
+#define PRIMECOUNT_VERSION_MINOR 7
 #define PRIMECOUNT_YEAR "2013"
 
 namespace primecount {
 
 enum {
-  /// Uses all CPU cores, do not modify.
-  MAX_THREADS = -1
+  /// Uses all CPU cores.
+  MAX_THREADS
 };
 
 /// This is an alias for the fastest prime counting implementation

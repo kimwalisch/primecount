@@ -1,11 +1,5 @@
 ##############################################################################
 # Makefile for primecount (console version & library)
-#
-# Author:          Kim Walisch
-# Contact:         kim.walisch@gmail.com
-# Created:         09 June 2013
-# Last modified:   04 September 2013
-#
 # Project home:    https://github.com/kimwalisch/primecount
 ##############################################################################
 

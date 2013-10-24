@@ -8,7 +8,7 @@
 ///
 
 #include <primecount.h>
-#include <primesieve/soe/ParallelPrimeSieve.h>
+#include <primesieve.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -55,8 +55,7 @@ void check_for_equality(const std::string& f1_name, F f1, F f2, int64_t iters)
 
 int64_t pps_nth_prime(int64_t x, int)
 {
-  ParallelPrimeSieve pps;
-  int64_t prime = pps.nthPrime(x);
+  int64_t prime = primesieve::parallel_nth_prime(x);
   return prime;
 }
 

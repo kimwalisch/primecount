@@ -1,6 +1,12 @@
-2013-09-04  Kim Walisch  <kim.walisch@gmail.com>
+2013-10-24  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.6 work in progress.
+  Version 0.7 work in progress.
+
+  * src/*: Ported primecount to primesieve-5.0.
+  * Readme.md: Updated build instructions.
+  * Makefile: Updated.
+
+2013-09-04  Kim Walisch  <kim.walisch@gmail.com>
 
   * src/phi.cpp: Added phi binary search optimization.
   * Makefile: Fixed ldconfig bug.

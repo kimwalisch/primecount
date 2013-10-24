@@ -12,8 +12,8 @@
 #include "imath.h"
 #include "Pk.h"
 
-#include <primesieve/soe/PrimeSieve.h>
 #include <primecount.h>
+#include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
 
@@ -35,8 +35,7 @@ int64_t pi_lmo_simple(int64_t x, int)
   // generate the primes <= x^(1/3)
   std::vector<int32_t> primes;
   primes.push_back(0);
-  PrimeSieve ps;
-  ps.generate_N_Primes(a, &primes);
+  primesieve::generate_n_primes(a, &primes);
 
   std::vector<int32_t> moebius;
   std::vector<int32_t> least_factor;
