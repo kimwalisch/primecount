@@ -1,3 +1,9 @@
+2013-11-08  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.8 work in progress.
+
+  * src/calculator.hpp: New expression parser for command-line options.
+
 2013-10-24  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.7 released.
