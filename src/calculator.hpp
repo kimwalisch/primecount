@@ -8,14 +8,13 @@
 /// @copyright Copyright (C) 2013 Kim Walisch
 /// @date      November 8, 2013
 /// @license   BSD 2-Clause, http://opensource.org/licenses/BSD-2-Clause
-/// @version   1.0
+/// @version   1.0 patched: `^' is raise to power instead of XOR.
 ///
 /// == Supported operators ==
 ///
 /// OPERATOR    NAME                     ASSOCIATIVITY    PRECEDENCE
 ///
 /// |           Bitwise Inclusive OR    Left               4
-/// ^           Bitwise Exclusive OR    Left               5
 /// &           Bitwise AND             Left               6
 /// <<          Shift Left              Left               9
 /// >>          Shift Right             Left               9
@@ -24,7 +23,7 @@
 /// *           Multiplication          Left              20
 /// /           Division                Left              20
 /// %           Modulo                  Left              20
-/// **          Raise to power          Right             30
+/// ^, **       Raise to power          Right             30
 /// e, E        Scientific notation     Right             40
 /// ~           Unary complement        Left              99
 ///
@@ -294,7 +293,6 @@ private:
     switch (getCharacter())
     {
       case '|': index_++;     return Operator(OPERATOR_BITWISE_OR,      4, 'L');
-      case '^': index_++;     return Operator(OPERATOR_BITWISE_XOR,     5, 'L');
       case '&': index_++;     return Operator(OPERATOR_BITWISE_AND,     6, 'L');
       case '<': expect("<<"); return Operator(OPERATOR_BITWISE_SHL,     9, 'L');
       case '>': expect(">>"); return Operator(OPERATOR_BITWISE_SHR,     9, 'L');
@@ -304,7 +302,7 @@ private:
       case '%': index_++;     return Operator(OPERATOR_MODULO,         20, 'L');
       case '*': index_++; if (getCharacter() != '*')
                               return Operator(OPERATOR_MULTIPLICATION, 20, 'L');
-                index_++;     return Operator(OPERATOR_POWER,          30, 'R');
+      case '^': index_++;     return Operator(OPERATOR_POWER,          30, 'R');
       case 'e': index_++;     return Operator(OPERATOR_EXPONENT,       40, 'R');
       case 'E': index_++;     return Operator(OPERATOR_EXPONENT,       40, 'R');
       default :               return Operator(OPERATOR_NULL,            0, 'L');
