@@ -10,7 +10,7 @@
 ///
 
 #include "cmdoptions.h"
-#include "ExpressionParser.h"
+#include "calculator.hpp"
 
 #include <stdint.h>
 #include <vector>
@@ -30,15 +30,14 @@ void test();
 void version();
 
 /// e.g. id = "--threads", value = "4"
-struct Option {
+struct Option
+{
   string id;
   string value;
   template <typename T>
   T getValue() const
   {
-    ExpressionParser<T> parser;
-    T result = parser.eval(value);
-    return result;
+    return calculator::eval(value);
   }
 };
 
