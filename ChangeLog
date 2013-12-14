@@ -1,7 +1,8 @@
-2013-11-08  Kim Walisch  <kim.walisch@gmail.com>
+2013-12-14  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.8 work in progress.
+  Version 0.8 released.
 
+  * src/cmdoptions.cpp: Fixed a calculator bug.
   * src/calculator.hpp: New expression parser for command-line options.
 
 2013-10-24  Kim Walisch  <kim.walisch@gmail.com>

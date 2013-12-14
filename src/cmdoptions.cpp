@@ -37,7 +37,7 @@ struct Option
   template <typename T>
   T getValue() const
   {
-    return calculator::eval(value);
+    return calculator::eval<T>(value);
   }
 };
 
