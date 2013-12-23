@@ -15,6 +15,7 @@
 #include <vector>
 #include <limits>
 #include <cstddef>
+#include <cassert>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -33,8 +34,48 @@
 
 namespace primecount {
 
-/// This class is used to calculate phi(x, a) using the recursive
-/// formula: phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
+/// This class calculates phi(x, a) in constant time for small values
+/// of a < 7 using lookup tables. Let pp = prime_products_[a]:
+/// phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a).
+/// 
+class PhiSmall {
+public:
+  PhiSmall()
+  {
+    phi_cache_[0].push_back(0);
+
+    // Initialize the phi_cache_ lookup tables
+    for (int a = 1; a < 7; a++)
+      for (int x = 0; x < prime_products_[a]; x++)
+        phi_cache_[a].push_back(static_cast<int16_t>(phi(x, a - 1) - phi(x / primes_[a], a - 1)));
+  }
+  /// Partial sieve function (a.k.a. Legendre-sum).
+  /// phi(x, a) counts the numbers <= x that are not divisible
+  /// by any of the first a primes.
+  /// @pre a >= 0 && a < 7.
+  ///
+  int64_t phi(int64_t x, int64_t a) const
+  {
+    assert(x >= 0);
+    assert(a >= 0 && a < 7);
+    return (x / prime_products_[a]) * totients_[a] + phi_cache_[a][x % prime_products_[a]];
+  }
+private:
+  std::vector<int16_t> phi_cache_[7];
+  static const int32_t primes_[7];
+  static const int32_t prime_products_[7];
+  static const int32_t totients_[7];
+};
+
+const int32_t PhiSmall::primes_[7] = { -1, 2, 3, 5, 7, 11, 13 };
+
+const int32_t PhiSmall::prime_products_[7] = { 1, 2, 6, 30, 210, 2310, 30030 };
+
+/// totients_[n] = φ(\prod_{i=1}^{n}(primes_[i] - 1))
+const int32_t PhiSmall::totients_[7] = { 1, 1, 2, 8, 48, 480, 5760 };
+
+/// This class calculates phi(x, a) using the recursive formula:
+/// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1).
 /// This implementation is based on an algorithm from Tomas Oliveira e
 /// Silva [1]. I have added a cache to my implementation in which
 /// results of phi(x, a) are stored if x < 2^16 and a <= 500.
@@ -47,7 +88,8 @@ namespace primecount {
 class PhiCache {
 public:
   PhiCache(const std::vector<int32_t>& primes) :
-    primes_(primes), bytes_(0)
+    primes_(primes),
+    bytes_(0)
   {
     std::size_t max_size = CACHE_A_LIMIT + 1;
     cache_.resize(std::min(primes.size(), max_size));
@@ -124,6 +166,12 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (x < 1) return 0;
   if (a > x) return 1;
   if (a < 1) return x;
+
+  /// @warning This is only thread safe since C++11
+  static PhiSmall phiSmall;
+
+  if (a <= 6)
+    return phiSmall.phi(x, a);
 
   std::vector<int32_t> primes;
   primesieve::generate_n_primes(a, &primes);

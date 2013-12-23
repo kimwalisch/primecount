@@ -42,7 +42,7 @@ int64_t pi_lmo_simple(int64_t x, int)
   init_moebius(moebius, x13);
   init_least_factor(least_factor, x13);
 
-  int64_t c = (a < 7) ? a : 7; 
+  int64_t c = (a < 6) ? a : 6;
   int64_t S1 = 0;
   int64_t S2 = 0;
 
