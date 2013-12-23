@@ -45,19 +45,23 @@ public:
     phi_cache_[0].push_back(0);
 
     // Initialize the phi_cache_ lookup tables
-    for (int a = 1; a < 7; a++)
+    for (int a = 1; is_cached(a); a++)
       for (int x = 0; x < prime_products_[a]; x++)
         phi_cache_[a].push_back(static_cast<int16_t>(phi(x, a - 1) - phi(x / primes_[a], a - 1)));
+  }
+  bool is_cached(int64_t a) const
+  {
+    return a >= 0 && a < 7;
   }
   /// Partial sieve function (a.k.a. Legendre-sum).
   /// phi(x, a) counts the numbers <= x that are not divisible
   /// by any of the first a primes.
-  /// @pre a >= 0 && a < 7.
+  /// @pre is_cached(a) == true.
   ///
   int64_t phi(int64_t x, int64_t a) const
   {
     assert(x >= 0);
-    assert(a >= 0 && a < 7);
+    assert(is_cached(a));
     return (x / prime_products_[a]) * totients_[a] + phi_cache_[a][x % prime_products_[a]];
   }
 private:
@@ -88,8 +92,9 @@ const int32_t PhiSmall::totients_[7] = { 1, 1, 2, 8, 48, 480, 5760 };
 ///
 class PhiCache {
 public:
-  PhiCache(const std::vector<int32_t>& primes) :
+  PhiCache(const std::vector<int32_t>& primes, const PhiSmall& phiSmall) :
     primes_(primes),
+    phiSmall_(phiSmall),
     bytes_(0)
   {
     std::size_t max_size = CACHE_A_LIMIT + 1;
@@ -106,33 +111,33 @@ public:
   template<int64_t SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
+    if (phiSmall_.is_cached(a))
+      return phiSmall_.phi(x, a) * SIGN;
+
     int64_t sum = x * SIGN;
-    if (a > 0)
+    // phi(x, i) = 1 for iters <= i < a
+    int64_t iters = pi_bsearch(primes_.begin(), primes_.begin() + a, isqrt(x));
+    sum += (a - iters) * -SIGN;
+
+    for (int64_t a2 = 0; a2 < iters; a2++)
     {
-      // phi(x, i) = 1 for iters <= i < a
-      int64_t iters = pi_bsearch(primes_.begin(), primes_.begin() + a, isqrt(x));
-      sum += (a - iters) * -SIGN;
+      // x2 = x / primes_[a2]
+      int64_t x2 = FAST_DIV(x, primes_[a2]);
+      int64_t phi_result;
 
-      for (int64_t a2 = 0; a2 < iters; a2++)
+      if (validate(a2, x2) && cache_[a2][x2] != 0)
+        phi_result = cache_[a2][x2] * -SIGN;
+      else
       {
-        // x2 = x / primes_[a2]
-        int64_t x2 = FAST_DIV(x, primes_[a2]);
-        int64_t phi_result;
-
-        if (validate(a2, x2) && cache_[a2][x2] != 0)
-          phi_result = cache_[a2][x2] * -SIGN;
+        if (x2 <= primes_.back() && x2 < isquare(primes_[a2]))
+          phi_result = phi_bsearch(x2, a2) * -SIGN;
         else
-        {
-          if (x2 <= primes_.back() && x2 < isquare(primes_[a2]))
-            phi_result = phi_bsearch(x2, a2) * -SIGN;
-          else
-            phi_result = phi<-SIGN>(x2, a2);
+          phi_result = phi<-SIGN>(x2, a2);
 
-          if (validate(a2, x2))
-            cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
-        }
-        sum += phi_result;
+        if (validate(a2, x2))
+          cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
       }
+      sum += phi_result;
     }
     return sum;
   }
@@ -140,6 +145,7 @@ private:
   /// Cache for phi(x, a) results
   std::vector<std::vector<uint16_t> > cache_;
   const std::vector<int32_t>& primes_;
+  const PhiSmall& phiSmall_;
   int64_t bytes_;
 
   bool validate(int64_t a2, int64_t x2)
@@ -171,7 +177,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   /// @warning This is only thread safe since C++11
   static const PhiSmall phiSmall;
 
-  if (a <= 6)
+  if (phiSmall.is_cached(a))
     return phiSmall.phi(x, a);
 
   std::vector<int32_t> primes;
@@ -181,7 +187,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     return 1;
 
   int iters = pi_bsearch(primes.begin(), primes.end(), isqrt(x));
-  PhiCache cache(primes);
+  PhiCache cache(primes, phiSmall);
   int64_t sum = x - a + iters;
 
 #ifdef _OPENMP
