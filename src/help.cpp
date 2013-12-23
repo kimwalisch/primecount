@@ -45,7 +45,7 @@ const string helpMenu(
 
 const string versionInfo(
   "primecount " PRIMECOUNT_VERSION ", <https://github.com/kimwalisch/primecount>\n"
-  "Copyright (C) " PRIMECOUNT_YEAR " Kim Walisch\n"
+  "Copyright (C) 2013 Kim Walisch\n"
   "BSD 2-Clause License <http://opensource.org/licenses/BSD-2-Clause>"
 );
 
