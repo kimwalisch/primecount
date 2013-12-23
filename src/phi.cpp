@@ -69,9 +69,10 @@ private:
 
 const int32_t PhiSmall::primes_[7] = { -1, 2, 3, 5, 7, 11, 13 };
 
+/// prime_products_[n] = \prod_{i=1}^{n} primes_[i]
 const int32_t PhiSmall::prime_products_[7] = { 1, 2, 6, 30, 210, 2310, 30030 };
 
-/// totients_[n] = φ(\prod_{i=1}^{n}(primes_[i] - 1))
+/// totients_[n] = \prod_{i=1}^{n} (primes_[i] - 1)
 const int32_t PhiSmall::totients_[7] = { 1, 1, 2, 8, 48, 480, 5760 };
 
 /// This class calculates phi(x, a) using the recursive formula:
@@ -168,7 +169,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a < 1) return x;
 
   /// @warning This is only thread safe since C++11
-  static PhiSmall phiSmall;
+  static const PhiSmall phiSmall;
 
   if (a <= 6)
     return phiSmall.phi(x, a);
