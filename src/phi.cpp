@@ -183,10 +183,10 @@ int64_t phi(int64_t x, int64_t a, int threads)
   std::vector<int32_t> primes;
   primesieve::generate_n_primes(a, &primes);
 
-  if (primes.back() >= x)
+  if (primes.at(a - 1) >= x)
     return 1;
 
-  int iters = pi_bsearch(primes.begin(), primes.end(), isqrt(x));
+  int iters = pi_bsearch(primes.begin(), primes.begin() + a, isqrt(x));
   PhiCache cache(primes, phiSmall);
   int64_t sum = x - a + iters;
 
