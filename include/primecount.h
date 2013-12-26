@@ -18,6 +18,8 @@
 
 namespace primecount {
 
+class PhiCache;
+
 enum {
   /// Uses all CPU cores.
   MAX_THREADS
@@ -72,6 +74,12 @@ int64_t nth_prime(int64_t n, int threads = MAX_THREADS);
 /// by any of the first a primes.
 ///
 int64_t phi(int64_t x, int64_t a, int threads = MAX_THREADS);
+
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
+///
+int64_t phi(int64_t x, int64_t a, PhiCache* phiCache);
 
 /// Calculate the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x.

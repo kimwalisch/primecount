@@ -15,6 +15,7 @@
 #include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
+#include <cassert>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -58,6 +59,16 @@ int64_t phi(int64_t x, int64_t a, int threads)
     sum += cache.phi_recursive<-1>(x / primes[a2 + 1], a2);
 
   return sum;
+}
+
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
+///
+int64_t phi(int64_t x, int64_t a, PhiCache* phiCache)
+{
+  assert(phiCache != 0);
+  return phiCache->phi(x, a);
 }
 
 } // namespace primecount

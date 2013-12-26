@@ -64,7 +64,7 @@ int64_t pi_lmo_simple(int64_t x, int threads)
 #endif
   for (int64_t n = 1; n <= x13; n++)
     if (least_factor[n] > primes[c])
-      S1 += moebius[n] * cache.phi(x / n, c);
+      S1 += moebius[n] * phi(x / n, c, &cache);
 
 #ifdef _OPENMP
   #pragma omp parallel for firstprivate(cache) reduction(-: S2) \
@@ -73,7 +73,7 @@ int64_t pi_lmo_simple(int64_t x, int threads)
   for (int64_t b = c; b < a_1; b++)
     for (int64_t m = (x13 / primes[b + 1]) + 1; m <= x13; m++)
       if (least_factor[m] > primes[b + 1])
-        S2 -= moebius[m] * cache.phi(x / (m * primes[b + 1]), b);
+        S2 -= moebius[m] * phi(x / (m * primes[b + 1]), b, &cache);
 
   int64_t phi = S1 + S2;
   int64_t sum = phi + a - 1 - P2(x, a);
