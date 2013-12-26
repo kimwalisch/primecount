@@ -1,8 +1,13 @@
-2013-12-23  Kim Walisch  <kim.walisch@gmail.com>
+2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.9 work in progress.
 
-  * src/phi.cpp: Added lookup tables for phi(x, a) for a < 7.
+  * src/pi_lmo_simple.cpp: Parallelized algorithm.
+  * src/PhiTiny.h: New class, Cache for phi(x, a) for a < 7.
+  * src/PhiCache.h:: Add PhiTiny optimization.
+  * src/phi.cpp: Add PhiTiny optimization.
+  * src/pi_bsearch.h: Refactoring.
+  * src/Pk.cpp: Refactoring.
 
 2013-12-14  Kim Walisch  <kim.walisch@gmail.com>
 
