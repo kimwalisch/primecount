@@ -92,16 +92,16 @@ public:
       int64_t x2 = FAST_DIV(x, primes_[a2 + 1]);
       int64_t phi_result;
 
-      if (validate(a2, x2) && cache_[a2][x2] != 0)
+      if (is_cached(a2, x2))
         phi_result = cache_[a2][x2] * -SIGN;
       else
       {
-        if (x2 <= primes_.back() && x2 < isquare(primes_[a2 + 1]))
+        if (is_bsearch(x2, a2))
           phi_result = phi_bsearch(x2, a2) * -SIGN;
         else
           phi_result = phi_recursive<-SIGN>(x2, a2);
 
-        if (validate(a2, x2))
+        if (write_to_cache(a2, x2))
           cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
       }
       sum += phi_result;
@@ -122,12 +122,28 @@ private:
     return pix - a + 1;
   }
 
-  bool validate(int64_t a2, int64_t x2)
+  bool is_bsearch(int64_t x2, int64_t a2) const
+  {
+    return x2 <= primes_.back() && x2 < isquare(primes_[a2 + 1]);
+  }
+
+  int64_t cache_size(int64_t a2) const
+  {
+    return static_cast<int64_t>(cache_[a2].size());
+  }
+
+  bool is_cached(int64_t a2, int64_t x2)
+  {
+    return a2 <= CACHE_A_LIMIT && x2 < cache_size(a2) &&
+           cache_[a2][x2] != 0;
+  }
+
+  bool write_to_cache(int64_t a2, int64_t x2)
   {
     if (a2 > CACHE_A_LIMIT || x2 > std::numeric_limits<uint16_t>::max())
       return false;
-    // resize and initialize cache if necessary
-    if (x2 >= static_cast<int64_t>(cache_[a2].size()))
+    // resize and initialize cache_ if necessary
+    if (x2 >= cache_size(a2))
     {
       if (bytes_ > CACHE_BYTES_LIMIT)
         return false;
