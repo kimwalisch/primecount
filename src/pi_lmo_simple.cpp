@@ -76,7 +76,7 @@ int64_t pi_lmo_simple(int64_t x, int threads)
         S2 -= moebius[m] * phi(x / (m * primes[b + 1]), b, &cache);
 
   int64_t phi = S1 + S2;
-  int64_t sum = phi + a - 1 - P2(x, a);
+  int64_t sum = phi + a - 1 - P2(x, a, threads);
 
   return sum;
 }
