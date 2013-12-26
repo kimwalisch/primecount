@@ -5,7 +5,7 @@
 
 TARGET   := primecount
 CXX      := c++
-CXXFLAGS := -O2
+CXXFLAGS := -O2 -DNDEBUG
 BINDIR   := bin
 INCDIR   := include
 LIBDIR   := lib

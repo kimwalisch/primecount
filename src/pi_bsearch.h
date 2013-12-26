@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 namespace primecount {
 
@@ -22,6 +23,7 @@ namespace primecount {
 template <typename T1, typename T2>
 inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
+  assert(primes[0] == 0);
   // +1 is a correction for primes[0] = 0
   return static_cast<T2>(std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
@@ -33,6 +35,7 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 template <typename T1, typename T2, typename T3>
 inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
 {
+  assert(primes[0] == 0);
   // +1 is a correction for primes[0] = 0
   return static_cast<T3>(std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
 }
