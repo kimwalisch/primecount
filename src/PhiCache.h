@@ -96,7 +96,7 @@ public:
         phi_result = cache_[a2][x2] * -SIGN;
       else
       {
-        if (is_bsearch(x2, a2))
+        if (is_phi_bsearch(x2, a2))
           phi_result = phi_bsearch(x2, a2) * -SIGN;
         else
           phi_result = phi_recursive<-SIGN>(x2, a2);
@@ -122,33 +122,33 @@ private:
     return pix - a + 1;
   }
 
-  bool is_bsearch(int64_t x2, int64_t a2) const
+  bool is_phi_bsearch(int64_t x, int64_t a) const
   {
-    return x2 <= primes_.back() && x2 < isquare(primes_[a2 + 1]);
+    return x <= primes_.back() && x < isquare(primes_[a + 1]);
   }
 
-  int64_t cache_size(int64_t a2) const
+  int64_t cache_size(int64_t a) const
   {
-    return static_cast<int64_t>(cache_[a2].size());
+    return static_cast<int64_t>(cache_[a].size());
   }
 
-  bool is_cached(int64_t a2, int64_t x2)
+  bool is_cached(int64_t a, int64_t x)
   {
-    return a2 <= CACHE_A_LIMIT && x2 < cache_size(a2) &&
-           cache_[a2][x2] != 0;
+    return a <= CACHE_A_LIMIT && x < cache_size(a) &&
+           cache_[a][x] != 0;
   }
 
-  bool write_to_cache(int64_t a2, int64_t x2)
+  bool write_to_cache(int64_t a, int64_t x)
   {
-    if (a2 > CACHE_A_LIMIT || x2 > std::numeric_limits<uint16_t>::max())
+    if (a > CACHE_A_LIMIT || x > std::numeric_limits<uint16_t>::max())
       return false;
     // resize and initialize cache_ if necessary
-    if (x2 >= cache_size(a2))
+    if (x >= cache_size(a))
     {
       if (bytes_ > CACHE_BYTES_LIMIT)
         return false;
-      bytes_ += (x2 + 1 - cache_[a2].size()) * 2;
-      cache_[a2].resize(x2 + 1, 0);
+      bytes_ += (x + 1 - cache_[a].size()) * 2;
+      cache_[a].resize(x + 1, 0);
     }
     return true;
   }
