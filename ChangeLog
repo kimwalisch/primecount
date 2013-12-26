@@ -1,9 +1,9 @@
 2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.9 work in progress.
+  Version 0.9 released.
 
   * src/pi_lmo_simple.cpp: Parallelized algorithm.
-  * src/PhiTiny.h: New class, Cache for phi(x, a) for a < 7.
+  * src/PhiTiny.h: New class, cache of phi(x, a) values for a < 7.
   * src/PhiCache.h:: Add PhiTiny optimization.
   * src/phi.cpp: Add PhiTiny optimization.
   * src/pi_bsearch.h: Refactoring.
