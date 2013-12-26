@@ -11,19 +11,30 @@
 #define PI_BSEARCH_H
 
 #include <algorithm>
-#include <iterator>
+#include <vector>
 
 namespace primecount {
 
-/// Given a std::vector with the first n primes and x <= nth prime
+/// Given a vector with the first n primes and x <= nth prime
 /// calculate the number of primes below x using binary search.
-/// Run time: O(log x)
+/// @pre primes[0] = 0, primes[1] = 2, primes[3] = 3, ...
 ///
-template <class ForwardIterator, typename T>
-inline T pi_bsearch(ForwardIterator first, ForwardIterator last, const T& x)
+template <typename T1, typename T2>
+inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
-  return static_cast<T>(
-      std::distance(first, std::upper_bound(first, last, x)));
+  // +1 is a correction for primes[0] = 0
+  return static_cast<T2>(std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
+}
+
+/// Given a vector with the first n primes and x <= nth prime
+/// calculate the number of primes below x using binary search.
+/// @pre primes[0] = 0, primes[1] = 2, primes[3] = 3, ...
+///
+template <typename T1, typename T2, typename T3>
+inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
+{
+  // +1 is a correction for primes[0] = 0
+  return static_cast<T3>(std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
 }
 
 } // namespace primecount

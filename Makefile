@@ -24,7 +24,8 @@ LIB_OBJECTS := \
   $(OBJDIR)/pi_lmo_simple.o \
   $(OBJDIR)/pi_lmo.o \
   $(OBJDIR)/pi.o \
-  $(OBJDIR)/phi.o
+  $(OBJDIR)/phi.o \
+  $(OBJDIR)/PhiTiny.o
 
 BIN_OBJECTS := \
   $(LIB_OBJECTS) \
