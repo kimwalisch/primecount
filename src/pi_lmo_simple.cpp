@@ -2,6 +2,10 @@
 /// @file  pi_lmo_simple.cpp
 /// @brief Simple demonstration implementation of the
 ///        Lagarias-Miller-Odlyzko prime counting algorithm.
+///        Usually in the Lagarias-Miller-Odlyzko algorithm phi(x, a)
+///        is calculated using a prime sieve but this simple
+///        implementation calculates phi(x, a) using the recursive
+///        formula with caching.
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -49,8 +53,8 @@ int64_t pi_lmo_simple(int64_t x, int threads)
   init_moebius(moebius, x13);
   init_least_factor(least_factor, x13);
 
-  int64_t c = (a < 6) ? a : 6;
   int64_t a_1 = a - 1;
+  int64_t c = (a < 6) ? a : 6;
   int64_t S1 = 0;
   int64_t S2 = 0;
 
