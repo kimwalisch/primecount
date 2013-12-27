@@ -79,7 +79,7 @@ public:
   ///
   int64_t phi(int64_t x, int64_t a, int sign)
   {
-	if (is_cached(x, a))
+    if (is_cached(x, a))
       return cache_[a][x] * sign;
 
     int64_t sum;
@@ -132,7 +132,7 @@ private:
   bool is_cached(int64_t x, int64_t a) const
   {
     return a <= CACHE_A_LIMIT && x < cache_size(a) &&
-           cache_[a][x] != 0;
+        cache_[a][x] != 0;
   }
 
   bool write_to_cache(int64_t x, int64_t a)
