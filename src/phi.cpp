@@ -56,7 +56,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
       num_threads(threads) schedule(dynamic, 16)
 #endif
   for (int64_t a2 = 0; a2 < iters; a2++)
-    sum += cache.phi_recursive<-1>(x / primes[a2 + 1], a2);
+    sum += cache.phi(x / primes[a2 + 1], a2, -1);
 
   return sum;
 }

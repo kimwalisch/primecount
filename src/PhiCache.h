@@ -71,41 +71,38 @@ public:
     if (primes_.at(a) >= x)
       return 1;
 
-    return phi_recursive<1>(x, a);
+    return phi(x, a, 1);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
   /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1)
   ///
-  template <int SIGN>
-  int64_t phi_recursive(int64_t x, int64_t a)
+  int64_t phi(int64_t x, int64_t a, int sign)
   {
-    if (phiTiny_.is_cached(a))
-      return phiTiny_.phi(x, a) * SIGN;
+	if (is_cached(x, a))
+      return cache_[a][x] * sign;
 
-    int64_t sum = x * SIGN;
-    int64_t iters = pi_bsearch(primes_, a, isqrt(x));
-    sum += (a - iters) * -SIGN;
+    int64_t sum;
 
-    for (int64_t a2 = 0; a2 < iters; a2++)
+    if (x < primes_[a])
+      sum = sign;
+    else if (phiTiny_.is_cached(a))
+      sum = phiTiny_.phi(x, a) * sign;
+    else if (is_phi_bsearch(x, a))
+      sum = phi_bsearch(x, a) * sign;
+    else
     {
-      int64_t x2 = FAST_DIV(x, primes_[a2 + 1]);
-      int64_t phi_result;
+      sum = x * sign;
+      int64_t iters = pi_bsearch(primes_, a, isqrt(x));
+      sum += (a - iters) * -sign;
 
-      if (is_cached(a2, x2))
-        phi_result = cache_[a2][x2] * -SIGN;
-      else
-      {
-        if (is_phi_bsearch(x2, a2))
-          phi_result = phi_bsearch(x2, a2) * -SIGN;
-        else
-          phi_result = phi_recursive<-SIGN>(x2, a2);
-
-        if (write_to_cache(a2, x2))
-          cache_[a2][x2] = static_cast<uint16_t>(phi_result * -SIGN);
-      }
-      sum += phi_result;
+      for (int64_t a2 = 0; a2 < iters; a2++)
+        sum += phi(FAST_DIV(x, primes_[a2 + 1]), a2, -sign);
     }
+
+    if (write_to_cache(x, a))
+      cache_[a][x] = static_cast<uint16_t>(sum * sign);
+
     return sum;
   }
 private:
@@ -132,13 +129,13 @@ private:
     return static_cast<int64_t>(cache_[a].size());
   }
 
-  bool is_cached(int64_t a, int64_t x)
+  bool is_cached(int64_t x, int64_t a) const
   {
     return a <= CACHE_A_LIMIT && x < cache_size(a) &&
            cache_[a][x] != 0;
   }
 
-  bool write_to_cache(int64_t a, int64_t x)
+  bool write_to_cache(int64_t x, int64_t a)
   {
     if (a > CACHE_A_LIMIT || x > std::numeric_limits<uint16_t>::max())
       return false;
