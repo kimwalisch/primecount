@@ -1,3 +1,10 @@
+2013-12-28  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.10 work in progress.
+
+  * src/PhiCache.h:: Faster phi(x, a).
+  * README: Updated timings.
+
 2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.9 released.

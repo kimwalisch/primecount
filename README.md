@@ -71,50 +71,50 @@ counting the primes below the nth prime.
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
     <td>0.05s</td>
-    <td>0.05s</td>
+    <td>0.06s</td>
     <td>0.03s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.10s</td>
-    <td>0.12s</td>
+    <td>0.08s</td>
     <td>0.09s</td>
+    <td>0.06s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.37s</td>
-    <td>0.40s</td>
+    <td>0.31s</td>
     <td>0.30s</td>
+    <td>0.25s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>1.80s</td>
-    <td>1.73s</td>
-    <td>1.20s</td>
+    <td>1.49s</td>
+    <td>1.48s</td>
+    <td>1.01s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>11.23s</td>
-    <td>9.33s</td>
-    <td>5.66s</td>
+    <td>9.30s</td>
+    <td>8.05s</td>
+    <td>5.21s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>75.19s</td>
-    <td>59.57s</td>
-    <td>31.52s</td>
+    <td>60.38s</td>
+    <td>50.65s</td>
+    <td>28.86s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>584.31s</td>
-    <td>433.22s</td>
-    <td>203.49s</td>
+    <td>423.12s</td>
+    <td>335.04s</td>
+    <td>184.20s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
