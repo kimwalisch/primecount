@@ -66,7 +66,7 @@ void test()
   check_for_equality("pi_legendre",   pi_legendre,   pi_primesieve, 100);
   check_for_equality("pi_meissel",    pi_meissel,    pi_legendre,   500);
   check_for_equality("pi_lehmer",     pi_lehmer,     pi_meissel,    500);
-  check_for_equality("pi_lmo_simple", pi_lmo_simple, pi_meissel,    200);
+  check_for_equality("pi_lmo_simple", pi_lmo_simple, pi_lehmer,     500);
   check_for_equality("nth_prime",     nth_prime,     pps_nth_prime, 100);
 
   cout << "All tests passed successfully!" << endl;
