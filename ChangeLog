@@ -2,7 +2,8 @@
 
   Version 0.10 work in progress.
 
-  * src/PhiCache.h:: Faster phi(x, a).
+  * src/PhiCache.h: Faster phi(x, a).
+  * src/test.cpp: Updated pi_lmo_simple(x) test.
   * README: Updated timings.
 
 2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
