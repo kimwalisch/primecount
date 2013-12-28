@@ -119,9 +119,9 @@ counting the primes below the nth prime.
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>5045.86s</td>
-    <td>3614.63s</td>
-    <td>1580.60s</td>
+    <td>3749.72s</td>
+    <td>2879.81s</td>
+    <td>1375.36s</td>
   </tr>
 </table>
 
