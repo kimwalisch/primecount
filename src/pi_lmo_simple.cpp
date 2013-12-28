@@ -41,7 +41,7 @@ int64_t pi_lmo_simple(int64_t x, int threads)
     return 0;
 
   int64_t x13 = iroot<3>(x); 
-  int64_t a = pi_meissel(x13);
+  int64_t a = pi_lehmer(x13);
 
   // generate the primes <= x^(1/3)
   std::vector<int32_t> primes;
