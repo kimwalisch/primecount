@@ -92,11 +92,12 @@ public:
       sum = phi_bsearch(x, a) * sign;
     else
     {
-      sum = x * sign;
       int64_t iters = pi_bsearch(primes_, a, isqrt(x));
-      sum += (a - iters) * -sign;
+      int64_t c = (iters > 6) ? 6 : iters;
+      sum = (a - iters) * -sign;
+      sum += phiTiny_.phi(x, c) * sign;
 
-      for (int64_t a2 = 0; a2 < iters; a2++)
+      for (int64_t a2 = c; a2 < iters; a2++)
         sum += phi(FAST_DIV(x, primes_[a2 + 1]), a2, -sign);
     }
 
