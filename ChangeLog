@@ -1,9 +1,11 @@
-2013-12-28  Kim Walisch  <kim.walisch@gmail.com>
+2013-12-31  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.10 work in progress.
+  Version 0.10 released.
 
   * src/PhiCache.h: Faster phi(x, a).
-  * src/test.cpp: Updated pi_lmo_simple(x) test.
+  * src/test.cpp: Update pi_lmo_simple(x) test.
+  * src/pi_primesieve.cpp: Fix primesieve API changes.
+  * src/nth_prime.cpp: Fix primesieve API changes.
   * README: Updated timings.
 
 2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
