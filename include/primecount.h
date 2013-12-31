@@ -22,7 +22,7 @@ class PhiCache;
 
 enum {
   /// Uses all CPU cores.
-  MAX_THREADS
+  MAX_THREADS = -1
 };
 
 /// This is an alias for the fastest prime counting implementation

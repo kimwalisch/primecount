@@ -18,7 +18,8 @@ int64_t pi_primesieve(int64_t x, int threads /* = MAX_THREADS */)
   if (x < 2)
     return 0;
 
-  return primesieve::parallel_count_primes(0, x, threads);
+  primesieve::set_num_threads(threads);
+  return primesieve::parallel_count_primes(0, x);
 }
 
 } // namespace primecount

@@ -34,7 +34,9 @@ int64_t nth_prime(int64_t n, int threads)
 
   int64_t n_remaining = n - count_approx;
   int64_t start = prime_approx + 1;
-  int64_t prime = primesieve::parallel_nth_prime(n_remaining, start, threads);
+
+  primesieve::set_num_threads(threads);
+  int64_t prime = primesieve::parallel_nth_prime(n_remaining, start);
 
   return prime;
 }
