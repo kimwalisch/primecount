@@ -135,7 +135,7 @@ In order to build primecount you need to have installed a C++ compiler and a
 recent version of the GNU Build System (automake, autoconf, libtool). primecount
 depends on the author's [primesieve](https://github.com/kimwalisch/primesieve)
 library (version 5.0 or later) which must be installed first:
-```
+```sh
 $ git clone git://github.com/kimwalisch/primesieve.git && cd primesieve
 $ ./autogen.sh
 $ ./configure
@@ -144,7 +144,7 @@ $ sudo make install
 
 ```
 After having installed primesieve you can build primecount using:
-```
+```sh
 $ git clone git://github.com/kimwalisch/primecount.git && cd primecount
 $ ./autogen.sh
 $ ./configure
@@ -156,13 +156,13 @@ $ sudo make install
 If you have installed primesieve but primecount's configure script still fails
 due to missing libprimesieve then you need to add /usr/local/lib to your library
 path using:
-```
+```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
 ### Usage Examples
-```
+```sh
 $ primecount 10^14
 $ primecount 10^14 --meissel --threads=2
 $ primecount 10^14 --nthprime
@@ -195,7 +195,7 @@ int main(int, char** argv)
 ```
 
 On Unix-like operating systems compile using:
-```
+```sh
 $ c++ -O2 primes.cpp -lprimecount
 ```
 
