@@ -5,8 +5,9 @@ primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes
 using efficient implementations of the prime counting function pi(x)
 (combinatorial methods) which is orders of magnitude faster than counting primes
 using the sieve of Eratosthenes. So far primecount offers the option to count
-primes using Legendre's, Meissel's and Lehmer's formulas. All pi(x)
-implementations are fully parallelized using OpenMP.
+primes using Legendre's, Meissel's and Lehmer's formulas and using the Lagarias,
+Miller, Odlyzko algorithm (simple implementation). All pi(x) implementations are
+fully parallelized using OpenMP.
 
 ### Algorithms and Complexity
 
@@ -132,19 +133,22 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 ### How to build it
 primecount depends on the author's
 [primesieve](https://github.com/kimwalisch/primesieve) library (version 5.0 or
-later). To download, build and install the latest primesieve version on a
-Unix-like operating system run (requires GNU Autotools and Libtool):
+later). In order to build and install the latest primesieve version you need to
+have installed a recent version of the GNU Build System (automake, autoconf,
+libtool) and a C++ compiler:
 ```
-$ git clone git://github.com/kimwalisch/primesieve.git
-$ cd primesieve
+$ git clone git://github.com/kimwalisch/primesieve.git && cd primesieve
 $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
 ```
-To build and install primecount using GNU make and the default `c++' compiler
-run:
+In order to build primecount you need to have installed a recent version of the
+GNU Build System (automake, autoconf, libtool) and a C++ compiler:
 ```
+$ git clone git://github.com/kimwalisch/primecount.git && cd primecount
+$ ./autogen.sh
+$ ./configure
 $ make
 $ sudo make install
 ```
