@@ -1,5 +1,5 @@
 ///
-/// @file  PhiCache.h
+/// @file  PhiCache.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,9 +10,9 @@
 #ifndef PHICACHE_H
 #define PHICACHE_H
 
-#include "PhiTiny.h"
-#include "pi_bsearch.h"
-#include "imath.h"
+#include "PhiTiny.hpp"
+#include "pi_bsearch.hpp"
+#include "imath.hpp"
 
 #include <stdint.h>
 #include <vector>

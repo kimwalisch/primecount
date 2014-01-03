@@ -9,7 +9,7 @@
 /// file in the top level directory.
 ///
 
-#include "cmdoptions.h"
+#include "cmdoptions.hpp"
 #include "calculator.hpp"
 
 #include <stdint.h>

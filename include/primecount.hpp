@@ -1,5 +1,5 @@
 ///
-/// @file  primecount.h
+/// @file  primecount.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///

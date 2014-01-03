@@ -7,9 +7,9 @@
 /// file in the top level directory.
 ///
 
-#include "cmdoptions.h"
+#include "cmdoptions.hpp"
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <iostream>
 #include <stdint.h>
 

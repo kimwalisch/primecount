@@ -1,5 +1,5 @@
 ///
-/// @file  PhiTiny.h
+/// @file  PhiTiny.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///

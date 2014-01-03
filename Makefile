@@ -35,8 +35,8 @@ BIN_OBJECTS := \
   $(OBJDIR)/test.o
 
 HEADERS := \
-  $(INCDIR)/primecount.h \
-  $(wildcard $(SRCDIR)/*.h)
+  $(INCDIR)/primecount.hpp \
+  $(wildcard $(SRCDIR)/*.hpp)
 
 #-----------------------------------------------------------------------------
 # Needed to suppress output while checking system features

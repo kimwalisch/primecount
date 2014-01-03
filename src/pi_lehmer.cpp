@@ -7,10 +7,10 @@
 /// file in the top level directory.
 ///
 
-#include "imath.h"
-#include "Pk.h"
+#include "imath.hpp"
+#include "Pk.hpp"
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <stdint.h>
 
 namespace primecount {

@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#include "pi_bsearch.h"
-#include "imath.h"
+#include "pi_bsearch.hpp"
+#include "imath.hpp"
 
 #include <primesieve.hpp>
 #include <stdint.h>
@@ -16,7 +16,7 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "to_omp_threads.h"
+  #include "to_omp_threads.hpp"
 #endif
 
 namespace primecount {

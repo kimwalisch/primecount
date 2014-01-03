@@ -13,19 +13,19 @@
 /// file in the top level directory.
 ///
 
-#include "PhiTiny.h"
-#include "PhiCache.h"
-#include "imath.h"
-#include "Pk.h"
+#include "PhiTiny.hpp"
+#include "PhiCache.hpp"
+#include "imath.hpp"
+#include "Pk.hpp"
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "to_omp_threads.h"
+  #include "to_omp_threads.hpp"
 #endif
 
 namespace primecount {

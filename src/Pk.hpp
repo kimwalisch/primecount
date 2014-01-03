@@ -1,5 +1,5 @@
 ///
-/// @file  Pk.h
+/// @file  Pk.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,7 +10,7 @@
 #ifndef PK_PRIMECOUNT_H
 #define PK_PRIMECOUNT_H
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <stdint.h>
 
 namespace primecount {

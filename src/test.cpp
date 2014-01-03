@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>

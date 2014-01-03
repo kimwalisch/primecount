@@ -1,5 +1,5 @@
 ///
-/// @file  to_omp_threads.h
+/// @file  to_omp_threads.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,7 +12,7 @@
 
 #ifdef _OPENMP
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <omp.h>
 
 namespace primecount {

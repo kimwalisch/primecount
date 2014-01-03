@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include "PhiTiny.h"
+#include "PhiTiny.hpp"
 #include <stdint.h>
 
 namespace primecount {

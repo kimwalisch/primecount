@@ -1,5 +1,5 @@
 ///
-/// @file  imath.h
+/// @file  imath.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///

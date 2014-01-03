@@ -1,5 +1,5 @@
 ///
-/// @file  cmdoptions.h
+/// @file  cmdoptions.hpp
 ///
 /// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,7 +10,7 @@
 #ifndef PRIMECOUNT_CMDOPTIONS_H
 #define PRIMECOUNT_CMDOPTIONS_H
 
-#include <primecount.h>
+#include <primecount.hpp>
 #include <stdint.h>
 
 namespace primecount {
