@@ -168,8 +168,8 @@ $ primecount 10^14 --nthprime
 
 ### C++ library
 Below is an example program that counts the primes below n and calculates the
-nth prime using libprimecount. Browse [primecount's API](include/primecount.hpp)
-online (documented using Doxygen).
+nth prime using libprimecount. Browse
+[libprimecount's API](include/primecount.hpp) online (documented using Doxygen).
 
 ```C++
 #include <primecount.hpp>
