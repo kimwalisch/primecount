@@ -141,6 +141,7 @@ $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
+
 ```
 After having installed primesieve you can build primecount using:
 ```
@@ -149,6 +150,15 @@ $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
+
+```
+### Linker issues
+If you have installed primesieve but primecount's configure script still fails
+due to missing libprimesieve then you need to add /usr/local/lib to your library
+path using:
+```
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
 ### Usage Examples
