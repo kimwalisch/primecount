@@ -19,5 +19,9 @@ case "$host_os" in
     *)       AM_CONDITIONAL(FORCE_SHARED_LIBRARY, false);;
 esac
 
+AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
+    [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])]
+)
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -10,7 +10,7 @@ libprimecount_la_LDFLAGS += -no-undefined
 endif
 
 bin_PROGRAMS = primecount
-primecount_LDADD = libprimecount.la -lprimesieve
+primecount_LDADD = libprimecount.la
 
 # If installation directory is /usr/local/lib
 # execute ldconfig after installation
