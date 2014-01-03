@@ -1,2 +1,2 @@
-+ Implement optimized LMO algorithm
-+ Try to compile with sunCC +w2
++ Check for libprimesieve in configure.ac
++ README.md simplify installation
