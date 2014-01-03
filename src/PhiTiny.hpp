@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PHITINY_H
-#define PHITINY_H
+#ifndef PHITINY_HPP
+#define PHITINY_HPP
 
 #include <stdint.h>
 #include <vector>

@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PI_BSEARCH_H
-#define PI_BSEARCH_H
+#ifndef PI_BSEARCH_HPP
+#define PI_BSEARCH_HPP
 
 #include <algorithm>
 #include <vector>

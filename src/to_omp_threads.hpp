@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef TO_OMP_THREADS_H
-#define TO_OMP_THREADS_H
+#ifndef TO_OMP_THREADS_HPP
+#define TO_OMP_THREADS_HPP
 
 #ifdef _OPENMP
 

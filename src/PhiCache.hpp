@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PHICACHE_H
-#define PHICACHE_H
+#ifndef PHICACHE_HPP
+#define PHICACHE_HPP
 
 #include "PhiTiny.hpp"
 #include "pi_bsearch.hpp"

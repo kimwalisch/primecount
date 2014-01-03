@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PRIMECOUNT_H
-#define PRIMECOUNT_H
+#ifndef PRIMECOUNT_HPP
+#define PRIMECOUNT_HPP
 
 #include <stdint.h>
 
