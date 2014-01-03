@@ -93,6 +93,11 @@ int64_t Li(int64_t);
 ///
 int64_t Li_inverse(int64_t);
 
+/// Test all prime counting function implementations.
+/// @return true if success else false.
+///
+bool test();
+
 } // namespace primecount
 
 #endif

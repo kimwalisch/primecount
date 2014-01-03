@@ -26,8 +26,8 @@ using std::string;
 namespace primecount {
 
 void help();
-void test();
 void version();
+bool test();
 
 /// e.g. id = "--threads", value = "4"
 struct Option
@@ -108,7 +108,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
         case OPTION_NUMBER:  numbers.push_back(option.getValue<int64_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
-        case OPTION_TEST:    test(); break;
+        case OPTION_TEST:    if (test()) exit(0); exit(1);
         case OPTION_VERSION: version(); break;
         default:             pco.option = optionMap[option.id];
       }

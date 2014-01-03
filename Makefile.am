@@ -39,10 +39,10 @@ libprimecount_la_SOURCES = \
   src/pi_lmo.cpp \
   src/pi.cpp \
   src/phi.cpp \
-  src/PhiTiny.cpp
+  src/PhiTiny.cpp \
+  src/test.cpp
 
 primecount_SOURCES = \
   src/cmdoptions.cpp \
   src/help.cpp \
-  src/primecount.cpp \
-  src/test.cpp
+  src/primecount.cpp
