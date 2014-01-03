@@ -131,11 +131,10 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 4.8 and used 8 threads for each benchmark.
 
 ### How to build it
-primecount depends on the author's
-[primesieve](https://github.com/kimwalisch/primesieve) library (version 5.0 or
-later). In order to build and install the latest primesieve version you need to
-have installed a recent version of the GNU Build System (automake, autoconf,
-libtool) and a C++ compiler:
+In order to build primecount you need to have installed a C++ compiler and a
+recent version of the GNU Build System (automake, autoconf, libtool). primecount
+depends on the author's [primesieve](https://github.com/kimwalisch/primesieve)
+library (version 5.0 or later) which must be installed first:
 ```
 $ git clone git://github.com/kimwalisch/primesieve.git && cd primesieve
 $ ./autogen.sh
@@ -143,8 +142,7 @@ $ ./configure
 $ make
 $ sudo make install
 ```
-In order to build primecount you need to have installed a recent version of the
-GNU Build System (automake, autoconf, libtool) and a C++ compiler:
+After having installed primesieve you can build primecount using:
 ```
 $ git clone git://github.com/kimwalisch/primecount.git && cd primecount
 $ ./autogen.sh
