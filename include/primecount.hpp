@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "0.10"
+#define PRIMECOUNT_VERSION "0.11"
 #define PRIMECOUNT_VERSION_MAJOR 0
-#define PRIMECOUNT_VERSION_MINOR 10
+#define PRIMECOUNT_VERSION_MINOR 11
 
 namespace primecount {
 

@@ -1,3 +1,9 @@
+2014-01-03  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.11 work in progress.
+
+  * Renamed *.h to *.hpp
+
 2013-12-31  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.10 released.
