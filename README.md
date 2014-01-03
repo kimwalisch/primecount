@@ -141,7 +141,6 @@ $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
-
 ```
 After having installed primesieve you can build primecount using:
 ```sh
@@ -150,7 +149,6 @@ $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
-
 ```
 
 If you have installed primesieve but primecount's configure script still fails
