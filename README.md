@@ -158,6 +158,37 @@ $ primecount 10^14 --meissel --threads=2
 $ primecount 10^14 --nthprime
 ```
 
+### C++ library
+Below is an example program that counts the primes below n and calculates the
+nth prime using libprimecount. Browse [primecount's API](include/primecount.hpp)
+online.
+```C++
+#include <primecount.hpp>
+#include <iostream>
+#include <cstdlib>
+#include <stdint.h>
+
+int main(int, char** argv)
+{
+  int64_t n = 1000;
+  if (argv[1])
+    n = std::atol(argv[1]);
+
+  int64_t prime_count = primecount::pi(n);
+  std::cout << "primes below " << n << " = " << prime_count << std::endl;
+
+  int64_t nth_prime = primecount::nth_prime(n);
+  std::cout << n << "th prime = " << nth_prime << std::endl;
+
+  return 0;
+}
+```
+
+On Unix-like operating systems compile using:
+```
+$ c++ -O2 primes.cpp -lprimecount
+```
+
 ### References
 1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
 2. D. H. Lehmer, On the exact number of primes less than a given limit, Illinois J. Math. 3 (1959), pp. 381–388.
