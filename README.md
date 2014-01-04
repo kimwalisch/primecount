@@ -153,7 +153,7 @@ $ sudo make install
 
 If you have installed primesieve but primecount's configure script still fails
 due to missing libprimesieve then you need to add /usr/local/lib to your library
-path using:
+path:
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
