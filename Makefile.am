@@ -28,21 +28,29 @@ EXTRA_DIST = \
 	README.md
 
 libprimecount_la_SOURCES = \
-  src/Li.cpp \
-  src/nth_prime.cpp \
-  src/Pk.cpp \
-  src/pi_primesieve.cpp \
-  src/pi_meissel.cpp \
-  src/pi_legendre.cpp \
-  src/pi_lehmer.cpp \
-  src/pi_lmo_simple.cpp \
-  src/pi_lmo.cpp \
-  src/pi.cpp \
-  src/phi.cpp \
-  src/PhiTiny.cpp \
-  src/test.cpp
+	src/Li.cpp \
+	src/nth_prime.cpp \
+	src/Pk.cpp \
+	src/pi_primesieve.cpp \
+	src/pi_meissel.cpp \
+	src/pi_legendre.cpp \
+	src/pi_lehmer.cpp \
+	src/pi_lmo_simple.cpp \
+	src/pi_lmo.cpp \
+	src/pi.cpp \
+	src/phi.cpp \
+	src/PhiTiny.cpp \
+	src/test.cpp \
+	src/imath.hpp \
+	src/PhiCache.hpp \
+	src/PhiTiny.hpp \
+	src/pi_bsearch.hpp \
+	src/Pk.hpp \
+	src/to_omp_threads.hpp
 
 primecount_SOURCES = \
-  src/cmdoptions.cpp \
-  src/help.cpp \
-  src/primecount.cpp
+	src/primecount.cpp \
+	src/help.cpp \
+	src/cmdoptions.cpp \
+	src/cmdoptions.hpp \
+	src/calculator.hpp
