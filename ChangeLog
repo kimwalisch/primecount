@@ -1,9 +1,10 @@
-2014-01-03  Kim Walisch  <kim.walisch@gmail.com>
+2014-01-04  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.11 work in progress.
+  Version 0.11 released.
 
   * Moved build system to GNU Autotools
   * Renamed *.h to *.hpp
+  * src/test.cpp: Refactoring.
 
 2013-12-31  Kim Walisch  <kim.walisch@gmail.com>
 

@@ -1,2 +1,1 @@
-+ Check for libprimesieve in configure.ac
-+ README.md simplify installation
++ implement pi_lmo(x)
