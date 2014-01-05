@@ -6,10 +6,14 @@ AC_LANG([C++])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([subdir-objects foreign -Wall -Werror])
 AC_PROG_CXX
-AC_OPENMP
 AC_CANONICAL_HOST
+AC_OPENMP
 AM_PROG_AR
 LT_INIT
+
+# Option to enable assert macro
+AC_ARG_ENABLE(assert, AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
+    [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
 
 # Force building shared library on Windows
 # Reference: <http://article.gmane.org/gmane.comp.gnu.mingw.user/18727>
