@@ -1,6 +1,6 @@
-2014-01-04  Kim Walisch  <kim.walisch@gmail.com>
+2014-01-05  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.11 released.
+  Version 0.12 released.
 
   * Moved build system to GNU Autotools
   * Renamed *.h to *.hpp

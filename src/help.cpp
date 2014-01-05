@@ -1,7 +1,7 @@
 ///
 /// @file  help.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -45,7 +45,7 @@ const string helpMenu(
 
 const string versionInfo(
   "primecount " PRIMECOUNT_VERSION ", <https://github.com/kimwalisch/primecount>\n"
-  "Copyright (C) 2013 Kim Walisch\n"
+  "Copyright (C) 2014 Kim Walisch\n"
   "BSD 2-Clause License <http://opensource.org/licenses/BSD-2-Clause>"
 );
 
