@@ -12,7 +12,8 @@ AM_PROG_AR
 LT_INIT
 
 # Option to enable assert macro
-AC_ARG_ENABLE(assert, AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
+AC_ARG_ENABLE(assert,
+    AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
     [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
 
 # Force building shared library on Windows
