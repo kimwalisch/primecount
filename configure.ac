@@ -11,7 +11,7 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
-# Option to enable assert macro
+# Disable assert macro by default
 AC_ARG_ENABLE(assert,
     AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
     [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
