@@ -78,9 +78,9 @@ inline int32_t iroot(int64_t x)
 /// This implementation is based on code by Rick Sladkey
 /// posted here: http://mathoverflow.net/a/99545
 ///
-inline void init_moebius(std::vector<int32_t>& mu, int64_t max)
+inline std::vector<int32_t> make_moebius(int64_t max)
 {
-  mu.resize(max + 1, 1);
+  std::vector<int32_t> mu(max + 1, 1);
 
   for (int32_t i = 2; i * i <= max; i++)
   {
@@ -103,18 +103,19 @@ inline void init_moebius(std::vector<int32_t>& mu, int64_t max)
     else if (mu[i] > 0)
       mu[i] = -1;
   }
+  return mu;
 }
 
 /// Initialize a vector with the least prime
 /// factors of the integers <= max.
 ///
-inline void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
+inline std::vector<int32_t> make_least_prime_factor(int64_t max)
 {
-  lpf.resize(max + 1, 1);
+  std::vector<int32_t> lpf(max + 1, 1);
 
-  // phi(x / 1, c) contributes to the sum,
-  // lpf[1] = MAX in order to pass
-  // if (least_factor[1] > primes[c])
+  // phi(x / 1, c) contributes to the sum, thus
+  // set lpf[1] = MAX in order to pass
+  // if (lpf[1] > primes[c])
   if (lpf.size() > 1)
     lpf[1] = std::numeric_limits<int32_t>::max();
 
@@ -127,6 +128,8 @@ inline void init_least_factor(std::vector<int32_t>& lpf, int64_t max)
   for (int32_t i = 2; i <= max; i++)
     if (lpf[i] == 1)
       lpf[i] = i;
+
+  return lpf;
 }
 
 } // namespace primecount

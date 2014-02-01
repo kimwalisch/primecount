@@ -1,8 +1,14 @@
+2014-02-01  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.15 work in progress.
+
+  * src/pi_lmo_simple.cpp: Code cleanup.
+
 2014-01-05  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.14 released.
 
-  * Moved build system to GNU Autotools
+  * Moved build system to GNU Autotools.
   * Renamed *.h to *.hpp
   * src/test.cpp: Refactoring.
 
