@@ -36,7 +36,7 @@ running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
 operations and uses
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space. Meissel (1870) improved Legendre's formula by setting
+space. E. D. F. Meissel improved Legendre's formula (1870) by setting
 <img src="http://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/>
 and by adding the correction term
 <img src="http://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>.
