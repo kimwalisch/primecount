@@ -9,7 +9,7 @@ primes using Legendre's, Meissel's and Lehmer's formulas and using the Lagarias,
 Miller, Odlyzko algorithm (simple implementation). All pi(x) implementations are
 fully parallelized using OpenMP.
 
-### Algorithms and Complexity
+### Algorithms and complexity
 
 <table>
   <tr>
@@ -148,8 +148,7 @@ linked.
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-win64.zip">primecount-0.15-win64.zip</a>, 578K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 985K
 
-
-### Usage Examples
+### Usage examples
 Open a terminal or Command Prompt and run:
 ```sh
 # Count the primes below 10^14
