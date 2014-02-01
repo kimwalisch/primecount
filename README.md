@@ -28,35 +28,44 @@ fully parallelized using OpenMP.
 
 Up until the early 19th century the most efficient known method for counting
 primes was the sieve of Eratosthenes which has a running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Oxlnlnx.svg" height="20" align="absmiddle"/> operations. The first
-improvement to this bound was Legendre's formula (1830) which uses the
-inclusion-exclusion principle to calculate the number of primes below x without
-enumerating the individual primes. Legendre's formula has a running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/> operations and uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/> space. Meissel (1870) improved
-Legendre's formula by setting
-<img src="http://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/> and by adding the correction
-term <img src="http://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>. Meissel's formula has a
-running time of <img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/> operations
-and uses <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/> space (my
-implementation uses <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/> space). In
-1959 Lehmer extended Meissel's formula and slightly improved the running time to
-<img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/> operations and
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/> space (my implementation
-uses <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/> space).
+<img src="http://kimwalisch.github.io/primecount/formulas/Oxlnlnx.svg" height="20" align="absmiddle"/>
+operations. The first improvement to this bound was Legendre's formula (1830)
+which uses the inclusion-exclusion principle to calculate the number of primes
+below x without enumerating the individual primes. Legendre's formula has a
+running time of
+<img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
+operations and uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+space. Meissel (1870) improved Legendre's formula by setting
+<img src="http://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/>
+and by adding the correction term
+<img src="http://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>.
+Meissel's formula has a running time of
+<img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
+operations and uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
+space (my implementation uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+space). In 1959 Lehmer extended Meissel's formula and slightly improved the running time to
+<img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
+operations and
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
+space (my implementation uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+space).
 
 ### Fast nth prime calculation
 
 The most efficient known method for calculating the nth prime is a combination
 of the prime counting function and a prime sieve. The idea is to closely
 approximate the nth prime using e.g. the inverse logarithmic integral
-<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/> and count the primes up to this
-guess using the prime counting function. Once this is done one starts sieving
-(using e.g. the segmented sieve of Eratosthenes) at the nth prime guess until
-one finds the actual nth prime. The author has implemented
-```primecount::nth_prime(n)``` this way. In practice most time is spend by the
-prime counting function so the calculation of the nth prime is about as fast as
-counting the primes below the nth prime.
+<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
+and count the primes up to this guess using the prime counting function. Once
+this is done one starts sieving (using e.g. the segmented sieve of Eratosthenes)
+at the nth prime guess until one finds the actual nth prime. The author has
+implemented ```primecount::nth_prime(n)``` this way. In practice most time is
+spend by the prime counting function so the calculation of the nth prime is
+about as fast as counting the primes below the nth prime.
 
 ### Timings
 
