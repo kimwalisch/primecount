@@ -140,26 +140,23 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 4.8 and used 8 threads for each benchmark.
 
 ### How to build it
-In order to build primecount you need to have installed a C++ compiler and a
-recent version of the GNU Build System (automake, autoconf, libtool). primecount
-depends on the author's [primesieve](https://github.com/kimwalisch/primesieve)
-library (version 5.0 or later) which must be installed first:
+In order to build primecount you need to have installed a C++ compiler and
+GNU make (or any other make). primecount depends on the author's primesieve
+library, download it from http://primesieve.org/downloads
+and install it using:
 ```sh
-$ git clone git://github.com/kimwalisch/primesieve.git && cd primesieve
-$ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
 ```
-After having installed primesieve you can build primecount using:
+Then download the latest
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15.tar.gz">primecount-0.15.tar.gz</a>
+release tarball and build it using:
 ```sh
-$ git clone git://github.com/kimwalisch/primecount.git && cd primecount
-$ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
 ```
-
 If you have installed primesieve but primecount's configure script still fails
 due to missing libprimesieve then you need to add /usr/local/lib to your library
 path:
