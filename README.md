@@ -33,17 +33,17 @@ improvement to this bound was Legendre's formula (1830) which uses the
 inclusion-exclusion principle to calculate the number of primes below x without
 enumerating the individual primes. Legendre's formula has a running time of
 <img src="images/Ox.png" align="absmiddle"/> operations and uses
-<img src="images/Osqrtx.svg" align="absmiddle"/> space. Meissel (1870) improved
+<img src="images/Osqrtx.png" align="absmiddle"/> space. Meissel (1870) improved
 Legendre's formula by setting
 <img src="images/apisqrt3x.png" align="absmiddle"/> and by adding the correction
 term <img src="images/P2xa.png" align="absmiddle"/>. Meissel's formula has a
 running time of <img src="images/Omeissel.png" align="absmiddle"/> operations
 and uses <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my
-implementation uses <img src="images/Osqrtx.svg" align="absmiddle"/> space). In
+implementation uses <img src="images/Osqrtx.png" align="absmiddle"/> space). In
 1959 Lehmer extended Meissel's formula and slightly improved the running time to
 <img src="images/Olehmer.png" align="absmiddle"/> operations and
 <img src="images/Osqrtxlnx.png" align="absmiddle"/> space (my implementation
-uses <img src="images/Osqrtx.svg" align="absmiddle"/> space).
+uses <img src="images/Osqrtx.png" align="absmiddle"/> space).
 
 ### Fast nth prime calculation
 
