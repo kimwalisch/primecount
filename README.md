@@ -46,7 +46,7 @@ operations and uses
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
 space (my implementation uses
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space). In 1959 Lehmer extended Meissel's formula and slightly improved the running time to
+space). In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
 <img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
 operations and
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
