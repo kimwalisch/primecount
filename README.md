@@ -139,6 +139,32 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system. primecount was compiled using GCC
 4.8 and used 8 threads for each benchmark.
 
+### Precompiled binaries
+
+Below are the latest precompiled binaries for Windows 64-bit and Linux 64-bit,
+they have been compiled using the Intel C++ compiler and they are statically
+linked.
+
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-win64.zip">primecount-0.15-win64.zip</a>, 578K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 985K
+
+
+### Usage Examples
+Open a terminal or Command Prompt and run:
+```sh
+# Count the primes below 10^14
+$ ./primecount 10**14
+
+# Count the primes below 10^14 using Meissel's algorithm
+$ ./primecount 10**14 --meissel
+
+# Find the 10^14th prime
+$ ./primecount 10**14 --nthprime
+
+# Print an option summary
+$ ./primecount --help
+```
+
 ### How to build it
 In order to build primecount you need to have installed a C++ compiler and
 GNU make (or any other make). primecount depends on the author's primesieve
@@ -163,13 +189,6 @@ path:
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-```
-
-### Usage Examples
-```sh
-$ primecount 10^14
-$ primecount 10^14 --meissel --threads=2
-$ primecount 10^14 --nthprime
 ```
 
 ### C++ library
