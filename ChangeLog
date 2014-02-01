@@ -2,6 +2,8 @@
 
   Version 0.15 work in progress.
 
+  * Readme.md: New "Precompiled binaries" section.
+  * Readme.md: Use svg formula images.
   * src/pi_lmo_simple.cpp: Code cleanup.
 
 2014-01-05  Kim Walisch  <kim.walisch@gmail.com>
