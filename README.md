@@ -141,16 +141,14 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 
 ### Precompiled binaries
 
-Below are the latest precompiled binaries for Windows 64-bit and Linux 64-bit,
-they have been compiled using the Intel C++ compiler and they are statically
-linked.
+Below are the latest precompiled binaries for Windows 64-bit and Linux 64-bit:
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-win64.zip">primecount-0.15-win64.zip</a>, 578K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 985K
 
 SHA1 checksums of the files:
 ```sh
-df698d3b91d15b4e52d4a13269db112790637430  primecount-0.15-win64.zip
+224daae633110dab7194195baea6d491164adc79  primecount-0.15-win64.zip
 174c72950ac15d31842674792713c312fef15d78  primecount-0.15-linux-x64.tar.gz
 ```
 
