@@ -3,7 +3,7 @@ primecount
 primecount is a command-line program and C++ library that counts the number of
 primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes
 using efficient implementations of the prime counting function pi(x)
-(combinatorial methods) which is orders of magnitude faster than counting primes
+(combinatorial methods) which is orders of magnitudes faster than counting primes
 using the sieve of Eratosthenes. So far primecount offers the option to count
 primes using Legendre's, Meissel's and Lehmer's formulas and using the Lagarias,
 Miller, Odlyzko algorithm (simple implementation). All pi(x) implementations are
@@ -164,7 +164,7 @@ $ ./primecount 10**14 --nthprime
 $ ./primecount --help
 ```
 
-### How to build primecount
+### Building primecount
 In order to build primecount you need to have installed a C++ compiler and
 GNU make (or any other make). primecount depends on the author's primesieve
 library, download it from http://primesieve.org/downloads
