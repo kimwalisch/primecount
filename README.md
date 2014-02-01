@@ -148,6 +148,12 @@ linked.
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-win64.zip">primecount-0.15-win64.zip</a>, 578K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 985K
 
+SHA1 checksums of the files:
+```sh
+df698d3b91d15b4e52d4a13269db112790637430  primecount-0.15-win64.zip
+174c72950ac15d31842674792713c312fef15d78  primecount-0.15-linux-x64.tar.gz
+```
+
 ### Usage examples
 Open a terminal or Command Prompt and run:
 ```sh
