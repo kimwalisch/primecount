@@ -5,9 +5,9 @@ primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes
 using efficient implementations of the prime counting function pi(x)
 (combinatorial methods) which is orders of magnitudes faster than counting primes
 using the sieve of Eratosthenes. So far primecount offers the option to count
-primes using Legendre's, Meissel's and Lehmer's formulas and using the Lagarias,
-Miller, Odlyzko algorithm (simple implementation). All pi(x) implementations are
-fully parallelized using OpenMP.
+primes using Legendre's, Meissel's and Lehmer's formulas and using the
+Lagarias-Miller-Odlyzko algorithm (simple implementation). All pi(x)
+implementations are fully parallelized using OpenMP.
 
 ### Algorithms and complexity
 
