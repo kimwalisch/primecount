@@ -146,12 +146,12 @@ These binaries are command-line programs for use with a terminal or Command
 Prompt.
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-win64.zip">primecount-0.15-win64.zip</a>, 217K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 985K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.15-linux-x64.tar.gz">primecount-0.15-linux-x64.tar.gz</a>, 301K
 
 SHA1 checksums of the files:
 ```sh
 224daae633110dab7194195baea6d491164adc79  primecount-0.15-win64.zip
-174c72950ac15d31842674792713c312fef15d78  primecount-0.15-linux-x64.tar.gz
+7c29fba26c81b0f8e5d6272203bd8da7e199cce5  primecount-0.15-linux-x64.tar.gz
 ```
 
 ### Usage examples
