@@ -1,7 +1,8 @@
-2014-02-01  Kim Walisch  <kim.walisch@gmail.com>
+2014-02-02  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.15 work in progress.
+  Version 0.15 released.
 
+  * Precompiled binaries for Windows 64-bit and Linux x64-64.
   * Readme.md: New "Precompiled binaries" section.
   * Readme.md: Use svg formula images.
   * src/pi_lmo_simple.cpp: Code cleanup.
