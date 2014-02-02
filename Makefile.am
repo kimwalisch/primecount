@@ -24,7 +24,6 @@ include_HEADERS = \
 	include/primecount.hpp
 
 EXTRA_DIST = \
-	images \
 	README.md
 
 libprimecount_la_SOURCES = \
