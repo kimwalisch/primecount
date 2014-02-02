@@ -151,7 +151,7 @@ Prompt.
 SHA1 checksums of the files:
 ```sh
 224daae633110dab7194195baea6d491164adc79  primecount-0.15-win64.zip
-7c29fba26c81b0f8e5d6272203bd8da7e199cce5  primecount-0.15-linux-x64.tar.gz
+e09c303da9bd8dbd407487564360a2bc3d480ce0  primecount-0.15-linux-x64.tar.gz
 ```
 
 ### Usage examples
