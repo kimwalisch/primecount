@@ -51,17 +51,15 @@ int64_t S1(int64_t x,
 ///
 int64_t S2(int64_t x,
            int64_t x13_alpha,
+           int64_t x23_alpha,
            int64_t a,
            int64_t c,
-           double alpha,
            std::vector<int32_t>& primes,
            std::vector<int32_t>& lpf,
            std::vector<int32_t>& mu)
 {
-  int64_t x23 = (int64_t) std::pow((double) x / alpha, 2.0 / 3.0);
   int64_t S2_result = 0;
-
-  std::vector<char> sieve(x23 + 1, 1);
+  std::vector<char> sieve(x23_alpha + 1, 1);
 
   // phi(y, b) nodes with b <= c do not contribute to S2, so we
   // simply sieve out the multiples of the first c primes
@@ -69,7 +67,7 @@ int64_t S2(int64_t x,
   for (int64_t b = 1; b <= c; b++)
   {
     int64_t prime = primes[b];
-    for (int64_t i = prime; i <= x23; i += prime)
+    for (int64_t i = prime; i <= x23_alpha; i += prime)
       sieve[i] = 0;
   }
 
@@ -98,7 +96,7 @@ int64_t S2(int64_t x,
 
     assert(prime > 2);
     // Remove the multiples of (b + 1)th prime
-    for (int64_t i = prime; i <= x23; i += prime * 2)
+    for (int64_t i = prime; i <= x23_alpha; i += prime * 2)
       sieve[i] = 0;
   }
 
@@ -127,6 +125,7 @@ int64_t pi_lmo1(int64_t x, int threads)
 
   int64_t x13 = iroot<3>(x);
   int64_t x13_alpha = (int64_t)(x13 * alpha);
+  int64_t x23_alpha = (int64_t) std::pow((double) x / alpha, 2.0 / 3.0);
   int64_t a = pi_lehmer(x13_alpha);
   int64_t c = (a < 6) ? a : 6;
 
@@ -137,7 +136,7 @@ int64_t pi_lmo1(int64_t x, int threads)
   primes.push_back(0);
   primesieve::generate_n_primes(a, &primes);
 
-  int64_t phi = S1(x, x13_alpha, c, primes, lpf , mu) + S2(x, x13_alpha, a, c, alpha, primes, lpf , mu);
+  int64_t phi = S1(x, x13_alpha, c, primes, lpf , mu) + S2(x, x13_alpha, x23_alpha, a, c, primes, lpf , mu);
   int64_t sum = phi + a - 1 - P2(x, a, threads);
 
   return sum;
