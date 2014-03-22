@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef IMATH_HPP
-#define IMATH_HPP
+#ifndef PMATH_HPP
+#define PMATH_HPP
 
 #include <stdint.h>
 #include <cmath>
