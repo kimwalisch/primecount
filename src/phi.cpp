@@ -10,7 +10,7 @@
 #include "PhiCache.hpp"
 #include "PhiTiny.hpp"
 #include "pi_bsearch.hpp"
-#include "imath.hpp"
+#include "pmath.hpp"
 
 #include <primesieve.hpp>
 #include <stdint.h>

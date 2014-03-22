@@ -8,6 +8,11 @@ problems, suggesting various improvements, or submitting actual code.
 Here is a list of these people. Help me keep it complete and exempt
 of errors.
 
+* James F. King, Optimized Meissel-Lehmer sieve
+  http://code.google.com/a/eclipselabs.org/p/meissel-lehmer-sieve/
+  I used this implementation as a starting point for my implementation
+  of the Lagarias-Miller-Odlyzko algorithm.
+
 * Andrew Ohana suggested calculating phi(x, a) using binary search if
   x and a are small. Using this optimization my Legendre prime
   counting function runs 3 times faster!
@@ -22,3 +27,4 @@ of errors.
   algorithm in 2003. Up until 2013 this was the only open source
   implementation of the Lagarias-Miller-Odlyzko algorithm! I studied
   his implementation in order to get mine working.
+

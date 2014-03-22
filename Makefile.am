@@ -34,13 +34,13 @@ libprimecount_la_SOURCES = \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
 	src/pi_lehmer.cpp \
-	src/pi_lmo_simple.cpp \
 	src/pi_lmo.cpp \
+	src/pi_lmo1.cpp \
 	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/test.cpp \
-	src/imath.hpp \
+	src/pmath.hpp \
 	src/PhiCache.hpp \
 	src/PhiTiny.hpp \
 	src/pi_bsearch.hpp \

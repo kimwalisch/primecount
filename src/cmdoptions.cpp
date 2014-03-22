@@ -52,7 +52,7 @@ void initOptionMap()
   optionMap["-l"]           = OPTION_LEHMER;
   optionMap["--lehmer"]     = OPTION_LEHMER;
   optionMap["--lmo"]        = OPTION_LMO;
-  optionMap["--lmo_simple"] = OPTION_LMOSIMPLE;
+  optionMap["--lmo1"]       = OPTION_LMO1;
   optionMap["--Li"]         = OPTION_LI;
   optionMap["--Li_inverse"] = OPTION_LIINV;
   optionMap["-m"]           = OPTION_MEISSEL;
@@ -74,7 +74,9 @@ void initOptionMap()
 Option makeOption(const string& str)
 {
   Option option;
-  size_t delimiter = str.find_first_of("=0123456789");
+  size_t delimiter = string::npos;
+  if (optionMap.count(str) == 0)
+    delimiter = str.find_first_of("=0123456789");
 
   if (delimiter == string::npos)
     option.id = str;

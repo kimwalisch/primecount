@@ -12,9 +12,9 @@
 
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "0.15"
+#define PRIMECOUNT_VERSION "0.16"
 #define PRIMECOUNT_VERSION_MAJOR 0
-#define PRIMECOUNT_VERSION_MINOR 15
+#define PRIMECOUNT_VERSION_MINOR 16
 
 namespace primecount {
 
@@ -55,13 +55,13 @@ int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^0.5) space.
 ///
-int64_t pi_lmo_simple(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(2/3)) space.
 ///
-int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo1(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
