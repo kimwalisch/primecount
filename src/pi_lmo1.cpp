@@ -119,7 +119,7 @@ int64_t pi_lmo1(int64_t x, int threads)
 
   // Optimization factor, see:
   // Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
-  // Revista do DETUA, vol. 4, no. 6, pp. 759-768, March 2006.
+  // Revista do DETUA, vol. 4, no. 6, pp. 763-764, March 2006.
   double beta = 1.1;
   double alpha = std::max(1.0, nth_log<2>(x) * beta);
 
