@@ -86,10 +86,10 @@ int64_t S2(int64_t x,
         // number of unsieved elements below x / (m * primes[b + 1])
         // after having removed the multiples of the first b primes
         //
-        int64_t q = x / (m * prime);
-        for (int64_t k = old + 1; k <= q; k++)
+        int64_t y = x / (m * prime);
+        for (int64_t k = old + 1; k <= y; k++)
           phi += sieve[k];
-        old = q;
+        old = y;
         S2_result -= mu[m] * phi;
       }
     }
