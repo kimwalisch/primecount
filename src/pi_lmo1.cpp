@@ -48,6 +48,7 @@ int64_t S1(int64_t x,
 }
 
 /// Calculate the contribution of the special leaves.
+/// @pre c >= 2
 ///
 int64_t S2(int64_t x,
            int64_t x13_alpha,
@@ -67,15 +68,15 @@ int64_t S2(int64_t x,
   for (int64_t b = 1; b <= c; b++)
   {
     int64_t prime = primes[b];
-    for (int64_t i = prime; i <= x23_alpha; i += prime)
-      sieve[i] = 0;
+    for (int64_t k = prime; k <= x23_alpha; k += prime)
+      sieve[k] = 0;
   }
 
   for (int64_t b = c; b < a; b++)
   {
     int64_t prime = primes[b + 1];
+    int64_t i = 1;
     int64_t phi = 0;
-    int64_t old = 0;
 
     for (int64_t m = x13_alpha; m > x13_alpha / prime; m--)
     {
@@ -83,21 +84,19 @@ int64_t S2(int64_t x,
       {
         // We have found a special leaf, compute it's contribution
         // phi(x / (m * primes[b + 1]), b) by counting the
-        // number of unsieved elements below x / (m * primes[b + 1])
+        // number of unsieved elements <= x / (m * primes[b + 1])
         // after having removed the multiples of the first b primes
         //
-        int64_t y = x / (m * prime);
-        for (int64_t k = old + 1; k <= y; k++)
-          phi += sieve[k];
-        old = y;
+        for (int64_t y = x / (m * prime); i <= y; i++)
+          phi += sieve[i];
+
         S2_result -= mu[m] * phi;
       }
     }
 
-    assert(prime > 2);
     // Remove the multiples of (b + 1)th prime
-    for (int64_t i = prime; i <= x23_alpha; i += prime * 2)
-      sieve[i] = 0;
+    for (int64_t k = prime; k <= x23_alpha; k += prime * 2)
+      sieve[k] = 0;
   }
 
   return S2_result;
@@ -110,7 +109,7 @@ namespace primecount {
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(2/3)) space.
-/// @note O(x^(2/3)) space is because S2(x, c) is not segmented.
+/// @note O(x^(2/3)) space is because S2(x) is not segmented.
 ///
 int64_t pi_lmo1(int64_t x, int threads)
 {

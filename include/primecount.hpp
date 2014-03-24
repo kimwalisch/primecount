@@ -63,6 +63,12 @@ int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
 ///
 int64_t pi_lmo1(int64_t x, int threads = MAX_THREADS);
 
+/// Calculate the number of primes below x using the
+/// Lagarias-Miller-Odlyzko algorithm.
+/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+///
+int64_t pi_lmo2(int64_t x, int threads = MAX_THREADS);
+
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
 /// Run time: O(x/(log x)^4) operations, O(x^0.5) space.

@@ -17,7 +17,7 @@ namespace primecount {
 ///
 int64_t pi_lmo(int64_t x, int threads)
 {
-  return pi_lmo1(x, threads);
+  return pi_lmo2(x, threads);
 }
 
 } // namespace primecount

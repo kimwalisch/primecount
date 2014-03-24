@@ -53,6 +53,7 @@ void initOptionMap()
   optionMap["--lehmer"]     = OPTION_LEHMER;
   optionMap["--lmo"]        = OPTION_LMO;
   optionMap["--lmo1"]       = OPTION_LMO1;
+  optionMap["--lmo2"]       = OPTION_LMO2;
   optionMap["--Li"]         = OPTION_LI;
   optionMap["--Li_inverse"] = OPTION_LIINV;
   optionMap["-m"]           = OPTION_MEISSEL;
