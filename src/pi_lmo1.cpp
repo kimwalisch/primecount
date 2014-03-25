@@ -42,7 +42,7 @@ int64_t pi_lmo1(int64_t x, int threads)
 
   int64_t x13 = iroot<3>(x); 
   int64_t a = pi_lehmer(x13);
-  int64_t a1 = a - 1;
+  int64_t a_1 = a - 1;
   int64_t c = (a < 6) ? a : 6;
   int64_t S1 = 0;
   int64_t S2 = 0;
@@ -67,7 +67,7 @@ int64_t pi_lmo1(int64_t x, int threads)
   #pragma omp parallel for firstprivate(cache) reduction(-: S2) \
       num_threads(threads) schedule(dynamic)
 #endif
-  for (int64_t b = c; b < a1; b++)
+  for (int64_t b = c; b < a_1; b++)
     for (int64_t m = (x13 / primes[b + 1]) + 1; m <= x13; m++)
       if (lpf[m] > primes[b + 1])
         S2 -= mu[m] * phi(x / (m * primes[b + 1]), b, &cache);
