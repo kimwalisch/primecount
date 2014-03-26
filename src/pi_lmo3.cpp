@@ -56,9 +56,8 @@ int64_t S2(int64_t x,
            std::vector<int32_t>& mu)
 {
   int64_t limit = x23_alpha + 1;
+  int64_t segment_size = primecount::isqrt(limit);
   int64_t S2_result = 0;
-  int64_t min_segment_size = 10;
-  int64_t segment_size = std::max(min_segment_size, limit / x13_alpha);
 
   // vector used for sieving
   std::vector<char> sieve(segment_size);
