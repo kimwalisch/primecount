@@ -86,26 +86,24 @@ int64_t S2(int64_t x,
 
     for (int64_t b = c; b + 1 < a; b++)
     {
-      int64_t max_m = x / (low * primes[b + 1]);
-      int64_t min_m = x / (high * primes[b + 1]);
-      int64_t stop = std::max(min_m, x13_alpha / primes[b + 1]);
+      int64_t prime = primes[b + 1];
+      int64_t max_m = std::min(x / (low * prime), x13_alpha);
+      int64_t min_m = std::max(x / (high * prime), x13_alpha / prime);
       int64_t i = low;
 
-      if (max_m > x13_alpha)
-        max_m = x13_alpha;
-      if (primes[b + 1] > max_m)
+      if (prime > max_m)
         break;
 
-      for (int64_t m = max_m; m > stop; m--)
+      for (int64_t m = max_m; m > min_m; m--)
       {
-        if (mu[m] != 0 && primes[b + 1] < lpf[m])
+        if (mu[m] != 0 && prime < lpf[m])
         {
           // We have found a special leaf, compute it's contribution
           // phi(x / (m * primes[b + 1]), b) by counting the
           // number of unsieved elements <= x / (m * primes[b + 1])
           // after having removed the multiples of the first b primes
           //
-          for (int64_t y = x / (m * primes[b + 1]); i <= y; i++)
+          for (int64_t y = x / (m * prime); i <= y; i++)
             phi[b + 1] += sieve[i - low];
 
           S2_result -= mu[m] * phi[b + 1];
@@ -119,7 +117,7 @@ int64_t S2(int64_t x,
 
       // Remove the multiples of (b + 1)th prime
       int64_t k = next[b + 1];
-      for (int64_t prime2 = primes[b + 1] * 2; k < high; k += prime2)
+      for (; k < high; k += prime * 2)
         sieve[k - low] = 0;
       next[b + 1] = k;
     }
