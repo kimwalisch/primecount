@@ -90,7 +90,11 @@ int64_t S2(int64_t x,
       int64_t min_m = std::max(x / (high * prime), x13_alpha / prime);
       int64_t i = low;
 
-      if (prime > max_m)
+      // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
+      // if so then (prime < lpf[m]) will always evaluate to
+      // false and no special leaves are possible
+      //
+      if (prime >= max_m)
         break;
 
       for (int64_t m = max_m; m > min_m; m--)
