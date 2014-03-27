@@ -74,7 +74,6 @@ int64_t S2(int64_t x,
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
     // simply sieve out the multiples of the first c primes
-    //
     for (int64_t b = 1; b <= c; b++)
     {
       int64_t k = next[b];
@@ -93,7 +92,6 @@ int64_t S2(int64_t x,
       // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
       // if so then (prime < lpf[m]) will always evaluate to
       // false and no special leaves are possible
-      //
       if (prime >= max_m)
         break;
 
