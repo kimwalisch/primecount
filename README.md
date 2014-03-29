@@ -52,6 +52,11 @@ space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the
 <img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
 operations and
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
+space. In 1985 J. C. Lagarias, V. S. Miller and A. M. Odlyzko published a new
+algorithm based on Meissel's formula which has a lower runtime complexity of
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23.svg" height="20" align="absmiddle"/>
+operations and which uses only
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot13.svg" height="20" align="absmiddle"/>
 space.
 
 ### Fast nth prime calculation
