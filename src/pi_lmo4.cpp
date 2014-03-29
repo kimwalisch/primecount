@@ -98,7 +98,7 @@ int64_t S2(int64_t x,
       if (prime >= max_m)
         break;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = min_m + 1; m <= max_m; m++)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
