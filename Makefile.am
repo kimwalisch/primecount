@@ -38,6 +38,7 @@ libprimecount_la_SOURCES = \
 	src/pi_lmo1.cpp \
 	src/pi_lmo2.cpp \
 	src/pi_lmo3.cpp \
+	src/pi_lmo4.cpp \
 	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
@@ -47,7 +48,8 @@ libprimecount_la_SOURCES = \
 	src/PhiTiny.hpp \
 	src/pi_bsearch.hpp \
 	src/Pk.hpp \
-	src/to_omp_threads.hpp
+	src/to_omp_threads.hpp \
+	src/tos_counters.hpp
 
 primecount_SOURCES = \
 	src/primecount.cpp \

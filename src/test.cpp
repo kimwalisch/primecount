@@ -1,7 +1,7 @@
 ///
 /// @file  test.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -78,6 +78,7 @@ bool test()
     check_equal("pi_lmo1",     pi_lmo1,     pi_lehmer,     500);
     check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     500);
     check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     500);
+    check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     500);
     check_equal("nth_prime",   nth_prime,   pps_nth_prime, 100);
   }
   catch (runtime_error& e)

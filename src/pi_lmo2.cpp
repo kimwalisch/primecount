@@ -81,6 +81,7 @@ int64_t S2(int64_t x,
         // phi(x / (m * primes[b + 1]), b) by counting the
         // number of unsieved elements <= x / (m * primes[b + 1])
         // after having removed the multiples of the first b primes
+        //
         for (int64_t y = x / (m * prime); i <= y; i++)
           phi += sieve[i];
 

@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -55,6 +55,7 @@ void initOptionMap()
   optionMap["--lmo1"]       = OPTION_LMO1;
   optionMap["--lmo2"]       = OPTION_LMO2;
   optionMap["--lmo3"]       = OPTION_LMO3;
+  optionMap["--lmo4"]       = OPTION_LMO4;
   optionMap["--Li"]         = OPTION_LI;
   optionMap["--Li_inverse"] = OPTION_LIINV;
   optionMap["-m"]           = OPTION_MEISSEL;

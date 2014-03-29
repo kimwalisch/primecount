@@ -1,7 +1,7 @@
 ///
 /// @file  cmdoptions.hpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,6 +24,7 @@ enum OptionValues
   OPTION_LMO1,
   OPTION_LMO2,
   OPTION_LMO3,
+  OPTION_LMO4,
   OPTION_LI,
   OPTION_LIINV,
   OPTION_MEISSEL,

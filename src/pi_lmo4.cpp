@@ -1,8 +1,9 @@
 ///
-/// @file  pi_lmo3.cpp
-/// @brief Simple implementation of the Lagarias-Miller-Odlyzko prime
+/// @file  pi_lmo4.cpp
+/// @brief Implementation of the Lagarias-Miller-Odlyzko prime
 ///        counting algorithm. This implementation uses the segmented
-///        sieve of Eratosthenes to calculate S2(x).
+///        sieve of Eratosthenes and a special tree data structure
+///        for faster counting in S2(x).
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -11,8 +12,9 @@
 ///
 
 #include "PhiTiny.hpp"
-#include "pmath.hpp"
 #include "Pk.hpp"
+#include "pmath.hpp"
+#include "tos_counters.hpp"
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
@@ -42,8 +44,6 @@ int64_t S1(int64_t x,
 }
 
 /// Calculate the contribution of the special leaves.
-/// This implementation uses segmentation which reduces the
-/// algorithm's space complexity to O(n^(1/3)).
 /// @pre c >= 2
 ///
 int64_t S2(int64_t x,
@@ -56,11 +56,12 @@ int64_t S2(int64_t x,
            std::vector<int32_t>& mu)
 {
   int64_t limit = x23_alpha + 1;
-  int64_t segment_size = isqrt(limit);
+  int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t S2_result = 0;
 
   // vector used for sieving
   std::vector<char> sieve(segment_size);
+  std::vector<int32_t> counters(segment_size);
   std::vector<int64_t> next(primes.begin(), primes.end());
   std::vector<int64_t> phi(primes.size(), 0);
 
@@ -82,12 +83,14 @@ int64_t S2(int64_t x,
       next[b] = k;
     }
 
+    // Initialize special tree data structure from sieve
+    cnt_finit(sieve, counters, segment_size);
+
     for (int64_t b = c; b + 1 < a; b++)
     {
       int64_t prime = primes[b + 1];
       int64_t max_m = std::min(x / (low * prime), x13_alpha);
       int64_t min_m = std::max(x / (high * prime), x13_alpha / prime);
-      int64_t i = low;
 
       // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
       // if so then (prime < lpf[m]) will always evaluate to
@@ -103,23 +106,30 @@ int64_t S2(int64_t x,
           // phi(x / (m * primes[b + 1]), b) by counting the
           // number of unsieved elements <= x / (m * primes[b + 1])
           // after having removed the multiples of the first b primes
+          //for (int64_t y = x / (m * prime); i <= y; i++)
           //
-          for (int64_t y = x / (m * prime); i <= y; i++)
-            phi[b + 1] += sieve[i - low];
+          int64_t y = x / (m * prime);
+          int64_t count = cnt_query(counters, y - low);
+          int64_t phi_y = phi[b + 1] + count;
 
-          S2_result -= mu[m] * phi[b + 1];
+          S2_result -= mu[m] * phi_y;
         }
       }
 
-      // Count the remaining unsieved elements in this segment,
-      // we need their values in the next segment
-      for (; i < high; i++)
-        phi[b + 1] += sieve[i - low];
+      // Calculate phi(x / ((high - 1) * primes[b + 1]), b) which will
+      // be used to calculate special leaves in the next segment
+      phi[b + 1] += cnt_query(counters, (high - 1) - low);
 
       // Remove the multiples of (b + 1)th prime
       int64_t k = next[b + 1];
       for (; k < high; k += prime * 2)
-        sieve[k - low] = 0;
+      {
+        if (sieve[k - low])
+        {
+          sieve[k - low] = 0;
+          cnt_update(counters, k - low, segment_size);
+        }
+      }
       next[b + 1] = k;
     }
   }
@@ -136,7 +146,7 @@ namespace primecount {
 /// Run time: O(x^(2/3)) operations, O(x^0.5) space.
 /// @note O(x^0.5) space is due to parallel P2(x, a).
 ///
-int64_t pi_lmo3(int64_t x, int threads)
+int64_t pi_lmo4(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
@@ -144,8 +154,8 @@ int64_t pi_lmo3(int64_t x, int threads)
   // Optimization factor, see:
   // Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
   // Revista do DETUA, vol. 4, no. 6, pp. 763-764, March 2006.
-  double beta = 1.1;
-  double alpha = std::max(1.0, log(log((double) x)) * beta);
+  double beta = 1.5;
+  double alpha = std::max(1.0, log(log(log((double) x))) * beta);
 
   int64_t x13 = iroot<3>(x);
   int64_t x13_alpha = (int64_t)(x13 * alpha);

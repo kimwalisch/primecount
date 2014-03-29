@@ -1,7 +1,7 @@
 ///
 /// @file  primecount.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,6 +30,7 @@ int main (int argc, char* argv[])
     case OPTION_LMO1:       res = pi_lmo1      (pco.x, pco.threads); break;
     case OPTION_LMO2:       res = pi_lmo2      (pco.x, pco.threads); break;
     case OPTION_LMO3:       res = pi_lmo3      (pco.x, pco.threads); break;
+    case OPTION_LMO4:       res = pi_lmo4      (pco.x, pco.threads); break;
     case OPTION_PHI:        res = phi          (pco.x, pco.a); break;
     case OPTION_LI:         res = Li           (pco.x); break;
     case OPTION_LIINV:      res = Li_inverse   (pco.x); break;

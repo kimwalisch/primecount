@@ -1,7 +1,7 @@
 ///
 /// @file  pmath.hpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,38 +15,39 @@
 #include <vector>
 #include <limits>
 
-namespace primecount {
+
+template <typename T>
+inline T number_of_bits(T)
+{
+  return static_cast<T>(sizeof(T) * 8);
+}
+
+/// @brief  Round up to the next power of 2.
+/// @see    Book "Hacker's Delight".
+///
+template <typename T>
+inline T next_power_of_2(T x)
+{
+  x--;
+  for (T i = 1; i < number_of_bits(x); i += i)
+    x |= (x >> i);
+  return ++x;
+}
 
 inline int64_t isquare(int64_t x)
 {
   return x * x;
 }
 
-/// Raise to power using template meta-programming
-template <int N>
-struct ipow_helper
-{
-  static int64_t ipow(int64_t x)
-  {
-    return x * ipow_helper<N - 1>::ipow(x);
-  }
-};
-
-/// Raise to power using template meta-programming
-template <>
-struct ipow_helper<0>
-{
-  static int64_t ipow(int64_t)
-  {
-    return 1;
-  }
-};
-
-/// Raise to power using template meta-programming
+/// Raise to power
 template <int N>
 inline int64_t ipow(int64_t x)
 {
-  return ipow_helper<N>::ipow(x);
+  int64_t r = 1;
+  for (int i = 0; i < N; i++)
+    r *= x;
+
+  return r;
 }
 
 /// Integer suare root
@@ -72,16 +73,6 @@ inline int32_t iroot(int64_t x)
   while (ipow<N>(r + 1) <= x)
     r++;
   return r;
-}
-
-/// nth logarithm
-template <int N>
-inline double nth_log(int64_t x)
-{
-  double l = static_cast<double>(x);
-  for (int i = 0; i < N; i++)
-    l = std::log(l);
-  return l;
 }
 
 /// Initialize a vector with Möbius function values.
@@ -141,7 +132,5 @@ inline std::vector<int32_t> make_least_prime_factor(int64_t max)
 
   return lpf;
 }
-
-} // namespace primecount
 
 #endif
