@@ -24,6 +24,10 @@ implementations are fully parallelized using OpenMP.
     <td>Lehmer's Formula</td>
     <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle"/></td>
   </tr>
+  <tr>
+    <td>LMO Formula</td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle"/></td>
+  </tr>
 </table>
 
 Up until the early 19th century the most efficient known method for counting
@@ -44,15 +48,11 @@ Meissel's formula has a running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
 operations and uses
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
-space (my implementation uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space). In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
+space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
 <img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
 operations and
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
-space (my implementation uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space).
+space.
 
 ### Fast nth prime calculation
 
