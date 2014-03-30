@@ -30,7 +30,7 @@ implementations are fully parallelized using OpenMP.
   </tr>
 </table>
 
-Up until the early 19th century the most efficient known method for counting
+<p>Up until the early 19th century the most efficient known method for counting
 primes was the sieve of Eratosthenes which has a running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Oxlnlnx.svg" height="20" align="absmiddle"/>
 operations. The first improvement to this bound was Legendre's formula (1830)
@@ -57,7 +57,11 @@ algorithm based on Meissel's formula which has a lower runtime complexity of
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot23x.svg" height="20" align="absmiddle"/>
 operations and which uses only
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot13x.svg" height="20" align="absmiddle"/>
-space.
+space.</p>
+<p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
+Riesel's book [4] is probably the best source of information, for the
+Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
+[3] as well as Tomás Oliveira's paper [7].
 
 ### Fast nth prime calculation
 
