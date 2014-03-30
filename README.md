@@ -70,10 +70,10 @@ approximate the nth prime using e.g. the inverse logarithmic integral
 <img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
 and count the primes up to this guess using the prime counting function. Once
 this is done one starts sieving (using e.g. the segmented sieve of Eratosthenes)
-at the nth prime guess until one finds the actual nth prime. The author has
-implemented ```primecount::nth_prime(n)``` this way. In practice most time is
-spend by the prime counting function so the calculation of the nth prime is
-about as fast as counting the primes below the nth prime.
+from there on until one finds the actual nth prime. The author has implemented
+```primecount::nth_prime(n)``` this way. In practice most time is spend by the
+prime counting function so the calculation of the nth prime is about as fast as
+counting the primes below the nth prime.
 
 ### Timings
 
