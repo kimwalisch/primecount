@@ -1,13 +1,12 @@
 primecount
 ==========
-primecount is a command-line program and C++ library that counts the number of
-primes below an integer x&nbsp;<&nbsp;2<sup>63</sup>. primecount counts primes
-using efficient implementations of the prime counting function pi(x)
-(combinatorial methods) which is orders of magnitudes faster than counting primes
-using the sieve of Eratosthenes. So far primecount offers the option to count
-primes using Legendre's, Meissel's and Lehmer's formulas and using the
-Lagarias-Miller-Odlyzko algorithm (work in progress). All pi(x)
-implementations are fully parallelized using OpenMP.
+primecount is a command-line program and C++ library that counts the primes
+below an integer x&nbsp;<&nbsp;2<sup>63</sup> using fast implementations
+of the prime counting function pi(x) (combinatorial methods). So far
+primecount offers the option to count primes using Legendre's, Meissel's and
+Lehmer's formulas and using the Lagarias-Miller-Odlyzko algorithm.
+The implementations of Legendre's, Meissel's and Lehmer's formulas have
+been parallelized using OpenMP, for LMO this remains to be done.
 
 ### Algorithms and complexity
 
