@@ -1,8 +1,7 @@
-2014-03-29  Kim Walisch  <kim.walisch@gmail.com>
+2014-03-30  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.16 work in progress.
+  Version 0.16 released.
 
-  * src/pi_lmo1.cpp: LMO using recursive phi formula with caching.
   * src/pi_lmo2.cpp: LMO using sieve of Eratosthenes.
   * src/pi_lmo3.cpp: LMO using segmented sieve of Eratosthenes.
   * src/pi_lmo4.cpp: LMO using special tree data structure.
