@@ -112,7 +112,7 @@ int64_t S2(int64_t x,
       }
 
       // Count the remaining unsieved elements in this segment,
-      // we need their values in the next segment
+      // we need their count in the next segment
       for (; i < high; i++)
         phi[b + 1] += sieve[i - low];
 
