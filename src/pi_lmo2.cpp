@@ -43,7 +43,7 @@ int64_t S1(int64_t x,
 
 /// Calculate the contribution of the special leaves.
 /// This implementation uses the sieve of Eratosthenes (without
-/// segmentation), the space complexity is O(n^(2/3)).
+/// segmentation). Space complexity: O(x^(2/3) / log log x).
 /// @pre c >= 2
 ///
 int64_t S2(int64_t x,
