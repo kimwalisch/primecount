@@ -1,3 +1,11 @@
+2014-03-31  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.17 work in progress.
+
+  * src/pi_lmo2.cpp: Speed improvement.
+  * src/pi_lmo3.cpp: Speed improvement.
+  * src/pi_lmo4.cpp: Speed improvement.
+
 2014-03-30  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.16 released.
