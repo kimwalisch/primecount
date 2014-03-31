@@ -82,7 +82,7 @@ int64_t pi_lmo3(int64_t x, int threads = MAX_THREADS);
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
 /// the segmented sieve of Eratosthenes and a special data structure
 /// for counting to calculate S2(x).
-/// Run time: O(x^(2/3) / log x) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3) / log log x) operations, O(x^0.5) space.
 ///
 int64_t pi_lmo4(int64_t x, int threads = MAX_THREADS);
 
