@@ -43,7 +43,7 @@ int64_t S1(int64_t x,
 
 /// Calculate the contribution of the special leaves.
 /// This implementation uses segmentation which reduces the
-/// algorithm's space complexity to O(x^(1/3)).
+/// algorithm's space complexity to O(x^(1/3) * log^2 x).
 /// @pre c >= 2
 ///
 int64_t S2(int64_t x,
