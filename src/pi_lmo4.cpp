@@ -141,7 +141,7 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3) / log x) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3) / log log x) operations, O(x^0.5) space.
 /// @note O(x^0.5) space is due to parallel P2(x, a).
 ///
 int64_t pi_lmo4(int64_t x, int threads)
