@@ -152,7 +152,7 @@ int64_t pi_lmo4(int64_t x, int threads)
   // Optimization factor, see:
   // J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-
   // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
-  double beta = 1.0;
+  double beta = 0.6;
   double alpha = std::max(1.0, log(log((double) x)) * beta);
 
   int64_t x13 = iroot<3>(x);
