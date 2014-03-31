@@ -48,14 +48,13 @@ int64_t S1(int64_t x,
 ///
 int64_t S2(int64_t x,
            int64_t x13_alpha,
-           int64_t x23_alpha,
            int64_t a,
            int64_t c,
            std::vector<int32_t>& primes,
            std::vector<int32_t>& lpf,
            std::vector<int32_t>& mu)
 {
-  int64_t limit = x23_alpha + 1;
+  int64_t limit = x / x13_alpha + 1;
   int64_t segment_size = isqrt(limit);
   int64_t S2_result = 0;
 
@@ -142,14 +141,13 @@ int64_t pi_lmo3(int64_t x, int threads)
     return 0;
 
   // Optimization factor, see:
-  // Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
-  // Revista do DETUA, vol. 4, no. 6, pp. 763-764, March 2006.
-  double beta = 1.1;
+  // J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-
+  // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
+  double beta = 1.0;
   double alpha = std::max(1.0, log(log((double) x)) * beta);
 
   int64_t x13 = iroot<3>(x);
   int64_t x13_alpha = (int64_t)(x13 * alpha);
-  int64_t x23_alpha = (int64_t) std::pow((double) x / alpha, 2.0 / 3.0);
   int64_t a = pi_lehmer(x13_alpha);
   int64_t c = (a < 6) ? a : 6;
 
@@ -159,7 +157,7 @@ int64_t pi_lmo3(int64_t x, int threads)
   primes.push_back(0);
   primesieve::generate_n_primes(a, &primes);
 
-  int64_t phi = S1(x, x13_alpha, c, primes, lpf , mu) + S2(x, x13_alpha, x23_alpha, a, c, primes, lpf , mu);
+  int64_t phi = S1(x, x13_alpha, c, primes, lpf , mu) + S2(x, x13_alpha, a, c, primes, lpf , mu);
   int64_t sum = phi + a - 1 - P2(x, a, threads);
 
   return sum;
