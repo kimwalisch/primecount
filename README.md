@@ -1,5 +1,7 @@
 primecount
 ==========
+[![Build Status](https://travis-ci.org/kimwalisch/primecount.png)](https://travis-ci.org/kimwalisch/primecount)
+
 primecount is a command-line program and C++ library that counts the primes
 below an integer x&nbsp;<&nbsp;2<sup>63</sup> using fast implementations
 of the prime counting function pi(x) (combinatorial methods). So far
