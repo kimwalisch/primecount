@@ -19,8 +19,11 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  if (n < 1)
+  if (n < 0)
     return 0;
+
+  if (n == 0)
+    n = 1;
 
   int64_t prime_approx = 0;
   int64_t count_approx = 0;
