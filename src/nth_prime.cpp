@@ -1,7 +1,7 @@
 ///
 /// @file  nth_prime.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -32,11 +32,8 @@ int64_t nth_prime(int64_t n, int threads)
     count_approx = pi(prime_approx, threads);
   }
 
-  int64_t n_remaining = n - count_approx;
-  int64_t start = prime_approx + 1;
-
   primesieve::set_num_threads(threads);
-  int64_t prime = primesieve::parallel_nth_prime(n_remaining, start);
+  int64_t prime = primesieve::parallel_nth_prime(n - count_approx, prime_approx);
 
   return prime;
 }
