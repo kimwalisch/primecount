@@ -23,6 +23,7 @@ install:
   - make
   - sudo make uninstall
   - sudo make install
+  - cd ..
 
 before_script:
   - ./autogen.sh
