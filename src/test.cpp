@@ -46,13 +46,13 @@ void check_equal(const string& f1_name, F f1, F f2, int64_t iters)
   srand(static_cast<unsigned int>(time(0)));
   cout << "Testing " << (f1_name + "(x)") << flush;
 
-  // test for 0 <= x < iters
-  for (int64_t x = 0; x < iters; x++)
+  // test for 1 <= x <= iters
+  for (int64_t x = 1; x <= iters; x++)
     assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
 
-  int64_t x = 0;
+  int64_t x = 1;
   // test using random increment
-  for (int64_t i = 0; i < iters; i++, x += get_rand())
+  for (int64_t i = 1; i <= iters; i++, x += get_rand())
     assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
 
   cout << " correct" << endl;
