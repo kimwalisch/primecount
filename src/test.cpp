@@ -73,13 +73,13 @@ bool test()
   try
   {
     check_equal("pi_legendre", pi_legendre, pi_primesieve, 100);
-    check_equal("pi_meissel",  pi_meissel,  pi_legendre,   500);
-    check_equal("pi_lehmer",   pi_lehmer,   pi_meissel,    500);
-    check_equal("pi_lmo1",     pi_lmo1,     pi_lehmer,     500);
-    check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     500);
-    check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     500);
-    check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     500);
-    check_equal("nth_prime",   nth_prime,   pps_nth_prime, 100);
+    check_equal("pi_meissel",  pi_meissel,  pi_legendre,   400);
+    check_equal("pi_lehmer",   pi_lehmer,   pi_meissel,    400);
+    check_equal("pi_lmo1",     pi_lmo1,     pi_lehmer,     400);
+    check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     400);
+    check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     400);
+    check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     400);
+    check_equal("nth_prime",   nth_prime,   pps_nth_prime,  80);
   }
   catch (runtime_error& e)
   {
