@@ -53,9 +53,13 @@ void check_equal(const string& f1_name, F f1, F f2, int64_t iters)
   int64_t x = 0;
   // test using random increment
   for (int64_t i = 0; i < iters; i++, x += get_rand())
+  {
     assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
+    double percent = 100.0 * (i + 1.0) / iters;
+    cout << "\rTesting " << (f1_name + "(x) ") << static_cast<int>(percent) << "%" << flush;
+  }
 
-  cout << " correct" << endl;
+  cout << endl;
 }
 
 int64_t pps_nth_prime(int64_t x, int)
@@ -79,7 +83,7 @@ bool test()
     check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     400);
     check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     400);
     check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     400);
-    check_equal("nth_prime",   nth_prime,   pps_nth_prime,  80);
+    check_equal("nth_prime",   nth_prime,   pps_nth_prime, 100);
   }
   catch (runtime_error& e)
   {
