@@ -5,10 +5,6 @@ compiler:
   - gcc
   - clang
 
-branches:
-  only:
-    - master
-
 env:
   global:
     - OMP_NUM_THREADS=4
@@ -28,4 +24,9 @@ install:
 before_script:
   - ./autogen.sh
 
-script: ./configure && make && make check
+script:
+  - ./configure CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic"
+  - make
+  - make install
+  - make dist
+  - make distcheck
