@@ -137,7 +137,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3749.72s</td>
     <td>2879.81s</td>
     <td>1375.36s</td>
-    <td>918.355s</td>
+    <td>918.35s</td>
   </tr>
 </table>
 
