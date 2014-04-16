@@ -1,12 +1,13 @@
-2014-04-12  Kim Walisch  <kim.walisch@gmail.com>
+2014-04-16  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.17 work in progress.
 
+  * .travis.yml: Travis continuous integration testing.
   * src/pi_lmo2.cpp: Speed improvement.
   * src/pi_lmo3.cpp: Speed improvement.
   * src/pi_lmo4.cpp: Speed improvement.
   * src/nth_prime.cpp: Port to primesieve-5.2.
-  * .travis.yml: Travis continuous integration testing.
+  * src/test.cpp: Display testing status.
 
 2014-03-30  Kim Walisch  <kim.walisch@gmail.com>
 
