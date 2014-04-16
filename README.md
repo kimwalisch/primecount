@@ -4,11 +4,11 @@ primecount
 
 primecount is a command-line program and C++ library that counts the primes
 below an integer x&nbsp;<&nbsp;2<sup>63</sup> using fast implementations
-of the prime counting function pi(x) (combinatorial methods). So far
-primecount offers the option to count primes using Legendre's, Meissel's and
-Lehmer's formulas and using the Lagarias-Miller-Odlyzko algorithm.
-The implementations of Legendre's, Meissel's and Lehmer's formulas have
-been parallelized using OpenMP, for LMO this remains to be done.
+of the prime counting function pi(x). So far primecount offers the option
+to count primes using Legendre's, Meissel's and Lehmer's formulas and using
+the Lagarias-Miller-Odlyzko algorithm. The implementations of Legendre's,
+Meissel's and Lehmer's formulas have been parallelized using OpenMP, for
+LMO this remains to be done.
 
 ### Algorithms and complexity
 
@@ -73,6 +73,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td><b>pi_legendre(x)</b></td>
     <td><b>pi_meissel(x)</b></td>
     <td><b>pi_lehmer(x)</b></td>
+    <td><b>pi_lmo(x)</b></td>
   </tr>
   <tr align="right">
     <td>10<sup>10</sup></td>
@@ -80,6 +81,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.05s</td>
     <td>0.06s</td>
     <td>0.03s</td>
+    <td>0.06s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
@@ -87,6 +89,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.08s</td>
     <td>0.09s</td>
     <td>0.06s</td>
+    <td>0.12s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
@@ -94,6 +97,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.31s</td>
     <td>0.30s</td>
     <td>0.25s</td>
+    <td>0.48s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
@@ -101,6 +105,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>1.49s</td>
     <td>1.48s</td>
     <td>1.01s</td>
+    <td>2.03s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
@@ -108,6 +113,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>9.30s</td>
     <td>8.05s</td>
     <td>5.21s</td>
+    <td>9.08s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
@@ -115,6 +121,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>60.38s</td>
     <td>50.65s</td>
     <td>28.86s</td>
+    <td>42.77s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -122,6 +129,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>423.12s</td>
     <td>335.04s</td>
     <td>184.20s</td>
+    <td>196.73s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -129,12 +137,14 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3749.72s</td>
     <td>2879.81s</td>
     <td>1375.36s</td>
+    <td>918.355s</td>
   </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system. primecount was compiled using GCC
-4.8 and used 8 threads for each benchmark.
+4.8 and used all CPU cores for each benchmark except for ```pi_lmo(x)``` which
+has not been parallelized yet.
 
 ### Fast nth prime calculation
 
@@ -165,7 +175,7 @@ bfbeaa6310a49d1d588148387b8794caad2a4e82  primecount-0.16-linux-x64.tar.gz
 ```
 
 ### Usage examples
-Open a terminal or Command Prompt and run:
+Open a terminal and run the primecount command-line application using e.g.:
 ```sh
 # Count the primes below 10^14
 $ ./primecount 10**14
@@ -206,16 +216,36 @@ export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
-### C++ library
-Below is an example program that counts the primes below n and calculates the
-nth prime using libprimecount. Browse
-[libprimecount's API](include/primecount.hpp) online (documented using Doxygen).
+### C++ API
+Below is a list of the functions declared in the ````primecount.hpp```` header
+file. A short description of each function including its run-time and space
+complexity can be read <a href="include/primecount.hpp">here</a>.
+
+```C++
+// Alias for the fastest prime counting implementation
+int64_t primecount::pi(int64_t x, int threads = MAX_THREADS);
+
+int64_t primecount::pi_legendre(int64_t x, int threads = MAX_THREADS);
+int64_t primecount::pi_lehmer(int64_t x, int threads = MAX_THREADS);
+int64_t primecount::pi_lmo(int64_t x, int threads = MAX_THREADS);
+int64_t primecount::pi_meissel(int64_t x, int threads = MAX_THREADS);
+int64_t primecount::pi_primesieve(int64_t x, int threads = MAX_THREADS);
+
+int64_t primecount::nth_prime(int64_t n, int threads = MAX_THREADS);
+
+int64_t primecount::phi(int64_t x, int64_t a, int threads = MAX_THREADS);
+int64_t primecount::Li(int64_t);
+int64_t primecount::Li_inverse(int64_t);
+```
+
+### Using libprimecount
+Below is a C++ example program that counts the primes below n and calculates
+the nth prime using libprimecount.
 
 ```C++
 #include <primecount.hpp>
 #include <iostream>
 #include <cstdlib>
-#include <stdint.h>
 
 int main(int, char** argv)
 {
