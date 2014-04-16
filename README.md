@@ -64,19 +64,6 @@ Riesel's book [4] is probably the best source of information, for the
 Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
 [3] as well as Tomás Oliveira's paper [7].
 
-### Fast nth prime calculation
-
-The most efficient known method for calculating the nth prime is a combination
-of the prime counting function and a prime sieve. The idea is to closely
-approximate the nth prime using e.g. the inverse logarithmic integral
-<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
-and then count the primes up to this guess using the prime counting function.
-Once this is done one starts sieving (e.g. using the segmented sieve of
-Eratosthenes) from there on until one finds the actual nth prime. The author
-has implemented ```primecount::nth_prime(n)``` this way. In practice most time
-is spent by the prime counting function so the calculation of the nth prime is
-about as fast as counting the primes below the nth prime.
-
 ### Timings
 
 <table>
@@ -148,6 +135,19 @@ about as fast as counting the primes below the nth prime.
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system. primecount was compiled using GCC
 4.8 and used 8 threads for each benchmark.
+
+### Fast nth prime calculation
+
+The most efficient known method for calculating the nth prime is a combination
+of the prime counting function and a prime sieve. The idea is to closely
+approximate the nth prime using e.g. the inverse logarithmic integral
+<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
+and then count the primes up to this guess using the prime counting function.
+Once this is done one starts sieving (e.g. using the segmented sieve of
+Eratosthenes) from there on until one finds the actual nth prime. The author
+has implemented ```primecount::nth_prime(n)``` this way. In practice most time
+is spent by the prime counting function so the calculation of the nth prime is
+about as fast as counting the primes below the nth prime.
 
 ### Precompiled binaries
 
