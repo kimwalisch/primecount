@@ -1,1 +1,2 @@
-+ implement pi_lmo(x)
++ implement faster pi_lmo(x)
++ parallelize pi_lmo(x)
