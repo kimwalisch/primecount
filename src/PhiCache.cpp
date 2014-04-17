@@ -29,15 +29,16 @@
 #include <cstddef>
 #include <cassert>
 
-/// Keep the cache size below CACHE_BYTES_LIMIT per thread
-#define CACHE_BYTES_LIMIT (16 << 20)
+namespace {
 
-/// Cache phi(x, a) results if a <= CACHE_A_LIMIT
-#define CACHE_A_LIMIT 500
+inline int64_t fast_div(int64_t x, int32_t y)
+{
+  // Avoid slow 64-bit division
+  return (x <= std::numeric_limits<uint32_t>::max())
+      ? static_cast<uint32_t>(x) / y : x / y;
+}
 
-/// Avoid slow 64-bit division if possible
-#define FAST_DIV(x, y) ((x <= std::numeric_limits<uint32_t>::max()) \
-    ? static_cast<uint32_t>(x) / (y) : (x) / (y))
+} // namespace
 
 namespace primecount {
 
@@ -94,7 +95,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
     sum += phiTiny_.phi(x, c) * sign;
 
     for (int64_t a2 = c; a2 < iters; a2++)
-      sum += phi(FAST_DIV(x, primes_[a2 + 1]), a2, -sign);
+      sum += phi(fast_div(x, primes_[a2 + 1]), a2, -sign);
   }
 
   if (write_to_cache(x, a))
@@ -114,13 +115,6 @@ bool PhiCache::is_phi_bsearch(int64_t x, int64_t a) const
 {
   return x <= primes_.back() &&
          x < isquare(primes_[a + 1]);
-}
-
-bool PhiCache::is_cached(int64_t x, int64_t a) const
-{
-  return a <= CACHE_A_LIMIT &&
-         x < static_cast<int64_t>(cache_[a].size()) &&
-         cache_[a][x] != 0;
 }
 
 bool PhiCache::write_to_cache(int64_t x, int64_t a)
