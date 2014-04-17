@@ -46,7 +46,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (primes.at(a) >= x)
     return 1;
 
-  int iters = pi_bsearch(primes, a, isqrt(x));
+  int64_t iters = pi_bsearch(primes, a, isqrt(x));
   PhiCache cache(primes, phiTiny);
   int64_t sum = x - a + iters;
 
