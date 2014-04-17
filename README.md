@@ -190,7 +190,7 @@ $ ./primecount 10**14 --nthprime
 $ ./primecount --help
 ```
 
-### How to build primecount
+### Build instructions
 In order to build primecount you need to have installed a C++ compiler and
 GNU make (or any other make). primecount depends on the author's primesieve
 library, download it from http://primesieve.org/downloads
