@@ -15,6 +15,10 @@
 #include <vector>
 #include <limits>
 
+inline int64_t isquare(int64_t x)
+{
+  return x * x;
+}
 
 template <typename T>
 inline T number_of_bits(T)
@@ -34,11 +38,6 @@ inline T next_power_of_2(T x)
   return ++x;
 }
 
-inline int64_t isquare(int64_t x)
-{
-  return x * x;
-}
-
 /// Raise to power
 template <int N>
 inline int64_t ipow(int64_t x)
@@ -51,9 +50,10 @@ inline int64_t ipow(int64_t x)
 }
 
 /// Integer suare root
-inline int32_t isqrt(int64_t x)
+template <typename T>
+inline T isqrt(T x)
 {
-  int32_t r = static_cast<int32_t>(std::sqrt(static_cast<double>(x)));
+  T r = static_cast<T>(std::sqrt(static_cast<double>(x)));
   // correct rounding error
   while (ipow<2>(r) > x)
     r--;
@@ -63,10 +63,10 @@ inline int32_t isqrt(int64_t x)
 }
 
 /// Integer nth root
-template <int N>
-inline int32_t iroot(int64_t x)
+template <int N, typename T>
+inline T iroot(T x)
 {
-  int32_t r = static_cast<int32_t>(std::pow(static_cast<double>(x), 1.0 / N));
+  T r = static_cast<T>(std::pow(static_cast<double>(x), 1.0 / N));
   // correct rounding error
   while (ipow<N>(r) > x)
     r--;
