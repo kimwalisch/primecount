@@ -45,6 +45,7 @@ libprimecount_la_SOURCES = \
 	src/test.cpp \
 	src/pmath.hpp \
 	src/PhiCache.hpp \
+	src/PhiCache.cpp \
 	src/PhiTiny.hpp \
 	src/pi_bsearch.hpp \
 	src/Pk.hpp \
