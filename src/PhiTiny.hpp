@@ -1,7 +1,7 @@
 ///
 /// @file  PhiTiny.hpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,18 +22,7 @@ namespace primecount {
 ///
 class PhiTiny {
 public:
-  PhiTiny()
-  {
-    phi_cache_[0].push_back(0);
-
-    // Initialize the phi_cache_ lookup tables
-    for (int a = 1; is_cached(a); a++)
-    {
-      phi_cache_[a].reserve(prime_products_[a]);
-      for (int x = 0; x < prime_products_[a]; x++)
-        phi_cache_[a].push_back(static_cast<int16_t>(phi(x, a - 1) - phi(x / primes_[a], a - 1)));
-    }
-  }
+  PhiTiny();
   static bool is_cached(int64_t a)
   {
     return a >= 0 && a < 7;
