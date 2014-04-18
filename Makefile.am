@@ -24,6 +24,7 @@ include_HEADERS = \
 	include/primecount.hpp
 
 EXTRA_DIST = \
+	Makefile.msvc \
 	README.md
 
 libprimecount_la_SOURCES = \
