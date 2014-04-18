@@ -1,0 +1,88 @@
+######################################################################
+# Microsoft Visual C++ Makefile for the primecount console
+# application and the primecount C++ library
+# 
+# Usage:
+# > nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
+# 
+######################################################################
+
+TARGET   = primecount
+CXX      = cl /nologo
+CXXFLAGS = /W2 /O2 /openmp /EHsc /D NDEBUG /I"include" /I"$(PRIMESIEVE_PATH)\include"
+LINK     = link /nologo /LIBPATH:"$(PRIMESIEVE_PATH)"
+
+LIB_OBJECTS = \
+	src\Li.obj \
+	src\nth_prime.obj \
+	src\phi.obj \
+	src\PhiCache.obj \
+	src\PhiTiny.obj \
+	src\pi.obj \
+	src\pi_legendre.obj \
+	src\pi_lehmer.obj \
+	src\pi_lmo.obj \
+	src\pi_lmo1.obj \
+	src\pi_lmo2.obj \
+	src\pi_lmo3.obj \
+	src\pi_lmo4.obj \
+	src\pi_meissel.obj \
+	src\pi_primesieve.obj \
+	src\Pk.obj
+
+APP_OBJECTS = \
+	src\cmdoptions.obj \
+	src\help.obj \
+	src\primecount.obj \
+	src\test.obj
+
+#-----------------------------------------------------------------------------
+# Default targets
+#-----------------------------------------------------------------------------
+
+all: lib bin
+
+#-----------------------------------------------------------------------------
+# Compilation rules
+#-----------------------------------------------------------------------------
+
+$(LIB_OBJECTS): $*.cpp
+	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
+
+$(APP_OBJECTS): $*.cpp
+	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
+
+#-----------------------------------------------------------------------------
+# Build the primecount console application
+#-----------------------------------------------------------------------------
+
+bin: lib $(APP_OBJECTS)
+	$(LINK) /OUT:$(TARGET).exe $(APP_OBJECTS) $(TARGET).lib primesieve.lib
+
+#-----------------------------------------------------------------------------
+# Build a static primecount.lib
+#-----------------------------------------------------------------------------
+
+lib: $(LIB_OBJECTS)
+	lib.exe /nologo /OUT:$(TARGET).lib $**
+
+#-----------------------------------------------------------------------------
+# `nmake -f Makefile.msvc check` runs correctness tests
+#-----------------------------------------------------------------------------
+
+check test:
+	$(TARGET).exe --test
+
+#-----------------------------------------------------------------------------
+# clean target
+#-----------------------------------------------------------------------------
+
+clean:
+	-del /Q *.exe *.lib src\*.obj 2> /nul
+
+#-----------------------------------------------------------------------------
+# help target
+#-----------------------------------------------------------------------------
+
+help:
+	@echo Usage: nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
