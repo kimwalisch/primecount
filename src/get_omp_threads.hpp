@@ -1,14 +1,14 @@
 ///
-/// @file  to_omp_threads.hpp
+/// @file  get_omp_threads.hpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#ifndef TO_OMP_THREADS_HPP
-#define TO_OMP_THREADS_HPP
+#ifndef GET_OMP_THREADS_HPP
+#define GET_OMP_THREADS_HPP
 
 #ifdef _OPENMP
 
@@ -17,7 +17,7 @@
 
 namespace primecount {
 
-inline int to_omp_threads(int threads)
+inline int get_omp_threads(int threads)
 {
   return (threads != MAX_THREADS) ? threads : omp_get_max_threads();
 }

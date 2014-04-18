@@ -1,7 +1,7 @@
 ///
 /// @file  Pk.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,7 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "to_omp_threads.hpp"
+  #include "get_omp_threads.hpp"
 #endif
 
 namespace primecount {
@@ -45,9 +45,8 @@ int64_t P2(int64_t x, int64_t a, int threads)
   // by backwards summing up the counts.
   //
 #ifdef _OPENMP
-  threads = to_omp_threads(threads);
-  #pragma omp parallel for schedule(dynamic) \
-      num_threads(threads)
+  #pragma omp parallel for num_threads(get_omp_threads(threads)) \
+      schedule(dynamic)
 #endif
   for (int64_t i = b; i > a; i--)
   {
@@ -80,9 +79,8 @@ int64_t P3(int64_t x, int64_t a, int threads)
   int64_t sum = 0;
 
 #ifdef _OPENMP
-  threads = to_omp_threads(threads);
-  #pragma omp parallel for reduction(+: sum) schedule(dynamic) \
-      num_threads(threads)
+  #pragma omp parallel for num_threads(get_omp_threads(threads)) \
+      schedule(dynamic) reduction(+: sum)
 #endif
   for (int64_t i = a + 1; i <= c; i++)
   {

@@ -25,7 +25,7 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "to_omp_threads.hpp"
+  #include "get_omp_threads.hpp"
 #endif
 
 namespace primecount {
@@ -63,9 +63,8 @@ int64_t pi_lmo1(int64_t x, int threads)
 
   // Calculate the contribution of the special leaves
 #ifdef _OPENMP
-  threads = to_omp_threads(threads);
-  #pragma omp parallel for firstprivate(cache) reduction(-: S2) \
-      num_threads(threads) schedule(dynamic)
+  #pragma omp parallel for firstprivate(cache) schedule(dynamic) reduction(-: S2) \
+      num_threads(get_omp_threads(threads)) 
 #endif
   for (int64_t b = c; b < a_1; b++)
     for (int64_t m = (x13 / primes[b + 1]) + 1; m <= x13; m++)
