@@ -1,16 +1,14 @@
 ######################################################################
 # Microsoft Visual C++ Makefile for the primecount console
 # application and the primecount C++ library
-# 
-# Usage:
-# > nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
-# 
+# Usage: nmake -f Makefile.msvc
 ######################################################################
 
-TARGET   = primecount
-CXX      = cl /nologo
-CXXFLAGS = /W2 /O2 /openmp /EHsc /D NDEBUG /I"include" /I"$(PRIMESIEVE_PATH)\include"
-LINK     = link /nologo /LIBPATH:"$(PRIMESIEVE_PATH)"
+TARGET = primecount
+CXX = cl /nologo
+CXXFLAGS = /W2 /O2 /EHsc /D NDEBUG /I include /I primesieve-master\include
+LINK = link /nologo /LIBPATH:primesieve-master
+PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
 LIB_OBJECTS = \
 	src\Li.obj \
@@ -37,29 +35,42 @@ APP_OBJECTS = \
 	src\test.obj
 
 #-----------------------------------------------------------------------------
+# Add /openmp if MSVC supports OpenMP
+#-----------------------------------------------------------------------------
+
+!IF ([$(CXX) /openmp /c src\has_openmp.cpp /Fonul > nul] == 0)
+CXXFLAGS = /openmp $(CXXFLAGS)
+!ENDIF
+
+#-----------------------------------------------------------------------------
 # Default targets
 #-----------------------------------------------------------------------------
 
-all: lib bin
+all: build_primesieve lib bin
 
 #-----------------------------------------------------------------------------
-# Error if PRIMESIEVE_PATH is missing
+# Automatically download and build primesieve
 #-----------------------------------------------------------------------------
 
-check_primesieve_path:
-!IFNDEF PRIMESIEVE_PATH
-	@echo Error: Usage: nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
-	@exit 1
+build_primesieve:
+!IF !EXISTS(primesieve-master\primesieve.lib)
+	@echo Downloading primesieve library...
+	@powershell -Command (new-object System.Net.WebClient).DownloadFile('$(PRIMESIEVE_URL)', 'primesieve-master.zip')
+	@echo Unzipping primesieve...
+	@powershell -command "$$shellApplication = new-object -com shell.application; $$zipPackage = $$shellApplication.NameSpace('%cd%\primesieve-master.zip'); $$destinationFolder = $$shellApplication.NameSpace('%cd%'); $$destinationFolder.CopyHere($$zipPackage.Items())"
+	@cd primesieve-master
+	@nmake -f Makefile.msvc lib
+	@cd..
 !ENDIF
 
 #-----------------------------------------------------------------------------
 # Compilation rules
 #-----------------------------------------------------------------------------
 
-$(LIB_OBJECTS): check_primesieve_path $*.cpp
+$(LIB_OBJECTS): $*.cpp
 	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
 
-$(APP_OBJECTS): check_primesieve_path $*.cpp
+$(APP_OBJECTS): $*.cpp
 	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
 
 #-----------------------------------------------------------------------------
@@ -95,4 +106,4 @@ clean:
 #-----------------------------------------------------------------------------
 
 help:
-	@echo Usage: nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
+	@echo Usage: nmake -f Makefile.msvc

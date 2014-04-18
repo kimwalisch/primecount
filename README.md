@@ -190,7 +190,7 @@ $ ./primecount 10**14 --nthprime
 $ ./primecount --help
 ```
 
-### Build instructions
+### Build instructions (Unix-like OSes)
 In order to build primecount you need to have installed a C++ compiler and
 GNU make (or any other make). primecount depends on the author's primesieve
 library, download it from http://primesieve.org/downloads
@@ -214,6 +214,15 @@ path:
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+```
+
+### Build instructions (Microsoft Visual C++)
+In order to facilitate building primecount on Windows the build process has been
+completely automated i.e. the ```nmake``` command automatically downloads and
+builds the latest primesieve library (dependency) before building primecount. To
+build primecount simply open a Visual Studio Command Prompt and run:
+```sh
+nmake -f Makefile.msvc
 ```
 
 ### C++ API
