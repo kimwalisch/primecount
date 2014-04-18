@@ -4,6 +4,7 @@
 
   * .travis.yml: Travis continuous integration testing.
   * configure.ac: Make silent building default.
+  * Makefile.msvc: Add Microsoft Visual C++ Makefile.
   * src/pi_lmo2.cpp: Speed improvement.
   * src/pi_lmo3.cpp: Speed improvement.
   * src/pi_lmo4.cpp: Speed improvement.
