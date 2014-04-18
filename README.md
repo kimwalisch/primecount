@@ -222,7 +222,7 @@ completely automated i.e. the ```nmake``` command automatically downloads and
 builds the latest primesieve library (dependency) before building primecount. To
 build primecount simply open a Visual Studio Command Prompt and run:
 ```sh
-nmake -f Makefile.msvc
+> nmake -f Makefile.msvc
 ```
 
 ### C++ API
