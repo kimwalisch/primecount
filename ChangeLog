@@ -1,8 +1,9 @@
-2014-04-16  Kim Walisch  <kim.walisch@gmail.com>
+2014-04-18  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.17 work in progress.
+  Version 0.17 released.
 
   * .travis.yml: Travis continuous integration testing.
+  * configure.ac: Make silent building default.
   * src/pi_lmo2.cpp: Speed improvement.
   * src/pi_lmo3.cpp: Speed improvement.
   * src/pi_lmo4.cpp: Speed improvement.
