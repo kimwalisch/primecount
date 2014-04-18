@@ -29,6 +29,7 @@ EXTRA_DIST = \
 libprimecount_la_SOURCES = \
 	src/Li.cpp \
 	src/nth_prime.cpp \
+	src/PhiCache.cpp \
 	src/Pk.cpp \
 	src/pi_primesieve.cpp \
 	src/pi_meissel.cpp \
@@ -43,13 +44,12 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/test.cpp \
+	src/get_omp_threads.hpp \
 	src/pmath.hpp \
 	src/PhiCache.hpp \
-	src/PhiCache.cpp \
 	src/PhiTiny.hpp \
 	src/pi_bsearch.hpp \
 	src/Pk.hpp \
-	src/to_omp_threads.hpp \
 	src/tos_counters.hpp
 
 primecount_SOURCES = \
