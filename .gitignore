@@ -9,6 +9,7 @@
 *.lo
 *.la
 /primecount
+/primesieve*
 Makefile
 Makefile.in
 autoconf.h*
