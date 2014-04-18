@@ -43,13 +43,23 @@ APP_OBJECTS = \
 all: lib bin
 
 #-----------------------------------------------------------------------------
+# Error if PRIMESIEVE_PATH is missing
+#-----------------------------------------------------------------------------
+
+check_primesieve_path:
+!IFNDEF PRIMESIEVE_PATH
+	@echo Error: Usage: nmake -f Makefile.msvc PRIMESIEVE_PATH="C:\path\to\primesieve"
+	@exit 1
+!ENDIF
+
+#-----------------------------------------------------------------------------
 # Compilation rules
 #-----------------------------------------------------------------------------
 
-$(LIB_OBJECTS): $*.cpp
+$(LIB_OBJECTS): check_primesieve_path $*.cpp
 	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
 
-$(APP_OBJECTS): $*.cpp
+$(APP_OBJECTS): check_primesieve_path $*.cpp
 	$(CXX) $(CXXFLAGS) /c $*.cpp /Fo$@
 
 #-----------------------------------------------------------------------------
