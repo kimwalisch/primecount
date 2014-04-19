@@ -30,6 +30,7 @@ private:
     /// Keep the cache size below CACHE_BYTES_LIMIT per thread
     CACHE_BYTES_LIMIT = 16 << 20
   };
+
   /// Cache of phi(x, a) results
   std::vector<std::vector<uint16_t> > cache_;
   const std::vector<int32_t>& primes_;
@@ -42,11 +43,14 @@ private:
   bool is_phi_bsearch(int64_t x, int64_t a) const;
   bool write_to_cache(int64_t x, int64_t a);
 
+  int64_t cache_size(int64_t a) const
+  {
+    return static_cast<int64_t>(cache_[a].size());
+  }
+
   bool is_cached(int64_t x, int64_t a) const
   {
-    return a <= CACHE_A_LIMIT &&
-           x < static_cast<int64_t>(cache_[a].size()) &&
-           cache_[a][x] != 0;
+    return a <= CACHE_A_LIMIT && x < cache_size(a) && cache_[a][x] != 0;
   }
 };
 
