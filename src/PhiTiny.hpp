@@ -25,7 +25,8 @@ public:
   PhiTiny();
   static bool is_cached(int64_t a)
   {
-    return a >= 0 && a < 7;
+    assert(a >= 0);
+    return a < 7;
   }
   /// Partial sieve function (a.k.a. Legendre-sum).
   /// phi(x, a) counts the numbers <= x that are not divisible
