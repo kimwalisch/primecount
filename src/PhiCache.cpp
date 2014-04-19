@@ -125,11 +125,11 @@ bool PhiCache::write_to_cache(int64_t x, int64_t a)
 {
   if (a > CACHE_A_LIMIT || x > std::numeric_limits<uint16_t>::max())
     return false;
-  if (x >= static_cast<int64_t>(cache_[a].size()))
+  if (x >= cache_size(a))
   {
     if (bytes_ > CACHE_BYTES_LIMIT)
       return false;
-    bytes_ += (x + 1 - cache_[a].size()) * 2;
+    bytes_ += (x + 1 - cache_size(a)) * 2;
     cache_[a].resize(x + 1, 0);
   }
   return true;
