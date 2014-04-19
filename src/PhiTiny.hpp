@@ -25,7 +25,6 @@ public:
   PhiTiny();
   static bool is_cached(int64_t a)
   {
-    assert(a >= 0);
     return a < 7;
   }
   /// Partial sieve function (a.k.a. Legendre-sum).
