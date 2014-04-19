@@ -76,9 +76,6 @@ int64_t PhiCache::phi(int64_t x, int64_t a)
 ///
 int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
 {
-  if (is_cached(x, a))
-    return cache_[a][x] * sign;
-
   int64_t sum;
 
   if (x < primes_[a])
@@ -95,7 +92,14 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
     sum += phiTiny_.phi(x, c) * sign;
 
     for (int64_t a2 = c; a2 < iters; a2++)
-      sum += phi(fast_div(x, primes_[a2 + 1]), a2, -sign);
+    {
+      int64_t x2 = fast_div(x, primes_[a2 + 1]);
+
+      if (is_cached(x2, a2))
+        sum += cache_[a2][x2] * -sign;
+      else
+        sum += phi(x2, a2, -sign);
+    }
   }
 
   if (write_to_cache(x, a))
