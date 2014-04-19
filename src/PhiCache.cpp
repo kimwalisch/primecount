@@ -43,7 +43,7 @@ inline int64_t fast_div(int64_t x, int32_t y)
 namespace primecount {
 
 /// @param primes  A vector of primes with:
-///                primes[0] = 0, primes[1] = 2, primes[3] ...
+///                primes[0] = 0, primes[1] = 2, primes[2] = 3, ...
 /// 
 PhiCache::PhiCache(const std::vector<int32_t>& primes, const PhiTiny& phiTiny) :
   primes_(primes),
