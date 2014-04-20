@@ -15,19 +15,19 @@ LMO this remains to be done.
 <table>
   <tr>
     <td>Legendre's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_legendre.svg" height="20" align="absmiddle"/></td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_legendre.svg" height="20" align="absmiddle" alt="pi(x) = pi(sqrt(x)) + phi(x, pi(sqrt(x))) - 1"/></td>
   </tr>
   <tr>
     <td>Meissel's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_meissel.svg" height="20" align="absmiddle"/></td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_meissel.svg" height="20" align="absmiddle" alt="pi(x) = pi(x^(1/3)) + phi(x, pi(x^(1/3))) - 1 - P2(x, pi(x^(1/3)))"/></td>
   </tr>
   <tr>
     <td>Lehmer's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle"/></td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle" alt="pi(x) = pi(x^(1/4)) + phi(x, pi(x^(1/4))) - 1 - P2(x, pi(x^(1/4))) - P3(x, pi(x^(1/4)))"/></td>
   </tr>
   <tr>
     <td>LMO Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle"/></td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle" alt="pi(x) = pi(x^(1/3)) + S1(x, pi(x^(1/3))) + S2(x, pi(x^(1/3))) - 1 - P2(x, pi(x^(1/3)))"/></td>
   </tr>
 </table>
 
