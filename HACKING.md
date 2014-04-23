@@ -6,6 +6,7 @@ Add a new prime counting implementation
 * Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount.hpp)
 * Create source file ```src/pi_lmo.cpp``` with the new function
 * Add ```src/pi_lmo.cpp``` to [Makefile.am](Makefile.am)
+* Add ```src\pi_lmo.cpp``` to [Makefile.msvc](Makefile.msvc)
 * Add ```OPTION_LMO``` to [src/cmdoptions.hpp](src/cmdoptions.hpp)
 * Add ```OPTION_LMO``` to optionMap in [src/cmdoptions.cpp](src/cmdoptions.cpp)
 * Add ```pi_lmo(x)``` to [src/primecount.cpp](src/primecount.cpp)
