@@ -1,8 +1,8 @@
 Hacking on primecount
 =====================
 
-Add a new prime counting implementation
----------------------------------------
+### Adding a new prime counting function implementation
+
 * Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount.hpp)
 * Create source file ```src/pi_lmo.cpp``` with the new function
 * Add ```src/pi_lmo.cpp``` to [Makefile.am](Makefile.am)
@@ -13,8 +13,7 @@ Add a new prime counting implementation
 * Add ```pi_lmo(x)``` to ```bool test()``` in [src/test.cpp](src/test.cpp)
 * Add ```--lmo``` command-line option summary to [src/help.cpp](src/help.cpp)
 
-Versioning
-----------
+### Versioning
 
 * Increase version number in [include/primecount.hpp](include/primecount.hpp)
 * Increase version number in _**Build instructions**_ section in [README.md](README.md)
@@ -22,8 +21,7 @@ Versioning
 * [Increase Libtool version](http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html) number in [configure.ac](configure.ac) in ```AC_SUBST```
 * Update to current year in [src/help.cpp](src/help.cpp)
 
-Release process
----------------
+### Release process
 
 * Increase version number (see <a href="#versioning">Versioning</a>)
 * Build statically linked primecout binaries and upload them to [https://bintray.com](https://bintray.com)
