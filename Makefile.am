@@ -26,6 +26,7 @@ include_HEADERS = \
 EXTRA_DIST = \
 	src/has_openmp.cpp \
 	Makefile.msvc \
+	HACKING.md \
 	README.md
 
 libprimecount_la_SOURCES = \
