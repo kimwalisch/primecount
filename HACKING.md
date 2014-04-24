@@ -1,6 +1,32 @@
 Hacking on primecount
 =====================
 
+### Hacking on Unix-like OSes
+
+Clone or fork primecount:
+```sh
+$ git clone https://github.com/kimwalisch/primecount.git
+```
+
+In order to hack primecount on Unix-like OSes you need to have
+installed a C++ compiler and the GNU Build System (a.k.a Autotools).
+To install the GNU Build System you need to install
+[GNU Autoconf](http://www.gnu.org/software/autoconf/),
+[GNU Automake](http://www.gnu.org/software/automake/) and
+[GNU Libtool](http://www.gnu.org/software/libtool/) using your packet
+manager.
+
+Generate configure script (only once):
+```sh
+$ ./autogen.sh
+```
+
+Then build primecount using:
+```sh
+$ ./configure
+$ make
+```
+
 ### Adding a new prime counting function implementation
 
 * Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount.hpp)
