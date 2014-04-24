@@ -23,6 +23,7 @@ Hacking on primecount
 
 ### Release process
 
+* Run tests using ```make check```
 * Increase version number (see <a href="#versioning">Versioning</a>)
 * Build statically linked primecout binaries and upload them to [https://bintray.com](https://bintray.com)
 * Update _**Precompiled binaries**_ section in [README.md](README.md)
