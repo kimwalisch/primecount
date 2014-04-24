@@ -5,11 +5,11 @@ Hacking on primecount
 
 Clone or fork primecount:
 ```sh
-$ git clone https://github.com/kimwalisch/primecount.git
+$ git clone git://github.com/kimwalisch/primecount.git
 ```
 
 In order to hack primecount you need to have installed a C++ compiler
-and the GNU Build System (a.k.a Autotools). To install the GNU Build
+and the GNU Build System (a.k.a. Autotools). To install the GNU Build
 System install
 [GNU Autoconf](http://www.gnu.org/software/autoconf/),
 [GNU Automake](http://www.gnu.org/software/automake/) and
