@@ -8,9 +8,9 @@ Clone or fork primecount:
 $ git clone https://github.com/kimwalisch/primecount.git
 ```
 
-In order to hack primecount on Unix-like OSes you need to have
-installed a C++ compiler and the GNU Build System (a.k.a Autotools).
-To install the GNU Build System you need to install
+In order to hack primecount you need to have installed a C++ compiler
+and the GNU Build System (a.k.a Autotools). To install the GNU Build
+System install
 [GNU Autoconf](http://www.gnu.org/software/autoconf/),
 [GNU Automake](http://www.gnu.org/software/automake/) and
 [GNU Libtool](http://www.gnu.org/software/libtool/) using your packet
