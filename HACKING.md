@@ -51,8 +51,8 @@ $ make
 
 * Run tests using ```make check```
 * Increase version number (see <a href="#versioning">Versioning</a>)
-* Build statically linked primecout binaries and upload them to [https://bintray.com](https://bintray.com)
+* Build statically linked primecout binaries and upload them to [https://bintray.com/kimwalisch/primecount](https://bintray.com/kimwalisch/primecount)
 * Update _**Precompiled binaries**_ section in [README.md](README.md)
 * Update [ChangeLog](ChangeLog)
 * Tag the new release in git
-* Create a new release tarball using ```make dist``` and upload it to [https://bintray.com](https://bintray.com)
+* Create new release tarball using ```make dist``` and upload it to [https://bintray.com/kimwalisch/primecount](https://bintray.com/kimwalisch/primecount)
