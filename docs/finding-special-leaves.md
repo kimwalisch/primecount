@@ -132,13 +132,24 @@ m := pi(a / primes[i]) + 1;
 ```
 
 The statements above are causing issues for an actual implementation
-as they may be quite large. We are allowed to add y as a maximum bound
-to both statements:
+as they may be quite large. We are allowed to use y as a maximum bound
+in both statements, e.g.:
 
 ```C++
-m := Aj(min(y, (a - 1) / primes[j] + 1));
-m := pi(min(y, a / primes[i])) + 1;
+if (a / primes[i] > y)
+    continue;
+m := pi(a / primes[i]) + 1;
 ```
+
+Using a decreasing algorithm i.e. ```for i := pi(y) to k do begin``` we
+can even do:
+
+```C++
+if (a / primes[i] > y)
+    break;
+m := pi(a / primes[i]) + 1;
+```
+
 process(n)
 ----------
 
