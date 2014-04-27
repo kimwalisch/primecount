@@ -90,7 +90,7 @@ int N(int k, int j) {
 ### Notes
 
 In the <a href="#algorithm">algorithm for finding the special leaves</a>
-we have to either add bounds checking in line 5.
+we have add bounds checking in line 5.
 
 Algorithm
 ---------
