@@ -2,10 +2,11 @@ Finding the special leaves
 ==========================
 
 This file describes how to implement the algorithm to find the
-special leaves in the Lagarias-Miller-Odlyzko prime counting algorithm
-as described on pages 556 - 557 in the paper "Computing pi(x) The
-Meissel-Lehmer Method", Mathematics of Computation, 44 (1985), pp.
-537–560, by J. C. Lagarias, V. S. Miller and A. M. Odlyzko.
+special leaves (sub-algorithm of the Lagarias-Miller-Odlyzko prime
+counting algorithm) as described in section 5 (pages 556-557) in the
+paper "Computing pi(x) The Meissel-Lehmer Method", Mathematics of
+Computation, 44 (1985), pp. 537–560, by J. C. Lagarias, V. S. Miller
+and A. M. Odlyzko.
 
 Definitions and bounds
 ----------------------
