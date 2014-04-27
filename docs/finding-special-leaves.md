@@ -67,27 +67,30 @@ Nk(j)
 For each prime pk ≤ sqrt(y) we store a table called Nk such that
 l = Nk(j) satisfies Ak(l-1) < j*pk ≤ Ak(l). Our algorithm simply
 iterates over all indices of the Ak table and for each Ak(l) finds
-a j which satisfies Ak(l-1)/pk < j ≤ Ak(l)/pk. Then we set
-Nk(j) = l;
+a j which satisfies Ak(l-1)/pk < j ≤ Ak(l)/pk. We use a vector of maps
+as our data structure, querying N(k, j) uses O(log n) operations.
 
 ```C++
 // N[k][j]
-vector<vector<int> > N(A);
+vector<map<int, int> > N_maps(A.size());
 
 for (int k = 1; k < A.size(); k++) {
     for (int l = 1; l < A[k].size(); l++) {
         int j = A[k][l] / primes[k];
-        N[k][j] = l;
+        N_maps[k][j] = l;
     }
+}
+
+int N(int k, int j) {
+    int l = N_maps[k].lower_bound(j)->second;
+    return l;
 }
 ```
 
 ### Notes
 
 In the <a href="#algorithm">algorithm for finding the special leaves</a>
-we have to either add bounds checking in line 5 to avoid
-N[j][m] with ```m >= N[j].size()``` or we could add a very large
-integer to the end of each Nk.
+we have to either add bounds checking in line 5.
 
 Algorithm
 ---------
