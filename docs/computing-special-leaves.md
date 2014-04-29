@@ -128,7 +128,7 @@ algorithm can be modified to:
 
 ```C++
 // Special leaves which are the product of two primes
-for i := pi(y) to pi(sqrt(y))
+for i := pi(sqrt(y)) to pi(y)
 	if (a / primes[i] < y)
 		l := pi(a / primes[i]) + 1;
 		limit := pi(min(b / primes[i], y));
