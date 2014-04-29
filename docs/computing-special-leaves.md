@@ -83,6 +83,7 @@ for (int k = 1; k < A.size(); k++) {
 }
 
 int N(int k, int j) {
+    // find the smallest integer >= j using binary search
     int l = N_maps[k].lower_bound(j)->second;
     return l;
 }
