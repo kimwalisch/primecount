@@ -23,10 +23,10 @@ Definitions and bounds
 Prerequisities
 --------------
 
-* Calculate for each prime pk = sqrt(y) two parallel tables Ak and Mk.
-* The value of Ak(j) is the jth square-free n = y such that lpf(n) = pk.
+* Calculate for each prime pk ≤ sqrt(y) two parallel tables Ak and Mk.
+* The value of Ak(j) is the jth square-free n ≤ y such that lpf(n) = pk.
 * The value of Mk(j) is mu(Ak(j)).
-* For each prime pk = sqrt(y) we store a table called Nk such that l = Nk(j) satisfies Ak(l - 1) < j*pk = Ak(l).
+* For each prime pk ≤ sqrt(y) we store a table called Nk such that l = Nk(j) satisfies Ak(l - 1) < j*pk ≤ Ak(l).
 
 <p>These tables may be computed in time O(y log x) and take up
 space O(y log log x).</p>
@@ -38,8 +38,8 @@ space O(y log log x).</p>
 Ak(j)
 -----
 
-Calculate for each prime pk = sqrt(y) the parallel table Ak. The value
-of Ak(j) is the jth square-free n = y such that lpf(n) = pk. Ak(j) can
+Calculate for each prime pk ≤ sqrt(y) the parallel table Ak. The value
+of Ak(j) is the jth square-free n ≤ y such that lpf(n) = pk. Ak(j) can
 be calculated efficiently using the code below:
 
 ```C++
@@ -65,10 +65,10 @@ in this case we can continue with the next loop iteration.
 Nk(j)
 -----
 
-For each prime pk = sqrt(y) we store a table called Nk such that
-l = Nk(j) satisfies Ak(l-1) < j*pk = Ak(l). Our algorithm simply
+For each prime pk ≤ sqrt(y) we store a table called Nk such that
+l = Nk(j) satisfies Ak(l-1) < j*pk ≤ Ak(l). Our algorithm simply
 iterates over all indices of the Ak table and for each Ak(l) finds
-a j which satisfies Ak(l-1)/pk < j = Ak(l)/pk. We use a vector of maps
+a j which satisfies Ak(l-1)/pk < j ≤ Ak(l)/pk. We use a vector of maps
 as our data structure, querying N(k, j) uses O(log n) operations.
 
 ```C++
@@ -98,7 +98,7 @@ we have to add bounds checking in line 5.
 Algorithm
 ---------
 
-<p>To find all special n ? [a, b) we use these two tables together with
+<p>To find all special n ∈ [a, b) we use these two tables together with
 the procedure from page 557 (figure 2).</p>
 
 ```C++
