@@ -79,7 +79,7 @@ for (int k = 1; k < A.size(); k++) {
 int N(int k, int j) {
     // lower_bound(j) finds the smallest key >= j using binary search
     int l = N_maps[k].lower_bound(j)->second;
-    // l = N_maps[k][key]
+    // l = N_maps[k][key /* >= j */]
     return l;
 }
 ```
