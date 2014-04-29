@@ -149,7 +149,7 @@ process(n)
 
 We have found a special leaf, compute it's contribution 
 ```phi(x / n, i - 1)``` by counting the number of unsieved elements ≤ x / n
-after having removed the multiples of the first b primes from the
+after having removed the multiples of the first i-1 primes from the
 sieve array. The code below uses the special counters data structure
 from Tomás Oliveira e Silva's paper
 "Computing pi(x): the combinatorial method", Revista do DETUA, vol. 4,
