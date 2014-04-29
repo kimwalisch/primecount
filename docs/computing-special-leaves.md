@@ -153,5 +153,5 @@ no. 6, March 2006, pp. 759-768.
 int64_t count = cnt_query(counters, (x / n) - a);
 int64_t phi_n = phi[i] + count;
 
-result -= mu[m] * phi_n;
+result -= mu[l] * phi_n;
 ```
