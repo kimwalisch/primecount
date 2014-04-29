@@ -24,6 +24,7 @@ include_HEADERS = \
 	include/primecount.hpp
 
 EXTRA_DIST = \
+	docs/computing-special-leaves.md \
 	src/has_openmp.cpp \
 	Makefile.msvc \
 	README.md
