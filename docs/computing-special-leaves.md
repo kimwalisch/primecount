@@ -58,7 +58,7 @@ for (int n = 1; n <= y; n++)
         A[pi[lpf[n]]].push_back(n);
 ```
 
-### Example
+### Examples
 
 * ```k = 5```, thus ```primes[5] = 11```
 *  11 is the 1st square free n with lpf(n) = 11, thus ```A[5][1] = 11```
@@ -96,6 +96,13 @@ int N(int k, int j) {
     return l;
 }
 ```
+
+### Example
+
+* ```k = 5```, ```j = 16```, thus ```j * primes[k] = 176```
+* ```l = N(k, j)```, thus ```N(5, 16) = 3```
+* ```A[k][l-1] < j * primes[k] <= A[k][l] ```, thus ```A[5][2] < 176 <= A[5][3]```
+* ```143 < 176 <= 187```
 
 Algorithm
 ---------
