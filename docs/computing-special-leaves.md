@@ -113,7 +113,7 @@ for i := k to pi(sqrt(y)) do
     end
 
 // Special leaves which are the product of two primes
-for i := k to pi(y) do
+for i := pi(sqrt(y)) to pi(y) do
     l := pi(a / primes[i]) + 1;
         while primes[l] <= b / primes[i] do
             // it is a special leaf
