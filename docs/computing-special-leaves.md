@@ -56,12 +56,6 @@ for (int n = 1; n <= y; n++)
         A[pi[lpf[n]]].push_back(n);
 ```
 
-### Notes
-
-In the <a href="#algorithm">algorithm for finding the special leaves</a>
-```if (j >= A[k].size())``` (line 4) then the jth square-free n > y,
-in this case we can continue with the next loop iteration.
-
 Nk(j)
 -----
 
