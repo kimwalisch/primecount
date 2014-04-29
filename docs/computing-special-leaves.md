@@ -126,7 +126,7 @@ for i := k to pi(y) do
 ### Notes
 
 In the first revision of the paper "Computing pi(x) The Meissel-Lehmer
-Method" the first part of the algorithm above contains an error, Aj(l)
+Method" the first part of the above algorithm contains an error, Aj(l)
 and Nj(k) are switched. In later revisions of the paper this error has
 been corrected.
 
