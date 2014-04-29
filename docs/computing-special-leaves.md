@@ -15,7 +15,7 @@ Definitions and bounds
 * lpf(n) denotes the smallest prime factor of n.
 * mu(n) is the Möbius function
 * x^(2/5) > y > x^(1/3)
-* j = pi(sqrt(y))
+* j ≤ pi(sqrt(y))
 * a = lower bound of the current segment (algorithm uses the segmented sieve of Eratosthenes)
 * b = upper bound of the current segment (...)
 * k is a small constant e.g. 5, used to pre-sieve the multiples of the first k primes
@@ -148,7 +148,7 @@ process(n)
 ----------
 
 We have found a special leaf, compute it's contribution 
-```phi(x / n, i - 1)``` by counting the number of unsieved elements = x / n
+```phi(x / n, i - 1)``` by counting the number of unsieved elements ≤ x / n
 after having removed the multiples of the first b primes from the
 sieve array. The code below uses the special counters data structure
 from Tomás Oliveira e Silva's paper
