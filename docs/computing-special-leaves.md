@@ -32,7 +32,7 @@ Prerequisities
 space O(y log log x).</p>
 
 ### Notes
-* _**parallel table**_ means two dimensional data structure e.g. A[k][j].
+* parallel table_ means two dimensional data structure e.g. A[k][j].
 * Mk(j) does not seem to be used in the algorithm?!
 
 Ak table
@@ -120,7 +120,7 @@ Method" the first part of the above algorithm contains an error, Aj(l)
 and Nj(k) are switched. In later revisions of the paper this error has
 been corrected.
 
-### Bounds checking
+### Adding bounds checking
 
 In both algorithms we must add bounds checking, e.g:
 
