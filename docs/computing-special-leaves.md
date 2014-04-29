@@ -11,9 +11,10 @@ and A. M. Odlyzko.
 Definitions and bounds
 ----------------------
 
-* pi(x) counts the primes below x.
-* lpf(n) denotes the smallest prime factor of n.
+* pi(x) counts the primes below x
+* lpf(n) denotes the smallest prime factor of n
 * mu(n) is the Möbius function
+* square_free(n) returns true if n is square free
 * x^(2/5) > y > x^(1/3)
 * j ≤ pi(sqrt(y))
 * a = lower bound of the current segment (algorithm uses the segmented sieve of Eratosthenes)
@@ -23,17 +24,20 @@ Definitions and bounds
 Prerequisities
 --------------
 
-* Calculate for each prime pk ≤ sqrt(y) two parallel tables Ak and Mk.
-* The value of Ak(j) is the jth square-free n ≤ y such that lpf(n) = pk.
-* The value of Mk(j) is mu(Ak(j)).
-* For each prime pk ≤ sqrt(y) we store a table called Nk such that l = Nk(j) satisfies Ak(l - 1) < j*pk ≤ Ak(l).
+* Generate a pi[n] lookup table of size y
+* Generate a lpf[n] lookup table of size y
+* Generate a mu[n] lookup table of size y
+* Generate a square_free[n] table of size y
+* Calculate for each prime pk ≤ sqrt(y) two parallel tables Ak and Mk
+* The value of Ak(j) is the jth square-free n ≤ y such that lpf(n) = pk
+* The value of Mk(j) is mu(Ak(j))
+* For each prime pk ≤ sqrt(y) we store a table called Nk such that l = Nk(j) satisfies Ak(l - 1) < j*pk ≤ Ak(l)
 
 <p>These tables may be computed in time O(y log x) and take up
 space O(y log log x).</p>
 
 ### Notes
-* parallel table_ means two dimensional data structure e.g. A[k][j].
-* Mk(j) does not seem to be used in the algorithm?!
+Mk(j) does not seem to be used in the algorithm!?
 
 Ak table
 --------
@@ -45,11 +49,6 @@ be calculated efficiently using the code below:
 ```C++
 // A[k][j]
 vector<vector<int> > A(/* size = */ pi[sqrt(y)] + 1, vector<int>(1));
-
-// the square_free[n] table returns true if n is square free
-// the pi[n] table counts the primes below n
-// the lpf[n] table returns the least prime factor of n
-// these 3 tables must all be of size y
 
 for (int n = 1; n <= y; n++)
     if (square_free[n] && lpf[n] <= sqrt(y))
@@ -95,9 +94,9 @@ Algorithm
 the procedure from page 557 (figure 2).</p>
 
 ```C++
-// Special leaves with lpf(n) <= sqrt(y)
-for i := k to pi(sqrt(y))
-    for j := i + 1 to pi(sqrt(y))
+// Special leaves with lpf[n] <= sqrt(y)
+for i := k to pi[sqrt(y)]
+    for j := i + 1 to pi[sqrt(y)]
         l :=  N(j, (a - 1) / primes[j] + 1)
         while A[j][l] <= b / primes[i]
             // it is a special leaf
@@ -105,8 +104,8 @@ for i := k to pi(sqrt(y))
             l := l + 1
 
 // Special leaves which are the product of two primes
-for i := pi(sqrt(y)) to pi(y)
-    l := pi(a / primes[i]) + 1;
+for i := pi[sqrt(y)] to pi[y]
+    l := pi[a / primes[i]] + 1;
     while primes[l] <= b / primes[i]
         // it is a special leaf
         process(primes[i] * primes[l]);
@@ -125,9 +124,9 @@ been corrected.
 In both algorithms we must add bounds checking, e.g:
 
 ```C++
-// Special leaves with lpf(n) <= sqrt(y)
-for i := k to pi(sqrt(y))
-    for j := i + 1 to pi(sqrt(y))
+// Special leaves with lpf[n] <= sqrt(y)
+for i := k to pi[sqrt(y)]
+    for j := i + 1 to pi[sqrt(y)]
         l :=  N(j, (a - 1) / primes[j] + 1)
         while l < A[j].size() && A[j][l] <= b / primes[i]
             // it is a special leaf
@@ -135,10 +134,10 @@ for i := k to pi(sqrt(y))
             l := l + 1
 
 // Special leaves which are the product of two primes
-for i := pi(sqrt(y)) to pi(y)
+for i := pi[sqrt(y)] to pi[y]
     if (a / primes[i] < y)
-        l := pi(a / primes[i]) + 1;
-        limit := pi(min(b / primes[i], y));
+        l := pi[a / primes[i]] + 1;
+        limit := pi[min(b / primes[i], y)];
         while l <= limit
             // it is a special leaf
             process(primes[i] * primes[l]);
