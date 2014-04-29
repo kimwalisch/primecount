@@ -1,5 +1,5 @@
-Finding the special leaves
-==========================
+Computing special leaves
+========================
 
 This file describes how to implement the algorithm to find the
 special leaves (sub-algorithm of the Lagarias-Miller-Odlyzko prime
@@ -101,55 +101,34 @@ the procedure from page 557 (figure 2).</p>
 
 ```C++
 // Special leaves with lpf(n) <= sqrt(y)
-for i := k to pi(sqrt(y)) do begin
-    for j := i + 1 to pi(sqrt(y)) do begin
-        m :=  Aj((a - 1) / primes[j] + 1)
-        while Nj(m) <= b / primes[i] do begin
+for i := k to pi(sqrt(y)) do
+    for j := i + 1 to pi(sqrt(y)) do
+        l :=  Nj((a - 1) / primes[j] + 1)
+        while Aj(l) <= b / primes[i] do
             // it is a special leaf
-            process(primes[i] * Nj(m));
-            m := m + 1
-            end {while}
-        end {for j}
-    end {for i};
-
-// -------------------------
+            process(primes[i] * Aj(l));
+            l := l + 1
+            end
+        end
+    end
 
 // Special leaves which are the product of two primes
-for i := k to pi(y) do begin
-    m := pi(a / primes[i]) + 1;
-        while primes[m] <= b / primes[i] do begin
+for i := k to pi(y) do
+    l := pi(a / primes[i]) + 1;
+        while primes[l] <= b / primes[i] do
             // it is a special leaf
-            process(primes[i] * primes[m]);
-            m := m + 1
-        end {while}
-    end {for /};
+            process(primes[i] * primes[l]);
+            l := l + 1
+        end
+    end
 ```
 
 ### Notes
 
-```C++
-m := Aj((a - 1) / primes[j] + 1)
-m := pi(a / primes[i]) + 1;
-```
-
-The statements above are causing issues for an actual implementation
-as they may be quite large. We are allowed to use y as a maximum bound
-in both statements, e.g.:
-
-```C++
-if (a / primes[i] > y)
-    continue;
-m := pi(a / primes[i]) + 1;
-```
-
-Using a decreasing algorithm i.e. ```for i := pi(y) to k do begin``` we
-can even do:
-
-```C++
-if (a / primes[i] > y)
-    break;
-m := pi(a / primes[i]) + 1;
-```
+In the first revision of the paper "Computing pi(x) The Meissel-Lehmer
+Method" the first part of the algorithm above contains an error, Aj(l)
+and Nj(k) are switched. In later revisions of the paper this error has
+been corrected.
 
 process(n)
 ----------
