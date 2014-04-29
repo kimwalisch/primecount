@@ -125,6 +125,8 @@ Method" the first part of the above algorithm contains an error, Aj(l)
 and Nj(k) are switched. In later revisions of the paper this error has
 been corrected.
 
+### Bounds checking
+
 In both algorithms we must add bounds checking, e.g. the second
 algorithm can be modified to:
 
