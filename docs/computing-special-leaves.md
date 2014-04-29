@@ -77,17 +77,16 @@ for (int k = 1; k < A.size(); k++) {
 }
 
 int N(int k, int j) {
-    // lower_bound(j) finds the smallest key >= j using binary search
-    int l = N_maps[k].lower_bound(j)->second;
-    // l = N_maps[k][key /* >= j */]
+    // find the smallest key >= j using binary search
+    auto iter = N_maps[k].lower_bound(j);
+    if (iter == N_maps[k].end())
+        return INT_MAX;
+
+    // l = N[k][key /* >= j */]
+    int l = iter->second;
     return l;
 }
 ```
-
-### Notes
-
-In the <a href="#algorithm">algorithm for finding the special leaves</a>
-we have to add bounds checking in line 5.
 
 Algorithm
 ---------
