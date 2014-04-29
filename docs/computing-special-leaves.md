@@ -35,8 +35,8 @@ space O(y log log x).</p>
 * _**parallel table**_ means two dimensional data structure e.g. A[k][j].
 * Mk(j) does not seem to be used in the algorithm?!
 
-Ak(j)
------
+Ak table
+--------
 
 Calculate for each prime pk ≤ sqrt(y) the parallel table Ak. The value
 of Ak(j) is the jth square-free n ≤ y such that lpf(n) = pk. Ak(j) can
@@ -56,8 +56,8 @@ for (int n = 1; n <= y; n++)
         A[pi[lpf[n]]].push_back(n);
 ```
 
-Nk(j)
------
+Nk table
+--------
 
 For each prime pk ≤ sqrt(y) we store a table called Nk such that
 l = Nk(j) satisfies Ak(l-1) < j*pk ≤ Ak(l). Our algorithm simply
@@ -66,7 +66,7 @@ a j which satisfies Ak(l-1)/pk < j ≤ Ak(l)/pk. We use a vector of maps
 as our data structure, querying N(k, j) uses O(log n) operations.
 
 ```C++
-// N[k][j]
+// N_maps[k][j]
 vector<map<int, int> > N_maps(A.size());
 
 for (int k = 1; k < A.size(); k++) {
@@ -98,10 +98,10 @@ the procedure from page 557 (figure 2).</p>
 // Special leaves with lpf(n) <= sqrt(y)
 for i := k to pi(sqrt(y))
     for j := i + 1 to pi(sqrt(y))
-        l :=  Nj((a - 1) / primes[j] + 1)
-        while Aj(l) <= b / primes[i]
+        l :=  N(j, (a - 1) / primes[j] + 1)
+        while A[j][l] <= b / primes[i]
             // it is a special leaf
-            process(primes[i] * Aj(l));
+            process(primes[i] * A[j][l]);
             l := l + 1
 
 // Special leaves which are the product of two primes
@@ -122,19 +122,27 @@ been corrected.
 
 ### Bounds checking
 
-In both algorithms we must add bounds checking, e.g. the second
-algorithm can be modified to:
+In both algorithms we must add bounds checking, e.g:
 
 ```C++
+// Special leaves with lpf(n) <= sqrt(y)
+for i := k to pi(sqrt(y))
+    for j := i + 1 to pi(sqrt(y))
+        l :=  N(j, (a - 1) / primes[j] + 1)
+        while l < A[j].size() && A[j][l] <= b / primes[i]
+            // it is a special leaf
+            process(primes[i] * A[j][l]);
+            l := l + 1
+
 // Special leaves which are the product of two primes
 for i := pi(sqrt(y)) to pi(y)
-	if (a / primes[i] < y)
-		l := pi(a / primes[i]) + 1;
-		limit := pi(min(b / primes[i], y));
-		while l <= limit
-			// it is a special leaf
-			process(primes[i] * primes[l]);
-			l := l + 1
+    if (a / primes[i] < y)
+        l := pi(a / primes[i]) + 1;
+        limit := pi(min(b / primes[i], y));
+        while l <= limit
+            // it is a special leaf
+            process(primes[i] * primes[l]);
+            l := l + 1
 ```
 
 process(n)
