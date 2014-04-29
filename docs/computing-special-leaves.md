@@ -8,6 +8,9 @@ paper "Computing pi(x) The Meissel-Lehmer Method", Mathematics of
 Computation, 44 (1985), pp. 537–560, by J. C. Lagarias, V. S. Miller
 and A. M. Odlyzko.
 
+The algorithm described in this document is implemented in
+[pi_lmo5.cpp](../src/pi_lmo5.cpp).
+
 Definitions and bounds
 ----------------------
 
@@ -54,6 +57,13 @@ for (int n = 1; n <= y; n++)
     if (square_free[n] && lpf[n] <= sqrt(y))
         A[pi[lpf[n]]].push_back(n);
 ```
+
+### Example
+
+* ```k = 5```, thus ```primes[5] = 11```
+*  11 is the 1st square free n with lpf(n) = 11, thus ```A[5][1] = 11```
+* 143 is the 2nd square free n with lpf(n) = 11, thus ```A[5][2] = 143```
+* 187 is the 3rd square free n with lpf(n) = 11, thus ```A[5][3] = 187```
 
 Nk table
 --------
