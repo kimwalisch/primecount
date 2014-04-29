@@ -108,19 +108,19 @@ for i := k to pi(sqrt(y)) do
             // it is a special leaf
             process(primes[i] * Aj(l));
             l := l + 1
-            end
         end
     end
+end
 
 // Special leaves which are the product of two primes
 for i := pi(sqrt(y)) to pi(y) do
     l := pi(a / primes[i]) + 1;
-        while primes[l] <= b / primes[i] do
-            // it is a special leaf
-            process(primes[i] * primes[l]);
-            l := l + 1
-        end
+    while primes[l] <= b / primes[i] do
+        // it is a special leaf
+        process(primes[i] * primes[l]);
+        l := l + 1
     end
+end
 ```
 
 ### Notes
