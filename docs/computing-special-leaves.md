@@ -168,7 +168,7 @@ for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
 }
 ```
 
-### Opimization
+### Optimization
 
 The code further up uses slow integer division operations to
 calculate the ```l``` bounds. We can speed up the code by
