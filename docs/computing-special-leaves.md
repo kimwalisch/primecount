@@ -168,6 +168,28 @@ for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
 }
 ```
 
+### Opimization
+
+The code further up uses slow integer division operations to
+calculate the ```l``` bounds. We can speed up the code by
+backwards iterating over ```l``` and using an ```l_max[]```
+array.
+
+```C++
+for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
+{
+    int prime = primes[i + 1];
+    int l = l_max[i];
+    if (prime >= primes[l_max])
+        break;
+
+    for (; x < prime * primes[l] * segment_high; l--)
+        process(prime * primes[l]);
+
+    l_max[i] = l;
+}
+```
+
 process(n)
 ----------
 
