@@ -180,8 +180,8 @@ from Tomás Oliveira e Silva's paper
 no. 6, March 2006, pp. 759-768.
 
 ```C++
-int64_t count = cnt_query(counters, (x / n) - a);
-int64_t phi_n = phi[i] + count;
+int64_t count = cnt_query(counters, (x / n) - segment_low);
+int64_t phi_xn = phi[i] + count;
 
-result -= mu[l] * phi_n;
+result += phi_xn;
 ```
