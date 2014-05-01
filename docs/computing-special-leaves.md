@@ -108,7 +108,7 @@ Algorithm
 ---------
 
 <p>To find all special n ∈ [a, b) we use these two tables together with
-the procedure from page 557 (figure 2).</p>
+the procedure from section 5 (page 557, figure 2).</p>
 
 ```C++
 // Special leaves with lpf[n] <= sqrt(y)
@@ -136,29 +136,36 @@ Method" the first part of the above algorithm contains an error, Aj(l)
 and Nj(k) are switched. In later revisions of the paper this error has
 been corrected.
 
-### Adding bounds checking
+Segmentation bounds (2nd algorithm)
+-----------------------------------
 
-In both algorithms we must add bounds checking, e.g:
+In each segment and for each ```primes[i]``` we need to process all
+the special leaves that satisfy:
 
 ```C++
-// Special leaves with lpf[n] <= sqrt(y)
-for i := k to pi[sqrt(y)]
-    for j := i + 1 to pi[sqrt(y)]
-        l :=  N(j, (a - 1) / primes[j] + 1)
-        while l < A[j].size() && A[j][l] <= b / primes[i]
-            // it is a special leaf
-            process(primes[i] * A[j][l]);
-            l := l + 1
+// special leaf
+n = primes[i] * primes[l]
+segment_low <= x / n < segment_high
+```
 
-// Special leaves which are the product of two primes
-for i := pi[sqrt(y)] to pi[y]
-    if (a / primes[i] < y)
-        l := pi[a / primes[i]] + 1;
-        limit := pi[min(b / primes[i], y)];
-        while l <= limit
-            // it is a special leaf
-            process(primes[i] * primes[l]);
-            l := l + 1
+The code below shows how to find the lower and upper bound for ```l```:
+
+```C++
+for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
+{
+    int prime = primes[i + 1];
+    int l_min = pi[max(x / (prime * segment_high), y / prime)] + 1;
+    int l_max = pi[min(x / (prime * segment_low ), y)];
+
+    if (prime >= primes[l_max])
+        break;
+
+    for (int l = l_min; l <= l_max; l++)
+    {
+        n = prime * primes[l];
+        process(n);
+    }
+}
 ```
 
 process(n)
