@@ -184,7 +184,7 @@ for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
     if (prime >= primes[l])
         break;
 
-    for (prime * primes[l] > special_leaf_threshold; l--)
+    for (; prime * primes[l] > special_leaf_threshold; l--)
         process(prime * primes[l]);
 
     l_max[i] = l;
