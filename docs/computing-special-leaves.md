@@ -172,10 +172,11 @@ for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
 
 The code further up uses slow integer division operations to
 calculate the ```l``` bounds. We can speed up the code by
-backwards iterating over ```l``` and using an ```l_max[]```
-array.
+using an ```l_max[]``` array and backwards iterating over ```l```.
 
 ```C++
+int special_leaf_threshold = max(x / segment_high, y);
+
 for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
 {
     int prime = primes[i + 1];
@@ -183,7 +184,7 @@ for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
     if (prime >= primes[l_max])
         break;
 
-    for (; x < prime * primes[l] * segment_high; l--)
+    for (prime * primes[l] > special_leaf_threshold; l--)
         process(prime * primes[l]);
 
     l_max[i] = l;
