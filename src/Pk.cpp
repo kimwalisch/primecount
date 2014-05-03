@@ -19,6 +19,8 @@
   #include "get_omp_threads.hpp"
 #endif
 
+using std::vector;
+
 namespace primecount {
 
 /// 2nd partial sieve function.
@@ -28,8 +30,8 @@ namespace primecount {
 ///
 int64_t P2(int64_t x, int64_t a, int threads)
 {
-  std::vector<int32_t> primes;
-  std::vector<int64_t> counts;
+  vector<int32_t> primes;
+  vector<int64_t> counts;
   primes.push_back(0);
   primesieve::generate_primes(isqrt(x), &primes);
   counts.resize(primes.size());
@@ -50,7 +52,7 @@ int64_t P2(int64_t x, int64_t a, int threads)
 #endif
   for (int64_t i = b; i > a; i--)
   {
-    int64_t prev = (i != b) ? x / primes[i + 1] + 1 : 0;
+    int64_t prev = (i == b) ? 0 : x / primes[i + 1] + 1;
     int64_t xi = x / primes[i];
     counts[i] = primesieve::count_primes(prev, xi);
   }
@@ -71,27 +73,25 @@ int64_t P2(int64_t x, int64_t a, int threads)
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {
-  std::vector<int32_t> primes;
+  vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(isqrt(x), &primes);
 
-  int64_t c = pi_bsearch(primes, iroot<3>(x));
+  int64_t y = iroot<3>(x);
+  int64_t pi_y = pi_bsearch(primes, y);
   int64_t sum = 0;
 
 #ifdef _OPENMP
   #pragma omp parallel for num_threads(get_omp_threads(threads)) \
       schedule(dynamic) reduction(+: sum)
 #endif
-  for (int64_t i = a + 1; i <= c; i++)
+  for (int64_t i = a + 1; i <= pi_y; i++)
   {
     int64_t xi = x / primes[i];
     int64_t bi = pi_bsearch(primes, isqrt(xi));
 
     for (int64_t j = i; j <= bi; j++)
-    {
-      int64_t xij = xi / primes[j];
-      sum += pi_bsearch(primes, xij) - (j - 1);
-    }
+      sum += pi_bsearch(primes, xi / primes[j]) - (j - 1);
   }
 
   return sum;
