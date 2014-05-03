@@ -148,19 +148,22 @@ n = primes[i] * primes[l]
 segment_low <= x / n < segment_high
 ```
 
-The code below shows how to find the lower and upper bound for ```l```:
+In practice this algorithm is best implemented using a decreasing
+(```l--```) inner loop. The code below shows how to find the lower
+and upper bound for ```l``` and how to find all special leaves
+i.e. ```n``` that are a product of two primes:
 
 ```C++
-for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
+for (int i = pi[sqrt(y)]; i < pi[y]; i++)
 {
-    int prime = primes[i + 1];
-    int l_min = pi[max(x / (prime * segment_high), y / prime)] + 1;
+    int prime = primes[i];
+    int l_min = pi[max(x / (prime * segment_high), y / prime)];
     int l_max = pi[min(x / (prime * segment_low ), y)];
 
     if (prime >= primes[l_max])
         break;
 
-    for (int l = l_min; l <= l_max; l++)
+    for (int l = l_max; l > max(l_min, i); l--)
     {
         n = prime * primes[l];
         process(n);
@@ -177,12 +180,14 @@ using an ```l_max[]``` array and backwards iterating over ```l```.
 ```C++
 int special_leaf_threshold = max(x / segment_high, y);
 
-for (int i = pi[sqrt(y)]; i + 1 < pi[y]; i++)
+for (int i = pi[sqrt(y)]; i < pi[y]; i++)
 {
-    int prime = primes[i + 1];
+    int prime = primes[i];
     int l = l_max[i];
     if (prime >= primes[l])
         break;
+
+    special_leaf_threshold = max(prime * prime, special_leaf_threshold);
 
     for (; prime * primes[l] > special_leaf_threshold; l--)
         process(prime * primes[l]);
