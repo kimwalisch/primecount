@@ -19,22 +19,22 @@
 #include <stdint.h>
 #include <vector>
 
-using std::log;
+using namespace std;
 
 namespace {
 
 /// Calculate the contribution of the ordinary leaves.
 ///
 int64_t S1(int64_t x,
-           int64_t x13_alpha,
+           int64_t y,
            int64_t c,
-           std::vector<int32_t>& primes,
-           std::vector<int32_t>& lpf,
-           std::vector<int32_t>& mu)
+           vector<int32_t>& primes,
+           vector<int32_t>& lpf,
+           vector<int32_t>& mu)
 {
   int64_t S1_result = 0;
 
-  for (int64_t n = 1; n <= x13_alpha; n++)
+  for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > primes[c])
       S1_result += mu[n] * primecount::phi(x / n, c);
 
@@ -47,50 +47,51 @@ int64_t S1(int64_t x,
 /// @pre c >= 2
 ///
 int64_t S2(int64_t x,
-           int64_t x13_alpha,
-           int64_t a,
+           int64_t y,
+           int64_t pi_y,
            int64_t c,
-           std::vector<int32_t>& primes,
-           std::vector<int32_t>& lpf,
-           std::vector<int32_t>& mu)
+           vector<int32_t>& primes,
+           vector<int32_t>& lpf,
+           vector<int32_t>& mu)
 {
-  int64_t limit = x / x13_alpha;
+  int64_t limit = x / y + 1;
   int64_t S2_result = 0;
-  std::vector<char> sieve(limit + 1, 1);
+  int64_t b = 1;
+  vector<char> sieve(limit, 1);
 
   // phi(y, b) nodes with b <= c do not contribute to S2, so we
   // simply sieve out the multiples of the first c primes
-  for (int64_t b = 1; b <= c; b++)
+  for (; b <= c; b++)
   {
     int64_t prime = primes[b];
-    for (int64_t k = prime; k <= limit; k += prime)
+    for (int64_t k = prime; k < limit; k += prime)
       sieve[k] = 0;
   }
 
-  for (int64_t b = c; b + 1 < a; b++)
+  for (; b < pi_y; b++)
   {
-    int64_t prime = primes[b + 1];
+    int64_t prime = primes[b];
     int64_t i = 1;
     int64_t phi = 0;
 
-    for (int64_t m = x13_alpha; m > x13_alpha / prime; m--)
+    for (int64_t m = y; m > y / prime; m--)
     {
       if (mu[m] != 0 && prime < lpf[m])
       {
         // We have found a special leaf, compute it's contribution
-        // phi(x / (m * primes[b + 1]), b) by counting the
-        // number of unsieved elements <= x / (m * primes[b + 1])
-        // after having removed the multiples of the first b primes
+        // phi(x / (primes[b] * m), b - 1) by counting the number
+        // of unsieved elements <= x / (primes[b] * m) after having
+        // removed the multiples of the first b - 1 primes
         //
-        for (int64_t y = x / (m * prime); i <= y; i++)
+        for (int64_t xn = x / (prime * m); i <= xn; i++)
           phi += sieve[i];
 
         S2_result -= mu[m] * phi;
       }
     }
 
-    // Remove the multiples of (b + 1)th prime
-    for (int64_t k = prime; k <= limit; k += prime * 2)
+    // Remove the multiples of (b)th prime
+    for (int64_t k = prime; k < limit; k += prime * 2)
       sieve[k] = 0;
   }
 
@@ -114,21 +115,21 @@ int64_t pi_lmo2(int64_t x, int threads)
   // J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-
   // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
   double beta = 1.0;
-  double alpha = std::max(1.0, log(log((double) x)) * beta);
+  double alpha = max(1.0, log(log((double) x)) * beta);
 
   int64_t x13 = iroot<3>(x);
-  int64_t x13_alpha = (int64_t)(x13 * alpha);
-  int64_t a = pi_lehmer(x13_alpha);
-  int64_t c = (a < 6) ? a : 6;
+  int64_t y = (int64_t)(x13 * alpha);
 
-  std::vector<int32_t> lpf = make_least_prime_factor(x13_alpha);
-  std::vector<int32_t> mu = make_moebius(x13_alpha);
+  std::vector<int32_t> lpf = make_least_prime_factor(y);
+  std::vector<int32_t> mu = make_moebius(y);
   std::vector<int32_t> primes;
   primes.push_back(0);
-  primesieve::generate_n_primes(a, &primes);
+  primesieve::generate_primes(y, &primes);
 
-  int64_t phi = S1(x, x13_alpha, c, primes, lpf , mu) + S2(x, x13_alpha, a, c, primes, lpf , mu);
-  int64_t sum = phi + a - 1 - P2(x, a, threads);
+  int64_t pi_y = primes.size() - 1;
+  int64_t c = (pi_y < 6) ? pi_y : 6;
+  int64_t phi = S1(x, y, c, primes, lpf , mu) + S2(x, y, pi_y, c, primes, lpf , mu);
+  int64_t sum = phi + pi_y - 1 - P2(x, pi_y, threads);
 
   return sum;
 }
