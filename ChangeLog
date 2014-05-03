@@ -1,3 +1,12 @@
+2014-05-03  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.18 work in progress.
+
+  * docs/computing-special-leaves.md: How to compute special leaves (LMO).
+  * src/pi_lmo5.cpp: Faster new LMO implementation.
+  * src/test.cpp: Add test for pi_lmo5(x).
+  * src/pi_lmo*.cpp: Refactoring.
+
 2014-04-19  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.17 released.
