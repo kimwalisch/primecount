@@ -75,7 +75,39 @@ inline T iroot(T x)
   return r;
 }
 
-/// Initialize a vector with Möbius function values.
+/// Generate a vector with the least prime
+/// factors of the integers <= max.
+///
+inline std::vector<int32_t> make_pi(int64_t max)
+{
+  std::vector<char> is_prime(max + 1, 1);
+  std::vector<int32_t> pi(max + 1, 0);
+  int32_t prime_count = 0;
+
+  for (int64_t i = 2; i * i <= max; i++)
+    if (is_prime[i])
+      for (int64_t j = i * i; j <= max; j += i)
+        is_prime[j] = 0;
+
+  for (int64_t i = 2; i <= max; i++)
+    pi[i] = (prime_count += is_prime[i]);
+
+  return pi;
+}
+
+inline std::vector<char> make_square_free(int64_t max)
+{
+  std::vector<char> square_free(max + 1, 1);
+
+  for (int64_t i = 2; i * i <= max; i++)
+    if (square_free[i])
+      for (int64_t j = i * i; j <= max; j += i * i)
+        square_free[j] = 0;
+
+  return square_free;
+}
+
+/// Generate a vector with Möbius function values.
 /// This implementation is based on code by Rick Sladkey
 /// posted here: http://mathoverflow.net/a/99545
 ///
@@ -107,7 +139,7 @@ inline std::vector<int32_t> make_moebius(int64_t max)
   return mu;
 }
 
-/// Initialize a vector with the least prime
+/// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
 inline std::vector<int32_t> make_least_prime_factor(int64_t max)

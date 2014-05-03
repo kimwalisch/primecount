@@ -83,6 +83,7 @@ bool test()
     check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     400);
     check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     400);
     check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     400);
+    check_equal("pi_lmo5",     pi_lmo5,     pi_lehmer,     100);
     check_equal("nth_prime",   nth_prime,   pps_nth_prime, 100);
   }
   catch (runtime_error& e)

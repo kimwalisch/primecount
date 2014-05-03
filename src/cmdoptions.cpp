@@ -56,6 +56,7 @@ void initOptionMap()
   optionMap["--lmo2"]       = OPTION_LMO2;
   optionMap["--lmo3"]       = OPTION_LMO3;
   optionMap["--lmo4"]       = OPTION_LMO4;
+  optionMap["--lmo5"]       = OPTION_LMO5;
   optionMap["--Li"]         = OPTION_LI;
   optionMap["--Li_inverse"] = OPTION_LIINV;
   optionMap["-m"]           = OPTION_MEISSEL;

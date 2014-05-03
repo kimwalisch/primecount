@@ -31,6 +31,7 @@ const string helpMenu(
   "         --lmo2          LMO algorithm using sieve of Eratosthenes\n"
   "         --lmo3          LMO algorithm using segmented sieve\n"
   "         --lmo4          Same as lmo3 but uses special data structure\n"
+  "         --lmo5          Unsegmented square free version\n"
   "         --Li            Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse    Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime      Calculate the nth prime\n"
