@@ -35,18 +35,18 @@ void cross_off(int64_t prime,
                T2& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple;
+  int64_t i;
 
-  for (; k < high; k += prime * 2)
+  for (i = next_multiple - low; i < segment_size; i += prime * 2)
   {
-    if (sieve[k - low])
+    if (sieve[i])
     {
-      sieve[k - low] = 0;
-      cnt_update(counters, k - low, segment_size);
+      sieve[i] = 0;
+      cnt_update(counters, i, segment_size);
     }
   }
 
-  next_multiple = k;
+  next_multiple = low + i;
 }
 
 /// Calculate the contribution of the ordinary leaves.
@@ -145,7 +145,6 @@ int64_t S2(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = l_max[b];
-
       if (prime >= primes[l])
         break;
 
@@ -192,17 +191,17 @@ int64_t pi_lmo5(int64_t x, int threads)
 
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
-  int64_t a = pi_lehmer(y);
-  int64_t c = (a < 6) ? a : 6;
 
-  vector<int32_t> lpf = make_least_prime_factor(y);
-  vector<int32_t> mu = make_moebius(y);
-  vector<int32_t> primes;
+  std::vector<int32_t> lpf = make_least_prime_factor(y);
+  std::vector<int32_t> mu = make_moebius(y);
+  std::vector<int32_t> primes;
   primes.push_back(0);
-  primesieve::generate_n_primes(a, &primes);
+  primesieve::generate_primes(y, &primes);
 
-  int64_t phi = S1(x, y, c, primes, lpf , mu) + S2(x, y, a, c, primes, lpf , mu);
-  int64_t sum = phi + a - 1 - P2(x, a, threads);
+  int64_t pi_y = primes.size() - 1;
+  int64_t c = (pi_y < 6) ? pi_y : 6;
+  int64_t phi = S1(x, y, c, primes, lpf , mu) + S2(x, y, pi_y, c, primes, lpf , mu);
+  int64_t sum = phi + pi_y - 1 - P2(x, pi_y, threads);
 
   return sum;
 }
