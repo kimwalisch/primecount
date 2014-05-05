@@ -1,7 +1,7 @@
 ///
 /// @file  pi_bsearch.hpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,8 +13,6 @@
 #include <algorithm>
 #include <vector>
 #include <cassert>
-
-namespace primecount {
 
 /// Given a vector with the first n primes and x <= nth prime
 /// calculate the number of primes below x using binary search.
@@ -39,7 +37,5 @@ inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
   // +1 is a correction for primes[0] = 0
   return static_cast<T3>(std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
 }
-
-} // namespace primecount
 
 #endif
