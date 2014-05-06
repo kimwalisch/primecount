@@ -33,7 +33,7 @@ int64_t pi_meissel(int64_t x, int threads)
 
   int64_t x13 = iroot<3>(x);
   int64_t a = pi_legendre(x13, /* threads = */ 1);
-  int64_t phi_xa, p2, sum;
+  int64_t phi_xa, p2;
 
 #ifdef _OPENMP
   omp_set_nested(true);
@@ -48,10 +48,10 @@ int64_t pi_meissel(int64_t x, int threads)
   }
 #else
     phi_xa = phi(x, a, threads);
-    p2 = P2 (x, a, x13);
+    p2 = P2(x, a, x13);
 #endif
 
-  sum = phi_xa + a - 1 - p2;
+  int64_t sum = phi_xa + a - 1 - p2;
   return sum;
 }
 
