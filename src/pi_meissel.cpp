@@ -11,12 +11,15 @@
 #include "Pk.hpp"
 
 #include <primecount.hpp>
+#include <algorithm>
 #include <stdint.h>
 
 #ifdef _OPENMP
   #include <omp.h>
   #include "get_omp_threads.hpp"
 #endif
+
+using std::max;
 
 namespace primecount {
 
@@ -39,7 +42,7 @@ int64_t pi_meissel(int64_t x, int threads)
   #pragma omp parallel sections num_threads(threads)
   {
     #pragma omp section
-    phi_xa = phi(x, a, threads - 1);
+    phi_xa = phi(x, a, max(1, threads - 1));
     #pragma omp section
     p2 = P2(x, a, x13);
   }
