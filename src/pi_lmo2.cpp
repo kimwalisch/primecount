@@ -129,7 +129,7 @@ int64_t pi_lmo2(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t c = (pi_y < 6) ? pi_y : 6;
   int64_t phi = S1(x, y, c, primes, lpf , mu) + S2(x, y, pi_y, c, primes, lpf , mu);
-  int64_t sum = phi + pi_y - 1 - P2(x, pi_y, threads);
+  int64_t sum = phi + pi_y - 1 - P2(x, pi_y, y);
 
   return sum;
 }

@@ -1,7 +1,7 @@
 ///
 /// @file  pi_lehmer.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,11 +23,12 @@ int64_t pi_lehmer(int64_t x, int threads)
   if (x < 2)
     return 0;
 
+  int64_t x14 = iroot<4>(x);
   int64_t a = pi_meissel(iroot<4>(x), /* threads = */ 1);
   int64_t sum = 0;
 
   sum += phi(x, a, threads) + a - 1;
-  sum -= P2 (x, a, threads);
+  sum -= P2 (x, a, x14);
   sum -= P3 (x, a, threads);
 
   return sum;

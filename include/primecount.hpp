@@ -42,7 +42,7 @@ int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
 int64_t pi_legendre(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using Meissel's formula.
-/// Run time: O(x/(log x)^3) operations, O(x^0.5) space.
+/// Run time: O(x/(log x)^3) operations, O(x^0.5 / log x) space.
 ///
 int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
 
@@ -53,14 +53,14 @@ int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses the
 /// recursive phi formula with caching to calculate S2(x).
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo1(int64_t x, int threads = MAX_THREADS);
 
@@ -74,7 +74,7 @@ int64_t pi_lmo2(int64_t x, int threads = MAX_THREADS);
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
 /// the segmented sieve of Eratosthenes to calculate S2(x).
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo3(int64_t x, int threads = MAX_THREADS);
 
@@ -82,19 +82,19 @@ int64_t pi_lmo3(int64_t x, int threads = MAX_THREADS);
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
 /// the segmented sieve of Eratosthenes and a special data structure
 /// for counting to calculate S2(x).
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo4(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo5(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
-/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t nth_prime(int64_t n, int threads = MAX_THREADS);
 
