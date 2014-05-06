@@ -80,7 +80,7 @@ bool test()
     check_equal("pi_meissel",  pi_meissel,  pi_legendre,   400);
     check_equal("pi_lehmer",   pi_lehmer,   pi_meissel,    400);
     check_equal("pi_lmo1",     pi_lmo1,     pi_lehmer,     400);
-    check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     400);
+    check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     200);
     check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     400);
     check_equal("pi_lmo4",     pi_lmo4,     pi_lehmer,     400);
     check_equal("pi_lmo5",     pi_lmo5,     pi_lehmer,     400);
