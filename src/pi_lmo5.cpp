@@ -19,6 +19,11 @@
 #include <stdint.h>
 #include <vector>
 
+#ifdef _OPENMP
+  #include <omp.h>
+  #include "get_omp_threads.hpp"
+#endif
+
 using namespace std;
 
 namespace {
@@ -198,8 +203,27 @@ int64_t pi_lmo5(int64_t x, int threads)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = (pi_y < 6) ? pi_y : 6;
-  int64_t phi = S1(x, y, c, primes, lpf , mu) + S2(x, y, pi_y, c, primes, lpf , mu);
-  int64_t sum = phi + pi_y - 1 - P2(x, pi_y, y);
+  int64_t s1, s2, p2;
+  int64_t phi, sum;
+
+#ifdef _OPENMP
+  #pragma omp parallel sections num_threads(get_omp_threads(threads))
+  {
+    #pragma omp section
+    s1 = S1(x, y, c, primes, lpf , mu);
+    #pragma omp section
+    s2 = S2(x, y, pi_y, c, primes, lpf , mu);
+    #pragma omp section
+    p2 = P2(x, pi_y, y);
+  }
+#else
+  s1 = S1(x, y, c, primes, lpf , mu);
+  s2 = S2(x, y, pi_y, c, primes, lpf , mu);
+  p2 = P2(x, pi_y, y);
+#endif
+
+  phi = s1 + s2;
+  sum = phi + pi_y - 1 - p2;
 
   return sum;
 }
