@@ -46,10 +46,10 @@ int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
   primesieve::iterator iter(sqrtx + 1);
   int64_t stop = x / iter.previous_prime();
   vector<char> sieve(segment_size);
-  vector<int32_t> next(primes.size());
+  vector<int64_t> next(primes.size());
 
   for (size_t i = 1; i < primes.size(); i++)
-    next[i] = static_cast<int32_t>((isquare(primes[i]) - /* low */ 3) % segment_size);
+    next[i] = (isquare(primes[i]) - /* low */ 3) % segment_size;
 
   // segmented sieve of Eratosthenes
   for (int64_t low = 3; low <= limit; low += segment_size)
