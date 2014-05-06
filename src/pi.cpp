@@ -1,7 +1,7 @@
 ///
 /// @file  pi.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,7 +15,7 @@ namespace primecount {
 /// Alias for fastest pi(x) implementation
 int64_t pi(int64_t x, int threads /* = MAX_THREADS */)
 {
-  return pi_lehmer(x, threads);
+  return pi_lmo5(x, threads);
 }
 
 } // namespace primecount
