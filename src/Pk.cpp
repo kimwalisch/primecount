@@ -10,6 +10,7 @@
 #include "pi_bsearch.hpp"
 #include "pmath.hpp"
 
+#include <primecount.hpp>
 #include <primesieve.hpp>
 #include <stdint.h>
 #include <vector>
