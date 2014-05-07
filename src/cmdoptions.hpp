@@ -32,6 +32,7 @@ enum OptionValues
   OPTION_NTHPRIME,
   OPTION_NUMBER,
   OPTION_PHI,
+  OPTION_PI,
   OPTION_PRIMESIEVE,
   OPTION_TEST,
   OPTION_THREADS,
@@ -47,7 +48,7 @@ struct PrimeCountOptions
   PrimeCountOptions() :
     x(-1),
     a(-1),
-    option(OPTION_LEHMER),
+    option(OPTION_PI),
     threads(primecount::MAX_THREADS)
   { }
 };
