@@ -104,11 +104,10 @@ int64_t S2(int64_t x,
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t special_leaf_threshold = max(x / high, y);
-    int64_t b = 1;
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
     // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
+    for (int64_t b = 1; b <= c; b++)
     {
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
@@ -119,7 +118,7 @@ int64_t S2(int64_t x,
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
 
-    for (; b < pi_sqrty; b++)
+    for (int64_t b = c + 1; b < pi_sqrty; b++)
     {
       int64_t prime = primes[b];
       int64_t m = std::min(x / (prime * low), y);
@@ -146,7 +145,7 @@ int64_t S2(int64_t x,
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
-    for (; b < pi_y; b++)
+    for (int64_t b = pi_sqrty; b < pi_y; b++)
     {
       int64_t prime = primes[b];
       int64_t l = l_max[b];
