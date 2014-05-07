@@ -35,8 +35,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a < 1) return x;
 
   static const PhiTiny phiTiny;
-
-  if (phiTiny.is_cached(a))
+  if (a <= PhiTiny::MAX_A)
     return phiTiny.phi(x, a);
 
   std::vector<int32_t> primes;
