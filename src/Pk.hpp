@@ -16,6 +16,7 @@
 namespace primecount {
 
 int64_t P2(int64_t x, int64_t a, int64_t y);
+int64_t P2_lehmer(int64_t x, int64_t a, int threads = MAX_THREADS);
 int64_t P3(int64_t x, int64_t a, int threads = MAX_THREADS);
 
 } // namespace primecount
