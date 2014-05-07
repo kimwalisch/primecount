@@ -80,7 +80,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
 
   if (x < primes_[a])
     sum = sign;
-  else if (phiTiny_.is_cached(a))
+  else if (a <= PhiTiny::MAX_A)
     sum = phiTiny_.phi(x, a) * sign;
   else if (is_phi_bsearch(x, a))
     sum = phi_bsearch(x, a) * sign;
