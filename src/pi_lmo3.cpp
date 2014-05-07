@@ -16,6 +16,7 @@
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
+#include <algorithm>
 #include <stdint.h>
 #include <vector>
 
@@ -160,9 +161,8 @@ int64_t pi_lmo3(int64_t x, int threads)
   primesieve::generate_primes(y, &primes);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = (pi_y < 6) ? pi_y : 6;
+  int64_t c = min(PhiTiny::MAX_A, pi_y);
   int64_t s1, s2, p2;
-  int64_t phi, sum;
 
 #ifdef _OPENMP
   #pragma omp parallel sections num_threads(get_omp_threads(threads))
@@ -180,8 +180,8 @@ int64_t pi_lmo3(int64_t x, int threads)
   p2 = P2(x, pi_y, y);
 #endif
 
-  phi = s1 + s2;
-  sum = phi + pi_y - 1 - p2;
+  int64_t phi = s1 + s2;
+  int64_t sum = phi + pi_y - 1 - p2;
 
   return sum;
 }
