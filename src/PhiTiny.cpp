@@ -14,6 +14,8 @@
 
 namespace primecount {
 
+const int64_t PhiTiny::MAX_A = 6;
+
 const int32_t PhiTiny::primes_[7] = { 0, 2, 3, 5, 7, 11, 13 };
 
 /// prime_products_[n] = \prod_{i=1}^{n} primes_[i]
@@ -27,7 +29,7 @@ PhiTiny::PhiTiny()
   phi_cache_[0].push_back(0);
 
   // Initialize the phi_cache_ lookup tables
-  for (int a = 1; is_cached(a); a++)
+  for (int a = 1; a <= MAX_A; a++)
   {
     phi_cache_[a].reserve(prime_products_[a]);
     for (int x = 0; x < prime_products_[a]; x++)
