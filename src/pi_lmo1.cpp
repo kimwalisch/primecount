@@ -20,6 +20,7 @@
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
+#include <algorithm>
 #include <stdint.h>
 #include <vector>
 
@@ -43,7 +44,7 @@ int64_t pi_lmo1(int64_t x, int threads)
 
   int64_t y = iroot<3>(x); 
   int64_t pi_y = pi_lehmer(y);
-  int64_t c = (pi_y < 6) ? pi_y : 6;
+  int64_t c = min(PhiTiny::MAX_A, pi_y);
   int64_t S1 = 0;
   int64_t S2 = 0;
 
