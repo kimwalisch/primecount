@@ -11,6 +11,7 @@
 #define PRIMECOUNT_HPP
 
 #include <stdint.h>
+#include <vector>
 
 #define PRIMECOUNT_VERSION "0.18"
 #define PRIMECOUNT_VERSION_MAJOR 0
@@ -30,24 +31,13 @@ enum {
 ///
 int64_t pi(int64_t x, int threads = MAX_THREADS);
 
-/// Calculate the number of primes below x using an optimized 
-/// segmented sieve of Eratosthenes implementation.
-/// Run time: O(x log log x) operations, O(x^0.5) space.
-///
-int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
-
 /// Calculate the number of primes below x using Legendre's formula.
-/// Run time: O(x) operations, O(x^0.5) space.
+/// Run time: O(x) operations, O(x^(1/2)) space.
 ///
 int64_t pi_legendre(int64_t x, int threads = MAX_THREADS);
 
-/// Calculate the number of primes below x using Meissel's formula.
-/// Run time: O(x/(log x)^3) operations, O(x^0.5 / log x) space.
-///
-int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
-
 /// Calculate the number of primes below x using Lehmer's formula.
-/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
+/// Run time: O(x/(log x)^4) operations, O(x^(1/2)) space.
 ///
 int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 
@@ -92,6 +82,17 @@ int64_t pi_lmo4(int64_t x, int threads = MAX_THREADS);
 ///
 int64_t pi_lmo5(int64_t x, int threads = MAX_THREADS);
 
+/// Calculate the number of primes below x using Meissel's formula.
+/// Run time: O(x/(log x)^3) operations, O(x^(1/2) / log x) space.
+///
+int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
+
+/// Calculate the number of primes below x using an optimized 
+/// segmented sieve of Eratosthenes implementation.
+/// Run time: O(x log log x) operations, O(x^(1/2)) space.
+///
+int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
+
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
@@ -121,6 +122,35 @@ int64_t Li(int64_t);
 /// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t);
+
+/// P2(x, a) counts the numbers <= x that have exactly 2 prime
+/// factors each exceeding the a-th prime.
+/// Space complexity: O(sqrt(x / y)).
+///
+int64_t P2(int64_t x, int64_t a, int64_t y);
+
+/// P2_lehmer(x, a) counts the numbers <= x that have exactly 2
+/// prime factors each exceeding the a-th prime.
+/// Space complexity: O(pi(x^(1/2))).
+///
+int64_t P2_lehmer(int64_t x, int64_t a, int threads = MAX_THREADS);
+
+/// P3(x, a) counts the numbers <= x that have exactly 3
+/// prime factorseach exceeding the a-th prime.
+/// Space complexity: O(pi(x^(1/2))).
+///
+int64_t P3(int64_t x, int64_t a, int threads = MAX_THREADS);
+
+/// Calculate the contribution of the ordinary leaves in the
+/// Lagarias-Miller-Odlyzko algorithm.
+/// Run time: O(y) operations, O(y) space.
+///
+int64_t S1(int64_t x,
+           int64_t y,
+           int64_t c,
+           std::vector<int32_t>& primes,
+           std::vector<int32_t>& lpf,
+           std::vector<int32_t>& mu);
 
 /// Test all prime counting function implementations.
 /// @return true if success else false.

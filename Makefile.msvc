@@ -27,13 +27,14 @@ LIB_OBJECTS = \
 	src\pi_lmo5.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
-	src\Pk.obj
+	src\Pk.obj \
+	src\S1.obj \
+	src\test.obj
 
 APP_OBJECTS = \
 	src\cmdoptions.obj \
 	src\help.obj \
-	src\primecount.obj \
-	src\test.obj
+	src\primecount.obj
 
 #-----------------------------------------------------------------------------
 # Add /openmp if MSVC supports OpenMP

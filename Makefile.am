@@ -47,13 +47,13 @@ libprimecount_la_SOURCES = \
 	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
+	src/S1.cpp \
 	src/test.cpp \
 	src/get_omp_threads.hpp \
 	src/pmath.hpp \
 	src/PhiCache.hpp \
 	src/PhiTiny.hpp \
 	src/pi_bsearch.hpp \
-	src/Pk.hpp \
 	src/tos_counters.hpp
 
 primecount_SOURCES = \

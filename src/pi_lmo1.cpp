@@ -16,7 +16,6 @@
 #include "PhiTiny.hpp"
 #include "PhiCache.hpp"
 #include "pmath.hpp"
-#include "Pk.hpp"
 
 #include <primecount.hpp>
 #include <primesieve.hpp>

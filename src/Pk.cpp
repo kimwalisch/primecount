@@ -97,7 +97,7 @@ int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
 /// optimized for small values of a < pi(x^(1/3)) which requires
 /// sieving up to a large limit (x / primes[a]). Sieving is done in
 /// parallel using primesieve (segmented sieve of Eratosthenes).
-/// Space complexity: O(sqrt(x)).
+/// Space complexity: O(pi(sqrt(x))).
 ///
 int64_t P2_lehmer(int64_t x, int64_t a, int threads)
 {
@@ -134,7 +134,7 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
 /// 3rd partial sieve function.
 /// P3(x, a) counts the numbers <= x that have exactly 3 prime
 /// factors each exceeding the a-th prime.
-/// Space complexity: O(sqrt(x)).
+/// Space complexity: O(pi(sqrt(x))).
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {

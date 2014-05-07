@@ -12,7 +12,6 @@
 
 #include "PhiTiny.hpp"
 #include "pmath.hpp"
-#include "Pk.hpp"
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
@@ -28,24 +27,6 @@
 using namespace std;
 
 namespace {
-
-/// Calculate the contribution of the ordinary leaves.
-///
-int64_t S1(int64_t x,
-           int64_t y,
-           int64_t c,
-           vector<int32_t>& primes,
-           vector<int32_t>& lpf,
-           vector<int32_t>& mu)
-{
-  int64_t S1_result = 0;
-
-  for (int64_t n = 1; n <= y; n++)
-    if (lpf[n] > primes[c])
-      S1_result += mu[n] * primecount::phi(x / n, c);
-
-  return S1_result;
-}
 
 /// Calculate the contribution of the special leaves.
 /// This implementation uses segmentation which reduces the
@@ -158,7 +139,6 @@ int64_t pi_lmo3(int64_t x, int threads)
   std::vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(y, &primes);
-
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(PhiTiny::MAX_A, pi_y);
   int64_t s1, s2, p2;

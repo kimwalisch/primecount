@@ -8,7 +8,6 @@
 ///
 
 #include "pmath.hpp"
-#include "Pk.hpp"
 
 #include <primecount.hpp>
 #include <algorithm>
@@ -32,7 +31,7 @@ int64_t pi_meissel(int64_t x, int threads)
     return 0;
 
   int64_t x13 = iroot<3>(x);
-  int64_t a = pi_legendre(x13, /* threads = */ 1);
+  int64_t a = pi_legendre(x13, 1);
   int64_t phi_xa, p2;
 
 #ifdef _OPENMP
