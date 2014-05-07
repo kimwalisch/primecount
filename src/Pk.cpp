@@ -1,5 +1,6 @@
 ///
 /// @file  Pk.cpp
+/// @brief Partial sieve functions.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,6 +13,7 @@
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
+#include <algorithm>
 #include <stdint.h>
 #include <vector>
 
@@ -27,6 +29,7 @@ namespace primecount {
 /// 2nd partial sieve function.
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
+/// Space complexity: O(sqrt(x / y)).
 ///
 int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
 {
@@ -88,10 +91,50 @@ int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
   return sum;
 }
 
+/// 2nd partial sieve function.
+/// P2_lehmer(x, a) counts the numbers <= x that have exactly 2 prime
+/// factors each exceeding the a-th prime. This implementation is
+/// optimized for small values of a < pi(x^(1/3)) which requires
+/// sieving up to a large limit (x / primes[a]). Sieving is done in
+/// parallel using primesieve (segmented sieve of Eratosthenes).
+/// Space complexity: O(sqrt(x)).
+///
+int64_t P2_lehmer(int64_t x, int64_t a, int threads)
+{
+  vector<int32_t> primes;
+  vector<int64_t> counts;
+  primes.push_back(0);
+  primesieve::generate_primes(isqrt(x), &primes);
+  counts.resize(primes.size());
+
+  int64_t b = pi_bsearch(primes, isqrt(x));
+  int64_t sum = 0;
+  int64_t pix = 0;
+
+#ifdef _OPENMP
+  #pragma omp parallel for num_threads(get_omp_threads(threads)) \
+      schedule(dynamic)
+#endif
+  for (int64_t i = b; i > a; i--)
+  {
+    int64_t prev = (i == b) ? 0 : x / primes[i + 1] + 1;
+    int64_t xi = x / primes[i];
+    counts[i] = primesieve::count_primes(prev, xi);
+  }
+
+  for (int64_t i = b; i > a; i--)
+  {
+    pix += counts[i];
+    sum += pix - (i - 1);
+  }
+
+  return sum;
+}
+
 /// 3rd partial sieve function.
 /// P3(x, a) counts the numbers <= x that have exactly 3 prime
 /// factors each exceeding the a-th prime.
-/// Space complexity: O(x^0.5).
+/// Space complexity: O(sqrt(x)).
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {
