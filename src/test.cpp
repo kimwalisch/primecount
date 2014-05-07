@@ -46,8 +46,8 @@ void check_equal(const string& f1_name, F f1, F f2, int64_t iters)
   srand(static_cast<unsigned int>(time(0)));
   cout << "Testing " << (f1_name + "(x)") << flush;
 
-  // test for 0 <= x < iters
-  for (int64_t x = 0; x < iters; x++)
+  // test for 0 <= x < 1000
+  for (int64_t x = 0; x < 1000; x++)
     assert_equal(f1_name, x, f1(x, MAX_THREADS), f2(x, MAX_THREADS));
 
   int64_t x = 0;
