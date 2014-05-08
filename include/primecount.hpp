@@ -133,9 +133,9 @@ int64_t phi(int64_t x, int64_t a, PhiCache* phiCache);
 
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
-/// Space complexity: O(sqrt(x / y)).
+/// Space complexity: O((x / primes[a])^(1/2)).
 ///
-int64_t P2(int64_t x, int64_t a, int64_t y);
+int64_t P2(int64_t x, int64_t a);
 
 /// P2_lehmer(x, a) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
