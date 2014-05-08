@@ -137,11 +137,11 @@ int64_t phi(int64_t x, int64_t a, PhiCache* phiCache);
 ///
 int64_t P2(int64_t x, int64_t a);
 
-/// P2_lehmer(x, a) counts the numbers <= x that have exactly 2
-/// prime factors each exceeding the a-th prime.
+/// P2(x, a) counts the numbers <= x that have exactly 2 prime
+/// factors each exceeding the a-th prime.
 /// Space complexity: O(pi(x^(1/2))).
 ///
-int64_t P2_lehmer(int64_t x, int64_t a, int threads = MAX_THREADS);
+int64_t P2(int64_t x, int64_t a, int threads = MAX_THREADS);
 
 /// P3(x, a) counts the numbers <= x that have exactly 3
 /// prime factorseach exceeding the a-th prime.
