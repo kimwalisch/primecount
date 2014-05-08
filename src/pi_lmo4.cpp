@@ -31,7 +31,7 @@ using namespace std;
 namespace {
 
 /// Calculate the contribution of the special leaves.
-/// @pre c >= 2
+/// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
            int64_t y,
@@ -143,8 +143,8 @@ int64_t pi_lmo4(int64_t x, int threads)
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
 
-  std::vector<int32_t> lpf = make_least_prime_factor(y);
   std::vector<int32_t> mu = make_moebius(y);
+  std::vector<int32_t> lpf = make_least_prime_factor(y);
   std::vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(y, &primes);
