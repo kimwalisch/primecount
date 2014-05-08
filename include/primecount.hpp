@@ -160,8 +160,8 @@ int64_t S1(int64_t x,
            std::vector<int32_t>& lpf,
            std::vector<int32_t>& mu);
 
-/// @endcond
 /// End internal definitions and functions.
+/// @endcond
 
 } // namespace primecount
 
