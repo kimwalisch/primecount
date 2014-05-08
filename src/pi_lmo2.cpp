@@ -124,12 +124,12 @@ int64_t pi_lmo2(int64_t x, int threads)
     #pragma omp section
     s2 = S2(x, y, pi_y, c, primes, lpf , mu);
     #pragma omp section
-    p2 = P2(x, pi_y, y);
+    p2 = P2(x, pi_y);
   }
 #else
   s1 = S1(x, y, c, primes, lpf , mu);
   s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-  p2 = P2(x, pi_y, y);
+  p2 = P2(x, pi_y);
 #endif
 
   int64_t phi = s1 + s2;
