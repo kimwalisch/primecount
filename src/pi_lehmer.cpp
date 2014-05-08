@@ -27,8 +27,8 @@ int64_t pi_lehmer(int64_t x, int threads)
   int64_t sum = 0;
 
   sum += phi(x, a, threads) + a - 1;
-  sum -= P2_lehmer(x, a, threads);
-  sum -= P3(x, a, threads);
+  sum -= P2 (x, a, threads);
+  sum -= P3 (x, a, threads);
 
   return sum;
 }
