@@ -92,14 +92,14 @@ int64_t P2(int64_t x, int64_t a)
 }
 
 /// 2nd partial sieve function.
-/// P2_lehmer(x, a) counts the numbers <= x that have exactly 2 prime
-/// factors each exceeding the a-th prime. This implementation is
-/// optimized for small values of a < pi(x^(1/3)) which requires
-/// sieving up to a large limit (x / primes[a]). Sieving is done in
-/// parallel using primesieve (segmented sieve of Eratosthenes).
+/// P2(x, a) counts the numbers <= x that have exactly 2 prime factors
+/// each exceeding the a-th prime. This implementation is optimized
+/// for small values of a < pi(x^(1/3)) which requires sieving up to a
+/// large limit (x / primes[a]). Sieving is done in parallel using
+/// primesieve (segmented sieve of Eratosthenes).
 /// Space complexity: O(pi(sqrt(x))).
 ///
-int64_t P2_lehmer(int64_t x, int64_t a, int threads)
+int64_t P2(int64_t x, int64_t a, int threads)
 {
   vector<int32_t> primes;
   vector<int64_t> counts;
