@@ -74,7 +74,7 @@ int64_t P2(int64_t x, int64_t a)
       next[i] = k - segment_size;
     }
 
-    int64_t j = ~low % 2;
+    int64_t j = ~low & 1;
     for (; stop <= high; stop = x / iter.previous_prime())
     {
       for (; j <= stop - low; j += 2)
