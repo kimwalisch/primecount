@@ -19,8 +19,6 @@
 
 namespace primecount {
 
-class PhiCache;
-
 enum {
   /// Uses all CPU cores.
   MAX_THREADS = -1
@@ -46,6 +44,51 @@ int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
+
+/// Calculate the number of primes below x using Meissel's formula.
+/// Run time: O(x/(log x)^3) operations, O(x^(1/2) / log x) space.
+///
+int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
+
+/// Calculate the number of primes below x using an optimized 
+/// segmented sieve of Eratosthenes implementation.
+/// Run time: O(x log log x) operations, O(x^(1/2)) space.
+///
+int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
+
+/// Calculate the nth prime using a combination of an efficient prime
+/// counting function implementation and the sieve of Eratosthenes.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
+///
+int64_t nth_prime(int64_t n, int threads = MAX_THREADS);
+
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
+///
+int64_t phi(int64_t x, int64_t a, int threads = MAX_THREADS);
+
+/// Calculate the offset logarithmic integral which is a very
+/// accurate approximation of the number of primes below x.
+/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
+///
+int64_t Li(int64_t);
+
+/// Calculate the inverse logarithmic integral Li^-1(x) which is
+/// a very accurate approximation of the nth prime.
+/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
+///
+int64_t Li_inverse(int64_t);
+
+/// Test all prime counting function implementations.
+/// @return true if success else false.
+///
+bool test();
+
+/// @cond
+/// Internal definitions and functions.
+
+class PhiCache;
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses the
@@ -82,46 +125,11 @@ int64_t pi_lmo4(int64_t x, int threads = MAX_THREADS);
 ///
 int64_t pi_lmo5(int64_t x, int threads = MAX_THREADS);
 
-/// Calculate the number of primes below x using Meissel's formula.
-/// Run time: O(x/(log x)^3) operations, O(x^(1/2) / log x) space.
-///
-int64_t pi_meissel(int64_t x, int threads = MAX_THREADS);
-
-/// Calculate the number of primes below x using an optimized 
-/// segmented sieve of Eratosthenes implementation.
-/// Run time: O(x log log x) operations, O(x^(1/2)) space.
-///
-int64_t pi_primesieve(int64_t x, int threads = MAX_THREADS);
-
-/// Calculate the nth prime using a combination of an efficient prime
-/// counting function implementation and the sieve of Eratosthenes.
-/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
-///
-int64_t nth_prime(int64_t n, int threads = MAX_THREADS);
-
-/// Partial sieve function (a.k.a. Legendre-sum).
-/// phi(x, a) counts the numbers <= x that are not divisible
-/// by any of the first a primes.
-///
-int64_t phi(int64_t x, int64_t a, int threads = MAX_THREADS);
-
 /// Partial sieve function (a.k.a. Legendre-sum).
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
 ///
 int64_t phi(int64_t x, int64_t a, PhiCache* phiCache);
-
-/// Calculate the offset logarithmic integral which is a very
-/// accurate approximation of the number of primes below x.
-/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
-///
-int64_t Li(int64_t);
-
-/// Calculate the inverse logarithmic integral Li^-1(x) which is
-/// a very accurate approximation of the nth prime.
-/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
-///
-int64_t Li_inverse(int64_t);
 
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
@@ -152,10 +160,8 @@ int64_t S1(int64_t x,
            std::vector<int32_t>& lpf,
            std::vector<int32_t>& mu);
 
-/// Test all prime counting function implementations.
-/// @return true if success else false.
-///
-bool test();
+/// @endcond
+/// End internal definitions and functions.
 
 } // namespace primecount
 
