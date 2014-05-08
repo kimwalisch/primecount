@@ -6,9 +6,8 @@ primecount is a command-line program and C++ library that counts the primes
 below an integer x&nbsp;<&nbsp;2<sup>63</sup> using fast implementations
 of the prime counting function pi(x). So far primecount offers the option
 to count primes using Legendre's, Meissel's and Lehmer's formulas and using
-the Lagarias-Miller-Odlyzko algorithm. The implementations of Legendre's,
-Meissel's and Lehmer's formulas have been parallelized using OpenMP, for
-LMO this remains to be done.
+the Lagarias-Miller-Odlyzko algorithm. All implementations are parallelized
+using OpenMP.
 
 ### Algorithms and complexity
 
@@ -79,57 +78,57 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
     <td>0.05s</td>
-    <td>0.06s</td>
+    <td>0.04s</td>
     <td>0.03s</td>
-    <td>0.05s</td>
+    <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
     <td>0.08s</td>
-    <td>0.09s</td>
     <td>0.06s</td>
-    <td>0.12s</td>
+    <td>0.06s</td>
+    <td>0.07s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
     <td>0.31s</td>
-    <td>0.30s</td>
+    <td>0.19s</td>
     <td>0.23s</td>
-    <td>0.44s</td>
+    <td>0.28s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
     <td>1.49s</td>
-    <td>1.48s</td>
+    <td>0.95s</td>
     <td>1.03s</td>
-    <td>1.98s</td>
+    <td>1.19s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
     <td>9.30s</td>
-    <td>8.05s</td>
-    <td>5.11s</td>
-    <td>8.89s</td>
+    <td>6.81s</td>
+    <td>5.05s</td>
+    <td>5.34s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
     <td>60.38s</td>
-    <td>50.65s</td>
-    <td>28.33s</td>
-    <td>41.91s</td>
+    <td>49.12s</td>
+    <td>28.26s</td>
+    <td>24.39s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
     <td>423.12s</td>
-    <td>335.04s</td>
-    <td>176.29s</td>
-    <td>193.12s</td>
+    <td>337.56s</td>
+    <td>173.78s</td>
+    <td>113.48s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -137,14 +136,14 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3749.72s</td>
     <td>2879.81s</td>
     <td>1335.85s</td>
-    <td>902.08s</td>
+    <td>521.51s</td>
   </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system. primecount was compiled using GCC
 4.8 and used all CPU cores for each benchmark except for ```pi_lmo(x)``` which
-has not been parallelized yet.
+is currently only partially parallelized.
 
 ### Fast nth prime calculation
 
