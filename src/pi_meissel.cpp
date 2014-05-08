@@ -43,11 +43,11 @@ int64_t pi_meissel(int64_t x, int threads)
     #pragma omp section
     phi_xa = phi(x, a, max(1, threads - 1));
     #pragma omp section
-    p2 = P2(x, a, x13);
+    p2 = P2(x, a);
   }
 #else
     phi_xa = phi(x, a, threads);
-    p2 = P2(x, a, x13);
+    p2 = P2(x, a);
 #endif
 
   int64_t sum = phi_xa + a - 1 - p2;
