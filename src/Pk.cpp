@@ -29,11 +29,14 @@ namespace primecount {
 /// 2nd partial sieve function.
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
-/// Space complexity: O(sqrt(x / y)).
+/// Space complexity: O((x / primes[a])^(1/2)).
 ///
-int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
+int64_t P2(int64_t x, int64_t a)
 {
-  int64_t limit = x / y;
+  vector<int32_t> primes;
+  primes.push_back(0);
+  primesieve::generate_n_primes(a, &primes);
+  int64_t limit = (a > 0) ? x / primes[a] : x;
   int64_t sqrt_limit = isqrt(limit);
   int64_t sum = 0; // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   int64_t pix = 1; // start counting primes at 3
@@ -44,9 +47,6 @@ int64_t P2(int64_t x, int64_t a, int64_t y /* pi(a) */)
   if (b <= a)
     return sum;
 
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(sqrt_limit, &primes);
   primesieve::iterator iter(sqrtx + 1);
   int64_t stop = x / iter.previous_prime();
   vector<char> sieve(segment_size);
