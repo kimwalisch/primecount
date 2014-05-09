@@ -15,8 +15,8 @@
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
-#include <algorithm>
 #include <stdint.h>
+#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP

@@ -20,8 +20,8 @@
 
 #include <primecount.hpp>
 #include <primesieve.hpp>
-#include <algorithm>
 #include <stdint.h>
+#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP
@@ -126,10 +126,7 @@ int64_t S2(int64_t x,
         }
       }
 
-      // Needed for calculation of special leaves in next segment
       phi[b] += cnt_query(counters, (high - 1) - low);
-
-      // Cross-off multiples of prime
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
@@ -150,10 +147,8 @@ int64_t S2(int64_t x,
         S2_result += phi_xn;
       }
 
-      // Save for use in next segment
       l_max[b] = l;
       phi[b] += cnt_query(counters, (high - 1) - low);
-
       cross_off(prime, low, high, next[b], sieve, counters);
     }
   }
