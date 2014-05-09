@@ -238,7 +238,6 @@ int64_t primecount::pi_lehmer     (int64_t x, int threads = MAX_THREADS);
 int64_t primecount::pi_lmo        (int64_t x, int threads = MAX_THREADS);
 int64_t primecount::pi_meissel    (int64_t x, int threads = MAX_THREADS);
 int64_t primecount::pi_primesieve (int64_t x, int threads = MAX_THREADS);
-
 int64_t primecount::nth_prime     (int64_t n, int threads = MAX_THREADS);
 ```
 
