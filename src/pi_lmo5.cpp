@@ -79,7 +79,7 @@ int64_t S2(int64_t x,
 
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int32_t> l_max(primes.size(), pi_y);
+  vector<int64_t> l_max(primes.size(), pi_y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
