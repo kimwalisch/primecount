@@ -1,7 +1,7 @@
 ///
 /// @file  Li.cpp
 ///
-/// Copyright (C) 2013 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -69,7 +69,7 @@ int64_t Li(int64_t x)
 
 /// Calculate the inverse logarithmic integral Li^-1(x) which is a
 /// very accurate approximation of the nth prime.
-/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
+/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
 int64_t Li_inverse(int64_t x)
 {
