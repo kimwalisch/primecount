@@ -27,31 +27,33 @@ using namespace std;
 namespace primecount {
 
 /// 2nd partial sieve function.
-/// P2(x, a) counts the numbers <= x that have exactly 2 prime
-/// factors each exceeding the a-th prime.
-/// Space complexity: O((x / primes[a])^(1/2)).
+/// P2(x, y) counts the numbers <= x that have exactly 2 prime
+/// factors each exceeding the a-th prime, a = pi(y).
+/// Space complexity: O((x / y)^(1/2)).
 ///
-int64_t P2(int64_t x, int64_t a)
+int64_t P2(int64_t x, int64_t y)
 {
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_n_primes(a, &primes);
-  int64_t limit = (a > 0) ? x / primes[a] : x;
-  int64_t sqrt_limit = isqrt(limit);
   int64_t sum = 0; // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   int64_t pix = 1; // start counting primes at 3
+  int64_t limit = (y > 0) ? x / y : x;
   int64_t sqrtx = isqrt(x);
+  int64_t sqrt_limit = isqrt(limit);
+  int64_t a = pi_legendre(y, 1);
   int64_t b = pi_legendre(sqrtx, 1);
   int64_t segment_size = next_power_of_2(sqrt_limit);
 
-  if (b <= a)
-    return sum;
+  if (x < 4 || a >= b)
+    return 0;
 
+  vector<int32_t> primes;
+  primes.push_back(0);
+  primesieve::generate_primes(sqrt_limit, &primes);
   primesieve::iterator iter(sqrtx + 1);
-  int64_t stop = x / iter.previous_prime();
   vector<char> sieve(segment_size);
   vector<int64_t> next(primes.size());
+  int64_t stop = x / iter.previous_prime();
 
+  // initialize sieve indices
   for (size_t i = 1; i < primes.size(); i++)
     next[i] = (isquare(primes[i]) - /* low */ 3) % segment_size;
 
@@ -81,7 +83,8 @@ int64_t P2(int64_t x, int64_t a)
         pix += sieve[j];
       // sum += pi(x / primes[b]) - (b - 1)
       sum += pix - (b - 1);
-      if (--b <= a) return sum;
+      if (--b <= a)
+        return sum;
     }
 
     for (; j <= high - low; j += 2)
