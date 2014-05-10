@@ -19,7 +19,7 @@
 #include <ctime>
 
 using namespace std;
-using primecount::MAX_THREADS;
+using namespace primecount;
 
 namespace {
 
@@ -43,7 +43,6 @@ int get_rand()
 template <typename F>
 void check_equal(const string& f1_name, F f1, F f2, int64_t iters)
 {
-  srand(static_cast<unsigned int>(time(0)));
   cout << "Testing " << (f1_name + "(x)") << flush;
 
   // test for 0 <= x < 1000
@@ -74,11 +73,13 @@ namespace primecount {
 
 bool test()
 {
+  srand(static_cast<unsigned int>(time(0)));
   try
   {
     check_equal("pi_legendre", pi_legendre, pi_primesieve, 100);
     check_equal("pi_meissel",  pi_meissel,  pi_legendre,   400);
     check_equal("pi_lehmer",   pi_lehmer,   pi_meissel,    400);
+    check_equal("pi_lehmer2",  pi_lehmer2,  pi_lehmer,     200);
     check_equal("pi_lmo1",     pi_lmo1,     pi_lehmer,     400);
     check_equal("pi_lmo2",     pi_lmo2,     pi_lehmer,     200);
     check_equal("pi_lmo3",     pi_lmo3,     pi_lehmer,     400);

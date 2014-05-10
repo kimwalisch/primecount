@@ -90,6 +90,12 @@ bool test();
 
 class PhiCache;
 
+/// Calculate the number of primes below x using Lehmer's formula.
+/// This version is for testing only, it uses a different P2(x, a)
+/// implementation than pi_lehmer(x).
+///
+int64_t pi_lehmer2(int64_t x, int threads = MAX_THREADS);
+
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses the
 /// recursive phi formula with caching to calculate S2(x).

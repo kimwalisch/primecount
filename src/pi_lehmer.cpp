@@ -32,4 +32,22 @@ int64_t pi_lehmer(int64_t x, int threads)
   return sum;
 }
 
+/// This version is for testing only, it uses a different P2(x, a)
+/// implementation than pi_lehmer(x).
+///
+int64_t pi_lehmer2(int64_t x, int threads)
+{
+  if (x < 2)
+    return 0;
+
+  int64_t a = pi_meissel(iroot<4>(x), /* threads = */ 1);
+  int64_t sum = 0;
+
+  sum += phi(x, a, threads) + a - 1;
+  sum -= P2 (x, a);
+  sum -= P3 (x, a, threads);
+
+  return sum;
+}
+
 } // namespace primecount
