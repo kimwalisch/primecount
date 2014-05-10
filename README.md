@@ -164,13 +164,13 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are command-line programs for use with a terminal or Command
 Prompt.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.17-win64.zip">primecount-0.17-win64.zip</a>, 215K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.17-linux-x64.tar.gz">primecount-0.17-linux-x64.tar.gz</a>, 605K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.18-win64.zip">primecount-0.18-win64.zip</a>,  	214K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.18-linux-x64.tar.gz">primecount-0.18-linux-x64.tar.gz</a>, 662K
 
 SHA1 checksums of the files:
 ```sh
-57f495d39bf2e72c8101f4745b3830e008d5eaf4  primecount-0.17-win64.zip
-e1db1fce2bb34e76b80e3d18bda5fc4c40b4460d  primecount-0.17-linux-x64.tar.gz
+7f316e836bcf99145c256fdd875a79d0ffc5df8c  primecount-0.18-win64.zip
+873ae49dc63264190bddd272a7e18260550fd204  primecount-0.18-linux-x64.tar.gz
 ```
 
 ### Usage examples
@@ -200,7 +200,7 @@ $ make
 $ sudo make install
 ```
 Then download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.17.tar.gz">primecount-0.17.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.18.tar.gz">primecount-0.18.tar.gz</a>
 release tarball and build it using:
 ```sh
 $ ./configure
