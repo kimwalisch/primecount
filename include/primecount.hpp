@@ -13,9 +13,9 @@
 #include <stdint.h>
 #include <vector>
 
-#define PRIMECOUNT_VERSION "0.18"
+#define PRIMECOUNT_VERSION "0.19"
 #define PRIMECOUNT_VERSION_MAJOR 0
-#define PRIMECOUNT_VERSION_MINOR 18
+#define PRIMECOUNT_VERSION_MINOR 19
 
 namespace primecount {
 
