@@ -35,9 +35,8 @@ int64_t pi_meissel(int64_t x, int threads)
   int64_t phi_xa, p2;
 
 #ifdef _OPENMP
-  omp_set_nested(true);
   threads = get_omp_threads(threads);
-
+  omp_set_nested(true);
   #pragma omp parallel sections num_threads(threads)
   {
     #pragma omp section
@@ -45,9 +44,10 @@ int64_t pi_meissel(int64_t x, int threads)
     #pragma omp section
     p2 = P2(x, x13);
   }
+  omp_set_nested(false);
 #else
-    phi_xa = phi(x, a, threads);
-    p2 = P2(x, x13);
+  phi_xa = phi(x, a, threads);
+  p2 = P2(x, x13);
 #endif
 
   int64_t sum = phi_xa + a - 1 - p2;
