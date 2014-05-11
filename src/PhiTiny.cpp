@@ -12,7 +12,6 @@
 #include <stdint.h>
 #include <vector>
 #include <cassert>
-#include <cstddef>
 
 namespace {
 
@@ -48,13 +47,14 @@ PhiTiny::PhiTiny()
   // Initialize the phi_cache_ lookup tables
   for (int a = 1; a <= MAX_A; a++)
   {
-    std::size_t size = prime_products_[a];
-    phi_cache_[a].reserve(size);
+    int size = prime_products_[a];
+    std::vector<int16_t>& cache = phi_cache_[a];
+    cache.reserve(size);
 
     for (int x = 0; x < size; x++)
     {
       int16_t phixa = static_cast<int16_t>(phi(x, a - 1) - phi(x / primes_[a], a - 1));
-      phi_cache_[a].push_back(phixa);
+      cache.push_back(phixa);
     }
   }
 }
