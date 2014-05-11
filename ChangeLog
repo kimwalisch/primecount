@@ -4,7 +4,7 @@
 
   * src/phi.cpp: Fix race condition.
   * src/test.cpp: Add phi(x, a) thread safety test.
-  * src/PhiTiny.cpp: New thread safe singleton.
+  * src/PhiTiny.cpp: Make thread safe.
   * src/Pk.cpp: Fix bug in P2(x, a).
 
 2014-05-10  Kim Walisch  <kim.walisch@gmail.com>
