@@ -11,8 +11,25 @@
 
 #include <stdint.h>
 #include <vector>
+#include <cassert>
+#include <cstddef>
+
+namespace {
+
+/// Thread-safe singleton without locking
+/// @note Meyer's singleton (static const Singleton instance) causes a
+///       race condition with MSVC 2013 and OpenMP
+///
+const primecount::PhiTiny phiTiny;
+
+}
 
 namespace primecount {
+
+int64_t phi_tiny(int64_t x, int64_t a)
+{
+  return phiTiny.phi(x, a);
+}
 
 const int64_t PhiTiny::MAX_A = 6;
 
@@ -31,13 +48,27 @@ PhiTiny::PhiTiny()
   // Initialize the phi_cache_ lookup tables
   for (int a = 1; a <= MAX_A; a++)
   {
-    phi_cache_[a].reserve(prime_products_[a]);
-    for (int x = 0; x < prime_products_[a]; x++)
+    std::size_t size = prime_products_[a];
+    phi_cache_[a].reserve(size);
+
+    for (int x = 0; x < size; x++)
     {
       int16_t phixa = static_cast<int16_t>(phi(x, a - 1) - phi(x / primes_[a], a - 1));
       phi_cache_[a].push_back(phixa);
     }
   }
+}
+
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
+/// @pre is_cached(a) == true.
+///
+int64_t PhiTiny::phi(int64_t x, int64_t a) const
+{
+  assert(x >= 0);
+  assert(a <= MAX_A);
+  return (x / prime_products_[a]) * totients_[a] + phi_cache_[a][x % prime_products_[a]];
 }
 
 } // namespace primecount

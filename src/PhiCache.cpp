@@ -45,9 +45,8 @@ namespace primecount {
 /// @param primes  A vector of primes with:
 ///                primes[0] = 0, primes[1] = 2, primes[2] = 3, ...
 /// 
-PhiCache::PhiCache(const std::vector<int32_t>& primes, const PhiTiny& phiTiny) :
+PhiCache::PhiCache(const std::vector<int32_t>& primes) :
   primes_(primes),
-  phiTiny_(phiTiny),
   bytes_(0)
 {
   assert(primes_[0] == 0);
@@ -80,8 +79,8 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
 
   if (x < primes_[a])
     sum = sign;
-  else if (a <= PhiTiny::MAX_A)
-    sum = phiTiny_.phi(x, a) * sign;
+  else if (is_phi_tiny(a))
+    sum = phi_tiny(x, a) * sign;
   else if (is_phi_bsearch(x, a))
     sum = phi_bsearch(x, a) * sign;
   else
@@ -89,7 +88,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
     int64_t iters = pi_bsearch(primes_, a, isqrt(x));
     int64_t c = (iters > 6) ? 6 : iters;
     sum = (a - iters) * -sign;
-    sum += phiTiny_.phi(x, c) * sign;
+    sum += phi_tiny(x, c) * sign;
 
     for (int64_t a2 = c; a2 < iters; a2++)
     {

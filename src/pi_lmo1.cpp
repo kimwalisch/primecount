@@ -13,7 +13,6 @@
 /// file in the top level directory.
 ///
 
-#include "PhiTiny.hpp"
 #include "PhiCache.hpp"
 #include "pmath.hpp"
 
@@ -58,8 +57,7 @@ int64_t pi_lmo1(int64_t x, int threads)
     if (lpf[n] > primes[c])
       S1 += mu[n] * phi(x / n, c);
 
-  const PhiTiny phiTiny;
-  PhiCache cache(primes, phiTiny);
+  PhiCache cache(primes);
 
   // Calculate the contribution of the special leaves
 #ifdef _OPENMP

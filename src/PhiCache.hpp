@@ -20,7 +20,7 @@ namespace primecount {
 class PhiCache
 {
 public:
-  PhiCache(const std::vector<int32_t>& primes, const PhiTiny& phiTiny);
+  PhiCache(const std::vector<int32_t>& primes);
   int64_t phi(int64_t x, int64_t a);
   int64_t phi(int64_t x, int64_t a, int sign);
 private:
@@ -34,7 +34,6 @@ private:
   /// Cache of phi(x, a) results
   std::vector<std::vector<uint16_t> > cache_;
   const std::vector<int32_t>& primes_;
-  const PhiTiny& phiTiny_;
   int64_t bytes_;
 
   /// Disable the default assignment operator

@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <cassert>
 
 namespace primecount {
 
@@ -23,17 +22,7 @@ namespace primecount {
 class PhiTiny {
 public:
   PhiTiny();
-  /// Partial sieve function (a.k.a. Legendre-sum).
-  /// phi(x, a) counts the numbers <= x that are not divisible
-  /// by any of the first a primes.
-  /// @pre is_cached(a) == true.
-  ///
-  int64_t phi(int64_t x, int64_t a) const
-  {
-    assert(x >= 0);
-    assert(a <= MAX_A);
-    return (x / prime_products_[a]) * totients_[a] + phi_cache_[a][x % prime_products_[a]];
-  }
+  int64_t phi(int64_t x, int64_t a) const;
   static const int64_t MAX_A;
 private:
   std::vector<int16_t> phi_cache_[7];
@@ -41,6 +30,13 @@ private:
   static const int32_t prime_products_[7];
   static const int32_t totients_[7];
 };
+
+inline bool is_phi_tiny(int64_t a)
+{
+  return a <= PhiTiny::MAX_A;
+}
+
+int64_t phi_tiny(int64_t x, int64_t a);
 
 } // namespace primecount
 

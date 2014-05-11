@@ -34,9 +34,8 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  static const PhiTiny phiTiny;
-  if (a <= PhiTiny::MAX_A)
-    return phiTiny.phi(x, a);
+  if (is_phi_tiny(a))
+    return phi_tiny(x, a);
 
   std::vector<int32_t> primes;
   primes.push_back(0);
@@ -46,7 +45,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     return 1;
 
   int64_t iters = pi_bsearch(primes, a, isqrt(x));
-  PhiCache cache(primes, phiTiny);
+  PhiCache cache(primes);
   int64_t sum = x - a + iters;
 
 #ifdef _OPENMP
