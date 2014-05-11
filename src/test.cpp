@@ -18,6 +18,10 @@
 #include <sstream>
 #include <ctime>
 
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
+
 using namespace std;
 using namespace primecount;
 
@@ -39,6 +43,37 @@ int get_rand()
 {
   return (rand() % 10000) * 1000 + 1;
 }
+
+#ifdef _OPENMP
+
+void check_phi_thread_safety(int64_t iters)
+{
+  cout << "Testing phi(x, a)" << flush;
+
+  int64_t single_thread_sum = 0;
+  int64_t multi_thread_sum = 0;
+  int64_t base = 1000000;
+  int threads = omp_get_max_threads() / 2;
+  int nested_threads = 2;
+
+  omp_set_nested(true);
+
+  #pragma omp parallel for num_threads(threads) reduction(+: multi_thread_sum)
+  for (int64_t i = 0; i < iters; i++)
+    multi_thread_sum += pi_legendre(base + i, nested_threads);
+
+  omp_set_nested(false);
+
+  for (int64_t i = 0; i < iters; i++)
+    single_thread_sum += pi_legendre(base + i);
+
+  if (multi_thread_sum != single_thread_sum)
+    throw runtime_error("Error: multi-threaded phi(x, a) is broken.");
+
+  std::cout << "\rTesting phi(x, a) 100%" << endl;
+}
+
+#endif
 
 template <typename F>
 void check_equal(const string& f1_name, F f1, F f2, int64_t iters)
@@ -76,6 +111,9 @@ bool test()
   srand(static_cast<unsigned int>(time(0)));
   try
   {
+#ifdef _OPENMP
+    check_phi_thread_safety(100);
+#endif
     check_equal("pi_legendre", pi_legendre, pi_primesieve, 100);
     check_equal("pi_meissel",  pi_meissel,  pi_legendre,   400);
     check_equal("pi_lehmer",   pi_lehmer,   pi_meissel,    400);
