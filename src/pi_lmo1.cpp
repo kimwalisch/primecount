@@ -13,6 +13,7 @@
 /// file in the top level directory.
 ///
 
+#include "internal.hpp"
 #include "PhiCache.hpp"
 #include "pmath.hpp"
 

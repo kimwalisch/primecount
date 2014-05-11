@@ -10,10 +10,10 @@
 /// file in the top level directory.
 ///
 
+#include "internal.hpp"
 #include "PhiTiny.hpp"
 #include "pmath.hpp"
 
-#include <primecount.hpp>
 #include <primesieve.hpp>
 #include <stdint.h>
 #include <algorithm>

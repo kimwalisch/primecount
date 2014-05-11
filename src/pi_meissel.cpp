@@ -7,6 +7,7 @@
 /// file in the top level directory.
 ///
 
+#include "internal.hpp"
 #include "pmath.hpp"
 
 #include <primecount.hpp>

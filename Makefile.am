@@ -50,6 +50,7 @@ libprimecount_la_SOURCES = \
 	src/S1.cpp \
 	src/test.cpp \
 	src/get_omp_threads.hpp \
+	src/internal.hpp \
 	src/pmath.hpp \
 	src/PhiCache.hpp \
 	src/PhiTiny.hpp \
