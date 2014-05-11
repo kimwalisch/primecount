@@ -15,10 +15,6 @@
 
 namespace {
 
-/// Thread-safe singleton without locking
-/// @note Meyer's singleton (static const Singleton instance) causes a
-///       race condition with MSVC 2013 and OpenMP
-///
 const primecount::PhiTiny phiTiny;
 
 }
