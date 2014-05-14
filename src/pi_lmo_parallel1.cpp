@@ -103,7 +103,7 @@ int64_t S2(int64_t x,
       int64_t low = j * segment_size + 1;
       int64_t high = min(low + segment_size, limit);
 
-      // Initialize sieve indices
+      // Initialize next multiples
       while (iter != primes.end() && isquare(*iter) < high)
       {
         int64_t prime = *iter++;
