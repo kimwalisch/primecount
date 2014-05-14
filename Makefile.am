@@ -44,6 +44,7 @@ libprimecount_la_SOURCES = \
 	src/pi_lmo3.cpp \
 	src/pi_lmo4.cpp \
 	src/pi_lmo5.cpp \
+	src/pi_lmo_parallel1.cpp \
 	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
