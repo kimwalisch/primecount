@@ -66,7 +66,6 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  threads = std::max(1, threads);
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
@@ -215,7 +214,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   #pragma omp parallel sections num_threads(threads)
   {
     #pragma omp section
-    s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads - 1);
+    s2 = S2(x, y, pi_y, c, primes, lpf , mu, max(1, threads - 1));
     #pragma omp section
     {
       s1 = S1(x, y, c, primes, lpf , mu);
