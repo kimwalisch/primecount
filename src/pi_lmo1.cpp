@@ -23,11 +23,6 @@
 #include <algorithm>
 #include <vector>
 
-#ifdef _OPENMP
-  #include <omp.h>
-  #include "get_omp_threads.hpp"
-#endif
-
 using namespace std;
 
 namespace primecount {
@@ -36,7 +31,7 @@ namespace primecount {
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo1(int64_t x, int threads)
+int64_t pi_lmo1(int64_t x)
 {
   if (x < 2)
     return 0;
@@ -61,10 +56,6 @@ int64_t pi_lmo1(int64_t x, int threads)
   PhiCache cache(primes);
 
   // Calculate the contribution of the special leaves
-#ifdef _OPENMP
-  #pragma omp parallel for firstprivate(cache) schedule(dynamic) reduction(-: S2) \
-      num_threads(get_omp_threads(threads)) 
-#endif
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])

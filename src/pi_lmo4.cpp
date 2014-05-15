@@ -53,10 +53,10 @@ int64_t S2(int64_t x,
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    std::fill(sieve.begin(), sieve.end(), 1);
+    fill(sieve.begin(), sieve.end(), 1);
 
     // Current segment = interval [low, high[
-    int64_t high = std::min(low + segment_size, limit);
+    int64_t high = min(low + segment_size, limit);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
     // simply sieve out the multiples of the first c primes
@@ -74,8 +74,8 @@ int64_t S2(int64_t x,
     for (int64_t b = c + 1; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = std::max(x / (prime * high), y / prime);
-      int64_t max_m = std::min(x / (prime * low), y);
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
 
       // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
       // if so then (prime < lpf[m]) will always evaluate to
@@ -83,7 +83,7 @@ int64_t S2(int64_t x,
       if (prime >= max_m)
         break;
 
-      for (int64_t m = min_m + 1; m <= max_m; m++)
+      for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
@@ -100,8 +100,8 @@ int64_t S2(int64_t x,
         }
       }
 
-      // Calculate phi(x / ((high - 1) * primes[b]), b) which will
-      // be used to calculate special leaves in the next segment
+      // Calculate phi(high - 1, b - 1) which will be used to
+      // calculate special leaves in the next segment
       phi[b] += cnt_query(counters, (high - 1) - low);
 
       // Remove the multiples of (b)th prime
@@ -129,7 +129,7 @@ namespace primecount {
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo4(int64_t x, int threads)
+int64_t pi_lmo4(int64_t x)
 {
   if (x < 2)
     return 0;
@@ -138,8 +138,7 @@ int64_t pi_lmo4(int64_t x, int threads)
   // J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-
   // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
   double beta = 0.6;
-  double alpha = std::max(1.0, log(log((double) x)) * beta);
-
+  double alpha = max(1.0, log(log((double) x)) * beta);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
 
@@ -150,23 +149,10 @@ int64_t pi_lmo4(int64_t x, int threads)
   primesieve::generate_primes(y, &primes);
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(PhiTiny::MAX_A, pi_y);
-  int64_t s1, s2, p2;
 
-#ifdef _OPENMP
-  #pragma omp parallel sections num_threads(get_omp_threads(threads))
-  {
-    #pragma omp section
-    s1 = S1(x, y, c, primes, lpf , mu);
-    #pragma omp section
-    s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-    #pragma omp section
-    p2 = P2(x, y);
-  }
-#else
-  s1 = S1(x, y, c, primes, lpf , mu);
-  s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-  p2 = P2(x, y);
-#endif
+  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);
+  int64_t p2 = P2(x, y);
 
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;

@@ -93,7 +93,7 @@ namespace primecount {
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(2/3) / log log x) space.
 ///
-int64_t pi_lmo2(int64_t x, int threads)
+int64_t pi_lmo2(int64_t x)
 {
   if (x < 2)
     return 0;
@@ -103,7 +103,6 @@ int64_t pi_lmo2(int64_t x, int threads)
   // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
   double beta = 1.0;
   double alpha = max(1.0, log(log((double) x)) * beta);
-
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
 
@@ -114,23 +113,10 @@ int64_t pi_lmo2(int64_t x, int threads)
   primesieve::generate_primes(y, &primes);
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(PhiTiny::MAX_A, pi_y);
-  int64_t s1, s2, p2;
 
-#ifdef _OPENMP
-  #pragma omp parallel sections num_threads(get_omp_threads(threads))
-  {
-    #pragma omp section
-    s1 = S1(x, y, c, primes, lpf , mu);
-    #pragma omp section
-    s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-    #pragma omp section
-    p2 = P2(x, y);
-  }
-#else
-  s1 = S1(x, y, c, primes, lpf , mu);
-  s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-  p2 = P2(x, y);
-#endif
+  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);
+  int64_t p2 = P2(x, y);
 
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;

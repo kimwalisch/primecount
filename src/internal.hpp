@@ -30,21 +30,21 @@ int64_t pi_lehmer2(int64_t x, int threads = MAX_THREADS);
 /// recursive phi formula with caching to calculate S2(x).
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo1(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo1(int64_t x);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
 /// the sieve of Eratosthenes to calculate S2(x).
 /// Run time: O(x^(2/3)) operations, O(x^(2/3) / log log x) space.
 ///
-int64_t pi_lmo2(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo2(int64_t x);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
 /// the segmented sieve of Eratosthenes to calculate S2(x).
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo3(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo3(int64_t x);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm. This implementation uses
@@ -52,13 +52,13 @@ int64_t pi_lmo3(int64_t x, int threads = MAX_THREADS);
 /// for counting to calculate S2(x).
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo4(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo4(int64_t x);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo5(int64_t x, int threads = MAX_THREADS);
+int64_t pi_lmo5(int64_t x);
 
 /// Parallel implementation of the Lagarias-Miller-Odlyzko
 /// prime counting algorithm using OpenMP.
