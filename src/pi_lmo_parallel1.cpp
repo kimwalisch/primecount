@@ -104,7 +104,7 @@ int64_t S2(int64_t x,
       int64_t high = min(low + segment_size, limit);
 
       // Initialize next multiples
-      while (iter != primes.end() && isquare(*iter) < high)
+      while (iter != primes.end() && *iter < high)
       {
         int64_t prime = *iter++;
         int64_t next_multiple = ((low + prime - 1) / prime) * prime;
