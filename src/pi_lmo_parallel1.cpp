@@ -66,12 +66,13 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
+  int64_t S2_total = 0;
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
-  int64_t segments_per_thread = (segments + threads - 1) / threads;
-  int64_t S2_total = 0;
 
+  threads = in_between(1, threads, segments);
+  int64_t segments_per_thread = (segments + threads - 1) / threads;
   vector<vector<int64_t> > phi(threads);
   vector<vector<int64_t> > mu_sum(threads);
 
@@ -99,6 +100,7 @@ int64_t S2(int64_t x,
       next.push_back(next_multiple);
     }
 
+    // Process the segments corresponding to the current thread
     for (int64_t j = start_idx; j < stop_idx; j++)
     {
       fill(sieve.begin(), sieve.end(), 1);
@@ -210,7 +212,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   #pragma omp parallel sections num_threads(threads)
   {
     #pragma omp section
-    s2 = S2(x, y, pi_y, c, primes, lpf , mu, max(1, threads - 1));
+    s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads - 1);
     #pragma omp section
     {
       s1 = S1(x, y, c, primes, lpf , mu);
