@@ -20,6 +20,14 @@ inline int64_t isquare(int64_t x)
   return x * x;
 }
 
+template <typename T1, typename T2, typename T3>
+inline T2 in_between(T1 min, T2 x, T3 max)
+{
+  if (x < min) return min;
+  if (x > max) return max;
+  return x;
+}
+
 template <typename T>
 inline T number_of_bits(T)
 {
