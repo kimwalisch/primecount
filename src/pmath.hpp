@@ -23,8 +23,10 @@ inline int64_t isquare(int64_t x)
 template <typename T1, typename T2, typename T3>
 inline T2 in_between(T1 min, T2 x, T3 max)
 {
-  if (x < min) return min;
-  if (x > max) return max;
+  if (x < min)
+    return static_cast<T2>(min);
+  if (x > max)
+    return static_cast<T2>(max);
   return x;
 }
 
