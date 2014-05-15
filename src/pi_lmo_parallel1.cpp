@@ -75,25 +75,29 @@ int64_t S2(int64_t x,
   vector<vector<int64_t> > phi(threads);
   vector<vector<int64_t> > mu_sum(threads);
 
-  for (int i = 0; i < threads; i++)
-  {
-    phi[i].resize(primes.size(), 0);
-    mu_sum[i].resize(primes.size(), 0);
-  }
-
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
   {
     vector<char> sieve(segment_size);
     vector<int32_t> counters(segment_size);
-    vector<int32_t>::iterator iter = primes.begin() + 1;
     vector<int64_t> next;
+    phi[i].resize(primes.size(), 0);
+    mu_sum[i].resize(primes.size(), 0);
     next.reserve(primes.size());
     next.push_back(0);
 
     int64_t start_idx = i * segments_per_thread;
     int64_t stop_idx = min(start_idx + segments_per_thread, segments);
+    int64_t low_thread = start_idx * segment_size + 1;
     int64_t S2_thread = 0;
+
+    // Initialize next multiples
+    for (size_t j = 1; j < primes.size(); j++)
+    {
+      int64_t prime = primes[j];
+      int64_t next_multiple = ((low_thread + prime - 1) / prime) * prime;
+      next.push_back(next_multiple);
+    }
 
     for (int64_t j = start_idx; j < stop_idx; j++)
     {
@@ -102,14 +106,6 @@ int64_t S2(int64_t x,
       // Current segment = interval [low, high[
       int64_t low = j * segment_size + 1;
       int64_t high = min(low + segment_size, limit);
-
-      // Initialize next multiples
-      while (iter != primes.end() && *iter < high)
-      {
-        int64_t prime = *iter++;
-        int64_t next_multiple = ((low + prime - 1) / prime) * prime;
-        next.push_back(next_multiple);
-      }
 
       for (int64_t b = 1; b <= c; b++)
       {
