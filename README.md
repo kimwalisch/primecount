@@ -88,7 +88,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.08s</td>
     <td>0.06s</td>
     <td>0.06s</td>
-    <td>0.07s</td>
+    <td>0.05s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
@@ -96,7 +96,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.31s</td>
     <td>0.19s</td>
     <td>0.23s</td>
-    <td>0.28s</td>
+    <td>0.17s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
@@ -104,7 +104,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>1.49s</td>
     <td>0.95s</td>
     <td>1.03s</td>
-    <td>1.19s</td>
+    <td>0.70s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
@@ -112,7 +112,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>9.30s</td>
     <td>6.81s</td>
     <td>5.05s</td>
-    <td>5.34s</td>
+    <td>3.13s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
@@ -120,7 +120,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>60.38s</td>
     <td>49.12s</td>
     <td>28.26s</td>
-    <td>24.39s</td>
+    <td>14.13s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -128,7 +128,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>423.12s</td>
     <td>337.56s</td>
     <td>173.78s</td>
-    <td>113.48s</td>
+    <td>66.72s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -136,14 +136,13 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3749.72s</td>
     <td>2879.81s</td>
     <td>1335.85s</td>
-    <td>521.51s</td>
+    <td>476.21s</td>
   </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system. primecount was compiled using GCC
-4.8 and used all CPU cores for each benchmark except for ```pi_lmo(x)``` which
-is currently only partially parallelized.
+4.8 and used all CPU cores for each benchmark.
 
 ### Fast nth prime calculation
 
