@@ -13,13 +13,14 @@
 #ifdef _OPENMP
 
 #include <primecount.hpp>
+#include <algorithm>
 #include <omp.h>
 
 namespace primecount {
 
 inline int get_omp_threads(int threads)
 {
-  return (threads != MAX_THREADS) ? threads : omp_get_max_threads();
+  return std::max(1, (threads != MAX_THREADS) ? threads : omp_get_max_threads());
 }
 
 } // namespace primecount
