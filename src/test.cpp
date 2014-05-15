@@ -28,6 +28,12 @@ using namespace std;
 
 namespace {
 
+int get_rand()
+{
+  // 0 <= get_rand() < 10^7
+  return (rand() % 10000) * 1000 + 1;
+}
+
 void assert_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
 {
   if (res1 != res2)
@@ -39,15 +45,29 @@ void assert_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
   }
 }
 
-int get_rand()
-{
-  // 0 <= get_rand() < 10^7
-  return (rand() % 10000) * 1000 + 1;
+#define ASSERT_EQUAL(f1, f2, iters) \
+{ \
+  cout << "Testing " << #f1 "(x)" << flush; \
+ \
+  /* test for 0 <= x < 1000 */ \
+  for (int64_t x = 0; x < 1000; x++) \
+    assert_equal(#f1, x, f1 (x), f2 (x)); \
+ \
+  int64_t x = 0; \
+  /* test using random increment */ \
+  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
+  { \
+    assert_equal(#f1, x, f1 (x), f2 (x)); \
+    double percent = 100.0 * (i + 1.0) / iters; \
+    cout << "\rTesting " << #f1 "(x) " << static_cast<int>(percent) << "%" << flush; \
+  } \
+ \
+  cout << endl; \
 }
 
 #ifdef _OPENMP
 
-void check_phi_thread_safety(int64_t iters)
+void test_phi_thread_safety(int64_t iters)
 {
   cout << "Testing phi(x, a)" << flush;
 
@@ -75,26 +95,6 @@ void check_phi_thread_safety(int64_t iters)
 
 #endif
 
-#define ASSERT_EQUAL(f1, f2, iters) \
-{ \
-  cout << "Testing " << #f1 "(x)" << flush; \
- \
-  /* test for 0 <= x < 1000 */ \
-  for (int64_t x = 0; x < 1000; x++) \
-    assert_equal(#f1, x, f1 (x), f2 (x)); \
- \
-  int64_t x = 0; \
-  /* test using random increment */ \
-  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
-  { \
-    assert_equal(#f1, x, f1 (x), f2 (x)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << static_cast<int>(percent) << "%" << flush; \
-  } \
- \
-  cout << endl; \
-}
-
 } // namespace
 
 namespace primecount {
@@ -105,7 +105,7 @@ bool test()
   try
   {
 #ifdef _OPENMP
-    check_phi_thread_safety(100);
+    test_phi_thread_safety(100);
 #endif
     ASSERT_EQUAL(pi_legendre,      pi_primesieve, 100);
     ASSERT_EQUAL(pi_meissel,       pi_legendre,   400);
