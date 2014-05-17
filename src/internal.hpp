@@ -66,6 +66,12 @@ int64_t pi_lmo5(int64_t x);
 ///
 int64_t pi_lmo_parallel1(int64_t x, int threads = MAX_THREADS);
 
+/// Parallel implementation of the Lagarias-Miller-Odlyzko
+/// prime counting algorithm using OpenMP.
+/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
+///
+int64_t pi_lmo_parallel2(int64_t x, int threads = MAX_THREADS);
+
 /// Partial sieve function (a.k.a. Legendre-sum).
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
