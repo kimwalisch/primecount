@@ -101,16 +101,19 @@ int64_t S2(int64_t x,
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
 
+    // For c + 1 <= b < pi_y
+    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
+    // Such that: low <= x / n < high
     for (; b < pi_sqrty; b++)
     {
       int64_t prime = primes[b];
-      int64_t m = std::min(x / (prime * low), y);
-      if (prime >= m)
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
+
+      if (prime >= max_m)
         break;
 
-      special_leaf_threshold = max(prime * prime, special_leaf_threshold);
-
-      for (; prime * m > special_leaf_threshold; m--)
+      for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
@@ -125,6 +128,9 @@ int64_t S2(int64_t x,
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
+    // For pi_sqrty <= b < pi_y
+    // Find all special leaves: n = primes[b] * prime2
+    // Such that: low <= x / n < high
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];

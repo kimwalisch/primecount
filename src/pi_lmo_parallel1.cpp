@@ -2,7 +2,7 @@
 /// @file  pi_lmo_parallel1.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm using OpenMP. This implementation
-///        is derived from pi_lmo4(x).
+///        is based on pi_lmo4(x).
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -123,13 +123,13 @@ int64_t S2(int64_t x,
       for (int64_t b = c + 1; b < pi_y; b++)
       {
         int64_t prime = primes[b];
-        int64_t min_m = max(x / (prime * high), y / prime);
-        int64_t max_m = min(x / (prime * low), y);
+        int64_t m_min = max(x / (prime * high), y / prime);
+        int64_t m_max = min(x / (prime * low), y);
 
-        if (prime >= max_m)
+        if (prime >= m_max)
           break;
 
-        for (int64_t m = max_m; m > min_m; m--)
+        for (int64_t m = m_max; m > m_min; m--)
         {
           if (mu[m] != 0 && prime < lpf[m])
           {
