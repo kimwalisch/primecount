@@ -152,7 +152,7 @@ inline std::vector<int32_t> make_pi(int64_t max)
 
   for (int64_t i = 2; i * i <= max; i++)
     if (is_prime[i])
-      for (int64_t j = i * i; j <= max; j += i * 2)
+      for (int64_t j = i * i; j <= max; j += i)
         is_prime[j] = 0;
 
   std::vector<int32_t> pi(max + 1, 0);
