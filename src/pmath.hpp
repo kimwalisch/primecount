@@ -143,4 +143,28 @@ inline std::vector<int32_t> make_least_prime_factor(int64_t max)
   return lpf;
 }
 
+/// Generate a vector with the prime counts below max
+/// using the sieve of Eratosthenes.
+///
+inline std::vector<int32_t> make_pi(int64_t max)
+{
+  std::vector<char> is_prime(max + 1, 1);
+
+  for (int64_t i = 2; i * i <= max; i++)
+    if (is_prime[i])
+      for (int64_t j = i * i; j <= max; j += i * 2)
+        is_prime[j] = 0;
+
+  std::vector<int32_t> pi(max + 1, 0);
+  int32_t pix = 0;
+
+  for (int64_t x = 2; x <= max; x++)
+  {
+    pix += is_prime[x];
+    pi[x] = pix;
+  }
+
+  return pi;
+}
+
 #endif
