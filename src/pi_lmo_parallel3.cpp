@@ -260,7 +260,7 @@ int64_t S2(int64_t x,
     // Increase the segments per thread if the running time is
     // less than a certain threshold, here 10 seconds.
     if (omp_get_wtime() - time < 10)
-      segments_per_thread *= 4;
+      segments_per_thread *= 2;
   }
 
   return S2_result;
