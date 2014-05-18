@@ -51,15 +51,14 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
-
   next_multiple = k;
 }
 
 /// Compute the S2 contribution for the interval
-/// [low_process, low_process + segments * segment_size[.
+/// [low_thread, low_thread + segments * segment_size[.
 /// The missing special leaf contributions for the interval
-/// [1, low_process[ are later reconstructed and added in
-/// the parent (calling) S2 function.
+/// [1, low_thread[ are later reconstructed and added in
+/// the calling (parent) S2 function.
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
@@ -86,7 +85,7 @@ int64_t S2_thread(int64_t x,
   next.reserve(primes.size());
   next.push_back(0);
 
-  int64_t start_idx = thread_num * segments_per_thread;
+  int64_t start_idx = segments_per_thread * thread_num;
   int64_t stop_idx = min((thread_num + 1) * segments_per_thread, segments);
   int64_t low_thread = start_idx * segment_size + 1;
   int64_t S2_thread = 0;
