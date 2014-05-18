@@ -257,10 +257,10 @@ int64_t S2(int64_t x,
     // 
     segment_size = min(segment_size * 2, max_segment_size);
 
-    // Increase the segments per thread if the average running
-    // time is less then 10 seconds
-    if ((omp_get_wtime() - time) / threads < 10)
-      segments_per_thread *= 2;
+    // Increase the segments per thread if the running time is
+    // less than a certain threshold, here 10 seconds.
+    if (omp_get_wtime() - time < 10)
+      segments_per_thread *= 4;
   }
 
   return S2_result;
