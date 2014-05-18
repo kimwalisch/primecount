@@ -196,13 +196,12 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  threads = max(1, threads);
-
   int64_t S2_result = 0;
   int64_t low = 1;
   int64_t limit = x / y + 1;
+  int64_t logx = (int64_t) max(1.0, log((double) x));
   int64_t max_segment_size = next_power_of_2(isqrt(limit));
-  int64_t segment_size = next_power_of_2(max_segment_size / threads);
+  int64_t segment_size = next_power_of_2(max_segment_size / logx);
   int64_t segments_per_thread = 1;
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
 
