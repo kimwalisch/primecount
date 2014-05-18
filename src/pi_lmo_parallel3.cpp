@@ -146,7 +146,7 @@ int64_t S2_thread(int64_t x,
         }
       }
 
-      phi[b] += cnt_query(counters, high - 1 - low);
+      phi[b] += cnt_query(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
@@ -171,7 +171,7 @@ int64_t S2_thread(int64_t x,
         mu_sum[b]++;
       }
 
-      phi[b] += cnt_query(counters, high - 1 - low);
+      phi[b] += cnt_query(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
   }
