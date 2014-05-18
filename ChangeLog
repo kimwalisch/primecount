@@ -1,9 +1,10 @@
-2014-05-17  Kim Walisch  <kim.walisch@gmail.com>
+2014-05-18  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.19 work in progress.
 
   * src/pi_lmo_parallel1.cpp: Simple parallel LMO implementation.
   * src/pi_lmo_parallel2.cpp: Advanced parallel LMO implementation.
+  * src/pi_lmo_parallel3.cpp: Better load balancing.
   * src/phi.cpp: Fix race condition.
   * src/test.cpp: Add phi(x, a) thread safety test.
   * src/PhiTiny.cpp: Make thread safe.

@@ -27,6 +27,7 @@ LIB_OBJECTS = \
 	src\pi_lmo5.obj \
 	src\pi_lmo_parallel1.obj \
 	src\pi_lmo_parallel2.obj \
+	src\pi_lmo_parallel3.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\Pk.obj \

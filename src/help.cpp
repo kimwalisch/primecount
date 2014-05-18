@@ -34,6 +34,7 @@ const string helpMenu(
   "         --lmo5           Advanced LMO algorithm\n"
   "         --lmo_parallel1  Simple parallel LMO implementation\n"
   "         --lmo_parallel2  Advanced parallel LMO implementation\n"
+  "         --lmo_parallel3  Better load balancing\n"
   "         --Li             Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse     Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime       Calculate the nth prime\n"
