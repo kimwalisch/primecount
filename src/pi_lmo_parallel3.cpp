@@ -2,7 +2,7 @@
 /// @file  pi_lmo_parallel3.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm using OpenMP. This implementation
-///        is based on pi_lmo_parallel2(x) and has an improved
+///        is based on pi_lmo_parallel2(x) but has an improved
 ///        load balancing.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
@@ -52,12 +52,18 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
-
   next_multiple = k;
 }
 
+/// Compute the S2 contribution for the interval
+/// [low_process, low_process + segments * segment_size[.
+/// The missing special leaf contributions for the interval
+/// [1, low_process[ are later reconstructed and added in
+/// the parent (calling) S2 function.
+///
 int64_t S2_thread(int64_t x,
                   int64_t y,
+                  int64_t pi_sqrty,
                   int64_t pi_y,
                   int64_t c,
                   int64_t limit,
@@ -66,6 +72,7 @@ int64_t S2_thread(int64_t x,
                   int64_t segment_size,
                   int64_t segments_per_thread,
                   int64_t thread_num,
+                  vector<int32_t>& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
                   vector<int32_t>& mu,
@@ -101,8 +108,10 @@ int64_t S2_thread(int64_t x,
     // Current segment = interval [low, high[
     int64_t low = low_process + (j * segment_size + 1);
     int64_t high = min(low + segment_size, limit);
+    int64_t special_leaf_threshold = max(x / high, y);
+    int64_t b = 1;
 
-    for (int64_t b = 1; b <= c; b++)
+    for (; b <= c; b++)
     {
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
@@ -113,33 +122,53 @@ int64_t S2_thread(int64_t x,
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
 
-    for (int64_t b = c + 1; b < pi_y; b++)
+    // For c + 1 <= b < pi_y
+    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
+    // Such that: low <= x / n < high
+    for (; b < pi_sqrty; b++)
     {
       int64_t prime = primes[b];
-      int64_t m_min = max(x / (prime * high), y / prime);
-      int64_t m_max = min(x / (prime * low), y);
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
 
-      if (prime >= m_max)
+      if (prime >= max_m)
         break;
 
-      for (int64_t m = m_max; m > m_min; m--)
+      for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
-          // phi_xn is the number of currently unsieved elements in
-          // the interval [start_idx * segment_size + 1, x / n].
-          // This is not the entire contribution of the special leaf
-          // n, the missing contribution is the number of unsieved
-          // elements in the interval [1, start_idx * segment_size].
-          // The missing contribution is reconstructed and added
-          // once all threads have finished.
-          //
           int64_t n = prime * m;
           int64_t count = cnt_query(counters, (x / n) - low);
           int64_t phi_xn = phi[b] + count;
           S2_thread -= mu[m] * phi_xn;
           mu_sum[b] -= mu[m];
         }
+      }
+
+      phi[b] += cnt_query(counters, high - 1 - low);
+      cross_off(prime, low, high, next[b], sieve, counters);
+    }
+
+    // For pi_sqrty <= b < pi_y
+    // Find all special leaves: n = primes[b] * prime2
+    // Such that: low <= x / n < high
+    for (; b < pi_y; b++)
+    {
+      int64_t prime = primes[b];
+      int64_t l = pi[min(x / (prime * low), y)];
+      if (prime >= primes[l])
+        break;
+
+      special_leaf_threshold = max(prime * prime, special_leaf_threshold);
+
+      for (; prime * primes[l] > special_leaf_threshold; l--)
+      {
+        int64_t n = prime * primes[l];
+        int64_t count = cnt_query(counters, (x / n) - low);
+        int64_t phi_xn = phi[b] + count;
+        S2_thread += phi_xn;
+        mu_sum[b]++;
       }
 
       phi[b] += cnt_query(counters, high - 1 - low);
@@ -193,8 +222,8 @@ int64_t S2(int64_t x,
     #pragma omp parallel for num_threads(threads) reduction(+: S2_result)
     for (int i = 0; i < threads; i++)
     {
-      S2_result += S2_thread(x, y, pi_y, c, limit, low, segments,
-          segment_size, segments_per_thread, i, primes, lpf, mu, mu_sum[i], phi[i]);
+      S2_result += S2_thread(x, y, pi_sqrty, pi_y, c, limit, low, segments,
+          segment_size, segments_per_thread, i, pi, primes, lpf, mu, mu_sum[i], phi[i]);
     }
 
     // Once all threads have finished reconstruct and add the 
@@ -228,8 +257,8 @@ int64_t S2(int64_t x,
     // 
     segment_size = min(segment_size * 2, max_segment_size);
 
-    // Increase the segments per thread if the running time is
-    // less then 10 seconds
+    // Increase the segments per thread if the average running
+    // time is less then 10 seconds
     if ((omp_get_wtime() - time) / threads < 10)
       segments_per_thread *= 2;
   }
