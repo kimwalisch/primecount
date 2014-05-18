@@ -50,11 +50,106 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
-
   next_multiple = k;
 }
 
+/// Compute the S2 contribution for the interval
+/// [low_thread, low_thread + segments * segment_size[.
+/// The missing special leaf contributions for the interval
+/// [1, low_thread[ are later reconstructed and added in
+/// the calling (parent) S2 function.
+///
+int64_t S2_thread(int64_t x,
+                  int64_t y,
+                  int64_t pi_y,
+                  int64_t c,
+                  int64_t limit,
+                  int64_t segments,
+                  int64_t segment_size,
+                  int64_t segments_per_thread,
+                  int64_t thread_num,
+                  vector<int32_t>& primes,
+                  vector<int32_t>& lpf,
+                  vector<int32_t>& mu,
+                  vector<int64_t>& mu_sum,
+                  vector<int64_t>& phi)
+{
+  vector<char> sieve(segment_size);
+  vector<int32_t> counters(segment_size);
+  vector<int64_t> next;
+  phi.resize(primes.size(), 0);
+  mu_sum.resize(primes.size(), 0);
+  next.reserve(primes.size());
+  next.push_back(0);
+
+  int64_t start_idx = segments_per_thread * thread_num;
+  int64_t stop_idx = min(segments_per_thread * (thread_num + 1), segments);
+  int64_t low_thread = segment_size * start_idx + 1;
+  int64_t S2_thread = 0;
+
+  // Initialize next multiples
+  for (size_t j = 1; j < primes.size(); j++)
+  {
+    int64_t prime = primes[j];
+    int64_t next_multiple = ((low_thread + prime - 1) / prime) * prime;
+    next.push_back(next_multiple);
+  }
+
+  // Process the segments corresponding to the current thread
+  for (int64_t j = start_idx; j < stop_idx; j++)
+  {
+    fill(sieve.begin(), sieve.end(), 1);
+
+    // Current segment = interval [low, high[
+    int64_t low = segment_size * j + 1;
+    int64_t high = min(low + segment_size, limit);
+    int64_t b = 1;
+
+    for (; b <= c; b++)
+    {
+      int64_t k = next[b];
+      for (int64_t prime = primes[b]; k < high; k += prime)
+        sieve[k - low] = 0;
+      next[b] = k;
+    }
+
+    // Initialize special tree data structure from sieve
+    cnt_finit(sieve, counters, segment_size);
+
+    // For c + 1 <= b < pi_y
+    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
+    // Such that: low <= x / n < high
+    for (; b < pi_y; b++)
+    {
+      int64_t prime = primes[b];
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
+
+      if (prime >= max_m)
+        break;
+
+      for (int64_t m = max_m; m > min_m; m--)
+      {
+        if (mu[m] != 0 && prime < lpf[m])
+        {
+          int64_t n = prime * m;
+          int64_t count = cnt_query(counters, (x / n) - low);
+          int64_t phi_xn = phi[b] + count;
+          S2_thread -= mu[m] * phi_xn;
+          mu_sum[b] -= mu[m];
+        }
+      }
+
+      phi[b] += cnt_query(counters, (high - 1) - low);
+      cross_off(prime, low, high, next[b], sieve, counters);
+    }
+  }
+
+  return S2_thread;
+}
+
 /// Calculate the contribution of the special leaves.
+/// This is a parallel implementation without load balancing.
 /// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
@@ -66,95 +161,22 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  int64_t S2_total = 0;
+  int64_t S2_result = 0;
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
-
   threads = in_between(1, threads, segments);
   int64_t segments_per_thread = (segments + threads - 1) / threads;
+
   vector<vector<int64_t> > phi(threads);
   vector<vector<int64_t> > mu_sum(threads);
 
-  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
+  #pragma omp parallel for num_threads(threads) reduction(+: S2_result)
   for (int i = 0; i < threads; i++)
   {
-    vector<char> sieve(segment_size);
-    vector<int32_t> counters(segment_size);
-    vector<int64_t> next;
-    phi[i].resize(primes.size(), 0);
-    mu_sum[i].resize(primes.size(), 0);
-    next.reserve(primes.size());
-    next.push_back(0);
-
-    int64_t start_idx = i * segments_per_thread;
-    int64_t stop_idx = min(start_idx + segments_per_thread, segments);
-    int64_t low_thread = start_idx * segment_size + 1;
-    int64_t S2_thread = 0;
-
-    // Initialize next multiples
-    for (size_t j = 1; j < primes.size(); j++)
-    {
-      int64_t prime = primes[j];
-      int64_t next_multiple = ((low_thread + prime - 1) / prime) * prime;
-      next.push_back(next_multiple);
-    }
-
-    // Process the segments corresponding to the current thread
-    for (int64_t j = start_idx; j < stop_idx; j++)
-    {
-      fill(sieve.begin(), sieve.end(), 1);
-
-      // Current segment = interval [low, high[
-      int64_t low = j * segment_size + 1;
-      int64_t high = min(low + segment_size, limit);
-
-      for (int64_t b = 1; b <= c; b++)
-      {
-        int64_t k = next[b];
-        for (int64_t prime = primes[b]; k < high; k += prime)
-          sieve[k - low] = 0;
-        next[b] = k;
-      }
-
-      // Initialize special tree data structure from sieve
-      cnt_finit(sieve, counters, segment_size);
-
-      for (int64_t b = c + 1; b < pi_y; b++)
-      {
-        int64_t prime = primes[b];
-        int64_t m_min = max(x / (prime * high), y / prime);
-        int64_t m_max = min(x / (prime * low), y);
-
-        if (prime >= m_max)
-          break;
-
-        for (int64_t m = m_max; m > m_min; m--)
-        {
-          if (mu[m] != 0 && prime < lpf[m])
-          {
-            // phi_xn is the number of currently unsieved elements in
-            // the interval [start_idx * segment_size + 1, x / n].
-            // This is not the entire contribution of the special leaf
-            // n, the missing contribution is the number of unsieved
-            // elements in the interval [1, start_idx * segment_size].
-            // The missing contribution is reconstructed and added
-            // once all threads have finished.
-            //
-            int64_t n = prime * m;
-            int64_t count = cnt_query(counters, (x / n) - low);
-            int64_t phi_xn = phi[i][b] + count;
-            S2_thread -= mu[m] * phi_xn;
-            mu_sum[i][b] -= mu[m];
-          }
-        }
-
-        phi[i][b] += cnt_query(counters, high - 1 - low);
-        cross_off(prime, low, high, next[b], sieve, counters);
-      }
-    }
-
-    S2_total += S2_thread;
+    S2_result += S2_thread(x, y, pi_y, c, limit, segments,
+        segment_size, segments_per_thread, i, primes, lpf, mu,
+            mu_sum[i], phi[i]);
   }
 
   // Once all threads have finished reconstruct and add the
@@ -166,12 +188,12 @@ int64_t S2(int64_t x,
   {
     for (size_t j = 0; j < phi[i].size(); j++)
     {
-      S2_total += phi[i - 1][j] * mu_sum[i][j];
+      S2_result += phi[i - 1][j] * mu_sum[i][j];
       phi[i][j] += phi[i - 1][j];
     }
   }
 
-  return S2_total;
+  return S2_result;
 }
 
 } // namespace
