@@ -27,6 +27,7 @@ inline T2 in_between(T1 min, T2 x, T3 max)
     return static_cast<T2>(min);
   if (x > max)
     return static_cast<T2>(max);
+
   return x;
 }
 
@@ -42,9 +43,13 @@ inline T number_of_bits(T)
 template <typename T>
 inline T next_power_of_2(T x)
 {
+  if (x == 0)
+    return 1;
+
   x--;
   for (T i = 1; i < number_of_bits(x); i += i)
     x |= (x >> i);
+
   return ++x;
 }
 
