@@ -128,13 +128,13 @@ int64_t S2_thread(int64_t x,
     for (; b < pi_sqrty; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(x / (prime * high), y / prime);
-      int64_t max_m = min(x / (prime * low), y);
+      int64_t m_min = max(x / (prime * high), y / prime);
+      int64_t m_max = min(x / (prime * low), y);
 
-      if (prime >= max_m)
+      if (prime >= m_max)
         break;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = m_max; m > m_min; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
@@ -200,8 +200,8 @@ int64_t S2(int64_t x,
   int64_t low = 1;
   int64_t limit = x / y + 1;
   int64_t logx = (int64_t) max(1.0, log((double) x));
-  int64_t max_segment_size = next_power_of_2(isqrt(limit));
-  int64_t segment_size = next_power_of_2(max_segment_size / logx);
+  int64_t segment_size_max = next_power_of_2(isqrt(limit));
+  int64_t segment_size = next_power_of_2(segment_size_max / logx);
   int64_t segments_per_thread = 1;
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
 
@@ -255,9 +255,10 @@ int64_t S2(int64_t x,
     // per thread as most special leaves are in the first segments
     // whereas later on there are very few special leaves.
     //
-    if (omp_get_wtime() - time < 10)
+    double seconds = omp_get_wtime() - time;
+    if (seconds < 10)
     {
-      segment_size = min(segment_size * 2, max_segment_size);
+      segment_size = min(segment_size * 2, segment_size_max);
       segments_per_thread *= 2;
     }
   }

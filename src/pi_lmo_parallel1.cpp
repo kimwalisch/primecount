@@ -122,13 +122,13 @@ int64_t S2_thread(int64_t x,
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(x / (prime * high), y / prime);
-      int64_t max_m = min(x / (prime * low), y);
+      int64_t m_min = max(x / (prime * high), y / prime);
+      int64_t m_max = min(x / (prime * low), y);
 
-      if (prime >= max_m)
+      if (prime >= m_max)
         break;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = m_max; m > m_min; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
