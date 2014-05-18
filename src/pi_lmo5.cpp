@@ -51,7 +51,6 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
-
   next_multiple = k;
 }
 

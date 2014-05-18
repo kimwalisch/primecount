@@ -30,6 +30,32 @@ using namespace std;
 
 namespace {
 
+/// Cross-off the multiples of prime in the sieve array.
+/// For each element that is unmarked the first time update
+/// the special counters tree data structure.
+///
+template <typename T1, typename T2>
+void cross_off(int64_t prime,
+               int64_t low,
+               int64_t high,
+               int64_t& next_multiple,
+               T1& sieve,
+               T2& counters)
+{
+  int64_t segment_size = sieve.size();
+  int64_t k = next_multiple;
+
+  for (; k < high; k += prime * 2)
+  {
+    if (sieve[k - low])
+    {
+      sieve[k - low] = 0;
+      cnt_update(counters, k - low, segment_size);
+    }
+  }
+  next_multiple = k;
+}
+
 /// Calculate the contribution of the special leaves.
 /// @pre y > 0 && c > 1
 ///
@@ -105,16 +131,7 @@ int64_t S2(int64_t x,
       phi[b] += cnt_query(counters, (high - 1) - low);
 
       // Remove the multiples of (b)th prime
-      int64_t k = next[b];
-      for (; k < high; k += prime * 2)
-      {
-        if (sieve[k - low])
-        {
-          sieve[k - low] = 0;
-          cnt_update(counters, k - low, segment_size);
-        }
-      }
-      next[b] = k;
+      cross_off(prime, low, high, next[b], sieve, counters);
     }
   }
 
