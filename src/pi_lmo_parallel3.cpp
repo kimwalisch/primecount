@@ -249,17 +249,17 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
 
-    // Dynamically increase segment_size and segments_per_thread.
+    // Dynamically increase segment_size and segments_per_thread
+    // if the running time is less than a certain threshold.
     // We start off with a small segment size and few segments
     // per thread as most special leaves are in the first segments
     // whereas later on there are very few special leaves.
-    // 
-    segment_size = min(segment_size * 2, max_segment_size);
-
-    // Increase the segments per thread if the running time is
-    // less than a certain threshold, here 10 seconds.
+    //
     if (omp_get_wtime() - time < 10)
+    {
+      segment_size = min(segment_size * 2, max_segment_size);
       segments_per_thread *= 2;
+    }
   }
 
   return S2_result;
