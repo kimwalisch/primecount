@@ -88,7 +88,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.08s</td>
     <td>0.06s</td>
     <td>0.06s</td>
-    <td>0.05s</td>
+    <td>0.04s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
@@ -96,7 +96,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.31s</td>
     <td>0.19s</td>
     <td>0.23s</td>
-    <td>0.17s</td>
+    <td>0.10s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
@@ -104,7 +104,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>1.49s</td>
     <td>0.95s</td>
     <td>1.03s</td>
-    <td>0.70s</td>
+    <td>0.41s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
@@ -112,7 +112,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>9.30s</td>
     <td>6.81s</td>
     <td>5.05s</td>
-    <td>3.13s</td>
+    <td>2.35s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
@@ -120,7 +120,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>60.38s</td>
     <td>49.12s</td>
     <td>28.26s</td>
-    <td>14.13s</td>
+    <td>11.50s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -128,7 +128,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>423.12s</td>
     <td>337.56s</td>
     <td>173.78s</td>
-    <td>66.72s</td>
+    <td>62.37s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -136,7 +136,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3749.72s</td>
     <td>2879.81s</td>
     <td>1335.85s</td>
-    <td>476.21s</td>
+    <td>428.28s</td>
   </tr>
 </table>
 
