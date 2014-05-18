@@ -88,8 +88,8 @@ int64_t S2_thread(int64_t x,
   next.push_back(0);
 
   int64_t start_idx = segments_per_thread * thread_num;
-  int64_t stop_idx = min((thread_num + 1) * segments_per_thread, segments);
-  int64_t low_thread = low_process + (start_idx * segment_size + 1);
+  int64_t stop_idx = min(segments_per_thread * (thread_num + 1), segments);
+  int64_t low_thread = low_process + segment_size * start_idx;
   int64_t S2_thread = 0;
 
   // Initialize next multiples
@@ -106,7 +106,7 @@ int64_t S2_thread(int64_t x,
     fill(sieve.begin(), sieve.end(), 1);
 
     // Current segment = interval [low, high[
-    int64_t low = low_process + (j * segment_size + 1);
+    int64_t low = low_process + segment_size * j;
     int64_t high = min(low + segment_size, limit);
     int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
@@ -199,7 +199,7 @@ int64_t S2(int64_t x,
   threads = max(1, threads);
 
   int64_t S2_result = 0;
-  int64_t low = 0;
+  int64_t low = 1;
   int64_t limit = x / y + 1;
   int64_t max_segment_size = next_power_of_2(isqrt(limit));
   int64_t segment_size = next_power_of_2(max_segment_size / threads);

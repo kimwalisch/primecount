@@ -86,8 +86,8 @@ int64_t S2_thread(int64_t x,
   next.push_back(0);
 
   int64_t start_idx = segments_per_thread * thread_num;
-  int64_t stop_idx = min((thread_num + 1) * segments_per_thread, segments);
-  int64_t low_thread = start_idx * segment_size + 1;
+  int64_t stop_idx = min(segments_per_thread * (thread_num + 1), segments);
+  int64_t low_thread = segment_size * start_idx + 1;
   int64_t S2_thread = 0;
 
   // Initialize next multiples
@@ -104,7 +104,7 @@ int64_t S2_thread(int64_t x,
     fill(sieve.begin(), sieve.end(), 1);
 
     // Current segment = interval [low, high[
-    int64_t low = j * segment_size + 1;
+    int64_t low = segment_size * j + 1;
     int64_t high = min(low + segment_size, limit);
     int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
@@ -195,9 +195,9 @@ int64_t S2(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
-
   threads = in_between(1, threads, segments);
   int64_t segments_per_thread = (segments + threads - 1) / threads;
+
   vector<int32_t> pi = make_pi(y);
   vector<vector<int64_t> > phi(threads);
   vector<vector<int64_t> > mu_sum(threads);
