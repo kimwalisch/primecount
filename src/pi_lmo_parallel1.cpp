@@ -161,7 +161,7 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  int64_t S2_result = 0;
+  int64_t S2_total = 0;
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
@@ -171,10 +171,10 @@ int64_t S2(int64_t x,
   vector<vector<int64_t> > phi(threads);
   vector<vector<int64_t> > mu_sum(threads);
 
-  #pragma omp parallel for num_threads(threads) reduction(+: S2_result)
+  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
   {
-    S2_result += S2_thread(x, y, pi_y, c, limit, segments,
+    S2_total += S2_thread(x, y, pi_y, c, limit, segments,
         segment_size, segments_per_thread, i, primes, lpf, mu,
             mu_sum[i], phi[i]);
   }
@@ -188,12 +188,12 @@ int64_t S2(int64_t x,
   {
     for (size_t j = 0; j < phi[i].size(); j++)
     {
-      S2_result += phi[i - 1][j] * mu_sum[i][j];
+      S2_total += phi[i - 1][j] * mu_sum[i][j];
       phi[i][j] += phi[i - 1][j];
     }
   }
 
-  return S2_result;
+  return S2_total;
 }
 
 } // namespace
