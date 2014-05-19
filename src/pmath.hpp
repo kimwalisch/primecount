@@ -37,6 +37,15 @@ inline T number_of_bits(T)
   return static_cast<T>(sizeof(T) * 8);
 }
 
+/// @brief  Check if an integer is a power of 2.
+/// @see    Book "Hacker's Delight".
+///
+template <typename T>
+inline bool is_power_of_2(T x)
+{
+  return (x != 0 && (x & (x - 1)) == 0);
+}
+
 /// @brief  Round up to the next power of 2.
 /// @see    Book "Hacker's Delight".
 ///
@@ -51,6 +60,12 @@ inline T next_power_of_2(T x)
     x |= (x >> i);
 
   return ++x;
+}
+
+template <typename T>
+inline int ilog(T x)
+{
+  return static_cast<int>(std::log(static_cast<double>(x)));
 }
 
 /// Raise to power
