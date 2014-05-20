@@ -17,9 +17,9 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <PhiTiny.hpp>
 #include <pmath.hpp>
 #include <pi_bsearch.hpp>
+#include <PhiTiny.hpp>
 
 #include <stdint.h>
 #include <algorithm>

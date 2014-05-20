@@ -16,8 +16,8 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <PhiCache.hpp>
 #include <pmath.hpp>
+#include <PhiCache.hpp>
 
 #include <stdint.h>
 #include <algorithm>

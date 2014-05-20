@@ -15,8 +15,8 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <PhiTiny.hpp>
 #include <pmath.hpp>
+#include <PhiTiny.hpp>
 
 #include <stdint.h>
 #include <algorithm>
