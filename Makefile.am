@@ -52,13 +52,13 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel2.cpp \
 	src/lmo/pi_lmo_parallel3.cpp \
 	src/lmo/S1.cpp \
+	src/lmo/tos_counters.hpp \
 	include/get_omp_threads.hpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
-	include/pi_bsearch.hpp \
-	include/tos_counters.hpp
+	include/pi_bsearch.hpp
 
 primecount_SOURCES = \
 	src/primecount.cpp \
