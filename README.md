@@ -229,7 +229,7 @@ file. A short description of each function including its run-time and space
 complexity can be read <a href="include/primecount.hpp">here</a>.
 
 ```C++
-/// @file primecount.hpp
+/// @file  primecount.hpp
 
 int64_t primecount::pi            (int64_t x, int threads = MAX_THREADS);
 int64_t primecount::pi_legendre   (int64_t x, int threads = MAX_THREADS);
