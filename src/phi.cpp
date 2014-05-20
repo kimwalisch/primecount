@@ -7,12 +7,15 @@
 /// file in the top level directory.
 ///
 
-#include <PhiCache.hpp>
-#include <PhiTiny.hpp>
+#include <primecount.hpp>
+#include <primecount-internal.hpp>
+#include <primesieve.hpp>
 #include <pi_bsearch.hpp>
 #include <pmath.hpp>
+#include <PhiCache.hpp>
+#include <PhiTiny.hpp>
 
-#include <primesieve.hpp>
+#include <algorithm>
 #include <stdint.h>
 #include <vector>
 #include <cassert>
@@ -21,6 +24,8 @@
   #include <omp.h>
   #include <get_omp_threads.hpp>
 #endif
+
+using namespace std;
 
 namespace primecount {
 
@@ -49,8 +54,11 @@ int64_t phi(int64_t x, int64_t a, int threads)
   int64_t sum = x - a + iters;
 
 #ifdef _OPENMP
+  // This algorithm scales only up to 8 CPU cores
+  threads = min(get_omp_threads(threads), 8);
+
   #pragma omp parallel for firstprivate(cache) schedule(dynamic, 16) \
-     num_threads(get_omp_threads(threads)) reduction(+: sum)
+     num_threads(threads) reduction(+: sum)
 #endif
   for (int64_t a2 = 0; a2 < iters; a2++)
     sum += cache.phi(x / primes[a2 + 1], a2, -1);
