@@ -7,9 +7,9 @@
 /// file in the top level directory.
 ///
 
-#include "pmath.hpp"
-
 #include <primecount.hpp>
+#include <pmath.hpp>
+
 #include <stdint.h>
 
 namespace primecount {

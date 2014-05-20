@@ -19,20 +19,20 @@ LIB_OBJECTS = \
 	src\pi.obj \
 	src\pi_legendre.obj \
 	src\pi_lehmer.obj \
-	src\pi_lmo.obj \
-	src\pi_lmo1.obj \
-	src\pi_lmo2.obj \
-	src\pi_lmo3.obj \
-	src\pi_lmo4.obj \
-	src\pi_lmo5.obj \
-	src\pi_lmo_parallel1.obj \
-	src\pi_lmo_parallel2.obj \
-	src\pi_lmo_parallel3.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\Pk.obj \
-	src\S1.obj \
-	src\test.obj
+	src\test.obj \
+	src\lmo\pi_lmo.obj \
+	src\lmo\pi_lmo1.obj \
+	src\lmo\pi_lmo2.obj \
+	src\lmo\pi_lmo3.obj \
+	src\lmo\pi_lmo4.obj \
+	src\lmo\pi_lmo5.obj \
+	src\lmo\pi_lmo_parallel1.obj \
+	src\lmo\pi_lmo_parallel2.obj \
+	src\lmo\pi_lmo_parallel3.obj \
+	src\lmo\S1.obj
 
 APP_OBJECTS = \
 	src\cmdoptions.obj \
@@ -104,7 +104,7 @@ check test:
 #-----------------------------------------------------------------------------
 
 clean:
-	-del /Q *.exe *.lib src\*.obj 2> /nul
+	-del /Q *.exe *.lib src\*.obj src\lmo\*.obj 2> /nul
 
 #-----------------------------------------------------------------------------
 # help target

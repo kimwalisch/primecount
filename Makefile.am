@@ -38,27 +38,27 @@ libprimecount_la_SOURCES = \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
 	src/pi_lehmer.cpp \
-	src/pi_lmo.cpp \
-	src/pi_lmo1.cpp \
-	src/pi_lmo2.cpp \
-	src/pi_lmo3.cpp \
-	src/pi_lmo4.cpp \
-	src/pi_lmo5.cpp \
-	src/pi_lmo_parallel1.cpp \
-	src/pi_lmo_parallel2.cpp \
-	src/pi_lmo_parallel3.cpp \
 	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
-	src/S1.cpp \
 	src/test.cpp \
-	src/get_omp_threads.hpp \
-	src/internal.hpp \
-	src/pmath.hpp \
-	src/PhiCache.hpp \
-	src/PhiTiny.hpp \
-	src/pi_bsearch.hpp \
-	src/tos_counters.hpp
+	src/lmo/pi_lmo.cpp \
+	src/lmo/pi_lmo1.cpp \
+	src/lmo/pi_lmo2.cpp \
+	src/lmo/pi_lmo3.cpp \
+	src/lmo/pi_lmo4.cpp \
+	src/lmo/pi_lmo5.cpp \
+	src/lmo/pi_lmo_parallel1.cpp \
+	src/lmo/pi_lmo_parallel2.cpp \
+	src/lmo/pi_lmo_parallel3.cpp \
+	src/lmo/S1.cpp \
+	include/get_omp_threads.hpp \
+	include/primecount-internal.hpp \
+	include/pmath.hpp \
+	include/PhiCache.hpp \
+	include/PhiTiny.hpp \
+	include/pi_bsearch.hpp \
+	include/tos_counters.hpp
 
 primecount_SOURCES = \
 	src/primecount.cpp \

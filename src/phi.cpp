@@ -7,10 +7,10 @@
 /// file in the top level directory.
 ///
 
-#include "PhiCache.hpp"
-#include "PhiTiny.hpp"
-#include "pi_bsearch.hpp"
-#include "pmath.hpp"
+#include <PhiCache.hpp>
+#include <PhiTiny.hpp>
+#include <pi_bsearch.hpp>
+#include <pmath.hpp>
 
 #include <primesieve.hpp>
 #include <stdint.h>
@@ -19,7 +19,7 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "get_omp_threads.hpp"
+  #include <get_omp_threads.hpp>
 #endif
 
 namespace primecount {

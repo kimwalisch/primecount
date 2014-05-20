@@ -19,7 +19,7 @@
 #ifndef TOS_COUNTERS_HPP
 #define TOS_COUNTERS_HPP
 
-#include "pmath.hpp"
+#include <pmath.hpp>
 
 #include <stdint.h>
 #include <vector>

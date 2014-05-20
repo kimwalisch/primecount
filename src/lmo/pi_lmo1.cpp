@@ -13,12 +13,12 @@
 /// file in the top level directory.
 ///
 
-#include "internal.hpp"
-#include "PhiCache.hpp"
-#include "pmath.hpp"
-
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <PhiCache.hpp>
+#include <pmath.hpp>
+
 #include <stdint.h>
 #include <algorithm>
 #include <vector>

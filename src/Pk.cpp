@@ -8,18 +8,18 @@
 /// file in the top level directory.
 ///
 
-#include "pi_bsearch.hpp"
-#include "pmath.hpp"
-
-#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <pi_bsearch.hpp>
+#include <pmath.hpp>
+
 #include <algorithm>
 #include <stdint.h>
 #include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "get_omp_threads.hpp"
+  #include <get_omp_threads.hpp>
 #endif
 
 using namespace std;

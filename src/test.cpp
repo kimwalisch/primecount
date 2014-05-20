@@ -7,9 +7,8 @@
 /// file in the top level directory.
 ///
 
-#include "internal.hpp"
-
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>

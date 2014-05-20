@@ -7,16 +7,16 @@
 /// file in the top level directory.
 ///
 
-#include "internal.hpp"
-#include "pmath.hpp"
-
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
+#include <pmath.hpp>
+
 #include <algorithm>
 #include <stdint.h>
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include "get_omp_threads.hpp"
+  #include <get_omp_threads.hpp>
 #endif
 
 using std::max;
