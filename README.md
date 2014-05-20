@@ -59,7 +59,7 @@ operations and which uses only
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot13x.svg" height="20" align="absmiddle"/>
 space.</p>
 <p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
-Riesel's book [4] is probably the best source of information, for the
+Riesel's book [4] is probably the best source of information. For the
 Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
 [3] as well as Tomás Oliveira's paper [7].
 
