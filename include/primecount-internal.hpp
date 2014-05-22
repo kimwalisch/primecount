@@ -1,5 +1,5 @@
 ///
-/// @file   internal.hpp
+/// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
