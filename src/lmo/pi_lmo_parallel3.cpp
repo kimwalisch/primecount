@@ -80,23 +80,24 @@ int64_t S2_thread(int64_t x,
                   vector<int64_t>& mu_sum,
                   vector<int64_t>& phi)
 {
-  vector<char> sieve(segment_size);
-  vector<int32_t> counters(segment_size);
-  vector<int64_t> next;
-  phi.resize(primes.size(), 0);
-  mu_sum.resize(primes.size(), 0);
-  next.reserve(primes.size());
-  next.push_back(0);
-
   int64_t start_idx = segments_per_thread * thread_num;
   int64_t stop_idx = min(segments_per_thread * (thread_num + 1), segments);
   int64_t low_thread = low_process + segment_size * start_idx;
+  int64_t size = pi[min(isqrt(x / low_thread), y)] + 1;
   int64_t S2_thread = 0;
 
+  vector<char> sieve(segment_size);
+  vector<int32_t> counters(segment_size);
+  vector<int64_t> next;
+  next.reserve(size);
+  phi.resize(size, 0);
+  mu_sum.resize(size, 0);
+  next.push_back(0);
+
   // Initialize next multiples
-  for (size_t j = 1; j < primes.size(); j++)
+  for (int64_t b = 1; b < size; b++)
   {
-    int64_t prime = primes[j];
+    int64_t prime = primes[b];
     int64_t next_multiple = ((low_thread + prime - 1) / prime) * prime;
     next.push_back(next_multiple);
   }
