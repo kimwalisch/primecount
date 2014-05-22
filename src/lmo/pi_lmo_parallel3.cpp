@@ -231,6 +231,20 @@ int64_t S2(int64_t x,
     low += segments_per_thread * threads * segment_size;
     seconds = omp_get_wtime() - seconds;
 
+    // Dynamically increase segment_size or segments_per_thread
+    // if the running time is less than a certain threshold.
+    // We start off with a small segment size and few segments
+    // per thread as most special leaves are in the first segments
+    // whereas later on there are very few special leaves.
+    //
+    if (low > sqrt_limit && seconds < 10)
+    {
+      if (segment_size < sqrt_limit)
+        segment_size <<= 1;
+      else
+        segments_per_thread *= 2;
+    }
+
     // Once all threads have finished reconstruct and add the 
     // missing contribution of all special leaves. This must
     // be done in order as each thread (i) requires the sum of
@@ -243,20 +257,6 @@ int64_t S2(int64_t x,
         S2_total += phi_total[j] * mu_sum[i][j];
         phi_total[j] += phi[i][j];
       }
-    }
-
-    // Dynamically increase segment_size or segments_per_thread
-    // if the running time is less than a certain threshold.
-    // We start off with a small segment size and few segments
-    // per thread as most special leaves are in the first segments
-    // whereas later on there are very few special leaves.
-    //
-    if (low > sqrt_limit && seconds < 10)
-    {
-      if (segment_size < sqrt_limit)
-        segment_size = next_power_of_2(segment_size * 2);
-      else
-        segments_per_thread *= 2;
     }
   }
 
