@@ -69,7 +69,6 @@ int64_t S2_thread(int64_t x,
                   int64_t segment_size,
                   int64_t segments_per_thread,
                   int64_t thread_num,
-                  int64_t low,
                   int64_t limit,
                   vector<int32_t>& pi,
                   vector<int32_t>& primes,
@@ -78,7 +77,7 @@ int64_t S2_thread(int64_t x,
                   vector<int64_t>& mu_sum,
                   vector<int64_t>& phi)
 {
-  low += segment_size * segments_per_thread * thread_num;
+  int64_t low = 1 + segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t S2_thread = 0;
@@ -210,7 +209,7 @@ int64_t S2(int64_t x,
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
     S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
-        i, /* low */ 1, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
+        i, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
 
   // Once all threads have finished reconstruct and add the
   // missing contribution of all special leaves. This must
