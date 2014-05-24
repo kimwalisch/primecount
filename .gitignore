@@ -13,6 +13,7 @@
 Makefile
 Makefile.in
 autoconf.h*
+confdefs.h
 /aclocal.m4
 /ar-lib
 /autom4te.cache/
@@ -23,7 +24,8 @@ autoconf.h*
 /install-sh
 /libtool
 /ltmain.sh
-/m4/
+/m4/*
+!m4-ax_cxx_compile_stdcxx_11.m4
 /missing
 stamp-*
 /test-driver
