@@ -68,7 +68,7 @@ int64_t S2_thread(int64_t x,
                   int64_t pi_y,
                   int64_t c,
                   int64_t limit,
-                  int64_t low_process,
+                  int64_t low,
                   int64_t segments,
                   int64_t segment_size,
                   int64_t segments_per_thread,
@@ -80,10 +80,9 @@ int64_t S2_thread(int64_t x,
                   vector<int64_t>& mu_sum,
                   vector<int64_t>& phi)
 {
-  int64_t start_idx = segments_per_thread * thread_num;
-  int64_t stop_idx = min(segments_per_thread * (thread_num + 1), segments);
-  int64_t low_thread = low_process + segment_size * start_idx;
-  int64_t size = pi[min(isqrt(x / low_thread), y)] + 1;
+  low += segment_size * segments_per_thread * thread_num;
+  limit = min(low + segment_size * segments_per_thread, limit);
+  int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t S2_thread = 0;
 
   vector<char> sieve(segment_size);
@@ -98,23 +97,25 @@ int64_t S2_thread(int64_t x,
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
-    int64_t next_multiple = ((low_thread + prime - 1) / prime) * prime;
+    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
     next.push_back(next_multiple);
   }
 
   // Process the segments corresponding to the current thread
-  for (int64_t j = start_idx; j < stop_idx; j++)
+  for (; low < limit; low += segment_size)
   {
     fill(sieve.begin(), sieve.end(), 1);
 
     // Current segment = interval [low, high[
-    int64_t low = low_process + segment_size * j;
     int64_t high = min(low + segment_size, limit);
     int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
 
     for (; b <= c; b++)
     {
+      if (b >= size)
+        goto next_iteration;
+
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
         sieve[k - low] = 0;
@@ -129,6 +130,9 @@ int64_t S2_thread(int64_t x,
     // Such that: low <= x / n < high
     for (; b < pi_sqrty; b++)
     {
+      if (b >= size)
+        goto next_iteration;
+
       int64_t prime = primes[b];
       int64_t m_min = max(x / (prime * high), y / prime);
       int64_t m_max = min(x / (prime * low), y);
@@ -157,11 +161,11 @@ int64_t S2_thread(int64_t x,
     // Such that: low <= x / n < high
     for (; b < pi_y; b++)
     {
+      if (b >= size)
+        goto next_iteration;
+
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
-      if (prime >= primes[l])
-        break;
-
       special_leaf_threshold = max(prime * prime, special_leaf_threshold);
 
       for (; prime * primes[l] > special_leaf_threshold; l--)
@@ -176,6 +180,8 @@ int64_t S2_thread(int64_t x,
       phi[b] += cnt_query(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
+
+    next_iteration:;
   }
 
   return S2_thread;
