@@ -34,6 +34,8 @@ before_script:
   - ./autogen.sh
 
 script:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
   - ./configure CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic -O2"
   - make
   - sudo make install
