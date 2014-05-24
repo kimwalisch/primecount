@@ -17,8 +17,8 @@ before_install:
 install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
-  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.3; fi
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.3"; fi
   - rm -rf primesieve-master*
   - curl -L -o primesieve-master.zip https://github.com/kimwalisch/primesieve/archive/master.zip
   - unzip primesieve-master.zip
