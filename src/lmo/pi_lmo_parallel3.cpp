@@ -64,15 +64,14 @@ void cross_off(int64_t prime,
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
+                  int64_t c,
                   int64_t pi_sqrty,
                   int64_t pi_y,
-                  int64_t c,
-                  int64_t limit,
-                  int64_t low,
-                  int64_t segments,
                   int64_t segment_size,
                   int64_t segments_per_thread,
                   int64_t thread_num,
+                  int64_t low,
+                  int64_t limit,
                   vector<int32_t>& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
@@ -136,9 +135,6 @@ int64_t S2_thread(int64_t x,
       int64_t prime = primes[b];
       int64_t m_min = max(x / (prime * high), y / prime);
       int64_t m_max = min(x / (prime * low), y);
-
-      if (prime >= m_max)
-        break;
 
       for (int64_t m = m_max; m > m_min; m--)
       {
@@ -230,10 +226,8 @@ int64_t S2(int64_t x,
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
-    {
-      S2_total += S2_thread(x, y, pi_sqrty, pi_y, c, limit, low, segments,
-          segment_size, segments_per_thread, i, pi, primes, lpf, mu, mu_sum[i], phi[i]);
-    }
+      S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
+          i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
 
     low += segments_per_thread * threads * segment_size;
     seconds = omp_get_wtime() - seconds;
