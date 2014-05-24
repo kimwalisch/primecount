@@ -33,7 +33,8 @@ libprimecount_la_SOURCES = \
 	src/Li.cpp \
 	src/nth_prime.cpp \
 	src/PhiCache.cpp \
-	src/Pk.cpp \
+	src/P2.cpp \
+	src/P3.cpp \
 	src/pi_primesieve.cpp \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
@@ -53,12 +54,12 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel3.cpp \
 	src/lmo/S1.cpp \
 	src/lmo/tos_counters.hpp \
-	include/get_omp_threads.hpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
-	include/pi_bsearch.hpp
+	include/pi_bsearch.hpp \
+	include/validate_threads.hpp
 
 primecount_SOURCES = \
 	src/primecount.cpp \

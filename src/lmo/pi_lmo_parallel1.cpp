@@ -16,6 +16,7 @@
 #include <primesieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <validate_threads.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -23,12 +24,9 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include <get_omp_threads.hpp>
 #endif
 
 using namespace std;
-
-#ifdef _OPENMP
 
 namespace {
 
@@ -166,6 +164,8 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
+  threads = validate_threads(threads);
+
   int64_t S2_total = 0;
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
@@ -201,8 +201,6 @@ int64_t S2(int64_t x,
 
 } // namespace
 
-#endif /* _OPENMP */
-
 namespace primecount {
 
 /// Calculate the number of primes below x using the
@@ -211,8 +209,6 @@ namespace primecount {
 ///
 int64_t pi_lmo_parallel1(int64_t x, int threads)
 {
-#ifdef _OPENMP
-
   if (x < 2)
     return 0;
 
@@ -229,30 +225,14 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(PhiTiny::MAX_A, pi_y);
-  int64_t s1, s2, p2;
 
-  threads = get_omp_threads(threads);
-  omp_set_nested(true);
-
-  #pragma omp parallel sections num_threads(threads)
-  {
-    #pragma omp section
-    s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads - 1);
-    #pragma omp section
-    {
-      s1 = S1(x, y, c, primes, lpf , mu);
-      p2 = P2(x, y);
-    }
-  }
-  omp_set_nested(false);
-
+  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads);
+  int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
   return sum;
-#else
-  return pi_lmo4(x);
-#endif
 }
 
 } // namespace primecount

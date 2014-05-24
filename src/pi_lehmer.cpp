@@ -23,13 +23,13 @@ int64_t pi_lehmer(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t x14 = iroot<4>(x);
-  int64_t a = pi_meissel(x14, /* threads = */ 1);
-  int64_t sum = 0;
+  int64_t y = iroot<4>(x);
+  int64_t a = pi_meissel(y, /* threads = */ 1);
+  int64_t phi_xa = phi(x, a, threads);
+  int64_t p2 = P2_lehmer(x, a, threads);
+  int64_t p3 = P3(x, a, threads);
 
-  sum += phi(x, a, threads) + a - 1;
-  sum -= P2 (x, a, threads);
-  sum -= P3 (x, a, threads);
+  int64_t sum = phi_xa + a - 1 - p2 - p3;
 
   return sum;
 }
@@ -42,13 +42,13 @@ int64_t pi_lehmer2(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t x14 = iroot<4>(x);
-  int64_t a = pi_meissel(x14, /* threads = */ 1);
-  int64_t sum = 0;
+  int64_t y = iroot<4>(x);
+  int64_t a = pi_meissel(y, /* threads = */ 1);
+  int64_t phi_xa = phi(x, a, threads);
+  int64_t p2 = P2(x, y, threads);
+  int64_t p3 = P3(x, a, threads);
 
-  sum += phi(x, a, threads) + a - 1;
-  sum -= P2 (x, x14);
-  sum -= P3 (x, a, threads);
+  int64_t sum = phi_xa + a - 1 - p2 - p3;
 
   return sum;
 }

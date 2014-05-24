@@ -22,11 +22,6 @@
 #include <algorithm>
 #include <vector>
 
-#ifdef _OPENMP
-  #include <omp.h>
-  #include <get_omp_threads.hpp>
-#endif
-
 using namespace std;
 
 namespace {
@@ -170,8 +165,7 @@ int64_t pi_lmo4(int64_t x)
 
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);
-  int64_t p2 = P2(x, y);
-
+  int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
