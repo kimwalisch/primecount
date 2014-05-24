@@ -16,7 +16,7 @@
 #include <primesieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <validate_threads.hpp>
+#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>

@@ -14,6 +14,7 @@
 #include <primesieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -21,7 +22,6 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include <validate_threads.hpp>
 #endif
 
 using namespace std;

@@ -59,7 +59,7 @@ libprimecount_la_SOURCES = \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/pi_bsearch.hpp \
-	include/validate_threads.hpp
+	include/utils.hpp
 
 primecount_SOURCES = \
 	src/primecount.cpp \

@@ -18,7 +18,7 @@
 #include <pmath.hpp>
 #include <pi_bsearch.hpp>
 #include <PhiTiny.hpp>
-#include <validate_threads.hpp>
+#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -216,10 +216,10 @@ int64_t S2(int64_t x,
 
   while (low < limit)
   {
-    double seconds = omp_get_wtime();
     int64_t segments = (limit - low + segment_size - 1) / segment_size;
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
+    double seconds = get_wtime();
 
     vector<vector<int64_t> > phi(threads);
     vector<vector<int64_t> > mu_sum(threads);
@@ -229,8 +229,8 @@ int64_t S2(int64_t x,
       S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
           i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
 
+    seconds = get_wtime() - seconds;
     low += segments_per_thread * threads * segment_size;
-    seconds = omp_get_wtime() - seconds;
 
     // Dynamically increase segment_size or segments_per_thread
     // if the running time is less than a certain threshold.

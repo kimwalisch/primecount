@@ -14,6 +14,7 @@
 #include <pmath.hpp>
 #include <PhiCache.hpp>
 #include <PhiTiny.hpp>
+#include <utils.hpp>
 
 #include <algorithm>
 #include <stdint.h>
@@ -22,7 +23,6 @@
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include <validate_threads.hpp>
 #endif
 
 using namespace std;

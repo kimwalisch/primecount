@@ -12,13 +12,13 @@
 #include <primesieve.hpp>
 #include <pi_bsearch.hpp>
 #include <pmath.hpp>
+#include <utils.hpp>
 
 #include <stdint.h>
 #include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
-  #include <validate_threads.hpp>
 #endif
 
 namespace primecount {

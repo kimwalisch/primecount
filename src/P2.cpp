@@ -12,7 +12,7 @@
 #include <primesieve.hpp>
 #include <pi_bsearch.hpp>
 #include <pmath.hpp>
-#include <validate_threads.hpp>
+#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -144,18 +144,18 @@ int64_t P2(int64_t x, int64_t y, int threads)
 
   while (low < limit)
   {
-    double seconds = omp_get_wtime();
     int64_t segments = (limit - low + segment_size - 1) / segment_size;
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
+    double seconds = get_wtime();
 
     #pragma omp parallel for num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
       sum += P2_thread(x, y, segment_size, segments_per_thread, i, low, limit, 
           pix[i], pix_counts[i], primes);
 
+    seconds = get_wtime() - seconds;
     low += segments_per_thread * threads * segment_size;
-    seconds = omp_get_wtime() - seconds;
 
     // Adjust thread load balancing
     if (seconds < 10)
