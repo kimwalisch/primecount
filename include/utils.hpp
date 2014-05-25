@@ -12,7 +12,7 @@
 
 #include <primecount.hpp>
 #include <algorithm>
-#include <chrono>
+#include <ctime>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -24,9 +24,7 @@ inline double get_wtime()
 #ifdef _OPENMP
   return omp_get_wtime();
 #else
-  auto now = std::chrono::system_clock::now();
-  auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
-  return microseconds / 1e6;
+  return static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
 #endif
 }
 
