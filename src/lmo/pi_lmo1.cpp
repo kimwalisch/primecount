@@ -62,7 +62,7 @@ int64_t pi_lmo1(int64_t x)
         S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, &cache);
 
   int64_t phi = S1 + S2;
-  int64_t sum = phi + pi_y - 1 - P2(x, y);
+  int64_t sum = phi + pi_y - 1 - P2(x, y, 1);
 
   return sum;
 }
