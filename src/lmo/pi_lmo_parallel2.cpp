@@ -106,11 +106,8 @@ int64_t S2_thread(int64_t x,
     int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
 
-    for (; b <= c; b++)
+    for (; b <= min(c, size - 1); b++)
     {
-      if (b >= size)
-        goto next_iteration;
-
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
         sieve[k - low] = 0;
@@ -122,15 +119,15 @@ int64_t S2_thread(int64_t x,
 
     // For c + 1 <= b < pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
-    // Such that: low <= x / n < high
-    for (; b < pi_sqrty; b++)
+    // which satisfy: low <= (x / n) < high
+    for (; b < min(pi_sqrty, size); b++)
     {
-      if (b >= size)
-        goto next_iteration;
-
       int64_t prime = primes[b];
       int64_t m_min = max(x / (prime * high), y / prime);
       int64_t m_max = min(x / (prime * low), y);
+
+      if (prime >= m_max)
+        goto next_segment;
 
       for (int64_t m = m_max; m > m_min; m--)
       {
@@ -150,14 +147,14 @@ int64_t S2_thread(int64_t x,
 
     // For pi_sqrty <= b < pi_y
     // Find all special leaves: n = primes[b] * prime2
-    // Such that: low <= x / n < high
-    for (; b < pi_y; b++)
+    // which satisfy: low <= (x / n) < high
+    for (; b < min(pi_y, size); b++)
     {
-      if (b >= size)
-        goto next_iteration;
-
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
+      if (prime >= primes[l])
+        goto next_segment;
+
       special_leaf_threshold = max(prime * prime, special_leaf_threshold);
 
       for (; prime * primes[l] > special_leaf_threshold; l--)
@@ -173,7 +170,7 @@ int64_t S2_thread(int64_t x,
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
-    next_iteration:;
+    next_segment:;
   }
 
   return S2_thread;
