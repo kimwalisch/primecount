@@ -2,13 +2,14 @@
 
   Version 0.19 work in progress.
 
+  * C++11 compiler is now required.
   * src/lmo/pi_lmo_parallel1.cpp: Simple parallel LMO implementation.
   * src/lmo/pi_lmo_parallel2.cpp: Advanced parallel LMO implementation.
-  * src/lmo/pi_lmo_parallel3.cpp: Better load balancing.
-  * src/phi.cpp: Fix race condition.
-  * src/test.cpp: Add phi(x, a) thread safety test.
-  * src/PhiTiny.cpp: Make thread safe.
+  * src/lmo/pi_lmo_parallel3.cpp: Improved load balancing.
   * src/P2.cpp: New parallel P2(x, y) implementation.
+  * src/phi.cpp: Fix race condition.
+  * src/PhiTiny.cpp: Make thread safe.
+  * src/test.cpp: Add phi(x, a) thread safety test.
 
 2014-05-10  Kim Walisch  <kim.walisch@gmail.com>
 
