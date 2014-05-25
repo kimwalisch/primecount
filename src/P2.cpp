@@ -41,24 +41,26 @@ int64_t P2_thread(int64_t x,
   pix_count = 0;
   low += thread_num * segments_per_thread * segment_size;
   limit = min(low + segments_per_thread * segment_size, limit);
-  int64_t P2_thread = 0;
-  int64_t sqrtx = isqrt(x);
-  int64_t start = max(x / limit + 1, y);
-  int64_t stop = min(x / low, sqrtx);
   int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
-  if (stop < 2) stop = 2;
+  int64_t P2_thread = 0;
+  int64_t start = max(x / limit + 1, y);
+  int64_t stop = in_between(2, x / low, isqrt(x));
 
   vector<char> sieve(segment_size);
-  vector<int64_t> xi;
-  vector<int64_t> next(1);
+  vector<int64_t> pi_input;
+  vector<int64_t> next;
+  next.push_back(0);
   next.reserve(size);
 
-  primesieve::generate_primes(start, stop, &xi);
-  auto iter = xi.rbegin();
-  auto rend = xi.rend();
+  // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i])
+  primesieve::generate_primes(start, stop, &pi_input);
 
-  for (size_t i = 0; i < xi.size(); i++)
-    xi[i] = x / xi[i];
+  // reverse iterator
+  auto iter = pi_input.rbegin();
+  auto rend = pi_input.rend();
+
+  for (size_t i = 0; i < pi_input.size(); i++)
+    pi_input[i] = x / pi_input[i];
 
   // initialize next multiples
   for (int64_t b = 1; b < size; b++)
@@ -89,14 +91,13 @@ int64_t P2_thread(int64_t x,
       next[i] = k;
     }
 
-    // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i])
     for (; iter != rend && *iter < high; iter++)
     {
-      // xil = x / primes[i] - low
       for (int64_t xil = *iter - low; j <= xil; j += 2)
         pix += sieve[j];
-      pix_count++;
+      // P2_thread += pi(x / primes[i])
       P2_thread += pix;
+      pix_count++;
     }
 
     for (; j < high - low; j += 2)
