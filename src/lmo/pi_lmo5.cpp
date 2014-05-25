@@ -74,7 +74,7 @@ int64_t S2(int64_t x,
 
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> l_max(primes.size(), pi_y);
+  vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -103,7 +103,7 @@ int64_t S2(int64_t x,
 
     // For c + 1 <= b < pi_y
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
-    // Such that: low <= x / n < high
+    // which satisfy: low <= (x / n) < high
     for (; b < pi_sqrty; b++)
     {
       int64_t prime = primes[b];
@@ -111,7 +111,7 @@ int64_t S2(int64_t x,
       int64_t m_max = min(x / (prime * low), y);
 
       if (prime >= m_max)
-        break;
+        goto next_segment;
 
       for (int64_t m = m_max; m > m_min; m--)
       {
@@ -130,13 +130,13 @@ int64_t S2(int64_t x,
 
     // For pi_sqrty <= b < pi_y
     // Find all special leaves: n = primes[b] * prime2
-    // Such that: low <= x / n < high
+    // which satisfy: low <= (x / n) < high
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = l_max[b];
+      int64_t l = pi[min(x / (prime * low), y)];
       if (prime >= primes[l])
-        break;
+        goto next_segment;
 
       special_leaf_threshold = max(prime * prime, special_leaf_threshold);
 
@@ -148,10 +148,11 @@ int64_t S2(int64_t x,
         S2_result += phi_xn;
       }
 
-      l_max[b] = l;
       phi[b] += cnt_query(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
+
+    next_segment:;
   }
 
   return S2_result;
