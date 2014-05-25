@@ -3,7 +3,6 @@ language: cpp
 
 compiler:
   - gcc
-  - clang
 
 env:
   global:
@@ -11,13 +10,11 @@ env:
 
 before_install:
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [[ "$CXX" == "clang++" && ! -f clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04.tar.xz ]]; then curl -O http://llvm.org/releases/3.4.1/clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04.tar.xz; tar xvf clang*.tar.xz; fi
   - sudo apt-get update -qq
 
 install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
-  - if [ "$CXX" = "clang++" ]; then export CXX=$(pwd)/clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04/bin/clang++; export PATH=$(pwd)/clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04/bin:$PATH; fi
   - rm -rf primesieve-master*
   - curl -L -o primesieve-master.zip https://github.com/kimwalisch/primesieve/archive/master.zip
   - unzip primesieve-master.zip
