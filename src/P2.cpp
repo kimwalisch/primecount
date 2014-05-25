@@ -93,7 +93,7 @@ int64_t P2_thread(int64_t x,
 
     for (; iter != rend && *iter < high; iter++)
     {
-      for (int64_t xil = *iter - low; j <= xil; j += 2)
+      for (int64_t xi = *iter - low; j <= xi; j += 2)
         pix += sieve[j];
       // P2_thread += pi(x / primes[i])
       P2_thread += pix;
