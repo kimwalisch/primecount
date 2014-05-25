@@ -17,7 +17,7 @@ before_install:
 install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
-  - if [ "$CXX" = "clang++" ]; then export PATH=$(pwd)/clang*/bin:$PATH; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX=$(pwd)/clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04/bin/clang++; export PATH=$(pwd)/clang+llvm-3.4.1-x86_64-unknown-ubuntu12.04/bin:$PATH; fi
   - rm -rf primesieve-master*
   - curl -L -o primesieve-master.zip https://github.com/kimwalisch/primesieve/archive/master.zip
   - unzip primesieve-master.zip
