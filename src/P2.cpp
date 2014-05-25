@@ -52,7 +52,8 @@ int64_t P2_thread(int64_t x,
   next.push_back(0);
   next.reserve(size);
 
-  // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i])
+  // P2_thread = \sum pi(x / prime) - pi(low - 1)
+  // for each prime in [start , stop]
   primesieve::generate_primes(start, stop, &pi_input);
 
   // reverse iterator
@@ -95,9 +96,8 @@ int64_t P2_thread(int64_t x,
     {
       for (int64_t xi = *iter - low; j <= xi; j += 2)
         pix += sieve[j];
-      // P2_thread += pi(x / primes[i])
-      P2_thread += pix;
       pix_count++;
+      P2_thread += pix;
     }
 
     for (; j < high - low; j += 2)
