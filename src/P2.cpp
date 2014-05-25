@@ -129,19 +129,19 @@ int64_t P2(int64_t x, int64_t y, int threads)
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   // initialize with \sum_{i=a+1}^{b} -i + 1
   int64_t sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-  int64_t pix_total = 1;
   int64_t low = 3;
   int64_t limit = (y > 0) ? x / y : x;
+  int64_t pix_total = 1;
   int64_t sqrt_limit = isqrt(limit);
   int64_t min_segment_size = 64;
   int64_t segment_size = max(min_segment_size, sqrt_limit);
   int64_t segments_per_thread = 1;
 
+  vector<int64_t> pix(threads);
+  vector<int64_t> pix_counts(threads);
   vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(sqrt_limit, &primes);
-  vector<int64_t> pix_counts(threads);
-  vector<int64_t> pix(threads);
 
   while (low < limit)
   {
