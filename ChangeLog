@@ -1,6 +1,6 @@
-2014-05-25  Kim Walisch  <kim.walisch@gmail.com>
+2014-05-26  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.19 work in progress.
+  Version 0.19 released.
 
   * src/lmo/pi_lmo_parallel1.cpp: Simple parallel LMO implementation.
   * src/lmo/pi_lmo_parallel2.cpp: Advanced parallel LMO implementation.
