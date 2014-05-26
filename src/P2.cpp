@@ -26,6 +26,28 @@ using namespace std;
 
 namespace {
 
+/// @return previous_prime or -1 if old <= 2
+inline int64_t get_previous_prime(primesieve::iterator* iter, int64_t old)
+{
+  return (old > 2) ? iter->previous_prime() : -1;
+}
+
+/// For each prime calculate its first multiple >= low
+/// which is not a multiple of 2.
+void initialize_next_multiples(vector<int64_t>* next, vector<int32_t>& primes, int64_t size, int64_t low)
+{
+  next->reserve(size);
+  next->push_back(0);
+
+  for (int64_t b = 1; b < size; b++)
+  {
+    int64_t prime = primes[b];
+    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    next_multiple += prime * (~next_multiple & 1);
+    next->push_back(max(isquare(prime), next_multiple));
+  }
+}
+
 int64_t P2_thread(int64_t x,
                   int64_t y,
                   int64_t segment_size,
@@ -42,31 +64,21 @@ int64_t P2_thread(int64_t x,
   low += thread_num * segments_per_thread * segment_size;
   limit = min(low + segments_per_thread * segment_size, limit);
   int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
-  int64_t P2_thread = 0;
+  int64_t sqrtx = isqrt(x);
   int64_t start = max(x / limit + 1, y);
-  int64_t stop = in_between(2, x / low, isqrt(x));
+  int64_t stop = min(x / low, sqrtx);
+  int64_t P2_thread = 0;
 
   vector<char> sieve(segment_size);
   vector<int64_t> pi_input;
   vector<int64_t> next;
-  next.push_back(0);
-  next.reserve(size);
+  initialize_next_multiples(&next, primes, size, low);
 
-  // P2_thread = \sum pi(x / prime) - pi(low - 1)
-  // for each prime in [start , stop].
-  // In order to compute P2_thread we use a reverse prime iterator.
+  // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
+  // We use a reverse prime iterator to calculate P2_thread.
   primesieve::iterator iter(stop + 1, start);
-  int64_t previous_prime = iter.previous_prime();
+  int64_t previous_prime = get_previous_prime(&iter, stop + 1);
   int64_t xp = x / previous_prime;
-
-  // initialize next multiples
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
-    next_multiple = max(isquare(prime), next_multiple + (~next_multiple & 1) * prime);
-    next.push_back(next_multiple);
-  }
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -94,9 +106,7 @@ int64_t P2_thread(int64_t x,
         pix += sieve[j];
       pix_count++;
       P2_thread += pix;
-      if (previous_prime == 2)
-        break;
-      previous_prime = iter.previous_prime();
+      previous_prime = get_previous_prime(&iter, previous_prime);
       xp = x / previous_prime;
     }
 
@@ -129,19 +139,17 @@ int64_t P2(int64_t x, int64_t y, int threads)
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   // initialize with \sum_{i=a+1}^{b} -i + 1
   int64_t sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-  int64_t low = 3;
-  int64_t limit = (y > 0) ? x / y : x;
-  int64_t pix_total = 1;
-  int64_t sqrt_limit = isqrt(limit);
-  int64_t min_segment_size = 64;
-  int64_t segment_size = max(min_segment_size, sqrt_limit);
+  int64_t low = 2;
+  int64_t pix_total = 1; // We sieve using primes > 2
+  int64_t limit = x / max<int64_t>(1, y);
+  int64_t segment_size = max<int64_t>(64, isqrt(limit));
   int64_t segments_per_thread = 1;
 
   vector<int64_t> pix(threads);
   vector<int64_t> pix_counts(threads);
   vector<int32_t> primes;
   primes.push_back(0);
-  primesieve::generate_primes(sqrt_limit, &primes);
+  primesieve::generate_primes(isqrt(limit), &primes);
 
   while (low < limit)
   {
