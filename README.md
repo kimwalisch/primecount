@@ -153,9 +153,12 @@ approximate the nth prime using e.g. the inverse logarithmic integral
 and then count the primes up to this guess using the prime counting function.
 Once this is done one starts sieving (e.g. using the segmented sieve of
 Eratosthenes) from there on until one finds the actual nth prime. The author
-has implemented ```primecount::nth_prime(n)``` this way. In practice most time
-is spent by the prime counting function so the calculation of the nth prime is
-about as fast as counting the primes below the nth prime.
+has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
+prime in
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23x.svg" height="20" align="absmiddle"/>
+operations using
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+space.
 
 ### Precompiled binaries
 
