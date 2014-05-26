@@ -23,7 +23,7 @@ class PhiTiny {
 public:
   PhiTiny();
   int64_t phi(int64_t x, int64_t a) const;
-  static const int64_t MAX_A;
+  enum { MAX_A = 6 };
 private:
   std::vector<int16_t> phi_cache_[7];
   static const int32_t primes_[7];

@@ -26,8 +26,6 @@ int64_t phi_tiny(int64_t x, int64_t a)
   return phiTiny.phi(x, a);
 }
 
-const int64_t PhiTiny::MAX_A = 6;
-
 const int32_t PhiTiny::primes_[7] = { 0, 2, 3, 5, 7, 11, 13 };
 
 /// prime_products_[n] = \prod_{i=1}^{n} primes_[i]

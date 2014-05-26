@@ -38,7 +38,7 @@ int64_t pi_lmo1(int64_t x)
 
   int64_t y = iroot<3>(x); 
   int64_t pi_y = pi_lehmer(y);
-  int64_t c = min(PhiTiny::MAX_A, pi_y);
+  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
   int64_t S1 = 0;
   int64_t S2 = 0;
 

@@ -31,12 +31,7 @@ namespace {
 /// the special counters tree data structure.
 ///
 template <typename T1, typename T2>
-void cross_off(int64_t prime,
-               int64_t low,
-               int64_t high,
-               int64_t& next_multiple,
-               T1& sieve,
-               T2& counters)
+void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple, T1& sieve, T2& counters)
 {
   int64_t segment_size = sieve.size();
   int64_t k = next_multiple;
@@ -161,7 +156,7 @@ int64_t pi_lmo4(int64_t x)
   primes.push_back(0);
   primesieve::generate_primes(y, &primes);
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(PhiTiny::MAX_A, pi_y);
+  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
 
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);

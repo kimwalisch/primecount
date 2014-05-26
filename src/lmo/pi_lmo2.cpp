@@ -107,7 +107,7 @@ int64_t pi_lmo2(int64_t x)
   primes.push_back(0);
   primesieve::generate_primes(y, &primes);
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(PhiTiny::MAX_A, pi_y);
+  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
 
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);

@@ -30,13 +30,23 @@ using namespace std;
 
 namespace {
 
+/// For each prime calculate its first multiple >= low.
 template <typename T1, typename T2>
-void cross_off(int64_t prime,
-               int64_t low,
-               int64_t high,
-               int64_t& next_multiple,
-               T1& sieve,
-               T2& counters)
+void initialize_next_multiples(T1* next, T2& primes, int64_t size, int64_t low)
+{
+  next->reserve(size);
+  next->push_back(0);
+
+  for (int64_t b = 1; b < size; b++)
+  {
+    int64_t prime = primes[b];
+    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    next->push_back(next_multiple);
+  }
+}
+
+template <typename T1, typename T2>
+void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple, T1& sieve, T2& counters)
 {
   int64_t segment_size = sieve.size();
   int64_t k = next_multiple + prime * (~next_multiple & 1);
@@ -78,21 +88,15 @@ int64_t S2_thread(int64_t x,
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t S2_thread = 0;
 
+  if (c >= size - 1)
+    return 0;
+
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
-  next.reserve(size);
+  initialize_next_multiples(&next, primes, size, low);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
-  next.push_back(0);
-
-  // Initialize next multiples
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
-    next.push_back(next_multiple);
-  }
 
   // Process the segments corresponding to the current thread
   for (; low < limit; low += segment_size)
@@ -103,7 +107,7 @@ int64_t S2_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = 1;
 
-    for (; b <= min(c, size - 1); b++)
+    for (; b <= c; b++)
     {
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
@@ -219,7 +223,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   primesieve::generate_primes(y, &primes);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(PhiTiny::MAX_A, pi_y);
+  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
 
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads);
