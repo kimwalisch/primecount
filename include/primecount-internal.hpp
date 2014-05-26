@@ -20,8 +20,9 @@ namespace primecount {
 class PhiCache;
 
 /// Calculate the number of primes below x using Lehmer's formula.
-/// This version is for testing only, it uses a different P2(x, a)
-/// implementation than pi_lehmer(x).
+/// This version uses a different P2(x, y) implementation,
+/// it runs slower than pi_lehmer(x) on most systems.
+/// Run time: O(x/(log x)^4) operations, O(x^(1/2) / log x) space.
 ///
 int64_t pi_lehmer2(int64_t x, int threads = MAX_THREADS);
 

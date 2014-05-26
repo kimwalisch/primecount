@@ -51,6 +51,7 @@ void initOptionMap()
   optionMap["--legendre"]      = OPTION_LEGENDRE;
   optionMap["-l"]              = OPTION_LEHMER;
   optionMap["--lehmer"]        = OPTION_LEHMER;
+  optionMap["--lehmer2"]       = OPTION_LEHMER2;
   optionMap["--lmo"]           = OPTION_LMO;
   optionMap["--lmo1"]          = OPTION_LMO1;
   optionMap["--lmo2"]          = OPTION_LMO2;

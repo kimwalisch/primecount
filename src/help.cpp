@@ -26,6 +26,7 @@ const string helpMenu(
   "         --legendre       Count primes using Legendre's formula\n"
   "  -m,    --meissel        Count primes using Meissel's formula\n"
   "  -l,    --lehmer         Count primes using Lehmer's formula\n"
+  "         --lehmer2        Uses different P2(x, a) implementation\n"
   "         --lmo            Count primes using Lagarias-Miller-Odlyzko\n"
   "         --lmo1           Uses recursive formula (very simple)\n"
   "         --lmo2           Uses sieve of Eratosthenes\n"
