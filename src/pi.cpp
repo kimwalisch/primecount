@@ -13,9 +13,9 @@
 namespace primecount {
 
 /// Alias for fastest pi(x) implementation
-int64_t pi(int64_t x, int threads /* = MAX_THREADS */)
+int64_t pi(int64_t x, int threads)
 {
-  return pi_lmo(x, threads);
+  return pi_deleglise_rivat(x, threads);
 }
 
 } // namespace primecount

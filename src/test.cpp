@@ -106,19 +106,21 @@ bool test()
 #ifdef _OPENMP
     test_phi_thread_safety(100);
 #endif
-    ASSERT_EQUAL(pi_legendre,      pi_primesieve, 100);
-    ASSERT_EQUAL(pi_meissel,       pi_legendre,   400);
-    ASSERT_EQUAL(pi_lehmer,        pi_meissel,    400);
-    ASSERT_EQUAL(pi_lehmer2,       pi_lehmer,     200);
-    ASSERT_EQUAL(pi_lmo1,          pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo2,          pi_meissel,    200);
-    ASSERT_EQUAL(pi_lmo3,          pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo4,          pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo5,          pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo_parallel1, pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo_parallel2, pi_meissel,    400);
-    ASSERT_EQUAL(pi_lmo_parallel3, pi_meissel,    400);
-    ASSERT_EQUAL(nth_prime,        primesieve::parallel_nth_prime, 100);
+    ASSERT_EQUAL(pi_legendre,                  pi_primesieve, 100);
+    ASSERT_EQUAL(pi_meissel,                   pi_legendre,   400);
+    ASSERT_EQUAL(pi_lehmer,                    pi_meissel,    400);
+    ASSERT_EQUAL(pi_lehmer2,                   pi_lehmer,     200);
+    ASSERT_EQUAL(pi_lmo1,                      pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo2,                      pi_meissel,    200);
+    ASSERT_EQUAL(pi_lmo3,                      pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo4,                      pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo5,                      pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo_parallel1,             pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo_parallel2,             pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo_parallel3,             pi_meissel,    400);
+    ASSERT_EQUAL(pi_deleglise_rivat1,          pi_meissel,    400);
+    ASSERT_EQUAL(pi_deleglise_rivat_parallel1, pi_meissel,    400);
+    ASSERT_EQUAL(nth_prime,                    primesieve::parallel_nth_prime, 100);
   }
   catch (runtime_error& e)
   {
