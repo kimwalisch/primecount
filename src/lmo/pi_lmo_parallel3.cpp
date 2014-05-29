@@ -11,13 +11,12 @@
 /// file in the top level directory.
 ///
 
-#include "tos_counters.hpp"
-
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <pmath.hpp>
 #include <pi_bsearch.hpp>
 #include <PhiTiny.hpp>
+#include <tos_counters.hpp>
 #include <utils.hpp>
 
 #include <stdint.h>
@@ -109,7 +108,6 @@ int64_t S2_thread(int64_t x,
 
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
 
     for (; b <= c; b++)
@@ -129,13 +127,13 @@ int64_t S2_thread(int64_t x,
     for (; b < min(pi_sqrty, size); b++)
     {
       int64_t prime = primes[b];
-      int64_t m_min = max(x / (prime * high), y / prime);
-      int64_t m_max = min(x / (prime * low), y);
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
 
-      if (prime >= m_max)
+      if (prime >= max_m)
         goto next_segment;
 
-      for (int64_t m = m_max; m > m_min; m--)
+      for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
@@ -158,12 +156,13 @@ int64_t S2_thread(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
+      int64_t min_m = min(y, max(x / (prime * high), y / prime));
+      int64_t min_l = pi[max(min_m, prime)];
+
       if (prime >= primes[l])
         goto next_segment;
 
-      special_leaf_threshold = max(prime * prime, special_leaf_threshold);
-
-      for (; prime * primes[l] > special_leaf_threshold; l--)
+      for (; l > min_l; l--)
       {
         int64_t n = prime * primes[l];
         int64_t count = cnt_query(counters, (x / n) - low);
@@ -291,7 +290,6 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
-
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads);
   int64_t p2 = P2(x, y, threads);

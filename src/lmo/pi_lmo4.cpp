@@ -11,12 +11,11 @@
 /// file in the top level directory.
 ///
 
-#include "tos_counters.hpp"
-
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <tos_counters.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -54,18 +53,18 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t pi_y,
            int64_t c,
-           std::vector<int32_t>& primes,
-           std::vector<int32_t>& lpf,
-           std::vector<int32_t>& mu)
+           vector<int32_t>& primes,
+           vector<int32_t>& lpf,
+           vector<int32_t>& mu)
 {
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t S2_result = 0;
 
-  std::vector<char> sieve(segment_size);
-  std::vector<int32_t> counters(segment_size);
-  std::vector<int64_t> next(primes.begin(), primes.end());
-  std::vector<int64_t> phi(primes.size(), 0);
+  vector<char> sieve(segment_size);
+  vector<int32_t> counters(segment_size);
+  vector<int64_t> next(primes.begin(), primes.end());
+  vector<int64_t> phi(primes.size(), 0);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -91,16 +90,16 @@ int64_t S2(int64_t x,
     for (int64_t b = c + 1; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t m_min = max(x / (prime * high), y / prime);
-      int64_t m_max = min(x / (prime * low), y);
+      int64_t min_m = max(x / (prime * high), y / prime);
+      int64_t max_m = min(x / (prime * low), y);
 
-      // Obviously if (prime >= m_max) then (prime >= lpf[m_max])
+      // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
       // if so then (prime < lpf[m]) will always evaluate to
       // false and no special leaves are possible
-      if (prime >= m_max)
+      if (prime >= max_m)
         break;
 
-      for (int64_t m = m_max; m > m_min; m--)
+      for (int64_t m = max_m; m > min_m; m--)
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
@@ -150,14 +149,14 @@ int64_t pi_lmo4(int64_t x)
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
 
-  std::vector<int32_t> mu = make_moebius(y);
-  std::vector<int32_t> lpf = make_least_prime_factor(y);
-  std::vector<int32_t> primes;
+  vector<int32_t> mu = make_moebius(y);
+  vector<int32_t> lpf = make_least_prime_factor(y);
+  vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(y, &primes);
+
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
-
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);
   int64_t p2 = P2(x, y, 1);
