@@ -90,7 +90,6 @@ int64_t S2(int64_t x,
 
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t special_leaf_threshold = max(x / high, y);
     int64_t b = 1;
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
