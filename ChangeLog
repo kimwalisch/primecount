@@ -1,3 +1,10 @@
+2014-05-29  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.20 work in progress.
+
+  * src/deleglise-rivat: New Deleglise & Rivat algorithm.
+  * src/lmo: Refactoring
+
 2014-05-26  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.19 released.
