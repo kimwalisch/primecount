@@ -26,7 +26,9 @@ LIB_OBJECTS = \
 	src\test.obj \
 	src\deleglise-rivat\pi_deleglise_rivat.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
+	src\deleglise-rivat\pi_deleglise_rivat2.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel1.obj \
+	src\deleglise-rivat\pi_deleglise_rivat_parallel2.obj \
 	src\lmo\pi_lmo.obj \
 	src\lmo\pi_lmo1.obj \
 	src\lmo\pi_lmo2.obj \

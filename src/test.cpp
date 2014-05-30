@@ -48,8 +48,8 @@ void assert_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
 { \
   cout << "Testing " << #f1 "(x)" << flush; \
  \
-  /* test for 0 <= x < 1000 */ \
-  for (int64_t x = 0; x < 1000; x++) \
+  /* test for 0 <= x < 10000 */ \
+  for (int64_t x = 0; x < 10000; x++) \
     assert_equal(#f1, x, f1 (x), f2 (x)); \
  \
   int64_t x = 0; \
@@ -119,7 +119,9 @@ bool test()
     ASSERT_EQUAL(pi_lmo_parallel2,             pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel3,             pi_meissel,    400);
     ASSERT_EQUAL(pi_deleglise_rivat1,          pi_meissel,    400);
+    ASSERT_EQUAL(pi_deleglise_rivat2,          pi_meissel,    400);
     ASSERT_EQUAL(pi_deleglise_rivat_parallel1, pi_meissel,    400);
+    ASSERT_EQUAL(pi_deleglise_rivat_parallel2, pi_meissel,    400);
     ASSERT_EQUAL(nth_prime,                    primesieve::parallel_nth_prime, 100);
   }
   catch (runtime_error& e)

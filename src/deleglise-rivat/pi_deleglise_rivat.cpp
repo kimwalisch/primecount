@@ -19,7 +19,7 @@ namespace primecount {
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
-  return pi_deleglise_rivat_parallel1(x, threads);
+  return pi_deleglise_rivat_parallel2(x, threads);
 }
 
 } // namespace primecount

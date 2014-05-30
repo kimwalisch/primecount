@@ -29,7 +29,9 @@ int main (int argc, char* argv[])
     {
       case OPTION_DELEGLISE_RIVAT:           res = pi_deleglise_rivat          (pco.x, pco.threads); break;
       case OPTION_DELEGLISE_RIVAT1:          res = pi_deleglise_rivat1         (pco.x); break;
+      case OPTION_DELEGLISE_RIVAT2:          res = pi_deleglise_rivat2         (pco.x); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1: res = pi_deleglise_rivat_parallel1(pco.x, pco.threads); break;
+      case OPTION_DELEGLISE_RIVAT_PARALLEL2: res = pi_deleglise_rivat_parallel2(pco.x, pco.threads); break;
       case OPTION_LEGENDRE:                  res = pi_legendre                 (pco.x, pco.threads); break;
       case OPTION_LEHMER:                    res = pi_lehmer                   (pco.x, pco.threads); break;
       case OPTION_LEHMER2:                   res = pi_lehmer2                  (pco.x, pco.threads); break;
