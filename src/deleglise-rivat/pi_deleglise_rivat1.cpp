@@ -79,8 +79,8 @@ int64_t S2(int64_t x,
   for (size_t i = 1; i < primes.size(); i++)
   {
     int64_t prime = primes[i];
-    min_trivial_leaves[i] = pi[min(y, max(x / (prime * prime), prime))];
-    min_easy_leaves[i] = pi[min(y, max(z / prime, prime))];
+    min_trivial_leaves[i] = pi[min(y, x / (prime * prime))];
+    min_easy_leaves[i] = pi[min(y, z / prime)];
   }
 
   // Segmented sieve of Eratosthenes
@@ -139,13 +139,14 @@ int64_t S2(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
+
+      if (prime >= primes[l])
+        goto next_segment;
+
       int64_t min_m = min(y, max(x / (prime * high), y / prime));
       int64_t min_hard_leaf = pi[max(min_m, prime)];
       int64_t min_trivial_leaf = max<int64_t>(min_hard_leaf, min_trivial_leaves[b]);
       int64_t min_easy_leaf = max<int64_t>(min_hard_leaf, min_easy_leaves[b]);
-
-      if (prime >= primes[l])
-        goto next_segment;
 
       // For max(x / primes[b]^2, primes[b]) < primes[l] <= y
       // Find all trivial leaves which satisfy:
@@ -156,10 +157,9 @@ int64_t S2(int64_t x,
         l = min_trivial_leaf;
       }
 
-      // For max(z / primes[b], primes[b]) < primes[l] <= max(x / primes[b]^2, y)
+      // For max(z / primes[b], primes[b]) < primes[l] <= x / primes[b]^2
       // Find all easy leaves: n = primes[b] * primes[l]
-      // which satisfy x / n <= y such that:
-      // phi(x / n, b - 1) = pi[x / n] - b + 2
+      // x / n <= y such that phi(x / n, b - 1) = pi[x / n] - b + 2
       for (; l > min_easy_leaf; l--)
       {
         int64_t n = prime * primes[l];
@@ -167,9 +167,9 @@ int64_t S2(int64_t x,
         S2_result += pi[xn] - b + 2;
       }
 
-      // For max(x / (prime * high), prime) < primes[l] <= max(z / primes[b], primes[b])
-      // Find all hard leaves: n = primes[b] * primes[l]
-      // which satisfy: low <= (x / n) < high
+      // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
+      // Find all hard leaves which satisfy:
+      // low <= (x / n) < high
       for (; l > min_hard_leaf; l--)
       {
         int64_t n = prime * primes[l];
