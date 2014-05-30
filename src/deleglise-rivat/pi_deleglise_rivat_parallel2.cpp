@@ -340,7 +340,7 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
     return 0;
 
   double beta = 3.0;
-  double alpha = max(1.0, log(log((double) x)) * beta);
+  double alpha = in_between(1, log(log((double) x)) * beta, iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
   int64_t z = x / (int64_t) (x13 * sqrt(alpha));

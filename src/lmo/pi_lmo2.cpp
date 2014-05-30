@@ -97,7 +97,7 @@ int64_t pi_lmo2(int64_t x)
   // J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-
   // Lehmer method, Mathematics of Computation, 44 (1985), p. 556.
   double beta = 1.0;
-  double alpha = max(1.0, log(log((double) x)) * beta);
+  double alpha = in_between(1, log(log((double) x)) * beta, iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
 
