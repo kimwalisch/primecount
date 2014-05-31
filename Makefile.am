@@ -58,6 +58,7 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel1.cpp \
 	src/lmo/pi_lmo_parallel2.cpp \
 	src/lmo/pi_lmo_parallel3.cpp \
+	src/lmo/pi_lmo_parallel4.cpp \
 	src/lmo/S1.cpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \

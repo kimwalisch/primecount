@@ -119,6 +119,7 @@ bool test()
     ASSERT_EQUAL(pi_lmo_parallel1,             pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel2,             pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel3,             pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo_parallel4,             pi_meissel,    400);
     ASSERT_EQUAL(pi_deleglise_rivat1,          pi_meissel,    400);
     ASSERT_EQUAL(pi_deleglise_rivat2,          pi_meissel,    400);
     ASSERT_EQUAL(pi_deleglise_rivat_parallel1, pi_meissel,    400);
