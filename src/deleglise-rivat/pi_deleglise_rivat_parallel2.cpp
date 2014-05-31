@@ -167,8 +167,9 @@ int64_t S2_thread(int64_t x,
       if (prime >= primes[l])
         goto next_segment;
 
-      int64_t min_m = min(y, max(x / (prime * high), y / prime));
-      int64_t min_hard_leaf = pi[max(min_m, prime)];
+      int64_t min_m = max(x / (prime * high), y / prime);
+      min_m = in_between(prime, min_m, y);
+      int64_t min_hard_leaf = pi[min_m];
       int64_t min_trivial_leaf = max<int64_t>(min_hard_leaf, min_trivial_leaves[b]);
       int64_t min_clustered_easy_leaf = max<int64_t>(min_hard_leaf, min_clustered_easy_leaves[b]);
       int64_t min_sparse_easy_leaf = max<int64_t>(min_hard_leaf, min_sparse_easy_leaves[b]);
