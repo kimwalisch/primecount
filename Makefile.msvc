@@ -35,6 +35,7 @@ LIB_OBJECTS = \
 	src\lmo\pi_lmo3.obj \
 	src\lmo\pi_lmo4.obj \
 	src\lmo\pi_lmo5.obj \
+	src\lmo\pi_lmo6.obj \
 	src\lmo\pi_lmo_parallel1.obj \
 	src\lmo\pi_lmo_parallel2.obj \
 	src\lmo\pi_lmo_parallel3.obj \

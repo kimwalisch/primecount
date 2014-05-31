@@ -1,11 +1,19 @@
 ///
-/// @file  pi_lmo5.cpp
+/// @file  pi_lmo6.cpp
 /// @brief Implementation of the Lagarias-Miller-Odlyzko prime counting
 ///        algorithm. This version uses the modified algorithm as
 ///        described in section 5 (pages 556-557) in the paper
 ///        "Computing pi(x) The Meissel-Lehmer Method", Mathematics of
 ///        Computation, 44 (1985), by J. C. Lagarias, V. S. Miller and
 ///        A. M. Odlyzko.
+///
+///        In this version the special leaves for c + 1 <= b < pi_sqrty
+///        have been split up into 2 categories:
+///           1) The special leaves that are a product of 2 primes.
+///           2) The special leaves that are a product of a prime and a
+///              square free integer (which must not be prime).
+///        Although this split up can give up to 15 percent speed
+///        improvement it uses considerably more memory.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -63,14 +71,23 @@ int64_t S2(int64_t x,
 {
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
+  int64_t sqrty = isqrt(y);
+  int64_t pi_sqrty = pi_bsearch(primes, sqrty);
   int64_t S2_result = 0;
 
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
+  vector<int32_t> kim(pi_sqrty, 0);
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
+
+  vector<vector<int32_t> > square_free_candidates = 
+      generate_square_free_candidates(c, y, lpf, mu, pi, primes);
+
+  vector<vector<int32_t>::reverse_iterator > square_free_iters(pi_sqrty);
+  for (int64_t i = 0; i < pi_sqrty; i++)
+    square_free_iters[i] = square_free_candidates[i].rbegin();
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -101,22 +118,36 @@ int64_t S2(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
-      int64_t max_m = min(x / (prime * low), y);
+      int64_t l = pi[min(x / (prime * low), y)];
+      min_m = in_between(prime, min_m, y);
+      int64_t l_min = pi[min_m];
+      vector<int32_t>::reverse_iterator iter = square_free_iters[b];
 
-      if (prime >= max_m)
+      if (prime >= primes[l])
         goto next_segment;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      // Special leaves which are a product of 2 primes
+      for (; l > l_min; l--)
       {
-        if (mu[m] != 0 && prime < lpf[m])
-        {
-          int64_t n = prime * m;
-          int64_t count = cnt_query(counters, (x / n) - low);
-          int64_t phi_xn = phi[b] + count;
-          S2_result -= mu[m] * phi_xn;
-        }
+        int64_t n = prime * primes[l];
+        int64_t count = cnt_query(counters, (x / n) - low);
+        int64_t phi_xn = phi[b] + count;
+        S2_result += phi_xn;
       }
 
+      // Special leaves which are a product of a prime and a
+      // square free integer which must satisfy:
+      // !is_prime(square_free) && prime < least_prime_factor[square_free]
+      for (; *iter > min_m; iter++)
+      {
+        int64_t square_free = *iter;
+        int64_t n = prime * square_free;
+        int64_t count = cnt_query(counters, (x / n) - low);
+        int64_t phi_xn = phi[b] + count;
+        S2_result -= mu[square_free] * phi_xn;
+      }
+
+      square_free_iters[b] = iter;
       phi[b] += cnt_query(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
@@ -128,8 +159,9 @@ int64_t S2(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
-      int64_t min_m = min(y, max(x / (prime * high), y / prime));
-      int64_t min_l = pi[max(min_m, prime)];
+      int64_t min_m = max(x / (prime * high), y / prime);
+      min_m = in_between(prime, min_m, y);
+      int64_t min_l = pi[min_m];
 
       if (prime >= primes[l])
         goto next_segment;
@@ -160,7 +192,7 @@ namespace primecount {
 /// Lagarias-Miller-Odlyzko algorithm.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo5(int64_t x)
+int64_t pi_lmo6(int64_t x)
 {
   if (x < 2)
     return 0;

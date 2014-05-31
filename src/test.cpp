@@ -115,6 +115,7 @@ bool test()
     ASSERT_EQUAL(pi_lmo3,                      pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo4,                      pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo5,                      pi_meissel,    400);
+    ASSERT_EQUAL(pi_lmo6,                      pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel1,             pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel2,             pi_meissel,    400);
     ASSERT_EQUAL(pi_lmo_parallel3,             pi_meissel,    400);

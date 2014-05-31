@@ -187,4 +187,26 @@ inline std::vector<int32_t> make_pi(int64_t max)
   return pi;
 }
 
+/// Generate vectors containing n values which satisfy:
+/// is_square_free(n) && && !is_prime(n) && primes[i] < least_prime_factor[n].
+///
+inline std::vector<std::vector<int32_t> >
+generate_square_free_candidates(int64_t c,
+                                int64_t y,
+                                std::vector<int32_t>& lpf,
+                                std::vector<int32_t>& mu,
+                                std::vector<int32_t>& pi,
+                                std::vector<int32_t>& primes)
+{
+  int64_t sqrty = isqrt(y);
+  std::vector<std::vector<int32_t> > square_free_candidates(pi[sqrty], std::vector<int32_t>(1, 0));
+
+  for (int32_t n = primes[c + 1]; n <= y; n++)
+    if (mu[n] != 0 && n != primes[pi[n]] && lpf[n] < sqrty)
+      for (int32_t i = pi[lpf[n]] - 1; i > c; i--)
+        square_free_candidates[i].push_back(n);
+
+  return square_free_candidates;
+}
+
 #endif

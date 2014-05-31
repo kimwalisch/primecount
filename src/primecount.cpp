@@ -41,6 +41,7 @@ int main (int argc, char* argv[])
       case OPTION_LMO3:                      res = pi_lmo3                     (pco.x); break;
       case OPTION_LMO4:                      res = pi_lmo4                     (pco.x); break;
       case OPTION_LMO5:                      res = pi_lmo5                     (pco.x); break;
+      case OPTION_LMO6:                      res = pi_lmo6                     (pco.x); break;
       case OPTION_LMO_PARALLEL1:             res = pi_lmo_parallel1            (pco.x, pco.threads); break;
       case OPTION_LMO_PARALLEL2:             res = pi_lmo_parallel2            (pco.x, pco.threads); break;
       case OPTION_LMO_PARALLEL3:             res = pi_lmo_parallel3            (pco.x, pco.threads); break;

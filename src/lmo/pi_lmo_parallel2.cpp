@@ -120,8 +120,8 @@ int64_t S2_thread(int64_t x,
     cnt_finit(sieve, counters, segment_size);
 
     // For c + 1 <= b < pi_sqrty
-    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
-    // which satisfy: low <= (x / n) < high
+    // Find all special leaves: n = primes[b] * m
+    // which satisfy:  mu[m] != 0 && primes[b] < lpf[m], low <= (x / n) < high
     for (; b < min(pi_sqrty, size); b++)
     {
       int64_t prime = primes[b];
