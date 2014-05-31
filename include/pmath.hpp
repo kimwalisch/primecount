@@ -11,6 +11,7 @@
 #define PMATH_HPP
 
 #include <stdint.h>
+#include <algorithm>
 #include <cmath>
 #include <vector>
 #include <limits>
@@ -199,9 +200,10 @@ generate_square_free_candidates(int64_t c,
                                 std::vector<int32_t>& primes)
 {
   int64_t sqrty = isqrt(y);
+  int64_t start = primes[std::min<int64_t>(c + 1, primes.size() - 1)];
   std::vector<std::vector<int32_t> > square_free_candidates(pi[sqrty], std::vector<int32_t>(1, 0));
 
-  for (int32_t n = primes[c + 1]; n <= y; n++)
+  for (int32_t n = start; n <= y; n++)
     if (mu[n] != 0 && n != primes[pi[n]] && lpf[n] < sqrty)
       for (int32_t i = pi[lpf[n]] - 1; i > c; i--)
         square_free_candidates[i].push_back(n);
