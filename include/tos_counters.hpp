@@ -19,10 +19,10 @@
 #ifndef TOS_COUNTERS_HPP
 #define TOS_COUNTERS_HPP
 
-#include <pmath.hpp>
-
 #include <stdint.h>
 #include <vector>
+
+namespace primecount {
 
 /// Initialize the counters from the sieve array.
 /// @pre segment_size is a power of 2.
@@ -68,5 +68,7 @@ inline int64_t cnt_query(std::vector<T>& cnt, int64_t pos)
   for (; pos &= pos - 1; sum += cnt[pos - 1]);
   return sum;
 }
+
+} // namespace
 
 #endif

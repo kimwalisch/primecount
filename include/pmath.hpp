@@ -11,10 +11,10 @@
 #define PMATH_HPP
 
 #include <stdint.h>
-#include <algorithm>
 #include <cmath>
 #include <vector>
-#include <limits>
+
+namespace primecount {
 
 inline int64_t isquare(int64_t x)
 {
@@ -107,108 +107,29 @@ inline T iroot(T x)
 }
 
 /// Generate a vector with Möbius function values.
-/// This implementation is based on code by Rick Sladkey
-/// posted here: http://mathoverflow.net/a/99545
-///
-inline std::vector<int32_t> make_moebius(int64_t max)
-{
-  std::vector<int32_t> mu(max + 1, 1);
-
-  for (int32_t i = 2; i * i <= max; i++)
-  {
-    if (mu[i] == 1)
-    {
-      for (int32_t j = i; j <= max; j += i)
-        mu[j] *= -i;
-      for (int32_t j = i * i; j <= max; j += i * i)
-        mu[j] = 0;
-    }
-  }
-  for (int32_t i = 2; i <= max; i++)
-  {
-    if (mu[i] == i)
-      mu[i] = 1;
-    else if (mu[i] == -i)
-      mu[i] = -1;
-    else if (mu[i] < 0)
-      mu[i] = 1;
-    else if (mu[i] > 0)
-      mu[i] = -1;
-  }
-  return mu;
-}
+std::vector<int32_t> make_moebius(int64_t max);
 
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-inline std::vector<int32_t> make_least_prime_factor(int64_t max)
-{
-  std::vector<int32_t> lpf(max + 1, 1);
-
-  // phi(x / 1, c) contributes to the sum, thus
-  // set lpf[1] = MAX in order to pass
-  // if (lpf[1] > primes[c])
-  if (lpf.size() > 1)
-    lpf[1] = std::numeric_limits<int32_t>::max();
-
-  for (int32_t i = 2; i * i <= max; i++)
-    if (lpf[i] == 1)
-      for (int32_t j = i * 2; j <= max; j += i)
-        if (lpf[j] == 1)
-          lpf[j] = i;
-
-  for (int32_t i = 2; i <= max; i++)
-    if (lpf[i] == 1)
-      lpf[i] = i;
-
-  return lpf;
-}
+std::vector<int32_t> make_least_prime_factor(int64_t max);
 
 /// Generate a vector with the prime counts below max
 /// using the sieve of Eratosthenes.
 ///
-inline std::vector<int32_t> make_pi(int64_t max)
-{
-  std::vector<char> is_prime(max + 1, 1);
-
-  for (int64_t i = 2; i * i <= max; i++)
-    if (is_prime[i])
-      for (int64_t j = i * i; j <= max; j += i)
-        is_prime[j] = 0;
-
-  std::vector<int32_t> pi(max + 1, 0);
-  int32_t pix = 0;
-
-  for (int64_t x = 2; x <= max; x++)
-  {
-    pix += is_prime[x];
-    pi[x] = pix;
-  }
-
-  return pi;
-}
+std::vector<int32_t> make_pi(int64_t max);
 
 /// Generate vectors containing n values which satisfy:
 /// is_square_free(n) && && !is_prime(n) && primes[i] < least_prime_factor[n].
 ///
-inline std::vector<std::vector<int32_t> >
+std::vector<std::vector<int32_t> >
 generate_square_free_candidates(int64_t c,
                                 int64_t y,
                                 std::vector<int32_t>& lpf,
                                 std::vector<int32_t>& mu,
                                 std::vector<int32_t>& pi,
-                                std::vector<int32_t>& primes)
-{
-  int64_t sqrty = isqrt(y);
-  int64_t start = primes[std::min<int64_t>(c + 1, primes.size() - 1)];
-  std::vector<std::vector<int32_t> > square_free_candidates(pi[sqrty], std::vector<int32_t>(1, 0));
+                                std::vector<int32_t>& primes);
 
-  for (int32_t n = start; n <= y; n++)
-    if (mu[n] != 0 && n != primes[pi[n]] && lpf[n] < sqrty)
-      for (int32_t i = pi[lpf[n]] - 1; i > c; i--)
-        square_free_candidates[i].push_back(n);
-
-  return square_free_candidates;
-}
+} // namespace
 
 #endif

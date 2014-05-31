@@ -25,6 +25,7 @@
 #endif
 
 using namespace std;
+using namespace primecount;
 
 namespace {
 

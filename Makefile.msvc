@@ -21,6 +21,7 @@ LIB_OBJECTS = \
 	src\pi_lehmer.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
+	src\pmath.obj \
 	src\P2.obj \
 	src\P3.obj \
 	src\test.obj \
