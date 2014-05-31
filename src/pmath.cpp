@@ -113,12 +113,11 @@ generate_square_free_candidates(int64_t c,
                                 vector<int32_t>& pi,
                                 vector<int32_t>& primes)
 {
-  int64_t sqrty = isqrt(y);
-  int64_t start = primes[min<int64_t>(c + 1, primes.size() - 1)];
-  vector<vector<int32_t> > square_free_candidates(pi[sqrty], vector<int32_t>(1, 0));
+  int64_t pi_sqrty = pi[isqrt(y)];
+  vector<vector<int32_t> > square_free_candidates(pi_sqrty, vector<int32_t>(1, 0));
 
-  for (int32_t n = start; n <= y; n++)
-    if (mu[n] != 0 && n != primes[pi[n]] && lpf[n] < sqrty)
+  for (int32_t n = 2; n <= y; n++)
+    if (mu[n] != 0 && n != primes[pi[n]])
       for (int32_t i = pi[lpf[n]] - 1; i > c; i--)
         square_free_candidates[i].push_back(n);
 
