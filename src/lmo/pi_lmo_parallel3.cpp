@@ -14,7 +14,6 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <pmath.hpp>
-#include <pi_bsearch.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
 #include <utils.hpp>

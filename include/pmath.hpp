@@ -11,10 +11,36 @@
 #define PMATH_HPP
 
 #include <stdint.h>
+#include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <vector>
 
 namespace primecount {
+
+/// Generate a vector with Möbius function values.
+std::vector<int32_t> make_moebius(int64_t max);
+
+/// Generate a vector with the least prime
+/// factors of the integers <= max.
+///
+std::vector<int32_t> make_least_prime_factor(int64_t max);
+
+/// Generate a vector with the prime counts below max
+/// using the sieve of Eratosthenes.
+///
+std::vector<int32_t> make_pi(int64_t max);
+
+/// Generate vectors containing n values which satisfy:
+/// is_square_free(n) && && !is_prime(n) && primes[i] < least_prime_factor[n].
+///
+std::vector<std::vector<int32_t> >
+generate_square_free_candidates(int64_t c,
+                                int64_t y,
+                                std::vector<int32_t>& lpf,
+                                std::vector<int32_t>& mu,
+                                std::vector<int32_t>& pi,
+                                std::vector<int32_t>& primes);
 
 inline int64_t isquare(int64_t x)
 {
@@ -106,29 +132,29 @@ inline T iroot(T x)
   return r;
 }
 
-/// Generate a vector with Möbius function values.
-std::vector<int32_t> make_moebius(int64_t max);
-
-/// Generate a vector with the least prime
-/// factors of the integers <= max.
+/// Calculate the number of primes below x using binary search.
+/// @pre primes[1] = 2, primes[3] = 3, ...
+/// @pre x <= primes.back()
 ///
-std::vector<int32_t> make_least_prime_factor(int64_t max);
+template <typename T1, typename T2>
+inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
+{
+  // primecount uses 1-indexing
+  assert(primes[0] == 0);
+  return static_cast<T2>(std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
+}
 
-/// Generate a vector with the prime counts below max
-/// using the sieve of Eratosthenes.
+/// Calculate the number of primes below x using binary search.
+/// @pre primes[1] = 2, primes[3] = 3, ...
+/// @pre x <= primes.back()
 ///
-std::vector<int32_t> make_pi(int64_t max);
-
-/// Generate vectors containing n values which satisfy:
-/// is_square_free(n) && && !is_prime(n) && primes[i] < least_prime_factor[n].
-///
-std::vector<std::vector<int32_t> >
-generate_square_free_candidates(int64_t c,
-                                int64_t y,
-                                std::vector<int32_t>& lpf,
-                                std::vector<int32_t>& mu,
-                                std::vector<int32_t>& pi,
-                                std::vector<int32_t>& primes);
+template <typename T1, typename T2, typename T3>
+inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
+{
+  // primecount uses 1-indexing
+  assert(primes[0] == 0);
+  return static_cast<T3>(std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
+}
 
 } // namespace
 

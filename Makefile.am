@@ -65,7 +65,6 @@ libprimecount_la_SOURCES = \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
-	include/pi_bsearch.hpp \
 	include/tos_counters.hpp \
 	include/utils.hpp
 

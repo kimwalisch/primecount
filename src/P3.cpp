@@ -10,7 +10,6 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <pi_bsearch.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 
