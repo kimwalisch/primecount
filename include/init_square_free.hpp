@@ -22,7 +22,6 @@ void init_square_free_candidates(std::vector<std::vector<int32_t> >&,
                                  std::vector<int32_t>&,
                                  std::vector<int32_t>&,
                                  std::vector<int32_t>&,
-                                 std::vector<int32_t>&,
                                  int64_t c,
                                  int64_t y);
 

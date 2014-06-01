@@ -25,7 +25,6 @@ void init_square_free_candidates(vector<vector<int32_t> >& square_free_candidate
                                  vector<int32_t>& lpf,
                                  vector<int32_t>& mu,
                                  vector<int32_t>& pi,
-                                 vector<int32_t>& primes,
                                  int64_t c,
                                  int64_t y)
 {
@@ -33,7 +32,7 @@ void init_square_free_candidates(vector<vector<int32_t> >& square_free_candidate
   square_free_candidates.resize(pi[isqrt(y)], vector<int32_t>(1, 0));
 
   for (int32_t n = 2; n <= y; n++)
-    if (mu[n] != 0 && n != primes[pi[n]])
+    if (mu[n] != 0 && n != lpf[n])
       for (int32_t i = pi[lpf[n]] - 1; i > c; i--)
         square_free_candidates[i].push_back(n);
 
