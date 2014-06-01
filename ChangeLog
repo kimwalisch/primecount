@@ -1,9 +1,12 @@
-2014-05-30  Kim Walisch  <kim.walisch@gmail.com>
+2014-06-01  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.20 work in progress.
 
-  * src/deleglise-rivat: New Deleglise & Rivat algorithm.
-  * src/lmo: Refactoring
+  * src/deleglise-rivat: Deleglise & Rivat implementations.
+  * src/lmo/pi_lmo6.cpp: New LMO implementation.
+  * src/lmo/pi_lmo_parallel6.cpp: New parallel LMO implementation.
+  * src/lmo/init_square_free.cpp: For special leaves of type (prime * square_free)
+  * src/test.cpp: Add tests for pi_lmo*6.cpp
 
 2014-05-26  Kim Walisch  <kim.walisch@gmail.com>
 
