@@ -23,6 +23,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <init_square_free.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -81,13 +82,11 @@ int64_t S2(int64_t x,
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
+  vector<vector<int32_t> > square_free_candidates;
+  vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);
 
-  vector<vector<int32_t> > square_free_candidates = 
-      generate_square_free_candidates(c, y, lpf, mu, pi, primes);
-
-  vector<vector<int32_t>::reverse_iterator > square_free_iters(pi_sqrty);
-  for (int64_t i = 0; i < pi_sqrty; i++)
-    square_free_iters[i] = square_free_candidates[i].rbegin();
+  init_square_free_candidates(&square_free_candidates, lpf, mu, pi, primes, c, y);
+  init_square_free_iters(&square_free_iters, square_free_candidates);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -121,7 +120,7 @@ int64_t S2(int64_t x,
       int64_t l = pi[min(x / (prime * low), y)];
       min_m = in_between(prime, min_m, y);
       int64_t l_min = pi[min_m];
-      vector<int32_t>::reverse_iterator iter = square_free_iters[b];
+      vector<int32_t>::iterator iter = square_free_iters[b];
 
       if (prime >= primes[l])
         goto next_segment;
@@ -138,7 +137,7 @@ int64_t S2(int64_t x,
       // Special leaves which are a product of a prime and a
       // square_free integer which must satisfy:
       // !is_prime(square_free) && prime < least_prime_factor[square_free]
-      for (; *iter > min_m; iter++)
+      for (; *iter > min_m; iter--)
       {
         int64_t square_free = *iter;
         int64_t n = prime * square_free;

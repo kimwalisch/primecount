@@ -31,17 +31,6 @@ std::vector<int32_t> make_least_prime_factor(int64_t max);
 ///
 std::vector<int32_t> make_pi(int64_t max);
 
-/// Generate vectors containing n values which satisfy:
-/// is_square_free(n) && && !is_prime(n) && primes[i] < least_prime_factor[n].
-///
-std::vector<std::vector<int32_t> >
-generate_square_free_candidates(int64_t c,
-                                int64_t y,
-                                std::vector<int32_t>& lpf,
-                                std::vector<int32_t>& mu,
-                                std::vector<int32_t>& pi,
-                                std::vector<int32_t>& primes);
-
 inline int64_t isquare(int64_t x)
 {
   return x * x;

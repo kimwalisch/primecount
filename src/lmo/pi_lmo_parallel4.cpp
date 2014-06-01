@@ -19,6 +19,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <init_square_free.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -70,23 +71,6 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   next_multiple = k;
 }
 
-void init_square_free_iters(vector<vector<int32_t>::iterator >* square_free_iters,
-                            vector<vector<int32_t> >& square_free_candidates,
-                            vector<int32_t>& primes,
-                            int64_t c,
-                            int64_t x,
-                            int64_t y,
-                            int64_t low)
-{
-  for (size_t i = c + 1; i < square_free_iters->size(); i++)
-  {
-    int64_t max_m = min(x / (primes[i] * low), y);
-    (*square_free_iters)[i] = upper_bound(square_free_candidates[i].begin(),
-        square_free_candidates[i].end(),
-        max_m) - 1;
-  }
-}
-
 /// Compute the S2 contribution for the interval
 /// [low_process, low_process + segments * segment_size[.
 /// The missing special leaf contributions for the interval
@@ -123,6 +107,7 @@ int64_t S2_thread(int64_t x,
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
   vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);
+
   init_square_free_iters(&square_free_iters, square_free_candidates, primes, c, x, y, low);
   initialize_next_multiples(&next, primes, size, low);
   phi.resize(size, 0);
@@ -256,8 +241,8 @@ int64_t S2(int64_t x,
 
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
-  vector<vector<int32_t> > square_free_candidates = 
-      generate_square_free_candidates(c, y, lpf, mu, pi, primes);
+  vector<vector<int32_t> > square_free_candidates;
+  init_square_free_candidates(&square_free_candidates, lpf, mu, pi, primes, c, y);
 
   while (low < limit)
   {
