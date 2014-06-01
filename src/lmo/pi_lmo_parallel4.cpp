@@ -41,16 +41,16 @@ namespace {
 
 /// For each prime calculate its first multiple >= low.
 template <typename T1, typename T2>
-void initialize_next_multiples(T1* next, T2& primes, int64_t size, int64_t low)
+void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
 {
-  next->reserve(size);
-  next->push_back(0);
+  next.reserve(size);
+  next.push_back(0);
 
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
     int64_t next_multiple = ((low + prime - 1) / prime) * prime;
-    next->push_back(next_multiple);
+    next.push_back(next_multiple);
   }
 }
 
@@ -108,8 +108,8 @@ int64_t S2_thread(int64_t x,
   vector<int64_t> next;
   vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);
 
-  init_square_free_iters(&square_free_iters, square_free_candidates, primes, c, x, y, low);
-  initialize_next_multiples(&next, primes, size, low);
+  init_square_free_iters(square_free_iters, square_free_candidates, primes, c, x, y, low);
+  init_next_multiples(next, primes, size, low);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 
@@ -242,7 +242,7 @@ int64_t S2(int64_t x,
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
   vector<vector<int32_t> > square_free_candidates;
-  init_square_free_candidates(&square_free_candidates, lpf, mu, pi, primes, c, y);
+  init_square_free_candidates(square_free_candidates, lpf, mu, pi, primes, c, y);
 
   while (low < limit)
   {

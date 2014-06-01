@@ -85,8 +85,8 @@ int64_t S2(int64_t x,
   vector<vector<int32_t> > square_free_candidates;
   vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);
 
-  init_square_free_candidates(&square_free_candidates, lpf, mu, pi, primes, c, y);
-  init_square_free_iters(&square_free_iters, square_free_candidates);
+  init_square_free_candidates(square_free_candidates, lpf, mu, pi, primes, c, y);
+  init_square_free_iters(square_free_iters, square_free_candidates);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)

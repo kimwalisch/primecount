@@ -34,17 +34,17 @@ inline int64_t get_previous_prime(primesieve::iterator* iter, int64_t old)
 
 /// For each prime calculate its first multiple >= low
 /// which is not a multiple of 2.
-void initialize_next_multiples(vector<int64_t>* next, vector<int32_t>& primes, int64_t size, int64_t low)
+void init_next_multiples(vector<int64_t>& next, vector<int32_t>& primes, int64_t size, int64_t low)
 {
-  next->reserve(size);
-  next->push_back(0);
+  next.reserve(size);
+  next.push_back(0);
 
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
     int64_t next_multiple = ((low + prime - 1) / prime) * prime;
     next_multiple += prime * (~next_multiple & 1);
-    next->push_back(max(isquare(prime), next_multiple));
+    next.push_back(max(isquare(prime), next_multiple));
   }
 }
 
@@ -72,7 +72,7 @@ int64_t P2_thread(int64_t x,
   vector<char> sieve(segment_size);
   vector<int64_t> pi_input;
   vector<int64_t> next;
-  initialize_next_multiples(&next, primes, size, low);
+  init_next_multiples(next, primes, size, low);
 
   // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   // We use a reverse prime iterator to calculate P2_thread.

@@ -32,16 +32,16 @@ namespace {
 
 /// For each prime calculate its first multiple >= low.
 template <typename T1, typename T2>
-void initialize_next_multiples(T1* next, T2& primes, int64_t size, int64_t low)
+void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
 {
-  next->reserve(size);
-  next->push_back(0);
+  next.reserve(size);
+  next.push_back(0);
 
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
     int64_t next_multiple = ((low + prime - 1) / prime) * prime;
-    next->push_back(next_multiple);
+    next.push_back(next_multiple);
   }
 }
 
@@ -95,7 +95,7 @@ int64_t S2_thread(int64_t x,
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
-  initialize_next_multiples(&next, primes, size, low);
+  init_next_multiples(next, primes, size, low);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 
