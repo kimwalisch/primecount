@@ -10,6 +10,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <aligned_vector.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 
@@ -145,11 +146,11 @@ int64_t P2(int64_t x, int64_t y, int threads)
   int64_t segment_size = max<int64_t>(64, isqrt(limit));
   int64_t segments_per_thread = 1;
 
-  vector<int64_t> pix(threads);
-  vector<int64_t> pix_counts(threads);
   vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(isqrt(limit), &primes);
+  aligned_vector<int64_t> pix(threads);
+  aligned_vector<int64_t> pix_counts(threads);
 
   while (low < limit)
   {
