@@ -19,6 +19,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <aligned_vector.hpp>
 #include <init_square_free.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -89,7 +90,6 @@ int64_t S2_thread(int64_t x,
                   int64_t limit,
                   vector<int32_t>& pi,
                   vector<int32_t>& primes,
-                  vector<int32_t>& lpf,
                   vector<int32_t>& mu,
                   vector<int64_t>& mu_sum,
                   vector<int64_t>& phi,
@@ -108,7 +108,7 @@ int64_t S2_thread(int64_t x,
   vector<int64_t> next;
   vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);
 
-  init_square_free_iters(square_free_iters, square_free_candidates, primes, c, x, y, low);
+  init_square_free_iters(square_free_iters, square_free_candidates, primes, c, x, low);
   init_next_multiples(next, primes, size, low);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
@@ -251,14 +251,14 @@ int64_t S2(int64_t x,
     segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
     double seconds = get_wtime();
 
-    vector<vector<int64_t> > phi(threads);
-    vector<vector<int64_t> > mu_sum(threads);
+    aligned_vector<vector<int64_t> > phi(threads);
+    aligned_vector<vector<int64_t> > mu_sum(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
-      S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
-          i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i],
-              square_free_candidates);
+      S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size,
+          segments_per_thread, i, low, limit, pi, primes, mu, mu_sum[i],
+              phi[i], square_free_candidates);
 
     seconds = get_wtime() - seconds;
     low += segments_per_thread * threads * segment_size;
