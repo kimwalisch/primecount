@@ -39,7 +39,6 @@ void init_square_free_iters(std::vector<std::vector<int32_t>::iterator >&,
                             std::vector<int32_t>&,
                             int64_t c,
                             int64_t x,
-                            int64_t y,
                             int64_t low);
 
 } // namespace
