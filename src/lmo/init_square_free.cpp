@@ -60,7 +60,6 @@ void init_square_free_iters(vector<vector<int32_t>::iterator >& iters,
                             vector<int32_t>& primes,
                             int64_t c,
                             int64_t x,
-                            int64_t y,
                             int64_t low)
 {
   for (size_t i = c + 1; i < iters.size(); i++)
