@@ -12,6 +12,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <aligned_vector.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -173,8 +174,8 @@ int64_t S2(int64_t x,
   int64_t segments_per_thread = (segments + threads - 1) / threads;
 
   vector<int32_t> pi = make_pi(y);
-  vector<vector<int64_t> > phi(threads);
-  vector<vector<int64_t> > mu_sum(threads);
+  aligned_vector<vector<int64_t> > phi(threads);
+  aligned_vector<vector<int64_t> > mu_sum(threads);
 
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
