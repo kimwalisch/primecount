@@ -121,6 +121,9 @@ int64_t pi_lmo_parallel4(int64_t x, int threads = MAX_THREADS);
 ///
 int64_t phi(int64_t x, int64_t a, PhiCache* phiCache);
 
+/// Calculates the number of 1 bits inside an array.
+int64_t popcount(const uint64_t* bits, int64_t start, int64_t stop, int64_t low);
+
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
 /// Space complexity: O((x / primes[a])^(1/2)).

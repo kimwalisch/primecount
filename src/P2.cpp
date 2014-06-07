@@ -11,6 +11,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
+#include <bit_sieve.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 
@@ -70,7 +71,7 @@ int64_t P2_thread(int64_t x,
   int64_t stop = min(x / low, sqrtx);
   int64_t P2_thread = 0;
 
-  vector<char> sieve(segment_size);
+  bit_sieve sieve(segment_size);
   vector<int64_t> pi_input;
   vector<int64_t> next;
   init_next_multiples(next, primes, size, low);
@@ -84,12 +85,13 @@ int64_t P2_thread(int64_t x,
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    fill(sieve.begin(), sieve.end(), 1);
-
     // current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t sqrt = isqrt(high - 1);
-    int64_t j = ~low & 1;
+    int64_t j = 0;
+
+    sieve.set_low(low);
+    sieve.fill();
 
     // cross-off multiples
     for (int64_t i = 2; i < size && primes[i] <= sqrt; i++)
@@ -97,22 +99,21 @@ int64_t P2_thread(int64_t x,
       int64_t k;
       int64_t p2 = primes[i] * 2;
       for (k = next[i]; k < high; k += p2)
-        sieve[k - low] = 0;
+        sieve.unset(k - low);
       next[i] = k;
     }
 
     while (previous_prime >= start && xp < high)
     {
-      for (; j <= xp - low; j += 2)
-        pix += sieve[j];
+      pix += sieve.count(j, xp - low);
+      j = xp - low + 1;
       pix_count++;
       P2_thread += pix;
       previous_prime = get_previous_prime(&iter, previous_prime);
       xp = x / previous_prime;
     }
 
-    for (; j < high - low; j += 2)
-      pix += sieve[j];
+    pix += sieve.count(j, (high - 1) - low);
   }
 
   return P2_thread;

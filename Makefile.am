@@ -43,6 +43,7 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/pmath.cpp \
+	src/popcount.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
@@ -63,6 +64,7 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel4.cpp \
 	src/lmo/S1.cpp \
 	include/aligned_vector.hpp \
+	include/bit_sieve.hpp \
 	include/init_square_free.hpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \
