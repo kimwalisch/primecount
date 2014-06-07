@@ -75,6 +75,7 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
+                  int64_t z,
                   int64_t c,
                   int64_t pi_sqrty,
                   int64_t pi_y,
@@ -88,10 +89,7 @@ int64_t S2_thread(int64_t x,
                   vector<int32_t>& lpf,
                   vector<int32_t>& mu,
                   vector<int64_t>& mu_sum,
-                  vector<int64_t>& phi,
-                  vector<int32_t>& min_trivial_leaves,
-                  vector<int32_t>& min_clustered_easy_leaves,
-                  vector<int32_t>& min_sparse_easy_leaves)
+                  vector<int64_t>& phi)
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
@@ -170,9 +168,13 @@ int64_t S2_thread(int64_t x,
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
       int64_t min_hard_leaf = pi[min_m];
-      int64_t min_trivial_leaf = max<int64_t>(min_hard_leaf, min_trivial_leaves[b]);
-      int64_t min_clustered_easy_leaf = max<int64_t>(min_hard_leaf, min_clustered_easy_leaves[b]);
-      int64_t min_sparse_easy_leaf = max<int64_t>(min_hard_leaf, min_sparse_easy_leaves[b]);
+      int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
+      int64_t min_clustered_easy_leaf = pi[min(isqrt(x / prime), y)];
+      int64_t min_sparse_easy_leaf = pi[min(z / prime, y)];
+
+      min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
+      min_clustered_easy_leaf = max(min_hard_leaf, min_clustered_easy_leaf);
+      min_sparse_easy_leaf = max(min_hard_leaf, min_sparse_easy_leaf);
 
       // For max(x / primes[b]^2, primes[b]) < primes[l] <= y
       // Find all trivial leaves which satisfy:
@@ -262,19 +264,8 @@ int64_t S2(int64_t x,
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
 
   vector<int32_t> pi = make_pi(y);
-  vector<int32_t> min_trivial_leaves(primes.size());
-  vector<int32_t> min_clustered_easy_leaves(primes.size());
-  vector<int32_t> min_sparse_easy_leaves(primes.size());
   vector<int64_t> phi_total(primes.size(), 0);
   segment_size = max(segment_size, min_segment_size);
-
-  for (size_t i = 1; i < primes.size(); i++)
-  {
-    int64_t prime = primes[i];
-    min_trivial_leaves[i] = pi[min(x / (prime * prime), y)];
-    min_clustered_easy_leaves[i] = pi[min(isqrt(x / primes[i]), y)];
-    min_sparse_easy_leaves[i] = pi[min(z / prime, y)];
-  }
 
   while (low < limit)
   {
@@ -288,9 +279,8 @@ int64_t S2(int64_t x,
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
-      S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread, i,
-          low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i], min_trivial_leaves,
-              min_clustered_easy_leaves, min_sparse_easy_leaves);
+      S2_total += S2_thread(x, y, z, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
+          i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
 
     seconds = get_wtime() - seconds;
     low += segments_per_thread * threads * segment_size;
