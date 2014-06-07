@@ -155,7 +155,6 @@ const uint64_t stop_masks[128] =
 const uint64_t m1  = UINT64_C(0x5555555555555555);
 const uint64_t m2  = UINT64_C(0x3333333333333333);
 const uint64_t m4  = UINT64_C(0x0F0F0F0F0F0F0F0F);
-const uint64_t m8  = UINT64_C(0x00FF00FF00FF00FF);
 const uint64_t h01 = UINT64_C(0x0101010101010101);
 
 int64_t popcount(uint64_t bits)
