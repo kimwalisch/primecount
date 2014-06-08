@@ -137,7 +137,7 @@ int64_t S2(int64_t x,
       // Special leaves which are a product of a prime and a
       // square_free integer which must satisfy:
       // !is_prime(square_free) && prime < least_prime_factor[square_free]
-      for (; *iter > min_m; iter--)
+      for (; *iter > min_m; --iter)
       {
         int64_t square_free = *iter;
         int64_t n = prime * square_free;

@@ -72,7 +72,6 @@ int64_t P2_thread(int64_t x,
   int64_t P2_thread = 0;
 
   bit_sieve sieve(segment_size);
-  vector<int64_t> pi_input;
   vector<int64_t> next;
   init_next_multiples(next, primes, size, low);
 
