@@ -30,13 +30,13 @@ namespace primecount {
 ///      for crossed-off elements.
 /// Runtime: O(N log N).
 ///
-template <typename T>
-inline void cnt_finit(std::vector<char>& sieve, std::vector<T>& cnt, int64_t segment_size)
+template <typename T1, typename T2>
+inline void cnt_finit(const T1& sieve, std::vector<T2>& cnt, int64_t segment_size)
 {
-  for (T i = 0; i < segment_size; i++)
+  for (T2 i = 0; i < segment_size; i++)
   {
     cnt[i] = sieve[i];
-    for (T k = (i + 1) & ~i, j = i; k >>= 1; j &= j - 1)
+    for (T2 k = (i + 1) & ~i, j = i; k >>= 1; j &= j - 1)
       cnt[i] += cnt[j - 1];
   }
 }
@@ -62,7 +62,7 @@ inline void cnt_update(std::vector<T>& cnt, int64_t pos, int64_t segment_size)
 /// Runtime: O(log N).
 ///
 template <typename T>
-inline int64_t cnt_query(std::vector<T>& cnt, int64_t pos)
+inline int64_t cnt_query(const std::vector<T>& cnt, int64_t pos)
 {
   int64_t sum = cnt[pos++];
   for (; pos &= pos - 1; sum += cnt[pos - 1]);
