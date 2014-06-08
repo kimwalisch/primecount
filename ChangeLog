@@ -1,13 +1,15 @@
-2014-06-03  Kim Walisch  <kim.walisch@gmail.com>
+2014-06-08  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.20 work in progress.
 
-  * src/deleglise-rivat: Deleglise & Rivat implementations.
+  * src/deleglise-rivat/*: Deleglise & Rivat implementations.
   * src/lmo/pi_lmo6.cpp: New LMO implementation.
   * src/lmo/pi_lmo_parallel6.cpp: New parallel LMO implementation.
   * src/lmo/init_square_free.cpp: For special leaves of type (prime * square_free).
+  * src/popcount.cpp: Fast bit population count algorithms for bit_sieve.
   * src/test.cpp: Add tests for pi_lmo*6.cpp.
   * include/aligned_vector.hpp: vector without false sharing issues.
+  * include/bit_sieve.hpp: bit vector with 8 numbers per byte.
 
 2014-05-26  Kim Walisch  <kim.walisch@gmail.com>
 
