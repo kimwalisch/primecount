@@ -18,58 +18,55 @@
 #include <vector>
 #include <stdint.h>
 
+const unsigned int unset_bit[32] =
+{
+  ~(1u <<  0), ~(1u <<  1), ~(1u <<  2),
+  ~(1u <<  3), ~(1u <<  4), ~(1u <<  5),
+  ~(1u <<  6), ~(1u <<  7), ~(1u <<  8),
+  ~(1u <<  9), ~(1u << 10), ~(1u << 11),
+  ~(1u << 12), ~(1u << 13), ~(1u << 14),
+  ~(1u << 15), ~(1u << 16), ~(1u << 17),
+  ~(1u << 18), ~(1u << 19), ~(1u << 20),
+  ~(1u << 21), ~(1u << 22), ~(1u << 23),
+  ~(1u << 24), ~(1u << 25), ~(1u << 26),
+  ~(1u << 27), ~(1u << 28), ~(1u << 29),
+  ~(1u << 30), ~(1u << 31)
+};
+
 namespace primecount {
 
 /// The bit_sieve data structure uses bit packing to save memory.
-/// bit_sieve uses 1 byte of memory for 16 numbers, each bit
-/// corresponds to one odd integer.
+/// bit_sieve uses 1 byte of memory for 8 numbers, each bit
+/// corresponds to one integer.
 ///
 class bit_sieve
 {
 public:
   bit_sieve(std::size_t size)
-    : bits_((size + 16 - 1) / 16 + sizeof(uint64_t)),
-      size_(size),
-      low_(0)
+    : bits_((size + 31) / 32 + sizeof(uint64_t)),
+      size_(size)
   { }
 
   /// Count the number of 1 bits inside [start, stop]
   int64_t count(int64_t start, int64_t stop) const
   {
-    assert(stop < size_);
+    assert(stop < (int64_t) size_);
     const uint64_t* bits = reinterpret_cast<const uint64_t*>(bits_.data());
-    return popcount(bits, start, stop, low_);
+    return popcount(bits, start, stop);
   }
 
-  /// Set all bits to 1
-  void fill()
+  /// Set all bits corresponding to odd numbers to 1
+  void fill(int64_t low)
   {
-    std::fill(bits_.begin(), bits_.end(), 0xff);
-
-    // As bits correspond to odd integers we must
-    // recalculate the bitmasks if low changes in
-    // order to ensure bit_sieve[even] = false
-    //
-    for (int i = 0; i < 16; i += 2)
-    {
-      int mask0 = 1 << (i / 2);
-      int mask1 = 0;
-
-      if (low_ % 2 == 0)
-        std::swap(mask0, mask1);
-
-      is_bit[i + 0] = mask0;
-      is_bit[i + 1] = mask1;
-
-      unset_bit[i + 0] = ~mask0;
-      unset_bit[i + 1] = ~mask1;
-    }
+    unsigned mask = (low & 1) ? 0x55555555u : 0xAAAAAAAAu;
+    std::fill(bits_.begin(), bits_.end(), mask);
   }
 
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    return (bits_[pos >> 4] & is_bit[pos & 15]) != 0;
+    unsigned mask = 1u << (pos & 31);
+    return (bits_[pos >> 5] & mask) != 0;
   }
 
   std::size_t size() const
@@ -77,22 +74,14 @@ public:
     return size_;
   }
 
-  void set_low(int64_t low)
-  {
-    low_ = low;
-  }
-
   void unset(uint64_t pos)
   {
     assert(pos < size_);
-    bits_[pos >> 4] &= unset_bit[pos & 15];
+    bits_[pos >> 5] &= unset_bit[pos & 31];
   }
 private:
-  int is_bit[16];
-  int unset_bit[16];
-  std::vector<unsigned char> bits_;
+  std::vector<uint32_t> bits_;
   std::size_t size_;
-  int64_t low_;
 };
 
 } // namespace
