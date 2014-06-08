@@ -1,10 +1,4 @@
-1) The following vectors are potentially causing false sharing:
-   pix[], pix_count[], mu_sum[], phi[]
-
-   This can be fixed by aligning the vector elements to
-   CACHE_LINE_SIZE.
-
-2) Implement Gourdon's algorithm.
-
-3) Implement faster counters with O(1) query access time and O(N)
-   update time.
+1) Implement Gourdon's algorithm.
+2) Update ./docs
+    * write document about special leaves
+    * write document about parallel S2(x, a)
