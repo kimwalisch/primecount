@@ -70,17 +70,8 @@ int64_t S2(int64_t x,
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int32_t> pi = make_pi(y);
-  vector<int32_t> min_trivial_leaves(primes.size());
-  vector<int32_t> min_easy_leaves(primes.size());
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
-
-  for (size_t i = 1; i < primes.size(); i++)
-  {
-    int64_t prime = primes[i];
-    min_trivial_leaves[i] = pi[min(y, x / (prime * prime))];
-    min_easy_leaves[i] = pi[min(y, z / prime)];
-  }
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -144,9 +135,12 @@ int64_t S2(int64_t x,
 
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
+      int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
+      int64_t min_easy_leaf = pi[min(z / prime, y)];
       int64_t min_hard_leaf = pi[min_m];
-      int64_t min_trivial_leaf = max<int64_t>(min_hard_leaf, min_trivial_leaves[b]);
-      int64_t min_easy_leaf = max<int64_t>(min_hard_leaf, min_easy_leaves[b]);
+
+      min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
+      min_easy_leaf = max(min_hard_leaf, min_easy_leaf);
 
       // For max(x / primes[b]^2, primes[b]) < primes[l] <= y
       // Find all trivial leaves which satisfy:
