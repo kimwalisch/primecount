@@ -30,7 +30,7 @@ int64_t pi(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * log log x) space.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads = MAX_THREADS);
 
@@ -46,7 +46,7 @@ int64_t pi_lehmer(int64_t x, int threads = MAX_THREADS);
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
+/// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo(int64_t x, int threads = MAX_THREADS);
 
