@@ -12,8 +12,8 @@
 ///           1) The special leaves that are a product of 2 primes.
 ///           2) The special leaves that are a product of a prime and a
 ///              square free integer (which must not be prime).
-///        Although this split up can give up to 15 percent speed
-///        improvement it uses considerably more memory.
+///        This split up uses considerably more memory without being
+///        noticeably faster.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
