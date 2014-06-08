@@ -17,6 +17,8 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <aligned_vector.hpp>
+#include <bit_sieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -46,6 +48,7 @@ void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
   {
     int64_t prime = primes[b];
     int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    next_multiple += prime * (~next_multiple & 1);
     next.push_back(next_multiple);
   }
 }
@@ -54,13 +57,13 @@ template <typename T1, typename T2>
 void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple, T1& sieve, T2& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple + prime * (~next_multiple & 1);
+  int64_t k = next_multiple;
 
   for (; k < high; k += prime * 2)
   {
     if (sieve[k - low])
     {
-      sieve[k - low] = 0;
+      sieve.unset(k - low);
       cnt_update(counters, k - low, segment_size);
     }
   }
@@ -99,7 +102,7 @@ int64_t S2_thread(int64_t x,
   if (c >= size - 1)
     return 0;
 
-  vector<char> sieve(segment_size);
+  bit_sieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
   init_next_multiples(next, primes, size, low);
@@ -109,17 +112,17 @@ int64_t S2_thread(int64_t x,
   // Process the segments corresponding to the current thread
   for (; low < limit; low += segment_size)
   {
-    fill(sieve.begin(), sieve.end(), 1);
-
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 1;
+    int64_t b = 2;
+
+    sieve.fill(low);
 
     for (; b <= c; b++)
     {
       int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime)
-        sieve[k - low] = 0;
+      for (int64_t prime = primes[b]; k < high; k += prime * 2)
+        sieve.unset(k - low);
       next[b] = k;
     }
 
@@ -274,8 +277,8 @@ int64_t S2(int64_t x,
     segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
     double seconds = get_wtime();
 
-    vector<vector<int64_t> > phi(threads);
-    vector<vector<int64_t> > mu_sum(threads);
+    aligned_vector<vector<int64_t> > phi(threads);
+    aligned_vector<vector<int64_t> > mu_sum(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
