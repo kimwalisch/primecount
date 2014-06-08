@@ -15,6 +15,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <bit_sieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -42,7 +43,7 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   {
     if (sieve[k - low])
     {
-      sieve[k - low] = 0;
+      sieve.unset(k - low);
       cnt_update(counters, k - low, segment_size);
     }
   }
@@ -67,7 +68,7 @@ int64_t S2(int64_t x,
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
   int64_t S2_result = 0;
 
-  vector<char> sieve(segment_size);
+  bit_sieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
@@ -76,19 +77,19 @@ int64_t S2(int64_t x,
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    fill(sieve.begin(), sieve.end(), 1);
-
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 1;
+    int64_t b = 2;
+
+    sieve.fill(low);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
     // simply sieve out the multiples of the first c primes
     for (; b <= c; b++)
     {
       int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime)
-        sieve[k - low] = 0;
+      for (int64_t prime = primes[b]; k < high; k += prime * 2)
+        sieve.unset(k - low);
       next[b] = k;
     }
 
