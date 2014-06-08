@@ -90,7 +90,7 @@ int64_t P2_thread(int64_t x,
     int64_t sqrt = isqrt(high - 1);
     int64_t j = 0;
 
-    sieve.fill(low);
+    sieve.memset(low);
 
     // cross-off multiples
     for (int64_t i = 2; i < size && primes[i] <= sqrt; i++)

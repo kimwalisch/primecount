@@ -95,7 +95,7 @@ int64_t S2(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = 2;
 
-    sieve.fill(low);
+    sieve.memset(low);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so we
     // simply sieve out the multiples of the first c primes

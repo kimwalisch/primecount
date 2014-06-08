@@ -18,7 +18,7 @@
 #include <vector>
 #include <stdint.h>
 
-const unsigned int unset_bit[32] =
+const unsigned unset_bit[32] =
 {
   ~(1u <<  0), ~(1u <<  1), ~(1u <<  2),
   ~(1u <<  3), ~(1u <<  4), ~(1u <<  5),
@@ -56,7 +56,7 @@ public:
   }
 
   /// Set all bits corresponding to odd numbers to 1
-  void fill(int64_t low)
+  void memset(int64_t low)
   {
     unsigned mask = (low & 1) ? 0x55555555u : 0xAAAAAAAAu;
     std::fill(bits_.begin(), bits_.end(), mask);
