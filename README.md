@@ -167,7 +167,7 @@ Once this is done one starts sieving (e.g. using the segmented sieve of
 Eratosthenes) from there on until one finds the actual nth prime. The author
 has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
 prime in
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23x.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xln2x.svg" height="20" align="absmiddle"/>
 operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
 space.
