@@ -32,7 +32,7 @@ parallelized using OpenMP.
 
 <p>Up until the early 19th century the most efficient known method for counting
 primes was the sieve of Eratosthenes which has a running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Oxlnlnx.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
 operations. The first improvement to this bound was Legendre's formula (1830)
 which uses the inclusion-exclusion principle to calculate the number of primes
 below x without enumerating the individual primes. Legendre's formula has a
@@ -47,16 +47,16 @@ and by adding the correction term
 Meissel's formula has a running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
 operations and uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
 space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
 <img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
 operations and
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlnx.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
 space. In 1985 J. C. Lagarias, V. S. Miller and A. M. Odlyzko published a new
 algorithm based on Meissel's formula which has a lower runtime complexity of
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlnx.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlogx.svg" height="20" align="absmiddle"/>
 operations and which uses only
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot13x.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
 space.</p>
 <p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
 Riesel's book [4] is probably the best source of information. For the
@@ -167,9 +167,9 @@ Once this is done one starts sieving (e.g. using the segmented sieve of
 Eratosthenes) from there on until one finds the actual nth prime. The author
 has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
 prime in
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xln2x.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
 operations using
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+<img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
 ### Precompiled binaries
