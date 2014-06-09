@@ -74,8 +74,8 @@ libprimecount_la_SOURCES = \
 	include/utils.hpp
 
 primecount_SOURCES = \
-	src/primecount.cpp \
-	src/help.cpp \
-	src/cmdoptions.cpp \
-	src/cmdoptions.hpp \
-	src/calculator.hpp
+	src/app/main.cpp \
+	src/app/help.cpp \
+	src/app/cmdoptions.cpp \
+	src/app/cmdoptions.hpp \
+	src/app/calculator.hpp
