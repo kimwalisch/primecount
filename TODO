@@ -1,4 +1,7 @@
-1) Implement Gourdon's algorithm.
-2) Update ./docs
+1) Add Gourdon's paper to references
+2) Speed up square free special leaves
+    * Is it possible to use algorithm like lmo6.cpp without using more memory?
+3) Implement Gourdon's algorithm.
+4) Update ./docs
     * write document about special leaves
     * write document about parallel S2(x, a)
