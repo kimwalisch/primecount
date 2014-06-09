@@ -43,6 +43,7 @@ libprimecount_la_SOURCES = \
 	src/PhiTiny.cpp \
 	src/pmath.cpp \
 	src/popcount.cpp \
+	src/primecount.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
