@@ -146,7 +146,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <td>10<sup>18</sup></td>
   <td>24,739,954,287,740,860</td>
     <td>NaN</td>
-    <td>NaN</td>
+    <td>9885.71s</td>
     <td>837.74s</td>
     <td>163.27s</td>
   </tr>
