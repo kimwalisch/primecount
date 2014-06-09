@@ -142,6 +142,14 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>121.31s</td>
     <td>36.01s</td>
   </tr>
+  <tr align="right">
+  <td>10<sup>18</sup></td>
+  <td>24,739,954,287,740,860</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+  </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
