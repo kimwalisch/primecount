@@ -69,74 +69,78 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <tr align="center">
     <td><b>x</b></td>
     <td><b>Prime Count</b></td>
-    <td><b>pi_legendre(x)</b></td>
-    <td><b>pi_meissel(x)</b></td>
-    <td><b>pi_lehmer(x)</b></td>
-    <td><b>pi_lmo(x)</b></td>
+    <td><b>Legendre</b></td>
+    <td><b>Lehmer</b></td>
+    <td><b>Lagarias<br/>Miller<br/>Odlyzko</b></td>
+    <td><b>Deleglise<br/>Rivat</b></td>
   </tr>
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
     <td>0.05s</td>
-    <td>0.04s</td>
     <td>0.03s</td>
     <td>0.02s</td>
+    <td>0.02s</td>
+  </tr>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
     <td>0.08s</td>
     <td>0.06s</td>
-    <td>0.06s</td>
     <td>0.03s</td>
+    <td>0.02s</td>
+  </tr>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
     <td>0.31s</td>
-    <td>0.19s</td>
     <td>0.23s</td>
     <td>0.07s</td>
+    <td>0.06s</td>
+  </tr>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
     <td>1.49s</td>
-    <td>0.95s</td>
     <td>1.03s</td>
     <td>0.28s</td>
+    <td>0.17s</td>
+  </tr>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
     <td>9.30s</td>
-    <td>6.81s</td>
     <td>5.05s</td>
     <td>1.21s</td>
+    <td>0.60s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
     <td>60.38s</td>
-    <td>49.12s</td>
     <td>28.26s</td>
     <td>5.41s</td>
+    <td>2.25s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
     <td>423.12s</td>
-    <td>337.56s</td>
     <td>173.78s</td>
     <td>24.77s</td>
+    <td>8.74s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
     <td>3749.72s</td>
-    <td>2879.81s</td>
     <td>1335.85s</td>
     <td>121.31s</td>
+    <td>36.01s</td>
   </tr>
 </table>
 
