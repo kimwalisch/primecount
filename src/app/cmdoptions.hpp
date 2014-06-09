@@ -60,7 +60,7 @@ struct PrimeCountOptions
     x(-1),
     a(-1),
     option(OPTION_PI),
-    threads(primecount::MAX_THREADS)
+    threads(get_num_threads())
   { }
 };
 

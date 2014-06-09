@@ -10,7 +10,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <algorithm>
 #include <ctime>
 

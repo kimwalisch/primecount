@@ -39,19 +39,16 @@ libprimecount_la_SOURCES = \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
 	src/pi_lehmer.cpp \
-	src/pi.cpp \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/pmath.cpp \
 	src/popcount.cpp \
 	src/test.cpp \
-	src/deleglise-rivat/pi_deleglise_rivat.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
 	src/lmo/init_square_free.cpp \
-	src/lmo/pi_lmo.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
 	src/lmo/pi_lmo3.cpp \

@@ -234,13 +234,17 @@ complexity can be read <a href="include/primecount.hpp">here</a>.
 ```C++
 /// @file  primecount.hpp
 
-int64_t primecount::pi            (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::pi_legendre   (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::pi_lehmer     (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::pi_lmo        (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::pi_meissel    (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::pi_primesieve (int64_t x, int threads = MAX_THREADS);
-int64_t primecount::nth_prime     (int64_t n, int threads = MAX_THREADS);
+int64_t primecount::pi                 (int64_t x);
+int64_t primecount::pi_deleglise_rivat (int64_t x);
+int64_t primecount::pi_legendre        (int64_t x);
+int64_t primecount::pi_lehmer          (int64_t x);
+int64_t primecount::pi_lmo             (int64_t x);
+int64_t primecount::pi_meissel         (int64_t x);
+int64_t primecount::pi_primesieve      (int64_t x);
+int64_t primecount::nth_prime          (int64_t n);
+
+int     primecount::get_num_threads();
+void    primecount::set_num_threads(int threads);
 ```
 
 ### Using libprimecount

@@ -16,23 +16,21 @@ LIB_OBJECTS = \
 	src\phi.obj \
 	src\PhiCache.obj \
 	src\PhiTiny.obj \
-	src\pi.obj \
 	src\pi_legendre.obj \
 	src\pi_lehmer.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\pmath.obj \
 	src\popcount.obj \
+	src\primecount.obj \
 	src\P2.obj \
 	src\P3.obj \
 	src\test.obj \
-	src\deleglise-rivat\pi_deleglise_rivat.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel2.obj \
 	src\lmo\init_square_free.obj \
-	src\lmo\pi_lmo.obj \
 	src\lmo\pi_lmo1.obj \
 	src\lmo\pi_lmo2.obj \
 	src\lmo\pi_lmo3.obj \

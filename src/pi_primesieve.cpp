@@ -7,14 +7,14 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>
 
 namespace primecount {
 
-int64_t pi_primesieve(int64_t x, int threads /* = MAX_THREADS */)
+int64_t pi_primesieve(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
