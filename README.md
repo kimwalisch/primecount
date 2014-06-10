@@ -137,16 +137,16 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>3749.72s</td>
-    <td>1335.85s</td>
+    <td>3,749.72s</td>
+    <td>1,335.85s</td>
     <td>121.31s</td>
     <td>36.01s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
   <td>24,739,954,287,740,860</td>
-    <td>NaN</td>
-    <td>9885.71s</td>
+    <td>31,897.66s</td>
+    <td>9,885.71s</td>
     <td>837.74s</td>
     <td>163.27s</td>
   </tr>
