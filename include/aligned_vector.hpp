@@ -29,6 +29,7 @@ class aligned_vector
 public:
   aligned_vector(std::size_t size) : vector_(size) { }
   T& operator[](std::size_t pos) { return vector_[pos].val; }
+  std::size_t size() const { return vector_.size(); }
 private:
   struct aligned_type
   {
