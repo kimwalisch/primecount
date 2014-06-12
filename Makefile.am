@@ -30,6 +30,7 @@ EXTRA_DIST = \
 	README.md
 
 libprimecount_la_SOURCES = \
+	src/balance_S2_load.cpp \
 	src/Li.cpp \
 	src/nth_prime.cpp \
 	src/PhiCache.cpp \
@@ -62,6 +63,7 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel4.cpp \
 	src/lmo/S1.cpp \
 	include/aligned_vector.hpp \
+	include/balance_S2_load.hpp \
 	include/bit_sieve.hpp \
 	include/init_square_free.hpp \
 	include/primecount-internal.hpp \
