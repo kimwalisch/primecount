@@ -11,6 +11,7 @@ LINK = link /nologo /LIBPATH:primesieve-master
 PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
 LIB_OBJECTS = \
+	src\balance_S2_load.obj \
 	src\Li.obj \
 	src\nth_prime.obj \
 	src\phi.obj \
