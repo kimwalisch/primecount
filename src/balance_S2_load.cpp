@@ -49,6 +49,8 @@ double relative_standard_deviation(aligned_vector<double>& timings)
   for (size_t i = 0; i < n; i++)
   {
     double mean = timings[i] - average;
+    // error correction
+    mean = min(mean, average * 2);
     sum_mean_squared += mean * mean;
   }
 
