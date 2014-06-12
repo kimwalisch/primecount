@@ -75,11 +75,11 @@ bool decrease_size(double rsd,
 }
 
 bool adjust_segments(double segments,
-                     double segments_per_thread,
+                     double segments_old,
                      double seconds)
 {
-  return (segments < segments_per_thread && seconds > 0.01) ||
-         (segments > segments_per_thread && seconds < 10);
+  return (segments < segments_old && seconds > 0.01) ||
+         (segments > segments_old && seconds < 10);
 }
 
 } // namespace
