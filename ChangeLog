@@ -1,7 +1,8 @@
-2014-06-08  Kim Walisch  <kim.walisch@gmail.com>
+2014-06-12  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.20 work in progress.
 
+  * src/balance_S2_load.cpp: New load balancing algorithm.
   * src/deleglise-rivat/*: Deleglise & Rivat implementations.
   * src/lmo/pi_lmo6.cpp: New LMO implementation.
   * src/lmo/pi_lmo_parallel6.cpp: New parallel LMO implementation.
