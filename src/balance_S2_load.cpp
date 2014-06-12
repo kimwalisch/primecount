@@ -64,14 +64,14 @@ bool increase_size(double rsd,
                    double increase_threshold,
                    double seconds)
 {
-  return seconds < 10 && (seconds < 0.1 || rsd < increase_threshold);
+  return seconds < 10 && (seconds < 0.01 || rsd < increase_threshold);
 }
 
 bool decrease_size(double rsd,
                    double increase_threshold,
                    double seconds)
 {
-  return seconds > 0.1 && rsd > increase_threshold;
+  return seconds > 0.01 && rsd > increase_threshold;
 }
 
 bool adjust_segments(double segments,
@@ -97,9 +97,10 @@ void balance_S2_load(int64_t* segment_size,
   double increase_threshold = 6;
 
   if (seconds < 0.1)
-    increase_threshold *= 2;
+    increase_threshold *= 3;
   else if (seconds > 2)
     increase_threshold /= 2;
+
 
   rsd = in_between(increase_threshold / 7, rsd, increase_threshold * 7);
 
