@@ -18,6 +18,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
+#include <balance_S2_load.hpp>
 #include <bit_sieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -277,31 +278,18 @@ int64_t S2(int64_t x,
     int64_t segments = (limit - low + segment_size - 1) / segment_size;
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
-    double seconds = get_wtime();
 
     aligned_vector<vector<int64_t> > phi(threads);
     aligned_vector<vector<int64_t> > mu_sum(threads);
+    aligned_vector<double> timings(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
+    {
+      timings[i] = get_wtime();
       S2_total += S2_thread(x, y, z, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
           i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
-
-    seconds = get_wtime() - seconds;
-    low += segments_per_thread * threads * segment_size;
-
-    // Dynamically increase segment_size or segments_per_thread
-    // if the running time is less than a certain threshold.
-    // We start off with a small segment size and few segments
-    // per thread as most special leaves are in the first segments
-    // whereas later on there are very few special leaves.
-    //
-    if (low > sqrt_limit && seconds < 10)
-    {
-      if (segment_size < sqrt_limit)
-        segment_size <<= 1;
-      else
-        segments_per_thread *= 2;
+      timings[i] = get_wtime() - timings[i];
     }
 
     // Once all threads have finished reconstruct and add the 
@@ -317,6 +305,10 @@ int64_t S2(int64_t x,
         phi_total[j] += phi[i][j];
       }
     }
+
+    low += segments_per_thread * threads * segment_size;
+    balance_S2_load(&segment_size, &segments_per_thread, min_segment_size,
+        sqrt_limit, timings);
   }
 
   return S2_total;
