@@ -5,7 +5,8 @@
 ///        in the computation of the special leaves. The algorithm
 ///        calculates the relative standard deviation of the timings
 ///        of the individual threads and then decides whether to
-///        assign more or less work to the threads.
+///        assign more work (low relative standard deviation) or less
+///        work (large relative standard deviation) to the threads.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -49,15 +50,36 @@ double relative_standard_deviation(aligned_vector<double>& timings)
   for (size_t i = 0; i < n; i++)
   {
     double mean = timings[i] - average;
-    // error correction
-    mean = min(mean, average * 2);
     sum_mean_squared += mean * mean;
   }
 
-  double standard_deviation = sqrt(sum_mean_squared / n);
+  double divisor = max<size_t>(1, n - 1);
+  double standard_deviation = sqrt(sum_mean_squared / divisor);
   double rel_standard_deviation = 100 * standard_deviation / average;
 
   return rel_standard_deviation;
+}
+
+bool increase_size(double rsd,
+                   double increase_threshold,
+                   double seconds)
+{
+  return seconds < 10 && (seconds < 0.1 || rsd < increase_threshold);
+}
+
+bool decrease_size(double rsd,
+                   double increase_threshold,
+                   double seconds)
+{
+  return seconds > 0.1 && rsd > increase_threshold;
+}
+
+bool adjust_segments(double segments,
+                     double segments_per_thread,
+                     double seconds)
+{
+  return (segments < segments_per_thread && seconds > 0.01) ||
+         (segments > segments_per_thread && seconds < 10);
 }
 
 } // namespace
@@ -83,21 +105,16 @@ void balance_S2_load(int64_t* segment_size,
 
   if (*segment_size < max_segment_size)
   {
-    // balance segment_size
-    if ((seconds < 0.1 || rsd < increase_threshold) &&
-         seconds < 10)
+    if (increase_size(rsd, increase_threshold, seconds))
       *segment_size <<= 1;
+    else if (decrease_size(rsd, increase_threshold, seconds))
+      *segment_size = (*segment_size + 1) >> 1;
   }
   else
   {
-    // balance segments_per_thread
     double segments = max(1.0, *segments_per_thread * increase_threshold / rsd);
-
-    if ((segments < *segments_per_thread && seconds > 0.01) ||
-        (segments > *segments_per_thread && seconds < 10))
-    {
+    if (adjust_segments(segments, *segments_per_thread, seconds))
       *segments_per_thread = (int) segments;
-    }
   }
 }
 
