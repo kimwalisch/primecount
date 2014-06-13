@@ -55,68 +55,71 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 
   double divisor = max<size_t>(1, n - 1);
   double standard_deviation = sqrt(sum_mean_squared / divisor);
-  double rel_standard_deviation = 100 * standard_deviation / average;
+  double rsd = 100 * standard_deviation / average;
 
-  return rel_standard_deviation;
+  return rsd;
 }
 
+/// @param rsd  Relative standard deviation
 bool increase_size(double rsd,
-                   double increase_threshold,
+                   double old_rsd,
                    double seconds)
 {
-  return seconds < 10 && (seconds < 0.01 || rsd < increase_threshold);
+  return seconds < 10 && (seconds < 0.01 || rsd < old_rsd);
 }
 
+/// @param rsd  Relative standard deviation
 bool decrease_size(double rsd,
-                   double increase_threshold,
+                   double old_rsd,
                    double seconds)
 {
-  return seconds > 0.01 && rsd > increase_threshold;
+  return seconds > 0.01 && rsd > old_rsd;
 }
 
 bool adjust_segments(double segments,
-                     double segments_old,
+                     double old_segments,
                      double seconds)
 {
-  return (segments < segments_old && seconds > 0.01) ||
-         (segments > segments_old && seconds < 10);
+  return (segments < old_segments && seconds > 0.01) ||
+         (segments > old_segments && seconds < 10);
 }
 
 } // namespace
 
 namespace primecount {
 
+/// Balance the load in the computation of the special leaves
+/// by dynamically ajusting the segment_size and segments_per_thread.
+/// @param old_rsd  Previous relative standard deviation.
+/// @param timings  Timings of the threads.
+///
 void balance_S2_load(int64_t* segment_size,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
                      int64_t max_segment_size,
+                     double* old_rsd,
                      aligned_vector<double>& timings)
 {
   double seconds = get_average(timings);
   double rsd = relative_standard_deviation(timings);
-  double increase_threshold = 6;
 
-  if (seconds < 0.1)
-    increase_threshold *= 3;
-  else if (seconds > 2)
-    increase_threshold /= 2;
-
-
-  rsd = in_between(increase_threshold / 7, rsd, increase_threshold * 7);
+  rsd = in_between(max(1.0, *old_rsd / 5), rsd, *old_rsd * 5);
 
   if (*segment_size < max_segment_size)
   {
-    if (increase_size(rsd, increase_threshold, seconds))
+    if (increase_size(rsd, *old_rsd, seconds))
       *segment_size <<= 1;
-    else if (decrease_size(rsd, increase_threshold, seconds))
+    else if (decrease_size(rsd, *old_rsd, seconds))
       *segment_size = (*segment_size + 1) >> 1;
   }
   else
   {
-    double segments = max(1.0, *segments_per_thread * increase_threshold / rsd);
+    double segments = max(1.0, *segments_per_thread * (*old_rsd / rsd));
     if (adjust_segments(segments, *segments_per_thread, seconds))
       *segments_per_thread = (int) segments;
   }
+
+  *old_rsd = rsd;
 }
 
 } //namespace

@@ -239,9 +239,10 @@ int64_t S2(int64_t x,
   int64_t logx = max(1, ilog(x));
   int64_t min_segment_size = 1 << 6;
   int64_t segment_size = next_power_of_2(sqrt_limit / (logx * threads));
-  segment_size = max(segment_size, min_segment_size);
   int64_t segments_per_thread = 1;
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
+  double relative_standard_deviation = 30;
+  segment_size = max(segment_size, min_segment_size);
 
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
@@ -284,7 +285,7 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load(&segment_size, &segments_per_thread, min_segment_size,
-        sqrt_limit, timings);
+        sqrt_limit, &relative_standard_deviation, timings);
   }
 
   return S2_total;

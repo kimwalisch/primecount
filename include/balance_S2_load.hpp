@@ -19,6 +19,7 @@ void balance_S2_load(int64_t* segment_size,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
                      int64_t max_segment_size,
+                     double* old_rsd,
                      aligned_vector<double>& timings);
 
 } // namespace primecount
