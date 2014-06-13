@@ -53,7 +53,7 @@ double relative_standard_deviation(aligned_vector<double>& timings)
     sum_mean_squared += mean * mean;
   }
 
-  double divisor = max<size_t>(1, n - 1);
+  double divisor = max(1.0, (double) n - 1);
   double standard_deviation = sqrt(sum_mean_squared / divisor);
   double rsd = 100 * standard_deviation / average;
 
@@ -77,7 +77,7 @@ bool decrease_size(double rsd,
 }
 
 bool adjust_segments(double segments,
-                     double old_segments,
+                     int64_t old_segments,
                      double seconds)
 {
   return (segments < old_segments && seconds > 0.01) ||
@@ -110,11 +110,12 @@ void balance_S2_load(int64_t* segment_size,
     if (increase_size(rsd, *old_rsd, seconds))
       *segment_size <<= 1;
     else if (decrease_size(rsd, *old_rsd, seconds))
-      *segment_size = (*segment_size + 1) >> 1;
+      if (*segment_size > min_segment_size)
+        *segment_size >>= 1;
   }
   else
   {
-    double segments = max(1.0, *segments_per_thread * (*old_rsd / rsd));
+    double segments = max(1.0, *segments_per_thread * *old_rsd / rsd);
     if (adjust_segments(segments, *segments_per_thread, seconds))
       *segments_per_thread = (int) segments;
   }
