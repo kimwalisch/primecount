@@ -205,11 +205,11 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  threads = validate_threads(threads);
+  int64_t limit = x / y + 1;
+  threads = validate_threads(threads, limit);
 
   int64_t S2_total = 0;
   int64_t low = 1;
-  int64_t limit = x / y + 1;
   int64_t sqrt_limit = isqrt(limit);
   int64_t logx = max(1, ilog(x));
   int64_t min_segment_size = 1 << 6;

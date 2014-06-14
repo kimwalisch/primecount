@@ -18,6 +18,8 @@
   #include <omp.h>
 #endif
 
+namespace primecount {
+
 /// Get the wall time in seconds.
 inline double get_wtime()
 {
@@ -31,7 +33,7 @@ inline double get_wtime()
 inline int validate_threads(int threads)
 {
 #ifdef _OPENMP
-  if (threads == primecount::MAX_THREADS) 
+  if (threads == MAX_THREADS)
     threads = omp_get_max_threads();
   return std::max(1, threads);
 #else
@@ -39,5 +41,17 @@ inline int validate_threads(int threads)
   return threads; 
 #endif
 }
+
+inline int validate_threads(int threads, int64_t sieve_limit)
+{
+  const int64_t thread_threshold = 100000;
+  threads = validate_threads(threads);
+  threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = std::max(1, threads);
+
+  return threads;
+}
+
+} // namespace
 
 #endif

@@ -166,10 +166,10 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  threads = validate_threads(threads);
+  int64_t limit = x / y + 1;
+  threads = validate_threads(threads, limit);
 
   int64_t S2_total = 0;
-  int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t segments = (limit + segment_size - 1) / segment_size;
   threads = in_between(1, threads, segments);

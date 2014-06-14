@@ -134,8 +134,6 @@ int64_t P2(int64_t x, int64_t y, int threads)
   if (x < 4 || a >= b)
     return 0;
 
-  threads = validate_threads(threads);
-
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   // initialize with \sum_{i=a+1}^{b} -i + 1
   int64_t sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
@@ -144,6 +142,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   int64_t limit = x / max<int64_t>(1, y);
   int64_t segment_size = max<int64_t>(64, isqrt(limit));
   int64_t segments_per_thread = 1;
+  threads = validate_threads(threads, limit);
 
   vector<int32_t> primes;
   primes.push_back(0);
