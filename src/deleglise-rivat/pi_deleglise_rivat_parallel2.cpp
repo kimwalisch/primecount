@@ -271,7 +271,6 @@ int64_t S2(int64_t x,
   double relative_standard_deviation = 30;
   segment_size = max(segment_size, min_segment_size);
 
-
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
 
