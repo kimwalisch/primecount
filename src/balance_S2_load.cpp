@@ -115,8 +115,10 @@ void balance_S2_load(int64_t* segment_size,
   }
   else
   {
-    double factor = in_between(1.0 / 4.0, decrease_threshold / rsd, 4.0);
-    double segments = max(1.0, *segments_per_thread * factor);
+    double factor = decrease_threshold / rsd;
+    factor = in_between(0.25, factor, 4.0);
+    double segments = *segments_per_thread * factor;
+    segments = max(1.0, segments);
 
     if (adjust_segments(segments, *segments_per_thread, seconds))
       *segments_per_thread = (int) segments;
