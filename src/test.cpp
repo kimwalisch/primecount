@@ -24,63 +24,27 @@
 #endif
 
 /// For types: f1(x) , f2(x)
-#define ASSERT_EQUAL_1(f1, f2, iters) \
-{ \
-  cout << "Testing " << #f1 << "(x)" << flush; \
- \
-  /* test for 0 <= x < 10000 */ \
-  for (int64_t x = 0; x < 10000; x++) \
-    assert_equal(#f1, x, f1(x), f2(x)); \
- \
-  int64_t x = 0; \
-  /* test using random increment */ \
-  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
-  { \
-    assert_equal(#f1, x, f1(x), f2(x)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
-  } \
- \
-  cout << endl; \
-}
+#define CHECK_11(f1, f2) check_equal(#f1, x, f1 (x), f2 (x))
 
 /// For types: f1(x) , f2(x, threads)
-#define ASSERT_EQUAL_2(f1, f2, iters) \
-{ \
-  cout << "Testing " << #f1 << "(x)" << flush; \
-  int threads = get_num_threads(); \
- \
-  /* test for 0 <= x < 10000 */ \
-  for (int64_t x = 0; x < 10000; x++) \
-    assert_equal(#f1, x, f1(x), f2(x, threads)); \
- \
-  int64_t x = 0; \
-  /* test using random increment */ \
-  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
-  { \
-    assert_equal(#f1, x, f1(x), f2(x, threads)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
-  } \
- \
-  cout << endl; \
-}
+#define CHECK_12(f1, f2) check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
 
 /// For types: f1(x, threads) , f2(x, threads)
-#define ASSERT_EQUAL_3(f1, f2, iters) \
+#define CHECK_22(f1, f2) check_equal(#f1, x, f1 (x, get_num_threads()), f2 (x, get_num_threads()))
+
+#define CHECK_EQUAL(f1, f2, check, iters) \
 { \
   cout << "Testing " << #f1 << "(x)" << flush; \
-  int threads = get_num_threads(); \
  \
   /* test for 0 <= x < 10000 */ \
   for (int64_t x = 0; x < 10000; x++) \
-    assert_equal(#f1, x, f1(x, threads), f2(x, threads)); \
+    check(f1, f2); \
  \
   int64_t x = 0; \
   /* test using random increment */ \
   for (int64_t i = 0; i < iters; i++, x += get_rand()) \
   { \
-    assert_equal(#f1, x, f1(x, threads), f2(x, threads)); \
+    check(f1, f2); \
     double percent = 100.0 * (i + 1.0) / iters; \
     cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
   } \
@@ -90,6 +54,7 @@
 
 using namespace std;
 using namespace primecount;
+using primesieve::parallel_nth_prime;
 
 namespace {
 
@@ -99,7 +64,7 @@ int get_rand()
   return (rand() % 10000) * 1000 + 1;
 }
 
-void assert_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
+void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
 {
   if (res1 != res2)
   {
@@ -151,25 +116,25 @@ bool test()
   {
     test_phi_thread_safety(100);
 
-    ASSERT_EQUAL_3(pi_legendre,                  pi_primesieve, 100);
-    ASSERT_EQUAL_3(pi_meissel,                   pi_legendre,   400);
-    ASSERT_EQUAL_3(pi_lehmer,                    pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_lehmer2,                   pi_lehmer,     200);
-    ASSERT_EQUAL_2(pi_lmo1,                      pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_lmo2,                      pi_meissel,    200);
-    ASSERT_EQUAL_2(pi_lmo3,                      pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_lmo4,                      pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_lmo5,                      pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_lmo6,                      pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_lmo_parallel1,             pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_lmo_parallel2,             pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_lmo_parallel3,             pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_lmo_parallel4,             pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_deleglise_rivat1,          pi_meissel,    400);
-    ASSERT_EQUAL_2(pi_deleglise_rivat2,          pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_deleglise_rivat_parallel1, pi_meissel,    400);
-    ASSERT_EQUAL_3(pi_deleglise_rivat_parallel2, pi_meissel,    400);
-    ASSERT_EQUAL_1(nth_prime,                    primesieve::parallel_nth_prime, 100);
+    CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22, 100);
+    CHECK_EQUAL(pi_meissel,                   pi_legendre,        CHECK_22, 400);
+    CHECK_EQUAL(pi_lehmer,                    pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_lehmer2,                   pi_lehmer,          CHECK_22, 200);
+    CHECK_EQUAL(pi_lmo1,                      pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_lmo2,                      pi_meissel,         CHECK_12, 200);
+    CHECK_EQUAL(pi_lmo3,                      pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_lmo4,                      pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_lmo5,                      pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_lmo6,                      pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_lmo_parallel1,             pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_lmo_parallel2,             pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_lmo_parallel3,             pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_lmo_parallel4,             pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_deleglise_rivat1,          pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_deleglise_rivat2,          pi_meissel,         CHECK_12, 400);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_meissel,         CHECK_22, 400);
+    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11, 100);
   }
   catch (runtime_error& e)
   {
