@@ -102,8 +102,8 @@ void balance_S2_load(int64_t* segment_size,
 {
   double seconds = get_average(timings);
   double rsd = max(0.1, relative_standard_deviation(timings));
-  double num_threads = timings.size();
-  double decrease_threshold = *old_rsd + min(log(num_threads), 1.0 / seconds);
+  double threads = (double) timings.size();
+  double decrease_threshold = *old_rsd + min(log(threads), 1.0 / seconds);
 
   if (*segment_size < max_segment_size)
   {
