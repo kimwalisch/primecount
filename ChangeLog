@@ -1,6 +1,6 @@
-2014-06-12  Kim Walisch  <kim.walisch@gmail.com>
+2014-06-15  Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.20 work in progress.
+  Version 0.20 released.
 
   * src/balance_S2_load.cpp: New load balancing algorithm.
   * src/deleglise-rivat/*: Deleglise & Rivat implementations.
