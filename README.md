@@ -178,8 +178,8 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are command-line programs for use with a terminal or Command
 Prompt.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.20-win64.zip">primecount-0.20-win64.zip</a>,  	222K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.20-linux-x64.tar.gz">primecount-0.20-linux-x64.tar.gz</a>, 81K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.20-win64.zip">primecount-0.20-win64.zip</a>, 241K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.20-linux-x64.tar.gz">primecount-0.20-linux-x64.tar.gz</a>, 100K
 
 SHA1 checksums of the files:
 ```sh
