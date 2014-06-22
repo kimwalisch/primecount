@@ -50,6 +50,7 @@ libprimecount_la_SOURCES = \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
+	src/lmo/FactorTable.cpp \
 	src/lmo/init_square_free.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
@@ -65,6 +66,7 @@ libprimecount_la_SOURCES = \
 	include/aligned_vector.hpp \
 	include/balance_S2_load.hpp \
 	include/bit_sieve.hpp \
+	include/FactorTable.hpp \
 	include/init_square_free.hpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \
