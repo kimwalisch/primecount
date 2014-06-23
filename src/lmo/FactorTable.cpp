@@ -64,9 +64,9 @@ const int8_t FactorTable::indexes_[210] =
 };
 
 FactorTable::FactorTable(int64_t max) :
-  max_(max)
+  max_((max < 8) ? 8 : max)
 {
-  if (isqrt(max) >= numeric_limits<uint16_t>::max())
+  if (isqrt(max_) >= numeric_limits<uint16_t>::max())
     throw runtime_error("FactorTable: sqrt(max) must be < max(uint16_t).");
   init();
 }
