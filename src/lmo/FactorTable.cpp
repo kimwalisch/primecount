@@ -82,6 +82,7 @@ void FactorTable::init()
     {
       int64_t prime = get_number(i);
       int64_t multiple = prime * get_number(1), j = 2;
+
       if (prime < 0xffff)
         factor_table_[i] = (uint16_t) prime;
 
