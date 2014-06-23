@@ -33,16 +33,14 @@ void PiTable::init()
       for (uint64_t j = i * i; j <= max_; j += i)
         sieve.unset(j);
 
-  uint64_t index = ~0u;
   uint32_t pix = 1;
   pi_.resize(max_ / 64 + 1);
 
   // fill pi_[x] table
   for (uint64_t x = 2; x <= max_; x++)
   {
-    if (x / 64 != index)
+    if (x % 64 == 0)
       pi_[x / 64].prime_count = pix;
-    index = x / 64;
 
     // check whether x is a prime
     if (sieve[x])
