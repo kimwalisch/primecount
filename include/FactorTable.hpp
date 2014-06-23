@@ -72,7 +72,7 @@ public:
   int64_t lpf(int64_t index) const
   {
     assert(get_number(index) > 7);
-    return factor_table_[index];
+    return factors_[index];
   }
 
   /// Get the Möbius function value of the number get_number(index).
@@ -81,13 +81,13 @@ public:
   int64_t mu(int64_t index) const
   {
     assert(lpf(index) != 0);
-    return (factor_table_[index] & 1) ? -1 : 1;
+    return (factors_[index] & 1) ? -1 : 1;
   }
 private:
   static const  int8_t indexes_[210];
   static const uint8_t numbers_[48];
 
-  std::vector<uint16_t> factor_table_;
+  std::vector<uint16_t> factors_;
   int64_t max_;
 };
 

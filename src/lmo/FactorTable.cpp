@@ -68,41 +68,40 @@ FactorTable::FactorTable(int64_t max) :
 {
   if (isqrt(max_) >= numeric_limits<uint16_t>::max())
     throw runtime_error("FactorTable: sqrt(max) must be < max(uint16_t).");
+
+  factors_.resize(get_index(max_) + 1, 0xffff);
   init();
 }
 
 void FactorTable::init()
 {
-  int64_t max_index = get_index(max_);
-  factor_table_.resize(max_index + 1, 0xffff);
-
-  for (size_t i = 1; i < factor_table_.size(); i++)
+  for (size_t i = 1; i < factors_.size(); i++)
   {
-    if (factor_table_[i] == 0xffff)
+    if (factors_[i] == 0xffff)
     {
       int64_t prime = get_number(i);
       int64_t multiple = prime * get_number(1), j = 2;
 
       if (prime < 0xffff)
-        factor_table_[i] = (uint16_t) prime;
+        factors_[i] = (uint16_t) prime;
 
       for (; multiple <= max_; multiple = prime * get_number(j++))
       {
         int64_t index = get_index(multiple);
 
         // prime is the smallest factor
-        if (factor_table_[index] == 0xffff)
-          factor_table_[index] = (uint16_t) prime;
+        if (factors_[index] == 0xffff)
+          factors_[index] = (uint16_t) prime;
         // the least significant bit indicates whether multiple has
         // an even (0) or odd (1) number of prime factors
-        else if (factor_table_[index] > 0)
-          factor_table_[index] ^= 1;
+        else if (factors_[index] > 0)
+          factors_[index] ^= 1;
       }
 
       // Moebius function is 0 if n has a squared prime factor
       multiple = prime * prime * get_number(0), j = 1;
       for (; multiple <= max_; multiple = prime * prime * get_number(j++))
-        factor_table_[get_index(multiple)] = 0;
+        factors_[get_index(multiple)] = 0;
     }
   }
 }

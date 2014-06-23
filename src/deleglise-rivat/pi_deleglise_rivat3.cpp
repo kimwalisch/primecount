@@ -66,7 +66,7 @@ int64_t S2(int64_t x,
   int64_t S2_result = 0;
 
   BitSieve sieve(segment_size);
-  FactorTable factor_table(y);
+  FactorTable factors(y);
   PiTable pi(y);
 
   vector<int32_t> counters(segment_size);
@@ -107,17 +107,17 @@ int64_t S2(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      factor_table.to_index(&min_m);
-      factor_table.to_index(&max_m);
+      factors.to_index(&min_m);
+      factors.to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor_table.lpf(m))
+        if (prime < factors.lpf(m))
         {
-          int64_t n = prime * factor_table.get_number(m);
+          int64_t n = prime * factors.get_number(m);
           int64_t count = cnt_query(counters, (x / n) - low);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= factor_table.mu(m) * phi_xn;
+          S2_result -= factors.mu(m) * phi_xn;
         }
       }
 
