@@ -55,11 +55,21 @@ public:
     return popcount(bits, start, stop);
   }
 
-  /// Set all bits corresponding to odd numbers to 1
-  void memset(int64_t low)
+  /// Set all bits to 1, except bits corresponding
+  /// to 0, 1 and even numbers > 2.
+  /// 
+  void memset(uint64_t low)
   {
     unsigned mask = (low & 1) ? 0x55555555u : 0xAAAAAAAAu;
     std::fill(bits_.begin(), bits_.end(), mask);
+
+    // correct 0, 1 and 2
+    if (low <= 2)
+    {
+      uint32_t bitmask = ~((1u << (2 - low)) - 1);
+      bits_[0] &= bitmask;
+      bits_[0] |= 1 << (2 - low);
+    }
   }
 
   bool operator[](uint64_t pos) const
