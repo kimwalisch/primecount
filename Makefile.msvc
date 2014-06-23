@@ -117,7 +117,7 @@ check test:
 #-----------------------------------------------------------------------------
 
 clean:
-	-del /Q *.exe *.lib src\*.obj src\lmo\*.obj 2> /nul
+	-del /Q *.exe *.lib src\*.obj src\app\*.obj src\lmo\*.obj src\deleglise-rivat\*.obj 2> /nul
 
 #-----------------------------------------------------------------------------
 # help target
