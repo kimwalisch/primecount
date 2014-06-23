@@ -11,7 +11,7 @@
 ///          2) The remaining primes inside ]n - n % 64, n]
 ///             are stored in pi_[n / 64].bits, each bit corresponds
 ///             to an integer i.e. bit[13] = n - n % 64 + 13. If the
-///             bit is set then corresponding integer is a prime.
+///             bit is set the corresponding integer is a prime.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
