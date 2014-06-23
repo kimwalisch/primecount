@@ -28,9 +28,9 @@ void PiTable::init()
   sieve.memset(0);
 
   // sieve of Eratosthenes
-  for (uint64_t i = 2; i * i <= max_; i++)
+  for (uint64_t i = 3; i * i <= max_; i += 2)
     if (sieve[i])
-      for (uint64_t j = i * i; j <= max_; j += i)
+      for (uint64_t j = i * i; j <= max_; j += i * 2)
         sieve.unset(j);
 
   uint32_t pix = 1;
