@@ -1,18 +1,17 @@
 ///
 /// @file    PiTable.hpp
 /// @brief   The PiTable class is a compressed lookup table for prime
-///          counts. It uses only n / 128 * 12 bytes of memory and
+///          counts. It uses only n / 64 * 12 bytes of memory and
 ///          returns the number of primes below n using O(1) operations.
 ///
 ///          How it works:
 ///
 ///          The prime count is calculated in 2 steps:
-///          1) pi(n - n % 128) is stored in pi_[n / 128].prime_count
-///          2) The remaining primes inside ]n - n % 128, n]
-///             are stored in pi_[n / 128].bits, each bit corresponds
-///             to an odd integer i.e. bit[13] = n - n % 128 + 2 * 13.
-///             If the bit is set the corresponding integer is a
-///             prime.
+///          1) pi(n - n % 64) is stored in pi_[n / 64].prime_count
+///          2) The remaining primes inside ]n - n % 64, n]
+///             are stored in pi_[n / 64].bits, each bit corresponds
+///             to an integer i.e. bit[13] = n - n % 64 + 13. If the
+///             bit is set then corresponding integer is a prime.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -40,14 +39,13 @@ public:
   void init();
 
   /// Get the number of primes <= n.
-  /// This implementation uses only 19 arithmetic operations.
-  /// @pre n > 2
+  /// This implementation uses only 20 arithmetic operations.
   ///
   uint64_t operator()(uint64_t n) const
   {
-    assert(n > 2);
     assert(n <= max_);
-    return pi_[n / 128].prime_count + popcount_3(pi_[n / 128].bits & bitmasks_[n % 128]);
+    uint64_t bitmask = UINT64_C(0xffffffffffffffff) >> (63 - n % 64);
+    return pi_[n / 64].prime_count + popcount_3(pi_[n / 64].bits & bitmask);
   }
 private:
   struct PiPair
@@ -57,8 +55,8 @@ private:
     uint64_t bits;
   };
 
-  static const uint64_t bitmasks_[128];
   std::vector<PiPair> pi_;
+  uint64_t masks_;
   uint64_t max_;
 
   /// Count the number of 1 bits in x.
