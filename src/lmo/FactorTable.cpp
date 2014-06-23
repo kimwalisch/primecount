@@ -9,6 +9,7 @@
 ///
 
 #include <FactorTable.hpp>
+#include <pmath.hpp>
 
 #include <limits>
 #include <stdexcept>
@@ -16,6 +17,8 @@
 #include <vector>
 
 using namespace std;
+
+namespace primecount {
 
 const uint8_t FactorTable::numbers_[48] =
 {
@@ -60,14 +63,11 @@ const int8_t FactorTable::indexes_[210] =
   46, 47
 };
 
-FactorTable::FactorTable(int64_t max, int64_t sqrty) :
+FactorTable::FactorTable(int64_t max) :
   max_(max)
 {
-  if (max > numeric_limits<uint32_t>::max())
-    throw runtime_error("FactorTable: max must be <= max(uint32_t).");
-  if (sqrty > numeric_limits<uint16_t>::max())
-    throw runtime_error("FactorTable: sqrty must be <= max(uint16_t).");
-
+  if (isqrt(max) >= numeric_limits<uint16_t>::max())
+    throw runtime_error("FactorTable: sqrt(max) must be < max(uint16_t).");
   init();
 }
 
@@ -106,3 +106,5 @@ void FactorTable::init()
     }
   }
 }
+
+} // namespace

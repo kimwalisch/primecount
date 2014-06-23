@@ -29,25 +29,36 @@
 #include <stdint.h>
 #include <vector>
 
+namespace primecount {
+
 class FactorTable
 {
 public:
-  FactorTable(int64_t max, int64_t sqrty);
+  FactorTable(int64_t max);
   void init();
 
   /// Get the FactorTable index corressponding to the number.
-  /// @pre get_number(index) > 7
+  /// @pre number > 7
   ///
-  int64_t get_index(int64_t number) const
+  static int64_t get_index(int64_t number)
   {
-    assert(get_number(index) > 7);
+    assert(number > 7);
     return 48 * (number / 210) + indexes_[number % 210];
+  }
+
+  /// Convert the number into a FactorTable index.
+  /// @pre number > 7
+  ///
+  static void to_index(int64_t* number)
+  {
+    assert(*number > 7);
+    *number = 48 * (*number / 210) + indexes_[*number % 210];
   }
 
   /// Get the number corresponding to the FactorTable index.
   /// @pre get_number(index) > 7
   ///
-  int64_t get_number(int64_t index) const
+  static int64_t get_number(int64_t index)
   {
     assert(get_number(index) > 7);
     return 210 * (index / 48) + numbers_[index % 48];
@@ -80,5 +91,7 @@ private:
   std::vector<uint16_t> factor_table_;
   int64_t max_;
 };
+
+} // namespace
 
 #endif
