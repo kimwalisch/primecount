@@ -33,7 +33,7 @@ void PiTable::init()
       for (uint64_t j = i * i; j <= max_; j += i * 2)
         sieve.unset(j);
 
-  uint32_t pix = 1;
+  uint32_t pix = 0;
   pi_.resize(max_ / 64 + 1);
 
   // fill pi_[x] table
