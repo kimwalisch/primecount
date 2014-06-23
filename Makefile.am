@@ -63,6 +63,7 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel2.cpp \
 	src/lmo/pi_lmo_parallel3.cpp \
 	src/lmo/pi_lmo_parallel4.cpp \
+	src/lmo/PiTable.cpp \
 	src/lmo/S1.cpp \
 	include/aligned_vector.hpp \
 	include/balance_S2_load.hpp \
@@ -73,6 +74,7 @@ libprimecount_la_SOURCES = \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
+	include/PiTable.hpp \
 	include/tos_counters.hpp \
 	include/utils.hpp
 
