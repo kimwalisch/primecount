@@ -11,8 +11,8 @@
 ///        FactorTable.lpf(index) is equal to (n = get_number(index)):
 ///
 ///         * 0      if moebius(n) = 0
-///         * lpf    if !is_prime(n) && moebius(n) = 1
-///         * lpf-1  if !is_prime(n) && moebius(n) = -1
+///         * lpf    if !is_prime(n) && moebius(n) = -1
+///         * lpf-1  if !is_prime(n) && moebius(n) = 1
 ///         * n      if  is_prime(n) && n < 65535
 ///         * 65535  if  is_prime(n) && n > 65535
 ///
@@ -71,7 +71,7 @@ public:
   int64_t mu(int64_t index) const
   {
     assert(lpf(index) != 0);
-    return (factor_table_[index] & 1) ? 1 : -1;
+    return (factor_table_[index] & 1) ? -1 : 1;
   }
 private:
   static const  int8_t indexes_[210];
