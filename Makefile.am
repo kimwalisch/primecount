@@ -67,7 +67,7 @@ libprimecount_la_SOURCES = \
 	src/lmo/S1.cpp \
 	include/aligned_vector.hpp \
 	include/balance_S2_load.hpp \
-	include/bit_sieve.hpp \
+	include/BitSieve.hpp \
 	include/FactorTable.hpp \
 	include/init_square_free.hpp \
 	include/primecount-internal.hpp \

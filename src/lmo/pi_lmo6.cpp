@@ -23,7 +23,7 @@
 
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <bit_sieve.hpp>
+#include <BitSieve.hpp>
 #include <init_square_free.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -77,7 +77,7 @@ int64_t S2(int64_t x,
   int64_t pi_sqrty = pi_bsearch(primes, sqrty);
   int64_t S2_result = 0;
 
-  bit_sieve sieve(segment_size);
+  BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());

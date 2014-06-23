@@ -9,7 +9,7 @@
 ///
 
 #include <PiTable.hpp>
-#include <bit_sieve.hpp>
+#include <BitSieve.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -24,7 +24,7 @@ PiTable::PiTable(uint64_t max) :
 
 void PiTable::init()
 {
-  bit_sieve sieve(max_ + 1);
+  BitSieve sieve(max_ + 1);
   sieve.memset(0);
 
   // sieve of Eratosthenes

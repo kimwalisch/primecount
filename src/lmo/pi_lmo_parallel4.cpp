@@ -21,7 +21,7 @@
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <balance_S2_load.hpp>
-#include <bit_sieve.hpp>
+#include <BitSieve.hpp>
 #include <init_square_free.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -105,7 +105,7 @@ int64_t S2_thread(int64_t x,
   if (c >= size - 1)
     return 0;
 
-  bit_sieve sieve(segment_size);
+  BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
   vector<vector<int32_t>::iterator > square_free_iters(pi_sqrty);

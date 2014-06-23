@@ -1,5 +1,5 @@
 ///
-/// @file  bit_sieve.hpp
+/// @file  BitSieve.hpp
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef BIT_SIEVE_HPP
-#define BIT_SIEVE_HPP
+#ifndef BITSIEVE_HPP
+#define BITSIEVE_HPP
 
 #include <primecount-internal.hpp>
 
@@ -35,14 +35,14 @@ const unsigned unset_bit[32] =
 
 namespace primecount {
 
-/// The bit_sieve data structure uses bit packing to save memory.
-/// bit_sieve uses 1 byte of memory for 8 numbers, each bit
+/// The BitSieve data structure uses bit packing to save memory.
+/// BitSieve uses 1 byte of memory for 8 numbers, each bit
 /// corresponds to one integer.
 ///
-class bit_sieve
+class BitSieve
 {
 public:
-  bit_sieve(std::size_t size)
+  BitSieve(std::size_t size)
     : bits_((size + 31) / 32 + sizeof(uint64_t)),
       size_(size)
   { }

@@ -11,7 +11,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
-#include <bit_sieve.hpp>
+#include <BitSieve.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 
@@ -71,7 +71,7 @@ int64_t P2_thread(int64_t x,
   int64_t stop = min(x / low, sqrtx);
   int64_t P2_thread = 0;
 
-  bit_sieve sieve(segment_size);
+  BitSieve sieve(segment_size);
   vector<int64_t> next;
   init_next_multiples(next, primes, size, low);
 
