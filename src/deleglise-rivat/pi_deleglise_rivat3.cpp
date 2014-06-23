@@ -2,19 +2,19 @@
 /// @file  pi_deleglise_rivat3.cpp
 /// @brief Implementation of the Lagarias-Miller-Odlyzko prime counting
 ///        algorithm with the improvements of Deleglise and Rivat.
-///        This version uses compression (see FactorTable) to reduce
-///        the memory usage.
+///        This version uses compression (see FactorTable & PiTable)
+///        to reduce the memory usage.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
-
+#include <PiTable.hpp>
+#include <FactorTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <bit_sieve.hpp>
-#include <FactorTable.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
@@ -67,9 +67,9 @@ int64_t S2(int64_t x,
 
   bit_sieve sieve(segment_size);
   FactorTable factor_table(y);
+  PiTable pi(y);
 
   vector<int32_t> counters(segment_size);
-  vector<int32_t> pi = make_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -131,17 +131,17 @@ int64_t S2(int64_t x,
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min(x / (prime * low), y)];
+      int64_t l = pi(min(x / (prime * low), y));
 
       if (prime >= primes[l])
         goto next_segment;
 
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
-      int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
-      int64_t min_clustered_easy_leaf = pi[min(isqrt(x / prime), y)];
-      int64_t min_sparse_easy_leaf = pi[min(z / prime, y)];
-      int64_t min_hard_leaf = pi[min_m];
+      int64_t min_trivial_leaf = pi(min(x / (prime * prime), y));
+      int64_t min_clustered_easy_leaf = pi(min(isqrt(x / prime), y));
+      int64_t min_sparse_easy_leaf = pi(min(z / prime, y));
+      int64_t min_hard_leaf = pi(min_m);
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
       min_clustered_easy_leaf = max(min_hard_leaf, min_clustered_easy_leaf);
@@ -158,14 +158,14 @@ int64_t S2(int64_t x,
 
       // For max(sqrt(x / primes[b]), primes[b]) < primes[l] <= x / primes[b]^2
       // Find all clustered easy leaves which satisfy:
-      // x / n <= y such that phi(x / n, b - 1) = pi[x / n] - b + 2
+      // x / n <= y such that phi(x / n, b - 1) = pi(x / n) - b + 2
       // And phi(x / n, b - 1) == phi(x / m, b - 1)
       while (l > min_clustered_easy_leaf)
       {
         int64_t n = prime * primes[l];
-        int64_t phi_xn = pi[x / n] - b + 2;
+        int64_t phi_xn = pi(x / n) - b + 2;
         int64_t m = prime * primes[b + phi_xn - 1];
-        int64_t l2 = pi[x / m];
+        int64_t l2 = pi(x / m);
         l2 = max(l2, min_clustered_easy_leaf);
         S2_result += phi_xn * (l - l2);
         l = l2;
@@ -173,12 +173,12 @@ int64_t S2(int64_t x,
 
       // For max(z / primes[b], primes[b]) < primes[l] <= sqrt(x / primes[b])
       // Find all sparse easy leaves which satisfy:
-      // x / n <= y such that phi(x / n, b - 1) = pi[x / n] - b + 2
+      // x / n <= y such that phi(x / n, b - 1) = pi(x / n) - b + 2
       for (; l > min_sparse_easy_leaf; l--)
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
-        S2_result += pi[xn] - b + 2;
+        S2_result += pi(xn) - b + 2;
       }
 
       // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
