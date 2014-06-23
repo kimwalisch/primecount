@@ -1,3 +1,10 @@
+2014-06-23  Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.21 work in progress.
+
+  * include/FactorTable.hpp: Uses compression to reduce memory usage.
+  * src/deleglise-rivat/*3.cpp: Uses FactorTable compression.
+
 2014-06-15  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.20 released.
