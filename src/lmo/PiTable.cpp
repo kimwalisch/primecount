@@ -45,7 +45,6 @@ void PiTable::init()
     // check whether x is a prime
     if (sieve[x])
     {
-      // set bit corresponding to x to 1
       uint64_t one = 1;
       pi_[x / 64].bits |= one << (x % 64);
       pix++;
