@@ -56,7 +56,6 @@ private:
   };
 
   std::vector<PiPair> pi_;
-  uint64_t masks_;
   uint64_t max_;
 
   /// Count the number of 1 bits in x.
