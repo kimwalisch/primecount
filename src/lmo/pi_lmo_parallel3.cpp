@@ -105,7 +105,7 @@ int64_t S2_thread(int64_t x,
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 
-  // Process the segments corresponding to the current thread
+  // Process the segments assigned to the current thread
   for (; low < limit; low += segment_size)
   {
     // Current segment = interval [low, high[
