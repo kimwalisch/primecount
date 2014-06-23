@@ -60,7 +60,6 @@ public:
   ///
   static int64_t get_number(int64_t index)
   {
-    assert(get_number(index) > 7);
     return 210 * (index / 48) + numbers_[index % 48];
   }
 
