@@ -42,7 +42,7 @@ void PiTable::init()
     if (x % 64 == 0)
       pi_[x / 64].prime_count = pix;
 
-    // check whether x is a prime
+    // check if x is a prime
     if (sieve[x])
     {
       uint64_t one = 1;
