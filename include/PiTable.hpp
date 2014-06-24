@@ -22,9 +22,7 @@
 #ifndef PITABLE_HPP
 #define PITABLE_HPP
 
-#if !defined(__STDC_CONSTANT_MACROS)
-  #define __STDC_CONSTANT_MACROS
-#endif
+#include <popcount64.hpp>
 
 #include <stdint.h>
 #include <cassert>
@@ -45,7 +43,7 @@ public:
   {
     assert(n <= max_);
     uint64_t bitmask = UINT64_C(0xffffffffffffffff) >> (63 - n % 64);
-    return pi_[n / 64].prime_count + popcount_3(pi_[n / 64].bits & bitmask);
+    return pi_[n / 64].prime_count + popcount64(pi_[n / 64].bits & bitmask);
   }
 private:
   struct PiPair
@@ -57,23 +55,6 @@ private:
 
   std::vector<PiPair> pi_;
   uint64_t max_;
-
-  /// Count the number of 1 bits in x.
-  /// This implementation uses only 12 arithmetic operations.
-  /// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
-  /// 
-  static uint64_t popcount_3(uint64_t x)
-  {
-    const uint64_t m1  = UINT64_C(0x5555555555555555);
-    const uint64_t m2  = UINT64_C(0x3333333333333333);
-    const uint64_t m4  = UINT64_C(0x0f0f0f0f0f0f0f0f);
-    const uint64_t h01 = UINT64_C(0x0101010101010101);
-
-    x -= (x >> 1) & m1;
-    x = (x & m2) + ((x >> 2) & m2);
-    x = (x + (x >> 4)) & m4;
-    return (x * h01) >> 56;
-  }
 };
 
 } // namespace
