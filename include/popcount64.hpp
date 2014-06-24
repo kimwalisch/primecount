@@ -1,8 +1,8 @@
 ///
 /// @file    popcount64.hpp
 /// @brief   Count the number of 1 bits inside a 64-bit word.
-///          If HAVE_POPCOUNT is defined then popcount64(x) uses the
-///          popcount instruction (requires SSE4.2 for x86 & x64).
+///          If HAVE_POPCNT is defined then popcount64(x) uses the
+///          POPCNT instruction (requires SSE4.2 for x86 & x64).
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#if defined(HAVE_POPCOUNT)
+#if defined(HAVE_POPCNT)
 
 #if defined(_MSC_VER) && defined(_WIN64)
 
@@ -42,14 +42,14 @@ inline uint64_t popcount64(uint64_t x)
          _mm_popcnt_u32((uint32_t)(x >> 32));
 }
 
-#elif defined(HAVE__BUILTIN_POPCOUNTLL)
+#elif defined(HAVE___BUILTIN_POPCOUNTLL)
 
 inline uint64_t popcount64(uint64_t x)
 {
   return __builtin_popcountll(x);
 }
 
-#elif defined(HAVE__BUILTIN_POPCOUNT)
+#elif defined(HAVE___BUILTIN_POPCOUNT)
 
 inline uint64_t popcount64(uint64_t x)
 {
@@ -60,14 +60,14 @@ inline uint64_t popcount64(uint64_t x)
 #else /* Error */
 
 #if defined(_MSC_VER)
-  #pragma error( "POPCOUNT not supported, remove \"/D HAVE_POPCOUNT\" from Makefile.msvc" )
+  #pragma error( "POPCOUNT not supported, remove \"/D HAVE_POPCNT\" from Makefile.msvc" )
 #else
   #error "POPCOUNT not supported, don't use --enable-popcount"
 #endif
 
-#endif /* HAVE_POPCOUNT */
+#endif /* HAVE_POPCNT */
 
-#elif !defined(HAVE_POPCOUNT)
+#elif !defined(HAVE_POPCNT)
 
 /// Count the number of 1 bits in x.
 /// This implementation uses only 12 arithmetic operations.
