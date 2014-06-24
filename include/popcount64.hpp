@@ -57,9 +57,13 @@ inline uint64_t popcount64(uint64_t x)
          __builtin_popcount((uint32_t)(x >> 32));
 }
 
-#else
+#else /* Error */
 
-#error __FILE__ ": POPCOUNT instruction not supported."
+#if defined(_MSC_VER)
+  #pragma error( "POPCOUNT not supported, remove \"/D HAVE_POPCOUNT\" from Makefile.msvc" )
+#else
+  #error "POPCOUNT not supported, don't use --enable-popcount"
+#endif
 
 #endif /* HAVE_POPCOUNT */
 
