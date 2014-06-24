@@ -204,10 +204,9 @@ $ ./primecount --help
 ```
 
 ### Build instructions (Unix-like OSes)
-In order to build primecount you need to have installed a C++ compiler and
-GNU make (or any other make). primecount depends on the author's primesieve
-library, download it from http://primesieve.org/downloads
-and install it using:
+To build primecount you need to have installed a C++ compiler and GNU make.
+primecount depends on the author's primesieve library, download it from
+http://primesieve.org/downloads and install it using:
 ```sh
 $ ./configure
 $ make
