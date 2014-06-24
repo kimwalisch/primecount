@@ -1,7 +1,8 @@
-1) Add Gourdon's paper to references
-2) Speed up square free special leaves
-    * Is it possible to use algorithm like lmo6.cpp without using more memory?
-3) Implement Gourdon's algorithm.
-4) Update ./docs
+1) Create src/BitSieve.cpp
+    * Inline functions must be as small as possible
+    * Inline functions should use very few (<= 2) registers
+    * Check all other inline functions
+
+2) Update ./docs
     * write document about special leaves
     * write document about parallel S2(x, a)
