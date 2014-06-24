@@ -12,8 +12,20 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
+# Disable popcount instruction by default
+AC_ARG_ENABLE([popcount],
+    AC_HELP_STRING([--enable-popcount], [enable popcount instruction (default no)]))
+
+AS_IF([test "x$enable_popcount" = "xyes"], [
+    AC_DEFINE(HAVE_POPCOUNT, 1, [has popcount instruction])
+    AX_GCC_BUILTIN([__builtin_popcount])
+    AX_GCC_BUILTIN([__builtin_popcountll])
+    AX_CHECK_COMPILE_FLAG([-mpopcnt], [CXXFLAGS="$CXXFLAGS -mpopcnt"],
+   [AX_CHECK_COMPILE_FLAG([-msse4.2], [CXXFLAGS="$CXXFLAGS -msse4.2"])])
+])
+
 # Disable assert macro by default
-AC_ARG_ENABLE(assert,
+AC_ARG_ENABLE([assert],
     AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
     [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
 
@@ -29,5 +41,6 @@ AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
     [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])]
 )
 
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
