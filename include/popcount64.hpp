@@ -60,9 +60,9 @@ inline uint64_t popcount64(uint64_t x)
 #else /* Error */
 
 #if defined(_MSC_VER)
-  #pragma error( "POPCOUNT not supported, remove \"/D HAVE_POPCNT\" from Makefile.msvc" )
+  #pragma error( "POPCNT not supported, remove \"/D HAVE_POPCNT\" from Makefile.msvc" )
 #else
-  #error "POPCOUNT not supported, don't use --enable-popcount"
+  #error "POPCNT not supported, don't use --enable-popcnt"
 #endif
 
 #endif /* HAVE_POPCNT */
