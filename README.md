@@ -221,6 +221,12 @@ $ ./configure
 $ make
 $ sudo make install
 ```
+If your CPU supports the
+[POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT) (2010 or later)
+then you can enable it in the configure step. It gives about 10 percent speed up.
+```sh
+$ ./configure --enable-popcnt
+```
 If you have installed primesieve but primecount's configure script still fails
 due to missing libprimesieve then you need to add /usr/local/lib to your library
 path:
