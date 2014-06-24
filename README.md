@@ -213,7 +213,13 @@ $ ./configure
 $ make
 $ sudo make install
 ```
-Then download the latest
+If you are not using Linux or Mac OS X then you may need to export these
+variables:
+```sh
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+```
+Finally download the latest
 <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-0.20.tar.gz">primecount-0.20.tar.gz</a>
 release tarball and build it using:
 ```sh
@@ -226,13 +232,6 @@ If your CPU supports the
 then you can enable it in the configure step. It gives about 10 percent speed up.
 ```sh
 $ ./configure --enable-popcnt
-```
-If you have installed primesieve but primecount's configure script still fails
-due to missing libprimesieve then you need to add /usr/local/lib to your library
-path:
-```sh
-export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
 ### Build instructions (Microsoft Visual C++)
