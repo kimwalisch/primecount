@@ -70,6 +70,7 @@ libprimecount_la_SOURCES = \
 	include/BitSieve.hpp \
 	include/FactorTable.hpp \
 	include/init_square_free.hpp \
+	include/popcount64.hpp \
 	include/primecount-internal.hpp \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
