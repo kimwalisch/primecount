@@ -12,12 +12,12 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
-# Disable popcount instruction by default
-AC_ARG_ENABLE([popcount],
-    AC_HELP_STRING([--enable-popcount], [enable popcount instruction (default no)]))
+# Disable POPCNT instruction by default
+AC_ARG_ENABLE([popcnt],
+    AC_HELP_STRING([--enable-popcnt], [enable POPCNT instruction (default no)]))
 
-AS_IF([test "x$enable_popcount" = "xyes"], [
-    AC_DEFINE(HAVE_POPCOUNT, 1, [has popcount instruction])
+AS_IF([test "x$enable_popcnt" = "xyes"], [
+    AC_DEFINE(HAVE_POPCNT, 1, [has POPCNT instruction])
     AX_GCC_BUILTIN([__builtin_popcount])
     AX_GCC_BUILTIN([__builtin_popcountll])
     AX_CHECK_COMPILE_FLAG([-mpopcnt], [CXXFLAGS="$CXXFLAGS -mpopcnt"],
