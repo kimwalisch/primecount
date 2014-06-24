@@ -13,71 +13,37 @@
 #endif
 
 #include <stdint.h>
+#include <popcount64.hpp>
 
 namespace {
 
-int64_t popcount(uint64_t bits)
+int64_t popcount_edges(const uint64_t* bits, int64_t start, int64_t stop)
 {
-  const uint64_t m1  = UINT64_C(0x5555555555555555);
-  const uint64_t m2  = UINT64_C(0x3333333333333333);
-  const uint64_t m4  = UINT64_C(0x0F0F0F0F0F0F0F0F);
-  const uint64_t h01 = UINT64_C(0x0101010101010101);
+  int64_t index1 = start >> 6;
+  int64_t index2 = stop  >> 6;
+  int64_t mask1 = UINT64_C(0xffffffffffffffff) << (start & 63);
+  int64_t mask2 = UINT64_C(0xffffffffffffffff) >> (63 - (stop & 63));
+  int64_t count = 0;
 
-  uint64_t bit_count = 0;
-  uint64_t x;
+  if (index1 == index2)
+    count += popcount64(bits[index1] & (mask1 & mask2));
+  else
+  {
+    count += popcount64(bits[index1] & mask1);
+    count += popcount64(bits[index2] & mask2);
+  }
 
-  // http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
-  x = bits;
-  x =  x       - ((x >> 1)  & m1);
-  x = (x & m2) + ((x >> 2)  & m2);
-  x = (x       +  (x >> 4)) & m4;
-  x = (x * h01) >> 56;
-  bit_count += x;
-
-  return bit_count;
+  return count;
 }
 
 int64_t popcount(const uint64_t* bits, int64_t start_idx, int64_t stop_idx)
 {
-  const uint64_t m1  = UINT64_C(0x5555555555555555);
-  const uint64_t m2  = UINT64_C(0x3333333333333333);
-  const uint64_t m4  = UINT64_C(0x0F0F0F0F0F0F0F0F);
-  const uint64_t h01 = UINT64_C(0x0101010101010101);
-
   uint64_t bit_count = 0;
-  uint64_t x;
 
-  // http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
   for (int64_t i = start_idx; i <= stop_idx; i++)
-  {
-    x = bits[i];
-    x =  x       - ((x >> 1)  & m1);
-    x = (x & m2) + ((x >> 2)  & m2);
-    x = (x       +  (x >> 4)) & m4;
-    x = (x * h01) >> 56;
-    bit_count += x;
-  }
+    bit_count += popcount64(bits[i]);
 
   return bit_count;
-}
-
-int64_t popcount_edges(const uint64_t* bits, int64_t start, int64_t stop)
-{
-  int64_t count = 0;
-  int64_t start_idx = start >> 6;
-  int64_t stop_idx = stop >> 6;
-  int64_t start_mask = UINT64_C(0xffffffffffffffff) << (start & 63);
-  int64_t stop_mask  = UINT64_C(0xffffffffffffffff) >> (63 - (stop & 63));
-
-  if (start_idx == stop_idx)
-    count += popcount(bits[start_idx] & (start_mask & stop_mask));
-  else
-  {
-    count += popcount(bits[start_idx] & start_mask);
-    count += popcount(bits[stop_idx] & stop_mask);
-  }
-
-  return count;
 }
 
 } // namespace
