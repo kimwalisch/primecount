@@ -101,9 +101,9 @@ inline T isqrt(T x)
 {
   T r = static_cast<T>(std::sqrt(static_cast<double>(x)));
   // correct rounding error
-  while (ipow<2>(r) > x)
+  while (isquare(r) > x)
     r--;
-  while (ipow<2>(r + 1) <= x)
+  while (isquare(r + 1) <= x)
     r++;
   return r;
 }
