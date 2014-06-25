@@ -12,6 +12,7 @@ PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
 LIB_OBJECTS = \
 	src\balance_S2_load.obj \
+	src\BitSieve.obj \
 	src\Li.obj \
 	src\nth_prime.obj \
 	src\phi.obj \
@@ -22,7 +23,6 @@ LIB_OBJECTS = \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\pmath.obj \
-	src\popcount.obj \
 	src\primecount.obj \
 	src\P2.obj \
 	src\P3.obj \
