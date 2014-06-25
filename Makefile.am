@@ -31,6 +31,7 @@ EXTRA_DIST = \
 
 libprimecount_la_SOURCES = \
 	src/balance_S2_load.cpp \
+	src/BitSieve.cpp \
 	src/Li.cpp \
 	src/nth_prime.cpp \
 	src/PhiCache.cpp \
@@ -43,7 +44,6 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/pmath.cpp \
-	src/popcount.cpp \
 	src/primecount.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
