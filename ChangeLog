@@ -1,9 +1,12 @@
-2014-06-23  Kim Walisch  <kim.walisch@gmail.com>
+2014-06-25  Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.21 work in progress.
 
-  * include/FactorTable.hpp: Uses compression to reduce memory usage.
-  * src/deleglise-rivat/*3.cpp: Uses FactorTable compression.
+  * ./configure --enable-popcnt: Use POPCNT instruction.
+  * include/PiTable.hpp: Compressed lookup table for prime counts.
+  * include/FactorTable.hpp: Compressed lookup table for lpf and Moebius.
+  * src/deleglise-rivat/*3.cpp: Uses PiTable & FactorTable.
+  * src/BitSieve.cpp: New file.
 
 2014-06-15  Kim Walisch  <kim.walisch@gmail.com>
 
