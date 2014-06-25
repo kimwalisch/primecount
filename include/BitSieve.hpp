@@ -1,6 +1,8 @@
 ///
 /// @file  BitSieve.hpp
-/// @brief Bit array for prime sieving.
+/// @brief The BitSieve class is a bit array for prime sieving.
+///        BitSieve packs 8 numbers into one byte i.e. each bit
+///        corresponds to one integer.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -18,41 +20,34 @@
 
 namespace primecount {
 
-/// The BitSieve data structure uses bit packing to save memory.
-/// BitSieve uses 1 byte of memory for 8 numbers, each bit
-/// corresponds to one integer.
-///
 class BitSieve
 {
 public:
-  BitSieve(std::size_t size)
-    : bits_((size + 31) / 32 + sizeof(uint64_t)),
-      size_(size)
-  { }
-
-  /// Count the number of 1 bits inside the interval [start, stop]
-  uint64_t count(uint64_t start, uint64_t stop) const;
+  BitSieve(std::size_t size);
 
   /// Set all bits to 1, except bits corresponding
   /// to 0, 1 and even numbers > 2.
   void memset(uint64_t low);
 
+  /// Count the number of 1 bits inside the interval [start, stop]
+  uint64_t count(uint64_t start, uint64_t stop) const;
+
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    unsigned mask = 1u << (pos & 31);
-    return (bits_[pos >> 5] & mask) != 0;
-  }
-
-  std::size_t size() const
-  {
-    return size_;
+    unsigned bit = 1u << (pos & 31);
+    return (bits_[pos >> 5] & bit) != 0;
   }
 
   void unset(uint64_t pos)
   {
     assert(pos < size_);
     bits_[pos >> 5] &= unset_bit_[pos & 31];
+  }
+
+  std::size_t size() const
+  {
+    return size_;
   }
 private:
   static const unsigned int unset_bit_[32];
