@@ -37,6 +37,16 @@ const unsigned int BitSieve::unset_bit_[32] =
   ~(1u << 30), ~(1u << 31)
 };
 
+BitSieve::BitSieve(std::size_t size) :
+  size_(size)
+{
+  std::size_t size32 = (size + 31) / 32;
+  // align to 64-bit boundary
+  if (size32 % 2 != 0)
+    size32 += 2 - size32 % 2;
+  bits_.resize(size32);
+}
+
 /// Set all bits to 1, except bits corresponding
 /// to 0, 1 and even numbers > 2.
 /// 
