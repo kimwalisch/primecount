@@ -193,9 +193,6 @@ int64_t Li_inverse(int64_t);
 ///
 int64_t nth_prime(int64_t n, int threads);
 
-/// Calculates the number of 1 bits inside an array.
-int64_t popcount(const uint64_t* bits, int64_t start, int64_t stop);
-
 /// P2(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime.
 /// Space complexity: O((x / primes[a])^(1/2)).
