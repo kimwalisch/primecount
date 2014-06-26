@@ -41,6 +41,5 @@ AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
     [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])]
 )
 
-AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
