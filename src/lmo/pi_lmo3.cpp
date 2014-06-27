@@ -132,7 +132,7 @@ int64_t pi_lmo3(int64_t x)
   double beta = 1.0;
   double alpha = in_between(1, log(log((double) x)) * beta, iroot<6>(x));
   int64_t x13 = iroot<3>(x);
-  int64_t y = (int64_t)(x13 * alpha);
+  int64_t y = (int64_t) (x13 * alpha);
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);
