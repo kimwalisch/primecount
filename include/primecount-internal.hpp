@@ -22,6 +22,7 @@ enum {
 };
 
 class PhiCache;
+class FactorTable;
 
 /// This is an alias for the fastest prime counting implementation
 /// within primecount.
@@ -221,6 +222,16 @@ int64_t S1(int64_t x,
            std::vector<int32_t>& primes,
            std::vector<int32_t>& lpf,
            std::vector<int32_t>& mu);
+
+/// Calculate the contribution of the ordinary leaves in the
+/// Lagarias-Miller-Odlyzko algorithm.
+/// Run time: O(y) operations, O(y) space.
+///
+int64_t S1(int64_t x,
+           int64_t y,
+           int64_t c,
+           std::vector<int32_t>& primes,
+           FactorTable& Factors);
 
 } // namespace primecount
 
