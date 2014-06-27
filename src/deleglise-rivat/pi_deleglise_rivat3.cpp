@@ -59,8 +59,8 @@ int64_t get_phi_size(int64_t x, int64_t z, PiTable& pi)
   // high > x / z, high = x / z + 1
   // primes[b] > x / (primes[b] * high)
   // primes[b] > sqrt(x / high)
-  // b > pi[sqrt(x / high)]
-  // b = pi[sqrt(x / high)] + 1
+  // b > pi(sqrt(x / high))
+  // b = pi(sqrt(x / high)) + 1
   // phi_size = b + 1
 
   double high = (double) x / (double) z + 1;
