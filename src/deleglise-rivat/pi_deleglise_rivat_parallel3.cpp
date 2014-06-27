@@ -346,7 +346,7 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log log x) space.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
 ///
 int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
 {
@@ -355,7 +355,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
 
   // alpha is a tuning factor
   double d = (double) x;
-  double alpha = in_between(1, log(d) - 3 * log(log(d)), iroot<6>(x));
+  double alpha = in_between(1, log(d), iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = (int64_t) (x / (x13 * sqrt(alpha)));
