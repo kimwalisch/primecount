@@ -49,6 +49,26 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   next_multiple = k;
 }
 
+int64_t get_phi_size(int64_t x, int64_t z, PiTable& pi)
+{
+  // The largest phi[b] index is needed
+  // when min_sparse_easy_leaf > min_hard_leaf
+  // happens for the first time:
+  // z / primes[b] > x / (primes[b] * high)
+  // high > x / z, high = x / z + 1
+  // primes[b] > x / (primes[b] * high)
+  // primes[b] > sqrt(x / high)
+  // b > pi[sqrt(x / high)]
+  // b = pi[sqrt(x / high)] + 1
+  // phi_size = b + 1
+
+  double high = (double) x / (double) z + 1;
+  int64_t max = (int64_t) (x / high);
+  int64_t max_sqrt = isqrt(max);
+  int64_t max_size = pi(min(max_sqrt, pi.size() - 1)) + 2;
+  return min(max_size, pi.size());
+}
+
 /// Calculate the contribution of the special leaves.
 /// @see ../docs/computing-special-leaves.md
 /// @pre y > 0 && c > 1
@@ -68,9 +88,10 @@ int64_t S2(int64_t x,
   BitSieve sieve(segment_size);
   PiTable pi(y);
 
+  int64_t phi_size = get_phi_size(x, z, pi);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next(primes.begin(), primes.end());
-  vector<int64_t> phi(primes.size(), 0);
+  vector<int64_t> next(primes.begin(), primes.begin() + phi_size);
+  vector<int64_t> phi(phi_size, 0);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -180,20 +201,23 @@ int64_t S2(int64_t x,
         S2_result += pi(xn) - b + 2;
       }
 
-      // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
-      // Find all hard leaves which satisfy:
-      // low <= (x / n) < high
-      for (; l > min_hard_leaf; l--)
+      if (b < phi_size)
       {
-        int64_t n = prime * primes[l];
-        int64_t xn = x / n;
-        int64_t count = cnt_query(counters, xn - low);
-        int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
-      }
+        // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
+        // Find all hard leaves which satisfy:
+        // low <= (x / n) < high
+        for (; l > min_hard_leaf; l--)
+        {
+          int64_t n = prime * primes[l];
+          int64_t xn = x / n;
+          int64_t count = cnt_query(counters, xn - low);
+          int64_t phi_xn = phi[b] + count;
+          S2_result += phi_xn;
+        }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
+      }
     }
 
     next_segment:;
