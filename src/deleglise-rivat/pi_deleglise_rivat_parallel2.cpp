@@ -73,21 +73,20 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
 
 int64_t get_phi_size(int64_t x, int64_t z, int64_t max_index, vector<int32_t>& pi)
 {
-  // The largest phi[b] index is needed when
-  // min_sparse_easy_leaf > min_hard_leaf
-  // for the first time. Thus:
+  // The largest phi[b] index is needed
+  // when min_sparse_easy_leaf > min_hard_leaf
+  // happens for the first time:
   // z / primes[b] > x / (primes[b] * high)
-  // high > x / z, high = x / z + 1 = (x + z) / z
+  // high > x / z, high = x / z + 1
   // primes[b] > x / (primes[b] * high)
-  // primes[b] > x / (primes[b] * (x + z) / z)
-  // primes[b] * primes[b] > (x * z) / (x + z)
-  // primes[b] > sqrt((x * z) / (x + z))
-  // b > pi[sqrt((x * z) / (x + z))]
-  // b = pi[sqrt((x * z) / (x + z))] + 1
+  // primes[b] > sqrt(x / high)
+  // b > pi[sqrt(x / high)]
+  // b = pi[sqrt(x / high)] + 1
   // phi_size = b + 1
 
-  double max = ((double) x * (double) z) / (x + z);
-  int64_t max_sqrt = isqrt((int64_t) max);
+  double high = (double) x / (double) z + 1;
+  int64_t max = (int64_t) (x / high);
+  int64_t max_sqrt = isqrt(max);
   int64_t max_pi = pi.size() - 1;
   int64_t max_size = pi[min(max_sqrt, max_pi)] + 2;
   return min(max_size, max_index + 1);
