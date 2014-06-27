@@ -58,15 +58,14 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t pi_y,
            int64_t c,
-           vector<int32_t>& primes)
+           vector<int32_t>& primes,
+           FactorTable& factors)
 {
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
   int64_t S2_result = 0;
-
   BitSieve sieve(segment_size);
-  FactorTable factors(y);
   PiTable pi(y);
 
   vector<int32_t> counters(segment_size);
@@ -107,8 +106,8 @@ int64_t S2(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      factors.to_index(&min_m);
-      factors.to_index(&max_m);
+      FactorTable::to_index(&min_m);
+      FactorTable::to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -221,18 +220,17 @@ int64_t pi_deleglise_rivat3(int64_t x)
   double alpha = in_between(1, log(d) - 3 * log(log(d)), iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = x / (int64_t) (x13 * sqrt(alpha));
+  int64_t z = (int64_t) (x / x13 * sqrt(alpha));
 
-  vector<int32_t> mu = make_moebius(y);
-  vector<int32_t> lpf = make_least_prime_factor(y);
   vector<int32_t> primes;
   primes.push_back(0);
-  primesieve::generate_primes(y, &primes);    
+  primesieve::generate_primes(y, &primes);
+  FactorTable factors(y);
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
-  int64_t s1 = S1(x, y, c, primes, lpf , mu);
-  int64_t s2 = S2(x, y, z, pi_y, c, primes);
+  int64_t s1 = S1(x, y, c, primes, factors);
+  int64_t s2 = S2(x, y, z, pi_y, c, primes, factors);
   int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
