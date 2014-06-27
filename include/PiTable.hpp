@@ -46,9 +46,9 @@ public:
     return pi_[n / 64].prime_count + popcount64(pi_[n / 64].bits & bitmask);
   }
 
-  int64_t max() const
+  int64_t size() const
   {
-    return max_;
+    return max_ + 1;
   }
 private:
   struct PiPair
