@@ -10,6 +10,7 @@
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
+
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
