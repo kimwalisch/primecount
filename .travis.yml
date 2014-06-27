@@ -25,7 +25,7 @@ before_script:
   - ./autogen.sh
 
 script:
-  - ./configure CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic -O2"
+  - ./configure --enable-assert CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic -O2"
   - make
   - sudo make install
   - make dist
