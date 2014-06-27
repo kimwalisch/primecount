@@ -66,7 +66,7 @@ int64_t pi_deleglise_rivat(int64_t x)
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
-  return pi_deleglise_rivat_parallel2(x, threads);
+  return pi_deleglise_rivat_parallel3(x, threads);
 }
 
 /// Calculate the number of primes below x using Legendre's formula.

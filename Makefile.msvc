@@ -32,6 +32,7 @@ LIB_OBJECTS = \
 	src\deleglise-rivat\pi_deleglise_rivat3.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel2.obj \
+	src\deleglise-rivat\pi_deleglise_rivat_parallel3.obj \
 	src\lmo\FactorTable.obj \
 	src\lmo\init_square_free.obj \
 	src\lmo\pi_lmo1.obj \
