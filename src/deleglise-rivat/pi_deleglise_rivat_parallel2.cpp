@@ -71,6 +71,28 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   next_multiple = k;
 }
 
+int64_t get_phi_size(int64_t x, int64_t z, int64_t max_index, vector<int32_t>& pi)
+{
+  // The largest phi[b] index is needed when
+  // min_sparse_easy_leaf > min_hard_leaf
+  // for the first time. Thus:
+  // z / primes[b] > x / (primes[b] * high)
+  // high > x / z, high = x / z + 1 = (x + z) / z
+  // primes[b] > x / (primes[b] * high)
+  // primes[b] > x / (primes[b] * (x + z) / z)
+  // primes[b] * primes[b] > (x * z) / (x + z)
+  // primes[b] > sqrt((x * z) / (x + z))
+  // b > pi[sqrt((x * z) / (x + z))]
+  // b = pi[sqrt((x * z) / (x + z))] + 1
+  // phi_size = b + 1
+
+  double max = ((double) x * (double) z) / (x + z);
+  int64_t max_sqrt = isqrt((int64_t) max);
+  int64_t max_pi = pi.size() - 1;
+  int64_t max_size = pi[min(max_sqrt, max_pi)] + 2;
+  return min(max_size, max_index + 1);
+}
+
 /// Compute the S2 contribution for the interval
 /// [low_process, low_process + segments * segment_size[.
 /// The missing special leaf contributions for the interval
@@ -97,18 +119,20 @@ int64_t S2_thread(int64_t x,
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
-  int64_t size = pi[min(isqrt(x / low), y)] + 1;
+  int64_t max_prime = min(isqrt(x / low), y);
+  int64_t max_index = pi[max_prime];
+  int64_t phi_size = get_phi_size(x, z, max_index, pi);
   int64_t S2_thread = 0;
 
-  if (c >= size - 1)
+  if (c >= phi_size)
     return 0;
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
-  init_next_multiples(next, primes, size, low);
-  phi.resize(size, 0);
-  mu_sum.resize(size, 0);
+  init_next_multiples(next, primes, phi_size, low);
+  phi.resize(phi_size, 0);
+  mu_sum.resize(phi_size, 0);
 
   // Process the segments assigned to the current thread
   for (; low < limit; low += segment_size)
@@ -135,7 +159,7 @@ int64_t S2_thread(int64_t x,
     // For c + 1 <= b < pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
     // which satisfy: low <= (x / n) < high
-    for (; b < min(pi_sqrty, size); b++)
+    for (int64_t end = min(pi_sqrty, max_index + 1); b < end; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -163,7 +187,7 @@ int64_t S2_thread(int64_t x,
     // For pi_sqrty <= b < pi_y
     // Find all special leaves: n = primes[b] * primes[l]
     // which satisfy: low <= (x / n) < high
-    for (; b < pi_y; b++)
+    for (int64_t end = min(pi_y, max_index + 1); b < end; b++)
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
@@ -216,21 +240,24 @@ int64_t S2_thread(int64_t x,
         S2_thread += pi[xn] - b + 2;
       }
 
-      // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
-      // Find all hard leaves which satisfy:
-      // low <= (x / n) < high
-      for (; l > min_hard_leaf; l--)
+      if (b < phi_size)
       {
-        int64_t n = prime * primes[l];
-        int64_t xn = x / n;
-        int64_t count = cnt_query(counters, xn - low);
-        int64_t phi_xn = phi[b] + count;
-        S2_thread += phi_xn;
-        mu_sum[b]++;
-      }
+        // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
+        // Find all hard leaves which satisfy:
+        // low <= (x / n) < high
+        for (; l > min_hard_leaf; l--)
+        {
+          int64_t n = prime * primes[l];
+          int64_t xn = x / n;
+          int64_t count = cnt_query(counters, xn - low);
+          int64_t phi_xn = phi[b] + count;
+          S2_thread += phi_xn;
+          mu_sum[b]++;
+        }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
+      }
     }
 
     next_segment:;
@@ -263,16 +290,16 @@ int64_t S2(int64_t x,
   int64_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
+  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
   int64_t logx = max(1, ilog(x));
   int64_t min_segment_size = 1 << 6;
-  int64_t segment_size = next_power_of_2(sqrt_limit / (logx * threads));
   int64_t segments_per_thread = 1;
-  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
-  double relative_standard_deviation = 30;
+  int64_t segment_size = next_power_of_2(sqrt_limit / (logx * threads));
   segment_size = max(segment_size, min_segment_size);
+  double relative_standard_deviation = 30;
 
   vector<int32_t> pi = make_pi(y);
-  vector<int64_t> phi_total(primes.size(), 0);
+  vector<int64_t> phi_total(get_phi_size(x, z, y, pi), 0);
 
   while (low < limit)
   {
@@ -288,8 +315,8 @@ int64_t S2(int64_t x,
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      S2_total += S2_thread(x, y, z, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
-          i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
+      S2_total += S2_thread(x, y, z, c, pi_sqrty, pi_y, segment_size,
+          segments_per_thread, i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
 
@@ -333,7 +360,7 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   double alpha = in_between(1, log(d) - 3 * log(log(d)), iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha);
-  int64_t z = x / (int64_t) (x13 * sqrt(alpha));
+  int64_t z = (int64_t)(x / (x13 * sqrt(alpha)));
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);
