@@ -38,45 +38,43 @@ public:
   void init();
 
   /// Get the FactorTable index corressponding to the number.
-  /// @pre number > 7
+  /// @pre number > 0
   ///
   static int64_t get_index(int64_t number)
   {
-    assert(number > 7);
+    assert(number > 0);
     return 48 * (number / 210) + indexes_[number % 210];
   }
 
   /// Convert the number into a FactorTable index.
-  /// @pre number > 7
+  /// @pre number > 0
   ///
   static void to_index(int64_t* number)
   {
-    assert(*number > 7);
+    assert(*number > 0);
     *number = 48 * (*number / 210) + indexes_[*number % 210];
   }
 
   /// Get the number corresponding to the FactorTable index.
-  /// @pre get_number(index) > 7
-  ///
   static int64_t get_number(int64_t index)
   {
     return 210 * (index / 48) + numbers_[index % 48];
   }
 
-  /// Get the least prime factor of the number get_number(index).
-  /// Note that if get_number(index) is a prime > 65535 than
-  /// lpf(index) returns 65535 and if mu(index) == -1 then lpf(index)
-  /// returns the least prime factor minus one.
-  /// @pre get_number(index) > 7
+  /// Get the least prime factor (lpf) of the number get_number(index).
+  /// The result is different from lpf in some situations:
+  /// 1) lpf(index) returns 65535 if get_number(index) is a prime > 65535.
+  /// 2) lpf(index) returns lpf minus one if mu(index) == 1.
+  /// 3) lpf(index) returns 0 if get_number(index) has a squared prime factor.
   ///
   int64_t lpf(int64_t index) const
   {
-    assert(get_number(index) > 7);
     return factors_[index];
   }
 
   /// Get the Möbius function value of the number get_number(index).
-  /// @pre lpf(index) != 0
+  /// For performance reasons mu(index) == 0 is not supported.
+  /// @pre mu(index) != 0 (i.e. lpf(index) != 0)
   ///
   int64_t mu(int64_t index) const
   {

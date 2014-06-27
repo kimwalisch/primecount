@@ -68,13 +68,15 @@ FactorTable::FactorTable(int64_t max) :
 {
   if (isqrt(max_) >= numeric_limits<uint16_t>::max())
     throw runtime_error("FactorTable: sqrt(max) must be < max(uint16_t).");
-
-  factors_.resize(get_index(max_) + 1, 0xffff);
   init();
 }
 
 void FactorTable::init()
 {
+  factors_.resize(get_index(max_) + 1, 0xffff);
+  // mu(1) = 1 -> factors_[0] = lpf - 1
+  factors_[0] = 0xffff - 1;
+
   for (size_t i = 1; i < factors_.size(); i++)
   {
     if (factors_[i] == 0xffff)
