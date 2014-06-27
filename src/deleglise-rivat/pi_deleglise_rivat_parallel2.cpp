@@ -86,7 +86,7 @@ int64_t get_phi_size(int64_t x, int64_t z, int64_t max_index, vector<int32_t>& p
   // b = pi[sqrt((x * z) / (x + z))] + 1
   // phi_size = b + 1
 
-  double max = ((double) x * (double) z) / (x + z);
+  double max = ((double) x / (double)(x + z)) * (double) z;
   int64_t max_sqrt = isqrt((int64_t) max);
   int64_t max_pi = pi.size() - 1;
   int64_t max_size = pi[min(max_sqrt, max_pi)] + 2;
