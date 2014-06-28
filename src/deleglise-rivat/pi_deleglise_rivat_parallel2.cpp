@@ -357,9 +357,8 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   // alpha is a tuning factor
   double d = (double) x;
   double alpha = in_between(1, log(d) - 3 * log(log(d)), iroot<6>(x));
-  int64_t x13 = iroot<3>(x);
-  int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = (int64_t) (x / (x13 * sqrt(alpha)));
+  int64_t y = (int64_t) (alpha * iroot<3>(x));
+  int64_t z = (int64_t) (alpha * iroot<2, 3>(x));
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);

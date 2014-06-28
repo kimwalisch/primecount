@@ -354,11 +354,9 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
     return 0;
 
   // alpha is a tuning factor
-  double d = (double) x;
-  double alpha = in_between(1, log(d), iroot<6>(x));
-  int64_t x13 = iroot<3>(x);
-  int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = (int64_t) (x / (x13 * sqrt(alpha)));
+  double alpha = in_between(1, log((double) x), iroot<6>(x));
+  int64_t y = (int64_t) (alpha * iroot<3>(x));
+  int64_t z = (int64_t) (alpha * iroot<2, 3>(x));
 
   vector<int32_t> primes;
   primes.push_back(0);
