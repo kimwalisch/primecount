@@ -40,9 +40,9 @@ template <typename T1, typename T2, typename T3>
 inline T2 in_between(T1 min, T2 x, T3 max)
 {
   if (x < min)
-    return static_cast<T2>(min);
+    return (T2) min;
   if (x > max)
-    return static_cast<T2>(max);
+    return (T2) max;
 
   return x;
 }
@@ -50,7 +50,7 @@ inline T2 in_between(T1 min, T2 x, T3 max)
 template <typename T>
 inline T number_of_bits(T)
 {
-  return static_cast<T>(sizeof(T) * 8);
+  return (T) (sizeof(T) * 8);
 }
 
 /// @brief  Check if an integer is a power of 2.
@@ -81,7 +81,7 @@ inline T next_power_of_2(T x)
 template <typename T>
 inline int ilog(T x)
 {
-  return static_cast<int>(std::log(static_cast<double>(x)));
+  return (int) std::log((double) x);
 }
 
 /// Raise to power
@@ -99,7 +99,7 @@ inline int64_t ipow(int64_t x)
 template <typename T>
 inline T isqrt(T x)
 {
-  T r = static_cast<T>(std::sqrt(static_cast<double>(x)));
+  T r = (T) std::sqrt((double) x);
   // correct rounding error
   while (isquare(r) > x)
     r--;
@@ -112,12 +112,20 @@ inline T isqrt(T x)
 template <int N, typename T>
 inline T iroot(T x)
 {
-  T r = static_cast<T>(std::pow(static_cast<double>(x), 1.0 / N));
+  T r = (T) std::pow((double) x, 1.0 / N);
   // correct rounding error
   while (ipow<N>(r) > x)
     r--;
   while (ipow<N>(r + 1) <= x)
     r++;
+  return r;
+}
+
+/// Integer nth root
+template <int D, int N, typename T>
+inline T iroot(T x)
+{
+  T r = (T) std::pow((double) x, D / (double) N);
   return r;
 }
 
@@ -130,7 +138,7 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return static_cast<T2>(std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
+  return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
 
 /// Calculate the number of primes below x using binary search.
@@ -142,7 +150,7 @@ inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return static_cast<T3>(std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
+  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
 }
 
 } // namespace
