@@ -50,26 +50,6 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   next_multiple = k;
 }
 
-int64_t get_phi_size(int64_t x, int64_t z, PiTable& pi)
-{
-  // The largest phi[b] index is needed
-  // when min_sparse_easy_leaf > min_hard_leaf
-  // happens for the first time:
-  // z / primes[b] > x / (primes[b] * high)
-  // high > x / z, high = x / z + 1
-  // primes[b] > x / (primes[b] * high)
-  // primes[b] > sqrt(x / high)
-  // b > pi(sqrt(x / high))
-  // b = pi(sqrt(x / high)) + 1
-  // phi_size = b + 1
-
-  double high = (double) x / (double) z + 1;
-  int64_t max = (int64_t) (x / high);
-  int64_t max_sqrt = isqrt(max);
-  int64_t max_size = pi(min(max_sqrt, pi.size() - 1)) + 2;
-  return min(max_size, pi.size());
-}
-
 /// Calculate the contribution of the special leaves.
 /// @see ../docs/computing-special-leaves.md
 /// @pre y > 0 && c > 1
@@ -77,25 +57,22 @@ int64_t get_phi_size(int64_t x, int64_t z, PiTable& pi)
 int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
-           int64_t pi_y,
            int64_t c,
            vector<int32_t>& primes,
            FactorTable& factors)
 {
+  PiTable pi(y);
+  int64_t pi_y = pi(y);
+  int64_t pi_sqrty = pi(isqrt(y));
+  int64_t pi_x13 = max(c, pi(iroot<3>(x)));
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
   int64_t S2_result = 0;
+
   BitSieve sieve(segment_size);
-  PiTable pi(y);
-
-  int64_t phi_size = get_phi_size(x, z, pi);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next(primes.begin(), primes.begin() + phi_size);
-  vector<int64_t> phi(phi_size, 0);
-
-  if (c >= phi_size)
-    return 0;
+  vector<int64_t> next(primes.begin(), primes.begin() + pi_x13 + 1);
+  vector<int64_t> phi(pi_x13 + 1, 0);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -205,7 +182,7 @@ int64_t S2(int64_t x,
         S2_result += pi(xn) - b + 2;
       }
 
-      if (b < phi_size)
+      if (b <= pi_x13)
       {
         // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
         // Find all hard leaves which satisfy:
@@ -253,10 +230,10 @@ int64_t pi_deleglise_rivat3(int64_t x)
   primesieve::generate_primes(y, &primes);
   FactorTable factors(y);
 
-  int64_t pi_y = primes.size() - 1;
+  int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
   int64_t s1 = S1(x, y, c, primes, factors);
-  int64_t s2 = S2(x, y, z, pi_y, c, primes, factors);
+  int64_t s2 = S2(x, y, z, c, primes, factors);
   int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
