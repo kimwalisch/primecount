@@ -172,7 +172,7 @@ int64_t S2_thread(int64_t x,
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
       int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
-      int64_t min_easy_leaf = pi[max(z / prime, x / (prime * prime * prime))];
+      int64_t min_easy_leaf = pi[min(y, max(z / prime, x / (prime * prime * prime)))];
       int64_t min_hard_leaf = pi[min_m];
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);

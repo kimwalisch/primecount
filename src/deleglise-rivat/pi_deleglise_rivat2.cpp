@@ -139,7 +139,7 @@ int64_t S2(int64_t x,
       min_m = in_between(prime, min_m, y);
       int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
       int64_t min_clustered_easy_leaf = pi[min(isqrt(x / prime), y)];
-      int64_t min_sparse_easy_leaf = pi[max(z / prime, x / (prime * prime * prime))];
+      int64_t min_sparse_easy_leaf = pi[min(y, max(z / prime, x / (prime * prime * prime)))];
       int64_t min_hard_leaf = pi[min_m];
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
