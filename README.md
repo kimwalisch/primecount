@@ -98,7 +98,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>0.31s</td>
     <td>0.23s</td>
     <td>0.07s</td>
-    <td>0.06s</td>
+    <td>0.05s</td>
   </tr>
   </tr>
   <tr align="right">
@@ -107,7 +107,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>1.49s</td>
     <td>1.03s</td>
     <td>0.28s</td>
-    <td>0.16s</td>
+    <td>0.15s</td>
   </tr>
   </tr>
   <tr align="right">
@@ -116,7 +116,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>9.30s</td>
     <td>5.05s</td>
     <td>1.21s</td>
-    <td>0.52s</td>
+    <td>0.49s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
@@ -124,7 +124,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>60.38s</td>
     <td>28.26s</td>
     <td>5.41s</td>
-    <td>2.03s</td>
+    <td>1.70s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -132,7 +132,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>423.12s</td>
     <td>173.78s</td>
     <td>24.77s</td>
-    <td>7.79s</td>
+    <td>6.56s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -140,7 +140,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3,749.72s</td>
     <td>1,335.85s</td>
     <td>121.31s</td>
-    <td>31.67s</td>
+    <td>26.20s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
@@ -148,13 +148,14 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>31,897.66s</td>
     <td>9,885.71s</td>
     <td>837.74s</td>
-    <td>141.24s</td>
+    <td>111.50s</td>
   </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
-2013 using a 64-bit Linux operating system. primecount was compiled using GCC
-4.8 and used all CPU cores for each benchmark.
+2013 using a 64-bit Linux operating system. The Deleglise-Rivat implementation
+has been optimized for little memory usage, it uses only 40 megabytes of
+memory to calculate pi(10^18) using 8 threads.
 
 ### Fast nth prime calculation
 
