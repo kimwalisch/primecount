@@ -64,7 +64,7 @@ int64_t S2(int64_t x,
   PiTable pi(y);
   int64_t pi_y = pi(y);
   int64_t pi_sqrty = pi(isqrt(y));
-  int64_t pi_sqrtz = max(c, pi(min(isqrt(z), y)));
+  int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t S2_result = 0;
@@ -79,22 +79,26 @@ int64_t S2(int64_t x,
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 2;
+    int64_t b = c + 1;
 
-    sieve.memset(low);
-
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
+    // check if we need the sieve
+    if (c < pi_sqrtz)
     {
-      int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      next[b] = k;
-    }
+      sieve.memset(low);
 
-    // Initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
+      // phi(y, i) nodes with i <= c do not contribute to S2, so we
+      // simply sieve out the multiples of the first c primes
+      for (int64_t i = 2; i <= c; i++)
+      {
+        int64_t k = next[i];
+        for (int64_t prime = primes[i]; k < high; k += prime * 2)
+          sieve.unset(k - low);
+        next[i] = k;
+      }
+
+      // Initialize special tree data structure from sieve
+      cnt_finit(sieve, counters, segment_size);
+    }
 
     // For c + 1 <= b < pi_y
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
