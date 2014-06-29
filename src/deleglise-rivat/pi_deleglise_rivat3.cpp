@@ -64,15 +64,15 @@ int64_t S2(int64_t x,
   PiTable pi(y);
   int64_t pi_y = pi(y);
   int64_t pi_sqrty = pi(isqrt(y));
-  int64_t pi_x13 = max(c, pi(iroot<3>(x)));
+  int64_t pi_sqrtz = max(c, pi(min(isqrt(z), y)));
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t S2_result = 0;
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next(primes.begin(), primes.begin() + pi_x13 + 1);
-  vector<int64_t> phi(pi_x13 + 1, 0);
+  vector<int64_t> next(primes.begin(), primes.begin() + pi_sqrtz + 1);
+  vector<int64_t> phi(pi_sqrtz + 1, 0);
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -182,7 +182,7 @@ int64_t S2(int64_t x,
         S2_result += pi(xn) - b + 2;
       }
 
-      if (b <= pi_x13)
+      if (b <= pi_sqrtz)
       {
         // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
         // Find all hard leaves which satisfy:

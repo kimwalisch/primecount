@@ -69,10 +69,11 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
   next_multiple = k;
 }
 
-int64_t get_phi_size(int64_t x, int64_t c, int64_t max_index, PiTable& pi)
+int64_t get_phi_size(int64_t z, int64_t c, int64_t max_prime, PiTable& pi)
 {
-  int64_t pi_x13 = pi(iroot<3>(x));
-  return max(c, min(pi_x13, max_index)) + 1;
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi(min(sqrtz, max_prime));
+  return max(c, pi_sqrtz) + 1;
 }
 
 /// Compute the S2 contribution for the interval
@@ -102,7 +103,7 @@ int64_t S2_thread(int64_t x,
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t max_prime = min(isqrt(x / low), y);
   int64_t max_index = pi(max_prime);
-  int64_t phi_size = get_phi_size(x, c, max_index, pi);
+  int64_t phi_size = get_phi_size(z, c, max_prime, pi);
   int64_t S2_thread = 0;
 
   BitSieve sieve(segment_size);
@@ -277,7 +278,7 @@ int64_t S2(int64_t x,
   segment_size = max(segment_size, min_segment_size);
 
   PiTable pi(y);
-  vector<int64_t> phi_total(get_phi_size(x, c, y, pi), 0);
+  vector<int64_t> phi_total(get_phi_size(z, c, y, pi), 0);
   double relative_standard_deviation = 30;
 
   while (low < limit)
