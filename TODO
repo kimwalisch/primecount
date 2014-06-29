@@ -1,8 +1,17 @@
-1) Create src/BitSieve.cpp
-    * Inline functions must be as small as possible
-    * Inline functions should use very few (<= 2) registers
-    * Check all other inline functions
+1) Get z formula in deleglise-rivat right:
 
-2) Update ./docs
-    * write document about special leaves
-    * write document about parallel S2(x, a)
+   Currently: z = x / y + isqrt(x)
+   Correct:   z = x / y
+   
+   This has to do with not using a lower bound for the sparse easy leaves.
+   phi can only be calculated using look up if:
+   
+   x / n < prime * prime (or is it: next_prime * next_prime)
+
+2) Why do I use in PhiCache::is_phi_bsearch(x, a):
+   return x <= primes_.back() && x < isquare(primes_[a + 1]);
+   Should it not be: x < isquare(primes_[a])
+   
+3) Update ./docs
+   * write document about special leaves
+   * write document about parallel S2(x, a)
