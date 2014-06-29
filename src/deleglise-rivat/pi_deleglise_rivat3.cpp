@@ -223,7 +223,7 @@ int64_t pi_deleglise_rivat3(int64_t x)
   // alpha is a tuning factor
   double alpha = in_between(1, log((double) x), iroot<6>(x));
   int64_t y = (int64_t) (alpha * iroot<3>(x));
-  int64_t z = (int64_t) (alpha * iroot<2, 3>(x));
+  int64_t z = x / y + isqrt(x);
 
   vector<int32_t> primes;
   primes.push_back(0);
