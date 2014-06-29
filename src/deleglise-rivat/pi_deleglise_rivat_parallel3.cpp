@@ -135,7 +135,7 @@ int64_t S2_thread(int64_t x,
     // For c + 1 <= b < pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
     // which satisfy: low <= (x / n) < high
-    for (int64_t end = min(pi_sqrty, max_index + 1); b < end; b++)
+    for (int64_t end = min(pi_sqrty, phi_size); b < end; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
