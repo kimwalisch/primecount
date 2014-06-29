@@ -29,15 +29,15 @@ $ make
 
 ### Adding a new prime counting function implementation
 
-* Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount.hpp)
-* Create source file ```src/pi_lmo.cpp``` with the new function
-* Add ```src/pi_lmo.cpp``` to [Makefile.am](Makefile.am)
-* Add ```src\pi_lmo.cpp``` to [Makefile.msvc](Makefile.msvc)
-* Add ```OPTION_LMO``` to [src/cmdoptions.hpp](src/cmdoptions.hpp)
-* Add ```OPTION_LMO``` to optionMap in [src/cmdoptions.cpp](src/cmdoptions.cpp)
-* Add ```pi_lmo(x)``` to [src/primecount.cpp](src/primecount.cpp)
+* Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount-internal.hpp)
+* Create source file ```src/lmo/pi_lmo.cpp``` with the new function
+* Add ```src/lmo/pi_lmo.cpp``` to [Makefile.am](Makefile.am)
+* Add ```src\lmo\pi_lmo.obj``` to [Makefile.msvc](Makefile.msvc)
+* Add ```OPTION_LMO``` to [src/app/cmdoptions.hpp](src/cmdoptions.hpp)
+* Add ```OPTION_LMO``` to optionMap in [src/app/cmdoptions.cpp](src/cmdoptions.cpp)
+* Add ```pi_lmo(x)``` to [src/app/main.cpp](src/app/main.cpp)
 * Add ```pi_lmo(x)``` to ```bool test()``` in [src/test.cpp](src/test.cpp)
-* Add ```--lmo``` command-line option summary to [src/help.cpp](src/help.cpp)
+* Add ```--lmo``` command-line option summary to [src/app/help.cpp](src/app/help.cpp)
 
 ### Versioning
 
@@ -45,7 +45,7 @@ $ make
 * Increase version number in _**Build instructions**_ section in [README.md](README.md)
 * Increase version number in [configure.ac](configure.ac) in ```AC_INIT```
 * [Increase Libtool version](http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html) number in [configure.ac](configure.ac) in ```AC_SUBST```
-* Update to current year in [src/help.cpp](src/help.cpp)
+* Update to current year in [src/app/help.cpp](src/help.cpp)
 
 ### Release process
 
