@@ -172,7 +172,7 @@ int64_t S2_thread(int64_t x,
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
       int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
-      int64_t min_easy_leaf = pi[min(z / prime, y)];
+      int64_t min_easy_leaf = pi[max(z / prime, x / (prime * prime * prime))];
       int64_t min_hard_leaf = pi[min_m];
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
@@ -238,7 +238,7 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  int64_t limit = x / y + 1;
+  int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
 
   int64_t S2_total = 0;
@@ -313,7 +313,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   double d = (double) x;
   double alpha = in_between(1, log(d) - 3 * log(log(d)), iroot<6>(x));
   int64_t y = (int64_t) (alpha * iroot<3>(x));
-  int64_t z = x / y + isqrt(x);
+  int64_t z = x / y;
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);

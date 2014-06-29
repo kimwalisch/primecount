@@ -179,7 +179,7 @@ int64_t S2_thread(int64_t x,
       min_m = in_between(prime, min_m, y);
       int64_t min_trivial_leaf = pi(min(x / (prime * prime), y));
       int64_t min_clustered_easy_leaf = pi(min(isqrt(x / prime), y));
-      int64_t min_sparse_easy_leaf = pi(min(z / prime, y));
+      int64_t min_sparse_easy_leaf = pi(max(z / prime, x / (prime * prime * prime)));
       int64_t min_hard_leaf = pi(min_m);
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
@@ -262,7 +262,7 @@ int64_t S2(int64_t x,
            FactorTable& factors,
            int threads)
 {
-  int64_t limit = x / y + 1;
+  int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
 
   int64_t S2_total = 0;
@@ -335,7 +335,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   // alpha is a tuning factor
   double alpha = in_between(1, log((double) x), iroot<6>(x));
   int64_t y = (int64_t) (alpha * iroot<3>(x));
-  int64_t z = x / y + isqrt(x);
+  int64_t z = x / y;
 
   vector<int32_t> primes;
   primes.push_back(0);
