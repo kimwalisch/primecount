@@ -96,10 +96,10 @@ int64_t S2(int64_t x,
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
 
-    // For c + 1 <= b < pi_y
+    // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
     // which satisfy: low <= (x / n) < high
-    for (; b < pi_sqrty; b++)
+    for (; b <= pi_sqrty; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -137,7 +137,7 @@ int64_t S2(int64_t x,
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
       int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
-      int64_t min_easy_leaf = pi[min(y, max(z / prime, x / (prime * prime * prime)))];
+      int64_t min_easy_leaf = pi[min(z / prime, y)];
       int64_t min_hard_leaf = pi[min_m];
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
