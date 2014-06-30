@@ -169,25 +169,23 @@ int64_t S2_thread(int64_t x,
       if (prime >= primes[l])
         goto next_segment;
 
-      int64_t min_m = max(x / (prime * high), y / prime);
-      min_m = in_between(prime, min_m, y);
-      int64_t min_trivial_leaf = pi[min(x / (prime * prime), y)];
-      int64_t min_easy_leaf = pi[min(z / prime, y)];
-      int64_t min_hard_leaf = pi[min_m];
+      int64_t min_hard_leaf = max(x / (prime * high), y / prime);
+      min_hard_leaf = in_between(prime, min_hard_leaf, y);
+      int64_t min_trivial_leaf = min(x / (prime * prime), y);
+      int64_t min_easy_leaf = min(z / prime, y);
 
       min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
       min_easy_leaf = max(min_hard_leaf, min_easy_leaf);
 
-      // For max(x / primes[b]^2, primes[b]) < primes[l] <= y
       // Find all trivial leaves which satisfy:
       // phi(x / (primes[b] * primes[l]), b - 1) = 1
-      if (l > min_trivial_leaf)
+      if (primes[l] > min_trivial_leaf)
       {
-        S2_thread += l - min_trivial_leaf;
-        l = min_trivial_leaf;
+        int64_t l_min = pi[min_trivial_leaf];
+        S2_thread += l - l_min;
+        l = l_min;
       }
 
-      // For max(z / primes[b], primes[b]) < primes[l] <= x / primes[b]^2
       // Find all easy leaves: n = primes[b] * primes[l]
       // x / n <= y such that phi(x / n, b - 1) = pi[x / n] - b + 2
       for (; l > min_easy_leaf; l--)
@@ -197,10 +195,9 @@ int64_t S2_thread(int64_t x,
         S2_thread += pi[xn] - b + 2;
       }
 
-      // For max(x / (primes[b] * high), primes[b]) < primes[l] <= z / primes[b]
       // Find all hard leaves which satisfy:
       // low <= (x / n) < high
-      for (; l > min_hard_leaf; l--)
+      for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
