@@ -135,11 +135,9 @@ bool test()
     CHECK_EQUAL(pi_lmo3,                      pi_meissel,         CHECK_12, 300);
     CHECK_EQUAL(pi_lmo4,                      pi_meissel,         CHECK_12, 300);
     CHECK_EQUAL(pi_lmo5,                      pi_meissel,         CHECK_12, 400);
-    CHECK_EQUAL(pi_lmo6,                      pi_meissel,         CHECK_12, 400);
     CHECK_EQUAL(pi_lmo_parallel1,             pi_meissel,         CHECK_22, 400);
     CHECK_EQUAL(pi_lmo_parallel2,             pi_meissel,         CHECK_22, 400);
     CHECK_EQUAL(pi_lmo_parallel3,             pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_lmo_parallel4,             pi_lmo_parallel3,   CHECK_22, 400);
     CHECK_EQUAL(pi_deleglise_rivat1,          pi_lmo_parallel3,   CHECK_12, 600);
     CHECK_EQUAL(pi_deleglise_rivat2,          pi_lmo_parallel3,   CHECK_12, 600);
     CHECK_EQUAL(pi_deleglise_rivat3,          pi_lmo_parallel3,   CHECK_12, 600);

@@ -129,12 +129,6 @@ int64_t pi_lmo4(int64_t x);
 ///
 int64_t pi_lmo5(int64_t x);
 
-/// Calculate the number of primes below x using the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * log log x) space.
-///
-int64_t pi_lmo6(int64_t x);
-
 /// Parallel implementation of the Lagarias-Miller-Odlyzko
 /// prime counting algorithm using OpenMP.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
@@ -152,12 +146,6 @@ int64_t pi_lmo_parallel2(int64_t x, int threads);
 /// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * log log x) space.
 ///
 int64_t pi_lmo_parallel3(int64_t x, int threads);
-
-/// Parallel implementation of the Lagarias-Miller-Odlyzko
-/// prime counting algorithm using OpenMP.
-/// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * log log x) space.
-///
-int64_t pi_lmo_parallel4(int64_t x, int threads);
 
 /// Calculate the number of primes below x using Meissel's formula.
 /// Run time: O(x/(log x)^3) operations, O(x^(1/2) / log x) space.
