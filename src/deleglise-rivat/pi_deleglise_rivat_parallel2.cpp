@@ -200,6 +200,7 @@ int64_t S2_thread(int64_t x,
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
+        assert(xn < isquare(primes[b]));
         int64_t phi_xn = pi[xn] - b + 2;
         int64_t m = prime * primes[b + phi_xn - 1];
         int64_t xm = max(x / m, min_clustered_easy_leaf);
@@ -214,6 +215,7 @@ int64_t S2_thread(int64_t x,
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
+        assert(xn < isquare(primes[b]));
         S2_thread += pi[xn] - b + 2;
       }
 
