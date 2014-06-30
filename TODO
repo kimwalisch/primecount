@@ -1,22 +1,3 @@
-1) In my Deleglise-Rivat implementation I am using the following
-   lower bound for sparse easy leaves:
-   
-   int64_t min_sparse_easy_leaf = pi[min(y, max(z / prime, x / (prime * prime * prime)))];
-
-   I think 'x / (prime * prime * prime)' is not needed but the
-   following formula does not work, why?
- 
-   int64_t min_sparse_easy_leaf = pi[min(y, z / prime)];
-
-   Apparently the formula cannot ensure:
-   assert(x / (prime * prime[l]) < prime * prime);
-   Which is required to calculate phi using:
-   phi = pi[x / n] - pi[prime] + 2
-
-2) Why do I use in PhiCache::is_phi_bsearch(x, a):
-   return x <= primes_.back() && x < isquare(primes_[a + 1]);
-   Should it not be: x < isquare(primes_[a])
-   
-3) Update ./docs
+1) Update ./docs
    * write document about special leaves
    * write document about parallel S2(x, a)
