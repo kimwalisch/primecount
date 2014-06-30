@@ -164,12 +164,11 @@ int64_t S2_thread(int64_t x,
       int64_t l = pi[min(x / (prime * low), y)];
       int64_t min_m = max(x / (prime * high), y / prime);
       min_m = in_between(prime, min_m, y);
-      int64_t min_l = pi[min_m];
 
       if (prime >= primes[l])
         goto next_segment;
 
-      for (; l > min_l; l--)
+      for (; primes[l] > min_m; l--)
       {
         int64_t n = prime * primes[l];
         int64_t count = cnt_query(counters, (x / n) - low);
@@ -276,8 +275,8 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double beta = 1.0;
-  double alpha = in_between(1, log(log((double) x)) * beta, iroot<6>(x));
+  // alpha is a tuning factor
+  double alpha = in_between(1, log(log((double) x)), iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
 

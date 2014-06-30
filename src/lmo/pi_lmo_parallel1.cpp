@@ -214,8 +214,8 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double beta = 0.6;
-  double alpha = in_between(1, log(log((double) x)) * beta, iroot<6>(x));
+  // alpha is a tuning factor
+  double alpha = in_between(1, log(log((double) x)) * 0.6, iroot<6>(x));
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
 
