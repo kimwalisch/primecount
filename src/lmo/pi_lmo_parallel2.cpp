@@ -11,7 +11,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -41,7 +40,7 @@ void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
-    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    int64_t next_multiple = ceil_div(low, prime) * prime;
     next.push_back(next_multiple);
   }
 }
@@ -199,9 +198,9 @@ int64_t S2(int64_t x,
 
   int64_t S2_total = 0;
   int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t segments = (limit + segment_size - 1) / segment_size;
+  int64_t segments = ceil_div(limit, segment_size);
   threads = in_between(1, threads, segments);
-  int64_t segments_per_thread = (segments + threads - 1) / threads;
+  int64_t segments_per_thread = ceil_div(segments, threads);
 
   vector<int32_t> pi = make_pi(y);
   aligned_vector<vector<int64_t> > phi(threads);
@@ -249,9 +248,7 @@ int64_t pi_lmo_parallel2(int64_t x, int threads)
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(y, &primes);
+  vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
