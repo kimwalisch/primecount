@@ -18,33 +18,15 @@
 
 namespace primecount {
 
-/// Generate a vector with Möbius function values.
-std::vector<int32_t> make_moebius(int64_t max);
-
-/// Generate a vector with the least prime
-/// factors of the integers <= max.
-///
-std::vector<int32_t> make_least_prime_factor(int64_t max);
-
-/// Generate a vector with the prime counts below max
-/// using the sieve of Eratosthenes.
-///
-std::vector<int32_t> make_pi(int64_t max);
-
 inline int64_t isquare(int64_t x)
 {
   return x * x;
 }
 
-template <typename T1, typename T2, typename T3>
-inline T2 in_between(T1 min, T2 x, T3 max)
+inline int64_t ceil_div(int64_t a, int64_t b)
 {
-  if (x < min)
-    return (T2) min;
-  if (x > max)
-    return (T2) max;
-
-  return x;
+  assert(b != 0);
+  return (a + b - 1) / b;
 }
 
 template <typename T>
@@ -100,7 +82,6 @@ template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
-  // correct rounding error
   while (isquare(r) > x)
     r--;
   while (isquare(r + 1) <= x)
@@ -113,7 +94,6 @@ template <int N, typename T>
 inline T iroot(T x)
 {
   T r = (T) std::pow((double) x, 1.0 / N);
-  // correct rounding error
   while (ipow<N>(r) > x)
     r--;
   while (ipow<N>(r + 1) <= x)
@@ -138,7 +118,8 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
+  return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) 
+      - (primes.begin() + 1));
 }
 
 /// Calculate the number of primes below x using binary search.
@@ -150,8 +131,33 @@ inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
+  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) 
+      - (primes.begin() + 1));
 }
+
+template <typename T1, typename T2, typename T3>
+inline T2 in_between(T1 min, T2 x, T3 max)
+{
+  if (x < min)
+    return (T2) min;
+  if (x > max)
+    return (T2) max;
+
+  return x;
+}
+
+/// Generate a vector with Möbius function values.
+std::vector<int32_t> make_moebius(int64_t max);
+
+/// Generate a vector with the least prime
+/// factors of the integers <= max.
+///
+std::vector<int32_t> make_least_prime_factor(int64_t max);
+
+/// Generate a vector with the prime counts below max
+/// using the sieve of Eratosthenes.
+///
+std::vector<int32_t> make_pi(int64_t max);
 
 } // namespace
 
