@@ -36,7 +36,6 @@ namespace {
 ///
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t pi_y,
            int64_t c,
            vector<int32_t>& primes,
            vector<int32_t>& lpf,
@@ -44,6 +43,7 @@ int64_t S2(int64_t x,
 {
   int64_t limit = x / y + 1;
   int64_t segment_size = isqrt(limit);
+  int64_t pi_y = pi_bsearch(primes, y);
   int64_t S2_result = 0;
 
   vector<char> sieve(segment_size);
@@ -140,7 +140,7 @@ int64_t pi_lmo3(int64_t x)
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
-  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu);
+  int64_t s2 = S2(x, y, c, primes, lpf , mu);
   int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
