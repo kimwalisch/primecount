@@ -15,7 +15,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <BitSieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -222,9 +221,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
 
   vector<int32_t> mu = make_moebius(y);
   vector<int32_t> lpf = make_least_prime_factor(y);
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(y, &primes);    
+  vector<int32_t> primes = generate_primes(y);    
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
