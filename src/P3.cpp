@@ -9,7 +9,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 
@@ -29,10 +28,7 @@ namespace primecount {
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {
-  std::vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(isqrt(x), &primes);
-
+  std::vector<int32_t> primes = generate_primes(isqrt(x));
   int64_t y = iroot<3>(x);
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t sum = 0;
