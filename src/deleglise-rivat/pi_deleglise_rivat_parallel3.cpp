@@ -14,7 +14,6 @@
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <balance_S2_load.hpp>
 #include <BitSieve.hpp>
@@ -46,7 +45,7 @@ void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
-    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    int64_t next_multiple = ceil_div(low, prime) * prime;
     next_multiple += prime * (~next_multiple & 1);
     next.push_back(next_multiple);
   }
@@ -279,9 +278,9 @@ int64_t S2(int64_t x,
 
   while (low < limit)
   {
-    int64_t segments = (limit - low + segment_size - 1) / segment_size;
+    int64_t segments = ceil_div(limit - low, segment_size);
     threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
+    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
     aligned_vector<vector<int64_t> > phi(threads);
     aligned_vector<vector<int64_t> > mu_sum(threads);
@@ -336,9 +335,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
 
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(y, &primes);
+  vector<int32_t> primes = generate_primes(y);
   FactorTable factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
