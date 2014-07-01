@@ -7,6 +7,7 @@
 /// file in the top level directory.
 ///
 
+#include <primesieve.hpp>
 #include <pmath.hpp>
 
 #include <stdint.h>
@@ -17,6 +18,28 @@
 using namespace std;
 
 namespace primecount {
+
+/// Generate a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+std::vector<int32_t> generate_primes(int64_t max)
+{
+  std::vector<int32_t> primes;
+  primes.push_back(0);
+  primesieve::generate_primes(max, &primes);
+  return primes;
+}
+
+/// Generate a vector with the first n primes.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+std::vector<int32_t> generate_n_primes(int64_t n)
+{
+  std::vector<int32_t> primes;
+  primes.push_back(0);
+  primesieve::generate_n_primes(n, &primes);
+  return primes;
+}
 
 /// Generate a vector with Möbius function values.
 /// This implementation is based on code by Rick Sladkey
