@@ -15,7 +15,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <pmath.hpp>
 #include <PhiCache.hpp>
 
@@ -44,9 +43,7 @@ int64_t pi_lmo1(int64_t x)
 
   vector<int32_t> lpf = make_least_prime_factor(y);
   vector<int32_t> mu = make_moebius(y);
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(y, &primes);
+  vector<int32_t> primes = generate_primes(y);
 
   // Calculate the contribution of the ordinary leaves
   for (int64_t n = 1; n <= y; n++)
