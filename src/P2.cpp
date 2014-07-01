@@ -44,7 +44,7 @@ void init_next_multiples(vector<int64_t>& next, vector<int32_t>& primes, int64_t
   for (int64_t b = 1; b < size; b++)
   {
     int64_t prime = primes[b];
-    int64_t next_multiple = ((low + prime - 1) / prime) * prime;
+    int64_t next_multiple = ceil_div(low, prime) * prime;
     next_multiple += prime * (~next_multiple & 1);
     next.push_back(max(isquare(prime), next_multiple));
   }
@@ -144,17 +144,15 @@ int64_t P2(int64_t x, int64_t y, int threads)
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
 
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(isqrt(limit), &primes);
+  vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
   while (low < limit)
   {
-    int64_t segments = (limit - low + segment_size - 1) / segment_size;
+    int64_t segments = ceil_div(limit - low, segment_size);
     threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, (segments + threads - 1) / threads);
+    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
     double seconds = get_wtime();
 
     #pragma omp parallel for num_threads(threads) reduction(+: sum)
@@ -192,11 +190,8 @@ int64_t P2(int64_t x, int64_t y, int threads)
 ///
 int64_t P2_lehmer(int64_t x, int64_t a, int threads)
 {
-  vector<int32_t> primes;
-  vector<int64_t> counts;
-  primes.push_back(0);
-  primesieve::generate_primes(isqrt(x), &primes);
-  counts.resize(primes.size());
+  vector<int32_t> primes = generate_primes(isqrt(x));
+  vector<int64_t> counts(primes.size());
 
   int64_t b = pi_bsearch(primes, isqrt(x));
   int64_t sum = 0;
