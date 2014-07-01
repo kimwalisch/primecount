@@ -72,7 +72,6 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t c,
-                  int64_t pi_y,
                   int64_t segment_size,
                   int64_t segments_per_thread,
                   int64_t thread_num,
@@ -87,11 +86,12 @@ int64_t S2_thread(int64_t x,
   int64_t low = 1 + segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
-  int64_t S2_thread = 0;
+  int64_t pi_y = pi[y];
 
   if (c >= size - 1)
     return 0;
 
+  int64_t S2_thread = 0;
   vector<char> sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
@@ -159,7 +159,6 @@ int64_t S2_thread(int64_t x,
 ///
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t pi_y,
            int64_t c,
            vector<int32_t>& primes,
            vector<int32_t>& lpf,
@@ -181,7 +180,7 @@ int64_t S2(int64_t x,
 
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
-    S2_total += S2_thread(x, y, c, pi_y, segment_size, segments_per_thread,
+    S2_total += S2_thread(x, y, c, segment_size, segments_per_thread,
         i, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
 
   // Once all threads have finished reconstruct and add the
@@ -228,7 +227,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
-  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads);
+  int64_t s2 = S2(x, y, c, primes, lpf , mu, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
