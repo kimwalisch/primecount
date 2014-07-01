@@ -146,6 +146,16 @@ inline T2 in_between(T1 min, T2 x, T3 max)
   return x;
 }
 
+/// Generate a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+//
+std::vector<int32_t> generate_primes(int64_t max);
+
+/// Generate a vector with the first n primes.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+//
+std::vector<int32_t> generate_n_primes(int64_t n);
+
 /// Generate a vector with Möbius function values.
 std::vector<int32_t> make_moebius(int64_t max);
 
