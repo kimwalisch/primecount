@@ -14,7 +14,6 @@
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <BitSieve.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -228,9 +227,7 @@ int64_t pi_deleglise_rivat3(int64_t x)
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
 
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(y, &primes);
+  vector<int32_t> primes = generate_primes(y);
   FactorTable factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
