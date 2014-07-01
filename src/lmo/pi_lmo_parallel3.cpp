@@ -76,8 +76,6 @@ void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple,
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t c,
-                  int64_t pi_sqrty,
-                  int64_t pi_y,
                   int64_t segment_size,
                   int64_t segments_per_thread,
                   int64_t thread_num,
@@ -93,11 +91,13 @@ int64_t S2_thread(int64_t x,
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
-  int64_t S2_thread = 0;
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t pi_y = pi[y];
 
   if (c >= size - 1)
     return 0;
 
+  int64_t S2_thread = 0;
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next;
@@ -197,7 +197,6 @@ int64_t S2_thread(int64_t x,
 ///
 int64_t S2(int64_t x,
            int64_t y,
-           int64_t pi_y,
            int64_t c,
            vector<int32_t>& primes,
            vector<int32_t>& lpf,
@@ -214,7 +213,6 @@ int64_t S2(int64_t x,
   int64_t min_segment_size = 1 << 6;
   int64_t segment_size = next_power_of_2(sqrt_limit / (logx * threads));
   int64_t segments_per_thread = 1;
-  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
   double relative_standard_deviation = 30;
   segment_size = max(segment_size, min_segment_size);
 
@@ -235,7 +233,7 @@ int64_t S2(int64_t x,
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      S2_total += S2_thread(x, y, c, pi_sqrty, pi_y, segment_size, segments_per_thread,
+      S2_total += S2_thread(x, y, c, segment_size, segments_per_thread,
           i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
@@ -289,7 +287,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
-  int64_t s2 = S2(x, y, pi_y, c, primes, lpf , mu, threads);
+  int64_t s2 = S2(x, y, c, primes, lpf , mu, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
