@@ -45,7 +45,7 @@ std::vector<int32_t> generate_n_primes(int64_t n)
 /// This implementation is based on code by Rick Sladkey
 /// posted here: http://mathoverflow.net/a/99545
 ///
-vector<int32_t> make_moebius(int64_t max)
+vector<int32_t> generate_moebius(int64_t max)
 {
   vector<int32_t> mu(max + 1, 1);
 
@@ -78,7 +78,7 @@ vector<int32_t> make_moebius(int64_t max)
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-vector<int32_t> make_least_prime_factor(int64_t max)
+vector<int32_t> generate_least_prime_factors(int64_t max)
 {
   vector<int32_t> lpf(max + 1, 1);
 

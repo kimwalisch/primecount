@@ -310,8 +310,8 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
 
-  vector<int32_t> mu = make_moebius(y);
-  vector<int32_t> lpf = make_least_prime_factor(y);
+  vector<int32_t> mu = generate_moebius(y);
+  vector<int32_t> lpf = generate_least_prime_factors(y);
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;

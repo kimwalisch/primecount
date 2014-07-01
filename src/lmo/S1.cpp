@@ -49,8 +49,8 @@ int64_t S1(int64_t x,
   // FactorTable contains only numbers coprime to 2, 3, 5 and 7
   if (primes[c] <= 7)
   {
-    std::vector<int32_t> mu = make_moebius(y);
-    std::vector<int32_t> lpf = make_least_prime_factor(y);
+    std::vector<int32_t> mu = generate_moebius(y);
+    std::vector<int32_t> lpf = generate_least_prime_factors(y);
     return S1(x, y, c, primes, lpf, mu);
   }
 

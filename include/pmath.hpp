@@ -157,12 +157,12 @@ std::vector<int32_t> generate_primes(int64_t max);
 std::vector<int32_t> generate_n_primes(int64_t n);
 
 /// Generate a vector with Möbius function values.
-std::vector<int32_t> make_moebius(int64_t max);
+std::vector<int32_t> generate_moebius(int64_t max);
 
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> make_least_prime_factor(int64_t max);
+std::vector<int32_t> generate_least_prime_factors(int64_t max);
 
 /// Generate a vector with the prime counts below max
 /// using the sieve of Eratosthenes.
