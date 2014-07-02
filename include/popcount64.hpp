@@ -10,6 +10,9 @@
 /// file in the top level directory.
 ///
 
+#ifndef POPCOUNT64_HPP
+#define POPCOUNT64_HPP
+
 #if !defined(__STDC_CONSTANT_MACROS)
   #define __STDC_CONSTANT_MACROS
 #endif
@@ -82,3 +85,5 @@ inline uint64_t popcount64(uint64_t x)
 }
 
 #endif
+
+#endif /* POPCOUNT64_HPP */
