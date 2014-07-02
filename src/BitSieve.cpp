@@ -19,6 +19,7 @@
 
 #include <BitSieve.hpp>
 #include <popcount64.hpp>
+#include <pmath.hpp>
 
 namespace primecount {
 
@@ -40,7 +41,7 @@ const unsigned int BitSieve::unset_bit_[32] =
 BitSieve::BitSieve(std::size_t size) :
   size_(size)
 {
-  std::size_t size32 = (size + 31) / 32;
+  std::size_t size32 = ceil_div(size, 32);
   // align to 64-bit boundary
   if (size32 % 2 != 0)
     size32 += 2 - size32 % 2;
@@ -71,7 +72,7 @@ uint64_t BitSieve::popcount(const uint64_t* bits, uint64_t start, uint64_t stop)
 
   uint64_t bit_count = popcount_edges(bits, start, stop);
   uint64_t start_idx = (start >> 6) + 1;
-  uint64_t limit = stop  >> 6;
+  uint64_t limit = stop >> 6;
 
   for (uint64_t i = start_idx; i < limit; i++)
     bit_count += popcount64(bits[i]);
