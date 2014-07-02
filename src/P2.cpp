@@ -46,7 +46,8 @@ void init_next_multiples(vector<int64_t>& next, vector<int32_t>& primes, int64_t
     int64_t prime = primes[b];
     int64_t next_multiple = ceil_div(low, prime) * prime;
     next_multiple += prime * (~next_multiple & 1);
-    next.push_back(max(isquare(prime), next_multiple));
+    next_multiple = max(isquare(prime), next_multiple);
+    next.push_back(next_multiple);
   }
 }
 
@@ -76,7 +77,7 @@ int64_t P2_thread(int64_t x,
   init_next_multiples(next, primes, size, low);
 
   // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
-  // We use a reverse prime iterator to calculate P2_thread.
+  // We use a reverse prime iterator to calculate P2_thread
   primesieve::iterator iter(stop + 1, start);
   int64_t previous_prime = get_previous_prime(&iter, stop + 1);
   int64_t xp = x / previous_prime;
