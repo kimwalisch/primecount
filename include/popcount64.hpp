@@ -48,7 +48,7 @@ inline uint64_t popcount64(uint64_t x)
          __builtin_popcount((uint32_t)(x >> 32));
 }
 
-#elif defined(HAVE___BUILTIN_POPCOUNTLL) /* && defined(__x86_64__) */
+#elif defined(HAVE___BUILTIN_POPCOUNTLL)
 
 inline uint64_t popcount64(uint64_t x)
 {
