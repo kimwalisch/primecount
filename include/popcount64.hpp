@@ -40,19 +40,19 @@ inline uint64_t popcount64(uint64_t x)
          _mm_popcnt_u32((uint32_t)(x >> 32));
 }
 
-#elif defined(HAVE___BUILTIN_POPCOUNTLL)
-
-inline uint64_t popcount64(uint64_t x)
-{
-  return __builtin_popcountll(x);
-}
-
-#elif defined(HAVE___BUILTIN_POPCOUNT)
+#elif defined(HAVE___BUILTIN_POPCOUNT) && defined(__i386__)
 
 inline uint64_t popcount64(uint64_t x)
 {
   return __builtin_popcount((uint32_t) x) +
          __builtin_popcount((uint32_t)(x >> 32));
+}
+
+#elif defined(HAVE___BUILTIN_POPCOUNTLL) /* && defined(__x86_64__) */
+
+inline uint64_t popcount64(uint64_t x)
+{
+  return __builtin_popcountll(x);
 }
 
 #else /* Error */
