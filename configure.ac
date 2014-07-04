@@ -12,16 +12,14 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
-# Disable POPCNT instruction by default
+# Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],
-    AC_HELP_STRING([--enable-popcnt], [enable POPCNT instruction (default no)]))
+    AC_HELP_STRING([--enable-popcnt], [enable POPCNT instruction (default yes)]))
 
-AS_IF([test "x$enable_popcnt" = "xyes"], [
-    AC_DEFINE(HAVE_POPCNT, 1, [has POPCNT instruction])
+AS_IF([test "x$enable_popcnt" != "xno"], [
+    AX_POPCNT
     AX_GCC_BUILTIN([__builtin_popcount])
     AX_GCC_BUILTIN([__builtin_popcountll])
-    AX_CHECK_COMPILE_FLAG([-mpopcnt], [CXXFLAGS="$CXXFLAGS -mpopcnt"],
-   [AX_CHECK_COMPILE_FLAG([-msse4.2], [CXXFLAGS="$CXXFLAGS -msse4.2"])])
 ])
 
 # Disable assert macro by default
