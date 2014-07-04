@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libprimecount.la
-libprimecount_la_CXXFLAGS = $(OPENMP_CXXFLAGS)
+libprimecount_la_CXXFLAGS = $(OPENMP_CXXFLAGS) $(POPCNT_FLAG)
 libprimecount_la_LDFLAGS = -version-info @primecount_lib_version@
 
 if FORCE_SHARED_LIBRARY
