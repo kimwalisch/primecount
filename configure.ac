@@ -17,9 +17,11 @@ AC_ARG_ENABLE([popcnt],
     AC_HELP_STRING([--enable-popcnt], [enable POPCNT instruction (default yes)]))
 
 AS_IF([test "x$enable_popcnt" != "xno"], [
-    AX_POPCNT
     AX_GCC_BUILTIN([__builtin_popcount])
     AX_GCC_BUILTIN([__builtin_popcountll])
+    AS_IF([test "x$ax_cv_have___builtin_popcount" = "xyes"], [
+        AX_POPCNT
+    ])
 ])
 
 # Disable assert macro by default
