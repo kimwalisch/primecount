@@ -229,10 +229,11 @@ $ sudo make install
 ```
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-(2010 or later) then you can enable it in the configure step. It gives about
-10 percent speed up.
+then it is enabled by default in the build process. POPCNT speeds up primecount
+by about about 10 percent. If you want to use libprimecount you may want to
+disable POPCNT for maximum portability.
 ```sh
-$ ./configure --enable-popcnt
+$ ./configure --disable-popcnt
 ```
 
 ### Build instructions (Microsoft Visual C++)
