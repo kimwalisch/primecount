@@ -9,9 +9,9 @@
 # DESCRIPTION
 #
 #   Find if the CPU supports the POPCNT instruction by requesting cpuid. If
-#   so then add -mpopcnt (or -msse4.2) to POPCNT_FLAG if the compiler
+#   so then add -mpopcnt (or -msse4.2) to POPCNT_FLAGS if the compiler
 #   supports it. This macro currently only supports the x86 and x86_64 CPU
-#   architectures, for all other CPU architectures POPCNT_FLAG will be
+#   architectures, for all other CPU architectures POPCNT_FLAGS will be
 #   empty.
 #
 # ACKNOWLEDGEMENTS
@@ -21,7 +21,7 @@
 #
 #   This macro calls:
 #
-#     AC_SUBST(POPCNT_FLAG)
+#     AC_SUBST(POPCNT_FLAGS)
 #
 #   And defines:
 #
@@ -67,8 +67,7 @@ AC_DEFUN([AX_POPCNT],
       if test "$ax_cv_have_popcnt_ext" = yes; then
         AX_CHECK_COMPILE_FLAG(-mpopcnt, ax_cv_support_popcnt_ext=yes, [])
         if test x"$ax_cv_support_popcnt_ext" = x"yes"; then
-          POPCNT_FLAG="-mpopcnt"
-          AC_DEFINE(HAVE_POPCNT, 1, [Support POPCNT (Bit population count) instruction])
+          POPCNT_FLAGS="-mpopcnt -DHAVE_POPCNT=1"
         else
 
           AC_CACHE_CHECK([whether sse4.2 is supported], [ax_cv_have_sse42_ext],
@@ -84,8 +83,7 @@ AC_DEFUN([AX_POPCNT],
           else
             AX_CHECK_COMPILE_FLAG(-msse4.2, ax_cv_support_sse42_ext=yes, [])
             if test x"$ax_cv_support_sse42_ext" = x"yes"; then
-              POPCNT_FLAG="-msse4.2"
-              AC_DEFINE(HAVE_POPCNT, 1, [Support POPCNT (Bit population count) instruction])
+              POPCNT_FLAGS="-msse4.2 -DHAVE_POPCNT=1"
             else
               AC_MSG_WARN([Your compiler does not support the POPCNT instruction.])
             fi
@@ -96,5 +94,5 @@ AC_DEFUN([AX_POPCNT],
   ;;
   esac
 
-  AC_SUBST(POPCNT_FLAG)
+  AC_SUBST(POPCNT_FLAGS)
 ])
