@@ -35,18 +35,17 @@
 #define CHECK_EQUAL(f1, f2, check, iters) \
 { \
   cout << "Testing " << #f1 << "(x)" << flush; \
-  int64_t limit = get_iters(iters); \
  \
-  /* test for 0 <= x < limit * 10 */ \
-  for (int64_t x = 0; x < limit * 10; x++) \
+  /* test for 0 <= x < 10000 */ \
+  for (int64_t x = 0; x < 10000; x++) \
     check(f1, f2); \
  \
   int64_t x = 0; \
   /* test using random increment */ \
-  for (int64_t i = 0; i < limit; i++, x += get_rand()) \
+  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
   { \
     check(f1, f2); \
-    double percent = 100.0 * (i + 1.0) / limit; \
+    double percent = 100.0 * (i + 1.0) / iters; \
     cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
   } \
  \
@@ -76,19 +75,10 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
   }
 }
 
-int64_t get_iters(int64_t iters)
-{
-#ifdef TEST_HARD
-  // Use about iters * sqrt(iters) iterations
-  return (int64_t) (iters * max(1.0, sqrt((double) iters) - 4));
-#else
-  return iters;
-#endif
-}
-
 void test_phi_thread_safety(int64_t iters)
 {
 #ifdef _OPENMP
+
   cout << "Testing phi(x, a)" << flush;
 
   int nested_threads = 2;
@@ -144,7 +134,7 @@ bool test()
     CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
-    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11,  50);
+    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11, 100);
   }
   catch (runtime_error& e)
   {
