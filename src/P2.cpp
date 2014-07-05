@@ -35,9 +35,10 @@ inline int64_t get_previous_prime(primesieve::iterator* iter, int64_t old)
 }
 
 /// For each prime calculate its first multiple >= low
-/// which is not a multiple of 2.
-void init_next_multiples(vector<int64_t>& next, vector<int32_t>& primes, int64_t size, int64_t low)
+vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
 {
+  vector<int64_t> next;
+
   next.reserve(size);
   next.push_back(0);
 
@@ -49,6 +50,8 @@ void init_next_multiples(vector<int64_t>& next, vector<int32_t>& primes, int64_t
     next_multiple = max(isquare(prime), next_multiple);
     next.push_back(next_multiple);
   }
+
+  return next;
 }
 
 int64_t P2_thread(int64_t x,
@@ -72,15 +75,14 @@ int64_t P2_thread(int64_t x,
   int64_t stop = min(x / low, sqrtx);
   int64_t P2_thread = 0;
 
-  BitSieve sieve(segment_size);
-  vector<int64_t> next;
-  init_next_multiples(next, primes, size, low);
-
   // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   // We use a reverse prime iterator to calculate P2_thread
   primesieve::iterator iter(stop + 1, start);
   int64_t previous_prime = get_previous_prime(&iter, stop + 1);
   int64_t xp = x / previous_prime;
+
+  vector<int64_t> next = generate_next_multiples(low, size, primes);
+  BitSieve sieve(segment_size);
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
