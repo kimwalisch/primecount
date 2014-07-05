@@ -78,7 +78,6 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
 void test_phi_thread_safety(int64_t iters)
 {
 #ifdef _OPENMP
-
   cout << "Testing phi(x, a)" << flush;
 
   int nested_threads = 2;
@@ -101,8 +100,7 @@ void test_phi_thread_safety(int64_t iters)
     throw runtime_error("Error: multi-threaded phi(x, a) is broken.");
 
   std::cout << "\rTesting phi(x, a) 100%" << endl;
-
-#endif /* _OPENMP */
+#endif
 }
 
 } // namespace
@@ -134,7 +132,7 @@ bool test()
     CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
-    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11, 100);
+    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11,  70);
   }
   catch (runtime_error& e)
   {
