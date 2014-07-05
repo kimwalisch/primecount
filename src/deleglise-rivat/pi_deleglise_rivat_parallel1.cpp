@@ -35,10 +35,11 @@ using namespace primecount;
 
 namespace {
 
-/// For each prime calculate its first multiple >= low.
-template <typename T1, typename T2>
-void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
+/// For each prime calculate its first multiple >= low
+vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
 {
+  vector<int64_t> next;
+
   next.reserve(size);
   next.push_back(0);
 
@@ -49,10 +50,17 @@ void init_next_multiples(T1& next, T2& primes, int64_t size, int64_t low)
     next_multiple += prime * (~next_multiple & 1);
     next.push_back(next_multiple);
   }
+
+  return next;
 }
 
-template <typename T1, typename T2>
-void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple, T1& sieve, T2& counters)
+template <typename T>
+void cross_off(int64_t prime,
+               int64_t low,
+               int64_t high,
+               int64_t& next_multiple,
+               BitSieve& sieve,
+               T& counters)
 {
   int64_t segment_size = sieve.size();
   int64_t k = next_multiple;
@@ -102,8 +110,7 @@ int64_t S2_thread(int64_t x,
   int64_t S2_thread = 0;
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next;
-  init_next_multiples(next, primes, size, low);
+  vector<int64_t> next = generate_next_multiples(low, size, primes);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 

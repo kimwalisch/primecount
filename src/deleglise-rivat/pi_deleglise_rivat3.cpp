@@ -32,8 +32,13 @@ namespace {
 /// For each element that is unmarked the first time update
 /// the special counters tree data structure.
 ///
-template <typename T1, typename T2>
-void cross_off(int64_t prime, int64_t low, int64_t high, int64_t& next_multiple, T1& sieve, T2& counters)
+template <typename T>
+void cross_off(int64_t prime,
+               int64_t low,
+               int64_t high,
+               int64_t& next_multiple,
+               BitSieve& sieve,
+               T& counters)
 {
   int64_t segment_size = sieve.size();
   int64_t k = next_multiple;
