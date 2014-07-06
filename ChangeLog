@@ -1,12 +1,12 @@
-2014-06-27  Kim Walisch  <kim.walisch@gmail.com>
+2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.21 work in progress.
+  Version 0.21 released.
 
-  * ./configure --enable-popcnt: Use POPCNT instruction.
   * pi_deleglise_rivat_parallel3.cpp: Uses 10 times less memory!
   * include/FactorTable.hpp: Compressed lookup table for lpf and Moebius.
   * include/PiTable.hpp: Compressed lookup table for prime counts.
-  * src/BitSieve.cpp: Refactoring.
+  * include/popcount64.hpp: Count bits using the POPCNT instruction.
+  * configure.ac: Check if CPU supports POPCNT.
 
 2014-06-15  Kim Walisch  <kim.walisch@gmail.com>
 
