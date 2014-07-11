@@ -1,3 +1,9 @@
+2014-07-11 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 0.22 work in progress.
+
+  * src/deleglise-rivat/*.cpp: Improved alpha factor.
+
 2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 0.21 released.
