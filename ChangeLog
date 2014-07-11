@@ -2,8 +2,9 @@
 
   Version 0.22 work in progress.
 
-  * src/deleglise-rivat/*.cpp: Improved alpha factor.
   * src/lmo/*.cpp: Improved alpha factor.
+  * src/deleglise-rivat/*.cpp: Improved alpha factor.
+  * include/pmath.hpp: Add max3(a, b, c).
 
 2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
 
