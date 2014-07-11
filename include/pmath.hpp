@@ -18,6 +18,11 @@
 
 namespace primecount {
 
+inline int64_t max3(int64_t a, int64_t b, int64_t c)
+{
+  return std::max(std::max(a, b), c);
+}
+
 inline int64_t isquare(int64_t x)
 {
   return x * x;
