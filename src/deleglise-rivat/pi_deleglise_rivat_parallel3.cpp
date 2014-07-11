@@ -324,6 +324,16 @@ int64_t S2(int64_t x,
   return S2_total;
 }
 
+/// alpha is a tuning factor which should grow like (log(x))^3
+/// for the Deleglise-Rivat prime counting algorithm.
+///
+double compute_alpha(int64_t x)
+{
+  double d = (double) x;
+  double alpha = log(d) * log(d) * log(d) / 1100.0;
+  return in_between(1, alpha, iroot<6>(x));
+}
+
 } // namespace
 
 namespace primecount {
@@ -337,8 +347,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  // alpha is a tuning factor
-  double alpha = in_between(1, log((double) x), iroot<6>(x));
+  double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
 
