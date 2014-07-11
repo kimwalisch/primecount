@@ -158,6 +158,15 @@ int64_t S2(int64_t x,
   return S2_result;
 }
 
+/// alpha is a tuning factor which should grow like (log(x))^2
+/// for the Lagarias-Miller-Odlyzko algorithm
+///
+double compute_alpha(int64_t x)
+{
+  double d = (double) x;
+  return in_between(1, log(d) * log(d) / 300, iroot<6>(x));
+}
+
 } // namespace
 
 namespace primecount {
@@ -171,8 +180,7 @@ int64_t pi_lmo5(int64_t x)
   if (x < 2)
     return 0;
 
-  // alpha is a tuning factor
-  double alpha = in_between(1, log(log((double) x)), iroot<6>(x));
+  double alpha = compute_alpha(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
 
