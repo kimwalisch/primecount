@@ -330,7 +330,7 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  double alpha = log(d) * log(d) * log(d) / 1100.0;
+  double alpha = log(d) * log(d) * log(d) / 1200;
   return in_between(1, alpha, iroot<6>(x));
 }
 
