@@ -181,8 +181,7 @@ int64_t S2_thread(int64_t x,
       if (prime >= primes[l])
         goto next_segment;
 
-      int64_t min_hard_leaf = max(x / (prime * high), y / prime);
-      min_hard_leaf = in_between(prime, min_hard_leaf, y);
+      int64_t min_hard_leaf = max3(x / (prime * high), y / prime, prime);
       int64_t min_trivial_leaf = min(x / (prime * prime), y);
       int64_t min_clustered_easy_leaf = min(isqrt(x / prime), y);
       int64_t min_sparse_easy_leaf = min(z / prime, y);
