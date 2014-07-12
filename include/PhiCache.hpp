@@ -36,7 +36,6 @@ private:
   const std::vector<int32_t>& primes_;
   int64_t bytes_;
 
-  /// Disable the default assignment operator
   void operator=(const PhiCache&);
   int64_t phi_bsearch(int64_t x, int64_t a) const;
   bool is_phi_bsearch(int64_t x, int64_t a) const;
