@@ -39,7 +39,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  std::vector<int32_t> primes = generate_n_primes(a);
+  vector<int32_t> primes = generate_n_primes(a);
 
   if (primes.at(a) >= x)
     return 1;

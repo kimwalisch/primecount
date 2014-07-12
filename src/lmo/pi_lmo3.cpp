@@ -143,7 +143,7 @@ int64_t pi_lmo3(int64_t x)
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
+  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes, lpf , mu);
   int64_t s2 = S2(x, y, c, primes, lpf , mu);
   int64_t p2 = P2(x, y, 1);
