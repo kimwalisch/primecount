@@ -24,7 +24,8 @@ public:
   int64_t phi(int64_t x, int64_t a);
   int64_t phi(int64_t x, int64_t a, int sign);
 private:
-  enum {
+  enum
+  {
     /// Cache phi(x, a) results if a <= CACHE_A_LIMIT
     CACHE_A_LIMIT = 500,
     /// Keep the cache size below CACHE_BYTES_LIMIT per thread
@@ -43,7 +44,7 @@ private:
 
   int64_t cache_size(int64_t a) const
   {
-    return static_cast<int64_t>(cache_[a].size());
+    return (int64_t) cache_[a].size();
   }
 
   bool is_cached(int64_t x, int64_t a) const
