@@ -15,25 +15,18 @@
 
 namespace primecount {
 
-/// This class calculates phi(x, a) in constant time for small values
-/// of a < 7 using lookup tables. Let pp = prime_products_[a]:
-/// phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a).
-///
 class PhiTiny {
 public:
   PhiTiny();
   int64_t phi(int64_t x, int64_t a) const;
-  enum { MAX_A = 6 };
+  static int64_t max_a() { return 6; }
 private:
   std::vector<int16_t> phi_cache_[7];
-  static const int32_t primes_[7];
-  static const int32_t prime_products_[7];
-  static const int32_t totients_[7];
 };
 
 inline bool is_phi_tiny(int64_t a)
 {
-  return a <= PhiTiny::MAX_A;
+  return a <= PhiTiny::max_a();
 }
 
 int64_t phi_tiny(int64_t x, int64_t a);

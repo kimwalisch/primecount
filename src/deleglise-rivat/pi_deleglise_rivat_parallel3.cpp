@@ -354,7 +354,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   FactorTable factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
-  int64_t c = min<int64_t>(PhiTiny::MAX_A, pi_y);
+  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes, factors);
   int64_t s2 = S2(x, y, z, c, primes, factors, threads);
   int64_t p2 = P2(x, y, threads);
