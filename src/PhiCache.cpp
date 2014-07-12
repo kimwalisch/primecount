@@ -2,10 +2,15 @@
 /// @file  PhiCache.cpp
 /// @brief The PhiCache class calculates phi(x, a) using the recursive
 ///        formula: phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
-///        I have added a cache to my implementation in which results
-///        of phi(x, a) are stored if x < 2^16 and a <= 500. The cache
-///        speeds up the calculations by at least 3 orders of
-///        magnitude near 10^15.
+///        This implementation is based on an algorithm from Tomas
+///        Oliveira e Silva [1]. I have added a cache to my
+///        implementation in which results of phi(x, a) are stored if
+///        x < 2^16 and a <= 500. The cache speeds up the calculations
+///        by at least 3 orders of magnitude near 10^15.
+///
+///       [1] Tomas Oliveira e Silva, "Computing pi(x): the
+///           combinatorial method", Revista do DETUA, vol. 4, no. 6,
+///           pp. 759-768, March 2006
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -18,35 +23,34 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
-#include <algorithm>
-#include <limits>
 #include <vector>
+#include <limits>
+#include <cstddef>
 #include <cassert>
-
-using namespace std;
 
 namespace {
 
 inline int64_t fast_div(int64_t x, int32_t y)
 {
   // Avoid slow 64-bit division
-  if (x <= numeric_limits<uint32_t>::max())
-    return ((uint32_t) x) / y;
-  return x / y;
+  return (x <= std::numeric_limits<uint32_t>::max())
+      ? static_cast<uint32_t>(x) / y : x / y;
 }
 
 } // namespace
 
 namespace primecount {
 
-PhiCache::PhiCache(const vector<int32_t>& primes) :
+/// @param primes  A vector of primes with:
+///                primes[0] = 0, primes[1] = 2, primes[2] = 3, ...
+/// 
+PhiCache::PhiCache(const std::vector<int32_t>& primes) :
   primes_(primes),
   bytes_(0)
 {
-  // primecount uses 1-indexing i.e. primes[1] = 2
   assert(primes_[0] == 0);
-  size_t max_size = CACHE_A_LIMIT + 1;
-  cache_.resize(min(primes.size(), max_size));
+  std::size_t max_size = CACHE_A_LIMIT + 1;
+  cache_.resize(std::min(primes.size(), max_size));
 }
 
 /// Partial sieve function (a.k.a. Legendre-sum).
@@ -81,7 +85,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
   else
   {
     int64_t iters = pi_bsearch(primes_, a, isqrt(x));
-    int64_t c = min(iters, PhiTiny::max_a());
+    int64_t c = (iters > 6) ? 6 : iters;
     sum = (a - iters) * -sign;
     sum += phi_tiny(x, c) * sign;
 
@@ -97,7 +101,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
   }
 
   if (write_to_cache(x, a))
-    cache_[a][x] = (uint16_t) (sum * sign);
+    cache_[a][x] = static_cast<uint16_t>(sum * sign);
 
   return sum;
 }
@@ -117,7 +121,7 @@ bool PhiCache::is_phi_bsearch(int64_t x, int64_t a) const
 
 bool PhiCache::write_to_cache(int64_t x, int64_t a)
 {
-  if (a > CACHE_A_LIMIT || x > numeric_limits<uint16_t>::max())
+  if (a > CACHE_A_LIMIT || x > std::numeric_limits<uint16_t>::max())
     return false;
   if (x >= cache_size(a))
   {
