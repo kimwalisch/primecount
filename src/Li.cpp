@@ -1,5 +1,6 @@
 ///
 /// @file  Li.cpp
+/// @brief Logarithmic integral approximation.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -33,7 +34,7 @@ long double li(long double x)
   long double power2 = 1;
 
   int k = 0;
-  int terms = static_cast<int>(logx * 2) + 10;
+  int terms = (int) (logx * 2 + 10);
 
   for (int n = 1; n < terms; n++)
   {
@@ -62,9 +63,8 @@ int64_t Li(int64_t x)
   if (x < 2)
     return 0;
 
-  long double n = static_cast<long double>(x);
-  return static_cast<int64_t>(
-      li(n) - /* li(2) = */ 1.04516);
+  long double n = (long double) x;
+  return (int64_t) (li(n) - /* li(2) = */ 1.04516);
 }
 
 /// Calculate the inverse logarithmic integral Li^-1(x) which is a
@@ -76,18 +76,18 @@ int64_t Li_inverse(int64_t x)
   if (x < 1)
     return 0;
 
-  double n = static_cast<double>(x);
+  double n = (double) x;
   double logn = log(n);
-  int64_t first = static_cast<int64_t>(n * logn);
-  int64_t last  = static_cast<int64_t>(n * logn * 2 + 2);
+  int64_t first = (int64_t) (n * logn);
+  int64_t last  = (int64_t) (n * logn * 2 + 2);
+
   if (last <= first)
-    last = std::numeric_limits<int64_t>::max();
+    last = numeric_limits<int64_t>::max();
 
   // find Li^-1(x) using binary search
   while (first < last)
   {
     int64_t mid = first + (last - first) / 2;
-
     if (Li(mid) < x)
       first = mid + 1;
     else
