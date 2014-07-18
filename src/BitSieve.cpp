@@ -103,7 +103,7 @@ uint64_t BitSieve::popcount_edges(const uint64_t* bits, uint64_t start, uint64_t
 uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
 {
   assert(stop < size_);
-  const uint64_t* bits = reinterpret_cast<const uint64_t*>(bits_.data());
+  const uint64_t* bits = reinterpret_cast<const uint64_t*>(&bits_[0]);
   return popcount(bits, start, stop);
 }
 
