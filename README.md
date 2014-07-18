@@ -153,9 +153,9 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
 </table>
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
-2013 using a 64-bit Linux operating system. primecount's parallel
-Deleglise-Rivat implementation currently (July 2014) counts primes faster
-than any other program on the web!
+2013 using a 64-bit Linux operating system and primecount was compiled using
+GCC 4.8. primecount's parallel Deleglise-Rivat implementation currently (July
+2014) counts primes faster than any other program on the web!
 
 ### Fast nth prime calculation
 
