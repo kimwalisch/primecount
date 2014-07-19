@@ -46,9 +46,9 @@ int64_t pi(int64_t x)
 /// This is an alias for the fastest prime counting implementation
 /// within primecount.
 ///
-int64_t pi(int64_t x, int threads)
+int64_t pi(int64_t x, int num_threads)
 {
-  return pi_deleglise_rivat(x, threads);
+  return pi_deleglise_rivat(x, num_threads);
 }
 
 /// Calculate the number of primes below x using the
@@ -64,9 +64,9 @@ int64_t pi_deleglise_rivat(int64_t x)
 /// Deleglise-Rivat algorithm.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
 ///
-int64_t pi_deleglise_rivat(int64_t x, int threads)
+int64_t pi_deleglise_rivat(int64_t x, int num_threads)
 {
-  return pi_deleglise_rivat_parallel3(x, threads);
+  return pi_deleglise_rivat_parallel3(x, num_threads);
 }
 
 /// Calculate the number of primes below x using Legendre's formula.
@@ -98,9 +98,9 @@ int64_t pi_lmo(int64_t x)
 /// prime counting algorithm using OpenMP.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo(int64_t x, int threads)
+int64_t pi_lmo(int64_t x, int num_threads)
 {
-  return pi_lmo_parallel3(x, threads);
+  return pi_lmo_parallel3(x, num_threads);
 }
 
 /// Calculate the number of primes below x using Meissel's formula.
