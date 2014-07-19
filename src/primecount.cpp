@@ -17,22 +17,22 @@
 namespace {
 
 // By default primecount uses all CPU cores.
-int threads = primecount::MAX_THREADS;
+int threads_ = primecount::MAX_THREADS;
 
 }
 
 namespace primecount {
 
 // Set the number of threads.
-void set_num_threads(int num_threads)
+void set_num_threads(int threads)
 {
-  threads = validate_threads(num_threads);
+  threads_ = validate_threads(threads);
 }
 
 // Get the currently set number of threads.
 int get_num_threads()
 {
-  return validate_threads(threads);
+  return validate_threads(threads_);
 }
 
 /// This is an alias for the fastest prime counting implementation
@@ -40,22 +40,13 @@ int get_num_threads()
 ///
 int64_t pi(int64_t x)
 {
-  return pi(x, threads);
+  return pi(x, threads_);
 }
 
 /// This is an alias for the fastest prime counting implementation
 /// within primecount.
 ///
-int64_t pi(int64_t x, int num_threads)
-{
-  return pi_deleglise_rivat(x, num_threads);
-}
-
-/// Calculate the number of primes below x using the
-/// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
-///
-int64_t pi_deleglise_rivat(int64_t x)
+int64_t pi(int64_t x, int threads)
 {
   return pi_deleglise_rivat(x, threads);
 }
@@ -64,9 +55,18 @@ int64_t pi_deleglise_rivat(int64_t x)
 /// Deleglise-Rivat algorithm.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
 ///
-int64_t pi_deleglise_rivat(int64_t x, int num_threads)
+int64_t pi_deleglise_rivat(int64_t x)
 {
-  return pi_deleglise_rivat_parallel3(x, num_threads);
+  return pi_deleglise_rivat(x, threads_);
+}
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
+///
+int64_t pi_deleglise_rivat(int64_t x, int threads)
+{
+  return pi_deleglise_rivat_parallel3(x, threads);
 }
 
 /// Calculate the number of primes below x using Legendre's formula.
@@ -74,7 +74,7 @@ int64_t pi_deleglise_rivat(int64_t x, int num_threads)
 ///
 int64_t pi_legendre(int64_t x)
 {
-  return pi_legendre(x, threads);
+  return pi_legendre(x, threads_);
 }
 
 /// Calculate the number of primes below x using Lehmer's formula.
@@ -82,7 +82,7 @@ int64_t pi_legendre(int64_t x)
 ///
 int64_t pi_lehmer(int64_t x)
 {
-  return pi_lehmer(x, threads);
+  return pi_lehmer(x, threads_);
 }
 
 /// Calculate the number of primes below x using the
@@ -91,16 +91,16 @@ int64_t pi_lehmer(int64_t x)
 ///
 int64_t pi_lmo(int64_t x)
 {
-  return pi_lmo(x, threads);
+  return pi_lmo(x, threads_);
 }
 
 /// Parallel implementation of the Lagarias-Miller-Odlyzko
 /// prime counting algorithm using OpenMP.
 /// Run time: O(x^(2/3)) operations, O(x^(1/3) * log log x) space.
 ///
-int64_t pi_lmo(int64_t x, int num_threads)
+int64_t pi_lmo(int64_t x, int threads)
 {
-  return pi_lmo_parallel3(x, num_threads);
+  return pi_lmo_parallel3(x, threads);
 }
 
 /// Calculate the number of primes below x using Meissel's formula.
@@ -108,7 +108,7 @@ int64_t pi_lmo(int64_t x, int num_threads)
 ///
 int64_t pi_meissel(int64_t x)
 {
-  return pi_meissel(x, threads);
+  return pi_meissel(x, threads_);
 }
 
 /// Calculate the number of primes below x using an optimized 
@@ -117,7 +117,7 @@ int64_t pi_meissel(int64_t x)
 ///
 int64_t pi_primesieve(int64_t x)
 {
-  return pi_primesieve(x, threads);
+  return pi_primesieve(x, threads_);
 }
 
 /// Calculate the nth prime using a combination of an efficient prime
@@ -126,7 +126,7 @@ int64_t pi_primesieve(int64_t x)
 ///
 int64_t nth_prime(int64_t n)
 {
-  return nth_prime(n, threads);
+  return nth_prime(n, threads_);
 }
 
 /// Partial sieve function (a.k.a. Legendre-sum).
@@ -135,7 +135,7 @@ int64_t nth_prime(int64_t n)
 ///
 int64_t phi(int64_t x, int64_t a)
 {
-  return phi(x, a, threads);
+  return phi(x, a, threads_);
 }
 
 } // namespace primecount
