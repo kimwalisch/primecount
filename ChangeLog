@@ -1,10 +1,12 @@
-2014-07-11 Kim Walisch  <kim.walisch@gmail.com>
+2014-07-19 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 0.22 work in progress.
+  Version 1.0 work in progress.
 
+  * src/BitSieve.cpp: Fix big-endian CPU bug.
   * src/lmo/*.cpp: Improved alpha factor.
   * src/deleglise-rivat/*.cpp: Improved alpha factor.
   * include/pmath.hpp: Add max3(a, b, c).
+  * Readme.md: Update documentation.
 
 2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
 
