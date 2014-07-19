@@ -10,9 +10,7 @@
 #
 #   Find if the CPU supports the POPCNT instruction by requesting cpuid. If
 #   so then add -mpopcnt (or -msse4.2) to POPCNT_FLAGS if the compiler
-#   supports it. This macro currently only supports the x86 and x86_64 CPU
-#   architectures, for all other CPU architectures POPCNT_FLAGS will be
-#   empty.
+#   supports it.
 #
 # ACKNOWLEDGEMENTS
 #
@@ -90,8 +88,18 @@ AC_DEFUN([AX_POPCNT],
           fi
         fi
       fi
+    ;;
 
-  ;;
+    *) # Non x86 CPU architectures
+      for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* "); do
+        POPCNT_FLAGS="$POPCNT_FLAGS $i"
+      done
+      if test x"$POPCNT_FLAGS" != x; then
+        POPCNT_FLAGS="$POPCNT_FLAGS -DHAVE_POPCNT=1"
+      else
+        AC_MSG_WARN([Your compiler does not support the POPCNT instruction.])
+      fi
+    ;;
   esac
 
   AC_SUBST(POPCNT_FLAGS)
