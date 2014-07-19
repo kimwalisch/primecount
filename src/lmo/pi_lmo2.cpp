@@ -25,7 +25,7 @@ namespace {
 
 /// Calculate the contribution of the special leaves.
 /// This implementation uses the sieve of Eratosthenes (without
-/// segmentation). Space complexity: O(x^(2/3) / log log x).
+/// segmentation). Space complexity: O(x^(2/3) * (log x)^2).
 /// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
@@ -95,7 +95,7 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^(2/3) / log log x) space.
+/// Run time: O(x^(2/3)) operations, O(x^(2/3) / (log x)^2) space.
 ///
 int64_t pi_lmo2(int64_t x)
 {

@@ -17,7 +17,7 @@ namespace primecount {
 
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
-/// Run time: O(x/(log x)^4) operations, O(x^0.5) space.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/2)) space.
 ///
 int64_t nth_prime(int64_t n, int threads)
 {

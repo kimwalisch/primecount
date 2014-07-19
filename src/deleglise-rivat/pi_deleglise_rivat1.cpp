@@ -201,7 +201,7 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * log x) space.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 ///
 int64_t pi_deleglise_rivat1(int64_t x)
 {
