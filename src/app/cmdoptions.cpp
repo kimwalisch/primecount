@@ -112,6 +112,9 @@ Option makeOption(const string& str)
 
 PrimeCountOptions parseOptions(int argc, char** argv)
 {
+  if (argc < 2)
+    help();
+
   initOptionMap();
   PrimeCountOptions pco;
   std::vector<int64_t> numbers;
