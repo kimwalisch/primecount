@@ -1,6 +1,6 @@
 2014-07-19 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.0 work in progress.
+  Version 1.0 released.
 
   * src/BitSieve.cpp: Fix big-endian CPU bug.
   * src/lmo/*.cpp: Improved alpha factor.
