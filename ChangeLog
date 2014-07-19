@@ -6,6 +6,7 @@
   * src/lmo/*.cpp: Improved alpha factor.
   * src/deleglise-rivat/*.cpp: Improved alpha factor.
   * include/pmath.hpp: Add max3(a, b, c).
+  * m4/m4-ax_popcnt.m4: Support non x86 CPU architectures.
   * Readme.md: Update documentation.
 
 2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
