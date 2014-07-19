@@ -23,64 +23,72 @@
 
 namespace primecount {
 
-const unsigned int BitSieve::unset_bit_[32] =
+const uint64_t BitSieve::unset_bit_[64] =
 {
-  ~(1u <<  0), ~(1u <<  1), ~(1u <<  2),
-  ~(1u <<  3), ~(1u <<  4), ~(1u <<  5),
-  ~(1u <<  6), ~(1u <<  7), ~(1u <<  8),
-  ~(1u <<  9), ~(1u << 10), ~(1u << 11),
-  ~(1u << 12), ~(1u << 13), ~(1u << 14),
-  ~(1u << 15), ~(1u << 16), ~(1u << 17),
-  ~(1u << 18), ~(1u << 19), ~(1u << 20),
-  ~(1u << 21), ~(1u << 22), ~(1u << 23),
-  ~(1u << 24), ~(1u << 25), ~(1u << 26),
-  ~(1u << 27), ~(1u << 28), ~(1u << 29),
-  ~(1u << 30), ~(1u << 31)
+  ~(UINT64_C(1) <<  0), ~(UINT64_C(1) <<  1), ~(UINT64_C(1) <<  2),
+  ~(UINT64_C(1) <<  3), ~(UINT64_C(1) <<  4), ~(UINT64_C(1) <<  5),
+  ~(UINT64_C(1) <<  6), ~(UINT64_C(1) <<  7), ~(UINT64_C(1) <<  8),
+  ~(UINT64_C(1) <<  9), ~(UINT64_C(1) << 10), ~(UINT64_C(1) << 11),
+  ~(UINT64_C(1) << 12), ~(UINT64_C(1) << 13), ~(UINT64_C(1) << 14),
+  ~(UINT64_C(1) << 15), ~(UINT64_C(1) << 16), ~(UINT64_C(1) << 17),
+  ~(UINT64_C(1) << 18), ~(UINT64_C(1) << 19), ~(UINT64_C(1) << 20),
+  ~(UINT64_C(1) << 21), ~(UINT64_C(1) << 22), ~(UINT64_C(1) << 23),
+  ~(UINT64_C(1) << 24), ~(UINT64_C(1) << 25), ~(UINT64_C(1) << 26),
+  ~(UINT64_C(1) << 27), ~(UINT64_C(1) << 28), ~(UINT64_C(1) << 29),
+  ~(UINT64_C(1) << 30), ~(UINT64_C(1) << 31), ~(UINT64_C(1) << 32),
+  ~(UINT64_C(1) << 33), ~(UINT64_C(1) << 34), ~(UINT64_C(1) << 35),
+  ~(UINT64_C(1) << 36), ~(UINT64_C(1) << 37), ~(UINT64_C(1) << 38),
+  ~(UINT64_C(1) << 39), ~(UINT64_C(1) << 40), ~(UINT64_C(1) << 41),
+  ~(UINT64_C(1) << 42), ~(UINT64_C(1) << 43), ~(UINT64_C(1) << 44),
+  ~(UINT64_C(1) << 45), ~(UINT64_C(1) << 46), ~(UINT64_C(1) << 47),
+  ~(UINT64_C(1) << 48), ~(UINT64_C(1) << 49), ~(UINT64_C(1) << 50),
+  ~(UINT64_C(1) << 51), ~(UINT64_C(1) << 52), ~(UINT64_C(1) << 53),
+  ~(UINT64_C(1) << 54), ~(UINT64_C(1) << 55), ~(UINT64_C(1) << 56),
+  ~(UINT64_C(1) << 57), ~(UINT64_C(1) << 58), ~(UINT64_C(1) << 59),
+  ~(UINT64_C(1) << 60), ~(UINT64_C(1) << 61), ~(UINT64_C(1) << 62),
+  ~(UINT64_C(1) << 63)
 };
 
 BitSieve::BitSieve(std::size_t size) :
+  bits_(ceil_div(size, 64)),
   size_(size)
-{
-  std::size_t size32 = ceil_div(size, 32);
-  // align to 64-bit boundary
-  if (size32 % 2 != 0)
-    size32 += 2 - size32 % 2;
-  bits_.resize(size32);
-}
+{ }
 
 /// Set all bits to 1, except bits corresponding
 /// to 0, 1 and even numbers > 2.
 /// 
 void BitSieve::memset(uint64_t low)
 {
-  unsigned mask = (low & 1) ? 0x55555555u : 0xAAAAAAAAu;
-  std::fill(bits_.begin(), bits_.end(), mask);
+  std::fill(bits_.begin(), bits_.end(), (low & 1)
+      ? UINT64_C(0x5555555555555555) : UINT64_C(0xAAAAAAAAAAAAAAAA));
 
   // correct 0, 1 and 2
   if (low <= 2)
   {
-    uint32_t bitmask = ~((1u << (2 - low)) - 1);
-    bits_[0] &= bitmask;
-    bits_[0] |= 1 << (2 - low);
+    uint64_t bit = 1 << (2 - low);
+    bits_[0] &= ~(bit - 1);
+    bits_[0] |= bit;
   }
 }
 
-uint64_t BitSieve::popcount(const uint64_t* bits, uint64_t start, uint64_t stop)
+/// Count the number of 1 bits inside [start, stop]
+uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
     return 0;
 
-  uint64_t bit_count = popcount_edges(bits, start, stop);
+  assert(stop < size_);
+  uint64_t bit_count = count_edges(start, stop);
   uint64_t start_idx = (start >> 6) + 1;
   uint64_t limit = stop >> 6;
 
   for (uint64_t i = start_idx; i < limit; i++)
-    bit_count += popcount64(bits[i]);
+    bit_count += popcount64(bits_[i]);
 
   return bit_count;
 }
 
-uint64_t BitSieve::popcount_edges(const uint64_t* bits, uint64_t start, uint64_t stop)
+uint64_t BitSieve::count_edges(uint64_t start, uint64_t stop) const
 {
   uint64_t index1 = start >> 6;
   uint64_t index2 = stop  >> 6;
@@ -89,22 +97,14 @@ uint64_t BitSieve::popcount_edges(const uint64_t* bits, uint64_t start, uint64_t
   uint64_t count = 0;
 
   if (index1 == index2)
-    count += popcount64(bits[index1] & (mask1 & mask2));
+    count += popcount64(bits_[index1] & (mask1 & mask2));
   else
   {
-    count += popcount64(bits[index1] & mask1);
-    count += popcount64(bits[index2] & mask2);
+    count += popcount64(bits_[index1] & mask1);
+    count += popcount64(bits_[index2] & mask2);
   }
 
   return count;
-}
-
-/// Count the number of 1 bits inside [start, stop]
-uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
-{
-  assert(stop < size_);
-  const uint64_t* bits = reinterpret_cast<const uint64_t*>(&bits_[0]);
-  return popcount(bits, start, stop);
 }
 
 } // namespace
