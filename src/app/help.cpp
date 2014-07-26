@@ -34,6 +34,7 @@ const string helpMenu(
   "         --phi              Calculate phi(x, a), requires 2 arguments\n"
   "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
   "         --test             Run various correctness tests and exit\n"
+  "         --time             Print the time elapsed in seconds\n"
   "  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores\n"
   "  -v,    --version          Print version and license information\n"
   "  -h,    --help             Print this help menu\n"
