@@ -6,7 +6,7 @@
 
 TARGET = primecount
 CXX = cl /nologo
-CXXFLAGS = /W4 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I include\64-bit /I primesieve-master\include
+CXXFLAGS = /W4 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I primesieve-master\include
 LINK = link /nologo /LIBPATH:primesieve-master
 PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
@@ -23,10 +23,10 @@ LIB_OBJECTS = \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\pmath.obj \
+	src\primecount.obj \
 	src\P2.obj \
 	src\P3.obj \
-	src\64-bit\primecount.obj \
-	src\64-bit\test.obj \
+	src\test.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \
 	src\deleglise-rivat\pi_deleglise_rivat3.obj \
@@ -118,7 +118,6 @@ clean:
 	-del /Q *.exe 2> /nul
 	-del /Q *.lib 2> /nul
 	-del /Q src\*.obj 2> /nul
-	-del /Q src\64-bit\*.obj 2> /nul
 	-del /Q src\app\*.obj 2> /nul
 	-del /Q src\app\64-bit\*.obj 2> /nul
 	-del /Q src\lmo\*.obj 2> /nul
