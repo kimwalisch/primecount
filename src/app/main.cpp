@@ -17,6 +17,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 #include <stdint.h>
 
 using namespace std;
@@ -90,9 +91,9 @@ int main (int argc, char* argv[])
       case OPTION_PI:
         res = pi(int64_cast(pco.x), pco.threads); break;
       case OPTION_LI:
-        res = Li((double) pco.x); break;
+        res = Li(int64_cast(pco.x)); break;
       case OPTION_LIINV:
-        res = Li_inverse((double) pco.x); break;
+        res = Li_inverse(int64_cast(pco.x)); break;
       case OPTION_NTHPRIME:
         res = nth_prime(int64_cast(pco.x), pco.threads); break;
     }
