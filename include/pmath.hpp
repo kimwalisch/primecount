@@ -18,20 +18,22 @@
 
 namespace primecount {
 
-inline int64_t max3(int64_t a, int64_t b, int64_t c)
+inline int64_t isquare(int32_t x)
+{
+  return x * (int64_t) x;
+}
+
+template <typename T>
+inline T max3(T a, T b, T c)
 {
   return std::max(std::max(a, b), c);
 }
 
-inline int64_t isquare(int64_t x)
+template <typename A, typename B>
+inline A ceil_div(A a, B b)
 {
-  return x * x;
-}
-
-inline int64_t ceil_div(int64_t a, int64_t b)
-{
-  assert(b != 0);
-  return (a + b - 1) / b;
+  assert(b > 0);
+  return (A) ((a + b - 1) / b);
 }
 
 template <typename T>
@@ -72,10 +74,10 @@ inline int ilog(T x)
 }
 
 /// Raise to power
-template <int N>
-inline int64_t ipow(int64_t x)
+template <int N, typename T>
+inline T ipow(T x)
 {
-  int64_t r = 1;
+  T r = 1;
   for (int i = 0; i < N; i++)
     r *= x;
 
@@ -87,9 +89,9 @@ template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
-  while (isquare(r) > x)
+  while (r * r > x)
     r--;
-  while (isquare(r + 1) <= x)
+  while ((r + 1) * (r + 1) <= x)
     r++;
   return r;
 }
@@ -103,14 +105,6 @@ inline T iroot(T x)
     r--;
   while (ipow<N>(r + 1) <= x)
     r++;
-  return r;
-}
-
-/// Integer nth root
-template <int D, int N, typename T>
-inline T iroot(T x)
-{
-  T r = (T) std::pow((double) x, D / (double) N);
   return r;
 }
 
