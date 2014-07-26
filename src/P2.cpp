@@ -47,7 +47,7 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
     int64_t prime = primes[b];
     int64_t next_multiple = ceil_div(low, prime) * prime;
     next_multiple += prime * (~next_multiple & 1);
-    next_multiple = max(isquare(prime), next_multiple);
+    next_multiple = max(prime * prime, next_multiple);
     next.push_back(next_multiple);
   }
 
