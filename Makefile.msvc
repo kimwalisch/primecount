@@ -54,7 +54,7 @@ APP_OBJECTS = \
 # Add /openmp if MSVC supports OpenMP
 #-----------------------------------------------------------------------------
 
-!IF ([$(CXX) /openmp /c src\has_openmp.cpp /Fonul > nul] == 0)
+!IF ([$(CXX) /openmp /c src\msvc\has_openmp.cpp /Fonul > nul] == 0)
 CXXFLAGS = /openmp $(CXXFLAGS)
 !ENDIF
 
@@ -123,6 +123,7 @@ clean:
 	-del /Q src\app\64-bit\*.obj 2> /nul
 	-del /Q src\lmo\*.obj 2> /nul
 	-del /Q src\deleglise-rivat\*.obj 2> /nul
+	-del /Q src\msvc\*.obj 2> /nul
 
 #-----------------------------------------------------------------------------
 # help target

@@ -30,7 +30,7 @@ include_HEADERS = \
 	include/primecount.hpp
 
 EXTRA_DIST = \
-	src/has_openmp.cpp \
+	src/msvc/has_openmp.cpp \
 	Makefile.msvc \
 	README.md
 
