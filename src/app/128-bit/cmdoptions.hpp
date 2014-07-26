@@ -46,6 +46,7 @@ enum OptionValues
   OPTION_PI,
   OPTION_PRIMESIEVE,
   OPTION_TEST,
+  OPTION_TIME,
   OPTION_THREADS,
   OPTION_VERSION
 };
@@ -55,11 +56,13 @@ struct PrimeCountOptions
   int64_t x;
   int64_t a;
   int64_t option;
+  bool time;
   int threads;
   PrimeCountOptions() :
     x(-1),
     a(-1),
     option(OPTION_PI),
+    time(false),
     threads(get_num_threads())
   { }
 };

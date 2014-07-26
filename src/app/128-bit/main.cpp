@@ -12,6 +12,8 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <utils.hpp>
+
 #include <exception>
 #include <iostream>
 #include <stdint.h>
@@ -23,6 +25,7 @@ int main (int argc, char* argv[])
 {
   PrimeCountOptions pco = parseOptions(argc, argv);
   int64_t res = 0;
+  double time = get_wtime();
 
   try
   {
@@ -63,5 +66,8 @@ int main (int argc, char* argv[])
   }
 
   cout << res << endl;
+  if (pco.time)
+    cout << "Seconds: " << get_wtime() - time << endl;
+
   return 0;
 }

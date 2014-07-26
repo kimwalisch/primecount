@@ -65,6 +65,7 @@ libprimecount_la_SOURCES = \
 	include/aligned_vector.hpp \
 	include/balance_S2_load.hpp \
 	include/BitSieve.hpp \
+	include/calculator.hpp \
 	include/FactorTable.hpp \
 	include/init_square_free.hpp \
 	include/popcount64.hpp \
@@ -77,8 +78,20 @@ libprimecount_la_SOURCES = \
 	include/utils.hpp
 
 primecount_SOURCES = \
-	src/app/main.cpp \
-	src/app/help.cpp \
-	src/app/cmdoptions.cpp \
-	src/app/cmdoptions.hpp \
-	src/app/calculator.hpp
+	src/app/help.cpp
+
+if !HAVE_INT128_T
+
+primecount_SOURCES += \
+	src/app/64-bit/main.cpp \
+	src/app/64-bit/cmdoptions.cpp \
+	src/app/64-bit/cmdoptions.hpp
+
+else HAVE_INT128_T
+
+primecount_SOURCES += \
+	src/app/128-bit/main.cpp \
+	src/app/128-bit/cmdoptions.cpp \
+	src/app/128-bit/cmdoptions.hpp
+
+endif

@@ -1,4 +1,4 @@
-AC_INIT([primecount], [1.0], [kim.walisch@gmail.com])
+AC_INIT([primecount], [1.1], [kim.walisch@gmail.com])
 AC_SUBST([primecount_lib_version], [1:0:0])
 
 AC_PREREQ([2.62])
@@ -11,6 +11,20 @@ AC_CANONICAL_HOST
 AC_OPENMP
 AM_PROG_AR
 LT_INIT
+
+AC_MSG_CHECKING(for int128_t)
+AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
+            [AC_MSG_RESULT(yes)
+             AC_DEFINE(HAVE_INT128_T)
+             AM_CONDITIONAL(HAVE_INT128_T, true)],
+            [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for __int128_t)
+AC_TRY_LINK(, [__int128_t x = 0;],
+              [AC_MSG_RESULT(yes)
+               AC_DEFINE(HAVE___INT128_T)
+               AM_CONDITIONAL(HAVE_INT128_T, true)],
+              [AC_MSG_RESULT(no)])
 
 # Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],

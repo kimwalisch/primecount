@@ -46,9 +46,9 @@ LIB_OBJECTS = \
 	src\lmo\S1.obj
 
 APP_OBJECTS = \
-	src\app\cmdoptions.obj \
 	src\app\help.obj \
-	src\app\main.obj
+	src\app\64-bit\cmdoptions.obj \
+	src\app\64-bit\main.obj
 
 #-----------------------------------------------------------------------------
 # Add /openmp if MSVC supports OpenMP
@@ -115,7 +115,13 @@ check test:
 #-----------------------------------------------------------------------------
 
 clean:
-	-del /Q *.exe *.lib src\*.obj src\app\*.obj src\lmo\*.obj src\deleglise-rivat\*.obj 2> /nul
+	-del /Q *.exe 2> /nul
+	-del /Q *.lib 2> /nul
+	-del /Q src\*.obj 2> /nul
+	-del /Q src\app\*.obj 2> /nul
+	-del /Q src\app\64-bit\*.obj 2> /nul
+	-del /Q src\lmo\*.obj 2> /nul
+	-del /Q src\deleglise-rivat\*.obj 2> /nul
 
 #-----------------------------------------------------------------------------
 # help target
