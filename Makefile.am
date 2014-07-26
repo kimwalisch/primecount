@@ -5,7 +5,7 @@ lib_LTLIBRARIES = libprimecount.la
 libprimecount_la_CXXFLAGS = $(OPENMP_CXXFLAGS) $(POPCNT_FLAGS)
 libprimecount_la_LDFLAGS = -version-info @primecount_lib_version@
 
-if FORCE_SHARED_LIBRARY
+if force_shared_library
 libprimecount_la_LDFLAGS += -no-undefined 
 endif
 
@@ -80,14 +80,14 @@ libprimecount_la_SOURCES = \
 primecount_SOURCES = \
 	src/app/help.cpp
 
-if !HAVE_INT128_T
+if !use_128_bit
 
 primecount_SOURCES += \
 	src/app/64-bit/main.cpp \
 	src/app/64-bit/cmdoptions.cpp \
 	src/app/64-bit/cmdoptions.hpp
 
-else HAVE_INT128_T
+else use_128_bit
 
 primecount_SOURCES += \
 	src/app/128-bit/main.cpp \

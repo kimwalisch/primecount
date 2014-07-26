@@ -12,19 +12,10 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
-AC_MSG_CHECKING(for int128_t)
-AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
-            [AC_MSG_RESULT(yes)
-             AC_DEFINE(HAVE_INT128_T)
-             AM_CONDITIONAL(HAVE_INT128_T, true)],
-            [AC_MSG_RESULT(no)])
-
-AC_MSG_CHECKING(for __int128_t)
-AC_TRY_LINK(, [__int128_t x = 0;],
-              [AC_MSG_RESULT(yes)
-               AC_DEFINE(HAVE___INT128_T)
-               AM_CONDITIONAL(HAVE_INT128_T, true)],
-              [AC_MSG_RESULT(no)])
+# Disable assert macro by default
+AC_ARG_ENABLE([assert],
+    AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
+    [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
 
 # Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],
@@ -38,18 +29,25 @@ AS_IF([test "x$enable_popcnt" != "xno"], [
     ])
 ])
 
-# Disable assert macro by default
-AC_ARG_ENABLE([assert],
-    AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
-    [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
+AC_MSG_CHECKING(for int128_t)
+AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
+            [have_int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE_INT128_T)],
+            [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for __int128_t)
+AC_TRY_LINK(, [__int128_t x = 0;],
+              [have_int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE___INT128_T)],
+              [AC_MSG_RESULT(no)])
+
+AM_CONDITIONAL(use_128_bit, test x$have_int128 = xyes)
 
 # Force building shared library on Windows
 # Reference: <http://article.gmane.org/gmane.comp.gnu.mingw.user/18727>
 case "$host_os" in
-    cygwin*) AM_CONDITIONAL(FORCE_SHARED_LIBRARY, true);;
-    mingw*)  AM_CONDITIONAL(FORCE_SHARED_LIBRARY, true);;
-    *)       AM_CONDITIONAL(FORCE_SHARED_LIBRARY, false);;
+    cygwin* | mingw*) force_shared=yes;;
 esac
+
+AM_CONDITIONAL(force_shared_library, test x$force_shared = xyes)
 
 AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
     [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])]
