@@ -10,13 +10,23 @@
 #ifndef PRIMECOUNT_HPP
 #define PRIMECOUNT_HPP
 
+#include <stdexcept>
+#include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "1.0"
+#define PRIMECOUNT_VERSION "1.1"
 #define PRIMECOUNT_VERSION_MAJOR 1
-#define PRIMECOUNT_VERSION_MINOR 0
+#define PRIMECOUNT_VERSION_MINOR 1
 
 namespace primecount {
+
+class primecount_error : public std::runtime_error
+{
+public:
+  primecount_error(const std::string& msg)
+    : std::runtime_error(msg)
+  { }
+};
 
 /// This is an alias for the fastest prime counting implementation
 /// within primecount.
