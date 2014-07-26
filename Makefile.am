@@ -1,6 +1,12 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
+if !use_128_bit
+AM_CPPFLAGS += -I$(top_srcdir)/include/64-bit
+else use_128_bit
+AM_CPPFLAGS += -I$(top_srcdir)/include/128-bit
+endif
+
 lib_LTLIBRARIES = libprimecount.la
 libprimecount_la_CXXFLAGS = $(OPENMP_CXXFLAGS) $(POPCNT_FLAGS)
 libprimecount_la_LDFLAGS = -version-info @primecount_lib_version@
@@ -43,8 +49,6 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/PhiTiny.cpp \
 	src/pmath.cpp \
-	src/primecount.cpp \
-	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat3.cpp \
@@ -69,7 +73,6 @@ libprimecount_la_SOURCES = \
 	include/FactorTable.hpp \
 	include/init_square_free.hpp \
 	include/popcount64.hpp \
-	include/primecount-internal.hpp \
 	include/pmath.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
@@ -82,12 +85,23 @@ primecount_SOURCES = \
 
 if !use_128_bit
 
+libprimecount_la_SOURCES += \
+	src/64-bit/primecount.cpp \
+	src/64-bit/test.cpp \
+	include/64-bit/primecount-internal.hpp
+
 primecount_SOURCES += \
 	src/app/64-bit/main.cpp \
 	src/app/64-bit/cmdoptions.cpp \
 	src/app/64-bit/cmdoptions.hpp
 
 else use_128_bit
+
+libprimecount_la_SOURCES += \
+	src/128-bit/primecount.cpp \
+	src/128-bit/test.cpp \
+	include/128-bit/primecount-internal.hpp \
+	include/128-bit/int128_t.hpp
 
 primecount_SOURCES += \
 	src/app/128-bit/main.cpp \
