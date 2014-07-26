@@ -1,3 +1,10 @@
+2014-07-26 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.1 work in progress
+
+  * Add --time option to print elapsed seconds.
+  * Initial support for 128-bit integers.
+
 2014-07-19 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.0 released.
