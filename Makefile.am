@@ -68,10 +68,10 @@ libprimecount_la_SOURCES = \
 	include/calculator.hpp \
 	include/FactorTable.hpp \
 	include/init_square_free.hpp \
-	include/int128_t.hpp \
 	include/popcount64.hpp \
 	include/pmath.hpp \
 	include/primecount-internal.hpp \
+	include/ptypes.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
@@ -79,20 +79,8 @@ libprimecount_la_SOURCES = \
 	include/utils.hpp
 
 primecount_SOURCES = \
-	src/app/help.cpp
+	src/app/main.cpp \
+	src/app/help.cpp \
+	src/app/cmdoptions.cpp \
+	src/app/cmdoptions.hpp
 
-if !use_128_bit
-
-primecount_SOURCES += \
-	src/app/64-bit/main.cpp \
-	src/app/64-bit/cmdoptions.cpp \
-	src/app/64-bit/cmdoptions.hpp
-
-else use_128_bit
-
-primecount_SOURCES += \
-	src/app/128-bit/main.cpp \
-	src/app/128-bit/cmdoptions.cpp \
-	src/app/128-bit/cmdoptions.hpp
-
-endif

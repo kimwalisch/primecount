@@ -11,6 +11,7 @@
 #define PRIMECOUNT_CMDOPTIONS_HPP
 
 #include <primecount.hpp>
+#include <ptypes.hpp>
 #include <stdint.h>
 
 namespace primecount {
@@ -53,8 +54,8 @@ enum OptionValues
 
 struct PrimeCountOptions
 {
-  int64_t x;
-  int64_t a;
+  maxint_t x;
+  maxint_t a;
   int64_t option;
   bool time;
   int threads;

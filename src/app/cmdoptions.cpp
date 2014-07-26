@@ -11,6 +11,7 @@
 
 #include "cmdoptions.hpp"
 #include <calculator.hpp>
+#include <ptypes.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -113,12 +114,9 @@ Option makeOption(const string& str)
 
 PrimeCountOptions parseOptions(int argc, char** argv)
 {
-  if (argc < 2)
-    help();
-
   initOptionMap();
   PrimeCountOptions pco;
-  std::vector<int64_t> numbers;
+  std::vector<maxint_t> numbers;
 
   try
   {
@@ -128,7 +126,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
       Option option = makeOption(argv[i]);
       switch (optionMap[option.id])
       {
-        case OPTION_NUMBER:  numbers.push_back(option.getValue<int64_t>()); break;
+        case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
         case OPTION_TIME:    pco.time = true; break;
@@ -138,10 +136,13 @@ PrimeCountOptions parseOptions(int argc, char** argv)
       }
     }
   }
-  catch (std::exception&) {
+  catch (std::exception&)
+  {
     help();
   }
 
+  if (numbers.empty())
+    help();
   if (numbers.size() >= 1)
     pco.x = numbers[0];
   if (numbers.size() >= 2)

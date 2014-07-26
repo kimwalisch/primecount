@@ -6,7 +6,7 @@
 
 TARGET = primecount
 CXX = cl /nologo
-CXXFLAGS = /W4 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I primesieve-master\include
+CXXFLAGS = /W2 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I primesieve-master\include
 LINK = link /nologo /LIBPATH:primesieve-master
 PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
@@ -47,8 +47,8 @@ LIB_OBJECTS = \
 
 APP_OBJECTS = \
 	src\app\help.obj \
-	src\app\64-bit\cmdoptions.obj \
-	src\app\64-bit\main.obj
+	src\app\cmdoptions.obj \
+	src\app\main.obj
 
 #-----------------------------------------------------------------------------
 # Add /openmp if MSVC supports OpenMP
@@ -119,7 +119,6 @@ clean:
 	-del /Q *.lib 2> /nul
 	-del /Q src\*.obj 2> /nul
 	-del /Q src\app\*.obj 2> /nul
-	-del /Q src\app\64-bit\*.obj 2> /nul
 	-del /Q src\lmo\*.obj 2> /nul
 	-del /Q src\deleglise-rivat\*.obj 2> /nul
 	-del /Q src\msvc\*.obj 2> /nul
