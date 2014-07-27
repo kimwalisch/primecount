@@ -14,6 +14,7 @@
 #include <ptypes.hpp>
 #include <utils.hpp>
 
+#include <limits>
 #include <sstream>
 #include <string>
 #include <stdint.h>
