@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <stdint.h>
+#include <string>
 #include <vector>
 
 namespace primecount {
@@ -24,10 +25,24 @@ enum {
 class PhiCache;
 class FactorTable;
 
-/// This is an alias for the fastest prime counting implementation
-/// within primecount.
-///
+/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads);
+
+#ifdef HAVE_INT128_T
+
+/// Alias for the fastest prime counting function in primecount.
+int128_t pi(int128_t x);
+
+/// Alias for the fastest prime counting function in primecount.
+int128_t pi(int128_t x, int threads);
+
+#endif /* HAVE_INT128_T */
+
+/// Alias for the fastest prime counting function in primecount.
+/// @param x  integer or arithmetic expression like 10^12.
+/// @pre   x  <= primecount::max().
+///
+std::string pi(const std::string& x, int threads);
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.

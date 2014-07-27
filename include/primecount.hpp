@@ -28,10 +28,14 @@ public:
   { }
 };
 
-/// This is an alias for the fastest prime counting implementation
-/// within primecount.
-///
+/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x);
+
+/// Alias for the fastest prime counting function in primecount.
+/// @param x  integer or arithmetic expression like 10^12.
+/// @pre   x  <= primecount::max().
+///
+std::string pi(const std::string& x);
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
@@ -95,6 +99,12 @@ void set_num_threads(int num_threads);
 
 // Get the currently set number of threads.
 int get_num_threads();
+
+/// Returns the largest integer that can be used with
+/// pi(std::string x). The return type is a string as max may be a
+/// 128-bit integer which is not supported by all compilers.
+///
+std::string max();
 
 /// Test all prime counting function implementations.
 /// @return true if success else false.

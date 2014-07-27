@@ -10,8 +10,12 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
+#include <ptypes.hpp>
 #include <utils.hpp>
 
+#include <sstream>
+#include <string>
 #include <stdint.h>
 
 namespace {
@@ -35,20 +39,56 @@ int get_num_threads()
   return validate_threads(threads_);
 }
 
-/// This is an alias for the fastest prime counting implementation
-/// within primecount.
-///
+/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x)
 {
   return pi(x, threads_);
 }
 
-/// This is an alias for the fastest prime counting implementation
-/// within primecount.
-///
+/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads)
 {
   return pi_deleglise_rivat(x, threads);
+}
+
+#ifdef HAVE_INT128_T
+
+/// Alias for the fastest prime counting function in primecount.
+int128_t pi(int128_t x)
+{
+  // TODO
+  return -1;
+}
+
+/// Alias for the fastest prime counting function in primecount.
+int128_t pi(int128_t x, int threads)
+{
+  // TODO
+  return -1;
+}
+
+#endif /* HAVE_INT128_T */
+
+/// Alias for the fastest prime counting function in primecount.
+/// @param x  integer or arithmetic expression like 10^12.
+/// @pre   x  <= primecount::max().
+///
+std::string pi(const std::string& x)
+{
+  return pi(x, threads_);
+}
+
+/// Alias for the fastest prime counting function in primecount.
+/// @param x  integer or arithmetic expression like 10^12.
+/// @pre   x  <= primecount::max().
+///
+std::string pi(const std::string& x, int threads)
+{
+  maxint_t n = calculator::eval<maxint_t>(x);
+  maxint_t pin = pi(n, threads);
+  std::ostringstream oss;
+  oss << pin;
+  return oss.str();
 }
 
 /// Calculate the number of primes below x using the
@@ -136,6 +176,22 @@ int64_t nth_prime(int64_t n)
 int64_t phi(int64_t x, int64_t a)
 {
   return phi(x, a, threads_);
+}
+
+/// Returns the largest integer that can be used with
+/// pi(std::string x). The return type is a string as max may be a
+/// 128-bit integer which is not supported by all compilers.
+///
+std::string max()
+{
+#ifdef HAVE_INT128_T
+  // TODO
+  return "-1";
+#else
+  std::ostringstream oss;
+  oss << std::numeric_limits<int64_t>::max();
+  return oss.str();
+#endif
 }
 
 } // namespace primecount
