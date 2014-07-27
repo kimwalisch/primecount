@@ -27,6 +27,7 @@ using namespace std;
 using namespace primecount;
 
 namespace {
+namespace P2 {
 
 /// @return previous_prime or -1 if old <= 2
 inline int64_t get_previous_prime(primesieve::iterator* iter, int64_t old)
@@ -54,32 +55,31 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
   return next;
 }
 
-int64_t P2_thread(int64_t x,
-                  int64_t y,
-                  int64_t segment_size,
-                  int64_t segments_per_thread,
-                  int64_t thread_num,
-                  int64_t low,
-                  int64_t limit,
-                  int64_t& pix,
-                  int64_t& pix_count,
-                  vector<int32_t>& primes)
+template <typename T>
+T P2_thread(T x, T y,
+            int64_t segment_size,
+            int64_t segments_per_thread,
+            int64_t thread_num,
+            int64_t low,
+            int64_t limit,
+            int64_t& pix,
+            int64_t& pix_count,
+            vector<int32_t>& primes)
 {
   pix = 0;
   pix_count = 0;
   low += thread_num * segments_per_thread * segment_size;
   limit = min(low + segments_per_thread * segment_size, limit);
   int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
-  int64_t sqrtx = isqrt(x);
-  int64_t start = max(x / limit + 1, y);
-  int64_t stop = min(x / low, sqrtx);
-  int64_t P2_thread = 0;
+  int64_t start = (int64_t) max(x / limit + 1, y);
+  int64_t stop  = (int64_t) min(x / low, isqrt(x));
+  T P2_thread = 0;
 
   // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   // We use a reverse prime iterator to calculate P2_thread
   primesieve::iterator iter(stop + 1, start);
   int64_t previous_prime = get_previous_prime(&iter, stop + 1);
-  int64_t xp = x / previous_prime;
+  int64_t xp = (int64_t) (x / previous_prime);
 
   vector<int64_t> next = generate_next_multiples(low, size, primes);
   BitSieve sieve(segment_size);
@@ -111,7 +111,7 @@ int64_t P2_thread(int64_t x,
       pix_count++;
       P2_thread += pix;
       previous_prime = get_previous_prime(&iter, previous_prime);
-      xp = x / previous_prime;
+      xp = (int64_t) (x / previous_prime);
     }
 
     pix += sieve.count(j, (high - 1) - low);
@@ -120,29 +120,22 @@ int64_t P2_thread(int64_t x,
   return P2_thread;
 }
 
-} // namespace
-
-namespace primecount {
-
 /// 2nd partial sieve function.
 /// P2(x, y) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime, a = pi(y).
 /// Space complexity: O((x / y)^(1/2)).
 ///
-int64_t P2(int64_t x, int64_t y, int threads)
+template <typename T>
+T P2(T x, int64_t y, int threads)
 {
-  int64_t a = pi_legendre(y, 1);
-  int64_t b = pi_legendre(isqrt(x), 1);
+  T a = pi_legendre(y, 1);
+  T b = pi_legendre((int64_t) isqrt(x), 1);
 
   if (x < 4 || a >= b)
     return 0;
 
-  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
-  // initialize with \sum_{i=a+1}^{b} -i + 1
-  int64_t sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
   int64_t low = 2;
-  int64_t pix_total = 0;
-  int64_t limit = x / max<int64_t>(1, y);
+  int64_t limit = (int64_t)(x / max<int64_t>(1, y));
   int64_t segment_size = max<int64_t>(64, isqrt(limit));
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
@@ -150,6 +143,11 @@ int64_t P2(int64_t x, int64_t y, int threads)
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
+
+  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
+  // initialize with \sum_{i=a+1}^{b} -i + 1
+  T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  T pix_total = 0;
 
   while (low < limit)
   {
@@ -160,11 +158,11 @@ int64_t P2(int64_t x, int64_t y, int threads)
 
     #pragma omp parallel for num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
-      sum += P2_thread(x, y, segment_size, segments_per_thread, i, low, limit, 
-          pix[i], pix_counts[i], primes);
+      sum += P2_thread(x, y, segment_size, segments_per_thread, i,
+         low, limit, pix[i], pix_counts[i], primes);
 
-    seconds = get_wtime() - seconds;
     low += segments_per_thread * threads * segment_size;
+    seconds = get_wtime() - seconds;
 
     // Adjust thread load balancing
     if (seconds < 10)
@@ -182,6 +180,25 @@ int64_t P2(int64_t x, int64_t y, int threads)
 
   return sum;
 }
+
+} // namespace P2
+} // namespace
+
+namespace primecount {
+
+int64_t P2(int64_t x, int64_t y, int threads)
+{
+  return P2::P2(x, y, threads);
+}
+
+#ifdef HAVE_INT128_T
+
+int128_t P2(int128_t x, int64_t y, int threads)
+{
+  return P2::P2(x, y, threads);
+}
+
+#endif
 
 /// 2nd partial sieve function.
 /// P2_lehmer(x, a) counts the numbers <= x that have exactly 2 prime

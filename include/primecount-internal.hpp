@@ -36,7 +36,7 @@ int128_t pi(int128_t x);
 /// Alias for the fastest prime counting function in primecount.
 int128_t pi(int128_t x, int threads);
 
-#endif /* HAVE_INT128_T */
+#endif
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like 10^12.
@@ -208,6 +208,16 @@ int64_t nth_prime(int64_t n, int threads);
 /// Space complexity: O((x / primes[a])^(1/2)).
 ///
 int64_t P2(int64_t x, int64_t y, int threads);
+
+#ifdef HAVE_INT128_T
+
+/// P2(x, a) counts the numbers <= x that have exactly 2 prime
+/// factors each exceeding the a-th prime.
+/// Space complexity: O((x / primes[a])^(1/2)).
+///
+int128_t P2(int128_t x, int64_t y, int threads);
+
+#endif
 
 /// P2_lehmer(x, a) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
