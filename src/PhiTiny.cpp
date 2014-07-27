@@ -15,17 +15,8 @@
 
 #include <stdint.h>
 #include <vector>
-#include <cassert>
 
 namespace {
-
-const int32_t primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
-
-/// prime_products[n] = \prod_{i=1}^{n} primes[i]
-const int32_t prime_products[7] = { 1, 2, 6, 30, 210, 2310, 30030 };
-
-/// totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const int32_t totients[7] = { 1, 1, 2, 8, 48, 480, 5760 };
 
 const primecount::PhiTiny phiTiny;
 
@@ -33,10 +24,13 @@ const primecount::PhiTiny phiTiny;
 
 namespace primecount {
 
-int64_t phi_tiny(int64_t x, int64_t a)
-{
-  return phiTiny.phi(x, a);
-}
+const int32_t PhiTiny::primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
+
+/// prime_products[n] = \prod_{i=1}^{n} primes[i]
+const int32_t PhiTiny::prime_products[7] = { 1, 2, 6, 30, 210, 2310, 30030 };
+
+/// totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
+const int32_t PhiTiny::totients[7] = { 1, 1, 2, 8, 48, 480, 5760 };
 
 PhiTiny::PhiTiny()
 {
@@ -57,16 +51,18 @@ PhiTiny::PhiTiny()
   }
 }
 
-/// Partial sieve function (a.k.a. Legendre-sum).
-/// phi(x, a) counts the numbers <= x that are not divisible
-/// by any of the first a primes.
-/// @pre a <= 6.
-///
-int64_t PhiTiny::phi(int64_t x, int64_t a) const
+int64_t phi_tiny(int64_t x, int64_t a)
 {
-  assert(x >= 0);
-  assert(a <= max_a());
-  return (x / prime_products[a]) * totients[a] + phi_cache_[a][x % prime_products[a]];
+  return phiTiny.phi(x, a);
 }
+
+#ifdef HAVE_INT128_T
+
+int128_t phi_tiny(int128_t x, int64_t a)
+{
+  return phiTiny.phi(x, a);
+}
+
+#endif
 
 } // namespace primecount
