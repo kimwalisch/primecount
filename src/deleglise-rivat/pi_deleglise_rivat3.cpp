@@ -2,8 +2,8 @@
 /// @file  pi_deleglise_rivat3.cpp
 /// @brief Implementation of the Lagarias-Miller-Odlyzko prime counting
 ///        algorithm with the improvements of Deleglise and Rivat.
-///        This version uses compression (see FactorTable & PiTable)
-///        to reduce the memory usage.
+///        This version uses compression (see Factors16 & PiTable) to
+///        reduce the memory usage.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///

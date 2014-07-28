@@ -2,7 +2,7 @@
 /// @file  pi_deleglise_rivat_parallel3.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm with the improvements of Deleglise
-///        and Rivat. This version uses compression (see FactorTable,
+///        and Rivat. This version uses compression (see Factors16 &
 ///        PiTable) to reduce the memory usage.
 /// 
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
