@@ -150,8 +150,8 @@ int64_t S2_thread(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      Factors16::to_index(&min_m);
-      Factors16::to_index(&max_m);
+      factors.to_index(&min_m);
+      factors.to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
