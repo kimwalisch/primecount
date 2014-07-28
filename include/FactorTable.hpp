@@ -43,6 +43,7 @@ extern const uint8_t to_number[48];
 
 /// Convert a wheel number to a wheel index
 extern const int8_t to_index[210];
+
 }
 
 template <typename T>
