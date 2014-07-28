@@ -252,6 +252,31 @@ int64_t S1(int64_t x,
            std::vector<int32_t>& primes,
            FactorTable& Factors);
 
+#ifdef HAVE_INT128_T
+
+/// Calculate the contribution of the ordinary leaves in the
+/// Lagarias-Miller-Odlyzko algorithm.
+/// Run time: O(y) operations, O(y) space.
+///
+int128_t S1(int128_t x,
+            int64_t y,
+            int64_t c,
+            std::vector<int32_t>& primes,
+            std::vector<int32_t>& lpf,
+            std::vector<int32_t>& mu);
+
+/// Calculate the contribution of the ordinary leaves in the
+/// Lagarias-Miller-Odlyzko algorithm.
+/// Run time: O(y) operations, O(y) space.
+///
+int128_t S1(int128_t x,
+            int64_t y,
+            int64_t c,
+            std::vector<int32_t>& primes,
+            FactorTable& factors);
+
+#endif
+
 } // namespace primecount
 
 #endif
