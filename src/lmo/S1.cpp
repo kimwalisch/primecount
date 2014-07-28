@@ -49,14 +49,15 @@ T S1(T x,
 /// Run time: O(y) operations, O(y) space.
 /// @pre is_phi_tiny(c) == true
 ///
-template <typename T>
+template <typename T, typename F>
 T S1(T x,
      int64_t y,
      int64_t c,
      vector<int32_t>& primes,
-     FactorTable& factors)
+     F& factors)
 {
-  // FactorTable contains only numbers coprime to 2, 3, 5 and 7
+  // the factors lookup table contains only numbers
+  // which are coprime to 2, 3, 5 and 7
   if (primes[c] <= 7)
   {
     vector<int32_t> mu = generate_moebius(y);
@@ -93,7 +94,7 @@ int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
            vector<int32_t>& primes,
-           FactorTable& factors)
+           Factors16& factors)
 {
   return S1::S1(x, y, c, primes, factors);
 }
@@ -114,7 +115,7 @@ int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
             vector<int32_t>& primes,
-            FactorTable& factors)
+            Factors32& factors)
 {
   return S1::S1(x, y, c, primes, factors);
 }

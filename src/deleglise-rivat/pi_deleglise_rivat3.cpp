@@ -63,7 +63,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            vector<int32_t>& primes,
-           FactorTable& factors)
+           Factors16& factors)
 {
   PiTable pi(y);
   int64_t pi_y = pi(y);
@@ -116,8 +116,8 @@ int64_t S2(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      FactorTable::to_index(&min_m);
-      FactorTable::to_index(&max_m);
+      Factors16::to_index(&min_m);
+      Factors16::to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -241,7 +241,7 @@ int64_t pi_deleglise_rivat3(int64_t x)
   int64_t z = x / y;
 
   vector<int32_t> primes = generate_primes(y);
-  FactorTable factors(y);
+  Factors16 factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());

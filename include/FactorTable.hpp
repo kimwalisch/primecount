@@ -13,8 +13,8 @@
 ///         * 0      if moebius(n) = 0
 ///         * lpf    if !is_prime(n) && moebius(n) = -1
 ///         * lpf-1  if !is_prime(n) && moebius(n) = 1
-///         * n      if  is_prime(n) && n < 65535
-///         * 65535  if  is_prime(n) && n > 65535
+///         * n      if  is_prime(n) && n < T_MAX
+///         * T_MAX  if  is_prime(n) && n > T_MAX
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,45 +25,102 @@
 #ifndef FACTORTABLE_HPP
 #define FACTORTABLE_HPP
 
+#include <primecount.hpp>
+#include <pmath.hpp>
+
+#include <algorithm>
 #include <cassert>
+#include <limits>
 #include <stdint.h>
 #include <vector>
 
 namespace primecount {
 
+namespace sft {
+
+/// Convert a wheel index to a wheel number
+extern const uint8_t to_number[48];
+
+/// Convert a wheel number to a wheel index
+extern const int8_t to_index[210];
+}
+
+template <typename T>
 class FactorTable
 {
 public:
-  FactorTable(int64_t max);
-  void init();
-
-  /// Get the FactorTable index corressponding to the number.
-  /// @pre number > 0
-  ///
-  static int64_t get_index(int64_t number)
+  FactorTable(int64_t max) :
+    max_(std::max(max, (int64_t) 8))
   {
-    assert(number > 0);
-    return 48 * (number / 210) + indexes_[number % 210];
+    T T_MAX = std::numeric_limits<T>::max();
+    if (isqrt(max_) >= T_MAX)
+      throw primecount_error("FactorTable: sqrt(max) must be < T_MAX.");
+    init_factors(T_MAX);
   }
 
-  /// Convert the number into a FactorTable index.
+  void init_factors(T T_MAX)
+  {
+    factors_.resize(get_index(max_) + 1, T_MAX);
+    // mu(1) = 1 -> factors_[0] = lpf - 1
+    factors_[0] = T_MAX - 1;
+
+    for (size_t i = 1; i < factors_.size(); i++)
+    {
+      if (factors_[i] == T_MAX)
+      {
+        int64_t prime = get_number(i);
+        int64_t multiple = prime * get_number(1);
+        int64_t j = 2;
+
+        if (prime < T_MAX)
+          factors_[i] = (T) prime;
+
+        for (; multiple <= max_; multiple = prime * get_number(j++))
+        {
+          int64_t index = get_index(multiple);
+          // prime is the smallest factor
+          if (factors_[index] == T_MAX)
+            factors_[index] = (T) prime;
+          // the least significant bit indicates whether multiple has
+          // an even (0) or odd (1) number of prime factors
+          else if (factors_[index] > 0)
+            factors_[index] ^= 1;
+        }
+
+        // Moebius function is 0 if n has a squared prime factor
+        multiple = prime * prime * get_number(0);
+        for (j = 1; multiple <= max_; multiple = prime * prime * get_number(j++))
+          factors_[get_index(multiple)] = 0;
+      }
+    }
+  }
+
   /// @pre number > 0
-  ///
   static void to_index(int64_t* number)
   {
     assert(*number > 0);
-    *number = 48 * (*number / 210) + indexes_[*number % 210];
+    *number = get_index(*number);
   }
 
-  /// Get the number corresponding to the FactorTable index.
+  /// @pre number > 0
+  static int64_t get_index(int64_t number)
+  {
+    assert(number > 0);
+    int64_t quotient = number / 210;
+    int64_t remainder = number % 210;
+    return 48 * quotient + sft::to_index[remainder];
+  }
+
   static int64_t get_number(int64_t index)
   {
-    return 210 * (index / 48) + numbers_[index % 48];
+    int64_t quotient = index / 48;
+    int64_t remainder = index % 48;
+    return 210 * quotient + sft::to_number[remainder];
   }
 
   /// Get the least prime factor (lpf) of the number get_number(index).
   /// The result is different from lpf in some situations:
-  /// 1) lpf(index) returns 65535 if get_number(index) is a prime > 65535.
+  /// 1) lpf(index) returns T_MAX if get_number(index) is a prime > T_MAX.
   /// 2) lpf(index) returns lpf minus one if mu(index) == 1.
   /// 3) lpf(index) returns 0 if get_number(index) has a squared prime factor.
   ///
@@ -82,10 +139,10 @@ public:
     return (factors_[index] & 1) ? -1 : 1;
   }
 private:
-  static const  int8_t indexes_[210];
   static const uint8_t numbers_[48];
+  static const  int8_t indexes_[210];
 
-  std::vector<uint16_t> factors_;
+  std::vector<T> factors_;
   int64_t max_;
 };
 

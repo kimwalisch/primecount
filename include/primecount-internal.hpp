@@ -23,7 +23,12 @@ enum {
 };
 
 class PhiCache;
+
+template <typename T>
 class FactorTable;
+
+typedef FactorTable<uint16_t> Factors16;
+typedef FactorTable<uint32_t> Factors32;
 
 /// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads);
@@ -250,7 +255,7 @@ int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
            std::vector<int32_t>& primes,
-           FactorTable& Factors);
+           Factors16& factors);
 
 #ifdef HAVE_INT128_T
 
@@ -273,7 +278,7 @@ int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
             std::vector<int32_t>& primes,
-            FactorTable& factors);
+            Factors32& factors);
 
 #endif
 

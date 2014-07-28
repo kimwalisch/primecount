@@ -9,18 +9,14 @@
 ///
 
 #include <FactorTable.hpp>
-#include <pmath.hpp>
-
-#include <limits>
-#include <stdexcept>
 #include <stdint.h>
-#include <vector>
-
-using namespace std;
 
 namespace primecount {
 
-const uint8_t FactorTable::numbers_[48] =
+/// Static FactorTable data
+namespace sft {
+
+const uint8_t to_number[48] =
 {
     1,  11,  13,  17,  19,  23,
    29,  31,  37,  41,  43,  47,
@@ -32,7 +28,7 @@ const uint8_t FactorTable::numbers_[48] =
   187, 191, 193, 197, 199, 209
 };
 
-const int8_t FactorTable::indexes_[210] =
+const int8_t to_index[210] =
 {
   -1,  0,  0,  0,  0,  0,  0,  0,
    0,  0,  0,  1,  1,  2,  2,  2,
@@ -63,49 +59,5 @@ const int8_t FactorTable::indexes_[210] =
   46, 47
 };
 
-FactorTable::FactorTable(int64_t max) :
-  max_((max < 8) ? 8 : max)
-{
-  if (isqrt(max_) >= numeric_limits<uint16_t>::max())
-    throw runtime_error("FactorTable: sqrt(max) must be < max(uint16_t).");
-  init();
-}
-
-void FactorTable::init()
-{
-  factors_.resize(get_index(max_) + 1, 0xffff);
-  // mu(1) = 1 -> factors_[0] = lpf - 1
-  factors_[0] = 0xffff - 1;
-
-  for (size_t i = 1; i < factors_.size(); i++)
-  {
-    if (factors_[i] == 0xffff)
-    {
-      int64_t prime = get_number(i);
-      int64_t multiple = prime * get_number(1), j = 2;
-
-      if (prime < 0xffff)
-        factors_[i] = (uint16_t) prime;
-
-      for (; multiple <= max_; multiple = prime * get_number(j++))
-      {
-        int64_t index = get_index(multiple);
-
-        // prime is the smallest factor
-        if (factors_[index] == 0xffff)
-          factors_[index] = (uint16_t) prime;
-        // the least significant bit indicates whether multiple has
-        // an even (0) or odd (1) number of prime factors
-        else if (factors_[index] > 0)
-          factors_[index] ^= 1;
-      }
-
-      // Moebius function is 0 if n has a squared prime factor
-      multiple = prime * prime * get_number(0), j = 1;
-      for (; multiple <= max_; multiple = prime * prime * get_number(j++))
-        factors_[get_index(multiple)] = 0;
-    }
-  }
-}
-
+} // namespace Ft
 } // namespace

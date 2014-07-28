@@ -91,7 +91,7 @@ int64_t S2_thread(int64_t x,
                   int64_t thread_num,
                   int64_t low,
                   int64_t limit,
-                  FactorTable& factors,
+                  Factors16& factors,
                   PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int64_t>& mu_sum,
@@ -150,8 +150,8 @@ int64_t S2_thread(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      FactorTable::to_index(&min_m);
-      FactorTable::to_index(&max_m);
+      Factors16::to_index(&min_m);
+      Factors16::to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -263,7 +263,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            vector<int32_t>& primes,
-           FactorTable& factors,
+           Factors16& factors,
            int threads)
 {
   int64_t limit = z + 1;
@@ -351,7 +351,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   int64_t z = x / y;
 
   vector<int32_t> primes = generate_primes(y);
-  FactorTable factors(y);
+  Factors16 factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());
