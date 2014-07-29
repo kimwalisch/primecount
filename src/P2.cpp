@@ -12,6 +12,7 @@
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <BitSieve.hpp>
+#include <generate.hpp>
 #include <pmath.hpp>
 #include <utils.hpp>
 

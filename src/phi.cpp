@@ -8,6 +8,7 @@
 ///
 
 #include <primecount-internal.hpp>
+#include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiCache.hpp>
 #include <PhiTiny.hpp>
