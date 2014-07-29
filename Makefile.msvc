@@ -13,6 +13,8 @@ PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 LIB_OBJECTS = \
 	src\balance_S2_load.obj \
 	src\BitSieve.obj \
+	src\FactorTable.obj \
+	src\generate.obj \
 	src\Li.obj \
 	src\nth_prime.obj \
 	src\phi.obj \
@@ -22,10 +24,10 @@ LIB_OBJECTS = \
 	src\pi_lehmer.obj \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
-	src\pmath.obj \
 	src\primecount.obj \
 	src\P2.obj \
 	src\P3.obj \
+	src\PiTable.obj \
 	src\test.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \
@@ -33,7 +35,6 @@ LIB_OBJECTS = \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel2.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel3.obj \
-	src\lmo\FactorTable.obj \
 	src\lmo\pi_lmo1.obj \
 	src\lmo\pi_lmo2.obj \
 	src\lmo\pi_lmo3.obj \
@@ -41,9 +42,7 @@ LIB_OBJECTS = \
 	src\lmo\pi_lmo5.obj \
 	src\lmo\pi_lmo_parallel1.obj \
 	src\lmo\pi_lmo_parallel2.obj \
-	src\lmo\pi_lmo_parallel3.obj \
-	src\lmo\PiTable.obj \
-	src\lmo\S1.obj
+	src\lmo\pi_lmo_parallel3.obj
 
 APP_OBJECTS = \
 	src\app\help.obj \

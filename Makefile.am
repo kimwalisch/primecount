@@ -31,18 +31,20 @@ EXTRA_DIST = \
 libprimecount_la_SOURCES = \
 	src/balance_S2_load.cpp \
 	src/BitSieve.cpp \
+	src/FactorTable.cpp \
+	src/generate.cpp \
 	src/Li.cpp \
 	src/nth_prime.cpp \
 	src/PhiCache.cpp \
 	src/P2.cpp \
 	src/P3.cpp \
+	src/PhiTiny.cpp \
+	src/PiTable.cpp \
 	src/pi_primesieve.cpp \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
 	src/pi_lehmer.cpp \
 	src/phi.cpp \
-	src/PhiTiny.cpp \
-	src/pmath.cpp \
 	src/primecount.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
@@ -51,7 +53,6 @@ libprimecount_la_SOURCES = \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp \
-	src/lmo/FactorTable.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
 	src/lmo/pi_lmo3.cpp \
@@ -60,13 +61,12 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel1.cpp \
 	src/lmo/pi_lmo_parallel2.cpp \
 	src/lmo/pi_lmo_parallel3.cpp \
-	src/lmo/PiTable.cpp \
-	src/lmo/S1.cpp \
 	include/aligned_vector.hpp \
 	include/balance_S2_load.hpp \
 	include/BitSieve.hpp \
 	include/calculator.hpp \
 	include/FactorTable.hpp \
+	include/generate.hpp \
 	include/init_square_free.hpp \
 	include/popcount64.hpp \
 	include/pmath.hpp \
@@ -75,6 +75,7 @@ libprimecount_la_SOURCES = \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
+	include/S1.hpp \
 	include/tos_counters.hpp \
 	include/utils.hpp
 
@@ -83,4 +84,3 @@ primecount_SOURCES = \
 	src/app/help.cpp \
 	src/app/cmdoptions.cpp \
 	src/app/cmdoptions.hpp
-
