@@ -42,9 +42,8 @@ inline int validate_threads(int threads)
 #endif
 }
 
-inline int validate_threads(int threads, int64_t sieve_limit)
+inline int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000)
 {
-  const int64_t thread_threshold = 100000;
   threads = validate_threads(threads);
   threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
   threads = std::max(1, threads);
