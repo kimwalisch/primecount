@@ -11,6 +11,8 @@
 #ifndef PRIMECOUNT_INTERNAL_HPP
 #define PRIMECOUNT_INTERNAL_HPP
 
+#include <FactorTable.hpp>
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -23,9 +25,6 @@ enum {
 };
 
 class PhiCache;
-
-template <typename T>
-class FactorTable;
 
 typedef FactorTable<uint16_t> Factors16;
 typedef FactorTable<uint32_t> Factors32;
@@ -235,52 +234,6 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 /// Space complexity: O(pi(x^(1/2))).
 ///
 int64_t P3(int64_t x, int64_t a, int threads);
-
-/// Calculate the contribution of the ordinary leaves in the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(y) operations, O(y) space.
-///
-int64_t S1(int64_t x,
-           int64_t y,
-           int64_t c,
-           std::vector<int32_t>& primes,
-           std::vector<int32_t>& lpf,
-           std::vector<int32_t>& mu);
-
-/// Calculate the contribution of the ordinary leaves in the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(y) operations, O(y) space.
-///
-int64_t S1(int64_t x,
-           int64_t y,
-           int64_t c,
-           std::vector<int32_t>& primes,
-           Factors16& factors);
-
-#ifdef HAVE_INT128_T
-
-/// Calculate the contribution of the ordinary leaves in the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(y) operations, O(y) space.
-///
-int128_t S1(int128_t x,
-            int64_t y,
-            int64_t c,
-            std::vector<int32_t>& primes,
-            std::vector<int32_t>& lpf,
-            std::vector<int32_t>& mu);
-
-/// Calculate the contribution of the ordinary leaves in the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(y) operations, O(y) space.
-///
-int128_t S1(int128_t x,
-            int64_t y,
-            int64_t c,
-            std::vector<int32_t>& primes,
-            Factors32& factors);
-
-#endif
 
 } // namespace primecount
 

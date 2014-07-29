@@ -36,29 +36,87 @@
 
 namespace primecount {
 
-namespace sft {
+/// AbstractFactorTable contains static FactorTable
+/// data and it used to convert:
+/// 1) A number into a FactorTable index.
+/// 2) A FactorTable index into a number.
+///
+class AbstractFactorTable
+{
+protected:
+  virtual ~AbstractFactorTable() { }
 
-/// Convert a wheel index to a wheel number
-extern const uint8_t to_number[48];
+public:
+  /// @pre number > 0
+  static void to_index(int64_t* number)
+  {
+    assert(*number > 0);
+    *number = get_index(*number);
+  }
 
-/// Convert a wheel number to a wheel index
-extern const int8_t to_index[210];
+  /// @pre number > 0
+  static int64_t get_index(int64_t number)
+  {
+    assert(number > 0);
+    int64_t quotient = number / 210;
+    int64_t remainder = number % 210;
+    return 48 * quotient + indexes_[remainder];
+  }
 
-}
+  static int64_t get_number(int64_t index)
+  {
+    int64_t quotient = index / 48;
+    int64_t remainder = index % 48;
+    return 210 * quotient + numbers_[remainder];
+  }
+
+private:
+  static const uint8_t numbers_[48];
+  static const  int8_t indexes_[210];
+};
 
 template <typename T>
-class FactorTable
+class FactorTable : public AbstractFactorTable
 {
 public:
-  FactorTable(int64_t max) :
-    max_(std::max(max, (int64_t) 8))
+  /// @param y = x(1/3) * alpha
+  FactorTable(int64_t y) :
+    max_(std::max<int64_t>(y, 8))
   {
+    if (y > max())
+      throw primecount_error("y must be <= FactorTable::max().");
     T T_MAX = std::numeric_limits<T>::max();
-    if (isqrt(max_) >= T_MAX)
-      throw primecount_error("FactorTable: sqrt(max) must be < T_MAX.");
     init_factors(T_MAX);
   }
 
+  static int64_t max()
+  {
+    int64_t T_MAX = std::numeric_limits<T>::max();
+    return ipow(T_MAX - 1, 2) - 1;
+  }
+
+  /// Get the least prime factor (lpf) of the number get_number(index).
+  /// The result is different from lpf in some situations:
+  /// 1) lpf(index) returns T_MAX if get_number(index) is a prime > T_MAX.
+  /// 2) lpf(index) returns lpf minus one if mu(index) == 1.
+  /// 3) lpf(index) returns 0 if get_number(index) has a squared prime factor.
+  ///
+  int64_t lpf(int64_t index) const
+  {
+    return factors_[index];
+  }
+
+  /// Get the Möbius function value of the number get_number(index).
+  /// For performance reasons mu(index) == 0 is not supported.
+  /// @pre mu(index) != 0 (i.e. lpf(index) != 0)
+  ///
+  int64_t mu(int64_t index) const
+  {
+    assert(lpf(index) != 0);
+    return (factors_[index] & 1) ? -1 : 1;
+  }
+
+private:
   void init_factors(T T_MAX)
   {
     factors_.resize(get_index(max_) + 1, T_MAX);
@@ -89,59 +147,12 @@ public:
         }
 
         // Moebius function is 0 if n has a squared prime factor
-        multiple = prime * prime * get_number(0);
+        multiple = prime * prime;
         for (j = 1; multiple <= max_; multiple = prime * prime * get_number(j++))
           factors_[get_index(multiple)] = 0;
       }
     }
   }
-
-  /// @pre number > 0
-  static void to_index(int64_t* number)
-  {
-    assert(*number > 0);
-    *number = get_index(*number);
-  }
-
-  /// @pre number > 0
-  static int64_t get_index(int64_t number)
-  {
-    assert(number > 0);
-    int64_t quotient = number / 210;
-    int64_t remainder = number % 210;
-    return 48 * quotient + sft::to_index[remainder];
-  }
-
-  static int64_t get_number(int64_t index)
-  {
-    int64_t quotient = index / 48;
-    int64_t remainder = index % 48;
-    return 210 * quotient + sft::to_number[remainder];
-  }
-
-  /// Get the least prime factor (lpf) of the number get_number(index).
-  /// The result is different from lpf in some situations:
-  /// 1) lpf(index) returns T_MAX if get_number(index) is a prime > T_MAX.
-  /// 2) lpf(index) returns lpf minus one if mu(index) == 1.
-  /// 3) lpf(index) returns 0 if get_number(index) has a squared prime factor.
-  ///
-  int64_t lpf(int64_t index) const
-  {
-    return factors_[index];
-  }
-
-  /// Get the Möbius function value of the number get_number(index).
-  /// For performance reasons mu(index) == 0 is not supported.
-  /// @pre mu(index) != 0 (i.e. lpf(index) != 0)
-  ///
-  int64_t mu(int64_t index) const
-  {
-    assert(lpf(index) != 0);
-    return (factors_[index] & 1) ? -1 : 1;
-  }
-private:
-  static const uint8_t numbers_[48];
-  static const  int8_t indexes_[210];
 
   std::vector<T> factors_;
   int64_t max_;
