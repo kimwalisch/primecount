@@ -74,11 +74,11 @@ inline int ilog(T x)
 }
 
 /// Raise to power
-template <int N, typename T>
-inline T ipow(T x)
+template <typename T>
+inline T ipow(T x, int n)
 {
   T r = 1;
-  for (int i = 0; i < N; i++)
+  for (int i = 0; i < n; i++)
     r *= x;
 
   return r;
@@ -101,9 +101,9 @@ template <int N, typename T>
 inline T iroot(T x)
 {
   T r = (T) std::pow((double) x, 1.0 / N);
-  while (ipow<N>(r) > x)
+  while (ipow(r, N) > x)
     r--;
-  while (ipow<N>(r + 1) <= x)
+  while (ipow(r + 1, N) <= x)
     r++;
   return r;
 }
@@ -144,29 +144,6 @@ inline T2 in_between(T1 min, T2 x, T3 max)
 
   return x;
 }
-
-/// Generate a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-std::vector<int32_t> generate_primes(int64_t max);
-
-/// Generate a vector with the first n primes.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-std::vector<int32_t> generate_n_primes(int64_t n);
-
-/// Generate a vector with Möbius function values.
-std::vector<int32_t> generate_moebius(int64_t max);
-
-/// Generate a vector with the least prime
-/// factors of the integers <= max.
-///
-std::vector<int32_t> generate_least_prime_factors(int64_t max);
-
-/// Generate a vector with the prime counts below max
-/// using the sieve of Eratosthenes.
-///
-std::vector<int32_t> make_pi(int64_t max);
 
 } // namespace
 
