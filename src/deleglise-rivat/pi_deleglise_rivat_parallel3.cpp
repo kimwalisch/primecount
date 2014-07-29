@@ -17,8 +17,10 @@
 #include <aligned_vector.hpp>
 #include <balance_S2_load.hpp>
 #include <BitSieve.hpp>
+#include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <S1.hpp>
 #include <tos_counters.hpp>
 #include <utils.hpp>
 
@@ -355,7 +357,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, primes, factors);
+  int64_t s1 = S1(x, y, c, primes[c], factors, threads);
   int64_t s2 = S2(x, y, z, c, primes, factors, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;

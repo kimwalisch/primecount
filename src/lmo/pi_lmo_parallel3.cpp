@@ -15,8 +15,10 @@
 #include <aligned_vector.hpp>
 #include <balance_S2_load.hpp>
 #include <BitSieve.hpp>
+#include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <S1.hpp>
 #include <tos_counters.hpp>
 #include <utils.hpp>
 
@@ -221,7 +223,7 @@ int64_t S2(int64_t x,
   double relative_standard_deviation = 30;
   segment_size = max(segment_size, min_segment_size);
 
-  vector<int32_t> pi = make_pi(y);
+  vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
 
   while (low < limit)
@@ -297,7 +299,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s1 = S1(x, y, c, primes[c], lpf , mu, threads);
   int64_t s2 = S2(x, y, c, primes, lpf , mu, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;

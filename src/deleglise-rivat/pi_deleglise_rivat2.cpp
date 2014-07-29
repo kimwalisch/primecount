@@ -16,8 +16,10 @@
 
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
+#include <S1.hpp>
 #include <tos_counters.hpp>
 
 #include <stdint.h>
@@ -75,7 +77,7 @@ int64_t S2(int64_t x,
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int32_t> pi = make_pi(y);
+  vector<int32_t> pi = generate_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -237,7 +239,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s1 = S1(x, y, c, primes[c], lpf , mu, 1);
   int64_t s2 = S2(x, y, z, c, primes, lpf , mu);
   int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;

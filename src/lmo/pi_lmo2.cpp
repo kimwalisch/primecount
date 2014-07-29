@@ -12,7 +12,9 @@
 
 #include <primecount-internal.hpp>
 #include <pmath.hpp>
+#include <generate.hpp>
 #include <PhiTiny.hpp>
+#include <S1.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -112,7 +114,7 @@ int64_t pi_lmo2(int64_t x)
 
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, primes, lpf , mu);
+  int64_t s1 = S1(x, y, c, primes[c], lpf , mu, 1);
   int64_t s2 = S2(x, y, c, primes, lpf , mu);
   int64_t p2 = P2(x, y, 1);
   int64_t phi = s1 + s2;
