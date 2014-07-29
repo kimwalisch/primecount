@@ -34,7 +34,6 @@ class PiTable
 {
 public:
   PiTable(uint64_t max);
-  void init();
 
   /// Get the number of primes <= n.
   /// This implementation uses only 20 arithmetic operations.
@@ -51,14 +50,14 @@ public:
     return max_ + 1;
   }
 private:
-  struct PiPair
+  struct PiData
   {
-    PiPair() : prime_count(0), bits(0) {}
-    uint32_t prime_count;
+    PiData() : prime_count(0), bits(0) { }
+    uint64_t prime_count;
     uint64_t bits;
   };
 
-  std::vector<PiPair> pi_;
+  std::vector<PiData> pi_;
   uint64_t max_;
 };
 
