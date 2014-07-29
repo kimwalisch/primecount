@@ -1,9 +1,13 @@
-2014-07-26 Kim Walisch  <kim.walisch@gmail.com>
+2014-07-29 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.1 work in progress
 
   * Add --time option to print elapsed seconds.
   * Initial support for 128-bit integers.
+  * include/S1.hpp: Added multi-threading and templates.
+  * include/FactorTable.hpp: template implementation.
+  * src/PiTable.cpp: Faster initialization.
+  * src/generate.cpp: Contains all generate_*() functions.
 
 2014-07-19 Kim Walisch  <kim.walisch@gmail.com>
 

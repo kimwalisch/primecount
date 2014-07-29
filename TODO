@@ -1,1 +1,7 @@
-1) Extend to 128-bit integers
+1) src/app: Support 128-bit API
+2) src/deleglise-rivat: Add 128-bit implementation
+3) Think about `std::string primecount::max()'
+    * Is it a good idea?
+    * What value to return?
+    * Ask python programmer about big number support in python.
+4) Update README.md: Add 128-bit section
