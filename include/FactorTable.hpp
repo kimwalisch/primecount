@@ -79,14 +79,14 @@ template <typename T>
 class FactorTable : public AbstractFactorTable
 {
 public:
-  /// @param y = x(1/3) * alpha
-  FactorTable(int64_t y) :
-    max_(std::max<int64_t>(y, 8))
+  /// @param y  factor numbers <= y
+  FactorTable(int64_t y)
   {
     if (y > max())
       throw primecount_error("y must be <= FactorTable::max().");
+    y = std::max<int64_t>(8, y);
     T T_MAX = std::numeric_limits<T>::max();
-    init_factors(T_MAX);
+    init_factors(y, T_MAX);
   }
 
   static int64_t max()
@@ -117,10 +117,10 @@ public:
   }
 
 private:
-  void init_factors(T T_MAX)
+  void init_factors(int64_t y, T T_MAX)
   {
-    factors_.resize(get_index(max_) + 1, T_MAX);
-    // mu(1) = 1 -> factors_[0] = lpf - 1
+    int64_t sqrty = isqrt(y);
+    factors_.resize(get_index(y) + 1, T_MAX);
     factors_[0] = T_MAX - 1;
 
     for (size_t i = 1; i < factors_.size(); i++)
@@ -133,29 +133,33 @@ private:
 
         if (prime < T_MAX)
           factors_[i] = (T) prime;
+        else if (multiple > y)
+          break;
 
-        for (; multiple <= max_; multiple = prime * get_number(j++))
+        for (; multiple <= y; multiple = prime * get_number(j++))
         {
           int64_t index = get_index(multiple);
-          // prime is the smallest factor
+          // prime is the smallest factor of multiple
           if (factors_[index] == T_MAX)
             factors_[index] = (T) prime;
           // the least significant bit indicates whether multiple has
           // an even (0) or odd (1) number of prime factors
-          else if (factors_[index] > 0)
+          else if (factors_[index] != 0)
             factors_[index] ^= 1;
         }
 
-        // Moebius function is 0 if n has a squared prime factor
-        multiple = prime * prime;
-        for (j = 1; multiple <= max_; multiple = prime * prime * get_number(j++))
-          factors_[get_index(multiple)] = 0;
+        // Möbius function is 0 if n has a squared prime factor
+        if (prime <= sqrty)
+        {
+          multiple = prime * prime;
+          for (j = 1; multiple <= y; multiple = prime * prime * get_number(j++))
+            factors_[get_index(multiple)] = 0;
+        }
       }
     }
   }
 
   std::vector<T> factors_;
-  int64_t max_;
 };
 
 } // namespace
