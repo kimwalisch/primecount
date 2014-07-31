@@ -129,14 +129,13 @@ private:
       {
         int64_t prime = get_number(i);
         int64_t multiple = prime * get_number(1);
-        int64_t j = 2;
 
         if (prime < T_MAX)
           factors_[i] = (T) prime;
         else if (multiple > y)
           break;
 
-        for (; multiple <= y; multiple = prime * get_number(j++))
+        for (int64_t j = 2; multiple <= y; multiple = prime * get_number(j++))
         {
           int64_t index = get_index(multiple);
           // prime is the smallest factor of multiple
@@ -152,7 +151,7 @@ private:
         if (prime <= sqrty)
         {
           multiple = prime * prime;
-          for (j = 1; multiple <= y; multiple = prime * prime * get_number(j++))
+          for (int64_t j = 1; multiple <= y; multiple = prime * prime * get_number(j++))
             factors_[get_index(multiple)] = 0;
         }
       }
