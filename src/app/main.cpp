@@ -96,6 +96,11 @@ int main (int argc, char* argv[])
         res = Li_inverse(int64_cast(pco.x)); break;
       case OPTION_NTHPRIME:
         res = nth_prime(int64_cast(pco.x), pco.threads); break;
+
+#ifdef HAVE_INT128_T
+      case OPTION_DELEGLISE_RIVAT4:
+        res = pi_deleglise_rivat4(pco.x); break;
+#endif
     }
   }
   catch (exception& e)
