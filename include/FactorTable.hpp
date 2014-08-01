@@ -2,7 +2,7 @@
 /// @file  FactorTable.hpp
 /// @brief The FactorTable class is used to save memory. It combines
 ///        the lpf[n] (least prime factor) and mu[n] (Möbius function)
-///        lookup tables into a single factor_table[n] which
+///        lookup tables into a single factors_[n] table which
 ///        furthermore only contains entries for numbers which are
 ///        not divisible by 2, 3, 5 and 7.
 ///        The factor table concept has first been devised and
