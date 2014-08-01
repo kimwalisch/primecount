@@ -68,7 +68,7 @@ int128_t pi(int128_t x, int threads)
   return -1;
 }
 
-#endif /* HAVE_INT128_T */
+#endif
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like 10^12.
