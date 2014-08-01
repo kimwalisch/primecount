@@ -123,7 +123,7 @@ private:
     factors_.resize(get_index(y) + 1, T_MAX);
     factors_[0] = T_MAX - 1;
 
-    for (size_t i = 1; i < factors_.size(); i++)
+    for (std::size_t i = 1; i < factors_.size(); i++)
     {
       if (factors_[i] == T_MAX)
       {
