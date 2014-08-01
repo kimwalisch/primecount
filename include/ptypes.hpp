@@ -12,9 +12,9 @@
 #ifndef PTYPES_HPP
 #define PTYPES_HPP
 
-#if defined(HAVE_INT128_T)
-
 #include <stdint.h>
+
+#if defined(HAVE_INT128_T)
 
 namespace primecount {
 
