@@ -10,6 +10,8 @@
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
 
+#include <ptypes.hpp>
+
 #include <stdint.h>
 #include <cassert>
 #include <vector>

@@ -12,6 +12,7 @@
 ///
 
 #include <PhiTiny.hpp>
+#include <ptypes.hpp>
 
 #include <stdint.h>
 #include <vector>
