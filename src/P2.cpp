@@ -14,6 +14,7 @@
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
+#include <ptypes.hpp>
 #include <utils.hpp>
 
 #include <stdint.h>
@@ -57,7 +58,8 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
 }
 
 template <typename T>
-T P2_thread(T x, T y,
+T P2_thread(T x,
+            int64_t y,
             int64_t segment_size,
             int64_t segments_per_thread,
             int64_t thread_num,
@@ -72,7 +74,7 @@ T P2_thread(T x, T y,
   low += thread_num * segments_per_thread * segment_size;
   limit = min(low + segments_per_thread * segment_size, limit);
   int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
-  int64_t start = (int64_t) max(x / limit + 1, y);
+  int64_t start = (int64_t) max((int64_t) (x / limit + 1), y);
   int64_t stop  = (int64_t) min(x / low, isqrt(x));
   T P2_thread = 0;
 
