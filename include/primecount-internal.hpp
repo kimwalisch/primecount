@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <FactorTable.hpp>
+#include <ptypes.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -71,6 +72,16 @@ int64_t pi_deleglise_rivat2(int64_t x);
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 ///
 int64_t pi_deleglise_rivat3(int64_t x);
+
+#ifdef HAVE_INT128_T
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat4(int128_t x);
+
+#endif
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
