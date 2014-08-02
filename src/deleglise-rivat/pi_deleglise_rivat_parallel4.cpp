@@ -13,9 +13,11 @@
 
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <balance_S2_load.hpp>
+#include <calculator.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
@@ -353,6 +355,9 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
 {
   if (x < 2)
     return 0;
+
+  if (x > calculator::eval<int128_t>(max()))
+    throw primecount_error("pi(x): x must be <= " + max());
 
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));

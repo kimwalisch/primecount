@@ -13,8 +13,10 @@
 
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <calculator.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -241,6 +243,9 @@ int128_t pi_deleglise_rivat4(int128_t x)
 {
   if (x < 2)
     return 0;
+
+  if (x > calculator::eval<int128_t>(max()))
+    throw primecount_error("pi(x): x must be <= " + max());
 
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
