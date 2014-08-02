@@ -30,12 +30,12 @@ AS_IF([test "x$enable_popcnt" != "xno"], [
 ])
 
 AC_MSG_CHECKING(for int128_t)
-AC_TRY_LINK([#include <stdint.h>], [int128_t func(int128_t a, int128_t b) { return a / b; }],
+AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
             [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE_INT128_T)],
             [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for __int128_t)
-AC_TRY_LINK(, [__int128_t func(__int128_t a, __int128_t b) { return a / b; }],
+AC_TRY_LINK(, [__int128_t x = 0;],
               [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE___INT128_T)],
               [AC_MSG_RESULT(no)])
 
