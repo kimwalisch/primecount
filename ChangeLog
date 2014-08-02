@@ -27,7 +27,7 @@
   * pi_deleglise_rivat_parallel3.cpp: Uses 10 times less memory!
   * include/FactorTable.hpp: Compressed lookup table for lpf and Moebius.
   * include/PiTable.hpp: Compressed lookup table for prime counts.
-  * include/popcount64.hpp: Count bits using the POPCNT instruction.
+  * include/popcount.hpp: Count bits using the POPCNT instruction.
   * configure.ac: Check if CPU supports POPCNT.
 
 2014-06-15  Kim Walisch  <kim.walisch@gmail.com>

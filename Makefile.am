@@ -68,7 +68,7 @@ libprimecount_la_SOURCES = \
 	include/FactorTable.hpp \
 	include/generate.hpp \
 	include/init_square_free.hpp \
-	include/popcount64.hpp \
+	include/popcount.hpp \
 	include/pmath.hpp \
 	include/primecount-internal.hpp \
 	include/ptypes.hpp \

@@ -18,7 +18,7 @@
 #include <vector>
 
 #include <BitSieve.hpp>
-#include <popcount64.hpp>
+#include <popcount.hpp>
 #include <pmath.hpp>
 
 namespace primecount {

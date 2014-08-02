@@ -1,5 +1,5 @@
 ///
-/// @file    popcount64.hpp
+/// @file    popcount.hpp
 /// @brief   Count the number of 1 bits inside a 64-bit word.
 ///          If HAVE_POPCNT is defined then popcount64(x) uses the
 ///          POPCNT instruction (requires SSE4.2 for x86 & x64).
@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef POPCOUNT64_HPP
-#define POPCOUNT64_HPP
+#ifndef POPCOUNT_HPP
+#define POPCOUNT_HPP
 
 #if !defined(__STDC_CONSTANT_MACROS)
   #define __STDC_CONSTANT_MACROS
