@@ -88,6 +88,7 @@ primecount_SOURCES = \
 if HAVE_INT128_T
 
 primecount_SOURCES += \
-	src/deleglise-rivat/pi_deleglise_rivat4.cpp
+	src/deleglise-rivat/pi_deleglise_rivat4.cpp \
+	src/deleglise-rivat/pi_deleglise_rivat_parallel4.cpp
 
 endif

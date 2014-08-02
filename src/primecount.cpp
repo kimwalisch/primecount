@@ -28,25 +28,21 @@ int threads_ = primecount::MAX_THREADS;
 
 namespace primecount {
 
-// Set the number of threads.
 void set_num_threads(int threads)
 {
   threads_ = validate_threads(threads);
 }
 
-// Get the currently set number of threads.
 int get_num_threads()
 {
   return validate_threads(threads_);
 }
 
-/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x)
 {
   return pi(x, threads_);
 }
 
-/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads)
 {
   return pi_deleglise_rivat(x, threads);
@@ -54,24 +50,23 @@ int64_t pi(int64_t x, int threads)
 
 #ifdef HAVE_INT128_T
 
-/// Alias for the fastest prime counting function in primecount.
 int128_t pi(int128_t x)
 {
-  // TODO
-  return -1;
+  return pi(x, threads_);
 }
 
-/// Alias for the fastest prime counting function in primecount.
 int128_t pi(int128_t x, int threads)
 {
-  // TODO
-  return -1;
+  if (x <= std::numeric_limits<int64_t>::max())
+    return pi_deleglise_rivat((int64_t) x, threads);
+
+  return pi_deleglise_rivat(x, threads);
 }
 
 #endif
 
 /// Alias for the fastest prime counting function in primecount.
-/// @param x  integer or arithmetic expression like 10^12.
+/// @param x  integer or arithmetic expression like "10^12".
 /// @pre   x  <= primecount::max().
 ///
 std::string pi(const std::string& x)
@@ -80,7 +75,7 @@ std::string pi(const std::string& x)
 }
 
 /// Alias for the fastest prime counting function in primecount.
-/// @param x  integer or arithmetic expression like 10^12.
+/// @param x  integer or arithmetic expression like "10^12".
 /// @pre   x  <= primecount::max().
 ///
 std::string pi(const std::string& x, int threads)
@@ -109,6 +104,28 @@ int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
   return pi_deleglise_rivat_parallel3(x, threads);
 }
+
+#ifdef HAVE_INT128_T
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat(int128_t x)
+{
+  return pi_deleglise_rivat(x, threads_);
+}
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat(int128_t x, int threads)
+{
+  return pi_deleglise_rivat_parallel4(x, threads);
+}
+
+#endif
 
 /// Calculate the number of primes below x using Legendre's formula.
 /// Run time: O(x) operations, O(x^(1/2)) space.
@@ -186,8 +203,8 @@ int64_t phi(int64_t x, int64_t a)
 std::string max()
 {
 #ifdef HAVE_INT128_T
-  // TODO
-  return "-1";
+  // max = 10^27 if int128_t is supported
+  return std::string("1") + std::string(27, '0');
 #else
   std::ostringstream oss;
   oss << std::numeric_limits<int64_t>::max();

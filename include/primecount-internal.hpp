@@ -51,6 +51,22 @@ std::string pi(const std::string& x, int threads);
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads);
 
+#ifdef HAVE_INT128_T
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat(int128_t x);
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat(int128_t x, int threads);
+
+#endif
+
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
@@ -96,6 +112,16 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads);
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 ///
 int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads);
+
+#ifdef HAVE_INT128_T
+
+/// Calculate the number of primes below x using the
+/// Deleglise-Rivat algorithm.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+///
+int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads);
+
+#endif
 
 /// Calculate the number of primes below x using Legendre's formula.
 /// Run time: O(x) operations, O(x^(1/2)) space.

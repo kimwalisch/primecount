@@ -45,7 +45,7 @@ int main (int argc, char* argv[])
     switch (pco.option)
     {
       case OPTION_DELEGLISE_RIVAT:
-        res = pi_deleglise_rivat(int64_cast(pco.x), pco.threads); break;
+        res = pi_deleglise_rivat(pco.x, pco.threads); break;
       case OPTION_DELEGLISE_RIVAT1:
         res = pi_deleglise_rivat1(int64_cast(pco.x)); break;
       case OPTION_DELEGLISE_RIVAT2:
@@ -89,7 +89,7 @@ int main (int argc, char* argv[])
       case OPTION_PHI:
         res = phi(int64_cast(pco.x), int64_cast(pco.a)); break;
       case OPTION_PI:
-        res = pi(int64_cast(pco.x), pco.threads); break;
+        res = pi(pco.x, pco.threads); break;
       case OPTION_LI:
         res = Li(int64_cast(pco.x)); break;
       case OPTION_LIINV:
@@ -100,6 +100,8 @@ int main (int argc, char* argv[])
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT4:
         res = pi_deleglise_rivat4(pco.x); break;
+      case OPTION_DELEGLISE_RIVAT_PARALLEL4:
+        res = pi_deleglise_rivat_parallel4(pco.x, pco.threads); break;
 #endif
     }
   }
