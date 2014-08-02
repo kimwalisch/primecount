@@ -63,9 +63,10 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 /// @param rsd  Relative standard deviation
 bool increase_size(double rsd,
                    double decrease_threshold,
-                   double seconds)
+                   double seconds,
+                   double max_seconds)
 {
-  return seconds < 10 && (seconds < 0.01 || rsd < decrease_threshold);
+  return seconds < max_seconds && (seconds < 0.01 || rsd < decrease_threshold);
 }
 
 /// @param rsd  Relative standard deviation
@@ -77,11 +78,12 @@ bool decrease_size(double rsd,
 }
 
 bool adjust_segments(double segments,
-                     int64_t old_segments,
-                     double seconds)
+                     double seconds,
+                     double max_seconds,
+                     int64_t old_segments)
 {
-  return (segments < old_segments && seconds > 0.01) ||
-         (segments > old_segments && seconds < 10);
+  return ((segments < old_segments) && (seconds > 0.01)) ||
+         ((segments > old_segments) && (seconds < max_seconds));
 }
 
 } // namespace
@@ -93,21 +95,25 @@ namespace primecount {
 /// @param old_rsd  Previous relative standard deviation.
 /// @param timings  Timings of the threads.
 ///
-void balance_S2_load(int64_t* segment_size,
+void balance_S2_load(double x,
+                     double threads,
+                     double* old_rsd,
+                     aligned_vector<double>& timings,
+                     int64_t* segment_size,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
-                     int64_t max_segment_size,
-                     double* old_rsd,
-                     aligned_vector<double>& timings)
+                     int64_t max_segment_size)
 {
   double seconds = get_average(timings);
   double rsd = max(0.1, relative_standard_deviation(timings));
-  double threads = (double) timings.size();
-  double decrease_threshold = *old_rsd + min(log(threads), 1.0 / seconds);
+  double max_seconds = in_between(5, log10(x) * max(1.0, log10(threads)), 60);
+  double log_threads = log(threads);
+  double dont_decrease = 1 / seconds * max(0.2, log10(seconds));
+  double decrease_threshold = *old_rsd + min(log_threads, dont_decrease);
 
   if (*segment_size < max_segment_size)
   {
-    if (increase_size(rsd, decrease_threshold, seconds))
+    if (increase_size(rsd, decrease_threshold, seconds, max_seconds))
       *segment_size <<= 1;
     else if (decrease_size(rsd, decrease_threshold, seconds))
       if (*segment_size > min_segment_size)
@@ -120,7 +126,7 @@ void balance_S2_load(int64_t* segment_size,
     double segments = *segments_per_thread * factor;
     segments = max(1.0, segments);
 
-    if (adjust_segments(segments, *segments_per_thread, seconds))
+    if (adjust_segments(segments, seconds, max_seconds, *segments_per_thread))
       *segments_per_thread = (int) segments;
   }
 
