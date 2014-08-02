@@ -242,10 +242,6 @@ int128_t pi_deleglise_rivat4(int128_t x)
   if (x < 2)
     return 0;
 
-  // if x < 2^63 use 64-bit instead of 128-bit
-  /*if (x < numeric_limits<int64_t>::max())
-    return pi_deleglise_rivat3((int64_t) x);*/
-
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = (int64_t) (x / y);
