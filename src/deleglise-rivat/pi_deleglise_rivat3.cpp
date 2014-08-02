@@ -2,7 +2,7 @@
 /// @file  pi_deleglise_rivat3.cpp
 /// @brief Implementation of the Lagarias-Miller-Odlyzko prime counting
 ///        algorithm with the improvements of Deleglise and Rivat.
-///        This version uses compression (see Factors16 & PiTable) to
+///        This version uses compression (see FactorTable& PiTable) to
 ///        reduce the memory usage.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
@@ -65,7 +65,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            vector<int32_t>& primes,
-           Factors16& factors)
+           FactorTable<uint16_t>& factors)
 {
   PiTable pi(y);
   int64_t pi_y = pi(y);
@@ -243,7 +243,7 @@ int64_t pi_deleglise_rivat3(int64_t x)
   int64_t z = x / y;
 
   vector<int32_t> primes = generate_primes(y);
-  Factors16 factors(y);
+  FactorTable<uint16_t> factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());

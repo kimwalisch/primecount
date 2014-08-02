@@ -2,8 +2,8 @@
 /// @file  pi_deleglise_rivat_parallel3.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm with the improvements of Deleglise
-///        and Rivat. This version uses compression (see Factors16 &
-///        PiTable) to reduce the memory usage.
+///        and Rivat. This version uses compression (see
+///        FactorTable & PiTable) to reduce the memory usage.
 /// 
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -93,7 +93,7 @@ int64_t S2_thread(int64_t x,
                   int64_t thread_num,
                   int64_t low,
                   int64_t limit,
-                  Factors16& factors,
+                  FactorTable<uint16_t>& factors,
                   PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int64_t>& mu_sum,
@@ -265,7 +265,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            vector<int32_t>& primes,
-           Factors16& factors,
+           FactorTable<uint16_t>& factors,
            int threads)
 {
   int64_t limit = z + 1;
@@ -353,7 +353,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   int64_t z = x / y;
 
   vector<int32_t> primes = generate_primes(y);
-  Factors16 factors(y);
+  FactorTable<uint16_t> factors(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());

@@ -252,7 +252,7 @@ int128_t pi_deleglise_rivat4(int128_t x)
     // which uses ~ (y / 2) bytes of memory
 
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    Factors16 factors(y);
+    FactorTable<uint16_t> factors(y);
     int64_t pi_y = primes.size() - 1;
     int64_t c = min(pi_y, PhiTiny::max_a());
 
@@ -270,7 +270,7 @@ int128_t pi_deleglise_rivat4(int128_t x)
     // FactorTable which uses ~ y bytes of memory
 
     vector<int64_t> primes = generate_primes<int64_t>(y);
-    Factors32 factors(y);
+    FactorTable<uint32_t> factors(y);
     int64_t pi_y = primes.size() - 1;
     int64_t c = min(pi_y, PhiTiny::max_a());
 

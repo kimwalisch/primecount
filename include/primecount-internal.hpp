@@ -11,7 +11,6 @@
 #ifndef PRIMECOUNT_INTERNAL_HPP
 #define PRIMECOUNT_INTERNAL_HPP
 
-#include <FactorTable.hpp>
 #include <ptypes.hpp>
 
 #include <stdint.h>
@@ -26,9 +25,6 @@ enum {
 };
 
 class PhiCache;
-
-typedef FactorTable<uint16_t> Factors16;
-typedef FactorTable<uint32_t> Factors32;
 
 /// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads);
