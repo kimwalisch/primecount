@@ -1,9 +1,10 @@
-2014-07-29 Kim Walisch  <kim.walisch@gmail.com>
+2014-08-02 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.1 work in progress
 
+  * pi_deleglise_rivat4.cpp: 128-bit implementation.
+  * pi_deleglise_rivat_parallel4.cpp: 128-bit implementation.
   * Add --time option to print elapsed seconds.
-  * Initial support for 128-bit integers.
   * include/S1.hpp: Added multi-threading and templates.
   * include/FactorTable.hpp: template implementation.
   * src/PiTable.cpp: Faster initialization.
