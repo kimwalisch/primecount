@@ -79,16 +79,16 @@ libprimecount_la_SOURCES = \
 	include/tos_counters.hpp \
 	include/utils.hpp
 
+if HAVE_INT128_T
+
+libprimecount_la_SOURCES += \
+	src/deleglise-rivat/pi_deleglise_rivat4.cpp \
+	src/deleglise-rivat/pi_deleglise_rivat_parallel4.cpp
+
+endif
+
 primecount_SOURCES = \
 	src/app/main.cpp \
 	src/app/help.cpp \
 	src/app/cmdoptions.cpp \
 	src/app/cmdoptions.hpp
-
-if HAVE_INT128_T
-
-primecount_SOURCES += \
-	src/deleglise-rivat/pi_deleglise_rivat4.cpp \
-	src/deleglise-rivat/pi_deleglise_rivat_parallel4.cpp
-
-endif
