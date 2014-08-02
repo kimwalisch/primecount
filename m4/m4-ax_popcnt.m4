@@ -62,12 +62,13 @@ AC_DEFUN([AX_POPCNT],
         fi
       ])
 
-      if test "$ax_cv_have_popcnt_ext" = yes; then
+      if test "$ax_cv_have_popcnt_ext" = no; then
+        AC_MSG_NOTICE([NOTICE: Your CPU does not support the POPCNT instruction.])
+      else
         AX_CHECK_COMPILE_FLAG(-mpopcnt, ax_cv_support_popcnt_ext=yes, [])
         if test x"$ax_cv_support_popcnt_ext" = x"yes"; then
           POPCNT_FLAGS="-mpopcnt -DHAVE_POPCNT=1"
         else
-
           AC_CACHE_CHECK([whether sse4.2 is supported], [ax_cv_have_sse42_ext],
           [
             ax_cv_have_sse42_ext=no
@@ -75,12 +76,14 @@ AC_DEFUN([AX_POPCNT],
               ax_cv_have_sse42_ext=yes
             fi
           ])
-
           if test "$ax_cv_have_sse42_ext" = yes; then
             AX_CHECK_COMPILE_FLAG(-msse4.2, ax_cv_support_sse42_ext=yes, [])
             if test x"$ax_cv_support_sse42_ext" = x"yes"; then
               POPCNT_FLAGS="-msse4.2 -DHAVE_POPCNT=1"
             fi
+          fi
+          if test x"$POPCNT_FLAGS" = x; then
+            AC_MSG_NOTICE([NOTICE: Your compiler does not support the POPCNT instruction.])
           fi
         fi
       fi
@@ -98,12 +101,11 @@ AC_DEFUN([AX_POPCNT],
           POPCNT_FLAGS=""
         fi
       fi
+      if test x"$POPCNT_FLAGS" = x; then
+        AC_MSG_NOTICE([NOTICE: Your compiler and/or CPU do not support the POPCNT instruction.])
+      fi
     ;;
   esac
-
-  if test x"$POPCNT_FLAGS" = x; then
-    AC_MSG_NOTICE([NOTICE: Your CPU/compiler does not support the POPCNT instruction.])
-  fi
 
   AC_SUBST(POPCNT_FLAGS)
 ])
