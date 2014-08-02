@@ -31,15 +31,15 @@ AS_IF([test "x$enable_popcnt" != "xno"], [
 
 AC_MSG_CHECKING(for int128_t)
 AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
-            [have_int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE_INT128_T)],
+            [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE_INT128_T)],
             [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for __int128_t)
 AC_TRY_LINK(, [__int128_t x = 0;],
-              [have_int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE___INT128_T)],
+              [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE___INT128_T)],
               [AC_MSG_RESULT(no)])
 
-AM_CONDITIONAL(use_128_bit, test x$have_int128 = xyes)
+AM_CONDITIONAL(HAVE_INT128_T, test x$int128 = xyes)
 
 # Force building shared library on Windows
 # Reference: <http://article.gmane.org/gmane.comp.gnu.mingw.user/18727>
