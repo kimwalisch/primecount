@@ -266,6 +266,7 @@ int64_t primecount::nth_prime          (int64_t n);
 /// Run-time: O(x^(2/3) / (log x)^2), memory: O(x^(1/3) * (log x)^3).
 /// @param expr  An integer arithmetic expression e.g. "10^20"
 /// @pre   expr  <= 10^27
+///
 std::string primecount::pi(const std::string& expr);
 
 /// @return  Largest integer supported by pi(const std::string&)
