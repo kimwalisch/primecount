@@ -14,7 +14,7 @@
 /// file in the top level directory.
 ///
 
-#include <balance_S2_load.hpp>
+#include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
 
