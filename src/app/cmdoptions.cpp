@@ -10,7 +10,7 @@
 ///
 
 #include "cmdoptions.hpp"
-#include <calculator.hpp>
+#include <primecount-internal.hpp>
 #include <ptypes.hpp>
 
 #include <stdint.h>
@@ -20,7 +20,6 @@
 #include <exception>
 #include <cstdlib>
 #include <cstddef>
-
 
 using std::string;
 
@@ -38,7 +37,7 @@ struct Option
   template <typename T>
   T getValue() const
   {
-    return calculator::eval<T>(value);
+    return (T) to_maxint(value);
   }
 };
 
