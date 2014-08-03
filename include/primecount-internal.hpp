@@ -27,15 +27,12 @@ enum {
 
 class PhiCache;
 
-/// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x, int threads);
 
 #ifdef HAVE_INT128_T
 
-/// Alias for the fastest prime counting function in primecount.
 int128_t pi(int128_t x);
 
-/// Alias for the fastest prime counting function in primecount.
 int128_t pi(int128_t x, int threads);
 
 #endif
@@ -280,6 +277,9 @@ void balance_S2_load(double x,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
                      int64_t max_segment_size);
+
+/// Convert a string into an integer of type maxint_t.
+maxint_t to_maxint(const std::string& expr);
 
 } // namespace primecount
 

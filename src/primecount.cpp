@@ -38,6 +38,12 @@ int get_num_threads()
   return validate_threads(threads_);
 }
 
+maxint_t to_maxint(const std::string& expr)
+{
+  maxint_t n = calculator::eval<maxint_t>(expr);
+  return n;
+}
+
 int64_t pi(int64_t x)
 {
   return pi(x, threads_);
@@ -80,7 +86,7 @@ std::string pi(const std::string& x)
 ///
 std::string pi(const std::string& x, int threads)
 {
-  maxint_t n = calculator::eval<maxint_t>(x);
+  maxint_t n = to_maxint(x);
   maxint_t pin = pi(n, threads);
   std::ostringstream oss;
   oss << pin;
