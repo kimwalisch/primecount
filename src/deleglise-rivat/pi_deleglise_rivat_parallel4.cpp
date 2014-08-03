@@ -16,7 +16,6 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
-#include <balance_S2_load.hpp>
 #include <calculator.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
@@ -259,6 +258,16 @@ int128_t S2_thread(int128_t x,
   return S2_thread;
 }
 
+int64_t get_segment_size(int128_t x,
+                         int64_t limit,
+                         int64_t min_segment_size)
+{
+  int64_t logx = max(1, ilog(x));
+  int64_t segment_size = next_power_of_2(isqrt(limit) / (logx * logx));
+  segment_size = max(segment_size, min_segment_size);
+  return segment_size;
+}
+
 /// Calculate the contribution of the special leaves.
 /// This is a parallel implementation with advanced load balancing.
 /// As most special leaves tend to be in the first segments we
@@ -282,15 +291,13 @@ int128_t S2(int128_t x,
   int128_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
-  int64_t logx = max(1, ilog(x));
-  int64_t min_segment_size = 1 << 6;
+  int64_t min_segment_size = next_power_of_2(64);
+  int64_t segment_size = get_segment_size(x, limit, min_segment_size);
   int64_t segments_per_thread = 1;
-  int64_t segment_size = next_power_of_2(sqrt_limit / (logx * threads));
-  segment_size = max(segment_size, min_segment_size);
+  double relative_standard_deviation = 30;
 
   PiTable pi(y);
   vector<int64_t> phi_total(pi(min(isqrt(z), y)) + 1, 0);
-  double relative_standard_deviation = 30;
 
   while (low < limit)
   {
