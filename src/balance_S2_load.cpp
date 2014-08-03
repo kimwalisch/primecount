@@ -60,13 +60,15 @@ double relative_standard_deviation(aligned_vector<double>& timings)
   return rsd;
 }
 
-/// @param rsd  Relative standard deviation
-bool increase_size(double rsd,
-                   double decrease_threshold,
-                   double seconds,
-                   double max_seconds)
+/// Used to decide whether to use a smaller or larger
+/// segment_size and/or segments_per_thread.
+///
+double compute_decrease_threshold(double rsd, double seconds, double threads)
 {
-  return seconds < max_seconds && (seconds < 0.01 || rsd < decrease_threshold);
+  double divided = max(0.7, log(threads) / 3.0);
+  double quotient = max(1.0, divided / (seconds * log(seconds)));
+  double dont_decrease = min(quotient, divided * 10.0);
+  return rsd + dont_decrease;
 }
 
 /// @param rsd  Relative standard deviation
@@ -75,6 +77,14 @@ bool decrease_size(double rsd,
                    double seconds)
 {
   return seconds > 0.01 && rsd > decrease_threshold;
+}
+
+bool increase_size(double rsd,
+                   double decrease_threshold,
+                   double seconds,
+                   double max_seconds)
+{
+  return seconds < max_seconds && (seconds < 0.01 || rsd < decrease_threshold);
 }
 
 bool adjust_segments(double segments,
@@ -107,9 +117,7 @@ void balance_S2_load(double x,
   double seconds = get_average(timings);
   double rsd = max(0.1, relative_standard_deviation(timings));
   double max_seconds = in_between(5, log10(x) * max(1.0, log10(threads)), 60);
-  double log_threads = log(threads);
-  double dont_decrease = 1 / seconds * max(0.2, log10(seconds));
-  double decrease_threshold = *old_rsd + min(log_threads, dont_decrease);
+  double decrease_threshold = compute_decrease_threshold(*old_rsd, seconds, threads);
 
   if (*segment_size < max_segment_size)
   {
