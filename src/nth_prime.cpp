@@ -10,6 +10,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <pmath.hpp>
 
 #include <stdint.h>
 
@@ -29,8 +30,9 @@ int64_t nth_prime(int64_t n, int threads)
 
   if (n > 100000)
   {
-    // Li_inverse(n) < nth_prime(n) for 7 <= n <= ~ 10^316
-    prime_approx = Li_inverse(n);
+    // Formula due to Dana Jacobsen:
+    // Nth prime ~ Li^-1(n) + Li^-1(sqrt(n)) / 4
+    prime_approx = Li_inverse(n) + Li_inverse(isqrt(n)) / 4;
     count_approx = pi(prime_approx, threads);
   }
 
