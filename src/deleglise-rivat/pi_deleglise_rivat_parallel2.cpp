@@ -250,6 +250,9 @@ int64_t S2_thread(int64_t x,
   return S2_thread;
 }
 
+/// Calculate a tiny starting segment_size in order to
+/// evenly balance the work load.
+///
 int64_t get_segment_size(int64_t x,
                          int64_t limit,
                          int64_t min_segment_size)
