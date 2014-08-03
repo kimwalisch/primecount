@@ -3,7 +3,7 @@ primecount
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 
 primecount is a command-line program and C++ library that counts the primes
-below an integer x&nbsp;<&nbsp;10<sup>27</sup> using highly optimized
+below an integer x&nbsp;≤&nbsp;10<sup>27</sup> using highly optimized
 implementations of the prime counting function pi(x). So far primecount
 offers the option to count primes using the algorithms of Legendre, Meissel,
 Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat. All implementations
