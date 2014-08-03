@@ -272,8 +272,8 @@ std::string primecount::pi(const std::string& expr);
 /// @return  Largest integer supported by pi(const std::string&)
 std::string primecount::max();
 
-int     primecount::get_num_threads();
-void    primecount::set_num_threads(int threads);
+int  primecount::get_num_threads();
+void primecount::set_num_threads(int threads);
 ```
 
 ### Using libprimecount
