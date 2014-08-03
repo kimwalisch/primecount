@@ -62,7 +62,6 @@ libprimecount_la_SOURCES = \
 	src/lmo/pi_lmo_parallel2.cpp \
 	src/lmo/pi_lmo_parallel3.cpp \
 	include/aligned_vector.hpp \
-	include/balance_S2_load.hpp \
 	include/BitSieve.hpp \
 	include/calculator.hpp \
 	include/FactorTable.hpp \

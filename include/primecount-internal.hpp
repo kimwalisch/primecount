@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <ptypes.hpp>
+#include <aligned_vector.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -267,6 +268,18 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 /// Space complexity: O(pi(x^(1/2))).
 ///
 int64_t P3(int64_t x, int64_t a, int threads);
+
+/// Used to balance the load in the computation of the special
+/// leaves in the LMO and Deleglise-Rivat algorithms.
+///
+void balance_S2_load(double x,
+                     double threads,
+                     double* old_rsd,
+                     aligned_vector<double>& timings,
+                     int64_t* segment_size,
+                     int64_t* segments_per_thread,
+                     int64_t min_segment_size,
+                     int64_t max_segment_size);
 
 } // namespace primecount
 
