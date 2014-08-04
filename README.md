@@ -245,6 +245,11 @@ build primecount simply open a Visual Studio Command Prompt and run:
 > nmake -f Makefile.msvc
 ```
 
+### 128-bit support
+If you have a 64-bit CPU and your compiler supports the ```__int128_t```
+type (GCC, Clang, Cygwin64, Mingw-w64) then 128-bit support is automatically
+enabled in the build process and you can count primes up to 10<sup>27</sup>.
+
 ### C++ API
 Below is a list of the functions declared in the ````primecount.hpp```` header
 file. A short description of each function including its run-time and space
