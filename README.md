@@ -263,9 +263,9 @@ int64_t primecount::pi_primesieve      (int64_t x);
 int64_t primecount::nth_prime          (int64_t n);
 
 /// 128-bit prime counting function.
-/// Run-time: O(x^(2/3) / (log x)^2), memory: O(x^(1/3) * (log x)^3).
-/// @param expr  An integer arithmetic expression e.g. "10^20"
-/// @pre   expr  <= 10^27
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+/// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
+/// @pre   expr  <= primecount::max()
 ///
 std::string primecount::pi(const std::string& expr);
 
