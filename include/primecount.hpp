@@ -31,9 +31,10 @@ public:
 /// Alias for the fastest prime counting function in primecount.
 int64_t pi(int64_t x);
 
-/// Alias for the fastest prime counting function in primecount.
-/// @param x  integer or arithmetic expression like 10^12.
-/// @pre   x  <= primecount::max().
+/// 128-bit prime counting function.
+/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+/// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
+/// @pre   expr  <= primecount::max()
 ///
 std::string pi(const std::string& x);
 
@@ -94,15 +95,16 @@ int64_t Li(int64_t x);
 ///
 int64_t Li_inverse(int64_t x);
 
-// Set the number of threads.
+/// Set the number of threads.
 void set_num_threads(int num_threads);
 
-// Get the currently set number of threads.
+/// Get the currently set number of threads.
 int get_num_threads();
 
-/// Returns the largest integer that can be used with
-/// pi(std::string x). The return type is a string as max may be a
-/// 128-bit integer which is not supported by all compilers.
+/// Largest integer supported by pi(const std::string& x).
+/// The return type is a string as max may be a 128-bit integer
+/// which is not supported by all compilers.
+/// @return 2^63-1 for 32-bit CPUs, 10^27 for 64-bit CPUs
 ///
 std::string max();
 
