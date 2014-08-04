@@ -1,5 +1,5 @@
 AC_INIT([primecount], [1.1], [kim.walisch@gmail.com])
-AC_SUBST([primecount_lib_version], [1:0:0])
+AC_SUBST([primecount_lib_version], [2:0:1])
 
 AC_PREREQ([2.62])
 AC_LANG([C++])
