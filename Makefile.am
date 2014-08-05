@@ -75,8 +75,7 @@ libprimecount_la_SOURCES = \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
 	include/S1.hpp \
-	include/tos_counters.hpp \
-	include/utils.hpp
+	include/tos_counters.hpp
 
 if HAVE_INT128_T
 

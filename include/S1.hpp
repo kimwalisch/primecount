@@ -9,10 +9,10 @@
 /// file in the top level directory.
 ///
 
+#include <primecount-internal.hpp>
 #include <FactorTable.hpp>
 #include <PhiTiny.hpp>
 #include <pmath.hpp>
-#include <utils.hpp>
 
 #include <stdint.h>
 #include <vector>

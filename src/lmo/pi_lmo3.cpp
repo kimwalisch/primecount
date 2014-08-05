@@ -15,7 +15,6 @@
 #include <generate.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
-#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>

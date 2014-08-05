@@ -13,7 +13,6 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <ptypes.hpp>
-#include <utils.hpp>
 
 #include <stdexcept>
 #include <iostream>

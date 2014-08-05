@@ -281,6 +281,13 @@ void balance_S2_load(double x,
 /// Convert a string into an integer of type maxint_t.
 maxint_t to_maxint(const std::string& expr);
 
+/// Get the wall time in seconds.
+double get_wtime();
+
+int validate_threads(int threads);
+
+int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
+
 } // namespace primecount
 
 #endif

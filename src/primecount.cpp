@@ -12,12 +12,16 @@
 #include <primecount-internal.hpp>
 #include <calculator.hpp>
 #include <ptypes.hpp>
-#include <utils.hpp>
 
+#include <ctime>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <stdint.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 namespace {
 
@@ -27,6 +31,36 @@ int threads_ = primecount::MAX_THREADS;
 }
 
 namespace primecount {
+
+/// Get the wall time in seconds.
+double get_wtime()
+{
+#ifdef _OPENMP
+  return omp_get_wtime();
+#else
+  return static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
+#endif
+}
+
+int validate_threads(int threads)
+{
+#ifdef _OPENMP
+  if (threads == MAX_THREADS)
+    threads = omp_get_max_threads();
+  return std::max(1, threads);
+#else
+  threads = 1;
+  return threads; 
+#endif
+}
+
+int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
+{
+  threads = validate_threads(threads);
+  threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = std::max(1, threads);
+  return threads;
+}
 
 void set_num_threads(int threads)
 {

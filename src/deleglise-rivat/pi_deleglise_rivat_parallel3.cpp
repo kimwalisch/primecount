@@ -21,7 +21,6 @@
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <tos_counters.hpp>
-#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>

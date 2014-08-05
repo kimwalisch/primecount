@@ -12,7 +12,6 @@
 #include <pmath.hpp>
 #include <PhiCache.hpp>
 #include <PhiTiny.hpp>
-#include <utils.hpp>
 
 #include <algorithm>
 #include <stdint.h>

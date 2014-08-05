@@ -15,7 +15,6 @@
 #include <generate.hpp>
 #include <pmath.hpp>
 #include <ptypes.hpp>
-#include <utils.hpp>
 
 #include <stdint.h>
 #include <algorithm>
