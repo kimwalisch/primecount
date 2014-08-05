@@ -1,6 +1,6 @@
-2014-08-03 Kim Walisch  <kim.walisch@gmail.com>
+2014-08-05 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.1 work in progress
+  Version 1.1 released.
 
   * pi_deleglise_rivat4.cpp: 128-bit implementation.
   * pi_deleglise_rivat_parallel4.cpp: 128-bit implementation.
