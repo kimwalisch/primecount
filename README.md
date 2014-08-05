@@ -184,7 +184,7 @@ supports the POPCNT instruction.
 
 SHA1 checksums of the files:
 ```sh
-8f799ae99f411f9dd8ba65dbea8c01e869414b03  primecount-1.1-win64.zip
+f4d4ed47dd5af6c35b048ffa75d2f38242f6edfe  primecount-1.1-win64.zip
 6320ee6c9f2ad90df262d596bfa666b153ff98fc  primecount-1.0-linux-x64.tar.gz
 ```
 
