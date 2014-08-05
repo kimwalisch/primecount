@@ -19,8 +19,8 @@ namespace {
 
 const string helpMenu(
   "Usage: primecount x [OPTION]...\n"
-  "Count the primes below x < 2^63 using the prime counting function, by\n"
-  "default uses the Deleglise & Rivat algorithm (-d).\n"
+  "Count the primes below x <= 10^27 using the prime counting function,\n"
+  "by default the Deleglise-Rivat algorithm (-d) is used.\n"
   "\n"
   "Options:\n"
   "  -d,    --deleglise_rivat  LMO with Deleglise and Rivat improvements\n"
