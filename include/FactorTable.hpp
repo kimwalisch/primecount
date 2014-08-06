@@ -27,6 +27,7 @@
 
 #include <primecount.hpp>
 #include <pmath.hpp>
+#include <ptypes.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -89,9 +90,9 @@ public:
     init_factors(y, T_MAX);
   }
 
-  static int64_t max()
+  static maxint_t max()
   {
-    int64_t T_MAX = std::numeric_limits<T>::max();
+    maxint_t T_MAX = std::numeric_limits<T>::max();
     return ipow(T_MAX - 1, 2) - 1;
   }
 
