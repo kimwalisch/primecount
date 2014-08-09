@@ -362,6 +362,7 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
+  int64_t p2 = P2(x, y, threads);
 
   vector<int32_t> primes = generate_primes(y);
   FactorTable<uint16_t> factors(y);
@@ -370,7 +371,6 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes[c], factors, threads);
   int64_t s2 = S2(x, y, z, c, primes, factors, threads);
-  int64_t p2 = P2(x, y, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

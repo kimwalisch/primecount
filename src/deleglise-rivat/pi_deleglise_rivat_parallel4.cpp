@@ -372,6 +372,7 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = (int64_t) (x / y);
+  int128_t p2 = P2(x, y, threads);
 
   if (y <= FactorTable<uint16_t>::max())
   {
@@ -380,12 +381,11 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
 
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
     FactorTable<uint16_t> factors(y);
+
     int64_t pi_y = primes.size() - 1;
     int64_t c = min(pi_y, PhiTiny::max_a());
-
     int128_t s1 = S1(x, y, c, primes[c], factors, threads);
     int128_t s2 = S2(x, y, z, c, primes, factors, threads);
-    int128_t p2 = P2(x, y, threads);
     int128_t phi = s1 + s2;
     int128_t sum = phi + pi_y - 1 - p2;
 
@@ -398,12 +398,11 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
 
     vector<int64_t> primes = generate_primes<int64_t>(y);
     FactorTable<uint32_t> factors(y);
+
     int64_t pi_y = primes.size() - 1;
     int64_t c = min(pi_y, PhiTiny::max_a());
-
     int128_t s1 = S1(x, y, c, primes[c], factors, threads);
     int128_t s2 = S2(x, y, z, c, primes, factors, threads);
-    int128_t p2 = P2(x, y, threads);
     int128_t phi = s1 + s2;
     int128_t sum = phi + pi_y - 1 - p2;
 
