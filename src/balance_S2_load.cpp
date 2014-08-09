@@ -120,6 +120,7 @@ void balance_S2_load(double x,
   double max_seconds = in_between(5, log10(x) * max(1.0, log10(threads)), 60);
   double decrease_threshold = compute_decrease_threshold(*old_rsd, seconds, threads);
 
+  // 1 segment per thread
   if (*segment_size < max_segment_size)
   {
     if (increase_size(rsd, decrease_threshold, seconds, max_seconds))
@@ -128,7 +129,7 @@ void balance_S2_load(double x,
       if (*segment_size > min_segment_size)
         *segment_size >>= 1;
   }
-  else
+  else /* many segments per thread */
   {
     double factor = decrease_threshold / rsd;
     factor = in_between(0.25, factor, 4.0);
