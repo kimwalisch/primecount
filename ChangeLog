@@ -1,3 +1,10 @@
+2014-08-09 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.2 work in progress.
+
+  * src/deleglise_rivat/*.cpp: Faster starting segment size.
+  * src/lmo/*.cpp: Faster starting segment size.
+
 2014-08-06 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.1 released.
