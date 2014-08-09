@@ -65,9 +65,9 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 ///
 double compute_decrease_threshold(double rsd, double seconds, double threads)
 {
-  double divided = max(0.7, log(threads) / 3.0);
-  double quotient = max(1.0, divided / (seconds * log(seconds)));
-  double dont_decrease = min(quotient, divided * 10.0);
+  double dividend = max(0.7, log(threads) / 3.0);
+  double quotient = max(1.0, dividend / (seconds * log(seconds)));
+  double dont_decrease = min(quotient, dividend * 10.0);
   return rsd + dont_decrease;
 }
 
