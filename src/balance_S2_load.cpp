@@ -84,7 +84,8 @@ bool increase_size(double rsd,
                    double seconds,
                    double max_seconds)
 {
-  return seconds < max_seconds && (seconds < 0.01 || rsd < decrease_threshold);
+  return seconds < max_seconds &&
+        (seconds < 0.01 || rsd < decrease_threshold);
 }
 
 bool adjust_segments(double segments,
