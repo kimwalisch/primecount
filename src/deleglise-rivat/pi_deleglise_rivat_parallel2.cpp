@@ -252,14 +252,12 @@ int64_t S2_thread(int64_t x,
 /// Calculate a tiny starting segment_size in order to
 /// evenly balance the work load.
 ///
-int64_t get_segment_size(int64_t x,
-                         int64_t limit,
-                         int64_t min_segment_size)
+int64_t get_segment_size(int128_t x, int64_t limit)
 {
-  int64_t logx = max(1, ilog(x));
-  int64_t segment_size = next_power_of_2(isqrt(limit) / (logx * 8));
-  segment_size = max(segment_size, min_segment_size);
-  return segment_size;
+  int64_t divisor = ilog(x) * ilog(ilog(x));
+  int64_t segment_size = isqrt(limit) / max((int64_t) 1, divisor);
+  segment_size = max((int64_t) (1 << 9), segment_size);
+  return next_power_of_2(segment_size);
 }
 
 /// Calculate the contribution of the special leaves.
@@ -285,8 +283,8 @@ int64_t S2(int64_t x,
   int64_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
-  int64_t min_segment_size = next_power_of_2(64);
-  int64_t segment_size = get_segment_size(x, limit, min_segment_size);
+  int64_t segment_size = get_segment_size(x, limit);
+  int64_t min_segment_size = segment_size >> 2;
   int64_t segments_per_thread = 1;
   double relative_standard_deviation = 30;
 
