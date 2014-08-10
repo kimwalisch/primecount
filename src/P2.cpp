@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -142,6 +143,18 @@ T P2(T x, int64_t y, int threads)
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
 
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== P2(x, y) ===" << endl;
+    cout << "P2(x, y) = \\sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)" << endl;
+    cout << "a = " << a << endl;
+    cout << "b = " << b << endl;
+    cout << "sieve limit = " << limit << endl;
+    cout << "segment size = " << segment_size << endl;
+    cout << "threads = " << threads << endl;
+  }
+
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
@@ -179,6 +192,9 @@ T P2(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
   }
+
+  if (print_status())
+    cout << "P2 = " << sum << endl;
 
   return sum;
 }

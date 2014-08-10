@@ -95,6 +95,9 @@ int64_t Li(int64_t x);
 ///
 int64_t Li_inverse(int64_t x);
 
+/// Enable/disable printing status information during computation.
+void set_print_status(bool print_status);
+
 /// Set the number of threads.
 void set_num_threads(int num_threads);
 

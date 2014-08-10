@@ -288,6 +288,8 @@ int validate_threads(int threads);
 
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
 
+bool print_status();
+
 } // namespace primecount
 
 #endif

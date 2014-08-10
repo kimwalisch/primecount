@@ -12,6 +12,7 @@
 #include <primecount-internal.hpp>
 #include <calculator.hpp>
 #include <ptypes.hpp>
+#include <pmath.hpp>
 
 #include <ctime>
 #include <limits>
@@ -28,9 +29,22 @@ namespace {
 // By default primecount uses all CPU cores.
 int threads_ = primecount::MAX_THREADS;
 
+// Print status information to std::cout.
+bool print_status_ = false;
+
 }
 
 namespace primecount {
+
+void set_print_status(bool print_status)
+{
+  print_status_ = print_status;
+}
+
+bool print_status()
+{
+  return print_status_;
+}
 
 /// Get the wall time in seconds.
 double get_wtime()
@@ -47,7 +61,7 @@ int validate_threads(int threads)
 #ifdef _OPENMP
   if (threads == MAX_THREADS)
     threads = omp_get_max_threads();
-  return std::max(1, threads);
+  return in_between(1, threads, omp_get_max_threads());
 #else
   threads = 1;
   return threads; 
