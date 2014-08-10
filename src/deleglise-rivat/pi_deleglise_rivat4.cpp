@@ -255,12 +255,12 @@ int128_t pi_deleglise_rivat4(int128_t x)
   if (print_status())
   {
     cout << endl;
-    cout << "=== pi_deleglise_rivat4 ===" << endl;
-    cout << "pi(x) = S1 + S2 - 1 - P2" << endl;
+    cout << "=== pi_deleglise_rivat4(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "threads = " << "1" << endl;
+    cout << "sieve limit = " << z << endl;
+    cout << "threads = 1" << endl;
   }
 
   int128_t p2 = P2(x, y, 1);

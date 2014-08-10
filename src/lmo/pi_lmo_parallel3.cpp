@@ -304,8 +304,8 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   if (print_status())
   {
     cout << endl;
-    cout << "=== pi_lmo_parallel3 ===" << endl;
-    cout << "pi(x) = S1 + S2 - 1 - P2" << endl;
+    cout << "=== pi_lmo_parallel3(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
     cout << "threads = " << validate_threads(threads) << endl;

@@ -154,12 +154,13 @@ T P2(T x, int64_t y, int threads)
   {
     cout << endl;
     cout << "=== P2(x, y) ===" << endl;
-    cout << "P2(x, y) = \\sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)" << endl;
+    cout << "Computation of the 2nd partial sieve function" << endl;
     cout << "a = " << a << endl;
     cout << "b = " << b << endl;
     cout << "Segment size = " << segment_size << endl;
     cout << "Sieve limit = " << limit << endl;
     cout << "Threads = " << threads << endl;
+    cout << "P2 = \\sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)" << endl;
     print_percent(low, limit);
   }
 

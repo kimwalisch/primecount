@@ -189,11 +189,11 @@ int64_t pi_lmo5(int64_t x)
   if (print_status())
   {
     cout << endl;
-    cout << "=== pi_lmo5 ===" << endl;
-    cout << "pi(x) = S1 + S2 - 1 - P2" << endl;
+    cout << "=== pi_lmo5(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
-    cout << "threads = " << "1" << endl;
+    cout << "threads = 1" << endl;
   }
 
   int64_t p2 = P2(x, y, 1);

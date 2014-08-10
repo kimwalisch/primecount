@@ -39,6 +39,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
   {
     std::cout << std::endl;
     std::cout << "=== S1(x, y) ===" << std::endl;
+    std::cout << "Computation of the trivial leaves" << std::endl;
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
     std::cout << "c = " << c << std::endl;
@@ -85,6 +86,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
   {
     std::cout << std::endl;
     std::cout << "=== S1(x, y) ===" << std::endl;
+    std::cout << "Computation of the trivial leaves" << std::endl;
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
     std::cout << "c = " << c << std::endl;
