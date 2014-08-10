@@ -33,6 +33,7 @@ const string helpMenu(
   "  -n,    --nthprime         Calculate the nth prime\n"
   "         --phi              Calculate phi(x, a), requires 2 arguments\n"
   "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
+  "  -s,    --status           Print status info during computation\n"
   "         --test             Run various correctness tests and exit\n"
   "         --time             Print the time elapsed in seconds\n"
   "  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores\n"
