@@ -111,7 +111,8 @@ namespace primecount {
 
 bool test()
 {
-  srand((unsigned) time(0));
+  set_print_status(false); 
+  srand(static_cast<unsigned>(time(0)));
   try
   {
     test_phi_thread_safety(100);
