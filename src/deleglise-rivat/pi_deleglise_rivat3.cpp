@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -241,6 +242,18 @@ int64_t pi_deleglise_rivat3(int64_t x)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_deleglise_rivat3 ===" << endl;
+    cout << "pi(x) = S1 + S2 - 1 - P2" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "threads = " << "1" << endl;
+  }
+
   int64_t p2 = P2(x, y, 1);
 
   vector<int32_t> primes = generate_primes(y);
@@ -252,6 +265,9 @@ int64_t pi_deleglise_rivat3(int64_t x)
   int64_t s2 = S2(x, y, z, c, primes, factors);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
+
+  if (print_status())
+    cout << endl;
 
   return sum;
 }

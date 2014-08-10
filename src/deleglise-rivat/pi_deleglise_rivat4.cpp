@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -249,7 +250,21 @@ int128_t pi_deleglise_rivat4(int128_t x)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = (int64_t) (x / y);
+  int64_t c, pi_y;
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_deleglise_rivat4 ===" << endl;
+    cout << "pi(x) = S1 + S2 - 1 - P2" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "threads = " << "1" << endl;
+  }
+
   int128_t p2 = P2(x, y, 1);
+  int128_t s1, s2;
 
   if (y <= FactorTable<uint16_t>::max())
   {
@@ -259,14 +274,10 @@ int128_t pi_deleglise_rivat4(int128_t x)
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
     FactorTable<uint16_t> factors(y);
 
-    int64_t pi_y = primes.size() - 1;
-    int64_t c = min(pi_y, PhiTiny::max_a());
-    int128_t s1 = S1(x, y, c, primes[c], factors, 1);
-    int128_t s2 = S2(x, y, z, c, primes, factors);
-    int128_t phi = s1 + s2;
-    int128_t sum = phi + pi_y - 1 - p2;
-
-    return sum;
+    pi_y = primes.size() - 1;
+    c = min(pi_y, PhiTiny::max_a());
+    s1 = S1(x, y, c, primes[c], factors, 1);
+    s2 = S2(x, y, z, c, primes, factors);
   }
   else
   {
@@ -276,15 +287,19 @@ int128_t pi_deleglise_rivat4(int128_t x)
     vector<int64_t> primes = generate_primes<int64_t>(y);
     FactorTable<uint32_t> factors(y);
 
-    int64_t pi_y = primes.size() - 1;
-    int64_t c = min(pi_y, PhiTiny::max_a());
-    int128_t s1 = S1(x, y, c, primes[c], factors, 1);
-    int128_t s2 = S2(x, y, z, c, primes, factors);
-    int128_t phi = s1 + s2;
-    int128_t sum = phi + pi_y - 1 - p2;
-
-    return sum;
+    pi_y = primes.size() - 1;
+    c = min(pi_y, PhiTiny::max_a());
+    s1 = S1(x, y, c, primes[c], factors, 1);
+    s2 = S2(x, y, z, c, primes, factors);
   }
+
+  if (print_status())
+    cout << endl;
+
+  int128_t phi = s1 + s2;
+  int128_t sum = phi + pi_y - 1 - p2;
+
+  return sum;
 }
 
 } // namespace
