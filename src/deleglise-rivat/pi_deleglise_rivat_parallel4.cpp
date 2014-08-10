@@ -291,7 +291,7 @@ int128_t S2(int128_t x,
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
   int64_t segment_size = get_segment_size(x, limit);
-  int64_t min_segment_size = segment_size >> 2;
+  int64_t min_segment_size = segment_size;
   int64_t segments_per_thread = 1;
   double relative_standard_deviation = 30;
 
