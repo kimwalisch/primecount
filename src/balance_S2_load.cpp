@@ -117,7 +117,7 @@ void balance_S2_load(double x,
 {
   double seconds = get_average(timings);
   double rsd = max(0.1, relative_standard_deviation(timings));
-  double max_seconds = in_between(5, log(x) * max(1.0, log(threads)), 120);
+  double max_seconds = max(5.0, log(x) * log(threads));
   double decrease_threshold = compute_decrease_threshold(*old_rsd, seconds, threads);
 
   // 1 segment per thread
