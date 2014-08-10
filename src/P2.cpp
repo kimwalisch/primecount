@@ -145,7 +145,7 @@ T P2(T x, int64_t y, int threads)
 
   int64_t low = 2;
   int64_t limit = (int64_t)(x / max<int64_t>(1, y));
-  int64_t segment_size = max<int64_t>(64, isqrt(limit));
+  int64_t segment_size = max<int64_t>(1 << 12, isqrt(limit));
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
   double time1 = get_wtime();
