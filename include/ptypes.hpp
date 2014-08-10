@@ -34,10 +34,16 @@ namespace primecount {
 
 typedef __int128_t maxint_t;
 typedef __int128_t int128_t;
+typedef __uint128_t uint128_t;
 
 inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
   std::string str;
+  if (n < 0)
+  {
+    str += '-';
+    n = -n;
+  }
   while (n > 0)
   {
     str += '0' + n % 10;
