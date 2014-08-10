@@ -57,6 +57,12 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
   return next;
 }
 
+void print_percent(int64_t low, int64_t limit)
+{
+  int percent = (int) (100 * (double) low / (double) limit);
+  cout << '\r' << min(percent, 100) << '%' << flush;
+}
+
 template <typename T>
 T P2_thread(T x,
             int64_t y,
@@ -142,6 +148,7 @@ T P2(T x, int64_t y, int threads)
   int64_t segment_size = max<int64_t>(64, isqrt(limit));
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
+  double time1 = get_wtime();
 
   if (print_status())
   {
@@ -150,9 +157,10 @@ T P2(T x, int64_t y, int threads)
     cout << "P2(x, y) = \\sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)" << endl;
     cout << "a = " << a << endl;
     cout << "b = " << b << endl;
-    cout << "sieve limit = " << limit << endl;
-    cout << "segment size = " << segment_size << endl;
-    cout << "threads = " << threads << endl;
+    cout << "Segment size = " << segment_size << endl;
+    cout << "Sieve limit = " << limit << endl;
+    cout << "Threads = " << threads << endl;
+    print_percent(low, limit);
   }
 
   vector<int32_t> primes = generate_primes(isqrt(limit));
@@ -191,10 +199,16 @@ T P2(T x, int64_t y, int threads)
       sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
+
+    if (print_status())
+      print_percent(low, limit);
   }
 
   if (print_status())
-    cout << "P2 = " << sum << endl;
+  {
+    cout << "\rP2 = " << sum << endl;
+    cout << "Seconds: " << get_wtime() - time1 << endl;
+  }
 
   return sum;
 }
