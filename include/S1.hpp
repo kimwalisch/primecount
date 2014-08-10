@@ -15,6 +15,7 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
+#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -32,11 +33,28 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
   T sum = 0;
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
+  double time1 = get_wtime();
+
+  if (print_status())
+  {
+    std::cout << std::endl;
+    std::cout << "=== S1(x, y) ===" << std::endl;
+    std::cout << "x = " << x << std::endl;
+    std::cout << "y = " << y << std::endl;
+    std::cout << "c = " << c << std::endl;
+    std::cout << "threads = " << threads << std::endl;
+  }
 
   #pragma omp parallel for num_threads(threads) reduction (+: sum)
   for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > prime_c)
       sum += mu[n] * phi_tiny(x / n, c);
+
+  if (print_status())
+  {
+    std::cout << "S1 = " << sum << std::endl;
+    std::cout << "Seconds: " << get_wtime() - time1 << std::endl;
+  }
 
   return sum;
 }
@@ -61,11 +79,28 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
   int64_t limit = factors.get_index(y);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
+  double time1 = get_wtime();
+
+  if (print_status())
+  {
+    std::cout << std::endl;
+    std::cout << "=== S1(x, y) ===" << std::endl;
+    std::cout << "x = " << x << std::endl;
+    std::cout << "y = " << y << std::endl;
+    std::cout << "c = " << c << std::endl;
+    std::cout << "threads = " << threads << std::endl;
+  }
 
   #pragma omp parallel for num_threads(threads) reduction (+: sum)
   for (int64_t i = factors.get_index(1); i <= limit; i++)
     if (factors.lpf(i) > prime_c)
       sum += factors.mu(i) * phi_tiny(x / factors.get_number(i), c);
+
+  if (print_status())
+  {
+    std::cout << "S1 = " << sum << std::endl;
+    std::cout << "Seconds: " << get_wtime() - time1 << std::endl;
+  }
 
   return sum;
 }
