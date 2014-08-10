@@ -33,7 +33,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
   T sum = 0;
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
-  double time1 = get_wtime();
+  double time = get_wtime();
 
   if (print_status())
   {
@@ -54,7 +54,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
   if (print_status())
   {
     std::cout << "S1 = " << sum << std::endl;
-    std::cout << "Seconds: " << get_wtime() - time1 << std::endl;
+    print_seconds(get_wtime() - time);
   }
 
   return sum;
@@ -80,7 +80,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
   int64_t limit = factors.get_index(y);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
-  double time1 = get_wtime();
+  double time = get_wtime();
 
   if (print_status())
   {
@@ -101,7 +101,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
   if (print_status())
   {
     std::cout << "S1 = " << sum << std::endl;
-    std::cout << "Seconds: " << get_wtime() - time1 << std::endl;
+    print_seconds(get_wtime() - time);
   }
 
   return sum;

@@ -116,7 +116,7 @@ int main (int argc, char* argv[])
 
   cout << res << endl;
   if (pco.time)
-    cout << "Seconds: " << get_wtime() - time << endl;
+    print_seconds(get_wtime() - time);
 
   return 0;
 }

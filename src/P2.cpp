@@ -148,7 +148,7 @@ T P2(T x, int64_t y, int threads)
   int64_t segment_size = max<int64_t>(1 << 12, isqrt(limit));
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
-  double time1 = get_wtime();
+  double time = get_wtime();
 
   if (print_status())
   {
@@ -208,7 +208,8 @@ T P2(T x, int64_t y, int threads)
   if (print_status())
   {
     cout << "\rP2 = " << sum << endl;
-    cout << "Seconds: " << get_wtime() - time1 << endl;
+    double seconds = get_wtime() - time;
+    print_seconds(seconds);
   }
 
   return sum;

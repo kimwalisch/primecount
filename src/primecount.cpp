@@ -14,7 +14,10 @@
 #include <ptypes.hpp>
 #include <pmath.hpp>
 
+#include <algorithm>
 #include <ctime>
+#include <iostream>
+#include <iomanip>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -44,6 +47,11 @@ void set_print_status(bool print_status)
 bool print_status()
 {
   return print_status_;
+}
+
+void print_seconds(double seconds)
+{
+  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
 }
 
 /// Get the wall time in seconds.
