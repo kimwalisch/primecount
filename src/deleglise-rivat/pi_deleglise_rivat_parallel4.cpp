@@ -86,7 +86,7 @@ void cross_off(int64_t prime,
 /// the calling (parent) S2 function.
 ///
 template <typename P, typename F>
-int128_t S2_thread(int128_t x,
+int128_t S2_thread(uint128_t x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
