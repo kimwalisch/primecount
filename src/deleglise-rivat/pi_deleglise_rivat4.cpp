@@ -232,10 +232,7 @@ int128_t S2(uint128_t x,
   }
 
   if (print_status())
-  {
-    cout << "S2 = " << S2_result << endl;
-    print_seconds(get_wtime() - time);
-  }
+    print_result("S2", S2_result, get_wtime() - time);
 
   return S2_result;
 }

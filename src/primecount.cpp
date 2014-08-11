@@ -281,6 +281,12 @@ void print_S2_result(maxint_t s2_total, double seconds)
   print_seconds(seconds);
 }
 
+void print_result(const std::string& str, maxint_t res, double seconds)
+{
+  std::cout << str << " = " << res << std::endl;
+  print_seconds(seconds);
+}
+
 void print_seconds(double seconds)
 {
   std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
