@@ -29,82 +29,13 @@
 
 namespace {
 
-// By default primecount uses all CPU cores.
 int threads_ = primecount::MAX_THREADS;
 
-// Print status information to std::cout.
 bool print_status_ = false;
 
 }
 
 namespace primecount {
-
-void set_print_status(bool print_status)
-{
-  print_status_ = print_status;
-}
-
-bool print_status()
-{
-  return print_status_;
-}
-
-void print_seconds(double seconds)
-{
-  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
-}
-
-void print_megabytes(std::size_t bytes)
-{
-  double megabytes = bytes / (double) (1 << 20);
-  std::cout << "memory usage = " << std::fixed << std::setprecision(3) << megabytes << " megabytes" << std::endl;
-}
-
-/// Get the wall time in seconds.
-double get_wtime()
-{
-#ifdef _OPENMP
-  return omp_get_wtime();
-#else
-  return static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
-#endif
-}
-
-int validate_threads(int threads)
-{
-#ifdef _OPENMP
-  if (threads == MAX_THREADS)
-    threads = omp_get_max_threads();
-  return in_between(1, threads, omp_get_max_threads());
-#else
-  threads = 1;
-  return threads; 
-#endif
-}
-
-int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
-{
-  threads = validate_threads(threads);
-  threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
-  threads = std::max(1, threads);
-  return threads;
-}
-
-void set_num_threads(int threads)
-{
-  threads_ = validate_threads(threads);
-}
-
-int get_num_threads()
-{
-  return validate_threads(threads_);
-}
-
-maxint_t to_maxint(const std::string& expr)
-{
-  maxint_t n = calculator::eval<maxint_t>(expr);
-  return n;
-}
 
 int64_t pi(int64_t x)
 {
@@ -288,6 +219,78 @@ std::string max()
   oss << std::numeric_limits<int64_t>::max();
   return oss.str();
 #endif
+}
+
+/// Get the wall time in seconds.
+double get_wtime()
+{
+#ifdef _OPENMP
+  return omp_get_wtime();
+#else
+  return static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
+#endif
+}
+
+int validate_threads(int threads)
+{
+#ifdef _OPENMP
+  if (threads == MAX_THREADS)
+    threads = omp_get_max_threads();
+  return in_between(1, threads, omp_get_max_threads());
+#else
+  threads = 1;
+  return threads; 
+#endif
+}
+
+int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
+{
+  threads = validate_threads(threads);
+  threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = std::max(1, threads);
+  return threads;
+}
+
+void set_num_threads(int threads)
+{
+  threads_ = validate_threads(threads);
+}
+
+int get_num_threads()
+{
+  return validate_threads(threads_);
+}
+
+maxint_t to_maxint(const std::string& expr)
+{
+  maxint_t n = calculator::eval<maxint_t>(expr);
+  return n;
+}
+
+void reset_line()
+{
+  std::cout << '\r' << std::string(60, ' ') << '\r' << std::flush;
+}
+
+void print_seconds(double seconds)
+{
+  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
+}
+
+void print_megabytes(std::size_t bytes)
+{
+  double megabytes = bytes / (double) (1 << 20);
+  std::cout << "memory usage = " << std::fixed << std::setprecision(3) << megabytes << " megabytes" << std::endl;
+}
+
+void set_print_status(bool print_status)
+{
+  print_status_ = print_status;
+}
+
+bool print_status()
+{
+  return print_status_;
 }
 
 } // namespace primecount

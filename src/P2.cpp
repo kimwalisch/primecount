@@ -57,12 +57,6 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
   return next;
 }
 
-void print_percent(int64_t low, int64_t limit)
-{
-  int percent = (int) (100.0 * low / limit);
-  cout << '\r' << min(percent, 100) << '%' << flush;
-}
-
 template <typename T>
 T P2_thread(T x,
             int64_t y,
@@ -193,20 +187,21 @@ T P2(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
 
-    if (print_status())
-      cout << '\r' << get_percent(low, limit) << '%' << flush;
-
     // Adjust thread load balancing
     if (seconds < 10)
       segments_per_thread *= 2;
     else if (seconds > 30 && segments_per_thread > 1)
       segments_per_thread /= 2;
+
+    if (print_status())
+      cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
 
   if (print_status())
   {
-    cout << "\rP2 = " << sum << endl;
-    print_seconds(/* time elapsed = */ get_wtime() - time);
+    reset_line();
+    cout << "P2 = " << sum << endl;
+    print_seconds(get_wtime() - time);
   }
 
   return sum;

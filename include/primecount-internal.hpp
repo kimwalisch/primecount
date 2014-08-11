@@ -314,6 +314,8 @@ int validate_threads(int threads);
 
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
 
+void reset_line();
+
 void print_seconds(double seconds);
 
 void print_megabytes(std::size_t bytes);
