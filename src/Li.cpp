@@ -50,44 +50,43 @@ long double li(long double x)
   return GAMMA + log(logx) + sqrt(x) * sum;
 }
 
-} // namespace
-
-namespace primecount {
-
 /// Calculate the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x.
 /// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
-int64_t Li(int64_t x)
+template <typename T>
+T Li(T x)
 {
   if (x < 2)
     return 0;
 
   long double n = (long double) x;
-  return (int64_t) (li(n) - /* li(2) = */ 1.04516);
+  return (T) (li(n) - /* li(2) = */ 1.04516);
 }
 
 /// Calculate the inverse logarithmic integral Li^-1(x) which is a
 /// very accurate approximation of the nth prime.
 /// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-int64_t Li_inverse(int64_t x)
+template <typename T>
+T Li_inverse(T x)
 {
   if (x < 1)
     return 0;
 
-  double n = (double) x;
-  double logn = log(n);
-  int64_t first = (int64_t) (n * logn);
-  int64_t last  = (int64_t) (n * logn * 2 + 2);
+  long double logx = log((long double) x);
+
+  // Calculate lower and upper bounds
+  T first = (T) (x * logx);
+  T last  = (T) (x * logx * 2 + 2);
 
   if (last <= first)
-    last = numeric_limits<int64_t>::max();
+    last = numeric_limits<T>::max();
 
-  // find Li^-1(x) using binary search
+  // Find Li^-1(x) using binary search
   while (first < last)
   {
-    int64_t mid = first + (last - first) / 2;
+    T mid = first + (last - first) / 2;
     if (Li(mid) < x)
       first = mid + 1;
     else
@@ -96,5 +95,33 @@ int64_t Li_inverse(int64_t x)
 
   return first;
 }
+
+} // namespace
+
+namespace primecount {
+
+int64_t Li(int64_t x)
+{
+  return ::Li(x);
+}
+
+int64_t Li_inverse(int64_t x)
+{
+  return ::Li_inverse(x);
+}
+
+#ifdef HAVE_INT128_T
+
+int128_t Li(int128_t x)
+{
+  return ::Li(x);
+}
+
+int128_t Li_inverse(int128_t x)
+{
+  return ::Li_inverse(x);
+}
+
+#endif
 
 } // namespace primecount
