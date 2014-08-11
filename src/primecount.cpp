@@ -54,6 +54,12 @@ void print_seconds(double seconds)
   std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
 }
 
+void print_megabytes(std::size_t bytes)
+{
+  double megabytes = bytes / (double) (1 << 20);
+  std::cout << "memory usage = " << std::fixed << std::setprecision(3) << megabytes << " megabytes" << std::endl;
+}
+
 /// Get the wall time in seconds.
 double get_wtime()
 {
