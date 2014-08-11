@@ -59,7 +59,7 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_
 
 void print_percent(int64_t low, int64_t limit)
 {
-  int percent = (int) (100 * (double) low / (double) limit);
+  int percent = (int) (100.0 * low / limit);
   cout << '\r' << min(percent, 100) << '%' << flush;
 }
 
@@ -155,13 +155,11 @@ T P2(T x, int64_t y, int threads)
     cout << endl;
     cout << "=== P2(x, y) ===" << endl;
     cout << "Computation of the 2nd partial sieve function" << endl;
-    cout << "a = " << a << endl;
-    cout << "b = " << b << endl;
-    cout << "Segment size = " << segment_size << endl;
-    cout << "Sieve limit = " << limit << endl;
-    cout << "Threads = " << threads << endl;
-    cout << "P2 = \\sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)" << endl;
-    print_percent(low, limit);
+    cout << "pi(y) = " << a << endl;
+    cout << "pi(x^(1/2)) = " << b << endl;
+    cout << "segment size = " << segment_size << endl;
+    cout << "sieve limit = " << limit << endl;
+    cout << "threads = " << threads << endl;
   }
 
   vector<int32_t> primes = generate_primes(isqrt(limit));
@@ -188,28 +186,27 @@ T P2(T x, int64_t y, int threads)
     low += segments_per_thread * threads * segment_size;
     seconds = get_wtime() - seconds;
 
+    if (print_status())
+      print_percent(low, limit);
+
     // Adjust thread load balancing
     if (seconds < 10)
       segments_per_thread *= 2;
     else if (seconds > 30 && segments_per_thread > 1)
       segments_per_thread /= 2;
 
-    // Add the missing sum contributions in order
+    // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
       sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
-
-    if (print_status())
-      print_percent(low, limit);
   }
 
   if (print_status())
   {
     cout << "\rP2 = " << sum << endl;
-    double seconds = get_wtime() - time;
-    print_seconds(seconds);
+    print_seconds(/* time elapsed = */ get_wtime() - time);
   }
 
   return sum;
