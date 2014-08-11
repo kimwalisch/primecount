@@ -9,6 +9,7 @@
 ///
 
 #include <primecount.hpp>
+#include <ptypes.hpp>
 
 #include <stdint.h>
 #include <algorithm>

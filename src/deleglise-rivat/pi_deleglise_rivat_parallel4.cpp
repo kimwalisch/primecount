@@ -289,17 +289,6 @@ int128_t S2(int128_t x,
   int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2(x, y) ===" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "pre-sieve primes <= " << primes[c] << endl;
-    cout << "sieve limit = " << z << endl;
-    cout << "threads = " << threads << endl;
-  }
-
   int128_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
@@ -310,6 +299,17 @@ int128_t S2(int128_t x,
 
   PiTable pi(y);
   vector<int64_t> phi_total(pi(min(isqrt(z), y)) + 1, 0);
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "pre-sieve primes <= " << primes[c] << endl;
+    cout << "sieve limit = " << z << endl;
+    cout << "threads = " << threads << endl;
+  }
 
   while (low < limit)
   {
