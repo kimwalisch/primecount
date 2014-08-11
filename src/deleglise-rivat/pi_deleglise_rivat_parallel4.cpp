@@ -304,6 +304,7 @@ int128_t S2(int128_t x,
   {
     cout << endl;
     cout << "=== S2(x, y) ===" << endl;
+    cout << "Computation of the special leaves" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
     cout << "pre-sieve primes <= " << primes[c] << endl;
@@ -353,7 +354,10 @@ int128_t S2(int128_t x,
   }
 
   if (print_status())
-    cout << endl << "S2 = " << S2_total << endl;
+  {
+    cout << "\rStatus: 100% | Load balance: 100%" << endl;
+    cout << "S2 = " << S2_total << endl;
+  }
 
   return S2_total;
 }
