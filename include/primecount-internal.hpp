@@ -232,6 +232,14 @@ int64_t Li(int64_t);
 ///
 int64_t Li_inverse(int64_t);
 
+#ifdef HAVE_INT128_T
+
+int128_t Li(int128_t);
+
+int128_t Li_inverse(int128_t);
+
+#endif
+
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/2)) space.
@@ -277,6 +285,15 @@ void balance_S2_load(double x,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
                      int64_t max_segment_size);
+
+/// S2(x, y) approximation.
+template <typename T>
+T S2_approx(T x, T S1, T P2, int64_t pi_y)
+{
+  T pix = Li(x);
+  T S2 = pix - S1 - pi_y + 1 + P2;
+  return S2;
+}
 
 /// Convert a string into an integer of type maxint_t.
 maxint_t to_maxint(const std::string& expr);
