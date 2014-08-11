@@ -271,9 +271,14 @@ void print_S2_status(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
   int percent = get_percent(s2_current, s2_approx);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+  std::cout << "\rStatus: " << percent << "% | " << "Load balance: " << load_balance << "%" << std::flush;
+}
 
-  std::cout << "\rStatus: " << percent << "% | "
-            << "Load balance: " << load_balance << "%" << std::flush;
+void print_S2_result(maxint_t s2_total, double seconds)
+{
+  std::cout << "\rStatus: 100% | Load balance: 100%" << std::endl;
+  std::cout << "S2 = " << s2_total << std::endl;
+  print_seconds(seconds);
 }
 
 void print_seconds(double seconds)

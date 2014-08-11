@@ -295,7 +295,9 @@ int128_t S2(int128_t x,
   int64_t segment_size = get_segment_size(x, limit);
   int64_t min_segment_size = segment_size;
   int64_t segments_per_thread = 1;
+
   double relative_standard_deviation = 30;
+  double time = get_wtime();
 
   PiTable pi(y);
   vector<int64_t> phi_total(pi(min(isqrt(z), y)) + 1, 0);
@@ -354,10 +356,7 @@ int128_t S2(int128_t x,
   }
 
   if (print_status())
-  {
-    cout << "\rStatus: 100% | Load balance: 100%" << endl;
-    cout << "S2 = " << S2_total << endl;
-  }
+    print_S2_result(S2_total, get_wtime() - time);
 
   return S2_total;
 }

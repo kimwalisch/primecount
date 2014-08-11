@@ -320,6 +320,8 @@ void print_megabytes(std::size_t bytes);
 
 void print_S2_status(maxint_t s2_current, maxint_t s2_approx, double rsd);
 
+void print_S2_result(maxint_t s2_total, double seconds);
+
 bool print_status();
 
 } // namespace primecount

@@ -271,6 +271,7 @@ int64_t get_segment_size(int64_t x, int64_t limit)
 /// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
+           int64_t s2_approx,
            int64_t y,
            int64_t z,
            int64_t c,
@@ -287,10 +288,24 @@ int64_t S2(int64_t x,
   int64_t segment_size = get_segment_size(x, limit);
   int64_t min_segment_size = segment_size;
   int64_t segments_per_thread = 1;
+
   double relative_standard_deviation = 30;
+  double time = get_wtime();
 
   PiTable pi(y);
   vector<int64_t> phi_total(pi(min(isqrt(z), y)) + 1, 0);
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "Computation of the special leaves" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "pre-sieve primes <= " << primes[c] << endl;
+    cout << "sieve limit = " << z << endl;
+    cout << "threads = " << threads << endl;
+  }
 
   while (low < limit)
   {
@@ -327,8 +342,14 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit);
+        &segments_per_thread, min_segment_size, sqrt_limit);
+
+    if (print_status())
+      print_S2_status(S2_total, s2_approx, relative_standard_deviation);
   }
+
+  if (print_status())
+    print_S2_result(S2_total, get_wtime() - time);
 
   return S2_total;
 }
@@ -379,7 +400,8 @@ int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads)
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes[c], factors, threads);
-  int64_t s2 = S2(x, y, z, c, primes, factors, threads);
+  int64_t s2_approx = S2_approx(x, s1, p2, pi_y);
+  int64_t s2 = S2(x, s2_approx, y, z, c, primes, factors, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
