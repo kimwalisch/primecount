@@ -186,21 +186,21 @@ T P2(T x, int64_t y, int threads)
     low += segments_per_thread * threads * segment_size;
     seconds = get_wtime() - seconds;
 
-    if (print_status())
-      print_percent(low, limit);
-
-    // Adjust thread load balancing
-    if (seconds < 10)
-      segments_per_thread *= 2;
-    else if (seconds > 30 && segments_per_thread > 1)
-      segments_per_thread /= 2;
-
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
       sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
+
+    if (print_status())
+      cout << '\r' << get_percent(low, limit) << '%' << flush;
+
+    // Adjust thread load balancing
+    if (seconds < 10)
+      segments_per_thread *= 2;
+    else if (seconds > 30 && segments_per_thread > 1)
+      segments_per_thread /= 2;
   }
 
   if (print_status())

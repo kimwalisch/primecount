@@ -278,12 +278,13 @@ int64_t get_segment_size(int128_t x, int64_t limit)
 ///
 template <typename P, typename F>
 int128_t S2(int128_t x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           vector<P>& primes,
-           FactorTable<F>& factors,
-           int threads)
+            int128_t s2_approx,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            vector<P>& primes,
+            FactorTable<F>& factors,
+            int threads)
 {
   int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
@@ -335,6 +336,11 @@ int128_t S2(int128_t x,
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
                     &segments_per_thread, min_segment_size, sqrt_limit);
+
+    if (print_status())
+    {
+      cout << "\rStatus: " << get_percent(S2_total, s2_approx) << '%';
+    }
   }
 
   return S2_total;
@@ -384,6 +390,7 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
 
   int128_t p2 = P2(x, y, threads);
   int128_t s1, s2;
+  int128_t s2_approx;
 
   if (y <= FactorTable<uint16_t>::max())
   {
@@ -396,7 +403,8 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
     pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, primes[c], factors, threads);
-    s2 = S2(x, y, z, c, primes, factors, threads);
+    s2_approx = S2_approx(x, s1, p2, pi_y);
+    s2 = S2(x, s2_approx, y, z, c, primes, factors, threads);
   }
   else
   {
@@ -409,7 +417,8 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
     pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, primes[c], factors, threads);
-    s2 = S2(x, y, z, c, primes, factors, threads);
+    s2_approx = S2_approx(x, s1, p2, pi_y);
+    s2 = S2(x, s2_approx, y, z, c, primes, factors, threads);
   }
 
   if (print_status())

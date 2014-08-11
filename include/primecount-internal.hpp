@@ -13,8 +13,10 @@
 
 #include <ptypes.hpp>
 #include <aligned_vector.hpp>
+#include <pmath.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -297,6 +299,13 @@ T S2_approx(T x, T S1, T P2, int64_t pi_y)
 
 /// Convert a string into an integer of type maxint_t.
 maxint_t to_maxint(const std::string& expr);
+
+template <typename T>
+int get_percent(T low, T limit)
+{
+  int percent = (int) (100.0 * low / std::max<T>(1, limit));
+  return in_between(0, percent, 100);
+}
 
 /// Get the wall time in seconds.
 double get_wtime();
