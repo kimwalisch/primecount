@@ -213,6 +213,7 @@ int64_t get_segment_size(int64_t x, int64_t limit)
 /// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
+           int64_t s2_approx,
            int64_t y,
            int64_t c,
            vector<int32_t>& primes,
@@ -223,13 +224,27 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   threads = validate_threads(threads, limit);
 
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "Computation of the special leaves" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "pre-sieve primes <= " << primes[c] << endl;
+    cout << "sieve limit = " << limit - 1 << endl;
+    cout << "threads = " << threads << endl;
+  }
+
   int64_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
   int64_t segment_size = get_segment_size(x, limit);
   int64_t min_segment_size = segment_size;
   int64_t segments_per_thread = 1;
+
   double relative_standard_deviation = 30;
+  double time = get_wtime();
 
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
@@ -269,8 +284,14 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit);
+        &segments_per_thread, min_segment_size, sqrt_limit);
+
+    if (print_status())
+      print_S2_status(S2_total, s2_approx, relative_standard_deviation);
   }
+
+  if (print_status())
+    print_S2_result(S2_total, get_wtime() - time);
 
   return S2_total;
 }
@@ -320,7 +341,8 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes[c], lpf , mu, threads);
-  int64_t s2 = S2(x, y, c, primes, lpf , mu, threads);
+  int64_t s2_approx = S2_approx(x, s1, p2, pi_y);
+  int64_t s2 = S2(x, s2_approx, y, c, primes, lpf , mu, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

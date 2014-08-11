@@ -94,6 +94,7 @@ int128_t S2(uint128_t x,
     cout << "y = " << y << endl;
     cout << "pre-sieve primes <= " << primes[c] << endl;
     cout << "sieve limit = " << z << endl;
+    cout << "threads = 1" << endl;
   }
 
   // Segmented sieve of Eratosthenes

@@ -70,6 +70,19 @@ int64_t S2(int64_t x,
 {
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
+  double time = get_wtime();
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "Computation of the special leaves" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "pre-sieve primes <= " << primes[c] << endl;
+    cout << "sieve limit = " << limit - 1 << endl;
+    cout << "threads = 1" << endl;
+  }
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
@@ -155,6 +168,12 @@ int64_t S2(int64_t x,
     }
 
     next_segment:;
+  }
+
+  if (print_status())
+  {
+    cout << "S2 = " << S2_result << endl;
+    print_seconds(get_wtime() - time);
   }
 
   return S2_result;
