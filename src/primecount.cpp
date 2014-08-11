@@ -267,9 +267,15 @@ maxint_t to_maxint(const std::string& expr)
   return n;
 }
 
-void reset_line()
+void print_S2_status(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
-  std::cout << '\r' << std::string(60, ' ') << '\r' << std::flush;
+  int percent = get_percent(s2_current, s2_approx);
+  int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+
+  std::cout << std::left << std::setw(25)
+            << "\rStatus: " << percent << "%"
+            << "Load balance: " << load_balance << "%"
+            << std::flush;
 }
 
 void print_seconds(double seconds)

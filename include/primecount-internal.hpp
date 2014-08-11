@@ -314,11 +314,11 @@ int validate_threads(int threads);
 
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
 
-void reset_line();
-
 void print_seconds(double seconds);
 
 void print_megabytes(std::size_t bytes);
+
+void print_S2_status(maxint_t s2_current, maxint_t s2_approx, double rsd);
 
 bool print_status();
 

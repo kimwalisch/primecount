@@ -199,8 +199,7 @@ T P2(T x, int64_t y, int threads)
 
   if (print_status())
   {
-    reset_line();
-    cout << "P2 = " << sum << endl;
+    cout << endl << "P2 = " << sum << endl;
     print_seconds(get_wtime() - time);
   }
 

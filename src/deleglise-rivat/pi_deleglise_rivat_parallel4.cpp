@@ -289,6 +289,17 @@ int128_t S2(int128_t x,
   int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
 
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "pre-sieve primes <= " << primes[c] << endl;
+    cout << "sieve limit = " << z << endl;
+    cout << "threads = " << threads << endl;
+  }
+
   int128_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
@@ -335,13 +346,14 @@ int128_t S2(int128_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit);
+        &segments_per_thread, min_segment_size, sqrt_limit);
 
     if (print_status())
-    {
-      cout << "\rStatus: " << get_percent(S2_total, s2_approx) << '%';
-    }
+      print_S2_status(S2_total, s2_approx, relative_standard_deviation);
   }
+
+  if (print_status())
+    cout << endl << "S2 = " << S2_total << endl;
 
   return S2_total;
 }
