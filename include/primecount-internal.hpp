@@ -135,7 +135,7 @@ int64_t P3(int64_t x, int64_t a, int threads);
 
 void balance_S2_load(double x, double threads, double* old_rsd,
     aligned_vector<double>& timings, int64_t* segment_size, int64_t* segments_per_thread,
-        int64_t min_segment_size, int64_t max_segment_size, int64_t S2_sum);
+        int64_t min_segment_size, int64_t max_segment_size);
 
 template <typename T>
 T S2_approx(T x, T S1, T P2, int64_t pi_y)

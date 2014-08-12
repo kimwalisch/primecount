@@ -343,7 +343,7 @@ int128_t S2(int128_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit, S2_total);
+                    &segments_per_thread, min_segment_size, sqrt_limit);
 
     if (print_status())
       print_percent(S2_total, s2_approx, relative_standard_deviation);
