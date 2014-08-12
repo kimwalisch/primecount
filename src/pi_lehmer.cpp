@@ -11,6 +11,9 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
+#include <iostream>
+
+using namespace std;
 
 namespace primecount {
 
@@ -23,12 +26,25 @@ int64_t pi_lehmer(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<4>(x);
-  int64_t a = pi_meissel(y, /* threads = */ 1);
+  int64_t a = pi_legendre(y, /* threads = */ 1);
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_lehmer(x) ===" << endl;
+    cout << "pi(x) = phi(x, a) + a - 1 - P2 - P3" << endl;
+    cout << "x = " << x << endl;
+    cout << "a = " << a << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
+  }
+
   int64_t phi_xa = phi(x, a, threads);
   int64_t p2 = P2_lehmer(x, a, threads);
   int64_t p3 = P3(x, a, threads);
-
   int64_t sum = phi_xa + a - 1 - p2 - p3;
+
+  if (print_status())
+    cout << endl;
 
   return sum;
 }
@@ -44,12 +60,26 @@ int64_t pi_lehmer2(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<4>(x);
-  int64_t a = pi_meissel(y, /* threads = */ 1);
+  int64_t a = pi_legendre(y, /* threads = */ 1);
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_lehmer2(x) ===" << endl;
+    cout << "pi(x) = phi(x, a) + a - 1 - P2 - P3" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "a = " << a << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
+  }
+
   int64_t phi_xa = phi(x, a, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t p3 = P3(x, a, threads);
-
   int64_t sum = phi_xa + a - 1 - p2 - p3;
+
+  if (print_status())
+    cout << endl;
 
   return sum;
 }

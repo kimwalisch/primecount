@@ -227,6 +227,14 @@ int128_t P2(int128_t x, int64_t y, int threads)
 ///
 int64_t P2_lehmer(int64_t x, int64_t a, int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== P2_lehmer(x, a) ===" << endl;
+    cout << "Computation of the 2nd partial sieve function" << endl;
+  }
+
+  double time = get_wtime();
   vector<int32_t> primes = generate_primes(isqrt(x));
   vector<int64_t> counts(primes.size());
 
@@ -247,6 +255,9 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
     pix += counts[i];
     sum += pix - (i - 1);
   }
+
+  if (print_status())
+    print_result("P2", sum, time);
 
   return sum;
 }

@@ -13,11 +13,14 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
+#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
 #endif
+
+using namespace std;
 
 namespace primecount {
 
@@ -28,6 +31,14 @@ namespace primecount {
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== P3(x, a) ===" << endl;
+    cout << "Computation of the 3rd partial sieve function" << endl;
+  }
+
+  double time = get_wtime();
   std::vector<int32_t> primes = generate_primes(isqrt(x));
   int64_t y = iroot<3>(x);
   int64_t pi_y = pi_bsearch(primes, y);
@@ -43,6 +54,9 @@ int64_t P3(int64_t x, int64_t a, int threads)
     for (int64_t j = i; j <= bi; j++)
       sum += pi_bsearch(primes, xi / primes[j]) - (j - 1);
   }
+
+  if (print_status())
+    print_result("P3", sum, time);
 
   return sum;
 }
