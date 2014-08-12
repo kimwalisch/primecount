@@ -37,7 +37,7 @@ int64_t nth_prime(int64_t n, int threads)
   else
   {
     // Formula due to Dana Jacobsen:
-    // Nth prime ~ Li^-1(n) + Li^-1(sqrt(n)) / 4
+    // Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
     prime_approx = Li_inverse(n) + Li_inverse(isqrt(n)) / 4;
     count_approx = pi(prime_approx, threads);
 
