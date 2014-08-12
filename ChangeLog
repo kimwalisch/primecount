@@ -1,8 +1,9 @@
-2014-08-10 Kim Walisch  <kim.walisch@gmail.com>
+2014-08-12 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.2 work in progress.
 
   * Add --status (-s) command-line option.
+  * src/balance_S2_load.cpp: Improved load balancing.
   * src/deleglise_rivat/*.cpp: Faster starting segment size.
   * src/lmo/*.cpp: Faster starting segment size.
 
