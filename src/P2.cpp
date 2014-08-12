@@ -137,24 +137,19 @@ T P2(T x, int64_t y, int threads)
   if (x < 4 || a >= b)
     return 0;
 
-  int64_t low = 2;
-  int64_t limit = (int64_t)(x / max<int64_t>(1, y));
-  int64_t segment_size = max<int64_t>(1 << 12, isqrt(limit));
-  int64_t segments_per_thread = 1;
-  threads = validate_threads(threads, limit);
-  double time = get_wtime();
-
   if (print_status())
   {
     cout << endl;
     cout << "=== P2(x, y) ===" << endl;
     cout << "Computation of the 2nd partial sieve function" << endl;
-    cout << "pi(y) = " << a << endl;
-    cout << "pi(x^(1/2)) = " << b << endl;
-    cout << "segment size = " << segment_size << endl;
-    cout << "sieve limit = " << limit << endl;
-    cout << "threads = " << threads << endl;
   }
+
+  double time = get_wtime();
+  int64_t low = 2;
+  int64_t limit = (int64_t)(x / max<int64_t>(1, y));
+  int64_t segment_size = max<int64_t>(1 << 12, isqrt(limit));
+  int64_t segments_per_thread = 1;
+  threads = validate_threads(threads, limit);
 
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
@@ -198,7 +193,7 @@ T P2(T x, int64_t y, int threads)
   }
 
   if (print_status())
-    print_result("\nP2", sum, get_wtime() - time);
+    print_result("P2", sum, time);
 
   return sum;
 }

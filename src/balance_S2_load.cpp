@@ -113,12 +113,18 @@ void balance_S2_load(double x,
                      int64_t* segment_size,
                      int64_t* segments_per_thread,
                      int64_t min_segment_size,
-                     int64_t max_segment_size)
+                     int64_t max_segment_size,
+                     int64_t S2_sum)
 {
   double seconds = get_average(timings);
   double rsd = max(0.1, relative_standard_deviation(timings));
   double max_seconds = max(5.0, log(x) * log(threads));
   double decrease_threshold = compute_decrease_threshold(*old_rsd, seconds, threads);
+  *old_rsd = rsd;
+
+  // only balance load if S2 > 0
+  if (S2_sum == 0)
+    return;
 
   // 1 segment per thread
   if (*segment_size < max_segment_size)
@@ -129,18 +135,15 @@ void balance_S2_load(double x,
       if (*segment_size > min_segment_size)
         *segment_size >>= 1;
   }
-  else /* many segments per thread */
+  else // many segments per thread
   {
     double factor = decrease_threshold / rsd;
+    double segments = max(1.0, *segments_per_thread * factor);
     factor = in_between(0.25, factor, 4.0);
-    double segments = *segments_per_thread * factor;
-    segments = max(1.0, segments);
 
     if (adjust_segments(segments, seconds, max_seconds, *segments_per_thread))
       *segments_per_thread = (int) segments;
   }
-
-  *old_rsd = rsd;
 }
 
 } //namespace

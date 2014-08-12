@@ -326,7 +326,7 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit);
+                    &segments_per_thread, min_segment_size, sqrt_limit, S2_total);
   }
 
   return S2_total;

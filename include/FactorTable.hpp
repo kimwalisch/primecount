@@ -32,7 +32,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 #include <limits>
 #include <stdint.h>
 #include <vector>
@@ -125,16 +124,6 @@ private:
     int64_t sqrty = isqrt(y);
     factors_.resize(get_index(y) + 1, T_MAX);
     factors_[0] = T_MAX - 1;
-    double wtime = get_wtime();
-
-    if (print_status())
-    {
-      std::cout << std::endl;
-      std::cout << "=== FactorTable initialization ===" << std::endl;
-      std::cout << "Lookup table for least prime factor and Möbius function" << std::endl;
-      std::cout << "pre-sieve primes <= 7" << std::endl;
-      print_megabytes(factors_.size() * sizeof(T));
-    }
 
     for (std::size_t i = 1; i < factors_.size(); i++)
     {
@@ -169,9 +158,6 @@ private:
         }
       }
     }
-
-    if (print_status())
-      print_seconds(get_wtime() - wtime);
   }
 
   std::vector<T> factors_;

@@ -221,30 +221,24 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  int64_t limit = x / y + 1;
-  threads = validate_threads(threads, limit);
-
   if (print_status())
   {
     cout << endl;
     cout << "=== S2(x, y) ===" << endl;
     cout << "Computation of the special leaves" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "pre-sieve primes <= " << primes[c] << endl;
-    cout << "sieve limit = " << limit - 1 << endl;
-    cout << "threads = " << threads << endl;
   }
 
+  double time = get_wtime();
+  double relative_standard_deviation = 30;
+
+  int64_t limit = x / y + 1;
+  threads = validate_threads(threads, limit);
   int64_t S2_total = 0;
   int64_t low = 1;
   int64_t sqrt_limit = isqrt(limit);
   int64_t segment_size = get_segment_size(x, limit);
   int64_t min_segment_size = segment_size;
   int64_t segments_per_thread = 1;
-
-  double relative_standard_deviation = 30;
-  double time = get_wtime();
 
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
@@ -284,14 +278,14 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-        &segments_per_thread, min_segment_size, sqrt_limit);
+                    &segments_per_thread, min_segment_size, sqrt_limit, S2_total);
 
     if (print_status())
-      print_S2_status(S2_total, s2_approx, relative_standard_deviation);
+      print_percent(S2_total, s2_approx, relative_standard_deviation);
   }
 
   if (print_status())
-    print_S2_result(S2_total, get_wtime() - time);
+    print_result("S2", S2_total, time);
 
   return S2_total;
 }
@@ -321,6 +315,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t z = x / std::max((int64_t) 1, y);
 
   if (print_status())
   {
@@ -329,6 +324,8 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
     cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
     cout << "threads = " << validate_threads(threads) << endl;
   }
 

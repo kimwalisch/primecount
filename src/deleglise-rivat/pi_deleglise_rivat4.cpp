@@ -71,6 +71,14 @@ int128_t S2(uint128_t x,
             vector<P>& primes,
             FactorTable<F>& factors)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2(x, y) ===" << endl;
+    cout << "Computation of the special leaves" << endl;
+  }
+
+  double time = get_wtime();
   PiTable pi(y);
   int64_t pi_y = pi(y);
   int64_t pi_sqrty = pi(isqrt(y));
@@ -83,19 +91,6 @@ int128_t S2(uint128_t x,
   vector<int32_t> counters(segment_size);
   vector<int64_t> next(primes.begin(), primes.begin() + pi_sqrtz + 1);
   vector<int64_t> phi(pi_sqrtz + 1, 0);
-  double time = get_wtime();
-
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2(x, y) ===" << endl;
-    cout << "Computation of the special leaves" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "pre-sieve primes <= " << primes[c] << endl;
-    cout << "sieve limit = " << z << endl;
-    cout << "threads = 1" << endl;
-  }
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -232,7 +227,7 @@ int128_t S2(uint128_t x,
   }
 
   if (print_status())
-    print_result("S2", S2_result, get_wtime() - time);
+    print_result("S2", S2_result, time);
 
   return S2_result;
 }
@@ -275,7 +270,8 @@ int128_t pi_deleglise_rivat4(int128_t x)
     cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
-    cout << "sieve limit = " << z << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
     cout << "threads = 1" << endl;
   }
 

@@ -9,11 +9,9 @@
 ///
 
 #include <PiTable.hpp>
-#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>
-#include <iostream>
 #include <vector>
 
 namespace primecount {
@@ -23,16 +21,6 @@ PiTable::PiTable(uint64_t max) :
 {
   pi_.resize(max_ / 64 + 1);
   primesieve::iterator iter(0, max);
-  double time = get_wtime();
-
-  if (print_status())
-  {
-    std::cout << std::endl;
-    std::cout << "=== PiTable initialization ===" << std::endl;
-    std::cout << "pi(x) lookup table" << std::endl;
-    std::cout << "x <= " << max << std::endl;
-    print_megabytes(pi_.size() * sizeof(PiData));
-  }
 
   uint64_t pix = 0;
   uint64_t prime = 0;
@@ -50,9 +38,6 @@ PiTable::PiTable(uint64_t max) :
     pi_[i].prime_count = pix;
     pix += popcount64(pi_[i].bits);
   }
-
-  if (print_status())
-    print_seconds(get_wtime() - time);
 }
 
 } // namespace

@@ -30,21 +30,17 @@ namespace primecount {
 template <typename T, typename V>
 T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
 {
-  T sum = 0;
-  int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
-  double time = get_wtime();
-
   if (print_status())
   {
     std::cout << std::endl;
     std::cout << "=== S1(x, y) ===" << std::endl;
     std::cout << "Computation of the trivial leaves" << std::endl;
-    std::cout << "x = " << x << std::endl;
-    std::cout << "y = " << y << std::endl;
-    std::cout << "pre-sieve primes <= " << prime_c << std::endl;
-    std::cout << "threads = " << threads << std::endl;
   }
+
+  T sum = 0;
+  int64_t thread_threshold = ipow(10, 6);
+  threads = validate_threads(threads, y, thread_threshold);
+  double time = get_wtime();
 
   #pragma omp parallel for num_threads(threads) reduction (+: sum)
   for (int64_t n = 1; n <= y; n++)
@@ -52,10 +48,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
       sum += mu[n] * phi_tiny(x / n, c);
 
   if (print_status())
-  {
-    std::cout << "S1 = " << sum << std::endl;
-    print_seconds(get_wtime() - time);
-  }
+    print_result("S1", sum, time);
 
   return sum;
 }
@@ -76,22 +69,18 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
     return S1(x, y, c, prime_c, lpf, mu, threads);
   }
 
-  T sum = 0;
-  int64_t limit = factors.get_index(y);
-  int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
-  double time = get_wtime();
-
   if (print_status())
   {
     std::cout << std::endl;
     std::cout << "=== S1(x, y) ===" << std::endl;
     std::cout << "Computation of the trivial leaves" << std::endl;
-    std::cout << "x = " << x << std::endl;
-    std::cout << "y = " << y << std::endl;
-    std::cout << "pre-sieve primes <= " << prime_c << std::endl;
-    std::cout << "threads = " << threads << std::endl;
   }
+
+  T sum = 0;
+  int64_t limit = factors.get_index(y);
+  int64_t thread_threshold = ipow(10, 6);
+  threads = validate_threads(threads, y, thread_threshold);
+  double time = get_wtime();
 
   #pragma omp parallel for num_threads(threads) reduction (+: sum)
   for (int64_t i = factors.get_index(1); i <= limit; i++)
@@ -99,10 +88,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
       sum += factors.mu(i) * phi_tiny(x / factors.get_number(i), c);
 
   if (print_status())
-  {
-    std::cout << "S1 = " << sum << std::endl;
-    print_seconds(get_wtime() - time);
-  }
+    print_result("S1", sum, time);
 
   return sum;
 }

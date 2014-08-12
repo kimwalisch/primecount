@@ -68,21 +68,16 @@ int64_t S2(int64_t x,
            vector<int32_t>& lpf,
            vector<int32_t>& mu)
 {
-  int64_t limit = x / y + 1;
-  int64_t segment_size = next_power_of_2(isqrt(limit));
-  double time = get_wtime();
-
   if (print_status())
   {
     cout << endl;
     cout << "=== S2(x, y) ===" << endl;
     cout << "Computation of the special leaves" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "pre-sieve primes <= " << primes[c] << endl;
-    cout << "sieve limit = " << limit - 1 << endl;
-    cout << "threads = 1" << endl;
   }
+
+  double time = get_wtime();
+  int64_t limit = x / y + 1;
+  int64_t segment_size = next_power_of_2(isqrt(limit));
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
@@ -171,7 +166,7 @@ int64_t S2(int64_t x,
   }
 
   if (print_status())
-    print_result("S2", S2_result, get_wtime() - time);
+    print_result("S2", S2_result, time);
 
   return S2_result;
 }
@@ -201,6 +196,7 @@ int64_t pi_lmo5(int64_t x)
   double alpha = compute_alpha(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t z = x / std::max((int64_t) 1, y);
 
   if (print_status())
   {
@@ -209,6 +205,8 @@ int64_t pi_lmo5(int64_t x)
     cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
     cout << "threads = 1" << endl;
   }
 
