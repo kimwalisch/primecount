@@ -27,6 +27,8 @@
   #include <omp.h>
 #endif
 
+using namespace std;
+
 namespace {
 
 int threads_ = primecount::MAX_THREADS;
@@ -78,7 +80,7 @@ std::string pi(const std::string& x, int threads)
 {
   maxint_t n = to_maxint(x);
   maxint_t pin = pi(n, threads);
-  std::ostringstream oss;
+  ostringstream oss;
   oss << pin;
   return oss.str();
 }
@@ -122,7 +124,7 @@ int128_t pi_deleglise_rivat(int128_t x)
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
   // use 64-bit if possible
-  if (x <= std::numeric_limits<int64_t>::max())
+  if (x <= numeric_limits<int64_t>::max())
     return pi_deleglise_rivat((int64_t) x, threads);
 
   if (threads <= 1)
@@ -212,11 +214,10 @@ int64_t phi(int64_t x, int64_t a)
 std::string max()
 {
 #ifdef HAVE_INT128_T
-  // max = 10^27 if int128_t is supported
-  return std::string("1") + std::string(27, '0');
+  return string("1") + string(27, '0');
 #else
-  std::ostringstream oss;
-  oss << std::numeric_limits<int64_t>::max();
+  ostringstream oss;
+  oss << numeric_limits<int64_t>::max();
   return oss.str();
 #endif
 }
@@ -271,25 +272,25 @@ void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
   int percent = get_percent(s2_current, s2_approx);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
-  std::cout << "\rStatus: " << percent << "%, Load balance: " << load_balance << "%" << std::flush;
+  cout << "\rStatus: " << percent << "%, Load balance: " << load_balance << "%" << flush;
 }
 
 void print_result(const std::string& str, maxint_t res, double time)
 {
-  std::cout << "\rStatus: 100%" << std::string(30, ' ') << std::endl;
-  std::cout << str << " = " << res << std::endl;
+  cout << "\rStatus: 100%" << string(30, ' ') << endl;
+  cout << str << " = " << res << endl;
   print_seconds(get_wtime() - time);
 }
 
 void print_seconds(double seconds)
 {
-  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
+  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
 }
 
 void print_megabytes(std::size_t bytes)
 {
   double megabytes = bytes / (double) (1 << 20);
-  std::cout << "memory usage = " << std::fixed << std::setprecision(3) << megabytes << " megabytes" << std::endl;
+  cout << "memory usage = " << fixed << setprecision(3) << megabytes << " megabytes" << endl;
 }
 
 void set_print_status(bool print_status)
