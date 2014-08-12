@@ -39,9 +39,9 @@ int64_t pi_meissel(int64_t x, int threads)
     cout << "threads = " << validate_threads(threads) << endl;
   }
 
-  int64_t phi_xa = phi(x, a, threads);
+  int64_t p1 = phi(x, a, threads, print_status());
   int64_t p2 = P2(x, y, threads);
-  int64_t sum = phi_xa + a - 1 - p2;
+  int64_t sum = p1 + a - 1 - p2;
 
   if (print_status())
     cout << endl;
