@@ -3,9 +3,7 @@
   Version 1.2 work in progress.
 
   * Add --status (-s) command-line option.
-  * src/balance_S2_load.cpp: Improved load balancing.
-  * src/deleglise_rivat/*.cpp: Faster starting segment size.
-  * src/lmo/*.cpp: Faster starting segment size.
+  * src/S2LoadBalancer.cpp: New faster load balancer.
 
 2014-08-06 Kim Walisch  <kim.walisch@gmail.com>
 
