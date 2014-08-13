@@ -250,17 +250,6 @@ int64_t S2_thread(int64_t x,
   return S2_thread;
 }
 
-/// Calculate a tiny starting segment_size in order to
-/// evenly balance the work load.
-///
-int64_t get_segment_size(int64_t x, int64_t limit)
-{
-  int64_t divisor = ilog(x) * ilog(ilog(x));
-  int64_t segment_size = isqrt(limit) / max((int64_t) 1, divisor);
-  segment_size = max((int64_t) (1 << 9), segment_size);
-  return next_power_of_2(segment_size);
-}
-
 /// Calculate the contribution of the special leaves.
 /// This is a parallel implementation with advanced load balancing.
 /// As most special leaves tend to be in the first segments we
