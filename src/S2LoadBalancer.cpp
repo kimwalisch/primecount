@@ -66,7 +66,8 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 namespace primecount {
 
 S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z) :
-  x_((double) x)
+  x_((double) x),
+  rsd_(40)
 {
   double divisor = log(x_) * log(log(x_));
   int64_t size = (int64_t) (isqrt(z) / max(1.0, divisor));
