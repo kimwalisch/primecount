@@ -29,7 +29,6 @@ EXTRA_DIST = \
 	README.md
 
 libprimecount_la_SOURCES = \
-	src/balance_S2_load.cpp \
 	src/BitSieve.cpp \
 	src/FactorTable.cpp \
 	src/generate.cpp \
@@ -46,6 +45,7 @@ libprimecount_la_SOURCES = \
 	src/pi_lehmer.cpp \
 	src/phi.cpp \
 	src/primecount.cpp \
+	src/S2LoadBalancer.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
@@ -75,6 +75,7 @@ libprimecount_la_SOURCES = \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
 	include/S1.hpp \
+	include/S2LoadBalancer.hpp \
 	include/tos_counters.hpp
 
 if HAVE_INT128_T

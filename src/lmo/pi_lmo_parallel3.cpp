@@ -18,6 +18,7 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
+#include <S2LoadBalancer.hpp>
 #include <tos_counters.hpp>
 
 #include <stdint.h>
@@ -228,18 +229,16 @@ int64_t S2(int64_t x,
     cout << "Computation of the special leaves" << endl;
   }
 
-  double time = get_wtime();
-  double relative_standard_deviation = 30;
-
-  int64_t limit = x / y + 1;
-  threads = validate_threads(threads, limit);
   int64_t S2_total = 0;
   int64_t low = 1;
-  int64_t sqrt_limit = isqrt(limit);
-  int64_t segment_size = get_segment_size(x, limit);
-  int64_t min_segment_size = segment_size;
+  int64_t limit = x / y + 1;
+  threads = validate_threads(threads, limit);
+
+  S2LoadBalancer loadBalancer(x, limit);
+  int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
 
+  double time = get_wtime();
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
 
@@ -277,11 +276,10 @@ int64_t S2(int64_t x,
     }
 
     low += segments_per_thread * threads * segment_size;
-    balance_S2_load((double) x, threads, &relative_standard_deviation, timings, &segment_size,
-                    &segments_per_thread, min_segment_size, sqrt_limit);
+    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
     if (print_status())
-      print_percent(S2_total, s2_approx, relative_standard_deviation);
+      print_percent(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
   if (print_status())
