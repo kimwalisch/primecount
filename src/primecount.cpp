@@ -272,12 +272,17 @@ void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
   int percent = get_percent(s2_current, s2_approx);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
-  cout << "\rStatus: " << percent << "%, Load balance: " << load_balance << "%" << flush;
+  ostringstream oss;
+  oss << "\r" << string(40,' ');
+  oss << "\rStatus: " << percent << "%, ";
+  oss << "Load balance: " << load_balance << "%";
+  cout << oss.str() << flush;
 }
 
 void print_result(const std::string& str, maxint_t res, double time)
 {
-  cout << "\rStatus: 100%" << string(30, ' ') << endl;
+  cout << "\r" << string(40,' ') << "\r";
+  cout << "Status: 100%" << endl;
   cout << str << " = " << res << endl;
   print_seconds(get_wtime() - time);
 }
