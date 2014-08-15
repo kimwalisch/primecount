@@ -297,12 +297,6 @@ void print_seconds(double seconds)
   cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
 }
 
-void print_megabytes(std::size_t bytes)
-{
-  double megabytes = bytes / (double) (1 << 20);
-  cout << "memory usage = " << fixed << setprecision(3) << megabytes << " megabytes" << endl;
-}
-
 void set_print_status(bool print_status)
 {
   print_status_ = print_status;
