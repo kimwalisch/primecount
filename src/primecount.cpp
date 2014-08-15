@@ -270,11 +270,16 @@ maxint_t to_maxint(const std::string& expr)
 
 void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
-  int percent = get_percent(s2_current, s2_approx);
+  double percent = get_percent((double) s2_current, (double) s2_approx);
+  double base = 0.95 + percent / 2000;
+  double min = pow(base, 100.0);
+  double max = pow(base, 0.0);
+  percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (max - min), 100);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+
   ostringstream oss;
-  oss << "\r" << string(40,' ');
-  oss << "\rStatus: " << percent << "%, ";
+  oss << "\r" << string(40,' ') << "\r";
+  oss << "Status: " << (int) percent << "%, ";
   oss << "Load balance: " << load_balance << "%";
   cout << oss.str() << flush;
 }
