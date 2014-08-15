@@ -271,7 +271,7 @@ maxint_t to_maxint(const std::string& expr)
 void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd)
 {
   double percent = get_percent((double) s2_current, (double) s2_approx);
-  double base = 0.95 + percent / 2000;
+  double base = 0.95 + percent / 2100;
   double min = pow(base, 100.0);
   double max = pow(base, 0.0);
   percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (max - min), 100);
