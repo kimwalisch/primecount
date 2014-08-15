@@ -133,27 +133,6 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 
 int64_t P3(int64_t x, int64_t a, int threads);
 
-void balance_S2_load(double x, double threads, double* old_rsd,
-    aligned_vector<double>& timings, int64_t* segment_size, int64_t* segments_per_thread,
-        int64_t min_segment_size, int64_t max_segment_size);
-
-template <typename T>
-T S2_approx(T x, T S1, T P2, int64_t pi_y)
-{
-  T pix = Li(x);
-  T S2 = pix - S1 - pi_y + 1 + P2;
-  return S2;
-}
-
-template <typename T>
-int get_percent(T low, T limit)
-{
-  int percent = (int) (100.0 * low / std::max<T>(1, limit));
-  return in_between(0, percent, 100);
-}
-
-maxint_t to_maxint(const std::string& expr);
-
 double get_wtime();
 
 int validate_threads(int threads);
@@ -169,6 +148,23 @@ void print_megabytes(std::size_t bytes);
 void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd);
 
 bool print_status();
+
+maxint_t to_maxint(const std::string& expr);
+
+template <typename T>
+T S2_approx(T x, T S1, T P2, int64_t pi_y)
+{
+  T pix = Li(x);
+  T S2 = pix - S1 - pi_y + 1 + P2;
+  return S2;
+}
+
+template <typename T>
+T get_percent(T low, T limit)
+{
+  T percent = (T) (100.0 * low / std::max<T>(1, limit));
+  return in_between(0, percent, 100);
+}
 
 } // namespace primecount
 
