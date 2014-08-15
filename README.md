@@ -192,13 +192,16 @@ SHA1 checksums of the files:
 Open a terminal and run the primecount command-line application using e.g.:
 ```sh
 # Count the primes below 10^14
-$ ./primecount 10**14
+$ ./primecount 1e14
 
-# Count the primes below 10^14 using Meissel's algorithm
-$ ./primecount 10**14 --meissel
+# Print progress and status information during computation
+$ ./primecount 1e20 --status
+
+# Count the primes using Meissel's algorithm
+$ ./primecount 1e14 --meissel
 
 # Find the 10^14th prime
-$ ./primecount 10**14 --nthprime
+$ ./primecount 1e14 --nthprime --time
 
 # Print an option summary
 $ ./primecount --help
