@@ -123,6 +123,19 @@ T P2_thread(T x,
   return P2_thread;
 }
 
+void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
+{
+  double time2 = get_wtime();
+  double seconds = time2 - seconds1;
+  double time = time2 - time1;
+  double increase_threshold = in_between(0.3, time / 100, 20);
+
+  if (seconds < increase_threshold)
+    *segments_per_thread += *segments_per_thread * 3;
+  else if (*segments_per_thread >= 4)
+    *segments_per_thread -= *segments_per_thread / 4;
+}
+
 /// 2nd partial sieve function.
 /// P2(x, y) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime, a = pi(y).
@@ -173,7 +186,7 @@ T P2(T x, int64_t y, int threads)
          low, limit, pix[i], pix_counts[i], primes);
 
     low += segments_per_thread * threads * segment_size;
-    seconds = get_wtime() - seconds;
+    balanceLoad(&segments_per_thread, seconds, time);
 
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
@@ -181,12 +194,6 @@ T P2(T x, int64_t y, int threads)
       sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
-
-    // Adjust thread load balancing
-    if (seconds < 10)
-      segments_per_thread *= 2;
-    else if (seconds > 30 && segments_per_thread > 1)
-      segments_per_thread /= 2;
 
     if (print_status())
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
