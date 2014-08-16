@@ -101,8 +101,8 @@ bool S2LoadBalancer::increase_size(double seconds, double max_seconds, double de
 /// Synchronize threads after at most max_seconds
 double S2LoadBalancer::get_max_seconds(int64_t threads) const
 {
-  double t = (double) threads;
-  return max(5.0, log(x_) * log(t));
+  double log_threads = log10((double) threads);
+  return max(2.0, log10(x_) * max(1.0, log_threads));
 }
 
 /// Used to decide whether to use a smaller or larger
