@@ -117,8 +117,9 @@ bool S2LoadBalancer::increase_size(double seconds, double decrease) const
 double S2LoadBalancer::get_decrease_threshold(double seconds, int64_t threads) const
 {
   double log_threads = log((double) threads);
-  double dividend = max(0.3, log_threads / 4.0);
-  double dont_decrease = min(dividend / seconds, rsd_);
+  double log_seconds = max(min_seconds_, log(seconds));
+  double dividend = max(0.5, log_threads / 3.0);
+  double dont_decrease = min(dividend / (seconds * log_seconds), rsd_);
   return rsd_ + dont_decrease;
 }
 
