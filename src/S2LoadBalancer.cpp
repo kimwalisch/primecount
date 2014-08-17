@@ -111,8 +111,8 @@ double S2LoadBalancer::get_max_seconds(int64_t threads) const
 double S2LoadBalancer::get_decrease_threshold(double seconds, int64_t threads) const
 {
   double t = (double) threads;
-  double dividend = max(0.7, log(t) / 3);
-  double quotient = max(1.0, dividend / (seconds * log(seconds)));
+  double dividend = max(0.5, log(t) / 4);
+  double quotient = max(0.5, dividend / (seconds * log(seconds)));
   double dont_decrease = min(quotient, dividend * 10);
   return rsd_ + dont_decrease;
 }
