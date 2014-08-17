@@ -25,7 +25,6 @@ public:
   S2LoadBalancer(maxint_t x, int64_t sqrtz);
   int64_t get_min_segment_size() const;
   double get_rsd() const;
-  double get_max_seconds(int64_t threads) const;
   void update(int64_t low,
               int64_t threads,
               int64_t* segment_size,
@@ -33,13 +32,17 @@ public:
               aligned_vector<double>& timings);
 private:
   void set_min_size(int64_t z);
+  void update_avg_seconds(double seconds);
   double get_decrease_threshold(double seconds, int64_t threads) const;
-  bool increase_size(double seconds, double max_seconds, double decrease) const;
+  bool increase_size(double seconds, double decrease) const;
   bool decrease_size(double seconds, double decrease) const;
   double x_;
   double rsd_;
+  double avg_seconds_;
+  double min_seconds_;
   int64_t min_size_;
   int64_t max_size_;
+  int64_t count_;
 };
 
 } // namespace
