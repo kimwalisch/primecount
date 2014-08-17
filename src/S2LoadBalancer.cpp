@@ -67,10 +67,13 @@ namespace primecount {
 
 S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z) :
   x_((double) x),
-  rsd_(40)
+  rsd_(40),
+  avg_seconds_(0),
+  min_seconds_(0.03),
+  count_(0)
 {
-  double divisor = log(x_) * log(log(x_));
-  int64_t size = (int64_t) (isqrt(z) / max(1.0, divisor));
+  double divisor = max(1.0, log(x_));
+  int64_t size = (int64_t) (isqrt(z) / divisor);
   size = max((int64_t) (1 << 9), size);
 
   min_size_ = next_power_of_2(size);
@@ -87,22 +90,25 @@ int64_t S2LoadBalancer::get_min_segment_size() const
   return min_size_;
 }
 
+void S2LoadBalancer::update_avg_seconds(double seconds)
+{
+  if (seconds < min_seconds_)
+    seconds = min_seconds_;
+  double dividend = avg_seconds_ * count_ + seconds;
+  avg_seconds_ = dividend / (count_ + 1);
+  count_++;
+}
+
 bool S2LoadBalancer::decrease_size(double seconds, double decrease) const
 {
-  return seconds > 0.01 && rsd_ > decrease;
+  return seconds > min_seconds_ &&
+         rsd_ > decrease;
 }
 
-bool S2LoadBalancer::increase_size(double seconds, double max_seconds, double decrease) const
+bool S2LoadBalancer::increase_size(double seconds, double decrease) const
 {
-  return seconds < max_seconds &&
+  return seconds < avg_seconds_ &&
         !decrease_size(seconds, decrease);
-}
-
-/// Synchronize threads after at most max_seconds
-double S2LoadBalancer::get_max_seconds(int64_t threads) const
-{
-  double log_threads = log10((double) threads);
-  return max(2.0, log10(x_) * max(1.0, log_threads));
 }
 
 /// Used to decide whether to use a smaller or larger
@@ -110,10 +116,9 @@ double S2LoadBalancer::get_max_seconds(int64_t threads) const
 ///
 double S2LoadBalancer::get_decrease_threshold(double seconds, int64_t threads) const
 {
-  double t = (double) threads;
-  double dividend = max(0.5, log(t) / 4);
-  double quotient = max(dividend, dividend / (seconds * log(seconds)));
-  double dont_decrease = min(quotient, dividend * 10);
+  double log_threads = log((double) threads);
+  double dividend = max(0.3, log_threads / 4.0);
+  double dont_decrease = min(dividend / seconds, rsd_);
   return rsd_ + dont_decrease;
 }
 
@@ -128,14 +133,14 @@ void S2LoadBalancer::update(int64_t low,
                             aligned_vector<double>& timings)
 {
   double seconds = get_average(timings);
-  double max_seconds = get_max_seconds(threads);
+  update_avg_seconds(seconds);
   double decrease_threshold = get_decrease_threshold(seconds, threads);
   rsd_ = max(0.1, relative_standard_deviation(timings));
 
   // 1 segment per thread
   if (*segment_size < max_size_)
   {
-    if (increase_size(seconds, max_seconds, decrease_threshold))
+    if (increase_size(seconds, decrease_threshold))
       *segment_size <<= 1;
     else if (decrease_size(seconds, decrease_threshold))
       if (*segment_size > min_size_)
@@ -150,13 +155,15 @@ void S2LoadBalancer::update(int64_t low,
   else // many segments per thread
   {
     double factor = decrease_threshold / rsd_;
-    factor = in_between(0.25, factor, 4.0);
+    factor = in_between(0.5, factor, 2);
     double n = *segments_per_thread * factor;
     n = max(1.0, n);
 
-    if ((n < *segments_per_thread && seconds > 0.01) ||
-        (n > *segments_per_thread && seconds < max_seconds))
+    if ((n < *segments_per_thread && seconds > min_seconds_) ||
+        (n > *segments_per_thread && seconds < avg_seconds_))
+    {
       *segments_per_thread = (int) n;
+    }
   }
 }
 
