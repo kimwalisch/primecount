@@ -31,8 +31,7 @@ void S2Status::print(maxint_t s2_current, double rsd)
   double percent = get_percent((double) s2_current, s2_approx_);
   double base = 0.96 + percent / (101 / (1 - 0.96));
   double min = pow(base, 100.0);
-  double max = pow(base, 0.0);
-  percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (max - min), 100);
+  percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (1 - min), 100);
   percent_ = std::max(percent_, (int) percent);
 
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
