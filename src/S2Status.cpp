@@ -38,7 +38,7 @@ void S2Status::print(maxint_t s2_current, double rsd)
 
   ostringstream oss;
   oss << "\r" << string(40,' ') << "\r";
-  oss << "Status: " << (int) percent_ << "%, ";
+  oss << "Status: " << percent_ << "%, ";
   oss << "Load balance: " << load_balance << "%";
   cout << oss.str() << flush;
 }
