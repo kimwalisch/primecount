@@ -46,6 +46,7 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/primecount.cpp \
 	src/S2LoadBalancer.cpp \
+	src/S2Status.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
@@ -75,6 +76,7 @@ libprimecount_la_SOURCES = \
 	include/PiTable.hpp \
 	include/S1.hpp \
 	include/S2LoadBalancer.hpp \
+	include/S2Status.hpp \
 	include/tos_counters.hpp
 
 if HAVE_INT128_T

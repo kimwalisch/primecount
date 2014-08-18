@@ -143,8 +143,6 @@ void print_result(const std::string& str, maxint_t res, double time);
 
 void print_seconds(double seconds);
 
-void print_percent(maxint_t s2_current, maxint_t s2_approx, double rsd);
-
 bool print_status();
 
 maxint_t to_maxint(const std::string& expr);

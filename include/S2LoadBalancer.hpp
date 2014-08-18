@@ -14,7 +14,6 @@
 #include <ptypes.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <vector>
 
 namespace primecount {

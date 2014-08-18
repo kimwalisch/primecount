@@ -23,6 +23,7 @@
 #include <ptypes.hpp>
 #include <S1.hpp>
 #include <S2LoadBalancer.hpp>
+#include <S2Status.hpp>
 #include <tos_counters.hpp>
 
 #include <stdint.h>
@@ -288,6 +289,7 @@ int128_t S2(int128_t x,
   int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
 
+  S2Status s2Status(s2_approx);
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -333,7 +335,7 @@ int128_t S2(int128_t x,
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
     if (print_status())
-      print_percent(S2_total, s2_approx, loadBalancer.get_rsd());
+      s2Status.print(S2_total, loadBalancer.get_rsd());
   }
 
   if (print_status())
