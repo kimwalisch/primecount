@@ -65,19 +65,17 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 
 namespace primecount {
 
-S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z) :
+S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
   x_((double) x),
+  z_((double) z),
   rsd_(40),
   avg_seconds_(0),
-  min_seconds_(0.03),
   count_(0)
 {
-  double divisor = max(1.0, log(x_));
-  int64_t size = (int64_t) (isqrt(z) / divisor);
-  size = max((int64_t) (1 << 9), size);
-
-  min_size_ = next_power_of_2(size);
+  double log_threads = max(1.0, log((double) threads));
+  min_seconds_ = 0.02 * log_threads;
   max_size_ = next_power_of_2(isqrt(z));
+  update_min_size(log(x_) * log(log(x_)));
 }
 
 double S2LoadBalancer::get_rsd() const
@@ -90,15 +88,6 @@ int64_t S2LoadBalancer::get_min_segment_size() const
   return min_size_;
 }
 
-void S2LoadBalancer::update_avg_seconds(double seconds)
-{
-  if (seconds < min_seconds_)
-    seconds = min_seconds_;
-  double dividend = avg_seconds_ * count_ + seconds;
-  avg_seconds_ = dividend / (count_ + 1);
-  count_++;
-}
-
 bool S2LoadBalancer::decrease_size(double seconds, double decrease) const
 {
   return seconds > min_seconds_ &&
@@ -109,6 +98,21 @@ bool S2LoadBalancer::increase_size(double seconds, double decrease) const
 {
   return seconds < avg_seconds_ &&
         !decrease_size(seconds, decrease);
+}
+
+void S2LoadBalancer::update_avg_seconds(double seconds)
+{
+  seconds = max(seconds, min_seconds_);
+  double dividend = avg_seconds_ * count_ + seconds;
+  avg_seconds_ = dividend / (count_ + 1);
+  count_++;
+}
+
+void S2LoadBalancer::update_min_size(double divisor)
+{
+  double size = sqrt(z_) / max(1.0, divisor);
+  min_size_ = max((int64_t) (1 << 9), (int64_t) size);
+  min_size_ = next_power_of_2(min_size_);
 }
 
 /// Used to decide whether to use a smaller or larger
@@ -137,6 +141,11 @@ void S2LoadBalancer::update(int64_t low,
   update_avg_seconds(seconds);
   double decrease_threshold = get_decrease_threshold(seconds, threads);
   rsd_ = max(0.1, relative_standard_deviation(timings));
+
+  // if low > sqrt(z) we use a larger min_size_ as the
+  // special leaves are distributed more evenly
+  if (low > max_size_)
+    update_min_size(log(x_));
 
   // 1 segment per thread
   if (*segment_size < max_size_)
