@@ -75,14 +75,13 @@ T Li_inverse(T x)
   if (x < 1)
     return 0;
 
-  long double logx = log((long double) x);
-
-  // Calculate lower and upper bounds
+  long double logx = max(1.0, log((double) x));
   T first = (T) (x * logx);
   T last  = (T) (x * logx * 2 + 2);
 
-  if (last <= first)
-    last = numeric_limits<T>::max();
+  // overflow
+  if (first < x) return -1;
+  if (last  < x) last = numeric_limits<T>::max();
 
   // Find Li^-1(x) using binary search
   while (first < last)
