@@ -31,8 +31,8 @@ typedef int128_t maxint_t;
 
 namespace primecount {
 
-typedef  __int128_t  maxint_t;
-typedef  __int128_t  int128_t;
+typedef __int128_t maxint_t;
+typedef __int128_t int128_t;
 typedef __uint128_t uint128_t;
 
 inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
@@ -52,9 +52,10 @@ inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
 inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
   std::string str;
+  std::string sign = "";
   if (n < 0)
   {
-    str += '-';
+    sign = "-";
     n = -n;
   }
   while (n > 0)
@@ -64,7 +65,7 @@ inline std::ostream& operator<<(std::ostream& stream, int128_t n)
   }
   if (str.empty())
     str = "0";
-  stream << std::string(str.rbegin(), str.rend());
+  stream << sign << std::string(str.rbegin(), str.rend());
   return stream;
 }
 
