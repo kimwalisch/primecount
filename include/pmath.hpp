@@ -103,6 +103,20 @@ inline T isqrt(T x)
   return r;
 }
 
+/// Check if ipow(x, n) <= limit
+template <typename T>
+inline bool ipow_less_equal(T x, int n, T limit)
+{
+  if (limit <= 0)
+    return false;
+
+  for (T r = 1; n > 0; n--, r *= x)
+    if (r > limit / x)
+      return false;
+
+  return true;
+}
+
 /// Integer nth root
 template <int N, typename T>
 inline T iroot(T x)
@@ -110,7 +124,7 @@ inline T iroot(T x)
   T r = (T) std::pow((double) x, 1.0 / N);
   while (ipow(r, N) > x)
     r--;
-  while (ipow(r + 1, N) <= x)
+  while (ipow_less_equal(r + 1, N, x))
     r++;
   return r;
 }
