@@ -98,7 +98,7 @@ inline T isqrt(T x)
   T r = (T) std::sqrt((double) x);
   while (r * r > x)
     r--;
-  while (r * r < x - r * 2)
+  while (x - r * r > r * 2)
     r++;
   return r;
 }
