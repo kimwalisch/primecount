@@ -1,10 +1,11 @@
-2014-08-18 Kim Walisch  <kim.walisch@gmail.com>
+2014-08-20 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.2 work in progress.
 
   * Add --status (-s) command-line option.
   * src/S2LoadBalancer.cpp: New faster load balancer.
   * src/S2Status.cpp: Print S2 progress.
+  * Fixed integer overflow bugs in: Li_inverse(x), isqrt(x), iroot(x)
 
 2014-08-06 Kim Walisch  <kim.walisch@gmail.com>
 
