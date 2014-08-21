@@ -9,7 +9,7 @@
 ///
 
 #include <primecount.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>

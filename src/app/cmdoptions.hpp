@@ -11,7 +11,7 @@
 #define PRIMECOUNT_CMDOPTIONS_HPP
 
 #include <primecount.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 #include <stdint.h>
 
 namespace primecount {

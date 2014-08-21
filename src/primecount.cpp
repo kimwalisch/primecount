@@ -11,7 +11,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <calculator.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 #include <pmath.hpp>
 
 #include <algorithm>

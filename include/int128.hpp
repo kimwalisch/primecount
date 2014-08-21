@@ -1,5 +1,5 @@
 ///
-/// @file   ptypes.hpp
+/// @file   int128.hpp
 /// @brief  Convenience functions and typedefs for the non standard
 ///         __int128_t & __uint128_t integer types.
 ///
@@ -19,6 +19,7 @@
 namespace primecount {
 
 typedef int128_t maxint_t;
+typedef uint128_t maxuint_t;
 
 }
 
@@ -31,41 +32,37 @@ typedef int128_t maxint_t;
 
 namespace primecount {
 
-typedef __int128_t maxint_t;
 typedef __int128_t int128_t;
 typedef __uint128_t uint128_t;
+typedef __int128_t maxint_t;
+typedef __uint128_t maxuint_t;
 
 inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
 {
   std::string str;
+
   while (n > 0)
   {
     str += '0' + n % 10;
     n /= 10;
   }
+
   if (str.empty())
     str = "0";
+
   stream << std::string(str.rbegin(), str.rend());
   return stream;
 }
 
 inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
-  std::string str;
-  std::string sign = "";
   if (n < 0)
   {
-    sign = "-";
+    stream << "-";
     n = -n;
   }
-  while (n > 0)
-  {
-    str += '0' + n % 10;
-    n /= 10;
-  }
-  if (str.empty())
-    str = "0";
-  stream << sign << std::string(str.rbegin(), str.rend());
+
+  stream << (uint128_t) n;
   return stream;
 }
 
@@ -76,6 +73,7 @@ inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 namespace primecount {
 
 typedef int64_t maxint_t;
+typedef int64_t maxuint_t;
 
 }
 

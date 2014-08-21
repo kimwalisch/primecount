@@ -11,7 +11,7 @@
 #ifndef PRIMECOUNT_INTERNAL_HPP
 #define PRIMECOUNT_INTERNAL_HPP
 
-#include <ptypes.hpp>
+#include <int128.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
 

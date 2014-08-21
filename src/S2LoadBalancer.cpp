@@ -18,7 +18,7 @@
 #include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>

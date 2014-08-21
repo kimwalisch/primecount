@@ -10,7 +10,7 @@
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
 
-#include <ptypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <cassert>

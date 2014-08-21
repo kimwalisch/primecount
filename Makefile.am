@@ -67,10 +67,10 @@ libprimecount_la_SOURCES = \
 	include/calculator.hpp \
 	include/FactorTable.hpp \
 	include/generate.hpp \
+	include/int128.hpp \
 	include/popcount.hpp \
 	include/pmath.hpp \
 	include/primecount-internal.hpp \
-	include/ptypes.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \

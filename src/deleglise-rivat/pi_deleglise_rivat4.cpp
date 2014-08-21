@@ -19,7 +19,7 @@
 #include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 #include <S1.hpp>
 #include <tos_counters.hpp>
 

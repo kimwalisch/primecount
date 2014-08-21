@@ -14,7 +14,7 @@
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>

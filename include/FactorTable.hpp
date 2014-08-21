@@ -28,7 +28,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <pmath.hpp>
-#include <ptypes.hpp>
+#include <int128.hpp>
 
 #include <algorithm>
 #include <cassert>
