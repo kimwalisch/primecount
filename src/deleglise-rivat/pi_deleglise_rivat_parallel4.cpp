@@ -284,7 +284,7 @@ int128_t S2(int128_t x,
     cout << "Computation of the special leaves" << endl;
   }
 
-  int64_t S2_total = 0;
+  int128_t S2_total = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
   threads = validate_threads(threads, limit);
