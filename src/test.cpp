@@ -82,18 +82,13 @@ void test_phi_thread_safety(int64_t iters)
 #ifdef _OPENMP
   cout << "Testing phi(x, a)" << flush;
 
-  int nested_threads = 2;
   int64_t single_thread_sum = 0;
   int64_t multi_thread_sum = 0;
   int64_t base = 1000000;
 
-  omp_set_nested(true);
-
   #pragma omp parallel for reduction(+: multi_thread_sum)
   for (int64_t i = 0; i < iters; i++)
-    multi_thread_sum += pi_legendre(base + i, nested_threads);
-
-  omp_set_nested(false);
+    multi_thread_sum += pi_legendre(base + i, 1);
 
   for (int64_t i = 0; i < iters; i++)
     single_thread_sum += pi_legendre(base + i, 1);
