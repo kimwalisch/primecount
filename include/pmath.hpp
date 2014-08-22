@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <limits>
 #include <cassert>
 #include <cmath>
 #include <vector>
@@ -96,6 +97,8 @@ template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
+  T max_r = std::numeric_limits<T>::max() >> (sizeof(T) / 2);
+  r = std::min(r, max_r);
   while (r * r > x)
     r--;
   while (x - r * r > r * 2)
