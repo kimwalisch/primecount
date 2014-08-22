@@ -14,6 +14,14 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
+#include <algorithm>
+#include <string>
+
+namespace {
+
+const std::string max_n = "216289611853439384";
+
+}
 
 namespace primecount {
 
@@ -23,14 +31,15 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  if (n < 1)
-    n = 1;
+  if (n > to_maxint(max_n))
+    throw primecount_error("nth_prime(n): n must be <= " + max_n);
+
+  primesieve::set_num_threads(threads);
+  n = std::max((int64_t) 1, n);
 
   int64_t prime = 0;
   int64_t prime_approx = 0;
   int64_t count_approx = 0;
-
-  primesieve::set_num_threads(threads);
 
   if (n < 100000)
     prime = primesieve::parallel_nth_prime(n, 0);

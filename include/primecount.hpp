@@ -74,6 +74,7 @@ int64_t pi_primesieve(int64_t x);
 /// Calculate the nth prime using a combination of an efficient prime
 /// counting function implementation and the sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/2)) space.
+/// @pre n <= 216289611853439384
 ///
 int64_t nth_prime(int64_t n);
 
