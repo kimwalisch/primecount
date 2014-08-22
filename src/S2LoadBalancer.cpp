@@ -145,7 +145,10 @@ void S2LoadBalancer::update(int64_t low,
   // if low > sqrt(z) we use a larger min_size_ as the
   // special leaves are distributed more evenly
   if (low > max_size_)
+  {
     update_min_size(log(x_));
+    *segment_size = max(*segment_size, min_size_);
+  }
 
   // 1 segment per thread
   if (*segment_size < max_size_)
