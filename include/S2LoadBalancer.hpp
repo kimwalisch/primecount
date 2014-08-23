@@ -33,7 +33,7 @@ private:
   void set_min_size(int64_t z);
   void update_avg_seconds(double seconds);
   void update_min_size(double divisor);
-  double get_decrease_threshold(double seconds, int64_t threads) const;
+  double get_decrease_threshold(double seconds) const;
   bool increase_size(double seconds, double decrease) const;
   bool decrease_size(double seconds, double decrease) const;
   double x_;
@@ -41,6 +41,7 @@ private:
   double rsd_;
   double avg_seconds_;
   double min_seconds_;
+  double decrease_dividend_;
   int64_t min_size_;
   int64_t max_size_;
   int64_t count_;

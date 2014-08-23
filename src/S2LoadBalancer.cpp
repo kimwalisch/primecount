@@ -73,6 +73,7 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
   count_(0)
 {
   double log_threads = max(1.0, log((double) threads));
+  decrease_dividend_ = log_threads / 5.0;
   min_seconds_ = 0.02 * log_threads;
   max_size_ = next_power_of_2(isqrt(z));
   update_min_size(log(x_) * log(log(x_)));
@@ -91,6 +92,7 @@ int64_t S2LoadBalancer::get_min_segment_size() const
 bool S2LoadBalancer::decrease_size(double seconds, double decrease) const
 {
   return seconds > min_seconds_ &&
+         rsd_ > decrease_dividend_ &&
          rsd_ > decrease;
 }
 
@@ -118,12 +120,10 @@ void S2LoadBalancer::update_min_size(double divisor)
 /// Used to decide whether to use a smaller or larger
 /// segment_size and/or segments_per_thread.
 ///
-double S2LoadBalancer::get_decrease_threshold(double seconds, int64_t threads) const
+double S2LoadBalancer::get_decrease_threshold(double seconds) const
 {
-  double log_threads = log((double) threads);
   double log_seconds = max(min_seconds_, log(seconds));
-  double dividend = max(0.1, log_threads / 4.0);
-  double dont_decrease = min(dividend / (seconds * log_seconds), rsd_);
+  double dont_decrease = min(decrease_dividend_ / (seconds * log_seconds), rsd_);
   return rsd_ + dont_decrease;
 }
 
@@ -139,7 +139,7 @@ void S2LoadBalancer::update(int64_t low,
 {
   double seconds = get_average(timings);
   update_avg_seconds(seconds);
-  double decrease_threshold = get_decrease_threshold(seconds, threads);
+  double decrease_threshold = get_decrease_threshold(seconds);
   rsd_ = max(0.1, relative_standard_deviation(timings));
 
   // if low > sqrt(z) we use a larger min_size_ as the
