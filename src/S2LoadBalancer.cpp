@@ -73,7 +73,7 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
   count_(0)
 {
   double log_threads = max(1.0, log((double) threads));
-  decrease_dividend_ = log_threads / 5.0;
+  decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
   max_size_ = next_power_of_2(isqrt(z));
   update_min_size(log(x_) * log(log(x_)));
@@ -92,7 +92,6 @@ int64_t S2LoadBalancer::get_min_segment_size() const
 bool S2LoadBalancer::decrease_size(double seconds, double decrease) const
 {
   return seconds > min_seconds_ &&
-         rsd_ > decrease_dividend_ &&
          rsd_ > decrease;
 }
 
@@ -100,6 +99,16 @@ bool S2LoadBalancer::increase_size(double seconds, double decrease) const
 {
   return seconds < avg_seconds_ &&
         !decrease_size(seconds, decrease);
+}
+
+/// Used to decide whether to use a smaller or larger
+/// segment_size and/or segments_per_thread.
+///
+double S2LoadBalancer::get_decrease_threshold(double seconds) const
+{
+  double log_seconds = max(min_seconds_, log(seconds));
+  double dont_decrease = min(decrease_dividend_ / (seconds * log_seconds), rsd_);
+  return rsd_ + dont_decrease;
 }
 
 void S2LoadBalancer::update_avg_seconds(double seconds)
@@ -115,16 +124,6 @@ void S2LoadBalancer::update_min_size(double divisor)
   double size = sqrt(z_) / max(1.0, divisor);
   min_size_ = max((int64_t) (1 << 9), (int64_t) size);
   min_size_ = next_power_of_2(min_size_);
-}
-
-/// Used to decide whether to use a smaller or larger
-/// segment_size and/or segments_per_thread.
-///
-double S2LoadBalancer::get_decrease_threshold(double seconds) const
-{
-  double log_seconds = max(min_seconds_, log(seconds));
-  double dont_decrease = min(decrease_dividend_ / (seconds * log_seconds), rsd_);
-  return rsd_ + dont_decrease;
 }
 
 /// Balance the load in the computation of the special leaves
