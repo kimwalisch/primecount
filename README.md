@@ -77,35 +77,35 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
-    <td>0.05s</td>
     <td>0.03s</td>
     <td>0.02s</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
+    <td>0.00s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.08s</td>
-    <td>0.06s</td>
-    <td>0.03s</td>
+    <td>0.07s</td>
+    <td>0.05s</td>
     <td>0.02s</td>
+    <td>0.01s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.31s</td>
-    <td>0.23s</td>
-    <td>0.08s</td>
+    <td>0.28s</td>
+    <td>0.21s</td>
+    <td>0.07s</td>
     <td>0.04s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>1.49s</td>
-    <td>1.03s</td>
+    <td>1.35s</td>
+    <td>0.99s</td>
     <td>0.30s</td>
     <td>0.13s</td>
   </tr>
@@ -113,24 +113,24 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>9.30s</td>
-    <td>5.05s</td>
+    <td>8.52s</td>
+    <td>4.89s</td>
     <td>1.20s</td>
     <td>0.47s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>60.38s</td>
-    <td>28.26s</td>
+    <td>56.22s</td>
+    <td>27.167s</td>
     <td>5.17s</td>
     <td>1.70s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>423.12s</td>
-    <td>173.78s</td>
+    <td>387.03s</td>
+    <td>170.47s</td>
     <td>23.61s</td>
     <td>6.44s</td>
   </tr>
