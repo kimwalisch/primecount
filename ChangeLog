@@ -1,6 +1,6 @@
-2014-08-20 Kim Walisch  <kim.walisch@gmail.com>
+2014-08-24 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.2 work in progress.
+  Version 1.2 released.
 
   * Add --status (-s) command-line option.
   * src/S2LoadBalancer.cpp: New faster load balancer.
