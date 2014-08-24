@@ -179,13 +179,13 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.1-win64.zip">primecount-1.1-win64.zip</a>, 239K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.1-linux-x64.tar.gz">primecount-1.1-linux-x64.tar.gz</a>, 120K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2-win64.zip">primecount-1.2-win64.zip</a>, 239K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2-linux-x64.tar.gz">primecount-1.2-linux-x64.tar.gz</a>, 120K
 
 SHA1 checksums of the files:
 ```sh
-3a544d77ad670fa1a9860ac3b90f5dc089441773  primecount-1.1-win64.zip
-8ce271b3d9dfc3af99186cb22a056d4aeff706c8  primecount-1.1-linux-x64.tar.gz
+5e68982b272f628285d19be75c9adf7f72c4ff27  primecount-1.2-win64.zip
+2fe46a048a0da2a33bed933dbd3d75feb76a9285  primecount-1.2-linux-x64.tar.gz
 ```
 
 ### Usage examples
@@ -223,7 +223,7 @@ export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ```
 Finally download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.1.tar.gz">primecount-1.1.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2.tar.gz">primecount-1.2.tar.gz</a>
 release tarball and build it using:
 ```sh
 $ ./configure
