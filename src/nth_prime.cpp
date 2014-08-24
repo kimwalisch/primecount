@@ -50,9 +50,9 @@ int64_t nth_prime(int64_t n, int threads)
     prime_approx = Li_inverse(n) + Li_inverse(isqrt(n)) / 4;
     count_approx = pi(prime_approx, threads);
 
-    if (count_approx <= n)
+    if (count_approx < n)
       prime = primesieve::parallel_nth_prime(n - count_approx, prime_approx);
-    else /* count_approx > n */
+    else /* count_approx >= n */
       prime = primesieve::parallel_nth_prime(n - count_approx - 1, prime_approx + 1);
   }
 
