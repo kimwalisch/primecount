@@ -221,6 +221,7 @@ variables:
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 Finally download the latest
 <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2.tar.gz">primecount-1.2.tar.gz</a>
