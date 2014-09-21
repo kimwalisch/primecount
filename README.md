@@ -216,8 +216,7 @@ $ ./configure
 $ make
 $ sudo make install
 ```
-If you are not using Linux or Mac OS X then you may need to export these
-variables:
+If you are not using Linux then you may need to export these variables:
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
