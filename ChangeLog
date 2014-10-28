@@ -3,6 +3,9 @@
   Version 1.3 work in progress.
 
   * Fixed bug in m4-ax_popcnt.m4 for QEMU virtual machines.
+  * Limit number of threads in phi.cpp to 8.
+  * Improve scaling of P2_lehmer(x, a).
+  * Improve scaling of P3(x, a).
 
 2014-08-24 Kim Walisch  <kim.walisch@gmail.com>
 
