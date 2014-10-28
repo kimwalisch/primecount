@@ -60,6 +60,10 @@ int64_t phi(int64_t x, int64_t a, int threads, bool is_print)
       int64_t iters = pi_bsearch(primes, a, isqrt(x));
       PhiCache cache(primes);
 
+      // this loop scales only up to about 8 CPU cores
+      // because the cache requires too much memory bandwidth
+      threads = min(8, threads);
+
       #pragma omp parallel for firstprivate(cache) schedule(dynamic, 16) \
           num_threads(validate_threads(threads)) reduction(+: sum)
       for (int64_t a2 = 0; a2 < iters; a2++)
