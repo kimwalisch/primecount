@@ -93,6 +93,7 @@ AC_DEFUN([AX_POPCNT],
       for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* " || $CXX --help=target 2>&1 | grep -o " -\w*popc\w* " || echo -popcnt -mpopcnt -mpopcntb -mpopcntd -mpopcntw); do
         POPCNT_FLAG="$i"
         if test x"$POPCNT_FLAG" != x; then
+          ax_cv_support_popcnt_ext=no
           AX_CHECK_COMPILE_FLAG($POPCNT_FLAG, ax_cv_support_popcnt_ext=yes, [])
           if test x"$ax_cv_support_popcnt_ext" = x"yes"; then
             POPCNT_FLAGS="$POPCNT_FLAGS $POPCNT_FLAG"
