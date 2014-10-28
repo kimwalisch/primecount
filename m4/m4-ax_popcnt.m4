@@ -90,7 +90,7 @@ AC_DEFUN([AX_POPCNT],
     ;;
 
     *) # Non x86 CPU architectures
-      for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* " || $CXX --help=target 2>&1 | grep -o " -\w*popc\w* " || $CXX --target-help 2>&1 | grep -o " -\w*popc\w* "); do
+      for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* " || $CXX --help=target 2>&1 | grep -o " -\w*popc\w* " || echo -mpopcnt -popcnt -popcntb -popcntd -popcntw); do
         POPCNT_FLAG="$i"
         if test x"$POPCNT_FLAG" != x; then
           AX_CHECK_COMPILE_FLAG($POPCNT_FLAG, ax_cv_support_popcnt_ext=yes, [])
