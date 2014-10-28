@@ -249,7 +249,7 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
   int64_t sum = 0;
   int64_t pix = 0;
 
-  #pragma omp parallel for num_threads(validate_threads(threads)) schedule(dynamic)
+  #pragma omp parallel for num_threads(validate_threads(threads, b, 1000)) schedule(dynamic)
   for (int64_t i = b; i > a; i--)
   {
     int64_t prev = (i == b) ? 0 : x / primes[i + 1] + 1;
