@@ -90,18 +90,18 @@ AC_DEFUN([AX_POPCNT],
     ;;
 
     *) # Non x86 CPU architectures
-      for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* "); do
-        POPCNT_FLAGS="$POPCNT_FLAGS $i"
+      for i in $($CXX -march=native -E -v - </dev/null 2>&1 | grep -o " -\w*popc\w* " || $CXX --help=target 2>&1 | grep -o " -\w*popc\w* " || $CXX --target-help 2>&1 | grep -o " -\w*popc\w* "); do
+        POPCNT_FLAG="$i"
+        if test x"$POPCNT_FLAG" != x; then
+          AX_CHECK_COMPILE_FLAG($POPCNT_FLAG, ax_cv_support_popcnt_ext=yes, [])
+          if test x"$ax_cv_support_popcnt_ext" = x"yes"; then
+            POPCNT_FLAGS="$POPCNT_FLAGS $POPCNT_FLAG"
+          fi
+        fi
       done
       if test x"$POPCNT_FLAGS" != x; then
-        AX_CHECK_COMPILE_FLAG($POPCNT_FLAGS, ax_cv_support_popcnt_ext=yes, [])
-        if test x"$ax_cv_support_popcnt_ext" = x"yes"; then
-          POPCNT_FLAGS="$POPCNT_FLAGS -DHAVE_POPCNT=1"
-        else
-          POPCNT_FLAGS=""
-        fi
-      fi
-      if test x"$POPCNT_FLAGS" = x; then
+        POPCNT_FLAGS="$POPCNT_FLAGS -DHAVE_POPCNT=1"
+      else
         AC_MSG_NOTICE([NOTICE: Your compiler and/or CPU do not support the POPCNT instruction.])
       fi
     ;;
