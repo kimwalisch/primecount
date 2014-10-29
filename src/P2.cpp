@@ -180,7 +180,8 @@ T P2(T x, int64_t y, int threads)
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
     double seconds = get_wtime();
 
-    #pragma omp parallel for num_threads(threads) reduction(+: sum)
+    #pragma omp parallel for \
+        num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
       sum += P2_thread(x, y, segment_size, segments_per_thread, i,
          low, limit, pix[i], pix_counts[i], primes);
@@ -249,7 +250,8 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
   int64_t sum = 0;
   int64_t pix = 0;
 
-  #pragma omp parallel for num_threads(validate_threads(threads, b, 1000)) schedule(dynamic)
+  #pragma omp parallel for schedule(dynamic) \
+      num_threads(validate_threads(threads, b, 1000))
   for (int64_t i = b; i > a; i--)
   {
     int64_t prev = (i == b) ? 0 : x / primes[i + 1] + 1;
