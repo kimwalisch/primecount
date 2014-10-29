@@ -64,8 +64,8 @@ int64_t phi(int64_t x, int64_t a, int threads, bool is_print)
       // because the cache requires too much memory bandwidth
       threads = min(8, threads);
 
-      #pragma omp parallel for firstprivate(cache) schedule(dynamic, 16) \
-          num_threads(validate_threads(threads)) reduction(+: sum)
+      #pragma omp parallel for firstprivate(cache) reduction(+: sum) \
+          num_threads(validate_threads(threads, iters, 100)) schedule(dynamic, 16)
       for (int64_t a2 = 0; a2 < iters; a2++)
         sum += cache.phi(x / primes[a2 + 1], a2, -1);
 
