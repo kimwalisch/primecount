@@ -183,14 +183,14 @@ GCC 4.8.
     <td>21,127,269,486,018,731,928</td>
     <td>39.81 min</td>
     <td>44</td>
-    <td>1.26 GB</td>
+    <td>1.11 GB</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
     <td>201,467,286,689,315,906,290</td>
-    <td>6.51 hours</td>
-    <td>66</td>
-    <td>3.02 GB</td>
+    <td>5.58 hours</td>
+    <td>44</td>
+    <td>2.63 GB</td>
   </tr>
 </table>
 
