@@ -154,8 +154,52 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
 
 The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
 2013 using a 64-bit Linux operating system and primecount was compiled using
-GCC 4.8. primecount's parallel Deleglise-Rivat implementation currently (July
-2014) counts primes faster than any other program on the web!
+GCC 4.8.
+
+<table>
+  <tr align="center">
+    <td><b>x</b></td>
+    <td><b>Prime Count</b></td>
+    <td><b>Deleglise<br/>Rivat</b></td>
+    <td><b>Threads</b></td>
+    <td><b>Memory Usage</b></td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>19</sup></td>
+    <td>234,057,667,276,344,607</td>
+    <td>1.74 min</td>
+    <td>88</td>
+    <td>0.22 GB</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>20</sup></td>
+    <td>2,220,819,602,560,918,840</td>
+    <td>7.15 min</td>
+    <td>88</td>
+    <td>0.54 GB</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>21</sup></td>
+    <td>21,127,269,486,018,731,928</td>
+    <td>47.32 min</td>
+    <td>66</td>
+    <td>1.26 GB</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>22</sup></td>
+    <td>201,467,286,689,315,906,290</td>
+    <td>6.51 hours</td>
+    <td>66</td>
+    <td>3.02 GB</td>
+  </tr>
+</table>
+
+The benchmarks above were run in November 2014 on a system with 22 IBM POWER8
+CPU cores running at 3.0 GHz with 8 threads per CPU core. The operating system
+used was Linux and primecount was compiled using GCC 4.8 Above
+3&nbsp;*&nbsp;10<sup>22</sup> primecount's memory usage doubles because it must
+then use a 64-bit array (instead of a 32-bit array) for its factor table data
+structure.
 
 ### Fast nth prime calculation
 
