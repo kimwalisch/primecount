@@ -152,7 +152,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   </tr>
 </table>
 
-The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4GHz) from
+The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4 GHz) from
 2013 using a 64-bit Linux operating system and primecount was compiled using
 GCC 4.8.
 
