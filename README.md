@@ -196,7 +196,7 @@ GCC 4.8.
 
 The benchmarks above were run in November 2014 on a system with 22 IBM POWER8
 CPU cores running at 3.0 GHz with 8 threads per CPU core. The operating system
-used was Linux and primecount was compiled using GCC 4.8 Above
+used was Linux and primecount was compiled using GCC 4.8. Above
 3&nbsp;*&nbsp;10<sup>22</sup> primecount's memory usage doubles because it must
 then use a 64-bit array (instead of a 32-bit array) for its factor table data
 structure.
