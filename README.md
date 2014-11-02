@@ -156,51 +156,6 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4 GHz) from
 2013 using a 64-bit Linux operating system and primecount was compiled using
 GCC 4.8.
 
-<table>
-  <tr align="center">
-    <td><b>x</b></td>
-    <td><b>Prime Count</b></td>
-    <td><b>Deleglise<br/>Rivat</b></td>
-    <td><b>Threads</b></td>
-    <td><b>Memory Usage</b></td>
-  </tr>
-  <tr align="right">
-    <td>10<sup>19</sup></td>
-    <td>234,057,667,276,344,607</td>
-    <td>1.74 min</td>
-    <td>88</td>
-    <td>0.22 GB</td>
-  </tr>
-  <tr align="right">
-    <td>10<sup>20</sup></td>
-    <td>2,220,819,602,560,918,840</td>
-    <td>7.15 min</td>
-    <td>88</td>
-    <td>0.54 GB</td>
-  </tr>
-  <tr align="right">
-    <td>10<sup>21</sup></td>
-    <td>21,127,269,486,018,731,928</td>
-    <td>39.81 min</td>
-    <td>44</td>
-    <td>1.11 GB</td>
-  </tr>
-  <tr align="right">
-    <td>10<sup>22</sup></td>
-    <td>201,467,286,689,315,906,290</td>
-    <td>5.58 hours</td>
-    <td>44</td>
-    <td>2.63 GB</td>
-  </tr>
-</table>
-
-The benchmarks above were run in November 2014 on a system with 22 IBM POWER8
-CPU cores running at 3.0 GHz with 8 threads per CPU core. The operating system
-used was Linux and primecount was compiled using GCC 4.8. Above
-3&nbsp;*&nbsp;10<sup>22</sup> primecount's memory usage doubles because it must
-then use 64-bit arrays (instead of a 32-bit arrays) for some of its data
-structures.
-
 ### Fast nth prime calculation
 
 The most efficient known method for calculating the nth prime is a combination
