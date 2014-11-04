@@ -178,13 +178,13 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2-win64.zip">primecount-1.2-win64.zip</a>, 355K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.2-linux-x64.tar.gz">primecount-1.2-linux-x64.tar.gz</a>, 114K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.3-win64.zip">primecount-1.3-win64.zip</a>, 355K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.3-linux-x64.tar.gz">primecount-1.3-linux-x64.tar.gz</a>, 134K
 
 SHA1 checksums of the files:
 ```sh
-5e68982b272f628285d19be75c9adf7f72c4ff27  primecount-1.2-win64.zip
-2fe46a048a0da2a33bed933dbd3d75feb76a9285  primecount-1.2-linux-x64.tar.gz
+bb47086e53e970c3f150ea71b48ed91b19a5fd47  primecount-1.3-win64.zip
+f8e329521399b814718ff9b46f1f9582630f4bfc  primecount-1.3-linux-x64.tar.gz
 ```
 
 ### Usage examples
