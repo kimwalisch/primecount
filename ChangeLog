@@ -1,6 +1,6 @@
-2014-10-28 Kim Walisch  <kim.walisch@gmail.com>
+2014-11-04 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.3 work in progress.
+  Version 1.3 released.
 
   * Fixed bug in m4-ax_popcnt.m4 for QEMU virtual machines.
   * Limit number of threads in phi.cpp to 8.
