@@ -1,12 +1,46 @@
 ///
 /// @file  S2LoadBalancer.cpp
-/// @brief Dynamically increase or decrease the segment_size or the
-///        segments_per_thread in order to improve the load balancing
-///        in the computation of the special leaves. The algorithm
-///        calculates the relative standard deviation of the timings
-///        of the individual threads and then decides whether to
-///        assign more work (low relative standard deviation) or less
-///        work (large relative standard deviation) to the threads.
+/// @brief The S2LoadBalancer evenly distributes the work load between
+///        the threads in the computation of the special leaves.
+///
+/// Simply parallelizing the computation of the special leaves in the
+/// Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms by
+/// subdividing the sieve interval by the number of threads into
+/// equally sized subintervals does not scale because the distribution
+/// of the special leaves is highly skewed, especially if the interval
+/// size is large and if the intervals are not adjacent. Also most
+/// special leaves are in the first few segments whereas later on
+/// there are very few special leaves.
+///
+/// Based on the above observations it is clear that we need a load
+/// balancer in order to scale our parallel algorithm to compute the
+/// special leaves. Below are the main rules I used to develop my load
+/// balancing algorithm:
+///
+/// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
+///    and one segment per thread. Our algorithm uses equally sized
+///    intervals, the interval_size per thread is
+///    segment_size * segments_per_thread and the threads process
+///    adjacent intervals i.e.
+///    [base + interval_size * thread_id, base + interval_size * (thread_id + 1)].
+///
+/// 2) If the relative standard deviation of the run times of the
+///    threads is low then increase the segment size and/or segments
+///    per thread, else if the relative standard deviation is large
+///    then decrease the segment size and/or segments per thread. This
+///    rule is derived from the fact that intervals with roughly the
+///    same number of special leaves take about the same time to
+///    process and the next intervals tend to have a similar
+///    distribution of special leaves (especially if the interval size
+///    is small).
+///
+/// 3) We can't use a static threshold for as to when the relative
+///    standard deviation is low or large as this threshold varies for
+///    different PC architectures e.g. 15 might be large relative
+///    standard deviation for a quad-core CPU system whereas it is a
+///    low standard deviation for a dual-socket system with 64
+///    threads. So instead of using a static threshold we compare the
+///    current relative standard deviation to the previous one.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
