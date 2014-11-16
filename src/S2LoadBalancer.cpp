@@ -14,7 +14,7 @@
 ///
 /// Based on the above observations it is clear that we need a load
 /// balancer in order to scale our parallel algorithm to compute the
-/// special leaves. Below are the main rules I used to develop my load
+/// special leaves. Below are the main ideas I used to develop my load
 /// balancing algorithm:
 ///
 /// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
@@ -38,8 +38,8 @@
 ///    standard deviation is low or large as this threshold varies for
 ///    different PC architectures e.g. 15 might be large relative
 ///    standard deviation for a quad-core CPU system whereas it is a
-///    low standard deviation for a dual-socket system with 64
-///    threads. So instead of using a static threshold we compare the
+///    low standard deviation for a dual-socket system with 64 CPU
+///    cores. So instead of using a static threshold we compare the
 ///    current relative standard deviation to the previous one.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
