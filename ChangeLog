@@ -1,3 +1,10 @@
+2014-11-16 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.3.1 work in progress.
+
+  * src/S2LoadBalancer.cpp: Update documentation.
+  * Introduce patch level version (3rd version number).
+
 2014-11-04 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.3 released.
