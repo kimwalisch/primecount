@@ -19,7 +19,7 @@
 ///
 /// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
 ///    and one segment per thread. Our algorithm uses equally sized
-///    intervals, the interval_size per thread is
+///    intervals, for each thread the interval_size is
 ///    segment_size * segments_per_thread and the threads process
 ///    adjacent intervals i.e.
 ///    [base + interval_size * thread_id, base + interval_size * (thread_id + 1)].
