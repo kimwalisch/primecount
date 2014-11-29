@@ -43,9 +43,6 @@ int64_t pi_lehmer(int64_t x, int threads)
   int64_t p3 = P3(x, a, threads);
   int64_t sum = p1 + a - 1 - p2 - p3;
 
-  if (print_status())
-    cout << endl;
-
   return sum;
 }
 
