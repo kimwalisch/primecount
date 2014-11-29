@@ -2,10 +2,20 @@
 /// @file  PhiCache.cpp
 /// @brief The PhiCache class calculates phi(x, a) using the recursive
 ///        formula: phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
-///        I have added a cache to my implementation in which results
-///        of phi(x, a) are stored if x < 2^16 and a <= 500. The cache
-///        speeds up the calculations by at least 3 orders of
-///        magnitude near 10^15.
+///        The algorithm used is an optimized version of the algorithm
+///        described in Tomás Oliveira e Silva's paper [1].
+///        I have added 3 optimizations to my implementation which
+///        speed up the calculation of phi(x, a), if x and/or a are
+///        sufficiently small phi(x, a) is calculated using one of the
+///        methods below:
+///
+///        * retrieve  phi(x, a) from the cache
+///        * calculate phi(x, a) using Euler's totient function
+///        * calculate phi(x, a) using binary search
+///
+///       [1] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///           method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
+///           http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
