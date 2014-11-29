@@ -10,12 +10,14 @@
 ///        methods below:
 ///
 ///        * retrieve  phi(x, a) from the cache
-///        * calculate phi(x, a) using Euler's totient function
+///        * calculate phi(x, a) using formula [2] if a <= 6
 ///        * calculate phi(x, a) using binary search
 ///
 ///       [1] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///           method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///           http://sweet.ua.pt/tos/bib/5.4.pdf
+///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+///           with pp = 2 * 3 * ... * prime[a] 
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
