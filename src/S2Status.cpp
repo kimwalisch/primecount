@@ -44,4 +44,4 @@ void S2Status::print(maxint_t s2_current, double rsd)
   cout << oss.str() << flush;
 }
 
-} //namespace
+} // namespace

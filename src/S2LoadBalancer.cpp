@@ -213,4 +213,4 @@ void S2LoadBalancer::update(int64_t low,
   }
 }
 
-} //namespace
+} // namespace
