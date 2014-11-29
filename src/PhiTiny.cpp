@@ -1,9 +1,11 @@
 ///
 /// @file  PhiTiny.cpp
 /// @brief phi_tiny(x, a) calculates the partial sieve function in
-///        constant time for small values of a <= 6 using lookup
-///        tables. Let pp = prime_products_[a]:
-///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a).
+///        constant time (using lookup tables) for small values of
+///        a <= 6 using the formula below:
+///
+///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+///        with pp = 2 * 3 * ... * prime[a]
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
