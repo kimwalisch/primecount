@@ -114,7 +114,11 @@ int main (int argc, char* argv[])
     return 1;
   }
 
+  if (print_status())
+    cout << endl;
+
   cout << res << endl;
+
   if (pco.time)
     print_seconds(get_wtime() - time);
 

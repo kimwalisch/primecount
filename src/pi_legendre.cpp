@@ -7,6 +7,7 @@
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <pmath.hpp>
 
@@ -22,9 +23,15 @@ int64_t pi_legendre(int64_t x, int threads)
   if (x < 2)
     return 0;
 
+  // disable printing for pi_legendre() because it is used to
+  // initialize all other prime counting functions 
+  bool is_print = print_status();
+  set_print_status(false);
+
   int64_t a = pi_primesieve(isqrt(x), /* threads = */ 1);
   int64_t sum = phi(x, a, threads) + a - 1;
 
+  set_print_status(is_print);
   return sum;
 }
 

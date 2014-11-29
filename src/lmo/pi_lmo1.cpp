@@ -37,7 +37,7 @@ int64_t pi_lmo1(int64_t x)
     return 0;
 
   int64_t y = iroot<3>(x); 
-  int64_t pi_y = pi_meissel(y, 1);
+  int64_t pi_y = pi_legendre(y, 1);
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t S1 = 0;
   int64_t S2 = 0;

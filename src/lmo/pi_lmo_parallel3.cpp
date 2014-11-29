@@ -332,9 +332,6 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
-  if (print_status())
-    cout << endl;
-
   return sum;
 }
 

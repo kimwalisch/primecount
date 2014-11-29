@@ -31,13 +31,13 @@ namespace primecount {
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
 ///
-int64_t phi(int64_t x, int64_t a, int threads, bool is_print)
+int64_t phi(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
   if (a > x) return 1;
   if (a < 1) return x;
 
-  if (is_print)
+  if (print_status())
   {
     cout << endl;
     cout << "=== phi(x, a) ===" << endl;
@@ -73,7 +73,7 @@ int64_t phi(int64_t x, int64_t a, int threads, bool is_print)
     }
   }
 
-  if (is_print)
+  if (print_status())
     print_result("phi", sum, time);
 
   return sum;

@@ -305,9 +305,6 @@ int128_t pi_deleglise_rivat4(int128_t x)
     s2 = S2(x, y, z, c, primes, factors);
   }
 
-  if (print_status())
-    cout << endl;
-
   int128_t phi = s1 + s2;
   int128_t sum = phi + pi_y - 1 - p2;
 

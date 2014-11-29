@@ -420,9 +420,6 @@ int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads)
     s2 = S2(x, s2_approx, y, z, c, primes, factors, threads);
   }
 
-  if (print_status())
-    cout << endl;
-
   int128_t phi = s1 + s2;
   int128_t sum = phi + pi_y - 1 - p2;
 
