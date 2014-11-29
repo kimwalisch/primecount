@@ -84,7 +84,7 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
 {
   int64_t sum;
 
-  if (x < primes_[a])
+  if (x <= primes_[a])
     sum = sign;
   else if (is_phi_tiny(a))
     sum = phi_tiny(x, a) * sign;
@@ -92,15 +92,23 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
     sum = phi_bsearch(x, a) * sign;
   else
   {
-    int64_t iters = pi_bsearch(primes_, a, isqrt(x));
-    int64_t c = min(iters, PhiTiny::max_a());
-    sum = (a - iters) * -sign;
+    // Move out of the loop the calculations where phi(x2, a2) = 1
+    // phi(x, a) = 1 if primes_[a] >= x
+    // x2 = x / primes_[a2 + 1]
+    // phi(x2, a2) = 1 if primes_[a2] >= x / primes_[a2 + 1]
+    // phi(x2, a2) = 1 if primes_[a2] >= sqrt(x)
+    // phi(x2, a2) = 1 if a2 >= pi(sqrt(x))
+    // \sum_{a2 = pi(sqrt(x))}^{a-1} phi(x2, a2) = a - pi(sqrt(x))
+    //
+    int64_t pi_sqrtx = pi_bsearch(primes_, a, isqrt(x));
+    sum = (a - pi_sqrtx) * -sign;
+
+    int64_t c = min(pi_sqrtx, PhiTiny::max_a());
     sum += phi_tiny(x, c) * sign;
 
-    for (int64_t a2 = c; a2 < iters; a2++)
+    for (int64_t a2 = c; a2 < pi_sqrtx; a2++)
     {
       int64_t x2 = fast_div(x, primes_[a2 + 1]);
-
       if (is_cached(x2, a2))
         sum += cache_[a2][x2] * -sign;
       else
