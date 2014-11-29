@@ -4,14 +4,14 @@
 ///        formula: phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
 ///        The algorithm used is an optimized version of the algorithm
 ///        described in Tomás Oliveira e Silva's paper [1].
-///        I have added 3 optimizations to my implementation which
-///        speed up the calculation of phi(x, a), if x and/or a are
-///        sufficiently small phi(x, a) is calculated using one of the
-///        methods below:
+///        I have added 5 optimizations to my implementation which
+///        significantly speed up the calculation:
 ///
-///        * retrieve  phi(x, a) from the cache
-///        * calculate phi(x, a) using formula [2] if a <= 6
-///        * calculate phi(x, a) using binary search
+///        * Cache results of phi(x, a)
+///        * Calculate phi(x, a) using formula [2] if a <= 6
+///        * Calculate phi(x, a) using binary search
+///        * Calculate all phi(x, a) = 1 upfront
+///        * Stop recursion at c instead of 1
 ///
 ///       [1] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///           method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
