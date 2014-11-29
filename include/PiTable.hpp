@@ -1,7 +1,7 @@
 ///
 /// @file    PiTable.hpp
 /// @brief   The PiTable class is a compressed lookup table for prime
-///          counts. It uses only n / 64 * 12 bytes of memory and
+///          counts. It uses only n / 64 * 16 bytes of memory and
 ///          returns the number of primes below n using O(1) operations.
 ///
 ///          How it works:
