@@ -1,6 +1,9 @@
 ///
 /// @file  BitSieve.cpp
-/// @brief Bit array for prime sieving.
+/// @brief The BitSieve class is a bit array for use with
+///        Eratosthenes-like prime sieving algorithms. BitSieve
+///        assigns 64 numbers to the bits of an 8 byte word thus
+///        reducing the memory usage by a factor of 8.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
