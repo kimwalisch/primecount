@@ -98,11 +98,12 @@ int64_t PhiCache::phi(int64_t x, int64_t a, int sign)
     // phi(x2, a2) = 1 if primes_[a2] >= x / primes_[a2 + 1]
     // phi(x2, a2) = 1 if primes_[a2] >= sqrt(x)
     // phi(x2, a2) = 1 if a2 >= pi(sqrt(x))
-    // \sum_{a2 = pi(sqrt(x))}^{a-1} phi(x2, a2) = a - pi(sqrt(x))
+    // \sum_{a2 = pi(sqrt(x))}^{a - 1} phi(x2, a2) = a - pi(sqrt(x))
     //
     int64_t pi_sqrtx = pi_bsearch(primes_, a, isqrt(x));
     sum = (a - pi_sqrtx) * -sign;
 
+    // phi(x, 1) - \sum_{a2 = 1}^{c - 1} phi(x / primes_[a2 + 1], a2) = phi(x, c)
     int64_t c = min(pi_sqrtx, PhiTiny::max_a());
     sum += phi_tiny(x, c) * sign;
 
