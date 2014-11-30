@@ -1,7 +1,8 @@
 ///
 /// @file  S1.hpp
 /// @brief Functions to calculate the contribution of the ordinary
-///        leaves in the Lagarias-Miller-Odlyzko algorithm.
+///        leaves in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
+///        prime counting algorithms.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///

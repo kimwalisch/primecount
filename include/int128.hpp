@@ -33,8 +33,11 @@ typedef uint128_t maxuint_t;
 namespace primecount {
 
 typedef __int128_t int128_t;
-typedef __uint128_t uint128_t;
 typedef __int128_t maxint_t;
+
+// uint128_t division is about 10% faster than int128_t division
+// using GCC 4.8 on my Intel i7-4770 CPU from 2013
+typedef __uint128_t uint128_t;
 typedef __uint128_t maxuint_t;
 
 inline std::ostream& operator<<(std::ostream& stream, uint128_t n)

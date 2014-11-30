@@ -23,6 +23,7 @@ public:
   PhiTiny();
   static int64_t max_a() { return 6; }
   static bool is_tiny(int64_t a) { return a <= max_a(); }
+
   /// Partial sieve function (a.k.a. Legendre-sum).
   /// phi(x, a) counts the numbers <= x that are not divisible
   /// by any of the first a primes.
@@ -35,7 +36,8 @@ public:
     assert(a <= max_a());
     return (x / prime_products[a]) * totients[a] + phi_cache_[a][x % prime_products[a]];
   }
-private:
+
+  private:
   std::vector<int16_t> phi_cache_[7];
   static const int32_t primes[7];
   static const int32_t prime_products[7];

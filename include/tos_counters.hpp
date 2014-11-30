@@ -1,11 +1,12 @@
 ///
 /// @file   tos_counters.hpp
 /// @brief  This file contains functions to initialize, update and query
-///         the special tree data structure used for counting the number
-///         of unsieved elements in the Lagarias-Miller-Odlyzko prime
-///         counting algorithm, see S2(x) in pi_lmo4.cpp.
+///         the special tree data structure used for counting the
+///         number of unsieved elements in the Lagarias-Miller-Odlyzko
+///         and Deleglise-Rivat prime counting algorithms.
 ///
-///         The special tree data structure is explained in the paper:
+///         The implementation is based on the paper:
+///
 ///         Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
 ///         Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
 ///         http://sweet.ua.pt/tos/bib/5.4.pdf
