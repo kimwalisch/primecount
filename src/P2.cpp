@@ -1,6 +1,8 @@
 ///
 /// @file  P2.cpp
 /// @brief 2nd partial sieve function.
+///        P2(x, y) counts the numbers <= x that have exactly 2 prime
+///        factors each exceeding the a-th prime.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -136,7 +138,6 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
     *segments_per_thread -= *segments_per_thread / 4;
 }
 
-/// 2nd partial sieve function.
 /// P2(x, y) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime, a = pi(y).
 /// Space complexity: O((x / y)^(1/2)).
@@ -225,7 +226,6 @@ int128_t P2(int128_t x, int64_t y, int threads)
 
 #endif
 
-/// 2nd partial sieve function.
 /// P2_lehmer(x, a) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime. This implementation is
 /// optimized for small values of a < pi(x^(1/3)) which requires

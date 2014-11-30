@@ -1,6 +1,7 @@
 ///
 /// @file  P3.cpp
-/// @brief 3rd partial sieve function.
+/// @brief 3rd partial sieve function, used in Lehmer's prime
+///        counting formula.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -24,7 +25,6 @@ using namespace std;
 
 namespace primecount {
 
-/// 3rd partial sieve function.
 /// P3(x, a) counts the numbers <= x that have exactly 3 prime
 /// factors each exceeding the a-th prime.
 /// Space complexity: O(pi(sqrt(x))).
