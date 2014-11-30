@@ -304,7 +304,6 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
-  int64_t z = x / std::max((int64_t) 1, y);
 
   if (print_status())
   {
@@ -313,7 +312,6 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
     cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
     cout << "c = " << PhiTiny::max_a() << endl;
     cout << "threads = " << validate_threads(threads) << endl;
   }
