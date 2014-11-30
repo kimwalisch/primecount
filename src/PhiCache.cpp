@@ -1,11 +1,14 @@
 ///
 /// @file  PhiCache.cpp
-/// @brief The PhiCache class calculates phi(x, a) using the recursive
-///        formula: phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
-///        The algorithm used is an optimized version of the algorithm
-///        described in Tomás Oliveira e Silva's paper [1].
-///        I have added 5 optimizations to my implementation which
-///        significantly speed up the calculation:
+/// @brief The PhiCache class calculates the partial sieve function
+///        (a.k.a. Legendre-sum) using the recursive formula:
+///        phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
+///        phi(x, a) counts the numbers <= x that are not divisible by
+///        any of the first a primes. The algorithm used is an
+///        optimized version of the algorithm described in Tomás
+///        Oliveira e Silva's paper [1]. I have added 5 optimizations
+///        to my implementation which significantly speed up the
+///        calculation:
 ///
 ///        * Cache results of phi(x, a)
 ///        * Calculate phi(x, a) using formula [2] if a <= 6
