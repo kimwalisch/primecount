@@ -1,5 +1,8 @@
 ///
 /// @file  S2Status.cpp
+/// @brief Print status information during the computation of the
+///        special leaves in the Lagarias-Miller-Odlyzko and
+///        Deleglise-Rivat algorithms.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
