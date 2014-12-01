@@ -27,7 +27,7 @@ public:
 
   /// Set all bits to 1, except bits corresponding
   /// to 0, 1 and even numbers > 2.
-  void memset(uint64_t low);
+  void fill(uint64_t low, uint64_t /* unused */);
 
   /// Count the number of 1 bits inside the interval [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;

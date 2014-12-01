@@ -102,7 +102,7 @@ int128_t S2(uint128_t x,
     // check if we need the sieve
     if (c < pi_sqrtz)
     {
-      sieve.memset(low);
+      sieve.fill(low, high);
 
       // phi(y, i) nodes with i <= c do not contribute to S2, so we
       // simply sieve out the multiples of the first c primes

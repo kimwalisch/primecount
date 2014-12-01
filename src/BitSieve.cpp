@@ -60,10 +60,12 @@ BitSieve::BitSieve(std::size_t size) :
 /// Set all bits to 1, except bits corresponding
 /// to 0, 1 and even numbers > 2.
 /// 
-void BitSieve::memset(uint64_t low)
+void BitSieve::fill(uint64_t low, uint64_t /* unused */)
 {
-  std::fill(bits_.begin(), bits_.end(), (low & 1)
-      ? UINT64_C(0x5555555555555555) : UINT64_C(0xAAAAAAAAAAAAAAAA));
+  if (low % 2 == 0)
+    std::fill(bits_.begin(), bits_.end(), UINT64_C(0xAAAAAAAAAAAAAAAA));
+  else
+    std::fill(bits_.begin(), bits_.end(), UINT64_C(0x5555555555555555));
 
   // correct 0, 1 and 2
   if (low <= 2)
@@ -82,8 +84,8 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
 
   assert(stop < size_);
   uint64_t bit_count = count_edges(start, stop);
-  uint64_t start_idx = (start >> 6) + 1;
-  uint64_t limit = stop >> 6;
+  uint64_t start_idx = (start / 64) + 1;
+  uint64_t limit = stop / 64;
 
   for (uint64_t i = start_idx; i < limit; i++)
     bit_count += popcount64(bits_[i]);
@@ -93,10 +95,10 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
 
 uint64_t BitSieve::count_edges(uint64_t start, uint64_t stop) const
 {
-  uint64_t index1 = start >> 6;
-  uint64_t index2 = stop  >> 6;
-  uint64_t mask1 = UINT64_C(0xffffffffffffffff) << (start & 63);
-  uint64_t mask2 = UINT64_C(0xffffffffffffffff) >> (63 - (stop & 63));
+  uint64_t index1 = start / 64;
+  uint64_t index2 = stop / 64;
+  uint64_t mask1 = UINT64_C(0xffffffffffffffff) << (start % 64);
+  uint64_t mask2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
   uint64_t count = 0;
 
   if (index1 == index2)

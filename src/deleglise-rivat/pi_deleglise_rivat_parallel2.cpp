@@ -126,7 +126,7 @@ int64_t S2_thread(int64_t x,
     // check if we need the sieve
     if (c < phi_size)
     {
-      sieve.memset(low);
+      sieve.fill(low, high);
 
       // phi(y, i) nodes with i <= c do not contribute to S2, so we
       // simply sieve out the multiples of the first c primes
