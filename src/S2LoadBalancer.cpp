@@ -29,9 +29,9 @@
 ///    threads is low then increase the segment size and/or segments
 ///    per thread, else if the relative standard deviation is large
 ///    then decrease the segment size and/or segments per thread. This
-///    rule is derived from the fact that intervals with roughly the
-///    same number of special leaves take about the same time to
-///    process and the next intervals tend to have a similar
+///    rule is derived from the observation that intervals with
+///    roughly the same number of special leaves take about the same
+///    time to process and the next intervals tend to have a similar
 ///    distribution of special leaves (especially if the interval size
 ///    is small).
 ///
