@@ -12,10 +12,11 @@
 /// special leaves are in the first few segments whereas later on
 /// there are very few special leaves.
 ///
-/// Based on the above observations it is clear that we need a load
-/// balancer in order to scale our parallel algorithm to compute the
-/// special leaves. Below are the main ideas I used to develop my load
-/// balancing algorithm:
+/// Based on the above observations it is clear that we need some kind
+/// of load balancing in order to scale our parallel algorithm for
+/// computing the special leaves. Below are the ideas I used to
+/// develop a load balancing algorithm which scales linearly up to a
+/// large number of CPU cores (tested with 300 threads).
 ///
 /// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
 ///    and one segment per thread. Our algorithm uses equally sized
