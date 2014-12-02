@@ -16,7 +16,7 @@ implementation of the Deleglise-Rivat algorithm and it features a
 [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
 which allows it to scale up to hundreds of CPU cores. As
 of December 2014 primecount counts primes faster than any other
-program on the web.
+program on the web!
 
 ### Algorithms and complexity
 
