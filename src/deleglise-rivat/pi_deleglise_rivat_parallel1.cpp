@@ -2,7 +2,7 @@
 /// @file  pi_deleglise_rivat_parallel1.cpp
 /// @brief Parallel implementation of the Deleglise-Rivat prime
 ///        counting algorithm. In the Deleglise-Rivat algorithm there
-///        3 additional types of special leaves compared to the 
+///        are 3 additional types of special leaves compared to the 
 ///        Lagarias-Miller-Odlyzko algorithm: trivial special leaves,
 ///        clustered easy leaves and sparse easy leaves.
 ///
