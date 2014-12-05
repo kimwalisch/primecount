@@ -374,15 +374,15 @@ int128_t S2_sieve(int128_t x,
 /// @pre y > 0 && c > 1
 ///
 template <typename P, typename F>
-int64_t S2(int64_t x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           vector<P>& primes,
-           FactorTable<F>& factors,
-           int threads)
+int128_t S2(int128_t x,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            vector<P>& primes,
+            FactorTable<F>& factors,
+            int threads)
 {
-  int64_t S2_total = 0;
+  int128_t S2_total = 0;
 
   threads = validate_threads(threads, z);
   PiTable pi(y);
