@@ -118,7 +118,6 @@ int64_t S2_easy(int64_t x,
                 vector<int32_t>& primes,
                 int threads)
 {
-  int64_t pi_y = pi[y];
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[iroot<3>(x)];
   int64_t S2_total = 0;
