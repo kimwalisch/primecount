@@ -126,15 +126,13 @@ bool test()
     CHECK_EQUAL(pi_lmo_parallel3,             pi_meissel,         CHECK_22, 400);
     CHECK_EQUAL(pi_deleglise_rivat1,          pi_lmo_parallel3,   CHECK_12, 600);
     CHECK_EQUAL(pi_deleglise_rivat2,          pi_lmo_parallel3,   CHECK_12, 600);
-    CHECK_EQUAL(pi_deleglise_rivat3,          pi_lmo_parallel3,   CHECK_12, 600);
 #ifdef HAVE_INT128_T
-    CHECK_EQUAL(pi_deleglise_rivat4,          pi_lmo_parallel3,   CHECK_12, 600);
+    CHECK_EQUAL(pi_deleglise_rivat3,          pi_lmo_parallel3,   CHECK_12, 600);
 #endif
     CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 900);
-    CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
 #ifdef HAVE_INT128_T
-    CHECK_EQUAL(pi_deleglise_rivat_parallel4, pi_lmo_parallel3,   CHECK_22, 900);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
 #endif
     CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11,  70);
   }

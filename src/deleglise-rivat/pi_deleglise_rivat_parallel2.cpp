@@ -4,7 +4,7 @@
 ///        counting algorithm. Compared to
 ///        pi_deleglise_rivat_parallel1.cpp this version uses
 ///        compression (FactorTable & PiTable) to reduce the memory
-///        usage. 
+///        usage.
 ///        
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial

@@ -53,14 +53,10 @@ int main (int argc, char* argv[])
         res = pi_deleglise_rivat1(int64_cast(x)); break;
       case OPTION_DELEGLISE_RIVAT2:
         res = pi_deleglise_rivat2(int64_cast(x)); break;
-      case OPTION_DELEGLISE_RIVAT3:
-        res = pi_deleglise_rivat3(int64_cast(x)); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
         res = pi_deleglise_rivat_parallel1(int64_cast(x), threads); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
         res = pi_deleglise_rivat_parallel2(int64_cast(x), threads); break;
-      case OPTION_DELEGLISE_RIVAT_PARALLEL3:
-        res = pi_deleglise_rivat_parallel3(int64_cast(x), threads); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(int64_cast(x), threads); break;
       case OPTION_LEHMER:
@@ -101,10 +97,10 @@ int main (int argc, char* argv[])
         res = nth_prime(int64_cast(x), threads); break;
 
 #ifdef HAVE_INT128_T
-      case OPTION_DELEGLISE_RIVAT4:
-        res = pi_deleglise_rivat4(x); break;
-      case OPTION_DELEGLISE_RIVAT_PARALLEL4:
-        res = pi_deleglise_rivat_parallel4(x, threads); break;
+      case OPTION_DELEGLISE_RIVAT3:
+        res = pi_deleglise_rivat3(x); break;
+      case OPTION_DELEGLISE_RIVAT_PARALLEL3:
+        res = pi_deleglise_rivat_parallel3(x, threads); break;
 #endif
     }
   }

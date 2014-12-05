@@ -55,11 +55,9 @@ int64_t pi_deleglise_rivat1(int64_t x);
 
 int64_t pi_deleglise_rivat2(int64_t x);
 
-int64_t pi_deleglise_rivat3(int64_t x);
-
 #ifdef HAVE_INT128_T
 
-int128_t pi_deleglise_rivat4(int128_t x);
+int128_t pi_deleglise_rivat3(int128_t x);
 
 #endif
 
@@ -67,11 +65,9 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads);
 
 int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads);
 
-int64_t pi_deleglise_rivat_parallel3(int64_t x, int threads);
-
 #ifdef HAVE_INT128_T
 
-int128_t pi_deleglise_rivat_parallel4(int128_t x, int threads);
+int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads);
 
 #endif
 
