@@ -1,11 +1,15 @@
-/// 
+///
 /// @file  pi_deleglise_rivat_parallel1.cpp
-/// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
-///        prime counting algorithm with the improvements of Deleglise
-///        and Rivat. This implementation is based on
-///        pi_deleglise_rivat1.cpp and the paper: Tomás Oliveira e
-///        Silva, Computing pi(x): the combinatorial method, Revista
-///        do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
+/// @brief Parallel implementation of the Deleglise-Rivat prime
+///        counting algorithm. In the Deleglise-Rivat algorithm there
+///        3 additional types of special leaves compared to the 
+///        Lagarias-Miller-Odlyzko algorithm: trivial special leaves,
+///        clustered easy leaves and sparse easy leaves.
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -77,70 +81,161 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Compute the S2 contribution for the interval
-/// [low_process, low_process + segments * segment_size[.
-/// The missing special leaf contributions for the interval
-/// [1, low_process[ are later reconstructed and added in
-/// the calling (parent) S2 function.
+/// Calculate the contribution of the trivial leaves.
 ///
-int64_t S2_thread(int64_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int64_t segment_size,
-                  int64_t segments_per_thread,
-                  int64_t thread_num,
-                  int64_t low,
-                  int64_t limit,
-                  vector<int32_t>& pi,
-                  vector<int32_t>& primes,
-                  vector<int32_t>& lpf,
-                  vector<int32_t>& mu,
-                  vector<int64_t>& mu_sum,
-                  vector<int64_t>& phi)
+int64_t S2_trivial(int64_t x,
+                   int64_t y,
+                   int64_t z,
+                   int64_t c,
+                   vector<int32_t>& pi,
+                   vector<int32_t>& primes,
+                   int threads)
+{
+  int64_t pi_y = pi[y];
+  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
+  int64_t S2_total = 0;
+
+  // Find all trivial leaves: n = primes[b] * primes[l]
+  // which satisfy phi(x / n), b - 1) = 1
+  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
+  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
+  {
+    int64_t prime = primes[b];
+    S2_total += pi_y - pi[max(x / (prime * prime), prime)];
+  }
+
+  return S2_total;
+}
+
+/// Calculate the contribution of the trivial leaves, the clustered
+/// easy leaves and the sparse easy leaves.
+///
+int64_t S2_easy(int64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                vector<int32_t>& pi,
+                vector<int32_t>& primes,
+                int threads)
+{
+  int64_t pi_y = pi[y];
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t pi_x13 = pi[iroot<3>(x)];
+  int64_t S2_total = 0;
+
+  #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: S2_total)
+  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+  {
+    int64_t prime = primes[b];
+    int64_t min_trivial_leaf = x / (prime * prime);
+    int64_t min_clustered_easy_leaf = isqrt(x / prime);
+    int64_t min_sparse_easy_leaf = z / prime;
+    int64_t min_hard_leaf = max(y / prime, prime);
+
+    min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
+    min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
+    int64_t l = pi[min(min_trivial_leaf, y)];
+    int64_t S2_result = 0;
+
+    // Find all clustered easy leaves:
+    // x / n <= y and phi(x / n, b - 1) == phi(x / m, b - 1)
+    // where phi(x / n, b - 1) = pi[x / n] - b + 2
+    while (primes[l] > min_clustered_easy_leaf)
+    {
+      int64_t n = prime * primes[l];
+      int64_t xn = x / n;
+      assert(xn < isquare(primes[b]));
+      int64_t phi_xn = pi[xn] - b + 2;
+      int64_t m = prime * primes[b + phi_xn - 1];
+      int64_t xm = max(x / m, min_clustered_easy_leaf);
+      int64_t l2 = pi[xm];
+      S2_result += phi_xn * (l - l2);
+      l = l2;
+    }
+
+    // Find all sparse easy leaves:
+    // x / n <= y and phi(x / n, b - 1) = pi[x / n] - b + 2
+    for (; primes[l] > min_sparse_easy_leaf; l--)
+    {
+      int64_t n = prime * primes[l];
+      int64_t xn = x / n;
+      assert(xn < isquare(primes[b]));
+      S2_result += pi[xn] - b + 2;
+    }
+
+    S2_total += S2_result;
+  }
+
+  return S2_total;
+}
+
+/// Compute the S2 contribution of the special leaves that require
+/// a sieve. Each thread processes the interval
+/// [low_thread, low_thread + segments * segment_size[
+/// and the missing special leaf contributions for the interval
+/// [1, low_process[ are later reconstructed and added in
+/// the parent S2_sieve() function.
+///
+int64_t S2_sieve_thread(int64_t x,
+                        int64_t y,
+                        int64_t z,
+                        int64_t c,
+                        int64_t segment_size,
+                        int64_t segments_per_thread,
+                        int64_t thread_num,
+                        int64_t low,
+                        int64_t limit,
+                        vector<int32_t>& pi,
+                        vector<int32_t>& primes,
+                        vector<int32_t>& lpf,
+                        vector<int32_t>& mu,
+                        vector<int64_t>& mu_sum,
+                        vector<int64_t>& phi)
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
-  int64_t size = pi[min(isqrt(x / low), y)] + 1;
-  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
-
-  if (c >= size - 1)
-    return 0;
-
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
+  int64_t pi_max = pi[max_prime];
   int64_t S2_thread = 0;
+
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next = generate_next_multiples(low, size, primes);
-  phi.resize(size, 0);
-  mu_sum.resize(size, 0);
+  vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
+  phi.resize(pi_max + 1, 0);
+  mu_sum.resize(pi_max + 1, 0);
 
-  // Process the segments assigned to the current thread
+  // segmeted sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 2;
+    int64_t b = c + 1;
 
-    sieve.fill(low, high);
-
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
+    // check if we need the sieve
+    if (c <= pi_max)
     {
-      int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      next[b] = k;
-    }
+      sieve.fill(low, high);
 
-    // Initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
+      // phi(y, i) nodes with i <= c do not contribute to S2, so we
+      // simply sieve out the multiples of the first c primes
+      for (int64_t i = 2; i <= c; i++)
+      {
+        int64_t k = next[i];
+        for (int64_t prime = primes[i]; k < high; k += prime * 2)
+          sieve.unset(k - low);
+        next[i] = k;
+      }
+
+      // Initialize special tree data structure from sieve
+      cnt_finit(sieve, counters, segment_size);
+    }
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
     // which satisfy: low <= (x / n) < high
-    for (int64_t end = min(pi_sqrty, size - 1); b <= end; b++)
+    for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -165,45 +260,18 @@ int64_t S2_thread(int64_t x,
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
-    // For pi_sqrty <= b < pi_y
-    // Find all special leaves: n = primes[b] * primes[l]
+    // For pi_sqrty <= b <= pi_sqrtz
+    // Find all hard special leaves: n = primes[b] * primes[l]
     // which satisfy: low <= (x / n) < high
-    for (; b < pi_y; b++)
+    for (; b <= pi_max; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min(x / (prime * low), y)];
+      int64_t l = pi[min3(x / (prime * low), z / prime, y)];
+      int64_t min_hard_leaf = max3(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
 
-      int64_t min_hard_leaf = max3(x / (prime * high), y / prime, prime);
-      int64_t min_trivial_leaf = min(x / (prime * prime), y);
-      int64_t min_easy_leaf = min(z / prime, y);
-
-      min_trivial_leaf = max(min_hard_leaf, min_trivial_leaf);
-      min_easy_leaf = max(min_hard_leaf, min_easy_leaf);
-
-      // Find all trivial leaves which satisfy:
-      // phi(x / (primes[b] * primes[l]), b - 1) = 1
-      if (primes[l] > min_trivial_leaf)
-      {
-        int64_t l_min = pi[min_trivial_leaf];
-        S2_thread += l - l_min;
-        l = l_min;
-      }
-
-      // Find all easy leaves: n = primes[b] * primes[l]
-      // x / n <= y such that phi(x / n, b - 1) = pi[x / n] - b + 2
-      for (; l > min_easy_leaf; l--)
-      {
-        int64_t n = prime * primes[l];
-        int64_t xn = x / n;
-        assert(xn < isquare(primes[b]));
-        S2_thread += pi[xn] - b + 2;
-      }
-
-      // Find all hard leaves which satisfy:
-      // low <= (x / n) < high
       for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t n = prime * primes[l];
@@ -224,34 +292,32 @@ int64_t S2_thread(int64_t x,
   return S2_thread;
 }
 
-/// Calculate the contribution of the special leaves.
+/// Calculate the contribution of the special leaves which require
+/// a sieve (in order to reduce the memory usage).
 /// This is a parallel implementation with advanced load balancing.
 /// As most special leaves tend to be in the first segments we
 /// start off with a small segment size and few segments
 /// per thread, after each iteration we dynamically increase
 /// the segment size and the segments per thread.
-/// @pre y > 0 && c > 1
 ///
-int64_t S2(int64_t x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           vector<int32_t>& primes,
-           vector<int32_t>& lpf,
-           vector<int32_t>& mu,
-           int threads)
+int64_t S2_sieve(int64_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 vector<int32_t>& pi,
+                 vector<int32_t>& primes,
+                 vector<int32_t>& lpf,
+                 vector<int32_t>& mu,
+                 int threads)
 {
   int64_t S2_total = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
-  threads = validate_threads(threads, limit);
 
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
-
-  vector<int32_t> pi = generate_pi(y);
-  vector<int64_t> phi_total(primes.size(), 0);
+  vector<int64_t> phi_total(pi[min(isqrt(z), y)] + 1, 0);
 
   while (low < limit)
   {
@@ -267,7 +333,7 @@ int64_t S2(int64_t x,
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      S2_total += S2_thread(x, y, z, c, segment_size, segments_per_thread,
+      S2_total += S2_sieve_thread(x, y, z, c, segment_size, segments_per_thread,
           i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
@@ -289,6 +355,31 @@ int64_t S2(int64_t x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
   }
+
+  return S2_total;
+}
+
+/// Calculate the contribution of the special leaves.
+/// @pre y > 0 && c > 1
+///
+int64_t S2(int64_t x,
+           int64_t y,
+           int64_t z,
+           int64_t c,
+           vector<int32_t>& primes,
+           vector<int32_t>& lpf,
+           vector<int32_t>& mu,
+           int threads)
+{
+  int64_t S2_total = 0;
+  int64_t limit = z + 1;
+  threads = validate_threads(threads, limit);
+
+  vector<int32_t> pi = generate_pi(y);
+
+  S2_total += S2_trivial(x, y, z, c, pi, primes, threads);
+  S2_total += S2_easy(x, y, z, c, pi, primes, threads);
+  S2_total += S2_sieve(x, y, z, c, pi, primes, lpf, mu, threads);
 
   return S2_total;
 }
@@ -325,7 +416,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   vector<int32_t> lpf = generate_least_prime_factors(y);
   vector<int32_t> primes = generate_primes(y);
 
-  int64_t pi_y = primes.size() - 1;
+  int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes[c], lpf , mu, threads);
   int64_t s2 = S2(x, y, z, c, primes, lpf , mu, threads);
