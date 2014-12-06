@@ -85,8 +85,8 @@ int64_t S2_trivial(int64_t x,
   return S2_result;
 }
 
-/// Calculate the contribution of the trivial leaves, the clustered
-/// easy leaves and the sparse easy leaves.
+/// Calculate the contribution of the clustered easy
+/// leaves and the sparse easy leaves.
 ///
 int64_t S2_easy(int64_t x,
                 int64_t y,
