@@ -11,7 +11,7 @@ Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all of
 which have been parallelized using
 [OpenMP](http://en.wikipedia.org/wiki/OpenMP).
 
-primecount contains the world's first parallel open source
+primecount contains the first ever parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
 [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
 which allows it to scale up to hundreds of CPU cores. As
