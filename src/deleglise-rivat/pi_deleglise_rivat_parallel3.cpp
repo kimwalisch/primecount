@@ -112,8 +112,8 @@ int128_t S2_trivial(uint128_t x,
   return S2_result;
 }
 
-/// Calculate the contribution of the trivial leaves, the clustered
-/// easy leaves and the sparse easy leaves.
+/// Calculate the contribution of the clustered easy
+/// leaves and the sparse easy leaves.
 ///
 template <typename P>
 int128_t S2_easy(uint128_t x,
