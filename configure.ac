@@ -1,4 +1,4 @@
-AC_INIT([primecount], [1.3.1], [kim.walisch@gmail.com])
+AC_INIT([primecount], [1.4], [kim.walisch@gmail.com])
 AC_SUBST([primecount_lib_version], [2:3:1])
 
 AC_PREREQ([2.62])
