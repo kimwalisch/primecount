@@ -130,7 +130,7 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
   double time2 = get_wtime();
   double seconds = time2 - seconds1;
   double time = time2 - time1;
-  double increase_threshold = in_between(0.3, time / 100, 20);
+  double increase_threshold = in_between(0.5, time / 10, 20);
 
   if (seconds < increase_threshold)
     *segments_per_thread += *segments_per_thread * 3;
