@@ -83,6 +83,7 @@ int128_t S2_trivial(uint128_t x,
   int64_t pi_y = pi(y);
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int128_t S2_result = 0;
+  double time = get_wtime();
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
