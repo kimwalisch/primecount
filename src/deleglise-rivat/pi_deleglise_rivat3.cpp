@@ -91,7 +91,7 @@ int128_t S2_trivial(uint128_t x,
   {
     uint128_t prime = primes[b];
     uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
-    S2_result += pi_y - pi(xn);
+    S2_result += pi_y - pi[xn];
   }
 
   if (print_status())
@@ -191,7 +191,7 @@ int128_t S2_sieve(uint128_t x,
     {
       int128_t prime128 = primes[b];
       int64_t prime = primes[b];
-      int64_t l = pi(min(min(x / (prime128 * low), y), z / prime));
+      int64_t l = pi[min(min(x / (prime128 * low), y), z / prime)];
       int64_t min_hard_leaf = max3(min(x / (prime128 * high), y), y / prime, prime);
 
       if (prime >= primes[l])
