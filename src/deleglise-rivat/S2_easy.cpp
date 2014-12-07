@@ -151,7 +151,7 @@ int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vect
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
 
-int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<uint64_t>& primes, int threads)
+int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int64_t>& primes, int threads)
 {
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
