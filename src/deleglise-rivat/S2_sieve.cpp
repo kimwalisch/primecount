@@ -234,7 +234,7 @@ T S2_sieve_thread(T x,
   phi.resize(pi_max + 1, 0);
   mu_sum.resize(pi_max + 1, 0);
 
-  // segmeted sieve of Eratosthenes
+  // Segmeted sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
     // Current segment = interval [low, high[
@@ -267,7 +267,7 @@ T S2_sieve_thread(T x,
     {
       int64_t prime = primes[b];
       int64_t min_m = max(min(x / ((T) prime * (T) high), y), y / prime);
-      int64_t max_m = min(x / ((T) prime * low), y);
+      int64_t max_m = min(x / ((T) prime * (T) low), y);
 
       if (prime >= max_m)
         goto next_segment;
