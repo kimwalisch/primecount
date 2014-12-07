@@ -46,12 +46,11 @@ libprimecount_la_SOURCES = \
 	src/phi.cpp \
 	src/primecount.cpp \
 	src/S2LoadBalancer.cpp \
-	src/S2Status.cpp \
 	src/test.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
-  src/deleglise-rivat/pi_deleglise_rivat2.cpp \
+	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
-  src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
+	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
 	src/lmo/pi_lmo3.cpp \
@@ -79,8 +78,8 @@ libprimecount_la_SOURCES = \
 if HAVE_INT128_T
 
 libprimecount_la_SOURCES += \
-  src/deleglise-rivat/pi_deleglise_rivat3.cpp \
-  src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp
+	src/deleglise-rivat/pi_deleglise_rivat3.cpp \
+	src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp
 
 endif
 
