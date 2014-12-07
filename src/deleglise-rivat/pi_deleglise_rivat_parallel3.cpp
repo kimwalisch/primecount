@@ -103,8 +103,8 @@ int128_t S2_trivial(uint128_t x,
     cout << "Computation of the trivial special leaves" << endl;
   }
 
-  int64_t pi_y = pi(y);
-  int64_t pi_sqrtz = pi(min(isqrt(z), y));
+  int64_t pi_y = pi[y];
+  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int128_t S2_total = 0;
   double time = get_wtime();
 
@@ -120,79 +120,6 @@ int128_t S2_trivial(uint128_t x,
 
   if (print_status())
     print_result("S2_trivial", S2_total, time);
-
-  return S2_total;
-}
-
-/// Calculate the contribution of the clustered easy
-/// leaves and the sparse easy leaves.
-///
-template <typename P>
-int128_t S2_easy(uint128_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 PiTable& pi,
-                 vector<P>& primes,
-                 int threads)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_easy(x, y) ===" << endl;
-    cout << "Computation of the easy special leaves" << endl;
-  }
-
-  int64_t pi_sqrty = pi(isqrt(y));
-  int64_t pi_x13 = pi(iroot<3>(x));
-  int128_t S2_total = 0;
-  double time = get_wtime();
-
-  #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: S2_total)
-  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
-  {
-    int128_t prime128 = primes[b];
-    int64_t prime = primes[b];
-    int64_t min_trivial_leaf = min(x / (prime128 * prime), y);
-    int64_t min_clustered_easy_leaf = isqrt(x / prime);
-    int64_t min_sparse_easy_leaf = z / prime;
-    int64_t min_hard_leaf = max(y / prime, prime);
-
-    min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
-    min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
-    int64_t l = pi(min_trivial_leaf);
-    int128_t S2_result = 0;
-
-    // Find all clustered easy leaves:
-    // x / n <= y and phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (primes[l] > min_clustered_easy_leaf)
-    {
-      int128_t n = prime128 * primes[l];
-      int64_t xn = (int64_t) (x / n);
-      int64_t phi_xn = pi(xn) - b + 2;
-      int128_t m = prime128 * primes[b + phi_xn - 1];
-      int64_t xm = max((int64_t) (x / m), min_clustered_easy_leaf);
-      int64_t l2 = pi(xm);
-      int128_t phi_factor = l - l2;
-      S2_result += phi_xn * phi_factor;
-      l = l2;
-    }
-
-    // Find all sparse easy leaves:
-    // x / n <= y and phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; primes[l] > min_sparse_easy_leaf; l--)
-    {
-      int128_t n = prime128 * primes[l];
-      int64_t xn = (int64_t) (x / n);
-      S2_result += pi(xn) - b + 2;
-    }
-
-    S2_total += S2_result;
-  }
-
-  if (print_status())
-    print_result("S2_easy", S2_total, time);
 
   return S2_total;
 }
@@ -222,9 +149,9 @@ int128_t S2_sieve_thread(uint128_t x,
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
-  int64_t pi_sqrty = pi(isqrt(y));
+  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t max_prime = min(min(isqrt(x / low), y), isqrt(z));
-  int64_t pi_max = pi(max_prime);
+  int64_t pi_max = pi[max_prime];
   int128_t S2_thread = 0;
 
   BitSieve sieve(segment_size);
@@ -359,7 +286,7 @@ int128_t S2_sieve(int128_t x,
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
-  vector<int64_t> phi_total(pi(min(isqrt(z), y)) + 1, 0);
+  vector<int64_t> phi_total(pi[min(isqrt(z), y)] + 1, 0);
 
   while (low < limit)
   {

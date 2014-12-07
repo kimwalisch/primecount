@@ -78,8 +78,8 @@ int64_t S2_trivial(int64_t x,
     cout << "Computation of the trivial special leaves" << endl;
   }
 
-  int64_t pi_y = pi(y);
-  int64_t pi_sqrtz = pi(min(isqrt(z), y));
+  int64_t pi_y = pi[y];
+  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int64_t S2_result = 0;
   double time = get_wtime();
 
@@ -88,78 +88,11 @@ int64_t S2_trivial(int64_t x,
   for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
   {
     int64_t prime = primes[b];
-    S2_result += pi_y - pi(max(x / (prime * prime), prime));
+    S2_result += pi_y - pi[max(x / (prime * prime), prime)];
   }
 
   if (print_status())
     print_result("S2_trivial", S2_result, time);
-
-  return S2_result;
-}
-
-/// Calculate the contribution of the clustered easy
-/// leaves and the sparse easy leaves.
-///
-int64_t S2_easy(int64_t x,
-                int64_t y,
-                int64_t z,
-                int64_t c,
-                PiTable& pi,
-                vector<int32_t>& primes)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_easy(x, y) ===" << endl;
-    cout << "Computation of the easy special leaves" << endl;
-  }
-
-  int64_t pi_sqrty = pi(isqrt(y));
-  int64_t pi_x13 = pi(iroot<3>(x));
-  int64_t S2_result = 0;
-  double time = get_wtime();
-
-  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t min_trivial_leaf = x / (prime * prime);
-    int64_t min_clustered_easy_leaf = isqrt(x / prime);
-    int64_t min_sparse_easy_leaf = z / prime;
-    int64_t min_hard_leaf = max(y / prime, prime);
-
-    min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
-    min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
-    int64_t l = pi(min(min_trivial_leaf, y));
-
-    // Find all clustered easy leaves:
-    // x / n <= y and phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (primes[l] > min_clustered_easy_leaf)
-    {
-      int64_t n = prime * primes[l];
-      int64_t xn = x / n;
-      assert(xn < isquare(primes[b]));
-      int64_t phi_xn = pi(xn) - b + 2;
-      int64_t m = prime * primes[b + phi_xn - 1];
-      int64_t xm = max(x / m, min_clustered_easy_leaf);
-      int64_t l2 = pi(xm);
-      S2_result += phi_xn * (l - l2);
-      l = l2;
-    }
-
-    // Find all sparse easy leaves:
-    // x / n <= y and phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; primes[l] > min_sparse_easy_leaf; l--)
-    {
-      int64_t n = prime * primes[l];
-      int64_t xn = x / n;
-      assert(xn < isquare(primes[b]));
-      S2_result += pi(xn) - b + 2;
-    }
-  }
-
-  if (print_status())
-    print_result("S2_easy", S2_result, time);
 
   return S2_result;
 }
@@ -184,8 +117,8 @@ int64_t S2_sieve(int64_t x,
 
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t pi_sqrty = pi(isqrt(y));
-  int64_t pi_sqrtz = pi(min(isqrt(z), y));
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int64_t S2_result = 0;
   double time = get_wtime();
 
@@ -252,7 +185,7 @@ int64_t S2_sieve(int64_t x,
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi(min3(x / (prime * low), z / prime, y));
+      int64_t l = pi[min3(x / (prime * low), z / prime, y)];
       int64_t min_hard_leaf = max3(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
@@ -294,7 +227,7 @@ int64_t S2(int64_t x,
   PiTable pi(y);
 
   S2_total += S2_trivial(x, y, z, c, pi, primes);
-  S2_total += S2_easy(x, y, z, c, pi, primes);
+  S2_total += S2_easy(x, y, z, c, pi, primes, 1);
   S2_total += S2_sieve(x, y, z, c, pi, primes, factors);
 
   return S2_total;

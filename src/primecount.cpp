@@ -271,9 +271,10 @@ maxint_t to_maxint(const std::string& expr)
 
 void print_result(const std::string& str, maxint_t res, double time)
 {
+  cout << "\r" << string(40,' ') << "\r";
+  cout << "Status: 100%" << endl;
   cout << str << " = " << res << endl;
-  time = get_wtime() - time;
-  print_seconds(time);
+  print_seconds(get_wtime() - time);
 }
 
 void print_seconds(double seconds)

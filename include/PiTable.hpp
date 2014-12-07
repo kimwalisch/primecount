@@ -37,7 +37,7 @@ public:
   PiTable(uint64_t max);
 
   /// @return  The number of primes <= n
-  int64_t operator()(uint64_t n) const
+  int64_t operator[](uint64_t n) const
   {
     assert(n <= max_);
     uint64_t bitmask = UINT64_C(0xffffffffffffffff) >> (63 - n % 64);

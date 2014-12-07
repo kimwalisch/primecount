@@ -11,6 +11,7 @@
 #ifndef PRIMECOUNT_INTERNAL_HPP
 #define PRIMECOUNT_INTERNAL_HPP
 
+#include <PiTable.hpp>
 #include <int128.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
@@ -129,6 +130,16 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 
 int64_t P3(int64_t x, int64_t a, int threads);
 
+int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, std::vector<int32_t>& pi, std::vector<int32_t>& primes, int threads);
+int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int32_t>& primes, int threads);
+
+#ifdef HAVE_INT128_T
+
+int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<uint32_t>& primes, int threads);
+int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<uint64_t>& primes, int threads);
+
+#endif
+
 double get_wtime();
 
 int validate_threads(int threads);
@@ -144,9 +155,9 @@ bool print_status();
 maxint_t to_maxint(const std::string& expr);
 
 template <typename T>
-T get_percent(T low, T limit)
+int get_percent(T low, T limit)
 {
-  T percent = (T) (100.0 * low / std::max<T>(1, limit));
+  int percent = (int) (100.0 * low / std::max<T>(1, limit));
   return in_between(0, percent, 100);
 }
 

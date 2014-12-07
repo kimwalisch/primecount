@@ -84,62 +84,6 @@ int64_t S2_trivial(int64_t x,
   return S2_result;
 }
 
-/// Calculate the contribution of the clustered easy
-/// leaves and the sparse easy leaves.
-///
-int64_t S2_easy(int64_t x,
-                int64_t y,
-                int64_t z,
-                int64_t c,
-                vector<int32_t>& pi,
-                vector<int32_t>& primes)
-{
-  int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_x13 = pi[iroot<3>(x)];
-  int64_t S2_result = 0;
-
-  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t min_trivial_leaf = x / (prime * prime);
-    int64_t min_clustered_easy_leaf = isqrt(x / prime);
-    int64_t min_sparse_easy_leaf = z / prime;
-    int64_t min_hard_leaf = max(y / prime, prime);
-
-    min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
-    min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
-    int64_t l = pi[min(min_trivial_leaf, y)];
-
-    // Find all clustered easy leaves:
-    // x / n <= y and phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi[x / n] - b + 2
-    while (primes[l] > min_clustered_easy_leaf)
-    {
-      int64_t n = prime * primes[l];
-      int64_t xn = x / n;
-      assert(xn < isquare(primes[b]));
-      int64_t phi_xn = pi[xn] - b + 2;
-      int64_t m = prime * primes[b + phi_xn - 1];
-      int64_t xm = max(x / m, min_clustered_easy_leaf);
-      int64_t l2 = pi[xm];
-      S2_result += phi_xn * (l - l2);
-      l = l2;
-    }
-
-    // Find all sparse easy leaves:
-    // x / n <= y and phi(x / n, b - 1) = pi[x / n] - b + 2
-    for (; primes[l] > min_sparse_easy_leaf; l--)
-    {
-      int64_t n = prime * primes[l];
-      int64_t xn = x / n;
-      assert(xn < isquare(primes[b]));
-      S2_result += pi[xn] - b + 2;
-    }
-  }
-
-  return S2_result;
-}
-
 /// Calculate the contribution of the special leaves which require
 /// a sieve (in order to reduce the memory usage).
 ///
@@ -258,7 +202,7 @@ int64_t S2(int64_t x,
   int64_t S2_total = 0;
 
   S2_total += S2_trivial(x, y, z, c, pi, primes);
-  S2_total += S2_easy(x, y, z, c, pi, primes);
+  S2_total += S2_easy(x, y, z, c, pi, primes, 1);
   S2_total += S2_sieve(x, y, z, c, pi, primes, lpf, mu);
 
   return S2_total;
