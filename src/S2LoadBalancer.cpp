@@ -50,7 +50,6 @@
 ///
 
 #include <S2LoadBalancer.hpp>
-#include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
 #include <int128.hpp>
