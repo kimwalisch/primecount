@@ -8,8 +8,8 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primecount.hpp>
 #include <calculator.hpp>
 #include <int128.hpp>
 #include <pmath.hpp>

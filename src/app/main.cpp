@@ -10,8 +10,8 @@
 
 #include "cmdoptions.hpp"
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primecount.hpp>
 #include <int128.hpp>
 
 #include <stdexcept>
