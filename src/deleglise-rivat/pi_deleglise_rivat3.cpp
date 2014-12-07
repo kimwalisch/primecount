@@ -24,6 +24,7 @@
 #include <PhiTiny.hpp>
 #include <int128.hpp>
 #include <S1.hpp>
+#include "S2.hpp"
 
 #include <stdint.h>
 #include <algorithm>

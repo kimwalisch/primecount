@@ -22,8 +22,9 @@
 #include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <S1.hpp>
 #include <tos_counters.hpp>
+#include <S1.hpp>
+#include "S2.hpp"
 
 #include <stdint.h>
 #include <algorithm>
