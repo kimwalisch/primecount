@@ -26,7 +26,6 @@
 #define FACTORTABLE_HPP
 
 #include <primecount.hpp>
-#include <primecount-internal.hpp>
 #include <pmath.hpp>
 #include <int128.hpp>
 

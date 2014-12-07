@@ -52,6 +52,7 @@ libprimecount_la_SOURCES = \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
 	src/deleglise-rivat/S2_easy.cpp \
+	src/deleglise-rivat/S2_sieve.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
 	src/lmo/pi_lmo3.cpp \

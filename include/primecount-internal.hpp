@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <PiTable.hpp>
+#include <FactorTable.hpp>
 #include <int128.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
@@ -137,6 +138,19 @@ int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::ve
 
 int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<uint32_t>& primes, int threads);
 int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int64_t>& primes, int threads);
+
+#endif
+
+int64_t S2_sieve(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int32_t>& primes, FactorTable<uint16_t>& factors);
+int64_t S2_sieve(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int32_t>& primes, FactorTable<uint16_t>& factors, int threads);
+
+#ifdef HAVE_INT128_T
+
+int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<uint32_t>& primes, FactorTable<uint16_t>& factors);
+int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int64_t>& primes, FactorTable<uint32_t>& factors);
+
+int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<uint32_t>& primes, FactorTable<uint16_t>& factors, int threads);
+int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, std::vector<int64_t>& primes, FactorTable<uint32_t>& factors, int threads);
 
 #endif
 
