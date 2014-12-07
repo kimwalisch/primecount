@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <PiTable.hpp>
+#include <primecount-internal.hpp>
 #include <int128.hpp>
 #include <pmath.hpp>
 
