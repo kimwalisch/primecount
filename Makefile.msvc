@@ -28,7 +28,6 @@ LIB_OBJECTS = \
 	src\P3.obj \
 	src\PiTable.obj \
 	src\S2LoadBalancer.obj \
-	src\S2Status.obj \
 	src\test.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \

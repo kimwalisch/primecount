@@ -19,7 +19,6 @@
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <S2LoadBalancer.hpp>
-#include <S2Status.hpp>
 #include <tos_counters.hpp>
 
 #include <stdint.h>
@@ -204,7 +203,6 @@ int64_t S2_thread(int64_t x,
 /// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
-           int64_t s2_approx,
            int64_t y,
            int64_t c,
            vector<int32_t>& primes,
@@ -224,7 +222,6 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   threads = validate_threads(threads, limit);
 
-  S2Status s2Status(s2_approx);
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -268,9 +265,6 @@ int64_t S2(int64_t x,
 
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
-
-    if (print_status())
-      s2Status.print(S2_total, loadBalancer.get_rsd());
   }
 
   if (print_status())
@@ -325,8 +319,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, primes[c], lpf , mu, threads);
-  int64_t s2_approx = S2_approx(x, s1, p2, pi_y);
-  int64_t s2 = S2(x, s2_approx, y, c, primes, lpf , mu, threads);
+  int64_t s2 = S2(x, y, c, primes, lpf , mu, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

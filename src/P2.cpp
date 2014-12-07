@@ -196,9 +196,6 @@ T P2(T x, int64_t y, int threads)
       sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
-
-    if (print_status())
-      cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
 
   if (print_status())

@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -70,9 +71,17 @@ int64_t S2_trivial(int64_t x,
                    PiTable& pi,
                    vector<int32_t>& primes)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
+
   int64_t pi_y = pi(y);
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int64_t S2_result = 0;
+  double time = get_wtime();
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
@@ -81,6 +90,9 @@ int64_t S2_trivial(int64_t x,
     int64_t prime = primes[b];
     S2_result += pi_y - pi(max(x / (prime * prime), prime));
   }
+
+  if (print_status())
+    print_result("S2_trivial", S2_result, time);
 
   return S2_result;
 }
@@ -95,9 +107,17 @@ int64_t S2_easy(int64_t x,
                 PiTable& pi,
                 vector<int32_t>& primes)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_easy(x, y) ===" << endl;
+    cout << "Computation of the easy special leaves" << endl;
+  }
+
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t pi_x13 = pi(iroot<3>(x));
   int64_t S2_result = 0;
+  double time = get_wtime();
 
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
@@ -138,6 +158,9 @@ int64_t S2_easy(int64_t x,
     }
   }
 
+  if (print_status())
+    print_result("S2_easy", S2_result, time);
+
   return S2_result;
 }
 
@@ -152,11 +175,19 @@ int64_t S2_sieve(int64_t x,
                  vector<int32_t>& primes,
                  FactorTable<uint16_t>& factors)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_sieve(x, y) ===" << endl;
+    cout << "Computation of the special leaves requiring a sieve" << endl;
+  }
+
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int64_t S2_result = 0;
+  double time = get_wtime();
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
@@ -243,6 +274,9 @@ int64_t S2_sieve(int64_t x,
     next_segment:;
   }
 
+  if (print_status())
+    print_result("S2_sieve", S2_result, time);
+
   return S2_result;
 }
 
@@ -292,8 +326,19 @@ int64_t pi_deleglise_rivat2(int64_t x)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
-  int64_t p2 = P2(x, y, 1);
 
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_deleglise_rivat2(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
+  }
+
+  int64_t p2 = P2(x, y, 1);
   vector<int32_t> primes = generate_primes(y);
   FactorTable<uint16_t> factors(y);
 

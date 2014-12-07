@@ -29,6 +29,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -72,6 +73,13 @@ int128_t S2_trivial(uint128_t x,
                    PiTable& pi,
                    vector<P>& primes)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
+
   int64_t pi_y = pi(y);
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int128_t S2_result = 0;
@@ -84,6 +92,9 @@ int128_t S2_trivial(uint128_t x,
     uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
     S2_result += pi_y - pi(xn);
   }
+
+  if (print_status())
+    print_result("S2_trivial", S2_result, time);
 
   return S2_result;
 }
@@ -99,9 +110,17 @@ int128_t S2_easy(uint128_t x,
                  PiTable& pi,
                  vector<P>& primes)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_easy(x, y) ===" << endl;
+    cout << "Computation of the easy special leaves" << endl;
+  }
+
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t pi_x13 = pi(iroot<3>(x));
   int128_t S2_result = 0;
+  double time = get_wtime();
 
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
@@ -142,6 +161,9 @@ int128_t S2_easy(uint128_t x,
     }
   }
 
+  if (print_status())
+    print_result("S2_easy", S2_result, time);
+
   return S2_result;
 }
 
@@ -157,11 +179,19 @@ int128_t S2_sieve(uint128_t x,
                   vector<P>& primes,
                   FactorTable<F>& factors)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_sieve(x, y) ===" << endl;
+    cout << "Computation of the special leaves requiring a sieve" << endl;
+  }
+
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int128_t S2_result = 0;
+  double time = get_wtime();
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
@@ -250,6 +280,9 @@ int128_t S2_sieve(uint128_t x,
     next_segment:;
   }
 
+  if (print_status())
+    print_result("S2_sieve", S2_result, time);
+
   return S2_result;
 }
 
@@ -306,7 +339,18 @@ int128_t pi_deleglise_rivat3(int128_t x)
   int64_t pi_y;
   int64_t c;
 
-  int128_t p2 = P2(x, y, 1);
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_deleglise_rivat3(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
+  }
+
+  int64_t p2 = P2(x, y, 1);
   int128_t s1, s2;
 
   if (y <= FactorTable<uint16_t>::max())

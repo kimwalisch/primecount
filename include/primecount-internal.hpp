@@ -144,14 +144,6 @@ bool print_status();
 maxint_t to_maxint(const std::string& expr);
 
 template <typename T>
-T S2_approx(T x, T S1, T P2, int64_t pi_y)
-{
-  T pix = Li(x);
-  T S2 = pix - S1 - pi_y + 1 + P2;
-  return S2;
-}
-
-template <typename T>
 T get_percent(T low, T limit)
 {
   T percent = (T) (100.0 * low / std::max<T>(1, limit));

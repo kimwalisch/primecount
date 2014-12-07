@@ -31,6 +31,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -95,9 +96,17 @@ int128_t S2_trivial(uint128_t x,
                    vector<P>& primes,
                    int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
+
   int64_t pi_y = pi(y);
   int64_t pi_sqrtz = pi(min(isqrt(z), y));
   int128_t S2_result = 0;
+  double time = get_wtime();
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
@@ -108,6 +117,9 @@ int128_t S2_trivial(uint128_t x,
     uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
     S2_result += pi_y - pi(xn);
   }
+
+  if (print_status())
+    print_result("S2_trivial", S2_total, time);
 
   return S2_result;
 }
@@ -124,9 +136,17 @@ int128_t S2_easy(uint128_t x,
                  vector<P>& primes,
                  int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_easy(x, y) ===" << endl;
+    cout << "Computation of the easy special leaves" << endl;
+  }
+
   int64_t pi_sqrty = pi(isqrt(y));
   int64_t pi_x13 = pi(iroot<3>(x));
   int128_t S2_total = 0;
+  double time = get_wtime();
 
   #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: S2_total)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
@@ -170,6 +190,9 @@ int128_t S2_easy(uint128_t x,
 
     S2_total += S2_result;
   }
+
+  if (print_status())
+    print_result("S2_easy", S2_total, time);
 
   return S2_total;
 }
@@ -321,9 +344,17 @@ int128_t S2_sieve(int128_t x,
                   FactorTable<F>& factors,
                   int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_sieve(x, y) ===" << endl;
+    cout << "Computation of the special leaves requiring a sieve" << endl;
+  }
+
   int128_t S2_total = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
+  double time = get_wtime();
 
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
@@ -366,6 +397,9 @@ int128_t S2_sieve(int128_t x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
   }
+
+  if (print_status())
+    print_result("S2_sieve", S2_total, time);
 
   return S2_total;
 }
@@ -425,6 +459,18 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t pi_y;
   int64_t c;
+
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== pi_deleglise_rivat_parallel3(x) ===" << endl;
+    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << PhiTiny::max_a() << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
+  }
 
   int128_t p2 = P2(x, y, threads);
   int128_t s1, s2;
