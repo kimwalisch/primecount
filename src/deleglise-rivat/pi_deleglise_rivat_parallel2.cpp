@@ -40,43 +40,6 @@ using namespace primecount;
 
 namespace {
 
-/// Calculate the contribution of the trivial leaves.
-///
-int64_t S2_trivial(int64_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t c,
-                   PiTable& pi,
-                   vector<int32_t>& primes,
-                   int threads)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
-
-  int64_t pi_y = pi[y];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_total = 0;
-  double time = get_wtime();
-
-  // Find all trivial leaves: n = primes[b] * primes[l]
-  // which satisfy phi(x / n), b - 1) = 1
-  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
-  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
-  {
-    int64_t prime = primes[b];
-    S2_total += pi_y - pi[max(x / (prime * prime), prime)];
-  }
-
-  if (print_status())
-    print_result("S2_trivial", S2_total, time);
-
-  return S2_total;
-}
-
 /// Calculate the contribution of the special leaves.
 /// @pre y > 0 && c > 1
 ///
