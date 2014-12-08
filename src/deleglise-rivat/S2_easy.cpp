@@ -14,6 +14,7 @@
 #include <primecount-internal.hpp>
 #include <int128.hpp>
 #include <pmath.hpp>
+#include <S2Status.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -28,29 +29,6 @@ using namespace std;
 using namespace primecount;
 
 namespace S2_easy {
-
-/// Print the current S2_easy() status in percent.
-/// Requires --status command-line flag.
-///
-class Percent
-{
-public:
-  Percent() : percent_(-1) { }
-  void print(int64_t iter, int64_t max)
-  {
-    int b_percent = get_percent(iter, max);
-    if (percent_ < b_percent)
-    {
-      #pragma omp critical (S2_easy)
-      {
-        percent_ = b_percent;
-        cout << "\rStatus: " << percent_ << '%' << flush;
-      }
-    }
-  }
-private:
-  int percent_;
-};
 
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
@@ -76,7 +54,7 @@ T1 S2_easy(T1 x,
   int64_t pi_x13 = pi[iroot<3>(x)];
   T1 S2_total = 0;
   double time = get_wtime();
-  Percent percent;
+  S2Status status;
 
   #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: S2_total)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
@@ -119,7 +97,7 @@ T1 S2_easy(T1 x,
     }
 
     if (print_status())
-      percent.print(b, pi_x13);
+      status.print(b, pi_x13);
 
     S2_total += S2_result;
   }
