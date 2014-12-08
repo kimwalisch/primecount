@@ -224,7 +224,7 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   threads = validate_threads(threads, limit);
 
-  S2Status status(s2_approx);
+  S2Status status;
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -270,7 +270,7 @@ int64_t S2(int64_t x,
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
     if (print_status())
-      status.print(S2_total, loadBalancer.get_rsd());
+      status.print(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
   if (print_status())
