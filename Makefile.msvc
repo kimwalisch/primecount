@@ -29,12 +29,13 @@ LIB_OBJECTS = \
 	src\PiTable.obj \
 	src\S2LoadBalancer.obj \
 	src\test.obj \
+	src\deleglise-rivat\S2_trivial.obj \
+	src\deleglise-rivat\S2_easy.obj \
+	src\deleglise-rivat\S2_sieve.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat_parallel2.obj \
-	src\deleglise-rivat\S2_easy.obj \
-	src\deleglise-rivat\S2_sieve.obj \
 	src\lmo\pi_lmo1.obj \
 	src\lmo\pi_lmo2.obj \
 	src\lmo\pi_lmo3.obj \
