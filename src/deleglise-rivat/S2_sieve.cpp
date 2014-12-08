@@ -2,8 +2,9 @@
 /// @file  S2_sieve.cpp
 /// @brief Calculate the contribution of the special leaves which
 ///        require a sieve in the Deleglise-Rivat algorithm.
-///        This implementation uses compression (PiTable & FactorTable)
-///        which reduces the memory usage by about 10x.
+///        This is a parallel implementation which uses compression
+///        (PiTable & FactorTable) to reduce the memory usage by
+///        about 10x.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -289,19 +290,40 @@ T S2_sieve(T x,
 
 namespace primecount {
 
-int64_t S2_sieve(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int32_t>& primes, FactorTable<uint16_t>& factors, int threads)
+int64_t S2_sieve(int64_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 PiTable& pi,
+                 vector<int32_t>& primes,
+                 FactorTable<uint16_t>& factors,
+                 int threads)
 {
   return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<uint32_t>& primes, FactorTable<uint16_t>& factors, int threads)
+int128_t S2_sieve(uint128_t x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t c,
+                  PiTable& pi,
+                  vector<uint32_t>& primes,
+                  FactorTable<uint16_t>& factors,
+                  int threads)
 {
   return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors, threads);
 }
 
-int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int64_t>& primes, FactorTable<uint32_t>& factors, int threads)
+int128_t S2_sieve(uint128_t x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t c,
+                  PiTable& pi,
+                  vector<int64_t>& primes,
+                  FactorTable<uint32_t>& factors,
+                  int threads)
 {
   return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors, threads);
 }
