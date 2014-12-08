@@ -150,6 +150,14 @@ int get_percent(T low, T limit)
   return in_between(0, percent, 100);
 }
 
+template <typename T>
+T S2_approx(T x, int64_t pi_y, T P2, T S1)
+{
+  T pix = Li(x);
+  T S2 = pix - S1 - pi_y + 1 + P2;
+  return S2;
+}
+
 } // namespace primecount
 
 #endif
