@@ -20,28 +20,57 @@
 #include <sstream>
 #include <string>
 
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
+
 using namespace std;
 
 namespace primecount {
 
-S2Status::S2Status(maxint_t s2_approx) :
-  s2_approx_((double) s2_approx),
-  percent_(0)
+S2Status::S2Status() :
+  old_(-1), time_(get_wtime())
 { }
 
-void S2Status::print(maxint_t s2_current, double rsd)
+int S2Status::calculate_percent(maxint_t n, maxint_t limit) const
 {
-  double percent = get_percent((double) s2_current, s2_approx_);
-  double base = 0.96 + percent / (101 / (1 - 0.96));
+  double exp = 0.96;
+  double percent = get_percent((double) n, (double) limit);
+  double base = exp + percent / (101 / (1 - exp));
   double min = pow(base, 100.0);
   percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (1 - min), 100);
-  percent_ = max(percent_, (int) percent);
+  return max(old_, (int) percent);
+}
 
+void S2Status::print(maxint_t n, maxint_t limit)
+{
+  int percent = calculate_percent(n, limit);
+  if (percent > old_)
+  {
+    #pragma omp critical (s2_status)
+    old_ = percent;
+
+    ostringstream oss;
+    oss << "\r" << string(12,' ');
+    oss << "\rStatus: " << percent << "%";
+    cout << oss.str() << flush;
+  }
+}
+
+void S2Status::print(maxint_t n, maxint_t limit, double rsd)
+{
+  double t2 = get_wtime();
+  if (old_ >= 0 && (t2 - time_) < 0.01)
+    return;
+
+  time_ = t2;
+  int percent = calculate_percent(n, limit);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+  old_ = percent;
 
   ostringstream oss;
-  oss << "\r" << string(40,' ') << "\r";
-  oss << "Status: " << percent_ << "%, ";
+  oss << "\r" << string(40,' ');
+  oss << "\rStatus: " << percent << "%, ";
   oss << "Load balance: " << load_balance << "%";
   cout << oss.str() << flush;
 }
