@@ -64,43 +64,6 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the trivial leaves.
-///
-template <typename P>
-int128_t S2_trivial(uint128_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t c,
-                   PiTable& pi,
-                   vector<P>& primes)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
-
-  int64_t pi_y = pi[y];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int128_t S2_result = 0;
-  double time = get_wtime();
-
-  // Find all trivial leaves: n = primes[b] * primes[l]
-  // which satisfy phi(x / n), b - 1) = 1
-  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
-  {
-    uint128_t prime = primes[b];
-    uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
-    S2_result += pi_y - pi[xn];
-  }
-
-  if (print_status())
-    print_result("S2_trivial", S2_result, time);
-
-  return S2_result;
-}
-
 /// Calculate the contribution of the special leaves which require
 /// a sieve (in order to reduce the memory usage).
 ///
@@ -234,7 +197,7 @@ int128_t S2(uint128_t x,
   int128_t S2_total = 0;
   PiTable pi(y);
 
-  S2_total += S2_trivial(x, y, z, c, pi, primes);
+  S2_total += S2_trivial(x, y, z, c, pi, primes, 1);
   S2_total += S2_easy(x, y, z, c, pi, primes, 1);
   S2_total += S2_sieve(x, y, z, c, pi, primes, factors);
 
