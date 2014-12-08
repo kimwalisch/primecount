@@ -1,8 +1,8 @@
 ///
 /// @file  S2_easy.cpp
 /// @brief Calculate the contribution of the clustered easy leaves
-///        and the sparse easy leaves in the Deleglise-Rivat
-///        algorithm.
+///        and the sparse easy leaves in parallel using OpenMP
+///        (Deleglise-Rivat algorithm).
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -52,8 +52,8 @@ private:
   int percent_;
 };
 
-/// Calculate the contribution of the clustered easy
-/// leaves and the sparse easy leaves.
+/// Calculate the contribution of the clustered easy leaves
+/// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
 ///
 template <typename T1, typename T2, typename T3>
@@ -134,24 +134,48 @@ T1 S2_easy(T1 x,
 
 namespace primecount {
 
-int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, vector<int32_t>& pi, vector<int32_t>& primes, int threads)
+int64_t S2_easy(int64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                vector<int32_t>& pi,
+                vector<int32_t>& primes,
+                int threads)
 {
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
 
-int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int32_t>& primes, int threads)
+int64_t S2_easy(int64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                PiTable& pi,
+                vector<int32_t>& primes,
+                int threads)
 {
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<uint32_t>& primes, int threads)
+int128_t S2_easy(uint128_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 PiTable& pi,
+                 vector<uint32_t>& primes,
+                 int threads)
 {
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
 
-int128_t S2_easy(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int64_t>& primes, int threads)
+int128_t S2_easy(uint128_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 PiTable& pi,
+                 vector<int64_t>& primes,
+                 int threads)
 {
   return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
 }
