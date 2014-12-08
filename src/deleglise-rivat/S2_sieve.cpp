@@ -80,124 +80,6 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the special leaves which require
-/// a sieve (in order to reduce the memory usage).
-/// Single-threaded version.
-///
-template <typename T, typename P, typename F>
-T S2_sieve(T x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           PiTable& pi,
-           vector<P>& primes,
-           FactorTable<F>& factors)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_sieve(x, y) ===" << endl;
-    cout << "Computation of the special leaves requiring a sieve" << endl;
-  }
-
-  T S2_result = 0;
-  int64_t limit = z + 1;
-  int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  double time = get_wtime();
-
-  BitSieve sieve(segment_size);
-  vector<int32_t> counters(segment_size);
-  vector<int64_t> next(primes.begin(), primes.end());
-  vector<int64_t> phi(primes.size(), 0);
-
-  // Segmented sieve of Eratosthenes
-  for (int64_t low = 1; low < limit; low += segment_size)
-  {
-    // Current segment = interval [low, high[
-    int64_t high = min(low + segment_size, limit);
-    int64_t b = 2;
-
-    sieve.fill(low, high);
-
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
-    {
-      int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      next[b] = k;
-    }
-
-    // Initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
-
-    // For c + 1 <= b <= pi_sqrty
-    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
-    // which satisfy: low <= (x / n) < high
-    for (; b <= pi_sqrty; b++)
-    {
-      int64_t prime = primes[b];
-      int64_t min_m = max(min(x / ((T) prime * (T) high), y), y / prime);
-      int64_t max_m = min(x / ((T) prime * (T) low), y);
-
-      if (prime >= max_m)
-        goto next_segment;
-
-      factors.to_index(&min_m);
-      factors.to_index(&max_m);
-
-      for (int64_t m = max_m; m > min_m; m--)
-      {
-        if (prime < factors.lpf(m))
-        {
-          int64_t n = prime * factors.get_number(m);
-          int64_t count = cnt_query(counters, (x / n) - low);
-          int64_t phi_xn = phi[b] + count;
-          S2_result -= factors.mu(m) * phi_xn;
-        }
-      }
-
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
-    }
-
-    // For pi_sqrty <= b <= pi_sqrtz
-    // Find all hard special leaves: n = primes[b] * primes[l]
-    // which satisfy: low <= (x / n) < high
-    for (; b <= pi_sqrtz; b++)
-    {
-      int64_t prime = primes[b];
-      int64_t l = pi[min(min(x / ((T) prime * (T) low), y), z / prime)];
-      int64_t min_hard_leaf = max3(min(x / ((T) prime * (T) high), y), y / prime, prime);
-
-      if (prime >= primes[l])
-        goto next_segment;
-
-      for (; primes[l] > min_hard_leaf; l--)
-      {
-        int64_t n = prime * primes[l];
-        int64_t xn = x / n;
-        int64_t count = cnt_query(counters, xn - low);
-        int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
-      }
-
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
-    }
-
-    next_segment:;
-  }
-
-  if (print_status())
-    print_result("S2_sieve", S2_result, time);
-
-  return S2_result;
-}
-
 /// Compute the S2 contribution of the special leaves that require
 /// a sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
@@ -407,27 +289,12 @@ T S2_sieve(T x,
 
 namespace primecount {
 
-int64_t S2_sieve(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int32_t>& primes, FactorTable<uint16_t>& factors)
-{
-  return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors);
-}
-
 int64_t S2_sieve(int64_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int32_t>& primes, FactorTable<uint16_t>& factors, int threads)
 {
   return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
-
-int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<uint32_t>& primes, FactorTable<uint16_t>& factors)
-{
-  return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors);
-}
-
-int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<int64_t>& primes, FactorTable<uint32_t>& factors)
-{
-  return S2_sieve::S2_sieve(x, y, z, c, pi, primes, factors);
-}
 
 int128_t S2_sieve(uint128_t x, int64_t y, int64_t z, int64_t c, PiTable& pi, vector<uint32_t>& primes, FactorTable<uint16_t>& factors, int threads)
 {
