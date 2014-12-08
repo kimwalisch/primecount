@@ -194,14 +194,14 @@ int128_t S2(uint128_t x,
             vector<P>& primes,
             FactorTable<F>& factors)
 {
-  int128_t S2_total = 0;
   PiTable pi(y);
 
-  S2_total += S2_trivial(x, y, z, c, pi, primes, 1);
-  S2_total += S2_easy(x, y, z, c, pi, primes, 1);
-  S2_total += S2_sieve(x, y, z, c, pi, primes, factors);
+  int128_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, 1);
+  int128_t s2_easy = S2_easy(x, y, z, c, pi, primes, 1);
+  int128_t s2_sieve = S2_sieve(x, y, z, c, pi, primes, factors);
+  int128_t s2 = s2_trivial + s2_easy + s2_sieve;
 
-  return S2_total;
+  return s2;
 }
 
 /// alpha is a tuning factor which should grow like (log(x))^3
