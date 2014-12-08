@@ -20,6 +20,7 @@
 #include <BitSieve.hpp>
 #include <tos_counters.hpp>
 #include <S2LoadBalancer.hpp>
+#include <S2Status.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -234,11 +235,12 @@ T S2_sieve(T x,
     cout << "Computation of the special leaves requiring a sieve" << endl;
   }
 
-  T S2_total = 0;
+  double time = get_wtime();
+  T s2_sieve = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
-  double time = get_wtime();
 
+  S2Status status(s2_sieve_approx);
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -254,11 +256,11 @@ T S2_sieve(T x,
     aligned_vector<vector<int64_t> > mu_sum(threads);
     aligned_vector<double> timings(threads);
 
-    #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
+    #pragma omp parallel for num_threads(threads) reduction(+: s2_sieve)
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      S2_total += S2_sieve_thread(x, y, z, c, segment_size, segments_per_thread,
+      s2_sieve += S2_sieve_thread(x, y, z, c, segment_size, segments_per_thread,
           i, low, limit, factors, pi, primes, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
@@ -272,19 +274,22 @@ T S2_sieve(T x,
     {
       for (size_t j = 1; j < phi[i].size(); j++)
       {
-        S2_total += phi_total[j] * (T) mu_sum[i][j];
+        s2_sieve += phi_total[j] * (T) mu_sum[i][j];
         phi_total[j] += phi[i][j];
       }
     }
 
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+
+    if (print_status())
+      status.print(s2_sieve, loadBalancer.get_rsd());
   }
 
   if (print_status())
-    print_result("S2_sieve", S2_total, time);
+    print_result("S2_sieve", s2_sieve, time);
 
-  return S2_total;
+  return s2_sieve;
 }
 
 } // namespace S2_sieve
