@@ -17,11 +17,13 @@ namespace primecount {
 class S2Status
 {
 public:
-  S2Status(maxint_t s2_approx);
-  void print(maxint_t s2_current, double rsd);
+  S2Status();
+  void print(maxint_t n, maxint_t limit);
+  void print(maxint_t n, maxint_t limit, double rsd);
 private:
-  double s2_approx_;
-  int percent_;
+  int calculate_percent(maxint_t n, maxint_t limit) const;
+  int old_;
+  double time_;
 };
 
 } // namespace
