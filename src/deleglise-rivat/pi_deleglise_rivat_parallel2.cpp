@@ -31,10 +31,6 @@
 #include <iostream>
 #include <vector>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 using namespace std;
 using namespace primecount;
 
