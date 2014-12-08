@@ -17,6 +17,7 @@
 /// file in the top level directory.
 ///
 
+#include "S2.hpp"
 #include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <BitSieve.hpp>
@@ -26,7 +27,6 @@
 #include <S2LoadBalancer.hpp>
 #include <tos_counters.hpp>
 #include <S1.hpp>
-#include "S2.hpp"
 
 #include <stdint.h>
 #include <algorithm>
