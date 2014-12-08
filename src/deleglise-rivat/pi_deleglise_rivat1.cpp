@@ -61,30 +61,6 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the trivial leaves.
-///
-int64_t S2_trivial(int64_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t c,
-                   vector<int32_t>& pi,
-                   vector<int32_t>& primes)
-{
-  int64_t pi_y = pi[y];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_result = 0;
-
-  // Find all trivial leaves: n = primes[b] * primes[l]
-  // which satisfy phi(x / n), b - 1) = 1
-  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
-  {
-    int64_t prime = primes[b];
-    S2_result += pi_y - pi[max(x / (prime * prime), prime)];
-  }
-
-  return S2_result;
-}
-
 /// Calculate the contribution of the special leaves which require
 /// a sieve (in order to reduce the memory usage).
 ///
@@ -202,7 +178,7 @@ int64_t S2(int64_t x,
   vector<int32_t> pi = generate_pi(y);
   int64_t S2_total = 0;
 
-  S2_total += S2_trivial(x, y, z, c, pi, primes);
+  S2_total += S2_trivial(x, y, z, c, pi, primes, 1);
   S2_total += S2_easy(x, y, z, c, pi, primes, 1);
   S2_total += S2_sieve(x, y, z, c, pi, primes, lpf, mu);
 
