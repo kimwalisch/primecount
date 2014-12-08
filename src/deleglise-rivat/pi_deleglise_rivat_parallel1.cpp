@@ -82,32 +82,6 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the trivial leaves.
-///
-int64_t S2_trivial(int64_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t c,
-                   vector<int32_t>& pi,
-                   vector<int32_t>& primes,
-                   int threads)
-{
-  int64_t pi_y = pi[y];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_total = 0;
-
-  // Find all trivial leaves: n = primes[b] * primes[l]
-  // which satisfy phi(x / n), b - 1) = 1
-  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
-  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
-  {
-    int64_t prime = primes[b];
-    S2_total += pi_y - pi[max(x / (prime * prime), prime)];
-  }
-
-  return S2_total;
-}
-
 /// Compute the S2 contribution of the special leaves that require
 /// a sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
