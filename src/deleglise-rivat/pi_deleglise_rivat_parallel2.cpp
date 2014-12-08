@@ -5,11 +5,6 @@
 ///        pi_deleglise_rivat_parallel1.cpp this version uses
 ///        compression (FactorTable & PiTable) to reduce the memory
 ///        usage.
-///        
-///        This implementation is based on the paper:
-///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
-///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
-///        pp. 759-768.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
