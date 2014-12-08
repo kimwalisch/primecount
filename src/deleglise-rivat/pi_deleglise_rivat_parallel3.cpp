@@ -39,20 +39,21 @@ int128_t S2(uint128_t x,
             int64_t y,
             int64_t z,
             int64_t c,
+            uint128_t s2_approx,
             vector<P>& primes,
             FactorTable<F>& factors,
             int threads)
 {
-  int128_t S2_total = 0;
-
   threads = validate_threads(threads, z);
   PiTable pi(y);
 
-  S2_total += S2_trivial(x, y, z, c, pi, primes, threads);
-  S2_total += S2_easy(x, y, z, c, pi, primes, threads);
-  S2_total += S2_sieve(x, y, z, c, pi, primes, factors, threads);
+  int128_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, threads);
+  int128_t s2_easy = S2_easy(x, y, z, c, pi, primes, threads);
+  int128_t s2_sieve_approx = s2_approx - (s2_trivial + s2_easy);
+  int128_t s2_sieve = S2_sieve(x, y, z, c, s2_sieve_approx, pi, primes, factors, threads);
+  int128_t s2 = s2_trivial + s2_easy + s2_sieve;
 
-  return S2_total;
+  return s2;
 }
 
 /// alpha is a tuning factor which should grow like (log(x))^3
@@ -100,6 +101,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   }
 
   int128_t p2 = P2(x, y, threads);
+  int128_t s2_approx;
   int128_t s1, s2;
 
   if (y <= FactorTable<uint16_t>::max())
@@ -113,7 +115,8 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, primes[c], factors, threads);
-    s2 = S2(x, y, z, c, primes, factors, threads);
+    s2_approx = S2_approx(x, pi_y, p2, s1);
+    s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }
   else
   {
@@ -126,7 +129,8 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, primes[c], factors, threads);
-    s2 = S2(x, y, z, c, primes, factors, threads);
+    s2_approx = S2_approx(x, pi_y, p2, s1);
+    s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }
 
   int128_t phi = s1 + s2;
