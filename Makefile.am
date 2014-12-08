@@ -47,12 +47,13 @@ libprimecount_la_SOURCES = \
 	src/primecount.cpp \
 	src/S2LoadBalancer.cpp \
 	src/test.cpp \
+	src/deleglise-rivat/S2.hpp \
+	src/deleglise-rivat/S2_easy.cpp \
+	src/deleglise-rivat/S2_sieve.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp \
-	src/deleglise-rivat/S2_easy.cpp \
-	src/deleglise-rivat/S2_sieve.cpp \
 	src/lmo/pi_lmo1.cpp \
 	src/lmo/pi_lmo2.cpp \
 	src/lmo/pi_lmo3.cpp \
