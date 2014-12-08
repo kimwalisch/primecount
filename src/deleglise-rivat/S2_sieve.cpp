@@ -240,7 +240,7 @@ T S2_sieve(T x,
   int64_t low = 1;
   int64_t limit = z + 1;
 
-  S2Status status(s2_sieve_approx);
+  S2Status status;
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -283,7 +283,7 @@ T S2_sieve(T x,
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
     if (print_status())
-      status.print(s2_sieve, loadBalancer.get_rsd());
+      status.print(s2_sieve, s2_sieve_approx, loadBalancer.get_rsd());
   }
 
   if (print_status())
