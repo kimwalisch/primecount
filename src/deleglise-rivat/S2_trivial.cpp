@@ -25,6 +25,7 @@
 using namespace std;
 using namespace primecount;
 
+namespace {
 namespace S2_trivial {
 
 template <typename T1, typename T2, typename T3>
@@ -65,6 +66,7 @@ T1 S2_trivial(T1 x,
 }
 
 } // namespace S2_trivial
+} // namespace
 
 namespace primecount {
 

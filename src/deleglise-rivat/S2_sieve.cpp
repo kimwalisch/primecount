@@ -34,6 +34,7 @@
 using namespace std;
 using namespace primecount;
 
+namespace {
 namespace S2_sieve {
 
 /// For each prime calculate its first multiple >= low
@@ -293,6 +294,7 @@ T S2_sieve(T x,
 }
 
 } // namespace S2_sieve
+} // namespace
 
 namespace primecount {
 

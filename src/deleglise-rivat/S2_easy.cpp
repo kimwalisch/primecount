@@ -28,6 +28,7 @@
 using namespace std;
 using namespace primecount;
 
+namespace {
 namespace S2_easy {
 
 /// Calculate the contribution of the clustered easy leaves
@@ -109,6 +110,7 @@ T1 S2_easy(T1 x,
 }
 
 } // namespace S2_easy
+} // namespace
 
 namespace primecount {
 
