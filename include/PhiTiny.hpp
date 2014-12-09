@@ -53,7 +53,7 @@ int64_t phi_tiny(int64_t x, int64_t a);
 
 #ifdef HAVE_INT128_T
 
-int128_t phi_tiny(int128_t x, int64_t a);
+int128_t phi_tiny(uint128_t x, int64_t a);
 
 #endif
 
