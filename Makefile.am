@@ -45,6 +45,7 @@ libprimecount_la_SOURCES = \
 	src/pi_lehmer.cpp \
 	src/phi.cpp \
 	src/primecount.cpp \
+	src/S1.cpp \
 	src/S2LoadBalancer.cpp \
 	src/S2Status.cpp \
 	src/test.cpp \

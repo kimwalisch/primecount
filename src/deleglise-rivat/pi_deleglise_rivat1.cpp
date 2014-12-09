@@ -17,6 +17,7 @@
 /// file in the top level directory.
 ///
 
+#include <S1.hpp>
 #include "S2.hpp"
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
@@ -24,7 +25,6 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>
-#include <S1.hpp>
 
 #include <stdint.h>
 #include <algorithm>

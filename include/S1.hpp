@@ -1,8 +1,6 @@
 ///
 /// @file  S1.hpp
-/// @brief Functions to calculate the contribution of the ordinary
-///        leaves in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
-///        prime counting algorithms.
+/// @brief S1 function declarations.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,88 +8,53 @@
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <FactorTable.hpp>
-#include <PhiTiny.hpp>
-#include <pmath.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
-#include <iostream>
 #include <vector>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 namespace primecount {
 
-/// Run time: O(y) operations, O(y) space.
-/// @pre is_phi_tiny(c) == true
-///
-template <typename T, typename V>
-T S1(T x, int64_t y, int64_t c, int64_t prime_c, V& lpf, V& mu, int threads)
-{
-  if (print_status())
-  {
-    std::cout << std::endl;
-    std::cout << "=== S1(x, y) ===" << std::endl;
-    std::cout << "Computation of the ordinary leaves" << std::endl;
-  }
+int64_t S1(int64_t x,
+           int64_t y,
+           int64_t c,
+           int64_t prime_c,
+           std::vector<int32_t>& lpf,
+           std::vector<int32_t>& mu,
+           int threads);
 
-  T sum = 0;
-  int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
-  double time = get_wtime();
+int64_t S1(int64_t x,
+           int64_t y,
+           int64_t c,
+           int64_t prime_c,
+           FactorTable<uint16_t>& factors,
+           int threads);
 
-  #pragma omp parallel for num_threads(threads) reduction (+: sum)
-  for (int64_t n = 1; n <= y; n++)
-    if (lpf[n] > prime_c)
-      sum += mu[n] * phi_tiny(x / n, c);
+#ifdef HAVE_INT128_T
 
-  if (print_status())
-    print_result("S1", sum, time);
+int128_t S1(uint128_t x,
+            int64_t y,
+            int64_t c,
+            int64_t prime_c,
+            std::vector<int32_t>& lpf,
+            std::vector<int32_t>& mu,
+            int threads);
 
-  return sum;
-}
+int128_t S1(uint128_t x,
+            int64_t y,
+            int64_t c,
+            int64_t prime_c,
+            FactorTable<uint16_t>& factors,
+            int threads);
 
-/// This version uses less memory (due to factors lookup table).
-/// Run time: O(y) operations, O(y) space.
-/// @pre is_phi_tiny(c) == true
-///
-template <typename T, typename F>
-T S1(T x, int64_t y, int64_t c, int64_t prime_c, F& factors, int threads)
-{
-  // the factors lookup table contains only numbers
-  // which are coprime to 2, 3, 5 and 7
-  if (prime_c <= 7)
-  {
-    std::vector<int32_t> mu = generate_moebius(y);
-    std::vector<int32_t> lpf = generate_least_prime_factors(y);
-    return S1(x, y, c, prime_c, lpf, mu, threads);
-  }
+int128_t S1(uint128_t x,
+            int64_t y,
+            int64_t c,
+            int64_t prime_c,
+            FactorTable<uint32_t>& factors,
+            int threads);
 
-  if (print_status())
-  {
-    std::cout << std::endl;
-    std::cout << "=== S1(x, y) ===" << std::endl;
-    std::cout << "Computation of the ordinary leaves" << std::endl;
-  }
-
-  T sum = 0;
-  int64_t limit = factors.get_index(y);
-  int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
-  double time = get_wtime();
-
-  #pragma omp parallel for num_threads(threads) reduction (+: sum)
-  for (int64_t i = factors.get_index(1); i <= limit; i++)
-    if (factors.lpf(i) > prime_c)
-      sum += factors.mu(i) * phi_tiny(x / factors.get_number(i), c);
-
-  if (print_status())
-    print_result("S1", sum, time);
-
-  return sum;
-}
+#endif
 
 } // namespace primecount
