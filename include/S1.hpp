@@ -44,7 +44,7 @@ int128_t S1(uint128_t x,
 int128_t S1(uint128_t x,
             int64_t y,
             int64_t c,
-            int64_t prime_c,
+            uint32_t prime_c,
             FactorTable<uint16_t>& factors,
             int threads);
 
