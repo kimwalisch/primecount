@@ -202,7 +202,7 @@ Open a terminal and run the primecount command-line application using e.g.:
 # Count the primes below 10^14
 $ ./primecount 1e14
 
-# Print status information during computation
+# Print progress and status information during computation
 $ ./primecount 1e20 --status
 
 # Count the primes using Meissel's algorithm
