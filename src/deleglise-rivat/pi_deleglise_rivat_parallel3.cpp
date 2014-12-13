@@ -35,11 +35,11 @@ namespace {
 /// @pre y > 0 && c > 1
 ///
 template <typename P, typename F>
-int128_t S2(uint128_t x,
+int128_t S2(int128_t x,
             int64_t y,
             int64_t z,
             int64_t c,
-            uint128_t s2_approx,
+            int128_t s2_approx,
             vector<P>& primes,
             FactorTable<F>& factors,
             int threads)

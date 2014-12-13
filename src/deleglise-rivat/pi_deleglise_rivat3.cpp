@@ -155,7 +155,7 @@ int128_t S2_sieve(uint128_t x,
     {
       int128_t prime128 = primes[b];
       int64_t prime = primes[b];
-      int64_t l = pi[min(min(x / (prime128 * low), y), z / prime)];
+      int64_t l = pi[min3(x / (prime128 * low), z / prime, y)];
       int64_t min_hard_leaf = max3(min(x / (prime128 * high), y), y / prime, prime);
 
       if (prime >= primes[l])
@@ -187,7 +187,7 @@ int128_t S2_sieve(uint128_t x,
 /// @pre y > 0 && c > 1
 ///
 template <typename P, typename F>
-int128_t S2(uint128_t x,
+int128_t S2(int128_t x,
             int64_t y,
             int64_t z,
             int64_t c,
@@ -207,7 +207,7 @@ int128_t S2(uint128_t x,
 /// alpha is a tuning factor which should grow like (log(x))^3
 /// for the Deleglise-Rivat prime counting algorithm.
 ///
-double compute_alpha(uint128_t x)
+double compute_alpha(int128_t x)
 {
   double d = (double) x;
   double alpha = log(d) * log(d) * log(d) / 1200;

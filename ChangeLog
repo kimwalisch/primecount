@@ -1,9 +1,10 @@
-2014-12-09 Kim Walisch  <kim.walisch@gmail.com>
+2014-12-13 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.4 work in progress.
 
   * src/deleglise-rivat/*.cpp: Improved computation of special leaves.
-  * src/S1.cpp: Moved code from S1.hpp here.
+  * src/P2.cpp: Use unsigned division for performance.
+  * src/S1.cpp: Use unsigned division for performance.
   * src/S2LoadBalancer.cpp: Update documentation.
   * src/PhiCache.cpp: Update documentation.
   * include/PiTable.hpp: Update documentation.

@@ -122,7 +122,8 @@ int64_t S2_easy(int64_t x,
                 vector<int32_t>& primes,
                 int threads)
 {
-  return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
+  assert(x >= 0);
+  return S2_easy::S2_easy((uint64_t) x, y, z, c, pi, primes, threads);
 }
 
 int64_t S2_easy(int64_t x,
@@ -133,12 +134,13 @@ int64_t S2_easy(int64_t x,
                 vector<int32_t>& primes,
                 int threads)
 {
-  return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
+  assert(x >= 0);
+  return S2_easy::S2_easy((uint64_t) x, y, z, c, pi, primes, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_easy(uint128_t x,
+int128_t S2_easy(int128_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
@@ -146,10 +148,11 @@ int128_t S2_easy(uint128_t x,
                  vector<uint32_t>& primes,
                  int threads)
 {
-  return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
+  assert(x >= 0);
+  return S2_easy::S2_easy((uint128_t) x, y, z, c, pi, primes, threads);
 }
 
-int128_t S2_easy(uint128_t x,
+int128_t S2_easy(int128_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
@@ -157,7 +160,8 @@ int128_t S2_easy(uint128_t x,
                  vector<int64_t>& primes,
                  int threads)
 {
-  return S2_easy::S2_easy(x, y, z, c, pi, primes, threads);
+  assert(x >= 0);
+  return S2_easy::S2_easy((uint128_t) x, y, z, c, pi, primes, threads);
 }
 
 #endif
