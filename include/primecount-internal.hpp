@@ -117,11 +117,11 @@ int128_t Li_inverse(int128_t);
 
 int64_t nth_prime(int64_t n, int threads);
 
-int64_t P2(int64_t x, int64_t y, int threads);
+int64_t P2(uint64_t x, int64_t y, int threads);
 
 #ifdef HAVE_INT128_T
 
-int128_t P2(int128_t x, int64_t y, int threads);
+int128_t P2(uint128_t x, int64_t y, int threads);
 
 #endif
 

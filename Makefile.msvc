@@ -6,7 +6,7 @@
 
 TARGET = primecount
 CXX = cl /nologo
-CXXFLAGS = /W2 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I primesieve-master\include
+CXXFLAGS = /W4 /O2 /EHsc /D HAVE_POPCNT /D NDEBUG /I include /I primesieve-master\include
 LINK = link /nologo /LIBPATH:primesieve-master
 PRIMESIEVE_URL = https://github.com/kimwalisch/primesieve/archive/master.zip
 
