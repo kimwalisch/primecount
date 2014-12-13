@@ -55,7 +55,7 @@ T1 S2_trivial(T1 x,
   for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
   {
     T1 prime = primes[b];
-    uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
+    int64_t xn = (int64_t) max(x / (prime * prime), prime);
     S2_total += pi_y - pi[xn];
   }
 
