@@ -60,7 +60,7 @@ inline bool is_phi_tiny(int64_t a)
 template <typename X, typename A>
 std::make_signed<X>::type phi_tiny(X x, A a)
 {
-  extern const PhiTiny& phiTiny;
+  extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
 }
 
@@ -69,7 +69,7 @@ std::make_signed<X>::type phi_tiny(X x, A a)
 template <typename X, typename A>
 X phi_tiny(X x, A a)
 {
-  extern const PhiTiny& phiTiny;
+  extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
 }
 
