@@ -30,18 +30,18 @@ public:
   /// @pre is_tiny(a).
   ///
   template <typename T>
-  T phi(T x, int64_t a) const
+  T phi(T x, uint64_t a) const
   {
-    assert(x >= 0);
-    assert(a <= max_a());
-    return (x / prime_products[a]) * totients[a] + phi_cache_[a][x % prime_products[a]];
+    assert(is_tiny(a));
+    T prime_product = prime_products[a];
+    return (x / prime_product) * totients[a] + phi_cache_[a][x % prime_product];
   }
 
   private:
   std::vector<int16_t> phi_cache_[7];
-  static const int32_t primes[7];
-  static const int32_t prime_products[7];
-  static const int32_t totients[7];
+  static const int primes[7];
+  static const int prime_products[7];
+  static const int totients[7];
 };
 
 inline bool is_phi_tiny(int64_t a)
@@ -49,11 +49,11 @@ inline bool is_phi_tiny(int64_t a)
   return PhiTiny::is_tiny(a);
 }
 
-int64_t phi_tiny(int64_t x, int64_t a);
+int64_t phi_tiny(uint64_t x, uint64_t a);
 
 #ifdef HAVE_INT128_T
 
-int128_t phi_tiny(uint128_t x, int64_t a);
+int128_t phi_tiny(uint128_t x, uint64_t a);
 
 #endif
 
