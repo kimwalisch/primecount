@@ -29,15 +29,15 @@ public:
   /// by any of the first a primes.
   /// @pre is_tiny(a).
   ///
-  template <typename T>
-  T phi(T x, T a) const
+  template <typename X, typename A>
+  X phi(X x, A a) const
   {
-    assert(is_tiny((int64_t) a));
+    assert(is_tiny(a));
     // phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
     // with pp = 2 * 3 * ... * prime[a]
-    T pp = prime_products[a];
-    T x_div_pp = x / pp;
-    T x_mod_pp = x - pp * x_div_pp;
+    X pp = prime_products[a];
+    X x_div_pp = x / pp;
+    X x_mod_pp = x - pp * x_div_pp;
     return x_div_pp * totients[a] + phi_cache_[a][x_mod_pp];
   }
 
@@ -53,13 +53,12 @@ inline bool is_phi_tiny(int64_t a)
   return PhiTiny::is_tiny(a);
 }
 
-int64_t phi_tiny(uint64_t x, uint64_t a);
-
-#ifdef HAVE_INT128_T
-
-int128_t phi_tiny(uint128_t x, uint128_t a);
-
-#endif
+template <typename X, typename A>
+X phi_tiny(X x, A a)
+{
+  extern const PhiTiny& phiTiny;
+  return phiTiny.phi(x, a);
+}
 
 } // namespace primecount
 

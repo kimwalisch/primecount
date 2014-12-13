@@ -21,11 +21,13 @@
 
 namespace {
 
-const primecount::PhiTiny phiTiny;
+const primecount::PhiTiny phiTinySingleton;
 
 }
 
 namespace primecount {
+
+const PhiTiny& phiTiny = phiTinySingleton;
 
 const int PhiTiny::primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
 
@@ -53,19 +55,5 @@ PhiTiny::PhiTiny()
     }
   }
 }
-
-int64_t phi_tiny(uint64_t x, uint64_t a)
-{
-  return phiTiny.phi(x, a);
-}
-
-#ifdef HAVE_INT128_T
-
-int128_t phi_tiny(uint128_t x, uint128_t a)
-{
-  return phiTiny.phi(x, a);
-}
-
-#endif
 
 } // namespace primecount
