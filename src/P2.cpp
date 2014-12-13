@@ -229,7 +229,6 @@ namespace primecount {
 
 int64_t P2(int64_t x, int64_t y, int threads)
 {
-  assert()
   return P2::P2(x, y, threads);
 }
 
