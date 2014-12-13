@@ -36,13 +36,6 @@ inline T min3(T a, T b, T c)
   return std::min(std::min(a, b), c);
 }
 
-/// Convenience min function for different types.
-template <typename A, typename B>
-inline B min(A a, B b)
-{
-  return (a < b) ? (B) a : b;
-}
-
 template <typename A, typename B>
 inline A ceil_div(A a, B b)
 {

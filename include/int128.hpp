@@ -82,4 +82,35 @@ typedef int64_t maxuint_t;
 
 #endif
 
+#if defined(HAVE_INT128_T)
+
+#include <algorithm>
+#include <cassert>
+
+namespace primecount {
+
+/// Convenience min function for different types.
+/// @pre sizeof(A) >= sizeof(B)
+///
+template <typename A, typename B>
+inline B min(A a, B b)
+{
+  assert(sizeof(A) >= sizeof(B));
+  return (a < b) ? (B) a : b;
+}
+
+/// Convenience min function for different types.
+/// @pre sizeof(A) >= sizeof sizeof(B)
+///
+template <typename A, typename B>
+inline B min3(A a, B b, B c)
+{
+  assert(sizeof(A) >= sizeof(B));
+  return (B) std::min(a, (A) std::min(b, c));
+}
+
+} // namespace
+
+#endif
+
 #endif /* PTYPES_HPP */

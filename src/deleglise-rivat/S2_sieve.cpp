@@ -109,7 +109,7 @@ T S2_sieve_thread(T x,
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t max_prime = min(min(isqrt(x / low), y), isqrt(z));
+  int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
   int64_t pi_max = pi[max_prime];
   T S2_thread = 0;
 
@@ -184,7 +184,7 @@ T S2_sieve_thread(T x,
     for (; b <= pi_max; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min(min(x / ((T) prime * (T) low), y), z / prime)];
+      int64_t l = pi[min3(x / ((T) prime * (T) low), z / prime, y)];
       int64_t min_hard_leaf = max3(min(x / ((T) prime * (T) high), y), y / prime, prime);
 
       if (prime >= primes[l])
