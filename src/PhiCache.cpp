@@ -50,9 +50,7 @@ inline int64_t fast_div(int64_t x, int32_t y)
   // Avoid slow 64-bit division
   if (x <= numeric_limits<uint32_t>::max())
     return ((uint32_t) x) / y;
-
-  // unsigned 64-bit division is faster on CPUs <= 2014
-  return ((uint64_t) x) / y;
+  return x / y;
 }
 
 } // namespace
