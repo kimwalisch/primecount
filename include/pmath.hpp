@@ -36,6 +36,34 @@ inline T min3(T a, T b, T c)
   return std::min(std::min(a, b), c);
 }
 
+/// Convenience min function for different types.
+/// @pre sizeof(A) >= sizeof(B)
+///
+template <typename A, typename B>
+inline B min(A a, B b)
+{
+#if __cplusplus >= 201103L
+  static_assert(sizeof(A) >= sizeof(B), "sizeof(A) must not be < sizeof(B)");
+#endif
+  assert(a >= 0);
+  assert(b >= 0);
+  return (a < (A) b) ? (B) a : b;
+}
+
+/// Convenience min function for different types.
+/// @pre sizeof(A) >= sizeof(B)
+///
+template <typename A, typename B>
+inline B min3(A a, B b, B c)
+{
+#if __cplusplus >= 201103L
+  static_assert(sizeof(A) >= sizeof(B), "sizeof(A) must not be < sizeof(B)");
+#endif
+  assert(a >= 0);
+  assert(b >= 0);
+  return (B) std::min(a, (A) std::min(b, c));
+}
+
 template <typename A, typename B>
 inline A ceil_div(A a, B b)
 {
@@ -96,8 +124,8 @@ template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
-  T max_r = std::numeric_limits<T>::max() >> (sizeof(T) / 2);
-  r = std::min(r, max_r);
+  r = std::min(r, (T) std::numeric_limits<T>::max() >> (sizeof(T) / 2));
+
   while (r * r > x)
     r--;
   while (x - r * r > r * 2)
