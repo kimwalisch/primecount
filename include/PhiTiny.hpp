@@ -30,11 +30,15 @@ public:
   /// @pre is_tiny(a).
   ///
   template <typename T>
-  T phi(T x, uint64_t a) const
+  T phi(T x, T a) const
   {
-    assert(is_tiny(a));
-    T prime_product = prime_products[a];
-    return (x / prime_product) * totients[a] + phi_cache_[a][x % prime_product];
+    assert(is_tiny((int64_t) a));
+    // phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+    // with pp = 2 * 3 * ... * prime[a]
+    T pp = prime_products[a];
+    T x_div_pp = x / pp;
+    T x_mod_pp = x - pp * x_div_pp;
+    return x_div_pp * totients[a] + phi_cache_[a][x_mod_pp];
   }
 
   private:
@@ -53,7 +57,7 @@ int64_t phi_tiny(uint64_t x, uint64_t a);
 
 #ifdef HAVE_INT128_T
 
-int128_t phi_tiny(uint128_t x, uint64_t a);
+int128_t phi_tiny(uint128_t x, uint128_t a);
 
 #endif
 

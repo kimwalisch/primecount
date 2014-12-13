@@ -61,7 +61,7 @@ int64_t phi_tiny(uint64_t x, uint64_t a)
 
 #ifdef HAVE_INT128_T
 
-int128_t phi_tiny(uint128_t x, uint64_t a)
+int128_t phi_tiny(uint128_t x, uint128_t a)
 {
   return phiTiny.phi(x, a);
 }
