@@ -33,11 +33,25 @@ using namespace primecount;
 namespace {
 namespace P2 {
 
-/// @return previous_prime or -1 if old <= 2
-inline int64_t get_previous_prime(primesieve::iterator* iter, int64_t old)
+class ReversePrimeIterator
 {
-  return (old > 2) ? iter->previous_prime() : -1;
-}
+public:
+  ReversePrimeIterator(int64_t stop, int64_t start) :
+    iter_(stop, start),
+    prime_(stop)
+  { }
+  int64_t previous_prime()
+  {
+    int64_t NO_PREV_PRIME = -1;
+    if (prime_ <= 2)
+      return NO_PREV_PRIME;
+    prime_ = iter_.previous_prime();
+    return prime_;
+  }
+private:
+  primesieve::iterator iter_;
+  int64_t prime_;
+};
 
 /// For each prime calculate its first multiple >= low
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
@@ -82,9 +96,9 @@ T P2_thread(T x,
 
   // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   // We use a reverse prime iterator to calculate P2_thread
-  primesieve::iterator iter(stop + 1, start);
-  int64_t previous_prime = get_previous_prime(&iter, stop + 1);
-  int64_t xp = (int64_t) (x / previous_prime);
+  ReversePrimeIterator prime_iter(stop + 1, start);
+  int64_t prime = prime_iter.previous_prime();
+  int64_t xp = (int64_t) (x / prime);
 
   vector<int64_t> next = generate_next_multiples(low, size, primes);
   BitSieve sieve(segment_size);
@@ -109,14 +123,15 @@ T P2_thread(T x,
       next[i] = k;
     }
 
-    while (previous_prime >= start && xp < high)
+    while (prime >= start && 
+           xp < high)
     {
       pix += sieve.count(j, xp - low);
       j = xp - low + 1;
       pix_count++;
       P2_thread += pix;
-      previous_prime = get_previous_prime(&iter, previous_prime);
-      xp = (int64_t) (x / previous_prime);
+      prime = prime_iter.previous_prime();
+      xp = (int64_t) (x / prime);
     }
 
     pix += sieve.count(j, (high - 1) - low);
