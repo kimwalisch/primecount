@@ -17,72 +17,60 @@
 #include <cmath>
 #include <vector>
 
-#if __cplusplus >= 201103L
-#include <type_traits>
-#endif
-
 namespace primecount {
 
 /// Convenience min function for different types.
-/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
-///      a >= 0, b >= 0.
+/// @pre sizeof(A) >= sizeof(B),
+///      if A is unsigned then b >= 0.
 ///
 template <typename A, typename B>
 inline B min(A a, B b)
 {
 #if __cplusplus >= 201103L
-  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
-                "max(type A) must not be < max(type B)");
-
-  // a < (unsigned) b, is correct only if b >= 0
-  assert(std::is_unsigned<B>::value || (
-         std::make_signed<B>::type) b >= 0);
+  static_assert(sizeof(A) >= sizeof(B),
+               "sizeof(A) >= sizeof(B)");
 #endif
   return (B) std::min(a, (A) b);
 }
 
 /// Convenience min function for different types.
-/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
-///      a >= 0, b >= 0.
+/// @pre sizeof(A) >= sizeof(B),
+///      if A is unsigned then b >= 0.
 ///
 template <typename A, typename B>
 inline B min3(A a, B b, B c)
 {
 #if __cplusplus >= 201103L
-  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
-                "max(type A) must not be < max(type B)");
+  static_assert(sizeof(A) >= sizeof(B),
+               "sizeof(A) >= sizeof(B)");
 #endif
   return (B) std::min(a, (A) std::min(b, c));
 }
 
 /// Convenience max function for different types.
-/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
-///      a >= 0, b >= 0.
+/// @pre sizeof(A) >= sizeof(B),
+///      if A is unsigned then b >= 0.
 ///
 template <typename A, typename B>
 inline A max(A a, B b)
 {
 #if __cplusplus >= 201103L
-  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
-                "max(type A) must not be < max(type B)");
-
-  // a > (unsigned) b, is correct only if b >= 0
-  assert(std::is_unsigned<B>::value || (
-         std::make_signed<B>::type) b >= 0);
+  static_assert(sizeof(A) >= sizeof(B),
+               "sizeof(A) >= sizeof(B)");
 #endif
   return std::max(a, (A) b);
 }
 
 /// Convenience max function for different types.
-/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
-///      a >= 0, b >= 0.
+/// @pre sizeof(A) >= sizeof(B),
+///      if A is unsigned then b >= 0.
 ///
 template <typename A, typename B>
 inline A max3(A a, B b, B c)
 {
 #if __cplusplus >= 201103L
-  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
-                "max(type A) must not be < max(type B)");
+  static_assert(sizeof(A) >= sizeof(B),
+               "sizeof(A) >= sizeof(B)");
 #endif
   return std::max(a, (A) std::max(b, c));
 }
