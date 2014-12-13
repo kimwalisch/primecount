@@ -53,7 +53,7 @@ inline bool is_phi_tiny(int64_t a)
   return PhiTiny::is_tiny(a);
 }
 
-/* C++ compilers (2014) have trouble compiling:
+/* In 2014 C++ compilers still cannot compile:
  * std::make_signed<__uint128_t>::type
 
 #if __cplusplus >= 201103L
