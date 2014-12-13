@@ -1,7 +1,8 @@
 ///
-/// @file   int128.hpp
-/// @brief  Convenience functions and typedefs for the non standard
-///         __int128_t & __uint128_t integer types.
+/// @file   inttypes.hpp
+/// @brief  Integer types used in primecount:
+///         int128_t, uint128_t, intfast64_t, intfast128_t,
+///         maxint_t, maxuint_t.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -9,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PTYPES_HPP
-#define PTYPES_HPP
+#ifndef INTTYPES_HPP
+#define INTTYPES_HPP
 
 #include <stdint.h>
 
@@ -35,8 +36,6 @@ namespace primecount {
 typedef __int128_t int128_t;
 typedef __int128_t maxint_t;
 
-// uint128_t division is about 10% faster than int128_t division
-// using GCC 4.8 on my Intel i7-4770 CPU from 2013
 typedef __uint128_t uint128_t;
 typedef __uint128_t maxuint_t;
 
@@ -80,6 +79,27 @@ typedef int64_t maxuint_t;
 
 }
 
+#endif /* HAVE_INT128_T */
+
+namespace primecount {
+
+/// Fastest 64-bit integer type for division.
+/// On most Intel CPUs before 2015 unsigned 64-bit division is about
+/// 10 percent faster than signed division. It is likely that in a few
+/// years years signed and unsigned division will run equally fast.
+///
+typedef uint64_t intfast64_t;
+
+#if defined(HAVE_INT128_T)
+
+/// Fastest 128-bit integer type for division.
+/// On the author's Intel Core-i7 4770 CPU from 2013 using uint128_t
+/// instead of int128_t gives 10 percent better performance.
+///
+typedef uint128_t intfast128_t;
+
 #endif
 
-#endif /* PTYPES_HPP */
+}
+
+#endif /* INTTYPES_HPP */

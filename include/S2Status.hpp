@@ -10,7 +10,7 @@
 #ifndef S2STATUS_HPP
 #define S2STATUS_HPP
 
-#include <int128.hpp>
+#include <inttypes.hpp>
 
 namespace primecount {
 

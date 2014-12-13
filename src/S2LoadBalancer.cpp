@@ -52,7 +52,7 @@
 #include <S2LoadBalancer.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
-#include <int128.hpp>
+#include <inttypes.hpp>
 
 #include <stdint.h>
 #include <algorithm>

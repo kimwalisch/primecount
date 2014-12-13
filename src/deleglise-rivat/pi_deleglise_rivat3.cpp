@@ -23,7 +23,7 @@
 #include <generate.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <int128.hpp>
+#include <inttypes.hpp>
 #include <tos_counters.hpp>
 #include <S1.hpp>
 #include "S2.hpp"

@@ -12,7 +12,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <int128.hpp>
+#include <inttypes.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
 

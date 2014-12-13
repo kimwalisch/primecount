@@ -9,7 +9,7 @@
 ///
 
 #include <FactorTable.hpp>
-#include <int128.hpp>
+#include <inttypes.hpp>
 
 #include <stdint.h>
 #include <vector>
