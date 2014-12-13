@@ -59,16 +59,19 @@ public:
   static int64_t get_index(int64_t number)
   {
     assert(number > 0);
-    int64_t quotient = number / 210;
-    int64_t remainder = number % 210;
-    return 48 * quotient + indexes_[remainder];
+    int64_t q = ((uint64_t) number) / 210;
+    int64_t r = number - q * 210;
+
+    return 48 * q + indexes_[r];
   }
 
   static int64_t get_number(int64_t index)
   {
-    int64_t quotient = index / 48;
-    int64_t remainder = index % 48;
-    return 210 * quotient + numbers_[remainder];
+    // unsigned is faster here
+    int64_t q = ((uint64_t) index) / 48;
+    int64_t r = index - q * 48;
+
+    return 210 * q + numbers_[r];
   }
 
 private:
