@@ -308,8 +308,7 @@ int64_t S2_sieve(int64_t x,
                  FactorTable<uint16_t>& factors,
                  int threads)
 {
-  assert(x >= 0);
-  return S2_sieve::S2_sieve((uint64_t) x, y, z, c, (uint64_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_sieve::S2_sieve((intfast64_t) x, y, z, c, (intfast64_t) s2_sieve_approx, pi, primes, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -324,8 +323,7 @@ int128_t S2_sieve(int128_t x,
                   FactorTable<uint16_t>& factors,
                   int threads)
 {
-  assert(x >= 0);
-  return S2_sieve::S2_sieve((uint128_t) x, y, z, c, (uint128_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_sieve::S2_sieve((intfast128_t) x, y, z, c, (intfast128_t) s2_sieve_approx, pi, primes, factors, threads);
 }
 
 int128_t S2_sieve(int128_t x,
@@ -338,8 +336,7 @@ int128_t S2_sieve(int128_t x,
                   FactorTable<uint32_t>& factors,
                   int threads)
 {
-  assert(x >= 0);
-  return S2_sieve::S2_sieve((uint128_t) x, y, z, c, (uint128_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_sieve::S2_sieve((intfast128_t) x, y, z, c, (intfast128_t) s2_sieve_approx, pi, primes, factors, threads);
 }
 
 #endif
