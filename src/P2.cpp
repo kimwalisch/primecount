@@ -90,7 +90,7 @@ T P2_thread(T x,
   low += thread_num * segments_per_thread * segment_size;
   limit = min(low + segments_per_thread * segment_size, limit);
   int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
-  int64_t start = (int64_t) max((int64_t) (x / limit + 1), y);
+  int64_t start = (int64_t) max(x / limit + 1, y);
   int64_t stop  = (int64_t) min(x / low, isqrt(x));
   T P2_thread = 0;
 
@@ -160,8 +160,8 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
 template <typename T>
 T P2(T x, int64_t y, int threads)
 {
-  T a = pi_legendre(y, 1);
-  T b = pi_legendre((int64_t) isqrt(x), 1);
+  int64_t a = pi_legendre(y, 1);
+  int64_t b = pi_legendre((int64_t) isqrt(x), 1);
 
   if (x < 4 || a >= b)
     return 0;
@@ -175,8 +175,8 @@ T P2(T x, int64_t y, int threads)
 
   double time = get_wtime();
   int64_t low = 2;
-  int64_t limit = (int64_t)(x / max<int64_t>(1, y));
-  int64_t segment_size = max<int64_t>(1 << 12, isqrt(limit));
+  int64_t limit = (int64_t)(x / max(y, 1));
+  int64_t segment_size = max(isqrt(limit), 1 << 12);
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
 
@@ -185,10 +185,10 @@ T P2(T x, int64_t y, int threads)
   aligned_vector<int64_t> pix_counts(threads);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
-  // initialize with \sum_{i=a+1}^{b} -i + 1
-  T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  T sum = 0;
   T pix_total = 0;
 
+  // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < limit)
   {
     int64_t segments = ceil_div(limit - low, segment_size);
@@ -215,6 +215,9 @@ T P2(T x, int64_t y, int threads)
     if (print_status())
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
+
+  // \sum_{i=a+1}^{b} - (i - 1)
+  sum -= (b - 2) * (b + 1) / 2 - (a - 2) * (a + 1) / 2;
 
   if (print_status())
     print_result("P2", sum, time);
