@@ -78,8 +78,7 @@ int64_t S2_trivial(int64_t x,
                    vector<int32_t>& primes,
                    int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint64_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial((intfast64_t) x, y, z, c, pi, primes, threads);
 }
 
 int64_t S2_trivial(int64_t x,
@@ -90,8 +89,7 @@ int64_t S2_trivial(int64_t x,
                    vector<int32_t>& primes,
                    int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint64_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial((intfast64_t) x, y, z, c, pi, primes, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -104,8 +102,7 @@ int128_t S2_trivial(int128_t x,
                     vector<uint32_t>& primes,
                     int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint128_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial((intfast128_t) x, y, z, c, pi, primes, threads);
 }
 
 int128_t S2_trivial(int128_t x,
@@ -116,8 +113,7 @@ int128_t S2_trivial(int128_t x,
                     vector<int64_t>& primes,
                     int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint128_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial((intfast128_t) x, y, z, c, pi, primes, threads);
 }
 
 #endif
