@@ -10,13 +10,14 @@
 
 #include <FactorTable.hpp>
 #include <int128.hpp>
+#include <primecount-internal.hpp>
 
 #include <stdint.h>
 #include <vector>
 
 namespace primecount {
 
-int64_t S1(int64_t x,
+int64_t S1(intfast64_t x,
            int64_t y,
            int64_t c,
            int64_t prime_c,
@@ -24,7 +25,7 @@ int64_t S1(int64_t x,
            std::vector<int32_t>& mu,
            int threads);
 
-int64_t S1(int64_t x,
+int64_t S1(intfast64_t x,
            int64_t y,
            int64_t c,
            int64_t prime_c,

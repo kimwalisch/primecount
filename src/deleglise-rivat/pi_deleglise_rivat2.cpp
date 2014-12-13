@@ -66,7 +66,7 @@ void cross_off(int64_t prime,
 /// Calculate the contribution of the special leaves which require
 /// a sieve (in order to reduce the memory usage).
 ///
-int64_t S2_sieve(uint64_t x,
+int64_t S2_sieve(intfast64_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,

@@ -105,7 +105,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, FactorTable<F>& factors, int th
 
 namespace primecount {
 
-int64_t S1(int64_t x,
+int64_t S1(intfast64_t x,
            int64_t y,
            int64_t c,
            int64_t prime_c,
@@ -113,24 +113,22 @@ int64_t S1(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  assert(x >= 0);
-  return S1::S1((uint64_t) x, y, c, prime_c, lpf, mu, threads);
+  return S1::S1(x, y, c, prime_c, lpf, mu, threads);
 }
 
-int64_t S1(int64_t x,
+int64_t S1(intfast64_t x,
            int64_t y,
            int64_t c,
            int64_t prime_c,
            FactorTable<uint16_t>& factors,
            int threads)
 {
-  assert(x >= 0);
-  return S1::S1((uint64_t) x, y, c, prime_c, factors, threads);
+  return S1::S1(x, y, c, prime_c, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S1(int128_t x,
+int128_t S1(intfast128_t x
             int64_t y,
             int64_t c,
             int64_t prime_c,
@@ -138,30 +136,27 @@ int128_t S1(int128_t x,
             vector<int32_t>& mu,
             int threads)
 {
-  assert(x >= 0);
-  return S1::S1((uint128_t) x, y, c, prime_c, lpf, mu, threads);
+  return S1::S1(x, y, c, prime_c, lpf, mu, threads);
 }
 
-int128_t S1(int128_t x,
+int128_t S1(intfast128_t x
             int64_t y,
             int64_t c,
             uint32_t prime_c,
             FactorTable<uint16_t>& factors,
             int threads)
 {
-  assert(x >= 0);
-  return S1::S1((uint128_t) x, y, c, prime_c, factors, threads);
+  return S1::S1(x, y, c, prime_c, factors, threads);
 }
 
-int128_t S1(int128_t x,
+int128_t S1(intfast128_t x
             int64_t y,
             int64_t c,
             int64_t prime_c,
             FactorTable<uint32_t>& factors,
             int threads)
 {
-  assert(x >= 0);
-  return S1::S1((uint128_t) x, y, c, prime_c, factors, threads);
+  return S1::S1(x, y, c, prime_c, factors, threads);
 }
 
 #endif

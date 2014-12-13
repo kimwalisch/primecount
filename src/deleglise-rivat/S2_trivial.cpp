@@ -55,7 +55,7 @@ T1 S2_trivial(T1 x,
   for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
   {
     T1 prime = primes[b];
-    uint64_t xn = (uint64_t) max(x / (prime * prime), prime);
+    int64_t xn = (int64_t) max(x / (prime * prime), prime);
     S2_total += pi_y - pi[xn];
   }
 
@@ -70,7 +70,7 @@ T1 S2_trivial(T1 x,
 
 namespace primecount {
 
-int64_t S2_trivial(int64_t x,
+int64_t S2_trivial(intfast64_t x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
@@ -78,11 +78,10 @@ int64_t S2_trivial(int64_t x,
                    vector<int32_t>& primes,
                    int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint64_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, pi, primes, threads);
 }
 
-int64_t S2_trivial(int64_t x,
+int64_t S2_trivial(intfast64_t x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
@@ -90,13 +89,12 @@ int64_t S2_trivial(int64_t x,
                    vector<int32_t>& primes,
                    int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint64_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, pi, primes, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_trivial(int128_t x,
+int128_t S2_trivial(intfast128_t x,
                     int64_t y,
                     int64_t z,
                     int64_t c,
@@ -104,11 +102,10 @@ int128_t S2_trivial(int128_t x,
                     vector<uint32_t>& primes,
                     int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint128_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, pi, primes, threads);
 }
 
-int128_t S2_trivial(int128_t x,
+int128_t S2_trivial(intfast128_t x,
                     int64_t y,
                     int64_t z,
                     int64_t c,
@@ -116,8 +113,7 @@ int128_t S2_trivial(int128_t x,
                     vector<int64_t>& primes,
                     int threads)
 {
-  assert(x >= 0);
-  return S2_trivial::S2_trivial((uint128_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, pi, primes, threads);
 }
 
 #endif

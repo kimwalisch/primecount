@@ -22,6 +22,23 @@
 
 namespace primecount {
 
+/// Fastest 64-bit integer type for division.
+/// On most Intel CPUs before 2015 unsigned 64-bit division is about
+/// 10 percent faster than signed division. It is likely that in a few
+/// years years signed and unsigned division will run equally fast.
+///
+typedef uint64_t intfast64_t;
+
+#if defined(HAVE_INT128_T)
+
+/// Fastest 128-bit integer type for division.
+/// On the author's Intel Core-i7 4770 CPU from 2013 using uint128_t
+/// instead of int128_t gives 10 percent better performance.
+///
+typedef uint128_t intfast128_t;
+
+#endif
+
 enum {
   /// Uses all CPU cores.
   MAX_THREADS = -1
@@ -117,11 +134,11 @@ int128_t Li_inverse(int128_t);
 
 int64_t nth_prime(int64_t n, int threads);
 
-int64_t P2(int64_t x, int64_t y, int threads);
+int64_t P2(intfast64_t x, int64_t y, int threads);
 
 #ifdef HAVE_INT128_T
 
-int128_t P2(int128_t x, int64_t y, int threads);
+int128_t P2(intfast128_t x, int64_t y, int threads);
 
 #endif
 
