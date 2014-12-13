@@ -230,16 +230,18 @@ T P2(T x, int64_t y, int threads)
 
 namespace primecount {
 
-int64_t P2(intfast64_t x, int64_t y, int threads)
+int64_t P2(int64_t x, int64_t y, int threads)
 {
-  return P2::P2(x, y, threads);
+  assert(x >= 0);
+  return P2::P2((uint64_t) x, y, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t P2(intfast128_t x, int64_t y, int threads)
+int128_t P2(int128_t x, int64_t y, int threads)
 {
-  return P2::P2(x, y, threads);
+  assert(x >= 0);
+  return P2::P2((uint128_t) x, y, threads);
 }
 
 #endif
