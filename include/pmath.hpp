@@ -37,30 +37,30 @@ inline T min3(T a, T b, T c)
 }
 
 /// Convenience min function for different types.
-/// @pre sizeof(A) >= sizeof(B)
+/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
+///      a >= 0, b >= 0.
 ///
 template <typename A, typename B>
 inline B min(A a, B b)
 {
 #if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B), "sizeof(A) must not be < sizeof(B)");
+  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
+                "max(type A) must not be < max(type B)");
 #endif
-  assert(a >= 0);
-  assert(b >= 0);
   return (a < (A) b) ? (B) a : b;
 }
 
 /// Convenience min function for different types.
-/// @pre sizeof(A) >= sizeof(B)
+/// @pre numeric_limits<A>::max() >= numeric_limits<B>::max(),
+///      a >= 0, b >= 0.
 ///
 template <typename A, typename B>
 inline B min3(A a, B b, B c)
 {
 #if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B), "sizeof(A) must not be < sizeof(B)");
+  static_assert(std::numeric_limits<A>::max() >= std::numeric_limits<B>::max(),
+                "max(type A) must not be < max(type B)");
 #endif
-  assert(a >= 0);
-  assert(b >= 0);
   return (B) std::min(a, (A) std::min(b, c));
 }
 
