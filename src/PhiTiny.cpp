@@ -19,15 +19,9 @@
 #include <stdint.h>
 #include <vector>
 
-namespace {
-
-const primecount::PhiTiny phiTinySingleton;
-
-}
-
 namespace primecount {
 
-extern const PhiTiny& phiTiny = phiTinySingleton;
+extern const PhiTiny phiTiny = PhiTiny();
 
 const int PhiTiny::primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
 
