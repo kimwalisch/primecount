@@ -1,8 +1,7 @@
 ///
 /// @file   inttypes.hpp
-/// @brief  Integer types used in primecount:
-///         int128_t, uint128_t, intfast64_t, intfast128_t,
-///         maxint_t, maxuint_t.
+/// @brief  Integer types used in primecount: int128_t, uint128_t,
+///         intfast64_t, intfast128_t, maxint_t, maxuint_t.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -86,7 +85,7 @@ namespace primecount {
 /// Fastest 64-bit integer type for division.
 /// On most Intel CPUs before 2015 unsigned 64-bit division is about
 /// 10 percent faster than signed division. It is likely that in a few
-/// years years signed and unsigned division will run equally fast.
+/// years signed and unsigned division will run equally fast.
 ///
 typedef uint64_t intfast64_t;
 
