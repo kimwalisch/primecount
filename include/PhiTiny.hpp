@@ -53,6 +53,9 @@ inline bool is_phi_tiny(int64_t a)
   return PhiTiny::is_tiny(a);
 }
 
+/* C++ compilers (2014) have trouble compiling:
+ * std::make_signed<__uint128_t>::type
+
 #if __cplusplus >= 201103L
 
 #include <type_traits>
@@ -64,7 +67,7 @@ typename std::make_signed<X>::type phi_tiny(X x, A a)
   return phiTiny.phi(x, a);
 }
 
-#else /* C++98 */
+#else */
 
 template <typename X, typename A>
 X phi_tiny(X x, A a)
@@ -72,8 +75,6 @@ X phi_tiny(X x, A a)
   extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
 }
-
-#endif
 
 } // namespace primecount
 
