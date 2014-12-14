@@ -37,9 +37,7 @@ public:
     // phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
     // with pp = 2 * 3 * ... * prime[a]
     X pp = prime_products[a];
-    X x_div_pp = x / pp;
-    X x_mod_pp = x - pp * x_div_pp;
-    return x_div_pp * totients[a] + phi_cache_[a][x_mod_pp];
+    return (x / pp) * totients[a] + phi_cache_[a][x % pp];
   }
 
   private:
