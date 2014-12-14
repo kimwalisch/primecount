@@ -49,18 +49,6 @@ struct make_signed_workaround
 };
 
 template <typename T>
-struct is_unsigned_workaround
-{
-  enum {
-#ifndef HAVE_INT128_T
-    value = std::is_unsigned<T>::value
-#else
-    value = !std::is_same<T, typename make_signed_workaround<T>::type>::value
-#endif
-  };
-};
-
-template <typename T>
 struct is_integral_workaround
 {
   enum {
@@ -83,13 +71,6 @@ struct integral_not_same
              is_integral_workaround<B>::value
   };
 };
-
-template <typename T>
-bool is_positive(T a)
-{
-  return is_unsigned_workaround<T>::value ||
-         (typename make_signed_workaround<T>::type) a >= 0;
-}
 
 template <typename A, typename B,
           typename std::enable_if<std::is_same<A, B>::value>::type* = nullptr>
