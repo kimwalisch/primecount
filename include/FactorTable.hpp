@@ -56,21 +56,18 @@ public:
   }
 
   /// @pre number > 0
-  static int64_t get_index(int64_t number)
+  static int64_t get_index(uint64_t number)
   {
     assert(number > 0);
-    int64_t q = ((uint64_t) number) / 210;
-    int64_t r = number - q * 210;
-
+    uint64_t q = number / 210;
+    uint64_t r = number % 210;
     return 48 * q + indexes_[r];
   }
 
-  static int64_t get_number(int64_t index)
+  static int64_t get_number(uint64_t index)
   {
-    // unsigned is faster here
-    int64_t q = ((uint64_t) index) / 48;
-    int64_t r = index - q * 48;
-
+    uint64_t q = index / 48;
+    uint64_t r = index % 48;
     return 210 * q + numbers_[r];
   }
 
