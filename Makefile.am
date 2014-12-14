@@ -71,6 +71,7 @@ libprimecount_la_SOURCES = \
 	include/FactorTable.hpp \
 	include/generate.hpp \
 	include/inttypes.hpp \
+	include/min_max.hpp \
 	include/popcount.hpp \
 	include/pmath.hpp \
 	include/primecount-internal.hpp \

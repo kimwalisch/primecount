@@ -10,6 +10,8 @@
 #ifndef PMATH_HPP
 #define PMATH_HPP
 
+#include <min_max.hpp>
+
 #include <stdint.h>
 #include <algorithm>
 #include <limits>
@@ -18,62 +20,6 @@
 #include <vector>
 
 namespace primecount {
-
-/// Convenience min function for different types.
-/// @pre sizeof(A) >= sizeof(B),
-///      if A is unsigned then b >= 0.
-///
-template <typename A, typename B>
-inline B min(A a, B b)
-{
-#if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B),
-               "sizeof(A) >= sizeof(B)");
-#endif
-  return (B) std::min(a, (A) b);
-}
-
-/// Convenience min function for different types.
-/// @pre sizeof(A) >= sizeof(B),
-///      if A is unsigned then b >= 0.
-///
-template <typename A, typename B>
-inline B min3(A a, B b, B c)
-{
-#if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B),
-               "sizeof(A) >= sizeof(B)");
-#endif
-  return (B) std::min(a, (A) std::min(b, c));
-}
-
-/// Convenience max function for different types.
-/// @pre sizeof(A) >= sizeof(B),
-///      if A is unsigned then b >= 0.
-///
-template <typename A, typename B>
-inline A max(A a, B b)
-{
-#if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B),
-               "sizeof(A) >= sizeof(B)");
-#endif
-  return std::max(a, (A) b);
-}
-
-/// Convenience max function for different types.
-/// @pre sizeof(A) >= sizeof(B),
-///      if A is unsigned then b >= 0.
-///
-template <typename A, typename B>
-inline A max3(A a, B b, B c)
-{
-#if __cplusplus >= 201103L
-  static_assert(sizeof(A) >= sizeof(B),
-               "sizeof(A) >= sizeof(B)");
-#endif
-  return std::max(a, (A) std::max(b, c));
-}
 
 inline int64_t isquare(int32_t x)
 {
