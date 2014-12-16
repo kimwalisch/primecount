@@ -29,7 +29,8 @@ using namespace std;
 namespace primecount {
 
 S2Status::S2Status() :
-  old_(-1), time_(get_wtime())
+  old_(-1),
+  time_(0)
 { }
 
 int S2Status::calculate_percent(maxint_t n, maxint_t limit) const
