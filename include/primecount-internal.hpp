@@ -144,9 +144,9 @@ bool print_status();
 maxint_t to_maxint(const std::string& expr);
 
 template <typename T>
-int get_percent(T low, T limit)
+T get_percent(T low, T limit)
 {
-  int percent = (int) (100.0 * low / std::max<T>(1, limit));
+  T percent = (T) (100.0 * low / std::max<T>(1, limit));
   return in_between(0, percent, 100);
 }
 
