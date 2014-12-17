@@ -33,7 +33,7 @@ S2Status::S2Status() :
   time_(0)
 { }
 
-int S2Status::calculate_percent(maxint_t n, maxint_t limit) const
+int S2Status::skewed_percent(maxint_t n, maxint_t limit) const
 {
   double exp = 0.96;
   double percent = get_percent((double) n, (double) limit);
@@ -45,7 +45,7 @@ int S2Status::calculate_percent(maxint_t n, maxint_t limit) const
 
 void S2Status::print(maxint_t n, maxint_t limit)
 {
-  int percent = calculate_percent(n, limit);
+  int percent = skewed_percent(n, limit);
   if (percent > old_)
   {
     #pragma omp critical (s2_status)
@@ -65,7 +65,7 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
     return;
 
   time_ = t2;
-  int percent = calculate_percent(n, limit);
+  int percent = skewed_percent(n, limit);
   int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
   old_ = percent;
 
