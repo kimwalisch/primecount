@@ -63,7 +63,7 @@ T1 S2_easy(T1 x,
     T1 prime = primes[b];
     int64_t prime64 =  primes[b];
     int64_t min_trivial_leaf = min(x / (prime * prime), y);
-    int64_t min_clustered_easy_leaf = isqrt(x / prime64);
+    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x / prime64);
     int64_t min_sparse_easy_leaf = z / prime64;
     int64_t min_hard_leaf = max(y / prime64, prime64);
 
