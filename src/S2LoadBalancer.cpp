@@ -38,7 +38,7 @@
 ///
 /// 4) We can't use a static threshold for as to when the relative
 ///    standard deviation is low or large as this threshold varies for
-///    different PC architectures. So Instead we compare the current
+///    different PC architectures. So instead we compare the current
 ///    relative standard deviation to the previous one in order to
 ///    decide whether to increase or decrease the interval_size.
 ///
