@@ -7,41 +7,40 @@
 /// Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms by
 /// subdividing the sieve interval by the number of threads into
 /// equally sized subintervals does not scale because the distribution
-/// of the special leaves is highly skewed, especially if the interval
-/// size is large and if the intervals are not adjacent. Also most
-/// special leaves are in the first few segments whereas later on
-/// there are very few special leaves.
+/// of the special leaves is highly skewed and most special leaves are
+/// in the first few segments whereas later on there are very few
+/// special leaves.
 ///
 /// Based on the above observations it is clear that we need some kind
 /// of load balancing in order to scale our parallel algorithm for
-/// computing the special leaves. Below are the ideas I used to
-/// develop a load balancing algorithm which scales linearly up to a
-/// large number of CPU cores (tested with 300 threads).
+/// computing special leaves. Below are the ideas I used to develop a
+/// load balancing algorithm that achieves a high load balance by
+/// dynamically increasing or decreasing the interval size based on
+/// the relative standard deviation of the thread run-times.
 ///
-/// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
-///    and one segment per thread. Our algorithm uses equally sized
+/// 1) Start with a tiny segment_size of x^(1/3) / (log x * log log x)
+///    and one segment_per_thread. Our algorithm uses equally sized
 ///    intervals, for each thread the interval_size is
 ///    segment_size * segments_per_thread and the threads process
 ///    adjacent intervals i.e.
 ///    [base + interval_size * thread_id, base + interval_size * (thread_id + 1)].
 ///
-/// 2) If the relative standard deviation of the run times of the
-///    threads is low then increase the segment size and/or segments
-///    per thread, else if the relative standard deviation is large
-///    then decrease the segment size and/or segments per thread. This
-///    rule is derived from the observation that intervals with
-///    roughly the same number of special leaves take about the same
-///    time to process and the next intervals tend to have a similar
-///    distribution of special leaves (especially if the interval size
-///    is small).
+/// 2) If the relative standard deviation of the thread run-times is
+///    large then we know the special leaves are distributed unevenly,
+///    else if the relative standard deviation is low the special
+///    leaves are more evenly distributed.
 ///
-/// 3) We can't use a static threshold for as to when the relative
+/// 3) If the special leaves are distributed unevenly then we can
+///    increase the load balance by decreasing the interval_size.
+///    Contrary if the special leaves are more evenly distributed
+///    we can increase the interval_size in order to improve the
+///    algorithm's efficiency.
+///
+/// 4) We can't use a static threshold for as to when the relative
 ///    standard deviation is low or large as this threshold varies for
-///    different PC architectures e.g. 15 might be large relative
-///    standard deviation for a quad-core CPU system whereas it is a
-///    low standard deviation for a dual-socket system with 64 CPU
-///    cores. So instead of using a static threshold we compare the
-///    current relative standard deviation to the previous one.
+///    different PC architectures. So Instead we compare the current
+///    relative standard deviation to the previous one in order to
+///    decide whether to increase or decrease the interval_size.
 ///
 /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
