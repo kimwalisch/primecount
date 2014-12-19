@@ -18,8 +18,8 @@
 /// dynamically increasing or decreasing the interval size based on
 /// the relative standard deviation of the thread run-times.
 ///
-/// 1) Start with a tiny segment_size of x^(1/3) / (log x * log log x)
-///    and one segment_per_thread. Our algorithm uses equally sized
+/// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
+///    and one segment per thread. Our algorithm uses equally sized
 ///    intervals, for each thread the interval_size is
 ///    segment_size * segments_per_thread and the threads process
 ///    adjacent intervals i.e.
