@@ -122,10 +122,9 @@ int128_t S2_sieve(intfast128_t x,
     // which satisfy: low <= (x / n) < high
     for (; b <= pi_sqrty; b++)
     {
-      int128_t prime128 = primes[b];
       int64_t prime = primes[b];
-      int64_t min_m = max(min(x / (prime128 * high), y), y / prime);
-      int64_t max_m = min(x / (prime128 * low), y);
+      int64_t min_m = max(min(x / (prime * (int128_t) high), y), y / prime);
+      int64_t max_m = min(x / (prime * (int128_t) low), y);
 
       if (prime >= max_m)
         goto next_segment;
@@ -138,7 +137,8 @@ int128_t S2_sieve(intfast128_t x,
         if (prime < factors.lpf(m))
         {
           int64_t n = prime * factors.get_number(m);
-          int64_t count = cnt_query(counters, (x / n) - low);
+          int64_t xn = (int64_t) (x / n);
+          int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           S2_result -= factors.mu(m) * phi_xn;
         }
@@ -153,10 +153,9 @@ int128_t S2_sieve(intfast128_t x,
     // which satisfy: low <= (x / n) < high
     for (; b <= pi_sqrtz; b++)
     {
-      int128_t prime128 = primes[b];
       int64_t prime = primes[b];
-      int64_t l = pi[min3(x / (prime128 * low), z / prime, y)];
-      int64_t min_hard_leaf = max3(min(x / (prime128 * high), y), y / prime, prime);
+      int64_t l = pi[min3(x / (prime * (int128_t) low), z / prime, y)];
+      int64_t min_hard_leaf = max3(min(x / (prime * (int128_t) high), y), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
@@ -164,7 +163,7 @@ int128_t S2_sieve(intfast128_t x,
       for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t n = prime * primes[l];
-        int64_t xn = x / n;
+        int64_t xn = (int64_t) (x / n);
         int64_t count = cnt_query(counters, xn - low);
         int64_t phi_xn = phi[b] + count;
         S2_result += phi_xn;

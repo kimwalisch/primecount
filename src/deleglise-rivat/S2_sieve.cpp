@@ -193,7 +193,7 @@ T S2_sieve_thread(T x,
       for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t n = prime * primes[l];
-        int64_t xn = x / n;
+        int64_t xn = (int64_t) (x / n);
         int64_t count = cnt_query(counters, xn - low);
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
