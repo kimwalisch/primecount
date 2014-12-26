@@ -151,8 +151,11 @@ T S2_sieve_thread(T x,
     for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(min(x / (prime * (T) high), y), y / prime);
-      int64_t max_m = min(x / (prime * (T) low), y);
+      T x2 = x / prime;
+      assert(x2 / high == x / (prime * (T) high));
+      assert(x2 / low  == x / (prime * (T) low));
+      int64_t min_m = max(min(x2 / high, y), y / prime);
+      int64_t max_m = min(x2 / low, y);
 
       if (prime >= max_m)
         goto next_segment;
@@ -164,8 +167,9 @@ T S2_sieve_thread(T x,
       {
         if (prime < factors.lpf(m))
         {
-          int64_t n = prime * factors.get_number(m);
-          int64_t xn = (int64_t) (x / n);
+          int64_t m2 = factors.get_number(m);
+          int64_t xn = (int64_t) (x2 / m2);
+          assert(xn == (int64_t) (x / (prime * m2)));
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factors.mu(m);
@@ -184,16 +188,19 @@ T S2_sieve_thread(T x,
     for (; b <= pi_max; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min3(x / (prime * (T) low), z / prime, y)];
-      int64_t min_hard_leaf = max3(min(x / (prime * (T) high), y), y / prime, prime);
+      T x2 = x / prime;
+      assert(x2 / high == x / (prime * (T) high));
+      assert(x2 / low  == x / (prime * (T) low));
+      int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+      int64_t l = pi[min3(x2 / low, z / prime, y)];
 
       if (prime >= primes[l])
         goto next_segment;
 
       for (; primes[l] > min_hard_leaf; l--)
       {
-        int64_t n = prime * primes[l];
-        int64_t xn = (int64_t) (x / n);
+        int64_t xn = (int64_t) (x2 / primes[l]);
+        assert(xn == (int64_t) (x / (prime * primes[l])));
         int64_t count = cnt_query(counters, xn - low);
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
