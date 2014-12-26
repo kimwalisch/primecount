@@ -79,7 +79,7 @@ T1 S2_easy(T1 x,
     while (primes[l] > min_clustered_easy_leaf)
     {
       int64_t xn = (int64_t) (x2 / primes[l]);
-      assert(xn == (int64_t) x / (prime * primes[l]));
+      assert(xn == (int64_t) (x / (prime * primes[l])));
       int64_t phi_xn = pi[xn] - b + 2;
       int64_t last_prime = primes[b + phi_xn - 1];
       assert(x2 / last_prime == x / (prime * last_prime));
@@ -94,7 +94,7 @@ T1 S2_easy(T1 x,
     for (; primes[l] > min_sparse_easy_leaf; l--)
     {
       int64_t xn = (int64_t) (x2 / primes[l]);
-      assert(xn == (int64_t) x / (prime * primes[l]));
+      assert(xn == (int64_t) (x / (prime * primes[l])));
       result += pi[xn] - b + 2;
     }
 
