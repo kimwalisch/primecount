@@ -1,6 +1,6 @@
 2014-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.5 work in progress.
+  Version 1.5 released.
 
   This version runs up to 30 percent faster than primecount-1.4 for
   numbers > 2^64. The speed up is achieved using a clever trick:
