@@ -191,8 +191,9 @@ T S2_sieve_thread(T x,
       T x2 = x / prime;
       assert(x2 / high == x / (prime * (T) high));
       assert(x2 / low  == x / (prime * (T) low));
-      int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+
       int64_t l = pi[min3(x2 / low, z / prime, y)];
+      int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
