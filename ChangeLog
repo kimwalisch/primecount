@@ -9,6 +9,8 @@
   If x2 is < 2^64 then xn can be calculated using a single 64-bit
   division which is much faster.
 
+  * README.md: Add command-line options summary.
+  * src/app/cmdoptions.cpp: Set -l = --lmo instead of --lehmer.
   * src/deleglise-rivat/S2_*.cpp: Avoid 128-bit divisions.
   * src/S2Status.cpp: Improved status precision.
 
