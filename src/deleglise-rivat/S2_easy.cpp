@@ -74,15 +74,14 @@ T1 S2_easy(T1 x,
     T1 x2 = x / prime;
 
     // Find all clustered easy leaves:
-    // x / n <= y and phi(x / n, b - 1) == phi(x / m, b - 1)
+    // n = primes[b] * primes[l]
+    // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
     // where phi(x / n, b - 1) = pi(x / n) - b + 2
     while (primes[l] > min_clustered_easy_leaf)
     {
       int64_t xn = (int64_t) (x2 / primes[l]);
-      assert(xn == (int64_t) (x / (prime * primes[l])));
       int64_t phi_xn = pi[xn] - b + 2;
       int64_t last_prime = primes[b + phi_xn - 1];
-      assert(x2 / last_prime == x / (prime * last_prime));
       int64_t xm = max((int64_t) (x2 / last_prime), min_clustered_easy_leaf);
       int64_t l2 = pi[xm];
       result += phi_xn * (l - l2);
@@ -90,11 +89,11 @@ T1 S2_easy(T1 x,
     }
 
     // Find all sparse easy leaves:
-    // x / n <= y and phi(x / n, b - 1) = pi(x / n) - b + 2
+    // n = primes[b] * primes[l]
+    // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
     for (; primes[l] > min_sparse_easy_leaf; l--)
     {
       int64_t xn = (int64_t) (x2 / primes[l]);
-      assert(xn == (int64_t) (x / (prime * primes[l])));
       result += pi[xn] - b + 2;
     }
 
