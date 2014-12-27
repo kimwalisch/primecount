@@ -146,7 +146,7 @@ T S2_sieve_thread(T x,
     }
 
     // For c + 1 <= b <= pi_sqrty
-    // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
+    // Find all special leaves: n = primes[b] * f, with mu[f] != 0 and primes[b] < lpf[f]
     // which satisfy: low <= (x / n) < high
     for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
     {
@@ -167,9 +167,9 @@ T S2_sieve_thread(T x,
       {
         if (prime < factors.lpf(m))
         {
-          int64_t m2 = factors.get_number(m);
-          int64_t xn = (int64_t) (x2 / m2);
-          assert(xn == (int64_t) (x / (prime * m2)));
+          int64_t f = factors.get_number(m);
+          int64_t xn = (int64_t) (x2 / f);
+          assert(xn == (int64_t) (x / (prime * f)));
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factors.mu(m);
