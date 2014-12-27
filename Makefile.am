@@ -86,7 +86,6 @@ libprimecount_la_SOURCES = \
 if HAVE_INT128_T
 
 libprimecount_la_SOURCES += \
-	src/deleglise-rivat/pi_deleglise_rivat3.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp
 
 endif

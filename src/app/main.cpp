@@ -97,8 +97,6 @@ int main (int argc, char* argv[])
         res = nth_prime(int64_cast(x), threads); break;
 
 #ifdef HAVE_INT128_T
-      case OPTION_DELEGLISE_RIVAT3:
-        res = pi_deleglise_rivat3(x); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL3:
         res = pi_deleglise_rivat_parallel3(x, threads); break;
 #endif

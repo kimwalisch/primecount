@@ -124,14 +124,10 @@ int128_t pi_deleglise_rivat(int128_t x)
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
   // use 64-bit if possible
-
   if (x <= numeric_limits<int64_t>::max())
     return pi_deleglise_rivat((int64_t) x, threads);
 
-  if (threads <= 1)
-    return pi_deleglise_rivat3(x);
-  else
-    return pi_deleglise_rivat_parallel3(x, threads);
+  return pi_deleglise_rivat_parallel3(x, threads);
 }
 
 #endif

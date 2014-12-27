@@ -52,7 +52,6 @@ void initOptionMap()
   optionMap["--deleglise_rivat"]           = OPTION_DELEGLISE_RIVAT;
   optionMap["--deleglise_rivat1"]          = OPTION_DELEGLISE_RIVAT1;
   optionMap["--deleglise_rivat2"]          = OPTION_DELEGLISE_RIVAT2;
-  optionMap["--deleglise_rivat3"]          = OPTION_DELEGLISE_RIVAT3;
   optionMap["--deleglise_rivat_parallel1"] = OPTION_DELEGLISE_RIVAT_PARALLEL1;
   optionMap["--deleglise_rivat_parallel2"] = OPTION_DELEGLISE_RIVAT_PARALLEL2;
   optionMap["--deleglise_rivat_parallel3"] = OPTION_DELEGLISE_RIVAT_PARALLEL3;
