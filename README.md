@@ -205,7 +205,7 @@ $ ./primecount 1e14
 $ ./primecount 1e20 --status
 
 # Count primes using Meissel's algorithm
-$ ./primecount 1e14 --meissel
+$ ./primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
 $ ./primecount 1e14 --nthprime --threads=4 --time
