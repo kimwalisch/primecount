@@ -146,14 +146,12 @@ T S2_sieve_thread(T x,
     }
 
     // For c + 1 <= b <= pi_sqrty
-    // Find all special leaves: n = primes[b] * f, with mu[f] != 0 and primes[b] < lpf[f]
-    // which satisfy: low <= (x / n) < high
+    // Find all special leaves: n = primes[b] * m
+    // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
     for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
     {
       int64_t prime = primes[b];
       T x2 = x / prime;
-      assert(x2 / high == x / (prime * (T) high));
-      assert(x2 / low  == x / (prime * (T) low));
       int64_t min_m = max(min(x2 / high, y), y / prime);
       int64_t max_m = min(x2 / low, y);
 
@@ -167,9 +165,7 @@ T S2_sieve_thread(T x,
       {
         if (prime < factors.lpf(m))
         {
-          int64_t f = factors.get_number(m);
-          int64_t xn = (int64_t) (x2 / f);
-          assert(xn == (int64_t) (x / (prime * f)));
+          int64_t xn = (int64_t) (x2 / factors.get_number(m));
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factors.mu(m);
@@ -189,9 +185,6 @@ T S2_sieve_thread(T x,
     {
       int64_t prime = primes[b];
       T x2 = x / prime;
-      assert(x2 / high == x / (prime * (T) high));
-      assert(x2 / low  == x / (prime * (T) low));
-
       int64_t l = pi[min3(x2 / low, z / prime, y)];
       int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
 
@@ -201,7 +194,6 @@ T S2_sieve_thread(T x,
       for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t xn = (int64_t) (x2 / primes[l]);
-        assert(xn == (int64_t) (x / (prime * primes[l])));
         int64_t count = cnt_query(counters, xn - low);
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
