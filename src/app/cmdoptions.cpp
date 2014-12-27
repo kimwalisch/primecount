@@ -56,9 +56,9 @@ void initOptionMap()
   optionMap["--deleglise_rivat_parallel2"] = OPTION_DELEGLISE_RIVAT_PARALLEL2;
   optionMap["--deleglise_rivat_parallel3"] = OPTION_DELEGLISE_RIVAT_PARALLEL3;
   optionMap["--legendre"]                  = OPTION_LEGENDRE;
-  optionMap["-l"]                          = OPTION_LEHMER;
   optionMap["--lehmer"]                    = OPTION_LEHMER;
   optionMap["--lehmer2"]                   = OPTION_LEHMER2;
+  optionMap["-l"]                          = OPTION_LMO;
   optionMap["--lmo"]                       = OPTION_LMO;
   optionMap["--lmo1"]                      = OPTION_LMO1;
   optionMap["--lmo2"]                      = OPTION_LMO2;
