@@ -2,9 +2,9 @@
 
   Version 1.5 work in progress.
 
-  This version runs up to twice as fast as primecount-1.4 for
-  numbers > 2^64. The speed up was achieved using a clever trick:
-  instead of calculating xn = x / (prime[b] * primes[l]),
+  This version runs up to 30 percent faster than primecount-1.4 for
+  numbers > 2^64. The speed up is achieved using a clever trick:
+  instead of calculating xn = x / (primes[b] * primes[l]),
   I calculate x2 = x / primes[b] upfront and then xn = x2 / primes[l].
   If x2 is < 2^64 then xn can be calculated using a single 64-bit
   division which is much faster.
