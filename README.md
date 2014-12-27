@@ -207,11 +207,33 @@ $ ./primecount 1e20 --status
 # Count the primes using Meissel's algorithm
 $ ./primecount 1e14 --meissel
 
-# Find the 10^14th prime
-$ ./primecount 1e14 --nthprime --time
+# Find the 10^14th prime using 4 threads
+$ ./primecount 1e14 --nthprime --threads=4 --time
+```
 
-# Print an option summary
-$ ./primecount --help
+### Command-line options
+```
+Usage: primecount x [OPTION]...
+Count the primes below x <= 10^27 using the prime counting function,
+by default the Deleglise-Rivat algorithm (-d) is used.
+
+Options:
+  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
+         --legendre         Count primes using Legendre's formula
+         --lehmer           Count primes using Lehmer's formula
+  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
+  -m,    --meissel          Count primes using Meissel's formula
+         --Li               Approximate pi(x) using the logarithmic integral
+         --Li_inverse       Approximate the nth prime using Li^-1(x)
+  -n,    --nthprime         Calculate the nth prime
+         --phi              Calculate phi(x, a), requires 2 arguments
+  -p,    --primesieve       Count primes using the sieve of Eratosthenes
+  -s,    --status           Print status info during computation
+         --test             Run various correctness tests and exit
+         --time             Print the time elapsed in seconds
+  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
+  -v,    --version          Print version and license information
+  -h,    --help             Print this help menu
 ```
 
 ### Build instructions (Unix-like OSes)
