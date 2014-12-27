@@ -23,11 +23,11 @@ const string helpMenu(
   "by default the Deleglise-Rivat algorithm (-d) is used.\n"
   "\n"
   "Options:\n"
-  "  -d,    --deleglise_rivat  LMO with Deleglise and Rivat improvements\n"
+  "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
+  "         --lehmer           Count primes using Lehmer's formula\n"
+  "  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
   "  -m,    --meissel          Count primes using Meissel's formula\n"
-  "  -l,    --lehmer           Count primes using Lehmer's formula\n"
-  "         --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
   "         --Li               Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse       Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime         Calculate the nth prime\n"
@@ -42,7 +42,7 @@ const string helpMenu(
   "\n"
   "Examples:\n"
   "  primecount 10**13\n"
-  "  primecount 10**13 --nthprime"
+  "  primecount 10**13 --nthprime --threads=4"
 );
 
 const string versionInfo(
