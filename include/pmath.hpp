@@ -10,7 +10,7 @@
 #ifndef PMATH_HPP
 #define PMATH_HPP
 
-#include <min_max.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -86,12 +86,12 @@ template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
-  r = std::min(r, (T) std::numeric_limits<T>::max() >> (sizeof(T) / 2));
 
   while (r * r > x)
     r--;
   while (x - r * r > r * 2)
     r++;
+
   return r;
 }
 
@@ -114,10 +114,12 @@ template <int N, typename T>
 inline T iroot(T x)
 {
   T r = (T) std::pow((double) x, 1.0 / N);
+
   while (ipow(r, N) > x)
     r--;
   while (ipow_less_equal(r + 1, N, x))
     r++;
+
   return r;
 }
 
@@ -130,8 +132,7 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) 
-      - (primes.begin() + 1));
+  return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
 
 /// Calculate the number of primes below x using binary search.
@@ -143,8 +144,7 @@ inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
 {
   // primecount uses 1-indexing
   assert(primes[0] == 0);
-  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) 
-      - (primes.begin() + 1));
+  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
 }
 
 template <typename T1, typename T2, typename T3>
