@@ -9,7 +9,7 @@
 ///
 
 #include <primecount.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -17,8 +17,10 @@
 #include <limits>
 
 using namespace std;
+using namespace primecount;
 
 namespace {
+namespace Li {
 
 /// Calculate the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
@@ -81,7 +83,7 @@ T Li_inverse(T x)
 
   // overflow
   if (first < x) return -1;
-  if (last  < x) last = numeric_limits<T>::max();
+  if (last  < x) last = prt::numeric_limits<T>::max();
 
   // Find Li^-1(x) using binary search
   while (first < last)
@@ -96,30 +98,31 @@ T Li_inverse(T x)
   return first;
 }
 
+} // namespace Li
 } // namespace
 
 namespace primecount {
 
 int64_t Li(int64_t x)
 {
-  return ::Li(x);
+  return Li::Li(x);
 }
 
 int64_t Li_inverse(int64_t x)
 {
-  return ::Li_inverse(x);
+  return Li::Li_inverse(x);
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t Li(int128_t x)
 {
-  return ::Li(x);
+  return Li::Li(x);
 }
 
 int128_t Li_inverse(int128_t x)
 {
-  return ::Li_inverse(x);
+  return Li::Li_inverse(x);
 }
 
 #endif
