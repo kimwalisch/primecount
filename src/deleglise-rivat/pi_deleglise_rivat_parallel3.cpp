@@ -15,9 +15,10 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
 #include <S1.hpp>
 #include "S2.hpp"
 

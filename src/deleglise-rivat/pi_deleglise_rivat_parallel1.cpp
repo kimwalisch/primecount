@@ -22,6 +22,7 @@
 #include <aligned_vector.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S2LoadBalancer.hpp>

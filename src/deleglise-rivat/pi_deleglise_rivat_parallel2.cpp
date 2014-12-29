@@ -16,6 +16,7 @@
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
