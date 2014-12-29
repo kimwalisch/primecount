@@ -15,8 +15,9 @@
 #include <aligned_vector.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -42,9 +43,8 @@ public:
   { }
   int64_t previous_prime()
   {
-    int64_t NO_PREV_PRIME = -1;
     if (prime_ <= 2)
-      return NO_PREV_PRIME;
+      return -1;
     prime_ = iter_.previous_prime();
     return prime_;
   }
