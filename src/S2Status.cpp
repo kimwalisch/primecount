@@ -12,7 +12,7 @@
 #include <S2Status.hpp>
 #include <primecount-internal.hpp>
 #include <pmath.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
 
 #include <algorithm>
 #include <cmath>

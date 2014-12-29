@@ -12,7 +12,7 @@
 
 #include <primecount-internal.hpp>
 #include <primecount.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
 
 #include <stdexcept>
 #include <iostream>

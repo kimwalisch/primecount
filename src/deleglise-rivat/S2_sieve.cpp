@@ -15,7 +15,8 @@
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
 #include <BitSieve.hpp>
 #include <tos_counters.hpp>

@@ -1,5 +1,5 @@
 ///
-/// @file   inttypes.hpp
+/// @file   int128.hpp
 /// @brief  Additional integer types used in primecount:
 ///         int128_t, uint128_t, intfast64_t, intfast128_t, maxint_t,
 ///         maxuint_t.
@@ -13,7 +13,12 @@
 #ifndef INTTYPES_HPP
 #define INTTYPES_HPP
 
+#include <limits>
 #include <stdint.h>
+
+#if __cplusplus >= 201103L
+  #include <type_traits>
+#endif
 
 #if defined(HAVE_INT128_T)
 
@@ -34,9 +39,9 @@ typedef uint128_t maxuint_t;
 namespace primecount {
 
 typedef __int128_t int128_t;
-typedef __int128_t maxint_t;
-
 typedef __uint128_t uint128_t;
+
+typedef __int128_t maxint_t;
 typedef __uint128_t maxuint_t;
 
 inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
@@ -48,7 +53,6 @@ inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
     str += '0' + n % 10;
     n /= 10;
   }
-
   if (str.empty())
     str = "0";
 
@@ -63,7 +67,6 @@ inline std::ostream& operator<<(std::ostream& stream, int128_t n)
     stream << "-";
     n = -n;
   }
-
   stream << (uint128_t) n;
   return stream;
 }
@@ -100,6 +103,78 @@ typedef uint128_t intfast128_t;
 
 #endif
 
-}
+/// Portable namespace, includes functions which (unlike the versions
+/// form the C++ standard library) work with the int128_t and
+/// uint128_t types (2014).
+///
+namespace prt {
+
+template <typename T>
+struct numeric_limits
+{
+  static T max()
+  {
+    return std::numeric_limits<T>::max();
+  }
+};
+
+#if defined(HAVE_INT128_T)
+
+template <>
+struct numeric_limits<int128_t>
+{
+  static int128_t max()
+  {
+    return ~(((int128_t) 1) << 127);
+  }
+};
+
+template <>
+struct numeric_limits<uint128_t>
+{
+  static uint128_t max()
+  {
+    return ~((int128_t) 0);
+  }
+};
+
+#endif /* HAVE_INT128_T */
+
+#if __cplusplus >= 201103L
+
+template <typename T>
+struct make_signed
+{
+#ifndef HAVE_INT128_T
+  typedef typename std::make_signed<T>::type type;
+#else
+  typedef typename std::conditional<std::is_same<T, uint8_t>::value, int8_t,
+          typename std::conditional<std::is_same<T, uint16_t>::value, int16_t,
+          typename std::conditional<std::is_same<T, uint32_t>::value, int32_t,
+          typename std::conditional<std::is_same<T, uint64_t>::value, int64_t,
+          typename std::conditional<std::is_same<T, uint128_t>::value, int128_t,
+          T>::type>::type>::type>::type>::type type;
+#endif
+};
+
+template <typename T>
+struct is_integral
+{
+  enum
+  {
+#ifndef HAVE_INT128_T
+    value = std::is_integral<T>::value
+#else
+    value = std::is_integral<T>::value ||
+            std::is_same<T, int128_t>::value ||
+            std::is_same<T, uint128_t>::value
+#endif
+  };
+};
+
+#endif /* __cplusplus >= 201103L */
+
+} // namespace prt
+} // namespace primecount
 
 #endif /* INTTYPES_HPP */

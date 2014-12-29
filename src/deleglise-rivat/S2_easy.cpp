@@ -12,7 +12,8 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <inttypes.hpp>
+#include <int128.hpp>
+#include <min_max.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
 

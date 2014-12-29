@@ -70,7 +70,7 @@ libprimecount_la_SOURCES = \
 	include/calculator.hpp \
 	include/FactorTable.hpp \
 	include/generate.hpp \
-	include/inttypes.hpp \
+	include/int128.hpp \
 	include/min_max.hpp \
 	include/popcount.hpp \
 	include/pmath.hpp \
