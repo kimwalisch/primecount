@@ -10,8 +10,7 @@
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
 
-#include <inttypes.hpp>
-#include <min_max.hpp>
+#include <int128.hpp>
 
 #include <stdint.h>
 #include <cassert>
@@ -55,7 +54,7 @@ inline bool is_phi_tiny(int64_t a)
 #if __cplusplus >= 201103L
 
 template <typename X, typename A>
-typename make_signed_workaround<X>::type phi_tiny(X x, A a)
+typename prt::make_signed<X>::type phi_tiny(X x, A a)
 {
   extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
