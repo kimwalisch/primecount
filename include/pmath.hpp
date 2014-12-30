@@ -81,11 +81,37 @@ inline T ipow(T x, int n)
   return r;
 }
 
-/// Integer suare root
+#if __cplusplus >= 201103L
+
+#define MID ((lo + hi + 1) / 2)
+
+template <typename T>
+constexpr T sqrt_helper(T x, T lo, T hi)
+{
+  return lo == hi ? lo : ((x / MID < MID)
+      ? sqrt_helper<T>(x, lo, MID - 1) : sqrt_helper<T>(x, MID, hi));
+}
+
+#undef MID
+
+/// C++11 compile time square root
+template <typename T>
+constexpr T ct_sqrt(T x)
+{
+  return sqrt_helper<T>(x, 0, (x < 9) ? x : x - 1);
+}
+
+#endif
+
+/// Integer square root
 template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
+
+#if __cplusplus >= 201103L
+  r = std::min(r , ct_sqrt(prt::numeric_limits<T>::max()));
+#endif
 
   while (r * r > x)
     r--;
