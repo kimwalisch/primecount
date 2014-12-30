@@ -37,7 +37,7 @@ namespace S2_easy {
 /// n = primes[b] * primes[l] with x / n <= y.
 /// @param x2 = x / primes[b].
 ///
-template <typename T1, typename T2, typename T3, typename R = T1>
+template <typename R, typename T1, typename T2, typename T3>
 R S2_easy(T1 x2,
           int64_t y,
           int64_t z,
@@ -95,10 +95,10 @@ T1 S2_strategy(T1 x,
   T1 x2 = x / primes[b];
 
   // Avoid slow 128-bit divisions
-  if (x2 <= std::numeric_limits<intfast64_t>::max())
+  if (x2 <= numeric_limits<intfast64_t>::max())
     return S2_easy<T1>((intfast64_t) x2, y, z, b, pi, primes);
 
-  return S2_easy(x2, y, z, b, pi, primes);
+  return S2_easy<T1>(x2, y, z, b, pi, primes);
 }
 
 /// Calculate the contribution of the clustered easy leaves
