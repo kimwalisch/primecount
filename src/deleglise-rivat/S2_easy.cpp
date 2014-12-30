@@ -37,15 +37,15 @@ namespace S2_easy {
 /// n = primes[b] * primes[l] with x / n <= y.
 /// @param x2 = x / primes[b].
 ///
-template <typename T1, typename T2, typename T3>
-T1 S2_easy(T1 x2,
-           int64_t y,
-           int64_t z,
-           int64_t b,
-           T2& pi,
-           vector<T3>& primes)
+template <typename T1, typename T2, typename T3, typename R = T1>
+R S2_easy(T1 x2,
+          int64_t y,
+          int64_t z,
+          int64_t b,
+          T2& pi,
+          vector<T3>& primes)
 {
-  T1 s2_easy = 0;
+  R s2_easy = 0;
   int64_t prime = primes[b];
   int64_t min_trivial_leaf = min(x2 / prime, y);
   int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
@@ -85,18 +85,18 @@ T1 S2_easy(T1 x2,
 
 /// Strategy pattern, chooses an S2_easy() implementation.
 template <typename T1, typename T2, typename T3>
-T1 strategy(T1 x,
-            int64_t y,
-            int64_t z,
-            int64_t b,
-            T2& pi,
-            vector<T3>& primes)
+T1 S2_strategy(T1 x,
+               int64_t y,
+               int64_t z,
+               int64_t b,
+               T2& pi,
+               vector<T3>& primes)
 {
   T1 x2 = x / primes[b];
 
   // Avoid slow 128-bit divisions
-  if (x2 <= std::numeric_limits<uint64_t>::max())
-    return S2_easy((uint64_t) x2, y, z, b, pi, primes);
+  if (x2 <= std::numeric_limits<intfast64_t>::max())
+    return S2_easy<T1>((intfast64_t) x2, y, z, b, pi, primes);
 
   return S2_easy(x2, y, z, b, pi, primes);
 }
@@ -130,7 +130,7 @@ T1 S2_easy(T1 x,
   #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
-    s2_easy += strategy(x, y, z, b, pi, primes);
+    s2_easy += S2_strategy(x, y, z, b, pi, primes);
 
     if (print_status())
       status.print(b, pi_x13);
