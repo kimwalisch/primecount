@@ -129,13 +129,19 @@ struct numeric_limits
 template <>
 struct numeric_limits<int128_t>
 {
-  static CONSTEXPR int128_t max() { return ~(((int128_t) 1) << 127); }
+  static CONSTEXPR int128_t max()
+  {
+    return ~(((int128_t) 1) << 127);
+  }
 };
 
 template <>
 struct numeric_limits<uint128_t>
 {
-  static CONSTEXPR uint128_t max() { return ~((int128_t) 0); }
+  static CONSTEXPR uint128_t max()
+  {
+    return ~((int128_t) 0);
+  }
 };
 
 #endif
