@@ -109,10 +109,16 @@ typedef uint128_t intfast128_t;
 ///
 namespace prt {
 
+#if __cplusplus >= 201103L
+  #define CONSTEXPR constexpr
+#else
+  #define CONSTEXPR
+#endif
+
 template <typename T>
 struct numeric_limits
 {
-  static T max()
+  static CONSTEXPR T max()
   {
     return std::numeric_limits<T>::max();
   }
@@ -123,22 +129,17 @@ struct numeric_limits
 template <>
 struct numeric_limits<int128_t>
 {
-  static int128_t max()
-  {
-    return ~(((int128_t) 1) << 127);
-  }
+  static CONSTEXPR int128_t max() { return ~(((int128_t) 1) << 127); }
 };
 
 template <>
 struct numeric_limits<uint128_t>
 {
-  static uint128_t max()
-  {
-    return ~((int128_t) 0);
-  }
+  static CONSTEXPR uint128_t max() { return ~((int128_t) 0); }
 };
 
-#endif /* HAVE_INT128_T */
+#endif
+#undef CONSTEXPR
 
 #if __cplusplus >= 201103L
 
