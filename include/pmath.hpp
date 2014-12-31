@@ -98,7 +98,7 @@ constexpr T sqrt_helper(T x, T lo, T hi)
 template <typename T>
 constexpr T ct_sqrt(T x)
 {
-  return sqrt_helper<T>(x, 0, (x < 9) ? x : x - 1);
+  return sqrt_helper<T>(x, 0, x / 2 + 1);
 }
 
 #endif
