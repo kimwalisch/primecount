@@ -160,8 +160,8 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
 template <typename T>
 T P2(T x, int64_t y, int threads)
 {
-  int64_t a = pi_legendre(y, 1);
-  int64_t b = pi_legendre((int64_t) isqrt(x), 1);
+  T a = pi_legendre(y, 1);
+  T b = pi_legendre((int64_t) isqrt(x), 1);
 
   if (x < 4 || a >= b)
     return 0;
