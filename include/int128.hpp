@@ -179,6 +179,20 @@ struct is_integral
   };
 };
 
+template <typename T>
+struct is_signed
+{
+  enum
+  {
+#ifndef HAVE_INT128_T
+    value = std::is_signed<T>::value
+#else
+    value = std::is_signed<T>::value ||
+            std::is_same<T, int128_t>::value
+#endif
+  };
+};
+
 #endif /* __cplusplus >= 201103L */
 
 } // namespace prt
