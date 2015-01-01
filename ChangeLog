@@ -1,3 +1,17 @@
+2015-01-01 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.6 work in progress.
+
+  This version fixes an important bug in P2(x, a) which was introduced
+  in primecount-1.4, 64-bit variables were used instead of 128-bit
+  variables which caused all pi(x) calculations for x > 10^21 to be
+  erroneous. Thanks to Dana Jacobsen for reporting it.
+
+  * src/P2.cpp: Bug fix for numbers > 10^21.
+  * include/pmath: Fixed C++11 bug in isqrt(x).
+  * include/min_max.hpp: Refactoring.
+  * include/int128.hpp: Add portable trait functions for int128_t.
+
 2014-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.5 released.
