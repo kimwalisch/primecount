@@ -160,12 +160,13 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
 template <typename T>
 T P2(T x, int64_t y, int threads)
 {
-  typedef typename prt::make_signed<T>::type signed_t;
+#if __cplusplus >= 201103L
+  static_assert(prt::is_signed<T>::value,
+                "P2(T x, ...): T must be signed integer type");
+#endif
 
-  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
-  signed_t p2 = 0;
-  signed_t a = pi_legendre(y, 1);
-  signed_t b = pi_legendre((int64_t) isqrt(x), 1);
+  T a = pi_legendre(y, 1);
+  T b = pi_legendre((int64_t) isqrt(x), 1);
 
   if (x < 4 || a >= b)
     return 0;
@@ -187,6 +188,9 @@ T P2(T x, int64_t y, int threads)
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
+
+  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
+  T p2 = 0;
   T pix_total = 0;
 
   // \sum_{i=a+1}^{b} -(i - 1)
@@ -233,14 +237,14 @@ namespace primecount {
 
 int64_t P2(int64_t x, int64_t y, int threads)
 {
-  return P2::P2((intfast64_t) x, y, threads);
+  return P2::P2(x, y, threads);
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t P2(int128_t x, int64_t y, int threads)
 {
-  return P2::P2((intfast128_t) x, y, threads);
+  return P2::P2(x, y, threads);
 }
 
 #endif
