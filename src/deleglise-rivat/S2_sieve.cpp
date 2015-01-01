@@ -152,8 +152,9 @@ T S2_sieve_thread(T x,
     for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
     {
       int64_t prime = primes[b];
-      int64_t min_m = max(min(x / (prime * (T) high), y), y / prime);
-      int64_t max_m = min(x / (prime * (T) low), y);
+      T x2 = x / prime;
+      int64_t min_m = max(min(x2 / high, y), y / prime);
+      int64_t max_m = min(x2 / low, y);
 
       if (prime >= max_m)
         goto next_segment;
@@ -165,8 +166,7 @@ T S2_sieve_thread(T x,
       {
         if (prime < factors.lpf(m))
         {
-          int64_t n = prime * factors.get_number(m);
-          int64_t xn = (int64_t) (x / n);
+          int64_t xn = (int64_t) (x2 / factors.get_number(m));
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factors.mu(m);
