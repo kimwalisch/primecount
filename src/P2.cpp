@@ -160,8 +160,12 @@ void balanceLoad(int64_t* segments_per_thread, double seconds1, double time1)
 template <typename T>
 T P2(T x, int64_t y, int threads)
 {
-  T a = pi_legendre(y, 1);
-  T b = pi_legendre((int64_t) isqrt(x), 1);
+  typedef typename prt::make_signed<T>::type signed_t;
+
+  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
+  signed_t p2 = 0;
+  signed_t a = pi_legendre(y, 1);
+  signed_t b = pi_legendre((int64_t) isqrt(x), 1);
 
   if (x < 4 || a >= b)
     return 0;
@@ -183,10 +187,10 @@ T P2(T x, int64_t y, int threads)
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
-
-  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
-  T sum = 0;
   T pix_total = 0;
+
+  // \sum_{i=a+1}^{b} -(i - 1)
+  p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < limit)
@@ -197,9 +201,9 @@ T P2(T x, int64_t y, int threads)
     double seconds = get_wtime();
 
     #pragma omp parallel for \
-        num_threads(threads) reduction(+: sum)
+        num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      sum += P2_thread(x, y, segment_size, segments_per_thread, i,
+      p2 += P2_thread(x, y, segment_size, segments_per_thread, i,
          low, limit, pix[i], pix_counts[i], primes);
 
     low += segments_per_thread * threads * segment_size;
@@ -208,7 +212,7 @@ T P2(T x, int64_t y, int threads)
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
-      sum += pix_total * pix_counts[i];
+      p2 += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
 
@@ -216,13 +220,10 @@ T P2(T x, int64_t y, int threads)
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
 
-  // \sum_{i=a+1}^{b} - (i - 1)
-  sum -= (b - 2) * (b + 1) / 2 - (a - 2) * (a + 1) / 2;
-
   if (print_status())
-    print_result("P2", sum, time);
+    print_result("P2", p2, time);
 
-  return sum;
+  return p2;
 }
 
 } // namespace P2
@@ -265,7 +266,7 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
   vector<int64_t> counts(primes.size());
 
   int64_t b = pi_bsearch(primes, isqrt(x));
-  int64_t sum = 0;
+  int64_t p2 = 0;
   int64_t pix = 0;
 
   #pragma omp parallel for schedule(dynamic) \
@@ -280,13 +281,13 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
   for (int64_t i = b; i > a; i--)
   {
     pix += counts[i];
-    sum += pix - (i - 1);
+    p2 += pix - (i - 1);
   }
 
   if (print_status())
-    print_result("P2", sum, time);
+    print_result("P2", p2, time);
 
-  return sum;
+  return p2;
 }
 
 } // namespace primecount
