@@ -56,7 +56,6 @@ private:
   static const uint64_t unset_bit_[64];
   std::vector<uint64_t> bits_;
   std::size_t size_;
-  uint64_t count_edges(uint64_t, uint64_t) const;
 };
 
 } // namespace

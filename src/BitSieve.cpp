@@ -83,12 +83,29 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
     return 0;
 
   assert(stop < size_);
-  uint64_t bit_count = count_edges(start, stop);
-  uint64_t start_idx = (start / 64) + 1;
-  uint64_t limit = stop / 64;
 
-  for (uint64_t i = start_idx; i < limit; i++)
-    bit_count += popcount64(bits_[i]);
+  uint64_t bit_count = 0;
+  uint64_t start_idx = start / 64;
+  uint64_t stop_idx = stop / 64;
+  uint64_t m1 = UINT64_C(0xffffffffffffffff) << (start % 64);
+  uint64_t m2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
+
+  if (start_idx == stop_idx)
+  {
+    uint64_t bits = bits_[start_idx] & (m1 & m2);
+    bit_count = popcount64(bits);
+  }
+  else
+  {
+    uint64_t bits = bits_[start_idx] & m1;
+    bit_count = popcount64(bits);
+
+    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
+      bit_count += popcount64(bits_[i]);
+
+    bits = bits_[stop_idx] & m2;
+    bit_count += popcount64(bits);
+  }
 
   return bit_count;
 }
@@ -97,33 +114,15 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
 uint64_t BitSieve::count(uint64_t stop) const
 {
   assert(stop < size_);
-  uint64_t limit = stop / 64;
-  uint64_t mask = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
-  uint64_t bit_count = popcount64(bits_[limit] & mask);
+  uint64_t stop_idx = stop / 64;
+  uint64_t m2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
+  uint64_t bit_count = 0;
 
-  for (uint64_t i = 0; i < limit; i++)
+  for (uint64_t i = 0; i < stop_idx; i++)
     bit_count += popcount64(bits_[i]);
 
+  bit_count += popcount64(bits_[stop_idx] & m2);
   return bit_count;
-}
-
-uint64_t BitSieve::count_edges(uint64_t start, uint64_t stop) const
-{
-  uint64_t index1 = start / 64;
-  uint64_t index2 = stop / 64;
-  uint64_t mask1 = UINT64_C(0xffffffffffffffff) << (start % 64);
-  uint64_t mask2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
-  uint64_t count = 0;
-
-  if (index1 == index2)
-    count += popcount64(bits_[index1] & (mask1 & mask2));
-  else
-  {
-    count += popcount64(bits_[index1] & mask1);
-    count += popcount64(bits_[index2] & mask2);
-  }
-
-  return count;
 }
 
 } // namespace
