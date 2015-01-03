@@ -8,7 +8,7 @@
   fixes an important bug in P2(x, a) for x > 10^21, thanks to Dana
   Jacobsen for reporting it.
 
-  * src/deleglise-rivat/S2_sieve.cpp: Massive speed improvement.
+  * src/deleglise-rivat/S2_hard.cpp: Massive speed improvement.
   * src/P2.cpp: Bug fix for numbers > 10^21.
   * src/BitSieve.cpp: Improved memory efficiency.
   * include/pmath: Fixed C++11 bug in isqrt(x).
