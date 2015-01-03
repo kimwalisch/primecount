@@ -100,9 +100,6 @@ int64_t pi_deleglise_rivat(int64_t x)
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
-  if (threads <= 1)
-    return pi_deleglise_rivat2(x);
-
   return pi_deleglise_rivat_parallel2(x, threads);
 }
 
