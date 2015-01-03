@@ -1,16 +1,19 @@
-2015-01-01 Kim Walisch  <kim.walisch@gmail.com>
+2015-01-03 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.6 work in progress.
 
-  This version fixes an important bug in P2(x, a) which was introduced
-  in primecount-1.4, 64-bit variables were used instead of 128-bit
-  variables which caused all pi(x) calculations for x > 10^21 to be
-  erroneous. Thanks to Dana Jacobsen for reporting it.
+  This version features a new "no counter data structure" optimization
+  in the computation of the hard special leaves which dramatically
+  improves memory efficiency for large numbers. This version also
+  fixes an important bug in P2(x, a) for x > 10^21, thanks to Dana
+  Jacobsen for reporting it.
 
+  * src/deleglise-rivat/S2_sieve.cpp: Massive speed improvement.
   * src/P2.cpp: Bug fix for numbers > 10^21.
+  * src/BitSieve.cpp: Improved memory efficiency.
   * include/pmath: Fixed C++11 bug in isqrt(x).
   * include/min_max.hpp: Refactoring.
-  * include/int128.hpp: Add portable trait functions for int128_t.
+  * include/int128.hpp: Add int128_t trait functions.
 
 2014-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
