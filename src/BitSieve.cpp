@@ -93,6 +93,20 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
   return bit_count;
 }
 
+/// Count the number of 1 bits inside [0, stop]
+uint64_t BitSieve::count(uint64_t stop) const
+{
+  assert(stop < size_);
+  uint64_t limit = stop / 64;
+  uint64_t mask = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
+  uint64_t bit_count = popcount64(bits_[limit] & mask);
+
+  for (uint64_t i = 0; i < limit; i++)
+    bit_count += popcount64(bits_[i]);
+
+  return bit_count;
+}
+
 uint64_t BitSieve::count_edges(uint64_t start, uint64_t stop) const
 {
   uint64_t index1 = start / 64;

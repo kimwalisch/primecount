@@ -32,6 +32,9 @@ public:
   /// Count the number of 1 bits inside the interval [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
 
+  /// Count the number of 1 bits inside the interval [0, stop]
+  uint64_t count(uint64_t stop) const;
+
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
