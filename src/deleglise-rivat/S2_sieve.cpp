@@ -116,8 +116,8 @@ int64_t cross_off(int64_t prime,
                   int64_t& next_multiple,
                   BitSieve& sieve)
 {
-  int64_t k = next_multiple;
   int64_t unset = 0;
+  int64_t k = next_multiple;
 
   for (; k < high; k += prime * 2)
   {
@@ -160,11 +160,11 @@ T S2_sieve_thread(T x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
   int64_t pi_max = pi[max_prime];
-  T S2_thread = 0;
 
   if (c > pi_max)
     return 0;
 
+  T S2_thread = 0;
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
@@ -254,8 +254,8 @@ T S2_sieve_thread(T x,
       // Calculate the contribution of the hard special leaves without
       // using a special tree data structure for counting the
       // number of unsieved elements. Above a certain threshold the
-      // number of special leaves is so small that it is faster not
-      // to use a special counting data structure.
+      // number of special leaves is so small that it is faster to
+      // simply count the number of unsieved elements from the sieve.
 
       int64_t count_low_high = sieve.count((high - 1) - low);
 
