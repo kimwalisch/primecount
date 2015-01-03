@@ -38,7 +38,7 @@ using namespace primecount;
 namespace {
 namespace S2_sieve {
 
-/// For each prime calculate its first multiple >= low
+/// For each prime calculate its first multiple >= low.
 template <typename T>
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
 {
@@ -56,6 +56,28 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& pr
   }
 
   return next;
+}
+
+/// phi(y, i) nodes with i <= c do not contribute to S2, so we
+/// simply sieve out the multiples of the first c primes.
+///
+template <typename T>
+void pre_sieve(BitSieve& sieve,
+               vector<T>& primes,
+               vector<int64_t>& next,
+               int64_t low,
+               int64_t high,
+               int64_t c)
+{
+  sieve.fill(low, high);
+
+  for (int64_t i = 2; i <= c; i++)
+  {
+    int64_t k = next[i];
+    for (int64_t prime = primes[i]; k < high; k += prime * 2)
+      sieve.unset(k - low);
+    next[i] = k;
+  }
 }
 
 /// Cross-off the multiples of prime in the sieve array.
@@ -81,7 +103,33 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
+
   next_multiple = k;
+}
+
+/// Cross-off the multiples of prime in the sieve array.
+/// @return  Count of crossed-off multiples.
+///
+int64_t cross_off(int64_t prime,
+                  int64_t low,
+                  int64_t high,
+                  int64_t& next_multiple,
+                  BitSieve& sieve)
+{
+  int64_t k = next_multiple;
+  int64_t unset = 0;
+
+  for (; k < high; k += prime * 2)
+  {
+    if (sieve[k - low])
+    {
+      sieve.unset(k - low);
+      unset++;
+    }
+  }
+
+  next_multiple = k;
+  return unset;
 }
 
 /// Compute the S2 contribution of the special leaves that require
@@ -114,6 +162,9 @@ T S2_sieve_thread(T x,
   int64_t pi_max = pi[max_prime];
   T S2_thread = 0;
 
+  if (c > pi_max)
+    return 0;
+
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
@@ -127,82 +178,151 @@ T S2_sieve_thread(T x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // check if we need the sieve
-    if (c <= pi_max)
-    {
-      sieve.fill(low, high);
+    // Cross-off the multiples of the first c primes
+    pre_sieve(sieve, primes, next, low, high, c);
 
-      // phi(y, i) nodes with i <= c do not contribute to S2, so we
-      // simply sieve out the multiples of the first c primes
-      for (int64_t i = 2; i <= c; i++)
-      {
-        int64_t k = next[i];
-        for (int64_t prime = primes[i]; k < high; k += prime * 2)
-          sieve.unset(k - low);
-        next[i] = k;
-      }
+    if (low < y * ilog(x))
+    {
+      // Calculate the contribution of the hard special leaves using
+      // Tomás Oliveira's O(log(N)) special tree data structure
+      // for counting the number of unsieved elements.
 
       // Initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
-    }
 
-    // For c + 1 <= b <= pi_sqrty
-    // Find all special leaves: n = primes[b] * m
-    // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
-    for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
-    {
-      int64_t prime = primes[b];
-      T x2 = x / prime;
-      int64_t min_m = max(min(x2 / high, y), y / prime);
-      int64_t max_m = min(x2 / low, y);
-
-      if (prime >= max_m)
-        goto next_segment;
-
-      factors.to_index(&min_m);
-      factors.to_index(&max_m);
-
-      for (int64_t m = max_m; m > min_m; m--)
+      // For c + 1 <= b <= pi_sqrty
+      // Find all special leaves: n = primes[b] * m
+      // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
+      for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
       {
-        if (prime < factors.lpf(m))
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t min_m = max(min(x2 / high, y), y / prime);
+        int64_t max_m = min(x2 / low, y);
+
+        if (prime >= max_m)
+          goto next_segment;
+
+        factors.to_index(&min_m);
+        factors.to_index(&max_m);
+
+        for (int64_t m = max_m; m > min_m; m--)
         {
-          int64_t xn = (int64_t) (x2 / factors.get_number(m));
+          if (prime < factors.lpf(m))
+          {
+            int64_t xn = (int64_t) (x2 / factors.get_number(m));
+            int64_t count = cnt_query(counters, xn - low);
+            int64_t phi_xn = phi[b] + count;
+            int64_t mu_m = factors.mu(m);
+            S2_thread -= mu_m * phi_xn;
+            mu_sum[b] -= mu_m;
+          }
+        }
+
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
+      }
+
+      // For pi_sqrty <= b <= pi_sqrtz
+      // Find all hard special leaves: n = primes[b] * primes[l]
+      // which satisfy: low <= (x / n) < high
+      for (; b <= pi_max; b++)
+      {
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t l = pi[min3(x2 / low, z / prime, y)];
+        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+
+        if (prime >= primes[l])
+          goto next_segment;
+
+        for (; primes[l] > min_hard_leaf; l--)
+        {
+          int64_t xn = (int64_t) (x2 / primes[l]);
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
-          int64_t mu_m = factors.mu(m);
-          S2_thread -= mu_m * phi_xn;
-          mu_sum[b] -= mu_m;
+          S2_thread += phi_xn;
+          mu_sum[b]++;
         }
-      }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
+      }
     }
-
-    // For pi_sqrty <= b <= pi_sqrtz
-    // Find all hard special leaves: n = primes[b] * primes[l]
-    // which satisfy: low <= (x / n) < high
-    for (; b <= pi_max; b++)
+    else
     {
-      int64_t prime = primes[b];
-      T x2 = x / prime;
-      int64_t l = pi[min3(x2 / low, z / prime, y)];
-      int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+      // Calculate the contribution of the hard special leaves without
+      // using a special tree data structure for counting the
+      // number of unsieved elements. Above a certain threshold the
+      // number of special leaves is so small that it is faster not
+      // to use a special counting data structure.
 
-      if (prime >= primes[l])
-        goto next_segment;
+      int64_t count_low_high = sieve.count((high - 1) - low);
 
-      for (; primes[l] > min_hard_leaf; l--)
+      // For c + 1 <= b <= pi_sqrty
+      // Find all special leaves: n = primes[b] * m
+      // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
+      for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
       {
-        int64_t xn = (int64_t) (x2 / primes[l]);
-        int64_t count = cnt_query(counters, xn - low);
-        int64_t phi_xn = phi[b] + count;
-        S2_thread += phi_xn;
-        mu_sum[b]++;
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t min_m = max(min(x2 / high, y), y / prime);
+        int64_t max_m = min(x2 / low, y);
+        int64_t count = 0;
+        int64_t i = 0;
+
+        if (prime >= max_m)
+          goto next_segment;
+
+        factors.to_index(&min_m);
+        factors.to_index(&max_m);
+
+        for (int64_t m = max_m; m > min_m; m--)
+        {
+          if (prime < factors.lpf(m))
+          {
+            int64_t xn = (int64_t) (x2 / factors.get_number(m));
+            count += sieve.count(i, xn - low);
+            i = xn - low + 1;
+            int64_t phi_xn = phi[b] + count;
+            int64_t mu_m = factors.mu(m);
+            S2_thread -= mu_m * phi_xn;
+            mu_sum[b] -= mu_m;
+          }
+        }
+
+        phi[b] += count_low_high;
+        count_low_high -= cross_off(prime, low, high, next[b], sieve);
       }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      // For pi_sqrty <= b <= pi_sqrtz
+      // Find all hard special leaves: n = primes[b] * primes[l]
+      // which satisfy: low <= (x / n) < high
+      for (; b <= pi_max; b++)
+      {
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t l = pi[min3(x2 / low, z / prime, y)];
+        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+        int64_t count = 0;
+        int64_t i = 0;
+
+        if (prime >= primes[l])
+          goto next_segment;
+
+        for (; primes[l] > min_hard_leaf; l--)
+        {
+          int64_t xn = (int64_t) (x2 / primes[l]);
+          count += sieve.count(i, xn - low);
+          i = xn - low + 1;
+          int64_t phi_xn = phi[b] + count;
+          S2_thread += phi_xn;
+          mu_sum[b]++;
+        }
+
+        phi[b] += count_low_high;
+        count_low_high -= cross_off(prime, low, high, next[b], sieve);
+      }
     }
 
     next_segment:;
