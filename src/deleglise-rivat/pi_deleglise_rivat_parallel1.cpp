@@ -83,14 +83,14 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Compute the S2 contribution of the special leaves that require
-/// a sieve. Each thread processes the interval
+/// Compute the S2 contribution of the hard special leaves.
+/// Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
 /// and the missing special leaf contributions for the interval
 /// [1, low_process[ are later reconstructed and added in
-/// the parent S2_sieve() function.
+/// the parent S2_hard() function.
 ///
-int64_t S2_sieve_thread(int64_t x,
+int64_t S2_hard_thread(int64_t x,
                         int64_t y,
                         int64_t z,
                         int64_t c,
@@ -111,8 +111,11 @@ int64_t S2_sieve_thread(int64_t x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
   int64_t pi_max = pi[max_prime];
-  int64_t S2_thread = 0;
 
+  if (c > pi_max)
+    return 0;
+
+  int64_t S2_thread = 0;
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
@@ -126,24 +129,20 @@ int64_t S2_sieve_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // check if we need the sieve
-    if (c <= pi_max)
+    sieve.fill(low, high);
+
+    // phi(y, i) nodes with i <= c do not contribute to S2, so we
+    // simply sieve out the multiples of the first c primes
+    for (int64_t i = 2; i <= c; i++)
     {
-      sieve.fill(low, high);
-
-      // phi(y, i) nodes with i <= c do not contribute to S2, so we
-      // simply sieve out the multiples of the first c primes
-      for (int64_t i = 2; i <= c; i++)
-      {
-        int64_t k = next[i];
-        for (int64_t prime = primes[i]; k < high; k += prime * 2)
-          sieve.unset(k - low);
-        next[i] = k;
-      }
-
-      // Initialize special tree data structure from sieve
-      cnt_finit(sieve, counters, segment_size);
+      int64_t k = next[i];
+      for (int64_t prime = primes[i]; k < high; k += prime * 2)
+        sieve.unset(k - low);
+      next[i] = k;
     }
+
+    // Initialize special tree data structure from sieve
+    cnt_finit(sieve, counters, segment_size);
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
@@ -213,7 +212,7 @@ int64_t S2_sieve_thread(int64_t x,
 /// per thread, after each iteration we dynamically increase
 /// the segment size and the segments per thread.
 ///
-int64_t S2_sieve(int64_t x,
+int64_t S2_hard(int64_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
@@ -246,7 +245,7 @@ int64_t S2_sieve(int64_t x,
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      S2_total += S2_sieve_thread(x, y, z, c, segment_size, segments_per_thread,
+      S2_total += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread,
           i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
@@ -290,8 +289,8 @@ int64_t S2(int64_t x,
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, threads);
   int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, threads);
-  int64_t s2_sieve = S2_sieve(x, y, z, c, pi, primes, lpf, mu, threads);
-  int64_t s2 = s2_trivial + s2_easy + s2_sieve;
+  int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, lpf, mu, threads);
+  int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
 }

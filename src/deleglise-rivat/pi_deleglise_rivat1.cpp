@@ -62,17 +62,17 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the special leaves which require
-/// a sieve (in order to reduce the memory usage).
+/// Calculate the contribution of the hard special leaves which
+/// require use of a sieve (to reduce the memory usage).
 ///
-int64_t S2_sieve(int64_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 vector<int32_t>& pi,
-                 vector<int32_t>& primes,
-                 vector<int32_t>& lpf,
-                 vector<int32_t>& mu)
+int64_t S2_hard(int64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                vector<int32_t>& pi,
+                vector<int32_t>& primes,
+                vector<int32_t>& lpf,
+                vector<int32_t>& mu)
 {
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
@@ -180,8 +180,8 @@ int64_t S2(int64_t x,
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, 1);
   int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, 1);
-  int64_t s2_sieve = S2_sieve(x, y, z, c, pi, primes, lpf, mu);
-  int64_t s2 = s2_trivial + s2_easy + s2_sieve;
+  int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, lpf, mu);
+  int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
 }

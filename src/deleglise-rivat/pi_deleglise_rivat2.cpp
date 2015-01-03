@@ -64,22 +64,22 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Calculate the contribution of the special leaves which require
-/// a sieve (in order to reduce the memory usage).
+/// Calculate the contribution of the hard special leaves which
+/// require use of a sieve (to reduce the memory usage).
 ///
-int64_t S2_sieve(intfast64_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 PiTable& pi,
-                 vector<int32_t>& primes,
-                 FactorTable<uint16_t>& factors)
+int64_t S2_hard(intfast64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                PiTable& pi,
+                vector<int32_t>& primes,
+                FactorTable<uint16_t>& factors)
 {
   if (print_status())
   {
     cout << endl;
-    cout << "=== S2_sieve(x, y) ===" << endl;
-    cout << "Computation of the special leaves requiring a sieve" << endl;
+    cout << "=== S2_hard(x, y) ===" << endl;
+    cout << "Computation of the hard special leaves" << endl;
   }
 
   int64_t limit = z + 1;
@@ -175,7 +175,7 @@ int64_t S2_sieve(intfast64_t x,
   }
 
   if (print_status())
-    print_result("S2_sieve", S2_result, time);
+    print_result("S2_hard", S2_result, time);
 
   return S2_result;
 }
@@ -194,8 +194,8 @@ int64_t S2(int64_t x,
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, 1);
   int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, 1);
-  int64_t s2_sieve = S2_sieve(x, y, z, c, pi, primes, factors);
-  int64_t s2 = s2_trivial + s2_easy + s2_sieve;
+  int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, factors);
+  int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
 }

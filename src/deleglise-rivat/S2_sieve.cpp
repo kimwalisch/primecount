@@ -1,7 +1,7 @@
 ///
-/// @file  S2_sieve.cpp
-/// @brief Calculate the contribution of the special leaves which
-///        require a sieve in the Deleglise-Rivat algorithm.
+/// @file  S2_hard.cpp
+/// @brief Calculate the contribution of the hard special leaves which
+///        require use of a sieve (Deleglise-Rivat algorithm).
 ///        This is a parallel implementation which uses compression
 ///        (PiTable & FactorTable) to reduce the memory usage by
 ///        about 10x.
@@ -36,7 +36,7 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-namespace S2_sieve {
+namespace S2_hard {
 
 /// For each prime calculate its first multiple >= low.
 template <typename T>
@@ -137,10 +137,10 @@ int64_t cross_off(int64_t prime,
 /// [low_thread, low_thread + segments * segment_size[
 /// and the missing special leaf contributions for the interval
 /// [1, low_process[ are later reconstructed and added in
-/// the parent S2_sieve() function.
+/// the parent S2_hard() function.
 ///
 template <typename T, typename P, typename F>
-T S2_sieve_thread(T x,
+T S2_hard_thread(T x,
                   int64_t y,
                   int64_t z,
                   int64_t c,
@@ -331,8 +331,8 @@ T S2_sieve_thread(T x,
   return S2_thread;
 }
 
-/// Calculate the contribution of the special leaves which require
-/// a sieve (in order to reduce the memory usage).
+/// Calculate the contribution of the hard special leaves which
+/// require use of a sieve (to reduce the memory usage).
 /// This is a parallel implementation with advanced load balancing.
 /// As most special leaves tend to be in the first segments we
 /// start off with a small segment size and few segments
@@ -340,25 +340,25 @@ T S2_sieve_thread(T x,
 /// the segment size and the segments per thread.
 ///
 template <typename T, typename P, typename F>
-T S2_sieve(T x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           T s2_sieve_approx,
-           PiTable& pi,
-           vector<P>& primes,
-           FactorTable<F>& factors,
-           int threads)
+T S2_hard(T x,
+          int64_t y,
+          int64_t z,
+          int64_t c,
+          T s2_hard_approx,
+          PiTable& pi,
+          vector<P>& primes,
+          FactorTable<F>& factors,
+          int threads)
 {
   if (print_status())
   {
     cout << endl;
-    cout << "=== S2_sieve(x, y) ===" << endl;
-    cout << "Computation of the special leaves requiring a sieve" << endl;
+    cout << "=== S2_hard(x, y) ===" << endl;
+    cout << "Computation of the hard special leaves" << endl;
   }
 
   double time = get_wtime();
-  T s2_sieve = 0;
+  T s2_hard = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
 
@@ -378,11 +378,11 @@ T S2_sieve(T x,
     aligned_vector<vector<int64_t> > mu_sum(threads);
     aligned_vector<double> timings(threads);
 
-    #pragma omp parallel for num_threads(threads) reduction(+: s2_sieve)
+    #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      s2_sieve += S2_sieve_thread(x, y, z, c, segment_size, segments_per_thread,
+      s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread,
           i, low, limit, factors, pi, primes, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
@@ -396,7 +396,7 @@ T S2_sieve(T x,
     {
       for (size_t j = 1; j < phi[i].size(); j++)
       {
-        s2_sieve += phi_total[j] * (T) mu_sum[i][j];
+        s2_hard += phi_total[j] * (T) mu_sum[i][j];
         phi_total[j] += phi[i][j];
       }
     }
@@ -405,59 +405,59 @@ T S2_sieve(T x,
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
     if (print_status())
-      status.print(s2_sieve, s2_sieve_approx, loadBalancer.get_rsd());
+      status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
   if (print_status())
-    print_result("S2_sieve", s2_sieve, time);
+    print_result("S2_hard", s2_hard, time);
 
-  return s2_sieve;
+  return s2_hard;
 }
 
-} // namespace S2_sieve
+} // namespace S2_hard
 } // namespace
 
 namespace primecount {
 
-int64_t S2_sieve(int64_t x,
+int64_t S2_hard(int64_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 int64_t s2_sieve_approx,
+                 int64_t s2_hard_approx,
                  PiTable& pi,
                  vector<int32_t>& primes,
                  FactorTable<uint16_t>& factors,
                  int threads)
 {
-  return S2_sieve::S2_sieve((intfast64_t) x, y, z, c, (intfast64_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, pi, primes, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_sieve(int128_t x,
+int128_t S2_hard(int128_t x,
                   int64_t y,
                   int64_t z,
                   int64_t c,
-                  int128_t s2_sieve_approx,
+                  int128_t s2_hard_approx,
                   PiTable& pi,
                   vector<uint32_t>& primes,
                   FactorTable<uint16_t>& factors,
                   int threads)
 {
-  return S2_sieve::S2_sieve((intfast128_t) x, y, z, c, (intfast128_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
 }
 
-int128_t S2_sieve(int128_t x,
+int128_t S2_hard(int128_t x,
                   int64_t y,
                   int64_t z,
                   int64_t c,
-                  int128_t s2_sieve_approx,
+                  int128_t s2_hard_approx,
                   PiTable& pi,
                   vector<int64_t>& primes,
                   FactorTable<uint32_t>& factors,
                   int threads)
 {
-  return S2_sieve::S2_sieve((intfast128_t) x, y, z, c, (intfast128_t) s2_sieve_approx, pi, primes, factors, threads);
+  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
 }
 
 #endif

@@ -96,39 +96,39 @@ int128_t S2_easy(int128_t x,
 
 #endif
 
-/// ------------------------ S2_sieve() ------------------------------
+/// ------------------------ S2_hard() -------------------------------
 
-int64_t S2_sieve(int64_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 int64_t s2_sieve_approx,
-                 PiTable& pi,
-                 std::vector<int32_t>& primes,
-                 FactorTable<uint16_t>& factors,
-                 int threads);
+int64_t S2_hard(int64_t x,
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                int64_t s2_hard_approx,
+                PiTable& pi,
+                std::vector<int32_t>& primes,
+                FactorTable<uint16_t>& factors,
+                int threads);
 
 #ifdef HAVE_INT128_T
 
-int128_t S2_sieve(int128_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int128_t s2_sieve_approx,
-                  PiTable& pi,
-                  std::vector<uint32_t>& primes,
-                  FactorTable<uint16_t>& factors,
-                  int threads);
+int128_t S2_hard(int128_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int128_t s2_hard_approx,
+                 PiTable& pi,
+                 std::vector<uint32_t>& primes,
+                 FactorTable<uint16_t>& factors,
+                 int threads);
 
-int128_t S2_sieve(int128_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int128_t s2_sieve_approx,
-                  PiTable& pi,
-                  std::vector<int64_t>& primes,
-                  FactorTable<uint32_t>& factors,
-                  int threads);
+int128_t S2_hard(int128_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int128_t s2_hard_approx,
+                 PiTable& pi,
+                 std::vector<int64_t>& primes,
+                 FactorTable<uint32_t>& factors,
+                 int threads);
 
 #endif
 
