@@ -20,7 +20,6 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
-#include <tos_counters.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -33,18 +32,15 @@ using namespace primecount;
 namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
-/// For each element that is unmarked the first time update
-/// the special counters tree data structure.
+/// @return  Count of crossed-off elements.
 ///
-template <typename T>
-void cross_off(int64_t prime,
-               int64_t low,
-               int64_t high,
-               int64_t& next_multiple,
-               BitSieve& sieve,
-               T& counters)
+int64_t cross_off(int64_t prime,
+                  int64_t low,
+                  int64_t high,
+                  int64_t& next_multiple,
+                  BitSieve& sieve)
 {
-  int64_t segment_size = sieve.size();
+  int64_t unset = 0;
   int64_t k = next_multiple;
 
   for (; k < high; k += prime * 2)
@@ -52,10 +48,12 @@ void cross_off(int64_t prime,
     if (sieve[k - low])
     {
       sieve.unset(k - low);
-      cnt_update(counters, k - low, segment_size);
+      unset++;
     }
   }
+
   next_multiple = k;
+  return unset;
 }
 
 /// Calculate the contribution of the special leaves.
@@ -81,7 +79,6 @@ int64_t S2(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
 
   BitSieve sieve(segment_size);
-  vector<int32_t> counters(segment_size);
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
@@ -109,8 +106,7 @@ int64_t S2(int64_t x,
       next[b] = k;
     }
 
-    // Initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
+    int64_t count_low_high = sieve.count((high - 1) - low);
 
     // For c + 1 <= b < pi_sqrty
     // Find all special leaves: n = primes[b] * m
@@ -120,6 +116,8 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
       int64_t max_m = min(x / (prime * low), y);
+      int64_t count = 0;
+      int64_t i = 0;
 
       if (prime >= max_m)
         goto next_segment;
@@ -128,15 +126,17 @@ int64_t S2(int64_t x,
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
-          int64_t n = prime * m;
-          int64_t count = cnt_query(counters, (x / n) - low);
+          int64_t xn = x / (prime * m);
+          int64_t stop = xn - low;
+          count += sieve.count(i, stop);
+          i = stop + 1;
           int64_t phi_xn = phi[b] + count;
           S2_result -= mu[m] * phi_xn;
         }
       }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      phi[b] += count_low_high;
+      count_low_high -= cross_off(prime, low, high, next[b], sieve);
     }
 
     // For pi_sqrty <= b < pi_y
@@ -147,20 +147,24 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
       int64_t min_m = max3(x / (prime * high), y / prime, prime);
+      int64_t count = 0;
+      int64_t i = 0;
 
       if (prime >= primes[l])
         goto next_segment;
 
       for (; primes[l] > min_m; l--)
       {
-        int64_t n = prime * primes[l];
-        int64_t count = cnt_query(counters, (x / n) - low);
+        int64_t xn = x / (prime * primes[l]);
+        int64_t stop = xn - low;
+        count += sieve.count(i, stop);
+        i = stop + 1;
         int64_t phi_xn = phi[b] + count;
         S2_result += phi_xn;
       }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      phi[b] += count_low_high;
+      count_low_high -= cross_off(prime, low, high, next[b], sieve);
     }
 
     next_segment:;
@@ -178,7 +182,7 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  return in_between(1, log(d) * log(d) / 300, iroot<6>(x));
+  return in_between(1, log(d) * log(d) / 400, iroot<6>(x));
 }
 
 } // namespace
