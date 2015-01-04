@@ -37,7 +37,7 @@ using namespace primecount;
 namespace {
 namespace S2_hard {
 
-/// For each prime calculate its first multiple >= low.
+/// @return  Vector with first multiples >= low.
 template <typename T>
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
 {
@@ -55,28 +55,6 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& pr
   }
 
   return next;
-}
-
-/// phi(y, i) nodes with i <= c do not contribute to S2, so we
-/// simply sieve out the multiples of the first c primes.
-///
-template <typename T>
-void pre_sieve(BitSieve& sieve,
-               vector<T>& primes,
-               vector<int64_t>& next,
-               int64_t low,
-               int64_t high,
-               int64_t c)
-{
-  sieve.fill(low, high);
-
-  for (int64_t i = 2; i <= c; i++)
-  {
-    int64_t k = next[i];
-    for (int64_t prime = primes[i]; k < high; k += prime * 2)
-      sieve.unset(k - low);
-    next[i] = k;
-  }
 }
 
 /// Cross-off the multiples of prime in the sieve array.
@@ -149,8 +127,17 @@ T S2_hard_thread(T x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // Cross-off the multiples of the first c primes
-    pre_sieve(sieve, primes, next, low, high, c);
+    sieve.fill(low, high);
+
+    // phi(y, i) nodes with i <= c do not contribute to S2, so we
+    // simply sieve out the multiples of the first c primes.
+    for (int64_t i = 2; i <= c; i++)
+    {
+      int64_t k = next[i];
+      for (int64_t prime = primes[i]; k < high; k += prime * 2)
+        sieve.unset(k - low);
+      next[i] = k;
+    }
 
     int64_t count_low_high = sieve.count((high - 1) - low);
 
