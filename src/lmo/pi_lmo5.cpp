@@ -13,8 +13,8 @@
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
