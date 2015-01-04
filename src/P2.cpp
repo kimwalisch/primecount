@@ -10,10 +10,10 @@
 /// file in the top level directory.
 ///
 
-#include <BitSieve.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
+#include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>

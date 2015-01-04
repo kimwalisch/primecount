@@ -12,10 +12,10 @@
 /// file in the top level directory.
 ///
 
-#include <BitSieve.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
+#include <BitSieve.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
