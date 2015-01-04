@@ -151,6 +151,7 @@ T S2_hard_thread(T x,
 
     // Cross-off the multiples of the first c primes
     pre_sieve(sieve, primes, next, low, high, c);
+
     int64_t count_low_high = sieve.count((high - 1) - low);
 
     // For c + 1 <= b <= pi_sqrty
@@ -176,8 +177,9 @@ T S2_hard_thread(T x,
         if (prime < factors.lpf(m))
         {
           int64_t xn = (int64_t) (x2 / factors.get_number(m));
-          count += sieve.count(i, xn - low);
-          i = xn - low + 1;
+          int64_t stop = xn - low;
+          count += sieve.count(i, stop);
+          i = stop + 1;
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factors.mu(m);
           S2_thread -= mu_m * phi_xn;
@@ -207,8 +209,9 @@ T S2_hard_thread(T x,
       for (; primes[l] > min_hard_leaf; l--)
       {
         int64_t xn = (int64_t) (x2 / primes[l]);
-        count += sieve.count(i, xn - low);
-        i = xn - low + 1;
+        int64_t stop = xn - low;
+        count += sieve.count(i, stop);
+        i = stop + 1;
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
         mu_sum[b]++;
