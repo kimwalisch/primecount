@@ -17,11 +17,9 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 #include <vector>
 
 #include <BitSieve.hpp>
-#include <popcount.hpp>
 #include <pmath.hpp>
 
 namespace primecount {
@@ -74,55 +72,6 @@ void BitSieve::fill(uint64_t low, uint64_t /* unused */)
     bits_[0] &= ~(bit - 1);
     bits_[0] |= bit;
   }
-}
-
-/// Count the number of 1 bits inside [start, stop]
-uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
-{
-  if (start > stop)
-    return 0;
-
-  assert(stop < size_);
-
-  uint64_t bit_count = 0;
-  uint64_t start_idx = start / 64;
-  uint64_t stop_idx = stop / 64;
-  uint64_t m1 = UINT64_C(0xffffffffffffffff) << (start % 64);
-  uint64_t m2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
-
-  if (start_idx == stop_idx)
-  {
-    uint64_t bits = bits_[start_idx] & (m1 & m2);
-    bit_count = popcount64(bits);
-  }
-  else
-  {
-    uint64_t bits = bits_[start_idx] & m1;
-    bit_count = popcount64(bits);
-
-    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-      bit_count += popcount64(bits_[i]);
-
-    bits = bits_[stop_idx] & m2;
-    bit_count += popcount64(bits);
-  }
-
-  return bit_count;
-}
-
-/// Count the number of 1 bits inside [0, stop]
-uint64_t BitSieve::count(uint64_t stop) const
-{
-  assert(stop < size_);
-  uint64_t stop_idx = stop / 64;
-  uint64_t m2 = UINT64_C(0xffffffffffffffff) >> (63 - stop % 64);
-  uint64_t bit_count = 0;
-
-  for (uint64_t i = 0; i < stop_idx; i++)
-    bit_count += popcount64(bits_[i]);
-
-  bit_count += popcount64(bits_[stop_idx] & m2);
-  return bit_count;
 }
 
 } // namespace
