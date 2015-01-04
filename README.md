@@ -87,7 +87,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>455,052,511</td>
     <td>0.03s</td>
     <td>0.02s</td>
-    <td>0.01s</td>
+    <td>0.00s</td>
     <td>0.00s</td>
   </tr>
   </tr>
@@ -96,7 +96,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>4,118,054,813</td>
     <td>0.08s</td>
     <td>0.06s</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
     <td>0.01s</td>
   </tr>
   </tr>
@@ -105,7 +105,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>37,607,912,018</td>
     <td>0.32s</td>
     <td>0.27s</td>
-    <td>0.07s</td>
+    <td>0.05s</td>
     <td>0.03s</td>
   </tr>
   </tr>
@@ -114,7 +114,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>346,065,536,839</td>
     <td>1.58s</td>
     <td>1.14s</td>
-    <td>0.30s</td>
+    <td>0.17s</td>
     <td>0.09s</td>
   </tr>
   </tr>
@@ -123,7 +123,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>3,204,941,750,802</td>
     <td>9.73s</td>
     <td>5.13s</td>
-    <td>1.20s</td>
+    <td>0.72s</td>
     <td>0.35s</td>
   </tr>
   <tr align="right">
@@ -131,7 +131,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>29,844,570,422,669</td>
     <td>62.95s</td>
     <td>28.55s</td>
-    <td>5.17s</td>
+    <td>3.06s</td>
     <td>1.32s</td>
   </tr>
   <tr align="right">
@@ -139,7 +139,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>279,238,341,033,925</td>
     <td>447.11s</td>
     <td>176.84s</td>
-    <td>23.61s</td>
+    <td>13.70s</td>
     <td>4.90s</td>
   </tr>
   <tr align="right">
@@ -147,7 +147,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
     <td>2,623,557,157,654,233</td>
     <td>3,920.29s</td>
     <td>1,349.95s</td>
-    <td>114.02s</td>
+    <td>64.19s</td>
     <td>19.42</td>
   </tr>
   <tr align="right">
@@ -155,7 +155,7 @@ Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
   <td>24,739,954,287,740,860</td>
     <td>31,897.66s</td>
     <td>9,885.71s</td>
-    <td>743.98s</td>
+    <td>299.17s</td>
     <td>78.34s</td>
   </tr>
 </table>
