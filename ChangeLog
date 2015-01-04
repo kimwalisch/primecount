@@ -1,17 +1,19 @@
-2015-01-03 Kim Walisch  <kim.walisch@gmail.com>
+2015-01-04 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.6 work in progress.
 
-  This version features a new "no counter data structure" optimization
-  in the computation of the hard special leaves which dramatically
-  improves memory efficiency for large numbers. This version also
-  fixes an important bug in P2(x, a) for x > 10^21, thanks to Dana
-  Jacobsen for reporting it.
+  This version features a new implementation for counting the hard
+  special leaves using POPCNT (instead of Tomás Oliveira's special
+  tree data structure) which dramatically improves memory efficiency
+  for large numbers. This version also fixes an important bug in
+  P2(x, a) for x > 10^21, thanks to Dana Jacobsen for reporting it.
 
-  * src/deleglise-rivat/S2_hard.cpp: Massive speed improvement.
+  * src/deleglise-rivat/S2_hard.cpp: Count special leaves using POPCNT.
+  * src/lmo/pi_lmo_parallel3: Count special leaves using POPCNT.
+  * src/lmo/pi_lmo5: Count special leaves using POPCNT.
   * src/P2.cpp: Bug fix for numbers > 10^21.
-  * src/BitSieve.cpp: Improved memory efficiency.
-  * include/pmath: Fixed C++11 bug in isqrt(x).
+  * include/BitSieve.hpp: Improved memory efficiency.
+  * include/isqrt.hpp: Fixed C++11 bug in isqrt(x).
   * include/min_max.hpp: Refactoring.
   * include/int128.hpp: Add int128_t trait functions.
 
