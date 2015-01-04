@@ -13,7 +13,7 @@
   * src/lmo/pi_lmo_parallel3: Add POPCNT optimization.
   * src/lmo/pi_lmo5: Add POPCNT optimization.
   * src/P2.cpp: Bug fix for numbers > 10^21.
-  * include/BitSieve.hpp: Improved memory efficiency.
+  * src/BitSieve.hpp: Improved memory efficiency.
   * include/isqrt.hpp: Fixed C++11 bug in isqrt(x).
   * include/min_max.hpp: Refactoring.
   * include/int128.hpp: Add int128_t trait functions.
