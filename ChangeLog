@@ -2,15 +2,16 @@
 
   Version 1.6 work in progress.
 
-  This version features a new implementation for counting the hard
-  special leaves using POPCNT (instead of Tomás Oliveira's special
-  tree data structure) which dramatically improves memory efficiency
-  for large numbers. This version also fixes an important bug in
-  P2(x, a) for x > 10^21, thanks to Dana Jacobsen for reporting it.
+  This version calculates hard special leaves much faster, above a
+  certain threshold the algorithm switches to POPCNT for counting the
+  number of unsieved elements (instead of Tomás Oliveira's special
+  tree data structure) which dramatically improves memory efficiency.
+  This version also fixes a serious bug in P2(x, a) for x > 10^21,
+  thanks to Dana Jacobsen for reporting it.
 
-  * src/deleglise-rivat/S2_hard.cpp: Count special leaves using POPCNT.
-  * src/lmo/pi_lmo_parallel3: Count special leaves using POPCNT.
-  * src/lmo/pi_lmo5: Count special leaves using POPCNT.
+  * src/deleglise-rivat/S2_hard.cpp: Add POPCNT optimization.
+  * src/lmo/pi_lmo_parallel3: Add POPCNT optimization.
+  * src/lmo/pi_lmo5: Add POPCNT optimization.
   * src/P2.cpp: Bug fix for numbers > 10^21.
   * include/BitSieve.hpp: Improved memory efficiency.
   * include/isqrt.hpp: Fixed C++11 bug in isqrt(x).
