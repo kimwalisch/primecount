@@ -1,6 +1,6 @@
-2015-01-04 Kim Walisch  <kim.walisch@gmail.com>
+2015-01-05 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.6 work in progress.
+  Version 1.6 released.
 
   This version calculates hard special leaves much faster, above a
   certain threshold the algorithm switches to POPCNT for counting the
