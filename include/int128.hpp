@@ -140,7 +140,7 @@ struct numeric_limits<uint128_t>
 {
   static CONSTEXPR uint128_t max()
   {
-    return ~((int128_t) 0);
+    return ~((uint128_t) 0);
   }
 };
 
