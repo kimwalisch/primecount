@@ -1,6 +1,6 @@
 2015-01-24 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.7 work in progress.
+  Version 1.7 released.
 
   This version runs up to 20 percent faster for numbers >= 2^63 by
   using 64-bit divisions instead of 128-bit divisions whenever
