@@ -69,6 +69,7 @@ libprimecount_la_SOURCES = \
 	include/BitSieve.hpp \
 	include/calculator.hpp \
 	include/FactorTable.hpp \
+	include/fast_div.hpp \
 	include/generate.hpp \
 	include/int128.hpp \
 	include/isqrt.hpp \
