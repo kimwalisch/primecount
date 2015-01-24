@@ -263,7 +263,7 @@ $ sudo make install
 ### Build options (Unix-like OSes)
 128-bit divisions involve a function call which can be quite slow on some
 systems (e.g. MinGW). Thus I recommend patching primecount in order to
-use 64-bit divisions instead of 128-bit divisions whenever possible.
+use 64-bit divisions instead of 128-bit divisions whenever possible:
 ```sh
 $ patch -p0 < fast_div.patch
 ```
