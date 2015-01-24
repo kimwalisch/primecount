@@ -31,6 +31,7 @@
 #include <PhiCache.hpp>
 #include <PhiTiny.hpp>
 #include <pmath.hpp>
+#include <fast_div.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -39,21 +40,6 @@
 #include <cassert>
 
 using namespace std;
-
-namespace {
-
-inline int64_t fast_div(int64_t x, int32_t y)
-{
-  assert(x >= 0);
-  assert(y >= 0);
-
-  // Avoid slow 64-bit division
-  if (x <= numeric_limits<uint32_t>::max())
-    return ((uint32_t) x) / y;
-  return x / y;
-}
-
-} // namespace
 
 namespace primecount {
 
