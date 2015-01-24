@@ -119,19 +119,19 @@ int64_t cross_off(int64_t prime,
 ///
 template <typename T, typename P, typename F>
 T S2_hard_thread(T x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int64_t segment_size,
-                  int64_t segments_per_thread,
-                  int64_t thread_num,
-                  int64_t low,
-                  int64_t limit,
-                  FactorTable<F>& factors,
-                  PiTable& pi,
-                  vector<P>& primes,
-                  vector<int64_t>& mu_sum,
-                  vector<int64_t>& phi)
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int64_t segment_size,
+                 int64_t segments_per_thread,
+                 int64_t thread_num,
+                 int64_t low,
+                 int64_t limit,
+                 FactorTable<F>& factors,
+                 PiTable& pi,
+                 vector<P>& primes,
+                 vector<int64_t>& mu_sum,
+                 vector<int64_t>& phi)
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
@@ -409,14 +409,14 @@ T S2_hard(T x,
 namespace primecount {
 
 int64_t S2_hard(int64_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 int64_t s2_hard_approx,
-                 PiTable& pi,
-                 vector<int32_t>& primes,
-                 FactorTable<uint16_t>& factors,
-                 int threads)
+                int64_t y,
+                int64_t z,
+                int64_t c,
+                int64_t s2_hard_approx,
+                PiTable& pi,
+                vector<int32_t>& primes,
+                FactorTable<uint16_t>& factors,
+                int threads)
 {
   return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, pi, primes, factors, threads);
 }
@@ -424,27 +424,27 @@ int64_t S2_hard(int64_t x,
 #ifdef HAVE_INT128_T
 
 int128_t S2_hard(int128_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int128_t s2_hard_approx,
-                  PiTable& pi,
-                  vector<uint32_t>& primes,
-                  FactorTable<uint16_t>& factors,
-                  int threads)
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int128_t s2_hard_approx,
+                 PiTable& pi,
+                 vector<uint32_t>& primes,
+                 FactorTable<uint16_t>& factors,
+                 int threads)
 {
   return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
 }
 
 int128_t S2_hard(int128_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  int128_t s2_hard_approx,
-                  PiTable& pi,
-                  vector<int64_t>& primes,
-                  FactorTable<uint32_t>& factors,
-                  int threads)
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int128_t s2_hard_approx,
+                 PiTable& pi,
+                 vector<int64_t>& primes,
+                 FactorTable<uint32_t>& factors,
+                 int threads)
 {
   return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
 }
