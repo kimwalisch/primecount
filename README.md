@@ -187,12 +187,12 @@ These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.7-win64.zip">primecount-1.7-win64.zip</a>, 379K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.7-linux-x64.tar.gz">primecount-1.7-linux-x64.tar.gz</a>, 846K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.7-linux-x64.tar.gz">primecount-1.7-linux-x64.tar.gz</a>, 847K
 
 SHA1 checksums of the files:
 ```sh
 6dd9cf9b09db5f5afcb27bd7a28232eee02e5729  primecount-1.7-win64.zip
-a25e614043293fcc46a71b0a4581908f356a5f2c  primecount-1.7-linux-x64.tar.gz
+72ff0be1baab1e34fd01be07af0ffcd534e2772d  primecount-1.7-linux-x64.tar.gz
 ```
 
 ### Usage examples
