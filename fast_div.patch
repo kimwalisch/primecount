@@ -1,0 +1,301 @@
+diff --git include/fast_div.hpp include/fast_div.hpp
+index 355766f..8fda6ab 100644
+--- include/fast_div.hpp
++++ include/fast_div.hpp
+@@ -1,5 +1,8 @@
+ ///
+ /// @file  fast_div.hpp
++/// @brief Uses 64-bit division instead of 128-bit division
++///        if x and y are < 2^64. This also avoids a slow function
++///        call into libgcc.
+ ///
+ /// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+ ///
+@@ -10,6 +13,7 @@
+ #ifndef FAST_DIV_HPP
+ #define FAST_DIV_HPP
+ 
++#include <int128.hpp>
+ #include <cassert>
+ #include <limits>
+ 
+@@ -26,6 +30,154 @@ inline int64_t fast_div(int64_t x, int32_t y)
+   return x / y;
+ }
+ 
++inline int64_t fast_div(int64_t x, uint32_t y)
++{
++  assert(x >= 0);
++
++  if (x <= std::numeric_limits<uint32_t>::max())
++    return (uint32_t) x /  y;
++
++  return x / y;
++}
++
++inline uint64_t fast_div(uint64_t x, int32_t y)
++{
++  assert(y >= 0);
++
++  if (x <= std::numeric_limits<uint32_t>::max())
++    return (uint32_t) x /  y;
++
++  return x / y;
++}
++
++inline uint64_t fast_div(uint64_t x, uint32_t y)
++{
++  if (x <= std::numeric_limits<uint32_t>::max())
++    return (uint32_t) x /  y;
++
++  return x / y;
++}
++
++inline int64_t fast_div(int64_t x, int64_t y)
++{
++  return x / y;
++}
++
++inline uint64_t fast_div(int64_t x, uint64_t y)
++{
++  return x / y;
++}
++
++inline uint64_t fast_div(uint64_t x, int64_t y)
++{
++  return x / y;
++}
++
++inline uint64_t fast_div(uint64_t x, uint64_t y)
++{
++  return x / y;
++}
++
++#if defined(HAVE_INT128_T)
++
++inline int128_t fast_div(int128_t x, int32_t y)
++{
++  assert(x >= 0);
++  assert(y >= 0);
++
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline int128_t fast_div(int128_t x, uint32_t y)
++{
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, int32_t y)
++{
++  assert(y >= 0);
++
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, uint32_t y)
++{
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline int128_t fast_div(int128_t x, int64_t y)
++{
++  assert(x >= 0);
++  assert(y >= 0);
++
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline int128_t fast_div(int128_t x, uint64_t y)
++{
++  assert(x >= 0);
++
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, int64_t y)
++{
++  assert(y >= 0);
++
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, uint64_t y)
++{
++  if (x <= std::numeric_limits<uint64_t>::max())
++    return (uint64_t) x / (uint64_t) y;
++
++  return x / y;
++}
++
++inline int128_t fast_div(int128_t x, int128_t y)
++{
++  return x / y;
++}
++
++inline uint128_t fast_div(int128_t x, uint128_t y)
++{
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, int128_t y)
++{
++  return x / y;
++}
++
++inline uint128_t fast_div(uint128_t x, uint128_t y)
++{
++  return x / y;
++}
++
++#endif /* HAVE_INT128_T */
++
+ } // namespace
+ 
+ #endif
+diff --git src/deleglise-rivat/S2_easy.cpp src/deleglise-rivat/S2_easy.cpp
+index bda0b10..f994279 100644
+--- src/deleglise-rivat/S2_easy.cpp
++++ src/deleglise-rivat/S2_easy.cpp
+@@ -16,6 +16,7 @@
+ #include <min_max.hpp>
+ #include <pmath.hpp>
+ #include <S2Status.hpp>
++#include <fast_div.hpp>
+ 
+ #include <stdint.h>
+ #include <algorithm>
+@@ -80,10 +81,10 @@ T1 S2_easy(T1 x,
+     // where phi(x / n, b - 1) = pi(x / n) - b + 2
+     while (primes[l] > min_clustered_easy_leaf)
+     {
+-      int64_t xn = (int64_t) (x2 / primes[l]);
++      int64_t xn = (int64_t) fast_div(x2, primes[l]);
+       int64_t phi_xn = pi[xn] - b + 2;
+       int64_t last_prime = primes[b + phi_xn - 1];
+-      int64_t xm = max((int64_t) (x2 / last_prime), min_clustered_easy_leaf);
++      int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
+       int64_t l2 = pi[xm];
+       result += phi_xn * (l - l2);
+       l = l2;
+@@ -94,7 +95,7 @@ T1 S2_easy(T1 x,
+     // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+     for (; primes[l] > min_sparse_easy_leaf; l--)
+     {
+-      int64_t xn = (int64_t) (x2 / primes[l]);
++      int64_t xn = (int64_t) fast_div(x2, primes[l]);
+       result += pi[xn] - b + 2;
+     }
+ 
+diff --git src/deleglise-rivat/S2_hard.cpp src/deleglise-rivat/S2_hard.cpp
+index 7a25e6d..c35062d 100644
+--- src/deleglise-rivat/S2_hard.cpp
++++ src/deleglise-rivat/S2_hard.cpp
+@@ -22,6 +22,7 @@
+ #include <S2LoadBalancer.hpp>
+ #include <S2Status.hpp>
+ #include <tos_counters.hpp>
++#include <fast_div.hpp>
+ 
+ #include <stdint.h>
+ #include <algorithm>
+@@ -184,8 +185,8 @@ T S2_hard_thread(T x,
+       {
+         int64_t prime = primes[b];
+         T x2 = x / prime;
+-        int64_t min_m = max(min(x2 / high, y), y / prime);
+-        int64_t max_m = min(x2 / low, y);
++        int64_t min_m = max(min(fast_div(x2, high), y), y / prime);
++        int64_t max_m = min(fast_div(x2, low), y);
+ 
+         if (prime >= max_m)
+           goto next_segment;
+@@ -197,7 +198,7 @@ T S2_hard_thread(T x,
+         {
+           if (prime < factors.lpf(m))
+           {
+-            int64_t xn = (int64_t) (x2 / factors.get_number(m));
++            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
+             int64_t count = cnt_query(counters, xn - low);
+             int64_t phi_xn = phi[b] + count;
+             int64_t mu_m = factors.mu(m);
+@@ -217,15 +218,15 @@ T S2_hard_thread(T x,
+       {
+         int64_t prime = primes[b];
+         T x2 = x / prime;
+-        int64_t l = pi[min3(x2 / low, z / prime, y)];
+-        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
++        int64_t l = pi[min3(fast_div(x2, low), z / prime, y)];
++        int64_t min_hard_leaf = max3(min(fast_div(x2, high), y), y / prime, prime);
+ 
+         if (prime >= primes[l])
+           goto next_segment;
+ 
+         for (; primes[l] > min_hard_leaf; l--)
+         {
+-          int64_t xn = (int64_t) (x2 / primes[l]);
++          int64_t xn = (int64_t) fast_div(x2, primes[l]);
+           int64_t count = cnt_query(counters, xn - low);
+           int64_t phi_xn = phi[b] + count;
+           s2_hard += phi_xn;
+@@ -253,8 +254,8 @@ T S2_hard_thread(T x,
+       {
+         int64_t prime = primes[b];
+         T x2 = x / prime;
+-        int64_t min_m = max(min(x2 / high, y), y / prime);
+-        int64_t max_m = min(x2 / low, y);
++        int64_t min_m = max(min(fast_div(x2, high), y), y / prime);
++        int64_t max_m = min(fast_div(x2, low), y);
+         int64_t count = 0;
+         int64_t i = 0;
+ 
+@@ -268,7 +269,7 @@ T S2_hard_thread(T x,
+         {
+           if (prime < factors.lpf(m))
+           {
+-            int64_t xn = (int64_t) (x2 / factors.get_number(m));
++            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
+             int64_t stop = xn - low;
+             count += sieve.count(i, stop);
+             i = stop + 1;
+@@ -290,8 +291,8 @@ T S2_hard_thread(T x,
+       {
+         int64_t prime = primes[b];
+         T x2 = x / prime;
+-        int64_t l = pi[min3(x2 / low, z / prime, y)];
+-        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
++        int64_t l = pi[min3(fast_div(x2, low), z / prime, y)];
++        int64_t min_hard_leaf = max3(min(fast_div(x2, high), y), y / prime, prime);
+         int64_t count = 0;
+         int64_t i = 0;
+ 
+@@ -300,7 +301,7 @@ T S2_hard_thread(T x,
+ 
+         for (; primes[l] > min_hard_leaf; l--)
+         {
+-          int64_t xn = (int64_t) (x2 / primes[l]);
++          int64_t xn = (int64_t) fast_div(x2, primes[l]);
+           int64_t stop = xn - low;
+           count += sieve.count(i, stop);
+           i = stop + 1;
