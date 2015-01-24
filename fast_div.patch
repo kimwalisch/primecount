@@ -1,5 +1,5 @@
 diff --git include/fast_div.hpp include/fast_div.hpp
-index 355766f..8fda6ab 100644
+index 355766f..17b5802 100644
 --- include/fast_div.hpp
 +++ include/fast_div.hpp
 @@ -1,5 +1,8 @@
@@ -19,7 +19,7 @@ index 355766f..8fda6ab 100644
  #include <cassert>
  #include <limits>
  
-@@ -26,6 +30,154 @@ inline int64_t fast_div(int64_t x, int32_t y)
+@@ -26,6 +30,156 @@ inline int64_t fast_div(int64_t x, int32_t y)
    return x / y;
  }
  
@@ -86,6 +86,8 @@ index 355766f..8fda6ab 100644
 +
 +inline int128_t fast_div(int128_t x, uint32_t y)
 +{
++  assert(x >= 0);
++
 +  if (x <= std::numeric_limits<uint64_t>::max())
 +    return (uint64_t) x / (uint64_t) y;
 +
@@ -175,7 +177,7 @@ index 355766f..8fda6ab 100644
  
  #endif
 diff --git src/deleglise-rivat/S2_easy.cpp src/deleglise-rivat/S2_easy.cpp
-index bda0b10..f994279 100644
+index bda0b10..c765499 100644
 --- src/deleglise-rivat/S2_easy.cpp
 +++ src/deleglise-rivat/S2_easy.cpp
 @@ -16,6 +16,7 @@
@@ -186,6 +188,26 @@ index bda0b10..f994279 100644
  
  #include <stdint.h>
  #include <algorithm>
+@@ -62,8 +63,9 @@ T1 S2_easy(T1 x,
+   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+   {
+     int64_t prime = primes[b];
+-    int64_t min_trivial_leaf = min(x / (prime * prime), y);
+-    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x / prime);
++    T1 x2 = x / prime;
++    int64_t min_trivial_leaf = min(x2 / prime, y);
++    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
+     int64_t min_sparse_easy_leaf = z / prime;
+     int64_t min_hard_leaf = max(y / prime, prime);
+ 
+@@ -72,7 +74,6 @@ T1 S2_easy(T1 x,
+     int64_t l = pi[min_trivial_leaf];
+ 
+     T1 result = 0;
+-    T1 x2 = x / prime;
+ 
+     // Find all clustered easy leaves:
+     // n = primes[b] * primes[l]
 @@ -80,10 +81,10 @@ T1 S2_easy(T1 x,
      // where phi(x / n, b - 1) = pi(x / n) - b + 2
      while (primes[l] > min_clustered_easy_leaf)
