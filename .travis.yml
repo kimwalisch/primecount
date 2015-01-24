@@ -23,6 +23,7 @@ install:
 
 before_script:
   - ./autogen.sh
+  - patch -p0 < fast_div.patch
 
 script:
   - ./configure --enable-assert CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic -O2"
