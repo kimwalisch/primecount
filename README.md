@@ -260,8 +260,8 @@ $ make
 $ sudo make install
 ```
 
-### Build options (GCC & Clang)
-128-bit divisions involve a function which is fast on Unix-like
+### Build options (Unix-like OSes)
+128-bit divisions involve a function call which is fast on Unix-like
 operating systems but slow on Windows (MinGW, Cygwin). Thus I
 recommend patching primecount on Windows so that it uses 64-bit
 divisions instead of 128-bit divisions whenever possible:
