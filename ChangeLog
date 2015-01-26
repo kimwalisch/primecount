@@ -1,3 +1,10 @@
+2015-01-26 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.7.1 released.
+
+  * Makefile.am: Add avoid_128bit_div.patch to EXTRA_DIST
+  * avoid_128bit_div.patch: Renamed
+
 2015-01-24 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.7 released.
