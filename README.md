@@ -252,7 +252,7 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 Finally download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.7.tar.gz">primecount-1.7.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-1.7.1.tar.gz">primecount-1.7.1.tar.gz</a>
 release tarball and build it using:
 ```sh
 $ ./configure
@@ -261,12 +261,12 @@ $ sudo make install
 ```
 
 ### Build options (Unix-like OSes)
-128-bit divisions involve a function call which is fast on Unix-like
-operating systems but slow on Windows (MinGW, Cygwin). Thus I
-recommend patching primecount on Windows so that it uses 64-bit
-divisions instead of 128-bit divisions whenever possible:
+128-bit divisions involve a function call which can significantly
+degrade performance (especially on Mingw & Cygwin). Thus I recommend
+patching primecount on all OSes so that it uses 64-bit divisions
+instead of 128-bit divisions whenever possible:
 ```sh
-$ patch -p0 < fast_div.patch
+$ patch -p0 < avoid_128bit_div.patch
 ```
 
 If your CPU supports the
