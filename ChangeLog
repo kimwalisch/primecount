@@ -2,11 +2,11 @@
 
   Version 1.7 released.
 
-  This version runs up to 20 percent faster for numbers >= 2^63 by
+  This version runs to 20% faster on Windows for numbers >= 2^63 by
   using 64-bit divisions instead of 128-bit divisions whenever
   possible. While primecount-1.6 has already been very fast on Linux
-  it was slower on Windows. primecount-1.7 now achieves the same
-  performance on Windows and Linux.  
+  it ran slower on Windows, primecount-1.7 now achieves the same
+  speed on both Windows and Linux.
 
   * fast_div.patch: Avoid 128-bit divisions.
 
