@@ -25,6 +25,7 @@ include_HEADERS = \
 
 EXTRA_DIST = \
 	src/msvc/has_openmp.cpp \
+	avoid_128bit_div.patch \
 	Makefile.msvc \
 	README.md
 
