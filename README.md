@@ -232,11 +232,6 @@ build primecount simply open a Visual Studio Command Prompt and run:
 > nmake -f Makefile.msvc
 ```
 
-### 128-bit support
-If you have a 64-bit CPU and your compiler supports the ```__int128_t```
-type (GCC, Clang, Cygwin64, Mingw-w64) then 128-bit support is automatically
-enabled in the build process and you can count primes up to 10<sup>27</sup>.
-
 ### C++ API
 Below is a list of the functions declared in the ````primecount.hpp```` header
 file. A short description of each function including its run-time and space
@@ -269,25 +264,16 @@ void primecount::set_num_threads(int threads);
 ```
 
 ### Using libprimecount
-Below is a C++ example program that counts the primes below n and calculates
-the nth prime using libprimecount.
+Below is a C++ example program that counts the primes below 1000.
 
 ```C++
 #include <primecount.hpp>
 #include <iostream>
-#include <cstdlib>
 
-int main(int, char** argv)
+int main()
 {
-  int64_t n = 1000;
-  if (argv[1])
-    n = std::atol(argv[1]);
-
-  int64_t prime_count = primecount::pi(n);
-  std::cout << "primes below " << n << " = " << prime_count << std::endl;
-
-  int64_t nth_prime = primecount::nth_prime(n);
-  std::cout << n << "th prime = " << nth_prime << std::endl;
+  int64_t prime_count = primecount::pi(1000);
+  std::cout << "primes below 1000 = " << prime_count << std::endl;
 
   return 0;
 }
@@ -298,7 +284,7 @@ On Unix-like operating systems compile using:
 $ c++ -O2 primes.cpp -lprimecount
 ```
 
-### Algorithms and complexity
+### Algorithms
 <table>
   <tr>
     <td>Legendre's Formula</td>
