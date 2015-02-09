@@ -224,10 +224,7 @@ $ ./configure --disable-popcnt
 ```
 
 ### Build instructions (Microsoft Visual C++)
-In order to facilitate building primecount on Windows the build process has been
-completely automated i.e. the ```nmake``` command automatically downloads and
-builds the latest primesieve library (dependency) before building primecount. To
-build primecount simply open a Visual Studio Command Prompt and run:
+To build primecount simply open a Visual Studio Command Prompt and run:
 ```sh
 > nmake -f Makefile.msvc
 ```
@@ -262,8 +259,8 @@ int  primecount::get_num_threads();
 void primecount::set_num_threads(int threads);
 ```
 
-### Using libprimecount
-Below is a C++ example program that counts the primes below 1000.
+### C++ library
+Below is an example program that counts the primes below 1000 using libprimecount.
 
 ```C++
 #include <primecount.hpp>
