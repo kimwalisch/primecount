@@ -17,7 +17,19 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
 
-The [algorithms](#algorithms) section contains more information.
+**Contents**
+- [Binaries](#binaries)
+- [Usage examples](#usage-examples)
+- [Command-line options](#command-line-options)
+- [Timings](#timings)
+- [Build instructions (Unix-like OSes)](#build-instructions-unix-like-oses)
+- [Build options (Unix-like OSes)](#build-options-unix-like-oses)
+- [Build instructions (Microsoft Visual C++)](#build-instructions-microsoft-visual-c)
+- [C++ API](#c-api)
+- [C++ library usage](#c-library-usage)
+- [Algorithms](#algorithms)
+- [Fast nth prime calculation](#fast-nth-prime-calculation)
+- [References](#references)
 
 ### Binaries
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
