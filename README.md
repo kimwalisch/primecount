@@ -260,7 +260,7 @@ void primecount::set_num_threads(int threads);
 ```
 
 ### C++ library usage
-Below is an example program that counts the primes below 1000 using libprimecount.
+Below is an example program that counts the primes below 1000.
 
 ```C++
 #include <primecount.hpp>
