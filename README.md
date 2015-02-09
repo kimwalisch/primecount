@@ -253,7 +253,6 @@ int64_t primecount::nth_prime          (int64_t n);
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 /// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
 /// @pre   expr  <= primecount::max()
-///
 std::string primecount::pi(const std::string& expr);
 
 /// @return  Largest integer supported by pi(const std::string&)
