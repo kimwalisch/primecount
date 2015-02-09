@@ -3,19 +3,21 @@ primecount
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 
 primecount is a command-line program and C++ library that counts the
-primes below an integer x&nbsp;≤&nbsp;10<sup>27</sup> using highly
-optimized implementations of the
+primes below an integer x&nbsp;≤&nbsp;10<sup>27</sup> using **highly
+optimized** implementations of the
 [prime counting function pi(x)](http://en.wikipedia.org/wiki/Prime-counting_function).
 primecount includes implementations of the algorithms of Legendre,
 Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all of
 which have been parallelized using
 [OpenMP](http://en.wikipedia.org/wiki/OpenMP).
 
-primecount contains the first ever parallel open source
+primecount contains the **first ever** parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
 [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
 which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
+
+The [algorithms](#algorithms) section contains more information.
 
 ### Binaries
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
