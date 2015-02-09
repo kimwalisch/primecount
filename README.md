@@ -17,20 +17,6 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
 
-### Contents
-- [Binaries](#binaries)
-- [Usage examples](#usage-examples)
-- [Command-line options](#command-line-options)
-- [Timings](#timings)
-- [Build instructions (Unix-like OSes)](#build-instructions-unix-like-oses)
-- [Build options (Unix-like OSes)](#build-options-unix-like-oses)
-- [Build instructions (Microsoft Visual C++)](#build-instructions-microsoft-visual-c)
-- [C++ API](#c-api)
-- [C++ library usage](#c-library-usage)
-- [Algorithms](#algorithms)
-- [Fast nth prime calculation](#fast-nth-prime-calculation)
-- [References](#references)
-
 ### Binaries
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
@@ -85,6 +71,74 @@ Options:
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
 ```
+
+### Algorithms
+<table>
+  <tr>
+    <td>Legendre's Formula</td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_legendre.svg" height="20" align="absmiddle"/></td>
+  </tr>
+  <tr>
+    <td>Meissel's Formula</td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_meissel.svg" height="20" align="absmiddle"/></td>
+  </tr>
+  <tr>
+    <td>Lehmer's Formula</td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle"/></td>
+  </tr>
+  <tr>
+    <td>LMO Formula</td>
+    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle"/></td>
+  </tr>
+</table>
+
+<p>Up until the early 19th century the most efficient known method for counting
+primes was the sieve of Eratosthenes which has a running time of
+<img src="http://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
+operations. The first improvement to this bound was Legendre's formula (1830)
+which uses the inclusion-exclusion principle to calculate the number of primes
+below x without enumerating the individual primes. Legendre's formula has a
+running time of
+<img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
+operations and uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
+space. In 1870 E. D. F. Meissel improved Legendre's formula by setting
+<img src="http://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/>
+and by adding the correction term
+<img src="http://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>.
+Meissel's formula has a running time of
+<img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
+operations and uses
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
+space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
+<img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
+operations and
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
+space. In 1985 J. C. Lagarias, V. S. Miller and A. M. Odlyzko published a new
+algorithm based on Meissel's formula which has a lower runtime complexity of
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlogx.svg" height="20" align="absmiddle"/>
+operations and which uses only
+<img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
+space.</p>
+<p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
+Riesel's book [4] is probably the best source of information. For the
+Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
+[3] as well as Tomás Oliveira's paper [7].
+
+### Fast nth prime calculation
+The most efficient known method for calculating the nth prime is a combination
+of the prime counting function and a prime sieve. The idea is to closely
+approximate the nth prime using e.g. the inverse logarithmic integral
+<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
+and then count the primes up to this guess using the prime counting function.
+Once this is done one starts sieving (e.g. using the segmented sieve of
+Eratosthenes) from there on until one finds the actual nth prime. The author
+has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
+prime in
+<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
+operations using
+<img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
+space.
 
 ### Timings
 <table>
@@ -293,74 +347,6 @@ On Unix-like OSes compile using:
 ```sh
 $ c++ -O2 primes.cpp -lprimecount
 ```
-
-### Algorithms
-<table>
-  <tr>
-    <td>Legendre's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_legendre.svg" height="20" align="absmiddle"/></td>
-  </tr>
-  <tr>
-    <td>Meissel's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_meissel.svg" height="20" align="absmiddle"/></td>
-  </tr>
-  <tr>
-    <td>Lehmer's Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle"/></td>
-  </tr>
-  <tr>
-    <td>LMO Formula</td>
-    <td><img src="http://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle"/></td>
-  </tr>
-</table>
-
-<p>Up until the early 19th century the most efficient known method for counting
-primes was the sieve of Eratosthenes which has a running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
-operations. The first improvement to this bound was Legendre's formula (1830)
-which uses the inclusion-exclusion principle to calculate the number of primes
-below x without enumerating the individual primes. Legendre's formula has a
-running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
-operations and uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space. In 1870 E. D. F. Meissel improved Legendre's formula by setting
-<img src="http://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/>
-and by adding the correction term
-<img src="http://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>.
-Meissel's formula has a running time of
-<img src="http://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
-operations and uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
-space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
-<img src="http://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
-operations and
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
-space. In 1985 J. C. Lagarias, V. S. Miller and A. M. Odlyzko published a new
-algorithm based on Meissel's formula which has a lower runtime complexity of
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlogx.svg" height="20" align="absmiddle"/>
-operations and which uses only
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
-space.</p>
-<p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
-Riesel's book [4] is probably the best source of information. For the
-Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
-[3] as well as Tomás Oliveira's paper [7].
-
-### Fast nth prime calculation
-The most efficient known method for calculating the nth prime is a combination
-of the prime counting function and a prime sieve. The idea is to closely
-approximate the nth prime using e.g. the inverse logarithmic integral
-<img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
-and then count the primes up to this guess using the prime counting function.
-Once this is done one starts sieving (e.g. using the segmented sieve of
-Eratosthenes) from there on until one finds the actual nth prime. The author
-has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
-prime in
-<img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
-operations using
-<img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
-space.
 
 ### References
 1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
