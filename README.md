@@ -17,7 +17,7 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
 
-**Contents**
+### Contents
 - [Binaries](#binaries)
 - [Usage examples](#usage-examples)
 - [Command-line options](#command-line-options)
