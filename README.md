@@ -224,7 +224,7 @@ $ ./configure --disable-popcnt
 ```
 
 ### Build instructions (Microsoft Visual C++)
-To build primecount simply open a Visual Studio Command Prompt and run:
+To build primecount simply open a Visual Studio Command Prompt and execute:
 ```sh
 > nmake -f Makefile.msvc
 ```
@@ -259,7 +259,7 @@ int  primecount::get_num_threads();
 void primecount::set_num_threads(int threads);
 ```
 
-### C++ library
+### C++ library usage
 Below is an example program that counts the primes below 1000 using libprimecount.
 
 ```C++
