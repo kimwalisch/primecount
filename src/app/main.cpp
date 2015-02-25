@@ -2,7 +2,7 @@
 /// @file   main.cpp
 /// @brief  primecount console application.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,9 +39,9 @@ int main (int argc, char* argv[])
   double time = get_wtime();
 
   maxint_t x = pco.x;
-  maxint_t a = pco.a;
   maxint_t res = 0;
   int threads = pco.threads;
+  set_alpha(pco.alpha);
 
   try
   {
@@ -85,8 +85,6 @@ int main (int argc, char* argv[])
         res = pi_meissel(int64_cast(x), threads); break;
       case OPTION_PRIMESIEVE:
         res = pi_primesieve(int64_cast(x), threads); break;
-      case OPTION_PHI:
-        res = phi(int64_cast(x), int64_cast(a)); break;
       case OPTION_PI:
         res = pi(x, threads); break;
       case OPTION_LI:

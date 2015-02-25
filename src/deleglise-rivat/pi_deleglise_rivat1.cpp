@@ -192,7 +192,7 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  double alpha = log(d) * log(d) * log(d) / 1500;
+  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) * log(d) / 1500;
   return in_between(1, alpha, iroot<6>(x));
 }
 

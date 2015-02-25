@@ -123,6 +123,10 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 
 int64_t P3(int64_t x, int64_t a, int threads);
 
+void set_alpha(double alpha);
+
+double get_alpha();
+
 double get_wtime();
 
 int validate_threads(int threads);

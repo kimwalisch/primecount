@@ -242,7 +242,8 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  return in_between(1, log(d) * log(d) / 300, iroot<6>(x));
+  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) / 300;
+  return in_between(1, alpha, iroot<6>(x));
 }
 
 } // namespace

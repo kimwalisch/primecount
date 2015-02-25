@@ -33,6 +33,8 @@ namespace {
 
 int threads_ = primecount::MAX_THREADS;
 
+double alpha_ = -1;
+
 bool print_status_ = false;
 
 }
@@ -244,6 +246,16 @@ int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
   threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
   threads = std::max(1, threads);
   return threads;
+}
+
+void set_alpha(double alpha)
+{
+  alpha_ = alpha;
+}
+
+double get_alpha()
+{
+  return alpha_;
 }
 
 void set_num_threads(int threads)

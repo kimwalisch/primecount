@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -182,7 +183,8 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  return in_between(1, log(d) * log(d) / 400, iroot<6>(x));
+  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) / 400;
+  return in_between(1, alpha, iroot<6>(x));
 }
 
 } // namespace
@@ -209,6 +211,7 @@ int64_t pi_lmo5(int64_t x)
     cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     cout << "c = " << PhiTiny::max_a() << endl;
     cout << "threads = 1" << endl;
   }

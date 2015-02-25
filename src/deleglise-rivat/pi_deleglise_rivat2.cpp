@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -206,7 +207,7 @@ int64_t S2(int64_t x,
 double compute_alpha(int64_t x)
 {
   double d = (double) x;
-  double alpha = log(d) * log(d) * log(d) / 1200;
+  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) * log(d) / 1200;
   return in_between(1, alpha, iroot<6>(x));
 }
 
@@ -235,6 +236,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     cout << "c = " << PhiTiny::max_a() << endl;
   }
 

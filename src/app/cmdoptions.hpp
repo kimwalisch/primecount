@@ -1,7 +1,7 @@
 ///
 /// @file  cmdoptions.hpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,13 +18,14 @@ namespace primecount {
 
 enum OptionValues
 {
-  OPTION_HELP,
+  OPTION_ALPHA,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT1,
   OPTION_DELEGLISE_RIVAT2,
   OPTION_DELEGLISE_RIVAT_PARALLEL1,
   OPTION_DELEGLISE_RIVAT_PARALLEL2,
   OPTION_DELEGLISE_RIVAT_PARALLEL3,
+  OPTION_HELP,
   OPTION_LEGENDRE,
   OPTION_LEHMER,
   OPTION_LEHMER2,
@@ -42,7 +43,6 @@ enum OptionValues
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NUMBER,
-  OPTION_PHI,
   OPTION_PI,
   OPTION_PRIMESIEVE,
   OPTION_STATUS,
@@ -55,13 +55,13 @@ enum OptionValues
 struct PrimeCountOptions
 {
   maxint_t x;
-  maxint_t a;
   int64_t option;
   bool time;
   int threads;
+  int alpha;
   PrimeCountOptions() :
     x(-1),
-    a(-1),
+    alpha(-1),
     option(OPTION_PI),
     time(false),
     threads(get_num_threads())

@@ -1,7 +1,7 @@
 ///
 /// @file  help.cpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,6 +23,7 @@ const string helpMenu(
   "by default the Deleglise-Rivat algorithm (-d) is used.\n"
   "\n"
   "Options:\n"
+  "  -a<N>, --alpha=<N>        Tuning factor for LMO and Deleglise-Rivat\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
@@ -31,7 +32,6 @@ const string helpMenu(
   "         --Li               Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse       Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime         Calculate the nth prime\n"
-  "         --phi              Calculate phi(x, a), requires 2 arguments\n"
   "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
   "  -s,    --status           Print status info during computation\n"
   "         --test             Run various correctness tests and exit\n"

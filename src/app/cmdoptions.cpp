@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -46,8 +46,8 @@ std::map<string, OptionValues> optionMap;
 
 void initOptionMap()
 {
-  optionMap["-h"]                          = OPTION_HELP;
-  optionMap["--help"]                      = OPTION_HELP;
+  optionMap["-a"]                          = OPTION_ALPHA;
+  optionMap["--alpha"]                     = OPTION_ALPHA;
   optionMap["-d"]                          = OPTION_DELEGLISE_RIVAT;
   optionMap["--deleglise_rivat"]           = OPTION_DELEGLISE_RIVAT;
   optionMap["--deleglise_rivat1"]          = OPTION_DELEGLISE_RIVAT1;
@@ -55,6 +55,8 @@ void initOptionMap()
   optionMap["--deleglise_rivat_parallel1"] = OPTION_DELEGLISE_RIVAT_PARALLEL1;
   optionMap["--deleglise_rivat_parallel2"] = OPTION_DELEGLISE_RIVAT_PARALLEL2;
   optionMap["--deleglise_rivat_parallel3"] = OPTION_DELEGLISE_RIVAT_PARALLEL3;
+  optionMap["-h"]                          = OPTION_HELP;
+  optionMap["--help"]                      = OPTION_HELP;
   optionMap["--legendre"]                  = OPTION_LEGENDRE;
   optionMap["--lehmer"]                    = OPTION_LEHMER;
   optionMap["--lehmer2"]                   = OPTION_LEHMER2;
@@ -75,7 +77,6 @@ void initOptionMap()
   optionMap["-n"]                          = OPTION_NTHPRIME;
   optionMap["--nthprime"]                  = OPTION_NTHPRIME;
   optionMap["--number"]                    = OPTION_NUMBER;
-  optionMap["--phi"]                       = OPTION_PHI;
   optionMap["--pi"]                        = OPTION_PI;
   optionMap["-p"]                          = OPTION_PRIMESIEVE;
   optionMap["--primesieve"]                = OPTION_PRIMESIEVE;
@@ -126,6 +127,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
       Option option = makeOption(argv[i]);
       switch (optionMap[option.id])
       {
+        case OPTION_ALPHA:   pco.alpha = option.getValue<int>(); break;
         case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
@@ -142,12 +144,10 @@ PrimeCountOptions parseOptions(int argc, char** argv)
     help();
   }
 
-  if (numbers.empty())
-    help();
-  if (numbers.size() >= 1)
+  if (numbers.size() == 1)
     pco.x = numbers[0];
-  if (numbers.size() >= 2)
-    pco.a = numbers[1];
+  else
+    help();
 
   return pco;
 }
