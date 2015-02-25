@@ -1,7 +1,7 @@
 ///
 /// @file  primecount.hpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,10 +14,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "1.7.1"
+#define PRIMECOUNT_VERSION "1.8"
 #define PRIMECOUNT_VERSION_MAJOR 1
-#define PRIMECOUNT_VERSION_MINOR 7
-#define PRIMECOUNT_VERSION_PATCH 1
+#define PRIMECOUNT_VERSION_MINOR 8
 
 namespace primecount {
 
