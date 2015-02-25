@@ -1,3 +1,9 @@
+2015-02-25 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.8 work in progress.
+
+  * -a<N>, --alpha=<N>: Manually set the tuning factor.
+
 2015-01-26 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.7.1 released.
