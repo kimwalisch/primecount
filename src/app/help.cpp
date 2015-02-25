@@ -23,7 +23,7 @@ const string helpMenu(
   "by default the Deleglise-Rivat algorithm (-d) is used.\n"
   "\n"
   "Options:\n"
-  "  -a<N>, --alpha=<N>        Tuning factor for LMO and Deleglise-Rivat\n"
+  "  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
