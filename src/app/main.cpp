@@ -41,7 +41,6 @@ int main (int argc, char* argv[])
   maxint_t x = pco.x;
   maxint_t res = 0;
   int threads = pco.threads;
-  set_alpha(pco.alpha);
 
   try
   {
