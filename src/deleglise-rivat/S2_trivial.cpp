@@ -48,7 +48,6 @@ T S2_trivial(T x,
   PiTable pi(y);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
-  int64_t pi_sqrtz = pi[min(sqrtz, y)];
 
   T S2_total = 0;
   double time = get_wtime();
