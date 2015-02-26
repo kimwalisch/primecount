@@ -58,10 +58,8 @@ struct PrimeCountOptions
   int64_t option;
   bool time;
   int threads;
-  int alpha;
   PrimeCountOptions() :
     x(-1),
-    alpha(-1),
     option(OPTION_PI),
     time(false),
     threads(get_num_threads())
