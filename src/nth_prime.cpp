@@ -21,6 +21,9 @@ namespace {
 
 const std::string max_n = "216289611853439384";
 
+// primes[1] = 2, primes[2] = 3, ...
+const int primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+
 }
 
 namespace primecount {
@@ -31,15 +34,18 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
+  n = std::max((int64_t) 1, n);
+
+  if (n < 10)
+    return primes[n];
+
   if (n > to_maxint(max_n))
     throw primecount_error("nth_prime(n): n must be <= " + max_n);
-
-  primesieve::set_num_threads(threads);
-  n = std::max((int64_t) 1, n);
 
   int64_t prime = 0;
   int64_t prime_approx = 0;
   int64_t count_approx = 0;
+  primesieve::set_num_threads(threads);
 
   if (n < 100000)
     prime = primesieve::parallel_nth_prime(n, 0);

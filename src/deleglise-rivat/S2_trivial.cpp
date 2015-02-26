@@ -32,9 +32,6 @@ using namespace primecount;
 namespace {
 namespace S2_trivial {
 
-/// primes[1] = 2, primes[2] = 3, ...
-const int64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
-
 template <typename T>
 T S2_trivial(T x,
              int64_t y,
@@ -45,19 +42,26 @@ T S2_trivial(T x,
   int64_t thread_threshold = 1000000;
   threads = validate_threads(threads, y, thread_threshold);
 
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
+
+  double time = get_wtime();
   PiTable pi(y);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
-
+  int64_t prime_c = nth_prime(c);
   T S2_total = 0;
-  double time = get_wtime();
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int64_t i = 0; i < threads; i++)
   {
-    int64_t start = max(primes[c], sqrtz + 1);
+    int64_t start = max(prime_c, sqrtz + 1);
     int64_t thread_interval = ceil_div(y - start, threads);
     start += thread_interval * i;
     int64_t stop = min(start + thread_interval, y);
@@ -88,13 +92,6 @@ int64_t S2_trivial(int64_t x,
                    int64_t c,
                    int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
-
   return S2_trivial::S2_trivial(x, y, z, c, threads);
 }
 
@@ -106,13 +103,6 @@ int128_t S2_trivial(int128_t x,
                     int64_t c,
                     int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
-
   return S2_trivial::S2_trivial(x, y, z, c, threads);
 }
 
