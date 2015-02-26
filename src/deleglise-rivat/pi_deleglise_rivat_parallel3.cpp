@@ -41,12 +41,10 @@ int128_t S2(int128_t x,
             int64_t z,
             int64_t c,
             int128_t s2_approx,
-            vector<P>& primes,
             FactorTable<F>& factors,
             int threads)
 {
   threads = validate_threads(threads, z);
-  PiTable pi(y);
 
   int128_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int128_t s2_easy = S2_easy(x, y, z, c, threads);
@@ -115,7 +113,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
-    s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
+    s2 = S2(x, y, z, c, s2_approx, factors, threads);
   }
   else
   {
@@ -126,7 +124,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     c = min(pi_y, PhiTiny::max_a());
     s1 = S1(x, y, c, factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
-    s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
+    s2 = S2(x, y, z, c, s2_approx, factors, threads);
   }
 
   int128_t phi = s1 + s2;
