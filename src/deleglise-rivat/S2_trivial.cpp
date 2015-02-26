@@ -10,12 +10,16 @@
 ///
 
 #include <PiTable.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primesieve.hpp>
+#include <generate.hpp>
 #include <int128.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #ifdef _OPENMP
@@ -28,35 +32,44 @@ using namespace primecount;
 namespace {
 namespace S2_trivial {
 
-template <typename T1, typename T2, typename T3>
-T1 S2_trivial(T1 x,
-              int64_t y,
-              int64_t z,
-              int64_t c,
-              T2& pi,
-              vector<T3>& primes,
-              int threads)
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
+/// primes[1] = 2, primes[2] = 3, ...
+const int64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
 
-  T1 S2_total = 0;
+template <typename T>
+T S2_trivial(T x,
+             int64_t y,
+             int64_t z,
+             int64_t c,
+             int threads)
+{
+  int64_t thread_threshold = 1000000;
+  threads = validate_threads(threads, y, thread_threshold);
+
+  PiTable pi(y);
   int64_t pi_y = pi[y];
-  int64_t pi_sqrtz = pi[min(isqrt(z), y)];
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi[min(sqrtz, y)];
+
+  T S2_total = 0;
   double time = get_wtime();
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
-  for (int64_t b = max(c, pi_sqrtz + 1); b < pi_y; b++)
+  for (int64_t i = 0; i < threads; i++)
   {
-    T1 prime = primes[b];
-    int64_t xn = (int64_t) max(x / (prime * prime), prime);
-    S2_total += pi_y - pi[xn];
+    int64_t start = max(primes[c], sqrtz + 1);
+    int64_t thread_interval = ceil_div(y - start, threads);
+    start += thread_interval * i;
+    int64_t stop = min(start + thread_interval, y);
+    primesieve::iterator iter(start - 1, stop);
+    T prime;
+
+    while ((prime = iter.next_prime()) < stop)
+    {
+      int64_t xn = (int64_t) max(x / (prime * prime), prime);
+      S2_total += pi_y - pi[xn];
+    }
   }
 
   if (print_status())
@@ -74,22 +87,16 @@ int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
-                   vector<int32_t>& pi,
-                   vector<int32_t>& primes,
                    int threads)
 {
-  return S2_trivial::S2_trivial((intfast64_t) x, y, z, c, pi, primes, threads);
-}
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
 
-int64_t S2_trivial(int64_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t c,
-                   PiTable& pi,
-                   vector<int32_t>& primes,
-                   int threads)
-{
-  return S2_trivial::S2_trivial((intfast64_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -98,22 +105,16 @@ int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t z,
                     int64_t c,
-                    PiTable& pi,
-                    vector<uint32_t>& primes,
                     int threads)
 {
-  return S2_trivial::S2_trivial((intfast128_t) x, y, z, c, pi, primes, threads);
-}
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_trivial(x, y) ===" << endl;
+    cout << "Computation of the trivial special leaves" << endl;
+  }
 
-int128_t S2_trivial(int128_t x,
-                    int64_t y,
-                    int64_t z,
-                    int64_t c,
-                    PiTable& pi,
-                    vector<int64_t>& primes,
-                    int threads)
-{
-  return S2_trivial::S2_trivial((intfast128_t) x, y, z, c, pi, primes, threads);
+  return S2_trivial::S2_trivial(x, y, z, c, threads);
 }
 
 #endif

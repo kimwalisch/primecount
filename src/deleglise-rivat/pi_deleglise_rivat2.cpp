@@ -193,7 +193,7 @@ int64_t S2(int64_t x,
 {
   PiTable pi(y);
 
-  int64_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, 1);
+  int64_t s2_trivial = S2_trivial(x, y, z, c,  1);
   int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, 1);
   int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, factors);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;

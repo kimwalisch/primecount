@@ -49,7 +49,7 @@ int64_t S2(int64_t x,
   threads = validate_threads(threads, limit);
   PiTable pi(y);
 
-  int64_t s2_trivial = S2_trivial(x, y, z, c, pi, primes, threads);
+  int64_t s2_trivial = S2_trivial(x, y, z, c,  threads);
   int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, threads);
   int64_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
   int64_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, pi, primes, factors, threads);
