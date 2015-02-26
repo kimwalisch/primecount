@@ -52,11 +52,11 @@ T1 S2_easy(T1 x,
     cout << "Computation of the easy special leaves" << endl;
   }
 
+  double time = get_wtime();
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[iroot<3>(x)];
   T1 s2_easy = 0;
-  double time = get_wtime();
   S2Status status;
 
   #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
@@ -135,7 +135,7 @@ int128_t S2_easy(int128_t x,
                  int threads)
 {
   // uses less memory
-  if (y <= std::numeric_limit<uint32_t>::max())
+  if (y <= std::numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
     return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
