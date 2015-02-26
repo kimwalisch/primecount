@@ -78,6 +78,8 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = x / y;
+  int64_t pi_y = pi_legendre(y, 1);
+  int64_t c = min(pi_y, PhiTiny::max_a());
 
   if (print_status())
   {
@@ -88,13 +90,11 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
     cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "c = " << PhiTiny::max_a() << endl;
+    cout << "c = " << c << endl;
     cout << "threads = " << validate_threads(threads) << endl;
   }
 
   int64_t p2 = P2(x, y, threads);
-  int64_t pi_y = pi_legendre(y, 1);
-  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
   int64_t s2 = S2(x, y, z, c, s2_approx, threads);
