@@ -14,7 +14,6 @@
 #include <FactorTable.hpp>
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <generate.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
@@ -52,7 +51,7 @@ int128_t S2(int128_t x,
   int128_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int128_t s2_easy = S2_easy(x, y, z, c, threads);
   int128_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
-  int128_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, pi, primes, factors, threads);
+  int128_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, factors, threads);
   int128_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -87,7 +86,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   double alpha = compute_alpha(x);
   int64_t y = (int64_t) (alpha * iroot<3>(x));
   int64_t z = (int64_t) (x / y);
-  int64_t pi_y;
+  int64_t pi_y = pi_legendre(y, 1);
   int64_t c;
 
   if (print_status())
@@ -112,12 +111,9 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     // if y < 2^32 we can use 32-bit primes and a 16-bit FactorTable
     // which uses ~ (y / 2) bytes of memory
 
-    vector<uint32_t> primes = generate_primes<uint32_t>(y);
     FactorTable<uint16_t> factors(y);
-
-    pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, primes[c], factors, threads);
+    s1 = S1(x, y, c, nth_prime(c), factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
     s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }
@@ -126,12 +122,9 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     // if y >= 2^32 we need to use 64-bit primes and a 32-bit
     // FactorTable which uses ~ y bytes of memory
 
-    vector<int64_t> primes = generate_primes<int64_t>(y);
     FactorTable<uint32_t> factors(y);
-
-    pi_y = primes.size() - 1;
     c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, primes[c], factors, threads);
+    s1 = S1(x, y, c, nth_prime(c), factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
     s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }

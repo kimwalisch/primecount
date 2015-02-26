@@ -19,6 +19,7 @@
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
+#include <generate.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
 #include <tos_counters.hpp>
@@ -135,19 +136,18 @@ T S2_hard_thread(T x,
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
+  int64_t max_b = pi[min(isqrt(x / low), isqrt(z))];
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
-  int64_t pi_max = pi[max_prime];
 
-  if (c > pi_max)
+  if (c > max_b)
     return 0;
 
   T s2_hard = 0;
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
-  phi.resize(pi_max + 1, 0);
-  mu_sum.resize(pi_max + 1, 0);
+  vector<int64_t> next = generate_next_multiples(low, max_b + 1, primes);
+  phi.resize(max_b + 1, 0);
+  mu_sum.resize(max_b + 1, 0);
 
   // Segmeted sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -180,7 +180,7 @@ T S2_hard_thread(T x,
       // For c + 1 <= b <= pi_sqrty
       // Find all special leaves: n = primes[b] * m
       // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
-      for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
+      for (int64_t end = min(pi_sqrty, max_b); b <= end; b++)
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
@@ -213,7 +213,7 @@ T S2_hard_thread(T x,
       // For pi_sqrty <= b <= pi_sqrtz
       // Find all hard special leaves: n = primes[b] * primes[l]
       // which satisfy: low <= (x / n) < high
-      for (; b <= pi_max; b++)
+      for (; b <= max_b; b++)
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
@@ -249,7 +249,7 @@ T S2_hard_thread(T x,
       // For c + 1 <= b <= pi_sqrty
       // Find all special leaves: n = primes[b] * m
       // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
-      for (int64_t end = min(pi_sqrty, pi_max); b <= end; b++)
+      for (int64_t end = min(pi_sqrty, max_b); b <= end; b++)
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
@@ -286,7 +286,7 @@ T S2_hard_thread(T x,
       // For pi_sqrty <= b <= pi_sqrtz
       // Find all hard special leaves: n = primes[b] * primes[l]
       // which satisfy: low <= (x / n) < high
-      for (; b <= pi_max; b++)
+      for (; b <= max_b; b++)
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
@@ -334,7 +334,6 @@ T S2_hard(T x,
           int64_t z,
           int64_t c,
           T s2_hard_approx,
-          PiTable& pi,
           vector<P>& primes,
           FactorTable<F>& factors,
           int threads)
@@ -350,12 +349,15 @@ T S2_hard(T x,
   T s2_hard = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
+  int64_t max_prime = z / isqrt(y);
 
   S2Status status;
   S2LoadBalancer loadBalancer(x, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
-  vector<int64_t> phi_total(pi[min(isqrt(z), y)] + 1, 0);
+
+  PiTable pi(max_prime);
+  vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
 
   while (low < limit)
   {
@@ -413,12 +415,12 @@ int64_t S2_hard(int64_t x,
                 int64_t z,
                 int64_t c,
                 int64_t s2_hard_approx,
-                PiTable& pi,
-                vector<int32_t>& primes,
                 FactorTable<uint16_t>& factors,
                 int threads)
 {
-  return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, pi, primes, factors, threads);
+  int64_t max_prime = z / isqrt(y);
+  vector<int32_t> primes = generate_primes(max_prime);
+  return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -428,12 +430,12 @@ int128_t S2_hard(int128_t x,
                  int64_t z,
                  int64_t c,
                  int128_t s2_hard_approx,
-                 PiTable& pi,
-                 vector<uint32_t>& primes,
                  FactorTable<uint16_t>& factors,
                  int threads)
 {
-  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
+  int64_t max_prime = z / isqrt(y);
+  vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
+  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
 }
 
 int128_t S2_hard(int128_t x,
@@ -441,12 +443,12 @@ int128_t S2_hard(int128_t x,
                  int64_t z,
                  int64_t c,
                  int128_t s2_hard_approx,
-                 PiTable& pi,
-                 vector<int64_t>& primes,
                  FactorTable<uint32_t>& factors,
                  int threads)
 {
-  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, pi, primes, factors, threads);
+  int64_t max_prime = z / isqrt(y);
+  vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+  return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
 }
 
 #endif
