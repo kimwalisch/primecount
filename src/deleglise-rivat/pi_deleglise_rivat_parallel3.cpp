@@ -113,7 +113,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
 
     FactorTable<uint16_t> factors(y);
     c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, nth_prime(c), factors, threads);
+    s1 = S1(x, y, c, factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
     s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }
@@ -124,7 +124,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
 
     FactorTable<uint32_t> factors(y);
     c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, nth_prime(c), factors, threads);
+    s1 = S1(x, y, c, factors, threads);
     s2_approx = S2_approx(x, pi_y, p2, s1);
     s2 = S2(x, y, z, c, s2_approx, primes, factors, threads);
   }

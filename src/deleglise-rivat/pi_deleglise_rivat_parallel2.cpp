@@ -100,7 +100,7 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
 
   int64_t pi_y = pi_legendre(y, 1);
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, nth_prime(c), factors, threads);
+  int64_t s1 = S1(x, y, c, factors, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
   int64_t s2 = S2(x, y, z, c, s2_approx, factors, threads);
   int64_t phi = s1 + s2;

@@ -35,7 +35,7 @@ namespace S1 {
 /// @pre is_phi_tiny(c) == true
 ///
 template <typename T>
-T S1(T x, int64_t y, int64_t c, int64_t prime_c, vector<int32_t>& lpf, vector<int32_t>& mu, int threads)
+T S1(T x, int64_t y, int64_t c, vector<int32_t>& lpf, vector<int32_t>& mu, int threads)
 {
   if (print_status())
   {
@@ -45,6 +45,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, vector<int32_t>& lpf, vector<in
   }
 
   T sum = 0;
+  int64_t prime_c = nth_prime(c);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
   double time = get_wtime();
@@ -65,15 +66,15 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, vector<int32_t>& lpf, vector<in
 /// @pre is_phi_tiny(c) == true
 ///
 template <typename T, typename F>
-T S1(T x, int64_t y, int64_t c, int64_t prime_c, FactorTable<F>& factors, int threads)
+T S1(T x, int64_t y, int64_t c, FactorTable<F>& factors, int threads)
 {
   // the factors lookup table contains only numbers
   // which are coprime to 2, 3, 5 and 7
-  if (prime_c <= 7)
+  if (c <= 4)
   {
     vector<int32_t> mu = generate_moebius(y);
     vector<int32_t> lpf = generate_least_prime_factors(y);
-    return S1(x, y, c, prime_c, lpf, mu, threads);
+    return S1(x, y, c, lpf, mu, threads);
   }
 
   if (print_status())
@@ -84,6 +85,7 @@ T S1(T x, int64_t y, int64_t c, int64_t prime_c, FactorTable<F>& factors, int th
   }
 
   T sum = 0;
+  int64_t prime_c = nth_prime(c);
   int64_t limit = factors.get_index(y);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
@@ -108,22 +110,20 @@ namespace primecount {
 int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
-           int64_t prime_c,
            vector<int32_t>& lpf,
            vector<int32_t>& mu,
            int threads)
 {
-  return S1::S1((intfast64_t) x, y, c, prime_c, lpf, mu, threads);
+  return S1::S1((intfast64_t) x, y, c, lpf, mu, threads);
 }
 
 int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
-           int64_t prime_c,
            FactorTable<uint16_t>& factors,
            int threads)
 {
-  return S1::S1((intfast64_t) x, y, c, prime_c, factors, threads);
+  return S1::S1((intfast64_t) x, y, c, factors, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -131,32 +131,29 @@ int64_t S1(int64_t x,
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            int64_t prime_c,
             vector<int32_t>& lpf,
             vector<int32_t>& mu,
             int threads)
 {
-  return S1::S1((intfast128_t) x, y, c, prime_c, lpf, mu, threads);
+  return S1::S1((intfast128_t) x, y, c, lpf, mu, threads);
 }
 
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            uint32_t prime_c,
             FactorTable<uint16_t>& factors,
             int threads)
 {
-  return S1::S1((intfast128_t) x, y, c, prime_c, factors, threads);
+  return S1::S1((intfast128_t) x, y, c, factors, threads);
 }
 
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            int64_t prime_c,
             FactorTable<uint32_t>& factors,
             int threads)
 {
-  return S1::S1((intfast128_t) x, y, c, prime_c, factors, threads);
+  return S1::S1((intfast128_t) x, y, c, factors, threads);
 }
 
 #endif
