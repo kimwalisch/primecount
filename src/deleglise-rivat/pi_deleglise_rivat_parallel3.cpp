@@ -4,7 +4,7 @@
 ///        counting algorithm. This implementation is identical to
 ///        pi_deleglise_rivat_parallel2(x) but uses 128-bit integers.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,8 +49,8 @@ int128_t S2(int128_t x,
   threads = validate_threads(threads, z);
   PiTable pi(y);
 
-  int128_t s2_trivial = S2_trivial(x, y, z, c,  threads);
-  int128_t s2_easy = S2_easy(x, y, z, c, pi, primes, threads);
+  int128_t s2_trivial = S2_trivial(x, y, z, c, threads);
+  int128_t s2_easy = S2_easy(x, y, z, c, threads);
   int128_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
   int128_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, pi, primes, factors, threads);
   int128_t s2 = s2_trivial + s2_easy + s2_hard;

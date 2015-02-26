@@ -11,7 +11,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -178,8 +178,8 @@ int64_t S2(int64_t x,
 {
   vector<int32_t> pi = generate_pi(y);
 
-  int64_t s2_trivial = S2_trivial(x, y, z, c,  1);
-  int64_t s2_easy = S2_easy(x, y, z, c, pi, primes, 1);
+  int64_t s2_trivial = S2_trivial(x, y, z, c, 1);
+  int64_t s2_easy = S2_easy(x, y, z, c, 1);
   int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, lpf, mu);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;
 

@@ -4,7 +4,7 @@
 ///        and the sparse easy leaves in parallel using OpenMP
 ///        (Deleglise-Rivat algorithm).
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,6 +12,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
@@ -36,13 +37,12 @@ namespace S2_easy {
 /// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
 ///
-template <typename T1, typename T2, typename T3>
+template <typename T1, typename T2>
 T1 S2_easy(T1 x,
            int64_t y,
            int64_t z,
            int64_t c,
-           T2& pi,
-           vector<T3>& primes,
+           vector<T2>& primes,
            int threads)
 {
   if (print_status())
@@ -52,6 +52,7 @@ T1 S2_easy(T1 x,
     cout << "Computation of the easy special leaves" << endl;
   }
 
+  PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[iroot<3>(x)];
   T1 s2_easy = 0;
@@ -119,22 +120,10 @@ int64_t S2_easy(int64_t x,
                 int64_t y,
                 int64_t z,
                 int64_t c,
-                vector<int32_t>& pi,
-                vector<int32_t>& primes,
                 int threads)
 {
-  return S2_easy::S2_easy((intfast64_t) x, y, z, c, pi, primes, threads);
-}
-
-int64_t S2_easy(int64_t x,
-                int64_t y,
-                int64_t z,
-                int64_t c,
-                PiTable& pi,
-                vector<int32_t>& primes,
-                int threads)
-{
-  return S2_easy::S2_easy((intfast64_t) x, y, z, c, pi, primes, threads);
+  vector<int32_t> primes = generate_primes(y);
+  return S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -143,22 +132,19 @@ int128_t S2_easy(int128_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 PiTable& pi,
-                 vector<uint32_t>& primes,
                  int threads)
 {
-  return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
-}
-
-int128_t S2_easy(int128_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 PiTable& pi,
-                 vector<int64_t>& primes,
-                 int threads)
-{
-  return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
+  // uses less memory
+  if (y <= std::numeric_limit<uint32_t>::max())
+  {
+    vector<uint32_t> primes = generate_primes<uint32_t>(y);
+    return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
+  }
+  else
+  {
+    vector<int64_t> primes = generate_primes<int64_t>(y);
+    return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
+  }
 }
 
 #endif
