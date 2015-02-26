@@ -138,12 +138,12 @@ int128_t S2_easy(int128_t x,
   if (y <= std::numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
+    return S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
     vector<int64_t> primes = generate_primes<int64_t>(y);
-    return S2_easy::S2_easy((intfast128_t) x, y, z, c, pi, primes, threads);
+    return S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
   }
 }
 
