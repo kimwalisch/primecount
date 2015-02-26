@@ -35,7 +35,7 @@ namespace {
 /// Calculate the contribution of the special leaves.
 /// @pre y > 0 && c > 1
 ///
-template <typename P, typename F>
+template <typename F>
 int128_t S2(int128_t x,
             int64_t y,
             int64_t z,
