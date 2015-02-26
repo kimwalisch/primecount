@@ -16,18 +16,29 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <map>
 #include <exception>
 #include <cstdlib>
 #include <cstddef>
 
 using std::string;
+using std::istringstream;
 
 namespace primecount {
 
 void help();
 void version();
 bool test();
+
+double to_double(const string& s)
+{
+  istringstream i(s);
+  double x;
+  if (!(i >> x))
+    throw primecount_error("failed to convert \"" + s + "\" to double");
+  return x;
+}
 
 /// e.g. id = "--threads", value = "4"
 struct Option
@@ -127,7 +138,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
       Option option = makeOption(argv[i]);
       switch (optionMap[option.id])
       {
-        case OPTION_ALPHA:   pco.alpha = option.getValue<int>(); break;
+        case OPTION_ALPHA:   set_alpha(to_double(option.value)); break;
         case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
