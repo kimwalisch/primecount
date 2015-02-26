@@ -70,7 +70,6 @@ int64_t S2_hard(int64_t x,
                 int64_t z,
                 int64_t c,
                 vector<int32_t>& pi,
-                vector<int32_t>& primes,
                 vector<int32_t>& lpf,
                 vector<int32_t>& mu)
 {
@@ -82,6 +81,7 @@ int64_t S2_hard(int64_t x,
 
   BitSieve sieve(segment_size);
   vector<int32_t> counters(segment_size);
+  vector<int32_t> primes = generate_primes(y);  
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -172,7 +172,6 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
            int64_t c,
-           vector<int32_t>& primes,
            vector<int32_t>& lpf,
            vector<int32_t>& mu)
 {
@@ -180,7 +179,7 @@ int64_t S2(int64_t x,
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, 1);
   int64_t s2_easy = S2_easy(x, y, z, c, 1);
-  int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, lpf, mu);
+  int64_t s2_hard = S2_hard(x, y, z, c, pi, lpf, mu);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -215,13 +214,12 @@ int64_t pi_deleglise_rivat1(int64_t x)
   int64_t p2 = P2(x, y, 1);
 
   vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> primes = generate_primes(y);    
+  vector<int32_t> lpf = generate_least_prime_factors(y);  
 
-  int64_t pi_y = primes.size() - 1;
+  int64_t pi_y = pi_legendre(y, 1);
   int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, lpf, mu, 1);
-  int64_t s2 = S2(x, y, z, c, primes, lpf, mu);
+  int64_t s2 = S2(x, y, z, c, lpf, mu);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
