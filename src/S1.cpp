@@ -84,12 +84,12 @@ T S1(T x, int64_t y, int64_t c, FactorTable<F>& factors, int threads)
     cout << "Computation of the ordinary leaves" << endl;
   }
 
-  T sum = 0;
-  int64_t prime_c = nth_prime(c);
+  double time = get_wtime();
   int64_t limit = factors.get_index(y);
+  int64_t prime_c = nth_prime(c);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
-  double time = get_wtime();
+  T sum = 0;
 
   #pragma omp parallel for num_threads(threads) reduction (+: sum)
   for (int64_t i = factors.get_index(1); i <= limit; i++)
@@ -120,9 +120,9 @@ int64_t S1(int64_t x,
 int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
-           FactorTable<uint16_t>& factors,
            int threads)
 {
+  FactorTable<uint16_t> factors(y);
   return S1::S1((intfast64_t) x, y, c, factors, threads);
 }
 
@@ -141,19 +141,19 @@ int128_t S1(int128_t x,
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            FactorTable<uint16_t>& factors,
             int threads)
 {
-  return S1::S1((intfast128_t) x, y, c, factors, threads);
-}
-
-int128_t S1(int128_t x,
-            int64_t y,
-            int64_t c,
-            FactorTable<uint32_t>& factors,
-            int threads)
-{
-  return S1::S1((intfast128_t) x, y, c, factors, threads);
+  // uses less memory
+  if (y <= FactorTable<uint16_t>::max())
+  {
+    FactorTable<uint16_t> factors(y);
+    return S1::S1((intfast128_t) x, y, c, factors, threads);
+  }
+  else
+  {
+    FactorTable<uint32_t> factors(y);
+    return S1::S1((intfast128_t) x, y, c, factors, threads);
+  }
 }
 
 #endif

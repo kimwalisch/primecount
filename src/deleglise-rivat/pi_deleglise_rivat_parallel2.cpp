@@ -13,9 +13,7 @@
 ///
 
 #include <PiTable.hpp>
-#include <FactorTable.hpp>
 #include <primecount-internal.hpp>
-#include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
@@ -40,7 +38,6 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            int64_t s2_approx,
-           FactorTable<uint16_t>& factors,
            int threads)
 {
   int64_t limit = z + 1;
@@ -49,7 +46,7 @@ int64_t S2(int64_t x,
   int64_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int64_t s2_easy = S2_easy(x, y, z, c, threads);
   int64_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
-  int64_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, factors, threads);
+  int64_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, threads);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -96,13 +93,11 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   }
 
   int64_t p2 = P2(x, y, threads);
-  FactorTable<uint16_t> factors(y);
-
   int64_t pi_y = pi_legendre(y, 1);
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, factors, threads);
+  int64_t s1 = S1(x, y, c, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
-  int64_t s2 = S2(x, y, z, c, s2_approx, factors, threads);
+  int64_t s2 = S2(x, y, z, c, s2_approx, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

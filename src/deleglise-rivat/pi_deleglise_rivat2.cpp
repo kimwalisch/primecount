@@ -71,10 +71,7 @@ void cross_off(int64_t prime,
 int64_t S2_hard(intfast64_t x,
                 int64_t y,
                 int64_t z,
-                int64_t c,
-                PiTable& pi,
-                vector<int32_t>& primes,
-                FactorTable<uint16_t>& factors)
+                int64_t c)
 {
   if (print_status())
   {
@@ -82,6 +79,10 @@ int64_t S2_hard(intfast64_t x,
     cout << "=== S2_hard(x, y) ===" << endl;
     cout << "Computation of the hard special leaves" << endl;
   }
+
+  PiTable pi(y);
+  FactorTable<uint16_t> factors(y);
+  vector<int32_t> primes = generate_primes(y);
 
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
@@ -187,15 +188,11 @@ int64_t S2_hard(intfast64_t x,
 int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
-           int64_t c,
-           vector<int32_t>& primes,
-           FactorTable<uint16_t>& factors)
+           int64_t c)
 {
-  PiTable pi(y);
-
   int64_t s2_trivial = S2_trivial(x, y, z, c, 1);
   int64_t s2_easy = S2_easy(x, y, z, c, 1);
-  int64_t s2_hard = S2_hard(x, y, z, c, pi, primes, factors);
+  int64_t s2_hard = S2_hard(x, y, z, c);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -241,13 +238,10 @@ int64_t pi_deleglise_rivat2(int64_t x)
   }
 
   int64_t p2 = P2(x, y, 1);
-  vector<int32_t> primes = generate_primes(y);
-  FactorTable<uint16_t> factors(y);
-
-  int64_t pi_y = pi_bsearch(primes, y);
+  int64_t pi_y = pi_legendre(y, 1);
   int64_t c = min(pi_y, PhiTiny::max_a());
-  int64_t s1 = S1(x, y, c, factors, 1);
-  int64_t s2 = S2(x, y, z, c, primes, factors);
+  int64_t s1 = S1(x, y, c, 1);
+  int64_t s2 = S2(x, y, z, c);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

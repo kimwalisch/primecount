@@ -26,7 +26,6 @@ int64_t S1(int64_t x,
 int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
-           FactorTable<uint16_t>& factors,
            int threads);
 
 #ifdef HAVE_INT128_T
@@ -41,13 +40,6 @@ int128_t S1(int128_t x,
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            FactorTable<uint16_t>& factors,
-            int threads);
-
-int128_t S1(int128_t x,
-            int64_t y,
-            int64_t c,
-            FactorTable<uint32_t>& factors,
             int threads);
 
 #endif

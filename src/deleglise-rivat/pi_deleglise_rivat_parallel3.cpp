@@ -11,10 +11,8 @@
 ///
 
 #include <PiTable.hpp>
-#include <FactorTable.hpp>
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <min_max.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <int128.hpp>
@@ -35,13 +33,11 @@ namespace {
 /// Calculate the contribution of the special leaves.
 /// @pre y > 0 && c > 1
 ///
-template <typename F>
 int128_t S2(int128_t x,
             int64_t y,
             int64_t z,
             int64_t c,
             int128_t s2_approx,
-            FactorTable<F>& factors,
             int threads)
 {
   threads = validate_threads(threads, z);
@@ -49,7 +45,7 @@ int128_t S2(int128_t x,
   int128_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int128_t s2_easy = S2_easy(x, y, z, c, threads);
   int128_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
-  int128_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, factors, threads);
+  int128_t s2_hard = S2_hard(x, y, z, c, s2_hard_approx, threads);
   int128_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
@@ -101,32 +97,10 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   }
 
   int128_t p2 = P2(x, y, threads);
-  int128_t s2_approx;
-  int128_t s1, s2;
-
-  if (y <= FactorTable<uint16_t>::max())
-  {
-    // if y < 2^32 we can use 32-bit primes and a 16-bit FactorTable
-    // which uses ~ (y / 2) bytes of memory
-
-    FactorTable<uint16_t> factors(y);
-    c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, factors, threads);
-    s2_approx = S2_approx(x, pi_y, p2, s1);
-    s2 = S2(x, y, z, c, s2_approx, factors, threads);
-  }
-  else
-  {
-    // if y >= 2^32 we need to use 64-bit primes and a 32-bit
-    // FactorTable which uses ~ y bytes of memory
-
-    FactorTable<uint32_t> factors(y);
-    c = min(pi_y, PhiTiny::max_a());
-    s1 = S1(x, y, c, factors, threads);
-    s2_approx = S2_approx(x, pi_y, p2, s1);
-    s2 = S2(x, y, z, c, s2_approx, factors, threads);
-  }
-
+  int128_t c = min(pi_y, PhiTiny::max_a());
+  int128_t s1 = S1(x, y, c, threads);
+  int128_t s2_approx = S2_approx(x, pi_y, p2, s1);
+  int128_t s2 = S2(x, y, z, c, s2_approx, threads);
   int128_t phi = s1 + s2;
   int128_t sum = phi + pi_y - 1 - p2;
 
