@@ -34,8 +34,8 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  n = std::max((int64_t) 1, n);
-
+  if (n < 2)
+    return primes[1];
   if (n < 10)
     return primes[n];
 
