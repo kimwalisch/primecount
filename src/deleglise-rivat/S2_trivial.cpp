@@ -39,7 +39,7 @@ T S2_trivial(T x,
              int64_t c,
              int threads)
 {
-  int64_t thread_threshold = ipow(10, 6);
+  int64_t thread_threshold = ipow(10, 7);
   threads = validate_threads(threads, y, thread_threshold);
 
   if (print_status())
