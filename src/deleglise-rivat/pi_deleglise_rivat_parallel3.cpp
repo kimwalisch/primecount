@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include <vector>
 
 using namespace std;
 using namespace primecount;
