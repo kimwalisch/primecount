@@ -17,6 +17,7 @@
 #include <min_max.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
+#include <fast_div.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -67,17 +68,16 @@ T1 S2_easy(T1 x,
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
-    int64_t min_trivial_leaf = min(x / (prime * prime), y);
-    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x / prime);
+    T1 x2 = x / prime;
+    int64_t min_trivial_leaf = min(x2 / prime, y);
+    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
     int64_t min_sparse_easy_leaf = z / prime;
     int64_t min_hard_leaf = max(y / prime, prime);
 
     min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
     min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
     int64_t l = pi[min_trivial_leaf];
-
     T1 result = 0;
-    T1 x2 = x / prime;
 
     // Find all clustered easy leaves:
     // n = primes[b] * primes[l]
@@ -85,10 +85,10 @@ T1 S2_easy(T1 x,
     // where phi(x / n, b - 1) = pi(x / n) - b + 2
     while (primes[l] > min_clustered_easy_leaf)
     {
-      int64_t xn = (int64_t) (x2 / primes[l]);
+      int64_t xn = (int64_t) fast_div(x2, primes[l]);
       int64_t phi_xn = pi[xn] - b + 2;
       int64_t last_prime = primes[b + phi_xn - 1];
-      int64_t xm = max((int64_t) (x2 / last_prime), min_clustered_easy_leaf);
+      int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
       int64_t l2 = pi[xm];
       result += phi_xn * (l - l2);
       l = l2;
@@ -99,7 +99,7 @@ T1 S2_easy(T1 x,
     // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
     for (; primes[l] > min_sparse_easy_leaf; l--)
     {
-      int64_t xn = (int64_t) (x2 / primes[l]);
+      int64_t xn = (int64_t) fast_div(x2, primes[l]);
       result += pi[xn] - b + 2;
     }
 

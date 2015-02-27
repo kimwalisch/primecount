@@ -273,15 +273,6 @@ $ make
 $ sudo make install
 ```
 
-### Build options (Unix-like OSes)
-128-bit divisions involve a function call which can significantly
-degrade performance (especially on Mingw & Cygwin). Thus I recommend
-patching primecount on all OSes so that it uses 64-bit divisions
-instead of 128-bit divisions whenever possible:
-```sh
-$ patch -p0 < avoid_128bit_div.patch
-```
-
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
 then it is enabled in the build process. Using POPCNT speeds up

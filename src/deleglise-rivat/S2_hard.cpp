@@ -6,7 +6,7 @@
 ///        (PiTable & FactorTable) to reduce the memory usage by
 ///        about 10x.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,6 +23,7 @@
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
 #include <tos_counters.hpp>
+#include <fast_div.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -184,8 +185,10 @@ T S2_hard_thread(T x,
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
-        int64_t min_m = max(min(x2 / high, y), y / prime);
-        int64_t max_m = min(x2 / low, y);
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t min_m = max(x2_div_high, y / prime);
+        int64_t max_m = x2_div_low;
 
         if (prime >= max_m)
           goto next_segment;
@@ -197,7 +200,7 @@ T S2_hard_thread(T x,
         {
           if (prime < factors.lpf(m))
           {
-            int64_t xn = (int64_t) (x2 / factors.get_number(m));
+            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t count = cnt_query(counters, xn - low);
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
@@ -217,15 +220,17 @@ T S2_hard_thread(T x,
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
-        int64_t l = pi[min3(x2 / low, z / prime, y)];
-        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t l = pi[min(x2_div_low, z / prime)];
+        int64_t min_hard_leaf = max3(x2_div_high, y / prime, prime);
 
         if (prime >= primes[l])
           goto next_segment;
 
         for (; primes[l] > min_hard_leaf; l--)
         {
-          int64_t xn = (int64_t) (x2 / primes[l]);
+          int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
@@ -253,8 +258,10 @@ T S2_hard_thread(T x,
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
-        int64_t min_m = max(min(x2 / high, y), y / prime);
-        int64_t max_m = min(x2 / low, y);
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t min_m = max(x2_div_high, y / prime);
+        int64_t max_m = x2_div_low;
         int64_t count = 0;
         int64_t i = 0;
 
@@ -268,7 +275,7 @@ T S2_hard_thread(T x,
         {
           if (prime < factors.lpf(m))
           {
-            int64_t xn = (int64_t) (x2 / factors.get_number(m));
+            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t stop = xn - low;
             count += sieve.count(i, stop);
             i = stop + 1;
@@ -290,8 +297,10 @@ T S2_hard_thread(T x,
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
-        int64_t l = pi[min3(x2 / low, z / prime, y)];
-        int64_t min_hard_leaf = max3(min(x2 / high, y), y / prime, prime);
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t l = pi[min(x2_div_low, z / prime)];
+        int64_t min_hard_leaf = max3(x2_div_high, y / prime, prime);
         int64_t count = 0;
         int64_t i = 0;
 
@@ -300,7 +309,7 @@ T S2_hard_thread(T x,
 
         for (; primes[l] > min_hard_leaf; l--)
         {
-          int64_t xn = (int64_t) (x2 / primes[l]);
+          int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t stop = xn - low;
           count += sieve.count(i, stop);
           i = stop + 1;
@@ -441,7 +450,7 @@ int128_t S2_hard(int128_t x,
     FactorTable<uint16_t> factors(y);
     int64_t max_prime = z / isqrt(y);
     vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
-	
+
     return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
   else

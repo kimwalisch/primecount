@@ -10,6 +10,7 @@
   smallest possible for the given formula.
 
   * -a<N>, --alpha=<N>: Manually set the tuning factor.
+  * avoid_128bit_div.patch: merged into master branch.
   * src/deleglise-rivat/*: Reduce memory usage.
   * src/lmo/*: Update S1(x) function calls.
   * src/nth_prime.cpp: Add optimization for small primes.
