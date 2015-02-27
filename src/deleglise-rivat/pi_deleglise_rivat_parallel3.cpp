@@ -30,6 +30,16 @@ using namespace primecount;
 
 namespace {
 
+/// alpha is a tuning factor which should grow like (log(x))^3
+/// for the Deleglise-Rivat prime counting algorithm.
+///
+double compute_alpha(int128_t x)
+{
+  double d = (double) x;
+  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) * log(d) / 1200;
+  return in_between(1, alpha, iroot<6>(x));
+}
+
 /// Calculate the contribution of the special leaves.
 /// @pre y > 0 && c > 1
 ///
@@ -40,8 +50,6 @@ int128_t S2(int128_t x,
             int128_t s2_approx,
             int threads)
 {
-  threads = validate_threads(threads, z);
-
   int128_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int128_t s2_easy = S2_easy(x, y, z, c, threads);
   int128_t s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
@@ -49,16 +57,6 @@ int128_t S2(int128_t x,
   int128_t s2 = s2_trivial + s2_easy + s2_hard;
 
   return s2;
-}
-
-/// alpha is a tuning factor which should grow like (log(x))^3
-/// for the Deleglise-Rivat prime counting algorithm.
-///
-double compute_alpha(int128_t x)
-{
-  double d = (double) x;
-  double alpha = (get_alpha() >= 1) ? get_alpha() : log(d) * log(d) * log(d) / 1200;
-  return in_between(1, alpha, iroot<6>(x));
 }
 
 } // namespace
