@@ -422,6 +422,7 @@ int64_t S2_hard(int64_t x,
   FactorTable<uint16_t> factors(y);
   int64_t max_prime = z / isqrt(y);
   vector<int32_t> primes = generate_primes(max_prime);
+
   return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 }
 
@@ -434,19 +435,21 @@ int128_t S2_hard(int128_t x,
                  int128_t s2_hard_approx,
                  int threads)
 {
-  int64_t max_prime = z / isqrt(y);
-
   // uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factors(y);
+    int64_t max_prime = z / isqrt(y);
     vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
+	
     return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
   else
   {
     FactorTable<uint32_t> factors(y);
+    int64_t max_prime = z / isqrt(y);
     vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+
     return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
 }
