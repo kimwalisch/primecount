@@ -345,7 +345,9 @@ T S2_hard(T x,
     cout << "Computation of the hard special leaves" << endl;
   }
 
+  threads = validate_threads(threads, z);
   double time = get_wtime();
+
   T s2_hard = 0;
   int64_t low = 1;
   int64_t limit = z + 1;
