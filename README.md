@@ -54,6 +54,7 @@ Count the primes below x <= 10^27 using the prime counting function,
 by default the Deleglise-Rivat algorithm (-d) is used.
 
 Options:
+  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
@@ -62,7 +63,6 @@ Options:
          --Li               Approximate pi(x) using the logarithmic integral
          --Li_inverse       Approximate the nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
-         --phi              Calculate phi(x, a), requires 2 arguments
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
   -s,    --status           Print status info during computation
          --test             Run various correctness tests and exit
