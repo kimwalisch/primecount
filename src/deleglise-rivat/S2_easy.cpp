@@ -52,11 +52,15 @@ T1 S2_easy(T1 x,
     cout << "Computation of the easy special leaves" << endl;
   }
 
+  T1 s2_easy = 0;
+  int64_t x13 = iroot<3>(x);
+  int64_t thread_threshold = 1000;
+  threads = validate_threads(threads, x13, thread_threshold);
+
   double time = get_wtime();
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_x13 = pi[iroot<3>(x)];
-  T1 s2_easy = 0;
+  int64_t pi_x13 = pi[x13];
   S2Status status;
 
   #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
