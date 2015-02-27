@@ -275,8 +275,8 @@ $ sudo make install
 
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-then it is enabled in the build process. Using POPCNT speeds up
-primecount by about 10 percent. If you need maximum portability you can
+then it is enabled in the build process. POPCNT speeds up primecount by
+about 10 percent. If you need maximum portability you can
 disable POPCNT using:
 ```sh
 $ ./configure --disable-popcnt
