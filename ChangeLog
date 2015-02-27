@@ -1,8 +1,19 @@
-2015-02-25 Kim Walisch  <kim.walisch@gmail.com>
+2015-02-27 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.8 work in progress.
 
+  This version reduces the memory usage of the Deleglise-Rivat
+  implementation by up to 30 percent. Instead of using the same set of
+  memory intense data structures for all formulas (P2, S1, S2_trvial,
+  S2_easy, S2_hard), each individual formula now generates its own set
+  of data structures and the size of each data structure is the
+  smallest possible for the given formula.
+
   * -a<N>, --alpha=<N>: Manually set the tuning factor.
+  * src/deleglise-rivat/*: Reduce memory usage.
+  * src/lmo/*: Update S1(x) function calls.
+  * src/nth_prime.cpp: Add optimization for small primes.
+  * src/app/*: Add --alpha option.
 
 2015-01-26 Kim Walisch  <kim.walisch@gmail.com>
 
