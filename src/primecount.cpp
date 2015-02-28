@@ -258,6 +258,29 @@ double get_alpha()
   return alpha_;
 }
 
+/// alpha is a tuning factor used in the Lagarias-Miller-Odlyzko
+/// and Deleglise-Rivat prime counting algorithms. alpha should grow
+/// like (log(x))^2 for LMO and (log(x))^3 for Deleglise-Rivat.
+///
+/// @param pivot       beta increases slowly if x > pivot.
+/// @param exp         Exponent, 2 for LMO, 3 for Deleglise-Rivat.
+/// @param beta_factor Tuning factor, determine empirically.
+///
+double get_alpha(maxint_t x, double pivot, double exp, double beta_factor)
+{
+  double d = (double) x;
+  double alpha = get_alpha();
+
+  if (alpha < 1)
+  {
+    double beta = pow(log(log(pivot)) / log(log(d)), exp);
+    beta = in_between(0.7, beta, 1.5) * beta_factor;
+    alpha = pow(log(d), exp) / beta;
+  }
+
+  return in_between(1, alpha, iroot<6>(x));
+}
+
 void set_num_threads(int threads)
 {
   threads_ = validate_threads(threads);

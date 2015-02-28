@@ -127,6 +127,8 @@ void set_alpha(double alpha);
 
 double get_alpha();
 
+double get_alpha(maxint_t x, double pivot, double exp, double beta_factor);
+
 double get_wtime();
 
 int validate_threads(int threads);
