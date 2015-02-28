@@ -10,7 +10,7 @@
   smallest possible for the given formula.
 
   * -a<N>, --alpha=<N>: Manually set the tuning factor.
-  * src/primecount.cpp: Imporved alpha factor formula.
+  * src/primecount.cpp: Improved alpha factor formula.
   * src/deleglise-rivat/*: Reduce memory usage.
   * src/lmo/*: Update S1(x) function calls.
   * src/nth_prime.cpp: Add optimization for small primes.
