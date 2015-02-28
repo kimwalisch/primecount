@@ -5,10 +5,10 @@ primecount
 primecount is a command-line program and C++ library that counts the
 primes below an integer x&nbsp;≤&nbsp;10<sup>27</sup> using **highly
 optimized** implementations of the
-[prime counting function pi(x)](http://en.wikipedia.org/wiki/Prime-counting_function).
-primecount includes implementations of the algorithms of Legendre,
-Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all of
-which have been parallelized using
+[prime counting function](http://en.wikipedia.org/wiki/Prime-counting_function)
+(combinatorial methods). primecount includes implementations of the algorithms
+of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all
+of which have been parallelized using
 [OpenMP](http://en.wikipedia.org/wiki/OpenMP).
 
 primecount contains the **first ever** parallel open source
