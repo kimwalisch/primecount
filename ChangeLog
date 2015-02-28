@@ -1,6 +1,6 @@
 2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.8 work in progress.
+  Version 1.8 released.
 
   This version reduces the memory usage of the Deleglise-Rivat
   implementation by up to 30 percent. Instead of using the same set of
