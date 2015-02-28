@@ -46,7 +46,6 @@ namespace {
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
 {
   vector<int64_t> next;
-
   next.reserve(size);
   next.push_back(0);
 
