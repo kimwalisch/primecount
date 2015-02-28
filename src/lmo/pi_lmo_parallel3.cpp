@@ -42,7 +42,6 @@ namespace {
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
 {
   vector<int64_t> next;
-
   next.reserve(size);
   next.push_back(0);
 
@@ -303,7 +302,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 1e15, 2, 400);
+  double alpha = get_alpha(x, 1e16, 2, 400);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
 

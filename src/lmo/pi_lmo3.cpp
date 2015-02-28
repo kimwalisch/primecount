@@ -126,7 +126,7 @@ int64_t pi_lmo3(int64_t x)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 1e15, 2, 300);
+  double alpha = get_alpha(x, 1e16, 2, 300);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t p2 = P2(x, y, 1);
