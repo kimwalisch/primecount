@@ -216,7 +216,7 @@ space.
     <td>3,920.29s</td>
     <td>1,349.95s</td>
     <td>68.88s</td>
-    <td>18.93</td>
+    <td>19.27</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
