@@ -1,4 +1,4 @@
-2015-02-27 Kim Walisch  <kim.walisch@gmail.com>
+2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.8 work in progress.
 
@@ -10,11 +10,12 @@
   smallest possible for the given formula.
 
   * -a<N>, --alpha=<N>: Manually set the tuning factor.
-  * avoid_128bit_div.patch: merged into master branch.
+  * src/primecount.cpp: Imporved alpha factor formula.
   * src/deleglise-rivat/*: Reduce memory usage.
   * src/lmo/*: Update S1(x) function calls.
   * src/nth_prime.cpp: Add optimization for small primes.
   * src/app/*: Add --alpha option.
+  * avoid_128bit_div.patch: merged into master branch.
 
 2015-01-26 Kim Walisch  <kim.walisch@gmail.com>
 
