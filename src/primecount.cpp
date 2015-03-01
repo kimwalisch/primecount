@@ -258,24 +258,35 @@ double get_alpha()
   return alpha_;
 }
 
-/// alpha is a tuning factor used in the Lagarias-Miller-Odlyzko
-/// and Deleglise-Rivat prime counting algorithms. alpha should grow
-/// like (log(x))^2 for LMO and (log(x))^3 for Deleglise-Rivat.
+/// Calculate the Lagarias-Miller-Odlyzko alpha tuning factor.
+/// alpha = a log(x)^2 + b
+/// a and b are constants that should be determined empirically.
 ///
-/// @param pivot       beta increases slowly if x > pivot.
-/// @param exp         Exponent, 2 for LMO, 3 for Deleglise-Rivat.
-/// @param beta_factor Tuning factor, determine empirically.
-///
-double get_alpha(maxint_t x, double pivot, double exp, double beta_factor)
+double get_alpha(maxint_t x, double a, double b)
 {
-  double d = (double) x;
   double alpha = get_alpha();
 
   if (alpha < 1)
   {
-    double beta = pow(log(log(pivot)) / log(log(d)), exp);
-    beta = in_between(0.7, beta, 1.5) * beta_factor;
-    alpha = pow(log(d), exp) / beta;
+    double logx = log((double) x);
+    alpha = a * pow(logx, 2) + b;
+  }
+
+  return in_between(1, alpha, iroot<6>(x));
+}
+
+/// Calculate the Deleglise-Rivat alpha tuning factor.
+/// alpha = a log(x)^3 + b log(x)^2 + c
+/// a, b and c are constants that should be determined empirically.
+///
+double get_alpha(maxint_t x, double a, double b, double c)
+{
+  double alpha = get_alpha();
+
+  if (alpha < 1)
+  {
+    double logx = log((double) x);
+    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c;
   }
 
   return in_between(1, alpha, iroot<6>(x));
