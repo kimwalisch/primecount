@@ -131,6 +131,10 @@ T P2_thread(T x,
 
     sieve.fill(low, high);
 
+    // reset previously unset prime 2
+    if (low <= 2)
+      sieve.set(2 - low);
+
     // cross-off multiples
     for (int64_t i = 2; i < size && primes[i] <= sqrt; i++)
     {
