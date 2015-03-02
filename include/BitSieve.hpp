@@ -25,8 +25,9 @@ class BitSieve
 public:
   BitSieve(std::size_t size);
 
-  /// Set all bits to 1, except bits corresponding
-  /// to 0, 1 and even numbers > 2.
+  /// Set all bits to 1, except bits corresponding to even numbers.
+  /// @warning You must reset 2 when sieving primes.
+  ///
   void fill(uint64_t low, uint64_t /* unused */);
 
   /// Count the number of 1 bits inside the interval [start, stop]
@@ -43,6 +44,13 @@ public:
     assert(pos < size_);
     uint64_t bit = ((uint64_t) 1) << (pos & 63);
     return (bits_[pos >> 6] & bit) != 0;
+  }
+
+  void set(uint64_t pos)
+  {
+    assert(pos < size_);
+    uint64_t bit = ((uint64_t) 1) << (pos & 63);
+    bits_[pos >> 6] |= bit;
   }
 
   void unset(uint64_t pos)
