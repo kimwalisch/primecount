@@ -61,7 +61,7 @@ T S2_trivial(T x,
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int64_t i = 0; i < threads; i++)
   {
-    int64_t start = max(prime_c, sqrtz + 1);
+    int64_t start = max(prime_c, sqrtz) + 1;
     int64_t thread_interval = ceil_div(y - start, threads);
     start += thread_interval * i;
     int64_t stop = min(start + thread_interval, y);
