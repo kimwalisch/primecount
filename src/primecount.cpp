@@ -259,24 +259,7 @@ double get_alpha()
 }
 
 /// Calculate the Lagarias-Miller-Odlyzko alpha tuning factor.
-/// alpha = a log(x)^2 + b
-/// a and b are constants that should be determined empirically.
-///
-double get_alpha(maxint_t x, double a, double b)
-{
-  double alpha = get_alpha();
-
-  if (alpha < 1)
-  {
-    double logx = log((double) x);
-    alpha = a * pow(logx, 2) + b;
-  }
-
-  return in_between(1, alpha, iroot<6>(x));
-}
-
-/// Calculate the Deleglise-Rivat alpha tuning factor.
-/// alpha = a log(x)^3 + b log(x)^2 + c
+/// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c are constants that should be determined empirically.
 ///
 double get_alpha(maxint_t x, double a, double b, double c)
@@ -286,7 +269,24 @@ double get_alpha(maxint_t x, double a, double b, double c)
   if (alpha < 1)
   {
     double logx = log((double) x);
-    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c;
+    alpha = a * pow(logx, 2) + b * logx + c;
+  }
+
+  return in_between(1, alpha, iroot<6>(x));
+}
+
+/// Calculate the Deleglise-Rivat alpha tuning factor.
+/// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
+/// a, b, c and d are constants that should be determined empirically.
+///
+double get_alpha(maxint_t x, double a, double b, double c, double d)
+{
+  double alpha = get_alpha();
+
+  if (alpha < 1)
+  {
+    double logx = log((double) x);
+    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
   }
 
   return in_between(1, alpha, iroot<6>(x));

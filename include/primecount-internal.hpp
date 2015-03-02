@@ -127,9 +127,9 @@ void set_alpha(double alpha);
 
 double get_alpha();
 
-double get_alpha(maxint_t x, double a, double b);
+double get_alpha(maxint_t x, double a, double b, double c)
 
-double get_alpha(maxint_t x, double a, double b, double c);
+double get_alpha(maxint_t x, double a, double b, double c, double d)
 
 double get_wtime();
 
