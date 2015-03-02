@@ -1,3 +1,11 @@
+2015-03-02 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 1.8.1 work in progress.
+
+  * src/deleglise-rivat/S2_trivial.cpp: Fix off by 1 bug.
+  * src/deleglise-rivat/*: Bugfix, set 1 and unset 2 in sieve.
+  * src/lmo/*: Bugfix, set 1 and unset 2 in sieve.
+
 2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.8 released.
