@@ -64,7 +64,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   if (x > to_maxint(primecount::max()))
     throw primecount_error("pi(x): x must be <= " + max());
 
-  double alpha = get_alpha(x, 0.00168068, -0.0492418 , 0.423038, 0.436291);
+  double alpha = get_alpha(x, 0.00162193, -0.0450437, 0.359918, 0.482142);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = (int64_t) (x / y);
