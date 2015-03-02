@@ -302,7 +302,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.00257109, -0.10308);
+  double alpha = get_alpha(x, 0.0026861, -0.00723349, 0.0062295);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
 
