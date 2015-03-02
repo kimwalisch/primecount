@@ -57,23 +57,15 @@ BitSieve::BitSieve(std::size_t size) :
   size_(size)
 { }
 
-/// Set all bits to 1, except bits corresponding
-/// to 0, 1 and even numbers > 2.
-/// 
+/// Set all bits to 1, except bits corresponding to even numbers.
+/// @warning You must reset 2 when sieving primes.
+///
 void BitSieve::fill(uint64_t low, uint64_t /* unused */)
 {
   if (low % 2 == 0)
     std::fill(bits_.begin(), bits_.end(), UINT64_C(0xAAAAAAAAAAAAAAAA));
   else
     std::fill(bits_.begin(), bits_.end(), UINT64_C(0x5555555555555555));
-
-  // correct 0, 1 and 2
-  if (low <= 2)
-  {
-    uint64_t bit = 1 << (2 - low);
-    bits_[0] &= ~(bit - 1);
-    bits_[0] |= bit;
-  }
 }
 
 /// Count the number of 1 bits inside [start, stop]
