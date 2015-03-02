@@ -4,7 +4,10 @@
 
   * src/deleglise-rivat/S2_trivial.cpp: Fix off by 1 bug.
   * src/deleglise-rivat/*: Bugfix, set 1 and unset 2 in sieve.
+  * src/deleglise-rivat/*: Alpha factor tuning.
   * src/lmo/*: Bugfix, set 1 and unset 2 in sieve.
+  * src/lmo/*: Alpha factor tuning.
+  * src/primecount.cpp: Improved alpha formula.
 
 2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
 
