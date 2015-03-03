@@ -261,6 +261,7 @@ double get_alpha()
 /// Calculate the Lagarias-Miller-Odlyzko alpha tuning factor.
 /// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c are constants that should be determined empirically.
+/// @see ../doc/alpha-factor-tuning.pdf
 ///
 double get_alpha(maxint_t x, double a, double b, double c)
 {
@@ -278,6 +279,7 @@ double get_alpha(maxint_t x, double a, double b, double c)
 /// Calculate the Deleglise-Rivat alpha tuning factor.
 /// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
 /// a, b, c and d are constants that should be determined empirically.
+/// @see ../doc/alpha-factor-tuning.pdf
 ///
 double get_alpha(maxint_t x, double a, double b, double c, double d)
 {
