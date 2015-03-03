@@ -211,7 +211,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.00162193, -0.0450437, 0.359918, 0.482142);
+  double alpha = get_alpha(x, 0.00142219, -0.032211, 0.227464, 0.185949);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = x / y;
