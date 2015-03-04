@@ -80,16 +80,6 @@ T S1(T x, int64_t y, int64_t c, FactorTable<F>& factors, int threads)
   return s1;
 }
 
-void print_info()
-{
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S1(x, y) ===" << endl;
-    cout << "Computation of the ordinary leaves" << endl;
-  }
-}
-
 } // namespace S1
 } // namespace
 
@@ -100,9 +90,14 @@ int64_t S1(int64_t x,
            int64_t c,
            int threads)
 {
-  S1::print_info();
-  double time = get_wtime();
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S1(x, y) ===" << endl;
+    cout << "Computation of the ordinary leaves" << endl;
+  }
 
+  double time = get_wtime();
   FactorTable<uint16_t> factors(y);
   int64_t s1 = S1::S1((intfast64_t) x, y, c, factors, threads);
   
@@ -119,7 +114,13 @@ int128_t S1(int128_t x,
             int64_t c,
             int threads)
 {
-  S1::print_info();
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S1(x, y) ===" << endl;
+    cout << "Computation of the ordinary leaves" << endl;
+  }
+
   double time = get_wtime();
   int128_t s1;
 

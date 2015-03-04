@@ -346,15 +346,7 @@ T S2_hard(T x,
           FactorTable<F>& factors,
           int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_hard(x, y) ===" << endl;
-    cout << "Computation of the hard special leaves" << endl;
-  }
-
   threads = validate_threads(threads, z);
-  double time = get_wtime();
 
   T s2_hard = 0;
   int64_t low = 1;
@@ -409,9 +401,6 @@ T S2_hard(T x,
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
-  if (print_status())
-    print_result("S2_hard", s2_hard, time);
-
   return s2_hard;
 }
 
@@ -427,11 +416,24 @@ int64_t S2_hard(int64_t x,
                 int64_t s2_hard_approx,
                 int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_hard(x, y) ===" << endl;
+    cout << "Computation of the hard special leaves" << endl;
+  }
+
+  double time = get_wtime();
   FactorTable<uint16_t> factors(y);
   int64_t max_prime = z / isqrt(y);
   vector<int32_t> primes = generate_primes(max_prime);
 
-  return S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+
+  if (print_status())
+    print_result("S2_hard", s2_hard, time);
+
+  return s2_hard;
 }
 
 #ifdef HAVE_INT128_T
@@ -443,6 +445,16 @@ int128_t S2_hard(int128_t x,
                  int128_t s2_hard_approx,
                  int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_hard(x, y) ===" << endl;
+    cout << "Computation of the hard special leaves" << endl;
+  }
+
+  double time = get_wtime();
+  int128_t s2_hard;
+
   // uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
@@ -450,7 +462,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
 
-    return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
   else
   {
@@ -458,8 +470,13 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     vector<int64_t> primes = generate_primes<int64_t>(max_prime);
 
-    return S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
+
+  if (print_status())
+    print_result("S2_hard", s2_hard, time);
+
+  return s2_hard;
 }
 
 #endif
