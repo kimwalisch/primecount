@@ -46,19 +46,11 @@ T1 S2_easy(T1 x,
            vector<T2>& primes,
            int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_easy(x, y) ===" << endl;
-    cout << "Computation of the easy special leaves" << endl;
-  }
-
   T1 s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
   threads = validate_threads(threads, x13, thread_threshold);
 
-  double time = get_wtime();
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
@@ -77,7 +69,7 @@ T1 S2_easy(T1 x,
     min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
     min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
     int64_t l = pi[min_trivial_leaf];
-    T1 result = 0;
+    T1 sum = 0;
 
     // Find all clustered easy leaves:
     // n = primes[b] * primes[l]
@@ -90,7 +82,7 @@ T1 S2_easy(T1 x,
       int64_t last_prime = primes[b + phi_xn - 1];
       int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
       int64_t l2 = pi[xm];
-      result += phi_xn * (l - l2);
+      sum += phi_xn * (l - l2);
       l = l2;
     }
 
@@ -100,17 +92,14 @@ T1 S2_easy(T1 x,
     for (; primes[l] > min_sparse_easy_leaf; l--)
     {
       int64_t xn = (int64_t) fast_div(x2, primes[l]);
-      result += pi[xn] - b + 2;
+      sum += pi[xn] - b + 2;
     }
 
     if (print_status())
       status.print(b, pi_x13);
 
-    s2_easy += result;
+    s2_easy += sum;
   }
-
-  if (print_status())
-    print_result("S2_easy", s2_easy, time);
 
   return s2_easy;
 }
@@ -126,8 +115,21 @@ int64_t S2_easy(int64_t x,
                 int64_t c,
                 int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_easy(x, y) ===" << endl;
+    cout << "Computation of the easy special leaves" << endl;
+  }
+
+  double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
-  return S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
+
+  if (print_status())
+    print_result("S2_easy", s2_easy, time);
+
+  return s2_easy;
 }
 
 #ifdef HAVE_INT128_T
@@ -138,17 +140,32 @@ int128_t S2_easy(int128_t x,
                  int64_t c,
                  int threads)
 {
+  if (print_status())
+  {
+    cout << endl;
+    cout << "=== S2_easy(x, y) ===" << endl;
+    cout << "Computation of the easy special leaves" << endl;
+  }
+
+  double time = get_wtime();
+  int128_t s2_easy;
+
   // uses less memory
   if (y <= std::numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    return S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
     vector<int64_t> primes = generate_primes<int64_t>(y);
-    return S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
   }
+
+  if (print_status())
+    print_result("S2_easy", s2_easy, time);
+
+  return s2_easy;
 }
 
 #endif
