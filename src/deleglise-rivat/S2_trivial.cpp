@@ -3,7 +3,7 @@
 /// @brief Calculate the contribution of the trivial special leaves
 ///        in parallel using OpenMP.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,11 +54,11 @@ T S2_trivial(T x,
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
-  T S2_total = 0;
+  T s2_trivial = 0;
 
   // Find all trivial leaves: n = primes[b] * primes[l]
   // which satisfy phi(x / n), b - 1) = 1
-  #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
+  #pragma omp parallel for num_threads(threads) reduction(+: s2_trivial)
   for (int64_t i = 0; i < threads; i++)
   {
     int64_t start = max(prime_c, sqrtz) + 1;
@@ -71,14 +71,14 @@ T S2_trivial(T x,
     while ((prime = iter.next_prime()) < stop)
     {
       int64_t xn = (int64_t) max(x / (prime * prime), prime);
-      S2_total += pi_y - pi[xn];
+      s2_trivial += pi_y - pi[xn];
     }
   }
 
   if (print_status())
-    print_result("S2_trivial", S2_total, time);
+    print_result("S2_trivial", s2_trivial, time);
 
-  return S2_total;
+  return s2_trivial;
 }
 
 } // namespace S2_trivial
