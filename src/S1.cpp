@@ -16,7 +16,6 @@
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
-#include <print.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -99,9 +98,7 @@ int64_t S1(int64_t x,
   FactorTable<uint16_t> factors(y);
   int64_t s1 = S1::S1((intfast64_t) x, y, c, factors, threads);
 
-  if (print_status())
-    print_result("S1", s1, time);
-
+  print("S1", s1, time);
   return s1;
 }
 
@@ -132,9 +129,7 @@ int128_t S1(int128_t x,
     s1 = S1::S1((intfast128_t) x, y, c, factors, threads);
   }
 
-  if (print_status())
-    print_result("S1", s1, time);
-
+  print("S1", s1, time);
   return s1;
 }
 

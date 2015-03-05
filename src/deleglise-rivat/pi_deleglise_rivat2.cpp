@@ -73,12 +73,9 @@ int64_t S2_hard(intfast64_t x,
                 int64_t z,
                 int64_t c)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_hard(x, y) ===" << endl;
-    cout << "Computation of the hard special leaves" << endl;
-  }
+  print("");
+  print("=== S2_hard(x, y) ===");
+  print("Computation of the hard special leaves");
 
   PiTable pi(y);
   FactorTable<uint16_t> factors(y);
@@ -176,9 +173,7 @@ int64_t S2_hard(intfast64_t x,
     next_segment:;
   }
 
-  if (print_status())
-    print_result("S2_hard", S2_result, time);
-
+  print("S2_hard", S2_result, time);
   return S2_result;
 }
 

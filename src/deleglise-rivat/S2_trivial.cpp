@@ -18,8 +18,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 #include <vector>
 
 #ifdef _OPENMP
@@ -39,15 +37,12 @@ T S2_trivial(T x,
              int64_t c,
              int threads)
 {
+  print("");
+  print("=== S2_trivial(x, y) ===");
+  print("Computation of the trivial special leaves");
+
   int64_t thread_threshold = ipow(10, 7);
   threads = validate_threads(threads, y, thread_threshold);
-
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_trivial(x, y) ===" << endl;
-    cout << "Computation of the trivial special leaves" << endl;
-  }
 
   double time = get_wtime();
   PiTable pi(y);
@@ -75,9 +70,7 @@ T S2_trivial(T x,
     }
   }
 
-  if (print_status())
-    print_result("S2_trivial", s2_trivial, time);
-
+  print("S2_trivial", s2_trivial, time);
   return s2_trivial;
 }
 

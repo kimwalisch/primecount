@@ -15,7 +15,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
 #include <vector>
 #include <cassert>
 
@@ -37,12 +36,9 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== phi(x, a) ===" << endl;
-    cout << "Count the numbers <= x coprime to the first a primes" << endl;
-  }
+  print("");
+  print("=== phi(x, a) ===");
+  print("Count the numbers <= x coprime to the first a primes");
 
   double time = get_wtime();
   int64_t sum = 0;
@@ -73,9 +69,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     }
   }
 
-  if (print_status())
-    print_result("phi", sum, time);
-
+  print("phi", sum, time);
   return sum;
 }
 

@@ -46,6 +46,7 @@ libprimecount_la_SOURCES = \
 	src/pi_lehmer.cpp \
 	src/phi.cpp \
 	src/primecount.cpp \
+	src/print.cpp \
 	src/S1.cpp \
 	src/S2LoadBalancer.cpp \
 	src/S2Status.cpp \
@@ -77,6 +78,7 @@ libprimecount_la_SOURCES = \
 	include/min_max.hpp \
 	include/popcount.hpp \
 	include/pmath.hpp \
+	include/print.hpp \
 	include/primecount-internal.hpp \
 	include/PhiCache.hpp \
 	include/PhiTiny.hpp \

@@ -68,12 +68,9 @@ int64_t S2(int64_t x,
            vector<int32_t>& lpf,
            vector<int32_t>& mu)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2(x, y) ===" << endl;
-    cout << "Computation of the special leaves" << endl;
-  }
+  print("");
+  print("=== S2(x, y) ===");
+  print("Computation of the special leaves");
 
   double time = get_wtime();
   int64_t limit = x / y + 1;
@@ -171,9 +168,7 @@ int64_t S2(int64_t x,
     next_segment:;
   }
 
-  if (print_status())
-    print_result("S2", S2_result, time);
-
+  print("S2", S2_result, time);
   return S2_result;
 }
 

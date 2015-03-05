@@ -180,14 +180,6 @@ T P2(T x, int64_t y, int threads)
   if (x < 4 || a >= b)
     return 0;
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== P2(x, y) ===" << endl;
-    cout << "Computation of the 2nd partial sieve function" << endl;
-  }
-
-  double time = get_wtime();
   int64_t low = 2;
   int64_t limit = (int64_t)(x / max(y, 1));
   int64_t segment_size = max(isqrt(limit), 1 << 12);
@@ -197,6 +189,7 @@ T P2(T x, int64_t y, int threads)
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
+  double time = get_wtime();
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
@@ -233,9 +226,6 @@ T P2(T x, int64_t y, int threads)
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
 
-  if (print_status())
-    print_result("P2", p2, time);
-
   return p2;
 }
 
@@ -246,14 +236,30 @@ namespace primecount {
 
 int64_t P2(int64_t x, int64_t y, int threads)
 {
-  return P2::P2(x, y, threads);
+  print("");
+  print("=== P2(x, y) ===");
+  print("Computation of the 2nd partial sieve function");
+
+  double time = get_wtime();
+  int64_t p2 = P2::P2(x, y, threads);
+
+  print("P2", p2, time);
+  return p2;
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t P2(int128_t x, int64_t y, int threads)
 {
-  return P2::P2(x, y, threads);
+  print("");
+  print("=== P2(x, y) ===");
+  print("Computation of the 2nd partial sieve function");
+
+  double time = get_wtime();
+  int128_t p2 = P2::P2(x, y, threads);
+
+  print("P2", p2, time);
+  return p2;
 }
 
 #endif
@@ -267,12 +273,9 @@ int128_t P2(int128_t x, int64_t y, int threads)
 ///
 int64_t P2_lehmer(int64_t x, int64_t a, int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== P2_lehmer(x, a) ===" << endl;
-    cout << "Computation of the 2nd partial sieve function" << endl;
-  }
+  print("");
+  print("=== P2_lehmer(x, a) ===");
+  print("Computation of the 2nd partial sieve function");
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(isqrt(x));
@@ -297,9 +300,7 @@ int64_t P2_lehmer(int64_t x, int64_t a, int threads)
     p2 += pix - (i - 1);
   }
 
-  if (print_status())
-    print_result("P2", p2, time);
-
+  print("P2", p2, time);
   return p2;
 }
 

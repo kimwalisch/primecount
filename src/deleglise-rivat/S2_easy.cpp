@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -115,20 +114,15 @@ int64_t S2_easy(int64_t x,
                 int64_t c,
                 int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_easy(x, y) ===" << endl;
-    cout << "Computation of the easy special leaves" << endl;
-  }
+  print("");
+  print("=== S2_easy(x, y) ===");
+  print("Computation of the easy special leaves");
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
   int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
 
-  if (print_status())
-    print_result("S2_easy", s2_easy, time);
-
+  print("S2_easy", s2_easy, time);
   return s2_easy;
 }
 
@@ -140,12 +134,9 @@ int128_t S2_easy(int128_t x,
                  int64_t c,
                  int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_easy(x, y) ===" << endl;
-    cout << "Computation of the easy special leaves" << endl;
-  }
+  print("");
+  print("=== S2_easy(x, y) ===");
+  print("Computation of the easy special leaves");
 
   double time = get_wtime();
   int128_t s2_easy;
@@ -162,9 +153,7 @@ int128_t S2_easy(int128_t x,
     s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
   }
 
-  if (print_status())
-    print_result("S2_easy", s2_easy, time);
-
+  print("S2_easy", s2_easy, time);
   return s2_easy;
 }
 

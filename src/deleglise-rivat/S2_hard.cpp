@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -416,12 +415,9 @@ int64_t S2_hard(int64_t x,
                 int64_t s2_hard_approx,
                 int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_hard(x, y) ===" << endl;
-    cout << "Computation of the hard special leaves" << endl;
-  }
+  print("");
+  print("=== S2_hard(x, y) ===");
+  print("Computation of the hard special leaves");
 
   double time = get_wtime();
   FactorTable<uint16_t> factors(y);
@@ -430,9 +426,7 @@ int64_t S2_hard(int64_t x,
 
   int64_t s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
-  if (print_status())
-    print_result("S2_hard", s2_hard, time);
-
+  print("S2_hard", s2_hard, time);
   return s2_hard;
 }
 
@@ -445,12 +439,9 @@ int128_t S2_hard(int128_t x,
                  int128_t s2_hard_approx,
                  int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2_hard(x, y) ===" << endl;
-    cout << "Computation of the hard special leaves" << endl;
-  }
+  print("");
+  print("=== S2_hard(x, y) ===");
+  print("Computation of the hard special leaves");
 
   double time = get_wtime();
   int128_t s2_hard;
@@ -473,9 +464,7 @@ int128_t S2_hard(int128_t x,
     s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
 
-  if (print_status())
-    print_result("S2_hard", s2_hard, time);
-
+  print("S2_hard", s2_hard, time);
   return s2_hard;
 }
 

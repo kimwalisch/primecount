@@ -16,8 +16,6 @@
 
 #include <algorithm>
 #include <ctime>
-#include <iostream>
-#include <iomanip>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -34,10 +32,6 @@ namespace {
 int threads_ = primecount::MAX_THREADS;
 
 double alpha_ = -1;
-
-bool print_status_ = false;
-
-bool print_variables_ = false;
 
 }
 
@@ -310,39 +304,6 @@ maxint_t to_maxint(const std::string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;
-}
-
-void print_result(const std::string& str, maxint_t res, double time)
-{
-  cout << "\r" << string(40,' ') << "\r";
-  cout << "Status: 100%" << endl;
-  cout << str << " = " << res << endl;
-  print_seconds(get_wtime() - time);
-}
-
-void print_seconds(double seconds)
-{
-  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-}
-
-void set_print_status(bool print_status)
-{
-  print_status_ = print_status;
-}
-
-void set_print_variables(bool print_variables)
-{
-  print_variables_ = print_variables;
-}
-
-bool print_status()
-{
-  return print_status_;
-}
-
-bool print_variables()
-{
-  return print_variables_;
 }
 
 } // namespace primecount

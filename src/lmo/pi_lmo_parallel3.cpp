@@ -222,12 +222,9 @@ int64_t S2(int64_t x,
            vector<int32_t>& mu,
            int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S2(x, y) ===" << endl;
-    cout << "Computation of the special leaves" << endl;
-  }
+  print("");
+  print("=== S2(x, y) ===");
+  print("Computation of the special leaves");
 
   int64_t S2_total = 0;
   int64_t low = 1;
@@ -283,9 +280,7 @@ int64_t S2(int64_t x,
       status.print(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
-  if (print_status())
-    print_result("S2", S2_total, time);
-
+  print("S2", S2_total, time);
   return S2_total;
 }
 

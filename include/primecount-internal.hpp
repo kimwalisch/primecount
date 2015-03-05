@@ -2,7 +2,7 @@
 /// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,6 +14,7 @@
 #include <int128.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -123,8 +124,6 @@ int128_t P2(int128_t x, int64_t y, int threads);
 
 #endif
 
-void set_print_variables(bool print_variables);
-
 void set_alpha(double alpha);
 
 double get_alpha();
@@ -138,14 +137,6 @@ double get_wtime();
 int validate_threads(int threads);
 
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
-
-void print_result(const std::string& str, maxint_t res, double time);
-
-void print_seconds(double seconds);
-
-bool print_status();
-
-bool print_variables();
 
 maxint_t to_maxint(const std::string& expr);
 
