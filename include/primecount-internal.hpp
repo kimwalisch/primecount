@@ -2,7 +2,7 @@
 /// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -113,15 +113,17 @@ int64_t nth_prime(int64_t n, int threads);
 
 int64_t P2(int64_t x, int64_t y, int threads);
 
+int64_t P2_lehmer(int64_t x, int64_t a, int threads);
+
+int64_t P3(int64_t x, int64_t a, int threads);
+
 #ifdef HAVE_INT128_T
 
 int128_t P2(int128_t x, int64_t y, int threads);
 
 #endif
 
-int64_t P2_lehmer(int64_t x, int64_t a, int threads);
-
-int64_t P3(int64_t x, int64_t a, int threads);
+void set_print_variables(bool print_variables);
 
 void set_alpha(double alpha);
 
@@ -142,6 +144,8 @@ void print_result(const std::string& str, maxint_t res, double time);
 void print_seconds(double seconds);
 
 bool print_status();
+
+bool print_variables();
 
 maxint_t to_maxint(const std::string& expr);
 
