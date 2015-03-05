@@ -41,7 +41,7 @@ void set_partial_computation(bool partial_computation)
 
 bool print_result()
 {
-  return partial_computation_;
+  return partial_computation();
 }
 
 bool print_status()
@@ -60,9 +60,22 @@ void print(const string& str)
     cout << str << endl;
 }
 
+void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
+{
+  if (print_status())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << c << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
+  }
+}
+
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (!partial_computation())
+  if (print_status() && !partial_computation())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
@@ -74,19 +87,6 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
     cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     cout << "threads = " << validate_threads(threads) << endl;
     cout << endl;
-  }
-}
-
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
-{
-  if (print_status())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "threads = " << validate_threads(threads) << endl;
   }
 }
 
