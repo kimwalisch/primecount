@@ -2,7 +2,7 @@
 /// @file   primecount.cpp
 /// @brief  primecount C++ API
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,6 +36,8 @@ int threads_ = primecount::MAX_THREADS;
 double alpha_ = -1;
 
 bool print_status_ = false;
+
+bool print_variables_ = false;
 
 }
 
@@ -328,9 +330,19 @@ void set_print_status(bool print_status)
   print_status_ = print_status;
 }
 
+void set_print_variables(bool print_variables)
+{
+  print_variables_ = print_variables;
+}
+
 bool print_status()
 {
   return print_status_;
+}
+
+bool print_variables()
+{
+  return print_variables_;
 }
 
 } // namespace primecount
