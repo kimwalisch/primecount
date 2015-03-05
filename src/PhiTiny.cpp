@@ -7,7 +7,7 @@
 ///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///        with pp = 2 * 3 * ... * prime[a]
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,6 +22,8 @@
 namespace primecount {
 
 extern const PhiTiny phiTiny = PhiTiny();
+
+const int PhiTiny::pi[20] = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
 
 const int PhiTiny::primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
 

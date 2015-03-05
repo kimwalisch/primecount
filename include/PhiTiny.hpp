@@ -1,7 +1,7 @@
 ///
 /// @file  PhiTiny.hpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,8 +39,16 @@ public:
     return (x / pp) * totients[a] + phi_cache_[a][x % pp];
   }
 
-  private:
+  static int64_t get_c(int64_t y)
+  {
+    assert(y >= 0);
+    if (y >= primes[PhiTiny::max_a()])
+      return PhiTiny::max_a();
+    return pi[y];
+  }
+private:
   std::vector<int16_t> phi_cache_[7];
+  static const int pi[20];
   static const int primes[7];
   static const int prime_products[7];
   static const int totients[7];
