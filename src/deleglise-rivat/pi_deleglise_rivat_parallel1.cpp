@@ -307,7 +307,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.00140126, -0.0299373, 0.150855, 0.964413);
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = x / y;
