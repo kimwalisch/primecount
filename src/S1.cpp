@@ -16,9 +16,9 @@
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
-#include <iostream>
 #include <vector>
 
 #ifdef _OPENMP
@@ -90,17 +90,15 @@ int64_t S1(int64_t x,
            int64_t c,
            int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S1(x, y) ===" << endl;
-    cout << "Computation of the ordinary leaves" << endl;
-  }
+  print("");
+  print("=== S1(x, y) ===");
+  print("Computation of the ordinary leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   FactorTable<uint16_t> factors(y);
   int64_t s1 = S1::S1((intfast64_t) x, y, c, factors, threads);
-  
+
   if (print_status())
     print_result("S1", s1, time);
 
@@ -114,12 +112,10 @@ int128_t S1(int128_t x,
             int64_t c,
             int threads)
 {
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== S1(x, y) ===" << endl;
-    cout << "Computation of the ordinary leaves" << endl;
-  }
+  print("");
+  print("=== S1(x, y) ===");
+  print("Computation of the ordinary leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   int128_t s1;
