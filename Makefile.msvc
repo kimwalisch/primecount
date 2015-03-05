@@ -24,6 +24,7 @@ LIB_OBJECTS = \
 	src\pi_meissel.obj \
 	src\pi_primesieve.obj \
 	src\primecount.obj \
+	src\print.obj \
 	src\P2.obj \
 	src\P3.obj \
 	src\S1.obj \
