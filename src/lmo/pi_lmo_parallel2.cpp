@@ -251,6 +251,7 @@ int64_t pi_lmo_parallel2(int64_t x, int threads)
   double alpha = get_alpha(x, 0.00352628, -0.0656652, 1.00454);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t c = PhiTiny::get_c(y);
   int64_t p2 = P2(x, y, threads);
 
   vector<int32_t> mu = generate_moebius(y);
@@ -258,7 +259,6 @@ int64_t pi_lmo_parallel2(int64_t x, int threads)
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2 = S2(x, y, c, primes, lpf, mu, threads);
   int64_t phi = s1 + s2;

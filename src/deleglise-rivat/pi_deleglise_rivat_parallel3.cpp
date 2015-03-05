@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace primecount;
@@ -69,20 +67,12 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t pi_y = pi_legendre(y, 1);
-  int64_t c = min(pi_y, PhiTiny::max_a());
+  int64_t c = PhiTiny::get_c(y);
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== pi_deleglise_rivat_parallel3(x) ===" << endl;
-    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "c = " << c << endl;
-    cout << "threads = " << validate_threads(threads) << endl;
-  }
+  print("");
+  print("=== pi_deleglise_rivat_parallel3(x) ===");
+  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+  print(x, y, z, c, alpha, threads);
 
   int128_t p2 = P2(x, y, threads);
   int128_t s1 = S1(x, y, c, threads);

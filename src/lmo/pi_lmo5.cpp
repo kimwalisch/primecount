@@ -7,7 +7,7 @@
 ///        Computation, 44 (1985), by J. C. Lagarias, V. S. Miller and
 ///        A. M. Odlyzko.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,8 +23,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -188,27 +186,20 @@ int64_t pi_lmo5(int64_t x)
   double alpha = get_alpha(x, 0.00352628, -0.0656652, 1.00454);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t z = x / y;
+  int64_t c = PhiTiny::get_c(y);
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== pi_lmo5(x) ===" << endl;
-    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "c = " << PhiTiny::max_a() << endl;
-    cout << "threads = 1" << endl;
-  }
+  print("");
+  print("=== pi_lmo5(x) ===");
+  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+  print(x, y, z, c, alpha, 1);
 
   int64_t p2 = P2(x, y, 1);
-
   vector<int32_t> mu = generate_moebius(y);
   vector<int32_t> lpf = generate_least_prime_factors(y);
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, 1);
   int64_t s2 = S2(x, y, c, primes, lpf, mu);
   int64_t phi = s1 + s2;

@@ -6,7 +6,7 @@
 ///        unsieved elements using POPCNT without using any special
 ///        counting tree data structure.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,8 +25,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 #include <vector>
 
 #ifdef _OPENMP
@@ -300,27 +298,20 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   double alpha = get_alpha(x, 0.00352628, -0.0656652, 1.00454);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t z = x / y;
+  int64_t c = PhiTiny::get_c(y);
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== pi_lmo_parallel3(x) ===" << endl;
-    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "c = " << PhiTiny::max_a() << endl;
-    cout << "threads = " << validate_threads(threads) << endl;
-  }
+  print("");
+  print("=== pi_lmo_parallel3(x) ===");
+  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+  print(x, y, z, c, alpha, threads);
 
   int64_t p2 = P2(x, y, threads);
-
   vector<int32_t> mu = generate_moebius(y);
   vector<int32_t> lpf = generate_least_prime_factors(y);
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
   int64_t s2 = S2(x, y, c, s2_approx, primes, lpf, mu, threads);

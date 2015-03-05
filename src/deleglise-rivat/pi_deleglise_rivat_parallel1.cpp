@@ -318,7 +318,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   vector<int32_t> primes = generate_primes(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
-  int64_t c = min(pi_y, PhiTiny::max_a());
+  int64_t c = PhiTiny::get_c(y);
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2 = S2(x, y, z, c, primes, lpf, mu, threads);
   int64_t phi = s1 + s2;

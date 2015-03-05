@@ -30,8 +30,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -209,23 +207,16 @@ int64_t pi_deleglise_rivat2(int64_t x)
   double alpha = get_alpha(x, 0.00140126, -0.0299373, 0.150855, 0.964413);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
+  int64_t c = PhiTiny::get_c(y);
   int64_t z = x / y;
 
-  if (print_status())
-  {
-    cout << endl;
-    cout << "=== pi_deleglise_rivat2(x) ===" << endl;
-    cout << "pi(x) = S1 + S2 + pi(y) - 1 - P2" << endl;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    cout << "c = " << PhiTiny::max_a() << endl;
-  }
+  print("");
+  print("=== pi_deleglise_rivat2(x) ===");
+  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+  print(x, y, z, c, alpha, 1);
 
   int64_t p2 = P2(x, y, 1);
   int64_t pi_y = pi_legendre(y, 1);
-  int64_t c = min(pi_y, PhiTiny::max_a());
   int64_t s1 = S1(x, y, c, 1);
   int64_t s2 = S2(x, y, z, c);
   int64_t phi = s1 + s2;

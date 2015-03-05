@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,7 +23,7 @@ namespace {
 
 bool print_status_ = false;
 
-bool print_variables_ = false;
+bool partial_computation_ = true;
 
 }
 
@@ -34,14 +34,14 @@ void set_print_status(bool print_status)
   print_status_ = print_status;
 }
 
-void set_print_variables(bool print_variables)
+void set_partial_computation(bool partial_computation)
 {
-  print_variables_ = print_variables;
+  partial_computation_ = partial_computation;
 }
 
 bool print_result()
 {
-  return !print_variables_;
+  return partial_computation_;
 }
 
 bool print_status()
@@ -49,9 +49,9 @@ bool print_status()
   return print_status_;
 }
 
-bool print_variables()
+bool partial_computation()
 {
-  return print_variables_;
+  return partial_computation_;
 }
 
 void print(const string& str)
@@ -62,7 +62,7 @@ void print(const string& str)
 
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (print_variables())
+  if (!partial_computation())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
@@ -74,6 +74,19 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
     cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     cout << "threads = " << validate_threads(threads) << endl;
     cout << endl;
+  }
+}
+
+void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
+{
+  if (print_status())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << c << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
   }
 }
 
