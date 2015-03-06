@@ -8,6 +8,12 @@ problems, suggesting various improvements, or submitting actual code.
 Here is a list of these people. Help me keep it complete and exempt
 of errors.
 
+* David Baugh suggested to implement standalone versions of the
+  Deleglise-Rivat formulas (P2, S1, S2_trvial, S2_easy, S2_hard) which
+  allows to distribute the computation of large pi(x) values on
+  multiple systems. Using his idea I found a way to reduce the memory
+  usage by up to 30 percent.
+
 * Andrey Kulsha helped testing new primecount binaries.
 
 * James F. King, Optimized Meissel-Lehmer sieve
