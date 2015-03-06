@@ -1,13 +1,20 @@
-2015-03-02 Kim Walisch  <kim.walisch@gmail.com>
+2015-03-06 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.8.1 work in progress.
+  Version 1.9 work in progress.
 
+  This version introduces new command-line options for calculating
+  intermediate formulas of the Deleglise-Rivat algorithm. This allows
+  to distribute the computation of large pi(x) values on multiple
+  systems. This version also fixes two non-critical bugs.
+
+  * src/app: New options: --p2, --s1, --s2_trivial, --s2_easy, --s2_hard.
   * src/deleglise-rivat/S2_trivial.cpp: Fix off by 1 bug.
   * src/deleglise-rivat/*: Bugfix, set 1 and unset 2 in sieve.
-  * src/deleglise-rivat/*: Alpha factor tuning.
   * src/lmo/*: Bugfix, set 1 and unset 2 in sieve.
+  * src/deleglise-rivat/*: Alpha factor tuning.
   * src/lmo/*: Alpha factor tuning.
   * src/primecount.cpp: Improved alpha formula.
+  * src/print.cpp: New print functions for terminal output.
 
 2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
 
