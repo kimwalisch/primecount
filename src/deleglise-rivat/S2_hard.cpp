@@ -418,6 +418,7 @@ int64_t S2_hard(int64_t x,
   print("");
   print("=== S2_hard(x, y) ===");
   print("Computation of the hard special leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   FactorTable<uint16_t> factors(y);
@@ -442,6 +443,7 @@ int128_t S2_hard(int128_t x,
   print("");
   print("=== S2_hard(x, y) ===");
   print("Computation of the hard special leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   int128_t s2_hard;
