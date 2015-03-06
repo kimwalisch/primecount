@@ -9,10 +9,14 @@
 ///
 
 #include "cmdoptions.hpp"
+#include "../deleglise-rivat/S2.hpp"
 
 #include <primecount-internal.hpp>
 #include <primecount.hpp>
+#include <pmath.hpp>
 #include <int128.hpp>
+#include <PhiTiny.hpp>
+#include <S1.hpp>
 
 #include <stdexcept>
 #include <iostream>
@@ -22,7 +26,7 @@
 using namespace std;
 using namespace primecount;
 
-namespace {
+namespace primecount {
 
 int64_t int64_cast(maxint_t x)
 {
@@ -31,7 +35,99 @@ int64_t int64_cast(maxint_t x)
   return (int64_t) x;
 }
 
-} // namespace
+maxint_t P2(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  set_print_variables(true);
+
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t z = (int64_t) (x / y);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return P2((int64_t) x, y, threads);
+  else
+    return P2(x, y, threads);
+}
+
+maxint_t S1(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  set_print_variables(true);
+
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return S1((int64_t) x, y, c, threads);
+  else
+    return S1(x, y, c, threads);
+}
+
+maxint_t S2_trivial(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  set_print_variables(true);
+
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return S2_trivial((int64_t) x, y, z, c, threads);
+  else
+    return S2_trivial(x, y, z, c, threads);
+}
+
+maxint_t S2_easy(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  set_print_variables(true);
+
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return S2_easy((int64_t) x, y, z, c, threads);
+  else
+    return S2_easy(x, y, z, c, threads);
+}
+
+maxint_t S2_hard(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  set_print_variables(true);
+
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
+
+  // TODO: find better S2_hard approximation formula
+  maxint_t s2_hard_approx = Li(x);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return S2_hard((int64_t) x, y, z, c, (int64_t) s2_hard_approx, threads);
+  else
+    return S2_hard(x, y, z, c, s2_hard_approx, threads);
+}
+
+} // namespace primecount
 
 int main (int argc, char* argv[])
 {
@@ -84,6 +180,8 @@ int main (int argc, char* argv[])
         res = pi_meissel(int64_cast(x), threads); break;
       case OPTION_PRIMESIEVE:
         res = pi_primesieve(int64_cast(x), threads); break;
+      case OPTION_P2:
+        res = P2(x, threads); break;
       case OPTION_PI:
         res = pi(x, threads); break;
       case OPTION_LI:
@@ -92,6 +190,14 @@ int main (int argc, char* argv[])
         res = Li_inverse(int64_cast(x)); break;
       case OPTION_NTHPRIME:
         res = nth_prime(int64_cast(x), threads); break;
+      case OPTION_S1:
+        res = S1(x, threads); break;
+      case OPTION_S2_EASY:
+        res = S2_easy(x, threads); break;
+      case OPTION_S2_HARD:
+        res = S2_hard(x, threads); break;
+      case OPTION_S2_TRIVIAL:
+        res = S2_trivial(x, threads); break;
 
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL3:
