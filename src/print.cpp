@@ -41,7 +41,7 @@ void set_print_variables(bool print_variables)
 
 bool print_result()
 {
-  return !print_variables() || !print_status();
+  return !print_variables();
 }
 
 bool print_status()
@@ -75,8 +75,7 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
 
 void print(maxint_t x, int64_t y, int threads)
 {
-  if (print_status() &&
-      print_variables())
+  if (print_variables())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
@@ -92,8 +91,7 @@ void print(maxint_t x, int64_t y, int threads)
 
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (print_status() &&
-      print_variables())
+  if (print_variables())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
