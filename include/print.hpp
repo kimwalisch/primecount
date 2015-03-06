@@ -1,7 +1,7 @@
 ///
 /// @file  print.hpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,13 +17,13 @@
 
 namespace primecount {
 
-void set_partial_computation(bool partial_computation);
+void set_print_variables(bool print_variables);
 
 bool print_result();
 
 bool print_status();
 
-bool partial_computation();
+bool print_variables();
 
 void print(const std::string& str);
 
