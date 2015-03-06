@@ -41,10 +41,8 @@ maxint_t P2(maxint_t x, int threads)
     return 0;
 
   set_print_variables(true);
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
 
   if (x <= numeric_limits<int64_t>::max())
     return P2((int64_t) x, y, threads);
@@ -58,10 +56,8 @@ maxint_t S1(maxint_t x, int threads)
     return 0;
 
   set_print_variables(true);
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= numeric_limits<int64_t>::max())
@@ -76,7 +72,6 @@ maxint_t S2_trivial(maxint_t x, int threads)
     return 0;
 
   set_print_variables(true);
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
@@ -94,7 +89,6 @@ maxint_t S2_easy(maxint_t x, int threads)
     return 0;
 
   set_print_variables(true);
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
@@ -112,7 +106,6 @@ maxint_t S2_hard(maxint_t x, int threads)
     return 0;
 
   set_print_variables(true);
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
