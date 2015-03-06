@@ -2,7 +2,7 @@
 /// @file  S2.hpp.
 /// @brief S2 function declarations.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,12 +11,8 @@
 #ifndef S2_HPP
 #define S2_HPP
 
-#include <PiTable.hpp>
-#include <FactorTable.hpp>
 #include <int128.hpp>
-
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
