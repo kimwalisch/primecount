@@ -117,6 +117,7 @@ int64_t S2_easy(int64_t x,
   print("");
   print("=== S2_easy(x, y) ===");
   print("Computation of the easy special leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
@@ -137,6 +138,7 @@ int128_t S2_easy(int128_t x,
   print("");
   print("=== S2_easy(x, y) ===");
   print("Computation of the easy special leaves");
+  print(x, y, c, threads);
 
   double time = get_wtime();
   int128_t s2_easy;
