@@ -27,6 +27,8 @@ bool partial_computation();
 
 void print(const std::string& str);
 
+void print(maxint_t x, int64_t y, int threads);
+
 void print(maxint_t x, int64_t y, int64_t c, int threads);
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads);
