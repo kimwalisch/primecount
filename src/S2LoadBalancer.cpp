@@ -42,7 +42,7 @@
 ///    relative standard deviation to the previous one in order to
 ///    decide whether to increase or decrease the interval_size.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -192,7 +192,7 @@ void S2LoadBalancer::update(int64_t low,
         *segment_size >>= 1;
 
     // near sqrt(z) there is a short peak of special
-    // leaves so we use the minium segment size
+    // leaves so we use the minimum segment size
     int64_t high = low + *segment_size * *segments_per_thread * threads; 
     if (low <= max_size_ && high > max_size_)
       *segment_size = min_size_;
