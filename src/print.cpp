@@ -73,9 +73,27 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
   }
 }
 
+void print(maxint_t x, int64_t y, int threads)
+{
+  if (print_status() && 
+      !partial_computation())
+  {
+    maxint_t z = x / y;
+    double alpha = (double) y / (double) iroot<3>(x);
+
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    cout << "threads = " << validate_threads(threads) << endl;
+    cout << endl;
+  }
+}
+
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (print_status() && !partial_computation())
+  if (print_status() && 
+      !partial_computation())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
