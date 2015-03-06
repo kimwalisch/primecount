@@ -42,9 +42,11 @@ public:
   static int64_t get_c(int64_t y)
   {
     assert(y >= 0);
-    if (y >= primes[PhiTiny::max_a()])
-      return PhiTiny::max_a();
-    return pi[y];
+
+    if (y >= primes[max_a()])
+      return max_a();
+    else
+      return pi[y];
   }
 private:
   std::vector<int16_t> phi_cache_[7];
