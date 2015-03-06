@@ -88,9 +88,14 @@ void initOptionMap()
   optionMap["-n"]                          = OPTION_NTHPRIME;
   optionMap["--nthprime"]                  = OPTION_NTHPRIME;
   optionMap["--number"]                    = OPTION_NUMBER;
+  optionMap["--p2"]                        = OPTION_P2;
   optionMap["--pi"]                        = OPTION_PI;
   optionMap["-p"]                          = OPTION_PRIMESIEVE;
   optionMap["--primesieve"]                = OPTION_PRIMESIEVE;
+  optionMap["--s1"]                        = OPTION_S1;
+  optionMap["--s2_easy"]                   = OPTION_S2_EASY;
+  optionMap["--s2_hard"]                   = OPTION_S2_HARD;
+  optionMap["--s2_trivial"]                = OPTION_S2_TRIVIAL;
   optionMap["-s"]                          = OPTION_STATUS;
   optionMap["--status"]                    = OPTION_STATUS;
   optionMap["--test"]                      = OPTION_TEST;
