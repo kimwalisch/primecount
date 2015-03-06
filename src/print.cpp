@@ -23,7 +23,7 @@ namespace {
 
 bool print_status_ = false;
 
-bool partial_computation_ = true;
+bool print_variables_ = false;
 
 }
 
@@ -34,14 +34,14 @@ void set_print_status(bool print_status)
   print_status_ = print_status;
 }
 
-void set_partial_computation(bool partial_computation)
+void set_print_variables(bool print_variables)
 {
-  partial_computation_ = partial_computation;
+  print_variables_ = print_variables;
 }
 
 bool print_result()
 {
-  return partial_computation();
+  return !print_variables() || !print_status();
 }
 
 bool print_status()
@@ -49,9 +49,9 @@ bool print_status()
   return print_status_;
 }
 
-bool partial_computation()
+bool print_variables()
 {
-  return partial_computation_;
+  return print_variables_;
 }
 
 void print(const string& str)
@@ -75,8 +75,8 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
 
 void print(maxint_t x, int64_t y, int threads)
 {
-  if (print_status() && 
-      !partial_computation())
+  if (print_status() &&
+      print_variables())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
@@ -92,8 +92,8 @@ void print(maxint_t x, int64_t y, int threads)
 
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (print_status() && 
-      !partial_computation())
+  if (print_status() &&
+      print_variables())
   {
     maxint_t z = x / y;
     double alpha = (double) y / (double) iroot<3>(x);
