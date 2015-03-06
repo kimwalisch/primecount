@@ -239,6 +239,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");
+  print(x, y, threads);
 
   double time = get_wtime();
   int64_t p2 = P2::P2(x, y, threads);
@@ -254,6 +255,7 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");
+  print(x, y, threads);
 
   double time = get_wtime();
   int128_t p2 = P2::P2(x, y, threads);
