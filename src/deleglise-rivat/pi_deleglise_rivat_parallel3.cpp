@@ -63,8 +63,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     throw primecount_error("pi(x): x must be <= " + max());
 
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
-  int64_t x13 = iroot<3>(x);
-  int64_t y = (int64_t) (x13 * alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t pi_y = pi_legendre(y, 1);
   int64_t c = PhiTiny::get_c(y);
