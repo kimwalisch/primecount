@@ -254,6 +254,13 @@ double get_alpha()
   return alpha_;
 }
 
+double get_alpha(maxint_t x, int64_t y)
+{
+  // y = x13 * alpha, thus alpha = y / x13
+  double x13 = (double) iroot<3>(x);
+  return (double) y / x13;
+}
+
 /// Calculate the Lagarias-Miller-Odlyzko alpha tuning factor.
 /// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c are constants that should be determined empirically.

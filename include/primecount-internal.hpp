@@ -128,6 +128,8 @@ void set_alpha(double alpha);
 
 double get_alpha();
 
+double get_alpha(maxint_t x, int64_t y);
+
 double get_alpha(maxint_t x, double a, double b, double c);
 
 double get_alpha(maxint_t x, double a, double b, double c, double d);
