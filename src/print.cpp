@@ -114,8 +114,7 @@ void print(const string& res_name, maxint_t res, double time)
 
 void print_seconds(double seconds)
 {
-  if (print_status())
-    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
 }
 
 } // namespace
