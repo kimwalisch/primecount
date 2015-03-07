@@ -136,6 +136,8 @@ T S2_hard_thread(T x,
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
+  int64_t alpha = (int64_t) get_alpha(x, y);
+  int64_t counters_limit = y * alpha;
   int64_t pi_sqrty = pi[isqrt(y)];
 
   if (c > max_b)
@@ -167,7 +169,7 @@ T S2_hard_thread(T x,
       next[i] = k;
     }
 
-    if (low < y * ilog(x))
+    if (low < counters_limit)
     {
       // Calculate the contribution of the hard special leaves using
       // Tomás Oliveira's O(log(N)) special tree data structure
@@ -246,6 +248,8 @@ T S2_hard_thread(T x,
       // number of unsieved elements. Above a certain threshold the
       // number of special leaves is so small that it is faster to
       // simply count the number of unsieved elements from the sieve.
+      // In practice both y * log(x) and y * alpha are good formulas
+      // for calculating the turnover point.
 
       int64_t count_low_high = sieve.count((high - 1) - low);
 
