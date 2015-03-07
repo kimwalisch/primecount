@@ -79,11 +79,6 @@ Advanced Deleglise-Rivat options:
          --s2_trivial       Only compute the trivial special leaves
          --s2_easy          Only compute the easy special leaves
          --s2_hard          Only compute the hard special leaves
-
-Examples:
-
-  primecount 10**13
-  primecount 10**13 --nthprime --threads=4
 ```
 
 ### Algorithms
