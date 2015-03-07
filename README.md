@@ -54,7 +54,7 @@ Count the primes below x <= 10^27 using the prime counting function,
 by default the Deleglise-Rivat algorithm (-d) is used.
 
 Options:
-  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
+
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
@@ -70,6 +70,20 @@ Options:
   -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
+
+Advanced Deleglise-Rivat options:
+
+  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
+         --p2               Only compute the 2nd partial sieve function
+         --s1               Only compute the ordinary leaves
+         --s2_trivial       Only compute the trivial special leaves
+         --s2_easy          Only compute the easy special leaves
+         --s2_hard          Only compute the hard special leaves
+
+Examples:
+
+  primecount 10**13
+  primecount 10**13 --nthprime --threads=4
 ```
 
 ### Algorithms
