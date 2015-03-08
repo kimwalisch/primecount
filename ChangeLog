@@ -1,6 +1,6 @@
 2015-03-07 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 1.9 work in progress.
+  Version 1.9 released.
 
   This version introduces new command-line options for calculating
   intermediate formulas of the Deleglise-Rivat algorithm. This allows
