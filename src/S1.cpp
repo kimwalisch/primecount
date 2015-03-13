@@ -42,7 +42,7 @@ T S1(T x,
      int64_t b,
      int64_t c,
      T prime_product,
-     std::vector<P>& primes)
+     vector<P>& primes)
 {
   T s1 = 0;
 
