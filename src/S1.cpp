@@ -12,7 +12,6 @@
 
 #include <S1.hpp>
 #include <primecount-internal.hpp>
-#include <FactorTable.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <pmath.hpp>
@@ -30,51 +29,56 @@ using namespace primecount;
 namespace {
 namespace S1 {
 
-/// Run time: O(y) operations, O(y) space.
-/// @pre is_phi_tiny(c) == true
+/// Recursively iterate over the square free numbers coprime to the
+/// first b primes and calculate the sum of the ordinary leaves.
+/// This algorithm is based on section 2.2 of the paper:
+/// Douglas Staple, "The Combinatorial Algorithm For Computing pi(x)",
+/// arXiv:1503.01839, 6 March 2015
 ///
-template <typename T>
-T S1(T x, int64_t y, int64_t c, vector<int32_t>& lpf, vector<int32_t>& mu, int threads)
+template <int MU, typename T, typename P>
+T S1(T x,
+     int64_t y,
+     int64_t pi_y,
+     int64_t b,
+     int64_t c,
+     T prime_product,
+     std::vector<P>& primes)
 {
   T s1 = 0;
-  int64_t prime_c = nth_prime(c);
-  int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
 
-  #pragma omp parallel for num_threads(threads) reduction (+: s1)
-  for (int64_t n = 1; n <= y; n++)
-    if (lpf[n] > prime_c)
-      s1 += mu[n] * phi_tiny(x / n, c);
+  for (b += 1; b <= pi_y && prime_product * primes[b] <= y; b++)
+  {
+    T next = prime_product * primes[b];
+    s1 += MU * phi_tiny(x / next, c);
+    s1 += S1<-MU>(x, y, pi_y, b, c, next, primes);
+  }
 
   return s1;
 }
 
-/// This version uses less memory (due to FactorTable compression).
-/// Run time: O(y) operations, O(y) space.
-/// @pre is_phi_tiny(c) == true
+/// Calculate the contribution of the ordinary leaves in parallel.
+/// Run time: O(y * log(log(y))) operations.
+/// Space complexity: O(y / log(y)).
 ///
-template <typename T, typename F>
-T S1(T x, int64_t y, int64_t c, FactorTable<F>& factors, int threads)
+template <typename X, typename Y>
+X S1(X x,
+     Y y,
+     int64_t c,
+     int threads)
 {
-  // the factors lookup table contains only numbers
-  // which are coprime to 2, 3, 5 and 7
-  if (c <= 4)
-  {
-    vector<int32_t> mu = generate_moebius(y);
-    vector<int32_t> lpf = generate_least_prime_factors(y);
-    return S1(x, y, c, lpf, mu, threads);
-  }
-
-  int64_t limit = factors.get_index(y);
-  int64_t prime_c = nth_prime(c);
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
-  T s1 = 0;
 
-  #pragma omp parallel for num_threads(threads) reduction (+: s1)
-  for (int64_t i = factors.get_index(1); i <= limit; i++)
-    if (factors.lpf(i) > prime_c)
-      s1 += factors.mu(i) * phi_tiny(x / factors.get_number(i), c);
+  vector<Y> primes = generate_primes<Y>(y);
+  int64_t pi_y = (int64_t) (primes.size() - 1);
+  X s1 = phi_tiny(x, c);
+
+  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction (+: s1)
+  for (int64_t b = c + 1; b <= pi_y; b++)
+  {
+    s1 += -1 * phi_tiny(x / primes[b], c);
+    s1 += S1<1>(x, y, pi_y, b, c, (X) primes[b], primes);
+  }
 
   return s1;
 }
@@ -95,8 +99,7 @@ int64_t S1(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  FactorTable<uint16_t> factors(y);
-  int64_t s1 = S1::S1((intfast64_t) x, y, c, factors, threads);
+  int64_t s1 = S1::S1(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;
@@ -118,16 +121,10 @@ int128_t S1(int128_t x,
   int128_t s1;
 
   // uses less memory
-  if (y <= FactorTable<uint16_t>::max())
-  {
-    FactorTable<uint16_t> factors(y);
-    s1 = S1::S1((intfast128_t) x, y, c, factors, threads);
-  }
+  if (y <= numeric_limits<uint32_t>::max())
+    s1 = S1::S1(x, (uint32_t) y, c, threads);
   else
-  {
-    FactorTable<uint32_t> factors(y);
-    s1 = S1::S1((intfast128_t) x, y, c, factors, threads);
-  }
+    s1 = S1::S1(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;
