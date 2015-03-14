@@ -33,12 +33,11 @@ namespace S1 {
 /// first b primes and calculate the sum of the ordinary leaves.
 /// This algorithm is based on section 2.2 of the paper:
 /// Douglas Staple, "The Combinatorial Algorithm For Computing pi(x)",
-/// arXiv:1503.01839, 6 March 2015
+/// arXiv:1503.01839, 6 March 2015.
 ///
 template <int MU, typename T, typename P>
 T S1(T x,
      int64_t y,
-     int64_t pi_y,
      int64_t b,
      int64_t c,
      T prime_product,
@@ -46,11 +45,12 @@ T S1(T x,
 {
   T s1 = 0;
 
-  for (b += 1; b <= pi_y && prime_product * primes[b] <= y; b++)
+  for (b += 1; b < (int64_t) primes.size(); b++)
   {
     T next = prime_product * primes[b];
+    if (next > y) break;
     s1 += MU * phi_tiny(x / next, c);
-    s1 += S1<-MU>(x, y, pi_y, b, c, next, primes);
+    s1 += S1<-MU>(x, y, b, c, next, primes);
   }
 
   return s1;
@@ -68,16 +68,14 @@ X S1(X x,
 {
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
-
   vector<Y> primes = generate_primes<Y>(y);
-  int64_t pi_y = (int64_t) (primes.size() - 1);
   X s1 = phi_tiny(x, c);
 
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction (+: s1)
-  for (int64_t b = c + 1; b <= pi_y; b++)
+  for (int64_t b = c + 1; b < (int64_t) primes.size(); b++)
   {
     s1 += -1 * phi_tiny(x / primes[b], c);
-    s1 += S1<1>(x, y, pi_y, b, c, (X) primes[b], primes);
+    s1 += S1<1>(x, y, b, c, (X) primes[b], primes);
   }
 
   return s1;
