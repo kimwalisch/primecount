@@ -169,12 +169,11 @@ T S2_hard_thread(T x,
       next[i] = k;
     }
 
+    // Calculate the contribution of the hard special leaves using
+    // Tomás Oliveira's O(log(N)) special tree data structure
+    // for counting the number of unsieved elements.
     if (low < counters_limit)
     {
-      // Calculate the contribution of the hard special leaves using
-      // Tomás Oliveira's O(log(N)) special tree data structure
-      // for counting the number of unsieved elements.
-
       // Initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
 
@@ -248,8 +247,8 @@ T S2_hard_thread(T x,
       // number of unsieved elements. Above a certain threshold the
       // number of special leaves is so small that it is faster to
       // simply count the number of unsieved elements from the sieve.
-      // In practice both y * log(x) and y * alpha are good formulas
-      // for calculating the turnover point.
+      // The turnover point when to start using this algorithm is
+      // around y * alpha.
 
       int64_t count_low_high = sieve.count((high - 1) - low);
 
