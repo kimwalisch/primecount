@@ -99,11 +99,9 @@ int64_t cross_off(int64_t prime,
 
   for (; k < high; k += prime * 2)
   {
-    if (sieve[k - low])
-    {
-      sieve.unset(k - low);
-      unset++;
-    }
+    // increase if k is unset the first time
+    unset += sieve[k - low];
+    sieve.unset(k - low);
   }
 
   next_multiple = k;
