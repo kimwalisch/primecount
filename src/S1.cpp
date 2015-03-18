@@ -40,14 +40,14 @@ T S1(T x,
      int64_t y,
      int64_t b,
      int64_t c,
-     T prime_product,
+     T square_free,
      vector<P>& primes)
 {
   T s1 = 0;
 
   for (b += 1; b < (int64_t) primes.size(); b++)
   {
-    T next = prime_product * primes[b];
+    T next = square_free * primes[b];
     if (next > y) break;
     s1 += MU * phi_tiny(x / next, c);
     s1 += S1<-MU>(x, y, b, c, next, primes);
