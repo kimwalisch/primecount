@@ -125,6 +125,7 @@ T S2_hard_thread(T x,
                  int64_t thread_num,
                  int64_t low,
                  int64_t limit,
+                 double alpha,
                  FactorTable<F>& factors,
                  PiTable& pi,
                  vector<P>& primes,
@@ -134,7 +135,6 @@ T S2_hard_thread(T x,
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
-  int64_t alpha = (int64_t) get_alpha(x, y);
   int64_t pi_sqrty = pi[isqrt(y)];
 
   if (c > max_b)
@@ -356,6 +356,7 @@ T S2_hard(T x,
 
   PiTable pi(max_prime);
   vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
+  double alpha = get_alpha(x, y);
 
   while (low < limit)
   {
@@ -371,8 +372,8 @@ T S2_hard(T x,
     for (int i = 0; i < threads; i++)
     {
       timings[i] = get_wtime();
-      s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread,
-          i, low, limit, factors, pi, primes, mu_sum[i], phi[i]);
+      s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread, i,
+          low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
       timings[i] = get_wtime() - timings[i];
     }
 
