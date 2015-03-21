@@ -59,6 +59,29 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& pr
 }
 
 /// Cross-off the multiples of prime in the sieve array.
+/// @return  Count of crossed-off multiples.
+///
+int64_t cross_off(int64_t prime,
+                  int64_t low,
+                  int64_t high,
+                  int64_t& next_multiple,
+                  BitSieve& sieve)
+{
+  int64_t unset = 0;
+  int64_t k = next_multiple;
+
+  for (; k < high; k += prime * 2)
+  {
+    // +1 if k is unset the first time
+    unset += sieve[k - low];
+    sieve.unset(k - low);
+  }
+
+  next_multiple = k;
+  return unset;
+}
+
+/// Cross-off the multiples of prime in the sieve array.
 /// For each element that is unmarked the first time update
 /// the special counters tree data structure.
 ///
@@ -85,29 +108,10 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off multiples.
+/// Use POPCNT algorithm for [0, y[ and ]y * alpha, z].
+/// The POPCNT algorithm runs fastest if there are relatively few
+/// special leaves per segment.
 ///
-int64_t cross_off(int64_t prime,
-                  int64_t low,
-                  int64_t high,
-                  int64_t& next_multiple,
-                  BitSieve& sieve)
-{
-  int64_t unset = 0;
-  int64_t k = next_multiple;
-
-  for (; k < high; k += prime * 2)
-  {
-    // +1 if k is unset the first time
-    unset += sieve[k - low];
-    sieve.unset(k - low);
-  }
-
-  next_multiple = k;
-  return unset;
-}
-
 bool is_popcnt(int64_t y,
                int64_t alpha,
                int64_t high)
@@ -174,8 +178,8 @@ T S2_hard_thread(T x,
     }
 
     // Calculate the contribution of the hard special leaves directly
-    // from the sieve array using POPCNT. This algorithm is fastest
-    // if there are relatively few special leaves per segment.
+    // from the sieve array using POPCNT. This algorithm is used if
+    // there are relatively few special leaves per segment.
     if (is_popcnt(y, alpha, high))
     {
       int64_t count_low_high = sieve.count((high - 1) - low);
@@ -256,7 +260,7 @@ T S2_hard_thread(T x,
       // Calculate the contribution of the hard special leaves using
       // Tomás Oliveira's O(log(N)) special tree data structure
       // for counting the number of unsieved elements. This algorithm
-      // is fastest if there are many special leaves per segment.
+      // runs fastest if there are many special leaves per segment.
 
       // Initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
