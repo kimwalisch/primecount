@@ -108,6 +108,13 @@ int64_t cross_off(int64_t prime,
   return unset;
 }
 
+bool is_popcnt(int64_t y,
+               int64_t alpha,
+               int64_t high)
+{
+  return (high < y || high > y * alpha);
+}
+
 /// Compute the S2 contribution of the hard special leaves which
 /// require use of a sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
@@ -135,7 +142,6 @@ T S2_hard_thread(T x,
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
   int64_t alpha = (int64_t) get_alpha(x, y);
-  int64_t counters_limit = y * alpha;
   int64_t pi_sqrty = pi[isqrt(y)];
 
   if (c > max_b)
@@ -167,87 +173,11 @@ T S2_hard_thread(T x,
       next[i] = k;
     }
 
-    // Calculate the contribution of the hard special leaves using
-    // Tomás Oliveira's O(log(N)) special tree data structure
-    // for counting the number of unsieved elements.
-    if (low < counters_limit)
+    // Calculate the contribution of the hard special leaves directly
+    // from the sieve array using POPCNT. This algorithm is fastest
+    // if there are relatively few special leaves per segment.
+    if (is_popcnt(y, alpha, high))
     {
-      // Initialize special tree data structure from sieve
-      cnt_finit(sieve, counters, segment_size);
-
-      // For c + 1 <= b <= pi_sqrty
-      // Find all special leaves: n = primes[b] * m
-      // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
-      for (int64_t end = min(pi_sqrty, max_b); b <= end; b++)
-      {
-        int64_t prime = primes[b];
-        T x2 = x / prime;
-        int64_t x2_div_low = min(fast_div(x2, low), y);
-        int64_t x2_div_high = min(fast_div(x2, high), y);
-        int64_t min_m = max(x2_div_high, y / prime);
-        int64_t max_m = x2_div_low;
-
-        if (prime >= max_m)
-          goto next_segment;
-
-        factors.to_index(&min_m);
-        factors.to_index(&max_m);
-
-        for (int64_t m = max_m; m > min_m; m--)
-        {
-          if (prime < factors.lpf(m))
-          {
-            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
-            int64_t count = cnt_query(counters, xn - low);
-            int64_t phi_xn = phi[b] + count;
-            int64_t mu_m = factors.mu(m);
-            s2_hard -= mu_m * phi_xn;
-            mu_sum[b] -= mu_m;
-          }
-        }
-
-        phi[b] += cnt_query(counters, (high - 1) - low);
-        cross_off(prime, low, high, next[b], sieve, counters);
-      }
-
-      // For pi_sqrty <= b <= pi_sqrtz
-      // Find all hard special leaves: n = primes[b] * primes[l]
-      // which satisfy: low <= (x / n) < high
-      for (; b <= max_b; b++)
-      {
-        int64_t prime = primes[b];
-        T x2 = x / prime;
-        int64_t x2_div_low = min(fast_div(x2, low), y);
-        int64_t x2_div_high = min(fast_div(x2, high), y);
-        int64_t l = pi[min(x2_div_low, z / prime)];
-        int64_t min_hard_leaf = max3(x2_div_high, y / prime, prime);
-
-        if (prime >= primes[l])
-          goto next_segment;
-
-        for (; primes[l] > min_hard_leaf; l--)
-        {
-          int64_t xn = (int64_t) fast_div(x2, primes[l]);
-          int64_t count = cnt_query(counters, xn - low);
-          int64_t phi_xn = phi[b] + count;
-          s2_hard += phi_xn;
-          mu_sum[b]++;
-        }
-
-        phi[b] += cnt_query(counters, (high - 1) - low);
-        cross_off(prime, low, high, next[b], sieve, counters);
-      }
-    }
-    else
-    {
-      // Calculate the contribution of the hard special leaves without
-      // using a special tree data structure for counting the
-      // number of unsieved elements. Above a certain threshold the
-      // number of special leaves is so small that it is faster to
-      // simply count the number of unsieved elements from the sieve.
-      // The turnover point when to start using this algorithm is
-      // around y * alpha.
-
       int64_t count_low_high = sieve.count((high - 1) - low);
 
       // For c + 1 <= b <= pi_sqrty
@@ -319,6 +249,79 @@ T S2_hard_thread(T x,
 
         phi[b] += count_low_high;
         count_low_high -= cross_off(prime, low, high, next[b], sieve);
+      }
+    }
+    else
+    {
+      // Calculate the contribution of the hard special leaves using
+      // Tomás Oliveira's O(log(N)) special tree data structure
+      // for counting the number of unsieved elements. This algorithm
+      // is fastest if there are many special leaves per segment.
+
+      // Initialize special tree data structure from sieve
+      cnt_finit(sieve, counters, segment_size);
+
+      // For c + 1 <= b <= pi_sqrty
+      // Find all special leaves: n = primes[b] * m
+      // which satisfy: mu[m] != 0 && primes[b] < lpf[m] && low <= (x / n) < high
+      for (int64_t end = min(pi_sqrty, max_b); b <= end; b++)
+      {
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t min_m = max(x2_div_high, y / prime);
+        int64_t max_m = x2_div_low;
+
+        if (prime >= max_m)
+          goto next_segment;
+
+        factors.to_index(&min_m);
+        factors.to_index(&max_m);
+
+        for (int64_t m = max_m; m > min_m; m--)
+        {
+          if (prime < factors.lpf(m))
+          {
+            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
+            int64_t count = cnt_query(counters, xn - low);
+            int64_t phi_xn = phi[b] + count;
+            int64_t mu_m = factors.mu(m);
+            s2_hard -= mu_m * phi_xn;
+            mu_sum[b] -= mu_m;
+          }
+        }
+
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
+      }
+
+      // For pi_sqrty <= b <= pi_sqrtz
+      // Find all hard special leaves: n = primes[b] * primes[l]
+      // which satisfy: low <= (x / n) < high
+      for (; b <= max_b; b++)
+      {
+        int64_t prime = primes[b];
+        T x2 = x / prime;
+        int64_t x2_div_low = min(fast_div(x2, low), y);
+        int64_t x2_div_high = min(fast_div(x2, high), y);
+        int64_t l = pi[min(x2_div_low, z / prime)];
+        int64_t min_hard_leaf = max3(x2_div_high, y / prime, prime);
+
+        if (prime >= primes[l])
+          goto next_segment;
+
+        for (; primes[l] > min_hard_leaf; l--)
+        {
+          int64_t xn = (int64_t) fast_div(x2, primes[l]);
+          int64_t count = cnt_query(counters, xn - low);
+          int64_t phi_xn = phi[b] + count;
+          s2_hard += phi_xn;
+          mu_sum[b]++;
+        }
+
+        phi[b] += cnt_query(counters, (high - 1) - low);
+        cross_off(prime, low, high, next[b], sieve, counters);
       }
     }
 
