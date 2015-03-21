@@ -108,17 +108,6 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// Use POPCNT algorithm for [0, y[ and ]y * alpha, z].
-/// The POPCNT algorithm runs fastest if there are relatively few
-/// special leaves per segment.
-///
-bool is_popcnt(int64_t y,
-               int64_t alpha,
-               int64_t high)
-{
-  return (high < y || high > y * alpha);
-}
-
 /// Compute the S2 contribution of the hard special leaves which
 /// require use of a sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
@@ -180,7 +169,7 @@ T S2_hard_thread(T x,
     // Calculate the contribution of the hard special leaves directly
     // from the sieve array using POPCNT. This algorithm is used if
     // there are relatively few special leaves per segment.
-    if (is_popcnt(y, alpha, high))
+    if (high < y || low > y * alpha)
     {
       int64_t count_low_high = sieve.count((high - 1) - low);
 
