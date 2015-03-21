@@ -1,3 +1,16 @@
+2015-03-21 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.0 work in progress.
+
+  This version improves the POPCNT algorithm in the computation of the
+  hard special leaves and contains a new algorithm for the computation
+  of the ordinary leaves which uses half as much memory.
+
+  * src/S1.cpp: New implementation based on Douglas Staple's algorithm.
+  * src/deleglise-rivat/S2_hard.cpp: Also use POPCNT if high < y.
+  * src/lmo/pi_lmo5.cpp: Optimized sieving, up to 10% faster.
+  * src/lmo/pi_lmo_parallel3.cpp: Optimized sieving, up to 10% faster.
+
 2015-03-08 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 1.9 released.
