@@ -1,4 +1,4 @@
-2015-03-21 Kim Walisch  <kim.walisch@gmail.com>
+2015-03-22 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.0 work in progress.
 
@@ -10,6 +10,7 @@
   * src/deleglise-rivat/S2_hard.cpp: Also use POPCNT if high < y.
   * src/lmo/pi_lmo5.cpp: Optimized sieving, up to 10% faster.
   * src/lmo/pi_lmo_parallel3.cpp: Optimized sieving, up to 10% faster.
+  * include/BitSieve.hpp: Add count backwards optimization.
 
 2015-03-08 Kim Walisch  <kim.walisch@gmail.com>
 
