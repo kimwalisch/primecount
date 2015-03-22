@@ -209,7 +209,7 @@ space.
     <td>62.95s</td>
     <td>28.55s</td>
     <td>2.94s</td>
-    <td>1.20s</td>
+    <td>1.18s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -225,7 +225,7 @@ space.
     <td>3,920.29s</td>
     <td>1,349.95s</td>
     <td>63.97s</td>
-    <td>18.42</td>
+    <td>18.10s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
@@ -233,7 +233,7 @@ space.
     <td>31,897.66s</td>
     <td>9,885.71s</td>
     <td>305.28s</td>
-    <td>77.59s</td>
+    <td>76.06s</td>
   </tr>
 </table>
 
