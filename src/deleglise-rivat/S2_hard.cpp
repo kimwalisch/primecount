@@ -185,7 +185,7 @@ T S2_hard_thread(T x,
         int64_t min_m = max(x2_div_high, y / prime);
         int64_t max_m = x2_div_low;
         int64_t count = 0;
-        int64_t i = 0;
+        int64_t start = 0;
 
         if (prime >= max_m)
           goto next_segment;
@@ -199,8 +199,8 @@ T S2_hard_thread(T x,
           {
             int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t stop = xn - low;
-            count += sieve.count(i, stop);
-            i = stop + 1;
+            count += sieve.count(start, stop, low, high, count, count_low_high);
+            start = stop + 1;
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
             s2_hard -= mu_m * phi_xn;
@@ -224,7 +224,7 @@ T S2_hard_thread(T x,
         int64_t l = pi[min(x2_div_low, z / prime)];
         int64_t min_hard_leaf = max3(x2_div_high, y / prime, prime);
         int64_t count = 0;
-        int64_t i = 0;
+        int64_t start = 0;
 
         if (prime >= primes[l])
           goto next_segment;
@@ -233,8 +233,8 @@ T S2_hard_thread(T x,
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t stop = xn - low;
-          count += sieve.count(i, stop);
-          i = stop + 1;
+          count += sieve.count(start, stop, low, high, count, count_low_high);
+          start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
           mu_sum[b]++;
