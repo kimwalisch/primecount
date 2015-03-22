@@ -136,13 +136,13 @@ T S2_hard_thread(T x,
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
+  T s2_hard = 0;
 
   if (c > max_b)
-    return 0;
+    return s2_hard;
 
-  T s2_hard = 0;
   BitSieve sieve(segment_size);
-  vector<int32_t> counters(segment_size);
+  vector<int32_t> counters;
   vector<int64_t> next = generate_next_multiples(low, max_b + 1, primes);
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);
@@ -199,7 +199,8 @@ T S2_hard_thread(T x,
           {
             int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t stop = xn - low;
-            count += sieve.count(start, stop, low, high, count, count_low_high);
+            int64_t count_start_stop = sieve.count(start, stop, low, high, count, count_low_high);
+            count += count_start_stop;
             start = stop + 1;
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
@@ -233,7 +234,8 @@ T S2_hard_thread(T x,
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t stop = xn - low;
-          count += sieve.count(start, stop, low, high, count, count_low_high);
+          int64_t count_start_stop = sieve.count(start, stop, low, high, count, count_low_high);
+          count += count_start_stop;
           start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
@@ -250,6 +252,9 @@ T S2_hard_thread(T x,
       // Tomás Oliveira's O(log(N)) special tree data structure
       // for counting the number of unsieved elements. This algorithm
       // runs fastest if there are many special leaves per segment.
+
+      // allocate memory upon first usage
+      counters.resize(segment_size);
 
       // Initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
