@@ -153,7 +153,7 @@ T S2_hard_thread(T x,
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);
 
-  // Segmeted sieve of Eratosthenes
+  // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
     // Current segment = interval [low, high[
