@@ -33,30 +33,17 @@
   #include <omp.h>
 #endif
 
+/// Count the number of unsieved elements inside
+/// [start, stop] from the sieve array.
+///
+#define COUNT_POPCNT(start, stop) \
+    sieve.count(start, stop, low, high, count, count_low_high)
+
 using namespace std;
 using namespace primecount;
 
 namespace {
 namespace S2_hard {
-
-/// @return  Vector with first multiples >= low.
-template <typename T>
-vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
-{
-  vector<int64_t> next;
-  next.reserve(size);
-  next.push_back(0);
-
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ceil_div(low, prime) * prime;
-    next_multiple += prime * (~next_multiple & 1);
-    next.push_back(next_multiple);
-  }
-
-  return next;
-}
 
 /// Cross-off the multiples of prime in the sieve array.
 /// @return  Count of crossed-off multiples.
@@ -106,6 +93,25 @@ void cross_off(int64_t prime,
   }
 
   next_multiple = k;
+}
+
+/// @return  Vector with first multiples >= low.
+template <typename T>
+vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
+{
+  vector<int64_t> next;
+  next.reserve(size);
+  next.push_back(0);
+
+  for (int64_t b = 1; b < size; b++)
+  {
+    int64_t prime = primes[b];
+    int64_t next_multiple = ceil_div(low, prime) * prime;
+    next_multiple += prime * (~next_multiple & 1);
+    next.push_back(next_multiple);
+  }
+
+  return next;
 }
 
 /// Compute the S2 contribution of the hard special leaves which
@@ -199,8 +205,7 @@ T S2_hard_thread(T x,
           {
             int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t stop = xn - low;
-            int64_t count_start_stop = sieve.count(start, stop, low, high, count, count_low_high);
-            count += count_start_stop;
+            count += COUNT_POPCNT(start, stop);
             start = stop + 1;
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
@@ -234,8 +239,7 @@ T S2_hard_thread(T x,
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t stop = xn - low;
-          int64_t count_start_stop = sieve.count(start, stop, low, high, count, count_low_high);
-          count += count_start_stop;
+          count += COUNT_POPCNT(start, stop);
           start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
