@@ -114,6 +114,17 @@ vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& pr
   return next;
 }
 
+/// @return  true if the interval [low, high] contains
+///          few hard special leaves.
+///
+bool is_popcnt(int64_t low,
+               int64_t high,
+               int64_t y,
+               double alpha)
+{
+  return (high < y || low > y * alpha);
+}
+
 /// Compute the S2 contribution of the hard special leaves which
 /// require use of a sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
@@ -172,10 +183,11 @@ T S2_hard_thread(T x,
       next[i] = k;
     }
 
-    // Calculate the contribution of the hard special leaves directly
-    // from the sieve array using POPCNT. This algorithm is used if
-    // there are relatively few special leaves per segment.
-    if (high < y || low > y * alpha)
+    // Calculate the contribution of the hard special leaves using the
+    // POPCNT algorithm. If there are relatively few special leaves
+    // per segment we count the number of unsieved elements directly
+    // from the sieve array using the POPCNT instruction.
+    if (is_popcnt(low, high, y, alpha))
     {
       int64_t count_low_high = sieve.count((high - 1) - low);
 
