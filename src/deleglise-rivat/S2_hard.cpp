@@ -95,7 +95,7 @@ void cross_off(int64_t prime,
   next_multiple = k;
 }
 
-/// @return  Vector with first multiples >= low.
+/// @return  vector with multiples >= low.
 template <typename T>
 vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
 {
