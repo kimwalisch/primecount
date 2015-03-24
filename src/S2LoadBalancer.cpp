@@ -105,10 +105,10 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
   avg_seconds_(0),
   count_(0)
 {
+  sqrtz_ = isqrt(z);
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
-  max_size_ = next_power_of_2(isqrt(z));
   update_min_size(log(x_) * log(log(x_)));
 }
 
@@ -176,14 +176,14 @@ void S2LoadBalancer::update(int64_t low,
 
   // if low > sqrt(z) we use a larger min_size_ as the
   // special leaves are distributed more evenly
-  if (low > max_size_)
+  if (low > sqrtz_)
   {
     update_min_size(log(x_));
     *segment_size = max(*segment_size, min_size_);
   }
 
   // 1 segment per thread
-  if (*segment_size < max_size_)
+  if (*segment_size < sqrtz_)
   {
     if (increase_size(seconds, decrease_threshold))
       *segment_size <<= 1;
@@ -194,7 +194,7 @@ void S2LoadBalancer::update(int64_t low,
     // near sqrt(z) there is a short peak of special
     // leaves so we use the minimum segment size
     int64_t high = low + *segment_size * *segments_per_thread * threads; 
-    if (low <= max_size_ && high > max_size_)
+    if (low <= sqrtz_ && high > sqrtz_)
       *segment_size = min_size_;
   }
   else // many segments per thread
