@@ -1,7 +1,7 @@
 ///
 /// @file  S2LoadBalancer.hpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,7 +43,7 @@ private:
   double min_seconds_;
   double decrease_dividend_;
   int64_t min_size_;
-  int64_t max_size_;
+  int64_t sqrtz_;
   int64_t count_;
 };
 
