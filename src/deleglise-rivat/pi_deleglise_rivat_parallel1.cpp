@@ -225,7 +225,7 @@ int64_t S2_hard(int64_t x,
   int64_t low = 1;
   int64_t limit = z + 1;
 
-  S2LoadBalancer loadBalancer(x, limit, threads);
+  S2LoadBalancer loadBalancer(x, y, z, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
   vector<int64_t> phi_total(pi[min(isqrt(z), y)] + 1, 0);

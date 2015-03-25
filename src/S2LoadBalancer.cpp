@@ -49,6 +49,7 @@
 ///
 
 #include <S2LoadBalancer.hpp>
+#include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <pmath.hpp>
 #include <int128.hpp>
@@ -98,7 +99,7 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 
 namespace primecount {
 
-S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
+S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads) :
   x_((double) x),
   z_((double) z),
   rsd_(40),
@@ -106,10 +107,15 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t z, int64_t threads) :
   count_(0)
 {
   sqrtz_ = isqrt(z);
+
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
   update_min_size(log(x_) * log(log(x_)));
+
+  double alpha = get_alpha(x, y);
+  double x16 = pow(x_, 1.0 / 6.0);
+  smallest_special_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
 }
 
 double S2LoadBalancer::get_rsd() const
@@ -174,9 +180,8 @@ void S2LoadBalancer::update(int64_t low,
   double decrease_threshold = get_decrease_threshold(seconds);
   rsd_ = max(0.1, relative_standard_deviation(timings));
 
-  // if low > sqrt(z) we use a larger min_size_ as the
-  // special leaves are distributed more evenly
-  if (low > sqrtz_)
+  // use a larger min_size_
+  if (low > smallest_special_leaf_)
   {
     update_min_size(log(x_));
     *segment_size = max(*segment_size, min_size_);
@@ -191,10 +196,11 @@ void S2LoadBalancer::update(int64_t low,
       if (*segment_size > min_size_)
         *segment_size >>= 1;
 
-    // near sqrt(z) there is a short peak of special
-    // leaves so we use the minimum segment size
+    // there are no hard special leaves below:
+    // x / (y * sqrt(alpha) * x^(1/6))
     int64_t high = low + *segment_size * *segments_per_thread * threads; 
-    if (low <= sqrtz_ && high > sqrtz_)
+    if (low <= smallest_special_leaf_ && 
+        high > smallest_special_leaf_)
       *segment_size = min_size_;
   }
   else // many segments per thread

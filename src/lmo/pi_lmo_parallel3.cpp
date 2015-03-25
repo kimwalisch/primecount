@@ -228,7 +228,7 @@ int64_t S2(int64_t x,
   threads = validate_threads(threads, limit);
 
   S2Status status;
-  S2LoadBalancer loadBalancer(x, limit, threads);
+  S2LoadBalancer loadBalancer(x, y, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
 
