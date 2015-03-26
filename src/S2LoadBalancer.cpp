@@ -180,13 +180,6 @@ void S2LoadBalancer::update(int64_t low,
   double decrease_threshold = get_decrease_threshold(seconds);
   rsd_ = max(0.1, relative_standard_deviation(timings));
 
-  // use a larger min_size_
-  if (low > smallest_special_leaf_)
-  {
-    update_min_size(log(x_));
-    *segment_size = max(*segment_size, min_size_);
-  }
-
   // 1 segment per thread
   if (*segment_size < sqrtz_)
   {
@@ -195,15 +188,9 @@ void S2LoadBalancer::update(int64_t low,
     else if (decrease_size(seconds, decrease_threshold))
       if (*segment_size > min_size_)
         *segment_size >>= 1;
-
-    // there are no hard special leaves below:
-    // x / (y * sqrt(alpha) * x^(1/6))
-    int64_t high = low + *segment_size * *segments_per_thread * threads; 
-    if (low <= smallest_special_leaf_ && 
-        high > smallest_special_leaf_)
-      *segment_size = min_size_;
   }
-  else // many segments per thread
+  // many segments per thread
+  else if (low > smallest_special_leaf_)
   {
     double factor = decrease_threshold / rsd_;
     factor = in_between(0.5, factor, 2);
@@ -215,6 +202,25 @@ void S2LoadBalancer::update(int64_t low,
     {
       *segments_per_thread = (int) n;
     }
+  }
+
+  int64_t high = low + *segment_size * *segments_per_thread * threads;
+
+  // near smallest_special_leaf_ the hard special leaves
+  // are distributed unevenly so use min_size_
+  if (low <= smallest_special_leaf_ && 
+      high > smallest_special_leaf_)
+  {
+    *segment_size = min_size_;
+  }
+
+  high = low + *segment_size * *segments_per_thread * threads; 
+
+  // increase min_size_
+  if (high >= smallest_special_leaf_)
+  {
+    update_min_size(1);
+    *segment_size = min_size_;
   }
 }
 
