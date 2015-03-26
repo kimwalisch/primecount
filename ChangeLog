@@ -1,6 +1,6 @@
 2015-03-26 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 2.0 work in progress.
+  Version 2.0 released.
 
   This version improves the POPCNT algorithm in the computation of the
   hard special leaves and contains a new algorithm for the computation
