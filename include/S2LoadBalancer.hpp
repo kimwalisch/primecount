@@ -37,6 +37,7 @@ private:
   bool increase_size(double seconds, double decrease) const;
   bool decrease_size(double seconds, double decrease) const;
   double x_;
+  double y_;
   double z_;
   double rsd_;
   double avg_seconds_;

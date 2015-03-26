@@ -101,6 +101,7 @@ namespace primecount {
 
 S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads) :
   x_((double) x),
+  y_((double) y),
   z_((double) z),
   rsd_(40),
   avg_seconds_(0),
@@ -219,7 +220,7 @@ void S2LoadBalancer::update(int64_t low,
   // slightly increase min_size_
   if (high >= smallest_special_leaf_)
   {
-    update_min_size(log(x_));
+    update_min_size(log(y_));
     *segment_size = max(min_size_, *segment_size);
   }
 }
