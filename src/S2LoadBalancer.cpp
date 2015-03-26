@@ -216,11 +216,11 @@ void S2LoadBalancer::update(int64_t low,
 
   high = low + *segment_size * *segments_per_thread * threads; 
 
-  // set segment_size to sqrt(z)
+  // slightly increase min_size_
   if (high >= smallest_special_leaf_)
   {
-    update_min_size(1);
-    *segment_size = min_size_;
+    update_min_size(log(x_));
+    *segment_size = max(min_size_, *segment_size);
   }
 }
 
