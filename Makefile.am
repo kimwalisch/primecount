@@ -24,6 +24,7 @@ include_HEADERS = \
 	include/primecount.hpp
 
 EXTRA_DIST = \
+	autogen.sh \
 	doc/alpha-factor-tuning.pdf \
 	src/msvc/has_openmp.cpp \
 	Makefile.msvc \
