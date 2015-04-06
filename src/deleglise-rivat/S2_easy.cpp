@@ -55,7 +55,7 @@ T1 S2_easy(T1 x,
   int64_t pi_x13 = pi[x13];
   S2Status status;
 
-  #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
+  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
