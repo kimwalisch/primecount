@@ -1,8 +1,9 @@
-2015-04-05 Kim Walisch  <kim.walisch@gmail.com>
+2015-04-06 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.1 work in progress.
 
   * src/S1.cpp: Fix Windows performance regression.
+  * src/S2LoadBalancer.cpp: Refactoring.
   * Makefile.am: Add autogen.sh to EXTRA_DIST.
 
 2015-03-26 Kim Walisch  <kim.walisch@gmail.com>
