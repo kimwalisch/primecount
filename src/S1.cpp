@@ -71,7 +71,7 @@ X S1(X x,
   vector<Y> primes = generate_primes<Y>(y);
   X s1 = phi_tiny(x, c);
 
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction (+: s1)
+  #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: s1)
   for (int64_t b = c + 1; b < (int64_t) primes.size(); b++)
   {
     s1 += -1 * phi_tiny(x / primes[b], c);
