@@ -46,7 +46,7 @@ private:
   int64_t min_size_;
   int64_t sqrtz_;
   int64_t count_;
-  int64_t smallest_special_leaf_;
+  int64_t smallest_hard_leaf_;
 };
 
 } // namespace

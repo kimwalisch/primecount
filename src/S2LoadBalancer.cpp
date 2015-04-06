@@ -115,8 +115,7 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads
   update_min_size(log(x_) * log(log(x_)));
 
   double alpha = get_alpha(x, y);
-  double x16 = pow(x_, 1.0 / 6.0);
-  smallest_special_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
 }
 
 double S2LoadBalancer::get_rsd() const
@@ -191,7 +190,7 @@ void S2LoadBalancer::update(int64_t low,
         *segment_size >>= 1;
   }
   // many segments per thread
-  else if (low > smallest_special_leaf_)
+  else if (low > smallest_hard_leaf_)
   {
     double factor = decrease_threshold / rsd_;
     factor = in_between(0.5, factor, 2);
@@ -207,10 +206,10 @@ void S2LoadBalancer::update(int64_t low,
 
   int64_t high = low + *segment_size * *segments_per_thread * threads;
 
-  // near smallest_special_leaf_ the hard special leaves
+  // near smallest_hard_leaf_ the hard special leaves
   // are distributed unevenly so use min_size_
-  if (low <= smallest_special_leaf_ && 
-      high > smallest_special_leaf_)
+  if (low <= smallest_hard_leaf_ && 
+      high > smallest_hard_leaf_)
   {
     *segment_size = min_size_;
   }
@@ -218,7 +217,7 @@ void S2LoadBalancer::update(int64_t low,
   high = low + *segment_size * *segments_per_thread * threads; 
 
   // slightly increase min_size_
-  if (high >= smallest_special_leaf_)
+  if (high >= smallest_hard_leaf_)
   {
     update_min_size(log(y_));
     *segment_size = max(min_size_, *segment_size);
