@@ -1,6 +1,6 @@
-2015-04-06 Kim Walisch  <kim.walisch@gmail.com>
+2015-04-12 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 2.1 work in progress.
+  Version 2.1 released.
 
   * src/S1.cpp: Fix Windows performance regression.
   * src/S2LoadBalancer.cpp: Refactoring.
