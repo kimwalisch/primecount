@@ -1,3 +1,9 @@
+2015-08-30 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.2 work in progress.
+
+  * include/popcount.hpp: Faster popcount algorithm for CPUs without POPCNT.
+
 2015-04-12 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.1 released.
