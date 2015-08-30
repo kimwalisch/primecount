@@ -41,7 +41,7 @@ public:
   {
     assert(n <= max_);
     uint64_t bitmask = UINT64_C(0xffffffffffffffff) >> (63 - n % 64);
-    return pi_[n / 64].prime_count + popcount64(pi_[n / 64].bits & bitmask);
+    return pi_[n / 64].prime_count + popcount_u64(pi_[n / 64].bits & bitmask);
   }
 
   int64_t size() const

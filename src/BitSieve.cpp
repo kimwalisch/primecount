@@ -85,18 +85,17 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
   if (start_idx == stop_idx)
   {
     uint64_t bits = bits_[start_idx] & (m1 & m2);
-    bit_count = popcount64(bits);
+    bit_count = popcount_u64(bits);
   }
   else
   {
-    uint64_t bits = bits_[start_idx] & m1;
-    bit_count = popcount64(bits);
+    uint64_t start_bits = bits_[start_idx] & m1;
+    bit_count = popcount_u64(start_bits);
 
-    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-      bit_count += popcount64(bits_[i]);
+    bit_count += popcount_u64(&bits_[start_idx + 1], stop_idx - (start_idx + 1));
 
-    bits = bits_[stop_idx] & m2;
-    bit_count += popcount64(bits);
+    uint64_t stop_bits = bits_[stop_idx] & m2;
+    bit_count += popcount_u64(stop_bits);
   }
 
   return bit_count;

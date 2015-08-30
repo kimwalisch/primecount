@@ -36,7 +36,7 @@ PiTable::PiTable(uint64_t max) :
   for (uint64_t i = 0; i < pi_.size(); i++)
   {
     pi_[i].prime_count = pix;
-    pix += popcount64(pi_[i].bits);
+    pix += popcount_u64(pi_[i].bits);
   }
 }
 
