@@ -28,6 +28,7 @@
 #include <S2LoadBalancer.hpp>
 #include <tos_counters.hpp>
 #include <S1.hpp>
+#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -42,36 +43,23 @@ using namespace primecount;
 
 namespace {
 
-/// For each prime calculate its first multiple >= low
-vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
-{
-  vector<int64_t> next;
-  next.reserve(size);
-  next.push_back(0);
-
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ceil_div(low, prime) * prime;
-    next_multiple += prime * (~next_multiple & 1);
-    next.push_back(next_multiple);
-  }
-
-  return next;
-}
-
+/// Cross-off the multiples of prime in the sieve array.
+/// For each element that is unmarked the first time update
+/// the special counters tree data structure.
+///
 template <typename T>
-void cross_off(int64_t prime,
+void cross_off(BitSieve& sieve,
                int64_t low,
                int64_t high,
-               int64_t& next_multiple,
-               BitSieve& sieve,
+               int64_t prime,
+               WheelItem& w,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple;
+  int64_t k = w.next_multiple;
+  int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * 2)
+  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     if (sieve[k - low])
     {
@@ -79,7 +67,9 @@ void cross_off(int64_t prime,
       cnt_update(counters, k - low, segment_size);
     }
   }
-  next_multiple = k;
+
+  w.next_multiple = k;
+  w.wheel_index = wheel_index;
 }
 
 /// Compute the S2 contribution of the hard special leaves.
@@ -110,14 +100,14 @@ int64_t S2_hard_thread(int64_t x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
   int64_t pi_max = pi[max_prime];
+  int64_t S2_thread = 0;
 
   if (c > pi_max)
     return 0;
 
-  int64_t S2_thread = 0;
   BitSieve sieve(segment_size);
+  Wheel wheel(primes, low, pi_max + 1, c);
   vector<int32_t> counters(segment_size);
-  vector<int64_t> next = generate_next_multiples(low, pi_max + 1, primes);
   phi.resize(pi_max + 1, 0);
   mu_sum.resize(pi_max + 1, 0);
 
@@ -134,10 +124,10 @@ int64_t S2_hard_thread(int64_t x,
     // simply sieve out the multiples of the first c primes
     for (int64_t i = 2; i <= c; i++)
     {
-      int64_t k = next[i];
+      int64_t k = wheel[i].next_multiple;
       for (int64_t prime = primes[i]; k < high; k += prime * 2)
         sieve.unset(k - low);
-      next[i] = k;
+      wheel[i].next_multiple = k;
     }
 
     // Initialize special tree data structure from sieve
@@ -168,7 +158,7 @@ int64_t S2_hard_thread(int64_t x,
       }
 
       phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      cross_off(sieve, low, high, prime, wheel[b], counters);
     }
 
     // For pi_sqrty <= b <= pi_sqrtz
@@ -194,7 +184,7 @@ int64_t S2_hard_thread(int64_t x,
       }
 
       phi[b] += cnt_query(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      cross_off(sieve, low, high, prime, wheel[b], counters);
     }
 
     next_segment:;
