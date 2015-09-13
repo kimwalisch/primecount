@@ -17,7 +17,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 #include <vector>
 
 namespace primecount {
@@ -55,7 +54,6 @@ public:
         int64_t size,
         int64_t c)
   {
-    assert(size <= primes.size());
     int64_t b = 1;
 
     wheelItems_.reserve(size);
