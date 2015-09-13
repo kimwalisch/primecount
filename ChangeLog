@@ -4,6 +4,8 @@
 
   * include/Wheel.hpp: New wheel factorization data structures.
   * src/deleglise-rivat/S2_hard.cpp: Use wheel factorization.
+  * src/lmo/pi_lmo5.cpp: Use wheel factorization.
+  * src/lmo/pi_lmo_parallel5.cpp: Use wheel factorization.
   * include/popcount.hpp: Faster popcount algorithm for CPUs without POPCNT.
 
 2015-04-12 Kim Walisch  <kim.walisch@gmail.com>

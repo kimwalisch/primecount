@@ -20,6 +20,7 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
+#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -31,25 +32,28 @@ using namespace primecount;
 namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off elements.
+/// @return  Count of crossed-off multiples.
 ///
-int64_t cross_off(int64_t prime,
+int64_t cross_off(BitSieve& sieve,
                   int64_t low,
                   int64_t high,
-                  int64_t& next_multiple,
-                  BitSieve& sieve)
+                  int64_t prime,
+                  WheelItem& w)
 {
   int64_t unset = 0;
-  int64_t k = next_multiple;
+  int64_t k = w.next_multiple;
+  int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * 2)
+  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     // +1 if k is unset the first time
     unset += sieve[k - low];
     sieve.unset(k - low);
   }
 
-  next_multiple = k;
+  w.next_multiple = k;
+  w.wheel_index = wheel_index;
+
   return unset;
 }
 
@@ -73,8 +77,8 @@ int64_t S2(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
 
   BitSieve sieve(segment_size);
+  Wheel wheel(primes, /* low = */ 1, (int64_t) primes.size(), c);
   vector<int32_t> pi = generate_pi(y);
-  vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
   int64_t S2_result = 0;
@@ -94,10 +98,10 @@ int64_t S2(int64_t x,
     // simply sieve out the multiples of the first c primes
     for (; b <= c; b++)
     {
-      int64_t k = next[b];
+      int64_t k = wheel[b].next_multiple;
       for (int64_t prime = primes[b]; k < high; k += prime * 2)
         sieve.unset(k - low);
-      next[b] = k;
+      wheel[b].next_multiple = k;
     }
 
     int64_t count_low_high = sieve.count((high - 1) - low);
@@ -130,7 +134,7 @@ int64_t S2(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(prime, low, high, next[b], sieve);
+      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
     }
 
     // For pi_sqrty <= b < pi_y
@@ -158,7 +162,7 @@ int64_t S2(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(prime, low, high, next[b], sieve);
+      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
     }
 
     next_segment:;

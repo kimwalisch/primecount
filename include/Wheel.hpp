@@ -45,6 +45,11 @@ struct WheelItem
   int8_t wheel_index;
 };
 
+/// Wheel factorization for the computation of the special leaves in
+/// the LMO and Deleglise-Rivat prime counting algorithms.
+/// This class is not suited for sieving primes as it will remove
+/// multiples and primes (e.g. 3, 6, 9, ...) from the sieve array.
+///
 class Wheel
 {
 public:
