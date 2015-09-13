@@ -104,7 +104,6 @@ public:
   }
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
-    assert(i < 8);
     int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;
     *wheel_index = nextWheel210[*wheel_index].next_wheel_index;
     return next_multiple_factor;
