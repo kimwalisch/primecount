@@ -16,15 +16,15 @@
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <fast_div.hpp>
 #include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
-#include <Wheel.hpp>
 #include <tos_counters.hpp>
-#include <fast_div.hpp>
+#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -145,8 +145,8 @@ T S2_hard_thread(T x,
   if (c > max_b)
     return s2_hard;
 
-  Wheel wheel(primes, low, max_b + 1, c);
   BitSieve sieve(segment_size);
+  Wheel wheel(primes, low, max_b + 1, c);
   vector<int32_t> counters;
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);

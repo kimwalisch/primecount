@@ -94,8 +94,8 @@ int64_t S2_thread(int64_t x,
   if (c >= size - 1)
     return 0;
 
-  Wheel wheel(primes, low, size, c);
   BitSieve sieve(segment_size);
+  Wheel wheel(primes, low, size, c);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 
