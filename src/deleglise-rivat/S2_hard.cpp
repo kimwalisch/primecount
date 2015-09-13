@@ -16,12 +16,13 @@
 #include <FactorTable.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
-#include <generate.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
+#include <Wheel.hpp>
 #include <tos_counters.hpp>
 #include <fast_div.hpp>
 
@@ -48,23 +49,26 @@ namespace S2_hard {
 /// Cross-off the multiples of prime in the sieve array.
 /// @return  Count of crossed-off multiples.
 ///
-int64_t cross_off(int64_t prime,
+int64_t cross_off(BitSieve& sieve,
                   int64_t low,
                   int64_t high,
-                  int64_t& next_multiple,
-                  BitSieve& sieve)
+                  int64_t prime,
+                  WheelItem& w)
 {
   int64_t unset = 0;
-  int64_t k = next_multiple;
+  int64_t k = w.next_multiple;
+  int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * 2)
+  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     // +1 if k is unset the first time
     unset += sieve[k - low];
     sieve.unset(k - low);
   }
 
-  next_multiple = k;
+  w.next_multiple = k;
+  w.wheel_index = wheel_index;
+
   return unset;
 }
 
@@ -73,17 +77,18 @@ int64_t cross_off(int64_t prime,
 /// the special counters tree data structure.
 ///
 template <typename T>
-void cross_off(int64_t prime,
+void cross_off(BitSieve& sieve,
                int64_t low,
                int64_t high,
-               int64_t& next_multiple,
-               BitSieve& sieve,
+               int64_t prime,
+               WheelItem& w,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple;
+  int64_t k = w.next_multiple;
+  int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * 2)
+  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     if (sieve[k - low])
     {
@@ -92,26 +97,8 @@ void cross_off(int64_t prime,
     }
   }
 
-  next_multiple = k;
-}
-
-/// @return  vector with multiples >= low.
-template <typename T>
-vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<T>& primes)
-{
-  vector<int64_t> next;
-  next.reserve(size);
-  next.push_back(0);
-
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ceil_div(low, prime) * prime;
-    next_multiple += prime * (~next_multiple & 1);
-    next.push_back(next_multiple);
-  }
-
-  return next;
+  w.next_multiple = k;
+  w.wheel_index = wheel_index;
 }
 
 /// @return  true if the interval [low, high] contains
@@ -132,7 +119,7 @@ bool is_popcnt(int64_t low,
 /// [1, low_process[ are later reconstructed and added in
 /// the parent S2_hard() function.
 ///
-template <typename T, typename P, typename F>
+template <typename T, typename FactorTable, typename Primes>
 T S2_hard_thread(T x,
                  int64_t y,
                  int64_t z,
@@ -143,9 +130,9 @@ T S2_hard_thread(T x,
                  int64_t low,
                  int64_t limit,
                  double alpha,
-                 FactorTable<F>& factors,
+                 FactorTable& factors,
                  PiTable& pi,
-                 vector<P>& primes,
+                 Primes& primes,
                  vector<int64_t>& mu_sum,
                  vector<int64_t>& phi)
 {
@@ -158,9 +145,9 @@ T S2_hard_thread(T x,
   if (c > max_b)
     return s2_hard;
 
+  Wheel wheel(primes, low, max_b + 1, c);
   BitSieve sieve(segment_size);
   vector<int32_t> counters;
-  vector<int64_t> next = generate_next_multiples(low, max_b + 1, primes);
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);
 
@@ -177,10 +164,10 @@ T S2_hard_thread(T x,
     // simply sieve out the multiples of the first c primes.
     for (int64_t i = 2; i <= c; i++)
     {
-      int64_t k = next[i];
+      int64_t k = wheel[i].next_multiple;
       for (int64_t prime = primes[i]; k < high; k += prime * 2)
         sieve.unset(k - low);
-      next[i] = k;
+      wheel[i].next_multiple = k;
     }
 
     // Calculate the contribution of the hard special leaves using the
@@ -227,7 +214,7 @@ T S2_hard_thread(T x,
         }
 
         phi[b] += count_low_high;
-        count_low_high -= cross_off(prime, low, high, next[b], sieve);
+        count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
       }
 
       // For pi_sqrty <= b <= pi_sqrtz
@@ -259,7 +246,7 @@ T S2_hard_thread(T x,
         }
 
         phi[b] += count_low_high;
-        count_low_high -= cross_off(prime, low, high, next[b], sieve);
+        count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
       }
     }
     else
@@ -307,7 +294,7 @@ T S2_hard_thread(T x,
         }
 
         phi[b] += cnt_query(counters, (high - 1) - low);
-        cross_off(prime, low, high, next[b], sieve, counters);
+        cross_off(sieve, low, high, prime, wheel[b], counters);
       }
 
       // For pi_sqrty <= b <= pi_sqrtz
@@ -335,7 +322,7 @@ T S2_hard_thread(T x,
         }
 
         phi[b] += cnt_query(counters, (high - 1) - low);
-        cross_off(prime, low, high, next[b], sieve, counters);
+        cross_off(sieve, low, high, prime, wheel[b], counters);
       }
     }
 
@@ -353,14 +340,14 @@ T S2_hard_thread(T x,
 /// per thread, after each iteration we dynamically increase
 /// the segment size and the segments per thread.
 ///
-template <typename T, typename P, typename F>
+template <typename T, typename FactorTable, typename Primes>
 T S2_hard(T x,
           int64_t y,
           int64_t z,
           int64_t c,
           T s2_hard_approx,
-          vector<P>& primes,
-          FactorTable<F>& factors,
+          Primes& primes,
+          FactorTable& factors,
           int threads)
 {
   threads = validate_threads(threads, z);
