@@ -54,7 +54,7 @@ void S2Status::print(maxint_t n, maxint_t limit)
 
     ostringstream oss;
     oss << "\r" << string(12,' ');
-    oss << "\rStatus: " << percent << "%";
+    oss << "\rStatus: " << fixed << setprecision(2) << percent << "%";
     cout << oss.str() << flush;
   }
 }
