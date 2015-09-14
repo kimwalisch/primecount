@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <stdexcept>
 #include <stdio.h>
@@ -335,12 +336,25 @@ T S2_hard_thread(T x,
 
   return s2_hard;
 }
+
 maxint_t get_next_line(ifstream& infile)
 {
   string line;
   getline(infile, line);
   size_t pos = line.find(" = ") + 3;
   return to_maxint(line.substr(pos, line.size() - pos));
+}
+
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
 }
 
 template <typename T>
@@ -351,6 +365,7 @@ void save_file(T x,
                int64_t segment_size,
                int64_t segments_per_thread,
                T s2_hard,
+               double time,
                vector<int64_t>& phi_total)
 {
   ofstream outfile("S2_hard.txt");
@@ -365,6 +380,7 @@ void save_file(T x,
   outfile << "segment_size = " << segment_size << endl;
   outfile << "segments_per_thread = " << segments_per_thread << endl;
   outfile << "s2_hard = " << s2_hard << endl;
+  outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
   outfile.close();
 
   FILE * pFile;
@@ -383,6 +399,7 @@ void read_file(T x,
                int64_t* segment_size,
                int64_t* segments_per_thread,
                T* s2_hard,
+               double* time,
                vector<int64_t>& phi_total)
 {
   ifstream infile("S2_hard.txt");
@@ -398,6 +415,7 @@ void read_file(T x,
       int64_t segment_size2 = (int64_t) get_next_line(infile);
       int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
       T s2_hard2 = get_next_line(infile);
+      double seconds = get_next_double(infile);
       infile.close();
 
       // only resume if S2_hard.txt matches the
@@ -412,6 +430,7 @@ void read_file(T x,
         *segment_size = segment_size2;
         *segments_per_thread = segments_per_thread2;
         *s2_hard = s2_hard2;
+        *time -= seconds;
 
         if (print_status())
         {
@@ -420,6 +439,7 @@ void read_file(T x,
           cout << "segment_size = " << *segment_size << endl;
           cout << "segments_per_thread = " << *segments_per_thread << endl;
           cout << "s2_hard = " << *s2_hard << endl;
+          cout << "Seconds = " << seconds << endl;
           cout << endl;
         }
 
@@ -453,7 +473,8 @@ T S2_hard(T x,
           T s2_hard_approx,
           Primes& primes,
           FactorTable& factors,
-          int threads)
+          int threads,
+          double& time)
 {
   threads = validate_threads(threads, z);
 
@@ -470,9 +491,9 @@ T S2_hard(T x,
   PiTable pi(max_prime);
   vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
   double alpha = get_alpha(x, y);
-  double time = get_wtime();
 
-  read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, phi_total);
+  read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
+  double backup_time = get_wtime();
 
   while (low < limit)
   {
@@ -510,16 +531,16 @@ T S2_hard(T x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
-    if (get_wtime() - time > 3600)
+    if (get_wtime() - backup_time > 3600)
     {
-      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, phi_total);
-      time = get_wtime();
+      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, phi_total);
+      backup_time = get_wtime();
     }
     if (print_status())
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
-  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, phi_total);
+  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, phi_total);
   return s2_hard;
 }
 
@@ -545,7 +566,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = z / isqrt(y);
   vector<int32_t> primes = generate_primes(max_prime);
 
-  int64_t s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads, time);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -575,7 +596,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
 
-    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
   }
   else
   {
@@ -583,7 +604,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     vector<int64_t> primes = generate_primes<int64_t>(max_prime);
 
-    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
   }
 
   print("S2_hard", s2_hard, time);
