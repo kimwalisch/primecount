@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <stdexcept>
 #include <vector>
 
@@ -45,6 +46,18 @@ maxint_t get_next_line(ifstream& infile)
   return to_maxint(line.substr(pos, line.size() - pos));
 }
 
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
+}
+
 template <typename T>
 void save_file(T x,
                int64_t y,
@@ -52,7 +65,8 @@ void save_file(T x,
                int64_t b,
                int64_t b_max,
                int64_t c,
-               T s2_easy)
+               T s2_easy,
+               double time)
 {
   ofstream outfile("S2_easy.txt");
 
@@ -65,6 +79,7 @@ void save_file(T x,
     outfile << "b_max = " << b_max << endl;
     outfile << "c = " << c << endl;
     outfile << "s2_easy = " << s2_easy << endl;
+    outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
     outfile.close();
   }
 }
@@ -76,7 +91,8 @@ void read_file(T x,
                int64_t* b,
                int64_t b_max,
                int64_t c,
-               T* s2_easy)
+               T* s2_easy,
+               double* time)
 {
   ifstream infile("S2_easy.txt");
 
@@ -91,6 +107,7 @@ void read_file(T x,
       int64_t b_max2 = (int64_t) get_next_line(infile);
       int64_t c2 = (int64_t) get_next_line(infile);
       T s2_easy2 = get_next_line(infile);
+      double seconds = get_next_double(infile);
       infile.close();
 
       // only resume if S2_easy.txt matches the
@@ -105,6 +122,7 @@ void read_file(T x,
       {
         *b = b2;
         *s2_easy = s2_easy2;
+        *time -= seconds;
 
         if (print_status())
         {
@@ -112,6 +130,7 @@ void read_file(T x,
           cout << "b = " << *b << endl;
           cout << "b_max = " << b_max << endl;
           cout << "s2_easy = " << *s2_easy << endl;
+          cout << "Seconds = " << seconds << endl;
           cout << endl;
         }
 
@@ -136,7 +155,8 @@ T1 S2_easy(T1 x,
            int64_t z,
            int64_t c,
            vector<T2>& primes,
-           int threads)
+           int threads,
+           double& time)
 {
   T1 s2_easy = 0;
   int64_t x13 = iroot<3>(x);
@@ -150,8 +170,8 @@ T1 S2_easy(T1 x,
   int64_t start = max(c, pi_sqrty) + 1;
   int64_t indexes_per_thread = 1;
 
-  read_file(x, y, z, &start, pi_x13, c, &s2_easy);
-  double time = get_wtime();
+  read_file(x, y, z, &start, pi_x13, c, &s2_easy, &time);
+  double backup_time = get_wtime();
 
   while (start <= pi_x13)
   {
@@ -202,20 +222,20 @@ T1 S2_easy(T1 x,
       s2_easy += sum;
     }
 
-    if (get_wtime() - time < 3600)
+    if (get_wtime() - backup_time < 3600)
       indexes_per_thread *= 2;
     else
     {
       indexes_per_thread = max(indexes_per_thread / 2, 1);
-      save_file(x, y, z, stop, pi_x13, c, s2_easy);
-      time = get_wtime();
+      save_file(x, y, z, stop, pi_x13, c, s2_easy, time);
+      backup_time = get_wtime();
     }
 
     start = stop + 1;
   }
 
   // save final result to file
-  save_file(x, y, z, pi_x13, pi_x13, c, s2_easy);
+  save_file(x, y, z, pi_x13, pi_x13, c, s2_easy, time);
 
   return s2_easy;
 }
@@ -238,7 +258,7 @@ int64_t S2_easy(int64_t x,
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
-  int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads, time);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -264,12 +284,12 @@ int128_t S2_easy(int128_t x,
   if (y <= numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
   }
   else
   {
     vector<int64_t> primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
   }
 
   print("S2_easy", s2_easy, time);
