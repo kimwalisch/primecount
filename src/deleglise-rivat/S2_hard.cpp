@@ -356,7 +356,7 @@ void save_file(T x,
   ofstream outfile("S2_hard.txt");
 
   if (!outfile.is_open())
-    throw runtime_error("failed to write S2_hard.txt");
+    throw primecount_error("failed to write S2_hard.txt");
 
   outfile << "x = " << x << endl;
   outfile << "y = " << y << endl;
@@ -370,7 +370,7 @@ void save_file(T x,
   FILE * pFile;
   pFile = fopen("S2_hard.bin", "wb");
   if (pFile == NULL)
-    throw runtime_error("failed to write S2_hard.bin");
+    throw primecount_error("failed to write S2_hard.bin");
   fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
   fclose(pFile);
 }
@@ -426,14 +426,14 @@ void read_file(T x,
         FILE * pFile;
         pFile = fopen( "S2_hard.bin" , "rb");
         if (pFile == NULL)
-          throw runtime_error("failed to read S2_hard.bin");
+          throw primecount_error("failed to read S2_hard.bin");
         fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
         fclose(pFile);
       }
     }
     catch (std::exception&)
     {
-      throw runtime_error("failed to read S2_hard.txt");
+      throw primecount_error("failed to read S2_hard.txt");
     }
   }
 }

@@ -120,7 +120,7 @@ void read_file(T x,
     }
     catch (std::exception&)
     {
-      throw runtime_error("failed to read S2_easy.txt");
+      throw primecount_error("failed to read S2_easy.txt");
     }
   }
 }

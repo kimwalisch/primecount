@@ -73,7 +73,7 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
     ostringstream oss;
     oss << f1 << "(" << x << ") = " << res1
         << " is an error, the correct result is " << res2;
-    throw runtime_error(oss.str());
+    throw primecount_error(oss.str());
   }
 }
 
@@ -94,7 +94,7 @@ void test_phi_thread_safety(int64_t iters)
     single_thread_sum += pi_legendre(base + i, 1);
 
   if (multi_thread_sum != single_thread_sum)
-    throw runtime_error("Error: multi-threaded phi(x, a) is broken.");
+    throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
 
   std::cout << "\rTesting phi(x, a) 100%" << endl;
 #endif
@@ -133,7 +133,7 @@ bool test()
 #endif
     CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11,  70);
   }
-  catch (runtime_error& e)
+  catch (primecount_error& e)
   {
     cerr << endl << e.what() << endl;
     return false;

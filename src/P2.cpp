@@ -246,7 +246,7 @@ void read_file(T x,
     }
     catch (std::exception&)
     {
-      throw runtime_error("failed to read P2.txt");
+      throw primecount_error("failed to read P2.txt");
     }
   }
 }
