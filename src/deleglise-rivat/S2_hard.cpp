@@ -470,9 +470,10 @@ T S2_hard(T x,
   PiTable pi(max_prime);
   vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
   double alpha = get_alpha(x, y);
+  double time = get_wtime();
 
   read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, phi_total);
-  double time = get_wtime();
+
   while (low < limit)
   {
     int64_t segments = ceil_div(limit - low, segment_size);
