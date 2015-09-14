@@ -21,8 +21,8 @@ public:
   void print(maxint_t n, maxint_t limit);
   void print(maxint_t n, maxint_t limit, double rsd);
 private:
-  int skewed_percent(maxint_t n, maxint_t limit) const;
-  int old_;
+  double skewed_percent(maxint_t n, maxint_t limit) const;
+  double old_;
   double time_;
 };
 
