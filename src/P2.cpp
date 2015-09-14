@@ -341,7 +341,7 @@ T P2(T x, int64_t y, int threads, double& time)
     }
 
     if (print_status())
-      cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
+      cout << "\rStatus: " << fixed << setprecision(2) << get_percent((double) low, (double) limit) << '%' << flush;
   }
 
   save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
