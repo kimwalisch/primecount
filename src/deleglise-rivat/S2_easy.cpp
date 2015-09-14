@@ -11,6 +11,7 @@
 ///
 
 #include <PiTable.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <int128.hpp>
