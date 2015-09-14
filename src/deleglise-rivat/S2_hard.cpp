@@ -386,9 +386,13 @@ void save_file(T x,
 
   FILE * pFile;
   pFile = fopen("S2_hard.bin", "wb");
+
   if (pFile == NULL)
     throw primecount_error("failed to write S2_hard.bin");
-  fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
+
+  if (fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+    throw primecount_error("failed to write S2_hard.bin");
+
   fclose(pFile);
 }
 
@@ -446,9 +450,13 @@ void read_file(T x,
 
         FILE * pFile;
         pFile = fopen( "S2_hard.bin" , "rb");
+
         if (pFile == NULL)
           throw primecount_error("failed to read S2_hard.bin");
-        fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
+
+        if (fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+          throw primecount_error("failed to read S2_hard.bin");
+
         fclose(pFile);
       }
     }
