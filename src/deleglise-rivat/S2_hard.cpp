@@ -28,6 +28,10 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+#include <stdio.h>
 #include <vector>
 
 #ifdef _OPENMP
@@ -331,7 +335,108 @@ T S2_hard_thread(T x,
 
   return s2_hard;
 }
+maxint_t get_next_line(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  return to_maxint(line.substr(pos, line.size() - pos));
+}
 
+template <typename T>
+void save_file(T x,
+               int64_t y,
+               int64_t low,
+               int64_t limit,
+               int64_t segment_size,
+               int64_t segments_per_thread,
+               T s2_hard,
+               vector<int64_t>& phi_total)
+{
+  ofstream outfile("S2_hard.txt");
+
+  if (!outfile.is_open())
+    throw runtime_error("failed to write S2_hard.txt");
+
+  outfile << "x = " << x << endl;
+  outfile << "y = " << y << endl;
+  outfile << "low = " << low << endl;
+  outfile << "limit = " << limit << endl;
+  outfile << "segment_size = " << segment_size << endl;
+  outfile << "segments_per_thread = " << segments_per_thread << endl;
+  outfile << "s2_hard = " << s2_hard << endl;
+  outfile.close();
+
+  FILE * pFile;
+  pFile = fopen("S2_hard.bin", "wb");
+  if (pFile == NULL)
+    throw runtime_error("failed to write S2_hard.bin");
+  fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
+  fclose(pFile);
+}
+
+template <typename T>
+void read_file(T x,
+               int64_t y,
+               int64_t* low,
+               int64_t limit,
+               int64_t* segment_size,
+               int64_t* segments_per_thread,
+               T* s2_hard,
+               vector<int64_t>& phi_total)
+{
+  ifstream infile("S2_hard.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t low2 = (int64_t) get_next_line(infile);
+      int64_t limit2 = (int64_t) get_next_line(infile);
+      int64_t segment_size2 = (int64_t) get_next_line(infile);
+      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      T s2_hard2 = get_next_line(infile);
+      infile.close();
+
+      // only resume if S2_hard.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          low2 > *low &&
+          low2 < limit &&
+          limit == limit2)
+      {
+        *low = low2;
+        *segment_size = segment_size2;
+        *segments_per_thread = segments_per_thread2;
+        *s2_hard = s2_hard2;
+
+        if (print_status())
+        {
+          cout << "=== Resuming from S2_hard.txt ===" << endl;
+          cout << "low = " << *low << endl;
+          cout << "segment_size = " << *segment_size << endl;
+          cout << "segments_per_thread = " << *segments_per_thread << endl;
+          cout << "s2_hard = " << *s2_hard << endl;
+          cout << endl;
+        }
+
+        FILE * pFile;
+        pFile = fopen( "S2_hard.bin" , "rb");
+        if (pFile == NULL)
+          throw runtime_error("failed to read S2_hard.bin");
+        fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile);
+        fclose(pFile);
+      }
+    }
+    catch (std::exception&)
+    {
+      throw runtime_error("failed to read S2_hard.txt");
+    }
+  }
+}
 /// Calculate the contribution of the hard special leaves which
 /// require use of a sieve (to reduce the memory usage).
 /// This is a parallel implementation with advanced load balancing.
@@ -366,6 +471,8 @@ T S2_hard(T x,
   vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
   double alpha = get_alpha(x, y);
 
+  read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, phi_total);
+  double time = get_wtime();
   while (low < limit)
   {
     int64_t segments = ceil_div(limit - low, segment_size);
@@ -402,10 +509,16 @@ T S2_hard(T x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
+    if (get_wtime() - time > 3600)
+    {
+      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, phi_total);
+      time = get_wtime();
+    }
     if (print_status())
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
+  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, phi_total);
   return s2_hard;
 }
 

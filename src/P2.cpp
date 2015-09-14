@@ -21,7 +21,9 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 
 #ifdef _OPENMP
@@ -162,6 +164,93 @@ T P2_thread(T x,
   return P2_thread;
 }
 
+maxint_t get_next_line(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  return to_maxint(line.substr(pos, line.size() - pos));
+}
+
+template <typename T>
+void save_file(T x,
+               int64_t y,
+               int64_t low,
+               int64_t limit,
+               int64_t segments_per_thread,
+               T pix,
+               T p2)
+{
+  ofstream outfile("P2.txt");
+
+  if (outfile.is_open())
+  {
+    outfile << "x = " << x << endl;
+    outfile << "y = " << y << endl;
+    outfile << "low = " << low << endl;
+    outfile << "limit = " << limit << endl;
+    outfile << "segments_per_thread = " << segments_per_thread << endl;
+    outfile << "pix = " << pix << endl;
+    outfile << "p2 = " << p2 << endl;
+    outfile.close();
+  }
+}
+
+template <typename T>
+void read_file(T x,
+               int64_t y,
+               int64_t* low,
+               int64_t limit,
+               int64_t* segments_per_thread,
+               T* pix,
+               T* p2)
+{
+  ifstream infile("P2.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t low2 = (int64_t) get_next_line(infile);
+      int64_t limit2 = (int64_t) get_next_line(infile);
+      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      T pix2 = get_next_line(infile);
+      T p22 = get_next_line(infile);
+      infile.close();
+
+      // only resume if P2.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          low2 > *low &&
+          low2 < limit2 &&
+          limit == limit2)
+      {
+        *low = low2;
+        *segments_per_thread = segments_per_thread2;
+        *pix = pix2;
+        *p2 = p22;
+
+        if (print_status())
+        {
+          cout << "=== Resuming from P2.txt ===" << endl;
+          cout << "low = " << *low << endl;
+          cout << "segments_per_thread = " << *segments_per_thread << endl;
+          cout << "pix = " << *pix << endl;
+          cout << "p2 = " << *p2 << endl;
+          cout << endl;
+        }
+      }
+    }
+    catch (std::exception&)
+    {
+      throw runtime_error("failed to read P2.txt");
+    }
+  }
+}
+
 /// P2(x, y) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime, a = pi(y).
 /// Space complexity: O((x / y)^(1/2)).
@@ -190,6 +279,7 @@ T P2(T x, int64_t y, int threads)
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
   double time = get_wtime();
+  double time_save = get_wtime();
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
@@ -197,6 +287,8 @@ T P2(T x, int64_t y, int threads)
 
   // \sum_{i=a+1}^{b} -(i - 1)
   p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+
+  read_file(x, y, &low, limit, &segments_per_thread, &pix_total, &p2);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < limit)
@@ -222,9 +314,17 @@ T P2(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
 
+    if (get_wtime() - time_save > 3600)
+    {
+      save_file(x, y, low, limit, segments_per_thread, pix_total, p2);
+      time_save = get_wtime();
+    }
+
     if (print_status())
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
+
+  save_file(x, y, limit, limit, segments_per_thread, pix_total, p2);
 
   return p2;
 }
