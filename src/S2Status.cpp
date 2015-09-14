@@ -62,7 +62,7 @@ void S2Status::print(maxint_t n, maxint_t limit)
 void S2Status::print(maxint_t n, maxint_t limit, double rsd)
 {
   double t2 = get_wtime();
-  if (old_ >= 0 && (t2 - time_) < 0.01)
+  if (old_ >= 0 && (t2 - time_) < 0.05)
     return;
 
   time_ = t2;
