@@ -23,7 +23,9 @@
 #include <stdint.h>
 #include <algorithm>
 #include <fstream>
+#include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <stdexcept>
 #include <vector>
 
@@ -173,6 +175,18 @@ maxint_t get_next_line(ifstream& infile)
   return to_maxint(line.substr(pos, line.size() - pos));
 }
 
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
+}
+
 template <typename T>
 void save_file(T x,
                int64_t y,
@@ -180,7 +194,8 @@ void save_file(T x,
                int64_t limit,
                int64_t segments_per_thread,
                T pix,
-               T p2)
+               T p2,
+               double time)
 {
   ofstream outfile("P2.txt");
 
@@ -193,6 +208,7 @@ void save_file(T x,
     outfile << "segments_per_thread = " << segments_per_thread << endl;
     outfile << "pix = " << pix << endl;
     outfile << "p2 = " << p2 << endl;
+    outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
     outfile.close();
   }
 }
@@ -204,7 +220,8 @@ void read_file(T x,
                int64_t limit,
                int64_t* segments_per_thread,
                T* pix,
-               T* p2)
+               T* p2,
+               double* time)
 {
   ifstream infile("P2.txt");
 
@@ -219,6 +236,7 @@ void read_file(T x,
       int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
       T pix2 = get_next_line(infile);
       T p22 = get_next_line(infile);
+      double seconds = get_next_double(infile);
       infile.close();
 
       // only resume if P2.txt matches the
@@ -233,6 +251,7 @@ void read_file(T x,
         *segments_per_thread = segments_per_thread2;
         *pix = pix2;
         *p2 = p22;
+        *time -= seconds;
 
         if (print_status())
         {
@@ -241,6 +260,7 @@ void read_file(T x,
           cout << "segments_per_thread = " << *segments_per_thread << endl;
           cout << "pix = " << *pix << endl;
           cout << "p2 = " << *p2 << endl;
+          cout << "Seconds = " << seconds << endl;
           cout << endl;
         }
       }
@@ -257,7 +277,7 @@ void read_file(T x,
 /// Space complexity: O((x / y)^(1/2)).
 ///
 template <typename T>
-T P2(T x, int64_t y, int threads)
+T P2(T x, int64_t y, int threads, double& time)
 {
 #if __cplusplus >= 201103L
   static_assert(prt::is_signed<T>::value,
@@ -279,8 +299,7 @@ T P2(T x, int64_t y, int threads)
   vector<int32_t> primes = generate_primes(isqrt(limit));
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
-  double time = get_wtime();
-  double time_save = get_wtime();
+  double backup_time = get_wtime();
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
@@ -289,7 +308,7 @@ T P2(T x, int64_t y, int threads)
   // \sum_{i=a+1}^{b} -(i - 1)
   p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
-  read_file(x, y, &low, limit, &segments_per_thread, &pix_total, &p2);
+  read_file(x, y, &low, limit, &segments_per_thread, &pix_total, &p2, &time);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < limit)
@@ -315,17 +334,17 @@ T P2(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
 
-    if (get_wtime() - time_save > 3600)
+    if (get_wtime() - backup_time > 3600)
     {
-      save_file(x, y, low, limit, segments_per_thread, pix_total, p2);
-      time_save = get_wtime();
+      save_file(x, y, low, limit, segments_per_thread, pix_total, p2, time);
+      backup_time = get_wtime();
     }
 
     if (print_status())
       cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
   }
 
-  save_file(x, y, limit, limit, segments_per_thread, pix_total, p2);
+  save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
 
   return p2;
 }
@@ -343,7 +362,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print(x, y, threads);
 
   double time = get_wtime();
-  int64_t p2 = P2::P2(x, y, threads);
+  int64_t p2 = P2::P2(x, y, threads, time);
 
   print("P2", p2, time);
   return p2;
@@ -359,7 +378,7 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print(x, y, threads);
 
   double time = get_wtime();
-  int128_t p2 = P2::P2(x, y, threads);
+  int128_t p2 = P2::P2(x, y, threads, time);
 
   print("P2", p2, time);
   return p2;
