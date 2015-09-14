@@ -47,15 +47,24 @@ double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
 void S2Status::print(maxint_t n, maxint_t limit)
 {
   double percent = skewed_percent(n, limit);
+
   if (percent - old_ >= 0.01)
   {
-    #pragma omp critical (s2_status)
-    old_ = percent;
+    double t2 = get_wtime();
 
-    ostringstream oss;
-    oss << "\r" << string(12,' ');
-    oss << "\rStatus: " << fixed << setprecision(2) << percent << "%";
-    cout << oss.str() << flush;
+    if (t2 - time_ >= 0.05)
+    {
+      #pragma omp critical (s2_status)
+      {
+        old_ = percent;
+        time_ = t2;
+      }
+
+      ostringstream oss;
+      oss << "\r" << string(12,' ');
+      oss << "\rStatus: " << fixed << setprecision(2) << percent << "%";
+      cout << oss.str() << flush;
+    }
   }
 }
 
