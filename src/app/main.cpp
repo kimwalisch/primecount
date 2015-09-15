@@ -18,10 +18,11 @@
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 
+#include <stdint.h>
 #include <stdexcept>
 #include <iostream>
 #include <limits>
-#include <stdint.h>
+#include <string>
 
 using namespace std;
 using namespace primecount;
@@ -40,10 +41,15 @@ maxint_t P2(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("P2(x): x must be <= " + limit);
+
   if (print_status())
     set_print_variables(true);
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
   if (x <= numeric_limits<int64_t>::max())
@@ -57,10 +63,15 @@ maxint_t S1(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("S1(x): x must be <= " + limit);
+
   if (print_status())
     set_print_variables(true);
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t c = PhiTiny::get_c(y);
 
@@ -75,10 +86,15 @@ maxint_t S2_trivial(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("S2_trivial(x): x must be <= " + limit);
+
   if (print_status())
     set_print_variables(true);
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
@@ -94,10 +110,15 @@ maxint_t S2_easy(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("S2_easy(x): x must be <= " + limit);
+
   if (print_status())
     set_print_variables(true);
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
@@ -113,10 +134,15 @@ maxint_t S2_hard(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
+  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("S2_hard(x): x must be <= " + limit);
+
   if (print_status())
     set_print_variables(true);
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
