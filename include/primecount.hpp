@@ -34,7 +34,7 @@ int64_t pi(int64_t x);
 /// 128-bit prime counting function.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 /// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
-/// @pre   expr  <= primecount::max()
+/// @pre   expr  <= max_x()
 ///
 std::string pi(const std::string& x);
 
@@ -107,10 +107,12 @@ int get_num_threads();
 
 /// Largest integer supported by pi(const std::string& x).
 /// The return type is a string as max may be a 128-bit integer
-/// which is not supported by all compilers.
-/// @return 2^63-1 for 32-bit CPUs, 10^27 for 64-bit CPUs
+/// which is not supported by some compilers.
+/// @param alpha Tuning factor used in LMO type algorithms.
+/// @return for 32-bit CPUs: 2^63-1, 
+///         for 64-bit CPUs: max >= 10^27
 ///
-std::string max();
+std::string max_x(double alpha = 1.0);
 
 /// Test all prime counting function implementations.
 /// @return true if success else false.
