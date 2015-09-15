@@ -1,7 +1,8 @@
-2015-09-13 Kim Walisch  <kim.walisch@gmail.com>
+2015-09-15 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.2 work in progress.
 
+  * src/primecount.cpp: Increase pi(x) limit to 10^31 (previously 10^27).
   * include/Wheel.hpp: New wheel factorization data structures.
   * src/deleglise-rivat/S2_hard.cpp: Use wheel factorization.
   * src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp: Use wheel factorization.
