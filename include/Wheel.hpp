@@ -60,8 +60,6 @@ public:
         int64_t size,
         int64_t c)
   {
-    int64_t b = 1;
-
     wheelItems_.reserve(size);
     // primecount uses 1-indexing, 0-index is a dummy
     wheelItems_.push_back(WheelItem(0, 0));
