@@ -158,17 +158,8 @@ T S2_hard_thread(T x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    sieve.fill(low, high);
-
-    // phi(y, i) nodes with i <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes.
-    for (int64_t i = 2; i <= c; i++)
-    {
-      int64_t k = wheel[i].next_multiple;
-      for (int64_t prime = primes[i]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      wheel[i].next_multiple = k;
-    }
+    // pre-sieve the multiples of the first c primes
+    sieve.pre_sieve(c, low);
 
     // Calculate the contribution of the hard special leaves using the
     // POPCNT algorithm. If there are relatively few special leaves

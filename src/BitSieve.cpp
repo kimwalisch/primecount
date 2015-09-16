@@ -22,7 +22,18 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <vector>
+#include <iostream>
+
+using namespace std;
+
+namespace {
+
+// 1-indexing: primes[1] = 2, primes[2] = 3, ...
+const uint64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+
+}
 
 namespace primecount {
 
@@ -66,6 +77,61 @@ void BitSieve::fill(uint64_t low, uint64_t /* unused */)
     std::fill(bits_.begin(), bits_.end(), UINT64_C(0xAAAAAAAAAAAAAAAA));
   else
     std::fill(bits_.begin(), bits_.end(), UINT64_C(0x5555555555555555));
+}
+
+/// Pre-sieve the multiples (>= low) of the first c primes.
+/// Note that this method pre-sieves both multiples and primes because
+/// this is required in the computation of the special leaves in LMO
+/// type prime counting algorithms.
+///
+void BitSieve::pre_sieve(uint64_t c, uint64_t low)
+{
+  if (!bits_.empty())
+  {
+    // using bytes instead of 64-bit words requires less sieving
+    uint8_t* sieve = (uint8_t*) bits_.data();
+    uint64_t sieve_size = bits_.size() * sizeof(uint64_t);
+
+    // unset multiples of 2 in first byte
+    sieve[0] = ((low % 2 == 0) ? 0xAA : 0x55);
+
+    uint64_t bytes_sieved = 1;
+    uint64_t bytes_copied = 1;
+
+    // pre-sieve multiples of the first c primes
+    for (uint64_t i = 2; i <= c; i++)
+    {
+      uint64_t prime = primes[i];
+      uint64_t end_memcpy = min(bytes_sieved * prime, sieve_size);
+
+      // pre-sieve the multiples of primes < i-th prime
+      // by copying a small pre-sieved buffer
+      while (bytes_copied < end_memcpy)
+      {
+        uint64_t bytes = min(bytes_sieved, sieve_size - bytes_copied);
+        memcpy(&sieve[bytes_copied], sieve, bytes);
+        bytes_copied += bytes;
+      }
+
+      // calculate the first multiple of prime >= low
+      uint64_t next_multiple = ceil_div(low, prime) * prime;
+      next_multiple += prime * (~next_multiple & 1);
+      uint64_t start = next_multiple - low;
+      uint64_t stop = bytes_copied * 8;
+
+      // cross-off the multiples of prime in the interval [low, low + stop[
+      for (uint64_t j = start; j < stop; j += prime * 2)
+        sieve[j / 8] &= (uint8_t) ~(1 << (j % 8));
+
+      bytes_sieved = bytes_copied;
+    }
+
+    for (uint64_t i = bytes_sieved; i < sieve_size; i += bytes_sieved)
+    {
+      uint64_t bytes = min(bytes_sieved, sieve_size - i);
+      memcpy(&sieve[i], sieve, bytes);
+    }
+  }
 }
 
 /// Count the number of 1 bits inside [start, stop]

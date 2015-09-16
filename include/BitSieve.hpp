@@ -30,6 +30,9 @@ public:
   ///
   void fill(uint64_t low, uint64_t /* unused */);
 
+  /// Sieve out the multiples of the first c primes.
+  void pre_sieve(uint64_t c, uint64_t low);
+
   /// Count the number of 1 bits inside the interval [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
 

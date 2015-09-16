@@ -90,19 +90,10 @@ int64_t S2_hard(int64_t x,
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 2;
+    int64_t b = c + 1;
 
-    sieve.fill(low, high);
-
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
-    {
-      int64_t k = next[b];
-      for (int64_t prime = primes[b]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      next[b] = k;
-    }
+    // pre-sieve the multiples of the first c primes
+    sieve.pre_sieve(c, low);
 
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
