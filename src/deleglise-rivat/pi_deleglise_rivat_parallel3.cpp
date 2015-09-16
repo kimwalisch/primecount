@@ -61,7 +61,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
     return 0;
 
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
-  string limit = max_x(alpha);
+  string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))
     throw primecount_error("pi(x): x must be <= " + limit);

@@ -64,7 +64,7 @@ int128_t pi(int128_t x, int threads)
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like "10^12".
-/// @pre   x  <= max_x().
+/// @pre   x  <= get_max_x().
 ///
 string pi(const string& x)
 {
@@ -73,7 +73,7 @@ string pi(const string& x)
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like "10^12".
-/// @pre   x  <= max_x().
+/// @pre   x  <= get_max_x().
 ///
 string pi(const string& x, int threads)
 {
@@ -204,7 +204,7 @@ int64_t phi(int64_t x, int64_t a)
 /// pi(string x). The return type is a string as max may be a
 /// 128-bit integer which is not supported by all compilers.
 ///
-string max_x(double alpha)
+string get_max_x(double alpha)
 {
   ostringstream oss;
 
