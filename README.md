@@ -320,7 +320,7 @@ int64_t primecount::nth_prime          (int64_t n);
 std::string primecount::pi(const std::string& expr);
 
 /// @return  Largest integer supported by pi(const std::string&)
-std::string primecount::max();
+std::string primecount::get_max_x();
 
 int  primecount::get_num_threads();
 void primecount::set_num_threads(int threads);
