@@ -106,7 +106,7 @@ int64_t S2_hard_thread(int64_t x,
     return 0;
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, low, pi_max + 1, c);
+  Wheel wheel(primes, pi_max + 1, low);
   vector<int32_t> counters(segment_size);
   phi.resize(pi_max + 1, 0);
   mu_sum.resize(pi_max + 1, 0);
