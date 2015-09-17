@@ -68,24 +68,17 @@ BitSieve::BitSieve(std::size_t size) :
   size_(size)
 { }
 
-/// Set all bits to 1, except bits corresponding to even numbers.
-/// @warning You must reset 2 when sieving primes.
-///
-void BitSieve::fill(uint64_t low, uint64_t /* unused */)
-{
-  if (low % 2 == 0)
-    std::fill(bits_.begin(), bits_.end(), UINT64_C(0xAAAAAAAAAAAAAAAA));
-  else
-    std::fill(bits_.begin(), bits_.end(), UINT64_C(0x5555555555555555));
-}
-
 /// Pre-sieve the multiples (>= low) of the first c primes.
-/// Note that this method pre-sieves both multiples and primes because
-/// this is required in the computation of the special leaves in LMO
-/// type prime counting algorithms.
+/// @cross_off_primes  Use false to cross-off multiples,
+///                    Use true  to cross-off multiples and primes.
+/// @pre c < 9
 ///
-void BitSieve::pre_sieve(uint64_t c, uint64_t low)
+void BitSieve::pre_sieve(uint64_t c,
+                         uint64_t low,
+                         bool sieve_primes)
 {
+  assert(c < /* primes.size() = */ 9);
+
   if (!bits_.empty())
   {
     // using bytes instead of 64-bit words requires less sieving
@@ -116,6 +109,7 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
       // calculate the first multiple of prime >= low
       uint64_t next_multiple = ceil_div(low, prime) * prime;
       next_multiple += prime * (~next_multiple & 1);
+
       uint64_t start = next_multiple - low;
       uint64_t stop = bytes_copied * 8;
 
@@ -126,10 +120,22 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
       bytes_sieved = bytes_copied;
     }
 
+    // we now have a pre-sieved buffer of size bytes_sieved
+    // which we use to fill up the rest of the sieve
     for (uint64_t i = bytes_sieved; i < sieve_size; i += bytes_sieved)
     {
       uint64_t bytes = min(bytes_sieved, sieve_size - i);
       memcpy(&sieve[i], sieve, bytes);
+    }
+
+    // reset the first c previously unset primes
+    if (sieve_primes)
+    {
+      for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
+      {
+        uint64_t j = primes[i] - low;
+        sieve[j / 8] |= 1 << (j % 8);
+      }
     }
   }
 }

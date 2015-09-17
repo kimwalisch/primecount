@@ -46,19 +46,18 @@ struct WheelItem
 };
 
 /// 4th wheel, skips multiples of 2, 3, 5 and 7.
-/// Wheel factorization for the computation of the special leaves in
-/// the LMO and Deleglise-Rivat prime counting algorithms.
-/// @warning This class is not suited for sieving primes as it
-///          removes multiples and primes from the sieve array.
-///
 class Wheel
 {
 public:
+  /// Calculate the first multiple >= low of each prime.
+  /// When sieving special leaves (sieve_primes = false) both
+  /// multiples and primes are crossed-off.
+  ///
   template <typename Primes>
   Wheel(Primes& primes,
-        int64_t low,
         int64_t size,
-        int64_t c)
+        int64_t low,
+        bool sieve_primes = false)
   {
     wheelItems_.reserve(size);
     // primecount uses 1-indexing, 0-index is a dummy
@@ -71,6 +70,13 @@ public:
 
       // calculate the first multiple of prime >= low
       int64_t multiple = prime * quotient;
+
+      // for sieving primes we start crossing off multiples at the square
+      if (sieve_primes && quotient < prime)
+      {
+        multiple = prime * prime;
+        quotient = prime;
+      }
 
       // calculate the next multiple of prime that is not
       // divisible by any of the wheel's factors (2, 3, 5, 7)
@@ -89,6 +95,9 @@ public:
   {
     return wheelItems_[i];
   }
+  /// Calculate the next multiple of prime using:
+  /// next_multiple = multiple + prime * next_multiple_factor(&wheel_index)
+  ///
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
     int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;

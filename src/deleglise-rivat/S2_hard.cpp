@@ -146,7 +146,7 @@ T S2_hard_thread(T x,
     return s2_hard;
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, low, max_b + 1, c);
+  Wheel wheel(primes, max_b + 1, low);
   vector<int32_t> counters;
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);

@@ -25,13 +25,12 @@ class BitSieve
 public:
   BitSieve(std::size_t size);
 
-  /// Set all bits to 1, except bits corresponding to even numbers.
-  /// @warning You must reset 2 when sieving primes.
+  /// Pre-sieve the multiples (>= low) of the first c primes.
+  /// @param sieve_primes true  to cross-off multiples,
+  ///                     false to cross-off multiples and primes.
+  /// @pre c < 9
   ///
-  void fill(uint64_t low, uint64_t /* unused */);
-
-  /// Sieve out the multiples of the first c primes.
-  void pre_sieve(uint64_t c, uint64_t low);
+  void pre_sieve(uint64_t c, uint64_t low, bool sieve_primes = false);
 
   /// Count the number of 1 bits inside the interval [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
@@ -42,7 +41,10 @@ public:
     return count(0, stop);
   }
 
-  /// Count the number of 1 bits inside the interval [start, stop]
+  /// Count the number of 1 bits inside the interval [start, stop].
+  /// As an optimization this method counts either forwards or
+  /// backwards depending on what's faster.
+  ///
   uint64_t count(uint64_t start,
                  uint64_t stop,
                  uint64_t low,
@@ -63,15 +65,13 @@ public:
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    uint64_t bit = ((uint64_t) 1) << (pos & 63);
-    return (bits_[pos >> 6] & bit) != 0;
+    return (bits_[pos >> 6] & ((uint64_t) 1) << (pos & 63)) != 0;
   }
 
   void set(uint64_t pos)
   {
     assert(pos < size_);
-    uint64_t bit = ((uint64_t) 1) << (pos & 63);
-    bits_[pos >> 6] |= bit;
+    bits_[pos >> 6] |= ((uint64_t) 1) << (pos & 63);
   }
 
   void unset(uint64_t pos)

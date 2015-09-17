@@ -1,13 +1,14 @@
-2015-09-16 Kim Walisch  <kim.walisch@gmail.com>
+2015-09-17 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.2 work in progress.
 
   * src/primecount.cpp: Increase pi(x) limit to 10^31 (previously 10^27).
   * src/BitSieve.cpp: Add pre-sieving of small primes.
-  * include/Wheel.hpp: New wheel factorization data structures.
+  * src/P2.cpp: Use pre-sieving and wheel factorization.
   * src/deleglise-rivat/*: Use pre-sieving and wheel factorization.
   * src/lmo/*: Use pre-sieving and wheel factorization.
   * include/popcount.hpp: Faster popcount algorithm for CPUs without POPCNT.
+  * include/Wheel.hpp: New wheel factorization data structures.
 
 2015-04-12 Kim Walisch  <kim.walisch@gmail.com>
 
