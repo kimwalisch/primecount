@@ -5,7 +5,7 @@
 ///        assigns 64 numbers to the bits of an 8 byte word thus
 ///        reducing the memory usage by a factor of 8.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -106,7 +106,7 @@ void BitSieve::pre_sieve(uint64_t c,
         bytes_copied += bytes;
       }
 
-      // calculate the first multiple of prime >= low
+      // calculate the first multiple >= low of prime
       uint64_t next_multiple = ceil_div(low, prime) * prime;
       next_multiple += prime * (~next_multiple & 1);
 
