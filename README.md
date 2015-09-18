@@ -50,7 +50,7 @@ $ ./primecount 1e14 --nthprime --threads=4 --time
 ### Command-line options
 ```
 Usage: primecount x [OPTION]...
-Count the primes below x <= 10^27 using the prime counting function,
+Count the primes below x <= 10^31 using the prime counting function,
 by default the Deleglise-Rivat algorithm (-d) is used.
 
 Options:
