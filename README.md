@@ -7,7 +7,14 @@ to a file once per hour. If your computer crashes and you restart the same
 computation primecount will automatically resume from the backup files.
 
 ### Build instructions (Unix-like OSes)
-To build primecount you need to have installed a C++ compiler and GNU make.
+To build primecount-backup you need to have installed a C++ compiler,
+GNU make and the GNU Build System (a.k.a. Autotools). To install the
+GNU Build System install
+[GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
+[GNU&#160;Automake](http://www.gnu.org/software/automake/) and
+[GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
+using your package manager.
+
 primecount depends on the author's primesieve library, download it from
 http://primesieve.org/downloads and install it using:
 ```sh
@@ -23,23 +30,8 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 
-Finally download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.1.tar.gz">primecount-2.1.tar.gz</a>
-release tarball and build it using:
-```sh
-$ ./configure
-$ make
-$ sudo make install
-```
-
-If you have cloned primecount or downloaded a zip archive from GitHub
-then the GNU Build System (a.k.a. Autotools) must be installed and
-```autogen.sh``` must be executed once. To install the GNU Build
-System install
-[GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
-[GNU&#160;Automake](http://www.gnu.org/software/automake/) and
-[GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
-using your package manager.
+Finally download the primecount-backup.zip archive from GitHub and
+build it using:
 ```sh
 $ ./autogen.sh
 $ ./configure
@@ -64,7 +56,7 @@ To build primecount simply open a Visual Studio Command Prompt and execute:
 ### Command-line options
 ```
 Usage: primecount x [OPTION]...
-Count the primes below x <= 10^27 using the prime counting function,
+Count the primes below x <= 10^31 using the prime counting function,
 by default the Deleglise-Rivat algorithm (-d) is used.
 
 Options:
