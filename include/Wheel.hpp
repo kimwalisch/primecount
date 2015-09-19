@@ -39,8 +39,15 @@ struct NextWheel
 struct WheelItem
 {
   WheelItem(int64_t multiple, int8_t i)
-    : next_multiple(multiple), wheel_index(i)
+    : next_multiple(multiple), 
+      wheel_index(i)
   { }
+  void set(int64_t multiple, 
+           int64_t next_wheel_index)
+  {
+    next_multiple = multiple;
+    wheel_index = (int8_t) next_wheel_index;
+  }
   int64_t next_multiple;
   int8_t wheel_index;
 };
