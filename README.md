@@ -30,8 +30,8 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 
-Finally download the latest primecount
-[backup.zip](https://github.com/kimwalisch/primecount/archive/backup.zip)
+Finally download the latest
+[primecount-backup.zip](https://github.com/kimwalisch/primecount/archive/backup.zip)
 archive from GitHub and build it using:
 ```sh
 $ ./autogen.sh
