@@ -259,7 +259,7 @@ export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 
 Finally download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.1.tar.gz">primecount-2.1.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.2.tar.gz">primecount-2.2.tar.gz</a>
 release tarball and build it using:
 ```sh
 $ ./configure
