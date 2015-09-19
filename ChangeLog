@@ -1,6 +1,9 @@
-2015-09-17 Kim Walisch  <kim.walisch@gmail.com>
+2015-09-19 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 2.2 work in progress.
+  This version runs about 10% faster due to newly added pre-sieving
+  of small primes and wheel factorization.
+
+  Version 2.2 released.
 
   * src/primecount.cpp: Increase pi(x) limit to 10^31 (previously 10^27).
   * src/BitSieve.cpp: Add pre-sieving of small primes.
