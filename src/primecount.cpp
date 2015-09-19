@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <ctime>
+#include <cmath>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -63,18 +64,18 @@ int128_t pi(int128_t x, int threads)
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like "10^12".
-/// @pre   x  <= primecount::max().
+/// @pre   x  <= get_max_x().
 ///
-std::string pi(const std::string& x)
+string pi(const string& x)
 {
   return pi(x, threads_);
 }
 
 /// Alias for the fastest prime counting function in primecount.
 /// @param x  integer or arithmetic expression like "10^12".
-/// @pre   x  <= primecount::max().
+/// @pre   x  <= get_max_x().
 ///
-std::string pi(const std::string& x, int threads)
+string pi(const string& x, int threads)
 {
   maxint_t n = to_maxint(x);
   maxint_t pin = pi(n, threads);
@@ -200,18 +201,28 @@ int64_t phi(int64_t x, int64_t a)
 }
 
 /// Returns the largest integer that can be used with
-/// pi(std::string x). The return type is a string as max may be a
+/// pi(string x). The return type is a string as max may be a
 /// 128-bit integer which is not supported by all compilers.
 ///
-std::string max()
+string get_max_x(double alpha)
 {
-#ifdef HAVE_INT128_T
-  return string("1") + string(27, '0');
-#else
   ostringstream oss;
+
+#ifdef HAVE_INT128_T
+  // primecount is limited by:
+  // z < 2^62, with z = x^(2/3) / alpha
+  // x^(2/3) / alpha < 2^62
+  // x < (2^62 * alpha)^(3/2)
+
+  // safety buffer: use 61 instead of 62 
+  double max_x = pow(pow(2.0, 61.0) * alpha, 3.0 / 2.0);
+  oss << (int128_t) max_x; 
+#else
+  unused_param(alpha); 
   oss << numeric_limits<int64_t>::max();
-  return oss.str();
 #endif
+
+  return oss.str();
 }
 
 /// Get the wall time in seconds.
@@ -239,8 +250,8 @@ int validate_threads(int threads)
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
   threads = validate_threads(threads);
-  threads = (int) std::min((int64_t) threads, sieve_limit / thread_threshold);
-  threads = std::max(1, threads);
+  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = max(1, threads);
   return threads;
 }
 
@@ -307,7 +318,7 @@ int get_num_threads()
   return validate_threads(threads_);
 }
 
-maxint_t to_maxint(const std::string& expr)
+maxint_t to_maxint(const string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;

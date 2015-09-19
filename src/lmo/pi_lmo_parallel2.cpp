@@ -58,17 +58,18 @@ void cross_off(int64_t prime,
                T2& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple + prime * (~next_multiple & 1);
+  int64_t m = next_multiple + prime * (~next_multiple & 1);
 
-  for (; k < high; k += prime * 2)
+  for (; m < high; m += prime * 2)
   {
-    if (sieve[k - low])
+    if (sieve[m - low])
     {
-      sieve[k - low] = 0;
-      cnt_update(counters, k - low, segment_size);
+      sieve[m - low] = 0;
+      cnt_update(counters, m - low, segment_size);
     }
   }
-  next_multiple = k;
+
+  next_multiple = m;
 }
 
 /// Compute the S2 contribution for the interval

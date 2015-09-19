@@ -56,20 +56,19 @@ void cross_off(BitSieve& sieve,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = w.next_multiple;
+  int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
+  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
-    if (sieve[k - low])
+    if (sieve[m - low])
     {
-      sieve.unset(k - low);
-      cnt_update(counters, k - low, segment_size);
+      sieve.unset(m - low);
+      cnt_update(counters, m - low, segment_size);
     }
   }
 
-  w.next_multiple = k;
-  w.wheel_index = wheel_index;
+  w.set(m, wheel_index);
 }
 
 /// Compute the S2 contribution of the hard special leaves.
@@ -106,7 +105,7 @@ int64_t S2_hard_thread(int64_t x,
     return 0;
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, low, pi_max + 1, c);
+  Wheel wheel(primes, pi_max + 1, low);
   vector<int32_t> counters(segment_size);
   phi.resize(pi_max + 1, 0);
   mu_sum.resize(pi_max + 1, 0);
@@ -118,17 +117,8 @@ int64_t S2_hard_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    sieve.fill(low, high);
-
-    // phi(y, i) nodes with i <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (int64_t i = 2; i <= c; i++)
-    {
-      int64_t k = wheel[i].next_multiple;
-      for (int64_t prime = primes[i]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      wheel[i].next_multiple = k;
-    }
+    // pre-sieve the multiples of the first c primes
+    sieve.pre_sieve(c, low);
 
     // Initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);

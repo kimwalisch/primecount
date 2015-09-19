@@ -47,19 +47,17 @@ int64_t cross_off(BitSieve& sieve,
                   WheelItem& w)
 {
   int64_t unset = 0;
-  int64_t k = w.next_multiple;
+  int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
+  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
-    // +1 if k is unset the first time
-    unset += sieve[k - low];
-    sieve.unset(k - low);
+    // +1 if m is unset the first time
+    unset += sieve[m - low];
+    sieve.unset(m - low);
   }
 
-  w.next_multiple = k;
-  w.wheel_index = wheel_index;
-
+  w.set(m, wheel_index);
   return unset;
 }
 
@@ -95,7 +93,7 @@ int64_t S2_thread(int64_t x,
     return 0;
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, low, size, c);
+  Wheel wheel(primes, size, low);
   phi.resize(size, 0);
   mu_sum.resize(size, 0);
 
@@ -104,19 +102,10 @@ int64_t S2_thread(int64_t x,
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = 2;
+    int64_t b = c + 1;
 
-    sieve.fill(low, high);
-
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
-    for (; b <= c; b++)
-    {
-      int64_t k = wheel[b].next_multiple;
-      for (int64_t prime = primes[b]; k < high; k += prime * 2)
-        sieve.unset(k - low);
-      wheel[b].next_multiple = k;
-    }
+    // pre-sieve the multiples of the first c primes
+    sieve.pre_sieve(c, low);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
 

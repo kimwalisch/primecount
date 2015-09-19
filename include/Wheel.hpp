@@ -39,54 +39,51 @@ struct NextWheel
 struct WheelItem
 {
   WheelItem(int64_t multiple, int8_t i)
-    : next_multiple(multiple), wheel_index(i)
+    : next_multiple(multiple), 
+      wheel_index(i)
   { }
+  void set(int64_t multiple, 
+           int64_t next_wheel_index)
+  {
+    next_multiple = multiple;
+    wheel_index = (int8_t) next_wheel_index;
+  }
   int64_t next_multiple;
   int8_t wheel_index;
 };
 
-/// Wheel factorization for the computation of the special leaves in
-/// the LMO and Deleglise-Rivat prime counting algorithms.
-/// This class is not suited for sieving primes as it will remove
-/// multiples and primes (e.g. 3, 6, 9, ...) from the sieve array.
-///
+/// 4th wheel, skips multiples of 2, 3, 5 and 7.
 class Wheel
 {
 public:
+  /// Calculate the first multiple >= low of each prime.
+  /// When sieving special leaves (sieve_primes = false) both
+  /// multiples and primes are crossed-off.
+  ///
   template <typename Primes>
   Wheel(Primes& primes,
-        int64_t low,
         int64_t size,
-        int64_t c)
+        int64_t low,
+        bool sieve_primes = false)
   {
-    int64_t b = 1;
-
     wheelItems_.reserve(size);
     // primecount uses 1-indexing, 0-index is a dummy
     wheelItems_.push_back(WheelItem(0, 0));
 
-    // for the first c primes only multiples of 2 are skipped
-    for (; b < std::min(c + 1, size); b++)
-    {
-      int64_t prime = primes[b];
-      int64_t multiple = ceil_div(low, prime) * prime;
-      multiple += prime * (~multiple & 1);
-
-#if __cplusplus >= 201103L
-      wheelItems_.emplace_back(multiple, 0);
-#else
-      wheelItems_.push_back(WheelItem(multiple, 0));
-#endif
-    }
-
-    for (; b < size; b++)
+    for (int64_t b = 1; b < size; b++)
     {
       int64_t prime = primes[b];
       int64_t quotient = ceil_div(low, prime);
 
       // calculate the first multiple of prime >= low
       int64_t multiple = prime * quotient;
-      if (multiple % 2 == 0) { multiple += prime; quotient += 1; }
+
+      // for sieving primes we start crossing off multiples at the square
+      if (sieve_primes && quotient < prime)
+      {
+        multiple = prime * prime;
+        quotient = prime;
+      }
 
       // calculate the next multiple of prime that is not
       // divisible by any of the wheel's factors (2, 3, 5, 7)
@@ -105,6 +102,9 @@ public:
   {
     return wheelItems_[i];
   }
+  /// Calculate the next multiple of prime using:
+  /// next_multiple = multiple + prime * next_multiple_factor(&wheel_index)
+  ///
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
     int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;

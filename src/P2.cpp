@@ -16,9 +16,10 @@
 #include <aligned_vector.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
+#include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
-#include <int128.hpp>
+#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -58,6 +59,32 @@ private:
   int64_t prime_;
 };
 
+/// Cross-off the multiples inside [low, high[
+/// of the primes <= sqrt(high - 1).
+///
+void cross_off(BitSieve& sieve,
+               vector<int32_t> primes,
+               Wheel& wheel,
+               int64_t c,
+               int64_t low,
+               int64_t high)
+{
+  int64_t pi_sqrt_high = pi_bsearch(primes, isqrt(high - 1));
+
+  for (int64_t i = c + 1; i <= pi_sqrt_high; i++)
+  {
+    int64_t prime = primes[i];
+    int64_t m = wheel[i].next_multiple;
+    int64_t wheel_index = wheel[i].wheel_index;
+
+    // cross-off the multiples of prime inside [low, high[
+    for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
+      sieve.unset(m - low);
+
+    wheel[i].set(m, wheel_index);
+  }
+}
+
 /// Calculate the segments per thread.
 /// The idea is to gradually increase the segments per thread (based
 /// on elapsed time) in order to keep all CPU cores busy. 
@@ -75,25 +102,6 @@ int64_t balanceLoad(int64_t segments_per_thread, double seconds1, double time1)
     segments_per_thread -= segments_per_thread / 4;
 
   return segments_per_thread;
-}
-
-/// For each prime calculate its first multiple >= low
-vector<int64_t> generate_next_multiples(int64_t low, int64_t size, vector<int32_t>& primes)
-{
-  vector<int64_t> next;
-  next.reserve(size);
-  next.push_back(0);
-
-  for (int64_t b = 1; b < size; b++)
-  {
-    int64_t prime = primes[b];
-    int64_t next_multiple = ceil_div(low, prime) * prime;
-    next_multiple += prime * (~next_multiple & 1);
-    next_multiple = max(prime * prime, next_multiple);
-    next.push_back(next_multiple);
-  }
-
-  return next;
 }
 
 template <typename T>
@@ -123,7 +131,8 @@ T P2_thread(T x,
   int64_t prime = prime_iter.previous_prime();
   int64_t xp = (int64_t) (x / prime);
 
-  vector<int64_t> next = generate_next_multiples(low, size, primes);
+  bool sieve_primes = true;
+  Wheel wheel(primes, size, low, sieve_primes);
   BitSieve sieve(segment_size);
 
   // segmented sieve of Eratosthenes
@@ -131,24 +140,14 @@ T P2_thread(T x,
   {
     // current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t sqrt = isqrt(high - 1);
+    int64_t c = 6;
     int64_t j = 0;
 
-    sieve.fill(low, high);
+    // pre-sieve the multiples of the first c primes
+    sieve.pre_sieve(c, low, sieve_primes);
 
-    // reset previously unset prime 2
-    if (low <= 2)
-      sieve.set(2 - low);
-
-    // cross-off multiples
-    for (int64_t i = 2; i < size && primes[i] <= sqrt; i++)
-    {
-      int64_t k;
-      int64_t p2 = primes[i] * 2;
-      for (k = next[i]; k < high; k += p2)
-        sieve.unset(k - low);
-      next[i] = k;
-    }
+    // cross-off the multiples of the primes <= sqrt(high - 1)
+    cross_off(sieve, primes, wheel, c, low, high);
 
     while (prime >= start && 
            xp < high)

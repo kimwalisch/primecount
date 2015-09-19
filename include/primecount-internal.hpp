@@ -157,6 +157,11 @@ T S2_approx(T x, int64_t pi_y, T P2, T S1)
   return S2;
 }
 
+/// Silence unused parameter compiler warning
+template<class T>
+void unused_param(const T&)
+{ }
+
 } // namespace primecount
 
 #endif

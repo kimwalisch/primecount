@@ -5,7 +5,7 @@
 ///        assigns 64 numbers to the bits of an 8 byte word thus
 ///        reducing the memory usage by a factor of 8.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,7 +22,18 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <vector>
+#include <iostream>
+
+using namespace std;
+
+namespace {
+
+// 1-indexing: primes[1] = 2, primes[2] = 3, ...
+const uint64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+
+}
 
 namespace primecount {
 
@@ -57,15 +68,76 @@ BitSieve::BitSieve(std::size_t size) :
   size_(size)
 { }
 
-/// Set all bits to 1, except bits corresponding to even numbers.
-/// @warning You must reset 2 when sieving primes.
+/// Pre-sieve the multiples (>= low) of the first c primes.
+/// @cross_off_primes  Use false to cross-off multiples,
+///                    Use true  to cross-off multiples and primes.
+/// @pre c < 9
 ///
-void BitSieve::fill(uint64_t low, uint64_t /* unused */)
+void BitSieve::pre_sieve(uint64_t c,
+                         uint64_t low,
+                         bool sieve_primes)
 {
-  if (low % 2 == 0)
-    std::fill(bits_.begin(), bits_.end(), UINT64_C(0xAAAAAAAAAAAAAAAA));
-  else
-    std::fill(bits_.begin(), bits_.end(), UINT64_C(0x5555555555555555));
+  assert(c < /* primes.size() = */ 9);
+
+  if (!bits_.empty())
+  {
+    // using bytes instead of 64-bit words requires less sieving
+    uint8_t* sieve = (uint8_t*) bits_.data();
+    uint64_t sieve_size = bits_.size() * sizeof(uint64_t);
+
+    // unset multiples of 2 in first byte
+    sieve[0] = ((low % 2 == 0) ? 0xAA : 0x55);
+
+    uint64_t bytes_sieved = 1;
+    uint64_t bytes_copied = 1;
+
+    // pre-sieve multiples of the first c primes
+    for (uint64_t i = 2; i <= c; i++)
+    {
+      uint64_t prime = primes[i];
+      uint64_t end_memcpy = min(bytes_sieved * prime, sieve_size);
+
+      // pre-sieve the multiples of primes < i-th prime
+      // by copying a small pre-sieved buffer
+      while (bytes_copied < end_memcpy)
+      {
+        uint64_t bytes = min(bytes_sieved, sieve_size - bytes_copied);
+        memcpy(&sieve[bytes_copied], sieve, bytes);
+        bytes_copied += bytes;
+      }
+
+      // calculate the first multiple >= low of prime
+      uint64_t next_multiple = ceil_div(low, prime) * prime;
+      next_multiple += prime * (~next_multiple & 1);
+
+      uint64_t start = next_multiple - low;
+      uint64_t stop = bytes_copied * 8;
+
+      // cross-off the multiples of prime in the interval [low, low + stop[
+      for (uint64_t j = start; j < stop; j += prime * 2)
+        sieve[j / 8] &= (uint8_t) ~(1 << (j % 8));
+
+      bytes_sieved = bytes_copied;
+    }
+
+    // we now have a pre-sieved buffer of size bytes_sieved
+    // which we use to fill up the rest of the sieve
+    for (uint64_t i = bytes_sieved; i < sieve_size; i += bytes_sieved)
+    {
+      uint64_t bytes = min(bytes_sieved, sieve_size - i);
+      memcpy(&sieve[i], sieve, bytes);
+    }
+
+    // reset the first c previously unset primes
+    if (sieve_primes)
+    {
+      for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
+      {
+        uint64_t j = primes[i] - low;
+        sieve[j / 8] |= 1 << (j % 8);
+      }
+    }
+  }
 }
 
 /// Count the number of 1 bits inside [start, stop]

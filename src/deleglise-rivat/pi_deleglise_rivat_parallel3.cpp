@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <string>
 
 using namespace std;
 using namespace primecount;
@@ -59,10 +60,12 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   if (x < 2)
     return 0;
 
-  if (x > to_maxint(primecount::max()))
-    throw primecount_error("pi(x): x must be <= " + max());
-
   double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  string limit = get_max_x(alpha);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("pi(x): x must be <= " + limit);
+
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t pi_y = pi_legendre(y, 1);
