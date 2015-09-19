@@ -50,17 +50,18 @@ void cross_off(int64_t prime,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = next_multiple;
+  int64_t m = next_multiple;
 
-  for (; k < high; k += prime * 2)
+  for (; m < high; m += prime * 2)
   {
-    if (sieve[k - low])
+    if (sieve[m - low])
     {
-      sieve.unset(k - low);
-      cnt_update(counters, k - low, segment_size);
+      sieve.unset(m - low);
+      cnt_update(counters, m - low, segment_size);
     }
   }
-  next_multiple = k;
+
+  next_multiple = m;
 }
 
 /// Calculate the contribution of the hard special leaves which
