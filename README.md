@@ -6,6 +6,20 @@ This primecount version saves intermediate results of P2, S2_easy and S2_hard
 to a file once per hour. If your computer crashes and you restart the same
 computation primecount will automatically resume from the backup files.
 
+### Binaries
+Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
+These binaries are statically linked and require a CPU (2010 or later) which
+supports the POPCNT instruction.
+
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.2-win64.zip">primecount-backup-2.2-win64.zip</a>, 380K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.2-linux-x64.tar.gz">primecount-backup-2.2-linux-x64.tar.gz</a>, 936K
+
+SHA1 checksums of the files:
+```sh
+1815630ea53500e1a00fc42bb940ccf51e8bf380  primecount-backup-2.2-win64.zip
+6320ed9cea03f31b1d923340283d6fe3a53fe048  primecount-backup-2.2-linux-x64.tar.gz
+```
+
 ### Build instructions (Unix-like OSes)
 To build primecount-backup you need to have installed a C++ compiler,
 GNU make and the GNU Build System (a.k.a. Autotools). To install the
