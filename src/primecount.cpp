@@ -218,6 +218,7 @@ string get_max_x(double alpha)
   double max_x = pow(pow(2.0, 61.0) * alpha, 3.0 / 2.0);
   oss << (int128_t) max_x; 
 #else
+  unused_param(alpha); 
   oss << numeric_limits<int64_t>::max();
 #endif
 
