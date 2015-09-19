@@ -69,15 +69,14 @@ void cross_off(BitSieve& sieve,
   for (int64_t i = c + 1; i <= pi_sqrt_high; i++)
   {
     int64_t prime = primes[i];
-    int64_t k = wheel[i].next_multiple;
+    int64_t m = wheel[i].next_multiple;
     int64_t wheel_index = wheel[i].wheel_index;
 
     // cross-off the multiples of prime inside [low, high[
-    for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
-      sieve.unset(k - low);
+    for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
+      sieve.unset(m - low);
 
-    wheel[i].next_multiple = k;
-    wheel[i].wheel_index = wheel_index;
+    wheel[i].set(m, wheel_index);
   }
 }
 

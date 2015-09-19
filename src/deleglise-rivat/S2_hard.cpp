@@ -56,19 +56,17 @@ int64_t cross_off(BitSieve& sieve,
                   WheelItem& w)
 {
   int64_t unset = 0;
-  int64_t k = w.next_multiple;
+  int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
+  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
-    // +1 if k is unset the first time
-    unset += sieve[k - low];
-    sieve.unset(k - low);
+    // +1 if m is unset the first time
+    unset += sieve[m - low];
+    sieve.unset(m - low);
   }
 
-  w.next_multiple = k;
-  w.wheel_index = wheel_index;
-
+  w.set(m, wheel_index);
   return unset;
 }
 
@@ -85,20 +83,19 @@ void cross_off(BitSieve& sieve,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = w.next_multiple;
+  int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
+  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
-    if (sieve[k - low])
+    if (sieve[m - low])
     {
-      sieve.unset(k - low);
-      cnt_update(counters, k - low, segment_size);
+      sieve.unset(m - low);
+      cnt_update(counters, m - low, segment_size);
     }
   }
 
-  w.next_multiple = k;
-  w.wheel_index = wheel_index;
+  w.set(m, wheel_index);
 }
 
 /// @return  true if the interval [low, high] contains

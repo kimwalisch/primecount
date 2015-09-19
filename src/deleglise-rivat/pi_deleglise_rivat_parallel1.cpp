@@ -56,20 +56,19 @@ void cross_off(BitSieve& sieve,
                T& counters)
 {
   int64_t segment_size = sieve.size();
-  int64_t k = w.next_multiple;
+  int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
-  for (; k < high; k += prime * Wheel::next_multiple_factor(&wheel_index))
+  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
-    if (sieve[k - low])
+    if (sieve[m - low])
     {
-      sieve.unset(k - low);
-      cnt_update(counters, k - low, segment_size);
+      sieve.unset(m - low);
+      cnt_update(counters, m - low, segment_size);
     }
   }
 
-  w.next_multiple = k;
-  w.wheel_index = wheel_index;
+  w.set(m, wheel_index);
 }
 
 /// Compute the S2 contribution of the hard special leaves.
