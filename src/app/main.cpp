@@ -234,7 +234,7 @@ int main (int argc, char* argv[])
 #endif
     }
   }
-  catch (bad_alloc& e)
+  catch (bad_alloc&)
   {
     cerr << "Error: failed to allocate memory, your system most likely does" << endl
          << "       not have enough memory to run this computation." << endl;
