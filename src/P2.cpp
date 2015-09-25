@@ -54,6 +54,25 @@ private:
   int64_t prime_;
 };
 
+/// Calculate the segments per thread.
+/// The idea is to gradually increase the segments per thread (based
+/// on elapsed time) in order to keep all CPU cores busy. 
+///
+int64_t balanceLoad(int64_t segments_per_thread, double seconds1, double time1)
+{
+  double time2 = get_wtime();
+  double seconds = time2 - seconds1;
+  double time = time2 - time1;
+  double increase_threshold = in_between(0.5, time / 10, 20);
+
+  if (seconds < increase_threshold)
+    segments_per_thread += segments_per_thread * 3;
+  else if (segments_per_thread >= 4)
+    segments_per_thread -= segments_per_thread / 4;
+
+  return segments_per_thread;
+}
+
 /// Cross-off the multiples inside [low, high[
 /// of the primes <= sqrt(high - 1).
 ///
@@ -78,25 +97,6 @@ void cross_off(BitSieve& sieve,
 
     wheel[i].set(m, wheel_index);
   }
-}
-
-/// Calculate the segments per thread.
-/// The idea is to gradually increase the segments per thread (based
-/// on elapsed time) in order to keep all CPU cores busy. 
-///
-int64_t balanceLoad(int64_t segments_per_thread, double seconds1, double time1)
-{
-  double time2 = get_wtime();
-  double seconds = time2 - seconds1;
-  double time = time2 - time1;
-  double increase_threshold = in_between(0.5, time / 10, 20);
-
-  if (seconds < increase_threshold)
-    segments_per_thread += segments_per_thread * 3;
-  else if (segments_per_thread >= 4)
-    segments_per_thread -= segments_per_thread / 4;
-
-  return segments_per_thread;
 }
 
 template <typename T>
@@ -268,45 +268,5 @@ int128_t P2(int128_t x, int64_t y, int threads)
 }
 
 #endif
-
-/// P2_lehmer(x, a) counts the numbers <= x that have exactly 2 prime
-/// factors each exceeding the a-th prime. This implementation is
-/// optimized for small values of a < pi(x^(1/3)) which requires
-/// sieving up to a large limit (x / primes[a]). Sieving is done in
-/// parallel using primesieve (segmented sieve of Eratosthenes).
-/// Space complexity: O(pi(sqrt(x))).
-///
-int64_t P2_lehmer(int64_t x, int64_t a, int threads)
-{
-  print("");
-  print("=== P2_lehmer(x, a) ===");
-  print("Computation of the 2nd partial sieve function");
-
-  double time = get_wtime();
-  vector<int32_t> primes = generate_primes(isqrt(x));
-  vector<int64_t> counts(primes.size());
-
-  int64_t b = pi_bsearch(primes, isqrt(x));
-  int64_t p2 = 0;
-  int64_t pix = 0;
-
-  #pragma omp parallel for schedule(dynamic) \
-      num_threads(validate_threads(threads, b, 1000))
-  for (int64_t i = b; i > a; i--)
-  {
-    int64_t prev = (i == b) ? 0 : x / primes[i + 1] + 1;
-    int64_t xi = x / primes[i];
-    counts[i] = primesieve::count_primes(prev, xi);
-  }
-
-  for (int64_t i = b; i > a; i--)
-  {
-    pix += counts[i];
-    p2 += pix - (i - 1);
-  }
-
-  print("P2", p2, time);
-  return p2;
-}
 
 } // namespace primecount

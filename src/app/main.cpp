@@ -185,8 +185,6 @@ int main (int argc, char* argv[])
         res = pi_legendre(int64_cast(x), threads); break;
       case OPTION_LEHMER:
         res = pi_lehmer(int64_cast(x), threads); break;
-      case OPTION_LEHMER2:
-        res = pi_lehmer2(int64_cast(x), threads); break;
       case OPTION_LMO:
         res = pi_lmo(int64_cast(x), threads); break;
       case OPTION_LMO1:

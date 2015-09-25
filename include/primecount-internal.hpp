@@ -2,7 +2,7 @@
 /// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -113,8 +113,6 @@ int128_t Li_inverse(int128_t);
 int64_t nth_prime(int64_t n, int threads);
 
 int64_t P2(int64_t x, int64_t y, int threads);
-
-int64_t P2_lehmer(int64_t x, int64_t a, int threads);
 
 int64_t P3(int64_t x, int64_t a, int threads);
 
