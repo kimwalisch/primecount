@@ -173,19 +173,23 @@ T P2(T x, int64_t y, int threads)
                 "P2(T x, ...): T must be signed integer type");
 #endif
 
-  T a = pi_legendre(y, 1);
-  T b = pi_legendre((int64_t) isqrt(x), 1);
+  if (x < 4)
+    return 0;
 
-  if (x < 4 || a >= b)
+  T a = pi_legendre(y, threads);
+  T b = pi_legendre((int64_t) isqrt(x), threads);
+
+  if (a >= b)
     return 0;
 
   int64_t low = 2;
   int64_t limit = (int64_t)(x / max(y, 1));
-  int64_t segment_size = max(isqrt(limit), 1 << 12);
+  int64_t sqrt_limit = isqrt(limit);
+  int64_t segment_size = max(sqrt_limit, 1 << 12);
   int64_t segments_per_thread = 1;
   threads = validate_threads(threads, limit);
 
-  vector<int32_t> primes = generate_primes(isqrt(limit));
+  vector<int32_t> primes = generate_primes(sqrt_limit);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
   double time = get_wtime();

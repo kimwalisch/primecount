@@ -250,6 +250,7 @@ int validate_threads(int threads)
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
   threads = validate_threads(threads);
+  thread_threshold = max((int64_t) 1, thread_threshold);
   threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
   threads = max(1, threads);
   return threads;
