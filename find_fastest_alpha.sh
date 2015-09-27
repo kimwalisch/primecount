@@ -74,12 +74,6 @@ function is_smaller
     echo $1'<'$2 | bc -l
 }
 
-# Returns 1 if $1 <= $2, else 0
-function is_smaller_equal
-{
-    echo $1'<='$2 | bc -l
-}
-
 # Returns 1 if $1 > $2, else 0
 function is_greater
 {
@@ -125,7 +119,7 @@ function get_primecount_alpha
 # $1: primecount args
 function get_primecount_seconds
 {
-    sleep 0.1
+    sleep 0.2
     seconds=$(./primecount $1 --time | grep Seconds | cut -d':' -f2 | cut -d' ' -f2)
     echo $seconds
 }
@@ -146,7 +140,7 @@ do
         increment=$(calc "($max_alpha - $new_alpha) / 5")
         increment=$(maximum 0.1 $increment)
 
-        while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
+        while [ $(is_smaller $new_alpha $max_alpha) -eq 1 ]
         do
             seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
 
@@ -156,13 +150,22 @@ do
                 fastest_seconds=$seconds
             fi
 
-            new_alpha=$(calc "$new_alpha + $increment")
+            # Reduce the number of long running primecount benchmarks
+            if [ $(is_greater $seconds 20) -eq 1 ]
+            then
+                repeat=1
+            elif [ $(is_greater $seconds 3) -eq 1 ]
+            then
+                repeat=2
+            fi
 
-            # The benchmark runs too quickly for this small input
-            if [ $(is_equal $fastest_seconds 0) -eq 1 ]
+            # Benchmark runs too quickly for this small input
+            if [ $(is_equal $seconds 0) -eq 1 ]
             then
                 break
             fi
+
+            new_alpha=$(calc "$new_alpha + $increment")
         done
     done
 
@@ -178,7 +181,7 @@ do
             increment=$(calc "($max_alpha - $new_alpha) / 8")
             increment=$(maximum 0.1 $increment)
 
-            while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
+            while [ $(is_smaller $new_alpha $max_alpha) -eq 1 ]
             do
                 seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
 
@@ -195,18 +198,10 @@ do
 
     # When fastest_alpha=1.000 the benchmark ran too quickly to get
     # any meaningful result, so we report undef
-    if [ $(is_smaller_equal $fastest_alpha 1) -eq 1 ]
+    if [ $(is_equal $fastest_alpha 1) -eq 1 ] || \
+       [ $(is_equal $fastest_seconds 0) -eq 1 ]
     then
         fastest_alpha="undef"
-    fi
-
-    # Reduce the number of long running primecount benchmarks
-    if [ $(is_greater $fastest_seconds 20) -eq 1 ]
-    then
-        repeat=1
-    elif [ $(is_greater $fastest_seconds 2) -eq 1 ]
-    then
-        repeat=2
     fi
 
     # Print fastest alpha found for pi(10^$i)
