@@ -41,7 +41,7 @@ maxint_t P2(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))
@@ -63,7 +63,7 @@ maxint_t S1(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))
@@ -86,7 +86,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))
@@ -110,7 +110,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))
@@ -134,7 +134,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))

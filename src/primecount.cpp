@@ -278,13 +278,17 @@ double get_alpha(maxint_t x, int64_t y)
 /// a, b and c are constants that should be determined empirically.
 /// @see ../doc/alpha-factor-tuning.pdf
 ///
-double get_alpha(maxint_t x, double a, double b, double c)
+double get_alpha_lmo(maxint_t x)
 {
   double alpha = get_alpha();
 
   if (alpha < 1)
   {
+    double a = 0.00352628;
+    double b = -0.0656652;
+    double c = 1.00454;
     double logx = log((double) x);
+
     alpha = a * pow(logx, 2) + b * logx + c;
   }
 
@@ -296,13 +300,18 @@ double get_alpha(maxint_t x, double a, double b, double c)
 /// a, b, c and d are constants that should be determined empirically.
 /// @see ../doc/alpha-factor-tuning.pdf
 ///
-double get_alpha(maxint_t x, double a, double b, double c, double d)
+double get_alpha_deleglise_rivat(maxint_t x)
 {
   double alpha = get_alpha();
 
   if (alpha < 1)
   {
+    double a = 0.0017154;
+    double b = -0.0508992;
+    double c = 0.483613;
+    double d = 0.0672202;
     double logx = log((double) x);
+
     alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
   }
 

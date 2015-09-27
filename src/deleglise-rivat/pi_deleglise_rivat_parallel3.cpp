@@ -60,7 +60,7 @@ int128_t pi_deleglise_rivat_parallel3(int128_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
 
   if (x > to_maxint(limit))

@@ -196,7 +196,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.0017154, -0.0508992, 0.483613, 0.0672202);
+  double alpha = get_alpha_deleglise_rivat(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t c = PhiTiny::get_c(y);
