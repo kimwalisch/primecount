@@ -74,6 +74,12 @@ function is_smaller
     echo $1'<'$2 | bc -l
 }
 
+# Returns 1 if $1 <= $2, else 0
+function is_smaller_equal
+{
+    echo $1'<='$2 | bc -l
+}
+
 # Returns 1 if $1 > $2, else 0
 function is_greater
 {
@@ -134,13 +140,14 @@ do
     # This loops tries to get close (< 25%) to the fastest alpha
     for ((j = 0; j < repeat; j++))
     do
-        new_alpha=$(calc "$alpha / 3")
+        pivot=$(calc "$alpha / 2")
+        max_alpha=$(calc "$alpha + $pivot")
+        new_alpha=$(calc "$alpha - $pivot")
         new_alpha=$(maximum 1.000 $new_alpha)
-        max_alpha=$(calc "$alpha + ($alpha / 2)")
-        increment=$(calc "($max_alpha - $new_alpha) / 5")
+        increment=$(calc "($max_alpha - $new_alpha) / 4")
         increment=$(maximum 0.1 $increment)
 
-        while [ $(is_smaller $new_alpha $max_alpha) -eq 1 ]
+        while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
         do
             seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
 
@@ -171,7 +178,7 @@ do
 
     if [ $(is_greater $fastest_seconds 0) -eq 1 ]
     then
-        # This loops tries to get very close (< 2%) to the fastest alpha
+        # This loops tries to get very close (< 1.6%) to the fastest alpha
         for ((j = 0; j < repeat; j++))
         do
             pivot=$(calc "$fastest_alpha / 8")
@@ -181,7 +188,7 @@ do
             increment=$(calc "($max_alpha - $new_alpha) / 8")
             increment=$(maximum 0.1 $increment)
 
-            while [ $(is_smaller $new_alpha $max_alpha) -eq 1 ]
+            while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
             do
                 seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
 
