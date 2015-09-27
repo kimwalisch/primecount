@@ -284,9 +284,9 @@ double get_alpha_lmo(maxint_t x)
 
   if (alpha < 1)
   {
-    double a = 0.00352628;
-    double b = -0.0656652;
-    double c = 1.00454;
+    double a = 0.00156512;
+    double b = -0.0261411;
+    double c = 0.990948;
     double logx = log((double) x);
 
     alpha = a * pow(logx, 2) + b * logx + c;
