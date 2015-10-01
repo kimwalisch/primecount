@@ -282,6 +282,7 @@ double get_alpha_lmo(maxint_t x)
 {
   double alpha = get_alpha();
 
+  // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
     double a = 0.00156512;
@@ -303,16 +304,35 @@ double get_alpha_lmo(maxint_t x)
 double get_alpha_deleglise_rivat(maxint_t x)
 {
   double alpha = get_alpha();
+  double x2 = (double) x;
 
+  // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
-    double a = 0.0017154;
-    double b = -0.0508992;
-    double c = 0.483613;
-    double d = 0.0672202;
-    double logx = log((double) x);
+    if (x2 <= 1e21)
+    {
+      double a = 0.000711339;
+      double b = -0.0160586;
+      double c = 0.123034;
+      double d = 0.802942;
+      double logx = log(x2);
 
-    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
+    else
+    {
+      // Because of CPU cache misses sieving (S2_hard(x) and P2(x))
+      // becomes the main bottleneck above 10^21 . Hence we use a
+      // different alpha formula when x > 10^21 which returns a larger
+      // alpha which reduces sieving but increases S2_easy(x) work.
+      double a = 0.0017154;
+      double b = -0.0508992;
+      double c = 0.483613;
+      double d = 0.0672202;
+      double logx = log(x2);
+
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
   }
 
   return in_between(1, alpha, iroot<6>(x));
