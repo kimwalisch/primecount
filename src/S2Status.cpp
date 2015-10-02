@@ -53,10 +53,10 @@ bool S2Status::is_print(double percent, double new_time) const
 {
   if (new_time - old_time_ >= print_threshold_)
   {
-    int new_percent = (int) (precision_factor_ * percent);
-    int old_percent = (int) (precision_factor_ * percent);
+    int new_val = (int) (precision_factor_ * percent);
+    int old_val = (int) (precision_factor_ * old_percent_);
 
-    return new_percent > old_percent_;
+    return new_val > old_val;
   }
 
   return false;
