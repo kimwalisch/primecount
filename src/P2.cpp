@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #ifdef _OPENMP
@@ -63,7 +64,7 @@ int64_t balanceLoad(int64_t segments_per_thread, double seconds1, double time1)
   double time2 = get_wtime();
   double seconds = time2 - seconds1;
   double time = time2 - time1;
-  double increase_threshold = in_between(0.5, time / 10, 20);
+  double increase_threshold = in_between(0.5, time / 10, 30);
 
   if (seconds < increase_threshold)
     segments_per_thread += segments_per_thread * 3;
@@ -226,7 +227,11 @@ T P2(T x, int64_t y, int threads)
     }
 
     if (print_status())
-      cout << "\rStatus: " << get_percent(low, limit) << '%' << flush;
+    {
+      int precision = get_status_precision(x);
+      double percent = get_percent((double) low, (double) limit);
+      cout << "\rStatus: " << fixed << setprecision(precision) << percent << '%' << flush;
+    }
   }
 
   return p2;

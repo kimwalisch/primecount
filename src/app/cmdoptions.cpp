@@ -146,7 +146,11 @@ PrimeCountOptions parseOptions(int argc, char** argv)
         case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
-        case OPTION_STATUS:  set_print_status(true); pco.time = true; break;
+        case OPTION_STATUS:  set_print_status(true);
+                             if (!option.value.empty())
+                                set_status_precision(option.getValue<int>());
+                             pco.time = true;
+                             break;
         case OPTION_TIME:    pco.time = true; break;
         case OPTION_TEST:    if (test()) exit(0); exit(1);
         case OPTION_VERSION: version(); break;

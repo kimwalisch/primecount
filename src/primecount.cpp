@@ -32,6 +32,8 @@ namespace {
 
 int threads_ = primecount::MAX_THREADS;
 
+int status_precision_ = -1;
+
 double alpha_ = -1;
 
 }
@@ -346,6 +348,30 @@ void set_num_threads(int threads)
 int get_num_threads()
 {
   return validate_threads(threads_);
+}
+
+void set_status_precision(int precision)
+{
+  status_precision_ = in_between(0, precision, 5);
+}
+
+int get_status_precision()
+{
+  return (status_precision_ > 0) ? status_precision_ : 0;
+}
+
+int get_status_precision(maxint_t x)
+{
+  // use default precision when no command-line precision provided
+  if (status_precision_ < 0)
+  {
+    if ((double) x >= 1e23)
+      return 2;
+    if ((double) x >= 1e21)
+      return 1;
+  }
+
+  return (status_precision_ > 0) ? status_precision_ : 0;
 }
 
 maxint_t to_maxint(const string& expr)

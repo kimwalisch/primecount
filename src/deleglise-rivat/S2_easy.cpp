@@ -53,7 +53,7 @@ T1 S2_easy(T1 x,
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  S2Status status;
+  S2Status status(x);
 
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)

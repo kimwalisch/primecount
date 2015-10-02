@@ -105,7 +105,7 @@ void print(const string& res_name, maxint_t res, double time)
 {
   if (print_status())
   {
-    cout << "\r" << string(40,' ') << "\r";
+    cout << "\r" << string(50,' ') << "\r";
     cout << "Status: 100%" << endl;
     cout << res_name << " = " << res << endl;
     print_seconds(get_wtime() - time);

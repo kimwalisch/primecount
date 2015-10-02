@@ -1,9 +1,9 @@
 ///
 /// @file  S2Status.cpp
 /// @brief Print the status of S2(x, y) in percent.
-///        Requires --status command-line flag.
+///        Requires use of --status[=N] command-line flag.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -28,52 +29,83 @@ using namespace std;
 
 namespace primecount {
 
-S2Status::S2Status() :
-  old_(-1),
-  time_(0)
-{ }
+S2Status::S2Status(maxint_t x) :
+  old_percent_(-1),
+  old_time_(0),
+  print_threshold_(0.04),
+  precision_(get_status_precision(x))
+{
+  precision_factor_ = ipow(10, precision_);
+}
 
-int S2Status::skewed_percent(maxint_t n, maxint_t limit) const
+double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
 {
   double exp = 0.96;
   double percent = get_percent((double) n, (double) limit);
   double base = exp + percent / (101 / (1 - exp));
   double min = pow(base, 100.0);
   percent = 100 - in_between(0, 100 * (pow(base, percent) - min) / (1 - min), 100);
-  return max(old_, (int) percent);
+
+  return max(old_percent_, percent);
+}
+
+bool S2Status::is_print(double percent, double new_time) const
+{
+  if (new_time - old_time_ >= print_threshold_)
+  {
+    int new_percent = (int) (precision_factor_ * percent);
+    int old_percent = (int) (precision_factor_ * percent);
+
+    return new_percent > old_percent_;
+  }
+
+  return false;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit)
 {
-  int percent = skewed_percent(n, limit);
-  if (percent > old_)
-  {
-    #pragma omp critical (s2_status)
-    old_ = percent;
+  double percent = skewed_percent(n, limit);
+  double time = get_wtime();
 
-    ostringstream oss;
-    oss << "\r" << string(12,' ');
-    oss << "\rStatus: " << percent << "%";
-    cout << oss.str() << flush;
+  if (is_print(percent, time))
+  {
+    ostringstream status;
+    ostringstream out;
+
+    status << "\rStatus: " << fixed << setprecision(precision_) << percent << "%";
+    string reset_line = string(status.str().length(),' ');
+    out << "\r" << reset_line << status.str();
+    cout << out.str() << flush;
+
+    #pragma omp critical (s2_status)
+    {
+      old_percent_ = percent;
+      old_time_ = time;
+    }
   }
 }
 
 void S2Status::print(maxint_t n, maxint_t limit, double rsd)
 {
-  double t2 = get_wtime();
-  if (old_ >= 0 && (t2 - time_) < 0.01)
-    return;
+  double percent = skewed_percent(n, limit);
+  double time = get_wtime();
 
-  time_ = t2;
-  int percent = skewed_percent(n, limit);
-  int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
-  old_ = percent;
+  if (is_print(percent, time))
+  {
+    ostringstream oss;
+    ostringstream out;
 
-  ostringstream oss;
-  oss << "\r" << string(40,' ');
-  oss << "\rStatus: " << percent << "%, ";
-  oss << "Load balance: " << load_balance << "%";
-  cout << oss.str() << flush;
+    int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+
+    oss << "\rStatus: " << fixed << setprecision(precision_) << percent << "%, ";
+    oss << "Load balance: " << load_balance << "%";
+    string reset_line = string(oss.str().length() + 2,' ');
+    out << "\r" << reset_line << oss.str();
+    cout << out.str() << flush;
+
+    old_percent_ = percent;
+    old_time_ = time;
+  }
 }
 
 } //namespace

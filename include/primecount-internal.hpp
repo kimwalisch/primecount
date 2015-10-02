@@ -122,6 +122,12 @@ int128_t P2(int128_t x, int64_t y, int threads);
 
 #endif
 
+void set_status_precision(int precision);
+
+int get_status_precision();
+
+int get_status_precision(maxint_t x);
+
 void set_alpha(double alpha);
 
 double get_alpha();

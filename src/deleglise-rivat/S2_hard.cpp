@@ -345,7 +345,7 @@ T S2_hard(T x,
   int64_t limit = z + 1;
   int64_t max_prime = z / isqrt(y);
 
-  S2Status status;
+  S2Status status(x);
   S2LoadBalancer loadBalancer(x, y, z, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
