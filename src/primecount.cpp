@@ -301,7 +301,7 @@ double get_alpha_lmo(maxint_t x)
 /// Calculate the Deleglise-Rivat alpha tuning factor.
 /// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
 /// a, b, c and d are constants that should be determined empirically.
-/// @see ../doc/alpha-factor-tuning.pdf
+/// @see ../doc/alpha-tuning-factor.pdf
 ///
 double get_alpha_deleglise_rivat(maxint_t x)
 {
