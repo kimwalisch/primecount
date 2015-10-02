@@ -327,10 +327,10 @@ double get_alpha_deleglise_rivat(maxint_t x)
       // becomes the main bottleneck above 10^21 . Hence we use a
       // different alpha formula when x > 10^21 which returns a larger
       // alpha which reduces sieving but increases S2_easy(x) work.
-      double a = 0.0017154;
-      double b = -0.0508992;
-      double c = 0.483613;
-      double d = 0.0672202;
+      double a = 0.00149385;
+      double b = -0.0378846;
+      double c = 0.294183;
+      double d = 0.536167;
       double logx = log(x2);
 
       alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
