@@ -64,7 +64,8 @@ Options:
          --Li_inverse       Approximate the nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
-  -s,    --status           Print status info during computation
+  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
+                            [N] digits after decimal point e.g. N=1, 99.9%
          --test             Run various correctness tests and exit
          --time             Print the time elapsed in seconds
   -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
