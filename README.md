@@ -305,23 +305,16 @@ complexity can be read <a href="include/primecount.hpp">here</a>.
 ```C++
 /// @file  primecount.hpp
 
-int64_t primecount::pi                 (int64_t x);
-int64_t primecount::pi_deleglise_rivat (int64_t x);
-int64_t primecount::pi_legendre        (int64_t x);
-int64_t primecount::pi_lehmer          (int64_t x);
-int64_t primecount::pi_lmo             (int64_t x);
-int64_t primecount::pi_meissel         (int64_t x);
-int64_t primecount::pi_primesieve      (int64_t x);
-int64_t primecount::nth_prime          (int64_t n);
+/// Count the primes <= x
+int64_t primecount::pi(int64_t x);
 
 /// 128-bit prime counting function.
-/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
 /// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
-/// @pre   expr  <= primecount::max()
+/// @pre   expr  <= primecount::get_max_x()
 std::string primecount::pi(const std::string& expr);
 
-/// @return  Largest integer supported by pi(const std::string&)
-std::string primecount::get_max_x();
+/// Find the nth prime
+int64_t primecount::nth_prime(int64_t n);
 
 int  primecount::get_num_threads();
 void primecount::set_num_threads(int threads);
@@ -336,10 +329,10 @@ Below is an example program that counts the primes below 1000.
 
 int main()
 {
-  int64_t prime_count = primecount::pi(1000);
-  std::cout << "primes below 1000 = " << prime_count << std::endl;
-
-  return 0;
+    int64_t prime_count = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << prime_count << std::endl;
+  
+    return 0;
 }
 ```
 
