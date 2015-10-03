@@ -75,9 +75,10 @@ void S2Status::print(maxint_t n, maxint_t limit)
     ostringstream status;
     ostringstream out;
 
-    status << "\rStatus: " << fixed << setprecision(precision_) << percent << "%";
-    string reset_line = string(status.str().length(),' ');
-    out << "\r" << reset_line << status.str();
+    status << "Status: " << fixed << setprecision(precision_) << percent << "%";
+    size_t spaces = status.str().length();
+    string reset_line = "\r" + string(spaces,' ') + "\r";
+    out << reset_line << status.str();
     cout << out.str() << flush;
 
     #pragma omp critical (s2_status)
@@ -97,13 +98,14 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
     double percent = skewed_percent(n, limit);
     int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
 
-    ostringstream oss;
+    ostringstream status;
     ostringstream out;
 
-    oss << "\rStatus: " << fixed << setprecision(precision_) << percent << "%, ";
-    oss << "Load balance: " << load_balance << "%";
-    string reset_line = string(oss.str().length() + 2,' ');
-    out << "\r" << reset_line << oss.str();
+    status << "Status: " << fixed << setprecision(precision_) << percent << "%, ";
+    status << "Load balance: " << load_balance << "%";
+    size_t spaces = status.str().length() + 2;
+    string reset_line = "\r" + string(spaces,' ') + "\r";
+    out << reset_line << status.str();
     cout << out.str() << flush;
 
     old_percent_ = percent;
