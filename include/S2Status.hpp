@@ -22,7 +22,8 @@ public:
   void print(maxint_t n, maxint_t limit, double rsd);
 private:
   double skewed_percent(maxint_t n, maxint_t limit) const;
-  bool is_print(double percent, double new_time) const;
+  bool is_print(double time) const;
+  bool is_print(double time, double percent) const;
   double old_percent_;
   double old_time_;
   double print_threshold_;
