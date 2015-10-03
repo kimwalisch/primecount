@@ -57,17 +57,14 @@ private:
 
 /// Calculate the segments per thread.
 /// The idea is to gradually increase the segments per thread (based
-/// on elapsed time) in order to keep all CPU cores busy. 
+/// on elapsed time) in order to keep all CPU cores busy.
 ///
-int64_t balanceLoad(int64_t segments_per_thread, double seconds1, double time1)
+int64_t balanceLoad(int64_t segments_per_thread, double start_time)
 {
-  double time2 = get_wtime();
-  double seconds = time2 - seconds1;
-  double time = time2 - time1;
-  double increase_threshold = in_between(0.5, time / 10, 30);
+  double seconds = get_wtime() - start_time;
 
-  if (seconds < increase_threshold)
-    segments_per_thread += segments_per_thread * 3;
+  if (seconds < 30)
+    segments_per_thread *= 2;
   else if (segments_per_thread >= 4)
     segments_per_thread -= segments_per_thread / 4;
 
@@ -145,7 +142,7 @@ T P2_thread(T x,
     // cross-off the multiples of the primes <= sqrt(high - 1)
     cross_off(sieve, primes, wheel, c, low, high);
 
-    while (prime >= start && 
+    while (prime >= start &&
            xp < high)
     {
       pix += sieve.count(j, xp - low);
@@ -187,13 +184,12 @@ T P2(T x, int64_t y, int threads)
   int64_t limit = (int64_t)(x / max(y, 1));
   int64_t sqrt_limit = isqrt(limit);
   int64_t segment_size = max(sqrt_limit, 1 << 12);
-  int64_t segments_per_thread = 1;
+  int64_t segments_per_thread = 64;
   threads = validate_threads(threads, limit);
 
   vector<int32_t> primes = generate_primes(sqrt_limit);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
-  double time = get_wtime();
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
@@ -208,7 +204,7 @@ T P2(T x, int64_t y, int threads)
     int64_t segments = ceil_div(limit - low, segment_size);
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
-    double seconds = get_wtime();
+    double time = get_wtime();
 
     #pragma omp parallel for \
         num_threads(threads) reduction(+: p2)
@@ -217,7 +213,7 @@ T P2(T x, int64_t y, int threads)
          low, limit, pix[i], pix_counts[i], primes);
 
     low += segments_per_thread * threads * segment_size;
-    segments_per_thread = balanceLoad(segments_per_thread, seconds, time);
+    segments_per_thread = balanceLoad(segments_per_thread, time);
 
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
