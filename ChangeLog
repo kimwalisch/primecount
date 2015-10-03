@@ -7,6 +7,7 @@
 
   Version 2.3 work in progress.
 
+  * find_fastest_alpha.sh: Benchmark which finds fastest alpha factors.
   * src/primecount.cpp: Alpha factor tuning.
   * src/P2.cpp: Use multi-threading for initialization.
   * src/S2Status.cpp: --status[=N], N digits after decimal point.
