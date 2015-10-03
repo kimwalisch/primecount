@@ -1,4 +1,4 @@
-2015-10-01 Kim Walisch  <kim.walisch@gmail.com>
+2015-10-03 Kim Walisch  <kim.walisch@gmail.com>
 
   This version runs about 10% faster for x <= 10^21. Because of the
   sieving optimizations implemented in primecount-2.2 we can now
@@ -9,6 +9,7 @@
 
   * src/primecount.cpp: Alpha factor tuning.
   * src/P2.cpp: Use multi-threading for initialization.
+  * src/S2Status.cpp: --status[=N], N digits after decimal point.
   * src/pi_lehmer.cpp: Remove pi_lehmer2(x).
 
 2015-09-19 Kim Walisch  <kim.walisch@gmail.com>
