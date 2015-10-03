@@ -355,11 +355,6 @@ void set_status_precision(int precision)
   status_precision_ = in_between(0, precision, 5);
 }
 
-int get_status_precision()
-{
-  return (status_precision_ > 0) ? status_precision_ : 0;
-}
-
 int get_status_precision(maxint_t x)
 {
   // use default precision when no command-line precision provided
