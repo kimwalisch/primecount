@@ -308,7 +308,7 @@ int64_t primecount::pi(int64_t x);
 /// 128-bit prime counting function.
 /// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
 /// @pre   expr  <= 10^31 on 64-bit systems
-///        expr  <=  2^63 on 32-bit systems
+///        expr    < 2^63 on 32-bit systems
 std::string primecount::pi(const std::string& expr);
 
 /// Find the nth prime
