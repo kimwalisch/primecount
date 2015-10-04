@@ -355,6 +355,7 @@ void save_file(T x,
                int64_t segments_per_thread,
                T s2_hard,
                double time,
+               double percent,
                vector<int64_t>& phi_total)
 {
   ofstream outfile("S2_hard.txt");
@@ -370,6 +371,7 @@ void save_file(T x,
   outfile << "segments_per_thread = " << segments_per_thread << endl;
   outfile << "s2_hard = " << s2_hard << endl;
   outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
+  outfile << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
   outfile.close();
 
   FILE * pFile;
@@ -530,14 +532,14 @@ T S2_hard(T x,
 
     if (get_wtime() - backup_time > 3600)
     {
-      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, phi_total);
+      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
       backup_time = get_wtime();
     }
     if (print_status())
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
-  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, phi_total);
+  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
   return s2_hard;
 }
 

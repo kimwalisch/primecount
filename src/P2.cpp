@@ -197,6 +197,8 @@ void save_file(T x,
 
   if (outfile.is_open())
   {
+    double percent = get_percent((double) low, (double) limit);
+
     outfile << "x = " << x << endl;
     outfile << "y = " << y << endl;
     outfile << "low = " << low << endl;
@@ -205,6 +207,7 @@ void save_file(T x,
     outfile << "pix = " << pix << endl;
     outfile << "p2 = " << p2 << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
+    outfile << "Status: " << fixed << setprecision(get_status_precision(x) << percent << '%' << endl;
     outfile.close();
   }
 }
