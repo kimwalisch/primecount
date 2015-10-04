@@ -50,8 +50,8 @@ $ ./primecount 1e14 --nthprime --threads=4 --time
 ### Command-line options
 ```
 Usage: primecount x [OPTION]...
-Count the primes below x <= 10^31 using the prime counting function,
-by default the Deleglise-Rivat algorithm (-d) is used.
+Count the primes below x <= 10^31 using fast implementations of the
+combinatorial prime counting function.
 
 Options:
 
@@ -80,6 +80,11 @@ Advanced Deleglise-Rivat options:
          --s2_trivial       Only compute the trivial special leaves
          --s2_easy          Only compute the easy special leaves
          --s2_hard          Only compute the hard special leaves
+
+Examples:
+
+  primecount 10**13
+  primecount 10**13 --nthprime --threads=4
 ```
 
 ### Algorithms
