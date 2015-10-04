@@ -298,19 +298,17 @@ To build primecount simply open a Visual Studio Command Prompt and execute:
 ```
 
 ### C++ API
-Below is a list of the functions declared in the ````primecount.hpp```` header
-file. A short description of each function including its run-time and space
-complexity can be read <a href="include/primecount.hpp">here</a>.
+Below is a list of the main functions declared in the ````primecount.hpp````
+header file.
 
 ```C++
-/// @file  primecount.hpp
-
 /// Count the primes <= x
 int64_t primecount::pi(int64_t x);
 
 /// 128-bit prime counting function.
 /// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
-/// @pre   expr  <= primecount::get_max_x()
+/// @pre   expr  <= 10^31 on 64-bit systems
+///        expr  <=  2^63 on 32-bit systems
 std::string primecount::pi(const std::string& expr);
 
 /// Find the nth prime
