@@ -36,6 +36,9 @@ int status_precision_ = -1;
 
 double alpha_ = -1;
 
+// Below 10^7 the Deleglise-Rivat algorithm is slower than LMO
+const int deleglise_rivat_threshold = 10000000;
+
 }
 
 namespace primecount {
@@ -47,7 +50,10 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  return pi_deleglise_rivat(x, threads);
+  if (x < deleglise_rivat_threshold)
+    return pi_lmo(x, threads);
+  else
+    return pi_deleglise_rivat(x, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -59,6 +65,10 @@ int128_t pi(int128_t x)
 
 int128_t pi(int128_t x, int threads)
 {
+  // use 64-bit if possible
+  if (x <= numeric_limits<int64_t>::max())
+    return pi((int64_t) x, threads);
+
   return pi_deleglise_rivat(x, threads);
 }
 
@@ -79,10 +89,9 @@ string pi(const string& x)
 ///
 string pi(const string& x, int threads)
 {
-  maxint_t n = to_maxint(x);
-  maxint_t pin = pi(n, threads);
+  maxint_t pi_x = pi(to_maxint(x), threads);
   ostringstream oss;
-  oss << pin;
+  oss << pi_x;
   return oss.str();
 }
 
