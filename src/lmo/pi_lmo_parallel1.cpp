@@ -220,7 +220,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.00352628, -0.0656652, 1.00454);
+  double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t c = PhiTiny::get_c(y);

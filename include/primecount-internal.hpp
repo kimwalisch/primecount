@@ -2,7 +2,7 @@
 /// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -114,8 +114,6 @@ int64_t nth_prime(int64_t n, int threads);
 
 int64_t P2(int64_t x, int64_t y, int threads);
 
-int64_t P2_lehmer(int64_t x, int64_t a, int threads);
-
 int64_t P3(int64_t x, int64_t a, int threads);
 
 #ifdef HAVE_INT128_T
@@ -124,15 +122,19 @@ int128_t P2(int128_t x, int64_t y, int threads);
 
 #endif
 
+void set_status_precision(int precision);
+
+int get_status_precision(maxint_t x);
+
 void set_alpha(double alpha);
 
 double get_alpha();
 
 double get_alpha(maxint_t x, int64_t y);
 
-double get_alpha(maxint_t x, double a, double b, double c);
+double get_alpha_lmo(maxint_t x);
 
-double get_alpha(maxint_t x, double a, double b, double c, double d);
+double get_alpha_deleglise_rivat(maxint_t x);
 
 double get_wtime();
 

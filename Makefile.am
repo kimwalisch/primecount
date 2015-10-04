@@ -25,7 +25,9 @@ include_HEADERS = \
 
 EXTRA_DIST = \
 	autogen.sh \
-	doc/alpha-factor-tuning.pdf \
+	find_fastest_alpha.sh \
+	doc/alpha-tuning-factor.nb \
+	doc/alpha-tuning-factor.pdf \
 	src/msvc/has_openmp.cpp \
 	Makefile.msvc \
 	README.md

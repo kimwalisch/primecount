@@ -19,8 +19,8 @@ namespace {
 
 const string helpMenu(
   "Usage: primecount x [OPTION]...\n"
-  "Count the primes below x <= 10^31 using the prime counting function,\n"
-  "by default the Deleglise-Rivat algorithm (-d) is used.\n"
+  "Count the primes below x <= 10^31 using fast implementations of the\n"
+  "combinatorial prime counting function.\n"
   "\n"
   "Options:\n"
   "\n"
@@ -33,7 +33,8 @@ const string helpMenu(
   "         --Li_inverse       Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime         Calculate the nth prime\n"
   "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
-  "  -s,    --status           Print status info during computation\n"
+  "  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...\n"
+  "                            [N] digits after decimal point e.g. N=1, 99.9%\n"
   "         --test             Run various correctness tests and exit\n"
   "         --time             Print the time elapsed in seconds\n"
   "  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores\n"

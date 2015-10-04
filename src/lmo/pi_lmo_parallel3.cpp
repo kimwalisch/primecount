@@ -202,7 +202,7 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   threads = validate_threads(threads, limit);
 
-  S2Status status;
+  S2Status status(x);
   S2LoadBalancer loadBalancer(x, y, limit, threads);
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
@@ -268,7 +268,7 @@ int64_t pi_lmo_parallel3(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha = get_alpha(x, 0.00352628, -0.0656652, 1.00454);
+  double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = x / y;

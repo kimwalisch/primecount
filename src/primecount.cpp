@@ -32,7 +32,12 @@ namespace {
 
 int threads_ = primecount::MAX_THREADS;
 
+int status_precision_ = -1;
+
 double alpha_ = -1;
+
+// Below 10^7 the Deleglise-Rivat algorithm is slower than LMO
+const int deleglise_rivat_threshold = 10000000;
 
 }
 
@@ -45,7 +50,10 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  return pi_deleglise_rivat(x, threads);
+  if (x < deleglise_rivat_threshold)
+    return pi_lmo(x, threads);
+  else
+    return pi_deleglise_rivat(x, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -57,7 +65,11 @@ int128_t pi(int128_t x)
 
 int128_t pi(int128_t x, int threads)
 {
-  return pi_deleglise_rivat(x, threads);
+  // use 64-bit if possible
+  if (x <= numeric_limits<int64_t>::max())
+    return pi((int64_t) x, threads);
+  else
+    return pi_deleglise_rivat(x, threads);
 }
 
 #endif
@@ -77,10 +89,9 @@ string pi(const string& x)
 ///
 string pi(const string& x, int threads)
 {
-  maxint_t n = to_maxint(x);
-  maxint_t pin = pi(n, threads);
+  maxint_t pi_x = pi(to_maxint(x), threads);
   ostringstream oss;
-  oss << pin;
+  oss << pi_x;
   return oss.str();
 }
 
@@ -122,8 +133,8 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
     return pi_deleglise_rivat((int64_t) x, threads);
-
-  return pi_deleglise_rivat_parallel3(x, threads);
+  else
+    return pi_deleglise_rivat_parallel3(x, threads);
 }
 
 #endif
@@ -159,9 +170,6 @@ int64_t pi_lmo(int64_t x)
 ///
 int64_t pi_lmo(int64_t x, int threads)
 {
-  if (threads <= 1)
-    return pi_lmo5(x);
-
   return pi_lmo_parallel3(x, threads);
 }
 
@@ -250,6 +258,7 @@ int validate_threads(int threads)
 int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
   threads = validate_threads(threads);
+  thread_threshold = max((int64_t) 1, thread_threshold);
   threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
   threads = max(1, threads);
   return threads;
@@ -277,13 +286,18 @@ double get_alpha(maxint_t x, int64_t y)
 /// a, b and c are constants that should be determined empirically.
 /// @see ../doc/alpha-factor-tuning.pdf
 ///
-double get_alpha(maxint_t x, double a, double b, double c)
+double get_alpha_lmo(maxint_t x)
 {
   double alpha = get_alpha();
 
+  // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
+    double a = 0.00156512;
+    double b = -0.0261411;
+    double c = 0.990948;
     double logx = log((double) x);
+
     alpha = a * pow(logx, 2) + b * logx + c;
   }
 
@@ -293,16 +307,40 @@ double get_alpha(maxint_t x, double a, double b, double c)
 /// Calculate the Deleglise-Rivat alpha tuning factor.
 /// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
 /// a, b, c and d are constants that should be determined empirically.
-/// @see ../doc/alpha-factor-tuning.pdf
+/// @see ../doc/alpha-tuning-factor.pdf
 ///
-double get_alpha(maxint_t x, double a, double b, double c, double d)
+double get_alpha_deleglise_rivat(maxint_t x)
 {
   double alpha = get_alpha();
+  double x2 = (double) x;
 
+  // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
-    double logx = log((double) x);
-    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    if (x2 <= 1e21)
+    {
+      double a = 0.000711339;
+      double b = -0.0160586;
+      double c = 0.123034;
+      double d = 0.802942;
+      double logx = log(x2);
+
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
+    else
+    {
+      // Because of CPU cache misses sieving (S2_hard(x) and P2(x))
+      // becomes the main bottleneck above 10^21 . Hence we use a
+      // different alpha formula when x > 10^21 which returns a larger
+      // alpha which reduces sieving but increases S2_easy(x) work.
+      double a = 0.00149066;
+      double b = -0.0375705;
+      double c = 0.282139;
+      double d = 0.591972;
+      double logx = log(x2);
+
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
   }
 
   return in_between(1, alpha, iroot<6>(x));
@@ -316,6 +354,25 @@ void set_num_threads(int threads)
 int get_num_threads()
 {
   return validate_threads(threads_);
+}
+
+void set_status_precision(int precision)
+{
+  status_precision_ = in_between(0, precision, 5);
+}
+
+int get_status_precision(maxint_t x)
+{
+  // use default precision when no command-line precision provided
+  if (status_precision_ < 0)
+  {
+    if ((double) x >= 1e23)
+      return 2;
+    if ((double) x >= 1e21)
+      return 1;
+  }
+
+  return (status_precision_ > 0) ? status_precision_ : 0;
 }
 
 maxint_t to_maxint(const string& expr)
