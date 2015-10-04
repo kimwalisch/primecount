@@ -68,8 +68,8 @@ int128_t pi(int128_t x, int threads)
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
-
-  return pi_deleglise_rivat(x, threads);
+  else
+    return pi_deleglise_rivat(x, threads);
 }
 
 #endif
@@ -133,8 +133,8 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
     return pi_deleglise_rivat((int64_t) x, threads);
-
-  return pi_deleglise_rivat_parallel3(x, threads);
+  else
+    return pi_deleglise_rivat_parallel3(x, threads);
 }
 
 #endif
@@ -170,9 +170,6 @@ int64_t pi_lmo(int64_t x)
 ///
 int64_t pi_lmo(int64_t x, int threads)
 {
-  if (threads <= 1)
-    return pi_lmo5(x);
-
   return pi_lmo_parallel3(x, threads);
 }
 
