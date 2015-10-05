@@ -40,6 +40,120 @@ using namespace primecount;
 namespace {
 namespace P2 {
 
+maxint_t get_next_line(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  return to_maxint(line.substr(pos, line.size() - pos));
+}
+
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
+}
+
+template <typename T>
+void save_file(T x,
+               int64_t y,
+               int64_t low,
+               int64_t limit,
+               int64_t segments_per_thread,
+               T pix,
+               T p2,
+               double time)
+{
+  ofstream outfile("P2.txt");
+
+  if (outfile.is_open())
+  {
+    double percent = get_percent((double) low, (double) limit);
+
+    outfile << "x = " << x << endl;
+    outfile << "y = " << y << endl;
+    outfile << "low = " << low << endl;
+    outfile << "limit = " << limit << endl;
+    outfile << "segments_per_thread = " << segments_per_thread << endl;
+    outfile << "pix = " << pix << endl;
+    outfile << "p2 = " << p2 << endl;
+    outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
+    outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+    outfile.close();
+  }
+}
+
+template <typename T>
+void read_file(T x,
+               int64_t y,
+               int64_t* low,
+               int64_t limit,
+               int64_t* segments_per_thread,
+               T* pix,
+               T* p2,
+               double* time)
+{
+  ifstream infile("P2.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t low2 = (int64_t) get_next_line(infile);
+      int64_t limit2 = (int64_t) get_next_line(infile);
+      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      T pix2 = get_next_line(infile);
+      T p22 = get_next_line(infile);
+      double seconds = get_next_double(infile);
+      double percent = get_next_double(infile);
+
+      infile.close();
+
+      // only resume if P2.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          low2 > *low &&
+          low2 <= limit2 &&
+          limit == limit2)
+      {
+        *low = low2;
+        *segments_per_thread = segments_per_thread2;
+        *pix = pix2;
+        *p2 = p22;
+        *time -= seconds;
+
+        if (print_status())
+        {
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from P2.txt ---" << endl;
+          cout << "low = " << *low << endl;
+          cout << "segments_per_thread = " << *segments_per_thread << endl;
+          cout << "pix = " << *pix << endl;
+          cout << "p2 = " << *p2 << endl;
+          cout << "Seconds = " << seconds << endl;
+          cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+          cout << endl;
+        }
+      }
+    }
+    catch (std::exception&)
+    {
+      throw primecount_error("failed to read P2.txt");
+    }
+  }
+}
+
 class ReversePrimeIterator
 {
 public:
@@ -163,117 +277,6 @@ T P2_thread(T x,
   return P2_thread;
 }
 
-maxint_t get_next_line(ifstream& infile)
-{
-  string line;
-  getline(infile, line);
-  size_t pos = line.find(" = ") + 3;
-  return to_maxint(line.substr(pos, line.size() - pos));
-}
-
-double get_next_double(ifstream& infile)
-{
-  string line;
-  getline(infile, line);
-  size_t pos = line.find(" = ") + 3;
-  stringstream ss;
-  double d = 0;
-  ss << line.substr(pos, line.size() - pos);
-  ss >> d;
-  return d;
-}
-
-template <typename T>
-void save_file(T x,
-               int64_t y,
-               int64_t low,
-               int64_t limit,
-               int64_t segments_per_thread,
-               T pix,
-               T p2,
-               double time)
-{
-  ofstream outfile("P2.txt");
-
-  if (outfile.is_open())
-  {
-    double percent = get_percent((double) low, (double) limit);
-
-    outfile << "x = " << x << endl;
-    outfile << "y = " << y << endl;
-    outfile << "low = " << low << endl;
-    outfile << "limit = " << limit << endl;
-    outfile << "segments_per_thread = " << segments_per_thread << endl;
-    outfile << "pix = " << pix << endl;
-    outfile << "p2 = " << p2 << endl;
-    outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-    outfile << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
-    outfile.close();
-  }
-}
-
-template <typename T>
-void read_file(T x,
-               int64_t y,
-               int64_t* low,
-               int64_t limit,
-               int64_t* segments_per_thread,
-               T* pix,
-               T* p2,
-               double* time)
-{
-  ifstream infile("P2.txt");
-
-  if (infile.is_open())
-  {
-    try
-    {
-      T x2 = get_next_line(infile);
-      int64_t y2 = (int64_t) get_next_line(infile);
-      int64_t low2 = (int64_t) get_next_line(infile);
-      int64_t limit2 = (int64_t) get_next_line(infile);
-      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
-      T pix2 = get_next_line(infile);
-      T p22 = get_next_line(infile);
-      double seconds = get_next_double(infile);
-      infile.close();
-
-      // only resume if P2.txt matches the
-      // command-line values x and alpha
-      if (x == x2 &&
-          y == y2 &&
-          low2 > *low &&
-          low2 <= limit2 &&
-          limit == limit2)
-      {
-        *low = low2;
-        *segments_per_thread = segments_per_thread2;
-        *pix = pix2;
-        *p2 = p22;
-        *time -= seconds;
-
-        if (print_status())
-        {
-          if (!print_variables())
-            cout << endl;
-
-          cout << "--- Resuming from P2.txt ---" << endl;
-          cout << "low = " << *low << endl;
-          cout << "segments_per_thread = " << *segments_per_thread << endl;
-          cout << "pix = " << *pix << endl;
-          cout << "p2 = " << *p2 << endl;
-          cout << "Seconds = " << seconds << endl;
-          cout << endl;
-        }
-      }
-    }
-    catch (std::exception&)
-    {
-      throw primecount_error("failed to read P2.txt");
-    }
-  }
-}
-
 /// P2(x, y) counts the numbers <= x that have exactly 2 prime
 /// factors each exceeding the a-th prime, a = pi(y).
 /// Space complexity: O((x / y)^(1/2)).
@@ -338,7 +341,7 @@ T P2(T x, int64_t y, int threads, double& time)
         pix_total += pix[i];
       }
 
-      if (get_wtime() - backup_time > 1)
+      if (is_backup(get_wtime() - backup_time))
       {
         save_file(x, y, low, limit, segments_per_thread, pix_total, p2, time);
         backup_time = get_wtime();
@@ -352,7 +355,8 @@ T P2(T x, int64_t y, int threads, double& time)
       }
     }
 
-    save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
+    if (is_backup(get_wtime() - time))
+      save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
   }
 
   return p2;

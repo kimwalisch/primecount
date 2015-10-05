@@ -59,6 +59,8 @@ void initOptionMap()
 {
   optionMap["-a"]                          = OPTION_ALPHA;
   optionMap["--alpha"]                     = OPTION_ALPHA;
+  optionMap["-b"]                          = OPTION_BACKUP;
+  optionMap["--backup"]                    = OPTION_BACKUP;
   optionMap["-d"]                          = OPTION_DELEGLISE_RIVAT;
   optionMap["--deleglise_rivat"]           = OPTION_DELEGLISE_RIVAT;
   optionMap["--deleglise_rivat1"]          = OPTION_DELEGLISE_RIVAT1;
@@ -143,6 +145,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
       switch (optionMap[option.id])
       {
         case OPTION_ALPHA:   set_alpha(to_double(option.value)); break;
+        case OPTION_BACKUP:  set_backup(option.getValue<int>() * 60); break;
         case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;

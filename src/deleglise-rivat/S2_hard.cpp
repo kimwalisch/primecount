@@ -52,6 +52,143 @@ using namespace primecount;
 namespace {
 namespace S2_hard {
 
+maxint_t get_next_line(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  return to_maxint(line.substr(pos, line.size() - pos));
+}
+
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
+}
+
+template <typename T>
+void save_file(T x,
+               int64_t y,
+               int64_t low,
+               int64_t limit,
+               int64_t segment_size,
+               int64_t segments_per_thread,
+               T s2_hard,
+               double time,
+               double percent,
+               vector<int64_t>& phi_total)
+{
+  ofstream outfile("S2_hard.txt");
+
+  if (!outfile.is_open())
+    throw primecount_error("failed to write S2_hard.txt");
+
+  outfile << "x = " << x << endl;
+  outfile << "y = " << y << endl;
+  outfile << "low = " << low << endl;
+  outfile << "limit = " << limit << endl;
+  outfile << "segment_size = " << segment_size << endl;
+  outfile << "segments_per_thread = " << segments_per_thread << endl;
+  outfile << "s2_hard = " << s2_hard << endl;
+  outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
+  outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+  outfile.close();
+
+  FILE * pFile;
+  pFile = fopen("S2_hard.bin", "wb");
+
+  if (pFile == NULL)
+    throw primecount_error("failed to write S2_hard.bin");
+
+  if (fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+    throw primecount_error("failed to write S2_hard.bin");
+
+  fclose(pFile);
+}
+
+template <typename T>
+void read_file(T x,
+               int64_t y,
+               int64_t* low,
+               int64_t limit,
+               int64_t* segment_size,
+               int64_t* segments_per_thread,
+               T* s2_hard,
+               double* time,
+               vector<int64_t>& phi_total)
+{
+  ifstream infile("S2_hard.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t low2 = (int64_t) get_next_line(infile);
+      int64_t limit2 = (int64_t) get_next_line(infile);
+      int64_t segment_size2 = (int64_t) get_next_line(infile);
+      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      T s2_hard2 = get_next_line(infile);
+      double seconds = get_next_double(infile);
+      double percent = get_next_double(infile);
+
+      infile.close();
+
+      // only resume if S2_hard.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          low2 > *low &&
+          low2 <= limit &&
+          limit == limit2)
+      {
+        *low = low2;
+        *segment_size = segment_size2;
+        *segments_per_thread = segments_per_thread2;
+        *s2_hard = s2_hard2;
+        *time -= seconds;
+
+        if (print_status())
+        {
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S2_hard.txt ---" << endl;
+          cout << "low = " << *low << endl;
+          cout << "segment_size = " << *segment_size << endl;
+          cout << "segments_per_thread = " << *segments_per_thread << endl;
+          cout << "s2_hard = " << *s2_hard << endl;
+          cout << "Seconds = " << seconds << endl;
+          cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+          cout << endl;
+        }
+
+        FILE * pFile;
+        pFile = fopen( "S2_hard.bin" , "rb");
+
+        if (pFile == NULL)
+          throw primecount_error("failed to read S2_hard.bin");
+
+        if (fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+          throw primecount_error("failed to read S2_hard.bin");
+
+        fclose(pFile);
+      }
+    }
+    catch (std::exception&)
+    {
+      throw primecount_error("failed to read S2_hard.txt");
+    }
+  }
+}
+
 /// Cross-off the multiples of prime in the sieve array.
 /// @return  Count of crossed-off multiples.
 ///
@@ -326,139 +463,6 @@ T S2_hard_thread(T x,
   return s2_hard;
 }
 
-maxint_t get_next_line(ifstream& infile)
-{
-  string line;
-  getline(infile, line);
-  size_t pos = line.find(" = ") + 3;
-  return to_maxint(line.substr(pos, line.size() - pos));
-}
-
-double get_next_double(ifstream& infile)
-{
-  string line;
-  getline(infile, line);
-  size_t pos = line.find(" = ") + 3;
-  stringstream ss;
-  double d = 0;
-  ss << line.substr(pos, line.size() - pos);
-  ss >> d;
-  return d;
-}
-
-template <typename T>
-void save_file(T x,
-               int64_t y,
-               int64_t low,
-               int64_t limit,
-               int64_t segment_size,
-               int64_t segments_per_thread,
-               T s2_hard,
-               double time,
-               double percent,
-               vector<int64_t>& phi_total)
-{
-  ofstream outfile("S2_hard.txt");
-
-  if (!outfile.is_open())
-    throw primecount_error("failed to write S2_hard.txt");
-
-  outfile << "x = " << x << endl;
-  outfile << "y = " << y << endl;
-  outfile << "low = " << low << endl;
-  outfile << "limit = " << limit << endl;
-  outfile << "segment_size = " << segment_size << endl;
-  outfile << "segments_per_thread = " << segments_per_thread << endl;
-  outfile << "s2_hard = " << s2_hard << endl;
-  outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-  outfile << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
-  outfile.close();
-
-  FILE * pFile;
-  pFile = fopen("S2_hard.bin", "wb");
-
-  if (pFile == NULL)
-    throw primecount_error("failed to write S2_hard.bin");
-
-  if (fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
-    throw primecount_error("failed to write S2_hard.bin");
-
-  fclose(pFile);
-}
-
-template <typename T>
-void read_file(T x,
-               int64_t y,
-               int64_t* low,
-               int64_t limit,
-               int64_t* segment_size,
-               int64_t* segments_per_thread,
-               T* s2_hard,
-               double* time,
-               vector<int64_t>& phi_total)
-{
-  ifstream infile("S2_hard.txt");
-
-  if (infile.is_open())
-  {
-    try
-    {
-      T x2 = get_next_line(infile);
-      int64_t y2 = (int64_t) get_next_line(infile);
-      int64_t low2 = (int64_t) get_next_line(infile);
-      int64_t limit2 = (int64_t) get_next_line(infile);
-      int64_t segment_size2 = (int64_t) get_next_line(infile);
-      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
-      T s2_hard2 = get_next_line(infile);
-      double seconds = get_next_double(infile);
-      infile.close();
-
-      // only resume if S2_hard.txt matches the
-      // command-line values x and alpha
-      if (x == x2 &&
-          y == y2 &&
-          low2 > *low &&
-          low2 <= limit &&
-          limit == limit2)
-      {
-        *low = low2;
-        *segment_size = segment_size2;
-        *segments_per_thread = segments_per_thread2;
-        *s2_hard = s2_hard2;
-        *time -= seconds;
-
-        if (print_status())
-        {
-          if (!print_variables())
-            cout << endl;
-
-          cout << "--- Resuming from S2_hard.txt ---" << endl;
-          cout << "low = " << *low << endl;
-          cout << "segment_size = " << *segment_size << endl;
-          cout << "segments_per_thread = " << *segments_per_thread << endl;
-          cout << "s2_hard = " << *s2_hard << endl;
-          cout << "Seconds = " << seconds << endl;
-          cout << endl;
-        }
-
-        FILE * pFile;
-        pFile = fopen( "S2_hard.bin" , "rb");
-
-        if (pFile == NULL)
-          throw primecount_error("failed to read S2_hard.bin");
-
-        if (fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
-          throw primecount_error("failed to read S2_hard.bin");
-
-        fclose(pFile);
-      }
-    }
-    catch (std::exception&)
-    {
-      throw primecount_error("failed to read S2_hard.txt");
-    }
-  }
-}
 /// Calculate the contribution of the hard special leaves which
 /// require use of a sieve (to reduce the memory usage).
 /// This is a parallel implementation with advanced load balancing.
@@ -490,8 +494,7 @@ T S2_hard(T x,
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
 
-  assert(isqrt(z) <= (int64_t) primes.back());
-  int64_t pi_sqrtz = pi_bsearch(primes, isqrt(z));
+  int64_t pi_sqrtz = pi_legendre(isqrt(z), threads);
   vector<int64_t> phi_total(pi_sqrtz + 1, 0);
 
   read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
@@ -538,16 +541,18 @@ T S2_hard(T x,
       low += segments_per_thread * threads * segment_size;
       loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
 
-      if (get_wtime() - backup_time > 3600)
+      if (print_status())
+        status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
+
+      if (is_backup(get_wtime() - backup_time))
       {
         save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
         backup_time = get_wtime();
       }
-      if (print_status())
-        status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
     }
 
-    save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
+    if (is_backup(get_wtime() - time))
+      save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, 100, phi_total);
   }
 
   return s2_hard;

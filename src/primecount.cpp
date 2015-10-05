@@ -39,6 +39,9 @@ double alpha_ = -1;
 // Below 10^7 the Deleglise-Rivat algorithm is slower than LMO
 const int deleglise_rivat_threshold = 10000000;
 
+// Store a backup file every hour
+double backup_ = 3600;
+
 }
 
 namespace primecount {
@@ -359,6 +362,16 @@ int get_num_threads()
 void set_status_precision(int precision)
 {
   status_precision_ = in_between(0, precision, 5);
+}
+
+bool is_backup(double seconds)
+{
+  return seconds >= backup_;
+}
+
+void set_backup(double seconds)
+{
+  backup_ = seconds;
 }
 
 int get_status_precision(maxint_t x)

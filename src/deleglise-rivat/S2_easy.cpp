@@ -82,7 +82,7 @@ void save_file(T x,
     outfile << "c = " << c << endl;
     outfile << "s2_easy = " << s2_easy << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-    outfile << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+    outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
     outfile.close();
   }
 }
@@ -111,6 +111,8 @@ void read_file(T x,
       int64_t c2 = (int64_t) get_next_line(infile);
       T s2_easy2 = get_next_line(infile);
       double seconds = get_next_double(infile);
+      double percent = get_next_double(infile);
+
       infile.close();
 
       // only resume if S2_easy.txt matches the
@@ -136,6 +138,7 @@ void read_file(T x,
           cout << "b_max = " << b_max << endl;
           cout << "s2_easy = " << *s2_easy << endl;
           cout << "Seconds = " << seconds << endl;
+          cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
           cout << endl;
         }
 
@@ -231,20 +234,22 @@ T1 S2_easy(T1 x,
         s2_easy += sum;
       }
 
-      if (get_wtime() - backup_time < 1)
-        indexes_per_thread *= 2;
-      else
+      if (is_backup(get_wtime() - backup_time))
       {
         indexes_per_thread = max(indexes_per_thread / 2, 1);
         save_file(x, y, z, stop, pi_x13, c, s2_easy, time, status.skewed_percent(stop, pi_x13));
         backup_time = get_wtime();
       }
+      else
+      {
+        indexes_per_thread *= 2;
+      }
 
       start = stop + 1;
     }
 
-    // save final result to file
-    save_file(x, y, z, pi_x13, pi_x13, c, s2_easy, time, 100.0);
+    if (is_backup(get_wtime() - time))
+      save_file(x, y, z, pi_x13, pi_x13, c, s2_easy, time, 100);
   }
 
   return s2_easy;

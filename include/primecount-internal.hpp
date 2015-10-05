@@ -126,6 +126,10 @@ void set_status_precision(int precision);
 
 int get_status_precision(maxint_t x);
 
+void set_backup(double seconds);
+
+bool is_backup(double seconds);
+
 void set_alpha(double alpha);
 
 double get_alpha();

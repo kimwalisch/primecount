@@ -24,6 +24,7 @@ const string helpMenu(
   "\n"
   "Options:\n"
   "\n"
+  "  -b<N>, --backup=<N>       Store backup file every N minutes (default 60)\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
