@@ -120,8 +120,7 @@ void read_file(T x,
           z == z2 &&
           c == c2 &&
           *b < b2 &&
-          b_max == b_max2 &&
-          b2 < b_max2)
+          b_max == b_max2)
       {
         *b = b2;
         *s2_easy = s2_easy2;
@@ -129,7 +128,10 @@ void read_file(T x,
 
         if (print_status())
         {
-          cout << "=== Resuming from S2_easy.txt ===" << endl;
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S2_easy.txt ---" << endl;
           cout << "b = " << *b << endl;
           cout << "b_max = " << b_max << endl;
           cout << "s2_easy = " << *s2_easy << endl;
@@ -166,79 +168,84 @@ T1 S2_easy(T1 x,
   int64_t thread_threshold = 1000;
   threads = validate_threads(threads, x13, thread_threshold);
 
-  PiTable pi(y);
-  int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_x13 = pi[x13];
-  S2Status status(x);
+  int64_t pi_sqrty = pi_bsearch(primes, isqrt(y));
+  int64_t pi_x13 = pi_bsearch(primes, x13);
   int64_t start = max(c, pi_sqrty) + 1;
-  int64_t indexes_per_thread = 1;
 
   read_file(x, y, z, &start, pi_x13, c, &s2_easy, &time);
-  double backup_time = get_wtime();
 
-  while (start <= pi_x13)
+  if (start <= pi_x13)
   {
-    int64_t stop = min(start + indexes_per_thread * threads, pi_x13);
+    PiTable pi(y);
+    S2Status status(x);
+    int64_t indexes_per_thread = 1;
 
-    #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
-    for (int64_t b = start; b <= stop; b++)
+    double backup_time = get_wtime();
+
+    while (start <= pi_x13)
     {
-      int64_t prime = primes[b];
-      T1 x2 = x / prime;
-      int64_t min_trivial_leaf = min(x2 / prime, y);
-      int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
-      int64_t min_sparse_easy_leaf = z / prime;
-      int64_t min_hard_leaf = max(y / prime, prime);
+      int64_t stop = min(start + indexes_per_thread * threads, pi_x13);
 
-      min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
-      min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
-      int64_t l = pi[min_trivial_leaf];
-      T1 sum = 0;
-
-      // Find all clustered easy leaves:
-      // n = primes[b] * primes[l]
-      // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
-      // where phi(x / n, b - 1) = pi(x / n) - b + 2
-      while (primes[l] > min_clustered_easy_leaf)
+      #pragma omp parallel for schedule(dynamic, 1) num_threads(threads) reduction(+: s2_easy)
+      for (int64_t b = start; b <= stop; b++)
       {
-        int64_t xn = (int64_t) fast_div(x2, primes[l]);
-        int64_t phi_xn = pi[xn] - b + 2;
-        int64_t last_prime = primes[b + phi_xn - 1];
-        int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
-        int64_t l2 = pi[xm];
-        sum += phi_xn * (l - l2);
-        l = l2;
+        int64_t prime = primes[b];
+        T1 x2 = x / prime;
+        int64_t min_trivial_leaf = min(x2 / prime, y);
+        int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
+        int64_t min_sparse_easy_leaf = z / prime;
+        int64_t min_hard_leaf = max(y / prime, prime);
+
+        min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
+        min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
+        int64_t l = pi[min_trivial_leaf];
+        T1 sum = 0;
+
+        // Find all clustered easy leaves:
+        // n = primes[b] * primes[l]
+        // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
+        // where phi(x / n, b - 1) = pi(x / n) - b + 2
+        while (primes[l] > min_clustered_easy_leaf)
+        {
+          int64_t xn = (int64_t) fast_div(x2, primes[l]);
+          int64_t phi_xn = pi[xn] - b + 2;
+          int64_t last_prime = primes[b + phi_xn - 1];
+          int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
+          int64_t l2 = pi[xm];
+          sum += phi_xn * (l - l2);
+          l = l2;
+        }
+
+        // Find all sparse easy leaves:
+        // n = primes[b] * primes[l]
+        // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+        for (; primes[l] > min_sparse_easy_leaf; l--)
+        {
+          int64_t xn = (int64_t) fast_div(x2, primes[l]);
+          sum += pi[xn] - b + 2;
+        }
+
+        if (print_status())
+          status.print(b, pi_x13);
+
+        s2_easy += sum;
       }
 
-      // Find all sparse easy leaves:
-      // n = primes[b] * primes[l]
-      // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
-      for (; primes[l] > min_sparse_easy_leaf; l--)
+      if (get_wtime() - backup_time < 1)
+        indexes_per_thread *= 2;
+      else
       {
-        int64_t xn = (int64_t) fast_div(x2, primes[l]);
-        sum += pi[xn] - b + 2;
+        indexes_per_thread = max(indexes_per_thread / 2, 1);
+        save_file(x, y, z, stop, pi_x13, c, s2_easy, time, status.skewed_percent(stop, pi_x13));
+        backup_time = get_wtime();
       }
 
-      if (print_status())
-        status.print(b, pi_x13);
-
-      s2_easy += sum;
+      start = stop + 1;
     }
 
-    if (get_wtime() - backup_time < 3600)
-      indexes_per_thread *= 2;
-    else
-    {
-      indexes_per_thread = max(indexes_per_thread / 2, 1);
-      save_file(x, y, z, stop, pi_x13, c, s2_easy, time, status.skewed_percent(stop, pi_x13));
-      backup_time = get_wtime();
-    }
-
-    start = stop + 1;
+    // save final result to file
+    save_file(x, y, z, pi_x13, pi_x13, c, s2_easy, time, 100.0);
   }
-
-  // save final result to file
-  save_file(x, y, z, pi_x13, pi_x13, c, s2_easy, time, 100.0);
 
   return s2_easy;
 }
