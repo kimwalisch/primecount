@@ -418,7 +418,7 @@ void read_file(T x,
       if (x == x2 &&
           y == y2 &&
           low2 > *low &&
-          low2 < limit &&
+          low2 <= limit &&
           limit == limit2)
       {
         *low = low2;
@@ -429,7 +429,10 @@ void read_file(T x,
 
         if (print_status())
         {
-          cout << "=== Resuming from S2_hard.txt ===" << endl;
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S2_hard.txt ---" << endl;
           cout << "low = " << *low << endl;
           cout << "segment_size = " << *segment_size << endl;
           cout << "segments_per_thread = " << *segments_per_thread << endl;
@@ -487,59 +490,66 @@ T S2_hard(T x,
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
 
-  PiTable pi(max_prime);
-  vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
-  double alpha = get_alpha(x, y);
+  assert(isqrt(z) <= (int64_t) primes.back());
+  int64_t pi_sqrtz = pi_bsearch(primes, isqrt(z));
+  vector<int64_t> phi_total(pi_sqrtz + 1, 0);
 
   read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
-  double backup_time = get_wtime();
 
-  while (low < limit)
+  if (low < limit)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
-    threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+    PiTable pi(max_prime);
+    double backup_time = get_wtime();
+    double alpha = get_alpha(x, y);
 
-    aligned_vector<vector<int64_t> > phi(threads);
-    aligned_vector<vector<int64_t> > mu_sum(threads);
-    aligned_vector<double> timings(threads);
-
-    #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
-    for (int i = 0; i < threads; i++)
+    while (low < limit)
     {
-      timings[i] = get_wtime();
-      s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread, i,
-          low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
-      timings[i] = get_wtime() - timings[i];
-    }
+      int64_t segments = ceil_div(limit - low, segment_size);
+      threads = in_between(1, threads, segments);
+      segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
-    // Once all threads have finished reconstruct and add the 
-    // missing contribution of all special leaves. This must
-    // be done in order as each thread (i) requires the sum of
-    // the phi values from the previous threads.
-    //
-    for (int i = 0; i < threads; i++)
-    {
-      for (size_t j = 1; j < phi[i].size(); j++)
+      aligned_vector<vector<int64_t> > phi(threads);
+      aligned_vector<vector<int64_t> > mu_sum(threads);
+      aligned_vector<double> timings(threads);
+
+      #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
+      for (int i = 0; i < threads; i++)
       {
-        s2_hard += phi_total[j] * (T) mu_sum[i][j];
-        phi_total[j] += phi[i][j];
+        timings[i] = get_wtime();
+        s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread, i,
+            low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
+        timings[i] = get_wtime() - timings[i];
       }
+
+      // Once all threads have finished reconstruct and add the 
+      // missing contribution of all special leaves. This must
+      // be done in order as each thread (i) requires the sum of
+      // the phi values from the previous threads.
+      //
+      for (int i = 0; i < threads; i++)
+      {
+        for (size_t j = 1; j < phi[i].size(); j++)
+        {
+          s2_hard += phi_total[j] * (T) mu_sum[i][j];
+          phi_total[j] += phi[i][j];
+        }
+      }
+
+      low += segments_per_thread * threads * segment_size;
+      loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+
+      if (get_wtime() - backup_time > 3600)
+      {
+        save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
+        backup_time = get_wtime();
+      }
+      if (print_status())
+        status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
     }
 
-    low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
-
-    if (get_wtime() - backup_time > 3600)
-    {
-      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
-      backup_time = get_wtime();
-    }
-    if (print_status())
-      status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
+    save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
   }
 
-  save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
   return s2_hard;
 }
 
