@@ -243,7 +243,7 @@ void read_file(T x,
       if (x == x2 &&
           y == y2 &&
           low2 > *low &&
-          low2 < limit2 &&
+          low2 <= limit2 &&
           limit == limit2)
       {
         *low = low2;
@@ -254,7 +254,10 @@ void read_file(T x,
 
         if (print_status())
         {
-          cout << "=== Resuming from P2.txt ===" << endl;
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from P2.txt ---" << endl;
           cout << "low = " << *low << endl;
           cout << "segments_per_thread = " << *segments_per_thread << endl;
           cout << "pix = " << *pix << endl;
@@ -295,11 +298,6 @@ T P2(T x, int64_t y, int threads, double& time)
   int64_t segments_per_thread = 64;
   threads = validate_threads(threads, limit);
 
-  vector<int32_t> primes = generate_primes(isqrt(limit));
-  aligned_vector<int64_t> pix(threads);
-  aligned_vector<int64_t> pix_counts(threads);
-  double backup_time = get_wtime();
-
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
   T pix_total = 0;
@@ -309,45 +307,53 @@ T P2(T x, int64_t y, int threads, double& time)
 
   read_file(x, y, &low, limit, &segments_per_thread, &pix_total, &p2, &time);
 
-  // \sum_{i=a+1}^{b} pi(x / primes[i])
-  while (low < limit)
+  if (low < limit)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
-    threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
-    double seconds = get_wtime();
+    vector<int32_t> primes = generate_primes(isqrt(limit));
+    aligned_vector<int64_t> pix(threads);
+    aligned_vector<int64_t> pix_counts(threads);
+    double backup_time = get_wtime();
 
-    #pragma omp parallel for \
-        num_threads(threads) reduction(+: p2)
-    for (int i = 0; i < threads; i++)
-      p2 += P2_thread(x, y, segment_size, segments_per_thread, i,
-         low, limit, pix[i], pix_counts[i], primes);
-
-    low += segments_per_thread * threads * segment_size;
-    segments_per_thread = balanceLoad(segments_per_thread, seconds);
-
-    // Add missing sum contributions in order
-    for (int i = 0; i < threads; i++)
+    // \sum_{i=a+1}^{b} pi(x / primes[i])
+    while (low < limit)
     {
-      p2 += pix_total * pix_counts[i];
-      pix_total += pix[i];
+      int64_t segments = ceil_div(limit - low, segment_size);
+      threads = in_between(1, threads, segments);
+      segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+      double seconds = get_wtime();
+
+      #pragma omp parallel for \
+          num_threads(threads) reduction(+: p2)
+      for (int i = 0; i < threads; i++)
+        p2 += P2_thread(x, y, segment_size, segments_per_thread, i,
+           low, limit, pix[i], pix_counts[i], primes);
+
+      low += segments_per_thread * threads * segment_size;
+      segments_per_thread = balanceLoad(segments_per_thread, seconds);
+
+      // Add missing sum contributions in order
+      for (int i = 0; i < threads; i++)
+      {
+        p2 += pix_total * pix_counts[i];
+        pix_total += pix[i];
+      }
+
+      if (get_wtime() - backup_time > 1)
+      {
+        save_file(x, y, low, limit, segments_per_thread, pix_total, p2, time);
+        backup_time = get_wtime();
+      }
+
+      if (print_status())
+      {
+        int precision = get_status_precision(x);
+        double percent = get_percent((double) low, (double) limit);
+        cout << "\rStatus: " << fixed << setprecision(precision) << percent << '%' << flush;
+      }
     }
 
-    if (get_wtime() - backup_time > 3600)
-    {
-      save_file(x, y, low, limit, segments_per_thread, pix_total, p2, time);
-      backup_time = get_wtime();
-    }
-
-    if (print_status())
-    {
-      int precision = get_status_precision(x);
-      double percent = get_percent((double) low, (double) limit);
-      cout << "\rStatus: " << fixed << setprecision(precision) << percent << '%' << flush;
-    }
+    save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
   }
-
-  save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
 
   return p2;
 }
