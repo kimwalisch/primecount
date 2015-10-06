@@ -494,66 +494,61 @@ T S2_hard(T x,
   int64_t segment_size = loadBalancer.get_min_segment_size();
   int64_t segments_per_thread = 1;
 
-  int64_t pi_sqrtz = pi_legendre(isqrt(z), threads);
-  vector<int64_t> phi_total(pi_sqrtz + 1, 0);
+  PiTable pi(max_prime);
+  vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
+  double alpha = get_alpha(x, y);
+  double backup_time = get_wtime();
 
   read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
 
-  if (low < limit)
+  while (low < limit)
   {
-    PiTable pi(max_prime);
-    double backup_time = get_wtime();
-    double alpha = get_alpha(x, y);
+    int64_t segments = ceil_div(limit - low, segment_size);
+    threads = in_between(1, threads, segments);
+    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
-    while (low < limit)
+    aligned_vector<vector<int64_t> > phi(threads);
+    aligned_vector<vector<int64_t> > mu_sum(threads);
+    aligned_vector<double> timings(threads);
+
+    #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
+    for (int i = 0; i < threads; i++)
     {
-      int64_t segments = ceil_div(limit - low, segment_size);
-      threads = in_between(1, threads, segments);
-      segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+      timings[i] = get_wtime();
+      s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread, i,
+          low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
+      timings[i] = get_wtime() - timings[i];
+    }
 
-      aligned_vector<vector<int64_t> > phi(threads);
-      aligned_vector<vector<int64_t> > mu_sum(threads);
-      aligned_vector<double> timings(threads);
-
-      #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
-      for (int i = 0; i < threads; i++)
+    // Once all threads have finished reconstruct and add the 
+    // missing contribution of all special leaves. This must
+    // be done in order as each thread (i) requires the sum of
+    // the phi values from the previous threads.
+    //
+    for (int i = 0; i < threads; i++)
+    {
+      for (size_t j = 1; j < phi[i].size(); j++)
       {
-        timings[i] = get_wtime();
-        s2_hard += S2_hard_thread(x, y, z, c, segment_size, segments_per_thread, i,
-            low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
-        timings[i] = get_wtime() - timings[i];
-      }
-
-      // Once all threads have finished reconstruct and add the 
-      // missing contribution of all special leaves. This must
-      // be done in order as each thread (i) requires the sum of
-      // the phi values from the previous threads.
-      //
-      for (int i = 0; i < threads; i++)
-      {
-        for (size_t j = 1; j < phi[i].size(); j++)
-        {
-          s2_hard += phi_total[j] * (T) mu_sum[i][j];
-          phi_total[j] += phi[i][j];
-        }
-      }
-
-      low += segments_per_thread * threads * segment_size;
-      loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
-
-      if (print_status())
-        status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
-
-      if (is_backup(get_wtime() - backup_time))
-      {
-        save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
-        backup_time = get_wtime();
+        s2_hard += phi_total[j] * (T) mu_sum[i][j];
+        phi_total[j] += phi[i][j];
       }
     }
 
-    if (is_backup(get_wtime() - time))
-      save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, 100, phi_total);
+    low += segments_per_thread * threads * segment_size;
+    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+
+    if (print_status())
+      status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
+
+    if (is_backup(get_wtime() - backup_time))
+    {
+      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
+      backup_time = get_wtime();
+    }
   }
+
+  if (is_backup(get_wtime() - time))
+    save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, 100, phi_total);
 
   return s2_hard;
 }
