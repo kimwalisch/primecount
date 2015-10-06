@@ -112,7 +112,7 @@ void read_file(T x,
           cout << "x = " << x << endl;
           cout << "y = " << y << endl;
           cout << "c = " << c << endl;
-          cout << "s1 = " << *s1 << endl;
+          cout << "S1 = " << *s1 << endl;
           cout << "Seconds = " << seconds << endl;
           cout << "Status = 100%" << endl;
           cout << endl;
