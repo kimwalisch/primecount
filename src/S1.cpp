@@ -11,6 +11,7 @@
 ///
 
 #include <S1.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
@@ -18,6 +19,10 @@
 
 #include <stdint.h>
 #include <vector>
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -28,6 +33,98 @@ using namespace primecount;
 
 namespace {
 namespace S1 {
+
+maxint_t get_next_line(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  return to_maxint(line.substr(pos, line.size() - pos));
+}
+
+double get_next_double(ifstream& infile)
+{
+  string line;
+  getline(infile, line);
+  size_t pos = line.find(" = ") + 3;
+  stringstream ss;
+  double d = 0;
+  ss << line.substr(pos, line.size() - pos);
+  ss >> d;
+  return d;
+}
+
+template <typename T>
+void save_file(T x,
+               int64_t y,
+               int64_t c,
+               T s1,
+               double time)
+{
+  ofstream outfile("S1.txt");
+
+  if (outfile.is_open())
+  {
+    outfile << "x = " << x << endl;
+    outfile << "y = " << y << endl;
+    outfile << "c = " << c << endl;
+    outfile << "S1 = " << s1 << endl;
+    outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
+    outfile << "Status = 100%" << endl;
+    outfile.close();
+  }
+}
+
+template <typename T>
+void read_file(T x,
+               int64_t y,
+               int64_t c,
+               T* s1,
+               double* time)
+{
+  ifstream infile("S1.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t c2 = (int64_t) get_next_line(infile);
+      int64_t s12 = (int64_t) get_next_line(infile);
+      double seconds = get_next_double(infile);
+
+      infile.close();
+
+      if (x == x2 &&
+          y == y2 &&
+          c == c2)
+      {
+        *s1 = s12;
+        *time -= seconds;
+
+        if (print_status())
+        {
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S1.txt ---" << endl;
+          cout << "x = " << x << endl;
+          cout << "y = " << y << endl;
+          cout << "c = " << c << endl;
+          cout << "s1 = " << *s1 << endl;
+          cout << "Seconds = " << seconds << endl;
+          cout << "Status = 100%" << endl;
+          cout << endl;
+        }
+      }
+    }
+    catch (std::exception&)
+    {
+      throw primecount_error("failed to read S1.txt");
+    }
+  }
+}
 
 /// Recursively iterate over the square free numbers coprime to the
 /// first b primes and calculate the sum of the ordinary leaves.
@@ -96,8 +193,16 @@ int64_t S1(int64_t x,
   print("Computation of the ordinary leaves");
   print(x, y, c, threads);
 
+  int64_t s1 = -1;
   double time = get_wtime();
-  int64_t s1 = S1::S1(x, y, c, threads);
+
+  S1::read_file(x, y, c, &s1, &time);
+
+  if (s1 < 0)
+    s1 = S1::S1(x, y, c, threads);
+
+  if (is_backup(get_wtime() - time))
+    S1::save_file(x, y, c, s1, time);
 
   print("S1", s1, time);
   return s1;
@@ -116,13 +221,21 @@ int128_t S1(int128_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int128_t s1;
+  int128_t s1 = -1;
 
-  // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
-    s1 = S1::S1(x, (uint32_t) y, c, threads);
-  else
-    s1 = S1::S1(x, y, c, threads);
+  S1::read_file(x, y, c, &s1, &time);
+
+  if (s1 < 0)
+  {
+    // uses less memory
+    if (y <= numeric_limits<uint32_t>::max())
+      s1 = S1::S1(x, (uint32_t) y, c, threads);
+    else
+      s1 = S1::S1(x, y, c, threads);
+  }
+
+  if (is_backup(get_wtime() - time))
+    S1::save_file(x, y, c, s1, time);
 
   print("S1", s1, time);
   return s1;
