@@ -2,9 +2,13 @@ primecount with backup functionality
 ====================================
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 
-This primecount version saves intermediate results of P2, S2_easy and S2_hard
-to a file once per hour. If your computer crashes and you restart the same
-computation primecount will automatically resume from the backup files.
+The primecount backup version saves intermediate results to a file once
+per hour (configurable using ```--backup[=N]```). If your computer crashes
+and you restart the same computation primecount will automatically resume
+from the backup files.
+
+The backup functionality works quite nicely but the code quality does not
+yet meet my standards to be included into the master branch.
 
 ### Binaries
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
@@ -20,62 +24,58 @@ fb1e03f59be1f2800ffbda15a589ddd12d7598e3  primecount-backup-2.2-win64.zip
 6320ed9cea03f31b1d923340283d6fe3a53fe048  primecount-backup-2.2-linux-x64.tar.gz
 ```
 
-### Build instructions (Unix-like OSes)
-To build primecount-backup you need to have installed a C++ compiler,
-GNU make and the GNU Build System (a.k.a. Autotools). To install the
-GNU Build System install
-[GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
-[GNU&#160;Automake](http://www.gnu.org/software/automake/) and
-[GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
-using your package manager.
-
-primecount depends on the author's primesieve library, download it from
-http://primesieve.org/downloads and install it using:
+### Backup usage example
 ```sh
-$ ./configure
-$ make
-$ sudo make install
+# We start a computation and then simulate a crash using Ctrl + C
+$ ./primecount 1e16 --s2_hard --status --backup=1
+
+=== S2_hard(x, y) ===
+Computation of the hard special leaves
+x = 10000000000000000
+y = 4117019
+z = 2428941911
+c = 6
+alpha = 19.110
+threads = 1
+
+Status: 50%, Load balance: 100%^C
 ```
 
-If you are not using Linux then you need to export these variables:
 ```sh
-export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
-```
+# Now when we rerun the same computation primecount resumes from the backup file
+$ ./primecount 1e16 --s2_hard --status --backup=1
 
-Finally download the latest
-[primecount-backup.zip](https://github.com/kimwalisch/primecount/archive/backup.zip)
-archive from GitHub and build it using:
-```sh
-$ ./autogen.sh
-$ ./configure
-$ make
-$ sudo make install
-```
+=== S2_hard(x, y) ===
+Computation of the hard special leaves
+x = 10000000000000000
+y = 4117019
+z = 2428941911
+c = 6
+alpha = 19.110
+threads = 1
 
-If your CPU supports the
-[POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-then it is enabled in the build process. POPCNT speeds up primecount by
-about 10 percent. If you need maximum portability you can disable POPCNT:
-```sh
-$ ./configure --disable-popcnt
-```
+--- Resuming from S2_hard.txt ---
+low = 12989441
+segment_size = 65536
+segments_per_thread = 8
+s2_hard = 39920794738663
+Seconds = 3.110
+Status = 41%
 
-### Build instructions (Microsoft Visual C++)
-To build primecount simply open a Visual Studio Command Prompt and execute:
-```sh
-> nmake -f Makefile.msvc
+Status: 100%                                      
+S2_hard = 297553418946962
+Seconds: 8.360
 ```
 
 ### Command-line options
 ```
 Usage: primecount x [OPTION]...
-Count the primes below x <= 10^31 using the prime counting function,
-by default the Deleglise-Rivat algorithm (-d) is used.
+Count the primes below x <= 10^31 using fast implementations of the
+combinatorial prime counting function.
 
 Options:
 
+  -b<N>, --backup=<N>       Store backup file every N minutes (default 60)
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
@@ -85,7 +85,8 @@ Options:
          --Li_inverse       Approximate the nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
-  -s,    --status           Print status info during computation
+  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
+                            [N] digits after decimal point e.g. N=1, 99.9%
          --test             Run various correctness tests and exit
          --time             Print the time elapsed in seconds
   -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
