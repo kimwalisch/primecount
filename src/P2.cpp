@@ -82,7 +82,7 @@ void save_file(T x,
     outfile << "limit = " << limit << endl;
     outfile << "segments_per_thread = " << segments_per_thread << endl;
     outfile << "pix = " << pix << endl;
-    outfile << "p2 = " << p2 << endl;
+    outfile << "P2 = " << p2 << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
     outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
     outfile.close();
@@ -140,7 +140,7 @@ void read_file(T x,
           cout << "low = " << *low << endl;
           cout << "segments_per_thread = " << *segments_per_thread << endl;
           cout << "pix = " << *pix << endl;
-          cout << "p2 = " << *p2 << endl;
+          cout << "P2 = " << *p2 << endl;
           cout << "Seconds = " << seconds << endl;
           cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
           cout << endl;
