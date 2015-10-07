@@ -355,7 +355,7 @@ T P2(T x, int64_t y, int threads, double& time)
       }
     }
 
-    if (is_backup(get_wtime() - time))
+    if (is_backup(get_wtime() - time) * 6)
       save_file(x, y, limit, limit, segments_per_thread, pix_total, p2, time);
   }
 
