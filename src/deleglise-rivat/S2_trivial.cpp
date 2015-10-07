@@ -174,7 +174,7 @@ T S2_trivial(T x,
       }
     }
 
-    if (is_backup(get_wtime() - time))
+    if ((get_wtime() - time) > 1.0)
       save_file(x, y, c, s2_trivial, time);
   }
 
