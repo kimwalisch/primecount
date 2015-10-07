@@ -15,19 +15,19 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.2-win64.zip">primecount-backup-2.2-win64.zip</a>, 412K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.2-linux-x64.tar.gz">primecount-backup-2.2-linux-x64.tar.gz</a>, 936K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.3-win64.zip">primecount-backup-2.3-win64.zip</a>, 421K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.3-linux-x64.tar.gz">primecount-backup-2.3-linux-x64.tar.gz</a>, 931K
 
 SHA1 checksums of the files:
 ```sh
-fb1e03f59be1f2800ffbda15a589ddd12d7598e3  primecount-backup-2.2-win64.zip
-6320ed9cea03f31b1d923340283d6fe3a53fe048  primecount-backup-2.2-linux-x64.tar.gz
+7ee9eeb2bb18bf07b1354deb47dfe0d3486e71c8  primecount-backup-2.3-win64.zip
+9543800ac3adf5f2f411842f5774043a251f8176  primecount-backup-2.3-linux-x64.tar.gz
 ```
 
 ### Backup usage example
 ```sh
 # We start a computation and then simulate a crash using Ctrl + C
-$ ./primecount 1e16 --S2_hard --status --backup=1
+$ ./primecount 1e16 --S2_hard --status --backup=60
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
@@ -43,7 +43,7 @@ Status: 50%, Load balance: 100%^C
 
 ```sh
 # Now when we rerun the same computation primecount resumes from the backup file
-$ ./primecount 1e16 --S2_hard --status --backup=1
+$ ./primecount 1e16 --S2_hard --status --backup=60
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
