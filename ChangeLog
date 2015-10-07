@@ -1,12 +1,18 @@
-2015-10-03 Kim Walisch  <kim.walisch@gmail.com>
+2015-10-07 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.3 released.
 
   This version runs about 10% faster for x <= 10^21. Because of the
-  sieving optimizations implemented in primecount-2.2 we can now
-  increase the sieving limit which decreases the time to compute the
+  sieving optimizations implemented in primecount-2.2 the sieving
+  limit has now been increased which reduces the time to compute the
   easy special leaves.
 
-  Version 2.3 work in progress.
+  I have now also officially published primecount-backup binaries
+  which save intermediate results to a file once per hour and which
+  can resume from these files after e.g. a crash:
+  https://github.com/kimwalisch/primecount/tree/backup
 
+  * Renamed to --P2, --S1, --S2_trivial, --S2_easy, --S2_hard.
   * find_fastest_alpha.sh: Benchmark which finds fastest alpha factors.
   * src/primecount.cpp: Alpha factor tuning.
   * src/P2.cpp: Use multi-threading for initialization.
