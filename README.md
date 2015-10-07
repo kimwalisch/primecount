@@ -1,5 +1,5 @@
-primecount with backup functionality
-====================================
+primecount-backup
+=================
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 
 The primecount backup version saves intermediate results to a file once
