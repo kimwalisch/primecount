@@ -27,7 +27,7 @@ fb1e03f59be1f2800ffbda15a589ddd12d7598e3  primecount-backup-2.2-win64.zip
 ### Backup usage example
 ```sh
 # We start a computation and then simulate a crash using Ctrl + C
-$ ./primecount 1e16 --s2_hard --status --backup=1
+$ ./primecount 1e16 --S2_hard --status --backup=1
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
@@ -43,7 +43,7 @@ Status: 50%, Load balance: 100%^C
 
 ```sh
 # Now when we rerun the same computation primecount resumes from the backup file
-$ ./primecount 1e16 --s2_hard --status --backup=1
+$ ./primecount 1e16 --S2_hard --status --backup=1
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
@@ -58,7 +58,7 @@ threads = 1
 low = 12989441
 segment_size = 65536
 segments_per_thread = 8
-s2_hard = 39920794738663
+S2_hard = 39920794738663
 Seconds = 3.110
 Status = 41%
 
@@ -96,9 +96,9 @@ Options:
 Advanced Deleglise-Rivat options:
 
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
-         --p2               Only compute the 2nd partial sieve function
-         --s1               Only compute the ordinary leaves
-         --s2_trivial       Only compute the trivial special leaves
-         --s2_easy          Only compute the easy special leaves
-         --s2_hard          Only compute the hard special leaves
+         --P2               Only compute the 2nd partial sieve function
+         --S1               Only compute the ordinary leaves
+         --S2_trivial       Only compute the trivial special leaves
+         --S2_easy          Only compute the easy special leaves
+         --S2_hard          Only compute the hard special leaves
 ```
