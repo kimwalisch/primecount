@@ -213,8 +213,8 @@ bool read_file_final_result(T x,
       int64_t c2 = (int64_t) get_next_line(infile);
       int64_t low2 = (int64_t) get_next_line(infile);
       int64_t limit2 = (int64_t) get_next_line(infile);
-      int64_t segment_size2 = (int64_t) get_next_line(infile);
-      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      get_next_line(infile);
+      get_next_line(infile);
       T s2_hard2 = get_next_line(infile);
       double seconds = get_next_double(infile);
 
