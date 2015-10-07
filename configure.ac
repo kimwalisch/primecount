@@ -8,6 +8,8 @@ AM_INIT_AUTOMAKE([subdir-objects foreign -Wall -Werror])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_PROG_CXX
 AC_CANONICAL_HOST
+# Silence warning: ar: 'u' modifier ignored since 'D' is the default
+AC_SUBST(AR_FLAGS, [cr])
 AC_OPENMP
 AM_PROG_AR
 LT_INIT
