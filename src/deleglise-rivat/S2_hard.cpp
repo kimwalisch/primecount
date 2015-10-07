@@ -224,7 +224,7 @@ bool read_file_final_result(T x,
       // command-line values x and alpha
       if (x == x2 &&
           y == y2 &&
-          c2 == c2 &&
+          c == c2 &&
           low2 == limit &&
           limit == limit2)
       {
