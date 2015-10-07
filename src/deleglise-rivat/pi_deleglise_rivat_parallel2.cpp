@@ -63,7 +63,7 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t z = x / y;
-  int64_t pi_y = pi_legendre(y, 1);
+  int64_t pi_y = pi_legendre(y, threads);
   int64_t c = PhiTiny::get_c(y);
 
   print("");
