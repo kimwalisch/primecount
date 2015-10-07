@@ -75,6 +75,7 @@ double get_next_double(ifstream& infile)
 template <typename T>
 void save_file(T x,
                int64_t y,
+               int64_t c,
                int64_t low,
                int64_t limit,
                int64_t segment_size,
@@ -91,6 +92,7 @@ void save_file(T x,
 
   outfile << "x = " << x << endl;
   outfile << "y = " << y << endl;
+  outfile << "c = " << c << endl;
   outfile << "low = " << low << endl;
   outfile << "limit = " << limit << endl;
   outfile << "segment_size = " << segment_size << endl;
@@ -115,6 +117,7 @@ void save_file(T x,
 template <typename T>
 void read_file(T x,
                int64_t y,
+               int64_t c,
                int64_t* low,
                int64_t limit,
                int64_t* segment_size,
@@ -131,6 +134,7 @@ void read_file(T x,
     {
       T x2 = get_next_line(infile);
       int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t c2 = (int64_t) get_next_line(infile);
       int64_t low2 = (int64_t) get_next_line(infile);
       int64_t limit2 = (int64_t) get_next_line(infile);
       int64_t segment_size2 = (int64_t) get_next_line(infile);
@@ -145,6 +149,7 @@ void read_file(T x,
       // command-line values x and alpha
       if (x == x2 &&
           y == y2 &&
+          c == c2 &&
           low2 > *low &&
           low2 <= limit &&
           limit == limit2)
@@ -187,6 +192,67 @@ void read_file(T x,
       throw primecount_error("failed to read S2_hard.txt");
     }
   }
+}
+
+template <typename T>
+bool read_file_final_result(T x,
+                            int64_t y,
+                            int64_t c,
+                            int64_t limit,
+                            T* s2_hard,
+                            double* time)
+{
+  ifstream infile("S2_hard.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t c2 = (int64_t) get_next_line(infile);
+      int64_t low2 = (int64_t) get_next_line(infile);
+      int64_t limit2 = (int64_t) get_next_line(infile);
+      int64_t segment_size2 = (int64_t) get_next_line(infile);
+      int64_t segments_per_thread2 = (int64_t) get_next_line(infile);
+      T s2_hard2 = get_next_line(infile);
+      double seconds = get_next_double(infile);
+
+      infile.close();
+
+      // only resume if S2_hard.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          c2 == c2 &&
+          low2 == limit &&
+          limit == limit2)
+      {
+        *s2_hard = s2_hard2;
+        *time -= seconds;
+
+        if (print_status())
+        {
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S2_hard.txt ---" << endl;
+          cout << "S2_hard = " << *s2_hard << endl;
+          cout << "Seconds = " << seconds << endl;
+          cout << "Status = " << fixed << setprecision(get_status_precision(x)) << 100.0 << '%' << endl;
+          cout << endl;
+        }
+
+        return true;
+      }
+    }
+    catch (std::exception&)
+    {
+      throw primecount_error("failed to read S2_hard.txt");
+    }
+  }
+
+  return false;
 }
 
 /// Cross-off the multiples of prime in the sieve array.
@@ -499,7 +565,7 @@ T S2_hard(T x,
   double alpha = get_alpha(x, y);
   double backup_time = get_wtime();
 
-  read_file(x, y, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
+  read_file(x, y, c, &low, limit, &segment_size, &segments_per_thread, &s2_hard, &time, phi_total);
 
   while (low < limit)
   {
@@ -542,13 +608,13 @@ T S2_hard(T x,
 
     if (is_backup(get_wtime() - backup_time))
     {
-      save_file(x, y, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
+      save_file(x, y, c, low, limit, segment_size, segments_per_thread, s2_hard, time, status.skewed_percent(s2_hard, s2_hard_approx), phi_total);
       backup_time = get_wtime();
     }
   }
 
   if (is_backup(get_wtime() - time))
-    save_file(x, y, limit, limit, segment_size, segments_per_thread, s2_hard, time, 100, phi_total);
+    save_file(x, y, c, limit, limit, segment_size, segments_per_thread, s2_hard, time, 100, phi_total);
 
   return s2_hard;
 }
@@ -571,11 +637,16 @@ int64_t S2_hard(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  FactorTable<uint16_t> factors(y);
-  int64_t max_prime = z / isqrt(y);
-  vector<int32_t> primes = generate_primes(max_prime);
+  int64_t s2_hard = 0;
 
-  int64_t s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads, time);
+  if (!S2_hard::read_file_final_result(x, y, c, z + 1, &s2_hard, &time))
+  {
+    FactorTable<uint16_t> factors(y);
+    int64_t max_prime = z / isqrt(y);
+    vector<int32_t> primes = generate_primes(max_prime);
+
+    s2_hard = S2_hard::S2_hard((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads, time);
+  }
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -598,22 +669,25 @@ int128_t S2_hard(int128_t x,
   double time = get_wtime();
   int128_t s2_hard;
 
-  // uses less memory
-  if (y <= FactorTable<uint16_t>::max())
+  if (!S2_hard::read_file_final_result(x, y, c, z + 1, &s2_hard, &time))
   {
-    FactorTable<uint16_t> factors(y);
-    int64_t max_prime = z / isqrt(y);
-    vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
+    // uses less memory
+    if (y <= FactorTable<uint16_t>::max())
+    {
+      FactorTable<uint16_t> factors(y);
+      int64_t max_prime = z / isqrt(y);
+      vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
 
-    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
-  }
-  else
-  {
-    FactorTable<uint32_t> factors(y);
-    int64_t max_prime = z / isqrt(y);
-    vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+      s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
+    }
+    else
+    {
+      FactorTable<uint32_t> factors(y);
+      int64_t max_prime = z / isqrt(y);
+      vector<int64_t> primes = generate_primes<int64_t>(max_prime);
 
-    s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
+      s2_hard = S2_hard::S2_hard((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads, time);
+    }
   }
 
   print("S2_hard", s2_hard, time);
