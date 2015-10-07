@@ -234,7 +234,7 @@ int128_t S1(int128_t x,
       s1 = S1::S1(x, y, c, threads);
   }
 
-  if (is_backup(get_wtime() - time))
+  if ((get_wtime() - time) > 5.0)
     S1::save_file(x, y, c, s1, time);
 
   print("S1", s1, time);
