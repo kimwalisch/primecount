@@ -201,7 +201,7 @@ int64_t S1(int64_t x,
   if (s1 < 0)
     s1 = S1::S1(x, y, c, threads);
 
-  if (is_backup(get_wtime() - time))
+  if (is_backup((get_wtime() - time) * 1000))
     S1::save_file(x, y, c, s1, time);
 
   print("S1", s1, time);
