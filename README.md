@@ -24,6 +24,7 @@ supports the POPCNT instruction.
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.2-win64.zip">primecount-2.2-win64.zip</a>, 380K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.2-linux-x64.tar.gz">primecount-2.2-linux-x64.tar.gz</a>, 892K
+* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 SHA1 checksums of the files:
 ```sh
@@ -75,11 +76,11 @@ Options:
 Advanced Deleglise-Rivat options:
 
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
-         --p2               Only compute the 2nd partial sieve function
-         --s1               Only compute the ordinary leaves
-         --s2_trivial       Only compute the trivial special leaves
-         --s2_easy          Only compute the easy special leaves
-         --s2_hard          Only compute the hard special leaves
+         --P2               Only compute the 2nd partial sieve function
+         --S1               Only compute the ordinary leaves
+         --S2_trivial       Only compute the trivial special leaves
+         --S2_easy          Only compute the easy special leaves
+         --S2_hard          Only compute the hard special leaves
 ```
 
 ### Algorithms
