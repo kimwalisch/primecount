@@ -153,6 +153,66 @@ void read_file(T x,
   }
 }
 
+template <typename T>
+bool read_file_final_result(T x,
+                            int64_t y,
+                            int64_t z,
+                            int64_t c,
+                            T* s2_easy,
+                            double* time)
+{
+  ifstream infile("S2_easy.txt");
+
+  if (infile.is_open())
+  {
+    try
+    {
+      T x2 = get_next_line(infile);
+      int64_t y2 = (int64_t) get_next_line(infile);
+      int64_t z2 = (int64_t) get_next_line(infile);
+      int64_t b2 = (int64_t) get_next_line(infile);
+      int64_t b_max2 = (int64_t) get_next_line(infile);
+      int64_t c2 = (int64_t) get_next_line(infile);
+      T s2_easy2 = get_next_line(infile);
+      double seconds = get_next_double(infile);
+
+      infile.close();
+
+      // only resume if S2_hard.txt matches the
+      // command-line values x and alpha
+      if (x == x2 &&
+          y == y2 &&
+          z == z2 &&
+          c == c2 &&
+          b2 == b_max2)
+      {
+        *s2_easy = s2_easy2;
+        *time -= seconds;
+
+        if (print_status())
+        {
+          if (!print_variables())
+            cout << endl;
+
+          cout << "--- Resuming from S2_easy.txt ---" << endl;
+          cout << "S2_easy = " << *s2_easy << endl;
+          cout << "Seconds = " << seconds << endl;
+          cout << "Status = " << fixed << setprecision(get_status_precision(x)) << 100.0 << '%' << endl;
+          cout << endl;
+        }
+
+        return true;
+      }
+    }
+    catch (std::exception&)
+    {
+      throw primecount_error("failed to read S2_easy.txt");
+    }
+  }
+
+  return false;
+}
+
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
@@ -272,8 +332,13 @@ int64_t S2_easy(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  vector<int32_t> primes = generate_primes(y);
-  int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads, time);
+  int64_t s2_easy = 0;
+
+  if (!S2_easy::read_file_final_result(x, y, z, c, &s2_easy, &time))
+  {
+    vector<int32_t> primes = generate_primes(y);
+    s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads, time);
+  }
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -293,18 +358,21 @@ int128_t S2_easy(int128_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int128_t s2_easy;
+  int128_t s2_easy = 0;
 
-  // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
+  if (!S2_easy::read_file_final_result(x, y, z, c, &s2_easy, &time))
   {
-    vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
-  }
-  else
-  {
-    vector<int64_t> primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
+    // uses less memory
+    if (y <= numeric_limits<uint32_t>::max())
+    {
+      vector<uint32_t> primes = generate_primes<uint32_t>(y);
+      s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
+    }
+    else
+    {
+      vector<int64_t> primes = generate_primes<int64_t>(y);
+      s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads, time);
+    }
   }
 
   print("S2_easy", s2_easy, time);
