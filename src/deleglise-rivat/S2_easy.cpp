@@ -80,7 +80,7 @@ void save_file(T x,
     outfile << "b = " << b << endl;
     outfile << "b_max = " << b_max << endl;
     outfile << "c = " << c << endl;
-    outfile << "s2_easy = " << s2_easy << endl;
+    outfile << "S2_easy = " << s2_easy << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
     outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
     outfile.close();
@@ -136,7 +136,7 @@ void read_file(T x,
           cout << "--- Resuming from S2_easy.txt ---" << endl;
           cout << "b = " << *b << endl;
           cout << "b_max = " << b_max << endl;
-          cout << "s2_easy = " << *s2_easy << endl;
+          cout << "S2_easy = " << *s2_easy << endl;
           cout << "Seconds = " << seconds << endl;
           cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
           cout << endl;
