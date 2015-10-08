@@ -99,7 +99,7 @@ void save_file(T x,
   outfile << "segments_per_thread = " << segments_per_thread << endl;
   outfile << "S2_hard = " << s2_hard << endl;
   outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-  outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+  outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << endl;
   outfile.close();
 
   FILE * pFile;
