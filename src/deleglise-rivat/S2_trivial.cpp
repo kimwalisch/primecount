@@ -70,7 +70,7 @@ void save_file(T x,
     outfile << "c = " << c << endl;
     outfile << "S2_trivial = " << s2_trivial << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-    outfile << "Status = 100%" << endl;
+    outfile << "Status = 100" << endl;
     outfile.close();
   }
 }
