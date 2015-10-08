@@ -82,7 +82,7 @@ void save_file(T x,
     outfile << "c = " << c << endl;
     outfile << "S2_easy = " << s2_easy << endl;
     outfile << "Seconds = " << fixed << setprecision(3) << (get_wtime() - time) << endl;
-    outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+    outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << endl;
     outfile.close();
   }
 }
