@@ -27,44 +27,42 @@ SHA1 checksums of the files:
 ### Backup usage example
 ```sh
 # We start a computation and then simulate a crash using Ctrl + C
-$ ./primecount 1e16 --S2_hard --status --backup=60
+$ ./primecount 1e22 --S2_hard --status --backup=60
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
-x = 10000000000000000
-y = 4117019
-z = 2428941911
+x = 10000000000000000000000
+y = 2418290079
+z = 4135153217076
 c = 6
-alpha = 19.110
-threads = 1
+alpha = 112.247
+threads = 8
 
-Status: 50%, Load balance: 100%^C
+Status: 43.2%, Load balance: 97%^C
 ```
 
 ```sh
 # Now when we rerun the same computation primecount resumes from the backup file
-$ ./primecount 1e16 --S2_hard --status --backup=60
+$ ./primecount 1e22 --S2_hard --status --backup=60
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
-x = 10000000000000000
-y = 4117019
-z = 2428941911
+x = 10000000000000000000000
+y = 2418290079
+z = 4135153217076
 c = 6
-alpha = 19.110
-threads = 1
+alpha = 112.247
+threads = 8
 
 --- Resuming from S2_hard.txt ---
-low = 12989441
-segment_size = 65536
-segments_per_thread = 8
-S2_hard = 39920794738663
-Seconds = 3.110
-Status = 41%
+low = 3842113537
+segment_size = 2097152
+segments_per_thread = 1
+S2_hard = 21554940363642178312
+Seconds = 3624.303
+Status = 33.1%
 
-Status: 100%                                      
-S2_hard = 297553418946962
-Seconds: 8.360
+Status: 34.8%, Load balance: 98%
 ```
 
 ### Command-line options
