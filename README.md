@@ -61,8 +61,6 @@ segments_per_thread = 1
 S2_hard = 21554940363642178312
 Seconds = 3624.303
 Status = 33.1%
-
-Status: 34.8%, Load balance: 98%
 ```
 
 ### Command-line options
