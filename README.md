@@ -248,7 +248,7 @@ GCC 4.8.
 ### Build instructions (Unix-like OSes)
 To build primecount you need to have installed a C++ compiler and GNU make.
 primecount depends on the author's primesieve library, download it from
-http://primesieve.org/downloads and install it using:
+http://primesieve.org/downloads and then build and install it using:
 ```sh
 $ ./configure --prefix=/usr
 $ make
@@ -280,8 +280,8 @@ $ sudo make install
 
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-then it is enabled in the build process. POPCNT speeds up primecount by
-about 10%. If you need maximum portability you can disable POPCNT:
+then it is automatically  enabled in the build process. If you need
+maximum portability you can disable POPCNT:
 ```sh
 $ ./configure --disable-popcnt
 ```
@@ -293,7 +293,7 @@ To build primecount open a Visual Studio Command Prompt and execute:
 ```
 
 ### C++ API
-Below is a list of the main functions declared in
+Below are the main functions declared in
 [primesieve.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
 All functions are multi-threaded by default.
 
