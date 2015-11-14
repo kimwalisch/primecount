@@ -27,7 +27,6 @@
 #include <int128.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <type_traits>
 
 namespace primecount {

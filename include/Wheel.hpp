@@ -16,7 +16,6 @@
 #include <pmath.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <vector>
 
 namespace primecount {
