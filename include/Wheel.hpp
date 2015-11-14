@@ -42,12 +42,14 @@ struct WheelItem
     : next_multiple(multiple), 
       wheel_index(i)
   { }
+
   void set(int64_t multiple, 
            int64_t next_wheel_index)
   {
     next_multiple = multiple;
     wheel_index = (int8_t) next_wheel_index;
   }
+
   int64_t next_multiple;
   int8_t wheel_index;
 };
@@ -67,6 +69,7 @@ public:
         bool sieve_primes = false)
   {
     wheelItems_.reserve(size);
+
     // primecount uses 1-indexing, 0-index is a dummy
     wheelItems_.push_back(WheelItem(0, 0));
 
@@ -90,18 +93,10 @@ public:
       uint64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
       multiple += prime * next_multiple_factor;
       int8_t wheel_index = initWheel210[quotient % 210].wheel_index;
-
-#if __cplusplus >= 201103L
-      wheelItems_.emplace_back(multiple, wheel_index);
-#else
-      wheelItems_.push_back(WheelItem(multiple, wheel_index));
-#endif
+      push_back(multiple, wheel_index);
     }
   }
-  WheelItem& operator[](int64_t i)
-  {
-    return wheelItems_[i];
-  }
+
   /// Calculate the next multiple of prime using:
   /// next_multiple = multiple + prime * next_multiple_factor(&wheel_index)
   ///
@@ -111,7 +106,22 @@ public:
     *wheel_index = nextWheel210[*wheel_index].next_wheel_index;
     return next_multiple_factor;
   }
+
+  WheelItem& operator[](int64_t i)
+  {
+    return wheelItems_[i];
+  }
 private:
+  void push_back(int64_t multiple,
+                 int64_t wheel_index)
+  {
+    #if __cplusplus >= 201103L
+      wheelItems_.emplace_back(multiple, wheel_index);
+    #else
+      wheelItems_.push_back(WheelItem(multiple, wheel_index));
+    #endif
+  }
+
   static const InitWheel initWheel210[210];
   static const NextWheel nextWheel210[48];
   std::vector<WheelItem> wheelItems_;
