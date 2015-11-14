@@ -52,8 +52,8 @@ const string helpMenu(
   "\n"
   "Examples:\n"
   "\n"
-  "  primecount 10**13\n"
-  "  primecount 10**13 --nthprime --threads=4"
+  "  primecount 1e13\n"
+  "  primecount 1e13 --nthprime --threads=4"
 );
 
 const string versionInfo(
