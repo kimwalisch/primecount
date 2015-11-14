@@ -21,24 +21,33 @@ AC_ARG_ENABLE([assert],
 
 # Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],
-    AC_HELP_STRING([--enable-popcnt], [enable POPCNT instruction (default yes)]))
+    AC_HELP_STRING([--enable-popcnt],
+                   [enable POPCNT instruction (default yes)]))
 
 AS_IF([test "x$enable_popcnt" != "xno"], [
-    AX_GCC_BUILTIN([__builtin_popcount])
-    AX_GCC_BUILTIN([__builtin_popcountll])
-    AS_IF([test "x$ax_cv_have___builtin_popcount" = "xyes"], [
+    AC_MSG_CHECKING(for __builtin_popcount)
+    AC_TRY_LINK(, [int x = __builtin_popcount(123);],
+                  [AC_MSG_RESULT(yes); builtin_popcount=yes; AC_DEFINE(HAVE___BUILTIN_POPCOUNT)],
+                  [AC_MSG_RESULT(no)])
+
+    AC_MSG_CHECKING(for __builtin_popcountll)
+    AC_TRY_LINK(, [long long x = __builtin_popcountll(123);],
+                  [AC_MSG_RESULT(yes); builtin_popcount=yes; AC_DEFINE(HAVE___BUILTIN_POPCOUNTLL)],
+                  [AC_MSG_RESULT(no)])
+
+    AS_IF([test "x$builtin_popcount" = "xyes"], [
         AX_POPCNT
     ])
 ])
 
 AC_MSG_CHECKING(for int128_t)
 AC_TRY_LINK([#include <stdint.h>], [int128_t x = 0;],
-            [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE_INT128_T)],
+            [AC_MSG_RESULT(yes); int128=yes; AC_DEFINE(HAVE_INT128_T)],
             [AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for __int128_t)
 AC_TRY_LINK(, [__int128_t x = 0;],
-              [int128=yes; AC_MSG_RESULT(yes); AC_DEFINE(HAVE___INT128_T)],
+              [AC_MSG_RESULT(yes); int128=yes; AC_DEFINE(HAVE___INT128_T)],
               [AC_MSG_RESULT(no)])
 
 AM_CONDITIONAL(HAVE_INT128_T, test x$int128 = xyes)
