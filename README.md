@@ -1,6 +1,8 @@
 primecount
 ==========
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
+[![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
 
 primecount is a command-line program and C++ library that counts the
 primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly
@@ -18,9 +20,9 @@ which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
 
 ### Binaries
-Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
-These binaries are statically linked and require a CPU (2010 or later) which
-supports the POPCNT instruction.
+Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
+These binaries are statically linked and require a CPU which supports the POPCNT
+instruction (2010 or later).
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.3-win64.zip">primecount-2.3-win64.zip</a>, 380K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.3-linux-x64.tar.gz">primecount-2.3-linux-x64.tar.gz</a>, 892K
@@ -248,19 +250,12 @@ To build primecount you need to have installed a C++ compiler and GNU make.
 primecount depends on the author's primesieve library, download it from
 http://primesieve.org/downloads and install it using:
 ```sh
-$ ./configure
+$ ./configure --prefix=/usr
 $ make
 $ sudo make install
 ```
 
-If you are not using Linux then you need to export these variables:
-```sh
-export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
-```
-
-Finally download the latest
+Then download the latest
 <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.3.tar.gz">primecount-2.3.tar.gz</a>
 release tarball and build it using:
 ```sh
@@ -269,9 +264,9 @@ $ make
 $ sudo make install
 ```
 
-If you have downloaded a primecount zip archive from GitHub then the GNU
-Build System (a.k.a. Autotools) must be installed and ```autogen.sh```
-must be executed once. To install the GNU Build System install
+If you have downloaded a zip archive from GitHub then Autotools
+(a.k.a. GNU Build System) must be installed and ```autogen.sh``` must
+be executed once. To install Autotools install
 [GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
 [GNU&#160;Automake](http://www.gnu.org/software/automake/) and
 [GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
@@ -286,20 +281,21 @@ $ sudo make install
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
 then it is enabled in the build process. POPCNT speeds up primecount by
-about 10 percent. If you need maximum portability you can disable POPCNT:
+about 10%. If you need maximum portability you can disable POPCNT:
 ```sh
 $ ./configure --disable-popcnt
 ```
 
 ### Build instructions (Microsoft Visual C++)
-To build primecount simply open a Visual Studio Command Prompt and execute:
+To build primecount open a Visual Studio Command Prompt and execute:
 ```sh
 > nmake -f Makefile.msvc
 ```
 
 ### C++ API
-Below is a list of the main functions declared in the ````primecount.hpp````
-header file.
+Below is a list of the main functions declared in
+[primesieve.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
+All functions are multi-threaded by default.
 
 ```C++
 /// Count the primes <= x
