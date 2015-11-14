@@ -248,7 +248,7 @@ GCC 4.8.
 ### Build instructions (Unix-like OSes)
 To build primecount you need to have installed a C++ compiler and GNU make.
 primecount depends on the author's primesieve library, download it from
-http://primesieve.org/downloads and then build and install it using:
+http://primesieve.org/downloads. Then build and install primesieve using:
 ```sh
 $ ./configure --prefix=/usr
 $ make
