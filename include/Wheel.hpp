@@ -69,9 +69,7 @@ public:
         bool sieve_primes = false)
   {
     wheelItems_.reserve(size);
-
-    // primecount uses 1-indexing, 0-index is a dummy
-    wheelItems_.push_back(WheelItem(0, 0));
+    push_back(0, 0);
 
     for (int64_t b = 1; b < size; b++)
     {
