@@ -246,9 +246,10 @@ The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4 GHz) from
 GCC 4.8.
 
 ### Build instructions (Unix-like OSes)
-To build primecount you need to have installed a C++ compiler and GNU make.
-primecount depends on the author's primesieve library, download it from
-http://primesieve.org/downloads. Then build and install primesieve using:
+To build primecount you need to have installed a C++ compiler and GNU
+make. primecount depends on the author's primesieve library, download
+the latest version from http://primesieve.org/downloads. Then build and
+install primesieve using:
 ```sh
 $ ./configure --prefix=/usr
 $ make
