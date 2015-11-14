@@ -19,7 +19,7 @@
 #include <S1.hpp>
 
 #include <stdint.h>
-#include <stdexcept>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <string>

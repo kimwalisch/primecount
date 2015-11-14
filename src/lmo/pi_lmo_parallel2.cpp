@@ -20,7 +20,6 @@
 #include <tos_counters.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP

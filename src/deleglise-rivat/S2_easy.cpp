@@ -20,7 +20,6 @@
 #include <fast_div.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP
