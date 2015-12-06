@@ -248,8 +248,9 @@ GCC 4.8.
 ### Build instructions (Unix-like OSes)
 To build primecount you need to have installed a C++ compiler and GNU
 make. primecount depends on the author's primesieve library, download
-the latest version from http://primesieve.org/downloads. Then build and
-install primesieve using:
+the latest version from http://primesieve.org/downloads.
+
+First build and install [primesieve](http://primesieve.org/downloads) using:
 ```sh
 $ ./configure --prefix=/usr
 $ make
@@ -271,7 +272,7 @@ be executed once. To install Autotools install
 [GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
 [GNU&#160;Automake](http://www.gnu.org/software/automake/) and
 [GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
-using your package manager.
+using your operating system's package manager.
 ```sh
 $ ./autogen.sh
 $ ./configure
@@ -281,8 +282,9 @@ $ sudo make install
 
 If your CPU supports the
 [POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-then it is automatically  enabled in the build process. If you need
-maximum portability you can disable POPCNT:
+then it is automatically  enabled in the build process. POPCNT speeds up
+primecount by about 10 percent. If you need maximum portability you can
+disable POPCNT:
 ```sh
 $ ./configure --disable-popcnt
 ```
