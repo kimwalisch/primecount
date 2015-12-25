@@ -70,8 +70,6 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
     oss << f1 << "(" << x << ") = " << res1
         << " is an error, the correct result is " << res2;
     throw primecount_error(oss.str());
-<<<<<<< HEAD
-=======
   }
 }
 
@@ -96,7 +94,6 @@ void check_nth_prime(int64_t iters)
 
     old_n = n;
     old_nth_prime = primesieve_nth_prime;
->>>>>>> master
   }
 
   cout << endl;
@@ -117,11 +114,7 @@ void test_phi_thread_safety(int64_t iters)
   for (int64_t i = 0; i < iters; i++)
     sum2 += pi_legendre(10000000 + i, 1);
 
-<<<<<<< HEAD
-  if (multi_thread_sum != single_thread_sum)
-=======
   if (sum1 != sum2)
->>>>>>> master
     throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
 
   std::cout << "\rTesting phi(x, a) 100%" << endl;
@@ -163,11 +156,7 @@ bool test()
 
     check_nth_prime(200);
   }
-<<<<<<< HEAD
-  catch (primecount_error& e)
-=======
   catch (exception& e)
->>>>>>> master
   {
     cerr << endl << e.what() << endl;
     return false;
