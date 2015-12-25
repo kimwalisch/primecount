@@ -40,6 +40,7 @@ using namespace primecount;
 namespace {
 namespace P2 {
 
+<<<<<<< HEAD
 maxint_t get_next_line(ifstream& infile)
 {
   string line;
@@ -173,6 +174,24 @@ private:
   int64_t prime_;
 };
 
+=======
+/// Calculate the segments per thread.
+/// The idea is to gradually increase the segments per thread (based
+/// on elapsed time) in order to keep all CPU cores busy.
+///
+int64_t balanceLoad(int64_t segments_per_thread, double start_time)
+{
+  double seconds = get_wtime() - start_time;
+
+  if (seconds < 30)
+    segments_per_thread *= 2;
+  else if (segments_per_thread >= 4)
+    segments_per_thread -= segments_per_thread / 4;
+
+  return segments_per_thread;
+}
+
+>>>>>>> master
 /// Cross-off the multiples inside [low, high[
 /// of the primes <= sqrt(high - 1).
 ///
@@ -236,11 +255,10 @@ T P2_thread(T x,
   int64_t stop  = (int64_t) min(x / low, isqrt(x));
   T P2_thread = 0;
 
-  // P2_thread = \sum_{i=pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
+  // P2_thread = \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   // We use a reverse prime iterator to calculate P2_thread
-  ReversePrimeIterator prime_iter(stop + 1, start);
-  int64_t prime = prime_iter.previous_prime();
-  int64_t xp = (int64_t) (x / prime);
+  primesieve::iterator pi(stop + 1, start);
+  int64_t prime = pi.previous_prime();
 
   bool sieve_primes = true;
   Wheel wheel(primes, size, low, sieve_primes);
@@ -251,8 +269,9 @@ T P2_thread(T x,
   {
     // current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t c = 6;
+    int64_t x_div_prime = 0;
     int64_t j = 0;
+    int64_t c = 6;
 
     // pre-sieve the multiples of the first c primes
     sieve.pre_sieve(c, low, sieve_primes);
@@ -260,15 +279,20 @@ T P2_thread(T x,
     // cross-off the multiples of the primes <= sqrt(high - 1)
     cross_off(sieve, primes, wheel, c, low, high);
 
+<<<<<<< HEAD
     while (prime >= start && 
            xp < high)
+=======
+    while (prime >= start &&
+           (x_div_prime = (int64_t) (x / prime)) < high)
+>>>>>>> master
     {
-      pix += sieve.count(j, xp - low);
-      j = xp - low + 1;
+      int64_t next_count = x_div_prime - low;
+      pix += sieve.count(j, next_count);
+      j = next_count + 1;
       pix_count++;
       P2_thread += pix;
-      prime = prime_iter.previous_prime();
-      xp = (int64_t) (x / prime);
+      prime = pi.previous_prime();
     }
 
     pix += sieve.count(j, (high - 1) - low);

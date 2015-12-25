@@ -25,7 +25,6 @@
 #include <Wheel.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <vector>
 
 #ifdef _OPENMP

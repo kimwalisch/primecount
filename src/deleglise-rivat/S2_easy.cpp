@@ -21,12 +21,15 @@
 #include <fast_div.hpp>
 
 #include <stdint.h>
+<<<<<<< HEAD
 #include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <stdexcept>
+=======
+>>>>>>> master
 #include <vector>
 
 #ifdef _OPENMP

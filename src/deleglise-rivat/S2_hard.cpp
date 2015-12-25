@@ -27,6 +27,7 @@
 #include <Wheel.hpp>
 
 #include <stdint.h>
+<<<<<<< HEAD
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -34,6 +35,8 @@
 #include <iomanip>
 #include <stdexcept>
 #include <stdio.h>
+=======
+>>>>>>> master
 #include <vector>
 
 #ifdef _OPENMP

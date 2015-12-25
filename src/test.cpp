@@ -17,16 +17,13 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <stdexcept>
+#include <exception>
 #include <sstream>
 #include <ctime>
 
 #ifdef _OPENMP
   #include <omp.h>
 #endif
-
-/// For types: f1(x) , f2(x)
-#define CHECK_11(f1, f2) check_equal(#f1, x, f1 (x), f2 (x))
 
 /// For types: f1(x) , f2(x, threads)
 #define CHECK_12(f1, f2) check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
@@ -56,7 +53,6 @@
 
 using namespace std;
 using namespace primecount;
-using primesieve::parallel_nth_prime;
 
 namespace {
 
@@ -74,7 +70,36 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
     oss << f1 << "(" << x << ") = " << res1
         << " is an error, the correct result is " << res2;
     throw primecount_error(oss.str());
+<<<<<<< HEAD
+=======
   }
+}
+
+void check_nth_prime(int64_t iters)
+{
+  cout << "Testing nth_prime(x)" << flush;
+
+  int64_t n = 0;
+  int64_t old_n = 0;
+  int64_t old_nth_prime = 0;
+
+  for (; n < 10000; n++)
+    check_equal("nth_prime", n, nth_prime(n), primesieve::parallel_nth_prime(n));
+
+  // test using random increment
+  for (int64_t i = 0; i < iters; i++, n += get_rand())
+  {
+    int64_t primesieve_nth_prime = primesieve::parallel_nth_prime(n - old_n, old_nth_prime);
+    check_equal("nth_prime", n, nth_prime(n), primesieve_nth_prime);
+    double percent = 100.0 * (i + 1.0) / iters;
+    cout << "\rTesting nth_prime(x) " << (int) percent << "%" << flush;
+
+    old_n = n;
+    old_nth_prime = primesieve_nth_prime;
+>>>>>>> master
+  }
+
+  cout << endl;
 }
 
 void test_phi_thread_safety(int64_t iters)
@@ -82,18 +107,21 @@ void test_phi_thread_safety(int64_t iters)
 #ifdef _OPENMP
   cout << "Testing phi(x, a)" << flush;
 
-  int64_t single_thread_sum = 0;
-  int64_t multi_thread_sum = 0;
-  int64_t base = 1000000;
-
-  #pragma omp parallel for reduction(+: multi_thread_sum)
-  for (int64_t i = 0; i < iters; i++)
-    multi_thread_sum += pi_legendre(base + i, 1);
+  int64_t sum1 = 0;
+  int64_t sum2 = 0;
 
   for (int64_t i = 0; i < iters; i++)
-    single_thread_sum += pi_legendre(base + i, 1);
+    sum1 += pi_legendre(10000000 + i, 1);
 
+  #pragma omp parallel for reduction(+: sum2)
+  for (int64_t i = 0; i < iters; i++)
+    sum2 += pi_legendre(10000000 + i, 1);
+
+<<<<<<< HEAD
   if (multi_thread_sum != single_thread_sum)
+=======
+  if (sum1 != sum2)
+>>>>>>> master
     throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
 
   std::cout << "\rTesting phi(x, a) 100%" << endl;
@@ -108,6 +136,7 @@ bool test()
 {
   set_print_status(false); 
   srand(static_cast<unsigned>(time(0)));
+
   try
   {
     test_phi_thread_safety(100);
@@ -127,12 +156,18 @@ bool test()
     CHECK_EQUAL(pi_deleglise_rivat2,          pi_lmo_parallel3,   CHECK_12, 600);
     CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22, 900);
     CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 900);
+
 #ifdef HAVE_INT128_T
     CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
 #endif
-    CHECK_EQUAL(nth_prime,                    parallel_nth_prime, CHECK_11,  70);
+
+    check_nth_prime(200);
   }
+<<<<<<< HEAD
   catch (primecount_error& e)
+=======
+  catch (exception& e)
+>>>>>>> master
   {
     cerr << endl << e.what() << endl;
     return false;

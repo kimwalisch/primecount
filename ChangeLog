@@ -1,3 +1,13 @@
+2015-11-15 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.4 work in progress.
+
+  * README.md: Simplified build instructions.
+  * appveyor.yml: Automated Windows (MSVC++) testing.
+  * configure.ac: Removed usage of buggy ax_gcc_builtin.m4 macro.
+  * src/P2.cpp: Port to primesieve-5.5.0 library.
+  * src/test.cpp: Faster nth prime testing.
+
 2015-10-07 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.3 released.

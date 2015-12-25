@@ -14,7 +14,6 @@
 #include <int128.hpp>
 
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 

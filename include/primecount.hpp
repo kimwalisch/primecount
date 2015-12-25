@@ -3,8 +3,7 @@
 ///
 /// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
 ///
-/// This file is distributed under the BSD License. See the COPYING
-/// file in the top level directory.
+/// This file is distributed under the BSD License.
 ///
 
 #ifndef PRIMECOUNT_HPP
@@ -14,9 +13,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "2.3"
+#define PRIMECOUNT_VERSION "2.4"
 #define PRIMECOUNT_VERSION_MAJOR 2
-#define PRIMECOUNT_VERSION_MINOR 3
+#define PRIMECOUNT_VERSION_MINOR 4
 
 namespace primecount {
 
@@ -71,8 +70,8 @@ int64_t pi_meissel(int64_t x);
 ///
 int64_t pi_primesieve(int64_t x);
 
-/// Calculate the nth prime using a combination of an efficient prime
-/// counting function implementation and the sieve of Eratosthenes.
+/// Calculate the nth prime using a combination of the counting
+/// function and the sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/2)) space.
 /// @pre n <= 216289611853439384
 ///
@@ -84,8 +83,8 @@ int64_t nth_prime(int64_t n);
 ///
 int64_t phi(int64_t x, int64_t a);
 
-/// Calculate the offset logarithmic integral which is a very
-/// accurate approximation of the number of primes below x.
+/// Calculate the offset logarithmic integral which is a very accurate
+/// approximation of the number of primes below x.
 /// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
 int64_t Li(int64_t x);
@@ -114,10 +113,8 @@ int get_num_threads();
 ///
 std::string get_max_x(double alpha = 1.0);
 
-/// Test all prime counting function implementations.
-/// @return true if success else false.
-///
-bool test();
+/// Get the primecount version number, in the form “i.j”.
+std::string primecount_version();
 
 } // namespace primecount
 

@@ -78,7 +78,7 @@ int128_t pi(int128_t x, int threads)
 #endif
 
 /// Alias for the fastest prime counting function in primecount.
-/// @param x  integer or arithmetic expression like "10^12".
+/// @param x  integer arithmetic expression e.g. "10^12".
 /// @pre   x  <= get_max_x().
 ///
 string pi(const string& x)
@@ -87,7 +87,7 @@ string pi(const string& x)
 }
 
 /// Alias for the fastest prime counting function in primecount.
-/// @param x  integer or arithmetic expression like "10^12".
+/// @param x  integer arithmetic expression e.g. "10^12".
 /// @pre   x  <= get_max_x().
 ///
 string pi(const string& x, int threads)
@@ -193,8 +193,8 @@ int64_t pi_primesieve(int64_t x)
   return pi_primesieve(x, threads_);
 }
 
-/// Calculate the nth prime using a combination of an efficient prime
-/// counting function implementation and the sieve of Eratosthenes.
+/// Calculate the nth prime using a combination of the prime
+/// counting function and the sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/2)) space.
 ///
 int64_t nth_prime(int64_t n)
@@ -212,8 +212,8 @@ int64_t phi(int64_t x, int64_t a)
 }
 
 /// Returns the largest integer that can be used with
-/// pi(string x). The return type is a string as max may be a
-/// 128-bit integer which is not supported by all compilers.
+/// pi(string x). The return type is a string as max can be a 128-bit
+/// integer which is not supported by all compilers.
 ///
 string get_max_x(double alpha)
 {
@@ -392,6 +392,12 @@ maxint_t to_maxint(const string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;
+}
+
+/// Get the primecount version number, in the form “i.j”.
+string primecount_version()
+{
+  return PRIMECOUNT_VERSION;
 }
 
 } // namespace primecount
