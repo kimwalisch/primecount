@@ -196,22 +196,6 @@ void cross_off(BitSieve& sieve,
   }
 }
 
-/// Calculate the segments per thread.
-/// The idea is to gradually increase the segments per thread (based
-/// on elapsed time) in order to keep all CPU cores busy.
-///
-int64_t balanceLoad(int64_t segments_per_thread, double start_time)
-{
-  double seconds = get_wtime() - start_time;
-
-  if (seconds < 30)
-    segments_per_thread *= 2;
-  else if (segments_per_thread >= 4)
-    segments_per_thread -= segments_per_thread / 4;
-
-  return segments_per_thread;
-}
-
 template <typename T>
 T P2_thread(T x,
             int64_t y,
