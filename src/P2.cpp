@@ -40,7 +40,6 @@ using namespace primecount;
 namespace {
 namespace P2 {
 
-<<<<<<< HEAD
 maxint_t get_next_line(ifstream& infile)
 {
   string line;
@@ -155,26 +154,6 @@ void read_file(T x,
   }
 }
 
-class ReversePrimeIterator
-{
-public:
-  ReversePrimeIterator(int64_t stop, int64_t start) :
-    iter_(stop, start),
-    prime_(stop)
-  { }
-  int64_t previous_prime()
-  {
-    if (prime_ <= 2)
-      return -1;
-    prime_ = iter_.previous_prime();
-    return prime_;
-  }
-private:
-  primesieve::iterator iter_;
-  int64_t prime_;
-};
-
-=======
 /// Calculate the segments per thread.
 /// The idea is to gradually increase the segments per thread (based
 /// on elapsed time) in order to keep all CPU cores busy.
@@ -191,7 +170,6 @@ int64_t balanceLoad(int64_t segments_per_thread, double start_time)
   return segments_per_thread;
 }
 
->>>>>>> master
 /// Cross-off the multiples inside [low, high[
 /// of the primes <= sqrt(high - 1).
 ///
@@ -279,13 +257,8 @@ T P2_thread(T x,
     // cross-off the multiples of the primes <= sqrt(high - 1)
     cross_off(sieve, primes, wheel, c, low, high);
 
-<<<<<<< HEAD
-    while (prime >= start && 
-           xp < high)
-=======
     while (prime >= start &&
            (x_div_prime = (int64_t) (x / prime)) < high)
->>>>>>> master
     {
       int64_t next_count = x_div_prime - low;
       pix += sieve.count(j, next_count);
