@@ -166,10 +166,10 @@ space.
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
-    <td>0.03s</td>
+    <td>0.04s</td>
     <td>0.02s</td>
     <td>0.01s</td>
-    <td>0.00s</td>
+    <td>0.01s</td>
   </tr>
   </tr>
   <tr align="right">
@@ -177,73 +177,73 @@ space.
     <td>4,118,054,813</td>
     <td>0.08s</td>
     <td>0.06s</td>
-    <td>0.01s</td>
-    <td>0.01s</td>
+    <td>0.02s</td>
+    <td>0.02s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.32s</td>
-    <td>0.27s</td>
-    <td>0.06s</td>
+    <td>0.31s</td>
+    <td>0.21s</td>
+    <td>0.04s</td>
     <td>0.03s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>1.58s</td>
-    <td>1.14s</td>
-    <td>0.13s</td>
+    <td>1.46s</td>
+    <td>1.11s</td>
+    <td>0.11s</td>
     <td>0.07s</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>9.73s</td>
-    <td>5.13s</td>
-    <td>0.49s</td>
+    <td>9.23s</td>
+    <td>5.81s</td>
+    <td>0.46s</td>
     <td>0.26s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>62.95s</td>
-    <td>28.55s</td>
-    <td>1.99s</td>
-    <td>1.03s</td>
+    <td>58.83s</td>
+    <td>33.40s</td>
+    <td>1.89s</td>
+    <td>1.00s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>447.11s</td>
-    <td>176.84s</td>
-    <td>8.67s</td>
-    <td>3.85s</td>
+    <td>402.41s</td>
+    <td>214.33s</td>
+    <td>8.20s</td>
+    <td>3.77s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
     <td>3,920.29s</td>
-    <td>1,349.95s</td>
-    <td>38.48s</td>
-    <td>15.16s</td>
+    <td>1,612.85s</td>
+    <td>36.05s</td>
+    <td>14.87s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
   <td>24,739,954,287,740,860</td>
     <td>31,897.66s</td>
     <td>9,885.71s</td>
-    <td>181.24s</td>
-    <td>64.20s</td>
+    <td>168.46s</td>
+    <td>62.03s</td>
   </tr>
 </table>
 
-The benchmarks above were run on an Intel Core i7-4770 CPU (4 x 3.4 GHz) from
-2013 using a 64-bit Linux operating system and primecount was compiled using
-GCC 4.8.
+The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
+2015 using a Linux x64 operating system and primecount was compiled using
+GCC 5.2.
 
 ### Build instructions (Unix-like OSes)
 To build primecount you need to have installed a C++ compiler and GNU
