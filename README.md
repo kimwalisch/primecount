@@ -239,6 +239,30 @@ space.
     <td>168.46s</td>
     <td>62.03s</td>
   </tr>
+  <tr align="right">
+  <td>10<sup>19</sup></td>
+  <td>234,057,667,276,344,607</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>278.02s</td>
+  </tr>
+  <tr align="right">
+  <td>10<sup>20</sup></td>
+  <td>2,220,819,602,560,918,840</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>1214.14s</td>
+  </tr>
+  <tr align="right">
+  <td>10<sup>21</sup></td>
+  <td>21,127,269,486,018,731,928</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>5422.27s</td>
+  </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
