@@ -1,6 +1,6 @@
-2015-11-15 Kim Walisch  <kim.walisch@gmail.com>
+2015-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 2.4 work in progress.
+  Version 2.4 released.
 
   * README.md: Simplified build instructions.
   * appveyor.yml: Automated Windows (MSVC++) testing.
