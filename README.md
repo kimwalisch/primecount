@@ -263,6 +263,14 @@ space.
     <td>NaN</td>
     <td>5,422.27s</td>
   </tr>
+  <tr align="right">
+  <td>10<sup>22</sup></td>
+  <td>201,467,286,689,315,906,290</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>NaN</td>
+    <td>24,098.16s</td>
+  </tr>
 </table>
 
 The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
