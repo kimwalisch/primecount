@@ -91,7 +91,7 @@ bool read_file(T x,
       T x2 = get_next_line(infile);
       int64_t y2 = (int64_t) get_next_line(infile);
       int64_t c2 = (int64_t) get_next_line(infile);
-      int64_t s2_trivial2 = (int64_t) get_next_line(infile);
+      T s2_trivial2 = get_next_line(infile);
       double seconds = get_next_double(infile);
 
       infile.close();
