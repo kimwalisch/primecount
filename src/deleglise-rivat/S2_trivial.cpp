@@ -116,9 +116,9 @@ bool read_file(T x,
           cout << "Seconds = " << seconds << endl;
           cout << "Status = 100%" << endl;
           cout << endl;
-
-          return true;
         }
+
+        return true;
       }
     }
     catch (std::exception&)
