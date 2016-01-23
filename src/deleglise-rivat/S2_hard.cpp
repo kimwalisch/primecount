@@ -35,6 +35,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -185,6 +186,25 @@ void read_file(T x,
           throw primecount_error("failed to read S2_hard.bin");
 
         fclose(pFile);
+
+        if (is_log())
+        {
+          ofstream outfile("primecount.log", std::ofstream::out | std::ofstream::app);
+
+          if (outfile.is_open())
+          {
+            outfile << "--- Resuming from S2_hard.txt ---" << endl;
+            outfile << "low = " << *low << endl;
+            outfile << "segment_size = " << *segment_size << endl;
+            outfile << "segments_per_thread = " << *segments_per_thread << endl;
+            outfile << "S2_hard = " << *s2_hard << endl;
+            outfile << "Seconds = " << seconds << endl;
+            outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+            outfile << endl;
+
+            outfile.close();
+          }
+        }
       }
     }
     catch (std::exception&)

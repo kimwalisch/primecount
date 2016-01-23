@@ -36,7 +36,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  double time = get_wtime();
   int64_t sum = 0;
 
   if (is_phi_tiny(a))

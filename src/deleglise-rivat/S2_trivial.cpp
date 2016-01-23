@@ -23,6 +23,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -116,6 +117,25 @@ bool read_file(T x,
           cout << "Seconds = " << seconds << endl;
           cout << "Status = 100%" << endl;
           cout << endl;
+        }
+
+        if (is_log())
+        {
+          ofstream outfile("primecount.log", std::ofstream::out | std::ofstream::app);
+
+          if (outfile.is_open())
+          {
+            outfile << "--- Resuming from S2_trivial.txt ---" << endl;
+            outfile << "x = " << x << endl;
+            outfile << "y = " << y << endl;
+            outfile << "c = " << c << endl;
+            outfile << "S2_trivial = " << *s2_trivial << endl;
+            outfile << "Seconds = " << seconds << endl;
+            outfile << "Status = 100%" << endl;
+            outfile << endl;
+
+            outfile.close();
+          }
         }
 
         return true;

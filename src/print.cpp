@@ -185,7 +185,6 @@ void print(const string& res_name, maxint_t res, double time)
 
     if (outfile.is_open())
     {
-      outfile << "\r" << string(50,' ') << "\r";
       outfile << "Status: 100%" << endl;
       outfile << res_name << " = " << res << endl;
       outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;

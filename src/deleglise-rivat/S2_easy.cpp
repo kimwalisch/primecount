@@ -28,6 +28,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <vector>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -140,6 +141,24 @@ void read_file(T x,
           cout << "Seconds = " << seconds << endl;
           cout << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
           cout << endl;
+        }
+
+        if (is_log())
+        {
+          ofstream outfile("primecount.log", std::ofstream::out | std::ofstream::app);
+
+          if (outfile.is_open())
+          {
+            outfile << "--- Resuming from S2_easy.txt ---" << endl;
+            outfile << "b = " << *b << endl;
+            outfile << "b_max = " << b_max << endl;
+            outfile << "S2_easy = " << *s2_easy << endl;
+            outfile << "Seconds = " << seconds << endl;
+            outfile << "Status = " << fixed << setprecision(get_status_precision(x)) << percent << '%' << endl;
+            outfile << endl;
+
+            outfile.close();
+          }
         }
 
         // we must start at b + 1

@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <exception>
 #include <iostream>
+#include <iomanip>
 #include <limits>
 #include <string>
 #include <fstream>
@@ -53,6 +54,8 @@ const std::string currentDateTime()
 
 namespace primecount {
 
+bool log_result = true;
+
 int64_t int64_cast(maxint_t x)
 {
   if (x > numeric_limits<int64_t>::max())
@@ -67,6 +70,7 @@ maxint_t P2(maxint_t x, int threads)
 
   double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
+  log_result = false;
 
   if (x > to_maxint(limit))
     throw primecount_error("P2(x): x must be <= " + limit);
@@ -89,6 +93,7 @@ maxint_t S1(maxint_t x, int threads)
 
   double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
+  log_result = false;
 
   if (x > to_maxint(limit))
     throw primecount_error("S1(x): x must be <= " + limit);
@@ -112,6 +117,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
 
   double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
+  log_result = false;
 
   if (x > to_maxint(limit))
     throw primecount_error("S2_trivial(x): x must be <= " + limit);
@@ -136,6 +142,7 @@ maxint_t S2_easy(maxint_t x, int threads)
 
   double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
+  log_result = false;
 
   if (x > to_maxint(limit))
     throw primecount_error("S2_easy(x): x must be <= " + limit);
@@ -160,6 +167,7 @@ maxint_t S2_hard(maxint_t x, int threads)
 
   double alpha = get_alpha_deleglise_rivat(x);
   string limit = get_max_x(alpha);
+  log_result = false;
 
   if (x > to_maxint(limit))
     throw primecount_error("S2_hard(x): x must be <= " + limit);
@@ -270,7 +278,7 @@ int main (int argc, char* argv[])
   }
 
   double seconds = get_wtime() - time;
-  
+
   if (print_result())
   {
     if (print_status())
@@ -280,7 +288,7 @@ int main (int argc, char* argv[])
       print_seconds(seconds);
   }
 
-  // Add delimiter line to primecount.log
+  // Write final result to primecount.log
   if (is_log())
   {
       ofstream outfile("primecount.log", std::ofstream::out | std::ofstream::app);
@@ -288,6 +296,14 @@ int main (int argc, char* argv[])
       if (outfile.is_open())
       {
         outfile << endl;
+
+        if (print_result() && log_result)
+        {
+          outfile << res << endl;
+          outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+          outfile << endl;
+        }
+
         outfile << "-----------------------------------------------------------------------";
         outfile << endl;
         outfile.close();
