@@ -33,6 +33,7 @@ const string helpMenu(
   "         --Li               Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse       Approximate the nth prime using Li^-1(x)\n"
   "  -n,    --nthprime         Calculate the nth prime\n"
+  "         --results=<file>   Add result to file\n"
   "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
   "  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...\n"
   "                            [N] digits after decimal point e.g. N=1, 99.9%\n"

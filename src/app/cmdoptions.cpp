@@ -92,6 +92,7 @@ void initOptionMap()
   optionMap["--P2"]                        = OPTION_P2;
   optionMap["--pi"]                        = OPTION_PI;
   optionMap["-p"]                          = OPTION_PRIMESIEVE;
+  optionMap["--results"]                   = OPTION_RESULTS;
   optionMap["--primesieve"]                = OPTION_PRIMESIEVE;
   optionMap["--S1"]                        = OPTION_S1;
   optionMap["--S2_easy"]                   = OPTION_S2_EASY;
@@ -149,6 +150,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
         case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
+        case OPTION_RESULTS: pco.results_file = option.value; break;
         case OPTION_STATUS:  set_print_status(true);
                              if (!option.value.empty())
                                 set_status_precision(option.getValue<int>());
