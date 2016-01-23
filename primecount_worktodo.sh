@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Script: primecount_worktodo.sh
+# Iterates over the numbers in worktodo.txt (one number per line with
+# optional command-line flags) and processes them using primecount.
+
 while read first_line < worktodo.txt
 do
     # Skip empty lines
