@@ -33,5 +33,5 @@ do
 
     # delete first line from worktodo.txt
     tail -n +2 worktodo.txt > .tmp_worktodo.txt
-    cp -f .tmp_worktodo.txt worktodo.txt
+    mv -f .tmp_worktodo.txt worktodo.txt
 done
