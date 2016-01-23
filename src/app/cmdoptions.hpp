@@ -40,12 +40,12 @@ enum OptionValues
   OPTION_LMO_PARALLEL3,
   OPTION_LI,
   OPTION_LIINV,
+  OPTION_LOG,
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NUMBER,
   OPTION_P2,
   OPTION_PI,
-  OPTION_RESULTS,
   OPTION_PRIMESIEVE,
   OPTION_S1,
   OPTION_S2_EASY,
@@ -64,8 +64,8 @@ struct PrimeCountOptions
   int64_t option;
   bool time;
   int threads;
+  std::string options;
   std::string number_string;
-  std::string results_file;
   PrimeCountOptions() :
     x(-1),
     option(OPTION_PI),

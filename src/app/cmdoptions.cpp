@@ -84,6 +84,7 @@ void initOptionMap()
   optionMap["--lmo_parallel3"]             = OPTION_LMO_PARALLEL3;
   optionMap["--Li"]                        = OPTION_LI;
   optionMap["--Li_inverse"]                = OPTION_LIINV;
+  optionMap["--log"]                       = OPTION_LOG;
   optionMap["-m"]                          = OPTION_MEISSEL;
   optionMap["--meissel"]                   = OPTION_MEISSEL;
   optionMap["-n"]                          = OPTION_NTHPRIME;
@@ -92,7 +93,6 @@ void initOptionMap()
   optionMap["--P2"]                        = OPTION_P2;
   optionMap["--pi"]                        = OPTION_PI;
   optionMap["-p"]                          = OPTION_PRIMESIEVE;
-  optionMap["--results"]                   = OPTION_RESULTS;
   optionMap["--primesieve"]                = OPTION_PRIMESIEVE;
   optionMap["--S1"]                        = OPTION_S1;
   optionMap["--S2_easy"]                   = OPTION_S2_EASY;
@@ -142,7 +142,9 @@ PrimeCountOptions parseOptions(int argc, char** argv)
     // iterate over the command-line options
     for (int i = 1; i < argc; i++)
     {
+      pco.options += string(argv[i]) + " ";
       Option option = makeOption(argv[i]);
+
       switch (optionMap[option.id])
       {
         case OPTION_ALPHA:   set_alpha(to_double(option.value)); break;
@@ -152,7 +154,7 @@ PrimeCountOptions parseOptions(int argc, char** argv)
                              break;
         case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
-        case OPTION_RESULTS: pco.results_file = option.value; break;
+        case OPTION_LOG:     set_log(true); break;
         case OPTION_STATUS:  set_print_status(true);
                              if (!option.value.empty())
                                 set_status_precision(option.getValue<int>());
@@ -174,6 +176,9 @@ PrimeCountOptions parseOptions(int argc, char** argv)
     pco.x = numbers[0];
   else
     help();
+
+  // remove last space
+  pco.options.erase(pco.options.size() - 1);
 
   return pco;
 }

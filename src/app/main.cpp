@@ -25,8 +25,31 @@
 #include <string>
 #include <fstream>
 
+// for currentDateTime()
+#include <stdio.h>
+#include <time.h>
+
 using namespace std;
 using namespace primecount;
+
+namespace {
+
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+// Link: http://stackoverflow.com/a/10467633
+const std::string currentDateTime()
+{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+
+    return buf;
+}
+
+}
 
 namespace primecount {
 
@@ -246,22 +269,44 @@ int main (int argc, char* argv[])
     return 1;
   }
 
+  double seconds = get_wtime() - time;
+  
   if (print_result())
   {
     if (print_status())
       cout << endl;
     cout << res << endl;
     if (pco.time)
-      print_seconds(get_wtime() - time);
+      print_seconds(seconds);
   }
-  
-  if (!pco.results_file.empty())
+
+  // Add delimiter line to primecount.log
+  if (is_log())
   {
-      ofstream outfile(pco.results_file.c_str(), std::ofstream::out | std::ofstream::app);
+      ofstream outfile("primecount.log", std::ofstream::out | std::ofstream::app);
+
+      if (outfile.is_open())
+      {
+        outfile << endl;
+        outfile << "-----------------------------------------------------------------------";
+        outfile << endl;
+        outfile.close();
+      }
+  }
+
+  // Append result to results.txt
+  if (is_log())
+  {
+      ofstream outfile("results.txt", std::ofstream::out | std::ofstream::app);
 
       if (outfile.is_open())
       {
         outfile << result_label << "(" << pco.number_string << ") = " << res << endl;
+        outfile << "Command: " << pco.options << endl;
+        outfile << "Seconds: " << seconds << endl;
+        outfile << "Finished: " << currentDateTime() << endl;
+        outfile << endl;
+
         outfile.close();
       }
   }

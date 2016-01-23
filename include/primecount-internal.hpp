@@ -135,6 +135,10 @@ void set_backup(double seconds);
 
 bool is_backup(double seconds);
 
+void set_log(bool logging);
+
+bool is_log();
+
 void set_alpha(double alpha);
 
 double get_alpha();

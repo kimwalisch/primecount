@@ -36,10 +36,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  print("");
-  print("=== phi(x, a) ===");
-  print("Count the numbers <= x coprime to the first a primes");
-
   double time = get_wtime();
   int64_t sum = 0;
 
@@ -72,7 +68,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
     }
   }
 
-  print("phi", sum, time);
   return sum;
 }
 

@@ -42,6 +42,9 @@ const int deleglise_rivat_threshold = 10000000;
 // Store a backup file every hour
 double backup_ = 3600;
 
+// log to primecount.log
+bool is_log_ = false;
+
 }
 
 namespace primecount {
@@ -373,6 +376,17 @@ void set_backup(double seconds)
 {
   backup_ = seconds;
 }
+
+bool is_log()
+{
+  return is_log_;
+}
+
+void set_log(bool logging)
+{
+  is_log_ = logging;
+}
+
 
 int get_status_precision(maxint_t x)
 {
