@@ -64,6 +64,7 @@ struct PrimeCountOptions
   int64_t option;
   bool time;
   int threads;
+  std::string number_string;
   std::string results_file;
   PrimeCountOptions() :
     x(-1),

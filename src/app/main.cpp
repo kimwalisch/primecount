@@ -167,70 +167,70 @@ int main (int argc, char* argv[])
   maxint_t x = pco.x;
   maxint_t res = 0;
   int threads = pco.threads;
-  std::string result_info;
+  std::string result_label;
 
   try
   {
     switch (pco.option)
     {
       case OPTION_DELEGLISE_RIVAT:
-        res = pi_deleglise_rivat(x, threads); result_info = "pi("; break;
+        res = pi_deleglise_rivat(x, threads); result_label = "pi"; break;
       case OPTION_DELEGLISE_RIVAT1:
-        res = pi_deleglise_rivat1(int64_cast(x)); result_info = "pi("; break;
+        res = pi_deleglise_rivat1(int64_cast(x)); result_label = "pi"; break;
       case OPTION_DELEGLISE_RIVAT2:
-        res = pi_deleglise_rivat2(int64_cast(x)); result_info = "pi("; break;
+        res = pi_deleglise_rivat2(int64_cast(x)); result_label = "pi"; break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
-        res = pi_deleglise_rivat_parallel1(int64_cast(x), threads); result_info = "pi("; break;
+        res = pi_deleglise_rivat_parallel1(int64_cast(x), threads); result_label = "pi"; break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
-        res = pi_deleglise_rivat_parallel2(int64_cast(x), threads); result_info = "pi("; break;
+        res = pi_deleglise_rivat_parallel2(int64_cast(x), threads); result_label = "pi"; break;
       case OPTION_LEGENDRE:
-        res = pi_legendre(int64_cast(x), threads); result_info = "pi_legendre("; break;
+        res = pi_legendre(int64_cast(x), threads); result_label = "pi_legendre"; break;
       case OPTION_LEHMER:
-        res = pi_lehmer(int64_cast(x), threads); result_info = "pi_lehmer("; break;
+        res = pi_lehmer(int64_cast(x), threads); result_label = "pi_lehmer"; break;
       case OPTION_LMO:
-        res = pi_lmo(int64_cast(x), threads); result_info = "pi_lmo("; break;
+        res = pi_lmo(int64_cast(x), threads); result_label = "pi_lmo"; break;
       case OPTION_LMO1:
-        res = pi_lmo1(int64_cast(x)); result_info = "pi_lmo("; break;
+        res = pi_lmo1(int64_cast(x)); result_label = "pi_lmo"; break;
       case OPTION_LMO2:
-        res = pi_lmo2(int64_cast(x)); result_info = "pi_lmo("; break;
+        res = pi_lmo2(int64_cast(x)); result_label = "pi_lmo"; break;
       case OPTION_LMO3:
-        res = pi_lmo3(int64_cast(x)); result_info = "pi_lmo("; break;
+        res = pi_lmo3(int64_cast(x)); result_label = "pi_lmo"; break;
       case OPTION_LMO4:
-        res = pi_lmo4(int64_cast(x)); result_info = "pi_lmo("; break;
+        res = pi_lmo4(int64_cast(x)); result_label = "pi_lmo"; break;
       case OPTION_LMO5:
-        res = pi_lmo5(int64_cast(x)); result_info = "pi_lmo("; break;
+        res = pi_lmo5(int64_cast(x)); result_label = "pi_lmo"; break;
       case OPTION_LMO_PARALLEL1:
-        res = pi_lmo_parallel1(int64_cast(x), threads); result_info = "pi_lmo("; break;
+        res = pi_lmo_parallel1(int64_cast(x), threads); result_label = "pi_lmo"; break;
       case OPTION_LMO_PARALLEL2:
-        res = pi_lmo_parallel2(int64_cast(x), threads); result_info = "pi_lmo("; break;
+        res = pi_lmo_parallel2(int64_cast(x), threads); result_label = "pi_lmo"; break;
       case OPTION_LMO_PARALLEL3:
-        res = pi_lmo_parallel3(int64_cast(x), threads); result_info = "pi_lmo("; break;
+        res = pi_lmo_parallel3(int64_cast(x), threads); result_label = "pi_lmo"; break;
       case OPTION_MEISSEL:
-        res = pi_meissel(int64_cast(x), threads); result_info = "pi_meissel("; break;
+        res = pi_meissel(int64_cast(x), threads); result_label = "pi_meissel"; break;
       case OPTION_PRIMESIEVE:
-        res = pi_primesieve(int64_cast(x), threads); result_info = "pi_primesieve("; break;
+        res = pi_primesieve(int64_cast(x), threads); result_label = "pi_primesieve"; break;
       case OPTION_P2:
-        res = P2(x, threads); result_info = "P2("; break;
+        res = P2(x, threads); result_label = "P2"; break;
       case OPTION_PI:
-        res = pi(x, threads); result_info = "pi("; break;
+        res = pi(x, threads); result_label = "pi"; break;
       case OPTION_LI:
-        res = Li(int64_cast(x)); result_info = "Li("; break;
+        res = Li(int64_cast(x)); result_label = "Li"; break;
       case OPTION_LIINV:
-        res = Li_inverse(int64_cast(x)); result_info = "Li_inverse("; break;
+        res = Li_inverse(int64_cast(x)); result_label = "Li_inverse"; break;
       case OPTION_NTHPRIME:
-        res = nth_prime(int64_cast(x), threads); result_info = "nthprime("; break;
+        res = nth_prime(int64_cast(x), threads); result_label = "nthprime"; break;
       case OPTION_S1:
-        res = S1(x, threads); result_info = "S1("; break;
+        res = S1(x, threads); result_label = "S1"; break;
       case OPTION_S2_EASY:
-        res = S2_easy(x, threads); result_info = "S2_easy("; break;
+        res = S2_easy(x, threads); result_label = "S2_easy"; break;
       case OPTION_S2_HARD:
-        res = S2_hard(x, threads); result_info = "S2_hard("; break;
+        res = S2_hard(x, threads); result_label = "S2_hard"; break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x, threads); result_info = "S2_trivial("; break;
+        res = S2_trivial(x, threads); result_label = "S2_trivial"; break;
 
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL3:
-        res = pi_deleglise_rivat_parallel3(x, threads); result_info = "pi("; break;
+        res = pi_deleglise_rivat_parallel3(x, threads); result_label = "pi"; break;
 #endif
     }
   }
@@ -261,7 +261,7 @@ int main (int argc, char* argv[])
 
       if (outfile.is_open())
       {
-        outfile << result_info << x << ") = " << res << endl;
+        outfile << result_label << "(" << pco.number_string << ") = " << res << endl;
         outfile.close();
       }
   }
