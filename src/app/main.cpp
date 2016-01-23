@@ -257,7 +257,7 @@ int main (int argc, char* argv[])
   
   if (!pco.results_file.empty())
   {
-      ofstream outfile(pco.results_file, std::ofstream::out | std::ofstream::app);
+      ofstream outfile(pco.results_file.c_str(), std::ofstream::out | std::ofstream::app);
 
       if (outfile.is_open())
       {
