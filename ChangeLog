@@ -6,7 +6,7 @@
   primecount backup version.
 
   * --log: Logs results into results.txt and primecount.log.
-  * primecount_worktodo.sh: Script for batch processing via worktodo.txt.
+  * scripts/worktodo.sh: Script for batch processing via worktodo.txt.
   * src/S1.cpp: Fix integer overflow bug (in backup branch).
   * src/deleglise-rivat/S2_trivial.cpp: Fix integer overflow bug (in backup branch).
 
