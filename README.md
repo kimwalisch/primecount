@@ -9,8 +9,9 @@ per hour (configurable using ```--backup[=N]```). If your computer crashes
 and you restart the same computation primecount will automatically resume
 from the backup files.
 
-The backup functionality works quite nicely but the code quality does not
-yet meet my standards to be included into the master branch.
+The backup functionality works very well but the code is a little messy
+and not polished that is the reason why I have not merged it into the master
+branch.
 
 ### Binaries
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
