@@ -2,9 +2,13 @@
 
   Version 2.5 released.
 
-  * src/S1.cpp: Fix integer overflow bug in backup branch.
-  * src/deleglise-rivat/S2_trivial.cpp: Fix integer overflow bug in backup branch.
-  * Add --results=<file.txt> command line option to backup branch.
+  This version adds logging and fixes 2 integer overflow bugs in the
+  primecount backup version.
+
+  * --log: Logs results into results.txt and primecount.log.
+  * primecount_worktodo.sh: Script for batch processing via worktodo.txt.
+  * src/S1.cpp: Fix integer overflow bug (in backup branch).
+  * src/deleglise-rivat/S2_trivial.cpp: Fix integer overflow bug (in backup branch).
 
 2015-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
