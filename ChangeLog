@@ -1,3 +1,11 @@
+2016-01-23 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.5 released.
+
+  * src/S1.cpp: Fix integer overflow bug in backup branch.
+  * src/deleglise-rivat/S2_trivial.cpp: Fix integer overflow bug in backup branch.
+  * Add --results=<file.txt> command line option to backup branch.
+
 2015-12-27 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.4 released.
