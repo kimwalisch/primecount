@@ -16,8 +16,8 @@ log_flag=$(./primecount --help | grep Log > /dev/null && echo --log)
 
 while read first_line < worktodo.txt
 do
-    # Skip empty lines
-    if [ "$first_line" != "" ]
+    # Skip empty lines and comments
+    if [ "$first_line" != "" ] && [ ${first_line:0:1} != "#" ]
     then
         ./primecount $first_line $log_flag
 
