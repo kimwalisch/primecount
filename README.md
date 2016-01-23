@@ -30,7 +30,7 @@ e99df1b1c34107715b4391b917b64ea7834066a6  primecount-backup-2.4-linux-x64.tar.gz
 ### Backup usage example
 ```sh
 # We start a computation and then simulate a crash using Ctrl + C
-$ ./primecount 1e22 --S2_hard --status --backup=60
+$ ./primecount 1e22 --S2_hard --status --log
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
@@ -46,7 +46,7 @@ Status: 43.2%, Load balance: 97%^C
 
 ```sh
 # Now when we rerun the same computation primecount resumes from the backup file
-$ ./primecount 1e22 --S2_hard --status --backup=60
+$ ./primecount 1e22 --S2_hard --status --log
 
 === S2_hard(x, y) ===
 Computation of the hard special leaves
@@ -66,6 +66,29 @@ Seconds = 3624.303
 Status = 33.1%
 ```
 
+### Batch processing
+
+It is possible to create a ```worktodo.txt``` file with a list of
+numbers to be computed e.g.:
+
+```sh
+# worktodo.txt
+10000000
+1e15
+1e15 --alpha=10 --threads=4
+1e14 --P2
+1e18 --S2_hard
+```
+
+Then you can batch process all the numbers from ```worktodo.txt``` using:
+
+```sh
+$ bash scripts/worktodo.sh
+```
+
+The results will be stored in ```results.txt``` and more details are
+logged into ```primecount.log```.
+
 ### Command-line options
 ```
 Usage: primecount x [OPTION]...
@@ -79,6 +102,7 @@ Options:
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
   -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
+         --log              Log into primecount.log and results.txt
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
          --Li_inverse       Approximate the nth prime using Li^-1(x)
