@@ -24,14 +24,14 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.4-win64.zip">primecount-2.4-win64.zip</a>, 380K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.4-linux-x64.tar.gz">primecount-2.4-linux-x64.tar.gz</a>, 889K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.5-win64.zip">primecount-2.5-win64.zip</a>, 380K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.5-linux-x64.tar.gz">primecount-2.5-linux-x64.tar.gz</a>, 888K
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 SHA1 checksums of the files:
 ```sh
-4a2909a2559cfa3b496826b337f127eee08f01aa  primecount-2.4-win64.zip
-a767417fe40215bf96998ab40fbeff8f27d9be8b  primecount-2.4-linux-x64.tar.gz
+db7fcf7edd41e9ef1e8db428104f33998afaaa9c  primecount-2.5-win64.zip
+6b3f36ec9aba4f9db1565585fb90103fc1928d79  primecount-2.5-linux-x64.tar.gz
 ```
 
 ### Usage examples
@@ -290,7 +290,7 @@ $ sudo make install
 ```
 
 Then download the latest
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.4.tar.gz">primecount-2.4.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.5.tar.gz">primecount-2.5.tar.gz</a>
 release tarball and build it using:
 ```sh
 $ ./configure
