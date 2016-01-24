@@ -110,7 +110,10 @@ void save_file(T x,
     throw primecount_error("failed to write S2_hard.bin");
 
   if (fwrite(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+  {
+    fclose(pFile);
     throw primecount_error("failed to write S2_hard.bin");
+  }
 
   fclose(pFile);
 }
@@ -183,7 +186,10 @@ void read_file(T x,
           throw primecount_error("failed to read S2_hard.bin");
 
         if (fread(&phi_total[0], sizeof(int64_t), phi_total.size(), pFile) != phi_total.size())
+        {
+          fclose(pFile);
           throw primecount_error("failed to read S2_hard.bin");
+        }
 
         fclose(pFile);
 
