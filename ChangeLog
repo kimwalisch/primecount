@@ -1,9 +1,9 @@
-2016-01-23 Kim Walisch  <kim.walisch@gmail.com>
+2016-01-24 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.5 released.
 
-  This version adds logging and fixes 2 integer overflow bugs in the
-  primecount backup version.
+  This version adds logging to primecount-backup and fixes 2
+  integer overflow bugs in primecount-backup.
 
   * --log: Logs results into results.txt and primecount.log.
   * scripts/worktodo.sh: Script for batch processing via worktodo.txt.
