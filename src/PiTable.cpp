@@ -46,7 +46,6 @@ PiTable::PiTable(std::vector<int32_t> primes)
   pi_.resize(max_ / 64 + 1);
 
   uint64_t pix = 0;
-  uint64_t prime = 0;
   uint64_t one = 1;
 
   for (uint64_t i = 1; i < primes.size(); i++)
