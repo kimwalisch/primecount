@@ -14,7 +14,7 @@
 ///            POPCNT instruction we can now easily count the primes
 ///            within ]n - n % 64, n] and add it to 1).
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,6 +35,8 @@ class PiTable
 {
 public:
   PiTable(uint64_t max);
+
+  PiTable(std::vector<int32_t> primes);
 
   /// @return  The number of primes <= n
   int64_t operator[](uint64_t n) const

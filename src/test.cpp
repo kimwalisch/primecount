@@ -137,7 +137,7 @@ bool test()
     CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22, 100);
     CHECK_EQUAL(pi_meissel,                   pi_legendre,        CHECK_22, 400);
     CHECK_EQUAL(pi_lehmer,                    pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_lmo1,                      pi_meissel,         CHECK_12, 200);
+    CHECK_EQUAL(pi_lmo1,                      pi_meissel,         CHECK_12, 100);
     CHECK_EQUAL(pi_lmo2,                      pi_meissel,         CHECK_12, 200);
     CHECK_EQUAL(pi_lmo3,                      pi_meissel,         CHECK_12, 300);
     CHECK_EQUAL(pi_lmo4,                      pi_meissel,         CHECK_12, 300);

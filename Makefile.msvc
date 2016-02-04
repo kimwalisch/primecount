@@ -17,7 +17,6 @@ LIB_OBJECTS = \
 	src\Li.obj \
 	src\nth_prime.obj \
 	src\phi.obj \
-	src\PhiCache.obj \
 	src\PhiTiny.obj \
 	src\pi_legendre.obj \
 	src\pi_lehmer.obj \

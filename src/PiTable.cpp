@@ -2,7 +2,7 @@
 /// @file  PiTable.cpp
 /// @see   PiTable.hpp for documentation.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,6 +30,29 @@ PiTable::PiTable(uint64_t max) :
   {
     uint64_t index = prime / 64;
     uint64_t mask = one << (prime % 64);
+    pi_[index].bits |= mask;
+  }
+
+  for (uint64_t i = 0; i < pi_.size(); i++)
+  {
+    pi_[i].prime_count = pix;
+    pix += popcount_u64(pi_[i].bits);
+  }
+}
+
+PiTable::PiTable(std::vector<int32_t> primes)
+{
+  max_ = primes.back();
+  pi_.resize(max_ / 64 + 1);
+
+  uint64_t pix = 0;
+  uint64_t prime = 0;
+  uint64_t one = 1;
+
+  for (uint64_t i = 1; i < primes.size(); i++)
+  {
+    uint64_t index = primes[i] / 64;
+    uint64_t mask = one << (primes[i] % 64);
     pi_[index].bits |= mask;
   }
 

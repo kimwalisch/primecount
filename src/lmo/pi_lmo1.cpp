@@ -7,7 +7,7 @@
 ///        implementation calculates phi(x, a) using the recursive
 ///        formula with caching.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,8 +16,8 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
+#include <PhiTiny.hpp>
 #include <pmath.hpp>
-#include <PhiCache.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -51,13 +51,11 @@ int64_t pi_lmo1(int64_t x)
     if (lpf[n] > primes[c])
       S1 += mu[n] * phi(x / n, c);
 
-  PhiCache cache(primes);
-
   // Calculate the contribution of the special leaves
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])
-        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, &cache);
+        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
   int64_t phi = S1 + S2;
   int64_t sum = phi + pi_y - 1 - P2(x, y, 1);

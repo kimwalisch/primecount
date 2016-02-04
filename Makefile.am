@@ -38,7 +38,6 @@ libprimecount_la_SOURCES = \
 	src/generate.cpp \
 	src/Li.cpp \
 	src/nth_prime.cpp \
-	src/PhiCache.cpp \
 	src/P2.cpp \
 	src/P3.cpp \
 	src/PhiTiny.cpp \
@@ -84,7 +83,6 @@ libprimecount_la_SOURCES = \
 	include/pmath.hpp \
 	include/print.hpp \
 	include/primecount-internal.hpp \
-	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
 	include/S1.hpp \
