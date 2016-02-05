@@ -3,7 +3,7 @@
 /// @brief Calculate the contribution of the trivial special leaves
 ///        in parallel using OpenMP.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -37,15 +37,9 @@ T S2_trivial(T x,
              int64_t c,
              int threads)
 {
-  print("");
-  print("=== S2_trivial(x, y) ===");
-  print("Computation of the trivial special leaves");
-  print(x, y, c, threads);
-
   int64_t thread_threshold = ipow(10, 7);
   threads = validate_threads(threads, y, thread_threshold);
 
-  double time = get_wtime();
   PiTable pi(y);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
@@ -71,7 +65,6 @@ T S2_trivial(T x,
     }
   }
 
-  print("S2_trivial", s2_trivial, time);
   return s2_trivial;
 }
 
@@ -86,7 +79,16 @@ int64_t S2_trivial(int64_t x,
                    int64_t c,
                    int threads)
 {
-  return S2_trivial::S2_trivial(x, y, z, c, threads);
+  print("");
+  print("=== S2_trivial(x, y) ===");
+  print("Computation of the trivial special leaves");
+  print(x, y, c, threads);
+
+  double time = get_wtime();
+  int64_t s2_trivial = S2_trivial::S2_trivial(x, y, z, c, threads);
+  
+  print("S2_trivial", s2_trivial, time);
+  return s2_trivial;
 }
 
 #ifdef HAVE_INT128_T
@@ -97,7 +99,16 @@ int128_t S2_trivial(int128_t x,
                     int64_t c,
                     int threads)
 {
-  return S2_trivial::S2_trivial(x, y, z, c, threads);
+  print("");
+  print("=== S2_trivial(x, y) ===");
+  print("Computation of the trivial special leaves");
+  print(x, y, c, threads);
+
+  double time = get_wtime();
+  int128_t s2_trivial = S2_trivial::S2_trivial(x, y, z, c, threads);
+  
+  print("S2_trivial", s2_trivial, time);
+  return s2_trivial;
 }
 
 #endif
