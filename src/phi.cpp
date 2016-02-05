@@ -35,6 +35,7 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <fast_div.hpp>
+#include <min_max.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -72,7 +73,7 @@ public:
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
-    int64_t sum;
+    int64_t sum = 0;
 
     if (x <= primes_[a])
       sum = SIGN;
@@ -84,6 +85,7 @@ public:
     {
       int64_t sqrtx = isqrt(x);
       int64_t pi_sqrtx = a;
+
       if (sqrtx < pi_.size() && sqrtx < primes_[a])
         pi_sqrtx = pi_[sqrtx];
 
@@ -97,8 +99,8 @@ public:
       //
       sum = (a - pi_sqrtx) * -SIGN;
 
-      // phi(x, 1) - \sum_{a2 = 1}^{c - 1} phi(x / primes_[a2 + 1], a2) = phi(x, c)
-      int64_t c = min(pi_sqrtx, PhiTiny::max_a());
+      // phi(x, c) = phi(x, 1) - \sum_{a2 = 1}^{c - 1} phi(x / primes_[a2 + 1], a2)
+      int64_t c = min(PhiTiny::max_a(), pi_sqrtx);
       sum += phi_tiny(x, c) * SIGN;
 
       for (int64_t a2 = c; a2 < pi_sqrtx; a2++)
@@ -147,14 +149,18 @@ private:
 
   bool is_cached(int64_t x, int64_t a) const
   {
-    return a <= CACHE_A_LIMIT && x < cache_size(a) && cache_[a][x] != 0;
+    return a <= CACHE_A_LIMIT && 
+           x < cache_size(a) && 
+           cache_[a][x] != 0;
   }
 
   bool write_to_cache(int64_t x, int64_t a)
   {
-    if (a > CACHE_A_LIMIT || x > numeric_limits<uint16_t>::max())
+    if (a > CACHE_A_LIMIT || 
+        x > numeric_limits<uint16_t>::max())
       return false;
 
+    // check if we need to increase cache size
     if (x >= cache_size(a))
     {
       if (bytes_ > CACHE_BYTES_LIMIT)
@@ -167,7 +173,7 @@ private:
   }
 };
 
-}
+} // namespace
 
 namespace primecount {
 
@@ -205,14 +211,16 @@ int64_t phi(int64_t x, int64_t a, int threads)
       // because the cache requires too much memory bandwidth
       threads = min(8, threads);
 
-      PiTable pi(primes);
+      // use a large pi(x) lookup table for speed
+      int64_t sqrtx = isqrt(x);
+      PiTable pi(max(sqrtx, primes[a]));
       PhiCache cache(primes, pi);
 
-      int64_t iters = pi_bsearch(primes, a, isqrt(x));
-      sum = x - a + iters;
+      int64_t pi_sqrtx = min(pi[sqrtx], a); 
+      sum = x - a + pi_sqrtx;
 
       #pragma omp parallel for firstprivate(cache) num_threads(threads) schedule(dynamic, 16) reduction(+: sum)
-      for (int64_t a2 = 0; a2 < iters; a2++)
+      for (int64_t a2 = 0; a2 < pi_sqrtx; a2++)
         sum += cache.phi<-1>(x / primes[a2 + 1], a2);
     }
   }
