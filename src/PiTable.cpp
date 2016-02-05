@@ -40,26 +40,4 @@ PiTable::PiTable(uint64_t max) :
   }
 }
 
-PiTable::PiTable(std::vector<int32_t> primes)
-{
-  max_ = primes.back();
-  pi_.resize(max_ / 64 + 1);
-
-  uint64_t pix = 0;
-  uint64_t one = 1;
-
-  for (uint64_t i = 1; i < primes.size(); i++)
-  {
-    uint64_t index = primes[i] / 64;
-    uint64_t mask = one << (primes[i] % 64);
-    pi_[index].bits |= mask;
-  }
-
-  for (uint64_t i = 0; i < pi_.size(); i++)
-  {
-    pi_[i].prime_count = pix;
-    pix += popcount_u64(pi_[i].bits);
-  }
-}
-
 } // namespace

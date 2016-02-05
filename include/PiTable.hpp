@@ -36,8 +36,6 @@ class PiTable
 public:
   PiTable(uint64_t max);
 
-  PiTable(std::vector<int32_t> primes);
-
   /// @return  The number of primes <= n
   int64_t operator[](uint64_t n) const
   {
