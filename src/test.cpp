@@ -2,7 +2,7 @@
 /// @file   test.cpp
 /// @brief  primecount integration tests.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -134,27 +134,27 @@ bool test()
   {
     test_phi_thread_safety(100);
 
-    CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22, 100);
-    CHECK_EQUAL(pi_meissel,                   pi_legendre,        CHECK_22, 400);
-    CHECK_EQUAL(pi_lehmer,                    pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_lmo1,                      pi_meissel,         CHECK_12, 100);
-    CHECK_EQUAL(pi_lmo2,                      pi_meissel,         CHECK_12, 200);
-    CHECK_EQUAL(pi_lmo3,                      pi_meissel,         CHECK_12, 300);
-    CHECK_EQUAL(pi_lmo4,                      pi_meissel,         CHECK_12, 300);
-    CHECK_EQUAL(pi_lmo5,                      pi_meissel,         CHECK_12, 400);
-    CHECK_EQUAL(pi_lmo_parallel1,             pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_lmo_parallel2,             pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_lmo_parallel3,             pi_meissel,         CHECK_22, 400);
-    CHECK_EQUAL(pi_deleglise_rivat1,          pi_lmo_parallel3,   CHECK_12, 600);
-    CHECK_EQUAL(pi_deleglise_rivat2,          pi_lmo_parallel3,   CHECK_12, 600);
-    CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22, 900);
-    CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 900);
+    CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22,  100);
+    CHECK_EQUAL(pi_meissel,                   pi_legendre,        CHECK_22,  500);
+    CHECK_EQUAL(pi_lehmer,                    pi_meissel,         CHECK_22,  500);
+    CHECK_EQUAL(pi_lmo1,                      pi_meissel,         CHECK_12,   50);
+    CHECK_EQUAL(pi_lmo2,                      pi_meissel,         CHECK_12,  200);
+    CHECK_EQUAL(pi_lmo3,                      pi_meissel,         CHECK_12,  300);
+    CHECK_EQUAL(pi_lmo4,                      pi_meissel,         CHECK_12,  300);
+    CHECK_EQUAL(pi_lmo5,                      pi_meissel,         CHECK_12,  600);
+    CHECK_EQUAL(pi_lmo_parallel1,             pi_meissel,         CHECK_22,  400);
+    CHECK_EQUAL(pi_lmo_parallel2,             pi_meissel,         CHECK_22,  400);
+    CHECK_EQUAL(pi_lmo_parallel3,             pi_meissel,         CHECK_22,  900);
+    CHECK_EQUAL(pi_deleglise_rivat1,          pi_lmo_parallel3,   CHECK_12,  600);
+    CHECK_EQUAL(pi_deleglise_rivat2,          pi_lmo_parallel3,   CHECK_12,  600);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel1, pi_lmo_parallel3,   CHECK_22,  900);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel2, pi_lmo_parallel3,   CHECK_22, 1500);
 
 #ifdef HAVE_INT128_T
-    CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 900);
+    CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 1500);
 #endif
 
-    check_nth_prime(200);
+    check_nth_prime(300);
   }
   catch (exception& e)
   {
