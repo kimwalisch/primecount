@@ -11,6 +11,12 @@
 #   instructions in doc/alpha-factor-tuning.pdf and generate a new
 #   alpha tuning function for use in primecount's source code.
 
+# Execute in base directory
+if [ "$(basename $(pwd))" == "scripts" ]
+then
+    cd ..
+fi
+
 command -v ./primecount >/dev/null 2>/dev/null
 if [ $? -ne 0 ]
 then
