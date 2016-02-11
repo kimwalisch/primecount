@@ -3,6 +3,8 @@
 !/.gitignore
 !/.travis.yml
 *.exe
+*.tar.gz
+*.zip
 *.obj
 *.lib
 *.o
@@ -10,6 +12,9 @@
 *.la
 /primecount
 /primesieve*
+/include/primesieve*
+/bin/*
+/lib/*
 Makefile
 Makefile.in
 autoconf.h*
