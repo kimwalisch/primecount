@@ -1,3 +1,17 @@
+2016-02-11 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 2.6 work in progress.
+
+  primecount has been distributed using MPI (Message Passing Interface)
+  and can now run computations on large clusters!
+  The distributed version of primecount is named primecount-mpi and
+  the code can be found at:
+
+  https://github.com/kimwalisch/primecount/tree/mpi
+
+  * src/phi.cpp: 2x speed up due to pi(x) lookup table optimization.
+  * scripts/build.sh: Easily build primecount.
+
 2016-01-24 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.5 released.
