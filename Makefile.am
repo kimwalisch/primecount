@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	autogen.sh \
 	doc/alpha-tuning-factor.nb \
 	doc/alpha-tuning-factor.pdf \
+	scripts/build.sh \
 	scripts/find_fastest_alpha.sh \
 	scripts/worktodo.sh \
 	src/msvc/has_openmp.cpp \
@@ -38,7 +39,6 @@ libprimecount_la_SOURCES = \
 	src/generate.cpp \
 	src/Li.cpp \
 	src/nth_prime.cpp \
-	src/PhiCache.cpp \
 	src/P2.cpp \
 	src/P3.cpp \
 	src/PhiTiny.cpp \
@@ -84,7 +84,6 @@ libprimecount_la_SOURCES = \
 	include/pmath.hpp \
 	include/print.hpp \
 	include/primecount-internal.hpp \
-	include/PhiCache.hpp \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
 	include/S1.hpp \
