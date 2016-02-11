@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	autogen.sh \
 	doc/alpha-tuning-factor.nb \
 	doc/alpha-tuning-factor.pdf \
+	scripts/build.sh \
 	scripts/find_fastest_alpha.sh \
 	scripts/worktodo.sh \
 	src/msvc/has_openmp.cpp \
