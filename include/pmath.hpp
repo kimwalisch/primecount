@@ -65,6 +65,18 @@ inline T next_power_of_2(T x)
   return ++x;
 }
 
+/// @brief  Round down to the previous power of 2.
+/// @see    Book "Hacker's Delight".
+///
+template <typename T>
+inline T prev_power_of_2(T x)
+{
+  for (T i = 1; i < number_of_bits(x); i += i)
+    x |= (x >> i);
+
+  return x - (x >> 1);
+}
+
 template <typename T>
 inline int ilog(T x)
 {
