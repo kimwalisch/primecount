@@ -583,7 +583,8 @@ T S2_hard(T x,
 
   S2Status status(x);
   S2LoadBalancer loadBalancer(x, y, z, threads);
-  int64_t segment_size = loadBalancer.get_min_segment_size();
+  int64_t min_segment_size = loadBalancer.get_min_segment_size();
+  int64_t segment_size = min_segment_size;
   int64_t segments_per_thread = 1;
 
   PiTable pi(max_prime);
@@ -595,6 +596,11 @@ T S2_hard(T x,
 
   while (low < limit)
   {
+    // make sure we use all CPU cores
+    segment_size = min(segment_size, (limit - low) / threads);
+    segment_size = max(segment_size, min_segment_size);
+    segment_size = prev_power_of_2(segment_size);
+
     int64_t segments = ceil_div(limit - low, segment_size);
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
