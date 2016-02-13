@@ -13,7 +13,8 @@ The backup functionality works very well but the code is a little messy
 and not polished that is the reason why I have not merged it into the master
 branch.
 
-### Binaries
+Binaries
+--------
 Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
@@ -27,7 +28,8 @@ SHA1 checksums of the files:
 d89f35d2e37bd04d58007c7488ba162d2b3978a8  primecount-backup-2.6-linux-x64.tar.gz
 ```
 
-### Backup usage example
+Backup usage example
+--------------------
 ```sh
 # We start a computation and then simulate a crash using Ctrl + C
 $ ./primecount 1e22 --S2_hard --status --log
@@ -66,8 +68,8 @@ Seconds = 3624.303
 Status = 33.1%
 ```
 
-### Batch processing
-
+Batch processing
+----------------
 It is possible to create a ```worktodo.txt``` file with a list of
 numbers to be computed e.g.:
 
@@ -89,7 +91,8 @@ $ sh scripts/worktodo.sh
 The results will be stored in ```results.txt``` and more details are
 logged into ```primecount.log```.
 
-### Command-line options
+Command-line options
+--------------------
 ```
 Usage: primecount x [OPTION]...
 Count the primes below x <= 10^31 using fast implementations of the
