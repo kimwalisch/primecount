@@ -19,7 +19,8 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. As of December 2014
 primecount counts primes faster than any other program on the web!
 
-### Binaries
+Binaries
+--------
 Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
@@ -27,14 +28,16 @@ instruction (2010 or later).
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
 
-#### primecount-backup
+primecount-backup
+-----------------
 These binaries save intermediate results to a backup file once per hour.
 More information [here](https://github.com/kimwalisch/primecount/tree/backup).
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
 
-#### primecount-mpi
+primecount-mpi
+--------------
 [primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi) is a
 distributed version of primecount using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) (Message
@@ -44,7 +47,8 @@ onto cluster nodes. No binaries are provided but a fully automated
 simplifies building. I hope ```primecount-mpi```will be used to break
 new pi(x) world records!
 
-### Usage examples
+Usage examples
+--------------
 Open a terminal and run the primecount application using e.g.:
 ```sh
 # Count the primes below 10^14
@@ -60,7 +64,8 @@ $ ./primecount 2**32 --meissel
 $ ./primecount 1e14 --nthprime --threads=4 --time
 ```
 
-### Command-line options
+Command-line options
+--------------------
 ```
 Usage: primecount x [OPTION]...
 Count the primes below x <= 10^31 using fast implementations of the
@@ -95,7 +100,8 @@ Advanced Deleglise-Rivat options:
          --S2_hard          Only compute the hard special leaves
 ```
 
-### Algorithms
+Algorithms
+----------
 <table>
   <tr>
     <td>Legendre's Formula</td>
@@ -148,7 +154,8 @@ Riesel's book [4] is probably the best source of information. For the
 Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
 [3] as well as Tomás Oliveira's paper [7].
 
-### Fast nth prime calculation
+Fast nth prime calculation
+--------------------------
 The most efficient known method for calculating the nth prime is a combination
 of the prime counting function and a prime sieve. The idea is to closely
 approximate the nth prime using e.g. the inverse logarithmic integral
@@ -163,7 +170,8 @@ operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-### Timings
+Timings
+-------
 <table>
   <tr align="center">
     <td><b>x</b></td>
@@ -287,7 +295,8 @@ The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
 2015 using a Linux x64 operating system and primecount was compiled using
 GCC 5.2.
 
-### Build instructions (Unix-like OSes)
+Build instructions (Unix-like OSes)
+-----------------------------------
 To build primecount you need to have installed a C++ compiler and GNU
 make. primecount depends on the author's primesieve library, download
 the latest version from http://primesieve.org/downloads.
@@ -331,8 +340,9 @@ disable POPCNT:
 $ ./configure --disable-popcnt
 ```
 
-### Build instructions (Microsoft Visual C++)
-To build primecount open a Visual Studio Command Prompt and execute:
+Build instructions (Microsoft Visual C++)
+-----------------------------------------
+Open a Visual Studio Command Prompt and run:
 ```sh
 > nmake -f Makefile.msvc
 ```
