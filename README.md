@@ -71,7 +71,7 @@ Status = 33.1%
 Batch processing
 ----------------
 It is possible to create a ```worktodo.txt``` file with a list of
-numbers to be computed e.g.:
+numbers to compute e.g.:
 
 ```sh
 # worktodo.txt
