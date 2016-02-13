@@ -18,13 +18,13 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
 These binaries are statically linked and require a CPU (2010 or later) which
 supports the POPCNT instruction.
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.5-win64.zip">primecount-backup-2.5-win64.zip</a>, 441K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.5-linux-x64.tar.gz">primecount-backup-2.5-linux-x64.tar.gz</a>, 942K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
 
 SHA1 checksums of the files:
 ```sh
-4c97b1dc25ecfe2f9429984494988290b85a2969  primecount-backup-2.5-win64.zip
-6e3a02fd6c05266e551fb2586d8e4fd8b65b4423  primecount-backup-2.5-linux-x64.tar.gz
+36171138743b0511f2588a00c6cffbffd9e919fb  primecount-backup-2.6-win64.zip
+d89f35d2e37bd04d58007c7488ba162d2b3978a8  primecount-backup-2.6-linux-x64.tar.gz
 ```
 
 ### Backup usage example
@@ -83,7 +83,7 @@ numbers to be computed e.g.:
 Then you can batch process all the numbers from ```worktodo.txt``` using:
 
 ```sh
-$ bash scripts/worktodo.sh
+$ sh scripts/worktodo.sh
 ```
 
 The results will be stored in ```results.txt``` and more details are
