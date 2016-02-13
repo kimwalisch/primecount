@@ -4,7 +4,7 @@
 ///         Wheel factorization is used to skip multiples of small
 ///         primes in the sieve of Eratosthenes.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -37,9 +37,9 @@ struct NextWheel
 
 struct WheelItem
 {
-  WheelItem(int64_t multiple, int8_t i)
+  WheelItem(int64_t multiple, int64_t index)
     : next_multiple(multiple), 
-      wheel_index(i)
+      wheel_index((int8_t) index)
   { }
 
   void set(int64_t multiple, 
@@ -87,9 +87,10 @@ public:
 
       // calculate the next multiple of prime that is not
       // divisible by any of the wheel's factors (2, 3, 5, 7)
-      uint64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
+      int64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
+      int64_t wheel_index = initWheel210[quotient % 210].wheel_index;
       multiple += prime * next_multiple_factor;
-      int8_t wheel_index = initWheel210[quotient % 210].wheel_index;
+
       push_back(multiple, wheel_index);
     }
   }
