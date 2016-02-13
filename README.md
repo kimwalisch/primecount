@@ -26,16 +26,26 @@ instruction (2010 or later).
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
-* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
-SHA1 checksums of the files:
-```sh
-0a18524d8995616900b8b5a288e7d1ac8ddf0a64  primecount-2.6-win64.zip
-9a9ec4cdb524d384e5da2f33a2d20df947a2e020  primecount-2.6-linux-x64.tar.gz
-```
+#### primecount-backup
+These binaries save intermediate results to a backup file once per hour.
+More information [here](https://github.com/kimwalisch/primecount/tree/backup).
+
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
+* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
+
+#### primecount-mpi
+[primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi) is a
+distributed version of primecount using
+[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) (Message
+Passing Interface) which automatically distributes the pi(x) computation
+onto cluster nodes. No binaries are provided but a fully automated
+[build script](https://github.com/kimwalisch/primecount/tree/mpi#build-instructions-unix-like-oses)
+simplifies building. I hope ```primecount-mpi```will be used to break
+new pi(x) world records!
 
 ### Usage examples
-Open a terminal and run the primecount command-line application using e.g.:
+Open a terminal and run the primecount application using e.g.:
 ```sh
 # Count the primes below 10^14
 $ ./primecount 1e14
