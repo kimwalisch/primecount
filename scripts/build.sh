@@ -14,18 +14,17 @@ then
 fi
 
 # Download primesieve
-if [ ! -f ./primesieve-master.tar.gz ]
+if [ ! -f ./primesieve-latest.tar.gz ]
 then
-    wget -O primesieve-master.tar.gz https://github.com/kimwalisch/primesieve/archive/master.tar.gz || \
-    curl -o primesieve-master.tar.gz -Lk https://github.com/kimwalisch/primesieve/archive/master.tar.gz
+    wget      http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz || \
+    curl -LkO http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz
 fi
 
 # Build libprimesieve
 if [ ! -f lib/libprimesieve.a ]
 then
-    tar xvf primesieve-master.tar.gz
-    cd primesieve-master
-    ./autogen.sh
+    tar xvf primesieve-latest.tar.gz
+    cd primesieve-*
     ./configure --prefix=$(pwd)/..
     make -j8
     make install
