@@ -168,22 +168,22 @@ operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-Timings
--------
+Benchmarks
+----------
 <table>
   <tr align="center">
     <td><b>x</b></td>
     <td><b>Prime Count</b></td>
     <td><b>Legendre</b></td>
-    <td><b>Lehmer</b></td>
+    <td><b>Meissel</b></td>
     <td><b>Lagarias<br/>Miller<br/>Odlyzko</b></td>
     <td><b>Deleglise<br/>Rivat</b></td>
   </tr>
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
-    <td>0.04s</td>
     <td>0.02s</td>
+    <td>0.01s</td>
     <td>0.01s</td>
     <td>0.01s</td>
   </tr>
@@ -191,8 +191,8 @@ Timings
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.08s</td>
-    <td>0.06s</td>
+    <td>0.04s</td>
+    <td>0.05s</td>
     <td>0.02s</td>
     <td>0.02s</td>
   </tr>
@@ -200,8 +200,8 @@ Timings
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.31s</td>
-    <td>0.21s</td>
+    <td>0.15s</td>
+    <td>0.13s</td>
     <td>0.04s</td>
     <td>0.03s</td>
   </tr>
@@ -209,8 +209,8 @@ Timings
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>1.46s</td>
-    <td>1.11s</td>
+    <td>0.70s</td>
+    <td>0.46s</td>
     <td>0.11s</td>
     <td>0.07s</td>
   </tr>
@@ -218,40 +218,40 @@ Timings
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>9.23s</td>
-    <td>5.81s</td>
+    <td>4.01s</td>
+    <td>1.96s</td>
     <td>0.46s</td>
     <td>0.26s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>58.83s</td>
-    <td>33.40s</td>
+    <td>27.75s</td>
+    <td>12.08s</td>
     <td>1.89s</td>
     <td>1.00s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>402.41s</td>
-    <td>214.33s</td>
+    <td>232.30s</td>
+    <td>92.09s</td>
     <td>8.20s</td>
     <td>3.77s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>3,920.29s</td>
-    <td>1,612.85s</td>
+    <td>1,836.73s</td>
+    <td>731.35s</td>
     <td>36.05s</td>
     <td>14.87s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
   <td>24,739,954,287,740,860</td>
-    <td>31,897.66s</td>
-    <td>10,885.71s</td>
+    <td>14,949.16s</td>
+    <td>6,631.73s</td>
     <td>168.46s</td>
     <td>62.03s</td>
   </tr>
