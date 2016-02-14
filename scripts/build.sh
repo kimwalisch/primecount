@@ -8,7 +8,7 @@
 set -e
 
 # Execute in base directory
-if [ "$(basename $(pwd))" == "scripts" ]
+if [ "$(basename $(pwd))" = "scripts" ]
 then
     cd ..
 fi
