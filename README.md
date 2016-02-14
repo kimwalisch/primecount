@@ -17,8 +17,8 @@ primecount contains the **first ever** parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
 [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
 which scales up to hundreds of CPU cores. primecount has already been
-used to compute several world records: pi(10^27), nth_prime(10^24),
-nth_prime(10^25).
+used to compute several world records: pi(10^27), nth_prime(10^24)
+and nth_prime(10^25).
 
 Binaries
 --------
