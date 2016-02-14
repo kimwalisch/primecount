@@ -299,7 +299,7 @@ You need to have installed a C++ compiler, GNU make and the author's
 primesieve library.
 
 Download 
-<a href="http://dl.bintray.com/kimwalisch/primesieve/primesieve-5.6.0.tar.gz">primesieve-5.6.0.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz">primesieve-latest.tar.gz</a>
 and build it using:
 ```sh
 $ ./configure --prefix=/usr
