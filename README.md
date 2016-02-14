@@ -30,13 +30,13 @@ instruction (2010 or later).
 
 #### primecount-backup
 These binaries save intermediate results to a backup file once per hour.
-More information [here](https://github.com/kimwalisch/primecount/tree/backup).
+More information [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup).
 
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
 * <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
 
 #### primecount-mpi
-[primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi) is a
+[primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi#primecount-mpi) is a
 distributed version of primecount using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) (Message
 Passing Interface) which automatically distributes the pi(x) computation
