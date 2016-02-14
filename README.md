@@ -337,7 +337,8 @@ Open a Visual Studio Command Prompt and run:
 > nmake -f Makefile.msvc
 ```
 
-### C++ API
+C++ API
+-------
 Below are the main functions declared in
 [primesieve.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
 All functions are multi-threaded by default.
@@ -359,7 +360,8 @@ int  primecount::get_num_threads();
 void primecount::set_num_threads(int threads);
 ```
 
-### C++ library usage
+C++ library usage
+-----------------
 Below is an example program that counts the primes below 1000.
 
 ```C++
@@ -380,7 +382,8 @@ On Unix-like OSes compile using:
 $ c++ -O2 primes.cpp -lprimecount
 ```
 
-### References
+References
+----------
 1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
 2. D. H. Lehmer, On the exact number of primes less than a given limit, Illinois J. Math. 3 (1959), pp. 381–388.
 3. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
