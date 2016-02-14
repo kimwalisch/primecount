@@ -12,7 +12,7 @@
 #   alpha tuning function for use in primecount's source code.
 
 # Execute in base directory
-if [ "$(basename $(pwd))" == "scripts" ]
+if [ "$(basename $(pwd))" = "scripts" ]
 then
     cd ..
 fi
