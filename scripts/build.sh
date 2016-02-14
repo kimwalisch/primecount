@@ -4,6 +4,9 @@
 # Builds a static primecount binary, automatically downloads and
 # builds the primesieve library (dependency).
 
+# Exit on any error
+set -e
+
 # Execute in base directory
 if [ "$(basename $(pwd))" == "scripts" ]
 then
