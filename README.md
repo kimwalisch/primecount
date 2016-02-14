@@ -18,8 +18,8 @@ implementation of the Deleglise-Rivat algorithm and it features a
 [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
 which scales up to hundreds of CPU cores. primecount has already been
 used to compute several world records:
-[pi(10^27)](http://www.mersenneforum.org/showthread.php?t=20473),
-nth_prime(10^23) and nth_prime(10^24).
+[pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
+nth_prime(10<sup>n</sup>) for 23 <= n <= 24.
 
 Binaries
 --------
