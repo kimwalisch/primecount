@@ -31,8 +31,14 @@ then
     cd ..
 fi
 
+# Generate configure script, requires GNU Autotools
+if [ ! -f ./configure ]
+then
+    ./autogen.sh
+fi
+
 # configure primecount-mpi
-if [ ! -f Makefile ]
+if [ ! -f ./Makefile ]
 then
     if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
     then
@@ -40,7 +46,6 @@ then
         sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
         mv -f Makefile.tmp Makefile.am
     fi
-    ./autogen.sh
     ./configure --disable-shared LDFLAGS=-L$(pwd)/lib
 fi
 
