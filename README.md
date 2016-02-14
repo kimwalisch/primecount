@@ -308,7 +308,7 @@ $ sudo make install
 ```
 
 Then download
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.5.tar.gz">primecount-2.5.tar.gz</a>
+<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6.tar.gz">primecount-2.6.tar.gz</a>
 and build it using:
 ```sh
 $ ./configure
