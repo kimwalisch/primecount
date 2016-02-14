@@ -13,21 +13,35 @@ then
     cd ..
 fi
 
-# Download and build primesieve
-wget https://github.com/kimwalisch/primesieve/archive/master.tar.gz || curl -OLk https://github.com/kimwalisch/primesieve/archive/master.tar.gz
-tar xvf master.tar.gz
-cd primesieve-master
-./autogen.sh
-./configure --prefix=$(pwd)/..
-make -j8
-make install
-cd ..
+# Download primesieve
+if [ ! -f ./primesieve-master.tar.gz ]
+then
+    wget -O primesieve-master.tar.gz https://github.com/kimwalisch/primesieve/archive/master.tar.gz || \
+    curl -o primesieve-master.tar.gz -Lk https://github.com/kimwalisch/primesieve/archive/master.tar.gz
+fi
 
-# Patch Makefile.am for static linking libprimesieve
-sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
-mv -f Makefile.tmp Makefile.am
+# Build libprimesieve
+if [ ! -f lib/libprimesieve.a ]
+then
+    tar xvf primesieve-master.tar.gz
+    cd primesieve-master
+    ./autogen.sh
+    ./configure --prefix=$(pwd)/..
+    make -j8
+    make install
+    cd ..
+fi
+
+# configure primecount-mpi
+if [ ! -f Makefile ]
+then
+    # Patch Makefile.am for static linking libprimesieve
+    sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
+    mv -f Makefile.tmp Makefile.am
+
+    ./autogen.sh
+    ./configure --disable-shared LDFLAGS=-L$(pwd)/lib
+fi
 
 # Build primecount-mpi
-./autogen.sh
-./configure --disable-shared LDFLAGS=-L$(pwd)/lib
 make -j8
