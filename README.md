@@ -295,20 +295,21 @@ GCC 5.2.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
-To build primecount you need to have installed a C++ compiler and GNU
-make. primecount depends on the author's primesieve library, download
-the latest version from http://primesieve.org/downloads.
+You need to have installed a C++ compiler, GNU make and the author's
+primesieve library.
 
-First build and install [primesieve](http://primesieve.org/downloads) using:
+Download 
+<a href="http://dl.bintray.com/kimwalisch/primesieve/primesieve-5.6.0.tar.gz">primesieve-5.6.0.tar.gz</a>
+and build it using:
 ```sh
 $ ./configure --prefix=/usr
 $ make
 $ sudo make install
 ```
 
-Then download the latest
+Then download
 <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.5.tar.gz">primecount-2.5.tar.gz</a>
-release tarball and build it using:
+and build it using:
 ```sh
 $ ./configure
 $ make
@@ -327,15 +328,6 @@ $ ./autogen.sh
 $ ./configure
 $ make
 $ sudo make install
-```
-
-If your CPU supports the
-[POPCNT instruction](http://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-then it is automatically  enabled in the build process. POPCNT speeds up
-primecount by about 10 percent. If you need maximum portability you can
-disable POPCNT:
-```sh
-$ ./configure --disable-popcnt
 ```
 
 Build instructions (Microsoft Visual C++)
