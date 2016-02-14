@@ -49,7 +49,7 @@ new pi(x) world records!
 
 Usage examples
 --------------
-Open a terminal and run the primecount application using e.g.:
+Open a terminal and run primecount using e.g.:
 ```sh
 # Count the primes below 10^14
 $ ./primecount 1e14
