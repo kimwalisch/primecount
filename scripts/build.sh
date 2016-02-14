@@ -35,10 +35,12 @@ fi
 # configure primecount-mpi
 if [ ! -f Makefile ]
 then
-    # Patch Makefile.am for static linking libprimesieve
-    sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
-    mv -f Makefile.tmp Makefile.am
-
+    if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
+    then
+        # Patch Makefile.am for static linking libprimesieve
+        sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
+        mv -f Makefile.tmp Makefile.am
+    fi
     ./autogen.sh
     ./configure --disable-shared LDFLAGS=-L$(pwd)/lib
 fi
