@@ -27,15 +27,15 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
 
 #### primecount-backup
 These binaries save intermediate results to a backup file once per hour.
 More information [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup).
 
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
-* <a href="http://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
 
 #### primecount-mpi
 [primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi#primecount-mpi) is a
@@ -301,7 +301,7 @@ You need to have installed a C++ compiler, GNU make and the author's
 primesieve library.
 
 Download 
-<a href="http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz">primesieve-latest.tar.gz</a>
+<a href="https://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz">primesieve-latest.tar.gz</a>
 and build it using:
 ```sh
 $ ./configure --prefix=/usr
@@ -310,7 +310,7 @@ $ sudo make install
 ```
 
 Then download
-<a href="http://dl.bintray.com/kimwalisch/primecount/primecount-2.6.tar.gz">primecount-2.6.tar.gz</a>
+<a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6.tar.gz">primecount-2.6.tar.gz</a>
 and build it using:
 ```sh
 $ ./configure
