@@ -505,7 +505,7 @@ T S2_hard_mpi_master(T x,
 
     if (loadBalancer.finished())
     {
-      msg.finish(msg.proc_id());
+      msg.send_finish();
       break;
     }
  
@@ -523,7 +523,7 @@ T S2_hard_mpi_master(T x,
     if (print_status())
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
-    msg.finish(msg.proc_id());
+    msg.send_finish();
   }
 
   return s2_hard;

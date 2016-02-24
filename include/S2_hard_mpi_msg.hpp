@@ -34,8 +34,8 @@ public:
   ~S2_hard_mpi_msg();
   void init_MPI_struct();
   void send(int proc_id);
+  void send_finish();
   void recv(int proc_id);
-  void finish(int proc_id);
   void recv_any();
   int proc_id() const;
   int64_t low() const;

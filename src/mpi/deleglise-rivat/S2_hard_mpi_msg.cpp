@@ -93,6 +93,14 @@ void S2_hard_mpi_msg::send(int proc_id)
   MPI_Send(&msgData_, 1, mpi_type_, proc_id, proc_id, MPI_COMM_WORLD);
 }
 
+void S2_hard_mpi_msg::send_finish()
+{
+  msgData_.finished = true;
+  int proc_id = msgData_.proc_id;
+
+  MPI_Send(&msgData_, 1, mpi_type_, proc_id, proc_id, MPI_COMM_WORLD);
+}
+
 void S2_hard_mpi_msg::recv(int proc_id)
 {
   int master_proc_id = 0;
@@ -107,12 +115,6 @@ void S2_hard_mpi_msg::recv_any()
 
   MPI_Status status;
   MPI_Recv(&msgData_, 1, mpi_type_, MPI_ANY_SOURCE, master_proc_id, MPI_COMM_WORLD, &status);
-}
-
-void S2_hard_mpi_msg::finish(int proc_id)
-{
-  msgData_.finished = true;
-  MPI_Send(&msgData_, 1, mpi_type_, proc_id, proc_id, MPI_COMM_WORLD);
 }
 
 int S2_hard_mpi_msg::proc_id() const
