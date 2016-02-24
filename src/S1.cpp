@@ -4,7 +4,7 @@
 ///        leaves in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
 ///        prime counting algorithms.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -27,7 +27,6 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-namespace S1 {
 
 /// Recursively iterate over the square free numbers coprime to the
 /// first b primes and calculate the sum of the ordinary leaves.
@@ -36,12 +35,12 @@ namespace S1 {
 /// arXiv:1503.01839, 6 March 2015.
 ///
 template <int MU, typename T, typename P>
-T S1(T x,
-     int64_t y,
-     int64_t b,
-     int64_t c,
-     T square_free,
-     vector<P>& primes)
+T S1_OpenMP_thread(T x,
+                   int64_t y,
+                   int64_t b,
+                   int64_t c,
+                   T square_free,
+                   vector<P>& primes)
 {
   T s1 = 0;
 
@@ -50,7 +49,7 @@ T S1(T x,
     T next = square_free * primes[b];
     if (next > y) break;
     s1 += MU * phi_tiny(x / next, c);
-    s1 += S1<-MU>(x, y, b, c, next, primes);
+    s1 += S1_OpenMP_thread<-MU>(x, y, b, c, next, primes);
   }
 
   return s1;
@@ -61,10 +60,10 @@ T S1(T x,
 /// Space complexity: O(y / log(y)).
 ///
 template <typename X, typename Y>
-X S1(X x,
-     Y y,
-     int64_t c,
-     int threads)
+X S1_OpenMP_master(X x,
+                   Y y,
+                   int64_t c,
+                   int threads)
 {
   int64_t thread_threshold = ipow(10, 6);
   threads = validate_threads(threads, y, thread_threshold);
@@ -75,13 +74,12 @@ X S1(X x,
   for (int64_t b = c + 1; b < (int64_t) primes.size(); b++)
   {
     s1 += -1 * phi_tiny(x / primes[b], c);
-    s1 += S1<1>(x, y, b, c, (X) primes[b], primes);
+    s1 += S1_OpenMP_thread<1>(x, y, b, c, (X) primes[b], primes);
   }
 
   return s1;
 }
 
-} // namespace S1
 } // namespace
 
 namespace primecount {
@@ -97,7 +95,7 @@ int64_t S1(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int64_t s1 = S1::S1(x, y, c, threads);
+  int64_t s1 = S1_OpenMP_master(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;
@@ -120,9 +118,9 @@ int128_t S1(int128_t x,
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
-    s1 = S1::S1(x, (uint32_t) y, c, threads);
+    s1 = S1_OpenMP_master(x, (uint32_t) y, c, threads);
   else
-    s1 = S1::S1(x, y, c, threads);
+    s1 = S1_OpenMP_master(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;
