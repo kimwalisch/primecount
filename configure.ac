@@ -19,6 +19,19 @@ AC_ARG_ENABLE([assert],
     AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
     [], [AC_DEFINE(NDEBUG, 1, [disable assertions])])
 
+# Disable MPI by default
+AC_ARG_ENABLE([mpi],
+    AC_HELP_STRING([--enable-mpi],
+        [enable MPI (Message Passing Interface)]), [], [])
+
+AS_IF([test "x$enable_mpi" = "xyes"], [
+    AC_CHECK_PROGS(MPICXX, mpic++,)
+    test -z "$MPICXX" && AC_MSG_ERROR([couldn't find MPI library])
+    CXX="$MPICXX"
+    AC_DEFINE([HAVE_MPI], 1, [Use MPI])
+    AM_CONDITIONAL(HAVE_MPI, test x$enable_mpi = xyes)
+])
+
 # Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],
     AC_HELP_STRING([--enable-popcnt],

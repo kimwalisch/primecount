@@ -99,6 +99,19 @@ libprimecount_la_SOURCES += \
 
 endif
 
+if HAVE_MPI
+
+libprimecount_la_SOURCES += \
+	src/mpi/mpi_reduce_sum.cpp \
+	src/mpi/P2_mpi.cpp \
+	src/mpi/deleglise-rivat/S2_easy_mpi.cpp \
+	src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp \
+	src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp \
+	src/mpi/deleglise-rivat/S2_hard_mpi.cpp \
+  include/mpi_reduce_sum.hpp
+
+endif
+
 primecount_SOURCES = \
 	src/app/main.cpp \
 	src/app/help.cpp \
