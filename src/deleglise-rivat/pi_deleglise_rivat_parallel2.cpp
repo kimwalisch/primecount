@@ -6,7 +6,7 @@
 ///        compression (FactorTable & PiTable) to reduce the memory
 ///        usage.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,7 @@
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
-#include "S2.hpp"
+#include <S2.hpp>
 
 #include <stdint.h>
 

@@ -2,14 +2,13 @@
 /// @file   main.cpp
 /// @brief  primecount console application.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include "cmdoptions.hpp"
-#include "../deleglise-rivat/S2.hpp"
 
 #include <primecount-internal.hpp>
 #include <primecount.hpp>
@@ -17,6 +16,7 @@
 #include <int128.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
+#include <S2.hpp>
 
 #include <stdint.h>
 #include <exception>

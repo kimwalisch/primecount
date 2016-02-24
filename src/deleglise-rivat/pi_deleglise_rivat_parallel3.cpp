@@ -4,7 +4,7 @@
 ///        counting algorithm. This implementation is identical to
 ///        pi_deleglise_rivat_parallel2(x) but uses 128-bit integers.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,7 @@
 #include <PhiTiny.hpp>
 #include <int128.hpp>
 #include <S1.hpp>
-#include "S2.hpp"
+#include <S2.hpp>
 
 #include <stdint.h>
 #include <string>
