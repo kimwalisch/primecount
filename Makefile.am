@@ -103,12 +103,15 @@ if HAVE_MPI
 
 libprimecount_la_SOURCES += \
 	src/mpi/mpi_reduce_sum.cpp \
+	src/mpi/phi_vector.cpp \
 	src/mpi/P2_mpi.cpp \
 	src/mpi/deleglise-rivat/S2_easy_mpi.cpp \
+	src/mpi/deleglise-rivat/S2_hard_mpi.cpp \
 	src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp \
 	src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp \
-	src/mpi/deleglise-rivat/S2_hard_mpi.cpp \
-  include/mpi_reduce_sum.hpp
+	include/mpi_reduce_sum.hpp \
+	include/S2_hard_mpi_msg.hpp \
+	include/S2_hard_mpi_LoadBalancer.hpp
 
 endif
 
