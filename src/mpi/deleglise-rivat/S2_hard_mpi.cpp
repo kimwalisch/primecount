@@ -501,7 +501,7 @@ T S2_hard_mpi_master(T x,
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     // update msg with new work to do
-    //loadBalancer.update(&msg, status.get_percent());
+    loadBalancer.update(&msg, status.get_percent());
 
     if (loadBalancer.finished())
     {

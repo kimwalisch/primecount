@@ -3,7 +3,7 @@
 /// @brief Print the status of S2(x, y) in percent.
 ///        Requires use of --status[=N] command-line flag.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,7 @@ using namespace std;
 namespace primecount {
 
 S2Status::S2Status(maxint_t x) :
-  old_percent_(-1),
+  old_percent_(0),
   old_time_(0),
   print_threshold_(1.0 / 20),
   precision_(get_status_precision(x))
@@ -41,12 +41,17 @@ S2Status::S2Status(maxint_t x) :
 double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
 {
   double exp = 0.96;
-  double percent = get_percent((double) n, (double) limit);
+  double percent = primecount::get_percent((double) n, (double) limit);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
   percent = 100 - in_between(0, 100 * (pow(base, percent) - low) / (1 - low), 100);
 
   return max(old_percent_, percent);
+}
+
+double S2Status::get_percent() const
+{
+  return old_percent_;
 }
 
 bool S2Status::is_print(double time) const
@@ -56,6 +61,9 @@ bool S2Status::is_print(double time) const
 
 bool S2Status::is_print(double time, double percent) const
 {
+  if (old_time_ == 0)
+    return true;
+
   if (!is_print(time))
     return false;
 
