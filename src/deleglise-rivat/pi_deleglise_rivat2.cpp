@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -67,7 +67,7 @@ void cross_off(int64_t prime,
 /// Calculate the contribution of the hard special leaves which
 /// require use of a sieve (to reduce the memory usage).
 ///
-int64_t S2_hard(intfast64_t x,
+int64_t S2_hard(int64_t x,
                 int64_t y,
                 int64_t z,
                 int64_t c)
