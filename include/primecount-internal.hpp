@@ -99,6 +99,10 @@ int64_t pi_primesieve(int64_t x, int threads);
 
 int64_t phi(int64_t x, int64_t a, int threads);
 
+class PiTable;
+
+std::vector<int64_t> phi_vector(int64_t x, int64_t a, const std::vector<int64_t>& primes, const PiTable& pi, int threads);
+
 int64_t Li(int64_t);
 
 int64_t Li_inverse(int64_t);

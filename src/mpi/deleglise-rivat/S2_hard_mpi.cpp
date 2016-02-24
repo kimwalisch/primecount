@@ -362,7 +362,7 @@ T S2_hard_OpenMP_master(int64_t low,
   int64_t min_segment_size = loadBalancer.get_min_segment_size();
 
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
-  vector<int64_t> phi_total;// = phi_vector(low - 1, max_b, primes, pi, threads);
+  vector<int64_t> phi_total = phi_vector(low - 1, max_b, primes, pi, threads);
 
   while (low < limit)
   {
