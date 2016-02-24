@@ -30,19 +30,18 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-namespace S2_easy {
 
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
 ///
 template <typename T1, typename T2>
-T1 S2_easy(T1 x,
-           int64_t y,
-           int64_t z,
-           int64_t c,
-           vector<T2>& primes,
-           int threads)
+T1 S2_easy_OpenMP(T1 x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t c,
+                  vector<T2>& primes,
+                  int threads)
 {
   T1 s2_easy = 0;
   int64_t x13 = iroot<3>(x);
@@ -102,7 +101,6 @@ T1 S2_easy(T1 x,
   return s2_easy;
 }
 
-} // namespace S2_easy
 } // namespace
 
 namespace primecount {
@@ -120,7 +118,7 @@ int64_t S2_easy(int64_t x,
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
-  int64_t s2_easy = S2_easy::S2_easy((intfast64_t) x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -146,12 +144,12 @@ int128_t S2_easy(int128_t x,
   if (y <= std::numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
     vector<int64_t> primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy::S2_easy((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
   }
 
   print("S2_easy", s2_easy, time);
