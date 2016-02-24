@@ -4,7 +4,7 @@
 ///        P2(x, y) counts the numbers <= x that have exactly 2 prime
 ///        factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,7 +34,6 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-namespace P2 {
 
 /// Calculate the segments per thread.
 /// The idea is to gradually increase the segments per thread (based
@@ -79,16 +78,16 @@ void cross_off(BitSieve& sieve,
 }
 
 template <typename T>
-T P2_thread(T x,
-            int64_t y,
-            int64_t segment_size,
-            int64_t segments_per_thread,
-            int64_t thread_num,
-            int64_t low,
-            int64_t limit,
-            int64_t& pix,
-            int64_t& pix_count,
-            vector<int32_t>& primes)
+T P2_OpenMP_thread(T x,
+                   int64_t y,
+                   int64_t segment_size,
+                   int64_t segments_per_thread,
+                   int64_t thread_num,
+                   int64_t low,
+                   int64_t limit,
+                   int64_t& pix,
+                   int64_t& pix_count,
+                   vector<int32_t>& primes)
 {
   pix = 0;
   pix_count = 0;
@@ -145,7 +144,7 @@ T P2_thread(T x,
 /// Space complexity: O((x / y)^(1/2)).
 ///
 template <typename T>
-T P2(T x, int64_t y, int threads)
+T P2_OpenMP_master(T x, int64_t y, int threads)
 {
 #if __cplusplus >= 201103L
   static_assert(prt::is_signed<T>::value,
@@ -190,8 +189,8 @@ T P2(T x, int64_t y, int threads)
     #pragma omp parallel for \
         num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      p2 += P2_thread(x, y, segment_size, segments_per_thread, i,
-         low, limit, pix[i], pix_counts[i], primes);
+      p2 += P2_OpenMP_thread(x, y, segment_size, segments_per_thread,
+         i, low, limit, pix[i], pix_counts[i], primes);
 
     low += segments_per_thread * threads * segment_size;
     segments_per_thread = balanceLoad(segments_per_thread, time);
@@ -205,16 +204,15 @@ T P2(T x, int64_t y, int threads)
 
     if (print_status())
     {
-      int precision = get_status_precision(x);
       double percent = get_percent((double) low, (double) limit);
-      cout << "\rStatus: " << fixed << setprecision(precision) << percent << '%' << flush;
+      cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
+           << percent << '%' << flush;
     }
   }
 
   return p2;
 }
 
-} // namespace P2
 } // namespace
 
 namespace primecount {
@@ -227,7 +225,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print(x, y, threads);
 
   double time = get_wtime();
-  int64_t p2 = P2::P2(x, y, threads);
+  int64_t p2 = P2_OpenMP_master(x, y, threads);
 
   print("P2", p2, time);
   return p2;
@@ -243,7 +241,7 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print(x, y, threads);
 
   double time = get_wtime();
-  int128_t p2 = P2::P2(x, y, threads);
+  int128_t p2 = P2_OpenMP_master(x, y, threads);
 
   print("P2", p2, time);
   return p2;
