@@ -1,10 +1,9 @@
 ///
 /// @file   int128.hpp
 /// @brief  Additional integer types used in primecount:
-///         int128_t, uint128_t, intfast64_t, intfast128_t, maxint_t,
-///         maxuint_t.
+///         int128_t, uint128_t, intfast128_t, maxint_t, maxuint_t.
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -85,13 +84,6 @@ typedef int64_t maxuint_t;
 #endif /* HAVE_INT128_T */
 
 namespace primecount {
-
-/// Fastest 64-bit integer type for division.
-/// On most Intel CPUs before 2015 unsigned 64-bit division is about
-/// 10 percent faster than signed division. It is likely that in a few
-/// years signed and unsigned division will run equally fast.
-///
-typedef uint64_t intfast64_t;
 
 #if defined(HAVE_INT128_T)
 
