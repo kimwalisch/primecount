@@ -102,7 +102,6 @@ endif
 if HAVE_MPI
 
 libprimecount_la_SOURCES += \
-	src/mpi/mpi_reduce_sum.cpp \
 	src/mpi/phi_vector.cpp \
 	src/mpi/P2_mpi.cpp \
 	src/mpi/deleglise-rivat/S2_easy_mpi.cpp \
