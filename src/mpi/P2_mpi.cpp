@@ -189,11 +189,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   if (is_mpi_master_proc())
     p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
-  // temporarily disable printing for pi()
-  bool is_print = print_status();
-  set_print_status(false);
-  T pix_total = pi(low - 1, threads);
-  set_print_status(is_print);
+  T pix_total = pi_legendre(low - 1, threads);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < limit)
