@@ -15,15 +15,13 @@
 #include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
 #include <fast_div.hpp>
 
 #include <stdint.h>
 #include <vector>
-
-#include <mpi.h>
-#include <mpi_reduce_sum.hpp>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -56,11 +54,8 @@ T1 S2_easy_mpi_master(T1 x,
   int64_t pi_x13 = pi[x13];
   S2Status status(x);
 
-  int proc_id;
-  int procs;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  int proc_id = mpi_proc_id();
+  int procs = mpi_num_procs();
 
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1 + proc_id; b <= pi_x13; b += procs)
