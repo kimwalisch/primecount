@@ -55,7 +55,6 @@ libprimecount_la_SOURCES = \
 	src/S2Status.cpp \
 	src/test.cpp \
 	src/Wheel.cpp \
-	src/deleglise-rivat/S2.hpp \
 	src/deleglise-rivat/S2_trivial.cpp \
 	src/deleglise-rivat/S2_easy.cpp \
 	src/deleglise-rivat/S2_hard.cpp \
@@ -87,6 +86,7 @@ libprimecount_la_SOURCES = \
 	include/PhiTiny.hpp \
 	include/PiTable.hpp \
 	include/S1.hpp \
+	include/S2.hpp \
 	include/S2LoadBalancer.hpp \
 	include/S2Status.hpp \
 	include/tos_counters.hpp \
