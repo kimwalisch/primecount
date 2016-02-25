@@ -8,6 +8,7 @@
 /// file in the top level directory.
 ///
 
+#include <primecount-internal.hpp>
 #include <S2_hard_mpi_msg.hpp>
 
 #include <cstddef>
@@ -103,18 +104,14 @@ void S2_hard_mpi_msg::send_finish()
 
 void S2_hard_mpi_msg::recv(int proc_id)
 {
-  int master_proc_id = 0;
-
   MPI_Status status;
-  MPI_Recv(&msgData_, 1, mpi_type_, master_proc_id, proc_id, MPI_COMM_WORLD, &status);
+  MPI_Recv(&msgData_, 1, mpi_type_, mpi_master_proc_id(), proc_id, MPI_COMM_WORLD, &status);
 }
 
 void S2_hard_mpi_msg::recv_any()
 {
-  int master_proc_id = 0;
-
   MPI_Status status;
-  MPI_Recv(&msgData_, 1, mpi_type_, MPI_ANY_SOURCE, master_proc_id, MPI_COMM_WORLD, &status);
+  MPI_Recv(&msgData_, 1, mpi_type_, MPI_ANY_SOURCE, mpi_master_proc_id(), MPI_COMM_WORLD, &status);
 }
 
 int S2_hard_mpi_msg::proc_id() const
