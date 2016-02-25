@@ -173,6 +173,7 @@ int mpi_proc_id();
 int mpi_master_proc_id();
 
 bool is_mpi();
+bool is_mpi_master_proc();
 
 #endif
 
