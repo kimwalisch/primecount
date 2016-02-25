@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,6 +20,8 @@ using namespace std;
 
 namespace {
 
+bool print_result_ = true;
+
 bool print_status_ = false;
 
 bool print_variables_ = false;
@@ -36,11 +38,15 @@ void set_print_status(bool print_status)
 void set_print_variables(bool print_variables)
 {
   print_variables_ = print_variables;
+
+  // Avoid printing the result twice in standalone mode
+  // when e.g. only computing S2_hard(x, y)
+  print_result_ = !print_variables;
 }
 
 bool print_result()
 {
-  return !print_variables();
+  return print_result_;
 }
 
 bool print_status()
@@ -61,7 +67,8 @@ void print(const string& str)
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
 {
-  if (print_status())
+  if (print_status() &&
+      print_variables())
   {
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
@@ -74,7 +81,8 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
 
 void print(maxint_t x, int64_t y, int threads)
 {
-  if (print_variables())
+  if (print_status() &&
+      print_variables())
   {
     maxint_t z = x / y;
     cout << "x = " << x << endl;
@@ -88,7 +96,8 @@ void print(maxint_t x, int64_t y, int threads)
 
 void print(maxint_t x, int64_t y, int64_t c, int threads)
 {
-  if (print_variables())
+  if (print_status() &&
+      print_variables())
   {
     maxint_t z = x / y;
     cout << "x = " << x << endl;
