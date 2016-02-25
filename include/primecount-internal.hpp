@@ -99,10 +99,6 @@ int64_t pi_primesieve(int64_t x, int threads);
 
 int64_t phi(int64_t x, int64_t a, int threads);
 
-class PiTable;
-
-std::vector<int64_t> phi_vector(int64_t x, int64_t a, const std::vector<int64_t>& primes, const PiTable& pi, int threads);
-
 int64_t Li(int64_t);
 
 int64_t Li_inverse(int64_t);
@@ -165,6 +161,19 @@ T S2_approx(T x, int64_t pi_y, T P2, T S1)
 }
 
 bool test();
+
+#ifdef HAVE_MPI
+
+class PiTable;
+
+std::vector<int64_t> phi_vector(int64_t x, int64_t a, const std::vector<int64_t>& primes, const PiTable& pi, int threads);
+
+int mpi_get_num_procs();
+int mpi_get_proc_id();
+
+bool is_mpi();
+
+#endif
 
 } // namespace primecount
 
