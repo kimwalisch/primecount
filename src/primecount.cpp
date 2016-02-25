@@ -2,7 +2,7 @@
 /// @file   primecount.cpp
 /// @brief  primecount C++ API
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,6 +24,35 @@
 
 #ifdef _OPENMP
   #include <omp.h>
+#endif
+
+#ifdef HAVE_MPI
+
+#include <mpi.h>
+
+namespace primecount {
+
+int mpi_get_num_procs()
+{
+  int procs;
+  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  return procs;
+}
+
+int mpi_get_proc_id()
+{
+  int proc_id;
+  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
+  return proc_id;
+}
+
+bool is_mpi()
+{
+  return mpi_get_num_procs() >= 2;
+}
+
+} // namespace
+
 #endif
 
 using namespace std;
