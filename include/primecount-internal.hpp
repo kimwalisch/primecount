@@ -168,8 +168,9 @@ class PiTable;
 
 std::vector<int64_t> phi_vector(int64_t x, int64_t a, const std::vector<int64_t>& primes, const PiTable& pi, int threads);
 
-int mpi_get_num_procs();
-int mpi_get_proc_id();
+int mpi_num_procs();
+int mpi_proc_id();
+int mpi_master_proc_id();
 
 bool is_mpi();
 
