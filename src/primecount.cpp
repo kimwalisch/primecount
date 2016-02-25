@@ -32,23 +32,28 @@
 
 namespace primecount {
 
-int mpi_get_num_procs()
+int mpi_num_procs()
 {
   int procs;
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
   return procs;
 }
 
-int mpi_get_proc_id()
+int mpi_proc_id()
 {
   int proc_id;
   MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
   return proc_id;
 }
 
+int mpi_master_proc_id()
+{
+  return 0;
+}
+
 bool is_mpi()
 {
-  return mpi_get_num_procs() >= 2;
+  return mpi_num_procs() >= 2;
 }
 
 } // namespace
