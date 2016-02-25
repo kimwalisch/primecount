@@ -24,6 +24,10 @@
 #include <limits>
 #include <string>
 
+#ifdef HAVE_MPI
+  #include <mpi.h>
+#endif
+
 using namespace std;
 using namespace primecount;
 
@@ -160,6 +164,10 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
+#ifdef HAVE_MPI
+  MPI_Init(&argc, &argv);
+#endif
+
   PrimeCountOptions pco = parseOptions(argc, argv);
   double time = get_wtime();
 
@@ -234,12 +242,18 @@ int main (int argc, char* argv[])
   }
   catch (bad_alloc&)
   {
+#ifdef HAVE_MPI
+    MPI_Finalize();
+#endif
     cerr << "Error: failed to allocate memory, your system most likely does" << endl
          << "       not have enough memory to run this computation." << endl;
     return 1;
   }
   catch (exception& e)
   {
+#ifdef HAVE_MPI
+    MPI_Finalize();
+#endif
     cerr << "Error: " << e.what() << endl;
     return 1;
   }
@@ -252,6 +266,10 @@ int main (int argc, char* argv[])
     if (pco.time)
       print_seconds(get_wtime() - time);
   }
+
+#ifdef HAVE_MPI
+    MPI_Finalize();
+#endif
 
   return 0;
 }

@@ -12,12 +12,13 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <fast_div.hpp>
 #include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
-#include <fast_div.hpp>
+#include <S2.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -111,6 +112,11 @@ int64_t S2_easy(int64_t x,
                 int64_t c,
                 int threads)
 {
+#ifdef HAVE_MPI
+  if (mpi_num_procs() > 1)
+    return S2_easy_mpi(x, y, z, c, threads);
+#endif
+
   print("");
   print("=== S2_easy(x, y) ===");
   print("Computation of the easy special leaves");
@@ -132,6 +138,11 @@ int128_t S2_easy(int128_t x,
                  int64_t c,
                  int threads)
 {
+#ifdef HAVE_MPI
+  if (mpi_num_procs() > 1)
+    return S2_easy_mpi(x, y, z, c, threads);
+#endif
+
   print("");
   print("=== S2_easy(x, y) ===");
   print("Computation of the easy special leaves");
