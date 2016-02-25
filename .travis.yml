@@ -29,7 +29,7 @@ before_script:
   - ./autogen.sh
 
 script:
-  - ./configure --enable-mpi --enable-assert CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -pedantic -O2"
+  - ./configure --enable-mpi --enable-assert CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-unknown-pragmas"
   - make
   - sudo make install
   - make dist
