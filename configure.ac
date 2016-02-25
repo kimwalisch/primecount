@@ -29,8 +29,9 @@ AS_IF([test "x$enable_mpi" = "xyes"], [
     test -z "$MPICXX" && AC_MSG_ERROR([couldn't find MPI library])
     CXX="$MPICXX"
     AC_DEFINE([HAVE_MPI], 1, [Use MPI])
-    AM_CONDITIONAL(HAVE_MPI, test x$enable_mpi = xyes)
 ])
+
+AM_CONDITIONAL(HAVE_MPI, test x$enable_mpi = xyes)
 
 # Enable POPCNT instruction by default
 AC_ARG_ENABLE([popcnt],
