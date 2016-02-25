@@ -18,6 +18,7 @@
 #include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>
 #include <print.hpp>
 #include <Wheel.hpp>
@@ -27,9 +28,6 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-
-#include <mpi.h>
-#include <mpi_reduce_sum.hpp>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -176,11 +174,8 @@ T P2_mpi_master(T x, int64_t y, int threads)
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
-  int proc_id;
-  int procs;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  int proc_id = mpi_proc_id();
+  int procs = mpi_num_procs();
 
   int64_t interval = limit - low;
   int64_t interval_per_proc = ceil_div(interval, procs);
@@ -191,7 +186,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   T p2 = 0;
 
   // \sum_{i=a+1}^{b} -(i - 1)
-  if (proc_id == 0)
+  if (proc_id == mpi_master_proc_id())
     p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   // temporarily disable printing for pi()
