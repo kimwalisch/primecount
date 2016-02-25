@@ -51,11 +51,6 @@ int mpi_master_proc_id()
   return 0;
 }
 
-bool is_mpi()
-{
-  return mpi_num_procs() >= 2;
-}
-
 bool is_mpi_master_proc()
 {
   return mpi_proc_id() == mpi_master_proc_id();
