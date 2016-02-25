@@ -186,7 +186,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   T p2 = 0;
 
   // \sum_{i=a+1}^{b} -(i - 1)
-  if (proc_id == mpi_master_proc_id())
+  if (is_mpi_master_proc())
     p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   // temporarily disable printing for pi()
