@@ -21,7 +21,10 @@
 #include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>
+#include <S2_hard_mpi_msg.hpp>
+#include <S2_hard_mpi_LoadBalancer.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
 #include <tos_counters.hpp>
@@ -29,11 +32,6 @@
 
 #include <stdint.h>
 #include <vector>
-
-#include <mpi.h>
-#include <S2_hard_mpi_msg.hpp>
-#include <S2_hard_mpi_LoadBalancer.hpp>
-#include <mpi_reduce_sum.hpp>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -410,8 +408,7 @@ T S2_hard_OpenMP_master(int64_t low,
       segments_per_thread, s2_hard, get_wtime() - time,
           loadBalancer.get_rsd());
 
-  int master_proc_id = 0;
-  result_msg.send(master_proc_id);
+  result_msg.send(mpi_master_proc_id());
 
   return s2_hard;
 }
@@ -426,7 +423,6 @@ void S2_hard_mpi_slave(T x,
                        int64_t z,
                        int64_t c,
                        T s2_hard_approx,
-                       int proc_id,
                        int threads)
 {
   // this will take a while to initialize
@@ -434,6 +430,7 @@ void S2_hard_mpi_slave(T x,
   int64_t max_prime = z / isqrt(y);
   vector<int64_t> primes = generate_primes<int64_t>(max_prime);
   PiTable pi(max_prime);
+  int proc_id = mpi_proc_id();
 
   S2_hard_mpi_msg get_work;
   get_work.recv(proc_id);
@@ -460,18 +457,15 @@ T S2_hard_mpi_master(T x,
                      int64_t z,
                      int64_t c,
                      T s2_hard_approx,
-                     int procs,
                      int threads)
 {
   T s2_hard = 0;
-  int slave_procs = procs - 1;
+  int slave_procs = mpi_num_procs() - 1;
 
   int64_t low = 1;
   int64_t high = 0;
   int64_t sqrtz = isqrt(z);
   int64_t logx = max(1, ilog(x));
-
-  // start with tiny segment size
   int64_t segment_size = max(sqrtz / logx, 1 << 9);
   int64_t segments_per_thread = 1;
   int64_t proc_interval = sqrtz;
@@ -540,16 +534,6 @@ int64_t S2_hard_mpi(int64_t x,
                     int64_t s2_hard_approx,
                     int threads)
 {
-  int proc_id;
-  int procs;
-  int master_proc_id = 0;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
-
-  if (procs < 2)
-    return S2_hard(x, y, z, c, s2_hard_approx, threads);
-
   print("");
   print("=== S2_hard_mpi(x, y) ===");
   print("Computation of the hard special leaves");
@@ -558,10 +542,10 @@ int64_t S2_hard_mpi(int64_t x,
   int64_t s2_hard = 0;
   double time = get_wtime();
 
-  if (proc_id == master_proc_id)
-    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx, procs, threads);
+  if (is_mpi_master_proc())
+    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx, threads);
   else
-    S2_hard_mpi_slave<uint16_t>(x, y, z, c, s2_hard_approx, proc_id, threads);
+    S2_hard_mpi_slave<uint16_t>(x, y, z, c, s2_hard_approx, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -576,16 +560,6 @@ int128_t S2_hard_mpi(int128_t x,
                      int128_t s2_hard_approx,
                      int threads)
 {
-  int proc_id;
-  int procs;
-  int master_proc_id = 0;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
-
-  if (procs < 2)
-    return S2_hard(x, y, z, c, s2_hard_approx, threads);
-
   print("");
   print("=== S2_hard_mpi(x, y) ===");
   print("Computation of the hard special leaves");
@@ -594,15 +568,15 @@ int128_t S2_hard_mpi(int128_t x,
   int128_t s2_hard = 0;
   double time = get_wtime();
 
-  if (proc_id == master_proc_id)
-    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx, procs, threads);
+  if (is_mpi_master_proc())
+    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx, threads);
   else
   {
     // uses less memory
     if (y <= FactorTable<uint16_t>::max())
-      S2_hard_mpi_slave<uint16_t>((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, proc_id, threads);
+      S2_hard_mpi_slave<uint16_t>((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, threads);
     else
-      S2_hard_mpi_slave<uint32_t>((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, proc_id, threads);
+      S2_hard_mpi_slave<uint32_t>((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, threads);
   }
 
   print("S2_hard", s2_hard, time);
