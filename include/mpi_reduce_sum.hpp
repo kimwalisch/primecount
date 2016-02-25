@@ -21,7 +21,24 @@
 
 namespace primecount {
 
-void mpi_sum(int* x, int* sum, int* len, MPI_Datatype *dtype);
+template <typename T>
+inline void mpi_sum_helper(int* x, int* sum)
+{
+  T& x_ = *((T*) x);
+  T& sum_ = *((T*) sum);
+  sum_ += x_;
+}
+
+inline void mpi_sum(int* x, int* sum, int* len, MPI_Datatype *dtype)
+{
+  if (*len * sizeof(int64_t) == sizeof(int64_t))
+    mpi_sum_helper<int64_t>(x, sum);
+
+#if defined(HAVE_INT128_T)
+  if (*len * sizeof(int64_t) == sizeof(int128_t))
+    mpi_sum_helper<int128_t>(x, sum);
+#endif
+}
 
 /// Works with both int64_t and int128_t
 template <typename T>
