@@ -43,8 +43,6 @@ T S2_trivial_OpenMP(T x,
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
-  int64_t start = max(prime_c, sqrtz) + 1;
-  int64_t thread_interval = ceil_div(y - start, threads);
 
   T s2_trivial = 0;
 
@@ -53,6 +51,8 @@ T S2_trivial_OpenMP(T x,
   #pragma omp parallel for num_threads(threads) reduction(+: s2_trivial)
   for (int64_t i = 0; i < threads; i++)
   {
+    int64_t start = max(prime_c, sqrtz) + 1;
+    int64_t thread_interval = ceil_div(y - start, threads);
     start += thread_interval * i;
     int64_t stop = min(start + thread_interval, y);
     primesieve::iterator iter(start - 1, stop);
