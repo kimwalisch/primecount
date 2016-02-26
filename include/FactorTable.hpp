@@ -142,40 +142,40 @@ private:
       int64_t high = std::min(low + thread_interval, y);
       int64_t wheel_prime = get_number(1);
       primesieve::iterator iter(wheel_prime - 1, high);
-      int64_t prime;
+      int64_t prime, i;
 
       while ((prime = iter.next_prime()) <= high)
       {
         // case 4), store prime
-        if (prime > low && 
-            prime < T_MAX)
+        if (prime > low && prime < T_MAX)
           factors_[get_index(prime)] = (T) prime;
 
-        int64_t i;
-        int64_t min_index = 1;
+        int64_t multiple = next_multiple(low, prime, 1, &i);
 
-        for (int64_t multiple = next_multiple(low, prime, min_index, &i);
-             multiple <= high;
-             multiple = prime * get_number(i++))
+        // no more work todo
+        if (prime >= T_MAX && multiple > high)
+          break;
+
+        for (; multiple <= high; multiple = prime * get_number(i++))
         {
           int64_t mi = get_index(multiple);
           // case 5), prime is the smallest factor of multiple
           if (factors_[mi] == T_MAX)
             factors_[mi] = (T) prime;
-          // case 2) & 3), the least significant bit indicates whether
-          // multiple has an even or odd number of prime factors
+          // case 2) & 3), the least significant bit indicates
+          // whether multiple has an even (0) or odd (1)
+          // number of prime factors
           else if (factors_[mi] != 0)
             factors_[mi] ^= 1;
         }
 
         if (prime <= sqrty)
         {
-          min_index = 0;
+          int64_t square = prime * prime;
+          multiple = next_multiple(low, square, 0, &i);
 
           // case 1), set 0 if moebius(n) = 0
-          for (int64_t multiple = next_multiple(low, prime * prime, min_index, &i);
-               multiple <= high;
-               multiple = prime * prime * get_number(i++))
+          for (; multiple <= high; multiple = square * get_number(i++))
             factors_[get_index(multiple)] = 0;
         }
       }
