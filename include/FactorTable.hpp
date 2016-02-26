@@ -147,13 +147,14 @@ private:
       while ((prime = iter.next_prime()) <= high)
       {
         // case 4), store prime
-        if (prime > low && prime < T_MAX)
+        if (prime > low && 
+            prime < T_MAX)
           factors_[get_index(prime)] = (T) prime;
 
         int64_t multiple = next_multiple(low, prime, 1, &i);
 
         // no more work todo
-        if (prime >= T_MAX && multiple > high)
+        if (prime > T_MAX && multiple > high)
           break;
 
         for (; multiple <= high; multiple = prime * get_number(i++))
