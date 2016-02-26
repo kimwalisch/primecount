@@ -77,7 +77,7 @@ int64_t S2_hard(int64_t x,
   print("Computation of the hard special leaves");
 
   PiTable pi(y);
-  FactorTable<uint16_t> factors(y);
+  FactorTable<uint16_t> factors(y, 1);
   vector<int32_t> primes = generate_primes(y);
 
   int64_t limit = z + 1;

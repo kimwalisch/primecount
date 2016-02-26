@@ -10,13 +10,13 @@
 ///
 ///        FactorTable.lpf(index) is equal to (n = get_number(index)):
 ///
-///         * 0      if moebius(n) = 0
-///         * lpf    if !is_prime(n) && moebius(n) = -1
-///         * lpf-1  if !is_prime(n) && moebius(n) = 1
-///         * n      if  is_prime(n) && n < T_MAX
-///         * T_MAX  if  is_prime(n) && n > T_MAX
+///         1) 0      if moebius(n) = 0
+///         2) lpf    if !is_prime(n) && moebius(n) = -1
+///         3) lpf-1  if !is_prime(n) && moebius(n) = 1
+///         4) n      if  is_prime(n) && n < T_MAX
+///         5) T_MAX  if  is_prime(n) && n > T_MAX
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,6 +26,8 @@
 #define FACTORTABLE_HPP
 
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
+#include <primesieve.hpp>
 #include <pmath.hpp>
 #include <int128.hpp>
 
@@ -34,6 +36,11 @@
 #include <limits>
 #include <stdint.h>
 #include <vector>
+#include <iostream>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 namespace primecount {
 
@@ -80,14 +87,14 @@ template <typename T>
 class FactorTable : public AbstractFactorTable
 {
 public:
-  /// @param y  factor numbers <= y
-  FactorTable(int64_t y)
+  /// Factor numbers <= y
+  FactorTable(int64_t y, int threads)
   {
     if (y > max())
       throw primecount_error("y must be <= FactorTable::max().");
     y = std::max<int64_t>(8, y);
     T T_MAX = std::numeric_limits<T>::max();
-    init_factors(y, T_MAX);
+    init_factors(y, T_MAX, threads);
   }
 
   static maxint_t max()
@@ -118,45 +125,80 @@ public:
   }
 
 private:
-  void init_factors(int64_t y, T T_MAX)
+  void init_factors(int64_t y, T T_MAX, int threads)
   {
     int64_t sqrty = isqrt(y);
     factors_.resize(get_index(y) + 1, T_MAX);
     factors_[0] = T_MAX - 1;
 
-    for (std::size_t i = 1; i < factors_.size(); i++)
+    int64_t thread_threshold = ipow(10, 7);
+    threads = validate_threads(threads, y, thread_threshold);
+    int64_t thread_interval = ceil_div(y, threads);
+
+    #pragma omp parallel for num_threads(threads)
+    for (int t = 0; t < threads; t++)
     {
-      if (factors_[i] == T_MAX)
+      int64_t low = thread_interval * t;
+      int64_t high = std::min(low + thread_interval, y);
+      int64_t wheel_prime = get_number(1);
+      primesieve::iterator iter(wheel_prime - 1, high);
+      int64_t prime;
+
+      while ((prime = iter.next_prime()) <= high)
       {
-        int64_t prime = get_number(i);
-        int64_t multiple = prime * get_number(1);
+        // case 4), store prime
+        if (prime > low && 
+            prime < T_MAX)
+          factors_[get_index(prime)] = (T) prime;
 
-        if (prime < T_MAX)
-          factors_[i] = (T) prime;
-        else if (multiple > y)
-          break;
+        int64_t i;
+        int64_t min_index = 1;
 
-        for (int64_t j = 2; multiple <= y; multiple = prime * get_number(j++))
+        for (int64_t multiple = next_multiple(low, prime, min_index, &i);
+             multiple <= high;
+             multiple = prime * get_number(i++))
         {
-          int64_t index = get_index(multiple);
-          // prime is the smallest factor of multiple
-          if (factors_[index] == T_MAX)
-            factors_[index] = (T) prime;
-          // the least significant bit indicates whether multiple has
-          // an even (0) or odd (1) number of prime factors
-          else if (factors_[index] != 0)
-            factors_[index] ^= 1;
+          int64_t mi = get_index(multiple);
+          // case 5), prime is the smallest factor of multiple
+          if (factors_[mi] == T_MAX)
+            factors_[mi] = (T) prime;
+          // case 2) & 3), the least significant bit indicates whether
+          // multiple has an even or odd number of prime factors
+          else if (factors_[mi] != 0)
+            factors_[mi] ^= 1;
         }
 
-        // Möbius function is 0 if n has a squared prime factor
         if (prime <= sqrty)
         {
-          multiple = prime * prime;
-          for (int64_t j = 1; multiple <= y; multiple = prime * prime * get_number(j++))
+          min_index = 0;
+
+          // case 1), set 0 if moebius(n) = 0
+          for (int64_t multiple = next_multiple(low, prime * prime, min_index, &i);
+               multiple <= high;
+               multiple = prime * prime * get_number(i++))
             factors_[get_index(multiple)] = 0;
         }
       }
     }
+  }
+
+  /// Find the first multiple > low of prime which
+  /// is not divisible by any prime <= 7.
+  ///
+  static int64_t next_multiple(int64_t low,
+                               int64_t prime,
+                               int64_t min_index,
+                               int64_t* index)
+  {
+    int64_t quotient = (low / prime) + 1;
+    int64_t i = std::max(min_index, get_index(quotient));
+    int64_t multiple = prime * get_number(i++);
+
+    for (; multiple <= low; i++)
+      multiple = prime * get_number(i);
+ 
+    *index = i;
+    return multiple;
   }
 
   std::vector<T> factors_;

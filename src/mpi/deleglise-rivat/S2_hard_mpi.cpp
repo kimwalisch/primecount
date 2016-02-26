@@ -426,7 +426,7 @@ void S2_hard_mpi_slave(T x,
                        int threads)
 {
   // this will take a while to initialize
-  FactorTable<F> factors(y);
+  FactorTable<F> factors(y, threads);
   int64_t max_prime = z / isqrt(y);
   vector<int64_t> primes = generate_primes<int64_t>(max_prime);
   PiTable pi(max_prime);
