@@ -142,20 +142,21 @@ private:
       int64_t high = std::min(low + thread_interval, y);
       int64_t wheel_prime = get_number(1);
       primesieve::iterator iter(wheel_prime - 1, high);
-      int64_t prime, i;
+      int64_t prime;
 
       while ((prime = iter.next_prime()) <= high)
       {
         // case 4), store prime
-        if (prime > low && 
+        if (prime > low &&
             prime < T_MAX)
           factors_[get_index(prime)] = (T) prime;
 
-        int64_t multiple = next_multiple(low, prime, 1, &i);
-
         // no more work todo
-        if (prime > T_MAX && multiple > high)
-          break;
+        if (prime * wheel_prime > high)
+           break;
+
+        int64_t i = 1;
+        int64_t multiple = next_multiple(low, prime, &i);
 
         for (; multiple <= high; multiple = prime * get_number(i++))
         {
@@ -172,11 +173,12 @@ private:
 
         if (prime <= sqrty)
         {
+          int64_t j = 0;
           int64_t square = prime * prime;
-          multiple = next_multiple(low, square, 0, &i);
+          multiple = next_multiple(low, square, &j);
 
           // case 1), set 0 if moebius(n) = 0
-          for (; multiple <= high; multiple = square * get_number(i++))
+          for (; multiple <= high; multiple = square * get_number(j++))
             factors_[get_index(multiple)] = 0;
         }
       }
@@ -188,11 +190,10 @@ private:
   ///
   static int64_t next_multiple(int64_t low,
                                int64_t prime,
-                               int64_t min_index,
                                int64_t* index)
   {
     int64_t quotient = (low / prime) + 1;
-    int64_t i = std::max(min_index, get_index(quotient));
+    int64_t i = std::max(*index, get_index(quotient));
     int64_t multiple = prime * get_number(i++);
 
     for (; multiple <= low; i++)
