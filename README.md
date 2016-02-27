@@ -308,10 +308,12 @@ To build ```primecount``` using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
 support for distributing computations onto cluster nodes use:
 ```sh
-$ sudo apt-get install openmpi-bin libopenmpi-dev
 $ ./build.sh --enable-mpi
 $ sudo make install
 ```
+
+[This page](doc/primecount-MPI.md) contains more information about
+```primecount MPI```.
 
 Build instructions (Microsoft Visual C++)
 -----------------------------------------
