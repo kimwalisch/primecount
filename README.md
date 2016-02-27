@@ -297,38 +297,20 @@ GCC 5.2.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
-You need to have installed a C++ compiler, GNU make and the author's
-primesieve library.
+You need to have installed a C++ compiler, GNU make to build ```primecount```.
 
-Download 
-<a href="https://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz">primesieve-latest.tar.gz</a>
-and build it using:
 ```sh
-$ ./configure --prefix=/usr
-$ make
+$ ./build.sh
 $ sudo make install
 ```
 
-Then download
-<a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6.tar.gz">primecount-2.6.tar.gz</a>
-and build it using:
+To build ```primecount``` using
+[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
+support for distributing computations onto cluster nodes use:
 ```sh
-$ ./configure
-$ make
-$ sudo make install
-```
+$ sudo apt-get install openmpi-bin libopenmpi-dev
 
-If you have downloaded a zip archive from GitHub then Autotools
-(a.k.a. GNU Build System) must be installed and ```autogen.sh``` must
-be executed once. To install Autotools install
-[GNU&#160;Autoconf](http://www.gnu.org/software/autoconf/),
-[GNU&#160;Automake](http://www.gnu.org/software/automake/) and
-[GNU&#160;Libtool](http://www.gnu.org/software/libtool/)
-using your operating system's package manager.
-```sh
-$ ./autogen.sh
-$ ./configure
-$ make
+$ ./build.sh --enable-mpi
 $ sudo make install
 ```
 
