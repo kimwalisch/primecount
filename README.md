@@ -312,8 +312,7 @@ $ ./build.sh --enable-mpi
 $ sudo make install
 ```
 
-[This page](doc/primecount-MPI.md) contains more information about
-```primecount MPI```.
+[primecount-MPI.md](doc/primecount-MPI.md) contains more information.
 
 Build instructions (Microsoft Visual C++)
 -----------------------------------------
