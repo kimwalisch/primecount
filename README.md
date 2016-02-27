@@ -29,23 +29,7 @@ instruction (2010 or later).
 
 * <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
 * <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
-
-#### primecount-backup
-These binaries save intermediate results to a backup file once per hour.
-More information [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup).
-
-* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
-* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
-
-#### primecount-mpi
-[primecount-mpi](https://github.com/kimwalisch/primecount/tree/mpi#primecount-mpi) is a
-distributed version of primecount using
-[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) (Message
-Passing Interface) which automatically distributes the pi(x) computation
-onto cluster nodes. No binaries are provided but a fully automated
-[build script](https://github.com/kimwalisch/primecount/tree/mpi#build-instructions-unix-like-oses)
-simplifies building. I hope ```primecount-mpi```will be used to break
-new pi(x) world records!
+* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
 --------------
