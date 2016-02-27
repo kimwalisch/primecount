@@ -141,7 +141,7 @@ private:
       int64_t low = thread_interval * t;
       int64_t high = std::min(low + thread_interval, y);
       int64_t wheel_prime = get_number(1);
-      primesieve::iterator iter(wheel_prime - 1, high);
+      primesieve::iterator iter(wheel_prime - 1);
       int64_t prime;
 
       while ((prime = iter.next_prime()) <= high)
