@@ -73,7 +73,7 @@ Benchmark pi(10<sup>23</sup>)
   <tr align="right">
     <td>10</td>
     <td>160</td>
-    <td>3,914.312</td>
+    <td>3,914.31</td>
     <td>8,93 x</td>
     <td>89.30%</td>
   </tr>
