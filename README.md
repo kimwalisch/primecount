@@ -297,7 +297,7 @@ GCC 5.2.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
-You need to have installed a C++ compiler, GNU make to build ```primecount```.
+You need to have installed a C++ compiler and GNU make to build ```primecount```.
 
 ```sh
 $ ./build.sh
