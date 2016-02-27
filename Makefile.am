@@ -27,6 +27,7 @@ EXTRA_DIST = \
 	build.sh \
 	doc/alpha-tuning-factor.nb \
 	doc/alpha-tuning-factor.pdf \
+	doc/primecount-MPI.md \
 	scripts/find_fastest_alpha.sh \
 	scripts/worktodo.sh \
 	src/msvc/has_openmp.cpp \
