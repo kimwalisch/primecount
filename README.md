@@ -309,7 +309,6 @@ To build ```primecount``` using
 support for distributing computations onto cluster nodes use:
 ```sh
 $ sudo apt-get install openmpi-bin libopenmpi-dev
-
 $ ./build.sh --enable-mpi
 $ sudo make install
 ```
