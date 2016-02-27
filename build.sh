@@ -7,11 +7,7 @@
 # Exit on any error
 set -e
 
-# Execute in base directory
-if [ "$(basename $(pwd))" = "scripts" ]
-then
-    cd ..
-fi
+CONFIGURE_OPTIONS="$1"
 
 # Download primesieve
 if [ ! -f ./primesieve-latest.tar.gz ]
@@ -46,7 +42,7 @@ then
         sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
         mv -f Makefile.tmp Makefile.am
     fi
-    ./configure --disable-shared LDFLAGS=-L$(pwd)/lib
+    ./configure $CONFIGURE_OPTIONS LDFLAGS=-L$(pwd)/lib
 fi
 
 # Build primecount-mpi
