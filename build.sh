@@ -27,7 +27,7 @@ then
 fi
 
 # Build libprimesieve
-if [ ! -f lib/libprimesieve.a ]
+if [ ! -f primesieve*/.libs/libprimesieve.a ]
 then
     tar xvf primesieve-latest.tar.gz
     cd primesieve-*
@@ -45,12 +45,15 @@ then
     ./autogen.sh
 fi
 
-# Patch ./configure script, needed for release tarballs
-sed '/libprimesieve is missing/c\
-true;
-' configure > configure.tmp
-mv -f configure.tmp configure
-chmod +x configure
+if [ "$(grep 'libprimesieve is missing' configure)" != "" ]
+then
+    # Patch ./configure script, needed for release tarballs
+    sed '/libprimesieve is missing/c\
+    true;
+    ' configure > configure.tmp
+    mv -f configure.tmp configure
+    chmod +x configure
+fi
 
 # Generate Makefile using ./configure
 if [ ! -f ./Makefile ]
