@@ -36,19 +36,9 @@ then
     cd ..
 fi
 
-if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
-then
-    # Patch Makefile.am for static linking libprimesieve
-    sed "s#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la $(echo primesieve-*/.libs/libprimesieve.a)#g" Makefile.am > Makefile.tmp
-    mv -f Makefile.tmp Makefile.am
-fi
-
-# Generate ./configure script, requires GNU Autotools
+# Generate ./configure script, requires Autotools
 if [ ! -f ./configure ]
 then
-    # Patch configure.ac for static linking libprimesieve
-    sed 's/AC_SEARCH_LIBS(\[primesieve/#AC_SEARCH_LIBS(\[primesieve/g' configure.ac > configure.tmp
-    mv -f configure.tmp configure.ac
     ./autogen.sh
 fi
 
@@ -66,6 +56,23 @@ fi
 if [ ! -f ./Makefile ]
 then
     ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
+fi
+
+# Patch Makefile to build primecount binary which statically
+# links against libprimecount and libprimesieve
+if [ "$(grep libprimesieve.a Makefile)" = "" ]
+then
+    sed '/primecount_DEPENDENCIES = libprimecount.la/c\
+    primecount_DEPENDENCIES = libprimecount.la primesieve-*/.libs/libprimesieve.a
+    ' Makefile > Makefile.tmp
+    mv -f Makefile.tmp Makefile
+
+    sed '/primecount_LDADD = libprimecount.la/c\
+    primecount_LDADD = libprimecount.la primesieve-*/.libs/libprimesieve.a
+    ' Makefile > Makefile.tmp
+    mv -f Makefile.tmp Makefile
+
+    chmod +x Makefile
 fi
 
 # Build both static and shared libprimecount
