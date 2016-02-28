@@ -1,8 +1,13 @@
 #!/bin/sh
 
 # Usage: ./build.sh
-# Builds a static primecount binary, automatically downloads and
-# builds the primesieve library (dependency).
+# Script which automates building primecount and libprimecount.
+#
+# What this script does:
+#
+# 1) Download primesieve library
+# 2) Build primesieve library using: ./configure && make
+# 3) Build primecount library using: ./configure && make
 
 # Exit on any error
 set -e
@@ -26,7 +31,7 @@ then
     cd ..
 fi
 
-# Generate configure script, requires GNU Autotools
+# Generate ./configure script, requires GNU Autotools
 if [ ! -f ./configure ]
 then
     # Patch configure.ac for static linking libprimesieve
@@ -35,6 +40,7 @@ then
     ./autogen.sh
 fi
 
+# Generate Makefile using ./configure
 if [ ! -f ./Makefile ]
 then
     if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
@@ -46,5 +52,11 @@ then
     ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -Iprimesieve*/include"
 fi
 
+# Build both static and shared libprimecount
 make libprimecount.la -j8
+
+# Build primecount binary which statically links against libprimecount
+# and libprimesieve. Statically linking against libprimecount and
+# libprimesieve gives slightly better performance and makes it easier
+# to copy the primecount binary around without missing dependencies.
 make primecount LDFLAGS="-static" -j8
