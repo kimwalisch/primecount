@@ -21,7 +21,7 @@ if [ ! -f lib/libprimesieve.a ]
 then
     tar xvf primesieve-latest.tar.gz
     cd primesieve-*
-    ./configure --disable-shared --prefix=$(pwd)/..
+    ./configure --prefix=$(pwd)/..
     make -j8
     make install
     cd ..
@@ -30,22 +30,13 @@ fi
 # Generate configure script, requires GNU Autotools
 if [ ! -f ./configure ]
 then
-    # Patch configure.ac for static linking libprimesieve
-    sed 's/AC_SEARCH_LIBS(\[primesieve/#AC_SEARCH_LIBS(\[primesieve/g' configure.ac > configure.tmp
-    mv -f configure.tmp configure.ac
     ./autogen.sh
 fi
 
 # configure primecount-mpi
 if [ ! -f ./Makefile ]
 then
-    if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
-    then
-        # Patch Makefile.am for static linking libprimesieve
-        sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la lib/libprimesieve.a#g' Makefile.am > Makefile.tmp
-        mv -f Makefile.tmp Makefile.am
-    fi
-    ./configure $CONFIGURE_OPTIONS LDFLAGS=-L$(pwd)/lib
+    ./configure $CONFIGURE_OPTIONS LDFLAGS="-static -L$(pwd)/lib"
 fi
 
 # Build primecount-mpi
