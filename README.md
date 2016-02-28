@@ -347,7 +347,7 @@ int main()
 
 On Unix-like OSes compile using:
 ```sh
-$ c++ -O2 primes.cpp -lprimecount
+$ c++ -O2 primes.cpp -lprimecount -lprimesieve
 ```
 
 References
