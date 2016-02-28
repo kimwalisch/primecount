@@ -12,8 +12,8 @@ CONFIGURE_OPTIONS="$1"
 # Download primesieve
 if [ ! -f ./primesieve-latest.tar.gz ]
 then
-    wget      http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz || \
-    curl -LkO http://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz
+    wget      https://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz || \
+    curl -LkO https://dl.bintray.com/kimwalisch/primesieve/primesieve-latest.tar.gz
 fi
 
 # Build libprimesieve
@@ -21,23 +21,31 @@ if [ ! -f lib/libprimesieve.a ]
 then
     tar xvf primesieve-latest.tar.gz
     cd primesieve-*
-    ./configure --prefix=$(pwd)/..
+    ./configure
     make -j8
-    make install
     cd ..
 fi
 
 # Generate configure script, requires GNU Autotools
 if [ ! -f ./configure ]
 then
+    # Patch configure.ac for static linking libprimesieve
+    sed 's/AC_SEARCH_LIBS(\[primesieve/#AC_SEARCH_LIBS(\[primesieve/g' configure.ac > configure.tmp
+    mv -f configure.tmp configure.ac
     ./autogen.sh
 fi
 
 # configure primecount-mpi
 if [ ! -f ./Makefile ]
 then
-    ./configure $CONFIGURE_OPTIONS LDFLAGS="-static -L$(pwd)/lib"
+    if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
+    then
+        # Patch Makefile.am for static linking libprimesieve
+        sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la primesieve*/.libs/libprimesieve.a#g' Makefile.am > Makefile.tmp
+        mv -f Makefile.tmp Makefile.am
+    fi
+    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -Iprimesieve*/include"
 fi
 
-# Build primecount-mpi
-make -j8
+make libprimecount.la -j8
+make primecount LDFLAGS="-static" -j8
