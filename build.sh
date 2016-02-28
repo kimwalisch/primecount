@@ -11,7 +11,7 @@
 #
 # Lots of hacks are needed because:
 #
-# 1) We build primesieve without first installing libprimesieve.
+# 1) We build primecount without first installing libprimesieve.
 # 2) We want to build a static primecount binary.
 
 CONFIGURE_OPTIONS="$1"
