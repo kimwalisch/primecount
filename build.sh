@@ -21,7 +21,7 @@ if [ ! -f lib/libprimesieve.a ]
 then
     tar xvf primesieve-latest.tar.gz
     cd primesieve-*
-    ./configure --prefix=$(pwd)/..
+    ./configure --disable-shared --prefix=$(pwd)/..
     make -j8
     make install
     cd ..
@@ -30,6 +30,9 @@ fi
 # Generate configure script, requires GNU Autotools
 if [ ! -f ./configure ]
 then
+    # Patch configure.ac for static linking libprimesieve
+    sed 's/AC_SEARCH_LIBS(\[primesieve/#AC_SEARCH_LIBS(\[primesieve/g' configure.ac > configure.tmp
+    mv -f configure.tmp configure.ac
     ./autogen.sh
 fi
 
