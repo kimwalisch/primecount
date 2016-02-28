@@ -44,7 +44,8 @@ fi
 
 if [ "$(grep 'libprimesieve is missing' configure)" != "" ]
 then
-    # Patch ./configure script, needed for release tarballs
+    # Patch ./configure script to continue even
+    # if libprimesieve is not installed
     sed '/libprimesieve is missing/c\
     true;
     ' configure > configure.tmp
