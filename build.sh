@@ -36,6 +36,13 @@ then
     cd ..
 fi
 
+if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
+then
+    # Patch Makefile.am for static linking libprimesieve
+    sed "s#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la $(echo primesieve-*/.libs/libprimesieve.a)#g" Makefile.am > Makefile.tmp
+    mv -f Makefile.tmp Makefile.am
+fi
+
 # Generate ./configure script, requires GNU Autotools
 if [ ! -f ./configure ]
 then
@@ -58,12 +65,6 @@ fi
 # Generate Makefile using ./configure
 if [ ! -f ./Makefile ]
 then
-    if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
-    then
-        # Patch Makefile.am for static linking libprimesieve
-        sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la primesieve*/.libs/libprimesieve.a#g' Makefile.am > Makefile.tmp
-        mv -f Makefile.tmp Makefile.am
-    fi
     ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
 fi
 
