@@ -40,6 +40,11 @@ then
     ./autogen.sh
 fi
 
+# Patch ./configure script, needed for release tarballs
+sed '/libprimesieve is missing/c\ true; ' configure > configure.tmp
+mv -f configure.tmp configure
+chmod +x configure
+
 # Generate Makefile using ./configure
 if [ ! -f ./Makefile ]
 then
