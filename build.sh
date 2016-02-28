@@ -35,7 +35,6 @@ then
     ./autogen.sh
 fi
 
-# configure primecount-mpi
 if [ ! -f ./Makefile ]
 then
     if [ "$(grep libprimesieve.a Makefile.am)" = "" ]
