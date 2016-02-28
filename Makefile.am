@@ -15,6 +15,7 @@ primecount_LDADD = libprimecount.la
 # execute ldconfig after installation
 install-exec-hook:
 	test "$(prefix)" = "/usr/local" && command -v ldconfig 2>/dev/null && ldconfig /usr/local/lib 2>/dev/null || true
+	test -f primesieve-*/primesieve && cd primesieve-* && make install && cd ..
 
 check: all
 	./primecount --test
