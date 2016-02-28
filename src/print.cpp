@@ -83,7 +83,7 @@ void print(const string& str)
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
 {
-  if (print_variables())
+  if (print_status())
   {
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
