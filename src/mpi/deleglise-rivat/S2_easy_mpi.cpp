@@ -124,7 +124,7 @@ int64_t S2_easy_mpi(int64_t x,
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(y);
-  int64_t s2_easy = S2_easy_mpi_master(x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;

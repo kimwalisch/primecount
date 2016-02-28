@@ -545,7 +545,7 @@ int64_t S2_hard_mpi(int64_t x,
   if (is_mpi_master_proc())
     s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx, threads);
   else
-    S2_hard_mpi_slave<uint16_t>(x, y, z, c, s2_hard_approx, threads);
+    S2_hard_mpi_slave<uint16_t>((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;

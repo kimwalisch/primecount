@@ -428,7 +428,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = z / isqrt(y);
   vector<int32_t> primes = generate_primes(max_prime);
 
-  int64_t s2_hard = S2_hard_OpenMP_master(x, y, z, c, s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard_OpenMP_master((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
