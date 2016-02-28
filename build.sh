@@ -8,11 +8,16 @@
 # 1) Download primesieve library
 # 2) Build primesieve library using: ./configure && make
 # 3) Build primecount library using: ./configure && make
+#
+# Lots of hacks are needed because:
+#
+# 1) We build primesieve without first installing libprimesieve.
+# 2) We want to build a static primecount binary.
+
+CONFIGURE_OPTIONS="$1"
 
 # Exit on any error
 set -e
-
-CONFIGURE_OPTIONS="$1"
 
 # Download primesieve
 if [ ! -f ./primesieve-latest.tar.gz ]
@@ -41,7 +46,9 @@ then
 fi
 
 # Patch ./configure script, needed for release tarballs
-sed '/libprimesieve is missing/c\ true; ' configure > configure.tmp
+sed '/libprimesieve is missing/c\
+true;
+' configure > configure.tmp
 mv -f configure.tmp configure
 chmod +x configure
 
@@ -54,7 +61,7 @@ then
         sed 's#primecount_LDADD = libprimecount.la#primecount_LDADD = libprimecount.la primesieve*/.libs/libprimesieve.a#g' Makefile.am > Makefile.tmp
         mv -f Makefile.tmp Makefile.am
     fi
-    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -Iprimesieve*/include"
+    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
 fi
 
 # Build both static and shared libprimecount
