@@ -33,6 +33,12 @@ then
     cd primesieve-*
     ./configure
     make -j8
+    # On Windows we must install libprimesive
+    if [ "$(uname | egrep -i 'windows|cygwin|mingw|msys')" != "" ]
+    then
+        make install
+        export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+    fi
     cd ..
 fi
 
@@ -42,10 +48,10 @@ then
     ./autogen.sh
 fi
 
+# Patch ./configure script to continue even
+# if libprimesieve is not installed
 if [ "$(grep 'libprimesieve is missing' configure)" != "" ]
 then
-    # Patch ./configure script to continue even
-    # if libprimesieve is not installed
     sed '/libprimesieve is missing/c\
     true;
     ' configure > configure.tmp
@@ -59,8 +65,8 @@ then
     ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
 fi
 
-# Patch Makefile to build primecount binary which statically
-# links against libprimecount and libprimesieve
+# Patch Makefile to build primecount binary which links statically
+# against libprimecount and libprimesieve
 if [ "$(grep libprimesieve.a Makefile)" = "" ]
 then
     sed '/primecount_DEPENDENCIES = libprimecount.la/c\
@@ -79,8 +85,5 @@ fi
 # Build both static and shared libprimecount
 make libprimecount.la -j8
 
-# Build primecount binary which statically links against libprimecount
-# and libprimesieve. Statically linking against libprimecount and
-# libprimesieve gives slightly better performance and makes it easier
-# to copy the primecount binary around without missing dependencies.
-make primecount LDFLAGS="-static" -j8
+# Build statically linked primecount binary
+make primecount$(grep 'EXEEXT =' Makefile | cut -f3 -d' ') LDFLAGS="-static" -j8
