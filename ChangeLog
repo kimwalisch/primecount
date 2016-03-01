@@ -8,6 +8,7 @@
   process (--enable-mpi).
 
   * src/mpi: primecount MPI source code.
+  * include/FactorTable.hpp: Multi-threaded initialization.
   * doc/primecount-MPI.md: primecount MPI documentation.
   * build.sh: Improved build script with support for primecount MPI.
   * README.md: Updated build instructions.
