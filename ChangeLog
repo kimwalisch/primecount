@@ -1,3 +1,17 @@
+2016-03-01 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.0 work in progress.
+
+  In this release I have merged the MPI (Message Passing Interface)
+  branch into the master branch. primecount can now distribute
+  computations on cluster nodes if MPI is enabled in the build
+  process (--enable-mpi).
+
+  * src/mpi: primecount MPI source code.
+  * doc/primecount-MPI.md: primecount MPI documentation.
+  * build.sh: Improved build script with support for primecount MPI.
+  * README.md: Updated build instructions.
+
 2016-02-14 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 2.6 released.
