@@ -1,5 +1,5 @@
-AC_INIT([primecount], [2.6], [kim.walisch@gmail.com])
-AC_SUBST([primecount_lib_version], [4:2:0])
+AC_INIT([primecount], [3.0], [kim.walisch@gmail.com])
+AC_SUBST([primecount_lib_version], [4:3:0])
 
 AC_PREREQ([2.62])
 AC_LANG([C++])
@@ -74,7 +74,8 @@ esac
 
 AM_CONDITIONAL(force_shared_library, test x$force_shared = xyes)
 
-AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [], [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])])
+AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
+    [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
