@@ -17,6 +17,9 @@ install-exec-hook:
 	test "$(prefix)" = "/usr/local" && command -v ldconfig 2>/dev/null && ldconfig /usr/local/lib 2>/dev/null || true
 	test -f primesieve-*/primesieve && cd primesieve-* && make install && cd .. || true
 
+uninstall-hook:
+	test -f primesieve-*/primesieve && cd primesieve-* && make uninstall && cd .. || true
+
 check: all
 	./primecount --test
 
