@@ -29,6 +29,7 @@ install:
 # Test build.sh script
 before_script:
   - ./build.sh
+  - ldd primecount
   - make distclean
 
 # Test standard build procedure
