@@ -15,6 +15,7 @@
 # 2) We build primecount without first installing libprimesieve.
 
 CONFIGURE_OPTIONS="$1"
+CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
 
 # Exit on any error
 set -e
@@ -32,7 +33,7 @@ then
     tar xvf primesieve-latest.tar.gz
     cd primesieve-*
     ./configure
-    make -j8
+    make -j$CPU_CORES
     cd ..
 fi
 
@@ -82,11 +83,11 @@ fi
 if [ "$(uname 2>/dev/null | egrep -i 'windows|cygwin|mingw|msys')" != "" ]
 then
     # Windows: build only static library
-    make libprimecount.la LDFLAGS="-static" -j8
+    make libprimecount.la LDFLAGS="-static" -j$CPU_CORES
 else
     # Other OSes: build static and shared library
-    make libprimecount.la -j8
+    make libprimecount.la -j$CPU_CORES
 fi
 
 # Build statically linked primecount binary
-make primecount$(grep 'EXEEXT =' Makefile | cut -f3 -d' ') LDFLAGS="-static" -j8
+make primecount$(grep 'EXEEXT =' Makefile | cut -f3 -d' ') LDFLAGS="-static" -j$CPU_CORES
