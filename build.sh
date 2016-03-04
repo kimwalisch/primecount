@@ -63,6 +63,9 @@ fi
 # statically against libprimecount and libprimesieve
 if [ "$(grep libprimesieve.a Makefile)" = "" ]
 then
+    sed 's/-lprimesieve//g' Makefile > Makefile.tmp
+    mv -f Makefile.tmp Makefile
+
     sed '/primecount_DEPENDENCIES = libprimecount.la/c\
     primecount_DEPENDENCIES = libprimecount.la primesieve-*/.libs/libprimesieve.a
     ' Makefile > Makefile.tmp
