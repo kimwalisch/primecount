@@ -12,6 +12,7 @@ env:
 before_install:
   - sudo apt-get update -qq
 
+# Install OpenMPI and libprimesieve
 install:
   - sudo apt-get install -y openmpi-bin libopenmpi-dev
   - rm -rf primesieve-master*
@@ -25,10 +26,14 @@ install:
   - sudo make install
   - cd ..
 
+# Test build.sh script
 before_script:
-  - ./autogen.sh
+  - ./build.sh
+  - make distclean
 
+# Test standard build procedure
 script:
+  - ./autogen.sh
   - ./configure --enable-mpi --enable-assert CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-unknown-pragmas"
   - make
   - sudo make install
