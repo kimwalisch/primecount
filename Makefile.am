@@ -4,7 +4,7 @@ lib_LTLIBRARIES = libprimecount.la
 libprimecount_la_CXXFLAGS = $(OPENMP_CXXFLAGS) $(POPCNT_FLAGS)
 libprimecount_la_LDFLAGS = -version-info @primecount_lib_version@
 
-if force_shared_library
+if IS_WINDOWS
 libprimecount_la_LDFLAGS += -no-undefined 
 endif
 

@@ -14,6 +14,9 @@ AC_OPENMP
 AM_PROG_AR
 LT_INIT
 
+# Check if OS is Windows
+AM_CONDITIONAL(IS_WINDOWS, test "$(uname 2>/dev/null | egrep -i 'windows|cygwin|mingw|msys')" != "")
+
 # Disable assert macro by default
 AC_ARG_ENABLE([assert],
     AC_HELP_STRING([--enable-assert], [enable assert macro (default no)]),
@@ -65,14 +68,6 @@ AC_TRY_LINK(, [__int128_t x = 0;],
               [AC_MSG_RESULT(no)])
 
 AM_CONDITIONAL(HAVE_INT128_T, test x$int128 = xyes)
-
-# Force building shared library on Windows
-# Reference: <http://article.gmane.org/gmane.comp.gnu.mingw.user/18727>
-case "$host_os" in
-    cygwin* | mingw*) force_shared=yes;;
-esac
-
-AM_CONDITIONAL(force_shared_library, test x$force_shared = xyes)
 
 AC_SEARCH_LIBS([primesieve_generate_primes], [primesieve], [],
     [AC_MSG_ERROR([libprimesieve is missing, get it from <http://primesieve.org>])])

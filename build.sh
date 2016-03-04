@@ -11,8 +11,8 @@
 #
 # Lots of hacks are needed because:
 #
-# 1) We build primecount without first installing libprimesieve.
-# 2) We want to build a static primecount binary.
+# 1) We want to build a static primecount binary.
+# 2) We build primecount without first installing libprimesieve.
 
 CONFIGURE_OPTIONS="$1"
 
@@ -82,8 +82,14 @@ then
     chmod +x Makefile
 fi
 
-# Build both static and shared libprimecount
-make libprimecount.la -j8
+if [ "$(uname 2>/dev/null | egrep -i 'windows|cygwin|mingw|msys')" != "" ]
+then
+    # Windows: build only static library
+    make libprimecount.la LDFLAGS="-static" -j8
+else
+    # Other OSes: build static and shared library
+    make libprimecount.la -j8
+fi
 
 # Build statically linked primecount binary
 make primecount$(grep 'EXEEXT =' Makefile | cut -f3 -d' ') LDFLAGS="-static" -j8
