@@ -25,10 +25,10 @@ $ sudo apt-get install g++ make libopenmpi-dev openmpi-bin
 ```
 
 Then download
-[primecount-mpi-2.6.1.tar.gz](http://dl.bintray.com/kimwalisch/primecount/primecount-mpi-2.6.1.tar.gz)
+[primecount-3.0.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.0.tar.gz)
 and build it:
 ```sh
-$ sh scripts/build.sh
+$ ./build.sh --enable-mpi
 ```
 
 Usage example
@@ -111,7 +111,7 @@ Benchmark pi(10<sup>23</sup>)
 
 The pi(10<sup>23</sup>) benchmark above was run on an
 [EC2 cluster](https://aws.amazon.com/ec2/) where each cluster node had
-2 CPUs of type Intel Xeon E5-2680 v2 (8 CPU cores, 16 threads, 2.80GHz).
+2 CPUs of type Intel Xeon E5-2680 v2 (2.80GHz, 8 CPU cores, 16 threads).
 The cluster has been set up using the
 [StarCluster](http://star.mit.edu/cluster/) tool. The efficiency drops
 slightly beyond 30 cluster nodes, the author thinks this is because
