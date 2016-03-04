@@ -33,12 +33,6 @@ then
     cd primesieve-*
     ./configure
     make -j8
-    # On Windows we must install libprimesive
-    if [ "$(uname | egrep -i 'windows|cygwin|mingw|msys')" != "" ]
-    then
-        make install
-        export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
-    fi
     cd ..
 fi
 
@@ -65,8 +59,8 @@ then
     ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
 fi
 
-# Patch Makefile to build primecount binary which links statically
-# against libprimecount and libprimesieve
+# Patch Makefile to build primecount binary which links
+# statically against libprimecount and libprimesieve
 if [ "$(grep libprimesieve.a Makefile)" = "" ]
 then
     sed '/primecount_DEPENDENCIES = libprimecount.la/c\
