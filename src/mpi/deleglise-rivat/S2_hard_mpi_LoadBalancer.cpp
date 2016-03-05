@@ -54,7 +54,7 @@ bool S2_hard_mpi_LoadBalancer::is_increase(double seconds,
   // for performance reasons all processes
   // should finish at the same time
   double max_time = remaining_time / slave_procs_;
-  double near_finish_time = elapsed_time / max(50, slave_procs_ / 2);
+  double near_finish_time = elapsed_time / max(100, slave_procs_);
   double is_increase = max3(0.1, max_time, near_finish_time);
 
   return seconds < is_increase;
