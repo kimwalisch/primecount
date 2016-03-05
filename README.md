@@ -19,7 +19,7 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. primecount has already been
 used to compute several world records e.g.
 [pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
-nth_prime(10<sup>24</sup>), more will hopefully follow!
+[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988), more will hopefully follow!
 
 Binaries
 --------
