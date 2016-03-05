@@ -293,7 +293,6 @@ To build ```primecount``` using
 support for distributing computations onto cluster nodes use:
 ```sh
 $ ./build.sh --enable-mpi
-$ sudo make install
 ```
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.
