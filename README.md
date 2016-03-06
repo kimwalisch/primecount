@@ -11,7 +11,10 @@ optimized** implementations of the
 (combinatorial methods). primecount includes implementations of the algorithms
 of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all
 of which have been parallelized using
-[OpenMP](http://en.wikipedia.org/wiki/OpenMP).
+[OpenMP](http://en.wikipedia.org/wiki/OpenMP). The Deleglise-Rivat
+implementation has 
+[recently been distributed](https://github.com/kimwalisch/primecount/blob/master/doc/primecount-MPI.md#primecount-mpi)
+using MPI.
 
 primecount contains the **first ever** parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
