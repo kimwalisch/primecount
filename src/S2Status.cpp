@@ -49,11 +49,6 @@ double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
   return max(old_percent_, percent);
 }
 
-double S2Status::get_percent() const
-{
-  return old_percent_;
-}
-
 bool S2Status::is_print(double time) const
 {
   return (time - old_time_) >= print_threshold_;

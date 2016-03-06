@@ -490,12 +490,13 @@ T S2_hard_mpi_master(T x,
     S2_hard_mpi_msg msg;
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
+    double percent = status.skewed_percent(s2_hard, s2_hard_approx);
 
     if (print_status())
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
-    // update msg with new work to do
-    loadBalancer.update(&msg, status.get_percent());
+    // assign new work to do
+    loadBalancer.update(&msg, percent);
 
     if (loadBalancer.finished())
     {
