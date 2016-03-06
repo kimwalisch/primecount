@@ -41,7 +41,7 @@ S2Status::S2Status(maxint_t x) :
 double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
 {
   double exp = 0.96;
-  double percent = primecount::get_percent((double) n, (double) limit);
+  double percent = get_percent((double) n, (double) limit);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
   percent = 100 - in_between(0, 100 * (pow(base, percent) - low) / (1 - low), 100);
