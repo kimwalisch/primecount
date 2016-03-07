@@ -36,6 +36,7 @@ S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t low,
     segments_per_thread_(1),
     proc_interval_(0),
     start_time_(get_wtime()),
+    init_seconds_(0),
     seconds_(0)
 { }
 
@@ -44,21 +45,20 @@ bool S2_hard_mpi_LoadBalancer::finished() const
   return low_ > z_;
 }
 
-bool S2_hard_mpi_LoadBalancer::is_increase(double seconds,
-                                           double percent) const
+bool S2_hard_mpi_LoadBalancer::is_increase(double percent) const
 {
+  if (seconds_ < init_seconds_ * 10)
+    return true;
+
   // avoid division by 0
   percent = in_between(1, percent, 100);
 
   // calculate remaining time till finished
   double elapsed_time = get_wtime() - start_time_;
   double remaining_time = elapsed_time * (100 / percent) - elapsed_time;
+  double is_increase = max(0.1, remaining_time / 4);
 
-  double max_time = remaining_time / 4;
-  double near_finish_time = elapsed_time / 100;
-  double is_increase = max3(0.1, max_time, near_finish_time);
-
-  return seconds < is_increase;
+  return seconds_ < is_increase;
 }
 
 void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
@@ -70,14 +70,15 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
     proc_interval_ = msg->high() - msg->low();
     segment_size_ = msg->segment_size();
     segments_per_thread_ = max(segments_per_thread_, msg->segments_per_thread());
+    init_seconds_ = msg->init_seconds();
     seconds_ = msg->seconds();
   }
 
   int64_t next_interval = proc_interval_;
 
-  // balance load by increasing or decreasing the
-  // next interval based on previous run-time
-  if (is_increase(seconds_, percent))
+  // balance load by increasing or decreasing the next
+  // interval based on previous run-time
+  if (is_increase(percent))
     next_interval *= 2;
   else
     next_interval = max(next_interval / 2, isqrt(z_)); 
