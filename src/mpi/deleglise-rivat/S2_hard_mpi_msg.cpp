@@ -24,6 +24,7 @@ namespace primecount {
 S2_hard_mpi_msg::S2_hard_mpi_msg()
 {
   init_MPI_struct();
+  reset();
 }
 
 S2_hard_mpi_msg::S2_hard_mpi_msg(int64_t proc_id,
@@ -42,11 +43,21 @@ void S2_hard_mpi_msg::set(int64_t proc_id,
                           int64_t segment_size,
                           int64_t segments_per_thread)
 {
+  reset();
   msgData_.proc_id = proc_id;
   msgData_.low = low;
   msgData_.high = high;
   msgData_.segment_size = segment_size;
   msgData_.segments_per_thread = segments_per_thread;
+}
+
+void S2_hard_mpi_msg::reset()
+{
+  msgData_.proc_id = 0;
+  msgData_.low = 0;
+  msgData_.high = 0;
+  msgData_.segment_size = 0;
+  msgData_.segments_per_thread = 0;
   msgData_.s2_hard[0] = 0;
   msgData_.s2_hard[1] = 0;
   msgData_.init_seconds = 0;
@@ -159,7 +170,7 @@ double S2_hard_mpi_msg::rsd() const
 
 bool S2_hard_mpi_msg::finished() const
 {
-  return msgData_.finished == true;
+  return ((bool) msgData_.finished) == true;
 }
 
 } // namespace
