@@ -32,6 +32,7 @@ public:
                   int64_t segments_per_thread);
 
   ~S2_hard_mpi_msg();
+  void reset();
   void init_MPI_struct();
   void send(int proc_id);
   void send_finish();
