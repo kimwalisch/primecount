@@ -32,7 +32,7 @@ public:
   bool finished() const;
 
 private:
-  bool is_increase(double seconds, double percent) const;
+  bool is_increase(double percent) const;
 
   int64_t low_;
   int64_t high_;
@@ -44,6 +44,7 @@ private:
   int64_t segments_per_thread_;
   int64_t proc_interval_;
   double start_time_;
+  double init_seconds_;
   double seconds_;
 };
 
