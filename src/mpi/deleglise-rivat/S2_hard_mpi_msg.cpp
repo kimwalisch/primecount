@@ -49,6 +49,7 @@ void S2_hard_mpi_msg::set(int64_t proc_id,
   msgData_.segments_per_thread = segments_per_thread;
   msgData_.s2_hard[0] = 0;
   msgData_.s2_hard[1] = 0;
+  msgData_.init_seconds = 0;
   msgData_.seconds = 0;
   msgData_.rsd = 0;
   msgData_.finished = false;
@@ -61,19 +62,20 @@ S2_hard_mpi_msg::~S2_hard_mpi_msg()
 
 void S2_hard_mpi_msg::init_MPI_struct()
 {
-  int items = 9;
-  int block_lengths[9] = { 1, 1, 1, 1, 1, 2, 1, 1, 1 };
+  int items = 10;
+  int block_lengths[10] = { 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 };
 
-  MPI_Datatype types[9] = { MPI_INT,     // proc_id
+  MPI_Datatype types[10] = { MPI_INT,     // proc_id
                             MPI_INT64_T, // low
                             MPI_INT64_T, // high
                             MPI_INT64_T, // segment_size
                             MPI_INT64_T, // segments_per_thread
                             MPI_INT64_T, // s2_hard
+                            MPI_DOUBLE,  // init_seconds
                             MPI_DOUBLE,  // seconds
                             MPI_DOUBLE,  // rsd
                             MPI_INT };   // finished
-  MPI_Aint offsets[9];
+  MPI_Aint offsets[10];
 
   offsets[0] = offsetof(MsgData, proc_id);
   offsets[1] = offsetof(MsgData, low);
@@ -81,9 +83,10 @@ void S2_hard_mpi_msg::init_MPI_struct()
   offsets[3] = offsetof(MsgData, segment_size);
   offsets[4] = offsetof(MsgData, segments_per_thread);
   offsets[5] = offsetof(MsgData, s2_hard);
-  offsets[6] = offsetof(MsgData, seconds);
-  offsets[7] = offsetof(MsgData, rsd);
-  offsets[8] = offsetof(MsgData, finished);
+  offsets[6] = offsetof(MsgData, init_seconds);
+  offsets[7] = offsetof(MsgData, seconds);
+  offsets[8] = offsetof(MsgData, rsd);
+  offsets[9] = offsetof(MsgData, finished);
 
   MPI_Type_create_struct(items, block_lengths, offsets, types, &mpi_type_);
   MPI_Type_commit(&mpi_type_);
@@ -137,6 +140,11 @@ int64_t S2_hard_mpi_msg::segment_size() const
 int64_t S2_hard_mpi_msg::segments_per_thread() const
 {
   return msgData_.segments_per_thread;
+}
+
+double S2_hard_mpi_msg::init_seconds() const
+{
+  return msgData_.init_seconds;
 }
 
 double S2_hard_mpi_msg::seconds() const
