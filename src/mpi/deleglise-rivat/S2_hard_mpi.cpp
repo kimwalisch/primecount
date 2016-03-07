@@ -361,6 +361,7 @@ T S2_hard_OpenMP_master(int64_t low,
 
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
   vector<int64_t> phi_total = phi_vector(low - 1, max_b, primes, pi, threads);
+  double init_seconds = get_wtime() - time;
 
   while (low < limit)
   {
@@ -404,8 +405,10 @@ T S2_hard_OpenMP_master(int64_t low,
     loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
   }
 
+  double seconds = get_wtime() - time;
+
   S2_hard_mpi_msg result_msg(proc_id, old_low, old_high, segment_size,
-      segments_per_thread, s2_hard, get_wtime() - time,
+      segments_per_thread, s2_hard, init_seconds, seconds,
           loadBalancer.get_rsd());
 
   result_msg.send(mpi_master_proc_id());
