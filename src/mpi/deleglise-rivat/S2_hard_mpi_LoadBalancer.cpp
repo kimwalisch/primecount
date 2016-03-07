@@ -12,7 +12,6 @@
 #include <S2_hard_mpi_LoadBalancer.hpp>
 #include <S2_hard_mpi_msg.hpp>
 #include <primecount-internal.hpp>
-#include <min_max.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -47,7 +46,9 @@ bool S2_hard_mpi_LoadBalancer::finished() const
 
 bool S2_hard_mpi_LoadBalancer::is_increase(double percent) const
 {
-  if (seconds_ < init_seconds_ * 10)
+  double min_seconds = max(0.1, init_seconds_ * 10);
+
+  if (seconds_ < min_seconds)
     return true;
 
   // avoid division by 0
@@ -56,7 +57,8 @@ bool S2_hard_mpi_LoadBalancer::is_increase(double percent) const
   // calculate remaining time till finished
   double elapsed_time = get_wtime() - start_time_;
   double remaining_time = elapsed_time * (100 / percent) - elapsed_time;
-  double is_increase = max(0.1, remaining_time / 4);
+  double max_seconds = remaining_time / 4;
+  double is_increase = max(min_seconds, max_seconds);
 
   return seconds_ < is_increase;
 }
