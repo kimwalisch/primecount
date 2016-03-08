@@ -36,7 +36,6 @@
 #include <limits>
 #include <stdint.h>
 #include <vector>
-#include <iostream>
 
 #ifdef _OPENMP
   #include <omp.h>
