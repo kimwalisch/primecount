@@ -34,6 +34,7 @@ S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t low,
     segment_size_(isqrt(z)),
     segments_per_thread_(1),
     proc_interval_(0),
+    rsd_(0),
     start_time_(get_wtime()),
     init_seconds_(0),
     seconds_(0)
@@ -72,6 +73,7 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
     proc_interval_ = msg->high() - msg->low();
     segment_size_ = msg->segment_size();
     segments_per_thread_ = max(segments_per_thread_, msg->segments_per_thread());
+    rsd_ = msg->rsd();
     init_seconds_ = msg->init_seconds();
     seconds_ = msg->seconds();
   }
@@ -89,7 +91,7 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
   high_ = min(low_ + next_interval, z_);
 
   // udpate existing message with new work todo
-  msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_);
+  msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_, rsd_);
 }
 
 } // namespace
