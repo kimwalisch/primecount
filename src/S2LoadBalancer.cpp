@@ -42,7 +42,7 @@
 ///    relative standard deviation to the previous one in order to
 ///    decide whether to increase or decrease the interval_size.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -99,16 +99,39 @@ double relative_standard_deviation(aligned_vector<double>& timings)
 
 namespace primecount {
 
-S2LoadBalancer::S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads) :
-  x_((double) x),
-  y_((double) y),
-  z_((double) z),
-  rsd_(40),
-  avg_seconds_(0),
-  count_(0)
+S2LoadBalancer::S2LoadBalancer(maxint_t x,
+                               int64_t y,
+                               int64_t z,
+                               int64_t threads)
 {
+  double rsd = 40;
+  init(x, y, z, threads, rsd);
+}
+
+S2LoadBalancer::S2LoadBalancer(maxint_t x,
+                               int64_t y,
+                               int64_t z,
+                               int64_t threads,
+                               double rsd)
+{
+  init(x, y, z, threads, rsd);
+}
+
+void S2LoadBalancer::init(maxint_t x,
+                          int64_t y,
+                          int64_t z,
+                          int64_t threads,
+                          double rsd)
+{
+  x_ = (double) x;
+  y_ = (double) y;
+  z_ = (double) z;
+  rsd_ = rsd;
+  avg_seconds_ = 0;
+  count_ = 0;
   sqrtz_ = isqrt(z);
 
+  // determined by benchmarking
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
@@ -128,13 +151,15 @@ int64_t S2LoadBalancer::get_min_segment_size() const
   return min_size_;
 }
 
-bool S2LoadBalancer::decrease_size(double seconds, double decrease) const
+bool S2LoadBalancer::decrease_size(double seconds,
+                                   double decrease) const
 {
   return seconds > min_seconds_ &&
          rsd_ > decrease;
 }
 
-bool S2LoadBalancer::increase_size(double seconds, double decrease) const
+bool S2LoadBalancer::increase_size(double seconds,
+                                   double decrease) const
 {
   return seconds < avg_seconds_ &&
         !decrease_size(seconds, decrease);
@@ -154,14 +179,14 @@ void S2LoadBalancer::update_avg_seconds(double seconds)
 {
   seconds = max(seconds, min_seconds_);
   double dividend = avg_seconds_ * count_ + seconds;
-  avg_seconds_ = dividend / (count_ + 1);
-  count_++;
+  avg_seconds_ = dividend / ++count_;
 }
 
 void S2LoadBalancer::update_min_size(double divisor)
 {
-  double size = sqrt(z_) / max(1.0, divisor);
-  min_size_ = max((int64_t) (1 << 9), (int64_t) size);
+  int64_t size = (int64_t) (sqrt(z_) / max(1.0, divisor));
+  int64_t min_size = 1 << 9;
+  min_size_ = max(size, min_size);
   min_size_ = next_power_of_2(min_size_);
 }
 
