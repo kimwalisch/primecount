@@ -43,6 +43,7 @@ private:
   int64_t segment_size_;
   int64_t segments_per_thread_;
   int64_t proc_interval_;
+  double rsd_;
   double start_time_;
   double init_seconds_;
   double seconds_;
