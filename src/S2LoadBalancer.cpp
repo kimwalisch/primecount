@@ -102,43 +102,44 @@ namespace primecount {
 S2LoadBalancer::S2LoadBalancer(maxint_t x,
                                int64_t y,
                                int64_t z,
-                               int64_t threads)
+                               int64_t threads) :
+  x_((double) x),
+  y_((double) y),
+  z_((double) z),
+  rsd_(40),
+  avg_seconds_(0),
+  count_(0),
+  sqrtz_(isqrt(z))
 {
-  double rsd = 40;
-  init(x, y, z, threads, rsd);
+  init(threads);
 }
 
 S2LoadBalancer::S2LoadBalancer(maxint_t x,
                                int64_t y,
                                int64_t z,
                                int64_t threads,
-                               double rsd)
+                               double rsd) :
+  x_((double) x),
+  y_((double) y),
+  z_((double) z),
+  rsd_(rsd),
+  avg_seconds_(0),
+  count_(0),
+  sqrtz_(isqrt(z))
 {
-  init(x, y, z, threads, rsd);
+  init(threads);
 }
 
-void S2LoadBalancer::init(maxint_t x,
-                          int64_t y,
-                          int64_t z,
-                          int64_t threads,
-                          double rsd)
+void S2LoadBalancer::init(int64_t threads)
 {
-  x_ = (double) x;
-  y_ = (double) y;
-  z_ = (double) z;
-  rsd_ = rsd;
-  avg_seconds_ = 0;
-  count_ = 0;
-  sqrtz_ = isqrt(z);
-
   // determined by benchmarking
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
   update_min_size(log(x_) * log(log(x_)));
 
-  double alpha = get_alpha(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
+  double alpha = get_alpha(x_, y_);
+  smallest_hard_leaf_ = (int64_t) (x_ / (y_ * sqrt(alpha) * iroot<6>(x_)));
 }
 
 double S2LoadBalancer::get_rsd() const
