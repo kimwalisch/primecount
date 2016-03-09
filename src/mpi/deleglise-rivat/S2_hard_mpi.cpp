@@ -333,12 +333,13 @@ T S2_hard_OpenMP_thread(T x,
 template <typename T, typename FactorTable, typename Primes>
 T S2_hard_OpenMP_master(int64_t low,
                         int64_t high,
+                        int64_t segment_size,
+                        int64_t segments_per_thread,
+                        double rsd,
                         T x,
                         int64_t y,
                         int64_t z,
                         int64_t c,
-                        int64_t segment_size,
-                        int64_t segments_per_thread,
                         T s2_hard_approx,
                         Primes& primes,
                         PiTable& pi,
@@ -356,7 +357,7 @@ T S2_hard_OpenMP_master(int64_t low,
 
   double alpha = get_alpha(x, y);
   S2Status status(x);
-  S2LoadBalancer loadBalancer(x, y, z, threads);
+  S2LoadBalancer loadBalancer(x, y, z, threads, rsd);
   int64_t min_segment_size = loadBalancer.get_min_segment_size();
 
   int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
@@ -442,9 +443,16 @@ void S2_hard_mpi_slave(T x,
   {
     proc_id = get_work.proc_id();
 
-    S2_hard_OpenMP_master(get_work.low(), get_work.high(), x, y, z, c,
-        get_work.segment_size(), get_work.segments_per_thread(), s2_hard_approx,
-            primes, pi, factors, proc_id, threads);
+    S2_hard_OpenMP_master(get_work.low(),
+                          get_work.high(),
+                          get_work.segment_size(),
+                          get_work.segments_per_thread(),
+                          get_work.rsd(),
+                          x, y, z, c,
+                          s2_hard_approx,
+                          primes, pi, factors,
+                          proc_id,
+                          threads);
 
     get_work.recv(proc_id);
   }
@@ -478,7 +486,6 @@ T S2_hard_mpi_master(T x,
   {
     low = high + 1;
     high = min(low + proc_interval, z);
-
     S2_hard_mpi_msg msg(proc_id, low, high, segment_size, segments_per_thread);
     msg.send(proc_id);
   }
@@ -500,7 +507,6 @@ T S2_hard_mpi_master(T x,
 
     // assign new work to do
     loadBalancer.update(&msg, percent);
-
     if (loadBalancer.finished())
     {
       msg.send_finish();
