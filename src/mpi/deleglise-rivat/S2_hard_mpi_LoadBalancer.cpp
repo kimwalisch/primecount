@@ -24,20 +24,20 @@ S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t low,
                                                    int64_t high,
                                                    int64_t y,
                                                    int64_t z,
-                                                   int slave_procs)
-  : low_(low),
-    high_(high),
-    y_(y),
-    z_(z),
-    slave_procs_(slave_procs),
-    max_finished_(0),
-    segment_size_(isqrt(z)),
-    segments_per_thread_(1),
-    proc_interval_(0),
-    rsd_(0),
-    start_time_(get_wtime()),
-    init_seconds_(0),
-    seconds_(0)
+                                                   int slave_procs) :
+  low_(low),
+  high_(high),
+  y_(y),
+  z_(z),
+  slave_procs_(slave_procs),
+  max_finished_(0),
+  segment_size_(isqrt(z)),
+  segments_per_thread_(1),
+  proc_interval_(0),
+  rsd_(0),
+  start_time_(get_wtime()),
+  init_seconds_(0),
+  seconds_(0)
 { }
 
 bool S2_hard_mpi_LoadBalancer::finished() const
