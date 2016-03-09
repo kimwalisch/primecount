@@ -1,7 +1,7 @@
 ///
 /// @file  S2LoadBalancer.hpp
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,6 +21,8 @@ class S2LoadBalancer
 {
 public:
   S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads);
+  S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads, double rsd);
+  void init(maxint_t x, int64_t y, int64_t z, int64_t threads, double rsd);
   int64_t get_min_segment_size() const;
   double get_rsd() const;
   void update(int64_t low,
