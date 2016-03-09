@@ -52,7 +52,8 @@ public:
            int64_t low,
            int64_t high,
            int64_t segment_size,
-           int64_t segments_per_thread);
+           int64_t segments_per_thread,
+           double rsd);
 
   template <typename T>
   S2_hard_mpi_msg(int proc_id,
