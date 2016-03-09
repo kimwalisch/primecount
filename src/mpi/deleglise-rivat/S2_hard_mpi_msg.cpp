@@ -34,14 +34,17 @@ S2_hard_mpi_msg::S2_hard_mpi_msg(int64_t proc_id,
                                  int64_t segments_per_thread)
 {
   init_MPI_struct();
-  set(proc_id, low, high, segment_size, segments_per_thread);
+
+  double rsd = 40;
+  set(proc_id, low, high, segment_size, segments_per_thread, rsd);
 }
 
 void S2_hard_mpi_msg::set(int64_t proc_id,
                           int64_t low,
                           int64_t high,
                           int64_t segment_size,
-                          int64_t segments_per_thread)
+                          int64_t segments_per_thread,
+                          double rsd)
 {
   reset();
   msgData_.proc_id = proc_id;
@@ -49,6 +52,7 @@ void S2_hard_mpi_msg::set(int64_t proc_id,
   msgData_.high = high;
   msgData_.segment_size = segment_size;
   msgData_.segments_per_thread = segments_per_thread;
+  msgData_.rsd = rsd;
 }
 
 void S2_hard_mpi_msg::reset()
