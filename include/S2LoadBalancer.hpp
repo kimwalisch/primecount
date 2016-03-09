@@ -22,7 +22,7 @@ class S2LoadBalancer
 public:
   S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads);
   S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads, double rsd);
-  void init(maxint_t x, int64_t y, int64_t z, int64_t threads, double rsd);
+  void init(int64_t threads);
   int64_t get_min_segment_size() const;
   double get_rsd() const;
   void update(int64_t low,
@@ -45,8 +45,8 @@ private:
   double min_seconds_;
   double decrease_dividend_;
   int64_t min_size_;
-  int64_t sqrtz_;
   int64_t count_;
+  int64_t sqrtz_;
   int64_t smallest_hard_leaf_;
 };
 
