@@ -23,7 +23,6 @@ class S2_hard_mpi_LoadBalancer
 {
 public:
   S2_hard_mpi_LoadBalancer(int64_t low,
-                           int64_t high,
                            int64_t y,
                            int64_t z,
                            int slave_procs);
