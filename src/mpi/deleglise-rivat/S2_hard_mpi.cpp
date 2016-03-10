@@ -463,20 +463,20 @@ int64_t start_mpi_slave_procs(int64_t z,
                               int64_t segment_size,
                               int slave_procs)
 {
-  int64_t low = 1;
-  int64_t high = low;
+  int64_t low = 0;
+  int64_t high = 0;
   int64_t segments_per_thread = 1;
   int64_t proc_interval = isqrt(z);
 
   for (int i = 1; i <= slave_procs; i++)
   {
+    low = high + 1;
     high = min(low + proc_interval, z);
     S2_hard_mpi_msg msg(i, low, high, segment_size, segments_per_thread);
     msg.send(i);
-    low = high + 1;
   }
 
-  return low;
+  return high;
 }
 
 /// S2_hard MPI master process.
@@ -496,8 +496,8 @@ T S2_hard_mpi_master(T x,
 
   S2LoadBalancer s2lb(x, y, z, threads);
   int64_t segment_size = s2lb.get_min_segment_size();
-  int64_t low = start_mpi_slave_procs(z, segment_size, slave_procs);
-  S2_hard_mpi_LoadBalancer loadBalancer(low, y, z, slave_procs);
+  int64_t high = start_mpi_slave_procs(z, segment_size, slave_procs);
+  S2_hard_mpi_LoadBalancer balancer(high, y, z, slave_procs);
   S2Status status(x);
 
   // main process scheduling loop
@@ -513,9 +513,9 @@ T S2_hard_mpi_master(T x,
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     // assign new work to do
-    loadBalancer.update(&msg, percent);
+    balancer.update(&msg, percent);
 
-    if (loadBalancer.finished())
+    if (balancer.finished())
     {
       msg.send_finish();
       break;
