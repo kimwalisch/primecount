@@ -458,6 +458,27 @@ void S2_hard_mpi_slave(T x,
   }
 }
 
+/// Start up all slave processes.
+int64_t start_mpi_slave_procs(int64_t z,
+                              int64_t segment_size,
+                              int slave_procs)
+{
+  int64_t low = 1;
+  int64_t high = low;
+  int64_t segments_per_thread = 1;
+  int64_t proc_interval = isqrt(z);
+
+  for (int i = 1; i <= slave_procs; i++)
+  {
+    high = min(low + proc_interval, z);
+    S2_hard_mpi_msg msg(i, low, high, segment_size, segments_per_thread);
+    msg.send(i);
+    low = high + 1;
+  }
+
+  return low;
+}
+
 /// S2_hard MPI master process.
 /// Distributes the computation of the hard speacial leaves on
 /// cluster nodes.
@@ -473,25 +494,11 @@ T S2_hard_mpi_master(T x,
   T s2_hard = 0;
   int slave_procs = mpi_num_procs() - 1;
 
-  int64_t low = 1;
-  int64_t high = 0;
-  int64_t sqrtz = isqrt(z);
-  int64_t logx = max(1, ilog(x));
-  int64_t segment_size = max(sqrtz / logx, 1 << 9);
-  int64_t segments_per_thread = 1;
-  int64_t proc_interval = sqrtz;
-
-  // start all slave processes
-  for (int proc_id = 1; proc_id <= slave_procs; proc_id++)
-  {
-    low = high + 1;
-    high = min(low + proc_interval, z);
-    S2_hard_mpi_msg msg(proc_id, low, high, segment_size, segments_per_thread);
-    msg.send(proc_id);
-  }
-
+  S2LoadBalancer s2lb(x, y, z, threads);
+  int64_t segment_size = s2lb.get_min_segment_size();
+  int64_t low = start_mpi_slave_procs(z, segment_size, slave_procs);
+  S2_hard_mpi_LoadBalancer loadBalancer(low, y, z, slave_procs);
   S2Status status(x);
-  S2_hard_mpi_LoadBalancer loadBalancer(low, high, y, z, slave_procs);
 
   // main process scheduling loop
   while (true)
@@ -507,6 +514,7 @@ T S2_hard_mpi_master(T x,
 
     // assign new work to do
     loadBalancer.update(&msg, percent);
+
     if (loadBalancer.finished())
     {
       msg.send_finish();
