@@ -71,7 +71,7 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
     max_finished_ = msg->high();
     proc_interval_ = msg->high() - msg->low();
     segment_size_ = msg->segment_size();
-    segments_per_thread_ = max(segments_per_thread_, msg->segments_per_thread());
+    segments_per_thread_ = msg->segments_per_thread();
     rsd_ = msg->rsd();
     init_seconds_ = msg->init_seconds();
     seconds_ = msg->seconds();
