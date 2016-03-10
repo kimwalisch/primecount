@@ -403,7 +403,9 @@ T S2_hard_OpenMP_master(int64_t low,
     }
 
     low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+
+    if (low < limit)
+      loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
   }
 
   double seconds = get_wtime() - time;
@@ -434,15 +436,14 @@ void S2_hard_mpi_slave(T x,
   int64_t max_prime = z / isqrt(y);
   vector<int64_t> primes = generate_primes<int64_t>(max_prime);
   PiTable pi(max_prime);
-  int proc_id = mpi_proc_id();
 
   S2_hard_mpi_msg get_work;
+
+  int proc_id = mpi_proc_id();
   get_work.recv(proc_id);
 
   while (!get_work.finished())
   {
-    proc_id = get_work.proc_id();
-
     S2_hard_OpenMP_master(get_work.low(),
                           get_work.high(),
                           get_work.segment_size(),
