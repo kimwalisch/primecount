@@ -410,9 +410,9 @@ T S2_hard_OpenMP_master(int64_t low,
 
   double seconds = get_wtime() - time;
 
-  S2_hard_mpi_msg result_msg(proc_id, old_low, old_high, segment_size,
-      segments_per_thread, s2_hard, init_seconds, seconds,
-          loadBalancer.get_rsd());
+  S2_hard_mpi_msg result_msg(proc_id, old_low, old_high,
+      segment_size, segments_per_thread, s2_hard, init_seconds,
+          seconds, loadBalancer.get_rsd());
 
   result_msg.send(mpi_master_proc_id());
 
