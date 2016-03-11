@@ -217,18 +217,7 @@ void S2LoadBalancer::update(int64_t low,
   }
   // many segments per thread
   else if (low > smallest_hard_leaf_)
-  {
-    double factor = decrease_threshold / rsd_;
-    factor = in_between(0.5, factor, 2);
-    double n = *segments_per_thread * factor;
-    n = max(1.0, n);
-
-    if ((n < *segments_per_thread && seconds > min_seconds_) ||
-        (n > *segments_per_thread && seconds < avg_seconds_))
-    {
-      *segments_per_thread = (int) n;
-    }
-  }
+    update(segments_per_thread, decrease_threshold, seconds);
 
   int64_t interval_per_thread = *segment_size * *segments_per_thread;
   int64_t high = low + interval_per_thread * threads;
@@ -248,6 +237,26 @@ void S2LoadBalancer::update(int64_t low,
   {
     update_min_size(log(y_));
     *segment_size = max(min_size_, *segment_size);
+  }
+}
+
+/// Increase the number of segments per thread if the previous
+/// thread run-times are close, otherwise decrease the
+/// number of segments per thread.
+///
+void S2LoadBalancer::update(int64_t* segments_per_thread,
+                            double decrease_threshold,
+                            double seconds)
+{
+  double factor = decrease_threshold / rsd_;
+  factor = in_between(0.5, factor, 2);
+  double n = *segments_per_thread * factor;
+  n = max(1.0, n);
+
+  if ((n < *segments_per_thread && seconds > min_seconds_) ||
+      (n > *segments_per_thread && seconds < avg_seconds_))
+  {
+    *segments_per_thread = (int64_t) n;
   }
 }
 
