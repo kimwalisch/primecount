@@ -32,6 +32,7 @@ public:
               aligned_vector<double>& timings);
 private:
   void set_min_size(int64_t z);
+  void update(int64_t* segments_per_thread, double decrease_threshold, double seconds);
   void update_avg_seconds(double seconds);
   void update_min_size(double divisor);
   double get_decrease_threshold(double seconds) const;
