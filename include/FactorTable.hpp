@@ -137,7 +137,8 @@ private:
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
-      int64_t low = thread_interval * t;
+      int64_t low = 1;
+      low += thread_interval * t;
       int64_t high = std::min(low + thread_interval, y);
       int64_t wheel_prime = get_number(1);
       primesieve::iterator iter(wheel_prime - 1);
