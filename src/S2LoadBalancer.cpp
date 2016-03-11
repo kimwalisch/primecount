@@ -185,7 +185,7 @@ void S2LoadBalancer::update_avg_seconds(double seconds)
 
 void S2LoadBalancer::update_min_size(double divisor)
 {
-  int64_t size = (int64_t) (sqrt(z_) / max(1.0, divisor));
+  int64_t size = (int64_t) (sqrtz_ / max(1.0, divisor));
   int64_t min_size = 1 << 9;
   min_size_ = max(size, min_size);
   min_size_ = next_power_of_2(min_size_);
