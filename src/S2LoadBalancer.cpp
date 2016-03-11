@@ -238,9 +238,8 @@ void S2LoadBalancer::update(int64_t low,
       high > smallest_hard_leaf_)
   {
     *segment_size = min_size_;
+    high = low + *segment_size * *segments_per_thread * threads; 
   }
-
-  high = low + *segment_size * *segments_per_thread * threads; 
 
   // slightly increase min_size_
   if (high >= smallest_hard_leaf_)
