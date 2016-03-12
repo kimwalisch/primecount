@@ -14,7 +14,7 @@
 # 1) We want to build a static primecount binary.
 # 2) We build primecount without first installing libprimesieve.
 
-CONFIGURE_OPTIONS="$1"
+CONFIGURE_OPTIONS="$@"
 CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
 
 # Exit on any error
