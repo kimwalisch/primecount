@@ -30,8 +30,8 @@ Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
-* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-win64.zip">primecount-2.6-win64.zip</a>, 386K
-* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-2.6-linux-x64.tar.gz">primecount-2.6-linux-x64.tar.gz</a>, 893K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-3.0-win64.zip">primecount-3.0-win64.zip</a>, 391K
+* <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-3.0-linux-x64.tar.gz">primecount-3.0-linux-x64.tar.gz</a>, 894K
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
@@ -285,6 +285,10 @@ GCC 5.2.
 Build instructions (Unix-like OSes)
 -----------------------------------
 You need to have installed a C++ compiler and GNU make to build ```primecount```.
+
+Download
+<a href="https://dl.bintray.com/kimwalisch/primecount/primecount-3.0.tar.gz">primecount-3.0.tar.gz</a>
+and build it using:
 
 ```sh
 $ ./build.sh
