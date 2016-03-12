@@ -111,9 +111,7 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   count_(0),
   sqrtz_(isqrt(z))
 {
-  double alpha = get_alpha(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
-  init(threads);
+  init(x, y, threads);
 }
 
 S2LoadBalancer::S2LoadBalancer(maxint_t x,
@@ -129,18 +127,22 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   count_(0),
   sqrtz_(isqrt(z))
 {
-  double alpha = get_alpha(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
-  init(threads);
+  init(x, y, threads);
 }
 
-void S2LoadBalancer::init(int64_t threads)
+void S2LoadBalancer::init(maxint_t x,
+                          int64_t y,
+                          int64_t threads)
 {
   // determined by benchmarking
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
+
   min_seconds_ = 0.02 * log_threads;
   update_min_size(log(log(x_)) * log(x_));
+
+  double alpha = get_alpha(x, y);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
 }
 
 double S2LoadBalancer::get_rsd() const
@@ -153,13 +155,6 @@ int64_t S2LoadBalancer::get_min_segment_size() const
   return min_size_;
 }
 
-bool S2LoadBalancer::decrease_size(double seconds,
-                                   double decrease) const
-{
-  return seconds > min_seconds_ &&
-         rsd_ > decrease;
-}
-
 bool S2LoadBalancer::increase_size(double seconds,
                                    double decrease) const
 {
@@ -167,9 +162,13 @@ bool S2LoadBalancer::increase_size(double seconds,
         !decrease_size(seconds, decrease);
 }
 
-/// Used to decide whether to use a smaller or larger
-/// segment_size and/or segments_per_thread.
-///
+bool S2LoadBalancer::decrease_size(double seconds,
+                                   double decrease) const
+{
+  return seconds > min_seconds_ &&
+         rsd_ > decrease;
+}
+
 double S2LoadBalancer::get_decrease_threshold(double seconds) const
 {
   double log_seconds = max(min_seconds_, log(seconds));
