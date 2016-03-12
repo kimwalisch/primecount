@@ -111,6 +111,8 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   count_(0),
   sqrtz_(isqrt(z))
 {
+  double alpha = get_alpha(x, y);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
   init(threads);
 }
 
@@ -127,6 +129,8 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   count_(0),
   sqrtz_(isqrt(z))
 {
+  double alpha = get_alpha(x, y);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
   init(threads);
 }
 
@@ -136,10 +140,7 @@ void S2LoadBalancer::init(int64_t threads)
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
   min_seconds_ = 0.02 * log_threads;
-  update_min_size(log(x_) * log(log(x_)));
-
-  double alpha = get_alpha(x_, y_);
-  smallest_hard_leaf_ = (int64_t) (x_ / (y_ * sqrt(alpha) * iroot<6>(x_)));
+  update_min_size(log(log(x_)) * log(x_));
 }
 
 double S2LoadBalancer::get_rsd() const
