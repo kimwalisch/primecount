@@ -80,7 +80,7 @@ void BitSieve::pre_sieve(uint64_t c,
 
   if (!sieve_.empty())
   {
-    // unset multiples of 2 in first byte
+    // unset multiples of 2 in first word
     sieve_[0] = UINT64_C(0xAAAAAAAAAAAAAAAA) >> (low % 2);
 
     uint64_t sieved = 1;
