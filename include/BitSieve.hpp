@@ -4,7 +4,7 @@
 ///        that packs 64 numbers into 8 bytes i.e. each bit
 ///        corresponds to one integer.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,10 +30,13 @@ public:
   ///                     false to cross-off multiples and primes.
   /// @pre c < 9
   ///
-  void pre_sieve(uint64_t c, uint64_t low, bool sieve_primes = false);
+  void pre_sieve(uint64_t c,
+                 uint64_t low,
+                 bool sieve_primes = false);
 
-  /// Count the number of 1 bits inside the interval [start, stop]
-  uint64_t count(uint64_t start, uint64_t stop) const;
+  /// Count the number of 1 bits inside [start, stop]
+  uint64_t count(uint64_t start,
+                 uint64_t stop) const;
 
   /// Count the number of 1 bits inside [0, stop]
   uint64_t count(uint64_t stop) const
@@ -41,7 +44,7 @@ public:
     return count(0, stop);
   }
 
-  /// Count the number of 1 bits inside the interval [start, stop].
+  /// Count the number of 1 bits inside [start, stop].
   /// As an optimization this method counts either forwards or
   /// backwards depending on what's faster.
   ///
@@ -65,19 +68,19 @@ public:
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    return (bits_[pos >> 6] & ((uint64_t) 1) << (pos & 63)) != 0;
+    return (sieve_[pos >> 6] & ((uint64_t) 1) << (pos & 63)) != 0;
   }
 
   void set(uint64_t pos)
   {
     assert(pos < size_);
-    bits_[pos >> 6] |= ((uint64_t) 1) << (pos & 63);
+    sieve_[pos >> 6] |= ((uint64_t) 1) << (pos & 63);
   }
 
   void unset(uint64_t pos)
   {
     assert(pos < size_);
-    bits_[pos >> 6] &= unset_bit_[pos & 63];
+    sieve_[pos >> 6] &= unset_bit_[pos & 63];
   }
 
   std::size_t size() const
@@ -86,7 +89,7 @@ public:
   }
 private:
   static const uint64_t unset_bit_[64];
-  std::vector<uint64_t> bits_;
+  std::vector<uint64_t> sieve_;
   std::size_t size_;
 };
 
