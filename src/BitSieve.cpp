@@ -5,7 +5,7 @@
 ///        assigns 64 numbers to the bits of an 8 byte word thus
 ///        reducing the memory usage by a factor of 8.
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -63,7 +63,7 @@ const uint64_t BitSieve::unset_bit_[64] =
 };
 
 BitSieve::BitSieve(std::size_t size) :
-  bits_(ceil_div(size, 64)),
+  sieve_(ceil_div(size, 64)),
   size_(size)
 { }
 
@@ -76,71 +76,65 @@ void BitSieve::pre_sieve(uint64_t c,
                          uint64_t low,
                          bool sieve_primes)
 {
-  assert(c < /* primes.size() = */ 9);
+  assert(c < 9);
 
-  if (!bits_.empty())
+  if (!sieve_.empty())
   {
-    // using bytes instead of 64-bit words requires less sieving
-    uint8_t* sieve = (uint8_t*) bits_.data();
-    uint64_t sieve_size = bits_.size() * sizeof(uint64_t);
-
     // unset multiples of 2 in first byte
-    sieve[0] = 0xAA >> (low % 2);
+    sieve_[0] = UINT64_C(0xAAAAAAAAAAAAAAAA) >> (low % 2);
 
-    uint64_t bytes_sieved = 1;
-    uint64_t bytes_copied = 1;
+    uint64_t sieved = 1;
+    uint64_t base = 1;
+    uint64_t sieve_size = sieve_.size();
 
     // pre-sieve multiples of the first c primes
     for (uint64_t i = 2; i <= c; i++)
     {
       uint64_t prime = primes[i];
-      uint64_t end_memcpy = min(bytes_sieved * prime, sieve_size);
+      uint64_t end_copy = min(sieved * prime, sieve_size);
 
-      // pre-sieve the multiples of primes < i-th prime
+      // pre-sieve multiples of primes < i-th prime
       // by copying a small pre-sieved buffer
-      while (bytes_copied < end_memcpy)
+      while (base < end_copy)
       {
-        uint64_t bytes = min(bytes_sieved, sieve_size - bytes_copied);
-        memcpy(&sieve[bytes_copied], sieve, bytes);
-        bytes_copied += bytes;
+        uint64_t last = min(sieved, sieve_size - base);
+        copy(sieve_.begin(), sieve_.begin() + last, sieve_.begin() + base);
+        base += last;
       }
 
-      // calculate the first multiple >= low of prime
+      // calculate first multiple >= low of prime
       uint64_t next_multiple = ceil_div(low, prime) * prime;
       next_multiple += prime * (~next_multiple & 1);
-
       uint64_t start = next_multiple - low;
-      uint64_t stop = bytes_copied * 8;
+      uint64_t stop = base * 64;
 
-      // cross-off the multiples of prime in the interval [low, low + stop[
+      // cross-off multiples of prime inside [low, low + stop[
       for (uint64_t j = start; j < stop; j += prime * 2)
-        sieve[j / 8] &= (uint8_t) ~(1 << (j % 8));
+        unset(j);
 
-      bytes_sieved = bytes_copied;
+      sieved = base;
     }
 
-    // we now have a pre-sieved buffer of size bytes_sieved
-    // which we use to fill up the rest of the sieve
-    for (uint64_t i = bytes_sieved; i < sieve_size; i += bytes_sieved)
+    // fill up the rest of the sieve
+    while (base < sieve_size)
     {
-      uint64_t bytes = min(bytes_sieved, sieve_size - i);
-      memcpy(&sieve[i], sieve, bytes);
+      uint64_t last = min(sieved, sieve_size - base);
+      copy(sieve_.begin(), sieve_.begin() + last, sieve_.begin() + base);
+      base += last;
     }
 
-    // reset the first c previously unset primes
     if (sieve_primes)
     {
+      // reset first c primes previously unset 
       for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
-      {
-        uint64_t j = primes[i] - low;
-        sieve[j / 8] |= 1 << (j % 8);
-      }
+        set(primes[i] - low);
     }
   }
 }
 
 /// Count the number of 1 bits inside [start, stop]
-uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
+uint64_t BitSieve::count(uint64_t start,
+                         uint64_t stop) const
 {
   if (start > stop)
     return 0;
@@ -154,19 +148,12 @@ uint64_t BitSieve::count(uint64_t start, uint64_t stop) const
   uint64_t bit_count;
 
   if (start_idx == stop_idx)
-  {
-    uint64_t bits = bits_[start_idx] & (m1 & m2);
-    bit_count = popcount_u64(bits);
-  }
+    bit_count = popcount_u64(sieve_[start_idx] & (m1 & m2));
   else
   {
-    uint64_t start_bits = bits_[start_idx] & m1;
-    bit_count = popcount_u64(start_bits);
-
-    bit_count += popcount_u64(&bits_[start_idx + 1], stop_idx - (start_idx + 1));
-
-    uint64_t stop_bits = bits_[stop_idx] & m2;
-    bit_count += popcount_u64(stop_bits);
+    bit_count = popcount_u64(sieve_[start_idx] & m1);
+    bit_count += popcount_u64(&sieve_[start_idx + 1], stop_idx - (start_idx + 1));
+    bit_count += popcount_u64(sieve_[stop_idx] & m2);
   }
 
   return bit_count;
