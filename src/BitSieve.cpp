@@ -85,7 +85,7 @@ void BitSieve::pre_sieve(uint64_t c,
     uint64_t sieve_size = bits_.size() * sizeof(uint64_t);
 
     // unset multiples of 2 in first byte
-    sieve[0] = ((low % 2 == 0) ? 0xAA : 0x55);
+    sieve[0] = 0xAA >> (low % 2);
 
     uint64_t bytes_sieved = 1;
     uint64_t bytes_copied = 1;
