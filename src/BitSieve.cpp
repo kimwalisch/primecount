@@ -29,8 +29,37 @@ using namespace std;
 
 namespace {
 
-// 1-indexing: primes[1] = 2, primes[2] = 3, ...
-const uint64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+/// 1-indexing: primes[1] = 2, primes[2] = 3, ...
+const uint64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+
+/// Bitmasks with multiples of the i-th prime set
+const uint64_t masks[] =
+{
+  UINT64_C(0x0000000000000000),
+  UINT64_C(0x5555555555555555), // 2
+  UINT64_C(0x9249249249249249), // 3
+  UINT64_C(0x1084210842108421), // 5
+  UINT64_C(0x8102040810204081), // 7
+  UINT64_C(0x0080100200400801), // 11
+  UINT64_C(0x0010008004002001), // 13
+  UINT64_C(0x0008000400020001), // 17
+  UINT64_C(0x0200004000080001), // 19
+  UINT64_C(0x0000400000800001)  // 23
+};
+
+/// Get bitmask with unset multiples
+uint64_t unset_mask(uint64_t mask, uint64_t shift)
+{
+  return ~(mask << shift);
+}
+
+/// @pre x < y * 2
+uint64_t fast_modulo(uint64_t x, uint64_t y)
+{
+  x = (x < y) ? x : x - y;
+  assert(x < y);
+  return x;
+}
 
 }
 
@@ -70,65 +99,72 @@ BitSieve::BitSieve(std::size_t size) :
 /// Pre-sieve the multiples (>= low) of the first c primes.
 /// @cross_off_primes  Use false to cross-off multiples,
 ///                    Use true  to cross-off multiples and primes.
-/// @pre c < 9
+/// @pre c < 10
 ///
 void BitSieve::pre_sieve(uint64_t c,
                          uint64_t low,
                          bool sieve_primes)
 {
-  assert(c < 9);
+  assert(c < 10);
 
-  if (!sieve_.empty())
+  if (sieve_.empty())
+    return;
+
+  // unset multiples of 2
+  sieve_[0] = unset_mask(masks[1], low % 2);
+
+  uint64_t last = 1;
+  uint64_t sieved = last;
+  uint64_t sieve_size = sieve_.size();
+
+  // pre-sieve multiples of first c primes
+  for (uint64_t i = 2; i <= c; i++)
   {
-    // unset multiples of 2 in first word
-    sieve_[0] = UINT64_C(0xAAAAAAAAAAAAAAAA) >> (low % 2);
+    uint64_t prime = primes[i];
+    uint64_t end_copy = min(sieved * prime, sieve_size);
 
-    uint64_t sieved = 1;
-    uint64_t base = 1;
-    uint64_t sieve_size = sieve_.size();
-
-    // pre-sieve multiples of the first c primes
-    for (uint64_t i = 2; i <= c; i++)
+    // pre-sieve multiples of primes < i-th prime
+    // by copying a small pre-sieved buffer
+    while (last < end_copy)
     {
-      uint64_t prime = primes[i];
-      uint64_t end_copy = min(sieved * prime, sieve_size);
-
-      // pre-sieve multiples of primes < i-th prime
-      // by copying a small pre-sieved buffer
-      while (base < end_copy)
-      {
-        uint64_t last = min(sieved, sieve_size - base);
-        copy(sieve_.begin(), sieve_.begin() + last, sieve_.begin() + base);
-        base += last;
-      }
-
-      // calculate first multiple >= low of prime
-      uint64_t next_multiple = ceil_div(low, prime) * prime;
-      next_multiple += prime * (~next_multiple & 1);
-      uint64_t start = next_multiple - low;
-      uint64_t stop = base * 64;
-
-      // cross-off multiples of prime inside [low, low + stop[
-      for (uint64_t j = start; j < stop; j += prime * 2)
-        unset(j);
-
-      sieved = base;
+      uint64_t copy_words = min(sieved, sieve_size - last);
+      copy(sieve_.begin(),
+           sieve_.begin() + copy_words,
+           sieve_.begin() + last);
+      last += copy_words;
     }
 
-    // fill up the rest of the sieve
-    while (base < sieve_size)
+    // calculate first multiple >= low of prime
+    uint64_t next_multiple = ceil_div(low, prime) * prime;
+    uint64_t shift = next_multiple - low;
+    uint64_t next_shift = prime - 64 % prime;
+    uint64_t mask = masks[i];
+
+    // pre-sieve multiples of the i-th prime
+    for (uint64_t j = 0; j < last; j++)
     {
-      uint64_t last = min(sieved, sieve_size - base);
-      copy(sieve_.begin(), sieve_.begin() + last, sieve_.begin() + base);
-      base += last;
+      sieve_[j] &= unset_mask(mask, shift);
+      shift = fast_modulo(shift + next_shift, prime);
     }
 
-    if (sieve_primes)
-    {
-      // reset first c primes previously unset 
-      for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
-        set(primes[i] - low);
-    }
+    sieved = last;
+  }
+
+  // fill up the rest of the sieve
+  while (last < sieve_size)
+  {
+    uint64_t copy_words = min(sieved, sieve_size - last);
+    copy(sieve_.begin(),
+         sieve_.begin() + copy_words,
+         sieve_.begin() + last);
+    last += copy_words;
+  }
+
+  if (sieve_primes)
+  {
+    // reset first c primes previously unset 
+    for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
+      set(primes[i] - low);
   }
 }
 
