@@ -135,8 +135,8 @@ void BitSieve::pre_sieve(uint64_t c,
     }
 
     // calculate first multiple >= low of prime
-    uint64_t next_multiple = ceil_div(low, prime) * prime;
-    uint64_t shift = next_multiple - low;
+    uint64_t multiple = ceil_div(low, prime) * prime;
+    uint64_t shift = multiple - low;
     uint64_t next_shift = prime - 64 % prime;
     uint64_t mask = masks[i];
 
