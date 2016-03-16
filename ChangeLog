@@ -1,3 +1,9 @@
+2016-03-16 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.1 work in progress.
+
+  * src/BitSieve.cpp: Fix broken Big-Endian CPU support.
+
 2016-03-12 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.0 released.
