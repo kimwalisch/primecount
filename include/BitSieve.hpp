@@ -28,7 +28,7 @@ public:
   /// Pre-sieve the multiples (>= low) of the first c primes.
   /// @param sieve_primes true  to cross-off multiples,
   ///                     false to cross-off multiples and primes.
-  /// @pre c < 9
+  /// @pre c < 10
   ///
   void pre_sieve(uint64_t c,
                  uint64_t low,
