@@ -65,12 +65,6 @@ public:
       return count_low_high - count_0_start - count(stop + 1, (high - 1) - low);
   }
 
-  bool operator[](uint64_t pos) const
-  {
-    assert(pos < size_);
-    return (sieve_[pos >> 6] >> (pos & 63)) & 1;
-  }
-
   void set(uint64_t pos)
   {
     assert(pos < size_);
@@ -81,6 +75,12 @@ public:
   {
     assert(pos < size_);
     sieve_[pos >> 6] &= unset_bit_[pos & 63];
+  }
+
+  bool operator[](uint64_t pos) const
+  {
+    assert(pos < size_);
+    return (sieve_[pos >> 6] >> (pos & 63)) & 1;
   }
 
   std::size_t size() const
