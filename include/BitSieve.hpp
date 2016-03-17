@@ -68,7 +68,7 @@ public:
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    return (sieve_[pos >> 6] & ((uint64_t) 1) << (pos & 63)) != 0;
+    return (sieve_[pos >> 6] >> (pos & 63)) & 1;
   }
 
   void set(uint64_t pos)
