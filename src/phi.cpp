@@ -40,7 +40,6 @@
 #include <stdint.h>
 #include <algorithm>
 #include <vector>
-#include <cassert>
 #include <limits>
 
 #ifdef _OPENMP
@@ -55,14 +54,12 @@ namespace {
 class PhiCache
 {
 public:
-  PhiCache(const vector<int32_t>& primes,
-           const PiTable& pi) :
+  PhiCache(vector<int32_t>& primes,
+           PiTable& pi) :
     primes_(primes),
     pi_(pi),
     bytes_(0)
   {
-    // primecount uses 1-indexing i.e. primes[1] = 2
-    assert(primes_[0] == 0);
     size_t max_size = CACHE_A_LIMIT + 1;
     cache_.resize(min(primes.size(), max_size));
   }
@@ -128,23 +125,20 @@ private:
     CACHE_BYTES_LIMIT = 16 << 20
   };
 
-  /// Cache of phi(x, a) results
   vector<vector<uint16_t> > cache_;
-  const vector<int32_t>& primes_;
-  const PiTable& pi_;
+  vector<int32_t>& primes_;
+  PiTable& pi_;
   int64_t bytes_;
 
-  void operator=(const PhiCache&);
+  int64_t cache_size(int64_t a) const
+  {
+    return (int64_t) cache_[a].size();
+  }
 
   bool is_phi_by_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
            x < isquare(primes_[a + 1]);
-  }
-
-  int64_t cache_size(int64_t a) const
-  {
-    return (int64_t) cache_[a].size();
   }
 
   bool is_cached(int64_t x, int64_t a) const
@@ -160,7 +154,7 @@ private:
         x > numeric_limits<uint16_t>::max())
       return false;
 
-    // check if we need to increase cache size
+    // we need to increase cache size
     if (x >= cache_size(a))
     {
       if (bytes_ > CACHE_BYTES_LIMIT)
@@ -204,13 +198,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
       sum = 1;
     else
     {
-      int64_t thread_threshold = ipow((int64_t) 10, 14) / primes[a];
-      threads = validate_threads(threads, x, thread_threshold);
-
-      // this loop scales only up to about 8 CPU cores
-      // because the cache requires too much memory bandwidth
-      threads = min(8, threads);
-
       // use a large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
       PiTable pi(max(sqrtx, primes[a]));
@@ -218,6 +205,12 @@ int64_t phi(int64_t x, int64_t a, int threads)
 
       int64_t pi_sqrtx = min(pi[sqrtx], a); 
       sum = x - a + pi_sqrtx;
+
+      int64_t thread_threshold = ipow((int64_t) 10, 14) / primes[a];
+      threads = validate_threads(threads, x, thread_threshold);
+
+      // this loop scales only up to about 8 CPU cores
+      threads = min(8, threads);
 
       #pragma omp parallel for firstprivate(cache) num_threads(threads) schedule(dynamic, 16) reduction(+: sum)
       for (int64_t a2 = 0; a2 < pi_sqrtx; a2++)
@@ -229,4 +222,4 @@ int64_t phi(int64_t x, int64_t a, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

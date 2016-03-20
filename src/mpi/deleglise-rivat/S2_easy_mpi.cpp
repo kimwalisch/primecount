@@ -62,26 +62,30 @@ T1 S2_easy_mpi_master(T1 x,
   {
     int64_t prime = primes[b];
     T1 x2 = x / prime;
-    int64_t min_trivial_leaf = min(x2 / prime, y);
-    int64_t min_clustered_easy_leaf = (int64_t) isqrt(x2);
-    int64_t min_sparse_easy_leaf = z / prime;
-    int64_t min_hard_leaf = max(y / prime, prime);
+    int64_t min_trivial = min(x2 / prime, y);
+    int64_t min_clustered = (int64_t) isqrt(x2);
+    int64_t min_sparse = z / prime;
+    int64_t min_hard = max(y / prime, prime);
 
-    min_sparse_easy_leaf = max(min_sparse_easy_leaf, min_hard_leaf);
-    min_clustered_easy_leaf = max(min_clustered_easy_leaf, min_hard_leaf);
-    int64_t l = pi[min_trivial_leaf];
+    min_clustered = in_between(min_hard, min_clustered, y);
+    min_sparse = in_between(min_hard, min_sparse, y);
+
+    int64_t l = pi[min_trivial];
+    int64_t pi_min_clustered = pi[min_clustered];
+    int64_t pi_min_sparse = pi[min_sparse];
+
     T1 sum = 0;
 
     // Find all clustered easy leaves:
     // n = primes[b] * primes[l]
     // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
     // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (primes[l] > min_clustered_easy_leaf)
+    while (l > pi_min_clustered)
     {
       int64_t xn = (int64_t) fast_div(x2, primes[l]);
       int64_t phi_xn = pi[xn] - b + 2;
-      int64_t last_prime = primes[b + phi_xn - 1];
-      int64_t xm = max((int64_t) fast_div(x2, last_prime), min_clustered_easy_leaf);
+      int64_t xm = (int64_t) fast_div(x2, primes[b + phi_xn - 1]);
+      xm = max(xm, min_clustered);
       int64_t l2 = pi[xm];
       sum += phi_xn * (l - l2);
       l = l2;
@@ -90,7 +94,7 @@ T1 S2_easy_mpi_master(T1 x,
     // Find all sparse easy leaves:
     // n = primes[b] * primes[l]
     // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; primes[l] > min_sparse_easy_leaf; l--)
+    for (; l > pi_min_sparse; l--)
     {
       int64_t xn = (int64_t) fast_div(x2, primes[l]);
       sum += pi[xn] - b + 2;
