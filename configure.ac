@@ -78,7 +78,6 @@ AC_ARG_ENABLE([libdivide],
     [], [enable_libdivide=$int128])
 
 AS_IF([test "x$enable_libdivide" = "xyes"], [
-    # Check if libdivide is supported by compiler and CPU architecture
     AC_MSG_CHECKING(for libdivide)
     AC_TRY_RUN([
     #include "include/libdivide.h"
@@ -87,13 +86,25 @@ AS_IF([test "x$enable_libdivide" = "xyes"], [
 
     int main()
     {
-        uint64_t x = std::numeric_limits<uint64_t>::max();
+        uint64_t tests[20] = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            63, 101, 511,
+            1 << 5, 1 << 9, 1 << 20,
+            std::numeric_limits<int32_t>::max(),
+            std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<int64_t>::max(),
+            std::numeric_limits<uint64_t>::max() };
 
-        for (uint64_t i = 1; i < 1000; i++)
+        for (int i = 0; i < 20; i++)
         {
-            libdivide::divider<uint64_t> divider(i);
-            if (x / i != x / divider)
-                return 1;
+            uint64_t x = tests[i];
+
+            for (int j = 1; j < 1000; j++)
+            {
+                libdivide::divider<uint64_t> divider(j);
+                if (x / j != x / divider)
+                    return 1;
+            }
         }
 
         return 0;
