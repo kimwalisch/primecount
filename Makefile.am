@@ -38,6 +38,12 @@ EXTRA_DIST = \
 	Makefile.msvc \
 	README.md
 
+primecount_SOURCES = \
+	src/app/main.cpp \
+	src/app/help.cpp \
+	src/app/cmdoptions.cpp \
+	src/app/cmdoptions.hpp
+
 libprimecount_la_SOURCES = \
 	src/BitSieve.cpp \
 	src/FactorTable.cpp \
@@ -52,7 +58,6 @@ libprimecount_la_SOURCES = \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
 	src/pi_lehmer.cpp \
-	src/phi.cpp \
 	src/primecount.cpp \
 	src/print.cpp \
 	src/S1.cpp \
@@ -61,7 +66,6 @@ libprimecount_la_SOURCES = \
 	src/test.cpp \
 	src/Wheel.cpp \
 	src/deleglise-rivat/S2_trivial.cpp \
-	src/deleglise-rivat/S2_easy.cpp \
 	src/deleglise-rivat/S2_hard.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat1.cpp \
 	src/deleglise-rivat/pi_deleglise_rivat2.cpp \
@@ -109,7 +113,6 @@ if HAVE_MPI
 libprimecount_la_SOURCES += \
 	src/mpi/phi_vector.cpp \
 	src/mpi/P2_mpi.cpp \
-	src/mpi/deleglise-rivat/S2_easy_mpi.cpp \
 	src/mpi/deleglise-rivat/S2_hard_mpi.cpp \
 	src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp \
 	src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp \
@@ -119,8 +122,31 @@ libprimecount_la_SOURCES += \
 
 endif
 
-primecount_SOURCES = \
-	src/app/main.cpp \
-	src/app/help.cpp \
-	src/app/cmdoptions.cpp \
-	src/app/cmdoptions.hpp
+if HAVE_LIBDIVIDE
+
+libprimecount_la_SOURCES += \
+	src/phi_libdivide.cpp \
+	src/deleglise-rivat/S2_easy_libdivide.cpp \
+	include/libdivide.h
+
+if HAVE_MPI
+
+libprimecount_la_SOURCES += \
+	src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp
+
+endif
+
+else
+
+libprimecount_la_SOURCES += \
+	src/phi.cpp \
+	src/deleglise-rivat/S2_easy.cpp
+
+if HAVE_MPI
+
+libprimecount_la_SOURCES += \
+	src/mpi/deleglise-rivat/S2_easy_mpi.cpp
+
+endif
+
+endif
