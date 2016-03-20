@@ -54,6 +54,7 @@ libprimecount_la_SOURCES = \
 	src/P3.cpp \
 	src/PhiTiny.cpp \
 	src/PiTable.cpp \
+	src/phi.cpp \
 	src/pi_primesieve.cpp \
 	src/pi_meissel.cpp \
 	src/pi_legendre.cpp \
@@ -125,7 +126,6 @@ endif
 if HAVE_LIBDIVIDE
 
 libprimecount_la_SOURCES += \
-	src/phi_libdivide.cpp \
 	src/deleglise-rivat/S2_easy_libdivide.cpp \
 	include/libdivide.h
 
@@ -139,7 +139,6 @@ endif
 else
 
 libprimecount_la_SOURCES += \
-	src/phi.cpp \
 	src/deleglise-rivat/S2_easy.cpp
 
 if HAVE_MPI
