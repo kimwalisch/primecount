@@ -292,6 +292,7 @@ and build it using:
 
 ```sh
 $ ./build.sh
+$ make check
 $ sudo make install
 ```
 
