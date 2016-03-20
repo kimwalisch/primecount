@@ -1,8 +1,15 @@
-2016-03-16 Kim Walisch  <kim.walisch@gmail.com>
+2016-03-20 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.1 work in progress.
 
-  * src/BitSieve.cpp: Fix broken Big-Endian CPU support.
+  This version runs up to 20% faster! The speed up is due to
+  the usage of libdivide in S2_easy, libdivide allows to replace
+  expensive integer divides with comparatively cheap
+  multiplication and bitshifts.
+
+  * S2_easy_libdivide.cpp: 40% speed up due to libdivide.
+  * S2_easy_mpi_libdivide.cpp: 40% speed up due to libdivide.
+  * BitSieve.cpp: Fix broken Big-Endian CPU support.
 
 2016-03-12 Kim Walisch  <kim.walisch@gmail.com>
 
