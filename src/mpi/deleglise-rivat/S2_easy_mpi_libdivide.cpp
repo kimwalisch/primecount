@@ -13,13 +13,14 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <generate.hpp>
 #include <int128.hpp>
-#include <LibdividePrimes.hpp>
 #include <min_max.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>
 #include <S2Status.hpp>
 
+#include <libdivide.h>
 #include <stdint.h>
 #include <vector>
 
@@ -32,22 +33,38 @@ using namespace primecount;
 
 namespace {
 
+typedef libdivide::divider<uint64_t> libdivide_u64_t;
+
+template <typename Primes>
+vector<libdivide_u64_t>
+generate_fast_divisors(Primes& primes)
+{
+  return vector<libdivide_u64_t>(primes.begin(), primes.end());
+}
+
+template <typename T>
+inline bool is_libdivide(T x)
+{
+  return x <= numeric_limits<uint64_t>::max();
+}
+
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
 ///
-template <typename T1, typename T2>
-T1 S2_easy_mpi_master(T1 x,
-                      int64_t y,
-                      int64_t z,
-                      int64_t c,
-                      LibdividePrimes<T2>& primes,
-                      int threads)
+template <typename T, typename Primes>
+T S2_easy_mpi_master(T x,
+                     int64_t y,
+                     int64_t z,
+                     int64_t c,
+                     Primes& primes,
+                     int threads)
 {
-  T1 s2_easy = 0;
+  T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
   threads = validate_threads(threads, x13, thread_threshold);
+  vector<libdivide_u64_t> fastdiv = generate_fast_divisors(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -61,7 +78,7 @@ T1 S2_easy_mpi_master(T1 x,
   for (int64_t b = max(c, pi_sqrty) + 1 + proc_id; b <= pi_x13; b += procs)
   {
     int64_t prime = primes[b];
-    T1 x2 = x / prime;
+    T x2 = x / prime;
     int64_t min_trivial = min(x2 / prime, y);
     int64_t min_clustered = (int64_t) isqrt(x2);
     int64_t min_sparse = z / prime;
@@ -74,30 +91,61 @@ T1 S2_easy_mpi_master(T1 x,
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    T1 sum = 0;
+    T sum = 0;
 
-    // Find all clustered easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (l > pi_min_clustered)
+    if (is_libdivide(x2))
     {
-      int64_t xn = (int64_t) primes.libdivide(x2, l);
-      int64_t phi_xn = pi[xn] - b + 2;
-      int64_t xm = (int64_t) primes.libdivide(x2, b + phi_xn - 1);
-      xm = max(xm, min_clustered);
-      int64_t l2 = pi[xm];
-      sum += phi_xn * (l - l2);
-      l = l2;
+      uint64_t x2_u64 = (uint64_t) x2;
+
+      // Find all clustered easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
+      // where phi(x / n, b - 1) = pi(x / n) - b + 2
+      while (l > pi_min_clustered)
+      {
+        int64_t xn = x2_u64 / fastdiv[l];
+        int64_t phi_xn = pi[xn] - b + 2;
+        int64_t xm = x2_u64 / fastdiv[b + phi_xn - 1];
+        xm = max(xm, min_clustered);
+        int64_t l2 = pi[xm];
+        sum += phi_xn * (l - l2);
+        l = l2;
+      }
+
+      // Find all sparse easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+      for (; l > pi_min_sparse; l--)
+      {
+        int64_t xn = x2_u64 / fastdiv[l];
+        sum += pi[xn] - b + 2;
+      }
     }
-
-    // Find all sparse easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; l > pi_min_sparse; l--)
+    else
     {
-      int64_t xn = (int64_t) primes.libdivide(x2, l);
-      sum += pi[xn] - b + 2;
+      // Find all clustered easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
+      // where phi(x / n, b - 1) = pi(x / n) - b + 2
+      while (l > pi_min_clustered)
+      {
+        int64_t xn = (int64_t) (x2 / primes[l]);
+        int64_t phi_xn = pi[xn] - b + 2;
+        int64_t xm = (int64_t) (x2 / primes[b + phi_xn - 1]);
+        xm = max(xm, min_clustered);
+        int64_t l2 = pi[xm];
+        sum += phi_xn * (l - l2);
+        l = l2;
+      }
+
+      // Find all sparse easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+      for (; l > pi_min_sparse; l--)
+      {
+        int64_t xn = (int64_t) (x2 / primes[l]);
+        sum += pi[xn] - b + 2;
+      }
     }
 
     if (print_status())
@@ -127,7 +175,7 @@ int64_t S2_easy_mpi(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  LibdividePrimes<int32_t> primes(y);
+  vector<int32_t> primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
@@ -153,12 +201,12 @@ int128_t S2_easy_mpi(int128_t x,
   // uses less memory
   if (y <= std::numeric_limits<uint32_t>::max())
   {
-    LibdividePrimes<uint32_t> primes(y);
+    vector<uint32_t> primes = generate_primes<uint32_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
-    LibdividePrimes<int64_t> primes(y);
+    vector<int64_t> primes = generate_primes<int64_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
 
