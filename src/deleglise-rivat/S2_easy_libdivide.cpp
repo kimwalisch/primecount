@@ -48,9 +48,8 @@ inline bool is_libdivide(T x)
   return x <= numeric_limits<uint64_t>::max();
 }
 
-/// Calculate the contribution of the clustered easy leaves
-/// and the sparse easy leaves.
-/// @param T  either int64_t or uint128_t.
+/// Calculate the contribution of the clustered easy
+/// leaves and the sparse easy leaves.
 ///
 template <typename T, typename Primes>
 T S2_easy_OpenMP(T x,
