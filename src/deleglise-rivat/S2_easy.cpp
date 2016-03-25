@@ -36,15 +36,15 @@ namespace {
 /// and the sparse easy leaves.
 /// @param T  either int64_t or uint128_t.
 ///
-template <typename T1, typename T2>
-T1 S2_easy_OpenMP(T1 x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  vector<T2>& primes,
-                  int threads)
+template <typename T, typename Primes>
+T S2_easy_OpenMP(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 Primes& primes,
+                 int threads)
 {
-  T1 s2_easy = 0;
+  T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
   threads = validate_threads(threads, x13, thread_threshold);
@@ -58,7 +58,7 @@ T1 S2_easy_OpenMP(T1 x,
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
-    T1 x2 = x / prime;
+    T x2 = x / prime;
     int64_t min_trivial = min(x2 / prime, y);
     int64_t min_clustered = (int64_t) isqrt(x2);
     int64_t min_sparse = z / prime;
@@ -71,7 +71,7 @@ T1 S2_easy_OpenMP(T1 x,
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    T1 sum = 0;
+    T sum = 0;
 
     // Find all clustered easy leaves:
     // n = primes[b] * primes[l]
