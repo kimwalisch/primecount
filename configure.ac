@@ -80,6 +80,8 @@ AC_ARG_ENABLE([libdivide],
 AS_IF([test "x$enable_libdivide" = "xyes"], [
     AC_MSG_CHECKING(for libdivide)
     AC_TRY_RUN([
+    #define LIBDIVIDE_U64_FEWER_BRANCHES
+
     #include "include/libdivide.h"
     #include <stdint.h>
     #include <limits>
@@ -99,7 +101,7 @@ AS_IF([test "x$enable_libdivide" = "xyes"], [
         {
             uint64_t x = tests[i];
 
-            for (int j = 1; j < 1000; j++)
+            for (int j = 2; j < 1000; j++)
             {
                 libdivide::divider<uint64_t> divider(j);
                 if (x / j != x / divider)
@@ -109,7 +111,8 @@ AS_IF([test "x$enable_libdivide" = "xyes"], [
 
         return 0;
     }
-    ], [AC_MSG_RESULT(yes); libdivide=yes; AC_DEFINE(HAVE_LIBDIVIDE)],
+    ], [AC_MSG_RESULT(yes); libdivide=yes;
+        AC_DEFINE(LIBDIVIDE_U64_FEWER_BRANCHES)],
        [AC_MSG_RESULT(no)])
 ])
 
