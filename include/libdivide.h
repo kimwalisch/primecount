@@ -1,5 +1,12 @@
 /* libdivide.h
    Copyright 2010 ridiculous_fish
+
+   Author:  Kim Walisch, 2016
+   Brief:   Added an alternative unsigned 64-bit/unsigned 64-bit
+            implementation which uses 1 branch less at the expense
+            of computing power of 2 values slightly slower.
+   Warning: Works only for divisors >= 2.
+   Usage:   #define LIBDIVIDE_U64_FEWER_BRANCHES
 */
 
 #if defined(_WIN32) || defined(WIN32)
@@ -683,8 +690,13 @@ __m128i libdivide_u32_do_vector_alg2(__m128i numers, const struct libdivide_u32_
 struct libdivide_u64_t libdivide_u64_gen(uint64_t d) {
     struct libdivide_u64_t result;
     if ((d & (d - 1)) == 0) {
-        result.more = libdivide__count_trailing_zeros64(d) | LIBDIVIDE_U64_SHIFT_PATH;
-        result.magic = 0;
+        #if defined(LIBDIVIDE_U64_FEWER_BRANCHES)
+            result.more = libdivide__count_trailing_zeros64(d) - 1;
+            result.magic = 1ULL << 63;
+        #else
+            result.more = libdivide__count_trailing_zeros64(d) | LIBDIVIDE_U64_SHIFT_PATH;
+            result.magic = 0;
+        #endif
     }
     else {
         const uint32_t floor_log_2_d = 63 - libdivide__count_leading_zeros64(d);
@@ -716,12 +728,15 @@ struct libdivide_u64_t libdivide_u64_gen(uint64_t d) {
 }
 
 uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {
-    uint8_t more = denom->more;
-    if (more & LIBDIVIDE_U64_SHIFT_PATH) {
-        return numer >> (more & LIBDIVIDE_64_SHIFT_MASK);
-    }
-    else {
+    // This is an optimized implementation which requires one branch
+    // less than the default algorithm. In this version power of 2
+    // divisors use the default code path which is slightly slower but
+    // therefore non power of 2 divisors compute with one less branch.
+    // precondition: divider >= 2
+    #if defined(LIBDIVIDE_U64_FEWER_BRANCHES)
         uint64_t q = libdivide__mullhi_u64(denom->magic, numer);
+        assert(q > 0 || numer == 0); // divider >= 2
+        uint8_t more = denom->more;
         if (more & LIBDIVIDE_ADD_MARKER) {
             uint64_t t = ((numer - q) >> 1) + q;
             return t >> (more & LIBDIVIDE_64_SHIFT_MASK);
@@ -729,7 +744,22 @@ uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {
         else {
             return q >> more; //all upper bits are 0 - don't need to mask them off
         }
-    }
+    #else
+        uint8_t more = denom->more;
+        if (more & LIBDIVIDE_U64_SHIFT_PATH) {
+            return numer >> (more & LIBDIVIDE_64_SHIFT_MASK);
+        }
+        else {
+            uint64_t q = libdivide__mullhi_u64(denom->magic, numer);
+            if (more & LIBDIVIDE_ADD_MARKER) {
+                uint64_t t = ((numer - q) >> 1) + q;
+                return t >> (more & LIBDIVIDE_64_SHIFT_MASK);
+            }
+            else {
+                return q >> more; //all upper bits are 0 - don't need to mask them off
+            }
+        }
+    #endif
 }
 
  
