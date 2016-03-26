@@ -89,8 +89,6 @@ T S2_easy_mpi_master(T x,
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    T sum = 0;
-
     if (is_libdivide(x2))
     {
       uint64_t x2_u64 = (uint64_t) x2;
@@ -106,7 +104,7 @@ T S2_easy_mpi_master(T x,
         int64_t xm = x2_u64 / fastdiv[b + phi_xn - 1];
         xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
-        sum += phi_xn * (l - l2);
+        s2_easy += phi_xn * (l - l2);
         l = l2;
       }
 
@@ -116,7 +114,7 @@ T S2_easy_mpi_master(T x,
       for (; l > pi_min_sparse; l--)
       {
         int64_t xn = x2_u64 / fastdiv[l];
-        sum += pi[xn] - b + 2;
+        s2_easy += pi[xn] - b + 2;
       }
     }
     else
@@ -132,7 +130,7 @@ T S2_easy_mpi_master(T x,
         int64_t xm = (int64_t) (x2 / primes[b + phi_xn - 1]);
         xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
-        sum += phi_xn * (l - l2);
+        s2_easy += phi_xn * (l - l2);
         l = l2;
       }
 
@@ -142,14 +140,12 @@ T S2_easy_mpi_master(T x,
       for (; l > pi_min_sparse; l--)
       {
         int64_t xn = (int64_t) (x2 / primes[l]);
-        sum += pi[xn] - b + 2;
+        s2_easy += pi[xn] - b + 2;
       }
     }
 
     if (print_status())
       status.print(b, pi_x13);
-
-    s2_easy += sum;
   }
 
   s2_easy = mpi_reduce_sum(s2_easy);
