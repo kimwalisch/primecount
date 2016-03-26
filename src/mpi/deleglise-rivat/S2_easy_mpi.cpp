@@ -147,7 +147,7 @@ int128_t S2_easy_mpi(int128_t x,
   int128_t s2_easy;
 
   // uses less memory
-  if (y <= std::numeric_limits<uint32_t>::max())
+  if (y <= numeric_limits<uint32_t>::max())
   {
     vector<uint32_t> primes = generate_primes<uint32_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
