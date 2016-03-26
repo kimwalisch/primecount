@@ -37,7 +37,7 @@ typedef libdivide::divider<uint64_t> libdivide_u64_t;
 
 template <typename Primes>
 vector<libdivide_u64_t>
-generate_fast_divisors(Primes& primes)
+libdivide_divisors(Primes& primes)
 {
   return vector<libdivide_u64_t>(primes.begin(), primes.end());
 }
@@ -61,9 +61,8 @@ T S2_easy_mpi_master(T x,
 {
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
-  int64_t thread_threshold = 1000;
-  threads = validate_threads(threads, x13, thread_threshold);
-  vector<libdivide_u64_t> fastdiv = generate_fast_divisors(primes);
+  threads = validate_threads(threads, x13, 1000);
+  vector<libdivide_u64_t> fastdiv = libdivide_divisors(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
