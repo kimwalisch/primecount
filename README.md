@@ -266,7 +266,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>4,968.83s</td>
+    <td>4,902.99s</td>
   </tr>
   <tr align="right">
   <td>10<sup>22</sup></td>
