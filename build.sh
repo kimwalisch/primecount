@@ -57,7 +57,7 @@ fi
 # Generate Makefile using ./configure
 if [ ! -f ./Makefile ]
 then
-    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O3 -I$(echo primesieve-*/include)"
+    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
 fi
 
 # Patch Makefile to build primecount binary which links
