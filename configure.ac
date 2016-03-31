@@ -75,7 +75,7 @@ AC_ARG_ENABLE([libdivide],
     AC_HELP_STRING([--enable-libdivide],
                    [enable libdivide (optimized integer division)]))
 
-AS_IF([test "x$enable_libdivide" = "xyes"], [
+AS_IF([test "x$enable_libdivide" != "xno"], [
     AC_MSG_CHECKING(for libdivide)
     AC_TRY_RUN([
     #include "include/libdivide.h"
