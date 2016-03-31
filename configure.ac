@@ -97,9 +97,9 @@ AS_IF([test "x$enable_libdivide" != "xno"], [
         {
             uint64_t x = tests[i];
 
-            for (int j = 1; j < 1000; j++)
+            for (int j = 2; j < 1000; j++)
             {
-                libdivide::divider<uint64_t> divider(j);
+                libdivide::divider<uint64_t, libdivide::BRANCHFREE> divider(j);
                 if (x / j != x / divider)
                     return 1;
             }
