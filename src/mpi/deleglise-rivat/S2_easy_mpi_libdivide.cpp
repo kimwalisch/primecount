@@ -33,19 +33,19 @@ using namespace primecount;
 
 namespace {
 
-typedef libdivide::divider<uint64_t> libdivide_u64_t;
+template <typename T>
+bool is_libdivide(T x)
+{
+  return x <= numeric_limits<uint64_t>::max();
+}
+
+typedef libdivide::divider<uint64_t, libdivide::BRANCHFREE> libdivide_u64_t;
 
 template <typename Primes>
 vector<libdivide_u64_t>
 libdivide_divisors(Primes& primes)
 {
   return vector<libdivide_u64_t>(primes.begin(), primes.end());
-}
-
-template <typename T>
-inline bool is_libdivide(T x)
-{
-  return x <= numeric_limits<uint64_t>::max();
 }
 
 /// Calculate the contribution of the clustered easy
