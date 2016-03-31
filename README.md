@@ -226,7 +226,7 @@ Benchmarks
     <td>232.30s</td>
     <td>92.09s</td>
     <td>8.20s</td>
-    <td>2.98s</td>
+    <td>2.94s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -234,7 +234,7 @@ Benchmarks
     <td>1,836.73s</td>
     <td>731.35s</td>
     <td>36.05s</td>
-    <td>12.02s</td>
+    <td>11.47s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
@@ -242,7 +242,7 @@ Benchmarks
     <td>14,949.16s</td>
     <td>6,631.73s</td>
     <td>168.46s</td>
-    <td>51.28s</td>
+    <td>49.39s</td>
   </tr>
   <tr align="right">
   <td>10<sup>19</sup></td>
@@ -250,7 +250,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>241.28s</td>
+    <td>234.19s</td>
   </tr>
   <tr align="right">
   <td>10<sup>20</sup></td>
@@ -258,7 +258,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,084.29s</td>
+    <td>1,056.87s</td>
   </tr>
   <tr align="right">
   <td>10<sup>21</sup></td>
