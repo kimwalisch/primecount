@@ -70,12 +70,10 @@ AC_TRY_LINK(, [__int128_t x = 0;],
 
 AM_CONDITIONAL(HAVE_INT128_T, test x$int128 = xyes)
 
-# Enable libdivide if compiler supports int128_t,
-# without int128_t libdivide is too slow
+# Enable libdivide by default
 AC_ARG_ENABLE([libdivide],
     AC_HELP_STRING([--enable-libdivide],
-                   [enable libdivide (optimized integer division)]),
-    [], [enable_libdivide=$int128])
+                   [enable libdivide (optimized integer division)]))
 
 AS_IF([test "x$enable_libdivide" = "xyes"], [
     AC_MSG_CHECKING(for libdivide)
