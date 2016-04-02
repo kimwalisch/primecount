@@ -73,7 +73,7 @@ then
     mv -f Makefile.tmp Makefile
 
     sed '/primecount_LDADD = libprimecount.la/c\
-    primecount_LDADD = libprimecount.la primesieve-*/.libs/libprimesieve.a
+    primecount_LDADD = $(OPENMP_CXXFLAGS) .libs/libprimecount.a primesieve-*/.libs/libprimesieve.a
     ' Makefile > Makefile.tmp
     mv -f Makefile.tmp Makefile
 
