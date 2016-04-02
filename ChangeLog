@@ -1,6 +1,6 @@
-2016-03-20 Kim Walisch  <kim.walisch@gmail.com>
+2016-04-02 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.1 work in progress.
+  Version 3.1 released.
 
   This version runs up to 20% faster! The speed up is due to
   the usage of libdivide in S2_easy, libdivide allows to replace
