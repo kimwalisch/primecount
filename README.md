@@ -32,6 +32,7 @@ instruction (2010 or later).
 
 * [primecount-3.1-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.1-win64.zip), 392K
 * [primecount-3.1-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.1-linux-x64.tar.gz), 895K
+* [primecount-3.1-macosx-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.1-macosx-x64.tar.gz), 693K
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
