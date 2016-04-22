@@ -1,5 +1,13 @@
 #!/bin/sh
 
+command -v autoreconf >/dev/null 2>/dev/null
+if [ $? -ne 0 ]
+then
+    echo "Error: GNU Autotools is not installed." >&2
+    echo "Please install automake, autoconf and libtool using your package manager." >&2
+    exit 1
+fi
+
 mkdir -p m4 || exit $?
 autoreconf --install || exit $?
 
