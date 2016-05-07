@@ -58,14 +58,13 @@ class Wheel
 {
 public:
   /// Calculate the first multiple >= low of each prime.
-  /// When sieving special leaves (sieve_primes = false) both
-  /// multiples and primes are crossed-off.
+  /// When sieving special leaves both multiples and
+  /// primes are crossed-off.
   ///
   template <typename Primes>
   Wheel(Primes& primes,
         int64_t size,
-        int64_t low,
-        bool sieve_primes = false)
+        int64_t low)
   {
     wheelItems_.reserve(size);
     push_back(0, 0);
@@ -77,13 +76,6 @@ public:
 
       // calculate the first multiple of prime >= low
       int64_t multiple = prime * quotient;
-
-      // for sieving primes we start crossing off multiples at the square
-      if (sieve_primes && quotient < prime)
-      {
-        multiple = prime * prime;
-        quotient = prime;
-      }
 
       // calculate the next multiple of prime that is not
       // divisible by any of the wheel's factors (2, 3, 5, 7)

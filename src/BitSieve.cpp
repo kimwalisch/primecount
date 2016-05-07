@@ -97,13 +97,10 @@ BitSieve::BitSieve(std::size_t size) :
 { }
 
 /// Pre-sieve the multiples (>= low) of the first c primes.
-/// @cross_off_primes  Use false to cross-off multiples,
-///                    Use true  to cross-off multiples and primes.
+/// @warning Removes both primes and multiples.
 /// @pre c < 10
 ///
-void BitSieve::pre_sieve(uint64_t c,
-                         uint64_t low,
-                         bool sieve_primes)
+void BitSieve::pre_sieve(uint64_t c, uint64_t low)
 {
   assert(c < 10);
 
@@ -158,13 +155,6 @@ void BitSieve::pre_sieve(uint64_t c,
          sieve_.begin() + copy_words,
          sieve_.begin() + last);
     last += copy_words;
-  }
-
-  if (sieve_primes)
-  {
-    // reset first c primes previously unset 
-    for (uint64_t i = c; i > 0 && primes[i] >= low; i--)
-      set(primes[i] - low);
   }
 }
 

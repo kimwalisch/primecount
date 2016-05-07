@@ -26,13 +26,11 @@ public:
   BitSieve(std::size_t size);
 
   /// Pre-sieve the multiples (>= low) of the first c primes.
-  /// @param sieve_primes true  to cross-off multiples,
-  ///                     false to cross-off multiples and primes.
+  /// @warning Removes both primes and multiples.
   /// @pre c < 10
   ///
   void pre_sieve(uint64_t c,
-                 uint64_t low,
-                 bool sieve_primes = false);
+                 uint64_t low);
 
   /// Count the number of 1 bits inside [start, stop]
   uint64_t count(uint64_t start,
