@@ -1,7 +1,7 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,9 +22,9 @@ namespace primecount {
 /// Generate a vector with the primes <= max.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 ///
-std::vector<int32_t> generate_primes(int64_t max)
+vector<int32_t> generate_primes(int64_t max)
 {
-  std::vector<int32_t> primes;
+  vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_primes(max, &primes);
   return primes;
@@ -33,9 +33,9 @@ std::vector<int32_t> generate_primes(int64_t max)
 /// Generate a vector with the first n primes.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 ///
-std::vector<int32_t> generate_n_primes(int64_t n)
+vector<int32_t> generate_n_primes(int64_t n)
 {
-  std::vector<int32_t> primes;
+  vector<int32_t> primes;
   primes.push_back(0);
   primesieve::generate_n_primes(n, &primes);
   return primes;
