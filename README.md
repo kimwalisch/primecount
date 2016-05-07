@@ -192,8 +192,8 @@ Benchmarks
     <td>37,607,912,018</td>
     <td>0.15s</td>
     <td>0.13s</td>
-    <td>0.04s</td>
     <td>0.03s</td>
+    <td>0.02s</td>
   </tr>
   </tr>
   <tr align="right">
@@ -201,7 +201,7 @@ Benchmarks
     <td>346,065,536,839</td>
     <td>0.70s</td>
     <td>0.46s</td>
-    <td>0.11s</td>
+    <td>0.10s</td>
     <td>0.07s</td>
   </tr>
   </tr>
@@ -210,7 +210,7 @@ Benchmarks
     <td>3,204,941,750,802</td>
     <td>4.01s</td>
     <td>1.96s</td>
-    <td>0.46s</td>
+    <td>0.43s</td>
     <td>0.22s</td>
   </tr>
   <tr align="right">
@@ -218,32 +218,32 @@ Benchmarks
     <td>29,844,570,422,669</td>
     <td>27.75s</td>
     <td>12.08s</td>
-    <td>1.89s</td>
-    <td>0.81s</td>
+    <td>1.65s</td>
+    <td>0.77s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
     <td>232.30s</td>
     <td>92.09s</td>
-    <td>8.20s</td>
-    <td>2.94s</td>
+    <td>7.31s</td>
+    <td>2.83s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
     <td>1,836.73s</td>
     <td>731.35s</td>
-    <td>36.05s</td>
-    <td>11.47s</td>
+    <td>33.66s</td>
+    <td>11.20s</td>
   </tr>
   <tr align="right">
   <td>10<sup>18</sup></td>
   <td>24,739,954,287,740,860</td>
     <td>14,949.16s</td>
     <td>6,631.73s</td>
-    <td>168.46s</td>
-    <td>49.39s</td>
+    <td>157.15s</td>
+    <td>47.07s</td>
   </tr>
   <tr align="right">
   <td>10<sup>19</sup></td>
@@ -251,7 +251,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>234.19s</td>
+    <td>225.08s</td>
   </tr>
   <tr align="right">
   <td>10<sup>20</sup></td>
@@ -259,7 +259,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,056.87s</td>
+    <td>1,029.41s</td>
   </tr>
   <tr align="right">
   <td>10<sup>21</sup></td>
@@ -267,7 +267,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>4,902.99s</td>
+    <td>4,867.45s</td>
   </tr>
   <tr align="right">
   <td>10<sup>22</sup></td>
