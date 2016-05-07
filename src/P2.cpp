@@ -13,18 +13,14 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
-#include <BitSieve.hpp>
-#include <generate.hpp>
 #include <int128.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
-#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-#include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -35,106 +31,70 @@ using namespace primecount;
 
 namespace {
 
-/// Calculate the segments per thread.
-/// The idea is to gradually increase the segments per thread (based
-/// on elapsed time) in order to keep all CPU cores busy.
+/// Calculate the segment_size per thread.
+/// The idea is to gradually increase the segment_size per
+/// thread in order to keep all CPU cores busy.
 ///
-int64_t balanceLoad(int64_t segments_per_thread, double start_time)
+int64_t balanceLoad(int64_t segment_size, double start_time)
 {
   double seconds = get_wtime() - start_time;
 
   if (seconds < 30)
-    segments_per_thread *= 2;
-  else if (segments_per_thread >= 4)
-    segments_per_thread -= segments_per_thread / 4;
+    segment_size *= 2;
+  else if (segment_size >= 4)
+    segment_size -= segment_size / 4;
 
-  return segments_per_thread;
+  return segment_size;
 }
 
-/// Cross-off the multiples inside [low, high[
-/// of the primes <= sqrt(high - 1).
-///
-void cross_off(BitSieve& sieve,
-               vector<int32_t> primes,
-               Wheel& wheel,
-               int64_t c,
-               int64_t low,
-               int64_t high)
+template <typename T>
+int64_t count_primes(primesieve::iterator& it,
+                     int64_t& prime,
+                     T stop)
 {
-  int64_t pi_sqrt_high = pi_bsearch(primes, isqrt(high - 1));
+  int64_t primes = 0;
 
-  for (int64_t i = c + 1; i <= pi_sqrt_high; i++)
-  {
-    int64_t prime = primes[i];
-    int64_t m = wheel[i].next_multiple;
-    int64_t wheel_index = wheel[i].wheel_index;
+  for (; prime <= stop; primes++)
+    prime = it.next_prime();
 
-    // cross-off the multiples of prime inside [low, high[
-    for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
-      sieve.unset(m - low);
-
-    wheel[i].set(m, wheel_index);
-  }
+  return primes;
 }
 
 template <typename T>
 T P2_OpenMP_thread(T x,
                    int64_t y,
                    int64_t segment_size,
-                   int64_t segments_per_thread,
                    int64_t thread_num,
                    int64_t low,
                    int64_t limit,
                    int64_t& pix,
-                   int64_t& pix_count,
-                   vector<int32_t>& primes)
+                   int64_t& pix_count)
 {
   pix = 0;
   pix_count = 0;
-  low += thread_num * segments_per_thread * segment_size;
-  limit = min(low + segments_per_thread * segment_size, limit);
-  int64_t size = pi_bsearch(primes, isqrt(limit)) + 1;
+  low += thread_num * segment_size;
+  limit = min(low + segment_size, limit);
   int64_t start = (int64_t) max(x / limit + 1, y);
   int64_t stop  = (int64_t) min(x / low, isqrt(x));
+
+  primesieve::iterator rit(stop + 1, start);
+  primesieve::iterator it(low - 1, limit);
+
+  int64_t next = it.next_prime();
+  int64_t prime = rit.previous_prime();
   T P2_thread = 0;
 
-  // P2_thread = \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
-  // We use a reverse prime iterator to calculate P2_thread
-  primesieve::iterator pi(stop + 1, start);
-  int64_t prime = pi.previous_prime();
-
-  bool sieve_primes = true;
-  Wheel wheel(primes, size, low, sieve_primes);
-  BitSieve sieve(segment_size);
-
-  // segmented sieve of Eratosthenes
-  for (; low < limit; low += segment_size)
+  // P2_thread = \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i])
+  while (prime >= start &&
+         x / prime < limit)
   {
-    // current segment = interval [low, high[
-    int64_t high = min(low + segment_size, limit);
-    int64_t x_div_prime = 0;
-    int64_t j = 0;
-    int64_t c = 6;
-
-    // pre-sieve the multiples of the first c primes
-    sieve.pre_sieve(c, low, sieve_primes);
-
-    // cross-off the multiples of the primes <= sqrt(high - 1)
-    cross_off(sieve, primes, wheel, c, low, high);
-
-    while (prime >= start &&
-           (x_div_prime = (int64_t) (x / prime)) < high)
-    {
-      int64_t next_count = x_div_prime - low;
-      pix += sieve.count(j, next_count);
-      j = next_count + 1;
-      pix_count++;
-      P2_thread += pix;
-      prime = pi.previous_prime();
-    }
-
-    pix += sieve.count(j, (high - 1) - low);
+    pix += count_primes(it, next, x / prime);
+    P2_thread += pix;
+    pix_count++;
+    prime = rit.previous_prime();
   }
+
+  pix += count_primes(it, next, limit);
 
   return P2_thread;
 }
@@ -162,12 +122,9 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
 
   int64_t low = 2;
   int64_t limit = (int64_t)(x / max(y, 1));
-  int64_t sqrt_limit = isqrt(limit);
-  int64_t segment_size = max(sqrt_limit, 1 << 12);
-  int64_t segments_per_thread = 64;
+  int64_t segment_size = 1 << 18;
   threads = validate_threads(threads, limit);
 
-  vector<int32_t> primes = generate_primes(sqrt_limit);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
@@ -183,17 +140,15 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
   {
     int64_t segments = ceil_div(limit - low, segment_size);
     threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
     double time = get_wtime();
 
-    #pragma omp parallel for \
-        num_threads(threads) reduction(+: p2)
+    #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      p2 += P2_OpenMP_thread(x, y, segment_size, segments_per_thread,
-         i, low, limit, pix[i], pix_counts[i], primes);
+      p2 += P2_OpenMP_thread(x, y, segment_size, i,
+         low, limit, pix[i], pix_counts[i]);
 
-    low += segments_per_thread * threads * segment_size;
-    segments_per_thread = balanceLoad(segments_per_thread, time);
+    low += threads * segment_size;
+    segment_size = balanceLoad(segment_size, time);
 
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
