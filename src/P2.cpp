@@ -63,30 +63,30 @@ int64_t count_primes(primesieve::iterator& it,
 template <typename T>
 T P2_OpenMP_thread(T x,
                    int64_t y,
+                   int64_t z,
                    int64_t segment_size,
                    int64_t thread_num,
                    int64_t low,
-                   int64_t limit,
                    int64_t& pix,
                    int64_t& pix_count)
 {
   pix = 0;
   pix_count = 0;
   low += thread_num * segment_size;
-  limit = min(low + segment_size, limit);
-  int64_t start = (int64_t) max(x / limit + 1, y);
-  int64_t stop  = (int64_t) min(x / low, isqrt(x));
+  z = min(low + segment_size, z);
+  int64_t start = (int64_t) max(x / z + 1, y);
+  int64_t stop = (int64_t) min(x / low, isqrt(x));
 
   primesieve::iterator rit(stop + 1, start);
-  primesieve::iterator it(low - 1, limit);
+  primesieve::iterator it(low - 1, z);
 
   int64_t next = it.next_prime();
   int64_t prime = rit.previous_prime();
   T P2_thread = 0;
 
-  // P2_thread = \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i])
+  // \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i])
   while (prime >= start &&
-         x / prime < limit)
+         x / prime < z)
   {
     pix += count_primes(it, next, x / prime);
     P2_thread += pix;
@@ -94,7 +94,7 @@ T P2_OpenMP_thread(T x,
     prime = rit.previous_prime();
   }
 
-  pix += count_primes(it, next, limit);
+  pix += count_primes(it, next, z - 1);
 
   return P2_thread;
 }
@@ -121,9 +121,9 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
     return 0;
 
   int64_t low = 2;
-  int64_t limit = (int64_t)(x / max(y, 1));
+  int64_t z = (int64_t)(x / max(y, 1));
   int64_t segment_size = 1 << 18;
-  threads = validate_threads(threads, limit);
+  threads = validate_threads(threads, z);
 
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
@@ -136,18 +136,18 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
   p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
-  while (low < limit)
+  while (low < z)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
+    int64_t segments = ceil_div(z - low, segment_size);
     threads = in_between(1, threads, segments);
     double time = get_wtime();
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      p2 += P2_OpenMP_thread(x, y, segment_size, i,
-         low, limit, pix[i], pix_counts[i]);
+      p2 += P2_OpenMP_thread(x, y, z, segment_size,
+        i, low, pix[i], pix_counts[i]);
 
-    low += threads * segment_size;
+    low += segment_size * threads;
     segment_size = balanceLoad(segment_size, time);
 
     // Add missing sum contributions in order
@@ -159,7 +159,7 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
 
     if (print_status())
     {
-      double percent = get_percent((double) low, (double) limit);
+      double percent = get_percent((double) low, (double) z);
       cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
            << percent << '%' << flush;
     }
