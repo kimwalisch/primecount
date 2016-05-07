@@ -1,7 +1,12 @@
-2016-04-22 Kim Walisch  <kim.walisch@gmail.com>
+2016-05-07 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.2 work in progress.
 
+  This version runs up to 5% faster due to an improved P2(x, a)
+  implementation.
+
+  * P2.cpp: 30% faster.
+  * P2_mpi.cpp: 30% faster.
   * libdivide.h: Update to latest version.
   * autogen.sh: Print error msg if Autotools is not installed.
 
