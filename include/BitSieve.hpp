@@ -26,7 +26,7 @@ public:
   BitSieve(std::size_t size);
 
   /// Pre-sieve the multiples (>= low) of the first c primes.
-  /// @warning Removes both primes and multiples.
+  /// @warning Also removes the first c primes.
   /// @pre c < 10
   ///
   void pre_sieve(uint64_t c,
