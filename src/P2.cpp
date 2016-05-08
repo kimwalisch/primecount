@@ -38,10 +38,11 @@ namespace {
 int64_t balanceLoad(int64_t segment_size, double start_time)
 {
   double seconds = get_wtime() - start_time;
+  int min_segment_size = 1 << 20;
 
   if (seconds < 30)
     segment_size *= 2;
-  else if (segment_size >= 4)
+  else if (segment_size > min_segment_size)
     segment_size -= segment_size / 4;
 
   return segment_size;
