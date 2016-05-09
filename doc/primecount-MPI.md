@@ -25,7 +25,7 @@ $ sudo apt-get install g++ make libopenmpi-dev openmpi-bin
 ```
 
 Then download
-[primecount-3.1.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.1.tar.gz)
+[primecount-3.2.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.2.tar.gz)
 and build it:
 ```sh
 $ ./build.sh --enable-mpi
