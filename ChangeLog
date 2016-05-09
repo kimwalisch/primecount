@@ -1,6 +1,6 @@
-2016-05-07 Kim Walisch  <kim.walisch@gmail.com>
+2016-05-09 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.2 work in progress.
+  Version 3.2 released.
 
   This version runs up to 5% faster due to an improved P2(x, a)
   implementation.
