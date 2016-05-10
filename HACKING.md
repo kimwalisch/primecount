@@ -16,15 +16,9 @@ System install
 [GNU Libtool](http://www.gnu.org/software/libtool/) using your packet
 manager.
 
-Generate configure script (only once):
+Build primecount using:
 ```sh
-$ ./autogen.sh
-```
-
-Then build primecount using:
-```sh
-$ ./configure
-$ make
+$ ./build.sh
 ```
 
 ### Adding a new prime counting function implementation
@@ -43,6 +37,7 @@ $ make
 
 * Increase version number in [include/primecount.hpp](include/primecount.hpp)
 * Increase version number in _**Build instructions**_ section in [README.md](README.md)
+* Increase version number in _**Build instructions**_ section in [doc/primecount-MPI.md](doc/primecount-MPI.md)
 * Increase version number in [configure.ac](configure.ac) in ```AC_INIT```
 * [Increase Libtool version](http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html) number in [configure.ac](configure.ac) in ```AC_SUBST```
 * Update to current year in [src/app/help.cpp](src/help.cpp)
