@@ -26,7 +26,7 @@ used to compute several world records e.g.
 
 Binaries
 --------
-Below are the latest precompiled binaries for Windows 64-bit and Linux x64.
+Below are the latest precompiled binaries for Windows 64-bit, Linux and OS X.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
