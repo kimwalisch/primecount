@@ -34,12 +34,6 @@
   #include <omp.h>
 #endif
 
-/// Count the number of unsieved elements inside
-/// [start, stop] from the sieve array.
-///
-#define COUNT_POPCNT(start, stop) \
-    sieve.count(start, stop, low, high, count, count_low_high)
-
 using namespace std;
 using namespace primecount;
 
@@ -100,10 +94,10 @@ void cross_off(BitSieve& sieve,
 /// @return  true if the interval [low, high] contains
 ///          few hard special leaves.
 ///
-bool is_popcnt(int64_t low,
-               int64_t high,
-               int64_t y,
-               double alpha)
+bool few_leaves(int64_t low,
+                int64_t high,
+                int64_t y,
+                double alpha)
 {
   return (high < y || low > y * alpha);
 }
@@ -157,11 +151,10 @@ T S2_hard_OpenMP_thread(T x,
     // pre-sieve the multiples of the first c primes
     sieve.pre_sieve(c, low);
 
-    // Calculate the contribution of the hard special leaves using the
-    // POPCNT algorithm. If there are relatively few special leaves
-    // per segment we count the number of unsieved elements directly
-    // from the sieve array using the POPCNT instruction.
-    if (is_popcnt(low, high, y, alpha))
+    // If there are relatively few hard special leaves per segment
+    // we count the number of unsieved elements directly from the
+    // sieve array using the POPCNT instruction.
+    if (few_leaves(low, high, y, alpha))
     {
       int64_t count_low_high = sieve.count((high - 1) - low);
 
@@ -191,7 +184,7 @@ T S2_hard_OpenMP_thread(T x,
           {
             int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
             int64_t stop = xn - low;
-            count += COUNT_POPCNT(start, stop);
+            count += sieve.count(start, stop, low, high, count, count_low_high);
             start = stop + 1;
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
@@ -225,7 +218,7 @@ T S2_hard_OpenMP_thread(T x,
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
           int64_t stop = xn - low;
-          count += COUNT_POPCNT(start, stop);
+          count += sieve.count(start, stop, low, high, count, count_low_high);
           start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
