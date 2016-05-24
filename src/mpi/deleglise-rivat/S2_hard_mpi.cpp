@@ -168,10 +168,9 @@ T S2_hard_OpenMP_thread(T x,
       {
         int64_t prime = primes[b];
         T x2 = x / prime;
-        int64_t x2_div_low = min(fast_div(x2, low), y);
         int64_t x2_div_high = min(fast_div(x2, high), y);
         int64_t min_m = max(x2_div_high, y / prime);
-        int64_t max_m = x2_div_low;
+        int64_t max_m = min(fast_div(x2, low), y);
         int64_t count = 0;
         int64_t start = 0;
 
