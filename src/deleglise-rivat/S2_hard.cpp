@@ -181,7 +181,8 @@ T S2_hard_OpenMP_thread(T x,
         {
           if (prime < factors.lpf(m))
           {
-            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
+            int64_t fm = factors.get_number(m);
+            int64_t xn = (int64_t) fast_div(x2, fm);
             int64_t stop = xn - low;
             count += sieve.count(start, stop, low, high, count, count_low_high);
             start = stop + 1;
@@ -262,7 +263,8 @@ T S2_hard_OpenMP_thread(T x,
         {
           if (prime < factors.lpf(m))
           {
-            int64_t xn = (int64_t) fast_div(x2, factors.get_number(m));
+            int64_t fm = factors.get_number(m);
+            int64_t xn = (int64_t) fast_div(x2, fm);
             int64_t count = cnt_query(counters, xn - low);
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
