@@ -53,12 +53,12 @@ int64_t count_primes(primesieve::iterator& it,
                      int64_t& prime,
                      T stop)
 {
-  int64_t primes = 0;
+  int64_t count = 0;
 
-  for (; prime <= stop; primes++)
+  for (; prime <= stop; count++)
     prime = it.next_prime();
 
-  return primes;
+  return count;
 }
 
 template <typename T>
