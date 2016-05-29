@@ -316,7 +316,7 @@ Open a Visual Studio Command Prompt and run:
 C++ API
 -------
 Below are the main functions declared in
-[primesieve.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
+[primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
 All functions are multi-threaded by default.
 
 ```C++
@@ -331,9 +331,6 @@ std::string primecount::pi(const std::string& expr);
 
 /// Find the nth prime
 int64_t primecount::nth_prime(int64_t n);
-
-int  primecount::get_num_threads();
-void primecount::set_num_threads(int threads);
 ```
 
 C++ library usage
