@@ -1,3 +1,11 @@
+2016-05-29 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.3 work in progress.
+
+  * README.md: Fix error in "C++ API" section.
+  * P2.cpp: Refactoring.
+  * P2_mpi.cpp: Refactoring.
+
 2016-05-09 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.2 released.
