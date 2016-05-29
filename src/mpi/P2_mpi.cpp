@@ -56,12 +56,12 @@ int64_t count_primes(primesieve::iterator& it,
                      int64_t& prime,
                      T stop)
 {
-  int64_t primes = 0;
+  int64_t count = 0;
 
-  for (; prime <= stop; primes++)
+  for (; prime <= stop; count++)
     prime = it.next_prime();
 
-  return primes;
+  return count;
 }
 
 template <typename T>
@@ -78,7 +78,7 @@ T P2_OpenMP_thread(T x,
   pix_count = 0;
   low += thread_num * segment_size;
   z = min(low + segment_size, z);
-  int64_t start = (int64_t) max(x / z + 1, y);
+  int64_t start = (int64_t) max(x / z, y);
   int64_t stop = (int64_t) min(x / low, isqrt(x));
 
   primesieve::iterator rit(stop + 1, start);
@@ -88,8 +88,8 @@ T P2_OpenMP_thread(T x,
   int64_t prime = rit.previous_prime();
   T P2_thread = 0;
 
-  // \sum_{i = pi[start]}^{pi[stop]} pi(x / primes[i])
-  while (prime >= start &&
+  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
+  while (prime > start &&
          x / prime < z)
   {
     pix += count_primes(it, next, x / prime);
