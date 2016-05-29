@@ -137,10 +137,11 @@ algorithm based on Meissel's formula which has a lower runtime complexity of
 operations and which uses only
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
 space.</p>
-<p>For more information on Legendre's, Meissel's and Lehmer's formulas Hans
-Riesel's book [4] is probably the best source of information. For the
-Lagarias-Miller-Odlyzko algorithm I recommend reading their original paper
-[3] as well as Tomás Oliveira's paper [7].
+<p>primecount's Legendre, Meissel and Lehmer implementations are based on
+Hans Riesel's book <a href="https://github.com/kimwalisch/primecount#references">[5]</a>,
+its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
+based on Tomás Oliveira's paper
+<a href="https://github.com/kimwalisch/primecount#references">[8]</a>.</p>
 
 Fast nth prime calculation
 --------------------------
