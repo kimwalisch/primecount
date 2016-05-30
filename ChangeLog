@@ -1,8 +1,10 @@
-2016-05-29 Kim Walisch  <kim.walisch@gmail.com>
+2016-05-30 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.3 work in progress.
 
   * README.md: Fix error in "C++ API" section.
+  * S2_hard.cpp: Refactoring.
+  * S2_hard_mpi.cpp: Refactoring.
   * P2.cpp: Refactoring.
   * P2_mpi.cpp: Refactoring.
 
