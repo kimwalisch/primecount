@@ -157,12 +157,12 @@ int64_t S2_hard_thread(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min3(x / (prime * low), z / prime, y)];
-      int64_t min_hard_leaf = max3(x / (prime * high), y / prime, prime);
+      int64_t min_hard = max3(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
 
-      for (; primes[l] > min_hard_leaf; l--)
+      for (; primes[l] > min_hard; l--)
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
