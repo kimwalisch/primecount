@@ -19,19 +19,14 @@ namespace primecount {
 PiTable::PiTable(uint64_t max) :
   max_(max)
 {
-  pi_.resize(max_ / 64 + 1);
+  pi_.resize(max / 64 + 1);
   primesieve::iterator iter(0, max);
 
   uint64_t pix = 0;
   uint64_t prime = 0;
-  uint64_t one = 1;
 
   while ((prime = iter.next_prime()) <= max)
-  {
-    uint64_t index = prime / 64;
-    uint64_t mask = one << (prime % 64);
-    pi_[index].bits |= mask;
-  }
+    pi_[prime / 64].bits |= ((uint64_t) 1) << (prime % 64);
 
   for (uint64_t i = 0; i < pi_.size(); i++)
   {
