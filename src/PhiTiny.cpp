@@ -7,7 +7,7 @@
 ///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///        with pp = 2 * 3 * ... * prime[a]
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -46,8 +46,8 @@ PhiTiny::PhiTiny()
 
     for (int x = 0; x < size; x++)
     {
-      int16_t phi_xa = (int16_t) (phi(x, a - 1) - phi(x / primes[a], a - 1));
-      cache.push_back(phi_xa);
+      int64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
+      cache.push_back((int16_t) phi_xa);
     }
   }
 }
