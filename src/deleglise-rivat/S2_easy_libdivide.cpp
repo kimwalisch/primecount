@@ -39,13 +39,13 @@ bool is_libdivide(T x)
   return x <= numeric_limits<uint64_t>::max();
 }
 
-typedef libdivide::divider<uint64_t, libdivide::BRANCHFREE> libdivide_u64_t;
+typedef libdivide::divider<uint64_t, libdivide::BRANCHFREE> fastdiv_t;
 
 template <typename Primes>
-vector<libdivide_u64_t>
-libdivide_divisors(Primes& primes)
+vector<fastdiv_t>
+libdivide_vector(Primes& primes)
 {
-  return vector<libdivide_u64_t>(primes.begin(), primes.end());
+  return vector<fastdiv_t>(primes.begin(), primes.end());
 }
 
 /// Calculate the contribution of the clustered easy
@@ -62,7 +62,7 @@ T S2_easy_OpenMP(T x,
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   threads = validate_threads(threads, x13, 1000);
-  vector<libdivide_u64_t> fastdiv = libdivide_divisors(primes);
+  vector<fastdiv_t> fastdiv = libdivide_vector(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
