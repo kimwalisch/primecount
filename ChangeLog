@@ -1,6 +1,6 @@
-2016-05-30 Kim Walisch  <kim.walisch@gmail.com>
+2016-07-16 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.3 work in progress.
+  Version 3.3 released.
 
   * README.md: Fix error in "C++ API" section.
   * S2_hard.cpp: Refactoring.
