@@ -215,4 +215,4 @@ int128_t P2(int128_t x, int64_t y, int threads)
 
 #endif
 
-} // namespace primecount
+} // namespace

@@ -145,4 +145,4 @@ int64_t pi_lmo3(int64_t x)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

@@ -171,4 +171,4 @@ PrimeCountOptions parseOptions(int argc, char** argv)
   return pco;
 }
 
-} // namespace primecount
+} // namespace

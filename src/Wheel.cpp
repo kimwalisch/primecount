@@ -61,4 +61,4 @@ const NextWheel Wheel::nextWheel210[48] =
   { 4, 45}, {2, 46}, {10, 47}, {2,  0}
 };
 
-} // namespace primecount
+} // namespace

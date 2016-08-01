@@ -78,4 +78,4 @@ void version()
   exit(1);
 }
 
-} // namespace primecount
+} // namespace

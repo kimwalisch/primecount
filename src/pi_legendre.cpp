@@ -35,4 +35,4 @@ int64_t pi_legendre(int64_t x, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

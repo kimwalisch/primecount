@@ -52,4 +52,4 @@ PhiTiny::PhiTiny()
   }
 }
 
-} // namespace primecount
+} // namespace

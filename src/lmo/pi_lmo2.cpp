@@ -114,4 +114,4 @@ int64_t pi_lmo2(int64_t x)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

@@ -23,4 +23,4 @@ int64_t pi_primesieve(int64_t x, int threads)
   return primesieve::parallel_count_primes(0, x);
 }
 
-} // namespace primecount
+} // namespace

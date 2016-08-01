@@ -213,4 +213,4 @@ int128_t S2_easy(int128_t x,
 
 #endif
 
-} // namespace primecount
+} // namespace

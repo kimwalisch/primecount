@@ -112,4 +112,4 @@ int128_t S2_trivial(int128_t x,
 
 #endif
 
-} // namespace primecount
+} // namespace

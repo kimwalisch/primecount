@@ -226,4 +226,4 @@ vector<int64_t> phi_vector(int64_t x,
   return phi;
 }
 
-} // namespace primecount
+} // namespace

@@ -239,4 +239,4 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

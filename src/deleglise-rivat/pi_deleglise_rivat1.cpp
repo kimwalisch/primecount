@@ -209,4 +209,4 @@ int64_t pi_deleglise_rivat1(int64_t x)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

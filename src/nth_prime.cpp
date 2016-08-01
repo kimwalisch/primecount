@@ -65,4 +65,4 @@ int64_t nth_prime(int64_t n, int threads)
   return prime;
 }
 
-} // namespace primecount
+} // namespace

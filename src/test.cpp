@@ -166,4 +166,4 @@ bool test()
   return true;
 }
 
-} // namespace primecount
+} // namespace

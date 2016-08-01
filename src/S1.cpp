@@ -128,4 +128,4 @@ int128_t S1(int128_t x,
 
 #endif
 
-} // namespace primecount
+} // namespace

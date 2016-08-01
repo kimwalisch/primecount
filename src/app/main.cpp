@@ -160,7 +160,7 @@ maxint_t S2_hard(maxint_t x, int threads)
     return S2_hard(x, y, z, c, s2_hard_approx, threads);
 }
 
-} // namespace primecount
+} // namespace
 
 int main (int argc, char* argv[])
 {

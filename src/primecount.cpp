@@ -416,4 +416,4 @@ string primecount_version()
   return PRIMECOUNT_VERSION;
 }
 
-} // namespace primecount
+} // namespace

@@ -220,4 +220,4 @@ int128_t P2_mpi(int128_t x, int64_t y, int threads)
 
 #endif
 
-} // namespace primecount
+} // namespace

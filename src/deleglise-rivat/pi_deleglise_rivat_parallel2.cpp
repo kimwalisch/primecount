@@ -79,4 +79,4 @@ int64_t pi_deleglise_rivat_parallel2(int64_t x, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

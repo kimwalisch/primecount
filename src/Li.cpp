@@ -127,4 +127,4 @@ int128_t Li_inverse(int128_t x)
 
 #endif
 
-} // namespace primecount
+} // namespace

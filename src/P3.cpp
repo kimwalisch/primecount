@@ -24,8 +24,8 @@ using namespace std;
 
 namespace primecount {
 
-/// P3(x, a) counts the numbers <= x that have exactly 3 prime
-/// factors each exceeding the a-th prime.
+/// P3(x, a) counts the numbers <= x that have exactly 3
+/// prime factors each exceeding the a-th prime.
 /// Space complexity: O(pi(sqrt(x))).
 ///
 int64_t P3(int64_t x, int64_t a, int threads)
@@ -55,4 +55,4 @@ int64_t P3(int64_t x, int64_t a, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace
