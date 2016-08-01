@@ -41,7 +41,7 @@ private:
   int64_t max_finished_;
   int64_t segment_size_;
   int64_t segments_per_thread_;
-  int64_t proc_interval_;
+  int64_t proc_distance_;
   double rsd_;
   double start_time_;
   double init_seconds_;
