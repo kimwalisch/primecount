@@ -52,9 +52,9 @@ T S2_trivial_OpenMP(T x,
   for (int64_t i = 0; i < threads; i++)
   {
     int64_t start = max(prime_c, sqrtz) + 1;
-    int64_t thread_interval = ceil_div(y - start, threads);
-    start += thread_interval * i;
-    int64_t stop = min(start + thread_interval, y);
+    int64_t thread_distance = ceil_div(y - start, threads);
+    start += thread_distance * i;
+    int64_t stop = min(start + thread_distance, y);
     primesieve::iterator iter(start - 1, stop);
     T prime;
 
