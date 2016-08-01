@@ -41,7 +41,7 @@ int64_t P3(int64_t x, int64_t a, int threads)
   int64_t sum = 0;
 
   #pragma omp parallel for reduction(+: sum) schedule(dynamic) \
-      num_threads(validate_threads(threads, pi_y, 100))
+      num_threads(ideal_num_threads(threads, pi_y, 100))
   for (int64_t i = a + 1; i <= pi_y; i++)
   {
     int64_t xi = x / primes[i];

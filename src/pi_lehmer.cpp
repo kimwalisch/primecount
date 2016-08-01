@@ -1,7 +1,7 @@
 ///
 /// @file  pi_lehmer.cpp
 ///
-/// Copyright (C) 2015 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,7 +35,7 @@ int64_t pi_lehmer(int64_t x, int threads)
     cout << "pi(x) = phi(x, a) + a - 1 - P2 - P3" << endl;
     cout << "x = " << x << endl;
     cout << "a = " << a << endl;
-    cout << "threads = " << validate_threads(threads) << endl;
+    cout << "threads = " << threads << endl;
   }
 
   int64_t p1 = phi(x, a, threads);
@@ -46,4 +46,4 @@ int64_t pi_lehmer(int64_t x, int threads)
   return sum;
 }
 
-} // namespace primecount
+} // namespace

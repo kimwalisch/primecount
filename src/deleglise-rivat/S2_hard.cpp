@@ -330,7 +330,7 @@ T S2_hard_OpenMP_master(T x,
                         FactorTable& factors,
                         int threads)
 {
-  threads = validate_threads(threads, z);
+  threads = ideal_num_threads(threads, z);
 
   T s2_hard = 0;
   int64_t low = 1;

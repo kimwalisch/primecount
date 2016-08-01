@@ -66,7 +66,7 @@ X S1_OpenMP_master(X x,
                    int threads)
 {
   int64_t thread_threshold = ipow(10, 6);
-  threads = validate_threads(threads, y, thread_threshold);
+  threads = ideal_num_threads(threads, y, thread_threshold);
   vector<Y> primes = generate_primes<Y>(y);
   X s1 = phi_tiny(x, c);
 

@@ -61,7 +61,7 @@ T S2_easy_mpi_master(T x,
 {
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
-  threads = validate_threads(threads, x13, 1000);
+  threads = ideal_num_threads(threads, x13, 1000);
   vector<fastdiv_t> fastdiv = libdivide_vector(primes);
 
   PiTable pi(y);

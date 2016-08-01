@@ -64,7 +64,11 @@ using namespace std;
 
 namespace {
 
-int threads_ = primecount::MAX_THREADS;
+#ifdef _OPENMP
+  int threads_ = max(1, omp_get_max_threads());
+#else
+  int threads_ = 1;
+#endif
 
 int status_precision_ = -1;
 
@@ -273,25 +277,12 @@ double get_wtime()
 #ifdef _OPENMP
   return omp_get_wtime();
 #else
-  return static_cast<double>(std::clock()) / CLOCKS_PER_SEC;
+  return (double) (std::clock() / CLOCKS_PER_SEC);
 #endif
 }
 
-int validate_threads(int threads)
+int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
-#ifdef _OPENMP
-  if (threads == MAX_THREADS)
-    threads = omp_get_max_threads();
-  return in_between(1, threads, omp_get_max_threads());
-#else
-  threads = 1;
-  return threads; 
-#endif
-}
-
-int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
-{
-  threads = validate_threads(threads);
   thread_threshold = max((int64_t) 1, thread_threshold);
   threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
   threads = max(1, threads);
@@ -382,12 +373,16 @@ double get_alpha_deleglise_rivat(maxint_t x)
 
 void set_num_threads(int threads)
 {
-  threads_ = validate_threads(threads);
+#ifdef _OPENMP
+  int threads_ = in_between(1, threads, omp_get_max_threads());
+#else
+  int threads_ = 1;
+#endif
 }
 
 int get_num_threads()
 {
-  return validate_threads(threads_);
+  return threads_;
 }
 
 void set_status_precision(int precision)

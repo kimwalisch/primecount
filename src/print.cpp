@@ -59,9 +59,9 @@ void print_threads(int threads)
 {
 #ifdef HAVE_MPI
   cout << "processes = " << mpi_num_procs() << endl;
-  cout << "threads = " << mpi_num_procs() << " * " << validate_threads(threads) << endl;
+  cout << "threads = " << mpi_num_procs() << " * " << threads << endl;
 #else
-  cout << "threads = " << validate_threads(threads) << endl;
+  cout << "threads = " << threads << endl;
 #endif
 }
 

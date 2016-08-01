@@ -37,7 +37,7 @@ T S2_trivial_OpenMP(T x,
                     int threads)
 {
   int64_t thread_threshold = ipow(10, 7);
-  threads = validate_threads(threads, y, thread_threshold);
+  threads = ideal_num_threads(threads, y, thread_threshold);
 
   PiTable pi(y);
   int64_t pi_y = pi[y];

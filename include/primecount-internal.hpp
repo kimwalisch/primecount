@@ -139,9 +139,7 @@ double get_alpha_deleglise_rivat(maxint_t x);
 
 double get_wtime();
 
-int validate_threads(int threads);
-
-int validate_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
+int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
 
 maxint_t to_maxint(const std::string& expr);
 

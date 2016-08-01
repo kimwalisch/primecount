@@ -127,7 +127,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t segment_size = 1 << 20;
-  threads = validate_threads(threads, z);
+  threads = ideal_num_threads(threads, z);
 
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);

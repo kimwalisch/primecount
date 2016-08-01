@@ -208,7 +208,7 @@ vector<int64_t> phi_vector(int64_t x,
     PhiCache cache(primes, pi);
 
     int64_t thread_threshold = ipow((int64_t) 10, 14) / primes[a];
-    threads = validate_threads(threads, x, thread_threshold);
+    threads = ideal_num_threads(threads, x, thread_threshold);
 
     // this loop scales only up to about 8 CPU cores
     // because the cache requires too much memory bandwidth

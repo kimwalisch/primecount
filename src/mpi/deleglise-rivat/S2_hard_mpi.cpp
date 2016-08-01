@@ -341,7 +341,7 @@ T S2_hard_OpenMP_master(int64_t low,
                         int threads)
 {
   double time = get_wtime();
-  threads = validate_threads(threads, z);
+  threads = ideal_num_threads(threads, z);
 
   T s2_hard = 0;
   int64_t limit = high + 1;

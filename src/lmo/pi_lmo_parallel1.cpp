@@ -173,7 +173,7 @@ int64_t S2(int64_t x,
            int threads)
 {
   int64_t limit = x / y + 1;
-  threads = validate_threads(threads, limit);
+  threads = ideal_num_threads(threads, limit);
 
   int64_t S2_total = 0;
   int64_t segment_size = next_power_of_2(isqrt(limit));

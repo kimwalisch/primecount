@@ -47,7 +47,7 @@ T S2_easy_mpi_master(T x,
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
-  threads = validate_threads(threads, x13, thread_threshold);
+  threads = ideal_num_threads(threads, x13, thread_threshold);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
