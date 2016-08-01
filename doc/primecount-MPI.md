@@ -4,17 +4,17 @@ primecount MPI
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
 
-This is a distributed version of ```primecount``` which uses the
+This is a distributed version of primecount which uses the
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library for
 inter-process communication and which automatically distributes
 the computation onto cluster nodes. Breaking the next world record pi(10<sup>28</sup>)
 would take about 6 years on the fastest shared memory server currently
 available. Hence it has become necessary to go distributed!
 
-Computing pi(10<sup>28</sup>) using ```primecount MPI``` requires up to 500 gigabytes
+Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500 gigabytes
 of memory per cluster node! That is a lot, it might take a few years until
 such clusters become more widely available. I expect the pi(10<sup>28</sup>)
-computation to take about 130 CPU core years using ```primecount MPI```.
+computation to take about 130 CPU core years using primecount MPI.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
@@ -40,7 +40,7 @@ mpiexec -n 100 -bynode -hostfile my_hosts ./primecount 1e23 --status
 ```
 
 Note that you should create only one process per cluster node as
-```primecount MPI``` will by default use all available CPU cores
+primecount MPI will by default use all available CPU cores
 on each node using [OpenMP](https://en.wikipedia.org/wiki/OpenMP)
 multi-threading.
 
