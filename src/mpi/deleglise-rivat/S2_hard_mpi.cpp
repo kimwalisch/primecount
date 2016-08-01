@@ -461,12 +461,12 @@ int64_t start_mpi_slave_procs(int64_t z,
   int64_t low = 0;
   int64_t high = 0;
   int64_t segments_per_thread = 1;
-  int64_t proc_interval = isqrt(z);
+  int64_t proc_distance = isqrt(z);
 
   for (int i = 1; i <= slave_procs; i++)
   {
     low = high + 1;
-    high = min(low + proc_interval, z);
+    high = min(low + proc_distance, z);
     S2_hard_mpi_msg msg(i, low, high, segment_size, segments_per_thread);
     msg.send(i);
   }
