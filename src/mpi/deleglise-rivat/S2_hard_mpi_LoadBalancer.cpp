@@ -77,17 +77,17 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
     seconds_ = msg->seconds();
   }
 
-  int64_t next_distance = proc_distance_;
+  int64_t distance = proc_distance_;
 
   // balance load by increasing or decreasing the next
-  // interval based on previous run-time
+  // distance based on previous run-time
   if (is_increase(percent))
-    next_distance *= 2;
+    distance *= 2;
   else
-    next_distance = max(next_distance / 2, isqrt(z_)); 
+    distance = max(distance / 2, isqrt(z_)); 
 
   low_ = high_ + 1;
-  high_ = min(low_ + next_distance, z_);
+  high_ = min(low_ + distance, z_);
 
   // udpate existing message with new work todo
   msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_, rsd_);
