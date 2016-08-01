@@ -21,14 +21,14 @@ Build instructions (Unix-like OSes)
 
 First install the prerequisites:
 ```sh
-$ sudo apt-get install g++ make libopenmpi-dev openmpi-bin
+sudo apt-get install g++ make libopenmpi-dev openmpi-bin
 ```
 
 Then download
 [primecount-3.3.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.3.tar.gz)
 and build it:
 ```sh
-$ ./build.sh --enable-mpi
+./build.sh --enable-mpi
 ```
 
 Usage example
@@ -36,7 +36,7 @@ Usage example
 
 ```sh
 # Distribute pi(10^23) computation onto 100 cluster nodes
-$ mpiexec -n 100 -bynode -hostfile my_hosts ./primecount 1e23 --status
+mpiexec -n 100 -bynode -hostfile my_hosts ./primecount 1e23 --status
 ```
 
 Note that you should create only one process per cluster node as

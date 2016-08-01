@@ -40,16 +40,16 @@ Usage examples
 Open a terminal and run primecount using e.g.:
 ```sh
 # Count the primes below 10^14
-$ ./primecount 1e14
+./primecount 1e14
 
 # Print progress and status information during computation
-$ ./primecount 1e20 --status
+./primecount 1e20 --status
 
 # Count primes using Meissel's algorithm
-$ ./primecount 2**32 --meissel
+./primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
-$ ./primecount 1e14 --nthprime --threads=4 --time
+./primecount 1e14 --nthprime --threads=4 --time
 ```
 
 Command-line options
@@ -293,16 +293,16 @@ Download
 and build it using:
 
 ```sh
-$ ./build.sh
-$ make check
-$ sudo make install
+./build.sh
+make check
+sudo make install
 ```
 
 To build ```primecount``` using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
 support for distributing computations onto cluster nodes use:
 ```sh
-$ ./build.sh --enable-mpi
+./build.sh --enable-mpi
 ```
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.
@@ -353,7 +353,7 @@ int main()
 
 On Unix-like OSes compile using:
 ```sh
-$ c++ -O2 primes.cpp -lprimecount -lprimesieve
+c++ -O2 primes.cpp -lprimecount -lprimesieve
 ```
 
 References
