@@ -374,7 +374,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
 void set_num_threads(int threads)
 {
 #ifdef _OPENMP
-  int threads_ = in_between(1, threads, omp_get_max_threads());
+  threads_ = in_between(1, threads, omp_get_max_threads());
 #else
   unused_param(threads);
 #endif
