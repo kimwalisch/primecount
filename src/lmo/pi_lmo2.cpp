@@ -4,7 +4,7 @@
 ///        counting algorithm. This implementation uses the sieve
 ///        of Eratosthenes (without segmentation) to calculate S2(x).
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

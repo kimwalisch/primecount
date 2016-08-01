@@ -11,7 +11,7 @@
 ///         Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
 ///         http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

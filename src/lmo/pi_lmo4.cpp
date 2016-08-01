@@ -5,7 +5,7 @@
 ///        sieve of Eratosthenes and a special tree data structure
 ///        for faster counting in S2(x).
 ///
-/// Copyright (C) 2014 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
