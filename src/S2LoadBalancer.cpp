@@ -19,11 +19,10 @@
 /// the relative standard deviation of the thread run-times.
 ///
 /// 1) Start with a tiny segment size of x^(1/3) / (log x * log log x)
-///    and one segment per thread. Our algorithm uses equally sized
-///    intervals, for each thread the interval_size is
-///    segment_size * segments_per_thread and the threads process
-///    adjacent intervals i.e.
-///    [base + interval_size * thread_id, base + interval_size * (thread_id + 1)].
+///    and one segment per thread. Each thread sieves a distance of
+///    segment_size * segments_per_thread. Once all threads have
+///    processed their intervals we calculate a new interval size
+///    based on the ideas below.
 ///
 /// 2) If the relative standard deviation of the thread run-times is
 ///    large then we know the special leaves are distributed unevenly,
@@ -31,16 +30,16 @@
 ///    leaves are more evenly distributed.
 ///
 /// 3) If the special leaves are distributed unevenly then we can
-///    increase the load balance by decreasing the interval_size.
+///    increase the load balance by decreasing the interval size.
 ///    Contrary if the special leaves are more evenly distributed
-///    we can increase the interval_size in order to improve the
+///    we can increase the interval size in order to improve the
 ///    algorithm's efficiency.
 ///
 /// 4) We can't use a static threshold for as to when the relative
 ///    standard deviation is low or large as this threshold varies for
 ///    different PC architectures. So instead we compare the current
 ///    relative standard deviation to the previous one in order to
-///    decide whether to increase or decrease the interval_size.
+///    decide whether to increase or decrease the interval size.
 ///
 /// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///
