@@ -139,7 +139,8 @@ void S2LoadBalancer::init(maxint_t x,
   decrease_dividend_ = max(0.5, log_threads / 3);
 
   min_seconds_ = 0.02 * log_threads;
-  update_min_size(log(log(x_)) * log(x_));
+  double divisor = log(log(x_)) * log(x_);
+  update_min_size(divisor);
 
   double alpha = get_alpha(x, y);
   smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
@@ -219,8 +220,8 @@ void S2LoadBalancer::update(int64_t low,
   else if (low > smallest_hard_leaf_)
     update(segments_per_thread, decrease_threshold, seconds);
 
-  int64_t interval_per_thread = *segment_size * *segments_per_thread;
-  int64_t high = low + interval_per_thread * threads;
+  int64_t thread_distance = *segment_size * *segments_per_thread;
+  int64_t high = low + thread_distance * threads;
 
   // near smallest_hard_leaf_ the hard special leaves
   // are distributed unevenly so use min_size_
@@ -228,8 +229,8 @@ void S2LoadBalancer::update(int64_t low,
       high > smallest_hard_leaf_)
   {
     *segment_size = min_size_;
-    interval_per_thread = *segment_size * *segments_per_thread;
-    high = low + interval_per_thread * threads;
+    thread_distance = *segment_size * *segments_per_thread;
+    high = low + thread_distance * threads;
   }
 
   // slightly increase min_size_
