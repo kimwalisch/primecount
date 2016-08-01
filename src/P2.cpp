@@ -49,9 +49,7 @@ int64_t balanceLoad(int64_t segment_size, double start_time)
 }
 
 template <typename T>
-int64_t count_primes(primesieve::iterator& it,
-                     int64_t& prime,
-                     T stop)
+int64_t count_primes(primesieve::iterator& it, int64_t& prime, T stop)
 {
   int64_t count = 0;
 
