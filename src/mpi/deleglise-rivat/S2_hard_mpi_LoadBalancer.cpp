@@ -32,7 +32,7 @@ S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t high,
   max_finished_(0),
   segment_size_(isqrt(z)),
   segments_per_thread_(1),
-  proc_interval_(0),
+  proc_distance_(0),
   rsd_(0),
   start_time_(get_wtime()),
   init_seconds_(0),
@@ -69,7 +69,7 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
   if (msg->high() >= max_finished_)
   {
     max_finished_ = msg->high();
-    proc_interval_ = msg->high() - msg->low();
+    proc_distance_ = msg->high() - msg->low();
     segment_size_ = msg->segment_size();
     segments_per_thread_ = msg->segments_per_thread();
     rsd_ = msg->rsd();
@@ -77,17 +77,17 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
     seconds_ = msg->seconds();
   }
 
-  int64_t next_interval = proc_interval_;
+  int64_t next_distance = proc_distance_;
 
   // balance load by increasing or decreasing the next
   // interval based on previous run-time
   if (is_increase(percent))
-    next_interval *= 2;
+    next_distance *= 2;
   else
-    next_interval = max(next_interval / 2, isqrt(z_)); 
+    next_distance = max(next_distance / 2, isqrt(z_)); 
 
   low_ = high_ + 1;
-  high_ = min(low_ + next_interval, z_);
+  high_ = min(low_ + next_distance, z_);
 
   // udpate existing message with new work todo
   msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_, rsd_);
