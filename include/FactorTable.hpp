@@ -132,14 +132,14 @@ private:
 
     int64_t thread_threshold = ipow(10, 7);
     threads = validate_threads(threads, y, thread_threshold);
-    int64_t thread_interval = ceil_div(y, threads);
+    int64_t thread_distance = ceil_div(y, threads);
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
       int64_t low = 1;
-      low += thread_interval * t;
-      int64_t high = std::min(low + thread_interval, y);
+      low += thread_distance * t;
+      int64_t high = std::min(low + thread_distance, y);
       int64_t wheel_prime = get_number(1);
       primesieve::iterator iter(wheel_prime - 1);
       int64_t prime;
