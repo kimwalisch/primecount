@@ -74,23 +74,24 @@ double get_average(aligned_vector<double>& timings)
   return sum / n;
 }
 
-double relative_standard_deviation(aligned_vector<double>& timings)
+/// Relative standard deviation
+double rel_std_dev(aligned_vector<double>& timings)
 {
   size_t n = timings.size();
-  double average = get_average(timings);
+  double avg = get_average(timings);
   double sum = 0;
 
-  if (average == 0)
+  if (avg == 0)
     return 0;
 
   for (size_t i = 0; i < n; i++)
   {
-    double mean = timings[i] - average;
+    double mean = timings[i] - avg;
     sum += mean * mean;
   }
 
   double std_dev = sqrt(sum / max(1.0, n - 1.0));
-  double rsd = 100 * std_dev / average;
+  double rsd = 100 * std_dev / avg;
 
   return rsd;
 }
@@ -205,7 +206,7 @@ void S2LoadBalancer::update(int64_t low,
   double seconds = get_average(timings);
   update_avg_seconds(seconds);
   double decrease_threshold = get_decrease_threshold(seconds);
-  rsd_ = max(0.1, relative_standard_deviation(timings));
+  rsd_ = max(0.1, rel_std_dev(timings));
 
   // 1 segment per thread
   if (*segment_size < sqrtz_)
