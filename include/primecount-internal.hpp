@@ -23,11 +23,6 @@
 
 namespace primecount {
 
-enum {
-  /// Uses all CPU cores.
-  MAX_THREADS = -1
-};
-
 /// Silence unused parameter compiler warning
 template<class T>
 void unused_param(const T&)
