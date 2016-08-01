@@ -116,6 +116,6 @@ std::string get_max_x(double alpha = 1.0);
 /// Get the primecount version number, in the form “i.j”.
 std::string primecount_version();
 
-} // namespace primecount
+} // namespace
 
 #endif

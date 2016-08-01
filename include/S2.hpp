@@ -114,6 +114,6 @@ int128_t S2_hard_mpi(int128_t x,
 
 #endif
 
-} // namespace primecount
+} // namespace
 
 #endif

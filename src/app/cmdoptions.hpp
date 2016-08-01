@@ -72,6 +72,6 @@ struct PrimeCountOptions
 
 PrimeCountOptions parseOptions(int, char**);
 
-} // namespace primecount
+} // namespace
 
 #endif

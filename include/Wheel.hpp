@@ -117,6 +117,6 @@ private:
   std::vector<WheelItem> wheelItems_;
 };
 
-} // namespace primecount
+} // namespace
 
 #endif

@@ -124,7 +124,7 @@ inline uint64_t popcount_u64(const uint64_t* array, uint64_t size)
   return total;
 }
 
-} // namespace primecount
+} // namespace
 
 #else /* no POPCNT */
 
@@ -196,7 +196,7 @@ inline uint64_t popcount_u64(const uint64_t* array, uint64_t size)
   return total;
 }
 
-} // namespace primecount
+} // namespace
 
 #endif
 
