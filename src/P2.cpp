@@ -121,20 +121,17 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
   if (a >= b)
     return 0;
 
+  // \sum_{i=a+1}^{b} -(i - 1)
+  T p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  T pix_total = 0;
+
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t segment_size = 1 << 20;
-  threads = ideal_num_threads(threads, z);
 
+  threads = ideal_num_threads(threads, z);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
-
-  // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
-  T p2 = 0;
-  T pix_total = 0;
-
-  // \sum_{i=a+1}^{b} -(i - 1)
-  p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
