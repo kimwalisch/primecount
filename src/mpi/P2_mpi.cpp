@@ -122,19 +122,9 @@ T P2_mpi_master(T x, int64_t y, int threads)
   if (a >= b)
     return 0;
 
-  T p2 = 0;
-  T pix_total = pi_legendre(low - 1, threads);
-
-  if (is_mpi_master_proc())
-    p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t segment_size = 1 << 20;
-
-  threads = ideal_num_threads(threads, z);
-  aligned_vector<int64_t> pix(threads);
-  aligned_vector<int64_t> pix_counts(threads);
 
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
@@ -143,6 +133,16 @@ T P2_mpi_master(T x, int64_t y, int threads)
   int64_t proc_distance = ceil_div(distance, procs);
   low += proc_distance * proc_id;
   z = min(low + proc_distance, z);
+
+  T p2 = 0;
+  T pix_total = pi_legendre(low - 1, threads);
+
+  if (is_mpi_master_proc())
+    p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+
+  threads = ideal_num_threads(threads, z);
+  aligned_vector<int64_t> pix(threads);
+  aligned_vector<int64_t> pix_counts(threads);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
