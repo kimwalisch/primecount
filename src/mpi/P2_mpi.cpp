@@ -135,10 +135,10 @@ T P2_mpi_master(T x, int64_t y, int threads)
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
 
-  int64_t interval = z - low;
-  int64_t interval_per_proc = ceil_div(interval, procs);
-  low += interval_per_proc * proc_id;
-  z = min(low + interval_per_proc, z);
+  int64_t distance = z - low;
+  int64_t proc_distance = ceil_div(distance, procs);
+  low += proc_distance * proc_id;
+  z = min(low + proc_distance, z);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i]) - (i - 1)
   T p2 = 0;
