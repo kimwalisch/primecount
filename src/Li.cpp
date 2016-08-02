@@ -99,7 +99,7 @@ T Li_inverse(T x)
 }
 
 } // namespace Li
-} // namespace
+} // namespace primecount
 
 namespace primecount {
 
@@ -127,4 +127,4 @@ int128_t Li_inverse(int128_t x)
 
 #endif
 
-} // namespace
+} // namespace primecount
