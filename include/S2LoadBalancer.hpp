@@ -42,11 +42,11 @@ private:
   double y_;
   double z_;
   double rsd_;
+  double count_;
   double total_seconds_;
   double min_seconds_;
   double decrease_dividend_;
   int64_t min_size_;
-  int64_t count_;
   int64_t sqrtz_;
   int64_t smallest_hard_leaf_;
 };
