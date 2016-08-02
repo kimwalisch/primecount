@@ -183,7 +183,7 @@ private:
   }
 };
 
-}
+} // namespace
 
 namespace primecount {
 
@@ -207,7 +207,8 @@ vector<int64_t> phi_vector(int64_t x,
   {
     PhiCache cache(primes, pi);
 
-    int64_t thread_threshold = ipow((int64_t) 10, 14) / primes[a];
+    int64_t p14 = ipow((int64_t) 10, 14);
+    int64_t thread_threshold = p14 / primes[a];
     threads = ideal_num_threads(threads, x, thread_threshold);
 
     // this loop scales only up to about 8 CPU cores
