@@ -38,7 +38,6 @@
 #include <stdint.h>
 #include <algorithm>
 #include <vector>
-#include <cassert>
 #include <limits>
 
 #ifdef _OPENMP
@@ -59,10 +58,9 @@ public:
     pi_(pi),
     bytes_(0)
   {
-    // primecount uses 1-indexing i.e. primes[1] = 2
-    assert(primes_[0] == 0);
-    size_t max_size = CACHE_A_LIMIT + 1;
-    cache_.resize(min(primes.size(), max_size));
+    size_t max_size = MAX_A + 1;
+    size_t size = min(primes.size(), max_size);
+    cache_.resize(size);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -103,7 +101,8 @@ public:
       int64_t a2 = c;
       
       // 64-bit integer division, slow
-      for (; a2 < pi_sqrtx && x > numeric_limits<uint32_t>::max(); a2++)
+      for (; a2 < pi_sqrtx && 
+             x > numeric_limits<uint32_t>::max(); a2++)
       {
         int64_t x2 = x / primes_[a2 + 1];
         if (is_cached(x2, a2))
@@ -112,7 +111,7 @@ public:
           sum += phi<-SIGN>(x2, a2);
       }
 
-      // 32-bit integer division, faster
+      // 32-bit integer division, fast
       for (; a2 < pi_sqrtx; a2++)
       {
         int64_t x2 = (uint32_t) x / (uint32_t) primes_[a2 + 1];
@@ -132,10 +131,10 @@ public:
 private:
   enum
   {
-    /// Cache phi(x, a) results if a <= CACHE_A_LIMIT
-    CACHE_A_LIMIT = 500,
-    /// Keep the cache size below CACHE_BYTES_LIMIT per thread
-    CACHE_BYTES_LIMIT = 16 << 20
+    /// Cache phi(x, a) results if a <= MAX_A
+    MAX_A = 500,
+    /// Keep the cache size below MAX_BYTES per thread
+    MAX_BYTES = 16 << 20
   };
 
   /// Cache of phi(x, a) results
@@ -159,21 +158,21 @@ private:
 
   bool is_cached(int64_t x, int64_t a) const
   {
-    return a <= CACHE_A_LIMIT && 
+    return a <= MAX_A && 
            x < cache_size(a) && 
            cache_[a][x] != 0;
   }
 
   bool write_to_cache(int64_t x, int64_t a)
   {
-    if (a > CACHE_A_LIMIT || 
+    if (a > MAX_A || 
         x > numeric_limits<uint16_t>::max())
       return false;
 
-    // check if we need to increase cache size
+    //  we need to increase cache size
     if (x >= cache_size(a))
     {
-      if (bytes_ > CACHE_BYTES_LIMIT)
+      if (bytes_ > MAX_BYTES)
         return false;
       bytes_ += (x + 1 - cache_size(a)) * 2;
       cache_[a].resize(x + 1, 0);
@@ -198,9 +197,6 @@ vector<int64_t> phi_vector(int64_t x,
                            int threads)
 {
   vector<int64_t> phi(a + 2, 0);
-
-  // phi(x, 0) = x
-  // primecount uses 1-indexing
   phi[1] = x;
 
   if (x > 0 && a > 0)
