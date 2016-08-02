@@ -60,7 +60,7 @@ public:
     pi_(pi),
     bytes_(0)
   {
-    size_t max_size = CACHE_A_LIMIT + 1;
+    size_t max_size = MAX_A + 1;
     size_t size = min(primes.size(), max_size);
     cache_.resize(size);
   }
@@ -120,10 +120,10 @@ public:
 private:
   enum
   {
-    /// Cache phi(x, a) results if a <= CACHE_A_LIMIT
-    CACHE_A_LIMIT = 500,
-    /// Keep the cache size below CACHE_BYTES_LIMIT per thread
-    CACHE_BYTES_LIMIT = 16 << 20
+    /// Cache phi(x, a) results if a <= MAX_A
+    MAX_A = 500,
+    /// Keep the cache size below MAX_BYTES per thread
+    MAX_BYTES = 16 << 20
   };
 
   vector<vector<uint16_t> > cache_;
@@ -144,21 +144,21 @@ private:
 
   bool is_cached(int64_t x, int64_t a) const
   {
-    return a <= CACHE_A_LIMIT && 
+    return a <= MAX_A && 
            x < cache_size(a) && 
            cache_[a][x] != 0;
   }
 
   bool write_to_cache(int64_t x, int64_t a)
   {
-    if (a > CACHE_A_LIMIT || 
+    if (a > MAX_A || 
         x > numeric_limits<uint16_t>::max())
       return false;
 
     // we need to increase cache size
     if (x >= cache_size(a))
     {
-      if (bytes_ > CACHE_BYTES_LIMIT)
+      if (bytes_ > MAX_BYTES)
         return false;
       bytes_ += (x + 1 - cache_size(a)) * 2;
       cache_[a].resize(x + 1, 0);
