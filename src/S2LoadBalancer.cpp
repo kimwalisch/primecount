@@ -62,7 +62,7 @@ using namespace primecount;
 
 namespace {
 
-double get_average(aligned_vector<double>& timings)
+double get_avg(aligned_vector<double>& timings)
 {
   size_t n = timings.size();
   double sum = 0;
@@ -77,7 +77,7 @@ double get_average(aligned_vector<double>& timings)
 double rel_std_dev(aligned_vector<double>& timings)
 {
   size_t n = timings.size();
-  double avg = get_average(timings);
+  double avg = get_avg(timings);
   double sum = 0;
 
   if (avg == 0)
@@ -107,8 +107,8 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   y_((double) y),
   z_((double) z),
   rsd_(40),
-  avg_seconds_(0),
   count_(0),
+  total_seconds_(0),
   sqrtz_(isqrt(z))
 {
   init(x, y, threads);
@@ -123,8 +123,8 @@ S2LoadBalancer::S2LoadBalancer(maxint_t x,
   y_((double) y),
   z_((double) z),
   rsd_(rsd),
-  avg_seconds_(0),
   count_(0),
+  total_seconds_(0),
   sqrtz_(isqrt(z))
 {
   init(x, y, threads);
@@ -151,43 +151,47 @@ double S2LoadBalancer::get_rsd() const
   return rsd_;
 }
 
+double S2LoadBalancer::get_avg_seconds() const
+{
+  return total_seconds_ / count_;
+}
+
 int64_t S2LoadBalancer::get_min_segment_size() const
 {
   return min_size_;
 }
 
-bool S2LoadBalancer::increase_size(double seconds,
-                                   double decrease) const
+/// Increase if relative std dev < pivot.
+/// Decrease if relative std dev > pivot.
+///
+double S2LoadBalancer::get_pivot(double seconds) const
 {
-  return seconds < avg_seconds_ &&
-        !decrease_size(seconds, decrease);
-}
+  double log_seconds = log(seconds);
+  log_seconds = max(min_seconds_, log_seconds);
+  double dont_decrease = decrease_dividend_ / (seconds * log_seconds);
+  dont_decrease = min(dont_decrease, rsd_);
 
-bool S2LoadBalancer::decrease_size(double seconds,
-                                   double decrease) const
-{
-  return seconds > min_seconds_ &&
-         rsd_ > decrease;
-}
-
-double S2LoadBalancer::get_decrease_threshold(double seconds) const
-{
-  double log_seconds = max(min_seconds_, log(seconds));
-  double dont_decrease = min(decrease_dividend_ / (seconds * log_seconds), rsd_);
   return rsd_ + dont_decrease;
 }
 
-void S2LoadBalancer::update_avg_seconds(double seconds)
+bool S2LoadBalancer::is_increase(double seconds,
+                                 double pivot) const
 {
-  seconds = max(seconds, min_seconds_);
-  double dividend = avg_seconds_ * count_ + seconds;
-  avg_seconds_ = dividend / ++count_;
+  return seconds < get_avg_seconds() &&
+         !is_decrease(seconds, pivot);
+}
+
+bool S2LoadBalancer::is_decrease(double seconds,
+                                 double pivot) const
+{
+  return seconds > min_seconds_ &&
+         rsd_ > pivot;
 }
 
 void S2LoadBalancer::update_min_size(double divisor)
 {
-  int64_t size = (int64_t) (sqrtz_ / max(1.0, divisor));
   int64_t min_size = 1 << 9;
+  int64_t size = (int64_t) (sqrtz_ / max(1.0, divisor));
   min_size_ = max(size, min_size);
   min_size_ = next_power_of_2(min_size_);
 }
@@ -202,23 +206,24 @@ void S2LoadBalancer::update(int64_t low,
                             int64_t* segments_per_thread,
                             aligned_vector<double>& timings)
 {
-  double seconds = get_average(timings);
-  update_avg_seconds(seconds);
-  double decrease_threshold = get_decrease_threshold(seconds);
+  count_++;
+  double seconds = get_avg(timings);
+  total_seconds_ += seconds;
+  double pivot = get_pivot(seconds);
   rsd_ = max(0.1, rel_std_dev(timings));
 
   // 1 segment per thread
   if (*segment_size < sqrtz_)
   {
-    if (increase_size(seconds, decrease_threshold))
+    if (is_increase(seconds, pivot))
       *segment_size <<= 1;
-    else if (decrease_size(seconds, decrease_threshold))
+    else if (is_decrease(seconds, pivot))
       if (*segment_size > min_size_)
         *segment_size >>= 1;
   }
   // many segments per thread
   else if (low > smallest_hard_leaf_)
-    update(segments_per_thread, decrease_threshold, seconds);
+    update(segments_per_thread, seconds, pivot);
 
   int64_t thread_distance = *segment_size * *segments_per_thread;
   int64_t high = low + thread_distance * threads;
@@ -241,21 +246,21 @@ void S2LoadBalancer::update(int64_t low,
   }
 }
 
-/// Increase the number of segments per thread if the previous
-/// thread run-times are close, otherwise decrease the
+/// Increases the number of segments per thread if the previous
+/// thread run-times are close, otherwise decreases the
 /// number of segments per thread.
 ///
 void S2LoadBalancer::update(int64_t* segments_per_thread,
-                            double decrease_threshold,
-                            double seconds)
+                            double seconds,
+                            double pivot)
 {
-  double factor = decrease_threshold / rsd_;
+  double factor = pivot / rsd_;
   factor = in_between(0.5, factor, 2);
   double n = *segments_per_thread * factor;
   n = max(1.0, n);
 
   if ((n < *segments_per_thread && seconds > min_seconds_) ||
-      (n > *segments_per_thread && seconds < avg_seconds_))
+      (n > *segments_per_thread && seconds < get_avg_seconds()))
   {
     *segments_per_thread = (int64_t) n;
   }
