@@ -206,13 +206,15 @@ int64_t phi(int64_t x, int64_t a, int threads)
       int64_t pi_sqrtx = min(pi[sqrtx], a); 
       sum = x - a + pi_sqrtx;
 
-      int64_t thread_threshold = ipow((int64_t) 10, 14) / primes[a];
+      int64_t p14 = ipow((int64_t) 10, 14);
+      int64_t thread_threshold = p14 / primes[a];
       threads = ideal_num_threads(threads, x, thread_threshold);
 
       // this loop scales only up to about 8 CPU cores
       threads = min(8, threads);
 
-      #pragma omp parallel for firstprivate(cache) num_threads(threads) schedule(dynamic, 16) reduction(+: sum)
+      #pragma omp parallel for schedule(dynamic, 16) \
+          num_threads(threads) firstprivate(cache) reduction(+: sum)
       for (int64_t a2 = 0; a2 < pi_sqrtx; a2++)
         sum += cache.phi<-1>(x / primes[a2 + 1], a2);
     }
