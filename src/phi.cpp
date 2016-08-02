@@ -61,7 +61,8 @@ public:
     bytes_(0)
   {
     size_t max_size = CACHE_A_LIMIT + 1;
-    cache_.resize(min(primes.size(), max_size));
+    size_t size = min(primes.size(), max_size);
+    cache_.resize(size);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
