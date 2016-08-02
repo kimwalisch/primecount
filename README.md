@@ -311,7 +311,7 @@ Build instructions (Microsoft Visual C++)
 -----------------------------------------
 Open a Visual Studio Command Prompt and run:
 ```sh
-> nmake -f Makefile.msvc
+nmake -f Makefile.msvc
 ```
 
 C++ API
