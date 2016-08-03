@@ -246,23 +246,28 @@ void S2LoadBalancer::update(int64_t low,
   }
 }
 
-/// Increases the number of segments per thread if the previous
-/// thread run-times are close, otherwise decreases the
-/// number of segments per thread.
+/// Increase the segments_per_thread if the relative standard
+/// deviation of the thread run times is small, or
+/// decrease the segments_per_thread if the relative standard
+/// deviation of the thread run times is large.
 ///
 void S2LoadBalancer::update(int64_t* segments_per_thread,
                             double seconds,
                             double pivot)
 {
-  double factor = pivot / rsd_;
-  factor = in_between(0.5, factor, 2);
-  double n = *segments_per_thread * factor;
-  n = max(1.0, n);
-
-  if ((n < *segments_per_thread && seconds > min_seconds_) ||
-      (n > *segments_per_thread && seconds < get_avg_seconds()))
+  if (is_increase(seconds, pivot) ||
+      is_decrease(seconds, pivot))
   {
-    *segments_per_thread = (int64_t) n;
+    if (seconds < min_seconds_)
+      *segments_per_thread *= 2;
+    else
+    {
+      double factor = pivot / rsd_;
+      factor = in_between(0.5, factor, 2);
+      double segments = *segments_per_thread * factor;
+      segments = max(1.0, segments);
+      *segments_per_thread = (int64_t) segments;
+    }
   }
 }
 
