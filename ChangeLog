@@ -1,3 +1,11 @@
+2016-08-03 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.4 work in progress.
+
+  * S2LoadBalancer.cpp: 1% speed up due to improved load balancer.
+  * .travis.yml: Add static C++ code analysis using cppcheck.
+  * primecount.cpp: Get rid of MAX_THREADS.
+
 2016-07-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.3 released.
