@@ -159,7 +159,7 @@ bool test();
 
 class PiTable;
 
-std::vector<int64_t> phi_vector(int64_t x, int64_t a, const std::vector<int64_t>& primes, const PiTable& pi, int threads);
+std::vector<int64_t> phi_vector(int64_t x, int64_t a, std::vector<int64_t>& primes, PiTable& pi, int threads);
 
 bool is_mpi_master_proc();
 int mpi_num_procs();
