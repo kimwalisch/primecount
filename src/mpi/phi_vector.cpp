@@ -52,8 +52,8 @@ namespace {
 class PhiCache
 {
 public:
-  PhiCache(const vector<int64_t>& primes,
-           const PiTable& pi) :
+  PhiCache(vector<int64_t>& primes,
+           PiTable& pi) :
     primes_(primes),
     pi_(pi),
     bytes_(0)
@@ -139,21 +139,19 @@ private:
 
   /// Cache of phi(x, a) results
   vector<vector<uint16_t> > cache_;
-  const vector<int64_t>& primes_;
-  const PiTable& pi_;
+  vector<int64_t>& primes_;
+  PiTable& pi_;
   int64_t bytes_;
 
-  void operator=(const PhiCache&);
+  int64_t cache_size(int64_t a) const
+  {
+    return (int64_t) cache_[a].size();
+  }
 
   bool is_phi_by_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
            x < isquare(primes_[a + 1]);
-  }
-
-  int64_t cache_size(int64_t a) const
-  {
-    return (int64_t) cache_[a].size();
   }
 
   bool is_cached(int64_t x, int64_t a) const
@@ -169,7 +167,7 @@ private:
         x > numeric_limits<uint16_t>::max())
       return false;
 
-    //  we need to increase cache size
+    // we need to increase cache size
     if (x >= cache_size(a))
     {
       if (bytes_ > MAX_BYTES)
@@ -192,8 +190,8 @@ namespace primecount {
 ///
 vector<int64_t> phi_vector(int64_t x,
                            int64_t a,
-                           const vector<int64_t>& primes,
-                           const PiTable& pi, 
+                           vector<int64_t>& primes,
+                           PiTable& pi, 
                            int threads)
 {
   vector<int64_t> phi(a + 2, 0);
