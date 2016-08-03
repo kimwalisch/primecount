@@ -177,7 +177,8 @@ double S2LoadBalancer::get_pivot(double seconds) const
 bool S2LoadBalancer::is_increase(double seconds,
                                  double pivot) const
 {
-  return seconds < get_avg_seconds() &&
+  return (seconds < min_seconds_ ||
+          seconds < get_avg_seconds()) &&
          !is_decrease(seconds, pivot);
 }
 
