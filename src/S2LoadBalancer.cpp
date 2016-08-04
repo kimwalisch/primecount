@@ -138,7 +138,7 @@ void S2LoadBalancer::init(maxint_t x,
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
 
-  min_seconds_ = 0.02 * log_threads;
+  min_seconds_ = 0.01 * log_threads;
   double divisor = log(log(x_)) * log(x_);
   update_min_size(divisor);
 
