@@ -141,10 +141,10 @@ private:
       low += thread_distance * t;
       int64_t high = std::min(low + thread_distance, y);
       int64_t wheel_prime = get_number(1);
-      primesieve::iterator iter(wheel_prime - 1);
+      primesieve::iterator it(wheel_prime - 1);
       int64_t prime;
 
-      while ((prime = iter.next_prime()) <= high)
+      while ((prime = it.next_prime()) <= high)
       {
         // case 4), store prime
         if (prime > low &&
