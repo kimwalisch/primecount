@@ -135,7 +135,6 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
   int64_t min_distance = 1 << 20;
   int64_t thread_distance = min_distance;
 
-  threads = ideal_num_threads(threads, z);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
