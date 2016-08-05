@@ -20,12 +20,12 @@ PiTable::PiTable(uint64_t max) :
   max_(max)
 {
   pi_.resize(max / 64 + 1);
-  primesieve::iterator iter(0, max);
+  primesieve::iterator it(0, max);
 
   uint64_t pix = 0;
   uint64_t prime = 0;
 
-  while ((prime = iter.next_prime()) <= max)
+  while ((prime = it.next_prime()) <= max)
     pi_[prime / 64].bits |= ((uint64_t) 1) << (prime % 64);
 
   for (uint64_t i = 0; i < pi_.size(); i++)
