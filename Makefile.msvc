@@ -33,7 +33,7 @@ LIB_OBJECTS = \
 	src\test.obj \
 	src\Wheel.obj \
 	src\deleglise-rivat\S2_trivial.obj \
-	src\deleglise-rivat\S2_easy.obj \
+	src\deleglise-rivat\S2_easy_libdivide.obj \
 	src\deleglise-rivat\S2_hard.obj \
 	src\deleglise-rivat\pi_deleglise_rivat1.obj \
 	src\deleglise-rivat\pi_deleglise_rivat2.obj \
