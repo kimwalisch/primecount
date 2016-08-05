@@ -55,10 +55,10 @@ T S2_trivial_OpenMP(T x,
     int64_t thread_distance = ceil_div(y - start, threads);
     start += thread_distance * i;
     int64_t stop = min(start + thread_distance, y);
-    primesieve::iterator iter(start - 1, stop);
+    primesieve::iterator it(start - 1, stop);
     T prime;
 
-    while ((prime = iter.next_prime()) < stop)
+    while ((prime = it.next_prime()) < stop)
     {
       int64_t xn = (int64_t) max(x / (prime * prime), prime);
       s2_trivial += pi_y - pi[xn];
