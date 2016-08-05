@@ -34,23 +34,7 @@ using namespace primecount;
 
 namespace {
 
-/// Calculate the segment_size per thread.
-/// The idea is to gradually increase the segment_size per
-/// thread in order to keep all CPU cores busy.
-///
-int64_t balanceLoad(int64_t segment_size, double start_time)
-{
-  double seconds = get_wtime() - start_time;
-  int min_segment_size = 1 << 20;
-
-  if (seconds < 30)
-    segment_size *= 2;
-  else if (segment_size > min_segment_size)
-    segment_size -= segment_size / 4;
-
-  return segment_size;
-}
-
+/// Count the primes inside [prime, stop]
 template <typename T>
 int64_t count_primes(primesieve::iterator& it, int64_t& prime, T stop)
 {
@@ -62,11 +46,34 @@ int64_t count_primes(primesieve::iterator& it, int64_t& prime, T stop)
   return count;
 }
 
+/// Calculate the thread sieving distance. The idea is to
+/// gradually increase the thread_distance in order to
+/// keep all CPU cores busy.
+///
+void balanceLoad(int64_t* thread_distance, 
+                 int64_t low,
+                 int64_t z,
+                 int threads,
+                 double start_time)
+{
+  double seconds = get_wtime() - start_time;
+
+  int64_t min_distance = 1 << 20;
+  int64_t max_distance = ceil_div(z - low, threads);
+
+  if (seconds < 60)
+    *thread_distance *= 2;
+  if (seconds > 60)
+    *thread_distance /= 2;
+
+  *thread_distance = in_between(min_distance, *thread_distance, max_distance);
+}
+
 template <typename T>
 T P2_OpenMP_thread(T x,
                    int64_t y,
                    int64_t z,
-                   int64_t segment_size,
+                   int64_t thread_distance,
                    int64_t thread_num,
                    int64_t low,
                    int64_t& pix,
@@ -74,8 +81,8 @@ T P2_OpenMP_thread(T x,
 {
   pix = 0;
   pix_count = 0;
-  low += thread_num * segment_size;
-  z = min(low + segment_size, z);
+  low += thread_distance * thread_num;
+  z = min(low + thread_distance, z);
   int64_t start = (int64_t) max(x / z, y);
   int64_t stop = (int64_t) min(x / low, isqrt(x));
 
@@ -101,9 +108,9 @@ T P2_OpenMP_thread(T x,
   return P2_thread;
 }
 
-/// P2_mpi_master(x, y) counts the numbers <= x that have exactly 2
-/// prime factors each exceeding the a-th prime, a = pi(y).
-/// Space complexity: O((x / y)^(1/2)).
+/// P2(x, y) counts the numbers <= x that have exactly 2
+/// prime factors each exceeding the a-th prime.
+/// Space complexity: O(z^(1/2)).
 ///
 template <typename T>
 T P2_mpi_master(T x, int64_t y, int threads)
@@ -124,7 +131,8 @@ T P2_mpi_master(T x, int64_t y, int threads)
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t segment_size = 1 << 20;
+  int64_t min_distance = 1 << 20;
+  int64_t thread_distance = min_distance;
 
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
@@ -147,17 +155,16 @@ T P2_mpi_master(T x, int64_t y, int threads)
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
   {
-    int64_t segments = ceil_div(z - low, segment_size);
-    threads = in_between(1, threads, segments);
+    int64_t max_threads = ceil_div(z - low, thread_distance);
+    threads = in_between(1, threads, max_threads);
     double time = get_wtime();
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      p2 += P2_OpenMP_thread(x, y, z, segment_size, 
-        i, low, pix[i], pix_counts[i]);
+      p2 += P2_OpenMP_thread(x, y, z, thread_distance, i, low, pix[i], pix_counts[i]);
 
-    low += segment_size * threads;
-    segment_size = balanceLoad(segment_size, time);
+    low += thread_distance * threads;
+    balanceLoad(&thread_distance, low, z, threads, time);
 
     // Add missing sum contributions in order
     for (int i = 0; i < threads; i++)
