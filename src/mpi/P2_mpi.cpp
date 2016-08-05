@@ -148,7 +148,6 @@ T P2_mpi_master(T x, int64_t y, int threads)
   if (is_mpi_master_proc())
     p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
-  threads = ideal_num_threads(threads, z);
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
