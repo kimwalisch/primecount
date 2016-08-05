@@ -1,10 +1,11 @@
-2016-08-03 Kim Walisch  <kim.walisch@gmail.com>
+2016-08-05 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.4 work in progress.
 
-  * S2LoadBalancer.cpp: 1% speed up due to improved load balancer.
+  * S2LoadBalancer.cpp: Improved load balancing.
+  * P2.cpp: Improved load balancing.
+  * P2_mpi.cpp: Improved load balancing.
   * .travis.yml: Add static C++ code analysis using cppcheck.
-  * primecount.cpp: Get rid of MAX_THREADS.
 
 2016-07-16 Kim Walisch  <kim.walisch@gmail.com>
 
