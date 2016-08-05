@@ -58,7 +58,7 @@ void balanceLoad(int64_t* thread_distance,
 {
   double seconds = get_wtime() - start_time;
 
-  int64_t min_distance = 1 << 20;
+  int64_t min_distance = 1 << 23;
   int64_t max_distance = ceil_div(z - low, threads);
 
   if (seconds < 60)
@@ -131,7 +131,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t min_distance = 1 << 20;
+  int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
 
   int proc_id = mpi_proc_id();
