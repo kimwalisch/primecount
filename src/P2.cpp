@@ -47,11 +47,11 @@ int64_t count_primes(primesieve::iterator& it, int64_t& prime, T stop)
 /// gradually increase the thread_distance in order to
 /// keep all CPU cores busy.
 ///
-int64_t balanceLoad(int64_t* thread_distance, 
-                    int64_t low,
-                    int64_t z,
-                    int threads,
-                    double start_time)
+void balanceLoad(int64_t* thread_distance, 
+                 int64_t low,
+                 int64_t z,
+                 int threads,
+                 double start_time)
 {
   double seconds = get_wtime() - start_time;
 
