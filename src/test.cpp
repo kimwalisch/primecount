@@ -99,9 +99,10 @@ void check_nth_prime(int64_t iters)
   cout << endl;
 }
 
+#ifdef _OPENMP
+
 void test_phi_thread_safety(int64_t iters)
 {
-#ifdef _OPENMP
   cout << "Testing phi(x, a)" << flush;
 
   int64_t sum1 = 0;
@@ -118,8 +119,9 @@ void test_phi_thread_safety(int64_t iters)
     throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
 
   std::cout << "\rTesting phi(x, a) 100%" << endl;
-#endif
 }
+
+#endif
 
 } // namespace
 
@@ -132,7 +134,9 @@ bool test()
 
   try
   {
+#ifdef _OPENMP
     test_phi_thread_safety(100);
+#endif
 
     CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22,  100);
     CHECK_EQUAL(pi_meissel,                   pi_legendre,        CHECK_22,  500);

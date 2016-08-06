@@ -36,12 +36,14 @@ int64_t P3(int64_t x, int64_t a, int threads)
 
   double time = get_wtime();
   vector<int32_t> primes = generate_primes(isqrt(x));
+
   int64_t y = iroot<3>(x);
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t sum = 0;
 
-  #pragma omp parallel for reduction(+: sum) schedule(dynamic) \
-      num_threads(ideal_num_threads(threads, pi_y, 100))
+  threads = ideal_num_threads(threads, pi_y, 100);
+
+  #pragma omp parallel for num_threads(threads) schedule(dynamic) reduction(+: sum)
   for (int64_t i = a + 1; i <= pi_y; i++)
   {
     int64_t xi = x / primes[i];
