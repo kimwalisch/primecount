@@ -1,7 +1,8 @@
-2016-08-05 Kim Walisch  <kim.walisch@gmail.com>
+2016-08-06 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.4 work in progress.
+  Version 3.4 released.
 
+  * Makfile.msvc: Use libdivide also with MSVC compiler.
   * S2LoadBalancer.cpp: Improved load balancing.
   * P2.cpp: Improved load balancing.
   * P2_mpi.cpp: Improved load balancing.
