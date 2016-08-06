@@ -64,7 +64,9 @@ using namespace std;
 
 namespace {
 
-int threads_ = -1;
+#ifdef _OPENMP
+  int threads_ = -1;
+#endif
 
 int status_precision_ = -1;
 
