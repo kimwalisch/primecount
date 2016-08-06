@@ -64,11 +64,7 @@ using namespace std;
 
 namespace {
 
-#ifdef _OPENMP
-  int threads_ = max(1, omp_get_max_threads());
-#else
-  int threads_ = 1;
-#endif
+int threads_ = -1;
 
 int status_precision_ = -1;
 
@@ -83,7 +79,7 @@ namespace primecount {
 
 int64_t pi(int64_t x)
 {
-  return pi(x, threads_);
+  return pi(x, get_num_threads());
 }
 
 int64_t pi(int64_t x, int threads)
@@ -98,7 +94,7 @@ int64_t pi(int64_t x, int threads)
 
 int128_t pi(int128_t x)
 {
-  return pi(x, threads_);
+  return pi(x, get_num_threads());
 }
 
 int128_t pi(int128_t x, int threads)
@@ -118,7 +114,7 @@ int128_t pi(int128_t x, int threads)
 ///
 string pi(const string& x)
 {
-  return pi(x, threads_);
+  return pi(x, get_num_threads());
 }
 
 /// Alias for the fastest prime counting function in primecount.
@@ -139,7 +135,7 @@ string pi(const string& x, int threads)
 ///
 int64_t pi_deleglise_rivat(int64_t x)
 {
-  return pi_deleglise_rivat(x, threads_);
+  return pi_deleglise_rivat(x, get_num_threads());
 }
 
 /// Calculate the number of primes below x using the
@@ -159,7 +155,7 @@ int64_t pi_deleglise_rivat(int64_t x, int threads)
 ///
 int128_t pi_deleglise_rivat(int128_t x)
 {
-  return pi_deleglise_rivat(x, threads_);
+  return pi_deleglise_rivat(x, get_num_threads());
 }
 
 /// Calculate the number of primes below x using the
@@ -182,7 +178,7 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
 ///
 int64_t pi_legendre(int64_t x)
 {
-  return pi_legendre(x, threads_);
+  return pi_legendre(x, get_num_threads());
 }
 
 /// Calculate the number of primes below x using Lehmer's formula.
@@ -190,7 +186,7 @@ int64_t pi_legendre(int64_t x)
 ///
 int64_t pi_lehmer(int64_t x)
 {
-  return pi_lehmer(x, threads_);
+  return pi_lehmer(x, get_num_threads());
 }
 
 /// Calculate the number of primes below x using the
@@ -199,7 +195,7 @@ int64_t pi_lehmer(int64_t x)
 ///
 int64_t pi_lmo(int64_t x)
 {
-  return pi_lmo(x, threads_);
+  return pi_lmo(x, get_num_threads());
 }
 
 /// Parallel implementation of the Lagarias-Miller-Odlyzko
@@ -216,7 +212,7 @@ int64_t pi_lmo(int64_t x, int threads)
 ///
 int64_t pi_meissel(int64_t x)
 {
-  return pi_meissel(x, threads_);
+  return pi_meissel(x, get_num_threads());
 }
 
 /// Calculate the number of primes below x using an optimized 
@@ -225,7 +221,7 @@ int64_t pi_meissel(int64_t x)
 ///
 int64_t pi_primesieve(int64_t x)
 {
-  return pi_primesieve(x, threads_);
+  return pi_primesieve(x, get_num_threads());
 }
 
 /// Calculate the nth prime using a combination of the prime
@@ -234,7 +230,7 @@ int64_t pi_primesieve(int64_t x)
 ///
 int64_t nth_prime(int64_t n)
 {
-  return nth_prime(n, threads_);
+  return nth_prime(n, get_num_threads());
 }
 
 /// Partial sieve function (a.k.a. Legendre-sum).
@@ -243,7 +239,7 @@ int64_t nth_prime(int64_t n)
 ///
 int64_t phi(int64_t x, int64_t a)
 {
-  return phi(x, a, threads_);
+  return phi(x, a, get_num_threads());
 }
 
 /// Returns the largest integer that can be used with
@@ -382,7 +378,14 @@ void set_num_threads(int threads)
 
 int get_num_threads()
 {
-  return threads_;
+#ifdef _OPENMP
+  if (threads_ != -1)
+    return threads_;
+  else
+    return max(1, omp_get_max_threads());
+#else
+  return 1;
+#endif
 }
 
 void set_status_precision(int precision)
