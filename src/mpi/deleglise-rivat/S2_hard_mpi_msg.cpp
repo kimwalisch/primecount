@@ -81,15 +81,15 @@ void S2_hard_mpi_msg::init_MPI_struct()
   int block_lengths[10] = { 1, 1, 1, 1, 1, 2, 1, 1, 1, 1 };
 
   MPI_Datatype types[10] = { MPI_INT,     // proc_id
-                            MPI_INT64_T, // low
-                            MPI_INT64_T, // high
-                            MPI_INT64_T, // segment_size
-                            MPI_INT64_T, // segments_per_thread
-                            MPI_INT64_T, // s2_hard
-                            MPI_DOUBLE,  // init_seconds
-                            MPI_DOUBLE,  // seconds
-                            MPI_DOUBLE,  // rsd
-                            MPI_INT };   // finished
+                             MPI_INT64_T, // low
+                             MPI_INT64_T, // high
+                             MPI_INT64_T, // segment_size
+                             MPI_INT64_T, // segments_per_thread
+                             MPI_INT64_T, // s2_hard
+                             MPI_DOUBLE,  // init_seconds
+                             MPI_DOUBLE,  // seconds
+                             MPI_DOUBLE,  // rsd
+                             MPI_INT };   // finished
   MPI_Aint offsets[10];
 
   offsets[0] = offsetof(MsgData, proc_id);
