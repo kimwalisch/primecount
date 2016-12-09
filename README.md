@@ -7,11 +7,9 @@ primecount-backup
 The primecount backup version saves intermediate results to a file once
 per hour (configurable using ```--backup[=N]```). If your computer crashes
 and you restart the same computation primecount will automatically resume
-from the backup files.
-
-The backup functionality works very well but the code is a little messy
-and not polished that is the reason why I have not merged it into the master
-branch.
+from the backup files. The backup functionality works very well but the
+code is a little messy and not polished that is the reason why I have not
+merged it into the master branch.
 
 Binaries
 --------
@@ -21,12 +19,6 @@ supports the POPCNT instruction.
 
 * <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-win64.zip">primecount-backup-2.6-win64.zip</a>, 446K
 * <a href="https://dl.bintray.com/kimwalisch/primecount/primecount-backup-2.6-linux-x64.tar.gz">primecount-backup-2.6-linux-x64.tar.gz</a>, 947K
-
-SHA1 checksums of the files:
-```sh
-36171138743b0511f2588a00c6cffbffd9e919fb  primecount-backup-2.6-win64.zip
-d89f35d2e37bd04d58007c7488ba162d2b3978a8  primecount-backup-2.6-linux-x64.tar.gz
-```
 
 Backup usage example
 --------------------
