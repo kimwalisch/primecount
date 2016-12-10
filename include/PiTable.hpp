@@ -40,7 +40,7 @@ public:
   int64_t operator[](uint64_t n) const
   {
     assert(n <= max_);
-    uint64_t bitmask = 0xffffffffffffffffll >> (63 - n % 64);
+    uint64_t bitmask = 0xffffffffffffffffull >> (63 - n % 64);
     return pi_[n / 64].prime_count + popcnt64(pi_[n / 64].bits & bitmask);
   }
 
