@@ -49,6 +49,14 @@ using namespace primecount;
 
 namespace {
 
+enum
+{
+  /// Cache phi(x, a) results if a <= MAX_A
+  MAX_A = 500,
+  /// Keep the cache size below MAX_BYTES per thread
+  MAX_BYTES = 16 << 20
+};
+
 class PhiCache
 {
 public:
@@ -129,15 +137,6 @@ public:
   }
 
 private:
-  enum
-  {
-    /// Cache phi(x, a) results if a <= MAX_A
-    MAX_A = 500,
-    /// Keep the cache size below MAX_BYTES per thread
-    MAX_BYTES = 16 << 20
-  };
-
-  /// Cache of phi(x, a) results
   vector<vector<uint16_t> > cache_;
   vector<int64_t>& primes_;
   PiTable& pi_;
