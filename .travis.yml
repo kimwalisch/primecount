@@ -12,32 +12,17 @@ env:
 before_install:
   - sudo apt-get update -qq
 
-# Install OpenMPI and libprimesieve
+# Install cmake, OpenMPI, cppcheck
 install:
-  - sudo apt-get install -y openmpi-bin libopenmpi-dev cppcheck
-  - rm -rf primesieve-master*
-  - curl -L -o primesieve-master.zip https://github.com/kimwalisch/primesieve/archive/master.zip
-  - unzip primesieve-master.zip
-  - cd primesieve-master
-  - ./autogen.sh
-  - ./configure
-  - make
-  - sudo make uninstall
-  - sudo make install
-  - cd ..
+  - sudo apt-get install -y cmake openmpi-bin libopenmpi-dev cppcheck
 
 # Test build.sh script
 before_script:
+  - ./build.sh -DWITH_MPI=ON
   - ./build.sh
   - ldd primecount
-  - make distclean
+  - cppcheck src include --error-exitcode=1 -i$(cd primesieve-*; basename $(pwd))
 
-# Test standard build procedure
+# Run primecount tests
 script:
-  - ./autogen.sh
-  - ./configure --enable-mpi --enable-assert CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-unknown-pragmas"
-  - make
-  - sudo make install
-  - make dist
-  - make distcheck
-  - cppcheck . --error-exitcode=1 -i$(cd primesieve-*; basename $(pwd))
+  - ./primecount --test

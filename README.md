@@ -286,15 +286,14 @@ GCC 5.2.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
-You need to have installed a C++ compiler and GNU make to build primecount.
+You need to have installed a C++ compiler, cmake and make to build primecount.
 
 Download
-[primecount-3.4.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.4.tar.gz)
+[primecount-master.zip](https://github.com/kimwalisch/primecount/archive/master.zip)
 and build it using:
 
 ```sh
 ./build.sh
-make check
 sudo make install
 ```
 
@@ -302,7 +301,7 @@ To build primecount using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
 support for distributing computations onto cluster nodes use:
 ```sh
-./build.sh --enable-mpi
+./build.sh -DWITH_MPI=ON
 ```
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.

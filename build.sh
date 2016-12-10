@@ -1,20 +1,10 @@
 #!/bin/sh
 
 # Usage: ./build.sh
-# Script which automates building primecount and libprimecount.
-#
-# What this script does:
-#
-# 1) Download primesieve library
-# 2) Build primesieve library using: ./configure && make
-# 3) Build primecount library using: ./configure && make
-#
-# Lots of hacks are needed because:
-#
-# 1) We want to build a static primecount binary.
-# 2) We build primecount without first installing libprimesieve.
+# Script which automates building primecount.
+# Prerequisites: cmake & make.
 
-CONFIGURE_OPTIONS="$@"
+BUILD_OPTIONS="$@"
 CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
 
 # Exit on any error
@@ -31,63 +21,15 @@ fi
 if [ ! -f primesieve*/.libs/libprimesieve.a ]
 then
     tar xvf primesieve-latest.tar.gz
-    cd primesieve-*
-    ./configure
+    mv primesieve-*/ primesieve-latest
+    cd primesieve-latest
+    ./configure --disable-shared
     make -j$CPU_CORES
     cd ..
 fi
 
-# Generate ./configure script, requires Autotools
-if [ ! -f ./configure ]
-then
-    ./autogen.sh
-fi
-
-# Patch ./configure script to continue even
-# if libprimesieve is not installed
-if [ "$(grep 'libprimesieve is missing' configure)" != "" ]
-then
-    sed '/libprimesieve is missing/c\
-    true;
-    ' configure > configure.tmp
-    mv -f configure.tmp configure
-    chmod +x configure
-fi
-
-# Generate Makefile using ./configure
-if [ ! -f ./Makefile ]
-then
-    ./configure $CONFIGURE_OPTIONS CXXFLAGS="-O2 -I$(echo primesieve-*/include)"
-fi
-
-# Patch Makefile to build primecount binary which links
-# statically against libprimecount and libprimesieve
-if [ "$(grep libprimesieve.a Makefile)" = "" ]
-then
-    sed 's/-lprimesieve//g' Makefile > Makefile.tmp
-    mv -f Makefile.tmp Makefile
-
-    sed '/primecount_DEPENDENCIES = libprimecount.la/c\
-    primecount_DEPENDENCIES = libprimecount.la primesieve-*/.libs/libprimesieve.a
-    ' Makefile > Makefile.tmp
-    mv -f Makefile.tmp Makefile
-
-    sed '/primecount_LDADD = libprimecount.la/c\
-    primecount_LDADD = $(OPENMP_CXXFLAGS) .libs/libprimecount.a primesieve-*/.libs/libprimesieve.a
-    ' Makefile > Makefile.tmp
-    mv -f Makefile.tmp Makefile
-
-    chmod +x Makefile
-fi
-
-if [ "$(uname 2>/dev/null | egrep -i 'windows|cygwin|mingw|msys')" != "" ]
-then
-    # Windows: build only static library
-    make libprimecount.la LDFLAGS="-static" -j$CPU_CORES
-else
-    # Other OSes: build static and shared library
-    make libprimecount.la -j$CPU_CORES
-fi
+# Generate Makefile
+cmake "$BUILD_OPTIONS" .
 
 # Build statically linked primecount binary
-make primecount$(grep 'EXEEXT =' Makefile | cut -f3 -d' ') LDFLAGS="-static" -j$CPU_CORES
+make -j$CPU_CORES
