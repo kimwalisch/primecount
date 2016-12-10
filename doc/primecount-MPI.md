@@ -21,14 +21,14 @@ Build instructions (Unix-like OSes)
 
 First install the prerequisites:
 ```sh
-sudo apt-get install g++ make libopenmpi-dev openmpi-bin
+sudo apt-get install g++ make cmake libopenmpi-dev openmpi-bin
 ```
 
 Then download
-[primecount-3.4.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.4.tar.gz)
-and build it:
+[primecount-master.zip](https://github.com/kimwalisch/primecount/archive/master.zip)
+and build it using:
 ```sh
-./build.sh --enable-mpi
+./build.sh -DWITH_MPI=ON
 ```
 
 Usage example
