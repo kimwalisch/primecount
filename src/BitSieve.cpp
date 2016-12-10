@@ -16,7 +16,7 @@
 #endif
 
 #include <BitSieve.hpp>
-#include <popcount.hpp>
+#include <popcnt.hpp>
 #include <pmath.hpp>
 
 #include <stdint.h>
@@ -174,12 +174,12 @@ uint64_t BitSieve::count(uint64_t start,
   uint64_t bit_count;
 
   if (start_idx == stop_idx)
-    bit_count = popcount_u64(sieve_[start_idx] & (m1 & m2));
+    bit_count = popcnt64(sieve_[start_idx] & (m1 & m2));
   else
   {
-    bit_count = popcount_u64(sieve_[start_idx] & m1);
-    bit_count += popcount_u64(&sieve_[start_idx + 1], stop_idx - (start_idx + 1));
-    bit_count += popcount_u64(sieve_[stop_idx] & m2);
+    bit_count = popcnt64(sieve_[start_idx] & m1);
+    bit_count += popcnt64(&sieve_[start_idx + 1], stop_idx - (start_idx + 1));
+    bit_count += popcnt64(sieve_[stop_idx] & m2);
   }
 
   return bit_count;
