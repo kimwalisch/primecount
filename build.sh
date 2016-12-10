@@ -31,5 +31,5 @@ fi
 # Generate Makefile
 cmake "$BUILD_OPTIONS" .
 
-# Build statically linked primecount binary
+# Build primecount
 make -j$CPU_CORES
