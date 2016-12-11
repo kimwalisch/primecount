@@ -40,7 +40,7 @@ inline uint64_t popcnt64(uint64_t x)
 }
 
 #elif __has_builtin(__builtin_popcount) || \
-      (defined(__GUNC__) && \
+      (defined(__GNUC__) && \
        defined(__i386__))
 
 inline uint64_t popcnt64(uint64_t x)
@@ -50,7 +50,7 @@ inline uint64_t popcnt64(uint64_t x)
 }
 
 #elif __has_builtin(__builtin_popcountll) || \
-      defined(__GUNC__)
+      defined(__GNUC__)
 
 inline uint64_t popcnt64(uint64_t x)
 {
