@@ -11,6 +11,11 @@ include(CheckCXXCompilerFlag)
 include(CheckCXXSourceRuns)
 include(CheckTypeSize)
 
+# Build options ######################################################
+
+option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
+option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
+
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/cmdoptions.cpp
@@ -57,9 +62,7 @@ set(LIB_SRC src/BitSieve.cpp
 
 # Check for MPI (Message Passing Interface) ##########################
 
-option(WITH_MPI "Enable MPI (Message Passing Interface)" OFF)
-
-if(WITH_MPI)
+if(ENABLE_MPI)
     find_package(MPI REQUIRED)
     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
@@ -83,9 +86,11 @@ endif()
 
 # Check for -mpopcnt compiler option #################################
 
-CHECK_CXX_COMPILER_FLAG("-mpopcnt" COMPILER_SUPPORTS_POPCNT)
-if(COMPILER_SUPPORTS_POPCNT)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+if(ENABLE_POPCNT)
+    CHECK_CXX_COMPILER_FLAG("-mpopcnt" MPOPCNT_FLAG)
+    if(MPOPCNT_FLAG)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+    endif()
 endif()
 
 # Check for __int128_t ###############################################
@@ -137,12 +142,12 @@ check_cxx_source_runs("
 
 if(HAVE_LIBDIVIDE)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    if(WITH_MPI)
+    if(ENABLE_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    if(WITH_MPI)
+    if(ENABLE_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
     endif()
 endif()
