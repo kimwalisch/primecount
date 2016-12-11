@@ -49,13 +49,11 @@ using namespace primecount;
 
 namespace {
 
-enum
-{
-  /// Cache phi(x, a) results if a <= MAX_A
-  MAX_A = 500,
-  /// Keep the cache size below MAX_BYTES per thread
-  MAX_BYTES = 16 << 20
-};
+/// Cache phi(x, a) results if a <= MAX_A
+const int MAX_A = 500;
+
+/// Keep the cache size below MAX_BYTES per thread
+const int MAX_BYTES = 16 << 20;
 
 class PhiCache
 {
