@@ -158,6 +158,7 @@ add_library(shared_libprimecount SHARED ${LIB_SRC})
 set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
 set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
 set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
+install(TARGETS shared_libprimecount DESTINATION lib)
 
 if(APPLE)
     set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
@@ -173,5 +174,5 @@ target_link_libraries(primecount static_libprimecount
 # Install primecount #################################################
 
 install(TARGETS primecount DESTINATION bin)
-install(TARGETS shared_libprimecount DESTINATION lib)
+install(TARGETS static_libprimecount DESTINATION lib)
 install(FILES include/primecount.hpp DESTINATION include)
