@@ -301,7 +301,7 @@ To build primecount using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
 support for distributing computations onto cluster nodes use:
 ```sh
-./build.sh -DWITH_MPI=ON
+./build.sh -DENABLE_MPI=ON
 ```
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.

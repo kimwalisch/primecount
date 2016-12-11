@@ -28,7 +28,7 @@ Then download
 [primecount-master.zip](https://github.com/kimwalisch/primecount/archive/master.zip)
 and build it using:
 ```sh
-./build.sh -DWITH_MPI=ON
+./build.sh -DENABLE_MPI=ON
 ```
 
 Usage example

@@ -18,7 +18,7 @@ install:
 
 # Test build.sh script
 before_script:
-  - ./build.sh -DWITH_MPI=ON
+  - ./build.sh -DENABLE_MPI=ON
   - ./build.sh
   - ldd primecount
   - cppcheck src include --error-exitcode=1 -i$(cd primesieve-*; basename $(pwd))
