@@ -6,6 +6,7 @@
 
 CMAKE_OPTIONS="$@"
 CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
+MINGW=$(uname 2>/dev/null | grep -i MinGW)
 
 # Exit on any error
 set -e
@@ -28,10 +29,9 @@ then
     cd ..
 fi
 
-# MinGW/MSYS (Windows) requires special cmake command
-uname 2>/dev/null | grep -i MinGW >/dev/null
-if [ $? -eq 0 ];
+if [ ! -z "$MINGW" ]
 then
+    # MinGW/MSYS (Windows) requires special cmake command
     cmake -G "MSYS Makefiles" "$CMAKE_OPTIONS" .
     make -j$CPU_CORES
     exit 0
