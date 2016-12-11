@@ -2,9 +2,9 @@
 
 # Usage: ./build.sh
 # Script which automates building primecount.
-# Prerequisites: cmake & make.
+# Prerequisites: make & cmake.
 
-BUILD_OPTIONS="$@"
+CMAKE_OPTIONS="$@"
 CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
 
 # Exit on any error
@@ -28,8 +28,17 @@ then
     cd ..
 fi
 
+# MinGW/MSYS (Windows) requires special cmake command
+uname 2>/dev/null | grep -i MinGW >/dev/null
+if [ $? -eq 0 ];
+then
+    cmake -G "MSYS Makefiles" "$CMAKE_OPTIONS" .
+    make -j$CPU_CORES
+    exit 0
+fi
+
 # Generate Makefile
-cmake "$BUILD_OPTIONS" .
+cmake "$CMAKE_OPTIONS" .
 
 # Build primecount
 make -j$CPU_CORES
