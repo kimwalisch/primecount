@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.4)
 project(primecount)
 set(LIBPRIMECOUNT_VERSION "1.0.0")
 set(LIBPRIMECOUNT_SOVERSION 1)
@@ -154,15 +154,17 @@ set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
 
 # Build shared library ###############################################
 
-add_library(shared_libprimecount SHARED ${LIB_SRC})
-set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
-set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
-set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
-install(TARGETS shared_libprimecount DESTINATION lib)
+if(NOT (WIN32 OR MINGW OR CYGWIN))
+    add_library(shared_libprimecount SHARED ${LIB_SRC})
+    set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
+    set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
+    set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
+    install(TARGETS shared_libprimecount DESTINATION lib)
 
-if(APPLE)
-    set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
+    if(APPLE)
+        set(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -undefined dynamic_lookup")
+    endif()
+endif()
 
 # Build binary #######################################################
 
