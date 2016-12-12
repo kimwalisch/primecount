@@ -87,16 +87,15 @@ endif()
 # Check for -mpopcnt compiler option #################################
 
 if(ENABLE_POPCNT)
-    CHECK_CXX_COMPILER_FLAG("-mpopcnt" MPOPCNT_FLAG)
+    CHECK_CXX_COMPILER_FLAG(-mpopcnt MPOPCNT_FLAG)
     if(MPOPCNT_FLAG)
-        list(APPEND CMAKE_CXX_FLAGS -mpopcnt)
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -mpopcnt)
     endif()
 endif()
 
 # Check for __int128_t ###############################################
 
 check_type_size("__int128_t" INT128_T)
-
 if(${INT128_T})
     add_definitions(-DHAVE___INT128_T)
     list(APPEND LIB_SRC src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp)
@@ -141,14 +140,14 @@ check_cxx_source_runs("
 # Include S2_easy* source files ######################################
 
 if(HAVE_LIBDIVIDE)
-    list(APPEND LIB_SRC src/deleglise-rivat/S2_easy_libdivide.cpp)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(ENABLE_MPI)
-        list(APPEND LIB_SRC src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
-    list(APPEND LIB_SRC src/deleglise-rivat/S2_easy.cpp)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(ENABLE_MPI)
-        list(APPEND LIB_SRC src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
     endif()
 endif()
 
