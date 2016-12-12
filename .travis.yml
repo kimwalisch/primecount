@@ -7,6 +7,7 @@ compiler:
 
 env:
   global:
+    - CXXFLAGS="-pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-unknown-pragmas"
     - OMP_NUM_THREADS=4
 
 before_install:
@@ -18,7 +19,6 @@ install:
 
 # Test build.sh script
 before_script:
-  - export CXXFLAGS="-pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-unknown-pragmas
   - ./build.sh -DENABLE_MPI=ON
   - ./build.sh
   - ldd primecount
