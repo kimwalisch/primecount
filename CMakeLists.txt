@@ -153,8 +153,11 @@ endif()
 
 # Find primesieve library ############################################
 
-find_library(LIBPRIMESIEVE NAMES libprimesieve.a primesieve
-                           PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
+find_library(STATIC_LIBPRIMESIEVE NAMES libprimesieve.a
+                                  PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
+
+find_library(SHARED_LIBPRIMESIEVE NAMES primesieve
+                                  PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
 
 # Build static library ###############################################
 
@@ -168,7 +171,7 @@ if(NOT (WIN32 OR MINGW OR CYGWIN))
     set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
     set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
-    target_link_libraries(shared_libprimecount ${LIBPRIMESIEVE})
+    target_link_libraries(shared_libprimecount ${SHARED_LIBPRIMESIEVE})
     install(TARGETS shared_libprimecount DESTINATION lib)
 endif()
 
@@ -176,7 +179,7 @@ endif()
 
 add_executable(primecount ${BIN_SRC})
 target_link_libraries(primecount static_libprimecount
-                                 ${LIBPRIMESIEVE}
+                                 ${STATIC_LIBPRIMESIEVE}
                                  ${MPI_CXX_LIBRARIES})
 
 # Install primecount #################################################

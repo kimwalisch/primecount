@@ -24,7 +24,7 @@ then
     tar xvf primesieve-latest.tar.gz
     mv primesieve-*/ primesieve-latest
     cd primesieve-latest
-    ./configure --disable-shared
+    ./configure
     make -j$CPU_CORES
     cd ..
 fi
