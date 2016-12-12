@@ -9,7 +9,6 @@ set(CMAKE_BUILD_TYPE Release)
 
 option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
 option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Include Check* #####################################################
 
@@ -160,7 +159,7 @@ set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
 
 # Build shared library ###############################################
 
-if(BUILD_SHARED_LIBS)
+if(NOT (WIN32 OR MINGW OR CYGWIN))
     add_library(shared_libprimecount SHARED ${LIB_SRC})
     set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
