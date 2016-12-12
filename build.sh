@@ -1,8 +1,9 @@
 #!/bin/sh
 
 # Usage: ./build.sh
-# Script which automates building primecount.
 # Prerequisites: make & cmake.
+# This script downloads and builds the primesieve library and
+# afterwards builds primecount using cmake & make.
 
 CMAKE_OPTIONS="$@"
 CPU_CORES=$(nproc --all 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 8)
