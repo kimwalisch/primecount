@@ -89,7 +89,7 @@ endif()
 if(ENABLE_POPCNT)
     CHECK_CXX_COMPILER_FLAG(-mpopcnt MPOPCNT_FLAG)
     if(MPOPCNT_FLAG)
-        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -mpopcnt)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()
 endif()
 
