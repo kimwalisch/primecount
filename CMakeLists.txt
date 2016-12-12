@@ -173,8 +173,10 @@ endif()
 # Build binary #######################################################
 
 add_executable(primecount ${BIN_SRC})
+find_library(LIBPRIMESIEVE NAMES libprimesieve.a primesieve
+                           PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
 target_link_libraries(primecount static_libprimecount
-                                 ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs/libprimesieve.a
+                                 ${LIBPRIMESIEVE}
                                  ${MPI_CXX_LIBRARIES})
 
 # Install primecount #################################################
