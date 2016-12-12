@@ -349,7 +349,6 @@ T S2_hard_OpenMP_master(int64_t low,
   int64_t old_high = high;
 
   double alpha = get_alpha(x, y);
-  S2Status status(x);
   S2LoadBalancer loadBalancer(x, y, z, threads, rsd);
   int64_t min_segment_size = loadBalancer.get_min_segment_size();
 
