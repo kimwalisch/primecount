@@ -1,20 +1,21 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.0)
 project(primecount)
 set(LIBPRIMECOUNT_VERSION "1.0.0")
 set(LIBPRIMECOUNT_SOVERSION 1)
 include_directories(include primesieve-latest/include)
 set(CMAKE_BUILD_TYPE Release)
 
-# Include cmake Checks* ##############################################
-
-include(CheckCXXCompilerFlag)
-include(CheckCXXSourceRuns)
-include(CheckTypeSize)
-
 # Build options ######################################################
 
 option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
 option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+# Include Check* #####################################################
+
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceRuns)
+include(CheckTypeSize)
 
 # primecount binary source files #####################################
 
@@ -67,7 +68,7 @@ if(ENABLE_MPI)
     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
     include_directories(${MPI_INCLUDE_PATH})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_MPI")
+    add_definitions(-DHAVE_MPI)
 
     set(LIB_SRC ${LIB_SRC} src/mpi/P2_mpi.cpp
                            src/mpi/deleglise-rivat
@@ -81,7 +82,7 @@ endif()
 
 find_package(OpenMP QUIET)
 if (OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS})
 endif()
 
 # Check for -mpopcnt compiler option #################################
@@ -89,7 +90,7 @@ endif()
 if(ENABLE_POPCNT)
     CHECK_CXX_COMPILER_FLAG("-mpopcnt" MPOPCNT_FLAG)
     if(MPOPCNT_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+        list(APPEND CMAKE_CXX_FLAGS -mpopcnt)
     endif()
 endif()
 
@@ -98,8 +99,8 @@ endif()
 check_type_size("__int128_t" INT128_T)
 
 if(${INT128_T})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE___INT128_T")
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp)
+    add_definitions(-DHAVE___INT128_T)
+    list(APPEND LIB_SRC src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp)
 endif()
 
 # Check if libdivide works ###########################################
@@ -141,14 +142,14 @@ check_cxx_source_runs("
 # Include S2_easy* source files ######################################
 
 if(HAVE_LIBDIVIDE)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+    list(APPEND LIB_SRC src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(ENABLE_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
+        list(APPEND LIB_SRC src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+    list(APPEND LIB_SRC src/deleglise-rivat/S2_easy.cpp)
     if(ENABLE_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
+        list(APPEND LIB_SRC src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
     endif()
 endif()
 
@@ -159,7 +160,7 @@ set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
 
 # Build shared library ###############################################
 
-if(NOT (WIN32 OR MINGW OR CYGWIN))
+if(BUILD_SHARED_LIBS)
     add_library(shared_libprimecount SHARED ${LIB_SRC})
     set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
