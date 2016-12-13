@@ -13,7 +13,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <min_max.hpp>
 #include <pmath.hpp>
 

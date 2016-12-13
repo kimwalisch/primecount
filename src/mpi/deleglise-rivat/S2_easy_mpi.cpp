@@ -13,7 +13,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <min_max.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>

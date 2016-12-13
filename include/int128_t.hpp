@@ -1,5 +1,5 @@
 ///
-/// @file   int128.hpp
+/// @file   int128_t.hpp
 /// @brief  Additional integer types used in primecount:
 ///         int128_t, uint128_t, intfast64_t, intfast128_t, maxint_t,
 ///         maxuint_t.
@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef INTTYPES_HPP
-#define INTTYPES_HPP
+#ifndef INT128_T_HPP
+#define INT128_T_HPP
 
 #include <limits>
 #include <stdint.h>
@@ -204,4 +204,4 @@ struct is_signed
 } // namespace prt
 } // namespace primecount
 
-#endif /* INTTYPES_HPP */
+#endif /* INT128_T_HPP */

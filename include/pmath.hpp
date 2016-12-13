@@ -11,7 +11,7 @@
 #ifndef PMATH_HPP
 #define PMATH_HPP
 
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <isqrt.hpp>
 
 #include <stdint.h>

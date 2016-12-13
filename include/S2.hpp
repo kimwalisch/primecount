@@ -11,7 +11,7 @@
 #ifndef S2_HPP
 #define S2_HPP
 
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <stdint.h>
 
 namespace primecount {

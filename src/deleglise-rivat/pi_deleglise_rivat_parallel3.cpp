@@ -14,7 +14,7 @@
 #include <primecount-internal.hpp>
 #include <pmath.hpp>
 #include <PhiTiny.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <S1.hpp>
 #include <S2.hpp>
 

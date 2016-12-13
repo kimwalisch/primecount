@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <stdint.h>
 
 namespace primecount {

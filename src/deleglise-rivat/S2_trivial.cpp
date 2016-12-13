@@ -14,7 +14,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <generate.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <algorithm>

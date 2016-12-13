@@ -13,7 +13,7 @@
 
 #include <cstddef>
 #include <mpi.h>
-#include <int128.hpp>
+#include <int128_t.hpp>
 
 #ifndef MPI_INT64_T
   #define MPI_INT64_T MPI_LONG_LONG

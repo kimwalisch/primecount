@@ -15,7 +15,7 @@
 #ifndef FAST_DIV_HPP
 #define FAST_DIV_HPP
 
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <cassert>
 #include <limits>
 

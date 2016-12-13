@@ -11,7 +11,7 @@
 
 #include "cmdoptions.hpp"
 #include <primecount-internal.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <vector>

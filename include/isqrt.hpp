@@ -11,7 +11,7 @@
 #ifndef ISQRT_HPP
 #define ISQRT_HPP
 
-#include <int128.hpp>
+#include <int128_t.hpp>
 
 #include <algorithm>
 #include <cmath>

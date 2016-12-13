@@ -11,7 +11,7 @@
 #define S2LOADBALANCER_HPP
 
 #include <aligned_vector.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 

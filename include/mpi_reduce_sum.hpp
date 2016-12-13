@@ -12,7 +12,7 @@
 #define MPI_REDUCE_SUM_HPP
 
 #include <mpi.h>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <cassert>
 
 #ifndef MPI_INT64_T

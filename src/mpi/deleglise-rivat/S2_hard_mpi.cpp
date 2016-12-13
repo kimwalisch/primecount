@@ -19,7 +19,7 @@
 #include <BitSieve.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <min_max.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <pmath.hpp>

@@ -14,7 +14,7 @@
 
 #include <mpi.h>
 #include <S2_hard_mpi_msg.hpp>
-#include <int128.hpp>
+#include <int128_t.hpp>
 #include <cassert>
 
 namespace primecount {
