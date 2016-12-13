@@ -166,14 +166,12 @@ set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
 
 # Build shared library ###############################################
 
-if(NOT (WIN32 OR MINGW OR CYGWIN))
-    add_library(shared_libprimecount SHARED ${LIB_SRC})
-    set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
-    set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
-    set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
-    target_link_libraries(shared_libprimecount ${SHARED_LIBPRIMESIEVE} ${MPI_CXX_LIBRARIES})
-    install(TARGETS shared_libprimecount DESTINATION lib)
-endif()
+add_library(shared_libprimecount SHARED ${LIB_SRC})
+set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
+set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
+set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
+target_link_libraries(shared_libprimecount ${SHARED_LIBPRIMESIEVE} ${MPI_CXX_LIBRARIES})
+install(TARGETS shared_libprimecount DESTINATION lib)
 
 # Build binary #######################################################
 
