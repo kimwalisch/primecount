@@ -31,6 +31,12 @@ typedef uint128_t maxuint_t;
 
 #elif defined(HAVE___INT128_T)
 
+/// The __int128_t type (GCC/Clang) is not well supported by the C++
+/// standard library (in 2016) so we have to define some functions
+/// ourselves. We also define typedefs so we can use int128_t
+/// instead of __int128_t. Once this is done int128_t can be used
+/// like a regular integer type e.g. int64_t.
+///
 #define HAVE_INT128_T
 
 #include <ostream>
@@ -152,7 +158,7 @@ struct numeric_limits<uint128_t>
 template <typename T>
 struct make_signed
 {
-#ifndef HAVE_INT128_T
+#if !defined(HAVE_INT128_T)
   typedef typename std::make_signed<T>::type type;
 #else
   typedef typename std::conditional<std::is_same<T, uint8_t>::value, int8_t,
@@ -169,7 +175,7 @@ struct is_integral
 {
   enum
   {
-#ifndef HAVE_INT128_T
+#if !defined(HAVE_INT128_T)
     value = std::is_integral<T>::value
 #else
     value = std::is_integral<T>::value ||
@@ -184,7 +190,7 @@ struct is_signed
 {
   enum
   {
-#ifndef HAVE_INT128_T
+#if !defined(HAVE_INT128_T)
     value = std::is_signed<T>::value
 #else
     value = std::is_signed<T>::value ||
