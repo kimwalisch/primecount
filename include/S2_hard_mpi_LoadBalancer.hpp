@@ -23,9 +23,7 @@ class S2_hard_mpi_LoadBalancer
 {
 public:
   S2_hard_mpi_LoadBalancer(int64_t high,
-                           int64_t y,
-                           int64_t z,
-                           int slave_procs);
+                           int64_t z);
 
   void update(S2_hard_mpi_msg* msg, double percent);
   bool finished() const;
@@ -35,9 +33,7 @@ private:
 
   int64_t low_;
   int64_t high_;
-  int64_t y_;
   int64_t z_;
-  int slave_procs_;
   int64_t max_finished_;
   int64_t segment_size_;
   int64_t segments_per_thread_;

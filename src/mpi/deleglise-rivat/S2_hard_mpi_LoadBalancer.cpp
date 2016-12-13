@@ -20,15 +20,10 @@ using namespace std;
 
 namespace primecount {
 
-S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t high,
-                                                   int64_t y,
-                                                   int64_t z,
-                                                   int slave_procs) :
+S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t high, int64_t z) :
   low_(0),
   high_(high),
-  y_(y),
   z_(z),
-  slave_procs_(slave_procs),
   max_finished_(0),
   segment_size_(isqrt(z)),
   segments_per_thread_(1),

@@ -491,7 +491,7 @@ T S2_hard_mpi_master(T x,
   S2LoadBalancer s2lb(x, y, z, threads);
   int64_t segment_size = s2lb.get_min_segment_size();
   int64_t high = start_mpi_slave_procs(z, segment_size, slave_procs);
-  S2_hard_mpi_LoadBalancer balancer(high, y, z, slave_procs);
+  S2_hard_mpi_LoadBalancer balancer(high, z);
   S2Status status(x);
 
   // main process scheduling loop
