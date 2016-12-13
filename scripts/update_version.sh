@@ -1,11 +1,10 @@
 #!/bin/sh
 
-if [ $# -ne 2 ]
+if [ $# -ne 1 ]
 then
     echo "Usage example:"
-    echo "$ ./update_version.sh 1.2.3"
-    echo "Updates the primecount version to 1.2.3 in all files"
-
+    echo "$ ./update_version.sh 3.5"
+    echo "Update the primecount version to 3.5 in all files"
     exit 1
 fi
 
@@ -15,25 +14,24 @@ test -e ../src && cd ..
 new_version=$1
 old_version=$(grep "PRIMECOUNT_VERSION " include/primecount.hpp | cut -f2 -d'"')
 
-new_major=$(echo $new_version | cut -f1 -d'.')
-new_minor=$(echo $new_version | cut -f2 -d'.')
-
 old_major=$(echo $old_version | cut -f1 -d'.')
 old_minor=$(echo $old_version | cut -f2 -d'.')
 
-new_year=$(date +'%Y')
-old_year=$(grep "Copyright (c)" COPYING | cut -f5 -d' ' | cut -f1 -d',')
+new_major=$(echo $new_version | cut -f1 -d'.')
+new_minor=$(echo $new_version | cut -f2 -d'.')
 
-echo "New version: $new_version"
+old_year=$(grep "Copyright (c)" COPYING | cut -f5 -d' ' | cut -f1 -d',')
+new_year=$(date +'%Y')
+
 echo "Old version: $old_version"
+echo "New version: $new_version"
 echo ""
-echo "New year: $new_year"
 echo "Old year: $old_year"
+echo "New year: $new_year"
 echo ""
 
 # Update version
-for i in $(echo README.md \
-                doc/primecount-MPI.md \
+for i in $(echo README.md \ \
                 include/primecount.hpp)
 do
     echo "Update version in $i"
@@ -59,4 +57,5 @@ do
     mv -f $i.tmp $i
 done
 
+echo ""
 echo "Version has been updated!"
