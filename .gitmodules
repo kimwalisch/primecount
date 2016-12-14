@@ -1,3 +1,0 @@
-[submodule "src/primesieve"]
-	path = src/primesieve
-	url = https://github.com/kimwalisch/primesieve
