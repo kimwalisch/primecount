@@ -8,14 +8,8 @@
 *.obj
 *.lib
 *.o
-*.lo
-*.la
 /primecount*
 /libprimecount*
-/primesieve*
-/include/primesieve*
-/bin/*
-/lib/*
 Makefile
 CMakeCache.txt
 CMakeFiles
