@@ -19,8 +19,8 @@ install:
 
 # Test build.sh script
 before_script:
-  - ./build.sh -DENABLE_MPI=ON
-  - ./build.sh
+  - cmake . -DENABLE_MPI=ON
+  - cmake .
   - ldd primecount
   - cppcheck src include --error-exitcode=1 -i$(cd primesieve-*; basename $(pwd))
 
