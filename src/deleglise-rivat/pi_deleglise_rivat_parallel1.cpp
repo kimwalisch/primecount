@@ -22,7 +22,7 @@
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <S2LoadBalancer.hpp>
 #include <tos_counters.hpp>

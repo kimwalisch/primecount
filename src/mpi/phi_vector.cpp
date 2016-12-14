@@ -31,7 +31,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primecount.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <min_max.hpp>
 

@@ -14,7 +14,7 @@
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <vector>

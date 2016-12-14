@@ -13,7 +13,7 @@
 #ifndef WHEEL_HPP
 #define WHEEL_HPP
 
-#include <pmath.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <vector>

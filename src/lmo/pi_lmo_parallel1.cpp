@@ -13,7 +13,7 @@
 #include <primecount-internal.hpp>
 #include <aligned_vector.hpp>
 #include <generate.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <tos_counters.hpp>

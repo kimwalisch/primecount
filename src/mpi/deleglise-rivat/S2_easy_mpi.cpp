@@ -16,7 +16,7 @@
 #include <int128_t.hpp>
 #include <min_max.hpp>
 #include <mpi_reduce_sum.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <S2Status.hpp>
 #include <fast_div.hpp>
 

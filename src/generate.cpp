@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>

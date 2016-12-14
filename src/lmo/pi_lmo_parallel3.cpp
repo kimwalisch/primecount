@@ -17,7 +17,7 @@
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <S2LoadBalancer.hpp>

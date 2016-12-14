@@ -22,7 +22,7 @@
 #include <int128_t.hpp>
 #include <min_max.hpp>
 #include <mpi_reduce_sum.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 #include <S2_hard_mpi_msg.hpp>
 #include <S2_hard_mpi_LoadBalancer.hpp>
 #include <S2LoadBalancer.hpp>

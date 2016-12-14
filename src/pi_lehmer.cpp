@@ -8,7 +8,7 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <pmath.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <iostream>

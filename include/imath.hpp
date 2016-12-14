@@ -1,5 +1,5 @@
 ///
-/// @file  pmath.hpp
+/// @file  imath.hpp
 /// @brief Integer math functions used in primecount.
 ///
 /// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
@@ -8,8 +8,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PMATH_HPP
-#define PMATH_HPP
+#ifndef IMATH_HPP
+#define IMATH_HPP
 
 #include <int128_t.hpp>
 #include <isqrt.hpp>
