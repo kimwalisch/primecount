@@ -284,8 +284,8 @@ The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
 2015 using a Linux x64 operating system and primecount was compiled using
 GCC 5.2.
 
-Build instructions (Unix-like OSes)
------------------------------------
+Build instructions
+------------------
 You need to have installed a C++ compiler, cmake and make to build primecount.
 
 Download
@@ -293,7 +293,8 @@ Download
 and build it using:
 
 ```sh
-./build.sh
+cmake .
+make -j8
 sudo make install
 ```
 
@@ -301,17 +302,10 @@ To build primecount using
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
 support for distributing computations onto cluster nodes use:
 ```sh
-./build.sh -DENABLE_MPI=ON
+cmake -DENABLE_MPI=ON .
 ```
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.
-
-Build instructions (Microsoft Visual C++)
------------------------------------------
-Open a Visual Studio Command Prompt and run:
-```sh
-nmake -f Makefile.msvc
-```
 
 C++ API
 -------
