@@ -314,6 +314,8 @@ Below are the main functions declared in
 All functions are multi-threaded by default.
 
 ```C++
+#include <primecount.hpp>
+
 /// Count the primes <= x
 int64_t primecount::pi(int64_t x);
 
