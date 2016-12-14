@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: primesieve
+Description: Fast C/C++ prime number generator
+Version: @VERSION@
+Libs: -L${libdir} -lprimesieve
+Libs.private: @OPENMP_CXXFLAGS@
+Cflags: -I${includedir}
