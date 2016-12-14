@@ -18,9 +18,8 @@ before_build:
   "\"C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Bin\\SetEnv.cmd\" /%platform%"
 
 build_script:
-  # Build using highest warning level on x64
-  - if "%platform%" == "x64" sed -i 's#/W2#/W3 /WX#' Makefile.msvc
-  - nmake /f Makefile.msvc
+  - cmake -G "NMake Makefiles" .
+  - nmake
 
 test_script:
-  - nmake /f Makefile.msvc check
+  - primecount.exe --test
