@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 project(primecount)
 set(LIBPRIMECOUNT_VERSION "1.0.0")
 set(LIBPRIMECOUNT_SOVERSION 1)
-include_directories(include primesieve-latest/include)
+include_directories(include src/primesieve/include)
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
@@ -60,6 +60,27 @@ set(LIB_SRC src/BitSieve.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
 
+# primesieve library source files ####################################
+
+set(PRIMESIEVE_PATH src/primesieve/src/primesieve)
+
+set(LIB_SRC ${LIB_SRC}
+            ${PRIMESIEVE_PATH}/EratBig.cpp
+            ${PRIMESIEVE_PATH}/EratMedium.cpp
+            ${PRIMESIEVE_PATH}/EratSmall.cpp
+            ${PRIMESIEVE_PATH}/ParallelPrimeSieve.cpp
+            ${PRIMESIEVE_PATH}/PreSieve.cpp
+            ${PRIMESIEVE_PATH}/PrimeFinder.cpp
+            ${PRIMESIEVE_PATH}/PrimeGenerator.cpp
+            ${PRIMESIEVE_PATH}/PrimeSieve-nthPrime.cpp
+            ${PRIMESIEVE_PATH}/PrimeSieve.cpp
+            ${PRIMESIEVE_PATH}/SieveOfEratosthenes.cpp
+            ${PRIMESIEVE_PATH}/WheelFactorization.cpp
+            ${PRIMESIEVE_PATH}/iterator.cpp
+            ${PRIMESIEVE_PATH}/popcount.cpp
+            ${PRIMESIEVE_PATH}/primesieve-api.cpp
+            ${PRIMESIEVE_PATH}/primesieve_test.cpp)
+
 # Check for MPI (Message Passing Interface) ##########################
 
 if(ENABLE_MPI)
@@ -69,12 +90,13 @@ if(ENABLE_MPI)
     include_directories(${MPI_INCLUDE_PATH})
     add_definitions(-DHAVE_MPI)
 
-    set(LIB_SRC ${LIB_SRC} src/mpi/P2_mpi.cpp
-                           src/mpi/deleglise-rivat
-                           src/mpi/phi_vector.cpp
-                           src/mpi/deleglise-rivat/S2_hard_mpi.cpp
-                           src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
-                           src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp)
+    set(LIB_SRC ${LIB_SRC}
+                src/mpi/P2_mpi.cpp
+                src/mpi/deleglise-rivat
+                src/mpi/phi_vector.cpp
+                src/mpi/deleglise-rivat/S2_hard_mpi.cpp
+                src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
+                src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp)
 endif()
 
 # Check for OpenMP ###################################################
@@ -157,14 +179,6 @@ else()
     endif()
 endif()
 
-# Find primesieve library ############################################
-
-find_library(STATIC_LIBPRIMESIEVE NAMES libprimesieve.a
-                                  PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
-
-find_library(SHARED_LIBPRIMESIEVE NAMES primesieve
-                                  PATHS ${CMAKE_SOURCE_DIR}/primesieve-latest/.libs)
-
 # Build static library ###############################################
 
 add_library(static_libprimecount STATIC ${LIB_SRC})
@@ -176,18 +190,16 @@ add_library(shared_libprimecount SHARED ${LIB_SRC})
 set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
 set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
 set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
-target_link_libraries(shared_libprimecount ${SHARED_LIBPRIMESIEVE} ${MPI_CXX_LIBRARIES})
-install(TARGETS shared_libprimecount DESTINATION lib)
+target_link_libraries(shared_libprimecount ${MPI_CXX_LIBRARIES})
 
 # Build binary #######################################################
 
 add_executable(primecount ${BIN_SRC})
-target_link_libraries(primecount static_libprimecount
-                                 ${STATIC_LIBPRIMESIEVE}
-                                 ${MPI_CXX_LIBRARIES})
+target_link_libraries(primecount static_libprimecount ${MPI_CXX_LIBRARIES})
 
 # Install primecount #################################################
 
 install(TARGETS primecount DESTINATION bin)
 install(TARGETS static_libprimecount DESTINATION lib)
+install(TARGETS shared_libprimecount DESTINATION lib)
 install(FILES include/primecount.hpp DESTINATION include)
