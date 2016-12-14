@@ -3,12 +3,13 @@ Release process
 
 Clone or fork primecount:
 ```sh
-$ git clone git://github.com/kimwalisch/primecount.git
+git clone git://github.com/kimwalisch/primecount.git
 ```
 
 Build primecount using:
 ```sh
-$ ./build.sh
+cmake .
+make -j8
 ```
 
 ### Adding a new prime counting function implementation
@@ -16,7 +17,6 @@ $ ./build.sh
 * Add new function signature e.g. ```pi_lmo(x)``` to [include/primecount.hpp](include/primecount-internal.hpp)
 * Create source file ```src/lmo/pi_lmo.cpp``` with the new function
 * Add ```src/lmo/pi_lmo.cpp``` to [CMakeLists.txt](CMakeLists.txt)
-* Add ```src\lmo\pi_lmo.obj``` to [Makefile.msvc](Makefile.msvc)
 * Add ```pi_lmo(x)``` to [src/app/main.cpp](src/app/main.cpp)
 * Add ```pi_lmo(x)``` to ```bool test()``` in [src/test.cpp](src/test.cpp)
 * Add ```--lmo``` command-line option summary to [src/app/help.cpp](src/app/help.cpp)
