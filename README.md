@@ -346,7 +346,7 @@ int main()
 }
 ```
 
-On Unix-like operating systems compile using:
+On Unix-like OSes compile using:
 ```sh
 c++ -O2 primes.cpp -lprimecount
 ```
