@@ -30,9 +30,9 @@ Below are the latest precompiled binaries for Windows 64-bit, Linux and OS X.
 These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
-* [primecount-3.4-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.4-win64.zip), 391K
-* [primecount-3.4-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.4-linux-x64.tar.gz), 902K
-* [primecount-3.4-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.4-macOS-x64.tar.gz), 673K
+* [primecount-3.5-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.5-win64.zip), 404K
+* [primecount-3.5-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.5-linux-x64.tar.gz), 915K
+* [primecount-3.5-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.5-macOS-x64.tar.gz), 688K
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
@@ -289,7 +289,7 @@ Build instructions
 You need to have installed a C++ compiler, cmake and make to build primecount.
 
 Download
-[primecount-3.4.zip](https://github.com/kimwalisch/primecount/archive/v3.4.zip)
+[primecount-3.5.zip](https://github.com/kimwalisch/primecount/archive/v3.5.zip)
 and build it using:
 
 ```sh
