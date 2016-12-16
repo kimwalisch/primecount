@@ -31,7 +31,8 @@ echo "New year: $new_year"
 echo ""
 
 # Update version
-for i in $(echo README.md \ \
+for i in $(echo README.md \
+                doc/primecount-MPI.md \
                 include/primecount.hpp)
 do
     echo "Update version in $i"
@@ -40,7 +41,8 @@ do
 done
 
 # Update version
-for i in $(echo include/primecount.hpp)
+for i in $(echo CMakeLists.txt \
+                include/primecount.hpp)
 do
     sed "s/PRIMECOUNT_VERSION_MAJOR $old_major/PRIMECOUNT_VERSION_MAJOR $new_major/g" $i > $i.tmp
     mv -f $i.tmp $i
