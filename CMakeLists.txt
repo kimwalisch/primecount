@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(primecount)
-set(LIBPRIMECOUNT_VERSION "1.0.0")
-set(LIBPRIMECOUNT_SOVERSION 1)
+set(PRIMECOUNT_VERSION_MAJOR 3)
+set(PRIMECOUNT_VERSION_MINOR 5)
+set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 include_directories(include src/primesieve/include)
 set(CMAKE_BUILD_TYPE Release)
 
@@ -188,8 +189,8 @@ set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
 
 add_library(shared_libprimecount SHARED ${LIB_SRC})
 set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
-set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${LIBPRIMECOUNT_SOVERSION})
-set_target_properties(shared_libprimecount PROPERTIES VERSION ${LIBPRIMECOUNT_VERSION})
+set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
+set_target_properties(shared_libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
 target_link_libraries(shared_libprimecount ${MPI_CXX_LIBRARIES})
 
 # Build binary #######################################################
