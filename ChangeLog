@@ -1,6 +1,6 @@
-2016-12-10 Kim Walisch  <kim.walisch@gmail.com>
+2016-12-16 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.5 work in progress.
+  Version 3.5 released.
 
   * CMake: Use CMake build system instead of Autotools.
   * README.md: Update build instructions.
