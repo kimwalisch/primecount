@@ -289,7 +289,7 @@ Build instructions
 You need to have installed a C++ compiler, cmake and make to build primecount.
 
 Download
-[primecount-master.zip](https://github.com/kimwalisch/primecount/archive/master.zip)
+[primecount-3.4.zip](https://github.com/kimwalisch/primecount/archive/v3.4.zip)
 and build it using:
 
 ```sh
