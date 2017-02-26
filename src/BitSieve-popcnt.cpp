@@ -1,8 +1,8 @@
 ///
 /// @file  BitSieve-popcnt.cpp
 /// @brief Count the number of 1 bits inside a 64-bit array.
-///        The vectorized popcount algorithms used in this file are
-///        described in the paper "Faster Population Counts using AVX2
+///        The AVX2 popcount algorithm used in this file is described
+///        in the paper "Faster Population Counts using AVX2
 ///        Instructions" by Wojciech Muła, Nathan Kurz, Daniel Lemire.
 /// @see   https://arxiv.org/abs/1611.07612
 /// @see   https://github.com/WojciechMula/sse-popcount
