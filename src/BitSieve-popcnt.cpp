@@ -306,4 +306,3 @@ uint64_t BitSieve::count(uint64_t start,
 }
 
 } // namespace
-
