@@ -8,13 +8,12 @@ set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
-option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
 option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
 
 # Include Check* #####################################################
 
-include(CheckCXXCompilerFlag)
 include(CheckCXXSourceRuns)
+include(CheckCXXSourceCompiles)
 include(CheckTypeSize)
 
 # primecount binary source files #####################################
@@ -26,6 +25,7 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/BitSieve.cpp
+            src/BitSieve-popcnt.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
@@ -107,14 +107,50 @@ if (OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-# Check for -mpopcnt compiler option #################################
+# Reset CMAKE_CXX_FLAGS for compiler checks ##########################
 
-if(ENABLE_POPCNT)
-    CHECK_CXX_COMPILER_FLAG(-mpopcnt MPOPCNT_FLAG)
-    if(MPOPCNT_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
-    endif()
+set(CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "")
+
+# Check -mpopcnt compiler flag #######################################
+
+set(CMAKE_CXX_FLAGS "-mpopcnt -Werror")
+
+check_cxx_source_compiles(
+    "int main(int, char**) { return 0; }"
+    mpopcnt)
+
+if(mpopcnt)
+    set(CXX_FLAGS "${CXX_FLAGS} -mpopcnt")
 endif()
+
+# Check -mpopcntd compiler flag ######################################
+
+set(CMAKE_CXX_FLAGS "-mpopcntd -Werror")
+
+check_cxx_source_compiles(
+    "int main(int, char**) { return 0; }"
+    mpopcntd)
+
+if(mpopcntd)
+    set(CXX_FLAGS "${CXX_FLAGS} -mpopcntd")
+endif()
+
+# Check -mavx2 compiler flag #########################################
+
+set(CMAKE_CXX_FLAGS "-mavx2 -Werror")
+
+check_cxx_source_compiles(
+    "int main(int, char**) { return 0; }"
+    mavx2)
+
+if(mavx2)
+    set_source_files_properties(src/BitSieve-popcnt.cpp PROPERTIES COMPILE_FLAGS -mavx2)
+endif()
+
+# Restore CMAKE_CXX_FLAGS ############################################
+
+set(CMAKE_CXX_FLAGS "${CXX_FLAGS}")
 
 # Check if int128_t type exists ######################################
 
