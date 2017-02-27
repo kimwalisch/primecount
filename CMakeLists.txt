@@ -13,7 +13,7 @@ option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
 # Include Check* #####################################################
 
 include(CheckCXXSourceRuns)
-include(CheckCXXSourceCompiles)
+include(CheckCXXCompilerFlag)
 include(CheckTypeSize)
 
 # primecount binary source files #####################################
@@ -107,43 +107,28 @@ if (OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-# Reset CMAKE_CXX_FLAGS for compiler checks ##########################
+# Use -Werror for compiler checks ####################################
 
 set(CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "")
+set(CMAKE_CXX_FLAGS -Werror)
 
 # Check -mpopcnt compiler flag #######################################
 
-set(CMAKE_CXX_FLAGS "-mpopcnt -Werror")
-
-check_cxx_source_compiles(
-    "int main(int, char**) { return 0; }"
-    mpopcnt)
-
+check_cxx_compiler_flag(-mpopcnt mpopcnt)
 if(mpopcnt)
     set(CXX_FLAGS "${CXX_FLAGS} -mpopcnt")
 endif()
 
 # Check -mpopcntd compiler flag ######################################
 
-set(CMAKE_CXX_FLAGS "-mpopcntd -Werror")
-
-check_cxx_source_compiles(
-    "int main(int, char**) { return 0; }"
-    mpopcntd)
-
+check_cxx_compiler_flag(-mpopcntd mpopcntd)
 if(mpopcntd)
     set(CXX_FLAGS "${CXX_FLAGS} -mpopcntd")
 endif()
 
 # Check -mavx2 compiler flag #########################################
 
-set(CMAKE_CXX_FLAGS "-mavx2 -Werror")
-
-check_cxx_source_compiles(
-    "int main(int, char**) { return 0; }"
-    mavx2)
-
+check_cxx_compiler_flag(-mavx2 mavx2)
 if(mavx2)
     set_source_files_properties(src/BitSieve-popcnt.cpp PROPERTIES COMPILE_FLAGS -mavx2)
 endif()
