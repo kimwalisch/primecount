@@ -11,7 +11,7 @@ env:
     - OMP_NUM_THREADS=4
 
 before_install:
-  - sudo add-apt-repository ppa:george-edison55/precise-backports
+  - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
 
 # Install cmake, OpenMPI, cppcheck
