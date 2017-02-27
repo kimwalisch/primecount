@@ -16,7 +16,7 @@ before_install:
 
 # Install cmake, OpenMPI, cppcheck
 install:
-  - sudo apt-get install -y cmake openmpi-bin libopenmpi-dev cppcheck
+  - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck
 
 # Test build.sh script
 before_script:
