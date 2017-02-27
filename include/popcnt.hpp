@@ -39,18 +39,8 @@ inline uint64_t popcnt64(uint64_t x)
          _mm_popcnt_u32((uint32_t)(x >> 32));
 }
 
-#elif __has_builtin(__builtin_popcount) || \
-      (defined(__GNUC__) && \
-       defined(__i386__))
-
-inline uint64_t popcnt64(uint64_t x)
-{
-  return __builtin_popcount((uint32_t) x) +
-         __builtin_popcount((uint32_t)(x >> 32));
-}
-
-#elif __has_builtin(__builtin_popcountll) || \
-      defined(__GNUC__)
+#elif defined(__GNUC__) || \
+      __has_builtin(__builtin_popcountll)
 
 inline uint64_t popcnt64(uint64_t x)
 {
