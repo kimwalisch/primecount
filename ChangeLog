@@ -7,6 +7,7 @@
   with AVX2 support (2013 or later).
 
   * BitSieve-popcnt.cpp: New AVX2 popcount algorithm.
+  * popcnt.hpp: Fix clang performance bug.
   * CMakeLists.txt: Add AVX2 check.
 
 2016-12-16 Kim Walisch  <kim.walisch@gmail.com>
