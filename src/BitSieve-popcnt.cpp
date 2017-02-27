@@ -176,6 +176,10 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
 } // namespace AVX2
 } // namespace
 
+#endif
+
+#if defined(HAVE_TARGET_AVX2)
+
 namespace {
 
 __attribute__ ((target ("default")))
