@@ -1,3 +1,14 @@
+2017-02-27 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.6 work in progress.
+
+  This version features a new AVX2 popcount algorithm which
+  computes the hard special leaves up to 15% faster on x86 CPUs
+  with AVX2 support (2013 or later).
+
+  * BitSieve-popcnt.cpp: New AVX2 popcount algorithm.
+  * CMakeLists.txt: Add AVX2 check.
+
 2016-12-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.5 released.
