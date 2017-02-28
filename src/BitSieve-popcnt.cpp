@@ -142,8 +142,9 @@ void align(const uint64_t*& p,
            uint64_t* size,
            uint64_t* total)
 {
-  for (; *size > 0 && (uintptr_t) p % 32 != 0; p++)
+  for (; (uintptr_t) p % 32 != 0; p++)
   {
+    assert(*size > 0);
     *total += popcnt64(*p);
     *size -= 1;
   }
