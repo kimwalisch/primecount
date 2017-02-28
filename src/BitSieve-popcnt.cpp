@@ -7,7 +7,7 @@
 /// @see   https://arxiv.org/abs/1611.07612
 /// @see   https://github.com/WojciechMula/sse-popcount
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
