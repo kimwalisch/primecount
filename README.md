@@ -31,8 +31,8 @@ These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later).
 
 * [primecount-3.6-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-win64.zip), 404K
-* [primecount-3.6-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-linux-x64.tar.gz), 915K
-* [primecount-3.6-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-macOS-x64.tar.gz), 688K
+* [primecount-3.6-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-linux-x64.tar.gz), 1018K
+* [primecount-3.6-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-macOS-x64.tar.gz), 897K
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
