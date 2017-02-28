@@ -207,7 +207,7 @@ Benchmarks
     <td>3,204,941,750,802</td>
     <td>4.01s</td>
     <td>1.96s</td>
-    <td>0.43s</td>
+    <td>0.38s</td>
     <td>0.22s</td>
   </tr>
   <tr align="right">
@@ -215,32 +215,32 @@ Benchmarks
     <td>29,844,570,422,669</td>
     <td>27.75s</td>
     <td>12.08s</td>
-    <td>1.65s</td>
-    <td>0.77s</td>
+    <td>1.52s</td>
+    <td>0.76s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
     <td>232.30s</td>
     <td>92.09s</td>
-    <td>7.31s</td>
-    <td>2.83s</td>
+    <td>6.87s</td>
+    <td>2.67s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
     <td>1,836.73s</td>
     <td>731.35s</td>
-    <td>33.66s</td>
-    <td>11.20s</td>
+    <td>31.63s</td>
+    <td>10.66s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
     <td>14,949.16s</td>
     <td>6,631.73s</td>
-    <td>157.15s</td>
-    <td>47.07s</td>
+    <td>146.55s</td>
+    <td>44.54s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -248,7 +248,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>225.08s</td>
+    <td>209.57s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -256,7 +256,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,029.41s</td>
+    <td>939.88s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -264,7 +264,7 @@ Benchmarks
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>4,867.45s</td>
+    <td>4,536.14s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -278,7 +278,7 @@ Benchmarks
 
 The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
 2015 using a Linux x64 operating system and primecount was compiled using
-GCC 5.2.
+GCC 5.4.
 
 Build instructions
 ------------------
