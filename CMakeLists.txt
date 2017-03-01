@@ -141,9 +141,9 @@ check_cxx_source_compiles("
     void func() { __m256i v = _mm256_setzero_si256(); }
     int x = __builtin_cpu_supports(\"avx2\");
     int main() { return 0; }"
-    have_avx2)
+    AVX2)
 
-if(have_avx2)
+if(AVX2)
     add_definitions(-DHAVE_AVX2)
 endif()
 
