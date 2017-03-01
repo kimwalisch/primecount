@@ -51,7 +51,7 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
 } // namespace POPCNT
 } // namespace
 
-#if defined(HAVE_TARGET_AVX2)
+#if defined(HAVE_AVX2)
 
 #include <immintrin.h>
 
@@ -179,23 +179,20 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
 
 #endif
 
-#if defined(HAVE_TARGET_AVX2)
-
 namespace {
 
-__attribute__ ((target ("default")))
+#if defined(HAVE_AVX2)
+
+// calls CPUID at program startup
+const int avx2 = __builtin_cpu_supports("avx2");
+
 uint64_t popcnt(const uint64_t* data, uint64_t size)
 {
-  return POPCNT::popcnt(data, size);
+  if (avx2)
+    return AVX2::popcnt(data, size);
+  else
+    return POPCNT::popcnt(data, size);
 }
-
-__attribute__ ((target ("avx2")))
-uint64_t popcnt(const uint64_t* data, uint64_t size)
-{
-  return AVX2::popcnt(data, size);
-}
-
-} // namespace
 
 #else
 
@@ -205,6 +202,8 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
 }
 
 #endif
+
+} // namespace
 
 namespace primecount {
 
