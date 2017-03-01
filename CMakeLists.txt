@@ -109,45 +109,42 @@ if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-# Use -Werror for compiler checks ####################################
-
-set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS -Werror)
-
 # Check -mpopcnt compiler flag #######################################
 
 if(ENABLE_POPCNT)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
     check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
     if(mpopcnt)
-        set(COPY_CXX_FLAGS "${COPY_CXX_FLAGS} -mpopcnt")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()
 endif()
 
 # Check -mpopcntd compiler flag ######################################
 
 if(ENABLE_POPCNT)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
     check_cxx_compiler_flag(-mpopcntd mpopcntd)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
     if(mpopcntd)
-        set(COPY_CXX_FLAGS "${COPY_CXX_FLAGS} -mpopcntd")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcntd")
     endif()
 endif()
 
-# Restore CMAKE_CXX_FLAGS ############################################
-
-set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
-
-# Check target("avx2") ###############################################
+# Check AVX2 (x86_64) compiler support  ##############################
 
 check_cxx_source_compiles("
-    __attribute__ ((target (\"default\")))
-    int func() { return 0; }
+    #include <immintrin.h>
     __attribute__ ((target (\"avx2\")))
-    int func() { return 1; }
-    int main() { return func(); }"
-    target_avx2)
+    void func() { __m256i v = _mm256_setzero_si256(); }
+    int x = __builtin_cpu_supports(\"avx2\");
+    int main() { return 0; }"
+    have_avx2)
 
-if(target_avx2)
-    add_definitions(-DHAVE_TARGET_AVX2)
+if(have_avx2)
+    add_definitions(-DHAVE_AVX2)
 endif()
 
 # Check if int128_t type exists ######################################
