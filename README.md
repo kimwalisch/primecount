@@ -26,9 +26,10 @@ used to compute several world records e.g.
 
 Binaries
 --------
-Below are the latest precompiled binaries for Windows 64-bit, Linux and OS X.
+Below are the latest primecount binaries for Windows 64-bit, Linux and macOS.
 These binaries are statically linked and require a CPU which supports the POPCNT
-instruction (2010 or later).
+instruction (2010 or later). primecount also uses the AVX2 instruction set (if
+available) to speed up the computation of the hard special leaves. 
 
 * [primecount-3.6-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-win64.zip), 400K
 * [primecount-3.6-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-linux-x64.tar.gz), 1018K
