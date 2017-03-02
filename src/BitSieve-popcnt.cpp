@@ -183,21 +183,11 @@ namespace {
 
 #if defined(HAVE_AVX2)
 
-struct CpuInfo
-{
-  int has_avx2;
-  CpuInfo()
-  {
-    __builtin_cpu_init();
-    has_avx2 = __builtin_cpu_supports("avx2");
-  }
-};
-
-const CpuInfo cpuInfo;
-
 uint64_t popcnt(const uint64_t* data, uint64_t size)
 {
-  if (cpuInfo.has_avx2)
+  static const int has_avx2 = __builtin_cpu_supports("avx2");
+
+  if (has_avx2)
     return AVX2::popcnt(data, size);
   else
     return POPCNT::popcnt(data, size);
