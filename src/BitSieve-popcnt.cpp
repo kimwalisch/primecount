@@ -28,9 +28,13 @@ namespace POPCNT {
 ///
 uint64_t popcnt(const uint64_t* data, uint64_t size)
 {
-  uint64_t sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
-  uint64_t limit = size - size % 4;
+  uint64_t sum0 = 0;
+  uint64_t sum1 = 0;
+  uint64_t sum2 = 0;
+  uint64_t sum3 = 0;
+
   uint64_t i = 0;
+  uint64_t limit = size - size % 4;
 
   for (; i < limit; i += 4)
   {
@@ -64,7 +68,7 @@ __m256i popcnt(const __m256i v)
   __m256i m1 = _mm256_set1_epi8(0x55);
   __m256i m2 = _mm256_set1_epi8(0x33);
   __m256i m4 = _mm256_set1_epi8(0x0F);
-  __m256i t1 = _mm256_sub_epi8(v, (_mm256_srli_epi16(v,  1) & m1));
+  __m256i t1 = _mm256_sub_epi8(v, (_mm256_srli_epi16(v, 1) & m1));
   __m256i t2 = _mm256_add_epi8(t1 & m2, (_mm256_srli_epi16(t1, 2) & m2));
   __m256i t3 = _mm256_add_epi8(t2, _mm256_srli_epi16(t2, 4)) & m4;
 
@@ -96,8 +100,8 @@ uint64_t popcnt(const __m256i* data, uint64_t size)
   __m256i sixteens = _mm256_setzero_si256();
   __m256i twosA, twosB, foursA, foursB, eightsA, eightsB;
 
-  uint64_t limit = size - size % 16;
   uint64_t i = 0;
+  uint64_t limit = size - size % 16;
 
   for(; i < limit; i += 16)
   {
@@ -139,14 +143,14 @@ uint64_t popcnt(const __m256i* data, uint64_t size)
 
 /// Align memory to 32 bytes boundary
 void align(const uint64_t*& p,
-           uint64_t* size,
-           uint64_t* total)
+           uint64_t& size,
+           uint64_t& total)
 {
   for (; (uintptr_t) p % 32 != 0; p++)
   {
-    assert(*size > 0);
-    *total += popcnt64(*p);
-    *size -= 1;
+    assert(size > 0);
+    total += popcnt64(*p);
+    size -= 1;
   }
 }
 
@@ -162,7 +166,7 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
   // for array sizes >= 1 kilobyte
   if (size * 8 >= 1024)
   {
-    align(data, &size, &total);
+    align(data, size, total);
     total += popcnt((const __m256i*) data, size / 4);
     data += size - size % 4;
     size = size % 4;
