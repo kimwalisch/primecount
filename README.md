@@ -33,7 +33,7 @@ available) to speed up the computation of the hard special leaves.
 
 * [primecount-3.6-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-win64.zip), 400 KB
 * [primecount-3.6-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-linux-x64.tar.gz), 1 MB
-* [primecount-3.6-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-macOS-x64.tar.gz), 922 KB
+* [primecount-3.6-macOS-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-macOS-x64.tar.gz), 899 KB
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
