@@ -275,7 +275,7 @@ double get_wtime()
 #ifdef _OPENMP
   return omp_get_wtime();
 #else
-  return (double) (std::clock() / CLOCKS_PER_SEC);
+  return (double) std::clock() / CLOCKS_PER_SEC;
 #endif
 }
 

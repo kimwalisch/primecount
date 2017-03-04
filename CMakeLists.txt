@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.0)
 project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 3)
-set(PRIMECOUNT_VERSION_MINOR 5)
+set(PRIMECOUNT_VERSION_MINOR 6)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 include_directories(include src/primesieve/include)
 set(CMAKE_BUILD_TYPE Release)
@@ -9,12 +9,13 @@ set(CMAKE_BUILD_TYPE Release)
 # Build options ######################################################
 
 option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
-option(ENABLE_MPI "Enable MPI (Message Passing Interface)" OFF)
+option(ENABLE_MPI    "Enable MPI (Message Passing Interface)" OFF)
 
 # Include Check* #####################################################
 
-include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
 include(CheckCXXSourceRuns)
+include(CheckCXXCompilerFlag)
 include(CheckTypeSize)
 
 # primecount binary source files #####################################
@@ -26,6 +27,7 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/BitSieve.cpp
+            src/BitSieve-popcnt.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
@@ -103,17 +105,46 @@ endif()
 # Check for OpenMP ###################################################
 
 find_package(OpenMP QUIET)
-if (OPENMP_FOUND)
+if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-# Check for -mpopcnt compiler option #################################
+# Check -mpopcnt compiler flag #######################################
 
 if(ENABLE_POPCNT)
-    CHECK_CXX_COMPILER_FLAG(-mpopcnt MPOPCNT_FLAG)
-    if(MPOPCNT_FLAG)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
+    if(mpopcnt)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()
+endif()
+
+# Check -mpopcntd compiler flag ######################################
+
+if(ENABLE_POPCNT)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcntd mpopcntd)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
+    if(mpopcntd)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcntd")
+    endif()
+endif()
+
+# Check AVX2 (x86_64) compiler support  ##############################
+
+check_cxx_source_compiles("
+    #include <immintrin.h>
+    __attribute__ ((target (\"avx2\")))
+    void func() { __m256i v = _mm256_setzero_si256(); }
+    int x = __builtin_cpu_supports(\"avx2\");
+    int main() { return 0; }"
+    AVX2)
+
+if(AVX2)
+    add_definitions(-DHAVE_AVX2)
 endif()
 
 # Check if int128_t type exists ######################################
@@ -164,11 +195,11 @@ check_cxx_source_runs("
 
         return 0;
     }"
-    HAVE_LIBDIVIDE)
+    use_libdivide)
 
 # Include S2_easy* source files ######################################
 
-if(HAVE_LIBDIVIDE)
+if(use_libdivide)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(ENABLE_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)

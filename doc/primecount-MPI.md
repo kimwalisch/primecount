@@ -25,7 +25,7 @@ sudo apt-get install g++ make cmake libopenmpi-dev openmpi-bin
 ```
 
 Then download
-[primecount-3.5.zip](https://github.com/kimwalisch/primecount/archive/v3.5.zip)
+[primecount-3.6.zip](https://github.com/kimwalisch/primecount/archive/v3.6.zip)
 and build it using:
 ```sh
 cmake -DENABLE_MPI=ON .

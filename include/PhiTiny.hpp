@@ -1,7 +1,7 @@
 ///
 /// @file  PhiTiny.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -56,6 +56,8 @@ private:
   static const int totients[7];
 };
 
+extern const PhiTiny phiTiny;
+
 inline bool is_phi_tiny(int64_t a)
 {
   return PhiTiny::is_tiny(a);
@@ -66,7 +68,6 @@ inline bool is_phi_tiny(int64_t a)
 template <typename X, typename A>
 typename prt::make_signed<X>::type phi_tiny(X x, A a)
 {
-  extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
 }
 
@@ -75,7 +76,6 @@ typename prt::make_signed<X>::type phi_tiny(X x, A a)
 template <typename X, typename A>
 X phi_tiny(X x, A a)
 {
-  extern const PhiTiny phiTiny;
   return phiTiny.phi(x, a);
 }
 

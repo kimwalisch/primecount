@@ -11,11 +11,12 @@ env:
     - OMP_NUM_THREADS=4
 
 before_install:
+  - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
 
 # Install cmake, OpenMPI, cppcheck
 install:
-  - sudo apt-get install -y cmake openmpi-bin libopenmpi-dev cppcheck
+  - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck
 
 # Test build.sh script
 before_script:
