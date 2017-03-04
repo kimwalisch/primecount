@@ -63,24 +63,37 @@ namespace {
 namespace AVX2 {
 
 __attribute__ ((target ("avx2")))
-__m256i popcnt(const __m256i v)
-{
-  __m256i m1 = _mm256_set1_epi8(0x55);
-  __m256i m2 = _mm256_set1_epi8(0x33);
-  __m256i m4 = _mm256_set1_epi8(0x0F);
-  __m256i t1 = _mm256_sub_epi8(v, (_mm256_srli_epi16(v, 1) & m1));
-  __m256i t2 = _mm256_add_epi8(t1 & m2, (_mm256_srli_epi16(t1, 2) & m2));
-  __m256i t3 = _mm256_add_epi8(t2, _mm256_srli_epi16(t2, 4)) & m4;
-
-  return _mm256_sad_epu8(t3, _mm256_setzero_si256());
-}
-
-__attribute__ ((target ("avx2")))
 void CSA(__m256i& h, __m256i& l, __m256i a, __m256i b, __m256i c)
 {
   __m256i u = a ^ b;
   h = (a & b) | (u & c);
   l = u ^ c;
+}
+
+__attribute__ ((target ("avx2")))
+__m256i popcnt(__m256i v)
+{
+    __m256i lookup1 = _mm256_setr_epi8(
+        4, 5, 5, 6, 5, 6, 6, 7,
+        5, 6, 6, 7, 6, 7, 7, 8,
+        4, 5, 5, 6, 5, 6, 6, 7,
+        5, 6, 6, 7, 6, 7, 7, 8
+    );
+
+    __m256i lookup2 = _mm256_setr_epi8(
+        4, 3, 3, 2, 3, 2, 2, 1,
+        3, 2, 2, 1, 2, 1, 1, 0,
+        4, 3, 3, 2, 3, 2, 2, 1,
+        3, 2, 2, 1, 2, 1, 1, 0
+    );
+
+    __m256i low_mask = _mm256_set1_epi8(0x0f);
+    __m256i lo = v & low_mask;
+    __m256i hi = _mm256_srli_epi16(v, 4) & low_mask;
+    __m256i popcnt1 = _mm256_shuffle_epi8(lookup1, lo);
+    __m256i popcnt2 = _mm256_shuffle_epi8(lookup2, hi);
+
+    return _mm256_sad_epu8(popcnt1, popcnt2);
 }
 
 /// AVX2 Harley-Seal popcount (4th iteration).
@@ -163,7 +176,7 @@ uint64_t popcnt(const uint64_t* data, uint64_t size)
   uint64_t total = 0;
 
   // AVX2 popcount is faster than POPCNT 
-  // for array sizes >= 1 kilobyte
+  // for array sizes >= 1 KB
   if (size * 8 >= 1024)
   {
     align(data, size, total);
