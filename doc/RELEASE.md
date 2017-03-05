@@ -44,4 +44,4 @@ The libprimecount version must be updated manually in ```CMakeLists.txt```.
 * Update _**Precompiled binaries**_ section in [README.md](README.md)
 * Update [ChangeLog](ChangeLog)
 * Tag the new release in git
-* Build statically linked primecout binaries and upload them to [https://github.com/kimwalisch/primecount/releases](https://github.com/kimwalisch/primecount/releases)
+* Upload new primecout binaries to [https://github.com/kimwalisch/primecount/releases](https://github.com/kimwalisch/primecount/releases)
