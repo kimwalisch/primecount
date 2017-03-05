@@ -41,8 +41,7 @@ The libprimecount version must be updated manually in ```CMakeLists.txt```.
 
 * Run tests: ```./primecount --test```
 * Increase version number (see <a href="#versioning">Versioning</a>)
-* Build statically linked primecout binaries and upload them to [https://bintray.com/kimwalisch/primecount](https://bintray.com/kimwalisch/primecount)
 * Update _**Precompiled binaries**_ section in [README.md](README.md)
 * Update [ChangeLog](ChangeLog)
 * Tag the new release in git
-* Create new release tarball using ```make dist``` and upload it to [https://bintray.com/kimwalisch/primecount](https://bintray.com/kimwalisch/primecount)
+* Build statically linked primecout binaries and upload them to [https://github.com/kimwalisch/primecount/releases](https://github.com/kimwalisch/primecount/releases)

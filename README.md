@@ -31,9 +31,9 @@ These binaries are statically linked and require a CPU which supports the POPCNT
 instruction (2010 or later). primecount also uses the AVX2 instruction set (if
 available) to speed up the computation of the hard special leaves. 
 
-* [primecount-3.6-win64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-win64.zip), 400 KB
-* [primecount-3.6-linux-x64.tar.gz](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-linux-x64.tar.gz), 1 MB
-* [primecount-3.6-macOS-x64.zip](https://dl.bintray.com/kimwalisch/primecount/primecount-3.6-macOS-x64.zip), 899 KB
+* [primecount-3.6-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-win64.zip), 400 KB
+* [primecount-3.6-linux-x64.tar.gz](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-linux-x64.tar.gz), 1 MB
+* [primecount-3.6-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-macOS-x64.zip), 899 KB
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
 Usage examples
