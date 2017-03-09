@@ -10,7 +10,6 @@
 *.o
 /primecount*
 /libprimecount*
-Makefile
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
