@@ -2,7 +2,7 @@ primecount
 ==========
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
-[![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
+[![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
 primecount is a command-line program and C++ library that counts the
 primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly
@@ -284,10 +284,6 @@ GCC 5.4.
 Build instructions
 ------------------
 You need to have installed a C++ compiler, cmake and make to build primecount.
-
-Download
-[primecount-3.6.zip](https://github.com/kimwalisch/primecount/archive/v3.6.zip)
-and build it using:
 
 ```sh
 cmake .
