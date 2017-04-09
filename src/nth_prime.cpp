@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -48,7 +48,7 @@ int64_t nth_prime(int64_t n, int threads)
   primesieve::set_num_threads(threads);
 
   if (n < 100000)
-    prime = primesieve::parallel_nth_prime(n, 0);
+    prime = primesieve::nth_prime(n, 0);
   else
   {
     // Formula due to Dana Jacobsen:
@@ -57,9 +57,9 @@ int64_t nth_prime(int64_t n, int threads)
     count_approx = pi(prime_approx, threads);
 
     if (count_approx < n)
-      prime = primesieve::parallel_nth_prime(n - count_approx, prime_approx);
+      prime = primesieve::nth_prime(n - count_approx, prime_approx);
     else /* count_approx >= n */
-      prime = primesieve::parallel_nth_prime(n - count_approx - 1, prime_approx + 1);
+      prime = primesieve::nth_prime(n - count_approx - 1, prime_approx + 1);
   }
 
   return prime;

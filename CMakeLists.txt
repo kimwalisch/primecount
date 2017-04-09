@@ -1,15 +1,27 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 3)
 set(PRIMECOUNT_VERSION_MINOR 6)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-include_directories(include src/primesieve/include)
+include_directories(include lib/primesieve/include)
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
-option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
-option(ENABLE_MPI    "Enable MPI (Message Passing Interface)" OFF)
+option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
+option(WITH_OPENMP       "Enable OpenMP support"          ON)
+option(WITH_MPI          "Enable MPI support"             OFF)
+option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
+option(BUILD_TESTS       "Build test programs"            OFF)
+
+if(WIN32)
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
+# Compiler must support C++11 or later ###############################
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include Check* #####################################################
 
@@ -62,30 +74,9 @@ set(LIB_SRC src/BitSieve.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
 
-# primesieve library source files ####################################
-
-set(PRIMESIEVE_PATH src/primesieve/src/primesieve)
-
-set(LIB_SRC ${LIB_SRC}
-            ${PRIMESIEVE_PATH}/EratBig.cpp
-            ${PRIMESIEVE_PATH}/EratMedium.cpp
-            ${PRIMESIEVE_PATH}/EratSmall.cpp
-            ${PRIMESIEVE_PATH}/ParallelPrimeSieve.cpp
-            ${PRIMESIEVE_PATH}/PreSieve.cpp
-            ${PRIMESIEVE_PATH}/PrimeFinder.cpp
-            ${PRIMESIEVE_PATH}/PrimeGenerator.cpp
-            ${PRIMESIEVE_PATH}/PrimeSieve-nthPrime.cpp
-            ${PRIMESIEVE_PATH}/PrimeSieve.cpp
-            ${PRIMESIEVE_PATH}/SieveOfEratosthenes.cpp
-            ${PRIMESIEVE_PATH}/WheelFactorization.cpp
-            ${PRIMESIEVE_PATH}/iterator.cpp
-            ${PRIMESIEVE_PATH}/popcount.cpp
-            ${PRIMESIEVE_PATH}/primesieve-api.cpp
-            ${PRIMESIEVE_PATH}/primesieve_test.cpp)
-
 # Check for MPI (Message Passing Interface) ##########################
 
-if(ENABLE_MPI)
+if(WITH_MPI)
     find_package(MPI REQUIRED)
     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
@@ -103,14 +94,17 @@ endif()
 
 # Check for OpenMP ###################################################
 
-find_package(OpenMP QUIET)
-if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+if(WITH_OPENMP)
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
+        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    endif()
 endif()
 
 # Check -mpopcnt compiler flag #######################################
 
-if(ENABLE_POPCNT)
+if(WITH_POPCNT)
     set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     set(CMAKE_CXX_FLAGS -Werror)
     check_cxx_compiler_flag(-mpopcnt mpopcnt)
@@ -174,37 +168,54 @@ check_cxx_source_runs("
 
 if(use_libdivide)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    if(ENABLE_MPI)
+    if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    if(ENABLE_MPI)
+    if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
     endif()
 endif()
 
-# Build static library ###############################################
+# Add subdirectories #################################################
 
-add_library(static_libprimecount STATIC ${LIB_SRC})
-set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
+add_subdirectory(lib/primesieve)
 
-# Build shared library ###############################################
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 
-add_library(shared_libprimecount SHARED ${LIB_SRC})
-set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
-set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
-set_target_properties(shared_libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-target_link_libraries(shared_libprimecount ${MPI_CXX_LIBRARIES})
+# libprimecount ######################################################
 
-# Build binary #######################################################
+add_library(libprimecount ${LIB_SRC})
+set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
+install(TARGETS libprimecount
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+if(BUILD_SHARED_LIBS)
+    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMESIEVE_VERSION_MAJOR})
+    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMESIEVE_VERSION})
+endif()
+
+# static_libprimecount ###############################################
+
+if(BUILD_SHARED_LIBS)
+    add_library(static_libprimecount STATIC ${LIB_SRC})
+    set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
+    install(TARGETS static_libprimecount
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
+
+# primecount binary ##################################################
 
 add_executable(primecount ${BIN_SRC})
-target_link_libraries(primecount static_libprimecount ${MPI_CXX_LIBRARIES})
+target_link_libraries(primecount libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
+install(TARGETS primecount
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
-# Install primecount #################################################
+# Install header #################################################
 
-install(TARGETS primecount DESTINATION bin)
-install(TARGETS static_libprimecount DESTINATION lib)
-install(TARGETS shared_libprimecount DESTINATION lib)
-install(FILES include/primecount.hpp DESTINATION include)
+install(FILES include/primecount.hpp
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
