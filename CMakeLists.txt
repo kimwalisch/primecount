@@ -180,6 +180,7 @@ endif()
 
 # Add subdirectories #################################################
 
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
 add_subdirectory(lib/primesieve)
 
 if(BUILD_TESTS)
