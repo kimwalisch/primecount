@@ -8,8 +8,10 @@
 *.obj
 *.lib
 *.o
+*.dSYM
 /primecount*
 /libprimecount*
+build
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
