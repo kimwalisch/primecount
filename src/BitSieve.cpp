@@ -5,13 +5,14 @@
 ///        assigns 64 numbers to the bits of an 8 byte word thus
 ///        reducing the memory usage by a factor of 8.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <BitSieve.hpp>
+#include <popcnt.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -42,17 +43,15 @@ const uint64_t masks[] =
   0x0000400000800001ull  // 23
 };
 
-/// Get bitmask with unset multiples
 uint64_t unset_mask(uint64_t mask, uint64_t shift)
 {
   return ~(mask << shift);
 }
 
-/// @pre x < y * 2
 uint64_t fast_modulo(uint64_t x, uint64_t y)
 {
+  assert(x < y * 2);
   x = (x < y) ? x : x - y;
-  assert(x < y);
   return x;
 }
 
@@ -145,6 +144,33 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
          sieve_.begin() + last);
     last += copy_words;
   }
+}
+
+/// Count the number of 1 bits inside [start, stop]
+uint64_t BitSieve::count(uint64_t start,
+                         uint64_t stop) const
+{
+  if (start > stop)
+    return 0;
+
+  assert(stop < size_);
+
+  uint64_t start_idx = start / 64;
+  uint64_t stop_idx = stop / 64;
+  uint64_t m1 = 0xffffffffffffffffull << (start % 64);
+  uint64_t m2 = 0xffffffffffffffffull >> (63 - stop % 64);
+  uint64_t bit_count;
+
+  if (start_idx == stop_idx)
+    bit_count = popcnt64(sieve_[start_idx] & (m1 & m2));
+  else
+  {
+    bit_count = popcnt64(sieve_[start_idx] & m1);
+    bit_count += popcnt(&sieve_[start_idx + 1], stop_idx - (start_idx + 1));
+    bit_count += popcnt64(sieve_[stop_idx] & m2);
+  }
+
+  return bit_count;
 }
 
 } // namespace

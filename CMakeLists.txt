@@ -27,7 +27,6 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/BitSieve.cpp
-            src/BitSieve-popcnt.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
@@ -119,32 +118,6 @@ if(ENABLE_POPCNT)
     if(mpopcnt)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()
-endif()
-
-# Check -mpopcntd compiler flag ######################################
-
-if(ENABLE_POPCNT)
-    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcntd mpopcntd)
-    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
-    if(mpopcntd)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcntd")
-    endif()
-endif()
-
-# Check AVX2 (x86_64) compiler support  ##############################
-
-check_cxx_source_compiles("
-    #include <immintrin.h>
-    __attribute__ ((target (\"avx2\")))
-    void func() { __m256i v = _mm256_setzero_si256(); }
-    int x = __builtin_cpu_supports(\"avx2\");
-    int main() { return 0; }"
-    AVX2)
-
-if(AVX2)
-    add_definitions(-DHAVE_AVX2)
 endif()
 
 # Check if int128_t type exists ######################################
