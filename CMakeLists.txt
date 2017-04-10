@@ -10,7 +10,9 @@ set(CMAKE_BUILD_TYPE Release)
 option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
 option(WITH_OPENMP       "Enable OpenMP support"          ON)
 option(WITH_MPI          "Enable MPI support"             OFF)
+option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
 option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
+option(BUILD_STATIC_LIBS "Build shared libprimecount"     ON)
 option(BUILD_TESTS       "Build test programs"            OFF)
 
 if(WIN32)
@@ -77,8 +79,6 @@ set(LIB_SRC src/BitSieve.cpp
 
 if(WITH_MPI)
     find_package(MPI REQUIRED)
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
     include_directories(${MPI_INCLUDE_PATH})
     add_definitions(-DHAVE_MPI)
 
@@ -177,21 +177,16 @@ else()
     endif()
 endif()
 
-# Add subdirectories #################################################
+# libprimesieve ######################################################
 
 option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
 add_subdirectory(lib/primesieve)
-
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
 
 # libprimecount ######################################################
 
 add_library(libprimecount ${LIB_SRC})
 set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-target_link_libraries(libprimecount libprimesieve)
+target_link_libraries(libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
 
 target_include_directories(libprimecount PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -207,10 +202,10 @@ install(TARGETS libprimecount
 
 # static_libprimecount ###############################################
 
-if(BUILD_SHARED_LIBS)
+if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     add_library(static_libprimecount STATIC ${LIB_SRC})
     set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
-    target_link_libraries(static_libprimecount static_libprimesieve)
+    target_link_libraries(static_libprimecount static_libprimesieve ${MPI_CXX_LIBRARIES})
 
     target_include_directories(static_libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -222,12 +217,21 @@ endif()
 
 # primecount binary ##################################################
 
-add_executable(primecount ${BIN_SRC})
-target_link_libraries(primecount libprimecount ${MPI_CXX_LIBRARIES})
-install(TARGETS primecount
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+if(BUILD_PRIMECOUNT)
+    add_executable(primecount ${BIN_SRC})
+    target_link_libraries(primecount libprimecount)
+    install(TARGETS primecount
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif()
 
-# Install header #################################################
+# Install header #####################################################
 
 install(FILES include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+
+# Testing ############################################################
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
