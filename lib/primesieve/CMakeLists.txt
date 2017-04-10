@@ -74,6 +74,7 @@ endif()
 
 add_library(libprimesieve ${LIB_SRC})
 set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
+target_include_directories(libprimesieve PUBLIC include)
 install(TARGETS libprimesieve
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
@@ -89,6 +90,7 @@ endif()
 if(BUILD_SHARED_LIBS)
     add_library(static_libprimesieve STATIC ${LIB_SRC})
     set_target_properties(static_libprimesieve PROPERTIES OUTPUT_NAME primesieve)
+    target_include_directories(static_libprimesieve PUBLIC include)
     install(TARGETS static_libprimesieve
             DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
