@@ -3,7 +3,7 @@ project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 3)
 set(PRIMECOUNT_VERSION_MINOR 6)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-include_directories(include lib/primesieve/include)
+include_directories(include)
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
