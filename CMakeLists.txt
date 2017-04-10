@@ -3,7 +3,6 @@ project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 3)
 set(PRIMECOUNT_VERSION_MINOR 6)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-include_directories(include)
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
@@ -192,19 +191,31 @@ endif()
 
 add_library(libprimecount ${LIB_SRC})
 set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-install(TARGETS libprimecount
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+target_link_libraries(libprimecount libprimesieve)
+
+target_include_directories(libprimecount PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
 if(BUILD_SHARED_LIBS)
-    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMESIEVE_VERSION_MAJOR})
-    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMESIEVE_VERSION})
+    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
+    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
 endif()
+
+install(TARGETS libprimecount
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 # static_libprimecount ###############################################
 
 if(BUILD_SHARED_LIBS)
     add_library(static_libprimecount STATIC ${LIB_SRC})
     set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
+    target_link_libraries(static_libprimecount static_libprimesieve)
+
+    target_include_directories(static_libprimecount PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
     install(TARGETS static_libprimecount
             DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif()
@@ -212,7 +223,7 @@ endif()
 # primecount binary ##################################################
 
 add_executable(primecount ${BIN_SRC})
-target_link_libraries(primecount libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
+target_link_libraries(primecount libprimecount ${MPI_CXX_LIBRARIES})
 install(TARGETS primecount
         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
