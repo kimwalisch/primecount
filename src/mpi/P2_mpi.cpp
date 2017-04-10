@@ -4,7 +4,7 @@
 ///        P2(x, y) counts the numbers <= x that have exactly 2 prime
 ///        factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -90,7 +90,7 @@ T P2_OpenMP_thread(T x,
   primesieve::iterator it(low - 1, z);
 
   int64_t next = it.next_prime();
-  int64_t prime = rit.previous_prime();
+  int64_t prime = rit.prev_prime();
   T P2_thread = 0;
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
@@ -100,7 +100,7 @@ T P2_OpenMP_thread(T x,
     pix += count_primes(it, next, x / prime);
     P2_thread += pix;
     pix_count++;
-    prime = rit.previous_prime();
+    prime = rit.prev_prime();
   }
 
   pix += count_primes(it, next, z - 1);

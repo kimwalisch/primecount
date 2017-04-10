@@ -20,12 +20,10 @@ install:
 
 # Test build.sh script
 before_script:
-  - cmake . -DENABLE_MPI=ON
-  - make -j4
-  - cmake .
+  - cmake . -DWITH_MPI=ON
   - make -j4
   - ldd primecount
-  - cppcheck src include --error-exitcode=1 -i$(cd primesieve-*; basename $(pwd))
+  - cppcheck src include --error-exitcode=1
 
 # Run primecount tests
 script:

@@ -5,16 +5,18 @@ primecount MPI
 [![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
 
 This is a distributed version of primecount which uses the
-[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library for
-inter-process communication and which automatically distributes
-the computation onto cluster nodes. Breaking the next world record pi(10<sup>28</sup>)
-would take about 6 years on the fastest shared memory server currently
-available. Hence it has become necessary to go distributed!
+[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library
+for inter-process communication and which automatically distributes
+the computation onto cluster nodes. Breaking the next world record
+pi(10<sup>28</sup>) would take about 6 years on the fastest shared
+memory server currently available. Hence it has become necessary to go
+distributed!
 
-Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500 gigabytes
-of memory per cluster node! That is a lot, it might take a few years until
-such clusters become more widely available. I expect the pi(10<sup>28</sup>)
-computation to take about 130 CPU core years using primecount MPI.
+Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500
+gigabytes of memory per cluster node! That is a lot, it might take a
+few years until such clusters become more widely available. I expect
+the pi(10<sup>28</sup>) computation to take about 130 CPU core years
+using primecount MPI.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
@@ -28,8 +30,8 @@ Then download
 [primecount-3.6.zip](https://github.com/kimwalisch/primecount/archive/v3.6.zip)
 and build it using:
 ```sh
-cmake -DENABLE_MPI=ON .
-make -j8
+cmake -DWITH_MPI=ON .
+make -j
 ```
 
 Usage example
