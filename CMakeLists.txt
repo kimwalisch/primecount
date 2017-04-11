@@ -26,7 +26,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include Check* #####################################################
 
-include(CheckCXXSourceRuns)
 include(CheckCXXCompilerFlag)
 include(CheckTypeSize)
 
@@ -126,50 +125,25 @@ else()
     endif()
 endif()
 
-# Check if libdivide works ###########################################
+# Check if libdivide.h works #########################################
 
-set(CMAKE_REQUIRED_INCLUDES ${CMAKE_SOURCE_DIR}/include)
+message(STATUS "Performing Test libdivide")
 
-check_cxx_source_runs("
-    #include <libdivide.h>
-    #include <stdint.h>
-    #include <limits>
-
-    int main()
-    {
-        uint64_t tests[20] = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-            63, 101, 511,
-            1 << 5, 1 << 9, 1 << 20,
-            std::numeric_limits<int32_t>::max(),
-            std::numeric_limits<uint32_t>::max(),
-            std::numeric_limits<int64_t>::max(),
-            std::numeric_limits<uint64_t>::max() };
-
-        for (int i = 0; i < 20; i++)
-        {
-            uint64_t x = tests[i];
-
-            for (int j = 2; j < 1000; j++)
-            {
-                libdivide::divider<uint64_t, libdivide::BRANCHFREE> divider(j);
-                if (x / j != x / divider)
-                    return 1;
-            }
-        }
-
-        return 0;
-    }"
-    use_libdivide)
+try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
+        ${CMAKE_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
+        COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Include S2_easy* source files ######################################
 
-if(use_libdivide)
+if(RUN_LIBDIVIDE EQUAL 0)
+    message(STATUS "Performing Test libdivide - Success")
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
+    message(STATUS "Performing Test libdivide - Failed")
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
