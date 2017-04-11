@@ -26,9 +26,7 @@ First install the prerequisites:
 sudo apt-get install g++ make cmake libopenmpi-dev openmpi-bin
 ```
 
-Then download
-[primecount-3.6.zip](https://github.com/kimwalisch/primecount/archive/v3.6.zip)
-and build it using:
+Then build primecount MPI using:
 ```sh
 cmake -DWITH_MPI=ON .
 make -j
@@ -115,10 +113,8 @@ Benchmark pi(10<sup>23</sup>)
 The pi(10<sup>23</sup>) benchmark above was run on an
 [EC2 cluster](https://aws.amazon.com/ec2/) where each cluster node had
 2 CPUs of type Intel Xeon E5-2680 v2 (2.80GHz, 8 CPU cores, 16 threads).
-The cluster has been set up using the
-[StarCluster](http://star.mit.edu/cluster/) tool. The efficiency drops
-slightly beyond 30 cluster nodes, the author thinks this is because
-the input 10<sup>23</sup> is too small.
+The efficiency drops slightly beyond 30 cluster nodes, the author
+thinks this is because the input 10<sup>23</sup> is too small.
 
 Command-line options
 --------------------
