@@ -4,9 +4,9 @@ primecount
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-primecount is a command-line program and C++ library that counts the
-primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly
-optimized** implementations of the
+primecount is a command-line program that counts the primes below an
+integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly optimized**
+implementations of the
 [prime counting function](http://en.wikipedia.org/wiki/Prime-counting_function)
 (combinatorial methods). primecount includes implementations of the
 algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and
@@ -27,12 +27,11 @@ hopefully follow!
 
 Build instructions
 ------------------
-You need to have installed a C++ compiler, cmake and make to build
-primecount.
+You need to have installed a C++ compiler, cmake and make.
 
 ```sh
 cmake .
-make -j8
+make -j
 sudo make install
 ```
 
