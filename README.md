@@ -48,7 +48,7 @@ cmake -DWITH_MPI=ON .
 Binaries
 --------
 Below are the latest precompiled primecount binaries for
-Windows 64-bit, Linux and macOS. These binaries are statically linked
+Windows, Linux and macOS. These binaries are statically linked
 and require a CPU which supports the POPCNT instruction (2010 or
 later).
 
