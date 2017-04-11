@@ -160,11 +160,9 @@ operations and which uses only
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
 space.</p>
 <p>primecount's Legendre, Meissel and Lehmer implementations are based
-on Hans Riesel's book
-<a href="https://github.com/kimwalisch/primecount#references">[5]</a>,
+on Hans Riesel's book <a href="doc/References.md">[5]</a>,
 its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
-based on Tomás Oliveira's paper
-<a href="https://github.com/kimwalisch/primecount#references">[8]</a>.</p>
+based on Tomás Oliveira's paper <a href="doc/References.md">[8]</a>.</p>
 
 Fast nth prime calculation
 --------------------------
@@ -177,7 +175,8 @@ and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
 actual nth prime. The author has implemented
-```primecount::nth_prime(n)``` this way, it finds the nth prime in
+```primecount::nth_prime(n)``` this way (option: ```--nthprime```),
+it finds the nth prime in
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
 operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
@@ -303,15 +302,3 @@ Benchmarks
 The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4
 GHz) from 2015 using a Linux x64 operating system and primecount was
 compiled using GCC 5.4.
-
-References
-----------
-1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
-2. D. H. Lehmer, On the exact number of primes less than a given limit, Illinois J. Math. 3 (1959), pp. 381–388.
-3. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
-4. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
-5. Hans Riesel, Prime Numbers and Computer Methods for Factorization, 2nd ed., Birkhäuser, Boston, 1994. pp. 10-38.
-6. Raymond Séroul, Programming for Mathematicians, Springer-Verlag, Berlin (2000), pp. 175-181.
-7. R. Crandall and C. Pomerance, Prime numbers: a computational perspective, 2nd ed., Springer, New York, 2005. pp. 152-162.
-8. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
-9. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
