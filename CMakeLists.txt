@@ -100,18 +100,6 @@ if(WITH_OPENMP)
     endif()
 endif()
 
-# Check -mpopcnt compiler flag #######################################
-
-if(WITH_POPCNT)
-    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
-    if(mpopcnt)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
-    endif()
-endif()
-
 # Check if int128_t type exists ######################################
 
 check_type_size("int128_t" INT128_T)
@@ -154,6 +142,18 @@ else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
+    endif()
+endif()
+
+# Check -mpopcnt compiler flag #######################################
+
+if(WITH_POPCNT)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
+    if(mpopcnt)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()
 endif()
 
