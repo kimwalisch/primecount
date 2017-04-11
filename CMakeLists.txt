@@ -8,6 +8,7 @@ set(CMAKE_BUILD_TYPE Release)
 # Build options ######################################################
 
 option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
+option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
 option(WITH_OPENMP       "Enable OpenMP support"          ON)
 option(WITH_MPI          "Enable MPI support"             OFF)
 option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
@@ -127,23 +128,29 @@ endif()
 
 # Check if libdivide.h works #########################################
 
-message(STATUS "Performing Test libdivide")
+if(WITH_LIBDIVIDE)
+    message(STATUS "Performing Test libdivide")
 
-try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
-        ${CMAKE_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
-        COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
+    try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
+            ${CMAKE_BINARY_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
+            COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+    if(RUN_LIBDIVIDE EQUAL 0)
+        message(STATUS "Performing Test libdivide - Success")
+    else()
+        message(STATUS "Performing Test libdivide - Failed")
+    endif()
+endif()
 
 # Include S2_easy* source files ######################################
 
 if(RUN_LIBDIVIDE EQUAL 0)
-    message(STATUS "Performing Test libdivide - Success")
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
-    message(STATUS "Performing Test libdivide - Failed")
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
