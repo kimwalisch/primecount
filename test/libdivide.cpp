@@ -10,16 +10,15 @@
 
 #include <libdivide.h>
 #include <stdint.h>
-#include <limits>
 
 uint64_t dividends[20] =
 {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 63, 101, 511,
     1 << 5, 1 << 9, 1 << 20,
-    std::numeric_limits<int32_t>::max(),
-    std::numeric_limits<uint32_t>::max(),
-    std::numeric_limits<int64_t>::max(),
-    std::numeric_limits<uint64_t>::max()
+    (uint64_t) ((1ull << 31) - 1),
+    (uint64_t) ((1ull << 63) - 1),
+    (uint32_t) (~0ull),
+    (uint64_t) (~0ull)
 };
 
 int main()
