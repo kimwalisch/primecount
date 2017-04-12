@@ -8,8 +8,8 @@
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 
@@ -17,9 +17,11 @@
 #include <algorithm>
 #include <string>
 
+using namespace std;
+
 namespace {
 
-const std::string max_n = "216289611853439384";
+const auto max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
 const int primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
@@ -39,8 +41,11 @@ int64_t nth_prime(int64_t n, int threads)
   if (n < 10)
     return primes[n];
 
-  if (n > to_maxint(max_n))
-    throw primecount_error("nth_prime(n): n must be <= " + max_n);
+  if (n > max_n)
+  {
+    string msg("nth_prime(n): n must be <= " + to_string(max_n));
+    throw primecount_error(msg);
+  }
 
   int64_t prime = 0;
   int64_t prime_approx = 0;
@@ -58,7 +63,7 @@ int64_t nth_prime(int64_t n, int threads)
 
     if (count_approx < n)
       prime = primesieve::nth_prime(n - count_approx, prime_approx);
-    else /* count_approx >= n */
+    else // count_approx >= n
       prime = primesieve::nth_prime(n - count_approx - 1, prime_approx + 1);
   }
 
