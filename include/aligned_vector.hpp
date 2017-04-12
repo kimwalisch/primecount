@@ -13,6 +13,11 @@
 #include <cstddef>
 #include <vector>
 
+// Maximum cache line size of current CPUs
+#ifndef CACHE_LINE_SIZE
+  #define CACHE_LINE_SIZE 128
+#endif
+
 namespace primecount {
 
 /// The aligned_vector class aligns each of its elements on a
@@ -28,12 +33,11 @@ public:
   std::size_t size() const { return vect_.size(); }
   T& operator[](std::size_t pos) { return vect_[pos].val; }
 private:
-  struct aligned_t
+  struct alignas(CACHE_LINE_SIZE) align_t
   {
-    // maximum cache line size of current CPUs
-    alignas(128) T val;
+    T val;
   };
-  std::vector<aligned_t> vect_;
+  std::vector<align_t> vect_;
 };
 
 } // namespace
