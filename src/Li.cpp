@@ -2,7 +2,7 @@
 /// @file  Li.cpp
 /// @brief Logarithmic integral approximation.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,7 +24,7 @@ namespace Li {
 
 /// Calculate the logarithmic integral using Ramanujan's fast
 /// converging formula (accurate up to 10^17).
-/// @see http://mathworld.wolfram.com/LogarithmicIntegral.html (15)
+/// http://mathworld.wolfram.com/LogarithmicIntegral.html
 ///
 long double li(long double x)
 {
@@ -83,7 +83,7 @@ T Li_inverse(T x)
 
   // overflow
   if (first < x) return -1;
-  if (last  < x) last = prt::numeric_limits<T>::max();
+  if (last < x) last = prt::numeric_limits<T>::max();
 
   // Find Li^-1(x) using binary search
   while (first < last)
@@ -127,4 +127,4 @@ int128_t Li_inverse(int128_t x)
 
 #endif
 
-} // namespace primecount
+} // namespace
