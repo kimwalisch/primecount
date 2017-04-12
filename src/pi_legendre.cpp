@@ -1,14 +1,13 @@
 ///
 /// @file  pi_legendre.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount-internal.hpp>
-#include <primecount.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -23,8 +22,7 @@ int64_t pi_legendre(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  // disable printing for pi_legendre() because it is used to
-  // initialize all other prime counting functions 
+  // disable printing for pi_legendre()
   bool is_print = print_status();
   set_print_status(false);
 
