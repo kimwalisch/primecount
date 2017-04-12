@@ -5,26 +5,29 @@ compiler:
   - gcc
   - clang
 
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+
 env:
   global:
     - CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"
     - OMP_NUM_THREADS=4
 
-before_install:
+install:
   - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
-
-# Install cmake, OpenMPI, cppcheck
-install:
   - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+  - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
 
-# Test build.sh script
-before_script:
+script:
   - cmake . -DWITH_MPI=ON
   - make -j4
   - ldd primecount
   - cppcheck src include --error-exitcode=1
-
-# Run primecount tests
-script:
   - ./primecount --test
