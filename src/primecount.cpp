@@ -2,7 +2,7 @@
 /// @file   primecount.cpp
 /// @brief  primecount C++ API
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -65,7 +65,7 @@ using namespace std;
 namespace {
 
 #ifdef _OPENMP
-  int threads_ = -1;
+  int threads_ = 0;
 #endif
 
 int status_precision_ = -1;
@@ -381,7 +381,7 @@ void set_num_threads(int threads)
 int get_num_threads()
 {
 #ifdef _OPENMP
-  if (threads_ != -1)
+  if (threads_)
     return threads_;
   else
     return max(1, omp_get_max_threads());
