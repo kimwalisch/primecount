@@ -292,9 +292,9 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t z = x / y;
   int64_t p2 = P2(x, y, threads);
 
-  vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
+  auto lpf = generate_lpf(y);
+  auto mu = generate_moebius(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = PhiTiny::get_c(y);

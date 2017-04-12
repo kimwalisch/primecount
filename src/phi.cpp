@@ -22,15 +22,15 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <PiTable.hpp>
-#include <primecount-internal.hpp>
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
@@ -191,7 +191,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     sum = phi_tiny(x, a);
   else
   {
-    vector<int32_t> primes = generate_n_primes(a);
+    auto primes = generate_n_primes<int32_t>(a);
 
     if (primes.at(a) >= x)
       sum = 1;

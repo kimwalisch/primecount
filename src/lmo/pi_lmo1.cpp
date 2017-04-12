@@ -7,7 +7,7 @@
 ///        implementation calculates phi(x, a) using the recursive
 ///        formula with caching.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,16 +42,16 @@ int64_t pi_lmo1(int64_t x)
   int64_t S1 = 0;
   int64_t S2 = 0;
 
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
+  auto lpf = generate_lpf(y);
+  auto mu = generate_moebius(y);
 
-  // Calculate the contribution of the ordinary leaves
+  // ordinary leaves
   for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > primes[c])
       S1 += mu[n] * phi(x / n, c);
 
-  // Calculate the contribution of the special leaves
+  // special leaves
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])

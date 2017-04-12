@@ -6,7 +6,7 @@
 ///        (PiTable & FactorTable) to reduce the memory usage by
 ///        about 10x.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -427,7 +427,7 @@ void S2_hard_mpi_slave(T x,
   // this will take a while to initialize
   FactorTable<F> factors(y, threads);
   int64_t max_prime = z / isqrt(y);
-  vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+  auto primes = generate_primes<int64_t>(max_prime);
   PiTable pi(max_prime);
 
   S2_hard_mpi_msg get_work;

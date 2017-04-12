@@ -1,14 +1,14 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
+#include <generate.hpp>
 #include <imath.hpp>
-#include <primesieve.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -19,31 +19,9 @@ using namespace std;
 
 namespace primecount {
 
-/// Generate a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-///
-vector<int32_t> generate_primes(int64_t max)
-{
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_primes(max, &primes);
-  return primes;
-}
-
-/// Generate a vector with the first n primes.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-///
-vector<int32_t> generate_n_primes(int64_t n)
-{
-  vector<int32_t> primes;
-  primes.push_back(0);
-  primesieve::generate_n_primes(n, &primes);
-  return primes;
-}
-
 /// Generate a vector with Möbius function values.
-/// This implementation is based on code by Rick Sladkey
-/// posted here: http://mathoverflow.net/a/99545
+/// This implementation is based on code by Rick Sladkey:
+/// http://mathoverflow.net/a/99545
 ///
 vector<int32_t> generate_moebius(int64_t max)
 {
@@ -75,10 +53,10 @@ vector<int32_t> generate_moebius(int64_t max)
   return mu;
 }
 
-/// Generate a vector with the least prime
-/// factors of the integers <= max.
+/// Generate a vector with the least prime factors
+/// of the integers <= max.
 ///
-vector<int32_t> generate_least_prime_factors(int64_t max)
+vector<int32_t> generate_lpf(int64_t max)
 {
   vector<int32_t> lpf(max + 1, 1);
 
@@ -101,24 +79,25 @@ vector<int32_t> generate_least_prime_factors(int64_t max)
   return lpf;
 }
 
-/// Generate a vector with the prime counts below max
+/// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
 vector<int32_t> generate_pi(int64_t max)
 {
-  vector<char> is_prime(max + 1, 1);
+  int64_t size = max + 1;
+  vector<char> sieve(size, 1);
 
   for (int64_t i = 2; i * i <= max; i++)
-    if (is_prime[i])
+    if (sieve[i])
       for (int64_t j = i * i; j <= max; j += i)
-        is_prime[j] = 0;
+        sieve[j] = 0;
 
-  vector<int32_t> pi(max + 1, 0);
+  vector<int32_t> pi(size, 0);
   int32_t pix = 0;
 
   for (int64_t x = 2; x <= max; x++)
   {
-    pix += is_prime[x];
+    pix += sieve[x];
     pi[x] = pix;
   }
 

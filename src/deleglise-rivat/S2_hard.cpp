@@ -414,7 +414,7 @@ int64_t S2_hard(int64_t x,
   double time = get_wtime();
   FactorTable<uint16_t> factors(y, threads);
   int64_t max_prime = z / isqrt(y);
-  vector<int32_t> primes = generate_primes(max_prime);
+  auto primes = generate_primes<int32_t>(max_prime);
 
   int64_t s2_hard = S2_hard_OpenMP_master((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
@@ -449,7 +449,7 @@ int128_t S2_hard(int128_t x,
   {
     FactorTable<uint16_t> factors(y, threads);
     int64_t max_prime = z / isqrt(y);
-    vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
+    auto primes = generate_primes<uint32_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
@@ -457,7 +457,7 @@ int128_t S2_hard(int128_t x,
   {
     FactorTable<uint32_t> factors(y, threads);
     int64_t max_prime = z / isqrt(y);
-    vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+    auto primes = generate_primes<int64_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }

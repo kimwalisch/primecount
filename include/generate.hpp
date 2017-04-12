@@ -1,7 +1,7 @@
 ///
 /// @file  generate.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,15 +29,17 @@ std::vector<T> generate_primes(int64_t max)
   return primes;
 }
 
-/// Generate a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-std::vector<int32_t> generate_primes(int64_t max);
-
 /// Generate a vector with the first n primes.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 //
-std::vector<int32_t> generate_n_primes(int64_t n);
+template <typename T>
+std::vector<T> generate_n_primes(int64_t n)
+{
+  std::vector<T> primes;
+  primes.push_back(0);
+  primesieve::generate_n_primes(n, &primes);
+  return primes;
+}
 
 /// Generate a vector with Möbius function values.
 std::vector<int32_t> generate_moebius(int64_t max);
@@ -45,7 +47,7 @@ std::vector<int32_t> generate_moebius(int64_t max);
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> generate_least_prime_factors(int64_t max);
+std::vector<int32_t> generate_lpf(int64_t max);
 
 /// Generate a vector with the prime counts below max
 /// using the sieve of Eratosthenes.

@@ -5,7 +5,7 @@
 ///        divides with comparatively cheap multiplication and
 ///        bitshifts.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -167,7 +167,7 @@ int64_t S2_easy_mpi(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  vector<int32_t> primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
@@ -193,12 +193,12 @@ int128_t S2_easy_mpi(int128_t x,
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
   {
-    vector<uint32_t> primes = generate_primes<uint32_t>(y);
+    auto primes = generate_primes<uint32_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
-    vector<int64_t> primes = generate_primes<int64_t>(y);
+    auto primes = generate_primes<int64_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
 
