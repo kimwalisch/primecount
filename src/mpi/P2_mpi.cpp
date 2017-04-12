@@ -115,10 +115,8 @@ T P2_OpenMP_thread(T x,
 template <typename T>
 T P2_mpi_master(T x, int64_t y, int threads)
 {
-#if __cplusplus >= 201103L
   static_assert(prt::is_signed<T>::value,
                 "P2(T x, ...): T must be signed integer type");
-#endif
 
   if (x < 4)
     return 0;
