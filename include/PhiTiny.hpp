@@ -18,7 +18,8 @@
 
 namespace primecount {
 
-class PhiTiny {
+class PhiTiny
+{
 public:
   PhiTiny();
   static int64_t max_a() { return 6; }
@@ -63,24 +64,12 @@ inline bool is_phi_tiny(int64_t a)
   return PhiTiny::is_tiny(a);
 }
 
-#if __cplusplus >= 201103L
-
 template <typename X, typename A>
 typename prt::make_signed<X>::type phi_tiny(X x, A a)
 {
   return phiTiny.phi(x, a);
 }
 
-#else /* C++98 */
-
-template <typename X, typename A>
-X phi_tiny(X x, A a)
-{
-  return phiTiny.phi(x, a);
-}
-
-#endif
-
 } // namespace
 
-#endif /* PHITINY_HPP */
+#endif
