@@ -135,7 +135,7 @@ public:
   }
 
 private:
-  vector<vector<uint16_t> > cache_;
+  vector<vector<uint16_t>> cache_;
   vector<int64_t>& primes_;
   PiTable& pi_;
   int64_t bytes_;
