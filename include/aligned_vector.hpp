@@ -1,7 +1,7 @@
 ///
 /// @file  aligned_vector.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,32 +13,27 @@
 #include <cstddef>
 #include <vector>
 
-// Maximum cache line size of current CPUs
-#ifndef CACHE_LINE_SIZE
-  #define CACHE_LINE_SIZE 128
-#endif
-
 namespace primecount {
 
 /// The aligned_vector class aligns each of its elements on a
 /// new cache line in order to avoid false sharing (cache trashing)
 /// when multiple threads write to adjacent elements.
 ///
-template <typename T, std::size_t ALIGN = CACHE_LINE_SIZE>
+template <typename T>
 class aligned_vector
 {
 public:
   aligned_vector(std::size_t size)
-    : vector_(size) { }
-  T& operator[](std::size_t pos) { return vector_[pos].val; }
-  std::size_t size() const { return vector_.size(); }
+    : vect_(size) { }
+  std::size_t size() const { return vect_.size(); }
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
 private:
-  struct aligned_type
+  struct aligned_t
   {
-    T val;
-    char pad[ALIGN - sizeof(T)];
+    // maximum cache line size of current CPUs
+    alignas(128) T val;
   };
-  std::vector<aligned_type> vector_;
+  std::vector<aligned_t> vect_;
 };
 
 } // namespace
