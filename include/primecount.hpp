@@ -1,7 +1,7 @@
 ///
 /// @file  primecount.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License.
 ///
@@ -27,7 +27,7 @@ public:
   { }
 };
 
-/// Alias for the fastest prime counting function in primecount.
+/// Alias for the fastest prime counting function.
 int64_t pi(int64_t x);
 
 /// 128-bit prime counting function.
@@ -94,9 +94,6 @@ int64_t Li(int64_t x);
 /// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x);
-
-/// Enable/disable printing status information during computation.
-void set_print_status(bool print_status);
 
 /// Set the number of threads.
 void set_num_threads(int num_threads);

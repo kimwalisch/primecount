@@ -37,6 +37,8 @@ void print(const std::string& res_name, maxint_t res, double time);
 
 void print_seconds(double seconds);
 
+void set_print_status(bool print_status);
+
 } // namespace
 
 #endif
