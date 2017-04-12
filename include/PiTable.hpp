@@ -1,20 +1,10 @@
 ///
 /// @file   PiTable.hpp
 /// @brief  The PiTable class is a compressed lookup table for prime
-///         counts. It uses only (n / 64 * 16) bytes of memory and
+///         counts. It uses only (n / 4) bytes of memory and
 ///         returns the number of primes below n in O(1) operations.
 ///
-///         How it works:
-///
-///         1) pi_[n / 64].prime_count = pi(n - n % 64).
-///
-///         2) pi_[n / 64].bits corresponds to ]base, base + 64] with
-///            base = n - n % 64, each bit represents one number and
-///            if the bit is 1 the number is a prime. Using the
-///            POPCNT instruction we can now easily count the primes
-///            within ]n - n % 64, n] and add it to 1).
-///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,7 +26,7 @@ class PiTable
 public:
   PiTable(uint64_t max);
 
-  /// @return  The number of primes <= n
+  /// Get number of primes <= n
   int64_t operator[](uint64_t n) const
   {
     assert(n <= max_);

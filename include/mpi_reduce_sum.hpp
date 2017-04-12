@@ -2,7 +2,7 @@
 /// @file   mpi_reduce_sum.hpp
 /// @brief  MPI utility functions and classes.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -57,4 +57,4 @@ inline T mpi_reduce_sum(T x)
 
 } // namespace
 
-#endif /* MPI_REDUCE_SUM_HPP */
+#endif

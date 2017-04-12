@@ -1,7 +1,7 @@
 ///
 /// @file  print.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,8 +11,8 @@
 #define PRINT_HPP
 
 #include <int128_t.hpp>
-#include <stdint.h>
 
+#include <stdint.h>
 #include <string>
 
 namespace primecount {

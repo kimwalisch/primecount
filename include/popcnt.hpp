@@ -85,4 +85,4 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
   return cnt;
 }
 
-#endif /* POPCNT_HPP */
+#endif
