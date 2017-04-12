@@ -263,7 +263,7 @@ int64_t S2(int64_t x,
 {
   int64_t limit = z + 1;
   threads = ideal_num_threads(threads, limit);
-  vector<int32_t> pi = generate_pi(y);
+  auto pi = generate_pi(y);
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int64_t s2_easy = S2_easy(x, y, z, c, threads);

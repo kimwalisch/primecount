@@ -4,7 +4,7 @@
 ///        leaves in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
 ///        prime counting algorithms.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -67,7 +67,7 @@ X S1_OpenMP_master(X x,
 {
   int64_t thread_threshold = ipow(10, 6);
   threads = ideal_num_threads(threads, y, thread_threshold);
-  vector<Y> primes = generate_primes<Y>(y);
+  auto primes = generate_primes<Y>(y);
   X s1 = phi_tiny(x, c);
 
   #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: s1)

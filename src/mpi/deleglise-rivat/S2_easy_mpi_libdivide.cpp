@@ -39,7 +39,7 @@ bool is_libdivide(T x)
   return x <= numeric_limits<uint64_t>::max();
 }
 
-typedef libdivide::divider<uint64_t, libdivide::BRANCHFREE> fastdiv_t;
+using fastdiv_t = libdivide::divider<uint64_t, libdivide::BRANCHFREE>;
 
 template <typename Primes>
 vector<fastdiv_t>
@@ -62,7 +62,7 @@ T S2_easy_mpi_master(T x,
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   threads = ideal_num_threads(threads, x13, 1000);
-  vector<fastdiv_t> fastdiv = libdivide_vector(primes);
+  auto fastdiv = libdivide_vector(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];

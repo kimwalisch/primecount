@@ -81,7 +81,7 @@ int64_t S2_hard(int64_t x,
   int64_t S2_result = 0;
 
   BitSieve sieve(segment_size);
-  vector<int32_t> primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<int32_t>(y);
   vector<int32_t> counters(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
@@ -167,7 +167,7 @@ int64_t S2(int64_t x,
            vector<int32_t>& lpf,
            vector<int32_t>& mu)
 {
-  vector<int32_t> pi = generate_pi(y);
+  auto pi = generate_pi(y);
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, 1);
   int64_t s2_easy = S2_easy(x, y, z, c, 1);
