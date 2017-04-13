@@ -90,6 +90,7 @@ double rel_std_dev(thread_timings_t& timings)
 
   double std_dev = sqrt(sum / max(1.0, n - 1.0));
   double rsd = 100 * std_dev / avg;
+
   return rsd;
 }
 
@@ -195,9 +196,6 @@ void S2LoadBalancer::update_min_size(double divisor)
   min_size_ = next_power_of_2(min_size_);
 }
 
-/// Balance the load in the computation of the special leaves
-/// by dynamically adjusting the segment_size and segments_per_thread.
-///
 void S2LoadBalancer::update(int64_t* segment_size,
                             int64_t* segments_per_thread,
                             int64_t low,
