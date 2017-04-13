@@ -67,7 +67,7 @@ public:
         int64_t low)
   {
     wheel_.reserve(size);
-    push_back(0, 0);
+    wheel_.emplace_back(0, 0);
 
     for (int64_t b = 1; b < size; b++)
     {
@@ -77,19 +77,17 @@ public:
       // first multiple of prime >= low
       int64_t multiple = prime * quotient;
 
-      // calculate the next multiple of prime that is not
-      // divisible by any of the wheel's factors (2, 3, 5, 7)
+      // calculate the next multiple of prime that
+      // is not divisible by any of the wheel's
+      // prime factors (2, 3, 5, 7)
       int64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
       int64_t wheel_index = initWheel210[quotient % 210].wheel_index;
       multiple += prime * next_multiple_factor;
 
-      push_back(multiple, wheel_index);
+      wheel_.emplace_back(multiple, wheel_index);
     }
   }
 
-  /// Calculate the next multiple of prime using:
-  /// next_multiple = multiple + prime * next_multiple_factor(&wheel_index)
-  ///
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
     int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;
@@ -102,11 +100,6 @@ public:
     return wheel_[i];
   }
 private:
-  void push_back(int64_t multiple,
-                 int64_t wheel_index)
-  {
-    wheel_.emplace_back(multiple, wheel_index);
-  }
 
   static const InitWheel initWheel210[210];
   static const NextWheel nextWheel210[48];
