@@ -141,8 +141,8 @@ int64_t S2_hard(int64_t x,
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min3(x / (prime * low), z / prime, y)];
-      int64_t min_hard = max3(x / (prime * high), y / prime, prime);
+      int64_t l = pi[min(x / (prime * low), z / prime, y)];
+      int64_t min_hard = max(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;

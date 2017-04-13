@@ -49,13 +49,25 @@ inline B min(A a, B b)
   return (B) std::min(a, (A) b);
 }
 
+template <typename T>
+inline T min(T a, T b, T c)
+{
+  return std::min(a, std::min(b, c));
+}
+
 template <typename A, typename B>
-inline B min3(A a, B b, B c)
+inline B min(A a, B b, B c)
 {
   static_assert(is_comparable<A, B>::value,
-                "min3(A, B, B): Cannot compare types A and B");
+                "min(A, B, B): Cannot compare types A and B");
 
   return (B) std::min(a, (A) std::min(b, c));
+}
+
+template <typename T>
+inline T max(T a, T b, T c)
+{
+  return std::max(a, std::max(b, c));
 }
 
 template <typename A, typename B>
@@ -68,10 +80,10 @@ inline A max(A a, B b)
 }
 
 template <typename A, typename B>
-inline A max3(A a, B b, B c)
+inline A max(A a, B b, B c)
 {
   static_assert(is_comparable<A, B>::value,
-                "max3(A, B, B): Cannot compare types A and B");
+                "max(A, B, B): Cannot compare types A and B");
 
   return std::max(a, (A) std::max(b, c));
 }

@@ -164,7 +164,7 @@ int64_t S2_thread(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
-      int64_t min_m = max3(x / (prime * high), y / prime, prime);
+      int64_t min_m = max(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
