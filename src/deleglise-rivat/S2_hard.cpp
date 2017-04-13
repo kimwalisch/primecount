@@ -353,8 +353,8 @@ T S2_hard_OpenMP_master(T x,
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
-    aligned_vector<vector<int64_t> > phi(threads);
-    aligned_vector<vector<int64_t> > mu_sum(threads);
+    aligned_vector<vector<int64_t>> phi(threads);
+    aligned_vector<vector<int64_t>> mu_sum(threads);
     aligned_vector<double> timings(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
