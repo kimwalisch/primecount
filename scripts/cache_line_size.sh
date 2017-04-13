@@ -1,5 +1,5 @@
 #!/bin/sh
-# Script that prints the CPUs cache line size in bytes
+# Script that prints the CPU's cache line size in bytes
 # Usage: ./cache_line_size.sh
 
 command -v getconf >/dev/null 2>/dev/null
