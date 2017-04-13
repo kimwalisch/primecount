@@ -11,7 +11,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <aligned_vector.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
 #include <imath.hpp>
@@ -210,8 +209,8 @@ int64_t S2(int64_t x,
   int64_t segments_per_thread = ceil_div(segments, threads);
 
   vector<int32_t> pi = generate_pi(y);
-  aligned_vector<vector<int64_t>> phi(threads);
-  aligned_vector<vector<int64_t>> mu_sum(threads);
+  phi_t phi(threads);
+  mu_sum_t mu_sum(threads);
 
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)

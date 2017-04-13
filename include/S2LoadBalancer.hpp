@@ -1,7 +1,7 @@
 ///
 /// @file  S2LoadBalancer.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,9 +10,8 @@
 #ifndef S2LOADBALANCER_HPP
 #define S2LOADBALANCER_HPP
 
-#include <aligned_vector.hpp>
+#include <primecount-internal.hpp>
 #include <int128_t.hpp>
-
 #include <stdint.h>
 
 namespace primecount {
@@ -24,11 +23,11 @@ public:
   S2LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t threads, double rsd);
   int64_t get_min_segment_size() const;
   double get_rsd() const;
-  void update(int64_t low,
-              int64_t threads,
-              int64_t* segment_size,
+  void update(int64_t* segment_size,
               int64_t* segments_per_thread,
-              aligned_vector<double>& timings);
+              int64_t low,
+              int64_t threads,
+              thread_timings_t& timings);
 private:
   void init(maxint_t x, int64_t y, int64_t threads);
   void set_min_size(int64_t z);

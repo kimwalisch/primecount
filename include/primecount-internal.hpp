@@ -2,7 +2,7 @@
 /// @file   primecount-internal.hpp
 /// @brief  primecount internal function definitions.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,7 +23,12 @@
 
 namespace primecount {
 
-/// Silence unused parameter compiler warning
+typedef aligned_vector<double> thread_timings_t;
+
+typedef aligned_vector<std::vector<int64_t>> phi_t;
+
+typedef aligned_vector<std::vector<int64_t>> mu_sum_t;
+
 template<class T>
 void unused_param(const T&)
 { }
@@ -172,9 +177,9 @@ int64_t P2_mpi(int64_t x, int64_t y, int threads);
 
 int128_t P2_mpi(int128_t x, int64_t y, int threads);
 
-#endif /* HAVE_INT128_T */
+#endif
 
-#endif /* HAVE_MPI */
+#endif
 
 } // namespace
 

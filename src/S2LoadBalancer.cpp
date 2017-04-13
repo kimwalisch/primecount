@@ -49,7 +49,6 @@
 
 #include <S2LoadBalancer.hpp>
 #include <primecount-internal.hpp>
-#include <aligned_vector.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 
@@ -62,7 +61,7 @@ using namespace primecount;
 
 namespace {
 
-double get_avg(aligned_vector<double>& timings)
+double get_avg(thread_timings_t& timings)
 {
   size_t n = timings.size();
   double sum = 0;
@@ -74,7 +73,7 @@ double get_avg(aligned_vector<double>& timings)
 }
 
 /// Relative standard deviation
-double rel_std_dev(aligned_vector<double>& timings)
+double rel_std_dev(thread_timings_t& timings)
 {
   size_t n = timings.size();
   double avg = get_avg(timings);
@@ -91,7 +90,6 @@ double rel_std_dev(aligned_vector<double>& timings)
 
   double std_dev = sqrt(sum / max(1.0, n - 1.0));
   double rsd = 100 * std_dev / avg;
-
   return rsd;
 }
 
@@ -199,13 +197,12 @@ void S2LoadBalancer::update_min_size(double divisor)
 
 /// Balance the load in the computation of the special leaves
 /// by dynamically adjusting the segment_size and segments_per_thread.
-/// @param timings  Timings of the threads.
 ///
-void S2LoadBalancer::update(int64_t low,
-                            int64_t threads,
-                            int64_t* segment_size,
+void S2LoadBalancer::update(int64_t* segment_size,
                             int64_t* segments_per_thread,
-                            aligned_vector<double>& timings)
+                            int64_t low,
+                            int64_t threads,
+                            thread_timings_t& timings)
 {
   count_++;
   double seconds = get_avg(timings);

@@ -368,9 +368,9 @@ T S2_hard_OpenMP_master(int64_t low,
     segments_per_thread = in_between(1, segments_per_thread, 
         ceil_div(segments, threads));
 
-    aligned_vector<vector<int64_t>> phi(threads);
-    aligned_vector<vector<int64_t>> mu_sum(threads);
-    aligned_vector<double> timings(threads);
+    phi_t phi(threads);
+    mu_sum_t mu_sum(threads);
+    thread_timings_t timings(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
     for (int i = 0; i < threads; i++)
@@ -398,7 +398,7 @@ T S2_hard_OpenMP_master(int64_t low,
     low += segments_per_thread * threads * segment_size;
 
     if (low < limit)
-      loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+      loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
   }
 
   double seconds = get_wtime() - time;
