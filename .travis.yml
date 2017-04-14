@@ -26,15 +26,15 @@ install:
   - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
 
 script:
+  - cppcheck src include --error-exitcode=1
   - mkdir build
   - cd build
   - cmake ..
   - make -j4
   - ldd primecount
-  - cppcheck src include --error-exitcode=1
   - ./primecount --test
   - valgrind --error-exitcode=1 ./primecount 1e14
-  - valgrind --error-exitcode=1 ./primecount 1e14 --lmo
+  - valgrind --error-exitcode=1 ./primecount 1e13 --lmo
   - valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
   - valgrind --error-exitcode=1 ./primecount 1e12 --meissel
   - valgrind --error-exitcode=1 ./primecount 1e12 --lehmer
