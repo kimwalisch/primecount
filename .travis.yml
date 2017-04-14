@@ -26,7 +26,9 @@ install:
   - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
 
 script:
-  - cmake . -DWITH_MPI=ON
+  - mkdir build
+  - cd build
+  - cmake ..
   - make -j4
   - ldd primecount
   - cppcheck src include --error-exitcode=1
@@ -36,3 +38,9 @@ script:
   - valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
   - valgrind --error-exitcode=1 ./primecount 1e12 --meissel
   - valgrind --error-exitcode=1 ./primecount 1e12 --lehmer
+  - cd ..
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - cmake .. -DWITH_MPI=ON
+  - make -j4
