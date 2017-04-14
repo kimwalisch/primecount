@@ -208,7 +208,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
       int64_t thread_threshold = p14 / primes[a];
       threads = ideal_num_threads(threads, x, thread_threshold);
 
-      // this loop scales only up to about 8 CPU cores
+      // this loop scales only up to 8 CPU cores
       threads = min(8, threads);
 
       #pragma omp parallel for schedule(dynamic, 16) \

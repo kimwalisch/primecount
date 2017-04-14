@@ -201,8 +201,7 @@ vector<int64_t> phi_vector(int64_t x,
     int64_t thread_threshold = p14 / primes[a];
     threads = ideal_num_threads(threads, x, thread_threshold);
 
-    // this loop scales only up to about 8 CPU cores
-    // because the cache requires too much memory bandwidth
+    // this loop scales only up to 8 CPU cores
     threads = min(8, threads);
 
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
