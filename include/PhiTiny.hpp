@@ -13,6 +13,7 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <array>
 #include <cassert>
 #include <vector>
 
@@ -22,18 +23,22 @@ class PhiTiny
 {
 public:
   PhiTiny();
-  static int64_t max_a() { return 6; }
-  static bool is_tiny(int64_t a) { return a <= max_a(); }
+
+  static int64_t max_a()
+  {
+    return primes.size() - 1;
+  }
 
   /// Partial sieve function (a.k.a. Legendre-sum).
   /// phi(x, a) counts the numbers <= x that are not divisible
   /// by any of the first a primes.
-  /// @pre is_tiny(a).
+  /// @pre a <= max_a().
   ///
   template <typename X, typename A>
   X phi(X x, A a) const
   {
-    assert(is_tiny(a));
+    assert(a <= max_a());
+
     // phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
     // with pp = 2 * 3 * ... * prime[a]
     X pp = prime_products[a];
@@ -44,24 +49,24 @@ public:
   {
     assert(y >= 0);
 
-    if (y >= primes[max_a()])
+    if (y >= primes.back())
       return max_a();
     else
       return pi[y];
   }
 private:
-  std::vector<int16_t> phi_cache_[7];
-  static const int pi[20];
-  static const int primes[7];
-  static const int prime_products[7];
-  static const int totients[7];
+  std::array<std::vector<int16_t>, 7> phi_cache_;
+  static const std::array<int, 7> primes;
+  static const std::array<int, 7> prime_products;
+  static const std::array<int, 7> totients;
+  static const std::array<int, 13> pi;
 };
 
 extern const PhiTiny phiTiny;
 
 inline bool is_phi_tiny(int64_t a)
 {
-  return PhiTiny::is_tiny(a);
+  return a <= PhiTiny::max_a();
 }
 
 template <typename X, typename A>
