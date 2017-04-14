@@ -131,7 +131,7 @@ private:
 
   int64_t cache_size(int64_t a) const
   {
-    return (int64_t) cache_[a].size();
+    return cache_[a].size();
   }
 
   bool is_pix(int64_t x, int64_t a) const
