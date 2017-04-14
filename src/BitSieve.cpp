@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <vector>
@@ -25,11 +26,11 @@ using namespace std;
 
 namespace {
 
-/// 1-indexing: primes[1] = 2, primes[2] = 3, ...
-const uint64_t primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+/// primes[1] = 2, primes[2] = 3, ...
+const array<uint64_t, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 /// Bitmasks with multiples of the i-th prime set
-const uint64_t masks[] =
+const array<uint64_t, 10> masks =
 {
   0x0000000000000000ull,
   0x5555555555555555ull, // 2
@@ -90,7 +91,7 @@ BitSieve::BitSieve(std::size_t size) :
 ///
 void BitSieve::pre_sieve(uint64_t c, uint64_t low)
 {
-  assert(c < 10);
+  assert(c < primes.size());
 
   if (sieve_.empty())
     return;
