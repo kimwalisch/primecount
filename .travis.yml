@@ -21,7 +21,7 @@ env:
 install:
   - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
-  - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck
+  - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck valgrind
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
   - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
 
@@ -31,3 +31,8 @@ script:
   - ldd primecount
   - cppcheck src include --error-exitcode=1
   - ./primecount --test
+  - valgrind --error-exitcode=1 ./primecount 1e14
+  - valgrind --error-exitcode=1 ./primecount 1e14 --lmo
+  - valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
+  - valgrind --error-exitcode=1 ./primecount 1e12 --meissel
+  - valgrind --error-exitcode=1 ./primecount 1e12 --lehmer
