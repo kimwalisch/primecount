@@ -15,7 +15,7 @@ addons:
 
 env:
   global:
-    - CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"
+    - CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"
     - OMP_NUM_THREADS=4
 
 install:
