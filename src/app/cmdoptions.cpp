@@ -10,6 +10,8 @@
 ///
 
 #include "cmdoptions.hpp"
+
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 
@@ -17,7 +19,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <exception>
 #include <cstdlib>
 #include <cstddef>
 
@@ -88,6 +89,8 @@ struct Option
   template <typename T>
   T getValue() const
   {
+    if (value.empty())
+      throw primecount_error("missing value for option " + str);
     return (T) to_maxint(value);
   }
 };
@@ -122,8 +125,9 @@ Option makeOption(const string& str)
   }
   if (opt.str.empty() && !opt.value.empty())
     opt.str = "--number";
+
   if (!optionMap.count(opt.str))
-    opt.str = "--help";
+    throw primecount_error("unknown option " + opt.str);
 
   return opt;
 }
@@ -133,29 +137,22 @@ CmdOptions parseOptions(int argc, char* argv[])
   CmdOptions opts;
   std::vector<maxint_t> numbers;
 
-  try
+  for (int i = 1; i < argc; i++)
   {
-    for (int i = 1; i < argc; i++)
-    {
-      Option opt = makeOption(argv[i]);
+    Option opt = makeOption(argv[i]);
 
-      switch (optionMap[opt.str])
-      {
-        case OPTION_ALPHA:   set_alpha(std::stod(opt.value)); break;
-        case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
-        case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
-        case OPTION_HELP:    help(); break;
-        case OPTION_STATUS:  optionStatus(opt, opts) ;break;
-        case OPTION_TIME:    opts.time = true; break;
-        case OPTION_TEST:    if (test()) exit(0); exit(1);
-        case OPTION_VERSION: version(); break;
-        default:             opts.option = optionMap[opt.str];
-      }
+    switch (optionMap[opt.str])
+    {
+      case OPTION_ALPHA:   set_alpha(std::stod(opt.value)); break;
+      case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
+      case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
+      case OPTION_HELP:    help(); break;
+      case OPTION_STATUS:  optionStatus(opt, opts) ;break;
+      case OPTION_TIME:    opts.time = true; break;
+      case OPTION_TEST:    if (test()) exit(0); exit(1);
+      case OPTION_VERSION: version(); break;
+      default:             opts.option = optionMap[opt.str];
     }
-  }
-  catch (std::exception&)
-  {
-    help();
   }
 
   if (numbers.size() == 1)

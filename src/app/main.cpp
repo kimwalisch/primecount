@@ -12,6 +12,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
@@ -168,15 +169,15 @@ int main (int argc, char* argv[])
   MPI_Init(&argc, &argv);
 #endif
 
-  CmdOptions opt = parseOptions(argc, argv);
-  double time = get_wtime();
-
-  maxint_t x = opt.x;
-  maxint_t res = 0;
-  int threads = opt.threads;
-
   try
   {
+    CmdOptions opt = parseOptions(argc, argv);
+    double time = get_wtime();
+
+    maxint_t x = opt.x;
+    maxint_t res = 0;
+    int threads = opt.threads;
+
     switch (opt.option)
     {
       case OPTION_DELEGLISE_RIVAT:
@@ -238,14 +239,23 @@ int main (int argc, char* argv[])
         res = pi_deleglise_rivat_parallel3(x, threads); break;
 #endif
     }
+
+    if (print_result())
+    {
+      if (print_status())
+        cout << endl;
+      cout << res << endl;
+      if (opt.time)
+        print_seconds(get_wtime() - time);
+    }
   }
-  catch (bad_alloc&)
+  catch (calculator::error& e)
   {
 #ifdef HAVE_MPI
     MPI_Finalize();
 #endif
-    cerr << "Error: failed to allocate memory, your system most likely does" << endl
-         << "       not have enough memory for this computation." << endl;
+    cerr << e.what() << "." << endl
+         << "Try `primecount --help' for more information." << endl;
     return 1;
   }
   catch (exception& e)
@@ -253,17 +263,9 @@ int main (int argc, char* argv[])
 #ifdef HAVE_MPI
     MPI_Finalize();
 #endif
-    cerr << "Error: " << e.what() << endl;
+    cerr << "Error: " << e.what() << "." << endl
+         << "Try `primecount --help' for more information." << endl;
     return 1;
-  }
-
-  if (print_result())
-  {
-    if (print_status())
-      cout << endl;
-    cout << res << endl;
-    if (opt.time)
-      print_seconds(get_wtime() - time);
   }
 
 #ifdef HAVE_MPI
