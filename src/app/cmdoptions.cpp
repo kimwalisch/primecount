@@ -30,7 +30,7 @@ void version();
 bool test();
 
 /// Command-line options
-std::map<string, OptionValues> optionMap =
+std::map<string, OptionID> optionMap =
 {
   { "-a", OPTION_ALPHA },
   { "--alpha", OPTION_ALPHA },
@@ -80,10 +80,10 @@ std::map<string, OptionValues> optionMap =
   { "--version", OPTION_VERSION }
 };
 
-/// e.g. id = "--threads", value = "4"
+/// e.g. str = "--threads", value = "4"
 struct Option
 {
-  string id;
+  string str;
   string value;
   template <typename T>
   T getValue() const
@@ -92,55 +92,64 @@ struct Option
   }
 };
 
-/// e.g. "--threads=8" -> { id = "--threads", value = "8" }
+void optionStatus(Option& opt,
+                  CmdOptions& opts)
+{
+  set_print_status(true);
+  opts.time = true;
+
+  if (!opt.value.empty())
+    set_status_precision(opt.getValue<int>());
+}
+
+/// e.g. "--threads=8"
+/// -> opt.str = "--threads"
+/// -> opt.value = "8"
+///
 Option makeOption(const string& str)
 {
-  Option option;
+  Option opt;
   size_t delimiter = string::npos;
   if (optionMap.count(str) == 0)
     delimiter = str.find_first_of("=0123456789");
 
   if (delimiter == string::npos)
-    option.id = str;
+    opt.str = str;
   else
   {
-    option.id = str.substr(0, delimiter);
-    option.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
+    opt.str = str.substr(0, delimiter);
+    opt.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
   }
-  if (option.id.empty() && !option.value.empty())
-    option.id = "--number";
-  if (optionMap.count(option.id) == 0)
-    option.id = "--help";
+  if (opt.str.empty() && !opt.value.empty())
+    opt.str = "--number";
+  if (!optionMap.count(opt.str))
+    opt.str = "--help";
 
-  return option;
+  return opt;
 }
 
-PrimeCountOptions parseOptions(int argc, char** argv)
+CmdOptions parseOptions(int argc, char* argv[])
 {
-  PrimeCountOptions pco;
+  CmdOptions opts;
   std::vector<maxint_t> numbers;
 
   try
   {
-    // iterate over the command-line options
     for (int i = 1; i < argc; i++)
     {
-      Option option = makeOption(argv[i]);
-      switch (optionMap[option.id])
+      Option opt = makeOption(argv[i]);
+
+      switch (optionMap[opt.str])
       {
-        case OPTION_ALPHA:   set_alpha(std::stod(option.value)); break;
-        case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
-        case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
+        case OPTION_ALPHA:   set_alpha(std::stod(opt.value)); break;
+        case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
+        case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
         case OPTION_HELP:    help(); break;
-        case OPTION_STATUS:  set_print_status(true);
-                             if (!option.value.empty())
-                                set_status_precision(option.getValue<int>());
-                             pco.time = true;
-                             break;
-        case OPTION_TIME:    pco.time = true; break;
+        case OPTION_STATUS:  optionStatus(opt, opts) ;break;
+        case OPTION_TIME:    opts.time = true; break;
         case OPTION_TEST:    if (test()) exit(0); exit(1);
         case OPTION_VERSION: version(); break;
-        default:             pco.option = optionMap[option.id];
+        default:             opts.option = optionMap[opt.str];
       }
     }
   }
@@ -150,11 +159,11 @@ PrimeCountOptions parseOptions(int argc, char** argv)
   }
 
   if (numbers.size() == 1)
-    pco.x = numbers[0];
+    opts.x = numbers[0];
   else
     help();
 
-  return pco;
+  return opts;
 }
 
 } // namespace

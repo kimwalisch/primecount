@@ -168,16 +168,16 @@ int main (int argc, char* argv[])
   MPI_Init(&argc, &argv);
 #endif
 
-  PrimeCountOptions pco = parseOptions(argc, argv);
+  CmdOptions opt = parseOptions(argc, argv);
   double time = get_wtime();
 
-  maxint_t x = pco.x;
+  maxint_t x = opt.x;
   maxint_t res = 0;
-  int threads = pco.threads;
+  int threads = opt.threads;
 
   try
   {
-    switch (pco.option)
+    switch (opt.option)
     {
       case OPTION_DELEGLISE_RIVAT:
         res = pi_deleglise_rivat(x, threads); break;
@@ -263,7 +263,7 @@ int main (int argc, char* argv[])
     if (print_status())
       cout << endl;
     cout << res << endl;
-    if (pco.time)
+    if (opt.time)
       print_seconds(get_wtime() - time);
   }
 

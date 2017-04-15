@@ -1,7 +1,7 @@
 ///
 /// @file  cmdoptions.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,7 @@
 
 namespace primecount {
 
-enum OptionValues
+enum OptionID
 {
   OPTION_ALPHA,
   OPTION_DELEGLISE_RIVAT,
@@ -56,13 +56,13 @@ enum OptionValues
   OPTION_VERSION
 };
 
-struct PrimeCountOptions
+struct CmdOptions
 {
   maxint_t x;
-  int64_t option;
+  OptionID option;
   bool time;
   int threads;
-  PrimeCountOptions() :
+  CmdOptions() :
     x(-1),
     option(OPTION_PI),
     time(false),
@@ -70,7 +70,7 @@ struct PrimeCountOptions
   { }
 };
 
-PrimeCountOptions parseOptions(int, char**);
+CmdOptions parseOptions(int, char**);
 
 } // namespace
 
