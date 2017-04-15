@@ -233,7 +233,6 @@ int main (int argc, char* argv[])
         res = S2_hard(x, threads); break;
       case OPTION_S2_TRIVIAL:
         res = S2_trivial(x, threads); break;
-
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL3:
         res = pi_deleglise_rivat_parallel3(x, threads); break;

@@ -59,7 +59,7 @@ enum OptionID
 struct CmdOptions
 {
   maxint_t x;
-  OptionID option;
+  int option;
   bool time;
   int threads;
   CmdOptions() :
