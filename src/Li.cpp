@@ -37,7 +37,7 @@ long double li(long double x)
   long double power2 = 1;
 
   int k = 0;
-  int terms = (int) (logx * 2 + 10);
+  int terms = max(logx * 2, (long double) 20);
 
   for (int n = 1; n < terms; n++)
   {
@@ -46,7 +46,7 @@ long double li(long double x)
     long double q = factorial * power2;
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
-      inner_sum += 1.0 / (2 * k + 1);
+      inner_sum += (long double) 1.0 / (2 * k + 1);
     sum += (p / q) * inner_sum;
   }
 
@@ -55,7 +55,7 @@ long double li(long double x)
 
 /// Calculate the offset logarithmic integral which is a very
 /// accurate approximation of the number of primes below x.
-/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
+/// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
 template <typename T>
 T Li(T x)
@@ -67,9 +67,9 @@ T Li(T x)
   return (T) (li(n) - /* li(2) = */ 1.04516);
 }
 
-/// Calculate the inverse logarithmic integral Li^-1(x) which is a
-/// very accurate approximation of the nth prime.
-/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= 10^316
+/// Calculate the inverse logarithmic integral Li^-1(x) which
+/// is a very accurate approximation of the nth prime.
+/// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
 template <typename T>
 T Li_inverse(T x)
@@ -77,15 +77,10 @@ T Li_inverse(T x)
   if (x < 1)
     return 0;
 
-  long double logx = max(1.0, log((double) x));
-  T first = (T) (x * logx);
-  T last  = (T) (x * logx * 2 + 2);
+  T first = 1;
+  T last = prt::numeric_limits<T>::max();
 
-  // overflow
-  if (first < x) return -1;
-  if (last < x) last = prt::numeric_limits<T>::max();
-
-  // Find Li^-1(x) using binary search
+  // Find using binary search
   while (first < last)
   {
     T mid = first + (last - first) / 2;
