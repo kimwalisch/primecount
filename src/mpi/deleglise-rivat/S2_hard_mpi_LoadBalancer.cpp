@@ -12,6 +12,7 @@
 #include <S2_hard_mpi_LoadBalancer.hpp>
 #include <S2_hard_mpi_msg.hpp>
 #include <primecount-internal.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <algorithm>
