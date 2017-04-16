@@ -12,7 +12,6 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -22,35 +21,39 @@ using namespace primecount;
 namespace {
 namespace Li {
 
-/// Calculate the logarithmic integral using Ramanujan's fast
-/// converging formula (accurate up to 10^17).
+/// Calculate the logarithmic integral using
+/// Ramanujan's fast converging formula.
 /// http://mathworld.wolfram.com/LogarithmicIntegral.html
 ///
 long double li(long double x)
 {
-  long double GAMMA = 0.57721566490153286061;
-  long double logx = log(x);
+  long double gamma = 0.57721566490153286061;
   long double sum = 0;
   long double inner_sum = 0;
   long double factorial = 1;
   long double p = -1;
   long double power2 = 1;
+  long double res = 0;
+  long double old = -1;
 
   int k = 0;
-  int terms = max(logx * 2, (long double) 20);
+  int n = 1;
 
-  for (int n = 1; n < terms; n++)
+  while (abs(res - old) > numeric_limits<double>::epsilon())
   {
+    old = res;
     factorial *= n;
-    p *= -logx;
     long double q = factorial * power2;
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
-      inner_sum += (long double) 1.0 / (2 * k + 1);
+      inner_sum += 1.0L / (2 * k + 1);
+    p *= -log(x);
     sum += (p / q) * inner_sum;
+    res = gamma + log(log(x)) + sqrt(x) * sum;
+    n++;
   }
 
-  return GAMMA + log(logx) + sqrt(x) * sum;
+  return res;
 }
 
 /// Calculate the offset logarithmic integral which is a very
