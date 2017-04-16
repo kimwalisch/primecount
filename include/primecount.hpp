@@ -85,13 +85,13 @@ int64_t phi(int64_t x, int64_t a);
 
 /// Calculate the offset logarithmic integral which is a very accurate
 /// approximation of the number of primes below x.
-/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
+/// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
 int64_t Li(int64_t x);
 
-/// Calculate the inverse logarithmic integral Li^-1(x) which is
-/// a very accurate approximation of the nth prime.
-/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
+/// Calculate the inverse logarithmic integral Li^-1(x) which
+/// is a very accurate approximation of the nth prime.
+/// Li^-1(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x);
 
