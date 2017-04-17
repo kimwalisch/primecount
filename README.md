@@ -1,5 +1,5 @@
-primecount
-==========
+# primecount
+
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
@@ -25,8 +25,8 @@ used to compute several world records e.g.
 [nth_prime(10<sup>24</sup>)](https://oeis.org/A006988), more will
 hopefully follow!
 
-Build instructions
-------------------
+## Build instructions
+
 You need to have installed a C++ compiler, cmake and make.
 
 ```sh
@@ -45,8 +45,8 @@ cmake -DWITH_MPI=ON .
 
 [primecount-MPI.md](doc/primecount-MPI.md) contains more information.
 
-Binaries
---------
+## Binaries
+
 Below are the latest precompiled primecount binaries for
 Windows, Linux and macOS. These binaries are statically linked
 and require a CPU which supports the POPCNT instruction (2010 or
@@ -57,8 +57,8 @@ later).
 * [primecount-3.6-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-macOS-x64.zip), 899 KB
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
-Usage examples
---------------
+## Usage examples
+
 Open a terminal and run primecount using e.g.:
 ```sh
 # Count the primes below 10^14
@@ -74,8 +74,8 @@ Open a terminal and run primecount using e.g.:
 ./primecount 1e14 --nthprime --threads=4 --time
 ```
 
-Command-line options
---------------------
+## Command-line options
+
 ```
 Usage: primecount x [OPTION]...
 Count the primes below x <= 10^31 using fast implementations of the
@@ -110,8 +110,8 @@ Advanced Deleglise-Rivat options:
          --S2_hard          Only compute the hard special leaves
 ```
 
-Algorithms
-----------
+## Algorithms
+
 <table>
   <tr>
     <td>Legendre's Formula</td>
@@ -164,8 +164,8 @@ on Hans Riesel's book <a href="doc/References.md">[5]</a>,
 its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
 based on Tomás Oliveira's paper <a href="doc/References.md">[8]</a>.</p>
 
-Fast nth prime calculation
---------------------------
+## Fast nth prime calculation
+
 The most efficient known method for calculating the nth prime is a
 combination of the prime counting function and a prime sieve. The idea
 is to closely approximate the nth prime using e.g. the inverse
@@ -174,16 +174,15 @@ logarithmic integral
 and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
-actual nth prime. The author has implemented
-```primecount::nth_prime(n)``` this way (option: ```--nthprime```),
-it finds the nth prime in
+actual nth prime. The author has implemented ```primecount::nth_prime(n)```
+this way (option: ```--nthprime```), it finds the nth prime in
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
 operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-Benchmarks
-----------
+## Benchmarks
+
 <table>
   <tr align="center">
     <td><b>x</b></td>
