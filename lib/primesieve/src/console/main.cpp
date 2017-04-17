@@ -9,8 +9,11 @@
 ///
 
 #include <primesieve/ParallelPrimeSieve.hpp>
+#include "calculator.hpp"
 #include "cmdoptions.hpp"
 
+#include <stdint.h>
+#include <cstddef>
 #include <iostream>
 #include <exception>
 #include <iomanip>
@@ -22,11 +25,11 @@ using namespace primesieve;
 
 namespace {
 
-void printResults(ParallelPrimeSieve& pps, CmdOptions& opts)
+void printResults(ParallelPrimeSieve& ps, CmdOptions& opt)
 {
   cout << left;
 
-  const string labels[] =
+  const string text[] =
   {
     "Primes",
     "Twin primes",
@@ -36,109 +39,115 @@ void printResults(ParallelPrimeSieve& pps, CmdOptions& opts)
     "Prime sextuplets"
   };
 
-  // largest label size, computed below
-  int size = 0;
+  // largest text size
+  size_t size = 0;
+
+  if (opt.time)
+    size = max(size, string("Seconds").size());
 
   for (int i = 0; i < 6; i++)
-  {
-    if (pps.isCount(i))
-    {
-      int label_size = (int) labels[i].size();
-      size = max(size, label_size);
-    }
-  }
+    if (ps.isCount(i))
+      size = max(size, text[i].size());
 
-  if (opts.time)
-  {
-    int label_size = (int) string("Seconds").size();
-    size = max(size, label_size);
-  }
+  int width = (int) size;
 
-  if (opts.time)
-    cout << setw(size) << "Seconds" << " : "
-         << fixed << setprecision(3) << pps.getSeconds()
+  if (opt.time)
+    cout << setw(width) << "Seconds" << " : "
+         << fixed << setprecision(3) << ps.getSeconds()
          << endl;
 
   // print results
   for (int i = 0; i < 6; i++)
   {
-    if (pps.isCount(i))
-      cout << setw(size) << labels[i] << " : "
-           << pps.getCount(i) << endl;
+    if (ps.isCount(i))
+      cout << setw(width) << text[i] << " : "
+           << ps.getCount(i) << endl;
   }
 }
 
 /// Used to count and print primes and prime k-tuplets
-void sieve(CmdOptions& opts)
+void sieve(CmdOptions& opt)
 {
-  ParallelPrimeSieve pps;
-  deque<uint64_t>& numbers = opts.numbers;
+  ParallelPrimeSieve ps;
+  auto& numbers = opt.numbers;
 
-  if (opts.flags     != 0) pps.setFlags(opts.flags);
-  if (opts.sieveSize != 0) pps.setSieveSize(opts.sieveSize);
-  if (opts.threads   != 0) pps.setNumThreads(opts.threads);
-  if (pps.isPrint()) pps.setNumThreads(1);
+  if (opt.flags)
+    ps.setFlags(opt.flags);
+  if (opt.sieveSize)
+    ps.setSieveSize(opt.sieveSize);
+  if (opt.threads)
+    ps.setNumThreads(opt.threads);
+  if (ps.isPrint())
+    ps.setNumThreads(1);
 
   if (numbers.size() < 2)
     numbers.push_front(0);
 
-  pps.setStart(numbers[0]);
-  pps.setStop(numbers[1]);
+  ps.setStart(numbers[0]);
+  ps.setStop(numbers[1]);
 
-  if (!opts.quiet)
+  if (!opt.quiet)
   {
-    cout << "Sieve size = " << pps.getSieveSize() << " kilobytes" << endl;
-    cout << "Threads = " << pps.idealNumThreads() << endl;
+    cout << "Sieve size = " << ps.getSieveSize() << " kilobytes" << endl;
+    cout << "Threads = " << ps.idealNumThreads() << endl;
   }
 
-  if (opts.status)
-    pps.addFlags(pps.PRINT_STATUS);
+  if (opt.status)
+    ps.addFlags(ps.PRINT_STATUS);
 
-  pps.sieve();
-  printResults(pps, opts);
+  ps.sieve();
+  printResults(ps, opt);
 }
 
-void nthPrime(CmdOptions& opts)
+void nthPrime(CmdOptions& opt)
 {
-  ParallelPrimeSieve pps;
-  deque<uint64_t>& numbers = opts.numbers;
+  ParallelPrimeSieve ps;
+  auto& numbers = opt.numbers;
 
-  if (opts.flags     != 0) pps.setFlags(opts.flags);
-  if (opts.sieveSize != 0) pps.setSieveSize(opts.sieveSize);
-  if (opts.threads   != 0) pps.setNumThreads(opts.threads);
+  if (opt.flags)
+    ps.setFlags(opt.flags);
+  if (opt.sieveSize)
+    ps.setSieveSize(opt.sieveSize);
+  if (opt.threads)
+    ps.setNumThreads(opt.threads);
 
   if (numbers.size() < 2)
     numbers.push_back(0);
 
   uint64_t n = numbers[0];
   uint64_t start = numbers[1];
-  uint64_t nthPrime = pps.nthPrime(n, start);
+  uint64_t nthPrime = ps.nthPrime(n, start);
 
-  if (opts.time)
+  if (opt.time)
     cout << "Seconds   : " << fixed << setprecision(3)
-         << pps.getSeconds() << endl;
+         << ps.getSeconds() << endl;
 
   cout << "Nth prime : " << nthPrime << endl;
 }
 
 } // namespace
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-  CmdOptions opts = parseOptions(argc, argv);
-
   try
   {
-    if (opts.nthPrime)
-      nthPrime(opts);
+    CmdOptions opt = parseOptions(argc, argv);
+
+    if (opt.nthPrime)
+      nthPrime(opt);
     else
-      sieve(opts);
+      sieve(opt);
+  }
+  catch (calculator::error& e)
+  {
+    cerr << e.what() << "." << endl
+         << "Try `primesieve --help' for more information." << endl;
+    return 1;
   }
   catch (exception& e)
   {
     cerr << "Error: " << e.what() << "." << endl
          << "Try `primesieve --help' for more information." << endl;
-
     return 1;
   }
 
