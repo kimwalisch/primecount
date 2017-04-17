@@ -4,14 +4,13 @@
 ///        prime counting algorithm using OpenMP. This implementation
 ///        is based on pi_lmo5(x).
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount-internal.hpp>
-#include <aligned_vector.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
 #include <imath.hpp>
@@ -164,7 +163,7 @@ int64_t S2_thread(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
-      int64_t min_m = max3(x / (prime * high), y / prime, prime);
+      int64_t min_m = max(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
@@ -210,8 +209,8 @@ int64_t S2(int64_t x,
   int64_t segments_per_thread = ceil_div(segments, threads);
 
   vector<int32_t> pi = generate_pi(y);
-  aligned_vector<vector<int64_t> > phi(threads);
-  aligned_vector<vector<int64_t> > mu_sum(threads);
+  phi_t phi(threads);
+  mu_sum_t mu_sum(threads);
 
   #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
   for (int i = 0; i < threads; i++)
@@ -254,9 +253,9 @@ int64_t pi_lmo_parallel2(int64_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
   int64_t p2 = P2(x, y, threads);
 
-  vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
+  auto lpf = generate_lpf(y);
+  auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
   int64_t s1 = S1(x, y, c, threads);

@@ -2,14 +2,14 @@
 /// @file   primecount.cpp
 /// @brief  primecount C++ API
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
@@ -65,7 +65,7 @@ using namespace std;
 namespace {
 
 #ifdef _OPENMP
-  int threads_ = -1;
+  int threads_ = 0;
 #endif
 
 int status_precision_ = -1;
@@ -257,8 +257,8 @@ string get_max_x(double alpha)
   // z < 2^62, with z = x^(2/3) / alpha
   // x^(2/3) / alpha < 2^62
   // x < (2^62 * alpha)^(3/2)
-
-  // safety buffer: use 61 instead of 62 
+  // safety buffer: use 61 instead of 62
+  //
   double max_x = pow(pow(2.0, 61.0) * alpha, 3.0 / 2.0);
   oss << (int128_t) max_x; 
 #else
@@ -307,7 +307,7 @@ double get_alpha(maxint_t x, int64_t y)
 /// Calculate the Lagarias-Miller-Odlyzko alpha tuning factor.
 /// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c are constants that should be determined empirically.
-/// @see ../doc/alpha-factor-tuning.pdf
+/// @see doc/alpha-factor-tuning.pdf
 ///
 double get_alpha_lmo(maxint_t x)
 {
@@ -330,7 +330,7 @@ double get_alpha_lmo(maxint_t x)
 /// Calculate the Deleglise-Rivat alpha tuning factor.
 /// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
 /// a, b, c and d are constants that should be determined empirically.
-/// @see ../doc/alpha-tuning-factor.pdf
+/// @see doc/alpha-tuning-factor.pdf
 ///
 double get_alpha_deleglise_rivat(maxint_t x)
 {
@@ -356,6 +356,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
       // becomes the main bottleneck above 10^21 . Hence we use a
       // different alpha formula when x > 10^21 which returns a larger
       // alpha which reduces sieving but increases S2_easy(x) work.
+      //
       double a = 0.00149066;
       double b = -0.0375705;
       double c = 0.282139;
@@ -381,7 +382,7 @@ void set_num_threads(int threads)
 int get_num_threads()
 {
 #ifdef _OPENMP
-  if (threads_ != -1)
+  if (threads_)
     return threads_;
   else
     return max(1, omp_get_max_threads());
@@ -415,7 +416,6 @@ maxint_t to_maxint(const string& expr)
   return n;
 }
 
-/// Get the primecount version number, in the form “i.j”.
 string primecount_version()
 {
   return PRIMECOUNT_VERSION;

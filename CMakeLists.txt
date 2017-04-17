@@ -1,20 +1,32 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 3)
-set(PRIMECOUNT_VERSION_MINOR 6)
+set(PRIMECOUNT_VERSION_MINOR 7)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-include_directories(include src/primesieve/include)
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
-option(ENABLE_POPCNT "Enable POPCNT instruction" ON)
-option(ENABLE_MPI    "Enable MPI (Message Passing Interface)" OFF)
+option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
+option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
+option(WITH_OPENMP       "Enable OpenMP support"          ON)
+option(WITH_MPI          "Enable MPI support"             OFF)
+option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
+option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
+option(BUILD_STATIC_LIBS "Build static libprimecount"     ON)
+option(BUILD_TESTS       "Build test programs"            OFF)
+
+if(WIN32)
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
+# Compiler must support C++11 or later ###############################
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include Check* #####################################################
 
-include(CheckCXXSourceCompiles)
-include(CheckCXXSourceRuns)
 include(CheckCXXCompilerFlag)
 include(CheckTypeSize)
 
@@ -27,7 +39,6 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/BitSieve.cpp
-            src/BitSieve-popcnt.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
@@ -63,33 +74,10 @@ set(LIB_SRC src/BitSieve.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
 
-# primesieve library source files ####################################
-
-set(PRIMESIEVE_PATH src/primesieve/src/primesieve)
-
-set(LIB_SRC ${LIB_SRC}
-            ${PRIMESIEVE_PATH}/EratBig.cpp
-            ${PRIMESIEVE_PATH}/EratMedium.cpp
-            ${PRIMESIEVE_PATH}/EratSmall.cpp
-            ${PRIMESIEVE_PATH}/ParallelPrimeSieve.cpp
-            ${PRIMESIEVE_PATH}/PreSieve.cpp
-            ${PRIMESIEVE_PATH}/PrimeFinder.cpp
-            ${PRIMESIEVE_PATH}/PrimeGenerator.cpp
-            ${PRIMESIEVE_PATH}/PrimeSieve-nthPrime.cpp
-            ${PRIMESIEVE_PATH}/PrimeSieve.cpp
-            ${PRIMESIEVE_PATH}/SieveOfEratosthenes.cpp
-            ${PRIMESIEVE_PATH}/WheelFactorization.cpp
-            ${PRIMESIEVE_PATH}/iterator.cpp
-            ${PRIMESIEVE_PATH}/popcount.cpp
-            ${PRIMESIEVE_PATH}/primesieve-api.cpp
-            ${PRIMESIEVE_PATH}/primesieve_test.cpp)
-
 # Check for MPI (Message Passing Interface) ##########################
 
-if(ENABLE_MPI)
+if(WITH_MPI)
     find_package(MPI REQUIRED)
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
     include_directories(${MPI_INCLUDE_PATH})
     add_definitions(-DHAVE_MPI)
 
@@ -104,47 +92,12 @@ endif()
 
 # Check for OpenMP ###################################################
 
-find_package(OpenMP QUIET)
-if(OPENMP_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
-# Check -mpopcnt compiler flag #######################################
-
-if(ENABLE_POPCNT)
-    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
-    if(mpopcnt)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+if(WITH_OPENMP)
+    find_package(OpenMP QUIET)
+    if(OPENMP_FOUND)
+        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
-endif()
-
-# Check -mpopcntd compiler flag ######################################
-
-if(ENABLE_POPCNT)
-    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcntd mpopcntd)
-    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
-    if(mpopcntd)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcntd")
-    endif()
-endif()
-
-# Check AVX2 (x86_64) compiler support  ##############################
-
-check_cxx_source_compiles("
-    #include <immintrin.h>
-    __attribute__ ((target (\"avx2\")))
-    void func() { __m256i v = _mm256_setzero_si256(); }
-    int x = __builtin_cpu_supports(\"avx2\");
-    int main() { return 0; }"
-    AVX2)
-
-if(AVX2)
-    add_definitions(-DHAVE_AVX2)
 endif()
 
 # Check if int128_t type exists ######################################
@@ -161,77 +114,122 @@ else()
     endif()
 endif()
 
-# Check if libdivide works ###########################################
+# Check if libdivide.h works #########################################
 
-set(CMAKE_REQUIRED_INCLUDES ${CMAKE_SOURCE_DIR}/include)
+if(WITH_LIBDIVIDE)
+    message(STATUS "Performing Test libdivide")
 
-check_cxx_source_runs("
-    #include <libdivide.h>
-    #include <stdint.h>
-    #include <limits>
+    try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
+            ${CMAKE_BINARY_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
+            COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-    int main()
-    {
-        uint64_t tests[20] = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-            63, 101, 511,
-            1 << 5, 1 << 9, 1 << 20,
-            std::numeric_limits<int32_t>::max(),
-            std::numeric_limits<uint32_t>::max(),
-            std::numeric_limits<int64_t>::max(),
-            std::numeric_limits<uint64_t>::max() };
-
-        for (int i = 0; i < 20; i++)
-        {
-            uint64_t x = tests[i];
-
-            for (int j = 2; j < 1000; j++)
-            {
-                libdivide::divider<uint64_t, libdivide::BRANCHFREE> divider(j);
-                if (x / j != x / divider)
-                    return 1;
-            }
-        }
-
-        return 0;
-    }"
-    use_libdivide)
+    if(RUN_LIBDIVIDE EQUAL 0)
+        message(STATUS "Performing Test libdivide - Success")
+    else()
+        message(STATUS "Performing Test libdivide - Failed")
+    endif()
+endif()
 
 # Include S2_easy* source files ######################################
 
-if(use_libdivide)
+if(RUN_LIBDIVIDE EQUAL 0)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    if(ENABLE_MPI)
+    if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    if(ENABLE_MPI)
+    if(WITH_MPI)
         set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
     endif()
 endif()
 
-# Build static library ###############################################
+# Check -mpopcnt compiler flag #######################################
 
-add_library(static_libprimecount STATIC ${LIB_SRC})
-set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
+if(WITH_POPCNT)
+    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
+    if(mpopcnt)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+    endif()
+endif()
 
-# Build shared library ###############################################
+# libprimesieve ######################################################
 
-add_library(shared_libprimecount SHARED ${LIB_SRC})
-set_target_properties(shared_libprimecount PROPERTIES OUTPUT_NAME primecount)
-set_target_properties(shared_libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
-set_target_properties(shared_libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-target_link_libraries(shared_libprimecount ${MPI_CXX_LIBRARIES})
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+add_subdirectory(lib/primesieve)
 
-# Build binary #######################################################
+# CPU cache line size ################################################
 
-add_executable(primecount ${BIN_SRC})
-target_link_libraries(primecount static_libprimecount ${MPI_CXX_LIBRARIES})
+if(CACHE_LINE_SIZE)
+    message(STATUS "Use CPU cache line size: ${CACHE_LINE_SIZE} bytes")
+    add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
+else()
+    execute_process(COMMAND sh ${PROJECT_SOURCE_DIR}/scripts/cache_line_size.sh
+                    RESULT_VARIABLE CLZ_RES
+                    OUTPUT_VARIABLE CACHE_LINE_SIZE
+                    ERROR_QUIET)
 
-# Install primecount #################################################
+    if(CLZ_RES EQUAL 0)
+        string(STRIP ${CACHE_LINE_SIZE} CACHE_LINE_SIZE)
+        message(STATUS "Found CPU cache line size: ${CACHE_LINE_SIZE} bytes")
+        add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
+    endif()
+endif()
 
-install(TARGETS primecount DESTINATION bin)
-install(TARGETS static_libprimecount DESTINATION lib)
-install(TARGETS shared_libprimecount DESTINATION lib)
-install(FILES include/primecount.hpp DESTINATION include)
+# libprimecount ######################################################
+
+add_library(libprimecount ${LIB_SRC})
+set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
+target_link_libraries(libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
+
+target_include_directories(libprimecount PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+if(BUILD_SHARED_LIBS)
+    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
+    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
+endif()
+
+install(TARGETS libprimecount
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+# static_libprimecount ###############################################
+
+if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+    add_library(static_libprimecount STATIC ${LIB_SRC})
+    set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
+    target_link_libraries(static_libprimecount static_libprimesieve ${MPI_CXX_LIBRARIES})
+
+    target_include_directories(static_libprimecount PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+    install(TARGETS static_libprimecount
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif()
+
+# primecount binary ##################################################
+
+if(BUILD_PRIMECOUNT)
+    add_executable(primecount ${BIN_SRC})
+    target_link_libraries(primecount libprimecount)
+    install(TARGETS primecount
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif()
+
+# Install header #####################################################
+
+install(FILES include/primecount.hpp
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+
+# Testing ############################################################
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()

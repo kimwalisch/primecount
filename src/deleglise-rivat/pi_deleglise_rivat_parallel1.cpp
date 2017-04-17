@@ -18,7 +18,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <aligned_vector.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min_max.hpp>
@@ -96,7 +95,7 @@ int64_t S2_hard_thread(int64_t x,
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t max_prime = min3(isqrt(x / low), isqrt(z), y);
+  int64_t max_prime = min(isqrt(x / low), isqrt(z), y);
   int64_t pi_max = pi[max_prime];
   int64_t S2_thread = 0;
 
@@ -156,8 +155,8 @@ int64_t S2_hard_thread(int64_t x,
     for (; b <= pi_max; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min3(x / (prime * low), z / prime, y)];
-      int64_t min_hard = max3(x / (prime * high), y / prime, prime);
+      int64_t l = pi[min(x / (prime * low), z / prime, y)];
+      int64_t min_hard = max(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;
@@ -215,9 +214,9 @@ int64_t S2_hard(int64_t x,
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
-    aligned_vector<vector<int64_t> > phi(threads);
-    aligned_vector<vector<int64_t> > mu_sum(threads);
-    aligned_vector<double> timings(threads);
+    phi_t phi(threads);
+    mu_sum_t mu_sum(threads);
+    thread_timings_t timings(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
     for (int i = 0; i < threads; i++)
@@ -243,7 +242,7 @@ int64_t S2_hard(int64_t x,
     }
 
     low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+    loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
   }
 
   return S2_total;
@@ -263,7 +262,7 @@ int64_t S2(int64_t x,
 {
   int64_t limit = z + 1;
   threads = ideal_num_threads(threads, limit);
-  vector<int32_t> pi = generate_pi(y);
+  auto pi = generate_pi(y);
 
   int64_t s2_trivial = S2_trivial(x, y, z, c, threads);
   int64_t s2_easy = S2_easy(x, y, z, c, threads);
@@ -292,9 +291,9 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t z = x / y;
   int64_t p2 = P2(x, y, threads);
 
-  vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
+  auto lpf = generate_lpf(y);
+  auto mu = generate_moebius(y);
 
   int64_t pi_y = pi_bsearch(primes, y);
   int64_t c = PhiTiny::get_c(y);

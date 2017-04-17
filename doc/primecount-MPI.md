@@ -2,19 +2,21 @@ primecount MPI
 ==============
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
-[![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
+[![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
 This is a distributed version of primecount which uses the
-[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library for
-inter-process communication and which automatically distributes
-the computation onto cluster nodes. Breaking the next world record pi(10<sup>28</sup>)
-would take about 6 years on the fastest shared memory server currently
-available. Hence it has become necessary to go distributed!
+[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library
+for inter-process communication and which automatically distributes
+the computation onto cluster nodes. Breaking the next world record
+pi(10<sup>28</sup>) would take about 6 years on the fastest shared
+memory server currently available (Intel Xeon, 36 CPU cores). Hence
+it has become necessary to go distributed!
 
-Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500 gigabytes
-of memory per cluster node! That is a lot, it might take a few years until
-such clusters become more widely available. I expect the pi(10<sup>28</sup>)
-computation to take about 130 CPU core years using primecount MPI.
+Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500
+gigabytes of memory per cluster node! That is a lot, it might take a
+few years until such clusters become more widely available. I expect
+the pi(10<sup>28</sup>) computation to take about 130 CPU core years
+using primecount MPI.
 
 Build instructions (Unix-like OSes)
 -----------------------------------
@@ -24,12 +26,10 @@ First install the prerequisites:
 sudo apt-get install g++ make cmake libopenmpi-dev openmpi-bin
 ```
 
-Then download
-[primecount-3.6.zip](https://github.com/kimwalisch/primecount/archive/v3.6.zip)
-and build it using:
+Then build primecount MPI using:
 ```sh
-cmake -DENABLE_MPI=ON .
-make -j8
+cmake -DWITH_MPI=ON .
+make -j
 ```
 
 Usage example
@@ -113,10 +113,8 @@ Benchmark pi(10<sup>23</sup>)
 The pi(10<sup>23</sup>) benchmark above was run on an
 [EC2 cluster](https://aws.amazon.com/ec2/) where each cluster node had
 2 CPUs of type Intel Xeon E5-2680 v2 (2.80GHz, 8 CPU cores, 16 threads).
-The cluster has been set up using the
-[StarCluster](http://star.mit.edu/cluster/) tool. The efficiency drops
-slightly beyond 30 cluster nodes, the author thinks this is because
-the input 10<sup>23</sup> is too small.
+The efficiency drops slightly beyond 30 cluster nodes, the author
+thinks this is because the input 10<sup>23</sup> is too small.
 
 Command-line options
 --------------------

@@ -1,7 +1,7 @@
 ///
 /// @file  primecount.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License.
 ///
@@ -13,9 +13,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "3.6"
+#define PRIMECOUNT_VERSION "3.7"
 #define PRIMECOUNT_VERSION_MAJOR 3
-#define PRIMECOUNT_VERSION_MINOR 6
+#define PRIMECOUNT_VERSION_MINOR 7
 
 namespace primecount {
 
@@ -27,7 +27,7 @@ public:
   { }
 };
 
-/// Alias for the fastest prime counting function in primecount.
+/// Alias for the fastest prime counting function.
 int64_t pi(int64_t x);
 
 /// 128-bit prime counting function.
@@ -85,18 +85,15 @@ int64_t phi(int64_t x, int64_t a);
 
 /// Calculate the offset logarithmic integral which is a very accurate
 /// approximation of the number of primes below x.
-/// @post Li(x) > pi(x) for 24 <= x <= ~ 10^316
+/// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
 int64_t Li(int64_t x);
 
-/// Calculate the inverse logarithmic integral Li^-1(x) which is
-/// a very accurate approximation of the nth prime.
-/// @post Li_inverse(x) < nth_prime(x) for 7 <= x <= ~ 10^316
+/// Calculate the inverse logarithmic integral Li^-1(x) which
+/// is a very accurate approximation of the nth prime.
+/// Li^-1(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x);
-
-/// Enable/disable printing status information during computation.
-void set_print_status(bool print_status);
 
 /// Set the number of threads.
 void set_num_threads(int num_threads);

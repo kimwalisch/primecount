@@ -128,7 +128,7 @@ T S2_hard_OpenMP_thread(T x,
 {
   low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
-  int64_t max_b = pi[min3(isqrt(x / low), isqrt(z), y)];
+  int64_t max_b = pi[min(isqrt(x / low), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
 
@@ -207,7 +207,7 @@ T S2_hard_OpenMP_thread(T x,
         int64_t x2_div_low = min(fast_div(x2, low), y);
         int64_t x2_div_high = min(fast_div(x2, high), y);
         int64_t l = pi[min(x2_div_low, z / prime)];
-        int64_t min_hard = max3(x2_div_high, y / prime, prime);
+        int64_t min_hard = max(x2_div_high, y / prime, prime);
         int64_t count = 0;
         int64_t start = 0;
 
@@ -287,7 +287,7 @@ T S2_hard_OpenMP_thread(T x,
         int64_t x2_div_low = min(fast_div(x2, low), y);
         int64_t x2_div_high = min(fast_div(x2, high), y);
         int64_t l = pi[min(x2_div_low, z / prime)];
-        int64_t min_hard = max3(x2_div_high, y / prime, prime);
+        int64_t min_hard = max(x2_div_high, y / prime, prime);
 
         if (prime >= primes[l])
           goto next_segment;
@@ -353,9 +353,9 @@ T S2_hard_OpenMP_master(T x,
     threads = in_between(1, threads, segments);
     segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
 
-    aligned_vector<vector<int64_t> > phi(threads);
-    aligned_vector<vector<int64_t> > mu_sum(threads);
-    aligned_vector<double> timings(threads);
+    phi_t phi(threads);
+    mu_sum_t mu_sum(threads);
+    thread_timings_t timings(threads);
 
     #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
     for (int i = 0; i < threads; i++)
@@ -381,7 +381,7 @@ T S2_hard_OpenMP_master(T x,
     }
 
     low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(low, threads, &segment_size, &segments_per_thread, timings);
+    loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
 
     if (print_status())
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
@@ -414,7 +414,7 @@ int64_t S2_hard(int64_t x,
   double time = get_wtime();
   FactorTable<uint16_t> factors(y, threads);
   int64_t max_prime = z / isqrt(y);
-  vector<int32_t> primes = generate_primes(max_prime);
+  auto primes = generate_primes<int32_t>(max_prime);
 
   int64_t s2_hard = S2_hard_OpenMP_master((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
@@ -449,7 +449,7 @@ int128_t S2_hard(int128_t x,
   {
     FactorTable<uint16_t> factors(y, threads);
     int64_t max_prime = z / isqrt(y);
-    vector<uint32_t> primes = generate_primes<uint32_t>(max_prime);
+    auto primes = generate_primes<uint32_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
@@ -457,7 +457,7 @@ int128_t S2_hard(int128_t x,
   {
     FactorTable<uint32_t> factors(y, threads);
     int64_t max_prime = z / isqrt(y);
-    vector<int64_t> primes = generate_primes<int64_t>(max_prime);
+    auto primes = generate_primes<int64_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }

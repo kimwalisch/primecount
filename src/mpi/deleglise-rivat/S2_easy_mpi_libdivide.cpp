@@ -5,7 +5,7 @@
 ///        divides with comparatively cheap multiplication and
 ///        bitshifts.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,7 +39,7 @@ bool is_libdivide(T x)
   return x <= numeric_limits<uint64_t>::max();
 }
 
-typedef libdivide::divider<uint64_t, libdivide::BRANCHFREE> fastdiv_t;
+using fastdiv_t = libdivide::divider<uint64_t, libdivide::BRANCHFREE>;
 
 template <typename Primes>
 vector<fastdiv_t>
@@ -62,7 +62,7 @@ T S2_easy_mpi_master(T x,
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   threads = ideal_num_threads(threads, x13, 1000);
-  vector<fastdiv_t> fastdiv = libdivide_vector(primes);
+  auto fastdiv = libdivide_vector(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -167,7 +167,7 @@ int64_t S2_easy_mpi(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  vector<int32_t> primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
@@ -193,12 +193,12 @@ int128_t S2_easy_mpi(int128_t x,
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
   {
-    vector<uint32_t> primes = generate_primes<uint32_t>(y);
+    auto primes = generate_primes<uint32_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
-    vector<int64_t> primes = generate_primes<int64_t>(y);
+    auto primes = generate_primes<int64_t>(y);
     s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
   }
 

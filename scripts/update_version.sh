@@ -32,7 +32,6 @@ echo ""
 
 # Update version
 for i in $(echo README.md \
-                doc/primecount-MPI.md \
                 include/primecount.hpp)
 do
     echo "Update version in $i"

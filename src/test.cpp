@@ -2,14 +2,14 @@
 /// @file   test.cpp
 /// @brief  primecount integration tests.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primecount-internal.hpp>
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <int128_t.hpp>
 
@@ -82,12 +82,12 @@ void check_nth_prime(int64_t iters)
   int64_t old_nth_prime = 0;
 
   for (; n < 10000; n++)
-    check_equal("nth_prime", n, nth_prime(n), primesieve::parallel_nth_prime(n));
+    check_equal("nth_prime", n, nth_prime(n), primesieve::nth_prime(n));
 
   // test using random increment
   for (int64_t i = 0; i < iters; i++, n += get_rand())
   {
-    int64_t primesieve_nth_prime = primesieve::parallel_nth_prime(n - old_n, old_nth_prime);
+    int64_t primesieve_nth_prime = primesieve::nth_prime(n - old_n, old_nth_prime);
     check_equal("nth_prime", n, nth_prime(n), primesieve_nth_prime);
     double percent = 100.0 * (i + 1.0) / iters;
     cout << "\rTesting nth_prime(x) " << (int) percent << "%" << flush;

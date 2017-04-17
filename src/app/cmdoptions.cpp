@@ -3,27 +3,26 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include "cmdoptions.hpp"
+
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <map>
-#include <exception>
 #include <cstdlib>
 #include <cstddef>
 
 using std::string;
-using std::istringstream;
 
 namespace primecount {
 
@@ -31,144 +30,137 @@ void help();
 void version();
 bool test();
 
-double to_double(const string& s)
+/// Command-line options
+std::map<string, OptionID> optionMap =
 {
-  istringstream i(s);
-  double x;
-  if (!(i >> x))
-    throw primecount_error("failed to convert \"" + s + "\" to double");
-  return x;
-}
+  { "-a", OPTION_ALPHA },
+  { "--alpha", OPTION_ALPHA },
+  { "-d", OPTION_DELEGLISE_RIVAT },
+  { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
+  { "--deleglise_rivat1", OPTION_DELEGLISE_RIVAT1 },
+  { "--deleglise_rivat2", OPTION_DELEGLISE_RIVAT2 },
+  { "--deleglise_rivat_parallel1", OPTION_DELEGLISE_RIVAT_PARALLEL1 },
+  { "--deleglise_rivat_parallel2", OPTION_DELEGLISE_RIVAT_PARALLEL2 },
+  { "--deleglise_rivat_parallel3", OPTION_DELEGLISE_RIVAT_PARALLEL3 },
+  { "-h", OPTION_HELP },
+  { "--help", OPTION_HELP },
+  { "--legendre", OPTION_LEGENDRE },
+  { "--lehmer", OPTION_LEHMER },
+  { "-l", OPTION_LMO },
+  { "--lmo", OPTION_LMO },
+  { "--lmo1", OPTION_LMO1 },
+  { "--lmo2", OPTION_LMO2 },
+  { "--lmo3", OPTION_LMO3 },
+  { "--lmo4", OPTION_LMO4 },
+  { "--lmo5", OPTION_LMO5 },
+  { "--lmo_parallel1", OPTION_LMO_PARALLEL1 },
+  { "--lmo_parallel2", OPTION_LMO_PARALLEL2 },
+  { "--lmo_parallel3", OPTION_LMO_PARALLEL3 },
+  { "--Li", OPTION_LI },
+  { "--Li_inverse", OPTION_LIINV },
+  { "-m", OPTION_MEISSEL },
+  { "--meissel", OPTION_MEISSEL },
+  { "-n", OPTION_NTHPRIME },
+  { "--nthprime", OPTION_NTHPRIME },
+  { "--number", OPTION_NUMBER },
+  { "--P2", OPTION_P2 },
+  { "--pi", OPTION_PI },
+  { "-p", OPTION_PRIMESIEVE },
+  { "--primesieve", OPTION_PRIMESIEVE },
+  { "--S1", OPTION_S1 },
+  { "--S2_easy", OPTION_S2_EASY },
+  { "--S2_hard", OPTION_S2_HARD },
+  { "--S2_trivial", OPTION_S2_TRIVIAL },
+  { "-s", OPTION_STATUS },
+  { "--status", OPTION_STATUS },
+  { "--test", OPTION_TEST },
+  { "--time", OPTION_TIME },
+  { "-t", OPTION_THREADS },
+  { "--threads", OPTION_THREADS },
+  { "-v", OPTION_VERSION },
+  { "--version", OPTION_VERSION }
+};
 
-/// e.g. id = "--threads", value = "4"
+/// e.g. str = "--threads", value = "4"
 struct Option
 {
-  string id;
+  string str;
   string value;
   template <typename T>
   T getValue() const
   {
+    if (value.empty())
+      throw primecount_error("missing value for option " + str);
     return (T) to_maxint(value);
   }
 };
 
-/// Command-line options
-std::map<string, OptionValues> optionMap;
-
-void initOptionMap()
+void optionStatus(Option& opt,
+                  CmdOptions& opts)
 {
-  optionMap["-a"]                          = OPTION_ALPHA;
-  optionMap["--alpha"]                     = OPTION_ALPHA;
-  optionMap["-d"]                          = OPTION_DELEGLISE_RIVAT;
-  optionMap["--deleglise_rivat"]           = OPTION_DELEGLISE_RIVAT;
-  optionMap["--deleglise_rivat1"]          = OPTION_DELEGLISE_RIVAT1;
-  optionMap["--deleglise_rivat2"]          = OPTION_DELEGLISE_RIVAT2;
-  optionMap["--deleglise_rivat_parallel1"] = OPTION_DELEGLISE_RIVAT_PARALLEL1;
-  optionMap["--deleglise_rivat_parallel2"] = OPTION_DELEGLISE_RIVAT_PARALLEL2;
-  optionMap["--deleglise_rivat_parallel3"] = OPTION_DELEGLISE_RIVAT_PARALLEL3;
-  optionMap["-h"]                          = OPTION_HELP;
-  optionMap["--help"]                      = OPTION_HELP;
-  optionMap["--legendre"]                  = OPTION_LEGENDRE;
-  optionMap["--lehmer"]                    = OPTION_LEHMER;
-  optionMap["-l"]                          = OPTION_LMO;
-  optionMap["--lmo"]                       = OPTION_LMO;
-  optionMap["--lmo1"]                      = OPTION_LMO1;
-  optionMap["--lmo2"]                      = OPTION_LMO2;
-  optionMap["--lmo3"]                      = OPTION_LMO3;
-  optionMap["--lmo4"]                      = OPTION_LMO4;
-  optionMap["--lmo5"]                      = OPTION_LMO5;
-  optionMap["--lmo_parallel1"]             = OPTION_LMO_PARALLEL1;
-  optionMap["--lmo_parallel2"]             = OPTION_LMO_PARALLEL2;
-  optionMap["--lmo_parallel3"]             = OPTION_LMO_PARALLEL3;
-  optionMap["--Li"]                        = OPTION_LI;
-  optionMap["--Li_inverse"]                = OPTION_LIINV;
-  optionMap["-m"]                          = OPTION_MEISSEL;
-  optionMap["--meissel"]                   = OPTION_MEISSEL;
-  optionMap["-n"]                          = OPTION_NTHPRIME;
-  optionMap["--nthprime"]                  = OPTION_NTHPRIME;
-  optionMap["--number"]                    = OPTION_NUMBER;
-  optionMap["--P2"]                        = OPTION_P2;
-  optionMap["--pi"]                        = OPTION_PI;
-  optionMap["-p"]                          = OPTION_PRIMESIEVE;
-  optionMap["--primesieve"]                = OPTION_PRIMESIEVE;
-  optionMap["--S1"]                        = OPTION_S1;
-  optionMap["--S2_easy"]                   = OPTION_S2_EASY;
-  optionMap["--S2_hard"]                   = OPTION_S2_HARD;
-  optionMap["--S2_trivial"]                = OPTION_S2_TRIVIAL;
-  optionMap["-s"]                          = OPTION_STATUS;
-  optionMap["--status"]                    = OPTION_STATUS;
-  optionMap["--test"]                      = OPTION_TEST;
-  optionMap["--time"]                      = OPTION_TIME;
-  optionMap["-t"]                          = OPTION_THREADS;
-  optionMap["--threads"]                   = OPTION_THREADS;
-  optionMap["-v"]                          = OPTION_VERSION;
-  optionMap["--version"]                   = OPTION_VERSION;
+  set_print_status(true);
+  opts.time = true;
+
+  if (!opt.value.empty())
+    set_status_precision(opt.getValue<int>());
 }
 
-/// e.g. "--threads=8" -> { id = "--threads", value = "8" }
+/// e.g. "--threads=8"
+/// -> opt.str = "--threads"
+/// -> opt.value = "8"
+///
 Option makeOption(const string& str)
 {
-  Option option;
+  Option opt;
   size_t delimiter = string::npos;
   if (optionMap.count(str) == 0)
     delimiter = str.find_first_of("=0123456789");
 
   if (delimiter == string::npos)
-    option.id = str;
+    opt.str = str;
   else
   {
-    option.id = str.substr(0, delimiter);
-    option.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
+    opt.str = str.substr(0, delimiter);
+    opt.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
   }
-  if (option.id.empty() && !option.value.empty())
-    option.id = "--number";
-  if (optionMap.count(option.id) == 0)
-    option.id = "--help";
+  if (opt.str.empty() && !opt.value.empty())
+    opt.str = "--number";
 
-  return option;
+  if (!optionMap.count(opt.str))
+    throw primecount_error("unknown option " + opt.str);
+
+  return opt;
 }
 
-PrimeCountOptions parseOptions(int argc, char** argv)
+CmdOptions parseOptions(int argc, char* argv[])
 {
-  initOptionMap();
-  PrimeCountOptions pco;
+  CmdOptions opts;
   std::vector<maxint_t> numbers;
 
-  try
+  for (int i = 1; i < argc; i++)
   {
-    // iterate over the command-line options
-    for (int i = 1; i < argc; i++)
+    Option opt = makeOption(argv[i]);
+
+    switch (optionMap[opt.str])
     {
-      Option option = makeOption(argv[i]);
-      switch (optionMap[option.id])
-      {
-        case OPTION_ALPHA:   set_alpha(to_double(option.value)); break;
-        case OPTION_NUMBER:  numbers.push_back(option.getValue<maxint_t>()); break;
-        case OPTION_THREADS: pco.threads = option.getValue<int>(); break;
-        case OPTION_HELP:    help(); break;
-        case OPTION_STATUS:  set_print_status(true);
-                             if (!option.value.empty())
-                                set_status_precision(option.getValue<int>());
-                             pco.time = true;
-                             break;
-        case OPTION_TIME:    pco.time = true; break;
-        case OPTION_TEST:    if (test()) exit(0); exit(1);
-        case OPTION_VERSION: version(); break;
-        default:             pco.option = optionMap[option.id];
-      }
+      case OPTION_ALPHA:   set_alpha(std::stod(opt.value)); break;
+      case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
+      case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
+      case OPTION_HELP:    help(); break;
+      case OPTION_STATUS:  optionStatus(opt, opts) ;break;
+      case OPTION_TIME:    opts.time = true; break;
+      case OPTION_TEST:    if (test()) exit(0); exit(1);
+      case OPTION_VERSION: version(); break;
+      default:             opts.option = optionMap[opt.str];
     }
-  }
-  catch (std::exception&)
-  {
-    help();
   }
 
   if (numbers.size() == 1)
-    pco.x = numbers[0];
+    opts.x = numbers[0];
   else
     help();
 
-  return pco;
+  return opts;
 }
 
 } // namespace

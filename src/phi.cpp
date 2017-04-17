@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,6 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <primecount.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
@@ -83,7 +82,7 @@ public:
       sum = SIGN;
     else if (is_phi_tiny(a))
       sum = phi_tiny(x, a) * SIGN;
-    else if (is_phi_by_pix(x, a))
+    else if (is_pix(x, a))
       sum = (pi_[x] - a + 1) * SIGN;
     else
     {
@@ -117,24 +116,24 @@ public:
       }
     }
 
-    if (write_to_cache(x, a))
+    if (update_cache(x, a))
       cache_[a][x] = (uint16_t) (sum * SIGN);
 
     return sum;
   }
 
 private:
-  vector<vector<uint16_t> > cache_;
+  vector<vector<uint16_t>> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
   int64_t bytes_;
 
   int64_t cache_size(int64_t a) const
   {
-    return (int64_t) cache_[a].size();
+    return cache_[a].size();
   }
 
-  bool is_phi_by_pix(int64_t x, int64_t a) const
+  bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
            x < isquare(primes_[a + 1]);
@@ -147,10 +146,9 @@ private:
            cache_[a][x] != 0;
   }
 
-  bool write_to_cache(int64_t x, int64_t a)
+  bool update_cache(int64_t x, int64_t a)
   {
-    if (a > MAX_A || 
-        x > numeric_limits<uint16_t>::max())
+    if (a > MAX_A || x > numeric_limits<uint16_t>::max())
       return false;
 
     // we need to increase cache size
@@ -191,7 +189,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     sum = phi_tiny(x, a);
   else
   {
-    vector<int32_t> primes = generate_n_primes(a);
+    auto primes = generate_n_primes<int32_t>(a);
 
     if (primes.at(a) >= x)
       sum = 1;
@@ -209,7 +207,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
       int64_t thread_threshold = p14 / primes[a];
       threads = ideal_num_threads(threads, x, thread_threshold);
 
-      // this loop scales only up to about 8 CPU cores
+      // this loop scales only up to 8 CPU cores
       threads = min(8, threads);
 
       #pragma omp parallel for schedule(dynamic, 16) \

@@ -17,21 +17,24 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <array>
 #include <vector>
 
 namespace primecount {
 
+const std::array<int, 7> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13 };
+
+// prime_products[n] = \prod_{i=1}^{n} primes[i]
+const std::array<int, 7> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030 };
+
+// totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
+const std::array<int, 7> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760 };
+
+// Number of primes below x
+const std::array<int, 13> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5 };
+
+// Singleton
 const PhiTiny phiTiny;
-
-const int PhiTiny::pi[20] = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
-
-const int PhiTiny::primes[7] = { 0, 2, 3, 5, 7, 11, 13 };
-
-/// prime_products[n] = \prod_{i=1}^{n} primes[i]
-const int PhiTiny::prime_products[7] = { 1, 2, 6, 30, 210, 2310, 30030 };
-
-/// totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const int PhiTiny::totients[7] = { 1, 1, 2, 8, 48, 480, 5760 };
 
 PhiTiny::PhiTiny()
 {

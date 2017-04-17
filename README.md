@@ -1,16 +1,16 @@
-primecount
-==========
+# primecount
+
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-primecount is a command-line program and C++ library that counts the
-primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly
-optimized** implementations of the
+primecount is a command-line program that counts the primes below an
+integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly optimized**
+implementations of the
 [prime counting function](http://en.wikipedia.org/wiki/Prime-counting_function)
-(combinatorial methods). primecount includes implementations of the algorithms
-of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and Deleglise-Rivat all
-of which have been parallelized using
+(combinatorial methods). primecount includes implementations of the
+algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and
+Deleglise-Rivat all of which have been parallelized using
 [OpenMP](http://en.wikipedia.org/wiki/OpenMP). The Deleglise-Rivat
 implementation has 
 [recently been distributed](https://github.com/kimwalisch/primecount/blob/master/doc/primecount-MPI.md#primecount-mpi)
@@ -22,22 +22,43 @@ implementation of the Deleglise-Rivat algorithm and it features a
 which scales up to hundreds of CPU cores. primecount has already been
 used to compute several world records e.g.
 [pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
-[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988), more will hopefully follow!
+[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988), more will
+hopefully follow!
 
-Binaries
---------
-Below are the latest primecount binaries for Windows 64-bit, Linux and macOS.
-These binaries are statically linked and require a CPU which supports the POPCNT
-instruction (2010 or later). primecount also uses the AVX2 instruction set (if
-available) to speed up the computation of the hard special leaves. 
+## Build instructions
+
+You need to have installed a C++ compiler, cmake and make.
+
+```sh
+cmake .
+make -j
+sudo make install
+```
+
+To build primecount using
+[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
+support for distributing computations onto cluster nodes use:
+
+```sh
+cmake -DWITH_MPI=ON .
+```
+
+[primecount-MPI.md](doc/primecount-MPI.md) contains more information.
+
+## Binaries
+
+Below are the latest precompiled primecount binaries for
+Windows, Linux and macOS. These binaries are statically linked
+and require a CPU which supports the POPCNT instruction (2010 or
+later).
 
 * [primecount-3.6-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-win64.zip), 400 KB
 * [primecount-3.6-linux-x64.tar.gz](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-linux-x64.tar.gz), 1 MB
 * [primecount-3.6-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.6/primecount-3.6-macOS-x64.zip), 899 KB
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
 
-Usage examples
---------------
+## Usage examples
+
 Open a terminal and run primecount using e.g.:
 ```sh
 # Count the primes below 10^14
@@ -53,8 +74,8 @@ Open a terminal and run primecount using e.g.:
 ./primecount 1e14 --nthprime --threads=4 --time
 ```
 
-Command-line options
---------------------
+## Command-line options
+
 ```
 Usage: primecount x [OPTION]...
 Count the primes below x <= 10^31 using fast implementations of the
@@ -89,8 +110,8 @@ Advanced Deleglise-Rivat options:
          --S2_hard          Only compute the hard special leaves
 ```
 
-Algorithms
-----------
+## Algorithms
+
 <table>
   <tr>
     <td>Legendre's Formula</td>
@@ -110,13 +131,13 @@ Algorithms
   </tr>
 </table>
 
-<p>Up until the early 19th century the most efficient known method for counting
-primes was the sieve of Eratosthenes which has a running time of
+<p>Up until the early 19th century the most efficient known method for
+counting primes was the sieve of Eratosthenes which has a running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
-operations. The first improvement to this bound was Legendre's formula (1830)
-which uses the inclusion-exclusion principle to calculate the number of primes
-below x without enumerating the individual primes. Legendre's formula has a
-running time of
+operations. The first improvement to this bound was Legendre's formula
+(1830) which uses the inclusion-exclusion principle to calculate the
+number of primes below x without enumerating the individual primes.
+Legendre's formula has a running time of
 <img src="http://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
 operations and uses
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
@@ -138,30 +159,30 @@ algorithm based on Meissel's formula which has a lower runtime complexity of
 operations and which uses only
 <img src="http://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
 space.</p>
-<p>primecount's Legendre, Meissel and Lehmer implementations are based on
-Hans Riesel's book <a href="https://github.com/kimwalisch/primecount#references">[5]</a>,
+<p>primecount's Legendre, Meissel and Lehmer implementations are based
+on Hans Riesel's book <a href="doc/References.md">[5]</a>,
 its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
-based on Tomás Oliveira's paper
-<a href="https://github.com/kimwalisch/primecount#references">[8]</a>.</p>
+based on Tomás Oliveira's paper <a href="doc/References.md">[8]</a>.</p>
 
-Fast nth prime calculation
---------------------------
-The most efficient known method for calculating the nth prime is a combination
-of the prime counting function and a prime sieve. The idea is to closely
-approximate the nth prime using e.g. the inverse logarithmic integral
+## Fast nth prime calculation
+
+The most efficient known method for calculating the nth prime is a
+combination of the prime counting function and a prime sieve. The idea
+is to closely approximate the nth prime using e.g. the inverse
+logarithmic integral
 <img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
-and then count the primes up to this guess using the prime counting function.
-Once this is done one starts sieving (e.g. using the segmented sieve of
-Eratosthenes) from there on until one finds the actual nth prime. The author
-has implemented ```primecount::nth_prime(n)``` this way, it finds the nth
-prime in
+and then count the primes up to this guess using the prime counting
+function. Once this is done one starts sieving (e.g. using the
+segmented sieve of Eratosthenes) from there on until one finds the
+actual nth prime. The author has implemented ```primecount::nth_prime(n)```
+this way (option: ```--nthprime```), it finds the nth prime in
 <img src="http://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
 operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-Benchmarks
-----------
+## Benchmarks
+
 <table>
   <tr align="center">
     <td><b>x</b></td>
@@ -277,81 +298,6 @@ Benchmarks
   </tr>
 </table>
 
-The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4 GHz) from
-2015 using a Linux x64 operating system and primecount was compiled using
-GCC 5.4.
-
-Build instructions
-------------------
-You need to have installed a C++ compiler, cmake and make to build primecount.
-
-```sh
-cmake .
-make -j8
-sudo make install
-```
-
-To build primecount using
-[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
-support for distributing computations onto cluster nodes use:
-```sh
-cmake -DENABLE_MPI=ON .
-```
-
-[primecount-MPI.md](doc/primecount-MPI.md) contains more information.
-
-C++ API
--------
-Below are the main functions declared in
-[primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp).
-All functions are multi-threaded by default.
-
-```C++
-#include <primecount.hpp>
-
-/// Count the primes <= x
-int64_t primecount::pi(int64_t x);
-
-/// 128-bit prime counting function.
-/// @param expr  Integer arithmetic expression e.g. "1000", "10^22"
-/// @pre   expr  <= 10^31 on 64-bit systems
-///        expr    < 2^63 on 32-bit systems
-std::string primecount::pi(const std::string& expr);
-
-/// Find the nth prime
-int64_t primecount::nth_prime(int64_t n);
-```
-
-C++ library usage
------------------
-Below is an example program that counts the primes below 1000.
-
-```C++
-#include <primecount.hpp>
-#include <iostream>
-
-int main()
-{
-    int64_t prime_count = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << prime_count << std::endl;
-  
-    return 0;
-}
-```
-
-On Unix-like OSes compile using:
-```sh
-c++ -O2 primes.cpp -lprimecount
-```
-
-References
-----------
-1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
-2. D. H. Lehmer, On the exact number of primes less than a given limit, Illinois J. Math. 3 (1959), pp. 381–388.
-3. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
-4. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
-5. Hans Riesel, Prime Numbers and Computer Methods for Factorization, 2nd ed., Birkhäuser, Boston, 1994. pp. 10-38.
-6. Raymond Séroul, Programming for Mathematicians, Springer-Verlag, Berlin (2000), pp. 175-181.
-7. R. Crandall and C. Pomerance, Prime numbers: a computational perspective, 2nd ed., Springer, New York, 2005. pp. 152-162.
-8. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
-9. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
+The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4
+GHz) from 2015 using a Linux x64 operating system and primecount was
+compiled using GCC 5.4.

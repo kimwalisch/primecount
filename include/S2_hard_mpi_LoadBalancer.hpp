@@ -3,7 +3,7 @@
 /// @brief  The S2_hard_mpi_LoadBalancer evenly distributes the
 ///         computation of the hard special leaves onto cluster nodes.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,8 +14,7 @@
 
 #include <mpi.h>
 #include <S2_hard_mpi_msg.hpp>
-#include <int128_t.hpp>
-#include <cassert>
+#include <stdint.h>
 
 namespace primecount {
 
@@ -30,7 +29,6 @@ public:
 
 private:
   bool is_increase(double percent) const;
-
   int64_t low_;
   int64_t high_;
   int64_t z_;

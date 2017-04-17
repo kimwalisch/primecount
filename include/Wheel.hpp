@@ -4,7 +4,7 @@
 ///         Wheel factorization is used to skip multiples of small
 ///         primes in the sieve of Eratosthenes.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,8 +20,8 @@
 
 namespace primecount {
 
-/// The InitWheel data structure is used to calculate the first
-/// multiple >= start of each sieving prime.
+/// The InitWheel data structure is used to calculate the
+/// first multiple >= start of each sieving prime.
 ///
 struct InitWheel
 {
@@ -66,30 +66,28 @@ public:
         int64_t size,
         int64_t low)
   {
-    wheelItems_.reserve(size);
-    push_back(0, 0);
+    wheel_.reserve(size);
+    wheel_.emplace_back(0, 0);
 
     for (int64_t b = 1; b < size; b++)
     {
       int64_t prime = primes[b];
       int64_t quotient = ceil_div(low, prime);
 
-      // calculate the first multiple of prime >= low
+      // first multiple of prime >= low
       int64_t multiple = prime * quotient;
 
-      // calculate the next multiple of prime that is not
-      // divisible by any of the wheel's factors (2, 3, 5, 7)
+      // calculate the next multiple of prime that
+      // is not divisible by any of the wheel's
+      // prime factors (2, 3, 5, 7)
       int64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
       int64_t wheel_index = initWheel210[quotient % 210].wheel_index;
       multiple += prime * next_multiple_factor;
 
-      push_back(multiple, wheel_index);
+      wheel_.emplace_back(multiple, wheel_index);
     }
   }
 
-  /// Calculate the next multiple of prime using:
-  /// next_multiple = multiple + prime * next_multiple_factor(&wheel_index)
-  ///
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
     int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;
@@ -99,22 +97,13 @@ public:
 
   WheelItem& operator[](int64_t i)
   {
-    return wheelItems_[i];
+    return wheel_[i];
   }
 private:
-  void push_back(int64_t multiple,
-                 int64_t wheel_index)
-  {
-    #if __cplusplus >= 201103L
-      wheelItems_.emplace_back(multiple, wheel_index);
-    #else
-      wheelItems_.push_back(WheelItem(multiple, wheel_index));
-    #endif
-  }
 
   static const InitWheel initWheel210[210];
   static const NextWheel nextWheel210[48];
-  std::vector<WheelItem> wheelItems_;
+  std::vector<WheelItem> wheel_;
 };
 
 } // namespace

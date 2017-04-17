@@ -5,7 +5,7 @@
 ///        sieve of Eratosthenes and a special tree data structure
 ///        for faster counting in S2(x).
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -155,9 +155,9 @@ int64_t pi_lmo4(int64_t x)
   int64_t c = PhiTiny::get_c(y);
   int64_t p2 = P2(x, y, 1);
 
-  vector<int32_t> mu = generate_moebius(y);
-  vector<int32_t> lpf = generate_least_prime_factors(y);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
+  auto lpf = generate_lpf(y);
+  auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
   int64_t s1 = S1(x, y, c, 1);

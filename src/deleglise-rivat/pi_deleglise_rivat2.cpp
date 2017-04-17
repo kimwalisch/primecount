@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -78,7 +78,7 @@ int64_t S2_hard(int64_t x,
 
   PiTable pi(y);
   FactorTable<uint16_t> factors(y, 1);
-  vector<int32_t> primes = generate_primes(y);
+  auto primes = generate_primes<int32_t>(y);
 
   int64_t limit = z + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
@@ -141,8 +141,8 @@ int64_t S2_hard(int64_t x,
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min3(x / (prime * low), z / prime, y)];
-      int64_t min_hard = max3(x / (prime * high), y / prime, prime);
+      int64_t l = pi[min(x / (prime * low), z / prime, y)];
+      int64_t min_hard = max(x / (prime * high), y / prime, prime);
 
       if (prime >= primes[l])
         goto next_segment;

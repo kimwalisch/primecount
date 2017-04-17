@@ -6,7 +6,7 @@
 ///         processes use the S2_hard_mpi_msg class to send back their
 ///         partial results to the S2_hard MPI master process.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -107,4 +107,4 @@ private:
 
 } // namespace
 
-#endif /* S2_HARD_MPI_MSG_HPP */
+#endif

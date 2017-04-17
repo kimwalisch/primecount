@@ -8,8 +8,16 @@
 *.obj
 *.lib
 *.o
+*.dSYM
 /primecount*
-/libprimecount*
+libprimecount*
+primecount.lib
+/lib/primesieve/primesieve
+libprimesieve*
+primesieve.lib
+primesieve.pc
+DoxyFile
+build
 CMakeCache.txt
 CMakeFiles
 CMakeScripts

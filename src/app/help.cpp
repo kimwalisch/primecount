@@ -1,7 +1,7 @@
 ///
 /// @file  help.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,7 +17,8 @@ using namespace std;
 
 namespace {
 
-const string helpMenu(
+const string helpMenu
+(
   "Usage: primecount x [OPTION]...\n"
   "Count the primes below x <= 10^31 using fast implementations of the\n"
   "combinatorial prime counting function.\n"
@@ -56,7 +57,8 @@ const string helpMenu(
   "  primecount 1e13 --nthprime --threads=4"
 );
 
-const string versionInfo(
+const string versionInfo
+(
   "primecount " PRIMECOUNT_VERSION ", <https://github.com/kimwalisch/primecount>\n"
   "Copyright (C) 2013 - 2017 Kim Walisch\n"
   "BSD 2-Clause License <http://opensource.org/licenses/BSD-2-Clause>"
