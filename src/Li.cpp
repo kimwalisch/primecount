@@ -22,8 +22,8 @@ namespace {
 namespace Li {
 
 /// Calculate the logarithmic integral using
-/// Ramanujan's fast converging formula.
-/// http://mathworld.wolfram.com/LogarithmicIntegral.html
+/// Ramanujan's formula:
+/// https://en.wikipedia.org/wiki/Logarithmic_integral_function#Series_representation
 ///
 long double li(long double x)
 {
@@ -33,15 +33,14 @@ long double li(long double x)
   long double factorial = 1;
   long double p = -1;
   long double power2 = 1;
-  long double res = 0;
-  long double old = -1;
+  long double lix = 0;
+  long double prev_lix = -1;
 
   int k = 0;
   int n = 1;
 
-  while (abs(res - old) > numeric_limits<double>::epsilon())
+  while (abs(lix - prev_lix) > numeric_limits<double>::epsilon())
   {
-    old = res;
     factorial *= n;
     long double q = factorial * power2;
     power2 *= 2;
@@ -49,11 +48,12 @@ long double li(long double x)
       inner_sum += 1.0L / (2 * k + 1);
     p *= -log(x);
     sum += (p / q) * inner_sum;
-    res = gamma + log(log(x)) + sqrt(x) * sum;
+    prev_lix = lix;
+    lix = gamma + log(log(x)) + sqrt(x) * sum;
     n++;
   }
 
-  return res;
+  return lix;
 }
 
 /// Calculate the offset logarithmic integral which is a very
