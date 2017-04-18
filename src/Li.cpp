@@ -101,6 +101,9 @@ long double Ri(long double x)
   auto mu = generate_moebius(terms);
   long double sum = 0;
 
+  if (x < 0)
+    return 0;
+
   for (int n = 1; n < terms; n++)
   {
     long double root = pow(x, 1.0L / n);
