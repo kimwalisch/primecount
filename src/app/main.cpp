@@ -153,7 +153,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   // TODO: find better S2_hard approximation formula
-  maxint_t s2_hard_approx = Li(x);
+  maxint_t s2_hard_approx = Ri(x);
 
   if (x <= numeric_limits<int64_t>::max())
     return S2_hard((int64_t) x, y, z, c, (int64_t) s2_hard_approx, threads);
@@ -224,6 +224,10 @@ int main (int argc, char* argv[])
         res = Li(to_int64(x)); break;
       case OPTION_LIINV:
         res = Li_inverse(to_int64(x)); break;
+      case OPTION_RI:
+        res = Ri(to_int64(x)); break;
+      case OPTION_RIINV:
+        res = Ri_inverse(to_int64(x)); break;
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_S1:

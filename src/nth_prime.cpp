@@ -21,7 +21,7 @@ using namespace std;
 
 namespace {
 
-const auto max_n = 216289611853439384ll;
+const int64_t max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
 const int primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
@@ -48,18 +48,14 @@ int64_t nth_prime(int64_t n, int threads)
   }
 
   int64_t prime = 0;
-  int64_t prime_approx = 0;
-  int64_t count_approx = 0;
   primesieve::set_num_threads(threads);
 
   if (n < 100000)
     prime = primesieve::nth_prime(n, 0);
   else
   {
-    // Formula due to Dana Jacobsen:
-    // Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
-    prime_approx = Li_inverse(n) + Li_inverse(isqrt(n)) / 4;
-    count_approx = pi(prime_approx, threads);
+    int64_t prime_approx = Ri_inverse(n);
+    int64_t count_approx = pi(prime_approx, threads);
 
     if (count_approx < n)
       prime = primesieve::nth_prime(n - count_approx, prime_approx);

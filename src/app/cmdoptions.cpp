@@ -67,6 +67,8 @@ std::map<string, OptionID> optionMap =
   { "--pi", OPTION_PI },
   { "-p", OPTION_PRIMESIEVE },
   { "--primesieve", OPTION_PRIMESIEVE },
+  { "--Ri", OPTION_RI },
+  { "--Ri_inverse", OPTION_RIINV },
   { "--S1", OPTION_S1 },
   { "--S2_easy", OPTION_S2_EASY },
   { "--S2_hard", OPTION_S2_HARD },

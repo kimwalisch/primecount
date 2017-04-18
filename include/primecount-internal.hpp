@@ -111,6 +111,18 @@ int128_t Li_inverse(int128_t);
 
 #endif
 
+int64_t Ri(int64_t);
+
+int64_t Ri_inverse(int64_t);
+
+#ifdef HAVE_INT128_T
+
+int128_t Ri(int128_t);
+
+int128_t Ri_inverse(int128_t);
+
+#endif
+
 int64_t nth_prime(int64_t n, int threads);
 
 int64_t P2(int64_t x, int64_t y, int threads);
@@ -153,7 +165,7 @@ T get_percent(T low, T limit)
 template <typename T>
 T S2_approx(T x, int64_t pi_y, T P2, T S1)
 {
-  T pix = Li(x);
+  T pix = Ri(x);
   T S2 = pix - S1 - pi_y + 1 + P2;
   return S2;
 }

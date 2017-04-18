@@ -89,9 +89,11 @@ Options:
   -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
-         --Li_inverse       Approximate the nth prime using Li^-1(x)
+         --Li_inverse       Approximate nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
+         --Ri               Approximate pi(x) using Riemann R
+         --Ri_inverse       Approximate nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
                             [N] digits after decimal point e.g. N=1, 99.9%
          --test             Run various correctness tests and exit

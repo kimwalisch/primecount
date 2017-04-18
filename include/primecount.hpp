@@ -89,11 +89,21 @@ int64_t phi(int64_t x, int64_t a);
 ///
 int64_t Li(int64_t x);
 
-/// Calculate the inverse logarithmic integral Li^-1(x) which
+/// Calculate the inverse offset logarithmic integral which
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= ~ 10^316
 ///
 int64_t Li_inverse(int64_t x);
+
+/// Calculate the Riemann R function which is a very accurate
+/// approximation of the number of primes below x.
+///
+int64_t Ri(int64_t x);
+
+/// Calculate the inverse Riemann R function which is a very
+/// accurate approximation of the nth prime.
+///
+int64_t Ri_inverse(int64_t x);
 
 /// Set the number of threads.
 void set_num_threads(int num_threads);

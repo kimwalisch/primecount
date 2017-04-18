@@ -1,6 +1,6 @@
 ///
 /// @file  Li.cpp
-/// @brief Logarithmic integral functions.
+/// @brief Logarithmic integral and Riemann R functions.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -9,6 +9,7 @@
 ///
 
 #include <primecount.hpp>
+#include <generate.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
@@ -17,10 +18,8 @@
 #include <limits>
 
 using namespace std;
-using namespace primecount;
 
-namespace {
-namespace Li {
+namespace primecount {
 
 /// Calculate the logarithmic integral using
 /// Ramanujan's formula:
@@ -36,6 +35,9 @@ long double li(long double x)
   long double q = 0;
   long double power2 = 1;
   int k = 0;
+
+  if (x < 1.001)
+    return 0;
 
   for (int n = 1; n < 200; n++)
   {
@@ -60,24 +62,24 @@ long double li(long double x)
 ///
 long double Li(long double x)
 {
-  if (x < 2)
-    return 0;
-
   long double li2 = 1.04516378011749278484;
+
+  if (x < 1.001)
+    return 0;
 
   return li(x) - li2;
 }
 
-/// Calculate the inverse logarithmic integral Li^-1(x) which
+/// Calculate the inverse offset logarithmic integral which
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
 long double Li_inverse(long double x)
 {
+  long double t = x * log(x);
+
   if (x < 2)
     return 0;
-
-  long double t = x * log(x);
 
   for (int i = 0; i < 100; i++)
   {
@@ -90,31 +92,92 @@ long double Li_inverse(long double x)
   return t;
 }
 
-} // namespace Li
-} // namespace
+/// Calculate the Riemann R function which is a very accurate
+/// approximation of the number of primes below x.
+///
+long double Ri(long double x)
+{
+  int terms = 200;
+  auto mu = generate_moebius(terms);
+  long double sum = 0;
 
-namespace primecount {
+  for (int n = 1; n < terms; n++)
+  {
+    long double root = pow(x, 1.0L / n);
+    long double Li_root = Li(root);
+    sum += (Li_root * mu[n]) / n;
+    if (abs(Li_root) < numeric_limits<double>::epsilon())
+      break;
+  }
+
+  return sum;
+}
+
+/// Calculate the inverse Riemann R function which is a very
+/// accurate approximation of the nth prime.
+///
+long double Ri_inverse(long double x)
+{
+  long double t = x * log(x);
+
+  if (x < 2)
+    return 0;
+
+  for (int i = 0; i < 100; i++)
+  {
+    long double old = t;
+    t -= (Ri(t) - x) * log(t);
+    if (abs(t - old) < numeric_limits<double>::epsilon() * max(abs(t), abs(old)))
+      break;
+  }
+
+  return t;
+}
 
 int64_t Li(int64_t x)
 {
-  return (int64_t) Li::Li((long double) x);
+  return (int64_t) Li((long double) x);
 }
 
 int64_t Li_inverse(int64_t x)
 {
-  return (int64_t) Li::Li_inverse((long double) x);
+  return (int64_t) Li_inverse((long double) x);
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t Li(int128_t x)
 {
-  return (int128_t) Li::Li((long double) x);
+  return (int128_t) Li((long double) x);
 }
 
 int128_t Li_inverse(int128_t x)
 {
-  return (int128_t) Li::Li_inverse((long double) x);
+  return (int128_t) Li_inverse((long double) x);
+}
+
+#endif
+
+int64_t Ri(int64_t x)
+{
+  return (int64_t) Ri((long double) x);
+}
+
+int64_t Ri_inverse(int64_t x)
+{
+  return (int64_t) Ri_inverse((long double) x);
+}
+
+#ifdef HAVE_INT128_T
+
+int128_t Ri(int128_t x)
+{
+  return (int128_t) Ri((long double) x);
+}
+
+int128_t Ri_inverse(int128_t x)
+{
+  return (int128_t) Ri_inverse((long double) x);
 }
 
 #endif
