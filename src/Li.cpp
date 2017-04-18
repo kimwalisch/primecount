@@ -83,7 +83,7 @@ long double Li_inverse(long double x)
   {
     long double old = t;
     t -= (Li(t) - x) * log(t);
-    if (abs(t - old) < numeric_limits<double>::epsilon() * max(t, old))
+    if (abs(t - old) < numeric_limits<double>::epsilon() * max(abs(t), abs(old)))
       break;
   }
 
