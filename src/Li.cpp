@@ -1,6 +1,6 @@
 ///
 /// @file  Li.cpp
-/// @brief Logarithmic integral approximation.
+/// @brief Logarithmic integral functions.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -30,16 +30,13 @@ long double li(long double x)
   long double gamma = 0.57721566490153286061;
   long double sum = 0;
   long double inner_sum = 0;
-  long double prev_sum = 1;
   long double factorial = 1;
   long double p = -1;
   long double q = 0;
   long double power2 = 1;
-
   int k = 0;
-  int n = 1;
 
-  while (abs(sum - prev_sum) > numeric_limits<double>::epsilon())
+  for (int n = 1; n < 200; n++)
   {
     p *= -log(x);
     factorial *= n;
@@ -47,79 +44,76 @@ long double li(long double x)
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0L / (2 * k + 1);
-    prev_sum = sum;
+    long double old = sum;
     sum += (p / q) * inner_sum;
-    n++;
+    if (abs(sum - old) < numeric_limits<double>::epsilon())
+      break;
   }
 
   return gamma + log(log(x)) + sqrt(x) * sum;
 }
 
 /// Calculate the offset logarithmic integral which is a very
-/// accurate approximation of the number of primes below x.
+/// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
-template <typename T>
-T Li(T x)
+long double Li(long double x)
 {
   if (x < 2)
     return 0;
 
-  long double n = (long double) x;
-  return (T) (li(n) - /* li(2) = */ 1.04516);
+  long double li2 = 1.04516378011749278484;
+
+  return li(x) - li2;
 }
 
 /// Calculate the inverse logarithmic integral Li^-1(x) which
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-template <typename T>
-T Li_inverse(T x)
+long double Li_inverse(long double x)
 {
-  if (x < 1)
+  if (x < 2)
     return 0;
 
-  T first = 1;
-  T last = prt::numeric_limits<T>::max();
+  long double t = x * log(x);
 
-  // Find using binary search
-  while (first < last)
+  for (int i = 0; i < 100; i++)
   {
-    T mid = first + (last - first) / 2;
-    if (Li(mid) < x)
-      first = mid + 1;
-    else
-      last = mid;
+    long double old = t;
+    t -= (Li(t) - x) * log(t);
+    if (abs(t - old) < numeric_limits<double>::epsilon() * max(t, old))
+      break;
   }
 
-  return first;
+  return t;
 }
 
 } // namespace Li
-} // namespace primecount
+} // namespace
 
 namespace primecount {
 
 int64_t Li(int64_t x)
 {
-  return Li::Li(x);
+  return (int64_t) Li::Li((long double) x);
 }
 
 int64_t Li_inverse(int64_t x)
 {
-  return Li::Li_inverse(x);
+  return (int64_t) Li::Li_inverse((long double) x);
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t Li(int128_t x)
 {
-  return Li::Li(x);
+  return (int128_t) Li::Li((long double) x);
 }
 
 int128_t Li_inverse(int128_t x)
 {
-  return Li::Li_inverse(x);
+  return (int128_t) Li::Li_inverse((long double) x);
 }
 
 #endif
