@@ -12,6 +12,7 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
