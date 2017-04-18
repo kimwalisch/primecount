@@ -30,30 +30,29 @@ long double li(long double x)
   long double gamma = 0.57721566490153286061;
   long double sum = 0;
   long double inner_sum = 0;
+  long double prev_sum = 1;
   long double factorial = 1;
   long double p = -1;
+  long double q = 0;
   long double power2 = 1;
-  long double lix = 0;
-  long double prev_lix = -1;
 
   int k = 0;
   int n = 1;
 
-  while (abs(lix - prev_lix) > numeric_limits<double>::epsilon())
+  while (abs(sum - prev_sum) > numeric_limits<double>::epsilon())
   {
+    p *= -log(x);
     factorial *= n;
-    long double q = factorial * power2;
+    q = factorial * power2;
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0L / (2 * k + 1);
-    p *= -log(x);
+    prev_sum = sum;
     sum += (p / q) * inner_sum;
-    prev_lix = lix;
-    lix = gamma + log(log(x)) + sqrt(x) * sum;
     n++;
   }
 
-  return lix;
+  return gamma + log(log(x)) + sqrt(x) * sum;
 }
 
 /// Calculate the offset logarithmic integral which is a very
