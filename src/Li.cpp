@@ -81,13 +81,16 @@ long double Li_inverse(long double x)
     return 0;
 
   long double t = x * log(x);
+  long double old_term = numeric_limits<long double>::max();
 
   for (int i = 0; i < 100; i++)
   {
-    long double old = t;
-    t -= (Li(t) - x) * log(t);
-    if (abs(t - old) < numeric_limits<double>::epsilon() * max(abs(t), abs(old)))
+    long double term = (Li(t) - x) * log(t);
+    // not converging anymore
+    if (abs(term) >= abs(old_term))
       break;
+    old_term = term;
+    t -= term;
   }
 
   return t;
@@ -131,13 +134,16 @@ long double Ri_inverse(long double x)
     return 0;
 
   long double t = x * log(x);
+  long double old_term = numeric_limits<long double>::max();
 
   for (int i = 0; i < 100; i++)
   {
-    long double old = t;
-    t -= (Ri(t) - x) * log(t);
-    if (abs(t - old) < numeric_limits<double>::epsilon() * max(abs(t), abs(old)))
+    long double term = (Ri(t) - x) * log(t);
+    // not converging anymore
+    if (abs(term) >= abs(old_term))
       break;
+    old_term = term;
+    t -= term;
   }
 
   return t;
