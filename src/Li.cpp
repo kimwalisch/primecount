@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <limits>
 
@@ -27,6 +28,8 @@ namespace primecount {
 ///
 long double li(long double x)
 {
+  assert(x >= 2);
+
   long double gamma = 0.57721566490153286061;
   long double sum = 0;
   long double inner_sum = 0;
@@ -34,10 +37,8 @@ long double li(long double x)
   long double p = -1;
   long double q = 0;
   long double power2 = 1;
+  long double term;
   int k = 0;
-
-  if (x < 1.001)
-    return 0;
 
   for (int n = 1; n < 200; n++)
   {
@@ -47,9 +48,9 @@ long double li(long double x)
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0L / (2 * k + 1);
-    long double old = sum;
-    sum += (p / q) * inner_sum;
-    if (abs(sum - old) < numeric_limits<double>::epsilon())
+    term = (p / q) * inner_sum;
+    sum += term;
+    if (abs(term) < numeric_limits<double>::epsilon())
       break;
   }
 
@@ -62,10 +63,10 @@ long double li(long double x)
 ///
 long double Li(long double x)
 {
-  long double li2 = 1.04516378011749278484;
-
-  if (x < 1.001)
+  if (x < 2)
     return 0;
+
+  long double li2 = 1.04516378011749278484;
 
   return li(x) - li2;
 }
@@ -76,10 +77,10 @@ long double Li(long double x)
 ///
 long double Li_inverse(long double x)
 {
-  long double t = x * log(x);
-
   if (x < 2)
     return 0;
+
+  long double t = x * log(x);
 
   for (int i = 0; i < 100; i++)
   {
@@ -97,20 +98,25 @@ long double Li_inverse(long double x)
 ///
 long double Ri(long double x)
 {
+  if (x < 2)
+    return 0;
+
   int terms = 200;
   auto mu = generate_moebius(terms);
   long double sum = 0;
-
-  if (x < 0)
-    return 0;
+  long double root;
+  long double term;
 
   for (int n = 1; n < terms; n++)
   {
-    long double root = pow(x, 1.0L / n);
-    long double Li_root = Li(root);
-    sum += (Li_root * mu[n]) / n;
-    if (abs(Li_root) < numeric_limits<double>::epsilon())
-      break;
+    if (mu[n])
+    {
+      root = pow(x, 1.0L / n);
+      term = (Li(root) * mu[n]) / n;
+      sum += term;
+      if (abs(term) < numeric_limits<double>::epsilon())
+        break;
+    }
   }
 
   return sum;
@@ -121,10 +127,10 @@ long double Ri(long double x)
 ///
 long double Ri_inverse(long double x)
 {
-  long double t = x * log(x);
-
   if (x < 2)
     return 0;
+
+  long double t = x * log(x);
 
   for (int i = 0; i < 100; i++)
   {
