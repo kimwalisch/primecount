@@ -221,13 +221,13 @@ int main (int argc, char* argv[])
       case OPTION_PI:
         res = pi(x, threads); break;
       case OPTION_LI:
-        res = Li(to_int64(x)); break;
+        res = Li(x); break;
       case OPTION_LIINV:
-        res = Li_inverse(to_int64(x)); break;
+        res = Li_inverse(x); break;
       case OPTION_RI:
-        res = Ri(to_int64(x)); break;
+        res = Ri(x); break;
       case OPTION_RIINV:
-        res = Ri_inverse(to_int64(x)); break;
+        res = Ri_inverse(x); break;
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_S1:
