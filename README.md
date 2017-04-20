@@ -170,9 +170,10 @@ based on Tomás Oliveira's paper <a href="doc/References.md">[8]</a>.</p>
 
 The most efficient known method for calculating the nth prime is a
 combination of the prime counting function and a prime sieve. The idea
-is to closely approximate the nth prime using e.g. the inverse
+is to closely approximate the nth prime (e.g. using the inverse
 logarithmic integral
 <img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
+or the inverse Riemann R function)
 and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
