@@ -1,3 +1,13 @@
+2017-20-04 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.7 work in progress.
+
+  This version requires C++11 or later. The AVX2 code has been
+  removed as RAM is too slow to take advantage of it.
+
+  * CMakeLists.txt: Much faster C++ compilation.
+  * Li.cpp: Riemann R and inverse Riemann R implementations.
+
 2017-03-04 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.6 released.
