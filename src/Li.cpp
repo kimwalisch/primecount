@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 
@@ -81,16 +81,16 @@ long double Li_inverse(long double x)
     return 0;
 
   long double t = x * log(x);
-  long double old_term = numeric_limits<long double>::max();
+  long double old_term = numeric_limits<long double>::infinity();
 
   for (int i = 0; i < 100; i++)
   {
     long double term = (Li(t) - x) * log(t);
+    t -= term;
     // not converging anymore
     if (abs(term) >= abs(old_term))
       break;
     old_term = term;
-    t -= term;
   }
 
   return t;
@@ -133,17 +133,17 @@ long double Ri_inverse(long double x)
   if (x < 2)
     return 0;
 
-  long double t = x * log(x);
-  long double old_term = numeric_limits<long double>::max();
+  long double t = Li_inverse(x);
+  long double old_term = numeric_limits<long double>::infinity();
 
   for (int i = 0; i < 100; i++)
   {
     long double term = (Ri(t) - x) * log(t);
+    t -= term;
     // not converging anymore
     if (abs(term) >= abs(old_term))
       break;
     old_term = term;
-    t -= term;
   }
 
   return t;
