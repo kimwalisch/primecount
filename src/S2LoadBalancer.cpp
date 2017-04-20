@@ -133,7 +133,6 @@ void S2LoadBalancer::init(maxint_t x,
                           int64_t y,
                           int64_t threads)
 {
-  // determined by benchmarking
   double log_threads = max(1.0, log((double) threads));
   decrease_dividend_ = max(0.5, log_threads / 3);
 
