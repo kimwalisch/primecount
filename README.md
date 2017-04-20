@@ -173,7 +173,8 @@ combination of the prime counting function and a prime sieve. The idea
 is to closely approximate the nth prime (e.g. using the inverse
 logarithmic integral
 <img src="http://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
-or the inverse Riemann R function)
+or the inverse Riemann R function
+<img src="http://kimwalisch.github.io/primecount/formulas/RiemannR-1.svgz" height="20" align="absmiddle"/>)
 and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
