@@ -151,8 +151,6 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
-
-  // TODO: find better S2_hard approximation formula
   maxint_t s2_hard_approx = Ri(x);
 
   if (x <= numeric_limits<int64_t>::max())
