@@ -1,7 +1,7 @@
 ///
 /// @file  S2Status.hpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,12 +23,11 @@ public:
   double skewed_percent(maxint_t n, maxint_t limit) const;
 private:
   bool is_print(double time) const;
-  bool is_print(double time, double percent) const;
+  double epsilon_;
   double old_percent_;
   double old_time_;
-  double print_threshold_;
+  double is_print_;
   int precision_;
-  int precision_factor_;
 };
 
 } // namespace
