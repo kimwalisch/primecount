@@ -407,7 +407,7 @@ int get_status_precision(maxint_t x)
       return 1;
   }
 
-  return (status_precision_ > 0) ? status_precision_ : 0;
+  return max(status_precision_, 0);
 }
 
 maxint_t to_maxint(const string& expr)
