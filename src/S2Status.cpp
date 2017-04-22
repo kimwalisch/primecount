@@ -36,16 +36,19 @@ S2Status::S2Status(maxint_t x) :
   epsilon_ = 1.0 / q;
 }
 
-double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
+double S2Status::skewed_percent(maxint_t n, maxint_t limit)
 {
   double exp = 0.96;
-  double percent = get_percent(n, limit);
   double old = percent_.load();
+  double percent = get_percent(n, limit);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
-  percent = 100 - 100 * (pow(base, percent) - low) / (1 - low);
 
-  return max(percent, old);
+  percent = 100 - 100 * (pow(base, percent) - low) / (1 - low);
+  percent = max(percent, old);
+  percent_ = percent;
+
+  return percent;
 }
 
 bool S2Status::is_print(double time) const
@@ -64,12 +67,11 @@ void S2Status::print(maxint_t n, maxint_t limit)
   {
     time_ = time;
 
-    double percent = skewed_percent(n, limit);
     double old = percent_.load();
+    double percent = skewed_percent(n, limit);
 
     if ((percent - old) >= epsilon_)
     {
-      percent_ = percent;
       ostringstream status;
       ostringstream out;
 
@@ -91,7 +93,6 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
     double percent = skewed_percent(n, limit);
 
     time_ = time;
-    percent_ = percent;
     ostringstream status;
     ostringstream out;
 
