@@ -11,6 +11,7 @@
 #define S2STATUS_HPP
 
 #include <int128_t.hpp>
+#include <atomic>
 
 namespace primecount {
 
@@ -24,8 +25,8 @@ public:
 private:
   bool is_print(double time) const;
   double epsilon_;
-  double old_percent_;
-  double old_time_;
+  std::atomic<double> old_percent_;
+  std::atomic<double> old_time_;
   double is_print_;
   int precision_;
 };

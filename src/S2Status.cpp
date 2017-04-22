@@ -16,14 +16,11 @@
 
 #include <iostream>
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <string>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 
@@ -41,10 +38,10 @@ S2Status::S2Status(maxint_t x) :
 
 bool S2Status::is_print(double time) const
 {
-  if (old_time_ == 0)
-    return true;
+  double old = old_time_.load();
 
-  return (time - old_time_) >= is_print_;
+  return (old == 0) ||
+         (time - old) >= is_print_;
 }
 
 double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
@@ -55,7 +52,7 @@ double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
   double low = pow(base, 100.0);
   percent = 100 - 100 * (pow(base, percent) - low) / (1 - low);
 
-  return max(old_percent_, percent);
+  return percent;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit)
@@ -64,17 +61,15 @@ void S2Status::print(maxint_t n, maxint_t limit)
 
   if (is_print(time))
   {
-    #pragma omp critical (time)
     old_time_ = time;
 
     double percent = skewed_percent(n, limit);
+    double old = old_percent_.load();
 
-    if ((percent > old_percent_) &&
-        (percent - old_percent_) >= epsilon_)
+    if ((percent > old) &&
+        (percent - old) >= epsilon_)
     {
-      #pragma omp critical (percent)
       old_percent_ = percent;
-
       ostringstream status;
       ostringstream out;
 
@@ -94,10 +89,16 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
   if (is_print(time))
   {
     double percent = skewed_percent(n, limit);
-    int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
+    double old = old_percent_.load();
+    percent = max(old, percent);
+
+    old_time_ = time;
+    old_percent_ = percent;
 
     ostringstream status;
     ostringstream out;
+
+    int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
 
     status << "Status: " << fixed << setprecision(precision_) << percent << "%, ";
     status << "Load balance: " << load_balance << "%";
@@ -105,9 +106,6 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
     string reset_line = "\r" + string(spaces,' ') + "\r";
     out << reset_line << status.str();
     cout << out.str() << flush;
-
-    old_percent_ = percent;
-    old_time_ = time;
   }
 }
 
