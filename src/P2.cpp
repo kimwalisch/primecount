@@ -159,7 +159,7 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
 
     if (print_status())
     {
-      double percent = get_percent((double) low, (double) z);
+      double percent = get_percent(low, z);
       cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
            << percent << '%' << flush;
     }

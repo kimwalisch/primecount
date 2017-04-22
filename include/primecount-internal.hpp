@@ -156,9 +156,9 @@ int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold
 maxint_t to_maxint(const std::string& expr);
 
 template <typename T>
-T get_percent(T low, T limit)
+double get_percent(T low, T limit)
 {
-  T percent = (T) (100.0 * low / std::max<T>(1, limit));
+  double percent = (100.0 * low) / std::max<T>(1, limit);
   return in_between(0, percent, 100);
 }
 
