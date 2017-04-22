@@ -106,4 +106,4 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
   }
 }
 
-} //namespace
+} // namespace
