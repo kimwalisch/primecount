@@ -23,26 +23,12 @@
 #include <string>
 
 using namespace std;
-using namespace primecount;
-
-namespace {
-
-double skewed_percent(maxint_t n, maxint_t limit)
-{
-  double exp = 0.96;
-  double percent = get_percent(n, limit);
-  double base = exp + percent / (101 / (1 - exp));
-  double low = pow(base, 100.0);
-  return 100 - 100 * (pow(base, percent) - low) / (1 - low);
-}
-
-} // namespace
 
 namespace primecount {
 
 S2Status::S2Status(maxint_t x) :
-  old_percent_(0),
-  old_time_(0),
+  percent_(0),
+  time_(0),
   is_print_(1.0 / 20)
 {
   precision_ = get_status_precision(x);
@@ -50,9 +36,21 @@ S2Status::S2Status(maxint_t x) :
   epsilon_ = 1.0 / q;
 }
 
+double S2Status::skewed_percent(maxint_t n, maxint_t limit) const
+{
+  double exp = 0.96;
+  double percent = get_percent(n, limit);
+  double old = percent_.load();
+  double base = exp + percent / (101 / (1 - exp));
+  double low = pow(base, 100.0);
+  percent = 100 - 100 * (pow(base, percent) - low) / (1 - low);
+
+  return max(percent, old);
+}
+
 bool S2Status::is_print(double time) const
 {
-  double old = old_time_.load();
+  double old = time_.load();
 
   return (old == 0) ||
          (time - old) >= is_print_;
@@ -64,15 +62,14 @@ void S2Status::print(maxint_t n, maxint_t limit)
 
   if (is_print(time))
   {
-    old_time_ = time;
+    time_ = time;
 
     double percent = skewed_percent(n, limit);
-    double old = old_percent_.load();
+    double old = percent_.load();
 
-    if ((percent > old) &&
-        (percent - old) >= epsilon_)
+    if ((percent - old) >= epsilon_)
     {
-      old_percent_ = percent;
+      percent_ = percent;
       ostringstream status;
       ostringstream out;
 
@@ -92,12 +89,9 @@ void S2Status::print(maxint_t n, maxint_t limit, double rsd)
   if (is_print(time))
   {
     double percent = skewed_percent(n, limit);
-    double old = old_percent_.load();
-    percent = max(old, percent);
 
-    old_time_ = time;
-    old_percent_ = percent;
-
+    time_ = time;
+    percent_ = percent;
     ostringstream status;
     ostringstream out;
 

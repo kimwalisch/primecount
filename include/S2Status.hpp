@@ -21,11 +21,12 @@ public:
   S2Status(maxint_t x);
   void print(maxint_t n, maxint_t limit);
   void print(maxint_t n, maxint_t limit, double rsd);
+  double skewed_percent(maxint_t n, maxint_t limit) const;
 private:
   bool is_print(double time) const;
   double epsilon_;
-  std::atomic<double> old_percent_;
-  std::atomic<double> old_time_;
+  std::atomic<double> percent_;
+  std::atomic<double> time_;
   double is_print_;
   int precision_;
 };
