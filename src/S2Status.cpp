@@ -23,20 +23,6 @@
 #include <string>
 
 using namespace std;
-using namespace primecount;
-
-namespace {
-
-double skewed_percent(maxint_t n, maxint_t limit)
-{
-  double exp = 0.96;
-  double percent = get_percent(n, limit);
-  double base = exp + percent / (101 / (1 - exp));
-  double low = pow(base, 100.0);
-  return 100 - 100 * (pow(base, percent) - low) / (1 - low);
-}
-
-} // namespace
 
 namespace primecount {
 
@@ -50,13 +36,13 @@ S2Status::S2Status(maxint_t x) :
   epsilon_ = 1.0 / q;
 }
 
-double S2Status::get_percent(maxint_t n, maxint_t limit)
+double S2Status::skewed_percent(maxint_t n, maxint_t limit)
 {
-  double percent = skewed_percent(n, limit);
-  double old = percent_.load();
-  percent = max(percent, old);
-  percent_ = percent;
-  return percent;
+  double exp = 0.96;
+  double percent = get_percent(n, limit);
+  double base = exp + percent / (101 / (1 - exp));
+  double low = pow(base, 100.0);
+  return 100 - 100 * (pow(base, percent) - low) / (1 - low);
 }
 
 bool S2Status::is_print(double time) const

@@ -501,7 +501,7 @@ T S2_hard_mpi_master(T x,
     S2_hard_mpi_msg msg;
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
-    double percent = status.get_percent(s2_hard, s2_hard_approx);
+    double percent = status.skewed_percent(s2_hard, s2_hard_approx);
 
     if (print_status())
       status.print(s2_hard, s2_hard_approx, msg.rsd());

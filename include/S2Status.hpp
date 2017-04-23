@@ -21,7 +21,7 @@ public:
   S2Status(maxint_t x);
   void print(maxint_t n, maxint_t limit);
   void print(maxint_t n, maxint_t limit, double rsd);
-  double get_percent(maxint_t n, maxint_t limit);
+  static double skewed_percent(maxint_t n, maxint_t limit);
 private:
   bool is_print(double time) const;
   double epsilon_;
