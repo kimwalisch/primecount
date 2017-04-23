@@ -25,6 +25,9 @@
   #include <omp.h>
 #endif
 
+using namespace std;
+using namespace primecount;
+
 /// For types: f1(x) , f2(x, threads)
 #define CHECK_12(f1, f2) check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
 
@@ -51,14 +54,11 @@
   cout << endl; \
 }
 
-using namespace std;
-using namespace primecount;
-
 namespace {
 
 int get_rand()
 {
-  // 0 <= get_rand() < 10^7
+  // 1 <= get_rand() <= 10^7+1
   return (rand() % 10000) * 1000 + 1;
 }
 
@@ -73,7 +73,7 @@ void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
   }
 }
 
-void check_nth_prime(int64_t iters)
+void test_nth_prime(int64_t iters)
 {
   cout << "Testing nth_prime(x)" << flush;
 
@@ -101,24 +101,24 @@ void check_nth_prime(int64_t iters)
 
 #ifdef _OPENMP
 
-void test_phi_thread_safety(int64_t iters)
+void test_phi(int64_t iters)
 {
   cout << "Testing phi(x, a)" << flush;
 
   int64_t sum1 = 0;
   int64_t sum2 = 0;
 
+  #pragma omp parallel for reduction(+: sum1)
   for (int64_t i = 0; i < iters; i++)
     sum1 += pi_legendre(10000000 + i, 1);
 
-  #pragma omp parallel for reduction(+: sum2)
   for (int64_t i = 0; i < iters; i++)
     sum2 += pi_legendre(10000000 + i, 1);
 
   if (sum1 != sum2)
     throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
 
-  std::cout << "\rTesting phi(x, a) 100%" << endl;
+  cout << "\rTesting phi(x, a) 100%" << endl;
 }
 
 #endif
@@ -130,12 +130,12 @@ namespace primecount {
 bool test()
 {
   set_print_status(false); 
-  srand(static_cast<unsigned>(time(0)));
+  srand((unsigned int) time(0));
 
   try
   {
 #ifdef _OPENMP
-    test_phi_thread_safety(100);
+    test_phi(100);
 #endif
 
     CHECK_EQUAL(pi_legendre,                  pi_primesieve,      CHECK_22,  100);
@@ -158,7 +158,7 @@ bool test()
     CHECK_EQUAL(pi_deleglise_rivat_parallel3, pi_lmo_parallel3,   CHECK_22, 1500);
 #endif
 
-    check_nth_prime(300);
+    test_nth_prime(300);
   }
   catch (exception& e)
   {
