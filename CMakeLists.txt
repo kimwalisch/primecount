@@ -157,11 +157,6 @@ if(WITH_POPCNT)
     endif()
 endif()
 
-# libprimesieve ######################################################
-
-option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
-add_subdirectory(lib/primesieve)
-
 # CPU cache line size ################################################
 
 if(CACHE_LINE_SIZE)
@@ -179,6 +174,11 @@ else()
         add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
     endif()
 endif()
+
+# libprimesieve ######################################################
+
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
 
