@@ -31,13 +31,13 @@ vector<uint64_t>& to_vector(uint64_t* primes_pimpl)
   return *primes;
 }
 
-/// Get a distance which ensures a good load balance.
-/// @param n  Start or stop number.
+/// Get a distance which ensures a good load balance
+/// @n:  Start or stop number
 ///
 uint64_t get_distance(uint64_t n, uint64_t& tiny_cache_size)
 {
   n = max<uint64_t>(n, 10);
-  uint64_t cache_size = config::ITERATOR_CACHE_SMALL;
+  uint64_t cache_size = config::MIN_CACHE_ITERATOR;
 
   if (tiny_cache_size < cache_size)
   {
@@ -48,9 +48,9 @@ uint64_t get_distance(uint64_t n, uint64_t& tiny_cache_size)
   double x = (double) n;
   double sqrtx = sqrt(x);
   uint64_t primes = (uint64_t)(sqrtx / (log(sqrtx) - 1));
-  uint64_t cache_min_primes = cache_size / sizeof(uint64_t);
-  uint64_t cache_max_primes = config::ITERATOR_CACHE_MAX / sizeof(uint64_t);
-  primes = inBetween(cache_min_primes, primes, cache_max_primes);
+  uint64_t min_primes = cache_size / sizeof(uint64_t);
+  uint64_t max_primes = config::MAX_CACHE_ITERATOR / sizeof(uint64_t);
+  primes = inBetween(min_primes, primes, max_primes);
   double distance = primes * log(x);
 
   return (uint64_t) distance;

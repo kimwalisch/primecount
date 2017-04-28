@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cmath>
 
 using namespace std;
@@ -44,8 +45,8 @@ bool sieveBackwards(int64_t n, int64_t count, uint64_t stop)
 int64_t pix(int64_t n)
 {
   double x = (double) n;
-  double logx = log(max(4.0, x));
-  double pix = x / logx;
+  x = max(4.0, x);
+  double pix = x / log(x);
   return (int64_t) pix;
 }
 
@@ -61,10 +62,14 @@ uint64_t nthPrimeDist(int64_t n, int64_t count, uint64_t start)
   double loglogx = log(logx);
   double pix = x * (logx + loglogx - 1);
 
-  // correct start if sieving backwards to get
-  // a more accurate approximation
+  // correct start if sieving backwards to
+  // get more accurate approximation
   if (count >= n)
-    start -= (uint64_t) pix;
+  {
+    double st = start - pix;
+    st = max(0.0, st);
+    start = (uint64_t) st;
+  }
 
   // approximate the nth prime using:
   // start + n * log(start + pi(n) / loglog(n))
@@ -73,14 +78,16 @@ uint64_t nthPrimeDist(int64_t n, int64_t count, uint64_t start)
   double logStartPix = log(startPix);
   double dist = max(pix, x * logStartPix);
 
-  // ensure (start + dist) <= nth prime
-  if (count < n) dist -= sqrt(dist) * log(logStartPix) * 2;
-  // ensure (start + dist) >= nth prime
-  if (count > n) dist += sqrt(dist) * log(logStartPix) * 2;
+  // ensure start + dist <= nth prime
+  if (count < n)
+    dist -= sqrt(dist) * log(logStartPix) * 2;
+  // ensure start + dist >= nth prime
+  if (count > n)
+    dist += sqrt(dist) * log(logStartPix) * 2;
 
   // if n is very small:
-  // ensure (start + dist) >= nth prime
-  double maxPrimeGap = logStartPix * logStartPix;
+  // ensure start + dist >= nth prime
+  double maxPrimeGap = max_prime_gap(startPix);
   dist = max(dist, maxPrimeGap);
 
   return (uint64_t) dist;
@@ -98,7 +105,7 @@ uint64_t PrimeSieve::nthPrime(uint64_t n)
 uint64_t PrimeSieve::nthPrime(int64_t n, uint64_t start)
 {
   setStart(start);
-  double t1 = getWallTime();
+  auto t1 = chrono::system_clock::now();
 
   if (n == 0)
     n = 1; // like Mathematica
@@ -131,7 +138,7 @@ uint64_t PrimeSieve::nthPrime(int64_t n, uint64_t start)
       checkLowerLimit(stop);
       dist = nthPrimeDist(n, count, stop);
       start = checkedSub(start, dist);
-      count -= countPrimes(start, stop);
+      count -= (int64_t) countPrimes(start, stop);
       stop = checkedSub(start, 1);
     }
   }
@@ -153,7 +160,11 @@ uint64_t PrimeSieve::nthPrime(int64_t n, uint64_t start)
     uint64_t prime = 0;
     for (primesieve::iterator it(start, stop); count < n; count++)
       prime = it.next_prime();
-    seconds_ = getWallTime() - t1;
+
+    auto t2 = chrono::system_clock::now();
+    chrono::duration<double> seconds = t2 - t1;
+    seconds_ = seconds.count();
+
     return prime;
   }
   catch (primesieve_error&) { }

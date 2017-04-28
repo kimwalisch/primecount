@@ -12,6 +12,7 @@
 #define PMATH_HPP
 
 #include <stdint.h>
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -98,8 +99,10 @@ inline T isqrt(T x)
 /// Returns 2^64-1 if x + y >= 2^64-1
 inline uint64_t checkedAdd(uint64_t x, uint64_t y)
 {
-  if (x >= std::numeric_limits<uint64_t>::max() - y)
-    return std::numeric_limits<uint64_t>::max();
+  const uint64_t max = std::numeric_limits<uint64_t>::max();
+
+  if (x >= max - y)
+    return max;
 
   return x + y;
 }
@@ -113,19 +116,23 @@ inline uint64_t checkedSub(uint64_t x, uint64_t y)
 template <typename A, typename B, typename C>
 inline B inBetween(A min, B x, C max)
 {
-  if (x < (B) min) return (B) min;
-  if (x > (B) max) return (B) max;
+  if (x < (B) min)
+    return (B) min;
+  if ((C) x > max)
+    return (B) max;
 
   return x;
 }
 
 /// Get an approximation of the maximum prime gap near n
-inline uint64_t max_prime_gap(uint64_t n)
+template <typename T>
+inline T max_prime_gap(T n)
 {
   double x = (double) n;
+  x = std::max(1.0, x);
   double logx = std::log(x);
   double prime_gap = logx * logx;
-  return (uint64_t) prime_gap;
+  return (T) prime_gap;
 }
 
 } // namespace

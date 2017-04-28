@@ -23,10 +23,6 @@
   #define L1_DCACHE_SIZE 32
 #endif
 
-#ifndef SIEVESIZE
-  #define SIEVESIZE L1_DCACHE_SIZE
-#endif
-
 namespace primesieve {
 
 /// byte_t must be unsigned in primesieve
@@ -44,13 +40,6 @@ enum {
 namespace config {
 
 enum {
-  /// Default sieve size in kilobytes of the PrimeSieve class. Set
-  /// PRIMESIEVE_SIEVESIZE to your CPUs L1 data cache size to get the
-  /// best performance.
-  /// @pre PRIMESIEVE_SIEVESIZE >= 1 && <= 2048
-  ///
-  PRIMESIEVE_SIEVESIZE = SIEVESIZE,
-
   /// Number of sieving primes per Bucket in EratSmall, EratMedium and
   /// EratBig objects, affects performance by about 3%.
   ///
@@ -65,15 +54,15 @@ enum {
   ///
   BYTES_PER_ALLOC = (1 << 20) * 8,
 
-  /// primesieve::iterator caches at least ITERATOR_CACHE_SMALL
+  /// primesieve::iterator caches at least MIN_CACHE_ITERATOR
   /// bytes of primes. L3_CACHE_SIZE is a good value.
   ///
-  ITERATOR_CACHE_SMALL = (1 << 20) * 8,
+  MIN_CACHE_ITERATOR = (1 << 20) * 8,
 
   /// primesieve::iterator maximum cache size in bytes, used if
-  /// pi(sqrt(n)) * 8 bytes > ITERATOR_CACHE_MAX.
+  /// pi(sqrt(n)) * 8 bytes > MAX_CACHE_ITERATOR.
   ///
-  ITERATOR_CACHE_MAX = (1 << 20) * 1024
+  MAX_CACHE_ITERATOR = (1 << 20) * 1024
 };
 
   /// Sieving primes <= (sieveSize in bytes * FACTOR_ERATSMALL)
