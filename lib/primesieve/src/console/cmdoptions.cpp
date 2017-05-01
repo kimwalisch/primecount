@@ -27,17 +27,18 @@ using namespace primesieve;
 namespace {
 
 /// Command-line option
-/// e.g. str = "--threads", value = "4"
+/// e.g. opt = "--threads", val = "4"
 struct Option
 {
   string str;
-  string value;
+  string opt;
+  string val;
   template <typename T>
   T getValue() const
   {
-    if (value.empty())
+    if (val.empty())
       throw primesieve_error("missing value for option " + str);
-    return calculator::eval<T>(value);
+    return calculator::eval<T>(val);
   }
 };
 
@@ -83,67 +84,90 @@ map<string, OptionID> optionMap =
   { "--version",   OPTION_VERSION }
 };
 
-int check(int primeType)
-{
-  primeType--;
-
-  if (primeType < 0 ||
-      primeType > 5)
-    help();
-
-  return primeType;
-}
-
 void optionPrint(Option& opt,
                  CmdOptions& opts)
 {
   opts.quiet = true;
 
-  if (opt.value.empty())
-    opt.value = "1";
+  // by default print primes
+  if (opt.val.empty())
+    opt.val = "1";
 
-  int i = opt.getValue<int>();
-  i = check(i);
-  opts.flags |= PrimeSieve::PRINT_PRIMES << i;
+  switch (opt.getValue<int>())
+  {
+    case 1: opts.flags |= PrimeSieve::PRINT_PRIMES; break;
+    case 2: opts.flags |= PrimeSieve::PRINT_TWINS; break;
+    case 3: opts.flags |= PrimeSieve::PRINT_TRIPLETS; break;
+    case 4: opts.flags |= PrimeSieve::PRINT_QUADRUPLETS; break;
+    case 5: opts.flags |= PrimeSieve::PRINT_QUINTUPLETS; break;
+    case 6: opts.flags |= PrimeSieve::PRINT_SEXTUPLETS; break;
+    default: throw primesieve_error("invalid option " + opt.str);
+  }
 }
 
 void optionCount(Option& opt,
                  CmdOptions& opts)
 {
-  if (opt.value.empty())
-    opt.value = "1";
+  // by default count primes
+  if (opt.val.empty())
+    opt.val = "1";
 
   int n = opt.getValue<int>();
 
   for (; n > 0; n /= 10)
   {
-    int i = check(n % 10);
-    opts.flags |= PrimeSieve::COUNT_PRIMES << i;
+    switch (n % 10)
+    {
+      case 1: opts.flags |= PrimeSieve::COUNT_PRIMES; break;
+      case 2: opts.flags |= PrimeSieve::COUNT_TWINS; break;
+      case 3: opts.flags |= PrimeSieve::COUNT_TRIPLETS; break;
+      case 4: opts.flags |= PrimeSieve::COUNT_QUADRUPLETS; break;
+      case 5: opts.flags |= PrimeSieve::COUNT_QUINTUPLETS; break;
+      case 6: opts.flags |= PrimeSieve::COUNT_SEXTUPLETS; break;
+      default: throw primesieve_error("invalid option " + opt.str);
+    }
   }
 }
 
+/// e.g. "--thread=4" -> return "--thread"
+string getOption(string str)
+{
+  size_t pos = str.find_first_of("=0123456789");
+
+  if (pos == string::npos)
+    return str;
+  else
+    return str.substr(0, pos);
+}
+
+/// e.g. "--thread=4" -> return "4"
+string getValue(string str)
+{
+  size_t pos = str.find_first_of("0123456789");
+
+  if (pos == string::npos)
+    return string();
+  else
+    return str.substr(pos);
+}
+
 /// e.g. "--threads=8"
-/// -> opt.str = "--threads"
-/// -> opt.value = "8"
+/// -> opt.opt = "--threads"
+/// -> opt.val = "8"
 ///
 Option makeOption(const string& str)
 {
   Option opt;
-  size_t delimiter = str.find_first_of("=0123456789");
 
-  if (delimiter == string::npos)
-    opt.str = str;
-  else
-  {
-    opt.str = str.substr(0, delimiter);
-    opt.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
-  }
+  opt.str = str;
+  opt.opt = getOption(str);
+  opt.val = getValue(str);
 
-  if (opt.str.empty() && !opt.value.empty())
-    opt.str = "--number";
+  if (opt.opt.empty() && !opt.val.empty())
+    opt.opt = "--number";
 
-  if (!optionMap.count(opt.str))
-    throw primesieve_error("unknown option " + opt.str);
+  if (!optionMap.count(opt.opt))
+    throw primesieve_error("unknown option " + str);
 
   return opt;
 }
@@ -158,7 +182,7 @@ CmdOptions parseOptions(int argc, char* argv[])
   {
     Option opt = makeOption(argv[i]);
 
-    switch (optionMap[opt.str])
+    switch (optionMap[opt.opt])
     {
       case OPTION_COUNT:     optionCount(opt, opts); break;
       case OPTION_PRINT:     optionPrint(opt, opts); break;
@@ -175,9 +199,8 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (opts.numbers.size() < 1 ||
-      opts.numbers.size() > 2)
-    help();
+  if (opts.numbers.empty())
+    throw primesieve_error("missing STOP number");
 
   if (opts.quiet)
     opts.status = false;
