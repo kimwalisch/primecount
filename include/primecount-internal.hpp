@@ -170,7 +170,7 @@ T S2_approx(T x, int64_t pi_y, T P2, T S1)
   return S2;
 }
 
-bool test();
+void test();
 
 #ifdef HAVE_MPI
 

@@ -1,6 +1,8 @@
 ///
 /// @file   test.cpp
-/// @brief  primecount integration tests.
+/// @brief  primecount integration tests (option: --test).
+///         These tests are also used by the author for
+///         benchmarking code changes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -16,17 +18,14 @@
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
-#include <string>
 #include <exception>
+#include <random>
 #include <sstream>
-#include <ctime>
+#include <string>
 
 #ifdef _OPENMP
   #include <omp.h>
 #endif
-
-using namespace std;
-using namespace primecount;
 
 /// For types: f1(x) , f2(x, threads)
 #define CHECK_12(f1, f2) check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
@@ -44,7 +43,7 @@ using namespace primecount;
  \
   int64_t x = 0; \
   /* test using random increment */ \
-  for (int64_t i = 0; i < iters; i++, x += get_rand()) \
+  for (int64_t i = 0; i < iters; i++, x += dist(gen)) \
   { \
     check(f1, f2); \
     double percent = 100.0 * (i + 1.0) / iters; \
@@ -54,15 +53,15 @@ using namespace primecount;
   cout << endl; \
 }
 
+using namespace std;
+using namespace primecount;
+
 namespace {
 
-int get_rand()
-{
-  // 1 <= get_rand() <= 10^7+1
-  return (rand() % 10000) * 1000 + 1;
-}
-
-void check_equal(const string& f1, int64_t x, int64_t res1, int64_t res2)
+void check_equal(const string& f1,
+                 int64_t x,
+                 int64_t res1,
+                 int64_t res2)
 {
   if (res1 != res2)
   {
@@ -78,22 +77,24 @@ void test_nth_prime(int64_t iters)
   cout << "Testing nth_prime(x)" << flush;
 
   int64_t n = 0;
-  int64_t old_n = 0;
-  int64_t old_nth_prime = 0;
+  int64_t old = 0;
+  int64_t prime = 0;
+
+  random_device rd;
+  mt19937 gen(rd());
+  uniform_int_distribution<int64_t> dist(1, 10000000);
 
   for (; n < 10000; n++)
     check_equal("nth_prime", n, nth_prime(n), primesieve::nth_prime(n));
 
   // test using random increment
-  for (int64_t i = 0; i < iters; i++, n += get_rand())
+  for (int64_t i = 0; i < iters; i++, n += dist(gen))
   {
-    int64_t primesieve_nth_prime = primesieve::nth_prime(n - old_n, old_nth_prime);
-    check_equal("nth_prime", n, nth_prime(n), primesieve_nth_prime);
+    prime = primesieve::nth_prime(n - old, prime);
+    check_equal("nth_prime", n, nth_prime(n), prime);
     double percent = 100.0 * (i + 1.0) / iters;
     cout << "\rTesting nth_prime(x) " << (int) percent << "%" << flush;
-
-    old_n = n;
-    old_nth_prime = primesieve_nth_prime;
+    old = n;
   }
 
   cout << endl;
@@ -127,10 +128,13 @@ void test_phi(int64_t iters)
 
 namespace primecount {
 
-bool test()
+void test()
 {
-  set_print_status(false); 
-  srand((unsigned int) time(0));
+  set_print_status(false);
+
+  random_device rd;
+  mt19937 gen(rd());
+  uniform_int_distribution<int64_t> dist(1, 10000000);
 
   try
   {
@@ -163,11 +167,11 @@ bool test()
   catch (exception& e)
   {
     cerr << endl << e.what() << endl;
-    return false;
+    exit(1);
   }
 
   cout << "All tests passed successfully!" << endl;
-  return true;
+  exit(0);
 }
 
 } // namespace

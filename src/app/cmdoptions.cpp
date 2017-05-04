@@ -19,7 +19,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <cstdlib>
 #include <cstddef>
 
 using namespace std;
@@ -28,7 +27,7 @@ namespace primecount {
 
 void help();
 void version();
-bool test();
+void test();
 
 /// Command-line options
 map<string, OptionID> optionMap =
@@ -174,7 +173,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_HELP:    help(); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
-      case OPTION_TEST:    if (test()) exit(0); exit(1);
+      case OPTION_TEST:    test(); break;
       case OPTION_VERSION: version(); break;
       default:             opts.option = optionMap[opt.opt];
     }
