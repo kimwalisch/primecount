@@ -27,11 +27,13 @@
   #include <omp.h>
 #endif
 
-/// For types: f1(x) , f2(x, threads)
-#define CHECK_12(f1, f2) check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
+// check: f1(x) == f2(x, threads)
+#define CHECK_12(f1, f2) \
+  check_equal(#f1, x, f1 (x), f2 (x, get_num_threads()))
 
-/// For types: f1(x, threads) , f2(x, threads)
-#define CHECK_22(f1, f2) check_equal(#f1, x, f1 (x, get_num_threads()), f2 (x, get_num_threads()))
+// check: f1(x, threads) == f2(x, threads)
+#define CHECK_22(f1, f2) \
+  check_equal(#f1, x, f1 (x, get_num_threads()), f2 (x, get_num_threads()))
 
 #define CHECK_EQUAL(f1, f2, check, iters) \
 { \
@@ -42,12 +44,13 @@
     check(f1, f2); \
  \
   int64_t x = 0; \
-  /* test using random increment */ \
-  for (int64_t i = 0; i < iters; i++, x += dist(gen)) \
+  /* test random increment */ \
+  for (int64_t i = 0; i < iters; i++) \
   { \
     check(f1, f2); \
     double percent = 100.0 * (i + 1.0) / iters; \
     cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
+    x += dist(gen); \
   } \
  \
   cout << endl; \
@@ -87,14 +90,15 @@ void test_nth_prime(int64_t iters)
   for (; n < 10000; n++)
     check_equal("nth_prime", n, nth_prime(n), primesieve::nth_prime(n));
 
-  // test using random increment
-  for (int64_t i = 0; i < iters; i++, n += dist(gen))
+  // test random increment
+  for (int64_t i = 0; i < iters; i++)
   {
     prime = primesieve::nth_prime(n - old, prime);
     check_equal("nth_prime", n, nth_prime(n), prime);
     double percent = 100.0 * (i + 1.0) / iters;
     cout << "\rTesting nth_prime(x) " << (int) percent << "%" << flush;
     old = n;
+    n += dist(gen);
   }
 
   cout << endl;
