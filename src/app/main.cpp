@@ -12,7 +12,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <calculator.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
@@ -151,12 +150,11 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
-  maxint_t s2_hard_approx = Ri(x);
 
   if (x <= numeric_limits<int64_t>::max())
-    return S2_hard((int64_t) x, y, z, c, (int64_t) s2_hard_approx, threads);
+    return S2_hard((int64_t) x, y, z, c, (int64_t) Ri(x), threads);
   else
-    return S2_hard(x, y, z, c, s2_hard_approx, threads);
+    return S2_hard(x, y, z, c, Ri(x), threads);
 }
 
 } // namespace
@@ -251,22 +249,13 @@ int main (int argc, char* argv[])
         print_seconds(get_wtime() - time);
     }
   }
-  catch (calculator::error& e)
-  {
-#ifdef HAVE_MPI
-    MPI_Finalize();
-#endif
-    cerr << e.what() << "." << endl
-         << "Try `primecount --help' for more information." << endl;
-    return 1;
-  }
   catch (exception& e)
   {
 #ifdef HAVE_MPI
     MPI_Finalize();
 #endif
-    cerr << "Error: " << e.what() << "." << endl
-         << "Try `primecount --help' for more information." << endl;
+    cerr << "primecount: " << e.what() << endl
+         << "Try 'primecount --help' for more information." << endl;
     return 1;
   }
 

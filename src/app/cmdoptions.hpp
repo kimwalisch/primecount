@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef PRIMECOUNT_CMDOPTIONS_HPP
-#define PRIMECOUNT_CMDOPTIONS_HPP
+#ifndef CMDOPTIONS_HPP
+#define CMDOPTIONS_HPP
 
 #include <primecount.hpp>
 #include <int128_t.hpp>

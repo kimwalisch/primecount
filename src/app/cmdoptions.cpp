@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <cstddef>
 
-using std::string;
+using namespace std;
 
 namespace primecount {
 
@@ -31,7 +31,7 @@ void version();
 bool test();
 
 /// Command-line options
-std::map<string, OptionID> optionMap =
+map<string, OptionID> optionMap =
 {
   { "-a", OPTION_ALPHA },
   { "--alpha", OPTION_ALPHA },
@@ -83,17 +83,19 @@ std::map<string, OptionID> optionMap =
   { "--version", OPTION_VERSION }
 };
 
-/// e.g. str = "--threads", value = "4"
+/// Command-line option
+/// e.g. opt = "--threads", val = "4"
 struct Option
 {
   string str;
-  string value;
+  string opt;
+  string val;
   template <typename T>
   T getValue() const
   {
-    if (value.empty())
+    if (val.empty())
       throw primecount_error("missing value for option " + str);
-    return (T) to_maxint(value);
+    return (T) to_maxint(val);
   }
 };
 
@@ -103,33 +105,54 @@ void optionStatus(Option& opt,
   set_print_status(true);
   opts.time = true;
 
-  if (!opt.value.empty())
+  if (!opt.val.empty())
     set_status_precision(opt.getValue<int>());
 }
 
+/// e.g. "--thread=4" -> return "--thread"
+string getOption(string str)
+{
+  size_t pos = str.find_first_of("=0123456789");
+
+  if (pos == string::npos)
+    return str;
+  else
+    return str.substr(0, pos);
+}
+
+/// e.g. "--thread=4" -> return "4"
+string getValue(string str)
+{
+  size_t pos = str.find_first_of("0123456789");
+
+  if (pos == string::npos)
+    return string();
+  else
+    return str.substr(pos);
+}
+
 /// e.g. "--threads=8"
-/// -> opt.str = "--threads"
-/// -> opt.value = "8"
+/// -> opt.opt = "--threads"
+/// -> opt.val = "8"
 ///
 Option makeOption(const string& str)
 {
   Option opt;
-  size_t delimiter = string::npos;
-  if (optionMap.count(str) == 0)
-    delimiter = str.find_first_of("=0123456789");
+  opt.str = str;
 
-  if (delimiter == string::npos)
-    opt.str = str;
+  if (optionMap.count(str))
+    opt.opt = str;
   else
   {
-    opt.str = str.substr(0, delimiter);
-    opt.value = str.substr(delimiter + (str.at(delimiter) == '=' ? 1 : 0));
+    opt.opt = getOption(str);
+    opt.val = getValue(str);
   }
-  if (opt.str.empty() && !opt.value.empty())
-    opt.str = "--number";
 
-  if (!optionMap.count(opt.str))
-    throw primecount_error("unknown option " + opt.str);
+  if (opt.opt.empty() && !opt.val.empty())
+    opt.opt = "--number";
+
+  if (!optionMap.count(opt.opt))
+    throw primecount_error("unknown option " + str);
 
   return opt;
 }
@@ -137,30 +160,30 @@ Option makeOption(const string& str)
 CmdOptions parseOptions(int argc, char* argv[])
 {
   CmdOptions opts;
-  std::vector<maxint_t> numbers;
+  vector<maxint_t> numbers;
 
   for (int i = 1; i < argc; i++)
   {
     Option opt = makeOption(argv[i]);
 
-    switch (optionMap[opt.str])
+    switch (optionMap[opt.opt])
     {
-      case OPTION_ALPHA:   set_alpha(std::stod(opt.value)); break;
+      case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
       case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
       case OPTION_HELP:    help(); break;
-      case OPTION_STATUS:  optionStatus(opt, opts) ;break;
+      case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    if (test()) exit(0); exit(1);
       case OPTION_VERSION: version(); break;
-      default:             opts.option = optionMap[opt.str];
+      default:             opts.option = optionMap[opt.opt];
     }
   }
 
-  if (numbers.size() == 1)
-    opts.x = numbers[0];
+  if (numbers.empty())
+    throw primecount_error("missing x number");
   else
-    help();
+    opts.x = numbers[0];
 
   return opts;
 }
