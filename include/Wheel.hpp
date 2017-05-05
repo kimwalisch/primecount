@@ -21,7 +21,7 @@
 namespace primecount {
 
 /// The InitWheel data structure is used to calculate the
-/// first multiple >= start of each sieving prime.
+/// first multiple >= start of each sieving prime
 ///
 struct InitWheel
 {
@@ -37,9 +37,9 @@ struct NextWheel
 
 struct WheelItem
 {
-  WheelItem(int64_t multiple, int64_t index)
-    : next_multiple(multiple), 
-      wheel_index((int8_t) index)
+  WheelItem(int64_t multiple, int64_t index) :
+    next_multiple(multiple),
+    wheel_index((int8_t) index)
   { }
 
   void set(int64_t multiple, 
@@ -53,7 +53,7 @@ struct WheelItem
   int8_t wheel_index;
 };
 
-/// 4th wheel, skips multiples of 2, 3, 5 and 7.
+/// 4th wheel, skips multiples of 2, 3, 5 and 7
 class Wheel
 {
 public:
@@ -74,7 +74,7 @@ public:
       int64_t prime = primes[b];
       int64_t quotient = ceil_div(low, prime);
 
-      // first multiple of prime >= low
+      // first multiple >= low
       int64_t multiple = prime * quotient;
 
       // calculate the next multiple of prime that

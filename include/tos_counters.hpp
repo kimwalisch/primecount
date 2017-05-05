@@ -27,9 +27,9 @@ namespace primecount {
 
 /// Initialize the counters from the sieve array.
 /// @pre segment_size is a power of 2.
-/// @pre sieve[i] = 1 for unsieved elements and sieve[i] = 0
-///      for crossed-off elements.
-/// Runtime: O(N log N).
+/// @pre sieve[i] = 1 for unsieved elements and
+///      sieve[i] = 0 for sieved elements.
+/// Runtime: O(N log N)
 ///
 template <typename T1, typename T2>
 inline void cnt_finit(const T1& sieve, std::vector<T2>& cnt, int64_t segment_size)
@@ -37,15 +37,16 @@ inline void cnt_finit(const T1& sieve, std::vector<T2>& cnt, int64_t segment_siz
   for (int64_t i = 0; i < segment_size; i++)
   {
     cnt[i] = sieve[i];
-    for (int64_t k = (i + 1) & ~i, j = i; k >>= 1; j &= j - 1)
+    int64_t k = (i + 1) & ~i;
+    for (int64_t j = i; k >>= 1; j &= j - 1)
       cnt[i] += cnt[j - 1];
   }
 }
 
-/// Update (decrement) the counters after that an element has been
-/// crossed-off for the first time in the sieve array.
-/// @pre segment_size is a power of 2.
-/// Runtime: O(log N).
+/// Update (decrement by 1) the counters after
+/// that an element has been crossed-off for the
+/// first time in the sieve array.
+/// Runtime: O(log N)
 ///
 template <typename T>
 inline void cnt_update(std::vector<T>& cnt, int64_t pos, int64_t segment_size)
@@ -60,7 +61,7 @@ inline void cnt_update(std::vector<T>& cnt, int64_t pos, int64_t segment_size)
 
 /// Get the number of unsieved elements <= pos
 /// in the current segment (sieve array).
-/// Runtime: O(log N).
+/// Runtime: O(log N)
 ///
 template <typename T>
 inline int64_t cnt_query(const std::vector<T>& cnt, int64_t pos)
