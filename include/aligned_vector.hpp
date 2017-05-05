@@ -20,9 +20,10 @@
 
 namespace primecount {
 
-/// The aligned_vector class aligns each of its elements on a
-/// new cache line in order to avoid false sharing (cache trashing)
-/// when multiple threads write to adjacent elements.
+/// The aligned_vector class aligns each of its
+/// elements on a new cache line in order to avoid
+/// false sharing (cache trashing) when multiple
+/// threads write to adjacent elements
 ///
 template <typename T>
 class aligned_vector

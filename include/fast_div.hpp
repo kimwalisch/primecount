@@ -2,11 +2,11 @@
 /// @file  fast_div.hpp
 /// @brief Integer division of small types is much faster than
 ///        integer division of large types on most CPUs. The
-///        fast_div(x, y) function tries to take advantage of this
-///        by casting x and y to smaller types (if possible) before
-///        doing the division.
+///        fast_div(x, y) function tries to take advantage of
+///        this by casting x and y to smaller types (if possible)
+///        before doing the division.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

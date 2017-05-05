@@ -1,6 +1,6 @@
 ///
 /// @file  isqrt.hpp
-/// @brief Integer square root function.
+/// @brief Integer square root function
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

@@ -1,6 +1,6 @@
 ///
 /// @file  imath.hpp
-/// @brief Integer math functions used in primecount.
+/// @brief Integer math functions used in primecount
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -111,7 +111,7 @@ inline T iroot(T x)
   return r;
 }
 
-/// Calculate the number of primes below x using binary search.
+/// Count the number of primes <= x using binary search.
 /// @pre primes[1] = 2, primes[3] = 3, ...
 /// @pre x <= primes.back()
 ///
@@ -122,7 +122,7 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
   return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
 
-/// Calculate the number of primes below x using binary search.
+/// Count the number of primes <= x using binary search.
 /// @pre primes[1] = 2, primes[3] = 3, ...
 /// @pre x <= primes.back()
 ///

@@ -41,7 +41,7 @@ std::vector<T> generate_n_primes(int64_t n)
   return primes;
 }
 
-/// Generate a vector with Möbius function values.
+/// Generate a vector with Möbius function values
 std::vector<int32_t> generate_moebius(int64_t max);
 
 /// Generate a vector with the least prime
@@ -49,7 +49,7 @@ std::vector<int32_t> generate_moebius(int64_t max);
 ///
 std::vector<int32_t> generate_lpf(int64_t max);
 
-/// Generate a vector with the prime counts below max
+/// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
 std::vector<int32_t> generate_pi(int64_t max);

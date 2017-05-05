@@ -4,7 +4,7 @@
 ///        that packs 64 numbers into 8 bytes i.e. each bit
 ///        corresponds to one integer.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,7 +25,7 @@ class BitSieve
 public:
   BitSieve(std::size_t size);
 
-  /// Pre-sieve the multiples (>= low) of the first c primes.
+  /// Pre-sieve the multiples >= low of the first c primes.
   /// @warning Also removes the first c primes.
   /// @pre c < 10
   ///
@@ -43,8 +43,8 @@ public:
   }
 
   /// Count the number of 1 bits inside [start, stop].
-  /// As an optimization this method counts either forwards or
-  /// backwards depending on what's faster.
+  /// As an optimization this method counts either forwards
+  /// or backwards depending on what's faster.
   ///
   uint64_t count(uint64_t start,
                  uint64_t stop,
@@ -59,7 +59,7 @@ public:
     if (stop - start < high - low - stop)
       return count(start, stop);
     else
-      // optimization, same as count(start, stop)
+      // count backwards
       return count_low_high - count_0_start - count(stop + 1, (high - 1) - low);
   }
 

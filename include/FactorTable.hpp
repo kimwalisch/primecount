@@ -16,7 +16,7 @@
 ///         4) n      if  is_prime(n) && n < T_MAX
 ///         5) T_MAX  if  is_prime(n) && n > T_MAX
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,10 +43,10 @@
 
 namespace primecount {
 
-/// AbstractFactorTable contains static FactorTable
-/// data and it used to convert:
-/// 1) A number into a FactorTable index.
-/// 2) A FactorTable index into a number.
+/// AbstractFactorTable contains static lookup tables
+/// and is used to convert:
+/// 1) A number into a FactorTable index
+/// 2) A FactorTable index into a number
 ///
 class AbstractFactorTable
 {
@@ -54,14 +54,12 @@ protected:
   virtual ~AbstractFactorTable() { }
 
 public:
-  /// @pre number > 0
   static void to_index(int64_t* number)
   {
     assert(*number > 0);
     *number = get_index(*number);
   }
 
-  /// @pre number > 0
   static int64_t get_index(uint64_t number)
   {
     assert(number > 0);
@@ -102,19 +100,21 @@ public:
     return ipow(T_MAX - 1, 2) - 1;
   }
 
-  /// Get the least prime factor (lpf) of the number get_number(index).
-  /// The result is different from lpf in some situations:
-  /// 1) lpf(index) returns T_MAX if get_number(index) is a prime > T_MAX.
-  /// 2) lpf(index) returns lpf minus one if mu(index) == 1.
-  /// 3) lpf(index) returns 0 if get_number(index) has a squared prime factor.
+  /// Get the least prime factor (lpf) of the number
+  /// n = get_number(index). The result is different from
+  /// the least prime factor in some situations:
+  /// 1) Returns 0 if n has a squared prime factor
+  /// 2) Returns lpf - 1 if mu(index) == 1
+  /// 3) Returns T_MAX if n is a prime > T_MAX
   ///
   int64_t lpf(int64_t index) const
   {
     return factors_[index];
   }
 
-  /// Get the Möbius function value of the number get_number(index).
-  /// For performance reasons mu(index) == 0 is not supported.
+  /// Get the Möbius function value of the number
+  /// n = get_number(index). For performance reasons
+  /// mu(index) == 0 is not supported.
   /// @pre mu(index) != 0 (i.e. lpf(index) != 0)
   ///
   int64_t mu(int64_t index) const
@@ -146,7 +146,7 @@ private:
 
       while ((prime = it.next_prime()) <= high)
       {
-        // case 4), store prime
+        // case 4) store prime
         if (prime > low &&
             prime < T_MAX)
           factors_[get_index(prime)] = (T) prime;
@@ -161,12 +161,12 @@ private:
         for (; multiple <= high; multiple = prime * get_number(i++))
         {
           int64_t mi = get_index(multiple);
-          // case 5), prime is the smallest factor of multiple
+          // case 5) prime is smallest factor of multiple
           if (factors_[mi] == T_MAX)
             factors_[mi] = (T) prime;
-          // case 2) & 3), the least significant bit indicates
-          // whether multiple has an even (0) or odd (1)
-          // number of prime factors
+          // case 2) & 3) the least significant bit
+          // indicates whether multiple has an even (0)
+          // or odd (1) number of prime factors
           else if (factors_[mi] != 0)
             factors_[mi] ^= 1;
         }
@@ -177,7 +177,7 @@ private:
           int64_t square = prime * prime;
           multiple = next_multiple(low, square, &j);
 
-          // case 1), set 0 if moebius(n) = 0
+          // case 1) set 0 if moebius(n) = 0
           for (; multiple <= high; multiple = square * get_number(j++))
             factors_[get_index(multiple)] = 0;
         }
@@ -186,7 +186,7 @@ private:
   }
 
   /// Find the first multiple > low of prime which
-  /// is not divisible by any prime <= 7.
+  /// is not divisible by any prime <= 7
   ///
   static int64_t next_multiple(int64_t low,
                                int64_t prime,

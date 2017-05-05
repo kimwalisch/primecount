@@ -1,8 +1,8 @@
 ///
-/// @file  S2.hpp.
-/// @brief S2 function declarations.
+/// @file  S2.hpp
+/// @brief S2 function declarations
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,7 @@
 
 namespace primecount {
 
-/// ------------------------ S2_trivial() ----------------------------
+// S2_trivial()
 
 int64_t S2_trivial(int64_t x,
                    int64_t y,
@@ -34,7 +34,7 @@ int128_t S2_trivial(int128_t x,
 
 #endif
 
-/// ------------------------ S2_easy() -------------------------------
+// S2_easy()
 
 int64_t S2_easy(int64_t x,
                 int64_t y,
@@ -72,7 +72,7 @@ int128_t S2_easy_mpi(int128_t x,
 
 #endif
 
-/// ------------------------ S2_hard() -------------------------------
+// S2_hard()
 
 int64_t S2_hard(int64_t x,
                 int64_t y,

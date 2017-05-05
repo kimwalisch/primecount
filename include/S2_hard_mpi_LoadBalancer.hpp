@@ -1,7 +1,8 @@
 ///
 /// @file   S2_hard_mpi_LoadBalancer.hpp
-/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes the
-///         computation of the hard special leaves onto cluster nodes.
+/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes
+///         the computation of the hard special leaves onto
+///         cluster nodes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

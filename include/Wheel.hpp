@@ -1,8 +1,8 @@
 ///
 /// @file   Wheel.hpp
 /// @brief  Data structures related to wheel factorization.
-///         Wheel factorization is used to skip multiples of small
-///         primes in the sieve of Eratosthenes.
+///         Wheel factorization is used to skip multiples of
+///         small primes in the sieve of Eratosthenes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -21,7 +21,7 @@
 namespace primecount {
 
 /// The InitWheel data structure is used to calculate the
-/// first multiple >= start of each sieving prime
+/// first multiple >= start of a sieving prime
 ///
 struct InitWheel
 {
@@ -29,12 +29,19 @@ struct InitWheel
   int8_t wheel_index;
 };
 
+/// The NextWheel data structure is used to calculate the
+/// next multiple of a sieving prime
+///
 struct NextWheel
 {
   int8_t next_multiple_factor;
   int8_t next_wheel_index;
 };
 
+/// For each sieving prime we create a WheelItem which
+/// contains the sieving prime's next multiple and the
+/// wheel index of that multiple
+///
 struct WheelItem
 {
   WheelItem(int64_t multiple, int64_t index) :
@@ -58,8 +65,8 @@ class Wheel
 {
 public:
   /// Calculate the first multiple >= low of each prime.
-  /// When sieving special leaves both multiples and
-  /// primes are crossed-off.
+  /// When sieving special leaves both multiples
+  /// and primes are crossed-off.
   ///
   template <typename Primes>
   Wheel(Primes& primes,
@@ -80,8 +87,8 @@ public:
       // calculate the next multiple of prime that
       // is not divisible by any of the wheel's
       // prime factors (2, 3, 5, 7)
-      int64_t next_multiple_factor = initWheel210[quotient % 210].next_multiple_factor;
-      int64_t wheel_index = initWheel210[quotient % 210].wheel_index;
+      int64_t next_multiple_factor = init[quotient % 210].next_multiple_factor;
+      int64_t wheel_index = init[quotient % 210].wheel_index;
       multiple += prime * next_multiple_factor;
 
       wheel_.emplace_back(multiple, wheel_index);
@@ -90,8 +97,8 @@ public:
 
   static int64_t next_multiple_factor(int64_t* wheel_index)
   {
-    int64_t next_multiple_factor = nextWheel210[*wheel_index].next_multiple_factor;
-    *wheel_index = nextWheel210[*wheel_index].next_wheel_index;
+    int64_t next_multiple_factor = next[*wheel_index].next_multiple_factor;
+    *wheel_index = next[*wheel_index].next_wheel_index;
     return next_multiple_factor;
   }
 
@@ -101,8 +108,8 @@ public:
   }
 private:
 
-  static const InitWheel initWheel210[210];
-  static const NextWheel nextWheel210[48];
+  static const InitWheel init[210];
+  static const NextWheel next[48];
   std::vector<WheelItem> wheel_;
 };
 

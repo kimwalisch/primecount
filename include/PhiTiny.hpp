@@ -32,7 +32,7 @@ public:
   /// Partial sieve function (a.k.a. Legendre-sum).
   /// phi(x, a) counts the numbers <= x that are not divisible
   /// by any of the first a primes.
-  /// @pre a <= max_a().
+  /// @pre a <= max_a()
   ///
   template <typename X, typename A>
   X phi(X x, A a) const

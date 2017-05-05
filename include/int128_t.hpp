@@ -1,8 +1,8 @@
 ///
 /// @file   int128_t.hpp
 /// @brief  Additional integer types used in primecount:
-///         int128_t, uint128_t, intfast64_t, intfast128_t, maxint_t,
-///         maxuint_t.
+///         int128_t, uint128_t, intfast64_t, intfast128_t,
+///         maxint_t, maxuint_t.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -17,11 +17,11 @@
 #include <limits>
 #include <type_traits>
 
-/// The __int128_t type (GCC/Clang) is not well supported by the C++
-/// standard library (in 2016) so we have to define some functions
-/// ourselves. We also define typedefs so we can use int128_t
-/// instead of __int128_t. Once this is done int128_t can be used
-/// like a regular integer type e.g. int64_t.
+/// The __int128_t type (GCC/Clang) is not well supported by
+/// the C++ standard library (in 2016) so we have to define
+/// some functions ourselves. We also define typedefs so we
+/// can use int128_t instead of __int128_t. Once this is done
+/// int128_t can be used like a regular integer type.
 ///
 #if defined(HAVE___INT128_T)
 #define HAVE_INT128_T
@@ -88,25 +88,27 @@ using maxuint_t = uint64_t;
 namespace primecount {
 
 /// Fastest 64-bit integer type for division.
-/// On most Intel CPUs before 2015 unsigned 64-bit division is about
-/// 10 percent faster than signed division. It is likely that in a few
-/// years signed and unsigned division will run equally fast.
+/// On most Intel CPUs before 2015 unsigned 64-bit division
+/// is about 10 percent faster than signed division. It is
+/// likely that in a few years signed and unsigned division
+/// will run equally fast.
 ///
 using intfast64_t = uint64_t;
 
 #if defined(HAVE_INT128_T)
 
 /// Fastest 128-bit integer type for division.
-/// On the author's Intel Core-i7 4770 CPU from 2013 using uint128_t
-/// instead of int128_t gives 10 percent better performance.
+/// On the author's Intel Core-i7 4770 CPU from 2013 using
+/// uint128_t instead of int128_t gives 10 percent better
+/// performance.
 ///
 using intfast128_t = uint128_t;
 
 #endif
 
-/// Portable namespace, includes functions which (unlike the versions
-/// form the C++ standard library) work with the int128_t and
-/// uint128_t types (2014).
+/// Portable namespace, includes functions which (unlike the
+/// versions form the C++ standard library) work with the
+/// int128_t and uint128_t types (2014).
 ///
 namespace prt {
 

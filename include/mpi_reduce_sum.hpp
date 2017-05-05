@@ -1,6 +1,6 @@
 ///
 /// @file   mpi_reduce_sum.hpp
-/// @brief  MPI utility functions and classes.
+/// @brief  MPI utility functions and classes
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -33,7 +33,6 @@ inline void mpi_sum(int* x, int* sum, int* len, MPI_Datatype *dtype)
 {
   if (*len * sizeof(int64_t) == sizeof(int64_t))
     mpi_sum_helper<int64_t>(x, sum);
-
 #if defined(HAVE_INT128_T)
   if (*len * sizeof(int64_t) == sizeof(int128_t))
     mpi_sum_helper<int128_t>(x, sum);

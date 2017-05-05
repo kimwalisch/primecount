@@ -11,7 +11,7 @@
 ///         Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
 ///         http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,9 +26,9 @@
 namespace primecount {
 
 /// Initialize the counters from the sieve array.
-/// @pre segment_size is a power of 2.
-/// @pre sieve[i] = 1 for unsieved elements and
-///      sieve[i] = 0 for sieved elements.
+/// @pre segment_size is a power of 2
+/// @pre sieve[i] = 1 for unsieved elements
+///      sieve[i] = 0 for sieved elements
 /// Runtime: O(N log N)
 ///
 template <typename T1, typename T2>

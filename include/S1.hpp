@@ -1,6 +1,6 @@
 ///
 /// @file  S1.hpp
-/// @brief S1 function declarations.
+/// @brief S1 function declarations
 ///
 /// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///

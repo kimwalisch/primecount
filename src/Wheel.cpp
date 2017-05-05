@@ -1,10 +1,10 @@
 ///
 /// @file   Wheel.cpp
 /// @brief  Data structures related to wheel factorization.
-///         Wheel factorization is used to skip multiples of small
-///         primes in the sieve of Eratosthenes.
+///         Wheel factorization is used to skip multiples of
+///         small primes in the sieve of Eratosthenes.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,7 +14,7 @@
 
 namespace primecount {
 
-const InitWheel Wheel::initWheel210[210] =
+const InitWheel Wheel::init[210] =
 {
   {1,  0}, {0,  0}, {9,  1}, {8,  1}, {7,  1}, {6,  1}, {5,  1}, {4,  1},
   {3,  1}, {2,  1}, {1,  1}, {0,  1}, {1,  2}, {0,  2}, {3,  3}, {2,  3},
@@ -45,7 +45,7 @@ const InitWheel Wheel::initWheel210[210] =
   {1, 47}, {0, 47}
 };
 
-const NextWheel Wheel::nextWheel210[48] =
+const NextWheel Wheel::next[48] =
 {
   {10,  1}, {2,  2}, { 4,  3}, {2,  4},
   { 4,  5}, {6,  6}, { 2,  7}, {6,  8},
