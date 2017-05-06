@@ -63,8 +63,8 @@ void cross_off(int64_t prime,
   next_multiple = m;
 }
 
-/// Calculate the contribution of the hard special leaves which
-/// require use of a sieve (to reduce the memory usage).
+/// Calculate the contribution of the hard special leaves
+/// using a segmented sieve to reduce memory usage.
 ///
 int64_t S2_hard(int64_t x,
                 int64_t y,
@@ -86,17 +86,17 @@ int64_t S2_hard(int64_t x,
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
-  // Segmented sieve of Eratosthenes
+  // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    // Current segment = interval [low, high[
+    // current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
     // pre-sieve the multiples of the first c primes
     sieve.pre_sieve(c, low);
 
-    // Initialize special tree data structure from sieve
+    // initialize special tree data structure from sieve
     cnt_finit(sieve, counters, segment_size);
 
     // For c + 1 <= b <= pi_sqrty
@@ -157,9 +157,7 @@ int64_t S2_hard(int64_t x,
   return S2_result;
 }
 
-/// Calculate the contribution of the special leaves.
-/// @pre y > 0 && c > 1
-///
+/// Calculate the contribution of the special leaves
 int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
@@ -183,7 +181,8 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / (log x)^2) operations, O(x^(1/3) * (log x)^3) space.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int64_t pi_deleglise_rivat1(int64_t x)
 {
