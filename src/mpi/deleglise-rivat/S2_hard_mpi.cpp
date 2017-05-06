@@ -1,7 +1,7 @@
 ///
 /// @file  S2_hard_mpi.cpp
-/// @brief Calculate the contribution of the hard special leaves which
-///        require use of a sieve (Deleglise-Rivat algorithm).
+/// @brief Calculate the contribution of the hard special leaves
+///        (Deleglise-Rivat algorithm) using a segmented sieve.
 ///        This is a parallel implementation which uses compression
 ///        (PiTable & FactorTable) to reduce the memory usage by
 ///        about 10x.
@@ -43,7 +43,7 @@ using namespace primecount;
 namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off multiples.
+/// @return  Count of crossed-off multiples
 ///
 int64_t cross_off(BitSieve& sieve,
                   int64_t low,
@@ -94,8 +94,8 @@ void cross_off(BitSieve& sieve,
   w.set(m, wheel_index);
 }
 
-/// @return  true if the interval [low, high] contains
-///          few hard special leaves.
+/// Returns true if the interval [low, high]
+/// contains few hard special leaves
 ///
 bool few_leaves(int64_t low,
                 int64_t high,
@@ -105,8 +105,8 @@ bool few_leaves(int64_t low,
   return (high < y || low > y * alpha);
 }
 
-/// Compute the S2 contribution of the hard special leaves which
-/// require use of a sieve. Each thread processes the interval
+/// Compute the contribution of the hard special leaves
+/// using a segmented sieve. Each thread processes the interval
 /// [low_thread, low_thread + segments * segment_size[
 /// and the missing special leaf contributions for the interval
 /// [1, low_process[ are later reconstructed and added in
@@ -144,19 +144,19 @@ T S2_hard_OpenMP_thread(T x,
   phi.resize(max_b + 1, 0);
   mu_sum.resize(max_b + 1, 0);
 
-  // Segmented sieve of Eratosthenes
+  // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    // Current segment = interval [low, high[
+    // Current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
     // pre-sieve the multiples of the first c primes
     sieve.pre_sieve(c, low);
 
-    // If there are relatively few hard special leaves per segment
-    // we count the number of unsieved elements directly from the
-    // sieve array using the POPCNT instruction.
+    // If there are few hard special leaves per segment we
+    // count the number of unsieved elements directly from
+    // the sieve array using the POPCNT instruction
     if (few_leaves(low, high, y, alpha))
     {
       int64_t count_low_high = sieve.count((high - 1) - low);
@@ -234,15 +234,16 @@ T S2_hard_OpenMP_thread(T x,
     }
     else
     {
-      // Calculate the contribution of the hard special leaves using
-      // Tomás Oliveira's O(log(N)) special tree data structure
-      // for counting the number of unsieved elements. This algorithm
-      // runs fastest if there are many special leaves per segment.
+      // Calculate the contribution of the hard special leaves
+      // using Tomás Oliveira's O(log(N)) special tree data
+      // structure for counting the number of unsieved
+      // elements. This algorithm runs fastest if there are
+      // many special leaves per segment
 
       // allocate memory upon first usage
       counters.resize(segment_size);
 
-      // Initialize special tree data structure from sieve
+      // initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
 
       // For c + 1 <= b <= pi_sqrty
@@ -315,13 +316,13 @@ T S2_hard_OpenMP_thread(T x,
   return s2_hard;
 }
 
-/// Calculate the contribution of the hard special leaves which
-/// require use of a sieve (to reduce the memory usage).
-/// This is a parallel implementation with advanced load balancing.
-/// As most special leaves tend to be in the first segments we
-/// start off with a small segment size and few segments
-/// per thread, after each iteration we dynamically increase
-/// the segment size and the segments per thread.
+/// Calculate the contribution of the hard special leaves
+/// using a segmented sieve. This is a parallel
+/// implementation with load balancing. As most special
+/// leaves tend to be in the first segments we start off
+/// with a small segment size and few segments per thread,
+/// after each iteration we dynamically increase the segment
+/// size and the segments per thread.
 ///
 template <typename T, typename FactorTable, typename Primes>
 T S2_hard_OpenMP_master(int64_t low,
@@ -381,7 +382,7 @@ T S2_hard_OpenMP_master(int64_t low,
       timings[i] = get_wtime() - timings[i];
     }
 
-    // Once all threads have finished reconstruct and add the 
+    // once all threads have finished reconstruct and add the
     // missing contribution of all special leaves. This must
     // be done in order as each thread (i) requires the sum of
     // the phi values from the previous threads.
@@ -413,8 +414,8 @@ T S2_hard_OpenMP_master(int64_t low,
 }
 
 /// S2_hard MPI slave process.
-/// Computes a part of the hard speacial leaves on a cluster node
-/// and sends the result to the master process.
+/// Computes a part of the hard speacial leaves on a cluster
+/// node and sends the result to the master process.
 ///
 template <typename F, typename T>
 void S2_hard_mpi_slave(T x,
@@ -452,7 +453,7 @@ void S2_hard_mpi_slave(T x,
   }
 }
 
-/// Start up all slave processes.
+/// Start up all slave processes
 int64_t start_mpi_slave_procs(int64_t z,
                               int64_t segment_size,
                               int slave_procs)
@@ -474,8 +475,8 @@ int64_t start_mpi_slave_procs(int64_t z,
 }
 
 /// S2_hard MPI master process.
-/// Distributes the computation of the hard speacial leaves on
-/// cluster nodes.
+/// Distributes the computation of the hard speacial leaves
+/// onto cluster nodes.
 ///
 template <typename T>
 T S2_hard_mpi_master(T x,
@@ -494,7 +495,7 @@ T S2_hard_mpi_master(T x,
   S2_hard_mpi_LoadBalancer balancer(high, z);
   S2Status status(x);
 
-  // main process scheduling loop
+  // process scheduling loop
   while (true)
   {
     // wait for results from slave process
@@ -519,7 +520,7 @@ T S2_hard_mpi_master(T x,
     msg.send(msg.proc_id());
   }
 
-  // we are nearly finished, wait for remaining results
+  // nearly finished, wait for remaining results
   for (int i = 1; i <= slave_procs - 1; i++)
   {
     S2_hard_mpi_msg msg;
