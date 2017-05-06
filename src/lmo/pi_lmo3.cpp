@@ -1,8 +1,8 @@
 ///
 /// @file  pi_lmo3.cpp
-/// @brief Simple implementation of the Lagarias-Miller-Odlyzko prime
-///        counting algorithm. This implementation uses the segmented
-///        sieve of Eratosthenes to calculate S2(x).
+/// @brief Simple implementation of the Lagarias-Miller-Odlyzko
+///        prime counting algorithm. This implementation uses
+///        the segmented sieve of Eratosthenes to calculate S2(x).
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -32,7 +32,6 @@ namespace {
 /// Calculate the contribution of the special leaves.
 /// This implementation uses segmentation which reduces the
 /// algorithm's space complexity to O(x^(1/3) * log^2 x).
-/// @pre y > 0 && c > 1
 ///
 int64_t S2(int64_t x,
            int64_t y,
@@ -50,16 +49,16 @@ int64_t S2(int64_t x,
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
-  // Segmented sieve of Eratosthenes
+  // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
     fill(sieve.begin(), sieve.end(), 1);
 
-    // Current segment = interval [low, high[
+    // current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
 
-    // phi(y, b) nodes with b <= c do not contribute to S2, so we
-    // simply sieve out the multiples of the first c primes
+    // phi(y, b) nodes with b <= c do not contribute to S2, so
+    // we sieve out the multiples of the first c primes
     for (int64_t b = 1; b <= c; b++)
     {
       int64_t k = next[b];
@@ -75,9 +74,9 @@ int64_t S2(int64_t x,
       int64_t max_m = min(x / (prime * low), y);
       int64_t i = 0;
 
-      // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
-      // if so then (prime < lpf[m]) will always evaluate to
-      // false and no special leaves are possible
+      // obviously if (prime >= max_m) then (prime >= lpf[max_m])
+      // hence (prime < lpf[m]) will always evaluate to false
+      // and no special leaves are possible
       if (prime >= max_m)
         break;
 
@@ -85,7 +84,7 @@ int64_t S2(int64_t x,
       {
         if (mu[m] != 0 && prime < lpf[m])
           {
-          // We have found a special leaf, compute it's contribution
+          // we have found a special leaf, compute it's contribution
           // phi(x / (primes[b] * m), b - 1) by counting the number
           // of unsieved elements <= x / (primes[b] * m) after having
           // removed the multiples of the first b - 1 primes
@@ -97,12 +96,12 @@ int64_t S2(int64_t x,
         }
       }
 
-      // Count the remaining unsieved elements in this segment,
+      // count the remaining unsieved elements in this segment,
       // we need their count in the next segment
       for (; i < high - low; i++)
         phi[b] += sieve[i];
 
-      // Remove the multiples of (b)th prime
+      // remove the multiples of the b-th prime
       int64_t k = next[b];
       for (; k < high; k += prime * 2)
         sieve[k - low] = 0;
@@ -119,7 +118,8 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3)) operations, O(x^(1/3) * (log x)^2) space.
+/// Run time: O(x^(2/3))
+/// Memory usage: O(x^(1/3) * (log x)^2)
 ///
 int64_t pi_lmo3(int64_t x)
 {

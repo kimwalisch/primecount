@@ -31,7 +31,7 @@ using namespace primecount;
 namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off multiples.
+/// @return  Count of crossed-off multiples
 ///
 int64_t cross_off(BitSieve& sieve,
                   int64_t low,
@@ -54,10 +54,7 @@ int64_t cross_off(BitSieve& sieve,
   return unset;
 }
 
-/// Calculate the contribution of the special leaves.
-/// @see ../docs/computing-special-leaves.md
-/// @pre y > 0 && c > 1
-///
+/// Calculate the contribution of the special leaves
 int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
@@ -74,7 +71,7 @@ int64_t S2(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, (int64_t) primes.size(), /*low = */ 1);
+  Wheel wheel(primes, (int64_t) primes.size(), /* low = */ 1);
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 
@@ -82,10 +79,10 @@ int64_t S2(int64_t x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
 
-  // Segmented sieve of Eratosthenes
+  // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    // Current segment = interval [low, high[
+    // current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
@@ -166,7 +163,8 @@ namespace primecount {
 
 /// Calculate the number of primes below x using the
 /// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3) / log x) operations, O(x^(1/3) * (log x)^2) space.
+/// Run time: O(x^(2/3) / log x)
+/// Memory usage: O(x^(1/3) * (log x)^2)
 ///
 int64_t pi_lmo5(int64_t x)
 {
