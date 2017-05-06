@@ -146,7 +146,7 @@ int64_t pi_deleglise_rivat(int64_t x)
 ///
 int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
-  return pi_deleglise_rivat_parallel2(x, threads);
+  return pi_deleglise_rivat_parallel1(x, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -170,7 +170,7 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
   if (x <= numeric_limits<int64_t>::max())
     return pi_deleglise_rivat((int64_t) x, threads);
   else
-    return pi_deleglise_rivat_parallel3(x, threads);
+    return pi_deleglise_rivat_parallel2(x, threads);
 }
 
 #endif

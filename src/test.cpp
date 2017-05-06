@@ -174,11 +174,10 @@ void test()
     TEST2(pi_lmo_parallel1,             pi_meissel,        900);
     TEST1(pi_deleglise_rivat1,          pi_lmo_parallel1,  600);
     TEST1(pi_deleglise_rivat2,          pi_lmo_parallel1,  600);
-    TEST2(pi_deleglise_rivat_parallel1, pi_lmo_parallel1,  900);
-    TEST2(pi_deleglise_rivat_parallel2, pi_lmo_parallel1, 1500);
+    TEST2(pi_deleglise_rivat_parallel1, pi_lmo_parallel1, 1500);
 
 #ifdef HAVE_INT128_T
-    TEST2(pi_deleglise_rivat_parallel3, pi_lmo_parallel1, 1500);
+    TEST2(pi_deleglise_rivat_parallel2, pi_lmo_parallel1, 1500);
 #endif
 
     test_nth_prime(300);

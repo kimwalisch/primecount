@@ -69,8 +69,7 @@ set(LIB_SRC src/BitSieve.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
+            src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp)
 
 # Check for MPI (Message Passing Interface) ##########################
 
@@ -103,12 +102,12 @@ endif()
 check_type_size("int128_t" INT128_T)
 if(HAVE_INT128_T)
     add_definitions(-DHAVE_INT128_T)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
 else()
     check_type_size("__int128_t" __INT128_T)
     if(HAVE___INT128_T)
         add_definitions(-DHAVE___INT128_T)
-        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel3.cpp)
+        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
     endif()
 endif()
 
