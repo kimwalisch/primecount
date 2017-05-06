@@ -89,10 +89,6 @@ int64_t pi_lmo5(int64_t x);
 
 int64_t pi_lmo_parallel1(int64_t x, int threads);
 
-int64_t pi_lmo_parallel2(int64_t x, int threads);
-
-int64_t pi_lmo_parallel3(int64_t x, int threads);
-
 int64_t pi_meissel(int64_t x, int threads);
 
 int64_t pi_primesieve(int64_t x, int threads);

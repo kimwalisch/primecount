@@ -65,8 +65,6 @@ set(LIB_SRC src/BitSieve.cpp
             src/lmo/pi_lmo4.cpp
             src/lmo/pi_lmo5.cpp
             src/lmo/pi_lmo_parallel1.cpp
-            src/lmo/pi_lmo_parallel2.cpp
-            src/lmo/pi_lmo_parallel3.cpp
             src/deleglise-rivat/S2_hard.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp

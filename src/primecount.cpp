@@ -206,7 +206,7 @@ int64_t pi_lmo(int64_t x)
 ///
 int64_t pi_lmo(int64_t x, int threads)
 {
-  return pi_lmo_parallel3(x, threads);
+  return pi_lmo_parallel1(x, threads);
 }
 
 /// Calculate the number of primes below x using Meissel's formula.

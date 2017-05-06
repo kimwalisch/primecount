@@ -53,8 +53,6 @@ map<string, OptionID> optionMap =
   { "--lmo4", OPTION_LMO4 },
   { "--lmo5", OPTION_LMO5 },
   { "--lmo_parallel1", OPTION_LMO_PARALLEL1 },
-  { "--lmo_parallel2", OPTION_LMO_PARALLEL2 },
-  { "--lmo_parallel3", OPTION_LMO_PARALLEL3 },
   { "--Li", OPTION_LI },
   { "--Li_inverse", OPTION_LIINV },
   { "-m", OPTION_MEISSEL },
