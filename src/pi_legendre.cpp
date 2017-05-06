@@ -14,8 +14,9 @@
 
 namespace primecount {
 
-/// Calculate the number of primes below x using Legendre's formula.
-/// Run time: O(x) operations, O(x^(1/2)) space.
+/// Count the number of primes <= x using Legendre's formula.
+/// Run time: O(x)
+/// Memory usage: O(x^(1/2))
 ///
 int64_t pi_legendre(int64_t x, int threads)
 {

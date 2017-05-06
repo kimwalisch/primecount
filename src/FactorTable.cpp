@@ -1,8 +1,8 @@
 ///
 /// @file  FactorTable.cpp
-/// @see   FactorTable.hpp for documentation.
+/// @see   FactorTable.hpp for documentation
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

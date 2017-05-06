@@ -30,9 +30,11 @@ const int primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 namespace primecount {
 
-/// Find the nth prime using a combination of the Deleglise-Rivat
-/// prime counting algorithm and the segmented sieve of Eratosthenes.
-/// Run time: O(x^(2/3) / (log x)^2), space: O(x^(1/2)).
+/// Find the nth prime using a combination of the
+/// Deleglise-Rivat prime counting algorithm and the
+/// segmented sieve of Eratosthenes.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/2))
 ///
 int64_t nth_prime(int64_t n, int threads)
 {

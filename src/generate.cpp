@@ -54,15 +54,15 @@ vector<int32_t> generate_moebius(int64_t max)
 }
 
 /// Generate a vector with the least prime factors
-/// of the integers <= max.
+/// of the integers <= max
 ///
 vector<int32_t> generate_lpf(int64_t max)
 {
   vector<int32_t> lpf(max + 1, 1);
 
-  // phi(x / 1, c) contributes to the sum, thus
-  // set lpf[1] = MAX in order to pass
-  // if (lpf[1] > primes[c])
+  // phi(x / 1, c) contributes to the sum in the
+  // Lagarias-Miller-Odlyzko prime counting algorithm,
+  // thus set lpf[1] = MAX (normally lpf[1] = 1)
   if (lpf.size() > 1)
     lpf[1] = numeric_limits<int32_t>::max();
 
@@ -80,7 +80,7 @@ vector<int32_t> generate_lpf(int64_t max)
 }
 
 /// Generate a vector with the prime counts <= max
-/// using the sieve of Eratosthenes.
+/// using the sieve of Eratosthenes
 ///
 vector<int32_t> generate_pi(int64_t max)
 {

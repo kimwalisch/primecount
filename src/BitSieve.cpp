@@ -28,7 +28,7 @@ namespace {
 /// primes[1] = 2, primes[2] = 3, ...
 const array<uint64_t, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
-/// Bitmasks with multiples of the i-th prime set
+/// bitmasks with multiples of the i-th prime
 const array<uint64_t, 10> masks =
 {
   0x0000000000000000ull,
@@ -84,7 +84,7 @@ BitSieve::BitSieve(std::size_t size) :
   size_(size)
 { }
 
-/// Pre-sieve the multiples (>= low) of the first c primes.
+/// Pre-sieve the multiples >= low of the first c primes.
 /// @warning Also removes the first c primes.
 /// @pre c < 10
 ///

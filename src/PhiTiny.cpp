@@ -1,8 +1,8 @@
 ///
 /// @file  PhiTiny.cpp
-/// @brief phi_tiny(x, a) calculates the partial sieve function in
-///        constant time (using lookup tables) for small values of
-///        a <= 6 using the formula below:
+/// @brief phi_tiny(x, a) calculates the partial sieve function
+///        in constant time (using lookup tables) for small
+///        values of a <= 6 using the formula below:
 ///
 ///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///        with pp = 2 * 3 * ... * prime[a]
@@ -40,7 +40,7 @@ PhiTiny::PhiTiny()
 {
   phi_cache_[0].push_back(0);
 
-  // Initialize the phi_cache_ lookup tables
+  // initialize the phi_cache_ lookup tables
   for (int a = 1; a <= max_a(); a++)
   {
     int size = prime_products[a];

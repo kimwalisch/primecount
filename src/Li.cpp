@@ -1,6 +1,6 @@
 ///
 /// @file  Li.cpp
-/// @brief Logarithmic integral and Riemann R functions.
+/// @brief Logarithmic integral and Riemann R functions
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

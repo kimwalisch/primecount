@@ -1,8 +1,8 @@
 ///
 /// @file  P2.cpp
-/// @brief 2nd partial sieve function.
-///        P2(x, y) counts the numbers <= x that have exactly 2 prime
-///        factors each exceeding the a-th prime.
+/// @brief 2nd partial sieve function. P2(x, y) counts the
+///        numbers <= x that have exactly 2 prime factors
+///        each exceeding the a-th prime.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -107,7 +107,7 @@ T P2_OpenMP_thread(T x,
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
-/// Run-time: O(z log log z) operations.
+/// Run-time: O(z log log z)
 ///
 template <typename T>
 T P2_OpenMP_master(T x, int64_t y, int threads)
@@ -150,7 +150,7 @@ T P2_OpenMP_master(T x, int64_t y, int threads)
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
 
-    // Add missing sum contributions in order
+    // add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
       p2 += pix_total * pix_counts[i];

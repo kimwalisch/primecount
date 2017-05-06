@@ -1,6 +1,6 @@
 ///
 /// @file  PiTable.cpp
-/// @see   PiTable.hpp for documentation.
+/// @see   PiTable.hpp for documentation
 ///
 /// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
 ///

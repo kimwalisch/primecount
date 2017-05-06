@@ -1,8 +1,8 @@
 ///
 /// @file  S1.cpp
-/// @brief Functions to calculate the contribution of the ordinary
-///        leaves in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
-///        prime counting algorithms.
+/// @brief Calculate the contribution of the ordinary leaves
+///        in the Lagarias-Miller-Odlyzko and Deleglise-
+///        Rivat prime counting algorithms.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -28,11 +28,12 @@ using namespace primecount;
 
 namespace {
 
-/// Recursively iterate over the square free numbers coprime to the
-/// first b primes and calculate the sum of the ordinary leaves.
-/// This algorithm is based on section 2.2 of the paper:
-/// Douglas Staple, "The Combinatorial Algorithm For Computing pi(x)",
-/// arXiv:1503.01839, 6 March 2015.
+/// Recursively iterate over the square free numbers coprime
+/// to the first b primes and calculate the sum of the
+/// ordinary leaves. This algorithm is described in section
+/// 2.2 of the paper: Douglas Staple, "The Combinatorial
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6
+/// March 2015.
 ///
 template <int MU, typename T, typename P>
 T S1_OpenMP_thread(T x,
@@ -55,9 +56,9 @@ T S1_OpenMP_thread(T x,
   return s1;
 }
 
-/// Calculate the contribution of the ordinary leaves in parallel.
-/// Run time: O(y * log(log(y))) operations.
-/// Space complexity: O(y / log(y)).
+/// Parallel computation of the ordinary leaves.
+/// Run time: O(y * log(log(y)))
+/// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
 X S1_OpenMP_master(X x,
@@ -65,15 +66,17 @@ X S1_OpenMP_master(X x,
                    int64_t c,
                    int threads)
 {
-  int64_t thread_threshold = ipow(10, 6);
-  threads = ideal_num_threads(threads, y, thread_threshold);
   auto primes = generate_primes<Y>(y);
+  int64_t pi_y = primes.size();
   X s1 = phi_tiny(x, c);
 
+  int64_t thread_threshold = ipow(10, 6);
+  threads = ideal_num_threads(threads, y, thread_threshold);
+
   #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: s1)
-  for (int64_t b = c + 1; b < (int64_t) primes.size(); b++)
+  for (int64_t b = c + 1; b < pi_y; b++)
   {
-    s1 += -1 * phi_tiny(x / primes[b], c);
+    s1 -= phi_tiny(x / primes[b], c);
     s1 += S1_OpenMP_thread<1>(x, y, b, c, (X) primes[b], primes);
   }
 

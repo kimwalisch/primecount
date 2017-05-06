@@ -17,8 +17,9 @@ using namespace std;
 
 namespace primecount {
 
-/// Calculate the number of primes below x using Lehmer's formula.
-/// Run time: O(x/(log x)^4) operations, O(x^(1/2)) space.
+/// Count the number of primes <= x using Lehmer's formula.
+/// Run time: O(x/(log x)^4)
+/// Memory usage: O(x^(1/2))
 ///
 int64_t pi_lehmer(int64_t x, int threads)
 {

@@ -17,9 +17,9 @@ using namespace std;
 
 namespace primecount {
 
-/// Calculate the number of primes below x using Meissel's formula.
-/// Run time: O(x/(log x)^3) operations.
-/// Space: O(x^0.5 / log x).
+/// Count the number of primes <= x using Meissel's formula.
+/// Run time: O(x/(log x)^3)
+/// Memory usage: O(x^0.5 / log x)
 ///
 int64_t pi_meissel(int64_t x, int threads)
 {
