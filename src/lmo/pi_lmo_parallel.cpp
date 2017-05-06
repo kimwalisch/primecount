@@ -1,5 +1,5 @@
 ///
-/// @file  pi_lmo_parallel1.cpp
+/// @file  pi_lmo_parallel.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm using OpenMP. This implementation
 ///        uses load balancing and counts the number of unsieved
@@ -259,7 +259,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / log x)
 /// Memory usage: O(x^(1/3) * (log x)^2)
 ///
-int64_t pi_lmo_parallel1(int64_t x, int threads)
+int64_t pi_lmo_parallel(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
@@ -271,7 +271,7 @@ int64_t pi_lmo_parallel1(int64_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   print("");
-  print("=== pi_lmo_parallel1(x) ===");
+  print("=== pi_lmo_parallel(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
   print(x, y, z, c, alpha, threads);
 

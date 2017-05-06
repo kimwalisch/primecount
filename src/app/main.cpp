@@ -200,8 +200,8 @@ int main (int argc, char* argv[])
         res = pi_lmo4(to_int64(x)); break;
       case OPTION_LMO5:
         res = pi_lmo5(to_int64(x)); break;
-      case OPTION_LMO_PARALLEL1:
-        res = pi_lmo_parallel1(to_int64(x), threads); break;
+      case OPTION_LMO_PARALLEL:
+        res = pi_lmo_parallel(to_int64(x), threads); break;
       case OPTION_MEISSEL:
         res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
