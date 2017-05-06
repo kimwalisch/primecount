@@ -21,7 +21,7 @@ namespace primecount {
 
 /// Generate a vector with Möbius function values.
 /// This implementation is based on code by Rick Sladkey:
-/// http://mathoverflow.net/a/99545
+/// https://mathoverflow.net/q/99545
 ///
 vector<int32_t> generate_moebius(int64_t max)
 {
