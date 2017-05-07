@@ -52,7 +52,7 @@ using namespace primecount;
 namespace {
 
 /// Cache phi(x, a) results if a < MAX_A
-const int MAX_A = 500;
+const int MAX_A = 100;
 
 class PhiCache
 {
