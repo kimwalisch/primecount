@@ -86,13 +86,13 @@ public:
     if (sqrtx < pi_.size() && sqrtx < primes_[a])
       pi_sqrtx = pi_[sqrtx];
 
-    // Move out of the loop the calculations where phi(x2, a2) = 1
+    // Move out of the loop the calculations where phi(x2, i) = 1
     // phi(x, a) = 1 if primes_[a] >= x
-    // x2 = x / primes_[a2 + 1]
-    // phi(x2, a2) = 1 if primes_[a2] >= x / primes_[a2 + 1]
-    // phi(x2, a2) = 1 if primes_[a2] >= sqrt(x)
-    // phi(x2, a2) = 1 if a2 >= pi(sqrt(x))
-    // \sum_{a2 = pi(sqrt(x))}^{a - 1} phi(x2, a2) = a - pi(sqrt(x))
+    // x2 = x / primes_[i + 1]
+    // phi(x2, i) = 1 if primes_[i] >= x / primes_[i + 1]
+    // phi(x2, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(x2, i) = 1 if i >= pi(sqrt(x))
+    // \sum_{i = pi(sqrt(x))}^{a - 1} phi(x2, i) = a - pi(sqrt(x))
     //
     sum += (pi_sqrtx - a) * SIGN;
     sum += phi_tiny(x, c) * SIGN;
@@ -188,8 +188,8 @@ int64_t phi(int64_t x, int64_t a, int threads)
 
       #pragma omp parallel for schedule(dynamic, 16) \
           num_threads(threads) firstprivate(cache) reduction(+: sum)
-      for (int64_t a2 = 0; a2 < pi_sqrtx; a2++)
-        sum += cache.phi<-1>(x / primes[a2 + 1], a2);
+      for (int64_t i = 0; i < pi_sqrtx; i++)
+        sum += cache.phi<-1>(x / primes[i + 1], i);
     }
   }
 
