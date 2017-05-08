@@ -1,6 +1,6 @@
 ///
 /// @file   main.cpp
-/// @brief  primecount console application.
+/// @brief  primecount console application
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
