@@ -14,7 +14,7 @@
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <int128_t.hpp>
-#include <min_max.hpp>
+#include <min.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>

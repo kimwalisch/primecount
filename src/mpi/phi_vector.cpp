@@ -32,7 +32,7 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
-#include <min_max.hpp>
+#include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>

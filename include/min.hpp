@@ -1,5 +1,5 @@
 ///
-/// @file  min_max.hpp
+/// @file  min.hpp
 /// @brief Template min and max functions that allow comparing
 ///        different types if both types are integral
 ///        and sizeof(A) >= sizeof(B).
@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef MIN_MAX_HPP
-#define MIN_MAX_HPP
+#ifndef MIN_HPP
+#define MIN_HPP
 
 #include <int128_t.hpp>
 

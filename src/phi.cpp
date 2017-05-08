@@ -34,7 +34,7 @@
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <fast_div.hpp>
-#include <min_max.hpp>
+#include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>

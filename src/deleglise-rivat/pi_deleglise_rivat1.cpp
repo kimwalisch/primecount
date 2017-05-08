@@ -20,7 +20,7 @@
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
-#include <min_max.hpp>
+#include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <tos_counters.hpp>

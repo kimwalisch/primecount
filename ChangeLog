@@ -259,7 +259,7 @@
   * src/P2.cpp: Bug fix for numbers > 10^21.
   * src/BitSieve.hpp: Improved memory efficiency.
   * include/isqrt.hpp: Fixed C++11 bug in isqrt(x).
-  * include/min_max.hpp: Refactoring.
+  * include/min.hpp: Refactoring.
   * include/int128.hpp: Add int128_t trait functions.
 
 2014-12-27 Kim Walisch  <kim.walisch@gmail.com>

@@ -20,7 +20,7 @@
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
-#include <min_max.hpp>
+#include <min.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <imath.hpp>
 #include <S2_hard_mpi_msg.hpp>
