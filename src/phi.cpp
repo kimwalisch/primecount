@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <vector>
 #include <limits>
 
@@ -73,10 +74,10 @@ public:
       return SIGN;
     else if (is_phi_tiny(a))
       return phi_tiny(x, a) * SIGN;
-    else if (is_cached(x, a))
-      return cache_[a][x] * SIGN;
     else if (is_pix(x, a))
       return (pi_[x] - a + 1) * SIGN;
+    else if (is_cached(x, a))
+      return cache_[a][x] * SIGN;
 
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
@@ -107,26 +108,26 @@ public:
         sum += phi<-SIGN>(x2, i);
     }
 
-    update_cache(x, a, sum * SIGN);
+    update_cache(x, a, sum);
 
     return sum;
   }
 
 private:
-  using cache_t = vector<uint16_t>;
-  array<cache_t, MAX_A> cache_;
+  using T = uint16_t;
+  array<vector<T>, MAX_A> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
 
-  void update_cache(uint64_t x, uint64_t a, uint64_t sum)
+  void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
     if (a < cache_.size() &&
-        x <= numeric_limits<uint16_t>::max())
+        x <= numeric_limits<T>::max())
     {
       if (x >= cache_[a].size())
         cache_[a].resize(x + 1, 0);
 
-      cache_[a][x] = (uint16_t) sum;
+      cache_[a][x] = (T) abs(sum);
     }
   }
 
@@ -171,7 +172,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   {
     auto primes = generate_n_primes<int32_t>(a);
 
-    if (primes.at(a) >= x)
+    if (primes[a] >= x)
       sum = 1;
     else
     {
