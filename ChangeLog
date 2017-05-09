@@ -1,11 +1,12 @@
-2017-22-04 Kim Walisch  <kim.walisch@gmail.com>
+2017-05-09 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.7 work in progress.
 
   This version requires C++11 or later. The AVX2 code has been
   removed as RAM is too slow to take advantage of it.
 
-  * CMakeLists.txt: Much faster C++ compilation.
+  * CMakeLists.txt: Faster C++ compilation.
+  * phi(x, a) now scales > 8 threads.
   * Li.cpp: Riemann R and inverse Riemann R implementations.
   * S2Status.cpp: Reduce --status overhead.
   * cache_line_size.sh: Detect CPU cache line size.
