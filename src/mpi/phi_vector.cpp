@@ -148,7 +148,8 @@ private:
 
 namespace primecount {
 
-/// Returns a vector with phi(x, i) values for 0 <= i <= a.
+/// Returns a vector with phi(x, i - 1) values such that
+/// phi[i] = phi(x, i - 1) for 1 <= i <= a.
 /// phi(x, a) counts the numbers <= x that are not
 /// divisible by any of the first a primes.
 ///
