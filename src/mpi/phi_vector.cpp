@@ -99,7 +99,7 @@ public:
 
     for (int64_t i = c; i < pi_sqrtx; i++)
     {
-      int64_t x2 = fast_div(x, (uint32_t) primes_[i + 1]);
+      int64_t x2 = fast_div(x, primes_[i + 1]);
 
       if (is_pix(x2, i))
         sum += (pi_[x2] - i + 1) * -SIGN;
@@ -173,7 +173,7 @@ vector<int64_t> phi_vector(int64_t x,
     for (int64_t i = 2; i <= a; i++)
       phi[i] = cache.phi<-1>(x / primes[i - 1], i - 2);
 
-    // calculate phi(x, i) using partial results
+    // calculate phi(x, a) using partial results
     for (int64_t i = 2; i <= a; i++)
       phi[i] += phi[i - 1];
   }

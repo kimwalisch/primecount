@@ -66,21 +66,44 @@ inline uint64_t fast_div(uint64_t x, uint32_t y)
 
 inline int64_t fast_div(int64_t x, int64_t y)
 {
+  assert(x >= 0);
+  assert(y >= 0);
+
+  if (x <= std::numeric_limits<uint32_t>::max() &&
+      y <= std::numeric_limits<uint32_t>::max())
+    return (uint32_t) x / (uint32_t) y;
+
   return x / y;
 }
 
 inline uint64_t fast_div(int64_t x, uint64_t y)
 {
+  assert(x >= 0);
+
+  if (x <= std::numeric_limits<uint32_t>::max() &&
+      y <= std::numeric_limits<uint32_t>::max())
+    return (uint32_t) x / (uint32_t) y;
+
   return x / y;
 }
 
 inline uint64_t fast_div(uint64_t x, int64_t y)
 {
+  assert(y >= 0);
+
+  if (x <= std::numeric_limits<uint32_t>::max() &&
+      y <= std::numeric_limits<uint32_t>::max())
+    return (uint32_t) x / (uint32_t) y;
+
   return x / y;
 }
 
 inline uint64_t fast_div(uint64_t x, uint64_t y)
 {
+  if (x <= std::numeric_limits<uint32_t>::max() &&
+      y <= std::numeric_limits<uint32_t>::max())
+    return (uint32_t) x / (uint32_t) y;
+
   return x / y;
 }
 
@@ -172,21 +195,44 @@ inline uint128_t fast_div(uint128_t x, uint64_t y)
 
 inline int128_t fast_div(int128_t x, int128_t y)
 {
+  assert(x >= 0);
+  assert(y >= 0);
+
+  if (x <= std::numeric_limits<uint64_t>::max() &&
+      y <= std::numeric_limits<uint64_t>::max())
+    return (uint64_t) x / (uint64_t) y;
+
   return x / y;
 }
 
 inline uint128_t fast_div(int128_t x, uint128_t y)
 {
+  assert(x >= 0);
+
+  if (x <= std::numeric_limits<uint64_t>::max() &&
+      y <= std::numeric_limits<uint64_t>::max())
+    return (uint64_t) x / (uint64_t) y;
+
   return x / y;
 }
 
 inline uint128_t fast_div(uint128_t x, int128_t y)
 {
+  assert(y >= 0);
+
+  if (x <= std::numeric_limits<uint64_t>::max() &&
+      y <= std::numeric_limits<uint64_t>::max())
+    return (uint64_t) x / (uint64_t) y;
+
   return x / y;
 }
 
 inline uint128_t fast_div(uint128_t x, uint128_t y)
 {
+  if (x <= std::numeric_limits<uint64_t>::max() &&
+      y <= std::numeric_limits<uint64_t>::max())
+    return (uint64_t) x / (uint64_t) y;
+
   return x / y;
 }
 
