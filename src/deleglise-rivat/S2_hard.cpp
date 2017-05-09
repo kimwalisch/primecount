@@ -91,8 +91,8 @@ void cross_off(BitSieve& sieve,
   w.set(m, wheel_index);
 }
 
-/// @return  true if the interval [low, high] contains
-///          few hard special leaves.
+/// Returns true if the interval [low, high]
+/// contains few hard special leaves
 ///
 bool few_leaves(int64_t low,
                 int64_t high,
