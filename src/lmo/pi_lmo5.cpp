@@ -71,7 +71,7 @@ int64_t S2(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, (int64_t) primes.size(), /* low = */ 1);
+  Wheel wheel(primes, primes.size(), /* low = */ 1);
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 
