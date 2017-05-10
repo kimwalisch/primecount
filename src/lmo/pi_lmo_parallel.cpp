@@ -18,6 +18,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <S1.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
@@ -71,7 +72,7 @@ int64_t S2_thread(int64_t x,
                   int64_t thread_num,
                   int64_t low,
                   int64_t limit,
-                  vector<int32_t>& pi,
+                  PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
                   vector<int32_t>& mu,
@@ -204,8 +205,8 @@ int64_t S2(int64_t x,
   int64_t segments_per_thread = 1;
 
   double time = get_wtime();
-  vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi_total(primes.size(), 0);
+  PiTable pi(y);
 
   while (low < limit)
   {
