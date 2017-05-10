@@ -163,24 +163,25 @@ vector<int64_t> phi_vector(int64_t x,
                            int threads = 1)
 {
   int64_t size = a + 1;
+  int64_t c = PhiTiny::get_c(primes[a]);
   vector<int64_t> phi(size, x > 0);
 
   if (primes[a] > x)
     a = pi[x];
 
-  if (x > 0 && a > 0)
+  if (x > 0 && a > c)
   {
-    phi[1] = x;
+    phi[c] = phi_tiny(x, c - 1);
     int64_t thread_threshold = ipow(10ll, 10);
     threads = ideal_num_threads(threads, x, thread_threshold);
     PhiCache<Primes> cache(primes, pi);
 
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
-    for (int64_t i = 2; i <= a; i++)
+    for (int64_t i = c + 1; i <= a; i++)
       phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
 
     // calculate phi(x, a) using partial results
-    for (int64_t i = 2; i <= a; i++)
+    for (int64_t i = c + 1; i <= a; i++)
       phi[i] += phi[i - 1];
   }
 
