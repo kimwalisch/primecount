@@ -47,10 +47,10 @@
   #include <omp.h>
 #endif
 
+namespace {
+
 using namespace std;
 using namespace primecount;
-
-namespace {
 
 /// Cache phi(x, a) results if a < MAX_A
 const int MAX_A = 100;
@@ -150,10 +150,6 @@ private:
   }
 };
 
-} // namespace
-
-namespace primecount {
-
 /// Returns a vector with phi(x, i - 1) values such that
 /// phi[i] = phi(x, i - 1) for 1 <= i <= a.
 /// phi(x, a) counts the numbers <= x that are not
@@ -164,9 +160,13 @@ vector<int64_t> phi_vector(int64_t x,
                            int64_t a,
                            Primes& primes,
                            PiTable& pi, 
-                           int threads)
+                           int threads = 1)
 {
-  vector<int64_t> phi(a + 1, 0);
+  int64_t size = a + 1;
+  vector<int64_t> phi(size, x > 0);
+
+  if (primes[a] > x)
+    a = pi[x];
 
   if (x > 0 && a > 0)
   {
@@ -177,7 +177,7 @@ vector<int64_t> phi_vector(int64_t x,
 
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
     for (int64_t i = 2; i <= a; i++)
-      phi[i] = cache.phi<-1>(x / primes[i - 1], i - 2);
+      phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
 
     // calculate phi(x, a) using partial results
     for (int64_t i = 2; i <= a; i++)
