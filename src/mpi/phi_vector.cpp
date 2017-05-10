@@ -159,15 +159,18 @@ vector<int64_t> phi_vector(int64_t x,
                            PiTable& pi, 
                            int threads)
 {
-  vector<int64_t> phi(a + 1, 0);
+  int64_t size = a + 1;
+  vector<int64_t> phi(size, x > 0);
+
+  if (primes[a] > x)
+    a = pi[x];
 
   if (x > 0 && a > 0)
   {
     phi[1] = x;
-    PhiCache cache(primes, pi);
-
     int64_t thread_threshold = ipow(10ll, 10);
     threads = ideal_num_threads(threads, x, thread_threshold);
+    PhiCache cache(primes, pi);
 
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
     for (int64_t i = 2; i <= a; i++)
