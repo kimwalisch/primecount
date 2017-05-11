@@ -178,16 +178,16 @@ vector<int64_t> phi_vector(int64_t x,
     phi[c] = phi_tiny(x, c - 1);
     PhiCache<Primes> cache(primes, pi);
 
-    int64_t limit = a;
     int64_t sqrtx = isqrt(x);
+    int64_t pi_sqrtx = a;
     int64_t thread_threshold = ipow(10ll, 10);
     threads = ideal_num_threads(threads, x, thread_threshold);
 
     if (sqrtx < pi.size())
-      limit = min(a, pi[sqrtx] + 1);
+      pi_sqrtx = min(pi[sqrtx] + 1, a);
 
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
-    for (int64_t i = c + 1; i <= limit; i++)
+    for (int64_t i = c + 1; i <= pi_sqrtx; i++)
       phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
 
     // calculate phi(x, a) using partial results
