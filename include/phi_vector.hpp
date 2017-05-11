@@ -163,7 +163,7 @@ vector<int64_t> phi_vector(int64_t x,
                            int threads = 1)
 {
   int64_t size = a + 1;
-  int64_t c = PhiTiny::get_c(primes[a]);
+  int64_t c = PhiTiny::max_a();
 
   if (primes[a] > x)
     a = pi[x];
