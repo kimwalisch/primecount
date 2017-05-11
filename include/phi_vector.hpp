@@ -159,7 +159,7 @@ template <typename Primes>
 vector<int64_t> phi_vector(int64_t x,
                            int64_t a,
                            Primes& primes,
-                           PiTable& pi, 
+                           PiTable& pi,
                            int threads = 1)
 {
   int64_t size = a + 1;
