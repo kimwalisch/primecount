@@ -142,7 +142,7 @@ T S2_easy_mpi_master(T x,
       }
     }
 
-    if (print_status())
+    if (is_print())
       status.print(b, pi_x13);
   }
 

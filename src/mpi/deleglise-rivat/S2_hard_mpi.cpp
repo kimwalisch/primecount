@@ -504,7 +504,7 @@ T S2_hard_mpi_master(T x,
     s2_hard += msg.s2_hard<T>();
     double percent = status.skewed_percent(s2_hard, s2_hard_approx);
 
-    if (print_status())
+    if (is_print())
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     // assign new work to do
@@ -527,7 +527,7 @@ T S2_hard_mpi_master(T x,
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
 
-    if (print_status())
+    if (is_print())
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     msg.send_finish();

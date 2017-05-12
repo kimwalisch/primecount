@@ -17,11 +17,13 @@
 
 namespace primecount {
 
+void set_print(bool print);
+
 void set_print_variables(bool print_variables);
 
-bool print_result();
+bool is_print();
 
-bool print_status();
+bool print_result();
 
 bool print_variables();
 
@@ -36,8 +38,6 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
 void print(const std::string& res_name, maxint_t res, double time);
 
 void print_seconds(double seconds);
-
-void set_print_status(bool print_status);
 
 } // namespace
 

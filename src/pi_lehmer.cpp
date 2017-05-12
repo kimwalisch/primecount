@@ -30,7 +30,7 @@ int64_t pi_lehmer(int64_t x, int threads)
   int64_t y = iroot<4>(x);
   int64_t a = pi_legendre(y);
 
-  if (print_status())
+  if (is_print())
   {
     cout << endl;
     cout << "=== pi_lehmer(x) ===" << endl;

@@ -99,7 +99,7 @@ struct Option
 void optionStatus(Option& opt,
                   CmdOptions& opts)
 {
-  set_print_status(true);
+  set_print(true);
   opts.time = true;
 
   if (!opt.val.empty())

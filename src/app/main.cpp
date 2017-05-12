@@ -51,7 +51,7 @@ maxint_t P2(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("P2(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -73,7 +73,7 @@ maxint_t S1(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S1(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -96,7 +96,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_trivial(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -120,7 +120,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_easy(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -144,7 +144,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_hard(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -239,9 +239,11 @@ int main (int argc, char* argv[])
 
     if (print_result())
     {
-      if (print_status())
+      if (is_print())
         cout << endl;
+
       cout << res << endl;
+
       if (opt.time)
         print_seconds(get_wtime() - time);
     }
