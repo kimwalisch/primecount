@@ -36,7 +36,7 @@ namespace primecount {
 int64_t to_int64(maxint_t x)
 {
   if (x > numeric_limits<int64_t>::max())
-    throw primecount_error("this is a 63-bit function, x must be < 2^63");
+    throw primecount_error("x must be < 2^63");
   return (int64_t) x;
 }
 
