@@ -170,9 +170,10 @@ int main (int argc, char* argv[])
     CmdOptions opt = parseOptions(argc, argv);
     double time = get_wtime();
 
-    maxint_t x = opt.x;
+    auto x = opt.x;
+    auto a = opt.a;
+    auto threads = opt.threads;
     maxint_t res = 0;
-    int threads = opt.threads;
 
     switch (opt.option)
     {
@@ -208,6 +209,8 @@ int main (int argc, char* argv[])
         res = pi_primesieve(to_int64(x), threads); break;
       case OPTION_P2:
         res = P2(x, threads); break;
+      case OPTION_PHI:
+        res = phi(to_int64(x), a, threads); break;
       case OPTION_PI:
         res = pi(x, threads); break;
       case OPTION_LI:
