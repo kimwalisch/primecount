@@ -242,7 +242,7 @@ int64_t S2(int64_t x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
 
-    if (print_status())
+    if (is_print())
       status.print(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
