@@ -383,7 +383,7 @@ T S2_hard_OpenMP_master(T x,
     low += segments_per_thread * threads * segment_size;
     loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
 
-    if (print_status())
+    if (is_print())
       status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
 
