@@ -151,7 +151,7 @@ namespace primecount {
 
 void test()
 {
-  set_print_status(false);
+  set_print(false);
 
   random_device rd;
   mt19937 gen(rd());
