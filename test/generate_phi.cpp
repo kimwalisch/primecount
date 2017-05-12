@@ -1,6 +1,6 @@
 ///
-/// @file  phi_vector.cpp
-/// @brief Test that phi_vector(x, a) and phi(x, a)
+/// @file  generate_phi.cpp
+/// @brief Test that generate_phi(x, a) and phi(x, a)
 ///        results are identical
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
@@ -11,8 +11,8 @@
 
 #include <primecount.hpp>
 #include <generate.hpp>
+#include <generate_phi.hpp>
 #include <PiTable.hpp>
-#include <phi_vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -37,7 +37,7 @@ int main()
     int64_t a = pi[y];
 
     auto primes = generate_primes<int64_t>(y);
-    auto phi_vect = phi_vector(x, a, primes, pi, get_num_threads());
+    auto phi_vect = generate_phi(x, a, primes, pi);
 
     for (int64_t i = 1; i < phi_vect.size(); i++)
     {

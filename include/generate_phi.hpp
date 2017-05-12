@@ -1,5 +1,5 @@
 ///
-/// @file  phi_vector.hpp
+/// @file  generate_phi.hpp
 /// @brief The PhiCache class calculates the partial sieve function
 ///        (a.k.a. Legendre-sum) using the recursive formula:
 ///        phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
@@ -28,24 +28,20 @@
 /// file in the top level directory.
 ///
 
-#ifndef PHI_VECTOR_HPP
-#define PHI_VECTOR_HPP
+#ifndef GENERATE_PHI_HPP
+#define GENERATE_PHI_HPP
 
-#include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <array>
 #include <cstdlib>
 #include <vector>
 #include <limits>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 namespace {
 
@@ -156,11 +152,7 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-vector<int64_t> phi_vector(int64_t x,
-                           int64_t a,
-                           Primes& primes,
-                           PiTable& pi,
-                           int threads = 1)
+vector<int64_t> generate_phi(int64_t x, int64_t a, Primes& primes, PiTable& pi)
 {
   int64_t size = a + 1;
 
@@ -177,14 +169,11 @@ vector<int64_t> phi_vector(int64_t x,
     phi[1] = x;
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
-    int64_t thread_threshold = ipow(10ll, 10);
-    threads = ideal_num_threads(threads, x, thread_threshold);
     PhiCache<Primes> cache(primes, pi);
 
     if (sqrtx < pi.size())
       pi_sqrtx = min(pi[sqrtx] + 1, a);
 
-    #pragma omp parallel for num_threads(threads) firstprivate(cache) schedule(dynamic, 16)
     for (int64_t i = 2; i <= pi_sqrtx; i++)
       phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
 
