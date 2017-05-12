@@ -172,9 +172,18 @@ else()
     endif()
 endif()
 
+# Testing ############################################################
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 # libprimesieve ######################################################
 
 option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+
 add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
@@ -224,9 +233,3 @@ endif()
 install(FILES include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
-# Testing ############################################################
-
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
