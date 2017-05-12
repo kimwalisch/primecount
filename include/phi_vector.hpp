@@ -84,8 +84,8 @@ public:
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t sum = 0;
 
-    if (sqrtx < pi_.size() && sqrtx < prime(a))
-      pi_sqrtx = pi_[sqrtx];
+    if (sqrtx < pi_.size())
+      pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(x2, i) = 1
     // phi(x, a) = 1 if prime(a) >= x
@@ -163,37 +163,32 @@ vector<int64_t> phi_vector(int64_t x,
                            int threads = 1)
 {
   int64_t size = a + 1;
-  int64_t c = PhiTiny::max_a();
 
   if (primes[a] > x)
     a = pi[x];
 
   vector<int64_t> phi;
   phi.reserve(size);
-  phi.resize(a + 1, (x > 0) ? -1 : 0);
-  phi.resize(size, x > 0);
+  phi.resize(2, x);
+  phi.resize(a + 1, -1);
+  phi.resize(size, 1);
 
-  if (x > 0 && a > c)
-  {
-    phi[c] = phi_tiny(x, c - 1);
-    PhiCache<Primes> cache(primes, pi);
+  PhiCache<Primes> cache(primes, pi);
+  int64_t sqrtx = isqrt(x);
+  int64_t pi_sqrtx = a;
+  int64_t thread_threshold = ipow(10ll, 10);
+  threads = ideal_num_threads(threads, x, thread_threshold);
 
-    int64_t sqrtx = isqrt(x);
-    int64_t pi_sqrtx = a;
-    int64_t thread_threshold = ipow(10ll, 10);
-    threads = ideal_num_threads(threads, x, thread_threshold);
+  if (sqrtx < pi.size())
+    pi_sqrtx = min(pi[sqrtx] + 1, a);
 
-    if (sqrtx < pi.size())
-      pi_sqrtx = min(pi[sqrtx] + 1, a);
+  #pragma omp parallel for num_threads(threads) firstprivate(cache) schedule(dynamic, 16)
+  for (int64_t i = 2; i <= pi_sqrtx; i++)
+    phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
 
-    #pragma omp parallel for num_threads(threads) firstprivate(cache) schedule(dynamic, 16)
-    for (int64_t i = c + 1; i <= pi_sqrtx; i++)
-      phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
-
-    // calculate phi(x, a) using partial results
-    for (int64_t i = c + 1; i <= a; i++)
-      phi[i] += phi[i - 1];
-  }
+  // calculate phi(x, a) using partial results
+  for (int64_t i = 2; i <= a; i++)
+    phi[i] += phi[i - 1];
 
   return phi;
 }

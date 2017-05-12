@@ -84,8 +84,8 @@ public:
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t sum = 0;
 
-    if (sqrtx < pi_.size() && sqrtx < primes_[a])
-      pi_sqrtx = pi_[sqrtx];
+    if (sqrtx < pi_.size())
+      pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(x2, i) = 1
     // phi(x, a) = 1 if primes_[a] >= x
