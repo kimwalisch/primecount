@@ -16,9 +16,10 @@
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
-#include <primecount-internal.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min.hpp>
@@ -207,7 +208,7 @@ int64_t pi_deleglise_rivat2(int64_t x)
   print(x, y, z, c, alpha, 1);
 
   int64_t p2 = P2(x, y, 1);
-  int64_t pi_y = pi_legendre(y, 1);
+  int64_t pi_y = pi_legendre(y);
   int64_t s1 = S1(x, y, c, 1);
   int64_t s2 = S2(x, y, z, c);
   int64_t phi = s1 + s2;

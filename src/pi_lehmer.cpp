@@ -1,12 +1,13 @@
 ///
 /// @file  pi_lehmer.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 
@@ -27,7 +28,7 @@ int64_t pi_lehmer(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<4>(x);
-  int64_t a = pi_legendre(y, 1);
+  int64_t a = pi_legendre(y);
 
   if (print_status())
   {
