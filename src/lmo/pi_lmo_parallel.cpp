@@ -15,12 +15,14 @@
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
+#include <generate_phi.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <S1.hpp>
-#include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
+#include <S2LoadBalancer.hpp>
 #include <Wheel.hpp>
 
 #include <stdint.h>
@@ -68,17 +70,13 @@ int64_t S2_thread(int64_t x,
                   int64_t c,
                   int64_t segment_size,
                   int64_t segments_per_thread,
-                  int64_t thread_num,
                   int64_t low,
                   int64_t limit,
-                  vector<int32_t>& pi,
+                  PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
-                  vector<int32_t>& mu,
-                  vector<int64_t>& mu_sum,
-                  vector<int64_t>& phi)
+                  vector<int32_t>& mu)
 {
-  low += segment_size * segments_per_thread * thread_num;
   limit = min(low + segment_size * segments_per_thread, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -90,8 +88,7 @@ int64_t S2_thread(int64_t x,
 
   BitSieve sieve(segment_size);
   Wheel wheel(primes, size, low);
-  phi.resize(size, 0);
-  mu_sum.resize(size, 0);
+  auto phi = generate_phi(low - 1, size - 1, primes, pi);
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -129,7 +126,6 @@ int64_t S2_thread(int64_t x,
           i = stop + 1;
           int64_t phi_xn = phi[b] + count;
           S2_thread -= mu[m] * phi_xn;
-          mu_sum[b] -= mu[m];
         }
       }
 
@@ -159,7 +155,6 @@ int64_t S2_thread(int64_t x,
         i = stop + 1;
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
-        mu_sum[b]++;
       }
 
       phi[b] += count_low_high;
@@ -171,6 +166,104 @@ int64_t S2_thread(int64_t x,
 
   return S2_thread;
 }
+
+class NewLoadBalancer
+{
+public:
+  NewLoadBalancer(maxint_t x,
+                  int64_t y,
+                  int64_t limit,
+                  maxint_t s2_approx,
+                  int threads)
+    : status_(x),
+      loadBalancer_(x, y, limit, threads),
+      low_(1),
+      limit_(x / y + 1),
+      segments_(1),
+      max_size_(next_power_of_2(max(isqrt(x / y), 1024))),
+      S2_total_(0),
+      time_(get_wtime()),
+      s2_approx_(s2_approx),
+      finished_(false)
+  {
+    segment_size_ = loadBalancer_.get_min_segment_size();
+  }
+
+  bool is_increase(double percent, double seconds)
+  {
+    double elapsed_time = get_wtime() - time_;
+    double min_seconds = 0.1;
+
+    if (seconds < min_seconds)
+      return true;
+
+    // avoid division by 0
+    percent = in_between(1, percent, 100);
+
+    // calculate remaining time till finished
+    double remaining_time = elapsed_time * (100 / percent) - elapsed_time;
+    double max_seconds = remaining_time / 4;
+    double is_increase = max(min_seconds, max_seconds);
+
+    return seconds < is_increase;
+  }
+
+  void update(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, double seconds)
+  {
+    #pragma omp critical (S2_schedule)
+    {
+      *low = low_;
+      *segments = segments_;
+      *segment_size = segment_size_;
+
+      S2_total_ += S2;
+      low_ += segments_ * segment_size_;
+
+      if (*low >= limit_)
+        finished_ = true;
+      else
+      {
+        double percent = status_.skewed_percent(S2_total_, s2_approx_);
+
+        if (is_increase(percent, seconds))
+        {
+          if (segment_size_ < max_size_)
+            segment_size_ *= 2;
+          else
+            segments_ += (segments_ / 2) + 1;
+        }
+        else
+          segments_ -= max(segments_ / 4, 1);
+      }
+    }
+
+    if (is_print())
+      status_.print(S2_total_, s2_approx_);
+  }
+  
+  bool finished()
+  {
+    return finished_;
+  }
+
+  maxint_t getResult()
+  {
+    return S2_total_;
+  }
+
+private:
+  S2Status status_;
+  S2LoadBalancer loadBalancer_;
+  int64_t low_;
+  int64_t limit_;
+  int64_t segment_size_;
+  int64_t segments_;
+  int64_t max_size_;
+  maxint_t S2_total_;
+  double time_;
+  maxint_t s2_approx_;
+  bool finished_;
+};
 
 /// Calculate the contribution of the special leaves.
 /// This is a parallel implementation with advanced load balancing.
@@ -192,61 +285,37 @@ int64_t S2(int64_t x,
   print("=== S2(x, y) ===");
   print("Computation of the special leaves");
 
-  int64_t S2_total = 0;
-  int64_t low = 1;
   int64_t limit = x / y + 1;
-  threads = ideal_num_threads(threads, limit);
-
-  S2Status status(x);
-  S2LoadBalancer loadBalancer(x, y, limit, threads);
-  int64_t min_segment_size = loadBalancer.get_min_segment_size();
-  int64_t segment_size = min_segment_size;
-  int64_t segments_per_thread = 1;
-
   double time = get_wtime();
-  vector<int32_t> pi = generate_pi(y);
-  vector<int64_t> phi_total(primes.size(), 0);
+  threads = ideal_num_threads(threads, limit);
+  NewLoadBalancer loadBalancer(x, y, limit, s2_approx, threads);
+  PiTable pi(y);
 
-  while (low < limit)
+  #pragma omp parallel for num_threads(threads)
+  for (int i = 0; i < threads; i++)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
-    threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+    int64_t low;
+    int64_t segments;
+    int64_t segment_size;
+    int64_t S2 = 0;
+    double seconds = 0;
 
-    phi_t phi(threads);
-    mu_sum_t mu_sum(threads);
-    thread_timings_t timings(threads);
-
-    #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
-    for (int i = 0; i < threads; i++)
+    while (true)
     {
-      timings[i] = get_wtime();
-      S2_total += S2_thread(x, y, c, segment_size, segments_per_thread, i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
-      timings[i] = get_wtime() - timings[i];
+      loadBalancer.update(&low, &segments, &segment_size, S2, seconds);
+
+      if (loadBalancer.finished())
+        break;
+
+      seconds = get_wtime();
+      S2 = S2_thread(x, y, c, segment_size, segments, low, limit, pi, primes, lpf, mu);
+      seconds = get_wtime() - seconds;
     }
-
-    // once all threads have finished reconstruct and add the
-    // missing contribution of all special leaves. This must
-    // be done in order as each thread (i) requires the sum of
-    // the phi values from the previous threads.
-    //
-    for (int i = 0; i < threads; i++)
-    {
-      for (size_t j = 1; j < phi[i].size(); j++)
-      {
-        S2_total += phi_total[j] * mu_sum[i][j];
-        phi_total[j] += phi[i][j];
-      }
-    }
-
-    low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
-
-    if (is_print())
-      status.print(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
+  int64_t S2_total = loadBalancer.getResult();
   print("S2", S2_total, time);
+
   return S2_total;
 }
 
