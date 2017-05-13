@@ -189,20 +189,19 @@ public:
     segment_size_ = loadBalancer_.get_min_segment_size();
   }
 
-  bool is_increase(double percent, double seconds)
+  bool is_increase(double percent, double seconds, double elapsed_time)
   {
-    double elapsed_time = get_wtime() - time_;
-    double min_seconds = 0.1;
+    double min_seconds = 0.01;
 
     if (seconds < min_seconds)
       return true;
 
     // avoid division by 0
-    percent = in_between(1, percent, 100);
+    percent = in_between(1, percent, 99);
 
     // calculate remaining time till finished
     double remaining_time = elapsed_time * (100 / percent) - elapsed_time;
-    double max_seconds = remaining_time / 4;
+    double max_seconds = remaining_time / 6;
     double is_increase = max(min_seconds, max_seconds);
 
     return seconds < is_increase;
@@ -210,6 +209,8 @@ public:
 
   void update(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, double seconds)
   {
+    double elapsed_time = get_wtime() - time_;
+
     #pragma omp critical (S2_schedule)
     {
       *low = low_;
@@ -225,7 +226,7 @@ public:
       {
         double percent = status_.skewed_percent(S2_total_, s2_approx_);
 
-        if (is_increase(percent, seconds))
+        if (is_increase(percent, seconds, elapsed_time))
         {
           if (segment_size_ < max_size_)
             segment_size_ *= 2;
@@ -233,7 +234,7 @@ public:
             segments_ += (segments_ / 2) + 1;
         }
         else
-          segments_ -= max(segments_ / 4, 1);
+          segments_ -= segments_ / 3;
       }
     }
 
