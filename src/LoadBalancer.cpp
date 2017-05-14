@@ -36,26 +36,30 @@ using namespace std;
 
 namespace primecount {
 
-LoadBalancer::LoadBalancer(maxint_t x, int64_t y, maxint_t s2_approx) :
+LoadBalancer::LoadBalancer(maxint_t x,
+                          int64_t y,
+                          int64_t z,
+                          maxint_t s2_approx) :
   status_(x),
   low_(1),
-  limit_(x / y + 1),
+  limit_(z + 1),
   segments_(1),
   s2_approx_(s2_approx),
   S2_total_(0),
   time_(get_wtime()),
   finished_(false)
 {
-  init_size(x, y);
+  init_size(x, y, z);
 }
 
-void LoadBalancer::init_size(maxint_t x, int64_t y)
+void LoadBalancer::init_size(maxint_t x,
+                             int64_t y,
+                             int64_t z)
 {
   double n = (double) x;
   double divisor = log(log(n)) * log(n);
 
   int64_t min_size = 1 << 9;
-  int64_t z = (int64_t) (x / y);
   int64_t sqrtz = isqrt(z);
 
   // Start with a tiny segment size

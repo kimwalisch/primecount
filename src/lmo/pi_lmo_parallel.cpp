@@ -74,7 +74,7 @@ int64_t S2_thread(int64_t x,
                   vector<int32_t>& mu,
                   Runtime& runtime)
 {
-  limit = min(low + segment_size * segments, limit);
+  limit = min(low + segments * segment_size, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
@@ -175,6 +175,7 @@ int64_t S2_thread(int64_t x,
 ///
 int64_t S2(int64_t x,
            int64_t y,
+           int64_t z,
            int64_t c,
            int64_t s2_approx,
            vector<int32_t>& primes,
@@ -187,9 +188,9 @@ int64_t S2(int64_t x,
   print("Computation of the special leaves");
 
   double time = get_wtime();
-  int64_t limit = x / y + 1;
+  int64_t limit = z + 1;
   threads = ideal_num_threads(threads, limit);
-  LoadBalancer loadBalancer(x, y, s2_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_approx);
   PiTable pi(y);
 
   #pragma omp parallel for num_threads(threads)
@@ -253,7 +254,7 @@ int64_t pi_lmo_parallel(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
-  int64_t s2 = S2(x, y, c, s2_approx, primes, lpf, mu, threads);
+  int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 
