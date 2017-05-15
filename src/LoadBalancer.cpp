@@ -87,7 +87,7 @@ bool LoadBalancer::is_increase(Runtime& runtime)
   return runtime.seconds < threshold;
 }
 
-void LoadBalancer::get_work(int64_t* low,
+bool LoadBalancer::get_work(int64_t* low,
                             int64_t* segments,
                             int64_t* segment_size,
                             maxint_t S2,
@@ -124,6 +124,8 @@ void LoadBalancer::get_work(int64_t* low,
 
   if (is_print())
     status_.print(S2_total_, s2_approx_);
+
+  return *low < limit_;
 }
 
 } // namespace

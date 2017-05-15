@@ -34,7 +34,7 @@ class LoadBalancer
 {
 public:
   LoadBalancer(maxint_t x, int64_t y, int64_t z, double alpha, maxint_t s2_approx);
-  void get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
+  bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
   maxint_t get_result();
 
 private:

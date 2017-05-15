@@ -331,20 +331,14 @@ T S2_hard_OpenMP_master(T x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
+    int64_t low;
+    int64_t segments;
+    int64_t segment_size;
     T s2_hard = 0;
     Runtime runtime;
 
-    while (true)
+    while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
-      int64_t low;
-      int64_t segments;
-      int64_t segment_size;
-
-      loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime);
-
-      if (low >= limit)
-        break;
-
       runtime.start();
       s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factors, pi, primes, runtime);
       runtime.stop();

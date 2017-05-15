@@ -197,20 +197,14 @@ int64_t S2(int64_t x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
+    int64_t low;
+    int64_t segments;
+    int64_t segment_size;
     int64_t S2 = 0;
     Runtime runtime;
 
-    while (true)
+    while (loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime))
     {
-      int64_t low;
-      int64_t segments;
-      int64_t segment_size;
-
-      loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime);
-
-      if (low >= limit)
-        break;
-
       runtime.start();
       S2 = S2_thread(x, y, c, low, limit, segments, segment_size, pi, primes, lpf, mu, runtime);
       runtime.stop();
