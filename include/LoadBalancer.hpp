@@ -33,25 +33,23 @@ struct Runtime
 class LoadBalancer
 {
 public:
-  LoadBalancer(maxint_t x, int64_t y, int64_t z, maxint_t s2_approx);
+  LoadBalancer(maxint_t x, int64_t y, int64_t z, double alpha, maxint_t s2_approx);
   void get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
-  bool finished();
   maxint_t get_result();
 
 private:
-  void init_size(maxint_t x, int64_t y, int64_t z);
-  bool is_increase(double percent, Runtime& runtime);
+  void init_size(int64_t z);
+  bool is_increase(Runtime& runtime);
 
   S2Status status_;
   int64_t low_;
   int64_t limit_;
   int64_t segments_;
   int64_t segment_size_;
-  int64_t max_size_;
+  int64_t smallest_hard_leaf_;
   maxint_t s2_approx_;
   maxint_t S2_total_;
   double time_;
-  bool finished_;
 };
 
 } // namespace

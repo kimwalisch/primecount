@@ -27,6 +27,7 @@
 #include <min.hpp>
 
 #include <stdint.h>
+#include <cmath>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -39,6 +40,7 @@ namespace primecount {
 LoadBalancer::LoadBalancer(maxint_t x,
                           int64_t y,
                           int64_t z,
+                          double alpha,
                           maxint_t s2_approx) :
   status_(x),
   low_(1),
@@ -46,34 +48,30 @@ LoadBalancer::LoadBalancer(maxint_t x,
   segments_(1),
   s2_approx_(s2_approx),
   S2_total_(0),
-  time_(get_wtime()),
-  finished_(false)
+  time_(get_wtime())
 {
-  init_size(x, y, z);
+  init_size(z);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
 }
 
-void LoadBalancer::init_size(maxint_t x,
-                             int64_t y,
-                             int64_t z)
+void LoadBalancer::init_size(int64_t z)
 {
-  double n = (double) x;
-  double divisor = log(log(n)) * log(n);
-
   int64_t min_size = 1 << 9;
   int64_t sqrtz = isqrt(z);
-
-  // Start with a tiny segment size
-  segment_size_ = (int64_t) (sqrtz / max(1.0, divisor));
-  segment_size_ = max(min_size, segment_size_);
+  segment_size_ = max(min_size, sqrtz);
   segment_size_ = next_power_of_2(segment_size_);
-
-  max_size_ = max(min_size, sqrtz);
-  max_size_ = next_power_of_2(max_size_);
 }
 
-bool LoadBalancer::is_increase(double percent, Runtime& runtime)
+maxint_t LoadBalancer::get_result()
+{
+  return S2_total_;
+}
+
+bool LoadBalancer::is_increase(Runtime& runtime)
 {
   double min_seconds = max(0.01, runtime.init * 10);
+  double total_time = get_wtime() - time_;
+  double percent = status_.skewed_percent(S2_total_, s2_approx_);
 
   if (runtime.seconds < min_seconds)
     return true;
@@ -81,10 +79,9 @@ bool LoadBalancer::is_increase(double percent, Runtime& runtime)
   // avoid division by 0
   percent = in_between(1, percent, 99.9);
 
-  // remaining time till finished
-  double total_time = get_wtime() - time_;
-  double remaining_time = total_time * (100 / percent) - total_time;
-  double threshold = remaining_time / 4;
+  // remaining seconds till finished
+  double remaining = total_time * (100 / percent) - total_time;
+  double threshold = remaining / 4;
   threshold = max(min_seconds, threshold);
 
   return runtime.seconds < threshold;
@@ -93,48 +90,40 @@ bool LoadBalancer::is_increase(double percent, Runtime& runtime)
 void LoadBalancer::get_work(int64_t* low,
                             int64_t* segments,
                             int64_t* segment_size,
-                            maxint_t S2, 
+                            maxint_t S2,
                             Runtime& runtime)
 {
   #pragma omp critical (S2_schedule)
   {
+    int64_t high = low_ + segments_ * segment_size_;
+
+    // Most hard special leaves are located just past
+    // smallest_hard_leaf_. In order to prevent assigning
+    // the bulk of work to a single thread we reduce
+    // the number of segments to a minimum.
+    //
+    if (low_ <= smallest_hard_leaf_ &&
+        high >= smallest_hard_leaf_)
+    {
+      segments_ = 1;
+    }
+
     *low = low_;
     *segments = segments_;
     *segment_size = segment_size_;
 
     S2_total_ += S2;
     low_ += segments_ * segment_size_;
+    low_ = min(low_, limit_);
 
-    if (*low >= limit_)
-      finished_ = true;
+    if (is_increase(runtime))
+      segments_ += ceil_div(segments_, 3);
     else
-    {
-      double percent = status_.skewed_percent(S2_total_, s2_approx_);
-
-      if (!is_increase(percent, runtime))
-        segments_ -= segments_ / 4;
-      else
-      {
-        if (segment_size_ < max_size_)
-          segment_size_ *= 2;
-        else
-          segments_ += max(segments_ / 3, 1);
-      }
-    }
+      segments_ -= segments_ / 4;
   }
 
   if (is_print())
     status_.print(S2_total_, s2_approx_);
-}
-
-bool LoadBalancer::finished()
-{
-  return finished_;
-}
-
-maxint_t LoadBalancer::get_result()
-{
-  return S2_total_;
 }
 
 } // namespace

@@ -47,7 +47,6 @@ set(LIB_SRC src/BitSieve.cpp
             src/PiTable.cpp
             src/S1.cpp
             src/LoadBalancer.cpp
-            src/S2LoadBalancer.cpp
             src/S2Status.cpp
             src/Wheel.cpp
             src/generate.cpp
@@ -81,7 +80,7 @@ if(WITH_MPI)
 
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
-                src/mpi/deleglise-rivat
+                src/mpi/S2LoadBalancer.cpp
                 src/mpi/phi_vector.cpp
                 src/mpi/deleglise-rivat/S2_hard_mpi.cpp
                 src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
@@ -233,4 +232,3 @@ endif()
 
 install(FILES include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-

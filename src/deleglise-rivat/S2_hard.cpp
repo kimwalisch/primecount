@@ -325,23 +325,24 @@ T S2_hard_OpenMP_master(T x,
   int64_t limit = z + 1;
   int64_t max_prime = z / isqrt(y);
   double alpha = get_alpha(x, y);
-  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
+  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
   PiTable pi(max_prime);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low;
-    int64_t segments;
-    int64_t segment_size;
     T s2_hard = 0;
     Runtime runtime;
 
     while (true)
     {
+      int64_t low;
+      int64_t segments;
+      int64_t segment_size;
+
       loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime);
 
-      if (loadBalancer.finished())
+      if (low >= limit)
         break;
 
       runtime.start();
@@ -350,7 +351,7 @@ T S2_hard_OpenMP_master(T x,
     }
   }
 
-  T s2_hard = loadBalancer.get_result();
+  T s2_hard = (T) loadBalancer.get_result();
 
   return s2_hard;
 }

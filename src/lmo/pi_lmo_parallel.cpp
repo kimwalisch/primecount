@@ -188,25 +188,27 @@ int64_t S2(int64_t x,
   print("Computation of the special leaves");
 
   double time = get_wtime();
+  double alpha = get_alpha(x, y);
   int64_t limit = z + 1;
   threads = ideal_num_threads(threads, limit);
-  LoadBalancer loadBalancer(x, y, z, s2_approx);
+  LoadBalancer loadBalancer(x, y, z, alpha, s2_approx);
   PiTable pi(y);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low;
-    int64_t segments;
-    int64_t segment_size;
     int64_t S2 = 0;
     Runtime runtime;
 
     while (true)
     {
+      int64_t low;
+      int64_t segments;
+      int64_t segment_size;
+
       loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime);
 
-      if (loadBalancer.finished())
+      if (low >= limit)
         break;
 
       runtime.start();
@@ -215,7 +217,7 @@ int64_t S2(int64_t x,
     }
   }
 
-  int64_t S2 = loadBalancer.get_result();
+  int64_t S2 = (int64_t) loadBalancer.get_result();
   print("S2", S2, time);
 
   return S2;
