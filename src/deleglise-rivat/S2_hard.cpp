@@ -331,9 +331,9 @@ T S2_hard_OpenMP_master(T x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low;
-    int64_t segments;
-    int64_t segment_size;
+    int64_t low = 0;
+    int64_t segments = 0;
+    int64_t segment_size = 0;
     T s2_hard = 0;
     Runtime runtime;
 

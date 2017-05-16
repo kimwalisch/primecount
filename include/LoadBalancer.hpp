@@ -43,6 +43,7 @@ private:
 
   S2Status status_;
   int64_t low_;
+  int64_t max_low_;
   int64_t limit_;
   int64_t segments_;
   int64_t segment_size_;

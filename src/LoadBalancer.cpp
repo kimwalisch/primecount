@@ -44,6 +44,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
                           maxint_t s2_approx) :
   status_(x),
   low_(1),
+  max_low_(1),
   limit_(z + 1),
   segments_(1),
   s2_approx_(s2_approx),
@@ -72,12 +73,10 @@ bool LoadBalancer::is_increase(Runtime& runtime)
   double min_seconds = max(0.01, runtime.init * 10);
   double total_time = get_wtime() - time_;
   double percent = status_.skewed_percent(S2_total_, s2_approx_);
+  percent = in_between(10, percent, 99.9);
 
   if (runtime.seconds < min_seconds)
     return true;
-
-  // avoid division by 0
-  percent = in_between(1, percent, 99.9);
 
   // remaining seconds till finished
   double remaining = total_time * (100 / percent) - total_time;
@@ -95,6 +94,18 @@ bool LoadBalancer::get_work(int64_t* low,
 {
   #pragma omp critical (S2_schedule)
   {
+    if (*low > max_low_)
+    {
+      max_low_ = *low;
+      segments_ = *segments;
+      segment_size_ = *segment_size;
+
+      if (is_increase(runtime))
+        segments_ *= 2;
+      else
+        segments_ = ceil_div(segments_, 2);
+    }
+
     int64_t high = low_ + segments_ * segment_size_;
 
     // Most hard special leaves are located just past
@@ -115,11 +126,6 @@ bool LoadBalancer::get_work(int64_t* low,
     S2_total_ += S2;
     low_ += segments_ * segment_size_;
     low_ = min(low_, limit_);
-
-    if (is_increase(runtime))
-      segments_ += ceil_div(segments_, 3);
-    else
-      segments_ -= segments_ / 4;
   }
 
   if (is_print())
