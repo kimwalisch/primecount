@@ -35,13 +35,13 @@ class LoadBalancer
 public:
   LoadBalancer(maxint_t x, int64_t y, int64_t z, double alpha, maxint_t s2_approx);
   bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
-  maxint_t get_result();
+  maxint_t get_result() const;
 
 private:
   void init_size(int64_t z);
-  bool is_increase(Runtime& runtime);
+  void update(int64_t* low, int64_t* segments, int64_t* segment_size, Runtime& runtime);
+  bool is_increase(Runtime& runtime) const;
 
-  S2Status status_;
   int64_t low_;
   int64_t max_low_;
   int64_t limit_;
@@ -51,6 +51,7 @@ private:
   maxint_t s2_approx_;
   maxint_t S2_total_;
   double time_;
+  S2Status status_;
 };
 
 } // namespace

@@ -42,14 +42,14 @@ LoadBalancer::LoadBalancer(maxint_t x,
                           int64_t z,
                           double alpha,
                           maxint_t s2_approx) :
-  status_(x),
   low_(1),
   max_low_(1),
   limit_(z + 1),
   segments_(1),
   s2_approx_(s2_approx),
   S2_total_(0),
-  time_(get_wtime())
+  time_(get_wtime()),
+  status_(x)
 {
   init_size(z);
   smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
@@ -63,27 +63,9 @@ void LoadBalancer::init_size(int64_t z)
   segment_size_ = next_power_of_2(segment_size_);
 }
 
-maxint_t LoadBalancer::get_result()
+maxint_t LoadBalancer::get_result() const
 {
   return S2_total_;
-}
-
-bool LoadBalancer::is_increase(Runtime& runtime)
-{
-  double min_seconds = max(0.01, runtime.init * 10);
-  double total_time = get_wtime() - time_;
-  double percent = status_.skewed_percent(S2_total_, s2_approx_);
-  percent = in_between(10, percent, 99.9);
-
-  if (runtime.seconds < min_seconds)
-    return true;
-
-  // remaining seconds till finished
-  double remaining = total_time * (100 / percent) - total_time;
-  double threshold = remaining / 4;
-  threshold = max(min_seconds, threshold);
-
-  return runtime.seconds < threshold;
 }
 
 bool LoadBalancer::get_work(int64_t* low,
@@ -94,30 +76,7 @@ bool LoadBalancer::get_work(int64_t* low,
 {
   #pragma omp critical (S2_schedule)
   {
-    if (*low > max_low_)
-    {
-      max_low_ = *low;
-      segments_ = *segments;
-      segment_size_ = *segment_size;
-
-      if (is_increase(runtime))
-        segments_ *= 2;
-      else
-        segments_ = ceil_div(segments_, 2);
-    }
-
-    int64_t high = low_ + segments_ * segment_size_;
-
-    // Most hard special leaves are located just past
-    // smallest_hard_leaf_. In order to prevent assigning
-    // the bulk of work to a single thread we reduce
-    // the number of segments to a minimum.
-    //
-    if (low_ <= smallest_hard_leaf_ &&
-        high >= smallest_hard_leaf_)
-    {
-      segments_ = 1;
-    }
+    update(low, segments, segment_size, runtime);
 
     *low = low_;
     *segments = segments_;
@@ -132,6 +91,54 @@ bool LoadBalancer::get_work(int64_t* low,
     status_.print(S2_total_, s2_approx_);
 
   return *low < limit_;
+}
+
+void LoadBalancer::update(int64_t* low,
+                          int64_t* segments,
+                          int64_t* segment_size,
+                          Runtime& runtime)
+{
+  if (*low > max_low_)
+  {
+    max_low_ = *low;
+    segments_ = *segments;
+    segment_size_ = *segment_size;
+
+    if (is_increase(runtime))
+      segments_ *= 2;
+    else
+      segments_ = ceil_div(segments_, 2);
+  }
+
+  // Most hard special leaves are located just past
+  // smallest_hard_leaf_. In order to prevent assigning
+  // the bulk of work to a single thread we reduce
+  // the number of segments to a minimum.
+  //
+  if (smallest_hard_leaf_ >= low_ &&
+      smallest_hard_leaf_ <= low_ + segments_ * segment_size_)
+  {
+    segments_ = 1;
+  }
+}
+
+bool LoadBalancer::is_increase(Runtime& runtime) const
+{
+  double min_secs = max(0.01, runtime.init * 10);
+
+  if (runtime.seconds < min_secs)
+    return true;
+
+  double total_time = get_wtime() - time_;
+  double percent = status_.skewed_percent(S2_total_, s2_approx_);
+  percent = in_between(10, percent, 99.9);
+
+  // remaining seconds till finished
+  double remaining = total_time * (100 / percent) - total_time;
+  double threshold = remaining / 4;
+  threshold = max(min_secs, threshold);
+
+  return runtime.seconds < threshold;
 }
 
 } // namespace
