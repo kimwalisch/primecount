@@ -85,10 +85,10 @@ bool LoadBalancer::get_work(int64_t* low,
     S2_total_ += S2;
     low_ += segments_ * segment_size_;
     low_ = min(low_, limit_);
-  }
 
-  if (is_print())
-    status_.print(*low, limit_, S2_total_, s2_approx_);
+    if (is_print())
+      status_.print(*low, limit_, S2_total_, s2_approx_);
+  }
 
   return *low < limit_;
 }
