@@ -21,13 +21,13 @@ namespace primecount {
 struct Runtime
 {
   Runtime() { reset(); }
-  void reset() { init = 0; seconds = 0; }
-  void start() { reset(); seconds = get_wtime(); }
-  void stop() { seconds = get_wtime() - seconds; }
+  void reset() { init = 0; secs = 0; }
+  void start() { reset(); secs = get_wtime(); }
+  void stop() { secs = get_wtime() - secs; }
   void init_start() { init = get_wtime(); }
   void init_stop() { init = get_wtime() - init; }
   double init;
-  double seconds;
+  double secs;
 };
 
 class LoadBalancer
@@ -41,6 +41,7 @@ private:
   void init_size();
   void update(int64_t* low, int64_t* segments, int64_t* segment_size, Runtime& runtime);
   bool is_increase(Runtime& runtime) const;
+  double remaining_secs() const;
 
   int64_t low_;
   int64_t max_low_;

@@ -126,19 +126,25 @@ bool LoadBalancer::is_increase(Runtime& runtime) const
 {
   double min_secs = max(0.01, runtime.init * 10);
 
-  if (runtime.seconds < min_secs)
+  if (runtime.secs < min_secs)
     return true;
 
-  double total_time = get_wtime() - time_;
+  double secs = remaining_secs();
+  double threshold = secs / 4;
+  threshold = max(min_secs, threshold);
+
+  return runtime.secs < threshold;
+}
+
+/// Remaining seconds till finished
+double LoadBalancer::remaining_secs() const
+{
   double percent = status_.getPercent(low_, z_, S2_total_, s2_approx_);
   percent = in_between(10, percent, 99.9);
 
-  // remaining seconds till finished
-  double remaining = total_time * (100 / percent) - total_time;
-  double threshold = remaining / 4;
-  threshold = max(min_secs, threshold);
-
-  return runtime.seconds < threshold;
+  double total_secs = get_wtime() - time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
 }
 
 } // namespace
