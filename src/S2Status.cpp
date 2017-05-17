@@ -1,7 +1,7 @@
 ///
 /// @file  S2Status.cpp
-/// @brief Print the status of S2(x, y) in percent, requires
-///        --status[=N] command-line flag.
+/// @brief Print the status of S2(x, y) in percent,
+///        requires --status[=N] option.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
