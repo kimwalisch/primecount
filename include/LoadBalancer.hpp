@@ -38,13 +38,13 @@ public:
   maxint_t get_result() const;
 
 private:
-  void init_size(int64_t z);
+  void init_size();
   void update(int64_t* low, int64_t* segments, int64_t* segment_size, Runtime& runtime);
   bool is_increase(Runtime& runtime) const;
 
   int64_t low_;
   int64_t max_low_;
-  int64_t limit_;
+  int64_t z_;
   int64_t segments_;
   int64_t segment_size_;
   int64_t smallest_hard_leaf_;

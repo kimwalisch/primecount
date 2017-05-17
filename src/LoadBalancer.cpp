@@ -44,21 +44,22 @@ LoadBalancer::LoadBalancer(maxint_t x,
                           maxint_t s2_approx) :
   low_(1),
   max_low_(1),
-  limit_(z + 1),
+  z_(z),
   segments_(1),
   s2_approx_(s2_approx),
   S2_total_(0),
   time_(get_wtime()),
   status_(x)
 {
-  init_size(z);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * iroot<6>(x)));
+  init_size();
+  maxint_t x16 = iroot<6>(x);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
 }
 
-void LoadBalancer::init_size(int64_t z)
+void LoadBalancer::init_size()
 {
   int64_t min_size = 1 << 9;
-  int64_t sqrtz = isqrt(z);
+  int64_t sqrtz = isqrt(z_);
   segment_size_ = max(min_size, sqrtz);
   segment_size_ = next_power_of_2(segment_size_);
 }
@@ -84,13 +85,12 @@ bool LoadBalancer::get_work(int64_t* low,
 
     S2_total_ += S2;
     low_ += segments_ * segment_size_;
-    low_ = min(low_, limit_);
 
     if (is_print())
-      status_.print(low_, limit_, S2_total_, s2_approx_);
+      status_.print(low_, z_, S2_total_, s2_approx_);
   }
 
-  return *low < limit_;
+  return *low <= z_;
 }
 
 void LoadBalancer::update(int64_t* low,
@@ -130,7 +130,7 @@ bool LoadBalancer::is_increase(Runtime& runtime) const
     return true;
 
   double total_time = get_wtime() - time_;
-  double percent = status_.getPercent(low_, limit_, S2_total_, s2_approx_);
+  double percent = status_.getPercent(low_, z_, S2_total_, s2_approx_);
   percent = in_between(10, percent, 99.9);
 
   // remaining seconds till finished
