@@ -110,13 +110,15 @@ void LoadBalancer::update(int64_t* low,
       segments_ = ceil_div(segments_, 2);
   }
 
+  auto high = low_ + segments_ * segment_size_;
+
   // Most hard special leaves are located just past
   // smallest_hard_leaf_. In order to prevent assigning
   // the bulk of work to a single thread we reduce
   // the number of segments to a minimum.
   //
   if (smallest_hard_leaf_ >= low_ &&
-      smallest_hard_leaf_ <= low_ + segments_ * segment_size_)
+      smallest_hard_leaf_ <= high)
   {
     segments_ = 1;
   }
