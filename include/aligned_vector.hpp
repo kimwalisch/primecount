@@ -32,11 +32,11 @@ public:
   aligned_vector(std::size_t size)
     : vect_(size) { }
   std::size_t size() const { return vect_.size(); }
-  T& operator[](std::size_t pos) { return vect_[pos].val; }
+  T& operator[](std::size_t pos) { return vect_[pos].val[0]; }
 private:
-  struct alignas(CACHE_LINE_SIZE) align_t
+  struct align_t
   {
-    T val;
+    T val[CACHE_LINE_SIZE / sizeof(T)];
   };
   std::vector<align_t> vect_;
 };
