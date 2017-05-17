@@ -88,7 +88,7 @@ bool LoadBalancer::get_work(int64_t* low,
   }
 
   if (is_print())
-    status_.print(S2_total_, s2_approx_);
+    status_.print(*low, limit_, S2_total_, s2_approx_);
 
   return *low < limit_;
 }
@@ -130,7 +130,7 @@ bool LoadBalancer::is_increase(Runtime& runtime) const
     return true;
 
   double total_time = get_wtime() - time_;
-  double percent = status_.skewed_percent(S2_total_, s2_approx_);
+  double percent = status_.getPercent(low_, limit_, S2_total_, s2_approx_);
   percent = in_between(10, percent, 99.9);
 
   // remaining seconds till finished

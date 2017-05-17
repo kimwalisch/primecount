@@ -27,7 +27,7 @@ using namespace std;
 namespace primecount {
 
 S2Status::S2Status(maxint_t x) :
-  percent_(0),
+  percent_(-1),
   time_(0),
   is_print_(1.0 / 20)
 {
@@ -36,21 +36,26 @@ S2Status::S2Status(maxint_t x) :
   epsilon_ = 1.0 / q;
 }
 
+double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
+{
+  double percent = get_percent(low, limit);
+  double skewed = skewed_percent(S2, S2_approx);
+  percent = max(percent, skewed);
+
+  return percent;
+}
+
+/// Dirty hack!
 double S2Status::skewed_percent(maxint_t n, maxint_t limit)
 {
   double exp = 0.96;
   double percent = get_percent(n, limit);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
-  return 100 - 100 * (pow(base, percent) - low) / (1 - low);
-}
+  double dividend = pow(base, percent) - low;
+  percent = 100 - (100 * dividend / (1 - low));
 
-bool S2Status::is_print(double time) const
-{
-  double old = time_.load();
-
-  return (old == 0) ||
-         (time - old) >= is_print_;
+  return percent;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit)
@@ -66,17 +71,51 @@ void S2Status::print(maxint_t n, maxint_t limit)
 
     if ((percent - old) >= epsilon_)
     {
+      percent = max(percent, old);
       percent_ = percent;
-      ostringstream status;
-      ostringstream out;
-
-      status << "Status: " << fixed << setprecision(precision_) << percent << "%";
-      size_t spaces = status.str().length();
-      string reset_line = "\r" + string(spaces,' ') + "\r";
-      out << reset_line << status.str();
-      cout << out.str() << flush;
+      print(percent);
     }
   }
+}
+
+void S2Status::print(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
+{
+  double time = get_wtime();
+
+  if (is_print(time))
+  {
+    time_ = time;
+
+    double percent = getPercent(low, limit, S2, S2_approx);
+    double old = percent_.load();
+
+    if ((percent - old) >= epsilon_)
+    {
+      percent = max(percent, old);
+      percent_ = percent;
+      print(percent);
+    }
+  }
+}
+
+bool S2Status::is_print(double time) const
+{
+  double old = time_.load();
+
+  return old == 0 ||
+        (time - old) >= is_print_;
+}
+
+void S2Status::print(double percent) const
+{
+  ostringstream status;
+  ostringstream out;
+
+  status << "Status: " << fixed << setprecision(precision_) << percent << "%";
+  size_t spaces = status.str().length();
+  string reset_line = "\r" + string(spaces,' ') + "\r";
+  out << reset_line << status.str();
+  cout << out.str() << flush;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit, double rsd)
