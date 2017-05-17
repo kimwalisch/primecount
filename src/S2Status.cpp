@@ -71,7 +71,6 @@ void S2Status::print(maxint_t n, maxint_t limit)
 
     if ((percent - old) >= epsilon_)
     {
-      percent = max(percent, old);
       percent_ = percent;
       print(percent);
     }
@@ -91,7 +90,6 @@ void S2Status::print(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx
 
     if ((percent - old) >= epsilon_)
     {
-      percent = max(percent, old);
       percent_ = percent;
       print(percent);
     }
