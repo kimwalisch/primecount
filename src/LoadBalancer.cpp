@@ -87,7 +87,7 @@ bool LoadBalancer::get_work(int64_t* low,
     low_ = min(low_, limit_);
 
     if (is_print())
-      status_.print(*low, limit_, S2_total_, s2_approx_);
+      status_.print(low_, limit_, S2_total_, s2_approx_);
   }
 
   return *low < limit_;
