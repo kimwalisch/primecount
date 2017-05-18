@@ -24,7 +24,7 @@
 #include <mpi_reduce_sum.hpp>
 #include <imath.hpp>
 #include <S2_hard_mpi_msg.hpp>
-#include <S2_hard_mpi_LoadBalancer.hpp>
+#include <MpiLoadBalancer.hpp>
 #include <S2LoadBalancer.hpp>
 #include <S2Status.hpp>
 #include <tos_counters.hpp>
@@ -492,7 +492,7 @@ T S2_hard_mpi_master(T x,
   S2LoadBalancer s2lb(x, y, z, threads);
   int64_t segment_size = s2lb.get_min_segment_size();
   int64_t high = start_mpi_slave_procs(z, segment_size, slave_procs);
-  S2_hard_mpi_LoadBalancer balancer(x, z, high, s2_hard_approx);
+  MpiLoadBalancer loadBalancer(x, z, high, s2_hard_approx);
   S2Status status(x);
 
   // process scheduling loop
@@ -507,9 +507,9 @@ T S2_hard_mpi_master(T x,
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     // assign new work to do
-    balancer.update(&msg, s2_hard);
+    loadBalancer.update(&msg, s2_hard);
 
-    if (balancer.finished())
+    if (loadBalancer.finished())
     {
       msg.send_finish();
       break;

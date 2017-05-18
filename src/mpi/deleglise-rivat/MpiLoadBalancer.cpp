@@ -1,7 +1,7 @@
 ///
-/// @file   S2_hard_mpi_LoadBalancer.cpp
-/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes
-///         the computation of the hard special leaves onto
+/// @file   MpiLoadBalancer.cpp
+/// @brief  The MpiLoadBalancer evenly distributes the
+///         computation of the hard special leaves onto
 ///         cluster nodes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
@@ -10,7 +10,7 @@
 /// file in the top level directory.
 ///
 
-#include <S2_hard_mpi_LoadBalancer.hpp>
+#include <MpiLoadBalancer.hpp>
 #include <S2_hard_mpi_msg.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
@@ -22,10 +22,10 @@ using namespace std;
 
 namespace primecount {
 
-S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(maxint_t x,
-                                                   int64_t z,
-                                                   int64_t high,
-                                                   maxint_t s2_approx) :
+MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
+                                 int64_t z,
+                                 int64_t high,
+                                 maxint_t s2_approx) :
   z_(z),
   low_(0),
   high_(high),
@@ -41,12 +41,12 @@ S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(maxint_t x,
   status_(x)
 { }
 
-bool S2_hard_mpi_LoadBalancer::finished() const
+bool MpiLoadBalancer::finished() const
 {
   return low_ > z_;
 }
 
-void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg, maxint_t s2_hard)
+void MpiLoadBalancer::update(S2_hard_mpi_msg* msg, maxint_t s2_hard)
 {
   if (msg->high() >= max_finished_)
   {
@@ -75,7 +75,7 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg, maxint_t s2_hard)
   msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_, rsd_);
 }
 
-bool S2_hard_mpi_LoadBalancer::is_increase(maxint_t s2_hard) const
+bool MpiLoadBalancer::is_increase(maxint_t s2_hard) const
 {
   double min_secs = max(0.1, init_seconds_ * 10);
 
@@ -90,7 +90,7 @@ bool S2_hard_mpi_LoadBalancer::is_increase(maxint_t s2_hard) const
 }
 
 /// Remaining seconds till finished
-double S2_hard_mpi_LoadBalancer::remaining_secs(maxint_t s2_hard) const
+double MpiLoadBalancer::remaining_secs(maxint_t s2_hard) const
 {
   double percent = status_.getPercent(low_, z_, s2_hard, s2_approx_);
   percent = in_between(20, percent, 99.9);

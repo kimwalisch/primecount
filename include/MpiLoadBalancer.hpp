@@ -1,7 +1,7 @@
 ///
-/// @file   S2_hard_mpi_LoadBalancer.hpp
-/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes
-///         the computation of the hard special leaves onto
+/// @file   MpiLoadBalancer.hpp
+/// @brief  The MpiLoadBalancer evenly distributes the
+///         computation of the hard special leaves onto
 ///         cluster nodes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef S2_HARD_MPI_LOADBALANCER_HPP
-#define S2_HARD_MPI_LOADBALANCER_HPP
+#ifndef MPILOADBALANCER_HPP
+#define MPILOADBALANCER_HPP
 
 #include <mpi.h>
 #include <S2_hard_mpi_msg.hpp>
@@ -21,10 +21,10 @@
 
 namespace primecount {
 
-class S2_hard_mpi_LoadBalancer
+class MpiLoadBalancer
 {
 public:
-  S2_hard_mpi_LoadBalancer(maxint_t x, int64_t z, int64_t high, maxint_t s2_approx);
+  MpiLoadBalancer(maxint_t x, int64_t z, int64_t high, maxint_t s2_approx);
   void update(S2_hard_mpi_msg* msg, maxint_t s2_hard);
   bool finished() const;
 
