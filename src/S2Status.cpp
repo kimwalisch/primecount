@@ -42,6 +42,9 @@ double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2
   double p2 = skewed_percent(S2, S2_approx);
   double percent = max(p1, p2);
 
+  if (S2 > S2_approx)
+    percent = max(p1, 90.0);
+
   return percent;
 }
 
@@ -58,6 +61,14 @@ double S2Status::skewed_percent(maxint_t n, maxint_t limit)
   return percent;
 }
 
+bool S2Status::is_print(double time) const
+{
+  double old = time_.load();
+
+  return old == 0 ||
+        (time - old) >= is_print_;
+}
+
 void S2Status::print(maxint_t n, maxint_t limit)
 {
   double time = get_wtime();
@@ -72,48 +83,16 @@ void S2Status::print(maxint_t n, maxint_t limit)
     if ((percent - old) >= epsilon_)
     {
       percent_ = percent;
-      print(percent);
+      ostringstream status;
+      ostringstream out;
+
+      status << "Status: " << fixed << setprecision(precision_) << percent << "%";
+      size_t spaces = status.str().length();
+      string reset_line = "\r" + string(spaces,' ') + "\r";
+      out << reset_line << status.str();
+      cout << out.str() << flush;
     }
   }
-}
-
-void S2Status::print(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
-{
-  double time = get_wtime();
-
-  if (is_print(time))
-  {
-    time_ = time;
-
-    double percent = getPercent(low, limit, S2, S2_approx);
-    double old = percent_.load();
-
-    if ((percent - old) >= epsilon_)
-    {
-      percent_ = percent;
-      print(percent);
-    }
-  }
-}
-
-bool S2Status::is_print(double time) const
-{
-  double old = time_.load();
-
-  return old == 0 ||
-        (time - old) >= is_print_;
-}
-
-void S2Status::print(double percent) const
-{
-  ostringstream status;
-  ostringstream out;
-
-  status << "Status: " << fixed << setprecision(precision_) << percent << "%";
-  size_t spaces = status.str().length();
-  string reset_line = "\r" + string(spaces,' ') + "\r";
-  out << reset_line << status.str();
-  cout << out.str() << flush;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit, double rsd)

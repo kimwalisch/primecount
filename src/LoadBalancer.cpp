@@ -77,17 +77,18 @@ bool LoadBalancer::get_work(int64_t* low,
 {
   #pragma omp critical (S2_schedule)
   {
+    S2_total_ += S2;
+
     update(low, segments, segment_size, runtime);
 
     *low = low_;
     *segments = segments_;
     *segment_size = segment_size_;
 
-    S2_total_ += S2;
     low_ += segments_ * segment_size_;
 
     if (is_print())
-      status_.print(max_low_, z_, S2_total_, s2_approx_);
+      status_.print(S2_total_, s2_approx_);
   }
 
   return *low <= z_;
@@ -142,7 +143,7 @@ bool LoadBalancer::is_increase(Runtime& runtime) const
 double LoadBalancer::remaining_secs() const
 {
   double percent = status_.getPercent(low_, z_, S2_total_, s2_approx_);
-  percent = in_between(10, percent, 99.9);
+  percent = in_between(20, percent, 99.9);
 
   double total_secs = get_wtime() - time_;
   double secs = total_secs * (100 / percent) - total_secs;

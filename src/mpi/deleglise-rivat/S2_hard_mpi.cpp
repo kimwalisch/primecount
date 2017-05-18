@@ -492,7 +492,7 @@ T S2_hard_mpi_master(T x,
   S2LoadBalancer s2lb(x, y, z, threads);
   int64_t segment_size = s2lb.get_min_segment_size();
   int64_t high = start_mpi_slave_procs(z, segment_size, slave_procs);
-  S2_hard_mpi_LoadBalancer balancer(high, z);
+  S2_hard_mpi_LoadBalancer balancer(x, z, high, s2_hard_approx);
   S2Status status(x);
 
   // process scheduling loop
@@ -502,13 +502,12 @@ T S2_hard_mpi_master(T x,
     S2_hard_mpi_msg msg;
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
-    double percent = status.skewed_percent(s2_hard, s2_hard_approx);
 
     if (is_print())
       status.print(s2_hard, s2_hard_approx, msg.rsd());
 
     // assign new work to do
-    balancer.update(&msg, percent);
+    balancer.update(&msg, s2_hard);
 
     if (balancer.finished())
     {

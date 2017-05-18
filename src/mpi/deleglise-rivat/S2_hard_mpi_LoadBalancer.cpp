@@ -1,9 +1,10 @@
 ///
 /// @file   S2_hard_mpi_LoadBalancer.cpp
-/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes the
-///         computation of the hard special leaves onto cluster nodes.
+/// @brief  The S2_hard_mpi_LoadBalancer evenly distributes
+///         the computation of the hard special leaves onto
+///         cluster nodes.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,18 +22,23 @@ using namespace std;
 
 namespace primecount {
 
-S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(int64_t high, int64_t z) :
+S2_hard_mpi_LoadBalancer::S2_hard_mpi_LoadBalancer(maxint_t x,
+                                                   int64_t z,
+                                                   int64_t high,
+                                                   maxint_t s2_approx) :
+  z_(z),
   low_(0),
   high_(high),
-  z_(z),
   max_finished_(0),
   segment_size_(isqrt(z)),
   segments_per_thread_(1),
   proc_distance_(0),
+  s2_approx_(S2_approx),
   rsd_(0),
   start_time_(get_wtime()),
   init_seconds_(0),
-  seconds_(0)
+  seconds_(0),
+  status_(x)
 { }
 
 bool S2_hard_mpi_LoadBalancer::finished() const
@@ -40,27 +46,7 @@ bool S2_hard_mpi_LoadBalancer::finished() const
   return low_ > z_;
 }
 
-bool S2_hard_mpi_LoadBalancer::is_increase(double percent) const
-{
-  double min_seconds = max(0.1, init_seconds_ * 10);
-
-  if (seconds_ < min_seconds)
-    return true;
-
-  // avoid division by 0
-  percent = in_between(1, percent, 100);
-
-  // calculate remaining time till finished
-  double elapsed_time = get_wtime() - start_time_;
-  double remaining_time = elapsed_time * (100 / percent) - elapsed_time;
-  double max_seconds = remaining_time / 4;
-  double is_increase = max(min_seconds, max_seconds);
-
-  return seconds_ < is_increase;
-}
-
-void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
-                                      double percent)
+void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg, maxint_t s2_hard)
 {
   if (msg->high() >= max_finished_)
   {
@@ -75,9 +61,9 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
 
   int64_t distance = proc_distance_;
 
-  // balance load by increasing or decreasing the next
+  // balance load by increasing/decreasing the next
   // distance based on previous run-time
-  if (is_increase(percent))
+  if (is_increase(s2_hard))
     distance *= 2;
   else
     distance = max(distance / 2, isqrt(z_)); 
@@ -87,6 +73,32 @@ void S2_hard_mpi_LoadBalancer::update(S2_hard_mpi_msg* msg,
 
   // udpate existing message with new work todo
   msg->set(msg->proc_id(), low_, high_, segment_size_, segments_per_thread_, rsd_);
+}
+
+bool S2_hard_mpi_LoadBalancer::is_increase(maxint_t s2_hard) const
+{
+  double min_secs = max(0.1, init_seconds_ * 10);
+
+  if (seconds_ < min_secs)
+    return true;
+
+  double secs = remaining_secs(s2_hard);
+  double threshold = secs / 4;
+  threshold = max(min_secs, threshold);
+
+  return seconds_ < threshold;
+}
+
+/// Remaining seconds till finished
+double S2_hard_mpi_LoadBalancer::remaining_secs(maxint_t s2_hard) const
+{
+  double percent = status_.getPercent(low_, z_, s2_hard, s2_approx_);
+  percent = in_between(20, percent, 99.9);
+
+  double total_secs = get_wtime() - start_time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+
+  return secs;
 }
 
 } // namespace
