@@ -49,10 +49,10 @@ double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2
 }
 
 /// Dirty hack!
-double S2Status::skewed_percent(maxint_t n, maxint_t limit)
+double S2Status::skewed_percent(maxint_t x, maxint_t y)
 {
   double exp = 0.96;
-  double percent = get_percent(n, limit);
+  double percent = get_percent(x, y);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
   double dividend = pow(base, percent) - low;
