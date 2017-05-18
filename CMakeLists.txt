@@ -84,7 +84,7 @@ if(WITH_MPI)
                 src/mpi/phi_vector.cpp
                 src/mpi/deleglise-rivat/S2_hard_mpi.cpp
                 src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp)
+                src/mpi/deleglise-rivat/MpiLoadBalancer.cpp)
 endif()
 
 # Check for OpenMP ###################################################
