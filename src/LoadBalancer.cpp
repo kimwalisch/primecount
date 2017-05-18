@@ -38,10 +38,10 @@ using namespace std;
 namespace primecount {
 
 LoadBalancer::LoadBalancer(maxint_t x,
-                          int64_t y,
-                          int64_t z,
-                          double alpha,
-                          maxint_t s2_approx) :
+                           int64_t y,
+                           int64_t z,
+                           double alpha,
+                           maxint_t s2_approx) :
   low_(1),
   max_low_(1),
   z_(z),
