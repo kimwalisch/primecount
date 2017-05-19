@@ -45,6 +45,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   low_(1),
   max_low_(1),
   z_(z),
+  sqrtz_(isqrt(z)),
   segments_(1),
   s2_approx_(s2_approx),
   S2_total_(0),
@@ -58,9 +59,12 @@ LoadBalancer::LoadBalancer(maxint_t x,
 
 void LoadBalancer::init_size()
 {
-  int64_t min_size = 1 << 9;
-  int64_t sqrtz = isqrt(z_);
-  segment_size_ = max(min_size, sqrtz);
+  int64_t log = ilog(sqrtz_);
+  log = max(log, 1);
+  segment_size_ = sqrtz_ / log;
+
+  int64_t min = 1 << 9;
+  segment_size_ = max(segment_size_, min);
   segment_size_ = next_power_of_2(segment_size_);
 }
 
@@ -79,7 +83,7 @@ bool LoadBalancer::get_work(int64_t* low,
   {
     S2_total_ += S2;
 
-    update(low, segments, segment_size, runtime);
+    update(low, segments, runtime);
 
     *low = low_;
     *segments = segments_;
@@ -96,19 +100,23 @@ bool LoadBalancer::get_work(int64_t* low,
 
 void LoadBalancer::update(int64_t* low,
                           int64_t* segments,
-                          int64_t* segment_size,
                           Runtime& runtime)
 {
   if (*low > max_low_)
   {
     max_low_ = *low;
     segments_ = *segments;
-    segment_size_ = *segment_size;
 
-    if (is_increase(runtime))
-      segments_ *= 2;
+    if (segment_size_ < sqrtz_)
+      segment_size_ *= 2;
     else
-      segments_ = ceil_div(segments_, 2);
+    {
+      double next = get_next(runtime);
+      next = in_between(0.25, next, 2.0);
+      next *= segments_;
+      next = max(1.0, next);
+      segments_ = (int64_t) next;
+    }
   }
 
   auto high = low_ + segments_ * segment_size_;
@@ -125,25 +133,26 @@ void LoadBalancer::update(int64_t* low,
   }
 }
 
-bool LoadBalancer::is_increase(Runtime& runtime) const
+double LoadBalancer::get_next(Runtime& runtime) const
 {
-  double min_secs = max(0.01, runtime.init * 10);
+  double min_secs = runtime.init * 10;
+  double run_secs = runtime.secs;
 
-  if (runtime.secs < min_secs)
-    return true;
+  min_secs = max(min_secs, 0.01);
+  run_secs = max(run_secs, min_secs / 10);
 
-  double secs = remaining_secs();
-  double threshold = secs / 4;
-  threshold = max(min_secs, threshold);
+  double rem = remaining_secs();
+  double threshold = rem / 4;
+  threshold = max(threshold, min_secs);
 
-  return runtime.secs < threshold;
+  return threshold / run_secs;
 }
 
 /// Remaining seconds till finished
 double LoadBalancer::remaining_secs() const
 {
   double percent = status_.getPercent(low_, z_, S2_total_, s2_approx_);
-  percent = in_between(20, percent, 99.9);
+  percent = in_between(20, percent, 100);
 
   double total_secs = get_wtime() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
