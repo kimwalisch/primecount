@@ -21,9 +21,9 @@
 
 namespace {
 
-inline int64_t isquare(int32_t x)
+inline int64_t isquare(int64_t x)
 {
-  return x * (int64_t) x;
+  return x * x;
 }
 
 template <typename A, typename B>
