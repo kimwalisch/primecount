@@ -311,14 +311,14 @@ T S2_hard_thread(T x,
 /// the segment size and the number of segments.
 ///
 template <typename T, typename FactorTable, typename Primes>
-T S2_hard_OpenMP_master(T x,
-                        int64_t y,
-                        int64_t z,
-                        int64_t c,
-                        T s2_hard_approx,
-                        Primes& primes,
-                        FactorTable& factors,
-                        int threads)
+T S2_hard_OpenMP(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 T s2_hard_approx,
+                 Primes& primes,
+                 FactorTable& factors,
+                 int threads)
 {
   threads = ideal_num_threads(threads, z);
 
@@ -376,7 +376,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = z / isqrt(y);
   auto primes = generate_primes<int32_t>(max_prime);
 
-  int64_t s2_hard = S2_hard_OpenMP_master((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -411,7 +411,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<uint32_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
   else
   {
@@ -419,7 +419,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<int64_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
 
   print("S2_hard", s2_hard, time);
