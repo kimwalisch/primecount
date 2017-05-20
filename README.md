@@ -18,7 +18,7 @@ using MPI.
 
 primecount contains the **first ever** parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
-[novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
+[novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
 which scales up to hundreds of CPU cores. primecount has already been
 used to compute several world records e.g.
 [pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
