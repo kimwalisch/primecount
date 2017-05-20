@@ -155,24 +155,6 @@ template <typename Primes>
 vector<int64_t> generate_phi(int64_t x, int64_t a, Primes& primes, PiTable& pi)
 {
   int64_t size = a + 1;
-<<<<<<< HEAD:src/mpi/phi_vector.cpp
-  int64_t c = PhiTiny::get_c(primes[a]);
-  vector<int64_t> phi(size, x > 0);
-
-  if (primes[a] > x)
-    a = pi[x];
-
-  if (x > 0 && a > c)
-  {
-    phi[c] = phi_tiny(x, c - 1);
-    int64_t thread_threshold = ipow(10ll, 10);
-    threads = ideal_num_threads(threads, x, thread_threshold);
-    PhiCache cache(primes, pi);
-
-    #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
-    for (int64_t i = c + 1; i <= a; i++)
-      phi[i] = cache.phi<-1>(x / primes[i - 1], i - 2);
-=======
 
   if (primes[a] > x)
     a = pi[x];
@@ -194,10 +176,9 @@ vector<int64_t> generate_phi(int64_t x, int64_t a, Primes& primes, PiTable& pi)
 
     for (int64_t i = 2; i <= pi_sqrtx; i++)
       phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
->>>>>>> NewLoadBalancer:include/generate_phi.hpp
 
     // calculate phi(x, a) using partial results
-    for (int64_t i = c + 1; i <= a; i++)
+    for (int64_t i = 2; i <= a; i++)
       phi[i] += phi[i - 1];
   }
 

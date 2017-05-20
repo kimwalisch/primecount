@@ -66,11 +66,8 @@ int64_t S2_thread(int64_t x,
                   int64_t c,
                   int64_t low,
                   int64_t limit,
-<<<<<<< HEAD
-=======
                   int64_t segments,
                   int64_t segment_size,
->>>>>>> NewLoadBalancer
                   PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
@@ -191,14 +188,10 @@ int64_t S2(int64_t x,
   print("Computation of the special leaves");
 
   double time = get_wtime();
-<<<<<<< HEAD
-  vector<int64_t> phi_total(primes.size(), 0);
-=======
   double alpha = get_alpha(x, y);
   int64_t limit = z + 1;
   threads = ideal_num_threads(threads, limit);
   LoadBalancer loadBalancer(x, y, z, alpha, s2_approx);
->>>>>>> NewLoadBalancer
   PiTable pi(y);
 
   #pragma omp parallel for num_threads(threads)
