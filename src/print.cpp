@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,7 +20,7 @@ using namespace std;
 
 namespace {
 
-bool print_status_ = false;
+bool print_ = false;
 
 bool print_variables_ = false;
 
@@ -28,12 +28,12 @@ bool print_variables_ = false;
 
 namespace primecount {
 
-void set_print_status(bool print_status)
+void set_print(bool print)
 {
 #ifdef HAVE_MPI
-  print_status_ = print_status && is_mpi_master_proc();
+  print_ = print && is_mpi_master_proc();
 #else
-  print_status_ = print_status;
+  print_ = print;
 #endif
 }
 
@@ -65,9 +65,9 @@ void print_threads(int threads)
 #endif
 }
 
-bool print_status()
+bool is_print()
 {
-  return print_status_;
+  return print_;
 }
 
 bool print_variables()
@@ -77,13 +77,13 @@ bool print_variables()
 
 void print(const string& str)
 {
-  if (print_status())
+  if (is_print())
     cout << str << endl;
 }
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
 {
-  if (print_status())
+  if (is_print())
   {
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
@@ -125,7 +125,7 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
 
 void print(const string& res_str, maxint_t res, double time)
 {
-  if (print_status())
+  if (is_print())
   {
     cout << "\r" << string(50,' ') << "\r";
     cout << "Status: 100%" << endl;

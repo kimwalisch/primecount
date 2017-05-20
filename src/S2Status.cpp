@@ -1,7 +1,7 @@
 ///
 /// @file  S2Status.cpp
-/// @brief Print the status of S2(x, y) in percent, requires
-///        --status[=N] command-line flag.
+/// @brief Print the status of S2(x, y) in percent,
+///        requires --status[=N] option.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -27,7 +27,7 @@ using namespace std;
 namespace primecount {
 
 S2Status::S2Status(maxint_t x) :
-  percent_(0),
+  percent_(-1),
   time_(0),
   is_print_(1.0 / 20)
 {
@@ -36,21 +36,39 @@ S2Status::S2Status(maxint_t x) :
   epsilon_ = 1.0 / q;
 }
 
-double S2Status::skewed_percent(maxint_t n, maxint_t limit)
+double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
+{
+  double p1 = skewed_percent(low, limit);
+  double p2 = skewed_percent(S2, S2_approx);
+  double percent = max(p1, p2);
+
+  // p2 is just an approximation,
+  // use p1 near the end
+  if (p2 > 95.0)
+    percent = max(p1, 95.0);
+
+  return percent;
+}
+
+/// Dirty hack!
+double S2Status::skewed_percent(maxint_t x, maxint_t y)
 {
   double exp = 0.96;
-  double percent = get_percent(n, limit);
+  double percent = get_percent(x, y);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
-  return 100 - 100 * (pow(base, percent) - low) / (1 - low);
+  double dividend = pow(base, percent) - low;
+  percent = 100 - (100 * dividend / (1 - low));
+
+  return percent;
 }
 
 bool S2Status::is_print(double time) const
 {
   double old = time_.load();
 
-  return (old == 0) ||
-         (time - old) >= is_print_;
+  return old == 0 ||
+        (time - old) >= is_print_;
 }
 
 void S2Status::print(maxint_t n, maxint_t limit)
@@ -76,30 +94,6 @@ void S2Status::print(maxint_t n, maxint_t limit)
       out << reset_line << status.str();
       cout << out.str() << flush;
     }
-  }
-}
-
-void S2Status::print(maxint_t n, maxint_t limit, double rsd)
-{
-  double time = get_wtime();
-
-  if (is_print(time))
-  {
-    double percent = skewed_percent(n, limit);
-
-    time_ = time;
-    percent_ = percent;
-    ostringstream status;
-    ostringstream out;
-
-    int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
-
-    status << "Status: " << fixed << setprecision(precision_) << percent << "%, ";
-    status << "Load balance: " << load_balance << "%";
-    size_t spaces = status.str().length() + 2;
-    string reset_line = "\r" + string(spaces,' ') + "\r";
-    out << reset_line << status.str();
-    cout << out.str() << flush;
   }
 }
 

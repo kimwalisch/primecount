@@ -15,13 +15,13 @@
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
+#include <generate_phi.hpp>
+#include <LoadBalancer.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <S1.hpp>
-#include <S2LoadBalancer.hpp>
-#include <S2Status.hpp>
 #include <Wheel.hpp>
 
 #include <stdint.h>
@@ -58,29 +58,26 @@ int64_t cross_off(BitSieve& sieve,
   return unset;
 }
 
-/// Compute the S2 contribution for the interval
-/// [low_process, low_process + segments * segment_size[.
-/// The missing special leaf contributions for the interval
-/// [1, low_process[ are later reconstructed and added in
-/// the calling (parent) S2 function.
+/// Compute the S2 contribution of the interval
+/// [low, low + segments * segment_size[
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t c,
-                  int64_t segment_size,
-                  int64_t segments_per_thread,
-                  int64_t thread_num,
                   int64_t low,
                   int64_t limit,
+<<<<<<< HEAD
+=======
+                  int64_t segments,
+                  int64_t segment_size,
+>>>>>>> NewLoadBalancer
                   PiTable& pi,
                   vector<int32_t>& primes,
                   vector<int32_t>& lpf,
                   vector<int32_t>& mu,
-                  vector<int64_t>& mu_sum,
-                  vector<int64_t>& phi)
+                  Runtime& runtime)
 {
-  low += segment_size * segments_per_thread * thread_num;
-  limit = min(low + segment_size * segments_per_thread, limit);
+  limit = min(low + segments * segment_size, limit);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
@@ -89,10 +86,11 @@ int64_t S2_thread(int64_t x,
   if (c >= size - 1)
     return 0;
 
+  runtime.init_start();
   BitSieve sieve(segment_size);
   Wheel wheel(primes, size, low);
-  phi.resize(size, 0);
-  mu_sum.resize(size, 0);
+  auto phi = generate_phi(low - 1, size - 1, primes, pi);
+  runtime.init_stop();
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -130,7 +128,6 @@ int64_t S2_thread(int64_t x,
           i = stop + 1;
           int64_t phi_xn = phi[b] + count;
           S2_thread -= mu[m] * phi_xn;
-          mu_sum[b] -= mu[m];
         }
       }
 
@@ -160,7 +157,6 @@ int64_t S2_thread(int64_t x,
         i = stop + 1;
         int64_t phi_xn = phi[b] + count;
         S2_thread += phi_xn;
-        mu_sum[b]++;
       }
 
       phi[b] += count_low_high;
@@ -178,10 +174,11 @@ int64_t S2_thread(int64_t x,
 /// As most special leaves tend to be in the first segments we
 /// start off with a small segment size and few segments
 /// per thread, after each iteration we dynamically increase
-/// the segment size and the segments per thread.
+/// the segment size and the number of segments.
 ///
 int64_t S2(int64_t x,
            int64_t y,
+           int64_t z,
            int64_t c,
            int64_t s2_approx,
            vector<int32_t>& primes,
@@ -193,62 +190,38 @@ int64_t S2(int64_t x,
   print("=== S2(x, y) ===");
   print("Computation of the special leaves");
 
-  int64_t S2_total = 0;
-  int64_t low = 1;
-  int64_t limit = x / y + 1;
-  threads = ideal_num_threads(threads, limit);
-
-  S2Status status(x);
-  S2LoadBalancer loadBalancer(x, y, limit, threads);
-  int64_t min_segment_size = loadBalancer.get_min_segment_size();
-  int64_t segment_size = min_segment_size;
-  int64_t segments_per_thread = 1;
-
   double time = get_wtime();
+<<<<<<< HEAD
   vector<int64_t> phi_total(primes.size(), 0);
+=======
+  double alpha = get_alpha(x, y);
+  int64_t limit = z + 1;
+  threads = ideal_num_threads(threads, limit);
+  LoadBalancer loadBalancer(x, y, z, alpha, s2_approx);
+>>>>>>> NewLoadBalancer
   PiTable pi(y);
 
-  while (low < limit)
+  #pragma omp parallel for num_threads(threads)
+  for (int i = 0; i < threads; i++)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
-    threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+    int64_t low = 0;
+    int64_t segments = 0;
+    int64_t segment_size = 0;
+    int64_t S2 = 0;
+    Runtime runtime;
 
-    phi_t phi(threads);
-    mu_sum_t mu_sum(threads);
-    thread_timings_t timings(threads);
-
-    #pragma omp parallel for num_threads(threads) reduction(+: S2_total)
-    for (int i = 0; i < threads; i++)
+    while (loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime))
     {
-      timings[i] = get_wtime();
-      S2_total += S2_thread(x, y, c, segment_size, segments_per_thread, i, low, limit, pi, primes, lpf, mu, mu_sum[i], phi[i]);
-      timings[i] = get_wtime() - timings[i];
+      runtime.start();
+      S2 = S2_thread(x, y, c, low, limit, segments, segment_size, pi, primes, lpf, mu, runtime);
+      runtime.stop();
     }
-
-    // once all threads have finished reconstruct and add the
-    // missing contribution of all special leaves. This must
-    // be done in order as each thread (i) requires the sum of
-    // the phi values from the previous threads.
-    //
-    for (int i = 0; i < threads; i++)
-    {
-      for (size_t j = 1; j < phi[i].size(); j++)
-      {
-        S2_total += phi_total[j] * mu_sum[i][j];
-        phi_total[j] += phi[i][j];
-      }
-    }
-
-    low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
-
-    if (print_status())
-      status.print(S2_total, s2_approx, loadBalancer.get_rsd());
   }
 
-  print("S2", S2_total, time);
-  return S2_total;
+  int64_t S2 = (int64_t) loadBalancer.get_result();
+  print("S2", S2, time);
+
+  return S2;
 }
 
 } // namespace
@@ -284,7 +257,7 @@ int64_t pi_lmo_parallel(int64_t x, int threads)
   int64_t pi_y = primes.size() - 1;
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
-  int64_t s2 = S2(x, y, c, s2_approx, primes, lpf, mu, threads);
+  int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

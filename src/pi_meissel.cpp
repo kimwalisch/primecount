@@ -1,12 +1,13 @@
 ///
 /// @file  pi_meissel.cpp
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 
@@ -19,7 +20,7 @@ namespace primecount {
 
 /// Count the number of primes <= x using Meissel's formula.
 /// Run time: O(x/(log x)^3)
-/// Memory usage: O(x^0.5 / log x)
+/// Memory usage: O(x^(1/2))
 ///
 int64_t pi_meissel(int64_t x, int threads)
 {
@@ -27,9 +28,9 @@ int64_t pi_meissel(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<3>(x);
-  int64_t a = pi_legendre(y, 1);
+  int64_t a = pi_legendre(y);
 
-  if (print_status())
+  if (is_print())
   {
     cout << endl;
     cout << "=== pi_meissel(x) ===" << endl;

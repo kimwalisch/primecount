@@ -20,10 +20,11 @@ class S2Status
 public:
   S2Status(maxint_t x);
   void print(maxint_t n, maxint_t limit);
-  void print(maxint_t n, maxint_t limit, double rsd);
-  static double skewed_percent(maxint_t n, maxint_t limit);
+  static double getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
 private:
   bool is_print(double time) const;
+  void print(double percent) const;
+  static double skewed_percent(maxint_t x, maxint_t y);
   double epsilon_;
   std::atomic<double> percent_;
   std::atomic<double> time_;

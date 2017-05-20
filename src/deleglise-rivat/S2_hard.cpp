@@ -6,24 +6,24 @@
 ///        (PiTable & FactorTable) to reduce the memory usage by
 ///        about 10x.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <PiTable.hpp>
-#include <FactorTable.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve.hpp>
+#include <FactorTable.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <int128_t.hpp>
-#include <min.hpp>
+#include <generate_phi.hpp>
 #include <imath.hpp>
+#include <int128_t.hpp>
+#include <LoadBalancer.hpp>
+#include <min.hpp>
+#include <PiTable.hpp>
 #include <S2.hpp>
-#include <S2LoadBalancer.hpp>
-#include <S2Status.hpp>
 #include <tos_counters.hpp>
 #include <Wheel.hpp>
 
@@ -102,32 +102,26 @@ bool few_leaves(int64_t low,
   return (high < y || low > y * alpha);
 }
 
-/// Compute the S2 contribution of the hard special leaves which
-/// require use of a sieve. Each thread processes the interval
-/// [low_thread, low_thread + segments * segment_size[
-/// and the missing special leaf contributions for the interval
-/// [1, low_process[ are later reconstructed and added in
-/// the parent S2_hard_OpenMP_master() function.
+/// Compute the S2 contribution of the hard special leaves
+/// using a sieve. Each thread processes the interval
+/// [low, low + segments * segment_size[
 ///
 template <typename T, typename FactorTable, typename Primes>
-T S2_hard_OpenMP_thread(T x,
-                        int64_t y,
-                        int64_t z,
-                        int64_t c,
-                        int64_t segment_size,
-                        int64_t segments_per_thread,
-                        int64_t thread_num,
-                        int64_t low,
-                        int64_t limit,
-                        double alpha,
-                        FactorTable& factors,
-                        PiTable& pi,
-                        Primes& primes,
-                        vector<int64_t>& mu_sum,
-                        vector<int64_t>& phi)
+T S2_hard_thread(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 int64_t low,
+                 int64_t limit,
+                 int64_t segments,
+                 int64_t segment_size,
+                 double alpha,
+                 FactorTable& factors,
+                 PiTable& pi,
+                 Primes& primes,
+                 Runtime& runtime)
 {
-  low += segment_size * segments_per_thread * thread_num;
-  limit = min(low + segment_size * segments_per_thread, limit);
+  limit = min(low + segments * segment_size, limit);
   int64_t max_b = pi[min(isqrt(x / low), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
@@ -135,11 +129,12 @@ T S2_hard_OpenMP_thread(T x,
   if (c > max_b)
     return s2_hard;
 
+  runtime.init_start();
   BitSieve sieve(segment_size);
   Wheel wheel(primes, max_b + 1, low);
   vector<int32_t> counters;
-  phi.resize(max_b + 1, 0);
-  mu_sum.resize(max_b + 1, 0);
+  auto phi = generate_phi(low - 1, max_b, primes, pi);
+  runtime.init_stop();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -189,7 +184,6 @@ T S2_hard_OpenMP_thread(T x,
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
             s2_hard -= mu_m * phi_xn;
-            mu_sum[b] -= mu_m;
           }
         }
 
@@ -222,7 +216,6 @@ T S2_hard_OpenMP_thread(T x,
           start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
-          mu_sum[b]++;
         }
 
         phi[b] += count_low_high;
@@ -269,7 +262,6 @@ T S2_hard_OpenMP_thread(T x,
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
             s2_hard -= mu_m * phi_xn;
-            mu_sum[b] -= mu_m;
           }
         }
 
@@ -298,7 +290,6 @@ T S2_hard_OpenMP_thread(T x,
           int64_t count = cnt_query(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
-          mu_sum[b]++;
         }
 
         phi[b] += cnt_query(counters, (high - 1) - low);
@@ -312,80 +303,49 @@ T S2_hard_OpenMP_thread(T x,
   return s2_hard;
 }
 
-/// Calculate the contribution of the hard special leaves which
-/// require use of a sieve (to reduce the memory usage).
+/// Calculate the contribution of the hard special leaves.
 /// This is a parallel implementation with advanced load balancing.
 /// As most special leaves tend to be in the first segments we
 /// start off with a small segment size and few segments
 /// per thread, after each iteration we dynamically increase
-/// the segment size and the segments per thread.
+/// the segment size and the number of segments.
 ///
 template <typename T, typename FactorTable, typename Primes>
-T S2_hard_OpenMP_master(T x,
-                        int64_t y,
-                        int64_t z,
-                        int64_t c,
-                        T s2_hard_approx,
-                        Primes& primes,
-                        FactorTable& factors,
-                        int threads)
+T S2_hard_OpenMP(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 T s2_hard_approx,
+                 Primes& primes,
+                 FactorTable& factors,
+                 int threads)
 {
   threads = ideal_num_threads(threads, z);
 
-  T s2_hard = 0;
-  int64_t low = 1;
   int64_t limit = z + 1;
   int64_t max_prime = z / isqrt(y);
-
-  S2Status status(x);
-  S2LoadBalancer loadBalancer(x, y, z, threads);
-  int64_t min_segment_size = loadBalancer.get_min_segment_size();
-  int64_t segment_size = min_segment_size;
-  int64_t segments_per_thread = 1;
-
-  PiTable pi(max_prime);
-  vector<int64_t> phi_total(pi[isqrt(z)] + 1, 0);
   double alpha = get_alpha(x, y);
+  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  PiTable pi(max_prime);
 
-  while (low < limit)
+  #pragma omp parallel for num_threads(threads)
+  for (int i = 0; i < threads; i++)
   {
-    int64_t segments = ceil_div(limit - low, segment_size);
-    threads = in_between(1, threads, segments);
-    segments_per_thread = in_between(1, segments_per_thread, ceil_div(segments, threads));
+    int64_t low = 0;
+    int64_t segments = 0;
+    int64_t segment_size = 0;
+    T s2_hard = 0;
+    Runtime runtime;
 
-    phi_t phi(threads);
-    mu_sum_t mu_sum(threads);
-    thread_timings_t timings(threads);
-
-    #pragma omp parallel for num_threads(threads) reduction(+: s2_hard)
-    for (int i = 0; i < threads; i++)
+    while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
-      timings[i] = get_wtime();
-      s2_hard += S2_hard_OpenMP_thread(x, y, z, c, segment_size, segments_per_thread,
-          i, low, limit, alpha, factors, pi, primes, mu_sum[i], phi[i]);
-      timings[i] = get_wtime() - timings[i];
+      runtime.start();
+      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factors, pi, primes, runtime);
+      runtime.stop();
     }
-
-    // Once all threads have finished reconstruct and add the 
-    // missing contribution of all special leaves. This must
-    // be done in order as each thread (i) requires the sum of
-    // the phi values from the previous threads.
-    //
-    for (int i = 0; i < threads; i++)
-    {
-      for (size_t j = 1; j < phi[i].size(); j++)
-      {
-        s2_hard += phi_total[j] * (T) mu_sum[i][j];
-        phi_total[j] += phi[i][j];
-      }
-    }
-
-    low += segments_per_thread * threads * segment_size;
-    loadBalancer.update(&segment_size, &segments_per_thread, low, threads, timings);
-
-    if (print_status())
-      status.print(s2_hard, s2_hard_approx, loadBalancer.get_rsd());
   }
+
+  T s2_hard = (T) loadBalancer.get_result();
 
   return s2_hard;
 }
@@ -416,7 +376,7 @@ int64_t S2_hard(int64_t x,
   int64_t max_prime = z / isqrt(y);
   auto primes = generate_primes<int32_t>(max_prime);
 
-  int64_t s2_hard = S2_hard_OpenMP_master((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -451,7 +411,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<uint32_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
   else
   {
@@ -459,7 +419,7 @@ int128_t S2_hard(int128_t x,
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<int64_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP_master((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
   }
 
   print("S2_hard", s2_hard, time);

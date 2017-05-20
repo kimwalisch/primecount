@@ -169,7 +169,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
 
-    if (print_status())
+    if (is_print())
     {
       double percent = get_percent(low, z);
       cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))

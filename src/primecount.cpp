@@ -287,7 +287,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
-    if (x2 <= 1e21)
+    if (x2 < 1e20)
     {
       double a = 0.000711339;
       double b = -0.0160586;
@@ -300,8 +300,8 @@ double get_alpha_deleglise_rivat(maxint_t x)
     else
     {
       // Because of CPU cache misses sieving in S2_hard(x)
-      // becomes the main bottleneck above 10^21 . Hence we
-      // use a different formula when x > 10^21 which
+      // becomes the main bottleneck above 10^20. Hence we
+      // use a different formula when x >= 10^20 which
       // returns a larger alpha factor which reduces the
       // amount of work in S2_hard(x) but increases the
       // amount of work in S2_easy(x).

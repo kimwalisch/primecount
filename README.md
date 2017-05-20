@@ -18,7 +18,7 @@ using MPI.
 
 primecount contains the **first ever** parallel open source
 implementation of the Deleglise-Rivat algorithm and it features a
-[novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/S2LoadBalancer.cpp)
+[novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
 which scales up to hundreds of CPU cores. primecount has already been
 used to compute several world records e.g.
 [pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
@@ -92,6 +92,8 @@ Options:
          --Li_inverse       Approximate nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
+         --phi=<a>          phi(x, a) counts the numbers <= x that are
+                            not divisible by any of the first a primes
          --Ri               Approximate pi(x) using Riemann R
          --Ri_inverse       Approximate nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...

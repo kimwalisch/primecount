@@ -36,7 +36,7 @@ namespace primecount {
 int64_t to_int64(maxint_t x)
 {
   if (x > numeric_limits<int64_t>::max())
-    throw primecount_error("this is a 63-bit function, x must be < 2^63");
+    throw primecount_error("x must be < 2^63");
   return (int64_t) x;
 }
 
@@ -51,7 +51,7 @@ maxint_t P2(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("P2(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -73,7 +73,7 @@ maxint_t S1(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S1(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -96,7 +96,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_trivial(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -120,7 +120,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_easy(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -144,7 +144,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   if (x > to_maxint(limit))
     throw primecount_error("S2_hard(x): x must be <= " + limit);
 
-  if (print_status())
+  if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
@@ -170,9 +170,10 @@ int main (int argc, char* argv[])
     CmdOptions opt = parseOptions(argc, argv);
     double time = get_wtime();
 
-    maxint_t x = opt.x;
+    auto x = opt.x;
+    auto a = opt.a;
+    auto threads = opt.threads;
     maxint_t res = 0;
-    int threads = opt.threads;
 
     switch (opt.option)
     {
@@ -208,6 +209,8 @@ int main (int argc, char* argv[])
         res = pi_primesieve(to_int64(x), threads); break;
       case OPTION_P2:
         res = P2(x, threads); break;
+      case OPTION_PHI:
+        res = phi(to_int64(x), a, threads); break;
       case OPTION_PI:
         res = pi(x, threads); break;
       case OPTION_LI:
@@ -236,9 +239,11 @@ int main (int argc, char* argv[])
 
     if (print_result())
     {
-      if (print_status())
+      if (is_print())
         cout << endl;
+
       cout << res << endl;
+
       if (opt.time)
         print_seconds(get_wtime() - time);
     }

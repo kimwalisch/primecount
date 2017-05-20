@@ -46,7 +46,7 @@ set(LIB_SRC src/BitSieve.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/S1.cpp
-            src/S2LoadBalancer.cpp
+            src/LoadBalancer.cpp
             src/S2Status.cpp
             src/Wheel.cpp
             src/generate.cpp
@@ -80,11 +80,9 @@ if(WITH_MPI)
 
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
-                src/mpi/deleglise-rivat
-                src/mpi/phi_vector.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi_LoadBalancer.cpp)
+                src/mpi/S2_hard_mpi.cpp
+                src/mpi/MpiLoadBalancer.cpp
+                src/mpi/MpiMsg.cpp)
 endif()
 
 # Check for OpenMP ###################################################
@@ -133,12 +131,12 @@ endif()
 if(RUN_LIBDIVIDE EQUAL 0)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(WITH_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(WITH_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
     endif()
 endif()
 
@@ -154,27 +152,18 @@ if(WITH_POPCNT)
     endif()
 endif()
 
-# CPU cache line size ################################################
+# Testing ############################################################
 
-if(CACHE_LINE_SIZE)
-    message(STATUS "Use CPU cache line size: ${CACHE_LINE_SIZE} bytes")
-    add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
-else()
-    execute_process(COMMAND sh ${PROJECT_SOURCE_DIR}/scripts/cache_line_size.sh
-                    RESULT_VARIABLE CLZ_RES
-                    OUTPUT_VARIABLE CACHE_LINE_SIZE
-                    ERROR_QUIET)
-
-    if(CLZ_RES EQUAL 0)
-        string(STRIP ${CACHE_LINE_SIZE} CACHE_LINE_SIZE)
-        message(STATUS "Found CPU cache line size: ${CACHE_LINE_SIZE} bytes")
-        add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
-    endif()
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
 endif()
 
 # libprimesieve ######################################################
 
 option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+
 add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
@@ -223,10 +212,3 @@ endif()
 
 install(FILES include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-
-# Testing ############################################################
-
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()

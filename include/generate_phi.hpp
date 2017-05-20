@@ -1,5 +1,5 @@
 ///
-/// @file  phi_vector.cpp
+/// @file  generate_phi.hpp
 /// @brief The PhiCache class calculates the partial sieve function
 ///        (a.k.a. Legendre-sum) using the recursive formula:
 ///        phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
@@ -28,48 +28,45 @@
 /// file in the top level directory.
 ///
 
-#include <PiTable.hpp>
+#ifndef GENERATE_PHI_HPP
+#define GENERATE_PHI_HPP
+
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
-#include <min.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <vector>
 #include <limits>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
+namespace {
 
 using namespace std;
 using namespace primecount;
 
-namespace {
-
 /// Cache phi(x, a) results if a < MAX_A
 const int MAX_A = 100;
 
+template <typename Primes>
 class PhiCache
 {
 public:
-  PhiCache(vector<int64_t>& primes,
-           PiTable& pi) :
-    primes_(primes),
-    pi_(pi)
+  PhiCache(Primes& primes, PiTable& pi)
+    : primes_(primes),
+      pi_(pi)
   { }
 
   /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1)
+  /// phi(x, a) = phi(x, a - 1) - phi(x / prime(a), a - 1)
   ///
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
-    if (x <= primes_[a])
+    if (x <= prime(a))
       return SIGN;
     else if (is_phi_tiny(a))
       return phi_tiny(x, a) * SIGN;
@@ -83,14 +80,14 @@ public:
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t sum = 0;
 
-    if (sqrtx < pi_.size() && sqrtx < primes_[a])
-      pi_sqrtx = pi_[sqrtx];
+    if (sqrtx < pi_.size())
+      pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(x2, i) = 1
-    // phi(x, a) = 1 if primes_[a] >= x
-    // x2 = x / primes_[i + 1]
-    // phi(x2, i) = 1 if primes_[i] >= x / primes_[i + 1]
-    // phi(x2, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(x, a) = 1 if prime(a) >= x
+    // x2 = x / prime(i + 1)
+    // phi(x2, i) = 1 if prime(i) >= x / prime(i + 1)
+    // phi(x2, i) = 1 if prime(i) >= sqrt(x)
     // phi(x2, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(x2, i) = a - pi(sqrt(x))
     //
@@ -99,7 +96,7 @@ public:
 
     for (int64_t i = c; i < pi_sqrtx; i++)
     {
-      int64_t x2 = fast_div(x, primes_[i + 1]);
+      int64_t x2 = fast_div(x, prime(i + 1));
 
       if (is_pix(x2, i))
         sum += (pi_[x2] - i + 1) * -SIGN;
@@ -115,8 +112,13 @@ public:
 private:
   using T = uint16_t;
   array<vector<T>, MAX_A> cache_;
-  vector<int64_t>& primes_;
+  Primes& primes_;
   PiTable& pi_;
+
+  int64_t prime(int64_t i) const
+  {
+    return primes_[i];
+  }
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
@@ -133,7 +135,7 @@ private:
   bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
-           x < isquare(primes_[a + 1]);
+           x < isquare(prime(a + 1));
   }
 
   bool is_cached(uint64_t x, uint64_t a) const
@@ -144,22 +146,16 @@ private:
   }
 };
 
-} // namespace
-
-namespace primecount {
-
 /// Returns a vector with phi(x, i - 1) values such that
 /// phi[i] = phi(x, i - 1) for 1 <= i <= a.
 /// phi(x, a) counts the numbers <= x that are not
 /// divisible by any of the first a primes.
 ///
-vector<int64_t> phi_vector(int64_t x,
-                           int64_t a,
-                           vector<int64_t>& primes,
-                           PiTable& pi, 
-                           int threads)
+template <typename Primes>
+vector<int64_t> generate_phi(int64_t x, int64_t a, Primes& primes, PiTable& pi)
 {
   int64_t size = a + 1;
+<<<<<<< HEAD:src/mpi/phi_vector.cpp
   int64_t c = PhiTiny::get_c(primes[a]);
   vector<int64_t> phi(size, x > 0);
 
@@ -176,6 +172,29 @@ vector<int64_t> phi_vector(int64_t x,
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache)
     for (int64_t i = c + 1; i <= a; i++)
       phi[i] = cache.phi<-1>(x / primes[i - 1], i - 2);
+=======
+
+  if (primes[a] > x)
+    a = pi[x];
+
+  vector<int64_t> phi;
+  phi.reserve(size);
+  phi.resize(a + 1, (x > 0) * -1);
+  phi.resize(size, x > 0);
+
+  if (size > 1)
+  {
+    phi[1] = x;
+    int64_t sqrtx = isqrt(x);
+    int64_t pi_sqrtx = a;
+    PhiCache<Primes> cache(primes, pi);
+
+    if (sqrtx < pi.size())
+      pi_sqrtx = min(pi[sqrtx] + 1, a);
+
+    for (int64_t i = 2; i <= pi_sqrtx; i++)
+      phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
+>>>>>>> NewLoadBalancer:include/generate_phi.hpp
 
     // calculate phi(x, a) using partial results
     for (int64_t i = c + 1; i <= a; i++)
@@ -186,3 +205,5 @@ vector<int64_t> phi_vector(int64_t x,
 }
 
 } // namespace
+
+#endif

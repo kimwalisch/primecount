@@ -40,6 +40,7 @@ enum OptionID
   OPTION_NTHPRIME,
   OPTION_NUMBER,
   OPTION_P2,
+  OPTION_PHI,
   OPTION_PI,
   OPTION_PRIMESIEVE,
   OPTION_RI,
@@ -58,14 +59,16 @@ enum OptionID
 struct CmdOptions
 {
   maxint_t x;
+  int64_t a;
   int option;
-  bool time;
   int threads;
+  bool time;
   CmdOptions() :
     x(-1),
+    a(-1),
     option(OPTION_PI),
-    time(false),
-    threads(get_num_threads())
+    threads(get_num_threads()),
+    time(false)
   { }
 };
 

@@ -84,8 +84,8 @@ public:
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t sum = 0;
 
-    if (sqrtx < pi_.size() && sqrtx < primes_[a])
-      pi_sqrtx = pi_[sqrtx];
+    if (sqrtx < pi_.size())
+      pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(x2, i) = 1
     // phi(x, a) = 1 if primes_[a] >= x
@@ -176,20 +176,20 @@ int64_t phi(int64_t x, int64_t a, int threads)
       sum = 1;
     else
     {
-      // use a large pi(x) lookup table for speed
+      // use large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
       PiTable pi(max(sqrtx, primes[a]));
       PhiCache cache(primes, pi);
 
-      int64_t pi_sqrtx = min(pi[sqrtx], a); 
-      sum = x - a + pi_sqrtx;
-
+      int64_t c = PhiTiny::get_c(sqrtx);
+      int64_t pi_sqrtx = min(pi[sqrtx], a);
       int64_t thread_threshold = ipow(10ll, 10);
       threads = ideal_num_threads(threads, x, thread_threshold);
 
-      #pragma omp parallel for schedule(dynamic, 16) \
-          num_threads(threads) firstprivate(cache) reduction(+: sum)
-      for (int64_t i = 0; i < pi_sqrtx; i++)
+      sum = phi_tiny(x, c) - a + pi_sqrtx;
+
+      #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache) reduction(+: sum)
+      for (int64_t i = c; i < pi_sqrtx; i++)
         sum += cache.phi<-1>(x / primes[i + 1], i);
     }
   }

@@ -36,12 +36,12 @@ namespace {
 /// March 2015.
 ///
 template <int MU, typename T, typename P>
-T S1_OpenMP_thread(T x,
-                   int64_t y,
-                   int64_t b,
-                   int64_t c,
-                   T square_free,
-                   vector<P>& primes)
+T S1_thread(T x,
+            int64_t y,
+            int64_t b,
+            int64_t c,
+            T square_free,
+            vector<P>& primes)
 {
   T s1 = 0;
 
@@ -50,7 +50,7 @@ T S1_OpenMP_thread(T x,
     T next = square_free * primes[b];
     if (next > y) break;
     s1 += MU * phi_tiny(x / next, c);
-    s1 += S1_OpenMP_thread<-MU>(x, y, b, c, next, primes);
+    s1 += S1_thread<-MU>(x, y, b, c, next, primes);
   }
 
   return s1;
@@ -61,10 +61,10 @@ T S1_OpenMP_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X S1_OpenMP_master(X x,
-                   Y y,
-                   int64_t c,
-                   int threads)
+X S1_OpenMP(X x,
+            Y y,
+            int64_t c,
+            int threads)
 {
   auto primes = generate_primes<Y>(y);
   int64_t pi_y = primes.size();
@@ -77,7 +77,7 @@ X S1_OpenMP_master(X x,
   for (int64_t b = c + 1; b < pi_y; b++)
   {
     s1 -= phi_tiny(x / primes[b], c);
-    s1 += S1_OpenMP_thread<1>(x, y, b, c, (X) primes[b], primes);
+    s1 += S1_thread<1>(x, y, b, c, (X) primes[b], primes);
   }
 
   return s1;
@@ -98,7 +98,7 @@ int64_t S1(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int64_t s1 = S1_OpenMP_master(x, y, c, threads);
+  int64_t s1 = S1_OpenMP(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;
@@ -121,9 +121,9 @@ int128_t S1(int128_t x,
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
-    s1 = S1_OpenMP_master(x, (uint32_t) y, c, threads);
+    s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
   else
-    s1 = S1_OpenMP_master(x, y, c, threads);
+    s1 = S1_OpenMP(x, y, c, threads);
 
   print("S1", s1, time);
   return s1;

@@ -135,6 +135,8 @@ Options:
          --Li_inverse       Approximate nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
+         --phi=<a>          phi(x, a) counts the numbers <= x that are
+                            not divisible by any of the first a primes
          --Ri               Approximate pi(x) using Riemann R
          --Ri_inverse       Approximate nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...

@@ -60,6 +60,7 @@ map<string, OptionID> optionMap =
   { "--nthprime", OPTION_NTHPRIME },
   { "--number", OPTION_NUMBER },
   { "--P2", OPTION_P2 },
+  { "--phi", OPTION_PHI },
   { "--pi", OPTION_PI },
   { "-p", OPTION_PRIMESIEVE },
   { "--primesieve", OPTION_PRIMESIEVE },
@@ -98,7 +99,7 @@ struct Option
 void optionStatus(Option& opt,
                   CmdOptions& opts)
 {
-  set_print_status(true);
+  set_print(true);
   opts.time = true;
 
   if (!opt.val.empty())
@@ -167,6 +168,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
       case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
+      case OPTION_PHI:     opts.a = opt.getValue<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;

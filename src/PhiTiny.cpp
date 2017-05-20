@@ -1,11 +1,13 @@
 ///
 /// @file  PhiTiny.cpp
-/// @brief phi_tiny(x, a) calculates the partial sieve function
-///        in constant time (using lookup tables) for small
-///        values of a <= 6 using the formula below:
+/// @brief phi(x, a) counts the numbers <= x that are not
+///        divisible by any of the first a primes.
+///        PhiTiny computes phi(x, a) in constant time
+///        for a <= 6 using lookup tables.
 ///
-///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
-///        with pp = 2 * 3 * ... * prime[a]
+///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
+///        pp = 2 * 3 * ... * prime[a]
+///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -14,7 +16,6 @@
 ///
 
 #include <PhiTiny.hpp>
-#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <array>
@@ -38,19 +39,18 @@ const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
-  phi_cache_[0].push_back(0);
+  phi_[0].push_back(0);
 
-  // initialize the phi_cache_ lookup tables
+  // initialize phi(x % pp, a) lookup tables
   for (int a = 1; a <= max_a(); a++)
   {
-    int size = prime_products[a];
-    std::vector<int16_t>& cache = phi_cache_[a];
-    cache.reserve(size);
+    int pp = prime_products[a];
+    phi_[a].resize(pp);
 
-    for (int x = 0; x < size; x++)
+    for (int x = 0; x < pp; x++)
     {
-      int64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
-      cache.push_back((int16_t) phi_xa);
+      auto phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
+      phi_[a][x] = (int16_t) phi_xa;
     }
   }
 }
