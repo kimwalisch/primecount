@@ -97,28 +97,4 @@ void S2Status::print(maxint_t n, maxint_t limit)
   }
 }
 
-void S2Status::print(maxint_t n, maxint_t limit, double rsd)
-{
-  double time = get_wtime();
-
-  if (is_print(time))
-  {
-    double percent = skewed_percent(n, limit);
-
-    time_ = time;
-    percent_ = percent;
-    ostringstream status;
-    ostringstream out;
-
-    int load_balance = (int) in_between(0, 100 - rsd + 0.5, 100);
-
-    status << "Status: " << fixed << setprecision(precision_) << percent << "%, ";
-    status << "Load balance: " << load_balance << "%";
-    size_t spaces = status.str().length() + 2;
-    string reset_line = "\r" + string(spaces,' ') + "\r";
-    out << reset_line << status.str();
-    cout << out.str() << flush;
-  }
-}
-
 } // namespace

@@ -80,11 +80,9 @@ if(WITH_MPI)
 
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
-                src/mpi/S2LoadBalancer.cpp
-                src/mpi/phi_vector.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi.cpp
-                src/mpi/deleglise-rivat/S2_hard_mpi_msg.cpp
-                src/mpi/deleglise-rivat/MpiLoadBalancer.cpp)
+                src/mpi/S2_hard_mpi.cpp
+                src/mpi/MpiLoadBalancer.cpp
+                src/mpi/MpiMsg.cpp)
 endif()
 
 # Check for OpenMP ###################################################
@@ -133,12 +131,12 @@ endif()
 if(RUN_LIBDIVIDE EQUAL 0)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     if(WITH_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi_libdivide.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
     endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     if(WITH_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/deleglise-rivat/S2_easy_mpi.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
     endif()
 endif()
 

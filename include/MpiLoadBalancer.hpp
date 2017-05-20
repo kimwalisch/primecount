@@ -14,7 +14,8 @@
 #define MPILOADBALANCER_HPP
 
 #include <mpi.h>
-#include <S2_hard_mpi_msg.hpp>
+#include <LoadBalancer.hpp>
+#include <MpiMsg.hpp>
 #include <S2Status.hpp>
 #include <int128_t.hpp>
 #include <stdint.h>
@@ -24,26 +25,23 @@ namespace primecount {
 class MpiLoadBalancer
 {
 public:
-  MpiLoadBalancer(maxint_t x, int64_t z, int64_t high, maxint_t s2_approx);
-  void update(S2_hard_mpi_msg* msg, maxint_t s2_hard);
+  MpiLoadBalancer(maxint_t x, int64_t y, int64_t z, maxint_t s2_approx);
+  void update(MpiMsg* msg, maxint_t s2_hard);
   bool finished() const;
 
 private:
-  bool is_increase(maxint_t s2_hard) const;
-  double remaining_secs(maxint_t s2_hard) const;
+  double get_next(Runtime& runtime) const;
+  double remaining_secs() const;
 
   int64_t z_;
   int64_t low_;
-  int64_t high_;
-  int64_t max_finished_;
+  int64_t max_low_;
+  int64_t segments_;
   int64_t segment_size_;
-  int64_t segments_per_thread_;
-  int64_t proc_distance_;
+  int64_t smallest_hard_leaf_;
+  maxint_t s2_hard_;
   maxint_t s2_approx_;
-  double rsd_;
-  double start_time_;
-  double init_seconds_;
-  double seconds_;
+  double time_;
   S2Status status_;
 };
 
