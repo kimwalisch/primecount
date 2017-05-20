@@ -46,7 +46,7 @@ int main()
 
       if (phi1 != phi2)
       {
-        cerr << "Error: phi_vector(x, i - 1) = " << phi1 << endl;
+        cerr << "Error: generate_phi(x, i - 1) = " << phi1 << endl;
         cerr << "Correct: phi(x, i - 1) = " << phi2 << endl;
         cerr << "x = " << x << endl;
         cerr << "i - 1 = " << i - 1 << endl;
