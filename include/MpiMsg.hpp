@@ -24,14 +24,7 @@ class MpiMsg
 {
 public:
   MpiMsg();
-  MpiMsg(int proc_id,
-         int thread_id,
-         int64_t low,
-         int64_t segments,
-         int64_t segment_size);
-
   ~MpiMsg();
-  void reset();
   void init_MPI_struct();
   void send(int proc_id);
   void send_finish();
@@ -51,17 +44,15 @@ public:
               int64_t segment_size);
 
   template <typename T>
-  MpiMsg(int proc_id,
-         int thread_id,
-         int64_t low,
-         int64_t segments,
-         int64_t segment_size,
-         T s2_hard,
-         double init_seconds,
-         double seconds)
+  void set(int proc_id,
+           int thread_id,
+           int64_t low,
+           int64_t segments,
+           int64_t segment_size,
+           T s2_hard,
+           double init_seconds,
+           double seconds)
   {
-    init_MPI_struct();
-
     msgData_.proc_id = proc_id;
     msgData_.thread_id = thread_id;
     msgData_.low = low;

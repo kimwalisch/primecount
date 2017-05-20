@@ -323,7 +323,7 @@ void S2_hard_OpenMP(T x,
   double alpha = get_alpha(x, y);
   PiTable pi(max_prime);
 
-  MpiMsg get_work;
+  MpiMsg msg;
   int master_proc_id = mpi_master_proc_id();
   int proc_id = mpi_proc_id();
 
@@ -334,30 +334,30 @@ void S2_hard_OpenMP(T x,
     int64_t low = 0;
     int64_t segments = 0;
     int64_t segment_size = 0;
-    bool finished = false;
+    bool finished;
     Runtime runtime;
 
     while (true)
     {
-      MpiMsg result(proc_id, i, low, segments, segment_size, 
-          s2_hard, runtime.init, runtime.secs);
-
       #pragma omp critical (mpi_sync)
       {
-        result.send(master_proc_id);
-        get_work.recv(proc_id);
-        low = get_work.low();
-        segments = get_work.segments();
-        segment_size = get_work.segment_size();
-        finished = get_work.finished();
+        // send result to master process
+        msg.set(proc_id, i, low, segments, segment_size, s2_hard, runtime.init, runtime.secs);
+        msg.send(master_proc_id);
+
+        // receive new work todo
+        msg.recv(proc_id);
+        low = msg.low();
+        segments = msg.segments();
+        segment_size = msg.segment_size();
+        finished = msg.finished();
       }
 
       if (finished)
         break;
 
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, 
-          alpha, factors, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factors, pi, primes, runtime);
       runtime.stop();
     }
   }

@@ -27,36 +27,7 @@ namespace primecount {
 MpiMsg::MpiMsg()
 {
   init_MPI_struct();
-  reset();
-}
 
-MpiMsg::MpiMsg(int proc_id,
-               int thread_id,
-               int64_t low,
-               int64_t segments,
-               int64_t segment_size)
-{
-  init_MPI_struct();
-
-  reset();
-  msgData_.proc_id = proc_id;
-  msgData_.thread_id = thread_id;
-  msgData_.low = low;
-  msgData_.segments = segments;
-  msgData_.segment_size = segment_size;
-}
-
-void MpiMsg::update(int64_t low,
-                    int64_t segments,
-                    int64_t segment_size)
-{
-  msgData_.low = low;
-  msgData_.segments = segments;
-  msgData_.segment_size = segment_size;
-}
-
-void MpiMsg::reset()
-{
   msgData_.proc_id = 0;
   msgData_.thread_id = 0;
   msgData_.low = 0;
@@ -67,6 +38,15 @@ void MpiMsg::reset()
   msgData_.init_seconds = 0;
   msgData_.seconds = 0;
   msgData_.finished = false;
+}
+
+void MpiMsg::update(int64_t low,
+                    int64_t segments,
+                    int64_t segment_size)
+{
+  msgData_.low = low;
+  msgData_.segments = segments;
+  msgData_.segment_size = segment_size;
 }
 
 MpiMsg::~MpiMsg()
