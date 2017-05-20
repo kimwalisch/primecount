@@ -47,8 +47,8 @@ LoadBalancer::LoadBalancer(maxint_t x,
   z_(z),
   sqrtz_(isqrt(z)),
   segments_(1),
+  s2_total_(0),
   s2_approx_(s2_approx),
-  S2_total_(0),
   time_(get_wtime()),
   status_(x)
 {
@@ -70,18 +70,18 @@ void LoadBalancer::init_size()
 
 maxint_t LoadBalancer::get_result() const
 {
-  return S2_total_;
+  return s2_total_;
 }
 
 bool LoadBalancer::get_work(int64_t* low,
                             int64_t* segments,
                             int64_t* segment_size,
-                            maxint_t S2,
+                            maxint_t s2,
                             Runtime& runtime)
 {
-  #pragma omp critical (S2_schedule)
+  #pragma omp critical (get_work)
   {
-    S2_total_ += S2;
+    s2_total_ += s2;
 
     update(low, segments, runtime);
 
@@ -92,7 +92,7 @@ bool LoadBalancer::get_work(int64_t* low,
     low_ += segments_ * segment_size_;
 
     if (is_print())
-      status_.print(S2_total_, s2_approx_);
+      status_.print(s2_total_, s2_approx_);
   }
 
   return *low <= z_;
@@ -151,7 +151,7 @@ double LoadBalancer::get_next(Runtime& runtime) const
 /// Remaining seconds till finished
 double LoadBalancer::remaining_secs() const
 {
-  double percent = status_.getPercent(low_, z_, S2_total_, s2_approx_);
+  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
   percent = in_between(20, percent, 100);
 
   double total_secs = get_wtime() - time_;
