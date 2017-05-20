@@ -12,22 +12,14 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
-#include <aligned_vector.hpp>
 #include <imath.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <string>
-#include <vector>
 
 namespace primecount {
-
-typedef aligned_vector<double> thread_timings_t;
-
-typedef aligned_vector<std::vector<int64_t>> phi_t;
-
-typedef aligned_vector<std::vector<int64_t>> mu_sum_t;
 
 template<class T>
 void unused_param(const T&)
@@ -169,8 +161,6 @@ void test();
 #ifdef HAVE_MPI
 
 class PiTable;
-
-std::vector<int64_t> phi_vector(int64_t x, int64_t a, std::vector<int64_t>& primes, PiTable& pi, int threads);
 
 bool is_mpi_master_proc();
 int mpi_num_procs();
