@@ -15,7 +15,7 @@
 
 // Maximum cache line size of current CPUs
 #ifndef CACHE_LINE_SIZE
-  #define CACHE_LINE_SIZE 128
+  #define CACHE_LINE_SIZE 512
 #endif
 
 namespace primecount {

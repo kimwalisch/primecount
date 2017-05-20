@@ -152,24 +152,6 @@ if(WITH_POPCNT)
     endif()
 endif()
 
-# CPU cache line size ################################################
-
-if(CACHE_LINE_SIZE)
-    message(STATUS "Use CPU cache line size: ${CACHE_LINE_SIZE} bytes")
-    add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
-else()
-    execute_process(COMMAND sh ${PROJECT_SOURCE_DIR}/scripts/cache_line_size.sh
-                    RESULT_VARIABLE CLZ_RES
-                    OUTPUT_VARIABLE CACHE_LINE_SIZE
-                    ERROR_QUIET)
-
-    if(CLZ_RES EQUAL 0)
-        string(STRIP ${CACHE_LINE_SIZE} CACHE_LINE_SIZE)
-        message(STATUS "Found CPU cache line size: ${CACHE_LINE_SIZE} bytes")
-        add_definitions(-DCACHE_LINE_SIZE=${CACHE_LINE_SIZE})
-    endif()
-endif()
-
 # Testing ############################################################
 
 if(BUILD_TESTS)
