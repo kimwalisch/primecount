@@ -69,14 +69,14 @@ void balanceLoad(int64_t* thread_distance,
 }
 
 template <typename T>
-T P2_OpenMP_thread(T x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t thread_distance,
-                   int64_t thread_num,
-                   int64_t low,
-                   int64_t& pix,
-                   int64_t& pix_count)
+T P2_thread(T x,
+            int64_t y,
+            int64_t z,
+            int64_t low,
+            int64_t thread_num,
+            int64_t thread_distance,
+            int64_t& pix,
+            int64_t& pix_count)
 {
   pix = 0;
   pix_count = 0;
@@ -90,21 +90,21 @@ T P2_OpenMP_thread(T x,
 
   int64_t next = it.next_prime();
   int64_t prime = rit.prev_prime();
-  T P2_thread = 0;
+  T p2 = 0;
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
   while (prime > start &&
          x / prime < z)
   {
     pix += count_primes(it, next, x / prime);
-    P2_thread += pix;
+    p2 += pix;
     pix_count++;
     prime = rit.prev_prime();
   }
 
   pix += count_primes(it, next, z - 1);
 
-  return P2_thread;
+  return p2;
 }
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
@@ -157,7 +157,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
-      p2 += P2_OpenMP_thread(x, y, z, thread_distance, i, low, pix[i], pix_counts[i]);
+      p2 += P2_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
