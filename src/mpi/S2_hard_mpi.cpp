@@ -369,7 +369,6 @@ template <typename T>
 T S2_hard_mpi_master(T x,
                      int64_t y,
                      int64_t z,
-                     int64_t c,
                      T s2_hard_approx)
 {
   T s2_hard = 0;
@@ -438,7 +437,7 @@ int64_t S2_hard_mpi(int64_t x,
   double time = get_wtime();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx);
+    s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
   else
   {
     FactorTable<uint16_t> factors(y, threads);
@@ -470,7 +469,7 @@ int128_t S2_hard_mpi(int128_t x,
   double time = get_wtime();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, y, z, c, s2_hard_approx);
+    s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
   else
   {
     // uses less memory
