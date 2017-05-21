@@ -334,7 +334,6 @@ void S2_hard_OpenMP(T x,
     int64_t low = 0;
     int64_t segments = 0;
     int64_t segment_size = 0;
-    bool finished;
     Runtime runtime;
 
     while (true)
@@ -350,10 +349,9 @@ void S2_hard_OpenMP(T x,
         low = msg.low();
         segments = msg.segments();
         segment_size = msg.segment_size();
-        finished = msg.finished();
       }
 
-      if (finished)
+      if (low > z)
         break;
 
       runtime.start();
@@ -375,6 +373,8 @@ T S2_hard_mpi_master(T x,
                      T s2_hard_approx)
 {
   T s2_hard = 0;
+
+  MpiMsg msg;
   MpiLoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   vector<unordered_map<int, bool>> threadMaps;
   threadMaps.resize(mpi_num_procs());
@@ -383,7 +383,6 @@ T S2_hard_mpi_master(T x,
   while (!loadBalancer.finished())
   {
     // wait for results from slave process
-    MpiMsg msg;
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
 
@@ -408,14 +407,12 @@ T S2_hard_mpi_master(T x,
   // nearly finished, wait for remaining results
   for (; threads > 0; threads--)
   {
-    MpiMsg msg;
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
+    msg.send_finish();
 
     if (is_print())
       status.print(s2_hard, s2_hard_approx);
-
-    msg.send_finish();
   }
 
   return s2_hard;

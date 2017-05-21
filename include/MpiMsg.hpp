@@ -37,7 +37,6 @@ public:
   int64_t segment_size() const;
   double init_seconds() const;
   double seconds() const;
-  bool finished() const;
 
   void update(int64_t low,
               int64_t segments,
@@ -61,7 +60,6 @@ public:
     *((T*) msgData_.s2_hard) = s2_hard;
     msgData_.init_seconds = init_seconds;
     msgData_.seconds = seconds;
-    msgData_.finished = false;
   }
 
   template <typename T>
@@ -81,7 +79,6 @@ private:
     int64_t s2_hard[2];
     double init_seconds;
     double seconds;
-    int finished;
   };
 
   MsgData msgData_;
