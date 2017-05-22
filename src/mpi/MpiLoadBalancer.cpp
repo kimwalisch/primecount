@@ -27,6 +27,7 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
                                  int64_t z,
                                  maxint_t s2_approx) :
   z_(z),
+  limit_(z + 1),
   low_(1),
   max_low_(1),
   segments_(1),
@@ -43,16 +44,12 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
   smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
 }
 
-bool MpiLoadBalancer::finished() const
-{
-  return low_ > z_;
-}
-
-void MpiLoadBalancer::update(MpiMsg* msg, maxint_t s2_hard)
+void MpiLoadBalancer::get_work(MpiMsg* msg,
+                               maxint_t s2_hard)
 {
   s2_hard_ += msg->s2_hard<maxint_t>();
 
-  if (msg->low() >= max_low_)
+  if (msg->low() > max_low_)
   {
     max_low_ = msg->low();
     segments_ = msg->segments();
@@ -80,13 +77,13 @@ void MpiLoadBalancer::update(MpiMsg* msg, maxint_t s2_hard)
       smallest_hard_leaf_ <= high)
   {
     segments_ = 1;
-    high = low_ + segments_ * segment_size_;
   }
 
   // udpate msg with new work todo
   msg->update(low_, segments_, segment_size_);
 
-  low_ = high;
+  low_ += segments_ * segment_size_;
+  low_ = min(low_, limit_);
 }
 
 double MpiLoadBalancer::get_next(Runtime& runtime) const

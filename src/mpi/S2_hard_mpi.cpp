@@ -32,7 +32,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <unordered_map>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -320,8 +319,8 @@ void S2_hard_OpenMP(T x,
 
   int64_t limit = z + 1;
   int64_t max_prime = z / isqrt(y);
-  double alpha = get_alpha(x, y);
   PiTable pi(max_prime);
+  double alpha = get_alpha(x, y);
 
   MpiMsg msg;
   int master_proc_id = mpi_master_proc_id();
@@ -359,6 +358,9 @@ void S2_hard_OpenMP(T x,
       runtime.stop();
     }
   }
+
+  msg.set_finished();
+  msg.send(master_proc_id);
 }
 
 /// S2_hard MPI master process.
@@ -372,43 +374,26 @@ T S2_hard_mpi_master(T x,
                      T s2_hard_approx)
 {
   T s2_hard = 0;
+  int procs = mpi_num_procs();
 
   MpiMsg msg;
   MpiLoadBalancer loadBalancer(x, y, z, s2_hard_approx);
-  vector<unordered_map<int, bool>> threadMaps;
-  threadMaps.resize(mpi_num_procs());
   S2Status status(x);
 
-  while (!loadBalancer.finished())
+  while (procs > 0)
   {
     // wait for results from slave process
     msg.recv_any();
     s2_hard += msg.s2_hard<T>();
 
     // update msg with new work
-    loadBalancer.update(&msg, s2_hard);
+    loadBalancer.get_work(&msg, s2_hard);
 
     // send new work to slave process
-    msg.send(msg.proc_id());
-
-    // remember process and thread id
-    threadMaps[msg.proc_id()][msg.thread_id()] = true;
-
-    if (is_print())
-      status.print(s2_hard, s2_hard_approx);
-  }
-
-  size_t threads = 0;
-
-  for (auto& map: threadMaps)
-    threads += map.size();
-
-  // nearly finished, wait for remaining results
-  for (; threads > 0; threads--)
-  {
-    msg.recv_any();
-    s2_hard += msg.s2_hard<T>();
-    msg.send_finish();
+    if (!msg.finished())
+      msg.send(msg.proc_id());
+    else
+      procs--;
 
     if (is_print())
       status.print(s2_hard, s2_hard_approx);

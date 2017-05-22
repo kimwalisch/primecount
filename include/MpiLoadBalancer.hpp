@@ -26,14 +26,14 @@ class MpiLoadBalancer
 {
 public:
   MpiLoadBalancer(maxint_t x, int64_t y, int64_t z, maxint_t s2_approx);
-  void update(MpiMsg* msg, maxint_t s2_hard);
-  bool finished() const;
+  void get_work(MpiMsg* msg, maxint_t s2_hard);
 
 private:
   double get_next(Runtime& runtime) const;
   double remaining_secs() const;
 
   int64_t z_;
+  int64_t limit_;
   int64_t low_;
   int64_t max_low_;
   int64_t segments_;

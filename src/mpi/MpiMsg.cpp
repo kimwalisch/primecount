@@ -38,6 +38,15 @@ MpiMsg::MpiMsg()
   msgData_.s2_hard[1] = 0;
   msgData_.init_seconds = 0;
   msgData_.seconds = 0;
+  msgData_.finished = 0;
+}
+
+void MpiMsg::set_finished()
+{
+  msgData_.finished = true;
+
+  msgData_.s2_hard[0] = 0;
+  msgData_.s2_hard[1] = 0;
 }
 
 void MpiMsg::update(int64_t low,
@@ -56,18 +65,19 @@ MpiMsg::~MpiMsg()
 
 void MpiMsg::init_MPI_struct()
 {
-  int items = 8;
-  int block_lengths[8] = { 1, 1, 1, 1, 1, 2, 1, 1 };
+  int items = 9;
+  int block_lengths[9] = { 1, 1, 1, 1, 1, 2, 1, 1, 1 };
 
-  MPI_Datatype types[8] = { MPI_INT,      // proc_id
-                            MPI_INT,      // thread_id
-                            MPI_INT64_T,  // low
-                            MPI_INT64_T,  // segments
-                            MPI_INT64_T,  // segment_size
-                            MPI_INT64_T,  // s2_hard
-                            MPI_DOUBLE,   // init_seconds
-                            MPI_DOUBLE }; // seconds
-  MPI_Aint offsets[8];
+  MPI_Datatype types[9] = { MPI_INT,     // proc_id
+                            MPI_INT,     // thread_id
+                            MPI_INT64_T, // low
+                            MPI_INT64_T, // segments
+                            MPI_INT64_T, // segment_size
+                            MPI_INT64_T, // s2_hard
+                            MPI_DOUBLE,  // init_seconds
+                            MPI_DOUBLE,  // seconds
+                            MPI_INT };   // finished
+  MPI_Aint offsets[9];
 
   offsets[0] = offsetof(MsgData, proc_id);
   offsets[1] = offsetof(MsgData, thread_id);
@@ -77,6 +87,7 @@ void MpiMsg::init_MPI_struct()
   offsets[5] = offsetof(MsgData, s2_hard);
   offsets[6] = offsetof(MsgData, init_seconds);
   offsets[7] = offsetof(MsgData, seconds);
+  offsets[8] = offsetof(MsgData, finished);
 
   MPI_Type_create_struct(items, block_lengths, offsets, types, &mpi_type_);
   MPI_Type_commit(&mpi_type_);
@@ -84,14 +95,6 @@ void MpiMsg::init_MPI_struct()
 
 void MpiMsg::send(int proc_id)
 {
-  MPI_Send(&msgData_, 1, mpi_type_, proc_id, proc_id, MPI_COMM_WORLD);
-}
-
-void MpiMsg::send_finish()
-{
-  msgData_.low = std::numeric_limits<int64_t>::max();
-  int proc_id = msgData_.proc_id;
-
   MPI_Send(&msgData_, 1, mpi_type_, proc_id, proc_id, MPI_COMM_WORLD);
 }
 
@@ -115,6 +118,11 @@ int MpiMsg::proc_id() const
 int MpiMsg::thread_id() const
 {
   return msgData_.thread_id;
+}
+
+int MpiMsg::finished() const
+{
+  return msgData_.finished;
 }
 
 int64_t MpiMsg::low() const

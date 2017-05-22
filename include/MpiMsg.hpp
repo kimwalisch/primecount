@@ -27,11 +27,12 @@ public:
   ~MpiMsg();
   void init_MPI_struct();
   void send(int proc_id);
-  void send_finish();
   void recv(int proc_id);
   void recv_any();
+  void set_finished();
   int proc_id() const;
   int thread_id() const;
+  int finished() const;
   int64_t low() const;
   int64_t segments() const;
   int64_t segment_size() const;
@@ -79,6 +80,7 @@ private:
     int64_t s2_hard[2];
     double init_seconds;
     double seconds;
+    int finished;
   };
 
   MsgData msgData_;
