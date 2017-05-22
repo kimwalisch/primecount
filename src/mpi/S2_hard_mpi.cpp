@@ -306,14 +306,18 @@ T S2_hard_thread(T x,
   return s2_hard;
 }
 
+/// S2_hard MPI slave process.
+/// Asks MPI master process for new work and reports
+/// partial results to MPI master process.
+///
 template <typename T, typename FactorTable, typename Primes>
-void S2_hard_OpenMP(T x,
-                    int64_t y,
-                    int64_t z,
-                    int64_t c,
-                    Primes& primes,
-                    FactorTable& factors,
-                    int threads)
+void S2_hard_slave(T x,
+                   int64_t y,
+                   int64_t z,
+                   int64_t c,
+                   Primes& primes,
+                   FactorTable& factors,
+                   int threads)
 {
   threads = ideal_num_threads(threads, z);
 
@@ -364,8 +368,7 @@ void S2_hard_OpenMP(T x,
 }
 
 /// S2_hard MPI master process.
-/// Distributes the computation of the hard speacial
-/// leaves onto cluster nodes.
+/// Assigns work to the MPI slave processes.
 ///
 template <typename T>
 T S2_hard_mpi_master(T x,
@@ -374,13 +377,13 @@ T S2_hard_mpi_master(T x,
                      T s2_hard_approx)
 {
   T s2_hard = 0;
-  int procs = mpi_num_procs();
+  int slaves = mpi_num_procs() - 1;
 
   MpiMsg msg;
   MpiLoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   S2Status status(x);
 
-  while (procs > 0)
+  while (slaves > 0)
   {
     // wait for results from slave process
     msg.recv_any();
@@ -393,7 +396,7 @@ T S2_hard_mpi_master(T x,
     if (!msg.finished())
       msg.send(msg.proc_id());
     else
-      procs--;
+      slaves--;
 
     if (is_print())
       status.print(s2_hard, s2_hard_approx);
@@ -429,7 +432,7 @@ int64_t S2_hard_mpi(int64_t x,
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<int32_t>(max_prime);
 
-    S2_hard_OpenMP((intfast64_t) x, y, z, c, primes, factors, threads);
+    S2_hard_slave((intfast64_t) x, y, z, c, primes, factors, threads);
   }
 
   print("S2_hard", s2_hard, time);
@@ -464,7 +467,7 @@ int128_t S2_hard_mpi(int128_t x,
       int64_t max_prime = z / isqrt(y);
       auto primes = generate_primes<uint32_t>(max_prime);
 
-      S2_hard_OpenMP((intfast128_t) x, y, z, c, primes, factors, threads);
+      S2_hard_slave((intfast128_t) x, y, z, c, primes, factors, threads);
     }
     else
     {
@@ -472,7 +475,7 @@ int128_t S2_hard_mpi(int128_t x,
       int64_t max_prime = z / isqrt(y);
       auto primes = generate_primes<int64_t>(max_prime);
 
-      S2_hard_OpenMP((intfast128_t) x, y, z, c, primes, factors, threads);
+      S2_hard_slave((intfast128_t) x, y, z, c, primes, factors, threads);
     }
   }
 
