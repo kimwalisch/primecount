@@ -10,7 +10,7 @@ for inter-process communication and which automatically distributes
 the computation onto cluster nodes. Breaking the next world record
 pi(10<sup>28</sup>) would take about 6 years on the fastest shared
 memory server currently available (Intel Xeon, 36 CPU cores). Hence
-it has become necessary to go distributed!
+it has become necessary to go distributed.
 
 Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500
 gigabytes of memory per cluster node! That is a lot, it might take a
