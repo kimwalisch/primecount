@@ -58,7 +58,7 @@ Benchmark pi(10<sup>23</sup>)
   <tr align="right">
     <td>1</td>
     <td>16</td>
-    <td>34,952.48</td>
+    <td>30,807.46</td>
     <td>1.00 x</td>
     <td>100.00%</td>
   </tr>
@@ -66,47 +66,47 @@ Benchmark pi(10<sup>23</sup>)
   <tr align="right">
     <td>5</td>
     <td>80</td>
-    <td>7,968.25</td>
-    <td>4.38 x</td>
-    <td>87.60%</td>
+    <td>6,645.98</td>
+    <td>4.63 x</td>
+    <td>92.60%</td>
   </tr>
   </tr>
   <tr align="right">
     <td>10</td>
     <td>160</td>
-    <td>3,914.31</td>
-    <td>8,93 x</td>
-    <td>89.30%</td>
+    <td>3,204.08</td>
+    <td>9.61 x</td>
+    <td>96.10%</td>
   </tr>
   </tr>
   <tr align="right">
     <td>20</td>
     <td>320</td>
-    <td>1,922.08</td>
-    <td>18.18 x</td>
-    <td>90.90%</td>
+    <td>1,590.61</td>
+    <td>19.36 x</td>
+    <td>96.80%</td>
   </tr>
   </tr>
   <tr align="right">
     <td>30</td>
     <td>480</td>
-    <td>1,292.46</td>
-    <td>27.04 x</td>
-    <td>90.13%</td>
+    <td>1,064.26</td>
+    <td>28.94 x</td>
+    <td>96.46%</td>
   </tr>
   <tr align="right">
     <td>40</td>
     <td>640</td>
-    <td>972.62</td>
-    <td>35.93 x</td>
-    <td>89.82%</td>
+    <td>827.73</td>
+    <td>37.21 x</td>
+    <td>93.02%</td>
   </tr>
   <tr align="right">
     <td>50</td>
     <td>800</td>
-    <td>784.99</td>
-    <td>44.52 x</td>
-    <td>89.04%</td>
+    <td>718.15</td>
+    <td>42.89 x</td>
+    <td>85.78%</td>
   </tr>
 </table>
 
@@ -114,7 +114,8 @@ The pi(10<sup>23</sup>) benchmark above was run on an
 [EC2 cluster](https://aws.amazon.com/ec2/) where each cluster node had
 2 CPUs of type Intel Xeon E5-2680 v2 (2.80GHz, 8 CPU cores, 16 threads).
 The efficiency drops slightly beyond 30 cluster nodes, the author
-thinks this is because the input 10<sup>23</sup> is too small.
+thinks this is because the input 10<sup>23</sup> is too small for such
+a large number of nodes.
 
 Command-line options
 --------------------
