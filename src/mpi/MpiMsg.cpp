@@ -44,9 +44,6 @@ MpiMsg::MpiMsg()
 void MpiMsg::set_finished()
 {
   msgData_.finished = true;
-
-  msgData_.s2_hard[0] = 0;
-  msgData_.s2_hard[1] = 0;
 }
 
 void MpiMsg::update(int64_t low,

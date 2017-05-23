@@ -387,19 +387,22 @@ T S2_hard_mpi_master(T x,
   {
     // wait for results from slave process
     msg.recv_any();
-    s2_hard += msg.s2_hard<T>();
 
-    // update msg with new work
-    loadBalancer.get_work(&msg, s2_hard);
-
-    // send new work to slave process
-    if (!msg.finished())
-      msg.send(msg.proc_id());
-    else
+    if (msg.finished())
       slaves--;
+    else
+    {
+      s2_hard += msg.s2_hard<T>();
 
-    if (is_print())
-      status.print(s2_hard, s2_hard_approx);
+      // update msg with new work
+      loadBalancer.get_work(&msg, s2_hard);
+
+      // send new work to slave process
+      msg.send(msg.proc_id());
+
+      if (is_print())
+        status.print(s2_hard, s2_hard_approx);
+    }
   }
 
   return s2_hard;
