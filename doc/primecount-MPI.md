@@ -36,8 +36,8 @@ Usage example
 -------------
 
 ```sh
-# Distribute pi(10^23) computation onto 100 cluster nodes
-mpiexec -n 100 -bynode -hostfile my_hosts ./primecount 1e23 --status
+# Distribute pi(10^23) computation onto 30 cluster nodes
+mpiexec -n 30 -bynode -hostfile my_hosts ./primecount 1e23 --status
 ```
 
 Note that you should create only one process per cluster node as
