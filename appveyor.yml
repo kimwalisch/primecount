@@ -19,6 +19,6 @@ build_script:
   - cmake --build . --config Release
 
 test_script:
-  - cd Release
   - ctest -C Release
+  - cd Release
   - primecount.exe --test
