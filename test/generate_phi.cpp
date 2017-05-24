@@ -24,7 +24,7 @@ using namespace primecount;
 
 int main()
 {
-  for (int i = 0; i < 100; i++)
+  for (int j = 0; j < 100; j++)
   {
     random_device rd;
     mt19937 gen(rd());
@@ -39,7 +39,7 @@ int main()
     auto primes = generate_primes<int64_t>(y);
     auto phi_vect = generate_phi(x, a, primes, pi);
 
-    for (int64_t i = 1; i < phi_vect.size(); i++)
+    for (size_t i = 1; i < phi_vect.size(); i++)
     {
       int64_t phi1 = phi_vect[i];
       int64_t phi2 = phi(x, i - 1);
