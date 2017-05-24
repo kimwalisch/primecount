@@ -29,8 +29,9 @@ script:
   - cppcheck src include --error-exitcode=1
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake .. -DBUILD_TESTS=ON
   - make -j4
+  - make test
   - ldd primecount
   - ./primecount --test
   - valgrind --error-exitcode=1 ./primecount 1e14
