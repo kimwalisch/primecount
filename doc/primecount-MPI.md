@@ -113,9 +113,9 @@ Benchmark pi(10<sup>23</sup>)
 The pi(10<sup>23</sup>) benchmark above was run on an
 [EC2 cluster](https://aws.amazon.com/ec2/) where each cluster node had
 2 CPUs of type Intel Xeon E5-2680 v2 (2.80GHz, 8 CPU cores, 16 threads).
-The efficiency drops slightly beyond 30 cluster nodes, the author
-thinks this is because the input 10<sup>23</sup> is too small for such
-a large number of nodes.
+The efficiency drops beyond 40 cluster nodes, that's because the
+input 10<sup>23</sup> is too small for such a large number of nodes.
+For 10<sup>24</sup> and 50 cluster nodes the efficiency is 93,65%.
 
 Command-line options
 --------------------
