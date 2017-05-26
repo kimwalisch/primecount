@@ -20,12 +20,12 @@
 #include <primecount-internal.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
+#include <BinaryIndexedTree.hpp>
 #include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
-#include <tos_counters.hpp>
 #include <S1.hpp>
 #include "S2.hpp"
 
@@ -40,29 +40,27 @@ namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
 /// For each element that is unmarked the first time update
-/// the special counters tree data structure.
+/// the binary indexed tree data structure.
 ///
-template <typename T>
 void cross_off(int64_t prime,
                int64_t low,
                int64_t high,
-               int64_t& next_multiple,
+               int64_t& multiple,
                BitSieve& sieve,
-               T& counters)
+               BinaryIndexedTree& tree)
 {
-  int64_t segment_size = sieve.size();
-  int64_t m = next_multiple;
+  int64_t m = multiple;
 
   for (; m < high; m += prime * 2)
   {
     if (sieve[m - low])
     {
       sieve.unset(m - low);
-      cnt_update(counters, m - low, segment_size);
+      tree.update(m - low);
     }
   }
 
-  next_multiple = m;
+  multiple = m;
 }
 
 /// Calculate the contribution of the hard special leaves
@@ -89,9 +87,9 @@ int64_t S2_hard(int64_t x,
   double time = get_wtime();
 
   BitSieve sieve(segment_size);
-  vector<int32_t> counters;
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
+  BinaryIndexedTree tree;
 
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -103,8 +101,8 @@ int64_t S2_hard(int64_t x,
     // pre-sieve the multiples of the first c primes
     sieve.pre_sieve(c, low);
 
-    // initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
+    // initialize binary indexed tree from sieve
+    tree.init(sieve);
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m, with mu[m] != 0 and primes[b] < lpf[m]
@@ -126,14 +124,14 @@ int64_t S2_hard(int64_t x,
         if (prime < factors.lpf(m))
         {
           int64_t n = prime * factors.get_number(m);
-          int64_t count = get_sum(counters, (x / n) - low);
+          int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
           S2_result -= factors.mu(m) * phi_xn;
         }
       }
 
-      phi[b] += get_sum(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      phi[b] += tree.count(low, high - 1);
+      cross_off(prime, low, high, next[b], sieve, tree);
     }
 
     // For pi_sqrty <= b <= pi_sqrtz
@@ -152,13 +150,13 @@ int64_t S2_hard(int64_t x,
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
-        int64_t count = get_sum(counters, xn - low);
+        int64_t count = tree.count(low, xn);
         int64_t phi_xn = phi[b] + count;
         S2_result += phi_xn;
       }
 
-      phi[b] += get_sum(counters, (high - 1) - low);
-      cross_off(prime, low, high, next[b], sieve, counters);
+      phi[b] += tree.count(low, high - 1);
+      cross_off(prime, low, high, next[b], sieve, tree);
     }
 
     next_segment:;

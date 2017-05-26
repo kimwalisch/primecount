@@ -12,10 +12,10 @@
 /// file in the top level directory.
 ///
 
-#include <PiTable.hpp>
-#include <S2.hpp>
-#include <FactorTable.hpp>
 #include <primecount-internal.hpp>
+#include <PiTable.hpp>
+#include <FactorTable.hpp>
+#include <BinaryIndexedTree.hpp>
 #include <BitSieve.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
@@ -27,7 +27,7 @@
 #include <MpiMsg.hpp>
 #include <imath.hpp>
 #include <S2Status.hpp>
-#include <tos_counters.hpp>
+#include <S2.hpp>
 #include <Wheel.hpp>
 
 #include <stdint.h>
@@ -68,17 +68,15 @@ int64_t cross_off(BitSieve& sieve,
 
 /// Cross-off the multiples of prime in the sieve array.
 /// For each element that is unmarked the first time update
-/// the special counters tree data structure.
+/// the binary indexed tree data structure.
 ///
-template <typename T>
 void cross_off(BitSieve& sieve,
                int64_t low,
                int64_t high,
                int64_t prime,
                WheelItem& w,
-               T& counters)
+               BinaryIndexedTree& tree)
 {
-  int64_t segment_size = sieve.size();
   int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
@@ -87,7 +85,7 @@ void cross_off(BitSieve& sieve,
     if (sieve[m - low])
     {
       sieve.unset(m - low);
-      cnt_update(counters, m - low, segment_size);
+      tree.update(m - low);
     }
   }
 
@@ -133,9 +131,9 @@ T S2_hard_thread(T x,
     return s2_hard;
 
   runtime.init_start();
+  BinaryIndexedTree tree;
   BitSieve sieve(segment_size);
   Wheel wheel(primes, max_b + 1, low);
-  vector<int32_t> counters;
   auto phi = generate_phi(low - 1, max_b, primes, pi);
   runtime.init_stop();
 
@@ -228,12 +226,12 @@ T S2_hard_thread(T x,
     else
     {
       // Calculate the contribution of the hard special leaves using
-      // Tomás Oliveira's O(log(N)) special tree data structure
+      // Tomás Oliveira's binary indexed tree data structure
       // for counting the number of unsieved elements. This algorithm
       // runs fastest if there are many special leaves per segment.
 
-      // Initialize special tree data structure from sieve
-      cnt_finit(sieve, counters, segment_size);
+      // initialize binary indexed tree from sieve
+      tree.init(sieve);
 
       // For c + 1 <= b <= pi_sqrty
       // Find all special leaves: n = primes[b] * m
@@ -258,15 +256,15 @@ T S2_hard_thread(T x,
           {
             int64_t fm = factors.get_number(m);
             int64_t xn = (int64_t) fast_div(x2, fm);
-            int64_t count = get_sum(counters, xn - low);
+            int64_t count = tree.count(low, xn);
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
             s2_hard -= mu_m * phi_xn;
           }
         }
 
-        phi[b] += get_sum(counters, (high - 1) - low);
-        cross_off(sieve, low, high, prime, wheel[b], counters);
+        phi[b] += tree.count(low, high - 1);
+        cross_off(sieve, low, high, prime, wheel[b], tree);
       }
 
       // For pi_sqrty <= b <= pi_sqrtz
@@ -287,13 +285,13 @@ T S2_hard_thread(T x,
         for (; primes[l] > min_hard; l--)
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
-          int64_t count = get_sum(counters, xn - low);
+          int64_t count = tree.count(low, xn);
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
         }
 
-        phi[b] += get_sum(counters, (high - 1) - low);
-        cross_off(sieve, low, high, prime, wheel[b], counters);
+        phi[b] += tree.count(low, high - 1);
+        cross_off(sieve, low, high, prime, wheel[b], tree);
       }
     }
 

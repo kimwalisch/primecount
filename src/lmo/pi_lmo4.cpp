@@ -15,8 +15,8 @@
 #include <imath.hpp>
 #include <generate.hpp>
 #include <PhiTiny.hpp>
+#include <BinaryIndexedTree.hpp>
 #include <S1.hpp>
-#include <tos_counters.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -29,17 +29,16 @@ namespace {
 
 /// Cross-off the multiples of prime in the sieve array.
 /// For each element that is unmarked the first time update
-/// the special counters tree data structure.
+/// the binary indexed tree data structure.
 ///
-template <typename T1, typename T2>
+template <typename S, typename T>
 void cross_off(int64_t prime,
                int64_t low,
                int64_t high,
                int64_t& next_multiple,
-               T1& sieve,
-               T2& counters)
+               S& sieve,
+               T& tree)
 {
-  int64_t segment_size = sieve.size();
   int64_t m = next_multiple;
 
   for (; m < high; m += prime * 2)
@@ -47,7 +46,7 @@ void cross_off(int64_t prime,
     if (sieve[m - low])
     {
       sieve[m - low] = 0;
-      cnt_update(counters, m - low, segment_size);
+      tree.update(m - low);
     }
   }
 
@@ -68,9 +67,9 @@ int64_t S2(int64_t x,
   int64_t S2_result = 0;
 
   vector<char> sieve(segment_size);
-  vector<int32_t> counters;
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
+  BinaryIndexedTree tree;
 
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
@@ -90,8 +89,8 @@ int64_t S2(int64_t x,
       next[b] = k;
     }
 
-    // initialize special tree data structure from sieve
-    cnt_finit(sieve, counters, segment_size);
+    // initialize binary indexed tree from sieve
+    tree.init(sieve);
 
     for (int64_t b = c + 1; b < pi_y; b++)
     {
@@ -115,17 +114,17 @@ int64_t S2(int64_t x,
           // removed the multiples of the first b - 1 primes
           //
           int64_t n = prime * m;
-          int64_t count = get_sum(counters, (x / n) - low);
+          int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
           S2_result -= mu[m] * phi_xn;
         }
       }
 
       // save the number of unsieved elements
-      phi[b] += get_sum(counters, (high - 1) - low);
+      phi[b] += tree.count(low, high - 1);
 
       // remove the multiples of the b-th prime
-      cross_off(prime, low, high, next[b], sieve, counters);
+      cross_off(prime, low, high, next[b], sieve, tree);
     }
   }
 
