@@ -12,7 +12,7 @@
   * MpiLoadBalancer.cpp: New MPI load balancer.
   * Li.cpp: Riemann R and inverse Riemann R implementations.
   * phi(x, a) now scales > 8 threads.
-  * tos_counters.hpp: Improved binary indexed tree.
+  * BinaryIndexedTree.hpp: Do not store multiples of 2.
   * CMakeLists.txt: Faster C++ compilation.
   * S2Status.cpp: Reduce --status overhead.
 
