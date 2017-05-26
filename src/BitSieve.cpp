@@ -43,11 +43,6 @@ const array<uint64_t, 10> masks =
   0x0000400000800001ull  // 23
 };
 
-uint64_t unset_mask(uint64_t mask, uint64_t shift)
-{
-  return ~(mask << shift);
-}
-
 uint64_t fast_modulo(uint64_t x, uint64_t y)
 {
   assert(x < y * 2);
@@ -96,7 +91,8 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
     return;
 
   // unset multiples of 2
-  sieve_[0] = unset_mask(masks[1], low % 2);
+  uint64_t shift = low % 2;
+  sieve_[0] = ~(masks[1] << shift);
 
   uint64_t last = 1;
   uint64_t sieved = last;
@@ -119,17 +115,17 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
       last += copy_words;
     }
 
-    // calculate first multiple >= low of prime
+    // first multiple (of prime) >= low
     uint64_t multiple = ceil_div(low, prime) * prime;
-    uint64_t shift = multiple - low;
-    uint64_t next_shift = prime - 64 % prime;
+    uint64_t p64 = prime - 64 % prime;
     uint64_t mask = masks[i];
+    shift = multiple - low;
 
     // pre-sieve multiples of the i-th prime
     for (uint64_t j = 0; j < last; j++)
     {
-      sieve_[j] &= unset_mask(mask, shift);
-      shift = fast_modulo(shift + next_shift, prime);
+      sieve_[j] &= ~(mask << shift);
+      shift = fast_modulo(shift + p64, prime);
     }
 
     sieved = last;
