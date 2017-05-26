@@ -68,7 +68,7 @@ int64_t S2(int64_t x,
   int64_t S2_result = 0;
 
   vector<char> sieve(segment_size);
-  vector<int32_t> counters(segment_size);
+  vector<int32_t> counters;
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -115,14 +115,14 @@ int64_t S2(int64_t x,
           // removed the multiples of the first b - 1 primes
           //
           int64_t n = prime * m;
-          int64_t count = cnt_query(counters, (x / n) - low);
+          int64_t count = get_sum(counters, (x / n) - low);
           int64_t phi_xn = phi[b] + count;
           S2_result -= mu[m] * phi_xn;
         }
       }
 
       // save the number of unsieved elements
-      phi[b] += cnt_query(counters, (high - 1) - low);
+      phi[b] += get_sum(counters, (high - 1) - low);
 
       // remove the multiples of the b-th prime
       cross_off(prime, low, high, next[b], sieve, counters);

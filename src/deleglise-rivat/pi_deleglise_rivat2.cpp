@@ -89,7 +89,7 @@ int64_t S2_hard(int64_t x,
   double time = get_wtime();
 
   BitSieve sieve(segment_size);
-  vector<int32_t> counters(segment_size);
+  vector<int32_t> counters;
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
 
@@ -126,13 +126,13 @@ int64_t S2_hard(int64_t x,
         if (prime < factors.lpf(m))
         {
           int64_t n = prime * factors.get_number(m);
-          int64_t count = cnt_query(counters, (x / n) - low);
+          int64_t count = get_sum(counters, (x / n) - low);
           int64_t phi_xn = phi[b] + count;
           S2_result -= factors.mu(m) * phi_xn;
         }
       }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
+      phi[b] += get_sum(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 
@@ -152,12 +152,12 @@ int64_t S2_hard(int64_t x,
       {
         int64_t n = prime * primes[l];
         int64_t xn = x / n;
-        int64_t count = cnt_query(counters, xn - low);
+        int64_t count = get_sum(counters, xn - low);
         int64_t phi_xn = phi[b] + count;
         S2_result += phi_xn;
       }
 
-      phi[b] += cnt_query(counters, (high - 1) - low);
+      phi[b] += get_sum(counters, (high - 1) - low);
       cross_off(prime, low, high, next[b], sieve, counters);
     }
 

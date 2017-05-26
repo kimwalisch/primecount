@@ -229,9 +229,6 @@ T S2_hard_thread(T x,
       // for counting the number of unsieved elements. This algorithm
       // runs fastest if there are many special leaves per segment.
 
-      // allocate memory upon first usage
-      counters.resize(segment_size);
-
       // Initialize special tree data structure from sieve
       cnt_finit(sieve, counters, segment_size);
 
@@ -258,14 +255,14 @@ T S2_hard_thread(T x,
           {
             int64_t fm = factors.get_number(m);
             int64_t xn = (int64_t) fast_div(x2, fm);
-            int64_t count = cnt_query(counters, xn - low);
+            int64_t count = get_sum(counters, xn - low);
             int64_t phi_xn = phi[b] + count;
             int64_t mu_m = factors.mu(m);
             s2_hard -= mu_m * phi_xn;
           }
         }
 
-        phi[b] += cnt_query(counters, (high - 1) - low);
+        phi[b] += get_sum(counters, (high - 1) - low);
         cross_off(sieve, low, high, prime, wheel[b], counters);
       }
 
@@ -287,12 +284,12 @@ T S2_hard_thread(T x,
         for (; primes[l] > min_hard; l--)
         {
           int64_t xn = (int64_t) fast_div(x2, primes[l]);
-          int64_t count = cnt_query(counters, xn - low);
+          int64_t count = get_sum(counters, xn - low);
           int64_t phi_xn = phi[b] + count;
           s2_hard += phi_xn;
         }
 
-        phi[b] += cnt_query(counters, (high - 1) - low);
+        phi[b] += get_sum(counters, (high - 1) - low);
         cross_off(sieve, low, high, prime, wheel[b], counters);
       }
     }
