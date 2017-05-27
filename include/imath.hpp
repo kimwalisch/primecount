@@ -40,12 +40,6 @@ inline T number_of_bits(T)
 }
 
 template <typename T>
-inline bool is_power_of_2(T x)
-{
-  return (x != 0 && (x & (x - 1)) == 0);
-}
-
-template <typename T>
 inline T next_power_of_2(T x)
 {
   if (x == 0)
