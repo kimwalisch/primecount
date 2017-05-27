@@ -9,6 +9,8 @@
 ///
 
 #include <isqrt.hpp>
+#include <imath.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -65,6 +67,43 @@ int main()
   res1 = isqrt(n);
   cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 4294967295ull);
+
+#ifdef HAVE_INT128_T
+
+  for (n = 0; n < 100000; n++)
+  {
+    res1 = isqrt((int128_t) n);
+    res2 = sqrt((double) n);
+    cout << "isqrt(" << n << ") = " << res1;
+    check(res1 == (uint64_t) res2);
+  }
+
+  int128_t x = ((int128_t) 1) << 100;
+  int128_t res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 1ull << 50);
+
+  x -= 1;
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 1125899906842623ull);
+
+  x = ipow((int128_t) 10, 31);
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 3162277660168379ull);
+
+  x = ipow((int128_t) 10, 30);
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 1000000000000000ull);
+
+  x -= 1;
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 999999999999999ull);
+
+#endif
 
   cout << endl;
   cout << "All tests passed successfully!" << endl;
