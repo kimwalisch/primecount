@@ -32,7 +32,9 @@ namespace {
 class BinaryIndexedTree
 {
 public:
-  BinaryIndexedTree() { }
+  BinaryIndexedTree() :
+    size_(0)
+  { }
 
   /// Initialize binary indexed tree from sieve array
   template <typename T>
