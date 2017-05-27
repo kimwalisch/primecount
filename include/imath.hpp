@@ -122,17 +122,6 @@ inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
   return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
 
-/// Count the number of primes <= x using binary search.
-/// @pre primes[1] = 2, primes[3] = 3, ...
-/// @pre x <= primes.back()
-///
-template <typename T1, typename T2, typename T3>
-inline T3 pi_bsearch(const std::vector<T1>& primes, T2 len, T3 x)
-{
-  assert(primes[0] == 0);
-  return (T3) (std::upper_bound(primes.begin() + 1, primes.begin() + len + 1, x) - (primes.begin() + 1));
-}
-
 template <typename T1, typename T2, typename T3>
 inline T2 in_between(T1 min, T2 x, T3 max)
 {
