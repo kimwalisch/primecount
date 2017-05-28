@@ -72,17 +72,44 @@ int main()
   cout << "iroot<2>(" << n << ") = " << res1;
   check(res1 == 4294967295ull);
 
+  n = 18446744073709551615ull;
   res1 = iroot<3>(n);
   cout << "iroot<3>(" << n << ") = " << res1;
   check(res1 == 2642245);
 
+  for (uint64_t i = 2000000; i <= 2100000; i++)
+  {
+    n = ipow(i, 3);
+    res1 = iroot<3>(n);
+    cout << "iroot<3>(" << n << ") = " << res1;
+    check(res1 == i);
+
+    res1 = iroot<3>(n - 1);
+    cout << "iroot<3>(" << n - 1 << ") = " << res1;
+    check(res1 == i - 1);
+  }
+
+  n = 18446744073709551615ull;
   res1 = iroot<4>(n);
   cout << "iroot<4>(" << n << ") = " << res1;
   check(res1 == 65535);
 
+  n = 18446744073709551615ull;
   res1 = iroot<6>(n);
   cout << "iroot<6>(" << n << ") = " << res1;
   check(res1 == 1625);
+
+  for (uint64_t i = 1; i <= 1625; i++)
+  {
+    n = ipow(i, 6);
+    res1 = iroot<6>(n);
+    cout << "iroot<6>(" << n << ") = " << res1;
+    check(res1 == i);
+
+    res1 = iroot<6>(n - 1);
+    cout << "iroot<6>(" << n - 1 << ") = " << res1;
+    check(res1 == i - 1);
+  }
 
 #ifdef HAVE_INT128_T
 
