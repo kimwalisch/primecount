@@ -66,7 +66,7 @@ inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
 
-  static const T sqrt_max = ct_sqrt(prt::numeric_limits<T>::max());
+  constexpr T sqrt_max = ct_sqrt(prt::numeric_limits<T>::max());
   r = std::min(r, sqrt_max);
 
   while (r * r > x)
