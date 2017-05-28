@@ -1,6 +1,6 @@
 ///
 /// @file  imath.hpp
-/// @brief Integer math functions used in primecount
+/// @brief Integer math functions
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -77,30 +77,20 @@ inline T ipow(T x, int n)
   return r;
 }
 
-/// Check if ipow(x, n) <= limit
-template <typename T>
-inline bool ipow_less_equal(T x, int n, T limit)
-{
-  if (limit <= 0)
-    return false;
-
-  for (T r = 1; n > 0; n--, r *= x)
-    if (r > limit / x)
-      return false;
-
-  return true;
-}
-
 /// Integer nth root
 template <int N, typename T>
 inline T iroot(T x)
 {
+  if (N == 0)
+    return 0;
+
   T r = (T) std::pow((double) x, 1.0 / N);
 
-  while (ipow(r, N) > x)
-    r--;
-  while (ipow_less_equal(r + 1, N, x))
-    r++;
+  // fix root too large
+  for (; r > 0 && ipow(r, N - 1) > x / r; r--);
+
+  // fix root too small
+  for (; ipow(r + 1, N - 1) <= x / (r + 1); r++);
 
   return r;
 }

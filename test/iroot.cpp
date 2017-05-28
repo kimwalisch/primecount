@@ -37,7 +37,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<2>(n);
-      res2 = pow((long double) n, 1.0L / 2);
+      res2 = sqrt((long double) n);
       cout << "iroot<2>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -45,7 +45,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<3>(n);
-      res2 = pow((long double) n, 1.0L / 3);
+      res2 = cbrt((long double) n);
       cout << "iroot<3>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -67,23 +67,95 @@ int main()
     }
   }
 
-#ifdef HAVE_INT128_T
-
-  res1 = iroot<2>((int128_t) 18446744073709551615ull);
+  n = 18446744073709551615ull;
+  res1 = iroot<2>(n);
   cout << "iroot<2>(" << n << ") = " << res1;
   check(res1 == 4294967295ull);
 
-  res1 = iroot<3>((int128_t) 18446744073709551615ull);
+  res1 = iroot<3>(n);
   cout << "iroot<3>(" << n << ") = " << res1;
   check(res1 == 2642245);
 
-  res1 = iroot<4>((int128_t) 18446744073709551615ull);
+  res1 = iroot<4>(n);
   cout << "iroot<4>(" << n << ") = " << res1;
   check(res1 == 65535);
 
-  res1 = iroot<6>((int128_t) 18446744073709551615ull);
+  res1 = iroot<6>(n);
   cout << "iroot<6>(" << n << ") = " << res1;
   check(res1 == 1625);
+
+#ifdef HAVE_INT128_T
+
+  int128_t m;
+
+  if (sizeof(long double) > 8)
+  {
+    for (m = 0; m < 100000; m++)
+    {
+      res1 = iroot<2>(m);
+      res2 = sqrt((long double) m);
+      cout << "iroot<2>(" << m << ") = " << res1;
+      check(res1 == (uint64_t) res2);
+    }
+
+    for (m = 0; m < 100000; m++)
+    {
+      res1 = iroot<3>(m);
+      res2 = cbrt((long double) m);
+      cout << "iroot<3>(" << m << ") = " << res1;
+      check(res1 == (uint64_t) res2);
+    }
+
+    for (m = 0; m < 100000; m++)
+    {
+      res1 = iroot<4>(m);
+      res2 = pow((long double) m, 1.0L / 4);
+      cout << "iroot<4>(" << m << ") = " << res1;
+      check(res1 == (uint64_t) res2);
+    }
+
+    for (m = 0; m < 100000; m++)
+    {
+      res1 = iroot<6>(m);
+      res2 = pow((long double) m, 1.0L / 6);
+      cout << "iroot<6>(" << m << ") = " << res1;
+      check(res1 == (uint64_t) res2);
+    }
+  }
+
+  m = ipow((int128_t) 10, 30);
+  res1 = iroot<2>(m);
+  cout << "iroot<2>(" << m << ") = " << res1;
+  check(res1 == ipow(10ll, 15));
+
+  res1 = iroot<2>(m - 1);
+  cout << "iroot<2>(" << m - 1 << ") = " << res1;
+  check(res1 == ipow(10ll, 15) - 1);
+
+  res1 = iroot<3>(m);
+  cout << "iroot<3>(" << m << ") = " << res1;
+  check(res1 == ipow(10ll, 10));
+
+  res1 = iroot<3>(m - 1);
+  cout << "iroot<3>(" << m - 1 << ") = " << res1;
+  check(res1 == ipow(10ll, 10) - 1);
+
+  res1 = iroot<6>(m);
+  cout << "iroot<6>(" << m << ") = " << res1;
+  check(res1 == ipow(10, 5));
+
+  res1 = iroot<6>(m - 1);
+  cout << "iroot<6>(" << m - 1 << ") = " << res1;
+  check(res1 == ipow(10, 5) - 1);
+
+  m = ipow((int128_t) 10, 28);
+  res1 = iroot<4>(m);
+  cout << "iroot<4>(" << m << ") = " << res1;
+  check(res1 == ipow(10ll, 7));
+
+  res1 = iroot<4>(m - 1);
+  cout << "iroot<4>(" << m - 1 << ") = " << res1;
+  check(res1 == ipow(10ll, 7) - 1);
 
 #endif
 
