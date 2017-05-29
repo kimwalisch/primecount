@@ -24,7 +24,8 @@ namespace primecount {
 /// 1) Same types
 /// 2) Different integral types which satisfy:
 ///      sizeof(A) > sizeof(B) ||
-///     (sizeof(A) == sizeof(B) && is_unsigned<A> && is_signed<B>)
+///     (sizeof(A) == sizeof(B) &&
+///      is_unsigned<A> && is_signed<B>)
 ///
 template <typename A, typename B>
 struct is_comparable
@@ -35,8 +36,8 @@ struct is_comparable
             prt::is_integral<B>::value) && (
             sizeof(A) > sizeof(B) || (
             sizeof(A) == sizeof(B) &&
-            std::is_unsigned<A>::value &&
-            std::is_signed<B>::value)))
+            prt::is_unsigned<A>::value &&
+            prt::is_signed<B>::value)))
   };
 };
 

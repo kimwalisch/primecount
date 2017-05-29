@@ -187,6 +187,20 @@ struct is_signed
   };
 };
 
+template <typename T>
+struct is_unsigned
+{
+  enum
+  {
+#if !defined(HAVE_INT128_T)
+    value = std::is_unsigned<T>::value
+#else
+    value = std::is_unsigned<T>::value ||
+            std::is_same<T, uint128_t>::value
+#endif
+  };
+};
+
 } // namespace prt
 } // namespace primecount
 
