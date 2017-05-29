@@ -16,227 +16,54 @@
 #define FAST_DIV_HPP
 
 #include <int128_t.hpp>
+
 #include <cassert>
 #include <limits>
+#include <type_traits>
 
 namespace primecount {
 
-// x = 64-bit and y = 32-bit
-
-inline int64_t fast_div(int64_t x, int32_t y)
+template <typename T>
+struct fastdiv
 {
-  assert(x >= 0);
-  assert(y >= 0);
+  typedef typename std::conditional<sizeof(T) / 2 <= sizeof(uint8_t), uint8_t,
+          typename std::conditional<sizeof(T) / 2 == sizeof(uint16_t), uint16_t,
+          typename std::conditional<sizeof(T) / 2 == sizeof(uint32_t), uint32_t,
+          uint64_t>::type>::type>::type type;
+};
 
-  if (x <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x / (uint32_t) y;
+template <typename T>
+T fast_div(T x, T y)
+{
+  static_assert(prt::is_integral<T>::value,
+                "fast_div(x, y): type must be integral");
+
+  using fastdiv_t = typename fastdiv<T>::type;
+
+  if (x <= std::numeric_limits<fastdiv_t>::max() &&
+      y <= std::numeric_limits<fastdiv_t>::max())
+  {
+    return (fastdiv_t) x / (fastdiv_t) y;
+  }
 
   return x / y;
 }
 
-inline int64_t fast_div(int64_t x, uint32_t y)
+template <typename X, typename Y>
+X fast_div(X x, Y y)
 {
-  assert(x >= 0);
+  static_assert(prt::is_integral<X>::value &&
+                prt::is_integral<Y>::value &&
+                sizeof(X) >= sizeof(Y),
+                "fast_div(x, y): invalid types");
 
-  if (x <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x /  y;
+  using fastdiv_t = typename fastdiv<X>::type;
+
+  if (x <= std::numeric_limits<fastdiv_t>::max())
+    return (fastdiv_t) x / (fastdiv_t) y;
 
   return x / y;
 }
-
-inline uint64_t fast_div(uint64_t x, int32_t y)
-{
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x /  y;
-
-  return x / y;
-}
-
-inline uint64_t fast_div(uint64_t x, uint32_t y)
-{
-  if (x <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x /  y;
-
-  return x / y;
-}
-
-// x = 64-bit and y = 64-bit
-
-inline int64_t fast_div(int64_t x, int64_t y)
-{
-  assert(x >= 0);
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint32_t>::max() &&
-      y <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x / (uint32_t) y;
-
-  return x / y;
-}
-
-inline uint64_t fast_div(int64_t x, uint64_t y)
-{
-  assert(x >= 0);
-
-  if (x <= std::numeric_limits<uint32_t>::max() &&
-      y <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x / (uint32_t) y;
-
-  return x / y;
-}
-
-inline uint64_t fast_div(uint64_t x, int64_t y)
-{
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint32_t>::max() &&
-      y <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x / (uint32_t) y;
-
-  return x / y;
-}
-
-inline uint64_t fast_div(uint64_t x, uint64_t y)
-{
-  if (x <= std::numeric_limits<uint32_t>::max() &&
-      y <= std::numeric_limits<uint32_t>::max())
-    return (uint32_t) x / (uint32_t) y;
-
-  return x / y;
-}
-
-#if defined(HAVE_INT128_T)
-
-// x = 128-bit and y = 32-bit
-
-inline int128_t fast_div(int128_t x, int32_t y)
-{
-  assert(x >= 0);
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline int128_t fast_div(int128_t x, uint32_t y)
-{
-  assert(x >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, int32_t y)
-{
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, uint32_t y)
-{
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-// x = 128-bit and y = 64-bit
-
-inline int128_t fast_div(int128_t x, int64_t y)
-{
-  assert(x >= 0);
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline int128_t fast_div(int128_t x, uint64_t y)
-{
-  assert(x >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, int64_t y)
-{
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, uint64_t y)
-{
-  if (x <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-// x = 128-bit and y = 128-bit
-
-inline int128_t fast_div(int128_t x, int128_t y)
-{
-  assert(x >= 0);
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max() &&
-      y <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(int128_t x, uint128_t y)
-{
-  assert(x >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max() &&
-      y <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, int128_t y)
-{
-  assert(y >= 0);
-
-  if (x <= std::numeric_limits<uint64_t>::max() &&
-      y <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-inline uint128_t fast_div(uint128_t x, uint128_t y)
-{
-  if (x <= std::numeric_limits<uint64_t>::max() &&
-      y <= std::numeric_limits<uint64_t>::max())
-    return (uint64_t) x / (uint64_t) y;
-
-  return x / y;
-}
-
-#endif /* HAVE_INT128_T */
 
 } // namespace
 
