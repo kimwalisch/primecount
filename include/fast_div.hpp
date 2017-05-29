@@ -32,13 +32,15 @@ struct fastdiv
           uint64_t>::type>::type>::type type;
 };
 
-template <typename T>
-T fast_div(T x, T y)
+template <typename X, typename Y>
+typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
+fast_div(X x, Y y)
 {
-  static_assert(prt::is_integral<T>::value,
-                "fast_div(x, y): type must be integral");
+  static_assert(prt::is_integral<X>::value &&
+                prt::is_integral<Y>::value,
+                "fast_div(x, y): types must be integral");
 
-  using fastdiv_t = typename fastdiv<T>::type;
+  using fastdiv_t = typename fastdiv<X>::type;
 
   if (x <= std::numeric_limits<fastdiv_t>::max() &&
       y <= std::numeric_limits<fastdiv_t>::max())
@@ -50,12 +52,12 @@ T fast_div(T x, T y)
 }
 
 template <typename X, typename Y>
-X fast_div(X x, Y y)
+typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
+fast_div(X x, Y y)
 {
   static_assert(prt::is_integral<X>::value &&
-                prt::is_integral<Y>::value &&
-                sizeof(X) >= sizeof(Y),
-                "fast_div(x, y): invalid types");
+                prt::is_integral<Y>::value,
+                "fast_div(x, y): types must be integral");
 
   using fastdiv_t = typename fastdiv<X>::type;
 
