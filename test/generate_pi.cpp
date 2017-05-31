@@ -69,7 +69,7 @@ int main()
   {
     int n = dist(gen) % pi.size();
     cout << "pi(" << n << ") = " << pi[n];
-    check(pi[n] == primesieve::count_primes(0, n));
+    check(pi[n] == (int) primesieve::count_primes(0, n));
   }
 
   cout << endl;
