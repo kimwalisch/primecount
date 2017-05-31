@@ -54,8 +54,8 @@ int main()
   }
 
   primesieve::iterator it;
-  uint64_t prime = it.next_prime();
-  uint64_t count = 1;
+  int64_t prime = it.next_prime();
+  int64_t count = 1;
 
   while (prime < pi.size())
   {
@@ -69,7 +69,7 @@ int main()
   {
     int n = dist(gen) % pi.size();
     cout << "pi(" << n << ") = " << pi[n];
-    check(pi[n] == primesieve::count_primes(0, n));
+    check(pi[n] == (int64_t) primesieve::count_primes(0, n));
   }
 
   cout << endl;
