@@ -37,13 +37,13 @@ int main()
   auto lpf = generate_lpf(max);
   auto primes = generate_primes<int>(max);
 
-  for (size_t i = 2; i <= max; i++)
+  for (int i = 2; i <= max; i++)
   {
     int factor = i;
     int sqrt = isqrt(i);
 
     // find smallest prime factor
-    for (size_t j = 1; primes[j] <= sqrt; j++)
+    for (int j = 1; primes[j] <= sqrt; j++)
     {
       if (i % primes[j] == 0)
       {
