@@ -36,11 +36,11 @@ int main()
 
   int size = dist(gen);
   int low = 1;
-  int pre_sieve = 7;
 
   auto primes = generate_primes<int>(isqrt(size));
   BitSieve bitSieve(size);
   vector<int> sieve(size, 1);
+  size_t pre_sieve = 7;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
@@ -60,7 +60,7 @@ int main()
     if (start > stop)
       swap(start, stop);
 
-    int count = 0;
+    uint64_t count = 0;
 
     for (int j = start; j <= stop; j++)
       count += sieve[j];
