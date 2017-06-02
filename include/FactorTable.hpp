@@ -17,8 +17,7 @@
 ///         1) 0            if moebius(n) = 0
 ///         2) lpf - 1      if moebius(n) = 1
 ///         3) lpf          if moebius(n) = -1
-///         4) INT_MAX - 1  if n = 1
-///         5) INT_MAX      if n is a prime
+///         4) INT_MAX      if n is a prime
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -97,7 +96,6 @@ public:
     y = std::max<int64_t>(8, y);
     T T_MAX = std::numeric_limits<T>::max();
     factor_.resize(get_index(y) + 1, T_MAX);
-    factor_[0] = T_MAX - 1;
 
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = ipow(10, 7);
@@ -157,8 +155,7 @@ public:
   /// 1) 0            if moebius(n) = 0
   /// 2) lpf - 1      if moebius(n) = 1
   /// 3) lpf          if moebius(n) = -1
-  /// 4) INT_MAX - 1  if n = 1
-  /// 5) INT_MAX      if n is a prime
+  /// 4) INT_MAX      if n is a prime
   ///
   int64_t lpf(int64_t index) const
   {
@@ -171,7 +168,7 @@ public:
   ///
   int64_t mu(int64_t index) const
   {
-    assert(lpf(index) != 0);
+    assert(factor_[index] != 0);
     return (factor_[index] & 1) ? -1 : 1;
   }
 
