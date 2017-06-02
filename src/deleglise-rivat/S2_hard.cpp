@@ -114,7 +114,7 @@ T S2_hard_thread(T x,
                  int64_t segments,
                  int64_t segment_size,
                  double alpha,
-                 FactorTable& factors,
+                 FactorTable& factor,
                  PiTable& pi,
                  Primes& primes,
                  Runtime& runtime)
@@ -167,20 +167,20 @@ T S2_hard_thread(T x,
         if (prime >= max_m)
           goto next_segment;
 
-        factors.to_index(&min_m);
-        factors.to_index(&max_m);
+        factor.to_index(&min_m);
+        factor.to_index(&max_m);
 
         for (int64_t m = max_m; m > min_m; m--)
         {
-          if (prime < factors.lpf(m))
+          if (prime < factor.lpf(m))
           {
-            int64_t fm = factors.get_number(m);
+            int64_t fm = factor.get_number(m);
             int64_t xn = (int64_t) fast_div(x2, fm);
             int64_t stop = xn - low;
             count += sieve.count(start, stop, low, high, count, count_low_high);
             start = stop + 1;
             int64_t phi_xn = phi[b] + count;
-            int64_t mu_m = factors.mu(m);
+            int64_t mu_m = factor.mu(m);
             s2_hard -= mu_m * phi_xn;
           }
         }
@@ -244,18 +244,18 @@ T S2_hard_thread(T x,
         if (prime >= max_m)
           goto next_segment;
 
-        factors.to_index(&min_m);
-        factors.to_index(&max_m);
+        factor.to_index(&min_m);
+        factor.to_index(&max_m);
 
         for (int64_t m = max_m; m > min_m; m--)
         {
-          if (prime < factors.lpf(m))
+          if (prime < factor.lpf(m))
           {
-            int64_t fm = factors.get_number(m);
+            int64_t fm = factor.get_number(m);
             int64_t xn = (int64_t) fast_div(x2, fm);
             int64_t count = tree.count(low, xn);
             int64_t phi_xn = phi[b] + count;
-            int64_t mu_m = factors.mu(m);
+            int64_t mu_m = factor.mu(m);
             s2_hard -= mu_m * phi_xn;
           }
         }
@@ -312,7 +312,7 @@ T S2_hard_OpenMP(T x,
                  int64_t c,
                  T s2_hard_approx,
                  Primes& primes,
-                 FactorTable& factors,
+                 FactorTable& factor,
                  int threads)
 {
   threads = ideal_num_threads(threads, z);
@@ -335,7 +335,7 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factors, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -367,11 +367,11 @@ int64_t S2_hard(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  FactorTable<uint16_t> factors(y, threads);
+  FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = z / isqrt(y);
   auto primes = generate_primes<int32_t>(max_prime);
 
-  int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factors, threads);
+  int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -402,19 +402,19 @@ int128_t S2_hard(int128_t x,
   // uses less memory
   if (y <= FactorTable<uint16_t>::max())
   {
-    FactorTable<uint16_t> factors(y, threads);
+    FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<uint32_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
   }
   else
   {
-    FactorTable<uint32_t> factors(y, threads);
+    FactorTable<uint32_t> factor(y, threads);
     int64_t max_prime = z / isqrt(y);
     auto primes = generate_primes<int64_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factors, threads);
+    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
   }
 
   print("S2_hard", s2_hard, time);

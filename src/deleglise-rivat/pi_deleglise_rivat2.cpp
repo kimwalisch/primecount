@@ -76,7 +76,7 @@ int64_t S2_hard(int64_t x,
   print("Computation of the hard special leaves");
 
   PiTable pi(y);
-  FactorTable<uint16_t> factors(y, 1);
+  FactorTable<uint16_t> factor(y, 1);
   auto primes = generate_primes<int32_t>(y);
 
   int64_t limit = z + 1;
@@ -116,17 +116,17 @@ int64_t S2_hard(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      factors.to_index(&min_m);
-      factors.to_index(&max_m);
+      factor.to_index(&min_m);
+      factor.to_index(&max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factors.lpf(m))
+        if (prime < factor.lpf(m))
         {
-          int64_t n = prime * factors.get_number(m);
+          int64_t n = prime * factor.get_number(m);
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= factors.mu(m) * phi_xn;
+          S2_result -= factor.mu(m) * phi_xn;
         }
       }
 
