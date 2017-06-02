@@ -42,7 +42,7 @@ int main()
 
   FactorTable<int> factor_table(max, threads);
 
-  for (int i = 1; i <= max; i++)
+  for (int i = 2; i <= max; i++)
   {
     if (i % 2 != 0 &&
         i % 3 != 0 &&
