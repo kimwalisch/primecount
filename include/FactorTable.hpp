@@ -1,20 +1,24 @@
 ///
 /// @file  FactorTable.hpp
-/// @brief The FactorTable class is used to save memory. It combines
-///        the lpf[n] (least prime factor) and mu[n] (Möbius function)
-///        lookup tables into a single factors_[n] table which
-///        furthermore only contains entries for numbers which are
-///        not divisible by 2, 3, 5 and 7.
+/// @brief The FactorTable class combines the lpf[n] (least prime
+///        factor) and mu[n] (Möbius function) lookup tables into
+///        a single factor_[n] table which furthermore only
+///        contains entries for numbers which are not divisible by
+///        2, 3, 5 and 7. The factor_[n] lookup table uses 17.5
+///        times less memory than the lpf[n] & mu[n] lookup tables!
+///        factor_[n] requires only 2 bytes per entry for 32-bit
+///        numbers and 4 bytes per entry for 64-bit numbers.
+///
 ///        The factor table concept has first been devised and
 ///        implemented by Christian Bau in 2003.
 ///
-///        FactorTable.lpf(index) is equal to (n = get_number(index)):
+///        What we store in the factor_[n] lookup table:
 ///
-///         1) 0      if moebius(n) = 0
-///         2) lpf    if !is_prime(n) && moebius(n) = -1
-///         3) lpf-1  if !is_prime(n) && moebius(n) = 1
-///         4) n      if  is_prime(n) && n < T_MAX
-///         5) T_MAX  if  is_prime(n) && n > T_MAX
+///         1) 0            if moebius(n) = 0
+///         2) lpf - 1      if moebius(n) = 1
+///         3) lpf          if moebius(n) = -1
+///         4) INT_MAX - 1  if n = 1
+///         5) INT_MAX      if n is a prime
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -88,48 +92,14 @@ public:
   FactorTable(int64_t y, int threads)
   {
     if (y > max())
-      throw primecount_error("y must be <= FactorTable::max().");
+      throw primecount_error("y must be <= FactorTable::max()");
+
     y = std::max<int64_t>(8, y);
     T T_MAX = std::numeric_limits<T>::max();
-    init_factors(y, T_MAX, threads);
-  }
+    factor_.resize(get_index(y) + 1, T_MAX);
+    factor_[0] = T_MAX - 1;
 
-  static maxint_t max()
-  {
-    maxint_t T_MAX = std::numeric_limits<T>::max();
-    return ipow(T_MAX - 1, 2) - 1;
-  }
-
-  /// Get the least prime factor (lpf) of the number
-  /// n = get_number(index). The result is different from
-  /// the least prime factor in some situations:
-  /// 1) Returns 0 if n has a squared prime factor
-  /// 2) Returns lpf - 1 if mu(index) == 1
-  /// 3) Returns T_MAX if n is a prime > T_MAX
-  ///
-  int64_t lpf(int64_t index) const
-  {
-    return factors_[index];
-  }
-
-  /// Get the Möbius function value of the number
-  /// n = get_number(index). For performance reasons
-  /// mu(index) == 0 is not supported.
-  /// @pre mu(index) != 0 (i.e. lpf(index) != 0)
-  ///
-  int64_t mu(int64_t index) const
-  {
-    assert(lpf(index) != 0);
-    return (factors_[index] & 1) ? -1 : 1;
-  }
-
-private:
-  void init_factors(int64_t y, T T_MAX, int threads)
-  {
     int64_t sqrty = isqrt(y);
-    factors_.resize(get_index(y) + 1, T_MAX);
-    factors_[0] = T_MAX - 1;
-
     int64_t thread_threshold = ipow(10, 7);
     threads = ideal_num_threads(threads, y, thread_threshold);
     int64_t thread_distance = ceil_div(y, threads);
@@ -140,56 +110,84 @@ private:
       int64_t low = 1;
       low += thread_distance * t;
       int64_t high = std::min(low + thread_distance, y);
-      int64_t wheel_prime = get_number(1);
-      primesieve::iterator it(wheel_prime - 1);
-      int64_t prime;
+      primesieve::iterator it(get_number(1) - 1);
 
-      while ((prime = it.next_prime()) <= high)
+      while (true)
       {
-        // case 4) store prime
-        if (prime > low &&
-            prime < T_MAX)
-          factors_[get_index(prime)] = (T) prime;
-
-        // no more work todo
-        if (prime * wheel_prime > high)
-           break;
-
         int64_t i = 1;
-        int64_t multiple = next_multiple(low, prime, &i);
+        int64_t prime = it.next_prime();
+        int64_t multiple = next_multiple(prime, low, &i);
+        int64_t min_m = prime * get_number(1);
+
+        if (min_m > high)
+          break;
 
         for (; multiple <= high; multiple = prime * get_number(i++))
         {
           int64_t mi = get_index(multiple);
-          // case 5) prime is smallest factor of multiple
-          if (factors_[mi] == T_MAX)
-            factors_[mi] = (T) prime;
-          // case 2) & 3) the least significant bit
-          // indicates whether multiple has an even (0)
-          // or odd (1) number of prime factors
-          else if (factors_[mi] != 0)
-            factors_[mi] ^= 1;
+          // prime is smallest factor of multiple
+          if (factor_[mi] == T_MAX)
+            factor_[mi] = (T) prime;
+          // the least significant bit indicates
+          // whether multiple has an even (0) or odd (1)
+          // number of prime factors
+          else if (factor_[mi] != 0)
+            factor_[mi] ^= 1;
         }
 
         if (prime <= sqrty)
         {
           int64_t j = 0;
           int64_t square = prime * prime;
-          multiple = next_multiple(low, square, &j);
+          multiple = next_multiple(square, low, &j);
 
-          // case 1) set 0 if moebius(n) = 0
+          // moebius(n) = 0
           for (; multiple <= high; multiple = square * get_number(j++))
-            factors_[get_index(multiple)] = 0;
+            factor_[get_index(multiple)] = 0;
         }
       }
     }
   }
 
-  /// Find the first multiple > low of prime which
+  /// Get the least prime factor (lpf) of the number
+  /// n = get_number(index). The return value is different
+  /// from the least prime factor in some situations
+  /// but this does not affect our calculations.
+  ///
+  /// 1) 0            if moebius(n) = 0
+  /// 2) lpf - 1      if moebius(n) = 1
+  /// 3) lpf          if moebius(n) = -1
+  /// 4) INT_MAX - 1  if n = 1
+  /// 5) INT_MAX      if n is a prime
+  ///
+  int64_t lpf(int64_t index) const
+  {
+    return factor_[index];
+  }
+
+  /// Get the Möbius function value of the number
+  /// n = get_number(index). For performance reasons
+  /// mu(index) == 0 is not supported.
+  ///
+  int64_t mu(int64_t index) const
+  {
+    assert(lpf(index) != 0);
+    return (factor_[index] & 1) ? -1 : 1;
+  }
+
+  static maxint_t max()
+  {
+    maxint_t T_MAX = std::numeric_limits<T>::max();
+    return ipow(T_MAX - 1, 2) - 1;
+  }
+
+private:
+
+  /// Find the first multiple (of prime) > low which
   /// is not divisible by any prime <= 7
   ///
-  static int64_t next_multiple(int64_t low,
-                               int64_t prime,
+  static int64_t next_multiple(int64_t prime,
+                               int64_t low,
                                int64_t* index)
   {
     int64_t quotient = ceil_div(low, prime);
@@ -198,12 +196,12 @@ private:
 
     for (; multiple <= low; i++)
       multiple = prime * get_number(i);
- 
+
     *index = i;
     return multiple;
   }
 
-  std::vector<T> factors_;
+  std::vector<T> factor_;
 };
 
 } // namespace

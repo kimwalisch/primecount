@@ -40,9 +40,9 @@ int main()
   auto lpf = generate_lpf(max);
   auto mu = generate_moebius(max);
 
-  FactorTable<int> factor_table(max * 11, threads);
+  FactorTable<int> factor_table(max, threads);
 
-  for (int i = 2; i <= max; i++)
+  for (int i = 1; i <= max; i++)
   {
     if (i % 2 != 0 &&
         i % 3 != 0 &&
@@ -55,7 +55,7 @@ int main()
         check(mu[i] == factor_table.mu(factor_table.get_index(i)));
 
         cout << "lpf(" << i << ") = " << lpf[i];
-        check(lpf[i] == factor_table.lpf(factor_table.get_index(i)) + (mu[i] == 1));
+        check(lpf[i] <= factor_table.lpf(factor_table.get_index(i)) + (mu[i] == 1));
       }
     }
   }
