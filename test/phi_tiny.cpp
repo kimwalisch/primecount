@@ -46,9 +46,9 @@ int main()
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(10000000, 20000000);
 
-  int size = dist(gen);
-  int x = size - 1;
-  auto max_a = PhiTiny::max_a();
+  int64_t max_a = PhiTiny::max_a();
+  int64_t size = dist(gen);
+  int64_t x = size - 1;
 
   auto primes = generate_n_primes<int>(max_a);
   vector<char> sieve(size, 1);
