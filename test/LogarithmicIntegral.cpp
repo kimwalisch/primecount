@@ -56,14 +56,16 @@ int main()
 
   for (size_t i = 0; i < size; i++)
   {
-    int64_t x = ipow(10ll, i + 1);
+    int p = (int) i + 1;
+    int64_t x = ipow(10ll, p);
     cout << "Li(" << x << ") = " << Li(x);
     check(Li(x) == Li_table[i]);
   }
 
   for (size_t i = 0; i < size; i++)
   {
-    int64_t x = ipow(10ll, i + 1);
+    int p = (int) i + 1;
+    int64_t x = ipow(10ll, p);
     cout << "Li_inverse(" << Li_table[i] << ") = " << Li_inverse(Li_table[i]);
     check(Li_inverse(Li_table[i]) <= x &&
           Li_inverse(Li_table[i] + 1) > x);

@@ -55,14 +55,16 @@ int main()
 
   for (size_t i = 0; i < size; i++)
   {
-    int64_t x = ipow(10ll, i + 1);
+    int p = (int) i + 1;
+    int64_t x = ipow(10ll, p);
     cout << "Ri(" << x << ") = " << Ri(x);
     check(Ri(x) == Ri_table[i]);
   }
 
   for (size_t i = 0; i < size; i++)
   {
-    int64_t x = ipow(10ll, i + 1);
+    int p = (int) i + 1;
+    int64_t x = ipow(10ll, p);
     cout << "Ri_inverse(" << Ri_table[i] << ") = " << Ri_inverse(Ri_table[i]);
     check(Ri_inverse(Ri_table[i]) < x &&
           Ri_inverse(Ri_table[i] + 1) >= x);
