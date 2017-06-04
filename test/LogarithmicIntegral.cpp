@@ -19,7 +19,7 @@
 using namespace std;
 using namespace primecount;
 
-vector<int64_t> offset_Li =
+vector<int64_t> Li_table =
 {
                      5, // Li(10^1)
                     29, // Li(10^2)
@@ -49,19 +49,24 @@ void check(bool OK)
 
 int main()
 {
-  for (size_t i = 0; i < offset_Li.size(); i++)
+  size_t size = 15;
+
+  if (sizeof(long double) > 8)
+    size = Li_table.size();
+
+  for (size_t i = 0; i < size; i++)
   {
     int64_t x = ipow(10ll, i + 1);
     cout << "Li(" << x << ") = " << Li(x);
-    check(Li(x) == offset_Li[i]);
+    check(Li(x) == Li_table[i]);
   }
 
-  for (size_t i = 0; i < offset_Li.size(); i++)
+  for (size_t i = 0; i < size; i++)
   {
     int64_t x = ipow(10ll, i + 1);
-    cout << "Li_inverse(" << offset_Li[i] << ") = " << Li_inverse(offset_Li[i]);
-    check(Li_inverse(offset_Li[i]) <= x &&
-          Li_inverse(offset_Li[i] + 1) > x);
+    cout << "Li_inverse(" << Li_table[i] << ") = " << Li_inverse(Li_table[i]);
+    check(Li_inverse(Li_table[i]) <= x &&
+          Li_inverse(Li_table[i] + 1) > x);
   }
 
   cout << endl;
