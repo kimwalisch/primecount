@@ -40,6 +40,7 @@ int main()
   auto primes = generate_primes<int>(isqrt(low));
   Wheel wheel(primes, primes.size(), low);
 
+  // test 1st multiple >= low
   for (size_t i = 5; i < primes.size(); i++)
   {
     int j = low;
@@ -55,6 +56,28 @@ int main()
 
     auto multiple = wheel[i].next_multiple;
     cout << "wheel.multiple(" << low << ", " << primes[i] << ") = " << multiple;
+    check(multiple == j);
+  }
+
+  // test 2nd multiple >= low
+  for (size_t i = 5; i < primes.size(); i++)
+  {
+    auto multiple = wheel[i].next_multiple;
+    auto j = multiple + 1;
+
+    while (j % primes[i] != 0 ||
+           j % 2 == 0 ||
+           j % 3 == 0 ||
+           j % 5 == 0 ||
+           j % 7 == 0)
+    {
+      j++;
+    }
+
+    int64_t wheel_index = wheel[i].wheel_index;
+    multiple += primes[i] * Wheel::next_multiple_factor(&wheel_index);
+
+    cout << "wheel.next_multiple = " << multiple;
     check(multiple == j);
   }
 
