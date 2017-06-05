@@ -17,7 +17,6 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <algorithm>
 #include <cstdlib>
 #include <vector>
 #include <random>
