@@ -34,7 +34,7 @@ int main()
 {
   random_device rd;
   mt19937 gen(rd());
-  uniform_int_distribution<int> dist(10000, 20000);
+  uniform_int_distribution<int> dist(50000, 70000);
 
   int64_t x = dist(gen);
   auto primes = generate_primes<int64_t>(x);
