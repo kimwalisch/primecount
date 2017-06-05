@@ -12,7 +12,6 @@
 
 #include <primecount-internal.hpp>
 #include <generate.hpp>
-#include <PiTable.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -39,19 +38,18 @@ int main()
 
   int64_t x = dist(gen);
   auto primes = generate_primes<int64_t>(x);
-  PiTable pi(x);
 
-  for (int a = 1; primes[pi[a]] <= isqrt(x); a++)
+  for (int a = 1; primes[a] <= isqrt(x); a++)
   {
     int64_t p2 = 0;
 
-    for (size_t b = pi[a] + 1; b < primes.size(); b++)
+    for (size_t b = a + 1; b < primes.size(); b++)
       for (size_t c = b; c < primes.size(); c++)
         if (primes[b] * primes[c] <= x)
           p2++;
 
     cout << "P2(" << x << ", " << a << ") = " << p2;
-    check(p2 == P2(x, a, 1));
+    check(p2 == P2(x, primes[a], 1));
   }
 
   cout << endl;
