@@ -96,7 +96,6 @@ T S2_easy_OpenMP(T x,
         int64_t xn = (uint64_t) x2 / fastdiv[l];
         int64_t phi_xn = pi[xn] - b + 2;
         int64_t xm = (uint64_t) x2 / fastdiv[b + phi_xn - 1];
-        xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
         s2_easy += phi_xn * (l - l2);
         l = l2;
@@ -122,7 +121,6 @@ T S2_easy_OpenMP(T x,
         int64_t xn = (int64_t) (x2 / primes[l]);
         int64_t phi_xn = pi[xn] - b + 2;
         int64_t xm = (int64_t) (x2 / primes[b + phi_xn - 1]);
-        xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
         s2_easy += phi_xn * (l - l2);
         l = l2;
