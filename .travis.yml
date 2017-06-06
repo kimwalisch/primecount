@@ -34,6 +34,7 @@ script:
   - make test
   - ldd primecount
   - ./primecount --test
+  - ldd test/alpha
   - valgrind --error-exitcode=1 test/alpha
   - valgrind --error-exitcode=1 ./primecount 1e13
   - valgrind --error-exitcode=1 ./primecount 1e11 --deleglise_rivat1
