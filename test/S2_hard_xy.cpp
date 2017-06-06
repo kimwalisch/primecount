@@ -53,7 +53,7 @@ int main()
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
-    auto primes = generate_n_primes<int32_t>(y);
+    auto primes = generate_primes<int32_t>(y);
     auto lpf = generate_lpf(y);
     auto mu = generate_moebius(y);
 
@@ -77,7 +77,7 @@ int main()
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
 
-    auto primes = generate_n_primes<int32_t>(y);
+    auto primes = generate_primes<int32_t>(y);
     auto lpf = generate_lpf(y);
     auto mu = generate_moebius(y);
 
