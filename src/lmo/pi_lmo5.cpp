@@ -91,10 +91,10 @@ int64_t S2(int64_t x,
 
     int64_t count_low_high = sieve.count((high - 1) - low);
 
-    // For c + 1 <= b < pi_sqrty
+    // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m
     // which satisfy:  mu[m] != 0 && primes[b] < lpf[m], low <= (x / n) < high
-    for (; b < pi_sqrty; b++)
+    for (; b <= pi_sqrty; b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -122,14 +122,14 @@ int64_t S2(int64_t x,
       count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
     }
 
-    // For pi_sqrty <= b < pi_y
+    // For pi_sqrty < b < pi_y
     // Find all special leaves: n = primes[b] * prime2
     // which satisfy: low <= (x / n) < high
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), y)];
-      int64_t min_m = max(x / (prime * high), y / prime, prime);
+      int64_t min_m = max(x / (prime * high), prime);
       int64_t count = 0;
       int64_t i = 0;
 

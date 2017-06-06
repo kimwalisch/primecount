@@ -134,14 +134,14 @@ int64_t S2_hard(int64_t x,
       cross_off(prime, low, high, next[b], sieve, tree);
     }
 
-    // For pi_sqrty <= b <= pi_sqrtz
+    // For pi_sqrty < b <= pi_sqrtz
     // Find all hard special leaves: n = primes[b] * primes[l]
     // which satisfy: low <= (x / n) < high
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low), z / prime, y)];
-      int64_t min_hard = max(x / (prime * high), y / prime, prime);
+      int64_t min_hard = max(x / (prime * high), prime);
 
       if (prime >= primes[l])
         goto next_segment;

@@ -192,7 +192,7 @@ T S2_hard_thread(T x,
         count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
       }
 
-      // For pi_sqrty <= b <= pi_sqrtz
+      // For pi_sqrty < b <= pi_sqrtz
       // Find all hard special leaves: n = primes[b] * primes[l]
       // which satisfy: low <= (x / n) < high
       for (; b <= max_b; b++)
@@ -202,7 +202,7 @@ T S2_hard_thread(T x,
         int64_t x2_div_low = min(fast_div(x2, low), y);
         int64_t x2_div_high = min(fast_div(x2, high), y);
         int64_t l = pi[min(x2_div_low, z / prime)];
-        int64_t min_hard = max(x2_div_high, y / prime, prime);
+        int64_t min_hard = max(x2_div_high, prime);
         int64_t count = 0;
         int64_t start = 0;
 
@@ -267,7 +267,7 @@ T S2_hard_thread(T x,
         cross_off(sieve, low, high, prime, wheel[b], tree);
       }
 
-      // For pi_sqrty <= b <= pi_sqrtz
+      // For pi_sqrty < b <= pi_sqrtz
       // Find all hard special leaves: n = primes[b] * primes[l]
       // which satisfy: low <= (x / n) < high
       for (; b <= max_b; b++)
@@ -277,7 +277,7 @@ T S2_hard_thread(T x,
         int64_t x2_div_low = min(fast_div(x2, low), y);
         int64_t x2_div_high = min(fast_div(x2, high), y);
         int64_t l = pi[min(x2_div_low, z / prime)];
-        int64_t min_hard = max(x2_div_high, y / prime, prime);
+        int64_t min_hard = max(x2_div_high, prime);
 
         if (prime >= primes[l])
           goto next_segment;
