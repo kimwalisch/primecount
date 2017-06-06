@@ -80,10 +80,9 @@ T S2_easy_mpi_master(T x,
     int64_t min_trivial = min(x2 / prime, y);
     int64_t min_clustered = (int64_t) isqrt(x2);
     int64_t min_sparse = z / prime;
-    int64_t min_hard = max(y / prime, prime);
 
-    min_clustered = in_between(min_hard, min_clustered, y);
-    min_sparse = in_between(min_hard, min_sparse, y);
+    min_clustered = in_between(prime, min_clustered, y);
+    min_sparse = in_between(prime, min_sparse, y);
 
     int64_t l = pi[min_trivial];
     int64_t pi_min_clustered = pi[min_clustered];
@@ -100,7 +99,6 @@ T S2_easy_mpi_master(T x,
         int64_t xn = (uint64_t) x2 / fastdiv[l];
         int64_t phi_xn = pi[xn] - b + 2;
         int64_t xm = (uint64_t) x2 / fastdiv[b + phi_xn - 1];
-        xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
         s2_easy += phi_xn * (l - l2);
         l = l2;
@@ -126,7 +124,6 @@ T S2_easy_mpi_master(T x,
         int64_t xn = (int64_t) (x2 / primes[l]);
         int64_t phi_xn = pi[xn] - b + 2;
         int64_t xm = (int64_t) (x2 / primes[b + phi_xn - 1]);
-        xm = max(xm, min_clustered);
         int64_t l2 = pi[xm];
         s2_easy += phi_xn * (l - l2);
         l = l2;
