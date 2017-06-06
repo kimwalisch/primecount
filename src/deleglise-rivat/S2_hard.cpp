@@ -110,7 +110,6 @@ T S2_hard_thread(T x,
                  int64_t z,
                  int64_t c,
                  int64_t low,
-                 int64_t limit,
                  int64_t segments,
                  int64_t segment_size,
                  double alpha,
@@ -119,7 +118,7 @@ T S2_hard_thread(T x,
                  Primes& primes,
                  Runtime& runtime)
 {
-  limit = min(low + segments * segment_size, limit);
+  int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t max_b = pi[min(isqrt(x / low), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
@@ -317,10 +316,9 @@ T S2_hard_OpenMP(T x,
 {
   threads = ideal_num_threads(threads, z);
 
-  int64_t limit = z + 1;
-  int64_t max_prime = z / isqrt(y);
   double alpha = get_alpha(x, y);
   LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
   #pragma omp parallel for num_threads(threads)
@@ -335,7 +333,7 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, limit, segments, segment_size, alpha, factor, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -368,7 +366,7 @@ int64_t S2_hard(int64_t x,
 
   double time = get_wtime();
   FactorTable<uint16_t> factor(y, threads);
-  int64_t max_prime = z / isqrt(y);
+  int64_t max_prime = min(y, z / isqrt(y));
   auto primes = generate_primes<int32_t>(max_prime);
 
   int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads);
@@ -403,7 +401,7 @@ int128_t S2_hard(int128_t x,
   if (y <= FactorTable<uint16_t>::max())
   {
     FactorTable<uint16_t> factor(y, threads);
-    int64_t max_prime = z / isqrt(y);
+    int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<uint32_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
@@ -411,7 +409,7 @@ int128_t S2_hard(int128_t x,
   else
   {
     FactorTable<uint32_t> factor(y, threads);
-    int64_t max_prime = z / isqrt(y);
+    int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<int64_t>(max_prime);
 
     s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
