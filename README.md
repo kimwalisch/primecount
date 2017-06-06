@@ -4,9 +4,9 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-primecount is a command-line program that counts the primes below an
-integer x&nbsp;≤&nbsp;10<sup>31</sup> using **highly optimized**
-implementations of the
+primecount is a command-line program and [C++ library](doc/libprimecount.md)
+that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
+**highly optimized** implementations of the
 [prime counting function](http://en.wikipedia.org/wiki/Prime-counting_function)
 (combinatorial methods). primecount includes implementations of the
 algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and
