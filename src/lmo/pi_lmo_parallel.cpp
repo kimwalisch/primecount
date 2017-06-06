@@ -63,9 +63,9 @@ int64_t cross_off(BitSieve& sieve,
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
+                  int64_t z,
                   int64_t c,
                   int64_t low,
-                  int64_t limit,
                   int64_t segments,
                   int64_t segment_size,
                   PiTable& pi,
@@ -74,7 +74,7 @@ int64_t S2_thread(int64_t x,
                   vector<int32_t>& mu,
                   Runtime& runtime)
 {
-  limit = min(low + segments * segment_size, limit);
+  int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t size = pi[min(isqrt(x / low), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
@@ -189,8 +189,7 @@ int64_t S2(int64_t x,
 
   double time = get_wtime();
   double alpha = get_alpha(x, y);
-  int64_t limit = z + 1;
-  threads = ideal_num_threads(threads, limit);
+  threads = ideal_num_threads(threads, z);
   LoadBalancer loadBalancer(x, y, z, alpha, s2_approx);
   PiTable pi(y);
 
@@ -206,7 +205,7 @@ int64_t S2(int64_t x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime))
     {
       runtime.start();
-      S2 = S2_thread(x, y, c, low, limit, segments, segment_size, pi, primes, lpf, mu, runtime);
+      S2 = S2_thread(x, y, z, c, low, segments, segment_size, pi, primes, lpf, mu, runtime);
       runtime.stop();
     }
   }
