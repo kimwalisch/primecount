@@ -62,10 +62,9 @@ T S2_easy_OpenMP(T x,
     int64_t min_trivial = min(x2 / prime, y);
     int64_t min_clustered = (int64_t) isqrt(x2);
     int64_t min_sparse = z / prime;
-    int64_t min_hard = max(y / prime, prime);
 
-    min_clustered = in_between(min_hard, min_clustered, y);
-    min_sparse = in_between(min_hard, min_sparse, y);
+    min_clustered = in_between(prime, min_clustered, y);
+    min_sparse = in_between(prime, min_sparse, y);
 
     int64_t l = pi[min_trivial];
     int64_t pi_min_clustered = pi[min_clustered];
