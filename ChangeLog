@@ -13,6 +13,7 @@
   * S2_hard.cpp: Use new load balancer.
   * BitSieve.cpp: Get rid of AVX2 (use POPCNT).
   * Li.cpp: Riemann R and inverse Riemann R implementations.
+  * fast_div.hpp: Refactor using template metaprogramming.
   * src/test: Added 27 unit tests.
   * phi(x, a) now scales > 8 threads.
   * BinaryIndexedTree.hpp: Do not store multiples of 2.
