@@ -1,6 +1,6 @@
-2017-05-26 Kim Walisch  <kim.walisch@gmail.com>
+2017-06-07 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.7 work in progress.
+  Version 3.7 released.
 
   This version features a new multi-threading load balancer
   for the computation of the hard special leaves. The new
@@ -9,8 +9,11 @@
   is based on ideas from Xavier Gourdon and Douglas Staple.
 
   * LoadBalancer.cpp: New multi-threading load balancer.
-  * MpiLoadBalancer.cpp: New MPI load balancer.
+  * generate_phi.hpp: Part of new load balancer.
+  * S2_hard.cpp: Use new load balancer.
+  * BitSieve.cpp: Get rid of AVX2 (use POPCNT).
   * Li.cpp: Riemann R and inverse Riemann R implementations.
+  * src/test: Added 27 unit tests.
   * phi(x, a) now scales > 8 threads.
   * BinaryIndexedTree.hpp: Do not store multiples of 2.
   * CMakeLists.txt: Faster C++ compilation.
