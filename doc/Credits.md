@@ -23,3 +23,10 @@ prime counting algorithm and wrote
 comparing the Deleglise-Rivat algorithm, Tomás Oliveira e Silva's
 version of the Deleglise-Rivat algorithm and Gourdon's algorithm.
 This improved my understanding of Gourdon's algorithm.
+
+* **Douglas Staple**<br/>
+After computing pi(10^26) using his own program Douglas Staple
+published [a paper](https://arxiv.org/pdf/1503.01839.pdf) with
+his improvements to the Deleglise-Rivat algorithm. I use Douglas
+Staple's improvements for the computation of the ordinary
+leaves and the multi-threading of the hard special leaves.
