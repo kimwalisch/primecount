@@ -46,3 +46,11 @@ faster than primecount for x <= 10<sup>10</sup>. Dennis's
 implementation replaced integer division by multiplication & bit
 shifts. After studying his implementation I also implemented this
 trick in primecount.
+
+* [ridiculousfish](https://github.com/ridiculousfish)<br/>
+primecount uses ridiculousfish's
+[libdivide library](https://github.com/ridiculousfish/libdivide)
+to replace integer division by multiplication & bit shifts. This
+optimization speeds up the computation of the easy special leaves
+by about 40%. ridiculousfish added a branchfree divider to libdivide
+specifically for primecount.
