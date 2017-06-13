@@ -30,3 +30,10 @@ published [a paper](https://arxiv.org/pdf/1503.01839.pdf) with
 his improvements to the Deleglise-Rivat algorithm. I use Douglas
 Staple's improvements for the computation of the ordinary
 leaves and the multi-threading of the hard special leaves.
+
+* **Christian Bau**<br/>
+Christian Bau wrote the first open source implementation of the
+extended Meissel-Lehmer prime counting algorithm in 2003. I use
+Christian's FactorTable idea to reduce the memory usage and
+also his fast integer division trick (use 32-bit instead of 64-bit
+whenever possible).
