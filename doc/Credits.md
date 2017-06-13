@@ -37,3 +37,12 @@ extended Meissel-Lehmer prime counting algorithm in 2003. I use
 Christian's FactorTable idea to reduce the memory usage and
 also his fast integer division trick (use 32-bit instead of 64-bit
 whenever possible).
+
+* [Dennis Mitchell](https://codegolf.stackexchange.com/users/12012/dennis)<br/>
+Dennis wrote a highly optimized
+[implementation](https://codegolf.stackexchange.com/a/74372/52196)
+(in 2016) of the meissel prime counting algorithm which was
+faster than primecount for x <= 10<sup>10</sup>. Dennis's
+implementation replaced integer division by multiplication & bit
+shifts. After studying his implementation I also implemented this
+trick in primecount.
