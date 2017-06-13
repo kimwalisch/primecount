@@ -5,7 +5,7 @@ My thanks to the following people, without whom primecount wouldn't be what it i
 * **David Baugh**<br/>
 David was the most extensive user of primecount during early
 development. He reported numerous bugs and suggested a lot
-of useful features e.g. backup functionality, standalone
+of useful features e.g. backup functionality & standalone
 flags for all deleglise-rivat formulas. David also broke many
 world records using primecount e.g. [A006880](https://oeis.org/A006880),
 [A006988](https://oeis.org/A006988), [A122121](https://oeis.org/A122121),
