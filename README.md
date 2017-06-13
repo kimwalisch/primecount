@@ -166,7 +166,7 @@ space.</p>
 <p>primecount's Legendre, Meissel and Lehmer implementations are based
 on Hans Riesel's book <a href="doc/References.md">[5]</a>,
 its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
-based on Tomás Oliveira's paper <a href="doc/References.md">[8]</a>.</p>
+based on Tomás Oliveira's paper <a href="doc/References.md">[9]</a>.</p>
 
 ## Fast nth prime calculation
 
