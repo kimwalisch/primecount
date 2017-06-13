@@ -15,3 +15,11 @@ world records using primecount e.g. [A006880](https://oeis.org/A006880),
 Dana explained to me in great detail the optimizations used in his
 phi(x, a) implementation and also the implementation of the 
 inverse logarithmic integral using Newton's method.
+
+* [Curtis Seizert](https://github.com/curtisseizert)<br/>
+Curtis partially implemented Xavier Gourdon's combinatorial
+prime counting algorithm and wrote
+[a paper](https://github.com/curtisseizert/CUDApix/blob/master/Deconvoluting%20Deleglise-Rivat.pdf)
+comparing the Deleglise-Rivat algorithm, Tomás Oliveira e Silva's
+version of the Deleglise-Rivat algorithm and Gourdon's algorithm.
+This improved my understanding of Gourdon's algorithm.
