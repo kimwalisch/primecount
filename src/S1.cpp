@@ -12,12 +12,15 @@
 
 #include <S1.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -25,8 +28,80 @@
 
 using namespace std;
 using namespace primecount;
+using namespace nlohmann;
 
 namespace {
+
+template <typename T>
+void backup(T x,
+            int64_t y,
+            int64_t c,
+            T s1,
+            double time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  j["S1"]["x"] = to_string(x);
+  j["S1"]["y"] = y;
+  j["S1"]["c"] = c;
+  j["S1"]["s1"] = to_string(s1);
+  j["S1"]["percent"] = 100.0;
+  j["S1"]["seconds"] = get_wtime() - time;
+
+  ofstream ofs("primecount.backup");
+  ofs << setw(4) << j << endl;
+}
+
+template <typename T>
+bool resume(T x,
+            int64_t y,
+            int64_t c,
+            T& s1,
+            double& time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("S1") != j.end() &&
+      x == calculator::eval<T>(j["S1"]["x"]) &&
+      y == j["S1"]["y"] &&
+      c == j["S1"]["c"])
+  {
+    double percent = j["S1"]["percent"];
+    double seconds = j["S1"]["seconds"];
+
+    s1 = calculator::eval<T>(j["S1"]["s1"]);
+    time = get_wtime() - seconds;
+
+    if (is_print())
+    {
+      if (!print_variables())
+        cout << endl;
+
+      cout << "=== Resuming from primecount.backup ===" << endl;
+      cout << "s1 = " << s1 << endl;
+      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
+      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+    }
+
+    return true;
+  }
+
+  return false;
+}
 
 /// Recursively iterate over the square free numbers coprime
 /// to the first b primes and calculate the sum of the
@@ -98,7 +173,12 @@ int64_t S1(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int64_t s1 = S1_OpenMP(x, y, c, threads);
+  int64_t s1;
+
+  if (!resume(x, y, c, s1, time))
+    s1 = S1_OpenMP(x, y, c, threads);
+
+  backup(x, y, c, s1, time);
 
   print("S1", s1, time);
   return s1;
@@ -119,11 +199,16 @@ int128_t S1(int128_t x,
   double time = get_wtime();
   int128_t s1;
 
-  // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
-    s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
-  else
-    s1 = S1_OpenMP(x, y, c, threads);
+  if (!resume(x, y, c, s1, time))
+  {
+    // uses less memory
+    if (y <= numeric_limits<uint32_t>::max())
+      s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
+    else
+      s1 = S1_OpenMP(x, y, c, threads);
+  }
+
+  backup(x, y, c, s1, time);
 
   print("S1", s1, time);
   return s1;
