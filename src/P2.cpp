@@ -13,13 +13,16 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
+#include <calculator.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 
 #ifdef _OPENMP
@@ -28,6 +31,7 @@
 
 using namespace std;
 using namespace primecount;
+using namespace nlohmann;
 
 namespace {
 
@@ -105,6 +109,87 @@ T P2_thread(T x,
   return p2;
 }
 
+template <typename T>
+void backup(T x,
+            int64_t y,
+            int64_t z,
+            int64_t low,
+            int64_t thread_distance,
+            T pix_total,
+            T p2,
+            double time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  double percent = get_percent(low, z);
+
+  j["P2"]["x"] = to_string(x);
+  j["P2"]["y"] = y;
+  j["P2"]["z"] = z;
+  j["P2"]["low"] = low;
+  j["P2"]["thread_distance"] = thread_distance;
+  j["P2"]["pix_total"] = to_string(pix_total);
+  j["P2"]["p2"] = to_string(p2);
+  j["P2"]["percent"] = percent;
+  j["P2"]["seconds"] = get_wtime() - time;
+
+  ofstream ofs("primecount.backup");
+  ofs << setw(4) << j << endl;
+}
+
+template <typename T>
+void resume(T x,
+            int64_t y,
+            int64_t z,
+            int64_t& low,
+            int64_t& thread_distance,
+            T& pix_total,
+            T& p2,
+            double& time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("P2") != j.end() &&
+      x == calculator::eval<T>(j["P2"]["x"]) &&
+      y == j["P2"]["y"] &&
+      z == j["P2"]["z"])
+  {
+    double percent = j["P2"]["percent"];
+    double seconds = j["P2"]["seconds"];
+
+    low = j["P2"]["low"];
+    thread_distance = j["P2"]["thread_distance"];
+    pix_total = calculator::eval<T>(j["P2"]["pix_total"]);
+    p2 = calculator::eval<T>(j["P2"]["p2"]);
+    time = get_wtime() - seconds;
+
+    if (is_print())
+    {
+      cout << "=== Resuming from primecount.backup ===" << endl;
+      cout << "low = " << low << endl;
+      cout << "thread_distance = " << thread_distance << endl;
+      cout << "pix_total = " << pix_total << endl;
+      cout << "p2 = " << p2 << endl;
+      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
+      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+    }
+  }
+}
+
 /// P2(x, y) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
 /// Run-time: O(z log log z)
@@ -135,20 +220,23 @@ T P2_OpenMP(T x, int64_t y, int threads)
 
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
+  double time = get_wtime();
+
+  resume(x, y, z, low, thread_distance, pix_total, p2, time);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
   {
     int64_t max_threads = ceil_div(z - low, thread_distance);
     threads = in_between(1, threads, max_threads);
-    double time = get_wtime();
+    double t = get_wtime();
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
       p2 += P2_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
 
     low += thread_distance * threads;
-    balanceLoad(&thread_distance, low, z, threads, time);
+    balanceLoad(&thread_distance, low, z, threads, t);
 
     // add missing sum contributions in order
     for (int i = 0; i < threads; i++)
@@ -157,6 +245,8 @@ T P2_OpenMP(T x, int64_t y, int threads)
       pix_total += pix[i];
     }
 
+    backup(x, y, z, low, thread_distance, pix_total, p2, time);
+
     if (is_print())
     {
       double percent = get_percent(low, z);
@@ -164,6 +254,8 @@ T P2_OpenMP(T x, int64_t y, int threads)
            << percent << '%' << flush;
     }
   }
+
+  print("P2", p2, time);
 
   return p2;
 }
@@ -184,10 +276,8 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  double time = get_wtime();
   int64_t p2 = P2_OpenMP(x, y, threads);
 
-  print("P2", p2, time);
   return p2;
 }
 
@@ -205,10 +295,8 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  double time = get_wtime();
   int128_t p2 = P2_OpenMP(x, y, threads);
 
-  print("P2", p2, time);
   return p2;
 }
 
