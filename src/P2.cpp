@@ -179,6 +179,9 @@ void resume(T x,
 
     if (is_print())
     {
+      if (!print_variables())
+        cout << endl;
+
       cout << "=== Resuming from primecount.backup ===" << endl;
       cout << "low = " << low << endl;
       cout << "thread_distance = " << thread_distance << endl;
