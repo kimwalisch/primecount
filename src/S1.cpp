@@ -176,9 +176,10 @@ int64_t S1(int64_t x,
   int64_t s1;
 
   if (!resume(x, y, c, s1, time))
+  {
     s1 = S1_OpenMP(x, y, c, threads);
-
-  backup(x, y, c, s1, time);
+    backup(x, y, c, s1, time);
+  }
 
   print("S1", s1, time);
   return s1;
@@ -206,9 +207,9 @@ int128_t S1(int128_t x,
       s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
     else
       s1 = S1_OpenMP(x, y, c, threads);
-  }
 
-  backup(x, y, c, s1, time);
+    backup(x, y, c, s1, time);
+  }
 
   print("S1", s1, time);
   return s1;
