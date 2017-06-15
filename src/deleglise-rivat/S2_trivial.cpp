@@ -3,7 +3,7 @@
 /// @brief Calculate the contribution of the trivial special leaves
 ///        in parallel using OpenMP.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,12 +13,15 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <calculator.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -26,8 +29,84 @@
 
 using namespace std;
 using namespace primecount;
+using namespace nlohmann;
 
 namespace {
+
+template <typename T>
+void backup(T x,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            T s2_trivial,
+            double time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  j["S2_trivial"]["x"] = to_string(x);
+  j["S2_trivial"]["y"] = y;
+  j["S2_trivial"]["z"] = z;
+  j["S2_trivial"]["c"] = c;
+  j["S2_trivial"]["s2_trivial"] = to_string(s2_trivial);
+  j["S2_trivial"]["percent"] = 100.0;
+  j["S2_trivial"]["seconds"] = get_wtime() - time;
+
+  ofstream ofs("primecount.backup");
+  ofs << setw(4) << j << endl;
+}
+
+template <typename T>
+bool resume(T x,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            T& s2_trivial,
+            double& time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("S2_trivial") != j.end() &&
+      x == calculator::eval<T>(j["S2_trivial"]["x"]) &&
+      y == j["S2_trivial"]["y"] &&
+      z == j["S2_trivial"]["z"] &&
+      c == j["S2_trivial"]["c"])
+  {
+    double percent = j["S2_trivial"]["percent"];
+    double seconds = j["S2_trivial"]["seconds"];
+
+    s2_trivial = calculator::eval<T>(j["S2_trivial"]["s2_trivial"]);
+    time = get_wtime() - seconds;
+
+    if (is_print())
+    {
+      if (!print_variables())
+        cout << endl;
+
+      cout << "=== Resuming from primecount.backup ===" << endl;
+      cout << "s2_trivial = " << s2_trivial << endl;
+      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
+      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+    }
+
+    return true;
+  }
+
+  return false;
+}
 
 template <typename T>
 T S2_trivial_OpenMP(T x,
@@ -84,7 +163,13 @@ int64_t S2_trivial(int64_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int64_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+  int64_t s2_trivial;
+
+  if (!resume(x, y, z, c, s2_trivial, time))
+  {
+    s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+    backup(x, y, z, c, s2_trivial, time);
+  }
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
@@ -104,7 +189,13 @@ int128_t S2_trivial(int128_t x,
   print(x, y, c, threads);
 
   double time = get_wtime();
-  int128_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+  int128_t s2_trivial;
+
+  if (!resume(x, y, z, c, s2_trivial, time))
+  {
+    s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+    backup(x, y, z, c, s2_trivial, time);
+  }
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
