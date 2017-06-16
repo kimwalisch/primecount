@@ -62,17 +62,6 @@ int64_t cross_off(BitSieve& sieve,
   return unset;
 }
 
-/// Returns true if the interval [low, high]
-/// contains few hard special leaves
-///
-bool few_leaves(int64_t low,
-                int64_t high,
-                int64_t y,
-                double alpha)
-{
-  return (high < y || low > y * alpha);
-}
-
 /// Compute the S2 contribution of the hard special leaves
 /// using a sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[
