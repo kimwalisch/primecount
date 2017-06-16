@@ -66,19 +66,22 @@ public:
   void set(uint64_t pos)
   {
     assert(pos < size_);
-    sieve_[pos >> 6] |= ((uint64_t) 1) << (pos & 63);
+    assert(pos % 2 != 0);
+    sieve_[pos >> 7] |= set_bit_[pos & 127];
   }
 
   void unset(uint64_t pos)
   {
     assert(pos < size_);
-    sieve_[pos >> 6] &= unset_bit_[pos & 63];
+    assert(pos % 2 != 0);
+    sieve_[pos >> 7] &= unset_bit_[pos & 127];
   }
 
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    return (sieve_[pos >> 6] >> (pos & 63)) & 1;
+    assert(pos % 2 != 0);
+    return (sieve_[pos >> 7] >> ((pos >> 1) & 63)) & 1;
   }
 
   std::size_t size() const
@@ -86,7 +89,8 @@ public:
     return size_;
   }
 private:
-  static const uint64_t unset_bit_[64];
+  static const uint64_t set_bit_[128];
+  static const uint64_t unset_bit_[128];
   std::vector<uint64_t> sieve_;
   std::size_t size_;
 };
