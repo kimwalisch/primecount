@@ -198,7 +198,7 @@ void resume(T x,
 /// Run-time: O(z log log z)
 ///
 template <typename T>
-T P2_OpenMP(T x, int64_t y, int threads)
+T P2_OpenMP(T x, int64_t y, int threads, double& time)
 {
   static_assert(prt::is_signed<T>::value,
                 "P2(T x, ...): T must be signed integer type");
@@ -223,7 +223,6 @@ T P2_OpenMP(T x, int64_t y, int threads)
 
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
-  double time = get_wtime();
 
   resume(x, y, z, low, thread_distance, pix_total, p2, time);
 
@@ -258,8 +257,6 @@ T P2_OpenMP(T x, int64_t y, int threads)
     }
   }
 
-  print("P2", p2, time);
-
   return p2;
 }
 
@@ -279,8 +276,10 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  int64_t p2 = P2_OpenMP(x, y, threads);
+  double time = get_wtime();
+  int64_t p2 = P2_OpenMP(x, y, threads, time);
 
+  print("P2", p2, time);
   return p2;
 }
 
@@ -298,8 +297,10 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  int128_t p2 = P2_OpenMP(x, y, threads);
+  double time = get_wtime();
+  int128_t p2 = P2_OpenMP(x, y, threads, time);
 
+  print("P2", p2, time);
   return p2;
 }
 
