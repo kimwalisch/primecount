@@ -12,6 +12,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
@@ -19,9 +20,11 @@
 #include <imath.hpp>
 #include <S2Status.hpp>
 #include <S2.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -29,8 +32,96 @@
 
 using namespace std;
 using namespace primecount;
+using namespace nlohmann;
 
 namespace {
+
+template <typename T>
+void backup(T x,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            int64_t start,
+            int64_t pi_x13,
+            T s2_easy,
+            double percent,
+            double time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("S2_easy") != j.end())
+    j.erase(j.find("S2_easy"));
+
+  j["S2_easy"]["x"] = to_string(x);
+  j["S2_easy"]["y"] = y;
+  j["S2_easy"]["z"] = z;
+  j["S2_easy"]["c"] = c;
+  j["S2_easy"]["start"] = start;
+  j["S2_easy"]["pi_x13"] = pi_x13;
+  j["S2_easy"]["s2_easy"] = to_string(s2_easy);
+  j["S2_easy"]["percent"] = percent;
+  j["S2_easy"]["seconds"] = get_wtime() - time;
+
+  ofstream ofs("primecount.backup");
+  ofs << setw(4) << j << endl;
+}
+
+template <typename T>
+bool resume(T x,
+            int64_t y,
+            int64_t z,
+            int64_t c,
+            int64_t& start,
+            int64_t& pi_x13,
+            T& s2_easy,
+            double& time)
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("S2_easy") != j.end() &&
+      x == calculator::eval<T>(j["S2_easy"]["x"]) &&
+      y == j["S2_easy"]["y"] &&
+      z == j["S2_easy"]["z"] &&
+      c == j["S2_easy"]["c"])
+  {
+    start = j["S2_easy"]["start"];
+    pi_x13 = j["S2_easy"]["pi_x13"];
+    s2_easy = calculator::eval<T>(j["S2_easy"]["s2_easy"]);
+    double seconds = j["S2_easy"]["seconds"];
+    time = get_wtime() - seconds;
+
+    if (is_print())
+    {
+      if (!print_variables())
+        cout << endl;
+
+      cout << "=== Resuming from primecount.backup ===" << endl;
+      cout << "start = " << start << endl;
+      cout << "pi_x13 = " << pi_x13 << endl;
+      cout << "s2_easy = " << s2_easy << endl;
+      cout << "Seconds: " << seconds << endl;
+      cout << endl;
+    }
+
+    return true;
+  }
+
+  return false;
+}
 
 /// Calculate the contribution of the clustered easy leaves
 /// and the sparse easy leaves.
@@ -42,60 +133,89 @@ T S2_easy_OpenMP(T x,
                  int64_t z,
                  int64_t c,
                  Primes& primes,
-                 int threads)
+                 int threads,
+                 double& time)
 {
   T s2_easy = 0;
-  int64_t x13 = iroot<3>(x);
-  int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
+  int64_t start;
+  int64_t pi_x13;
+  double backup_time = get_wtime();
+
+  if (resume(x, y, z, c, start, pi_x13, s2_easy, time) && start >= pi_x13)
+    return s2_easy;
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_x13 = pi[x13];
+  int64_t x13 = iroot<3>(x);
+  int64_t max_dist = 1;
+  int64_t thread_threshold = 1000;
+  threads = ideal_num_threads(threads, x13, thread_threshold);
+
+  pi_x13 = pi[x13];
+  start = max(c, pi_sqrty) + 1;
   S2Status status(x);
 
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
-  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+  while (start <= pi_x13)
   {
-    int64_t prime = primes[b];
-    T x2 = x / prime;
-    int64_t min_trivial = min(x2 / prime, y);
-    int64_t min_clustered = (int64_t) isqrt(x2);
-    int64_t min_sparse = z / prime;
+    int64_t stop = min(start + max_dist * threads, pi_x13);
 
-    min_clustered = in_between(prime, min_clustered, y);
-    min_sparse = in_between(prime, min_sparse, y);
-
-    int64_t l = pi[min_trivial];
-    int64_t pi_min_clustered = pi[min_clustered];
-    int64_t pi_min_sparse = pi[min_sparse];
-
-    // Find all clustered easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (l > pi_min_clustered)
+    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
+    for (int64_t b = start; b <= stop; b++)
     {
-      int64_t xn = (int64_t) fast_div(x2, primes[l]);
-      int64_t phi_xn = pi[xn] - b + 2;
-      int64_t xm = (int64_t) fast_div(x2, primes[b + phi_xn - 1]);
-      int64_t l2 = pi[xm];
-      s2_easy += phi_xn * (l - l2);
-      l = l2;
+      int64_t prime = primes[b];
+      T x2 = x / prime;
+      int64_t min_trivial = min(x2 / prime, y);
+      int64_t min_clustered = (int64_t) isqrt(x2);
+      int64_t min_sparse = z / prime;
+
+      min_clustered = in_between(prime, min_clustered, y);
+      min_sparse = in_between(prime, min_sparse, y);
+
+      int64_t l = pi[min_trivial];
+      int64_t pi_min_clustered = pi[min_clustered];
+      int64_t pi_min_sparse = pi[min_sparse];
+
+      // Find all clustered easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
+      // where phi(x / n, b - 1) = pi(x / n) - b + 2
+      while (l > pi_min_clustered)
+      {
+        int64_t xn = (int64_t) fast_div(x2, primes[l]);
+        int64_t phi_xn = pi[xn] - b + 2;
+        int64_t xm = (int64_t) fast_div(x2, primes[b + phi_xn - 1]);
+        int64_t l2 = pi[xm];
+        s2_easy += phi_xn * (l - l2);
+        l = l2;
+      }
+
+      // Find all sparse easy leaves:
+      // n = primes[b] * primes[l]
+      // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+      for (; l > pi_min_sparse; l--)
+      {
+        int64_t xn = (int64_t) fast_div(x2, primes[l]);
+        s2_easy += pi[xn] - b + 2;
+      }
+
+      if (is_print())
+        status.print(b, pi_x13);
     }
 
-    // Find all sparse easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; l > pi_min_sparse; l--)
-    {
-      int64_t xn = (int64_t) fast_div(x2, primes[l]);
-      s2_easy += pi[xn] - b + 2;
-    }
+    start = stop + 1;
 
-    if (is_print())
-      status.print(b, pi_x13);
+    if (get_wtime() - backup_time < 60)
+      max_dist *= 2;
+    else
+    {
+      max_dist = ceil_div(max_dist, 2);
+      double percent = status.getPercent(start, pi_x13, start, pi_x13);
+      backup(x, y, z, c, start, pi_x13, s2_easy, percent, time);
+      backup_time = get_wtime();
+    }
   }
+
+  backup(x, y, z, c, pi_x13, pi_x13, s2_easy, 100, time);
 
   return s2_easy;
 }
@@ -122,7 +242,7 @@ int64_t S2_easy(int64_t x,
 
   double time = get_wtime();
   auto primes = generate_primes<int32_t>(y);
-  int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads, time);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -146,19 +266,19 @@ int128_t S2_easy(int128_t x,
   print("Computation of the easy special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
   int128_t s2_easy;
+  double time = get_wtime();
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time);
   }
 
   print("S2_easy", s2_easy, time);
