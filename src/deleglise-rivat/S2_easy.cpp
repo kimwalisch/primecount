@@ -98,10 +98,12 @@ bool resume(T x,
       z == j["S2_easy"]["z"] &&
       c == j["S2_easy"]["c"])
   {
+    double percent = j["S2_easy"]["percent"];
+    double seconds = j["S2_easy"]["seconds"];
+
     start = j["S2_easy"]["start"];
     pi_x13 = j["S2_easy"]["pi_x13"];
     s2_easy = calculator::eval<T>(j["S2_easy"]["s2_easy"]);
-    double seconds = j["S2_easy"]["seconds"];
     time = get_wtime() - seconds;
 
     if (is_print())
@@ -113,8 +115,8 @@ bool resume(T x,
       cout << "start = " << start << endl;
       cout << "pi_x13 = " << pi_x13 << endl;
       cout << "s2_easy = " << s2_easy << endl;
-      cout << "Seconds: " << seconds << endl;
-      cout << endl;
+      cout << "Seconds: " << seconds << endl << endl;
+      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
     }
 
     return true;
@@ -140,20 +142,25 @@ T S2_easy_OpenMP(T x,
   int64_t start;
   int64_t pi_x13;
   double backup_time = get_wtime();
+  bool is_resume = resume(x, y, z, c, start, pi_x13, s2_easy, time);
 
-  if (resume(x, y, z, c, start, pi_x13, s2_easy, time) && start >= pi_x13)
+  if (is_resume && start >= pi_x13)
     return s2_easy;
 
   PiTable pi(y);
+  S2Status status(x);
+
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t x13 = iroot<3>(x);
   int64_t max_dist = 1;
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
-  pi_x13 = pi[x13];
-  start = max(c, pi_sqrty) + 1;
-  S2Status status(x);
+  if (!is_resume)
+  {
+    start = max(c, pi_sqrty) + 1;
+    pi_x13 = pi[x13];
+  }
 
   while (start <= pi_x13)
   {
