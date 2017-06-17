@@ -38,6 +38,7 @@ public:
   void update(int64_t low, int64_t segments, int64_t segment_size, maxint_t S2, Runtime& runtime);
   bool resume(int thread_id, int64_t& low, int64_t& segments, int64_t& segment_size);
   bool resume(maxint_t x, int64_t y, int64_t z, maxint_t& s2_hard, double& time) const;
+  void get_backup_threads(int& threads) const;
   maxint_t get_result() const;
 
 private:

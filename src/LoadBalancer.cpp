@@ -76,6 +76,26 @@ void LoadBalancer::backup(int thread_id,
   ofs << setw(4) << j << endl;
 }
 
+void LoadBalancer::get_backup_threads(int& threads) const
+{
+
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+
+    int t = 0;
+    while (j["S2_hard"]["thread" + to_string(t)].is_object())
+      t++;
+
+    if (t > 0)
+      threads = t;
+  }
+}
+
 bool LoadBalancer::resume(int thread_id,
                           int64_t& low,
                           int64_t& segments,

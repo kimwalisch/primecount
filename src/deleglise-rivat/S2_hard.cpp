@@ -201,6 +201,8 @@ T S2_hard_OpenMP(T x,
 
   double alpha = get_alpha(x, y);
   LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  loadBalancer.get_backup_threads(threads);
+
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
