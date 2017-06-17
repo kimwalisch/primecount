@@ -201,14 +201,14 @@ T S2_hard_OpenMP(T x,
 
   double alpha = get_alpha(x, y);
   LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
-  loadBalancer.get_backup_threads(threads);
+  int resume_threads = loadBalancer.resume_threads();
 
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
   // resume from backup file
-  #pragma omp parallel for num_threads(threads)
-  for (int i = 0; i < threads; i++)
+  #pragma omp parallel for num_threads(resume_threads)
+  for (int i = 0; i < resume_threads; i++)
   {
     int64_t low = 0;
     int64_t segments = 0;
@@ -221,7 +221,7 @@ T S2_hard_OpenMP(T x,
       runtime.start();
       s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
       runtime.stop();
-      loadBalancer.update(low, segments, segment_size, s2_hard, runtime);
+      loadBalancer.finish_resume(i, low, segments, segment_size, s2_hard, runtime);
     }
   }
 
@@ -242,6 +242,7 @@ T S2_hard_OpenMP(T x,
     }
   }
 
+  loadBalancer.backup_result();
   T s2_hard = (T) loadBalancer.get_result();
 
   return s2_hard;

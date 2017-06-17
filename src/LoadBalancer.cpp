@@ -42,6 +42,24 @@ using namespace nlohmann;
 
 namespace primecount {
 
+int LoadBalancer::resume_threads() const
+{
+  int threads = 0;
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+
+    while (j["S2_hard"]["thread" + to_string(threads)].is_object())
+      threads++;
+  }
+
+  return threads;
+}
+
 void LoadBalancer::backup(int thread_id,
                           int64_t low,
                           int64_t segments,
@@ -76,26 +94,6 @@ void LoadBalancer::backup(int thread_id,
   ofs << setw(4) << j << endl;
 }
 
-void LoadBalancer::get_backup_threads(int& threads) const
-{
-
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-
-    int t = 0;
-    while (j["S2_hard"]["thread" + to_string(t)].is_object())
-      t++;
-
-    if (t > 0)
-      threads = t;
-  }
-}
-
 bool LoadBalancer::resume(int thread_id,
                           int64_t& low,
                           int64_t& segments,
@@ -120,13 +118,11 @@ bool LoadBalancer::resume(int thread_id,
         z_ == j["S2_hard"]["z"])
     {
       double seconds = j["S2_hard"]["seconds"];
-
       s2_total_ = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
       low_ = j["S2_hard"]["low"];
       segments_ = j["S2_hard"]["segments"];
       segment_size_ = j["S2_hard"]["segment_size"];
       time_ = get_wtime() - seconds;
-
       low = j["S2_hard"]["thread" + to_string(thread_id)]["low"];
       segments = j["S2_hard"]["thread" + to_string(thread_id)]["segments"];
       segment_size = j["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
@@ -189,6 +185,77 @@ bool LoadBalancer::resume(maxint_t x, int64_t y, int64_t z, maxint_t& s2_hard, d
   return false;
 }
 
+void LoadBalancer::finish_resume(int thread_id,
+                                 int64_t low,
+                                 int64_t segments,
+                                 int64_t segment_size,
+                                 maxint_t s2,
+                                 Runtime& runtime)
+{
+  #pragma omp critical (LoadBalancer)
+  {
+    s2_total_ += s2;
+
+    update(&low, &segments, runtime);
+
+    ifstream ifs("primecount.backup");
+    json j;
+
+    if (ifs.is_open())
+    {
+      ifs >> j;
+      ifs.close();
+    }
+
+    double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+
+    j["S2_hard"]["x"] = to_string(x_);
+    j["S2_hard"]["y"] = y_;
+    j["S2_hard"]["z"] = z_;
+    j["S2_hard"]["low"] = low_;
+    j["S2_hard"]["segments"] = segments_;
+    j["S2_hard"]["segment_size"] = segment_size_;
+    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    j["S2_hard"]["percent"] = percent;
+    j["S2_hard"]["seconds"] = get_wtime() - time_;
+    j["S2_hard"].erase("thread" + to_string(thread_id));
+
+    if (is_print())
+      status_.print(s2_total_, s2_approx_);
+  }
+}
+
+void LoadBalancer::backup_result() const
+{
+  ifstream ifs("primecount.backup");
+  json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  if (j.find("S2_hard") != j.end() &&
+      x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
+      y_ == j["S2_hard"]["y"] &&
+      z_ == j["S2_hard"]["z"])
+  {
+    j.erase("S2_hard");
+
+    j["S2_hard"]["x"] = to_string(x_);
+    j["S2_hard"]["y"] = y_;
+    j["S2_hard"]["z"] = z_;
+    j["S2_hard"]["low"] = low_;
+    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    j["S2_hard"]["percent"] = 100;
+    j["S2_hard"]["seconds"] = get_wtime() - time_;
+
+    ofstream ofs("primecount.backup");
+    ofs << setw(4) << j << endl;
+  }
+}
+
 LoadBalancer::LoadBalancer(maxint_t x,
                            int64_t y,
                            int64_t z,
@@ -224,34 +291,6 @@ void LoadBalancer::init_size()
 
 maxint_t LoadBalancer::get_result() const
 {
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_hard") != j.end() &&
-      x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
-      y_ == j["S2_hard"]["y"] &&
-      z_ == j["S2_hard"]["z"])
-  {
-    j.erase("S2_hard");
-
-    j["S2_hard"]["x"] = to_string(x_);
-    j["S2_hard"]["y"] = y_;
-    j["S2_hard"]["z"] = z_;
-    j["S2_hard"]["low"] = low_;
-    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-    j["S2_hard"]["percent"] = 100;
-    j["S2_hard"]["seconds"] = get_wtime() - time_;
-
-    ofstream ofs("primecount.backup");
-    ofs << setw(4) << j << endl;
-  }
-
   return s2_total_;
 }
 
@@ -281,23 +320,6 @@ bool LoadBalancer::get_work(int thread_id,
   }
 
   return *low <= z_;
-}
-
-void LoadBalancer::update(int64_t low,
-                          int64_t segments,
-                          int64_t segment_size,
-                          maxint_t s2,
-                          Runtime& runtime)
-{
-  #pragma omp critical (LoadBalancer)
-  {
-    s2_total_ += s2;
-
-    update(&low, &segments, runtime);
-
-    if (is_print())
-      status_.print(s2_total_, s2_approx_);
-  }
 }
 
 void LoadBalancer::update(int64_t* low,
