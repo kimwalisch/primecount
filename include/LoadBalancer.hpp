@@ -41,6 +41,7 @@ public:
   void backup_result() const;
   int resume_threads() const;
   maxint_t get_result() const;
+  double get_time() const;
 
 private:
   void init_size();

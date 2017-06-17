@@ -195,7 +195,8 @@ T S2_hard_OpenMP(T x,
                  T s2_hard_approx,
                  Primes& primes,
                  FactorTable& factor,
-                 int threads)
+                 int threads,
+                 double& time)
 {
   threads = ideal_num_threads(threads, z);
 
@@ -242,6 +243,7 @@ T S2_hard_OpenMP(T x,
     }
   }
 
+  time = loadBalancer.get_time();
   loadBalancer.backup_result();
   T s2_hard = (T) loadBalancer.get_result();
 
@@ -280,7 +282,7 @@ int64_t S2_hard(int64_t x,
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<int32_t>(max_prime);
 
-    s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads);
+    s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads, time);
   }
 
   print("S2_hard", s2_hard, time);
@@ -320,7 +322,7 @@ int128_t S2_hard(int128_t x,
       int64_t max_prime = min(y, z / isqrt(y));
       auto primes = generate_primes<uint32_t>(max_prime);
 
-      s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
+      s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads, time);
     }
     else
     {
@@ -328,7 +330,7 @@ int128_t S2_hard(int128_t x,
       int64_t max_prime = min(y, z / isqrt(y));
       auto primes = generate_primes<int64_t>(max_prime);
 
-      s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
+      s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads, time);
     }
   }
 

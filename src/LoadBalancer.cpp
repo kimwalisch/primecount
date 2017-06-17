@@ -52,7 +52,13 @@ int LoadBalancer::resume_threads() const
   {
     ifs >> j;
     ifs.close();
+  }
 
+  if (j.find("S2_hard") != j.end() &&
+      x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
+      y_ == j["S2_hard"]["y"] &&
+      z_ == j["S2_hard"]["z"])
+  {
     while (j["S2_hard"]["thread" + to_string(threads)].is_object())
       threads++;
   }
@@ -292,6 +298,11 @@ void LoadBalancer::init_size()
 maxint_t LoadBalancer::get_result() const
 {
   return s2_total_;
+}
+
+double LoadBalancer::get_time() const
+{
+  return time_;
 }
 
 bool LoadBalancer::get_work(int thread_id,
