@@ -202,7 +202,7 @@ int64_t S2(int64_t x,
     int64_t S2 = 0;
     Runtime runtime;
 
-    while (loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime))
+    while (loadBalancer.get_work(i, &low, &segments, &segment_size, S2, runtime))
     {
       runtime.start();
       S2 = S2_thread(x, y, z, c, low, segments, segment_size, pi, primes, lpf, mu, runtime);
