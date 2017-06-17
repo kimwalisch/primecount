@@ -99,7 +99,6 @@ bool LoadBalancer::resume(int thread_id,
         y_ == j["S2_hard"]["y"] &&
         z_ == j["S2_hard"]["z"])
     {
-      double percent = j["S2_hard"]["percent"];
       double seconds = j["S2_hard"]["seconds"];
 
       s2_total_ = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
