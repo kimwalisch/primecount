@@ -211,7 +211,7 @@ T S2_easy_OpenMP(T x,
 
     start = stop + 1;
 
-    if (get_wtime() - backup_time < 60)
+    if (get_wtime() - backup_time < 300)
       max_dist *= 2;
     else
     {
