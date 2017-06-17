@@ -264,6 +264,23 @@ bool LoadBalancer::get_work(int thread_id,
   return *low <= z_;
 }
 
+void LoadBalancer::update(int64_t low,
+                          int64_t segments,
+                          int64_t segment_size,
+                          maxint_t s2,
+                          Runtime& runtime)
+{
+  #pragma omp critical (LoadBalancer)
+  {
+    s2_total_ += s2;
+
+    update(&low, &segments, runtime);
+
+    if (is_print())
+      status_.print(s2_total_, s2_approx_);
+  }
+}
+
 void LoadBalancer::update(int64_t* low,
                           int64_t* segments,
                           Runtime& runtime)

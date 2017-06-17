@@ -204,6 +204,25 @@ T S2_hard_OpenMP(T x,
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
+  // resume from backup file
+  #pragma omp parallel for num_threads(threads)
+  for (int i = 0; i < threads; i++)
+  {
+    int64_t low = 0;
+    int64_t segments = 0;
+    int64_t segment_size = 0;
+    T s2_hard = 0;
+    Runtime runtime;
+
+    if (loadBalancer.resume(i, low, segments, segment_size))
+    {
+      runtime.start();
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
+      runtime.stop();
+      loadBalancer.update(low, segments, segment_size, s2_hard, runtime);
+    }
+  }
+
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
