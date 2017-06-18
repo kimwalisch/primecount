@@ -24,7 +24,8 @@
 
 #include <stdint.h>
 #include <vector>
-#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -32,7 +33,6 @@
 
 using namespace std;
 using namespace primecount;
-using namespace nlohmann;
 
 namespace {
 
@@ -47,17 +47,7 @@ void backup(T x,
             double percent,
             double time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_easy") != j.end())
-    j.erase(j.find("S2_easy"));
+  auto j = load_backup();
 
   j["S2_easy"]["x"] = to_string(x);
   j["S2_easy"]["y"] = y;
@@ -69,8 +59,29 @@ void backup(T x,
   j["S2_easy"]["percent"] = percent;
   j["S2_easy"]["seconds"] = get_wtime() - time;
 
-  ofstream ofs("primecount.backup");
-  ofs << setw(4) << j << endl;
+  store_backup(j);
+}
+
+template <typename T>
+void print_resume(T x,
+                  int64_t start,
+                  int64_t pi_x13,
+                  T s2_easy,
+                  double seconds,
+                  double percent)
+{
+  if (is_print())
+  {
+    if (!print_variables())
+      cout << endl;
+
+    cout << "=== Resuming from primecount.backup ===" << endl;
+    cout << "start = " << start << endl;
+    cout << "pi_x13 = " << pi_x13 << endl;
+    cout << "s2_easy = " << s2_easy << endl;
+    cout << "Seconds: " << seconds << endl << endl;
+    cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+  }
 }
 
 template <typename T>
@@ -83,20 +94,9 @@ bool resume(T x,
             T& s2_easy,
             double& time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_easy") != j.end() &&
-      x == calculator::eval<T>(j["S2_easy"]["x"]) &&
-      y == j["S2_easy"]["y"] &&
-      z == j["S2_easy"]["z"] &&
-      c == j["S2_easy"]["c"])
+  if (is_resume(j, "S2_easy", x, y, z))
   {
     double percent = j["S2_easy"]["percent"];
     double seconds = j["S2_easy"]["seconds"];
@@ -105,19 +105,7 @@ bool resume(T x,
     pi_x13 = j["S2_easy"]["pi_x13"];
     s2_easy = calculator::eval<T>(j["S2_easy"]["s2_easy"]);
     time = get_wtime() - seconds;
-
-    if (is_print())
-    {
-      if (!print_variables())
-        cout << endl;
-
-      cout << "=== Resuming from primecount.backup ===" << endl;
-      cout << "start = " << start << endl;
-      cout << "pi_x13 = " << pi_x13 << endl;
-      cout << "s2_easy = " << s2_easy << endl;
-      cout << "Seconds: " << seconds << endl << endl;
-      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
-    }
+    print_resume(x, start, pi_x13, s2_easy, seconds, percent);
 
     return true;
   }
