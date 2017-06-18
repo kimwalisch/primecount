@@ -80,6 +80,60 @@ void LoadBalancer::backup(int threads,
   store_backup(j);
 }
 
+void LoadBalancer::backup(int thread_id,
+                          int64_t low,
+                          int64_t segments,
+                          int64_t segment_size,
+                          maxint_t s2,
+                          Runtime& runtime)
+{
+  #pragma omp critical (LoadBalancer)
+  {
+    s2_total_ += s2;
+
+    update(&low, &segments, runtime);
+
+    double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+    auto j = load_backup();
+
+    j["S2_hard"]["x"] = to_string(x_);
+    j["S2_hard"]["y"] = y_;
+    j["S2_hard"]["z"] = z_;
+    j["S2_hard"]["low"] = low_;
+    j["S2_hard"]["segments"] = segments_;
+    j["S2_hard"]["segment_size"] = segment_size_;
+    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    j["S2_hard"]["percent"] = percent;
+    j["S2_hard"]["seconds"] = get_wtime() - time_;
+    j["S2_hard"].erase("thread" + to_string(thread_id));
+
+    store_backup(j);
+
+    if (is_print())
+      status_.print(s2_total_, s2_approx_);
+  }
+}
+
+void LoadBalancer::backup_result() const
+{
+  auto j = load_backup();
+
+  if (is_resume(j, "S2_hard", x_, y_, z_))
+  {
+    j.erase("S2_hard");
+
+    j["S2_hard"]["x"] = to_string(x_);
+    j["S2_hard"]["y"] = y_;
+    j["S2_hard"]["z"] = z_;
+    j["S2_hard"]["low"] = low_;
+    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    j["S2_hard"]["percent"] = 100;
+    j["S2_hard"]["seconds"] = get_wtime() - time_;
+
+    store_backup(j);
+  }
+}
+
 template <typename T>
 void print_resume(int thread_id,
                   T low,
@@ -163,60 +217,6 @@ bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
   }
 
   return false;
-}
-
-void LoadBalancer::finish_resume(int thread_id,
-                                 int64_t low,
-                                 int64_t segments,
-                                 int64_t segment_size,
-                                 maxint_t s2,
-                                 Runtime& runtime)
-{
-  #pragma omp critical (LoadBalancer)
-  {
-    s2_total_ += s2;
-
-    update(&low, &segments, runtime);
-
-    double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-    auto j = load_backup();
-
-    j["S2_hard"]["x"] = to_string(x_);
-    j["S2_hard"]["y"] = y_;
-    j["S2_hard"]["z"] = z_;
-    j["S2_hard"]["low"] = low_;
-    j["S2_hard"]["segments"] = segments_;
-    j["S2_hard"]["segment_size"] = segment_size_;
-    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-    j["S2_hard"]["percent"] = percent;
-    j["S2_hard"]["seconds"] = get_wtime() - time_;
-    j["S2_hard"].erase("thread" + to_string(thread_id));
-
-    store_backup(j);
-
-    if (is_print())
-      status_.print(s2_total_, s2_approx_);
-  }
-}
-
-void LoadBalancer::backup_result() const
-{
-  auto j = load_backup();
-
-  if (is_resume(j, "S2_hard", x_, y_, z_))
-  {
-    j.erase("S2_hard");
-
-    j["S2_hard"]["x"] = to_string(x_);
-    j["S2_hard"]["y"] = y_;
-    j["S2_hard"]["z"] = z_;
-    j["S2_hard"]["low"] = low_;
-    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-    j["S2_hard"]["percent"] = 100;
-    j["S2_hard"]["seconds"] = get_wtime() - time_;
-
-    store_backup(j);
-  }
 }
 
 LoadBalancer::LoadBalancer(maxint_t x,

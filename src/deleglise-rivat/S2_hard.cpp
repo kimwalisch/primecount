@@ -222,7 +222,7 @@ T S2_hard_OpenMP(T x,
       runtime.start();
       s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
       runtime.stop();
-      loadBalancer.finish_resume(i, low, segments, segment_size, s2_hard, runtime);
+      loadBalancer.backup(i, low, segments, segment_size, s2_hard, runtime);
     }
   }
 
