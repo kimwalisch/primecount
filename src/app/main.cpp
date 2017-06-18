@@ -20,6 +20,8 @@
 
 #include <stdint.h>
 #include <exception>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -247,10 +249,14 @@ int main (int argc, char* argv[])
 
     if (print_result())
     {
+      ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+
       if (is_print())
         cout << endl;
 
       cout << res << endl;
+      outfile << endl << res << endl;
+      outfile << "Seconds: " << fixed << setprecision(3) << get_wtime() - time << endl;
 
       if (opt.time)
         print_seconds(get_wtime() - time);
