@@ -48,7 +48,7 @@ int LoadBalancer::resume_threads() const
   auto j = load_backup();
 
   if (is_resume(j, "S2_hard", x_, y_, z_))
-    while (j["S2_hard"]["thread" + to_string(threads)].is_object())
+    while (j["S2_hard"].count("thread" + to_string(threads)))
       threads++;
 
   return threads;
