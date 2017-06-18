@@ -276,7 +276,7 @@ int64_t S2_hard(int64_t x,
   LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
   maxint_t s2_hard;
 
-  if (!loadBalancer.resume(x, y, z, s2_hard, time))
+  if (!loadBalancer.resume(s2_hard, time))
   {
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
@@ -313,7 +313,7 @@ int128_t S2_hard(int128_t x,
   LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
   maxint_t s2_hard;
 
-  if (!loadBalancer.resume(x, y, z, s2_hard, time))
+  if (!loadBalancer.resume(s2_hard, time))
   {
     // uses less memory
     if (y <= FactorTable<uint16_t>::max())

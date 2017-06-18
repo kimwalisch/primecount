@@ -148,11 +148,11 @@ bool LoadBalancer::resume(int thread_id,
   return resumed;
 }
 
-bool LoadBalancer::resume(maxint_t x, int64_t y, int64_t z, maxint_t& s2_hard, double& time) const
+bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
 {
   auto j = load_backup();
 
-  if (is_resume(j, "S2_hard", x, y, z) &&
+  if (is_resume(j, "S2_hard", x_, y_, z_) &&
       j["S2_hard"]["low"] >= j["S2_hard"]["z"])
   {
     double seconds = j["S2_hard"]["seconds"];
