@@ -45,4 +45,4 @@ script:
   - cd build
   - cmake .. -DWITH_MPI=ON
   - make -j4
-  - mpiexec -n 4 ./primecount 1e14 -t1 #| grep 3204941750802
+  - mpiexec -n 4 ./primecount 1e14 -t1 -s #| grep 3204941750802
