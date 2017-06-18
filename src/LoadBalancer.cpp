@@ -30,8 +30,8 @@
 
 #include <stdint.h>
 #include <cmath>
-#include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -45,23 +45,11 @@ namespace primecount {
 int LoadBalancer::resume_threads() const
 {
   int threads = 0;
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_hard") != j.end() &&
-      x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
-      y_ == j["S2_hard"]["y"] &&
-      z_ == j["S2_hard"]["z"])
-  {
+  if (is_resume(j, "S2_hard", x_, y_, z_))
     while (j["S2_hard"]["thread" + to_string(threads)].is_object())
       threads++;
-  }
 
   return threads;
 }
@@ -71,14 +59,7 @@ void LoadBalancer::backup(int thread_id,
                           int64_t segments,
                           int64_t segment_size) const
 {
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
+  auto j = load_backup();
 
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
 
@@ -96,8 +77,43 @@ void LoadBalancer::backup(int thread_id,
   j["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
   j["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
 
-  ofstream ofs("primecount.backup");
-  ofs << setw(4) << j << endl;
+  store_backup(j);
+}
+
+template <typename T>
+void print_resume(int thread_id,
+                  T low,
+                  T segments,
+                  T segment_size)
+{
+  if (is_print())
+  {
+    if (!print_variables())
+      cout << endl;
+
+    cout << "=== Resuming from primecount.backup ===" << endl;
+    cout << "thread = " << thread_id << endl;
+    cout << "low = " << low << endl;
+    cout << "segments = " << segments << endl;
+    cout << "segment_size = " << segment_size << endl;
+    cout << endl;
+  }
+}
+
+template <typename T>
+void print_resume(T s2_hard,
+                  double seconds)
+{
+  if (is_print())
+  {
+    if (!print_variables())
+      cout << endl;
+
+    cout << "=== Resuming from primecount.backup ===" << endl;
+    cout << "S2_hard = " << s2_hard << endl;
+    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+    cout << endl;
+  }
 }
 
 bool LoadBalancer::resume(int thread_id,
@@ -105,23 +121,13 @@ bool LoadBalancer::resume(int thread_id,
                           int64_t& segments,
                           int64_t& segment_size)
 {
-  bool is_resume = false;
+  bool resumed = false;
 
   #pragma omp critical (LoadBalancer)
   {
-    ifstream ifs("primecount.backup");
-    json j;
+    auto j = load_backup();
 
-    if (ifs.is_open())
-    {
-      ifs >> j;
-      ifs.close();
-    }
-
-    if (j.find("S2_hard") != j.end() &&
-        x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
-        y_ == j["S2_hard"]["y"] &&
-        z_ == j["S2_hard"]["z"])
+    if (is_resume(j, "S2_hard", x_, y_, z_))
     {
       double seconds = j["S2_hard"]["seconds"];
       s2_total_ = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
@@ -133,57 +139,26 @@ bool LoadBalancer::resume(int thread_id,
       segments = j["S2_hard"]["thread" + to_string(thread_id)]["segments"];
       segment_size = j["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
 
-      if (is_print())
-      {
-        if (!print_variables())
-          cout << endl;
+      print_resume(thread_id, low, segments, segment_size);
 
-        cout << "=== Resuming from primecount.backup ===" << endl;
-        cout << "thread = " << thread_id << endl;
-        cout << "low = " << low << endl;
-        cout << "segments = " << segments << endl;
-        cout << "segment_size = " << segment_size << endl;
-        cout << endl;
-      }
-
-      is_resume = true;
+      resumed = true;
     }
   }
 
-  return is_resume;
+  return resumed;
 }
 
 bool LoadBalancer::resume(maxint_t x, int64_t y, int64_t z, maxint_t& s2_hard, double& time) const
 {
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_hard") != j.end() &&
-      x == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
-      y == j["S2_hard"]["y"] &&
-      z == j["S2_hard"]["z"] &&
+  if (is_resume(j, "S2_hard", x, y, z) &&
       j["S2_hard"]["low"] >= j["S2_hard"]["z"])
   {
     double seconds = j["S2_hard"]["seconds"];
     s2_hard = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
     time = get_wtime() - seconds;
-
-    if (is_print())
-    {
-      if (!print_variables())
-        cout << endl;
-
-      cout << "=== Resuming from primecount.backup ===" << endl;
-      cout << "S2_hard = " << s2_hard << endl;
-      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-      cout << endl;
-    }
+    print_resume(s2_hard, seconds);
 
     return true;
   }
@@ -204,16 +179,8 @@ void LoadBalancer::finish_resume(int thread_id,
 
     update(&low, &segments, runtime);
 
-    ifstream ifs("primecount.backup");
-    json j;
-
-    if (ifs.is_open())
-    {
-      ifs >> j;
-      ifs.close();
-    }
-
     double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+    auto j = load_backup();
 
     j["S2_hard"]["x"] = to_string(x_);
     j["S2_hard"]["y"] = y_;
@@ -226,6 +193,8 @@ void LoadBalancer::finish_resume(int thread_id,
     j["S2_hard"]["seconds"] = get_wtime() - time_;
     j["S2_hard"].erase("thread" + to_string(thread_id));
 
+    store_backup(j);
+
     if (is_print())
       status_.print(s2_total_, s2_approx_);
   }
@@ -233,19 +202,9 @@ void LoadBalancer::finish_resume(int thread_id,
 
 void LoadBalancer::backup_result() const
 {
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_hard") != j.end() &&
-      x_ == calculator::eval<maxint_t>(j["S2_hard"]["x"]) &&
-      y_ == j["S2_hard"]["y"] &&
-      z_ == j["S2_hard"]["z"])
+  if (is_resume(j, "S2_hard", x_, y_, z_))
   {
     j.erase("S2_hard");
 
@@ -257,8 +216,7 @@ void LoadBalancer::backup_result() const
     j["S2_hard"]["percent"] = 100;
     j["S2_hard"]["seconds"] = get_wtime() - time_;
 
-    ofstream ofs("primecount.backup");
-    ofs << setw(4) << j << endl;
+    store_backup(j);
   }
 }
 
