@@ -96,10 +96,6 @@ void LoadBalancer::backup(int thread_id,
     double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
     auto j = load_backup();
 
-    j["S2_hard"]["x"] = to_string(x_);
-    j["S2_hard"]["y"] = y_;
-    j["S2_hard"]["z"] = z_;
-    j["S2_hard"]["low"] = low_;
     j["S2_hard"]["segments"] = segments_;
     j["S2_hard"]["segment_size"] = segment_size_;
     j["S2_hard"]["s2_hard"] = to_string(s2_total_);
