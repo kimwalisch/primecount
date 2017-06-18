@@ -179,10 +179,12 @@ int main (int argc, char* argv[])
     {
       case OPTION_DELEGLISE_RIVAT:
       {
-        if (x <= numeric_limits<int64_t>::max())
-          res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time);
-        else
+#ifdef HAVE_INT128_T
+        if (x > numeric_limits<int64_t>::max())
           res = pi_deleglise_rivat_parallel2(x, threads, &time);
+        else
+#endif
+        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time);
         break;
       }
       case OPTION_DELEGLISE_RIVAT1:
