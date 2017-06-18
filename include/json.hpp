@@ -14501,6 +14501,55 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
     #pragma GCC diagnostic pop
 #endif
 
+// kim custom stuff
+
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <calculator.hpp>
+
+namespace primecount
+{
+
+inline nlohmann::json load_backup()
+{
+  std::ifstream ifs("primecount.backup");
+  nlohmann::json j;
+
+  if (ifs.is_open())
+  {
+    ifs >> j;
+    ifs.close();
+  }
+
+  return j;
+}
+
+inline void store_backup(const nlohmann::json& j)
+{
+  std::ofstream ofs("primecount.backup");
+  ofs << std::setw(4) << j << std::endl;
+}
+
+template <typename T>
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y)
+{
+  return j.find(formula) != j.end() &&
+         x == calculator::eval<T>(j[formula]["x"]) &&
+         y == j[formula]["y"];
+}
+
+template <typename T>
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y, int64_t z)
+{
+  return j.find(formula) != j.end() &&
+         x == calculator::eval<T>(j[formula]["x"]) &&
+         y == j[formula]["y"] &&
+         z == j[formula]["z"];
+}
+
+}
+
 // clean up
 #undef JSON_CATCH
 #undef JSON_THROW

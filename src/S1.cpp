@@ -20,7 +20,8 @@
 
 #include <stdint.h>
 #include <vector>
-#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -28,7 +29,6 @@
 
 using namespace std;
 using namespace primecount;
-using namespace nlohmann;
 
 namespace {
 
@@ -39,14 +39,7 @@ void backup(T x,
             T s1,
             double time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
+  auto j = load_backup();
 
   j["S1"]["x"] = to_string(x);
   j["S1"]["y"] = y;
@@ -55,8 +48,25 @@ void backup(T x,
   j["S1"]["percent"] = 100.0;
   j["S1"]["seconds"] = get_wtime() - time;
 
-  ofstream ofs("primecount.backup");
-  ofs << setw(4) << j << endl;
+  store_backup(j);
+}
+
+template <typename T>
+void print_resume(T x,
+                  T s1,
+                  double seconds,
+                  double percent)
+{
+  if (is_print())
+  {
+    if (!print_variables())
+      cout << endl;
+
+    cout << "=== Resuming from primecount.backup ===" << endl;
+    cout << "s1 = " << s1 << endl;
+    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
+    cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+  }
 }
 
 template <typename T>
@@ -66,36 +76,16 @@ bool resume(T x,
             T& s1,
             double& time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S1") != j.end() &&
-      x == calculator::eval<T>(j["S1"]["x"]) &&
-      y == j["S1"]["y"] &&
-      c == j["S1"]["c"])
+  if (is_resume(j, "S1", x, y))
   {
     double percent = j["S1"]["percent"];
     double seconds = j["S1"]["seconds"];
 
     s1 = calculator::eval<T>(j["S1"]["s1"]);
     time = get_wtime() - seconds;
-
-    if (is_print())
-    {
-      if (!print_variables())
-        cout << endl;
-
-      cout << "=== Resuming from primecount.backup ===" << endl;
-      cout << "s1 = " << s1 << endl;
-      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
-      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
-    }
+    print_resume(x, s1, seconds, percent);
 
     return true;
   }

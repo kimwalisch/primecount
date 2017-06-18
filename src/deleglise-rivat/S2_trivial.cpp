@@ -21,7 +21,8 @@
 #include <stdint.h>
 #include <algorithm>
 #include <vector>
-#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -29,7 +30,6 @@
 
 using namespace std;
 using namespace primecount;
-using namespace nlohmann;
 
 namespace {
 
@@ -41,14 +41,7 @@ void backup(T x,
             T s2_trivial,
             double time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
-
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
+  auto j = load_backup();
 
   j["S2_trivial"]["x"] = to_string(x);
   j["S2_trivial"]["y"] = y;
@@ -58,8 +51,25 @@ void backup(T x,
   j["S2_trivial"]["percent"] = 100.0;
   j["S2_trivial"]["seconds"] = get_wtime() - time;
 
-  ofstream ofs("primecount.backup");
-  ofs << setw(4) << j << endl;
+  store_backup(j);
+}
+
+template <typename T>
+void print_resume(T x,
+                  T s2_trivial,
+                  double seconds,
+                  double percent)
+{
+  if (is_print())
+  {
+    if (!print_variables())
+      cout << endl;
+
+    cout << "=== Resuming from primecount.backup ===" << endl;
+    cout << "s2_trivial = " << s2_trivial << endl;
+    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
+    cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+  }
 }
 
 template <typename T>
@@ -70,37 +80,16 @@ bool resume(T x,
             T& s2_trivial,
             double& time)
 {
-  ifstream ifs("primecount.backup");
-  json j;
+  auto j = load_backup();
 
-  if (ifs.is_open())
-  {
-    ifs >> j;
-    ifs.close();
-  }
-
-  if (j.find("S2_trivial") != j.end() &&
-      x == calculator::eval<T>(j["S2_trivial"]["x"]) &&
-      y == j["S2_trivial"]["y"] &&
-      z == j["S2_trivial"]["z"] &&
-      c == j["S2_trivial"]["c"])
+  if (is_resume(j, "S2_trivial", x, y, z))
   {
     double percent = j["S2_trivial"]["percent"];
     double seconds = j["S2_trivial"]["seconds"];
 
     s2_trivial = calculator::eval<T>(j["S2_trivial"]["s2_trivial"]);
     time = get_wtime() - seconds;
-
-    if (is_print())
-    {
-      if (!print_variables())
-        cout << endl;
-
-      cout << "=== Resuming from primecount.backup ===" << endl;
-      cout << "s2_trivial = " << s2_trivial << endl;
-      cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
-      cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
-    }
+    print_resume(x, s2_trivial, seconds, percent);
 
     return true;
   }
