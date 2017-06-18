@@ -14549,6 +14549,16 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, 
 }
 
 template <typename T>
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, T x, int64_t y, int64_t z)
+{
+  return j.find(formula) != j.end() &&
+         x == calculator::eval<T>(j[formula]["x"]) &&
+         y == j[formula]["y"] &&
+         z == j[formula]["z"] &&
+         j[formula].count("thread" + to_string(thread_id)) > 0;
+}
+
+template <typename T>
 inline double backup_seconds(T x, int64_t y, int64_t z)
 {
   auto j = load_backup();

@@ -44,17 +44,16 @@ namespace primecount {
 
 int LoadBalancer::resume_threads() const
 {
-  int threads = 0;
   auto j = load_backup();
 
   if (is_resume(j, "S2_hard", x_, y_, z_))
-    while (j["S2_hard"].count("thread" + to_string(threads)))
-      threads++;
+    return j["S2_hard"]["threads"];
 
-  return threads;
+  return 0;
 }
 
-void LoadBalancer::backup(int thread_id,
+void LoadBalancer::backup(int threads,
+                          int thread_id,
                           int64_t low,
                           int64_t segments,
                           int64_t segment_size) const
@@ -66,6 +65,7 @@ void LoadBalancer::backup(int thread_id,
   j["S2_hard"]["x"] = to_string(x_);
   j["S2_hard"]["y"] = y_;
   j["S2_hard"]["z"] = z_;
+  j["S2_hard"]["threads"] = threads;
   j["S2_hard"]["low"] = low_;
   j["S2_hard"]["segments"] = segments_;
   j["S2_hard"]["segment_size"] = segment_size_;
@@ -126,7 +126,7 @@ bool LoadBalancer::resume(int thread_id,
   {
     auto j = load_backup();
 
-    if (is_resume(j, "S2_hard", x_, y_, z_))
+    if (is_resume(j, "S2_hard", thread_id, x_, y_, z_))
     {
       double seconds = j["S2_hard"]["seconds"];
       s2_total_ = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
@@ -262,7 +262,8 @@ double LoadBalancer::get_time() const
   return time_;
 }
 
-bool LoadBalancer::get_work(int thread_id,
+bool LoadBalancer::get_work(int threads,
+                            int thread_id,
                             int64_t* low,
                             int64_t* segments,
                             int64_t* segment_size,
@@ -281,7 +282,7 @@ bool LoadBalancer::get_work(int thread_id,
 
     low_ += segments_ * segment_size_;
 
-    backup(thread_id, *low, *segments, *segment_size);
+    backup(threads, thread_id, *low, *segments, *segment_size);
 
     if (is_print())
       status_.print(s2_total_, s2_approx_);

@@ -235,7 +235,7 @@ T S2_hard_OpenMP(T x,
     T s2_hard = 0;
     Runtime runtime;
 
-    while (loadBalancer.get_work(i, &low, &segments, &segment_size, s2_hard, runtime))
+    while (loadBalancer.get_work(threads, i, &low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
       s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
