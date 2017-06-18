@@ -266,10 +266,10 @@ int64_t S2_hard(int64_t x,
     return S2_hard_mpi(x, y, z, c, s2_hard_approx, threads);
 #endif
 
-  print("");
-  print("=== S2_hard(x, y) ===");
-  print("Computation of the hard special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_hard(x, y) ===");
+  print_log("Computation of the hard special leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   double alpha = get_alpha(x, y);
@@ -285,7 +285,7 @@ int64_t S2_hard(int64_t x,
     s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads, time);
   }
 
-  print("S2_hard", s2_hard, time);
+  print_log("S2_hard", s2_hard, time);
   return (int64_t) s2_hard;
 }
 
@@ -303,10 +303,10 @@ int128_t S2_hard(int128_t x,
     return S2_hard_mpi(x, y, z, c, s2_hard_approx, threads);
 #endif
 
-  print("");
-  print("=== S2_hard(x, y) ===");
-  print("Computation of the hard special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_hard(x, y) ===");
+  print_log("Computation of the hard special leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   double alpha = get_alpha(x, y);
@@ -334,7 +334,7 @@ int128_t S2_hard(int128_t x,
     }
   }
 
-  print("S2_hard", s2_hard, time);
+  print_log("S2_hard", s2_hard, time);
   return s2_hard;
 }
 

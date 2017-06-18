@@ -79,25 +79,13 @@ bool print_variables()
 void print(const string& str)
 {
   if (is_print())
-  {
     cout << str << endl;
-
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
-
-    if (outfile.is_open())
-    {
-      outfile << str << endl;
-      outfile.close();
-    }
-  }
 }
 
 void print_log(const string& str)
 {
   if (is_print())
-  {
     cout << str << endl;
-  }
 
   ofstream outfile("primecount.log", ofstream::out | ofstream::app);
 
@@ -118,19 +106,6 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
     cout << "c = " << c << endl;
     cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     print_threads(threads);
-
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
-
-    if (outfile.is_open())
-    {
-      outfile << "x = " << x << endl;
-      outfile << "y = " << y << endl;
-      outfile << "z = " << z << endl;
-      outfile << "c = " << c << endl;
-      outfile << "alpha = " << fixed << setprecision(3) << alpha << endl;
-      outfile << "threads = " << threads << endl;
-      outfile.close();
-    }
   }
 }
 
@@ -171,20 +146,34 @@ void print(maxint_t x, int64_t y, int threads)
     cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
     print_threads(threads);
     cout << endl;
+  }
+}
 
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+void print_log(maxint_t x, int64_t y, int threads)
+{
+  if (print_variables())
+  {
+    maxint_t z = x / y;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+    print_threads(threads);
+    cout << endl;
+  }
 
-    if (outfile.is_open())
-    {
-      maxint_t z = x / y;
-      outfile << "x = " << x << endl;
-      outfile << "y = " << y << endl;
-      outfile << "z = " << z << endl;
-      outfile << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-      outfile << "threads = " << threads << endl;
-      outfile << endl;
-      outfile.close();
-    }
+  ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (outfile.is_open())
+  {
+    maxint_t z = x / y;
+    outfile << "x = " << x << endl;
+    outfile << "y = " << y << endl;
+    outfile << "z = " << z << endl;
+    outfile << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+    outfile << "threads = " << threads << endl;
+    outfile << endl;
+    outfile.close();
   }
 }
 
@@ -200,21 +189,36 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
     cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
     print_threads(threads);
     cout << endl;
+  }
+}
 
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+void print_log(maxint_t x, int64_t y, int64_t c, int threads)
+{
+  if (print_variables())
+  {
+    maxint_t z = x / y;
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << c << endl;
+    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+    print_threads(threads);
+    cout << endl;
+  }
 
-    if (outfile.is_open())
-    {
-      maxint_t z = x / y;
-      outfile << "x = " << x << endl;
-      outfile << "y = " << y << endl;
-      outfile << "z = " << z << endl;
-      outfile << "c = " << c << endl;
-      outfile << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-      outfile << "threads = " << threads << endl;
-      outfile << endl;
-      outfile.close();
-    }
+  ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (outfile.is_open())
+  {
+    maxint_t z = x / y;
+    outfile << "x = " << x << endl;
+    outfile << "y = " << y << endl;
+    outfile << "z = " << z << endl;
+    outfile << "c = " << c << endl;
+    outfile << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+    outfile << "threads = " << threads << endl;
+    outfile << endl;
+    outfile.close();
   }
 }
 
@@ -228,16 +232,29 @@ void print(const string& res_str, maxint_t res, double time)
     cout << "Status: 100%" << endl;
     cout << res_str << " = " << res << endl;
     print_seconds(seconds);
+  }
+}
 
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+void print_log(const string& res_str, maxint_t res, double time)
+{
+  double seconds = get_wtime() - time;
 
-    if (outfile.is_open())
-    {
-      outfile << "Status: 100%" << endl;
-      outfile << res_str << " = " << res << endl;
-      outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-      outfile.close();
-    }
+  if (is_print())
+  {
+    cout << "\r" << string(50,' ') << "\r";
+    cout << "Status: 100%" << endl;
+    cout << res_str << " = " << res << endl;
+    print_seconds(seconds);
+  }
+
+  ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (outfile.is_open())
+  {
+    outfile << "Status: 100%" << endl;
+    outfile << res_str << " = " << res << endl;
+    outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+    outfile.close();
   }
 }
 

@@ -146,10 +146,10 @@ int64_t S2_trivial(int64_t x,
                    int64_t c,
                    int threads)
 {
-  print("");
-  print("=== S2_trivial(x, y) ===");
-  print("Computation of the trivial special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_trivial(x, y) ===");
+  print_log("Computation of the trivial special leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   int64_t s2_trivial;
@@ -160,7 +160,7 @@ int64_t S2_trivial(int64_t x,
     backup(x, y, z, c, s2_trivial, time);
   }
 
-  print("S2_trivial", s2_trivial, time);
+  print_log("S2_trivial", s2_trivial, time);
   return s2_trivial;
 }
 
@@ -172,10 +172,10 @@ int128_t S2_trivial(int128_t x,
                     int64_t c,
                     int threads)
 {
-  print("");
-  print("=== S2_trivial(x, y) ===");
-  print("Computation of the trivial special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_trivial(x, y) ===");
+  print_log("Computation of the trivial special leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   int128_t s2_trivial;
@@ -186,7 +186,7 @@ int128_t S2_trivial(int128_t x,
     backup(x, y, z, c, s2_trivial, time);
   }
 
-  print("S2_trivial", s2_trivial, time);
+  print_log("S2_trivial", s2_trivial, time);
   return s2_trivial;
 }
 

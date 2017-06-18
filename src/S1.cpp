@@ -157,10 +157,10 @@ int64_t S1(int64_t x,
            int64_t c,
            int threads)
 {
-  print("");
-  print("=== S1(x, y) ===");
-  print("Computation of the ordinary leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S1(x, y) ===");
+  print_log("Computation of the ordinary leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   int64_t s1;
@@ -171,7 +171,7 @@ int64_t S1(int64_t x,
     backup(x, y, c, s1, time);
   }
 
-  print("S1", s1, time);
+  print_log("S1", s1, time);
   return s1;
 }
 
@@ -182,10 +182,10 @@ int128_t S1(int128_t x,
             int64_t c,
             int threads)
 {
-  print("");
-  print("=== S1(x, y) ===");
-  print("Computation of the ordinary leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S1(x, y) ===");
+  print_log("Computation of the ordinary leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   int128_t s1;
@@ -201,7 +201,7 @@ int128_t S1(int128_t x,
     backup(x, y, c, s1, time);
   }
 
-  print("S1", s1, time);
+  print_log("S1", s1, time);
   return s1;
 }
 

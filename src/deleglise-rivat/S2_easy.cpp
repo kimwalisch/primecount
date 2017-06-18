@@ -230,16 +230,16 @@ int64_t S2_easy(int64_t x,
     return S2_easy_mpi(x, y, z, c, threads);
 #endif
 
-  print("");
-  print("=== S2_easy(x, y) ===");
-  print("Computation of the easy special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_easy(x, y) ===");
+  print_log("Computation of the easy special leaves");
+  print_log(x, y, c, threads);
 
   double time = get_wtime();
   auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads, time);
 
-  print("S2_easy", s2_easy, time);
+  print_log("S2_easy", s2_easy, time);
   return s2_easy;
 }
 
@@ -256,10 +256,10 @@ int128_t S2_easy(int128_t x,
     return S2_easy_mpi(x, y, z, c, threads);
 #endif
 
-  print("");
-  print("=== S2_easy(x, y) ===");
-  print("Computation of the easy special leaves");
-  print(x, y, c, threads);
+  print_log("");
+  print_log("=== S2_easy(x, y) ===");
+  print_log("Computation of the easy special leaves");
+  print_log(x, y, c, threads);
 
   int128_t s2_easy;
   double time = get_wtime();
@@ -276,7 +276,7 @@ int128_t S2_easy(int128_t x,
     s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time);
   }
 
-  print("S2_easy", s2_easy, time);
+  print_log("S2_easy", s2_easy, time);
   return s2_easy;
 }
 

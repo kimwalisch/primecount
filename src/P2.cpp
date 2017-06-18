@@ -262,15 +262,15 @@ int64_t P2(int64_t x, int64_t y, int threads)
     return P2_mpi(x, y, threads);
 #endif
 
-  print("");
-  print("=== P2(x, y) ===");
-  print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_log("");
+  print_log("=== P2(x, y) ===");
+  print_log("Computation of the 2nd partial sieve function");
+  print_log(x, y, threads);
 
   double time = get_wtime();
   int64_t p2 = P2_OpenMP(x, y, threads, time);
 
-  print("P2", p2, time);
+  print_log("P2", p2, time);
   return p2;
 }
 
@@ -283,15 +283,15 @@ int128_t P2(int128_t x, int64_t y, int threads)
     return P2_mpi(x, y, threads);
 #endif
 
-  print("");
-  print("=== P2(x, y) ===");
-  print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_log("");
+  print_log("=== P2(x, y) ===");
+  print_log("Computation of the 2nd partial sieve function");
+  print_log(x, y, threads);
 
   double time = get_wtime();
   int128_t p2 = P2_OpenMP(x, y, threads, time);
 
-  print("P2", p2, time);
+  print_log("P2", p2, time);
   return p2;
 }
 
