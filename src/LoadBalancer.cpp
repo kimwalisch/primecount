@@ -101,8 +101,7 @@ void print_resume(int thread_id,
 }
 
 template <typename T>
-void print_resume(T s2_hard,
-                  double seconds)
+void print_resume(T s2_hard, double seconds)
 {
   if (is_print())
   {
