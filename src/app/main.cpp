@@ -178,13 +178,19 @@ int main (int argc, char* argv[])
     switch (opt.option)
     {
       case OPTION_DELEGLISE_RIVAT:
-        res = pi_deleglise_rivat(x, threads); break;
+      {
+        if (x <= numeric_limits<int64_t>::max())
+          res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time);
+        else
+          res = pi_deleglise_rivat_parallel2(x, threads, &time);
+        break;
+      }
       case OPTION_DELEGLISE_RIVAT1:
         res = pi_deleglise_rivat1(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT2:
         res = pi_deleglise_rivat2(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
-        res = pi_deleglise_rivat_parallel1(to_int64(x), threads); break;
+        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:
@@ -233,7 +239,7 @@ int main (int argc, char* argv[])
         res = S2_trivial(x, threads); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
-        res = pi_deleglise_rivat_parallel2(x, threads); break;
+        res = pi_deleglise_rivat_parallel2(x, threads, &time); break;
 #endif
     }
 

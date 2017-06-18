@@ -66,7 +66,7 @@ struct CmdOptions
   CmdOptions() :
     x(-1),
     a(-1),
-    option(OPTION_PI),
+    option(OPTION_DELEGLISE_RIVAT),
     threads(get_num_threads()),
     time(false)
   { }

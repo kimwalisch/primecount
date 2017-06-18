@@ -14,6 +14,7 @@
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <S2.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 
@@ -48,7 +49,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
+int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads, double* time)
 {
   if (x < 2)
     return 0;
@@ -71,6 +72,9 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t s2 = S2(x, y, z, c, s2_approx, threads);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
+
+  if (time)
+    *time = get_wtime() - backup_seconds(x, y, z);
 
   return sum;
 }

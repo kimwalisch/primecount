@@ -14548,6 +14548,29 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, 
          z == j[formula]["z"];
 }
 
+template <typename T>
+inline double backup_seconds(T x, int64_t y, int64_t z)
+{
+  auto j = load_backup();
+
+  if (is_resume(j, "P2", x, y, z) &&
+      is_resume(j, "S1", x, y) &&
+      is_resume(j, "S2_trivial", x, y, z) &&
+      is_resume(j, "S2_easy", x, y, z) &&
+      is_resume(j, "S2_hard", x, y, z))
+  {
+    double p2 = j["P2"]["seconds"];
+    double s1 = j["S1"]["seconds"];
+    double s2_trivial = j["S2_trivial"]["seconds"];
+    double s2_easy = j["S2_easy"]["seconds"];
+    double s2_hard = j["S2_hard"]["seconds"];
+
+    return p2 + s1 + s2_trivial + s2_easy + s2_hard;
+  }
+
+  return 0;
+}
+
 }
 
 // clean up

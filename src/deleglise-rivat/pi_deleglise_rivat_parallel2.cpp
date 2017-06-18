@@ -16,6 +16,7 @@
 #include <int128_t.hpp>
 #include <S1.hpp>
 #include <S2.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -51,7 +52,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads)
+int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads, double* time)
 {
   if (x < 2)
     return 0;
@@ -78,6 +79,9 @@ int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads)
   int128_t s2 = S2(x, y, z, c, s2_approx, threads);
   int128_t phi = s1 + s2;
   int128_t sum = phi + pi_y - 1 - p2;
+
+  if (time)
+    *time = get_wtime() - backup_seconds(x, y, z);
 
   return sum;
 }
