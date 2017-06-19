@@ -16,6 +16,7 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
@@ -64,6 +65,7 @@ map<string, OptionID> optionMap =
   { "--pi", OPTION_PI },
   { "-p", OPTION_PRIMESIEVE },
   { "--primesieve", OPTION_PRIMESIEVE },
+  { "-r", OPTION_RESUME },
   { "--resume", OPTION_RESUME },
   { "--Ri", OPTION_RI },
   { "--Ri_inverse", OPTION_RIINV },
@@ -145,6 +147,13 @@ void optionResume(Option& opt,
 {
   opts.resume = true;
   set_backup_file(getBackupFile(opt.str));
+
+  ifstream ifs(backup_file());
+
+  if (!ifs.is_open())
+    throw primecount_error("failed to open backup file: " + backup_file());
+
+  ifs.close();
 }
 
 /// e.g. "--threads=8"
