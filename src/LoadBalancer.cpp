@@ -30,8 +30,6 @@
 
 #include <stdint.h>
 #include <cmath>
-#include <iostream>
-#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -136,33 +134,23 @@ void print_resume(int thread_id,
                   T segments,
                   T segment_size)
 {
-  if (is_print())
-  {
-    if (!print_variables())
-      cout << endl;
-
-    cout << "=== Resuming from primecount.backup ===" << endl;
-    cout << "thread = " << thread_id << endl;
-    cout << "low = " << low << endl;
-    cout << "segments = " << segments << endl;
-    cout << "segment_size = " << segment_size << endl;
-    cout << endl;
-  }
+  print_log("=== Resuming from primecount.backup ===");
+  print_log("thread", thread_id);
+  print_log("low", low);
+  print_log("segments", segments);
+  print_log("segment_size", segment_size);
+  print_log("");
 }
 
 template <typename T>
 void print_resume(T s2_hard, double seconds)
 {
-  if (is_print())
-  {
-    if (!print_variables())
-      cout << endl;
+  if (!print_variables())
+    print_log("");
 
-    cout << "=== Resuming from primecount.backup ===" << endl;
-    cout << "S2_hard = " << s2_hard << endl;
-    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-    cout << endl;
-  }
+  print_log("=== Resuming from primecount.backup ===");
+  print_log("s2_hard", s2_hard);
+  print_log_seconds(seconds);
 }
 
 bool LoadBalancer::resume(int thread_id,

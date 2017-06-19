@@ -142,19 +142,16 @@ void print_resume(T x,
                   double seconds,
                   double percent)
 {
-  if (is_print())
-  {
-    if (!print_variables())
-      cout << endl;
+  if (!print_variables())
+    print_log("");
 
-    cout << "=== Resuming from primecount.backup ===" << endl;
-    cout << "low = " << low << endl;
-    cout << "thread_distance = " << thread_distance << endl;
-    cout << "pix_total = " << pix_total << endl;
-    cout << "p2 = " << p2 << endl;
-    cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
-    cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
-  }
+  print_log("=== Resuming from primecount.backup ===");
+  print_log("low", low);
+  print_log("thread_distance", thread_distance);
+  print_log("pix_total", pix_total);
+  print_log("p2", p2);
+  print_log_seconds(seconds);
+  print_status(percent, x);
 }
 
 template <typename T>

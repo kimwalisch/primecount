@@ -250,16 +250,18 @@ int main (int argc, char* argv[])
     if (print_result())
     {
       ofstream outfile("primecount.log", ofstream::out | ofstream::app);
+      double seconds = get_wtime() - time;
 
       if (is_print())
         cout << endl;
 
       cout << res << endl;
-      outfile << endl << res << endl;
-      outfile << "Seconds: " << fixed << setprecision(3) << get_wtime() - time << endl;
-
+      
       if (opt.time)
-        print_seconds(get_wtime() - time);
+        cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+  
+      outfile << endl << res << endl;
+      outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
     }
   }
   catch (exception& e)

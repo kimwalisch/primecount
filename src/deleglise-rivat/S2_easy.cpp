@@ -24,8 +24,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <iostream>
-#include <iomanip>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -70,18 +68,15 @@ void print_resume(T x,
                   double seconds,
                   double percent)
 {
-  if (is_print())
-  {
-    if (!print_variables())
-      cout << endl;
+  if (!print_variables())
+    print_log("");
 
-    cout << "=== Resuming from primecount.backup ===" << endl;
-    cout << "start = " << start << endl;
-    cout << "pi_x13 = " << pi_x13 << endl;
-    cout << "s2_easy = " << s2_easy << endl;
-    cout << "Seconds: " << seconds << endl << endl;
-    cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
-  }
+  print_log("=== Resuming from primecount.backup ===");
+  print_log("start", start);
+  print_log("pi_x13", pi_x13);
+  print_log("s2_easy", s2_easy);
+  print_log_seconds(seconds);
+  print_status(percent, x);
 }
 
 template <typename T>
