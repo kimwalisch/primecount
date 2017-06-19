@@ -8,6 +8,7 @@ set(CMAKE_BUILD_TYPE Release)
 # Build options ######################################################
 
 option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
+option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
 option(WITH_OPENMP       "Enable OpenMP support"          ON)
 option(WITH_MPI          "Enable MPI support"             OFF)
 option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
@@ -64,7 +65,6 @@ set(LIB_SRC src/BitSieve.cpp
             src/lmo/pi_lmo4.cpp
             src/lmo/pi_lmo5.cpp
             src/lmo/pi_lmo_parallel.cpp
-            src/deleglise-rivat/S2_easy.cpp
             src/deleglise-rivat/S2_hard.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
@@ -80,7 +80,6 @@ if(WITH_MPI)
 
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
-                src/mpi/S2_easy_mpi.cpp
                 src/mpi/S2_hard_mpi.cpp
                 src/mpi/MpiLoadBalancer.cpp
                 src/mpi/MpiMsg.cpp)
@@ -107,6 +106,37 @@ else()
     if(HAVE___INT128_T)
         add_definitions(-DHAVE___INT128_T)
         set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
+    endif()
+endif()
+
+# Check if libdivide.h works #########################################
+
+if(WITH_LIBDIVIDE)
+    message(STATUS "Performing Test libdivide")
+
+    try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
+            ${CMAKE_BINARY_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
+            COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+    if(RUN_LIBDIVIDE EQUAL 0)
+        message(STATUS "Performing Test libdivide - Success")
+    else()
+        message(STATUS "Performing Test libdivide - Failed")
+    endif()
+endif()
+
+# Include S2_easy* source files ######################################
+
+if(RUN_LIBDIVIDE EQUAL 0)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+    if(WITH_MPI)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
+    endif()
+else()
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+    if(WITH_MPI)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
     endif()
 endif()
 
