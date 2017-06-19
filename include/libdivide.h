@@ -14,6 +14,8 @@
 // disable warning C4146: unary minus operator applied to
 // unsigned type, result still unsigned
 #pragma warning(disable: 4146)
+
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
 #endif
 
 #ifdef __cplusplus
@@ -67,6 +69,7 @@ typedef unsigned __int8 uint8_t;
 
 #if __GNUC__ || __clang__
 #define LIBDIVIDE_GCC_STYLE_ASM 1
+#define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
 #endif
 
 #if LIBDIVIDE_ASSERTIONS_ON
@@ -137,45 +140,53 @@ enum {
     LIBDIVIDE_NEGATIVE_DIVISOR = 0x80    
 };
 
+PACK(
 struct libdivide_u32_t {
     uint32_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_s32_t {
     int32_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_u64_t {
     uint64_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_s64_t {
     int64_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_u32_branchfree_t {
     uint32_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_s32_branchfree_t {
     int32_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_u64_branchfree_t {
     uint64_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
+PACK(
 struct libdivide_s64_branchfree_t {
     int64_t magic;
     uint8_t more;
-} __attribute__((packed));
+});
 
 #ifndef LIBDIVIDE_API
     #ifdef __cplusplus
