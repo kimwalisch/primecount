@@ -140,42 +140,42 @@ enum {
 struct libdivide_u32_t {
     uint32_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_s32_t {
     int32_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_u64_t {
     uint64_t magic;
     uint8_t more;
-};    
+} __attribute__((packed));
 
 struct libdivide_s64_t {
     int64_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_u32_branchfree_t {
     uint32_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_s32_branchfree_t {
     int32_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_u64_branchfree_t {
     uint64_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 struct libdivide_s64_branchfree_t {
     int64_t magic;
     uint8_t more;
-};
+} __attribute__((packed));
 
 #ifndef LIBDIVIDE_API
     #ifdef __cplusplus
