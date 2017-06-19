@@ -71,7 +71,7 @@ void print_resume(T x,
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from primecount.backup ===");
+  print_log("=== Resuming from " + backup_file() + " ===");
   print_log("start", start);
   print_log("pi_x13", pi_x13);
   print_log("s2_easy", s2_easy);

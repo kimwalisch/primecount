@@ -64,6 +64,7 @@ map<string, OptionID> optionMap =
   { "--pi", OPTION_PI },
   { "-p", OPTION_PRIMESIEVE },
   { "--primesieve", OPTION_PRIMESIEVE },
+  { "--resume", OPTION_RESUME },
   { "--Ri", OPTION_RI },
   { "--Ri_inverse", OPTION_RIINV },
   { "--S1", OPTION_S1 },
@@ -128,6 +129,24 @@ string getValue(string str)
     return str.substr(pos);
 }
 
+/// e.g. "--resume=primecount.backup" -> return "primecount.backup"
+string getBackupFile(string str)
+{
+  size_t pos = str.find_first_of("=");
+
+  if (pos != string::npos)
+    return str.substr(pos + 1);
+
+  return backup_file();
+}
+
+void optionResume(Option& opt,
+                  CmdOptions& opts)
+{
+  opts.resume = true;
+  set_backup_file(getBackupFile(opt.str));
+}
+
 /// e.g. "--threads=8"
 /// -> opt.opt = "--threads"
 /// -> opt.val = "8"
@@ -170,6 +189,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
       case OPTION_PHI:     opts.a = opt.getValue<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
+      case OPTION_RESUME:  optionResume(opt, opts); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
@@ -178,10 +198,13 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (numbers.empty())
-    throw primecount_error("missing x number");
-  else
-    opts.x = numbers[0];
+  if (!opts.resume)
+  {
+    if (numbers.empty())
+      throw primecount_error("missing x number");
+    else
+      opts.x = numbers[0];
+  }
 
   return opts;
 }

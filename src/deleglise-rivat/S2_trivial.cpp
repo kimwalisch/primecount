@@ -61,7 +61,7 @@ void print_resume(T x,
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from primecount.backup ===");
+  print_log("=== Resuming from " + backup_file() + " ===");
   print_log("s2_trivial", s2_trivial);
   print_log_seconds(seconds);
   print_status(percent, x);

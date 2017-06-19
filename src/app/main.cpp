@@ -17,6 +17,7 @@
 #include <PhiTiny.hpp>
 #include <S1.hpp>
 #include <S2.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <exception>
@@ -170,6 +171,26 @@ int main (int argc, char* argv[])
   try
   {
     CmdOptions opt = parseOptions(argc, argv);
+
+    if (!opt.resume)
+      backup_command(argc, argv);
+    else
+    {
+      auto j = load_backup();
+      auto command = j["command"];
+
+      vector<string> args;
+      vector<char*> cargs;
+
+      for (auto& str : command)
+        args.push_back(str);
+
+      for (size_t i = 0; i < args.size(); i++)
+        cargs.push_back((char*) args[i].c_str());
+
+      opt = parseOptions((int) cargs.size(), cargs.data());
+    }
+
     double time = get_wtime();
 
     auto x = opt.x;

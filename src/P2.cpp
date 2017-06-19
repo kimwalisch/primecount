@@ -145,7 +145,7 @@ void print_resume(T x,
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from primecount.backup ===");
+  print_log("=== Resuming from " + backup_file() + " ===");
   print_log("low", low);
   print_log("thread_distance", thread_distance);
   print_log("pix_total", pix_total);

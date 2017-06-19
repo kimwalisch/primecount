@@ -43,6 +43,7 @@ enum OptionID
   OPTION_PHI,
   OPTION_PI,
   OPTION_PRIMESIEVE,
+  OPTION_RESUME,
   OPTION_RI,
   OPTION_RIINV,
   OPTION_S1,
@@ -62,12 +63,14 @@ struct CmdOptions
   int64_t a;
   int option;
   int threads;
+  bool resume;
   bool time;
   CmdOptions() :
     x(-1),
     a(-1),
     option(OPTION_DELEGLISE_RIVAT),
     threads(get_num_threads()),
+    resume(false),
     time(false)
   { }
 };

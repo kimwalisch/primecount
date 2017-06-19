@@ -14506,14 +14506,16 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <fstream>
 #include <iomanip>
 #include <string>
+
 #include <calculator.hpp>
+#include <primecount-internal.hpp>
 
 namespace primecount
 {
 
 inline nlohmann::json load_backup()
 {
-  std::ifstream ifs("primecount.backup");
+  std::ifstream ifs(backup_file());
   nlohmann::json j;
 
   if (ifs.is_open())
@@ -14527,8 +14529,20 @@ inline nlohmann::json load_backup()
 
 inline void store_backup(const nlohmann::json& j)
 {
-  std::ofstream ofs("primecount.backup");
+  std::ofstream ofs(backup_file());
   ofs << std::setw(4) << j << std::endl;
+}
+
+inline void backup_command(int argc, char** argv)
+{
+  auto j = load_backup();
+  std::vector<std::string> args;
+
+  for (int i = 0; i < argc; i++)
+    args.push_back(argv[i]);
+
+  j["command"] = args;
+  store_backup(j);
 }
 
 template <typename T>
