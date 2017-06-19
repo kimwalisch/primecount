@@ -176,17 +176,11 @@ int main (int argc, char* argv[])
       backup_command(argc, argv);
     else
     {
-      auto j = load_backup();
-      auto command = j["command"];
-
-      vector<string> args;
+      vector<string> args = get_backup_command();
       vector<char*> cargs;
 
-      for (auto& str : command)
-        args.push_back(str);
-
-      for (size_t i = 0; i < args.size(); i++)
-        cargs.push_back((char*) args[i].c_str());
+      for (string& s : args)
+        cargs.push_back((char*) s.c_str());
 
       opt = parseOptions((int) cargs.size(), cargs.data());
     }

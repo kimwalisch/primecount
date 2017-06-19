@@ -14545,6 +14545,19 @@ inline void backup_command(int argc, char** argv)
   store_backup(j);
 }
 
+inline std::vector<std::string> get_backup_command()
+{
+  auto j = load_backup();
+  auto command = j["command"];
+
+  std::vector<std::string> args;
+
+  for (auto& str : command)
+    args.push_back(str);
+
+  return args;
+}
+
 template <typename T>
 inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y)
 {
