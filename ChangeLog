@@ -1,3 +1,9 @@
+2017-06-20 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 3.8 work in progress.
+
+  * libdivide.h: Pack structs to reduce memory usage.
+
 2017-06-07 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.7 released.
