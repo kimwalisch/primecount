@@ -172,7 +172,7 @@ int main (int argc, char* argv[])
   {
     CmdOptions opt = parseOptions(argc, argv);
 
-    if (!opt.resume)
+    if (!opt.is_resume())
       backup_command(argc, argv);
     else
     {

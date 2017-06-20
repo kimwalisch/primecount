@@ -35,6 +35,8 @@ map<string, OptionID> optionMap =
 {
   { "-a", OPTION_ALPHA },
   { "--alpha", OPTION_ALPHA },
+  { "-b", OPTION_BACKUP },
+  { "--backup", OPTION_BACKUP },
   { "-d", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat1", OPTION_DELEGLISE_RIVAT1 },
@@ -142,11 +144,18 @@ string getBackupFile(string str)
   return backup_file();
 }
 
+void optionBackup(Option& opt,
+                  CmdOptions& opts)
+{
+  opts.backupFile = getBackupFile(opt.str);
+  set_backup_file(opts.backupFile);
+}
+
 void optionResume(Option& opt,
                   CmdOptions& opts)
 {
-  opts.resume = true;
-  set_backup_file(getBackupFile(opt.str));
+  opts.resumeFile = getBackupFile(opt.str);
+  set_backup_file(opts.resumeFile);
 
   ifstream ifs(backup_file());
 
@@ -194,6 +203,7 @@ CmdOptions parseOptions(int argc, char* argv[])
     switch (optionMap[opt.opt])
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
+      case OPTION_BACKUP:  optionBackup(opt, opts); break;
       case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
       case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
       case OPTION_PHI:     opts.a = opt.getValue<int64_t>(); opts.option = OPTION_PHI; break;
@@ -207,12 +217,19 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (!opts.resume)
+  if (!opts.is_resume())
   {
     if (numbers.empty())
       throw primecount_error("missing x number");
     else
       opts.x = numbers[0];
+  }
+
+  if (!opts.backupFile.empty() &&
+      !opts.resumeFile.empty() &&
+      opts.backupFile != opts.resumeFile)
+  {
+    throw primecount_error("resume and backup file must be the same");
   }
 
   return opts;

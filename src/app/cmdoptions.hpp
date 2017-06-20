@@ -13,12 +13,14 @@
 #include <primecount.hpp>
 #include <int128_t.hpp>
 #include <stdint.h>
+#include <string>
 
 namespace primecount {
 
 enum OptionID
 {
   OPTION_ALPHA,
+  OPTION_BACKUP,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT1,
   OPTION_DELEGLISE_RIVAT2,
@@ -63,16 +65,22 @@ struct CmdOptions
   int64_t a;
   int option;
   int threads;
-  bool resume;
+  std::string resumeFile;
+  std::string backupFile;
   bool time;
+
   CmdOptions() :
     x(-1),
     a(-1),
     option(OPTION_DELEGLISE_RIVAT),
     threads(get_num_threads()),
-    resume(false),
     time(false)
   { }
+
+  bool is_resume() const
+  {
+    return !resumeFile.empty();
+  }
 };
 
 CmdOptions parseOptions(int, char**);
