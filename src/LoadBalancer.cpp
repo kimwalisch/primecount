@@ -190,7 +190,8 @@ bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
   auto j = load_backup();
 
   if (is_resume(j, "S2_hard", x_, y_, z_) &&
-      j["S2_hard"]["low"] >= j["S2_hard"]["z"])
+      j["S2_hard"]["low"] >= j["S2_hard"]["z"] &&
+      j["S2_hard"].count("threads") == 0)
   {
     double seconds = j["S2_hard"]["seconds"];
     s2_hard = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
