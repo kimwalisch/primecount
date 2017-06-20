@@ -161,8 +161,6 @@ void optionResume(Option& opt,
 
   if (!ifs.is_open())
     throw primecount_error("failed to open backup file: " + backup_file());
-
-  ifs.close();
 }
 
 /// e.g. "--threads=8"

@@ -14519,10 +14519,7 @@ inline nlohmann::json load_backup()
   nlohmann::json j;
 
   if (ifs.is_open())
-  {
     ifs >> j;
-    ifs.close();
-  }
 
   return j;
 }
