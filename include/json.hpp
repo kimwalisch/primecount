@@ -30,7 +30,7 @@ SOFTWARE.
 #define NLOHMANN_JSON_HPP
 
 #ifdef _MSC_VER
-  #include <Windows.h>
+  #include <windows.h>
 #else
   #include <cstdio> // posix rename file
 #endif
