@@ -13,12 +13,13 @@ pi(10^27) and many other records.
 
 ## Binaries
 
-Below are the latest precompiled binaries for Windows 64-bit and Linux x86-64.
-These binaries are statically linked and require a CPU (2010 or later) which
-supports the POPCNT instruction.
+Below are the latest precompiled primecount binaries for
+Windows and Linux. These binaries are statically linked and
+require a CPU which supports the POPCNT instruction (2010 or
+later).
 
-* <a href="https://github.com/kimwalisch/primecount/releases/download/backup2-v3.7/primecount-backup-3.7-win64.zip">primecount-backup-3.7-win64.zip</a>, 446K
-* <a href="https://github.com/kimwalisch/primecount/releases/download/backup2-v3.7/primecount-backup-3.7-linux-x64.tar.gz">primecount-backup-3.7-linux-x64.tar.gz</a>, 947K
+* [primecount-3.7-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.7/primecount-backup-3.7-win64.zip), 479 KB
+* [primecount-3.7-linux-x64.tar.gz](https://github.com/kimwalisch/primecount/releases/download/v3.7/primecount-backup-3.7-linux-x64.tar.gz), 1.07 MB
 
 ## Backup usage example
 
