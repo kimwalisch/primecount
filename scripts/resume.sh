@@ -33,15 +33,30 @@ then
 fi
 
 rm -f primecount.backup
-./primecount $x --S2_hard -s &
-sleep $seconds;
+./primecount $x --S2_hard &
+run=0
 
-while [ "$(grep -o -c threads primecount.backup)" -ne 0 ]
+while [ $run -eq 0 ]
 do
     sleep $seconds;
-    # Send SIGKILL (9) to simulate crash
-    kill -9 $(ps -A -o pid,args | grep primecount | grep -v grep | awk '{print $1}')
-    ./primecount --resume &
+    ps_primecount=$(ps -A -o pid,args | grep primecount | grep -v grep)
+    run=$?
+
+    if [ $run -eq 0 ]
+    then
+        # Get primecount PID
+        pid=$(echo "$ps_primecount" | awk '{print $1}')
+
+        # Send SIGKILL (9) to simulate crash
+        kill -9 $pid
+
+        # Print current status
+        echo ""
+        echo "Percent: $(cat primecount.backup | grep percent | cut -d':' -f2 | cut -c2-6)"
+
+        # Resume from primecount.backup
+        ./primecount --resume &
+    fi
 done
 
 echo "finished!"
