@@ -29,12 +29,6 @@ SOFTWARE.
 #ifndef NLOHMANN_JSON_HPP
 #define NLOHMANN_JSON_HPP
 
-#ifdef _MSC_VER
-  #include <windows.h>
-#else
-  #include <cstdio> // posix rename file
-#endif
-
 #include <algorithm> // all_of, copy, fill, find, for_each, none_of, remove, reverse, transform
 #include <array> // array
 #include <cassert> // assert
@@ -14507,6 +14501,14 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
     #pragma GCC diagnostic pop
 #endif
 
+// clean up
+#undef JSON_CATCH
+#undef JSON_THROW
+#undef JSON_TRY
+#undef JSON_LIKELY
+#undef JSON_UNLIKELY
+#undef JSON_DEPRECATED
+
 // kim custom stuff
 
 #include <fstream>
@@ -14515,6 +14517,12 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 
 #include <calculator.hpp>
 #include <primecount-internal.hpp>
+
+#ifdef _MSC_VER
+  #include <windows.h> // MoveFile
+#else
+  #include <cstdio> // posix rename file
+#endif
 
 namespace primecount
 {
@@ -14624,13 +14632,5 @@ inline double backup_seconds(T x, int64_t y, int64_t z)
 }
 
 }
-
-// clean up
-#undef JSON_CATCH
-#undef JSON_THROW
-#undef JSON_TRY
-#undef JSON_LIKELY
-#undef JSON_UNLIKELY
-#undef JSON_DEPRECATED
 
 #endif
