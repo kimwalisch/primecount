@@ -36,16 +36,13 @@
 #endif
 
 using namespace std;
-using namespace nlohmann;
 
 namespace primecount {
 
 int LoadBalancer::resume_threads() const
 {
-  auto j = load_backup();
-
-  if (is_resume(j, "S2_hard", x_, y_, z_))
-    return j["S2_hard"]["threads"];
+  if (is_resume(json_, "S2_hard", x_, y_, z_))
+    return json_["S2_hard"]["threads"];
 
   return 0;
 }
@@ -54,28 +51,26 @@ void LoadBalancer::backup(int threads,
                           int thread_id,
                           int64_t low,
                           int64_t segments,
-                          int64_t segment_size) const
+                          int64_t segment_size)
 {
-  auto j = load_backup();
-
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
 
-  j["S2_hard"]["x"] = to_string(x_);
-  j["S2_hard"]["y"] = y_;
-  j["S2_hard"]["z"] = z_;
-  j["S2_hard"]["threads"] = threads;
-  j["S2_hard"]["low"] = low_;
-  j["S2_hard"]["segments"] = segments_;
-  j["S2_hard"]["segment_size"] = segment_size_;
-  j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-  j["S2_hard"]["percent"] = percent;
-  j["S2_hard"]["seconds"] = get_wtime() - time_;
+  json_["S2_hard"]["x"] = to_string(x_);
+  json_["S2_hard"]["y"] = y_;
+  json_["S2_hard"]["z"] = z_;
+  json_["S2_hard"]["threads"] = threads;
+  json_["S2_hard"]["low"] = low_;
+  json_["S2_hard"]["segments"] = segments_;
+  json_["S2_hard"]["segment_size"] = segment_size_;
+  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+  json_["S2_hard"]["percent"] = percent;
+  json_["S2_hard"]["seconds"] = get_wtime() - time_;
 
-  j["S2_hard"]["thread" + to_string(thread_id)]["low"] = low;
-  j["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
-  j["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
+  json_["S2_hard"]["thread" + to_string(thread_id)]["low"] = low;
+  json_["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
+  json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
 
-  store_backup(j);
+  store_backup(json_);
 }
 
 void LoadBalancer::backup(int thread_id,
@@ -92,39 +87,36 @@ void LoadBalancer::backup(int thread_id,
     update(&low, &segments, runtime);
 
     double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-    auto j = load_backup();
 
-    j["S2_hard"]["segments"] = segments_;
-    j["S2_hard"]["segment_size"] = segment_size_;
-    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-    j["S2_hard"]["percent"] = percent;
-    j["S2_hard"]["seconds"] = get_wtime() - time_;
-    j["S2_hard"].erase("thread" + to_string(thread_id));
+    json_["S2_hard"]["segments"] = segments_;
+    json_["S2_hard"]["segment_size"] = segment_size_;
+    json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    json_["S2_hard"]["percent"] = percent;
+    json_["S2_hard"]["seconds"] = get_wtime() - time_;
+    json_["S2_hard"].erase("thread" + to_string(thread_id));
 
-    store_backup(j);
+    store_backup(json_);
 
     if (is_print())
       status_.print(s2_total_, s2_approx_);
   }
 }
 
-void LoadBalancer::backup_result() const
+void LoadBalancer::backup_result()
 {
-  auto j = load_backup();
-
-  if (is_resume(j, "S2_hard", x_, y_, z_))
+  if (is_resume(json_, "S2_hard", x_, y_, z_))
   {
-    j.erase("S2_hard");
+    json_.erase("S2_hard");
 
-    j["S2_hard"]["x"] = to_string(x_);
-    j["S2_hard"]["y"] = y_;
-    j["S2_hard"]["z"] = z_;
-    j["S2_hard"]["low"] = low_;
-    j["S2_hard"]["s2_hard"] = to_string(s2_total_);
-    j["S2_hard"]["percent"] = 100;
-    j["S2_hard"]["seconds"] = get_wtime() - time_;
+    json_["S2_hard"]["x"] = to_string(x_);
+    json_["S2_hard"]["y"] = y_;
+    json_["S2_hard"]["z"] = z_;
+    json_["S2_hard"]["low"] = low_;
+    json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+    json_["S2_hard"]["percent"] = 100;
+    json_["S2_hard"]["seconds"] = get_wtime() - time_;
 
-    store_backup(j);
+    store_backup(json_);
   }
 }
 
@@ -161,25 +153,21 @@ bool LoadBalancer::resume(int thread_id,
   bool resumed = false;
 
   #pragma omp critical (LoadBalancer)
+  if (is_resume(json_, "S2_hard", thread_id, x_, y_, z_))
   {
-    auto j = load_backup();
+    double seconds = json_["S2_hard"]["seconds"];
+    s2_total_ = calculator::eval<maxint_t>(json_["S2_hard"]["s2_hard"]);
+    low_ = json_["S2_hard"]["low"];
+    segments_ = json_["S2_hard"]["segments"];
+    segment_size_ = json_["S2_hard"]["segment_size"];
+    time_ = get_wtime() - seconds;
+    low = json_["S2_hard"]["thread" + to_string(thread_id)]["low"];
+    segments = json_["S2_hard"]["thread" + to_string(thread_id)]["segments"];
+    segment_size = json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
 
-    if (is_resume(j, "S2_hard", thread_id, x_, y_, z_))
-    {
-      double seconds = j["S2_hard"]["seconds"];
-      s2_total_ = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
-      low_ = j["S2_hard"]["low"];
-      segments_ = j["S2_hard"]["segments"];
-      segment_size_ = j["S2_hard"]["segment_size"];
-      time_ = get_wtime() - seconds;
-      low = j["S2_hard"]["thread" + to_string(thread_id)]["low"];
-      segments = j["S2_hard"]["thread" + to_string(thread_id)]["segments"];
-      segment_size = j["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
+    print_resume(thread_id, low, segments, segment_size);
 
-      print_resume(thread_id, low, segments, segment_size);
-
-      resumed = true;
-    }
+    resumed = true;
   }
 
   return resumed;
@@ -187,14 +175,12 @@ bool LoadBalancer::resume(int thread_id,
 
 bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
 {
-  auto j = load_backup();
-
-  if (is_resume(j, "S2_hard", x_, y_, z_) &&
-      j["S2_hard"]["low"] >= j["S2_hard"]["z"] &&
-      j["S2_hard"].count("threads") == 0)
+  if (is_resume(json_, "S2_hard", x_, y_, z_) &&
+      json_["S2_hard"]["low"] >= json_["S2_hard"]["z"] &&
+      json_["S2_hard"].count("threads") == 0)
   {
-    double seconds = j["S2_hard"]["seconds"];
-    s2_hard = calculator::eval<maxint_t>(j["S2_hard"]["s2_hard"]);
+    double seconds = json_["S2_hard"]["seconds"];
+    s2_hard = calculator::eval<maxint_t>(json_["S2_hard"]["s2_hard"]);
     time = get_wtime() - seconds;
     print_resume(s2_hard, seconds);
 
@@ -219,7 +205,8 @@ LoadBalancer::LoadBalancer(maxint_t x,
   s2_total_(0),
   s2_approx_(s2_approx),
   time_(get_wtime()),
-  status_(x)
+  status_(x),
+  json_(load_backup())
 {
   init_size();
   maxint_t x16 = iroot<6>(x);
