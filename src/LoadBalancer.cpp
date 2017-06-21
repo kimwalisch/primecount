@@ -46,33 +46,6 @@ int LoadBalancer::resume_threads() const
 
   return 0;
 }
-
-void LoadBalancer::backup(int threads,
-                          int thread_id,
-                          int64_t low,
-                          int64_t segments,
-                          int64_t segment_size)
-{
-  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-
-  json_["S2_hard"]["x"] = to_string(x_);
-  json_["S2_hard"]["y"] = y_;
-  json_["S2_hard"]["z"] = z_;
-  json_["S2_hard"]["threads"] = threads;
-  json_["S2_hard"]["low"] = low_;
-  json_["S2_hard"]["segments"] = segments_;
-  json_["S2_hard"]["segment_size"] = segment_size_;
-  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
-  json_["S2_hard"]["percent"] = percent;
-  json_["S2_hard"]["seconds"] = get_wtime() - time_;
-
-  json_["S2_hard"]["thread" + to_string(thread_id)]["low"] = low;
-  json_["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
-  json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
-
-  store_backup(json_);
-}
-
 void LoadBalancer::backup(int thread_id,
                           int64_t low,
                           int64_t segments,
@@ -101,6 +74,33 @@ void LoadBalancer::backup(int thread_id,
       status_.print(s2_total_, s2_approx_);
   }
 }
+
+void LoadBalancer::backup(int threads,
+                          int thread_id,
+                          int64_t low,
+                          int64_t segments,
+                          int64_t segment_size)
+{
+  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+
+  json_["S2_hard"]["x"] = to_string(x_);
+  json_["S2_hard"]["y"] = y_;
+  json_["S2_hard"]["z"] = z_;
+  json_["S2_hard"]["threads"] = threads;
+  json_["S2_hard"]["low"] = low_;
+  json_["S2_hard"]["segments"] = segments_;
+  json_["S2_hard"]["segment_size"] = segment_size_;
+  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+  json_["S2_hard"]["percent"] = percent;
+  json_["S2_hard"]["seconds"] = get_wtime() - time_;
+
+  json_["S2_hard"]["thread" + to_string(thread_id)]["low"] = low;
+  json_["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
+  json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
+
+  store_backup(json_);
+}
+
 
 void LoadBalancer::backup_result()
 {
