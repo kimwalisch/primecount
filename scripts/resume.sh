@@ -40,7 +40,7 @@ while [ "$(grep -o -c threads primecount.backup)" -ne 0 ]
 do
     sleep $seconds;
     # Send SIGKILL (9) to simulate crash
-    kill -9 $(ps | grep primecount | grep -v grep | cut -f1 -d' ')
+    kill -9 $(ps -A -o pid,args | grep primecount | grep -v grep | awk '{print $1}')
     ./primecount --resume &
 done
 
