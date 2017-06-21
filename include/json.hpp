@@ -29,6 +29,12 @@ SOFTWARE.
 #ifndef NLOHMANN_JSON_HPP
 #define NLOHMANN_JSON_HPP
 
+#ifdef _MSC_VER
+  #include <Windows.h>
+#else
+  #include <cstdio> // posix rename file
+#endif
+
 #include <algorithm> // all_of, copy, fill, find, for_each, none_of, remove, reverse, transform
 #include <array> // array
 #include <cassert> // assert
@@ -14526,8 +14532,20 @@ inline nlohmann::json load_backup()
 
 inline void store_backup(const nlohmann::json& j)
 {
-  std::ofstream ofs(backup_file());
-  ofs << std::setw(4) << j << std::endl;
+  {
+    // create new backup file
+    std::ofstream ofs(backup_file() + ".new");
+    ofs << std::setw(4) << j << std::endl;
+  }
+
+  // TODO: use C++17 std::filesystem::rename once compilers support it
+
+#ifdef _MSC_VER
+  MoveFile(std::string(backup_file() + ".new").c_str(), backup_file().c_str());
+#else
+  // atomically replace old backup file
+  std::rename(std::string(backup_file() + ".new").c_str(), backup_file().c_str());
+#endif
 }
 
 inline void backup_command(int argc, char** argv)
