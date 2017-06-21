@@ -55,7 +55,7 @@ later).
 * [primecount-3.7-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.7/primecount-3.7-win64.zip), 412 KB
 * [primecount-3.7-linux-x64.tar.gz](https://github.com/kimwalisch/primecount/releases/download/v3.7/primecount-3.7-linux-x64.tar.gz), 1 MB
 * [primecount-3.7-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v3.7/primecount-3.7-macOS-x64.zip), 894 KB
-* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup#primecount-backup)
+* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup2#primecount-backup)
 
 ## Usage examples
 
