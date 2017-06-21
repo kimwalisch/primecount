@@ -75,8 +75,6 @@ double alpha_ = -1;
 // Below 10^7 LMO is faster than Deleglise-Rivat
 const int lmo_threshold = 10000000;
 
-string backup_file_ = "primecount.backup";
-
 }
 
 namespace primecount {
@@ -365,16 +363,6 @@ maxint_t to_maxint(const string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;
-}
-
-string backup_file()
-{
-  return backup_file_;
-}
-
-void set_backup_file(const string& filename)
-{
-  backup_file_ = filename;
 }
 
 string primecount_version()

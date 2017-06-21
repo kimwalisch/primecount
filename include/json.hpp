@@ -14515,14 +14515,8 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <iomanip>
 #include <string>
 
+#include <backup.hpp>
 #include <calculator.hpp>
-#include <primecount-internal.hpp>
-
-#ifdef _MSC_VER
-  #include <windows.h> // MoveFile
-#else
-  #include <cstdio> // posix rename file
-#endif
 
 namespace primecount
 {
@@ -14546,14 +14540,7 @@ inline void store_backup(const nlohmann::json& j)
     ofs << std::setw(4) << j << std::endl;
   }
 
-  // TODO: use C++17 std::filesystem::rename once compilers support it
-
-#ifdef _MSC_VER
-  MoveFile(std::string(backup_file() + ".new").c_str(), backup_file().c_str());
-#else
-  // atomically replace old backup file
-  std::rename(std::string(backup_file() + ".new").c_str(), backup_file().c_str());
-#endif
+  atomic_backup();
 }
 
 inline void backup_command(int argc, char** argv)

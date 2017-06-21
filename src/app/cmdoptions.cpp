@@ -13,6 +13,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <backup.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>

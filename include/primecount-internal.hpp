@@ -141,10 +141,6 @@ int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold
 
 maxint_t to_maxint(const std::string& expr);
 
-std::string backup_file();
-
-void set_backup_file(const std::string& backup_file);
-
 template <typename T>
 double get_percent(T low, T limit)
 {

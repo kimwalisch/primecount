@@ -101,7 +101,6 @@ void LoadBalancer::backup(int threads,
   store_backup(json_);
 }
 
-
 void LoadBalancer::backup_result()
 {
   if (is_resume(json_, "S2_hard", x_, y_, z_))
