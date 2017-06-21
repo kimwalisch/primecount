@@ -10,7 +10,7 @@
 #include <backup.hpp>
 #include <string>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
   #include <windows.h> // MoveFile
 #else
   #include <cstdio> // posix rename file
@@ -41,8 +41,8 @@ void atomic_backup()
 {
   // TODO: use C++17 filesystem::rename()
 
-#ifdef _MSC_VER
-  MoveFile(string(backup_file() + ".new").c_str(), backup_file().c_str());
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+  MoveFileEx(string(backup_file() + ".new").c_str(), backup_file().c_str(), MOVEFILE_REPLACE_EXISTING);
 #else
   // atomically replace old backup file
   rename(string(backup_file() + ".new").c_str(), backup_file().c_str());
