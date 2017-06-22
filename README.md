@@ -128,11 +128,11 @@ numbers to compute e.g.:
 1e18 --S2_hard
 ```
 
-Then you can batch process all the numbers from ```worktodo.txt``` using:
+Then you can process all numbers from ```worktodo.txt``` using:
 
 ```sh
 $ sh scripts/worktodo.sh
 ```
 
-The results will be stored in ```results.txt``` and more details are
+The results will be printed to screen and full details are
 logged into ```primecount.log```.
