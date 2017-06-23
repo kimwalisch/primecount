@@ -1,9 +1,8 @@
 ///
 /// @file  BitSieve.cpp
-/// @brief The BitSieve class is a bit array for use with
-///        Eratosthenes-like prime sieving algorithms. BitSieve
-///        assigns 64 numbers to the bits of an 8 byte word thus
-///        reducing the memory usage by a factor of 8.
+/// @brief The BitSieve class is a bit array for prime sieving
+///        that packs 128 numbers into 8 bytes i.e. each bit
+///        corresponds to an odd integer.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,7 +24,6 @@ using namespace std;
 
 namespace {
 
-/// primes[1] = 2, primes[2] = 3, ...
 const array<uint64_t, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 /// bitmasks with multiples of the i-th prime
@@ -142,7 +140,7 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
   if (sieve_.empty())
     return;
 
-  // unset multiples of 2
+  // reset all bits
   sieve_[0] = ~0ull;
 
   uint64_t last = 1;
@@ -168,7 +166,7 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
 
     // first multiple (of prime) >= low
     uint64_t multiple = ceil_div(low, prime) * prime;
-    if (multiple % 2 == 0) multiple += prime;
+    multiple += prime * (~multiple & 1);
     uint64_t p64 = prime - 64 % prime;
     uint64_t mask = masks[i];
     uint64_t shift = (multiple - low) / 2;
@@ -198,11 +196,9 @@ void BitSieve::pre_sieve(uint64_t c, uint64_t low)
 uint64_t BitSieve::count(uint64_t start,
                          uint64_t stop) const
 {
-  if (start % 2)
-    start++;
-
-  if (stop % 2)
-    stop--;
+  // start & stop must be odd
+  start += start % 2;
+  stop -= stop % 2;
 
   if (start > stop)
     return 0;
@@ -211,8 +207,8 @@ uint64_t BitSieve::count(uint64_t start,
 
   uint64_t start_idx = start / 128;
   uint64_t stop_idx = stop / 128;
-  uint64_t m1 = 0xffffffffffffffffull << ((start / 2) % 64);
-  uint64_t m2 = 0xffffffffffffffffull >> (63 - ((stop / 2) % 64));
+  uint64_t m1 = ~(set_bit_[start % 128] - 1);
+  uint64_t m2 = ((set_bit_[stop % 128] - 1) << 1) | 1;
   uint64_t bit_count;
 
   if (start_idx == stop_idx)
