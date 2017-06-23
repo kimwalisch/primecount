@@ -1,8 +1,12 @@
-2017-06-20 Kim Walisch  <kim.walisch@gmail.com>
+2017-06-23 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.8 work in progress.
 
   * libdivide.h: Pack structs to reduce memory usage.
+  * BitSieve.hpp: Only store odd integers.
+  * S2_hard.cpp: Get rid of binary indexed tree.
+  * S2_hard_mpi.cpp: Get rid of binary indexed tree.
+  * primecount.cpp: Update alpha tuning factor formula.
 
 2017-06-07 Kim Walisch  <kim.walisch@gmail.com>
 
