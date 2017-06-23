@@ -1,8 +1,8 @@
 ///
 /// @file  BitSieve.hpp
 /// @brief The BitSieve class is a bit array for prime sieving
-///        that packs 64 numbers into 8 bytes i.e. each bit
-///        corresponds to one integer.
+///        that packs 128 numbers into 8 bytes i.e. each bit
+///        corresponds to an odd integer.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -56,37 +56,41 @@ public:
     if (start > stop)
       return 0;
 
-    if (stop - start < high - low - stop)
+    if (stop - start < (high - low) - stop)
       return count(start, stop);
     else
-      // count backwards
       return count_low_high - count_0_start - count(stop + 1, (high - 1) - low);
   }
 
   void set(uint64_t pos)
   {
     assert(pos < size_);
-    sieve_[pos >> 6] |= ((uint64_t) 1) << (pos & 63);
+    assert(pos % 2 != 0);
+    sieve_[pos >> 7] |= set_bit_[pos & 127];
   }
 
   void unset(uint64_t pos)
   {
     assert(pos < size_);
-    sieve_[pos >> 6] &= unset_bit_[pos & 63];
+    assert(pos % 2 != 0);
+    sieve_[pos >> 7] &= unset_bit_[pos & 127];
   }
 
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    return (sieve_[pos >> 6] >> (pos & 63)) & 1;
+    assert(pos % 2 != 0);
+    return (sieve_[pos >> 7] & set_bit_[pos & 127]) != 0;
   }
 
   std::size_t size() const
   {
     return size_;
   }
+
 private:
-  static const uint64_t unset_bit_[64];
+  static const uint64_t set_bit_[128];
+  static const uint64_t unset_bit_[128];
   std::vector<uint64_t> sieve_;
   std::size_t size_;
 };

@@ -42,12 +42,16 @@ int main()
   vector<int> sieve(size, 1);
   size_t pre_sieve = 7;
 
-  for (size_t i = 1; i < primes.size(); i++)
+  // unset multiples of 2
+  for (int j = 1; j < size; j += 2)
+    sieve[j] = 0;
+
+  for (size_t i = 2; i < primes.size(); i++)
   {
     if (i <= pre_sieve)
       bitSieve.pre_sieve(i, low);
 
-    for (int j = primes[i] - low; j < size; j += primes[i])
+    for (int j = primes[i] - low; j < size; j += primes[i] * 2)
     {
       sieve[j] = 0;
       if (i > pre_sieve)
