@@ -73,7 +73,7 @@ public:
   {
     assert(pos < size_);
     assert(pos % 2 != 0);
-    sieve_[pos >> 7] &= unset_bit_[pos & 127];
+    sieve_[pos >> 7] &= ~set_bit_[pos & 127];
   }
 
   bool operator[](uint64_t pos) const
@@ -90,7 +90,6 @@ public:
 
 private:
   static const uint64_t set_bit_[128];
-  static const uint64_t unset_bit_[128];
   std::vector<uint64_t> sieve_;
   std::size_t size_;
 };
