@@ -210,47 +210,47 @@ space.
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
     <td>0.04s</td>
-    <td>0.05s</td>
+    <td>0.03s</td>
     <td>0.02s</td>
     <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.15s</td>
     <td>0.13s</td>
+    <td>0.07s</td>
     <td>0.03s</td>
     <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.70s</td>
-    <td>0.46s</td>
+    <td>0.69s</td>
+    <td>0.32s</td>
     <td>0.10s</td>
     <td>0.07s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>4.01s</td>
-    <td>1.96s</td>
+    <td>3.93s</td>
+    <td>1.71s</td>
     <td>0.32s</td>
     <td>0.22s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>27.75s</td>
-    <td>12.08s</td>
+    <td>27.15s</td>
+    <td>11.25s</td>
     <td>1.33s</td>
     <td>0.76s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>232.30s</td>
-    <td>92.09s</td>
+    <td>214.99s</td>
+    <td>85.18s</td>
     <td>5.95s</td>
     <td>2.67s</td>
   </tr>
@@ -306,4 +306,4 @@ space.
 
 The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4
 GHz) from 2015 using a Linux x64 operating system and primecount was
-compiled using GCC 5.4.
+compiled using GCC 6.3.
