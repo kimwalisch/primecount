@@ -235,7 +235,7 @@ space.
     <td>3,204,941,750,802</td>
     <td>4.01s</td>
     <td>1.96s</td>
-    <td>0.38s</td>
+    <td>0.32s</td>
     <td>0.22s</td>
   </tr>
   <tr align="right">
@@ -243,7 +243,7 @@ space.
     <td>29,844,570,422,669</td>
     <td>27.75s</td>
     <td>12.08s</td>
-    <td>1.52s</td>
+    <td>1.33s</td>
     <td>0.76s</td>
   </tr>
   <tr align="right">
@@ -251,7 +251,7 @@ space.
     <td>279,238,341,033,925</td>
     <td>232.30s</td>
     <td>92.09s</td>
-    <td>6.87s</td>
+    <td>5.95s</td>
     <td>2.67s</td>
   </tr>
   <tr align="right">
@@ -259,7 +259,7 @@ space.
     <td>2,623,557,157,654,233</td>
     <td>1,836.73s</td>
     <td>731.35s</td>
-    <td>31.63s</td>
+    <td>27.49s</td>
     <td>10.66s</td>
   </tr>
   <tr align="right">
@@ -267,7 +267,7 @@ space.
     <td>24,739,954,287,740,860</td>
     <td>14,949.16s</td>
     <td>6,631.73s</td>
-    <td>146.55s</td>
+    <td>128.54s</td>
     <td>44.54s</td>
   </tr>
   <tr align="right">
