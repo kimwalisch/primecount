@@ -93,7 +93,15 @@ void result_txt(int argc,
   }
 }
 
-void result_log(maxint_t res, double seconds)
+void log_footer()
+{
+  ofstream logfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (logfile.is_open())
+    logfile << endl << string(60, '=') << endl;
+}
+
+void log_result(maxint_t res, double seconds)
 {
   ofstream logfile("primecount.log", ofstream::out | ofstream::app);
 
@@ -339,6 +347,8 @@ int main (int argc, char* argv[])
 
     if (print_result())
     {
+      log_result(res, seconds);
+
       if (is_print())
         cout << endl;
 
@@ -346,9 +356,9 @@ int main (int argc, char* argv[])
 
       if (opt.time)
         cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-
-      result_log(res, seconds);
     }
+
+    log_footer();
   }
   catch (exception& e)
   {
