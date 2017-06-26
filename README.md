@@ -4,12 +4,17 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![GitHub license](https://img.shields.io/badge/license-BSD%202-blue.svg)](https://github.com/kimwalisch/primecount/blob/master/COPYING)
 
-The primecount backup version saves intermediate results to a backup file.
+The primecount backup version saves intermediate results to a backup file (```primecount.backup```).
 If your computer crashes or if you interrupt a computation you can resume
 the same computation from the backup file. For pi(x) computations that
 take weeks or even months to compute the backup functionality is very
 important. David Baugh and myself have used primecount-backup to compute
 pi(10^27) and many other records.
+
+The primecount backup version also features advanced logging:
+
+* ```results.txt```: Contains results only
+* ```primecount.log```: Contains all partial results
 
 ## Binaries
 
