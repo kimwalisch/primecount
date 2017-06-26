@@ -67,6 +67,8 @@ struct CmdOptions
   int threads;
   std::string resumeFile;
   std::string backupFile;
+  std::string x_str;
+  std::string args;
   bool time;
 
   CmdOptions() :
