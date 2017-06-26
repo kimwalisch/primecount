@@ -198,13 +198,12 @@ CmdOptions parseOptions(int argc, char* argv[])
   for (int i = 1; i < argc; i++)
   {
     Option opt = makeOption(argv[i]);
-    opts.args += string(argv[i]) + " ";
 
     switch (optionMap[opt.opt])
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_BACKUP:  optionBackup(opt, opts); break;
-      case OPTION_NUMBER:  opts.x_str = opt.str; numbers.push_back(opt.getValue<maxint_t>()); break;
+      case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
       case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
       case OPTION_PHI:     opts.a = opt.getValue<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;

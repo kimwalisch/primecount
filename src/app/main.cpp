@@ -54,6 +54,45 @@ const string dateTime()
   return buffer;
 }
 
+string basename(string path)
+{
+  while (path.back() == '/' ||
+         path.back() == '\\')
+  {
+    path.pop_back();
+  }
+
+  size_t pos = path.find_last_of("/\\");
+
+  if (pos != string::npos)
+    return path.substr(pos + 1);
+
+  return path;
+}
+
+void result_txt(int argc,
+                char* argv[],
+                maxint_t res,
+                int threads,
+                double seconds)
+{
+  ofstream resfile("results.txt", ofstream::out | ofstream::app);
+
+  if (resfile.is_open())
+  {
+    resfile << basename(argv[0]);
+
+    for (int i = 1; i < argc; i++)
+      resfile << " " << argv[i];
+
+    resfile << endl;
+    resfile << "Result: " << res << endl;
+    resfile << "Threads: " << threads << endl;
+    resfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+    resfile << "Date: " << dateTime() << endl << endl;
+  }
+}
+
 void result_log(maxint_t res, double seconds)
 {
   ofstream logfile("primecount.log", ofstream::out | ofstream::app);
@@ -62,23 +101,6 @@ void result_log(maxint_t res, double seconds)
   {
     logfile << endl << res << endl;
     logfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
-  }
-}
-
-void result_txt(string& formula,
-                maxint_t res,
-                CmdOptions& opt,
-                double seconds)
-{
-  ofstream resfile("results.txt", ofstream::out | ofstream::app);
-
-  if (resfile.is_open())
-  {
-    resfile << formula << " = " << res << endl;
-    resfile << "Command: primecount " << opt.args << endl;
-    resfile << "Threads: " << opt.threads << endl;
-    resfile << "Seconds: " << seconds << endl;
-    resfile << "Date: " << dateTime() << endl << endl;
   }
 }
 
@@ -241,7 +263,6 @@ int main (int argc, char* argv[])
     auto a = opt.a;
     auto threads = opt.threads;
     maxint_t res = 0;
-    string formula;
 
     switch (opt.option)
     {
@@ -253,69 +274,68 @@ int main (int argc, char* argv[])
         else
 #endif
         res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time);
-        formula = "pi(" + opt.x_str + ")";
         break;
       }
       case OPTION_DELEGLISE_RIVAT1:
-        res = pi_deleglise_rivat1(to_int64(x)); formula = "pi(" + opt.x_str + ")"; break;
+        res = pi_deleglise_rivat1(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT2:
-        res = pi_deleglise_rivat2(to_int64(x)); formula = "pi(" + opt.x_str + ")"; break;
+        res = pi_deleglise_rivat2(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
-        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time); formula = "pi(" + opt.x_str + ")"; break;
+        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time); break;
       case OPTION_LEGENDRE:
-        res = pi_legendre(to_int64(x), threads); formula = "pi_legendre(" + opt.x_str + ")"; break;
+        res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:
-        res = pi_lehmer(to_int64(x), threads); formula = "pi_lehmer(" + opt.x_str + ")"; break;
+        res = pi_lehmer(to_int64(x), threads); break;
       case OPTION_LMO:
-        res = pi_lmo(to_int64(x), threads); formula = "pi_lmo(" + opt.x_str + ")"; break;
+        res = pi_lmo(to_int64(x), threads); break;
       case OPTION_LMO1:
-        res = pi_lmo1(to_int64(x)); formula = "pi_lmo1(" + opt.x_str + ")"; break;
+        res = pi_lmo1(to_int64(x)); break;
       case OPTION_LMO2:
-        res = pi_lmo2(to_int64(x)); formula = "pi_lmo2(" + opt.x_str + ")"; break;
+        res = pi_lmo2(to_int64(x)); break;
       case OPTION_LMO3:
-        res = pi_lmo3(to_int64(x)); formula = "pi_lmo3(" + opt.x_str + ")"; break;
+        res = pi_lmo3(to_int64(x)); break;
       case OPTION_LMO4:
-        res = pi_lmo4(to_int64(x)); formula = "pi_lmo4(" + opt.x_str + ")"; break;
+        res = pi_lmo4(to_int64(x)); break;
       case OPTION_LMO5:
-        res = pi_lmo5(to_int64(x)); formula = "pi_lmo5(" + opt.x_str + ")"; break;
+        res = pi_lmo5(to_int64(x)); break;
       case OPTION_LMO_PARALLEL:
-        res = pi_lmo_parallel(to_int64(x), threads); formula = "pi_lmo(" + opt.x_str + ")"; break;
+        res = pi_lmo_parallel(to_int64(x), threads); break;
       case OPTION_MEISSEL:
-        res = pi_meissel(to_int64(x), threads); formula = "pi_meissel(" + opt.x_str + ")"; break;
+        res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
-        res = pi_primesieve(to_int64(x), threads); formula = "pi_primesieve(" + opt.x_str + ")"; break;
+        res = pi_primesieve(to_int64(x), threads); break;
       case OPTION_P2:
-        res = P2(x, threads); formula = "P2(" + opt.x_str + ")"; break;
+        res = P2(x, threads); break;
       case OPTION_PHI:
-        res = phi(to_int64(x), a, threads); formula = "phi(" + opt.x_str + ", " + to_string(a) + ")"; break;
+        res = phi(to_int64(x), a, threads); break;
       case OPTION_PI:
-        res = pi(x, threads); formula = "pi(" + opt.x_str + ")"; break;
+        res = pi(x, threads); break;
       case OPTION_LI:
-        res = Li(x); formula = "Li(" + opt.x_str + ")"; break;
+        res = Li(x); break;
       case OPTION_LIINV:
-        res = Li_inverse(x); formula = "Li_inverse(" + opt.x_str + ")"; break;
+        res = Li_inverse(x); break;
       case OPTION_RI:
-        res = Ri(x); formula = "Ri(" + opt.x_str + ")"; break;
+        res = Ri(x); break;
       case OPTION_RIINV:
-        res = Ri_inverse(x); formula = "Ri_inverse(" + opt.x_str + ")"; break;
+        res = Ri_inverse(x); break;
       case OPTION_NTHPRIME:
-        res = nth_prime(to_int64(x), threads); formula = "nth_prime(" + opt.x_str + ")"; break;
+        res = nth_prime(to_int64(x), threads); break;
       case OPTION_S1:
-        res = S1(x, threads); formula = "S1(" + opt.x_str + ")"; break;
+        res = S1(x, threads); break;
       case OPTION_S2_EASY:
-        res = S2_easy(x, threads); formula = "S2_easy(" + opt.x_str + ")"; break;
+        res = S2_easy(x, threads); break;
       case OPTION_S2_HARD:
-        res = S2_hard(x, threads); formula = "S2_hard(" + opt.x_str + ")"; break;
+        res = S2_hard(x, threads); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x, threads); formula = "S2_trivial(" + opt.x_str + ")"; break;
+        res = S2_trivial(x, threads); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
-        res = pi_deleglise_rivat_parallel2(x, threads, &time); formula = "pi(" + opt.x_str + ")"; break;
+        res = pi_deleglise_rivat_parallel2(x, threads, &time); break;
 #endif
     }
 
     double seconds = get_wtime() - time;
-    result_txt(formula, res, opt, seconds);
+    result_txt(argc, argv, res, threads, seconds);
 
     if (print_result())
     {
