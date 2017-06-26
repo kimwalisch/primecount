@@ -201,12 +201,11 @@ string get_max_x(double alpha)
 
 #ifdef HAVE_INT128_T
   // primecount is limited by:
-  // z < 2^62, with z = x^(2/3) / alpha
+  // z <= 2^62, with z = x^(2/3) / alpha
   // x^(2/3) / alpha < 2^62
-  // x < (2^62 * alpha)^(3/2)
-  // safety buffer: use 61 instead of 62
+  // x <= (2^62 * alpha)^(3/2)
   //
-  double max_x = pow(pow(2.0, 61.0) * alpha, 3.0 / 2.0);
+  double max_x = pow(pow(2.0, 62.0) * alpha, 3.0 / 2.0);
   oss << (int128_t) max_x; 
 #else
   unused_param(alpha); 
