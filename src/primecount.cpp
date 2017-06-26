@@ -87,7 +87,7 @@ int64_t pi(int64_t x)
 int64_t pi(int64_t x, int threads)
 {
   if (x < lmo_threshold)
-    return pi_lmo(x, threads);
+    return pi_lmo5(x);
   else
     return pi_deleglise_rivat(x, threads);
 }
