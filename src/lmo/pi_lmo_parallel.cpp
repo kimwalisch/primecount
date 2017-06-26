@@ -43,19 +43,19 @@ int64_t cross_off(BitSieve& sieve,
                   int64_t prime,
                   WheelItem& w)
 {
-  int64_t unset = 0;
+  int64_t count = 0;
   int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
   for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     // +1 if m is unset the first time
-    unset += sieve[m - low];
+    count += sieve[m - low];
     sieve.unset(m - low);
   }
 
   w.set(m, wheel_index);
-  return unset;
+  return count;
 }
 
 /// Compute the S2 contribution of the interval
@@ -96,7 +96,7 @@ int64_t S2_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // pre-sieve the multiples of the first c primes
+    // pre-sieve multiples of first c primes
     sieve.pre_sieve(c, low);
 
     int64_t count_low_high = sieve.count((high - 1) - low);

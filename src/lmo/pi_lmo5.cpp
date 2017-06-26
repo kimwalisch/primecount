@@ -39,19 +39,19 @@ int64_t cross_off(BitSieve& sieve,
                   int64_t prime,
                   WheelItem& w)
 {
-  int64_t unset = 0;
+  int64_t count = 0;
   int64_t m = w.next_multiple;
   int64_t wheel_index = w.wheel_index;
 
   for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
   {
     // +1 if m is unset the first time
-    unset += sieve[m - low];
+    count += sieve[m - low];
     sieve.unset(m - low);
   }
 
   w.set(m, wheel_index);
-  return unset;
+  return count;
 }
 
 /// Calculate the contribution of the special leaves
@@ -69,9 +69,10 @@ int64_t S2(int64_t x,
   double time = get_wtime();
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
+  int64_t low = 1;
 
   BitSieve sieve(segment_size);
-  Wheel wheel(primes, primes.size(), /* low = */ 1);
+  Wheel wheel(primes, primes.size(), low);
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 
@@ -80,13 +81,13 @@ int64_t S2(int64_t x,
   int64_t pi_y = pi[y];
 
   // segmented sieve of Eratosthenes
-  for (int64_t low = 1; low < limit; low += segment_size)
+  for (; low < limit; low += segment_size)
   {
     // current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // pre-sieve the multiples of the first c primes
+    // pre-sieve multiples of first c primes
     sieve.pre_sieve(c, low);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
