@@ -42,7 +42,8 @@ int main()
   vector<int> sieve(size, 1);
   size_t pre_sieve = 7;
 
-  for (int j = primes[1] - low; j < size; j += primes[1])
+  // unset multiples of 2
+  for (int j = 1; j < size; j += 2)
     sieve[j] = 0;
 
   for (size_t i = 2; i < primes.size(); i++)
