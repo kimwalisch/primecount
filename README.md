@@ -131,8 +131,8 @@ numbers to compute e.g.:
 Then you can process all numbers from ```worktodo.txt``` using:
 
 ```sh
-$ sh scripts/worktodo.sh
+$ scripts/worktodo.sh
 ```
 
-The results will be printed to screen and full details are
-logged into ```primecount.log```.
+The results will be stored in ```results.txt``` and extended
+details are logged into ```primecount.log```.
