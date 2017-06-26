@@ -92,7 +92,7 @@ int64_t S2_hard(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
-    // pre-sieve the multiples of the first c primes
+    // pre-sieve multiples of first c primes
     sieve.pre_sieve(c, low);
 
     // initialize binary indexed tree from sieve
