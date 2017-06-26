@@ -265,7 +265,7 @@ space.
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>14,949.16s</td>
+    <td>15,801.25s</td>
     <td>6,085.91s</td>
     <td>128.54s</td>
     <td>41.26s</td>
