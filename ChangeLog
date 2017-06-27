@@ -1,6 +1,6 @@
-2017-06-24 Kim Walisch  <kim.walisch@gmail.com>
+2017-06-27 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 3.8 work in progress.
+  Version 3.8 released.
 
   This version reduces the memory usage by a factor of 2
   above 10^20! Furthermore the S2_hard algorithm for
