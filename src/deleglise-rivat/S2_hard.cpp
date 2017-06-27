@@ -102,6 +102,7 @@ T S2_hard_thread(T x,
 
     // pre-sieve multiples of first c primes
     sieve.pre_sieve(c, low);
+
     int64_t count_low_high = sieve.count((high - 1) - low);
 
     // For c + 1 <= b <= pi_sqrty
