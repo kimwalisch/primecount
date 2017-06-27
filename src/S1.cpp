@@ -67,7 +67,6 @@ void print_resume(T x,
 template <typename T>
 bool resume(T x,
             int64_t y,
-            int64_t c,
             T& s1,
             double& time)
 {
@@ -160,7 +159,7 @@ int64_t S1(int64_t x,
   double time = get_wtime();
   int64_t s1;
 
-  if (!resume(x, y, c, s1, time))
+  if (!resume(x, y, s1, time))
   {
     s1 = S1_OpenMP(x, y, c, threads);
     backup(x, y, c, s1, time);
@@ -185,7 +184,7 @@ int128_t S1(int128_t x,
   double time = get_wtime();
   int128_t s1;
 
-  if (!resume(x, y, c, s1, time))
+  if (!resume(x, y, s1, time))
   {
     // uses less memory
     if (y <= numeric_limits<uint32_t>::max())

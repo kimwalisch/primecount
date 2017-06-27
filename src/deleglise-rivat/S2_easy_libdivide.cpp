@@ -84,7 +84,6 @@ template <typename T>
 bool resume(T x,
             int64_t y,
             int64_t z,
-            int64_t c,
             int64_t& start,
             int64_t& pi_x13,
             T& s2_easy,
@@ -140,7 +139,7 @@ T S2_easy_OpenMP(T x,
   int64_t start;
   int64_t pi_x13;
   double backup_time = get_wtime();
-  bool is_resume = resume(x, y, z, c, start, pi_x13, s2_easy, time);
+  bool is_resume = resume(x, y, z, start, pi_x13, s2_easy, time);
 
   if (is_resume && start >= pi_x13)
     return s2_easy;

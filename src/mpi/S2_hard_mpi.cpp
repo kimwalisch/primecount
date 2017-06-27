@@ -77,7 +77,6 @@ T S2_hard_thread(T x,
                  int64_t low,
                  int64_t segments,
                  int64_t segment_size,
-                 double alpha,
                  FactorTable& factor,
                  PiTable& pi,
                  Primes& primes,
@@ -201,7 +200,6 @@ void S2_hard_slave(T x,
 
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
-  double alpha = get_alpha(x, y);
 
   MpiMsg msg;
   int master_proc_id = mpi_master_proc_id();
@@ -235,7 +233,7 @@ void S2_hard_slave(T x,
         break;
 
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }

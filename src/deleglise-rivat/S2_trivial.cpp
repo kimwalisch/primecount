@@ -71,7 +71,6 @@ template <typename T>
 bool resume(T x,
             int64_t y,
             int64_t z,
-            int64_t c,
             T& s2_trivial,
             double& time)
 {
@@ -149,7 +148,7 @@ int64_t S2_trivial(int64_t x,
   double time = get_wtime();
   int64_t s2_trivial;
 
-  if (!resume(x, y, z, c, s2_trivial, time))
+  if (!resume(x, y, z, s2_trivial, time))
   {
     s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
     backup(x, y, z, c, s2_trivial, time);
@@ -175,7 +174,7 @@ int128_t S2_trivial(int128_t x,
   double time = get_wtime();
   int128_t s2_trivial;
 
-  if (!resume(x, y, z, c, s2_trivial, time))
+  if (!resume(x, y, z, s2_trivial, time))
   {
     s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
     backup(x, y, z, c, s2_trivial, time);

@@ -74,7 +74,6 @@ T S2_hard_thread(T x,
                  int64_t low,
                  int64_t segments,
                  int64_t segment_size,
-                 double alpha,
                  FactorTable& factor,
                  PiTable& pi,
                  Primes& primes,
@@ -200,8 +199,7 @@ T S2_hard_OpenMP(T x,
 {
   threads = ideal_num_threads(threads, z);
 
-  double alpha = get_alpha(x, y);
-  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   int resume_threads = loadBalancer.resume_threads();
 
   int64_t max_prime = min(y, z / isqrt(y));
@@ -224,9 +222,9 @@ T S2_hard_OpenMP(T x,
     if (loadBalancer.resume(i, low, segments, segment_size))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
-      loadBalancer.backup(i, low, segments, segment_size, s2_hard, runtime);
+      loadBalancer.backup(i, low, segments, s2_hard, runtime);
     }
   }
 
@@ -242,7 +240,7 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(threads, i, &low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -276,8 +274,7 @@ int64_t S2_hard(int64_t x,
   print_log(x, y, c, threads);
 
   double time = get_wtime();
-  double alpha = get_alpha(x, y);
-  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   maxint_t s2_hard;
 
   if (!loadBalancer.resume(s2_hard, time))
@@ -313,8 +310,7 @@ int128_t S2_hard(int128_t x,
   print_log(x, y, c, threads);
 
   double time = get_wtime();
-  double alpha = get_alpha(x, y);
-  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   maxint_t s2_hard;
 
   if (!loadBalancer.resume(s2_hard, time))
