@@ -74,7 +74,6 @@ T S2_hard_thread(T x,
                  int64_t low,
                  int64_t segments,
                  int64_t segment_size,
-                 double alpha,
                  FactorTable& factor,
                  PiTable& pi,
                  Primes& primes,
@@ -200,8 +199,7 @@ T S2_hard_OpenMP(T x,
 {
   threads = ideal_num_threads(threads, z);
 
-  double alpha = get_alpha(x, y);
-  LoadBalancer loadBalancer(x, y, z, alpha, s2_hard_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
@@ -217,7 +215,7 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, alpha, factor, pi, primes, runtime);
+      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }

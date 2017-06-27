@@ -40,7 +40,6 @@ namespace primecount {
 LoadBalancer::LoadBalancer(maxint_t x,
                            int64_t y,
                            int64_t z,
-                           double alpha,
                            maxint_t s2_approx) :
   low_(1),
   max_low_(1),
@@ -54,6 +53,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
 {
   init_size();
   maxint_t x16 = iroot<6>(x);
+  double alpha = get_alpha(x, y);
   smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
 }
 
