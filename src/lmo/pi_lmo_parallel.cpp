@@ -188,9 +188,8 @@ int64_t S2(int64_t x,
   print("Computation of the special leaves");
 
   double time = get_wtime();
-  double alpha = get_alpha(x, y);
   threads = ideal_num_threads(threads, z);
-  LoadBalancer loadBalancer(x, y, z, alpha, s2_approx);
+  LoadBalancer loadBalancer(x, y, z, s2_approx);
   PiTable pi(y);
 
   #pragma omp parallel for num_threads(threads)
