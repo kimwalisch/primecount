@@ -21,10 +21,10 @@ install:
   - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
   - sudo apt-get install -y cmake cmake-data openmpi-bin libopenmpi-dev cppcheck valgrind
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
-  - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
   - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing"; fi
   - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+  - if [ "$CC" = "gcc" ]; then export CC="gcc-4.8"; fi
 
 script:
   - cppcheck src include --error-exitcode=1
@@ -32,7 +32,7 @@ script:
   - mkdir build
   - cd build
   - cmake .. -DBUILD_TESTS=ON
-  - make -j4 VERBOSE=1
+  - make -j4
   - make test
   - ldd primecount
   - ./primecount --test
