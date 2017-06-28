@@ -27,6 +27,7 @@ install:
 
 script:
   - cppcheck src include --error-exitcode=1
+  - sed -i 's#CMAKE_BUILD_TYPE Release#CMAKE_BUILD_TYPE Debug#g' CMakeLists.txt
   - mkdir build
   - cd build
   - cmake .. -DBUILD_TESTS=ON
