@@ -65,21 +65,18 @@ public:
   void set(uint64_t pos)
   {
     assert(pos < size_);
-    assert(pos % 2 != 0);
     sieve_[pos >> 7] |= set_bit_[pos & 127];
   }
 
   void unset(uint64_t pos)
   {
     assert(pos < size_);
-    assert(pos % 2 != 0);
     sieve_[pos >> 7] &= ~set_bit_[pos & 127];
   }
 
   bool operator[](uint64_t pos) const
   {
     assert(pos < size_);
-    assert(pos % 2 != 0);
     return (sieve_[pos >> 7] & set_bit_[pos & 127]) != 0;
   }
 
