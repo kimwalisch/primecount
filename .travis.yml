@@ -46,7 +46,7 @@ script:
   - rm -rf build
   - mkdir build
   - cd build
-  - export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"; fi
+  - export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas";
   - cmake .. -DWITH_MPI=ON
   - make -j4
   - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
