@@ -276,16 +276,15 @@ void Sieve::reset()
   {
     low_ += distance();
     high_ = low_ + distance() - 1;
+  }
 
-    if (high_ >= stop_)
-    {
-      high_ = stop_;
-      uint64_t segment_size = get_segment_size(stop_ - low_);
-      uint64_t size = segment_size / 30;
-      sieve_.resize(size);
-      auto sieve = (uint64_t*) &sieve_[0];
-      sieve[(stop_ - low_) / 240] &= unset_larger[(stop_ - low_) % 240];
-    }
+  if (high_ >= stop_)
+  {
+    high_ = stop_;
+    uint64_t segment_size = get_segment_size(stop_ - low_);
+    set_sieve_size(segment_size);
+    auto sieve = (uint64_t*) &sieve_[0];
+    sieve[(stop_ - low_) / 240] &= unset_larger[(stop_ - low_) % 240];
   }
 }
 
