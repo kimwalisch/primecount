@@ -283,6 +283,8 @@ void Sieve::reset()
       uint64_t segment_size = get_segment_size(stop_ - low_);
       uint64_t size = segment_size / 30;
       sieve_.resize(size);
+      auto sieve = (uint64_t*) &sieve_[0];
+      sieve[(stop_ - low_) / 240] &= unset_larger[(stop_ - low_) % 240];
     }
   }
 }

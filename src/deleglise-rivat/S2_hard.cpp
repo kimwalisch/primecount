@@ -108,7 +108,7 @@ T S2_hard_thread(T x,
           int64_t fm = factor.get_number(m);
           int64_t xn = (int64_t) fast_div(x2, fm);
           int64_t stop = xn - low;
-          count += sieve.count(start, stop);
+          count += sieve.count(start, stop, count, count_low_high);
           start = stop + 1;
           int64_t phi_xn = phi[b] + count;
           int64_t mu_m = factor.mu(m);
@@ -141,7 +141,7 @@ T S2_hard_thread(T x,
       {
         int64_t xn = (int64_t) fast_div(x2, primes[l]);
         int64_t stop = xn - low;
-        count += sieve.count(start, stop);
+        count += sieve.count(start, stop, count, count_low_high);
         start = stop + 1;
         int64_t phi_xn = phi[b] + count;
         s2_hard += phi_xn;
