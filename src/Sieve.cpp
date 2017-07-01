@@ -327,15 +327,16 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
   prime /= 30;
   Wheel& wheel = wheel_[i];
+  uint32_t sieve_size = (uint32_t) sieve_.size();
   uint64_t cnt = 0;
 
-  if (wheel.multiple >= sieve_.size())
-    wheel.multiple -= sieve_.size();
+  if (wheel.multiple >= sieve_size)
+    wheel.multiple -= sieve_size;
   else
   {
     // pointer to the byte with the 1st multiple 
     byte_t* s = &sieve_[wheel.multiple];
-    byte_t* sieve_end = &sieve_[sieve_.size()];
+    byte_t* sieve_end = &sieve_[sieve_size];
 
     switch (wheel.index)
     {

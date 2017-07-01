@@ -72,13 +72,13 @@ T S2_hard_thread(T x,
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = c + 1;
+    int64_t b = 4;
 
     // reset all bits to 1
     sieve.reset();
 
-    for (uint64_t i = 4; i <= c; i++)
-      sieve.cross_off(i, primes[i]);
+    for (; b <= c; b++)
+      sieve.cross_off(b, primes[b]);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
 
