@@ -22,6 +22,7 @@
 #include <LoadBalancer.hpp>
 #include <primecount-internal.hpp>
 #include <S2Status.hpp>
+#include <Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -65,7 +66,7 @@ void LoadBalancer::init_size()
 
   int64_t min = 1 << 9;
   segment_size_ = max(segment_size_, min);
-  segment_size_ = next_power_of_2(segment_size_);
+  segment_size_ = Sieve::get_segment_size(segment_size_);
 }
 
 maxint_t LoadBalancer::get_result() const
@@ -84,6 +85,11 @@ bool LoadBalancer::get_work(int64_t* low,
     s2_total_ += s2;
 
     update(low, segments, runtime);
+
+    if (low_ == 1)
+      segment_size_ -= 1;
+    else
+      segment_size_ = Sieve::get_segment_size(segment_size_);
 
     *low = low_;
     *segments = segments_;
@@ -108,7 +114,10 @@ void LoadBalancer::update(int64_t* low,
     segments_ = *segments;
 
     if (segment_size_ < sqrtz_)
-      segment_size_ *= 2;
+    {
+      segment_size_ = min(segment_size_ * 2, sqrtz_);
+      segment_size_ = Sieve::get_segment_size(segment_size_);
+    }
     else
     {
       double next = get_next(runtime);

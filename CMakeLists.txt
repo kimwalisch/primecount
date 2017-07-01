@@ -46,6 +46,7 @@ set(LIB_SRC src/BitSieve.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/S1.cpp
+            src/Sieve.cpp
             src/LoadBalancer.cpp
             src/S2Status.cpp
             src/Wheel.cpp
