@@ -69,16 +69,18 @@ public:
   ///
   uint64_t count(uint64_t start,
                  uint64_t stop,
+                 uint64_t low,
+                 uint64_t high,
                  uint64_t count_0_start,
                  uint64_t count_low_high) const
   {
     if (start > stop)
       return 0;
 
-    if (stop - start < (high_ - low_) - stop)
+    if (stop - start < ((high - 1) - low) - stop)
       return count(start, stop);
     else
-      return count_low_high - count_0_start - count(stop + 1, high_ - low_);
+      return count_low_high - count_0_start - count(stop + 1, (high - 1) - low);
   }
 
 private:
