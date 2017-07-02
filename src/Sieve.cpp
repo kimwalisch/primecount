@@ -21,13 +21,12 @@
 ///
 
 #include <Sieve.hpp>
-#include <primesieve.hpp>
-#include <imath.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <vector>
 
 using namespace std;
@@ -63,106 +62,106 @@ const WheelInit wheel_init[30] =
 // unset bits < start
 const array<uint64_t, 240> unset_smaller =
 {
-  ~0ull << 0, ~0ull << 0, ~0ull << 1, ~0ull << 1, ~0ull << 1, 
-  ~0ull << 1, ~0ull << 1, ~0ull << 1, ~0ull << 2, ~0ull << 2, 
-  ~0ull << 2, ~0ull << 2, ~0ull << 3, ~0ull << 3, ~0ull << 4, 
-  ~0ull << 4, ~0ull << 4, ~0ull << 4, ~0ull << 5, ~0ull << 5, 
-  ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 7, 
-  ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7, 
-  ~0ull << 8, ~0ull << 8, ~0ull << 9, ~0ull << 9, ~0ull << 9, 
-  ~0ull << 9, ~0ull << 9, ~0ull << 9, ~0ull << 10, ~0ull << 10, 
-  ~0ull << 10, ~0ull << 10, ~0ull << 11, ~0ull << 11, ~0ull << 12, 
-  ~0ull << 12, ~0ull << 12, ~0ull << 12, ~0ull << 13, ~0ull << 13, 
-  ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 15, 
-  ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15, 
-  ~0ull << 16, ~0ull << 16, ~0ull << 17, ~0ull << 17, ~0ull << 17, 
-  ~0ull << 17, ~0ull << 17, ~0ull << 17, ~0ull << 18, ~0ull << 18, 
-  ~0ull << 18, ~0ull << 18, ~0ull << 19, ~0ull << 19, ~0ull << 20, 
-  ~0ull << 20, ~0ull << 20, ~0ull << 20, ~0ull << 21, ~0ull << 21, 
-  ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 23, 
-  ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23, 
-  ~0ull << 24, ~0ull << 24, ~0ull << 25, ~0ull << 25, ~0ull << 25, 
-  ~0ull << 25, ~0ull << 25, ~0ull << 25, ~0ull << 26, ~0ull << 26, 
-  ~0ull << 26, ~0ull << 26, ~0ull << 27, ~0ull << 27, ~0ull << 28, 
-  ~0ull << 28, ~0ull << 28, ~0ull << 28, ~0ull << 29, ~0ull << 29, 
-  ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 31, 
-  ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31, 
-  ~0ull << 32, ~0ull << 32, ~0ull << 33, ~0ull << 33, ~0ull << 33, 
-  ~0ull << 33, ~0ull << 33, ~0ull << 33, ~0ull << 34, ~0ull << 34, 
-  ~0ull << 34, ~0ull << 34, ~0ull << 35, ~0ull << 35, ~0ull << 36, 
-  ~0ull << 36, ~0ull << 36, ~0ull << 36, ~0ull << 37, ~0ull << 37, 
-  ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 39, 
-  ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39, 
-  ~0ull << 40, ~0ull << 40, ~0ull << 41, ~0ull << 41, ~0ull << 41, 
-  ~0ull << 41, ~0ull << 41, ~0ull << 41, ~0ull << 42, ~0ull << 42, 
-  ~0ull << 42, ~0ull << 42, ~0ull << 43, ~0ull << 43, ~0ull << 44, 
-  ~0ull << 44, ~0ull << 44, ~0ull << 44, ~0ull << 45, ~0ull << 45, 
-  ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 47, 
-  ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47, 
-  ~0ull << 48, ~0ull << 48, ~0ull << 49, ~0ull << 49, ~0ull << 49, 
-  ~0ull << 49, ~0ull << 49, ~0ull << 49, ~0ull << 50, ~0ull << 50, 
-  ~0ull << 50, ~0ull << 50, ~0ull << 51, ~0ull << 51, ~0ull << 52, 
-  ~0ull << 52, ~0ull << 52, ~0ull << 52, ~0ull << 53, ~0ull << 53, 
-  ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 55, 
-  ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55, 
-  ~0ull << 56, ~0ull << 56, ~0ull << 57, ~0ull << 57, ~0ull << 57, 
-  ~0ull << 57, ~0ull << 57, ~0ull << 57, ~0ull << 58, ~0ull << 58, 
-  ~0ull << 58, ~0ull << 58, ~0ull << 59, ~0ull << 59, ~0ull << 60, 
-  ~0ull << 60, ~0ull << 60, ~0ull << 60, ~0ull << 61, ~0ull << 61, 
-  ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 63, 
+  ~0ull << 0, ~0ull << 0, ~0ull << 1, ~0ull << 1, ~0ull << 1,
+  ~0ull << 1, ~0ull << 1, ~0ull << 1, ~0ull << 2, ~0ull << 2,
+  ~0ull << 2, ~0ull << 2, ~0ull << 3, ~0ull << 3, ~0ull << 4,
+  ~0ull << 4, ~0ull << 4, ~0ull << 4, ~0ull << 5, ~0ull << 5,
+  ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 7,
+  ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7,
+  ~0ull << 8, ~0ull << 8, ~0ull << 9, ~0ull << 9, ~0ull << 9,
+  ~0ull << 9, ~0ull << 9, ~0ull << 9, ~0ull << 10, ~0ull << 10,
+  ~0ull << 10, ~0ull << 10, ~0ull << 11, ~0ull << 11, ~0ull << 12,
+  ~0ull << 12, ~0ull << 12, ~0ull << 12, ~0ull << 13, ~0ull << 13,
+  ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 15,
+  ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15,
+  ~0ull << 16, ~0ull << 16, ~0ull << 17, ~0ull << 17, ~0ull << 17,
+  ~0ull << 17, ~0ull << 17, ~0ull << 17, ~0ull << 18, ~0ull << 18,
+  ~0ull << 18, ~0ull << 18, ~0ull << 19, ~0ull << 19, ~0ull << 20,
+  ~0ull << 20, ~0ull << 20, ~0ull << 20, ~0ull << 21, ~0ull << 21,
+  ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 23,
+  ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23,
+  ~0ull << 24, ~0ull << 24, ~0ull << 25, ~0ull << 25, ~0ull << 25,
+  ~0ull << 25, ~0ull << 25, ~0ull << 25, ~0ull << 26, ~0ull << 26,
+  ~0ull << 26, ~0ull << 26, ~0ull << 27, ~0ull << 27, ~0ull << 28,
+  ~0ull << 28, ~0ull << 28, ~0ull << 28, ~0ull << 29, ~0ull << 29,
+  ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 31,
+  ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31,
+  ~0ull << 32, ~0ull << 32, ~0ull << 33, ~0ull << 33, ~0ull << 33,
+  ~0ull << 33, ~0ull << 33, ~0ull << 33, ~0ull << 34, ~0ull << 34,
+  ~0ull << 34, ~0ull << 34, ~0ull << 35, ~0ull << 35, ~0ull << 36,
+  ~0ull << 36, ~0ull << 36, ~0ull << 36, ~0ull << 37, ~0ull << 37,
+  ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 39,
+  ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39,
+  ~0ull << 40, ~0ull << 40, ~0ull << 41, ~0ull << 41, ~0ull << 41,
+  ~0ull << 41, ~0ull << 41, ~0ull << 41, ~0ull << 42, ~0ull << 42,
+  ~0ull << 42, ~0ull << 42, ~0ull << 43, ~0ull << 43, ~0ull << 44,
+  ~0ull << 44, ~0ull << 44, ~0ull << 44, ~0ull << 45, ~0ull << 45,
+  ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 47,
+  ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47,
+  ~0ull << 48, ~0ull << 48, ~0ull << 49, ~0ull << 49, ~0ull << 49,
+  ~0ull << 49, ~0ull << 49, ~0ull << 49, ~0ull << 50, ~0ull << 50,
+  ~0ull << 50, ~0ull << 50, ~0ull << 51, ~0ull << 51, ~0ull << 52,
+  ~0ull << 52, ~0ull << 52, ~0ull << 52, ~0ull << 53, ~0ull << 53,
+  ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 55,
+  ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55,
+  ~0ull << 56, ~0ull << 56, ~0ull << 57, ~0ull << 57, ~0ull << 57,
+  ~0ull << 57, ~0ull << 57, ~0ull << 57, ~0ull << 58, ~0ull << 58,
+  ~0ull << 58, ~0ull << 58, ~0ull << 59, ~0ull << 59, ~0ull << 60,
+  ~0ull << 60, ~0ull << 60, ~0ull << 60, ~0ull << 61, ~0ull << 61,
+  ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 63,
   ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63
 };
 
 // unset bits > stop
 const array<uint64_t, 240> unset_larger =
 {
-   0ull,       ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, 
-  ~0ull >> 63, ~0ull >> 63, ~0ull >> 62, ~0ull >> 62, ~0ull >> 62, 
-  ~0ull >> 62, ~0ull >> 61, ~0ull >> 61, ~0ull >> 60, ~0ull >> 60, 
-  ~0ull >> 60, ~0ull >> 60, ~0ull >> 59, ~0ull >> 59, ~0ull >> 58, 
-  ~0ull >> 58, ~0ull >> 58, ~0ull >> 58, ~0ull >> 57, ~0ull >> 57, 
-  ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 56, 
-  ~0ull >> 56, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55, 
-  ~0ull >> 55, ~0ull >> 55, ~0ull >> 54, ~0ull >> 54, ~0ull >> 54, 
-  ~0ull >> 54, ~0ull >> 53, ~0ull >> 53, ~0ull >> 52, ~0ull >> 52, 
-  ~0ull >> 52, ~0ull >> 52, ~0ull >> 51, ~0ull >> 51, ~0ull >> 50, 
-  ~0ull >> 50, ~0ull >> 50, ~0ull >> 50, ~0ull >> 49, ~0ull >> 49, 
-  ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 48, 
-  ~0ull >> 48, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47, 
-  ~0ull >> 47, ~0ull >> 47, ~0ull >> 46, ~0ull >> 46, ~0ull >> 46, 
-  ~0ull >> 46, ~0ull >> 45, ~0ull >> 45, ~0ull >> 44, ~0ull >> 44, 
-  ~0ull >> 44, ~0ull >> 44, ~0ull >> 43, ~0ull >> 43, ~0ull >> 42, 
-  ~0ull >> 42, ~0ull >> 42, ~0ull >> 42, ~0ull >> 41, ~0ull >> 41, 
-  ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 40, 
-  ~0ull >> 40, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39, 
-  ~0ull >> 39, ~0ull >> 39, ~0ull >> 38, ~0ull >> 38, ~0ull >> 38, 
-  ~0ull >> 38, ~0ull >> 37, ~0ull >> 37, ~0ull >> 36, ~0ull >> 36, 
-  ~0ull >> 36, ~0ull >> 36, ~0ull >> 35, ~0ull >> 35, ~0ull >> 34, 
-  ~0ull >> 34, ~0ull >> 34, ~0ull >> 34, ~0ull >> 33, ~0ull >> 33, 
-  ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 32, 
-  ~0ull >> 32, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31, 
-  ~0ull >> 31, ~0ull >> 31, ~0ull >> 30, ~0ull >> 30, ~0ull >> 30, 
-  ~0ull >> 30, ~0ull >> 29, ~0ull >> 29, ~0ull >> 28, ~0ull >> 28, 
-  ~0ull >> 28, ~0ull >> 28, ~0ull >> 27, ~0ull >> 27, ~0ull >> 26, 
-  ~0ull >> 26, ~0ull >> 26, ~0ull >> 26, ~0ull >> 25, ~0ull >> 25, 
-  ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 24, 
-  ~0ull >> 24, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23, 
-  ~0ull >> 23, ~0ull >> 23, ~0ull >> 22, ~0ull >> 22, ~0ull >> 22, 
-  ~0ull >> 22, ~0ull >> 21, ~0ull >> 21, ~0ull >> 20, ~0ull >> 20, 
-  ~0ull >> 20, ~0ull >> 20, ~0ull >> 19, ~0ull >> 19, ~0ull >> 18, 
-  ~0ull >> 18, ~0ull >> 18, ~0ull >> 18, ~0ull >> 17, ~0ull >> 17, 
-  ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 16, 
-  ~0ull >> 16, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15, 
-  ~0ull >> 15, ~0ull >> 15, ~0ull >> 14, ~0ull >> 14, ~0ull >> 14, 
-  ~0ull >> 14, ~0ull >> 13, ~0ull >> 13, ~0ull >> 12, ~0ull >> 12, 
-  ~0ull >> 12, ~0ull >> 12, ~0ull >> 11, ~0ull >> 11, ~0ull >> 10, 
-  ~0ull >> 10, ~0ull >> 10, ~0ull >> 10, ~0ull >> 9, ~0ull >> 9, 
-  ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 8, 
-  ~0ull >> 8, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7, 
-  ~0ull >> 7, ~0ull >> 7, ~0ull >> 6, ~0ull >> 6, ~0ull >> 6, 
-  ~0ull >> 6, ~0ull >> 5, ~0ull >> 5, ~0ull >> 4, ~0ull >> 4, 
-  ~0ull >> 4, ~0ull >> 4, ~0ull >> 3, ~0ull >> 3, ~0ull >> 2, 
-  ~0ull >> 2, ~0ull >> 2, ~0ull >> 2, ~0ull >> 1, ~0ull >> 1, 
+   0ull,       ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63,
+  ~0ull >> 63, ~0ull >> 63, ~0ull >> 62, ~0ull >> 62, ~0ull >> 62,
+  ~0ull >> 62, ~0ull >> 61, ~0ull >> 61, ~0ull >> 60, ~0ull >> 60,
+  ~0ull >> 60, ~0ull >> 60, ~0ull >> 59, ~0ull >> 59, ~0ull >> 58,
+  ~0ull >> 58, ~0ull >> 58, ~0ull >> 58, ~0ull >> 57, ~0ull >> 57,
+  ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 56,
+  ~0ull >> 56, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55,
+  ~0ull >> 55, ~0ull >> 55, ~0ull >> 54, ~0ull >> 54, ~0ull >> 54,
+  ~0ull >> 54, ~0ull >> 53, ~0ull >> 53, ~0ull >> 52, ~0ull >> 52,
+  ~0ull >> 52, ~0ull >> 52, ~0ull >> 51, ~0ull >> 51, ~0ull >> 50,
+  ~0ull >> 50, ~0ull >> 50, ~0ull >> 50, ~0ull >> 49, ~0ull >> 49,
+  ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 48,
+  ~0ull >> 48, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47,
+  ~0ull >> 47, ~0ull >> 47, ~0ull >> 46, ~0ull >> 46, ~0ull >> 46,
+  ~0ull >> 46, ~0ull >> 45, ~0ull >> 45, ~0ull >> 44, ~0ull >> 44,
+  ~0ull >> 44, ~0ull >> 44, ~0ull >> 43, ~0ull >> 43, ~0ull >> 42,
+  ~0ull >> 42, ~0ull >> 42, ~0ull >> 42, ~0ull >> 41, ~0ull >> 41,
+  ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 40,
+  ~0ull >> 40, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39,
+  ~0ull >> 39, ~0ull >> 39, ~0ull >> 38, ~0ull >> 38, ~0ull >> 38,
+  ~0ull >> 38, ~0ull >> 37, ~0ull >> 37, ~0ull >> 36, ~0ull >> 36,
+  ~0ull >> 36, ~0ull >> 36, ~0ull >> 35, ~0ull >> 35, ~0ull >> 34,
+  ~0ull >> 34, ~0ull >> 34, ~0ull >> 34, ~0ull >> 33, ~0ull >> 33,
+  ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 32,
+  ~0ull >> 32, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31,
+  ~0ull >> 31, ~0ull >> 31, ~0ull >> 30, ~0ull >> 30, ~0ull >> 30,
+  ~0ull >> 30, ~0ull >> 29, ~0ull >> 29, ~0ull >> 28, ~0ull >> 28,
+  ~0ull >> 28, ~0ull >> 28, ~0ull >> 27, ~0ull >> 27, ~0ull >> 26,
+  ~0ull >> 26, ~0ull >> 26, ~0ull >> 26, ~0ull >> 25, ~0ull >> 25,
+  ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 24,
+  ~0ull >> 24, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23,
+  ~0ull >> 23, ~0ull >> 23, ~0ull >> 22, ~0ull >> 22, ~0ull >> 22,
+  ~0ull >> 22, ~0ull >> 21, ~0ull >> 21, ~0ull >> 20, ~0ull >> 20,
+  ~0ull >> 20, ~0ull >> 20, ~0ull >> 19, ~0ull >> 19, ~0ull >> 18,
+  ~0ull >> 18, ~0ull >> 18, ~0ull >> 18, ~0ull >> 17, ~0ull >> 17,
+  ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 16,
+  ~0ull >> 16, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15,
+  ~0ull >> 15, ~0ull >> 15, ~0ull >> 14, ~0ull >> 14, ~0ull >> 14,
+  ~0ull >> 14, ~0ull >> 13, ~0ull >> 13, ~0ull >> 12, ~0ull >> 12,
+  ~0ull >> 12, ~0ull >> 12, ~0ull >> 11, ~0ull >> 11, ~0ull >> 10,
+  ~0ull >> 10, ~0ull >> 10, ~0ull >> 10, ~0ull >> 9, ~0ull >> 9,
+  ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 8,
+  ~0ull >> 8, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7,
+  ~0ull >> 7, ~0ull >> 7, ~0ull >> 6, ~0ull >> 6, ~0ull >> 6,
+  ~0ull >> 6, ~0ull >> 5, ~0ull >> 5, ~0ull >> 4, ~0ull >> 4,
+  ~0ull >> 4, ~0ull >> 4, ~0ull >> 3, ~0ull >> 3, ~0ull >> 2,
+  ~0ull >> 2, ~0ull >> 2, ~0ull >> 2, ~0ull >> 1, ~0ull >> 1,
   ~0ull >> 1, ~0ull >> 1, ~0ull >> 1, ~0ull >> 1, ~0ull >> 0
 };
 
@@ -181,33 +180,29 @@ uint64_t unset_bit(byte_t* sieve)
 
 namespace primecount {
 
-Sieve::Sieve(uint64_t start, 
-             uint64_t stop, 
+Sieve::Sieve(uint64_t start,
              uint64_t segment_size, 
              uint64_t wheel_size)
 {
-  low_ = start - start % 30;
-  start_ = start;
-  stop_ = stop;
-  first_segment_ = true;
+  assert(start % 30 == 0);
+  assert(segment_size % 240 == 0);
 
+  start_ = start;
   set_sieve_size(segment_size);
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
-
-  high_ = low_ + distance() - 1;
 }
 
 /// Each sieve byte contains 30 numbers,
 /// the 8 bits of each byte correspond to the offsets:
 /// { 1, 7, 11, 13, 17, 19, 23, 29 }
 ///
-uint64_t Sieve::distance() const
+uint64_t Sieve::segment_size() const
 {
   return sieve_.size() * 30;
 }
 
-/// segment_size should be a multiple of 240
+/// segment_size must be a multiple of 240
 /// as we process 64-bit words (8 bytes)
 /// and each byte contains 30 numbers.
 ///
@@ -237,7 +232,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
-  assert(stop - start < distance());
+  assert(stop - start < segment_size());
 
   uint64_t bit_count = 0;
   uint64_t start_idx = start / 240;
@@ -258,53 +253,38 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return bit_count;
 }
 
-/// Reset all bits to 1,
-/// update low & high for next segment.
-///
-void Sieve::reset()
+/// Reset all bits to 1
+void Sieve::reset(uint64_t low, uint64_t high)
 {
   fill(sieve_.begin(), sieve_.end(), 0xff);
 
-  if (first_segment_)
-  {
-    first_segment_ = false;
-    assert(start_ - low_ < 240);
-    auto sieve = (uint64_t*) &sieve_[0];
-    sieve[0] &= unset_smaller[start_ - low_];
-  }
-  else
-  {
-    low_ += distance();
-    high_ = low_ + distance() - 1;
-  }
+  uint64_t dist = high - low;
 
-  if (high_ >= stop_)
+  if (dist < segment_size())
   {
-    high_ = stop_;
-    uint64_t segment_size = get_segment_size(stop_ - low_);
-    set_sieve_size(segment_size);
+    set_sieve_size(dist);
     auto sieve = (uint64_t*) &sieve_[0];
-    sieve[(stop_ - low_) / 240] &= unset_larger[(stop_ - low_) % 240];
+    sieve[dist / 240] &= unset_larger[dist % 240];
   }
 }
 
-/// Calculate the first multiple > low_ of prime
+/// Calculate the first multiple > start_ of prime
 /// that is not divisible by 2, 3, 5 and
 /// its wheel index.
 ///
 void Sieve::add_wheel(uint64_t prime)
 {
-  assert(low_ % 30 == 0);
+  assert(start_ % 30 == 0);
 
-  // first multiple > low_
-  uint64_t quotient = low_ / prime + 1;
+  // first multiple > start_
+  uint64_t quotient = start_ / prime + 1;
   uint64_t multiple = prime * quotient;
 
   // find next multiple of prime that
   // is not divisible by 2, 3, 5
   uint64_t factor = wheel_init[quotient % 30].factor;
   multiple += prime * factor;
-  multiple = (multiple - low_) / 30;
+  multiple = (multiple - start_) / 30;
 
   // calculate wheel index of multiple
   uint32_t index = wheel_init[quotient % 30].index;

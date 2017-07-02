@@ -42,8 +42,8 @@ LoadBalancer::LoadBalancer(maxint_t x,
                            int64_t y,
                            int64_t z,
                            maxint_t s2_approx) :
-  low_(1),
-  max_low_(1),
+  low_(0),
+  max_low_(0),
   z_(z),
   segments_(1),
   s2_total_(0),
@@ -96,11 +96,6 @@ bool LoadBalancer::get_work(int64_t* low,
     s2_total_ += s2;
 
     update(low, segments, runtime);
-
-    if (low_ == 1)
-      segment_size_ -= 1;
-    else
-      segment_size_ = Sieve::get_segment_size(segment_size_);
 
     *low = low_;
     *segments = segments_;

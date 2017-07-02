@@ -54,8 +54,9 @@ T S2_hard_thread(T x,
                  Primes& primes,
                  Runtime& runtime)
 {
+  int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
-  int64_t max_b = pi[min(isqrt(x / low), isqrt(z), y)];
+  int64_t max_b = pi[min(isqrt(x / low1), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
 
@@ -63,8 +64,8 @@ T S2_hard_thread(T x,
     return s2_hard;
 
   runtime.init_start();
-  Sieve sieve(low, limit - 1, segment_size, max_b);
-  auto phi = generate_phi(low - 1, max_b, primes, pi);
+  Sieve sieve(low, segment_size, max_b);
+  auto phi = generate_phi(low, max_b, primes, pi);
   runtime.init_stop();
 
   // Segmented sieve of Eratosthenes
@@ -72,10 +73,11 @@ T S2_hard_thread(T x,
   {
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
+    low1 = max(low, 1);
     int64_t b = 4;
 
     // reset all bits to 1
-    sieve.reset();
+    sieve.reset(low, high);
 
     for (; b <= c; b++)
       sieve.cross_off(b, primes[b]);
@@ -91,7 +93,7 @@ T S2_hard_thread(T x,
       T x2 = x / prime;
       int64_t x2_div_high = min(fast_div(x2, high), y);
       int64_t min_m = max(x2_div_high, y / prime);
-      int64_t max_m = min(fast_div(x2, low), y);
+      int64_t max_m = min(fast_div(x2, low1), y);
       int64_t count = 0;
       int64_t start = 0;
 
@@ -127,7 +129,7 @@ T S2_hard_thread(T x,
     {
       int64_t prime = primes[b];
       T x2 = x / prime;
-      int64_t x2_div_low = min(fast_div(x2, low), y);
+      int64_t x2_div_low = min(fast_div(x2, low1), y);
       int64_t x2_div_high = min(fast_div(x2, high), y);
       int64_t l = pi[min(x2_div_low, z / prime)];
       int64_t min_hard = max(x2_div_high, prime);

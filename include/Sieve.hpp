@@ -44,13 +44,12 @@ struct Wheel
 class Sieve
 {
 public:
-  Sieve(uint64_t start, 
-      uint64_t stop, 
-      uint64_t segment_size, 
-      uint64_t wheel_size);
+  Sieve(uint64_t start,
+        uint64_t segment_size,
+        uint64_t wheel_size);
 
-  void reset();
-  uint64_t distance() const;
+  void reset(uint64_t low, uint64_t high);
+  uint64_t segment_size() const;
   static uint64_t get_segment_size(uint64_t size);
   uint64_t cross_off(uint64_t i, uint64_t prime);
 
@@ -87,12 +86,7 @@ private:
   void set_sieve_size(uint64_t segment_size);
   void add_wheel(uint64_t prime);
 
-  uint64_t low_;
-  uint64_t high_;
   uint64_t start_;
-  uint64_t stop_;
-  bool first_segment_;
-
   std::vector<byte_t> sieve_;
   std::vector<Wheel> wheel_;
 };
