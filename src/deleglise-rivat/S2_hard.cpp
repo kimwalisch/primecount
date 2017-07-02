@@ -1,10 +1,17 @@
 ///
 /// @file  S2_hard.cpp
-/// @brief Calculate the contribution of the hard special leaves which
-///        require use of a sieve (Deleglise-Rivat algorithm).
-///        This is a parallel implementation which uses compression
-///        (PiTable & FactorTable) to reduce the memory usage by
-///        about 10x.
+/// @brief Calculate the contribution of the hard special leaves using
+///        a prime sieve. This is a multi-threaded implementation
+///        which uses compression (PiTable & FactorTable) to reduce
+///        the memory usage by about 10x.
+///
+///        Usually the computation of the hard special leaves
+///        requires a binary indexed tree a.k.a. Fenwick tree to count
+///        the number of unsieved elements in O(log n) time. But it
+///        is actually much faster to simply count the number of
+///        unsieved elements directly from the sieve array using the
+///        POPCNT instruction. Hence this implementation does not use
+///        a binary indexed tree.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -37,7 +44,7 @@ using namespace primecount;
 
 namespace {
 
-/// Compute the S2 contribution of the hard special leaves
+/// Compute the contribution of the hard special leaves
 /// using a sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[
 ///
