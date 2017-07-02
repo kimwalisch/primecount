@@ -13,7 +13,7 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <BitSieve.hpp>
+#include <Sieve.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
 #include <LoadBalancer.hpp>
@@ -22,7 +22,6 @@
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <S1.hpp>
-#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -35,28 +34,6 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-
-/// Cross-off the multiples of prime in the sieve array
-int64_t cross_off(BitSieve& sieve,
-                  int64_t low,
-                  int64_t high,
-                  int64_t prime,
-                  WheelItem& w)
-{
-  int64_t count = 0;
-  int64_t m = w.next_multiple;
-  int64_t wheel_index = w.wheel_index;
-
-  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
-  {
-    // +1 if m is unset the first time
-    count += sieve[m - low];
-    sieve.unset(m - low);
-  }
-
-  w.set(m, wheel_index);
-  return count;
-}
 
 /// Compute the S2 contribution of the interval
 /// [low, low + segments * segment_size[
@@ -74,8 +51,9 @@ int64_t S2_thread(int64_t x,
                   vector<int32_t>& mu,
                   Runtime& runtime)
 {
+  int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
-  int64_t size = pi[min(isqrt(x / low), y)] + 1;
+  int64_t size = pi[min(isqrt(x / low1), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
   int64_t S2_thread = 0;
@@ -84,9 +62,8 @@ int64_t S2_thread(int64_t x,
     return 0;
 
   runtime.init_start();
-  BitSieve sieve(segment_size);
-  Wheel wheel(primes, size, low);
-  auto phi = generate_phi(low - 1, size - 1, primes, pi);
+  Sieve sieve(low, segment_size, size - 1);
+  auto phi = generate_phi(low, size - 1, primes, pi);
   runtime.init_stop();
 
   // segmented sieve of Eratosthenes
@@ -94,10 +71,14 @@ int64_t S2_thread(int64_t x,
   {
     // current segment = [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = c + 1;
+    int64_t low1 = max(low, 1);
+    int64_t b = 4;
 
-    // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low);
+    // reset all bits to 1
+    sieve.reset(low, high);
+
+    for (; b <= c; b++)
+      sieve.cross_off(b, primes[b]);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
 
@@ -108,7 +89,7 @@ int64_t S2_thread(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
-      int64_t max_m = min(x / (prime * low), y);
+      int64_t max_m = min(x / (prime * low1), y);
       int64_t count = 0;
       int64_t i = 0;
 
@@ -129,7 +110,7 @@ int64_t S2_thread(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
 
     // For pi_sqrty < b < pi_y
@@ -138,7 +119,7 @@ int64_t S2_thread(int64_t x,
     for (; b < min(pi_y, size); b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min(x / (prime * low), y)];
+      int64_t l = pi[min(x / (prime * low1), y)];
       int64_t min_m = max(x / (prime * high), prime);
       int64_t count = 0;
       int64_t i = 0;
@@ -157,7 +138,7 @@ int64_t S2_thread(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
 
     next_segment:;
