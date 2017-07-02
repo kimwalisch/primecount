@@ -115,7 +115,7 @@ const array<uint64_t, 240> unset_smaller =
 // unset bits > stop
 const array<uint64_t, 240> unset_larger =
 {
-   0ull,       ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63,
+         0ull, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63,
   ~0ull >> 63, ~0ull >> 63, ~0ull >> 62, ~0ull >> 62, ~0ull >> 62,
   ~0ull >> 62, ~0ull >> 61, ~0ull >> 61, ~0ull >> 60, ~0ull >> 60,
   ~0ull >> 60, ~0ull >> 60, ~0ull >> 59, ~0ull >> 59, ~0ull >> 58,
@@ -216,8 +216,8 @@ uint64_t Sieve::get_segment_size(uint64_t size)
   return size;
 }
 
-/// sieve_size = segment_size / 30
-/// as each byte contains 30 numbers.
+/// sieve size = segment_size / 30 as
+/// each byte contains 30 numbers.
 ///
 void Sieve::set_sieve_size(uint64_t segment_size)
 {
@@ -253,7 +253,9 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return bit_count;
 }
 
-/// Reset all bits to 1
+/// Reset all bits to 1,
+/// next segment = [low, high[.
+///
 void Sieve::reset(uint64_t low, uint64_t high)
 {
   fill(sieve_.begin(), sieve_.end(), 0xff);
@@ -262,6 +264,7 @@ void Sieve::reset(uint64_t low, uint64_t high)
 
   if (dist < segment_size())
   {
+    dist -= 1;
     set_sieve_size(dist);
     auto sieve = (uint64_t*) &sieve_[0];
     sieve[dist / 240] &= unset_larger[dist % 240];
