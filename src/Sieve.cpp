@@ -264,10 +264,10 @@ void Sieve::reset(uint64_t low, uint64_t high)
 
   if (dist < segment_size())
   {
-    dist -= 1;
     set_sieve_size(dist);
     auto sieve = (uint64_t*) &sieve_[0];
-    sieve[dist / 240] &= unset_larger[dist % 240];
+    uint64_t back = dist - 1;
+    sieve[back / 240] &= unset_larger[back % 240];
   }
 }
 
