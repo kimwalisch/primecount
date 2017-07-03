@@ -1,18 +1,17 @@
 ///
 /// @file  Sieve.cpp
 /// @brief The Sieve class is a highly optimized sieve of
-///        Eratosthenes implementation with 30 numbers per
-///        byte i.e. the 8 bits of each byte correspond to
-///        the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-///        This Sieve also skips multiples of 2, 3, 5 using
-///        wheel factorization.
+///        Eratosthenes implementation with 30 numbers per byte
+///        i.e. the 8 bits of each byte correspond to the offsets
+///        { 1, 7, 11, 13, 17, 19, 23, 29 }. This Sieve also
+///        skips multiples of 2, 3, 5 using wheel factorization.
 ///
 ///        Unlike a traditional prime sieve this sieve is
-///        designed for use in the combinatorial prime
-///        counting algorithms: this sieve removes primes
-///        as well as multiples of primes and it counts
-///        the number of elements that have been crossed
-///        off for the first time in the sieve array.
+///        designed for use in the combinatorial prime counting
+///        algorithms: this sieve removes primes as well as
+///        multiples of primes and it counts the number of
+///        elements that have been crossed off for the first
+///        time in the sieve array.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
