@@ -49,7 +49,6 @@ set(LIB_SRC src/BitSieve.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
             src/S2Status.cpp
-            src/Wheel.cpp
             src/generate.cpp
             src/nth_prime.cpp
             src/phi.cpp
