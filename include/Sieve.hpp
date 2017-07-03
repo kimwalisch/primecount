@@ -48,9 +48,9 @@ public:
         uint64_t segment_size,
         uint64_t wheel_size);
 
-  void reset(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
   static uint64_t get_segment_size(uint64_t size);
+  void pre_sieve(uint64_t c, uint64_t low, uint64_t high);
   uint64_t cross_off(uint64_t i, uint64_t prime);
 
   /// Count 1 bits inside [start, stop]

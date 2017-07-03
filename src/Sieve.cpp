@@ -65,7 +65,10 @@ const WheelInit wheel_init[30] =
   {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
 };
 
-// unset bits < start
+/// Small primes used for pre-sieving
+const array<int, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+
+/// Unset bits < start
 const array<uint64_t, 240> unset_smaller =
 {
   ~0ull << 0, ~0ull << 0, ~0ull << 1, ~0ull << 1, ~0ull << 1,
@@ -118,7 +121,7 @@ const array<uint64_t, 240> unset_smaller =
   ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63
 };
 
-// unset bits > stop
+/// Unset bits > stop
 const array<uint64_t, 240> unset_larger =
 {
          0ull, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63,
@@ -258,10 +261,10 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return bit_count;
 }
 
-/// Reset all bits to 1,
-/// next segment = [low, high[.
+/// Pre-sieve the multiples of the first
+/// c primes inside [low, high[.
 ///
-void Sieve::reset(uint64_t low, uint64_t high)
+void Sieve::pre_sieve(uint64_t c, uint64_t low, uint64_t high)
 {
   fill(sieve_.begin(), sieve_.end(), 0xff);
 
@@ -274,6 +277,12 @@ void Sieve::reset(uint64_t low, uint64_t high)
     uint64_t back = size - 1;
     sieve[back / 240] &= unset_larger[back % 240];
   }
+
+  assert(c > 3);
+  assert(c < 10);
+
+  for (uint64_t i = 4; i <= c; i++)
+    cross_off(i, primes[i]);
 }
 
 /// Calculate the first multiple > start_ of prime

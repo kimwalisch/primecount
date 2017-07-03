@@ -81,15 +81,12 @@ T S2_hard_thread(T x,
     // Current segment = interval [low, high[
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
-    int64_t b = 4;
 
-    // reset all bits to 1
-    sieve.reset(low, high);
-
-    for (; b <= c; b++)
-      sieve.cross_off(b, primes[b]);
+    // pre-sieve multiples of first c primes
+    sieve.pre_sieve(c, low, high);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
+    int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m
