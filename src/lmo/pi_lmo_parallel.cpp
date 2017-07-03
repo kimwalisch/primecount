@@ -69,7 +69,7 @@ int64_t S2_thread(int64_t x,
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    // current segment = [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 

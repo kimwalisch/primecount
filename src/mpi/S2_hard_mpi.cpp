@@ -99,7 +99,7 @@ T S2_hard_thread(T x,
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    // Current segment = interval [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 

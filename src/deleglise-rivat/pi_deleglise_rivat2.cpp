@@ -94,7 +94,7 @@ int64_t S2_hard(int64_t x,
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    // current segment = [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 

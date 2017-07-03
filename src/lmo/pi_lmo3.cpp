@@ -54,7 +54,7 @@ int64_t S2(int64_t x,
   {
     fill(sieve.begin(), sieve.end(), 1);
 
-    // current segment = [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so
