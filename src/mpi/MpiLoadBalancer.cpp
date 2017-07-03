@@ -14,6 +14,7 @@
 #include <MpiLoadBalancer.hpp>
 #include <MpiMsg.hpp>
 #include <imath.hpp>
+#include <Sieve.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -28,8 +29,8 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
                                  maxint_t s2_approx) :
   z_(z),
   limit_(z + 1),
-  low_(1),
-  max_low_(1),
+  low_(0),
+  max_low_(0),
   segments_(1),
   s2_hard_(0),
   s2_approx_(s2_approx),
@@ -37,7 +38,7 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
   status_(x)
 {
   int64_t sqrtz = isqrt(z);
-  segment_size_ = next_power_of_2(sqrtz);
+  segment_size_ = Sieve::get_segment_size(sqrtz);
 
   double alpha = get_alpha(x, y);
   maxint_t x16 = iroot<6>(x);
