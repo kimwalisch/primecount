@@ -74,10 +74,10 @@ int64_t S2(int64_t x,
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    fill(sieve.begin(), sieve.end(), 1);
-
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
+
+    fill(sieve.begin(), sieve.end(), 1);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so
     // we sieve out the multiples of the first c primes
