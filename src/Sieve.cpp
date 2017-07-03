@@ -4,7 +4,7 @@
 ///        Eratosthenes implementation with 30 numbers per
 ///        byte i.e. the 8 bits of each byte correspond to
 ///        the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-///        The Sieve also skips multiples of 2, 3, 5 using
+///        This Sieve also skips multiples of 2, 3, 5 using
 ///        wheel factorization.
 ///
 ///        Unlike a traditional prime sieve this sieve is
@@ -40,6 +40,9 @@ struct WheelInit
   uint8_t index;
 };
 
+/// Categorize sieving primes according to their modulo 30
+/// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
+///
 const array<int, 30> wheel_offsets =
 {
   0, 8 * 0, 0, 0, 0, 0,
@@ -49,6 +52,9 @@ const array<int, 30> wheel_offsets =
   0, 0,     0, 0, 0, 8 * 7
 };
 
+/// Used to calculate the first multiple > start of a
+/// sieving prime that is coprime to 2, 3, 5.
+///
 const WheelInit wheel_init[30] =
 {
   {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
@@ -193,18 +199,17 @@ Sieve::Sieve(uint64_t start,
   wheel_.resize(4);
 }
 
-/// Each sieve byte contains 30 numbers,
-/// the 8 bits of each byte correspond to the offsets:
-/// { 1, 7, 11, 13, 17, 19, 23, 29 }
+/// The segment size (a.k.a. sieve distance) is sieve
+/// size * 30 as each byte contains 30 numbers.
 ///
 uint64_t Sieve::segment_size() const
 {
   return sieve_.size() * 30;
 }
 
-/// segment_size must be a multiple of 240
-/// as we process 64-bit words (8 bytes)
-/// and each byte contains 30 numbers.
+/// segment_size must be a multiple of 240 as we
+/// process 64-bit words (8 bytes) and each
+/// byte contains 30 numbers.
 ///
 uint64_t Sieve::get_segment_size(uint64_t size)
 {
@@ -260,13 +265,13 @@ void Sieve::reset(uint64_t low, uint64_t high)
 {
   fill(sieve_.begin(), sieve_.end(), 0xff);
 
-  uint64_t dist = high - low;
+  uint64_t size = high - low;
 
-  if (dist < segment_size())
+  if (size < segment_size())
   {
-    set_sieve_size(dist);
+    set_sieve_size(size);
     auto sieve = (uint64_t*) &sieve_[0];
-    uint64_t back = dist - 1;
+    uint64_t back = size - 1;
     sieve[back / 240] &= unset_larger[back % 240];
   }
 }
