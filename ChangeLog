@@ -1,3 +1,18 @@
+2017-07-03 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.0 work in progress.
+
+  This version features a new highly optimized sieve of
+  Eratosthenes implementation for the computation of the
+  hard special leaves that speeds up the S2_hard algorithm
+  by up to 30%, giving an overall speed up of up to 15%.
+
+  * Sieve.cpp: New sieve of Eratosthenes.
+  * S2_hard.cpp: Use new sieve.
+  * S2_hard_mpi.cpp: Use new sieve.
+  * lmo5.cpp: Use new sieve.
+  * pi_lmo_parallel.cpp: Use new sieve.
+
 2017-06-27 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 3.8 released.
