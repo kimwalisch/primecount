@@ -14,13 +14,12 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <BitSieve.hpp>
+#include <Sieve.hpp>
 #include <generate.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <S1.hpp>
-#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -29,30 +28,6 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-
-/// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off multiples
-///
-int64_t cross_off(BitSieve& sieve,
-                  int64_t low,
-                  int64_t high,
-                  int64_t prime,
-                  WheelItem& w)
-{
-  int64_t count = 0;
-  int64_t m = w.next_multiple;
-  int64_t wheel_index = w.wheel_index;
-
-  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
-  {
-    // +1 if m is unset the first time
-    count += sieve[m - low];
-    sieve.unset(m - low);
-  }
-
-  w.set(m, wheel_index);
-  return count;
-}
 
 /// Calculate the contribution of the special leaves
 int64_t S2(int64_t x,
@@ -68,11 +43,10 @@ int64_t S2(int64_t x,
 
   double time = get_wtime();
   int64_t limit = x / y + 1;
-  int64_t segment_size = next_power_of_2(isqrt(limit));
-  int64_t low = 1;
+  int64_t segment_size = Sieve::get_segment_size(isqrt(limit));
+  int64_t low = 0;
 
-  BitSieve sieve(segment_size);
-  Wheel wheel(primes, primes.size(), low);
+  Sieve sieve(low, segment_size, primes.size());
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 
@@ -83,14 +57,15 @@ int64_t S2(int64_t x,
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    // current segment = [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = c + 1;
+    int64_t low1 = max(low, 1);
 
     // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low);
+    sieve.pre_sieve(c, low, high);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
+    int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m
@@ -99,7 +74,7 @@ int64_t S2(int64_t x,
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
-      int64_t max_m = min(x / (prime * low), y);
+      int64_t max_m = min(x / (prime * low1), y);
       int64_t count = 0;
       int64_t i = 0;
 
@@ -120,7 +95,7 @@ int64_t S2(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
 
     // For pi_sqrty < b < pi_y
@@ -129,7 +104,7 @@ int64_t S2(int64_t x,
     for (; b < pi_y; b++)
     {
       int64_t prime = primes[b];
-      int64_t l = pi[min(x / (prime * low), y)];
+      int64_t l = pi[min(x / (prime * low1), y)];
       int64_t min_m = max(x / (prime * high), prime);
       int64_t count = 0;
       int64_t i = 0;
@@ -148,7 +123,7 @@ int64_t S2(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
 
     next_segment:;

@@ -46,9 +46,9 @@ private:
   int64_t low_;
   int64_t max_low_;
   int64_t z_;
-  int64_t sqrtz_;
   int64_t segments_;
   int64_t segment_size_;
+  int64_t max_size_;
   int64_t smallest_hard_leaf_;
   maxint_t s2_total_;
   maxint_t s2_approx_;
