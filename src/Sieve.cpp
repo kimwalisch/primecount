@@ -278,7 +278,7 @@ void Sieve::pre_sieve(uint64_t c, uint64_t low, uint64_t high)
     sieve[back / 240] &= unset_larger[back % 240];
   }
 
-  assert(c > 3);
+  assert(c > 2);
   assert(c < 10);
 
   for (uint64_t i = 4; i <= c; i++)
