@@ -38,8 +38,7 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 # primecount library source files ####################################
 
-set(LIB_SRC src/BitSieve.cpp
-            src/FactorTable.cpp
+set(LIB_SRC src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
             src/P3.cpp
