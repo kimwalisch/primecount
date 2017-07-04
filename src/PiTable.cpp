@@ -1,8 +1,11 @@
 ///
 /// @file  PiTable.cpp
-/// @see   PiTable.hpp for documentation
+/// @brief The PiTable class is a compressed lookup table for
+///        prime counts. It uses only (n / 4) bytes of memory
+///        and returns the number of primes <= n in O(1)
+///        operations.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

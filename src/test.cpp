@@ -1,8 +1,8 @@
 ///
-/// @file   test.cpp
-/// @brief  primecount integration tests (option: --test).
-///         These tests are also used (by the author) for
-///         benchmarking code changes.
+/// @file  test.cpp
+/// @brief primecount integration tests (option: --test).
+///        These tests are also used (by the author) for
+///        benchmarking code changes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

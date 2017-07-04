@@ -1,17 +1,25 @@
 ///
 /// @file  LoadBalancer.cpp
-/// @brief The LoadBalancer assigns work to the individual
-///        threads in the computation of the special leaves
-///        in the Lagarias-Miller-Odlyzko and
-///        Deleglise-Rivat prime counting algorithms.
+/// @brief The LoadBalancer assigns work to the individual threads
+///        in the computation of the special leaves in the
+///        Lagarias-Miller-Odlyzko and Deleglise-Rivat prime
+///        counting algorithms.
 ///
-/// Simply parallelizing the computation of the special leaves in the
-/// Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms by
-/// subdividing the sieve interval by the number of threads into
-/// equally sized subintervals does not scale because the distribution
-/// of the special leaves is highly skewed and most special leaves are
-/// in the first few segments whereas later on there are very few
-/// special leaves.
+///        Simply parallelizing the computation of the special
+///        leaves in the Lagarias-Miller-Odlyzko algorithm by
+///        subdividing the sieve interval by the number of threads
+///        into equally sized subintervals does not scale because
+///        the distribution of the special leaves is highly skewed
+///        and most special leaves are in the first few segments
+///        whereas later on there are very few special leaves.
+///
+///        This LoadBalancer gradually increases the number of
+///        segments to sieve as long the expected runtime of the
+///        sieve distance is smaller than the expected finish time
+///        of the algorithm. Near the end the LoadBalancer will
+///        gradually decrease the number of segments to sieve in
+///        order to prevent that 1 thread will run much longer
+///        than all the other threads.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

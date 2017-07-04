@@ -1,19 +1,18 @@
 ///
-/// @file   BinaryIndexedTree.hpp
-/// @brief  The BinaryIndexedTree class is a binary indexed
-///         tree (a.k.a. Fenwick tree) that keeps track of
-///         the number of unsieved elements (sieve[i] = 1)
-///         in the sieve array. Whenever an element is
-///         crossed-off for the first time in the sieve array
-///         we update the counters data structure. Both
-///         updating and querying the counters data structure
-///         uses O(log n) operations.
+/// @file  BinaryIndexedTree.hpp
+/// @brief The BinaryIndexedTree class is a binary indexed tree
+///        (a.k.a. Fenwick tree) that keeps track of the number of
+///        unsieved elements (sieve[i] = 1) in the sieve array.
+///        Whenever an element is crossed off for the first time
+///        in the sieve array we update the binary indexed tree.
+///        Both updating and querying the binary indexed tree uses
+///        O(log n) operations.
+//
+///        The implementation is based on the paper:
 ///
-///         The implementation is based on the paper:
-///
-///         Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
-///         Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
-///         http://sweet.ua.pt/tos/bib/5.4.pdf
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial method,
+///        Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
+///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
