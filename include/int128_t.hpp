@@ -1,8 +1,8 @@
 ///
-/// @file   int128_t.hpp
-/// @brief  Additional integer types used in primecount:
-///         int128_t, uint128_t, intfast64_t, intfast128_t,
-///         maxint_t, maxuint_t.
+/// @file  int128_t.hpp
+/// @brief Additional integer types used in primecount:
+///        int128_t, uint128_t, intfast64_t, intfast128_t,
+///        maxint_t, maxuint_t.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

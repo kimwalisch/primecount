@@ -1,6 +1,6 @@
 ///
-/// @file   primecount-internal.hpp
-/// @brief  primecount internal function definitions
+/// @file  primecount-internal.hpp
+/// @brief primecount internal functions
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

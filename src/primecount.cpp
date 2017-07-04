@@ -1,6 +1,6 @@
 ///
-/// @file   primecount.cpp
-/// @brief  primecount C++ API
+/// @file  primecount.cpp
+/// @brief Function definitions of primecount.hpp
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

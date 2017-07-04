@@ -1,6 +1,6 @@
 ///
-/// @file   mpi_reduce_sum.hpp
-/// @brief  MPI utility functions and classes
+/// @file  mpi_reduce_sum.hpp
+/// @brief MPI utility functions and classes
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///

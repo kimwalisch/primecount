@@ -1,8 +1,7 @@
 ///
-/// @file   MpiLoadBalancer.hpp
-/// @brief  The MpiLoadBalancer evenly distributes the
-///         computation of the hard special leaves onto
-///         cluster nodes.
+/// @file  MpiLoadBalancer.hpp
+/// @brief The MpiLoadBalancer evenly distributes the computation
+///        of the hard special leaves onto cluster nodes.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
