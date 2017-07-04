@@ -20,7 +20,6 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <BinaryIndexedTree.hpp>
-#include <BitSieve.hpp>
 #include <generate.hpp>
 #include <min.hpp>
 #include <imath.hpp>
@@ -41,11 +40,12 @@ namespace {
 /// For each element that is unmarked the first time update
 /// the binary indexed tree data structure.
 ///
+template <typename Sieve>
 void cross_off(int64_t prime,
                int64_t low,
                int64_t high,
                int64_t& multiple,
-               BitSieve& sieve,
+               Sieve& sieve,
                BinaryIndexedTree& tree)
 {
   int64_t m = multiple;
@@ -54,7 +54,7 @@ void cross_off(int64_t prime,
   {
     if (sieve[m - low])
     {
-      sieve.unset(m - low);
+      sieve[m - low] = 0;
       tree.update(m - low);
     }
   }
@@ -79,8 +79,9 @@ int64_t S2_hard(int64_t x,
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int64_t S2_result = 0;
 
-  BitSieve sieve(segment_size);
   auto primes = generate_primes<int32_t>(y);
+
+  vector<char> sieve(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());
   vector<int64_t> phi(primes.size(), 0);
   BinaryIndexedTree tree;
@@ -88,12 +89,20 @@ int64_t S2_hard(int64_t x,
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
   {
-    // current segment = [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
     int64_t b = c + 1;
 
+    fill(sieve.begin(), sieve.end(), 1);
+
     // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low);
+    for (int64_t b = 1; b <= c; b++)
+    {
+      int64_t k = next[b];
+      for (int64_t prime = primes[b]; k < high; k += prime)
+        sieve[k - low] = 0;
+      next[b] = k;
+    }
 
     // initialize binary indexed tree from sieve
     tree.init(sieve);

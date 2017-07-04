@@ -22,6 +22,7 @@
 #include <LoadBalancer.hpp>
 #include <primecount-internal.hpp>
 #include <S2Status.hpp>
+#include <Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -192,12 +193,11 @@ LoadBalancer::LoadBalancer(maxint_t x,
                            int64_t y,
                            int64_t z,
                            maxint_t s2_approx) :
-  low_(1),
-  max_low_(1),
+  low_(0),
+  max_low_(0),
   x_(x),
   y_(y),
   z_(z),
-  sqrtz_(isqrt(z)),
   segments_(1),
   s2_total_(0),
   s2_approx_(s2_approx),
@@ -213,13 +213,25 @@ LoadBalancer::LoadBalancer(maxint_t x,
 
 void LoadBalancer::init_size()
 {
-  int64_t log = ilog(sqrtz_);
+  // start with a tiny segment_size as most
+  // special leaves are in the first few segments
+  // and we need to ensure that all threads are
+  // assigned an equal amount of work
+  int64_t sqrtz = isqrt(z_);
+  int64_t log = ilog(sqrtz);
   log = max(log, 1);
-  segment_size_ = sqrtz_ / log;
+  segment_size_ = sqrtz / log;
 
-  int64_t min = 1 << 9;
-  segment_size_ = max(segment_size_, min);
-  segment_size_ = next_power_of_2(segment_size_);
+  int64_t min_size = 1 << 9;
+  segment_size_ = max(segment_size_, min_size);
+  segment_size_ = Sieve::get_segment_size(segment_size_);
+
+  // try to use a segment size that fits exactly
+  // into the CPUs L1 data cache
+  int64_t l1_dcache_size = 1 << 15;
+  max_size_ = l1_dcache_size * 30;
+  max_size_ = max(max_size_, sqrtz);
+  max_size_ = Sieve::get_segment_size(max_size_);
 }
 
 maxint_t LoadBalancer::get_result() const
@@ -270,8 +282,8 @@ void LoadBalancer::update(int64_t* low,
     max_low_ = *low;
     segments_ = *segments;
 
-    if (segment_size_ < sqrtz_)
-      segment_size_ *= 2;
+    if (segment_size_ < max_size_)
+      segment_size_ = min(segment_size_ * 2, max_size_);
     else
     {
       double next = get_next(runtime);

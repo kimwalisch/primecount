@@ -1,10 +1,17 @@
 ///
 /// @file  S2_hard.cpp
-/// @brief Calculate the contribution of the hard special leaves which
-///        require use of a sieve (Deleglise-Rivat algorithm).
-///        This is a parallel implementation which uses compression
-///        (PiTable & FactorTable) to reduce the memory usage by
-///        about 10x.
+/// @brief Calculate the contribution of the hard special leaves using
+///        a prime sieve. This is a multi-threaded implementation
+///        which uses compression (PiTable & FactorTable) to reduce
+///        the memory usage by about 10x.
+///
+///        Usually the computation of the hard special leaves
+///        requires a binary indexed tree a.k.a. Fenwick tree to count
+///        the number of unsieved elements in O(log n) time. But it
+///        is actually much faster to simply count the number of
+///        unsieved elements directly from the sieve array using the
+///        POPCNT instruction. Hence this implementation does not use
+///        a binary indexed tree.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -15,7 +22,7 @@
 #include <primecount-internal.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
-#include <BitSieve.hpp>
+#include <Sieve.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
@@ -24,7 +31,6 @@
 #include <LoadBalancer.hpp>
 #include <min.hpp>
 #include <S2.hpp>
-#include <Wheel.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -38,31 +44,7 @@ using namespace primecount;
 
 namespace {
 
-/// Cross-off the multiples of prime in the sieve array.
-/// @return  Count of crossed-off multiples.
-///
-int64_t cross_off(BitSieve& sieve,
-                  int64_t low,
-                  int64_t high,
-                  int64_t prime,
-                  WheelItem& w)
-{
-  int64_t count = 0;
-  int64_t m = w.next_multiple;
-  int64_t wheel_index = w.wheel_index;
-
-  for (; m < high; m += prime * Wheel::next_multiple_factor(&wheel_index))
-  {
-    // +1 if m is unset the first time
-    count += sieve[m - low];
-    sieve.unset(m - low);
-  }
-
-  w.set(m, wheel_index);
-  return count;
-}
-
-/// Compute the S2 contribution of the hard special leaves
+/// Compute the contribution of the hard special leaves
 /// using a sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[
 ///
@@ -79,8 +61,9 @@ T S2_hard_thread(T x,
                  Primes& primes,
                  Runtime& runtime)
 {
+  int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
-  int64_t max_b = pi[min(isqrt(x / low), isqrt(z), y)];
+  int64_t max_b = pi[min(isqrt(x / low1), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
 
@@ -88,22 +71,22 @@ T S2_hard_thread(T x,
     return s2_hard;
 
   runtime.init_start();
-  BitSieve sieve(segment_size);
-  Wheel wheel(primes, max_b + 1, low);
-  auto phi = generate_phi(low - 1, max_b, primes, pi);
+  Sieve sieve(low, segment_size, max_b);
+  auto phi = generate_phi(low, max_b, primes, pi);
   runtime.init_stop();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
-    // Current segment = interval [low, high[
+    // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = c + 1;
+    low1 = max(low, 1);
 
     // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low);
+    sieve.pre_sieve(c, low, high);
 
     int64_t count_low_high = sieve.count((high - 1) - low);
+    int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m
@@ -114,7 +97,7 @@ T S2_hard_thread(T x,
       T x2 = x / prime;
       int64_t x2_div_high = min(fast_div(x2, high), y);
       int64_t min_m = max(x2_div_high, y / prime);
-      int64_t max_m = min(fast_div(x2, low), y);
+      int64_t max_m = min(fast_div(x2, low1), y);
       int64_t count = 0;
       int64_t start = 0;
 
@@ -140,7 +123,7 @@ T S2_hard_thread(T x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
 
     // For pi_sqrty < b <= pi_sqrtz
@@ -150,7 +133,7 @@ T S2_hard_thread(T x,
     {
       int64_t prime = primes[b];
       T x2 = x / prime;
-      int64_t x2_div_low = min(fast_div(x2, low), y);
+      int64_t x2_div_low = min(fast_div(x2, low1), y);
       int64_t x2_div_high = min(fast_div(x2, high), y);
       int64_t l = pi[min(x2_div_low, z / prime)];
       int64_t min_hard = max(x2_div_high, prime);
@@ -171,7 +154,7 @@ T S2_hard_thread(T x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= cross_off(sieve, low, high, prime, wheel[b]);
+      count_low_high -= sieve.cross_off(b, prime);
     }
  
     next_segment:;

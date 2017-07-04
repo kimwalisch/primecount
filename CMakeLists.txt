@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(primecount)
-set(PRIMECOUNT_VERSION_MAJOR 3)
-set(PRIMECOUNT_VERSION_MINOR 8)
+set(PRIMECOUNT_VERSION_MAJOR 4)
+set(PRIMECOUNT_VERSION_MINOR 0)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 set(CMAKE_BUILD_TYPE Release)
 
@@ -39,7 +39,6 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/backup.cpp
-            src/BitSieve.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
@@ -47,9 +46,9 @@ set(LIB_SRC src/backup.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/S1.cpp
+            src/Sieve.cpp
             src/LoadBalancer.cpp
             src/S2Status.cpp
-            src/Wheel.cpp
             src/generate.cpp
             src/nth_prime.cpp
             src/phi.cpp
