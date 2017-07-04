@@ -49,8 +49,8 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int cnt1 = 0;
-    int cnt2 = 0;
+    int64_t cnt1 = 0;
+    int64_t cnt2 = 0;
 
     if (primes[i] <= 5)
       sieve.pre_sieve(i, low, high);
