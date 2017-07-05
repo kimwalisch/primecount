@@ -235,40 +235,40 @@ space.
     <td>3,204,941,750,802</td>
     <td>3.93s</td>
     <td>1.71s</td>
-    <td>0.32s</td>
-    <td>0.18s</td>
+    <td>0.30s</td>
+    <td>0.19s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
     <td>27.15s</td>
     <td>11.25s</td>
-    <td>1.33s</td>
-    <td>0.65s</td>
+    <td>1.16s</td>
+    <td>0.64s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
     <td>214.99s</td>
     <td>85.18s</td>
-    <td>5.95s</td>
-    <td>2.48s</td>
+    <td>5.25s</td>
+    <td>2.28s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
     <td>1,807.24s</td>
     <td>700.79s</td>
-    <td>27.49s</td>
-    <td>9.83s</td>
+    <td>24.08s</td>
+    <td>9.21s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
     <td>15,801.25s</td>
     <td>6,085.91s</td>
-    <td>128.54s</td>
-    <td>41.26s</td>
+    <td>111.88s</td>
+    <td>38.48s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -276,7 +276,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>189.82s</td>
+    <td>173.98s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -284,7 +284,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>842.36s</td>
+    <td>754.82s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -292,7 +292,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>3,761.66s</td>
+    <td>3,285.29s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -300,7 +300,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>17,325.24s</td>
+    <td>14,689.46s</td>
   </tr>
 </table>
 
