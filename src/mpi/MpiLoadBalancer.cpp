@@ -52,16 +52,19 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
   time_(get_wtime()),
   status_(x)
 {
-  int64_t sqrtz = isqrt(z);
-  segment_size_ = Sieve::get_segment_size(sqrtz);
-
   double alpha = get_alpha(x, y);
   maxint_t x16 = iroot<6>(x);
   smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
+
+  // try to use a segment size that fits exactly
+  // into the CPUs L1 data cache
+  int64_t l1_dcache_size = 1 << 15;
+  int64_t size = l1_dcache_size * 30;
+  size = max(size, isqrt(z));
+  segment_size_ = Sieve::get_segment_size(size);
 }
 
-void MpiLoadBalancer::get_work(MpiMsg* msg,
-                               maxint_t s2_hard)
+void MpiLoadBalancer::get_work(MpiMsg* msg, maxint_t s2_hard)
 {
   s2_hard_ += msg->s2_hard<maxint_t>();
 
