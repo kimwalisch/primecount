@@ -39,6 +39,7 @@
 
 #include <stdint.h>
 #include <cmath>
+#include <string>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -68,13 +69,14 @@ void LoadBalancer::backup(int thread_id,
     update(&low, &segments, runtime);
 
     double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+    string tid = "thread" + to_string(thread_id);
 
     json_["S2_hard"]["segments"] = segments_;
     json_["S2_hard"]["segment_size"] = segment_size_;
     json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
     json_["S2_hard"]["percent"] = percent;
     json_["S2_hard"]["seconds"] = get_wtime() - time_;
-    json_["S2_hard"].erase("thread" + to_string(thread_id));
+    json_["S2_hard"].erase(tid);
 
     store_backup(json_);
 
@@ -90,6 +92,7 @@ void LoadBalancer::backup(int threads,
                           int64_t segment_size)
 {
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+  string tid = "thread" + to_string(thread_id);
 
   json_["S2_hard"]["x"] = to_string(x_);
   json_["S2_hard"]["y"] = y_;
@@ -101,10 +104,9 @@ void LoadBalancer::backup(int threads,
   json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
   json_["S2_hard"]["percent"] = percent;
   json_["S2_hard"]["seconds"] = get_wtime() - time_;
-
-  json_["S2_hard"]["thread" + to_string(thread_id)]["low"] = low;
-  json_["S2_hard"]["thread" + to_string(thread_id)]["segments"] = segments;
-  json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"] = segment_size;
+  json_["S2_hard"][tid]["low"] = low;
+  json_["S2_hard"][tid]["segments"] = segments;
+  json_["S2_hard"][tid]["segment_size"] = segment_size;
 
   store_backup(json_);
 }
@@ -168,9 +170,10 @@ bool LoadBalancer::resume(int thread_id,
     segments_ = json_["S2_hard"]["segments"];
     segment_size_ = json_["S2_hard"]["segment_size"];
     time_ = get_wtime() - seconds;
-    low = json_["S2_hard"]["thread" + to_string(thread_id)]["low"];
-    segments = json_["S2_hard"]["thread" + to_string(thread_id)]["segments"];
-    segment_size = json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
+    string tid = "thread" + to_string(thread_id);
+    low = json_["S2_hard"][tid]["low"];
+    segments = json_["S2_hard"][tid]["segments"];
+    segment_size = json_["S2_hard"][tid]["segment_size"];
     print_resume(thread_id, low, segments, segment_size);
     resumed = true;
   }
