@@ -219,6 +219,15 @@ bool resume(J& json,
   return resumed;
 }
 
+int get_thread_num()
+{
+#ifdef _OPENMP
+  return omp_get_thread_num();
+#else
+  return 0;
+#endif
+}
+
 template <typename T, typename Primes>
 T S2_easy(T x,
           int64_t y,
@@ -313,7 +322,7 @@ T S2_easy_OpenMP(T x,
 
   #pragma omp parallel num_threads(threads) reduction(+: s2)
   {
-    int thread_id = omp_get_thread_num();
+    int thread_id = get_thread_num();
 
     T s2_easy = 0;
     int64_t stop = 0;
