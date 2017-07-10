@@ -40,7 +40,6 @@ void backup(J& json,
             T x,
             int64_t y,
             int64_t z,
-            int64_t pi_x13,
             int threads,
             double percent,
             double time)
@@ -48,7 +47,6 @@ void backup(J& json,
   json["S2_easy"]["x"] = to_string(x);
   json["S2_easy"]["y"] = y;
   json["S2_easy"]["z"] = z;
-  json["S2_easy"]["pi_x13"] = pi_x13;
   json["S2_easy"]["threads"] = threads;
   json["S2_easy"]["percent"] = percent;
   json["S2_easy"]["seconds"] = get_wtime() - time;
@@ -79,7 +77,6 @@ void backup(J& json,
             T x,
             int64_t y,
             int64_t z,
-            int64_t pi_x13,
             T s2_easy,
             double time)
 {
@@ -88,7 +85,6 @@ void backup(J& json,
   json["S2_easy"]["x"] = to_string(x);
   json["S2_easy"]["y"] = y;
   json["S2_easy"]["z"] = z;
-  json["S2_easy"]["pi_x13"] = pi_x13;
   json["S2_easy"]["s2_easy"] = to_string(s2_easy);
   json["S2_easy"]["percent"] = 100;
   json["S2_easy"]["seconds"] = get_wtime() - time;
@@ -341,7 +337,7 @@ T S2_easy_OpenMP(T x,
         if (backup_seconds > 1)
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
-          backup(json, x, y, z, pi_x13, threads, percent, time);
+          backup(json, x, y, z, threads, percent, time);
           backup_time = get_wtime();
         }
       }
@@ -353,7 +349,7 @@ T S2_easy_OpenMP(T x,
     s2 += s2_easy;
   }
 
-  backup(json, x, y, z, pi_x13, s2, time);
+  backup(json, x, y, z, s2, time);
 
   return s2;
 }
