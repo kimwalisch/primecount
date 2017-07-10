@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <iostream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -63,10 +64,12 @@ void backup(J& json,
             int64_t iters,
             T s2_easy)
 {
+  string tid = "thread" + to_string(thread_id);
+
   json["S2_easy"]["start"] = start;
-  json["S2_easy"]["thread" + to_string(thread_id)]["b"] = b;
-  json["S2_easy"]["thread" + to_string(thread_id)]["iters"] = iters;
-  json["S2_easy"]["thread" + to_string(thread_id)]["s2_easy"] = to_string(s2_easy);
+  json["S2_easy"][tid]["b"] = b;
+  json["S2_easy"][tid]["iters"] = iters;
+  json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
 }
 
 template <typename T, typename J>
@@ -74,6 +77,7 @@ void backup(J& json,
             T x,
             int64_t y,
             int64_t z,
+            int64_t pi_x13,
             T s2_easy,
             double time)
 {
@@ -82,6 +86,7 @@ void backup(J& json,
   json["S2_easy"]["x"] = to_string(x);
   json["S2_easy"]["y"] = y;
   json["S2_easy"]["z"] = z;
+  json["S2_easy"]["pi_x13"] = pi_x13;
   json["S2_easy"]["s2_easy"] = to_string(s2_easy);
   json["S2_easy"]["percent"] = 100;
   json["S2_easy"]["seconds"] = get_wtime() - time;
@@ -89,47 +94,89 @@ void backup(J& json,
   store_backup(json);
 }
 
+template <typename T, typename J>
+int get_start(J& json,
+              T x,
+              int64_t y,
+              int64_t z,
+              int64_t start)
+{
+  if (is_resume(json, "S2_easy", x, y, z) &&
+      json["S2_easy"].count("start"))
+  {
+    start = json["S2_easy"]["start"];
+  }
+
+  return start;
+}
+
+template <typename T, typename J>
+int get_threads(J& json,
+                T x,
+                int64_t y,
+                int64_t z,
+                int threads)
+{
+  if (is_resume(json, "S2_easy", x, y, z) &&
+      json["S2_easy"].count("threads"))
+  {
+    int threads2 = json["S2_easy"]["threads"];
+    threads = max(threads, threads2);
+  }
+
+  return threads;
+}
+
 template <typename T>
 void print_resume(T x,
-                  int64_t start,
-                  int64_t pi_x13,
                   T s2_easy,
-                  double seconds,
-                  double percent)
+                  double seconds)
 {
   if (!print_variables())
     print_log("");
 
   print_log("=== Resuming from " + backup_file() + " ===");
-  print_log("start", start);
-  print_log("pi_x13", pi_x13);
   print_log("s2_easy", s2_easy);
   print_log_seconds(seconds);
-  print_status(percent, x);
 }
 
-template <typename T>
-bool resume(T x,
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
             int64_t y,
             int64_t z,
-            int64_t& start,
-            int64_t& pi_x13,
             T& s2_easy,
             double& time)
 {
-  auto j = load_backup();
-
-  if (is_resume(j, "S2_easy", x, y, z))
+  if (is_resume(json, "S2_easy", x, y, z) &&
+      json["S2_easy"].count("s2_easy"))
   {
-    double percent = j["S2_easy"]["percent"];
-    double seconds = j["S2_easy"]["seconds"];
-
-    start = j["S2_easy"]["b"];
-    pi_x13 = j["S2_easy"]["pi_x13"];
-    s2_easy = calculator::eval<T>(j["S2_easy"]["s2_easy"]);
+    double seconds = json["S2_easy"]["seconds"];
+    s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     time = get_wtime() - seconds;
-    print_resume(x, start, pi_x13, s2_easy, seconds, percent);
+    print_resume(x, s2_easy, seconds);
+    return true;
+  }
 
+  return false;
+}
+
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t& b,
+            int64_t& iters,
+            T& s2_easy,
+            int thread_id)
+{
+  if (is_resume(json, "S2_easy", x, y, z))
+  {
+    string tid = "thread" + to_string(thread_id);
+    b = json["S2_easy"][tid]["b"];
+    iters = json["S2_easy"][tid]["iters"];
+    s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
     return true;
   }
 
@@ -208,41 +255,46 @@ T S2_easy_OpenMP(T x,
                  double& time)
 {
   T s2 = 0;
-  int64_t start;
-  int64_t pi_x13;
-  bool is_resume = resume(x, y, z, start, pi_x13, s2, time);
+  auto json = load_backup();
 
-  if (is_resume && start >= pi_x13)
+  if (resume(json, x, y, z, s2, time))
     return s2;
 
   PiTable pi(y);
   S2Status status(x);
 
-  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t x13 = iroot<3>(x);
+  int64_t pi_x13 = pi[x13];
+  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t start = max(c, pi_sqrty) + 1;
+  start = get_start(json, x, y, z, start);
+
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-
-  if (!is_resume)
-  {
-    start = max(c, pi_sqrty) + 1;
-    pi_x13 = pi[x13];
-  }
-
-  auto json = load_backup();
+  threads = get_threads(json, x, y, z, threads);
   double backup_time = get_wtime();
 
-  #pragma omp parallel for reduction(+: s2)
-  for (int thread_id = 0; thread_id < threads; thread_id++)
+  #pragma omp parallel num_threads(threads) reduction(+: s2)
   {
     T s2_easy = 0;
+    int64_t stop = 0;
     int64_t b = 0;
     int64_t iters = 1;
     double iter_time = 0;
+    int thread_id = omp_get_thread_num();
 
+    if (resume(json, x, y, z, b, iters, s2_easy, thread_id))
+    {
+      iter_time = get_wtime();
+      stop = b + iters;
+      stop = min(stop, pi_x13 + 1);
+      s2_easy += S2_easy_thread(x, y, z, b, stop, pi_x13, primes, pi, status);
+      std::cout << "Resume finished!" << std::endl;
+    }
+
+    #pragma omp barrier
     while (b <= pi_x13)
     {
-      int64_t stop;
       double curr_time = get_wtime();
 
       #pragma omp critical (s2_easy_backup)
@@ -263,11 +315,12 @@ T S2_easy_OpenMP(T x,
 
         backup(json, start, b, thread_id, iters, s2_easy);
 
-        if (curr_time - backup_time > 300)
+        if (curr_time - backup_time > 1)
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
           backup(json, x, y, z, pi_x13, threads, percent, time);
           backup_time = get_wtime();
+          std::cout << "Backup!" << std::endl;
         }
       }
 
@@ -278,7 +331,7 @@ T S2_easy_OpenMP(T x,
     s2 += s2_easy;
   }
 
-  backup(json, x, y, z, s2, time);
+  backup(json, x, y, z, pi_x13, s2, time);
 
   return s2;
 }
