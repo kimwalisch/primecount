@@ -133,7 +133,7 @@ void print_resume(int thread_id,
                   T segments,
                   T segment_size)
 {
-  print_log("=== Resuming from primecount.backup ===");
+  print_log("=== Resuming from " + backup_file() + " ===");
   print_log("thread", thread_id);
   print_log("low", low);
   print_log("segments", segments);
@@ -147,7 +147,7 @@ void print_resume(T s2_hard, double seconds)
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from primecount.backup ===");
+  print_log("=== Resuming from " + backup_file() + " ===");
   print_log("s2_hard", s2_hard);
   print_log_seconds(seconds);
 }
@@ -171,9 +171,7 @@ bool LoadBalancer::resume(int thread_id,
     low = json_["S2_hard"]["thread" + to_string(thread_id)]["low"];
     segments = json_["S2_hard"]["thread" + to_string(thread_id)]["segments"];
     segment_size = json_["S2_hard"]["thread" + to_string(thread_id)]["segment_size"];
-
     print_resume(thread_id, low, segments, segment_size);
-
     resumed = true;
   }
 
@@ -190,7 +188,6 @@ bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
     s2_hard = calculator::eval<maxint_t>(json_["S2_hard"]["s2_hard"]);
     time = get_wtime() - seconds;
     print_resume(s2_hard, seconds);
-
     return true;
   }
 
