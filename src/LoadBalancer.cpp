@@ -213,6 +213,9 @@ LoadBalancer::LoadBalancer(maxint_t x,
   status_(x),
   json_(load_backup())
 {
+  if (!is_resume(json_, "S2_hard", x_, y_, z_))
+    json_.erase("S2_hard");
+
   init_size();
   maxint_t x16 = iroot<6>(x);
   double alpha = get_alpha(x, y);

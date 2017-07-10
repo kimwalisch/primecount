@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -304,6 +305,9 @@ T S2_easy_OpenMP(T x,
 
   if (resume(json, x, y, z, s2, time))
     return s2;
+
+  if (!is_resume(json, "S2_easy", x, y, z))
+    json.erase("S2_easy");
 
   PiTable pi(y);
   S2Status status(x);
