@@ -4,7 +4,7 @@
 ///        and the sparse easy leaves in parallel using OpenMP
 ///        (Deleglise-Rivat algorithm).
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include <iostream>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -35,6 +34,7 @@ using namespace primecount;
 
 namespace {
 
+/// backup to file
 template <typename T, typename J>
 void backup(J& json,
             T x,
@@ -56,6 +56,7 @@ void backup(J& json,
   store_backup(json);
 }
 
+/// backup thread
 template <typename T, typename J>
 void backup(J& json,
             int64_t start,
@@ -72,6 +73,7 @@ void backup(J& json,
   json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
 }
 
+/// backup result
 template <typename T, typename J>
 void backup(J& json,
             T x,
@@ -140,6 +142,7 @@ void print_resume(T x,
   print_log_seconds(seconds);
 }
 
+/// resume result
 template <typename T, typename J>
 bool resume(J& json,
             T x,
@@ -161,6 +164,7 @@ bool resume(J& json,
   return false;
 }
 
+/// resume thread
 template <typename T, typename J>
 bool resume(J& json,
             T x,
@@ -289,7 +293,6 @@ T S2_easy_OpenMP(T x,
       stop = b + iters;
       stop = min(stop, pi_x13 + 1);
       s2_easy += S2_easy_thread(x, y, z, b, stop, pi_x13, primes, pi, status);
-      std::cout << "Resume finished!" << std::endl;
     }
 
     #pragma omp barrier
@@ -320,7 +323,6 @@ T S2_easy_OpenMP(T x,
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
           backup(json, x, y, z, pi_x13, threads, percent, time);
           backup_time = get_wtime();
-          std::cout << "Backup!" << std::endl;
         }
       }
 
