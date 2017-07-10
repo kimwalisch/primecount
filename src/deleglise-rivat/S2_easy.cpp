@@ -188,15 +188,15 @@ bool resume(J& json,
 }
 
 template <typename T, typename Primes>
-T S2_easy_thread(T x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t b,
-                 int64_t stop,
-                 int64_t pi_x13,
-                 Primes& primes,
-                 PiTable& pi,
-                 S2Status& status)
+T S2_easy(T x,
+          int64_t y,
+          int64_t z,
+          int64_t b,
+          int64_t stop,
+          int64_t pi_x13,
+          Primes& primes,
+          PiTable& pi,
+          S2Status& status)
 {
   T s2_easy = 0;
 
@@ -266,6 +266,7 @@ T S2_easy_OpenMP(T x,
 
   PiTable pi(y);
   S2Status status(x);
+  double backup_time = get_wtime();
 
   int64_t x13 = iroot<3>(x);
   int64_t pi_x13 = pi[x13];
@@ -276,34 +277,36 @@ T S2_easy_OpenMP(T x,
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
   threads = get_threads(json, x, y, z, threads);
-  double backup_time = get_wtime();
 
   #pragma omp parallel num_threads(threads) reduction(+: s2)
   {
+    int thread_id = omp_get_thread_num();
+
     T s2_easy = 0;
     int64_t stop = 0;
     int64_t b = 0;
     int64_t iters = 1;
     double iter_time = 0;
-    int thread_id = omp_get_thread_num();
 
     if (resume(json, x, y, z, b, iters, s2_easy, thread_id))
     {
       iter_time = get_wtime();
       stop = b + iters;
       stop = min(stop, pi_x13 + 1);
-      s2_easy += S2_easy_thread(x, y, z, b, stop, pi_x13, primes, pi, status);
+      s2_easy += S2_easy(x, y, z, b, stop, pi_x13, primes, pi, status);
     }
 
     #pragma omp barrier
     while (b <= pi_x13)
     {
       double curr_time = get_wtime();
+      double iter_seconds = curr_time - iter_time;
+      double backup_seconds = curr_time - backup_time;
 
       #pragma omp critical (s2_easy_backup)
       {
-        if (start <= pi_x13 &&
-            curr_time - iter_time < 10)
+        if (iter_seconds < 10 &&
+            start <= pi_x13)
         {
           iters *= 2;
           int64_t max_iters = (pi_x13 - start) / threads;
@@ -312,13 +315,13 @@ T S2_easy_OpenMP(T x,
         }
 
         b = start;
-        start += iters;
-        stop = start;
+        stop = b + iters;
         stop = min(stop, pi_x13 + 1);
+        start = stop;
 
         backup(json, start, b, thread_id, iters, s2_easy);
 
-        if (curr_time - backup_time > 1)
+        if (backup_seconds > 1)
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
           backup(json, x, y, z, pi_x13, threads, percent, time);
@@ -327,7 +330,7 @@ T S2_easy_OpenMP(T x,
       }
 
       iter_time = get_wtime();
-      s2_easy += S2_easy_thread(x, y, z, b, stop, pi_x13, primes, pi, status);
+      s2_easy += S2_easy(x, y, z, b, stop, pi_x13, primes, pi, status);
     }
 
     s2 += s2_easy;
