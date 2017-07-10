@@ -129,6 +129,22 @@ int get_threads(J& json,
   return threads;
 }
 
+template <typename T, typename J>
+double get_time(J& json,
+                T x,
+                int64_t y,
+                int64_t z,
+                double time)
+{
+  if (is_resume(json, "S2_easy", x, y, z))
+  {
+    double seconds = json["S2_easy"]["seconds"];
+    time = get_wtime() - seconds;
+  }
+
+  return time;
+}
+
 template <typename T>
 void print_resume(T x,
                   T s2_easy,
@@ -267,6 +283,7 @@ T S2_easy_OpenMP(T x,
   PiTable pi(y);
   S2Status status(x);
   double backup_time = get_wtime();
+  time = get_time(json, x, y, z, time);
 
   int64_t x13 = iroot<3>(x);
   int64_t pi_x13 = pi[x13];

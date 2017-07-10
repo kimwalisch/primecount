@@ -33,7 +33,7 @@ then
 fi
 
 rm -f primecount.backup
-./primecount $x --S2_hard &
+./primecount $x --S2_easy &
 run=0
 
 while [ $run -eq 0 ]
