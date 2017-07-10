@@ -120,6 +120,8 @@ int get_threads(J& json,
   {
     int threads2 = json["S2_easy"]["threads"];
     threads = max(threads, threads2);
+    if (!print_variables())
+      print_log("");
   }
 
   return threads;
@@ -152,6 +154,20 @@ void print_resume(T x,
   print_log("=== Resuming from " + backup_file() + " ===");
   print_log("s2_easy", s2_easy);
   print_log_seconds(seconds);
+}
+
+template <typename T>
+void print_resume(int thread_id,
+                  int64_t b,
+                  int64_t iters,
+                  T s2_easy)
+{
+  print_log("\r=== Resuming from " + backup_file() + " ===");
+  print_log("thread", thread_id);
+  print_log("b", b);
+  print_log("iters", iters);
+  print_log("s2_easy", s2_easy);
+  print_log("");
 }
 
 /// resume result
@@ -193,6 +209,7 @@ bool resume(J& json,
     b = json["S2_easy"][tid]["b"];
     iters = json["S2_easy"][tid]["iters"];
     s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
+    print_resume(thread_id, b, iters, s2_easy);
     return true;
   }
 
