@@ -203,17 +203,20 @@ bool resume(J& json,
             T& s2_easy,
             int thread_id)
 {
+  bool resumed = false;
+
+  #pragma omp critical (s2_easy_resume)
   if (is_resume(json, "S2_easy", thread_id, x, y, z))
   {
+    resumed = true;
     string tid = "thread" + to_string(thread_id);
     b = json["S2_easy"][tid]["b"];
     iters = json["S2_easy"][tid]["iters"];
     s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
     print_resume(thread_id, b, iters, s2_easy);
-    return true;
   }
 
-  return false;
+  return resumed;
 }
 
 template <typename T, typename Primes>
