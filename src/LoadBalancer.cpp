@@ -108,7 +108,7 @@ void print_resume(int thread_id,
                   T segments,
                   T segment_size)
 {
-  print_log("=== Resuming from " + backup_file() + " ===");
+  print_log("\r=== Resuming from " + backup_file() + " ===");
   print_log("thread", thread_id);
   print_log("low", low);
   print_log("segments", segments);
