@@ -51,17 +51,12 @@ void backup(T x,
 }
 
 template <typename T>
-void print_resume(T x,
-                  T s2_trivial,
-                  double seconds,
-                  double percent)
+void print_resume(double percent, T x)
 {
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from " + backup_file() + " ===");
-  print_log("s2_trivial", s2_trivial);
-  print_log_seconds(seconds);
+  print_log("Resuming from " + backup_file());
   print_status(percent, x);
 }
 
@@ -81,8 +76,7 @@ bool resume(T x,
 
     s2_trivial = calculator::eval<T>(json["S2_trivial"]["s2_trivial"]);
     time = get_wtime() - seconds;
-    print_resume(x, s2_trivial, seconds, percent);
-
+    print_resume(percent, x);
     return true;
   }
 

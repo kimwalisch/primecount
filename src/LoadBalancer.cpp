@@ -49,12 +49,28 @@ using namespace std;
 
 namespace primecount {
 
+template <typename T>
+void print_resume(double percent, T x)
+{
+  if (!print_variables())
+    print_log("");
+
+  print_log("Resuming from " + backup_file());
+  print_status(percent, x);
+}
+
 int LoadBalancer::resume_threads() const
 {
-  if (is_resume(copy_, "S2_hard", x_, y_, z_))
-    return copy_["S2_hard"]["threads"];
+  int threads = 0;
 
-  return 0;
+  if (is_resume(copy_, "S2_hard", x_, y_, z_))
+  {
+    int threads = copy_["S2_hard"]["threads"];
+    double percent = json_["S2_hard"]["percent"];
+    print_resume(percent, x_);
+  }
+
+  return threads;
 }
 
 /// backup thread
@@ -102,31 +118,6 @@ void LoadBalancer::backup()
   store_backup(json_);
 }
 
-template <typename T>
-void print_resume(int thread_id,
-                  T low,
-                  T segments,
-                  T segment_size)
-{
-  print_log("\r=== Resuming from " + backup_file() + " ===");
-  print_log("thread", thread_id);
-  print_log("low", low);
-  print_log("segments", segments);
-  print_log("segment_size", segment_size);
-  print_log("");
-}
-
-template <typename T>
-void print_resume(T s2_hard, double seconds)
-{
-  if (!print_variables())
-    print_log("");
-
-  print_log("=== Resuming from " + backup_file() + " ===");
-  print_log("s2_hard", s2_hard);
-  print_log_seconds(seconds);
-}
-
 /// resume thread
 bool LoadBalancer::resume(int thread_id,
                           int64_t& low,
@@ -142,7 +133,6 @@ bool LoadBalancer::resume(int thread_id,
     low = copy_["S2_hard"][tid]["low"];
     segments = copy_["S2_hard"][tid]["segments"];
     segment_size = copy_["S2_hard"][tid]["segment_size"];
-    print_resume(thread_id, low, segments, segment_size);
     resumed = true;
   }
 
@@ -155,10 +145,12 @@ bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
   if (is_resume(copy_, "S2_hard", x_, y_, z_) &&
       copy_["S2_hard"].count("low") == 0)
   {
+    double percent = copy_["S2_hard"]["percent"];
     double seconds = copy_["S2_hard"]["seconds"];
+
     s2_hard = calculator::eval<maxint_t>(copy_["S2_hard"]["s2_hard"]);
     time = get_wtime() - seconds;
-    print_resume(s2_hard, seconds);
+    print_resume(percent, x_);
     return true;
   }
 

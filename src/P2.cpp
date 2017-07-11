@@ -134,23 +134,12 @@ void backup(J& json,
 }
 
 template <typename T>
-void print_resume(T x,
-                  int64_t low,
-                  int64_t thread_distance,
-                  T pix_total,
-                  T p2,
-                  double seconds,
-                  double percent)
+void print_resume(double percent, T x)
 {
   if (!print_variables())
     print_log("");
 
-  print_log("=== Resuming from " + backup_file() + " ===");
-  print_log("low", low);
-  print_log("thread_distance", thread_distance);
-  print_log("pix_total", pix_total);
-  print_log("p2", p2);
-  print_log_seconds(seconds);
+  print_log("Resuming from " + backup_file());
   print_status(percent, x);
 }
 
@@ -175,7 +164,7 @@ void resume(J& json,
     pix_total = calculator::eval<T>(json["P2"]["pix_total"]);
     p2 = calculator::eval<T>(json["P2"]["p2"]);
     time = get_wtime() - seconds;
-    print_resume(x, low, thread_distance, pix_total, p2, seconds, percent);
+    print_resume(percent, x);
   }
 }
 

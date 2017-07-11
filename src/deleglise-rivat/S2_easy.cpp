@@ -42,6 +42,16 @@ bool is_backup(double time)
   return seconds > 60;
 }
 
+template <typename T>
+void print_resume(double percent, T x)
+{
+  if (!print_variables())
+    print_log("");
+
+  print_log("Resuming from " + backup_file());
+  print_status(percent, x);
+}
+
 /// backup to file
 template <typename T, typename J>
 void backup(J& json,
@@ -124,10 +134,10 @@ int get_threads(J& json,
   if (is_resume(json, "S2_easy", x, y, z) &&
       json["S2_easy"].count("threads"))
   {
+    double percent = json["S2_easy"]["percent"];
     int backup_threads = json["S2_easy"]["threads"];
     threads = max(threads, backup_threads);
-    if (!print_variables())
-      print_log("");
+    print_resume(percent, x);
   }
 
   return threads;
@@ -149,31 +159,6 @@ double get_time(J& json,
   return time;
 }
 
-template <typename T>
-void print_resume(T x,
-                  T s2_easy,
-                  double seconds)
-{
-  if (!print_variables())
-    print_log("");
-
-  print_log("=== Resuming from " + backup_file() + " ===");
-  print_log("s2_easy", s2_easy);
-  print_log_seconds(seconds);
-}
-
-template <typename T>
-void print_resume(int thread_id,
-                  int64_t b,
-                  T s2_easy)
-{
-  print_log("\r=== Resuming from " + backup_file() + " ===");
-  print_log("thread", thread_id);
-  print_log("b", b);
-  print_log("s2_easy", s2_easy);
-  print_log("");
-}
-
 /// resume result
 template <typename T, typename J>
 bool resume(J& json,
@@ -186,10 +171,12 @@ bool resume(J& json,
   if (is_resume(json, "S2_easy", x, y, z) &&
       json["S2_easy"].count("s2_easy"))
   {
+    double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
+
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     time = get_wtime() - seconds;
-    print_resume(x, s2_easy, seconds);
+    print_resume(percent, x);
     return true;
   }
 
@@ -215,7 +202,6 @@ bool resume(J& json,
     string tid = "thread" + to_string(thread_id);
     b = json["S2_easy"][tid]["b"];
     s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
-    print_resume(thread_id, b, s2_easy);
   }
 
   return resumed;
