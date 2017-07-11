@@ -40,7 +40,7 @@ int main()
   int64_t max = min * 2;
   uniform_int_distribution<int64_t> dist(min, max);
 
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 20; i++)
   {
     int64_t x = dist(gen);
     int64_t res1 = pi_meissel(x);
@@ -55,21 +55,21 @@ int main()
     }
   }
 
-  min = ipow(10, 8);
+  min = ipow(10, 7);
   max = min * 2;
-  uniform_int_distribution<int64_t> dist_lmo(min, max);
+  uniform_int_distribution<int64_t> dist_small(min, max);
 
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 20; i++)
   {
-    int64_t x = dist_lmo(gen);
+    int64_t x = dist_small(gen);
     int64_t res1 = pi_meissel(x);
 
     for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
     {
       set_alpha(alpha);
-      int64_t res2 = pi_lmo(x);
+      int64_t res2 = pi_deleglise_rivat(x);
 
-      cout << "pi_lmo(" << x << ") = " << res2;
+      cout << "pi_deleglise_rivat(" << x << ") = " << res2;
       check(res1 == res2);
     }
   }
