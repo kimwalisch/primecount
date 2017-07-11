@@ -121,19 +121,16 @@ bool LoadBalancer::resume(int thread_id,
                           int64_t& segments,
                           int64_t& segment_size)
 {
-  bool resumed = false;
-
-  #pragma omp critical (LoadBalancer)
   if (is_resume(copy_, "S2_hard", thread_id, x_, y_, z_))
   {
     string tid = "thread" + to_string(thread_id);
     low = copy_["S2_hard"][tid]["low"];
     segments = copy_["S2_hard"][tid]["segments"];
     segment_size = copy_["S2_hard"][tid]["segment_size"];
-    resumed = true;
+    return true;
   }
 
-  return resumed;
+  return false;
 }
 
 // resume result
