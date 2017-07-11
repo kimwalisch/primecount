@@ -38,7 +38,8 @@ namespace {
 /// backup to file every 60 seconds
 bool is_backup(double time)
 {
-  return get_wtime() - time > 60;
+  double seconds = get_wtime() - time;
+  return seconds > 60;
 }
 
 /// backup to file
@@ -98,11 +99,11 @@ void backup(J& json,
 }
 
 template <typename T, typename J>
-int get_start(J& json,
-              T x,
-              int64_t y,
-              int64_t z,
-              int64_t start)
+int64_t get_start(J& json,
+                  T x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t start)
 {
   if (is_resume(json, "S2_easy", x, y, z) &&
       json["S2_easy"].count("start"))
@@ -123,8 +124,8 @@ int get_threads(J& json,
   if (is_resume(json, "S2_easy", x, y, z) &&
       json["S2_easy"].count("threads"))
   {
-    int threads2 = json["S2_easy"]["threads"];
-    threads = max(threads, threads2);
+    int backup_threads = json["S2_easy"]["threads"];
+    threads = max(threads, backup_threads);
     if (!print_variables())
       print_log("");
   }
