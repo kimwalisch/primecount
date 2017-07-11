@@ -189,10 +189,6 @@ T S2_hard_OpenMP(T x,
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
-  if (resume_threads > 0 &&
-      !print_variables())
-    print_log("");
-
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {

@@ -53,9 +53,6 @@ void backup(T x,
 template <typename T>
 void print_resume(double percent, T x)
 {
-  if (!print_variables())
-    print_log("");
-
   print_log("Resuming from " + backup_file());
   print_status(percent, x);
 }
