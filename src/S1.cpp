@@ -33,7 +33,6 @@ namespace {
 template <typename T>
 void backup(T x,
             int64_t y,
-            int64_t c,
             T s1,
             double time)
 {
@@ -41,7 +40,6 @@ void backup(T x,
 
   j["S1"]["x"] = to_string(x);
   j["S1"]["y"] = y;
-  j["S1"]["c"] = c;
   j["S1"]["s1"] = to_string(s1);
   j["S1"]["percent"] = 100.0;
   j["S1"]["seconds"] = get_wtime() - time;
@@ -162,7 +160,7 @@ int64_t S1(int64_t x,
   if (!resume(x, y, s1, time))
   {
     s1 = S1_OpenMP(x, y, c, threads);
-    backup(x, y, c, s1, time);
+    backup(x, y, s1, time);
   }
 
   print_log("S1", s1, time);
@@ -192,7 +190,7 @@ int128_t S1(int128_t x,
     else
       s1 = S1_OpenMP(x, y, c, threads);
 
-    backup(x, y, c, s1, time);
+    backup(x, y, s1, time);
   }
 
   print_log("S1", s1, time);

@@ -35,7 +35,6 @@ template <typename T>
 void backup(T x,
             int64_t y,
             int64_t z,
-            int64_t c,
             T s2_trivial,
             double time)
 {
@@ -44,7 +43,6 @@ void backup(T x,
   j["S2_trivial"]["x"] = to_string(x);
   j["S2_trivial"]["y"] = y;
   j["S2_trivial"]["z"] = z;
-  j["S2_trivial"]["c"] = c;
   j["S2_trivial"]["s2_trivial"] = to_string(s2_trivial);
   j["S2_trivial"]["percent"] = 100.0;
   j["S2_trivial"]["seconds"] = get_wtime() - time;
@@ -151,7 +149,7 @@ int64_t S2_trivial(int64_t x,
   if (!resume(x, y, z, s2_trivial, time))
   {
     s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
-    backup(x, y, z, c, s2_trivial, time);
+    backup(x, y, z, s2_trivial, time);
   }
 
   print_log("S2_trivial", s2_trivial, time);
@@ -177,7 +175,7 @@ int128_t S2_trivial(int128_t x,
   if (!resume(x, y, z, s2_trivial, time))
   {
     s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
-    backup(x, y, z, c, s2_trivial, time);
+    backup(x, y, z, s2_trivial, time);
   }
 
   print_log("S2_trivial", s2_trivial, time);
