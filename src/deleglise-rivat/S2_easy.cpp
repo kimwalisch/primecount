@@ -190,17 +190,15 @@ bool resume(J& json,
             int thread_id,
             T& s2_easy)
 {
-  bool resumed = false;
-
   if (is_resume(json, "S2_easy", thread_id, x, y, z))
   {
-    resumed = true;
     string tid = "thread" + to_string(thread_id);
     b = json["S2_easy"][tid]["b"];
     s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
+    return true;
   }
 
-  return resumed;
+  return false;
 }
 
 template <typename T, typename Primes>
