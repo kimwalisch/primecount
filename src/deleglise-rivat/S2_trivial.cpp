@@ -38,16 +38,16 @@ void backup(T x,
             T s2_trivial,
             double time)
 {
-  auto j = load_backup();
+  auto json = load_backup();
 
-  j["S2_trivial"]["x"] = to_string(x);
-  j["S2_trivial"]["y"] = y;
-  j["S2_trivial"]["z"] = z;
-  j["S2_trivial"]["s2_trivial"] = to_string(s2_trivial);
-  j["S2_trivial"]["percent"] = 100.0;
-  j["S2_trivial"]["seconds"] = get_wtime() - time;
+  json["S2_trivial"]["x"] = to_string(x);
+  json["S2_trivial"]["y"] = y;
+  json["S2_trivial"]["z"] = z;
+  json["S2_trivial"]["s2_trivial"] = to_string(s2_trivial);
+  json["S2_trivial"]["percent"] = 100.0;
+  json["S2_trivial"]["seconds"] = get_wtime() - time;
 
-  store_backup(j);
+  store_backup(json);
 }
 
 template <typename T>
@@ -72,14 +72,14 @@ bool resume(T x,
             T& s2_trivial,
             double& time)
 {
-  auto j = load_backup();
+  auto json = load_backup();
 
-  if (is_resume(j, "S2_trivial", x, y, z))
+  if (is_resume(json, "S2_trivial", x, y, z))
   {
-    double percent = j["S2_trivial"]["percent"];
-    double seconds = j["S2_trivial"]["seconds"];
+    double percent = json["S2_trivial"]["percent"];
+    double seconds = json["S2_trivial"]["seconds"];
 
-    s2_trivial = calculator::eval<T>(j["S2_trivial"]["s2_trivial"]);
+    s2_trivial = calculator::eval<T>(json["S2_trivial"]["s2_trivial"]);
     time = get_wtime() - seconds;
     print_resume(x, s2_trivial, seconds, percent);
 

@@ -36,15 +36,15 @@ void backup(T x,
             T s1,
             double time)
 {
-  auto j = load_backup();
+  auto json = load_backup();
 
-  j["S1"]["x"] = to_string(x);
-  j["S1"]["y"] = y;
-  j["S1"]["s1"] = to_string(s1);
-  j["S1"]["percent"] = 100.0;
-  j["S1"]["seconds"] = get_wtime() - time;
+  json["S1"]["x"] = to_string(x);
+  json["S1"]["y"] = y;
+  json["S1"]["s1"] = to_string(s1);
+  json["S1"]["percent"] = 100.0;
+  json["S1"]["seconds"] = get_wtime() - time;
 
-  store_backup(j);
+  store_backup(json);
 }
 
 template <typename T>
@@ -68,14 +68,14 @@ bool resume(T x,
             T& s1,
             double& time)
 {
-  auto j = load_backup();
+  auto json = load_backup();
 
-  if (is_resume(j, "S1", x, y))
+  if (is_resume(json, "S1", x, y))
   {
-    double percent = j["S1"]["percent"];
-    double seconds = j["S1"]["seconds"];
+    double percent = json["S1"]["percent"];
+    double seconds = json["S1"]["seconds"];
 
-    s1 = calculator::eval<T>(j["S1"]["s1"]);
+    s1 = calculator::eval<T>(json["S1"]["s1"]);
     time = get_wtime() - seconds;
     print_resume(x, s1, seconds, percent);
 
