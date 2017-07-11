@@ -35,6 +35,12 @@ using namespace primecount;
 
 namespace {
 
+/// backup to file every 60 seconds
+bool is_backup(double time)
+{
+  return get_wtime() - time > 60;
+}
+
 /// backup to file
 template <typename T, typename J>
 void backup(J& json,
@@ -61,14 +67,12 @@ void backup(J& json,
             int64_t start,
             int64_t b,
             int64_t thread_id,
-            int64_t iters,
             T s2_easy)
 {
   string tid = "thread" + to_string(thread_id);
 
   json["S2_easy"]["start"] = start;
   json["S2_easy"][tid]["b"] = b;
-  json["S2_easy"][tid]["iters"] = iters;
   json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
 }
 
@@ -160,13 +164,11 @@ void print_resume(T x,
 template <typename T>
 void print_resume(int thread_id,
                   int64_t b,
-                  int64_t iters,
                   T s2_easy)
 {
   print_log("\r=== Resuming from " + backup_file() + " ===");
   print_log("thread", thread_id);
   print_log("b", b);
-  print_log("iters", iters);
   print_log("s2_easy", s2_easy);
   print_log("");
 }
@@ -200,9 +202,8 @@ bool resume(J& json,
             int64_t y,
             int64_t z,
             int64_t& b,
-            int64_t& iters,
-            T& s2_easy,
-            int thread_id)
+            int thread_id,
+            T& s2_easy)
 {
   bool resumed = false;
 
@@ -212,21 +213,11 @@ bool resume(J& json,
     resumed = true;
     string tid = "thread" + to_string(thread_id);
     b = json["S2_easy"][tid]["b"];
-    iters = json["S2_easy"][tid]["iters"];
     s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
-    print_resume(thread_id, b, iters, s2_easy);
+    print_resume(thread_id, b, s2_easy);
   }
 
   return resumed;
-}
-
-int get_thread_num()
-{
-#ifdef _OPENMP
-  return omp_get_thread_num();
-#else
-  return 0;
-#endif
 }
 
 template <typename T, typename Primes>
@@ -234,54 +225,44 @@ T S2_easy(T x,
           int64_t y,
           int64_t z,
           int64_t b,
-          int64_t stop,
-          int64_t pi_x13,
           Primes& primes,
-          PiTable& pi,
-          S2Status& status)
+          PiTable& pi)
 {
+  int64_t prime = primes[b];
+  T x2 = x / prime;
+  int64_t min_trivial = min(x2 / prime, y);
+  int64_t min_clustered = (int64_t) isqrt(x2);
+  int64_t min_sparse = z / prime;
+
+  min_clustered = in_between(prime, min_clustered, y);
+  min_sparse = in_between(prime, min_sparse, y);
+
+  int64_t l = pi[min_trivial];
+  int64_t pi_min_clustered = pi[min_clustered];
+  int64_t pi_min_sparse = pi[min_sparse];
   T s2_easy = 0;
 
-  for (; b < stop; b++)
+  // Find all clustered easy leaves:
+  // n = primes[b] * primes[l]
+  // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
+  // where phi(x / n, b - 1) = pi(x / n) - b + 2
+  while (l > pi_min_clustered)
   {
-    int64_t prime = primes[b];
-    T x2 = x / prime;
-    int64_t min_trivial = min(x2 / prime, y);
-    int64_t min_clustered = (int64_t) isqrt(x2);
-    int64_t min_sparse = z / prime;
+    int64_t xn = (int64_t) fast_div(x2, primes[l]);
+    int64_t phi_xn = pi[xn] - b + 2;
+    int64_t xm = (int64_t) fast_div(x2, primes[b + phi_xn - 1]);
+    int64_t l2 = pi[xm];
+    s2_easy += phi_xn * (l - l2);
+    l = l2;
+  }
 
-    min_clustered = in_between(prime, min_clustered, y);
-    min_sparse = in_between(prime, min_sparse, y);
-
-    int64_t l = pi[min_trivial];
-    int64_t pi_min_clustered = pi[min_clustered];
-    int64_t pi_min_sparse = pi[min_sparse];
-
-    // Find all clustered easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
-    while (l > pi_min_clustered)
-    {
-      int64_t xn = (int64_t) fast_div(x2, primes[l]);
-      int64_t phi_xn = pi[xn] - b + 2;
-      int64_t xm = (int64_t) fast_div(x2, primes[b + phi_xn - 1]);
-      int64_t l2 = pi[xm];
-      s2_easy += phi_xn * (l - l2);
-      l = l2;
-    }
-
-    // Find all sparse easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
-    for (; l > pi_min_sparse; l--)
-    {
-      int64_t xn = (int64_t) fast_div(x2, primes[l]);
-      s2_easy += pi[xn] - b + 2;
-    }
-
-    if (is_print())
-      status.print(b, pi_x13);
+  // Find all sparse easy leaves:
+  // n = primes[b] * primes[l]
+  // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+  for (; l > pi_min_sparse; l--)
+  {
+    int64_t xn = (int64_t) fast_div(x2, primes[l]);
+    s2_easy += pi[xn] - b + 2;
   }
 
   return s2_easy;
@@ -302,6 +283,7 @@ T S2_easy_OpenMP(T x,
 {
   T s2 = 0;
   auto json = load_backup();
+  auto copy = json;
 
   if (resume(json, x, y, z, s2, time))
     return s2;
@@ -324,50 +306,27 @@ T S2_easy_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
   threads = get_threads(json, x, y, z, threads);
 
-  #pragma omp parallel num_threads(threads) reduction(+: s2)
+  #pragma omp parallel for reduction(+: s2)
+  for (int i = 0; i < threads; i++)
   {
-    int thread_id = get_thread_num();
-
     T s2_easy = 0;
-    int64_t stop = 0;
     int64_t b = 0;
-    int64_t iters = 1;
-    double iter_time = 0;
 
-    if (resume(json, x, y, z, b, iters, s2_easy, thread_id))
-    {
-      iter_time = get_wtime();
-      stop = b + iters;
-      stop = min(stop, pi_x13 + 1);
-      s2_easy += S2_easy(x, y, z, b, stop, pi_x13, primes, pi, status);
-    }
+    if (resume(copy, x, y, z, b, i, s2_easy))
+      s2_easy += S2_easy(x, y, z, b, primes, pi);
 
-    #pragma omp barrier
     while (b <= pi_x13)
     {
-      double curr_time = get_wtime();
-      double iter_seconds = curr_time - iter_time;
-      double backup_seconds = curr_time - backup_time;
+      if (is_print())
+        status.print(b, pi_x13);
 
       #pragma omp critical (s2_easy_backup)
       {
-        if (iter_seconds < 10 &&
-            start <= pi_x13)
-        {
-          iters *= 2;
-          int64_t max_iters = (pi_x13 - start) / threads;
-          max_iters = max(max_iters / 8, 1);
-          iters = min(iters, max_iters);
-        }
+        b = start++;
 
-        b = start;
-        stop = b + iters;
-        stop = min(stop, pi_x13 + 1);
-        start = stop;
+        backup(json, start, b, i, s2_easy);
 
-        backup(json, start, b, thread_id, iters, s2_easy);
-
-        if (backup_seconds > 1)
+        if (is_backup(backup_time))
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
           backup(json, x, y, z, threads, percent, time);
@@ -375,8 +334,7 @@ T S2_easy_OpenMP(T x,
         }
       }
 
-      iter_time = get_wtime();
-      s2_easy += S2_easy(x, y, z, b, stop, pi_x13, primes, pi, status);
+      s2_easy += S2_easy(x, y, z, b, primes, pi);
     }
 
     s2 += s2_easy;
