@@ -307,7 +307,8 @@ T S2_easy_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
   threads = get_threads(json, x, y, z, threads);
 
-  #pragma omp parallel for reduction(+: s2)
+  #pragma omp parallel for \
+      num_threads(threads) reduction(+: s2)
   for (int i = 0; i < threads; i++)
   {
     T s2_easy = 0;
