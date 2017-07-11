@@ -192,7 +192,6 @@ bool resume(J& json,
 {
   bool resumed = false;
 
-  #pragma omp critical (s2_easy_resume)
   if (is_resume(json, "S2_easy", thread_id, x, y, z))
   {
     resumed = true;
@@ -305,7 +304,7 @@ T S2_easy_OpenMP(T x,
       if (is_print())
         status.print(b, pi_x13);
 
-      #pragma omp critical (s2_easy_backup)
+      #pragma omp critical (s2_easy)
       {
         b = start++;
 
