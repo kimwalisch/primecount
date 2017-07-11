@@ -107,8 +107,9 @@ T P2_thread(T x,
   return p2;
 }
 
-template <typename T>
-void backup(T x,
+template <typename T, typename J>
+void backup(J& json,
+            T x,
             int64_t y,
             int64_t z,
             int64_t low,
@@ -117,20 +118,19 @@ void backup(T x,
             T p2,
             double time)
 {
-  auto j = load_backup();
   double percent = get_percent(low, z);
 
-  j["P2"]["x"] = to_string(x);
-  j["P2"]["y"] = y;
-  j["P2"]["z"] = z;
-  j["P2"]["low"] = low;
-  j["P2"]["thread_distance"] = thread_distance;
-  j["P2"]["pix_total"] = to_string(pix_total);
-  j["P2"]["p2"] = to_string(p2);
-  j["P2"]["percent"] = percent;
-  j["P2"]["seconds"] = get_wtime() - time;
+  json["P2"]["x"] = to_string(x);
+  json["P2"]["y"] = y;
+  json["P2"]["z"] = z;
+  json["P2"]["low"] = low;
+  json["P2"]["thread_distance"] = thread_distance;
+  json["P2"]["pix_total"] = to_string(pix_total);
+  json["P2"]["p2"] = to_string(p2);
+  json["P2"]["percent"] = percent;
+  json["P2"]["seconds"] = get_wtime() - time;
 
-  store_backup(j);
+  store_backup(json);
 }
 
 template <typename T>
@@ -154,8 +154,9 @@ void print_resume(T x,
   print_status(percent, x);
 }
 
-template <typename T>
-void resume(T x,
+template <typename T, typename J>
+void resume(J& json,
+            T x,
             int64_t y,
             int64_t z,
             int64_t& low,
@@ -164,19 +165,16 @@ void resume(T x,
             T& p2,
             double& time)
 {
-  auto j = load_backup();
-
-  if (is_resume(j, "P2", x, y, z))
+  if (is_resume(json, "P2", x, y, z))
   {
-    double percent = j["P2"]["percent"];
-    double seconds = j["P2"]["seconds"];
+    double percent = json["P2"]["percent"];
+    double seconds = json["P2"]["seconds"];
 
-    low = j["P2"]["low"];
-    thread_distance = j["P2"]["thread_distance"];
-    pix_total = calculator::eval<T>(j["P2"]["pix_total"]);
-    p2 = calculator::eval<T>(j["P2"]["p2"]);
+    low = json["P2"]["low"];
+    thread_distance = json["P2"]["thread_distance"];
+    pix_total = calculator::eval<T>(json["P2"]["pix_total"]);
+    p2 = calculator::eval<T>(json["P2"]["p2"]);
     time = get_wtime() - seconds;
-
     print_resume(x, low, thread_distance, pix_total, p2, seconds, percent);
   }
 }
@@ -212,7 +210,8 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
-  resume(x, y, z, low, thread_distance, pix_total, p2, time);
+  auto json = load_backup();
+  resume(json, x, y, z, low, thread_distance, pix_total, p2, time);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
@@ -235,7 +234,7 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
       pix_total += pix[i];
     }
 
-    backup(x, y, z, low, thread_distance, pix_total, p2, time);
+    backup(json, x, y, z, low, thread_distance, pix_total, p2, time);
 
     if (is_print())
     {
