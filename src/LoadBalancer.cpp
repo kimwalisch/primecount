@@ -62,7 +62,7 @@ int LoadBalancer::resume_threads() const
 
   if (is_resume(copy_, "S2_hard", x_, y_, z_))
   {
-    int threads = copy_["S2_hard"]["threads"];
+    threads = copy_["S2_hard"]["threads"];
     double percent = json_["S2_hard"]["percent"];
     print_resume(percent, x_);
   }
