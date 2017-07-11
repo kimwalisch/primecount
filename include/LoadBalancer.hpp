@@ -62,6 +62,7 @@ private:
   maxint_t s2_total_;
   maxint_t s2_approx_;
   double time_;
+  double backup_time_;
   S2Status status_;
   nlohmann::json json_;
   nlohmann::json copy_;

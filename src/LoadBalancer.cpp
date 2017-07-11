@@ -65,6 +65,8 @@ void LoadBalancer::backup(int threads,
                           int64_t segment_size)
 {
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+  double seconds = get_wtime() - backup_time_;
+
   string tid = "thread" + to_string(thread_id);
 
   json_["S2_hard"]["threads"] = threads;
@@ -78,7 +80,11 @@ void LoadBalancer::backup(int threads,
   json_["S2_hard"][tid]["segments"] = segments;
   json_["S2_hard"][tid]["segment_size"] = segment_size;
 
-  store_backup(json_);
+  if (seconds > 60)
+  {
+    backup_time_ = get_wtime();
+    store_backup(json_);
+  }
 }
 
 /// backup result
@@ -172,6 +178,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   s2_total_(0),
   s2_approx_(s2_approx),
   time_(get_wtime()),
+  backup_time_(get_wtime()),
   status_(x),
   json_(load_backup())
 {

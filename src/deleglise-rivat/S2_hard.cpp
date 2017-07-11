@@ -182,7 +182,6 @@ T S2_hard_OpenMP(T x,
                  double& time)
 {
   LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
-
   threads = ideal_num_threads(threads, z);
   int resume_threads = loadBalancer.resume_threads();
   threads = max(threads, resume_threads);
