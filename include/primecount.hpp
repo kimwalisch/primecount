@@ -63,13 +63,6 @@ int64_t pi_legendre(int64_t x);
 ///
 int64_t pi_lehmer(int64_t x);
 
-/// Count the number of primes <= x using the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3) / log x)
-/// Memory usage: O(x^(1/3) * (log x)^2)
-///
-int64_t pi_lmo(int64_t x);
-
 /// Count the number of primes <= x using Meissel's formula.
 /// Run time: O(x / (log x)^3)
 /// Memory usage: O(x^(1/2) / log x)

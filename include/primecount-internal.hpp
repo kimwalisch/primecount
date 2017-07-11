@@ -65,8 +65,6 @@ int64_t pi_lehmer(int64_t x, int threads);
 
 int64_t pi_lehmer2(int64_t x, int threads);
 
-int64_t pi_lmo(int64_t x, int threads);
-
 int64_t pi_lmo1(int64_t x);
 
 int64_t pi_lmo2(int64_t x);
@@ -76,8 +74,6 @@ int64_t pi_lmo3(int64_t x);
 int64_t pi_lmo4(int64_t x);
 
 int64_t pi_lmo5(int64_t x);
-
-int64_t pi_lmo_parallel(int64_t x, int threads);
 
 int64_t pi_meissel(int64_t x, int threads);
 

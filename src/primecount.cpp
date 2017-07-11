@@ -72,9 +72,6 @@ int status_precision_ = -1;
 
 double alpha_ = -1;
 
-// Below 10^7 LMO is faster than Deleglise-Rivat
-const int lmo_threshold = 10000000;
-
 }
 
 namespace primecount {
@@ -86,10 +83,7 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  if (x < lmo_threshold)
-    return pi_lmo5(x);
-  else
-    return pi_deleglise_rivat(x, threads);
+  return pi_deleglise_rivat(x, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -131,16 +125,6 @@ int64_t pi_legendre(int64_t x)
 int64_t pi_lehmer(int64_t x)
 {
   return pi_lehmer(x, get_num_threads());
-}
-
-int64_t pi_lmo(int64_t x)
-{
-  return pi_lmo(x, get_num_threads());
-}
-
-int64_t pi_lmo(int64_t x, int threads)
-{
-  return pi_lmo_parallel(x, threads);
 }
 
 int64_t pi_meissel(int64_t x)
