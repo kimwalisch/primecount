@@ -315,7 +315,7 @@ T S2_easy_OpenMP(T x,
     if (resume(copy, x, y, z, b, i, s2_easy))
       s2_easy += S2_easy(x, y, z, b, primes, pi);
 
-    while (b <= pi_x13)
+    while (true)
     {
       if (is_print())
         status.print(b, pi_x13);
@@ -333,6 +333,9 @@ T S2_easy_OpenMP(T x,
           backup_time = get_wtime();
         }
       }
+
+      if (b > pi_x13)
+        break;
 
       s2_easy += S2_easy(x, y, z, b, primes, pi);
     }
