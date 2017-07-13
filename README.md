@@ -35,12 +35,12 @@ $ ./primecount 1e19 --P2 -s
 === P2(x, y) ===
 Computation of the 2nd partial sieve function
 x = 10000000000000000000
-y = 75434780
-z = 132564846082
-alpha = 35.014
+y = 66422883
+z = 150550526390
+alpha = 30.831
 threads = 8
 
-Status: 52%^C
+Status: 46%^C
 ```
 
 ```sh
@@ -50,19 +50,13 @@ $ ./primecount --resume
 === P2(x, y) ===
 Computation of the 2nd partial sieve function
 x = 10000000000000000000
-y = 75434780
-z = 132564846082
-alpha = 35.014
+y = 66422883
+z = 150550526390
+alpha = 30.831
 threads = 8
 
-=== Resuming from primecount.backup ===
-low = 68652367874
-thread_distance = 7989059776
-pix_total = 2871709096
-p2 = 56268889109074621
-Seconds: 10.153
-
-Status: 52%
+Resuming from primecount.backup
+Status: 46%
 ```
 
 ## Command-line options
@@ -86,7 +80,6 @@ Options:
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
-  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
          --Li_inverse       Approximate the nth prime using Li^-1(x)
