@@ -275,21 +275,15 @@ int main (int argc, char* argv[])
     switch (opt.option)
     {
       case OPTION_DELEGLISE_RIVAT:
-      {
-#ifdef HAVE_INT128_T
-        if (x > numeric_limits<int64_t>::max())
-          res = pi_deleglise_rivat_parallel2(x, threads, &time);
-        else
-#endif
-        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time);
-        break;
-      }
+        res = pi_deleglise_rivat(x, threads);
+        time = backup_time(time); break;
       case OPTION_DELEGLISE_RIVAT1:
         res = pi_deleglise_rivat1(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT2:
         res = pi_deleglise_rivat2(to_int64(x)); break;
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
-        res = pi_deleglise_rivat_parallel1(to_int64(x), threads, &time); break;
+        res = pi_deleglise_rivat_parallel1(to_int64(x), threads);
+        time = backup_time(time); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:
@@ -309,11 +303,13 @@ int main (int argc, char* argv[])
       case OPTION_PRIMESIEVE:
         res = pi_primesieve(to_int64(x), threads); break;
       case OPTION_P2:
-        res = P2(x, threads); break;
+        res = P2(x, threads);
+        time = backup_time(time, "P2"); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_PI:
-        res = pi(x, threads); break;
+        res = pi(x, threads);
+        time = backup_time(time); break;
       case OPTION_LI:
         res = Li(x); break;
       case OPTION_LIINV:
@@ -325,16 +321,21 @@ int main (int argc, char* argv[])
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_S1:
-        res = S1(x, threads); break;
+        res = S1(x, threads);
+        time = backup_time(time, "S1"); break;
       case OPTION_S2_EASY:
-        res = S2_easy(x, threads); break;
+        res = S2_easy(x, threads);
+        time = backup_time(time, "S2_easy"); break;
       case OPTION_S2_HARD:
-        res = S2_hard(x, threads); break;
+        res = S2_hard(x, threads);
+        time = backup_time(time, "S2_hard"); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x, threads); break;
+        res = S2_trivial(x, threads);
+        time = backup_time(time, "S2_trivial"); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
-        res = pi_deleglise_rivat_parallel2(x, threads, &time); break;
+        res = pi_deleglise_rivat_parallel2(x, threads);
+        time = backup_time(time); break;
 #endif
     }
 

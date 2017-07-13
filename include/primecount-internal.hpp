@@ -51,11 +51,11 @@ int64_t pi_deleglise_rivat1(int64_t x);
 
 int64_t pi_deleglise_rivat2(int64_t x);
 
-int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads, double* time = nullptr);
+int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads);
 
 #ifdef HAVE_INT128_T
 
-int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads, double* time = nullptr);
+int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads);
 
 #endif
 

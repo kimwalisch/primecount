@@ -14595,16 +14595,34 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, int t
          j[formula].count("thread" + to_string(thread_id)) > 0;
 }
 
-template <typename T>
-inline double backup_seconds(T x, int64_t y, int64_t z)
+inline bool is_backup_seconnds(const nlohmann::json& j, const std::string& formula)
+{
+  return j.find(formula) != j.end() &&
+         j[formula].count("seconds");
+}
+
+inline double backup_time(double time, const std::string& formula)
 {
   auto j = load_backup();
 
-  if (is_resume(j, "P2", x, y, z) &&
-      is_resume(j, "S1", x, y) &&
-      is_resume(j, "S2_trivial", x, y, z) &&
-      is_resume(j, "S2_easy", x, y, z) &&
-      is_resume(j, "S2_hard", x, y, z))
+  if (is_backup_seconnds(j, formula))
+  {
+    double seconds = j[formula]["seconds"];
+    return get_wtime() - seconds;
+  }
+
+  return time;
+}
+
+inline double backup_time(double time)
+{
+  auto j = load_backup();
+
+  if (is_backup_seconnds(j, "P2") &&
+      is_backup_seconnds(j, "S1") &&
+      is_backup_seconnds(j, "S2_trivial") &&
+      is_backup_seconnds(j, "S2_easy") &&
+      is_backup_seconnds(j, "S2_hard"))
   {
     double p2 = j["P2"]["seconds"];
     double s1 = j["S1"]["seconds"];
@@ -14612,10 +14630,11 @@ inline double backup_seconds(T x, int64_t y, int64_t z)
     double s2_easy = j["S2_easy"]["seconds"];
     double s2_hard = j["S2_hard"]["seconds"];
 
-    return p2 + s1 + s2_trivial + s2_easy + s2_hard;
+    double seconds = p2 + s1 + s2_trivial + s2_easy + s2_hard;
+    return get_wtime() - seconds;
   }
 
-  return 0;
+  return time;
 }
 
 }
