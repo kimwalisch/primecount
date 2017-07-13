@@ -45,7 +45,7 @@ bool is_backup(double time)
 template <typename T>
 void print_resume(double percent, T x)
 {
-  print_log("Resume from " + backup_file());
+  print_log("Resuming from " + backup_file());
   print_status(percent, x);
 }
 
