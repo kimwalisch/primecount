@@ -26,6 +26,16 @@ later).
 * [primecount-backup-4.0-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.0/primecount-backup-4.0-win64.zip), 493 KB
 * [primecount-backup-4.0-linux-x64.tar.gz](https://github.com/kimwalisch/primecount/releases/download/v4.0/primecount-backup-4.0-linux-x64.tar.gz), 1.1 MB
 
+## Build instructions
+
+Download a snapshot of the ```backup2``` branch and build it using:
+
+```sh
+cmake .
+make -j
+sudo make install
+```
+
 ## Backup usage example
 
 ```sh
