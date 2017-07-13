@@ -1,3 +1,16 @@
+2017-07-13 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.1 work in progress.
+
+  This version improves the backup & resume functionality
+  of the primecount-backup version.
+
+  * S2_easy.cpp: Fix severe backup scaling issues.
+  * S2_easy_libdivide.cpp: Fix severe backup scaling issues.
+  * S2_hard.cpp: Faster resume.
+  * LoadBalancer.cpp: Simplify backup.
+  * results.txt: Fix incorrect time elapsed.
+
 2017-07-06 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.0 released.
