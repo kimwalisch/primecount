@@ -129,7 +129,7 @@ bool LoadBalancer::resume(int thread_id,
 bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
 {
   if (is_resume(copy_, "S2_hard", x_, y_, z_) &&
-      copy_["S2_hard"].count("low") == 0)
+      !copy_["S2_hard"].count("low"))
   {
     double percent = copy_["S2_hard"]["percent"];
     double seconds = copy_["S2_hard"]["seconds"];
