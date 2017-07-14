@@ -62,21 +62,6 @@ void backup(J& json,
   store_backup(json);
 }
 
-/// backup thread
-template <typename T, typename J>
-void backup(J& json,
-            int64_t start,
-            int64_t b,
-            int64_t thread_id,
-            T s2_easy)
-{
-  string tid = "thread" + to_string(thread_id);
-
-  json["S2_easy"]["start"] = start;
-  json["S2_easy"][tid]["b"] = b;
-  json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
-}
-
 /// backup result
 template <typename T, typename J>
 void backup(J& json,
@@ -96,6 +81,66 @@ void backup(J& json,
   json["S2_easy"]["seconds"] = get_wtime() - time;
 
   store_backup(json);
+}
+
+/// update thread vars
+template <typename T, typename J>
+void update(J& json,
+            int64_t start,
+            int64_t b,
+            int64_t thread_id,
+            T s2_easy)
+{
+  string tid = "thread" + to_string(thread_id);
+
+  json["S2_easy"]["start"] = start;
+  json["S2_easy"][tid]["b"] = b;
+  json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
+}
+
+/// resume thread
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t& b,
+            int thread_id,
+            T& s2_easy)
+{
+  if (is_resume(json, "S2_easy", thread_id, x, y, z))
+  {
+    string tid = "thread" + to_string(thread_id);
+    b = json["S2_easy"][tid]["b"];
+    s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
+    return true;
+  }
+
+  return false;
+}
+
+/// resume result
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            T& s2_easy,
+            double& time)
+{
+  if (is_resume(json, "S2_easy", x, y, z) &&
+      json["S2_easy"].count("s2_easy"))
+  {
+    double percent = json["S2_easy"]["percent"];
+    double seconds = json["S2_easy"]["seconds"];
+
+    s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
+    time = get_wtime() - seconds;
+    print_resume(percent, x);
+    return true;
+  }
+
+  return false;
 }
 
 template <typename T, typename J>
@@ -147,51 +192,6 @@ double get_time(J& json,
   }
 
   return time;
-}
-
-/// resume result
-template <typename T, typename J>
-bool resume(J& json,
-            T x,
-            int64_t y,
-            int64_t z,
-            T& s2_easy,
-            double& time)
-{
-  if (is_resume(json, "S2_easy", x, y, z) &&
-      json["S2_easy"].count("s2_easy"))
-  {
-    double percent = json["S2_easy"]["percent"];
-    double seconds = json["S2_easy"]["seconds"];
-
-    s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
-    time = get_wtime() - seconds;
-    print_resume(percent, x);
-    return true;
-  }
-
-  return false;
-}
-
-/// resume thread
-template <typename T, typename J>
-bool resume(J& json,
-            T x,
-            int64_t y,
-            int64_t z,
-            int64_t& b,
-            int thread_id,
-            T& s2_easy)
-{
-  if (is_resume(json, "S2_easy", thread_id, x, y, z))
-  {
-    string tid = "thread" + to_string(thread_id);
-    b = json["S2_easy"][tid]["b"];
-    s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
-    return true;
-  }
-
-  return false;
 }
 
 template <typename T, typename Primes>
@@ -299,7 +299,7 @@ T S2_easy_OpenMP(T x,
       {
         b = start++;
 
-        backup(json, start, b, i, s2_easy);
+        update(json, start, b, i, s2_easy);
 
         if (is_backup(backup_time))
         {
