@@ -84,7 +84,7 @@ void backup(J& json,
   store_backup(json);
 }
 
-/// update thread vars
+/// update json
 template <typename T, typename J>
 void update(J& json,
             int64_t start,
@@ -94,9 +94,9 @@ void update(J& json,
 {
   string tid = "thread" + to_string(thread_id);
 
-  json["S2_easy"]["start"] = start;
   json["S2_easy"][tid]["b"] = b;
-  json["S2_easy"][tid]["s2_easy"] = to_string(s2_easy);
+  json["S2_easy"]["start"] = start;
+  json["S2_easy"]["s2_easy"] = to_string(s2_easy);
 }
 
 /// resume thread
@@ -106,14 +106,40 @@ bool resume(J& json,
             int64_t y,
             int64_t z,
             int64_t& b,
-            int thread_id,
-            T& s2_easy)
+            int thread_id)
 {
   if (is_resume(json, "S2_easy", thread_id, x, y, z))
   {
     string tid = "thread" + to_string(thread_id);
     b = json["S2_easy"][tid]["b"];
-    s2_easy = calculator::eval<T>(json["S2_easy"][tid]["s2_easy"]);
+    return true;
+  }
+
+  return false;
+}
+
+/// resume vars
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            T& s2_easy,
+            int64_t& start,
+            int& threads,
+            double& time)
+{
+  if (is_resume(json, "S2_easy", x, y, z))
+  {
+    double percent = json["S2_easy"]["percent"];
+    double seconds = json["S2_easy"]["seconds"];
+
+    int backup_threads = json["S2_easy"]["threads"];
+    s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
+    start = json["S2_easy"]["start"];
+    threads = max(threads, backup_threads);
+    time = get_wtime() - seconds;
+    print_resume(percent, x);
     return true;
   }
 
@@ -130,7 +156,7 @@ bool resume(J& json,
             double& time)
 {
   if (is_resume(json, "S2_easy", x, y, z) &&
-      json["S2_easy"].count("s2_easy"))
+      !json["S2_easy"].count("threads"))
   {
     double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
@@ -142,57 +168,6 @@ bool resume(J& json,
   }
 
   return false;
-}
-
-template <typename T, typename J>
-int64_t get_start(J& json,
-                  T x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t start)
-{
-  if (is_resume(json, "S2_easy", x, y, z) &&
-      json["S2_easy"].count("start"))
-  {
-    start = json["S2_easy"]["start"];
-  }
-
-  return start;
-}
-
-template <typename T, typename J>
-int get_threads(J& json,
-                T x,
-                int64_t y,
-                int64_t z,
-                int threads)
-{
-  if (is_resume(json, "S2_easy", x, y, z) &&
-      json["S2_easy"].count("threads"))
-  {
-    double percent = json["S2_easy"]["percent"];
-    int backup_threads = json["S2_easy"]["threads"];
-    threads = max(threads, backup_threads);
-    print_resume(percent, x);
-  }
-
-  return threads;
-}
-
-template <typename T, typename J>
-double get_time(J& json,
-                T x,
-                int64_t y,
-                int64_t z,
-                double time)
-{
-  if (is_resume(json, "S2_easy", x, y, z))
-  {
-    double seconds = json["S2_easy"]["seconds"];
-    time = get_wtime() - seconds;
-  }
-
-  return time;
 }
 
 using fastdiv_t = libdivide::divider<uint64_t, libdivide::BRANCHFREE>;
@@ -299,41 +274,35 @@ T S2_easy_OpenMP(T x,
                  int threads,
                  double& time)
 {
-  T s2 = 0;
+  T s2_easy = 0;
   auto json = load_backup();
   auto copy = json;
 
-  if (resume(json, x, y, z, s2, time))
-    return s2;
-
-  if (!is_resume(json, "S2_easy", x, y, z))
-    json.erase("S2_easy");
+  if (resume(json, x, y, z, s2_easy, time))
+    return s2_easy;
 
   PiTable pi(y);
   S2Status status(x);
   auto fastdiv = libdivide_vector(primes);
   double backup_time = get_wtime();
-  time = get_time(json, x, y, z, time);
 
   int64_t x13 = iroot<3>(x);
   int64_t pi_x13 = pi[x13];
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t start = max(c, pi_sqrty) + 1;
-  start = get_start(json, x, y, z, start);
+  threads = ideal_num_threads(threads, x13, 1000);
 
-  int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
-  threads = get_threads(json, x, y, z, threads);
+  if (!resume(json, x, y, z, s2_easy, start, threads, time))
+    json.erase("S2_easy");
 
-  #pragma omp parallel for \
-      num_threads(threads) reduction(+: s2)
+  #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    T s2_easy = 0;
+    T s2_thread = 0;
     int64_t b = 0;
 
-    if (resume(copy, x, y, z, b, i, s2_easy))
-      s2_easy += S2_easy(x, y, z, b, primes, fastdiv, pi);
+    if (resume(copy, x, y, z, b, i))
+      s2_thread = S2_easy(x, y, z, b, primes, fastdiv, pi);
 
     while (true)
     {
@@ -342,6 +311,7 @@ T S2_easy_OpenMP(T x,
 
       #pragma omp critical (s2_easy)
       {
+        s2_easy += s2_thread;
         b = start++;
 
         update(json, start, b, i, s2_easy);
@@ -357,15 +327,13 @@ T S2_easy_OpenMP(T x,
       if (b > pi_x13)
         break;
 
-      s2_easy += S2_easy(x, y, z, b, primes, fastdiv, pi);
+      s2_thread = S2_easy(x, y, z, b, primes, fastdiv, pi);
     }
-
-    s2 += s2_easy;
   }
 
-  backup(json, x, y, z, s2, time);
+  backup(json, x, y, z, s2_easy, time);
 
-  return s2;
+  return s2_easy;
 }
 
 } // namespace
