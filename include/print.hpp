@@ -44,6 +44,8 @@ void print_seconds(double seconds);
 
 void print_status(double percent, maxint_t x);
 
+void print_resume(double percent, maxint_t x);
+
 
 void print_log(const std::string& str);
 

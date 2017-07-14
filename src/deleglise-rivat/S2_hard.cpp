@@ -183,8 +183,7 @@ T S2_hard_OpenMP(T x,
 {
   LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   threads = ideal_num_threads(threads, z);
-  int resume_threads = loadBalancer.resume_threads();
-  threads = max(threads, resume_threads);
+  threads = loadBalancer.get_threads(threads);
 
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);

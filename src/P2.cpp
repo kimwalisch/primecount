@@ -133,13 +133,6 @@ void backup(J& json,
   store_backup(json);
 }
 
-template <typename T>
-void print_resume(double percent, T x)
-{
-  print_log("Resuming from " + backup_file());
-  print_status(percent, x);
-}
-
 template <typename T, typename J>
 void resume(J& json,
             T x,

@@ -10,6 +10,7 @@
 #include <print.hpp>
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
+#include <backup.hpp>
 #include <stdint.h>
 
 #include <fstream>
@@ -268,6 +269,12 @@ void print_status(double percent, maxint_t x)
 {
   if (is_print())
     cout << "Status: " << fixed << setprecision(get_status_precision(x)) << percent << '%' << flush;
+}
+
+void print_resume(double percent, maxint_t x)
+{
+  print_log("Resuming from " + backup_file());
+  print_status(percent, x);
 }
 
 } // namespace

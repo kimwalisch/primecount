@@ -49,21 +49,13 @@ using namespace std;
 
 namespace primecount {
 
-template <typename T>
-void print_resume(double percent, T x)
+int LoadBalancer::get_threads(int threads) const
 {
-  print_log("Resuming from " + backup_file());
-  print_status(percent, x);
-}
-
-int LoadBalancer::resume_threads() const
-{
-  int threads = 0;
-
   if (is_resume(copy_, "S2_hard", x_, y_, z_))
   {
-    threads = copy_["S2_hard"]["threads"];
-    double percent = json_["S2_hard"]["percent"];
+    double percent = copy_["S2_hard"]["percent"];
+    int backup_threads = copy_["S2_hard"]["threads"];
+    threads = max(threads, backup_threads);
     print_resume(percent, x_);
   }
 

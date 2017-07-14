@@ -51,13 +51,6 @@ void backup(T x,
 }
 
 template <typename T>
-void print_resume(double percent, T x)
-{
-  print_log("Resuming from " + backup_file());
-  print_status(percent, x);
-}
-
-template <typename T>
 bool resume(T x,
             int64_t y,
             int64_t z,

@@ -42,13 +42,6 @@ bool is_backup(double time)
   return seconds > 60;
 }
 
-template <typename T>
-void print_resume(double percent, T x)
-{
-  print_log("Resuming from " + backup_file());
-  print_status(percent, x);
-}
-
 /// backup to file
 template <typename T, typename J>
 void backup(J& json,
