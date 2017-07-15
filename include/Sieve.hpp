@@ -31,7 +31,10 @@ typedef uint8_t byte_t;
 
 struct Wheel
 {
-  Wheel() { }
+  Wheel()
+    : multiple(0),
+      index(0)
+  { }
   Wheel(uint32_t m, uint32_t i)
     : multiple(m),
       index(i)
