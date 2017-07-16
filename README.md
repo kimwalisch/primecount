@@ -69,6 +69,29 @@ Resuming from primecount.backup
 Status: 46%
 ```
 
+## Batch processing
+
+It is possible to create a ```worktodo.txt``` file with a list of
+numbers to compute e.g.:
+
+```sh
+# worktodo.txt
+10000000
+1e15
+1e15 --alpha=10 --threads=4
+1e14 --P2
+1e18 --S2_hard
+```
+
+Then you can process all numbers from ```worktodo.txt``` using:
+
+```sh
+$ scripts/worktodo.sh
+```
+
+The results will be stored in ```results.txt``` and extended
+details are logged into ```primecount.log```.
+
 ## Command-line options
 
 ```
@@ -121,26 +144,3 @@ Examples:
   primecount 1e13
   primecount 1e13 --nthprime --threads=4
 ```
-
-## Batch processing
-
-It is possible to create a ```worktodo.txt``` file with a list of
-numbers to compute e.g.:
-
-```sh
-# worktodo.txt
-10000000
-1e15
-1e15 --alpha=10 --threads=4
-1e14 --P2
-1e18 --S2_hard
-```
-
-Then you can process all numbers from ```worktodo.txt``` using:
-
-```sh
-$ scripts/worktodo.sh
-```
-
-The results will be stored in ```results.txt``` and extended
-details are logged into ```primecount.log```.
