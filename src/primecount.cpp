@@ -286,10 +286,10 @@ double get_alpha_deleglise_rivat(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
-    double a = 0.000356618;
-    double b = 0.00263762;
-    double c = -0.125227;
-    double d = 1.39952;
+    double a = 0.00033826;
+    double b = 0.0018113;
+    double c = -0.110407;
+    double d = 1.3724;
     double logx = log(x2);
 
     alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
