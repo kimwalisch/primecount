@@ -164,6 +164,11 @@ LoadBalancer::LoadBalancer(maxint_t x,
   // in parallel by multiple threads
   copy_ = json_;
 
+  init_size();
+  maxint_t x16 = iroot<6>(x);
+  double alpha = get_alpha(x, y);
+  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
+
   if (is_resume(json_, "S2_hard", x_, y_, z_))
   {
     double seconds = copy_["S2_hard"]["seconds"];
@@ -184,11 +189,6 @@ LoadBalancer::LoadBalancer(maxint_t x,
     json_["S2_hard"]["y"] = y_;
     json_["S2_hard"]["z"] = z_;
   }
-
-  init_size();
-  maxint_t x16 = iroot<6>(x);
-  double alpha = get_alpha(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
 }
 
 void LoadBalancer::init_size()
