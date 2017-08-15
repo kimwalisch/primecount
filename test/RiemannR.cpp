@@ -20,23 +20,21 @@ using namespace primecount;
 
 vector<int64_t> Ri_table =
 {
-                     4, // Ri(10^1)
-                    25, // Ri(10^2)
-                   168, // Ri(10^3)
-                  1226, // Ri(10^4)
-                  9587, // Ri(10^5)
-                 78527, // Ri(10^6)
-                664667, // Ri(10^7)
-               5761551, // Ri(10^8)
-              50847455, // Ri(10^9)
-             455050683, // Ri(10^10)
-          4118052494ll, // Ri(10^11)
-         37607910542ll, // Ri(10^12)
-        346065531065ll, // Ri(10^13)
-       3204941731601ll, // Ri(10^14)
-      29844570495886ll, // Ri(10^15)
-     279238341360977ll, // Ri(10^16)
-    2623557157055978ll  // Ri(10^17)
+                 4, // Ri(10^1)
+                25, // Ri(10^2)
+               168, // Ri(10^3)
+              1226, // Ri(10^4)
+              9587, // Ri(10^5)
+             78527, // Ri(10^6)
+            664667, // Ri(10^7)
+           5761551, // Ri(10^8)
+          50847455, // Ri(10^9)
+         455050683, // Ri(10^10)
+      4118052494ll, // Ri(10^11)
+     37607910542ll, // Ri(10^12)
+    346065531065ll, // Ri(10^13)
+   3204941731601ll, // Ri(10^14)
+  29844570495886ll  // Ri(10^15)
 };
 
 void check(bool OK)
@@ -48,12 +46,7 @@ void check(bool OK)
 
 int main()
 {
-  size_t size = 15;
-
-  if (sizeof(long double) > 8)
-    size = Ri_table.size();
-
-  for (size_t i = 0; i < size; i++)
+  for (size_t i = 0; i < Ri_table.size(); i++)
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
@@ -61,7 +54,7 @@ int main()
     check(Ri(x) == Ri_table[i]);
   }
 
-  for (size_t i = 0; i < size; i++)
+  for (size_t i = 0; i < Ri_table.size(); i++)
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
