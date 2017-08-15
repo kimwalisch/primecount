@@ -70,6 +70,14 @@ set(LIB_SRC src/FactorTable.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp)
 
+# Silence GCC switch fall through warnings ###########################
+
+check_cxx_compiler_flag(-Wno-implicit-fallthrough no_fallthrough)
+
+if(no_fallthrough)
+    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+endif()
+
 # Check for MPI (Message Passing Interface) ##########################
 
 if(WITH_MPI)
