@@ -24,16 +24,16 @@ using namespace primesieve;
 
 namespace {
 
-const uint_t primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+const uint64_t primes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
-const uint_t primeProduct[] = { 2, 6, 30, 210, 2310, 30030, 510510, 9699690, 223092870 };
+const uint64_t primeProduct[] = { 2, 6, 30, 210, 2310, 30030, 510510, 9699690, 223092870 };
 
 } // namespace
 
 namespace primesieve {
 
 PreSieve::PreSieve(uint64_t start, uint64_t stop) :
-  limit_(7),
+  maxPrime_(7),
   buffer_(nullptr)
 {
   // use a small buffer_ array if the
@@ -43,43 +43,40 @@ PreSieve::PreSieve(uint64_t start, uint64_t stop) :
 
   for (int i = 4; i < 8; i++)
     if (threshold > primeProduct[i])
-      limit_ = primes[i];
+      maxPrime_ = primes[i];
 
-  for (int i = 0; primes[i] <= limit_; i++)
+  for (int i = 0; primes[i] <= maxPrime_; i++)
     primeProduct_ = primeProduct[i];
 
-  allocate();
+  init();
 }
 
-void PreSieve::allocate()
+void PreSieve::init()
 {
   size_ = primeProduct_ / NUMBERS_PER_BYTE;
   deleter_.reset(new byte_t[size_]);
   buffer_ = deleter_.get();
   memset(buffer_, 0xff, size_);
 
-  uint_t stop = primeProduct_ * 2;
-  EratSmall eratSmall(stop, size_, limit_);
+  uint64_t stop = primeProduct_ * 2;
+  EratSmall eratSmall(stop, size_, maxPrime_);
 
-  for (int i = 3; primes[i] <= limit_; i++)
+  for (int i = 3; primes[i] <= maxPrime_; i++)
     eratSmall.addSievingPrime(primes[i], primeProduct_);
 
-  // cross-off the multiples of small
-  // primes <= limit in buffer
-  eratSmall.crossOff(buffer_, &buffer_[size_]);
+  // pre-sieve [primeProduct, primeProduct * 2]
+  eratSmall.crossOff(buffer_, size_);
 }
 
-/// Pre-sieve multiples of small primes <= limit
-/// by copying buffer_ to sieve
-///
+/// Pre-sieve multiples of small primes
 void PreSieve::copy(byte_t* sieve,
-                    uint_t sieveSize,
+                    uint64_t sieveSize,
                     uint64_t segmentLow) const
 {
-  // map segmentLow to the buffer array
-  uint_t remainder = (uint_t)(segmentLow % primeProduct_);
-  uint_t index = remainder / NUMBERS_PER_BYTE;
-  uint_t sizeLeft = size_ - index;
+  // find segmentLow index
+  uint64_t remainder = segmentLow % primeProduct_;
+  uint64_t index = remainder / NUMBERS_PER_BYTE;
+  uint64_t sizeLeft = size_ - index;
 
   if (sieveSize <= sizeLeft)
     memcpy(sieve, &buffer_[index], sieveSize);

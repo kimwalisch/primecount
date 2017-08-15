@@ -40,6 +40,7 @@ double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2
 {
   double p1 = skewed_percent(low, limit);
   double p2 = skewed_percent(S2, S2_approx);
+
   double percent = max(p1, p2);
 
   // p2 is just an approximation,

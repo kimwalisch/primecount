@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 4)
-set(PRIMECOUNT_VERSION_MINOR 1)
+set(PRIMECOUNT_VERSION_MINOR 2)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 set(CMAKE_BUILD_TYPE Release)
 
@@ -69,6 +69,14 @@ set(LIB_SRC src/backup.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp)
+
+# Silence GCC switch fall through warnings ###########################
+
+check_cxx_compiler_flag(-Wno-implicit-fallthrough no_fallthrough)
+
+if(no_fallthrough)
+    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+endif()
 
 # Check for MPI (Message Passing Interface) ##########################
 

@@ -72,8 +72,8 @@ primesieve --help
 ## Build instructions
 
 Building primesieve requires a compiler which supports C++11 (or later)
-and CMake ≥ 3.1. If your compiler does not support C++11 you can fall back 
-to [primesieve-5.x](https://github.com/kimwalisch/primesieve/tree/v5.7.3)
+and CMake ≥ 3.1. If your compiler does not yet support C++11 you can fall back 
+to [primesieve-5.7.3](https://github.com/kimwalisch/primesieve/tree/v5.7.3)
 which is written in C++98.
 
 ```sh
@@ -176,13 +176,12 @@ export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 #### Microsoft Visual C++
 
 ```sh
-cl /O2 /EHsc primes.cpp /I primesieve\include /link primesieve\primesieve.lib
+cl /O2 /EHsc primes.cpp /I primesieve\include /link primesieve.lib
 ```
 
 ## Bindings for other languages
 
-primesieve supports C++ and C directly, and has bindings available for
-a few other languages:
+primesieve natively supports C and C++ and has bindings available for:
 
 <table>
     <tr>
@@ -190,8 +189,16 @@ a few other languages:
         <td><a href="https://github.com/hickford/primesieve-python">primesieve-python</a></td>
     </tr>
     <tr>
+        <td><b>Perl:</b></td>
+        <td><a href="https://github.com/CurtTilmes/perl6-primesieve">perl6-primesieve</a></td>
+    </tr>
+    <tr>
         <td><b>Ruby:</b></td>
         <td><a href="https://github.com/robertjlooby/primesieve-ruby">primesieve-ruby</a></td>
+    </tr>
+    <tr>
+        <td><b>Rust:</b></td>
+        <td><a href="https://github.com/pthariensflame/primesieve.rs">primesieve.rs</a></td>
     </tr>
 </table>
 

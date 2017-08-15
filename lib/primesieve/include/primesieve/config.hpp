@@ -18,11 +18,6 @@
   #define NDEBUG
 #endif
 
-/// Default CPU L1 data cache size in kilobytes (per core)
-#ifndef L1_DCACHE_SIZE
-  #define L1_DCACHE_SIZE 32
-#endif
-
 namespace primesieve {
 
 /// byte_t must be unsigned in primesieve
@@ -77,7 +72,7 @@ enum {
 
   /// Sieving primes <= (sieveSize in bytes * FACTOR_ERATMEDIUM)
   /// (and > EratSmall see above) are processed in EratMedium objects.
-  /// @pre FACTOR_ERATMEDIUM >= 0 && <= 9
+  /// @pre FACTOR_ERATMEDIUM >= 0 && <= 5
   ///
   /// Statistically ideal factor for 4th Wheel is:
   /// FACTOR_ERATMEDIUM * 2 + FACTOR_ERATMEDIUM * 10 = 30
