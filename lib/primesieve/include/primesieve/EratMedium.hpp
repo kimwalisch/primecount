@@ -11,10 +11,11 @@
 #define ERATMEDIUM_HPP
 
 #include "config.hpp"
+#include "Bucket.hpp"
 #include "Wheel.hpp"
 
 #include <stdint.h>
-#include <list>
+#include <vector>
 
 namespace primesieve {
 
@@ -22,17 +23,15 @@ namespace primesieve {
 /// of Eratosthenes optimized for medium sieving primes that
 /// have a few multiples per segment
 ///
-class EratMedium : public Modulo210Wheel_t
+class EratMedium : public Wheel210_t
 {
 public:
-  EratMedium(uint64_t, uint_t, uint_t);
-  uint_t getLimit() const { return limit_; }
-  void crossOff(byte_t*, uint_t);
+  EratMedium(uint64_t, uint64_t, uint64_t);
+  void crossOff(byte_t*, uint64_t);
 private:
-  uint_t limit_;
-  std::list<Bucket> buckets_;
-  void storeSievingPrime(uint_t, uint_t, uint_t);
-  static void crossOff(byte_t*, uint_t, Bucket&);
+  uint64_t maxPrime_;
+  std::vector<SievingPrime> primes_;
+  void storeSievingPrime(uint64_t, uint64_t, uint64_t);
 };
 
 } // namespace
