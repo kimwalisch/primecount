@@ -1,3 +1,16 @@
+2017-08-16 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.2 work in progress.
+
+  The computation of the second partial sieve function
+  P2(x, a) has been speed up by 10% due to an upgrade to the
+  latest primesieve-6.1 library.
+
+  * lib/primesieve: upgrade to version 6.1.
+  * src/backup.cpp: Speed up resume from backup.
+  * test/RiemannR.cpp: Fix bash/ubuntu on Windows issue.
+  * CMakeLists.txt: Silence GCC 7 warnings.
+
 2017-07-19 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.1 released.
