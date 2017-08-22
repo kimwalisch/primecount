@@ -209,66 +209,66 @@ space.
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.04s</td>
     <td>0.03s</td>
     <td>0.02s</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
+    <td>0.01s</td>
   </tr>
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.13s</td>
-    <td>0.07s</td>
+    <td>0.10s</td>
+    <td>0.06s</td>
     <td>0.03s</td>
-    <td>0.03s</td>
+    <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.69s</td>
-    <td>0.32s</td>
-    <td>0.09s</td>
-    <td>0.08s</td>
+    <td>0.46s</td>
+    <td>0.26s</td>
+    <td>0.06s</td>
+    <td>0.04s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>3.93s</td>
-    <td>1.71s</td>
-    <td>0.30s</td>
+    <td>2.66s</td>
+    <td>1.28s</td>
     <td>0.19s</td>
+    <td>0.10s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>27.15s</td>
-    <td>11.25s</td>
-    <td>1.16s</td>
-    <td>0.64s</td>
+    <td>17.51s</td>
+    <td>7.65s</td>
+    <td>0.73s</td>
+    <td>0.36s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>214.99s</td>
-    <td>85.18s</td>
-    <td>5.25s</td>
-    <td>2.28s</td>
+    <td>136.16s</td>
+    <td>55.30s</td>
+    <td>2.95s</td>
+    <td>1.26s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>1,807.24s</td>
-    <td>700.79s</td>
-    <td>24.08s</td>
-    <td>9.21s</td>
+    <td>1,155.34s</td>
+    <td>457.11s</td>
+    <td>12.49s</td>
+    <td>4.57s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>15,801.25s</td>
-    <td>6,085.91s</td>
-    <td>111.88s</td>
-    <td>38.48s</td>
+    <td>10,249.59s</td>
+    <td>3,974.21s</td>
+    <td>55.87s</td>
+    <td>18.97s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -276,7 +276,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>173.98s</td>
+    <td>86.13s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -284,7 +284,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>754.82s</td>
+    <td>373.09s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -292,7 +292,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>3,285.29s</td>
+    <td>1,828.89s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -300,10 +300,10 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>14,689.46s</td>
+    <td>8,215.59s</td>
   </tr>
 </table>
 
-The benchmarks above were run on an Intel Core i7-6700 CPU (4 x 3.4
-GHz) from 2015 using a Linux x64 operating system and primecount was
-compiled using GCC 6.3.
+The benchmarks above were run on an AMD Ryzen 7 1700 CPU (8 x 3.0
+GHz, 3.7 GHz Turbo) from 2017 and primecount was compiled using
+GCC 6.3.
