@@ -244,7 +244,7 @@ space.
     <td>17.51s</td>
     <td>7.65s</td>
     <td>0.73s</td>
-    <td>0.36s</td>
+    <td>0.35s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
@@ -292,7 +292,7 @@ space.
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,828.89s</td>
+    <td>1,747.57s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
