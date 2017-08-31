@@ -1,6 +1,6 @@
 ///
 /// @file   config.hpp
-/// @brief  Constants that set various limits within primesieve.
+/// @brief  primesieve compile time constants.
 ///
 /// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -50,7 +50,8 @@ enum {
   BYTES_PER_ALLOC = (1 << 20) * 8,
 
   /// primesieve::iterator caches at least MIN_CACHE_ITERATOR
-  /// bytes of primes. L3_CACHE_SIZE is a good value.
+  /// bytes of primes. Larger is usually faster but also
+  /// requires more memory.
   ///
   MIN_CACHE_ITERATOR = (1 << 20) * 8,
 
@@ -86,11 +87,6 @@ enum {
   /// @pre MIN_THREAD_DISTANCE >= 100
   ///
   const uint64_t MIN_THREAD_DISTANCE = (uint64_t) 1e7;
-
-  /// Each thread sieves at most a distance of MAX_THREAD_DISTANCE
-  /// in order to prevent load imbalance near 99%.
-  ///
-  const uint64_t MAX_THREAD_DISTANCE = (uint64_t) 2e10;
 
 } // namespace config
 } // namespace primesieve
