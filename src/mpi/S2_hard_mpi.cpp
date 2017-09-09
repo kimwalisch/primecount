@@ -253,7 +253,7 @@ T S2_hard_mpi_master(T x,
       s2_hard += msg.s2_hard<T>();
 
       // update msg with new work
-      loadBalancer.get_work(&msg, s2_hard);
+      loadBalancer.get_work(&msg);
 
       // send new work to slave process
       msg.send(msg.proc_id());

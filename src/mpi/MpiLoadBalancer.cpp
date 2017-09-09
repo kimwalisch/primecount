@@ -64,7 +64,7 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
   segment_size_ = Sieve::get_segment_size(size);
 }
 
-void MpiLoadBalancer::get_work(MpiMsg* msg, maxint_t s2_hard)
+void MpiLoadBalancer::get_work(MpiMsg* msg)
 {
   s2_hard_ += msg->s2_hard<maxint_t>();
 
