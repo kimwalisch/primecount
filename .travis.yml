@@ -49,7 +49,7 @@ script:
   - mkdir build
   - cd build
   - export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas";
-  - if [ "$CXX" = "g++-4.9" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-error=literal-suffix"; fi
+  - if [ "$CXX" = "g++-4.9" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-literal-suffix"; fi
   - cmake .. -DWITH_MPI=ON
   - make -j4
   - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
