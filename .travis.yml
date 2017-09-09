@@ -23,8 +23,8 @@ install:
   - wget --no-check-certificate http://cmake.org/files/v3.1/cmake-3.1.3-Linux-x86_64.tar.gz
   - tar -xzf cmake-3.1.3-Linux-x86_64.tar.gz
   - export PATH=$PWD/cmake-3.1.3-Linux-x86_64/bin:$PATH
-  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-error=literal-suffix"; fi
-  - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas -Wno-error=literal-suffix"; fi
+  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9"; fi
   - if [ "$CC" = "gcc" ]; then export CC="gcc-4.9"; fi
 
@@ -49,6 +49,7 @@ script:
   - mkdir build
   - cd build
   - export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas";
+  - if [ "$CXX" = "g++-4.9" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-error=literal-suffix"; fi
   - cmake .. -DWITH_MPI=ON
   - make -j4
   - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
