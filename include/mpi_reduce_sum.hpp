@@ -12,6 +12,7 @@
 #define MPI_REDUCE_SUM_HPP
 
 #include <mpi.h>
+#include <primecount-internal.hpp>
 #include <int128_t.hpp>
 #include <cassert>
 
@@ -31,6 +32,7 @@ inline void mpi_sum_helper(int* x, int* sum)
 
 inline void mpi_sum(int* x, int* sum, int* len, MPI_Datatype *dtype)
 {
+  unused_param(dtype);
   if (*len * sizeof(int64_t) == sizeof(int64_t))
     mpi_sum_helper<int64_t>(x, sum);
 #if defined(HAVE_INT128_T)
