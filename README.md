@@ -32,9 +32,6 @@ You need to have installed a C++ compiler, cmake and make. Ideally
 primecount should be compiled using the GCC compiler as GCC supports
 both OpenMP and 128-bit integers.
 
-Download a [tarball](https://github.com/kimwalisch/primecount/archive/backup2.zip)
-of the ```backup2``` branch and build it using:
-
 ```sh
 cmake .
 make -j
