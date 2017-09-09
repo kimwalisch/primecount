@@ -33,8 +33,8 @@ script:
   - sed -i 's#CMAKE_BUILD_TYPE Release#CMAKE_BUILD_TYPE Debug#g' CMakeLists.txt
   - mkdir build
   - cd build
-  - if [ "$CXX" = "g++-4.9" ]; then cmake .. -DWITH_MPI=ON; fi
-  - if [ "$CXX" = "clang++" ]; then cmake .. -DWITH_MPI=ON -DOpenMP_CXX_FLAGS=""; fi
+  - if [ "$CXX" = "g++-4.9" ]; then cmake .. -DBUILD_TESTS=ON; fi
+  - if [ "$CXX" = "clang++" ]; then cmake .. -DBUILD_TESTS=ON -DOpenMP_CXX_FLAGS=""; fi
   - make -j4
   - make test
   - ldd primecount
