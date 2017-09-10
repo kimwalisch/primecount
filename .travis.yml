@@ -34,7 +34,7 @@ script:
   - mkdir build
   - cd build
   - if [ "$CXX" = "g++-4.9" ]; then cmake .. -DBUILD_TESTS=ON; fi
-  - if [ "$CXX" = "clang++" ]; then cmake .. -DBUILD_TESTS=ON -DOpenMP_CXX_FLAGS=""; fi
+  - if [ "$CXX" = "clang++" ]; then cmake .. -DBUILD_TESTS=ON -DWITH_OPENMP=OFF; fi
   - make -j4
   - make test
   - ldd primecount
@@ -51,6 +51,6 @@ script:
   - cd build
   - if [ "$CXX" = "g++-4.9" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-literal-suffix"; fi
   - if [ "$CXX" = "g++-4.9" ]; then cmake .. -DWITH_MPI=ON; fi
-  - if [ "$CXX" = "clang++" ]; then cmake .. -DWITH_MPI=ON -DOpenMP_CXX_FLAGS=""; fi
+  - if [ "$CXX" = "clang++" ]; then cmake .. -DWITH_MPI=ON -DWITH_OPENMP=OFF; fi
   - make -j4
   - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
