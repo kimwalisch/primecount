@@ -12,7 +12,7 @@ that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
 algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and
 Deleglise-Rivat all of which have been parallelized using
 [OpenMP](http://en.wikipedia.org/wiki/OpenMP). The Deleglise-Rivat
-implementation has been 
+implementation has also been 
 [distributed](https://github.com/kimwalisch/primecount/blob/master/doc/primecount-MPI.md#primecount-mpi)
 using MPI.
 
