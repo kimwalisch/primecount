@@ -24,11 +24,6 @@ void check(bool OK)
     exit(1);
 }
 
-uint64_t prev_power_of_2_cmath(uint64_t n)
-{
-  return 1ull << (uint64_t) (log((double) n) / log(2.0));
-}
-
 int main()
 {
   uint64_t n;
@@ -38,20 +33,20 @@ int main()
   for (n = 1; n < 100000; n++)
   {
     res1 = prev_power_of_2(n);
-    res2 = prev_power_of_2_cmath(n);
+    res2 = 1ull << (uint64_t) log2(n);
     cout << "prev_power_of_2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
   n = (1ull << 32) - 1;
   res1 = prev_power_of_2(n);
-  res2 = prev_power_of_2_cmath(n);
+  res2 = 1ull << (uint64_t) log2(n);
   cout << "prev_power_of_2(" << n << ") = " << res1;
   check(res1 == res2);
 
   n = 1ull << 32;
   res1 = prev_power_of_2(n);
-  res2 = prev_power_of_2_cmath(n);
+  res2 = 1ull << (uint64_t) log2(n);
   cout << "prev_power_of_2(" << n << ") = " << res1;
   check(res1 == res2);
 
