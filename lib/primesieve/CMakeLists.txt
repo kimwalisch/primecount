@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(primesieve)
-set(PRIMESIEVE_VERSION "6.2")
-set(PRIMESIEVE_SOVERSION "8.2.0")
+set(PRIMESIEVE_VERSION "6.3")
+set(PRIMESIEVE_SOVERSION "8.3.0")
 set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
@@ -57,12 +57,39 @@ if(no_fallthrough)
     set_source_files_properties(src/primesieve/EratSmall.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
+# Check if libatomic is needed #######################################
+
+include(CheckCXXSourceCompiles)
+
+set(CMAKE_OLD_FLAGS ${CMAKE_REQUIRED_FLAGS})
+set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
+
+check_cxx_source_compiles("
+    #include <atomic>
+    int main() {
+        std::atomic<int> x;
+        x = 1;
+        x--;
+        return x;
+    }"
+    have_atomic)
+
+set(CMAKE_REQUIRED_FLAGS ${CMAKE_OLD_FLAGS})
+
+if(NOT have_atomic)
+    find_library(ATOMIC NAMES atomic libatomic.so libatomic.so.1)
+    if(ATOMIC)
+        set(LIBATOMIC ${ATOMIC})
+        message(STATUS "Found libatomic: TRUE")
+    endif()
+endif()
+
 # libprimesieve ######################################################
 
 add_library(libprimesieve ${LIB_SRC})
 set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
 find_package(Threads REQUIRED)
-target_link_libraries(libprimesieve Threads::Threads)
+target_link_libraries(libprimesieve Threads::Threads ${LIBATOMIC})
 
 target_include_directories(libprimesieve PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -76,21 +103,21 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 install(TARGETS libprimesieve
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
 
 # static_libprimesieve ###############################################
 
 if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     add_library(static_libprimesieve STATIC ${LIB_SRC})
     set_target_properties(static_libprimesieve PROPERTIES OUTPUT_NAME primesieve)
-    target_link_libraries(static_libprimesieve Threads::Threads)
+    target_link_libraries(static_libprimesieve Threads::Threads ${LIBATOMIC})
 
     target_include_directories(static_libprimesieve PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
     install(TARGETS static_libprimesieve
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
 endif()
 
 # primesieve binary ##################################################
@@ -105,7 +132,8 @@ endif()
 # Install headers ####################################################
 
 install(FILES include/primesieve.h
-              include/primesieve.hpp        
+              include/primesieve.hpp
+              COMPONENT libprimesieve-headers
               DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 install(FILES include/primesieve/PrimeSieve.hpp
@@ -114,6 +142,7 @@ install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/iterator.hpp
               include/primesieve/primesieve_error.hpp
               include/primesieve/pmath.hpp
+              COMPONENT libprimesieve-headers
               DESTINATION ${CMAKE_INSTALL_PREFIX}/include/primesieve)
 
 # Regenerate man page ################################################
@@ -160,7 +189,7 @@ endif()
 configure_file(primesieve.pc.in primesieve.pc @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/primesieve.pc
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE}/pkgconfig)
 
 # Add subdirectories #################################################
 
