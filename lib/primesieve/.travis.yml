@@ -1,0 +1,63 @@
+# Test configuration for Travis CI. See <https://travis-ci.org/>.
+language: cpp
+
+branches:
+  except:
+    - gh-pages
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.9
+    - g++-4.9
+
+install:
+  - sudo apt-get install -y ninja-build cppcheck doxygen help2man texlive texlive-latex-extra graphviz libqt4-dev qt4-qmake valgrind
+  - wget --no-check-certificate http://cmake.org/files/v3.1/cmake-3.1.3-Linux-x86_64.tar.gz
+  - tar -xzf cmake-3.1.3-Linux-x86_64.tar.gz
+  - export CXXFLAGS="-Wall -Wextra -Werror -Wno-long-long -pedantic -O2"
+  - export PATH=$PWD/cmake-3.1.3-Linux-x86_64/bin:$PATH
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9"; fi
+  - if [ "$CC" = "gcc" ]; then export CC="gcc-4.9"; fi
+
+script:
+  # 1) Build using GNU make
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_DOC=ON -DCMAKE_INSTALL_PREFIX=$(pwd) ..
+  - make -j4
+  - make doc >/dev/null
+  - make install
+  - cd ..
+  - rm -rf build
+  # 2) Build primesieve GUI app
+  - cd src/gui
+  - qmake QMAKE_CXX=$CXX QMAKE_CC=$CC
+  - make -j4
+  - cd ../..
+  # 3) Build using ninja
+  - mkdir build
+  - cd build
+  - cmake -GNinja -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_DOC=ON ..
+  - ninja
+  - ninja doc >/dev/null
+  # 4) Run integration tests
+  - ninja test
+  - test/cpu_info
+  - test/atomic
+  - cd ..
+  # 5) Test using valgrind
+  - $CXX -Iinclude -O2 -std=c++11 -g examples/cpp/nth_prime.cpp -o nth_prime build/libprimesieve.a -lpthread
+  - valgrind --error-exitcode=1 ./nth_prime 500000000
+  # 6) Test using cppcheck
+  - rm -rf build
+  - cppcheck . -q --error-exitcode=1 -icmake-3.1.3-Linux-x86_64 -iexamples/cpp/prev_prime.cpp -iexamples/cpp/primesieve_iterator.cpp -itest/next_prime1.cpp -itest/prev_prime1.cpp

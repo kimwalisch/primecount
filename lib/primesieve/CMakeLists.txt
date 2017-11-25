@@ -59,30 +59,48 @@ endif()
 
 # Check if libatomic is needed #######################################
 
+include(CMakePushCheckState)
 include(CheckCXXSourceCompiles)
 
-set(CMAKE_OLD_FLAGS ${CMAKE_REQUIRED_FLAGS})
+cmake_push_check_state()
 set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
 
 check_cxx_source_compiles("
     #include <atomic>
+    #include <stdint.h>
     int main() {
-        std::atomic<int> x;
+        std::atomic<int64_t> x;
         x = 1;
         x--;
-        return x;
+        return (int) x;
     }"
-    have_atomic)
+    atomic64)
 
-set(CMAKE_REQUIRED_FLAGS ${CMAKE_OLD_FLAGS})
+if(NOT atomic64)
+    find_library(ATOMIC NAMES atomic libatomic.so.1)
 
-if(NOT have_atomic)
-    find_library(ATOMIC NAMES atomic libatomic.so libatomic.so.1)
     if(ATOMIC)
         set(LIBATOMIC ${ATOMIC})
-        message(STATUS "Found libatomic: TRUE")
+        message(STATUS "Found libatomic: ${LIBATOMIC}")
+    else()
+        check_cxx_source_compiles("
+            #include <atomic>
+            #include <stdint.h>
+            int main() {
+                std::atomic<int32_t> x;
+                x = 1;
+                x--;
+                return (int) x;
+            }"
+            atomic32)
+
+        if(atomic32)
+            message(FATAL_ERROR "Failed to find libatomic!")
+        endif()
     endif()
 endif()
+
+cmake_pop_check_state()
 
 # libprimesieve ######################################################
 
