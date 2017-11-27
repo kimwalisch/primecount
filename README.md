@@ -189,7 +189,7 @@ operations using
 <img src="http://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-## Benchmarks
+## Benchmark
 
 <table>
   <tr align="center">
