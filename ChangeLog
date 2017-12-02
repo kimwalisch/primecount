@@ -1,6 +1,6 @@
-2017-12-01 Kim Walisch  <kim.walisch@gmail.com>
+2017-12-02 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 4.2 work in progress.
+  Version 4.2 released.
 
   The computation of the second partial sieve function
   P2(x, a) has been speed up by 10% due to an upgrade to the
