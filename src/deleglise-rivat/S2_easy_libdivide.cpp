@@ -50,7 +50,10 @@ libdivide_vector(Primes& primes)
   try {
   // branchfree divider must be >= 2
   uint64_t min_divisor = 2;
-  vector<fastdiv_t> fastdiv(1, min_divisor);
+
+  vector<fastdiv_t> fastdiv;
+  fastdiv.reserve(primes.size());
+  fastdiv.push_back(min_divisor);
   fastdiv.insert(fastdiv.end(), primes.begin() + 1, primes.end());
   return fastdiv;
   }
