@@ -45,11 +45,20 @@ template <typename Primes>
 vector<fastdiv_t>
 libdivide_vector(Primes& primes)
 {
+  try {
   // branchfree divider must be >= 2
   uint64_t min_divisor = 2;
   vector<fastdiv_t> fastdiv(1, min_divisor);
   fastdiv.insert(fastdiv.end(), primes.begin() + 1, primes.end());
   return fastdiv;
+  }
+  catch(std::exception& e)
+  {
+    std::cerr << "Exception caught in " << __FILE__ << " in " << __FUNCTION__ << "(): " << e.what() << std::endl;
+    throw;
+  }
+  vector<fastdiv_t> empty;
+  return empty;
 }
 
 /// Calculate the contribution of the clustered easy
