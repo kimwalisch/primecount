@@ -23,8 +23,6 @@
 #include <libdivide.h>
 #include <stdint.h>
 #include <vector>
-#include <iostream>
-#include <exception>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -47,23 +45,11 @@ template <typename Primes>
 vector<fastdiv_t>
 libdivide_vector(Primes& primes)
 {
-  try {
   // branchfree divider must be >= 2
   uint64_t min_divisor = 2;
-
-  vector<fastdiv_t> fastdiv;
-  fastdiv.reserve(primes.size());
-  fastdiv.push_back(min_divisor);
+  vector<fastdiv_t> fastdiv(1, min_divisor);
   fastdiv.insert(fastdiv.end(), primes.begin() + 1, primes.end());
   return fastdiv;
-  }
-  catch(std::exception& e)
-  {
-    std::cerr << "Exception caught in " << __FILE__ << " in " << __FUNCTION__ << "(): " << e.what() << std::endl;
-    throw;
-  }
-  vector<fastdiv_t> empty;
-  return empty;
 }
 
 /// Calculate the contribution of the clustered easy

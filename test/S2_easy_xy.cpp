@@ -37,9 +37,6 @@ void check(bool OK)
 
 int main()
 {
-  try
-  {
-  
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(1, 100000000);
@@ -55,20 +52,27 @@ int main()
     int64_t c = PhiTiny::get_c(y);
     int64_t s2_easy = 0;
 
-    auto primes = generate_primes<int64_t>(y);
-
-    PiTable pi(y);
-    int64_t pi_sqrty = pi[isqrt(y)];
-    int64_t pi_x13 = pi[x13];
-
-    for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+    try
     {
-      int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-      int64_t min_sparse = max(z / primes[b], primes[b]);
-      int64_t l = pi[min_trivial];
+      auto primes = generate_primes<int64_t>(y);
 
-      for (; primes[l] > min_sparse; l--)
-        s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      PiTable pi(y);
+      int64_t pi_sqrty = pi[isqrt(y)];
+      int64_t pi_x13 = pi[x13];
+
+      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+      {
+        int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
+        int64_t min_sparse = max(z / primes[b], primes[b]);
+        int64_t l = pi[min_trivial];
+
+        for (; primes[l] > min_sparse; l--)
+          s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+    }
+    catch (std::exception& e)
+    {
+      std::cerr << "exception caught (memory fragmentation): " << e.what() << std::endl;
+      return 1;
     }
 
     cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
@@ -109,12 +113,6 @@ int main()
   cout << endl;
   cout << "All tests passed successfully!" << endl;
   
-  }
-  catch (std::exception& e)
-  {
-    std::cout << "exception caught: " << e.what() << std::endl;
-    std::cerr << "exception caught: " << e.what() << std::endl;
-    return 1;
   }
 
   return 0;
