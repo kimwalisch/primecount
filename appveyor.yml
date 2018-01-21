@@ -4,7 +4,6 @@
 version: 1.0.{build}
 
 platform:
-  - x86
   - x64
 
 branches:
@@ -13,21 +12,15 @@ branches:
 
 os: Visual Studio 2017
 
+environment:
+  CTEST_OUTPUT_ON_FAILURE: 1
+
 build_script:
   - if "%platform%" == "x86" cmake . -G "Visual Studio 15 2017" -DBUILD_TESTS=ON
   - if "%platform%" == "x64" cmake . -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=ON
   - cmake --build . --config Release
 
 test_script:
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - test/Release/S2_easy_xy.exe
-  - cd Release
-  - primecount.exe --test
+  - ctest -C Release
+  - ctest -C Release
+
