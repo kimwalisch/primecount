@@ -41,8 +41,17 @@ int main()
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(1, 100000000);
 
+  int64_t max_x = 100000;
+  int64_t max_x13 = iroot<3>(max_x);
+  double max_alpha = get_alpha_deleglise_rivat(max_x);
+  int64_t max_y = (int64_t) (max_alpha * max_x13);
+
+  // generate lookup tables
+  auto primes = generate_primes<int64_t>(max_y);
+  PiTable pi(max_y);
+
   // test small x
-  for (int i = 1; i < 100000; i++)
+  for (int64_t i = 1; i < max_x; i++)
   {
     int64_t x = i;
     double alpha = get_alpha_deleglise_rivat(x);
@@ -50,30 +59,18 @@ int main()
     int64_t y = (int64_t) (alpha * x13);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
+    int64_t pi_sqrty = pi[isqrt(y)];
+    int64_t pi_x13 = pi[x13];
     int64_t s2_easy = 0;
 
-    try
+    for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
     {
-      auto primes = generate_primes<int64_t>(y);
+      int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
+      int64_t min_sparse = max(z / primes[b], primes[b]);
+      int64_t l = pi[min_trivial];
 
-      PiTable pi(y);
-      int64_t pi_sqrty = pi[isqrt(y)];
-      int64_t pi_x13 = pi[x13];
-
-      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
-      {
-        int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-        int64_t min_sparse = max(z / primes[b], primes[b]);
-        int64_t l = pi[min_trivial];
-
-        for (; primes[l] > min_sparse; l--)
-          s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
-      }
-    }
-    catch (std::exception& e)
-    {
-      std::cerr << "exception caught (memory fragmentation): " << e.what() << std::endl;
-      return 1;
+      for (; primes[l] > min_sparse; l--)
+        s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
     }
 
     cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
@@ -81,7 +78,7 @@ int main()
   }
 
   // test random x
-  for (int i = 0; i < 10000; i++)
+  for (int64_t i = 0; i < max_x / 10; i++)
   {
     int64_t x = dist(gen);
     double alpha = get_alpha_deleglise_rivat(x);
@@ -89,13 +86,9 @@ int main()
     int64_t y = (int64_t) (alpha * x13);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
-    int64_t s2_easy = 0;
-
-    auto primes = generate_primes<int64_t>(y);
-
-    PiTable pi(y);
     int64_t pi_sqrty = pi[isqrt(y)];
     int64_t pi_x13 = pi[x13];
+    int64_t s2_easy = 0;
 
     for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
     {
