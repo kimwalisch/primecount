@@ -68,6 +68,7 @@ int main()
 
         for (; primes[l] > min_sparse; l--)
           s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      }
     }
     catch (std::exception& e)
     {
