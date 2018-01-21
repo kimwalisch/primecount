@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <exception>
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -36,6 +37,9 @@ void check(bool OK)
 
 int main()
 {
+  try
+  {
+  
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(1, 100000000);
@@ -104,6 +108,13 @@ int main()
 
   cout << endl;
   cout << "All tests passed successfully!" << endl;
+  
+  }
+  catch (std::exception& e)
+  {
+    std::cout << "exception caught: " << e.what() << std::endl;
+    std::cerr << "exception caught: " << e.what() << std::endl;
+  }
 
   return 0;
 }
