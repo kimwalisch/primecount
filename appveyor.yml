@@ -20,5 +20,15 @@ build_script:
 
 test_script:
   - ctest -C Release
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
+  - test/Release/S2_easy_xy.exe
   - cd Release
   - primecount.exe --test
