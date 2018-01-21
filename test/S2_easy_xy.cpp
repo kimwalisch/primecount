@@ -114,6 +114,7 @@ int main()
   {
     std::cout << "exception caught: " << e.what() << std::endl;
     std::cerr << "exception caught: " << e.what() << std::endl;
+    return 1;
   }
 
   return 0;
