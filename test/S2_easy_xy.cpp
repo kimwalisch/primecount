@@ -113,8 +113,6 @@ int main()
 
   cout << endl;
   cout << "All tests passed successfully!" << endl;
-  
-  }
 
   return 0;
 }
