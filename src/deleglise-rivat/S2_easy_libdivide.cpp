@@ -23,6 +23,8 @@
 #include <libdivide.h>
 #include <stdint.h>
 #include <vector>
+#include <iostream>
+#include <exception>
 
 #ifdef _OPENMP
   #include <omp.h>
