@@ -36,70 +36,82 @@ void check(bool OK)
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1, 100000000);
+  int64_t max_x = 100000;
+  double max_alpha = get_alpha_deleglise_rivat(max_x);
+  int64_t max_x13 = iroot<3>(max_x);
+  int64_t max_y = (int64_t) (max_alpha * max_x13);
 
-  // test small x
-  for (int i = 1; i < 100000; i++)
   {
-    int64_t x = i;
-    double alpha = get_alpha_deleglise_rivat(x);
-    int64_t x13 = iroot<3>(x);
-    int64_t y = (int64_t) (alpha * x13);
-    int64_t z = x / y;
-    int64_t c = PhiTiny::get_c(y);
-    int64_t s2_easy = 0;
+    auto primes = generate_primes<int64_t>(max_y);
+    PiTable pi(max_y);
 
-    auto primes = generate_primes<int64_t>(y);
-
-    PiTable pi(y);
-    int64_t pi_sqrty = pi[isqrt(y)];
-    int64_t pi_x13 = pi[x13];
-
-    for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+    // test small x
+    for (int64_t i = 1; i < max_x; i++)
     {
-      int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-      int64_t min_sparse = max(z / primes[b], primes[b]);
-      int64_t l = pi[min_trivial];
+      int64_t x = i;
+      double alpha = get_alpha_deleglise_rivat(x);
+      int64_t x13 = iroot<3>(x);
+      int64_t y = (int64_t) (alpha * x13);
+      int64_t z = x / y;
+      int64_t c = PhiTiny::get_c(y);
+      int64_t pi_sqrty = pi[isqrt(y)];
+      int64_t pi_x13 = pi[x13];
+      int64_t s2_easy = 0;
 
-      for (; primes[l] > min_sparse; l--)
-        s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+      {
+        int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
+        int64_t min_sparse = max(z / primes[b], primes[b]);
+        int64_t l = pi[min_trivial];
+
+        for (; primes[l] > min_sparse; l--)
+          s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      }
+
+      cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
+      check(s2_easy == S2_easy(x, y, z, c, 1));
     }
-
-    cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-    check(s2_easy == S2_easy(x, y, z, c, 1));
   }
 
-  // test random x
-  for (int i = 0; i < 10000; i++)
+  max_x = 100000000;
+  max_alpha = get_alpha_deleglise_rivat(max_x);
+  max_x13 = iroot<3>(max_x);
+  max_y = (int64_t) (max_alpha * max_x13);
+
   {
-    int64_t x = dist(gen);
-    double alpha = get_alpha_deleglise_rivat(x);
-    int64_t x13 = iroot<3>(x);
-    int64_t y = (int64_t) (alpha * x13);
-    int64_t z = x / y;
-    int64_t c = PhiTiny::get_c(y);
-    int64_t s2_easy = 0;
+    auto primes = generate_primes<int64_t>(max_y);
+    PiTable pi(max_y);
 
-    auto primes = generate_primes<int64_t>(y);
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int64_t> dist(1, max_x);
 
-    PiTable pi(y);
-    int64_t pi_sqrty = pi[isqrt(y)];
-    int64_t pi_x13 = pi[x13];
-
-    for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+    // test random x
+    for (int64_t i = 0; i < 10000; i++)
     {
-      int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
-      int64_t min_sparse = max(z / primes[b], primes[b]);
-      int64_t l = pi[min_trivial];
+      int64_t x = dist(gen);
+      double alpha = get_alpha_deleglise_rivat(x);
+      int64_t x13 = iroot<3>(x);
+      int64_t y = (int64_t) (alpha * x13);
+      int64_t z = x / y;
+      int64_t c = PhiTiny::get_c(y);
+      int64_t pi_sqrty = pi[isqrt(y)];
+      int64_t pi_x13 = pi[x13];
+      int64_t s2_easy = 0;
 
-      for (; primes[l] > min_sparse; l--)
-        s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+      {
+        int64_t min_trivial = min(x / (primes[b] * primes[b]), y);
+        int64_t min_sparse = max(z / primes[b], primes[b]);
+        int64_t l = pi[min_trivial];
+
+        for (; primes[l] > min_sparse; l--)
+          s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
+      }
+
+      cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
+      check(s2_easy == S2_easy(x, y, z, c, 1));
     }
-
-    cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-    check(s2_easy == S2_easy(x, y, z, c, 1));
   }
 
   cout << endl;
