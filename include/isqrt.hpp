@@ -56,11 +56,11 @@ template <> struct isqrt_limits<uint64_t> {
 #if defined(HAVE_INT128_T)
 
 template <> struct isqrt_limits<int128_t> {
-  static constexpr uint64_t max() { return 13043817825332782212ull; }
+  static constexpr int128_t max() { return 13043817825332782212ull; }
 };
 
 template <> struct isqrt_limits<uint128_t> {
-  static constexpr uint64_t max() { return 18446744073709551615ull; }
+  static constexpr uint128_t max() { return 18446744073709551615ull; }
 };
 
 #endif
@@ -68,17 +68,15 @@ template <> struct isqrt_limits<uint128_t> {
 template <typename T>
 inline T isqrt(T x)
 {
-  T r = (T) std::sqrt((double) x);
+  T s = (T) std::sqrt((double) x);
+  s = std::min(s, isqrt_limits<T>::max());
 
-  constexpr T max_sqrt = isqrt_limits<T>::max();
-  r = std::min(r, max_sqrt);
+  while (s * s > x)
+    s--;
+  while (x - s * s > s * 2)
+    s++;
 
-  while (r * r > x)
-    r--;
-  while (x - r * r > r * 2)
-    r++;
-
-  return r;
+  return s;
 }
 
 } // namespace
