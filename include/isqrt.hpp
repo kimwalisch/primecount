@@ -18,56 +18,46 @@
 
 namespace primecount {
 
-#if __cplusplus >= 201402L
-
-/// C++14 compile time square root using binary search
 template <typename T>
-constexpr T sqrt_helper(T x, T lo, T hi)
-{
-  if (lo == hi)
-    return lo;
+struct isqrt_limits { };
 
-  const T mid = (lo + hi + 1) / 2;
+template <> struct isqrt_limits<int8_t>
+{ static constexpr int8_t max() { return 11; } };
 
-  if (x / mid < mid)
-    return sqrt_helper<T>(x, lo, mid - 1);
-  else
-    return sqrt_helper(x, mid, hi);
-}
+template <> struct isqrt_limits<uint8_t>
+{ static constexpr uint8_t max() { return 15; } };
 
-template <typename T>
-constexpr T ct_sqrt(T x)
-{
-  return sqrt_helper<T>(x, 0, x / 2 + 1);
-}
+template <> struct isqrt_limits<int16_t>
+{ static constexpr int16_t max() { return 181; } };
 
-#else
+template <> struct isqrt_limits<uint16_t>
+{ static constexpr uint16_t max() { return 255; } };
 
-#define MID ((lo + hi + 1) / 2)
+template <> struct isqrt_limits<int32_t>
+{ static constexpr int32_t max() { return 46340; } };
 
-/// C++11 compile time square root using binary search
-template <typename T>
-constexpr T sqrt_helper(T x, T lo, T hi)
-{
-  return lo == hi ? lo : ((x / MID < MID)
-      ? sqrt_helper<T>(x, lo, MID - 1) : sqrt_helper<T>(x, MID, hi));
-}
+template <> struct isqrt_limits<uint32_t>
+{ static constexpr uint32_t max() { return 65535; } };
 
-template <typename T>
-constexpr T ct_sqrt(T x)
-{
-  return sqrt_helper<T>(x, 0, x / 2 + 1);
-}
+template <> struct isqrt_limits<int64_t>
+{ static constexpr int64_t max() { return 3037000499ll; } };
 
-#endif
+template <> struct isqrt_limits<uint64_t>
+{ static constexpr uint64_t max() { return 4294967295ull; } };
+
+template <> struct isqrt_limits<int128_t>
+{ static constexpr uint64_t max() { return 13043817825332782212ull; } };
+
+template <> struct isqrt_limits<uint128_t>
+{ static constexpr uint64_t max() { return 18446744073709551615ull; } };
 
 template <typename T>
 inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
 
-  constexpr T sqrt_max = ct_sqrt(prt::numeric_limits<T>::max());
-  r = std::min(r, sqrt_max);
+  constexpr T max_sqrt = isqrt_limits<T>::max();
+  r = std::min(r, max_sqrt);
 
   while (r * r > x)
     r--;
