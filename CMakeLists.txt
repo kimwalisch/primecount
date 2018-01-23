@@ -104,14 +104,12 @@ endif()
 
 # Check if int128_t type exists ######################################
 
-check_type_size("int128_t" INT128_T)
-if(HAVE_INT128_T)
-    add_definitions(-DHAVE_INT128_T)
+check_type_size("__int128_t" __INT128_T)
+if(HAVE___INT128_T)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
 else()
-    check_type_size("__int128_t" __INT128_T)
-    if(HAVE___INT128_T)
-        add_definitions(-DHAVE___INT128_T)
+    check_type_size("int128_t" INT128_T)
+    if(HAVE_INT128_T)
         set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
     endif()
 endif()
