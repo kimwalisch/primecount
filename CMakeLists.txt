@@ -4,6 +4,7 @@ set(PRIMECOUNT_VERSION_MAJOR 4)
 set(PRIMECOUNT_VERSION_MINOR 2)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 set(CMAKE_BUILD_TYPE Release)
+include(CheckCXXCompilerFlag)
 
 # Build options ######################################################
 
@@ -24,11 +25,6 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Include Check* #####################################################
-
-include(CheckCXXCompilerFlag)
-include(CheckTypeSize)
 
 # primecount binary source files #####################################
 
