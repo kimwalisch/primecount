@@ -1,5 +1,5 @@
 ///
-/// @file   isqrt_constexr.cpp
+/// @file   isqrt_constexpr.cpp
 /// @brief  Test compile time square root function.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
