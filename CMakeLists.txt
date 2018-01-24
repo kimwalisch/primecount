@@ -68,7 +68,7 @@ set(LIB_SRC src/FactorTable.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp)
+            src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
 
 # Silence GCC switch fall through warnings ###########################
 
@@ -99,18 +99,6 @@ if(WITH_OPENMP)
     if(OPENMP_FOUND)
         message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    endif()
-endif()
-
-# Check if int128_t type exists ######################################
-
-check_type_size("__int128_t" __INT128_T)
-if(HAVE___INT128_T)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
-else()
-    check_type_size("int128_t" INT128_T)
-    if(HAVE_INT128_T)
-        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
     endif()
 endif()
 
