@@ -3,7 +3,7 @@
 /// @brief Calculate the contribution of the trivial special leaves
 ///        in parallel using OpenMP.
 ///
-/// Copyright (C) 2016 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,12 +13,10 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <generate.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <vector>
 
 #ifdef _OPENMP
   #include <omp.h>
