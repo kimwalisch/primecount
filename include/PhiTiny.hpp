@@ -9,7 +9,7 @@
 ///        pp = 2 * 3 * ... * prime[a]
 ///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <array>
 #include <cassert>
+#include <limits>
 #include <vector>
 
 namespace primecount {
