@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,10 +11,8 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <imath.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <string>
 
 using namespace std;
