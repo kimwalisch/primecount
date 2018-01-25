@@ -107,7 +107,7 @@ inline T iroot(T x)
 template <typename T1, typename T2>
 inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
-  assert(primes.empty() || primes[1] == 2);
+  assert(primes.size() < 2 || primes[1] == 2);
   return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
 }
 
