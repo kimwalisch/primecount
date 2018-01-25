@@ -15,6 +15,7 @@
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <vector>
