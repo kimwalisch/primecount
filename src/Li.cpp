@@ -2,7 +2,7 @@
 /// @file  Li.cpp
 /// @brief Logarithmic integral and Riemann R functions
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,7 +13,6 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <limits>
