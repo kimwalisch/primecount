@@ -2,7 +2,7 @@
 /// @file   calculator.cpp
 /// @brief  test program for calculator.hpp
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -68,6 +68,10 @@ int main()
 
   compare(calculator::eval<int64_t>("1e18"), "1000000000000000000");
   compare(calculator::eval<int64_t>("3e18"), "3000000000000000000");
+  compare(calculator::eval<int64_t>("10^0"), "1");
+  compare(calculator::eval<int64_t>("10^1"), "10");
+  compare(calculator::eval<int64_t>("37^2"), "1369");
+  compare(calculator::eval<int64_t>("101^3"), "1030301");
   compare(calculator::eval<int64_t>("3^30"), "205891132094649");
   compare(calculator::eval<int64_t>("2^62-1"), "4611686018427387903");
 
