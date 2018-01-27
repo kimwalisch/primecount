@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 4)
-set(PRIMECOUNT_VERSION_MINOR 2)
+set(PRIMECOUNT_VERSION_MINOR 3)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 set(CMAKE_BUILD_TYPE Release)
+include(CheckCXXCompilerFlag)
 
 # Build options ######################################################
 
@@ -24,11 +25,6 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Include Check* #####################################################
-
-include(CheckCXXCompilerFlag)
-include(CheckTypeSize)
 
 # primecount binary source files #####################################
 
@@ -68,7 +64,7 @@ set(LIB_SRC src/backup.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel1.cpp)
+            src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
 
 # Silence GCC switch fall through warnings ###########################
 
@@ -99,20 +95,6 @@ if(WITH_OPENMP)
     if(OPENMP_FOUND)
         message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    endif()
-endif()
-
-# Check if int128_t type exists ######################################
-
-check_type_size("int128_t" INT128_T)
-if(HAVE_INT128_T)
-    add_definitions(-DHAVE_INT128_T)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
-else()
-    check_type_size("__int128_t" __INT128_T)
-    if(HAVE___INT128_T)
-        add_definitions(-DHAVE___INT128_T)
-        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/pi_deleglise_rivat_parallel2.cpp)
     endif()
 endif()
 
@@ -150,10 +132,13 @@ endif()
 # Check -mpopcnt compiler flag #######################################
 
 if(WITH_POPCNT)
-    set(COPY_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS -Werror)
+    include(CMakePushCheckState)
+
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_FLAGS -Werror)
     check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    set(CMAKE_CXX_FLAGS "${COPY_CXX_FLAGS}")
+    cmake_pop_check_state()
+
     if(mpopcnt)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
     endif()

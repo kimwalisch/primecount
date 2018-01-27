@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -87,10 +87,15 @@ inline T iroot(T x)
   T r = (T) std::pow((double) x, 1.0 / N);
 
   // fix root too large
-  for (; r > 0 && ipow(r, N - 1) > x / r; r--);
+  for (; r > 0; r--)
+  {
+    if (ipow(r, N - 1) <= x / r)
+      break;
+  }
 
   // fix root too small
-  for (; ipow(r + 1, N - 1) <= x / (r + 1); r++);
+  while (ipow(r + 1, N - 1) <= x / (r + 1))
+    r += 1;
 
   return r;
 }
@@ -102,19 +107,8 @@ inline T iroot(T x)
 template <typename T1, typename T2>
 inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
 {
-  assert(primes[0] == 0);
+  assert(primes.size() < 2 || primes[1] == 2);
   return (T2) (std::upper_bound(primes.begin() + 1, primes.end(), x) - (primes.begin() + 1));
-}
-
-template <typename T1, typename T2, typename T3>
-inline T2 in_between(T1 min, T2 x, T3 max)
-{
-  if (x < min)
-    return (T2) min;
-  if (x > max)
-    return (T2) max;
-
-  return x;
 }
 
 } // namespace

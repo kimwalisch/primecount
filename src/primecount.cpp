@@ -2,7 +2,7 @@
 /// @file  primecount.cpp
 /// @brief Function definitions of primecount.hpp
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -158,7 +158,7 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
-    return pi_deleglise_rivat((int64_t) x, threads);
+    return pi_deleglise_rivat_parallel1((int64_t) x, threads);
   else
     return pi_deleglise_rivat_parallel2(x, threads);
 }

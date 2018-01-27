@@ -8,13 +8,13 @@
 /// file in the top level directory.
 ///
 
-#include <calculator.hpp>
-#include <int128_t.hpp>
+#include <primesieve/calculator.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
 #include <string>
+#include <stdint.h>
 
 #define STR1(s) #s
 #define TOSTRING(s) STR1(s)
@@ -33,7 +33,6 @@
 #define EXPRb ((((((((((5))))))  ))))- ((((((((( 6)))))))))
 
 using namespace std;
-using namespace primecount;
 
 template <typename T>
 void compare(T result, const string& str)
@@ -73,15 +72,6 @@ int main()
   compare(calculator::eval<int64_t>("101^3"), "1030301");
   compare(calculator::eval<int64_t>("3^30"), "205891132094649");
   compare(calculator::eval<int64_t>("2^62-1"), "4611686018427387903");
-
-#ifdef HAVE_INT128_T
-
-  compare(calculator::eval<int128_t>("1e25"), "10000000000000000000000000");
-  compare(calculator::eval<int128_t>("3e25"), "30000000000000000000000000");
-  compare(calculator::eval<int128_t>("5^50"), "88817841970012523233890533447265625");
-  compare(calculator::eval<int128_t>("2^120-1"), "1329227995784915872903807060280344575");
-
-#endif
 
   cout << "All tests passed successfully!" << endl;
 

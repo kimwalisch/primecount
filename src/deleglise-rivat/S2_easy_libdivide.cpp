@@ -170,19 +170,21 @@ bool resume(J& json,
   return false;
 }
 
-using fastdiv_t = libdivide::divider<uint64_t, libdivide::BRANCHFREE>;
-
 template <typename T>
 bool is_libdivide(T x)
 {
   return x <= numeric_limits<uint64_t>::max();
 }
 
+using fastdiv_t = libdivide::branchfree_divider<uint64_t>;
+
 template <typename Primes>
 vector<fastdiv_t>
 libdivide_vector(Primes& primes)
 {
-  return vector<fastdiv_t>(primes.begin(), primes.end());
+  vector<fastdiv_t> fastdiv(1);
+  fastdiv.insert(fastdiv.end(), primes.begin() + 1, primes.end());
+  return fastdiv;
 }
 
 template <typename T, typename Primes, typename Fastdiv>

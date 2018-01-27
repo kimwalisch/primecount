@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,7 +12,6 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
-#include <imath.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -136,6 +135,17 @@ double get_wtime();
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
 
 maxint_t to_maxint(const std::string& expr);
+
+template <typename T1, typename T2, typename T3>
+inline T2 in_between(T1 min, T2 x, T3 max)
+{
+  if (x < min)
+    return (T2) min;
+  if (x > max)
+    return (T2) max;
+
+  return x;
+}
 
 template <typename T>
 double get_percent(T low, T limit)

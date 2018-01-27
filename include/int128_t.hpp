@@ -4,7 +4,7 @@
 ///        int128_t, uint128_t, intfast64_t, intfast128_t,
 ///        maxint_t, maxuint_t.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,13 +17,26 @@
 #include <limits>
 #include <type_traits>
 
+/// If INT128_MAX is defined we know that int128_t and
+/// uint128_t are available in stdint.h.
+///
+#if defined(INT128_MAX)
+#define HAVE_INT128_T
+
+namespace primecount {
+
+using maxint_t = int128_t;
+using maxuint_t = uint128_t;
+
+}
+
 /// The __int128_t type (GCC/Clang) is not well supported by
 /// the C++ standard library (in 2016) so we have to define
 /// some functions ourselves. We also define typedefs so we
 /// can use int128_t instead of __int128_t. Once this is done
 /// int128_t can be used like a regular integer type.
 ///
-#if defined(HAVE___INT128_T)
+#elif defined(__SIZEOF_INT128__)
 #define HAVE_INT128_T
 
 #include <ostream>
@@ -46,6 +59,7 @@ inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
     str += '0' + n % 10;
     n /= 10;
   }
+
   if (str.empty())
     str = "0";
 
@@ -60,6 +74,7 @@ inline std::ostream& operator<<(std::ostream& stream, int128_t n)
     stream << "-";
     n = -n;
   }
+
   stream << (uint128_t) n;
   return stream;
 }
@@ -74,16 +89,7 @@ inline std::string to_string(T x)
 
 } // namespace
 
-#elif defined(HAVE_INT128_T)
-
-namespace primecount {
-
-using maxint_t = int128_t;
-using maxuint_t = uint128_t;
-
-}
-
-#else /* int128_t not supported */
+#else // int128_t not supported
 
 namespace primecount {
 

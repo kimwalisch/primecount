@@ -2,13 +2,14 @@
 /// @file  fast_div.cpp
 /// @brief Test fast_div(x, y) function
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <fast_div.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <cstdlib>
