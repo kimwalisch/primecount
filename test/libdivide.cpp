@@ -27,7 +27,7 @@ int main()
   {
     for (int j = 2; j < 10000; j++)
     {
-      libdivide::branchfree_divider<uint64_t> fast_d(j);
+      libdivide::divider<uint64_t, libdivide::BRANCHFREE> fast_d(j);
       uint64_t res1 = dividends[i] / j;
       uint64_t res2 = dividends[i] / fast_d;
 
@@ -40,7 +40,7 @@ int main()
   {
     for (int j = 2; j < 20; j++)
     {
-      libdivide::branchfree_divider<uint64_t> fast_d(dividends[j]);
+      libdivide::divider<uint64_t, libdivide::BRANCHFREE> fast_d(dividends[j]);
       uint64_t res1 = dividends[i] / dividends[j];
       uint64_t res2 = dividends[i] / fast_d;
 
