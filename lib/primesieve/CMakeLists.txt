@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project(primesieve)
 set(PRIMESIEVE_VERSION "6.4")
 set(PRIMESIEVE_SOVERSION "8.4.0")
-set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
@@ -17,11 +16,6 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
-# Compiler must support C++11 or later ###############################
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # primesieve binary source files #####################################
 
 set(BIN_SRC src/console/cmdoptions.cpp
@@ -30,31 +24,64 @@ set(BIN_SRC src/console/cmdoptions.cpp
 
 # primesieve library source files ####################################
 
-set(LIB_SRC src/primesieve/api-c.cpp
-            src/primesieve/api.cpp
-            src/primesieve/CpuInfo.cpp
-            src/primesieve/EratBig.cpp
-            src/primesieve/EratMedium.cpp
-            src/primesieve/EratSmall.cpp
-            src/primesieve/iterator-c.cpp
-            src/primesieve/iterator.cpp
-            src/primesieve/nthPrime.cpp
-            src/primesieve/ParallelPrimeSieve.cpp
-            src/primesieve/popcount.cpp
-            src/primesieve/PreSieve.cpp
-            src/primesieve/PrimeGenerator.cpp
-            src/primesieve/PrimeSieve.cpp
-            src/primesieve/SieveOfEratosthenes.cpp
-            src/primesieve/SievingPrimes.cpp
-            src/primesieve/Wheel.cpp)
+set(LIB_SRC src/api-c.cpp
+            src/api.cpp
+            src/CpuInfo.cpp
+            src/EratBig.cpp
+            src/EratMedium.cpp
+            src/EratSmall.cpp
+            src/iterator-c.cpp
+            src/iterator.cpp
+            src/nthPrime.cpp
+            src/ParallelPrimeSieve.cpp
+            src/popcount.cpp
+            src/PreSieve.cpp
+            src/PrimeGenerator.cpp
+            src/PrimeSieve.cpp
+            src/SieveOfEratosthenes.cpp
+            src/SievingPrimes.cpp
+            src/Wheel.cpp)
+
+# Compiler must support C++11 or later ###############################
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set default build type to Release ##################################
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+        FORCE)
+endif()
+
+# These variables are needed for rpm builds ##########################
+
+if(NOT INCLUDE_INSTALL_DIR)
+    set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
+endif()
+
+if(NOT LIB_INSTALL_DIR)
+    set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
+
+if(NOT SHARE_INSTALL_PREFIX)
+    set(SHARE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/share")
+endif()
+
+# Multiarch support for Debian/Ubuntu ################################
+
+if(CMAKE_LIBRARY_ARCHITECTURE)
+    set(LIB_INSTALL_DIR "${LIB_INSTALL_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}")
+endif()
 
 # Silence GCC switch fall through warnings ###########################
 
 include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag(-Wno-implicit-fallthrough no_fallthrough)
+check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
 
-if(no_fallthrough)
-    set_source_files_properties(src/primesieve/EratSmall.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+if(Wno_fallthrough)
+    set_source_files_properties(src/EratSmall.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
 # Check if libatomic is needed #######################################
@@ -120,8 +147,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimesieve PROPERTIES VERSION ${PRIMESIEVE_SOVERSION})
 endif()
 
-install(TARGETS libprimesieve
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
+install(TARGETS libprimesieve DESTINATION ${LIB_INSTALL_DIR})
 
 # static_libprimesieve ###############################################
 
@@ -129,13 +155,13 @@ if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     add_library(static_libprimesieve STATIC ${LIB_SRC})
     set_target_properties(static_libprimesieve PROPERTIES OUTPUT_NAME primesieve)
     target_link_libraries(static_libprimesieve Threads::Threads ${LIBATOMIC})
+    add_dependencies(static_libprimesieve libprimesieve)
 
     target_include_directories(static_libprimesieve PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-    install(TARGETS static_libprimesieve
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
+    install(TARGETS static_libprimesieve DESTINATION ${LIB_INSTALL_DIR})
 endif()
 
 # primesieve binary ##################################################
@@ -143,8 +169,12 @@ endif()
 if(BUILD_PRIMESIEVE)
     add_executable(primesieve ${BIN_SRC})
     target_link_libraries(primesieve libprimesieve)
-    install(TARGETS primesieve
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+    # primesieve should build after static_libprimesieve
+    if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+        add_dependencies(primesieve static_libprimesieve)
+    endif()
 endif()
 
 # Install headers ####################################################
@@ -152,7 +182,7 @@ endif()
 install(FILES include/primesieve.h
               include/primesieve.hpp
               COMPONENT libprimesieve-headers
-              DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+              DESTINATION ${INCLUDE_INSTALL_DIR})
 
 install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/StorePrimes.hpp
@@ -161,7 +191,7 @@ install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/primesieve_error.hpp
               include/primesieve/pmath.hpp
               COMPONENT libprimesieve-headers
-              DESTINATION ${CMAKE_INSTALL_PREFIX}/include/primesieve)
+              DESTINATION ${INCLUDE_INSTALL_DIR}/primesieve)
 
 # Regenerate man page ################################################
 
@@ -199,7 +229,7 @@ endif()
 
 if(BUILD_PRIMESIEVE)
     install(FILES ${PROJECT_SOURCE_DIR}/doc/primesieve.1
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
+            DESTINATION ${SHARE_INSTALL_PREFIX}/man/man1)
 endif()
 
 # Install primesieve.pc (pkg-config) #################################
@@ -207,7 +237,7 @@ endif()
 configure_file(primesieve.pc.in primesieve.pc @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/primesieve.pc
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_LIBRARY_ARCHITECTURE}/pkgconfig)
+        DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 
 # Add subdirectories #################################################
 

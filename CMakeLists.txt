@@ -3,7 +3,6 @@ project(primecount)
 set(PRIMECOUNT_VERSION_MAJOR 4)
 set(PRIMECOUNT_VERSION_MINOR 3)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-set(CMAKE_BUILD_TYPE Release)
 include(CheckCXXCompilerFlag)
 
 # Build options ######################################################
@@ -20,11 +19,6 @@ option(BUILD_TESTS       "Build test programs"            OFF)
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
-
-# Compiler must support C++11 or later ###############################
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # primecount binary source files #####################################
 
@@ -66,11 +60,24 @@ set(LIB_SRC src/backup.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
 
+# Compiler must support C++11 or later ###############################
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set default build type to Release ##################################
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+        FORCE)
+endif()
+
 # Silence GCC switch fall through warnings ###########################
 
-check_cxx_compiler_flag(-Wno-implicit-fallthrough no_fallthrough)
+check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
 
-if(no_fallthrough)
+if(Wno_fallthrough)
     set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
