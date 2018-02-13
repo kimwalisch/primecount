@@ -16,6 +16,14 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+# If BUILD_SHARED_LIBS is disabled the static libprimesieve will
+# be built using the libprimesieve target instead of the
+# static_libprimesieve target
+
+if(BUILD_STATIC_LIBS)
+    set(BUILD_STATIC_LIBPRIMESIEVE ${BUILD_SHARED_LIBS})
+endif()
+
 # primesieve binary source files #####################################
 
 set(BIN_SRC src/console/cmdoptions.cpp
@@ -42,10 +50,12 @@ set(LIB_SRC src/api-c.cpp
             src/SievingPrimes.cpp
             src/Wheel.cpp)
 
-# Compiler must support C++11 or later ###############################
+# Required includes ##################################################
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(GNUInstallDirs)
+include(CMakePushCheckState)
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
 
 # Set default build type to Release ##################################
 
@@ -55,29 +65,8 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
-# These variables are needed for rpm builds ##########################
-
-if(NOT INCLUDE_INSTALL_DIR)
-    set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
-endif()
-
-if(NOT LIB_INSTALL_DIR)
-    set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
-
-if(NOT SHARE_INSTALL_PREFIX)
-    set(SHARE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/share")
-endif()
-
-# Multiarch support for Debian/Ubuntu ################################
-
-if(CMAKE_LIBRARY_ARCHITECTURE)
-    set(LIB_INSTALL_DIR "${LIB_INSTALL_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}")
-endif()
-
 # Silence GCC switch fall through warnings ###########################
 
-include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
 
 if(Wno_fallthrough)
@@ -86,11 +75,11 @@ endif()
 
 # Check if libatomic is needed #######################################
 
-include(CMakePushCheckState)
-include(CheckCXXSourceCompiles)
-
 cmake_push_check_state()
-set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
+
+if(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
+endif()
 
 check_cxx_source_compiles("
     #include <atomic>
@@ -134,7 +123,17 @@ cmake_pop_check_state()
 add_library(libprimesieve ${LIB_SRC})
 set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
 find_package(Threads REQUIRED)
-target_link_libraries(libprimesieve Threads::Threads ${LIBATOMIC})
+target_link_libraries(libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
+
+target_compile_features(libprimesieve
+PUBLIC
+    cxx_alias_templates
+PRIVATE
+    cxx_auto_type
+    cxx_lambdas
+    cxx_nullptr
+    cxx_range_for
+    cxx_uniform_initialization)
 
 target_include_directories(libprimesieve PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -147,21 +146,31 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimesieve PROPERTIES VERSION ${PRIMESIEVE_SOVERSION})
 endif()
 
-install(TARGETS libprimesieve DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS libprimesieve DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 # static_libprimesieve ###############################################
 
-if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+if(BUILD_STATIC_LIBPRIMESIEVE)
     add_library(static_libprimesieve STATIC ${LIB_SRC})
     set_target_properties(static_libprimesieve PROPERTIES OUTPUT_NAME primesieve)
-    target_link_libraries(static_libprimesieve Threads::Threads ${LIBATOMIC})
+    target_link_libraries(static_libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
     add_dependencies(static_libprimesieve libprimesieve)
+
+    target_compile_features(static_libprimesieve
+    PUBLIC
+        cxx_alias_templates
+    PRIVATE
+        cxx_auto_type
+        cxx_lambdas
+        cxx_nullptr
+        cxx_range_for
+        cxx_uniform_initialization)
 
     target_include_directories(static_libprimesieve PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-    install(TARGETS static_libprimesieve DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS static_libprimesieve DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # primesieve binary ##################################################
@@ -169,10 +178,10 @@ endif()
 if(BUILD_PRIMESIEVE)
     add_executable(primesieve ${BIN_SRC})
     target_link_libraries(primesieve libprimesieve)
-    install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    target_compile_features(primesieve PRIVATE cxx_auto_type)
+    install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    # primesieve should build after static_libprimesieve
-    if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+    if(BUILD_STATIC_LIBPRIMESIEVE)
         add_dependencies(primesieve static_libprimesieve)
     endif()
 endif()
@@ -182,7 +191,7 @@ endif()
 install(FILES include/primesieve.h
               include/primesieve.hpp
               COMPONENT libprimesieve-headers
-              DESTINATION ${INCLUDE_INSTALL_DIR})
+              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/StorePrimes.hpp
@@ -191,7 +200,7 @@ install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/primesieve_error.hpp
               include/primesieve/pmath.hpp
               COMPONENT libprimesieve-headers
-              DESTINATION ${INCLUDE_INSTALL_DIR}/primesieve)
+              DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/primesieve)
 
 # Regenerate man page ################################################
 
@@ -229,7 +238,7 @@ endif()
 
 if(BUILD_PRIMESIEVE)
     install(FILES ${PROJECT_SOURCE_DIR}/doc/primesieve.1
-            DESTINATION ${SHARE_INSTALL_PREFIX}/man/man1)
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
 # Install primesieve.pc (pkg-config) #################################
@@ -237,7 +246,7 @@ endif()
 configure_file(primesieve.pc.in primesieve.pc @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/primesieve.pc
-        DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # Add subdirectories #################################################
 
