@@ -20,6 +20,14 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+# If BUILD_SHARED_LIBS is disabled the static libprimecount will
+# be built using the libprimecount target instead of the
+# static_libprimecount target
+
+if(BUILD_STATIC_LIBS)
+    set(BUILD_STATIC_LIBPRIMECOUNT ${BUILD_SHARED_LIBS})
+endif()
+
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/cmdoptions.cpp
@@ -59,11 +67,6 @@ set(LIB_SRC src/FactorTable.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
-
-# Compiler must support C++11 or later ###############################
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set default build type to Release ##################################
 
@@ -169,7 +172,15 @@ add_subdirectory(lib/primesieve)
 
 add_library(libprimecount ${LIB_SRC})
 set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-target_link_libraries(libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
+target_link_libraries(libprimecount PRIVATE libprimesieve ${MPI_CXX_LIBRARIES})
+
+target_compile_features(libprimecount
+PRIVATE
+    cxx_auto_type
+    cxx_lambdas
+    cxx_nullptr
+    cxx_range_for
+    cxx_uniform_initialization)
 
 target_include_directories(libprimecount PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -185,10 +196,18 @@ install(TARGETS libprimecount
 
 # static_libprimecount ###############################################
 
-if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+if(BUILD_STATIC_LIBPRIMECOUNT)
     add_library(static_libprimecount STATIC ${LIB_SRC})
     set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
-    target_link_libraries(static_libprimecount static_libprimesieve ${MPI_CXX_LIBRARIES})
+    target_link_libraries(static_libprimecount PRIVATE static_libprimesieve ${MPI_CXX_LIBRARIES})
+
+    target_compile_features(static_libprimecount
+    PRIVATE
+        cxx_auto_type
+        cxx_lambdas
+        cxx_nullptr
+        cxx_range_for
+        cxx_uniform_initialization)
 
     target_include_directories(static_libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -203,6 +222,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount libprimecount)
+    target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount
             DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
