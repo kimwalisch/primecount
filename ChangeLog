@@ -1,9 +1,10 @@
-2018-27-01 Kim Walisch  <kim.walisch@gmail.com>
+2018-18-02 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.3 unreleased.
 
   * libdivide.h: update to libdivide 1.0.
   * calculator.hpp: Fix integer overflow in pow().
+  * CMakeLists.txt: Fix make install issue.
   * CMakeLists.txt: Get rid of int128_t, __int128_t checks.
   * isqrt_constexpr.cpp: Add test for compile time square root.
 
