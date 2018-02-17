@@ -168,6 +168,8 @@ add_subdirectory(lib/primesieve)
 
 if (BUILD_SHARED_LIBS)
     add_library(libprimecount SHARED ${LIB_SRC})
+    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
+    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     target_link_libraries(libprimecount PRIVATE libprimesieve ${MPI_CXX_LIBRARIES})
 
@@ -183,11 +185,6 @@ if (BUILD_SHARED_LIBS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-    if(BUILD_SHARED_LIBS)
-        set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
-        set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    endif()
-
     install(TARGETS libprimecount
             DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
@@ -198,10 +195,6 @@ if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_link_libraries(libprimecount-static PRIVATE libprimesieve-static ${MPI_CXX_LIBRARIES})
-
-    if(BUILD_SHARED_LIBS)
-        add_dependencies(libprimecount-static libprimecount)
-    endif()
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
@@ -231,10 +224,6 @@ if(BUILD_PRIMECOUNT)
     target_link_libraries(primecount libprimecount)
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-    if(BUILD_STATIC_LIBS)
-        add_dependencies(primecount libprimecount-static)
-    endif()
 endif()
 
 # Install header #####################################################
