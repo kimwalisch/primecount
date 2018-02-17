@@ -16,14 +16,6 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
-# If BUILD_SHARED_LIBS is disabled the static libprimesieve will
-# be built using the libprimesieve target instead of the
-# static_libprimesieve target
-
-if(BUILD_STATIC_LIBS)
-    set(BUILD_STATIC_LIBPRIMESIEVE ${BUILD_SHARED_LIBS})
-endif()
-
 # primesieve binary source files #####################################
 
 set(BIN_SRC src/console/cmdoptions.cpp
@@ -56,6 +48,7 @@ include(GNUInstallDirs)
 include(CMakePushCheckState)
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
+include(CMakePackageConfigHelpers)
 
 # Set default build type to Release ##################################
 
@@ -118,45 +111,21 @@ endif()
 
 cmake_pop_check_state()
 
-# libprimesieve ######################################################
+# libprimesieve (shared library) #####################################
 
-add_library(libprimesieve ${LIB_SRC})
-set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
 find_package(Threads REQUIRED)
-target_link_libraries(libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
-
-target_compile_features(libprimesieve
-PUBLIC
-    cxx_alias_templates
-PRIVATE
-    cxx_auto_type
-    cxx_lambdas
-    cxx_nullptr
-    cxx_range_for
-    cxx_uniform_initialization)
-
-target_include_directories(libprimesieve PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
 
 if(BUILD_SHARED_LIBS)
+    add_library(libprimesieve SHARED ${LIB_SRC})
+    set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
+    target_link_libraries(libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
+
     string(REPLACE "." ";" SOVERSION_LIST ${PRIMESIEVE_SOVERSION})
     list(GET SOVERSION_LIST 0 PRIMESIEVE_SOVERSION_MAJOR)
     set_target_properties(libprimesieve PROPERTIES SOVERSION ${PRIMESIEVE_SOVERSION_MAJOR})
     set_target_properties(libprimesieve PROPERTIES VERSION ${PRIMESIEVE_SOVERSION})
-endif()
 
-install(TARGETS libprimesieve DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-# static_libprimesieve ###############################################
-
-if(BUILD_STATIC_LIBPRIMESIEVE)
-    add_library(static_libprimesieve STATIC ${LIB_SRC})
-    set_target_properties(static_libprimesieve PROPERTIES OUTPUT_NAME primesieve)
-    target_link_libraries(static_libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
-    add_dependencies(static_libprimesieve libprimesieve)
-
-    target_compile_features(static_libprimesieve
+    target_compile_features(libprimesieve
     PUBLIC
         cxx_alias_templates
     PRIVATE
@@ -166,11 +135,52 @@ if(BUILD_STATIC_LIBPRIMESIEVE)
         cxx_range_for
         cxx_uniform_initialization)
 
-    target_include_directories(static_libprimesieve PUBLIC
+    target_include_directories(libprimesieve PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-    install(TARGETS static_libprimesieve DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS libprimesieve
+            EXPORT primesieveShared
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
+
+# libprimesieve-static ###############################################
+
+if(BUILD_STATIC_LIBS)
+    add_library(libprimesieve-static STATIC ${LIB_SRC})
+    set_target_properties(libprimesieve-static PROPERTIES OUTPUT_NAME primesieve)
+    target_link_libraries(libprimesieve-static PRIVATE Threads::Threads ${LIBATOMIC})
+
+    if(BUILD_SHARED_LIBS)
+        add_dependencies(libprimesieve-static libprimesieve)
+    endif()
+
+    if(NOT BUILD_SHARED_LIBS)
+        # make sure libprimesieve is always defined
+        add_library(libprimesieve ALIAS libprimesieve-static)
+    endif()
+
+    target_compile_features(libprimesieve-static
+    PUBLIC
+        cxx_alias_templates
+    PRIVATE
+        cxx_auto_type
+        cxx_lambdas
+        cxx_nullptr
+        cxx_range_for
+        cxx_uniform_initialization)
+
+    target_include_directories(libprimesieve-static PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+    install(TARGETS libprimesieve-static
+            EXPORT primesieveStatic
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # primesieve binary ##################################################
@@ -181,8 +191,8 @@ if(BUILD_PRIMESIEVE)
     target_compile_features(primesieve PRIVATE cxx_auto_type)
     install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    if(BUILD_STATIC_LIBPRIMESIEVE)
-        add_dependencies(primesieve static_libprimesieve)
+    if(BUILD_STATIC_LIBS)
+        add_dependencies(primesieve libprimesieve-static)
     endif()
 endif()
 
@@ -201,6 +211,34 @@ install(FILES include/primesieve/PrimeSieve.hpp
               include/primesieve/pmath.hpp
               COMPONENT libprimesieve-headers
               DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/primesieve)
+
+# CMake find_package(primesieve) support #############################
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/primesieveConfigVersion.cmake"
+    VERSION ${PRIMESIEVE_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/primesieveConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/primesieveConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primesieve")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/primesieveConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/primesieveConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primesieve")
+
+if(BUILD_SHARED_LIBS)
+    install(EXPORT primesieveShared
+            NAMESPACE primesieve::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primesieve")
+endif()
+
+if(BUILD_STATIC_LIBS)
+    install(EXPORT primesieveStatic
+            NAMESPACE primesieve::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primesieve")
+endif()
 
 # Regenerate man page ################################################
 
