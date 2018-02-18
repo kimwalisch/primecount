@@ -11,14 +11,13 @@ before_install:
 
 env:
   global:
+    - CXXFLAGS="-O3 -Wall -Wextra -Werror -pedantic -Wno-missing-braces"
     - OMP_NUM_THREADS=4
 
 install:
   - sudo apt-get install -y g++-5 make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
   - sudo rm -f /usr/bin/g++
   - sudo ln -s /usr/bin/g++-5 /usr/bin/g++
-  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing"; fi
-  - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"; fi
 
 script:
   - cppcheck src include --error-exitcode=1
@@ -40,7 +39,6 @@ script:
   - rm -rf build
   - mkdir build
   - cd build
-  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing -Wno-literal-suffix"; fi
   - if [ "$CXX" = "g++" ]; then cmake .. -DWITH_MPI=ON; fi
   - if [ "$CXX" = "clang++" ]; then cmake .. -DWITH_MPI=ON -DWITH_OPENMP=OFF; fi
   - make -j4
