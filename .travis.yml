@@ -11,7 +11,7 @@ before_install:
 
 env:
   global:
-    - CXXFLAGS="-O3 -Wall -Wextra -Werror -pedantic -Wno-missing-braces"
+    - CXXFLAGS="-O3 -Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-missing-braces"
     - OMP_NUM_THREADS=4
 
 install:
