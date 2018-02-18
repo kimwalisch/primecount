@@ -100,7 +100,7 @@ if(WITH_OPENMP)
     find_package(OpenMP QUIET)
     if(OPENMP_FOUND)
         message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(OpenMP_FLAGS "${OpenMP_CXX_FLAGS}")
     endif()
 endif()
 
@@ -146,7 +146,7 @@ if(WITH_POPCNT)
     cmake_pop_check_state()
 
     if(mpopcnt)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+        set(POPCNT_FLAG "-mpopcnt")
     endif()
 endif()
 
@@ -171,7 +171,8 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-    target_link_libraries(libprimecount PRIVATE libprimesieve ${MPI_CXX_LIBRARIES})
+    target_compile_options(libprimecount PRIVATE "${OpenMP_FLAGS}" "${POPCNT_FLAG}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${OpenMP_FLAGS}" "${MPI_CXX_LIBRARIES}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -194,7 +195,8 @@ endif()
 if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static ${MPI_CXX_LIBRARIES})
+    target_compile_options(libprimecount-static PRIVATE "${OpenMP_FLAGS}" "${POPCNT_FLAG}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${OpenMP_FLAGS}" "${MPI_CXX_LIBRARIES}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
