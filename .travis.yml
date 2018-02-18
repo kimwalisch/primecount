@@ -40,7 +40,7 @@ script:
   - mkdir build
   - cd build
   - if [ "$CXX" = "clang++" ]; then cmake .. -DWITH_MPI=ON -DWITH_OPENMP=OFF; fi
-  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="$CXXFLAGS -Wno-literal-suffix"; fi
+  - if [ "$CXX" = "g++" ]; then export CXXFLAGS="$CXXFLAGS -Wno-literal-suffix -Wno-strict-aliasing"; fi
   - if [ "$CXX" = "g++" ]; then cmake .. -DWITH_MPI=ON; fi
   - make -j4
   - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
