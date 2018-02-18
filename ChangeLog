@@ -4,6 +4,7 @@
 
   * libdivide.h: update to libdivide 1.0.
   * calculator.hpp: Fix integer overflow in pow().
+  * Required CMake version is now 3.4 (previously 3.1).
   * CMakeLists.txt: Fix make install issue.
   * CMakeLists.txt: Get rid of int128_t, __int128_t checks.
   * isqrt_constexpr.cpp: Add test for compile time square root.

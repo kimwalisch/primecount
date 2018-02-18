@@ -20,16 +20,15 @@ env:
 install:
   - sudo apt-get update -qq
   - sudo apt-get install -y make openmpi-bin libopenmpi-dev cppcheck valgrind
-  - wget --no-check-certificate http://cmake.org/files/v3.1/cmake-3.1.3-Linux-x86_64.tar.gz
-  - tar -xzf cmake-3.1.3-Linux-x86_64.tar.gz
-  - export PATH=$PWD/cmake-3.1.3-Linux-x86_64/bin:$PATH
+  - wget --no-check-certificate https://cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz
+  - tar -xzf cmake-3.4.3-Linux-x86_64.tar.gz
+  - export PATH=$PWD/cmake-3.4.3-Linux-x86_64/bin:$PATH
   - if [ "$CXX" = "g++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-strict-aliasing"; fi
   - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-O2 -pedantic -Wall -Wextra -Werror -Wno-missing-braces -Wno-long-long -Wno-unused-parameter -Wno-strict-aliasing -Wno-unknown-pragmas"; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9"; fi
-  - if [ "$CC" = "gcc" ]; then export CC="gcc-4.9"; fi
 
 script:
-  - cppcheck src include --error-exitcode=1 -icmake-3.1.3-Linux-x86_64
+  - cppcheck src include --error-exitcode=1 -icmake-3.4.3-Linux-x86_64
   - sed -i 's#CMAKE_BUILD_TYPE Release#CMAKE_BUILD_TYPE Debug#g' CMakeLists.txt
   - mkdir build
   - cd build
