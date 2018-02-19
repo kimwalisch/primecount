@@ -170,9 +170,9 @@ add_subdirectory(lib/primesieve)
 
 if (BUILD_SHARED_LIBS)
     add_library(libprimecount SHARED ${LIB_SRC})
+    set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount PRIVATE "${OpenMP_FLAGS}" "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE libprimesieve "${OpenMP_FLAGS}" "${MPI_CXX_LIBRARIES}")
 
