@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.1)
-project(primecount)
+cmake_minimum_required(VERSION 3.4)
+project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 4)
 set(PRIMECOUNT_VERSION_MINOR 3)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-include(CheckCXXCompilerFlag)
 
 # Build options ######################################################
 
@@ -60,10 +59,10 @@ set(LIB_SRC src/backup.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
 
-# Compiler must support C++11 or later ###############################
+# Required includes ##################################################
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(GNUInstallDirs)
+include(CheckCXXCompilerFlag)
 
 # Set default build type to Release ##################################
 
@@ -101,7 +100,7 @@ if(WITH_OPENMP)
     find_package(OpenMP QUIET)
     if(OPENMP_FOUND)
         message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(OpenMP_FLAGS "${OpenMP_CXX_FLAGS}")
     endif()
 endif()
 
@@ -126,12 +125,14 @@ endif()
 
 if(RUN_LIBDIVIDE EQUAL 0)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    if(WITH_MPI)
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
-    endif()
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    if(WITH_MPI)
+endif()
+
+if(WITH_MPI)
+    if(RUN_LIBDIVIDE EQUAL 0)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
+    else()
         set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
     endif()
 endif()
@@ -147,7 +148,7 @@ if(WITH_POPCNT)
     cmake_pop_check_state()
 
     if(mpopcnt)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+        set(POPCNT_FLAG "-mpopcnt")
     endif()
 endif()
 
@@ -167,35 +168,57 @@ add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
 
-add_library(libprimecount ${LIB_SRC})
-set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-target_link_libraries(libprimecount libprimesieve ${MPI_CXX_LIBRARIES})
-
-target_include_directories(libprimecount PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
-
-if(BUILD_SHARED_LIBS)
+if (BUILD_SHARED_LIBS)
+    add_library(libprimecount SHARED ${LIB_SRC})
+    set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-endif()
+    target_compile_options(libprimecount PRIVATE "${OpenMP_FLAGS}" "${POPCNT_FLAG}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${OpenMP_FLAGS}" "${MPI_CXX_LIBRARIES}")
 
-install(TARGETS libprimecount
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    target_compile_features(libprimecount
+    PRIVATE
+        cxx_auto_type
+        cxx_lambdas
+        cxx_nullptr
+        cxx_range_for
+        cxx_uniform_initialization)
 
-# static_libprimecount ###############################################
-
-if(BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
-    add_library(static_libprimecount STATIC ${LIB_SRC})
-    set_target_properties(static_libprimecount PROPERTIES OUTPUT_NAME primecount)
-    target_link_libraries(static_libprimecount static_libprimesieve ${MPI_CXX_LIBRARIES})
-
-    target_include_directories(static_libprimecount PUBLIC
+    target_include_directories(libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
-    install(TARGETS static_libprimecount
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    install(TARGETS libprimecount
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
+
+# libprimecount-static ###############################################
+
+if (BUILD_STATIC_LIBS)
+    add_library(libprimecount-static STATIC ${LIB_SRC})
+    set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
+    target_compile_options(libprimecount-static PRIVATE "${OpenMP_FLAGS}" "${POPCNT_FLAG}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${OpenMP_FLAGS}" "${MPI_CXX_LIBRARIES}")
+
+    if(NOT BUILD_SHARED_LIBS)
+        # make sure libprimecount is always defined
+        add_library(libprimecount ALIAS libprimecount-static)
+    endif()
+
+    target_compile_features(libprimecount-static
+    PRIVATE
+        cxx_auto_type
+        cxx_lambdas
+        cxx_nullptr
+        cxx_range_for
+        cxx_uniform_initialization)
+
+    target_include_directories(libprimecount-static PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+    install(TARGETS libprimecount-static
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # primecount binary ##################################################
@@ -203,11 +226,11 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount libprimecount)
-    install(TARGETS primecount
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    target_compile_features(primecount PRIVATE cxx_auto_type)
+    install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Install header #####################################################
 
 install(FILES include/primecount.hpp
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

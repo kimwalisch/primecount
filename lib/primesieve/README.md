@@ -174,6 +174,23 @@ export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 cl /O2 /EHsc primes.cpp /I primesieve\include /link primesieve.lib
 ```
 
+## CMake support
+
+Since primesieve-6.4 you can easily link against libprimesieve in your
+```CMakeLists.txt```:
+
+```CMake
+find_package(primesieve REQUIRED)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
+To link against the static libprimesieve use:
+
+```CMake
+find_package(primesieve REQUIRED static)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
 ## Bindings for other languages
 
 primesieve natively supports C and C++ and has bindings available for:
