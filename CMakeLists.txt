@@ -19,6 +19,10 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
+    message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON")
+endif()
+
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/cmdoptions.cpp
@@ -63,6 +67,7 @@ set(LIB_SRC src/backup.cpp
 
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
+include(CheckCXXSourceRuns)
 
 # Set default build type to Release ##################################
 
@@ -78,6 +83,25 @@ check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
 
 if(Wno_fallthrough)
     set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+endif()
+
+# Check if big-endian CPU architecture ###############################
+
+check_cxx_source_runs("
+    int main()
+    {
+        union {
+          long word;
+          char c[sizeof(long)];
+        } x;
+        x.word = 1;
+        bool is_big_endian = (x.c[sizeof(long) - 1] == 1);
+        return is_big_endian ? 0 : 1;
+    }"
+    big_endian)
+
+if(big_endian)
+    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_DEFINITIONS IS_BIG_ENDIAN)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
