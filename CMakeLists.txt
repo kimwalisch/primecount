@@ -94,10 +94,10 @@ check_cxx_source_runs("
         bool is_big_endian = (x.c[sizeof(long) - 1] == 1);
         return is_big_endian ? 0 : 1;
     }"
-  big_endian)
+    big_endian)
 
 if(big_endian)
-    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_DEFINITIONS BIG_ENDIAN)
+    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_DEFINITIONS IS_BIG_ENDIAN)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################

@@ -19,10 +19,14 @@
 
 namespace {
 
-#if defined(BIG_ENDIAN) || \
-   (defined(__BYTE_ORDER__) && \
-    defined(__ORDER_BIG_ENDIAN__) && \
-    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__)
+  #undef IS_BIG_ENDIAN
+  #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    #define IS_BIG_ENDIAN
+  #endif
+#endif
+
+#if defined(IS_BIG_ENDIAN)
 
 /// The values of the big-endian lookup tables have been computed by
 /// converting the values of the little-endian lookup tables to
