@@ -11,15 +11,18 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVEENDIANESS_HPP
-#define SIEVEENDIANESS_HPP
+#ifndef SIEVEENDIANNESS_HPP
+#define SIEVEENDIANNESS_HPP
 
 #include <stdint.h>
 #include <array>
 
 namespace {
 
-#if defined(BIG_ENDIAN)
+#if defined(BIG_ENDIAN) || \
+   (defined(__BYTE_ORDER__) && \
+    defined(__ORDER_BIG_ENDIAN__) && \
+    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 
 /// The values of the big-endian lookup tables have been computed by
 /// converting the values of the little-endian lookup tables to
