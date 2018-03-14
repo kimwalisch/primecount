@@ -1,6 +1,6 @@
 2018-14-03 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 4.3 unreleased.
+  Version 4.3 released.
 
   * Support big-endian CPUs.
   * libdivide.h: update to libdivide 1.0.
