@@ -19,6 +19,10 @@ if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
+    message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON")
+endif()
+
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/cmdoptions.cpp
