@@ -13,13 +13,14 @@
 ///        elements that have been crossed off for the first
 ///        time in the sieve array.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <Sieve.hpp>
+#include <SieveEndianness.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -66,112 +67,6 @@ const WheelInit wheel_init[30] =
 
 /// Small primes used for pre-sieving
 const array<int, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
-
-/// Unset bits < start
-const array<uint64_t, 240> unset_smaller =
-{
-  ~0ull << 0, ~0ull << 0, ~0ull << 1, ~0ull << 1, ~0ull << 1,
-  ~0ull << 1, ~0ull << 1, ~0ull << 1, ~0ull << 2, ~0ull << 2,
-  ~0ull << 2, ~0ull << 2, ~0ull << 3, ~0ull << 3, ~0ull << 4,
-  ~0ull << 4, ~0ull << 4, ~0ull << 4, ~0ull << 5, ~0ull << 5,
-  ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 6, ~0ull << 7,
-  ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7, ~0ull << 7,
-  ~0ull << 8, ~0ull << 8, ~0ull << 9, ~0ull << 9, ~0ull << 9,
-  ~0ull << 9, ~0ull << 9, ~0ull << 9, ~0ull << 10, ~0ull << 10,
-  ~0ull << 10, ~0ull << 10, ~0ull << 11, ~0ull << 11, ~0ull << 12,
-  ~0ull << 12, ~0ull << 12, ~0ull << 12, ~0ull << 13, ~0ull << 13,
-  ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 14, ~0ull << 15,
-  ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15, ~0ull << 15,
-  ~0ull << 16, ~0ull << 16, ~0ull << 17, ~0ull << 17, ~0ull << 17,
-  ~0ull << 17, ~0ull << 17, ~0ull << 17, ~0ull << 18, ~0ull << 18,
-  ~0ull << 18, ~0ull << 18, ~0ull << 19, ~0ull << 19, ~0ull << 20,
-  ~0ull << 20, ~0ull << 20, ~0ull << 20, ~0ull << 21, ~0ull << 21,
-  ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 22, ~0ull << 23,
-  ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23, ~0ull << 23,
-  ~0ull << 24, ~0ull << 24, ~0ull << 25, ~0ull << 25, ~0ull << 25,
-  ~0ull << 25, ~0ull << 25, ~0ull << 25, ~0ull << 26, ~0ull << 26,
-  ~0ull << 26, ~0ull << 26, ~0ull << 27, ~0ull << 27, ~0ull << 28,
-  ~0ull << 28, ~0ull << 28, ~0ull << 28, ~0ull << 29, ~0ull << 29,
-  ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 30, ~0ull << 31,
-  ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31, ~0ull << 31,
-  ~0ull << 32, ~0ull << 32, ~0ull << 33, ~0ull << 33, ~0ull << 33,
-  ~0ull << 33, ~0ull << 33, ~0ull << 33, ~0ull << 34, ~0ull << 34,
-  ~0ull << 34, ~0ull << 34, ~0ull << 35, ~0ull << 35, ~0ull << 36,
-  ~0ull << 36, ~0ull << 36, ~0ull << 36, ~0ull << 37, ~0ull << 37,
-  ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 38, ~0ull << 39,
-  ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39, ~0ull << 39,
-  ~0ull << 40, ~0ull << 40, ~0ull << 41, ~0ull << 41, ~0ull << 41,
-  ~0ull << 41, ~0ull << 41, ~0ull << 41, ~0ull << 42, ~0ull << 42,
-  ~0ull << 42, ~0ull << 42, ~0ull << 43, ~0ull << 43, ~0ull << 44,
-  ~0ull << 44, ~0ull << 44, ~0ull << 44, ~0ull << 45, ~0ull << 45,
-  ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 46, ~0ull << 47,
-  ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47, ~0ull << 47,
-  ~0ull << 48, ~0ull << 48, ~0ull << 49, ~0ull << 49, ~0ull << 49,
-  ~0ull << 49, ~0ull << 49, ~0ull << 49, ~0ull << 50, ~0ull << 50,
-  ~0ull << 50, ~0ull << 50, ~0ull << 51, ~0ull << 51, ~0ull << 52,
-  ~0ull << 52, ~0ull << 52, ~0ull << 52, ~0ull << 53, ~0ull << 53,
-  ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 54, ~0ull << 55,
-  ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55, ~0ull << 55,
-  ~0ull << 56, ~0ull << 56, ~0ull << 57, ~0ull << 57, ~0ull << 57,
-  ~0ull << 57, ~0ull << 57, ~0ull << 57, ~0ull << 58, ~0ull << 58,
-  ~0ull << 58, ~0ull << 58, ~0ull << 59, ~0ull << 59, ~0ull << 60,
-  ~0ull << 60, ~0ull << 60, ~0ull << 60, ~0ull << 61, ~0ull << 61,
-  ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 62, ~0ull << 63,
-  ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63, ~0ull << 63
-};
-
-/// Unset bits > stop
-const array<uint64_t, 240> unset_larger =
-{
-         0ull, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63, ~0ull >> 63,
-  ~0ull >> 63, ~0ull >> 63, ~0ull >> 62, ~0ull >> 62, ~0ull >> 62,
-  ~0ull >> 62, ~0ull >> 61, ~0ull >> 61, ~0ull >> 60, ~0ull >> 60,
-  ~0ull >> 60, ~0ull >> 60, ~0ull >> 59, ~0ull >> 59, ~0ull >> 58,
-  ~0ull >> 58, ~0ull >> 58, ~0ull >> 58, ~0ull >> 57, ~0ull >> 57,
-  ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 57, ~0ull >> 56,
-  ~0ull >> 56, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55, ~0ull >> 55,
-  ~0ull >> 55, ~0ull >> 55, ~0ull >> 54, ~0ull >> 54, ~0ull >> 54,
-  ~0ull >> 54, ~0ull >> 53, ~0ull >> 53, ~0ull >> 52, ~0ull >> 52,
-  ~0ull >> 52, ~0ull >> 52, ~0ull >> 51, ~0ull >> 51, ~0ull >> 50,
-  ~0ull >> 50, ~0ull >> 50, ~0ull >> 50, ~0ull >> 49, ~0ull >> 49,
-  ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 49, ~0ull >> 48,
-  ~0ull >> 48, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47, ~0ull >> 47,
-  ~0ull >> 47, ~0ull >> 47, ~0ull >> 46, ~0ull >> 46, ~0ull >> 46,
-  ~0ull >> 46, ~0ull >> 45, ~0ull >> 45, ~0ull >> 44, ~0ull >> 44,
-  ~0ull >> 44, ~0ull >> 44, ~0ull >> 43, ~0ull >> 43, ~0ull >> 42,
-  ~0ull >> 42, ~0ull >> 42, ~0ull >> 42, ~0ull >> 41, ~0ull >> 41,
-  ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 41, ~0ull >> 40,
-  ~0ull >> 40, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39, ~0ull >> 39,
-  ~0ull >> 39, ~0ull >> 39, ~0ull >> 38, ~0ull >> 38, ~0ull >> 38,
-  ~0ull >> 38, ~0ull >> 37, ~0ull >> 37, ~0ull >> 36, ~0ull >> 36,
-  ~0ull >> 36, ~0ull >> 36, ~0ull >> 35, ~0ull >> 35, ~0ull >> 34,
-  ~0ull >> 34, ~0ull >> 34, ~0ull >> 34, ~0ull >> 33, ~0ull >> 33,
-  ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 33, ~0ull >> 32,
-  ~0ull >> 32, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31, ~0ull >> 31,
-  ~0ull >> 31, ~0ull >> 31, ~0ull >> 30, ~0ull >> 30, ~0ull >> 30,
-  ~0ull >> 30, ~0ull >> 29, ~0ull >> 29, ~0ull >> 28, ~0ull >> 28,
-  ~0ull >> 28, ~0ull >> 28, ~0ull >> 27, ~0ull >> 27, ~0ull >> 26,
-  ~0ull >> 26, ~0ull >> 26, ~0ull >> 26, ~0ull >> 25, ~0ull >> 25,
-  ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 25, ~0ull >> 24,
-  ~0ull >> 24, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23, ~0ull >> 23,
-  ~0ull >> 23, ~0ull >> 23, ~0ull >> 22, ~0ull >> 22, ~0ull >> 22,
-  ~0ull >> 22, ~0ull >> 21, ~0ull >> 21, ~0ull >> 20, ~0ull >> 20,
-  ~0ull >> 20, ~0ull >> 20, ~0ull >> 19, ~0ull >> 19, ~0ull >> 18,
-  ~0ull >> 18, ~0ull >> 18, ~0ull >> 18, ~0ull >> 17, ~0ull >> 17,
-  ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 17, ~0ull >> 16,
-  ~0ull >> 16, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15, ~0ull >> 15,
-  ~0ull >> 15, ~0ull >> 15, ~0ull >> 14, ~0ull >> 14, ~0ull >> 14,
-  ~0ull >> 14, ~0ull >> 13, ~0ull >> 13, ~0ull >> 12, ~0ull >> 12,
-  ~0ull >> 12, ~0ull >> 12, ~0ull >> 11, ~0ull >> 11, ~0ull >> 10,
-  ~0ull >> 10, ~0ull >> 10, ~0ull >> 10, ~0ull >> 9, ~0ull >> 9,
-  ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 9, ~0ull >> 8,
-  ~0ull >> 8, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7, ~0ull >> 7,
-  ~0ull >> 7, ~0ull >> 7, ~0ull >> 6, ~0ull >> 6, ~0ull >> 6,
-  ~0ull >> 6, ~0ull >> 5, ~0ull >> 5, ~0ull >> 4, ~0ull >> 4,
-  ~0ull >> 4, ~0ull >> 4, ~0ull >> 3, ~0ull >> 3, ~0ull >> 2,
-  ~0ull >> 2, ~0ull >> 2, ~0ull >> 2, ~0ull >> 1, ~0ull >> 1,
-  ~0ull >> 1, ~0ull >> 1, ~0ull >> 1, ~0ull >> 1, ~0ull >> 0
-};
 
 /// Unset the n-th bit.
 /// @return  1 if n-th bit was previously set, else 0
