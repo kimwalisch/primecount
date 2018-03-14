@@ -6,9 +6,3 @@ foreach(file ${files})
     target_link_libraries(${binary_name} libprimecount libprimesieve)
     add_test(NAME ${binary_name} COMMAND ${binary_name})
 endforeach()
-
-target_compile_options(factor_table PRIVATE "${OpenMP_FLAGS}")
-
-if(NOT MSVC_VERSION)
-    target_link_libraries(factor_table "${OpenMP_FLAGS}")
-endif()
