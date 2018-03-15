@@ -2,12 +2,12 @@
 
 primecount can be built as a static and shared C++ library for use in
 other math projects. primecount's prime counting function implementation
-and nth prime function are currently (2017) orders of magnitude faster
+and nth prime function are currently (2018) orders of magnitude faster
 than e.g. Mathematica, PARI/GP, SageMath and SymPy.
 
 libprimecount is also very portable, it has been tested successfully on
 a wide range of operating systems, compilers (GCC, Clang, MSVC) and CPU
-architectures (x86, x64, ARM, PowerPC, PP64).
+architectures (x86, x64, ARM, ARM64, PowerPC, PP64).
 
 ## Build instructions
 
@@ -17,6 +17,14 @@ You need to have installed a C++ compiler, cmake and make.
 cmake . -DBUILD_SHARED_LIBS=ON
 make -j
 sudo make install
+```
+
+#### Run the tests
+
+```sh
+cmake . -DBUILD_TESTS=ON
+make -j
+make test
 ```
 
 ## C++ API
