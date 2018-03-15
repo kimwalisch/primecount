@@ -20,7 +20,7 @@
 ///
 
 #include <Sieve.hpp>
-#include <SieveEndianness.hpp>
+#include <SieveTables.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
