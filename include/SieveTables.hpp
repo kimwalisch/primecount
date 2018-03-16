@@ -44,12 +44,12 @@ for (int i = 0; i < 240; i++)
 /// lookup table. This lookup table is used to unset
 /// bits corresponding to numbers > stop.
 
-std::array<uint64_t, 240> unset_larger;
+std::array<uint64_t, 240> unset_larger = { 0 };
 std::array<int, 8> bit_values = { 1, 7, 11, 13, 17, 19, 23, 29 };
 
 int shift = 64;
 
-for (int i = 0; i < 240; i++)
+for (int i = 1; i < 240; i++)
 {
     for (int val : bit_values)
       if (i == (i - i % 30) + val)
