@@ -7,7 +7,7 @@ than e.g. Mathematica, PARI/GP, SageMath and SymPy.
 
 libprimecount is also very portable, it has been tested successfully on
 a wide range of operating systems, compilers (GCC, Clang, MSVC) and CPU
-architectures (x86, x64, ARM, ARM64, PowerPC, PP64).
+architectures (x86, x64, ARM, ARM64, PowerPC, PP64, Sparc).
 
 ## Build instructions
 
@@ -25,6 +25,19 @@ sudo make install
 cmake . -DBUILD_TESTS=ON
 make -j
 make test
+```
+
+Here are all available cmake configuration options:
+
+```CMake
+option(WITH_x86_POPCNT   "Enable x86 POPCNT instruction"  ON)
+option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
+option(WITH_OPENMP       "Enable OpenMP support"          ON)
+option(WITH_MPI          "Enable MPI support"             OFF)
+option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
+option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
+option(BUILD_STATIC_LIBS "Build static libprimecount"     ON)
+option(BUILD_TESTS       "Build test programs"            OFF)
 ```
 
 ## C++ API
