@@ -6,7 +6,7 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
+option(WITH_x86_POPCNT   "Enable x86 POPCNT instruction"  ON)
 option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
 option(WITH_OPENMP       "Enable OpenMP support"          ON)
 option(WITH_MPI          "Enable MPI support"             OFF)
@@ -143,7 +143,7 @@ endif()
 
 # Check -mpopcnt compiler flag #######################################
 
-if(WITH_POPCNT)
+if(WITH_x86_POPCNT)
     include(CMakePushCheckState)
 
     cmake_push_check_state()
@@ -154,6 +154,10 @@ if(WITH_POPCNT)
     if(mpopcnt)
         set(POPCNT_FLAG "-mpopcnt")
     endif()
+endif()
+
+if(NOT WITH_x86_POPCNT)
+    set(POPCNT_DEFINE "DISABLE_x86_POPCNT")
 endif()
 
 # Testing ############################################################
@@ -177,6 +181,7 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
+    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE libprimesieve "${MPI_CXX_LIBRARIES}")
 
@@ -201,6 +206,7 @@ endif()
 if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
+    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${MPI_CXX_LIBRARIES}")
 
