@@ -92,8 +92,8 @@ Below is an example program that counts the primes below 1000.
 
 int main()
 {
-    int64_t prime_count = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << prime_count << std::endl;
+    int64_t primes = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << primes << std::endl;
   
     return 0;
 }
