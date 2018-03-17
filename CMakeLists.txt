@@ -6,14 +6,14 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_x86_POPCNT   "Enable x86 POPCNT instruction"  ON)
-option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
-option(WITH_OPENMP       "Enable OpenMP support"          ON)
-option(WITH_MPI          "Enable MPI support"             OFF)
-option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
-option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
-option(BUILD_STATIC_LIBS "Build static libprimecount"     ON)
-option(BUILD_TESTS       "Build test programs"            OFF)
+option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
+option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
+option(WITH_OPENMP        "Enable OpenMP support"       ON)
+option(WITH_MPI           "Enable MPI support"          OFF)
+option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
+option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
+option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
+option(BUILD_TESTS        "Build test programs"         OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -143,7 +143,7 @@ endif()
 
 # Check -mpopcnt compiler flag #######################################
 
-if(WITH_x86_POPCNT)
+if(WITH_POPCNT)
     include(CMakePushCheckState)
 
     cmake_push_check_state()
@@ -156,8 +156,8 @@ if(WITH_x86_POPCNT)
     endif()
 endif()
 
-if(NOT WITH_x86_POPCNT)
-    set(POPCNT_DEFINE "DISABLE_x86_POPCNT")
+if(NOT WITH_POPCNT)
+    set(POPCNT_DEFINE "DISABLE_POPCNT")
 endif()
 
 # Testing ############################################################

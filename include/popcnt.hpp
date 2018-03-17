@@ -14,18 +14,10 @@
 
 #include <stdint.h>
 
-#if defined(DISABLE_x86_POPCNT) && \
-   (defined(__i386__) || \
-    defined(_M_IX86) || \
-    defined(__x86_64__) || \
-    defined(_M_X64))
-#define INTEGER_POPCNT
-#endif
-
-#if !defined(INTEGER_POPCNT)
+#if !defined(DISABLE_POPCNT)
 
 #ifndef __has_builtin
-#define __has_builtin(x) 0
+  #define __has_builtin(x) 0
 #endif
 
 #if defined(__GNUC__) || __has_builtin(__builtin_popcountll)
@@ -59,12 +51,12 @@ inline uint64_t popcnt64(uint64_t x)
 #else
 
 // fallback mode
-#define INTEGER_POPCNT
+#define DISABLE_POPCNT
 
 #endif
 #endif
 
-#if !defined(INTEGER_POPCNT)
+#if !defined(DISABLE_POPCNT)
 
 inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 {
@@ -88,7 +80,7 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 
 #endif
 
-#if defined(INTEGER_POPCNT)
+#if defined(DISABLE_POPCNT)
 
 /// This uses fewer arithmetic operations than any other known
 /// implementation on machines with fast multiplication.

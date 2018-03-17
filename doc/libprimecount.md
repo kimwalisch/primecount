@@ -30,14 +30,14 @@ make test
 Here are all available cmake configuration options:
 
 ```CMake
-option(WITH_x86_POPCNT   "Enable x86 POPCNT instruction"  ON)
-option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
-option(WITH_OPENMP       "Enable OpenMP support"          ON)
-option(WITH_MPI          "Enable MPI support"             OFF)
-option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
-option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
-option(BUILD_STATIC_LIBS "Build static libprimecount"     ON)
-option(BUILD_TESTS       "Build test programs"            OFF)
+option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
+option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
+option(WITH_OPENMP        "Enable OpenMP support"       ON)
+option(WITH_MPI           "Enable MPI support"          OFF)
+option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
+option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
+option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
+option(BUILD_TESTS        "Build test programs"         OFF)
 ```
 
 ## C++ API
