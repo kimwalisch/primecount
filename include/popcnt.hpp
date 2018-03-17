@@ -56,6 +56,8 @@ inline uint64_t popcnt64(uint64_t x)
 #endif
 #endif
 
+namespace {
+
 #if !defined(DISABLE_POPCNT)
 
 inline uint64_t popcnt(const uint64_t* data, uint64_t size)
@@ -89,10 +91,10 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 ///
 inline uint64_t popcnt64(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ll;
-  uint64_t m2 = 0x3333333333333333ll;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
-  uint64_t h01 = 0x0101010101010101ll;
+  uint64_t m1 = 0x5555555555555555ull;
+  uint64_t m2 = 0x3333333333333333ull;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
+  uint64_t h01 = 0x0101010101010101ull;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -150,5 +152,7 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 }
 
 #endif
+
+} // namespace
 
 #endif // POPCNT_HPP
