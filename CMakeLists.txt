@@ -76,6 +76,14 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
+# libprimesieve ######################################################
+
+set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+add_subdirectory(lib/primesieve)
+set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
+
 # Silence GCC switch fall through warnings ###########################
 
 check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
@@ -166,13 +174,6 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
-
-# libprimesieve ######################################################
-
-option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
-set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
-
-add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
 
