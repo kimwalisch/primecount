@@ -2,8 +2,8 @@
 
 primecount can be built as a static and shared C++ library for use in
 other math projects. primecount's prime counting function implementation
-and nth prime function are currently (2018) orders of magnitude faster
-than e.g. Mathematica, PARI/GP, SageMath and SymPy.
+and nth prime function are currently (March 2018) orders of magnitude
+faster than e.g. Mathematica, PARI/GP, SageMath and SymPy.
 
 libprimecount is also very portable, it has been tested successfully on
 a wide range of operating systems, compilers (GCC, Clang, MSVC) and CPU
