@@ -116,6 +116,26 @@ Advanced Deleglise-Rivat options:
          --S2_hard          Only compute the hard special leaves
 ```
 
+## C++ library
+
+primecount can be built as a static and shared C++ library for use in
+other math projects.
+
+```C++
+#include <primecount.hpp>
+#include <iostream>
+
+int main()
+{
+    int64_t primes = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << primes << std::endl;
+
+    return 0;
+}
+```
+
+[libprimecount.md](doc/libprimecount.md) contains more information.
+
 ## Algorithms
 
 <table>
