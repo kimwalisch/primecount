@@ -6,14 +6,14 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_POPCNT       "Enable x86 POPCNT instruction"  ON)
-option(WITH_LIBDIVIDE    "Use libdivide.h"                ON)
-option(WITH_OPENMP       "Enable OpenMP support"          ON)
-option(WITH_MPI          "Enable MPI support"             OFF)
-option(BUILD_PRIMECOUNT  "Build primecount binary"        ON)
-option(BUILD_SHARED_LIBS "Build shared libprimecount"     OFF)
-option(BUILD_STATIC_LIBS "Build static libprimecount"     ON)
-option(BUILD_TESTS       "Build test programs"            OFF)
+option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
+option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
+option(WITH_OPENMP        "Enable OpenMP support"       ON)
+option(WITH_MPI           "Enable MPI support"          OFF)
+option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
+option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
+option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
+option(BUILD_TESTS        "Build test programs"         OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -67,7 +67,6 @@ set(LIB_SRC src/backup.cpp
 
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
-include(CheckCXXSourceRuns)
 
 # Set default build type to Release ##################################
 
@@ -77,31 +76,20 @@ if(NOT CMAKE_BUILD_TYPE)
         FORCE)
 endif()
 
+# libprimesieve ######################################################
+
+set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+add_subdirectory(lib/primesieve)
+set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
+
 # Silence GCC switch fall through warnings ###########################
 
 check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
 
 if(Wno_fallthrough)
     set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-endif()
-
-# Check if big-endian CPU architecture ###############################
-
-check_cxx_source_runs("
-    int main()
-    {
-        union {
-          long word;
-          char c[sizeof(long)];
-        } x;
-        x.word = 1;
-        bool is_big_endian = (x.c[sizeof(long) - 1] == 1);
-        return is_big_endian ? 0 : 1;
-    }"
-    big_endian)
-
-if(big_endian)
-    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_DEFINITIONS IS_BIG_ENDIAN)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
@@ -176,19 +164,16 @@ if(WITH_POPCNT)
     endif()
 endif()
 
+if(NOT WITH_POPCNT)
+    set(POPCNT_DEFINE "DISABLE_POPCNT")
+endif()
+
 # Testing ############################################################
 
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
-
-# libprimesieve ######################################################
-
-option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
-set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
-
-add_subdirectory(lib/primesieve)
 
 # libprimecount ######################################################
 
@@ -197,6 +182,7 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
+    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE libprimesieve "${MPI_CXX_LIBRARIES}")
 
@@ -221,6 +207,7 @@ endif()
 if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
+    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${MPI_CXX_LIBRARIES}")
 

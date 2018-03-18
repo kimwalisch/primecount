@@ -2,12 +2,12 @@
 
 primecount can be built as a static and shared C++ library for use in
 other math projects. primecount's prime counting function implementation
-and nth prime function are currently (2017) orders of magnitude faster
-than e.g. Mathematica, PARI/GP, SageMath and SymPy.
+and nth prime function are currently (March 2018) orders of magnitude
+faster than e.g. Mathematica, PARI/GP, SageMath and SymPy.
 
 libprimecount is also very portable, it has been tested successfully on
 a wide range of operating systems, compilers (GCC, Clang, MSVC) and CPU
-architectures (x86, x64, ARM, PowerPC, PP64).
+architectures (x86, x64, ARM, ARM64, PowerPC, PP64, Sparc).
 
 ## Build instructions
 
@@ -17,6 +17,39 @@ You need to have installed a C++ compiler, cmake and make.
 cmake . -DBUILD_SHARED_LIBS=ON
 make -j
 sudo make install
+```
+
+#### Run the tests
+
+```sh
+cmake . -DBUILD_TESTS=ON
+make -j
+make test
+```
+
+#### Maximum portability
+
+By default primecount uses the ```POPCNT```instruction in order to achieve the
+best performance. As a drawback primecount won't work on CPUs that do not
+have the ```POPCNT``` instruction e.g. all x86 CPUs built before 2010 do not
+have the ```POPCNT```instruction. If you require primecount to run on all CPUs
+you have to disable ```POPCNT```:
+
+```
+cmake . -DWITH_POPCNT=OFF
+```
+
+Here are all available cmake configuration options:
+
+```CMake
+option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
+option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
+option(WITH_OPENMP        "Enable OpenMP support"       ON)
+option(WITH_MPI           "Enable MPI support"          OFF)
+option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
+option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
+option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
+option(BUILD_TESTS        "Build test programs"         OFF)
 ```
 
 ## C++ API
@@ -59,8 +92,8 @@ Below is an example program that counts the primes below 1000.
 
 int main()
 {
-    int64_t prime_count = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << prime_count << std::endl;
+    int64_t primes = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << primes << std::endl;
   
     return 0;
 }

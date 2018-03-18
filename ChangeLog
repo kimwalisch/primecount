@@ -1,8 +1,9 @@
-2018-14-03 Kim Walisch  <kim.walisch@gmail.com>
+2018-18-03 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.3 released.
 
   * Support big-endian CPUs.
+  * Speed up x86 without POPCNT.
   * libdivide.h: update to libdivide 1.0.
   * calculator.hpp: Fix integer overflow in pow().
   * Required CMake version is now 3.4 (previously 3.1).
