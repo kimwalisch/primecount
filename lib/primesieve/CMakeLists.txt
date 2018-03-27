@@ -117,10 +117,11 @@ cmake_pop_check_state()
 
 # libprimesieve (shared library) #####################################
 
-find_package(Threads REQUIRED)
+find_package(Threads REQUIRED QUIET)
 
 if(BUILD_SHARED_LIBS)
     add_library(libprimesieve SHARED ${LIB_SRC})
+    add_library(primesieve::primesieve ALIAS libprimesieve)
     set_target_properties(libprimesieve PROPERTIES OUTPUT_NAME primesieve)
     target_link_libraries(libprimesieve PRIVATE Threads::Threads ${LIBATOMIC})
 
@@ -159,11 +160,8 @@ if(BUILD_STATIC_LIBS)
 
     if(BUILD_SHARED_LIBS)
         add_dependencies(libprimesieve-static libprimesieve)
-    endif()
-
-    if(NOT BUILD_SHARED_LIBS)
-        # make sure libprimesieve is always defined
-        add_library(libprimesieve ALIAS libprimesieve-static)
+    else()
+        add_library(primesieve::primesieve ALIAS libprimesieve-static)
     endif()
 
     target_compile_features(libprimesieve-static
@@ -191,7 +189,7 @@ endif()
 
 if(BUILD_PRIMESIEVE)
     add_executable(primesieve ${BIN_SRC})
-    target_link_libraries(primesieve libprimesieve)
+    target_link_libraries(primesieve primesieve::primesieve)
     target_compile_features(primesieve PRIVATE cxx_auto_type)
     install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_BINDIR})
 

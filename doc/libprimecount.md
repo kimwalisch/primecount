@@ -29,10 +29,10 @@ make test
 
 #### Maximum portability
 
-By default primecount uses the ```POPCNT```instruction in order to achieve the
+By default primecount uses the ```POPCNT``` instruction in order to achieve the
 best performance. As a drawback primecount won't work on CPUs that do not
 have the ```POPCNT``` instruction e.g. all x86 CPUs built before 2010 do not
-have the ```POPCNT```instruction. If you require primecount to run on all CPUs
+have the ```POPCNT``` instruction. If you require primecount to run on all CPUs
 you have to disable ```POPCNT```:
 
 ```
