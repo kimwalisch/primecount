@@ -16,8 +16,8 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cassert>
-#include <climits>
 #include <cmath>
+#include <limits>
 #include <vector>
 
 namespace {
@@ -37,8 +37,7 @@ inline A ceil_div(A a, B b)
 template <typename T>
 inline T number_of_bits(T)
 {
-  static_assert(sizeof(uint64_t) * CHAR_BIT == 64, "number_of_bits() is broken");
-  return (T) (sizeof(T) * CHAR_BIT);
+  return (T) std::numeric_limits<T>::digits;
 }
 
 template <typename T>
