@@ -3,7 +3,7 @@
 /// @brief  Wheel factorization is used to skip multiles of
 ///         small primes in the sieve of Eratosthenes.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,6 +15,7 @@
 #include "config.hpp"
 #include "primesieve_error.hpp"
 #include "Bucket.hpp"
+#include "types.hpp"
 
 #include <stdint.h>
 #include <algorithm>
@@ -67,7 +68,7 @@ class Wheel
 public:
   /// Add a new sieving prime to the sieving algorithm.
   /// Calculate the first multiple > segmentLow of prime and the
-  /// position within the SieveOfEratosthenes array of that multiple
+  /// position within the sieve array of that multiple
   /// and its wheel index. When done store the sieving prime.
   ///
   void addSievingPrime(uint64_t prime, uint64_t segmentLow)
@@ -89,15 +90,15 @@ public:
     if (nextMultiple > stop_ - multiple)
       return;
     nextMultiple += multiple - segmentLow;
-    uint64_t multipleIndex = nextMultiple / NUMBERS_PER_BYTE;
-    uint64_t wheelIndex = wheelOffsets_[prime % NUMBERS_PER_BYTE] + INIT[quotient % MODULO].wheelIndex;
+    uint64_t multipleIndex = nextMultiple / 30;
+    uint64_t wheelIndex = wheelOffsets_[prime % 30] + INIT[quotient % MODULO].wheelIndex;
     storeSievingPrime(prime, multipleIndex, wheelIndex);
   }
 
 protected:
-  Wheel(uint64_t stop, uint64_t sieveSize) :
-    stop_(stop)
+  void init(uint64_t stop, uint64_t sieveSize)
   {
+    stop_ = stop;
     uint64_t maxSieveSize = SievingPrime::MAX_MULTIPLEINDEX + 1;
 
     if (sieveSize > maxSieveSize)
@@ -145,10 +146,10 @@ Wheel<MODULO, SIZE, WHEEL, INIT>::wheelOffsets_[30] =
 };
 
 /// 3rd wheel, skips multiples of 2, 3 and 5
-typedef Wheel<30, 8, wheel30, wheel30Init> Wheel30_t;
+using Wheel30_t = Wheel<30, 8, wheel30, wheel30Init>;
 
 /// 4th wheel, skips multiples of 2, 3, 5 and 7
-typedef Wheel<210, 48, wheel210, wheel210Init> Wheel210_t;
+using Wheel210_t = Wheel<210, 48, wheel210, wheel210Init>;
 
 } // namespace
 

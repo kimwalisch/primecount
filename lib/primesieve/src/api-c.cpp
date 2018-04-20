@@ -4,7 +4,7 @@
 ///         Contains the implementations of the functions declared
 ///         in the primesieve.h header file.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,35 +13,35 @@
 #include <primesieve.h>
 #include <primesieve.hpp>
 #include <primesieve/PrimeSieve.hpp>
-#include <primesieve/ParallelPrimeSieve.hpp>
+#include <primesieve/ParallelSieve.hpp>
 #include <primesieve/malloc_vector.hpp>
 
 #include <stdint.h>
-#include <stdlib.h>
-#include <stddef.h>
+#include <cstdlib>
+#include <cstddef>
 #include <cerrno>
 #include <exception>
 
+using namespace std;
 using namespace primesieve;
 
 namespace {
 
 template <typename T>
-void* primes_helper(uint64_t start, uint64_t stop, size_t* size)
+void* store_primes(uint64_t start, uint64_t stop, size_t* size)
 {
   try
   {
     malloc_vector<T> primes;
-    StorePrimes<malloc_vector<T>> sp(primes);
-    sp.storePrimes(start, stop);
+    store_primes(start, stop, primes);
 
     if (size)
       *size = primes.size();
 
     primes.disable_free();
-    return (void*) primes.data();
+    return primes.data();
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
     if (size)
@@ -52,18 +52,16 @@ void* primes_helper(uint64_t start, uint64_t stop, size_t* size)
 }
 
 template <typename T>
-void* n_primes_helper(uint64_t n, uint64_t start)
+void* store_n_primes(uint64_t n, uint64_t start)
 {
   try
   {
     malloc_vector<T> primes;
-    Store_N_Primes<malloc_vector<T>> sp(primes);
-    sp.storePrimes(n, start);
-
+    store_n_primes(n, start, primes);
     primes.disable_free();
-    return (void*) primes.data();
+    return primes.data();
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -77,20 +75,20 @@ void* primesieve_generate_primes(uint64_t start, uint64_t stop, size_t* size, in
 {
   switch (type)
   {
-    case SHORT_PRIMES:     return primes_helper<short>(start, stop, size);
-    case USHORT_PRIMES:    return primes_helper<unsigned short>(start, stop, size);
-    case INT_PRIMES:       return primes_helper<int>(start, stop, size);
-    case UINT_PRIMES:      return primes_helper<unsigned int>(start, stop, size);
-    case LONG_PRIMES:      return primes_helper<long>(start, stop, size);
-    case ULONG_PRIMES:     return primes_helper<unsigned long>(start, stop, size);
-    case LONGLONG_PRIMES:  return primes_helper<long long>(start, stop, size);
-    case ULONGLONG_PRIMES: return primes_helper<unsigned long long>(start, stop, size);
-    case INT16_PRIMES:     return primes_helper<int16_t>(start, stop, size);
-    case UINT16_PRIMES:    return primes_helper<uint16_t>(start, stop, size);
-    case INT32_PRIMES:     return primes_helper<int32_t>(start, stop, size);
-    case UINT32_PRIMES:    return primes_helper<uint32_t>(start, stop, size);
-    case INT64_PRIMES:     return primes_helper<int64_t>(start, stop, size);
-    case UINT64_PRIMES:    return primes_helper<uint64_t>(start, stop, size);
+    case SHORT_PRIMES:     return store_primes<short>(start, stop, size);
+    case USHORT_PRIMES:    return store_primes<unsigned short>(start, stop, size);
+    case INT_PRIMES:       return store_primes<int>(start, stop, size);
+    case UINT_PRIMES:      return store_primes<unsigned int>(start, stop, size);
+    case LONG_PRIMES:      return store_primes<long>(start, stop, size);
+    case ULONG_PRIMES:     return store_primes<unsigned long>(start, stop, size);
+    case LONGLONG_PRIMES:  return store_primes<long long>(start, stop, size);
+    case ULONGLONG_PRIMES: return store_primes<unsigned long long>(start, stop, size);
+    case INT16_PRIMES:     return store_primes<int16_t>(start, stop, size);
+    case UINT16_PRIMES:    return store_primes<uint16_t>(start, stop, size);
+    case INT32_PRIMES:     return store_primes<int32_t>(start, stop, size);
+    case UINT32_PRIMES:    return store_primes<uint32_t>(start, stop, size);
+    case INT64_PRIMES:     return store_primes<int64_t>(start, stop, size);
+    case UINT64_PRIMES:    return store_primes<uint64_t>(start, stop, size);
   }
   errno = EDOM;
   if (size)
@@ -102,20 +100,20 @@ void* primesieve_generate_n_primes(uint64_t n, uint64_t start, int type)
 {
   switch (type)
   {
-    case SHORT_PRIMES:     return n_primes_helper<short>(n, start);
-    case USHORT_PRIMES:    return n_primes_helper<unsigned short>(n, start);
-    case INT_PRIMES:       return n_primes_helper<int>(n, start);
-    case UINT_PRIMES:      return n_primes_helper<unsigned int>(n, start);
-    case LONG_PRIMES:      return n_primes_helper<long>(n, start);
-    case ULONG_PRIMES:     return n_primes_helper<unsigned long>(n, start);
-    case LONGLONG_PRIMES:  return n_primes_helper<long long>(n, start);
-    case ULONGLONG_PRIMES: return n_primes_helper<unsigned long long>(n, start);
-    case INT16_PRIMES:     return n_primes_helper<int16_t>(n, start);
-    case UINT16_PRIMES:    return n_primes_helper<uint16_t>(n, start);
-    case INT32_PRIMES:     return n_primes_helper<int32_t>(n, start);
-    case UINT32_PRIMES:    return n_primes_helper<uint32_t>(n, start);
-    case INT64_PRIMES:     return n_primes_helper<int64_t>(n, start);
-    case UINT64_PRIMES:    return n_primes_helper<uint64_t>(n, start);
+    case SHORT_PRIMES:     return store_n_primes<short>(n, start);
+    case USHORT_PRIMES:    return store_n_primes<unsigned short>(n, start);
+    case INT_PRIMES:       return store_n_primes<int>(n, start);
+    case UINT_PRIMES:      return store_n_primes<unsigned int>(n, start);
+    case LONG_PRIMES:      return store_n_primes<long>(n, start);
+    case ULONG_PRIMES:     return store_n_primes<unsigned long>(n, start);
+    case LONGLONG_PRIMES:  return store_n_primes<long long>(n, start);
+    case ULONGLONG_PRIMES: return store_n_primes<unsigned long long>(n, start);
+    case INT16_PRIMES:     return store_n_primes<int16_t>(n, start);
+    case UINT16_PRIMES:    return store_n_primes<uint16_t>(n, start);
+    case INT32_PRIMES:     return store_n_primes<int32_t>(n, start);
+    case UINT32_PRIMES:    return store_n_primes<uint32_t>(n, start);
+    case INT64_PRIMES:     return store_n_primes<int64_t>(n, start);
+    case UINT64_PRIMES:    return store_n_primes<uint64_t>(n, start);
   }
   errno = EDOM;
   return NULL;
@@ -130,12 +128,12 @@ uint64_t primesieve_nth_prime(int64_t n, uint64_t start)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.nthPrime(n, start);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    return ps.nthPrime(n, start);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -146,12 +144,13 @@ uint64_t primesieve_count_primes(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countPrimes(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_PRIMES);
+    return ps.getCount(0);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -162,12 +161,13 @@ uint64_t primesieve_count_twins(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countTwins(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_TWINS);
+    return ps.getCount(1);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -178,12 +178,13 @@ uint64_t primesieve_count_triplets(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countTriplets(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_TRIPLETS);
+    return ps.getCount(2);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -194,12 +195,13 @@ uint64_t primesieve_count_quadruplets(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countQuadruplets(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_QUADRUPLETS);
+    return ps.getCount(3);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -210,12 +212,13 @@ uint64_t primesieve_count_quintuplets(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countQuintuplets(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_QUINTUPLETS);
+    return ps.getCount(4);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -226,12 +229,13 @@ uint64_t primesieve_count_sextuplets(uint64_t start, uint64_t stop)
 {
   try
   {
-    ParallelPrimeSieve pps;
-    pps.setSieveSize(get_sieve_size());
-    pps.setNumThreads(get_num_threads());
-    return pps.countSextuplets(start, stop);
+    ParallelSieve ps;
+    ps.setSieveSize(get_sieve_size());
+    ps.setNumThreads(get_num_threads());
+    ps.sieve(start, stop, COUNT_SEXTUPLETS);
+    return ps.getCount(5);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -244,9 +248,9 @@ void primesieve_print_primes(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printPrimes(start, stop);
+    ps.sieve(start, stop, PRINT_PRIMES);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -258,9 +262,9 @@ void primesieve_print_twins(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printTwins(start, stop);
+    ps.sieve(start, stop, PRINT_TWINS);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -272,9 +276,9 @@ void primesieve_print_triplets(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printTriplets(start, stop);
+    ps.sieve(start, stop, PRINT_TRIPLETS);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -286,9 +290,9 @@ void primesieve_print_quadruplets(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printQuadruplets(start, stop);
+    ps.sieve(start, stop, PRINT_QUADRUPLETS);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -300,9 +304,9 @@ void primesieve_print_quintuplets(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printQuintuplets(start, stop);
+    ps.sieve(start, stop, PRINT_QUINTUPLETS);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }
@@ -314,9 +318,9 @@ void primesieve_print_sextuplets(uint64_t start, uint64_t stop)
   {
     PrimeSieve ps;
     ps.setSieveSize(get_sieve_size());
-    ps.printSextuplets(start, stop);
+    ps.sieve(start, stop, PRINT_SEXTUPLETS);
   }
-  catch (std::exception&)
+  catch (exception&)
   {
     errno = EDOM;
   }

@@ -1,23 +1,19 @@
 ///
-/// @file   PrimeSieve.hpp
-/// @brief  The PrimeSieve class is a high level class that
-///         manages prime sieving using the PreSieve, SievingPrimes
-///         and PrimeGenerator classes.
+/// @file   PrimeSieve.cpp
+/// @brief  PrimeSieve is a high level class that manages prime
+///         sieving. It is used for printing and counting primes
+///         and for computing the nth prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primesieve/config.hpp>
 #include <primesieve/PrimeSieve.hpp>
-#include <primesieve/primesieve_error.hpp>
-#include <primesieve/PreSieve.hpp>
-#include <primesieve/PrimeGenerator.hpp>
-#include <primesieve/SievingPrimes.hpp>
-#include <primesieve/StorePrimes.hpp>
 #include <primesieve/pmath.hpp>
+#include <primesieve/PrintPrimes.hpp>
+#include <primesieve/types.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -54,29 +50,23 @@ const array<SmallPrime, 8> smallPrimes
 
 namespace primesieve {
 
-int get_sieve_size();
-
 PrimeSieve::PrimeSieve() :
   start_(0),
   stop_(0),
-  counts_(6),
   flags_(COUNT_PRIMES),
-  parent_(nullptr),
-  store_(nullptr)
+  parent_(nullptr)
 {
   setSieveSize(get_sieve_size());
   reset();
 }
 
-/// ParallelPrimeSieve creates one PrimeSieve
+/// ParallelSieve creates one PrimeSieve
 /// child object for each thread.
 ///
 PrimeSieve::PrimeSieve(PrimeSieve* parent) :
-  counts_(6),
   sieveSize_(parent->sieveSize_),
   flags_(parent->flags_),
-  parent_(parent),
-  store_(parent->store_)
+  parent_(parent)
 { }
 
 PrimeSieve::~PrimeSieve()
@@ -84,35 +74,97 @@ PrimeSieve::~PrimeSieve()
 
 void PrimeSieve::reset()
 {
-  fill(counts_.begin(), counts_.end(), 0);
+  counts_.fill(0);
   seconds_ = 0.0;
   toUpdate_ = 0;
   processed_ = 0;
   percent_ = -1.0;
 }
 
-uint64_t PrimeSieve::getStart()                  const { return start_; }
-uint64_t PrimeSieve::getStop()                   const { return stop_; }
-uint64_t PrimeSieve::getDistance()               const { return stop_ - start_; }
-uint64_t PrimeSieve::getPrimeCount()             const { return counts_[0]; }
-uint64_t PrimeSieve::getTwinCount()              const { return counts_[1]; }
-uint64_t PrimeSieve::getTripletCount()           const { return counts_[2]; }
-uint64_t PrimeSieve::getQuadrupletCount()        const { return counts_[3]; }
-uint64_t PrimeSieve::getQuintupletCount()        const { return counts_[4]; }
-uint64_t PrimeSieve::getSextupletCount()         const { return counts_[5]; }
-uint64_t PrimeSieve::getCount(int index)         const { return counts_.at(index); }
-double   PrimeSieve::getStatus()                 const { return percent_; }
-double   PrimeSieve::getSeconds()                const { return seconds_; }
-int      PrimeSieve::getSieveSize()              const { return sieveSize_; }
-bool     PrimeSieve::isFlag(int flag)            const { return (flags_ & flag) == flag; }
-bool     PrimeSieve::isFlag(int first, int last) const { return (flags_ & (last * 2 - first)) != 0; }
-bool     PrimeSieve::isCount(int index)          const { return isFlag(COUNT_PRIMES << index); }
-bool     PrimeSieve::isPrint(int index)          const { return isFlag(PRINT_PRIMES << index); }
-bool     PrimeSieve::isCount()                   const { return isFlag(COUNT_PRIMES, COUNT_SEXTUPLETS); }
-bool     PrimeSieve::isPrint()                   const { return isFlag(PRINT_PRIMES, PRINT_SEXTUPLETS); }
-bool     PrimeSieve::isStatus()                  const { return isFlag(PRINT_STATUS, CALCULATE_STATUS); }
-bool     PrimeSieve::isStore()                   const { return store_ != nullptr; }
-bool     PrimeSieve::isParallelPrimeSieve()      const { return parent_ != nullptr; }
+bool PrimeSieve::isParallelSieve() const
+{
+  return parent_ != nullptr;
+}
+
+bool PrimeSieve::isFlag(int flag) const
+{
+  return (flags_ & flag) == flag;
+}
+
+bool PrimeSieve::isFlag(int first, int last) const
+{
+  int mask = (last * 2) - first;
+  return (flags_ & mask) != 0;
+}
+
+bool PrimeSieve::isCountPrimes()   const { return isFlag(COUNT_PRIMES); }
+bool PrimeSieve::isPrintPrimes()   const { return isFlag(PRINT_PRIMES); }
+bool PrimeSieve::isPrint()         const { return isFlag(PRINT_PRIMES, PRINT_SEXTUPLETS); }
+bool PrimeSieve::isCountkTuplets() const { return isFlag(COUNT_TWINS, COUNT_SEXTUPLETS); }
+bool PrimeSieve::isPrintkTuplets() const { return isFlag(PRINT_TWINS, PRINT_SEXTUPLETS); }
+bool PrimeSieve::isStatus()        const { return isFlag(PRINT_STATUS, CALCULATE_STATUS); }
+bool PrimeSieve::isCount(int i)    const { return isFlag(COUNT_PRIMES << i); }
+bool PrimeSieve::isPrint(int i)    const { return isFlag(PRINT_PRIMES << i); }
+
+uint64_t PrimeSieve::getStart() const
+{
+  return start_;
+}
+
+uint64_t PrimeSieve::getStop() const
+{
+  return stop_;
+}
+
+uint64_t PrimeSieve::getDistance() const
+{
+  return stop_ - start_;
+}
+
+uint64_t PrimeSieve::getCount(int i) const
+{
+  return counts_.at(i);
+}
+
+counts_t& PrimeSieve::getCounts()
+{
+  return counts_;
+}
+
+int PrimeSieve::getSieveSize() const
+{
+  return sieveSize_;
+}
+
+double PrimeSieve::getSeconds() const
+{
+  return seconds_;
+}
+
+double PrimeSieve::getStatus() const
+{
+  return percent_;
+}
+
+void PrimeSieve::setFlags(int flags)
+{
+  flags_ = flags;
+}
+
+void PrimeSieve::addFlags(int flags)
+{
+  flags_ |= flags;
+}
+
+/// Set the size of the sieve array in kilobytes.
+/// The best sieving performance is usually achieved if the
+/// sieve size is set to the CPU's L1 or L2 cache size.
+///
+void PrimeSieve::setSieveSize(int sieveSize)
+{
+  sieveSize_ = inBetween(8, sieveSize, 4096);
+  sieveSize_ = floorPow2(sieveSize_);
+}
 
 /// Set a start number (lower bound) for sieving
 void PrimeSieve::setStart(uint64_t start)
@@ -126,42 +178,12 @@ void PrimeSieve::setStop(uint64_t stop)
   stop_ = stop;
 }
 
-/// Set the size of the sieve array in kilobytes.
-/// The best sieving performance is usually achieved if the
-/// sieve size is set to the CPU's L1 or L2 cache size.
-///
-void PrimeSieve::setSieveSize(int sieveSize)
-{
-  sieveSize_ = inBetween(8, sieveSize, 4096);
-  sieveSize_ = floorPow2(sieveSize_);
-}
-
-Store& PrimeSieve::getStore()
-{
-  return *store_;
-}
-
-PrimeSieve::counts_t& PrimeSieve::getCounts()
-{
-  return counts_;
-}
-
-void PrimeSieve::setFlags(int flags)
-{
-  flags_ = flags;
-}
-
-void PrimeSieve::addFlags(int flags)
-{
-  flags_ |= flags;
-}
-
 /// Print status in percent to stdout.
 /// @processed:  Sum of recently processed segments
 ///
 bool PrimeSieve::updateStatus(uint64_t processed, bool tryLock)
 {
-  if (isParallelPrimeSieve())
+  if (isParallelSieve())
   {
     toUpdate_ += processed;
     if (parent_->updateStatus(toUpdate_, tryLock))
@@ -203,10 +225,29 @@ void PrimeSieve::processSmallPrimes()
         counts_[p.index]++;
       if (isPrint(p.index))
         cout << p.str << '\n';
-      if (isStore() && p.index == 0)
-        (*store_)(p.first);
     }
   }
+}
+
+uint64_t PrimeSieve::countPrimes(uint64_t start, uint64_t stop)
+{
+  sieve(start, stop, COUNT_PRIMES);
+  return getCount(0);
+}
+
+void PrimeSieve::sieve(uint64_t start, uint64_t stop)
+{
+  setStart(start);
+  setStop(stop);
+  sieve();
+}
+
+void PrimeSieve::sieve(uint64_t start, uint64_t stop, int flags)
+{
+  setStart(start);
+  setStop(stop);
+  setFlags(flags);
+  sieve();
 }
 
 /// Sieve the primes and prime k-tuplets (twin primes,
@@ -231,18 +272,8 @@ void PrimeSieve::sieve()
 
   if (stop_ >= 7)
   {
-    PreSieve preSieve(start_, stop_);
-    PrimeGenerator primeGen(*this, preSieve);
-
-    // generate sieving primes for primeGen
-    if (primeGen.getSqrtStop() > preSieve.getMaxPrime())
-    {
-      SievingPrimes sp(primeGen, preSieve);
-      sp.generate();
-    }
-
-    // sieve [start, stop]
-    primeGen.sieve();
+    PrintPrimes printPrimes(*this);
+    printPrimes.sieve();
   }
 
   auto t2 = chrono::system_clock::now();
@@ -251,100 +282,6 @@ void PrimeSieve::sieve()
 
   if (isStatus())
     updateStatus(finishStatus, false);
-}
-
-void PrimeSieve::sieve(uint64_t start, uint64_t stop)
-{
-  setStart(start);
-  setStop(stop);
-  sieve();
-}
-
-void PrimeSieve::sieve(uint64_t start, uint64_t stop, int flags)
-{
-  setStart(start);
-  setStop(stop);
-  setFlags(flags);
-  sieve();
-}
-
-void PrimeSieve::storePrimes(uint64_t start, uint64_t stop, Store* store)
-{
-  if (!store)
-    throw primesieve_error("invalid store pointer");
-  store_ = store;
-  flags_ = 0;
-  sieve(start, stop);
-}
-
-// Print methods
-
-void PrimeSieve::printPrimes(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_PRIMES);
-}
-
-void PrimeSieve::printTwins(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_TWINS);
-}
-
-void PrimeSieve::printTriplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_TRIPLETS);
-}
-
-void PrimeSieve::printQuadruplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_QUADRUPLETS);
-}
-
-void PrimeSieve::printQuintuplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_QUINTUPLETS);
-}
-
-void PrimeSieve::printSextuplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, PRINT_SEXTUPLETS);
-}
-
-// Count methods
-
-uint64_t PrimeSieve::countPrimes(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_PRIMES);
-  return getPrimeCount();
-}
-
-uint64_t PrimeSieve::countTwins(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_TWINS);
-  return getTwinCount();
-}
-
-uint64_t PrimeSieve::countTriplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_TRIPLETS);
-  return getTripletCount();
-}
-
-uint64_t PrimeSieve::countQuadruplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_QUADRUPLETS);
-  return getQuadrupletCount();
-}
-
-uint64_t PrimeSieve::countQuintuplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_QUINTUPLETS);
-  return getQuintupletCount();
-}
-
-uint64_t PrimeSieve::countSextuplets(uint64_t start, uint64_t stop)
-{
-  sieve(start, stop, COUNT_SEXTUPLETS);
-  return getSextupletCount();
 }
 
 } // namespace

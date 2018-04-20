@@ -3,19 +3,19 @@
 /// @brief  Segmented sieve of Eratosthenes optimized for
 ///         small sieving primes.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primesieve/config.hpp>
+#include <primesieve/bits.hpp>
+#include <primesieve/Bucket.hpp>
 #include <primesieve/CpuInfo.hpp>
 #include <primesieve/EratSmall.hpp>
-#include <primesieve/bits.hpp>
 #include <primesieve/pmath.hpp>
 #include <primesieve/primesieve_error.hpp>
-#include <primesieve/Bucket.hpp>
+#include <primesieve/types.hpp>
 #include <primesieve/Wheel.hpp>
 
 #include <stdint.h>
@@ -31,15 +31,17 @@ namespace primesieve {
 /// @l1Size:    Sieve size in bytes
 /// @maxPrime:  Sieving primes <= maxPrime
 ///
-EratSmall::EratSmall(uint64_t stop, uint64_t l1Size, uint64_t maxPrime) :
-  Wheel30_t(stop, l1Size),
-  maxPrime_(maxPrime),
-  l1Size_(l1Size)
+void EratSmall::init(uint64_t stop, uint64_t l1Size, uint64_t maxPrime)
 {
-  if (maxPrime_ > l1Size * 3)
+  if (maxPrime > l1Size * 3)
     throw primesieve_error("EratSmall: maxPrime must be <= l1Size * 3");
 
-  size_t count = prime_count_approx(maxPrime);
+  enabled_ = true;
+  maxPrime_ = maxPrime;
+  l1Size_ = l1Size;
+  Wheel::init(stop, l1Size);
+
+  size_t count = primeCountApprox(maxPrime);
   primes_.reserve(count);
 }
 
@@ -65,7 +67,7 @@ uint64_t EratSmall::getL1Size(uint64_t sieveSize)
 void EratSmall::storeSievingPrime(uint64_t prime, uint64_t multipleIndex, uint64_t wheelIndex)
 {
   assert(prime <= maxPrime_);
-  uint64_t sievingPrime = prime / NUMBERS_PER_BYTE;
+  uint64_t sievingPrime = prime / 30;
   primes_.emplace_back(sievingPrime, multipleIndex, wheelIndex);
 }
 
@@ -74,13 +76,14 @@ void EratSmall::storeSievingPrime(uint64_t prime, uint64_t multipleIndex, uint64
 ///
 void EratSmall::crossOff(byte_t* sieve, uint64_t sieveSize)
 {
-  byte_t* sieveEnd = &sieve[sieveSize];
+  byte_t* sieveEnd = sieve + sieveSize;
 
-  for (; sieve < sieveEnd; sieve += l1Size_)
+  while (sieve < sieveEnd)
   {
-    byte_t* end = &sieve[l1Size_];
-    end = min(end, sieveEnd);
-    crossOff(sieve, end);
+    byte_t* start = sieve;
+    sieve += l1Size_;
+    sieve = min(sieve, sieveEnd);
+    crossOff(start, sieve);
   }
 }
 

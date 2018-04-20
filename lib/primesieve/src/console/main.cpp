@@ -2,17 +2,16 @@
 /// @file   main.cpp
 /// @brief  primesieve console application.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primesieve/ParallelPrimeSieve.hpp>
+#include <primesieve/ParallelSieve.hpp>
 #include "cmdoptions.hpp"
 
 #include <stdint.h>
-#include <cstdlib>
 #include <iostream>
 #include <exception>
 #include <iomanip>
@@ -23,11 +22,11 @@ using namespace primesieve;
 
 namespace {
 
-void printResults(ParallelPrimeSieve& ps, CmdOptions& opt)
+void printResults(ParallelSieve& ps, CmdOptions& opt)
 {
   cout << left;
 
-  const string text[] =
+  const string text[6] =
   {
     "Primes: ",
     "Twin primes: ",
@@ -48,7 +47,7 @@ void printResults(ParallelPrimeSieve& ps, CmdOptions& opt)
 /// Count & print primes and prime k-tuplets
 void sieve(CmdOptions& opt)
 {
-  ParallelPrimeSieve ps;
+  ParallelSieve ps;
   auto& numbers = opt.numbers;
 
   if (opt.flags)
@@ -72,7 +71,7 @@ void sieve(CmdOptions& opt)
   }
 
   if (opt.status)
-    ps.addFlags(ps.PRINT_STATUS);
+    ps.addFlags(PRINT_STATUS);
 
   ps.sieve();
   printResults(ps, opt);
@@ -80,7 +79,7 @@ void sieve(CmdOptions& opt)
 
 void nthPrime(CmdOptions& opt)
 {
-  ParallelPrimeSieve ps;
+  ParallelSieve ps;
   auto& numbers = opt.numbers;
 
   if (opt.flags)

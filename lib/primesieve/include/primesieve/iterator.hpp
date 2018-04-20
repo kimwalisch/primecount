@@ -1,7 +1,7 @@
 ///
 /// @file   iterator.hpp
-/// @brief  The iterator class allows to easily iterate (forward and
-///         backward) over prime numbers.
+/// @brief  The iterator class allows to easily iterate (forwards
+///         and backwards) over prime numbers.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,11 +12,14 @@
 #ifndef PRIMESIEVE_ITERATOR_HPP
 #define PRIMESIEVE_ITERATOR_HPP
 
-#include <vector>
-#include <cstddef>
 #include <stdint.h>
+#include <cstddef>
+#include <vector>
+#include <memory>
 
 namespace primesieve {
+
+class PrimeGenerator;
 
 uint64_t get_max_stop();
 
@@ -24,7 +27,7 @@ uint64_t get_max_stop();
 /// forwards and backwards. Generating the first prime has a
 /// complexity of O(r log log r) operations with r = n^0.5, after that
 /// any additional prime is generated in amortized O(log n log log n)
-/// operations. The memory usage is about pi(n^0.5) * 16 bytes.
+/// operations. The memory usage is PrimePi(n^0.5) * 8 bytes.
 ///
 class iterator
 {
@@ -38,7 +41,7 @@ public:
   ///
   iterator(uint64_t start = 0, uint64_t stop_hint = get_max_stop());
 
-  /// Reinitialize this iterator object to start.
+  /// Reset the primesieve iterator to start.
   /// @param start      Generate primes > start (or < start).
   /// @param stop_hint  Stop number optimization hint, gives significant
   ///                   speed up if few primes are generated. E.g. if
@@ -47,8 +50,8 @@ public:
   ///
   void skipto(uint64_t start, uint64_t stop_hint = get_max_stop());
 
-  /// Advance the iterator by one position.
-  /// @return The next prime.
+  /// Get the next prime.
+  /// Returns UINT64_MAX if next prime > 2^64.
   ///
   uint64_t next_prime()
   {
@@ -57,8 +60,8 @@ public:
     return primes_[i_];
   }
 
-  /// Get the previous prime,
-  /// or 0 if input <= 2 e.g. prev_prime(2) = 0.
+  /// Get the previous prime.
+  /// prev_prime(n) = 0 if n <= 2.
   ///
   uint64_t prev_prime()
   {
@@ -66,6 +69,8 @@ public:
       generate_prev_primes();
     return primes_[i_];
   }
+
+  ~iterator();
 private:
   std::size_t i_;
   std::size_t last_idx_;
@@ -73,8 +78,8 @@ private:
   uint64_t start_;
   uint64_t stop_;
   uint64_t stop_hint_;
-  uint64_t tiny_cache_size_;
-  uint64_t get_distance(uint64_t);
+  uint64_t dist_;
+  std::unique_ptr<PrimeGenerator> primeGenerator_;
   void generate_next_primes();
   void generate_prev_primes();
 };

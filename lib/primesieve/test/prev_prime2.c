@@ -2,7 +2,7 @@
 /// @file   prev_prime2.cpp
 /// @brief  Test primesieve_prev_prime().
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,6 +36,7 @@ int main()
   uint64_t i;
   uint64_t prime;
   uint64_t sum = 0;
+  uint64_t old, p1, p2;
 
   for (i = size - 1; i > 0; i--)
   {
@@ -50,25 +51,49 @@ int main()
     check(prime == primes[i - 1]);
   }
 
-  primesieve_skipto(&it, 1000000000, 0);
+  primesieve_skipto(&it, 100000000, 0);
 
-  // iterate over the primes below 10^9
+  // iterate over the primes below 10^8
   while ((prime = primesieve_prev_prime(&it)) > 0)
     sum += prime;
 
-  printf("Sum of the primes below 10^9 = %" PRIu64, sum);
-  check(sum == 24739512092254535ull);
+  printf("Sum of the primes below 10^8 = %" PRIu64, sum);
+  check(sum == 279209790387276ull);
 
-  uint64_t p1 = primes[size - 1];
-  uint64_t p2 = primes[size - 2];
-  primesieve_skipto(&it, p2, p1);
-  prime = primesieve_next_prime(&it);
-  printf("next_prime(%" PRIu64 ") = %" PRIu64, p2, prime);
-  check(prime == p1);
+  for (i = 0; i < 1000; i++)
+  {
+    prime = primesieve_prev_prime(&it);
+    printf("prev_prime(0) = %" PRIu64, prime);
+    check(prime == 0);
+  }
 
-  prime = primesieve_prev_prime(&it);
-  printf("prev_prime(%" PRIu64 ") = %" PRIu64, p1, prime);
-  check(prime == p2);
+  for (i = 0; i < 1000; i++)
+  {
+    old = prime;
+    prime = primesieve_next_prime(&it);
+    printf("next_prime(%" PRIu64 ") = %" PRIu64, old, prime);
+    check(prime == primes[i]);
+  }
+
+  primesieve_skipto(&it, primes[size - 1], 0);
+
+  for (i = 0; i < 1000; i++)
+  {
+    p1 = primes[size - (i + 1)];
+    p2 = primes[size - (i + 2)];
+    prime = primesieve_prev_prime(&it);
+    printf("prev_prime(%" PRIu64 ") = %" PRIu64, p1, prime);
+    check(prime == p2);
+  }
+
+  for (i = 0; i < 1000; i++)
+  {
+    old = prime;
+    p1 = size - 1000 + i;
+    prime = primesieve_next_prime(&it);
+    printf("next_prime(%" PRIu64 ") = %" PRIu64, old, prime);
+    check(prime == primes[p1]);
+  }
 
   primesieve_free(primes);
   primesieve_free_iterator(&it);

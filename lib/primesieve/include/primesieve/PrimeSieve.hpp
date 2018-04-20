@@ -1,10 +1,10 @@
 ///
 /// @file   PrimeSieve.hpp
-/// @brief  The PrimeSieve class is a high level class that
-///         manages prime sieving using the PreSieve, SievingPrimes
-///         and PrimeGenerator classes.
+/// @brief  PrimeSieve is a high level class that manages prime
+///         sieving. It is used for printing and counting primes
+///         and for computing the nth prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,32 +14,33 @@
 #define PRIMESIEVE_CLASS_HPP
 
 #include <stdint.h>
-#include <vector>
+#include <array>
 
 namespace primesieve {
 
-class Store;
+using counts_t = std::array<uint64_t, 6>;
+
+enum
+{
+  COUNT_PRIMES      = 1 << 0,
+  COUNT_TWINS       = 1 << 1,
+  COUNT_TRIPLETS    = 1 << 2,
+  COUNT_QUADRUPLETS = 1 << 3,
+  COUNT_QUINTUPLETS = 1 << 4,
+  COUNT_SEXTUPLETS  = 1 << 5,
+  PRINT_PRIMES      = 1 << 6,
+  PRINT_TWINS       = 1 << 7,
+  PRINT_TRIPLETS    = 1 << 8,
+  PRINT_QUADRUPLETS = 1 << 9,
+  PRINT_QUINTUPLETS = 1 << 10,
+  PRINT_SEXTUPLETS  = 1 << 11,
+  PRINT_STATUS      = 1 << 12,
+  CALCULATE_STATUS  = 1 << 13
+};
 
 class PrimeSieve
 {
 public:
-  enum
-  {
-    COUNT_PRIMES      = 1 << 0,
-    COUNT_TWINS       = 1 << 1,
-    COUNT_TRIPLETS    = 1 << 2,
-    COUNT_QUADRUPLETS = 1 << 3,
-    COUNT_QUINTUPLETS = 1 << 4,
-    COUNT_SEXTUPLETS  = 1 << 5,
-    PRINT_PRIMES      = 1 << 6,
-    PRINT_TWINS       = 1 << 7,
-    PRINT_TRIPLETS    = 1 << 8,
-    PRINT_QUADRUPLETS = 1 << 9,
-    PRINT_QUINTUPLETS = 1 << 10,
-    PRINT_SEXTUPLETS  = 1 << 11,
-    PRINT_STATUS      = 1 << 12,
-    CALCULATE_STATUS  = 1 << 13
-  };
   PrimeSieve();
   PrimeSieve(PrimeSieve*);
   virtual ~PrimeSieve();
@@ -49,7 +50,6 @@ public:
   int getSieveSize() const;
   double getStatus() const;
   double getSeconds() const;
-  Store& getStore();
   // Setters
   void setStart(uint64_t);
   void setStop(uint64_t);
@@ -57,46 +57,27 @@ public:
   void setFlags(int);
   void addFlags(int);
   // Bool is*
-  bool isCount() const;
   bool isCount(int) const;
+  bool isCountPrimes() const;
+  bool isCountkTuplets() const;
   bool isPrint() const;
   bool isPrint(int) const;
+  bool isPrintPrimes() const;
+  bool isPrintkTuplets() const;
   bool isFlag(int) const;
   bool isFlag(int, int) const;
   bool isStatus() const;
-  bool isStore() const;
   // Sieve
   virtual void sieve();
   void sieve(uint64_t, uint64_t);
   void sieve(uint64_t, uint64_t, int);
-  void storePrimes(uint64_t, uint64_t, Store*);
   // nth prime
   uint64_t nthPrime(uint64_t);
   uint64_t nthPrime(int64_t, uint64_t);
-  // Print
-  void printPrimes(uint64_t, uint64_t);
-  void printTwins(uint64_t, uint64_t);
-  void printTriplets(uint64_t, uint64_t);
-  void printQuadruplets(uint64_t, uint64_t);
-  void printQuintuplets(uint64_t, uint64_t);
-  void printSextuplets(uint64_t, uint64_t);
   // Count
-  uint64_t countPrimes(uint64_t, uint64_t);
-  uint64_t countTwins(uint64_t, uint64_t);
-  uint64_t countTriplets(uint64_t, uint64_t);
-  uint64_t countQuadruplets(uint64_t, uint64_t);
-  uint64_t countQuintuplets(uint64_t, uint64_t);
-  uint64_t countSextuplets(uint64_t, uint64_t);
-  // Count getters
-  typedef std::vector<uint64_t> counts_t;
   counts_t& getCounts();
-  uint64_t getPrimeCount() const;
-  uint64_t getTwinCount() const;
-  uint64_t getTripletCount() const;
-  uint64_t getQuadrupletCount() const;
-  uint64_t getQuintupletCount() const;
-  uint64_t getSextupletCount() const;
   uint64_t getCount(int) const;
+  uint64_t countPrimes(uint64_t, uint64_t);
   virtual bool updateStatus(uint64_t, bool tryLock = true);
 protected:
   /// Sieve primes >= start_
@@ -120,11 +101,10 @@ private:
   int sieveSize_;
   /// Setter methods set flags e.g. COUNT_PRIMES
   int flags_;
-  /// parent ParallelPrimeSieve object
+  /// parent ParallelSieve object
   PrimeSieve* parent_;
-  Store* store_;
   static void printStatus(double, double);
-  bool isParallelPrimeSieve() const;
+  bool isParallelSieve() const;
   void processSmallPrimes();
 };
 

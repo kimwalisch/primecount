@@ -9,9 +9,11 @@
 /// file in the top level directory.
 ///
 
-#include <primesieve.hpp>
-#include <primesieve/calculator.hpp>
 #include "cmdoptions.hpp"
+
+#include <primesieve/calculator.hpp>
+#include <primesieve/PrimeSieve.hpp>
+#include <primesieve/primesieve_error.hpp>
 
 #include <string>
 #include <map>
@@ -95,12 +97,12 @@ void optionPrint(Option& opt,
 
   switch (opt.getValue<int>())
   {
-    case 1: opts.flags |= PrimeSieve::PRINT_PRIMES; break;
-    case 2: opts.flags |= PrimeSieve::PRINT_TWINS; break;
-    case 3: opts.flags |= PrimeSieve::PRINT_TRIPLETS; break;
-    case 4: opts.flags |= PrimeSieve::PRINT_QUADRUPLETS; break;
-    case 5: opts.flags |= PrimeSieve::PRINT_QUINTUPLETS; break;
-    case 6: opts.flags |= PrimeSieve::PRINT_SEXTUPLETS; break;
+    case 1: opts.flags |= PRINT_PRIMES; break;
+    case 2: opts.flags |= PRINT_TWINS; break;
+    case 3: opts.flags |= PRINT_TRIPLETS; break;
+    case 4: opts.flags |= PRINT_QUADRUPLETS; break;
+    case 5: opts.flags |= PRINT_QUINTUPLETS; break;
+    case 6: opts.flags |= PRINT_SEXTUPLETS; break;
     default: throw primesieve_error("invalid option " + opt.str);
   }
 }
@@ -118,19 +120,19 @@ void optionCount(Option& opt,
   {
     switch (n % 10)
     {
-      case 1: opts.flags |= PrimeSieve::COUNT_PRIMES; break;
-      case 2: opts.flags |= PrimeSieve::COUNT_TWINS; break;
-      case 3: opts.flags |= PrimeSieve::COUNT_TRIPLETS; break;
-      case 4: opts.flags |= PrimeSieve::COUNT_QUADRUPLETS; break;
-      case 5: opts.flags |= PrimeSieve::COUNT_QUINTUPLETS; break;
-      case 6: opts.flags |= PrimeSieve::COUNT_SEXTUPLETS; break;
+      case 1: opts.flags |= COUNT_PRIMES; break;
+      case 2: opts.flags |= COUNT_TWINS; break;
+      case 3: opts.flags |= COUNT_TRIPLETS; break;
+      case 4: opts.flags |= COUNT_QUADRUPLETS; break;
+      case 5: opts.flags |= COUNT_QUINTUPLETS; break;
+      case 6: opts.flags |= COUNT_SEXTUPLETS; break;
       default: throw primesieve_error("invalid option " + opt.str);
     }
   }
 }
 
 /// e.g. "--thread=4" -> return "--thread"
-string getOption(string str)
+string getOption(const string& str)
 {
   size_t pos = str.find_first_of("=0123456789");
 
@@ -141,7 +143,7 @@ string getOption(string str)
 }
 
 /// e.g. "--thread=4" -> return "4"
-string getValue(string str)
+string getValue(const string& str)
 {
   size_t pos = str.find_first_of("0123456789");
 

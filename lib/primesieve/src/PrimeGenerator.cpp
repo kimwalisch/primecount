@@ -1,8 +1,10 @@
 ///
-/// @file   PrimeGenerator.cpp
-/// @brief  After a segment has been sieved PrimeGenerator is
-///         used to reconstruct primes and prime k-tuplets from
-///         1 bits of the sieve array.
+/// @file  PrimeGenerator.cpp
+///        Generates the primes inside [start, stop] and stores them
+///        in a vector. After the primes have been stored in the
+///        vector primesieve::iterator iterates over the vector and
+///        returns the primes. When there are no more primes left in
+///        the vector PrimeGenerator generates new primes.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,184 +12,215 @@
 /// file in the top level directory.
 ///
 
-#include <primesieve/config.hpp>
-#include <primesieve/littleendian_cast.hpp>
-#include <primesieve/pmath.hpp>
+#include <primesieve/Erat.hpp>
+#include <primesieve/PreSieve.hpp>
 #include <primesieve/PrimeGenerator.hpp>
-#include <primesieve/PrimeSieve.hpp>
-#include <primesieve/SieveOfEratosthenes.hpp>
-#include <primesieve/StorePrimes.hpp>
+#include <primesieve/pmath.hpp>
+#include <primesieve/SievingPrimes.hpp>
+#include <primesieve/types.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
-#include <sstream>
+#include <array>
+#include <vector>
 
 using namespace std;
 
 namespace primesieve {
 
-/// popcount.cpp
-uint64_t popcount(const uint64_t* array, uint64_t size);
-
-const uint64_t PrimeGenerator::bitmasks_[6][5] =
+/// First 64 primes
+const array<uint64_t, 64> PrimeGenerator::smallPrimes =
 {
-  { END },
-  { 0x06, 0x18, 0xc0, END },       // Twin primes:       b00000110, b00011000, b11000000
-  { 0x07, 0x0e, 0x1c, 0x38, END }, // Prime triplets:    b00000111, b00001110, ...
-  { 0x1e, END },                   // Prime quadruplets: b00011110
-  { 0x1f, 0x3e, END },             // Prime quintuplets
-  { 0x3f, END }                    // Prime sextuplets
+    2,   3,   5,   7,  11,  13,  17,  19,
+   23,  29,  31,  37,  41,  43,  47,  53,
+   59,  61,  67,  71,  73,  79,  83,  89,
+   97, 101, 103, 107, 109, 113, 127, 131,
+  137, 139, 149, 151, 157, 163, 167, 173,
+  179, 181, 191, 193, 197, 199, 211, 223,
+  227, 229, 233, 239, 241, 251, 257, 263,
+  269, 271, 277, 281, 283, 293, 307, 311
 };
 
-PrimeGenerator::PrimeGenerator(PrimeSieve& ps, const PreSieve& preSieve) :
-  SieveOfEratosthenes(max<uint64_t>(7, ps.getStart()),
-                      ps.getStop(),
-                      ps.getSieveSize(),
-                      preSieve),
-  ps_(ps),
-  counts_(ps_.getCounts())
+/// Number of primes <= n
+const array<uint8_t, 312> PrimeGenerator::primePi =
 {
-  if (ps_.isFlag(ps_.COUNT_TWINS, ps_.COUNT_SEXTUPLETS))
-    init_kCounts();
+   0,  0,  1,  2,  2,  3,  3,  4,  4,  4,
+   4,  5,  5,  6,  6,  6,  6,  7,  7,  8,
+   8,  8,  8,  9,  9,  9,  9,  9,  9, 10,
+  10, 11, 11, 11, 11, 11, 11, 12, 12, 12,
+  12, 13, 13, 14, 14, 14, 14, 15, 15, 15,
+  15, 15, 15, 16, 16, 16, 16, 16, 16, 17,
+  17, 18, 18, 18, 18, 18, 18, 19, 19, 19,
+  19, 20, 20, 21, 21, 21, 21, 21, 21, 22,
+  22, 22, 22, 23, 23, 23, 23, 23, 23, 24,
+  24, 24, 24, 24, 24, 24, 24, 25, 25, 25,
+  25, 26, 26, 27, 27, 27, 27, 28, 28, 29,
+  29, 29, 29, 30, 30, 30, 30, 30, 30, 30,
+  30, 30, 30, 30, 30, 30, 30, 31, 31, 31,
+  31, 32, 32, 32, 32, 32, 32, 33, 33, 34,
+  34, 34, 34, 34, 34, 34, 34, 34, 34, 35,
+  35, 36, 36, 36, 36, 36, 36, 37, 37, 37,
+  37, 37, 37, 38, 38, 38, 38, 39, 39, 39,
+  39, 39, 39, 40, 40, 40, 40, 40, 40, 41,
+  41, 42, 42, 42, 42, 42, 42, 42, 42, 42,
+  42, 43, 43, 44, 44, 44, 44, 45, 45, 46,
+  46, 46, 46, 46, 46, 46, 46, 46, 46, 46,
+  46, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+  47, 47, 47, 48, 48, 48, 48, 49, 49, 50,
+  50, 50, 50, 51, 51, 51, 51, 51, 51, 52,
+  52, 53, 53, 53, 53, 53, 53, 53, 53, 53,
+  53, 54, 54, 54, 54, 54, 54, 55, 55, 55,
+  55, 55, 55, 56, 56, 56, 56, 56, 56, 57,
+  57, 58, 58, 58, 58, 58, 58, 59, 59, 59,
+  59, 60, 60, 61, 61, 61, 61, 61, 61, 61,
+  61, 61, 61, 62, 62, 62, 62, 62, 62, 62,
+  62, 62, 62, 62, 62, 62, 62, 63, 63, 63,
+  63, 64
+};
+
+PrimeGenerator::PrimeGenerator(uint64_t start, uint64_t stop) :
+  Erat(start, stop),
+  preSieve_(start, stop)
+{ }
+
+void PrimeGenerator::init()
+{
+  // sieving is used > max(SmallPrime)
+  uint64_t sieving = smallPrimes.back() + 1;
+  uint64_t sieveSize = get_sieve_size();
+  start_ = max(start_, sieving);
+
+  Erat::init(start_, stop_, sieveSize, preSieve_);
+  sievingPrimes_.init(this, preSieve_);
+  isInit_ = true;
 }
 
-/// Calculate the number of twins, triplets, ...
-/// for each possible byte value
-///
-void PrimeGenerator::init_kCounts()
+size_t PrimeGenerator::getStartIdx() const
 {
-  for (uint_t i = 1; i < counts_.size(); i++)
-  {
-    if (ps_.isCount(i))
-    {
-      kCounts_[i].resize(256);
+  size_t startIdx = 0;
 
-      for (uint64_t j = 0; j < 256; j++)
-      {
-        byte_t count = 0;
-        for (const uint64_t* b = bitmasks_[i]; *b <= j; b++)
-        {
-          if ((j & *b) == *b)
-            count++;
-        }
-        kCounts_[i][j] = count;
-      }
-    }
+  if (start_ > 1)
+    startIdx = primePi[start_ - 1];
+
+  return startIdx;
+}
+
+size_t PrimeGenerator::getStopIdx() const
+{
+  size_t stopIdx = 0;
+
+  if (stop_ < smallPrimes.back())
+    stopIdx = primePi[stop_];
+  else
+    stopIdx = smallPrimes.size();
+
+  return stopIdx;
+}
+
+void PrimeGenerator::init(vector<uint64_t>& primes)
+{
+  size_t size = primeCountApprox(start_, stop_);
+  primes.reserve(size);
+
+  if (start_ <= smallPrimes.back())
+  {
+    size_t a = getStartIdx();
+    size_t b = getStopIdx();
+
+    primes.insert(primes.end(),
+             smallPrimes.begin() + a,
+             smallPrimes.begin() + b);
   }
+
+  init();
 }
 
-/// Executed after each sieved segment.
-/// @see sieveSegment() in SieveOfEratosthenes.cpp
-///
-void PrimeGenerator::generatePrimes(const byte_t* sieve, uint64_t sieveSize)
+void PrimeGenerator::init(vector<uint64_t>& primes, size_t* size)
 {
-  if (ps_.isStore())
-    storePrimes(ps_.getStore(), sieve, sieveSize);
-  if (ps_.isCount())
-    count(sieve, sieveSize);
-  if (ps_.isPrint())
-    print(sieve, sieveSize);
-  if (ps_.isStatus())
-    ps_.updateStatus(sieveSize * NUMBERS_PER_BYTE);
-}
-
-void PrimeGenerator::storePrimes(Store& store, const byte_t* sieve, uint64_t sieveSize) const
-{
-  uint64_t low = getSegmentLow();
-
-  for (uint64_t i = 0; i < sieveSize; i += 8)
+  if (start_ <= smallPrimes.back())
   {
-    uint64_t bits = littleendian_cast<uint64_t>(&sieve[i]); 
+    size_t a = getStartIdx();
+    size_t b = getStopIdx();
+    *size = b - a;
+
+    copy(smallPrimes.begin() + a,
+         smallPrimes.begin() + b,
+         primes.begin());
+  }
+
+  init();
+}
+
+bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes)
+{
+  if (!isInit_)
+    init(primes);
+
+  if (!hasNextSegment())
+    return false;
+
+  sieveSegment();
+  return true;
+}
+
+bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes, size_t* size)
+{
+  if (!isInit_)
+  {
+    init(primes, size);
+    if (*size > 0)
+      return false;
+  }
+
+  if (!hasNextSegment())
+  {
+    *size = 1;
+    primes[0] = ~0ull;
+    finished_ = (primes[0] > stop_);
+    return false;
+  }
+
+  sieveSegment();
+  return true;
+}
+
+void PrimeGenerator::sieveSegment()
+{
+  uint64_t sqrtHigh = isqrt(segmentHigh_);
+
+  sieveIdx_ = 0;
+  low_ = segmentLow_;
+
+  if (!prime_)
+    prime_ = sievingPrimes_.next();
+
+  while (prime_ <= sqrtHigh)
+  {
+    addSievingPrime(prime_);
+    prime_ = sievingPrimes_.next();
+  }
+
+  Erat::sieveSegment();
+}
+
+void PrimeGenerator::fill(vector<uint64_t>& primes)
+{
+  while (true)
+  {
+    if (sieveIdx_ >= sieveSize_)
+      if (!sieveSegment(primes))
+        return;
+
+    auto bits = littleendian_cast<uint64_t>(&sieve_[sieveIdx_]);
+    sieveIdx_ += 8;
+
     while (bits)
-      store(nextPrime(&bits, low));
-
-    low += NUMBERS_PER_BYTE * 8;
-  }
-}
-
-/// Count the primes and prime k-tuplets
-/// in the current segment
-///
-void PrimeGenerator::count(const byte_t* sieve, uint64_t sieveSize)
-{
-  if (ps_.isFlag(ps_.COUNT_PRIMES))
-    counts_[0] += popcount((const uint64_t*) sieve, ceilDiv(sieveSize, 8));
-
-  // i = 1 twins, i = 2 triplets, ...
-  for (uint_t i = 1; i < counts_.size(); i++)
-  {
-    if (ps_.isCount(i))
     {
-      uint64_t sum = 0;
-
-      for (uint64_t j = 0; j < sieveSize; j += 4)
-      {
-        sum += kCounts_[i][sieve[j+0]];
-        sum += kCounts_[i][sieve[j+1]];
-        sum += kCounts_[i][sieve[j+2]];
-        sum += kCounts_[i][sieve[j+3]];
-      }
-
-      counts_[i] += sum;
-    }
-  }
-}
-
-/// Print primes and prime k-tuplets to cout.
-/// primes <= 5 are handled in processSmallPrimes().
-///
-void PrimeGenerator::print(const byte_t* sieve, uint64_t sieveSize) const
-{
-  if (ps_.isFlag(ps_.PRINT_PRIMES))
-  {
-    uint64_t i = 0;
-    uint64_t low = getSegmentLow();
-
-    while (i < sieveSize)
-    {
-      uint64_t size = min(i + (1 << 16), sieveSize);
-      ostringstream primes;
-
-      for (; i < size; i += 8)
-      {
-        uint64_t bits = littleendian_cast<uint64_t>(&sieve[i]);
-        while (bits)
-          primes << nextPrime(&bits, low) << '\n';
-
-        low += NUMBERS_PER_BYTE * 8;
-      }
-
-      cout << primes.str();
-    }
-  }
-
-  // print prime k-tuplets
-  if (ps_.isFlag(ps_.PRINT_TWINS, ps_.PRINT_SEXTUPLETS))
-  {
-    uint_t i = 1; // i = 1 twins, i = 2 triplets, ...
-    uint64_t low = getSegmentLow();
-    ostringstream kTuplets;
-
-    for (; !ps_.isPrint(i); i++);
-    for (uint64_t j = 0; j < sieveSize; j++, low += NUMBERS_PER_BYTE)
-    {
-      for (const uint64_t* bitmask = bitmasks_[i]; *bitmask <= sieve[j]; bitmask++)
-      {
-        if ((sieve[j] & *bitmask) == *bitmask)
-        {
-          kTuplets << "(";
-          uint64_t bits = *bitmask;
-          while (bits != 0)
-          {
-            kTuplets << nextPrime(&bits, low);
-            kTuplets << ((bits != 0) ? ", " : ")\n");
-          }
-        }
-      }
+      auto prime = nextPrime(&bits, low_);
+      primes.push_back(prime);
     }
 
-    cout << kTuplets.str();
+    low_ += 8 * 30;
   }
 }
 
