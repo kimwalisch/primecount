@@ -34,14 +34,27 @@ script:
   - make -j4 VERBOSE=1
   - make doc >/dev/null
   - make install
+  # 2) Test printing primes and prime k-tuplets
+  - if [ "$(./primesieve 1e8 -p | md5sum | cut -f1 -d' ')" != "4e2b0027288a27e9c99699364877c9db" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e8 -p2 | md5sum | cut -f1 -d' ')" != "5076d235d5b03389034ec107227eab98" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e8 -p3 | md5sum | cut -f1 -d' ')" != "1b40d7e67868ccc857df11c3e0f7e0f5" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e8 -p4 | md5sum | cut -f1 -d' ')" != "b998d7cdbeae6623cdecba1b921cb2e1" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e8 -p5 | md5sum | cut -f1 -d' ')" != "1ec7d5704d7399caf43667090b5bf836" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e8 -p6 | md5sum | cut -f1 -d' ')" != "0fb813d345c94cf2012588d1f71328b5" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p | md5sum | cut -f1 -d' ')" != "5fbe254a97ad3bbc07c224908c9d59b2" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p2 | md5sum | cut -f1 -d' ')" != "7a7a770c1841a17a9a63b92b7b6532b9" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p3 | md5sum | cut -f1 -d' ')" != "72323b08c62ad8342f7331e3d6d45a64" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p4 | md5sum | cut -f1 -d' ')" != "c2b0818499f77aa35681db3826caf3f6" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p5 | md5sum | cut -f1 -d' ')" != "11b50e4f75899891a62465f6d68fb76e" ]; then exit 1; fi
+  - if [ "$(./primesieve 1e10 -d1e8 -p6 | md5sum | cut -f1 -d' ')" != "5a0bc83fdef0bb116d60f356adfde52f" ]; then exit 1; fi
   - cd ..
   - rm -rf build
-  # 2) Build primesieve GUI app
+  # 3) Build primesieve GUI app
   - cd src/gui
   - qmake QMAKE_CXX=$CXX QMAKE_CC=$CC
   - make -j4
   - cd ../..
-  # 3) Build using ninja
+  # 4) Build using ninja
   - sed -i 's#if(HELP2MAN)#if(DISABLE_HELP2MAN)#g' CMakeLists.txt
   - mkdir build
   - cd build
@@ -49,14 +62,14 @@ script:
   - if [ "$CXX" = "clang++" ]; then cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS" -DCMAKE_C_FLAGS="$SANITIZER_FLAGS" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_DOC=ON ..; fi
   - ninja -v
   - ninja doc >/dev/null
-  # 4) Run integration tests
+  # 5) Run integration tests
   - ninja test
   - test/cpu_info
   - test/atomic
   - cd ..
-  # 5) Test using valgrind
+  # 6) Test using valgrind
   - $CXX -Iinclude -O2 -std=c++11 -g src/*.cpp examples/cpp/nth_prime.cpp -o nth_prime -lpthread
   - valgrind --error-exitcode=1 ./nth_prime 500000000
-  # 6) Test using cppcheck
+  # 7) Test using cppcheck
   - rm -rf build
   - cppcheck . -q --error-exitcode=1 -iexamples/cpp/prev_prime.cpp -iexamples/cpp/primesieve_iterator.cpp -itest/next_prime1.cpp -itest/prev_prime1.cpp
