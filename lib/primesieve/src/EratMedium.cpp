@@ -3,17 +3,17 @@
 /// @brief  Segmented sieve of Eratosthenes optimized for
 ///         medium sieving primes.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primesieve/config.hpp>
+#include <primesieve/Bucket.hpp>
 #include <primesieve/EratMedium.hpp>
 #include <primesieve/primesieve_error.hpp>
 #include <primesieve/pmath.hpp>
-#include <primesieve/Bucket.hpp>
+#include <primesieve/types.hpp>
 #include <primesieve/Wheel.hpp>
 
 #include <stdint.h>
@@ -26,17 +26,20 @@ namespace primesieve {
 /// @sieveSize:  Sieve size in bytes
 /// @maxPrime:   Sieving primes <= maxPrime
 ///
-EratMedium::EratMedium(uint64_t stop, uint64_t sieveSize, uint64_t maxPrime) :
-  Wheel210_t(stop, sieveSize),
-  maxPrime_(maxPrime)
+void EratMedium::init(uint64_t stop, uint64_t sieveSize, uint64_t maxPrime)
 {
-  // ensure multipleIndex < 2^23 in crossOff()
-  if (sieveSize > (4096u << 10))
+  uint64_t maxSieveSize = 4096 << 10;
+
+  if (sieveSize > maxSieveSize)
     throw primesieve_error("EratMedium: sieveSize must be <= 4096 kilobytes");
-  if (maxPrime_ > sieveSize * 5)
+  if (maxPrime > sieveSize * 5)
     throw primesieve_error("EratMedium: maxPrime must be <= sieveSize * 5");
 
-  size_t size = prime_count_approx(maxPrime);
+  enabled_ = true;
+  maxPrime_ = maxPrime;
+  Wheel::init(stop, sieveSize);
+
+  size_t size = primeCountApprox(maxPrime);
   primes_.reserve(size);
 }
 
@@ -44,7 +47,7 @@ EratMedium::EratMedium(uint64_t stop, uint64_t sieveSize, uint64_t maxPrime) :
 void EratMedium::storeSievingPrime(uint64_t prime, uint64_t multipleIndex, uint64_t wheelIndex)
 {
   assert(prime <= maxPrime_);
-  uint64_t sievingPrime = prime / NUMBERS_PER_BYTE;
+  uint64_t sievingPrime = prime / 30;
   primes_.emplace_back(sievingPrime, multipleIndex, wheelIndex);
 }
 

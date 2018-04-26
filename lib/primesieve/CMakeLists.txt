@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "6.4")
-set(PRIMESIEVE_SOVERSION "8.4.0")
+set(PRIMESIEVE_VERSION "7.0")
+set(PRIMESIEVE_SOVERSION "9.0.0")
 
 # Build options ######################################################
 
@@ -36,13 +36,15 @@ set(LIB_SRC src/api-c.cpp
             src/EratSmall.cpp
             src/iterator-c.cpp
             src/iterator.cpp
+            src/IteratorHelper.cpp
+            src/PrimeGenerator.cpp
             src/nthPrime.cpp
-            src/ParallelPrimeSieve.cpp
+            src/ParallelSieve.cpp
             src/popcount.cpp
             src/PreSieve.cpp
-            src/PrimeGenerator.cpp
+            src/PrintPrimes.cpp
             src/PrimeSieve.cpp
-            src/SieveOfEratosthenes.cpp
+            src/Erat.cpp
             src/SievingPrimes.cpp
             src/Wheel.cpp)
 
@@ -134,11 +136,9 @@ if(BUILD_SHARED_LIBS)
     PUBLIC
         cxx_alias_templates
     PRIVATE
-        cxx_auto_type
-        cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_constexpr
+        cxx_uniform_initialization
+        cxx_lambdas)
 
     target_include_directories(libprimesieve PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -168,11 +168,9 @@ if(BUILD_STATIC_LIBS)
     PUBLIC
         cxx_alias_templates
     PRIVATE
-        cxx_auto_type
-        cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_constexpr
+        cxx_uniform_initialization
+        cxx_lambdas)
 
     target_include_directories(libprimesieve-static PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -205,12 +203,10 @@ install(FILES include/primesieve.h
               COMPONENT libprimesieve-headers
               DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES include/primesieve/PrimeSieve.hpp
-              include/primesieve/StorePrimes.hpp
-              include/primesieve/iterator.h
+install(FILES include/primesieve/iterator.h
               include/primesieve/iterator.hpp
+              include/primesieve/StorePrimes.hpp
               include/primesieve/primesieve_error.hpp
-              include/primesieve/pmath.hpp
               COMPONENT libprimesieve-headers
               DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/primesieve)
 

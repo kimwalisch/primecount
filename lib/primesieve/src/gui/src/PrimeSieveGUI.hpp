@@ -1,7 +1,7 @@
 /*
  * PrimeSieveGUI.hpp -- This file is part of primesieve
  *
- * Copyright (C) 2012 Kim Walisch, <kim.walisch@gmail.com>
+ * Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #define PRIMESIEVEGUI_HPP
 
 #include "PrimeSieveGUI_const.hpp"
-#include <primesieve/ParallelPrimeSieve.hpp>
+#include <primesieve/ParallelSieve.hpp>
 
 #if QT_VERSION >= 0x050000
   #include <QtGlobal>
@@ -84,12 +84,12 @@ private:
   Ui::PrimeSieveGUI* ui;
 
   enum {
-    COUNT_PRIMES     = primesieve::ParallelPrimeSieve::COUNT_PRIMES,
-    COUNT_KTUPLETS   = primesieve::ParallelPrimeSieve::COUNT_SEXTUPLETS * 2 - primesieve::ParallelPrimeSieve::COUNT_TWINS,
-    COUNT_FLAGS      = primesieve::ParallelPrimeSieve::COUNT_SEXTUPLETS * 2 - primesieve::ParallelPrimeSieve::COUNT_PRIMES,
-    PRINT_FLAGS      = primesieve::ParallelPrimeSieve::PRINT_SEXTUPLETS * 2 - primesieve::ParallelPrimeSieve::PRINT_PRIMES,
-    PRINT_PRIMES     = primesieve::ParallelPrimeSieve::PRINT_PRIMES,
-    CALCULATE_STATUS = primesieve::ParallelPrimeSieve::CALCULATE_STATUS
+    COUNT_PRIMES     = primesieve::COUNT_PRIMES,
+    COUNT_KTUPLETS   = primesieve::COUNT_SEXTUPLETS * 2 - primesieve::COUNT_TWINS,
+    COUNT_FLAGS      = primesieve::COUNT_SEXTUPLETS * 2 - primesieve::COUNT_PRIMES,
+    PRINT_FLAGS      = primesieve::PRINT_SEXTUPLETS * 2 - primesieve::PRINT_PRIMES,
+    PRINT_PRIMES     = primesieve::PRINT_PRIMES,
+    CALCULATE_STATUS = primesieve::CALCULATE_STATUS
   };
 
   void initGUI();

@@ -1,15 +1,15 @@
 ///
-/// @file   ParallelPrimeSieve.cpp
+/// @file   ParallelSieve.cpp
 /// @brief  Multi-threaded prime sieve using std::async.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primesieve/config.hpp>
-#include <primesieve/ParallelPrimeSieve.hpp>
+#include <primesieve/ParallelSieve.hpp>
 #include <primesieve/PrimeSieve.hpp>
 #include <primesieve/pmath.hpp>
 
@@ -23,13 +23,12 @@
 #include <vector>
 
 using namespace std;
+using namespace primesieve;
 
 namespace {
 
-template <typename T>
-vector<T>& operator+=(vector<T>& v1, const vector<T>& v2)
+counts_t& operator+=(counts_t& v1, const counts_t& v2)
 {
-  assert(v1.size() == v2.size());
   for (size_t i = 0; i < v1.size(); i++)
     v1[i] += v2[i];
   return v1;
@@ -39,12 +38,12 @@ vector<T>& operator+=(vector<T>& v1, const vector<T>& v2)
 
 namespace primesieve {
 
-ParallelPrimeSieve::ParallelPrimeSieve() :
+ParallelSieve::ParallelSieve() :
   shm_(nullptr),
   numThreads_(getMaxThreads())
 { }
 
-void ParallelPrimeSieve::init(SharedMemory& shm)
+void ParallelSieve::init(SharedMemory& shm)
 {
   setStart(shm.start);
   setStop(shm.stop);
@@ -54,17 +53,18 @@ void ParallelPrimeSieve::init(SharedMemory& shm)
   shm_ = &shm;
 }
 
-int ParallelPrimeSieve::getMaxThreads()
+int ParallelSieve::getMaxThreads()
 {
-  return max<int>(1, thread::hardware_concurrency());
+  int maxThreads = thread::hardware_concurrency();
+  return max(1, maxThreads);
 }
 
-int ParallelPrimeSieve::getNumThreads() const
+int ParallelSieve::getNumThreads() const
 {
   return numThreads_;
 }
 
-void ParallelPrimeSieve::setNumThreads(int threads)
+void ParallelSieve::setNumThreads(int threads)
 {
   numThreads_ = inBetween(1, threads, getMaxThreads());
 }
@@ -72,7 +72,7 @@ void ParallelPrimeSieve::setNumThreads(int threads)
 /// Get an ideal number of threads for
 /// the start_ and stop_ numbers
 ///
-int ParallelPrimeSieve::idealNumThreads() const
+int ParallelSieve::idealNumThreads() const
 {
   if (start_ > stop_)
     return 1;
@@ -88,7 +88,7 @@ int ParallelPrimeSieve::idealNumThreads() const
 /// Get a thread distance which ensures a good load
 /// balance when using multiple threads
 ///
-uint64_t ParallelPrimeSieve::getThreadDistance(int threads) const
+uint64_t ParallelSieve::getThreadDistance(int threads) const
 {
   assert(threads > 0);
 
@@ -108,9 +108,10 @@ uint64_t ParallelPrimeSieve::getThreadDistance(int threads) const
 /// Align n to modulo (30 + 2) to prevent prime k-tuplet
 /// (twin primes, prime triplets) gaps
 ///
-uint64_t ParallelPrimeSieve::align(uint64_t n) const
+uint64_t ParallelSieve::align(uint64_t n) const
 {
   uint64_t n32 = checkedAdd(n, 32);
+
   if (n32 >= stop_)
     return stop_;
 
@@ -120,7 +121,7 @@ uint64_t ParallelPrimeSieve::align(uint64_t n) const
 /// Sieve the primes and prime k-tuplets in [start_, stop_]
 /// in parallel using multi-threading
 ///
-void ParallelPrimeSieve::sieve()
+void ParallelSieve::sieve()
 {
   reset();
 
@@ -143,8 +144,9 @@ void ParallelPrimeSieve::sieve()
     auto task = [&]()
     {
       PrimeSieve ps(this);
-      counts_t counts(counts_.size(), 0);
       uint64_t j;
+      counts_t counts;
+      counts.fill(0);
 
       while ((j = i++) < iters)
       {
@@ -189,7 +191,7 @@ void ParallelPrimeSieve::sieve()
 /// @processed:  Sum of recently processed segments
 /// @tryLock:    Do not block if tryLock = true
 ///
-bool ParallelPrimeSieve::updateStatus(uint64_t processed, bool tryLock)
+bool ParallelSieve::updateStatus(uint64_t processed, bool tryLock)
 {
   unique_lock<mutex> lock(lock_, defer_lock);
 

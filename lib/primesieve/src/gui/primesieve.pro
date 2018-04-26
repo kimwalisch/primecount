@@ -46,14 +46,16 @@ SOURCES += \
   ../EratMedium.cpp \
   ../EratSmall.cpp \
   ../iterator.cpp \
+  ../IteratorHelper.cpp \
+  ../PrimeGenerator.cpp \
   ../nthPrime.cpp \
-  ../ParallelPrimeSieve.cpp \
+  ../ParallelSieve.cpp \
   ../popcount.cpp \
   ../PreSieve.cpp \
-  ../PrimeGenerator.cpp \
+  ../PrintPrimes.cpp \
   ../SievingPrimes.cpp \
   ../PrimeSieve.cpp \
-  ../SieveOfEratosthenes.cpp \
+  ../Erat.cpp \
   ../Wheel.cpp
 
 # ---------------------------------------------------------
@@ -76,11 +78,11 @@ macx {
 }
 
 *g++* {
-  QMAKE_CXXFLAGS += -std=c++11 -Wno-implicit-fallthrough
+  QMAKE_CXXFLAGS += -std=c++14 -Wno-implicit-fallthrough
 }
 
 *clang* {
-  QMAKE_CXXFLAGS += -std=c++11 -Wno-implicit-fallthrough
+  QMAKE_CXXFLAGS += -std=c++14 -Wno-implicit-fallthrough
 }
 
 *icc* {

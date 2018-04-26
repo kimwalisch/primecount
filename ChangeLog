@@ -1,3 +1,11 @@
+2018-26-04 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.4 unreleased.
+
+  The computation of the second partial sieve function
+  P2(x, a) has been sped up by 30% due to an update to the
+  latest primesieve-7.0 library.
+
 2018-18-03 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.3 released.
@@ -16,7 +24,7 @@
   Version 4.2 released.
 
   The computation of the second partial sieve function
-  P2(x, a) has been speed up by 10% due to an upgrade to the
+  P2(x, a) has been sped up by 10% due to an upgrade to the
   latest primesieve-6.3 library.
 
   * lib/primesieve: upgrade to version 6.3.

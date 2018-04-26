@@ -8,30 +8,17 @@
 /// file in the top level directory.
 ///
 
-#ifndef CONFIG_PRIMESIEVE_HPP
-#define CONFIG_PRIMESIEVE_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 #include <stdint.h>
 
-/// Disable assert() macro
+/// Disable assert() by default
 #if !defined(DEBUG) && !defined(NDEBUG)
   #define NDEBUG
 #endif
 
 namespace primesieve {
-
-/// in primesieve bytes must have 8-bits
-typedef uint8_t byte_t;
-typedef unsigned int uint_t;
-
-enum {
-  /// SieveOfEratosthenes objects use a bit array with 30 numbers per
-  /// byte for sieving, the 8 bits of each byte correspond to the
-  /// offsets { 7, 11, 13, 17, 19, 23, 29, 31 }.
-  ///
-  NUMBERS_PER_BYTE = 30
-};
-
 namespace config {
 
 enum {
