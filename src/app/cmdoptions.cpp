@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <print.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>

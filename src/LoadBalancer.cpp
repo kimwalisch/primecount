@@ -21,7 +21,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,6 +34,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <cmath>

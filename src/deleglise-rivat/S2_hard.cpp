@@ -13,7 +13,7 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,6 +30,7 @@
 #include <int128_t.hpp>
 #include <LoadBalancer.hpp>
 #include <min.hpp>
+#include <print.hpp>
 #include <S2.hpp>
 
 #include <stdint.h>

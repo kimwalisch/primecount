@@ -4,7 +4,7 @@
 ///        numbers <= x that have exactly 2 prime factors
 ///        each exceeding the a-th prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,6 +16,7 @@
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>

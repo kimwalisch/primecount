@@ -15,6 +15,7 @@
 #include <primesieve.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>

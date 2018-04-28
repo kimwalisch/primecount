@@ -6,7 +6,7 @@
 ///        elements using POPCNT without using any special counting
 ///        tree data structure.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,6 +21,7 @@
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
+#include <print.hpp>
 #include <S1.hpp>
 
 #include <stdint.h>

@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,6 +25,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <print.hpp>
 #include <S1.hpp>
 #include "S2.hpp"
 
