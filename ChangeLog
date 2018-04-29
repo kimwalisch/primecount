@@ -1,10 +1,15 @@
-2018-26-04 Kim Walisch  <kim.walisch@gmail.com>
+2018-29-04 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.4 unreleased.
 
   The computation of the second partial sieve function
   P2(x, a) has been sped up by 30% due to an update to the
   latest primesieve-7.0 library.
+
+  * nth_prime.cpp: Fix non-critical data race.
+  * pi_legendre.cpp: Fix non-critical data race.
+  * pi_primesieve.cpp: Fix non-critical data race.
+  * make test: Runs twice as fast.
 
 2018-18-03 Kim Walisch  <kim.walisch@gmail.com>
 
