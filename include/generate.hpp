@@ -1,7 +1,7 @@
 ///
 /// @file  generate.hpp
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,8 +23,7 @@ namespace primecount {
 template <typename T>
 std::vector<T> generate_primes(int64_t max)
 {
-  std::vector<T> primes;
-  primes.push_back(0);
+  std::vector<T> primes = { 0 };
   primesieve::generate_primes(max, &primes);
   return primes;
 }
@@ -35,8 +34,7 @@ std::vector<T> generate_primes(int64_t max)
 template <typename T>
 std::vector<T> generate_n_primes(int64_t n)
 {
-  std::vector<T> primes;
-  primes.push_back(0);
+  std::vector<T> primes = { 0 };
   primesieve::generate_n_primes(n, &primes);
   return primes;
 }
