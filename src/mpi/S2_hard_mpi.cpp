@@ -284,7 +284,7 @@ int64_t S2_hard_mpi(int64_t x,
   print(x, y, c, threads);
 
   int64_t s2_hard = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   if (is_mpi_master_proc())
     s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
@@ -316,7 +316,7 @@ int128_t S2_hard_mpi(int128_t x,
   print(x, y, c, threads);
 
   int128_t s2_hard = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   if (is_mpi_master_proc())
     s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);

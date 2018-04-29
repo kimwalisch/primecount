@@ -55,7 +55,7 @@ void balanceLoad(int64_t* thread_distance,
                  int threads,
                  double start_time)
 {
-  double seconds = get_wtime() - start_time;
+  double seconds = get_time() - start_time;
 
   int64_t min_distance = 1 << 23;
   int64_t max_distance = ceil_div(z - low, threads);
@@ -153,7 +153,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   {
     int64_t max_threads = ceil_div(z - low, thread_distance);
     threads = in_between(1, threads, max_threads);
-    double time = get_wtime();
+    double time = get_time();
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
@@ -193,7 +193,7 @@ int64_t P2_mpi(int64_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int64_t p2 = P2_mpi_master(x, y, threads);
 
   print("P2", p2, time);
@@ -209,7 +209,7 @@ int128_t P2_mpi(int128_t x, int64_t y, int threads)
   print("Computation of the 2nd partial sieve function");
   print(x, y, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t p2 = P2_mpi_master(x, y, threads);
 
   print("P2", p2, time);

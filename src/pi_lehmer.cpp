@@ -39,7 +39,7 @@ int64_t pi_lehmer(int64_t x, int threads)
   print("");
   print("=== phi(x, a) ===");
   print("Count the numbers <= x coprime to the first a primes");
-  double time = get_wtime();
+  double time = get_time();
   int64_t p1 = phi(x, a, threads);
   print("phi", p1, time);
 

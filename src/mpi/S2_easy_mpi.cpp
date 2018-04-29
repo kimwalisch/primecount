@@ -121,7 +121,7 @@ int64_t S2_easy_mpi(int64_t x,
   print("Computation of the easy special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
@@ -142,7 +142,7 @@ int128_t S2_easy_mpi(int128_t x,
   print("Computation of the easy special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s2_easy;
 
   // uses less memory

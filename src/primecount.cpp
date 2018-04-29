@@ -16,7 +16,7 @@
 #include <imath.hpp>
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <sstream>
@@ -211,14 +211,13 @@ string get_max_x(double alpha)
   return oss.str();
 }
 
-/// Get the wall time in seconds
-double get_wtime()
+/// Get the time in seconds
+double get_time()
 {
-#ifdef _OPENMP
-  return omp_get_wtime();
-#else
-  return (double) std::clock() / CLOCKS_PER_SEC;
-#endif
+  auto now = chrono::steady_clock::now();
+  auto time = now.time_since_epoch();
+  auto micro = chrono::duration_cast<chrono::microseconds>(time);
+  return (double) micro.count() / 1e6;
 }
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)

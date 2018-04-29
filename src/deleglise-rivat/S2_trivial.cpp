@@ -83,7 +83,7 @@ int64_t S2_trivial(int64_t x,
   print("Computation of the trivial special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int64_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
 
   print("S2_trivial", s2_trivial, time);
@@ -103,7 +103,7 @@ int128_t S2_trivial(int128_t x,
   print("Computation of the trivial special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
 
   print("S2_trivial", s2_trivial, time);

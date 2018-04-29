@@ -136,7 +136,7 @@ void print(const string& str, maxint_t res, double time)
     cout << "\r" << string(50,' ') << "\r";
     cout << "Status: 100%" << endl;
     cout << str << " = " << res << endl;
-    print_seconds(get_wtime() - time);
+    print_seconds(get_time() - time);
   }
 }
 

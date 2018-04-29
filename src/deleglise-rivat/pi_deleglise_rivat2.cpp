@@ -85,7 +85,7 @@ int64_t S2_hard(int64_t x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int64_t S2_result = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   vector<char> sieve(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());

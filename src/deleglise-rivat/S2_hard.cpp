@@ -230,7 +230,7 @@ int64_t S2_hard(int64_t x,
   print("Computation of the hard special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
   auto primes = generate_primes<int32_t>(max_prime);
@@ -260,7 +260,7 @@ int128_t S2_hard(int128_t x,
   print("Computation of the hard special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s2_hard;
 
   // uses less memory

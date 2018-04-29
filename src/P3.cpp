@@ -34,7 +34,7 @@ int64_t P3(int64_t x, int64_t a, int threads)
   print("=== P3(x, a) ===");
   print("Computation of the 3rd partial sieve function");
 
-  double time = get_wtime();
+  double time = get_time();
   auto primes = generate_primes<int32_t>(isqrt(x));
 
   int64_t y = iroot<3>(x);

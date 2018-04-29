@@ -74,7 +74,7 @@ bool S2Status::is_print(double time) const
 
 void S2Status::print(maxint_t n, maxint_t limit)
 {
-  double time = get_wtime();
+  double time = get_time();
 
   if (is_print(time))
   {

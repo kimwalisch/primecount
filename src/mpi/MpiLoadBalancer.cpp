@@ -49,7 +49,7 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
   segments_(1),
   s2_hard_(0),
   s2_approx_(s2_approx),
-  time_(get_wtime()),
+  time_(get_time()),
   status_(x)
 {
   double alpha = get_alpha(x, y);
@@ -126,7 +126,7 @@ double MpiLoadBalancer::remaining_secs() const
   double percent = status_.getPercent(low_, z_, s2_hard_, s2_approx_);
   percent = in_between(20, percent, 100);
 
-  double total_secs = get_wtime() - time_;
+  double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
 }

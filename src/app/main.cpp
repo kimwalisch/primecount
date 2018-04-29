@@ -169,7 +169,7 @@ int main (int argc, char* argv[])
   try
   {
     CmdOptions opt = parseOptions(argc, argv);
-    double time = get_wtime();
+    double time = get_time();
 
     auto x = opt.x;
     auto a = opt.a;
@@ -246,7 +246,7 @@ int main (int argc, char* argv[])
       cout << res << endl;
 
       if (opt.time)
-        print_seconds(get_wtime() - time);
+        print_seconds(get_time() - time);
     }
   }
   catch (exception& e)
