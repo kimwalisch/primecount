@@ -173,7 +173,7 @@ int main (int argc, char* argv[])
 
     auto x = opt.x;
     auto a = opt.a;
-    auto threads = opt.threads;
+    auto threads = get_num_threads();
     maxint_t res = 0;
 
     switch (opt.option)
@@ -207,7 +207,7 @@ int main (int argc, char* argv[])
       case OPTION_MEISSEL:
         res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
-        res = pi_primesieve(to_int64(x), threads); break;
+        res = pi_primesieve(to_int64(x)); break;
       case OPTION_P2:
         res = P2(x, threads); break;
       case OPTION_PHI:

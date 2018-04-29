@@ -10,6 +10,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primesieve.hpp>
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
@@ -146,11 +147,6 @@ int64_t pi_lmo(int64_t x, int threads)
 int64_t pi_meissel(int64_t x)
 {
   return pi_meissel(x, get_num_threads());
-}
-
-int64_t pi_primesieve(int64_t x)
-{
-  return pi_primesieve(x, get_num_threads());
 }
 
 int64_t pi_deleglise_rivat(int64_t x)
@@ -302,6 +298,7 @@ void set_num_threads(int threads)
 {
 #ifdef _OPENMP
   threads_ = in_between(1, threads, omp_get_max_threads());
+  primesieve::set_num_threads(threads);
 #else
   unused_param(threads);
 #endif

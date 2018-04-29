@@ -1,7 +1,7 @@
 ///
 /// @file  cmdoptions.hpp
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,7 +10,6 @@
 #ifndef CMDOPTIONS_HPP
 #define CMDOPTIONS_HPP
 
-#include <primecount.hpp>
 #include <int128_t.hpp>
 #include <stdint.h>
 
@@ -58,18 +57,10 @@ enum OptionID
 
 struct CmdOptions
 {
-  maxint_t x;
-  int64_t a;
-  int option;
-  int threads;
-  bool time;
-  CmdOptions() :
-    x(-1),
-    a(-1),
-    option(OPTION_PI),
-    threads(get_num_threads()),
-    time(false)
-  { }
+  maxint_t x = -1;
+  int64_t a = -1;
+  int option = OPTION_PI;
+  bool time = false;
 };
 
 CmdOptions parseOptions(int, char**);
