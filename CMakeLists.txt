@@ -188,11 +188,9 @@ if (BUILD_SHARED_LIBS)
 
     target_compile_features(libprimecount
     PRIVATE
-        cxx_auto_type
+        cxx_constexpr
         cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_range_for)
 
     target_include_directories(libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -218,11 +216,9 @@ if (BUILD_STATIC_LIBS)
 
     target_compile_features(libprimecount-static
     PRIVATE
-        cxx_auto_type
+        cxx_constexpr
         cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_range_for)
 
     target_include_directories(libprimecount-static PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
