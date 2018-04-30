@@ -14,7 +14,7 @@
 ///        Revista do DETUA, vol. 4, no. 6, March 2006, pp. 767-768.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,10 +31,6 @@ namespace {
 class BinaryIndexedTree
 {
 public:
-  BinaryIndexedTree() :
-    size_(0)
-  { }
-
   /// Initialize binary indexed tree from sieve array
   template <typename T>
   void init(const T& sieve)
@@ -59,8 +55,7 @@ public:
   void update(int64_t pos)
   {
     pos >>= 1;
-    do
-    {
+    do {
       tree_[pos]--;
       pos |= pos + 1;
     }
@@ -71,17 +66,18 @@ public:
   /// in the current segment (sieve array).
   /// Runtime: O(log N)
   ///
-  int64_t count(int64_t low, int64_t high)
+  int64_t count(int64_t low, int64_t high) const
   {
     int64_t pos = (high - low) >> 1;
     int64_t sum = tree_[pos++];
-    for (; pos &= pos - 1; sum += tree_[pos - 1]);
+    while ((pos &= pos - 1) != 0)
+      sum += tree_[pos - 1]);
     return sum;
   }
 
 private:
   std::vector<int32_t> tree_;
-  int64_t size_;
+  int64_t size_ = 0;
 };
 
 } // namespace
