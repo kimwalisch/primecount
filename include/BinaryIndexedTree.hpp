@@ -71,7 +71,7 @@ public:
     int64_t pos = (high - low) >> 1;
     int64_t sum = tree_[pos++];
     while ((pos &= pos - 1) != 0)
-      sum += tree_[pos - 1]);
+      sum += tree_[pos - 1];
     return sum;
   }
 
