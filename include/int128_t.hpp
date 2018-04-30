@@ -155,12 +155,9 @@ struct make_signed
 #if !defined(HAVE_INT128_T)
   typedef typename std::make_signed<T>::type type;
 #else
-  typedef typename std::conditional<std::is_same<T, uint8_t>::value, int8_t,
-          typename std::conditional<std::is_same<T, uint16_t>::value, int16_t,
-          typename std::conditional<std::is_same<T, uint32_t>::value, int32_t,
-          typename std::conditional<std::is_same<T, uint64_t>::value, int64_t,
+  typedef typename std::conditional<std::is_same<T, int128_t>::value, int128_t,
           typename std::conditional<std::is_same<T, uint128_t>::value, int128_t,
-          T>::type>::type>::type>::type>::type type;
+          typename std::make_signed<T>::type>::type>::type type;
 #endif
 };
 
