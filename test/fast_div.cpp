@@ -36,8 +36,8 @@ int main()
   uniform_int_distribution<int32_t> dist_i32(1, std::numeric_limits<int32_t>::max());
   uniform_int_distribution<uint64_t> dist_u64(0, std::numeric_limits<uint64_t>::max());
 
-  static_assert(is_same<fastdiv<int32_t>::type, uint16_t>::value,
-                "fastdiv<int32_t>::type != uint16_t");
+  static_assert(is_same<fastdiv<int32_t>::type, uint32_t>::value,
+                "fastdiv<int32_t>::type != uint32_t");
 
   static_assert(is_same<fastdiv<uint64_t>::type, uint32_t>::value,
                 "fastdiv<uint64_t>::type != uint32_t");
