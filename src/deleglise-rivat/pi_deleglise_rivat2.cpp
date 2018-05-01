@@ -27,7 +27,7 @@
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <S1.hpp>
-#include "S2.hpp"
+#include <S2.hpp>
 
 #include <stdint.h>
 #include <algorithm>
