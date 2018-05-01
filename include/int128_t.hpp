@@ -1,8 +1,6 @@
 ///
-/// @file  int128_t.hpp
-/// @brief Additional integer types used in primecount:
-///        int128_t, uint128_t, intfast64_t, intfast128_t,
-///        maxint_t, maxuint_t.
+/// @file   int128_t.hpp
+/// @brief  Support for int128_t, uint128_t types.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -132,19 +130,15 @@ struct numeric_limits
 template <>
 struct numeric_limits<int128_t>
 {
-  static constexpr int128_t max()
-  {
-    return ~(((int128_t) 1) << 127);
-  }
+  static constexpr int128_t min() { return ((int128_t) 1) << 127; }
+  static constexpr int128_t max() { return ~min(); }
 };
 
 template <>
 struct numeric_limits<uint128_t>
 {
-  static constexpr uint128_t max()
-  {
-    return ~((uint128_t) 0);
-  }
+  static constexpr uint128_t min() { return 0; }
+  static constexpr uint128_t max() { return ~min(); }
 };
 
 #endif
