@@ -149,18 +149,31 @@ if(WITH_MPI)
     endif()
 endif()
 
-# Check -mpopcnt compiler flag #######################################
+# Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
     include(CMakePushCheckState)
 
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    cmake_pop_check_state()
+    if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS -Werror)
+        check_cxx_compiler_flag(-msse4.2 msse42)
+        cmake_pop_check_state()
 
-    if(mpopcnt)
-        set(POPCNT_FLAG "-mpopcnt")
+        if(msse42)
+            set(POPCNT_FLAG "-msse4.2")
+        endif()
+    endif()
+
+    if(NOT POPCNT_FLAG)
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS -Werror)
+        check_cxx_compiler_flag(-mpopcnt mpopcnt)
+        cmake_pop_check_state()
+
+        if(mpopcnt)
+            set(POPCNT_FLAG "-mpopcnt")
+        endif()
     endif()
 endif()
 
