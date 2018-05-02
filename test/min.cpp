@@ -59,28 +59,28 @@ int main()
   uint64_t u64_100 = 100;
 
   cout << "min(100, 99) = " << (int) min(u64_100, u8_99);
-  check(min(u64_100, u8_99) == std::min(i64_100, i64_99));
+  check(min(u64_100, u8_99) == std::min(u64_100, u64_99));
 
   cout << "min(99, 100) = " << (int) min(u64_99, u8_100);
-  check(min(u64_99, u8_100) == std::min(i64_99, i64_100));
+  check(min(u64_99, u8_100) == std::min(u64_99, u64_100));
 
   cout << "min(100, 99) = " << min(u64_100, i64_99);
-  check(min(u64_100, i64_99) == std::min(i64_100, i64_99));
+  check(min(u64_100, i64_99) == std::min(u64_100, u64_99));
 
   cout << "min(99, 100) = " << min(u64_99, i64_100);
-  check(min(u64_99, i64_100) == std::min(i64_99, i64_100));
+  check(min(u64_99, i64_100) == std::min(u64_99, u64_100));
 
   cout << "max(100, 99) = " << max(u64_100, u8_99);
-  check(max(u64_100, u8_99) == std::max(i64_100, i64_99));
+  check(max(u64_100, u8_99) == std::max(u64_100, u64_99));
 
   cout << "max(99, 100) = " << max(u64_99, u8_100);
-  check(max(u64_99, u8_100) == std::max(i64_99, i64_100));
+  check(max(u64_99, u8_100) == std::max(u64_99, u64_100));
 
   cout << "max(100, 99) = " << max(u64_100, i64_99);
-  check(max(u64_100, i64_99) == std::max(i64_100, i64_99));
+  check(max(u64_100, i64_99) == std::max(u64_100, u64_99));
 
   cout << "max(99, 100) = " << max(u64_99, i64_100);
-  check(max(u64_99, i64_100) == std::max(i64_99, i64_100));
+  check(max(u64_99, i64_100) == std::max(u64_99, u64_100));
 
 #if defined(HAVE_INT128_T)
 
@@ -111,28 +111,28 @@ int main()
   uint128_t u128_100 = 100;
 
   cout << "min(100, 99) = " << (int) min(u128_100, u8_99);
-  check(min(u128_100, u8_99) == std::min(i128_100, i128_99));
+  check(min(u128_100, u8_99) == std::min(u128_100, u128_99));
 
   cout << "min(99, 100) = " << (int) min(u128_99, u8_100);
-  check(min(u128_99, u8_100) == std::min(i128_99, i128_100));
+  check(min(u128_99, u8_100) == std::min(u128_99, u128_100));
 
   cout << "min(100, 99) = " << min(u128_100, i128_99);
-  check(min(u128_100, i128_99) == std::min(i128_100, i128_99));
+  check(min(u128_100, i128_99) == std::min(u128_100, u128_99));
 
   cout << "min(99, 100) = " << min(u128_99, i128_100);
-  check(min(u128_99, i128_100) == std::min(i128_99, i128_100));
+  check(min(u128_99, i128_100) == std::min(u128_99, u128_100));
 
   cout << "max(100, 99) = " << max(u128_100, u8_99);
-  check(max(u128_100, u8_99) == std::max(i128_100, i128_99));
+  check(max(u128_100, u8_99) == std::max(u128_100, u128_99));
 
   cout << "max(99, 100) = " << max(u128_99, u8_100);
-  check(max(u128_99, u8_100) == std::max(i128_99, i128_100));
+  check(max(u128_99, u8_100) == std::max(u128_99, u128_100));
 
   cout << "max(100, 99) = " << max(u128_100, i128_99);
-  check(max(u128_100, i128_99) == std::max(i128_100, i128_99));
+  check(max(u128_100, i128_99) == std::max(u128_100, u128_99));
 
   cout << "max(99, 100) = " << max(u128_99, i128_100);
-  check(max(u128_99, i128_100) == std::max(i128_99, i128_100));
+  check(max(u128_99, i128_100) == std::max(u128_99, u128_100));
 
 #endif
 
