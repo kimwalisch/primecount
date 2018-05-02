@@ -63,6 +63,7 @@ int main()
                 "prt::make_signed<uint64_t> != int64_t");
 
 #if defined(HAVE_INT128_T)
+
   static_assert(prt::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
                 "prt::numeric_limits<uint128_t>::max() is broken");
 
@@ -110,6 +111,7 @@ int main()
     cout << "2^128-1 = " << s.str();
     check(s.str() == "340282366920938463463374607431768211455");
   }
+
 #endif
 
   cout << endl;
