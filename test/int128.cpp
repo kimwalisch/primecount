@@ -107,6 +107,13 @@ int main()
 
   {
     ostringstream s;
+    s << prt::numeric_limits<int128_t>::max();
+    cout << "2^127-1 = " << s.str();
+    check(s.str() == "170141183460469231731687303715884105727");
+  }
+
+  {
+    ostringstream s;
     s << prt::numeric_limits<uint128_t>::max();
     cout << "2^128-1 = " << s.str();
     check(s.str() == "340282366920938463463374607431768211455");
