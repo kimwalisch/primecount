@@ -67,6 +67,7 @@ set(LIB_SRC src/FactorTable.cpp
 
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
+include(CMakePushCheckState)
 
 # Set default build type to Release ##################################
 
@@ -115,14 +116,50 @@ endif()
 
 if(WITH_OPENMP)
     find_package(OpenMP QUIET)
+    if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
 
-    if(TARGET OpenMP::OpenMP_CXX)
-        set(LIB_OPENMP "OpenMP::OpenMP_CXX")
-        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-    elseif(OPENMP_FOUND)
-        # Support for CMake <= 3.8
-        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        if(TARGET OpenMP::OpenMP_CXX)
+            set(LIB_OPENMP "OpenMP::OpenMP_CXX")
+            message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
+        else()
+            message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        endif()
+
+        include(CheckTypeSize)
+        check_type_size("__int128_t" __INT128_T LANGUAGE CXX)
+        if(NOT HAVE___INT128_T)
+            check_type_size("int128_t" INT128_T LANGUAGE CXX)
+        endif()
+
+        if(HAVE_INT128_T OR HAVE___INT128_T)
+            cmake_push_check_state()
+            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
+            set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+            check_cxx_source_compiles("
+                #include <int128_t.hpp>
+                #include <omp.h>
+                int main() {
+                    primecount::int128_t sum = 0;
+                    #pragma omp parallel for reduction(+: sum)
+                    for (int i = 0; i < 100; i++)
+                        sum += i;
+                    return 0;
+                }" OpenMP_128-bit)
+
+            if(NOT OpenMP_128-bit)
+                find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
+
+                if(LIB_ATOMIC)
+                    message(STATUS "Found libatomic: ${LIB_ATOMIC}")
+                else()
+                    message(FATAL_ERROR "Failed to find libatomic!")
+                endif()
+            endif()
+
+            cmake_pop_check_state()
+        endif()
     endif()
 endif()
 
@@ -162,8 +199,6 @@ endif()
 # Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
-    include(CMakePushCheckState)
-
     if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
         cmake_push_check_state()
         set(CMAKE_REQUIRED_FLAGS -Werror)
@@ -207,7 +242,7 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -230,7 +265,7 @@ if (BUILD_STATIC_LIBS)
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
