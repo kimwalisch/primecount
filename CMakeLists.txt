@@ -188,7 +188,7 @@ if(WITH_POPCNT)
 endif()
 
 if(NOT WITH_POPCNT)
-    set(POPCNT_DEFINE "DISABLE_POPCNT")
+    set(DISABLE_POPCNT "DISABLE_POPCNT")
 endif()
 
 # Testing ############################################################
@@ -205,7 +205,7 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}" "${HAVE_MPI}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}")
 
@@ -228,7 +228,7 @@ endif()
 if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}" "${HAVE_MPI}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}")
 
