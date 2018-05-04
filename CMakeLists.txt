@@ -96,9 +96,14 @@ endif()
 
 if(WITH_MPI)
     find_package(MPI REQUIRED)
-    include_directories(${MPI_INCLUDE_PATH})
-    add_definitions(-DHAVE_MPI)
 
+    if(TARGET MPI::MPI_CXX)
+        set(LIB_MPI "MPI::MPI_CXX")
+    else()
+        include_directories("${MPI_INCLUDE_PATH}")
+    endif()
+
+    set(HAVE_MPI "HAVE_MPI")
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
                 src/mpi/S2_hard_mpi.cpp
@@ -110,7 +115,12 @@ endif()
 
 if(WITH_OPENMP)
     find_package(OpenMP QUIET)
-    if(OPENMP_FOUND)
+
+    if(TARGET OpenMP::OpenMP_CXX)
+        set(LIB_OPENMP "OpenMP::OpenMP_CXX")
+        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
+    elseif(OPENMP_FOUND)
+        # Support for CMake <= 3.8
         message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     endif()
@@ -195,9 +205,9 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}")
+    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE libprimesieve "${MPI_CXX_LIBRARIES}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -218,9 +228,9 @@ endif()
 if (BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}")
+    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${MPI_CXX_LIBRARIES}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
@@ -245,7 +255,8 @@ endif()
 
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
-    target_link_libraries(primecount libprimecount)
+    target_compile_definitions(primecount PRIVATE "${HAVE_MPI}")
+    target_link_libraries(primecount PRIVATE libprimecount "${LIB_MPI}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
