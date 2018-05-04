@@ -139,7 +139,6 @@ if(WITH_OPENMP)
 
             check_cxx_source_compiles("
                 #include <int128_t.hpp>
-                #include <omp.h>
                 int main() {
                     primecount::int128_t sum = 0;
                     #pragma omp parallel for reduction(+: sum)

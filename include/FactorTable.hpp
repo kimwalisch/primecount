@@ -40,10 +40,6 @@
 #include <stdint.h>
 #include <vector>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 namespace primecount {
 
 /// AbstractFactorTable contains static lookup tables

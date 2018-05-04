@@ -24,10 +24,6 @@
 #include <sstream>
 #include <string>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 // test: f1(x) == f2(x)
 #define TEST0(f1, f2, iters) \
 { \
