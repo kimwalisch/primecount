@@ -132,9 +132,9 @@ if(WITH_OPENMP)
             check_type_size("int128_t" INT128_T LANGUAGE CXX)
         endif()
 
-        if(HAVE_INT128_T OR HAVE___INT128_T)
+        if(HAVE___INT128_T OR HAVE_INT128_T)
             cmake_push_check_state()
-            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
+            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
             set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
             check_cxx_source_compiles("
