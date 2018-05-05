@@ -11,7 +11,10 @@
 #define S2STATUS_HPP
 
 #include <int128_t.hpp>
-#include <OmpLock.hpp>
+
+#if definded(_OPENMP)
+  #include <OmpLock.hpp>
+#endif
 
 namespace primecount {
 
@@ -25,12 +28,15 @@ private:
   bool is_print(double time);
   void print(double percent) const;
   static double skewed_percent(maxint_t x, maxint_t y);
-  OmpLock lock_;
   double epsilon_;
   double percent_ = -1;
   double time_ = 0;
   double is_print_ = 1.0 / 20;
   int precision_;
+
+#if definded(_OPENMP)
+  OmpLock lock_;
+#endif
 };
 
 } // namespace
