@@ -12,7 +12,7 @@
 
 #include <int128_t.hpp>
 
-#if definded(_OPENMP)
+#if defined(_OPENMP)
   #include <OmpLock.hpp>
 #endif
 
@@ -34,7 +34,7 @@ private:
   double is_print_ = 1.0 / 20;
   int precision_;
 
-#if definded(_OPENMP)
+#if defined(_OPENMP)
   OmpLock lock_;
 #endif
 };
