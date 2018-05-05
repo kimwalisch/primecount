@@ -64,7 +64,7 @@ bool S2Status::is_print(double time)
 {
   unique_lock<std::mutex> lock(mutex_, try_to_lock);
 
-  if(lock.owns_lock())
+  if (lock.owns_lock())
   {
     double old = time_;
     return old == 0 ||
