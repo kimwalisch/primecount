@@ -126,38 +126,30 @@ if(WITH_OPENMP)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         endif()
 
-        include(CheckTypeSize)
-        check_type_size("__int128_t" __INT128_T LANGUAGE CXX)
-        if(NOT HAVE___INT128_T)
-            check_type_size("int128_t" INT128_T LANGUAGE CXX)
-        endif()
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-        if(HAVE___INT128_T OR HAVE_INT128_T)
-            cmake_push_check_state()
-            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
-            set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        check_cxx_source_compiles("
+            #include <int128_t.hpp>
+            int main() {
+                primecount::maxint_t sum = 0;
+                #pragma omp parallel for reduction(+: sum)
+                for (int i = 0; i < 100; i++)
+                    sum += i;
+                return 0;
+            }" OpenMP_without_libatomic)
 
-            check_cxx_source_compiles("
-                #include <int128_t.hpp>
-                int main() {
-                    primecount::int128_t sum = 0;
-                    #pragma omp parallel for reduction(+: sum)
-                    for (int i = 0; i < 100; i++)
-                        sum += i;
-                    return 0;
-                }" OpenMP_128-bit)
+        cmake_pop_check_state()
 
-            if(NOT OpenMP_128-bit)
-                find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
+        if(NOT OpenMP_without_libatomic)
+            find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
-                if(LIB_ATOMIC)
-                    message(STATUS "Found libatomic: ${LIB_ATOMIC}")
-                else()
-                    message(FATAL_ERROR "Failed to find libatomic!")
-                endif()
+            if(LIB_ATOMIC)
+                message(STATUS "Found libatomic: ${LIB_ATOMIC}")
+            else()
+                message(FATAL_ERROR "Failed to find libatomic!")
             endif()
-
-            cmake_pop_check_state()
         endif()
     endif()
 endif()
