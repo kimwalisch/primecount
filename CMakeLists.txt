@@ -130,9 +130,9 @@ if(WITH_OPENMP)
                 for (int i = 0; i < 100; i++)
                     sum += i;
                 return 0;
-            }" OpenMP_without_libatomic)
+            }" OpenMP)
 
-        if(NOT OpenMP_without_libatomic)
+        if(NOT OpenMP)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
             if(LIB_ATOMIC)
@@ -156,7 +156,7 @@ if(WITH_OPENMP)
 
         cmake_pop_check_state()
 
-        if(OpenMP_without_libatomic OR OpenMP_with_libatomic)
+        if(OpenMP OR OpenMP_with_libatomic)
             if(TARGET OpenMP::OpenMP_CXX)
                 set(LIB_OPENMP "OpenMP::OpenMP_CXX")
             else()
