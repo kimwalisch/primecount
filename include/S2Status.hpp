@@ -11,7 +11,7 @@
 #define S2STATUS_HPP
 
 #include <int128_t.hpp>
-#include <mutex>
+#include <OmpLock.hpp>
 
 namespace primecount {
 
@@ -25,7 +25,7 @@ private:
   bool is_print(double time);
   void print(double percent) const;
   static double skewed_percent(maxint_t x, maxint_t y);
-  std::mutex mutex_;
+  OmpLock lock_;
   double epsilon_;
   double percent_ = -1;
   double time_ = 0;

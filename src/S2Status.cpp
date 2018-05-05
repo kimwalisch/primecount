@@ -13,6 +13,7 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <OmpLock.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -62,9 +63,9 @@ double S2Status::skewed_percent(maxint_t x, maxint_t y)
 
 bool S2Status::is_print(double time)
 {
-  unique_lock<std::mutex> lock(mutex_, try_to_lock);
+  TryLock lock(lock_);
 
-  if (lock.owns_lock())
+  if (lock.ownsLock())
   {
     double old = time_;
     return old == 0 ||
