@@ -116,16 +116,8 @@ endif()
 
 if(WITH_OPENMP)
     find_package(OpenMP QUIET)
+
     if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
-
-        if(TARGET OpenMP::OpenMP_CXX)
-            set(LIB_OPENMP "OpenMP::OpenMP_CXX")
-            message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-        else()
-            message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        endif()
-
         cmake_push_check_state()
         set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
         set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -140,15 +132,35 @@ if(WITH_OPENMP)
                 return 0;
             }" OpenMP_without_libatomic)
 
-        cmake_pop_check_state()
-
         if(NOT OpenMP_without_libatomic)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
             if(LIB_ATOMIC)
-                message(STATUS "Found libatomic: ${LIB_ATOMIC}")
+                set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
+
+                check_cxx_source_compiles("
+                    #include <int128_t.hpp>
+                    int main() {
+                        primecount::maxint_t sum = 0;
+                        #pragma omp parallel for reduction(+: sum)
+                        for (int i = 0; i < 100; i++)
+                            sum += i;
+                        return 0;
+                    }" OpenMP_with_libatomic)
+
+                if(NOT OpenMP_with_libatomic)
+                    set(LIB_ATOMIC "")
+                endif()
+            endif()
+        endif()
+
+        cmake_pop_check_state()
+
+        if(OpenMP_without_libatomic OR OpenMP_with_libatomic)
+            if(TARGET OpenMP::OpenMP_CXX)
+                set(LIB_OPENMP "OpenMP::OpenMP_CXX")
             else()
-                message(FATAL_ERROR "Failed to find libatomic!")
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
             endif()
         endif()
     endif()
@@ -226,7 +238,7 @@ endif()
 
 # libprimecount ######################################################
 
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
     add_library(libprimecount SHARED ${LIB_SRC})
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
@@ -251,7 +263,7 @@ endif()
 
 # libprimecount-static ###############################################
 
-if (BUILD_STATIC_LIBS)
+if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
