@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,13 +15,14 @@
 #include <primecount-internal.hpp>
 #include <backup.hpp>
 #include <int128_t.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <fstream>
+#include <cstddef>
+#include <map>
 #include <vector>
 #include <string>
-#include <map>
-#include <cstddef>
 
 using namespace std;
 
@@ -90,8 +91,9 @@ struct Option
   string str;
   string opt;
   string val;
+
   template <typename T>
-  T getValue() const
+  T to() const
   {
     if (val.empty())
       throw primecount_error("missing value for option " + str);
@@ -106,7 +108,7 @@ void optionStatus(Option& opt,
   opts.time = true;
 
   if (!opt.val.empty())
-    set_status_precision(opt.getValue<int>());
+    set_status_precision(opt.to<int>());
 }
 
 /// e.g. "--thread=4" -> return "--thread"
@@ -200,9 +202,9 @@ CmdOptions parseOptions(int argc, char* argv[])
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_BACKUP:  optionBackup(opt, opts); break;
-      case OPTION_NUMBER:  numbers.push_back(opt.getValue<maxint_t>()); break;
-      case OPTION_THREADS: opts.threads = opt.getValue<int>(); break;
-      case OPTION_PHI:     opts.a = opt.getValue<int64_t>(); opts.option = OPTION_PHI; break;
+      case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
+      case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
       case OPTION_RESUME:  optionResume(opt, opts); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
