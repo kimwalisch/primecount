@@ -18,13 +18,10 @@
 #include <imath.hpp>
 #include <json.hpp>
 #include <int128_t.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <vector>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -139,7 +136,7 @@ int64_t S1(int64_t x,
   print_log("Computation of the ordinary leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int64_t s1;
 
   if (!resume(x, y, s1, time))
@@ -164,7 +161,7 @@ int128_t S1(int128_t x,
   print_log("Computation of the ordinary leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s1;
 
   if (!resume(x, y, s1, time))
