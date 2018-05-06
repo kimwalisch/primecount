@@ -83,6 +83,12 @@ void print(const string& str)
     cout << str << endl;
 }
 
+void print(const string& str, int64_t res)
+{
+  if (is_print())
+    cout << str << " = " << res << endl;
+}
+
 void print(maxint_t x, int64_t y, int threads)
 {
   if (print_variables())
