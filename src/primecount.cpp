@@ -10,12 +10,13 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primesieve.hpp>
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 
 #include <algorithm>
-#include <ctime>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <sstream>
@@ -132,11 +133,6 @@ int64_t pi_meissel(int64_t x)
   return pi_meissel(x, get_num_threads());
 }
 
-int64_t pi_primesieve(int64_t x)
-{
-  return pi_primesieve(x, get_num_threads());
-}
-
 int64_t pi_deleglise_rivat(int64_t x)
 {
   return pi_deleglise_rivat(x, get_num_threads());
@@ -199,14 +195,13 @@ string get_max_x(double alpha)
   return oss.str();
 }
 
-/// Get the wall time in seconds
-double get_wtime()
+/// Get the time in seconds
+double get_time()
 {
-#ifdef _OPENMP
-  return omp_get_wtime();
-#else
-  return (double) std::clock() / CLOCKS_PER_SEC;
-#endif
+  auto now = chrono::steady_clock::now();
+  auto time = now.time_since_epoch();
+  auto micro = chrono::duration_cast<chrono::microseconds>(time);
+  return (double) micro.count() / 1e6;
 }
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
@@ -286,6 +281,7 @@ void set_num_threads(int threads)
 {
 #ifdef _OPENMP
   threads_ = in_between(1, threads, omp_get_max_threads());
+  primesieve::set_num_threads(threads_);
 #else
   unused_param(threads);
 #endif
