@@ -2,7 +2,7 @@
 /// @file   main.cpp
 /// @brief  primecount console application
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,6 +15,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
+#include <print.hpp>
 #include <S1.hpp>
 #include <S2.hpp>
 #include <json.hpp>
@@ -265,11 +266,11 @@ int main (int argc, char* argv[])
       opt = parseOptions((int) cargs.size(), cargs.data());
     }
 
-    double time = get_wtime();
+    double time = get_time();
 
     auto x = opt.x;
     auto a = opt.a;
-    auto threads = opt.threads;
+    auto threads = get_num_threads();
     maxint_t res = 0;
 
     switch (opt.option)
@@ -301,7 +302,7 @@ int main (int argc, char* argv[])
       case OPTION_MEISSEL:
         res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
-        res = pi_primesieve(to_int64(x), threads); break;
+        res = pi_primesieve(to_int64(x)); break;
       case OPTION_P2:
         res = P2(x, threads);
         time = backup_time(time, "P2"); break;
