@@ -281,10 +281,8 @@ void set_num_threads(int threads)
 {
 #ifdef _OPENMP
   threads_ = in_between(1, threads, omp_get_max_threads());
-  primesieve::set_num_threads(threads_);
-#else
-  unused_param(threads);
 #endif
+  primesieve::set_num_threads(threads);
 }
 
 int get_num_threads()
