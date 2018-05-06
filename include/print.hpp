@@ -30,15 +30,15 @@ bool print_variables();
 
 void print(const std::string& str);
 
-void print(const std::string& str, int64_t res);
+void print(const std::string& res_str, maxint_t res);
+
+void print(const std::string& res_name, maxint_t res, double time);
 
 void print(maxint_t x, int64_t y, int threads);
 
 void print(maxint_t x, int64_t y, int64_t c, int threads);
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads);
-
-void print(const std::string& res_name, maxint_t res, double time);
 
 void print_seconds(double seconds);
 
