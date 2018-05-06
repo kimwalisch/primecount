@@ -18,13 +18,10 @@
 #include <int128_t.hpp>
 #include <json.hpp>
 #include <imath.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -127,7 +124,7 @@ int64_t S2_trivial(int64_t x,
   print_log("Computation of the trivial special leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int64_t s2_trivial;
 
   if (!resume(x, y, z, s2_trivial, time))
@@ -153,7 +150,7 @@ int128_t S2_trivial(int128_t x,
   print_log("Computation of the trivial special leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s2_trivial;
 
   if (!resume(x, y, z, s2_trivial, time))
