@@ -40,7 +40,7 @@ public:
   bool resume(maxint_t& s2_hard, double& time) const;
   int get_threads(int threads) const;
   maxint_t get_result() const;
-  double get_time() const;
+  double get_wtime() const;
   void backup();
 
 private:

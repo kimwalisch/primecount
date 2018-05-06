@@ -216,7 +216,7 @@ maxint_t LoadBalancer::get_result() const
   return s2_total_;
 }
 
-double LoadBalancer::get_time() const
+double LoadBalancer::get_wtime() const
 {
   return time_;
 }

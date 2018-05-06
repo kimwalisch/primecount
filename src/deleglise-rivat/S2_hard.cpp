@@ -211,7 +211,7 @@ T S2_hard_OpenMP(T x,
   }
 
   loadBalancer.backup();
-  time = loadBalancer.get_time();
+  time = loadBalancer.get_wtime();
   T s2_hard = (T) loadBalancer.get_result();
 
   return s2_hard;
