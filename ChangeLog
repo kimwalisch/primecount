@@ -1,4 +1,4 @@
-2018-29-04 Kim Walisch  <kim.walisch@gmail.com>
+2018-06-05 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.4 unreleased.
 
@@ -6,6 +6,8 @@
   P2(x, a) has been sped up by 30% due to an update to the
   latest primesieve-7.0 library.
 
+  * CMakeLists.txt: Add OpenMP support for LLVM/Clang.
+  * CMakeLists.txt: Add Intel C++ compiler support.
   * nth_prime.cpp: Fix non-critical data race.
   * pi_legendre.cpp: Fix non-critical data race.
   * pi_primesieve.cpp: Fix non-critical data race.
