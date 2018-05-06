@@ -21,7 +21,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,14 +36,11 @@
 #include <min.hpp>
 #include <calculator.hpp>
 #include <json.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <cmath>
 #include <string>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 
@@ -70,7 +67,7 @@ void LoadBalancer::backup(int threads,
                           int64_t segment_size)
 {
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-  double seconds = get_wtime() - backup_time_;
+  double seconds = get_time() - backup_time_;
 
   string tid = "thread" + to_string(thread_id);
 
@@ -80,14 +77,14 @@ void LoadBalancer::backup(int threads,
   json_["S2_hard"]["segment_size"] = segment_size_;
   json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
   json_["S2_hard"]["percent"] = percent;
-  json_["S2_hard"]["seconds"] = get_wtime() - time_;
+  json_["S2_hard"]["seconds"] = get_time() - time_;
   json_["S2_hard"][tid]["low"] = low;
   json_["S2_hard"][tid]["segments"] = segments;
   json_["S2_hard"][tid]["segment_size"] = segment_size;
 
   if (seconds > 60)
   {
-    backup_time_ = get_wtime();
+    backup_time_ = get_time();
     store_backup(json_);
   }
 }
@@ -102,7 +99,7 @@ void LoadBalancer::backup()
   json_["S2_hard"]["z"] = z_;
   json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
   json_["S2_hard"]["percent"] = 100;
-  json_["S2_hard"]["seconds"] = get_wtime() - time_;
+  json_["S2_hard"]["seconds"] = get_time() - time_;
 
   store_backup(json_);
 }
@@ -135,7 +132,7 @@ bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
     double seconds = copy_["S2_hard"]["seconds"];
 
     s2_hard = calculator::eval<maxint_t>(copy_["S2_hard"]["s2_hard"]);
-    time = get_wtime() - seconds;
+    time = get_time() - seconds;
     print_resume(percent, x_);
     return true;
   }
@@ -155,8 +152,8 @@ LoadBalancer::LoadBalancer(maxint_t x,
   segments_(1),
   s2_total_(0),
   s2_approx_(s2_approx),
-  time_(get_wtime()),
-  backup_time_(get_wtime()),
+  time_(get_time()),
+  backup_time_(get_time()),
   status_(x),
   json_(load_backup())
 {
@@ -173,7 +170,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   {
     double seconds = copy_["S2_hard"]["seconds"];
     s2_total_ = calculator::eval<maxint_t>(copy_["S2_hard"]["s2_hard"]);
-    time_ = get_wtime() - seconds;
+    time_ = get_time() - seconds;
 
     if (json_["S2_hard"].count("low"))
     {
@@ -309,7 +306,7 @@ double LoadBalancer::remaining_secs() const
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
   percent = in_between(20, percent, 100);
 
-  double total_secs = get_wtime() - time_;
+  double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
 }
