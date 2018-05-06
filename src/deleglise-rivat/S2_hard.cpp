@@ -13,7 +13,7 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,14 +30,11 @@
 #include <int128_t.hpp>
 #include <LoadBalancer.hpp>
 #include <min.hpp>
+#include <print.hpp>
 #include <S2.hpp>
 
 #include <stdint.h>
 #include <vector>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -241,7 +238,7 @@ int64_t S2_hard(int64_t x,
   print_log("Computation of the hard special leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   maxint_t s2_hard;
 
@@ -277,7 +274,7 @@ int128_t S2_hard(int128_t x,
   print_log("Computation of the hard special leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   maxint_t s2_hard;
 
