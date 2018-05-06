@@ -4,7 +4,7 @@
 ///        and the sparse easy leaves in parallel using OpenMP
 ///        (Deleglise-Rivat algorithm).
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,6 +18,7 @@
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <print.hpp>
 #include <S2Status.hpp>
 #include <S2.hpp>
 #include <json.hpp>
@@ -25,10 +26,6 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -311,7 +308,7 @@ int64_t S2_easy(int64_t x,
   print_log("Computation of the easy special leaves");
   print_log(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads, time);
 
@@ -338,7 +335,7 @@ int128_t S2_easy(int128_t x,
   print_log(x, y, c, threads);
 
   int128_t s2_easy;
-  double time = get_wtime();
+  double time = get_time();
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
