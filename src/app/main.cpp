@@ -340,7 +340,7 @@ int main (int argc, char* argv[])
 #endif
     }
 
-    double seconds = get_wtime() - time;
+    double seconds = get_time() - time;
     result_txt(argc, argv, res, threads, seconds);
 
     if (print_result())

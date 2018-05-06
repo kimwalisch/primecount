@@ -40,7 +40,7 @@ void backup(T x,
   json["S1"]["y"] = y;
   json["S1"]["s1"] = to_string(s1);
   json["S1"]["percent"] = 100.0;
-  json["S1"]["seconds"] = get_wtime() - time;
+  json["S1"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -59,7 +59,7 @@ bool resume(T x,
     double seconds = json["S1"]["seconds"];
 
     s1 = calculator::eval<T>(json["S1"]["s1"]);
-    time = get_wtime() - seconds;
+    time = get_time() - seconds;
     print_resume(percent, x);
     return true;
   }

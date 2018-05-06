@@ -14608,7 +14608,7 @@ inline double backup_time(double time, const std::string& formula)
   if (is_backup_seconnds(j, formula))
   {
     double seconds = j[formula]["seconds"];
-    return get_wtime() - seconds;
+    return get_time() - seconds;
   }
 
   return time;
@@ -14631,7 +14631,7 @@ inline double backup_time(double time)
     double s2_hard = j["S2_hard"]["seconds"];
 
     double seconds = p2 + s1 + s2_trivial + s2_easy + s2_hard;
-    return get_wtime() - seconds;
+    return get_time() - seconds;
   }
 
   return time;

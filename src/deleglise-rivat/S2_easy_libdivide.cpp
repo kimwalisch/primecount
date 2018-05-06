@@ -36,7 +36,7 @@ namespace {
 /// backup to file every 60 seconds
 bool is_backup(double time)
 {
-  double seconds = get_wtime() - time;
+  double seconds = get_time() - time;
   return seconds > 60;
 }
 
@@ -55,7 +55,7 @@ void backup(J& json,
   json["S2_easy"]["z"] = z;
   json["S2_easy"]["threads"] = threads;
   json["S2_easy"]["percent"] = percent;
-  json["S2_easy"]["seconds"] = get_wtime() - time;
+  json["S2_easy"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -76,7 +76,7 @@ void backup(J& json,
   json["S2_easy"]["z"] = z;
   json["S2_easy"]["s2_easy"] = to_string(s2_easy);
   json["S2_easy"]["percent"] = 100;
-  json["S2_easy"]["seconds"] = get_wtime() - time;
+  json["S2_easy"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -135,7 +135,7 @@ bool resume(J& json,
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     start = json["S2_easy"]["start"];
     threads = max(threads, backup_threads);
-    time = get_wtime() - seconds;
+    time = get_time() - seconds;
     print_resume(percent, x);
     return true;
   }
@@ -159,7 +159,7 @@ bool resume(J& json,
     double seconds = json["S2_easy"]["seconds"];
 
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
-    time = get_wtime() - seconds;
+    time = get_time() - seconds;
     print_resume(percent, x);
     return true;
   }
@@ -283,7 +283,7 @@ T S2_easy_OpenMP(T x,
   PiTable pi(y);
   S2Status status(x);
   auto fastdiv = libdivide_vector(primes);
-  double backup_time = get_wtime();
+  double backup_time = get_time();
 
   int64_t x13 = iroot<3>(x);
   int64_t pi_x13 = pi[x13];
@@ -319,7 +319,7 @@ T S2_easy_OpenMP(T x,
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
           backup(json, x, y, z, threads, percent, time);
-          backup_time = get_wtime();
+          backup_time = get_time();
         }
       }
 

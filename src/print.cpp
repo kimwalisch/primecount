@@ -138,7 +138,7 @@ void print(const string& res_str, maxint_t res, double time)
     cout << "\r" << string(50,' ') << "\r";
     cout << "Status: 100%" << endl;
     cout << res_str << " = " << res << endl;
-    cout << "Seconds: " << fixed << setprecision(3) << get_wtime() - time << endl;
+    cout << "Seconds: " << fixed << setprecision(3) << get_time() - time << endl;
   }
 }
 
@@ -241,7 +241,7 @@ void print_log(const string& res_str, maxint_t res, double time)
   {
     outfile << "Status: 100%" << endl;
     outfile << res_str << " = " << res << endl;
-    outfile << "Seconds: " << fixed << setprecision(3) << get_wtime() - time << endl;
+    outfile << "Seconds: " << fixed << setprecision(3) << get_time() - time << endl;
     outfile.close();
   }
 }

@@ -125,7 +125,7 @@ void backup(J& json,
   json["P2"]["pix_total"] = to_string(pix_total);
   json["P2"]["p2"] = to_string(p2);
   json["P2"]["percent"] = percent;
-  json["P2"]["seconds"] = get_wtime() - time;
+  json["P2"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -150,7 +150,7 @@ void resume(J& json,
     thread_distance = json["P2"]["thread_distance"];
     pix_total = calculator::eval<T>(json["P2"]["pix_total"]);
     p2 = calculator::eval<T>(json["P2"]["p2"]);
-    time = get_wtime() - seconds;
+    time = get_time() - seconds;
     print_resume(percent, x);
   }
 }
