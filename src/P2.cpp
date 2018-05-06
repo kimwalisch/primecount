@@ -4,7 +4,7 @@
 ///        numbers <= x that have exactly 2 prime factors
 ///        each exceeding the a-th prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,15 +18,12 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <json.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -55,7 +52,7 @@ void balanceLoad(int64_t* thread_distance,
                  int threads,
                  double start_time)
 {
-  double seconds = get_wtime() - start_time;
+  double seconds = get_time() - start_time;
 
   int64_t min_distance = 1 << 23;
   int64_t max_distance = ceil_div(z - low, threads);
@@ -197,7 +194,7 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   {
     int64_t max_threads = ceil_div(z - low, thread_distance);
     threads = in_between(1, threads, max_threads);
-    double t = get_wtime();
+    double t = get_time();
 
     #pragma omp parallel for num_threads(threads) reduction(+: p2)
     for (int i = 0; i < threads; i++)
@@ -242,7 +239,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print_log("Computation of the 2nd partial sieve function");
   print_log(x, y, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int64_t p2 = P2_OpenMP(x, y, threads, time);
 
   print_log("P2", p2, time);
@@ -263,7 +260,7 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print_log("Computation of the 2nd partial sieve function");
   print_log(x, y, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t p2 = P2_OpenMP(x, y, threads, time);
 
   print_log("P2", p2, time);
