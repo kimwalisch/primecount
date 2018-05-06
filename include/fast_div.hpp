@@ -6,7 +6,7 @@
 ///        this by casting x and y to smaller types (if possible)
 ///        before doing the division.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,10 +26,9 @@ namespace primecount {
 template <typename T>
 struct fastdiv
 {
-  typedef typename std::conditional<sizeof(T) / 2 <= sizeof(uint8_t), uint8_t,
-          typename std::conditional<sizeof(T) / 2 == sizeof(uint16_t), uint16_t,
-          typename std::conditional<sizeof(T) / 2 == sizeof(uint32_t), uint32_t,
-          uint64_t>::type>::type>::type type;
+  typedef typename std::conditional<sizeof(T) / 2 <= sizeof(uint32_t), uint32_t,
+          typename std::conditional<sizeof(T) / 2 <= sizeof(uint64_t), uint64_t,
+          T>::type>::type type;
 };
 
 template <typename X, typename Y>

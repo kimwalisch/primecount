@@ -1,8 +1,6 @@
 ///
-/// @file  int128_t.hpp
-/// @brief Additional integer types used in primecount:
-///        int128_t, uint128_t, intfast64_t, intfast128_t,
-///        maxint_t, maxuint_t.
+/// @file   int128_t.hpp
+/// @brief  Support for int128_t, uint128_t types.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -141,19 +139,15 @@ struct numeric_limits
 template <>
 struct numeric_limits<int128_t>
 {
-  static constexpr int128_t max()
-  {
-    return ~(((int128_t) 1) << 127);
-  }
+  static constexpr int128_t min() { return ((int128_t) 1) << 127; }
+  static constexpr int128_t max() { return ~min(); }
 };
 
 template <>
 struct numeric_limits<uint128_t>
 {
-  static constexpr uint128_t max()
-  {
-    return ~((uint128_t) 0);
-  }
+  static constexpr uint128_t min() { return 0; }
+  static constexpr uint128_t max() { return ~min(); }
 };
 
 #endif
@@ -164,12 +158,9 @@ struct make_signed
 #if !defined(HAVE_INT128_T)
   typedef typename std::make_signed<T>::type type;
 #else
-  typedef typename std::conditional<std::is_same<T, uint8_t>::value, int8_t,
-          typename std::conditional<std::is_same<T, uint16_t>::value, int16_t,
-          typename std::conditional<std::is_same<T, uint32_t>::value, int32_t,
-          typename std::conditional<std::is_same<T, uint64_t>::value, int64_t,
+  typedef typename std::conditional<std::is_same<T, int128_t>::value, int128_t,
           typename std::conditional<std::is_same<T, uint128_t>::value, int128_t,
-          T>::type>::type>::type>::type>::type type;
+          typename std::make_signed<T>::type>::type>::type type;
 #endif
 };
 

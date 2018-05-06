@@ -3,7 +3,7 @@
 /// @brief 3rd partial sieve function, used in Lehmer's
 ///        prime counting formula.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,11 +12,9 @@
 #include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
-#include <stdint.h>
+#include <print.hpp>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
+#include <stdint.h>
 
 using namespace std;
 
@@ -32,7 +30,7 @@ int64_t P3(int64_t x, int64_t a, int threads)
   print("=== P3(x, a) ===");
   print("Computation of the 3rd partial sieve function");
 
-  double time = get_wtime();
+  double time = get_time();
   auto primes = generate_primes<int32_t>(isqrt(x));
 
   int64_t y = iroot<3>(x);

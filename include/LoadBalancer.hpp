@@ -23,10 +23,10 @@ struct Runtime
 {
   Runtime() { reset(); }
   void reset() { init = 0; secs = 0; }
-  void start() { reset(); secs = get_wtime(); }
-  void stop() { secs = get_wtime() - secs; }
-  void init_start() { init = get_wtime(); }
-  void init_stop() { init = get_wtime() - init; }
+  void start() { reset(); secs = get_time(); }
+  void stop() { secs = get_time() - secs; }
+  void init_start() { init = get_time(); }
+  void init_stop() { init = get_time() - init; }
   double init;
   double secs;
 };

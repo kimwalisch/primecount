@@ -67,6 +67,7 @@ set(LIB_SRC src/backup.cpp
 
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
+include(CMakePushCheckState)
 
 # Set default build type to Release ##################################
 
@@ -96,9 +97,14 @@ endif()
 
 if(WITH_MPI)
     find_package(MPI REQUIRED)
-    include_directories(${MPI_INCLUDE_PATH})
-    add_definitions(-DHAVE_MPI)
 
+    if(TARGET MPI::MPI_CXX)
+        set(LIB_MPI "MPI::MPI_CXX")
+    else()
+        include_directories("${MPI_INCLUDE_PATH}")
+    endif()
+
+    set(HAVE_MPI "HAVE_MPI")
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/P2_mpi.cpp
                 src/mpi/S2_hard_mpi.cpp
@@ -110,9 +116,56 @@ endif()
 
 if(WITH_OPENMP)
     find_package(OpenMP QUIET)
-    if(OPENMP_FOUND)
-        message(STATUS "Found OpenMP: ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
+    if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+        check_cxx_source_compiles("
+            #include <int128_t.hpp>
+            int main() {
+                primecount::maxint_t sum = 0;
+                #pragma omp parallel for reduction(+: sum)
+                for (int i = 0; i < 100; i++)
+                    sum += i;
+                return 0;
+            }" OpenMP)
+
+        if(NOT OpenMP)
+            find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
+
+            if(LIB_ATOMIC)
+                set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
+
+                check_cxx_source_compiles("
+                    #include <int128_t.hpp>
+                    int main() {
+                        primecount::maxint_t sum = 0;
+                        #pragma omp parallel for reduction(+: sum)
+                        for (int i = 0; i < 100; i++)
+                            sum += i;
+                        return 0;
+                    }" OpenMP_with_libatomic)
+
+                if(NOT OpenMP_with_libatomic)
+                    set(LIB_ATOMIC "")
+                endif()
+            endif()
+        endif()
+
+        cmake_pop_check_state()
+
+        if(OpenMP OR OpenMP_with_libatomic)
+            if(TARGET OpenMP::OpenMP_CXX)
+                set(LIB_OPENMP "OpenMP::OpenMP_CXX")
+            else()
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+            endif()
+        endif()
+    else()
+        message(STATUS "Performing Test OpenMP")
+        message(STATUS "Performing Test OpenMP - Failed")
     endif()
 endif()
 
@@ -149,23 +202,34 @@ if(WITH_MPI)
     endif()
 endif()
 
-# Check -mpopcnt compiler flag #######################################
+# Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
-    include(CMakePushCheckState)
+    if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS -Werror)
+        check_cxx_compiler_flag(-msse4.2 msse42)
+        cmake_pop_check_state()
 
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    cmake_pop_check_state()
+        if(msse42)
+            set(POPCNT_FLAG "-msse4.2")
+        endif()
+    endif()
 
-    if(mpopcnt)
-        set(POPCNT_FLAG "-mpopcnt")
+    if(NOT POPCNT_FLAG)
+        cmake_push_check_state()
+        set(CMAKE_REQUIRED_FLAGS -Werror)
+        check_cxx_compiler_flag(-mpopcnt mpopcnt)
+        cmake_pop_check_state()
+
+        if(mpopcnt)
+            set(POPCNT_FLAG "-mpopcnt")
+        endif()
     endif()
 endif()
 
 if(NOT WITH_POPCNT)
-    set(POPCNT_DEFINE "DISABLE_POPCNT")
+    set(DISABLE_POPCNT "DISABLE_POPCNT")
 endif()
 
 # Testing ############################################################
@@ -177,22 +241,20 @@ endif()
 
 # libprimecount ######################################################
 
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
     add_library(libprimecount SHARED ${LIB_SRC})
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${POPCNT_DEFINE}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE libprimesieve "${MPI_CXX_LIBRARIES}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
     PRIVATE
-        cxx_auto_type
+        cxx_constexpr
         cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_range_for)
 
     target_include_directories(libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -204,12 +266,12 @@ endif()
 
 # libprimecount-static ###############################################
 
-if (BUILD_STATIC_LIBS)
+if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${POPCNT_DEFINE}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${MPI_CXX_LIBRARIES}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
@@ -218,11 +280,9 @@ if (BUILD_STATIC_LIBS)
 
     target_compile_features(libprimecount-static
     PRIVATE
-        cxx_auto_type
+        cxx_constexpr
         cxx_lambdas
-        cxx_nullptr
-        cxx_range_for
-        cxx_uniform_initialization)
+        cxx_range_for)
 
     target_include_directories(libprimecount-static PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -236,7 +296,8 @@ endif()
 
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
-    target_link_libraries(primecount libprimecount)
+    target_compile_definitions(primecount PRIVATE "${HAVE_MPI}")
+    target_link_libraries(primecount PRIVATE libprimecount "${LIB_MPI}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

@@ -29,8 +29,8 @@ later).
 ## Build instructions
 
 You need to have installed a C++ compiler, cmake and make. Ideally
-primecount should be compiled using the GCC compiler as GCC supports
-both OpenMP and 128-bit integers.
+primecount should be compiled using a C++ compiler that supports both
+OpenMP and 128-bit integers (e.g. GCC, Clang, Intel C++ Compiler).
 
 ```sh
 cmake .

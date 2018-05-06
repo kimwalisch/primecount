@@ -14,15 +14,17 @@
 
 #include <stdint.h>
 #include <string>
+#include <array>
 
 using namespace std;
 
 namespace {
 
+// Number of primes < 2^63
 const int64_t max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
-const int primes[] = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+const array<int, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 }
 
@@ -48,7 +50,6 @@ int64_t nth_prime(int64_t n, int threads)
   }
 
   int64_t prime = 0;
-  primesieve::set_num_threads(threads);
 
   if (n < 100000)
     prime = primesieve::nth_prime(n, 0);

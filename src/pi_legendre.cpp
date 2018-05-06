@@ -7,7 +7,6 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <isqrt.hpp>
 
@@ -24,14 +23,9 @@ int64_t pi_legendre(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  // temporarily disable printing
-  bool print = is_print();
-  set_print(false);
-
-  int64_t a = pi_primesieve(isqrt(x));
+  int64_t a = pi_legendre(isqrt(x), 1);
   int64_t sum = phi(x, a, threads) + a - 1;
 
-  set_print(print);
   return sum;
 }
 

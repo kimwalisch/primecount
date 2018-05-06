@@ -5,7 +5,7 @@
 ///        divides with comparatively cheap multiplication and
 ///        bitshifts.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,14 +19,11 @@
 #include <mpi_reduce_sum.hpp>
 #include <imath.hpp>
 #include <S2Status.hpp>
+#include <print.hpp>
 
 #include <libdivide.h>
 #include <stdint.h>
 #include <vector>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -165,7 +162,7 @@ int64_t S2_easy_mpi(int64_t x,
   print("Computation of the easy special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   auto primes = generate_primes<int32_t>(y);
   int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
 
@@ -186,7 +183,7 @@ int128_t S2_easy_mpi(int128_t x,
   print("Computation of the easy special leaves");
   print(x, y, c, threads);
 
-  double time = get_wtime();
+  double time = get_time();
   int128_t s2_easy;
 
   // uses less memory

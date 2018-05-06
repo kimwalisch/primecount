@@ -17,7 +17,7 @@ libprimesieve*
 primesieve.lib
 primesieve.pc
 DoxyFile
-build
+/build*
 CMakeCache.txt
 CMakeFiles
 CMakeScripts

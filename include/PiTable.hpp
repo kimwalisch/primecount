@@ -5,7 +5,7 @@
 ///        and returns the number of primes <= n in O(1)
 ///        operations.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,9 +42,8 @@ public:
 private:
   struct PiData
   {
-    PiData() : prime_count(0), bits(0) { }
-    uint64_t prime_count;
-    uint64_t bits;
+    uint64_t prime_count = 0;
+    uint64_t bits = 0;
   };
 
   std::vector<PiData> pi_;

@@ -231,22 +231,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
     {
       for (;;)
       {
-        case 0: if (s >= sieve_end) { wheel.index = 0; break; }
-        cnt += unset_bit<0>(s); s += prime * 6 + 0;
-        case 1: if (s >= sieve_end) { wheel.index = 1; break; }
-        cnt += unset_bit<1>(s); s += prime * 4 + 0;
-        case 2: if (s >= sieve_end) { wheel.index = 2; break; }
-        cnt += unset_bit<2>(s); s += prime * 2 + 0;
-        case 3: if (s >= sieve_end) { wheel.index = 3; break; }
-        cnt += unset_bit<3>(s); s += prime * 4 + 0;
-        case 4: if (s >= sieve_end) { wheel.index = 4; break; }
-        cnt += unset_bit<4>(s); s += prime * 2 + 0;
-        case 5: if (s >= sieve_end) { wheel.index = 5; break; }
-        cnt += unset_bit<5>(s); s += prime * 4 + 0;
-        case 6: if (s >= sieve_end) { wheel.index = 6; break; }
-        cnt += unset_bit<6>(s); s += prime * 6 + 0;
-        case 7: if (s >= sieve_end) { wheel.index = 7; break; }
-        cnt += unset_bit<7>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 0; break; }
+        case 0: cnt += unset_bit<0>(s); s += prime * 6 + 0;
+        if (s >= sieve_end) { wheel.index = 1; break; }
+        case 1: cnt += unset_bit<1>(s); s += prime * 4 + 0;
+        if (s >= sieve_end) { wheel.index = 2; break; }
+        case 2: cnt += unset_bit<2>(s); s += prime * 2 + 0;
+        if (s >= sieve_end) { wheel.index = 3; break; }
+        case 3: cnt += unset_bit<3>(s); s += prime * 4 + 0;
+        if (s >= sieve_end) { wheel.index = 4; break; }
+        case 4: cnt += unset_bit<4>(s); s += prime * 2 + 0;
+        if (s >= sieve_end) { wheel.index = 5; break; }
+        case 5: cnt += unset_bit<5>(s); s += prime * 4 + 0;
+        if (s >= sieve_end) { wheel.index = 6; break; }
+        case 6: cnt += unset_bit<6>(s); s += prime * 6 + 0;
+        if (s >= sieve_end) { wheel.index = 7; break; }
+        case 7: cnt += unset_bit<7>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 < sieve_end)
         {
@@ -265,22 +265,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case  8: if (s >= sieve_end) { wheel.index =  8; break; }
-        cnt += unset_bit<1>(s); s += prime * 6 + 1;
-        case  9: if (s >= sieve_end) { wheel.index =  9; break; }
-        cnt += unset_bit<5>(s); s += prime * 4 + 1;
-        case 10: if (s >= sieve_end) { wheel.index = 10; break; }
-        cnt += unset_bit<4>(s); s += prime * 2 + 1;
-        case 11: if (s >= sieve_end) { wheel.index = 11; break; }
-        cnt += unset_bit<0>(s); s += prime * 4 + 0;
-        case 12: if (s >= sieve_end) { wheel.index = 12; break; }
-        cnt += unset_bit<7>(s); s += prime * 2 + 1;
-        case 13: if (s >= sieve_end) { wheel.index = 13; break; }
-        cnt += unset_bit<3>(s); s += prime * 4 + 1;
-        case 14: if (s >= sieve_end) { wheel.index = 14; break; }
-        cnt += unset_bit<2>(s); s += prime * 6 + 1;
-        case 15: if (s >= sieve_end) { wheel.index = 15; break; }
-        cnt += unset_bit<6>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index =  8; break; }
+        case  8: cnt += unset_bit<1>(s); s += prime * 6 + 1;
+        if (s >= sieve_end) { wheel.index =  9; break; }
+        case  9: cnt += unset_bit<5>(s); s += prime * 4 + 1;
+        if (s >= sieve_end) { wheel.index = 10; break; }
+        case 10: cnt += unset_bit<4>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 11; break; }
+        case 11: cnt += unset_bit<0>(s); s += prime * 4 + 0;
+        if (s >= sieve_end) { wheel.index = 12; break; }
+        case 12: cnt += unset_bit<7>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 13; break; }
+        case 13: cnt += unset_bit<3>(s); s += prime * 4 + 1;
+        if (s >= sieve_end) { wheel.index = 14; break; }
+        case 14: cnt += unset_bit<2>(s); s += prime * 6 + 1;
+        if (s >= sieve_end) { wheel.index = 15; break; }
+        case 15: cnt += unset_bit<6>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 6 < sieve_end)
         {
@@ -299,22 +299,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 16: if (s >= sieve_end) { wheel.index = 16; break; }
-        cnt += unset_bit<2>(s); s += prime * 6 + 2;
-        case 17: if (s >= sieve_end) { wheel.index = 17; break; }
-        cnt += unset_bit<4>(s); s += prime * 4 + 2;
-        case 18: if (s >= sieve_end) { wheel.index = 18; break; }
-        cnt += unset_bit<0>(s); s += prime * 2 + 0;
-        case 19: if (s >= sieve_end) { wheel.index = 19; break; }
-        cnt += unset_bit<6>(s); s += prime * 4 + 2;
-        case 20: if (s >= sieve_end) { wheel.index = 20; break; }
-        cnt += unset_bit<1>(s); s += prime * 2 + 0;
-        case 21: if (s >= sieve_end) { wheel.index = 21; break; }
-        cnt += unset_bit<7>(s); s += prime * 4 + 2;
-        case 22: if (s >= sieve_end) { wheel.index = 22; break; }
-        cnt += unset_bit<3>(s); s += prime * 6 + 2;
-        case 23: if (s >= sieve_end) { wheel.index = 23; break; }
-        cnt += unset_bit<5>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 16; break; }
+        case 16: cnt += unset_bit<2>(s); s += prime * 6 + 2;
+        if (s >= sieve_end) { wheel.index = 17; break; }
+        case 17: cnt += unset_bit<4>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 18; break; }
+        case 18: cnt += unset_bit<0>(s); s += prime * 2 + 0;
+        if (s >= sieve_end) { wheel.index = 19; break; }
+        case 19: cnt += unset_bit<6>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 20; break; }
+        case 20: cnt += unset_bit<1>(s); s += prime * 2 + 0;
+        if (s >= sieve_end) { wheel.index = 21; break; }
+        case 21: cnt += unset_bit<7>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 22; break; }
+        case 22: cnt += unset_bit<3>(s); s += prime * 6 + 2;
+        if (s >= sieve_end) { wheel.index = 23; break; }
+        case 23: cnt += unset_bit<5>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 10 < sieve_end)
         {
@@ -333,22 +333,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 24: if (s >= sieve_end) { wheel.index = 24; break; }
-        cnt += unset_bit<3>(s); s += prime * 6 + 3;
-        case 25: if (s >= sieve_end) { wheel.index = 25; break; }
-        cnt += unset_bit<0>(s); s += prime * 4 + 1;
-        case 26: if (s >= sieve_end) { wheel.index = 26; break; }
-        cnt += unset_bit<6>(s); s += prime * 2 + 1;
-        case 27: if (s >= sieve_end) { wheel.index = 27; break; }
-        cnt += unset_bit<5>(s); s += prime * 4 + 2;
-        case 28: if (s >= sieve_end) { wheel.index = 28; break; }
-        cnt += unset_bit<2>(s); s += prime * 2 + 1;
-        case 29: if (s >= sieve_end) { wheel.index = 29; break; }
-        cnt += unset_bit<1>(s); s += prime * 4 + 1;
-        case 30: if (s >= sieve_end) { wheel.index = 30; break; }
-        cnt += unset_bit<7>(s); s += prime * 6 + 3;
-        case 31: if (s >= sieve_end) { wheel.index = 31; break; }
-        cnt += unset_bit<4>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 24; break; }
+        case 24: cnt += unset_bit<3>(s); s += prime * 6 + 3;
+        if (s >= sieve_end) { wheel.index = 25; break; }
+        case 25: cnt += unset_bit<0>(s); s += prime * 4 + 1;
+        if (s >= sieve_end) { wheel.index = 26; break; }
+        case 26: cnt += unset_bit<6>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 27; break; }
+        case 27: cnt += unset_bit<5>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 28; break; }
+        case 28: cnt += unset_bit<2>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 29; break; }
+        case 29: cnt += unset_bit<1>(s); s += prime * 4 + 1;
+        if (s >= sieve_end) { wheel.index = 30; break; }
+        case 30: cnt += unset_bit<7>(s); s += prime * 6 + 3;
+        if (s >= sieve_end) { wheel.index = 31; break; }
+        case 31: cnt += unset_bit<4>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 12 < sieve_end)
         {
@@ -367,22 +367,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 32: if (s >= sieve_end) { wheel.index = 32; break; }
-        cnt += unset_bit<4>(s); s += prime * 6 + 3;
-        case 33: if (s >= sieve_end) { wheel.index = 33; break; }
-        cnt += unset_bit<7>(s); s += prime * 4 + 3;
-        case 34: if (s >= sieve_end) { wheel.index = 34; break; }
-        cnt += unset_bit<1>(s); s += prime * 2 + 1;
-        case 35: if (s >= sieve_end) { wheel.index = 35; break; }
-        cnt += unset_bit<2>(s); s += prime * 4 + 2;
-        case 36: if (s >= sieve_end) { wheel.index = 36; break; }
-        cnt += unset_bit<5>(s); s += prime * 2 + 1;
-        case 37: if (s >= sieve_end) { wheel.index = 37; break; }
-        cnt += unset_bit<6>(s); s += prime * 4 + 3;
-        case 38: if (s >= sieve_end) { wheel.index = 38; break; }
-        cnt += unset_bit<0>(s); s += prime * 6 + 3;
-        case 39: if (s >= sieve_end) { wheel.index = 39; break; }
-        cnt += unset_bit<3>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 32; break; }
+        case 32: cnt += unset_bit<4>(s); s += prime * 6 + 3;
+        if (s >= sieve_end) { wheel.index = 33; break; }
+        case 33: cnt += unset_bit<7>(s); s += prime * 4 + 3;
+        if (s >= sieve_end) { wheel.index = 34; break; }
+        case 34: cnt += unset_bit<1>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 35; break; }
+        case 35: cnt += unset_bit<2>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 36; break; }
+        case 36: cnt += unset_bit<5>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 37; break; }
+        case 37: cnt += unset_bit<6>(s); s += prime * 4 + 3;
+        if (s >= sieve_end) { wheel.index = 38; break; }
+        case 38: cnt += unset_bit<0>(s); s += prime * 6 + 3;
+        if (s >= sieve_end) { wheel.index = 39; break; }
+        case 39: cnt += unset_bit<3>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 16 < sieve_end)
         {
@@ -401,22 +401,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 40: if (s >= sieve_end) { wheel.index = 40; break; }
-        cnt += unset_bit<5>(s); s += prime * 6 + 4;
-        case 41: if (s >= sieve_end) { wheel.index = 41; break; }
-        cnt += unset_bit<3>(s); s += prime * 4 + 2;
-        case 42: if (s >= sieve_end) { wheel.index = 42; break; }
-        cnt += unset_bit<7>(s); s += prime * 2 + 2;
-        case 43: if (s >= sieve_end) { wheel.index = 43; break; }
-        cnt += unset_bit<1>(s); s += prime * 4 + 2;
-        case 44: if (s >= sieve_end) { wheel.index = 44; break; }
-        cnt += unset_bit<6>(s); s += prime * 2 + 2;
-        case 45: if (s >= sieve_end) { wheel.index = 45; break; }
-        cnt += unset_bit<0>(s); s += prime * 4 + 2;
-        case 46: if (s >= sieve_end) { wheel.index = 46; break; }
-        cnt += unset_bit<4>(s); s += prime * 6 + 4;
-        case 47: if (s >= sieve_end) { wheel.index = 47; break; }
-        cnt += unset_bit<2>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 40; break; }
+        case 40: cnt += unset_bit<5>(s); s += prime * 6 + 4;
+        if (s >= sieve_end) { wheel.index = 41; break; }
+        case 41: cnt += unset_bit<3>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 42; break; }
+        case 42: cnt += unset_bit<7>(s); s += prime * 2 + 2;
+        if (s >= sieve_end) { wheel.index = 43; break; }
+        case 43: cnt += unset_bit<1>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 44; break; }
+        case 44: cnt += unset_bit<6>(s); s += prime * 2 + 2;
+        if (s >= sieve_end) { wheel.index = 45; break; }
+        case 45: cnt += unset_bit<0>(s); s += prime * 4 + 2;
+        if (s >= sieve_end) { wheel.index = 46; break; }
+        case 46: cnt += unset_bit<4>(s); s += prime * 6 + 4;
+        if (s >= sieve_end) { wheel.index = 47; break; }
+        case 47: cnt += unset_bit<2>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 18 < sieve_end)
         {
@@ -435,22 +435,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 48: if (s >= sieve_end) { wheel.index = 48; break; }
-        cnt += unset_bit<6>(s); s += prime * 6 + 5;
-        case 49: if (s >= sieve_end) { wheel.index = 49; break; }
-        cnt += unset_bit<2>(s); s += prime * 4 + 3;
-        case 50: if (s >= sieve_end) { wheel.index = 50; break; }
-        cnt += unset_bit<3>(s); s += prime * 2 + 1;
-        case 51: if (s >= sieve_end) { wheel.index = 51; break; }
-        cnt += unset_bit<7>(s); s += prime * 4 + 4;
-        case 52: if (s >= sieve_end) { wheel.index = 52; break; }
-        cnt += unset_bit<0>(s); s += prime * 2 + 1;
-        case 53: if (s >= sieve_end) { wheel.index = 53; break; }
-        cnt += unset_bit<4>(s); s += prime * 4 + 3;
-        case 54: if (s >= sieve_end) { wheel.index = 54; break; }
-        cnt += unset_bit<5>(s); s += prime * 6 + 5;
-        case 55: if (s >= sieve_end) { wheel.index = 55; break; }
-        cnt += unset_bit<1>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 48; break; }
+        case 48: cnt += unset_bit<6>(s); s += prime * 6 + 5;
+        if (s >= sieve_end) { wheel.index = 49; break; }
+        case 49: cnt += unset_bit<2>(s); s += prime * 4 + 3;
+        if (s >= sieve_end) { wheel.index = 50; break; }
+        case 50: cnt += unset_bit<3>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 51; break; }
+        case 51: cnt += unset_bit<7>(s); s += prime * 4 + 4;
+        if (s >= sieve_end) { wheel.index = 52; break; }
+        case 52: cnt += unset_bit<0>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 53; break; }
+        case 53: cnt += unset_bit<4>(s); s += prime * 4 + 3;
+        if (s >= sieve_end) { wheel.index = 54; break; }
+        case 54: cnt += unset_bit<5>(s); s += prime * 6 + 5;
+        if (s >= sieve_end) { wheel.index = 55; break; }
+        case 55: cnt += unset_bit<1>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 22 < sieve_end)
         {
@@ -469,22 +469,22 @@ uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 
       for (;;)
       {
-        case 56: if (s >= sieve_end) { wheel.index = 56; break; }
-        cnt += unset_bit<7>(s); s += prime * 6 + 6;
-        case 57: if (s >= sieve_end) { wheel.index = 57; break; }
-        cnt += unset_bit<6>(s); s += prime * 4 + 4;
-        case 58: if (s >= sieve_end) { wheel.index = 58; break; }
-        cnt += unset_bit<5>(s); s += prime * 2 + 2;
-        case 59: if (s >= sieve_end) { wheel.index = 59; break; }
-        cnt += unset_bit<4>(s); s += prime * 4 + 4;
-        case 60: if (s >= sieve_end) { wheel.index = 60; break; }
-        cnt += unset_bit<3>(s); s += prime * 2 + 2;
-        case 61: if (s >= sieve_end) { wheel.index = 61; break; }
-        cnt += unset_bit<2>(s); s += prime * 4 + 4;
-        case 62: if (s >= sieve_end) { wheel.index = 62; break; }
-        cnt += unset_bit<1>(s); s += prime * 6 + 6;
-        case 63: if (s >= sieve_end) { wheel.index = 63; break; }
-        cnt += unset_bit<0>(s); s += prime * 2 + 1;
+        if (s >= sieve_end) { wheel.index = 56; break; }
+        case 56: cnt += unset_bit<7>(s); s += prime * 6 + 6;
+        if (s >= sieve_end) { wheel.index = 57; break; }
+        case 57: cnt += unset_bit<6>(s); s += prime * 4 + 4;
+        if (s >= sieve_end) { wheel.index = 58; break; }
+        case 58: cnt += unset_bit<5>(s); s += prime * 2 + 2;
+        if (s >= sieve_end) { wheel.index = 59; break; }
+        case 59: cnt += unset_bit<4>(s); s += prime * 4 + 4;
+        if (s >= sieve_end) { wheel.index = 60; break; }
+        case 60: cnt += unset_bit<3>(s); s += prime * 2 + 2;
+        if (s >= sieve_end) { wheel.index = 61; break; }
+        case 61: cnt += unset_bit<2>(s); s += prime * 4 + 4;
+        if (s >= sieve_end) { wheel.index = 62; break; }
+        case 62: cnt += unset_bit<1>(s); s += prime * 6 + 6;
+        if (s >= sieve_end) { wheel.index = 63; break; }
+        case 63: cnt += unset_bit<0>(s); s += prime * 2 + 1;
 
         while (s + prime * 28 + 28 < sieve_end)
         {

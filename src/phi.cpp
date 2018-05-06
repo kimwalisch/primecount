@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,13 +39,8 @@
 #include <stdint.h>
 #include <algorithm>
 #include <array>
-#include <cstdlib>
 #include <vector>
 #include <limits>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -159,11 +154,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  print("");
-  print("=== phi(x, a) ===");
-  print("Count the numbers <= x coprime to the first a primes");
-
-  double time = get_wtime();
   int64_t sum = 0;
 
   if (is_phi_tiny(a))
@@ -194,7 +184,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
     }
   }
 
-  print("phi", sum, time);
   return sum;
 }
 

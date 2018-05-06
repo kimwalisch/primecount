@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,8 +25,9 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <print.hpp>
 #include <S1.hpp>
-#include "S2.hpp"
+#include <S2.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -84,7 +85,7 @@ int64_t S2_hard(int64_t x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
   int64_t S2_result = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   vector<char> sieve(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());

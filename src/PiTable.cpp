@@ -5,7 +5,7 @@
 ///        and returns the number of primes <= n in O(1)
 ///        operations.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,12 +29,12 @@ PiTable::PiTable(uint64_t max) :
   uint64_t prime = 0;
 
   while ((prime = it.next_prime()) <= max)
-    pi_[prime / 64].bits |= ((uint64_t) 1) << (prime % 64);
+    pi_[prime / 64].bits |= 1ull << (prime % 64);
 
-  for (uint64_t i = 0; i < pi_.size(); i++)
+  for (auto& i : pi_)
   {
-    pi_[i].prime_count = pix;
-    pix += popcnt64(pi_[i].bits);
+    i.prime_count = pix;
+    pix += popcnt64(i.bits);
   }
 }
 

@@ -13,7 +13,7 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,13 +34,10 @@
 #include <S2Status.hpp>
 #include <S2.hpp>
 #include <Sieve.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <vector>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -283,7 +280,7 @@ int64_t S2_hard_mpi(int64_t x,
   print(x, y, c, threads);
 
   int64_t s2_hard = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   if (is_mpi_master_proc())
     s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
@@ -315,7 +312,7 @@ int128_t S2_hard_mpi(int128_t x,
   print(x, y, c, threads);
 
   int128_t s2_hard = 0;
-  double time = get_wtime();
+  double time = get_time();
 
   if (is_mpi_master_proc())
     s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
