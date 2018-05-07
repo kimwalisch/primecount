@@ -14592,7 +14592,7 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, int t
          x == calculator::eval<T>(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
-         j[formula].count("thread" + to_string(thread_id)) > 0;
+         j[formula].count("thread" + std::to_string(thread_id)) > 0;
 }
 
 inline bool is_backup_seconnds(const nlohmann::json& j, const std::string& formula)
