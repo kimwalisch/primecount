@@ -100,9 +100,9 @@ int main()
 
   {
     ostringstream s;
-    s << prt::numeric_limits<int128_t>::min();
-    cout << "-2^127 = " << s.str();
-    check(s.str() == "-170141183460469231731687303715884105728");
+    s << prt::numeric_limits<int128_t>::min() + 1;
+    cout << "-2^127+1 = " << s.str();
+    check(s.str() == "-170141183460469231731687303715884105727");
   }
 
   {
