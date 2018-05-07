@@ -59,9 +59,6 @@ int main()
   static_assert(prt::is_unsigned<uint64_t>::value, 
                 "prt::is_unsigned<uint64_t> != true");
 
-  static_assert(std::is_same<typename prt::make_signed<uint64_t>::type, int64_t>::value, 
-                "prt::make_signed<uint64_t> != int64_t");
-
 #if defined(HAVE_INT128_T)
 
   static_assert(prt::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
@@ -84,12 +81,6 @@ int main()
 
   static_assert(prt::is_unsigned<uint128_t>::value, 
                 "prt::is_unsigned<uint128_t> != true");
-
-  static_assert(std::is_same<typename prt::make_signed<int128_t>::type, int128_t>::value, 
-                "prt::make_signed<int128_t> != int128_t");
-
-  static_assert(std::is_same<typename prt::make_signed<uint128_t>::type, int128_t>::value, 
-                "prt::make_signed<uint128_t> != int128_t");
 
   {
     ostringstream s;
