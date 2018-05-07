@@ -153,18 +153,6 @@ struct numeric_limits<uint128_t>
 #endif
 
 template <typename T>
-struct make_signed
-{
-#if !defined(HAVE_INT128_T)
-  typedef typename std::make_signed<T>::type type;
-#else
-  typedef typename std::conditional<std::is_same<T, int128_t>::value, int128_t,
-          typename std::conditional<std::is_same<T, uint128_t>::value, int128_t,
-          typename std::make_signed<T>::type>::type>::type type;
-#endif
-};
-
-template <typename T>
 struct is_integral
 {
   enum

@@ -73,7 +73,7 @@ inline bool is_phi_tiny(int64_t a)
 }
 
 template <typename T>
-typename prt::make_signed<T>::type phi_tiny(T x, int64_t a)
+T phi_tiny(T x, int64_t a)
 {
   if (x <= std::numeric_limits<uint32_t>::max())
     return phiTiny.phi((uint32_t) x, a);
