@@ -18,8 +18,6 @@
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
 
-#include <int128_t.hpp>
-
 #include <stdint.h>
 #include <array>
 #include <cassert>
