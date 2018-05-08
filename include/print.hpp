@@ -59,8 +59,6 @@ void print_log(const std::string& res_name, maxint_t res);
 
 void print_log(const std::string& res_name, maxint_t res, double time);
 
-void print_log_seconds(double seconds);
-
 } // namespace
 
 #endif

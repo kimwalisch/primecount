@@ -252,19 +252,6 @@ void print_seconds(double seconds)
     cout << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
 }
 
-void print_log_seconds(double seconds)
-{
-  print_seconds(seconds);
-
-  ofstream outfile("primecount.log", ofstream::out | ofstream::app);
-
-  if (outfile.is_open())
-  {
-    outfile << "Seconds: " << fixed << setprecision(3) << seconds << endl << endl;
-    outfile.close();
-  }
-}
-
 void print_status(double percent, maxint_t x)
 {
   if (is_print())
