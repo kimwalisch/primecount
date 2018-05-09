@@ -81,7 +81,7 @@ void print(const string& str)
     cout << str << endl;
 }
 
-void print(const string& str, int64_t res)
+void print(const string& str, maxint_t res)
 {
   if (is_print())
     cout << str << " = " << res << endl;

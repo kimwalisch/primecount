@@ -29,7 +29,7 @@ bool print_variables();
 
 void print(const std::string& str);
 
-void print(const std::string& str, int64_t res);
+void print(const std::string& str, maxint_t res);
 
 void print(maxint_t x, int64_t y, int threads);
 
