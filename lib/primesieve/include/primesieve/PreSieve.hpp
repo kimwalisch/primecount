@@ -32,23 +32,23 @@ namespace primesieve {
 /// - PreSieve multiples of primes <=  7 uses    7    bytes
 /// - PreSieve multiples of primes <= 11 uses   77    bytes
 /// - PreSieve multiples of primes <= 13 uses 1001    bytes
-/// - PreSieve multiples of primes <= 17 uses   16.62 kilobytes
-/// - PreSieve multiples of primes <= 19 uses  315.75 kilobytes
-/// - PreSieve multiples of primes <= 23 uses    7.09 megabytes
+/// - PreSieve multiples of primes <= 17 uses   17.02 kilobytes
+/// - PreSieve multiples of primes <= 19 uses  323.32 kilobytes
+/// - PreSieve multiples of primes <= 23 uses    7.44 megabytes
 ///
 class PreSieve
 {
 public:
-  PreSieve(uint64_t start, uint64_t stop);
+  void init(uint64_t, uint64_t);
   uint64_t getMaxPrime() const { return maxPrime_; }
   void copy(byte_t*, uint64_t, uint64_t) const;
 private:
-  uint64_t maxPrime_;
-  uint64_t primeProduct_;
-  uint64_t size_;
-  byte_t* buffer_;
+  uint64_t maxPrime_ = 0;
+  uint64_t primeProduct_ = 0;
+  uint64_t size_ = 0;
+  byte_t* buffer_ = nullptr;
   std::unique_ptr<byte_t[]> deleter_;
-  void init();
+  void initBuffer(uint64_t, uint64_t);
 };
 
 } // namespace

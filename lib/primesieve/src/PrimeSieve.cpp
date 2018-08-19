@@ -13,6 +13,7 @@
 #include <primesieve/PrimeSieve.hpp>
 #include <primesieve/pmath.hpp>
 #include <primesieve/PrintPrimes.hpp>
+#include <primesieve/PreSieve.hpp>
 #include <primesieve/types.hpp>
 
 #include <stdint.h>
@@ -56,7 +57,8 @@ PrimeSieve::PrimeSieve() :
   flags_(COUNT_PRIMES),
   parent_(nullptr)
 {
-  setSieveSize(get_sieve_size());
+  int sieveSize = get_sieve_size();
+  setSieveSize(sieveSize);
   reset();
 }
 
@@ -141,6 +143,11 @@ double PrimeSieve::getSeconds() const
   return seconds_;
 }
 
+PreSieve& PrimeSieve::getPreSieve()
+{
+  return preSieve_;
+}
+
 double PrimeSieve::getStatus() const
 {
   return percent_;
@@ -156,10 +163,7 @@ void PrimeSieve::addFlags(int flags)
   flags_ |= flags;
 }
 
-/// Set the size of the sieve array in kilobytes.
-/// The best sieving performance is usually achieved if the
-/// sieve size is set to the CPU's L1 or L2 cache size.
-///
+/// Set the size of the sieve array in KiB (kibibyte)
 void PrimeSieve::setSieveSize(int sieveSize)
 {
   sieveSize_ = inBetween(8, sieveSize, 4096);

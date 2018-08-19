@@ -27,14 +27,14 @@ using namespace std;
 
 namespace primesieve {
 
-/// @stop:      Upper bound for sieving
-/// @l1Size:    Sieve size in bytes
-/// @maxPrime:  Sieving primes <= maxPrime
+/// @stop:     Upper bound for sieving
+/// @l1Size:   Sieve size in bytes
+/// @maxPrime: Sieving primes <= maxPrime
 ///
 void EratSmall::init(uint64_t stop, uint64_t l1Size, uint64_t maxPrime)
 {
   if (maxPrime > l1Size * 3)
-    throw primesieve_error("EratSmall: maxPrime must be <= l1Size * 3");
+    throw primesieve_error("EratSmall: maxPrime > l1Size * 3");
 
   enabled_ = true;
   maxPrime_ = maxPrime;
@@ -45,9 +45,9 @@ void EratSmall::init(uint64_t stop, uint64_t l1Size, uint64_t maxPrime)
   primes_.reserve(count);
 }
 
-/// Usually sieve size = L2 cache size,
+/// Usually sieve size = l2CacheSize / 2
 /// but EratSmall runs faster using
-/// sieve size = L1 cache size
+/// sieve size = l1CacheSize.
 ///
 uint64_t EratSmall::getL1Size(uint64_t sieveSize)
 {
@@ -58,6 +58,7 @@ uint64_t EratSmall::getL1Size(uint64_t sieveSize)
   uint64_t minSize = 8 << 10;
   uint64_t maxSize = 4096 << 10;
 
+  size = min(size, sieveSize);
   size = inBetween(minSize, size, maxSize);
 
   return size;
