@@ -30,7 +30,6 @@ SOURCES += \
 HEADERS += \
   ../../include/primesieve/calculator.hpp \
   src/PrimeSieveGUI.hpp \
-  src/PrimeSieveGUI_const.hpp \
   src/PrimeSieveProcess.hpp
 
 # ---------------------------------------------------------
@@ -47,6 +46,7 @@ SOURCES += \
   ../EratSmall.cpp \
   ../iterator.cpp \
   ../IteratorHelper.cpp \
+  ../MemoryPool.cpp \
   ../PrimeGenerator.cpp \
   ../nthPrime.cpp \
   ../ParallelSieve.cpp \
