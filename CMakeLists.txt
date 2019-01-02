@@ -3,6 +3,7 @@ project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 4)
 set(PRIMECOUNT_VERSION_MINOR 4)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
+set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
@@ -68,14 +69,6 @@ set(LIB_SRC src/backup.cpp
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
 include(CMakePushCheckState)
-
-# Set default build type to Release ##################################
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-        FORCE)
-endif()
 
 # libprimesieve ######################################################
 
