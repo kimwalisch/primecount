@@ -10,8 +10,8 @@
 #ifndef ERATMEDIUM_HPP
 #define ERATMEDIUM_HPP
 
-#include "MemoryPool.hpp"
 #include "Bucket.hpp"
+#include "MemoryPool.hpp"
 #include "types.hpp"
 #include "Wheel.hpp"
 
@@ -34,8 +34,8 @@ private:
   bool enabled_ = false;
   uint64_t maxPrime_;
   MemoryPool memoryPool_;
-  std::array<Bucket*, 64> lists_;
-  void resetLists();
+  std::array<SievingPrime*, 64> sievingPrimes_;
+  void resetSievingPrimes();
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
   void crossOff(byte_t*, byte_t*, Bucket*);
   void crossOff_7(byte_t*, byte_t*, Bucket*);
