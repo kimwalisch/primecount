@@ -23,7 +23,6 @@
 
 #include <primesieve.hpp>
 #include <primesieve/calculator.hpp>
-#include <primesieve/CpuInfo.hpp>
 #include <primesieve/ParallelSieve.hpp>
 #include <primesieve/pmath.hpp>
 
@@ -54,9 +53,9 @@
 using namespace primesieve;
 
 PrimeSieveGUI::PrimeSieveGUI(QWidget *parent) :
-  QMainWindow(parent), ui(new Ui::PrimeSieveGUI), validator_(0),
-  primeSieveProcess_(0), saveAct_(0), quitAct_(0), aboutAct_(0),
-  alignmentGroup_(0) {
+  QMainWindow(parent),
+  ui(new Ui::PrimeSieveGUI)
+{
   ui->setupUi(this);
   primeText_.push_back("Prime numbers");
   primeText_.push_back("Twin primes");
@@ -68,17 +67,20 @@ PrimeSieveGUI::PrimeSieveGUI(QWidget *parent) :
   this->initConnections();
 }
 
-PrimeSieveGUI::~PrimeSieveGUI() {
+PrimeSieveGUI::~PrimeSieveGUI()
+{
   this->cleanUp();
   delete validator_;
   delete saveAct_;
   delete quitAct_;
   delete aboutAct_;
   delete alignmentGroup_;
+
   for (; !countAct_.isEmpty(); countAct_.pop_back())
     delete countAct_.back();
   for (; !printAct_.isEmpty(); printAct_.pop_back())
     delete printAct_.back();
+
   // Qt code
   delete ui;
 }
@@ -98,12 +100,12 @@ void PrimeSieveGUI::initGUI() {
   this->setWindowTitle(APPLICATION_NAME + " " + PRIMESIEVE_VERSION);
   this->createMenu(primeText_);
 
-  // fill the sieveSizeComboBox with power of 2 values <= "4096 KB"
+  // fill sieveSizeComboBox with power of 2 values <= "4096 KiB"
   for (int i = MINIMUM_SIEVE_SIZE; i <= MAXIMUM_SIEVE_SIZE; i *= 2)
-    ui->sieveSizeComboBox->addItem(QString::number(i) + " KB");
+    ui->sieveSizeComboBox->addItem(QString::number(i) + " KiB");
 
   int sieveSize = get_sieve_size();
-  this->setTo(ui->sieveSizeComboBox, QString::number(sieveSize) + " KB");
+  this->setTo(ui->sieveSizeComboBox, QString::number(sieveSize) + " KiB");
 
   maxThreads_ = ParallelSieve::getMaxThreads();
 
@@ -131,7 +133,7 @@ void PrimeSieveGUI::initGUI() {
   QSize size = this->sizeHint();
   size.setWidth(this->minimumSizeHint().width());
 #if defined(Q_OS_WIN)
-  size.setHeight(size.height() - size.height() / 10);
+  size.setHeight(size.height() - (size.height() / 20));
 #endif
   this->resize(size);
 
@@ -154,13 +156,13 @@ void PrimeSieveGUI::initConnections() {
 }
 
 /**
- * Get the sieve size in kilobytes from the sieveSizeComboBox.
+ * Get the sieve size in from the sieveSizeComboBox.
  * @post sieveSize >= 1 && sieveSize <= 4096.
  */
 int PrimeSieveGUI::getSieveSize() {
   QString sieveSize(ui->sieveSizeComboBox->currentText());
-  // remove " KB"
-  sieveSize.chop(3);
+  // remove " KiB"
+  sieveSize.chop(4);
   return sieveSize.toInt();
 }
 
@@ -390,11 +392,14 @@ void PrimeSieveGUI::on_cancelButton_clicked() {
  * Clean up after sieving is finished or canceled (abort the
  * PrimeSieveProcess if still running).
  */
-void PrimeSieveGUI::cleanUp() {
+void PrimeSieveGUI::cleanUp()
+{
   progressBarTimer_.stop();
-  if (primeSieveProcess_ != 0)
+
+  if (primeSieveProcess_)
     delete primeSieveProcess_;
-  primeSieveProcess_ = 0;
+
+  primeSieveProcess_ = nullptr;
   // invert buttons
   ui->cancelButton->setDisabled(true);
   ui->sieveButton->setEnabled(true);

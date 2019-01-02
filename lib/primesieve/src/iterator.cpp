@@ -27,8 +27,11 @@ void clear(std::unique_ptr<T>& ptr)
 
 namespace primesieve {
 
-iterator::~iterator()
-{ }
+iterator::~iterator() = default;
+
+iterator::iterator(iterator&&) noexcept = default;
+
+iterator& iterator::operator=(iterator&&) noexcept = default;
 
 iterator::iterator(uint64_t start,
                    uint64_t stop_hint)

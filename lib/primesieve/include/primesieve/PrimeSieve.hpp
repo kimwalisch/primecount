@@ -13,6 +13,8 @@
 #ifndef PRIMESIEVE_CLASS_HPP
 #define PRIMESIEVE_CLASS_HPP
 
+#include "PreSieve.hpp"
+
 #include <stdint.h>
 #include <array>
 
@@ -50,6 +52,7 @@ public:
   int getSieveSize() const;
   double getStatus() const;
   double getSeconds() const;
+  PreSieve& getPreSieve();
   // Setters
   void setStart(uint64_t);
   void setStop(uint64_t);
@@ -97,12 +100,13 @@ private:
   uint64_t toUpdate_;
   /// Status of sieve() in percent
   double percent_;
-  /// Sieve size in kilobytes
+  /// Sieve size in KiB
   int sieveSize_;
   /// Setter methods set flags e.g. COUNT_PRIMES
   int flags_;
   /// parent ParallelSieve object
   PrimeSieve* parent_;
+  PreSieve preSieve_;
   static void printStatus(double, double);
   bool isParallelSieve() const;
   void processSmallPrimes();

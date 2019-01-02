@@ -34,6 +34,7 @@ class Erat
 public:
   uint64_t getSieveSize() const;
   uint64_t getStop() const;
+
 protected:
   /// Sieve primes >= start_
   uint64_t start_ = 0;
@@ -47,24 +48,24 @@ protected:
   uint64_t segmentHigh_ = 0;
   /// Sieve of Eratosthenes array
   byte_t* sieve_ = nullptr;
-  PreSieve* preSieve_;
   Erat();
   Erat(uint64_t, uint64_t);
-  virtual ~Erat();
   void init(uint64_t, uint64_t, uint64_t, PreSieve&);
   void addSievingPrime(uint64_t);
   void sieveSegment();
   bool hasNextSegment() const;
   static uint64_t nextPrime(uint64_t*, uint64_t);
+
 private:
   static const std::array<uint64_t, 64> bruijnBitValues_;
   uint64_t maxPreSieve_;
   uint64_t maxEratSmall_;
   uint64_t maxEratMedium_;
   std::unique_ptr<byte_t[]> deleter_;
+  PreSieve* preSieve_;
   EratSmall eratSmall_;
-  EratMedium eratMedium_;
   EratBig eratBig_;
+  EratMedium eratMedium_;
   static uint64_t byteRemainder(uint64_t);
   void initSieve(uint64_t);
   void initErat();
@@ -100,10 +101,10 @@ inline uint64_t Erat::getStop() const
   return stop_;
 }
 
-/// Sieve size in kilobytes
+/// Sieve size in KiB
 inline uint64_t Erat::getSieveSize() const
 {
-  return sieveSize_ / 1024;
+  return sieveSize_ >> 10;
 }
 
 } // namespace

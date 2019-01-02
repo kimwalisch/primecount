@@ -22,19 +22,20 @@ namespace primesieve {
 namespace config {
 
 enum {
-  /// Number of sieving primes per Bucket in EratSmall, EratMedium and
-  /// EratBig objects, affects performance by about 3%.
+  /// Number of sieving primes per Bucket in EratSmall, EratMedium
+  /// and EratBig objects, affects performance by about 3%.
+  /// @pre BUCKET_BYTES must be a power of 2.
   ///
-  /// - For x86-64 CPUs after  2010 use 1024
-  /// - For x86-64 CPUs before 2010 use 512
-  /// - For PowerPC G4 CPUs    2003 use 256
+  /// - For x86-64 CPUs after  2010 use 8192
+  /// - For x86-64 CPUs before 2010 use 4096
+  /// - For PowerPC G4 CPUs    2003 use 2048
   ///
-  BUCKETSIZE = 1 << 10,
+  BUCKET_BYTES = 1 << 13,
 
-  /// EratBig allocates BYTES_PER_ALLOC of new memory each time
-  /// it needs more buckets. Default = 8 megabytes.
+  /// The MemoryPool allocates at most MAX_ALLOC_BYTES of new
+  /// memory when it runs out of buckets.
   ///
-  BYTES_PER_ALLOC = (1 << 20) * 8,
+  MAX_ALLOC_BYTES = (1 << 20) * 16,
 
   /// primesieve::iterator caches at least MIN_CACHE_ITERATOR
   /// bytes of primes. Larger is usually faster but also
@@ -42,8 +43,8 @@ enum {
   ///
   MIN_CACHE_ITERATOR = (1 << 20) * 8,
 
-  /// primesieve::iterator maximum cache size in bytes, used if
-  /// pi(sqrt(n)) * 8 bytes > MAX_CACHE_ITERATOR.
+  /// primesieve::iterator maximum cache size in bytes, used
+  /// if pi(sqrt(n)) * 8 bytes > MAX_CACHE_ITERATOR.
   ///
   MAX_CACHE_ITERATOR = (1 << 20) * 1024
 };
@@ -52,22 +53,21 @@ enum {
   /// are processed in EratSmall objects, speed up ~ 5%.
   /// @pre FACTOR_ERATSMALL >= 0 && <= 3
   ///
-  /// - For x86-64 CPUs after  2010 use 0.5
+  /// - For x86-64 CPUs after  2010 use 0.4
   /// - For x86-64 CPUs before 2010 use 0.8
   /// - For PowerPC G4 CPUs    2003 use 1.0
   ///
-  const double FACTOR_ERATSMALL = 0.5;
+  const double FACTOR_ERATSMALL = 0.4;
 
-  /// Sieving primes <= (sieveSize in bytes * FACTOR_ERATMEDIUM)
-  /// (and > EratSmall see above) are processed in EratMedium objects.
-  /// @pre FACTOR_ERATMEDIUM >= 0 && <= 5
+  /// The formula below ensures that each sieving prime in EratMedium
+  /// has at least 1 multiple occurrence in each segment.
+  /// @pre FACTOR_ERATMEDIUM >= 0 && <= 6
   ///
-  /// Statistically ideal factor for 4th Wheel is:
-  /// FACTOR_ERATMEDIUM * 2 + FACTOR_ERATMEDIUM * 10 = 30
-  /// FACTOR_ERATMEDIUM = 30 / 12
-  /// FACTOR_ERATMEDIUM = 2.5
+  /// FACTOR_ERATMEDIUM <= 30 numbers per byte / max(wheelFactor)
+  /// FACTOR_ERATMEDIUM = 30 / 6
+  /// FACTOR_ERATMEDIUM = 5.0
   ///
-  const double FACTOR_ERATMEDIUM = 2.5;
+  const double FACTOR_ERATMEDIUM = 5.0;
 
   /// Each thread sieves at least a distance of MIN_THREAD_DISTANCE
   /// in order to reduce the initialization overhead.

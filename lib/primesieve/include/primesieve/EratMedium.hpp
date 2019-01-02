@@ -11,29 +11,41 @@
 #define ERATMEDIUM_HPP
 
 #include "Bucket.hpp"
-#include "Wheel.hpp"
+#include "MemoryPool.hpp"
 #include "types.hpp"
+#include "Wheel.hpp"
 
 #include <stdint.h>
-#include <vector>
+#include <array>
 
 namespace primesieve {
 
-/// EratMedium is an implementation of the segmented sieve
-/// of Eratosthenes optimized for medium sieving primes that
-/// have a few multiples per segment
+/// EratMedium is an implementation of the segmented sieve of
+/// Eratosthenes optimized for medium sieving primes
+/// that have a few multiples per segment.
 ///
-class EratMedium : public Wheel210_t
+class EratMedium : public Wheel30_t
 {
 public:
   void init(uint64_t, uint64_t, uint64_t);
-  void crossOff(byte_t*, uint64_t);
   bool enabled() const { return enabled_; }
+  void crossOff(byte_t*, uint64_t);
 private:
-  uint64_t maxPrime_;
-  std::vector<SievingPrime> primes_;
   bool enabled_ = false;
+  uint64_t maxPrime_;
+  MemoryPool memoryPool_;
+  std::array<SievingPrime*, 64> sievingPrimes_;
+  void resetSievingPrimes();
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
+  void crossOff(byte_t*, byte_t*, Bucket*);
+  void crossOff_7(byte_t*, byte_t*, Bucket*);
+  void crossOff_11(byte_t*, byte_t*, Bucket*);
+  void crossOff_13(byte_t*, byte_t*, Bucket*);
+  void crossOff_17(byte_t*, byte_t*, Bucket*);
+  void crossOff_19(byte_t*, byte_t*, Bucket*);
+  void crossOff_23(byte_t*, byte_t*, Bucket*);
+  void crossOff_29(byte_t*, byte_t*, Bucket*);
+  void crossOff_31(byte_t*, byte_t*, Bucket*);
 };
 
 } // namespace
