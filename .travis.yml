@@ -12,11 +12,12 @@ matrix:
 
     - os: linux
       dist: xenial
+      compiler: gcc
       addons:
         apt:
           packages:
             - g++-5
-            - g++-5-multilib 
+            - g++-5-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -24,11 +25,12 @@ matrix:
 
     - os: linux
       dist: xenial
+      compiler: gcc
       addons:
         apt:
           packages:
             - g++-6
-            - g++-6-multilib 
+            - g++-6-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -36,11 +38,12 @@ matrix:
 
     - os: linux
       dist: xenial
+      compiler: gcc
       addons:
         apt:
           packages:
             - g++-7
-            - g++-7-multilib 
+            - g++-7-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -48,11 +51,12 @@ matrix:
 
     - os: linux
       dist: xenial
+      compiler: gcc
       addons:
         apt:
           packages:
             - g++-8
-            - g++-8-multilib 
+            - g++-8-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
