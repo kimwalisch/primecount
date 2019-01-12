@@ -17,7 +17,6 @@ matrix:
           packages:
             - g++-5
             - g++-5-multilib
-            - g++-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -30,7 +29,6 @@ matrix:
           packages:
             - g++-6
             - g++-6-multilib
-            - g++-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -43,7 +41,6 @@ matrix:
           packages:
             - g++-7
             - g++-7-multilib
-            - g++-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -56,7 +53,6 @@ matrix:
           packages:
             - g++-8
             - g++-8-multilib
-            - g++-multilib
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -84,7 +80,7 @@ install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
-        sudo apt-get install -y make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
+        sudo apt-get install -y g++-multilib make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
     fi
 
 script:
