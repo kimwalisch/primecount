@@ -70,6 +70,30 @@ include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
 include(CMakePushCheckState)
 
+# Check if libdivide.h compiles ######################################
+
+if(WITH_LIBDIVIDE)
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+    check_cxx_source_compiles("
+        #include <libdivide.h>
+        #include <stdint.h>
+        int main() {
+            libdivide::divider<uint64_t, libdivide::BRANCHFREE> d(3);
+            uint64_t n = 1000000000;
+            return (n / d == n / 3) ? 0 : 1;
+        }" libdivide_branchfree)
+
+    cmake_pop_check_state()
+
+    if(libdivide_branchfree)
+        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+    else()
+        set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+    endif()
+endif()
+
 # Check for MPI (Message Passing Interface) ##########################
 
 if(WITH_MPI)
@@ -87,18 +111,8 @@ if(WITH_MPI)
                 src/mpi/S2_hard_mpi.cpp
                 src/mpi/MpiLoadBalancer.cpp
                 src/mpi/MpiMsg.cpp)
-endif()
 
-# Include S2_easy* source files ######################################
-
-if(WITH_LIBDIVIDE)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-endif()
-
-if(WITH_MPI)
-    if(WITH_LIBDIVIDE)
+    if(libdivide_branchfree)
         set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
     else()
         set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
