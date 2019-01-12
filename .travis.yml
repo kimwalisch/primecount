@@ -12,12 +12,11 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
       addons:
         apt:
           packages:
-            - gcc-5
             - g++-5
+            - g++-5-multilib 
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -25,12 +24,11 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
       addons:
         apt:
           packages:
-            - gcc-6
             - g++-6
+            - g++-6-multilib 
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -38,12 +36,11 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
       addons:
         apt:
           packages:
-            - gcc-7
             - g++-7
+            - g++-7-multilib 
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -51,12 +48,11 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
       addons:
         apt:
           packages:
-            - gcc-8
             - g++-8
+            - g++-8-multilib 
           sources: &sources
             - ubuntu-toolchain-r-test
       env:
@@ -64,7 +60,6 @@ matrix:
 
     - os: linux
       dist: xenial
-      compiler: gcc
       addons:
         apt:
           packages:
@@ -83,14 +78,14 @@ before_install:
 
 install:
   - |
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]
+    if [ "${TRAVIS_OS_NAME}" == "linux" ]
     then
-        sudo apt-get install -y g++-multilib make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
+        sudo apt-get install -y make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
     fi
 
 script:
   - |
-    if [ "$CXX" = "x86_64-w64-mingw32-g++-posix" ]
+    if [ "$CXX" == "x86_64-w64-mingw32-g++-posix" ]
     then
         # 1) Test MinGW/GCC compilation
         mkdir build
@@ -101,7 +96,7 @@ script:
                  -DBUILD_TESTS=ON
         make -j4 VERBOSE=1
 
-    elif [ "${TRAVIS_OS_NAME}" = "linux" ]
+    elif [ "${TRAVIS_OS_NAME}" == "linux" ]
     then
         # 1) Static analysis using cppcheck
         cppcheck src include test \
@@ -112,12 +107,12 @@ script:
         # 2) Run test suite
         mkdir build
         cd build
-        if [ "$CXX" = "g++" ]
+        if [ "$CXX" == "g++" ]
         then
             cmake .. -DCMAKE_BUILD_TYPE=Debug \
                      -DBUILD_TESTS=ON
         fi
-        if [ "$CXX" = "clang++" ]
+        if [ "$CXX" == "clang++" ]
         then
             cmake .. -DCMAKE_BUILD_TYPE=Debug \
                      -DBUILD_TESTS=ON \
@@ -144,12 +139,12 @@ script:
         rm -rf build
         mkdir build
         cd build
-        if [ "$CXX" = "clang++" ]
+        if [ "$CXX" == "clang++" ]
         then
             cmake .. -DWITH_MPI=ON \
                      -DWITH_OPENMP=OFF
         fi
-        if [ "$CXX" = "g++" ]
+        if [ "$CXX" == "g++" ]
         then
             cmake .. -DCMAKE_CXX_FLAGS="$CXXFLAGS -Wno-literal-suffix -Wno-strict-aliasing" \
                      -DWITH_MPI=ON
@@ -167,7 +162,7 @@ script:
         make -j4 VERBOSE=1
         make test
 
-    elif [ "${TRAVIS_OS_NAME}" = "osx" ]
+    elif [ "${TRAVIS_OS_NAME}" == "osx" ]
     then
         # 1) Build using GNU make
         mkdir build
