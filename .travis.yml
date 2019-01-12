@@ -80,7 +80,6 @@ install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
-        sudo apt-get update -qq
         sudo apt-get install -y g++-multilib make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
     fi
 
