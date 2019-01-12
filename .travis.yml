@@ -19,7 +19,7 @@ install:
 
 script:
   # 1) Static analysis using cppcheck
-  - cppcheck src include --error-exitcode=1
+  - cppcheck src include test -itest/generate_pi.cpp -itest/pi_table.cpp --error-exitcode=1
   # 2) Run test suite (64-bit)
   - mkdir build
   - cd build
