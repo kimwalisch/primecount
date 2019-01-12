@@ -15,12 +15,12 @@ env:
     - OMP_NUM_THREADS=4
 
 install:
-  - sudo apt-get install -y make cmake cppcheck valgrind openmpi-bin libopenmpi-dev mingw-w64
+  - sudo apt-get install -y g++-multilib make cmake cppcheck valgrind openmpi-bin libopenmpi-dev mingw-w64
 
 script:
   # 1) Static analysis using cppcheck
   - cppcheck src include --error-exitcode=1
-  # 2) Run test suite
+  # 2) Run test suite (64-bit)
   - mkdir build
   - cd build
   - if [ "$CXX" = "g++" ]; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON; fi
@@ -58,3 +58,13 @@ script:
              -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
              -DBUILD_TESTS=ON
   - make -j4 VERBOSE=1
+  # 8) Test 32-bit
+  - cd ..
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - |
+    cmake .. -DCMAKE_CXX_FLAGS="$CXXFLAGS -m32 -Wno-long-long" \
+             -DBUILD_TESTS=ON
+  - make -j4 VERBOSE=1
+  - make test
