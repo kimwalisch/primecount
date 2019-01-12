@@ -33,7 +33,7 @@ script:
   - ./primecount --test
   # 5) Find runtime memory errors 
   - ldd test/alpha
-  - valgrind --error-exitcode=1 test/alpha
+  - if [ "$CXX" = "g++" ]; then valgrind --error-exitcode=1 test/alpha; fi
   - valgrind --error-exitcode=1 ./primecount 1e13
   - valgrind --error-exitcode=1 ./primecount 1e11 --deleglise_rivat1
   - valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
