@@ -162,33 +162,16 @@ if(WITH_OPENMP)
     endif()
 endif()
 
-# Check if libdivide.h works #########################################
-
-if(WITH_LIBDIVIDE)
-    message(STATUS "Performing Test libdivide")
-
-    try_run(RUN_LIBDIVIDE COMPILE_LIBDIVIDE
-            ${CMAKE_BINARY_DIR}
-            ${CMAKE_CURRENT_SOURCE_DIR}/test/libdivide.cpp
-            COMPILE_DEFINITIONS -I${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-    if(RUN_LIBDIVIDE EQUAL 0)
-        message(STATUS "Performing Test libdivide - Success")
-    else()
-        message(STATUS "Performing Test libdivide - Failed")
-    endif()
-endif()
-
 # Include S2_easy* source files ######################################
 
-if(RUN_LIBDIVIDE EQUAL 0)
+if(WITH_LIBDIVIDE)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
 endif()
 
 if(WITH_MPI)
-    if(RUN_LIBDIVIDE EQUAL 0)
+    if(WITH_LIBDIVIDE)
         set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
     else()
         set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
