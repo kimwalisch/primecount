@@ -36,7 +36,6 @@ script:
   - valgrind --error-exitcode=1 ./primecount 1e12 --nthprime
   - valgrind --error-exitcode=1 ./primecount 1e11 --deleglise_rivat1
   - valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
-  - valgrind --error-exitcode=1 ./primecount 1e10 --lmo
   - valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
   # 6) Test primecount MPI
   - cd ..
