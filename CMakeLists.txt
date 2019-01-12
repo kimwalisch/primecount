@@ -70,22 +70,6 @@ include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
 include(CMakePushCheckState)
 
-# libprimesieve ######################################################
-
-set(COPY_BUILD_TESTS "${BUILD_TESTS}")
-set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
-option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
-add_subdirectory(lib/primesieve)
-set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
-
-# Silence GCC switch fall through warnings ###########################
-
-check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
-
-if(Wno_fallthrough)
-    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-endif()
-
 # Check for MPI (Message Passing Interface) ##########################
 
 if(WITH_MPI)
@@ -103,6 +87,30 @@ if(WITH_MPI)
                 src/mpi/S2_hard_mpi.cpp
                 src/mpi/MpiLoadBalancer.cpp
                 src/mpi/MpiMsg.cpp)
+endif()
+
+# Include S2_easy* source files ######################################
+
+if(WITH_LIBDIVIDE)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+else()
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+endif()
+
+if(WITH_MPI)
+    if(WITH_LIBDIVIDE)
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
+    else()
+        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
+    endif()
+endif()
+
+# Silence GCC switch fall through warnings ###########################
+
+check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
+
+if(Wno_fallthrough)
+    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
 # Check for OpenMP ###################################################
@@ -162,22 +170,6 @@ if(WITH_OPENMP)
     endif()
 endif()
 
-# Include S2_easy* source files ######################################
-
-if(WITH_LIBDIVIDE)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-endif()
-
-if(WITH_MPI)
-    if(WITH_LIBDIVIDE)
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
-    else()
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
-    endif()
-endif()
-
 # Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
@@ -207,6 +199,14 @@ endif()
 if(NOT WITH_POPCNT)
     set(DISABLE_POPCNT "DISABLE_POPCNT")
 endif()
+
+# libprimesieve ######################################################
+
+set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+add_subdirectory(lib/primesieve)
+set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 
 # Testing ############################################################
 
