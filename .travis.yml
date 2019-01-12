@@ -107,7 +107,7 @@ script:
         # 2) Run test suite
         mkdir build
         cd build
-        if [ "$CXX" = "g++" ]
+        if [ "${CXX:0:3}" = "g++" ]
         then
             cmake .. -DCMAKE_BUILD_TYPE=Debug \
                      -DBUILD_TESTS=ON
