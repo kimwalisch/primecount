@@ -166,6 +166,12 @@ script:
 
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]
     then
+        # Workaround for Clang/macOS bug
+        # .../XcodeDefault.xctoolchain/usr/include/c++/v1/algorithm:3117:45:
+        # runtime error: signed integer overflow: 
+        # 0x7fffffffffffffffffffffffffffffff + 1 cannot be represented in type '__int128'
+        rm test/fast_div.cpp
+
         # 1) Build using GNU make
         mkdir build
         cd build
