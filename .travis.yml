@@ -69,7 +69,9 @@ matrix:
 
 env:
   global:
-    - CXXFLAGS="-O3 -Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-missing-braces"
+    - WARNING_FLAGS="-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-missing-braces"
+    - CXXFLAGS="-O3 $WARNING_FLAGS"
+    - SANITIZER_FLAGS="-O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer $WARNING_FLAGS"
     - OMP_NUM_THREADS=4
 
 before_install:
@@ -167,7 +169,9 @@ script:
         # 1) Build using GNU make
         mkdir build
         cd build
-        cmake .. -DBUILD_TESTS=ON
+        cmake .. -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS" \
+                 -DBUILD_SHARED_LIBS=OFF \
+                 -DBUILD_TESTS=ON
         make -j4 VERBOSE=1
         make test
     fi
