@@ -70,7 +70,7 @@ matrix:
 env:
   global:
     - WARNING_FLAGS="-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-missing-braces"
-    - CXXFLAGS="-O3 -g $WARNING_FLAGS"
+    - CXXFLAGS="-O3 $WARNING_FLAGS"
     - SANITIZER_FLAGS="-O1 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer $WARNING_FLAGS"
     - OMP_NUM_THREADS=4
 
@@ -111,11 +111,13 @@ script:
         cd build
         if [ "${CXX:0:3}" = "g++" ]
         then
-            cmake .. -DBUILD_TESTS=ON
+            cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                     -DBUILD_TESTS=ON
         fi
         if [ "$CXX" = "clang++" ]
         then
-            cmake .. -DBUILD_TESTS=ON \
+            cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                     -DBUILD_TESTS=ON \
                      -DWITH_OPENMP=OFF
         fi
         make -j4
@@ -173,7 +175,7 @@ script:
         # 1) Build using GNU make
         mkdir build
         cd build
-        cmake .. -DCMAKE_CXX_FLAGS=Debug \
+        cmake .. -DCMAKE_BUILD_TYPE=Debug \
                  -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS" \
                  -DBUILD_SHARED_LIBS=OFF \
                  -DBUILD_TESTS=ON
