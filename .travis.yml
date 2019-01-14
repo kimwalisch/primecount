@@ -179,5 +179,10 @@ script:
                  -DBUILD_SHARED_LIBS=OFF \
                  -DBUILD_TESTS=ON
         make -j4 VERBOSE=1
+
+        # 2) Run test suite (using sanitizers)
         make test
+
+        # 3) Run builtin tests (using sanitizers)
+        ./primecount --test
     fi
