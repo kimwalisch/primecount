@@ -3,7 +3,6 @@ project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 4)
 set(PRIMECOUNT_VERSION_MINOR 4)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
-set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
@@ -22,6 +21,19 @@ endif()
 
 if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON")
+endif()
+
+# Set default build type to Release ##################################
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.9)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+elseif(CMAKE_CONFIGURATION_TYPES)
+    set(isMultiConfig TRUE)
+endif()
+
+if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 # primecount binary source files #####################################
