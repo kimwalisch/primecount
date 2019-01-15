@@ -186,7 +186,4 @@ script:
 
         # 2) Run test suite (using sanitizers)
         make test
-
-        # 3) Run builtin tests (using sanitizers)
-        ./primecount --test
     fi
