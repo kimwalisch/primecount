@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.4)
 project(primesieve CXX)
 set(PRIMESIEVE_VERSION "7.3")
 set(PRIMESIEVE_SOVERSION "9.3.0")
-set(CMAKE_BUILD_TYPE Release)
 
 # Build options ######################################################
 
@@ -15,6 +14,19 @@ option(BUILD_TESTS       "Build test programs"        OFF)
 
 if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON")
+endif()
+
+# Set default build type to Release ##################################
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.9)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+elseif(CMAKE_CONFIGURATION_TYPES)
+    set(isMultiConfig TRUE)
+endif()
+
+if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 # primesieve binary source files #####################################
@@ -268,34 +280,46 @@ endif()
 
 # Regenerate man page ################################################
 
-if(BUILD_PRIMESIEVE)
-    find_program(HELP2MAN help2man)
+if(CMAKE_SYSTEM_NAME AND
+   CMAKE_HOST_SYSTEM_NAME AND
+   NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "${CMAKE_HOST_SYSTEM_NAME}")
+    set(IS_CROSS_COMPILIATION ON)
 endif()
 
-if(HELP2MAN)
-    message(STATUS "Found help2man: ${HELP2MAN}")
+if(CMAKE_SYSTEM_PROCESSOR AND
+   CMAKE_HOST_SYSTEM_PROCESSOR AND
+   NOT "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+    set(IS_CROSS_COMPILIATION ON)
+endif()
 
-    execute_process(COMMAND perl -e "use Locale::gettext;"
-                    RESULT_VARIABLE LOCALE_RES
-                    OUTPUT_QUIET ERROR_QUIET)
+if(BUILD_PRIMESIEVE AND NOT IS_CROSS_COMPILIATION)
+    find_program(HELP2MAN help2man)
 
-    if(LOCALE_RES EQUAL 0)
-        message(STATUS "Found help2man option: --locale=C.UTF-8")
-        set(HELP2MAN_LOCALE "--locale=C.UTF-8")
+    if(HELP2MAN)
+        message(STATUS "Found help2man: ${HELP2MAN}")
+
+        execute_process(COMMAND perl -e "use Locale::gettext;"
+                        RESULT_VARIABLE LOCALE_RES
+                        OUTPUT_QUIET ERROR_QUIET)
+
+        if(LOCALE_RES EQUAL 0)
+            message(STATUS "Found help2man option: --locale=C.UTF-8")
+            set(HELP2MAN_LOCALE "--locale=C.UTF-8")
+        endif()
+
+        add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${HELP2MAN}
+            ARGS -s 1
+                 --manual="primesieve"
+                 --source="primesieve ${PRIMESIEVE_VERSION}"
+                 --no-info
+                 ${HELP2MAN_LOCALE}
+                 -n "efficient prime number generator"
+                 -o ${PROJECT_SOURCE_DIR}/doc/primesieve.1
+                 ./primesieve
+            VERBATIM)
     endif()
-
-    add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${HELP2MAN}
-        ARGS -s 1
-             --manual="primesieve"
-             --source="primesieve ${PRIMESIEVE_VERSION}"
-             --no-info
-             ${HELP2MAN_LOCALE}
-             -n "efficient prime number generator"
-             -o ${PROJECT_SOURCE_DIR}/doc/primesieve.1
-             ./primesieve
-        VERBATIM)
 endif()
 
 # Install man page ###################################################
