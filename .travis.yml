@@ -172,6 +172,9 @@ script:
         # 0x7fffffffffffffffffffffffffffffff + 1 cannot be represented in type '__int128'
         rm test/fast_div.cpp
 
+        # Delete slow tests
+        rm test/S2_*.cpp
+
         # 1) Build using GNU make
         mkdir build
         cd build
