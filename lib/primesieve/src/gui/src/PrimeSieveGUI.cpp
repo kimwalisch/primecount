@@ -241,7 +241,7 @@ void PrimeSieveGUI::on_sieveButton_clicked() {
   ui->sieveButton->setDisabled(true);
   ui->cancelButton->setEnabled(true);
   try {
-    flags_ = this->getMenuSettings() | CALCULATE_STATUS;
+    flags_ = this->getMenuSettings() | UPDATE_GUI_STATUS;
     if ((flags_ & (COUNT_FLAGS | PRINT_FLAGS)) == 0)
       throw std::invalid_argument("Nothing to do, no count or print options selected.");
 
@@ -276,7 +276,7 @@ void PrimeSieveGUI::on_sieveButton_clicked() {
 }
 
 void PrimeSieveGUI::advanceProgressBar() {
-  int permil = static_cast<int>(primeSieveProcess_->getStatus() * 10.0);
+  int permil = static_cast<int>(primeSieveProcess_->getPercent() * 10.0);
   ui->progressBar->setValue(permil);
 }
 
