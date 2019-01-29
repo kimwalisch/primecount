@@ -1,3 +1,16 @@
+Changes in version 7.4, 26/01/2019
+==================================
+
+This is a minor new release, the API and ABI (Application binary
+interface) are backwards compatible.
+
+* CpuInfo.cpp: Fix MinGW CPU detection.
+* CMakeLists.txt: Fix cross compilation bug.
+* Add --test option: Runs self tests.
+* ParallelSieve.cpp: Non-blocking status updates.
+* PrimeSieve.cpp: Simplify status update.
+* travis.yml: Test using GCC 5, 6, 7, 8, Clang 7 and MinGW.
+
 Changes in version 7.3, 04/01/2019
 ==================================
 

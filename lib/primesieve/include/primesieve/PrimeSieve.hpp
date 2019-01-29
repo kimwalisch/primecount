@@ -4,7 +4,7 @@
 ///         sieving. It is used for printing and counting primes
 ///         and for computing the nth prime.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,13 +14,27 @@
 #define PRIMESIEVE_CLASS_HPP
 
 #include "PreSieve.hpp"
-
 #include <stdint.h>
 #include <array>
 
 namespace primesieve {
 
 using counts_t = std::array<uint64_t, 6>;
+class ParallelSieve;
+
+/// Used for inter-process communication with the
+/// primesieve Qt GUI application.
+struct SharedMemory
+{
+  uint64_t start;
+  uint64_t stop;
+  counts_t counts;
+  double percent;
+  double seconds;
+  int flags;
+  int sieveSize;
+  int threads;
+};
 
 enum
 {
@@ -37,25 +51,26 @@ enum
   PRINT_QUINTUPLETS = 1 << 10,
   PRINT_SEXTUPLETS  = 1 << 11,
   PRINT_STATUS      = 1 << 12,
-  CALCULATE_STATUS  = 1 << 13
+  UPDATE_GUI_STATUS = 1 << 13
 };
 
 class PrimeSieve
 {
 public:
   PrimeSieve();
-  PrimeSieve(PrimeSieve*);
+  PrimeSieve(ParallelSieve*);
   virtual ~PrimeSieve();
   // Getters
   uint64_t getStart() const;
   uint64_t getStop() const;
+  uint64_t getDistance() const;
   int getSieveSize() const;
-  double getStatus() const;
   double getSeconds() const;
   PreSieve& getPreSieve();
   // Setters
   void setStart(uint64_t);
   void setStop(uint64_t);
+  void updateStatus(uint64_t);
   void setSieveSize(int);
   void setFlags(int);
   void addFlags(int);
@@ -81,35 +96,35 @@ public:
   counts_t& getCounts();
   uint64_t getCount(int) const;
   uint64_t countPrimes(uint64_t, uint64_t);
-  virtual bool updateStatus(uint64_t, bool tryLock = true);
+
 protected:
   /// Sieve primes >= start_
-  uint64_t start_;
+  uint64_t start_ = 0;
   /// Sieve primes <= stop_
-  uint64_t stop_;
+  uint64_t stop_ = 0;
+  /// Time elapsed of sieve()
+  double seconds_ = 0;
+  /// Sieving status in percent
+  double percent_ = 0;
   /// Prime number and prime k-tuplet counts
   counts_t counts_;
-  /// Time elapsed of sieve()
-  double seconds_;
-  uint64_t getDistance() const;
+  /// Used for communication with the Qt GUI app
+  SharedMemory* sharedMemory_ = nullptr;
   void reset();
+  void setStatus(double);
+
 private:
-  /// Sum of all processed segments
-  uint64_t processed_;
-  /// Sum of processed segments to update
-  uint64_t toUpdate_;
-  /// Status of sieve() in percent
-  double percent_;
+  uint64_t sievedDistance_ = 0;
+  uint64_t updateDistance_ = 0;
+  /// Default flags
+  int flags_ = COUNT_PRIMES;
   /// Sieve size in KiB
-  int sieveSize_;
-  /// Setter methods set flags e.g. COUNT_PRIMES
-  int flags_;
-  /// parent ParallelSieve object
-  PrimeSieve* parent_;
+  int sieveSize_ = 0;
+  /// Status updates must be synchronized by main thread
+  ParallelSieve* parent_ = nullptr;
   PreSieve preSieve_;
-  static void printStatus(double, double);
-  bool isParallelSieve() const;
   void processSmallPrimes();
+  static void printStatus(double, double);
 };
 
 } // namespace

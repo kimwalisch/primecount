@@ -3,7 +3,7 @@
 /// @brief  Get detailed information about the CPU's caches
 ///         on Windows, macOS and Linux.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -245,6 +245,74 @@ void CpuInfo::init()
       cpuThreads_ += threadsPerCore_;
     }
   }
+// Windows XP or later
+#elif _WIN32_WINNT >= 0x0501
+
+  using LPFN_GLPI = decltype(&GetLogicalProcessorInformation);
+
+  LPFN_GLPI glpi = (LPFN_GLPI) (void*) GetProcAddress(
+      GetModuleHandle(TEXT("kernel32")),
+      "GetLogicalProcessorInformation");
+
+  if (!glpi)
+    return;
+
+  DWORD bytes = 0;
+  glpi(0, &bytes);
+
+  if (!bytes)
+    return;
+
+  size_t size = bytes / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
+  vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> info(size);
+
+  if (!glpi(&info[0], &bytes))
+    return;
+
+  for (size_t i = 0; i < size; i++)
+  {
+    if (info[i].Relationship == RelationProcessorCore)
+    {
+      // ProcessorMask contains one bit set for
+      // each logical CPU core related to the
+      // current physical CPU core
+      auto mask = info[i].ProcessorMask;
+      for (threadsPerCore_ = 0; mask > 0; threadsPerCore_++)
+        mask &= mask - 1;
+
+      cpuCores_++;
+      cpuThreads_ += threadsPerCore_;
+    }
+  }
+
+  for (size_t i = 0; i < size; i++)
+  {
+    if (info[i].Relationship == RelationCache &&
+        info[i].Cache.Level >= 1 &&
+        info[i].Cache.Level <= 3 &&
+        (info[i].Cache.Type == CacheData ||
+         info[i].Cache.Type == CacheUnified))
+    {
+      auto level = info[i].Cache.Level;
+      cacheSizes_[level] = info[i].Cache.Size;
+
+      // We assume the L1 and L2 caches are private
+      if (info[i].Cache.Level <= 2)
+        cacheSharing_[level] = threadsPerCore_;
+
+      // We assume the L3 cache is shared
+      if (info[i].Cache.Level == 3)
+        cacheSharing_[level] = threadsPerCore_ * cpuCores_;
+    }
+  }
+
+  // Most Intel CPUs have an L3 cache.
+  // But a few Intel CPUs don't have an L3 cache
+  // and for many of those CPUs the L2 cache is
+  // shared e.g. Intel Core 2 Duo/Quad CPUs and
+  // Intel Atom x5-Z8350 CPUs.
+  if (hasL2Cache() && !hasL3Cache())
+    cacheSharing_[2] = threadsPerCore_ * cpuCores_;
 #endif
 }
 

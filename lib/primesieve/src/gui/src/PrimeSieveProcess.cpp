@@ -1,7 +1,7 @@
 /*
  * PrimeSieveProcess.cpp -- This file is part of primesieve
  *
- * Copyright (C) 2012 Kim Walisch, <kim.walisch@gmail.com>
+ * Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ void PrimeSieveProcess::createSharedMemory() {
         "Interprocess communication error, could not allocate shared memory.");
   }
   // map the attached shared memory to the shm_ segment
-  shm_ = static_cast<primesieve::ParallelSieve::SharedMemory*>(sharedMemory_.data());
+  shm_ = static_cast<primesieve::SharedMemory*>(sharedMemory_.data());
 }
 
 /**
@@ -86,10 +86,9 @@ void PrimeSieveProcess::start(quint64 start, quint64 stop,
   shm_->sieveSize = sieveSize;
   shm_->flags = flags;
   shm_->threads = threads;
-  shm_->status = 0.0;
+  shm_->percent = 0.0;
   shm_->seconds = 0.0;
-  for (int i = 0; i < 6; i++)
-    shm_->counts[i] = 0;
+  shm_->counts.fill(0);
   // path + file name of the aplication
   QString path = QCoreApplication::applicationFilePath();
   // process arguments, see main.cpp
@@ -101,7 +100,7 @@ void PrimeSieveProcess::start(quint64 start, quint64 stop,
 }
 
 bool PrimeSieveProcess::isFinished() {
-  return (static_cast<int>(shm_->status) == 100);
+  return (static_cast<int>(shm_->percent) == 100);
 }
 
 /**
@@ -109,14 +108,14 @@ bool PrimeSieveProcess::isFinished() {
  * @pre index < 6
  */
 quint64 PrimeSieveProcess::getCount(unsigned int index) const {
-  return shm_->counts[index];
+  return shm_->counts.at(index);
 }
 
 /**
  * @return The sieving status in percent.
  */
-double PrimeSieveProcess::getStatus() const {
-  return shm_->status;
+double PrimeSieveProcess::getPercent() const {
+  return shm_->percent;
 }
 
 /**

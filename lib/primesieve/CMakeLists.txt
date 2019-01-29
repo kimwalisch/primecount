@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "7.3")
-set(PRIMESIEVE_SOVERSION "9.3.0")
+set(PRIMESIEVE_VERSION "7.4")
+set(PRIMESIEVE_SOVERSION "9.4.0")
 
 # Build options ######################################################
 
@@ -33,7 +33,8 @@ endif()
 
 set(BIN_SRC src/console/cmdoptions.cpp
             src/console/help.cpp
-            src/console/main.cpp)
+            src/console/main.cpp
+            src/console/test.cpp)
 
 # primesieve library source files ####################################
 
@@ -317,7 +318,7 @@ if(BUILD_PRIMESIEVE AND NOT IS_CROSS_COMPILIATION)
                  ${HELP2MAN_LOCALE}
                  -n "efficient prime number generator"
                  -o ${PROJECT_SOURCE_DIR}/doc/primesieve.1
-                 ./primesieve
+                 $<TARGET_FILE:primesieve>
             VERBATIM)
     endif()
 endif()

@@ -3,7 +3,7 @@
 /// @brief  The ParallelSieve class provides an easy API for
 ///         multi-threaded prime sieving.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,34 +21,22 @@ namespace primesieve {
 class ParallelSieve : public PrimeSieve
 {
 public:
-  /// Used for inter-process communication with the
-  /// primesieve GUI application.
-  struct SharedMemory
-  {
-    uint64_t start;
-    uint64_t stop;
-    uint64_t counts[6];
-    double status;
-    double seconds;
-    int flags;
-    int sieveSize;
-    int threads;
-  };
+  using PrimeSieve::sieve;
+
   ParallelSieve();
   void init(SharedMemory&);
   static int getMaxThreads();
   int getNumThreads() const;
   int idealNumThreads() const;
   void setNumThreads(int numThreads);
-  using PrimeSieve::sieve;
-  void sieve();
+  bool tryUpdateStatus(uint64_t);
+  virtual void sieve();
+
 private:
-  std::mutex lock_;
-  SharedMemory* shm_;
-  int numThreads_;
+  std::mutex mutex_;
+  int numThreads_ = 0;
   uint64_t getThreadDistance(int) const;
   uint64_t align(uint64_t) const;
-  bool updateStatus(uint64_t, bool);
 };
 
 } // namespace

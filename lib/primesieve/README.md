@@ -6,7 +6,7 @@
 
 primesieve is a program and C/C++ library that generates primes using a highly optimized
 [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes)
-implementation. It counts the primes below 10^10 in just 0.45 seconds on an
+implementation. It counts the primes below 10^10 in just 0.4 seconds on an
 Intel Core i7-6700 CPU (4 x 3.4 GHz). primesieve can generate primes and
 [prime k-tuplets](https://en.wikipedia.org/wiki/Prime_k-tuple) up to 2^64.
 
@@ -33,9 +33,9 @@ bytes per thread.
 
 ## Installation
 
-The primesieve console application can be installed using your operating
-system's package manager. The primesieve GUI application can be downloaded from
-[https://primesieve.org/downloads](https://primesieve.org/downloads).
+The primesieve console application can be installed using your operating system's
+package manager. You can also download the primesieve console and GUI applications
+from [https://primesieve.org/downloads](https://primesieve.org/downloads).
 
 ```sh
 # Debian/Ubuntu
@@ -84,6 +84,7 @@ Options:
                          e.g. -p1 primes, -p2 twins, -p3 triplets, ...
   -q,     --quiet        Quiet mode, prints less output
   -s<N>,  --size=<N>     Set the sieve size in KiB, N <= 4096
+          --test         Run various sieving tests
   -t<N>,  --threads=<N>  Set the number of threads, N <= CPU cores
           --time         Print the time elapsed in seconds
   -v,     --version      Print version and license information
