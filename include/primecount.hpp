@@ -14,9 +14,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "4.4"
+#define PRIMECOUNT_VERSION "4.5"
 #define PRIMECOUNT_VERSION_MAJOR 4
-#define PRIMECOUNT_VERSION_MINOR 4
+#define PRIMECOUNT_VERSION_MINOR 5
 
 namespace primecount {
 
