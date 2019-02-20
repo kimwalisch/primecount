@@ -3,7 +3,7 @@
   Version 4.5 released.
 
   This is a maintenance release that contains minor
-  improvements e.g. tests should run 10% faster. 
+  improvements e.g. tests should run 10% faster.
 
   * lib/primesieve: upgrade to version 7.4.
   * travis.yml: Test using many different compiler versions.
