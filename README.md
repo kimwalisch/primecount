@@ -116,6 +116,24 @@ Advanced Deleglise-Rivat options:
          --S2_hard          Only compute the hard special leaves
 ```
 
+## Performance tips
+
+primecount scales nicely up until 10^24 on current CPUs. For larger
+computations primecount's large memory usage will cause many
+[TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
+cache misses that will severely deteriorate primecount's performance.
+Fortunately the Linux kernel allows to enable
+[transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
+so that large memory allocations will automatically be done using huge
+pages instead of ordinary pages which dramatically reduces the number of
+TLB cache misses. I have measured a speed up of more than 2x for 10^26
+when transparent huge pages are enabled.
+
+```bash
+# Enable transparent huge pages until next reboot
+sudo echo always > /sys/kernel/mm/transparent_hugepage/enabled
+```
+
 ## C++ library
 
 primecount can be built as a static and shared C++ library for use in
@@ -209,7 +227,7 @@ operations using
 <img src="https://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
 
-## Benchmark
+## Benchmarks
 
 <table>
   <tr align="center">
