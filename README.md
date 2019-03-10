@@ -126,12 +126,15 @@ Fortunately the Linux kernel allows to enable
 [transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
 so that large memory allocations will automatically be done using huge
 pages instead of ordinary pages which dramatically reduces the number of
-TLB cache misses. I have measured a speed up of more than 2x for 10^26
-when transparent huge pages are enabled.
+TLB cache misses. I have measured a speed up of more than 2x for
+```S1(10^26)``` when transparent huge pages are enabled.
 
 ```bash
+sudo su
+
 # Enable transparent huge pages until next reboot
-sudo echo always > /sys/kernel/mm/transparent_hugepage/enabled
+echo always > /sys/kernel/mm/transparent_hugepage/enabled
+echo always > /sys/kernel/mm/transparent_hugepage/defrag
 ```
 
 ## C++ library
