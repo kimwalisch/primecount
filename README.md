@@ -127,7 +127,7 @@ Fortunately the Linux kernel allows to enable
 so that large memory allocations will automatically be done using huge
 pages instead of ordinary pages which dramatically reduces the number of
 TLB cache misses. I have measured a speed up of more than 2x for
-```S1(10^26)``` when transparent huge pages are enabled.
+S1(10^26) when transparent huge pages are enabled.
 
 ```bash
 sudo su
