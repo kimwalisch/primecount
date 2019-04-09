@@ -10,32 +10,34 @@ implementation. It counts the primes below 10^10 in just 0.4 seconds on an
 Intel Core i7-6700 CPU (4 x 3.4 GHz). primesieve can generate primes and
 [prime k-tuplets](https://en.wikipedia.org/wiki/Prime_k-tuple) up to 2^64.
 
-* **Homepage:** https://primesieve.org
-* **Binaries:** https://primesieve.org/downloads
-* **API:** https://primesieve.org/api
+* [Release notes](https://github.com/kimwalisch/primesieve/releases)
+* [Downloads](https://github.com/kimwalisch/primesieve/wiki/Downloads)
+* [API documentation](#c-api)
 
-![primesieve windows screenshot](https://github.com/kimwalisch/primesieve/blob/gh-pages/screenshots/primesieve_win10.png)
+![primesieve windows screenshot](https://github.com/kimwalisch/primesieve/blob/gh-pages/screenshots/primesieve74_win10.png)
 
 ## Algorithms
 
 primesieve generates primes using the segmented sieve of Eratosthenes with
 [wheel factorization](https://en.wikipedia.org/wiki/Wheel_factorization).
 This algorithm has a run time complexity of
-<img src="https://primesieve.org/images/Onloglogn.svg" height="20" align="absmiddle"/>
+<img src="https://github.com/kimwalisch/primesieve/blob/gh-pages/images/Onloglogn.svg" height="20" align="absmiddle"/>
 operations and uses
-<img src="https://primesieve.org/images/Osqrtn.svg" height="20" align="absmiddle"/>
+<img src="https://github.com/kimwalisch/primesieve/blob/gh-pages/images/Osqrtn.svg" height="20" align="absmiddle"/>
 memory. Furthermore primesieve uses the
 [bucket sieve](http://sweet.ua.pt/tos/software/prime_sieve.html)
 algorithm which improves the cache efficiency when generating primes > 2^32.
 primesieve uses 8 bytes per sieving prime, hence its memory usage is about
-<img src="http://primesieve.org/images/primesieve_memory_usage.svg" height="20" align="absmiddle"/>
+<img src="https://github.com/kimwalisch/primesieve/blob/gh-pages/images/primesieve_memory_usage.svg" height="20" align="absmiddle"/>
 bytes per thread.
+
+* [More algorithm details](doc/ALGORITHMS.md#algorithm-details)
 
 ## Installation
 
 The primesieve console application can be installed using your operating system's
-package manager. You can also download the primesieve console and GUI applications
-from [https://primesieve.org/downloads](https://primesieve.org/downloads).
+package manager. You can also download the latest primesieve console and GUI applications
+from the [downloads](https://github.com/kimwalisch/primesieve/wiki/Downloads) page.
 
 ```sh
 # Debian, Ubuntu
@@ -92,10 +94,8 @@ Options:
 
 ## Build instructions
 
-Building primesieve requires a compiler which supports C++11 (or later)
-and CMake ≥ 3.4. If your compiler does not yet support C++11 you can fall back 
-to [primesieve-5.7.3](https://github.com/kimwalisch/primesieve/tree/v5.7.3)
-which is written in C++98.
+You need to have installed a C++ compiler which supports C++11 (or later)
+and CMake ≥ 3.4.
 
 ```sh
 cmake .
@@ -103,20 +103,7 @@ make -j
 sudo make install
 ```
 
-#### Build C/C++ examples
-
-```sh
-cmake -DBUILD_EXAMPLES=ON .
-make -j
-```
-
-#### Run the tests
-
-```sh
-cmake -DBUILD_TESTS=ON .
-make -j
-make test
-```
+* [Detailed build instructions](BUILD.md)
 
 ## C++ API
 
@@ -172,6 +159,70 @@ int main()
 
 * [More C examples](examples/c)
 * [Browse primesieve's C API online](https://primesieve.org/api/primesieve_8h.html)
+
+## Multi-threading
+
+By default libprimesieve uses multi-threading for counting primes/k-tuplets
+and for finding the nth prime. However ```primesieve::iterator``` the most
+useful feature provided by libprimesieve runs single-threaded because
+it is simply not possible to efficiently parallelize the generation of primes
+in sequential order.
+
+Hence if you want to parallelize an algorithm using ```primesieve::iterator```
+you need to implement the multi-threading part yourself. The basic technique
+for parallelizing an algorithm using ```primesieve::iterator``` is:
+
+* Subdivide the sieving distance into equally sized chunks.
+* Process each chunk in its own thread.
+* Combine the partial thread results to get the final result.
+
+The C++ example below calculates the sum of the primes ≤ 10^10 in parallel
+using [OpenMP](https://en.wikipedia.org/wiki/OpenMP). Each thread processes a
+chunk of size ```(dist / threads) + 1``` using its own ```primesieve::iterator```
+object. The OpenMP reduction clause takes care of adding the partial
+prime sum results together in a thread safe manner.
+
+```C++
+#include <primesieve.hpp>
+#include <iostream>
+#include <omp.h>
+
+int main()
+{
+  uint64_t sum = 0;
+  uint64_t dist = 1e10;
+  int threads = omp_get_max_threads();
+  uint64_t thread_dist = (dist / threads) + 1;
+
+  #pragma omp parallel for reduction(+: sum)
+  for (int i = 0; i < threads; i++)
+  {
+    uint64_t start = i * thread_dist;
+    uint64_t stop = std::min(start + thread_dist, dist);
+    primesieve::iterator it(start, stop);
+    uint64_t prime = it.next_prime();
+
+    for (; prime <= stop; prime = it.next_prime())
+      sum += prime;
+  }
+
+  std::cout << "Sum of the primes below " << dist << ": " << sum << std::endl;
+
+  return 0;
+}
+```
+
+<details>
+<summary>Build instructions</summary>
+
+```bash
+# Unix-like OSes
+wget https://primesieve.org/primesum.cpp
+c++ -O3 -fopenmp primesum.cpp -o primesum -lprimesieve
+time ./primesum
+```
+
+</details>
 
 ## Linking against libprimesieve
 
