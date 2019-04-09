@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "7.4")
-set(PRIMESIEVE_SOVERSION "9.4.0")
+set(PRIMESIEVE_VERSION "7.5")
+set(PRIMESIEVE_SOVERSION "9.5.0")
 
 # Build options ######################################################
 
@@ -18,7 +18,7 @@ endif()
 
 # Set default build type to Release ##################################
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.9)
+if(NOT CMAKE_VERSION VERSION_LESS 3.9)
     get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 elseif(CMAKE_CONFIGURATION_TYPES)
     set(isMultiConfig TRUE)
