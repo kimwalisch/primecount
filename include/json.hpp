@@ -14514,9 +14514,11 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <fstream>
 #include <iomanip>
 #include <string>
+#include <set>
 
 #include <backup.hpp>
 #include <calculator.hpp>
+#include <primecount.hpp>
 
 namespace primecount
 {
@@ -14593,6 +14595,33 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, int t
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
          j[formula].count("thread" + std::to_string(thread_id)) > 0;
+}
+
+inline int calculate_resume_threads(const nlohmann::json& j, const std::string& formula)
+{
+  // sorted set
+  std::set<int> threadIds;
+
+  if (j.find(formula) != j.end())
+  {
+    for (auto it = j[formula].begin(); it != j[formula].end(); ++it)
+    {
+      std::string threadId = it.key();
+
+      if (threadId.find("thread") == 0)
+      {
+        threadId.erase(0, std::string("thread").size());
+        threadIds.insert(std::stoi(threadId));
+      }
+    }
+
+    if (!threadIds.empty())
+      return *threadIds.rbegin() + 1;
+    else
+      throw primecount_error("\nCorrupted primecount.backup file: failed to read thread IDs!");
+  }
+
+  return 0;
 }
 
 inline bool is_backup_seconnds(const nlohmann::json& j, const std::string& formula)

@@ -46,22 +46,20 @@ using namespace std;
 
 namespace primecount {
 
-int LoadBalancer::get_threads(int threads) const
+int LoadBalancer::get_resume_threads() const
 {
   if (is_resume(copy_, "S2_hard", x_, y_, z_))
   {
     double percent = copy_["S2_hard"]["percent"];
-    int backup_threads = copy_["S2_hard"]["threads"];
-    threads = max(threads, backup_threads);
     print_resume(percent, x_);
+    return calculate_resume_threads(copy_, "S2_hard");
   }
 
-  return threads;
+  return 0;
 }
 
 /// backup thread
-void LoadBalancer::backup(int threads,
-                          int thread_id,
+void LoadBalancer::backup(int thread_id,
                           int64_t low,
                           int64_t segments,
                           int64_t segment_size)
@@ -71,7 +69,6 @@ void LoadBalancer::backup(int threads,
 
   string tid = "thread" + to_string(thread_id);
 
-  json_["S2_hard"]["threads"] = threads;
   json_["S2_hard"]["low"] = low_;
   json_["S2_hard"]["segments"] = segments_;
   json_["S2_hard"]["segment_size"] = segment_size_;
@@ -89,7 +86,27 @@ void LoadBalancer::backup(int threads,
   }
 }
 
-/// backup result
+/// backup resume thread
+void LoadBalancer::backup(int thread_id)
+{
+  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+  double seconds = get_time() - backup_time_;
+
+  string tid = "thread" + to_string(thread_id);
+
+  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+  json_["S2_hard"]["percent"] = percent;
+  json_["S2_hard"]["seconds"] = get_time() - time_;
+  json_["S2_hard"].erase(tid);
+
+  if (seconds > 60)
+  {
+    backup_time_ = get_time();
+    store_backup(json_);
+  }
+}
+
+/// finished
 void LoadBalancer::backup()
 {
   json_.erase("S2_hard");
@@ -221,8 +238,21 @@ double LoadBalancer::get_wtime() const
   return time_;
 }
 
-bool LoadBalancer::get_work(int threads,
-                            int thread_id,
+void LoadBalancer::update_result(int thread_id, maxint_t s2)
+{
+  #pragma omp critical (LoadBalancer)
+  {
+    s2_total_ += s2;
+
+    backup(thread_id);
+
+    if (is_print())
+      status_.print(s2_total_, s2_approx_);
+  }
+}
+
+// Get work and update result
+bool LoadBalancer::get_work(int thread_id,
                             int64_t* low,
                             int64_t* segments,
                             int64_t* segment_size,
@@ -241,7 +271,7 @@ bool LoadBalancer::get_work(int threads,
 
     low_ += segments_ * segment_size_;
 
-    backup(threads, thread_id, *low, *segments, *segment_size);
+    backup(thread_id, *low, *segments, *segment_size);
 
     if (is_print())
       status_.print(s2_total_, s2_approx_);

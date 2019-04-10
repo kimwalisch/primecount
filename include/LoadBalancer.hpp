@@ -35,10 +35,11 @@ class LoadBalancer
 {
 public:
   LoadBalancer(maxint_t x, int64_t y, int64_t z, maxint_t s2_approx);
-  bool get_work(int threads, int thread_id, int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
+  bool get_work(int thread_id, int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
   bool resume(int thread_id, int64_t& low, int64_t& segments, int64_t& segment_size);
   bool resume(maxint_t& s2_hard, double& time) const;
-  int get_threads(int threads) const;
+  void update_result(int thread_id, maxint_t s2);
+  int get_resume_threads() const;
   maxint_t get_result() const;
   double get_wtime() const;
   void backup();
@@ -46,7 +47,8 @@ public:
 private:
   void init_size();
   void update(int64_t* low, int64_t* segments, Runtime& runtime);
-  void backup(int threads, int thread_id, int64_t low, int64_t segments, int64_t segment_size);
+  void backup(int thread_id, int64_t low, int64_t segments, int64_t segment_size);
+  void backup(int thread_id);
   double get_next(Runtime& runtime) const;
   double remaining_secs() const;
 

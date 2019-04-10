@@ -180,7 +180,7 @@ T S2_hard_OpenMP(T x,
 {
   LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
   threads = ideal_num_threads(threads, z);
-  threads = loadBalancer.get_threads(threads);
+  int resume_threads = loadBalancer.get_resume_threads();
 
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
@@ -195,14 +195,23 @@ T S2_hard_OpenMP(T x,
     Runtime runtime;
 
     // resume from backup file
-    if (loadBalancer.resume(i, low, segments, segment_size))
+    for (int j = i; j < resume_threads; j += threads)
     {
-      runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
-      runtime.stop();
+      if (loadBalancer.resume(j, low, segments, segment_size))
+      {
+        runtime.start();
+        s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
+        loadBalancer.update_result(j, s2_hard);
+        runtime.stop();
+
+        low = 0;
+        segments = 0;
+        segment_size = 0;
+        s2_hard = 0;
+      }
     }
 
-    while (loadBalancer.get_work(threads, i, &low, &segments, &segment_size, s2_hard, runtime))
+    while (loadBalancer.get_work(i, &low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
       s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
