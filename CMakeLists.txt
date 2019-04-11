@@ -163,7 +163,9 @@ if(WITH_OPENMP)
         if(NOT OpenMP)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
-            if(LIB_ATOMIC)
+            if(NOT LIB_ATOMIC)
+                set(LIB_ATOMIC "")
+            else()
                 set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
 
                 check_cxx_source_compiles("
