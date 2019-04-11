@@ -42,7 +42,7 @@ public:
   int get_resume_threads() const;
   maxint_t get_result() const;
   double get_wtime() const;
-  void backup();
+  void finish_backup();
 
 private:
   void init_size();

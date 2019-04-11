@@ -21,7 +21,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,41 +49,9 @@ namespace primecount {
 int LoadBalancer::get_resume_threads() const
 {
   if (is_resume(copy_, "S2_hard", x_, y_, z_))
-  {
-    double percent = copy_["S2_hard"]["percent"];
-    print_resume(percent, x_);
     return calculate_resume_threads(copy_, "S2_hard");
-  }
 
   return 0;
-}
-
-/// backup thread
-void LoadBalancer::backup(int thread_id,
-                          int64_t low,
-                          int64_t segments,
-                          int64_t segment_size)
-{
-  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-  double seconds = get_time() - backup_time_;
-
-  string tid = "thread" + to_string(thread_id);
-
-  json_["S2_hard"]["low"] = low_;
-  json_["S2_hard"]["segments"] = segments_;
-  json_["S2_hard"]["segment_size"] = segment_size_;
-  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
-  json_["S2_hard"]["percent"] = percent;
-  json_["S2_hard"]["seconds"] = get_time() - time_;
-  json_["S2_hard"][tid]["low"] = low;
-  json_["S2_hard"][tid]["segments"] = segments;
-  json_["S2_hard"][tid]["segment_size"] = segment_size;
-
-  if (seconds > 60)
-  {
-    backup_time_ = get_time();
-    store_backup(json_);
-  }
 }
 
 /// backup resume thread
@@ -106,8 +74,41 @@ void LoadBalancer::backup(int thread_id)
   }
 }
 
-/// finished
-void LoadBalancer::backup()
+/// backup regular thread
+void LoadBalancer::backup(int thread_id,
+                          int64_t low,
+                          int64_t segments,
+                          int64_t segment_size)
+{
+  double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
+  double seconds = get_time() - backup_time_;
+
+  json_["S2_hard"]["low"] = low_;
+  json_["S2_hard"]["segments"] = segments_;
+  json_["S2_hard"]["segment_size"] = segment_size_;
+  json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
+  json_["S2_hard"]["percent"] = percent;
+  json_["S2_hard"]["seconds"] = get_time() - time_;
+
+  string tid = "thread" + to_string(thread_id);
+
+  if (low > z_)
+    json_["S2_hard"].erase(tid);
+  else
+  {
+    json_["S2_hard"][tid]["low"] = low;
+    json_["S2_hard"][tid]["segments"] = segments;
+    json_["S2_hard"][tid]["segment_size"] = segment_size;
+  }
+
+  if (seconds > 60)
+  {
+    backup_time_ = get_time();
+    store_backup(json_);
+  }
+}
+
+void LoadBalancer::finish_backup()
 {
   json_.erase("S2_hard");
 
@@ -142,16 +143,18 @@ bool LoadBalancer::resume(int thread_id,
 // resume result
 bool LoadBalancer::resume(maxint_t& s2_hard, double& time) const
 {
-  if (is_resume(copy_, "S2_hard", x_, y_, z_) &&
-      !copy_["S2_hard"].count("low"))
+  if (is_resume(copy_, "S2_hard", x_, y_, z_))
   {
     double percent = copy_["S2_hard"]["percent"];
     double seconds = copy_["S2_hard"]["seconds"];
-
-    s2_hard = calculator::eval<maxint_t>(copy_["S2_hard"]["s2_hard"]);
-    time = get_time() - seconds;
     print_resume(percent, x_);
-    return true;
+
+    if (!copy_["S2_hard"].count("low"))
+    {
+      s2_hard = calculator::eval<maxint_t>(copy_["S2_hard"]["s2_hard"]);
+      time = get_time() - seconds;
+      return true;
+    }
   }
 
   return false;
@@ -238,12 +241,12 @@ double LoadBalancer::get_wtime() const
   return time_;
 }
 
+// Used by resume threads
 void LoadBalancer::update_result(int thread_id, maxint_t s2)
 {
   #pragma omp critical (LoadBalancer)
   {
     s2_total_ += s2;
-
     backup(thread_id);
 
     if (is_print())
@@ -270,6 +273,8 @@ bool LoadBalancer::get_work(int thread_id,
     *segment_size = segment_size_;
 
     low_ += segments_ * segment_size_;
+    int64_t limit = z_ + 1;
+    low_ = min(low_, limit);
 
     backup(thread_id, *low, *segments, *segment_size);
 

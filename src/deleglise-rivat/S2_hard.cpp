@@ -13,7 +13,7 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -188,29 +188,31 @@ T S2_hard_OpenMP(T x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low = 0;
-    int64_t segments = 0;
-    int64_t segment_size = 0;
-    T s2_hard = 0;
-    Runtime runtime;
-
-    // resume from backup file
+    // 1st resume computations from backup file
     for (int j = i; j < resume_threads; j += threads)
     {
+      int64_t low = 0;
+      int64_t segments = 0;
+      int64_t segment_size = 0;
+      T s2_hard = 0;
+      Runtime runtime;
+
       if (loadBalancer.resume(j, low, segments, segment_size))
       {
         runtime.start();
         s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
         loadBalancer.update_result(j, s2_hard);
         runtime.stop();
-
-        low = 0;
-        segments = 0;
-        segment_size = 0;
-        s2_hard = 0;
       }
     }
+ 
+    int64_t low = 0;
+    int64_t segments = 0;
+    int64_t segment_size = 0;
+    T s2_hard = 0;
+    Runtime runtime;
 
+    // 2nd get new work from loadBalancer
     while (loadBalancer.get_work(i, &low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
@@ -219,7 +221,7 @@ T S2_hard_OpenMP(T x,
     }
   }
 
-  loadBalancer.backup();
+  loadBalancer.finish_backup();
   time = loadBalancer.get_wtime();
   T s2_hard = (T) loadBalancer.get_result();
 
