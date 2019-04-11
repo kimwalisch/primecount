@@ -14527,6 +14527,9 @@ namespace primecount
 
 inline void verify_checksum(nlohmann::json copy)
 {
+  if (copy.empty())
+    return;
+
   std::string oldMd5 = copy["md5"];
   copy.erase("md5");
 
