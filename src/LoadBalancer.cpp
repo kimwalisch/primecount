@@ -299,7 +299,6 @@ void LoadBalancer::update(int64_t* low,
     else
     {
       double next = get_next(runtime);
-      next = in_between(0.25, next, 2.0);
       next *= segments_;
       next = max(1.0, next);
       segments_ = (int64_t) next;
@@ -331,8 +330,16 @@ double LoadBalancer::get_next(Runtime& runtime) const
   double rem = remaining_secs();
   double threshold = rem / 4;
   threshold = max(threshold, min_secs);
+  double next = threshold / run_secs;
 
-  return threshold / run_secs;
+  // Increase the number of backups
+  // by keeping the number of segments small.
+  if (runtime.secs > 0.1 && 
+      runtime.init > 0 &&
+      runtime.secs > runtime.init * 200)
+    next = min(next, 0.8);
+
+  return in_between(0.25, next, 2.0);
 }
 
 /// Remaining seconds till finished
