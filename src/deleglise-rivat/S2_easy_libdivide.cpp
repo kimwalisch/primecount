@@ -46,14 +46,12 @@ void backup(J& json,
             T x,
             int64_t y,
             int64_t z,
-            int threads,
             double percent,
             double time)
 {
   json["S2_easy"]["x"] = to_string(x);
   json["S2_easy"]["y"] = y;
   json["S2_easy"]["z"] = z;
-  json["S2_easy"]["threads"] = threads;
   json["S2_easy"]["percent"] = percent;
   json["S2_easy"]["seconds"] = get_time() - time;
 
@@ -123,7 +121,6 @@ bool resume(J& json,
             int64_t z,
             T& s2_easy,
             int64_t& start,
-            int& threads,
             double& time)
 {
   if (is_resume(json, "S2_easy", x, y, z))
@@ -131,10 +128,8 @@ bool resume(J& json,
     double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
 
-    int backup_threads = json["S2_easy"]["threads"];
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     start = json["S2_easy"]["start"];
-    threads = max(threads, backup_threads);
     time = get_time() - seconds;
     print_resume(percent, x);
     return true;
@@ -153,7 +148,7 @@ bool resume(J& json,
             double& time)
 {
   if (is_resume(json, "S2_easy", x, y, z) &&
-      !json["S2_easy"].count("threads"))
+      !json["S2_easy"].count("start"))
   {
     double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
@@ -291,18 +286,37 @@ T S2_easy_OpenMP(T x,
   int64_t start = max(c, pi_sqrty) + 1;
   threads = ideal_num_threads(threads, x13, 1000);
 
-  if (!resume(json, x, y, z, s2_easy, start, threads, time))
+  if (!resume(json, x, y, z, s2_easy, start, time))
     json.erase("S2_easy");
+
+  int resume_threads = calculate_resume_threads(json, "S2_easy");
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    T s2_thread = 0;
     int64_t b = 0;
 
-    if (resume(copy, x, y, z, b, i))
-      s2_thread = S2_easy(x, y, z, b, primes, fastdiv, pi);
+    // 1st resume computations from backup file
+    for (int j = i; j < resume_threads; j += threads)
+    {
+      if (resume(copy, x, y, z, b, j))
+      {
+        T s2_thread = S2_easy(x, y, z, b, primes, fastdiv, pi);
 
+        #pragma omp critical (s2_easy)
+        {
+          s2_easy += s2_thread;
+          string tid = "thread" + to_string(j);
+
+          json["S2_easy"]["s2_easy"] = to_string(s2_easy);
+          json["S2_easy"].erase(tid);
+        }
+      }
+    }
+
+    T s2_thread = 0;
+
+    // 2nd, run new computations
     while (true)
     {
       if (is_print())
@@ -318,7 +332,7 @@ T S2_easy_OpenMP(T x,
         if (is_backup(backup_time))
         {
           double percent = status.getPercent(start, pi_x13, start, pi_x13);
-          backup(json, x, y, z, threads, percent, time);
+          backup(json, x, y, z, percent, time);
           backup_time = get_time();
         }
       }
