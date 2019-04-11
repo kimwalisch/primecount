@@ -14514,10 +14514,12 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <fstream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 #include <set>
 
 #include <backup.hpp>
 #include <calculator.hpp>
+#include <WjCryptLib_Md5.h>
 
 namespace primecount
 {
@@ -14533,8 +14535,21 @@ inline nlohmann::json load_backup()
   return j;
 }
 
-inline void store_backup(const nlohmann::json& j)
+inline void store_backup(nlohmann::json& j)
 {
+  j.erase("md5");
+  MD5_HASH md5Hash;
+  std::string json_str = j.dump();
+  Md5Calculate(json_str.c_str(), (uint32_t) json_str.size(), &md5Hash);
+
+  // convert char buffer into hex std::string
+  // https://stackoverflow.com/a/22528949
+  std::stringstream md5;
+  for (std::size_t i = 0; i < sizeof(md5Hash.bytes); i++)
+    md5 << std::hex << (unsigned) md5Hash.bytes[i];
+
+  j["md5"] = md5.str();
+
   {
     // create new backup file
     std::ofstream ofs(backup_file() + ".new");

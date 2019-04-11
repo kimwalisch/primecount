@@ -44,7 +44,8 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 # primecount library source files ####################################
 
-set(LIB_SRC src/backup.cpp
+set(LIB_SRC src/WjCryptLib_Md5.cpp
+            src/backup.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
