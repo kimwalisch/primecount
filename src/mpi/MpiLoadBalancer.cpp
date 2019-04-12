@@ -119,7 +119,7 @@ double MpiLoadBalancer::get_next(Runtime& runtime) const
 
   // Increase the number of backups
   // by keeping the number of segments small.
-  if (runtime.secs > 0.1 && 
+  if (runtime.secs > 10 && 
       runtime.init > 0 &&
       runtime.secs > runtime.init * 200)
     next = min(next, 0.8);
