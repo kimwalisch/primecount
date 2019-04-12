@@ -261,6 +261,13 @@ void print_status(double percent, maxint_t x)
 void print_resume(double percent, maxint_t x)
 {
   print_log("Resuming from " + backup_file());
+
+  // When the primecount.backup file is loaded from hard disk we
+  // also verify the MD5 checksum and abort if there is a mismatch.
+  // print_resume() is always called after that primecount.backup
+  // has been loaded, hence we know the MD5 checksum is correct.
+  print_log("MD5 checksum: OK");
+
   print_status(percent, x);
 }
 
