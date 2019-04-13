@@ -98,9 +98,8 @@ void update(J& json,
   else
   {
     // finished
-    if (json.find("S2_easy") != json.end())
-      if (json["S2_easy"].find(tid) != json["S2_easy"].end())
-        json["S2_easy"].erase(tid);
+    if (json["S2_easy"].find(tid) != json["S2_easy"].end())
+      json["S2_easy"].erase(tid);
   }
 }
 
