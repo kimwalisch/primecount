@@ -116,7 +116,7 @@ void LoadBalancer::finish_backup()
   json_["S2_hard"]["y"] = y_;
   json_["S2_hard"]["z"] = z_;
   json_["S2_hard"]["s2_hard"] = to_string(s2_total_);
-  json_["S2_hard"]["percent"] = 100;
+  json_["S2_hard"]["percent"] = 100.0;
   json_["S2_hard"]["seconds"] = get_time() - time_;
 
   store_backup(json_);
