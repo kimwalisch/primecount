@@ -4,7 +4,7 @@
 ///        and the sparse easy leaves in parallel using OpenMP
 ///        (Deleglise-Rivat algorithm).
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -79,19 +79,29 @@ void backup(J& json,
   store_backup(json);
 }
 
-/// update json
+/// update backup (without storing to disk)
 template <typename T, typename J>
 void update(J& json,
             int64_t start,
             int64_t b,
+            int64_t pi_x13,
             int64_t thread_id,
             T s2_easy)
 {
   string tid = "thread" + to_string(thread_id);
 
-  json["S2_easy"][tid]["b"] = b;
   json["S2_easy"]["start"] = start;
   json["S2_easy"]["s2_easy"] = to_string(s2_easy);
+
+  if (b <= pi_x13)
+    json["S2_easy"][tid]["b"] = b;
+  else
+  {
+    // finished
+    if (json.find("S2_easy") != json.end())
+      if (json["S2_easy"].find(tid) != json["S2_easy"].end())
+        json["S2_easy"].erase(tid);
+  }
 }
 
 /// resume thread
@@ -277,7 +287,7 @@ T S2_easy_OpenMP(T x,
         s2_easy += s2_thread;
         b = start++;
 
-        update(json, start, b, i, s2_easy);
+        update(json, start, b, pi_x13, i, s2_easy);
 
         if (is_backup(backup_time))
         {
