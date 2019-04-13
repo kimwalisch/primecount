@@ -9,7 +9,6 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
 option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
 option(WITH_OPENMP        "Enable OpenMP support"       ON)
-option(WITH_MPI           "Enable MPI support"          OFF)
 option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
 option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
 option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
@@ -105,31 +104,6 @@ if(libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-endif()
-
-# Check for MPI (Message Passing Interface) ##########################
-
-if(WITH_MPI)
-    find_package(MPI REQUIRED)
-
-    if(TARGET MPI::MPI_CXX)
-        set(LIB_MPI "MPI::MPI_CXX")
-    else()
-        include_directories("${MPI_INCLUDE_PATH}")
-    endif()
-
-    set(HAVE_MPI "HAVE_MPI")
-    set(LIB_SRC ${LIB_SRC}
-                src/mpi/P2_mpi.cpp
-                src/mpi/S2_hard_mpi.cpp
-                src/mpi/MpiLoadBalancer.cpp
-                src/mpi/MpiMsg.cpp)
-
-    if(libdivide_branchfree)
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
-    else()
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
-    endif()
 endif()
 
 # Silence GCC switch fall through warnings ###########################
@@ -251,9 +225,9 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -274,9 +248,9 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_ATOMIC}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
@@ -301,8 +275,7 @@ endif()
 
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
-    target_compile_definitions(primecount PRIVATE "${HAVE_MPI}")
-    target_link_libraries(primecount PRIVATE libprimecount "${LIB_MPI}")
+    target_link_libraries(primecount PRIVATE libprimecount)
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
