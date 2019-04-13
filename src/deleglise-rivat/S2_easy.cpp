@@ -130,7 +130,6 @@ bool resume(J& json,
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     start = json["S2_easy"]["start"];
     time = get_time() - seconds;
-    print_resume(percent, x);
     return true;
   }
 
@@ -146,16 +145,18 @@ bool resume(J& json,
             T& s2_easy,
             double& time)
 {
-  if (is_resume(json, "S2_easy", x, y, z) &&
-      !json["S2_easy"].count("start"))
+  if (is_resume(json, "S2_easy", x, y, z))
   {
     double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
-
-    s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
-    time = get_time() - seconds;
     print_resume(percent, x);
-    return true;
+
+    if (!json["S2_easy"].count("start"))
+    {
+      s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
+      time = get_time() - seconds;
+      return true;
+    }
   }
 
   return false;
@@ -220,19 +221,15 @@ T S2_easy_OpenMP(T x,
                  int64_t c,
                  Primes& primes,
                  int threads,
-                 double& time)
+                 double& time,
+                 nlohmann::json& json)
 {
-  T s2_easy = 0;
-  auto json = load_backup();
-  auto copy = json;
-
-  if (resume(json, x, y, z, s2_easy, time))
-    return s2_easy;
-
   PiTable pi(y);
   S2Status status(x);
   double backup_time = get_time();
+  nlohmann::json copy = json;
 
+  T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   int64_t pi_x13 = pi[x13];
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -322,9 +319,15 @@ int64_t S2_easy(int64_t x,
   print_log("Computation of the easy special leaves");
   print_log(x, y, c, threads);
 
+  auto json = load_backup();
   double time = get_time();
-  auto primes = generate_primes<int32_t>(y);
-  int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads, time);
+  int64_t s2_easy = 0;
+
+  if (!resume(json, x, y, z, s2_easy, time))
+  {
+    auto primes = generate_primes<int32_t>(y);
+    s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads, time, json);
+  }
 
   print_log("S2_easy", s2_easy, time);
   return s2_easy;
@@ -348,19 +351,23 @@ int128_t S2_easy(int128_t x,
   print_log("Computation of the easy special leaves");
   print_log(x, y, c, threads);
 
-  int128_t s2_easy;
+  auto json = load_backup();
   double time = get_time();
+  int128_t s2_easy = 0;
 
-  // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
+  if (!resume(json, x, y, z, s2_easy, time))
   {
-    auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time);
-  }
-  else
-  {
-    auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time);
+    // uses less memory
+    if (y <= numeric_limits<uint32_t>::max())
+    {
+      auto primes = generate_primes<uint32_t>(y);
+      s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time, json);
+    }
+    else
+    {
+      auto primes = generate_primes<int64_t>(y);
+      s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads, time, json);
+    }
   }
 
   print_log("S2_easy", s2_easy, time);
