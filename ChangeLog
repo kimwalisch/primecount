@@ -1,3 +1,20 @@
+2019-04-13 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.6 released.
+
+  This version fixes 2 bugs in the CMakeLists.txt build script
+  and improves the primecount backup version that stores
+  intermediate results to hard disk. Note that
+  primecount.backup files produced by previous primecount
+  releases are incompatible with primecount-4.6.
+
+  CMakeLists.txt: Fix libatomic issue.
+  CMakeLists.txt: Require CMake 3.4 instead of 3.9.
+  LoadBalancer.cpp: Increase number of backups.
+  S2_easy.cpp: Allow resuming using fewer/more threads.
+  S2_hard.cpp: Allow resuming using fewer/more threads.
+  primecount.backup: Add MD5 checksum.
+
 2019-02-20 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.5 released.
