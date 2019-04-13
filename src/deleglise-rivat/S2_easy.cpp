@@ -124,9 +124,7 @@ bool resume(J& json,
 {
   if (is_resume(json, "S2_easy", x, y, z))
   {
-    double percent = json["S2_easy"]["percent"];
     double seconds = json["S2_easy"]["seconds"];
-
     s2_easy = calculator::eval<T>(json["S2_easy"]["s2_easy"]);
     start = json["S2_easy"]["start"];
     time = get_time() - seconds;
