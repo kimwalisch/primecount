@@ -40,7 +40,7 @@ bool is_backup(double time)
   return seconds > 60;
 }
 
-/// backup to file
+/// backup intermediate result
 template <typename T, typename J>
 void backup(J& json,
             T x,
@@ -73,7 +73,7 @@ void backup(J& json,
   json["S2_easy"]["y"] = y;
   json["S2_easy"]["z"] = z;
   json["S2_easy"]["s2_easy"] = to_string(s2_easy);
-  json["S2_easy"]["percent"] = 100;
+  json["S2_easy"]["percent"] = 100.0;
   json["S2_easy"]["seconds"] = get_time() - time;
 
   store_backup(json);
