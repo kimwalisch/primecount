@@ -205,7 +205,7 @@ T S2_hard_OpenMP(T x,
         runtime.stop();
       }
     }
- 
+
     int64_t low = 0;
     int64_t segments = 0;
     int64_t segment_size = 0;
