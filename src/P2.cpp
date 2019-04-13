@@ -4,7 +4,7 @@
 ///        numbers <= x that have exactly 2 prime factors
 ///        each exceeding the a-th prime.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,6 +29,13 @@ using namespace std;
 using namespace primecount;
 
 namespace {
+
+/// backup to file every 60 seconds
+bool is_backup(double time)
+{
+  double seconds = get_time() - time;
+  return seconds > 60;
+}
 
 /// Count the primes inside [prime, stop]
 template <typename T>
@@ -104,6 +111,7 @@ T P2_thread(T x,
   return p2;
 }
 
+// backup intermediate result
 template <typename T, typename J>
 void backup(J& json,
             T x,
@@ -120,23 +128,33 @@ void backup(J& json,
   json["P2"]["x"] = to_string(x);
   json["P2"]["y"] = y;
   json["P2"]["z"] = z;
+  json["P2"]["low"] = low;
+  json["P2"]["thread_distance"] = thread_distance;
+  json["P2"]["pix_total"] = to_string(pix_total);
   json["P2"]["p2"] = to_string(p2);
   json["P2"]["percent"] = percent;
   json["P2"]["seconds"] = get_time() - time;
 
-  if (low < z)
-  {
-    json["P2"]["low"] = low;
-    json["P2"]["thread_distance"] = thread_distance;
-    json["P2"]["pix_total"] = to_string(pix_total);
-  }
-  else
-  {
-    // finished
-    json["P2"].erase("low");
-    json["P2"].erase("thread_distance");
-    json["P2"].erase("pix_total");
-  }
+  store_backup(json);
+}
+
+// backup result
+template <typename T, typename J>
+void backup(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            T p2,
+            double time)
+{
+  json.erase("P2");
+
+  json["P2"]["x"] = to_string(x);
+  json["P2"]["y"] = y;
+  json["P2"]["z"] = z;
+  json["P2"]["p2"] = to_string(p2);
+  json["P2"]["percent"] = 100.0;
+  json["P2"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -209,6 +227,7 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   if (resume(json, x, y, z, p2, time))
     return p2;
 
+  double backup_time = get_time();
   T a = pi_legendre(y, threads);
   T b = pi_legendre((int64_t) isqrt(x), threads);
 
@@ -249,7 +268,11 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
       pix_total += pix[i];
     }
 
-    backup(json, x, y, z, low, thread_distance, pix_total, p2, time);
+    if (is_backup(backup_time))
+    {
+      backup(json, x, y, z, low, thread_distance, pix_total, p2, time);
+      backup_time = get_time();
+    }
 
     if (is_print())
     {
@@ -258,6 +281,8 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
            << percent << '%' << flush;
     }
   }
+
+  backup(json, x, y, z, p2, time);
 
   return p2;
 }
