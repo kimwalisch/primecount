@@ -83,6 +83,9 @@ void LoadBalancer::backup(int thread_id,
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
   double seconds = get_time() - backup_time_;
 
+  json_["S2_hard"]["x"] = to_string(x_);
+  json_["S2_hard"]["y"] = y_;
+  json_["S2_hard"]["z"] = z_;
   json_["S2_hard"]["low"] = low_;
   json_["S2_hard"]["segments"] = segments_;
   json_["S2_hard"]["segment_size"] = segment_size_;
@@ -91,15 +94,9 @@ void LoadBalancer::backup(int thread_id,
   json_["S2_hard"]["seconds"] = get_time() - time_;
 
   string tid = "thread" + to_string(thread_id);
-
-  if (low > z_)
-    json_["S2_hard"].erase(tid);
-  else
-  {
-    json_["S2_hard"][tid]["low"] = low;
-    json_["S2_hard"][tid]["segments"] = segments;
-    json_["S2_hard"][tid]["segment_size"] = segment_size;
-  }
+  json_["S2_hard"][tid]["low"] = low;
+  json_["S2_hard"][tid]["segments"] = segments;
+  json_["S2_hard"][tid]["segment_size"] = segment_size;
 
   if (seconds > 60)
   {
@@ -110,7 +107,8 @@ void LoadBalancer::backup(int thread_id,
 
 void LoadBalancer::finish_backup()
 {
-  json_.erase("S2_hard");
+  if (json_.find("S2_hard") != json_.end())
+    json_.erase("S2_hard");
 
   json_["S2_hard"]["x"] = to_string(x_);
   json_["S2_hard"]["y"] = y_;
@@ -201,10 +199,8 @@ LoadBalancer::LoadBalancer(maxint_t x,
   }
   else
   {
-    json_.erase("S2_hard");
-    json_["S2_hard"]["x"] = to_string(x_);
-    json_["S2_hard"]["y"] = y_;
-    json_["S2_hard"]["z"] = z_;
+    if (json_.find("S2_hard") != json_.end())
+      json_.erase("S2_hard");
   }
 }
 

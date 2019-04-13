@@ -147,7 +147,8 @@ void backup(J& json,
             T p2,
             double time)
 {
-  json.erase("P2");
+  if (json.find("P2") != json.end())
+    json.erase("P2");
 
   json["P2"]["x"] = to_string(x);
   json["P2"]["y"] = y;
@@ -161,7 +162,7 @@ void backup(J& json,
 
 // resume computation
 template <typename T, typename J>
-void resume(J& json,
+bool resume(J& json,
             T x,
             int64_t y,
             int64_t z,
@@ -179,7 +180,10 @@ void resume(J& json,
     pix_total = calculator::eval<T>(json["P2"]["pix_total"]);
     p2 = calculator::eval<T>(json["P2"]["p2"]);
     time = get_time() - seconds;
+    return true;
   }
+
+  return false;
 }
 
 /// resume result
@@ -245,7 +249,9 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
-  resume(json, x, y, z, low, thread_distance, pix_total, p2, time);
+  if (!resume(json, x, y, z, low, thread_distance, pix_total, p2, time))
+    if (json.find("P2") != json.end())
+      json.erase("P2");
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
