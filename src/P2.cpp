@@ -120,16 +120,28 @@ void backup(J& json,
   json["P2"]["x"] = to_string(x);
   json["P2"]["y"] = y;
   json["P2"]["z"] = z;
-  json["P2"]["low"] = low;
-  json["P2"]["thread_distance"] = thread_distance;
-  json["P2"]["pix_total"] = to_string(pix_total);
   json["P2"]["p2"] = to_string(p2);
   json["P2"]["percent"] = percent;
   json["P2"]["seconds"] = get_time() - time;
 
+  if (low < z)
+  {
+    json["P2"]["low"] = low;
+    json["P2"]["thread_distance"] = thread_distance;
+    json["P2"]["pix_total"] = to_string(pix_total);
+  }
+  else
+  {
+    // finished
+    json["P2"].erase("low");
+    json["P2"].erase("thread_distance");
+    json["P2"].erase("pix_total");
+  }
+
   store_backup(json);
 }
 
+// resume computation
 template <typename T, typename J>
 void resume(J& json,
             T x,
@@ -143,16 +155,39 @@ void resume(J& json,
 {
   if (is_resume(json, "P2", x, y, z))
   {
-    double percent = json["P2"]["percent"];
     double seconds = json["P2"]["seconds"];
-
     low = json["P2"]["low"];
     thread_distance = json["P2"]["thread_distance"];
     pix_total = calculator::eval<T>(json["P2"]["pix_total"]);
     p2 = calculator::eval<T>(json["P2"]["p2"]);
     time = get_time() - seconds;
-    print_resume(percent, x);
   }
+}
+
+/// resume result
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            T& p2,
+            double& time)
+{
+  if (is_resume(json, "P2", x, y, z))
+  {
+    double percent = json["P2"]["percent"];
+    double seconds = json["P2"]["seconds"];
+    print_resume(percent, x);
+
+    if (!json["P2"].count("low"))
+    {
+      p2 = calculator::eval<T>(json["P2"]["p2"]);
+      time = get_time() - seconds;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
@@ -168,6 +203,12 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   if (x < 4)
     return 0;
 
+  T p2 = 0;
+  int64_t z = (int64_t)(x / max(y, 1));
+  auto json = load_backup();
+  if (resume(json, x, y, z, p2, time))
+    return p2;
+
   T a = pi_legendre(y, threads);
   T b = pi_legendre((int64_t) isqrt(x), threads);
 
@@ -175,18 +216,16 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
     return 0;
 
   // \sum_{i=a+1}^{b} -(i - 1)
-  T p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
   T pix_total = 0;
 
   int64_t low = 2;
-  int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
 
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
-  auto json = load_backup();
   resume(json, x, y, z, low, thread_distance, pix_total, p2, time);
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
