@@ -94,9 +94,19 @@ void LoadBalancer::backup(int thread_id,
   json_["S2_hard"]["seconds"] = get_time() - time_;
 
   string tid = "thread" + to_string(thread_id);
-  json_["S2_hard"][tid]["low"] = low;
-  json_["S2_hard"][tid]["segments"] = segments;
-  json_["S2_hard"][tid]["segment_size"] = segment_size;
+
+  if (low <= z_)
+  {
+    json_["S2_hard"][tid]["low"] = low;
+    json_["S2_hard"][tid]["segments"] = segments;
+    json_["S2_hard"][tid]["segment_size"] = segment_size;
+  }
+  else
+  {
+    // finished
+    if (json_["S2_hard"].find(tid) != json_["S2_hard"].end())
+      json_["S2_hard"].erase(tid);
+  }
 
   if (seconds > 60)
   {
