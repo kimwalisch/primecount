@@ -14515,7 +14515,6 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include <set>
 
 #include <backup.hpp>
 #include <calculator.hpp>
@@ -14638,27 +14637,24 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, int t
 
 inline int calculate_resume_threads(const nlohmann::json& j, const std::string& formula)
 {
-  // sorted set
-  std::set<int> threadIds;
+  if (j.find(formula) == j.end())
+    return 0;
 
-  if (j.find(formula) != j.end())
+  int maxThreadId = -1;
+
+  for (auto it = j[formula].begin(); it != j[formula].end(); ++it)
   {
-    for (auto it = j[formula].begin(); it != j[formula].end(); ++it)
+    std::string threadId = it.key();
+
+    if (threadId.find("thread") == 0)
     {
-      std::string threadId = it.key();
-
-      if (threadId.find("thread") == 0)
-      {
-        threadId.erase(0, std::string("thread").size());
-        threadIds.insert(std::stoi(threadId));
-      }
+      threadId.erase(0, std::string("thread").size());
+      int tid = std::stoi(threadId);
+      maxThreadId = std::max(tid, maxThreadId);
     }
-
-    if (!threadIds.empty())
-      return *threadIds.rbegin() + 1;
   }
 
-  return 0;
+  return maxThreadId + 1;
 }
 
 inline bool is_backup_seconnds(const nlohmann::json& j, const std::string& formula)
