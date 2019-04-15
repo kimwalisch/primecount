@@ -4,17 +4,18 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-The primecount backup version saves intermediate results to a backup file (```primecount.backup```).
+The primecount backup version saves intermediate results to a backup file.
 If your computer crashes or if you interrupt a computation you can resume
 the same computation from the backup file. For pi(x) computations that
 take weeks or even months to compute the backup functionality is very
 important. David Baugh and myself have used primecount-backup to compute
 pi(10^27) and many other records.
 
-The primecount backup version also features advanced logging:
+The primecount backup version generates the following files:
 
-* ```results.txt```: Contains results only
-* ```primecount.log```: Contains all partial results
+* ```primecount.backup```: Backup file with intermediate results.
+* ```primecount.log```: Main log file.
+* ```results.txt```: Log file with final results.
 
 ## Binaries
 
@@ -69,6 +70,7 @@ alpha = 30.831
 threads = 8
 
 Resuming from primecount.backup
+MD5 checksum: OK
 Status: 46%
 ```
 
@@ -141,9 +143,4 @@ Advanced Deleglise-Rivat options:
          --S2_trivial       Only compute the trivial special leaves
          --S2_easy          Only compute the easy special leaves
          --S2_hard          Only compute the hard special leaves
-
-Examples:
-
-  primecount 1e13
-  primecount 1e13 --nthprime --threads=4
 ```
