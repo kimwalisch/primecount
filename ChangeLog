@@ -1,3 +1,14 @@
+2019-04-15 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.7 released.
+
+  This version fixes an issue with the new MD5 checksum
+  feature introduced in primecount-backup-4.6 that I
+  found unfortunately 1 day after releasing primecount-4.6.
+
+  * json.hpp: Fix incorrect MD5 formatting, bytes with
+    values < 10 must be prefixed with '0'.
+
 2019-04-13 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.6 released.
@@ -8,12 +19,12 @@
   primecount.backup files produced by previous primecount
   releases are incompatible with primecount-4.6.
 
-  CMakeLists.txt: Fix libatomic issue.
-  CMakeLists.txt: Require CMake 3.4 instead of 3.9.
-  LoadBalancer.cpp: Increase number of backups.
-  S2_easy.cpp: Allow resuming using fewer/more threads.
-  S2_hard.cpp: Allow resuming using fewer/more threads.
-  primecount.backup: Add MD5 checksum.
+  * CMakeLists.txt: Fix libatomic issue.
+  * CMakeLists.txt: Require CMake 3.4 instead of 3.9.
+  * LoadBalancer.cpp: Increase number of backups.
+  * S2_easy.cpp: Allow resuming using fewer/more threads.
+  * S2_hard.cpp: Allow resuming using fewer/more threads.
+  * primecount.backup: Add MD5 checksum.
 
 2019-02-20 Kim Walisch  <kim.walisch@gmail.com>
 
