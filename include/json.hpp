@@ -14537,10 +14537,11 @@ inline void verify_checksum(nlohmann::json copy)
   Md5Calculate(json_str.c_str(), (uint32_t) json_str.size(), &md5Hash);
 
   // convert char buffer into hex std::string
-  // https://stackoverflow.com/a/22528949
+  // https://stackoverflow.com/a/7639754
   std::stringstream md5;
+  md5 << std::hex << std::setfill('0');
   for (std::size_t i = 0; i < sizeof(md5Hash.bytes); i++)
-    md5 << std::hex << (unsigned) md5Hash.bytes[i];
+    md5 << std::setw(2) << (unsigned) md5Hash.bytes[i];
 
   if (oldMd5 != md5.str())
     throw primecount_error("MD5 mismatch: corrupted primecount.backup file!");
@@ -14567,10 +14568,11 @@ inline void store_backup(nlohmann::json& j)
   Md5Calculate(json_str.c_str(), (uint32_t) json_str.size(), &md5Hash);
 
   // convert char buffer into hex std::string
-  // https://stackoverflow.com/a/22528949
+  // https://stackoverflow.com/a/7639754
   std::stringstream md5;
+  md5 << std::hex << std::setfill('0');
   for (std::size_t i = 0; i < sizeof(md5Hash.bytes); i++)
-    md5 << std::hex << (unsigned) md5Hash.bytes[i];
+    md5 << std::setw(2) << (unsigned) md5Hash.bytes[i];
 
   j["md5"] = md5.str();
 
