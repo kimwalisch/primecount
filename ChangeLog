@@ -1,4 +1,4 @@
-2019-04-15 Kim Walisch  <kim.walisch@gmail.com>
+2019-04-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.7 released.
 
@@ -6,8 +6,8 @@
   feature introduced in primecount-backup-4.6 that I
   found unfortunately 1 day after releasing primecount-4.6.
 
-  * json.hpp: Fix incorrect MD5 formatting, bytes with
-    values < 10 must be prefixed with '0'.
+  * json.hpp: Fix incorrect MD5 formatting, bytes with the
+    first 4 bits masked off must be prefixed with '0'.
 
 2019-04-13 Kim Walisch  <kim.walisch@gmail.com>
 
