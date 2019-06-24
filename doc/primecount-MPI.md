@@ -1,5 +1,5 @@
-primecount MPI
-==============
+# primecount MPI
+
 [![Build Status](https://travis-ci.org/kimwalisch/primecount.svg)](https://travis-ci.org/kimwalisch/primecount)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
@@ -18,8 +18,7 @@ few years until such clusters become more widely available. I expect
 the pi(10<sup>28</sup>) computation to take about 130 CPU core years
 using primecount MPI.
 
-Build instructions (Unix-like OSes)
------------------------------------
+## Build instructions (Unix-like OSes)
 
 First install the prerequisites:
 ```sh
@@ -32,21 +31,33 @@ cmake -DWITH_MPI=ON .
 make -j
 ```
 
-Usage example
--------------
+## Usage example
 
 ```sh
 # Distribute pi(10^23) computation onto 30 cluster nodes
 mpiexec -n 30 -bynode -hostfile my_hosts ./primecount 1e23 --status
 ```
 
-Note that you should create only one process per cluster node as
-primecount MPI will by default use all available CPU cores
-on each node using [OpenMP](https://en.wikipedia.org/wiki/OpenMP)
-multi-threading.
+The ```-bynode``` option ensures that only one primecount process will be
+created on each cluster node, this is important for performance. The
+```hostfile``` is a text file that contains the ip addresses of your
+cluster nodes.
 
-Benchmark pi(10<sup>23</sup>)
------------------------------
+## Performance tips
+
+* You should create only one process per cluster node as primecount MPI
+  will by default use all available CPU cores on each cluster node using
+  [OpenMP](https://en.wikipedia.org/wiki/OpenMP) multi-threading.
+* Ideally all cluster nodes (including the master node) should have an
+  equal number of CPU cores because primecount MPI evenly (statically)
+  distributes the work among the cluster nodes.
+* If possible you should
+  [enable transparent huge pages](https://github.com/kimwalisch/primecount#performance-tips)
+  on all cluster nodes in order to reduce [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
+  cache misses. This will usually provide a minor speedup.
+
+## Benchmark pi(10<sup>23</sup>)
+
 <table>
   <tr align="center">
     <td><b>Cluster nodes</b></td>
@@ -117,8 +128,7 @@ The efficiency drops beyond 40 cluster nodes because the input
 10<sup>23</sup> is too small for such a large number of nodes.
 For 10<sup>24</sup> and 50 cluster nodes the efficiency is 93,65%.
 
-Command-line options
---------------------
+## Command-line options
 
 ```
 Usage: primecount x [OPTION]...
