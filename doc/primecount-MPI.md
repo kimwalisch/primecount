@@ -33,19 +33,23 @@ make -j
 
 ```sh
 # Distribute pi(10^23) computation onto 30 cluster nodes
-mpiexec -n 30 -bynode -hostfile my_hosts ./primecount 1e23 --status
+mpiexec -n 30 --map-by node ./primecount 1e23 --status
 ```
 
-The ```-bynode``` option ensures that only one primecount process will be
-created on each cluster node, this is important for performance. The
-```hostfile``` is a text file that contains the ip addresses of your
-cluster nodes.
+```--map-by node``` ensures that only one primecount process will be
+created on each cluster node. This is important for performance as
+primecount will by default use all available CPU cores on each cluster
+node using [OpenMP](https://en.wikipedia.org/wiki/OpenMP)
+multi&#8209;threading.
 
 ## Performance tips
 
 * You should create only one process per cluster node as primecount MPI
   will by default use all available CPU cores on each cluster node using
   [OpenMP](https://en.wikipedia.org/wiki/OpenMP) multi-threading.
+* Be careful when submitting multiple future primecount MPI jobs, they
+  might be run simultaneously on the same hardware instead of one after
+  the other. This will of course deteriorate performance.
 * Ideally all cluster nodes (including the master node) should have an
   equal number of CPU cores because primecount MPI evenly (statically)
   distributes the work among the cluster nodes.
