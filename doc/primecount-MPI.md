@@ -4,7 +4,7 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-This is a distributed version of primecount which uses the
+This is the distributed version of primecount which uses the
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library
 for inter-process communication and which automatically distributes
 the computation onto cluster nodes. primecount MPI scales nearly
