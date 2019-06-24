@@ -7,16 +7,14 @@
 This is a distributed version of primecount which uses the
 [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) library
 for inter-process communication and which automatically distributes
-the computation onto cluster nodes. Breaking the next world record
-pi(10<sup>28</sup>) would take about 6 years on the fastest shared
-memory server currently available (Intel Xeon, 36 CPU cores). Hence
-it has become necessary to go distributed.
+the computation onto cluster nodes. primecount MPI scales nearly
+linearly (up to 96.8% efficiency) for large input values and has been
+tested successfully with clusters of up to 50 nodes.
 
-Computing pi(10<sup>28</sup>) using primecount MPI requires up to 500
-gigabytes of memory per cluster node! That is a lot, it might take a
-few years until such clusters become more widely available. I expect
-the pi(10<sup>28</sup>) computation to take about 130 CPU core years
-using primecount MPI.
+Breaking the next world record pi(10<sup>28</sup>) would take about 6
+years on the fastest shared memory server currently available
+(Intel Xeon, 36 CPU cores). Hence it has become necessary to go
+distributed!
 
 ## Build instructions (Unix-like OSes)
 
