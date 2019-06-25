@@ -28,13 +28,14 @@ public:
   void get_work(MpiMsg* msg);
 
 private:
-  double get_next(Runtime& runtime) const;
+  void init_size();
+  void update_segments(Runtime& runtime);
   double remaining_secs() const;
 
   int64_t z_;
-  int64_t limit_;
   int64_t low_;
   int64_t max_low_;
+  int64_t max_size_;
   int64_t segments_;
   int64_t segment_size_;
   int64_t smallest_hard_leaf_;
