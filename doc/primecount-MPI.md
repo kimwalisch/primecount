@@ -50,9 +50,9 @@ multi&#8209;threading.
 * Be careful when submitting multiple future primecount MPI jobs, they
   might be run simultaneously on the same hardware instead of one after
   the other. This will of course deteriorate performance.
-* Ideally all cluster nodes (including the master node) should have an
-  equal number of CPU cores because primecount MPI evenly (statically)
-  distributes the work among the cluster nodes.
+* Ideally all cluster nodes should have an equal number of CPU cores
+  because primecount MPI evenly (statically) distributes the work among
+  the cluster nodes.
 * If possible you should
   [enable transparent huge pages](https://github.com/kimwalisch/primecount#performance-tips)
   on all cluster nodes in order to reduce [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
