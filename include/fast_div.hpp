@@ -6,7 +6,7 @@
 ///        this by casting x and y to smaller types (if possible)
 ///        before doing the division.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -64,6 +64,49 @@ fast_div(X x, Y y)
     return (fastdiv_t) x / (fastdiv_t) y;
 
   return x / y;
+}
+
+template <typename R, typename X, typename Y>
+typename std::enable_if<(sizeof(R) == sizeof(uint64_t) &&
+                         sizeof(X) == sizeof(uint128_t) &&
+                         sizeof(Y) <= sizeof(uint64_t)), R>::type
+fast_div(X x, Y y)
+{
+#if defined(__x86_64__) && \
+   (defined(__GNUC__) || defined(__clang__))
+
+  // primecount does not need signed division so 
+  // we use the unsigned division instruction further
+  // down as DIV is usually faster than IDIV.
+  assert(x >= 0 && y >= 0);
+
+  uint64_t result;
+  uint64_t remainder;
+  uint64_t x0 = (uint64_t) x;
+  uint64_t x1 = (uint64_t) (x >> 64);
+  uint64_t d = y;
+
+  // We know the result is 64-bit (even though the
+  // numerator is 128-bit) so we can use the divq
+  // instruction instead of doing a full 128-bit division.
+  __asm__("divq %[d]"
+          : "=a"(result), "=d"(remainder)
+          : [d] "r"(d), "a"(x0), "d"(x1)
+          );
+
+  return result;
+#else
+  return (uint64_t) fast_div(x, y);
+#endif
+}
+
+template <typename R, typename X, typename Y>
+typename std::enable_if<!(sizeof(R) == sizeof(uint64_t) &&
+                          sizeof(X) == sizeof(uint128_t) &&
+                          sizeof(Y) <= sizeof(uint64_t)), R>::type
+fast_div(X x, Y y)
+{
+  return fast_div(x, y);
 }
 
 } // namespace
