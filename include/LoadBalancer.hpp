@@ -40,7 +40,7 @@ public:
 private:
   void init_size();
   void update(int64_t* low, int64_t* segments, Runtime& runtime);
-  double get_next(Runtime& runtime) const;
+  void update_segments(Runtime& runtime);
   double remaining_secs() const;
 
   int64_t low_;

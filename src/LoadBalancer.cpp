@@ -21,7 +21,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -105,7 +105,6 @@ bool LoadBalancer::get_work(int64_t* low,
     *low = low_;
     *segments = segments_;
     *segment_size = segment_size_;
-
     low_ += segments_ * segment_size_;
 
     if (is_print())
@@ -127,22 +126,16 @@ void LoadBalancer::update(int64_t* low,
     if (segment_size_ < max_size_)
       segment_size_ = min(segment_size_ * 2, max_size_);
     else
-    {
-      double next = get_next(runtime);
-      next = in_between(0.25, next, 2.0);
-      next *= segments_;
-      next = max(1.0, next);
-      segments_ = (int64_t) next;
-    }
+      update_segments(runtime);
   }
-
-  auto high = low_ + segments_ * segment_size_;
 
   // Most hard special leaves are located just past
   // smallest_hard_leaf_. In order to prevent assigning
   // the bulk of work to a single thread we reduce
   // the number of segments to a minimum.
-  //
+
+  int64_t high = low_ + segments_ * segment_size_;
+
   if (smallest_hard_leaf_ >= low_ &&
       smallest_hard_leaf_ <= high)
   {
@@ -150,30 +143,45 @@ void LoadBalancer::update(int64_t* low,
   }
 }
 
-double LoadBalancer::get_next(Runtime& runtime) const
-{
-  double min_secs = runtime.init * 10;
-  double run_secs = runtime.secs;
-
-  min_secs = max(min_secs, 0.01);
-  run_secs = max(run_secs, min_secs / 10);
-
-  double rem = remaining_secs();
-  double threshold = rem / 4;
-  threshold = max(threshold, min_secs);
-
-  return threshold / run_secs;
-}
-
 /// Remaining seconds till finished
 double LoadBalancer::remaining_secs() const
 {
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
   percent = in_between(20, percent, 100);
-
   double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
+}
+
+/// Increase or decrease the number of segments based on the
+/// remaining runtime. Near the end it is important that
+/// threads run only for a short amount of time in order to
+/// ensure all threads finish nearly at the same time.
+///
+void LoadBalancer::update_segments(Runtime& runtime)
+{
+  double rem = remaining_secs();
+  double threshold = rem / 8;
+  double min_secs = 0.01;
+
+  // Each thread should run at least 10x
+  // longer than its initialization time
+  threshold = max(threshold, runtime.init * 10);
+  threshold = max(threshold, min_secs);
+
+  // divider must not be 0
+  double divider = max(runtime.secs, min_secs / 10);
+  double factor = threshold / divider;
+  factor = in_between(0.5, factor, 2.0);
+
+  // Prevent threads from running for very long periods of time
+  if (runtime.secs > min_secs &&
+      runtime.secs > runtime.init * 1000)
+    factor = min(factor, 0.8);
+
+  double new_segments = round(segments_ * factor);
+  segments_ = (int64_t) new_segments;
+  segments_ = max(segments_, 1);
 }
 
 } // namespace
