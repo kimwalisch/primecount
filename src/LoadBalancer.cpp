@@ -147,7 +147,7 @@ void LoadBalancer::update(int64_t* low,
 double LoadBalancer::remaining_secs() const
 {
   double percent = status_.getPercent(low_, z_, s2_total_, s2_approx_);
-  percent = in_between(20, percent, 100);
+  percent = in_between(10, percent, 100);
   double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
