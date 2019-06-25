@@ -172,13 +172,18 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // divider must not be 0
   double divider = max(runtime.secs, min_secs / 10);
   double factor = threshold / divider;
-  factor = in_between(0.5, factor, 2.0);
 
-  // Prevent threads from running for very long periods of time
+  // Reduce the thread runtime if it is much
+  // larger than its initialization time
   if (runtime.secs > min_secs &&
       runtime.secs > runtime.init * 1000)
-    factor = min(factor, 0.8);
+  {
+    double old = factor;
+    factor = (runtime.init * 1000) / runtime.secs;
+    factor = min(factor, old);
+  }
 
+  factor = in_between(0.5, factor, 2.0);
   double new_segments = round(segments_ * factor);
   segments_ = (int64_t) new_segments;
   segments_ = max(segments_, 1);
