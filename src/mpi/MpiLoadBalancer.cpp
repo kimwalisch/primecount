@@ -104,13 +104,13 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
     }
   }
 
-  auto high = low_ + segments_ * segment_size_;
-
   // Most hard special leaves are located just past
   // smallest_hard_leaf_. In order to prevent assigning
   // the bulk of work to a single thread we reduce
   // the number of segments to a minimum.
-  //
+
+  int64_t high = low_ + segments_ * segment_size_;
+
   if (smallest_hard_leaf_ >= low_ &&
       smallest_hard_leaf_ <= high)
   {
@@ -121,6 +121,16 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
   msg->update(low_, segments_, segment_size_);
   low_ += segments_ * segment_size_;
   low_ = min(low_, z_ + 1);
+}
+
+/// Remaining seconds till finished
+double MpiLoadBalancer::remaining_secs() const
+{
+  double percent = status_.getPercent(low_, z_, s2_hard_, s2_approx_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
 }
 
 /// Increase or decrease the number of segments based on the
@@ -152,16 +162,6 @@ void MpiLoadBalancer::update_segments(Runtime& runtime)
   double new_segments = round(segments_ * factor);
   segments_ = (int64_t) new_segments;
   segments_ = max(segments_, 1);
-}
-
-/// Remaining seconds till finished
-double MpiLoadBalancer::remaining_secs() const
-{
-  double percent = status_.getPercent(low_, z_, s2_hard_, s2_approx_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
 }
 
 } // namespace
