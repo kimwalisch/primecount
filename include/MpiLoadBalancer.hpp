@@ -32,12 +32,12 @@ private:
   void update_segments(Runtime& runtime);
   double remaining_secs() const;
 
-  int64_t z_;
   int64_t low_;
   int64_t max_low_;
-  int64_t max_size_;
+  int64_t z_;
   int64_t segments_;
   int64_t segment_size_;
+  int64_t max_size_;
   int64_t smallest_hard_leaf_;
   maxint_t s2_hard_;
   maxint_t s2_approx_;
