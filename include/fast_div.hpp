@@ -66,13 +66,16 @@ fast_div(X x, Y y)
   return x / y;
 }
 
+/// Optimized (128-bit / 64-bit) = 64-bit, for x64.
+/// uint64_t fast_div(uint128_t x, uint64_t x)
 template <typename R, typename X, typename Y>
 typename std::enable_if<(sizeof(R) == sizeof(uint64_t) &&
-                         sizeof(X) == sizeof(uint128_t) &&
+                         sizeof(X) == sizeof(uint64_t) * 2 &&
                          sizeof(Y) <= sizeof(uint64_t)), R>::type
 fast_div(X x, Y y)
 {
 #if defined(__x86_64__) && \
+    defined(HAVE_INT128_T) && \
    (defined(__GNUC__) || defined(__clang__))
 
   // primecount does not need signed division so 
@@ -80,18 +83,19 @@ fast_div(X x, Y y)
   // down as DIV is usually faster than IDIV.
   assert(x >= 0 && y >= 0);
 
+  uint128_t xu = x;
+  uint64_t x0 = (uint64_t) xu;
+  uint64_t x1 = (uint64_t) (xu >> 64);
+  uint64_t divider = y;
   uint64_t result;
   uint64_t remainder;
-  uint64_t x0 = (uint64_t) x;
-  uint64_t x1 = (uint64_t) (x >> 64);
-  uint64_t d = y;
 
   // We know the result is 64-bit (even though the
   // numerator is 128-bit) so we can use the divq
   // instruction instead of doing a full 128-bit division.
-  __asm__("divq %[d]"
+  __asm__("divq %[divider]"
           : "=a"(result), "=d"(remainder)
-          : [d] "r"(d), "a"(x0), "d"(x1)
+          : [divider] "r"(divider), "a"(x0), "d"(x1)
           );
 
   return result;
@@ -102,7 +106,7 @@ fast_div(X x, Y y)
 
 template <typename R, typename X, typename Y>
 typename std::enable_if<!(sizeof(R) == sizeof(uint64_t) &&
-                          sizeof(X) == sizeof(uint128_t) &&
+                          sizeof(X) == sizeof(uint64_t) * 2 &&
                           sizeof(Y) <= sizeof(uint64_t)), R>::type
 fast_div(X x, Y y)
 {
