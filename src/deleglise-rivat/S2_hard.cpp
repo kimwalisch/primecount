@@ -109,7 +109,7 @@ T S2_hard_thread(T x,
         if (prime < factor.lpf(m))
         {
           int64_t fm = factor.get_number(m);
-          int64_t xn = (int64_t) fast_div(x2, fm);
+          int64_t xn = fast_div64(x2, fm);
           int64_t stop = xn - low;
           count += sieve.count(start, stop, low, high, count, count_low_high);
           start = stop + 1;
@@ -142,7 +142,7 @@ T S2_hard_thread(T x,
 
       for (; primes[l] > min_hard; l--)
       {
-        int64_t xn = (int64_t) fast_div(x2, primes[l]);
+        int64_t xn = fast_div64(x2, primes[l]);
         int64_t stop = xn - low;
         count += sieve.count(start, stop, low, high, count, count_low_high);
         start = stop + 1;
