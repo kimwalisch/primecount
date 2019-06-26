@@ -87,8 +87,9 @@ fast_div64(X x, Y y)
   uint64_t x1 = ((uint64_t*) &x)[1];
   uint64_t d = y;
 
-  // We know the result is 64-bit (even though the
-  // numerator is 128-bit) so we can use the divq
+  // (128-bit / 64-bit) = 64-bit.
+  // When we know the result fits into 64-bit (even
+  // though the numerator is 128-bit) we can use the divq
   // instruction instead of doing a full 128-bit division.
   __asm__("divq %[divider]"
           : "=a"(result), "=d"(remainder)
