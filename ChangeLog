@@ -1,3 +1,14 @@
+2019-06-26 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 4.8 work in progress.
+
+  * LoadBalancer.cpp: Improve scaling.
+  * MpiLoadBalancer.cpp: Improve scaling.
+  * fast_div.hpp: x64 assembly for (128-bit / 64-bit) = 64-bit.
+  * libdivide.h: Update to libdivide-2.0.
+  * appveyor.yml: Treat compiler warnings as errors.
+  * doc/primecount-MPI.md: Update documentation.
+
 2019-04-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.7 released.
