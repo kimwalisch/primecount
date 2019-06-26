@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancer.hpp
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,7 +49,7 @@ private:
   void update(int64_t* low, int64_t* segments, Runtime& runtime);
   void backup(int thread_id, int64_t low, int64_t segments, int64_t segment_size);
   void backup(int thread_id);
-  double get_next(Runtime& runtime) const;
+  void update_segments(Runtime& runtime);
   double remaining_secs() const;
 
   int64_t low_;
