@@ -2,7 +2,7 @@
 /// @file  primecount.hpp
 /// @brief primecount C++ API
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License.
 ///
@@ -14,9 +14,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "4.7"
+#define PRIMECOUNT_VERSION "4.8"
 #define PRIMECOUNT_VERSION_MAJOR 4
-#define PRIMECOUNT_VERSION_MINOR 7
+#define PRIMECOUNT_VERSION_MINOR 8
 
 namespace primecount {
 

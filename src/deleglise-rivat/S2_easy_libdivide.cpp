@@ -5,7 +5,7 @@
 ///        divides with comparatively cheap multiplication and
 ///        bitshifts.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,7 +13,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
+#include <fast_div.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -244,9 +244,9 @@ T S2_easy(T x,
     // where phi(x / n, b - 1) = pi(x / n) - b + 2
     while (l > pi_min_clustered)
     {
-      int64_t xn = (int64_t) (x2 / primes[l]);
+      int64_t xn = fast_div64(x2, primes[l]);
       int64_t phi_xn = pi[xn] - b + 2;
-      int64_t xm = (int64_t) (x2 / primes[b + phi_xn - 1]);
+      int64_t xm = fast_div64(x2, primes[b + phi_xn - 1]);
       int64_t l2 = pi[xm];
       s2_easy += phi_xn * (l - l2);
       l = l2;
@@ -257,7 +257,7 @@ T S2_easy(T x,
     // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
     for (; l > pi_min_sparse; l--)
     {
-      int64_t xn = (int64_t) (x2 / primes[l]);
+      int64_t xn = fast_div64(x2, primes[l]);
       s2_easy += pi[xn] - b + 2;
     }
   }
