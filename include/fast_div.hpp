@@ -101,6 +101,7 @@ fast_div64(X x, Y y)
 #endif
 }
 
+/// (?-bit / 64-bit) = 64-bit
 template <typename X, typename Y>
 typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
                           sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
