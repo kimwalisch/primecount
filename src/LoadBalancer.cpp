@@ -351,10 +351,10 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // Reduce the thread runtime if it is much
   // larger than its initialization time
   if (runtime.secs > min_secs &&
-      runtime.secs > runtime.init * 1000)
+      runtime.secs > runtime.init * 200)
   {
     double old = factor;
-    factor = (runtime.init * 1000) / runtime.secs;
+    factor = (runtime.init * 200) / runtime.secs;
     factor = min(factor, old);
   }
 
