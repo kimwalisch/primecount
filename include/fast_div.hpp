@@ -67,12 +67,11 @@ fast_div(X x, Y y)
 }
 
 /// Optimized (128-bit / 64-bit) = 64-bit, for x64.
-/// uint64_t fast_div(uint128_t x, uint64_t x)
-template <typename R, typename X, typename Y>
-typename std::enable_if<(sizeof(R) == sizeof(uint64_t) &&
-                         sizeof(X) == sizeof(uint64_t) * 2 &&
-                         sizeof(Y) <= sizeof(uint64_t)), R>::type
-fast_div(X x, Y y)
+/// uint64_t fast_div64(uint128_t x, uint64_t x)
+template <typename X, typename Y>
+typename std::enable_if<(sizeof(X) == sizeof(uint64_t) * 2 &&
+                         sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
+fast_div64(X x, Y y)
 {
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
@@ -98,17 +97,16 @@ fast_div(X x, Y y)
 
   return result;
 #else
-  return (R) fast_div(x, y);
+  return (uint64_t) fast_div(x, y);
 #endif
 }
 
-template <typename R, typename X, typename Y>
-typename std::enable_if<!(sizeof(R) == sizeof(uint64_t) &&
-                          sizeof(X) == sizeof(uint64_t) * 2 &&
-                          sizeof(Y) <= sizeof(uint64_t)), R>::type
-fast_div(X x, Y y)
+template <typename X, typename Y>
+typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
+                          sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
+fast_div64(X x, Y y)
 {
-  return (R) fast_div(x, y);
+  return (uint64_t) fast_div(x, y);
 }
 
 } // namespace
