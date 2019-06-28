@@ -161,7 +161,7 @@ double LoadBalancer::remaining_secs() const
 void LoadBalancer::update_segments(Runtime& runtime)
 {
   double rem = remaining_secs();
-  double threshold = rem / 8;
+  double threshold = rem / 4;
   double min_secs = 0.01;
 
   // Each thread should run at least 10x
