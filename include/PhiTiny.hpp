@@ -9,7 +9,7 @@
 ///        pp = 2 * 3 * ... * prime[a]
 ///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,6 +17,8 @@
 
 #ifndef PHITINY_HPP
 #define PHITINY_HPP
+
+#include <fast_div.hpp>
 
 #include <stdint.h>
 #include <array>
@@ -73,8 +75,12 @@ inline bool is_phi_tiny(int64_t a)
 template <typename T>
 T phi_tiny(T x, int64_t a)
 {
-  if (x <= std::numeric_limits<uint32_t>::max())
-    return phiTiny.phi((uint32_t) x, a);
+  using fastdiv_t = typename fastdiv<T>::type;
+
+  // If possible use smaller integer type
+  // to speed up integer division
+  if (x <= std::numeric_limits<fastdiv_t>::max())
+    return phiTiny.phi((fastdiv_t) x, a);
   else
     return phiTiny.phi(x, a);
 }
