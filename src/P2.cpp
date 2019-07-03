@@ -88,13 +88,13 @@ T P2_thread(T x,
   int64_t prime = rit.prev_prime();
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
-  while (prime > start &&
-         x / prime < z)
+  while (prime > start)
   {
     int64_t xp = (int64_t)(x / prime);
+    if (xp >= z) break;
     pix += count_primes(it, next, xp);
-    p2 += pix;
     pix_count++;
+    p2 += pix;
     prime = rit.prev_prime();
   }
 
