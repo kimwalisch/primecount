@@ -4,7 +4,7 @@
 ///        numbers <= x that have exactly 2 prime factors
 ///        each exceeding the a-th prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,9 +29,7 @@ using namespace primecount;
 
 namespace {
 
-/// Count the primes inside [prime, stop]
-template <typename T>
-int64_t count_primes(primesieve::iterator& it, int64_t& prime, T stop)
+int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
 {
   int64_t count = 0;
 
@@ -74,8 +72,10 @@ T P2_thread(T x,
             int64_t& pix,
             int64_t& pix_count)
 {
+  T p2 = 0;
   pix = 0;
   pix_count = 0;
+
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
   int64_t start = (int64_t) max(x / z, y);
@@ -86,15 +86,15 @@ T P2_thread(T x,
 
   int64_t next = it.next_prime();
   int64_t prime = rit.prev_prime();
-  T p2 = 0;
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
-  while (prime > start &&
-         x / prime < z)
+  while (prime > start)
   {
-    pix += count_primes(it, next, x / prime);
-    p2 += pix;
+    int64_t xp = (int64_t)(x / prime);
+    if (xp >= z) break;
+    pix += count_primes(it, next, xp);
     pix_count++;
+    p2 += pix;
     prime = rit.prev_prime();
   }
 
