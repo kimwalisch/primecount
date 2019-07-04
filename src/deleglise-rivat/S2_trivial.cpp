@@ -1,7 +1,9 @@
 ///
 /// @file  S2_trivial.cpp
-/// @brief Calculate the contribution of the trivial special leaves
-///        in parallel using OpenMP.
+/// @brief Calculate the contribution of the trivial special leaves.
+///        Since this can be calculated very quickly using only
+///        about O(alpha * n^(1/3)) time, there is no need to use
+///        multi-threading.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,42 +27,45 @@ using namespace primecount;
 
 namespace {
 
+/// Find all trivial leaves: n = primes[b] * primes[l]
+/// which satisfy phi(x / n), b - 1) = 1.
+/// Hence we only need to calculate their number!
+///
 template <typename T>
-T S2_trivial_OpenMP(T x,
-                    int64_t y,
-                    int64_t z,
-                    int64_t c,
-                    int threads)
+T S2_trivial(T x,
+             int64_t y,
+             int64_t z,
+             int64_t c)
 {
-  int64_t thread_threshold = ipow(10, 7);
-  threads = ideal_num_threads(threads, y, thread_threshold);
-
   PiTable pi(y);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
+  int64_t start = max(prime_c, sqrtz) + 1;
+  primesieve::iterator it(start - 1, y);
 
   T s2_trivial = 0;
+  int64_t prime;
 
-  // Find all trivial leaves: n = primes[b] * primes[l]
-  // which satisfy phi(x / n), b - 1) = 1
-  #pragma omp parallel for num_threads(threads) reduction(+: s2_trivial)
-  for (int64_t i = 0; i < threads; i++)
+  // Goes up to ~ x^(1/3)
+  while ((prime = it.next_prime()) < y)
   {
-    int64_t start = max(prime_c, sqrtz) + 1;
-    int64_t thread_distance = ceil_div(y - start, threads);
-    start += thread_distance * i;
-    int64_t stop = min(start + thread_distance, y);
-    primesieve::iterator it(start - 1, stop);
-    int64_t prime;
+    T n = (T) prime * prime;
+    int64_t xn = (int64_t)(x / n);
+    if (xn <= prime) break;
+    s2_trivial += pi_y - pi[xn];
+  }
 
-    while ((prime = it.next_prime()) < stop)
-    {
-      T n = (T) prime * prime;
-      int64_t xn = (int64_t)(x / n);
-      xn = max(prime, xn);
-      s2_trivial += pi_y - pi[xn];
-    }
+  if (prime < y)
+  {
+    // \sum_{i = pi[prime]}^{pi[y-1]} pi[y] - i
+    // Formula above can be calculated using:
+    // https://en.wikipedia.org/wiki/Arithmetic_progression
+    // sum = n * (a1 + a2) / 2
+    T n = (pi[y-1] - pi[prime]) + 1;
+    T a1 = pi[y] - pi[y-1];
+    T a2 = pi[y] - pi[prime];
+    s2_trivial += n * (a1 + a2) / 2;
   }
 
   return s2_trivial;
@@ -82,7 +87,7 @@ int64_t S2_trivial(int64_t x,
   print(x, y, c, threads);
 
   double time = get_time();
-  int64_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+  int64_t s2_trivial = ::S2_trivial(x, y, z, c);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
@@ -102,7 +107,7 @@ int128_t S2_trivial(int128_t x,
   print(x, y, c, threads);
 
   double time = get_time();
-  int128_t s2_trivial = S2_trivial_OpenMP(x, y, z, c, threads);
+  int128_t s2_trivial = ::S2_trivial(x, y, z, c);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
