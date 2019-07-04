@@ -32,10 +32,10 @@ namespace {
 /// Hence we only need to calculate their number!
 ///
 template <typename T>
-T S2_trivial(T x,
-             int64_t y,
-             int64_t z,
-             int64_t c)
+T get_S2_trivial(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c)
 {
   PiTable pi(y);
   int64_t pi_y = pi[y];
@@ -78,16 +78,15 @@ namespace primecount {
 int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t z,
-                   int64_t c,
-                   int threads)
+                   int64_t c)
 {
   print("");
   print("=== S2_trivial(x, y) ===");
   print("Computation of the trivial special leaves");
-  print(x, y, c, threads);
+  print(x, y, c, /* threads */ 1);
 
   double time = get_time();
-  int64_t s2_trivial = ::S2_trivial(x, y, z, c);
+  int64_t s2_trivial = get_S2_trivial(x, y, z, c);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
@@ -98,16 +97,15 @@ int64_t S2_trivial(int64_t x,
 int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t z,
-                    int64_t c,
-                    int threads)
+                    int64_t c)
 {
   print("");
   print("=== S2_trivial(x, y) ===");
   print("Computation of the trivial special leaves");
-  print(x, y, c, threads);
+  print(x, y, c, /* threads */ 1);
 
   double time = get_time();
-  int128_t s2_trivial = ::S2_trivial(x, y, z, c);
+  int128_t s2_trivial = get_S2_trivial(x, y, z, c);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
