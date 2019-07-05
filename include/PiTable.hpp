@@ -1,11 +1,13 @@
 ///
 /// @file  PiTable.hpp
 /// @brief The PiTable class is a compressed lookup table for
-///        prime counts. It uses only (n / 4) bytes of memory
-///        and returns the number of primes <= n in O(1)
+///        prime counts. Each bit in the lookup table corresponds
+///        to an odd integer and that bit is set to 1 if the
+///        integer is a prime. PiTable uses only (n / 8) bytes of
+///        memory and returns the number of primes <= n in O(1)
 ///        operations.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,6 +19,7 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
+#include <array>
 #include <cassert>
 #include <vector>
 
@@ -31,8 +34,18 @@ public:
   int64_t operator[](uint64_t n) const
   {
     assert(n <= max_);
-    uint64_t bitmask = 0xffffffffffffffffull >> (63 - n % 64);
-    return pi_[n / 64].prime_count + popcnt64(pi_[n / 64].bits & bitmask);
+
+    // Since we store only odd numbers in our lookup table,
+    // we cannot store 2 which is the only even prime.
+    // As a workaround we mark 1 as a prime (1st bit) and
+    // add a check to return 0 for pi[1].
+    if (n == 1)
+      return 0;
+
+    uint64_t bitmask = unset_bits_[n % 128];
+    uint64_t prime_count = pi_[n / 128].prime_count;
+    uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
+    return prime_count + bit_count;
   }
 
   int64_t size() const
@@ -46,6 +59,7 @@ private:
     uint64_t bits = 0;
   };
 
+  static const std::array<uint64_t, 128> unset_bits_;
   std::vector<PiData> pi_;
   uint64_t max_;
 };
