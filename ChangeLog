@@ -1,10 +1,13 @@
-2019-06-26 Kim Walisch  <kim.walisch@gmail.com>
+2019-07-05 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.8 work in progress.
 
+  * PiTable.cpp: Reduce memory usage by 2x.
   * LoadBalancer.cpp: Improve scaling.
   * MpiLoadBalancer.cpp: Improve scaling.
   * fast_div.hpp: x64 assembly for (128-bit / 64-bit) = 64-bit.
+  * phi_tiny.hpp: Speedup for 128-bit integers.
+  * S2_trivial.cpp: Implement O(1) math formula.
   * libdivide.h: Update to libdivide-2.0.
   * appveyor.yml: Treat compiler warnings as errors.
   * doc/primecount-MPI.md: Update documentation.

@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -181,7 +181,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c)
 {
-  int64_t s2_trivial = S2_trivial(x, y, z, c, 1);
+  int64_t s2_trivial = S2_trivial(x, y, z, c);
   int64_t s2_easy = S2_easy(x, y, z, c, 1);
   int64_t s2_hard = S2_hard(x, y, z, c);
   int64_t s2 = s2_trivial + s2_easy + s2_hard;

@@ -21,16 +21,14 @@ namespace primecount {
 int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t z,
-                   int64_t c,
-                   int threads);
+                   int64_t c);
 
 #ifdef HAVE_INT128_T
 
 int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t z,
-                    int64_t c,
-                    int threads);
+                    int64_t c);
 
 #endif
 

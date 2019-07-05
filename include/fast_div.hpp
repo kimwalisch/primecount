@@ -81,8 +81,6 @@ fast_div64(X x, Y y)
   // down as DIV is usually faster than IDIV.
   assert(x >= 0 && y > 0);
 
-  uint64_t result;
-  uint64_t remainder;
   uint64_t x0 = (uint64_t) x;
   uint64_t x1 = ((uint64_t*) &x)[1];
   uint64_t d = y;
@@ -92,11 +90,9 @@ fast_div64(X x, Y y)
   // though the numerator is 128-bit) we can use the divq
   // instruction instead of doing a full 128-bit division.
   __asm__("divq %[divider]"
-          : "=a"(result), "=d"(remainder)
-          : "a"(x0), "d"(x1), [divider] "r"(d)
-          );
+          : "+a"(x0), "+d"(x1) : [divider] "r"(d));
 
-  return result;
+  return x0;
 #else
   return (uint64_t) fast_div(x, y);
 #endif

@@ -2,7 +2,7 @@
 /// @file   main.cpp
 /// @brief  primecount console application
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -169,7 +169,7 @@ maxint_t S1(maxint_t x, int threads)
     return S1(x, y, c, threads);
 }
 
-maxint_t S2_trivial(maxint_t x, int threads)
+maxint_t S2_trivial(maxint_t x)
 {
   if (x < 1)
     return 0;
@@ -188,9 +188,9 @@ maxint_t S2_trivial(maxint_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= numeric_limits<int64_t>::max())
-    return S2_trivial((int64_t) x, y, z, c, threads);
+    return S2_trivial((int64_t) x, y, z, c);
   else
-    return S2_trivial(x, y, z, c, threads);
+    return S2_trivial(x, y, z, c);
 }
 
 maxint_t S2_easy(maxint_t x, int threads)
@@ -331,7 +331,7 @@ int main (int argc, char* argv[])
         res = S2_hard(x, threads);
         time = backup_time(time, "S2_hard"); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x, threads);
+        res = S2_trivial(x); break;
         time = backup_time(time, "S2_trivial"); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:

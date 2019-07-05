@@ -4,7 +4,7 @@
 ///        in the Lagarias-Miller-Odlyzko and Deleglise-
 ///        Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -77,14 +77,14 @@ bool resume(T x,
 template <int MU, typename T, typename P>
 T S1_thread(T x,
             int64_t y,
-            int64_t b,
+            uint64_t b,
             int64_t c,
             T square_free,
             vector<P>& primes)
 {
   T s1 = 0;
 
-  for (b += 1; b < (int64_t) primes.size(); b++)
+  for (b++; b < primes.size(); b++)
   {
     T next = square_free * primes[b];
     if (next > y) break;
