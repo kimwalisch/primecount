@@ -66,10 +66,10 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t pi_y = pi_legendre(y, threads);
   int64_t c = PhiTiny::get_c(y);
 
-  print("");
-  print("=== pi_deleglise_rivat_parallel1(x) ===");
-  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, alpha, threads);
+  print_log("");
+  print_log("=== pi_deleglise_rivat_parallel1(x) ===");
+  print_log("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+  print_log(x, y, z, c, alpha, threads);
 
   int64_t p2 = P2(x, y, threads);
   int64_t s1 = S1(x, y, c, threads);
