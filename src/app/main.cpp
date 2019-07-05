@@ -331,7 +331,7 @@ int main (int argc, char* argv[])
         res = S2_hard(x, threads);
         time = backup_time(time, "S2_hard"); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x); break;
+        res = S2_trivial(x);
         time = backup_time(time, "S2_trivial"); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_PARALLEL2:
