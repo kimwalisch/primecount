@@ -27,7 +27,7 @@
     defined(__clang__)
   #define unlikely(x) __builtin_expect(!!(x), 0)
 #else
-  #define unlikely(x) (!!(x))
+  #define unlikely(x) (x)
 #endif
 
 namespace primecount {
