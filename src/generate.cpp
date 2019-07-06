@@ -1,7 +1,7 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -80,14 +80,26 @@ vector<int32_t> generate_moebius(int64_t max)
   return mu;
 }
 
-/// Generate a vector with the least prime factors
-/// of the integers <= max
+/// Generate a vector with the least prime factors of
+/// of the integers <= max.
+/// @Examples: lfp(2) = 2, lpf(15) = 3
 ///
 vector<int32_t> generate_lpf(int64_t max)
 {
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
   vector<int32_t> lpf(size, 1);
+
+  // By convention lfp(1) = +Infinity. Note that lpf(n) is
+  // named pmin(n) in Tomás Oliveira e Silva's paper:
+  // "Computing π(x): the combinatorial method".
+  // The reason why lfp(1) is defined to be +Infinity is
+  // that phi(x / 1, c) contributes to the ordinary leaves
+  // (S1) in the Lagarias-Miller-Odlyzko and
+  // Deleglise-Rivat prime counting algorithms. And
+  // lfp(1) = +Infinity allows to simplify that algorithm.
+  if (lpf.size() > 1)
+    lpf[1] = numeric_limits<int32_t>::max();
 
   for (int64_t i = 2; i <= sqrt; i++)
     if (lpf[i] == 1)
@@ -98,12 +110,6 @@ vector<int32_t> generate_lpf(int64_t max)
   for (int64_t i = 2; i < size; i++)
     if (lpf[i] == 1)
       lpf[i] = (int32_t) i;
-
-  // phi(x / 1, c) contributes to the sum in the
-  // Lagarias-Miller-Odlyzko prime counting algorithm,
-  // thus set lpf[1] = MAX (normally lpf[1] = 1)
-  if (lpf.size() > 1)
-    lpf[1] = numeric_limits<int32_t>::max();
 
   return lpf;
 }
