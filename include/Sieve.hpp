@@ -58,12 +58,6 @@ public:
   /// Count 1 bits inside [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
 
-  /// Count 1 bits inside [0, stop]
-  uint64_t count(uint64_t stop) const
-  {
-    return count(0, stop);
-  }
-
   /// Count 1 bits inside [start, stop].
   /// This method counts either forwards or backwards 
   /// depending on what's faster.
