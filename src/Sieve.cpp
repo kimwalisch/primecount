@@ -157,25 +157,33 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 
 /// Pre-sieve the multiples of the first
 /// c primes inside [low, high[.
+/// @return: Count of 1 bits inside [low, high[
 ///
-void Sieve::pre_sieve(uint64_t c, uint64_t low, uint64_t high)
+uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low, uint64_t high)
 {
   fill(sieve_.begin(), sieve_.end(), 0xff);
 
+  uint64_t bits_per_byte = 8;
+  uint64_t bit_count = sieve_.size() * bits_per_byte;
   uint64_t size = high - low;
 
   if (size < segment_size())
   {
     set_sieve_size(size);
     auto sieve = (uint64_t*) &sieve_[0];
-    uint64_t back = size - 1;
-    sieve[back / 240] &= unset_larger[back % 240];
+    uint64_t last = size - 1;
+    uint64_t last_idx = last / 240;
+    sieve[last_idx] &= unset_larger[last % 240];
+    bit_count = last_idx * sizeof(uint64_t) * bits_per_byte;
+    bit_count += popcnt64(sieve[last_idx]);
   }
 
   assert(c < primes.size());
 
   for (uint64_t i = 4; i <= c; i++)
-    cross_off(i, primes[i]);
+    bit_count -= cross_off(i, primes[i]);
+
+  return bit_count;
 }
 
 /// Add a sieving prime to the sieve.

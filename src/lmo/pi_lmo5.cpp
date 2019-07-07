@@ -7,7 +7,7 @@
 ///        Mathematics of Computation, 44 (1985), by J. C. Lagarias,
 ///        V. S. Miller and A. M. Odlyzko.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -63,9 +63,7 @@ int64_t S2(int64_t x,
     int64_t low1 = max(low, 1);
 
     // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low, high);
-
-    int64_t count_low_high = sieve.count((high - 1) - low);
+    int64_t count_low_high = sieve.pre_sieve(c, low, high);
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
