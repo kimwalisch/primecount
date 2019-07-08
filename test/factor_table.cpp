@@ -3,7 +3,7 @@
 /// @brief  FactorTable is a compressed lookup table
 ///         of mu (moebius) and lpf (least prime factor).
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,24 +39,34 @@ int main()
   auto lpf = generate_lpf(max);
   auto mu = generate_moebius(max);
 
+  vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
   FactorTable<int> factor_table(max, threads);
+  int64_t limit = factor_table.get_number(1);
 
-  for (int i = 2; i <= max; i++)
+  for (int n = 2; n <= max; n++)
   {
-    if (i % 2 != 0 &&
-        i % 3 != 0 &&
-        i % 5 != 0 &&
-        i % 7 != 0)
+    // Check if n is coprime to the primes < limit
+    for (int p : small_primes)
     {
-      if (mu[i] != 0)
-      {
-        cout << "mu(" << i << ") = " << mu[i];
-        check(mu[i] == factor_table.mu(factor_table.get_index(i)));
-
-        cout << "lpf(" << i << ") = " << lpf[i];
-        check(lpf[i] <= factor_table.lpf(factor_table.get_index(i)) + (mu[i] == 1));
-      }
+      if (p >= limit)
+        break;
+      if (n % p == 0)
+        goto not_coprime;
     }
+
+    // For performance reasons FactorTable does not support (mu[n] == 0)
+    if (mu[n] != 0)
+    {
+      int64_t i = factor_table.get_index(n);
+
+      cout << "mu(" << n << ") = " << mu[n];
+      check(mu[n] == factor_table.mu(i));
+
+      cout << "lpf(" << n << ") = " << lpf[n];
+      check(lpf[n] <= factor_table.lpf(i) + (mu[n] == 1));
+    }
+
+    not_coprime:;
   }
 
   cout << endl;
