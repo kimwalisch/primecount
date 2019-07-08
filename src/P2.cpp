@@ -148,8 +148,7 @@ void backup(J& json,
             T p2,
             double time)
 {
-  if (json.find("P2") != json.end())
-    json.erase("P2");
+  json.erase("P2");
 
   json["P2"]["x"] = to_string(x);
   json["P2"]["y"] = y;
@@ -251,8 +250,7 @@ T P2_OpenMP(T x, int64_t y, int threads, double& time)
   aligned_vector<int64_t> pix_counts(threads);
 
   if (!resume(json, x, y, z, low, thread_distance, pix_total, p2, time))
-    if (json.find("P2") != json.end())
-      json.erase("P2");
+    json.erase("P2");
 
   // \sum_{i=a+1}^{b} pi(x / primes[i])
   while (low < z)
