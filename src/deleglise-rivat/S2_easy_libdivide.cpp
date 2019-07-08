@@ -67,7 +67,8 @@ void backup(J& json,
             T s2_easy,
             double time)
 {
-  json.erase("S2_easy");
+  if (json.find("S2_easy") != json.end())
+    json.erase("S2_easy");
 
   json["S2_easy"]["x"] = to_string(x);
   json["S2_easy"]["y"] = y;
@@ -291,7 +292,8 @@ T S2_easy_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, 1000);
 
   if (!resume(json, x, y, z, s2_easy, start, time))
-    json.erase("S2_easy");
+    if (json.find("S2_easy") != json.end())
+      json.erase("S2_easy");
 
   int resume_threads = calculate_resume_threads(json, "S2_easy");
 

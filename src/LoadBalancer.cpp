@@ -117,7 +117,8 @@ void LoadBalancer::backup(int thread_id,
 
 void LoadBalancer::finish_backup()
 {
-  json_.erase("S2_hard");
+  if (json_.find("S2_hard") != json_.end())
+    json_.erase("S2_hard");
 
   json_["S2_hard"]["x"] = to_string(x_);
   json_["S2_hard"]["y"] = y_;
@@ -207,7 +208,10 @@ LoadBalancer::LoadBalancer(maxint_t x,
     }
   }
   else
-    json_.erase("S2_hard");
+  {
+    if (json_.find("S2_hard") != json_.end())
+      json_.erase("S2_hard");
+  }
 }
 
 void LoadBalancer::init_size()

@@ -52,7 +52,7 @@ const string dateTime()
   timeinfo = localtime(&rawtime);
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %X", timeinfo);
 
-  return string(buffer);
+  return buffer;
 }
 
 string basename(string path)
