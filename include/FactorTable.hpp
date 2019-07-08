@@ -60,21 +60,21 @@ public:
   static int64_t get_index(uint64_t number)
   {
     assert(number > 0);
-    uint64_t q = number / 210;
-    uint64_t r = number % 210;
-    return 48 * q + indexes_[r];
+    uint64_t q = number / 2310;
+    uint64_t r = number % 2310;
+    return 480 * q + indexes_[r];
   }
 
   static int64_t get_number(uint64_t index)
   {
-    uint64_t q = index / 48;
-    uint64_t r = index % 48;
-    return 210 * q + numbers_[r];
+    uint64_t q = index / 480;
+    uint64_t r = index % 480;
+    return 2310 * q + numbers_[r];
   }
 
 private:
-  static const uint8_t numbers_[48];
-  static const int8_t indexes_[210];
+  static const uint16_t numbers_[480];
+  static const int16_t indexes_[2310];
 };
 
 template <typename T>
