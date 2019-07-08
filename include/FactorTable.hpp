@@ -14,12 +14,13 @@
 ///
 ///        What we store in the factor_[n] lookup table:
 ///
-///         1) 0            if moebius(n) = 0
-///         2) lpf - 1      if moebius(n) = 1
-///         3) lpf          if moebius(n) = -1
-///         4) INT_MAX      if n is a prime
+///        1) INT_MAX      if n = 1
+///        2) INT_MAX      if n is a prime
+///        3) 0            if moebius(n) = 0
+///        4) lpf - 1      if moebius(n) = 1
+///        5) lpf          if moebius(n) = -1
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,9 +50,6 @@ namespace primecount {
 ///
 class AbstractFactorTable
 {
-protected:
-  virtual ~AbstractFactorTable() { }
-
 public:
   static void to_index(int64_t* number)
   {
@@ -76,7 +74,7 @@ public:
 
 private:
   static const uint8_t numbers_[48];
-  static const  int8_t indexes_[210];
+  static const int8_t indexes_[210];
 };
 
 template <typename T>
@@ -148,10 +146,11 @@ public:
   /// from the least prime factor in some situations
   /// but this does not affect our calculations.
   ///
-  /// 1) 0            if moebius(n) = 0
-  /// 2) lpf - 1      if moebius(n) = 1
-  /// 3) lpf          if moebius(n) = -1
-  /// 4) INT_MAX      if n is a prime
+  /// 1) INT_MAX      if n = 1
+  /// 2) INT_MAX      if n is a prime
+  /// 3) 0            if moebius(n) = 0
+  /// 4) lpf - 1      if moebius(n) = 1
+  /// 5) lpf          if moebius(n) = -1
   ///
   int64_t lpf(int64_t index) const
   {

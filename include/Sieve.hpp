@@ -13,7 +13,7 @@
 ///        elements that have been crossed off for the first
 ///        time in the sieve array.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -86,7 +86,7 @@ public:
 
 private:
   void set_sieve_size(uint64_t segment_size);
-  void add_wheel(uint64_t prime);
+  void add(uint64_t prime);
 
   uint64_t start_;
   std::vector<byte_t> sieve_;

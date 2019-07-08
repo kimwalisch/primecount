@@ -13,7 +13,7 @@
 ///        elements that have been crossed off for the first
 ///        time in the sieve array.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -178,11 +178,11 @@ void Sieve::pre_sieve(uint64_t c, uint64_t low, uint64_t high)
     cross_off(i, primes[i]);
 }
 
-/// Calculate the first multiple > start_ of prime
-/// that is not divisible by 2, 3, 5 and
-/// its wheel index.
+/// Add a sieving prime to the sieve.
+/// Calculates the first multiple > start_ of prime that
+/// is not divisible by 2, 3, 5 and its wheel index.
 ///
-void Sieve::add_wheel(uint64_t prime)
+void Sieve::add(uint64_t prime)
 {
   assert(start_ % 30 == 0);
 
@@ -212,7 +212,7 @@ void Sieve::add_wheel(uint64_t prime)
 uint64_t Sieve::cross_off(uint64_t i, uint64_t prime)
 {
   if (i >= wheel_.size())
-    add_wheel(prime);
+    add(prime);
 
   uint64_t cnt = 0;
   uint32_t sieve_size = (uint32_t) sieve_.size();
