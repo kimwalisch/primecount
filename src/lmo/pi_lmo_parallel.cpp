@@ -6,7 +6,7 @@
 ///        elements using POPCNT without using any special counting
 ///        tree data structure.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -173,21 +173,21 @@ int64_t S2(int64_t x,
     int64_t low = 0;
     int64_t segments = 0;
     int64_t segment_size = 0;
-    int64_t S2 = 0;
+    int64_t s2 = 0;
     Runtime runtime;
 
-    while (loadBalancer.get_work(&low, &segments, &segment_size, S2, runtime))
+    while (loadBalancer.get_work(&low, &segments, &segment_size, s2, runtime))
     {
       runtime.start();
-      S2 = S2_thread(x, y, z, c, low, segments, segment_size, pi, primes, lpf, mu, runtime);
+      s2 = S2_thread(x, y, z, c, low, segments, segment_size, pi, primes, lpf, mu, runtime);
       runtime.stop();
     }
   }
 
-  int64_t S2 = (int64_t) loadBalancer.get_result();
-  print("S2", S2, time);
+  int64_t s2 = (int64_t) loadBalancer.get_result();
+  print("S2", s2, time);
 
-  return S2;
+  return s2;
 }
 
 } // namespace
