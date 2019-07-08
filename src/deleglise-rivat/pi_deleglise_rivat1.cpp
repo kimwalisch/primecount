@@ -91,12 +91,12 @@ int64_t S2_hard(int64_t x,
   {
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
-    int64_t b = c + 1;
+    int64_t b = 1;
 
     fill(sieve.begin(), sieve.end(), 1);
 
     // pre-sieve multiples of first c primes
-    for (int64_t b = 1; b <= c; b++)
+    for (; b <= c; b++)
     {
       int64_t k = next[b];
       for (int64_t prime = primes[b]; k < high; k += prime)
