@@ -13,7 +13,7 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -83,7 +83,9 @@ T S2_hard_thread(T x,
     low1 = max(low, 1);
 
     // pre-sieve multiples of first c primes
-    int64_t count_low_high = sieve.pre_sieve(c, low, high);
+    sieve.pre_sieve(c, low, high);
+
+    int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty

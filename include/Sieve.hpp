@@ -50,13 +50,19 @@ public:
         uint64_t segment_size,
         uint64_t wheel_size);
 
-  static uint64_t get_segment_size(uint64_t size);
   uint64_t segment_size() const;
-  uint64_t pre_sieve(uint64_t c, uint64_t low, uint64_t high);
+  static uint64_t get_segment_size(uint64_t size);
+  void pre_sieve(uint64_t c, uint64_t low, uint64_t high);
   uint64_t cross_off(uint64_t i, uint64_t prime);
 
   /// Count 1 bits inside [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
+
+  /// Count 1 bits inside [0, stop]
+  uint64_t count(uint64_t stop) const
+  {
+    return count(0, stop);
+  }
 
   /// Count 1 bits inside [start, stop].
   /// This method counts either forwards or backwards 
