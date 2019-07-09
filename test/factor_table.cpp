@@ -41,7 +41,7 @@ int main()
 
   vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
   FactorTable<int> factor_table(max, threads);
-  int64_t limit = factor_table.get_number(1);
+  int64_t limit = factor_table.get_first_coprime();
 
   for (int n = 1; n <= max; n++)
   {

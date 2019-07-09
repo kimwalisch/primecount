@@ -72,6 +72,14 @@ public:
     return 2310 * q + coprime_[r];
   }
 
+  /// Returns the 1st number > 1 that is not divisible
+  /// by 2, 3, 5, 7 and 11. Hence 13 is returned.
+  ///
+  static int64_t get_first_coprime()
+  {
+    return get_number(1);
+  }
+
 private:
   static const uint16_t coprime_[480];
   static const int16_t coprime_indexes_[2310];
@@ -109,14 +117,15 @@ public:
       int64_t low = 1;
       low += thread_distance * t;
       int64_t high = std::min(low + thread_distance, y);
-      primesieve::iterator it(get_number(1) - 1);
+      int64_t start = get_first_coprime() - 1;
+      primesieve::iterator it(start);
 
       while (true)
       {
         int64_t i = 1;
         int64_t prime = it.next_prime();
         int64_t multiple = next_multiple(prime, low, &i);
-        int64_t min_m = prime * get_number(1);
+        int64_t min_m = prime * get_first_coprime();
 
         if (min_m > high)
           break;
