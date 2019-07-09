@@ -2,6 +2,9 @@
 
   Version 4.8 work in progress.
 
+  This version reduces the memory usage of S2_easy(n) by
+  15% and the memory usage of S2_hard(n) by 10%.
+
   * PiTable.cpp: Reduce memory usage by 2x.
   * FactorTable.hpp: Reduce memory usage by 10%.
   * LoadBalancer.cpp: Improve scaling.
