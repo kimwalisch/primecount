@@ -1,10 +1,10 @@
 ///
 /// @file  FactorTable.hpp
 /// @brief The FactorTable class combines the lpf[n] (least prime
-///        factor) and mu[n] (Möbius function) lookup tables into
-///        a single factor_[n] table which furthermore only
-///        contains entries for numbers which are not divisible by
-///        2, 3, 5 and 7. The factor_[n] lookup table uses 17.5
+///        factor) and mu[n] (Möbius function) lookup tables into a
+///        single factor_[n] table which furthermore only contains
+///        entries for numbers which are not divisible by 2, 3, 5, 7
+///        and 11. The factor_[n] lookup table uses up to 19.25
 ///        times less memory than the lpf[n] & mu[n] lookup tables!
 ///        factor_[n] requires only 2 bytes per entry for 32-bit
 ///        numbers and 4 bytes per entry for 64-bit numbers.
@@ -62,19 +62,19 @@ public:
     assert(number > 0);
     uint64_t q = number / 2310;
     uint64_t r = number % 2310;
-    return 480 * q + indexes_[r];
+    return 480 * q + coprime_indexes_[r];
   }
 
   static int64_t get_number(uint64_t index)
   {
     uint64_t q = index / 480;
     uint64_t r = index % 480;
-    return 2310 * q + numbers_[r];
+    return 2310 * q + coprime_[r];
   }
 
 private:
-  static const uint16_t numbers_[480];
-  static const int16_t indexes_[2310];
+  static const uint16_t coprime_[480];
+  static const int16_t coprime_indexes_[2310];
 };
 
 template <typename T>
@@ -87,7 +87,7 @@ public:
     if (y > max())
       throw primecount_error("y must be <= FactorTable::max()");
 
-    y = std::max<int64_t>(8, y);
+    y = std::max<int64_t>(1, y);
     T T_MAX = std::numeric_limits<T>::max();
     factor_.resize(get_index(y) + 1, T_MAX);
 
@@ -176,7 +176,7 @@ public:
 private:
 
   /// Find the first multiple (of prime) > low which
-  /// is not divisible by any prime <= 7
+  /// is not divisible by any prime <= 11.
   ///
   static int64_t next_multiple(int64_t prime,
                                int64_t low,
