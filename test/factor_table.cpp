@@ -43,7 +43,7 @@ int main()
   FactorTable<int> factor_table(max, threads);
   int64_t limit = factor_table.get_number(1);
 
-  for (int n = 2; n <= max; n++)
+  for (int n = 1; n <= max; n++)
   {
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)

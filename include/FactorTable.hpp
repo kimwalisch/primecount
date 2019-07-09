@@ -14,7 +14,7 @@
 ///
 ///        What we store in the factor_[n] lookup table:
 ///
-///        1) INT_MAX      if n = 1
+///        1) INT_MAX - 1  if n = 1
 ///        2) INT_MAX      if n is a prime
 ///        3) 0            if moebius(n) = 0
 ///        4) lpf - 1      if moebius(n) = 1
@@ -91,6 +91,13 @@ public:
     T T_MAX = std::numeric_limits<T>::max();
     factor_.resize(get_index(y) + 1, T_MAX);
 
+    // mu(1) = 1.
+    // 1 has zero prime factors, hence 1 has an even
+    // number of prime factors. We use the least
+    // significant bit to indicate whether the number
+    // has an even or odd number of prime factors.
+    factor_[0] ^= 1;
+
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = ipow(10, 7);
     threads = ideal_num_threads(threads, y, thread_threshold);
@@ -146,7 +153,7 @@ public:
   /// from the least prime factor in some situations
   /// but this does not affect our calculations.
   ///
-  /// 1) INT_MAX      if n = 1
+  /// 1) INT_MAX - 1  if n = 1
   /// 2) INT_MAX      if n is a prime
   /// 3) 0            if moebius(n) = 0
   /// 4) lpf - 1      if moebius(n) = 1
