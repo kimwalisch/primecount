@@ -1,10 +1,10 @@
 ///
 /// @file  FactorTable.hpp
 /// @brief The FactorTable class combines the lpf[n] (least prime
-///        factor) and mu[n] (Möbius function) lookup tables into
-///        a single factor_[n] table which furthermore only
-///        contains entries for numbers which are not divisible by
-///        2, 3, 5 and 7. The factor_[n] lookup table uses 17.5
+///        factor) and mu[n] (Möbius function) lookup tables into a
+///        single factor_[n] table which furthermore only contains
+///        entries for numbers which are not divisible by 2, 3, 5, 7
+///        and 11. The factor_[n] lookup table uses up to 19.25
 ///        times less memory than the lpf[n] & mu[n] lookup tables!
 ///        factor_[n] requires only 2 bytes per entry for 32-bit
 ///        numbers and 4 bytes per entry for 64-bit numbers.
@@ -14,7 +14,7 @@
 ///
 ///        What we store in the factor_[n] lookup table:
 ///
-///        1) INT_MAX      if n = 1
+///        1) INT_MAX - 1  if n = 1
 ///        2) INT_MAX      if n is a prime
 ///        3) 0            if moebius(n) = 0
 ///        4) lpf - 1      if moebius(n) = 1
@@ -60,21 +60,29 @@ public:
   static int64_t get_index(uint64_t number)
   {
     assert(number > 0);
-    uint64_t q = number / 210;
-    uint64_t r = number % 210;
-    return 48 * q + indexes_[r];
+    uint64_t q = number / 2310;
+    uint64_t r = number % 2310;
+    return 480 * q + coprime_indexes_[r];
   }
 
   static int64_t get_number(uint64_t index)
   {
-    uint64_t q = index / 48;
-    uint64_t r = index % 48;
-    return 210 * q + numbers_[r];
+    uint64_t q = index / 480;
+    uint64_t r = index % 480;
+    return 2310 * q + coprime_[r];
+  }
+
+  /// Returns the 1st number > 1 that is not divisible
+  /// by 2, 3, 5, 7 and 11. Hence 13 is returned.
+  ///
+  static int64_t get_first_coprime()
+  {
+    return get_number(1);
   }
 
 private:
-  static const uint8_t numbers_[48];
-  static const int8_t indexes_[210];
+  static const uint16_t coprime_[480];
+  static const int16_t coprime_indexes_[2310];
 };
 
 template <typename T>
@@ -87,9 +95,16 @@ public:
     if (y > max())
       throw primecount_error("y must be <= FactorTable::max()");
 
-    y = std::max<int64_t>(8, y);
+    y = std::max<int64_t>(1, y);
     T T_MAX = std::numeric_limits<T>::max();
     factor_.resize(get_index(y) + 1, T_MAX);
+
+    // mu(1) = 1.
+    // 1 has zero prime factors, hence 1 has an even
+    // number of prime factors. We use the least
+    // significant bit to indicate whether the number
+    // has an even or odd number of prime factors.
+    factor_[0] ^= 1;
 
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = ipow(10, 7);
@@ -102,14 +117,15 @@ public:
       int64_t low = 1;
       low += thread_distance * t;
       int64_t high = std::min(low + thread_distance, y);
-      primesieve::iterator it(get_number(1) - 1);
+      int64_t start = get_first_coprime() - 1;
+      primesieve::iterator it(start);
 
       while (true)
       {
         int64_t i = 1;
         int64_t prime = it.next_prime();
         int64_t multiple = next_multiple(prime, low, &i);
-        int64_t min_m = prime * get_number(1);
+        int64_t min_m = prime * get_first_coprime();
 
         if (min_m > high)
           break;
@@ -146,7 +162,7 @@ public:
   /// from the least prime factor in some situations
   /// but this does not affect our calculations.
   ///
-  /// 1) INT_MAX      if n = 1
+  /// 1) INT_MAX - 1  if n = 1
   /// 2) INT_MAX      if n is a prime
   /// 3) 0            if moebius(n) = 0
   /// 4) lpf - 1      if moebius(n) = 1
@@ -176,7 +192,7 @@ public:
 private:
 
   /// Find the first multiple (of prime) > low which
-  /// is not divisible by any prime <= 7
+  /// is not divisible by any prime <= 11.
   ///
   static int64_t next_multiple(int64_t prime,
                                int64_t low,
