@@ -1,8 +1,16 @@
 ///
 /// @file  P2_mpi.cpp
-/// @brief 2nd partial sieve function. P2(x, y) counts the
-///        numbers <= x that have exactly 2 prime factors
-///        each exceeding the a-th prime.
+/// @brief P2(x, a) is the 2nd partial sieve function.
+///        P2(x, a) counts the numbers <= x that have exactly 2 prime
+///        factors each exceeding the a-th prime. This implementation
+///        uses the primesieve library for quickly iterating over
+///        primes using next_prime() and prev_prime() which greatly
+///        simplifies the implementation.
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///

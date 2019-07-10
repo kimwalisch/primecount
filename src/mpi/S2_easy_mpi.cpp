@@ -1,10 +1,16 @@
 ///
 /// @file  S2_easy_mpi.cpp
 /// @brief Calculate the contribution of the clustered easy leaves
-///        and the sparse easy leaves in parallel using OpenMP
-///        (Deleglise-Rivat algorithm).
+///        and the sparse easy leaves (Deleglise-Rivat algorithm).
+///        This is a distributed implementation using MPI (Message
+///        Passing Interface) and OpenMP multi-threading.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
+///
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

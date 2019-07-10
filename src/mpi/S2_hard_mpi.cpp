@@ -1,9 +1,8 @@
 ///
 /// @file  S2_hard_mpi.cpp
 /// @brief Calculate the contribution of the hard special leaves using
-///        a prime sieve. This is a distributed implementation
-///        using MPI (Message Passing Interface) and OpenMP
-///        multi-threading.
+///        a prime sieve. This is a distributed implementation using
+///        MPI (Message Passing Interface) and OpenMP multi-threading.
 ///
 ///        Usually the computation of the hard special leaves
 ///        requires a binary indexed tree a.k.a. Fenwick tree to count
@@ -12,6 +11,11 @@
 ///        unsieved elements directly from the sieve array using the
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
 ///
 /// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
 ///
