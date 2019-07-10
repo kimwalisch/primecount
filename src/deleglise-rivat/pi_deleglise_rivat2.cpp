@@ -84,7 +84,7 @@ int64_t S2_hard(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_result = 0;
+  int64_t s2_hard = 0;
   double time = get_time();
 
   vector<char> sieve(segment_size);
@@ -135,7 +135,7 @@ int64_t S2_hard(int64_t x,
           int64_t n = prime * factor.get_number(m);
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= factor.mu(m) * phi_xn;
+          s2_hard -= factor.mu(m) * phi_xn;
         }
       }
 
@@ -161,7 +161,7 @@ int64_t S2_hard(int64_t x,
         int64_t xn = x / n;
         int64_t count = tree.count(low, xn);
         int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
+        s2_hard += phi_xn;
       }
 
       phi[b] += tree.count(low, high - 1);
@@ -171,8 +171,8 @@ int64_t S2_hard(int64_t x,
     next_segment:;
   }
 
-  print("S2_hard", S2_result, time);
-  return S2_result;
+  print("S2_hard", s2_hard, time);
+  return s2_hard;
 }
 
 /// Calculate the contribution of the special leaves

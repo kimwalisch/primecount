@@ -61,7 +61,7 @@ int64_t S2_thread(int64_t x,
   int64_t size = pi[min(isqrt(x / low1), y)] + 1;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
-  int64_t S2_thread = 0;
+  int64_t s2_thread = 0;
 
   if (c >= size - 1)
     return 0;
@@ -107,7 +107,7 @@ int64_t S2_thread(int64_t x,
           count += sieve.count(i, stop);
           i = stop + 1;
           int64_t phi_xn = phi[b] + count;
-          S2_thread -= mu[m] * phi_xn;
+          s2_thread -= mu[m] * phi_xn;
         }
       }
 
@@ -136,7 +136,7 @@ int64_t S2_thread(int64_t x,
         count += sieve.count(i, stop);
         i = stop + 1;
         int64_t phi_xn = phi[b] + count;
-        S2_thread += phi_xn;
+        s2_thread += phi_xn;
       }
 
       phi[b] += count_low_high;
@@ -146,7 +146,7 @@ int64_t S2_thread(int64_t x,
     next_segment:;
   }
 
-  return S2_thread;
+  return s2_thread;
 }
 
 /// Calculate the contribution of thes pecial leaves.

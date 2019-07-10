@@ -57,7 +57,7 @@ int64_t S2(int64_t x,
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 
-  int64_t S2_result = 0;
+  int64_t s2 = 0;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_y = pi[y];
 
@@ -97,7 +97,7 @@ int64_t S2(int64_t x,
           count += sieve.count(i, stop);
           i = stop + 1;
           int64_t phi_xn = phi[b] + count;
-          S2_result -= mu[m] * phi_xn;
+          s2 -= mu[m] * phi_xn;
         }
       }
 
@@ -126,7 +126,7 @@ int64_t S2(int64_t x,
         count += sieve.count(i, stop);
         i = stop + 1;
         int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
+        s2 += phi_xn;
       }
 
       phi[b] += count_low_high;
@@ -136,8 +136,8 @@ int64_t S2(int64_t x,
     next_segment:;
   }
 
-  print("S2", S2_result, time);
-  return S2_result;
+  print("S2", s2, time);
+  return s2;
 }
 
 } // namespace

@@ -40,7 +40,7 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   int64_t segment_size = isqrt(limit);
   int64_t pi_y = pi_bsearch(primes, y);
-  int64_t S2_result = 0;
+  int64_t s2 = 0;
 
   vector<char> sieve(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());
@@ -89,7 +89,7 @@ int64_t S2(int64_t x,
           for (int64_t xn = x / (prime * m); i <= xn - low; i++)
             phi[b] += sieve[i];
 
-          S2_result -= mu[m] * phi[b];
+          s2 -= mu[m] * phi[b];
         }
       }
 
@@ -106,7 +106,7 @@ int64_t S2(int64_t x,
     }
   }
 
-  return S2_result;
+  return s2;
 }
 
 } // namespace
