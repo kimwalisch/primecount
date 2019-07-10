@@ -141,12 +141,23 @@ int64_t S2_thread(int64_t x,
   return S2_thread;
 }
 
-/// Calculate the contribution of the special leaves.
-/// This is a parallel implementation with advanced load balancing.
-/// As most special leaves tend to be in the first segments we
-/// start off with a small segment size and few segments
-/// per thread, after each iteration we dynamically increase
-/// the segment size and the number of segments.
+/// Calculate the contribution of thes pecial leaves.
+///
+/// This is a parallel S2(x, y) implementation with advanced load
+/// balancing. As most special leaves tend to be in the first segments
+/// we start off with a tiny segment size and one segment per thread.
+/// After each iteration we dynamically increase the segment size (until
+/// it reaches some limit) or the number of segments.
+///
+/// S2(x, y) has been parallelized using an idea devised by Xavier
+/// Gourdon. The idea is to make the individual threads completely
+/// independent from each other so that no thread depends on values
+/// calculated by another thread. The benefit of this approach is that
+/// the algorithm will scale well up to a very large number of CPU
+/// cores. In order to make the threads independent from each other
+/// each thread needs to precompute a lookup table of phi(x, a) values
+/// (this is done in S2_thread(x, y)) every time the thread starts a
+/// new computation.
 ///
 int64_t S2(int64_t x,
            int64_t y,
