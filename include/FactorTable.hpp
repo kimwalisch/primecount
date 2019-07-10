@@ -6,11 +6,16 @@
 ///        entries for numbers which are not divisible by 2, 3, 5, 7
 ///        and 11. The factor_[n] lookup table uses up to 19.25
 ///        times less memory than the lpf[n] & mu[n] lookup tables!
-///        factor_[n] requires only 2 bytes per entry for 32-bit
-///        numbers and 4 bytes per entry for 64-bit numbers.
+///        factor_[n] uses only 2 bytes per entry for 32-bit numbers
+///        and 4 bytes per entry for 64-bit numbers.
 ///
-///        The factor table concept has first been devised and
-///        implemented by Christian Bau in 2003.
+///        The factor table concept was devised and implemented by
+///        Christian Bau in 2003. Note that Tomás Oliveira e Silva
+///        also suggests combining the mu[n] and lpf[n] lookup tables
+///        in his paper. However Christian Bau's FactorTable data
+///        structure uses only half as much memory as the data
+///        structure proposed by Tomás Oliveira e Silva. Hence I am
+///        using Christian Bau's FactorTable data structure.
 ///
 ///        What we store in the factor_[n] lookup table:
 ///
@@ -157,10 +162,9 @@ public:
     }
   }
 
-  /// Get the least prime factor (lpf) of the number
-  /// n = get_number(index). The return value is different
-  /// from the least prime factor in some situations
-  /// but this does not affect our calculations.
+  /// mu_lpf(n) is a combination of the mu(n) (Möbius function)
+  /// and lpf(n) (least prime factor) functions.
+  /// mu_lpf(n) returns (with n = get_number(index)):
   ///
   /// 1) INT_MAX - 1  if n = 1
   /// 2) INT_MAX      if n is a prime
@@ -168,7 +172,7 @@ public:
   /// 4) lpf - 1      if moebius(n) = 1
   /// 5) lpf          if moebius(n) = -1
   ///
-  int64_t lpf(int64_t index) const
+  int64_t mu_lpf(int64_t index) const
   {
     return factor_[index];
   }

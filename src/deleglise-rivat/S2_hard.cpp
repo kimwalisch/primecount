@@ -111,7 +111,8 @@ T S2_hard_thread(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor.lpf(m))
+        // mu(m) != 0 && prime < lpf(m)
+        if (prime < factor.mu_lpf(m))
         {
           int64_t fm = factor.get_number(m);
           int64_t xn = fast_div64(x2, fm);

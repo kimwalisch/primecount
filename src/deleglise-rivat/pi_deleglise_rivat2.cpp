@@ -130,7 +130,8 @@ int64_t S2_hard(int64_t x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor.lpf(m))
+        // mu(m) != 0 && prime < lpf(m)
+        if (prime < factor.mu_lpf(m))
         {
           int64_t n = prime * factor.get_number(m);
           int64_t count = tree.count(low, x / n);

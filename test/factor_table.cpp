@@ -62,7 +62,7 @@ int main()
     if (mu[n] != 0)
     {
       cout << "lpf(" << n << ") = " << lpf[n];
-      check(lpf[n] <= factor_table.lpf(i) + (mu[n] == 1));
+      check(lpf[n] <= factor_table.mu_lpf(i) + (factor_table.mu(i) == 1));
     }
 
     not_coprime:;

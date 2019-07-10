@@ -17,7 +17,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -113,7 +113,8 @@ T S2_hard_thread(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor.lpf(m))
+        // mu(m) != 0 && prime < lpf(m)
+        if (prime < factor.mu_lpf(m))
         {
           int64_t fm = factor.get_number(m);
           int64_t xn = fast_div64(x2, fm);
