@@ -56,18 +56,11 @@ int main()
         goto not_coprime;
     }
 
-    // For performance reasons FactorTable.mu(n) = 0 is not supported.
-    // But mu(n) = 0 implies that n is not square free.
-    if (mu[n] == 0)
+    cout << "mu(" << n << ") = " << mu[n];
+    check(mu[n] == factor_table.mu(i));
+ 
+    if (mu[n] != 0)
     {
-      cout << "mu(" << n << ") = " << mu[n];
-      check(!factor_table.is_square_free(i));
-    }
-    else
-    {
-      cout << "mu(" << n << ") = " << mu[n];
-      check(mu[n] == factor_table.mu(i));
-
       cout << "lpf(" << n << ") = " << lpf[n];
       check(lpf[n] <= factor_table.lpf(i) + (mu[n] == 1));
     }

@@ -174,22 +174,21 @@ public:
   }
 
   /// Get the Möbius function value of the number
-  /// n = get_number(index). For performance reasons
-  /// mu(index) == 0 is not supported.
+  /// n = get_number(index).
+  ///
+  /// https://en.wikipedia.org/wiki/Möbius_function
+  /// mu(n) = 1 if n is a square-free integer with an even number of prime factors.
+  /// mu(n) = −1 if n is a square-free integer with an odd number of prime factors.
+  /// mu(n) = 0 if n has a squared prime factor.
   ///
   int64_t mu(int64_t index) const
   {
-    assert(factor_[index] != 0);
-    return (factor_[index] & 1) ? -1 : 1;
-  }
-
-  /// Returns true if n has no squared prime factor,
-  /// with n = get_number(index). Note that
-  /// is_square_free(n) = false implies mu(n) = 0.
-  ///
-  bool is_square_free(int64_t index) const
-  {
-    return factor_[index] != 0;
+    if (factor_[index] == 0)
+      return 0;
+    else if (factor_[index] & 1)
+      return -1;
+    else
+      return 1;
   }
 
   static maxint_t max()
