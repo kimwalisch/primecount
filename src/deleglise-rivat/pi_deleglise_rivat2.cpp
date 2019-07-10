@@ -1,9 +1,9 @@
 ///
 /// @file  pi_deleglise_rivat2.cpp
-/// @brief Implementation of the Deleglise-Rivat prime counting
-///        algorithm. Compared to pi_deleglise_rivat1.cpp this
-///        version uses compression (FactorTable & PiTable) to
-///        reduce the memory usage.
+/// @brief Simple demonstration implementation of the Deleglise-Rivat
+///        prime counting algorithm. This version uses compression
+///        (FactorTable & PiTable) to reduce the memory usage, it uses
+///        up to 12.5 times less memory than pi_deleglise_rivat1.cpp.
 ///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial

@@ -2,9 +2,17 @@
 /// @file  pi_lmo_parallel.cpp
 /// @brief Parallel implementation of the Lagarias-Miller-Odlyzko
 ///        prime counting algorithm using OpenMP. This implementation
-///        uses load balancing and counts the number of unsieved
-///        elements using POPCNT without using any special counting
-///        tree data structure.
+///        uses load balancing to ensure all threads are kept busy
+///        till the very end. This implementation also does not use a
+///        special tree data structure (a.k.a. Fenwick tree) for
+///        counting the number of unsieved elements but instead counts
+///        the number of unsieved elements directly from the sieve
+///        array using the POPCNT instruction which is much faster.
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///

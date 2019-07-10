@@ -7,7 +7,13 @@
 ///        Mathematics of Computation, 44 (1985), by J. C. Lagarias,
 ///        V. S. Miller and A. M. Odlyzko.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+///        Unlike pi_lmo4.cpp this version does not use a special tree
+///        data structure (a.k.a. Fenwick tree) for counting the number
+///        of unsieved elements but instead counts the number of
+///        unsieved elements directly from the sieve array using the
+///        POPCNT instruction which is much faster.
+///
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

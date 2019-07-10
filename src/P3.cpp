@@ -1,9 +1,9 @@
 ///
 /// @file  P3.cpp
-/// @brief 3rd partial sieve function, used in Lehmer's
-///        prime counting formula.
+/// @brief P3(x, a) is the 3rd partial sieve function, it is used
+///        in Lehmer's prime counting formula.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
