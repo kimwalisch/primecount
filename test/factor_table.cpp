@@ -1,7 +1,7 @@
 ///
 /// @file   factor_table.cpp
-/// @brief  FactorTable is a compressed lookup table
-///         of mu (moebius) and lpf (least prime factor).
+/// @brief  FactorTable is a compressed lookup table of mu
+///         (moebius) and lpf (least prime factor).
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -45,6 +45,8 @@ int main()
 
   for (int n = 1; n <= max; n++)
   {
+    int64_t i = factor_table.get_index(n);
+
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)
     {
@@ -54,11 +56,15 @@ int main()
         goto not_coprime;
     }
 
-    // For performance reasons FactorTable does not support (mu[n] == 0)
-    if (mu[n] != 0)
+    // For performance reasons FactorTable.mu(n) = 0 is not supported.
+    // But mu(n) = 0 implies that n is not square free.
+    if (mu[n] == 0)
     {
-      int64_t i = factor_table.get_index(n);
-
+      cout << "mu(" << n << ") = " << mu[n];
+      check(!factor_table.is_square_free(i));
+    }
+    else
+    {
       cout << "mu(" << n << ") = " << mu[n];
       check(mu[n] == factor_table.mu(i));
 

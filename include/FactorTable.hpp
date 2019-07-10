@@ -183,6 +183,15 @@ public:
     return (factor_[index] & 1) ? -1 : 1;
   }
 
+  /// Returns true if n has no squared prime factor,
+  /// with n = get_number(index). Note that
+  /// is_square_free(n) = true implies mu(n) = 0.
+  ///
+  bool is_square_free(int64_t index) const
+  {
+    return factor_[index] != 0;
+  }
+
   static maxint_t max()
   {
     maxint_t T_MAX = std::numeric_limits<T>::max();
