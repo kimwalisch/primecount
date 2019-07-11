@@ -9,6 +9,10 @@
 ///        the number of unsieved elements directly from the sieve
 ///        array using the POPCNT instruction which is much faster.
 ///
+///        Lagarias-Miller-Odlyzko formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        with y = x^(1/3), a = pi(y)
+///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,

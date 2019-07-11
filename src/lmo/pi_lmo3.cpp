@@ -5,6 +5,10 @@
 ///        This implementation uses the segmented sieve of
 ///        Eratosthenes to calculate S2(x).
 ///
+///        Lagarias-Miller-Odlyzko formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        with y = x^(1/3), a = pi(y)
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
