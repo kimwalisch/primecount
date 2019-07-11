@@ -39,8 +39,9 @@ endif()
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/cmdoptions.cpp
+            src/app/main.cpp
             src/app/help.cpp
-            src/app/main.cpp)
+            src/app/test.cpp)
 
 # primecount library source files ####################################
 
@@ -63,7 +64,6 @@ set(LIB_SRC src/FactorTable.cpp
             src/pi_primesieve.cpp
             src/primecount.cpp
             src/print.cpp
-            src/test.cpp
             src/lmo/pi_lmo1.cpp
             src/lmo/pi_lmo2.cpp
             src/lmo/pi_lmo3.cpp

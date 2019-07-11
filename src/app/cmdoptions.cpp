@@ -28,6 +28,7 @@ namespace primecount {
 
 void help();
 void version();
+void test();
 
 /// Command-line options
 map<string, OptionID> optionMap =

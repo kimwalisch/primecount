@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -162,8 +162,6 @@ T S2_approx(T x, int64_t pi_y, T P2, T S1)
   T S2 = pix - S1 - pi_y + 1 + P2;
   return S2;
 }
-
-void test();
 
 #ifdef HAVE_MPI
 
