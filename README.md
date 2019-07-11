@@ -240,7 +240,7 @@ numbers&nbsp;>&nbsp;2<sup>63</sup>.
 
 ## Performance tips
 
-primecount scales nicely up until 10^24 on current CPUs. For larger
+primecount scales nicely up until 10<sup>24</sup> on current CPUs. For larger
 values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
 cache misses that severely deteriorate primecount's performance.
