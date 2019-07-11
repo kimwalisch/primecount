@@ -2,28 +2,38 @@
 /// @file  FactorTable.hpp
 /// @brief The FactorTable class combines the lpf[n] (least prime
 ///        factor) and mu[n] (Möbius function) lookup tables into a
-///        single factor_[n] table which furthermore only contains
+///        single factor[n] table which furthermore only contains
 ///        entries for numbers which are not divisible by 2, 3, 5, 7
-///        and 11. The factor_[n] lookup table uses up to 19.25
+///        and 11. The factor[n] lookup table uses up to 19.25
 ///        times less memory than the lpf[n] & mu[n] lookup tables!
-///        factor_[n] uses only 2 bytes per entry for 32-bit numbers
+///        factor[n] uses only 2 bytes per entry for 32-bit numbers
 ///        and 4 bytes per entry for 64-bit numbers.
 ///
 ///        The factor table concept was devised and implemented by
 ///        Christian Bau in 2003. Note that Tomás Oliveira e Silva
 ///        also suggests combining the mu[n] and lpf[n] lookup tables
 ///        in his paper. However Christian Bau's FactorTable data
-///        structure uses only half as much memory as the data
-///        structure proposed by Tomás Oliveira e Silva. Hence I am
-///        using Christian Bau's FactorTable data structure.
+///        structure uses only half as much memory and is also
+///        slightly more efficient (uses fewer instructions) than the
+///        data structure proposed by Tomás Oliveira e Silva.
 ///
-///        What we store in the factor_[n] lookup table:
+///        What we store in the factor[n] lookup table:
 ///
 ///        1) INT_MAX - 1  if n = 1
 ///        2) INT_MAX      if n is a prime
 ///        3) 0            if moebius(n) = 0
 ///        4) lpf - 1      if moebius(n) = 1
 ///        5) lpf          if moebius(n) = -1
+///
+///        factor[1] = (INT_MAX - 1) because 1 contributes to the
+///        sum of the ordinary leaves S1(x, a) in the
+///        Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms.
+///        The values above allow to replace the 1st if statement
+///        below used in the S1(x, a) and S2(x, a) formulas by the
+///        2nd new if statement which is obviously faster.
+///
+///        * Old: if (mu[n] != 0 && prime < lpf[n])
+///        * New: if (prime < factor[n])
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
