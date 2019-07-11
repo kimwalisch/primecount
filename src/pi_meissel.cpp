@@ -1,13 +1,13 @@
 ///
-/// @file   pi_meissel.cpp
-/// @brief  Count the number of primes <= x using Meissel's formula.
-///         Meissel's formula is an improvement over Legendre's formula,
-///         it adds the P2(x, a) term which is the 2nd partial sieve
-///         function and sets y=x^(1/3) instead of x^(1/2).
+/// @file  pi_meissel.cpp
+/// @brief Count the number of primes <= x using Meissel's formula.
+///        Meissel's formula is an improvement over Legendre's formula,
+///        it adds the P2(x, a) term which is the 2nd partial sieve
+///        function and sets y=x^(1/3) instead of x^(1/2).
 ///
-///         Meissel's formula:
-///         pi(x) = pi(y) + phi(x, a) - 1 - P2(x, a)
-///         with y = x^1/3, a = pi(y)
+///        Meissel's formula:
+///        pi(x) = pi(y) + phi(x, a) - 1 - P2(x, a)
+///        with y = x^1/3, a = pi(y)
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///

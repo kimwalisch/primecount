@@ -1,15 +1,15 @@
 ///
-/// @file   pi_legendre.cpp
-/// @brief  Count the number of primes <= x using Legendre's formula.
-///         Legendre's prime counting algorithm is the simplest
-///         combinatorial algorithm for counting the number of primes.
-///         All other formulas (e.g. Meissel's formula, Lehmer's
-///         formula, ...) are extensions of Legendre's formula that
-///         run faster but are also more complex.
+/// @file  pi_legendre.cpp
+/// @brief Count the number of primes <= x using Legendre's formula.
+///        Legendre's prime counting algorithm is the simplest
+///        combinatorial algorithm for counting the number of primes.
+///        All other formulas (e.g. Meissel's formula, Lehmer's
+///        formula, ...) are extensions of Legendre's formula that
+///        run faster but are also more complex.
 ///
-///         Legendre's formula:
-///         pi(x) = pi(y) + phi(x, pi(y)) - 1
-///         with y = x^(1/2)
+///        Legendre's formula:
+///        pi(x) = pi(y) + phi(x, pi(y)) - 1
+///        with y = x^(1/2)
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///

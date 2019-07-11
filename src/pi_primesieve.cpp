@@ -1,7 +1,10 @@
 ///
 /// @file  pi_primesieve.cpp
+/// @brief Count primes using the primesieve C/C++ library which
+///        uses a highly optimized parallel implementation of the
+///        segmented sieve of Eratosthenes.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
