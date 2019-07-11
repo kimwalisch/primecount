@@ -39,13 +39,15 @@ int main()
   auto lpf = generate_lpf(max);
   auto mu = generate_moebius(max);
 
+  FactorTable<uint16_t> factorTable(max, threads);
+  int64_t uint16_max = numeric_limits<uint16_t>::max();
+  int64_t limit = factorTable.get_first_coprime();
   vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
-  FactorTable<int> factor_table(max, threads);
-  int64_t limit = factor_table.get_first_coprime();
 
   for (int n = 1; n <= max; n++)
   {
-    int64_t i = factor_table.get_index(n);
+    int64_t i = factorTable.get_index(n);
+    bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)
@@ -57,13 +59,28 @@ int main()
     }
 
     cout << "mu(" << n << ") = " << mu[n];
-    check(mu[n] == factor_table.mu(i));
- 
-    if (mu[n] != 0)
-    {
-      cout << "lpf(" << n << ") = " << lpf[n];
-      check(lpf[n] <= factor_table.mu_lpf(i) + (factor_table.mu(i) == 1));
-    }
+    check(mu[n] == factorTable.mu(i));
+
+    cout << "lpf(" << n << ") = " << lpf[n];
+
+    // mu_lpf(n) is a combination of the mu(n) (Möbius function)
+    // and lpf(n) (least prime factor) functions.
+    // mu_lpf(n) returns (with n = get_number(index)):
+    //
+    // 1) INT_MAX - 1  if n = 1
+    // 2) INT_MAX      if n is a prime
+    // 3) 0            if moebius(n) = 0
+    // 4) lpf - 1      if moebius(n) = 1
+    // 5) lpf          if moebius(n) = -1
+
+    if (n == 1)
+      check(factorTable.mu_lpf(i) == uint16_max - 1);
+    else if (is_prime)
+      check(factorTable.mu_lpf(i) == uint16_max);
+    else if (mu[n] == 0)
+      check(factorTable.mu_lpf(i) == 0);
+    else
+      check(lpf[n] == factorTable.mu_lpf(i) + (factorTable.mu(i) == 1));
 
     not_coprime:;
   }
