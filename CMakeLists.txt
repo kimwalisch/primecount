@@ -252,7 +252,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE libprimesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -275,7 +275,7 @@ if(BUILD_STATIC_LIBS)
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE libprimesieve-static "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined
