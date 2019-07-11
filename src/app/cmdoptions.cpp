@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -28,7 +28,6 @@ namespace primecount {
 
 void help();
 void version();
-void test();
 
 /// Command-line options
 map<string, OptionID> optionMap =
@@ -109,7 +108,7 @@ void optionStatus(Option& opt,
 }
 
 /// e.g. "--thread=4" -> return "--thread"
-string getOption(string str)
+string getOption(const string& str)
 {
   size_t pos = str.find_first_of("=0123456789");
 
@@ -120,7 +119,7 @@ string getOption(string str)
 }
 
 /// e.g. "--thread=4" -> return "4"
-string getValue(string str)
+string getValue(const string& str)
 {
   size_t pos = str.find_first_of("0123456789");
 
