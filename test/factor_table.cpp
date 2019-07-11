@@ -58,7 +58,7 @@ int main()
         goto not_coprime;
     }
 
-    cout << "mu(" << n << ") = " << mu[n];
+    cout << "mu(" << n << ") = " << factorTable.mu(i);
     check(mu[n] == factorTable.mu(i));
 
     cout << "lpf(" << n << ") = " << lpf[n];
