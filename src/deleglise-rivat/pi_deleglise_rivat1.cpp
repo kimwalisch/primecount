@@ -1,10 +1,11 @@
 ///
 /// @file  pi_deleglise_rivat1.cpp
 /// @brief Simple demonstration implementation of the Deleglise-Rivat
-///        prime counting algorithm. In the Deleglise-Rivat algorithm
-///        there are 3 additional types of special leaves compared to
-///        the Lagarias-Miller-Odlyzko algorithm: trivial special
-///        leaves, clustered easy leaves and sparse easy leaves.
+///        prime counting algorithm. The Deleglise-Rivat algorithm is
+///        an improvement over the Lagarias-Miller-Odlyzko algorithm,
+///        in the Deleglise-Rivat algorithm the special leaves
+///        S2(x, a) have been split up into trivial special leaves,
+///        easy special leaves and hard special leaves.
 ///
 ///        Deleglise-Rivat formula:
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)

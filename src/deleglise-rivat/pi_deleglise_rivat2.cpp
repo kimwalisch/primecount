@@ -1,14 +1,21 @@
 ///
 /// @file  pi_deleglise_rivat2.cpp
 /// @brief Simple demonstration implementation of the Deleglise-Rivat
-///        prime counting algorithm. This version uses compression
-///        (FactorTable & PiTable) to reduce the memory usage, it uses
-///        up to 12.5 times less memory than pi_deleglise_rivat1.cpp.
+///        prime counting algorithm. The Deleglise-Rivat algorithm is
+///        an improvement over the Lagarias-Miller-Odlyzko algorithm,
+///        in the Deleglise-Rivat algorithm the special leaves
+///        S2(x, a) have been split up into trivial special leaves,
+///        easy special leaves and hard special leaves.
 ///
 ///        Deleglise-Rivat formula:
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        S2(x, a) = S2_trivial(x, a) + S2_easy(x, a) + S2_hard(x, a)
 ///        with y = alpha * x^(1/3), a = pi(y)
+///
+///        This version is identical to pi_deleglise_rivat1.cpp except
+///        that this version uses compression (FactorTable & PiTable)
+///        to reduce the memory usage. pi_deleglise_rivat2.cpp uses up
+///        to 12 times less memory than pi_deleglise_rivat1.cpp.
 ///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
