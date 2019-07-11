@@ -6,6 +6,11 @@
 ///        the Lagarias-Miller-Odlyzko algorithm: trivial special
 ///        leaves, clustered easy leaves and sparse easy leaves.
 ///
+///        Deleglise-Rivat formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        S2(x, a) = S2_trivial(x, a) + S2_easy(x, a) + S2_hard(x, a)
+///        with y = alpha * x^(1/3), a = pi(y)
+///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
