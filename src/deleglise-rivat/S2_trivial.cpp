@@ -52,7 +52,9 @@ T get_S2_trivial(T x,
   T s2_trivial = 0;
   int64_t prime;
 
-  // Goes up to ~ x^(1/3)
+  // For all primes[b] > z^(1/2) && < x^(1/3):
+  // (primes[b] < x / primes[b]^2 < y)
+  // s2_trivial += pi[y] - pi[x / primes[b]^2]
   while ((prime = it.next_prime()) < y)
   {
     T n = (T) prime * prime;
@@ -61,12 +63,16 @@ T get_S2_trivial(T x,
     s2_trivial += pi_y - pi[xn];
   }
 
+  // For all primes[b] >= x^(1/3) && < y:
+  // (x / primes[b]^2 <= primes[b])
+  // s2_trivial += pi[y] - b
+  //
+  // \sum_{b = pi[prime]}^{pi[y-1]} (pi[y] - b)
+  // Formula above can be calculated using:
+  // https://en.wikipedia.org/wiki/Arithmetic_progression
+  // sum = n * (a1 + a2) / 2
   if (prime < y)
   {
-    // \sum_{i = pi[prime]}^{pi[y-1]} pi[y] - i
-    // Formula above can be calculated using:
-    // https://en.wikipedia.org/wiki/Arithmetic_progression
-    // sum = n * (a1 + a2) / 2
     T n = (pi[y-1] - pi[prime]) + 1;
     T a1 = pi[y] - pi[y-1];
     T a2 = pi[y] - pi[prime];
