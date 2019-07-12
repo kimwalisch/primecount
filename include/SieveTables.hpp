@@ -39,16 +39,47 @@ constexpr int left_shift(int n)
 ///
 constexpr int right_shift(int n)
 {
-  return   (n % 30 >= 29) ? 63 - (n / 30 * 8) - 7
-         : (n % 30 >= 23) ? 63 - (n / 30 * 8) - 6
-         : (n % 30 >= 19) ? 63 - (n / 30 * 8) - 5
-         : (n % 30 >= 17) ? 63 - (n / 30 * 8) - 4
-         : (n % 30 >= 13) ? 63 - (n / 30 * 8) - 3
-         : (n % 30 >= 11) ? 63 - (n / 30 * 8) - 2
-         : (n % 30 >= 7)  ? 63 - (n / 30 * 8) - 1
-         : (n % 30 >= 1)  ? 63 - (n / 30 * 8) - 0
+  return   (n % 30 >= 29) ? 56 - (n / 30 * 8)
+         : (n % 30 >= 23) ? 57 - (n / 30 * 8)
+         : (n % 30 >= 19) ? 58 - (n / 30 * 8)
+         : (n % 30 >= 17) ? 59 - (n / 30 * 8)
+         : (n % 30 >= 13) ? 60 - (n / 30 * 8)
+         : (n % 30 >= 11) ? 61 - (n / 30 * 8)
+         : (n % 30 >= 7)  ? 62 - (n / 30 * 8)
+         : (n % 30 >= 1)  ? 63 - (n / 30 * 8)
          : 64 - (n / 30 * 8);
 }
+
+#if defined(__BYTE_ORDER__) && \
+    defined(__ORDER_BIG_ENDIAN__) && \
+    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+
+/// Since the sieve array is a byte array but the
+/// unset_smaller and unset_larger arrays are of
+/// type uint64_t we need to reverse the byte order
+/// of the unset_smaller and unset_larger arrays
+/// on big endian CPU architectures.
+
+/// Reverse byte order of 64-bit integer
+constexpr uint64_t bswap64(uint64_t i, uint64_t j = 0, uint64_t n = 0)
+{
+  return (n == sizeof(T)) ? j :
+      bswap64(i >> 8, (j << 8) | (i & 0xff), n + 1);
+}
+
+/// Bitmask to unset bits <= n
+constexpr uint64_t unset_s(int n)
+{
+  return bswap64(~0ull << left_shift(n));
+}
+
+/// Bitmask to unset bits >= n
+constexpr uint64_t unset_l(int n)
+{
+  return bswap64((n == 0) ? 0 : ~0ull >> right_shift(n));
+}
+
+#else
 
 /// Bitmask to unset bits <= n
 constexpr uint64_t unset_s(int n)
@@ -61,6 +92,8 @@ constexpr uint64_t unset_l(int n)
 {
   return (n == 0) ? 0 : ~0ull >> right_shift(n);
 }
+
+#endif
 
 /// Unset bits < start
 const std::array<uint64_t, 240> unset_smaller =
