@@ -74,6 +74,19 @@ MD5 checksum: OK
 Status: 46%
 ```
 
+The ```primecount.backup``` file is updated using atomic writes in order to
+prevent crashes from corrupting the ```primecount.backup``` file. We also
+calculate an MD5 checksum of the  ```primecount.backup``` content before writing
+to disk and verify that checksum when resuming in order to protect from
+harddisk errors.
+
+Note that the ```primecount.backup``` file is not tied to the PC on which the
+computation was originally started. You can safely copy the
+```primecount.backup``` file to another PC and resume the computation there.
+If the new PC has a different number of CPU cores primecount will by default
+resume the computation using all available CPU cores (unless you have
+specified the number of threads using ```--threads=<N>```).
+
 ## Batch processing
 
 It is possible to create a ```worktodo.txt``` file with a list of
