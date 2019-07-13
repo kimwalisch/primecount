@@ -1,8 +1,12 @@
-2019-07-05 Kim Walisch  <kim.walisch@gmail.com>
+2019-07-09 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 4.8 work in progress.
 
+  This version reduces the memory usage of S2_easy(n) by
+  15% and the memory usage of S2_hard(n) by 10%.
+
   * PiTable.cpp: Reduce memory usage by 2x.
+  * FactorTable.hpp: Reduce memory usage by 10%.
   * LoadBalancer.cpp: Improve scaling.
   * MpiLoadBalancer.cpp: Improve scaling.
   * fast_div.hpp: x64 assembly for (128-bit / 64-bit) = 64-bit.

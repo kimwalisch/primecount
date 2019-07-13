@@ -3,6 +3,16 @@
 /// @brief 64-bit and 128-bit parallel implementations of the
 ///        Deleglise-Rivat prime counting algorithm.
 ///
+///        Deleglise-Rivat formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        S2(x, a) = S2_trivial(x, a) + S2_easy(x, a) + S2_hard(x, a)
+///        with y = alpha * x^(1/3), a = pi(y)
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING

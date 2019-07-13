@@ -30,7 +30,7 @@ later).
 
 ## Build instructions
 
-You need to have installed a C++ compiler, cmake and make. Ideally
+You need to have installed a C++ compiler and CMake. Ideally
 primecount should be compiled using a C++ compiler that supports both
 OpenMP and 128-bit integers (e.g. GCC, Clang, Intel C++ Compiler).
 

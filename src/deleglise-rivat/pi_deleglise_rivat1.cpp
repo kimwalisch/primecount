@@ -1,10 +1,16 @@
 ///
-/// @file  pi_deleglise_rivat_parallel1.cpp
-/// @brief Implementation of the Deleglise-Rivat prime counting
-///        algorithm. In the Deleglise-Rivat algorithm there are 3
-///        additional types of special leaves compared to the
-///        Lagarias-Miller-Odlyzko algorithm: trivial special leaves,
-///        clustered easy leaves and sparse easy leaves.
+/// @file  pi_deleglise_rivat1.cpp
+/// @brief Simple demonstration implementation of the Deleglise-Rivat
+///        prime counting algorithm. The Deleglise-Rivat algorithm is
+///        an improvement over the Lagarias-Miller-Odlyzko algorithm,
+///        in the Deleglise-Rivat algorithm the special leaves
+///        S2(x, a) have been split up into trivial special leaves,
+///        easy special leaves and hard special leaves.
+///
+///        Deleglise-Rivat formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        S2(x, a) = S2_trivial(x, a) + S2_easy(x, a) + S2_hard(x, a)
+///        with y = alpha * x^(1/3), a = pi(y)
 ///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
@@ -77,7 +83,7 @@ int64_t S2_hard(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_result = 0;
+  int64_t s2_hard = 0;
 
   auto primes = generate_primes<int32_t>(y);
 
@@ -126,7 +132,7 @@ int64_t S2_hard(int64_t x,
           int64_t n = prime * m;
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= mu[m] * phi_xn;
+          s2_hard -= mu[m] * phi_xn;
         }
       }
 
@@ -152,7 +158,7 @@ int64_t S2_hard(int64_t x,
         int64_t xn = x / n;
         int64_t count = tree.count(low, xn);
         int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
+        s2_hard += phi_xn;
       }
 
       phi[b] += tree.count(low, high - 1);
@@ -162,7 +168,7 @@ int64_t S2_hard(int64_t x,
     next_segment:;
   }
 
-  return S2_result;
+  return s2_hard;
 }
 
 /// Calculate the contribution of the special leaves

@@ -1,11 +1,15 @@
 ///
 /// @file  pi_lmo2.cpp
-/// @brief Simple implementation of the Lagarias-Miller-Odlyzko
-///        prime counting algorithm. This implementation uses
-///        the sieve of Eratosthenes (without segmentation) to
-///        calculate S2(x).
+/// @brief Simple demonstration implementation of the
+///        Lagarias-Miller-Odlyzko prime counting algorithm.
+///        This implementation uses the sieve of Eratosthenes
+///        (without segmentation) to calculate S2(x).
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+///        Lagarias-Miller-Odlyzko formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        with y = x^(1/3), a = pi(y)
+///
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,7 +43,7 @@ int64_t S2(int64_t x,
 {
   int64_t limit = x / y + 1;
   int64_t pi_y = pi_bsearch(primes, y);
-  int64_t S2_result = 0;
+  int64_t s2 = 0;
   int64_t b = 1;
   vector<char> sieve(limit, 1);
 
@@ -62,15 +66,15 @@ int64_t S2(int64_t x,
     {
       if (mu[m] != 0 && prime < lpf[m])
       {
-        // we have found a special leaf, compute it's contribution
+        // We have found a special leaf. Compute it's contribution
         // phi(x / (primes[b] * m), b - 1) by counting the number
         // of unsieved elements <= x / (primes[b] * m) after having
-        // removed the multiples of the first b - 1 primes
+        // removed the multiples of the first b - 1 primes.
         //
         for (int64_t xn = x / (prime * m); i <= xn; i++)
           phi += sieve[i];
 
-        S2_result -= mu[m] * phi;
+        s2 -= mu[m] * phi;
       }
     }
 
@@ -79,7 +83,7 @@ int64_t S2(int64_t x,
       sieve[k] = 0;
   }
 
-  return S2_result;
+  return s2;
 }
 
 } // namespace

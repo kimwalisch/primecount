@@ -1,9 +1,9 @@
 ///
 /// @file   factor_table.cpp
-/// @brief  FactorTable is a compressed lookup table
-///         of mu (moebius) and lpf (least prime factor).
+/// @brief  FactorTable is a compressed lookup table of mu
+///         (moebius) and lpf (least prime factor).
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,24 +39,50 @@ int main()
   auto lpf = generate_lpf(max);
   auto mu = generate_moebius(max);
 
-  FactorTable<int> factor_table(max, threads);
+  FactorTable<uint16_t> factorTable(max, threads);
+  int64_t uint16_max = numeric_limits<uint16_t>::max();
+  int64_t limit = factorTable.get_first_coprime();
+  vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
-  for (int i = 2; i <= max; i++)
+  for (int n = 1; n <= max; n++)
   {
-    if (i % 2 != 0 &&
-        i % 3 != 0 &&
-        i % 5 != 0 &&
-        i % 7 != 0)
-    {
-      if (mu[i] != 0)
-      {
-        cout << "mu(" << i << ") = " << mu[i];
-        check(mu[i] == factor_table.mu(factor_table.get_index(i)));
+    int64_t i = factorTable.get_index(n);
+    bool is_prime = (lpf[n] == n);
 
-        cout << "lpf(" << i << ") = " << lpf[i];
-        check(lpf[i] <= factor_table.lpf(factor_table.get_index(i)) + (mu[i] == 1));
-      }
+    // Check if n is coprime to the primes < limit
+    for (int p : small_primes)
+    {
+      if (p >= limit)
+        break;
+      if (n % p == 0)
+        goto not_coprime;
     }
+
+    cout << "mu(" << n << ") = " << factorTable.mu(i);
+    check(mu[n] == factorTable.mu(i));
+
+    cout << "lpf(" << n << ") = " << lpf[n];
+
+    // mu_lpf(n) is a combination of the mu(n) (Möbius function)
+    // and lpf(n) (least prime factor) functions.
+    // mu_lpf(n) returns (with n = get_number(index)):
+    //
+    // 1) INT_MAX - 1  if n = 1
+    // 2) INT_MAX      if n is a prime
+    // 3) 0            if moebius(n) = 0
+    // 4) lpf - 1      if moebius(n) = 1
+    // 5) lpf          if moebius(n) = -1
+
+    if (n == 1)
+      check(factorTable.mu_lpf(i) == uint16_max - 1);
+    else if (is_prime)
+      check(factorTable.mu_lpf(i) == uint16_max);
+    else if (mu[n] == 0)
+      check(factorTable.mu_lpf(i) == 0);
+    else
+      check(lpf[n] == factorTable.mu_lpf(i) + (factorTable.mu(i) == 1));
+
+    not_coprime:;
   }
 
   cout << endl;

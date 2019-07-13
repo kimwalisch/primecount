@@ -1,11 +1,17 @@
 ///
 /// @file  pi_lmo4.cpp
-/// @brief Implementation of the Lagarias-Miller-Odlyzko prime
-///        counting algorithm. This implementation uses the
-///        segmented sieve of Eratosthenes and a special tree
-///        data structure for faster counting in S2(x).
+/// @brief Simple demonstration implementation of the
+///        Lagarias-Miller-Odlyzko prime counting algorithm.
+///        This implementation uses the segmented sieve of
+///        Eratosthenes to calculate the contribution of the special
+///        leaves and a special tree data structure (a.k.a. Fenwick
+///        tree) to count the number of unsieved elements.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+///        Lagarias-Miller-Odlyzko formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        with y = x^(1/3), a = pi(y)
+///
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -64,7 +70,7 @@ int64_t S2(int64_t x,
   int64_t limit = x / y + 1;
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_y = pi_bsearch(primes, y);
-  int64_t S2_result = 0;
+  int64_t s2 = 0;
 
   vector<char> sieve(segment_size);
   vector<int64_t> next(primes.begin(), primes.end());
@@ -98,9 +104,9 @@ int64_t S2(int64_t x,
       int64_t min_m = max(x / (prime * high), y / prime);
       int64_t max_m = min(x / (prime * low), y);
 
-      // obviously if (prime >= max_m) then (prime >= lpf[max_m])
+      // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
       // hence (prime < lpf[m]) will always evaluate to
-      // false and no special leaves are possible
+      // false and no special leaves are possible.
       if (prime >= max_m)
         break;
 
@@ -108,15 +114,15 @@ int64_t S2(int64_t x,
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
-          // we have found a special leaf, compute it's contribution
+          // We have found a special leaf. Compute it's contribution
           // phi(x / (primes[b] * m), b - 1) by counting the number
           // of unsieved elements <= x / (primes[b] * m) after having
-          // removed the multiples of the first b - 1 primes
+          // removed the multiples of the first b - 1 primes.
           //
           int64_t n = prime * m;
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= mu[m] * phi_xn;
+          s2 -= mu[m] * phi_xn;
         }
       }
 
@@ -128,7 +134,7 @@ int64_t S2(int64_t x,
     }
   }
 
-  return S2_result;
+  return s2;
 }
 
 } // namespace

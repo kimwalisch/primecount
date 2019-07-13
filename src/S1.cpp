@@ -1,8 +1,11 @@
 ///
 /// @file  S1.cpp
-/// @brief Calculate the contribution of the ordinary leaves
-///        in the Lagarias-Miller-Odlyzko and Deleglise-
-///        Rivat prime counting algorithms.
+/// @brief Calculate the contribution of the ordinary leaves in the
+///        Lagarias-Miller-Odlyzko and Deleglise-Rivat prime counting
+///        algorithms. Note that in the original paper from
+///        Lagarias-Miller-Odlyzko the ordinary leaves were named S1
+///        however in many newer papers the ordinary leaves are named
+///        S0. In primecount the ordinary leaves are named S1.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -71,8 +74,8 @@ bool resume(T x,
 /// to the first b primes and calculate the sum of the
 /// ordinary leaves. This algorithm is described in section
 /// 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6
-/// March 2015.
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
+/// 2015.
 ///
 template <int MU, typename T, typename P>
 T S1_thread(T x,

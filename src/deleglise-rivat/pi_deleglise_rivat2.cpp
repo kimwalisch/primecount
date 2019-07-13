@@ -1,9 +1,21 @@
 ///
 /// @file  pi_deleglise_rivat2.cpp
-/// @brief Implementation of the Deleglise-Rivat prime counting
-///        algorithm. Compared to pi_deleglise_rivat1.cpp this
-///        version uses compression (FactorTable & PiTable) to
-///        reduce the memory usage.
+/// @brief Simple demonstration implementation of the Deleglise-Rivat
+///        prime counting algorithm. The Deleglise-Rivat algorithm is
+///        an improvement over the Lagarias-Miller-Odlyzko algorithm,
+///        in the Deleglise-Rivat algorithm the special leaves
+///        S2(x, a) have been split up into trivial special leaves,
+///        easy special leaves and hard special leaves.
+///
+///        Deleglise-Rivat formula:
+///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
+///        S2(x, a) = S2_trivial(x, a) + S2_easy(x, a) + S2_hard(x, a)
+///        with y = alpha * x^(1/3), a = pi(y)
+///
+///        This version is identical to pi_deleglise_rivat1.cpp except
+///        that this version uses compression (FactorTable & PiTable)
+///        to reduce the memory usage. pi_deleglise_rivat2.cpp uses up
+///        to 12 times less memory than pi_deleglise_rivat1.cpp.
 ///
 ///        This implementation is based on the paper:
 ///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
@@ -84,7 +96,7 @@ int64_t S2_hard(int64_t x,
   int64_t segment_size = next_power_of_2(isqrt(limit));
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_sqrtz = pi[min(isqrt(z), y)];
-  int64_t S2_result = 0;
+  int64_t s2_hard = 0;
   double time = get_time();
 
   vector<char> sieve(segment_size);
@@ -130,12 +142,13 @@ int64_t S2_hard(int64_t x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor.lpf(m))
+        // mu(m) != 0 && prime < lpf(m)
+        if (prime < factor.mu_lpf(m))
         {
           int64_t n = prime * factor.get_number(m);
           int64_t count = tree.count(low, x / n);
           int64_t phi_xn = phi[b] + count;
-          S2_result -= factor.mu(m) * phi_xn;
+          s2_hard -= factor.mu(m) * phi_xn;
         }
       }
 
@@ -161,7 +174,7 @@ int64_t S2_hard(int64_t x,
         int64_t xn = x / n;
         int64_t count = tree.count(low, xn);
         int64_t phi_xn = phi[b] + count;
-        S2_result += phi_xn;
+        s2_hard += phi_xn;
       }
 
       phi[b] += tree.count(low, high - 1);
@@ -171,8 +184,8 @@ int64_t S2_hard(int64_t x,
     next_segment:;
   }
 
-  print("S2_hard", S2_result, time);
-  return S2_result;
+  print("S2_hard", s2_hard, time);
+  return s2_hard;
 }
 
 /// Calculate the contribution of the special leaves

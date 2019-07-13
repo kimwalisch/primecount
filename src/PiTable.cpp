@@ -24,7 +24,7 @@ namespace {
 
 constexpr uint64_t bitmask(uint64_t n)
 {
-  return ((n + 1) % 128 == 0) ? 0xffffffffffffffffull
+  return ((n + 1) / 2 == 64) ? 0xffffffffffffffffull
          : (1ull << ((n + 1) / 2)) - 1;
 }
 
@@ -32,7 +32,7 @@ constexpr uint64_t bitmask(uint64_t n)
 
 namespace primecount {
 
-const std::array<uint64_t, 128>  PiTable::unset_bits_ =
+const std::array<uint64_t, 128> PiTable::unset_bits_ =
 {
   bitmask(0),   bitmask(1),   bitmask(2),   bitmask(3),
   bitmask(4),   bitmask(5),   bitmask(6),   bitmask(7),

@@ -4,6 +4,11 @@
 ///        and the sparse easy leaves in parallel using OpenMP
 ///        (Deleglise-Rivat algorithm).
 ///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING

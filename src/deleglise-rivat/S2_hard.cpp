@@ -13,6 +13,11 @@
 ///        POPCNT instruction. Hence this implementation does not use
 ///        a binary indexed tree.
 ///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -106,7 +111,8 @@ T S2_hard_thread(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (prime < factor.lpf(m))
+        // mu(m) != 0 && prime < lpf(m)
+        if (prime < factor.mu_lpf(m))
         {
           int64_t fm = factor.get_number(m);
           int64_t xn = fast_div64(x2, fm);
@@ -161,11 +167,22 @@ T S2_hard_thread(T x,
 }
 
 /// Calculate the contribution of the hard special leaves.
-/// This is a parallel implementation with advanced load balancing.
-/// As most special leaves tend to be in the first segments we
-/// start off with a small segment size and few segments
-/// per thread, after each iteration we dynamically increase
-/// the segment size and the number of segments.
+///
+/// This is a parallel S2_hard(x, y) implementation with advanced load
+/// balancing. As most special leaves tend to be in the first segments
+/// we start off with a tiny segment size and one segment per thread.
+/// After each iteration we dynamically increase the segment size (until
+/// it reaches some limit) or the number of segments.
+///
+/// S2_hard(x, y) has been parallelized using an idea devised by Xavier
+/// Gourdon. The idea is to make the individual threads completely
+/// independent from each other so that no thread depends on values
+/// calculated by another thread. The benefit of this approach is that
+/// the algorithm will scale well up to a very large number of CPU
+/// cores. In order to make the threads independent from each other
+/// each thread needs to precompute a lookup table of phi(x, a) values
+/// (this is done in S2_hard_thread(x, y)) every time the thread starts
+/// a new computation.
 ///
 template <typename T, typename FactorTable, typename Primes>
 T S2_hard_OpenMP(T x,

@@ -1,9 +1,17 @@
 ///
 /// @file  S2_easy_libdivide.cpp
-/// @brief This is an optimized version of S2_easy which uses
+/// @brief Calculate the contribution of the clustered easy leaves
+///        and the sparse easy leaves in parallel using OpenMP.
+///        This is an optimized version of S2_easy(x, y) which uses
 ///        libdivide. libdivide allows to replace expensive integer
-///        divides with comparatively cheap multiplication and
-///        bitshifts.
+///        divsion instructions by a sequence of shift, add and
+///        multiply instructions that will calculate the integer
+///        division much faster.
+///
+///        This implementation is based on the paper:
+///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
+///        pp. 759-768.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///

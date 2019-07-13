@@ -4,7 +4,7 @@
 ///         which counts the numbers <= x that are not divisible
 ///         by any of the first a primes.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -59,8 +59,9 @@ int main()
     for (int j = primes[a]; j <= x; j += primes[a])
       sieve[j] = 0;
 
-    cout << "phi(" << x << ", " << a << ") = " << phi(x, a);
-    check(phi(x, a) == count(sieve));
+    int64_t phi_xa = phi(x, a);
+    cout << "phi(" << x << ", " << a << ") = " << phi_xa;
+    check(phi_xa == count(sieve));
   }
 
   cout << endl;
