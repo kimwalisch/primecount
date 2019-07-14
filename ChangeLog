@@ -1,9 +1,11 @@
-2019-07-09 Kim Walisch  <kim.walisch@gmail.com>
+2019-07-14 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 4.8 work in progress.
+  Version 4.8 released.
 
   This version reduces the memory usage of S2_easy(n) by
   15% and the memory usage of S2_hard(n) by 10%.
+  I have also improved the documentation of the code so
+  that others and myself can easier understand it.
 
   * PiTable.cpp: Reduce memory usage by 2x.
   * FactorTable.hpp: Reduce memory usage by 10%.
@@ -14,7 +16,6 @@
   * S2_trivial.cpp: Implement O(1) math formula.
   * libdivide.h: Update to libdivide-2.0.
   * appveyor.yml: Treat compiler warnings as errors.
-  * doc/primecount-MPI.md: Update documentation.
 
 2019-04-16 Kim Walisch  <kim.walisch@gmail.com>
 
