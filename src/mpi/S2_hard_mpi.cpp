@@ -48,9 +48,18 @@ using namespace primecount;
 
 namespace {
 
-/// Compute the contribution of the hard special leaves
-/// using a sieve. Each thread processes the interval
-/// [low, low + segments * segment_size[
+/// Compute the contribution of the hard special leaves using a
+/// segmented sieve. Each thread processes the interval
+/// [low, low + segments * segment_size[.
+///
+/// Note that in the Deleglise-Rivat paper it is suggested to use a
+/// segment size of y. In practice however this uses too much memory
+/// especially when using multi-threading. Hence we are using a
+/// segment size of sqrt(z) as suggested in Xavier Gourdon's paper.
+/// In primecount's implementation a segment size of sqrt(z) seems
+/// ideal since slightly increasing the segment size decreases
+/// performance because of cache misses and slightly decreasing the
+/// segment size also decreases performance.
 ///
 template <typename T, typename FactorTable, typename Primes>
 T S2_hard_thread(T x,
