@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,10 +21,9 @@ using namespace std;
 namespace {
 
 bool print_ = false;
-
 bool print_variables_ = false;
 
-}
+} // naespace
 
 namespace primecount {
 
@@ -75,6 +74,11 @@ bool print_variables()
   return print_variables_;
 }
 
+void print_seconds(double seconds)
+{
+  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+}
+
 void print(const string& str)
 {
   if (is_print())
@@ -87,16 +91,14 @@ void print(const string& str, maxint_t res)
     cout << str << " = " << res << endl;
 }
 
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
+void print(const string& str, maxint_t res, double time)
 {
   if (is_print())
   {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    print_threads(threads);
+    cout << "\r" << string(50,' ') << "\r";
+    cout << "Status: 100%" << endl;
+    cout << str << " = " << res << endl;
+    print_seconds(get_time() - time);
   }
 }
 
@@ -129,20 +131,29 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
   }
 }
 
-void print(const string& str, maxint_t res, double time)
+void print(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
   if (is_print())
   {
-    cout << "\r" << string(50,' ') << "\r";
-    cout << "Status: 100%" << endl;
-    cout << str << " = " << res << endl;
-    print_seconds(get_time() - time);
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "k = " << k << endl;
+    print_threads(threads);
   }
 }
 
-void print_seconds(double seconds)
+void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
 {
-  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+  if (is_print())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << c << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    print_threads(threads);
+  }
 }
 
 } // namespace

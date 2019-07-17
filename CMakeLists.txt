@@ -74,7 +74,9 @@ set(LIB_SRC src/FactorTable.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat1.cpp
             src/deleglise-rivat/pi_deleglise_rivat2.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp)
+            src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp
+            src/gourdon/pi_gourdon1.cpp
+            src/gourdon/phi0.cpp)
 
 # Required includes ##################################################
 
