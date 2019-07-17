@@ -1,5 +1,5 @@
 ///
-/// @file  phi0.cpp
+/// @file  Phi0.cpp
 /// @brief Calculate the contribution of the ordinary leaves using
 ///        Xavier Gourdon's prime counting algorithm. Note that this
 ///        implementation is a modified version of S1.cpp which is
@@ -43,7 +43,7 @@ namespace {
 /// 2015.
 ///
 template <int MU, typename T, typename P>
-T phi0_thread(T x,
+T Phi0_thread(T x,
               int64_t z,
               uint64_t b,
               int64_t k,
@@ -57,7 +57,7 @@ T phi0_thread(T x,
     T next = square_free * primes[b];
     if (next > z) break;
     phi0 += MU * phi_tiny(x / next, k);
-    phi0 += phi0_thread<-MU>(x, z, b, k, next, primes);
+    phi0 += Phi0_thread<-MU>(x, z, b, k, next, primes);
   }
 
   return phi0;
@@ -68,7 +68,7 @@ T phi0_thread(T x,
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
-X phi0_OpenMP(X x,
+X Phi0_OpenMP(X x,
               Y y,
               int64_t z,
               int64_t k,
@@ -85,7 +85,7 @@ X phi0_OpenMP(X x,
   for (int64_t b = k + 1; b < pi_y; b++)
   {
     phi0 -= phi_tiny(x / primes[b], k);
-    phi0 += phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
+    phi0 += Phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
   }
 
   return phi0;
@@ -95,48 +95,48 @@ X phi0_OpenMP(X x,
 
 namespace primecount {
 
-int64_t phi0(int64_t x,
+int64_t Phi0(int64_t x,
              int64_t y,
              int64_t z,
              int64_t k,
              int threads)
 {
   print("");
-  print("=== phi0(x, y, z) ===");
+  print("=== Phi0(x, y, z) ===");
   print("Computation of the ordinary leaves");
   print(x, y, z, k, threads);
 
   double time = get_time();
-  int64_t phi = phi0_OpenMP(x, y, z, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
 
-  print("phi0", phi, time);
-  return phi;
+  print("phi0", phi0, time);
+  return phi0;
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t phi0(int128_t x,
+int128_t Phi0(int128_t x,
               int64_t y,
               int64_t z,
               int64_t k,
               int threads)
 {
   print("");
-  print("=== phi0(x, y, z) ===");
+  print("=== Phi0(x, y, z) ===");
   print("Computation of the ordinary leaves");
   print(x, y, z, k, threads);
 
   double time = get_time();
-  int128_t phi;
+  int128_t phi0;
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
-    phi = phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
   else
-    phi = phi0_OpenMP(x, y, z, k, threads);
+    phi0 = Phi0_OpenMP(x, y, z, k, threads);
 
-  print("phi0", phi, time);
-  return phi;
+  print("phi0", phi0, time);
+  return phi0;
 }
 
 #endif

@@ -16,7 +16,7 @@ namespace primecount {
 
 int64_t pi_gourdon1(int64_t x, int64_t y, int64_t z, int64_t k);
 
-int64_t phi0(int64_t x,
+int64_t Phi0(int64_t x,
              int64_t y,
              int64_t z,
              int64_t k,
@@ -24,7 +24,7 @@ int64_t phi0(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t phi0(int128_t x,
+int128_t Phi0(int128_t x,
               int64_t y,
               int64_t z,
               int64_t k,
