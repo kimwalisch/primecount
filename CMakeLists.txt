@@ -77,7 +77,6 @@ set(LIB_SRC src/FactorTable.cpp
             src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp
             src/gourdon/pi_gourdon1.cpp
             src/gourdon/Phi0.cpp
-            src/gourdon/A.cpp
             src/gourdon/B.cpp)
 
 # Required includes ##################################################
@@ -106,8 +105,10 @@ endif()
 
 if(libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/A_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/A.cpp)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
