@@ -1,5 +1,9 @@
 ///
 /// @file  A.cpp
+/// @brief Simple demonstration implementation of the A(x, y) formula
+///        in Xavier Gourdon's prime counting algorithm. This
+///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
+///        in order to simplify the implementation.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -17,7 +21,6 @@
 #include <imath.hpp>
 #include <print.hpp>
 #include <S2Status.hpp>
-#include <S2.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -51,13 +54,20 @@ T A_OpenMP(T x,
     int64_t j = b + 1;
     int64_t max_j = pi[isqrt(x2)];
 
+    // x / (p * q) >= y
     for (; j <= max_j; j++)
     {
       int64_t xn = fast_div64(x2, primes[j]);
       if (xn < y)
-        sum += pi[xn] * 2;
-      else
-        sum += pi[xn];
+        break;
+      sum += pi[xn];
+    }
+
+    // x / (p * q) < y
+    for (; j <= max_j; j++)
+    {
+      int64_t xn = fast_div64(x2, primes[j]);
+      sum += pi[xn] * 2;
     }
 
     if (is_print())
