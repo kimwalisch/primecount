@@ -18,6 +18,7 @@
 /// file in the top level directory.
 ///
 
+#include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
@@ -80,7 +81,7 @@ T B_thread(T x,
             int64_t& pix,
             int64_t& pix_count)
 {
-  T b = 0;
+  T sum = 0;
   pix = 0;
   pix_count = 0;
 
@@ -102,13 +103,13 @@ T B_thread(T x,
     if (xp >= z) break;
     pix += count_primes(it, next, xp);
     pix_count++;
-    b += pix;
+    sum += pix;
     prime = rit.prev_prime();
   }
 
   pix += count_primes(it, next, z - 1);
 
-  return b;
+  return sum;
 }
 
 /// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -121,7 +122,7 @@ T B_OpenMP(T x, int64_t y, int threads)
   if (x < 4)
     return 0;
 
-  T b = 0;
+  T sum = 0;
   T pix_total = 0;
 
   int64_t low = 2;
@@ -138,9 +139,9 @@ T B_OpenMP(T x, int64_t y, int threads)
     threads = in_between(1, threads, max_threads);
     double time = get_time();
 
-    #pragma omp parallel for num_threads(threads) reduction(+: b)
+    #pragma omp parallel for num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
-      b += B_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
+      sum += B_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
@@ -148,7 +149,7 @@ T B_OpenMP(T x, int64_t y, int threads)
     // add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
-      b += pix_total * pix_counts[i];
+      sum += pix_total * pix_counts[i];
       pix_total += pix[i];
     }
 
@@ -160,7 +161,7 @@ T B_OpenMP(T x, int64_t y, int threads)
     }
   }
 
-  return b;
+  return sum;
 }
 
 } // namespace
@@ -169,11 +170,6 @@ namespace primecount {
 
 int64_t B(int64_t x, int64_t y, int threads)
 {
-#ifdef HAVE_MPI
-  if (mpi_num_procs() > 1)
-    return B_mpi(x, y, threads);
-#endif
-
   print("");
   print("=== B(x, y) ===");
   print(x, y, threads);
@@ -189,11 +185,6 @@ int64_t B(int64_t x, int64_t y, int threads)
 
 int128_t B(int128_t x, int64_t y, int threads)
 {
-#ifdef HAVE_MPI
-  if (mpi_num_procs() > 1)
-    return B_mpi(x, y, threads);
-#endif
-
   print("");
   print("=== B(x, y) ===");
   print(x, y, threads);
