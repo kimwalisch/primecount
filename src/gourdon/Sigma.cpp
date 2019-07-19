@@ -85,7 +85,7 @@ T Sigma4(T x, int64_t y, int threads)
 
 /// Memory usage: O(y)
 template <typename T>
-T Sigma5(T x, int64_t y, int threads)
+T Sigma5(T x, int64_t y)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -103,23 +103,27 @@ T Sigma5(T x, int64_t y, int threads)
 
 /// Memory usage: O(x^(3/8))
 template <typename T>
-T Sigma6(T x, int64_t y, int threads)
+T Sigma6(T x, int64_t y)
 {
   T sum = 0;
-  int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
   int64_t x_star = max(iroot<4>(x), x / ((T) y * (T) y));
 
-  PiTable pi(sqrtx / isqrt(x_star));
+  PiTable pi(isqrt(x / x_star));
   primesieve::iterator it(x_star, x13);
   int64_t prime = it.next_prime();
 
   for (; prime <= x13; prime = it.next_prime())
   {
-    T pix = pi[sqrtx / isqrt(prime)]; 
+    // Note that in Xavier Gourdon's paper the actual
+    // formula for Σ6 is: sum += pi(x^(1/2) / prime^(1/2))^2.
+    // However when implemented this way using integers
+    // the formula returns erroneous results.
+    // Hence the formula must be implemented as below:
+    T pix = pi[isqrt(x / prime)]; 
     sum += pix * pix;
   }
-
+ 
   return -sum;
 }
 
@@ -139,8 +143,8 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
                 Sigma2(x, y, threads) +
                 Sigma3(x, y, threads) +
                 Sigma4(x, y, threads) +
-                Sigma5(x, y, threads) +
-                Sigma6(x, y, threads);
+                Sigma5(x, y) +
+                Sigma6(x, y);
   
   print("Sigma", sum, time);
   return sum;
@@ -160,8 +164,8 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
                  Sigma2(x, y, threads) +
                  Sigma3(x, y, threads) +
                  Sigma4(x, y, threads) +
-                 Sigma5(x, y, threads) +
-                 Sigma6(x, y, threads);
+                 Sigma5(x, y) +
+                 Sigma6(x, y);
 
   print("Sigma", sum, time);
   return sum;
