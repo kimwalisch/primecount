@@ -33,7 +33,7 @@ namespace {
 template <typename T, typename Primes>
 T A_OpenMP(T x,
            int64_t y,
-           int64_t start,
+           int64_t x_star,
            Primes& primes,
            int threads)
 {
@@ -47,7 +47,7 @@ T A_OpenMP(T x,
   S2Status status(x);
 
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
-  for (int64_t b = pi[start] + 1; b <= pi_x13; b++)
+  for (int64_t b = pi[x_star] + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
     T x2 = x / prime;
@@ -91,11 +91,11 @@ int64_t A(int64_t x,
 
   double time = get_time();
   int64_t y2 = y * y;
-  int64_t start = max(iroot<4>(x), x / y2);
-  int64_t max_prime = (int64_t) isqrt(x / start);
+  int64_t x_star = max(iroot<4>(x), x / y2);
+  int64_t max_prime = (int64_t) isqrt(x / x_star);
 
   auto primes = generate_primes<int32_t>(max_prime);
-  int64_t a = A_OpenMP((intfast64_t) x, y, start, primes, threads);
+  int64_t a = A_OpenMP((intfast64_t) x, y, x_star, primes, threads);
 
   print("A", a, time);
   return a;
@@ -115,19 +115,19 @@ int128_t A(int128_t x,
   int128_t a;
 
   int128_t y2 = (int128_t) y * y;
-  int128_t start = max(iroot<4>(x), x / y2);
-  int64_t max_prime = (int64_t) isqrt(x / start);
+  int128_t x_star = max(iroot<4>(x), x / y2);
+  int64_t max_prime = (int64_t) isqrt(x / x_star);
 
   // uses less memory
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    a = A_OpenMP((intfast128_t) x, y, start, primes, threads);
+    a = A_OpenMP((intfast128_t) x, y, x_star, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(max_prime);
-    a = A_OpenMP((intfast128_t) x, y, start, primes, threads);
+    a = A_OpenMP((intfast128_t) x, y, x_star, primes, threads);
   }
 
   print("A", a, time);
