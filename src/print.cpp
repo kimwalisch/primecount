@@ -133,7 +133,7 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
 
 void print(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
-  if (is_print())
+  if (print_variables())
   {
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
