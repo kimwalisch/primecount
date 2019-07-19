@@ -156,12 +156,12 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
 
   double time = get_time();
   int128_t sum = Sigma0(x, y, threads) +
-                  Sigma1(x, y, threads) +
-                  Sigma2(x, y, threads) +
-                  Sigma3(x, y, threads) +
-                  Sigma4(x, y, threads) +
-                  Sigma5(x, y, threads) +
-                  Sigma6(x, y, threads);
+                 Sigma1(x, y, threads) +
+                 Sigma2(x, y, threads) +
+                 Sigma3(x, y, threads) +
+                 Sigma4(x, y, threads) +
+                 Sigma5(x, y, threads) +
+                 Sigma6(x, y, threads);
 
   print("Sigma", sum, time);
   return sum;
