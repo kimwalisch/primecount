@@ -118,9 +118,9 @@ T Sigma6(T x, int64_t y)
     // Note that in Xavier Gourdon's paper the actual
     // formula for Σ6 is: sum += pi(x^(1/2) / prime^(1/2))^2.
     // However when implemented this way using integers
-    // the formula returns erroneous results.
+    // the formula returns incorrect results.
     // Hence the formula must be implemented as below:
-    T pix = pi[isqrt(x / prime)]; 
+    T pix = pi[isqrt(x / prime)];
     sum += pix * pix;
   }
  
