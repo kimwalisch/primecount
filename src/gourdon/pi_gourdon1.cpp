@@ -39,12 +39,12 @@ int64_t pi_gourdon1(int64_t x, int64_t y, int64_t z, int64_t k)
 
   int64_t a = A(x, y, 1);
   int64_t b = B(x, y, 1);
-  int64_t C = 0;
-  int64_t D = 0;
+  int64_t c = 0;
+  int64_t d = 0;
   int64_t phi0 = Phi0(x, y, z, k, 1);
-  int64_t Sigma = 0;
+  int64_t sigma = Sigma(x, y, 1);
 
-  int64_t sum = a - b + C + D + phi0 + Sigma;
+  int64_t sum = a - b + c + d + phi0 + sigma;
 
   return sum;
 }

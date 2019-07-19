@@ -34,11 +34,13 @@ int128_t Phi0(int128_t x,
 
 int64_t A(int64_t x, int64_t y, int threads);
 int64_t B(int64_t x, int64_t y, int threads);
+int64_t Sigma(int64_t x, int64_t y, int threads);
 
 #ifdef HAVE_INT128_T
 
 int128_t A(int128_t x, int64_t y, int threads);
 int128_t B(int128_t x, int64_t y, int threads);
+int128_t Sigma(int128_t x, int64_t y, int threads);
 
 #endif
 
