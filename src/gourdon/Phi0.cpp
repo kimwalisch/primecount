@@ -103,7 +103,6 @@ int64_t Phi0(int64_t x,
 {
   print("");
   print("=== Phi0(x, y, z) ===");
-  print("Computation of the ordinary leaves");
   print(x, y, z, k, threads);
 
   double time = get_time();
@@ -123,7 +122,6 @@ int128_t Phi0(int128_t x,
 {
   print("");
   print("=== Phi0(x, y, z) ===");
-  print("Computation of the ordinary leaves");
   print(x, y, z, k, threads);
 
   double time = get_time();
