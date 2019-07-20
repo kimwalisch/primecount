@@ -5,6 +5,13 @@
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
 ///        in order to simplify the implementation.
 ///
+///        Currently this implementation is very slow, it is more than
+///        3x slower than Xavier Gourdon's fastpix11.exe binary. There
+///        are 2 obvious options to improve this implementation:
+///
+///        1) Implement clustered easy leaves like in S2_easy.cpp.
+///        2) Use FactorTable lookup table instead of mu, lpf, mpf.
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
