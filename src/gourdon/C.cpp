@@ -5,12 +5,9 @@
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
 ///        in order to simplify the implementation.
 ///
-///        Currently this implementation is very slow, it is more than
-///        3x slower than Xavier Gourdon's fastpix11.exe binary. There
-///        are 2 obvious options to improve this implementation:
-///
-///        1) Implement clustered easy leaves like in S2_easy.cpp.
-///        2) Use FactorTable lookup table instead of mu, lpf, mpf.
+///        I guess this implementation can be optimized significantly
+///        by using an algorithm that is similar to the algorithm used
+///        in S2_easy.cpp for the clustered easy leaves.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -28,6 +25,8 @@
 #include <print.hpp>
 #include <S2Status.hpp>
 
+#include "FactorTableGourdon.hpp"
+
 #include <stdint.h>
 #include <vector>
 
@@ -36,12 +35,13 @@ using namespace primecount;
 
 namespace {
 
-template <typename T, typename Primes>
+template <typename T, typename Primes, typename FactorTable>
 T C_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
            Primes& primes,
+           FactorTable& factor,
            int threads)
 {
   T sum = 0;
@@ -54,28 +54,26 @@ T C_OpenMP(T x,
   int64_t pi_x_star = pi[x_star];
   S2Status status(x);
 
-  auto mu = generate_moebius(z);
-  auto lpf = generate_lpf(z);
-  auto mpf = generate_mpf(z);
-
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
   for (int64_t b = k + 1; b <= pi_x_star; b++)
   {
     int64_t prime = primes[b];
     T x2 = x / prime;
-    int64_t min_trivial = min(x2 / prime, z);
-    int64_t min_sparse = x / ipow<T>(prime, 3);
-    min_sparse = max(prime, min_sparse);
-    int64_t m = min_trivial;
+    int64_t m = min(x2 / prime, z);
+    int64_t min_m = x / ipow<T>(prime, 3);
+    min_m = max(min_m, prime, z / prime);
 
-    for (; m > min_sparse; m--)
+    factor.to_index(&m);
+    factor.to_index(&min_m);
+
+    for (; m > min_m; m--)
     {
-      if (mu[m] != 0 &&
-          lpf[m] > prime && 
-          mpf[m] <= y)
+      // leastPrimeFactor[m] > prime && maxPrimeFactor[m] <= y
+      if (prime < factor.is_leaf(m))
       {
-        int64_t xn = fast_div64(x2, m);
-        sum -= mu[m] * (pi[xn] - b + 2);
+        int64_t n = factor.get_number(m);
+        int64_t xn = fast_div64(x2, n);
+        sum -= factor.mu(m) * (pi[xn] - b + 2);
       }
     }
 
@@ -102,7 +100,8 @@ int64_t C(int64_t x,
 
   double time = get_time();
   auto primes = generate_primes<int32_t>(z);
-  int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, threads);
+  FactorTableGourdon<uint16_t> factor(y, z, threads);
+  int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, factor, threads);
 
   print("C", c, time);
   return c;
@@ -124,15 +123,17 @@ int128_t C(int128_t x,
   int128_t c;
 
   // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
+  if (z <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
+    FactorTableGourdon<uint16_t> factor(y, z, threads);
+    c = C_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
+    FactorTableGourdon<uint32_t> factor(y, z, threads);
+    c = C_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
   }
 
   print("C", c, time);
