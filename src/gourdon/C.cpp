@@ -58,24 +58,23 @@ T C_OpenMP(T x,
   auto lpf = generate_lpf(z);
   auto mpf = generate_mpf(z);
 
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
+  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
   for (int64_t b = k + 1; b <= pi_x_star; b++)
   {
     int64_t prime = primes[b];
     T x2 = x / prime;
-    int64_t min_trivial = min(x2 / prime, z);
-    int64_t min_sparse = x / ipow<T>(prime, 3);
-    min_sparse = max(prime, min_sparse);
-    int64_t m = min_trivial;
+    int64_t m = min(x2 / prime, z);
+    int64_t min_m = x / ipow<T>(prime, 3);
+    min_m = max(min_m, prime, z / prime);
 
-    for (; m > min_sparse; m--)
+    for (; m > min_m; m--)
     {
       if (mu[m] != 0 &&
           lpf[m] > prime && 
           mpf[m] <= y)
       {
         int64_t xn = fast_div64(x2, m);
-        sum += mu[m] * (pi[xn] - b + 2);
+        sum -= mu[m] * (pi[xn] - b + 2);
       }
     }
 
@@ -83,7 +82,7 @@ T C_OpenMP(T x,
       status.print(b, pi_x_star);
   }
 
-  return -sum;
+  return sum;
 }
 
 } // namespace
