@@ -1,13 +1,13 @@
 ///
-/// @file  C.cpp
+/// @file  C1.cpp
 /// @brief Simple demonstration implementation of the C(x, y) formula
 ///        in Xavier Gourdon's prime counting algorithm. This
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
 ///        in order to simplify the implementation.
 ///
-///        Currently this implementation is very slow, it is more than
-///        3x slower than Xavier Gourdon's fastpix11.exe binary. There
-///        are 2 obvious options to improve this implementation:
+///        Currently this implementation is quite slow when compared
+///        to Xavier Gourdon's fastpix11.exe binary. There are 2
+///        obvious options to improve this implementation:
 ///
 ///        1) Implement clustered easy leaves like in S2_easy.cpp.
 ///        2) Use FactorTable lookup table instead of mu, lpf, mpf.
@@ -69,8 +69,7 @@ T C_OpenMP(T x,
 
     for (; m > min_m; m--)
     {
-      if (mu[m] != 0 &&
-          lpf[m] > prime && 
+      if (lpf[m] > prime && 
           mpf[m] <= y)
       {
         int64_t xn = fast_div64(x2, m);
