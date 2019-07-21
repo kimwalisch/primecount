@@ -80,7 +80,7 @@ vector<int32_t> generate_moebius(int64_t max)
   return mu;
 }
 
-/// Generate a vector with the least prime factors of
+/// Generate a vector with the least prime factors
 /// of the integers <= max.
 /// @Examples: lfp(2) = 2, lpf(15) = 3
 ///
@@ -112,6 +112,23 @@ vector<int32_t> generate_lpf(int64_t max)
       lpf[i] = (int32_t) i;
 
   return lpf;
+}
+
+/// Generate a vector with the largest prime factors
+/// of the integers <= max.
+/// @Examples: mfp(2) = 2, mpf(15) = 5
+///
+vector<int32_t> generate_mpf(int64_t max)
+{
+  int64_t size = max + 1;
+  vector<int32_t> mpf(size, 1);
+
+  for (int64_t i = 2; i <= max; i++)
+    if (mpf[i] == 1)
+      for (int64_t j = i; j < size; j += i)
+        mpf[j] = (int32_t) i;
+
+  return mpf;
 }
 
 } // namespace

@@ -47,6 +47,11 @@ std::vector<int32_t> generate_moebius(int64_t max);
 ///
 std::vector<int32_t> generate_lpf(int64_t max);
 
+/// Generate a vector with the largest prime
+/// factors of the integers <= max.
+///
+std::vector<int32_t> generate_mpf(int64_t max);
+
 /// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
