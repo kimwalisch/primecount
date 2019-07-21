@@ -5,9 +5,11 @@
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
 ///        in order to simplify the implementation.
 ///
-///        I guess this implementation can be optimized significantly
-///        by using an algorithm that is similar to the algorithm used
-///        in S2_easy.cpp for the clustered easy leaves.
+///        This implementation runs about 5x faster than C1.cpp
+///        because it only iterates over the square free integers
+///        which are coprime to the first b primes. C1.cpp iterates
+///        over all integer and for each integer checks whether it is
+///        coprime to the first b primes.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,8 +27,6 @@
 #include <print.hpp>
 #include <S2Status.hpp>
 
-#include "FactorTableGourdon.hpp"
-
 #include <stdint.h>
 #include <vector>
 
@@ -35,13 +35,50 @@ using namespace primecount;
 
 namespace {
 
-template <typename T, typename Primes, typename FactorTable>
+/// Recursively iterate over the square free numbers coprime
+/// to the first b primes. This algorithm is described in
+/// section 2.2 of the paper: Douglas Staple, "The Combinatorial
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
+/// 2015.
+///
+template <int MU, typename T, typename Primes>
+T C(T xp,
+    uint64_t i,
+    uint64_t m,
+    uint64_t min_m,
+    uint64_t max_m,
+    uint64_t b,
+    Primes& primes,
+    PiTable& pi)
+{
+  T sum = 0;
+
+  for (i++; i < primes.size(); i++)
+  {
+    uint64_t next_m = m * primes[i];
+
+    // next_m may be 128-bit
+    if ((T) m * primes[i] > max_m)
+      return sum;
+
+    if (next_m > min_m)
+    {
+      uint64_t xpm = fast_div64(xp, next_m);
+      sum += MU * (pi[xpm] - b + 2);
+    }
+
+    sum += C<-MU>(xp, i, next_m, min_m, max_m, b, primes, pi);
+  }
+
+  return sum;
+}
+
+template <typename T, typename Primes>
 T C_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
            Primes& primes,
-           FactorTable& factor,
            int threads)
 {
   T sum = 0;
@@ -58,24 +95,12 @@ T C_OpenMP(T x,
   for (int64_t b = k + 1; b <= pi_x_star; b++)
   {
     int64_t prime = primes[b];
-    T x2 = x / prime;
-    int64_t m = min(x2 / prime, z);
+    T xp = x / prime;
+    int64_t max_m = min(xp / prime, z);
     int64_t min_m = x / ipow<T>(prime, 3);
     min_m = max(min_m, prime, z / prime);
 
-    factor.to_index(&m);
-    factor.to_index(&min_m);
-
-    for (; m > min_m; m--)
-    {
-      // leastPrimeFactor[m] > prime && maxPrimeFactor[m] <= y
-      if (prime < factor.is_leaf(m))
-      {
-        int64_t n = factor.get_number(m);
-        int64_t xn = fast_div64(x2, n);
-        sum -= factor.mu(m) * (pi[xn] - b + 2);
-      }
-    }
+    sum -= C<-1>(xp, b, 1, min_m, max_m, b, primes, pi);
 
     if (is_print())
       status.print(b, pi_x_star);
@@ -99,9 +124,8 @@ int64_t C(int64_t x,
   print(x, y, z, k, threads);
 
   double time = get_time();
-  auto primes = generate_primes<int32_t>(z);
-  FactorTableGourdon<uint16_t> factor(y, z, threads);
-  int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, factor, threads);
+  auto primes = generate_primes<int32_t>(y);
+  int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, threads);
 
   print("C", c, time);
   return c;
@@ -123,17 +147,15 @@ int128_t C(int128_t x,
   int128_t c;
 
   // uses less memory
-  if (z <= numeric_limits<uint32_t>::max())
+  if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    FactorTableGourdon<uint16_t> factor(y, z, threads);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
+    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    FactorTableGourdon<uint32_t> factor(y, z, threads);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
+    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
   }
 
   print("C", c, time);

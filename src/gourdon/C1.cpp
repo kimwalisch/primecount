@@ -6,11 +6,12 @@
 ///        in order to simplify the implementation.
 ///
 ///        Currently this implementation is quite slow when compared
-///        to Xavier Gourdon's fastpix11.exe binary. There are 2
-///        obvious options to improve this implementation:
-///
-///        1) Implement clustered easy leaves like in S2_easy.cpp.
-///        2) Use FactorTable lookup table instead of mu, lpf, mpf.
+///        to Xavier Gourdon's fastpix11.exe binary. This
+///        implementation is slow mainly because it iterates over all
+///        integers and for each integer checks whether it is coprime
+///        to the first b primes. It is possible to iterate only over
+///        the square free integers which are coprime to the first b
+///        primes which is obviously much faster (see C2.cpp).
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
