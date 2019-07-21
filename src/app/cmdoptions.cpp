@@ -41,7 +41,7 @@ map<string, OptionID> optionMap =
   { "--deleglise_rivat2", OPTION_DELEGLISE_RIVAT2 },
   { "--deleglise_rivat_parallel1", OPTION_DELEGLISE_RIVAT_PARALLEL1 },
   { "--deleglise_rivat_parallel2", OPTION_DELEGLISE_RIVAT_PARALLEL2 },
-  { "--gourdon1", OPTION_GOURDON1 },
+  { "--gourdon", OPTION_GOURDON },
   { "-h", OPTION_HELP },
   { "--help", OPTION_HELP },
   { "--legendre", OPTION_LEGENDRE },

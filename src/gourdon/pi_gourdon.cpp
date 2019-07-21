@@ -1,5 +1,5 @@
 ///
-/// @file  pi_gourdon1.cpp
+/// @file  pi_gourdon.cpp
 /// @brief Simple demonstration implementation of Xavier Gourdon's
 ///        prime counting algorithm. Xavier Gourdon's algorithm is
 ///        an improved version of the Deleglise-Rivat algorithm.
@@ -14,16 +14,7 @@
 ///
 
 #include <gourdon.hpp>
-#include <primecount.hpp>
-#include <primecount-internal.hpp>
-#include <generate.hpp>
-#include <PhiTiny.hpp>
-#include <imath.hpp>
-
 #include <stdint.h>
-#include <vector>
-
-using namespace std;
 
 namespace primecount {
 
@@ -32,7 +23,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t pi_gourdon1(int64_t x, int64_t y, int64_t z, int64_t k)
+int64_t pi_gourdon(int64_t x, int64_t y, int64_t z, int64_t k)
 {
   if (x < 2)
     return 0;

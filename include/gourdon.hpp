@@ -14,7 +14,7 @@
 
 namespace primecount {
 
-int64_t pi_gourdon1(int64_t x, int64_t y, int64_t z, int64_t k);
+int64_t pi_gourdon(int64_t x, int64_t y, int64_t z, int64_t k);
 
 int64_t Phi0(int64_t x,
              int64_t y,
