@@ -35,6 +35,7 @@ int128_t Phi0(int128_t x,
 int64_t A(int64_t x, int64_t y, int threads);
 int64_t B(int64_t x, int64_t y, int threads);
 int64_t C(int64_t x, int64_t y, int64_t c, int64_t k, int threads);
+int64_t D(int64_t x, int64_t y, int64_t c, int64_t k);
 int64_t Sigma(int64_t x, int64_t y, int threads);
 
 #ifdef HAVE_INT128_T

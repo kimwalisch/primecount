@@ -79,6 +79,7 @@ set(LIB_SRC src/FactorTable.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
             src/gourdon/C.cpp
+            src/gourdon/D1.cpp
             src/gourdon/Sigma.cpp)
 
 # Required includes ##################################################
