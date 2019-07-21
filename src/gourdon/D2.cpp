@@ -74,8 +74,9 @@ int64_t D(int64_t x,
   int64_t segment_size = isqrt(limit);
   int64_t x_star = max(iroot<4>(x), x / (y * y));
 
-  PiTable pi(z);
-  auto primes = generate_primes<int32_t>(z);
+  PiTable pi(y);
+  auto primes = generate_primes<int32_t>(y);
+
   auto mu = generate_moebius(z);
   auto lpf = generate_lpf(z);
   auto mpf = generate_mpf(z);
@@ -154,11 +155,11 @@ int64_t D(int64_t x,
 
     // For pi_sqrtz < b <= pi_x_star
     // Find all special leaves: n = primes[b] * prime2
-    // which satisfy: low <= (x / n) < high
+    // which satisfy: low <= (x / n) < high && prime2 <= y
     for (; b <= pi_x_star; b++)
     {
       int64_t prime = primes[b];
-      int64_t max_m = min(x / (prime * low), x / ipow(prime, 3), z);
+      int64_t max_m = min(x / (prime * low), x / ipow(prime, 3), y);
       int64_t min_m = max(x / (prime * high), z / prime, prime);
       int64_t l = pi[max_m];
       int64_t i = 0;
