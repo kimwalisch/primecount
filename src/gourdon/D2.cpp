@@ -86,11 +86,7 @@ int64_t D(int64_t x,
 
   vector<char> sieve(segment_size);
   vector<int64_t> phi(pi_x_star + 1, 0);
-  vector<int64_t> next;
-
-  next.reserve(pi_x_star + 1);
-  for (int64_t i = 0; i <= pi_x_star; i++)
-    next.push_back(primes[i]);
+  vector<int64_t> next(primes.begin(), primes.end());
 
   // Segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)
