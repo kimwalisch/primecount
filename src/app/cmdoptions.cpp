@@ -163,6 +163,7 @@ Option makeOption(const string& str)
 CmdOptions parseOptions(int argc, char* argv[])
 {
   CmdOptions opts;
+  vector<maxint_t> numbers;
 
   for (int i = 1; i < argc; i++)
   {
@@ -173,7 +174,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
       case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
-      case OPTION_NUMBER:  opts.numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
@@ -185,10 +186,10 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (opts.numbers.empty())
+  if (numbers.empty())
     throw primecount_error("missing x number");
   else
-    opts.x = opts.numbers[0];
+    opts.x = numbers[0];
 
   return opts;
 }

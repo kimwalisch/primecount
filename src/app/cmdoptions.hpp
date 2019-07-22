@@ -1,7 +1,7 @@
 ///
 /// @file  cmdoptions.hpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,7 +12,6 @@
 
 #include <int128_t.hpp>
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
@@ -65,7 +64,6 @@ struct CmdOptions
   int64_t a = -1;
   int option = OPTION_PI;
   bool time = false;
-  std::vector<maxint_t> numbers;
 };
 
 CmdOptions parseOptions(int, char**);
