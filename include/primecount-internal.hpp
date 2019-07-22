@@ -123,7 +123,9 @@ int get_status_precision(maxint_t x);
 
 void set_alpha(double alpha);
 
-double get_alpha();
+void set_alpha_y(double alpha_y);
+
+void set_alpha_z(double alpha_z);
 
 double get_alpha(maxint_t x, int64_t y);
 

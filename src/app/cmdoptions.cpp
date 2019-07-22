@@ -35,6 +35,8 @@ map<string, OptionID> optionMap =
 {
   { "-a", OPTION_ALPHA },
   { "--alpha", OPTION_ALPHA },
+  { "--alpha_y", OPTION_ALPHA_Y },
+  { "--alpha_z", OPTION_ALPHA_Z },
   { "-d", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat1", OPTION_DELEGLISE_RIVAT1 },
@@ -169,6 +171,8 @@ CmdOptions parseOptions(int argc, char* argv[])
     switch (optionMap[opt.opt])
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
+      case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
+      case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
       case OPTION_NUMBER:  opts.numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;

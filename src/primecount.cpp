@@ -2,7 +2,7 @@
 /// @file  primecount.cpp
 /// @brief Function definitions of primecount.hpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -69,12 +69,20 @@ namespace {
   int threads_ = 0;
 #endif
 
+// Below 10^7 LMO is faster than Deleglise-Rivat
+const int lmo_threshold_ = 10000000;
+
 int status_precision_ = -1;
 
+// Tuning factor used in the Lagarias-Miller-Odlyzko
+// and Deleglise-Rivat algorithms.
 double alpha_ = -1;
 
-// Below 10^7 LMO is faster than Deleglise-Rivat
-const int lmo_threshold = 10000000;
+// Tuning factor used in Xavier Gourdon's algorithm
+double alpha_y_ = -1;
+
+// Tuning factor used in Xavier Gourdon's algorithm
+double alpha_z_ = -1;
 
 }
 
@@ -87,7 +95,7 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  if (x <= lmo_threshold)
+  if (x <= lmo_threshold_)
     return pi_lmo5(x);
   else
     return pi_deleglise_rivat(x, threads);
@@ -233,9 +241,14 @@ void set_alpha(double alpha)
   alpha_ = alpha;
 }
 
-double get_alpha()
+void set_alpha_y(double alpha_y)
 {
-  return alpha_;
+  alpha_y_ = alpha_y;
+}
+
+void set_alpha_z(double alpha_z)
+{
+  alpha_z_ = alpha_z;
 }
 
 /// Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -270,7 +283,7 @@ double get_alpha_z(int64_t y, int64_t z)
 ///
 double get_alpha_lmo(maxint_t x)
 {
-  double alpha = get_alpha();
+  double alpha = alpha_;
 
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
@@ -293,7 +306,7 @@ double get_alpha_lmo(maxint_t x)
 ///
 double get_alpha_deleglise_rivat(maxint_t x)
 {
-  double alpha = get_alpha();
+  double alpha = alpha_;
   double x2 = (double) x;
 
   // use default alpha if no command-line alpha provided
@@ -320,14 +333,20 @@ double get_alpha_deleglise_rivat(maxint_t x)
 ///
 double get_alpha_y_gourdon(maxint_t x)
 {
-  double a = 0.000265994;
-  double b = -0.00197097;
-  double c = -0.0125028;
-  double d = 1.09006;
-
+  double alpha_y = alpha_y_;
   double x2 = (double) x;
-  double logx = log(x2);
-  double alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+
+  // use default alpha if no command-line alpha provided
+  if (alpha_y < 1)
+  {
+    double a = 0.000265994;
+    double b = -0.00197097;
+    double c = -0.0125028;
+    double d = 1.09006;
+    double logx = log(x2);
+
+    alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  }
 
   return in_between(1, alpha_y, iroot<6>(x));
 }
@@ -339,10 +358,15 @@ double get_alpha_y_gourdon(maxint_t x)
 ///
 double get_alpha_z_gourdon(double alpha_y)
 {
-  // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
-  double alpha_z = 2.4;
-  alpha_z = in_between(1, alpha_z, alpha_y / 5);
-  return alpha_z;
+  double alpha_z = alpha_z_;
+
+  if (alpha_z < 1)
+  {
+    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
+    alpha_z = 2.4;
+  }
+
+  return in_between(1, alpha_z, alpha_y / 5);
 }
 
 /// x_star = max(x^(1/4), x / y^2)
