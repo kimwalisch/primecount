@@ -78,7 +78,7 @@ set(LIB_SRC src/FactorTable.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
-            src/gourdon/C.cpp
+            src/gourdon/C3.cpp
             src/gourdon/D2.cpp
             src/gourdon/Sigma.cpp)
 
