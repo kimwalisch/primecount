@@ -1,9 +1,15 @@
 ///
-/// @file  C.cpp
+/// @file  C2.cpp
 /// @brief Simple demonstration implementation of the C(x, y) formula
 ///        in Xavier Gourdon's prime counting algorithm. This
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))
 ///        in order to simplify the implementation.
+///
+///        This implementation runs about 5x faster than C1.cpp
+///        because it only iterates over the square free integers
+///        which are coprime to the first b primes. C1.cpp iterates
+///        over all integer and for each integer checks whether it is
+///        coprime to the first b primes.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
