@@ -144,7 +144,7 @@ maxint_t to_maxint(const std::string& expr);
 template <typename T1, typename T2, typename T3>
 inline T2 in_between(T1 min, T2 x, T3 max)
 {
-  if (x < min)
+  if (x < min || max < min)
     return (T2) min;
   if (x > max)
     return (T2) max;
