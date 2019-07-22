@@ -16,7 +16,6 @@
 #include <imath.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
@@ -315,7 +314,7 @@ double get_alpha_y_gourdon(maxint_t x)
   return in_between(1, alpha_y, iroot<6>(x));
 }
 
-/// z = y * alpha_z, with alpha_z > 1.
+/// z = y * alpha_z, with alpha_z >= 1.
 /// In Xavier Gourdon's algorithm the alpha_z tuning factor
 /// is named d. d should be determined experimentally by
 /// running benchmarks.
@@ -324,8 +323,7 @@ double get_alpha_z_gourdon(double alpha_y)
 {
   // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
   double alpha_z = 2.4;
-  alpha_z = in_between(1.1, alpha_z, alpha_y / 5);
-  assert(alpha_z > 1);
+  alpha_z = in_between(1, alpha_z, alpha_y / 5);
   return alpha_z;
 }
 
