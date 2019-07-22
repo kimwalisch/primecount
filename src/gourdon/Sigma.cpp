@@ -29,8 +29,9 @@ T Sigma0(T x, int64_t y, int threads)
 {
   T a = pi_legendre(y, threads);
   T pi_sqrtx = pi_legendre(isqrt(x), threads);
+  T sum = a - 1 + (pi_sqrtx * (pi_sqrtx - 1)) / 2 - (a * (a - 1)) / 2;
 
-  return a - 1 + (pi_sqrtx * (pi_sqrtx - 1)) / 2 - (a * (a - 1)) / 2;
+  return sum;
 }
 
 template <typename T>
@@ -38,8 +39,9 @@ T Sigma1(T x, int64_t y, int threads)
 {
   T a = pi_legendre(y, threads);
   T b = pi_legendre(iroot<3>(x), threads);
+  T sum = (a - b) * (a - b - 1) / 2;
 
-  return (a - b) * (a - b - 1) / 2;
+  return sum;
 }
 
 template <typename T>
@@ -48,20 +50,22 @@ T Sigma2(T x, int64_t y, int threads)
   T a = pi_legendre(y, threads);
   T b = pi_legendre(iroot<3>(x), threads);
   T c = pi_legendre(isqrt(x / y), threads);
-  T x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  T x_star = get_x_star_gourdon(x, y);
   T d = pi_legendre(x_star, threads);
+  T sum = a * (b - c - (c * (c - 3)) / 2 + (d * (d - 3)) / 2);
 
-  return a * (b - c - (c * (c - 3)) / 2 + (d * (d - 3)) / 2);
+  return sum;
 }
 
 template <typename T>
 T Sigma3(T x, int64_t y, int threads)
 {
   T b = pi_legendre(iroot<3>(x), threads);
-  T x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  T x_star = get_x_star_gourdon(x, y);
   T d = pi_legendre(x_star, threads);
+  T sum = (b * (b - 1) * (2 * b - 1)) / 6 - b - (d * (d - 1) * (2 * d - 1)) / 6 + d;
 
-  return (b * (b - 1) * (2 * b - 1)) / 6 - b - (d * (d - 1) * (2 * d - 1)) / 6 + d;
+  return sum;
 }
 
 /// Memory usage: O(x^(1/3)) or less
@@ -70,7 +74,7 @@ T Sigma4(T x, int64_t y, int threads)
 {
   T sum = 0;
   int64_t pi_y = pi_legendre(y, threads);
-  int64_t x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t sqrt_xy = isqrt(x / y);
 
   PiTable pi(x / (x_star * (T) y));
@@ -80,7 +84,8 @@ T Sigma4(T x, int64_t y, int threads)
   for (; prime <= sqrt_xy; prime = it.next_prime())
     sum += pi[x / (prime * (T) y)];
 
-  return pi_y * sum;
+  sum *= pi_y;
+  return sum;
 }
 
 /// Memory usage: O(y)
@@ -107,7 +112,7 @@ T Sigma6(T x, int64_t y)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
-  int64_t x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  int64_t x_star = get_x_star_gourdon(x, y);
 
   PiTable pi(isqrt(x / x_star));
   primesieve::iterator it(x_star, x13);
@@ -123,7 +128,7 @@ T Sigma6(T x, int64_t y)
     T pix = pi[isqrt(x / prime)];
     sum += pix * pix;
   }
- 
+
   return -sum;
 }
 

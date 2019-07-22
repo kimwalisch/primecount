@@ -123,13 +123,25 @@ int get_status_precision(maxint_t x);
 
 void set_alpha(double alpha);
 
-double get_alpha();
+void set_alpha_y(double alpha_y);
+
+void set_alpha_z(double alpha_z);
 
 double get_alpha(maxint_t x, int64_t y);
+
+double get_alpha_y(maxint_t x, int64_t y);
+
+double get_alpha_z(int64_t y, int64_t z);
 
 double get_alpha_lmo(maxint_t x);
 
 double get_alpha_deleglise_rivat(maxint_t x);
+
+double get_alpha_y_gourdon(maxint_t x);
+
+double get_alpha_z_gourdon(double alpha_y);
+
+int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 
 double get_time();
 
@@ -140,7 +152,7 @@ maxint_t to_maxint(const std::string& expr);
 template <typename T1, typename T2, typename T3>
 inline T2 in_between(T1 min, T2 x, T3 max)
 {
-  if (x < min)
+  if (x < min || max < min)
     return (T2) min;
   if (x > max)
     return (T2) max;

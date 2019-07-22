@@ -52,6 +52,13 @@ public:
       return pi[y];
   }
 
+  /// In Xavier Gourdon's algorithm the small
+  /// constant is named k instead of c.
+  static int64_t get_k(int64_t y)
+  {
+    return get_c(y);
+  }
+
   static int64_t max_a()
   {
     return primes.size() - 1;

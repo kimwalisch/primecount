@@ -35,12 +35,16 @@ map<string, OptionID> optionMap =
 {
   { "-a", OPTION_ALPHA },
   { "--alpha", OPTION_ALPHA },
+  { "--alpha_y", OPTION_ALPHA_Y },
+  { "--alpha_z", OPTION_ALPHA_Z },
   { "-d", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat1", OPTION_DELEGLISE_RIVAT1 },
   { "--deleglise_rivat2", OPTION_DELEGLISE_RIVAT2 },
   { "--deleglise_rivat_parallel1", OPTION_DELEGLISE_RIVAT_PARALLEL1 },
   { "--deleglise_rivat_parallel2", OPTION_DELEGLISE_RIVAT_PARALLEL2 },
+  { "-g", OPTION_GOURDON },
+  { "--gourdon", OPTION_GOURDON },
   { "-h", OPTION_HELP },
   { "--help", OPTION_HELP },
   { "--legendre", OPTION_LEGENDRE },
@@ -159,7 +163,6 @@ Option makeOption(const string& str)
 CmdOptions parseOptions(int argc, char* argv[])
 {
   CmdOptions opts;
-  vector<maxint_t> numbers;
 
   for (int i = 1; i < argc; i++)
   {
@@ -168,7 +171,9 @@ CmdOptions parseOptions(int argc, char* argv[])
     switch (optionMap[opt.opt])
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
-      case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
+      case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
+      case OPTION_NUMBER:  opts.numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
@@ -180,10 +185,10 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (numbers.empty())
+  if (opts.numbers.empty())
     throw primecount_error("missing x number");
   else
-    opts.x = numbers[0];
+    opts.x = opts.numbers[0];
 
   return opts;
 }

@@ -26,6 +26,7 @@ const string helpMenu
   "Options:\n"
   "\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
+  "  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
   "  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
@@ -46,7 +47,7 @@ const string helpMenu
   "  -v,    --version          Print version and license information\n"
   "  -h,    --help             Print this help menu\n"
   "\n"
-  "Advanced Deleglise-Rivat options:\n"
+  "Advanced options for the Deleglise-Rivat algorithm:\n"
   "\n"
   "  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)\n"
   "         --P2               Only compute the 2nd partial sieve function\n"
@@ -55,10 +56,12 @@ const string helpMenu
   "         --S2_easy          Only compute the easy special leaves\n"
   "         --S2_hard          Only compute the hard special leaves\n"
   "\n"
-  "Examples:\n"
+  "Advanced options for Xavier Gourdon's algorithm:\n"
   "\n"
-  "  primecount 1e13\n"
-  "  primecount 1e13 --nthprime --threads=4"
+  "         --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)\n"
+  "                            with y = x^(1/3) * alpha_y\n"
+  "         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= alpha_y\n"
+  "                            with z = y * alpha_z\n"
 );
 
 const string versionInfo

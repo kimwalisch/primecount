@@ -46,8 +46,7 @@ T C_OpenMP(T x,
            int threads)
 {
   T sum = 0;
-  T y2 = y * (T) y;
-  int64_t x_star = max(iroot<4>(x), x / y2);
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x_star, thread_threshold);
 
@@ -63,8 +62,8 @@ T C_OpenMP(T x,
   for (int64_t b = k + 1; b <= pi_x_star; b++)
   {
     int64_t prime = primes[b];
-    T x2 = x / prime;
-    int64_t m = min(x2 / prime, z);
+    T xp = x / prime;
+    int64_t m = min(xp / prime, z);
     int64_t min_m = x / ipow<T>(prime, 3);
     min_m = max(min_m, prime, z / prime);
 
@@ -73,8 +72,8 @@ T C_OpenMP(T x,
       if (lpf[m] > prime && 
           mpf[m] <= y)
       {
-        int64_t xn = fast_div64(x2, m);
-        sum -= mu[m] * (pi[xn] - b + 2);
+        int64_t xpm = fast_div64(xp, m);
+        sum -= mu[m] * (pi[xpm] - b + 2);
       }
     }
 
@@ -100,7 +99,7 @@ int64_t C(int64_t x,
   print(x, y, z, k, threads);
 
   double time = get_time();
-  auto primes = generate_primes<int32_t>(z);
+  auto primes = generate_primes<int32_t>(y);
   int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, threads);
 
   print("C", c, time);

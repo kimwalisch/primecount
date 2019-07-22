@@ -12,17 +12,21 @@
 
 #include <int128_t.hpp>
 #include <stdint.h>
+#include <vector>
 
 namespace primecount {
 
 enum OptionID
 {
   OPTION_ALPHA,
+  OPTION_ALPHA_Y,
+  OPTION_ALPHA_Z,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT1,
   OPTION_DELEGLISE_RIVAT2,
   OPTION_DELEGLISE_RIVAT_PARALLEL1,
   OPTION_DELEGLISE_RIVAT_PARALLEL2,
+  OPTION_GOURDON,
   OPTION_HELP,
   OPTION_LEGENDRE,
   OPTION_LEHMER,
@@ -61,6 +65,7 @@ struct CmdOptions
   int64_t a = -1;
   int option = OPTION_PI;
   bool time = false;
+  std::vector<maxint_t> numbers;
 };
 
 CmdOptions parseOptions(int, char**);
