@@ -42,6 +42,7 @@ int64_t pi_gourdon(int64_t x, int threads)
   // x^(1/3) < y < x^(1/2)
   y = std::max(y, x13 + 1);
   y = std::min(y, isqrt(x) - 1);
+  y = std::max(y, (int64_t) 1);
 
   int64_t k = PhiTiny::get_k(y);
   int64_t z = (int64_t)(y * alpha_z);
@@ -49,6 +50,7 @@ int64_t pi_gourdon(int64_t x, int threads)
   // y <= z < x^(1/2)
   z = std::max(z, y);
   z = std::min(z, isqrt(x) - 1);
+  z = std::max(z, (int64_t) 1);
 
   print("");
   print("=== pi_gourdon(x) ===");

@@ -372,9 +372,11 @@ double get_alpha_z_gourdon(double alpha_y)
 /// x_star = max(x^(1/4), x / y^2)
 int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 {
+  y = max(y, (int64_t) 1);
   maxint_t yy = (maxint_t) y * y;
-  int64_t x_star = (int64_t) max(iroot<4>(x), x / yy);
-  return x_star;
+  maxint_t x_div_yy = ceil_div(x, yy);
+  int64_t x_star = (int64_t) max(iroot<4>(x), x_div_yy);
+  return in_between(1, x_star, y);
 }
 
 void set_num_threads(int threads)
