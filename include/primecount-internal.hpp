@@ -133,7 +133,7 @@ double get_alpha_deleglise_rivat(maxint_t x);
 
 double get_alpha_y_gourdon(maxint_t x);
 
-double get_alpha_z_gourdon();
+double get_alpha_z_gourdon(double alpha_y);
 
 double get_time();
 

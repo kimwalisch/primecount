@@ -319,11 +319,11 @@ double get_alpha_y_gourdon(maxint_t x)
 /// is named d. d should be determined experimentally by
 /// running benchmarks.
 ///
-double get_alpha_z_gourdon()
+double get_alpha_z_gourdon(double alpha_y)
 {
   // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
   double alpha_z = 2.4;
-  return alpha_z;
+  return in_between(1.1, alpha_z, alpha_y);
 }
 
 void set_num_threads(int threads)
