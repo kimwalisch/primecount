@@ -16,6 +16,7 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
+#include <PhiTiny.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -37,7 +38,7 @@ int64_t pi_gourdon(int64_t x, int threads)
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha_y);
   int64_t z = (int64_t)(y * alpha_z);
-  int64_t k = 1;
+  int64_t k = PhiTiny::get_k(y);
 
   print("");
   print("=== pi_gourdon(x) ===");
