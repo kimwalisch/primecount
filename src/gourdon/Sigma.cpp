@@ -48,7 +48,7 @@ T Sigma2(T x, int64_t y, int threads)
   T a = pi_legendre(y, threads);
   T b = pi_legendre(iroot<3>(x), threads);
   T c = pi_legendre(isqrt(x / y), threads);
-  T x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  T x_star = get_x_star_gourdon(x, y);
   T d = pi_legendre(x_star, threads);
 
   return a * (b - c - (c * (c - 3)) / 2 + (d * (d - 3)) / 2);
@@ -58,7 +58,7 @@ template <typename T>
 T Sigma3(T x, int64_t y, int threads)
 {
   T b = pi_legendre(iroot<3>(x), threads);
-  T x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  T x_star = get_x_star_gourdon(x, y);
   T d = pi_legendre(x_star, threads);
 
   return (b * (b - 1) * (2 * b - 1)) / 6 - b - (d * (d - 1) * (2 * d - 1)) / 6 + d;
@@ -70,7 +70,7 @@ T Sigma4(T x, int64_t y, int threads)
 {
   T sum = 0;
   int64_t pi_y = pi_legendre(y, threads);
-  int64_t x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t sqrt_xy = isqrt(x / y);
 
   PiTable pi(x / (x_star * (T) y));
@@ -107,7 +107,7 @@ T Sigma6(T x, int64_t y)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
-  int64_t x_star = max(iroot<4>(x), x / ((T) y * (T) y));
+  int64_t x_star = get_x_star_gourdon(x, y);
 
   PiTable pi(isqrt(x / x_star));
   primesieve::iterator it(x_star, x13);

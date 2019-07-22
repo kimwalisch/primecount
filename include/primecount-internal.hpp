@@ -135,6 +135,8 @@ double get_alpha_y_gourdon(maxint_t x);
 
 double get_alpha_z_gourdon(double alpha_y);
 
+int64_t get_x_star_gourdon(maxint_t x, int64_t y);
+
 double get_time();
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);

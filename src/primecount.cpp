@@ -327,6 +327,15 @@ double get_alpha_z_gourdon(double alpha_y)
   return alpha_z;
 }
 
+/// x_star = max(x^(1/4), x / y^2)
+int64_t get_x_star_gourdon(maxint_t x, int64_t y)
+{
+  maxint_t yy = (maxint_t) y * y;
+  int64_t x_star = (int64_t) max(iroot<4>(x), x / yy);
+  x_star = min(x_star, y);
+  return x_star;
+}
+
 void set_num_threads(int threads)
 {
 #ifdef _OPENMP

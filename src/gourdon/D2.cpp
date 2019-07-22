@@ -72,8 +72,7 @@ int64_t D(int64_t x,
   int64_t sum = 0;
   int64_t limit = x / z + 1;
   int64_t segment_size = isqrt(limit);
-  int64_t x_star = max(iroot<4>(x), x / (y * y));
-  x_star = min(x_star, y);
+  int64_t x_star = get_x_star_gourdon(x, y);
 
   PiTable pi(y);
   auto primes = generate_primes<int32_t>(y);

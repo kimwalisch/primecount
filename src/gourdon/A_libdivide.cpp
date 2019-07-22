@@ -136,8 +136,7 @@ int64_t A(int64_t x,
   print(x, y, threads);
 
   double time = get_time();
-  int64_t y2 = y * y;
-  int64_t x_star = max(iroot<4>(x), x / y2);
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_prime = (int64_t) isqrt(x / x_star);
 
   auto primes = generate_primes<int32_t>(max_prime);
@@ -158,11 +157,9 @@ int128_t A(int128_t x,
   print(x, y, threads);
 
   double time = get_time();
-  int128_t a;
-
-  int128_t y2 = (int128_t) y * y;
-  int128_t x_star = max(iroot<4>(x), x / y2);
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_prime = (int64_t) isqrt(x / x_star);
+  int128_t a;
 
   // uses less memory
   if (max_prime <= numeric_limits<uint32_t>::max())

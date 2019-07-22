@@ -82,14 +82,11 @@ T C_OpenMP(T x,
            int threads)
 {
   T sum = 0;
-  T y2 = y * (T) y;
-  PiTable pi(isqrt(x));
-
-  int64_t x_star = max(iroot<4>(x), x / y2);
-  x_star = min(x_star, y);
+  int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x_star, thread_threshold);
 
+  PiTable pi(isqrt(x));
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
   S2Status status(x);
