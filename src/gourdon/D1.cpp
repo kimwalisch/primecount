@@ -44,6 +44,7 @@ int64_t D(int64_t x,
   int64_t limit = x / z + 1;
   int64_t segment_size = isqrt(limit);
   int64_t x_star = max(iroot<4>(x), x / (y * y));
+  x_star = min(x_star, y);
 
   auto pi = generate_pi(x_star);
   auto primes = generate_primes<int32_t>(x_star);
