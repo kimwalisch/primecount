@@ -16,6 +16,7 @@
 #include <imath.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
@@ -323,7 +324,9 @@ double get_alpha_z_gourdon(double alpha_y)
 {
   // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
   double alpha_z = 2.4;
-  return in_between(1.1, alpha_z, alpha_y);
+  alpha_z = in_between(1.1, alpha_z, alpha_y / 5);
+  assert(alpha_z > 1);
+  return alpha_z;
 }
 
 void set_num_threads(int threads)
