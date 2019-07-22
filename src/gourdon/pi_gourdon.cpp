@@ -14,6 +14,10 @@
 ///
 
 #include <gourdon.hpp>
+#include <primecount-internal.hpp>
+#include <imath.hpp>
+#include <print.hpp>
+
 #include <stdint.h>
 
 namespace primecount {
@@ -23,10 +27,22 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t pi_gourdon(int64_t x, int64_t y, int64_t z, int64_t k)
+int64_t pi_gourdon(int64_t x)
 {
   if (x < 2)
     return 0;
+
+  double alpha_y = get_alpha_y_gourdon(x);
+  double alpha_z = get_alpha_z_gourdon();
+  int64_t x13 = iroot<3>(x);
+  int64_t y = (int64_t)(x13 * alpha_y);
+  int64_t z = (int64_t)(y * alpha_z);
+  int64_t k = 1;
+
+  print("");
+  print("=== pi_gourdon(x) ===");
+  print("pi(x) = A - B + C + D + phi0 + Sigma");
+  print(x, y, z, k, alpha_y, alpha_z, 1);
 
   int64_t a = A(x, y, 1);
   int64_t b = B(x, y, 1);

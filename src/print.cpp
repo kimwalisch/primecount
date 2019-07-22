@@ -156,4 +156,18 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
   }
 }
 
+void print(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double alpha_z, int threads)
+{
+  if (is_print())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "k = " << k << endl;
+    cout << "alpha_y = " << fixed << setprecision(3) << alpha_y << endl;
+    cout << "alpha_z = " << fixed << setprecision(3) << alpha_z << endl;
+    print_threads(threads);
+  }
+}
+
 } // namespace

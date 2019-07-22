@@ -293,6 +293,39 @@ double get_alpha_deleglise_rivat(maxint_t x)
   return in_between(1, alpha, iroot<6>(x));
 }
 
+/// y = x^(1/3) * alpha_y, with alpha_y >= 1.
+/// In Xavier Gourdon's algorithm the alpha_y tuning factor
+/// is named c. The function below returns values of alpha_y
+/// that are close to the values of c in Xavier's fastpix11.exe
+/// program. This function was obtained by doing curve fitting
+/// using the Mathematica program.
+///
+double get_alpha_y_gourdon(maxint_t x)
+{
+  double a = 0.000265994;
+  double b = -0.00197097;
+  double c = -0.0125028;
+  double d = 1.09006;
+
+  double x2 = (double) x;
+  double logx = log(x2);
+  double alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+
+  return in_between(1, alpha_y, iroot<6>(x));
+}
+
+/// z = y * alpha_z, with alpha_z > 1.
+/// In Xavier Gourdon's algorithm the alpha_z tuning factor
+/// is named d. d should be determined experimentally by
+/// running benchmarks.
+///
+double get_alpha_z_gourdon()
+{
+  // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
+  double alpha_z = 2.4;
+  return alpha_z;
+}
+
 void set_num_threads(int threads)
 {
 #ifdef _OPENMP

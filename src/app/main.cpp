@@ -188,7 +188,7 @@ int main (int argc, char* argv[])
       case OPTION_DELEGLISE_RIVAT_PARALLEL1:
         res = pi_deleglise_rivat_parallel1(to_int64(x), threads); break;
       case OPTION_GOURDON:
-        res = pi_gourdon(to_int64(x), opt.numbers.at(1), opt.numbers.at(2), opt.numbers.at(3)); break;
+        res = pi_gourdon(to_int64(x)); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:

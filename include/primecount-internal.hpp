@@ -131,6 +131,10 @@ double get_alpha_lmo(maxint_t x);
 
 double get_alpha_deleglise_rivat(maxint_t x);
 
+double get_alpha_y_gourdon(maxint_t x);
+
+double get_alpha_z_gourdon();
+
 double get_time();
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
