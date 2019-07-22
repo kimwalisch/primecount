@@ -139,6 +139,8 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
     cout << "k = " << k << endl;
+    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
     print_threads(threads);
   }
 }

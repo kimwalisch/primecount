@@ -127,6 +127,10 @@ double get_alpha();
 
 double get_alpha(maxint_t x, int64_t y);
 
+double get_alpha_y(maxint_t x, int64_t y);
+
+double get_alpha_z(int64_t y, int64_t z);
+
 double get_alpha_lmo(maxint_t x);
 
 double get_alpha_deleglise_rivat(maxint_t x);

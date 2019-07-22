@@ -238,11 +238,29 @@ double get_alpha()
   return alpha_;
 }
 
+/// Tuning factor used in the Lagarias-Miller-Odlyzko
+/// and Deleglise-Rivat algorithms.
+///
 double get_alpha(maxint_t x, int64_t y)
 {
   // y = x13 * alpha, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
   return (double) y / x13;
+}
+
+/// Tuning factor used in Xavier Gourdon's algorithm.
+double get_alpha_y(maxint_t x, int64_t y)
+{
+  // y = x13 * alpha_y, thus alpha = y / x13
+  double x13 = (double) iroot<3>(x);
+  return (double) y / x13;
+}
+
+/// Tuning factor used in Xavier Gourdon's algorithm.
+double get_alpha_z(int64_t y, int64_t z)
+{
+  // z = y * alpha_z, thus alpha_z = z / y
+  return (double) z / y;
 }
 
 /// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
