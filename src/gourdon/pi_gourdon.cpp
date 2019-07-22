@@ -20,6 +20,7 @@
 #include <print.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 
 namespace primecount {
 
@@ -37,8 +38,17 @@ int64_t pi_gourdon(int64_t x, int threads)
   double alpha_z = get_alpha_z_gourdon(alpha_y);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t)(x13 * alpha_y);
-  int64_t z = (int64_t)(y * alpha_z);
+
+  // x^(1/3) < y < x^(1/2)
+  y = std::max(y, x13 + 1);
+  y = std::min(y, isqrt(x) - 1);
+
   int64_t k = PhiTiny::get_k(y);
+  int64_t z = (int64_t)(y * alpha_z);
+
+  // y <= z < x^(1/2)
+  z = std::max(z, y);
+  z = std::min(z, isqrt(x) - 1);
 
   print("");
   print("=== pi_gourdon(x) ===");
@@ -51,7 +61,6 @@ int64_t pi_gourdon(int64_t x, int threads)
   int64_t d = D(x, y, z, k);
   int64_t phi0 = Phi0(x, y, z, k, threads);
   int64_t sigma = Sigma(x, y, threads);
-
   int64_t sum = a - b + c + d + phi0 + sigma;
 
   return sum;
