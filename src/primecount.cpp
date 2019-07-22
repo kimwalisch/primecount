@@ -370,13 +370,40 @@ double get_alpha_z_gourdon(double alpha_y)
 }
 
 /// x_star = max(x^(1/4), x / y^2)
+///
+/// After my implementation of Xavier Gourdon's algorithm worked for
+/// the first time there were still many miscalculations mainly for
+/// small numbers < 10^6. By debugging I found that most errors were
+/// related to the Sigma formulas (Σ0 - Σ6) and the x_star variable
+/// was responsible for most errors. For some unknown reason the
+/// bounds from Xavier's paper (max(x^(1/4), x / y^2)) don't seem to
+/// be enough. By trial and error I figured out a few more bounds that
+/// fix all miscalculations in my implementation.
+///
 int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 {
+  // For some unknown reason it is necessary
+  // to round up (x / y^2). Without rounding up
+  // there are many miscalculations below 2000
+  // in my implementation.
   y = max(y, (int64_t) 1);
   maxint_t yy = (maxint_t) y * y;
   maxint_t x_div_yy = ceil_div(x, yy);
+
   int64_t x_star = (int64_t) max(iroot<4>(x), x_div_yy);
-  return in_between(1, x_star, y);
+  int64_t sqrt_xy = (int64_t) isqrt(x / y);
+
+  // x_star <= y
+  // x_star <= (x / y)^(1/2)
+  // The bounds above are missing in Xavier Gourdon's
+  // paper. Without these bounds many of the 7 Sigma
+  // formulas (Σ0 - Σ6) return incorrect results for
+  // numbers below 10^6.
+  x_star = min(x_star, y);
+  x_star = min(x_star, sqrt_xy);
+  x_star = max(x_star, (int64_t) 1);
+
+  return x_star;
 }
 
 void set_num_threads(int threads)
