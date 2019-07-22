@@ -26,6 +26,7 @@ const string helpMenu
   "Options:\n"
   "\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
+  "  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm\n"
   "         --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
   "  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
