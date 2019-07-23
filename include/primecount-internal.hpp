@@ -168,11 +168,21 @@ double get_percent(T low, T limit)
 }
 
 template <typename T>
-T S2_approx(T x, int64_t pi_y, T P2, T S1)
+T S2_approx(T x, int64_t pi_y, T p2, T s1)
 {
   T pix = Ri(x);
-  T S2 = pix - S1 - pi_y + 1 + P2;
-  return S2;
+  T s2_approx = pix - s1 - pi_y + 1 + p2;
+  s2_approx = std::max(s2_approx, (T) 0);
+  return s2_approx;
+}
+
+template <typename T>
+T D_approx(T x, T sigma, T phi0, T a, T b, T c)
+{
+  T pix = Ri(x);
+  T d_approx = pix - (a - b + c + phi0 + sigma);
+  d_approx = std::max(d_approx, (T) 0);
+  return d_approx;
 }
 
 #ifdef HAVE_MPI
