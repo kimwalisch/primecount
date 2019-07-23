@@ -40,7 +40,7 @@ namespace {
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[.
 ///
-template <typename T, typename FactorTable, typename Primes>
+template <typename T, typename DFactorTable, typename Primes>
 T D_thread(T x,
            int64_t x_star,
            int64_t xz,
@@ -50,7 +50,7 @@ T D_thread(T x,
            int64_t low,
            int64_t segments,
            int64_t segment_size,
-           FactorTable& factor,
+           DFactorTable& factor,
            PiTable& pi,
            Primes& primes,
            Runtime& runtime)
@@ -185,13 +185,13 @@ T D_thread(T x,
 /// (this is done in D_thread(x, y)) every time the thread starts
 /// a new computation.
 ///
-template <typename T, typename FactorTable, typename Primes>
+template <typename T, typename DFactorTable, typename Primes>
 T D_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
            Primes& primes,
-           FactorTable& factor,
+           DFactorTable& factor,
            int threads)
 {
   int64_t xz = x / z;
@@ -263,7 +263,7 @@ int128_t D(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (z <= FactorTable<uint16_t>::max())
+  if (z <= DFactorTable<uint16_t>::max())
   {
     DFactorTable<uint16_t> factor(y, z, threads);
 
