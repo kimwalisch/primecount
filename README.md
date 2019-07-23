@@ -106,7 +106,12 @@ Options:
   -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
+```
 
+<details>
+<summary>Advanced options</summary>
+
+```
 Advanced options for the Deleglise-Rivat algorithm:
 
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
@@ -123,6 +128,8 @@ Advanced options for Xavier Gourdon's algorithm:
          --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= alpha_y
                             with z = y * alpha_z
 ```
+
+</details>
 
 ## Benchmarks
 
