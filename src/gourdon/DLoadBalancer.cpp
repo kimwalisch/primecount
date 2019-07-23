@@ -35,7 +35,7 @@ DLoadBalancer::DLoadBalancer(maxint_t x,
   init_size();
   maxint_t x16 = iroot<6>(x);
   double alpha_y = get_alpha_y(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha_y) * x16));
+  smallest_hard_leaf_ = (int64_t) (x / (z * sqrt(alpha_y) * x16));
 }
 
 void DLoadBalancer::init_size()
