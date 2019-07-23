@@ -62,8 +62,7 @@ int64_t pi_gourdon(int64_t x, int threads)
   int64_t a = A(x, y, threads);
   int64_t b = B(x, y, threads);
   int64_t c = C(x, y, z, k, threads);
-  int64_t d_approx = D_approx(x, sigma, phi0, a, b, c);
-  int64_t d = D(x, y, z, k, d_approx, threads);
+  int64_t d = D(x, y, z, k, threads);
   int64_t sum = a - b + c + d + phi0 + sigma;
 
   return sum;

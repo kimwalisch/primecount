@@ -21,12 +21,12 @@
 #include <generate_phi.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
-#include <LoadBalancer.hpp>
 #include <min.hpp>
 #include <print.hpp>
 #include <S2.hpp>
 
 #include "DFactorTable.hpp"
+#include "DLoadBalancer.hpp"
 
 #include <stdint.h>
 #include <vector>
@@ -41,19 +41,19 @@ namespace {
 /// [low, low + segments * segment_size[.
 ///
 template <typename T, typename FactorTable, typename Primes>
-T S2_hard_thread(T x,
-                 int64_t x_star,
-                 int64_t xz,
-                 int64_t y,
-                 int64_t z,
-                 int64_t k,
-                 int64_t low,
-                 int64_t segments,
-                 int64_t segment_size,
-                 FactorTable& factor,
-                 PiTable& pi,
-                 Primes& primes,
-                 Runtime& runtime)
+T D_thread(T x,
+           int64_t x_star,
+           int64_t xz,
+           int64_t y,
+           int64_t z,
+           int64_t k,
+           int64_t low,
+           int64_t segments,
+           int64_t segment_size,
+           FactorTable& factor,
+           PiTable& pi,
+           Primes& primes,
+           Runtime& runtime)
 {
   int64_t low1 = max(low, 1);
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -182,25 +182,24 @@ T S2_hard_thread(T x,
 /// the algorithm will scale well up to a very large number of CPU
 /// cores. In order to make the threads independent from each other
 /// each thread needs to precompute a lookup table of phi(x, a) values
-/// (this is done in S2_hard_thread(x, y)) every time the thread starts
+/// (this is done in D_thread(x, y)) every time the thread starts
 /// a new computation.
 ///
 template <typename T, typename FactorTable, typename Primes>
-T S2_hard_OpenMP(T x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t k,
-                 T d_approx,
-                 Primes& primes,
-                 FactorTable& factor,
-                 int threads)
+T D_OpenMP(T x,
+           int64_t y,
+           int64_t z,
+           int64_t k,
+           Primes& primes,
+           FactorTable& factor,
+           int threads)
 {
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);
 
   PiTable pi(y);
-  LoadBalancer loadBalancer(x, z, xz, d_approx);
+  DLoadBalancer loadBalancer(x, y, z);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
@@ -214,12 +213,12 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, sum, runtime))
     {
       runtime.start();
-      sum = S2_hard_thread(x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
+      sum = D_thread(x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
 
-  T sum = (T) loadBalancer.get_result();
+  T sum = (T) loadBalancer.get_sum();
 
   return sum;
 }
@@ -232,7 +231,6 @@ int64_t D(int64_t x,
           int64_t y,
           int64_t z,
           int64_t k,
-          int64_t d_approx,
           int threads)
 {
   print("");
@@ -243,7 +241,7 @@ int64_t D(int64_t x,
   DFactorTable<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
 
-  int64_t sum = S2_hard_OpenMP((intfast64_t) x, y, z, k, (intfast64_t) d_approx, primes, factor, threads);
+  int64_t sum = D_OpenMP((intfast64_t) x, y, z, k, primes, factor, threads);
 
   print("D", sum, time);
   return sum;
@@ -255,7 +253,6 @@ int128_t D(int128_t x,
            int64_t y,
            int64_t z,
            int64_t k,
-           int128_t d_approx,
            int threads)
 {
   print("");
@@ -271,7 +268,7 @@ int128_t D(int128_t x,
     DFactorTable<uint16_t> factor(y, z, threads);
 
     auto primes = generate_primes<uint32_t>(y);
-    sum = S2_hard_OpenMP((intfast128_t) x, y, z, k, (intfast128_t) d_approx, primes, factor, threads);
+    sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
   }
   else
   {
@@ -281,12 +278,12 @@ int128_t D(int128_t x,
     if (y <= numeric_limits<uint32_t>::max())
     {
       auto primes = generate_primes<uint32_t>(y);
-      sum = S2_hard_OpenMP((intfast128_t) x, y, z, k, (intfast128_t) d_approx, primes, factor, threads);
+      sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
     }
     else
     {
       auto primes = generate_primes<int64_t>(y);
-      sum = S2_hard_OpenMP((intfast128_t) x, y, z, k, (intfast128_t) d_approx, primes, factor, threads); 
+      sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads); 
     }
   }
 
