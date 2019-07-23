@@ -308,7 +308,7 @@ int main()
   </tr>
 </table>
 
-<p>Up until the early 19th century the most efficient known method for
+Up until the early 19th century the most efficient known method for
 counting primes was the sieve of Eratosthenes which has a running time of
 <img src="https://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
 operations. The first improvement to this bound was Legendre's formula
@@ -335,11 +335,14 @@ algorithm based on Meissel's formula which has a lower runtime complexity of
 <img src="https://kimwalisch.github.io/primecount/formulas/Oroot23xlogx.svg" height="20" align="absmiddle"/>
 operations and which uses only
 <img src="https://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
-space.</p>
-<p>primecount's Legendre, Meissel and Lehmer implementations are based
+space.
+
+primecount's Legendre, Meissel and Lehmer implementations are based
 on Hans Riesel's book <a href="doc/References.md">[5]</a>,
 its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
-based on Tomás Oliveira's paper <a href="doc/References.md">[9]</a>.</p>
+based on Tomás Oliveira's paper <a href="doc/References.md">[9]</a>
+and the implementation of Xavier Gourdon's algorithm is based
+on Xavier Gourdon's paper  <a href="doc/References.md">[7]</a>.
 
 ## Fast nth prime calculation
 
