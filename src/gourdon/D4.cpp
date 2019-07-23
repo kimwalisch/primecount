@@ -1,11 +1,19 @@
 ///
 /// @file  D4.cpp
-/// @brief Highly optimized implementation of the D(x, y) formula in
-///        Xavier Gourdon's prime counting algorithm. The D formula is
-///        very similar to the formula of the hard special leaves in
-///        the Deleglise-Rivat algorithm. Hence this implementation is
-///        basically identical to S2_hard.cpp except that the bounds
-///        have been changed slightly.
+/// @brief This is a highly optimized implementation of the D(x, y)
+///        formula in Xavier Gourdon's prime counting algorithm. The D
+///        formula is very similar to the formula of the hard special
+///        leaves in the Deleglise-Rivat algorithm. Hence this
+///        implementation is basically identical to S2_hard.cpp except
+///        that the bounds have been changed slightly.
+///
+///        This implementation uses multi-threading with advanced load
+///        balancing, it scales well up to a large number of CPU cores
+///        because the compute threads are completely independent from
+///        each other. This implementation also uses the highly
+///        optimized Sieve class and the DFactorTable class which is a
+///        compressed lookup table of moebius function values,
+///        least prime factors and max prime factors.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
