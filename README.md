@@ -9,8 +9,8 @@ that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
 **highly optimized** implementations of the
 [prime counting function](https://en.wikipedia.org/wiki/Prime-counting_function)
 (combinatorial methods). primecount includes implementations of the
-algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko and
-Deleglise-Rivat all of which have been parallelized using
+algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko, Deleglise-Rivat
+and Gourdon all of which have been parallelized using
 [OpenMP](https://en.wikipedia.org/wiki/OpenMP). The Deleglise-Rivat
 implementation has also been 
 [distributed](https://github.com/kimwalisch/primecount/blob/master/doc/primecount-MPI.md#primecount-mpi)
@@ -86,18 +86,19 @@ combinatorial prime counting function.
 Options:
 
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
+  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
          --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
   -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
-         --Li_inverse       Approximate nth prime using Li^-1(x)
+         --Li_inverse       Approximate the nth prime using Li^-1(x)
   -n,    --nthprime         Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
          --phi=<a>          phi(x, a) counts the numbers <= x that are
                             not divisible by any of the first a primes
          --Ri               Approximate pi(x) using Riemann R
-         --Ri_inverse       Approximate nth prime using Ri^-1(x)
+         --Ri_inverse       Approximate the nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
                             [N] digits after decimal point e.g. N=1, 99.9%
          --test             Run various correctness tests and exit
@@ -106,7 +107,7 @@ Options:
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
 
-Advanced Deleglise-Rivat options:
+Advanced options for the Deleglise-Rivat algorithm:
 
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
          --P2               Only compute the 2nd partial sieve function
@@ -114,6 +115,13 @@ Advanced Deleglise-Rivat options:
          --S2_trivial       Only compute the trivial special leaves
          --S2_easy          Only compute the easy special leaves
          --S2_hard          Only compute the hard special leaves
+
+Advanced options for Xavier Gourdon's algorithm:
+
+         --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
+                            with y = x^(1/3) * alpha_y
+         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= alpha_y
+                            with z = y * alpha_z
 ```
 
 ## Benchmarks
