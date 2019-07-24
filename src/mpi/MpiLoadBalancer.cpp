@@ -43,12 +43,10 @@ namespace primecount {
 
 MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
                                  int64_t sieve_limit,
-                                 int64_t smallest_leaf,
                                  maxint_t sum_approx) :
   low_(0),
   max_low_(0),
   sieve_limit_(sieve_limit),
-  smallest_leaf_(smallest_leaf),
   segments_(1),
   sum_(0),
   sum_approx_(sum_approx),
@@ -86,28 +84,23 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
     segments_ = msg->segments();
     segment_size_ = msg->segment_size();
 
-    if (segment_size_ < max_size_)
-      segment_size_ = min(segment_size_ * 2, max_size_);
-    else
+    // We only start increasing the segment_size and segments
+    // per thread once the first special leaves have been
+    // found. Near the start there is a very large number of
+    // leaves and we don't want a single thread to compute
+    // them all by himself (which would cause scaling issues).
+    if (sum_ != 0)
     {
-      Runtime runtime;
-      runtime.init = msg->init_seconds();
-      runtime.secs = msg->seconds();
-      update_segments(runtime);
+      if (segment_size_ < max_size_)
+        segment_size_ = min(segment_size_ * 2, max_size_);
+      else
+      {
+        Runtime runtime;
+        runtime.init = msg->init_seconds();
+        runtime.secs = msg->seconds();
+        update_segments(runtime);
+      }
     }
-  }
-
-  // Most hard special leaves are located just past
-  // smallest_leaf_. In order to prevent assigning
-  // the bulk of work to a single thread we reduce
-  // the number of segments to a minimum.
-
-  int64_t high = low_ + segments_ * segment_size_;
-
-  if (smallest_leaf_ >= low_ &&
-      smallest_leaf_ <= high)
-  {
-    segments_ = 1;
   }
 
   // udpate msg with new work todo

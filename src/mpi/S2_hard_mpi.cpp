@@ -252,9 +252,7 @@ T S2_hard_mpi_master(T x,
   int slaves = mpi_num_procs() - 1;
 
   MpiMsg msg;
-  double alpha = get_alpha(x, y);
-  int64_t smallest_leaf = get_smallest_leaf(x, y, alpha);
-  MpiLoadBalancer loadBalancer(x, z, smallest_leaf, s2_hard_approx);
+  MpiLoadBalancer loadBalancer(x, z, s2_hard_approx);
   S2Status status(x);
 
   while (slaves > 0)

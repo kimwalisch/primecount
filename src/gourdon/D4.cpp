@@ -208,9 +208,7 @@ T D_OpenMP(T x,
   threads = ideal_num_threads(threads, xz);
 
   PiTable pi(y);
-  double alpha_y = get_alpha_y(x, y);
-  int64_t smallest_leaf = get_smallest_leaf(x, z, alpha_y);
-  LoadBalancer loadBalancer(x, xz, smallest_leaf, d_approx);
+  LoadBalancer loadBalancer(x, xz, d_approx);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)

@@ -24,7 +24,7 @@ namespace primecount {
 class MpiLoadBalancer
 {
 public:
-  MpiLoadBalancer(maxint_t x, int64_t sieve_limit, int64_t smallest_leaf, maxint_t sum_approx);
+  MpiLoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
   void get_work(MpiMsg* msg);
 
 private:
@@ -34,7 +34,6 @@ private:
   int64_t low_;
   int64_t max_low_;
   int64_t sieve_limit_;
-  int64_t smallest_leaf_;
   int64_t segments_;
   int64_t segment_size_;
   int64_t max_size_;
