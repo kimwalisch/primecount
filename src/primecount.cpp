@@ -325,11 +325,13 @@ double get_alpha_deleglise_rivat(maxint_t x)
 }
 
 /// y = x^(1/3) * alpha_y, with alpha_y >= 1.
-/// In Xavier Gourdon's algorithm the alpha_y tuning factor
-/// is named c. The function below returns values of alpha_y
-/// that are close to the values of c in Xavier's fastpix11.exe
-/// program. This function was obtained by doing curve fitting
-/// using the Mathematica program.
+/// alpha_y is a tuning factor which should be determined
+/// experimentally by running benchmarks.
+///
+/// Note that in Xavier Gourdon's paper alpha_y is named c
+/// but we name it alpha_y since y = x^(1/3) * alpha_y
+/// and the tuning factor in Tomás Oliveira e Silva's paper
+/// is also named alpha.
 ///
 double get_alpha_y_gourdon(maxint_t x)
 {
@@ -339,10 +341,10 @@ double get_alpha_y_gourdon(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha_y < 1)
   {
-    double a = 0.000265994;
-    double b = -0.00197097;
-    double c = -0.0125028;
-    double d = 1.09006;
+    double a = 0.0001302;
+    double b = 0.003262;
+    double c = -0.0875037;
+    double d = 1.20458;
     double logx = log(x2);
 
     alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
@@ -352,21 +354,25 @@ double get_alpha_y_gourdon(maxint_t x)
 }
 
 /// z = y * alpha_z, with alpha_z >= 1.
-/// In Xavier Gourdon's algorithm the alpha_z tuning factor
-/// is named d. d should be determined experimentally by
-/// running benchmarks.
+/// In Xavier Gourdon's paper the alpha_z tuning factor
+/// is named d. alpha_z should be determined experimentally
+/// by running benchmarks.
 ///
-double get_alpha_z_gourdon(double alpha_y)
+double get_alpha_z_gourdon(maxint_t x)
 {
+  double alpha_y = get_alpha_y_gourdon(x);
   double alpha_z = alpha_z_;
 
   if (alpha_z < 1)
   {
-    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4
-    alpha_z = 2.4;
+    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4.
+    // alpha_z should also be much smaller than alpha_y.
+    alpha_z = in_between(1, 2.4, alpha_y / 5);
   }
 
-  return in_between(1, alpha_z, alpha_y / 5);
+  double x16 = iroot<6>(x);
+  double max_alpha = min(alpha_y * alpha_z, x16);
+  return in_between(1, alpha_z, max_alpha);
 }
 
 /// x_star = max(x^(1/4), x / y^2)
