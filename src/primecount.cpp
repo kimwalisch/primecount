@@ -370,7 +370,7 @@ double get_alpha_z_gourdon(maxint_t x)
     alpha_z = in_between(1, 2.4, alpha_y / 5);
   }
 
-  double x16 = iroot<6>(x);
+  double x16 = (double) iroot<6>(x);
   double max_alpha = min(alpha_y * alpha_z, x16);
   return in_between(1, alpha_z, max_alpha);
 }
