@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primecount CXX)
-set(PRIMECOUNT_VERSION_MAJOR 4)
-set(PRIMECOUNT_VERSION_MINOR 8)
+set(PRIMECOUNT_VERSION_MAJOR 5)
+set(PRIMECOUNT_VERSION_MINOR 0)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 
 # Build options ######################################################
