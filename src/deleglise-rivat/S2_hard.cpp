@@ -221,7 +221,10 @@ T S2_hard_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
     {
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
+      // Unsigned integer division is usually slightly
+      // faster than signed integer division
+      using UT = typename make_unsigned<T>::type;
+      s2_hard = S2_hard_thread((UT) x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -256,8 +259,7 @@ int64_t S2_hard(int64_t x,
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
   auto primes = generate_primes<int32_t>(max_prime);
-
-  int64_t s2_hard = S2_hard_OpenMP((intfast64_t) x, y, z, c, (intfast64_t) s2_hard_approx, primes, factor, threads);
+  int64_t s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
 
   print("S2_hard", s2_hard, time);
   return s2_hard;
@@ -291,16 +293,14 @@ int128_t S2_hard(int128_t x,
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<uint32_t>(max_prime);
-
-    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
+    s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<int64_t>(max_prime);
-
-    s2_hard = S2_hard_OpenMP((intfast128_t) x, y, z, c, (intfast128_t) s2_hard_approx, primes, factor, threads);
+    s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
   }
 
   print("S2_hard", s2_hard, time);

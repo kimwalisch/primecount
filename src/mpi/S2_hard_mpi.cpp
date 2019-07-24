@@ -227,7 +227,10 @@ void S2_hard_slave(T x,
         break;
 
       runtime.start();
-      s2_hard = S2_hard_thread(x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
+      // Unsigned integer division is usually slightly
+      // faster than signed integer division
+      using UT = typename make_unsigned<T>::type;
+      s2_hard = S2_hard_thread((UT) x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -303,8 +306,7 @@ int64_t S2_hard_mpi(int64_t x,
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<int32_t>(max_prime);
-
-    S2_hard_slave((intfast64_t) x, y, z, c, primes, factor, threads);
+    S2_hard_slave(x, y, z, c, primes, factor, threads);
   }
 
   print("S2_hard", s2_hard, time);
@@ -338,16 +340,14 @@ int128_t S2_hard_mpi(int128_t x,
       FactorTable<uint16_t> factor(y, threads);
       int64_t max_prime = min(y, z / isqrt(y));
       auto primes = generate_primes<uint32_t>(max_prime);
-
-      S2_hard_slave((intfast128_t) x, y, z, c, primes, factor, threads);
+      S2_hard_slave(x, y, z, c, primes, factor, threads);
     }
     else
     {
       FactorTable<uint32_t> factor(y, threads);
       int64_t max_prime = min(y, z / isqrt(y));
       auto primes = generate_primes<int64_t>(max_prime);
-
-      S2_hard_slave((intfast128_t) x, y, z, c, primes, factor, threads);
+      S2_hard_slave(x, y, z, c, primes, factor, threads);
     }
   }
 
