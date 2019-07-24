@@ -4,7 +4,7 @@
 ///        These tests are also used (by the author) for
 ///        benchmarking code changes.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <print.hpp>
 
@@ -199,6 +200,7 @@ void test()
     TEST2(pi_deleglise_rivat_parallel2, pi_lmo_parallel, 1500);
 #endif
 
+    TEST2(pi_gourdon, pi_lmo_parallel, 1500);
     test_nth_prime(300);
   }
   catch (exception& e)
