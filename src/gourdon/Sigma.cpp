@@ -1,5 +1,11 @@
 ///
 /// @file  Sigma.cpp
+///        The 7 sigma formulas are the least computationally
+///        expensive formulas in Gourdon's algorithm. The Sigma6
+///        formula has not been fully implemented yet, it uses
+///        O(x^(3/8)) instead of O(y). The Sigma5 and Sigma6 formulas
+///        could also be parallelized although this won't improve
+///        performance overall.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
