@@ -107,10 +107,10 @@ T S2_hard_thread(T x,
     for (int64_t end = min(pi_sqrty, max_b); b <= end; b++)
     {
       int64_t prime = primes[b];
-      T x2 = x / prime;
-      int64_t x2_div_high = min(fast_div(x2, high), y);
-      int64_t min_m = max(x2_div_high, y / prime);
-      int64_t max_m = min(fast_div(x2, low1), y);
+      T xp = x / prime;
+      int64_t xp_div_high = min(fast_div(xp, high), y);
+      int64_t min_m = max(xp_div_high, y / prime);
+      int64_t max_m = min(fast_div(xp, low1), y);
       int64_t count = 0;
       int64_t start = 0;
 
@@ -126,7 +126,7 @@ T S2_hard_thread(T x,
         if (prime < factor.mu_lpf(m))
         {
           int64_t fm = factor.get_number(m);
-          int64_t xn = fast_div64(x2, fm);
+          int64_t xn = fast_div64(xp, fm);
           int64_t stop = xn - low;
           count += sieve.count(start, stop, low, high, count, count_low_high);
           start = stop + 1;
@@ -146,11 +146,11 @@ T S2_hard_thread(T x,
     for (; b <= max_b; b++)
     {
       int64_t prime = primes[b];
-      T x2 = x / prime;
-      int64_t x2_div_low = min(fast_div(x2, low1), y);
-      int64_t x2_div_high = min(fast_div(x2, high), y);
-      int64_t l = pi[min(x2_div_low, z / prime)];
-      int64_t min_hard = max(x2_div_high, prime);
+      T xp = x / prime;
+      int64_t xp_div_low = min(fast_div(xp, low1), y);
+      int64_t xp_div_high = min(fast_div(xp, high), y);
+      int64_t l = pi[min(xp_div_low, z / prime)];
+      int64_t min_hard = max(xp_div_high, prime);
       int64_t count = 0;
       int64_t start = 0;
 
@@ -159,7 +159,7 @@ T S2_hard_thread(T x,
 
       for (; primes[l] > min_hard; l--)
       {
-        int64_t xn = fast_div64(x2, primes[l]);
+        int64_t xn = fast_div64(xp, primes[l]);
         int64_t stop = xn - low;
         count += sieve.count(start, stop, low, high, count, count_low_high);
         start = stop + 1;

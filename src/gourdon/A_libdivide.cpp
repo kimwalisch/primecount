@@ -75,16 +75,16 @@ T A_OpenMP(T x,
   for (int64_t b = pi[x_star] + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
-    T x2 = x / prime;
+    T xp = x / prime;
     int64_t j = b + 1;
-    int64_t max_j = pi[isqrt(x2)];
+    int64_t max_j = pi[isqrt(xp)];
 
-    if (is_libdivide(x2))
+    if (is_libdivide(xp))
     {
       // x / (p * q) >= y
       for (; j <= max_j; j++)
       {
-        int64_t xn = (uint64_t) x2 / fastdiv[j];
+        int64_t xn = (uint64_t) xp / fastdiv[j];
         if (xn < y)
           break;
         sum += pi[xn];
@@ -93,7 +93,7 @@ T A_OpenMP(T x,
       // x / (p * q) < y
       for (; j <= max_j; j++)
       {
-        int64_t xn = (uint64_t) x2 / fastdiv[j];
+        int64_t xn = (uint64_t) xp / fastdiv[j];
         sum += pi[xn] * 2;
       }
     }
@@ -102,7 +102,7 @@ T A_OpenMP(T x,
       // x / (p * q) >= y
       for (; j <= max_j; j++)
       {
-        int64_t xn = fast_div64(x2, primes[j]);
+        int64_t xn = fast_div64(xp, primes[j]);
         if (xn < y)
           break;
         sum += pi[xn];
@@ -111,7 +111,7 @@ T A_OpenMP(T x,
       // x / (p * q) < y
       for (; j <= max_j; j++)
       {
-        int64_t xn = fast_div64(x2, primes[j]);
+        int64_t xn = fast_div64(xp, primes[j]);
         sum += pi[xn] * 2;
       } 
     }

@@ -82,25 +82,25 @@ public:
     if (sqrtx < pi_.size())
       pi_sqrtx = min(pi_[sqrtx], a);
 
-    // Move out of the loop the calculations where phi(x2, i) = 1
+    // Move out of the loop the calculations where phi(xp, i) = 1
     // phi(x, a) = 1 if primes_[a] >= x
-    // x2 = x / primes_[i + 1]
-    // phi(x2, i) = 1 if primes_[i] >= x / primes_[i + 1]
-    // phi(x2, i) = 1 if primes_[i] >= sqrt(x)
-    // phi(x2, i) = 1 if i >= pi(sqrt(x))
-    // \sum_{i = pi(sqrt(x))}^{a - 1} phi(x2, i) = a - pi(sqrt(x))
+    // xp = x / primes_[i + 1]
+    // phi(xp, i) = 1 if primes_[i] >= x / primes_[i + 1]
+    // phi(xp, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(xp, i) = 1 if i >= pi(sqrt(x))
+    // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
     sum += (pi_sqrtx - a) * SIGN;
     sum += phi_tiny(x, c) * SIGN;
 
     for (int64_t i = c; i < pi_sqrtx; i++)
     {
-      int64_t x2 = fast_div(x, primes_[i + 1]);
+      int64_t xp = fast_div(x, primes_[i + 1]);
 
-      if (is_pix(x2, i))
-        sum += (pi_[x2] - i + 1) * -SIGN;
+      if (is_pix(xp, i))
+        sum += (pi_[xp] - i + 1) * -SIGN;
       else
-        sum += phi<-SIGN>(x2, i);
+        sum += phi<-SIGN>(xp, i);
     }
 
     update_cache(x, a, sum);

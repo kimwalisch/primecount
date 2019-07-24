@@ -60,9 +60,9 @@ T S2_easy_OpenMP(T x,
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
     int64_t prime = primes[b];
-    T x2 = x / prime;
-    int64_t min_trivial = min(x2 / prime, y);
-    int64_t min_clustered = (int64_t) isqrt(x2);
+    T xp = x / prime;
+    int64_t min_trivial = min(xp / prime, y);
+    int64_t min_clustered = (int64_t) isqrt(xp);
     int64_t min_sparse = z / prime;
 
     min_clustered = in_between(prime, min_clustered, y);
@@ -78,9 +78,9 @@ T S2_easy_OpenMP(T x,
     // where phi(x / n, b - 1) = pi(x / n) - b + 2
     while (l > pi_min_clustered)
     {
-      int64_t xn = fast_div64(x2, primes[l]);
+      int64_t xn = fast_div64(xp, primes[l]);
       int64_t phi_xn = pi[xn] - b + 2;
-      int64_t xm = fast_div64(x2, primes[b + phi_xn - 1]);
+      int64_t xm = fast_div64(xp, primes[b + phi_xn - 1]);
       int64_t l2 = pi[xm];
       s2_easy += phi_xn * (l - l2);
       l = l2;
@@ -91,7 +91,7 @@ T S2_easy_OpenMP(T x,
     // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
     for (; l > pi_min_sparse; l--)
     {
-      int64_t xn = fast_div64(x2, primes[l]);
+      int64_t xn = fast_div64(xp, primes[l]);
       s2_easy += pi[xn] - b + 2;
     }
 
