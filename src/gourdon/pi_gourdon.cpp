@@ -10,8 +10,7 @@
 ///        algorithm .i.e. the memory usage of my implementation is
 ///        O(x^(1/2)) instead of O(x^(1/3) * (log x)^3). What remains
 ///        to be done is reduce the memory usage of my implementations
-///        of the A and C formulas and parallelize some of the Sigma
-///        formulas.
+///        of the A, C and Sigma formulas.
 ///
 ///        Xavier Gourdon formula:
 ///        pi(x) = A - B + C + D + phi0 + Sigma
