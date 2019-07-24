@@ -33,8 +33,8 @@ struct Runtime
 class LoadBalancer
 {
 public:
-  LoadBalancer(maxint_t x, int64_t y, int64_t z, maxint_t sum_approx_);
-  bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t S2, Runtime& runtime);
+  LoadBalancer(maxint_t x, int64_t sieve_limit, int64_t smallest_leaf, maxint_t sum_approx);
+  bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t sum, Runtime& runtime);
   maxint_t get_sum() const;
 
 private:

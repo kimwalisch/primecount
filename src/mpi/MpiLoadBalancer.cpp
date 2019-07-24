@@ -42,34 +42,27 @@ using namespace std;
 namespace primecount {
 
 MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
-                                 int64_t y,
-                                 int64_t z,
-                                 maxint_t s2_approx) :
+                                 int64_t sieve_limit,
+                                 int64_t smallest_leaf,
+                                 maxint_t sum_approx) :
   low_(0),
   max_low_(0),
-  z_(z),
+  sieve_limit_(sieve_limit),
+  smallest_leaf_(smallest_leaf),
   segments_(1),
-  s2_hard_(0),
-  s2_approx_(s2_approx),
+  sum_(0),
+  sum_approx_(sum_approx),
   time_(get_time()),
   status_(x)
-{
-  init_size();
-  maxint_t x16 = iroot<6>(x);
-  double alpha = get_alpha(x, y);
-  smallest_hard_leaf_ = (int64_t) (x / (y * sqrt(alpha) * x16));
-}
-
-void MpiLoadBalancer::init_size()
 {
   // start with a tiny segment_size as most
   // special leaves are in the first few segments
   // and we need to ensure that all threads are
   // assigned an equal amount of work
-  int64_t sqrtz = isqrt(z_);
-  int64_t log = ilog(sqrtz);
+  int64_t sqrt_limit = isqrt(sieve_limit);
+  int64_t log = ilog(sqrt_limit);
   log = max(log, 1);
-  segment_size_ = sqrtz / log;
+  segment_size_ = sqrt_limit / log;
 
   int64_t min_size = 1 << 9;
   segment_size_ = max(segment_size_, min_size);
@@ -79,13 +72,13 @@ void MpiLoadBalancer::init_size()
   // into the CPUs L1 data cache
   int64_t l1_dcache_size = 1 << 15;
   max_size_ = l1_dcache_size * 30;
-  max_size_ = max(max_size_, sqrtz);
+  max_size_ = max(max_size_, sqrt_limit);
   max_size_ = Sieve::get_segment_size(max_size_);
 }
 
 void MpiLoadBalancer::get_work(MpiMsg* msg)
 {
-  s2_hard_ += msg->s2_hard<maxint_t>();
+  sum_ += msg->s2_hard<maxint_t>();
 
   if (msg->low() > max_low_)
   {
@@ -105,14 +98,14 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
   }
 
   // Most hard special leaves are located just past
-  // smallest_hard_leaf_. In order to prevent assigning
+  // smallest_leaf_. In order to prevent assigning
   // the bulk of work to a single thread we reduce
   // the number of segments to a minimum.
 
   int64_t high = low_ + segments_ * segment_size_;
 
-  if (smallest_hard_leaf_ >= low_ &&
-      smallest_hard_leaf_ <= high)
+  if (smallest_leaf_ >= low_ &&
+      smallest_leaf_ <= high)
   {
     segments_ = 1;
   }
@@ -120,13 +113,13 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
   // udpate msg with new work todo
   msg->update(low_, segments_, segment_size_);
   low_ += segments_ * segment_size_;
-  low_ = min(low_, z_ + 1);
+  low_ = min(low_, sieve_limit_ + 1);
 }
 
 /// Remaining seconds till finished
 double MpiLoadBalancer::remaining_secs() const
 {
-  double percent = status_.getPercent(low_, z_, s2_hard_, s2_approx_);
+  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
   percent = in_between(10, percent, 100);
   double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;
