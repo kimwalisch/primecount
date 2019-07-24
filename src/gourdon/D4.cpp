@@ -251,7 +251,6 @@ int64_t D(int64_t x,
   double time = get_time();
   DFactorTable<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
-
   int64_t sum = D_OpenMP(x, y, z, k, primes, factor, threads);
 
   print("D", sum, time);
@@ -277,7 +276,6 @@ int128_t D(int128_t x,
   if (z <= DFactorTable<uint16_t>::max())
   {
     DFactorTable<uint16_t> factor(y, z, threads);
-
     auto primes = generate_primes<uint32_t>(y);
     sum = D_OpenMP(x, y, z, k, primes, factor, threads);
   }
