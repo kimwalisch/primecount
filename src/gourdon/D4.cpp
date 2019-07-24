@@ -221,7 +221,10 @@ T D_OpenMP(T x,
     while (loadBalancer.get_work(&low, &segments, &segment_size, sum, runtime))
     {
       runtime.start();
-      sum = D_thread(x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
+      // Unsigned integer division is usually slightly
+      // faster than signed integer division
+      using UT = typename make_unsigned<T>::type;
+      sum = D_thread((UT) x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
       runtime.stop();
     }
   }
@@ -249,7 +252,7 @@ int64_t D(int64_t x,
   DFactorTable<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
 
-  int64_t sum = D_OpenMP((intfast64_t) x, y, z, k, primes, factor, threads);
+  int64_t sum = D_OpenMP(x, y, z, k, primes, factor, threads);
 
   print("D", sum, time);
   return sum;
@@ -276,7 +279,7 @@ int128_t D(int128_t x,
     DFactorTable<uint16_t> factor(y, z, threads);
 
     auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
+    sum = D_OpenMP(x, y, z, k, primes, factor, threads);
   }
   else
   {
@@ -286,12 +289,12 @@ int128_t D(int128_t x,
     if (y <= numeric_limits<uint32_t>::max())
     {
       auto primes = generate_primes<uint32_t>(y);
-      sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads);
+      sum = D_OpenMP(x, y, z, k, primes, factor, threads);
     }
     else
     {
       auto primes = generate_primes<int64_t>(y);
-      sum = D_OpenMP((intfast128_t) x, y, z, k, primes, factor, threads); 
+      sum = D_OpenMP(x, y, z, k, primes, factor, threads); 
     }
   }
 
