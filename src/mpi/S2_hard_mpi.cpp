@@ -126,13 +126,13 @@ T S2_hard_thread(T x,
         if (prime < factor.mu_lpf(m))
         {
           int64_t fm = factor.get_number(m);
-          int64_t xn = fast_div64(xp, fm);
-          int64_t stop = xn - low;
+          int64_t xpm = fast_div64(xp, fm);
+          int64_t stop = xpm - low;
           count += sieve.count(start, stop, low, high, count, count_low_high);
           start = stop + 1;
-          int64_t phi_xn = phi[b] + count;
+          int64_t phi_xpm = phi[b] + count;
           int64_t mu_m = factor.mu(m);
-          s2_hard -= mu_m * phi_xn;
+          s2_hard -= mu_m * phi_xpm;
         }
       }
 
@@ -159,12 +159,12 @@ T S2_hard_thread(T x,
 
       for (; primes[l] > min_hard; l--)
       {
-        int64_t xn = fast_div64(xp, primes[l]);
-        int64_t stop = xn - low;
+        int64_t xpq = fast_div64(xp, primes[l]);
+        int64_t stop = xpq - low;
         count += sieve.count(start, stop, low, high, count, count_low_high);
         start = stop + 1;
-        int64_t phi_xn = phi[b] + count;
-        s2_hard += phi_xn;
+        int64_t phi_xpq = phi[b] + count;
+        s2_hard += phi_xpq;
       }
 
       phi[b] += count_low_high;

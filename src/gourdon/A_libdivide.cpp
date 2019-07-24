@@ -84,17 +84,17 @@ T A_OpenMP(T x,
       // x / (p * q) >= y
       for (; j <= max_j; j++)
       {
-        int64_t xn = (uint64_t) xp / fastdiv[j];
-        if (xn < y)
+        int64_t xpq = (uint64_t) xp / fastdiv[j];
+        if (xpq < y)
           break;
-        sum += pi[xn];
+        sum += pi[xpq];
       }
 
       // x / (p * q) < y
       for (; j <= max_j; j++)
       {
-        int64_t xn = (uint64_t) xp / fastdiv[j];
-        sum += pi[xn] * 2;
+        int64_t xpq = (uint64_t) xp / fastdiv[j];
+        sum += pi[xpq] * 2;
       }
     }
     else
@@ -102,18 +102,18 @@ T A_OpenMP(T x,
       // x / (p * q) >= y
       for (; j <= max_j; j++)
       {
-        int64_t xn = fast_div64(xp, primes[j]);
-        if (xn < y)
+        int64_t xpq = fast_div64(xp, primes[j]);
+        if (xpq < y)
           break;
-        sum += pi[xn];
+        sum += pi[xpq];
       }
 
       // x / (p * q) < y
       for (; j <= max_j; j++)
       {
-        int64_t xn = fast_div64(xp, primes[j]);
-        sum += pi[xn] * 2;
-      } 
+        int64_t xpq = fast_div64(xp, primes[j]);
+        sum += pi[xpq] * 2;
+      }
     }
 
     if (is_print())

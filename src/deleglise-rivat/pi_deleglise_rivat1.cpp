@@ -138,10 +138,10 @@ int64_t S2_hard(int64_t x,
       {
         if (mu[m] != 0 && prime < lpf[m])
         {
-          int64_t n = prime * m;
-          int64_t count = tree.count(low, x / n);
-          int64_t phi_xn = phi[b] + count;
-          s2_hard -= mu[m] * phi_xn;
+          int64_t pm = prime * m;
+          int64_t count = tree.count(low, x / pm);
+          int64_t phi_xpm = phi[b] + count;
+          s2_hard -= mu[m] * phi_xpm;
         }
       }
 
@@ -163,11 +163,11 @@ int64_t S2_hard(int64_t x,
 
       for (; primes[l] > min_hard; l--)
       {
-        int64_t n = prime * primes[l];
-        int64_t xn = x / n;
-        int64_t count = tree.count(low, xn);
-        int64_t phi_xn = phi[b] + count;
-        s2_hard += phi_xn;
+        int64_t pq = prime * primes[l];
+        int64_t xpq = x / pq;
+        int64_t count = tree.count(low, xpq);
+        int64_t phi_xpq = phi[b] + count;
+        s2_hard += phi_xpq;
       }
 
       phi[b] += tree.count(low, high - 1);

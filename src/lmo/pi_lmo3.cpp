@@ -90,7 +90,7 @@ int64_t S2(int64_t x,
           // of unsieved elements <= x / (primes[b] * m) after having
           // removed the multiples of the first b - 1 primes.
           //
-          for (int64_t xn = x / (prime * m); i <= xn - low; i++)
+          for (int64_t xpm = x / (prime * m); i <= xpm - low; i++)
             phi[b] += sieve[i];
 
           s2 -= mu[m] * phi[b];

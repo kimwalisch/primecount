@@ -57,10 +57,10 @@ T get_S2_trivial(T x,
   // s2_trivial += pi[y] - pi[x / primes[b]^2]
   while ((prime = it.next_prime()) < y)
   {
-    T n = (T) prime * prime;
-    int64_t xn = (int64_t)(x / n);
-    if (xn <= prime) break;
-    s2_trivial += pi_y - pi[xn];
+    T pp = (T) prime * prime;
+    int64_t xpp = (int64_t)(x / pp);
+    if (xpp <= prime) break;
+    s2_trivial += pi_y - pi[xpp];
   }
 
   // For all primes[b] >= x^(1/3) && < y:
