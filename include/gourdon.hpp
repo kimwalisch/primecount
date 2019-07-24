@@ -21,7 +21,7 @@ int64_t Phi0(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
 int64_t A(int64_t x, int64_t y, int threads);
 int64_t B(int64_t x, int64_t y, int threads);
 int64_t C(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
-int64_t D(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
+int64_t D(int64_t x, int64_t y, int64_t z, int64_t k, int64_t d_approx, int threads);
 
 #ifdef HAVE_INT128_T
 
@@ -30,7 +30,7 @@ int128_t Phi0(int128_t x, int64_t y, int64_t z, int64_t k, int threads);
 int128_t A(int128_t x, int64_t y, int threads);
 int128_t B(int128_t x, int64_t y, int threads);
 int128_t C(int128_t x, int64_t y, int64_t z, int64_t k, int threads);
-int128_t D(int128_t x, int64_t y, int64_t z, int64_t k, int threads);
+int128_t D(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int threads);
 
 #endif
 

@@ -24,6 +24,7 @@
 #include <primecount-internal.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
+#include <LoadBalancer.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
@@ -34,7 +35,6 @@
 #include <S2.hpp>
 
 #include "DFactorTable.hpp"
-#include "DLoadBalancer.hpp"
 
 #include <stdint.h>
 #include <vector>
@@ -198,6 +198,7 @@ T D_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
+           T d_approx,
            Primes& primes,
            DFactorTable& factor,
            int threads)
@@ -207,7 +208,9 @@ T D_OpenMP(T x,
   threads = ideal_num_threads(threads, xz);
 
   PiTable pi(y);
-  DLoadBalancer loadBalancer(x, y, z);
+  double alpha_y = get_alpha_y(x, y);
+  int64_t smallest_leaf = get_smallest_leaf(x, z, alpha_y);
+  LoadBalancer loadBalancer(x, xz, smallest_leaf, d_approx);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
@@ -242,6 +245,7 @@ int64_t D(int64_t x,
           int64_t y,
           int64_t z,
           int64_t k,
+          int64_t d_approx,
           int threads)
 {
   print("");
@@ -251,7 +255,7 @@ int64_t D(int64_t x,
   double time = get_time();
   DFactorTable<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
-  int64_t sum = D_OpenMP(x, y, z, k, primes, factor, threads);
+  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
 
   print("D", sum, time);
   return sum;
@@ -263,6 +267,7 @@ int128_t D(int128_t x,
            int64_t y,
            int64_t z,
            int64_t k,
+           int128_t d_approx,
            int threads)
 {
   print("");
@@ -277,7 +282,7 @@ int128_t D(int128_t x,
   {
     DFactorTable<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, primes, factor, threads);
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
   }
   else
   {
@@ -287,12 +292,12 @@ int128_t D(int128_t x,
     if (y <= numeric_limits<uint32_t>::max())
     {
       auto primes = generate_primes<uint32_t>(y);
-      sum = D_OpenMP(x, y, z, k, primes, factor, threads);
+      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
     }
     else
     {
       auto primes = generate_primes<int64_t>(y);
-      sum = D_OpenMP(x, y, z, k, primes, factor, threads); 
+      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads); 
     }
   }
 

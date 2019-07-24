@@ -205,7 +205,10 @@ T S2_hard_OpenMP(T x,
 {
   threads = ideal_num_threads(threads, z);
 
-  LoadBalancer loadBalancer(x, y, z, s2_hard_approx);
+  double alpha = get_alpha(x, y);
+  int64_t smallest_leaf = get_smallest_leaf(x, y, alpha);
+  LoadBalancer loadBalancer(x, z, smallest_leaf, s2_hard_approx);
+
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime);
 
@@ -229,7 +232,7 @@ T S2_hard_OpenMP(T x,
     }
   }
 
-  T s2_hard = (T) loadBalancer.get_result();
+  T s2_hard = (T) loadBalancer.get_sum();
 
   return s2_hard;
 }

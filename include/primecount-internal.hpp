@@ -12,10 +12,12 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <string>
+#include <cmath>
 
 namespace primecount {
 
@@ -183,6 +185,20 @@ T D_approx(T x, T sigma, T phi0, T a, T b, T c)
   T d_approx = pix - (a - b + c + phi0 + sigma);
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;
+}
+
+/// This function returns the sieving distance at which we
+/// can expect the 1st hard special leaf in the
+/// Lagarias-Miller-Odlyzko and Deleglise-Rivat algorithms.
+/// We also use this function for the Gourdon algorithm
+/// but there the formula is usually off by a small margin
+/// (I have not found an accurate formula yet).
+///
+template <typename T>
+int64_t get_smallest_leaf(T x, int64_t y, double alpha)
+{
+  double divider = std::max(1.0, y * std::sqrt(alpha) * iroot<3>(x));
+  return (int64_t) (x / divider);
 }
 
 #ifdef HAVE_MPI

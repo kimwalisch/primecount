@@ -187,7 +187,9 @@ int64_t S2(int64_t x,
 
   double time = get_time();
   threads = ideal_num_threads(threads, z);
-  LoadBalancer loadBalancer(x, y, z, s2_approx);
+  double alpha = get_alpha(x, y);
+  int64_t smallest_leaf = get_smallest_leaf(x, y, alpha);
+  LoadBalancer loadBalancer(x, z, smallest_leaf, s2_approx);
   PiTable pi(y);
 
   #pragma omp parallel for num_threads(threads)
@@ -207,7 +209,7 @@ int64_t S2(int64_t x,
     }
   }
 
-  int64_t s2 = (int64_t) loadBalancer.get_result();
+  int64_t s2 = (int64_t) loadBalancer.get_sum();
   print("S2", s2, time);
 
   return s2;
