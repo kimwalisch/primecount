@@ -1,8 +1,17 @@
 ///
 /// @file  pi_gourdon.cpp
-/// @brief Simple demonstration implementation of Xavier Gourdon's
-///        prime counting algorithm. Xavier Gourdon's algorithm is
-///        an improved version of the Deleglise-Rivat algorithm.
+/// @brief Implementation of Xavier Gourdon's prime counting
+///        algorithm. Xavier Gourdon's algorithm is an improved
+///        version of the Deleglise-Rivat algorithm, according to my
+///        benchmarks Gourdon's algorithm runs up to 2x faster than
+///        the Deleglise-Rivat algorithm.
+///
+///        Currently I have not yet fully implemented Gourdon's
+///        algorithm .i.e. the memory usage of my implementation is
+///        O(x^(1/2)) instead of O(x^(1/3) * (log x)^3). What remains
+///        to be done is reduce the memory usage of my implementations
+///        of the A and C formulas and parallelize some of the Sigma
+///        formulas.
 ///
 ///        Xavier Gourdon formula:
 ///        pi(x) = A - B + C + D + phi0 + Sigma
@@ -27,7 +36,7 @@ namespace primecount {
 /// Calculate the number of primes below x using
 /// Xavier Gourdon's algorithm.
 /// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/3) * (log x)^3)
+/// Memory usage: O(x^(1/2))
 ///
 int64_t pi_gourdon(int64_t x, int threads)
 {
