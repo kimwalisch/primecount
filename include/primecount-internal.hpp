@@ -197,7 +197,7 @@ T D_approx(T x, T sigma, T phi0, T a, T b, T c)
 template <typename T>
 int64_t get_smallest_leaf(T x, int64_t y, double alpha)
 {
-  double divider = std::max(1.0, y * std::sqrt(alpha) * iroot<3>(x));
+  double divider = std::max(1.0, y * std::sqrt(alpha) * iroot<6>(x));
   return (int64_t) (x / divider);
 }
 
