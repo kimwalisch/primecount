@@ -341,10 +341,10 @@ double get_alpha_y_gourdon(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha_y < 1)
   {
-    double a = 0.000451957;
-    double b = -0.0128774;
-    double c = 0.0999006;
-    double d = 0.860792;
+    double a = 0.000446563;
+    double b = -0.0125132;
+    double c = 0.094232;
+    double d = 0.875222;
     double logx = log(x2);
 
     alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
