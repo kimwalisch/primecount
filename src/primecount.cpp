@@ -365,9 +365,12 @@ double get_alpha_z_gourdon(maxint_t x)
 
   if (alpha_z < 1)
   {
-    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4.
-    // alpha_z should also be much smaller than alpha_y.
-    alpha_z = in_between(1, 2.4, alpha_y / 5);
+    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4 but
+    // according to my benchmarks alpha_z should grow very slowly
+    // and be much smaller than alpha_y.
+    double log_alpha_y = log(max(1.0, alpha_y));
+    double loglog_alpha_y = log(max(1.0, log_alpha_y));
+    alpha_z = 1 + loglog_alpha_y;
   }
 
   double x16 = (double) iroot<6>(x);
