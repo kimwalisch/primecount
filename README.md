@@ -125,7 +125,7 @@ Advanced options for Xavier Gourdon's algorithm:
 
          --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
                             with y = x^(1/3) * alpha_y
-         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= alpha_y
+         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
                             with z = y * alpha_z
 ```
 
