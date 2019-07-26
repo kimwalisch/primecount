@@ -141,18 +141,21 @@ Advanced options for Xavier Gourdon's algorithm:
     <td><b>Meissel</b></td>
     <td><b>Lagarias<br/>Miller<br/>Odlyzko</b></td>
     <td><b>Deleglise<br/>Rivat</b></td>
+    <td><b>Gourdon</b></td>
   </tr>
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
     <td>0.02s</td>
     <td>0.01s</td>
-    <td>0.01s</td>
-    <td>0.01s</td>
+    <td>0.00s</td>
+    <td>0.00s</td>
+    <td>0.00s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
+    <td>0.03s</td>
     <td>0.03s</td>
     <td>0.02s</td>
     <td>0.01s</td>
@@ -163,40 +166,45 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>37,607,912,018</td>
     <td>0.10s</td>
     <td>0.06s</td>
-    <td>0.03s</td>
+    <td>0.02s</td>
+    <td>0.02s</td>
     <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.46s</td>
-    <td>0.26s</td>
-    <td>0.06s</td>
+    <td>0.43s</td>
+    <td>0.22s</td>
+    <td>0.05s</td>
     <td>0.04s</td>
+    <td>0.03s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>2.66s</td>
-    <td>1.28s</td>
-    <td>0.19s</td>
-    <td>0.10s</td>
+    <td>2.52s</td>
+    <td>1.11s</td>
+    <td>0.17s</td>
+    <td>0.15s</td>
+    <td>0.11s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>17.51s</td>
-    <td>7.65s</td>
-    <td>0.73s</td>
-    <td>0.35s</td>
+    <td>16.27s</td>
+    <td>6.72s</td>
+    <td>0.68s</td>
+    <td>0.48s</td>
+    <td>0.28s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>136.16s</td>
-    <td>55.30s</td>
-    <td>2.95s</td>
-    <td>1.26s</td>
+    <td>125.75s</td>
+    <td>48.73s</td>
+    <td>2.84s</td>
+    <td>1.84s</td>
+    <td>0.96s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
@@ -204,15 +212,17 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>1,155.34s</td>
     <td>456.08s</td>
     <td>12.49s</td>
-    <td>4.57s</td>
+    <td>5.46s</td>
+    <td>3.52s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>10,239.22s</td>
-    <td>3,974.21s</td>
-    <td>55.87s</td>
-    <td>18.97s</td>
+    <td>9,335.19s</td>
+    <td>3,544.03s</td>
+    <td>57.92s</td>
+    <td>22.12s</td>
+    <td>13.36s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -220,7 +230,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>86.13s</td>
+    <td>98.85s</td>
+    <td>NaN</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -228,7 +239,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>373.09s</td>
+    <td>427.89s</td>
+    <td>NaN</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -236,7 +248,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,747.57s</td>
+    <td>1,921.61s</td>
+    <td>NaN</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -244,14 +257,17 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>8,215.59s</td>
+    <td>8,622.43s</td>
+    <td>NaN</td>
   </tr>
 </table>
 
-The benchmarks above were run on an AMD Ryzen 7 1700 CPU (8 x 3.0
-GHz, 3.7 GHz Turbo) from 2017 and primecount was compiled using
-GCC 6.3. Only the Deleglise-Rivat implementation supports
-numbers&nbsp;>&nbsp;2<sup>63</sup>.
+The benchmarks above were run on a system with an Intel Xeon Platinum 8175M CPU
+from 2017 using 8 CPU cores (16 threads) clocked at 2.50GHz. By default primecount
+currently uses the Deleglise-Rivat algorithm as its implementation is very
+mature. The implementation of Gourdon's algorithm is very recent, it is already
+very fast but some work remains to be done e.g. the memory usage needs to be
+reduced without deteriorating scaling.
 
 ## Performance tips
 
