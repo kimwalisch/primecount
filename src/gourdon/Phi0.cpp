@@ -74,12 +74,11 @@ X Phi0_OpenMP(X x,
               int64_t k,
               int threads)
 {
+  threads = ideal_num_threads(threads, y);
+
   auto primes = generate_primes<Y>(y);
   int64_t pi_y = primes.size();
   X phi0 = phi_tiny(x, k);
-
-  int64_t thread_threshold = ipow(10, 6);
-  threads = ideal_num_threads(threads, y, thread_threshold);
 
   #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: phi0)
   for (int64_t b = k + 1; b < pi_y; b++)

@@ -145,7 +145,7 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 
 double get_time();
 
-int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 100000);
+int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 
 maxint_t to_maxint(const std::string& expr);
 
