@@ -182,8 +182,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>2.52s</td>
-    <td>1.11s</td>
+    <td>2.49s</td>
+    <td>1.09s</td>
     <td>0.17s</td>
     <td>0.15s</td>
     <td>0.11s</td>
@@ -191,8 +191,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>16.27s</td>
-    <td>6.72s</td>
+    <td>16.17s</td>
+    <td>6.65s</td>
     <td>0.68s</td>
     <td>0.48s</td>
     <td>0.28s</td>
@@ -200,8 +200,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>125.75s</td>
-    <td>48.73s</td>
+    <td>124.75s</td>
+    <td>48.20s</td>
     <td>2.84s</td>
     <td>1.57s</td>
     <td>0.96s</td>
@@ -209,8 +209,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>1,155.34s</td>
-    <td>456.08s</td>
+    <td>1,046.52s</td>
+    <td>395.41s</td>
     <td>12.49s</td>
     <td>5.46s</td>
     <td>3.52s</td>
