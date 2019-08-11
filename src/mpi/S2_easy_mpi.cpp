@@ -76,10 +76,11 @@ T S2_easy_mpi_master(T x,
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    // Find all clustered easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) == phi(x / m, b - 1)
-    // where phi(x / n, b - 1) = pi(x / n) - b + 2
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // pq = primes[b] * primes[l]
+    // Which satisfy: pq > z && x / pq <= y
+    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     while (l > pi_min_clustered)
     {
       int64_t xpq = fast_div64(xp, primes[l]);
@@ -90,9 +91,11 @@ T S2_easy_mpi_master(T x,
       l = l2;
     }
 
-    // Find all sparse easy leaves:
-    // n = primes[b] * primes[l]
-    // x / n <= y && phi(x / n, b - 1) = pi(x / n) - b + 2
+    // Find all sparse easy leaves where
+    // successive leaves are different.
+    // pq = primes[b] * primes[l]
+    // Which satisfy: pq > z && x / pq <= y
+    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     for (; l > pi_min_sparse; l--)
     {
       int64_t xpq = fast_div64(xp, primes[l]);
