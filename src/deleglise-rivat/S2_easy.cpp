@@ -80,8 +80,8 @@ T S2_easy_OpenMP(T x,
     {
       int64_t xpq = fast_div64(xp, primes[l]);
       int64_t phi_xpq = pi[xpq] - b + 2;
-      int64_t xm = fast_div64(xp, primes[b + phi_xpq - 1]);
-      int64_t l2 = pi[xm];
+      int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+      int64_t l2 = pi[xpq2];
       s2_easy += phi_xpq * (l - l2);
       l = l2;
     }
