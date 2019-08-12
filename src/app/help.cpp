@@ -61,7 +61,7 @@ const string helpMenu
   "         --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)\n"
   "                            with y = x^(1/3) * alpha_y\n"
   "         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)\n"
-  "                            with z = y * alpha_z\n"
+  "                            with z = y * alpha_z"
 );
 
 const string versionInfo
