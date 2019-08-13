@@ -1,6 +1,6 @@
-2019-07-24 Kim Walisch  <kim.walisch@gmail.com>
+2019-08-13 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 5.0 work in progress.
+  Version 5.0 released.
 
   I have finally implemented Xavier Gourdon's prime counting
   algorithm! Xavier Gourdon's algorithm is an improved
@@ -14,6 +14,7 @@
   * print.cpp: Updated for Gourdon's algorithm.
   * generate.cpp: Generate array with largest prime factors.
   * test.cpp: Test Gourdon's algorithm.
+  * README.md: Update benchmarks.
 
 2019-07-14 Kim Walisch  <kim.walisch@gmail.com>
 
