@@ -1,5 +1,5 @@
 ///
-/// @file  A.cpp
+/// @file  A1.cpp
 /// @brief Simple demonstration implementation of the A(x, y) formula
 ///        in Xavier Gourdon's prime counting algorithm. This
 ///        implementation uses O(x^(1/2)) memory instead of O(x^(1/3))

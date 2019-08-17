@@ -1,10 +1,6 @@
 # Test configuration for Travis CI. See <https://travis-ci.org/>.
 language: cpp
 
-branches:
-  except:
-    - segmented_A_formula
-
 matrix:
   include:
     - os: osx
