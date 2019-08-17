@@ -50,10 +50,10 @@ T A_OpenMP(T x,
   int64_t pi_x13 = pi[x13];
   S2Status status(x);
 
+  // while (low <= sqrt(x))
   for (; !segmentedPi.finished(); segmentedPi.next())
   {
     // Current segment [low, high[
-    // with low >= 1 && high < x^(1/2)
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
