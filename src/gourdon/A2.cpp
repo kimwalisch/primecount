@@ -63,11 +63,11 @@ T A_OpenMP(T x,
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] < sqrt(x / low)
-    // primes[i+1] <= sqrt(x / low) || primes[i+1] >= sqrt(x / low)
+    // primes[i+1] <= || >= sqrt(x / low)
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
     int64_t max_b = pi[sqrt_low];
     if (primes[max_b] < max_prime &&
-        primes[max_b] * primes[max_b + 1] > x_div_low)
+        (T) primes[max_b] * (T) primes[max_b + 1] > (T) x_div_low)
       max_b -= 1;
 
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)

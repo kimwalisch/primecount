@@ -66,7 +66,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t max,
                                    uint64_t segment_size)
   : max_(max)
 {
-  segment_size_ = segment_size + ~segment_size % 2;
+  segment_size_ = segment_size + segment_size % 2;
   high_ = segment_size_;
   pi_.resize(segment_size_ / 128 + 1);
   primesieve::iterator it(2, high_);
