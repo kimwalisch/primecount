@@ -64,10 +64,24 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 
 SegmentedPiTable::SegmentedPiTable(uint64_t max,
                                    uint64_t segment_size)
-  : max_(max)
+  : max_(max + 1)
 {
+  // Each bit of the pi[x] lookup table corresponds
+  // to an odd integer, so there are 16 numbers per
+  // byte. However we also store 64-bit prime_count
+  // values in the pi[x] lookup table, hence each byte
+  // only corresponds to 8 numbers.
+  uint64_t numbers_per_byte = 8;
+
+  // Minimum segment size = 256 KiB (L2 cache size),
+  // A large segment size improves load balancing.
+  uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
+  segment_size_ = std::max(segment_size, min_segment_size);
+  segment_size_ = std::min(segment_size_, max_);
   segment_size_ = segment_size + segment_size % 2;
+
   high_ = segment_size_;
+  high_ = std::min(high_, max_);
   pi_.resize(segment_size_ / 128 + 1);
   primesieve::iterator it(2, high_);
 
@@ -99,15 +113,20 @@ void SegmentedPiTable::next()
   uint64_t prime = 0;
   uint64_t pix = operator[](high_ - 1);
 
+  low_ = high_;
+  high_ = low_ + segment_size_;
+  high_ = std::min(high_, max_);
+
+  if (finished())
+    return;
+
+  // Reset pi[x] lookup table
   for (auto& i : pi_)
   {
     i.bits = 0;
     i.prime_count = 0;
   }
 
-  low_ = high_;
-  high_ += segment_size_;
-  high_ = std::min(high_, max_);
   primesieve::iterator it(low_ - 1, high_);
 
   while ((prime = it.next_prime()) < high_)
