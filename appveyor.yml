@@ -10,6 +10,7 @@ image:
 branches:
   except:
     - gh-pages
+    - segmented_A_formula
 
 platform:
   - x86
