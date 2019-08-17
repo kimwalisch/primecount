@@ -51,6 +51,7 @@ set(LIB_SRC src/FactorTable.cpp
             src/P3.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
+            src/SegmentedPiTable.cpp
             src/S1.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
@@ -107,7 +108,7 @@ endif()
 
 if(libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/A_libdivide.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/A2.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/C3_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
