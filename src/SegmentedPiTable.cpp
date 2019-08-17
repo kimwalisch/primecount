@@ -125,6 +125,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
 ///
 void SegmentedPiTable::next()
 {
+  assert(low_ <= max_);
   uint64_t prime = 0;
   uint64_t pix = operator[](high_ - 1);
 

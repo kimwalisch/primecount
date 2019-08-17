@@ -1,9 +1,10 @@
 ///
 /// @file  A2.cpp
-/// @brief Simple demonstration implementation of the A(x, y) formula
-///        in Xavier Gourdon's prime counting algorithm.
-///        In this version the memory usage has been reduced from
-///        O(x^(1/2)) to O(z) by segmenting the pi[x] lookup table.
+/// @brief Implementation of the A(x, y) formula in Xavier Gourdon's
+///        prime counting algorithm. In this version the memory usage
+///        has been reduced from O(x^(1/2)) to O(z) by segmenting
+///        the pi[x] lookup table. In each segment we process the
+///        leaves that satisfy: low <= x / (prime1 * prime2) < high.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -70,6 +71,8 @@ T A_OpenMP(T x,
         (T) primes[max_b] * (T) primes[max_b + 1] > (T) x_div_low)
       max_b -= 1;
 
+    // Process all leaves that satisfiy:
+    // low <= x / (primes[b] * primes[j]) < high
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
     for (int64_t b = pi[x_star] + 1; b <= max_b; b++)
     {
