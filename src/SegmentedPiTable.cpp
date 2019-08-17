@@ -78,10 +78,14 @@ SegmentedPiTable::SegmentedPiTable(uint64_t max,
   // we cannot store 2 which is the only even prime.
   // As a workaround we mark 1 as a prime (1st bit) and
   // add a check to return 0 for pi[1].
-  pi_[0].bits = 1;
+  if (low_ <= 1)
+    pi_[0].bits = 1;
 
   while ((prime = it.next_prime()) < high_)
-    pi_[prime / 128].bits |= 1ull << (prime % 128 / 2);
+  {
+    uint64_t p = prime - low_;
+    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+  }
 
   for (auto& i : pi_)
   {
@@ -107,7 +111,10 @@ void SegmentedPiTable::next()
   primesieve::iterator it(low_ - 1, high_);
 
   while ((prime = it.next_prime()) < high_)
-    pi_[prime / 128].bits |= 1ull << (prime % 128 / 2);
+  {
+    uint64_t p = prime - low_;
+    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+  }
 
   for (auto& i : pi_)
   {
