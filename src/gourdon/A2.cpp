@@ -45,10 +45,10 @@ T A_OpenMP(T x,
   int64_t max_prime = primes.back();
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
+  S2Status status(x);
   PiTable pi(isqrt(x / x_star));
   SegmentedPiTable segmentedPi(isqrt(x), z);
   int64_t pi_x13 = pi[x13];
-  S2Status status(x);
 
   // while (low <= sqrt(x))
   for (; !segmentedPi.finished(); segmentedPi.next())
