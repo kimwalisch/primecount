@@ -120,6 +120,9 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   }
 }
 
+/// Initialize next segment to [high, high + segment_size[
+/// (the current segment is [low, high[).
+///
 void SegmentedPiTable::next()
 {
   uint64_t prime = 0;
@@ -141,12 +144,14 @@ void SegmentedPiTable::next()
 
   primesieve::iterator it(low_ - 1, high_);
 
+  // Mark prime numbers
   while ((prime = it.next_prime()) < high_)
   {
     uint64_t p = prime - low_;
     pi_[p / 128].bits |= 1ull << (p % 128 / 2);
   }
 
+  // Update prime counts
   for (auto& i : pi_)
   {
     i.prime_count = pix;
