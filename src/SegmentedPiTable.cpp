@@ -167,13 +167,6 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 ///
 void SegmentedPiTable::init_next_segment(uint64_t pi_low)
 {
-  // Since we store only odd numbers in our lookup table,
-  // we cannot store 2 which is the only even prime.
-  // As a workaround we mark 1 as a prime (1st bit) and
-  // add a check to return 0 for pi[1].
-  if (low_ <= 1)
-    pi_[0].bits = 1;
-
   #pragma omp parallel for num_threads(threads_)
   for (int t = 0; t < threads_; t++)
   {
@@ -184,6 +177,13 @@ void SegmentedPiTable::init_next_segment(uint64_t pi_low)
     stop = min(stop, high_);
 
     reset_pi(start, stop);
+
+    // Since we store only odd numbers in our lookup table,
+    // we cannot store 2 which is the only even prime.
+    // As a workaround we mark 1 as a prime (1st bit) and
+    // add a check to return 0 for pi[1].
+    if (start <= 1)
+      pi_[0].bits |= 1;
 
     // Iterate over primes > 2
     start = max(start, 2);
