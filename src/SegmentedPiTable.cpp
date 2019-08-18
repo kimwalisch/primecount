@@ -90,7 +90,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   uint64_t numbers_per_byte = 8;
 
   // Minimum segment size = 256 KiB (L2 cache size),
-  // A large segment size improves load balancing.
+  // a large segment size improves load balancing.
   uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
   segment_size_ = std::max(segment_size, min_segment_size);
   segment_size_ = std::min(segment_size_, max_);
@@ -145,27 +145,30 @@ void SegmentedPiTable::init_next_segment(uint64_t pi_low)
   if (low_ <= 1)
     pi_[0].bits = 1;
 
-  uint64_t thread_size = ceil_div(segment_size_, threads_);
-
-  // Make sure threads never write to
-  // the same pi[x] location
-  if (thread_size % 128)
-    thread_size += 128 - thread_size % 128;
-
   #pragma omp parallel for num_threads(threads_)
   for (int t = 0; t < threads_; t++)
   {
-    // Iterate over the primes inside [start, stop[
-    // with start >= 3 and stop <= high
+    uint64_t thread_size = ceil_div(segment_size_, threads_);
+    thread_size = max(thread_size, 128);
     uint64_t start = low_ + thread_size * t;
     uint64_t stop = start + thread_size;
-    start = max(start, 3) - 1;
-    stop = std::min(stop, high_);
 
+    // Make sure threads never write to
+    // the same pi[x] location.
+    if (start > low_ && start % 128 != 0)
+      start += 128 - start % 128;
+    if (stop % 128 != 0)
+      stop += 128 - stop % 128;
+
+    // Iterate over primes >= 3
+    start = max(start, 3) - 1;
+    stop = min(stop, high_);
     primesieve::iterator it(start, stop);
     uint64_t prime = 0;
 
-    // Mark prime numbers
+    // Each thread iterates over the primes
+    // inside [start + 1, stop[ and initializes
+    // the pi[x] lookup table.
     while ((prime = it.next_prime()) < stop)
     {
       uint64_t p = prime - low_;
