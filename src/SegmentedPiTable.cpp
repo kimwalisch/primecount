@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 #include <array>
-#include <cstring>
 #include <vector>
 
 namespace {
@@ -97,7 +96,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   segment_size_ = std::min(segment_size_, max_);
   segment_size_ = segment_size + segment_size % 2;
 
-  int thread_threshold = (int) 1e8;
+  int thread_threshold = (int) 1e7;
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = segment_size_;
@@ -122,8 +121,11 @@ void SegmentedPiTable::next()
     return;
 
   // Reset pi[x] lookup table
-  std::size_t bytes = sizeof(PiData) * pi_.size();
-  std::memset(&pi_[0], 0, bytes);
+  for (auto& i : pi_)
+  {
+    i.prime_count = 0;
+    i.bits = 0;
+  }
 
   init_next_segment(pi_low);
 }
