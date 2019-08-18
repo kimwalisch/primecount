@@ -21,9 +21,11 @@
 
 #include <SegmentedPiTable.hpp>
 #include <primesieve.hpp>
+#include <min.hpp>
 
 #include <stdint.h>
 #include <array>
+#include <cstring>
 #include <vector>
 
 namespace {
@@ -95,39 +97,16 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   high_ = segment_size_;
   high_ = std::min(high_, max_);
   pi_.resize(segment_size_ / 128 + 1);
-  primesieve::iterator it(2, high_);
 
-  uint64_t pix = 0;
-  uint64_t prime = 0;
-
-  // Since we store only odd numbers in our lookup table,
-  // we cannot store 2 which is the only even prime.
-  // As a workaround we mark 1 as a prime (1st bit) and
-  // add a check to return 0 for pi[1].
-  if (low_ <= 1)
-    pi_[0].bits = 1;
-
-  while ((prime = it.next_prime()) < high_)
-  {
-    uint64_t p = prime - low_;
-    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
-  }
-
-  for (auto& i : pi_)
-  {
-    i.prime_count = pix;
-    pix += popcnt64(i.bits);
-  }
+  uint64_t pi_low = 0;
+  init_next_segment(pi_low);
 }
 
-/// Initialize next segment to [high, high + segment_size[
-/// (the current segment is [low, high[).
-///
+/// Increase low & high and initialize the next segment.
 void SegmentedPiTable::next()
 {
-  assert(low_ <= max_);
-  uint64_t prime = 0;
-  uint64_t pix = operator[](high_ - 1);
+  // Count of primes < low
+  uint64_t pi_low = operator[](high_ - 1);
 
   low_ = high_;
   high_ = low_ + segment_size_;
@@ -137,13 +116,33 @@ void SegmentedPiTable::next()
     return;
 
   // Reset pi[x] lookup table
-  for (auto& i : pi_)
+  std::size_t bytes = sizeof(PiData) * pi_.size();
+  std::memset(&pi_[0], 0, bytes);
+
+  init_next_segment(pi_low);
+}
+
+/// Iterate over the primes inside the segment [low, high[
+/// and initialize the pi[x] lookup table. The pi[x]
+/// lookup table returns the number of primes <= x for
+/// low <= x < high.
+/// @pi_low: Count of primes < low
+///
+void SegmentedPiTable::init_next_segment(uint64_t pi_low)
+{
+  if (low_ <= 1)
   {
-    i.bits = 0;
-    i.prime_count = 0;
+    // Since we store only odd numbers in our lookup table,
+    // we cannot store 2 which is the only even prime.
+    // As a workaround we mark 1 as a prime (1st bit) and
+    // add a check to return 0 for pi[1].
+    pi_[0].bits = 1;
   }
 
-  primesieve::iterator it(low_ - 1, high_);
+  // Iterate over primes >= 3
+  uint64_t prime = 0;
+  uint64_t start = max(low_, 3) - 1;
+  primesieve::iterator it(start, high_);
 
   // Mark prime numbers
   while ((prime = it.next_prime()) < high_)
@@ -155,8 +154,8 @@ void SegmentedPiTable::next()
   // Update prime counts
   for (auto& i : pi_)
   {
-    i.prime_count = pix;
-    pix += popcnt64(i.bits);
+    i.prime_count = pi_low;
+    pi_low += popcnt64(i.bits);
   }
 }
 

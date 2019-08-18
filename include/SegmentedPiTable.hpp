@@ -44,8 +44,7 @@ public:
   SegmentedPiTable(uint64_t sqrtx,
                    uint64_t segment_size);
 
-  /// Init next segment to [high, high + segment_size[
-  /// (current segment is [low, high[).
+  /// Increase low & high and initialize the next segment.
   void next();
 
   /// Get number of primes <= n
@@ -69,6 +68,11 @@ public:
     return prime_count + bit_count;
   }
 
+  bool finished() const
+  {
+    return low_ >= max_;
+  }
+
   int64_t low() const
   {
     return low_;
@@ -79,12 +83,9 @@ public:
     return high_;
   }
 
-  bool finished() const
-  {
-    return low_ >= max_;
-  }
-
 private:
+  void init_next_segment(uint64_t pi_low);
+
   struct PiData
   {
     uint64_t prime_count = 0;
