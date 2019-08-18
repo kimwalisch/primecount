@@ -1,5 +1,5 @@
 ///
-/// @file  pi_deleglise_rivat_parallel.cpp
+/// @file  pi_deleglise_rivat3.cpp
 /// @brief 64-bit and 128-bit parallel implementations of the
 ///        Deleglise-Rivat prime counting algorithm.
 ///
@@ -63,7 +63,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
+int64_t pi_deleglise_rivat_64(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
@@ -76,7 +76,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   print("");
-  print("=== pi_deleglise_rivat_parallel1(x) ===");
+  print("=== pi_deleglise_rivat_64(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
   print(x, y, z, c, alpha, threads);
 
@@ -97,7 +97,7 @@ int64_t pi_deleglise_rivat_parallel1(int64_t x, int threads)
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads)
+int128_t pi_deleglise_rivat_128(int128_t x, int threads)
 {
   if (x < 2)
     return 0;
@@ -114,7 +114,7 @@ int128_t pi_deleglise_rivat_parallel2(int128_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   print("");
-  print("=== pi_deleglise_rivat_parallel2(x) ===");
+  print("=== pi_deleglise_rivat_128(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
   print(x, y, z, c, alpha, threads);
 

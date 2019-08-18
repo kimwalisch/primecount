@@ -181,12 +181,8 @@ int main (int argc, char* argv[])
     {
       case OPTION_DELEGLISE_RIVAT:
         res = pi_deleglise_rivat(x, threads); break;
-      case OPTION_DELEGLISE_RIVAT1:
-        res = pi_deleglise_rivat1(to_int64(x)); break;
-      case OPTION_DELEGLISE_RIVAT2:
-        res = pi_deleglise_rivat2(to_int64(x)); break;
-      case OPTION_DELEGLISE_RIVAT_PARALLEL1:
-        res = pi_deleglise_rivat_parallel1(to_int64(x), threads); break;
+      case OPTION_DELEGLISE_RIVAT_64:
+        res = pi_deleglise_rivat_64(to_int64(x), threads); break;
       case OPTION_GOURDON:
         res = pi_gourdon(to_int64(x), threads); break;
       case OPTION_LEGENDRE:
@@ -236,8 +232,8 @@ int main (int argc, char* argv[])
       case OPTION_S2_TRIVIAL:
         res = S2_trivial(x); break;
 #ifdef HAVE_INT128_T
-      case OPTION_DELEGLISE_RIVAT_PARALLEL2:
-        res = pi_deleglise_rivat_parallel2(x, threads); break;
+      case OPTION_DELEGLISE_RIVAT_128:
+        res = pi_deleglise_rivat_128(x, threads); break;
 #endif
     }
 
