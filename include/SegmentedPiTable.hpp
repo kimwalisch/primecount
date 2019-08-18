@@ -85,6 +85,7 @@ public:
   }
 
 private:
+  void reset_pi(uint64_t start, uint64_t stop);
   void init_next_segment(uint64_t pi_low);
 
   struct PiData

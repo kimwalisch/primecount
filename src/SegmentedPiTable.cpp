@@ -22,7 +22,6 @@
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <imath.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
@@ -94,14 +93,17 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
   segment_size_ = std::max(segment_size, min_segment_size);
   segment_size_ = std::min(segment_size_, max_);
-  segment_size_ = segment_size + segment_size % 2;
+
+  // In order to simplify multi-threading we set low,
+  // high and segment_size % 128 == 0.
+  segment_size_ += 128 - segment_size_ % 128;
 
   int thread_threshold = (int) 1e7;
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = segment_size_;
   high_ = std::min(high_, max_);
-  pi_.resize(segment_size_ / 128 + 1);
+  pi_.resize(segment_size_ / 128);
 
   uint64_t pi_low = 0;
   init_next_segment(pi_low);
@@ -120,14 +122,41 @@ void SegmentedPiTable::next()
   if (finished())
     return;
 
-  // Reset pi[x] lookup table
-  for (auto& i : pi_)
-  {
-    i.prime_count = 0;
-    i.bits = 0;
-  }
-
   init_next_segment(pi_low);
+}
+
+/// Reset the pi[x] lookup table using multi-threading.
+/// Each thread resets the chunk [start, stop[.
+///
+void SegmentedPiTable::reset_pi(uint64_t start,
+                                uint64_t stop)
+{
+  // Already intialized to 0
+  if (start == 0)
+    return;
+  if (start >= stop)
+    return;
+
+  if (stop % 128 != 0)
+    stop += 128 - stop % 128;
+
+  // Make sure threads never write to
+  // the same pi[x] location.
+  assert(start >= low_);
+  assert(stop - low_ <= segment_size_);
+  assert(low_ % 128 == 0);
+  assert(start % 128 == 0);
+  assert(stop % 128 == 0);
+
+  // Convert to array indexes
+  start = (start - low_) / 128;
+  stop = (stop - low_) / 128;
+
+  for (uint64_t i = start; i < stop; i++)
+  {
+    pi_[i].prime_count = 0;
+    pi_[i].bits = 0;
+  }
 }
 
 /// Iterate over the primes inside the segment [low, high[
@@ -148,26 +177,21 @@ void SegmentedPiTable::init_next_segment(uint64_t pi_low)
   #pragma omp parallel for num_threads(threads_)
   for (int t = 0; t < threads_; t++)
   {
-    uint64_t thread_size = ceil_div(segment_size_, threads_);
-    thread_size = max(thread_size, 128);
+    uint64_t thread_size = segment_size_ / threads_;
+    thread_size += 128 - thread_size % 128;
     uint64_t start = low_ + thread_size * t;
     uint64_t stop = start + thread_size;
-
-    // Make sure threads never write to
-    // the same pi[x] location.
-    if (start > low_ && start % 128 != 0)
-      start += 128 - start % 128;
-    if (stop % 128 != 0)
-      stop += 128 - stop % 128;
-
-    // Iterate over primes >= 3
-    start = max(start, 3) - 1;
     stop = min(stop, high_);
+
+    reset_pi(start, stop);
+
+    // Iterate over primes > 2
+    start = max(start, 2);
     primesieve::iterator it(start, stop);
     uint64_t prime = 0;
 
     // Each thread iterates over the primes
-    // inside [start + 1, stop[ and initializes
+    // inside [start, stop[ and initializes
     // the pi[x] lookup table.
     while ((prime = it.next_prime()) < stop)
     {
