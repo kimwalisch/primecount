@@ -183,21 +183,19 @@ void test()
     test_phi(100);
 #endif
 
-    TEST0(pi_legendre,                  pi_primesieve,    100);
-    TEST2(pi_meissel,                   pi_legendre,      500);
-    TEST2(pi_lehmer,                    pi_meissel,       500);
-    TEST1(pi_lmo1,                      pi_meissel,        50);
-    TEST1(pi_lmo2,                      pi_meissel,       200);
-    TEST1(pi_lmo3,                      pi_meissel,       300);
-    TEST1(pi_lmo4,                      pi_meissel,       300);
-    TEST1(pi_lmo5,                      pi_meissel,       600);
-    TEST2(pi_lmo_parallel,              pi_meissel,       900);
-    TEST1(pi_deleglise_rivat1,          pi_lmo_parallel,  600);
-    TEST1(pi_deleglise_rivat2,          pi_lmo_parallel,  600);
-    TEST2(pi_deleglise_rivat_parallel1, pi_lmo_parallel, 1500);
+    TEST0(pi_legendre,            pi_primesieve,    100);
+    TEST2(pi_meissel,             pi_legendre,      500);
+    TEST2(pi_lehmer,              pi_meissel,       500);
+    TEST1(pi_lmo1,                pi_meissel,        50);
+    TEST1(pi_lmo2,                pi_meissel,       200);
+    TEST1(pi_lmo3,                pi_meissel,       300);
+    TEST1(pi_lmo4,                pi_meissel,       300);
+    TEST1(pi_lmo5,                pi_meissel,       600);
+    TEST2(pi_lmo_parallel,        pi_meissel,       900);
+    TEST2(pi_deleglise_rivat_64,  pi_lmo_parallel, 1500);
 
 #ifdef HAVE_INT128_T
-    TEST2(pi_deleglise_rivat_parallel2, pi_lmo_parallel, 1500);
+    TEST2(pi_deleglise_rivat_128, pi_lmo_parallel, 1500);
 #endif
 
     TEST2(pi_gourdon, pi_lmo_parallel, 1500);

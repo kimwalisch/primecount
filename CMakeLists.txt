@@ -73,9 +73,7 @@ set(LIB_SRC src/FactorTable.cpp
             src/lmo/pi_lmo_parallel.cpp
             src/deleglise-rivat/S2_hard.cpp
             src/deleglise-rivat/S2_trivial.cpp
-            src/deleglise-rivat/pi_deleglise_rivat1.cpp
-            src/deleglise-rivat/pi_deleglise_rivat2.cpp
-            src/deleglise-rivat/pi_deleglise_rivat_parallel.cpp
+            src/deleglise-rivat/pi_deleglise_rivat3.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
