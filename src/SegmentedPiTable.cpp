@@ -20,7 +20,9 @@
 ///
 
 #include <SegmentedPiTable.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <imath.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
@@ -77,7 +79,8 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 };
 
 SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
-                                   uint64_t segment_size)
+                                   uint64_t segment_size,
+                                   int threads)
   : max_(sqrtx + 1)
 {
   // Each bit of the pi[x] lookup table corresponds
@@ -93,6 +96,9 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   segment_size_ = std::max(segment_size, min_segment_size);
   segment_size_ = std::min(segment_size_, max_);
   segment_size_ = segment_size + segment_size % 2;
+
+  int thread_threshold = (int) 1e8;
+  threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = segment_size_;
   high_ = std::min(high_, max_);
@@ -130,25 +136,39 @@ void SegmentedPiTable::next()
 ///
 void SegmentedPiTable::init_next_segment(uint64_t pi_low)
 {
+  // Since we store only odd numbers in our lookup table,
+  // we cannot store 2 which is the only even prime.
+  // As a workaround we mark 1 as a prime (1st bit) and
+  // add a check to return 0 for pi[1].
   if (low_ <= 1)
-  {
-    // Since we store only odd numbers in our lookup table,
-    // we cannot store 2 which is the only even prime.
-    // As a workaround we mark 1 as a prime (1st bit) and
-    // add a check to return 0 for pi[1].
     pi_[0].bits = 1;
-  }
 
-  // Iterate over primes >= 3
-  uint64_t prime = 0;
-  uint64_t start = max(low_, 3) - 1;
-  primesieve::iterator it(start, high_);
+  uint64_t thread_size = ceil_div(segment_size_, threads_);
 
-  // Mark prime numbers
-  while ((prime = it.next_prime()) < high_)
+  // Make sure threads never write to
+  // the same pi[x] location
+  if (thread_size % 128)
+    thread_size += 128 - thread_size % 128;
+
+  #pragma omp parallel for num_threads(threads_)
+  for (int t = 0; t < threads_; t++)
   {
-    uint64_t p = prime - low_;
-    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+    // Iterate over the primes inside [start, stop[
+    // with start >= 3 and stop <= high
+    uint64_t start = low_ + thread_size * t;
+    uint64_t stop = start + thread_size;
+    start = max(start, 3) - 1;
+    stop = std::min(stop, high_);
+
+    primesieve::iterator it(start, stop);
+    uint64_t prime = 0;
+
+    // Mark prime numbers
+    while ((prime = it.next_prime()) < stop)
+    {
+      uint64_t p = prime - low_;
+      pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+    }
   }
 
   // Update prime counts

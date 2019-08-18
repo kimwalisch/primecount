@@ -42,7 +42,8 @@ class SegmentedPiTable
 {
 public:
   SegmentedPiTable(uint64_t sqrtx,
-                   uint64_t segment_size);
+                   uint64_t segment_size,
+                   int threads);
 
   /// Increase low & high and initialize the next segment.
   void next();
@@ -98,6 +99,7 @@ private:
   uint64_t high_;
   uint64_t max_;
   uint64_t segment_size_;
+  int threads_;
 };
 
 } // namespace
