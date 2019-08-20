@@ -93,7 +93,6 @@ T C_OpenMP(T x,
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
-  int64_t pi_y = pi[y];
 
   // Find all special leaves of type:
   // x / (primes[b] * m) <= z.
@@ -117,7 +116,7 @@ T C_OpenMP(T x,
 
   // Find all special leaves of type:
   // z < x / (primes[b] * primes[i]) <= x^(1/2)
-  // with z^(1/2) < primes[b] < x_star.
+  // with z^(1/2) < primes[b] <= x_star.
   // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
   // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
   // in order to reduce the memory usage.
