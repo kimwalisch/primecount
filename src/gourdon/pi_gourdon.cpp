@@ -67,12 +67,11 @@ int64_t pi_gourdon(int64_t x, int threads)
 
   int64_t sigma = Sigma(x, y, threads);
   int64_t phi0 = Phi0(x, y, z, k, threads);
-  int64_t a = A(x, y, z, threads);
   int64_t b = B(x, y, threads);
-  int64_t c = C(x, y, z, k, threads);
-  int64_t d_approx = D_approx(x, sigma, phi0, a, b, c);
+  int64_t ac = AC(x, y, z, k, threads);
+  int64_t d_approx = D_approx(x, sigma, phi0, ac, b);
   int64_t d = D(x, y, z, k, d_approx, threads);
-  int64_t sum = a - b + c + d + phi0 + sigma;
+  int64_t sum = ac - b + d + phi0 + sigma;
 
   return sum;
 }

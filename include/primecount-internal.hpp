@@ -173,10 +173,10 @@ T S2_approx(T x, int64_t pi_y, T p2, T s1)
 }
 
 template <typename T>
-T D_approx(T x, T sigma, T phi0, T a, T b, T c)
+T D_approx(T x, T sigma, T phi0, T ac, T b)
 {
   T pix = Ri(x);
-  T d_approx = pix - (a - b + c + phi0 + sigma);
+  T d_approx = pix - (ac - b + phi0 + sigma);
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;
 }
