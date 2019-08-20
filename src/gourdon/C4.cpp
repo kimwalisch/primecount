@@ -133,10 +133,10 @@ T C_OpenMP(T x,
     int64_t min_prime2 = min(isqrt(low), primes[pi_x_star]);
     int64_t min_prime3 = min(iroot<3>(x_div_y), primes[pi_x_star]);
 
-    int64_t min_b = std::max(k, pi_sqrtz);
-    min_b = std::max(min_b, pi[min_prime1]);
-    min_b = std::max(min_b, pi[min_prime2]);
-    min_b = std::max(min_b, pi[min_prime3]);
+    int64_t min_b = max(k, pi_sqrtz);
+    min_b = max(min_b, pi[min_prime1]);
+    min_b = max(min_b, pi[min_prime2]);
+    min_b = max(min_b, pi[min_prime3]);
 
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
     for (int64_t b = min_b + 1; b <= pi_x_star; b++)
