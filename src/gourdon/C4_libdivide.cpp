@@ -159,7 +159,6 @@ T C_OpenMP(T x,
     int64_t min_prime2 = min(isqrt(low), primes[pi_x_star]);
     int64_t min_prime3 = min(iroot<3>(x_div_y), primes[pi_x_star]);
 
-    int64_t max_b = pi[x_star];
     int64_t min_b = std::max(k, pi_sqrtz);
     min_b = std::max(min_b, pi[min_prime1]);
     min_b = std::max(min_b, pi[min_prime2]);
@@ -180,13 +179,6 @@ T C_OpenMP(T x,
       int64_t min_clustered = (int64_t) isqrt(xp);
       min_clustered = in_between(min_m, min_clustered, max_m);
       int64_t pi_min_clustered = pi[min_clustered];
-
-      // x / (primes[b] * prime[i]) < low
-      // Nothing todo, these leaves were already
-      // processed in the previous segment.
-      if (pi_min_m + 1 <= pi_y &&
-          x_div_low < (T) prime * primes[pi_min_m + 1])
-        continue;
 
       if (is_libdivide(xp))
       {
