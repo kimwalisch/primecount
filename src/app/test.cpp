@@ -25,20 +25,21 @@
 #include <sstream>
 #include <string>
 
-// test: f1(x) == f2(x)
+// test: f1(x, threads) == f2(x)
 #define TEST0(f1, f2, iters) \
 { \
   cout << "Testing " << #f1 << "(x)" << flush; \
+  int threads = get_num_threads(); \
   int64_t x = 0; \
  \
   /* test small values */ \
   for (x = 0; x < 10000; x++) \
-    check_equal(#f1, x, f1 (x), f2 (x)); \
+    check_equal(#f1, x, f1 (x, threads), f2 (x)); \
  \
   /* test random increment */ \
   for (int64_t i = 0; i < iters; i++) \
   { \
-    check_equal(#f1, x, f1 (x), f2 (x)); \
+    check_equal(#f1, x, f1 (x, threads), f2 (x)); \
     double percent = 100.0 * (i + 1.0) / iters; \
     cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
     x += dist(gen); \
@@ -183,7 +184,7 @@ void test()
     test_phi(100);
 #endif
 
-    TEST1(pi_primesieve,          pi_legendre,      100);
+    TEST0(pi_legendre,            pi_primesieve,    100);
     TEST2(pi_meissel,             pi_legendre,      500);
     TEST2(pi_lehmer,              pi_meissel,       500);
     TEST1(pi_lmo1,                pi_meissel,        50);
