@@ -28,68 +28,21 @@ public:
   { }
 };
 
-/// Count the number of primes <= x.
-/// Alias for the fastest prime counting function. For
-/// performance reasons API users should use this function
-/// or the 128-bit version instead of directly using
-/// e.g. pi_deleglise_rivat(x).
+/// Count the number of primes <= x using Xavier Gourdon's
+/// algorithm. Uses all CPU cores by default.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int64_t pi(int64_t x);
 
-/// 128-bit prime counting function.
+/// Count the number of primes <= x using Xavier Gourdon's
+/// algorithm. Uses all CPU cores by default.
 /// @param x Number or arithmetic expression e.g. "1000", "10^22"
-/// @pre x <= get_max_x()
+/// @pre x <= 10^31 on 64-bit systems, x < 2^63 on 32-bit systems.
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 std::string pi(const std::string& x);
-
-/// Count the number of primes <= x using the
-/// Deleglise-Rivat algorithm.
-/// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/3) * (log x)^3)
-///
-int64_t pi_deleglise_rivat(int64_t x);
-
-/// Count the number of primes <= x using the
-/// Xavier Gourdon's algorithm.
-/// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/3) * (log x)^3)
-///
-int64_t pi_gourdon(int64_t x);
-
-/// Count the number of primes <= x using Legendre's formula.
-/// Run time: O(x)
-/// Memory usage: O(x^(1/2))
-///
-int64_t pi_legendre(int64_t x);
-
-/// Count the number of primes <= x using Lehmer's formula.
-/// Run time: O(x / (log x)^4)
-/// Memory usage: O(x^(1/2))
-///
-int64_t pi_lehmer(int64_t x);
-
-/// Count the number of primes <= x using the
-/// Lagarias-Miller-Odlyzko algorithm.
-/// Run time: O(x^(2/3) / log x)
-/// Memory usage: O(x^(1/3) * (log x)^2)
-///
-int64_t pi_lmo(int64_t x);
-
-/// Count the number of primes <= x using Meissel's formula.
-/// Run time: O(x / (log x)^3)
-/// Memory usage: O(x^(1/2) / log x)
-///
-int64_t pi_meissel(int64_t x);
-
-/// Count the number of primes <= x using primesieve's
-/// highly optimized segmented sieve of Eratosthenes
-/// implementation.
-/// Run time: O(x log log x)
-/// Memory usage: O(x^(1/2))
-///
-int64_t pi_primesieve(int64_t x);
 
 /// Find the nth prime using a combination of the prime
 /// counting function and the sieve of Eratosthenes.

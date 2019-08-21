@@ -183,7 +183,7 @@ void test()
     test_phi(100);
 #endif
 
-    TEST0(pi_legendre,            pi_primesieve,    100);
+    TEST1(pi_primesieve,          pi_legendre,      100);
     TEST2(pi_meissel,             pi_legendre,      500);
     TEST2(pi_lehmer,              pi_meissel,       500);
     TEST1(pi_lmo1,                pi_meissel,        50);

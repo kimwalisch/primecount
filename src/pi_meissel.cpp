@@ -34,7 +34,7 @@ int64_t pi_meissel(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<3>(x);
-  int64_t a = pi_legendre(y);
+  int64_t a = pi_legendre(y, threads);
 
   print("");
   print("=== pi_meissel(x) ===");
