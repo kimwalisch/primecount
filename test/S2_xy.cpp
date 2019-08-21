@@ -11,6 +11,7 @@
 ///
 
 #include <S2.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
