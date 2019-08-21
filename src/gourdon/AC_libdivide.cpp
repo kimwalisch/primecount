@@ -104,7 +104,7 @@ T AC_OpenMP(T x,
   auto fastdiv = libdivide_vector(primes);
 
   S2Status status(x);
-  PiTable pi(z);
+  PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
@@ -163,7 +163,7 @@ T AC_OpenMP(T x,
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
     int64_t max_b = pi[sqrt_low];
 
-    if (primes[max_b] < max_a_prime &&
+    if (max_b + 1 < (int64_t) primes.size() &&
         (T) primes[max_b] * (T) primes[max_b + 1] > (T) x_div_low)
       max_b -= 1;
 
@@ -316,10 +316,11 @@ int64_t AC(int64_t x,
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_c_prime = y;
+  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<int32_t>(max_prime);
+
   int64_t ac = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
 
   print("A + C", ac, time);
@@ -340,8 +341,8 @@ int128_t AC(int128_t x,
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_c_prime = y;
+  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
   int128_t ac;
 

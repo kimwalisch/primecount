@@ -106,12 +106,10 @@ endif()
 
 if(libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/A2_libdivide.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/A2.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/C3.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
