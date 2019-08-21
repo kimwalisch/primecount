@@ -39,16 +39,17 @@ int main()
   int64_t min = ipow(10, 9);
   int64_t max = min * 2;
   uniform_int_distribution<int64_t> dist(min, max);
+  int threads = get_num_threads();
 
   for (int i = 0; i < 10; i++)
   {
     int64_t x = dist(gen);
-    int64_t res1 = pi_meissel(x);
+    int64_t res1 = pi_meissel(x, threads);
 
     for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
     {
       set_alpha(alpha);
-      int64_t res2 = pi_deleglise_rivat(x);
+      int64_t res2 = pi_deleglise_rivat(x, threads);
 
       cout << "pi_deleglise_rivat(" << x << ") = " << res2;
       check(res1 == res2);
@@ -62,12 +63,12 @@ int main()
   for (int i = 0; i < 10; i++)
   {
     int64_t x = dist_lmo(gen);
-    int64_t res1 = pi_meissel(x);
+    int64_t res1 = pi_meissel(x, threads);
 
     for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
     {
       set_alpha(alpha);
-      int64_t res2 = pi_lmo(x);
+      int64_t res2 = pi_lmo_parallel(x, threads);
 
       cout << "pi_lmo(" << x << ") = " << res2;
       check(res1 == res2);
