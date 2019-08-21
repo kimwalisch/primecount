@@ -43,6 +43,8 @@ map<string, OptionID> optionMap =
   { "--deleglise_rivat_128", OPTION_DELEGLISE_RIVAT_128 },
   { "-g", OPTION_GOURDON },
   { "--gourdon", OPTION_GOURDON },
+  { "--gourdon_64", OPTION_GOURDON_64 },
+  { "--gourdon_128", OPTION_GOURDON_128 },
   { "-h", OPTION_HELP },
   { "--help", OPTION_HELP },
   { "--legendre", OPTION_LEGENDRE },

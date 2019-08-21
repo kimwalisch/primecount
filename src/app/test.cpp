@@ -192,13 +192,17 @@ void test()
     TEST1(pi_lmo4,                pi_meissel,       300);
     TEST1(pi_lmo5,                pi_meissel,       600);
     TEST2(pi_lmo_parallel,        pi_meissel,       900);
-    TEST2(pi_deleglise_rivat_64,  pi_lmo_parallel, 1500);
 
+    TEST2(pi_deleglise_rivat_64,  pi_lmo_parallel, 1500);
 #ifdef HAVE_INT128_T
     TEST2(pi_deleglise_rivat_128, pi_lmo_parallel, 1500);
 #endif
 
-    TEST2(pi_gourdon, pi_lmo_parallel, 1500);
+    TEST2(pi_gourdon_64,  pi_lmo_parallel, 1500);
+#ifdef HAVE_INT128_T
+    TEST2(pi_gourdon_128, pi_lmo_parallel, 1500);
+#endif
+
     test_nth_prime(300);
   }
   catch (exception& e)

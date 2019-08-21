@@ -184,6 +184,8 @@ int main (int argc, char* argv[])
       case OPTION_DELEGLISE_RIVAT_64:
         res = pi_deleglise_rivat_64(to_int64(x), threads); break;
       case OPTION_GOURDON:
+        res = pi_gourdon(x, threads); break;
+      case OPTION_GOURDON_64:
         res = pi_gourdon(to_int64(x), threads); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
@@ -234,6 +236,8 @@ int main (int argc, char* argv[])
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_128:
         res = pi_deleglise_rivat_128(x, threads); break;
+      case OPTION_GOURDON_128:
+        res = pi_gourdon_128(x, threads); break;
 #endif
     }
 

@@ -51,6 +51,13 @@ std::string pi(const std::string& x);
 ///
 int64_t pi_deleglise_rivat(int64_t x);
 
+/// Count the number of primes <= x using the
+/// Xavier Gourdon's algorithm.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
+///
+int64_t pi_gourdon(int64_t x);
+
 /// Count the number of primes <= x using Legendre's formula.
 /// Run time: O(x)
 /// Memory usage: O(x^(1/2))
