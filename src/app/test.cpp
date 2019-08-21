@@ -25,20 +25,21 @@
 #include <sstream>
 #include <string>
 
-// test: f1(x) == f2(x)
+// test: f1(x, threads) == f2(x)
 #define TEST0(f1, f2, iters) \
 { \
   cout << "Testing " << #f1 << "(x)" << flush; \
+  int threads = get_num_threads(); \
   int64_t x = 0; \
  \
   /* test small values */ \
   for (x = 0; x < 10000; x++) \
-    check_equal(#f1, x, f1 (x), f2 (x)); \
+    check_equal(#f1, x, f1 (x, threads), f2 (x)); \
  \
   /* test random increment */ \
   for (int64_t i = 0; i < iters; i++) \
   { \
-    check_equal(#f1, x, f1 (x), f2 (x)); \
+    check_equal(#f1, x, f1 (x, threads), f2 (x)); \
     double percent = 100.0 * (i + 1.0) / iters; \
     cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
     x += dist(gen); \
@@ -192,13 +193,17 @@ void test()
     TEST1(pi_lmo4,                pi_meissel,       300);
     TEST1(pi_lmo5,                pi_meissel,       600);
     TEST2(pi_lmo_parallel,        pi_meissel,       900);
-    TEST2(pi_deleglise_rivat_64,  pi_lmo_parallel, 1500);
 
+    TEST2(pi_deleglise_rivat_64,  pi_lmo_parallel, 1500);
 #ifdef HAVE_INT128_T
     TEST2(pi_deleglise_rivat_128, pi_lmo_parallel, 1500);
 #endif
 
-    TEST2(pi_gourdon, pi_lmo_parallel, 1500);
+    TEST2(pi_gourdon_64,  pi_lmo_parallel, 1500);
+#ifdef HAVE_INT128_T
+    TEST2(pi_gourdon_128, pi_lmo_parallel, 1500);
+#endif
+
     test_nth_prime(300);
   }
   catch (exception& e)

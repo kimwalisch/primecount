@@ -15,7 +15,6 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <print.hpp>
@@ -34,7 +33,7 @@ int64_t pi_lehmer(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<4>(x);
-  int64_t a = pi_legendre(y);
+  int64_t a = pi_legendre(y, threads);
 
   print("");
   print("=== pi_lehmer(x) ===");

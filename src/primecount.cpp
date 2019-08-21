@@ -12,6 +12,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <calculator.hpp>
+#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 
@@ -69,7 +70,7 @@ namespace {
   int threads_ = 0;
 #endif
 
-// Below 10^7 LMO is faster than Deleglise-Rivat
+// Below 10^7 LMO is faster than Gourdon's algorithm
 const int lmo_threshold_ = 10000000;
 
 int status_precision_ = -1;
@@ -98,7 +99,15 @@ int64_t pi(int64_t x, int threads)
   if (x <= lmo_threshold_)
     return pi_lmo5(x);
   else
-    return pi_deleglise_rivat(x, threads);
+  {
+#ifdef HAVE_MPI
+    // So far only the Deleglise-Rivat algorithm has been distributed
+    if (mpi_num_procs() > 1)
+      return pi_deleglise_rivat_64(x, threads);
+#endif
+
+    return pi_gourdon_64(x, threads);
+  }
 }
 
 #ifdef HAVE_INT128_T
@@ -114,7 +123,15 @@ int128_t pi(int128_t x, int threads)
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
   else
-    return pi_deleglise_rivat(x, threads);
+  {
+#ifdef HAVE_MPI
+    // So far only the Deleglise-Rivat algorithm has been distributed
+    if (mpi_num_procs() > 1)
+      return pi_deleglise_rivat_128(x, threads);
+#endif
+
+    return pi_gourdon_128(x, threads);
+  }
 }
 
 #endif
@@ -132,34 +149,9 @@ string pi(const string& x, int threads)
   return oss.str();
 }
 
-int64_t pi_legendre(int64_t x)
-{
-  return pi_legendre(x, get_num_threads());
-}
-
-int64_t pi_lehmer(int64_t x)
-{
-  return pi_lehmer(x, get_num_threads());
-}
-
-int64_t pi_lmo(int64_t x)
-{
-  return pi_lmo(x, get_num_threads());
-}
-
 int64_t pi_lmo(int64_t x, int threads)
 {
   return pi_lmo_parallel(x, threads);
-}
-
-int64_t pi_meissel(int64_t x)
-{
-  return pi_meissel(x, get_num_threads());
-}
-
-int64_t pi_deleglise_rivat(int64_t x)
-{
-  return pi_deleglise_rivat(x, get_num_threads());
 }
 
 int64_t pi_deleglise_rivat(int64_t x, int threads)
@@ -167,12 +159,12 @@ int64_t pi_deleglise_rivat(int64_t x, int threads)
   return pi_deleglise_rivat_64(x, threads);
 }
 
-#ifdef HAVE_INT128_T
-
-int128_t pi_deleglise_rivat(int128_t x)
+int64_t pi_gourdon(int64_t x, int threads)
 {
-  return pi_deleglise_rivat(x, get_num_threads());
+  return pi_gourdon_64(x, threads);
 }
+
+#ifdef HAVE_INT128_T
 
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
@@ -181,6 +173,15 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
     return pi_deleglise_rivat_64((int64_t) x, threads);
   else
     return pi_deleglise_rivat_128(x, threads);
+}
+
+int128_t pi_gourdon(int128_t x, int threads)
+{
+  // use 64-bit if possible
+  if (x <= numeric_limits<int64_t>::max())
+    return pi_gourdon_64((int64_t) x, threads);
+  else
+    return pi_gourdon_128(x, threads);
 }
 
 #endif
