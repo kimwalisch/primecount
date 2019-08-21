@@ -4,13 +4,16 @@
 ///        prime counting algorithm. In this version the memory usage
 ///        has been reduced from O(x^(1/2)) to O(z) by segmenting
 ///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime1 * prime2) < high.
+///        leaves that satisfy: low <= x / (prime * m) < high.
 ///
-///        This is an optimized version of AC(x, y) which uses
-///        libdivide. libdivide allows to replace expensive integer
-///        divsion instructions by a sequence of shift, add and
-///        multiply instructions that will calculate the integer
-///        division much faster.
+///        The A & C formulas roughly correspond to the easy special
+///        leaves in the Deleglise-Rivat algorithm. Since both
+///        formulas use a very similar segmented algorithm that goes
+///        up to x^(1/2) it makes sense to merge the A & C formulas
+///        hence reducing the runtime complexity by a factor of
+///        O(x^(1/2) * ln ln x^(1/2)) and avoiding initializing some
+///        data structures twice. Merging the A & C formulas also
+///        improves scaling on systems with many CPU cores.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
