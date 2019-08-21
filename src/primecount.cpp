@@ -99,7 +99,15 @@ int64_t pi(int64_t x, int threads)
   if (x <= lmo_threshold_)
     return pi_lmo5(x);
   else
+  {
+#ifdef HAVE_MPI
+    // So far only the Deleglise-Rivat algorithm has been distributed
+    if (mpi_num_procs() > 1)
+      return pi_deleglise_rivat_64(x, threads);
+#endif
+
     return pi_gourdon_64(x, threads);
+  }
 }
 
 #ifdef HAVE_INT128_T
@@ -115,7 +123,15 @@ int128_t pi(int128_t x, int threads)
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
   else
+  {
+#ifdef HAVE_MPI
+    // So far only the Deleglise-Rivat algorithm has been distributed
+    if (mpi_num_procs() > 1)
+      return pi_deleglise_rivat_128(x, threads);
+#endif
+
     return pi_gourdon_128(x, threads);
+  }
 }
 
 #endif
