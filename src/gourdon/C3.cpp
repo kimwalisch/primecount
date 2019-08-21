@@ -61,8 +61,7 @@ T C(T xp,
     if ((T) m * primes[i] > max_m)
       return sum;
 
-    if (next_m > min_m)
-    {
+    if (next_m > min_m) {
       uint64_t xpm = fast_div64(xp, next_m);
       sum += MU * (pi[xpm] - b + 2);
     }
