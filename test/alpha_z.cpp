@@ -45,7 +45,7 @@ int main()
   for (int i = 0; i < 20; i++)
   {
     int64_t x = dist(gen);
-    int64_t res1 = pi_meissel(x);
+    int64_t res1 = pi_meissel(x, threads);
 
     for (double alpha_z = 1; alpha_z <= iroot<6>(x); alpha_z++)
     {

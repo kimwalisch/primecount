@@ -8,14 +8,13 @@
 ///         trivial and no easy special leaves which allows
 ///         us to test only the hard special leaves.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <S2.hpp>
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
@@ -48,7 +47,7 @@ int main()
   {
     int64_t x = i;
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_legendre(y);
+    int64_t pi_y = pi_legendre(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
@@ -72,7 +71,7 @@ int main()
   {
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_legendre(y);
+    int64_t pi_y = pi_legendre(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;

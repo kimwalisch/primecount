@@ -10,7 +10,7 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 
 #include <stdint.h>

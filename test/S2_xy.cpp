@@ -11,7 +11,6 @@
 ///
 
 #include <S2.hpp>
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
@@ -45,7 +44,7 @@ int main()
     int64_t x = i;
     double alpha = get_alpha_deleglise_rivat(x);
     int64_t y = (int64_t) (alpha * iroot<3>(x));
-    int64_t pi_y = pi_legendre(y);
+    int64_t pi_y = pi_legendre(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
@@ -73,7 +72,7 @@ int main()
     int64_t x = dist(gen);
     double alpha = get_alpha_deleglise_rivat(x);
     int64_t y = (int64_t) (alpha * iroot<3>(x));
-    int64_t pi_y = pi_legendre(y);
+    int64_t pi_y = pi_legendre(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;

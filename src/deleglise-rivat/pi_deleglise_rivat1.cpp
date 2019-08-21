@@ -23,7 +23,6 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <BinaryIndexedTree.hpp>
 #include <generate.hpp>
@@ -222,7 +221,7 @@ int64_t pi_deleglise_rivat1(int64_t x)
   auto mu = generate_moebius(y);
   auto lpf = generate_lpf(y);
 
-  int64_t pi_y = pi_legendre(y);
+  int64_t pi_y = pi_legendre(y, 1);
   int64_t s1 = S1(x, y, c, 1);
   int64_t s2 = S2(x, y, z, c, lpf, mu);
   int64_t phi = s1 + s2;
