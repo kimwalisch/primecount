@@ -299,7 +299,7 @@ int64_t S2_hard_mpi(int64_t x,
   double time = get_time();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
+    s2_hard = S2_hard_mpi_master(x, z, s2_hard_approx);
   else
   {
     FactorTable<uint16_t> factor(y, threads);
@@ -330,7 +330,7 @@ int128_t S2_hard_mpi(int128_t x,
   double time = get_time();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, y, z, s2_hard_approx);
+    s2_hard = S2_hard_mpi_master(x, z, s2_hard_approx);
   else
   {
     // uses less memory
