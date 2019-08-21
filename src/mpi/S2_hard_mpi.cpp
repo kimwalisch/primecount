@@ -244,7 +244,6 @@ void S2_hard_slave(T x,
 ///
 template <typename T>
 T S2_hard_mpi_master(T x,
-                     int64_t y,
                      int64_t z,
                      T s2_hard_approx)
 {
