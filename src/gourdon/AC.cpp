@@ -89,16 +89,19 @@ T AC_OpenMP(T x,
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
-  int64_t x_div_y = x / y;
   int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x_star, thread_threshold);
+  threads = ideal_num_threads(threads, x13, thread_threshold);
 
   S2Status status(x);
   PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
+
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
   int64_t pi_x13 = pi[x13];
+  int64_t pi_root3_xy = pi[iroot<3>(x / y)];
+  int64_t pi_root3_xz = pi[iroot<3>(x / z)];
+  int64_t min_b = max(k, pi_root3_xz);
 
   // This computes the 1st part of the C formula.
   // Find all special leaves of type:
@@ -107,7 +110,7 @@ T AC_OpenMP(T x,
   // who is coprime to the first b primes and
   // whose largest prime factor <= y.
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
-  for (int64_t b = k + 1; b <= pi_sqrtz; b++)
+  for (int64_t b = min_b + 1; b <= pi_sqrtz; b++)
   {
     int64_t prime = primes[b];
     T xp = x / prime;
@@ -138,14 +141,12 @@ T AC_OpenMP(T x,
     T x_div_low = x / low;
     T x_div_high = x / high;
 
-    int64_t min_prime1 = min(x_div_y / high, primes[pi_x_star]);
+    int64_t min_prime1 = min((x / y) / high, primes[pi_x_star]);
     int64_t min_prime2 = min(isqrt(low), primes[pi_x_star]);
-    int64_t min_prime3 = min(iroot<3>(x_div_y), primes[pi_x_star]);
 
-    int64_t min_b = max(k, pi_sqrtz);
+    min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[min_prime1]);
     min_b = max(min_b, pi[min_prime2]);
-    min_b = max(min_b, pi[min_prime3]);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
