@@ -2,7 +2,7 @@
 /// @file   min.cpp
 /// @brief  Test min() and max() functions.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -38,9 +38,6 @@ int main()
 
   static_assert(is_comparable<uint64_t, int64_t>::value, 
                 "is_comparable<uint64_t, int64_t> is broken");
-
-  static_assert(!is_comparable<int64_t, uint64_t>::value, 
-                "is_comparable<int64_t, uint64_t> is broken");
 
   static_assert(is_comparable<int64_t, int8_t>::value, 
                 "is_comparable<int64_t, int8_t> is broken");
@@ -92,9 +89,6 @@ int main()
 
   static_assert(is_comparable<uint128_t, int128_t>::value, 
                 "is_comparable<uint128_t, int128_t> is broken");
-
-  static_assert(!is_comparable<int128_t, uint128_t>::value, 
-                "is_comparable<int128_t, uint128_t> is broken");
 
   static_assert(is_comparable<int128_t, int8_t>::value, 
                 "is_comparable<int128_t, int8_t> is broken");

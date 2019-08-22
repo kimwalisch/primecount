@@ -130,8 +130,7 @@ T C_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
     int64_t max_m = min(xp / prime, z);
-    int64_t min_m = x / ipow<T>(prime, 3);
-    min_m = max(min_m, prime, z / prime);
+    int64_t min_m = max(x / ipow<T>(prime, 3), z / prime);
 
     sum += C<1>(xp, b, 1, min_m, max_m, b, primes, pi);
 
@@ -151,8 +150,8 @@ T C_OpenMP(T x,
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
-    int64_t x_div_low = x / low;
-    int64_t x_div_high = x / high;
+    T x_div_low = x / low;
+    T x_div_high = x / high;
 
     int64_t min_prime1 = min(x_div_y / high, primes[pi_x_star]);
     int64_t min_prime2 = min(isqrt(low), primes[pi_x_star]);
@@ -168,10 +167,9 @@ T C_OpenMP(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t max_m = min(xp / prime, x_div_low / prime, y);
-      int64_t min_m = max(x / ipow<T>(prime, 3), x_div_high / prime);
-      min_m = max(min_m, prime, z / prime);
-      min_m = min(min_m, max_m);
+      int64_t max_m = min3(x_div_low / prime, xp / prime, y);
+      T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
+      int64_t min_m = min(min_m128, max_m);
 
       int64_t i = pi[max_m];
       int64_t pi_min_m = pi[min_m];

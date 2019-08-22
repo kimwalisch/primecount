@@ -64,8 +64,7 @@ T C_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
     int64_t m = min(xp / prime, z);
-    int64_t min_m = x / ipow<T>(prime, 3);
-    min_m = max(min_m, prime, z / prime);
+    int64_t min_m = max(x / ipow<T>(prime, 3), z / prime);
 
     for (; m > min_m; m--)
     {

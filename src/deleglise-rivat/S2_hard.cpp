@@ -74,7 +74,7 @@ T S2_hard_thread(T x,
 {
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
-  int64_t max_b = pi[min(isqrt(x / low1), isqrt(z), y)];
+  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(z), y)];
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
 

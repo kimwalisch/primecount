@@ -4,7 +4,7 @@
 ///        different types if both types are integral
 ///        and sizeof(A) >= sizeof(B).
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,24 +20,26 @@
 
 namespace primecount {
 
-/// Check if A and B are:
-/// 1) Same types
-/// 2) Different integral types which satisfy:
-///      sizeof(A) > sizeof(B) ||
-///     (sizeof(A) == sizeof(B) &&
-///      is_unsigned<A> && is_signed<B>)
-///
 template <typename A, typename B>
 struct is_comparable
 {
   enum {
-    value = std::is_same<A, B>::value || ((
+    value = std::is_same<A, B>::value || (
             prt::is_integral<A>::value &&
-            prt::is_integral<B>::value) && (
-            sizeof(A) > sizeof(B) || (
-            sizeof(A) == sizeof(B) &&
-            prt::is_unsigned<A>::value &&
-            prt::is_signed<B>::value)))
+            prt::is_integral<B>::value &&
+            sizeof(A) >= sizeof(B))
+  };
+};
+
+template <typename A, typename B, typename C>
+struct is_comparable_3
+{
+  enum {
+    value = prt::is_integral<A>::value &&
+            prt::is_integral<B>::value &&
+            prt::is_integral<C>::value &&
+            sizeof(A) >= sizeof(B) &&
+            sizeof(B) >= sizeof(C)
   };
 };
 
@@ -50,25 +52,13 @@ inline B min(A a, B b)
   return (B) std::min(a, (A) b);
 }
 
-template <typename T>
-inline T min(T a, T b, T c)
+template <typename A, typename B, typename C>
+inline C min3(A a, B b, C c)
 {
-  return std::min(a, std::min(b, c));
-}
+  static_assert(is_comparable_3<A, B, C>::value,
+                "min3(A, B, C): Cannot compare types A, B and C");
 
-template <typename A, typename B>
-inline B min(A a, B b, B c)
-{
-  static_assert(is_comparable<A, B>::value,
-                "min(A, B, B): Cannot compare types A and B");
-
-  return (B) std::min(a, (A) std::min(b, c));
-}
-
-template <typename T>
-inline T max(T a, T b, T c)
-{
-  return std::max(a, std::max(b, c));
+  return (C) std::min(a, (A) std::min(b, (B) c));
 }
 
 template <typename A, typename B>
@@ -80,13 +70,13 @@ inline A max(A a, B b)
   return std::max(a, (A) b);
 }
 
-template <typename A, typename B>
-inline A max(A a, B b, B c)
+template <typename A, typename B, typename C>
+inline A max3(A a, B b, C c)
 {
-  static_assert(is_comparable<A, B>::value,
-                "max(A, B, B): Cannot compare types A and B");
+  static_assert(is_comparable_3<A, B, C>::value,
+                "max3(A, B, C): Cannot compare types A, B and C");
 
-  return std::max(a, (A) std::max(b, c));
+  return std::max(a, (A) std::max(b, (B) c));
 }
 
 } // namespace
