@@ -43,11 +43,11 @@ namespace {
 ///
 template <int MU, typename T, typename Primes>
 T C(T xp,
+    uint64_t b,
     uint64_t i,
     uint64_t m,
     uint64_t min_m,
     uint64_t max_m,
-    uint64_t b,
     Primes& primes,
     PiTable& pi)
 {
@@ -55,18 +55,18 @@ T C(T xp,
 
   for (i++; i < primes.size(); i++)
   {
-    uint64_t next_m = m * primes[i];
-
-    // next_m may be 128-bit
-    if ((T) m * primes[i] > max_m)
+    // next m may be 128-bit
+    T m128 = (T) m * primes[i];
+    if (m128 > max_m)
       return sum;
 
-    if (next_m > min_m) {
-      uint64_t xpm = fast_div64(xp, next_m);
+    uint64_t m64 = (uint64_t) m128;
+    if (m64 > min_m) {
+      uint64_t xpm = fast_div64(xp, m64);
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C<-MU>(xp, i, next_m, min_m, max_m, b, primes, pi);
+    sum += C<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -95,9 +95,11 @@ T C_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
     int64_t max_m = min(xp / prime, z);
-    int64_t min_m = max(x / ipow<T>(prime, 3), z / prime);
+    T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
+    int64_t min_m = min(min_m128, max_m);
 
-    sum -= C<-1>(xp, b, 1, min_m, max_m, b, primes, pi);
+    if (min_m < max_m)
+      sum -= C<-1>(xp, b, b, 1, min_m, max_m, primes, pi);
 
     if (is_print())
       status.print(b, pi_x_star);
