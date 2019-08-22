@@ -70,11 +70,11 @@ X S1_OpenMP(X x,
   threads = ideal_num_threads(threads, y);
 
   auto primes = generate_primes<Y>(y);
-  int64_t pi_y = primes.size();
+  int64_t pi_y = primes.size() - 1;
   X s1 = phi_tiny(x, c);
 
   #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: s1)
-  for (int64_t b = c + 1; b < pi_y; b++)
+  for (int64_t b = c + 1; b <= pi_y; b++)
   {
     s1 -= phi_tiny(x / primes[b], c);
     s1 += S1_thread<1>(x, y, b, c, (X) primes[b], primes);
