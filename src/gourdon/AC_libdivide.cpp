@@ -166,8 +166,8 @@ T AC_OpenMP(T x,
     T x_div_low = x / low;
     T x_div_high = x / high;
 
-    int64_t min_prime1 = min((x / y) / high, primes[pi_x_star]);
-    int64_t min_prime2 = min(isqrt(low), primes[pi_x_star]);
+    int64_t min_prime1 = min(isqrt(low), primes[pi_x_star]);
+    int64_t min_prime2 = min(x_div_high / y, primes[pi_x_star]);
 
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[min_prime1]);
