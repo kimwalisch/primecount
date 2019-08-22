@@ -48,30 +48,31 @@ namespace {
 ///
 template <int MU, typename T, typename Primes>
 T C(T xp,
-    uint64_t b,
-    uint64_t i,
-    uint64_t m,
-    uint64_t min_m,
-    uint64_t max_m,
+    int64_t b,
+    int64_t i,
+    int64_t pi_y,
+    int64_t m,
+    int64_t min_m,
+    int64_t max_m,
     Primes& primes,
     PiTable& pi)
 {
   T sum = 0;
 
-  for (i++; i < primes.size(); i++)
+  for (i++; i <= pi_y; i++)
   {
-    // next m may be 128-bit
+    // Calculate next m
     T m128 = (T) m * primes[i];
-    if (m128 > max_m)
+    if (m128 > (T) max_m)
       return sum;
 
-    uint64_t m64 = (uint64_t) m128;
+    int64_t m64 = (int64_t) m128;
     if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
+      int64_t xpm = fast_div64(xp, m64);
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
+    sum += C<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -96,6 +97,7 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
+  int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
   int64_t pi_x13 = pi[x13];
@@ -119,7 +121,7 @@ T AC_OpenMP(T x,
     int64_t min_m = min(min_m128, max_m);
 
     if (min_m < max_m)
-      sum -= C<-1>(xp, b, b, 1, min_m, max_m, primes, pi);
+      sum -= C<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
 
     if (is_print())
       status.print(b, pi_x13);
@@ -143,7 +145,6 @@ T AC_OpenMP(T x,
 
     int64_t min_prime1 = min(isqrt(low), primes[pi_x_star]);
     int64_t min_prime2 = min(x_div_high / y, primes[pi_x_star]);
-
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[min_prime1]);
     min_b = max(min_b, pi[min_prime2]);
