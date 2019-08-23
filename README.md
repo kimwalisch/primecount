@@ -87,9 +87,9 @@ Options:
 
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
   -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
-         --legendre         Count primes using Legendre's formula
+  -l,    --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
-  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
+         --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
          --Li_inverse       Approximate the nth prime using Li^-1(x)
@@ -127,6 +127,12 @@ Advanced options for Xavier Gourdon's algorithm:
                             with y = x^(1/3) * alpha_y
          --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
                             with z = y * alpha_z
+          -A                Only compute Gourdon's A formula
+          -B                Only compute Gourdon's B formula
+          -C                Only compute Gourdon's C formula
+          -D                Only compute Gourdon's D formula
+         --Phi0             Only compute the Phi0 formula
+         --Sigma            Only compute the 7 Sigma formulas
 ```
 
 </details>

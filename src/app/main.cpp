@@ -72,6 +72,44 @@ maxint_t B(maxint_t x, int threads)
     return B(x, y, threads);
 }
 
+maxint_t D(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  double alpha_y = get_alpha_y_gourdon(x);
+  double alpha_z = get_alpha_z_gourdon(x);
+  std::string limit = get_max_x(alpha_y * alpha_z);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("D(x): x must be <= " + limit);
+
+  int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
+  int64_t y = (int64_t)(x13 * alpha_y);
+
+  // x^(1/3) < y < x^(1/2)
+  y = std::max(y, x13 + 1);
+  y = std::min(y, sqrtx - 1);
+  y = std::max(y, (int64_t) 1);
+
+  int64_t k = PhiTiny::get_k(y);
+  int64_t z = (int64_t)(y * alpha_z);
+
+  // y <= z < x^(1/2)
+  z = std::max(z, y);
+  z = std::min(z, sqrtx - 1);
+  z = std::max(z, (int64_t) 1);
+
+  if (is_print())
+    set_print_variables(true);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return D((int64_t) x, y, z, k, (int64_t) Ri(x), threads);
+  else
+    return D(x, y, z, k, Ri(x), threads);
+}
+
 maxint_t P2(maxint_t x, int threads)
 {
   if (x < 1)
@@ -263,6 +301,8 @@ int main (int argc, char* argv[])
         res = S2_trivial(x); break;
       case OPTION_B:
         res = B(x, threads); break;
+      case OPTION_D:
+        res = D(x, threads); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_128:
         res = pi_deleglise_rivat_128(x, threads); break;

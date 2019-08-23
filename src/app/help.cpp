@@ -27,9 +27,9 @@ const string helpMenu
   "\n"
   "  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm\n"
   "  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm\n"
-  "         --legendre         Count primes using Legendre's formula\n"
+  "  -l,    --legendre         Count primes using Legendre's formula\n"
   "         --lehmer           Count primes using Lehmer's formula\n"
-  "  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
+  "         --lmo              Count primes using Lagarias-Miller-Odlyzko\n"
   "  -m,    --meissel          Count primes using Meissel's formula\n"
   "         --Li               Approximate pi(x) using the logarithmic integral\n"
   "         --Li_inverse       Approximate the nth prime using Li^-1(x)\n"
@@ -62,6 +62,12 @@ const string helpMenu
   "                            with y = x^(1/3) * alpha_y\n"
   "         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)\n"
   "                            with z = y * alpha_z\n"
+  "          -A                Only compute Gourdon's A formula\n"
+  "          -B                Only compute Gourdon's B formula\n"
+  "          -C                Only compute Gourdon's C formula\n"
+  "          -D                Only compute Gourdon's D formula\n"
+  "         --Phi0             Only compute the Phi0 formula\n"
+  "         --Sigma            Only compute the 7 Sigma formulas\n"
 );
 
 const string versionInfo
