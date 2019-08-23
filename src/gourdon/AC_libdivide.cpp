@@ -64,7 +64,10 @@ libdivide_vector(Primes& primes)
   return fastdiv;
 }
 
-/// Compute the A formula
+/// Compute the A formula.
+/// pi[x_star] < b <= pi[x^(1/3)]
+/// x / (primes[b] * primes[i]) <= x^(1/2)
+///
 template <typename T, 
           typename Primes, 
           typename LibdividePrimes>
@@ -129,7 +132,10 @@ T A(T x,
   return sum;
 }
 
-/// Used to compute the 1st part of the C formula.
+/// Compute the 1st part of the C formula.
+/// k < b <= pi[sqrt(z)]
+/// x / (primes[b] * m) <= z
+/// 
 /// Recursively iterate over the square free numbers coprime
 /// to the first b primes. This algorithm is described in
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
@@ -168,7 +174,10 @@ T C1(T xp,
   return sum;
 }
 
-/// Compute the 2nd part of the C formula
+/// Compute the 2nd part of the C formula.
+/// pi[sqrt(z)] < b <= pi[x_star]
+/// x / (primes[b] * primes[i]) <= x^(1/2)
+///
 template <typename T, 
           typename Primes, 
           typename LibdividePrimes>
