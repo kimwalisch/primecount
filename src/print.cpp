@@ -156,7 +156,6 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
     cout << "c = " << c << endl;
     cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
     print_threads(threads);
-    cout << endl;
   }
 }
 
@@ -171,7 +170,6 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double a
     cout << "alpha_y = " << fixed << setprecision(3) << alpha_y << endl;
     cout << "alpha_z = " << fixed << setprecision(3) << alpha_z << endl;
     print_threads(threads);
-    cout << endl;
   }
 }
 
