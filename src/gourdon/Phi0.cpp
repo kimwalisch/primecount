@@ -64,7 +64,7 @@ T Phi0_thread(T x,
 }
 
 /// Parallel computation of the ordinary leaves.
-/// Run time: O(z * log(log(z)))
+/// Run time: O(z)
 /// Memory usage: O(y / log(y))
 ///
 template <typename X, typename Y>
