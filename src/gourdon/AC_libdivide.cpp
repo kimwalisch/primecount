@@ -64,6 +64,72 @@ libdivide_vector(Primes& primes)
   return fastdiv;
 }
 
+/// Compute the A formula
+template <typename T, 
+          typename Primes, 
+          typename LibdividePrimes>
+T A(T x,
+    int64_t y,
+    int64_t b,
+    int64_t max_a_prime,
+    T x_div_low,
+    T x_div_high,
+    Primes& primes,
+    LibdividePrimes& fastdiv,
+    PiTable& pi,
+    SegmentedPiTable& segmentedPi)
+{
+  int64_t prime = primes[b];
+  T xp = x / prime;
+  T sum = 0;
+
+  int64_t min_2nd_prime = min(x_div_high / prime, max_a_prime);
+  int64_t i = pi[min_2nd_prime] + 1;
+  i = max(i, b + 1);
+  int64_t max_2nd_prime = min(x_div_low / prime, isqrt(xp));
+  int64_t max_i = pi[max_2nd_prime];
+
+  if (is_libdivide(xp))
+  {
+    // x / (p * q) >= y
+    for (; i <= max_i; i++)
+    {
+      int64_t xpq = (uint64_t) xp / fastdiv[i];
+      if (xpq < y)
+        break;
+      sum += segmentedPi[xpq];
+    }
+
+    // x / (p * q) < y
+    for (; i <= max_i; i++)
+    {
+      int64_t xpq = (uint64_t) xp / fastdiv[i];
+      sum += segmentedPi[xpq] * 2;
+    }
+  }
+  else
+  {
+    // x / (p * q) >= y
+    for (; i <= max_i; i++)
+    {
+      int64_t xpq = fast_div64(xp, primes[i]);
+      if (xpq < y)
+        break;
+      sum += segmentedPi[xpq];
+    }
+
+    // x / (p * q) < y
+    for (; i <= max_i; i++)
+    {
+      int64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] * 2;
+    }
+  }
+
+  return sum;
+}
+
+/// Used to compute the 1st part of the C formula.
 /// Recursively iterate over the square free numbers coprime
 /// to the first b primes. This algorithm is described in
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
@@ -71,15 +137,15 @@ libdivide_vector(Primes& primes)
 /// 2015.
 ///
 template <int MU, typename T, typename Primes>
-T C(T xp,
-    int64_t b,
-    int64_t i,
-    int64_t pi_y,
-    int64_t m,
-    int64_t min_m,
-    int64_t max_m,
-    Primes& primes,
-    PiTable& pi)
+T C1(T xp,
+     int64_t b,
+     int64_t i,
+     int64_t pi_y,
+     int64_t m,
+     int64_t min_m,
+     int64_t max_m,
+     Primes& primes,
+     PiTable& pi)
 {
   T sum = 0;
 
@@ -96,12 +162,97 @@ T C(T xp,
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
+    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
 }
 
+/// Compute the 2nd part of the C formula
+template <typename T, 
+          typename Primes, 
+          typename LibdividePrimes>
+T C2(T x,
+     int64_t y,
+     int64_t b,
+     T x_div_low,
+     T x_div_high,
+     Primes& primes,
+     LibdividePrimes& fastdiv,
+     PiTable& pi,
+     SegmentedPiTable& segmentedPi)
+{
+  int64_t prime = primes[b];
+  T xp = x / prime;
+  T sum = 0;
+
+  int64_t max_m = min3(x_div_low / prime, xp / prime, y);
+  T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
+  int64_t min_m = min(min_m128, max_m);
+
+  int64_t i = pi[max_m];
+  int64_t pi_min_m = pi[min_m];
+  int64_t min_clustered = (int64_t) isqrt(xp);
+  min_clustered = in_between(min_m, min_clustered, max_m);
+  int64_t pi_min_clustered = pi[min_clustered];
+
+  if (is_libdivide(xp))
+  {
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // n = primes[b] * primes[i]
+    // Which satisfy: n > z && primes[i] <= y
+    while (i > pi_min_clustered)
+    {
+      int64_t xpq = (uint64_t) xp / fastdiv[i];
+      int64_t phi_xpq = segmentedPi[xpq] - b + 2;
+      int64_t xpq2 = (uint64_t) xp / fastdiv[b + phi_xpq - 1];
+      int64_t i2 = segmentedPi[xpq2];
+      sum += phi_xpq * (i - i2);
+      i = i2;
+    }
+
+    // Find all sparse easy leaves where
+    // successive leaves are different.
+    // n = primes[b] * primes[i]
+    // Which satisfy: n > z && primes[i] <= y
+    for (; i > pi_min_m; i--)
+    {
+      int64_t xpq = (uint64_t) xp / fastdiv[i];
+      sum += segmentedPi[xpq] - b + 2;
+    }
+  }
+  else
+  {      
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // n = primes[b] * primes[i]
+    // Which satisfy: n > z && primes[i] <= y
+    while (i > pi_min_clustered)
+    {
+      int64_t xpq = fast_div64(xp, primes[i]);
+      int64_t phi_xpq = segmentedPi[xpq] - b + 2;
+      int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+      int64_t i2 = segmentedPi[xpq2];
+      sum += phi_xpq * (i - i2);
+      i = i2;
+    }
+
+    // Find all sparse easy leaves where
+    // successive leaves are different.
+    // n = primes[b] * primes[i]
+    // Which satisfy: n > z && primes[i] <= y
+    for (; i > pi_min_m; i--)
+    {
+      int64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] - b + 2;
+    }
+  }
+
+  return sum;
+}
+
+/// Compute A + C
 template <typename T, typename Primes>
 T AC_OpenMP(T x,
             int64_t y,
@@ -133,9 +284,9 @@ T AC_OpenMP(T x,
   // This computes the 1st part of the C formula.
   // Find all special leaves of type:
   // x / (primes[b] * m) <= z.
-  // m may be a prime or a square free number
-  // who is coprime to the first b primes and
-  // whose largest prime factor <= y.
+  // m may be a prime <= y or a square free number <= z who
+  // is coprime to the first b primes and whose whose
+  // largest prime factor <= y.
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
   for (int64_t b = min_b + 1; b <= pi_sqrtz; b++)
   {
@@ -145,8 +296,7 @@ T AC_OpenMP(T x,
     T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
     int64_t min_m = min(min_m128, max_m);
 
-    if (min_m < max_m)
-      sum -= C<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+    sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
 
     if (is_print())
       status.print(b, pi_x13);
@@ -180,134 +330,22 @@ T AC_OpenMP(T x,
     // primes[i+1] <= || >= sqrt(x / low)
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
     int64_t max_b = pi[sqrt_low];
-
     if (max_b + 1 < (int64_t) primes.size() &&
-        (T) primes[max_b] * (T) primes[max_b + 1] > x_div_low)
+        primes[max_b] * (T) primes[max_b + 1] > x_div_low)
       max_b -= 1;
 
     min_b = min(min_b, pi_x_star + 1);
     max_b = max(max_b, pi_x_star);
 
-    // 2nd part C formula: pi[sqrt(z)] < b <= pi[x_star]
-    // A formula: pi[x_star] < b <= pi[x13]
+    // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+    // A  formula: pi[x_star] < b <= pi[x13]
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
     for (int64_t b = min_b + 1; b <= max_b; b++)
     {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-
-      // This computes the 2nd part of the C formula
       if (b <= pi_x_star)
-      {
-        int64_t max_m = min3(x_div_low / prime, xp / prime, y);
-        T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
-        int64_t min_m = min(min_m128, max_m);
-
-        int64_t i = pi[max_m];
-        int64_t pi_min_m = pi[min_m];
-        int64_t min_clustered = (int64_t) isqrt(xp);
-        min_clustered = in_between(min_m, min_clustered, max_m);
-        int64_t pi_min_clustered = pi[min_clustered];
-
-        if (is_libdivide(xp))
-        {
-          // Find all clustered easy leaves where
-          // successive leaves are identical.
-          // n = primes[b] * primes[i]
-          // Which satisfy: n > z && primes[i] <= y
-          while (i > pi_min_clustered)
-          {
-            int64_t xpq = (uint64_t) xp / fastdiv[i];
-            int64_t phi_xpq = segmentedPi[xpq] - b + 2;
-            int64_t xpq2 = (uint64_t) xp / fastdiv[b + phi_xpq - 1];
-            int64_t i2 = segmentedPi[xpq2];
-            sum += phi_xpq * (i - i2);
-            i = i2;
-          }
-
-          // Find all sparse easy leaves where
-          // successive leaves are different.
-          // n = primes[b] * primes[i]
-          // Which satisfy: n > z && primes[i] <= y
-          for (; i > pi_min_m; i--)
-          {
-            int64_t xpq = (uint64_t) xp / fastdiv[i];
-            sum += segmentedPi[xpq] - b + 2;
-          }
-        }
-        else
-        {      
-          // Find all clustered easy leaves where
-          // successive leaves are identical.
-          // n = primes[b] * primes[i]
-          // Which satisfy: n > z && primes[i] <= y
-          while (i > pi_min_clustered)
-          {
-            int64_t xpq = fast_div64(xp, primes[i]);
-            int64_t phi_xpq = segmentedPi[xpq] - b + 2;
-            int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-            int64_t i2 = segmentedPi[xpq2];
-            sum += phi_xpq * (i - i2);
-            i = i2;
-          }
-
-          // Find all sparse easy leaves where
-          // successive leaves are different.
-          // n = primes[b] * primes[i]
-          // Which satisfy: n > z && primes[i] <= y
-          for (; i > pi_min_m; i--)
-          {
-            int64_t xpq = fast_div64(xp, primes[i]);
-            sum += segmentedPi[xpq] - b + 2;
-          }
-        }
-      }
+        sum += C2(x, y, b, x_div_low, x_div_high, primes, fastdiv, pi, segmentedPi);
       else
-      {
-        // This computes the A formula
-        int64_t min_2nd_prime = min(x_div_high / prime, max_a_prime);
-        int64_t i = pi[min_2nd_prime] + 1;
-        i = max(i, b + 1);
-        int64_t max_2nd_prime = min(x_div_low / prime, isqrt(xp));
-        int64_t max_i = pi[max_2nd_prime];
-
-        if (is_libdivide(xp))
-        {
-          // x / (p * q) >= y
-          for (; i <= max_i; i++)
-          {
-            int64_t xpq = (uint64_t) xp / fastdiv[i];
-            if (xpq < y)
-              break;
-            sum += segmentedPi[xpq];
-          }
-
-          // x / (p * q) < y
-          for (; i <= max_i; i++)
-          {
-            int64_t xpq = (uint64_t) xp / fastdiv[i];
-            sum += segmentedPi[xpq] * 2;
-          }
-        }
-        else
-        {
-          // x / (p * q) >= y
-          for (; i <= max_i; i++)
-          {
-            int64_t xpq = fast_div64(xp, primes[i]);
-            if (xpq < y)
-              break;
-            sum += segmentedPi[xpq];
-          }
-
-          // x / (p * q) < y
-          for (; i <= max_i; i++)
-          {
-            int64_t xpq = fast_div64(xp, primes[i]);
-            sum += segmentedPi[xpq] * 2;
-          }
-        }
-      }
+        sum += A(x, y, b, max_a_prime, x_div_low, x_div_high, primes, fastdiv, pi, segmentedPi);
 
       if (is_print())
         status.print(b, pi_x13);
