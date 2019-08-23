@@ -44,14 +44,14 @@ namespace {
 /// 2015.
 ///
 template <int MU, typename T, typename Primes>
-T C(T xp,
-    uint64_t b,
-    uint64_t i,
-    uint64_t m,
-    uint64_t min_m,
-    uint64_t max_m,
-    Primes& primes,
-    PiTable& pi)
+T C1(T xp,
+     uint64_t b,
+     uint64_t i,
+     uint64_t m,
+     uint64_t min_m,
+     uint64_t max_m,
+     Primes& primes,
+     PiTable& pi)
 {
   T sum = 0;
 
@@ -68,7 +68,7 @@ T C(T xp,
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
+    sum += C1<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -97,11 +97,12 @@ T C_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_b = max(k, pi_root3_xz);
 
+  // This computes the 1st part of the C formula.
   // Find all special leaves of type:
   // x / (primes[b] * m) <= z.
-  // m may be a prime or a square free number
-  // who is coprime to the first b primes and
-  // whose largest prime factor <= y.
+  // m may be a prime <= y or a square free number <= z
+  // who is coprime to the first b primes and whose
+  // largest prime factor <= y.
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
   for (int64_t b = min_b + 1; b <= pi_sqrtz; b++)
   {
@@ -111,8 +112,7 @@ T C_OpenMP(T x,
     T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
     int64_t min_m = min(min_m128, max_m);
 
-    if (min_m < max_m)
-      sum -= C<-1>(xp, b, b, 1, min_m, max_m, primes, pi);
+    sum -= C1<-1>(xp, b, b, 1, min_m, max_m, primes, pi);
 
     if (is_print())
       status.print(b, pi_x_star);
@@ -135,7 +135,6 @@ T C_OpenMP(T x,
 
     int64_t min_prime1 = min(isqrt(low), primes[pi_x_star]);
     int64_t min_prime2 = min(x_div_high / y, primes[pi_x_star]);
-
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[min_prime1]);
     min_b = max(min_b, pi[min_prime2]);
