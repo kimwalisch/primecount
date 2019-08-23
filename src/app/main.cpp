@@ -155,7 +155,7 @@ maxint_t Phi0(maxint_t x, int threads)
   std::string limit = get_max_x(alpha_y * alpha_z);
 
   if (x > to_maxint(limit))
-    throw primecount_error("Phi(x): x must be <= " + limit);
+    throw primecount_error("Phi0(x): x must be <= " + limit);
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -178,6 +178,33 @@ maxint_t Phi0(maxint_t x, int threads)
     return Phi0((int64_t) x, y, z, k, threads);
   else
     return Phi0(x, y, z, k, threads);
+}
+
+maxint_t Sigma(maxint_t x, int threads)
+{
+  if (x < 1)
+    return 0;
+
+  double alpha_y = get_alpha_y_gourdon(x);
+  double alpha_z = get_alpha_z_gourdon(x);
+  std::string limit = get_max_x(alpha_y * alpha_z);
+
+  if (x > to_maxint(limit))
+    throw primecount_error("Sigma(x): x must be <= " + limit);
+
+  int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
+  int64_t y = (int64_t)(x13 * alpha_y);
+
+  // x^(1/3) < y < x^(1/2)
+  y = std::max(y, x13 + 1);
+  y = std::min(y, sqrtx - 1);
+  y = std::max(y, (int64_t) 1);
+
+  if (x <= numeric_limits<int64_t>::max())
+    return Sigma((int64_t) x, y, threads);
+  else
+    return Sigma(x, y, threads);
 }
 
 maxint_t P2(maxint_t x, int threads)
@@ -377,6 +404,8 @@ int main (int argc, char* argv[])
         res = D(x, threads); break;
       case OPTION_PHI0:
         res = Phi0(x, threads); break;
+      case OPTION_SIGMA:
+        res = Sigma(x, threads); break;
 #ifdef HAVE_INT128_T
       case OPTION_DELEGLISE_RIVAT_128:
         res = pi_deleglise_rivat_128(x, threads); break;
