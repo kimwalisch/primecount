@@ -20,6 +20,7 @@ enum OptionID
   OPTION_ALPHA,
   OPTION_ALPHA_Y,
   OPTION_ALPHA_Z,
+  OPTION_DEFAULT,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT_64,
   OPTION_DELEGLISE_RIVAT_128,
@@ -38,7 +39,6 @@ enum OptionID
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NUMBER,
-  OPTION_PI,
   OPTION_PRIMESIEVE,
   OPTION_LI,
   OPTION_LIINV,
@@ -66,7 +66,7 @@ struct CmdOptions
 {
   maxint_t x = -1;
   int64_t a = -1;
-  int option = OPTION_PI;
+  int option = OPTION_DEFAULT;
   bool time = false;
 };
 

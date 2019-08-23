@@ -61,7 +61,6 @@ map<string, OptionID> optionMap =
   { "-n", OPTION_NTHPRIME },
   { "--nthprime", OPTION_NTHPRIME },
   { "--number", OPTION_NUMBER },
-  { "--pi", OPTION_PI },
   { "-p", OPTION_PRIMESIEVE },
   { "--primesieve", OPTION_PRIMESIEVE },
   { "--Li", OPTION_LI },

@@ -344,7 +344,7 @@ int main (int argc, char* argv[])
 
     switch (opt.option)
     {
-      case OPTION_PI:
+      case OPTION_DEFAULT:
         res = pi(x, threads); break;
       case OPTION_DELEGLISE_RIVAT:
         res = pi_deleglise_rivat(x, threads); break;
