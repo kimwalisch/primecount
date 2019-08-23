@@ -79,7 +79,7 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
                                    uint64_t segment_size,
                                    int threads)
-  : max_(sqrtx + 1)
+  : max_high_(sqrtx + 1)
 {
   // Each bit of the pi[x] lookup table corresponds
   // to an odd integer, so there are 16 numbers per
@@ -92,7 +92,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   // a large segment size improves load balancing.
   uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
   segment_size_ = std::max(segment_size, min_segment_size);
-  segment_size_ = std::min(segment_size_, max_);
+  segment_size_ = std::min(segment_size_, max_high_);
 
   // In order to simplify multi-threading we set low,
   // high and segment_size % 128 == 0.
@@ -102,7 +102,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = segment_size_;
-  high_ = std::min(high_, max_);
+  high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
 
   uint64_t pi_low = 0;
@@ -117,7 +117,7 @@ void SegmentedPiTable::next()
 
   low_ = high_;
   high_ = low_ + segment_size_;
-  high_ = std::min(high_, max_);
+  high_ = std::min(high_, max_high_);
 
   if (finished())
     return;

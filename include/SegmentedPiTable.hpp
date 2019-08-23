@@ -53,7 +53,7 @@ public:
   {
     assert(n >= low_);
     assert(n < high_);
-    assert(n < max_);
+    assert(n < max_high_);
 
     // Since we store only odd numbers in our lookup table,
     // we cannot store 2 which is the only even prime.
@@ -71,7 +71,7 @@ public:
 
   bool finished() const
   {
-    return low_ >= max_;
+    return low_ >= max_high_;
   }
 
   int64_t low() const
@@ -98,7 +98,7 @@ private:
   std::vector<PiData> pi_;
   uint64_t low_ = 0;
   uint64_t high_;
-  uint64_t max_;
+  uint64_t max_high_;
   uint64_t segment_size_;
   int threads_;
 };
