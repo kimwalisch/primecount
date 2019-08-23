@@ -37,6 +37,7 @@ map<string, OptionID> optionMap =
   { "--alpha", OPTION_ALPHA },
   { "--alpha_y", OPTION_ALPHA_Y },
   { "--alpha_z", OPTION_ALPHA_Z },
+  { "--B", OPTION_B },
   { "-d", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
   { "--deleglise_rivat_64", OPTION_DELEGLISE_RIVAT_64 },
