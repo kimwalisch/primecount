@@ -203,8 +203,8 @@ T AC_OpenMP(T x,
   // This computes the 1st part of the C formula.
   // Find all special leaves of type:
   // x / (primes[b] * m) <= z.
-  // m may be a prime <= y or a square free number <= z who
-  // is coprime to the first b primes and whose whose
+  // m may be a prime <= y or a square free number <= z
+  // who is coprime to the first b primes and whose
   // largest prime factor <= y.
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
   for (int64_t b = min_b + 1; b <= pi_sqrtz; b++)
