@@ -87,9 +87,9 @@ Options:
 
   -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
   -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
-         --legendre         Count primes using Legendre's formula
+  -l,    --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
-  -l,    --lmo              Count primes using Lagarias-Miller-Odlyzko
+         --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
          --Li_inverse       Approximate the nth prime using Li^-1(x)
@@ -115,11 +115,11 @@ Options:
 Advanced options for the Deleglise-Rivat algorithm:
 
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
-         --P2               Only compute the 2nd partial sieve function
-         --S1               Only compute the ordinary leaves
-         --S2_trivial       Only compute the trivial special leaves
-         --S2_easy          Only compute the easy special leaves
-         --S2_hard          Only compute the hard special leaves
+         --P2               Compute the 2nd partial sieve function
+         --S1               Compute the ordinary leaves
+         --S2_trivial       Compute the trivial special leaves
+         --S2_easy          Compute the easy special leaves
+         --S2_hard          Compute the hard special leaves
 
 Advanced options for Xavier Gourdon's algorithm:
 
@@ -127,6 +127,11 @@ Advanced options for Xavier Gourdon's algorithm:
                             with y = x^(1/3) * alpha_y
          --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
                             with z = y * alpha_z
+         --AC               Compute Gourdon's A + C formulas
+         --B                Compute Gourdon's B formula
+         --D                Compute Gourdon's D formula
+         --Phi0             Compute the Phi0 formula
+         --Sigma            Compute the 7 Sigma formulas
 ```
 
 </details>
