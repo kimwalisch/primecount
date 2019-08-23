@@ -212,7 +212,7 @@ maxint_t get_max_x(double alpha_y)
   double max_x = pow(pow(2.0, 62.0) * alpha_y, 3.0 / 2.0);
   return (int128_t) max_x; 
 #else
-  unused_param(alpha); 
+  unused_param(alpha_y); 
   return numeric_limits<int64_t>::max();
 #endif
 }
