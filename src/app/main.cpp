@@ -49,10 +49,10 @@ maxint_t AC(maxint_t x, int threads)
 
   double alpha_y = get_alpha_y_gourdon(x);
   double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("AC(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("AC(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -83,11 +83,10 @@ maxint_t B(maxint_t x, int threads)
     return 0;
 
   double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("B(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("B(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -114,10 +113,10 @@ maxint_t D(maxint_t x, int threads)
 
   double alpha_y = get_alpha_y_gourdon(x);
   double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("D(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("D(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -152,10 +151,10 @@ maxint_t Phi0(maxint_t x, int threads)
 
   double alpha_y = get_alpha_y_gourdon(x);
   double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("Phi0(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("Phi0(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -186,11 +185,10 @@ maxint_t Sigma(maxint_t x, int threads)
     return 0;
 
   double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("Sigma(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("Sigma(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -213,10 +211,10 @@ maxint_t P2(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("P2(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("P2(x): x must be <= " + to_str(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -235,10 +233,10 @@ maxint_t S1(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("S1(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("S1(x): x must be <= " + to_str(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -258,10 +256,10 @@ maxint_t S2_trivial(maxint_t x)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("S2_trivial(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("S2_trivial(x): x must be <= " + to_str(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -282,10 +280,10 @@ maxint_t S2_easy(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("S2_easy(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("S2_easy(x): x must be <= " + to_str(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -306,10 +304,10 @@ maxint_t S2_hard(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("S2_hard(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("S2_hard(x): x must be <= " + to_str(limit));
 
   if (is_print())
     set_print_variables(true);

@@ -72,7 +72,7 @@ int get_num_threads();
 /// 128-bit integer which is not supported by some
 /// compilers.
 ///
-std::string get_max_x(double alpha = 1.0);
+std::string get_max_x();
 
 /// Get the primecount version number, in the form “i.j”
 std::string primecount_version();

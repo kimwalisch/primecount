@@ -103,10 +103,10 @@ int128_t pi_deleglise_rivat_128(int128_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  string limit = get_max_x(alpha);
+  maxint_t limit = get_max_x(alpha);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("pi(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("pi(x): x must be <= " + to_str(limit));
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);

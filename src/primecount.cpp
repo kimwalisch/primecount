@@ -1,6 +1,10 @@
 ///
 /// @file  primecount.cpp
-/// @brief Function definitions of primecount.hpp
+///        This file contains pi(x) function definitions that redirect
+///        to the actual implementations e.g. pi(x) redirects to
+///        pi_gourdon_64(x) or pi_gourdon_128(x). This file also
+///        contains helper functions and global variables that are
+///        initialized with default settings.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -196,27 +200,27 @@ int64_t phi(int64_t x, int64_t a)
   return phi(x, a, get_num_threads());
 }
 
-/// Returns the largest integer supported by pi(x). The
-/// return type is a string as get_max_x() can be a 128-bit
-/// integer which is not supported by all compilers.
+/// Returns the largest x supported by pi(x).
+/// The S2_hard, P2, B and D functions are limited by:
+/// x / y <= 2^62, with y = x^(1/3) * alpha_y
+/// Hence x^(2/3) / alpha_y <= 2^62
+/// x <= (2^62 * alpha_y)^(3/2)
 ///
-string get_max_x(double alpha)
+maxint_t get_max_x(double alpha_y)
 {
-  ostringstream oss;
-
 #ifdef HAVE_INT128_T
-  // primecount is limited by:
-  // z <= 2^62, with z = x^(2/3) / alpha
-  // x^(2/3) / alpha <= 2^62
-  // x <= (2^62 * alpha)^(3/2)
-  //
-  double max_x = pow(pow(2.0, 62.0) * alpha, 3.0 / 2.0);
-  oss << (int128_t) max_x; 
+  double max_x = pow(pow(2.0, 62.0) * alpha_y, 3.0 / 2.0);
+  return (int128_t) max_x; 
 #else
   unused_param(alpha); 
-  oss << numeric_limits<int64_t>::max();
+  return numeric_limits<int64_t>::max();
 #endif
+}
 
+std::string get_max_x()
+{
+  ostringstream oss;
+  oss << get_max_x(1.0);
   return oss.str();
 }
 
@@ -459,6 +463,13 @@ maxint_t to_maxint(const string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;
+}
+
+string to_str(maxint_t x)
+{
+  ostringstream oss;
+  oss << x;
+  return oss.str();
 }
 
 string primecount_version()

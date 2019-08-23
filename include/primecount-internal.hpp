@@ -77,9 +77,11 @@ double get_alpha_deleglise_rivat(maxint_t x);
 double get_alpha_y_gourdon(maxint_t x);
 double get_alpha_z_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
+maxint_t get_max_x(double alpha_y);
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 maxint_t to_maxint(const std::string& expr);
+std::string to_str(maxint_t x);
 double get_time();
 
 template <typename T1, typename T2, typename T3>

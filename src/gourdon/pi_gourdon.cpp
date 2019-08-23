@@ -87,10 +87,10 @@ int128_t pi_gourdon_128(int128_t x, int threads)
 
   double alpha_y = get_alpha_y_gourdon(x);
   double alpha_z = get_alpha_z_gourdon(x);
-  std::string limit = get_max_x(alpha_y * alpha_z);
+  maxint_t limit = get_max_x(alpha_y);
 
-  if (x > to_maxint(limit))
-    throw primecount_error("pi(x): x must be <= " + limit);
+  if (x > limit)
+    throw primecount_error("pi(x): x must be <= " + to_str(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
