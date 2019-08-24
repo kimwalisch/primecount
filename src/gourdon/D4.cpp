@@ -100,9 +100,8 @@ T D_thread(T x,
       T xp = x / prime;
       int64_t xp_div_low = min(fast_div(xp, low1), z);
       int64_t xp_div_high = min(fast_div(xp, high), z);
-      int64_t x_div_prime3 = (int64_t)(x / ipow<T>(prime, 3));
       int64_t min_m = max(xp_div_high, z / prime);
-      int64_t max_m = min(xp_div_low, x_div_prime3);
+      int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
 
       int64_t count = 0;
       int64_t start = 0;
@@ -144,9 +143,8 @@ T D_thread(T x,
       T xp = x / prime;
       int64_t xp_div_low = min(fast_div(xp, low1), y);
       int64_t xp_div_high = min(fast_div(xp, high), y);
-      int64_t x_div_prime3 = (int64_t)(x / ipow<T>(prime, 3));
       int64_t min_m = max(xp_div_high, prime);
-      int64_t max_m = min(xp_div_low, x_div_prime3);
+      int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
 
       int64_t l = pi[max_m];
       int64_t count = 0;
