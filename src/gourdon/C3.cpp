@@ -163,7 +163,7 @@ int64_t C(int64_t x,
 {
   print("");
   print("=== C(x, y) ===");
-  print(x, y, z, k, threads);
+  print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
   auto primes = generate_primes<int32_t>(y);
@@ -183,7 +183,7 @@ int128_t C(int128_t x,
 {
   print("");
   print("=== C(x, y) ===");
-  print(x, y, z, k, threads);
+  print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
   int128_t c;

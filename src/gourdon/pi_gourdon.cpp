@@ -60,7 +60,7 @@ int64_t pi_gourdon_64(int64_t x, int threads)
   print("");
   print("=== pi_gourdon_64(x) ===");
   print("pi(x) = A - B + C + D + phi0 + Sigma");
-  print(x, y, z, k, alpha_y, alpha_z, threads);
+  print_gourdon(x, y, z, k, alpha_y, alpha_z, threads);
 
   int64_t sigma = Sigma(x, y, threads);
   int64_t phi0 = Phi0(x, y, z, k, threads);
@@ -112,7 +112,7 @@ int128_t pi_gourdon_128(int128_t x, int threads)
   print("");
   print("=== pi_gourdon_128(x) ===");
   print("pi(x) = A - B + C + D + phi0 + Sigma");
-  print(x, y, z, k, alpha_y, alpha_z, threads);
+  print_gourdon(x, y, z, k, alpha_y, alpha_z, threads);
 
   int128_t sigma = Sigma(x, y, threads);
   int128_t phi0 = Phi0(x, y, z, k, threads);
