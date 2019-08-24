@@ -58,18 +58,14 @@ T A_OpenMP(T x,
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
-    int64_t x_div_low = x / low;
-    int64_t x_div_high = x / high;
+    T x_div_low = x / low;
+    T x_div_high = x / high;
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] < sqrt(x / low)
-    // primes[i+1] <= || >= sqrt(x / low)
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
-    int64_t max_b = pi[sqrt_low];
-    if (primes[max_b] < max_prime &&
-        (T) primes[max_b] * (T) primes[max_b + 1] > (T) x_div_low)
-      max_b -= 1;
+    int64_t max_b = pi[max(sqrt_low, 1) - 1];
 
     // Process all leaves that satisfiy:
     // low <= x / (primes[b] * primes[j]) < high
@@ -78,10 +74,10 @@ T A_OpenMP(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t min_2nd_prime = min(max_prime, x_div_high / prime);
+      int64_t min_2nd_prime = min(x_div_high / prime, max_prime);
       int64_t j = pi[min_2nd_prime] + 1;
       j = max(j, b + 1);
-      int64_t max_2nd_prime = min(isqrt(xp), x_div_low / prime);
+      int64_t max_2nd_prime = min(x_div_low / prime, isqrt(xp));
       int64_t max_j = pi[max_2nd_prime];
 
       // x / (p * q) >= y

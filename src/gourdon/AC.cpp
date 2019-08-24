@@ -251,18 +251,13 @@ T AC_OpenMP(T x,
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[min_prime1]);
     min_b = max(min_b, pi[min_prime2]);
+    min_b = min(min_b, pi_x_star + 1);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] < sqrt(x / low)
-    // primes[i+1] <= || >= sqrt(x / low)
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
-    int64_t max_b = pi[sqrt_low];
-    if (max_b + 1 < (int64_t) primes.size() &&
-        primes[max_b] * (T) primes[max_b + 1] > x_div_low)
-      max_b -= 1;
-
-    min_b = min(min_b, pi_x_star + 1);
+    int64_t max_b = pi[max(sqrt_low, 1) - 1];
     max_b = max(max_b, pi_x_star);
 
     // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
