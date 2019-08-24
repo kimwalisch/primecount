@@ -78,8 +78,8 @@ int64_t D(int64_t x,
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
-      int64_t max_m = min(x / (prime * low1), x / ipow(prime, 3), z);
-      int64_t min_m = max(x / (prime * high), z / prime, prime);
+      int64_t max_m = min3(x / (prime * low1), x / ipow(prime, 3), z);
+      int64_t min_m = max3(x / (prime * high), z / prime, prime);
       int64_t start = 0;
       int64_t count = 0;
 
