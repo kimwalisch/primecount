@@ -117,7 +117,7 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
 {
   print("");
   print("=== Sigma(x, y) ===");
-  print(x, y, threads);
+  print_gourdon(x, y, threads);
 
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_pix_sigma4 = x / (x_star * y);
@@ -150,7 +150,7 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
 {
   print("");
   print("=== Sigma(x, y) ===");
-  print(x, y, threads);
+  print_gourdon(x, y, threads);
 
   int128_t x_star = get_x_star_gourdon(x, y);
   int64_t max_pix_sigma4 = x / (x_star * y);

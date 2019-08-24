@@ -102,7 +102,7 @@ int64_t Phi0(int64_t x,
 {
   print("");
   print("=== Phi0(x, y, z) ===");
-  print(x, y, z, k, threads);
+  print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
   int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
@@ -121,7 +121,7 @@ int128_t Phi0(int128_t x,
 {
   print("");
   print("=== Phi0(x, y, z) ===");
-  print(x, y, z, k, threads);
+  print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
   int128_t phi0;

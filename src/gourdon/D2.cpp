@@ -66,7 +66,7 @@ int64_t D(int64_t x,
 {
   print("");
   print("=== D(x, y) ===");
-  print(x, y, z, k, 1);
+  print_gourdon(x, y, z, k, 1);
 
   double time = get_time();
   int64_t sum = 0;

@@ -131,7 +131,32 @@ void print(maxint_t x, int64_t y, int64_t c, int threads)
   }
 }
 
-void print(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
+void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
+{
+  if (is_print())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "z = " << z << endl;
+    cout << "c = " << c << endl;
+    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    print_threads(threads);
+  }
+}
+
+void print_gourdon(maxint_t x, int64_t y, int threads)
+{
+  if (print_variables())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    print_threads(threads);
+    cout << endl;
+  }
+}
+
+void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
   if (print_variables())
   {
@@ -146,20 +171,7 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
   }
 }
 
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
-{
-  if (is_print())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    print_threads(threads);
-  }
-}
-
-void print(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double alpha_z, int threads)
+void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double alpha_z, int threads)
 {
   if (is_print())
   {

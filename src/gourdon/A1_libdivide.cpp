@@ -133,7 +133,7 @@ int64_t A(int64_t x,
 {
   print("");
   print("=== A(x, y) ===");
-  print(x, y, threads);
+  print_gourdon(x, y, threads);
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
@@ -154,7 +154,7 @@ int128_t A(int128_t x,
 {
   print("");
   print("=== A(x, y) ===");
-  print(x, y, threads);
+  print_gourdon(x, y, threads);
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);

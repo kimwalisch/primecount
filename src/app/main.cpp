@@ -71,6 +71,9 @@ maxint_t AC(maxint_t x, int threads)
   z = std::min(z, sqrtx - 1);
   z = std::max(z, (int64_t) 1);
 
+  if (is_print())
+    set_print_variables(true);
+
   if (x <= numeric_limits<int64_t>::max())
     return AC((int64_t) x, y, z, k, threads);
   else
@@ -173,6 +176,9 @@ maxint_t Phi0(maxint_t x, int threads)
   z = std::min(z, sqrtx - 1);
   z = std::max(z, (int64_t) 1);
 
+  if (is_print())
+    set_print_variables(true);
+
   if (x <= numeric_limits<int64_t>::max())
     return Phi0((int64_t) x, y, z, k, threads);
   else
@@ -198,6 +204,9 @@ maxint_t Sigma(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+  if (is_print())
+    set_print_variables(true);
 
   if (x <= numeric_limits<int64_t>::max())
     return Sigma((int64_t) x, y, threads);
