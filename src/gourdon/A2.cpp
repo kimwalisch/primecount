@@ -63,9 +63,9 @@ T A_OpenMP(T x,
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
-    // primes[i] < sqrt(x / low)
+    // primes[i] <= floor(sqrt(x / low))
     int64_t sqrt_low = min(isqrt(x_div_low), x13);
-    int64_t max_b = pi[max(sqrt_low, 1) - 1];
+    int64_t max_b = pi[sqrt_low];
 
     // Process all leaves that satisfiy:
     // low <= x / (primes[b] * primes[j]) < high
