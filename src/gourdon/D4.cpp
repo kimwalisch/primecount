@@ -66,7 +66,8 @@ T D_thread(T x,
   int64_t low1 = max(low, 1);
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t limit = min(low + segments * segment_size, xz + 1);
-  int64_t max_b = pi[min(isqrt(x / low1), x_star)];
+  int64_t max_b_prime = min3(isqrt(x / low1), isqrt(xz), x_star);
+  int64_t max_b = pi[max_b_prime];
   T sum = 0;
 
   if (k > max_b)
