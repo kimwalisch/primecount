@@ -67,7 +67,7 @@ int64_t D(int64_t x,
     fill(sieve.begin(), sieve.end(), 1);
 
     // Pre-sieve multiples of first k primes
-    for (; b <= k; b++)
+    for (; b <= min(k, pi_x_star); b++)
     {
       int64_t j = next[b];
       for (int64_t prime = primes[b]; j < high; j += prime)
