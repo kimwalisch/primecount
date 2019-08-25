@@ -78,7 +78,7 @@ T S2_hard_thread(T x,
   int64_t pi_sqrty = pi[isqrt(y)];
   T s2_hard = 0;
 
-  if (c > max_b)
+  if (c >= max_b)
     return s2_hard;
 
   runtime.init_start();
