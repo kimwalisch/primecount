@@ -288,7 +288,7 @@ T AC_OpenMP(T x,
   int64_t pi_x13 = pi[x13];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
-  int64_t min_b = max(k, pi_root3_xz);
+  int64_t min_b = max(k, pi_root3_xz) + 1;
 
   // This computes the 1st part of the C formula.
   // Find all special leaves of type:
@@ -297,7 +297,7 @@ T AC_OpenMP(T x,
   // who is coprime to the first b primes and whose
   // largest prime factor <= y.
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
-  for (int64_t b = min_b + 1; b <= pi_sqrtz; b++)
+  for (int64_t b = min_b; b <= pi_sqrtz; b++)
   {
     int64_t prime = primes[b];
     T xp = x / prime;
@@ -330,7 +330,7 @@ T AC_OpenMP(T x,
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[isqrt(low)]);
     min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
-    min_b = min(min_b, pi_x_star);
+    min_b = min(min_b, pi_x_star) + 1;
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
@@ -342,7 +342,7 @@ T AC_OpenMP(T x,
     // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
     // A  formula: pi[x_star] < b <= pi[x13]
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
-    for (int64_t b = min_b + 1; b <= max_b; b++)
+    for (int64_t b = min_b; b <= max_b; b++)
     {
       if (b <= pi_x_star)
         sum += C2(x, y, b, x_div_low, x_div_high, primes, fastdiv, pi, segmentedPi);
