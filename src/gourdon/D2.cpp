@@ -155,8 +155,8 @@ int64_t D(int64_t x,
     for (; b <= pi_x_star; b++)
     {
       int64_t prime = primes[b];
-      int64_t max_m = min(x / (prime * low), x / ipow(prime, 3), y);
-      int64_t min_m = max(x / (prime * high), z / prime, prime);
+      int64_t max_m = min3(x / (prime * low), x / ipow(prime, 3), y);
+      int64_t min_m = max3(x / (prime * high), z / prime, prime);
       int64_t l = pi[max_m];
       int64_t i = 0;
       int64_t count = 0;
