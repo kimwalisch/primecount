@@ -86,11 +86,9 @@ T D_thread(T x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    // pre-sieve multiples of first k primes
-    sieve.pre_sieve(k, low, high);
-
+    sieve.pre_sieve(primes, min_b - 1, low, high);
     int64_t count_low_high = sieve.count((high - 1) - low);
-    int64_t b = k + 1;
+    int64_t b = min_b;
 
     // For k + 1 <= b <= pi_sqrtz
     // Find all special leaves: n = primes[b] * m
@@ -133,7 +131,7 @@ T D_thread(T x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off(b, prime);
+      count_low_high -= sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrtz < b <= pi_x_star
@@ -166,7 +164,7 @@ T D_thread(T x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off(b, prime);
+      count_low_high -= sieve.cross_off_count(prime, b);
     }
 
     next_segment:;

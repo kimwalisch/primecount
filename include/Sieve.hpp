@@ -23,6 +23,7 @@
 #define SIEVE_HPP
 
 #include <stdint.h>
+#include <cassert>
 #include <vector>
 
 namespace primecount {
@@ -46,14 +47,21 @@ struct Wheel
 class Sieve
 {
 public:
-  Sieve(uint64_t start,
-        uint64_t segment_size,
-        uint64_t wheel_size);
-
-  uint64_t segment_size() const;
+  Sieve(uint64_t start, uint64_t segment_size, uint64_t wheel_size);
   static uint64_t get_segment_size(uint64_t size);
-  void pre_sieve(uint64_t c, uint64_t low, uint64_t high);
-  uint64_t cross_off(uint64_t i, uint64_t prime);
+  uint64_t segment_size() const;
+  void cross_off(uint64_t prime, uint64_t i);
+  uint64_t cross_off_count(uint64_t prime, uint64_t i);
+
+  template <typename T>
+  void pre_sieve(const std::vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  {
+    assert(c < primes.size());
+    reset_sieve(low, high);
+
+    for (uint64_t i = 4; i <= c; i++)
+      cross_off(primes[i], i);
+  }
 
   /// Count 1 bits inside [start, stop]
   uint64_t count(uint64_t start, uint64_t stop) const;
@@ -85,6 +93,7 @@ public:
   }
 
 private:
+  void reset_sieve(uint64_t low, uint64_t high);
   void set_sieve_size(uint64_t segment_size);
   void add(uint64_t prime);
 

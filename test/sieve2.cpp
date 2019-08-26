@@ -53,9 +53,9 @@ int main()
     int64_t cnt2 = 0;
 
     if (primes[i] <= 5)
-      sieve.pre_sieve(i, low, high);
+      sieve.pre_sieve(primes, i, low, high);
     else
-      cnt1 = sieve.cross_off(i, primes[i]);
+      cnt1 = sieve.cross_off_count(primes[i], i);
 
     for (int j = primes[i]; j < high; j += primes[i])
     {
@@ -65,7 +65,7 @@ int main()
 
     if (primes[i] > 5)
     {
-      cout << "sieve.cross_off(" << i << ", " << primes[i] << ") = " << cnt1;
+      cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
       check(cnt1 == cnt2);
     }
   }

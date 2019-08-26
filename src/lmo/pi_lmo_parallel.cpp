@@ -82,9 +82,7 @@ int64_t S2_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    // pre-sieve multiples of first c primes
-    sieve.pre_sieve(c, low, high);
-
+    sieve.pre_sieve(primes, c, low, high);
     int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = c + 1;
 
@@ -116,7 +114,7 @@ int64_t S2_thread(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off(b, prime);
+      count_low_high -= sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrty < b < pi_y
@@ -144,7 +142,7 @@ int64_t S2_thread(int64_t x,
       }
 
       phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off(b, prime);
+      count_low_high -= sieve.cross_off_count(prime, b);
     }
 
     next_segment:;
