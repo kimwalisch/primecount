@@ -74,14 +74,16 @@ T S2_hard_thread(T x,
                  Primes& primes,
                  Runtime& runtime)
 {
+  T s2_hard = 0;
+  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t max_b = pi[min3(isqrt(x / low1), isqrt(z), y)];
-  int64_t pi_sqrty = pi[isqrt(y)];
-  T s2_hard = 0;
+  int64_t min_b = pi[min(z / limit, primes[max_b])];
+  min_b = max(c, min_b) + 1;
 
-  if (c > max_b)
-    return s2_hard;
+  if (min_b > max_b)
+    return 0;
 
   runtime.init_start();
   Sieve sieve(low, segment_size, max_b);
@@ -95,9 +97,9 @@ T S2_hard_thread(T x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    sieve.pre_sieve(primes, c, low, high);
+    sieve.pre_sieve(primes, min_b - 1, low, high);
     int64_t count_low_high = sieve.count((high - 1) - low);
-    int64_t b = c + 1;
+    int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves: n = primes[b] * m
