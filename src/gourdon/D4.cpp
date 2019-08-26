@@ -86,14 +86,16 @@ T D_thread(T x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
+    // For i < min_b there are no special leaves:
+    // low <= x / (primes[i] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
     int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = min_b;
 
     // For k + 1 <= b <= pi_sqrtz
-    // Find all special leaves: n = primes[b] * m
-    // In the interval: low <= (x / n) < high
-    // Which satisfy:  mu[m] != 0 && lpf[m] > primes[b] && mpf[m] <= y
+    // Find all special leaves in the current segment that are
+    // composed of a prime and a square free number:
+    // low <= x / (primes[b] * m) < high
     for (int64_t end = min(pi_sqrtz, max_b); b <= end; b++)
     {
       int64_t prime = primes[b];
@@ -135,8 +137,9 @@ T D_thread(T x,
     }
 
     // For pi_sqrtz < b <= pi_x_star
-    // Find all special leaves: n = primes[b] * prime2
-    // which satisfy: low <= (x / n) < high && prime2 <= y
+    // Find all special leaves in the current segment
+    // that are composed of 2 primes:
+    // low <= x / (primes[b] * primes[l]) < high
     for (; b <= max_b; b++)
     {
       int64_t prime = primes[b];

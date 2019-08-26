@@ -70,9 +70,9 @@ int64_t D(int64_t x,
     int64_t b = k + 1;
 
     // For k + 1 <= b <= pi_sqrtz
-    // Find all special leaves: n = primes[b] * m
-    // In the interval: low <= (x / n) < high
-    // Which satisfy:  mu[m] != 0 && lpf[m] > primes[b] && mpf[m] <= y
+    // Find all special leaves in the current segment that are
+    // composed of a prime and a square free number:
+    // low <= x / (primes[b] * m) < high
     for (; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
@@ -108,8 +108,9 @@ int64_t D(int64_t x,
     }
 
     // For pi_sqrtz < b <= pi_x_star
-    // Find all special leaves: n = primes[b] * prime2
-    // which satisfy: low <= (x / n) < high && prime2 <= y
+    // Find all special leaves in the current segment
+    // that are composed of 2 primes:
+    // low <= x / (primes[b] * primes[l]) < high
     for (; b <= pi_x_star; b++)
     {
       int64_t prime = primes[b];

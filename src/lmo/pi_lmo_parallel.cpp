@@ -87,8 +87,9 @@ int64_t S2_thread(int64_t x,
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
-    // Find all special leaves: n = primes[b] * m
-    // which satisfy:  mu[m] != 0 && primes[b] < lpf[m], low <= (x / n) < high
+    // Find all special leaves in the current segment that are
+    // composed of a prime and a square free number:
+    // low <= x / (primes[b] * m) < high
     for (; b <= min(pi_sqrty, size - 1); b++)
     {
       int64_t prime = primes[b];
@@ -118,8 +119,9 @@ int64_t S2_thread(int64_t x,
     }
 
     // For pi_sqrty < b < pi_y
-    // Find all special leaves: n = primes[b] * prime2
-    // which satisfy: low <= (x / n) < high
+    // Find all special leaves in the current segment
+    // that are composed of 2 primes:
+    // low <= x / (primes[b] * primes[l]) < high
     for (; b < min(pi_y, size); b++)
     {
       int64_t prime = primes[b];
