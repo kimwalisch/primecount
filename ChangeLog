@@ -1,3 +1,23 @@
+2019-08-26 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.1 work in progress.
+
+  The memory usage of Xavier Gourdon's algorithm has been
+  reduced from O(x^(1/2)) to O(x^(1/3) * log^3 x). Xavier
+  Gourdon's algorithm is now fully implemented and luckily it
+  scales well up to a very large number of CPU cores. Xavier
+  Gourdon's algorithm is now enabled by default for
+  numbers > 10^7.
+
+  * main.cpp: New options: --AC, --B, --D, --Phi0, --Sigma.
+  * SegmentedPiTable.cpp: New PiTable implementation.
+  * AC.cpp: Combine the A & C formulas to improve scaling.
+  * D4.cpp: Tighter bounds, minor speedup.
+  * Sigma.cpp: Reduce initialization overhead.
+  * Sieve.cpp: Improved pre-sieving.
+  * S2_hard.cpp: Improved pre-sieving.
+  * print.cpp: Updated for Gourdon's algorithm.
+
 2019-08-13 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.0 released.
