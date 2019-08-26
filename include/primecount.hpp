@@ -1,6 +1,9 @@
 ///
 /// @file  primecount.hpp
-/// @brief primecount C++ API
+/// @brief primecount C++ API. primecount is a C++ library for
+///        counting the number of primes <= x using highly
+///        optimized implementations of the combinatorial type
+///        prime counting function algorithms.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
