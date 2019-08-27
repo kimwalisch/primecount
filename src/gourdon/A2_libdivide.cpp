@@ -67,7 +67,6 @@ T A_OpenMP(T x,
   T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
-  int64_t max_prime = primes.back();
   threads = ideal_num_threads(threads, x13, thread_threshold);
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
   auto fastdiv = libdivide_vector(primes);
@@ -99,10 +98,11 @@ T A_OpenMP(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t min_2nd_prime = min(x_div_high / prime, max_prime);
-      int64_t j = pi[min_2nd_prime] + 1;
-      j = max(j, b + 1);
-      int64_t max_2nd_prime = min(x_div_low / prime, isqrt(xp));
+      int64_t sqrt_xp = isqrt(xp);
+      int64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
+      int64_t j = pi[min_2nd_prime];
+      j = max(j, b) + 1;
+      int64_t max_2nd_prime = min(x_div_low / prime, sqrt_xp);
       int64_t max_j = pi[max_2nd_prime];
 
       if (is_libdivide(xp))

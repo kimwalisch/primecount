@@ -48,7 +48,6 @@ template <typename T, typename Primes>
 T A(T x,
     int64_t y,
     int64_t b,
-    int64_t max_a_prime,
     T x_div_low,
     T x_div_high,
     Primes& primes,
@@ -59,10 +58,11 @@ T A(T x,
   T xp = x / prime;
   T sum = 0;
 
-  int64_t min_2nd_prime = min(x_div_high / prime, max_a_prime);
-  int64_t i = pi[min_2nd_prime] + 1;
-  i = max(i, b + 1);
-  int64_t max_2nd_prime = min(x_div_low / prime, isqrt(xp));
+  int64_t sqrt_xp = isqrt(xp);
+  int64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
+  int64_t i = pi[min_2nd_prime];
+  i = max(i, b) + 1;
+  int64_t max_2nd_prime = min(x_div_low / prime, sqrt_xp);
   int64_t max_i = pi[max_2nd_prime];
 
   // x / (p * q) >= y
@@ -266,7 +266,7 @@ T AC_OpenMP(T x,
       if (b <= pi_x_star)
         sum += C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
       else
-        sum += A(x, y, b, max_a_prime, x_div_low, x_div_high, primes, pi, segmentedPi);
+        sum +=  A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
 
       if (is_print())
         status.print(b, pi_x13);
@@ -331,7 +331,7 @@ int128_t AC(int128_t x,
   else
   {
     auto primes = generate_primes<int64_t>(max_prime);
-    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime,  primes, threads);
+    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
   }
 
   print("A + C", ac, time);
