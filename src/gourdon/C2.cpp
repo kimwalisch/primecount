@@ -43,11 +43,11 @@ namespace {
 ///
 template <int MU, typename T, typename Primes>
 T C(T xp,
-    uint64_t b,
+    int64_t b,
     uint64_t i,
-    uint64_t m,
-    uint64_t min_m,
-    uint64_t max_m,
+    int64_t m,
+    int64_t min_m,
+    int64_t max_m,
     Primes& primes,
     PiTable& pi)
 {
@@ -55,18 +55,18 @@ T C(T xp,
 
   for (i++; i < primes.size(); i++)
   {
-    // next m may be 128-bit
+    // Calculate next m
     T m128 = (T) m * primes[i];
-    if (m128 > max_m)
+    if (m128 > (T) max_m)
       return sum;
 
-    uint64_t m64 = (uint64_t) m128;
+    int64_t m64 = (int64_t) m128;
     if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
+      int64_t xpm = fast_div64(xp, m64);
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
+    sum += C1<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
