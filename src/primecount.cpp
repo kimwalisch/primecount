@@ -346,10 +346,10 @@ double get_alpha_y_gourdon(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha_y < 1)
   {
-    double a = 0.000446563;
-    double b = -0.0125132;
-    double c = 0.094232;
-    double d = 0.875222;
+    double a = 0.00118697;
+    double b = -0.0510434;
+    double c = 0.622372;
+    double d = -0.421988;
     double logx = log(x2);
 
     alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
@@ -370,12 +370,15 @@ double get_alpha_z_gourdon(maxint_t x)
 
   if (alpha_z < 1)
   {
-    // Xavier Gourdon's fastpix11.exe binary uses d = 2.4 but
-    // according to my benchmarks alpha_z should grow very slowly
-    // and be much smaller than alpha_y.
-    double log_alpha_y = log(max(1.0, alpha_y));
-    double loglog_alpha_y = log(max(1.0, log_alpha_y));
-    alpha_z = 1 + loglog_alpha_y;
+    // Xavier Gourdon's fastpix11.exe binary uses alpha_z = 2.4.
+    // According to my benchmarks setting the alpha_z tuning factor
+    // to some small constant (and slightly decreasing alpha_y)
+    // provides a tiny speedup but also significantly increases memory
+    // usage. Since using large amounts of memory will eventually
+    // cause many cache & TLB misses which severely deteriorate
+    // performance we deliberately set alpha_z=1 in order to reduce
+    // the memory usage as much as possible.
+    alpha_z = 1;
   }
 
   double x16 = (double) iroot<6>(x);
