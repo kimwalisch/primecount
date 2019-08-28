@@ -19,6 +19,7 @@
 #define PHITINY_HPP
 
 #include <fast_div.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <array>
@@ -54,9 +55,12 @@ public:
 
   /// In Xavier Gourdon's algorithm the small
   /// constant is named k instead of c.
-  static int64_t get_k(int64_t y)
+  /// k <= PrimePi[min(x_star, sqrt(x / y))]
+  ///
+  template <typename T>
+  static int64_t get_k(T x)
   {
-    return get_c(y);
+    return get_c(iroot<4>(x));
   }
 
   static int64_t max_a()

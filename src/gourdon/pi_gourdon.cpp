@@ -49,7 +49,7 @@ int64_t pi_gourdon_64(int64_t x, int threads)
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(y);
+  int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
 
   // y <= z < x^(1/2)
@@ -101,7 +101,7 @@ int128_t pi_gourdon_128(int128_t x, int threads)
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(y);
+  int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
 
   // y <= z < x^(1/2)

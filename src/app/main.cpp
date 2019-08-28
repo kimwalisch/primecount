@@ -63,7 +63,7 @@ maxint_t AC(maxint_t x, int threads)
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(y);
+  int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
 
   // y <= z < x^(1/2)
@@ -130,7 +130,7 @@ maxint_t D(maxint_t x, int threads)
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(y);
+  int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
 
   // y <= z < x^(1/2)
@@ -168,7 +168,7 @@ maxint_t Phi0(maxint_t x, int threads)
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
 
-  int64_t k = PhiTiny::get_k(y);
+  int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
 
   // y <= z < x^(1/2)
