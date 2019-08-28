@@ -19,6 +19,7 @@
 /// sizes e.g. IBM z13 CPUs from 2015 have a cache line size of 256
 /// bytes. Hence in order to be future-proof we set the maximum cache
 /// line size to 1 kilobyte.
+///
 #ifndef CACHE_LINE_SIZE
   #define CACHE_LINE_SIZE 1024
 #endif
