@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include <stdint.h>
+#include <utility>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -329,61 +330,50 @@ double get_alpha_deleglise_rivat(maxint_t x)
   return in_between(1, alpha, iroot<6>(x));
 }
 
-/// y = x^(1/3) * alpha_y, with alpha_y >= 1.
-/// alpha_y is a tuning factor which should be determined
+/// In Xavier Gourdon's algorithm there are 2 alpha tuning
+/// factors. The alpha_y tuning factor should grow like
+/// O(log(x)^3) and the alpha_z tuning factor is a small
+/// constant. Both alpha_y and alpha_z should be determined
 /// experimentally by running benchmarks.
 ///
-/// Note that in Xavier Gourdon's paper alpha_y is named c
-/// but we name it alpha_y since y = x^(1/3) * alpha_y
-/// and the tuning factor in Tomás Oliveira e Silva's paper
-/// is also named alpha.
-///
-double get_alpha_y_gourdon(maxint_t x)
-{
-  double alpha_y = alpha_y_;
-  double x2 = (double) x;
-
-  // use default alpha if no command-line alpha provided
-  if (alpha_y < 1)
-  {
-    double a = 0.00118697;
-    double b = -0.0510434;
-    double c = 0.622372;
-    double d = -0.421988;
-    double logx = log(x2);
-
-    alpha_y = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
-  }
-
-  return in_between(1, alpha_y, iroot<6>(x));
-}
-
+/// y = x^(1/3) * alpha_y, with alpha_y >= 1.
 /// z = y * alpha_z, with alpha_z >= 1.
-/// In Xavier Gourdon's paper the alpha_z tuning factor
-/// is named d. alpha_z should be determined experimentally
-/// by running benchmarks.
+/// alpha_y * alpha_z <= x^(1/6)
 ///
-double get_alpha_z_gourdon(maxint_t x)
+std::pair<double, double> get_alpha_gourdon(maxint_t x)
 {
-  double alpha_y = get_alpha_y_gourdon(x);
+  double a = 0.00118697;
+  double b = -0.0510434;
+  double c = 0.622372;
+  double d = -0.421988;
+  double logx = log((double) x);
+
+  // alpha_yz = alpha_y * alpha_z
+  double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
 
+  // Use default alpha_z
   if (alpha_z < 1)
   {
     // Xavier Gourdon's fastpix11.exe binary uses alpha_z = 2.4.
-    // According to my benchmarks setting the alpha_z tuning factor
-    // to some small constant (and slightly decreasing alpha_y)
-    // provides a tiny speedup but also significantly increases memory
-    // usage. Since using large amounts of memory will eventually
-    // cause many cache & TLB misses which severely deteriorate
-    // performance we deliberately set alpha_z=1 in order to reduce
-    // the memory usage as much as possible.
-    alpha_z = 1;
+    // Our implementation works best with alpha_z = 1.5.
+    // Increasing alpha_z increases the runtime of the B formula
+    // but dereases the runtime of the C and D formulas.
+    alpha_z = in_between(1, alpha_yz / 5, 1.5);
   }
 
+  // Use default alpha_y
+  if (alpha_y < 1)
+    alpha_y = alpha_yz / alpha_z;
+
+  // Ensure alpha_y * alpha_z <= x^(1/6)
   double x16 = (double) iroot<6>(x);
-  double max_alpha = min(alpha_y * alpha_z, x16);
-  return in_between(1, alpha_z, max_alpha);
+  alpha_y = in_between(1, alpha_y, x16);
+  double max_alpha_z = max(1.0, x16 / alpha_y);
+  alpha_z = in_between(1, alpha_z, max_alpha_z);
+
+  return std::make_pair(alpha_y, alpha_z);
 }
 
 /// x_star = max(x^(1/4), x / y^2)

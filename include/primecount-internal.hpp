@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <string>
+#include <utility>
 
 namespace primecount {
 
@@ -74,8 +75,7 @@ double get_alpha_y(maxint_t x, int64_t y);
 double get_alpha_z(int64_t y, int64_t z);
 double get_alpha_lmo(maxint_t x);
 double get_alpha_deleglise_rivat(maxint_t x);
-double get_alpha_y_gourdon(maxint_t x);
-double get_alpha_z_gourdon(maxint_t x);
+std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 

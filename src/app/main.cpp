@@ -47,8 +47,9 @@ maxint_t AC(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
@@ -85,7 +86,8 @@ maxint_t B(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
@@ -114,8 +116,9 @@ maxint_t D(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
@@ -152,8 +155,9 @@ maxint_t Phi0(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
@@ -190,7 +194,8 @@ maxint_t Sigma(maxint_t x, int threads)
   if (x < 1)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)

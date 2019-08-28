@@ -38,8 +38,9 @@ int64_t pi_gourdon_64(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t y = (int64_t)(x13 * alpha_y);
@@ -85,8 +86,9 @@ int128_t pi_gourdon_128(int128_t x, int threads)
   if (x < 2)
     return 0;
 
-  double alpha_y = get_alpha_y_gourdon(x);
-  double alpha_z = get_alpha_z_gourdon(x);
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
