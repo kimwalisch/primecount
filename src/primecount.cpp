@@ -358,8 +358,9 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   {
     // Xavier Gourdon's fastpix11.exe binary uses alpha_z = 2.4.
     // Our implementation works best with alpha_z = 1.5.
-    // Increasing alpha_z increases the runtime of the B formula
-    // but dereases the runtime of the C and D formulas.
+    // By default increasing alpha_z will automatically decrease
+    // alpha_y which in turn increases the runtime of the B
+    // formula but decreases the runtime of the C and D formulas.
     alpha_z = in_between(1, alpha_yz / 5, 1.5);
   }
 
