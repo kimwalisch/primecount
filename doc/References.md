@@ -11,3 +11,4 @@ primecount References
 8. R. Crandall and C. Pomerance, Prime numbers: a computational perspective, 2nd ed., Springer, New York, 2005. pp. 152-162.
 9. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
 10. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
+11. Jan Büthe, An improved analytic method for calculating pi(x), Manuscripta Math. 151 (2016), no. 3-4, 329-352.
