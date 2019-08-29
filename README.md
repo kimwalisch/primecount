@@ -161,7 +161,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
     <td>0.03s</td>
-    <td>0.03s</td>
+    <td>0.02s</td>
     <td>0.02s</td>
     <td>0.01s</td>
     <td>0.01s</td>
@@ -169,8 +169,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.10s</td>
-    <td>0.06s</td>
+    <td>0.09s</td>
+    <td>0.05s</td>
     <td>0.02s</td>
     <td>0.02s</td>
     <td>0.02s</td>
@@ -178,56 +178,56 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.43s</td>
-    <td>0.22s</td>
+    <td>0.39s</td>
+    <td>0.20s</td>
     <td>0.05s</td>
-    <td>0.04s</td>
     <td>0.03s</td>
+    <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>2.49s</td>
-    <td>1.09s</td>
-    <td>0.17s</td>
+    <td>2.27s</td>
+    <td>1.00s</td>
     <td>0.15s</td>
-    <td>0.11s</td>
+    <td>0.13s</td>
+    <td>0.07s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>16.17s</td>
-    <td>6.65s</td>
-    <td>0.68s</td>
-    <td>0.48s</td>
-    <td>0.28s</td>
+    <td>14.81s</td>
+    <td>6.12s</td>
+    <td>0.59s</td>
+    <td>0.44s</td>
+    <td>0.22s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>124.75s</td>
-    <td>48.20s</td>
-    <td>2.84s</td>
-    <td>1.57s</td>
-    <td>0.96s</td>
+    <td>114.59s</td>
+    <td>44.43s</td>
+    <td>2.60s</td>
+    <td>1.47s</td>
+    <td>0.81s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>1,046.52s</td>
-    <td>395.41s</td>
-    <td>12.49s</td>
-    <td>5.46s</td>
-    <td>3.52s</td>
+    <td>963.52s</td>
+    <td>366.32s</td>
+    <td>11.62s</td>
+    <td>4.94s</td>
+    <td>3.00s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>9,335.19s</td>
-    <td>3,544.03s</td>
-    <td>57.92s</td>
-    <td>22.12s</td>
-    <td>13.36s</td>
+    <td>8,472.67s</td>
+    <td>3,224.68s</td>
+    <td>52.80s</td>
+    <td>19.90s</td>
+    <td>11.66s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -235,8 +235,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>98.76s</td>
-    <td>NaN</td>
+    <td>93.05s</td>
+    <td>48.60s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -244,8 +244,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>427.89s</td>
-    <td>NaN</td>
+    <td>398.20s</td>
+    <td>202.87s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -253,8 +253,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,921.61s</td>
-    <td>NaN</td>
+    <td>1,718.79s</td>
+    <td>870.17s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -262,38 +262,19 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>8,399.37s</td>
-    <td>NaN</td>
+    <td>7,796.46s</td>
+    <td>3,679.60s</td>
   </tr>
 </table>
 
-The benchmarks above were run on a system with an Intel Xeon Platinum 8175M CPU
-from 2017 using 8 CPU cores (16 threads) clocked at 2.50GHz. By default primecount
-currently uses the Deleglise-Rivat algorithm as its implementation is very
-mature. The implementation of Gourdon's algorithm is very recent, it is already
-very fast but some work remains to be done e.g. the memory usage needs to be
-reduced without deteriorating scaling.
-
-## Performance tips
-
-primecount scales nicely up until 10<sup>24</sup> on current CPUs. For larger
-values primecount's large memory usage causes many
-[TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
-cache misses that severely deteriorate primecount's performance.
-Fortunately the Linux kernel allows to enable
-[transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
-so that large memory allocations will automatically be done using huge
-pages instead of ordinary pages which dramatically reduces the number of
-TLB cache misses. I have measured a speed up of more than 2x for
-S1(10^26) when transparent huge pages are enabled.
-
-```bash
-sudo su
-
-# Enable transparent huge pages until next reboot
-echo always > /sys/kernel/mm/transparent_hugepage/enabled
-echo always > /sys/kernel/mm/transparent_hugepage/defrag
-```
+The benchmarks above were run on a system with an Intel Xeon Platinum 8124M CPU
+from 2017 using 8 CPU cores (16 threads) clocked at 3.00GHz. Note that Jan Büthe
+mentions in <a href="doc/References.md">[11]</a> that he computed pi(10<sup>25</sup>)
+in 40,000 CPU core hours using the analytic prime counting function algorithm.
+Büthe also mentions that by using additional zeros of the zeta function the runtime
+could have potentially been reduced to 4,000 CPU core hours. But using primecount
+and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 800 CPU core
+hours!
 
 ## C++ library
 
