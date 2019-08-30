@@ -76,10 +76,10 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
   bitmask(124), bitmask(125), bitmask(126), bitmask(127)
 };
 
-SegmentedPiTable::SegmentedPiTable(uint64_t sqrtx,
+SegmentedPiTable::SegmentedPiTable(uint64_t limit,
                                    uint64_t segment_size,
                                    int threads)
-  : max_high_(sqrtx + 1)
+  : max_high_(limit + 1)
 {
   // Each bit of the pi[x] lookup table corresponds
   // to an odd integer, so there are 16 numbers per

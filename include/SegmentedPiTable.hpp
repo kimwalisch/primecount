@@ -41,7 +41,7 @@ namespace primecount {
 class SegmentedPiTable
 {
 public:
-  SegmentedPiTable(uint64_t sqrtx,
+  SegmentedPiTable(uint64_t limit,
                    uint64_t segment_size,
                    int threads);
 
