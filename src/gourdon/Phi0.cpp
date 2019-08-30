@@ -101,7 +101,7 @@ int64_t Phi0(int64_t x,
              int threads)
 {
   print("");
-  print("=== Phi0(x, y, z) ===");
+  print("=== Phi0(x, y) ===");
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
@@ -120,7 +120,7 @@ int128_t Phi0(int128_t x,
               int threads)
 {
   print("");
-  print("=== Phi0(x, y, z) ===");
+  print("=== Phi0(x, y) ===");
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
