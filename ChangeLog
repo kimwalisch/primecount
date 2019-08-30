@@ -1,4 +1,4 @@
-2019-08-26 Kim Walisch  <kim.walisch@gmail.com>
+2019-08-30 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.1 work in progress.
 
@@ -17,6 +17,22 @@
   * Sieve.cpp: Improved pre-sieving.
   * S2_hard.cpp: Improved pre-sieving.
   * print.cpp: Updated for Gourdon's algorithm.
+
+  === C++ API Changes ===
+
+  In order to simplify the API the following functions have
+  been removed from the primecount.hpp header:
+
+  int64_t pi_deleglise_rivat(int64_t x);
+  int64_t pi_legendre(int64_t x);
+  int64_t pi_lehmer(int64_t x);
+  int64_t pi_lmo(int64_t x);
+  int64_t pi_meissel(int64_t x);
+  int64_t pi_primesieve(int64_t x);
+
+  You should use pi(x) instead which is an alias for the
+  fastest prime counting function implementation in
+  primecount.
 
 2019-08-13 Kim Walisch  <kim.walisch@gmail.com>
 
