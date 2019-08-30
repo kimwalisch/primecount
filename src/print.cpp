@@ -164,6 +164,7 @@ void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
     cout << "k = " << k << endl;
+    cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
     cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
     cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
     print_threads(threads);
@@ -179,6 +180,7 @@ void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, 
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
     cout << "k = " << k << endl;
+    cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
     cout << "alpha_y = " << fixed << setprecision(3) << alpha_y << endl;
     cout << "alpha_z = " << fixed << setprecision(3) << alpha_z << endl;
     print_threads(threads);
