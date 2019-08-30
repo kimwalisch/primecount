@@ -342,16 +342,27 @@ double get_alpha_deleglise_rivat(maxint_t x)
 ///
 std::pair<double, double> get_alpha_gourdon(maxint_t x)
 {
-  double a = 0.00118697;
-  double b = -0.0510434;
-  double c = 0.622372;
-  double d = -0.421988;
-  double logx = log((double) x);
-
   // alpha_yz = alpha_y * alpha_z
-  double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  double alpha_yz;
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
+
+  if (x < 1e10)
+  {
+    double a = 0.078173;
+    double b = 1;
+    double logx = log((double) x);
+    alpha_yz = a * logx + b;
+  }
+  else
+  {
+    double a = 0.00223533;
+    double b = -0.144108;
+    double c = 3.07786;
+    double d = -18.8831;
+    double logx = log((double) x);
+    alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  }
 
   // Use default alpha_z
   if (alpha_z < 1)
