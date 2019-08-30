@@ -36,8 +36,8 @@ int main()
   uniform_int_distribution<int> dist2(1, 1000);
 
   int64_t limit = dist(gen);
-  int64_t threads = get_num_threads();
   int64_t segment_size = iroot<3>(limit);
+  int threads = get_num_threads();
 
   PiTable pi(limit);
   SegmentedPiTable segmentedPi(limit, segment_size, threads);
