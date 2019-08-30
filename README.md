@@ -272,9 +272,9 @@ from 2017 using 8 CPU cores (16 threads) clocked at 3.00GHz. Note that Jan Büth
 mentions in <a href="doc/References.md">[11]</a> that he computed pi(10<sup>25</sup>)
 in 40,000 CPU core hours using the analytic prime counting function algorithm.
 Büthe also mentions that by using additional zeros of the zeta function the runtime
-could have potentially been reduced to 4,000 CPU core hours. But using primecount
-and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 800 CPU core
-hours!
+could have potentially been reduced to 4,000 CPU core hours. However using primecount
+and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 800 CPU
+core hours!
 
 ## C++ library
 
