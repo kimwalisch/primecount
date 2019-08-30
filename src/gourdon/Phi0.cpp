@@ -1,10 +1,10 @@
 ///
 /// @file  Phi0.cpp
-/// @brief Calculate the contribution of the ordinary leaves using
-///        Xavier Gourdon's prime counting algorithm. Note that this
-///        implementation is a modified version of S1.cpp which is
-///        used in the Lagarias-Miller-Odlyzko and Deleglise-Rivat
-///        prime counting algorithms.
+/// @brief Calculate the contribution of the ordinary leaves in
+///        Xavier Gourdon's prime counting algorithm. Note that the
+///        Phi0 formula on the 7th page of Gourdon's paper is not
+///        correct, however the correct Phi0 formula can be found on
+///        page 3 of Gourdon's paper.
 ///
 ///        The only difference in the computation of the ordinary
 ///        leaves compared to the Deleglise-Rivat algorithm is that we
