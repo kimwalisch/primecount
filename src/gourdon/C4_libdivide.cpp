@@ -106,21 +106,23 @@ T C_OpenMP(T x,
            Primes& primes,
            int threads)
 {
-  T sum = 0;
+  int64_t root3_xy = iroot<3>(x / y);
+  int64_t root3_xz = iroot<3>(x / z);
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x_star, thread_threshold);
 
   S2Status status(x);
-  PiTable pi(z);
+  PiTable pi(max(root3_xy, z));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
   auto fastdiv = libdivide_vector(primes);
 
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
-  int64_t pi_root3_xy = pi[iroot<3>(x / y)];
-  int64_t pi_root3_xz = pi[iroot<3>(x / z)];
+  int64_t pi_root3_xy = pi[root3_xy];
+  int64_t pi_root3_xz = pi[root3_xz];
   int64_t min_b = max(k, pi_root3_xz) + 1;
+  T sum = 0;
 
   // This computes the 1st part of the C formula.
   // Find all special leaves of type:
