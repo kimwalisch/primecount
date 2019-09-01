@@ -367,12 +367,16 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   // Use default alpha_z
   if (alpha_z < 1)
   {
-    // Xavier Gourdon's fastpix11.exe binary uses alpha_z = 2.4.
-    // Our implementation works best with alpha_z = 1.5.
-    // By default increasing alpha_z will automatically decrease
-    // alpha_y which in turn increases the runtime of the B
-    // formula but decreases the runtime of the C and D formulas.
-    alpha_z = in_between(1, alpha_yz / 5, 1.5);
+    // In primecount when alpha_z is increased alpha_y is automatically
+    // decreased because alpha_y = alpha_yz / alpha_z. When alpha_z
+    // is increased this increases the runtime of the B formula but at
+    // the same time reduces the runtime of the C and D formulas.
+    // Since the B formula scales extremely well even up to very large
+    // input values e.g. x > 10^24 and the D formula scales poorly when
+    // x > 10^24 it makes sense to use a small alpha_z when x <= 10^24
+    // and a large alpha_z when x > 10^24.
+    alpha_z = (x <= 1e24) ? 1.3 : 2.0;
+    alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
   // Use default alpha_y
