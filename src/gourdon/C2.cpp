@@ -66,7 +66,7 @@ T C(T xp,
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C1<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
+    sum += C<-MU>(xp, b, i, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
