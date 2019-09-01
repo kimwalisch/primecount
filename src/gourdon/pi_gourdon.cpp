@@ -7,7 +7,7 @@
 ///        the Deleglise-Rivat algorithm.
 ///
 ///        Xavier Gourdon formula:
-///        pi(x) = A - B + C + D + phi0 + Sigma
+///        pi(x) = A - B + C + D + Phi0 + Sigma
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -60,7 +60,7 @@ int64_t pi_gourdon_64(int64_t x, int threads)
 
   print("");
   print("=== pi_gourdon_64(x) ===");
-  print("pi(x) = A - B + C + D + phi0 + Sigma");
+  print("pi(x) = A - B + C + D + Phi0 + Sigma");
   print_gourdon(x, y, z, k, alpha_y, alpha_z, threads);
 
   int64_t sigma = Sigma(x, y, threads);
@@ -113,7 +113,7 @@ int128_t pi_gourdon_128(int128_t x, int threads)
 
   print("");
   print("=== pi_gourdon_128(x) ===");
-  print("pi(x) = A - B + C + D + phi0 + Sigma");
+  print("pi(x) = A - B + C + D + Phi0 + Sigma");
   print_gourdon(x, y, z, k, alpha_y, alpha_z, threads);
 
   int128_t sigma = Sigma(x, y, threads);

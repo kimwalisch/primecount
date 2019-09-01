@@ -107,7 +107,7 @@ int64_t Phi0(int64_t x,
   double time = get_time();
   int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
 
-  print("phi0", phi0, time);
+  print("Phi0", phi0, time);
   return phi0;
 }
 
@@ -132,7 +132,7 @@ int128_t Phi0(int128_t x,
   else
     phi0 = Phi0_OpenMP(x, y, z, k, threads);
 
-  print("phi0", phi0, time);
+  print("Phi0", phi0, time);
   return phi0;
 }
 
