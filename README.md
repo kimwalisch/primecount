@@ -6,24 +6,21 @@
 
 primecount is a command-line program and [C++ library](doc/libprimecount.md)
 that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
-**highly optimized** implementations of the
-[prime counting function](https://en.wikipedia.org/wiki/Prime-counting_function)
-(combinatorial methods). primecount includes implementations of the
-algorithms of Legendre, Meissel, Lehmer, Lagarias-Miller-Odlyzko, Deleglise-Rivat
-and Gourdon all of which have been parallelized using
-[OpenMP](https://en.wikipedia.org/wiki/OpenMP). The Deleglise-Rivat
-implementation has also been 
-[distributed](https://github.com/kimwalisch/primecount/blob/master/doc/primecount-MPI.md#primecount-mpi)
-using MPI.
+**highly optimized** implementations of the combinatorial
+[prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
 
+primecount includes implementations of all important combinatorial
+prime counting algorithms known up to this date all of which have
+been parallelized using [OpenMP](https://en.wikipedia.org/wiki/OpenMP).
 primecount contains the **first ever** parallel open source
-implementation of the Deleglise-Rivat algorithm and it features a
-[novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
-which scales up to hundreds of CPU cores. primecount has already been
-used to compute several world records e.g.
+implementation of the Deleglise-Rivat algorithm and the first ever open
+source implementation of Xavier Gourdon's algorithm. primecount also
+features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
+that is shared amongst all implementations and that scales up to
+hundreds of CPU cores. primecount has already been used to compute
+several world records e.g.
 [pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
-[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988), more will
-hopefully follow!
+[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988).
 
 ## Build instructions
 
