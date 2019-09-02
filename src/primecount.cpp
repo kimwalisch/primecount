@@ -154,11 +154,6 @@ string pi(const string& x, int threads)
   return oss.str();
 }
 
-int64_t pi_lmo(int64_t x, int threads)
-{
-  return pi_lmo_parallel(x, threads);
-}
-
 int64_t pi_deleglise_rivat(int64_t x, int threads)
 {
   return pi_deleglise_rivat_64(x, threads);
