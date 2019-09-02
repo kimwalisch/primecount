@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,9 +30,8 @@ const array<int, 10> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19, 23 };
 
 namespace primecount {
 
-/// Find the nth prime using a combination of the
-/// Deleglise-Rivat prime counting algorithm and the
-/// segmented sieve of Eratosthenes.
+/// Find the nth prime using a combination of the prime counting
+/// function and the segmented sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/2))
 ///
