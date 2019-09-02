@@ -1,6 +1,6 @@
-2019-08-30 Kim Walisch  <kim.walisch@gmail.com>
+2019-09-02 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 5.1 work in progress.
+  Version 5.1 released.
 
   The memory usage of Xavier Gourdon's algorithm has been
   reduced from O(x^(1/2)) to O(x^(1/3) * log^3 x). Xavier
