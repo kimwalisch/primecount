@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <cassert>
+#include <memory>
 #include <vector>
 
 namespace primecount {
@@ -94,11 +95,12 @@ public:
 
 private:
   void reset_sieve(uint64_t low, uint64_t high);
-  void set_sieve_size(uint64_t segment_size);
   void add(uint64_t prime);
 
   uint64_t start_;
-  std::vector<byte_t> sieve_;
+  uint64_t sieve_size_;
+  byte_t* sieve_;
+  std::unique_ptr<byte_t[]> deleter_;
   std::vector<Wheel> wheel_;
 };
 
