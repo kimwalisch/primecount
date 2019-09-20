@@ -30,8 +30,7 @@ constexpr int left_shift(int n)
          : (n % 30 <= 17) ? (n / 30 * 8) + 4
          : (n % 30 <= 19) ? (n / 30 * 8) + 5
          : (n % 30 <= 23) ? (n / 30 * 8) + 6
-         : (n % 30 <= 29) ? (n / 30 * 8) + 7
-         : n / 30 * 8;
+         : (n / 30 * 8) + 7;
 }
 
 /// The 8 bits in each byte of the sieve array correspond
