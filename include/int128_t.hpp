@@ -39,6 +39,7 @@ using maxuint_t = uint128_t;
 
 #include <ostream>
 #include <string>
+#include <sstream>
 
 namespace primecount {
 
@@ -74,6 +75,14 @@ inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 
   stream << (uint128_t) n;
   return stream;
+}
+
+template <typename T>
+inline std::string to_string(T x)
+{
+  std::ostringstream ss;
+  ss << x;
+  return ss.str();
 }
 
 } // namespace
