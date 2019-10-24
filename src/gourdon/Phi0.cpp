@@ -21,10 +21,12 @@
 
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <json.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -34,6 +36,51 @@ using namespace std;
 using namespace primecount;
 
 namespace {
+
+template <typename T>
+void backup(T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            T phi0,
+            double time)
+{
+  auto json = load_backup();
+
+  json["Phi0"]["x"] = to_string(x);
+  json["Phi0"]["y"] = y;
+  json["Phi0"]["z"] = z;
+  json["Phi0"]["k"] = k;
+  json["Phi0"]["phi0"] = to_string(phi0);
+  json["Phi0"]["percent"] = 100.0;
+  json["Phi0"]["seconds"] = get_time() - time;
+
+  store_backup(json);
+}
+
+template <typename T>
+bool resume(T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            T& phi0,
+            double& time)
+{
+  auto json = load_backup();
+
+  if (is_resume(json, "Phi0", x, y, z, k))
+  {
+    double percent = json["Phi0"]["percent"];
+    double seconds = json["Phi0"]["seconds"];
+
+    phi0 = calculator::eval<T>(json["Phi0"]["phi0"]);
+    time = get_time() - seconds;
+    print_resume(percent, x);
+    return true;
+  }
+
+  return false;
+}
 
 /// Recursively iterate over the square free numbers coprime
 /// to the first b primes and calculate the sum of the
@@ -105,7 +152,13 @@ int64_t Phi0(int64_t x,
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
-  int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
+  int64_t phi0 = 0;
+
+  if (!resume(x, y, z, k, phi0, time))
+  {
+    phi0 = Phi0_OpenMP(x, y, z, k, threads);
+    backup(x, y, z, k, phi0, time);
+  }
 
   print("Phi0", phi0, time);
   return phi0;
@@ -124,13 +177,18 @@ int128_t Phi0(int128_t x,
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
-  int128_t phi0;
+  int128_t phi0 = 0;
 
-  // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
-    phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
-  else
-    phi0 = Phi0_OpenMP(x, y, z, k, threads);
+  if (!resume(x, y, z, k, phi0, time))
+  {
+    // uses less memory
+    if (y <= numeric_limits<uint32_t>::max())
+      phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
+    else
+      phi0 = Phi0_OpenMP(x, y, z, k, threads);
+
+    backup(x, y, z, k, phi0, time);
+  }
 
   print("Phi0", phi0, time);
   return phi0;

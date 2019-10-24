@@ -14619,21 +14619,23 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, 
 }
 
 template <typename T>
-inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y, int64_t z)
-{
-  return j.find(formula) != j.end() &&
-         x == calculator::eval<T>(j[formula]["x"]) &&
-         y == j[formula]["y"] &&
-         z == j[formula]["z"];
-}
-
-template <typename T>
-inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, T x, int64_t y, int64_t z)
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y, int64_t z, int64_t k)
 {
   return j.find(formula) != j.end() &&
          x == calculator::eval<T>(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
+         k == j[formula]["k"];
+}
+
+template <typename T>
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, T x, int64_t y, int64_t z, int64_t k)
+{
+  return j.find(formula) != j.end() &&
+         x == calculator::eval<T>(j[formula]["x"]) &&
+         y == j[formula]["y"] &&
+         z == j[formula]["z"] &&
+         k == j[formula]["k"] &&
          j[formula].count("thread" + std::to_string(thread_id)) > 0;
 }
 
@@ -14659,7 +14661,7 @@ inline int calculate_resume_threads(const nlohmann::json& j, const std::string& 
   return maxThreadId + 1;
 }
 
-inline bool is_backup_seconnds(const nlohmann::json& j, const std::string& formula)
+inline bool is_backup_seconds(const nlohmann::json& j, const std::string& formula)
 {
   return j.find(formula) != j.end() &&
          j[formula].count("seconds");
@@ -14669,7 +14671,7 @@ inline double backup_time(double time, const std::string& formula)
 {
   auto j = load_backup();
 
-  if (is_backup_seconnds(j, formula))
+  if (is_backup_seconds(j, formula))
   {
     double seconds = j[formula]["seconds"];
     return get_time() - seconds;
@@ -14682,19 +14684,19 @@ inline double backup_time(double time)
 {
   auto j = load_backup();
 
-  if (is_backup_seconnds(j, "P2") &&
-      is_backup_seconnds(j, "S1") &&
-      is_backup_seconnds(j, "S2_trivial") &&
-      is_backup_seconnds(j, "S2_easy") &&
-      is_backup_seconnds(j, "S2_hard"))
+  if (is_backup_seconds(j, "AC") &&
+      is_backup_seconds(j, "B") &&
+      is_backup_seconds(j, "D") &&
+      is_backup_seconds(j, "Phi0") &&
+      is_backup_seconds(j, "Sigma"))
   {
-    double p2 = j["P2"]["seconds"];
-    double s1 = j["S1"]["seconds"];
-    double s2_trivial = j["S2_trivial"]["seconds"];
-    double s2_easy = j["S2_easy"]["seconds"];
-    double s2_hard = j["S2_hard"]["seconds"];
+    double ac = j["AC"]["seconds"];
+    double b = j["B"]["seconds"];
+    double d = j["D"]["seconds"];
+    double phi0 = j["Phi0"]["seconds"];
+    double sigma = j["Sigma"]["seconds"];
 
-    double seconds = p2 + s1 + s2_trivial + s2_easy + s2_hard;
+    double seconds = ac + b + d + phi0 + sigma;
     return get_time() - seconds;
   }
 
