@@ -58,7 +58,7 @@ int LoadBalancer::get_resume_threads() const
 void LoadBalancer::backup(int thread_id)
 {
   double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
-  double seconds = get_time() - backup_time_;
+  double last_backup_seconds = get_time() - backup_time_;
 
   string tid = "thread" + to_string(thread_id);
 
@@ -67,7 +67,7 @@ void LoadBalancer::backup(int thread_id)
   json_["D"]["seconds"] = get_time() - time_;
   json_["D"].erase(tid);
 
-  if (seconds > 60)
+  if (last_backup_seconds > 60)
   {
     backup_time_ = get_time();
     store_backup(json_);
