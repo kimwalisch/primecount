@@ -45,7 +45,7 @@ for:
         - image: Visual Studio 2017
           platform: x64
     environment:
-      CXXFLAGS: "/W3 /WX"
+      CXXFLAGS: "/W3 /WX /D_CRT_SECURE_NO_WARNINGS"
     build_script:
       - cmake . -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=ON
       - cmake --build . --config Release --target install
