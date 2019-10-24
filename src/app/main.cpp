@@ -312,10 +312,23 @@ int main (int argc, char* argv[])
   try
   {
     CmdOptions opt = parseOptions(argc, argv);
-    double time = get_time();
+
+    if (!opt.is_resume())
+      backup_command(argc, argv);
+    else
+    {
+      vector<string> args = get_backup_command();
+      vector<char*> cargs;
+
+      for (string& s : args)
+        cargs.push_back((char*) s.c_str());
+
+      opt = parseOptions((int) cargs.size(), cargs.data());
+    }
 
     auto x = opt.x;
     auto a = opt.a;
+    auto time = get_time();
     auto threads = get_num_threads();
     maxint_t res = 0;
 
