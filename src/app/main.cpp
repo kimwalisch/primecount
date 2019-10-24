@@ -18,10 +18,15 @@
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <S1.hpp>
-#include <S2.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
+#include <stdio.h>
+#include <time.h>
+
 #include <exception>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -32,6 +37,83 @@
 
 using namespace std;
 using namespace primecount;
+
+namespace {
+
+// Get current date & time
+// http://www.cplusplus.com/reference/ctime/strftime
+const string dateTime()
+{
+  time_t rawtime;
+  struct tm* timeinfo;
+  char buffer[80];
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %X", timeinfo);
+
+  return buffer;
+}
+
+string basename(string path)
+{
+  while (path.back() == '/' ||
+         path.back() == '\\')
+  {
+    path.pop_back();
+  }
+
+  size_t pos = path.find_last_of("/\\");
+
+  if (pos != string::npos)
+    return path.substr(pos + 1);
+
+  return path;
+}
+
+void result_txt(int argc,
+                char* argv[],
+                maxint_t res,
+                int threads,
+                double seconds)
+{
+  ofstream resfile("results.txt", ofstream::out | ofstream::app);
+
+  if (resfile.is_open())
+  {
+    resfile << basename(argv[0]);
+
+    for (int i = 1; i < argc; i++)
+      resfile << " " << argv[i];
+
+    resfile << endl;
+    resfile << "Result: " << res << endl;
+    resfile << "Threads: " << threads << endl;
+    resfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+    resfile << "Date: " << dateTime() << endl << endl;
+  }
+}
+
+void log_footer()
+{
+  ofstream logfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (logfile.is_open())
+    logfile << endl << string(60, '=') << endl;
+}
+
+void log_result(maxint_t res, double seconds)
+{
+  ofstream logfile("primecount.log", ofstream::out | ofstream::app);
+
+  if (logfile.is_open())
+  {
+    logfile << endl << res << endl;
+    logfile << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+  }
+}
+
+} // namespace
 
 namespace primecount {
 
