@@ -336,10 +336,13 @@ int main (int argc, char* argv[])
     {
       case OPTION_DEFAULT:
         res = pi(x, threads); break;
+        time = backup_time(time); break;
       case OPTION_GOURDON:
         res = pi_gourdon(x, threads); break;
+        time = backup_time(time); break;
       case OPTION_GOURDON_64:
         res = pi_gourdon_64(to_int64(x), threads); break;
+        time = backup_time(time); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
       case OPTION_MEISSEL:
@@ -356,21 +359,28 @@ int main (int argc, char* argv[])
         res = Ri_inverse(x); break;
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
+        time = backup_time(time); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_AC:
         res = AC(x, threads); break;
+        time = backup_time(time, "AC"); break;
       case OPTION_B:
         res = B(x, threads); break;
+        time = backup_time(time, "B"); break;
       case OPTION_D:
         res = D(x, threads); break;
+        time = backup_time(time, "D"); break;
       case OPTION_PHI0:
         res = Phi0(x, threads); break;
+        time = backup_time(time, "Phi0"); break;
       case OPTION_SIGMA:
         res = Sigma(x, threads); break;
+        time = backup_time(time, "Sigma"); break;
 #ifdef HAVE_INT128_T
       case OPTION_GOURDON_128:
         res = pi_gourdon_128(x, threads); break;
+        time = backup_time(time); break;
 #endif
     }
 
