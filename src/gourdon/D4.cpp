@@ -201,25 +201,48 @@ T D_OpenMP(T x,
            T d_approx,
            Primes& primes,
            DFactorTable& factor,
-           int threads)
+           int threads,
+           double& time)
 {
   int64_t xz = x / z;
+  LoadBalancer loadBalancer(x, y, z, k, xz, d_approx);
+  int resume_threads = loadBalancer.get_resume_threads();
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);
-
   PiTable pi(y);
-  LoadBalancer loadBalancer(x, xz, d_approx);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
+    // 1st resume computations from backup file
+    for (int j = i; j < resume_threads; j += threads)
+    {
+      int64_t low = 0;
+      int64_t segments = 0;
+      int64_t segment_size = 0;
+      T sum = 0;
+      Runtime runtime;
+
+      if (loadBalancer.resume(j, low, segments, segment_size))
+      {
+        runtime.start();
+        // Unsigned integer division is usually slightly
+        // faster than signed integer division
+        using UT = typename make_unsigned<T>::type;
+        sum = D_thread((UT) x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
+        loadBalancer.update_result(j, sum);
+        runtime.stop();
+      }
+    }
+
     int64_t low = 0;
     int64_t segments = 0;
     int64_t segment_size = 0;
     T sum = 0;
     Runtime runtime;
 
-    while (loadBalancer.get_work(&low, &segments, &segment_size, sum, runtime))
+    // 2nd get new work from loadBalancer
+    while (loadBalancer.get_work(i, &low, &segments, &segment_size, sum, runtime))
     {
       runtime.start();
       // Unsigned integer division is usually slightly
@@ -230,6 +253,8 @@ T D_OpenMP(T x,
     }
   }
 
+  loadBalancer.finish_backup();
+  time = loadBalancer.get_wtime();
   T sum = (T) loadBalancer.get_sum();
 
   return sum;
@@ -251,12 +276,19 @@ int64_t D(int64_t x,
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
-  DFactorTable<uint16_t> factor(y, z, threads);
-  auto primes = generate_primes<int32_t>(y);
-  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+  int64_t xz = x / z;
+  LoadBalancer loadBalancer(x, y, z, k, xz, d_approx);
+  maxint_t sum = 0;
+
+  if (!loadBalancer.resume(sum, time))
+  {
+    DFactorTable<uint16_t> factor(y, z, threads);
+    auto primes = generate_primes<int32_t>(y);
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
+  }
 
   print("D", sum, time);
-  return sum;
+  return (int64_t) sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -273,29 +305,34 @@ int128_t D(int128_t x,
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
-  int128_t sum;
+  int64_t xz = x / z;
+  LoadBalancer loadBalancer(x, y, z, k, xz, d_approx);
+  maxint_t sum = 0;
 
-  // uses less memory
-  if (z <= DFactorTable<uint16_t>::max())
+  if (!loadBalancer.resume(sum, time))
   {
-    DFactorTable<uint16_t> factor(y, z, threads);
-    auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
-  }
-  else
-  {
-    DFactorTable<uint32_t> factor(y, z, threads);
-
     // uses less memory
-    if (y <= numeric_limits<uint32_t>::max())
+    if (z <= DFactorTable<uint16_t>::max())
     {
+      DFactorTable<uint16_t> factor(y, z, threads);
       auto primes = generate_primes<uint32_t>(y);
-      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
     }
     else
     {
-      auto primes = generate_primes<int64_t>(y);
-      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads); 
+      DFactorTable<uint32_t> factor(y, z, threads);
+
+      // uses less memory
+      if (y <= numeric_limits<uint32_t>::max())
+      {
+        auto primes = generate_primes<uint32_t>(y);
+        sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
+      }
+      else
+      {
+        auto primes = generate_primes<int64_t>(y);
+        sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
+      }
     }
   }
 

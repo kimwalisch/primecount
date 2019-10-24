@@ -13,6 +13,7 @@
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 #include <S2Status.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 
@@ -33,15 +34,29 @@ struct Runtime
 class LoadBalancer
 {
 public:
-  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
-  bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t sum, Runtime& runtime);
+  LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t k, int64_t sieve_limit, maxint_t sum_approx);
+  bool get_work(int thread_id, int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t sum, Runtime& runtime);
   maxint_t get_sum() const;
+
+  bool resume(int thread_id, int64_t& low, int64_t& segments, int64_t& segment_size) const;
+  bool resume(maxint_t& s2_hard, double& time) const;
+  void update_result(int thread_id, maxint_t s2);
+  int get_resume_threads() const;
+  double get_wtime() const;
+  void finish_backup();
 
 private:
   void update(int64_t* low, int64_t* segments, Runtime& runtime);
   void update_segments(Runtime& runtime);
+  void backup(int thread_id, int64_t low, int64_t segments, int64_t segment_size);
+  void backup(int thread_id);
   double remaining_secs() const;
 
+  maxint_t x_;
+  int64_t y_;
+  int64_t z_;
+  int64_t k_;
+  int64_t x_star_;
   int64_t low_;
   int64_t max_low_;
   int64_t sieve_limit_;
@@ -51,7 +66,10 @@ private:
   maxint_t sum_;
   maxint_t sum_approx_;
   double time_;
+  double backup_time_;
   S2Status status_;
+  nlohmann::json json_;
+  nlohmann::json copy_;
 };
 
 } // namespace
