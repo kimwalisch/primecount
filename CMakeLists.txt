@@ -52,7 +52,6 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/SegmentedPiTable.cpp
-            src/S1.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
             src/S2Status.cpp

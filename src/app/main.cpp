@@ -17,7 +17,6 @@
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
-#include <S1.hpp>
 #include <json.hpp>
 
 #include <stdint.h>

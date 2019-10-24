@@ -12,6 +12,7 @@
 
 #include <int128_t.hpp>
 #include <stdint.h>
+#include <string>
 
 namespace primecount {
 
@@ -19,6 +20,7 @@ enum OptionID
 {
   OPTION_ALPHA_Y,
   OPTION_ALPHA_Z,
+  OPTION_BACKUP,
   OPTION_DEFAULT,
   OPTION_GOURDON,
   OPTION_GOURDON_64,
@@ -29,6 +31,7 @@ enum OptionID
   OPTION_NTHPRIME,
   OPTION_NUMBER,
   OPTION_PRIMESIEVE,
+  OPTION_RESUME,
   OPTION_LI,
   OPTION_LIINV,
   OPTION_RI,
@@ -52,6 +55,13 @@ struct CmdOptions
   int64_t a = -1;
   int option = OPTION_DEFAULT;
   bool time = false;
+  std::string resumeFile;
+  std::string backupFile;
+
+  bool is_resume() const
+  {
+    return !resumeFile.empty();
+  }
 };
 
 CmdOptions parseOptions(int, char**);

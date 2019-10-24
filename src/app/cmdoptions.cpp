@@ -13,10 +13,12 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <backup.hpp>
 #include <print.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <fstream>
 #include <cstddef>
 #include <map>
 #include <vector>
@@ -35,6 +37,10 @@ map<string, OptionID> optionMap =
 {
   { "--alpha_y", OPTION_ALPHA_Y },
   { "--alpha_z", OPTION_ALPHA_Z },
+  { "-b", OPTION_BACKUP },
+  { "--backup", OPTION_BACKUP },
+  { "-r", OPTION_RESUME },
+  { "--resume", OPTION_RESUME },
   { "-g", OPTION_GOURDON },
   { "--gourdon", OPTION_GOURDON },
   { "--gourdon_64", OPTION_GOURDON_64 },
@@ -119,6 +125,36 @@ string getValue(const string& str)
     return str.substr(pos);
 }
 
+/// e.g. "--resume=primecount.backup" -> return "primecount.backup"
+string getBackupFile(string str)
+{
+  size_t pos = str.find_first_of("=");
+
+  if (pos != string::npos)
+    return str.substr(pos + 1);
+
+  return backup_file();
+}
+
+void optionBackup(Option& opt,
+                  CmdOptions& opts)
+{
+  opts.backupFile = getBackupFile(opt.str);
+  set_backup_file(opts.backupFile);
+}
+
+void optionResume(Option& opt,
+                  CmdOptions& opts)
+{
+  opts.resumeFile = getBackupFile(opt.str);
+  set_backup_file(opts.resumeFile);
+
+  ifstream ifs(backup_file());
+
+  if (!ifs.is_open())
+    throw primecount_error("failed to open backup file: " + backup_file());
+}
+
 /// e.g. "--threads=8"
 /// -> opt.opt = "--threads"
 /// -> opt.val = "8"
@@ -158,10 +194,12 @@ CmdOptions parseOptions(int argc, char* argv[])
     {
       case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
       case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
+      case OPTION_BACKUP:  optionBackup(opt, opts); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
+      case OPTION_RESUME:  optionResume(opt, opts); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
@@ -170,10 +208,20 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
-  if (numbers.empty())
-    throw primecount_error("missing x number");
-  else
-    opts.x = numbers[0];
+  if (!opts.is_resume())
+  {
+    if (numbers.empty())
+      throw primecount_error("missing x number!");
+    else
+      opts.x = numbers[0];
+  }
+
+  if (!opts.backupFile.empty() &&
+      !opts.resumeFile.empty() &&
+      opts.backupFile != opts.resumeFile)
+  {
+    throw primecount_error("resume and backup file must be identical!");
+  }
 
   return opts;
 }
