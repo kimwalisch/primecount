@@ -33,14 +33,8 @@ void test();
 /// Command-line options
 map<string, OptionID> optionMap =
 {
-  { "-a", OPTION_ALPHA },
-  { "--alpha", OPTION_ALPHA },
   { "--alpha_y", OPTION_ALPHA_Y },
   { "--alpha_z", OPTION_ALPHA_Z },
-  { "-d", OPTION_DELEGLISE_RIVAT },
-  { "--deleglise_rivat", OPTION_DELEGLISE_RIVAT },
-  { "--deleglise_rivat_64", OPTION_DELEGLISE_RIVAT_64 },
-  { "--deleglise_rivat_128", OPTION_DELEGLISE_RIVAT_128 },
   { "-g", OPTION_GOURDON },
   { "--gourdon", OPTION_GOURDON },
   { "--gourdon_64", OPTION_GOURDON_64 },
@@ -49,13 +43,6 @@ map<string, OptionID> optionMap =
   { "--help", OPTION_HELP },
   { "-l", OPTION_LEGENDRE },
   { "--legendre", OPTION_LEGENDRE },
-  { "--lehmer", OPTION_LEHMER },
-  { "--lmo", OPTION_LMO },
-  { "--lmo1", OPTION_LMO1 },
-  { "--lmo2", OPTION_LMO2 },
-  { "--lmo3", OPTION_LMO3 },
-  { "--lmo4", OPTION_LMO4 },
-  { "--lmo5", OPTION_LMO5 },
   { "-m", OPTION_MEISSEL },
   { "--meissel", OPTION_MEISSEL },
   { "-n", OPTION_NTHPRIME },
@@ -68,11 +55,6 @@ map<string, OptionID> optionMap =
   { "--Ri", OPTION_RI },
   { "--Ri_inverse", OPTION_RIINV },
   { "--phi", OPTION_PHI },
-  { "--P2", OPTION_P2 },
-  { "--S1", OPTION_S1 },
-  { "--S2_easy", OPTION_S2_EASY },
-  { "--S2_hard", OPTION_S2_HARD },
-  { "--S2_trivial", OPTION_S2_TRIVIAL },
   { "--AC", OPTION_AC },
   { "--B", OPTION_B },
   { "--D", OPTION_D },
@@ -174,7 +156,6 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionMap[opt.opt])
     {
-      case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
       case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;

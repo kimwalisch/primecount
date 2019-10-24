@@ -68,7 +68,6 @@ void set_num_threads(int num_threads);
 int get_num_threads();
 
 /// Largest number supported by pi(const std::string& x).
-/// @param alpha Tuning factor
 /// @return 64-bit CPUs: max >= 10^27,
 ///         32-bit CPUs: 2^63-1
 /// The return type is a string as get_max_x() may be a

@@ -171,63 +171,6 @@ void print(maxint_t x, int64_t y, int threads)
   }
 }
 
-void print(maxint_t x, int64_t y, int64_t c, int threads)
-{
-  if (print_variables())
-  {
-    maxint_t z = x / y;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-    print_threads(threads);
-    cout << endl;
-  }
-
-  if (print_variables())
-  {
-    ofstream outfile("primecount.log", ofstream::out | ofstream::app);
-
-    if (outfile.is_open())
-    {
-      maxint_t z = x / y;
-      outfile << "x = " << x << endl;
-      outfile << "y = " << y << endl;
-      outfile << "z = " << z << endl;
-      outfile << "c = " << c << endl;
-      outfile << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-      outfile << "threads = " << threads << endl;
-      outfile << endl;
-    }
-  }
-}
-
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
-{
-  if (is_print())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    print_threads(threads);
-  }
-
-  ofstream outfile("primecount.log", ofstream::out | ofstream::app);
-
-  if (outfile.is_open())
-  {
-    outfile << "x = " << x << endl;
-    outfile << "y = " << y << endl;
-    outfile << "z = " << z << endl;
-    outfile << "c = " << c << endl;
-    outfile << "alpha = " << fixed << setprecision(3) << alpha << endl;
-    outfile << "threads = " << threads << endl;
-  }
-}
-
 void print_gourdon(maxint_t x, int64_t y, int threads)
 {
   if (print_variables())

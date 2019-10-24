@@ -75,14 +75,10 @@ namespace {
   int threads_ = 0;
 #endif
 
-// Below 10^7 LMO is faster than Gourdon's algorithm
-const int lmo_threshold_ = 10000000;
+// Below 10^5 Meissel is faster than Gourdon's algorithm
+const int meissel_threshold_ = 100000;
 
 int status_precision_ = -1;
-
-// Tuning factor used in the Lagarias-Miller-Odlyzko
-// and Deleglise-Rivat algorithms.
-double alpha_ = -1;
 
 // Tuning factor used in Xavier Gourdon's algorithm
 double alpha_y_ = -1;
@@ -101,18 +97,10 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  if (x <= lmo_threshold_)
-    return pi_lmo5(x);
+  if (x <= meissel_threshold_)
+    return pi_meissel(x, threads);
   else
-  {
-#ifdef HAVE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_64(x, threads);
-#endif
-
     return pi_gourdon_64(x, threads);
-  }
 }
 
 #ifdef HAVE_INT128_T
@@ -128,15 +116,7 @@ int128_t pi(int128_t x, int threads)
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
   else
-  {
-#ifdef HAVE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_128(x, threads);
-#endif
-
     return pi_gourdon_128(x, threads);
-  }
 }
 
 #endif
@@ -154,26 +134,12 @@ string pi(const string& x, int threads)
   return oss.str();
 }
 
-int64_t pi_deleglise_rivat(int64_t x, int threads)
-{
-  return pi_deleglise_rivat_64(x, threads);
-}
-
 int64_t pi_gourdon(int64_t x, int threads)
 {
   return pi_gourdon_64(x, threads);
 }
 
 #ifdef HAVE_INT128_T
-
-int128_t pi_deleglise_rivat(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi_deleglise_rivat_64((int64_t) x, threads);
-  else
-    return pi_deleglise_rivat_128(x, threads);
-}
 
 int128_t pi_gourdon(int128_t x, int threads)
 {
@@ -237,11 +203,6 @@ int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold
   return threads;
 }
 
-void set_alpha(double alpha)
-{
-  alpha_ = alpha;
-}
-
 void set_alpha_y(double alpha_y)
 {
   alpha_y_ = alpha_y;
@@ -275,54 +236,6 @@ double get_alpha_z(int64_t y, int64_t z)
 {
   // z = y * alpha_z, thus alpha_z = z / y
   return (double) z / y;
-}
-
-/// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
-/// alpha = a log(x)^2 + b log(x) + c
-/// a, b and c have been determined empirically.
-/// @see doc/alpha-factor-tuning.pdf
-///
-double get_alpha_lmo(maxint_t x)
-{
-  double alpha = alpha_;
-
-  // use default alpha if no command-line alpha provided
-  if (alpha < 1)
-  {
-    double a = 0.00156512;
-    double b = -0.0261411;
-    double c = 0.990948;
-    double logx = log((double) x);
-
-    alpha = a * pow(logx, 2) + b * logx + c;
-  }
-
-  return in_between(1, alpha, iroot<6>(x));
-}
-
-/// Get the Deleglise-Rivat alpha tuning factor.
-/// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
-/// a, b, c and d have been determined empirically.
-/// @see doc/alpha-tuning-factor.pdf
-///
-double get_alpha_deleglise_rivat(maxint_t x)
-{
-  double alpha = alpha_;
-  double x2 = (double) x;
-
-  // use default alpha if no command-line alpha provided
-  if (alpha < 1)
-  {
-    double a = 0.00033826;
-    double b = 0.0018113;
-    double c = -0.110407;
-    double d = 1.3724;
-    double logx = log(x2);
-
-    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
-  }
-
-  return in_between(1, alpha, iroot<6>(x));
 }
 
 /// In Xavier Gourdon's algorithm there are 2 alpha tuning

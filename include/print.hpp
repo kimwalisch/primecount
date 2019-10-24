@@ -31,8 +31,6 @@ void print(const std::string& str);
 void print(const std::string& str, maxint_t res);
 void print(const std::string& str, maxint_t res, double time);
 void print(maxint_t x, int64_t y, int threads);
-void print(maxint_t x, int64_t y, int64_t c, int threads);
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads);
 
 void print_gourdon(maxint_t x, int64_t y, int threads);
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);

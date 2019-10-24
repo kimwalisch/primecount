@@ -49,7 +49,6 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/FactorTable.cpp
             src/Li.cpp
             src/P2.cpp
-            src/P3.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/SegmentedPiTable.cpp
@@ -61,20 +60,10 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/nth_prime.cpp
             src/phi.cpp
             src/pi_legendre.cpp
-            src/pi_lehmer.cpp
             src/pi_meissel.cpp
             src/pi_primesieve.cpp
             src/primecount.cpp
             src/print.cpp
-            src/lmo/pi_lmo1.cpp
-            src/lmo/pi_lmo2.cpp
-            src/lmo/pi_lmo3.cpp
-            src/lmo/pi_lmo4.cpp
-            src/lmo/pi_lmo5.cpp
-            src/lmo/pi_lmo_parallel.cpp
-            src/deleglise-rivat/S2_hard.cpp
-            src/deleglise-rivat/S2_trivial.cpp
-            src/deleglise-rivat/pi_deleglise_rivat3.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
@@ -106,10 +95,8 @@ if(WITH_LIBDIVIDE)
 endif()
 
 if(libdivide_branchfree)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
 else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
 endif()
 

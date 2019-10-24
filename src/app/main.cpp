@@ -219,123 +219,6 @@ maxint_t Sigma(maxint_t x, int threads)
     return Sigma(x, y, threads);
 }
 
-maxint_t P2(maxint_t x, int threads)
-{
-  if (x < 1)
-    return 0;
-
-  double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if (x > limit)
-    throw primecount_error("P2(x): x must be <= " + to_str(limit));
-
-  if (is_print())
-    set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-
-  if (x <= numeric_limits<int64_t>::max())
-    return P2((int64_t) x, y, threads);
-  else
-    return P2(x, y, threads);
-}
-
-maxint_t S1(maxint_t x, int threads)
-{
-  if (x < 1)
-    return 0;
-
-  double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if (x > limit)
-    throw primecount_error("S1(x): x must be <= " + to_str(limit));
-
-  if (is_print())
-    set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t c = PhiTiny::get_c(y);
-
-  if (x <= numeric_limits<int64_t>::max())
-    return S1((int64_t) x, y, c, threads);
-  else
-    return S1(x, y, c, threads);
-}
-
-maxint_t S2_trivial(maxint_t x)
-{
-  if (x < 1)
-    return 0;
-
-  double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if (x > limit)
-    throw primecount_error("S2_trivial(x): x must be <= " + to_str(limit));
-
-  if (is_print())
-    set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
-
-  if (x <= numeric_limits<int64_t>::max())
-    return S2_trivial((int64_t) x, y, z, c);
-  else
-    return S2_trivial(x, y, z, c);
-}
-
-maxint_t S2_easy(maxint_t x, int threads)
-{
-  if (x < 1)
-    return 0;
-
-  double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if (x > limit)
-    throw primecount_error("S2_easy(x): x must be <= " + to_str(limit));
-
-  if (is_print())
-    set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
-
-  if (x <= numeric_limits<int64_t>::max())
-    return S2_easy((int64_t) x, y, z, c, threads);
-  else
-    return S2_easy(x, y, z, c, threads);
-}
-
-maxint_t S2_hard(maxint_t x, int threads)
-{
-  if (x < 1)
-    return 0;
-
-  double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if (x > limit)
-    throw primecount_error("S2_hard(x): x must be <= " + to_str(limit));
-
-  if (is_print())
-    set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
-
-  if (x <= numeric_limits<int64_t>::max())
-    return S2_hard((int64_t) x, y, z, c, (int64_t) Ri(x), threads);
-  else
-    return S2_hard(x, y, z, c, Ri(x), threads);
-}
-
 } // namespace
 
 int main (int argc, char* argv[])
@@ -358,30 +241,12 @@ int main (int argc, char* argv[])
     {
       case OPTION_DEFAULT:
         res = pi(x, threads); break;
-      case OPTION_DELEGLISE_RIVAT:
-        res = pi_deleglise_rivat(x, threads); break;
-      case OPTION_DELEGLISE_RIVAT_64:
-        res = pi_deleglise_rivat_64(to_int64(x), threads); break;
       case OPTION_GOURDON:
         res = pi_gourdon(x, threads); break;
       case OPTION_GOURDON_64:
         res = pi_gourdon_64(to_int64(x), threads); break;
       case OPTION_LEGENDRE:
         res = pi_legendre(to_int64(x), threads); break;
-      case OPTION_LEHMER:
-        res = pi_lehmer(to_int64(x), threads); break;
-      case OPTION_LMO:
-        res = pi_lmo_parallel(to_int64(x), threads); break;
-      case OPTION_LMO1:
-        res = pi_lmo1(to_int64(x)); break;
-      case OPTION_LMO2:
-        res = pi_lmo2(to_int64(x)); break;
-      case OPTION_LMO3:
-        res = pi_lmo3(to_int64(x)); break;
-      case OPTION_LMO4:
-        res = pi_lmo4(to_int64(x)); break;
-      case OPTION_LMO5:
-        res = pi_lmo5(to_int64(x)); break;
       case OPTION_MEISSEL:
         res = pi_meissel(to_int64(x), threads); break;
       case OPTION_PRIMESIEVE:
@@ -398,16 +263,6 @@ int main (int argc, char* argv[])
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
-      case OPTION_P2:
-        res = P2(x, threads); break;
-      case OPTION_S1:
-        res = S1(x, threads); break;
-      case OPTION_S2_EASY:
-        res = S2_easy(x, threads); break;
-      case OPTION_S2_HARD:
-        res = S2_hard(x, threads); break;
-      case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x); break;
       case OPTION_AC:
         res = AC(x, threads); break;
       case OPTION_B:
@@ -419,8 +274,6 @@ int main (int argc, char* argv[])
       case OPTION_SIGMA:
         res = Sigma(x, threads); break;
 #ifdef HAVE_INT128_T
-      case OPTION_DELEGLISE_RIVAT_128:
-        res = pi_deleglise_rivat_128(x, threads); break;
       case OPTION_GOURDON_128:
         res = pi_gourdon_128(x, threads); break;
 #endif
