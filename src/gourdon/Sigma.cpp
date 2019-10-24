@@ -15,9 +15,11 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <calculator.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <json.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 
@@ -28,6 +30,45 @@ using namespace std;
 using namespace primecount;
 
 namespace {
+
+template <typename T>
+void backup(T x,
+            int64_t y,
+            T sigma,
+            double time)
+{
+  auto json = load_backup();
+
+  json["Sigma"]["x"] = to_string(x);
+  json["Sigma"]["y"] = y;
+  json["Sigma"]["sigma"] = to_string(sigma);
+  json["Sigma"]["percent"] = 100.0;
+  json["Sigma"]["seconds"] = get_time() - time;
+
+  store_backup(json);
+}
+
+template <typename T>
+bool resume(T x,
+            int64_t y,
+            T& sigma,
+            double& time)
+{
+  auto json = load_backup();
+
+  if (is_resume(json, "Sigma", x, y))
+  {
+    double percent = json["Sigma"]["percent"];
+    double seconds = json["Sigma"]["seconds"];
+
+    sigma = calculator::eval<T>(json["Sigma"]["sigma"]);
+    time = get_time() - seconds;
+    print_resume(percent, x);
+    return true;
+  }
+
+  return false;
+}
 
 template <typename T>
 T Sigma0(T x, T a, int threads)
@@ -119,27 +160,34 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
   print("=== Sigma(x, y) ===");
   print_gourdon(x, y, threads);
 
-  int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_pix_sigma4 = x / (x_star * y);
-  int64_t max_pix_sigma5 = y;
-  int64_t max_pix_sigma6 = isqrt(x / x_star);
-  int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-  PiTable pi(max_pix);
-
-  int64_t a = pi[y];
-  int64_t b = pi[iroot<3>(x)];
-  int64_t c = pi[isqrt(x / y)];
-  int64_t d = pi[x_star];
-
+  int64_t sum = 0;
   double time = get_time();
-  int64_t sum = Sigma0(x, a, threads) +
-                Sigma1(a, b) +
-                Sigma2(a, b, c, d) +
-                Sigma3(b, d) +
-                Sigma4(x, y, a, x_star, pi) +
-                Sigma5(x, y, pi) +
-                Sigma6(x, x_star, pi);
-  
+
+  if (!resume(x, y, sum, time))
+  {
+    int64_t x_star = get_x_star_gourdon(x, y);
+    int64_t max_pix_sigma4 = x / (x_star * y);
+    int64_t max_pix_sigma5 = y;
+    int64_t max_pix_sigma6 = isqrt(x / x_star);
+    int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
+    PiTable pi(max_pix);
+
+    int64_t a = pi[y];
+    int64_t b = pi[iroot<3>(x)];
+    int64_t c = pi[isqrt(x / y)];
+    int64_t d = pi[x_star];
+
+    sum = Sigma0(x, a, threads) +
+          Sigma1(a, b) +
+          Sigma2(a, b, c, d) +
+          Sigma3(b, d) +
+          Sigma4(x, y, a, x_star, pi) +
+          Sigma5(x, y, pi) +
+          Sigma6(x, x_star, pi);
+
+    backup(x, y, sum, time);
+  }
+
   print("Sigma", sum, time);
   return sum;
 }
@@ -152,26 +200,33 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
   print("=== Sigma(x, y) ===");
   print_gourdon(x, y, threads);
 
-  int128_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_pix_sigma4 = x / (x_star * y);
-  int64_t max_pix_sigma5 = y;
-  int64_t max_pix_sigma6 = isqrt(x / x_star);
-  int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-  PiTable pi(max_pix);
-
-  int128_t a = pi[y];
-  int128_t b = pi[iroot<3>(x)];
-  int128_t c = pi[isqrt(x / y)];
-  int128_t d = pi[x_star];
-
+  int128_t sum = 0;
   double time = get_time();
-  int128_t sum = Sigma0(x, a, threads) +
-                 Sigma1(a, b) +
-                 Sigma2(a, b, c, d) +
-                 Sigma3(b, d) +
-                 Sigma4(x, y, a, x_star, pi) +
-                 Sigma5(x, y, pi) +
-                 Sigma6(x, x_star, pi);
+
+  if (!resume(x, y, sum, time))
+  {
+    int128_t x_star = get_x_star_gourdon(x, y);
+    int64_t max_pix_sigma4 = x / (x_star * y);
+    int64_t max_pix_sigma5 = y;
+    int64_t max_pix_sigma6 = isqrt(x / x_star);
+    int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
+    PiTable pi(max_pix);
+
+    int128_t a = pi[y];
+    int128_t b = pi[iroot<3>(x)];
+    int128_t c = pi[isqrt(x / y)];
+    int128_t d = pi[x_star];
+
+    sum = Sigma0(x, a, threads) +
+          Sigma1(a, b) +
+          Sigma2(a, b, c, d) +
+          Sigma3(b, d) +
+          Sigma4(x, y, a, x_star, pi) +
+          Sigma5(x, y, pi) +
+          Sigma6(x, x_star, pi);
+
+    backup(x, y, sum, time);
+  }
 
   print("Sigma", sum, time);
   return sum;
