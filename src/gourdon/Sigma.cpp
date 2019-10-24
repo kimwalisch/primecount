@@ -34,6 +34,7 @@ namespace {
 template <typename T>
 void backup(T x,
             int64_t y,
+            int64_t x_star,
             T sigma,
             double time)
 {
@@ -41,6 +42,7 @@ void backup(T x,
 
   json["Sigma"]["x"] = to_string(x);
   json["Sigma"]["y"] = y;
+  json["Sigma"]["x_star"] = x_star;
   json["Sigma"]["sigma"] = to_string(sigma);
   json["Sigma"]["percent"] = 100.0;
   json["Sigma"]["seconds"] = get_time() - time;
@@ -185,7 +187,7 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
           Sigma5(x, y, pi) +
           Sigma6(x, x_star, pi);
 
-    backup(x, y, sum, time);
+    backup(x, y, x_star, sum, time);
   }
 
   print("Sigma", sum, time);
@@ -225,7 +227,7 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
           Sigma5(x, y, pi) +
           Sigma6(x, x_star, pi);
 
-    backup(x, y, sum, time);
+    backup(x, y, (int64_t) x_star, sum, time);
   }
 
   print("Sigma", sum, time);
