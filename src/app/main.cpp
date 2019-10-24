@@ -374,16 +374,23 @@ int main (int argc, char* argv[])
 #endif
     }
 
+    double seconds = get_time() - time;
+    result_txt(argc, argv, res, threads, seconds);
+
     if (print_result())
     {
+      log_result(res, seconds);
+
       if (is_print())
         cout << endl;
 
       cout << res << endl;
 
       if (opt.time)
-        print_seconds(get_time() - time);
+        cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
     }
+
+    log_footer();
   }
   catch (exception& e)
   {
