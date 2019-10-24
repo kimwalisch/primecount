@@ -82,7 +82,7 @@ install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]
     then
-        sudo apt-get install -y g++-multilib make cmake cppcheck valgrind openmpi-bin libopenmpi-dev
+        sudo apt-get install -y g++-multilib make cmake cppcheck valgrind
     fi
 
 script:
@@ -136,25 +136,7 @@ script:
         valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
         valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
 
-        # 6) Test primecount MPI
-        cd ..
-        rm -rf build
-        mkdir build
-        cd build
-        if [ "${CXX:0:3}" = "g++" ]
-        then
-            cmake .. -DCMAKE_CXX_FLAGS="$CXXFLAGS -Wno-literal-suffix -Wno-strict-aliasing" \
-                     -DWITH_MPI=ON
-        fi
-        if [ "$CXX" = "clang++" ]
-        then
-            cmake .. -DWITH_MPI=ON \
-                     -DWITH_OPENMP=OFF
-        fi
-        make -j4
-        mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
-
-        # 7) Test 32-bit
+        # 6) Test 32-bit
         cd ..
         rm -rf build
         mkdir build
@@ -183,7 +165,4 @@ script:
 
         # 2) Run test suite (using sanitizers)
         make test
-
-        # 3) Run builtin tests (using sanitizers)
-        ./primecount --test
     fi
