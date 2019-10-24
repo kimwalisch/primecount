@@ -24,6 +24,8 @@ bool is_print();
 bool print_result();
 bool print_variables();
 void print_seconds(double seconds);
+void print_status(double percent, maxint_t x);
+void print_resume(double percent, maxint_t x);
 
 void print(const std::string& str);
 void print(const std::string& str, maxint_t res);
