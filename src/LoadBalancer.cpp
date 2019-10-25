@@ -128,6 +128,7 @@ void LoadBalancer::finish_backup()
   json_["D"]["z"] = z_;
   json_["D"]["k"] = k_;
   json_["D"]["x_star"] = x_star_;
+  json_["D"]["sieve_limit"] = sieve_limit_;
   json_["D"]["d"] = to_string(sum_);
   json_["D"]["percent"] = 100.0;
   json_["D"]["seconds"] = get_time() - time_;

@@ -64,6 +64,7 @@ void backup(J& json,
   json["B"]["y"] = y;
   json["B"]["low"] = low;
   json["B"]["thread_distance"] = thread_distance;
+  json["B"]["sieve_limit"] = z;
   json["B"]["pix_total"] = to_string(pix_total);
   json["B"]["b"] = to_string(b);
   json["B"]["percent"] = percent;
@@ -76,6 +77,7 @@ void backup(J& json,
 template <typename T>
 void backup(T x,
             int64_t y,
+            int64_t z,
             T b,
             double time)
 {
@@ -87,6 +89,7 @@ void backup(T x,
   json["B"]["x"] = to_string(x);
   json["B"]["y"] = y;
   json["B"]["b"] = to_string(b);
+  json["B"]["sieve_limit"] = z;
   json["B"]["percent"] = 100.0;
   json["B"]["seconds"] = get_time() - time;
 
@@ -224,7 +227,11 @@ T B_thread(T x,
 /// Memory usage: O(z^(1/2))
 ///
 template <typename T>
-T B_OpenMP(T x, int64_t y, int threads, double& time)
+T B_OpenMP(T x, 
+           int64_t y,
+           int64_t z,
+           int threads,
+           double& time)
 {
   if (x < 4)
     return 0;
@@ -233,7 +240,6 @@ T B_OpenMP(T x, int64_t y, int threads, double& time)
   T pix_total = 0;
 
   int64_t low = 2;
-  int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
 
@@ -299,8 +305,9 @@ int64_t B(int64_t x, int64_t y, int threads)
 
   if (!resume(x, y, b, time))
   {
-    b = B_OpenMP((intfast64_t) x, y, threads, time);
-    backup(x, y, b, time);
+    int64_t z = (int64_t)(x / max(y, 1));
+    b = B_OpenMP((intfast64_t) x, y, z, threads, time);
+    backup(x, y, z, b, time);
   }
 
   print("B", b, time);
@@ -320,8 +327,9 @@ int128_t B(int128_t x, int64_t y, int threads)
 
   if (!resume(x, y, b, time))
   {
-    b = B_OpenMP((intfast128_t) x, y, threads, time);
-    backup(x, y, b, time);
+    int64_t z = (int64_t)(x / max(y, 1));
+    b = B_OpenMP((intfast128_t) x, y, z, threads, time);
+    backup(x, y, z, b, time);
   }
 
   print("B", b, time);
