@@ -76,10 +76,12 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
   bitmask(124), bitmask(125), bitmask(126), bitmask(127)
 };
 
-SegmentedPiTable::SegmentedPiTable(uint64_t limit,
+SegmentedPiTable::SegmentedPiTable(uint64_t low,
+                                   uint64_t limit,
                                    uint64_t segment_size,
                                    int threads)
-  : max_high_(limit + 1)
+  : low_(low),
+    max_high_(limit + 1)
 {
   // Each bit of the pi[x] lookup table corresponds
   // to an odd integer, so there are 16 numbers per
@@ -101,11 +103,12 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   int thread_threshold = (int) 1e7;
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
-  high_ = segment_size_;
+  high_ = low_ + segment_size_;
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
 
-  uint64_t pi_low = 0;
+  // Count of primes < low
+  uint64_t pi_low = pi_legendre((low_ <= 0) ? low_ : low_ - 1, 1);
   init_next_segment(pi_low);
 }
 

@@ -37,7 +37,6 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
-#include <iostream>
 
 using namespace std;
 using namespace primecount;
@@ -148,7 +147,6 @@ bool resume(J& json,
             int64_t k,
             int64_t& min_b,
             int64_t& low,
-            int64_t& high,
             T& ac,
             double& time)
 {
@@ -158,7 +156,6 @@ bool resume(J& json,
     ac = calculator::eval<T>(json["AC"]["ac"]);
     min_b = json["AC"]["min_b"];
     low = json["AC"]["low"];
-    high = json["AC"]["high"];
     time = get_time() - seconds;
     return true;
   }
@@ -353,7 +350,6 @@ T AC_OpenMP(T x,
 
   S2Status status(x);
   PiTable pi(max(z, max_a_prime));
-  SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -391,15 +387,12 @@ T AC_OpenMP(T x,
   int64_t low = 0;
   int64_t high = 0;
 
-  if (!resume(json, x, y, z, k, resume_min_b, low, high, sum, time))
+  if (!resume(json, x, y, z, k, resume_min_b, low, sum, time))
     if (json.find("AC") != json.end())
       json.erase("AC");
 
+  SegmentedPiTable segmentedPi(low, isqrt(x), z, threads);
   int64_t resume_threads = calculate_resume_threads(json, "AC");
-  for (; !segmentedPi.finished() && segmentedPi.low() < low; segmentedPi.next());
-
-  std::cout << "low: " << segmentedPi.low() << std::endl;
-  std::cout << "high: " << segmentedPi.high() << std::endl;
 
   // This computes A and the 2nd part of the C formula.
   // Find all special leaves of type:
@@ -414,24 +407,16 @@ T AC_OpenMP(T x,
     low = segmentedPi.low();
     high = segmentedPi.high();
     json["AC"]["low"] = segmentedPi.low();
-    json["AC"]["high"] = segmentedPi.high();
 
     low = max(low, 1);
     T x_div_low = x / low;
     T x_div_high = x / high;
 
-    if (resume_min_b != 0)
-    {
-      min_b = resume_min_b;
-      resume_min_b = 0; 
-    }
-    else
-    {
-      min_b = max3(k, pi_sqrtz, pi_root3_xy);
-      min_b = max(min_b, pi[isqrt(low)]);
-      min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
-      min_b = min(min_b, pi_x_star) + 1;
-    }
+    min_b = max3(k, pi_sqrtz, pi_root3_xy);
+    min_b = max(min_b, pi[isqrt(low)]);
+    min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
+    min_b = min(min_b, pi_x_star) + 1;
+    min_b = max(min_b, resume_min_b);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
@@ -500,12 +485,14 @@ T AC_OpenMP(T x,
       }
     }
 
+    // Resume finished, reset vars so there is
+    // no reset attempt the next iteration.
+    resume_threads = 0;
+    resume_min_b = 0;
     copy.clear();
   }
 
-  json["AC"]["low"] = segmentedPi.low();
-  json["AC"]["high"] = segmentedPi.high();
-  backup(json, x, y, z, k, 100.0, time);
+  backup(json, x, y, z, k, sum, time);
 
   return sum;
 }
