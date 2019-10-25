@@ -499,6 +499,8 @@ T AC_OpenMP(T x,
           sum_thread = A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
       }
     }
+
+    copy.clear();
   }
 
   json["AC"]["low"] = segmentedPi.low();
