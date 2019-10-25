@@ -31,14 +31,162 @@
 #include <imath.hpp>
 #include <print.hpp>
 #include <S2Status.hpp>
+#include <calculator.hpp>
+#include <json.hpp>
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 using namespace std;
 using namespace primecount;
 
 namespace {
+
+/// backup to file every 60 seconds
+bool is_backup(double time)
+{
+  double seconds = get_time() - time;
+  return seconds > 1;
+}
+
+/// backup intermediate result
+template <typename T, typename J>
+void backup(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            double percent,
+            double time)
+{
+  json["AC"]["x"] = to_string(x);
+  json["AC"]["y"] = y;
+  json["AC"]["z"] = z;
+  json["AC"]["k"] = k;
+  json["AC"]["percent"] = percent;
+  json["AC"]["seconds"] = get_time() - time;
+
+  store_backup(json);
+}
+
+/// backup result
+template <typename T, typename J>
+void backup(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            T ac,
+            double time)
+{
+  if (json.find("AC") != json.end())
+    json.erase("AC");
+
+  json["AC"]["x"] = to_string(x);
+  json["AC"]["y"] = y;
+  json["AC"]["z"] = z;
+  json["AC"]["k"] = k;
+  json["AC"]["ac"] = to_string(ac);
+  json["AC"]["percent"] = 100.0;
+  json["AC"]["seconds"] = get_time() - time;
+
+  store_backup(json);
+}
+
+/// update backup (without storing to disk)
+template <typename T, typename J>
+void update(J& json,
+            int64_t min_b,
+            int64_t b,
+            int64_t max_b,
+            int64_t thread_id,
+            T ac)
+{
+  string tid = "thread" + to_string(thread_id);
+
+  json["AC"]["min_b"] = min_b;
+  json["AC"]["ac"] = to_string(ac);
+
+  if (b <= max_b)
+    json["AC"][tid]["b"] = b;
+  else
+  {
+    // finished
+    if (json["AC"].find(tid) != json["AC"].end())
+      json["AC"].erase(tid);
+  }
+}
+
+/// resume thread
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            int64_t& b,
+            int thread_id)
+{
+  if (is_resume(json, "AC", thread_id, x, y, z, k))
+  {
+    string tid = "thread" + to_string(thread_id);
+    b = json["AC"][tid]["b"];
+    return true;
+  }
+
+  return false;
+}
+
+/// resume vars
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            int64_t& min_b,
+            T& ac,
+            double& time)
+{
+  if (is_resume(json, "AC", x, y, z, k))
+  {
+    double seconds = json["AC"]["seconds"];
+    ac = calculator::eval<T>(json["AC"]["ac"]);
+    min_b = json["AC"]["min_b"];
+    time = get_time() - seconds;
+    return true;
+  }
+
+  return false;
+}
+
+/// resume result
+template <typename T, typename J>
+bool resume(J& json,
+            T x,
+            int64_t y,
+            int64_t z,
+            int64_t k,
+            T& ac,
+            double& time)
+{
+  if (is_resume(json, "AC", x, y, z, k))
+  {
+    double percent = json["AC"]["percent"];
+    double seconds = json["AC"]["seconds"];
+    print_resume(percent, x);
+
+    if (!json["AC"].count("min_b"))
+    {
+      ac = calculator::eval<T>(json["AC"]["ac"]);
+      time = get_time() - seconds;
+      return true;
+    }
+  }
+
+  return false;
+}
 
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
@@ -190,7 +338,8 @@ T AC_OpenMP(T x,
             int64_t x_star,
             int64_t max_a_prime,
             Primes& primes,
-            int threads)
+            int threads,
+            double& time)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -230,6 +379,17 @@ T AC_OpenMP(T x,
       status.print(b, pi_x13);
   }
 
+  auto json = load_backup();
+  auto copy = json;
+  double backup_time = get_time();
+  int64_t resume_min_b = 0;
+
+  if (!resume(json, x, y, z, k, resume_min_b, sum, time))
+    if (json.find("AC") != json.end())
+      json.erase("AC");
+
+  int64_t resume_threads = calculate_resume_threads(json, "AC");
+
   // This computes A and the 2nd part of the C formula.
   // Find all special leaves of type:
   // x / (primes[b] * primes[i]) <= x^(1/2)
@@ -250,6 +410,7 @@ T AC_OpenMP(T x,
     min_b = max(min_b, pi[isqrt(low)]);
     min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
     min_b = min(min_b, pi_x_star) + 1;
+    min_b = max(min_b, resume_min_b);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
@@ -258,18 +419,64 @@ T AC_OpenMP(T x,
     int64_t max_b = pi[sqrt_low];
     max_b = max(max_b, pi_x_star);
 
-    // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-    // A  formula: pi[x_star] < b <= pi[x13]
-    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
-    for (int64_t b = min_b; b <= max_b; b++)
+    #pragma omp parallel for num_threads(threads)
+    for (int64_t i = 0; i < threads; i++)
     {
-      if (b <= pi_x_star)
-        sum += C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
-      else
-        sum +=  A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+      int64_t b = 0;
 
-      if (is_print())
-        status.print(b, pi_x13);
+      // 1st resume computations from backup file
+      for (int64_t j = i; j < resume_threads; j += threads)
+      {
+        if (resume(copy, x, y, z, k, b, j))
+        {
+          T sum_thread = 0;
+
+          if (b <= pi_x_star)
+            sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+          else
+            sum_thread = A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+
+          #pragma omp critical (ac)
+          {
+            sum += sum_thread;
+            string tid = "thread" + to_string(j);
+            json["AC"]["ac"] = to_string(sum);
+            json["AC"].erase(tid);
+          }
+        }
+      }
+
+      T sum_thread = 0;
+
+      // 2nd, run new computations
+      while (true)
+      {
+        if (is_print())
+          status.print(b, pi_x13);
+
+        #pragma omp critical (ac)
+        {
+          sum += sum_thread;
+          b = min_b++;
+
+          update(json, min_b, b, max_b, i, sum);
+
+          if (is_backup(backup_time))
+          {
+            double percent = status.getPercent(min_b, pi_x13, min_b, pi_x13);
+            backup(json, x, y, z, k, percent, time);
+            backup_time = get_time();
+          }
+        }
+
+        if (b > max_b)
+          break;
+
+        if (b <= pi_x_star)
+          sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+        else
+          sum_thread = A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+      }
     }
   }
 
@@ -297,7 +504,7 @@ int64_t AC(int64_t x,
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<int32_t>(max_prime);
 
-  int64_t ac = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+  int64_t ac = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
 
   print("A + C", ac, time);
   return ac;
@@ -326,12 +533,12 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
   }
   else
   {
     auto primes = generate_primes<int64_t>(max_prime);
-    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
   }
 
   print("A + C", ac, time);
