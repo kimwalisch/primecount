@@ -111,4 +111,19 @@ void S2Status::print(maxint_t n, maxint_t limit)
   }
 }
 
+/// Hack used when resuming from backup file
+void S2Status::print(double percent)
+{
+  percent_ = percent;
+  time_ = get_time();
+  ostringstream status;
+  ostringstream out;
+
+  status << "Status: " << fixed << setprecision(precision_) << percent_ << "%";
+  size_t spaces = status.str().length();
+  string reset_line = "\r" + string(spaces,' ') + "\r";
+  out << reset_line << status.str();
+  cout << out.str() << flush;
+}
+
 } // namespace

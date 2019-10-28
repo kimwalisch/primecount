@@ -411,7 +411,22 @@ T AC_OpenMP(T x,
   int64_t next_b = 0;
   int64_t low = 0;
 
-  if (!resume_a_c2(json, x, y, z, k, next_b, low, sum, time))
+  if (resume_a_c2(json, x, y, z, k, next_b, low, sum, time))
+  {
+    // Currently our implementation cannot accurately estimate
+    // the completion percentage near the end. We cheat and
+    // simply set it to 95%. In order to fix this we would need
+    // to implement backwards sieving in SegmentedPi.cpp which
+    // would add some more complexity. I don't think this is
+    // worth doing.
+    if (low > 0)
+    {
+      status.setPercent(95);
+      if (is_print())
+        status.print(/* percent = */ 95);
+    }
+  }
+  else
   {
     if (!resume_c1(json, x, y, z, k, next_b, sum, time))
       if (json.find("AC") != json.end())
@@ -544,7 +559,7 @@ T AC_OpenMP(T x,
       while (true)
       {
         if (is_print())
-          status.print(b, pi_x13);
+          status.print(b, max_b);
 
         #pragma omp critical (ac)
         {
@@ -555,7 +570,7 @@ T AC_OpenMP(T x,
 
           if (is_backup(backup_time))
           {
-            double percent = status.getPercent(next_b, pi_x13, next_b, pi_x13);
+            double percent = status.getPercent(next_b, max_b, next_b, max_b);
             backup(json, x, y, z, k, percent, time);
             backup_time = get_time();
           }
