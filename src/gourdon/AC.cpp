@@ -516,9 +516,15 @@ int64_t AC(int64_t x,
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
-  auto primes = generate_primes<int32_t>(max_prime);
+  int64_t ac = 0;
 
-  int64_t ac = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+  auto json = load_backup();
+
+  if (!resume(json, x, y, z, k, ac, time))
+  {
+    auto primes = generate_primes<int32_t>(max_prime);
+    ac = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+  }
 
   print("A + C", ac, time);
   return ac;
@@ -541,18 +547,23 @@ int128_t AC(int128_t x,
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
-  int128_t ac;
+  int128_t ac = 0;
 
-  // uses less memory
-  if (max_prime <= numeric_limits<uint32_t>::max())
+  auto json = load_backup();
+
+  if (!resume(json, x, y, z, k, ac, time))
   {
-    auto primes = generate_primes<uint32_t>(max_prime);
-    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
-  }
-  else
-  {
-    auto primes = generate_primes<int64_t>(max_prime);
-    ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+    // uses less memory
+    if (max_prime <= numeric_limits<uint32_t>::max())
+    {
+      auto primes = generate_primes<uint32_t>(max_prime);
+      ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+    }
+    else
+    {
+      auto primes = generate_primes<int64_t>(max_prime);
+      ac = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+    }
   }
 
   print("A + C", ac, time);
