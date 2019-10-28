@@ -47,7 +47,7 @@ namespace {
 bool is_backup(double time)
 {
   double seconds = get_time() - time;
-  return seconds > 1;
+  return seconds > 0.1;
 }
 
 /// backup intermediate result
@@ -98,14 +98,14 @@ void backup(J& json,
 template <typename T, typename J>
 void update(J& json,
             int64_t b,
-            int64_t min_b,
+            int64_t next_b,
             int64_t max_b,
             int64_t thread_id,
             T ac)
 {
   string tid = "thread" + to_string(thread_id);
 
-  json["AC"]["min_b"] = min_b;
+  json["AC"]["next_b"] = next_b;
   json["AC"]["ac"] = to_string(ac);
 
   if (b <= max_b)
@@ -145,7 +145,7 @@ bool resume(J& json,
             int64_t y,
             int64_t z,
             int64_t k,
-            int64_t& min_b,
+            int64_t& next_b,
             int64_t& low,
             T& ac,
             double& time)
@@ -154,7 +154,7 @@ bool resume(J& json,
   {
     double seconds = json["AC"]["seconds"];
     ac = calculator::eval<T>(json["AC"]["ac"]);
-    min_b = json["AC"]["min_b"];
+    next_b = json["AC"]["next_b"];
     low = json["AC"]["low"];
     time = get_time() - seconds;
     return true;
@@ -179,7 +179,7 @@ bool resume(J& json,
     double seconds = json["AC"]["seconds"];
     print_resume(percent, x);
 
-    if (!json["AC"].count("min_b"))
+    if (!json["AC"].count("next_b"))
     {
       ac = calculator::eval<T>(json["AC"]["ac"]);
       time = get_time() - seconds;
@@ -380,14 +380,14 @@ T AC_OpenMP(T x,
       status.print(b, pi_x13);
   }
 
+  auto backup_time = get_time();
   auto json = load_backup();
   auto copy = json;
-  double backup_time = get_time();
-  int64_t resume_min_b = 0;
+  int64_t next_b = 0;
   int64_t low = 0;
   int64_t high = 0;
 
-  if (!resume(json, x, y, z, k, resume_min_b, low, sum, time))
+  if (!resume(json, x, y, z, k, next_b, low, sum, time))
     if (json.find("AC") != json.end())
       json.erase("AC");
 
@@ -416,7 +416,7 @@ T AC_OpenMP(T x,
     min_b = max(min_b, pi[isqrt(low)]);
     min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
     min_b = min(min_b, pi_x_star) + 1;
-    min_b = max(min_b, resume_min_b);
+    next_b = max(next_b, min_b);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
@@ -463,13 +463,13 @@ T AC_OpenMP(T x,
         #pragma omp critical (ac)
         {
           sum += sum_thread;
-          b = min_b++;
+          b = next_b++;
 
-          update(json, b, min_b, max_b, i, sum);
+          update(json, b, next_b, max_b, i, sum);
 
           if (is_backup(backup_time))
           {
-            double percent = status.getPercent(min_b, pi_x13, min_b, pi_x13);
+            double percent = status.getPercent(next_b, pi_x13, next_b, pi_x13);
             backup(json, x, y, z, k, percent, time);
             backup_time = get_time();
           }
@@ -488,7 +488,7 @@ T AC_OpenMP(T x,
     // Resume finished, reset vars so there is
     // no reset attempt the next iteration.
     resume_threads = 0;
-    resume_min_b = 0;
+    next_b = 0;
     copy.clear();
   }
 

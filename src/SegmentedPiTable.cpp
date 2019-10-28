@@ -107,15 +107,14 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
 
-  // Count of primes < low
-  uint64_t pi_low = pi_legendre((low_ <= 0) ? low_ : low_ - 1, 1);
+  uint64_t pi_low = pi_legendre(low_, threads);
   init_next_segment(pi_low);
 }
 
 /// Increase low & high and initialize the next segment.
 void SegmentedPiTable::next()
 {
-  // Count of primes < low
+  // Count of primes <= low
   uint64_t pi_low = operator[](high_ - 1);
 
   low_ = high_;
