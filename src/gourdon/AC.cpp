@@ -97,16 +97,17 @@ void backup_result(J& json,
 /// update backup (without storing to disk)
 template <typename T, typename J>
 void update(J& json,
+            const std::string& formula,
             int64_t b,
             int64_t next_b,
             int64_t max_b,
             int64_t thread_id,
-            T ac)
+            T sum)
 {
   string tid = "thread" + to_string(thread_id);
 
   json["AC"]["next_b"] = next_b;
-  json["AC"]["ac"] = to_string(ac);
+  json["AC"][formula] = to_string(sum);
 
   if (b <= max_b)
     json["AC"][tid]["b"] = b;
@@ -146,14 +147,14 @@ bool resume_c1(J& json,
                int64_t z,
                int64_t k,
                int64_t& next_b,
-               T& ac,
+               T& sum,
                double& time)
 {
   if (is_resume(json, "AC", x, y, z, k) &&
-      json["AC"].count("low") <= 0)
+      json["AC"].count("sum_c1") > 0)
   {
     double seconds = json["AC"]["seconds"];
-    ac = calculator::eval<T>(json["AC"]["ac"]);
+    sum = calculator::eval<T>(json["AC"]["sum_c1"]);
     next_b = json["AC"]["next_b"];
     time = get_time() - seconds;
     return true;
@@ -173,14 +174,14 @@ bool resume_a_c2(J& json,
                  int64_t k,
                  int64_t& next_b,
                  int64_t& low,
-                 T& ac,
+                 T& sum,
                  double& time)
 {
   if (is_resume(json, "AC", x, y, z, k) &&
-      json["AC"].count("low") > 0)
+      json["AC"].count("sum_ac") > 0)
   {
     double seconds = json["AC"]["seconds"];
-    ac = calculator::eval<T>(json["AC"]["ac"]);
+    sum = calculator::eval<T>(json["AC"]["sum_ac"]);
     next_b = json["AC"]["next_b"];
     low = json["AC"]["low"];
     time = get_time() - seconds;
@@ -206,7 +207,7 @@ bool resume(J& json,
     double seconds = json["AC"]["seconds"];
     print_resume(percent, x);
 
-    if (!json["AC"].count("next_b"))
+    if (json["AC"].count("ac") > 0)
     {
       ac = calculator::eval<T>(json["AC"]["ac"]);
       time = get_time() - seconds;
@@ -434,7 +435,7 @@ T AC_OpenMP(T x,
           {
             sum -= sum_thread;
             string tid = "thread" + to_string(j);
-            json["AC"]["ac"] = to_string(sum);
+            json["AC"]["sum_c1"] = to_string(sum);
             json["AC"].erase(tid);
           }
         }
@@ -453,7 +454,7 @@ T AC_OpenMP(T x,
           sum -= sum_thread;
           b = next_b++;
 
-          update(json, b, next_b, pi_sqrtz, i, sum);
+          update(json, "sum_c1", b, next_b, pi_sqrtz, i, sum);
 
           if (is_backup(backup_time))
           {
@@ -531,7 +532,7 @@ T AC_OpenMP(T x,
           {
             sum += sum_thread;
             string tid = "thread" + to_string(j);
-            json["AC"]["ac"] = to_string(sum);
+            json["AC"]["sum_ac"] = to_string(sum);
             json["AC"].erase(tid);
           }
         }
@@ -550,7 +551,7 @@ T AC_OpenMP(T x,
           sum += sum_thread;
           b = next_b++;
 
-          update(json, b, next_b, max_b, i, sum);
+          update(json, "sum_ac", b, next_b, max_b, i, sum);
 
           if (is_backup(backup_time))
           {
