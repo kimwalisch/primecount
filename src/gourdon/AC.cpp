@@ -60,6 +60,12 @@ void backup(J& json,
             double percent,
             double time)
 {
+  if (json["AC"].count("percent") > 0)
+  {
+    double percent2 = json["AC"]["percent"];
+    percent = std::max(percent, percent2);
+  }
+
   json["AC"]["x"] = to_string(x);
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
@@ -414,16 +420,17 @@ T AC_OpenMP(T x,
   if (resume_a_c2(json, x, y, z, k, next_b, low, sum, time))
   {
     // Currently our implementation cannot accurately estimate
-    // the completion percentage near the end. We cheat and
-    // simply set it to 95%. In order to fix this we would need
-    // to implement backwards sieving in SegmentedPi.cpp which
-    // would add some more complexity. I don't think this is
-    // worth doing.
+    // the completion percentage near the end. In order to fix
+    // this we would need to implement backwards sieving in
+    // SegmentedPi.cpp which would add some more complexity. I
+    // don't think this is worth doing.
     if (low > 0)
     {
-      status.setPercent(95);
-      if (is_print())
-        status.print(/* percent = */ 95);
+      if (json["AC"].count("percent") > 0)
+      {
+        double percent = json["AC"]["percent"];
+        status.setPercent(percent);
+      }
     }
   }
   else

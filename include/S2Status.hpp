@@ -23,7 +23,6 @@ class S2Status
 public:
   S2Status(maxint_t x);
   void print(maxint_t n, maxint_t limit);
-  void print(double percent);
   void setPercent(double percent) { percent_ = percent; }
   static double getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
 private:
