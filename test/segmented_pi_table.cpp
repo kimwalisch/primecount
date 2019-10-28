@@ -40,7 +40,7 @@ int main()
   int threads = get_num_threads();
 
   PiTable pi(limit);
-  SegmentedPiTable segmentedPi(limit, segment_size, threads);
+  SegmentedPiTable segmentedPi(0, limit, segment_size, threads);
   int64_t i = 0;
 
   // Check small pi(x) values
