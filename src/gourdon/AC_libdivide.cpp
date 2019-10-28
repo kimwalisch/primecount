@@ -522,12 +522,12 @@ T AC_OpenMP(T x,
     string sum_c1 = "sum_c1";
 
     #pragma omp parallel for num_threads(threads)
-    for (int64_t i = 0; i < threads; i++)
+    for (int i = 0; i < threads; i++)
     {
       int64_t b = 0;
 
       // 1st resume computations from backup file
-      for (int64_t j = i; j < resume_threads; j += threads)
+      for (int j = i; j < resume_threads; j += threads)
       {
         if (resume(copy, x, y, z, k, b, j))
         {
@@ -617,12 +617,12 @@ T AC_OpenMP(T x,
     max_b = max(max_b, pi_x_star);
 
     #pragma omp parallel for num_threads(threads)
-    for (int64_t i = 0; i < threads; i++)
+    for (int i = 0; i < threads; i++)
     {
       int64_t b = 0;
 
       // 1st resume computations from backup file
-      for (int64_t j = i; j < resume_threads; j += threads)
+      for (int j = i; j < resume_threads; j += threads)
       {
         if (resume(copy, x, y, z, k, b, j))
         {
