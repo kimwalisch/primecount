@@ -1,5 +1,5 @@
 ///
-/// @file  AC_libdivide.cpp
+/// @file  AC.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
 ///        prime counting algorithm. In this version the memory usage
 ///        has been reduced from O(x^(1/2)) to O(z) by segmenting
