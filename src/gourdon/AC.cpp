@@ -47,7 +47,7 @@ namespace {
 bool is_backup(double time)
 {
   double seconds = get_time() - time;
-  return seconds > 0.1;
+  return seconds > 60;
 }
 
 /// backup intermediate result
