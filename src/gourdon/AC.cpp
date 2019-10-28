@@ -138,6 +138,30 @@ bool resume(J& json,
   return false;
 }
 
+/// Resume C1 algorithm
+template <typename T, typename J>
+bool resume_c1(J& json,
+               T x,
+               int64_t y,
+               int64_t z,
+               int64_t k,
+               int64_t& next_b,
+               T& ac,
+               double& time)
+{
+  if (is_resume(json, "AC", x, y, z, k) &&
+      json["AC"].count("low") <= 0)
+  {
+    double seconds = json["AC"]["seconds"];
+    ac = calculator::eval<T>(json["AC"]["ac"]);
+    next_b = json["AC"]["next_b"];
+    time = get_time() - seconds;
+    return true;
+  }
+
+  return false;
+}
+
 /// Resume the A and C2 algorithms which
 /// make use of SegmentedPi.
 ///
@@ -279,6 +303,23 @@ T C1(T xp,
   return sum;
 }
 
+template <typename T, typename Primes>
+T C1(T x,
+     int64_t z,
+     int64_t b,
+     int64_t pi_y,
+     Primes& primes,
+     PiTable& pi)
+{
+  int64_t prime = primes[b];
+  T xp = x / prime;
+  int64_t max_m = min(xp / prime, z);
+  T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
+  int64_t min_m = min(min_m128, max_m);
+
+  return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+}
+
 /// Compute the 2nd part of the C formula.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
@@ -365,38 +406,78 @@ T AC_OpenMP(T x,
   auto backup_time = get_time();
   auto json = load_backup();
   auto copy = json;
+  int64_t resume_threads = calculate_resume_threads(json, "AC");
   int64_t next_b = 0;
   int64_t low = 0;
 
   if (!resume_a_c2(json, x, y, z, k, next_b, low, sum, time))
   {
-    if (json.find("AC") != json.end())
-      json.erase("AC");
+    if (!resume_c1(json, x, y, z, k, next_b, sum, time))
+      if (json.find("AC") != json.end())
+        json.erase("AC");
 
-    // This computes the 1st part of the C formula.
-    // Find all special leaves of type:
-    // x / (primes[b] * m) <= z.
-    // m may be a prime <= y or a square free number <= z
-    // who is coprime to the first b primes and whose
-    // largest prime factor <= y.
-    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
-    for (int64_t b = min_b; b <= pi_sqrtz; b++)
+    next_b = max(next_b, min_b);
+
+    #pragma omp parallel for num_threads(threads)
+    for (int64_t i = 0; i < threads; i++)
     {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t max_m = min(xp / prime, z);
-      T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
-      int64_t min_m = min(min_m128, max_m);
+      int64_t b = 0;
 
-      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+      // 1st resume computations from backup file
+      for (int64_t j = i; j < resume_threads; j += threads)
+      {
+        if (resume(copy, x, y, z, k, b, j))
+        {
+          T sum_thread = C1(x, z, b, pi_y, primes, pi);
 
-      if (is_print())
-        status.print(b, pi_x13);
+          #pragma omp critical (ac)
+          {
+            sum -= sum_thread;
+            string tid = "thread" + to_string(j);
+            json["AC"]["ac"] = to_string(sum);
+            json["AC"].erase(tid);
+          }
+        }
+      }
+
+      T sum_thread = 0;
+
+      // 2nd, run new computations
+      while (true)
+      {
+        if (is_print())
+          status.print(b, pi_x13);
+
+        #pragma omp critical (ac)
+        {
+          sum -= sum_thread;
+          b = next_b++;
+
+          update(json, b, next_b, pi_sqrtz, i, sum);
+
+          if (is_backup(backup_time))
+          {
+            double percent = status.getPercent(next_b, pi_x13, next_b, pi_x13);
+            backup(json, x, y, z, k, percent, time);
+            backup_time = get_time();
+          }
+        }
+
+        if (b > pi_sqrtz)
+          break;
+
+        sum_thread = C1(x, z, b, pi_y, primes, pi);
+      }
     }
+
+    // Resume finished, reset vars so there is
+    // no reset attempt the next iteration.
+    resume_threads = 0;
+    next_b = 0;
+    copy.clear();
   }
 
   SegmentedPiTable segmentedPi(low, isqrt(x), z, threads);
-  int64_t resume_threads = calculate_resume_threads(json, "AC");
 
   // This computes A and the 2nd part of the C formula.
   // Find all special leaves of type:
