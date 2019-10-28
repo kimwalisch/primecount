@@ -72,13 +72,13 @@ void backup(J& json,
 
 /// backup result
 template <typename T, typename J>
-void backup(J& json,
-            T x,
-            int64_t y,
-            int64_t z,
-            int64_t k,
-            T ac,
-            double time)
+void backup_result(J& json,
+                   T x,
+                   int64_t y,
+                   int64_t z,
+                   int64_t k,
+                   T ac,
+                   double time)
 {
   if (json.find("AC") != json.end())
     json.erase("AC");
@@ -138,19 +138,22 @@ bool resume(J& json,
   return false;
 }
 
-/// resume vars
+/// Resume the A and C2 algorithms which
+/// make use of SegmentedPi.
+///
 template <typename T, typename J>
-bool resume(J& json,
-            T x,
-            int64_t y,
-            int64_t z,
-            int64_t k,
-            int64_t& next_b,
-            int64_t& low,
-            T& ac,
-            double& time)
+bool resume_a_c2(J& json,
+                 T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t k,
+                 int64_t& next_b,
+                 int64_t& low,
+                 T& ac,
+                 double& time)
 {
-  if (is_resume(json, "AC", x, y, z, k))
+  if (is_resume(json, "AC", x, y, z, k) &&
+      json["AC"].count("low") > 0)
   {
     double seconds = json["AC"]["seconds"];
     ac = calculator::eval<T>(json["AC"]["ac"]);
@@ -359,37 +362,38 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_b = max(k, pi_root3_xz) + 1;
 
-  // This computes the 1st part of the C formula.
-  // Find all special leaves of type:
-  // x / (primes[b] * m) <= z.
-  // m may be a prime <= y or a square free number <= z
-  // who is coprime to the first b primes and whose
-  // largest prime factor <= y.
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
-  for (int64_t b = min_b; b <= pi_sqrtz; b++)
-  {
-    int64_t prime = primes[b];
-    T xp = x / prime;
-    int64_t max_m = min(xp / prime, z);
-    T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
-    int64_t min_m = min(min_m128, max_m);
-
-    sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
-
-    if (is_print())
-      status.print(b, pi_x13);
-  }
-
   auto backup_time = get_time();
   auto json = load_backup();
   auto copy = json;
   int64_t next_b = 0;
   int64_t low = 0;
-  int64_t high = 0;
 
-  if (!resume(json, x, y, z, k, next_b, low, sum, time))
+  if (!resume_a_c2(json, x, y, z, k, next_b, low, sum, time))
+  {
     if (json.find("AC") != json.end())
       json.erase("AC");
+
+    // This computes the 1st part of the C formula.
+    // Find all special leaves of type:
+    // x / (primes[b] * m) <= z.
+    // m may be a prime <= y or a square free number <= z
+    // who is coprime to the first b primes and whose
+    // largest prime factor <= y.
+    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
+    for (int64_t b = min_b; b <= pi_sqrtz; b++)
+    {
+      int64_t prime = primes[b];
+      T xp = x / prime;
+      int64_t max_m = min(xp / prime, z);
+      T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
+      int64_t min_m = min(min_m128, max_m);
+
+      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+
+      if (is_print())
+        status.print(b, pi_x13);
+    }
+  }
 
   SegmentedPiTable segmentedPi(low, isqrt(x), z, threads);
   int64_t resume_threads = calculate_resume_threads(json, "AC");
@@ -405,7 +409,7 @@ T AC_OpenMP(T x,
   {
     // Current segment [low, high[
     low = segmentedPi.low();
-    high = segmentedPi.high();
+    int64_t high = segmentedPi.high();
     json["AC"]["low"] = segmentedPi.low();
 
     low = max(low, 1);
@@ -492,7 +496,7 @@ T AC_OpenMP(T x,
     copy.clear();
   }
 
-  backup(json, x, y, z, k, sum, time);
+  backup_result(json, x, y, z, k, sum, time);
 
   return sum;
 }
