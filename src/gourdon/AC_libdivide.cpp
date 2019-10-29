@@ -117,17 +117,17 @@ void update(J& json,
             int64_t max_b,
             T sum)
 {
-  string AC = "AC";
-  json[AC]["next_b"] = next_b;
-  json[AC][formula] = to_string(sum);
+  auto& AC = json["AC"];
+  AC["next_b"] = next_b;
+  AC[formula] = to_string(sum);
 
   if (b <= max_b)
-    json[AC][tid]["b"] = b;
+    AC[tid]["b"] = b;
   else
   {
     // finished
-    if (json[AC].find(tid) != json[AC].end())
-      json[AC].erase(tid);
+    if (AC.find(tid) != AC.end())
+      AC.erase(tid);
   }
 }
 
@@ -519,7 +519,6 @@ T AC_OpenMP(T x,
         json.erase("AC");
 
     next_b = max(next_b, min_b);
-    string sum_c1 = "sum_c1";
 
     #pragma omp parallel for num_threads(threads)
     for (int i = 0; i < threads; i++)
@@ -537,7 +536,7 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum -= sum_thread;
-            json["AC"][sum_c1] = to_string(sum);
+            json["AC"]["sum_c1"] = to_string(sum);
             json["AC"].erase(thread_id);
           }
         }
@@ -557,7 +556,7 @@ T AC_OpenMP(T x,
           sum -= sum_thread;
           b = next_b++;
 
-          update(json, thread_id, sum_c1, b, next_b, pi_sqrtz, sum);
+          update(json, thread_id, "sum_c1", b, next_b, pi_sqrtz, sum);
 
           if (is_backup(backup_time))
           {
@@ -583,7 +582,6 @@ T AC_OpenMP(T x,
 
   SegmentedPiTable segmentedPi(low, isqrt(x), z, threads);
   auto fastdiv = libdivide_vector(primes);
-  string sum_ac = "sum_ac";
 
   // This computes A and the 2nd part of the C formula.
   // Find all special leaves of type:
@@ -637,7 +635,7 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum += sum_thread;
-            json["AC"][sum_ac] = to_string(sum);
+            json["AC"]["sum_ac"] = to_string(sum);
             json["AC"].erase(thread_id);
           }
         }
@@ -657,7 +655,7 @@ T AC_OpenMP(T x,
           sum += sum_thread;
           b = next_b++;
 
-          update(json, thread_id, sum_ac, b, next_b, max_b, sum);
+          update(json, thread_id, "sum_ac", b, next_b, max_b, sum);
 
           if (is_backup(backup_time))
           {
