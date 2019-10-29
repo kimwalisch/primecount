@@ -60,15 +60,16 @@ void backup(J& json,
 {
   double percent = get_percent(low, z);
 
-  json["B"]["x"] = to_string(x);
-  json["B"]["y"] = y;
-  json["B"]["low"] = low;
-  json["B"]["thread_distance"] = thread_distance;
-  json["B"]["sieve_limit"] = z;
-  json["B"]["pix_total"] = to_string(pix_total);
-  json["B"]["b"] = to_string(b);
-  json["B"]["percent"] = percent;
-  json["B"]["seconds"] = get_time() - time;
+  auto& B = json["B"];
+  B["x"] = to_string(x);
+  B["y"] = y;
+  B["low"] = low;
+  B["thread_distance"] = thread_distance;
+  B["sieve_limit"] = z;
+  B["pix_total"] = to_string(pix_total);
+  B["b"] = to_string(b);
+  B["percent"] = percent;
+  B["seconds"] = get_time() - time;
 
   store_backup(json);
 }
@@ -86,12 +87,13 @@ void backup(T x,
   if (json.find("B") != json.end())
     json.erase("B");
 
-  json["B"]["x"] = to_string(x);
-  json["B"]["y"] = y;
-  json["B"]["b"] = to_string(b);
-  json["B"]["sieve_limit"] = z;
-  json["B"]["percent"] = 100.0;
-  json["B"]["seconds"] = get_time() - time;
+  auto& B = json["B"];
+  B["x"] = to_string(x);
+  B["y"] = y;
+  B["b"] = to_string(b);
+  B["sieve_limit"] = z;
+  B["percent"] = 100.0;
+  B["seconds"] = get_time() - time;
 
   store_backup(json);
 }
