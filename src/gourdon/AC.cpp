@@ -103,25 +103,24 @@ void backup_result(J& json,
 /// update backup (without storing to disk)
 template <typename T, typename J>
 void update(J& json,
+            const std::string& tid,
             const std::string& formula,
             int64_t b,
             int64_t next_b,
             int64_t max_b,
-            int64_t thread_id,
             T sum)
 {
-  string tid = "thread" + to_string(thread_id);
-
-  json["AC"]["next_b"] = next_b;
-  json["AC"][formula] = to_string(sum);
+  auto& AC = json["AC"];
+  AC["next_b"] = next_b;
+  AC[formula] = to_string(sum);
 
   if (b <= max_b)
-    json["AC"][tid]["b"] = b;
+    AC[tid]["b"] = b;
   else
   {
     // finished
-    if (json["AC"].find(tid) != json["AC"].end())
-      json["AC"].erase(tid);
+    if (AC.find(tid) != AC.end())
+      AC.erase(tid);
   }
 }
 
@@ -413,7 +412,7 @@ T AC_OpenMP(T x,
   auto backup_time = get_time();
   auto json = load_backup();
   auto copy = json;
-  int64_t resume_threads = calculate_resume_threads(json, "AC");
+  int resume_threads = calculate_resume_threads(json, "AC");
   int64_t next_b = 0;
   int64_t low = 0;
 
@@ -442,28 +441,29 @@ T AC_OpenMP(T x,
     next_b = max(next_b, min_b);
 
     #pragma omp parallel for num_threads(threads)
-    for (int64_t i = 0; i < threads; i++)
+    for (int i = 0; i < threads; i++)
     {
       int64_t b = 0;
 
       // 1st resume computations from backup file
-      for (int64_t j = i; j < resume_threads; j += threads)
+      for (int j = i; j < resume_threads; j += threads)
       {
         if (resume(copy, x, y, z, k, b, j))
         {
           T sum_thread = C1(x, z, b, pi_y, primes, pi);
+          string thread_id = "thread" + to_string(j);
 
           #pragma omp critical (ac)
           {
             sum -= sum_thread;
-            string tid = "thread" + to_string(j);
             json["AC"]["sum_c1"] = to_string(sum);
-            json["AC"].erase(tid);
+            json["AC"].erase(thread_id);
           }
         }
       }
 
       T sum_thread = 0;
+      string thread_id = "thread" + to_string(i);
 
       // 2nd, run new computations
       while (true)
@@ -476,7 +476,7 @@ T AC_OpenMP(T x,
           sum -= sum_thread;
           b = next_b++;
 
-          update(json, "sum_c1", b, next_b, pi_sqrtz, i, sum);
+          update(json, thread_id, "sum_c1", b, next_b, pi_sqrtz, sum);
 
           if (is_backup(backup_time))
           {
@@ -534,16 +534,17 @@ T AC_OpenMP(T x,
     max_b = max(max_b, pi_x_star);
 
     #pragma omp parallel for num_threads(threads)
-    for (int64_t i = 0; i < threads; i++)
+    for (int i = 0; i < threads; i++)
     {
       int64_t b = 0;
 
       // 1st resume computations from backup file
-      for (int64_t j = i; j < resume_threads; j += threads)
+      for (int j = i; j < resume_threads; j += threads)
       {
         if (resume(copy, x, y, z, k, b, j))
         {
           T sum_thread = 0;
+          string thread_id = "thread" + to_string(j);
 
           if (b <= pi_x_star)
             sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
@@ -553,14 +554,14 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum += sum_thread;
-            string tid = "thread" + to_string(j);
             json["AC"]["sum_ac"] = to_string(sum);
-            json["AC"].erase(tid);
+            json["AC"].erase(thread_id);
           }
         }
       }
 
       T sum_thread = 0;
+      string thread_id = "thread" + to_string(i);
 
       // 2nd, run new computations
       while (true)
@@ -573,7 +574,7 @@ T AC_OpenMP(T x,
           sum += sum_thread;
           b = next_b++;
 
-          update(json, "sum_ac", b, next_b, max_b, i, sum);
+          update(json, thread_id, "sum_ac", b, next_b, max_b, sum);
 
           if (is_backup(backup_time))
           {
