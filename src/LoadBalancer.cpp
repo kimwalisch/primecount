@@ -62,10 +62,11 @@ void LoadBalancer::backup(int thread_id)
 
   string tid = "thread" + to_string(thread_id);
 
-  json_["D"]["d"] = to_string(sum_);
-  json_["D"]["percent"] = percent;
-  json_["D"]["seconds"] = get_time() - time_;
-  json_["D"].erase(tid);
+  auto& D = json_["D"];
+  D["d"] = to_string(sum_);
+  D["percent"] = percent;
+  D["seconds"] = get_time() - time_;
+  D.erase(tid);
 
   if (last_backup_seconds > 60)
   {
@@ -83,32 +84,33 @@ void LoadBalancer::backup(int thread_id,
   double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
   double last_backup_seconds = get_time() - backup_time_;
 
-  json_["D"]["x"] = to_string(x_);
-  json_["D"]["y"] = y_;
-  json_["D"]["z"] = z_;
-  json_["D"]["k"] = k_;
-  json_["D"]["x_star"] = x_star_;
-  json_["D"]["low"] = low_;
-  json_["D"]["segments"] = segments_;
-  json_["D"]["segment_size"] = segment_size_;
-  json_["D"]["sieve_limit"] = sieve_limit_;
-  json_["D"]["d"] = to_string(sum_);
-  json_["D"]["percent"] = percent;
-  json_["D"]["seconds"] = get_time() - time_;
+  auto& D = json_["D"];
+  D["x"] = to_string(x_);
+  D["y"] = y_;
+  D["z"] = z_;
+  D["k"] = k_;
+  D["x_star"] = x_star_;
+  D["low"] = low_;
+  D["segments"] = segments_;
+  D["segment_size"] = segment_size_;
+  D["sieve_limit"] = sieve_limit_;
+  D["d"] = to_string(sum_);
+  D["percent"] = percent;
+  D["seconds"] = get_time() - time_;
 
   string tid = "thread" + to_string(thread_id);
 
   if (low <= sieve_limit_)
   {
-    json_["D"][tid]["low"] = low;
-    json_["D"][tid]["segments"] = segments;
-    json_["D"][tid]["segment_size"] = segment_size;
+    D[tid]["low"] = low;
+    D[tid]["segments"] = segments;
+    D[tid]["segment_size"] = segment_size;
   }
   else
   {
     // finished
-    if (json_["D"].find(tid) != json_["D"].end())
-      json_["D"].erase(tid);
+    if (D.find(tid) != D.end())
+      D.erase(tid);
   }
 
   if (last_backup_seconds > 60)
@@ -123,15 +125,16 @@ void LoadBalancer::finish_backup()
   if (json_.find("D") != json_.end())
     json_.erase("D");
 
-  json_["D"]["x"] = to_string(x_);
-  json_["D"]["y"] = y_;
-  json_["D"]["z"] = z_;
-  json_["D"]["k"] = k_;
-  json_["D"]["x_star"] = x_star_;
-  json_["D"]["sieve_limit"] = sieve_limit_;
-  json_["D"]["d"] = to_string(sum_);
-  json_["D"]["percent"] = 100.0;
-  json_["D"]["seconds"] = get_time() - time_;
+  auto& D = json_["D"];
+  D["x"] = to_string(x_);
+  D["y"] = y_;
+  D["z"] = z_;
+  D["k"] = k_;
+  D["x_star"] = x_star_;
+  D["sieve_limit"] = sieve_limit_;
+  D["d"] = to_string(sum_);
+  D["percent"] = 100.0;
+  D["seconds"] = get_time() - time_;
 
   store_backup(json_);
 }
