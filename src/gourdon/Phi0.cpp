@@ -42,7 +42,7 @@ void backup(T x,
             int64_t y,
             int64_t z,
             int64_t k,
-            T phi0,
+            T sum,
             double time)
 {
   auto json = load_backup();
@@ -51,7 +51,7 @@ void backup(T x,
   json["Phi0"]["y"] = y;
   json["Phi0"]["z"] = z;
   json["Phi0"]["k"] = k;
-  json["Phi0"]["phi0"] = to_string(phi0);
+  json["Phi0"]["sum"] = to_string(sum);
   json["Phi0"]["percent"] = 100.0;
   json["Phi0"]["seconds"] = get_time() - time;
 
@@ -63,7 +63,7 @@ bool resume(T x,
             int64_t y,
             int64_t z,
             int64_t k,
-            T& phi0,
+            T& sum,
             double& time)
 {
   auto json = load_backup();
@@ -73,7 +73,7 @@ bool resume(T x,
     double percent = json["Phi0"]["percent"];
     double seconds = json["Phi0"]["seconds"];
 
-    phi0 = calculator::eval<T>(json["Phi0"]["phi0"]);
+    sum = calculator::eval<T>(json["Phi0"]["sum"]);
     time = get_time() - seconds;
     print_resume(percent, x);
     return true;

@@ -63,7 +63,7 @@ void LoadBalancer::backup(int thread_id)
   string tid = "thread" + to_string(thread_id);
 
   auto& D = json_["D"];
-  D["d"] = to_string(sum_);
+  D["sum"] = to_string(sum_);
   D["percent"] = percent;
   D["seconds"] = get_time() - time_;
   D.erase(tid);
@@ -94,7 +94,7 @@ void LoadBalancer::backup(int thread_id,
   D["segments"] = segments_;
   D["segment_size"] = segment_size_;
   D["sieve_limit"] = sieve_limit_;
-  D["d"] = to_string(sum_);
+  D["sum"] = to_string(sum_);
   D["percent"] = percent;
   D["seconds"] = get_time() - time_;
 
@@ -132,7 +132,7 @@ void LoadBalancer::finish_backup()
   D["k"] = k_;
   D["x_star"] = x_star_;
   D["sieve_limit"] = sieve_limit_;
-  D["d"] = to_string(sum_);
+  D["sum"] = to_string(sum_);
   D["percent"] = 100.0;
   D["seconds"] = get_time() - time_;
 
@@ -158,7 +158,7 @@ bool LoadBalancer::resume(int thread_id,
 }
 
 // resume result
-bool LoadBalancer::resume(maxint_t& d, double& time) const
+bool LoadBalancer::resume(maxint_t& sum, double& time) const
 {
   if (is_resume(copy_, "D", x_, y_, z_, k_))
   {
@@ -168,7 +168,7 @@ bool LoadBalancer::resume(maxint_t& d, double& time) const
 
     if (!copy_["D"].count("low"))
     {
-      d = calculator::eval<maxint_t>(copy_["D"]["d"]);
+      sum = calculator::eval<maxint_t>(copy_["D"]["sum"]);
       time = get_time() - seconds;
       return true;
     }
@@ -226,7 +226,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   if (is_resume(json_, "D", x_, y_, z_, k_))
   {
     double seconds = copy_["D"]["seconds"];
-    sum_ = calculator::eval<maxint_t>(copy_["D"]["d"]);
+    sum_ = calculator::eval<maxint_t>(copy_["D"]["sum"]);
     time_ = get_time() - seconds;
 
     if (json_["D"].count("low"))

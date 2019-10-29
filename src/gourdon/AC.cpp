@@ -83,7 +83,7 @@ void backup_result(J& json,
                    int64_t y,
                    int64_t z,
                    int64_t k,
-                   T ac,
+                   T sum,
                    double time)
 {
   if (json.find("AC") != json.end())
@@ -93,7 +93,7 @@ void backup_result(J& json,
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
   json["AC"]["k"] = k;
-  json["AC"]["ac"] = to_string(ac);
+  json["AC"]["sum"] = to_string(sum);
   json["AC"]["percent"] = 100.0;
   json["AC"]["seconds"] = get_time() - time;
 
@@ -203,7 +203,7 @@ bool resume(J& json,
             int64_t y,
             int64_t z,
             int64_t k,
-            T& ac,
+            T& sum,
             double& time)
 {
   if (is_resume(json, "AC", x, y, z, k))
@@ -212,9 +212,9 @@ bool resume(J& json,
     double seconds = json["AC"]["seconds"];
     print_resume(percent, x);
 
-    if (json["AC"].count("ac") > 0)
+    if (json["AC"].count("sum") > 0)
     {
-      ac = calculator::eval<T>(json["AC"]["ac"]);
+      sum = calculator::eval<T>(json["AC"]["sum"]);
       time = get_time() - seconds;
       return true;
     }

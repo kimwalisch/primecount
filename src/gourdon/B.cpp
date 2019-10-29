@@ -55,7 +55,7 @@ void backup(J& json,
             int64_t low,
             int64_t thread_distance,
             T pix_total,
-            T b,
+            T sum,
             double time)
 {
   double percent = get_percent(low, z);
@@ -67,7 +67,7 @@ void backup(J& json,
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
   B["pix_total"] = to_string(pix_total);
-  B["b"] = to_string(b);
+  B["sum"] = to_string(sum);
   B["percent"] = percent;
   B["seconds"] = get_time() - time;
 
@@ -79,7 +79,7 @@ template <typename T>
 void backup(T x,
             int64_t y,
             int64_t z,
-            T b,
+            T sum,
             double time)
 {
   auto json = load_backup();
@@ -90,7 +90,7 @@ void backup(T x,
   auto& B = json["B"];
   B["x"] = to_string(x);
   B["y"] = y;
-  B["b"] = to_string(b);
+  B["sum"] = to_string(sum);
   B["sieve_limit"] = z;
   B["percent"] = 100.0;
   B["seconds"] = get_time() - time;
@@ -106,7 +106,7 @@ bool resume(J& json,
             int64_t& low,
             int64_t& thread_distance,
             T& pix_total,
-            T& b,
+            T& sum,
             double& time)
 {
   if (is_resume(json, "B", x, y))
@@ -115,7 +115,7 @@ bool resume(J& json,
     low = json["B"]["low"];
     thread_distance = json["B"]["thread_distance"];
     pix_total = calculator::eval<T>(json["B"]["pix_total"]);
-    b = calculator::eval<T>(json["B"]["b"]);
+    sum = calculator::eval<T>(json["B"]["sum"]);
     time = get_time() - seconds;
     return true;
   }
@@ -127,7 +127,7 @@ bool resume(J& json,
 template <typename T>
 bool resume(T x,
             int64_t y,
-            T& b,
+            T& sum,
             double& time)
 {
   auto json = load_backup();
@@ -140,7 +140,7 @@ bool resume(T x,
 
     if (!json["B"].count("low"))
     {
-      b = calculator::eval<T>(json["B"]["b"]);
+      sum = calculator::eval<T>(json["B"]["sum"]);
       time = get_time() - seconds;
       return true;
     }

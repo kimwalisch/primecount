@@ -35,7 +35,7 @@ template <typename T>
 void backup(T x,
             int64_t y,
             int64_t x_star,
-            T sigma,
+            T sum,
             double time)
 {
   auto json = load_backup();
@@ -43,7 +43,7 @@ void backup(T x,
   json["Sigma"]["x"] = to_string(x);
   json["Sigma"]["y"] = y;
   json["Sigma"]["x_star"] = x_star;
-  json["Sigma"]["sigma"] = to_string(sigma);
+  json["Sigma"]["sum"] = to_string(sum);
   json["Sigma"]["percent"] = 100.0;
   json["Sigma"]["seconds"] = get_time() - time;
 
@@ -53,7 +53,7 @@ void backup(T x,
 template <typename T>
 bool resume(T x,
             int64_t y,
-            T& sigma,
+            T& sum,
             double& time)
 {
   auto json = load_backup();
@@ -63,7 +63,7 @@ bool resume(T x,
     double percent = json["Sigma"]["percent"];
     double seconds = json["Sigma"]["seconds"];
 
-    sigma = calculator::eval<T>(json["Sigma"]["sigma"]);
+    sum = calculator::eval<T>(json["Sigma"]["sum"]);
     time = get_time() - seconds;
     print_resume(percent, x);
     return true;
