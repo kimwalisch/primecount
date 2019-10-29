@@ -2,7 +2,7 @@
 /// @file   int128_t.hpp
 /// @brief  Support for int128_t, uint128_t types.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -40,6 +40,7 @@ using maxuint_t = uint128_t;
 #include <ostream>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 namespace primecount {
 
@@ -48,7 +49,14 @@ using uint128_t = __uint128_t;
 using maxint_t = __int128_t;
 using maxuint_t = __uint128_t;
 
-inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
+template <typename T>
+inline std::string to_string(T n)
+{
+  return std::to_string(n);
+}
+
+template <>
+inline std::string to_string<uint128_t>(uint128_t n)
 {
   std::string str;
 
@@ -61,28 +69,29 @@ inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
   if (str.empty())
     str = "0";
 
-  stream << std::string(str.rbegin(), str.rend());
+  std::reverse(str.begin(), str.end());
+  return str;
+}
+
+template <>
+inline std::string to_string<int128_t>(int128_t n)
+{
+  if (n >= 0)
+    return to_string((uint128_t) n);
+  else
+    return "-" + to_string((uint128_t) -n);
+}
+
+inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
+{
+  stream << to_string(n);
   return stream;
 }
 
 inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
-  if (n < 0)
-  {
-    stream << "-";
-    n = -n;
-  }
-
-  stream << (uint128_t) n;
+  stream << to_string(n);
   return stream;
-}
-
-template <typename T>
-inline std::string to_string(T x)
-{
-  std::ostringstream ss;
-  ss << x;
-  return ss.str();
 }
 
 } // namespace
