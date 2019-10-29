@@ -492,7 +492,7 @@ T AC_OpenMP(T x,
   auto backup_time = get_time();
   auto json = load_backup();
   auto copy = json;
-  int64_t resume_threads = calculate_resume_threads(json, "AC");
+  int resume_threads = calculate_resume_threads(json, "AC");
   int64_t next_b = 0;
   int64_t low = 0;
 
