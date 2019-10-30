@@ -26,7 +26,6 @@ public:
   static double getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
 private:
   bool is_print(double time);
-  void print(double percent) const;
   static double skewed_percent(maxint_t x, maxint_t y);
   double epsilon_;
   double percent_ = -1;

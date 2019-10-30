@@ -32,7 +32,6 @@
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <print.hpp>
-#include <S2.hpp>
 
 #include "DFactorTable.hpp"
 
