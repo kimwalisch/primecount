@@ -124,10 +124,10 @@ int64_t C(int64_t x,
 
   double time = get_time();
   auto primes = generate_primes<int32_t>(y);
-  int64_t c = C_OpenMP((intfast64_t) x, y, z, k, primes, threads);
+  int64_t sum = C_OpenMP((intfast64_t) x, y, z, k, primes, threads);
 
-  print("C", c, time);
-  return c;
+  print("C", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -143,22 +143,22 @@ int128_t C(int128_t x,
   print_gourdon(x, y, z, k, threads);
 
   double time = get_time();
-  int128_t c;
+  int128_t sum;
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
+    sum = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    c = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
+    sum = C_OpenMP((intfast128_t) x, y, z, k, primes, threads);
   }
 
-  print("C", c, time);
-  return c;
+  print("C", sum, time);
+  return sum;
 }
 
 #endif
