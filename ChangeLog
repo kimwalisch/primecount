@@ -1,3 +1,11 @@
+2019-10-30 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.2 work in progress.
+
+  * doc/primecount.txt: Add primecount DocBook man page.
+  * CMakeLists.txt: Generate man page using a2x program.
+  * Sieve.cpp: Fix vector out of bounds.
+
 2019-09-02 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.1 released.
