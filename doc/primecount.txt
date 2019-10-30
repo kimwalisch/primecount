@@ -150,4 +150,4 @@ EXAMPLES
 
 AUTHOR
 ------
-Kim Walisch <\kim.walisch@gmail.com>
+Kim Walisch <kim.walisch@gmail.com>
