@@ -21,7 +21,7 @@ const string helpMenu
 (
   "Usage: primecount x [OPTION]...\n"
   "Count the primes below x <= 10^31 using fast implementations of the\n"
-  "combinatorial prime counting function.\n"
+  "combinatorial prime counting function algorithms.\n"
   "\n"
   "Options:\n"
   "\n"
