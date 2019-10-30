@@ -90,7 +90,6 @@ OPTIONS
 **--help**::
 	Print this help menu.
 
-
 Advanced options for the Deleglise-Rivat algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -112,7 +111,6 @@ Advanced options for the Deleglise-Rivat algorithm
 
 **--S2_hard**::
 	Compute the hard special leaves.
-
 
 Advanced options for Xavier Gourdon's algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,7 +136,18 @@ Advanced options for Xavier Gourdon's algorithm
 **--Sigma**::
 	Compute the 7 Sigma formulas.
 
+EXAMPLES
+--------
 
-COPYRIGHT
----------
-Copyright (c) 2013-2019, Kim Walisch.
+**primecount 1000**::
+	Count the primes \<= 1000.
+
+**primecount 1e17 --status**::
+	Count the primes \<= 10^17 and print status information.
+
+**primecount 1e15 --threads=1 --time**::
+	Count the primes \<= 10^15 using a single thread and print the time elapsed.
+
+AUTHOR
+------
+Kim Walisch <\kim.walisch@gmail.com>
