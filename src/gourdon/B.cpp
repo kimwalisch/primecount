@@ -303,17 +303,17 @@ int64_t B(int64_t x, int64_t y, int threads)
   print_gourdon(x, y, threads);
 
   double time = get_time();
-  int64_t b = 0;
+  int64_t sum = 0;
 
-  if (!resume(x, y, b, time))
+  if (!resume(x, y, sum, time))
   {
     int64_t z = (int64_t)(x / max(y, 1));
-    b = B_OpenMP((intfast64_t) x, y, z, threads, time);
-    backup(x, y, z, b, time);
+    sum = B_OpenMP((intfast64_t) x, y, z, threads, time);
+    backup(x, y, z, sum, time);
   }
 
-  print("B", b, time);
-  return b;
+  print("B", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -325,17 +325,17 @@ int128_t B(int128_t x, int64_t y, int threads)
   print_gourdon(x, y, threads);
 
   double time = get_time();
-  int128_t b = 0;
+  int128_t sum = 0;
 
-  if (!resume(x, y, b, time))
+  if (!resume(x, y, sum, time))
   {
     int64_t z = (int64_t)(x / max(y, 1));
-    b = B_OpenMP((intfast128_t) x, y, z, threads, time);
-    backup(x, y, z, b, time);
+    sum = B_OpenMP((intfast128_t) x, y, z, threads, time);
+    backup(x, y, z, sum, time);
   }
 
-  print("B", b, time);
-  return b;
+  print("B", sum, time);
+  return sum;
 }
 
 #endif

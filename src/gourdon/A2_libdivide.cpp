@@ -168,10 +168,10 @@ int64_t A(int64_t x,
   int64_t max_prime = (int64_t) isqrt(x / x_star);
 
   auto primes = generate_primes<int32_t>(max_prime);
-  int64_t a = A_OpenMP((intfast64_t) x, y, z, x_star, primes, threads);
+  int64_t sum = A_OpenMP((intfast64_t) x, y, z, x_star, primes, threads);
 
-  print("A", a, time);
-  return a;
+  print("A", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -188,22 +188,22 @@ int128_t A(int128_t x,
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_prime = (int64_t) isqrt(x / x_star);
-  int128_t a;
+  int128_t sum;
 
   // uses less memory
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    a = A_OpenMP((intfast128_t) x, y, z, x_star, primes, threads);
+    sum = A_OpenMP((intfast128_t) x, y, z, x_star, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(max_prime);
-    a = A_OpenMP((intfast128_t) x, y, z, x_star, primes, threads);
+    sum = A_OpenMP((intfast128_t) x, y, z, x_star, primes, threads);
   }
 
-  print("A", a, time);
-  return a;
+  print("A", sum, time);
+  return sum;
 }
 
 #endif
