@@ -316,3 +316,36 @@ endif()
 
 install(FILES include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Regenerate man page ################################################
+
+find_program(A2X_EXECUTABLE a2x)
+
+if(A2X_EXECUTABLE)
+    # First check if a2x works
+    execute_process(
+        COMMAND ${A2X_EXECUTABLE} --version
+        OUTPUT_VARIABLE _OUT
+        ERROR_VARIABLE _ERR
+        RESULT_VARIABLE _RES
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if(_RES MATCHES 0)
+        message(STATUS "Found a2x: ${A2X_EXECUTABLE}")
+
+        add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${A2X_EXECUTABLE}
+            ARGS --format=manpage
+                 -D "${PROJECT_SOURCE_DIR}/doc"
+                 "${PROJECT_SOURCE_DIR}/doc/primecount.txt"
+            VERBATIM)
+    endif()
+endif()
+
+# Install man page ###################################################
+
+if(BUILD_PRIMECOUNT)
+    install(FILES ${PROJECT_SOURCE_DIR}/doc/primecount.1
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif()
