@@ -77,11 +77,11 @@ Open a terminal and run primecount using e.g.:
 ```
 Usage: primecount x [OPTION]...
 Count the primes below x <= 10^31 using fast implementations of the
-combinatorial prime counting function.
+combinatorial prime counting function algorithms.
 
 Options:
 
-  -d,    --deleglise_rivat  Count primes using Deleglise-Rivat algorithm
+  -d,    --deleglise_rivat  Count primes using the Deleglise-Rivat algorithm
   -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
   -l,    --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
