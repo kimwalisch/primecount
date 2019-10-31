@@ -1,10 +1,17 @@
-2019-10-30 Kim Walisch  <kim.walisch@gmail.com>
+2019-10-31 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.2 work in progress.
 
   * doc/primecount.txt: Add primecount DocBook man page.
   * CMakeLists.txt: Generate man page using a2x program.
   * Sieve.cpp: Fix vector out of bounds.
+  * help.cpp: Update help menu.
+  * Get rid of underscores in command-line options:
+
+      --deleglise_rivat -> --deleglise-rivat
+      --S2_trivial      -> --S2-trivial
+      --S2_easy         -> --S2-easy
+      --S2_hard         -> --S2-hard
 
 2019-09-02 Kim Walisch  <kim.walisch@gmail.com>
 
