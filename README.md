@@ -82,7 +82,7 @@ computation was originally started. You can safely copy the
 ```primecount.backup``` file to another PC and resume the computation there.
 If the new PC has a different number of CPU cores primecount will by default
 resume the computation using all available CPU cores (unless you have
-specified the number of threads using ```--threads=<N>```).
+specified the number of threads using ```--threads=N```).
 
 ## Verifying pi(x) results
 
