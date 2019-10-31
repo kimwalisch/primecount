@@ -12,7 +12,7 @@ that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
 primecount includes implementations of all important combinatorial
 prime counting algorithms known up to this date all of which have
 been parallelized using [OpenMP](https://en.wikipedia.org/wiki/OpenMP).
-primecount contains the **first ever** open source implementations of
+primecount contains the first ever open source implementations of
 the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
 that is shared amongst all implementations and that scales up to
