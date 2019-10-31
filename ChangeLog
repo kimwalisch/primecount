@@ -1,3 +1,20 @@
+2019-10-31 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.2 work in progress.
+
+  * doc/BUILD.md: Detailed build instructions. Contains new
+    section: "Packaging primecount" for Linux distros.
+  * doc/primecount.txt: Add primecount AsciiDoc man page.
+  * CMakeLists.txt: Generate man page using a2x program.
+  * CMakeLists.txt: New option for packagers: -DBUILD_LIBPRIMESIEVE=OFF
+  * Sieve.cpp: Fix vector out of bounds.
+  * Get rid of underscores in command-line options:
+
+      --deleglise_rivat -> --deleglise-rivat
+      --S2_trivial      -> --S2-trivial
+      --S2_easy         -> --S2-easy
+      --S2_hard         -> --S2-hard
+
 2019-09-02 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.1 released.

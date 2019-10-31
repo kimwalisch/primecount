@@ -6,13 +6,14 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_POPCNT        "Enable POPCNT instruction"   ON)
-option(WITH_LIBDIVIDE     "Use libdivide.h"             ON)
-option(WITH_OPENMP        "Enable OpenMP support"       ON)
-option(BUILD_PRIMECOUNT   "Build primecount binary"     ON)
-option(BUILD_SHARED_LIBS  "Build shared libprimecount"  OFF)
-option(BUILD_STATIC_LIBS  "Build static libprimecount"  ON)
-option(BUILD_TESTS        "Build test programs"         OFF)
+option(WITH_POPCNT         "Enable POPCNT instruction"   ON)
+option(WITH_LIBDIVIDE      "Use libdivide.h"             ON)
+option(WITH_OPENMP         "Enable OpenMP support"       ON)
+option(BUILD_PRIMECOUNT    "Build primecount binary"     ON)
+option(BUILD_LIBPRIMESIEVE "Build libprimesieve"         ON)
+option(BUILD_SHARED_LIBS   "Build shared libprimecount"  OFF)
+option(BUILD_STATIC_LIBS   "Build static libprimecount"  ON)
+option(BUILD_TESTS         "Build test programs"         OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -198,11 +199,21 @@ endif()
 
 # libprimesieve ######################################################
 
-set(COPY_BUILD_TESTS "${BUILD_TESTS}")
-set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
-option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
-add_subdirectory(lib/primesieve)
-set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
+# By default the libprimesieve dependency is built from source
+# (BUILD_LIBPRIMESIEVE=ON). However when packaging primecount
+# for e.g. a Linux distro this is not a good idea. For this use
+# case it is better to install the libprimesieve package
+# (e.g. libprimesieve-dev) and link against that version.
+
+if(BUILD_LIBPRIMESIEVE)
+    set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+    set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
+    option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+    add_subdirectory(lib/primesieve)
+    set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
+else()
+    find_package(primesieve REQUIRED)
+endif()
 
 # Testing ############################################################
 
@@ -233,7 +244,9 @@ if(BUILD_SHARED_LIBS)
         $<INSTALL_INTERFACE:include>)
 
     install(TARGETS libprimecount
-            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # libprimecount-static ###############################################
@@ -261,7 +274,9 @@ if(BUILD_STATIC_LIBS)
         $<INSTALL_INTERFACE:include>)
 
     install(TARGETS libprimecount-static
-            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # primecount binary ##################################################

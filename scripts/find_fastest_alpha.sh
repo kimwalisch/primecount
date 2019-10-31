@@ -35,7 +35,7 @@ start=1
 stop=21
 seconds=0
 repeat=3
-threads=$(./primecount 1e18 --S2_trivial -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
+threads=$(./primecount 1e18 --S2-trivial -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
 
 for i in "$@"
 do
@@ -124,7 +124,7 @@ function minimum
 # $1: primecount args
 function get_primecount_alpha
 {
-    alpha=$(./primecount $1 --S2_trivial -s | grep alpha | cut -d'=' -f2 | cut -d' ' -f2)
+    alpha=$(./primecount $1 --S2-trivial -s | grep alpha | cut -d'=' -f2 | cut -d' ' -f2)
     echo $alpha
 }
 

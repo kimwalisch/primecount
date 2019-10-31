@@ -21,7 +21,7 @@ The primecount backup version generates the following files:
 
 Below are the latest precompiled primecount binaries for
 Windows and Linux. These binaries are statically linked and
-require a CPU which supports the POPCNT instruction (2010 or
+require a CPU which supports the POPCNT instruction (2008 or
 later).
 
 * [primecount-backup-4.8-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-win64.zip), 588 KB
@@ -37,8 +37,9 @@ OpenMP and 128-bit integers (e.g. GCC, Clang, Intel C++ Compiler).
 ```sh
 cmake .
 make -j
-sudo make install
 ```
+
+* [Detailed build instructions](doc/BUILD.md)
 
 ## Backup usage example
 
@@ -109,46 +110,45 @@ details are logged into ```primecount.log```.
 ## Command-line options
 
 ```
-Usage: primecount x [OPTION]...
-Count the primes below x <= 10^31 using fast implementations of the
-combinatorial prime counting function.
+Usage: primecount x [options]
+Count the number of primes less than or equal to x (<= 10^31).
 
 Backup options:
 
   -b, --backup=<filename>   Set the backup filename. The default backup
-                            filename is primecount.backup
+                            filename is primecount.backup.
 
   -r, --resume[=filename]   Resume the last computation from the
                             primecount.backup file. If another backup
                             filename is provided the computation is resumed
-                            from that backup file
+                            from that backup file.
 Options:
 
-  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
+  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm.
+                            This is the default algorithm.
          --legendre         Count primes using Legendre's formula
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
-         --Li_inverse       Approximate the nth prime using Li^-1(x)
-  -n,    --nthprime         Calculate the nth prime
+         --Li-inverse       Approximate the nth prime using Li^-1(x)
+  -n,    --nth-prime        Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
-         --phi=<a>          phi(x, a) counts the numbers <= x that are
-                            not divisible by any of the first a primes
+         --phi=<a>          phi(x, a) counts the numbers <= x that are not
+                            divisible by any of the first a primes
          --Ri               Approximate pi(x) using Riemann R
-         --Ri_inverse       Approximate the nth prime using Ri^-1(x)
+         --Ri-inverse       Approximate the nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
-                            [N] digits after decimal point e.g. N=1, 99.9%
+                            Set digits after decimal point: -s1 prints 99.9%
          --test             Run various correctness tests and exit
          --time             Print the time elapsed in seconds
-  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
+  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores.
+                            By default primecount uses all available CPU cores.
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
 
 Advanced options for Xavier Gourdon's algorithm:
 
-         --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
-                            with y = x^(1/3) * alpha_y
-         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
-                            with z = y * alpha_z
+         --alpha-y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
+         --alpha-z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
          --AC               Compute Gourdon's A + C formulas
          --B                Compute Gourdon's B formula
          --D                Compute Gourdon's D formula
