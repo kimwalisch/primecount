@@ -39,7 +39,7 @@ sudo make install
 
 Below are the latest precompiled primecount binaries for
 Windows, Linux and macOS. These binaries are statically linked
-and require a CPU which supports the POPCNT instruction (2010 or
+and require a CPU which supports the POPCNT instruction (2008 or
 later).
 
 * [primecount-5.1-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.1/primecount-5.1-win64.zip), 560 KB
