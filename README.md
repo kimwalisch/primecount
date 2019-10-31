@@ -69,37 +69,38 @@ Open a terminal and run primecount using e.g.:
 ./primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
-./primecount 1e14 --nthprime --threads=4 --time
+./primecount 1e14 --nth-prime --threads=4 --time
 ```
 
 ## Command-line options
 
 ```
-Usage: primecount x [OPTION]...
-Count the primes below x <= 10^31 using fast implementations of the
-combinatorial prime counting function algorithms.
+Usage: primecount x [options]
+Count the number of primes less than or equal to x (<= 10^31).
 
 Options:
 
-  -d,    --deleglise_rivat  Count primes using the Deleglise-Rivat algorithm
-  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm
+  -d,    --deleglise-rivat  Count primes using the Deleglise-Rivat algorithm
+  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm.
+                            This is the default algorithm.
   -l,    --legendre         Count primes using Legendre's formula
          --lehmer           Count primes using Lehmer's formula
          --lmo              Count primes using Lagarias-Miller-Odlyzko
   -m,    --meissel          Count primes using Meissel's formula
          --Li               Approximate pi(x) using the logarithmic integral
-         --Li_inverse       Approximate the nth prime using Li^-1(x)
-  -n,    --nthprime         Calculate the nth prime
+         --Li-inverse       Approximate the nth prime using Li^-1(x)
+  -n,    --nth-prime        Calculate the nth prime
   -p,    --primesieve       Count primes using the sieve of Eratosthenes
-         --phi=<a>          phi(x, a) counts the numbers <= x that are
-                            not divisible by any of the first a primes
+         --phi=<a>          phi(x, a) counts the numbers <= x that are not
+                            divisible by any of the first a primes
          --Ri               Approximate pi(x) using Riemann R
-         --Ri_inverse       Approximate the nth prime using Ri^-1(x)
+         --Ri-inverse       Approximate the nth prime using Ri^-1(x)
   -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
-                            [N] digits after decimal point e.g. N=1, 99.9%
+                            Set digits after decimal point: -s1 prints 99.9%
          --test             Run various correctness tests and exit
          --time             Print the time elapsed in seconds
-  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores
+  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores.
+                            By default primecount uses all available CPU cores.
   -v,    --version          Print version and license information
   -h,    --help             Print this help menu
 ```
@@ -113,16 +114,14 @@ Advanced options for the Deleglise-Rivat algorithm:
   -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
          --P2               Compute the 2nd partial sieve function
          --S1               Compute the ordinary leaves
-         --S2_trivial       Compute the trivial special leaves
-         --S2_easy          Compute the easy special leaves
-         --S2_hard          Compute the hard special leaves
+         --S2-trivial       Compute the trivial special leaves
+         --S2-easy          Compute the easy special leaves
+         --S2-hard          Compute the hard special leaves
 
 Advanced options for Xavier Gourdon's algorithm:
 
-         --alpha_y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
-                            with y = x^(1/3) * alpha_y
-         --alpha_z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
-                            with z = y * alpha_z
+         --alpha-y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
+         --alpha-z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
          --AC               Compute Gourdon's A + C formulas
          --B                Compute Gourdon's B formula
          --D                Compute Gourdon's D formula
@@ -362,7 +361,7 @@ and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
 actual nth prime. The author has implemented ```primecount::nth_prime(n)```
-this way (option: ```--nthprime```), it finds the nth prime in
+this way (option: ```--nth-prime```), it finds the nth prime in
 <img src="https://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
 operations using
 <img src="https://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>

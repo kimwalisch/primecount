@@ -131,8 +131,8 @@ script:
 
         # 5) Find runtime memory errors
         valgrind --error-exitcode=1 ./primecount 1e13 --gourdon
-        valgrind --error-exitcode=1 ./primecount 1e13 --deleglise_rivat
-        valgrind --error-exitcode=1 ./primecount 1e12 --nthprime
+        valgrind --error-exitcode=1 ./primecount 1e13 --deleglise-rivat
+        valgrind --error-exitcode=1 ./primecount 1e12 --nth-prime
         valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
         valgrind --error-exitcode=1 ./primecount 1e10 --lmo3
 
