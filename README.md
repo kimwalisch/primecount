@@ -33,15 +33,7 @@ make -j
 sudo make install
 ```
 
-To build primecount using
-[MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface)
-support for distributing computations onto cluster nodes use:
-
-```sh
-cmake -DWITH_MPI=ON .
-```
-
-[primecount-MPI.md](doc/primecount-MPI.md) contains more information.
+* [Detailed build instructions](doc/BUILD.md)
 
 ## Binaries
 
