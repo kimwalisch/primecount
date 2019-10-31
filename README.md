@@ -113,7 +113,7 @@ Record pi(x) computations may take many months to complete. For such long
 running computations it is important to double check the pi(x) computation in
 order to protect from hardware and software errors. The first thing you can do
 to reduce the risk of a pi(x) miscalculation due to hardware errors is using
-[EEC memory](https://en.wikipedia.org/wiki/ECC_memory).
+[ECC memory](https://en.wikipedia.org/wiki/ECC_memory).
 
 In order to double check and verify a pi(x) computation you have to run the
 same pi(x) computation a second time but this time you manually specify a slightly
