@@ -5,10 +5,6 @@
 You need to have installed a C++ compiler which supports C++11 (or later) and CMake ≥ 3.4.
 
 ```bash
-# macOS
-xcode-select --install
-brew install cmake
-
 # Debian, Ubuntu
 sudo apt install g++ cmake
 
@@ -25,6 +21,21 @@ Open a terminal, cd into the primecount directory and run:
 
 ```bash
 cmake .
+make -j
+```
+
+## macOS
+
+On macOS the default C++ compiler that can be installed using ```xcode-select --install```
+does not support OpenMP multi-threading. Hence I suggest installing an alternative
+C++ compiler that supports OpenMP.
+
+```bash
+# Install C++ compiler with OpenMP support
+brew install cmake llvm libomp
+
+# Build primecount with OpenMP
+LIBRARY_PATH=/usr/local/opt/llvm/lib:$LIBRARY_PATH CXX=/usr/local/opt/llvm/bin/clang++ cmake .
 make -j
 ```
 
