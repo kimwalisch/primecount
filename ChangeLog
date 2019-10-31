@@ -2,10 +2,12 @@
 
   Version 5.2 work in progress.
 
-  * doc/primecount.txt: Add primecount DocBook man page.
+  * doc/BUILD.md: Detailed build instructions. Contains new
+    section: "Packaging primecount" for Linux distros.
+  * doc/primecount.txt: Add primecount AsciiDoc man page.
   * CMakeLists.txt: Generate man page using a2x program.
+  * CMakeLists.txt: New option for packagers: -DBUILD_LIBPRIMESIEVE=OFF
   * Sieve.cpp: Fix vector out of bounds.
-  * help.cpp: Update help menu.
   * Get rid of underscores in command-line options:
 
       --deleglise_rivat -> --deleglise-rivat
