@@ -17,17 +17,6 @@ The primecount backup version generates the following files:
 * ```primecount.log```: Main log file.
 * ```results.txt```: Log file with final results.
 
-## Binaries
-
-Below are the latest precompiled primecount binaries for
-Windows and Linux. These binaries are statically linked and
-require a CPU which supports the POPCNT instruction (2008 or
-later).
-
-* [primecount-backup-4.8-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-win64.zip), 588 KB
-* [primecount-backup-4.8-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-linux-x64.tar.xz), 886 KB
-* [primecount-backup-4.8-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-macOS-x64.zip), 433 KB
-
 ## Build instructions
 
 You need to have installed a C++ compiler and CMake. Ideally
@@ -40,6 +29,17 @@ make -j
 ```
 
 * [Detailed build instructions](doc/BUILD.md)
+
+## Binaries
+
+Below are the latest precompiled primecount binaries for
+Windows and Linux. These binaries are statically linked and
+require a CPU which supports the POPCNT instruction (2008 or
+later).
+
+* [primecount-backup-4.8-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-win64.zip), 588 KB
+* [primecount-backup-4.8-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-linux-x64.tar.xz), 886 KB
+* [primecount-backup-4.8-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-macOS-x64.zip), 433 KB
 
 ## Backup usage example
 
@@ -83,6 +83,21 @@ computation was originally started. You can safely copy the
 If the new PC has a different number of CPU cores primecount will by default
 resume the computation using all available CPU cores (unless you have
 specified the number of threads using ```--threads=<N>```).
+
+## Verifying pi(x) results
+
+Record pi(x) computations may take many months to complete. For such long
+running computations it is important to double check the pi(x) computation in
+order to protect from hardware and software errors. The first thing you can do
+to reduce the risk of a pi(x) miscalculation due to hardware errors is using
+[EEC memory](https://en.wikipedia.org/wiki/ECC_memory).
+
+In order to double check and verify a pi(x) computation you have to run the
+same pi(x) computation a second time but this time you manually specify a slightly
+different ```alpha_y``` or ```alpha_z``` tuning factor (using e.g. ```--alpha_y=N```).
+Doing this the results of the many formulas of Gourdon's algorithm will be
+completely different from the first run but if the pi(x) results of the 1st and
+2nd run match then the computation has been verified successfully!
 
 ## Batch processing
 
