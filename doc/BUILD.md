@@ -35,7 +35,7 @@ C++ compiler that supports OpenMP.
 brew install cmake llvm libomp
 
 # Build primecount with OpenMP
-LIBRARY_PATH=/usr/local/opt/llvm/lib:$LIBRARY_PATH CXX=/usr/local/opt/llvm/bin/clang++ cmake .
+LIBRARY_PATH=$(brew --prefix llvm)/lib CXX=$(brew --prefix llvm)/bin/clang++ cmake .
 make -j
 ```
 
