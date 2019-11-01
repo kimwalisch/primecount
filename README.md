@@ -49,19 +49,18 @@ later).
 
 ## Usage examples
 
-Open a terminal and run primecount using e.g.:
 ```sh
 # Count the primes below 10^14
-./primecount 1e14
+primecount 1e14
 
 # Print progress and status information during computation
-./primecount 1e20 --status
+primecount 1e20 --status
 
 # Count primes using Meissel's algorithm
-./primecount 2**32 --meissel
+primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
-./primecount 1e14 --nth-prime --threads=4 --time
+primecount 1e14 --nth-prime --threads=4 --time
 ```
 
 ## Command-line options
