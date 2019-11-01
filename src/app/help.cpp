@@ -39,7 +39,7 @@ const string helpMenu
   "                         divisible by any of the first a primes\n"
   "      --Ri               Approximate pi(x) using Riemann R\n"
   "      --Ri-inverse       Approximate the nth prime using Ri^-1(x)\n"
-  "  -s, --status [NUM]     Show computation progress 1%, 2%, 3%, ...\n"
+  "  -s, --status[=NUM]     Show computation progress 1%, 2%, 3%, ...\n"
   "                         Set digits after decimal point: -s 1 prints 99.9%\n"
   "      --test             Run various correctness tests and exit\n"
   "      --time             Print the time elapsed in seconds\n"

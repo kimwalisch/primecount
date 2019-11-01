@@ -180,22 +180,6 @@ Option parseOption(int argc, char* argv[], int& i)
       if (i >= argc || optionMap.count(opt.val))
         throw primecount_error("missing value for option " + opt.opt);
     }
- 
-    if (isParam == OPTIONAL_PARAM)
-    {
-      try {
-        // Make sure the next parameter is a number and not
-        // another option (--arg). to_maxint() throws an
-        // exception if string to maxint_t conversion fails.
-        if (i + 1 < argc)
-        {
-          to_maxint(argv[i + 1]);
-          i += 1;
-          opt.val = argv[i];
-        }
-      }
-      catch (std::exception&) { }
-    }
   }
   else
   {
