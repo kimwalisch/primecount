@@ -19,8 +19,9 @@
 #include <stdint.h>
 #include <cstddef>
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
+#include <utility>
 
 using namespace std;
 
@@ -30,68 +31,80 @@ void help();
 void version();
 void test();
 
-/// Command-line options
-map<string, OptionID> optionMap =
+/// Some command-line options require an additional parameter.
+/// Examples: --threads THREADS, -a ALPHA, ...
+enum IsParam
 {
-  { "-a", OPTION_ALPHA },
-  { "--alpha", OPTION_ALPHA },
-  { "--alpha-y", OPTION_ALPHA_Y },
-  { "--alpha-z", OPTION_ALPHA_Z },
-  { "-d", OPTION_DELEGLISE_RIVAT },
-  { "--deleglise-rivat", OPTION_DELEGLISE_RIVAT },
-  { "--deleglise-rivat-64", OPTION_DELEGLISE_RIVAT_64 },
-  { "--deleglise-rivat-128", OPTION_DELEGLISE_RIVAT_128 },
-  { "-g", OPTION_GOURDON },
-  { "--gourdon", OPTION_GOURDON },
-  { "--gourdon-64", OPTION_GOURDON_64 },
-  { "--gourdon-128", OPTION_GOURDON_128 },
-  { "-h", OPTION_HELP },
-  { "--help", OPTION_HELP },
-  { "-l", OPTION_LEGENDRE },
-  { "--legendre", OPTION_LEGENDRE },
-  { "--lehmer", OPTION_LEHMER },
-  { "--lmo", OPTION_LMO },
-  { "--lmo1", OPTION_LMO1 },
-  { "--lmo2", OPTION_LMO2 },
-  { "--lmo3", OPTION_LMO3 },
-  { "--lmo4", OPTION_LMO4 },
-  { "--lmo5", OPTION_LMO5 },
-  { "-m", OPTION_MEISSEL },
-  { "--meissel", OPTION_MEISSEL },
-  { "-n", OPTION_NTHPRIME },
-  { "--nth-prime", OPTION_NTHPRIME },
-  { "--number", OPTION_NUMBER },
-  { "-p", OPTION_PRIMESIEVE },
-  { "--primesieve", OPTION_PRIMESIEVE },
-  { "--Li", OPTION_LI },
-  { "--Li-inverse", OPTION_LIINV },
-  { "--Ri", OPTION_RI },
-  { "--Ri-inverse", OPTION_RIINV },
-  { "--phi", OPTION_PHI },
-  { "--P2", OPTION_P2 },
-  { "--S1", OPTION_S1 },
-  { "--S2-easy", OPTION_S2_EASY },
-  { "--S2-hard", OPTION_S2_HARD },
-  { "--S2-trivial", OPTION_S2_TRIVIAL },
-  { "--AC", OPTION_AC },
-  { "--B", OPTION_B },
-  { "--D", OPTION_D },
-  { "--Phi0", OPTION_PHI0 },
-  { "--Sigma", OPTION_SIGMA },
-  { "-s", OPTION_STATUS },
-  { "--status", OPTION_STATUS },
-  { "--test", OPTION_TEST },
-  { "--time", OPTION_TIME },
-  { "-t", OPTION_THREADS },
-  { "--threads", OPTION_THREADS },
-  { "-v", OPTION_VERSION },
-  { "--version", OPTION_VERSION }
+  NO_PARAM,
+  REQUIRED_PARAM,
+  OPTIONAL_PARAM
+};
+
+/// Command-line options
+map<string, std::pair<OptionID, IsParam>> optionMap =
+{
+  { "-a", make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
+  { "--alpha", make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
+  { "--alpha-y", make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
+  { "--alpha-z", make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
+  { "-d", make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
+  { "--deleglise-rivat", make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
+  { "--deleglise-rivat-64", make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
+  { "--deleglise-rivat-128", make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
+  { "-g", make_pair(OPTION_GOURDON, NO_PARAM) },
+  { "--gourdon", make_pair(OPTION_GOURDON, NO_PARAM) },
+  { "--gourdon-64", make_pair(OPTION_GOURDON_64, NO_PARAM) },
+  { "--gourdon-128", make_pair(OPTION_GOURDON_128, NO_PARAM) },
+  { "-h", make_pair(OPTION_HELP, NO_PARAM) },
+  { "--help", make_pair(OPTION_HELP, NO_PARAM) },
+  { "-l", make_pair(OPTION_LEGENDRE, NO_PARAM) },
+  { "--legendre", make_pair(OPTION_LEGENDRE, NO_PARAM) },
+  { "--lehmer", make_pair(OPTION_LEHMER, NO_PARAM) },
+  { "--lmo", make_pair(OPTION_LMO, NO_PARAM) },
+  { "--lmo1", make_pair(OPTION_LMO1, NO_PARAM) },
+  { "--lmo2", make_pair(OPTION_LMO2, NO_PARAM) },
+  { "--lmo3", make_pair(OPTION_LMO3, NO_PARAM) },
+  { "--lmo4", make_pair(OPTION_LMO4, NO_PARAM) },
+  { "--lmo5", make_pair(OPTION_LMO5, NO_PARAM) },
+  { "-m", make_pair(OPTION_MEISSEL, NO_PARAM) },
+  { "--meissel", make_pair(OPTION_MEISSEL, NO_PARAM) },
+  { "-n", make_pair(OPTION_NTHPRIME, NO_PARAM) },
+  { "--nth-prime", make_pair(OPTION_NTHPRIME, NO_PARAM) },
+  { "--number", make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
+  { "-p", make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+  { "--primesieve", make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+  { "--Li", make_pair(OPTION_LI, NO_PARAM) },
+  { "--Li-inverse", make_pair(OPTION_LIINV, NO_PARAM) },
+  { "--Ri", make_pair(OPTION_RI, NO_PARAM) },
+  { "--Ri-inverse", make_pair(OPTION_RIINV, NO_PARAM) },
+  { "--phi", make_pair(OPTION_PHI, REQUIRED_PARAM) },
+  { "--P2", make_pair(OPTION_P2, NO_PARAM) },
+  { "--S1", make_pair(OPTION_S1, NO_PARAM) },
+  { "--S2-easy", make_pair(OPTION_S2_EASY, NO_PARAM) },
+  { "--S2-hard", make_pair(OPTION_S2_HARD, NO_PARAM) },
+  { "--S2-trivial", make_pair(OPTION_S2_TRIVIAL, NO_PARAM) },
+  { "--AC", make_pair(OPTION_AC, NO_PARAM) },
+  { "--B", make_pair(OPTION_B, NO_PARAM) },
+  { "--D", make_pair(OPTION_D, NO_PARAM) },
+  { "--Phi0", make_pair(OPTION_PHI0, NO_PARAM) },
+  { "--Sigma", make_pair(OPTION_SIGMA, NO_PARAM) },
+  { "-s", make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+  { "--status", make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+  { "--test", make_pair(OPTION_TEST, NO_PARAM) },
+  { "--time", make_pair(OPTION_TIME, NO_PARAM) },
+  { "-t", make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+  { "--threads", make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+  { "-v", make_pair(OPTION_VERSION, NO_PARAM) },
+  { "--version", make_pair(OPTION_VERSION, NO_PARAM) }
 };
 
 /// Command-line option
-/// e.g. opt = "--threads", val = "4"
 struct Option
 {
+  // Example:
+  // str = "--threads=32"
+  // opt = "--threads"
+  // val = "32"
   string str;
   string opt;
   string val;
@@ -99,9 +112,12 @@ struct Option
   template <typename T>
   T to() const
   {
-    if (val.empty())
-      throw primecount_error("missing value for option " + str);
-    return (T) to_maxint(val);
+    try {
+      return (T) to_maxint(val);
+    }
+    catch (std::exception&) {
+      throw primecount_error("invalid option `" + opt + "=" + val + "'");
+    }
   }
 };
 
@@ -137,28 +153,69 @@ string getValue(const string& str)
     return str.substr(pos);
 }
 
-/// e.g. "--threads=8"
+/// Parse the next command-line option.
+/// e.g. "--threads=32"
+/// -> opt.str = "--threads=32"
 /// -> opt.opt = "--threads"
 /// -> opt.val = "8"
 ///
-Option makeOption(const string& str)
+Option parseOption(int argc, char* argv[], int& i)
 {
   Option opt;
-  opt.str = str;
+  opt.str = argv[i];
 
-  if (optionMap.count(str))
-    opt.opt = str;
+  // Check if the option has the format:
+  // --arg or -a (but not --arg=N)
+  if (optionMap.count(opt.str))
+  {
+    opt.opt = opt.str;
+    IsParam isParam = optionMap[opt.str].second;
+
+    if (isParam == REQUIRED_PARAM)
+    {
+      i += 1;
+
+      if (i < argc)
+        opt.val = argv[i];
+      if (i >= argc || optionMap.count(opt.val))
+        throw primecount_error("missing value for option " + opt.opt);
+    }
+ 
+    if (isParam == OPTIONAL_PARAM)
+    {
+      try {
+        // Make sure the next parameter is a number and not
+        // another option (--arg). to_maxint() throws an
+        // exception if string to maxint_t conversion fails.
+        if (i + 1 < argc)
+        {
+          to_maxint(argv[i + 1]);
+          i += 1;
+          opt.val = argv[i];
+        }
+      }
+      catch (std::exception&) { }
+    }
+  }
   else
   {
-    opt.opt = getOption(str);
-    opt.val = getValue(str);
+    // Here the option is either:
+    // 1) A number (e.g. the start number)
+    // 2) An option of type: --arg=N
+
+    opt.opt = getOption(opt.str);
+    opt.val = getValue(opt.str);
+
+    if (opt.opt.empty() && !opt.val.empty())
+      opt.opt = "--number";
   }
 
-  if (opt.opt.empty() && !opt.val.empty())
-    opt.opt = "--number";
-
   if (!optionMap.count(opt.opt))
-    throw primecount_error("unknown option " + str);
+    throw primecount_error("unknown option `" + opt.opt + "'");
+
+  IsParam isParam = optionMap[opt.opt].second;
+  if (isParam == REQUIRED_PARAM && opt.val.empty())
+    throw primecount_error("missing value for option " + opt.opt);
 
   return opt;
 }
@@ -170,9 +227,10 @@ CmdOptions parseOptions(int argc, char* argv[])
 
   for (int i = 1; i < argc; i++)
   {
-    Option opt = makeOption(argv[i]);
+    Option opt = parseOption(argc, argv, i);
+    OptionID optionID = optionMap[opt.opt].first;
 
-    switch (optionMap[opt.opt])
+    switch (optionID)
     {
       case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
       case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
@@ -185,7 +243,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
       case OPTION_VERSION: version(); break;
-      default:             opts.option = optionMap[opt.opt];
+      default:             opts.option = optionID;
     }
   }
 
