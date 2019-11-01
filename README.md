@@ -102,7 +102,7 @@ Options:
 ```
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha <NUM>      Tuning factor, 1 <= alpha <= x^(1/6)
+  -a, --alpha <NUM>      Tuning factor, y = x^(1/3) * alpha
       --P2               Compute the 2nd partial sieve function
       --S1               Compute the ordinary leaves
       --S2-trivial       Compute the trivial special leaves
@@ -111,8 +111,8 @@ Advanced options for the Deleglise-Rivat algorithm:
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y <NUM>    Tuning factor, 1 <= alpha_y <= x^(1/6)
-      --alpha-z <NUM>    Tuning factor, 1 <= alpha_z <= x^(1/6)
+      --alpha-y <NUM>    Tuning factor, y = x^(1/3) * alpha_y
+      --alpha-z <NUM>    Tuning factor, z = y * alpha_z
       --AC               Compute Gourdon's A + C formulas
       --B                Compute Gourdon's B formula
       --D                Compute Gourdon's D formula
