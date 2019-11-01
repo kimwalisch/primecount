@@ -84,15 +84,16 @@ libprimesieve will be built. The build options can be modified at
 the configure step using e.g. ```cmake . -DBUILD_TESTS=ON```.
 
 ```CMake
-option(WITH_POPCNT         "Enable POPCNT instruction"   ON)
-option(WITH_LIBDIVIDE      "Use libdivide.h"             ON)
-option(WITH_OPENMP         "Enable OpenMP support"       ON)
-option(WITH_MPI            "Enable MPI support"          OFF)
-option(BUILD_PRIMECOUNT    "Build primecount binary"     ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"         ON)
-option(BUILD_SHARED_LIBS   "Build shared libprimecount"  OFF)
-option(BUILD_STATIC_LIBS   "Build static libprimecount"  ON)
-option(BUILD_TESTS         "Build test programs"         OFF)
+option(WITH_POPCNT         "Enable POPCNT instruction"     ON)
+option(WITH_LIBDIVIDE      "Use libdivide.h"               ON)
+option(WITH_OPENMP         "Enable OpenMP support"         ON)
+option(WITH_MPI            "Enable MPI support"            OFF)
+option(BUILD_PRIMECOUNT    "Build primecount binary"       ON)
+option(BUILD_LIBPRIMESIEVE "Build libprimesieve"           ON)
+option(BUILD_SHARED_LIBS   "Build shared libprimecount"    OFF)
+option(BUILD_STATIC_LIBS   "Build static libprimecount"    ON)
+option(BUILD_MANPAGE       "Regenerate man page using a2x" OFF)
+option(BUILD_TESTS         "Build test programs"           OFF)
 ```
 
 ## Packaging primecount
@@ -128,7 +129,7 @@ That man page has been generated from ```doc/primecount.txt``` using
 the ```a2x``` program from the AsciiDoc package. Usually when packaging
 primecount it is recommended to regenerate the man page. In order to
 regenerate the man page you need to install the AsciiDoc package and
-then build primecount (using e.g. cmake and make).
+then build primecount using ```cmake . -DBUILD_MANPAGE=ON```.
 
 ```bash
 # Debian/Ubuntu

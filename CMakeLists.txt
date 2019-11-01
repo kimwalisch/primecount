@@ -6,15 +6,16 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_POPCNT         "Enable POPCNT instruction"   ON)
-option(WITH_LIBDIVIDE      "Use libdivide.h"             ON)
-option(WITH_OPENMP         "Enable OpenMP support"       ON)
-option(WITH_MPI            "Enable MPI support"          OFF)
-option(BUILD_PRIMECOUNT    "Build primecount binary"     ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"         ON)
-option(BUILD_SHARED_LIBS   "Build shared libprimecount"  OFF)
-option(BUILD_STATIC_LIBS   "Build static libprimecount"  ON)
-option(BUILD_TESTS         "Build test programs"         OFF)
+option(WITH_POPCNT         "Enable POPCNT instruction"     ON)
+option(WITH_LIBDIVIDE      "Use libdivide.h"               ON)
+option(WITH_OPENMP         "Enable OpenMP support"         ON)
+option(WITH_MPI            "Enable MPI support"            OFF)
+option(BUILD_PRIMECOUNT    "Build primecount binary"       ON)
+option(BUILD_LIBPRIMESIEVE "Build libprimesieve"           ON)
+option(BUILD_SHARED_LIBS   "Build shared libprimecount"    OFF)
+option(BUILD_STATIC_LIBS   "Build static libprimecount"    ON)
+option(BUILD_MANPAGE       "Regenerate man page using a2x" OFF)
+option(BUILD_TESTS         "Build test programs"           OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -334,18 +335,12 @@ install(FILES include/primecount.hpp
 
 # Regenerate man page ################################################
 
-find_program(A2X_EXECUTABLE a2x)
+if(BUILD_MANPAGE)
+    find_program(A2X_EXECUTABLE a2x)
 
-if(A2X_EXECUTABLE)
-    # First check if a2x works
-    execute_process(
-        COMMAND ${A2X_EXECUTABLE} --version
-        OUTPUT_VARIABLE _OUT
-        ERROR_VARIABLE _ERR
-        RESULT_VARIABLE _RES
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    if(_RES MATCHES 0)
+    if(NOT A2X_EXECUTABLE)
+        message(FATAL_ERROR "Missing a2x program (required for man page generation)!")
+    else()
         message(STATUS "Found a2x: ${A2X_EXECUTABLE}")
 
         add_custom_command(
