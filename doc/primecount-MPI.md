@@ -153,7 +153,7 @@ Options:
       --Ri               Approximate pi(x) using Riemann R
       --Ri-inverse       Approximate the nth prime using Ri^-1(x)
   -s, --status[=NUM]     Show computation progress 1%, 2%, 3%, ...
-                         Set digits after decimal point: -s 1 prints 99.9%
+                         Set digits after decimal point: -s1 prints 99.9%
       --test             Run various correctness tests and exit
       --time             Print the time elapsed in seconds
   -t, --threads <NUM>    Set the number of threads, 1 <= NUM <= CPU cores.
