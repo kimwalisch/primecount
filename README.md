@@ -60,7 +60,7 @@ primecount 1e20 --status
 primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
-primecount 1e14 --nth-prime --threads=4 --time
+primecount 1e14 --nth-prime --threads 4 --time
 ```
 
 ## Command-line options
@@ -71,29 +71,29 @@ Count the number of primes less than or equal to x (<= 10^31).
 
 Options:
 
-  -d,    --deleglise-rivat  Count primes using the Deleglise-Rivat algorithm
-  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm.
-                            This is the default algorithm.
-  -l,    --legendre         Count primes using Legendre's formula
-         --lehmer           Count primes using Lehmer's formula
-         --lmo              Count primes using Lagarias-Miller-Odlyzko
-  -m,    --meissel          Count primes using Meissel's formula
-         --Li               Approximate pi(x) using the logarithmic integral
-         --Li-inverse       Approximate the nth prime using Li^-1(x)
-  -n,    --nth-prime        Calculate the nth prime
-  -p,    --primesieve       Count primes using the sieve of Eratosthenes
-         --phi=<a>          phi(x, a) counts the numbers <= x that are not
-                            divisible by any of the first a primes
-         --Ri               Approximate pi(x) using Riemann R
-         --Ri-inverse       Approximate the nth prime using Ri^-1(x)
-  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
-                            Set digits after decimal point: -s1 prints 99.9%
-         --test             Run various correctness tests and exit
-         --time             Print the time elapsed in seconds
-  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores.
-                            By default primecount uses all available CPU cores.
-  -v,    --version          Print version and license information
-  -h,    --help             Print this help menu
+  -d, --deleglise-rivat  Count primes using the Deleglise-Rivat algorithm
+  -g, --gourdon          Count primes using Xavier Gourdon's algorithm.
+                         This is the default algorithm.
+  -l, --legendre         Count primes using Legendre's formula
+      --lehmer           Count primes using Lehmer's formula
+      --lmo              Count primes using Lagarias-Miller-Odlyzko
+  -m, --meissel          Count primes using Meissel's formula
+      --Li               Approximate pi(x) using the logarithmic integral
+      --Li-inverse       Approximate the nth prime using Li^-1(x)
+  -n, --nth-prime        Calculate the nth prime
+  -p, --primesieve       Count primes using the sieve of Eratosthenes
+      --phi <x> <a>      phi(x, a) counts the numbers <= x that are not
+                         divisible by any of the first a primes
+      --Ri               Approximate pi(x) using Riemann R
+      --Ri-inverse       Approximate the nth prime using Ri^-1(x)
+  -s, --status[=NUM]     Show computation progress 1%, 2%, 3%, ...
+                         Set digits after decimal point: -s1 prints 99.9%
+      --test             Run various correctness tests and exit
+      --time             Print the time elapsed in seconds
+  -t, --threads <NUM>    Set the number of threads, 1 <= NUM <= CPU cores.
+                         By default primecount uses all available CPU cores.
+  -v, --version          Print version and license information
+  -h, --help             Print this help menu
 ```
 
 <details>
@@ -102,22 +102,22 @@ Options:
 ```
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a<N>, --alpha=<N>        Tuning factor, 1 <= alpha <= x^(1/6)
-         --P2               Compute the 2nd partial sieve function
-         --S1               Compute the ordinary leaves
-         --S2-trivial       Compute the trivial special leaves
-         --S2-easy          Compute the easy special leaves
-         --S2-hard          Compute the hard special leaves
+  -a, --alpha <NUM>      Tuning factor, 1 <= alpha <= x^(1/6)
+      --P2               Compute the 2nd partial sieve function
+      --S1               Compute the ordinary leaves
+      --S2-trivial       Compute the trivial special leaves
+      --S2-easy          Compute the easy special leaves
+      --S2-hard          Compute the hard special leaves
 
 Advanced options for Xavier Gourdon's algorithm:
 
-         --alpha-y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
-         --alpha-z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
-         --AC               Compute Gourdon's A + C formulas
-         --B                Compute Gourdon's B formula
-         --D                Compute Gourdon's D formula
-         --Phi0             Compute the Phi0 formula
-         --Sigma            Compute the 7 Sigma formulas
+      --alpha-y <NUM>    Tuning factor, 1 <= alpha_y <= x^(1/6)
+      --alpha-z <NUM>    Tuning factor, 1 <= alpha_z <= x^(1/6)
+      --AC               Compute Gourdon's A + C formulas
+      --B                Compute Gourdon's B formula
+      --D                Compute Gourdon's D formula
+      --Phi0             Compute the Phi0 formula
+      --Sigma            Compute the 7 Sigma formulas
 ```
 
 </details>
