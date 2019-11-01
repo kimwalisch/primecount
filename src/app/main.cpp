@@ -442,8 +442,7 @@ int main (int argc, char* argv[])
 #ifdef HAVE_MPI
     MPI_Finalize();
 #endif
-    cerr << "primecount: " << e.what() << endl
-         << "Try 'primecount --help' for more information." << endl;
+    cerr << "primecount: " << e.what() << endl;
     return 1;
   }
 

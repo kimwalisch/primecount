@@ -77,7 +77,7 @@ map<string, std::pair<OptionID, IsParam>> optionMap =
   { "--Li-inverse", make_pair(OPTION_LIINV, NO_PARAM) },
   { "--Ri", make_pair(OPTION_RI, NO_PARAM) },
   { "--Ri-inverse", make_pair(OPTION_RIINV, NO_PARAM) },
-  { "--phi", make_pair(OPTION_PHI, REQUIRED_PARAM) },
+  { "--phi", make_pair(OPTION_PHI, NO_PARAM) },
   { "--P2", make_pair(OPTION_P2, NO_PARAM) },
   { "--S1", make_pair(OPTION_S1, NO_PARAM) },
   { "--S2-easy", make_pair(OPTION_S2_EASY, NO_PARAM) },
@@ -237,7 +237,6 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
-      case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
       case OPTION_HELP:    help(); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
@@ -247,10 +246,18 @@ CmdOptions parseOptions(int argc, char* argv[])
     }
   }
 
+  if (opts.option == OPTION_PHI)
+  {
+    if (numbers.size() >= 2)
+      opts.a = numbers[1];
+    else
+      throw primecount_error("option --phi requires 2 numbers");
+  }
+
   if (numbers.empty())
     throw primecount_error("missing x number");
-  else
-    opts.x = numbers[0];
+
+  opts.x = numbers[0];
 
   return opts;
 }
