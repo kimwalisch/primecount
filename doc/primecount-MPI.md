@@ -163,7 +163,7 @@ Options:
 
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha <NUM>      Tuning factor, y = x^(1/3) * alpha
+  -a, --alpha <NUM>      Tuning factor: y = x^(1/3) * alpha
       --P2               Compute the 2nd partial sieve function
       --S1               Compute the ordinary leaves
       --S2-trivial       Compute the trivial special leaves

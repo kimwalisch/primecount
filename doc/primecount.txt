@@ -57,7 +57,7 @@ OPTIONS
 *--primesieve*::
 	Count primes using the sieve of Eratosthenes.
 
-*--phi* _x_ _a_::
+*--phi* _X_ _A_::
 	phi(x, a) counts the numbers \<= x that are not divisible by
 	any of the first a primes.
 
@@ -122,19 +122,19 @@ pi(x) has been verified successfully.
 
 *-a*::
 *--alpha* _NUM_::
-	Alpha tuning factor, y = x\^(1/3) * alpha, 1 \<= alpha \<= x^(1/6).
+	Set the alpha tuning factor: y = x\^(1/3) * alpha, 1 \<= alpha \<= x^(1/6).
 
 Advanced options for Xavier Gourdon's algorithm
 -----------------------------------------------
 
 *--AC*::
-	Compute Gourdon's A + C formulas.
+	Compute the A + C formulas.
 
 *--B*::
-	Compute Gourdon's B formula.
+	Compute the B formula.
 
 *--D*::
-	Compute Gourdon's D formula.
+	Compute the D formula.
 
 *--Phi0*::
 	Compute the Phi0 formula.
@@ -159,10 +159,10 @@ If the results of both pi(x) computations match then pi(x) has been verified
 successfully.
 
 *--alpha-y* _NUM_::
-	alpha_y tuning factor, y = x\^(1/3) * alpha_y, 1 \<= alpha_y \<= x^(1/6).
+	Set the alpha_y tuning factor: y = x\^(1/3) * alpha_y, 1 \<= alpha_y \<= x^(1/6).
 
 *--alpha-z* _NUM_::
-	alpha_z tuning factor, z = y * alpha_z, 1 \<= alpha_z \<= x^(1/6).
+	Set the alpha_z tuning factor: z = y * alpha_z, 1 \<= alpha_z \<= x^(1/6).
 
 EXAMPLES
 --------
