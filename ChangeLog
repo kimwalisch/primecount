@@ -2,11 +2,18 @@
 
   Version 5.2 work in progress.
 
+  I have now implemented Xavier Gourdon's algorithm in the
+  primecount-backup version (branch backup3). Other than that
+  there have been documentation improvements and build system
+  improvements which should make it easier to package
+  primecount for e.g. Linux distros.
+
   * doc/BUILD.md: Detailed build instructions. Contains new
     section: "Packaging primecount" for Linux distros.
-  * doc/primecount.txt: Add primecount AsciiDoc man page.
+  * doc/primecount.1: Add primecount man page.
+  * doc/primecount.txt: AsciiDoc, used to generate primecount.1.
   * CMakeLists.txt: Generate man page using a2x program.
-  * CMakeLists.txt: New option for packagers: -DBUILD_LIBPRIMESIEVE=OFF
+  * CMakeLists.txt: New option: -DBUILD_LIBPRIMESIEVE=OFF.
   * Sieve.cpp: Fix vector out of bounds.
   * Get rid of underscores in command-line options:
 

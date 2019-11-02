@@ -24,46 +24,45 @@ const string helpMenu
   "\n"
   "Backup options:\n"
   "\n"
-  "  -b, --backup=<filename>   Set the backup filename. The default backup\n"
+  "  -b, --backup <FILENAME>   Set the backup filename. The default backup\n"
   "                            filename is primecount.backup.\n"
   "\n"
-  "  -r, --resume[=filename]   Resume the last computation from the\n"
+  "  -r, --resume[=FILENAME]   Resume the last computation from the\n"
   "                            primecount.backup file. If another backup\n"
   "                            filename is provided the computation is resumed\n"
   "                            from that backup file.\n"
-  "\n"
   "Options:\n"
   "\n"
-  "  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm.\n"
+  "  -g, --gourdon             Count primes using Xavier Gourdon's algorithm.\n"
   "                            This is the default algorithm.\n"
-  "  -l,    --legendre         Count primes using Legendre's formula\n"
-  "  -m,    --meissel          Count primes using Meissel's formula\n"
-  "         --Li               Approximate pi(x) using the logarithmic integral\n"
-  "         --Li-inverse       Approximate the nth prime using Li^-1(x)\n"
-  "  -n,    --nth-prime        Calculate the nth prime\n"
-  "  -p,    --primesieve       Count primes using the sieve of Eratosthenes\n"
-  "         --phi=<a>          phi(x, a) counts the numbers <= x that are not\n"
+  "  -l, --legendre            Count primes using Legendre's formula\n"
+  "  -m, --meissel             Count primes using Meissel's formula\n"
+  "      --Li                  Approximate pi(x) using the logarithmic integral\n"
+  "      --Li-inverse          Approximate the nth prime using Li^-1(x)\n"
+  "  -n, --nth-prime           Calculate the nth prime\n"
+  "  -p, --primesieve          Count primes using the sieve of Eratosthenes\n"
+  "      --phi <X> <A>         phi(x, a) counts the numbers <= x that are not\n"
   "                            divisible by any of the first a primes\n"
-  "         --Ri               Approximate pi(x) using Riemann R\n"
-  "         --Ri-inverse       Approximate the nth prime using Ri^-1(x)\n"
-  "  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...\n"
+  "      --Ri                  Approximate pi(x) using Riemann R\n"
+  "      --Ri-inverse          Approximate the nth prime using Ri^-1(x)\n"
+  "  -s, --status[=NUM]        Show computation progress 1%, 2%, 3%, ...\n"
   "                            Set digits after decimal point: -s1 prints 99.9%\n"
-  "         --test             Run various correctness tests and exit\n"
-  "         --time             Print the time elapsed in seconds\n"
-  "  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores.\n"
+  "      --test                Run various correctness tests and exit\n"
+  "      --time                Print the time elapsed in seconds\n"
+  "  -t, --threads <NUM>       Set the number of threads, 1 <= NUM <= CPU cores.\n"
   "                            By default primecount uses all available CPU cores.\n"
-  "  -v,    --version          Print version and license information\n"
-  "  -h,    --help             Print this help menu\n"
+  "  -v, --version             Print version and license information\n"
+  "  -h, --help                Print this help menu\n"
   "\n"
   "Advanced options for Xavier Gourdon's algorithm:\n"
   "\n"
-  "         --alpha-y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)\n"
-  "         --alpha-z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)\n"
-  "         --AC               Compute Gourdon's A + C formulas\n"
-  "         --B                Compute Gourdon's B formula\n"
-  "         --D                Compute Gourdon's D formula\n"
-  "         --Phi0             Compute the Phi0 formula\n"
-  "         --Sigma            Compute the 7 Sigma formulas\n"
+  "      --alpha-y <NUM>       Tuning factor, y = x^(1/3) * alpha_y\n"
+  "      --alpha-z <NUM>       Tuning factor, z = y * alpha_z\n"
+  "      --AC                  Compute Gourdon's A + C formulas\n"
+  "      --B                   Compute Gourdon's B formula\n"
+  "      --D                   Compute Gourdon's D formula\n"
+  "      --Phi0                Compute the Phi0 formula\n"
+  "      --Sigma               Compute the 7 Sigma formulas\n"
 );
 
 const string versionInfo
@@ -77,10 +76,10 @@ const string versionInfo
 
 namespace primecount {
 
-void help()
+void help(int exitCode)
 {
   cout << helpMenu << endl;
-  exit(0);
+  exit(exitCode);
 }
 
 void version()

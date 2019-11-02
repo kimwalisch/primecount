@@ -93,7 +93,7 @@ numbers to compute e.g.:
 # worktodo.txt
 10000000
 1e15
-1e15 --alpha_y=10 --threads=4
+1e15 --alpha_y 10 --threads 4
 1e14 --AC
 1e18 --D
 ```
@@ -130,43 +130,43 @@ Count the number of primes less than or equal to x (<= 10^31).
 
 Backup options:
 
-  -b, --backup=<filename>   Set the backup filename. The default backup
+  -b, --backup <FILENAME>   Set the backup filename. The default backup
                             filename is primecount.backup.
 
-  -r, --resume[=filename]   Resume the last computation from the
+  -r, --resume[=FILENAME]   Resume the last computation from the
                             primecount.backup file. If another backup
                             filename is provided the computation is resumed
                             from that backup file.
 Options:
 
-  -g,    --gourdon          Count primes using Xavier Gourdon's algorithm.
+  -g, --gourdon             Count primes using Xavier Gourdon's algorithm.
                             This is the default algorithm.
-         --legendre         Count primes using Legendre's formula
-  -m,    --meissel          Count primes using Meissel's formula
-         --Li               Approximate pi(x) using the logarithmic integral
-         --Li-inverse       Approximate the nth prime using Li^-1(x)
-  -n,    --nth-prime        Calculate the nth prime
-  -p,    --primesieve       Count primes using the sieve of Eratosthenes
-         --phi=<a>          phi(x, a) counts the numbers <= x that are not
+  -l, --legendre            Count primes using Legendre's formula
+  -m, --meissel             Count primes using Meissel's formula
+      --Li                  Approximate pi(x) using the logarithmic integral
+      --Li-inverse          Approximate the nth prime using Li^-1(x)
+  -n, --nth-prime           Calculate the nth prime
+  -p, --primesieve          Count primes using the sieve of Eratosthenes
+      --phi <X> <A>         phi(x, a) counts the numbers <= x that are not
                             divisible by any of the first a primes
-         --Ri               Approximate pi(x) using Riemann R
-         --Ri-inverse       Approximate the nth prime using Ri^-1(x)
-  -s[N], --status[=N]       Show computation progress 1%, 2%, 3%, ...
+      --Ri                  Approximate pi(x) using Riemann R
+      --Ri-inverse          Approximate the nth prime using Ri^-1(x)
+  -s, --status[=NUM]        Show computation progress 1%, 2%, 3%, ...
                             Set digits after decimal point: -s1 prints 99.9%
-         --test             Run various correctness tests and exit
-         --time             Print the time elapsed in seconds
-  -t<N>, --threads=<N>      Set the number of threads, 1 <= N <= CPU cores.
+      --test                Run various correctness tests and exit
+      --time                Print the time elapsed in seconds
+  -t, --threads <NUM>       Set the number of threads, 1 <= NUM <= CPU cores.
                             By default primecount uses all available CPU cores.
-  -v,    --version          Print version and license information
-  -h,    --help             Print this help menu
+  -v, --version             Print version and license information
+  -h, --help                Print this help menu
 
 Advanced options for Xavier Gourdon's algorithm:
 
-         --alpha-y=<N>      Tuning factor, 1 <= alpha_y <= x^(1/6)
-         --alpha-z=<N>      Tuning factor, 1 <= alpha_z <= x^(1/6)
-         --AC               Compute Gourdon's A + C formulas
-         --B                Compute Gourdon's B formula
-         --D                Compute Gourdon's D formula
-         --Phi0             Compute the Phi0 formula
-         --Sigma            Compute the 7 Sigma formulas
+      --alpha-y <NUM>       Tuning factor, y = x^(1/3) * alpha_y
+      --alpha-z <NUM>       Tuning factor, z = y * alpha_z
+      --AC                  Compute Gourdon's A + C formulas
+      --B                   Compute Gourdon's B formula
+      --D                   Compute Gourdon's D formula
+      --Phi0                Compute the Phi0 formula
+      --Sigma               Compute the 7 Sigma formulas
 ```

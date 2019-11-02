@@ -12,6 +12,7 @@
 /primecount*
 libprimecount*
 primecount.lib
+/doc/primecount.xml
 /lib/primesieve/primesieve
 libprimesieve*
 primesieve.lib

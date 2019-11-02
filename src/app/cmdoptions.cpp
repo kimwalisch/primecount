@@ -21,65 +21,79 @@
 #include <fstream>
 #include <cstddef>
 #include <map>
-#include <vector>
 #include <string>
+#include <type_traits>
+#include <vector>
+#include <utility>
 
 using namespace std;
 
 namespace primecount {
 
-void help();
+void help(int exitCode);
 void version();
 void test();
 
-/// Command-line options
-map<string, OptionID> optionMap =
+/// Some command-line options require an additional parameter.
+/// Examples: --threads THREADS, -a ALPHA, ...
+enum IsParam
 {
-  { "--alpha-y", OPTION_ALPHA_Y },
-  { "--alpha-z", OPTION_ALPHA_Z },
-  { "-b", OPTION_BACKUP },
-  { "--backup", OPTION_BACKUP },
-  { "-r", OPTION_RESUME },
-  { "--resume", OPTION_RESUME },
-  { "-g", OPTION_GOURDON },
-  { "--gourdon", OPTION_GOURDON },
-  { "--gourdon-64", OPTION_GOURDON_64 },
-  { "--gourdon-128", OPTION_GOURDON_128 },
-  { "-h", OPTION_HELP },
-  { "--help", OPTION_HELP },
-  { "-l", OPTION_LEGENDRE },
-  { "--legendre", OPTION_LEGENDRE },
-  { "-m", OPTION_MEISSEL },
-  { "--meissel", OPTION_MEISSEL },
-  { "-n", OPTION_NTHPRIME },
-  { "--nth-prime", OPTION_NTHPRIME },
-  { "--number", OPTION_NUMBER },
-  { "-p", OPTION_PRIMESIEVE },
-  { "--primesieve", OPTION_PRIMESIEVE },
-  { "--Li", OPTION_LI },
-  { "--Li-inverse", OPTION_LIINV },
-  { "--Ri", OPTION_RI },
-  { "--Ri-inverse", OPTION_RIINV },
-  { "--phi", OPTION_PHI },
-  { "--AC", OPTION_AC },
-  { "--B", OPTION_B },
-  { "--D", OPTION_D },
-  { "--Phi0", OPTION_PHI0 },
-  { "--Sigma", OPTION_SIGMA },
-  { "-s", OPTION_STATUS },
-  { "--status", OPTION_STATUS },
-  { "--test", OPTION_TEST },
-  { "--time", OPTION_TIME },
-  { "-t", OPTION_THREADS },
-  { "--threads", OPTION_THREADS },
-  { "-v", OPTION_VERSION },
-  { "--version", OPTION_VERSION }
+  NO_PARAM,
+  REQUIRED_PARAM,
+  OPTIONAL_PARAM
+};
+
+/// Command-line options
+map<string, std::pair<OptionID, IsParam>> optionMap =
+{
+  { "-b", make_pair(OPTION_BACKUP, REQUIRED_PARAM) },
+  { "--backup", make_pair(OPTION_BACKUP, REQUIRED_PARAM) },
+  { "-r", make_pair(OPTION_RESUME, OPTIONAL_PARAM) },
+  { "--resume", make_pair(OPTION_RESUME, OPTIONAL_PARAM) },
+  { "--alpha-y", make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
+  { "--alpha-z", make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
+  { "-g", make_pair(OPTION_GOURDON, NO_PARAM) },
+  { "--gourdon", make_pair(OPTION_GOURDON, NO_PARAM) },
+  { "--gourdon-64", make_pair(OPTION_GOURDON_64, NO_PARAM) },
+  { "--gourdon-128", make_pair(OPTION_GOURDON_128, NO_PARAM) },
+  { "-h", make_pair(OPTION_HELP, NO_PARAM) },
+  { "--help", make_pair(OPTION_HELP, NO_PARAM) },
+  { "-l", make_pair(OPTION_LEGENDRE, NO_PARAM) },
+  { "--legendre", make_pair(OPTION_LEGENDRE, NO_PARAM) },
+  { "-m", make_pair(OPTION_MEISSEL, NO_PARAM) },
+  { "--meissel", make_pair(OPTION_MEISSEL, NO_PARAM) },
+  { "-n", make_pair(OPTION_NTHPRIME, NO_PARAM) },
+  { "--nth-prime", make_pair(OPTION_NTHPRIME, NO_PARAM) },
+  { "--number", make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
+  { "-p", make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+  { "--primesieve", make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+  { "--Li", make_pair(OPTION_LI, NO_PARAM) },
+  { "--Li-inverse", make_pair(OPTION_LIINV, NO_PARAM) },
+  { "--Ri", make_pair(OPTION_RI, NO_PARAM) },
+  { "--Ri-inverse", make_pair(OPTION_RIINV, NO_PARAM) },
+  { "--phi", make_pair(OPTION_PHI, NO_PARAM) },
+  { "--AC", make_pair(OPTION_AC, NO_PARAM) },
+  { "--B", make_pair(OPTION_B, NO_PARAM) },
+  { "--D", make_pair(OPTION_D, NO_PARAM) },
+  { "--Phi0", make_pair(OPTION_PHI0, NO_PARAM) },
+  { "--Sigma", make_pair(OPTION_SIGMA, NO_PARAM) },
+  { "-s", make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+  { "--status", make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+  { "--test", make_pair(OPTION_TEST, NO_PARAM) },
+  { "--time", make_pair(OPTION_TIME, NO_PARAM) },
+  { "-t", make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+  { "--threads", make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+  { "-v", make_pair(OPTION_VERSION, NO_PARAM) },
+  { "--version", make_pair(OPTION_VERSION, NO_PARAM) }
 };
 
 /// Command-line option
-/// e.g. opt = "--threads", val = "4"
 struct Option
 {
+  // Example:
+  // str = "--threads=32"
+  // opt = "--threads"
+  // val = "32"
   string str;
   string opt;
   string val;
@@ -87,21 +101,17 @@ struct Option
   template <typename T>
   T to() const
   {
-    if (val.empty())
-      throw primecount_error("missing value for option " + str);
-    return (T) to_maxint(val);
+    try {
+      if (std::is_floating_point<T>::value)
+        return (T) stod(val);
+      else
+        return (T) to_maxint(val);
+    }
+    catch (std::exception&) {
+      throw primecount_error("invalid option '" + opt + "=" + val + "'");
+    }
   }
 };
-
-void optionStatus(Option& opt,
-                  CmdOptions& opts)
-{
-  set_print(true);
-  opts.time = true;
-
-  if (!opt.val.empty())
-    set_status_precision(opt.to<int>());
-}
 
 /// e.g. "--thread=4" -> return "--thread"
 string getOption(const string& str)
@@ -114,69 +124,102 @@ string getOption(const string& str)
     return str.substr(0, pos);
 }
 
-/// e.g. "--thread=4" -> return "4"
+/// Examples:
+/// "--option=ABC" -> return "ABC"
+/// "-t4" -> return "4"
+///
 string getValue(const string& str)
 {
-  size_t pos = str.find_first_of("0123456789");
-
-  if (pos == string::npos)
-    return string();
-  else
-    return str.substr(pos);
-}
-
-/// e.g. "--resume=primecount.backup" -> return "primecount.backup"
-string getBackupFile(string str)
-{
-  size_t pos = str.find_first_of("=");
-
+  size_t pos = str.find("=");
   if (pos != string::npos)
     return str.substr(pos + 1);
 
-  return backup_file();
+  pos = str.find_first_of("0123456789");
+  if (pos != string::npos)
+    return str.substr(pos);
+
+  return string();
+}
+
+void optionStatus(Option& opt,
+                  CmdOptions& opts)
+{
+  set_print(true);
+  opts.time = true;
+
+  if (!opt.val.empty())
+    set_status_precision(opt.to<int>());
 }
 
 void optionBackup(Option& opt,
                   CmdOptions& opts)
 {
-  opts.backupFile = getBackupFile(opt.str);
+  if (!opt.val.empty())
+    opts.backupFile = opt.val;
+  else
+    opts.backupFile = backup_file();
+
   set_backup_file(opts.backupFile);
 }
 
 void optionResume(Option& opt,
                   CmdOptions& opts)
 {
-  opts.resumeFile = getBackupFile(opt.str);
-  set_backup_file(opts.resumeFile);
+  if (!opt.val.empty())
+    opts.resumeFile = opt.val;
+  else
+    opts.resumeFile = backup_file();
 
+  set_backup_file(opts.resumeFile);
   ifstream ifs(backup_file());
 
   if (!ifs.is_open())
     throw primecount_error("failed to open backup file: " + backup_file());
 }
 
-/// e.g. "--threads=8"
+/// Parse the next command-line option.
+/// e.g. "--threads=32"
+/// -> opt.str = "--threads=32"
 /// -> opt.opt = "--threads"
 /// -> opt.val = "8"
 ///
-Option makeOption(const string& str)
+Option parseOption(int argc, char* argv[], int& i)
 {
   Option opt;
-  opt.str = str;
+  opt.str = argv[i];
 
-  if (optionMap.count(str))
-    opt.opt = str;
+  // Check if the option has the format:
+  // --arg or -a (but not --arg=N)
+  if (optionMap.count(opt.str))
+  {
+    opt.opt = opt.str;
+    IsParam isParam = optionMap[opt.str].second;
+
+    if (isParam == REQUIRED_PARAM)
+    {
+      i += 1;
+
+      if (i < argc)
+        opt.val = argv[i];
+      if (opt.val.empty() || optionMap.count(opt.val))
+        throw primecount_error("missing value for option '" + opt.opt + "'");
+    }
+  }
   else
   {
-    opt.opt = getOption(str);
-    opt.val = getValue(str);
+    // Here the option is either:
+    // 1) A number (e.g. the start number)
+    // 2) An option of type: --arg=N
+
+    opt.opt = getOption(opt.str);
+    opt.val = getValue(opt.str);
+
+    if (opt.opt.empty() && !opt.val.empty())
+      opt.opt = "--number";
   }
 
-  if (opt.opt.empty() && !opt.val.empty())
-    opt.opt = "--number";
-
   if (!optionMap.count(opt.opt))
-    throw primecount_error("unknown option " + str);
+    throw primecount_error("unrecognized option '" + opt.opt + "'");
 
   return opt;
 }
@@ -186,41 +229,51 @@ CmdOptions parseOptions(int argc, char* argv[])
   CmdOptions opts;
   vector<maxint_t> numbers;
 
+  // No command-line options provided
+  if (argc <= 1)
+    help(/* exitCode */ 1);
+
   for (int i = 1; i < argc; i++)
   {
-    Option opt = makeOption(argv[i]);
+    Option opt = parseOption(argc, argv, i);
+    OptionID optionID = optionMap[opt.opt].first;
 
-    switch (optionMap[opt.opt])
+    switch (optionID)
     {
-      case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
-      case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
       case OPTION_BACKUP:  optionBackup(opt, opts); break;
+      case OPTION_RESUME:  optionResume(opt, opts); break;
+      case OPTION_ALPHA_Y: set_alpha_y(opt.to<double>()); break;
+      case OPTION_ALPHA_Z: set_alpha_z(opt.to<double>()); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
-      case OPTION_PHI:     opts.a = opt.to<int64_t>(); opts.option = OPTION_PHI; break;
-      case OPTION_HELP:    help(); break;
-      case OPTION_RESUME:  optionResume(opt, opts); break;
+      case OPTION_HELP:    help(/* exitCode */ 0); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
       case OPTION_VERSION: version(); break;
-      default:             opts.option = optionMap[opt.opt];
+      default:             opts.option = optionID;
     }
   }
 
   if (!opts.is_resume())
   {
+    if (opts.option == OPTION_PHI)
+    {
+      if (numbers.size() < 2)
+        throw primecount_error("option --phi requires 2 numbers");
+      opts.a = numbers[1];
+    }
+
     if (numbers.empty())
-      throw primecount_error("missing x number!");
-    else
-      opts.x = numbers[0];
+      throw primecount_error("missing x number");
+    opts.x = numbers[0];
   }
 
   if (!opts.backupFile.empty() &&
       !opts.resumeFile.empty() &&
       opts.backupFile != opts.resumeFile)
   {
-    throw primecount_error("resume and backup file must be identical!");
+    throw primecount_error("resume and backup file must be identical");
   }
 
   return opts;
