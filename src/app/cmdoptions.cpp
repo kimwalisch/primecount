@@ -28,7 +28,7 @@ using namespace std;
 
 namespace primecount {
 
-void help();
+void help(int exitCode);
 void version();
 void test();
 
@@ -209,6 +209,10 @@ CmdOptions parseOptions(int argc, char* argv[])
   CmdOptions opts;
   vector<maxint_t> numbers;
 
+  // No command-line options provided
+  if (argc <= 1)
+    help(/* exitCode */ 1);
+
   for (int i = 1; i < argc; i++)
   {
     Option opt = parseOption(argc, argv, i);
@@ -221,7 +225,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_ALPHA_Z: set_alpha_z(opt.to<double>()); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
-      case OPTION_HELP:    help(); break;
+      case OPTION_HELP:    help(/* exitCode */ 0); break;
       case OPTION_STATUS:  optionStatus(opt, opts); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
@@ -232,10 +236,9 @@ CmdOptions parseOptions(int argc, char* argv[])
 
   if (opts.option == OPTION_PHI)
   {
-    if (numbers.size() >= 2)
-      opts.a = numbers[1];
-    else
+    if (numbers.size() < 2)
       throw primecount_error("option --phi requires 2 numbers");
+    opts.a = numbers[1];
   }
 
   if (numbers.empty())

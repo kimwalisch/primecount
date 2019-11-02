@@ -79,10 +79,10 @@ const string versionInfo
 
 namespace primecount {
 
-void help()
+void help(int exitCode)
 {
   cout << helpMenu << endl;
-  exit(0);
+  exit(exitCode);
 }
 
 void version()
