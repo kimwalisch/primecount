@@ -120,7 +120,7 @@ struct Option
         return (T) to_maxint(val);
     }
     catch (std::exception&) {
-      throw primecount_error("invalid option `" + opt + "=" + val + "'");
+      throw primecount_error("invalid option '" + opt + "=" + val + "'");
     }
   }
 };
@@ -181,8 +181,8 @@ Option parseOption(int argc, char* argv[], int& i)
 
       if (i < argc)
         opt.val = argv[i];
-      if (i >= argc || optionMap.count(opt.val))
-        throw primecount_error("missing value for option " + opt.opt);
+      if (opt.val.empty() || optionMap.count(opt.val))
+        throw primecount_error("missing value for option '" + opt.opt + "'");
     }
   }
   else
@@ -199,11 +199,7 @@ Option parseOption(int argc, char* argv[], int& i)
   }
 
   if (!optionMap.count(opt.opt))
-    throw primecount_error("unknown option `" + opt.opt + "'");
-
-  IsParam isParam = optionMap[opt.opt].second;
-  if (isParam == REQUIRED_PARAM && opt.val.empty())
-    throw primecount_error("missing value for option " + opt.opt);
+    throw primecount_error("unrecognized option '" + opt.opt + "'");
 
   return opt;
 }
