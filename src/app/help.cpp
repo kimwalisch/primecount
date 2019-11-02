@@ -35,7 +35,7 @@ const string helpMenu
   "      --Li-inverse       Approximate the nth prime using Li^-1(x)\n"
   "  -n, --nth-prime        Calculate the nth prime\n"
   "  -p, --primesieve       Count primes using the sieve of Eratosthenes\n"
-  "      --phi <x> <a>      phi(x, a) counts the numbers <= x that are not\n"
+  "      --phi <X> <A>      phi(x, a) counts the numbers <= x that are not\n"
   "                         divisible by any of the first a primes\n"
   "      --Ri               Approximate pi(x) using Riemann R\n"
   "      --Ri-inverse       Approximate the nth prime using Ri^-1(x)\n"
