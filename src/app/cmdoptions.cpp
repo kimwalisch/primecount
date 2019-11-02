@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <utility>
 
@@ -113,7 +114,10 @@ struct Option
   T to() const
   {
     try {
-      return (T) to_maxint(val);
+      if (std::is_floating_point<T>::value)
+        return (T) stod(val);
+      else
+        return (T) to_maxint(val);
     }
     catch (std::exception&) {
       throw primecount_error("invalid option `" + opt + "=" + val + "'");
@@ -216,9 +220,9 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionID)
     {
-      case OPTION_ALPHA:   set_alpha(stod(opt.val)); break;
-      case OPTION_ALPHA_Y: set_alpha_y(stod(opt.val)); break;
-      case OPTION_ALPHA_Z: set_alpha_z(stod(opt.val)); break;
+      case OPTION_ALPHA:   set_alpha(opt.to<double>()); break;
+      case OPTION_ALPHA_Y: set_alpha_y(opt.to<double>()); break;
+      case OPTION_ALPHA_Z: set_alpha_z(opt.to<double>()); break;
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_HELP:    help(); break;
