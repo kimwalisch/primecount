@@ -4,16 +4,24 @@
 
 You need to have installed a C++ compiler which supports C++11 (or later) and CMake ≥ 3.4.
 
-```bash
-# Debian, Ubuntu
-sudo apt install g++ cmake
-
-# Fedora, Red Hat
-sudo dnf install gcc-c++ cmake
-
-# Arch Linux
-sudo pacman -S gcc cmake
-```
+<table>
+    <tr>
+        <td><b>Debian/Ubuntu:</b></td>
+        <td><code>sudo apt install g++ cmake</code></td>
+    </tr>
+    <tr>
+        <td><b>Fedora:</b></td>
+        <td><code>sudo dnf install gcc-c++ cmake</code></td>
+    </tr>
+    <tr>
+        <td><b>openSUSE:</b></td>
+        <td><code>sudo zypper install gcc-c++ cmake</code></td>
+    </tr>
+    <tr>
+        <td><b>Arch Linux:</b></td>
+        <td><code>sudo pacman -S gcc cmake</code></td>
+    </tr>
+</table>
 
 ## Unix-like OSes
 
@@ -131,10 +139,21 @@ primecount it is recommended to regenerate the man page. In order to
 regenerate the man page you need to install the AsciiDoc package and
 then build primecount using ```cmake . -DBUILD_MANPAGE=ON```.
 
-```bash
-# Debian/Ubuntu
-sudo apt install asciidoc-base
-
-# Fedora
-sudo dnf install asciidoc
-```
+<table>
+    <tr>
+        <td><b>Debian/Ubuntu:</b></td>
+        <td><code>sudo apt install asciidoc-base</code></td>
+    </tr>
+    <tr>
+        <td><b>Fedora:</b></td>
+        <td><code>sudo dnf install asciidoc</code></td>
+    </tr>
+    <tr>
+        <td><b>openSUSE:</b></td>
+        <td><code>sudo zypper install asciidoc</code></td>
+    </tr>
+    <tr>
+        <td><b>Arch Linux:</b></td>
+        <td><code>sudo pacman -S asciidoc</code></td>
+    </tr>
+</table>
