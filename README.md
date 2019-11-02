@@ -162,11 +162,11 @@ Options:
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y <NUM>       Tuning factor, y = x^(1/3) * alpha_y
-      --alpha-z <NUM>       Tuning factor, z = y * alpha_z
-      --AC                  Compute Gourdon's A + C formulas
-      --B                   Compute Gourdon's B formula
-      --D                   Compute Gourdon's D formula
+      --alpha-y <NUM>       Tuning factor: y = x^(1/3) * alpha_y
+      --alpha-z <NUM>       Tuning factor: z = y * alpha_z
+      --AC                  Compute the A + C formulas
+      --B                   Compute the B formula
+      --D                   Compute the D formula
       --Phi0                Compute the Phi0 formula
       --Sigma               Compute the 7 Sigma formulas
 ```
