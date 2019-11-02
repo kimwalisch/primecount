@@ -125,17 +125,10 @@ struct Option
   }
 };
 
-void optionStatus(Option& opt,
-                  CmdOptions& opts)
-{
-  set_print(true);
-  opts.time = true;
-
-  if (!opt.val.empty())
-    set_status_precision(opt.to<int>());
-}
-
-/// e.g. "--thread=4" -> return "--thread"
+/// Examples:
+/// "--option=ABC" -> return "--option"
+/// "-t4" -> return "-t"
+///
 string getOption(const string& str)
 {
   size_t pos = str.find_first_of("=0123456789");
@@ -146,15 +139,31 @@ string getOption(const string& str)
     return str.substr(0, pos);
 }
 
-/// e.g. "--thread=4" -> return "4"
+/// Examples:
+/// "--option=ABC" -> return "ABC"
+/// "-t4" -> return "4"
+///
 string getValue(const string& str)
 {
-  size_t pos = str.find_first_of("0123456789");
+  size_t pos = str.find("=");
+  if (pos != string::npos)
+    return str.substr(pos + 1);
 
-  if (pos == string::npos)
-    return string();
-  else
+  pos = str.find_first_of("0123456789");
+  if (pos != string::npos)
     return str.substr(pos);
+
+  return string();
+}
+
+void optionStatus(Option& opt,
+                  CmdOptions& opts)
+{
+  set_print(true);
+  opts.time = true;
+
+  if (!opt.val.empty())
+    set_status_precision(opt.to<int>());
 }
 
 /// Parse the next command-line option.
