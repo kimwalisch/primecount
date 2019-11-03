@@ -60,7 +60,7 @@ primecount 1e20 --status
 primecount 2**32 --meissel
 
 # Find the 10^14th prime using 4 threads
-primecount 1e14 --nth-prime --threads 4 --time
+primecount 1e14 --nth-prime --threads=4 --time
 ```
 
 ## Command-line options
