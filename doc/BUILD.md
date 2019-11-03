@@ -126,7 +126,8 @@ libprimecount using:
 For performance reasons primecount uses the POPCNT instruction on
 x86 CPUs. The POPCNT instruction was added to Intel's and AMD's CPUs
 alongside the SSE4 instruction set in 2008. If you need to support
-older x86 CPUs you can disable the POPCNT instruction using:
+older x86 CPUs you can disable POPCNT but this will deteriorate
+performance by about 40%.
 
 * ```cmake . -DWITH_POPCNT=OFF```
 
@@ -134,9 +135,9 @@ older x86 CPUs you can disable the POPCNT instruction using:
 
 primecount includes an up to date man page at ```doc/primecount.1```.
 That man page has been generated from ```doc/primecount.txt``` using
-the ```a2x``` program from the AsciiDoc package. Usually when packaging
+the ```a2x``` program from the ```asciidoc``` package. Usually when packaging
 primecount it is recommended to regenerate the man page. In order to
-regenerate the man page you need to install the AsciiDoc package and
+regenerate the man page you need to install the ```asciidoc``` package and
 then build primecount using ```cmake . -DBUILD_MANPAGE=ON```.
 
 <table>
