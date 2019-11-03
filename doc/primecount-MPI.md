@@ -156,14 +156,14 @@ Options:
                          Set digits after decimal point: -s1 prints 99.9%
       --test             Run various correctness tests and exit
       --time             Print the time elapsed in seconds
-  -t, --threads <NUM>    Set the number of threads, 1 <= NUM <= CPU cores.
+  -t, --threads=NUM      Set the number of threads, 1 <= NUM <= CPU cores.
                          By default primecount uses all available CPU cores.
   -v, --version          Print version and license information
   -h, --help             Print this help menu
 
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha <NUM>      Tuning factor: y = x^(1/3) * alpha
+  -a, --alpha=NUM        Set tuning factor: y = x^(1/3) * alpha
       --P2               Compute the 2nd partial sieve function
       --S1               Compute the ordinary leaves
       --S2-trivial       Compute the trivial special leaves

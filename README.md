@@ -90,7 +90,7 @@ Options:
                          Set digits after decimal point: -s1 prints 99.9%
       --test             Run various correctness tests and exit
       --time             Print the time elapsed in seconds
-  -t, --threads <NUM>    Set the number of threads, 1 <= NUM <= CPU cores.
+  -t, --threads=NUM      Set the number of threads, 1 <= NUM <= CPU cores.
                          By default primecount uses all available CPU cores.
   -v, --version          Print version and license information
   -h, --help             Print this help menu
@@ -102,7 +102,7 @@ Options:
 ```
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha <NUM>      Tuning factor: y = x^(1/3) * alpha
+  -a, --alpha=NUM        Set tuning factor: y = x^(1/3) * alpha
       --P2               Compute the 2nd partial sieve function
       --S1               Compute the ordinary leaves
       --S2-trivial       Compute the trivial special leaves
@@ -111,8 +111,8 @@ Advanced options for the Deleglise-Rivat algorithm:
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y <NUM>    Tuning factor: y = x^(1/3) * alpha_y
-      --alpha-z <NUM>    Tuning factor: z = y * alpha_z
+      --alpha-y=NUM      Set tuning factor: y = x^(1/3) * alpha_y
+      --alpha-z=NUM      Set tuning factor: z = y * alpha_z
       --AC               Compute the A + C formulas
       --B                Compute the B formula
       --D                Compute the D formula
