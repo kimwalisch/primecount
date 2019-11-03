@@ -151,17 +151,6 @@ void optionStatus(Option& opt,
     set_status_precision(opt.to<int>());
 }
 
-void optionBackup(Option& opt,
-                  CmdOptions& opts)
-{
-  if (!opt.val.empty())
-    opts.backupFile = opt.val;
-  else
-    opts.backupFile = backup_file();
-
-  set_backup_file(opts.backupFile);
-}
-
 void optionResume(Option& opt,
                   CmdOptions& opts)
 {
@@ -221,6 +210,11 @@ Option parseOption(int argc, char* argv[], int& i)
   if (!optionMap.count(opt.opt))
     throw primecount_error("unrecognized option '" + opt.opt + "'");
 
+  // Prevent '--option='
+  if (opt.val.empty() &&
+      optionMap[opt.opt].second == REQUIRED_PARAM)
+    throw primecount_error("missing value for option '" + opt.opt + "'");
+
   return opt;
 }
 
@@ -240,7 +234,7 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionID)
     {
-      case OPTION_BACKUP:  optionBackup(opt, opts); break;
+      case OPTION_BACKUP:  set_backup_file(opt.val); break;
       case OPTION_RESUME:  optionResume(opt, opts); break;
       case OPTION_ALPHA_Y: set_alpha_y(opt.to<double>()); break;
       case OPTION_ALPHA_Z: set_alpha_z(opt.to<double>()); break;

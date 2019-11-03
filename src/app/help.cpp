@@ -24,7 +24,7 @@ const string helpMenu
   "\n"
   "Backup options:\n"
   "\n"
-  "  -b, --backup <FILENAME>   Set the backup filename. The default backup\n"
+  "  -b, --backup=FILENAME     Set the backup filename. The default backup\n"
   "                            filename is primecount.backup.\n"
   "\n"
   "  -r, --resume[=FILENAME]   Resume the last computation from the\n"

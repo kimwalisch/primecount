@@ -130,7 +130,7 @@ Count the number of primes less than or equal to x (<= 10^31).
 
 Backup options:
 
-  -b, --backup <FILENAME>   Set the backup filename. The default backup
+  -b, --backup=FILENAME     Set the backup filename. The default backup
                             filename is primecount.backup.
 
   -r, --resume[=FILENAME]   Resume the last computation from the
