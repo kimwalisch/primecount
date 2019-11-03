@@ -93,7 +93,7 @@ numbers to compute e.g.:
 # worktodo.txt
 10000000
 1e15
-1e15 --alpha_y 10 --threads 4
+1e15 --alpha_y=10 --threads=4
 1e14 --AC
 1e18 --D
 ```
