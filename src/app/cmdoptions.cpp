@@ -190,7 +190,13 @@ Option parseOption(int argc, char* argv[], int& i)
 
       if (i < argc)
         opt.val = argv[i];
-      if (opt.val.empty() || optionMap.count(opt.val))
+
+      if (opt.val.empty())
+        throw primecount_error("missing value for option '" + opt.opt + "'");
+
+      // Prevent e.g. --threads --other-option
+      string isOption = getOption(opt.val);
+      if (optionMap.count(isOption))
         throw primecount_error("missing value for option '" + opt.opt + "'");
     }
   }
