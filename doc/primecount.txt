@@ -63,7 +63,7 @@ OPTIONS
 	Approximate the nth prime using Ri^-1(x).
 
 *-s, --status*[='NUM']::
-	Show the computation progress e.g. 1%, 2%, 3%, ... Show NUM digits after the decimal point: *--status=1* prints 99.9%.
+	Show the computation progress e.g. 1%, 2%, 3%, ... Show 'NUM' digits after the decimal point: *--status=1* prints 99.9%.
 
 *--test*::
 	Run various correctness tests and exit.
@@ -72,7 +72,7 @@ OPTIONS
 	Print the time elapsed in seconds.
 
 *-t, --threads*='NUM'::
-	Set the number of threads, 1 \<= NUM \<= CPU cores. By default primecount uses all available CPU cores.
+	Set the number of threads, 1 \<= 'NUM' \<= CPU cores. By default primecount uses all available CPU cores.
 
 *-v, --version*::
 	Print version and license information.
