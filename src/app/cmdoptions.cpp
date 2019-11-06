@@ -113,7 +113,10 @@ struct Option
   }
 };
 
-/// e.g. "--thread=4" -> return "--thread"
+/// Examples:
+/// "--option=ABC" -> return "--option"
+/// "-t4" -> return "-t"
+///
 string getOption(const string& str)
 {
   size_t pos = str.find_first_of("=0123456789");
