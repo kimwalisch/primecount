@@ -113,35 +113,27 @@ struct Option
   }
 };
 
-/// Examples:
-/// "--option=ABC" -> return "--option"
-/// "-t4" -> return "-t"
+/// Options start with "-" or "--", then
+/// follows a Latin ASCII character.
 ///
-string getOption(const string& str)
+bool isOption(const string& str)
 {
-  size_t pos = str.find_first_of("=0123456789");
+  // Option of type: -o...
+  if (str.size() >= 2 &&
+      str[0] == '-' &&
+      ((str[1] >= 'a' && str[1] <= 'z') ||
+       (str[1] >= 'A' && str[1] <= 'Z')))
+    return true;
 
-  if (pos == string::npos)
-    return str;
-  else
-    return str.substr(0, pos);
-}
+  // Option of type: --o...
+  if (str.size() >= 3 &&
+      str[0] == '-' &&
+      str[1] == '-' &&
+      ((str[2] >= 'a' && str[2] <= 'z') ||
+       (str[2] >= 'A' && str[2] <= 'Z')))
+    return true;
 
-/// Examples:
-/// "--option=ABC" -> return "ABC"
-/// "-t4" -> return "4"
-///
-string getValue(const string& str)
-{
-  size_t pos = str.find("=");
-  if (pos != string::npos)
-    return str.substr(pos + 1);
-
-  pos = str.find_first_of("0123456789");
-  if (pos != string::npos)
-    return str.substr(pos);
-
-  return string();
+  return false;
 }
 
 void optionStatus(Option& opt,
@@ -180,8 +172,11 @@ Option parseOption(int argc, char* argv[], int& i)
   Option opt;
   opt.str = argv[i];
 
+  if (opt.str.empty())
+    throw primecount_error("unrecognized option ''");
+
   // Check if the option has the format:
-  // --arg or -a (but not --arg=N)
+  // --opt or -o (but not --opt=N)
   if (optionMap.count(opt.str))
   {
     opt.opt = opt.str;
@@ -194,35 +189,84 @@ Option parseOption(int argc, char* argv[], int& i)
       if (i < argc)
         opt.val = argv[i];
 
-      if (opt.val.empty())
+      // Prevent --threads --other-option
+      if (opt.val.empty() || isOption(opt.val))
         throw primecount_error("missing value for option '" + opt.opt + "'");
+    }
 
-      // Prevent e.g. --threads --other-option
-      string isOption = getOption(opt.val);
-      if (optionMap.count(isOption))
-        throw primecount_error("missing value for option '" + opt.opt + "'");
+    // If the option takes an optional argument we
+    // assume the next value is an optional argument
+    // if the value is not a vaild option.
+    if (isParam == OPTIONAL_PARAM &&
+        i + 1 < argc &&
+        !string(argv[i + 1]).empty() &&
+        !isOption(argv[i + 1]))
+    {
+      i += 1;
+      opt.val = argv[i];
     }
   }
   else
   {
     // Here the option is either:
-    // 1) A number (e.g. the start number)
-    // 2) An option of type: --arg=N
+    // 1) An option of type: --opt[=N]
+    // 2) An option of type: --opt[N]
+    // 3) A number (e.g. the start number)
 
-    opt.opt = getOption(opt.str);
-    opt.val = getValue(opt.str);
+    if (isOption(opt.str))
+    {
+      size_t pos = opt.str.find("=");
 
-    if (opt.opt.empty() && !opt.val.empty())
+      // Option of type: --opt=N
+      if (pos != string::npos)
+      {
+        opt.opt = opt.str.substr(0, pos);
+        opt.val = opt.str.substr(pos + 1);
+
+        // Print partial option: --opt (without =N)
+        if (!optionMap.count(opt.opt))
+          throw primecount_error("unrecognized option '" + opt.opt + "'");
+      }
+      else
+      {
+        // Option of type: --opt[N]
+        pos = opt.str.find_first_of("0123456789");
+
+        if (pos == string::npos)
+          opt.opt = opt.str;
+        else
+        {
+          opt.opt = opt.str.substr(0, pos);
+          opt.val = opt.str.substr(pos);
+        }
+
+        // Print full option e.g.: --opt123
+        if (!optionMap.count(opt.opt))
+          throw primecount_error("unrecognized option '" + opt.str + "'");
+      }
+
+      // Prevent '--option='
+      if (opt.val.empty() &&
+          optionMap[opt.opt].second == REQUIRED_PARAM)
+        throw primecount_error("missing value for option '" + opt.opt + "'");
+    }
+    else
+    {
+      // Here the option is actually a number or
+      // an integer arithmetic expression.
       opt.opt = "--number";
+      opt.val = opt.str;
+
+      // This is not a valid number
+      if (opt.str.find_first_of("0123456789") == string::npos)
+        throw primecount_error("unrecognized option '" + opt.str + "'");
+
+      // Prevent negative numbers as there are
+      // no negative prime numbers.
+      if (opt.str.at(0) == '-')
+        throw primecount_error("unrecognized option '" + opt.str + "'");
+    }
   }
-
-  if (!optionMap.count(opt.opt))
-    throw primecount_error("unrecognized option '" + opt.opt + "'");
-
-  // Prevent '--option='
-  if (opt.val.empty() &&
-      optionMap[opt.opt].second == REQUIRED_PARAM)
-    throw primecount_error("missing value for option '" + opt.opt + "'");
 
   return opt;
 }
