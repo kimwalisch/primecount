@@ -133,7 +133,7 @@ bool isOption(const string& str)
   // Option of type: -o...
   if (str.size() >= 2 &&
       str[0] == '-' &&
-      ((str[1] >= 'a' && str[1] <= 'z') || 
+      ((str[1] >= 'a' && str[1] <= 'z') ||
        (str[1] >= 'A' && str[1] <= 'Z')))
     return true;
 
@@ -141,7 +141,7 @@ bool isOption(const string& str)
   if (str.size() >= 3 &&
       str[0] == '-' &&
       str[1] == '-' &&
-      ((str[2] >= 'a' && str[2] <= 'z') || 
+      ((str[2] >= 'a' && str[2] <= 'z') ||
        (str[2] >= 'A' && str[2] <= 'Z')))
     return true;
 
