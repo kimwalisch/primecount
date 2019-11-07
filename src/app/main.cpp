@@ -85,11 +85,8 @@ void result_txt(int argc,
     // Don't put primecount --resume into results file
     if (json.count("command") > 0)
     {
-      int i = 0;
-      int size = 0;
-
-      for (auto& c : json["command"])
-        size += 1;
+      size_t i = 0;
+      size_t size = json["command"].size();
 
       for (auto& c : json["command"])
       {
