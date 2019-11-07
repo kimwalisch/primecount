@@ -80,10 +80,31 @@ void result_txt(int argc,
 
   if (resfile.is_open())
   {
-    resfile << basename(argv[0]);
+    auto json = load_backup();
 
-    for (int i = 1; i < argc; i++)
-      resfile << " " << argv[i];
+    // Don't put primecount --resume into results file
+    if (json.count("command") > 0)
+    {
+      int i = 0;
+      int size = 0;
+
+      for (auto& c : json["command"])
+        size += 1;
+
+      for (auto& c : json["command"])
+      {
+        resfile << c.get<std::string>();
+        i += 1;
+        if (i < size)
+          resfile << " ";
+      }
+    }
+    else
+    {
+      resfile << basename(argv[0]);
+      for (int i = 1; i < argc; i++)
+        resfile << " " << argv[i];
+    }
 
     resfile << endl;
     resfile << "Result: " << res << endl;
