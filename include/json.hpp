@@ -14518,6 +14518,7 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 
 #include <backup.hpp>
 #include <calculator.hpp>
+#include <int128_t.hpp>
 #include <primecount.hpp>
 #include <WjCryptLib_Md5.h>
 
@@ -14610,29 +14611,26 @@ inline std::vector<std::string> get_backup_command()
   return args;
 }
 
-template <typename T>
-inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y)
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, maxint_t x, int64_t y)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<T>(j[formula]["x"]) &&
+         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
          y == j[formula]["y"];
 }
 
-template <typename T>
-inline bool is_resume(const nlohmann::json& j, const std::string& formula, T x, int64_t y, int64_t z, int64_t k)
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, maxint_t x, int64_t y, int64_t z, int64_t k)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<T>(j[formula]["x"]) &&
+         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
          k == j[formula]["k"];
 }
 
-template <typename T>
-inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, T x, int64_t y, int64_t z, int64_t k)
+inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, maxint_t x, int64_t y, int64_t z, int64_t k)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<T>(j[formula]["x"]) &&
+         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
          k == j[formula]["k"] &&
