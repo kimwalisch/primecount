@@ -30,6 +30,7 @@
 #include <LoadBalancer.hpp>
 #include <primecount-internal.hpp>
 #include <json.hpp>
+#include <backup.hpp>
 #include <S2Status.hpp>
 #include <Sieve.hpp>
 #include <imath.hpp>

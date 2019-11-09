@@ -19,6 +19,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <json.hpp>
+#include <backup.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 

@@ -13,7 +13,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <backup.hpp>
 #include <print.hpp>
 #include <int128_t.hpp>
 
@@ -30,6 +29,11 @@ using namespace std;
 
 namespace primecount {
 
+// backup.cpp
+std::string backup_file();
+void set_backup_file(const std::string& backup_file);
+
+// help.cpp
 void help(int exitCode);
 void version();
 void test();

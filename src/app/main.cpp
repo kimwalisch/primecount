@@ -18,6 +18,7 @@
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <json.hpp>
+#include <backup.hpp>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -68,6 +69,73 @@ string basename(string path)
     return path.substr(pos + 1);
 
   return path;
+}
+
+std::vector<std::string> get_backup_command()
+{
+  auto j = load_backup();
+  auto command = j["command"];
+
+  std::vector<std::string> args;
+
+  for (auto& str : command)
+    args.push_back(str);
+
+  return args;
+}
+
+void backup_command(int argc, char** argv)
+{
+  auto j = load_backup();
+  std::vector<std::string> args;
+
+  for (int i = 0; i < argc; i++)
+    args.push_back(argv[i]);
+
+  j["command"] = args;
+  store_backup(j);
+}
+
+bool is_backup_seconds(const nlohmann::json& j, const std::string& formula)
+{
+  return j.find(formula) != j.end() &&
+         j[formula].count("seconds");
+}
+
+double backup_time(double time)
+{
+  auto j = load_backup();
+
+  if (is_backup_seconds(j, "AC") &&
+      is_backup_seconds(j, "B") &&
+      is_backup_seconds(j, "D") &&
+      is_backup_seconds(j, "Phi0") &&
+      is_backup_seconds(j, "Sigma"))
+  {
+    double ac = j["AC"]["seconds"];
+    double b = j["B"]["seconds"];
+    double d = j["D"]["seconds"];
+    double phi0 = j["Phi0"]["seconds"];
+    double sigma = j["Sigma"]["seconds"];
+
+    double seconds = ac + b + d + phi0 + sigma;
+    return get_time() - seconds;
+  }
+
+  return time;
+}
+
+double backup_time(double time, const std::string& formula)
+{
+  auto j = load_backup();
+
+  if (is_backup_seconds(j, formula))
+  {
+    double seconds = j[formula]["seconds"];
+    return get_time() - seconds;
+  }
+
+  return time;
 }
 
 void result_txt(int argc,

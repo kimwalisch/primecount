@@ -39,6 +39,7 @@
 #include <print.hpp>
 #include <S2Status.hpp>
 #include <json.hpp>
+#include <backup.hpp>
 
 #include <stdint.h>
 #include <vector>

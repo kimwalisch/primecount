@@ -9,7 +9,6 @@
 
 #include <print.hpp>
 #include <primecount-internal.hpp>
-#include <backup.hpp>
 #include <int128_t.hpp>
 #include <stdint.h>
 
@@ -28,6 +27,9 @@ bool print_variables_ = false;
 } // naespace
 
 namespace primecount {
+
+// backup.cpp
+std::string backup_file();
 
 void set_print(bool print)
 {
