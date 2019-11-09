@@ -128,9 +128,9 @@ CPU architectures that support it. On x86/x64 the POPCNT instruction was
 added to Intel's and AMD's CPUs alongside the SSE4 instruction set in 2008.
 If you need to support older x86/x64 CPUs you can disable POPCNT but this
 will deteriorate performance by about 40%. Ideally POPCNT support should
-only be disabled for x86/x64 since other CPU architectures do not have the
-issue that there exist CPUs with and without the POPCNT instruction for
-the same instruction set.
+only be disabled for x86/x64 since other CPU architectures
+(e.g. ARM64, PPC64LE) do not have the issue that there exist CPUs with and
+without the POPCNT instruction for the same instruction set.
 
 * ```cmake . -DWITH_POPCNT=OFF```
 
