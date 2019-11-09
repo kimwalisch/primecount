@@ -13,6 +13,7 @@
 #include <primecount-internal.hpp>
 #include <WjCryptLib_Md5.h>
 
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -175,7 +176,8 @@ int calculate_resume_threads(const nlohmann::json& j,
     {
       threadId.erase(0, std::string("thread").size());
       int tid = std::stoi(threadId);
-      maxThreadId = std::max(tid, maxThreadId);
+      // std::max<int> prevents collison with max macro from Windows.h
+      maxThreadId = std::max<int>(tid, maxThreadId);
     }
   }
 
