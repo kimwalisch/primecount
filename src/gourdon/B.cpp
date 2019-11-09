@@ -21,7 +21,6 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <calculator.hpp>
 #include <aligned_vector.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -47,15 +46,14 @@ bool is_backup(double time)
 }
 
 /// backup intermediate result
-template <typename T, typename J>
-void backup(J& json,
-            T x,
+void backup(nlohmann::json& json,
+            maxint_t x,
             int64_t y,
             int64_t z,
             int64_t low,
             int64_t thread_distance,
-            T pix_total,
-            T sum,
+            maxint_t pix_total,
+            maxint_t sum,
             double time)
 {
   double percent = get_percent(low, z);
@@ -75,11 +73,10 @@ void backup(J& json,
 }
 
 /// backup result
-template <typename T>
-void backup(T x,
+void backup(maxint_t x,
             int64_t y,
             int64_t z,
-            T sum,
+            maxint_t sum,
             double time)
 {
   auto json = load_backup();
@@ -99,8 +96,8 @@ void backup(T x,
 }
 
 /// resume computation
-template <typename T, typename J>
-bool resume(J& json,
+template <typename T>
+bool resume(nlohmann::json& json,
             T x,
             int64_t y,
             int64_t& low,
@@ -114,8 +111,8 @@ bool resume(J& json,
     double seconds = json["B"]["seconds"];
     low = json["B"]["low"];
     thread_distance = json["B"]["thread_distance"];
-    pix_total = calculator::eval<T>(json["B"]["pix_total"]);
-    sum = calculator::eval<T>(json["B"]["sum"]);
+    pix_total = (T) to_maxint(json["B"]["pix_total"]);
+    sum = (T) to_maxint(json["B"]["sum"]);
     time = get_time() - seconds;
     return true;
   }
@@ -140,7 +137,7 @@ bool resume(T x,
 
     if (!json["B"].count("low"))
     {
-      sum = calculator::eval<T>(json["B"]["sum"]);
+      sum = (T) to_maxint(json["B"]["sum"]);
       time = get_time() - seconds;
       return true;
     }

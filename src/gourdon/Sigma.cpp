@@ -15,7 +15,6 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <calculator.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
@@ -31,11 +30,10 @@ using namespace primecount;
 
 namespace {
 
-template <typename T>
-void backup(T x,
+void backup(maxint_t x,
             int64_t y,
             int64_t x_star,
-            T sum,
+            maxint_t sum,
             double time)
 {
   auto json = load_backup();
@@ -62,8 +60,7 @@ bool resume(T x,
   {
     double percent = json["Sigma"]["percent"];
     double seconds = json["Sigma"]["seconds"];
-
-    sum = calculator::eval<T>(json["Sigma"]["sum"]);
+    sum = (T) to_maxint(json["Sigma"]["sum"]);
     time = get_time() - seconds;
     print_resume(percent, x);
     return true;

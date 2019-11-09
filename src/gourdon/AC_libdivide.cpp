@@ -38,7 +38,6 @@
 #include <imath.hpp>
 #include <print.hpp>
 #include <S2Status.hpp>
-#include <calculator.hpp>
 #include <json.hpp>
 
 #include <stdint.h>
@@ -58,9 +57,8 @@ bool is_backup(double time)
 }
 
 /// backup intermediate result
-template <typename T, typename J>
-void backup(J& json,
-            T x,
+void backup(nlohmann::json& json,
+            maxint_t x,
             int64_t y,
             int64_t z,
             int64_t k,
@@ -84,13 +82,12 @@ void backup(J& json,
 }
 
 /// backup result
-template <typename T, typename J>
-void backup_result(J& json,
-                   T x,
+void backup_result(nlohmann::json& json,
+                   maxint_t x,
                    int64_t y,
                    int64_t z,
                    int64_t k,
-                   T sum,
+                   maxint_t sum,
                    double time)
 {
   if (json.find("AC") != json.end())
@@ -108,14 +105,13 @@ void backup_result(J& json,
 }
 
 /// update backup (without storing to disk)
-template <typename T, typename J>
-void update(J& json,
+void update(nlohmann::json& json,
             const std::string& tid,
             const std::string& formula,
             int64_t b,
             int64_t next_b,
             int64_t max_b,
-            T sum)
+            maxint_t sum)
 {
   auto& AC = json["AC"];
   AC["next_b"] = next_b;
@@ -132,9 +128,8 @@ void update(J& json,
 }
 
 /// resume thread
-template <typename T, typename J>
-bool resume(J& json,
-            T x,
+bool resume(nlohmann::json& json,
+            maxint_t x,
             int64_t y,
             int64_t z,
             int64_t k,
@@ -152,8 +147,8 @@ bool resume(J& json,
 }
 
 /// Resume C1 algorithm
-template <typename T, typename J>
-bool resume_c1(J& json,
+template <typename T>
+bool resume_c1(nlohmann::json& json,
                T x,
                int64_t y,
                int64_t z,
@@ -166,7 +161,7 @@ bool resume_c1(J& json,
       json["AC"].count("sum_c1") > 0)
   {
     double seconds = json["AC"]["seconds"];
-    sum = calculator::eval<T>(json["AC"]["sum_c1"]);
+    sum = (T) to_maxint(json["AC"]["sum_c1"]);
     next_b = json["AC"]["next_b"];
     time = get_time() - seconds;
     return true;
@@ -178,8 +173,8 @@ bool resume_c1(J& json,
 /// Resume the A and C2 algorithms which
 /// make use of SegmentedPi.
 ///
-template <typename T, typename J>
-bool resume_a_c2(J& json,
+template <typename T>
+bool resume_a_c2(nlohmann::json& json,
                  T x,
                  int64_t y,
                  int64_t z,
@@ -193,7 +188,7 @@ bool resume_a_c2(J& json,
       json["AC"].count("sum_ac") > 0)
   {
     double seconds = json["AC"]["seconds"];
-    sum = calculator::eval<T>(json["AC"]["sum_ac"]);
+    sum = (T) to_maxint(json["AC"]["sum_ac"]);
     next_b = json["AC"]["next_b"];
     low = json["AC"]["low"];
     time = get_time() - seconds;
@@ -204,8 +199,8 @@ bool resume_a_c2(J& json,
 }
 
 /// resume result
-template <typename T, typename J>
-bool resume(J& json,
+template <typename T>
+bool resume(nlohmann::json& json,
             T x,
             int64_t y,
             int64_t z,
@@ -221,7 +216,7 @@ bool resume(J& json,
 
     if (json["AC"].count("sum") > 0)
     {
-      sum = calculator::eval<T>(json["AC"]["sum"]);
+      sum = (T) to_maxint(json["AC"]["sum"]);
       time = get_time() - seconds;
       return true;
     }

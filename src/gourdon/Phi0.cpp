@@ -21,7 +21,6 @@
 
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
-#include <calculator.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
@@ -37,12 +36,11 @@ using namespace primecount;
 
 namespace {
 
-template <typename T>
-void backup(T x,
+void backup(maxint_t x,
             int64_t y,
             int64_t z,
             int64_t k,
-            T sum,
+            maxint_t sum,
             double time)
 {
   auto json = load_backup();
@@ -73,7 +71,7 @@ bool resume(T x,
     double percent = json["Phi0"]["percent"];
     double seconds = json["Phi0"]["seconds"];
 
-    sum = calculator::eval<T>(json["Phi0"]["sum"]);
+    sum = (T) to_maxint(json["Phi0"]["sum"]);
     time = get_time() - seconds;
     print_resume(percent, x);
     return true;

@@ -14517,13 +14517,14 @@ inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std
 #include <sstream>
 
 #include <backup.hpp>
-#include <calculator.hpp>
 #include <int128_t.hpp>
 #include <primecount.hpp>
 #include <WjCryptLib_Md5.h>
 
 namespace primecount
 {
+// defined in primecount-internal.hpp
+maxint_t to_maxint(const std::string& expr);
 
 inline void verify_checksum(nlohmann::json copy)
 {
@@ -14614,14 +14615,14 @@ inline std::vector<std::string> get_backup_command()
 inline bool is_resume(const nlohmann::json& j, const std::string& formula, maxint_t x, int64_t y)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
+         x == to_maxint(j[formula]["x"]) &&
          y == j[formula]["y"];
 }
 
 inline bool is_resume(const nlohmann::json& j, const std::string& formula, maxint_t x, int64_t y, int64_t z, int64_t k)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
+         x == to_maxint(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
          k == j[formula]["k"];
@@ -14630,7 +14631,7 @@ inline bool is_resume(const nlohmann::json& j, const std::string& formula, maxin
 inline bool is_resume(const nlohmann::json& j, const std::string& formula, int thread_id, maxint_t x, int64_t y, int64_t z, int64_t k)
 {
   return j.find(formula) != j.end() &&
-         x == calculator::eval<maxint_t>(j[formula]["x"]) &&
+         x == to_maxint(j[formula]["x"]) &&
          y == j[formula]["y"] &&
          z == j[formula]["z"] &&
          k == j[formula]["k"] &&

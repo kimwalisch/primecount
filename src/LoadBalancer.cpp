@@ -29,7 +29,6 @@
 
 #include <LoadBalancer.hpp>
 #include <primecount-internal.hpp>
-#include <calculator.hpp>
 #include <json.hpp>
 #include <S2Status.hpp>
 #include <Sieve.hpp>
@@ -168,7 +167,7 @@ bool LoadBalancer::resume(maxint_t& sum, double& time) const
 
     if (!copy_["D"].count("low"))
     {
-      sum = calculator::eval<maxint_t>(copy_["D"]["sum"]);
+      sum = to_maxint(copy_["D"]["sum"]);
       time = get_time() - seconds;
       return true;
     }
@@ -226,7 +225,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   if (is_resume(json_, "D", x_, y_, z_, k_))
   {
     double seconds = copy_["D"]["seconds"];
-    sum_ = calculator::eval<maxint_t>(copy_["D"]["sum"]);
+    sum_ = to_maxint(copy_["D"]["sum"]);
     time_ = get_time() - seconds;
 
     if (json_["D"].count("low"))
