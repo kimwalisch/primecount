@@ -180,7 +180,7 @@ void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads
 {
   if (is_print_variables())
   {
-    print_gourdon_vars(x, y, z, k, threads);
+    print_gourdon(x, y, z, k, threads);
     cout << endl;
   }
 }
