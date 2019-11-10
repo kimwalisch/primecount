@@ -90,7 +90,16 @@ double alpha_y_ = -1;
 // Tuning factor used in Xavier Gourdon's algorithm
 double alpha_z_ = -1;
 
+/// Truncate & ceil a floating point number to
+/// 3 digits after the decimal point.
+/// Example: 1.123001 -> 1.124
+///
+double truncate3_ceil(double n)
+{
+  return ((uint64_t) std::ceil(n * 1000)) / 1000.0;
 }
+
+} // namespace
 
 namespace primecount {
 
@@ -244,11 +253,7 @@ void set_alpha(double alpha)
   if (alpha < 1.0)
     alpha_ = -1;
   else
-  {
-    alpha_ = alpha;
-    // Preserve 3 digits after decimal point
-    alpha_ = (uint64_t)(alpha_ * 1000) / 1000.0;
-  }
+    alpha_ = truncate3_ceil(alpha);
 }
 
 void set_alpha_y(double alpha_y)
@@ -258,11 +263,7 @@ void set_alpha_y(double alpha_y)
   if (alpha_y < 1.0)
     alpha_y_ = -1;
   else
-  {
-    alpha_y_ = alpha_y;
-    // Preserve 3 digits after decimal point
-    alpha_y_ = (uint64_t)(alpha_y_ * 1000) / 1000.0;
-  }
+    alpha_y_ = truncate3_ceil(alpha_y);
 }
 
 void set_alpha_z(double alpha_z)
@@ -272,11 +273,7 @@ void set_alpha_z(double alpha_z)
   if (alpha_z < 1.0)
     alpha_z_ = -1;
   else
-  {
-    alpha_z_ = alpha_z;
-    // Preserve 3 digits after decimal point
-    alpha_z_ = (uint64_t)(alpha_z_ * 1000) / 1000.0;
-  }
+    alpha_z_ = truncate3_ceil(alpha_z);
 }
 
 /// Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -286,7 +283,9 @@ double get_alpha(maxint_t x, int64_t y)
 {
   // y = x13 * alpha, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
-  return (double) y / x13;
+  double alpha = (double) y / x13;
+  alpha = truncate3_ceil(alpha);
+  return alpha;
 }
 
 /// Tuning factor used in Xavier Gourdon's algorithm.
@@ -294,14 +293,18 @@ double get_alpha_y(maxint_t x, int64_t y)
 {
   // y = x13 * alpha_y, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
-  return (double) y / x13;
+  double alpha_y = (double) y / x13;
+  alpha_y = truncate3_ceil(alpha_y);
+  return alpha_y;
 }
 
 /// Tuning factor used in Xavier Gourdon's algorithm.
 double get_alpha_z(int64_t y, int64_t z)
 {
   // z = y * alpha_z, thus alpha_z = z / y
-  return (double) z / y;
+  double alpha_z = (double) z / y;
+  alpha_z = truncate3_ceil(alpha_z);
+  return alpha_z;
 }
 
 /// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
@@ -326,7 +329,7 @@ double get_alpha_lmo(maxint_t x)
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
-  alpha = (uint64_t)(alpha * 1000) / 1000.0;
+  alpha = truncate3_ceil(alpha);
 
   return in_between(1, alpha, x16);
 }
@@ -354,7 +357,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
-  alpha = (uint64_t)(alpha * 1000) / 1000.0;
+  alpha = truncate3_ceil(alpha);
 
   return in_between(1, alpha, x16);
 }
@@ -415,8 +418,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
 
   // Preserve 3 digits after decimal point
   alpha_y = in_between(1, alpha_y, x16);
-  alpha_y = (uint64_t)(alpha_y * 1000) / 1000.0;
-  alpha_z = (uint64_t)(alpha_z * 1000) / 1000.0;
+  alpha_y = truncate3_ceil(alpha_y);
+  alpha_z = truncate3_ceil(alpha_z);
 
   // Ensure alpha_y * alpha_z <= x^(1/6)
   alpha_y = in_between(1, alpha_y, x16);
