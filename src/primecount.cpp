@@ -285,6 +285,7 @@ double get_alpha_z(int64_t y, int64_t z)
 double get_alpha_lmo(maxint_t x)
 {
   double alpha = alpha_;
+  double x16 = (double) iroot<6>(x);
 
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
@@ -295,9 +296,12 @@ double get_alpha_lmo(maxint_t x)
     double logx = log((double) x);
 
     alpha = a * pow(logx, 2) + b * logx + c;
+    alpha = in_between(1, alpha, x16);
+    // Preserve 3 digits after decimal point
+    alpha = (uint64_t)(alpha * 1000) / 1000.0;
   }
 
-  return in_between(1, alpha, iroot<6>(x));
+  return in_between(1, alpha, x16);
 }
 
 /// Get the Deleglise-Rivat alpha tuning factor.
@@ -308,7 +312,7 @@ double get_alpha_lmo(maxint_t x)
 double get_alpha_deleglise_rivat(maxint_t x)
 {
   double alpha = alpha_;
-  double x2 = (double) x;
+  double x16 = (double) iroot<6>(x);
 
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
@@ -317,12 +321,15 @@ double get_alpha_deleglise_rivat(maxint_t x)
     double b = 0.0018113;
     double c = -0.110407;
     double d = 1.3724;
-    double logx = log(x2);
+    double logx = log((double) x);
 
     alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    alpha = in_between(1, alpha, x16);
+    // Preserve 3 digits after decimal point
+    alpha = (uint64_t)(alpha * 1000) / 1000.0;
   }
 
-  return in_between(1, alpha, iroot<6>(x));
+  return in_between(1, alpha, x16);
 }
 
 /// In Xavier Gourdon's algorithm there are 2 alpha tuning
@@ -341,6 +348,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_yz;
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
+  double x16 = (double) iroot<6>(x);
 
   if (x < 1e10)
   {
@@ -372,14 +380,20 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // and a large alpha_z when x > 10^24.
     alpha_z = (x <= 1e24) ? 1.3 : 2.0;
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
+    // Preserve 3 digits after decimal point
+    alpha_z = (uint64_t)(alpha_z * 1000) / 1000.0;
   }
 
   // Use default alpha_y
   if (alpha_y < 1)
+  {
     alpha_y = alpha_yz / alpha_z;
+    alpha_y = in_between(1, alpha_y, x16);
+    // Preserve 3 digits after decimal point
+    alpha_y = (uint64_t)(alpha_y * 1000) / 1000.0;
+  }
 
   // Ensure alpha_y * alpha_z <= x^(1/6)
-  double x16 = (double) iroot<6>(x);
   alpha_y = in_between(1, alpha_y, x16);
   double max_alpha_z = max(1.0, x16 / alpha_y);
   alpha_z = in_between(1, alpha_z, max_alpha_z);
