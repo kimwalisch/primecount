@@ -248,7 +248,7 @@ int64_t D(int64_t x,
 {
   print("");
   print("=== D(x, y) ===");
-  print_gourdon(x, y, z, k, threads);
+  print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
   DFactorTable<uint16_t> factor(y, z, threads);
@@ -270,7 +270,7 @@ int128_t D(int128_t x,
 {
   print("");
   print("=== D(x, y) ===");
-  print_gourdon(x, y, z, k, threads);
+  print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
   int128_t sum;

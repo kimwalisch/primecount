@@ -167,7 +167,7 @@ int64_t pi_lmo5(int64_t x)
   print("");
   print("=== pi_lmo5(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, alpha, 1);
+  print(x, y, z, c, 1);
 
   int64_t p2 = P2(x, y, 1);
   auto primes = generate_primes<int32_t>(y);

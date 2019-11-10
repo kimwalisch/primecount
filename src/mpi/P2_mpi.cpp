@@ -195,7 +195,7 @@ int64_t P2_mpi(int64_t x, int64_t y, int threads)
   print("");
   print("=== P2_mpi(x, y) ===");
   print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_vars(x, y, threads);
 
   double time = get_time();
   int64_t p2 = P2_mpi_master(x, y, threads);
@@ -211,7 +211,7 @@ int128_t P2_mpi(int128_t x, int64_t y, int threads)
   print("");
   print("=== P2_mpi(x, y) ===");
   print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_vars(x, y, threads);
 
   double time = get_time();
   int128_t p2 = P2_mpi_master(x, y, threads);

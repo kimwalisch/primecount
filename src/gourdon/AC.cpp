@@ -288,7 +288,7 @@ int64_t AC(int64_t x,
 {
   print("");
   print("=== AC(x, y) ===");
-  print_gourdon(x, y, z, k, threads);
+  print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
@@ -313,7 +313,7 @@ int128_t AC(int128_t x,
 {
   print("");
   print("=== AC(x, y) ===");
-  print_gourdon(x, y, z, k, threads);
+  print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);

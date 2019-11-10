@@ -95,7 +95,7 @@ int64_t S1(int64_t x,
   print("");
   print("=== S1(x, y) ===");
   print("Computation of the ordinary leaves");
-  print(x, y, c, threads);
+  print_vars(x, y, c, threads);
 
   double time = get_time();
   int64_t s1 = S1_OpenMP(x, y, c, threads);
@@ -114,7 +114,7 @@ int128_t S1(int128_t x,
   print("");
   print("=== S1(x, y) ===");
   print("Computation of the ordinary leaves");
-  print(x, y, c, threads);
+  print_vars(x, y, c, threads);
 
   double time = get_time();
   int128_t s1;

@@ -236,7 +236,7 @@ int64_t pi_lmo_parallel(int64_t x, int threads)
   print("");
   print("=== pi_lmo_parallel(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, alpha, threads);
+  print(x, y, z, c, threads);
 
   int64_t p2 = P2(x, y, threads);
   auto primes = generate_primes<int32_t>(y);

@@ -426,8 +426,9 @@ int main (int argc, char* argv[])
 #endif
     }
 
-    if (print_result())
+    if (is_print_combined_result())
     {
+      // Add empty line after last partial formula
       if (is_print())
         cout << endl;
 

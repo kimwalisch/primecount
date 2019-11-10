@@ -23,6 +23,11 @@ namespace {
 bool print_ = false;
 bool print_variables_ = false;
 
+bool is_print_variables()
+{
+  return print_variables_;
+}
+
 } // naespace
 
 namespace primecount {
@@ -45,12 +50,21 @@ void set_print_variables(bool print_variables)
 #endif
 }
 
-bool print_result()
+bool is_print()
+{
+  return print_;
+}
+
+/// The final combined result is always shown at
+/// the end even if is_print = false. It is only
+/// not shown for partial formulas.
+///
+bool is_print_combined_result()
 {
 #ifdef HAVE_MPI
-  return !print_variables() && is_mpi_master_proc();
+  return !is_print_variables() && is_mpi_master_proc();
 #else
-  return !print_variables();
+  return !is_print_variables();
 #endif
 }
 
@@ -62,16 +76,6 @@ void print_threads(int threads)
 #else
   cout << "threads = " << threads << endl;
 #endif
-}
-
-bool is_print()
-{
-  return print_;
-}
-
-bool print_variables()
-{
-  return print_variables_;
 }
 
 void print_seconds(double seconds)
@@ -91,6 +95,7 @@ void print(const string& str, maxint_t res)
     cout << str << " = " << res << endl;
 }
 
+/// Print result of partial formula
 void print(const string& str, maxint_t res, double time)
 {
   if (is_print())
@@ -102,36 +107,8 @@ void print(const string& str, maxint_t res, double time)
   }
 }
 
-void print(maxint_t x, int64_t y, int threads)
-{
-  if (print_variables())
-  {
-    maxint_t z = x / y;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-    print_threads(threads);
-    cout << endl;
-  }
-}
-
-void print(maxint_t x, int64_t y, int64_t c, int threads)
-{
-  if (print_variables())
-  {
-    maxint_t z = x / y;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-    print_threads(threads);
-    cout << endl;
-  }
-}
-
-void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int threads)
+/// Used by pi_lmo(x), pi_deleglise_rivat(x)
+void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
 {
   if (is_print())
   {
@@ -139,41 +116,40 @@ void print(maxint_t x, int64_t y, int64_t z, int64_t c, double alpha, int thread
     cout << "y = " << y << endl;
     cout << "z = " << z << endl;
     cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << alpha << endl;
+    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
     print_threads(threads);
   }
 }
 
-void print_gourdon(maxint_t x, int64_t y, int threads)
+/// Only enabled for partial formulas
+void print_vars(maxint_t x, int64_t y, int threads)
 {
-  if (print_variables())
+  if (is_print_variables())
   {
+    maxint_t z = x / y;
     cout << "x = " << x << endl;
     cout << "y = " << y << endl;
-    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    cout << "z = " << z << endl;
+    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
     print_threads(threads);
     cout << endl;
   }
 }
 
+/// Only enabled for partial formulas
+void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
+{
+  if (is_print_variables())
+  {
+    int64_t z = (int64_t)(x / y);
+    print(x, y, z, c, threads);
+    cout << endl;
+  }
+}
+
+/// Used by pi_gourdon(x)
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
-  if (print_variables())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "k = " << k << endl;
-    cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
-    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
-    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
-    print_threads(threads);
-    cout << endl;
-  }
-}
-
-void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double alpha_z, int threads)
-{
   if (is_print())
   {
     cout << "x = " << x << endl;
@@ -181,9 +157,32 @@ void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, 
     cout << "z = " << z << endl;
     cout << "k = " << k << endl;
     cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
-    cout << "alpha_y = " << fixed << setprecision(3) << alpha_y << endl;
-    cout << "alpha_z = " << fixed << setprecision(3) << alpha_z << endl;
+    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
     print_threads(threads);
+  }
+}
+
+/// Only enabled for partial formulas
+void print_gourdon_vars(maxint_t x, int64_t y, int threads)
+{
+  if (is_print_variables())
+  {
+    cout << "x = " << x << endl;
+    cout << "y = " << y << endl;
+    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    print_threads(threads);
+    cout << endl;
+  }
+}
+
+/// Only enabled for partial formulas
+void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
+{
+  if (is_print_variables())
+  {
+    print_gourdon_vars(x, y, z, k, threads);
+    cout << endl;
   }
 }
 

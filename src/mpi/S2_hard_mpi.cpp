@@ -293,7 +293,7 @@ int64_t S2_hard_mpi(int64_t x,
   print("");
   print("=== S2_hard_mpi(x, y) ===");
   print("Computation of the hard special leaves");
-  print(x, y, c, threads);
+  print_vars(x, y, c, threads);
 
   int64_t s2_hard = 0;
   double time = get_time();
@@ -324,7 +324,7 @@ int128_t S2_hard_mpi(int128_t x,
   print("");
   print("=== S2_hard_mpi(x, y) ===");
   print("Computation of the hard special leaves");
-  print(x, y, c, threads);
+  print_vars(x, y, c, threads);
 
   int128_t s2_hard = 0;
   double time = get_time();

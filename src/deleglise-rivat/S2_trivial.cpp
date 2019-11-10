@@ -94,7 +94,7 @@ int64_t S2_trivial(int64_t x,
   print("");
   print("=== S2_trivial(x, y) ===");
   print("Computation of the trivial special leaves");
-  print(x, y, c, /* threads */ 1);
+  print_vars(x, y, c, 1);
 
   double time = get_time();
   int64_t s2_trivial = get_S2_trivial(x, y, z, c);
@@ -113,7 +113,7 @@ int128_t S2_trivial(int128_t x,
   print("");
   print("=== S2_trivial(x, y) ===");
   print("Computation of the trivial special leaves");
-  print(x, y, c, /* threads */ 1);
+  print_vars(x, y, c, 1);
 
   double time = get_time();
   int128_t s2_trivial = get_S2_trivial(x, y, z, c);

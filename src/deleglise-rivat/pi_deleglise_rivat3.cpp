@@ -78,7 +78,7 @@ int64_t pi_deleglise_rivat_64(int64_t x, int threads)
   print("");
   print("=== pi_deleglise_rivat_64(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, alpha, threads);
+  print(x, y, z, c, threads);
 
   int64_t p2 = P2(x, y, threads);
   int64_t s1 = S1(x, y, c, threads);
@@ -116,7 +116,7 @@ int128_t pi_deleglise_rivat_128(int128_t x, int threads)
   print("");
   print("=== pi_deleglise_rivat_128(x) ===");
   print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, alpha, threads);
+  print(x, y, z, c, threads);
 
   int128_t p2 = P2(x, y, threads);
   int128_t s1 = S1(x, y, c, threads);
