@@ -293,7 +293,6 @@ double get_alpha_lmo(maxint_t x)
     double b = -0.0261411;
     double c = 0.990948;
     double logx = log((double) x);
-
     alpha = a * pow(logx, 2) + b * logx + c;
   }
 
@@ -308,7 +307,6 @@ double get_alpha_lmo(maxint_t x)
 double get_alpha_deleglise_rivat(maxint_t x)
 {
   double alpha = alpha_;
-  double x2 = (double) x;
 
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
@@ -317,8 +315,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
     double b = 0.0018113;
     double c = -0.110407;
     double d = 1.3724;
-    double logx = log(x2);
-
+    double logx = log((double) x);
     alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
   }
 
