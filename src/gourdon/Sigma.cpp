@@ -42,6 +42,7 @@ void backup(maxint_t x,
   json["Sigma"]["x"] = to_string(x);
   json["Sigma"]["y"] = y;
   json["Sigma"]["x_star"] = x_star;
+  json["Sigma"]["alpha_y"] = get_alpha_y(x, y);
   json["Sigma"]["sum"] = to_string(sum);
   json["Sigma"]["percent"] = 100.0;
   json["Sigma"]["seconds"] = get_time() - time;

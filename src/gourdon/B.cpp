@@ -62,6 +62,7 @@ void backup(nlohmann::json& json,
   auto& B = json["B"];
   B["x"] = to_string(x);
   B["y"] = y;
+  B["alpha_y"] = get_alpha_y(x, y);
   B["low"] = low;
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
@@ -88,6 +89,7 @@ void backup(maxint_t x,
   auto& B = json["B"];
   B["x"] = to_string(x);
   B["y"] = y;
+  B["alpha_y"] = get_alpha_y(x, y);
   B["sum"] = to_string(sum);
   B["sieve_limit"] = z;
   B["percent"] = 100.0;

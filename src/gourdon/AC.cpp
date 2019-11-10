@@ -56,6 +56,7 @@ void backup(nlohmann::json& json,
             int64_t y,
             int64_t z,
             int64_t k,
+            int64_t x_star,
             double percent,
             double time)
 {
@@ -69,6 +70,9 @@ void backup(nlohmann::json& json,
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
   json["AC"]["k"] = k;
+  json["AC"]["x_star"] = x_star;
+  json["AC"]["alpha_y"] = get_alpha_y(x, y);
+  json["AC"]["alpha_z"] = get_alpha_z(y, z);
   json["AC"]["percent"] = percent;
   json["AC"]["seconds"] = get_time() - time;
 
@@ -81,6 +85,7 @@ void backup_result(nlohmann::json& json,
                    int64_t y,
                    int64_t z,
                    int64_t k,
+                   int64_t x_star,
                    maxint_t sum,
                    double time)
 {
@@ -91,6 +96,9 @@ void backup_result(nlohmann::json& json,
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
   json["AC"]["k"] = k;
+  json["AC"]["x_star"] = x_star;
+  json["AC"]["alpha_y"] = get_alpha_y(x, y);
+  json["AC"]["alpha_z"] = get_alpha_z(y, z);
   json["AC"]["sum"] = to_string(sum);
   json["AC"]["percent"] = 100.0;
   json["AC"]["seconds"] = get_time() - time;
@@ -477,7 +485,7 @@ T AC_OpenMP(T x,
           if (is_backup(backup_time))
           {
             double percent = status.getPercent(next_b, pi_x13, next_b, pi_x13);
-            backup(json, x, y, z, k, percent, time);
+            backup(json, x, y, z, k, x_star, percent, time);
             backup_time = get_time();
           }
         }
@@ -575,7 +583,7 @@ T AC_OpenMP(T x,
           if (is_backup(backup_time))
           {
             double percent = status.getPercent(next_b, max_b, next_b, max_b);
-            backup(json, x, y, z, k, percent, time);
+            backup(json, x, y, z, k, x_star, percent, time);
             backup_time = get_time();
           }
         }
@@ -597,7 +605,7 @@ T AC_OpenMP(T x,
     copy.clear();
   }
 
-  backup_result(json, x, y, z, k, sum, time);
+  backup_result(json, x, y, z, k, x_star, sum, time);
 
   return sum;
 }

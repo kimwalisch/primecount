@@ -90,6 +90,8 @@ void LoadBalancer::backup(int thread_id,
   D["z"] = z_;
   D["k"] = k_;
   D["x_star"] = x_star_;
+  D["alpha_y"] = get_alpha_y(x_, y_);
+  D["alpha_z"] = get_alpha_z(y_, z_);
   D["low"] = low_;
   D["segments"] = segments_;
   D["segment_size"] = segment_size_;
@@ -131,6 +133,8 @@ void LoadBalancer::finish_backup()
   D["z"] = z_;
   D["k"] = k_;
   D["x_star"] = x_star_;
+  D["alpha_y"] = get_alpha_y(x_, y_);
+  D["alpha_z"] = get_alpha_z(y_, z_);
   D["sieve_limit"] = sieve_limit_;
   D["sum"] = to_string(sum_);
   D["percent"] = 100.0;
