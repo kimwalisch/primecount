@@ -205,12 +205,30 @@ int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold
 
 void set_alpha_y(double alpha_y)
 {
-  alpha_y_ = alpha_y;
+  // If alpha_y < 1 then we compute a good
+  // alpha tuning factor at runtime.
+  if (alpha_y < 1.0)
+    alpha_y_ = -1;
+  else
+  {
+    alpha_y_ = alpha_y;
+    // Preserve 3 digits after decimal point
+    alpha_y_ = (uint64_t)(alpha_y_ * 1000) / 1000.0;
+  }
 }
 
 void set_alpha_z(double alpha_z)
 {
-  alpha_z_ = alpha_z;
+  // If alpha_z < 1 then we compute a good
+  // alpha tuning factor at runtime.
+  if (alpha_z < 1.0)
+    alpha_z_ = -1;
+  else
+  {
+    alpha_z_ = alpha_z;
+    // Preserve 3 digits after decimal point
+    alpha_z_ = (uint64_t)(alpha_z_ * 1000) / 1000.0;
+  }
 }
 
 /// Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -286,18 +304,16 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // and a large alpha_z when x > 10^24.
     alpha_z = (x <= 1e24) ? 1.3 : 2.0;
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
-    // Preserve 3 digits after decimal point
-    alpha_z = (uint64_t)(alpha_z * 1000) / 1000.0;
   }
 
   // Use default alpha_y
   if (alpha_y < 1)
-  {
     alpha_y = alpha_yz / alpha_z;
-    alpha_y = in_between(1, alpha_y, x16);
-    // Preserve 3 digits after decimal point
-    alpha_y = (uint64_t)(alpha_y * 1000) / 1000.0;
-  }
+
+  // Preserve 3 digits after decimal point
+  alpha_y = in_between(1, alpha_y, x16);
+  alpha_y = (uint64_t)(alpha_y * 1000) / 1000.0;
+  alpha_z = (uint64_t)(alpha_z * 1000) / 1000.0;
 
   // Ensure alpha_y * alpha_z <= x^(1/6)
   alpha_y = in_between(1, alpha_y, x16);
