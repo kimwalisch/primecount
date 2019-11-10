@@ -95,7 +95,6 @@ void print(const string& str, maxint_t res)
     cout << str << " = " << res << endl;
 }
 
-/// Print result of partial formula
 void print(const string& str, maxint_t res, double time)
 {
   if (is_print())
@@ -158,7 +157,7 @@ void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
     cout << "k = " << k << endl;
     cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
     cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
-    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
     print_threads(threads);
   }
 }
