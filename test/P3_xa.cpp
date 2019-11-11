@@ -4,7 +4,7 @@
 ///         that counts the numbers <= x that have exactly
 ///         3 prime factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,7 +12,6 @@
 
 #include <primecount-internal.hpp>
 #include <generate.hpp>
-#include <PiTable.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -38,11 +37,9 @@ int main()
   uniform_int_distribution<int> dist(5000, 10000);
 
   int64_t x = dist(gen);
-  int64_t y = iroot<4>(x);
   auto primes = generate_primes<int64_t>(x);
-  PiTable pi(y);
 
-  for (int64_t a = pi[y]; primes[a] <= iroot<3>(x); a++)
+  for (int64_t a = 1; primes[a] <= iroot<3>(x); a++)
   {
     int64_t p3 = 0;
 
@@ -53,7 +50,7 @@ int main()
             p3++;
 
     cout << "P3(" << x << ", " << a << ") = " << p3;
-    check(p3 == P3(x, a, 1));
+    check(p3 == P3(x, primes[a], 1));
   }
 
   cout << endl;
