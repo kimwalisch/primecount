@@ -472,10 +472,11 @@ int main (int argc, char* argv[])
     double seconds = get_time() - time;
     result_txt(argc, argv, res, threads, seconds);
 
-    if (print_result())
+    if (is_print_combined_result())
     {
       log_result(res, seconds);
 
+      // Add empty line after last partial formula
       if (is_print())
         cout << endl;
 

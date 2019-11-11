@@ -21,8 +21,7 @@ void set_print(bool print);
 void set_print_variables(bool print_variables);
 
 bool is_print();
-bool print_result();
-bool print_variables();
+bool is_print_combined_result();
 void print_seconds(double seconds);
 void print_status(double percent, maxint_t x);
 void print_resume(double percent, maxint_t x);
@@ -30,11 +29,11 @@ void print_resume(double percent, maxint_t x);
 void print(const std::string& str);
 void print(const std::string& str, maxint_t res);
 void print(const std::string& str, maxint_t res, double time);
-void print(maxint_t x, int64_t y, int threads);
+void print_vars(maxint_t x, int64_t y, int threads);
 
-void print_gourdon(maxint_t x, int64_t y, int threads);
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);
-void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, double alpha_y, double alpha_z, int threads);
+void print_gourdon_vars(maxint_t x, int64_t y, int threads);
+void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int threads);
 
 } // namespace
 

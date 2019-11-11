@@ -300,7 +300,7 @@ int64_t B(int64_t x, int64_t y, int threads)
 {
   print("");
   print("=== B(x, y) ===");
-  print_gourdon(x, y, threads);
+  print_gourdon_vars(x, y, threads);
 
   double time = get_time();
   int64_t sum = 0;
@@ -322,7 +322,7 @@ int128_t B(int128_t x, int64_t y, int threads)
 {
   print("");
   print("=== B(x, y) ===");
-  print_gourdon(x, y, threads);
+  print_gourdon_vars(x, y, threads);
 
   double time = get_time();
   int128_t sum = 0;

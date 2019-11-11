@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,6 +30,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <print.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
@@ -183,6 +184,26 @@ int64_t phi(int64_t x, int64_t a, int threads)
         sum += cache.phi<-1>(x / primes[i + 1], i);
     }
   }
+
+  return sum;
+}
+
+/// The default phi(x, a) implementation does not print anything
+/// to the screen as it is used by pi_simple(x) which is used
+/// all over the place (e.g. to initialize S1, S2, P2, P3, ...)
+/// and we don't want to print any info about this.
+/// Hence we also provide phi_print(x, a) for use cases where we
+/// do want to print the result of phi(x, a).
+///
+int64_t phi_print(int64_t x, int64_t a, int threads)
+{
+  print("");
+  print("=== phi(x, a) ===");
+  print("Count the numbers <= x coprime to the first a primes");
+
+  double time = get_time();
+  int64_t sum = phi(x, a, threads);
+  print("phi", sum, time);
 
   return sum;
 }

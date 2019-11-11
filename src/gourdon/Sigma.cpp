@@ -74,7 +74,7 @@ bool resume(T x,
 template <typename T>
 T Sigma0(T x, T a, int threads)
 {
-  T pi_sqrtx = pi_legendre(isqrt(x), threads);
+  T pi_sqrtx = pi_simple(isqrt(x), threads);
   return a - 1 + (pi_sqrtx * (pi_sqrtx - 1)) / 2 - (a * (a - 1)) / 2;
 }
 
@@ -159,7 +159,7 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
 {
   print("");
   print("=== Sigma(x, y) ===");
-  print_gourdon(x, y, threads);
+  print_gourdon_vars(x, y, threads);
 
   int64_t sum = 0;
   double time = get_time();
@@ -199,7 +199,7 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
 {
   print("");
   print("=== Sigma(x, y) ===");
-  print_gourdon(x, y, threads);
+  print_gourdon_vars(x, y, threads);
 
   int128_t sum = 0;
   double time = get_time();

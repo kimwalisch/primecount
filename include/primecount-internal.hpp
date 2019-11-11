@@ -29,9 +29,11 @@ int64_t pi(int64_t x, int threads);
 int64_t pi_legendre(int64_t x, int threads);
 int64_t pi_meissel(int64_t x, int threads);
 int64_t pi_primesieve(int64_t x);
+int64_t pi_simple(int64_t x, int threads);
 
 int64_t nth_prime(int64_t n, int threads);
 int64_t phi(int64_t x, int64_t a, int threads);
+int64_t phi_print(int64_t x, int64_t a, int threads);
 int64_t P2(int64_t x, int64_t y, int threads);
 
 int64_t Li(int64_t);

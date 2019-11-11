@@ -124,8 +124,8 @@ T P2_OpenMP(T x, int64_t y, int threads)
   if (x < 4)
     return 0;
 
-  T a = pi_legendre(y, threads);
-  T b = pi_legendre((int64_t) isqrt(x), threads);
+  T a = pi_simple(y, threads);
+  T b = pi_simple((int64_t) isqrt(x), threads);
 
   if (a >= b)
     return 0;
@@ -188,7 +188,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_vars(x, y, threads);
 
   double time = get_time();
   int64_t p2 = P2_OpenMP(x, y, threads);
@@ -209,7 +209,7 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");
-  print(x, y, threads);
+  print_vars(x, y, threads);
 
   double time = get_time();
   int128_t p2 = P2_OpenMP(x, y, threads);
