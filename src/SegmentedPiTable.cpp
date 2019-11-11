@@ -107,7 +107,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
 
-  uint64_t pi_low = pi_legendre(low_, threads);
+  uint64_t pi_low = pi_simple(low_, threads);
   init_next_segment(pi_low);
 }
 
