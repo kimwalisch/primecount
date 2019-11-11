@@ -50,9 +50,9 @@ int64_t pi_legendre(int64_t x, int threads)
   return sum;
 }
 
-/// This is an internal pi(x) implementation based on Legendre's
-/// formula which is used for small values of x and which does
-/// not print anything to the screen.
+/// This is an internal pi(x) helper function which uses Legendre's
+/// formula but which does not print anything to the screen.
+/// It is used all over the place to initialize other algorithms.
 ///
 int64_t pi_simple(int64_t x, int threads)
 {
