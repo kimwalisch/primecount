@@ -48,7 +48,7 @@ int main()
   {
     int64_t x = i;
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_legendre(y, 1);
+    int64_t pi_y = pi_simple(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
@@ -72,7 +72,7 @@ int main()
   {
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_legendre(y, 1);
+    int64_t pi_y = pi_simple(y, 1);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;

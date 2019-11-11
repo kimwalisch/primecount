@@ -124,8 +124,8 @@ T P2_mpi_master(T x, int64_t y, int threads)
   if (x < 4)
     return 0;
 
-  T a = pi_legendre(y, threads);
-  T b = pi_legendre((int64_t) isqrt(x), threads);
+  T a = pi_simple(y, threads);
+  T b = pi_simple((int64_t) isqrt(x), threads);
 
   if (a >= b)
     return 0;
@@ -144,7 +144,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   z = min(low + proc_distance, z);
 
   T p2 = 0;
-  T pix_total = pi_legendre(low - 1, threads);
+  T pix_total = pi_simple(low - 1, threads);
 
   if (is_mpi_master_proc())
     p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;

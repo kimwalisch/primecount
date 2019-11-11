@@ -34,23 +34,8 @@ int64_t pi_legendre(int64_t x, int threads)
   if (x < 2)
     return 0;
 
-  int64_t a = pi_legendre(isqrt(x), 1);
-  int64_t sum = phi(x, a, threads) + a - 1;
-
-  return sum;
-}
-
-/// The default pi_legendre(x) implementation does not support
-/// printing as it is used all over the place in many other
-/// formulas (e.g. for initializing the size of arrays) and we
-/// don't want to print info about that.
-///
-int64_t pi_legendre_print(int64_t x, int threads)
-{
-  if (x < 2)
-    return 0;
-
-  int64_t a = pi_legendre(isqrt(x), 1);
+  int64_t y = isqrt(x);
+  int64_t a = pi_simple(y, threads);
 
   print("");
   print("=== pi_legendre(x) ===");
@@ -60,6 +45,22 @@ int64_t pi_legendre_print(int64_t x, int threads)
   print("threads", threads);
 
   int64_t sum = phi_print(x, a, threads) + a - 1;
+
+  return sum;
+}
+
+/// This is an internal pi(x) implementation based on Legendre's
+/// formula which is used for small values of x and which does
+/// not print anything to the screen.
+///
+int64_t pi_simple(int64_t x, int threads)
+{
+  if (x < 2)
+    return 0;
+
+  int64_t y = isqrt(x);
+  int64_t a = pi_simple(y, threads);
+  int64_t sum = phi(x, a, threads) + a - 1;
 
   return sum;
 }

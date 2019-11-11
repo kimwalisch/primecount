@@ -367,7 +367,7 @@ int main (int argc, char* argv[])
       case OPTION_GOURDON_64:
         res = pi_gourdon_64(to_int64(x), threads); break;
       case OPTION_LEGENDRE:
-        res = pi_legendre_print(to_int64(x), threads); break;
+        res = pi_legendre(to_int64(x), threads); break;
       case OPTION_LEHMER:
         res = pi_lehmer(to_int64(x), threads); break;
       case OPTION_LMO:
@@ -397,7 +397,7 @@ int main (int argc, char* argv[])
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_PHI:
-        res = phi_print(to_int64(x), a, threads); break;
+        res = phi(to_int64(x), a, threads); break;
       case OPTION_P2:
         res = P2(x, threads); break;
       case OPTION_S1:

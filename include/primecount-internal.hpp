@@ -29,7 +29,6 @@ int64_t pi(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);
 int64_t pi_deleglise_rivat_64(int64_t x, int threads);
 int64_t pi_legendre(int64_t x, int threads);
-int64_t pi_legendre_print(int64_t x, int threads);
 int64_t pi_lehmer(int64_t x, int threads);
 int64_t pi_lmo1(int64_t x);
 int64_t pi_lmo2(int64_t x);
@@ -39,6 +38,7 @@ int64_t pi_lmo5(int64_t x);
 int64_t pi_lmo_parallel(int64_t x, int threads);
 int64_t pi_meissel(int64_t x, int threads);
 int64_t pi_primesieve(int64_t x);
+int64_t pi_simple(int64_t x, int threads);
 
 int64_t nth_prime(int64_t n, int threads);
 int64_t phi(int64_t x, int64_t a, int threads);
