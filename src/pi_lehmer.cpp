@@ -1,9 +1,9 @@
 ///
 /// @file  pi_lehmer.cpp
 /// @brief Count the number of primes <= x using Lehmer's formula.
-///        Lehmer's formula is an improvement over Meissel's formula,
-///        it adds the P3(x, a) term which is the 3rd partial sieve
-///        function and sets y=x^(1/4) instead of x^(1/3).
+///        Lehmer's formula is an improved version of Meissel's
+///        formula, it adds the P3(x, a) term which is the 3rd partial
+///        sieve function and uses y=x^(1/4) instead of x^(1/3).
 ///
 ///        Lehmer's formula:
 ///        pi(x) = pi(y) + phi(x, a) - 1 - P2(x, a) - P3(x, a)
