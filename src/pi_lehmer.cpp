@@ -45,7 +45,7 @@ int64_t pi_lehmer(int64_t x, int threads)
 
   int64_t phi_xa = phi_print(x, a, threads);
   int64_t p2 = P2(x, y, threads);
-  int64_t p3 = P3(x, a, threads);
+  int64_t p3 = P3(x, y, threads);
   int64_t sum = phi_xa + a - 1 - p2 - p3;
 
   return sum;
