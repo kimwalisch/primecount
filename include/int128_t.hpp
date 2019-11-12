@@ -52,7 +52,6 @@ using maxuint_t = uint128_t;
 #define HAVE_INT128_T
 
 #include <ostream>
-#include <string>
 #include <sstream>
 #include <algorithm>
 
