@@ -289,7 +289,7 @@ double get_alpha(maxint_t x, int64_t y)
 
   // Prevent x^(1/3) * alpha = 23.99999...
   if (verify_y < y)
-    alpha = std::nextafter(alpha, max_alpha); 
+    alpha = std::nextafter(alpha, max_alpha);
 
   return alpha;
 }
@@ -305,7 +305,7 @@ double get_alpha_y(maxint_t x, int64_t y)
 
   // Prevent x^(1/3) * alpha_y = 23.99999...
   if (verify_y < y)
-    alpha_y = std::nextafter(alpha_y, max_alpha_y); 
+    alpha_y = std::nextafter(alpha_y, max_alpha_y);
 
   return alpha_y;
 }
@@ -320,7 +320,7 @@ double get_alpha_z(int64_t y, int64_t z)
 
   // Prevent y * alpha_z = 23.99999...
   if (verify_z < z)
-    alpha_z = std::nextafter(alpha_z, max_alpha_z); 
+    alpha_z = std::nextafter(alpha_z, max_alpha_z);
 
   return alpha_z;
 }
