@@ -13,7 +13,21 @@
 
 #include <stdint.h>
 #include <limits>
+#include <string>
 #include <type_traits>
+
+namespace primecount {
+
+/// Used for all integer types except __int128_t since this
+/// type is not yet supported by std::to_string().
+///
+template <typename T>
+inline std::string to_str(T n)
+{
+  return std::to_string(n);
+}
+
+} // namespace
 
 /// If INT128_MAX is defined we know that int128_t and
 /// uint128_t are available in stdint.h.
@@ -48,12 +62,6 @@ using int128_t = __int128_t;
 using uint128_t = __uint128_t;
 using maxint_t = __int128_t;
 using maxuint_t = __uint128_t;
-
-template <typename T>
-inline std::string to_str(T n)
-{
-  return std::to_string(n);
-}
 
 template <>
 inline std::string to_str<uint128_t>(uint128_t n)
