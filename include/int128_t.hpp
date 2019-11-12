@@ -50,13 +50,13 @@ using maxint_t = __int128_t;
 using maxuint_t = __uint128_t;
 
 template <typename T>
-inline std::string to_string(T n)
+inline std::string to_str(T n)
 {
   return std::to_string(n);
 }
 
 template <>
-inline std::string to_string<uint128_t>(uint128_t n)
+inline std::string to_str<uint128_t>(uint128_t n)
 {
   std::string str;
 
@@ -74,23 +74,23 @@ inline std::string to_string<uint128_t>(uint128_t n)
 }
 
 template <>
-inline std::string to_string<int128_t>(int128_t n)
+inline std::string to_str<int128_t>(int128_t n)
 {
   if (n >= 0)
-    return to_string((uint128_t) n);
+    return to_str((uint128_t) n);
   else
-    return "-" + to_string((uint128_t) -n);
+    return "-" + to_str((uint128_t) -n);
 }
 
 inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
 {
-  stream << to_string(n);
+  stream << to_str(n);
   return stream;
 }
 
 inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
-  stream << to_string(n);
+  stream << to_str(n);
   return stream;
 }
 

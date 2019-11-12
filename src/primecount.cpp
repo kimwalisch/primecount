@@ -412,13 +412,6 @@ maxint_t to_maxint(const string& expr)
   return n;
 }
 
-string to_str(maxint_t x)
-{
-  ostringstream oss;
-  oss << x;
-  return oss.str();
-}
-
 string primecount_version()
 {
   return PRIMECOUNT_VERSION;

@@ -60,14 +60,14 @@ void backup(nlohmann::json& json,
   double percent = get_percent(low, z);
 
   auto& B = json["B"];
-  B["x"] = to_string(x);
+  B["x"] = to_str(x);
   B["y"] = y;
   B["alpha_y"] = get_alpha_y(x, y);
   B["low"] = low;
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
-  B["pix_total"] = to_string(pix_total);
-  B["sum"] = to_string(sum);
+  B["pix_total"] = to_str(pix_total);
+  B["sum"] = to_str(sum);
   B["percent"] = percent;
   B["seconds"] = get_time() - time;
 
@@ -87,10 +87,10 @@ void backup(maxint_t x,
     json.erase("B");
 
   auto& B = json["B"];
-  B["x"] = to_string(x);
+  B["x"] = to_str(x);
   B["y"] = y;
   B["alpha_y"] = get_alpha_y(x, y);
-  B["sum"] = to_string(sum);
+  B["sum"] = to_str(sum);
   B["sieve_limit"] = z;
   B["percent"] = 100.0;
   B["seconds"] = get_time() - time;

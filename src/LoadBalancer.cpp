@@ -60,10 +60,10 @@ void LoadBalancer::backup(int thread_id)
   double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
   double last_backup_seconds = get_time() - backup_time_;
 
-  string tid = "thread" + to_string(thread_id);
+  string tid = "thread" + to_str(thread_id);
 
   auto& D = json_["D"];
-  D["sum"] = to_string(sum_);
+  D["sum"] = to_str(sum_);
   D["percent"] = percent;
   D["seconds"] = get_time() - time_;
   D.erase(tid);
@@ -85,7 +85,7 @@ void LoadBalancer::backup(int thread_id,
   double last_backup_seconds = get_time() - backup_time_;
 
   auto& D = json_["D"];
-  D["x"] = to_string(x_);
+  D["x"] = to_str(x_);
   D["y"] = y_;
   D["z"] = z_;
   D["k"] = k_;
@@ -96,11 +96,11 @@ void LoadBalancer::backup(int thread_id,
   D["segments"] = segments_;
   D["segment_size"] = segment_size_;
   D["sieve_limit"] = sieve_limit_;
-  D["sum"] = to_string(sum_);
+  D["sum"] = to_str(sum_);
   D["percent"] = percent;
   D["seconds"] = get_time() - time_;
 
-  string tid = "thread" + to_string(thread_id);
+  string tid = "thread" + to_str(thread_id);
 
   if (low <= sieve_limit_)
   {
@@ -128,7 +128,7 @@ void LoadBalancer::finish_backup()
     json_.erase("D");
 
   auto& D = json_["D"];
-  D["x"] = to_string(x_);
+  D["x"] = to_str(x_);
   D["y"] = y_;
   D["z"] = z_;
   D["k"] = k_;
@@ -136,7 +136,7 @@ void LoadBalancer::finish_backup()
   D["alpha_y"] = get_alpha_y(x_, y_);
   D["alpha_z"] = get_alpha_z(y_, z_);
   D["sieve_limit"] = sieve_limit_;
-  D["sum"] = to_string(sum_);
+  D["sum"] = to_str(sum_);
   D["percent"] = 100.0;
   D["seconds"] = get_time() - time_;
 
@@ -151,7 +151,7 @@ bool LoadBalancer::resume(int thread_id,
 {
   if (is_resume(copy_, "D", thread_id, x_, y_, z_, k_))
   {
-    string tid = "thread" + to_string(thread_id);
+    string tid = "thread" + to_str(thread_id);
     low = copy_["D"][tid]["low"];
     segments = copy_["D"][tid]["segments"];
     segment_size = copy_["D"][tid]["segment_size"];

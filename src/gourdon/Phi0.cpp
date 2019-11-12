@@ -46,13 +46,13 @@ void backup(maxint_t x,
 {
   auto json = load_backup();
 
-  json["Phi0"]["x"] = to_string(x);
+  json["Phi0"]["x"] = to_str(x);
   json["Phi0"]["y"] = y;
   json["Phi0"]["z"] = z;
   json["Phi0"]["k"] = k;
   json["Phi0"]["alpha_y"] = get_alpha_y(x, y);
   json["Phi0"]["alpha_z"] = get_alpha_z(y, z);
-  json["Phi0"]["sum"] = to_string(sum);
+  json["Phi0"]["sum"] = to_str(sum);
   json["Phi0"]["percent"] = 100.0;
   json["Phi0"]["seconds"] = get_time() - time;
 

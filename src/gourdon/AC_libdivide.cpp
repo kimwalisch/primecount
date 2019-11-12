@@ -73,7 +73,7 @@ void backup(nlohmann::json& json,
     percent = std::max(percent, percent2);
   }
 
-  json["AC"]["x"] = to_string(x);
+  json["AC"]["x"] = to_str(x);
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
   json["AC"]["k"] = k;
@@ -99,14 +99,14 @@ void backup_result(nlohmann::json& json,
   if (json.find("AC") != json.end())
     json.erase("AC");
 
-  json["AC"]["x"] = to_string(x);
+  json["AC"]["x"] = to_str(x);
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
   json["AC"]["k"] = k;
   json["AC"]["x_star"] = x_star;
   json["AC"]["alpha_y"] = get_alpha_y(x, y);
   json["AC"]["alpha_z"] = get_alpha_z(y, z);
-  json["AC"]["sum"] = to_string(sum);
+  json["AC"]["sum"] = to_str(sum);
   json["AC"]["percent"] = 100.0;
   json["AC"]["seconds"] = get_time() - time;
 
@@ -124,7 +124,7 @@ void update(nlohmann::json& json,
 {
   auto& AC = json["AC"];
   AC["next_b"] = next_b;
-  AC[formula] = to_string(sum);
+  AC[formula] = to_str(sum);
 
   if (b <= max_b)
     AC[tid]["b"] = b;
@@ -147,7 +147,7 @@ bool resume(nlohmann::json& json,
 {
   if (is_resume(json, "AC", thread_id, x, y, z, k))
   {
-    string tid = "thread" + to_string(thread_id);
+    string tid = "thread" + to_str(thread_id);
     b = json["AC"][tid]["b"];
     return true;
   }
@@ -535,19 +535,19 @@ T AC_OpenMP(T x,
         if (resume(copy, x, y, z, k, b, j))
         {
           T sum_thread = C1(x, z, b, pi_y, primes, pi);
-          string thread_id = "thread" + to_string(j);
+          string thread_id = "thread" + to_str(j);
 
           #pragma omp critical (ac)
           {
             sum -= sum_thread;
-            json["AC"]["sum_c1"] = to_string(sum);
+            json["AC"]["sum_c1"] = to_str(sum);
             json["AC"].erase(thread_id);
           }
         }
       }
 
       T sum_thread = 0;
-      string thread_id = "thread" + to_string(i);
+      string thread_id = "thread" + to_str(i);
 
       // 2nd, run new computations
       while (true)
@@ -629,7 +629,7 @@ T AC_OpenMP(T x,
         if (resume(copy, x, y, z, k, b, j))
         {
           T sum_thread = 0;
-          string thread_id = "thread" + to_string(j);
+          string thread_id = "thread" + to_str(j);
 
           if (b <= pi_x_star)
             sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, fastdiv, pi, segmentedPi);
@@ -639,14 +639,14 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum += sum_thread;
-            json["AC"]["sum_ac"] = to_string(sum);
+            json["AC"]["sum_ac"] = to_str(sum);
             json["AC"].erase(thread_id);
           }
         }
       }
 
       T sum_thread = 0;
-      string thread_id = "thread" + to_string(i);
+      string thread_id = "thread" + to_str(i);
 
       // 2nd, run new computations
       while (true)
