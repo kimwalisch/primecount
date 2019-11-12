@@ -19,7 +19,7 @@ fi
 max_threads=$2
 max_seconds=$3
 
-./primecount $1 -s --threads=$max_threads &
+./primecount $1 -s &
 
 while true
 do 
@@ -37,5 +37,5 @@ do
 
     kill $primecount_pid
     sleep 1
-    ./primecount --resume &
+    ./primecount --resume --threads=$threads &
 done
