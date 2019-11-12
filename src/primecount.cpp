@@ -86,13 +86,15 @@ double alpha_y_ = -1;
 // Tuning factor used in Xavier Gourdon's algorithm
 double alpha_z_ = -1;
 
-/// Truncate & ceil a floating point number to
-/// 3 digits after the decimal point.
-/// Example: 1.123001 -> 1.124
+/// Truncate a floating point number to 3 digits after the decimal
+/// point. This function is used limit the number of digits after the
+/// decimal point of the alpha tuning factor in order to make it more
+/// convenient for the user to e.g. type the alpha tuning factor as
+/// a command-line parameter.
 ///
-double truncate3_ceil(double n)
+double truncate3(double n)
 {
-  return ((uint64_t) std::ceil(n * 1000)) / 1000.0;
+  return (int64_t)(n * 1000) / 1000.0;
 }
 
 } // namespace
@@ -219,7 +221,7 @@ void set_alpha_y(double alpha_y)
   if (alpha_y < 1.0)
     alpha_y_ = -1;
   else
-    alpha_y_ = truncate3_ceil(alpha_y);
+    alpha_y_ = truncate3(alpha_y);
 }
 
 void set_alpha_z(double alpha_z)
@@ -229,7 +231,7 @@ void set_alpha_z(double alpha_z)
   if (alpha_z < 1.0)
     alpha_z_ = -1;
   else
-    alpha_z_ = truncate3_ceil(alpha_z);
+    alpha_z_ = truncate3(alpha_z);
 }
 
 /// Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -240,7 +242,13 @@ double get_alpha(maxint_t x, int64_t y)
   // y = x13 * alpha, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
   double alpha = (double) y / x13;
-  alpha = truncate3_ceil(alpha);
+  double max_alpha = (double) y;
+  int64_t verify_y = (int64_t)(x13 * alpha);
+
+  // Prevent x^(1/3) * alpha = 23.99999...
+  if (verify_y < y)
+    alpha = std::nextafter(alpha, max_alpha);
+
   return alpha;
 }
 
@@ -250,7 +258,13 @@ double get_alpha_y(maxint_t x, int64_t y)
   // y = x13 * alpha_y, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
   double alpha_y = (double) y / x13;
-  alpha_y = truncate3_ceil(alpha_y);
+  double max_alpha_y = (double) y;
+  int64_t verify_y = (int64_t)(x13 * alpha_y);
+
+  // Prevent x^(1/3) * alpha_y = 23.99999...
+  if (verify_y < y)
+    alpha_y = std::nextafter(alpha_y, max_alpha_y);
+
   return alpha_y;
 }
 
@@ -259,7 +273,13 @@ double get_alpha_z(int64_t y, int64_t z)
 {
   // z = y * alpha_z, thus alpha_z = z / y
   double alpha_z = (double) z / y;
-  alpha_z = truncate3_ceil(alpha_z);
+  double max_alpha_z = (double) z;
+  int64_t verify_z = (int64_t)(y * alpha_z);
+
+  // Prevent y * alpha_z = 23.99999...
+  if (verify_z < z)
+    alpha_z = std::nextafter(alpha_z, max_alpha_z);
+
   return alpha_z;
 }
 
@@ -319,8 +339,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
 
   // Preserve 3 digits after decimal point
   alpha_y = in_between(1, alpha_y, x16);
-  alpha_y = truncate3_ceil(alpha_y);
-  alpha_z = truncate3_ceil(alpha_z);
+  alpha_y = truncate3(alpha_y);
+  alpha_z = truncate3(alpha_z);
 
   // Ensure alpha_y * alpha_z <= x^(1/6)
   alpha_y = in_between(1, alpha_y, x16);

@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,11 +14,9 @@
 #include <isqrt.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <limits>
-#include <vector>
 
 namespace {
 
@@ -99,18 +97,6 @@ inline T iroot(T x)
     r += 1;
 
   return r;
-}
-
-/// Count the number of primes <= x using binary search.
-/// @pre primes[1] = 2, primes[3] = 3, ...
-/// @pre x <= primes.back()
-///
-template <typename T1, typename T2>
-inline T2 pi_bsearch(const std::vector<T1>& primes, T2 x)
-{
-  assert(primes.size() < 2 || primes[1] == 2);
-  auto start = primes.begin() + 1;
-  return (T2) (std::upper_bound(start, primes.end(), x) - start);
 }
 
 } // namespace
