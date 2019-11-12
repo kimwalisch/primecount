@@ -284,7 +284,13 @@ double get_alpha(maxint_t x, int64_t y)
   // y = x13 * alpha, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
   double alpha = (double) y / x13;
-  alpha = truncate3_ceil(alpha);
+  double max_alpha = (double) y;
+  int64_t verify_y = (int64_t)(x13 * alpha);
+
+  // Prevent x^(1/3) * alpha = 23.99999...
+  if (verify_y < y)
+    alpha = std::nextafter(alpha, max_alpha); 
+
   return alpha;
 }
 
@@ -294,7 +300,13 @@ double get_alpha_y(maxint_t x, int64_t y)
   // y = x13 * alpha_y, thus alpha = y / x13
   double x13 = (double) iroot<3>(x);
   double alpha_y = (double) y / x13;
-  alpha_y = truncate3_ceil(alpha_y);
+  double max_alpha_y = (double) y;
+  int64_t verify_y = (int64_t)(x13 * alpha_y);
+
+  // Prevent x^(1/3) * alpha_y = 23.99999...
+  if (verify_y < y)
+    alpha_y = std::nextafter(alpha_y, max_alpha_y); 
+
   return alpha_y;
 }
 
@@ -303,7 +315,13 @@ double get_alpha_z(int64_t y, int64_t z)
 {
   // z = y * alpha_z, thus alpha_z = z / y
   double alpha_z = (double) z / y;
-  alpha_z = truncate3_ceil(alpha_z);
+  double max_alpha_z = (double) z;
+  int64_t verify_z = (int64_t)(y * alpha_z);
+
+  // Prevent y * alpha_z = 23.99999...
+  if (verify_z < z)
+    alpha_z = std::nextafter(alpha_z, max_alpha_z); 
+
   return alpha_z;
 }
 
