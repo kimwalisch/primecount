@@ -160,21 +160,26 @@ bool is_resume(const nlohmann::json& j,
          j[formula].count("thread" + std::to_string(thread_id)) > 0;
 }
 
-int calculate_resume_threads(const nlohmann::json& j, 
+int calculate_resume_threads(const nlohmann::json& j,
                              const std::string& formula)
 {
-  if (j.find(formula) == j.end())
+  auto jsonFormula = j.find(formula);
+  if (jsonFormula == j.end())
     return 0;
 
   int maxThreadId = -1;
+  std::string thread = "thread";
 
-  for (auto it = j[formula].begin(); it != j[formula].end(); ++it)
+  for (auto it = jsonFormula->begin(); it != jsonFormula->end(); ++it)
   {
     std::string threadId = it.key();
 
-    if (threadId.find("thread") == 0)
+    // Check if json entry starts with "thread"
+    if (!threadId.compare(0, thread.size(), thread))
     {
-      threadId.erase(0, std::string("thread").size());
+      // Get the integer part,
+      // string format is: "thread<THREAD_ID>"
+      threadId.erase(0, thread.size());
       int tid = std::stoi(threadId);
       // std::max<int> prevents collison with max macro from Windows.h
       maxThreadId = std::max<int>(tid, maxThreadId);
