@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <tuple>
 
 using namespace std;
 using namespace primecount;
@@ -72,18 +73,17 @@ void balanceLoad(int64_t* thread_distance,
 }
 
 template <typename T>
-T B_thread(T x,
-            int64_t y,
-            int64_t z,
-            int64_t low,
-            int64_t thread_num,
-            int64_t thread_distance,
-            int64_t& pix,
-            int64_t& pix_count)
+std::tuple<T, int64_t, int64_t>
+B_thread(T x,
+         int64_t y,
+         int64_t z,
+         int64_t low,
+         int64_t thread_num,
+         int64_t thread_distance)
 {
   T sum = 0;
-  pix = 0;
-  pix_count = 0;
+  int64_t pix = 0;
+  int64_t pix_count = 0;
 
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
@@ -108,8 +108,9 @@ T B_thread(T x,
   }
 
   pix += count_primes(it, next, z - 1);
+  auto res = make_tuple(sum, pix, pix_count);
 
-  return sum;
+  return res;
 }
 
 /// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -123,13 +124,14 @@ T B_OpenMP(T x, int64_t y, int threads)
     return 0;
 
   T sum = 0;
-  T pix_total = 0;
+  T pix_sum = 0;
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
 
+  // prevents CPU false sharing
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
   
@@ -141,7 +143,12 @@ T B_OpenMP(T x, int64_t y, int threads)
 
     #pragma omp parallel for num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
-      sum += B_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
+    {
+      auto res = B_thread(x, y, z, low, i, thread_distance);
+      pix[i] = std::get<1>(res);
+      pix_counts[i] = std::get<2>(res);
+      sum += std::get<0>(res);
+    }
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
@@ -149,8 +156,8 @@ T B_OpenMP(T x, int64_t y, int threads)
     // add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
-      sum += pix_total * pix_counts[i];
-      pix_total += pix[i];
+      sum += pix_sum * pix_counts[i];
+      pix_sum += pix[i];
     }
 
     if (is_print())

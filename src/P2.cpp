@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <tuple>
 
 using namespace std;
 using namespace primecount;
@@ -71,18 +72,17 @@ void balanceLoad(int64_t* thread_distance,
 }
 
 template <typename T>
-T P2_thread(T x,
-            int64_t y,
-            int64_t z,
-            int64_t low,
-            int64_t thread_num,
-            int64_t thread_distance,
-            int64_t& pix,
-            int64_t& pix_count)
+std::tuple<T, int64_t, int64_t>
+P2_thread(T x,
+          int64_t y,
+          int64_t z,
+          int64_t low,
+          int64_t thread_num,
+          int64_t thread_distance)
 {
-  T p2 = 0;
-  pix = 0;
-  pix_count = 0;
+  T sum = 0;
+  int64_t pix = 0;
+  int64_t pix_count = 0;
 
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
@@ -102,13 +102,14 @@ T P2_thread(T x,
     if (xp >= z) break;
     pix += count_primes(it, next, xp);
     pix_count++;
-    p2 += pix;
+    sum += pix;
     prime = rit.prev_prime();
   }
 
   pix += count_primes(it, next, z - 1);
+  auto res = make_tuple(sum, pix, pix_count);
 
-  return p2;
+  return res;
 }
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
@@ -131,14 +132,15 @@ T P2_OpenMP(T x, int64_t y, int threads)
     return 0;
 
   // \sum_{i=a+1}^{b} -(i - 1)
-  T p2 = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-  T pix_total = 0;
+  T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  T pix_sum = 0;
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
 
+  // prevents CPU false sharing
   aligned_vector<int64_t> pix(threads);
   aligned_vector<int64_t> pix_counts(threads);
 
@@ -149,9 +151,14 @@ T P2_OpenMP(T x, int64_t y, int threads)
     threads = in_between(1, threads, max_threads);
     double time = get_time();
 
-    #pragma omp parallel for num_threads(threads) reduction(+: p2)
+    #pragma omp parallel for num_threads(threads) reduction(+: sum)
     for (int i = 0; i < threads; i++)
-      p2 += P2_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
+    {
+      auto res = P2_thread(x, y, z, low, i, thread_distance);
+      pix[i] = std::get<1>(res);
+      pix_counts[i] = std::get<2>(res);
+      sum += std::get<0>(res);
+    }
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
@@ -159,8 +166,8 @@ T P2_OpenMP(T x, int64_t y, int threads)
     // add missing sum contributions in order
     for (int i = 0; i < threads; i++)
     {
-      p2 += pix_total * pix_counts[i];
-      pix_total += pix[i];
+      sum += pix_sum * pix_counts[i];
+      pix_sum += pix[i];
     }
 
     if (is_print())
@@ -171,7 +178,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
     }
   }
 
-  return p2;
+  return sum;
 }
 
 } // namespace
@@ -191,10 +198,10 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print_vars(x, y, threads);
 
   double time = get_time();
-  int64_t p2 = P2_OpenMP(x, y, threads);
+  int64_t sum = P2_OpenMP(x, y, threads);
 
-  print("P2", p2, time);
-  return p2;
+  print("P2", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -212,10 +219,10 @@ int128_t P2(int128_t x, int64_t y, int threads)
   print_vars(x, y, threads);
 
   double time = get_time();
-  int128_t p2 = P2_OpenMP(x, y, threads);
+  int128_t sum = P2_OpenMP(x, y, threads);
 
-  print("P2", p2, time);
-  return p2;
+  print("P2", sum, time);
+  return sum;
 }
 
 #endif
