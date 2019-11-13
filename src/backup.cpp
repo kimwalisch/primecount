@@ -120,28 +120,42 @@ void store_backup(nlohmann::json& j)
   atomic_backup();
 }
 
-bool is_resume(const nlohmann::json& j, 
-               const std::string& formula, 
+bool is_resume(const nlohmann::json& j,
+               const std::string& formula,
                maxint_t x,
                int64_t y)
 {
-  return j.find(formula) != j.end() &&
-         x == to_maxint(j[formula]["x"]) &&
-         y == j[formula]["y"];
+  auto iter = j.find(formula);
+
+  if (iter != j.end())
+  {
+    auto& jsonFormula = *iter;
+    return x == to_maxint(jsonFormula["x"]) &&
+           y == jsonFormula["y"]; 
+  }
+
+  return false;
 }
 
-bool is_resume(const nlohmann::json& j, 
+bool is_resume(const nlohmann::json& j,
                const std::string& formula,
                maxint_t x,
                int64_t y,
                int64_t z,
                int64_t k)
 {
-  return j.find(formula) != j.end() &&
-         x == to_maxint(j[formula]["x"]) &&
-         y == j[formula]["y"] &&
-         z == j[formula]["z"] &&
-         k == j[formula]["k"];
+  auto iter = j.find(formula);
+
+  if (iter != j.end())
+  {
+    auto& jsonFormula = *iter;
+    return x == to_maxint(jsonFormula["x"]) &&
+           y == jsonFormula["y"] &&
+           z == jsonFormula["z"] &&
+           k == jsonFormula["k"];
+  }
+
+  return false;
 }
 
 bool is_resume(const nlohmann::json& j,
@@ -152,25 +166,33 @@ bool is_resume(const nlohmann::json& j,
                int64_t z,
                int64_t k)
 {
-  return j.find(formula) != j.end() &&
-         x == to_maxint(j[formula]["x"]) &&
-         y == j[formula]["y"] &&
-         z == j[formula]["z"] &&
-         k == j[formula]["k"] &&
-         j[formula].count("thread" + std::to_string(thread_id)) > 0;
+  auto iter = j.find(formula);
+
+  if (iter != j.end())
+  {
+    auto& jsonFormula = *iter;
+    return x == to_maxint(jsonFormula["x"]) &&
+           y == jsonFormula["y"] &&
+           z == jsonFormula["z"] &&
+           k == jsonFormula["k"] &&
+           jsonFormula.count("thread" + std::to_string(thread_id)) > 0;
+  }
+
+  return false;
 }
 
 int calculate_resume_threads(const nlohmann::json& j,
                              const std::string& formula)
 {
-  auto jsonFormula = j.find(formula);
-  if (jsonFormula == j.end())
+  auto iter = j.find(formula);
+  if (iter == j.end())
     return 0;
 
-  int maxThreadId = -1;
   std::string thread = "thread";
+  int maxThreadId = -1;
+  auto& jsonFormula = *iter;
 
-  for (auto it = jsonFormula->begin(); it != jsonFormula->end(); ++it)
+  for (auto it = jsonFormula.begin(); it != jsonFormula.end(); ++it)
   {
     std::string threadId = it.key();
 
