@@ -1,13 +1,11 @@
 ///
 /// @file  B.cpp
 /// @brief The B formula is a partial computation of the P2(x, a)
-///        formula from the Lagarias-Miller-Odlyzko and Deleglise-
-///        Rivat prime counting algorithms. P2(x, a) counts the
-///        numbers <= x that have exactly 2 prime factors each
-///        exceeding the a-th prime. Both P2 and B have a runtime
-///        complexity of O(z log log z) and use O(z^(1/2)) memory,
-///        with z = x / y. This implementation is a simplified
-///        version of P2.cpp.
+///        formula from the Lagarias-Miller-Odlyzko and Deleglise-Rivat
+///        prime counting algorithms. P2(x, a) counts the numbers <= x
+///        that have exactly 2 prime factors each exceeding the a-th
+///        prime. Both P2 and B have a runtime complexity of
+///        O(z log log z) and use O(z^(1/2)) memory, with z = x / y.
 ///
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
