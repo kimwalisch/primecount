@@ -31,10 +31,6 @@
 #include <limits>
 #include <string>
 
-#ifdef HAVE_MPI
-  #include <mpi.h>
-#endif
-
 using namespace std;
 using namespace primecount;
 
@@ -76,23 +72,17 @@ std::vector<std::string> get_backup_command()
   auto j = load_backup();
   auto command = j["command"];
 
-  std::vector<std::string> args;
+  std::vector<std::string> argv;
+  for (auto& arg : command)
+    argv.push_back(arg);
 
-  for (auto& str : command)
-    args.push_back(str);
-
-  return args;
+  return argv;
 }
 
-void backup_command(int argc, char** argv)
+void backup_command(const std::vector<std::string>& argv)
 {
   auto j = load_backup();
-  std::vector<std::string> args;
-
-  for (int i = 0; i < argc; i++)
-    args.push_back(argv[i]);
-
-  j["command"] = args;
+  j["command"] = argv;
   store_backup(j);
 }
 
@@ -138,8 +128,7 @@ double backup_time(double time, const std::string& formula)
   return time;
 }
 
-void result_txt(int argc,
-                char* argv[],
+void result_txt(const std::vector<std::string>& argv,
                 maxint_t res,
                 int threads,
                 double seconds)
@@ -148,28 +137,9 @@ void result_txt(int argc,
 
   if (resfile.is_open())
   {
-    auto json = load_backup();
-
-    // Don't put primecount --resume into results file
-    if (json.count("command") > 0)
-    {
-      size_t i = 0;
-      size_t size = json["command"].size();
-
-      for (auto& c : json["command"])
-      {
-        resfile << c.get<std::string>();
-        i += 1;
-        if (i < size)
-          resfile << " ";
-      }
-    }
-    else
-    {
-      resfile << basename(argv[0]);
-      for (int i = 1; i < argc; i++)
-        resfile << " " << argv[i];
-    }
+    resfile << basename(argv.at(0));
+    for (std::size_t i = 1; i < argv.size(); i++)
+      resfile << " " << argv[i];
 
     resfile << endl;
     resfile << "Result: " << res << endl;
@@ -390,22 +360,28 @@ maxint_t Sigma(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
-#ifdef HAVE_MPI
-  MPI_Init(&argc, &argv);
-#endif
-
   try
   {
     CmdOptions opt = parseOptions(argc, argv);
+    vector<string> use_argv;
 
     if (!opt.is_resume())
-      backup_command(argc, argv);
+    {
+      for (int i = 0; i < argc; i++)
+        use_argv.push_back(argv[i]);
+
+      backup_command(use_argv);
+    }
     else
     {
-      vector<string> args = get_backup_command();
-      vector<char*> cargs;
+      // If --resume has been specified any additional option
+      // will also be applied unless the same option exists
+      // in the backup file in which case the option from the
+      // the backup file will be applied.
+      use_argv = get_backup_command();
 
-      for (string& s : args)
+      vector<char*> cargs;
+      for (string& s : use_argv)
         cargs.push_back((char*) s.c_str());
 
       opt = parseOptions((int) cargs.size(), cargs.data());
@@ -470,7 +446,7 @@ int main (int argc, char* argv[])
     }
 
     double seconds = get_time() - time;
-    result_txt(argc, argv, res, threads, seconds);
+    result_txt(use_argv, res, threads, seconds);
 
     if (is_print_combined_result())
     {
@@ -490,17 +466,10 @@ int main (int argc, char* argv[])
   }
   catch (exception& e)
   {
-#ifdef HAVE_MPI
-    MPI_Finalize();
-#endif
     cerr << "primecount: " << e.what() << endl
          << "Try 'primecount --help' for more information." << endl;
     return 1;
   }
-
-#ifdef HAVE_MPI
-    MPI_Finalize();
-#endif
 
   return 0;
 }
