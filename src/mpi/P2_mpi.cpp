@@ -122,7 +122,7 @@ template <typename T>
 T P2_mpi_master(T x, int64_t y, int threads)
 {
   static_assert(prt::is_signed<T>::value,
-                "P2(T x, ...): T must be signed integer type");
+                "T must be signed integer type");
 
   if (x < 4)
     return 0;
