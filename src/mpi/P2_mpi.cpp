@@ -131,6 +131,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   if (a >= b)
     return 0;
 
+  T sum = 0;
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
@@ -143,9 +144,7 @@ T P2_mpi_master(T x, int64_t y, int threads)
   int64_t proc_distance = ceil_div(distance, procs);
   low += proc_distance * proc_id;
   z = min(low + proc_distance, z);
-
-  T sum = 0;
-  T pix_sum = pi_simple(low - 1, threads);
+  int64_t pix_low = pi_simple(low - 1, threads);
 
   if (is_mpi_master_proc())
     sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
@@ -173,11 +172,16 @@ T P2_mpi_master(T x, int64_t y, int threads)
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
 
-    // add missing sum contributions in order
+    // Add the missing sum contributions in sequential order.
+    // The sum from the parallel for loop above is the sum
+    // of the prime counts inside [thread_start, thread_stop].
+    // For each such prime count we now have to add the
+    // missing part from [0, thread_start - 1].
     for (int i = 0; i < threads; i++)
     {
-      sum += pix_sum * pix_counts[i];
-      pix_sum += pix[i];
+      T count = pix_counts[i];
+      sum += pix_low * count;
+      pix_low += pix[i];
     }
 
     if (is_print())

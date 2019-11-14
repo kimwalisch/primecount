@@ -133,12 +133,12 @@ T P2_OpenMP(T x, int64_t y, int threads)
 
   // \sum_{i=a+1}^{b} -(i - 1)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-  T pix_sum = 0;
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
+  int64_t pix_low = 0;
 
   // prevents CPU false sharing
   aligned_vector<int64_t> pix(threads);
@@ -163,11 +163,16 @@ T P2_OpenMP(T x, int64_t y, int threads)
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
 
-    // add missing sum contributions in order
+    // Add the missing sum contributions in sequential order.
+    // The sum from the parallel for loop above is the sum
+    // of the prime counts inside [thread_start, thread_stop].
+    // For each such prime count we now have to add the
+    // missing part from [0, thread_start - 1].
     for (int i = 0; i < threads; i++)
     {
-      sum += pix_sum * pix_counts[i];
-      pix_sum += pix[i];
+      T count = pix_counts[i];
+      sum += pix_low * count;
+      pix_low += pix[i];
     }
 
     if (is_print())
