@@ -1,13 +1,11 @@
 ///
 /// @file  B.cpp
 /// @brief The B formula is a partial computation of the P2(x, a)
-///        formula from the Lagarias-Miller-Odlyzko and Deleglise-
-///        Rivat prime counting algorithms. P2(x, a) counts the
-///        numbers <= x that have exactly 2 prime factors each
-///        exceeding the a-th prime. Both P2 and B have a runtime
-///        complexity of O(z log log z) and use O(z^(1/2)) memory,
-///        with z = x / y. This implementation is a simplified
-///        version of P2.cpp.
+///        formula from the Lagarias-Miller-Odlyzko and Deleglise-Rivat
+///        prime counting algorithms. P2(x, a) counts the numbers <= x
+///        that have exactly 2 prime factors each exceeding the a-th
+///        prime. Both P2 and B have a runtime complexity of
+///        O(z log log z) and use O(z^(1/2)) memory, with z = x / y.
 ///
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -53,7 +51,7 @@ void backup(nlohmann::json& json,
             int64_t y,
             int64_t z,
             int64_t low,
-            int64_t pix_low,
+            int64_t pi_low_minus_1,
             int64_t thread_distance,
             maxint_t sum,
             double time)
@@ -65,7 +63,7 @@ void backup(nlohmann::json& json,
   B["y"] = y;
   B["alpha_y"] = get_alpha_y(x, y);
   B["low"] = low;
-  B["pix_low"] = pix_low;
+  B["pi_low_minus_1"] = pi_low_minus_1;
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
   B["sum"] = to_str(sum);
@@ -105,7 +103,7 @@ bool resume(nlohmann::json& json,
             T x,
             int64_t y,
             int64_t& low,
-            int64_t& pix_low,
+            int64_t& pi_low_minus_1,
             int64_t& thread_distance,
             T& sum,
             double& time)
@@ -114,7 +112,7 @@ bool resume(nlohmann::json& json,
   {
     double seconds = json["B"]["seconds"];
     low = json["B"]["low"];
-    pix_low = json["B"]["pix_low"];
+    pi_low_minus_1 = json["B"]["pi_low_minus_1"];
     thread_distance = json["B"]["thread_distance"];
     sum = (T) to_maxint(json["B"]["sum"]);
     time = get_time() - seconds;
@@ -197,6 +195,7 @@ B_thread(T x,
   int64_t pix = 0;
   int64_t pix_count = 0;
 
+  // thread sieves [low, z[
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
   int64_t start = (int64_t) max(x / z, y);
@@ -208,7 +207,7 @@ B_thread(T x,
   int64_t next = it.next_prime();
   int64_t prime = rit.prev_prime();
 
-  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
+  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   while (prime > start)
   {
     int64_t xp = (int64_t)(x / prime);
@@ -219,7 +218,7 @@ B_thread(T x,
     prime = rit.prev_prime();
   }
 
-  // prime count [low, z - 1]
+  // prime count [low, z[
   pix += count_primes(it, next, z - 1);
   auto res = make_tuple(sum, pix, pix_count);
 
@@ -244,14 +243,14 @@ T B_OpenMP(T x,
   int64_t low = 2;
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
-  int64_t pix_low = 0;
+  int64_t pi_low_minus_1 = 0;
 
   // prevents CPU false sharing
   using res_t = std::tuple<T, int64_t, int64_t>;
   aligned_vector<res_t> res(threads);
 
   auto json = load_backup();
-  if (!resume(json, x, y, low, pix_low, thread_distance, sum, time))
+  if (!resume(json, x, y, low, pi_low_minus_1, thread_distance, sum, time))
     if (json.find("B") != json.end())
       json.erase("B");
 
@@ -267,22 +266,22 @@ T B_OpenMP(T x,
     for (int i = 0; i < threads; i++)
       res[i] = B_thread(x, y, z, low, i, thread_distance);
 
-    // The threads above have computed the sum of
-    // PrimePi(n) - PrimePi(thread_low) for many different values
-    // of n. However we actually want to compute the sum of
-    // PrimePi(n). In order to get the complete sum we now have
-    // to calculate the missing sum contributions in sequential
-    // order as each thread depends on values from the previous
-    // thread. The missing sum contribution for each thread can
-    // be calculated using pix_low * thread_count.
+    // The threads above have computed the sum of:
+    // PrimePi(n) - PrimePi(thread_low - 1)
+    // for many different values of n. However we actually want to
+    // compute the sum of PrimePi(n). In order to get the complete
+    // sum we now have to calculate the missing sum contributions in
+    // sequential order as each thread depends on values from the
+    // previous thread. The missing sum contribution for each thread
+    // can be calculated using pi_low_minus_1 * thread_count.
     for (int i = 0; i < threads; i++)
     {
       auto thread_sum = std::get<0>(res[i]);
       auto thread_pix = std::get<1>(res[i]);
       auto thread_count = std::get<2>(res[i]);
-      thread_sum += (T) pix_low * (T) thread_count;
+      thread_sum += (T) pi_low_minus_1 * thread_count;
       sum += thread_sum;
-      pix_low += thread_pix;
+      pi_low_minus_1 += thread_pix;
     }
 
     low += thread_distance * threads;
@@ -290,7 +289,7 @@ T B_OpenMP(T x,
 
     if (is_backup(last_backup_time))
     {
-      backup(json, x, y, z, low, pix_low, thread_distance, sum, time);
+      backup(json, x, y, z, low, pi_low_minus_1, thread_distance, sum, time);
       last_backup_time = get_time();
     }
 
