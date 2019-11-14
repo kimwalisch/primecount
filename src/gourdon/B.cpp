@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <tuple>
 
 using namespace std;
 using namespace primecount;
@@ -52,8 +53,8 @@ void backup(nlohmann::json& json,
             int64_t y,
             int64_t z,
             int64_t low,
+            int64_t pix_low,
             int64_t thread_distance,
-            maxint_t pix_total,
             maxint_t sum,
             double time)
 {
@@ -64,9 +65,9 @@ void backup(nlohmann::json& json,
   B["y"] = y;
   B["alpha_y"] = get_alpha_y(x, y);
   B["low"] = low;
+  B["pix_low"] = pix_low;
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
-  B["pix_total"] = to_str(pix_total);
   B["sum"] = to_str(sum);
   B["percent"] = percent;
   B["seconds"] = get_time() - time;
@@ -104,8 +105,8 @@ bool resume(nlohmann::json& json,
             T x,
             int64_t y,
             int64_t& low,
+            int64_t& pix_low,
             int64_t& thread_distance,
-            T& pix_total,
             T& sum,
             double& time)
 {
@@ -113,8 +114,8 @@ bool resume(nlohmann::json& json,
   {
     double seconds = json["B"]["seconds"];
     low = json["B"]["low"];
+    pix_low = json["B"]["pix_low"];
     thread_distance = json["B"]["thread_distance"];
-    pix_total = (T) to_maxint(json["B"]["pix_total"]);
     sum = (T) to_maxint(json["B"]["sum"]);
     time = get_time() - seconds;
     return true;
@@ -184,18 +185,17 @@ void balanceLoad(int64_t* thread_distance,
 }
 
 template <typename T>
-T B_thread(T x,
-            int64_t y,
-            int64_t z,
-            int64_t low,
-            int64_t thread_num,
-            int64_t thread_distance,
-            int64_t& pix,
-            int64_t& pix_count)
+std::tuple<T, int64_t, int64_t>
+B_thread(T x,
+         int64_t y,
+         int64_t z,
+         int64_t low,
+         int64_t thread_num,
+         int64_t thread_distance)
 {
   T sum = 0;
-  pix = 0;
-  pix_count = 0;
+  int64_t pix = 0;
+  int64_t pix_count = 0;
 
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
@@ -219,9 +219,11 @@ T B_thread(T x,
     prime = rit.prev_prime();
   }
 
+  // prime count [low, z - 1]
   pix += count_primes(it, next, z - 1);
+  auto res = make_tuple(sum, pix, pix_count);
 
-  return sum;
+  return res;
 }
 
 /// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -239,17 +241,17 @@ T B_OpenMP(T x,
     return 0;
 
   T sum = 0;
-  T pix_total = 0;
-
   int64_t low = 2;
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
+  int64_t pix_low = 0;
 
-  aligned_vector<int64_t> pix(threads);
-  aligned_vector<int64_t> pix_counts(threads);
+  // prevents CPU false sharing
+  using res_t = std::tuple<T, int64_t, int64_t>;
+  aligned_vector<res_t> res(threads);
 
   auto json = load_backup();
-  if (!resume(json, x, y, low, thread_distance, pix_total, sum, time))
+  if (!resume(json, x, y, low, pix_low, thread_distance, sum, time))
     if (json.find("B") != json.end())
       json.erase("B");
 
@@ -261,23 +263,34 @@ T B_OpenMP(T x,
     threads = in_between(1, threads, max_threads);
     double t = get_time();
 
-    #pragma omp parallel for num_threads(threads) reduction(+: sum)
+    #pragma omp parallel for num_threads(threads)
     for (int i = 0; i < threads; i++)
-      sum += B_thread(x, y, z, low, i, thread_distance, pix[i], pix_counts[i]);
+      res[i] = B_thread(x, y, z, low, i, thread_distance);
+
+    // The threads above have computed the sum of
+    // PrimePi(n) - PrimePi(thread_low) for many different values
+    // of n. However we actually want to compute the sum of
+    // PrimePi(n). In order to get the complete sum we now have
+    // to calculate the missing sum contributions in sequential
+    // order as each thread depends on values from the previous
+    // thread. The missing sum contribution for each thread can
+    // be calculated using pix_low * thread_count.
+    for (int i = 0; i < threads; i++)
+    {
+      auto thread_sum = std::get<0>(res[i]);
+      auto thread_pix = std::get<1>(res[i]);
+      auto thread_count = std::get<2>(res[i]);
+      thread_sum += (T) pix_low * (T) thread_count;
+      sum += thread_sum;
+      pix_low += thread_pix;
+    }
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, t);
 
-    // add missing sum contributions in order
-    for (int i = 0; i < threads; i++)
-    {
-      sum += pix_total * pix_counts[i];
-      pix_total += pix[i];
-    }
-
     if (is_backup(last_backup_time))
     {
-      backup(json, x, y, z, low, thread_distance, pix_total, sum, time);
+      backup(json, x, y, z, low, pix_low, thread_distance, sum, time);
       last_backup_time = get_time();
     }
 
