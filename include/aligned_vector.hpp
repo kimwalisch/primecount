@@ -21,7 +21,7 @@
 /// line size to 512 bytes.
 ///
 #ifndef CACHE_LINE_SIZE
-  #define CACHE_LINE_SIZE 512
+  #define CACHE_LINE_SIZE (1 << 9)
 #endif
 
 namespace primecount {
@@ -34,17 +34,27 @@ namespace primecount {
 template <typename T>
 class aligned_vector
 {
+  static_assert(sizeof(T) < CACHE_LINE_SIZE,
+                "sizeof(T) must be < CACHE_LINE_SIZE");
+
 public:
   aligned_vector(std::size_t size)
     : vect_(size) { }
   std::size_t size() const { return vect_.size(); }
-  T& operator[](std::size_t pos) { return vect_[pos].val[0]; }
-private:
-  struct align_t
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
+  char unused()
   {
-    T val[CACHE_LINE_SIZE / sizeof(T)];
+    vect_.back().pad[0] = 123;
+    return vect_.back().pad[0];
+  }
+
+private:
+  struct CacheLine
+  {
+    T val;
+    char pad[CACHE_LINE_SIZE - sizeof(T)];
   };
-  std::vector<align_t> vect_;
+  std::vector<CacheLine> vect_;
 };
 
 } // namespace

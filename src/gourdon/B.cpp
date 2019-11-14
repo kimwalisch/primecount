@@ -107,6 +107,7 @@ B_thread(T x,
     prime = rit.prev_prime();
   }
 
+  // prime count [low, z - 1]
   pix += count_primes(it, next, z - 1);
   auto res = make_tuple(sum, pix, pix_count);
 
@@ -131,38 +132,39 @@ T B_OpenMP(T x, int64_t y, int threads)
   int64_t pix_low = 0;
 
   // prevents CPU false sharing
-  aligned_vector<int64_t> pix(threads);
-  aligned_vector<int64_t> pix_counts(threads);
-  
+  using res_t = std::tuple<T, int64_t, int64_t>;
+  aligned_vector<res_t> res(threads);
+
   while (low < z)
   {
     int64_t max_threads = ceil_div(z - low, thread_distance);
     threads = in_between(1, threads, max_threads);
     double time = get_time();
 
-    #pragma omp parallel for num_threads(threads) reduction(+: sum)
+    #pragma omp parallel for num_threads(threads)
+    for (int i = 0; i < threads; i++)
+      res[i] = B_thread(x, y, z, low, i, thread_distance);
+
+    // The threads above have computed the sum of
+    // PrimePi(n) - PrimePi(thread_low) for many different values
+    // of n. However we actually want to compute the sum of
+    // PrimePi(n). In order to get the complete sum we now have
+    // to calculate the missing sum contributions in sequential
+    // order as each thread depends on values from the previous
+    // thread. The missing sum contribution for each thread can
+    // be calculated using pix_low * thread_count.
     for (int i = 0; i < threads; i++)
     {
-      auto res = B_thread(x, y, z, low, i, thread_distance);
-      pix[i] = std::get<1>(res);
-      pix_counts[i] = std::get<2>(res);
-      sum += std::get<0>(res);
+      auto thread_sum = std::get<0>(res[i]);
+      auto thread_pix = std::get<1>(res[i]);
+      auto thread_count = std::get<2>(res[i]);
+      thread_sum += (T) pix_low * (T) thread_count;
+      sum += thread_sum;
+      pix_low += thread_pix;
     }
 
     low += thread_distance * threads;
     balanceLoad(&thread_distance, low, z, threads, time);
-
-    // Add the missing sum contributions in sequential order.
-    // The sum from the parallel for loop above is the sum
-    // of the prime counts inside [thread_start, thread_stop].
-    // For each such prime count we now have to add the
-    // missing part from [0, thread_start - 1].
-    for (int i = 0; i < threads; i++)
-    {
-      T count = pix_counts[i];
-      sum += pix_low * count;
-      pix_low += pix[i];
-    }
 
     if (is_print())
     {
