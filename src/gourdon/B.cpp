@@ -85,6 +85,7 @@ B_thread(T x,
   int64_t pix = 0;
   int64_t pix_count = 0;
 
+  // thread sieves [low, z[
   low += thread_distance * thread_num;
   z = min(low + thread_distance, z);
   int64_t start = (int64_t) max(x / z, y);
@@ -96,7 +97,7 @@ B_thread(T x,
   int64_t next = it.next_prime();
   int64_t prime = rit.prev_prime();
 
-  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
+  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
   while (prime > start)
   {
     int64_t xp = (int64_t)(x / prime);
@@ -107,7 +108,7 @@ B_thread(T x,
     prime = rit.prev_prime();
   }
 
-  // prime count [low, z - 1]
+  // prime count [low, z[
   pix += count_primes(it, next, z - 1);
   auto res = make_tuple(sum, pix, pix_count);
 
@@ -129,7 +130,7 @@ T B_OpenMP(T x, int64_t y, int threads)
   int64_t z = (int64_t)(x / max(y, 1));
   int64_t min_distance = 1 << 23;
   int64_t thread_distance = min_distance;
-  int64_t pix_low = 0;
+  int64_t pi_low_minus_1 = 0;
 
   // prevents CPU false sharing
   using res_t = std::tuple<T, int64_t, int64_t>;
@@ -145,22 +146,22 @@ T B_OpenMP(T x, int64_t y, int threads)
     for (int i = 0; i < threads; i++)
       res[i] = B_thread(x, y, z, low, i, thread_distance);
 
-    // The threads above have computed the sum of
-    // PrimePi(n) - PrimePi(thread_low) for many different values
-    // of n. However we actually want to compute the sum of
-    // PrimePi(n). In order to get the complete sum we now have
-    // to calculate the missing sum contributions in sequential
-    // order as each thread depends on values from the previous
-    // thread. The missing sum contribution for each thread can
-    // be calculated using pix_low * thread_count.
+    // The threads above have computed the sum of:
+    // PrimePi(n) - PrimePi(thread_low - 1)
+    // for many different values of n. However we actually want to
+    // compute the sum of PrimePi(n). In order to get the complete
+    // sum we now have to calculate the missing sum contributions in
+    // sequential order as each thread depends on values from the
+    // previous thread. The missing sum contribution for each thread
+    // can be calculated using pi_low_minus_1 * thread_count.
     for (int i = 0; i < threads; i++)
     {
       auto thread_sum = std::get<0>(res[i]);
       auto thread_pix = std::get<1>(res[i]);
       auto thread_count = std::get<2>(res[i]);
-      thread_sum += (T) pix_low * (T) thread_count;
+      thread_sum += (T) pi_low_minus_1 * thread_count;
       sum += thread_sum;
-      pix_low += thread_pix;
+      pi_low_minus_1 += thread_pix;
     }
 
     low += thread_distance * threads;
