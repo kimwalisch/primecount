@@ -1,4 +1,4 @@
-2019-10-31 Kim Walisch  <kim.walisch@gmail.com>
+2019-11-15 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.2 work in progress.
 
@@ -15,6 +15,7 @@
   * CMakeLists.txt: Generate man page using a2x program.
   * CMakeLists.txt: New option: -DBUILD_LIBPRIMESIEVE=OFF.
   * Sieve.cpp: Fix vector out of bounds.
+  * cmdoptions.cpp: Support options of type: --option VALUE.
   * Get rid of underscores in command-line options:
 
       --deleglise_rivat -> --deleglise-rivat
