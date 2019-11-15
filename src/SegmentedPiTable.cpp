@@ -97,7 +97,6 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   // In order to simplify multi-threading we set low,
   // high and segment_size % 128 == 0.
   segment_size_ += 128 - segment_size_ % 128;
-
   int thread_threshold = (int) 1e7;
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
@@ -105,15 +104,14 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
 
-  uint64_t pi_low = 0;
-  init_next_segment(pi_low);
+  uint64_t pi_low_minus_1 = 0;
+  init_next_segment(pi_low_minus_1);
 }
 
 /// Increase low & high and initialize the next segment.
 void SegmentedPiTable::next()
 {
-  // Count of primes < low
-  uint64_t pi_low = operator[](high_ - 1);
+  uint64_t pi_low_minus_1 = operator[](high_ - 1);
 
   low_ = high_;
   high_ = low_ + segment_size_;
@@ -122,7 +120,7 @@ void SegmentedPiTable::next()
   if (finished())
     return;
 
-  init_next_segment(pi_low);
+  init_next_segment(pi_low_minus_1);
 }
 
 /// Reset the pi[x] lookup table using multi-threading.
@@ -163,9 +161,8 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 /// and initialize the pi[x] lookup table. The pi[x]
 /// lookup table returns the number of primes <= x for
 /// low <= x < high.
-/// @pi_low: Count of primes < low
 ///
-void SegmentedPiTable::init_next_segment(uint64_t pi_low)
+void SegmentedPiTable::init_next_segment(uint64_t pi_low_minus_1)
 {
   #pragma omp parallel for num_threads(threads_)
   for (int t = 0; t < threads_; t++)
@@ -203,8 +200,8 @@ void SegmentedPiTable::init_next_segment(uint64_t pi_low)
   // Update prime counts
   for (auto& i : pi_)
   {
-    i.prime_count = pi_low;
-    pi_low += popcnt64(i.bits);
+    i.prime_count = pi_low_minus_1;
+    pi_low_minus_1 += popcnt64(i.bits);
   }
 }
 
