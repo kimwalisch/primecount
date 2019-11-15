@@ -49,11 +49,16 @@ public:
   }
 
 private:
-  struct CacheLine
-  {
+  struct CacheLine {
     T val;
+    // We cannot use alignas(CACHE_LINE_SIZE) for the
+    // CacheLine struct as GCC does not yet support
+    // alignas(n) with n > 128. Also alignas(n) for
+    // over-aligned data and dynamic memory allocation
+    // is only supported since C++17.
     char pad[CACHE_LINE_SIZE - sizeof(T)];
   };
+
   std::vector<CacheLine> vect_;
 };
 
