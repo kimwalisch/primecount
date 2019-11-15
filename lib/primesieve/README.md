@@ -35,20 +35,36 @@ bytes per thread.
 
 ## Installation
 
-The primesieve console application can be installed using your operating system's
-package manager. You can also download the latest primesieve console and GUI applications
+The primesieve command-line program can be installed using your operating system's
+package manager. You can also download the latest primesieve command-line and GUI programs
 from the [downloads](https://github.com/kimwalisch/primesieve/wiki/Downloads) page.
 
-```sh
-# Debian, Ubuntu
-sudo apt install primesieve
-
-# Homebrew (macOS) or Linuxbrew
-brew install primesieve
-
-# Windows using Chocolatey package manager
-choco install primesieve
-```
+<table>
+    <tr>
+        <td><b>Windows:</b></td>
+        <td><code>choco install primesieve</code></td>
+    </tr>
+    <tr>
+        <td><b>macOS:</b></td>
+        <td><code>brew install primesieve</code></td>
+    </tr>
+    <tr>
+        <td><b>Debian/Ubuntu:</b></td>
+        <td><code>sudo apt install primesieve</code></td>
+    </tr>
+    <tr>
+        <td><b>Fedora:</b></td>
+        <td><code>sudo dnf install primesieve</code></td>
+    </tr>
+    <tr>
+        <td><b>openSUSE:</b></td>
+        <td><code>sudo zypper install primesieve</code></td>
+    </tr>
+    <tr>
+        <td><b>FreeBSD:</b></td>
+        <td><code>pkg install primesieve</code></td>
+    </tr>
+</table>
 
 ## Usage examples
 
@@ -74,22 +90,31 @@ Generate the primes and/or prime k-tuplets inside [START, STOP]
 (< 2^64) using the segmented sieve of Eratosthenes.
 
 Options:
-  -c[N+], --count[=N+]   Count primes and prime k-tuplets, N <= 6,
-                         e.g. -c1 primes, -c2 twins, -c3 triplets, ...
-          --cpu-info     Print CPU information
-  -d<N>,  --dist=<N>     Sieve the interval [START, START + N]
-  -h,     --help         Print this help menu
-  -n,     --nth-prime    Calculate the nth prime,
-                         e.g. 1 100 -n finds the 1st prime > 100
-          --no-status    Turn off the progressing status
-  -p[N],  --print[=N]    Print primes or prime k-tuplets, N <= 6,
-                         e.g. -p1 primes, -p2 twins, -p3 triplets, ...
-  -q,     --quiet        Quiet mode, prints less output
-  -s<N>,  --size=<N>     Set the sieve size in KiB, N <= 4096
-          --test         Run various sieving tests
-  -t<N>,  --threads=<N>  Set the number of threads, N <= CPU cores
-          --time         Print the time elapsed in seconds
-  -v,     --version      Print version and license information
+  -c, --count[=NUM+]  Count primes and/or prime k-tuplets, NUM <= 6.
+                      Count primes: -c or --count (default option),
+                      count twin primes: -c2 or --count=2,
+                      count prime triplets: -c3 or --count=3, ...
+      --cpu-info      Print CPU information (cache sizes).
+  -d, --dist=DIST     Sieve the interval [START, START + DIST].
+  -h, --help          Print this help menu.
+  -n, --nth-prime     Find the nth prime.
+                      primesieve 100 -n: finds the 100th prime,
+                      primesieve 2 100 -n: finds the 2nd prime > 100.
+      --no-status     Turn off the progressing status.
+  -p, --print[=NUM]   Print primes or prime k-tuplets, NUM <= 6.
+                      Print primes: -p or --print,
+                      print twin primes: -p2 or --print=2,
+                      print prime triplets: -p3 or --print=3, ...
+  -q, --quiet         Quiet mode, prints less output.
+  -s, --size=SIZE     Set the sieve size in KiB, SIZE <= 4096.
+                      By default primesieve uses a sieve size that
+                      matches your CPU's L1 cache size or half of
+                      your CPU's L2 cache size (per core).
+      --test          Run various sieving tests.
+  -t, --threads=NUM   Set the number of threads, NUM <= CPU cores.
+                      Default setting: use all available CPU cores.
+      --time          Print the time elapsed in seconds.
+  -v, --version       Print version and license information.
 ```
 
 ## Build instructions
@@ -132,7 +157,7 @@ int main()
 ```
 
 * [More C++ examples](examples/cpp)
-* [Browse primesieve's C++ API online](https://primesieve.org/api/primesieve_8hpp.html)
+* [Browse primesieve's C++ API online](https://primesieve.org/api)
 
 ## C API
 
@@ -158,7 +183,7 @@ int main()
 ```
 
 * [More C examples](examples/c)
-* [Browse primesieve's C API online](https://primesieve.org/api/primesieve_8h.html)
+* [Browse primesieve's C API online](https://primesieve.org/api)
 
 ## Multi-threading
 
@@ -277,8 +302,8 @@ primesieve natively supports C and C++ and has bindings available for:
         <td><a href="https://github.com/hickford/primesieve-python">primesieve-python</a></td>
     </tr>
     <tr>
-        <td><b>Perl:</b></td>
-        <td><a href="https://github.com/CurtTilmes/perl6-primesieve">perl6-primesieve</a></td>
+        <td><b>Raku:</b></td>
+        <td><a href="https://github.com/CurtTilmes/raku-primesieve">raku-primesieve</a></td>
     </tr>
     <tr>
         <td><b>Ruby:</b></td>
