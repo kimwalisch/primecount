@@ -312,7 +312,7 @@ int128_t D(int128_t x,
   if (!loadBalancer.resume(sum, time))
   {
     // uses less memory
-    if (z <= DFactorTable<uint16_t>::max())
+    if (y <= DFactorTable<uint16_t>::max())
     {
       DFactorTable<uint16_t> factor(y, z, threads);
       auto primes = generate_primes<uint32_t>(y);
@@ -321,18 +321,8 @@ int128_t D(int128_t x,
     else
     {
       DFactorTable<uint32_t> factor(y, z, threads);
-
-      // uses less memory
-      if (y <= numeric_limits<uint32_t>::max())
-      {
-        auto primes = generate_primes<uint32_t>(y);
-        sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
-      }
-      else
-      {
-        auto primes = generate_primes<int64_t>(y);
-        sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
-      }
+      auto primes = generate_primes<int64_t>(y);
+      sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, time);
     }
   }
 
