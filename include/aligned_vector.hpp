@@ -49,11 +49,14 @@ public:
   }
 
 private:
-  struct CacheLine
-  {
+  struct alignas(CACHE_LINE_SIZE) CacheLine {
     T val;
+    // The padding is needed before C++17 as alignas
+    // is not repspected for over-aligned data
+    // that is dynamically allocated.
     char pad[CACHE_LINE_SIZE - sizeof(T)];
   };
+
   std::vector<CacheLine> vect_;
 };
 
