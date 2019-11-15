@@ -54,7 +54,6 @@
 #include <int128_t.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <limits>
 #include <stdint.h>
 #include <vector>
@@ -70,8 +69,8 @@ public:
                int64_t z, 
                int threads)
   {
-    if (z > max())
-      throw primecount_error("z must be <= FactorTable::max()");
+    if (y > max())
+      throw primecount_error("y must be <= FactorTable::max()");
 
     z = std::max<int64_t>(1, z);
     T T_MAX = std::numeric_limits<T>::max();
@@ -114,9 +113,15 @@ public:
         for (; multiple <= high; multiple = prime * get_number(i++))
         {
           int64_t mi = get_index(multiple);
+
           // prime is the smallest factor of multiple
           if (factor_[mi] == T_MAX)
-            factor_[mi] = (T) prime;
+          {
+            if (prime <= y)
+              factor_[mi] = (T) prime;
+            else
+              factor_[mi] = 0;
+          }
           // the least significant bit indicates
           // whether multiple has an even (0) or odd (1)
           // number of prime factors
