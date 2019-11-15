@@ -8,14 +8,15 @@
   improvements which should make it easier to package
   primecount for e.g. Linux distros.
 
+  * Sieve.cpp: Fix vector out of bounds.
+  * DFactorTable.hpp: Slightly reduce memory usage.
+  * cmdoptions.cpp: Support options of type: --option VALUE.
   * doc/BUILD.md: Detailed build instructions. Contains new
     section: "Packaging primecount" for Linux distros.
   * doc/primecount.1: Add primecount man page.
   * doc/primecount.txt: AsciiDoc, used to generate primecount.1.
   * CMakeLists.txt: Generate man page using a2x program.
   * CMakeLists.txt: New option: -DBUILD_LIBPRIMESIEVE=OFF.
-  * Sieve.cpp: Fix vector out of bounds.
-  * cmdoptions.cpp: Support options of type: --option VALUE.
   * Get rid of underscores in command-line options:
 
       --deleglise_rivat -> --deleglise-rivat
