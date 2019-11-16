@@ -104,14 +104,14 @@ T D_thread(T x,
       int64_t min_m = max(xp_div_high, z / prime);
       int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
 
-      int64_t count = 0;
-      int64_t start = 0;
-
       if (prime >= max_m)
         goto next_segment;
 
-      factor.to_index(&min_m);
-      factor.to_index(&max_m);
+      min_m = factor.to_index(min_m);
+      max_m = factor.to_index(max_m);
+
+      int64_t count = 0;
+      int64_t start = 0;
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -120,8 +120,7 @@ T D_thread(T x,
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
         {
-          int64_t fm = factor.get_number(m);
-          int64_t xpm = fast_div64(xp, fm);
+          int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t stop = xpm - low;
           count += sieve.count(start, stop, low, high, count, count_low_high);
           start = stop + 1;
@@ -147,7 +146,6 @@ T D_thread(T x,
       int64_t xp_div_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_div_high, prime);
       int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
-
       int64_t l = pi[max_m];
       int64_t count = 0;
       int64_t start = 0;
@@ -312,7 +310,7 @@ int128_t D(int128_t x,
   if (!loadBalancer.resume(sum, time))
   {
     // uses less memory
-    if (y <= DFactorTable<uint16_t>::max())
+    if (z <= DFactorTable<uint16_t>::max())
     {
       DFactorTable<uint16_t> factor(y, z, threads);
       auto primes = generate_primes<uint32_t>(y);

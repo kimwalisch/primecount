@@ -66,13 +66,7 @@ namespace primecount {
 class AbstractFactorTable
 {
 public:
-  static void to_index(int64_t* number)
-  {
-    assert(*number > 0);
-    *number = get_index(*number);
-  }
-
-  static int64_t get_index(uint64_t number)
+  static int64_t to_index(uint64_t number)
   {
     assert(number > 0);
     uint64_t q = number / 2310;
@@ -80,7 +74,7 @@ public:
     return 480 * q + coprime_indexes_[r];
   }
 
-  static int64_t get_number(uint64_t index)
+  static int64_t to_number(uint64_t index)
   {
     uint64_t q = index / 480;
     uint64_t r = index % 480;
@@ -92,7 +86,7 @@ public:
   ///
   static int64_t get_first_coprime()
   {
-    return get_number(1);
+    return to_number(1);
   }
 
 private:
@@ -112,7 +106,7 @@ public:
 
     y = std::max<int64_t>(1, y);
     T T_MAX = std::numeric_limits<T>::max();
-    factor_.resize(get_index(y) + 1, T_MAX);
+    factor_.resize(to_index(y) + 1, T_MAX);
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
@@ -145,9 +139,9 @@ public:
         if (min_m > high)
           break;
 
-        for (; multiple <= high; multiple = prime * get_number(i++))
+        for (; multiple <= high; multiple = prime * to_number(i++))
         {
-          int64_t mi = get_index(multiple);
+          int64_t mi = to_index(multiple);
           // prime is smallest factor of multiple
           if (factor_[mi] == T_MAX)
             factor_[mi] = (T) prime;
@@ -165,8 +159,8 @@ public:
           multiple = next_multiple(square, low, &j);
 
           // moebius(n) = 0
-          for (; multiple <= high; multiple = square * get_number(j++))
-            factor_[get_index(multiple)] = 0;
+          for (; multiple <= high; multiple = square * to_number(j++))
+            factor_[to_index(multiple)] = 0;
         }
       }
     }
@@ -174,7 +168,7 @@ public:
 
   /// mu_lpf(n) is a combination of the mu(n) (Möbius function)
   /// and lpf(n) (least prime factor) functions.
-  /// mu_lpf(n) returns (with n = get_number(index)):
+  /// mu_lpf(n) returns (with n = to_number(index)):
   ///
   /// 1) INT_MAX - 1  if n = 1
   /// 2) INT_MAX      if n is a prime
@@ -188,7 +182,7 @@ public:
   }
 
   /// Get the Möbius function value of the number
-  /// n = get_number(index).
+  /// n = to_number(index).
   ///
   /// https://en.wikipedia.org/wiki/Möbius_function
   /// mu(n) = 1 if n is a square-free integer with an even number of prime factors.
@@ -221,11 +215,11 @@ private:
                                int64_t* index)
   {
     int64_t quotient = ceil_div(low, prime);
-    int64_t i = std::max(*index, get_index(quotient));
+    int64_t i = std::max(*index, to_index(quotient));
     int64_t multiple = 0;
 
     for (; multiple <= low; i++)
-      multiple = prime * get_number(i);
+      multiple = prime * to_number(i);
 
     *index = i;
     return multiple;

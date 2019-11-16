@@ -50,7 +50,7 @@ int main()
 
   for (int n = 1; n <= z; n++)
   {
-    int64_t i = factorTable.get_index(n);
+    int64_t i = factorTable.to_index(n);
     bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
@@ -78,7 +78,7 @@ int main()
 
     // is_leaf(n) is a combination of the mu(n) (Möbius function),
     // lpf(n) (least prime factor) and mpf(n) (max prime factor)
-    // functions. is_leaf(n) returns (with n = get_number(index)):
+    // functions. is_leaf(n) returns (with n = to_number(index)):
     //
     // 1) INT_MAX - 1  if n = 1
     // 2) INT_MAX      if n is a prime

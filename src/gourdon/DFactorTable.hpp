@@ -65,16 +65,16 @@ class DFactorTable : public AbstractFactorTable
 {
 public:
   /// Factor numbers <= z
-  DFactorTable(int64_t y, 
-               int64_t z, 
+  DFactorTable(int64_t y,
+               int64_t z,
                int threads)
   {
-    if (y > max())
-      throw primecount_error("y must be <= FactorTable::max()");
+    if (z > max())
+      throw primecount_error("z must be <= FactorTable::max()");
 
     z = std::max<int64_t>(1, z);
     T T_MAX = std::numeric_limits<T>::max();
-    factor_.resize(get_index(z) + 1, T_MAX);
+    factor_.resize(to_index(z) + 1, T_MAX);
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
@@ -110,18 +110,12 @@ public:
 
         // Find the smallest prime factors of the
         // integers inside ]low, high].
-        for (; multiple <= high; multiple = prime * get_number(i++))
+        for (; multiple <= high; multiple = prime * to_number(i++))
         {
-          int64_t mi = get_index(multiple);
-
+          int64_t mi = to_index(multiple);
           // prime is the smallest factor of multiple
           if (factor_[mi] == T_MAX)
-          {
-            if (prime <= y)
-              factor_[mi] = (T) prime;
-            else
-              factor_[mi] = 0;
-          }
+            factor_[mi] = (T) prime;
           // the least significant bit indicates
           // whether multiple has an even (0) or odd (1)
           // number of prime factors
@@ -137,8 +131,8 @@ public:
 
           // Sieve out numbers that are not square free
           // i.e. numbers for which moebius(n) = 0.
-          for (; multiple <= high; multiple = square * get_number(j++))
-            factor_[get_index(multiple)] = 0;
+          for (; multiple <= high; multiple = square * to_number(j++))
+            factor_[to_index(multiple)] = 0;
         }
       }
 
@@ -156,13 +150,13 @@ public:
 
         // Sieve out primes > y &&
         // Sieve out numbers with prime factors > y
-        for (; next <= high; next = prime * get_number(i++))
-          factor_[get_index(next)] = 0;
+        for (; next <= high; next = prime * to_number(i++))
+          factor_[to_index(next)] = 0;
       }
     }
   }
 
-  /// Returns true if n (with n = get_number(index)) is a
+  /// Returns true if n (with n = to_number(index)) is a
   /// hard special leaf in the D formula of Xavier
   /// Gourdon's prime counting algorithm.
   ///
@@ -181,7 +175,7 @@ public:
   }
 
   /// Get the Möbius function value of the number
-  /// n = get_number(index).
+  /// n = to_number(index).
   ///
   /// https://en.wikipedia.org/wiki/Möbius_function
   /// mu(n) = 1 if n is a square-free integer with an even number of prime factors.
@@ -214,11 +208,11 @@ private:
                                int64_t* index)
   {
     int64_t quotient = ceil_div(low, prime);
-    int64_t i = std::max(*index, get_index(quotient));
+    int64_t i = std::max(*index, to_index(quotient));
     int64_t multiple = 0;
 
     for (; multiple <= low; i++)
-      multiple = prime * get_number(i);
+      multiple = prime * to_number(i);
 
     *index = i;
     return multiple;
