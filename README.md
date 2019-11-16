@@ -45,15 +45,15 @@ later).
 
 ```sh
 # We start a computation and interrupt it using Ctrl + C
-$ ./primecount 1e19 --B -s
+$ ./primecount 1e21 --B -s
 
 === B(x, y) ===
-x = 10000000000000000000
-y = 66422883
-alpha_y = 30.831
+x = 1000000000000000000000
+y = 351720000
+alpha_y = 35.172
 threads = 8
 
-Status: 46%^C
+Status: 38.7%^C
 ```
 
 ```sh
@@ -61,14 +61,14 @@ Status: 46%^C
 $ ./primecount --resume
 
 === B(x, y) ===
-x = 10000000000000000000
-y = 66422883
-alpha_y = 30.831
+x = 1000000000000000000000
+y = 351720000
+alpha_y = 35.172
 threads = 8
 
 Resuming from primecount.backup
 MD5 checksum: OK
-Status: 46%
+Status: 38.7%
 ```
 
 The ```primecount.backup``` file is updated using atomic writes in order to
@@ -82,7 +82,7 @@ computation was originally started. You can safely copy the
 ```primecount.backup``` file to another PC and resume the computation there.
 If the new PC has a different number of CPU cores primecount will by default
 resume the computation using all available CPU cores (unless you have
-specified the number of threads using ```--threads=N```).
+specified the number of threads using ```--threads=NUM```).
 
 ## Batch processing
 
@@ -117,7 +117,7 @@ to reduce the risk of a pi(x) miscalculation due to hardware errors is using
 
 In order to double check and verify a pi(x) computation you have to run the
 same pi(x) computation a second time but this time you manually specify a slightly
-different ```alpha_y``` or ```alpha_z``` tuning factor (using e.g. ```--alpha-y=N```).
+different ```alpha_y``` or ```alpha_z``` tuning factor (using e.g. ```--alpha-y=NUM```).
 Doing this the results of the many formulas of Gourdon's algorithm will be
 completely different from the first run but if the pi(x) results of the 1st and
 2nd run match then the computation has been verified successfully!
