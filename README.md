@@ -13,9 +13,20 @@ pi(10^27) and many other records.
 
 The primecount backup version generates the following files:
 
-* ```primecount.backup```: Backup file with intermediate results.
-* ```primecount.log```: Main log file.
-* ```results.txt```: Log file with final results.
+<table>
+    <tr>
+        <td><code>primecount.backup</code></td>
+        <td>Backup file with intermediate results</td>
+    </tr>
+    <tr>
+        <td><code>primecount.log</code></td>
+        <td>Detailed log file</td>
+    </tr>
+    <tr>
+        <td><code>results.txt</code></td>
+        <td>Log file with final results only</td>
+    </tr>
+</table>
 
 ## Build instructions
 
