@@ -145,15 +145,15 @@ int64_t S2_hard(int64_t x,
       if (prime >= max_m)
         goto next_segment;
 
-      factor.to_index(&min_m);
-      factor.to_index(&max_m);
+      min_m = factor.to_index(min_m);
+      max_m = factor.to_index(max_m);
 
       for (int64_t m = max_m; m > min_m; m--)
       {
         // mu(m) != 0 && prime < lpf(m)
         if (prime < factor.mu_lpf(m))
         {
-          int64_t pm = prime * factor.get_number(m);
+          int64_t pm = prime * factor.to_number(m);
           int64_t count = tree.count(low, x / pm);
           int64_t phi_xpm = phi[b] + count;
           s2_hard -= factor.mu(m) * phi_xpm;

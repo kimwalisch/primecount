@@ -46,7 +46,7 @@ int main()
 
   for (int n = 1; n <= max; n++)
   {
-    int64_t i = factorTable.get_index(n);
+    int64_t i = factorTable.to_index(n);
     bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
@@ -65,7 +65,7 @@ int main()
 
     // mu_lpf(n) is a combination of the mu(n) (Möbius function)
     // and lpf(n) (least prime factor) functions.
-    // mu_lpf(n) returns (with n = get_number(index)):
+    // mu_lpf(n) returns (with n = to_number(index)):
     //
     // 1) INT_MAX - 1  if n = 1
     // 2) INT_MAX      if n is a prime
