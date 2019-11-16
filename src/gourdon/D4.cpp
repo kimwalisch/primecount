@@ -276,7 +276,7 @@ int128_t D(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (y <= DFactorTable<uint16_t>::max())
+  if (z <= DFactorTable<uint16_t>::max())
   {
     DFactorTable<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
