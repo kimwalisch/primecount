@@ -111,14 +111,15 @@ T S2_hard_thread(T x,
       int64_t xp_div_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_div_high, y / prime);
       int64_t max_m = min(fast_div(xp, low1), y);
-      int64_t count = 0;
-      int64_t start = 0;
 
       if (prime >= max_m)
         goto next_segment;
 
-      factor.to_index(&min_m);
-      factor.to_index(&max_m);
+      min_m = factor.to_index(min_m);
+      max_m = factor.to_index(max_m);
+
+      int64_t count = 0;
+      int64_t start = 0;
 
       for (int64_t m = max_m; m > min_m; m--)
       {
