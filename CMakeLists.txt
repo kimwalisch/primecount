@@ -245,10 +245,15 @@ endif()
 # (e.g. libprimesieve-dev) and link against that version.
 
 if(BUILD_LIBPRIMESIEVE)
+    set(COPY_BUILD_MANPAGE "${BUILD_MANPAGE}")
     set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+    set(BUILD_MANPAGE OFF CACHE BOOL "Build primesieve manpage" FORCE)
     set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
     option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+
     add_subdirectory(lib/primesieve)
+
+    set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()
     find_package(primesieve REQUIRED)
