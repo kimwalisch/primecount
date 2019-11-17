@@ -48,9 +48,9 @@ Windows and Linux. These binaries are statically linked and
 require a CPU which supports the POPCNT instruction (2008 or
 later).
 
-* [primecount-backup-4.8-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-win64.zip), 588 KB
-* [primecount-backup-4.8-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-linux-x64.tar.xz), 886 KB
-* [primecount-backup-4.8-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v4.8-backup/primecount-backup-4.8-macOS-x64.zip), 433 KB
+* [primecount-backup-5.2-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.2-backup/primecount-backup-5.2-win64.zip), 626 KB
+* [primecount-backup-5.2-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v5.2-backup/primecount-backup-5.2-linux-x64.tar.xz), 916 KB
+* [primecount-backup-5.2-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.2-backup/primecount-backup-5.2-macOS-x64.zip), 427 KB
 
 ## Backup usage example
 
