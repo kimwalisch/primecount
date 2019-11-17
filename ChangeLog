@@ -1,15 +1,14 @@
-2019-11-15 Kim Walisch  <kim.walisch@gmail.com>
+2019-11-17 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 5.2 work in progress.
+  Version 5.2 released.
 
   I have now implemented Xavier Gourdon's algorithm in the
   primecount-backup version (branch backup3). Other than that
   there have been documentation improvements and build system
   improvements which should make it easier to package
-  primecount for e.g. Linux distros.
+  primecount for e.g. Linux distros (see BUILD.md).
 
   * Sieve.cpp: Fix vector out of bounds.
-  * DFactorTable.hpp: Slightly reduce memory usage.
   * cmdoptions.cpp: Support options of type: --option VALUE.
   * doc/BUILD.md: Detailed build instructions. Contains new
     section: "Packaging primecount" for Linux distros.
