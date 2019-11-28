@@ -4,16 +4,16 @@
 ///         S1(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <S1.hpp>
 #include <generate.hpp>
 #include <PhiTiny.hpp>
 #include <imath.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <iostream>

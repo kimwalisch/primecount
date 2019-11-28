@@ -14,12 +14,12 @@
 /// file in the top level directory.
 ///
 
-#include <S2.hpp>
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <PhiTiny.hpp>
 #include <imath.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <iostream>

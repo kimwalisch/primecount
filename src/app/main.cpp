@@ -17,8 +17,7 @@
 #include <int128_t.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
-#include <S1.hpp>
-#include <S2.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <exception>

@@ -22,7 +22,7 @@
 #include <generate.hpp>
 #include <PhiTiny.hpp>
 #include <BinaryIndexedTree.hpp>
-#include <S1.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <algorithm>

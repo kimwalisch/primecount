@@ -13,13 +13,13 @@
 /// file in the top level directory.
 ///
 
-#include <S1.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <print.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <vector>

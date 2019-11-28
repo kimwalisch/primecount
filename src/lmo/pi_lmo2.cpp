@@ -19,7 +19,7 @@
 #include <imath.hpp>
 #include <generate.hpp>
 #include <PhiTiny.hpp>
-#include <S1.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <vector>

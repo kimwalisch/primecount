@@ -36,7 +36,7 @@
 #include <MpiMsg.hpp>
 #include <imath.hpp>
 #include <S2Status.hpp>
-#include <S2.hpp>
+#include <S.hpp>
 #include <Sieve.hpp>
 #include <print.hpp>
 

@@ -24,7 +24,7 @@
 #include <imath.hpp>
 #include <print.hpp>
 #include <S2Status.hpp>
-#include <S2.hpp>
+#include <S.hpp>
 
 #include <stdint.h>
 #include <vector>
