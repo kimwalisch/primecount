@@ -1,7 +1,7 @@
 ///
 /// @file  S2Status.hpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,7 @@
 #define S2STATUS_HPP
 
 #include <int128_t.hpp>
+#include <noinline.hpp>
 
 #if defined(_OPENMP)
   #include <OmpLock.hpp>
@@ -22,7 +23,7 @@ class S2Status
 {
 public:
   S2Status(maxint_t x);
-  void print(maxint_t n, maxint_t limit);
+  NOINLINE void print(maxint_t n, maxint_t limit);
   static double getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
 private:
   bool is_print(double time);
