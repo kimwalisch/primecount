@@ -42,7 +42,7 @@ int64_t S2(int64_t x,
            vector<int32_t>& lpf,
            vector<int32_t>& mu)
 {
-  int64_t limit = x / y + 1;
+  int64_t limit = x / y;
   int64_t segment_size = isqrt(limit);
   int64_t s2 = 0;
 

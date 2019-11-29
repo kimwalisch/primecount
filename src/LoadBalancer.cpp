@@ -102,7 +102,7 @@ bool LoadBalancer::get_work(int64_t* low,
       status_.print(sum_, sum_approx_);
   }
 
-  return *low <= sieve_limit_;
+  return *low < sieve_limit_;
 }
 
 void LoadBalancer::update(int64_t* low,

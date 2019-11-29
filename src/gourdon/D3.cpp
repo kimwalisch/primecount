@@ -44,7 +44,7 @@ int64_t D(int64_t x,
 
   double time = get_time();
   int64_t sum = 0;
-  int64_t limit = x / z + 1;
+  int64_t limit = x / z;
   int64_t segment_size = Sieve::get_segment_size(isqrt(limit));
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t low = 0;
