@@ -106,7 +106,7 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
   // udpate msg with new work todo
   msg->update(low_, segments_, segment_size_);
   low_ += segments_ * segment_size_;
-  low_ = min(low_, sieve_limit_ + 1);
+  low_ = min(low_, sieve_limit_);
 }
 
 /// Remaining seconds till finished

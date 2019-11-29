@@ -223,7 +223,7 @@ void S2_hard_slave(T x,
         segment_size = msg.segment_size();
       }
 
-      if (low > z)
+      if (low >= z)
         break;
 
       runtime.start();
