@@ -5,7 +5,7 @@
 ///         once there is no more space in the current Bucket
 ///         a new Bucket is allocated.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,8 +42,7 @@ public:
                uint64_t multipleIndex,
                uint64_t wheelIndex)
   {
-    set(multipleIndex, wheelIndex);
-    sievingPrime_ = (uint32_t) sievingPrime;
+    set(sievingPrime, multipleIndex, wheelIndex);
   }
 
   void set(uint64_t multipleIndex,
@@ -51,7 +50,6 @@ public:
   {
     assert(multipleIndex <= MAX_MULTIPLEINDEX);
     assert(wheelIndex <= MAX_WHEELINDEX);
-
     indexes_ = (uint32_t) (multipleIndex | (wheelIndex << 23));
   }
 
@@ -59,7 +57,9 @@ public:
            uint64_t multipleIndex,
            uint64_t wheelIndex)
   {
-    set(multipleIndex, wheelIndex);
+    assert(multipleIndex <= MAX_MULTIPLEINDEX);
+    assert(wheelIndex <= MAX_WHEELINDEX);
+    indexes_ = (uint32_t) (multipleIndex | (wheelIndex << 23));
     sievingPrime_ = (uint32_t) sievingPrime;
   }
 
@@ -76,18 +76,6 @@ public:
   uint64_t getWheelIndex() const
   {
     return indexes_ >> 23;
-  }
-
-  void setMultipleIndex(uint64_t multipleIndex)
-  {
-    assert(multipleIndex <= MAX_MULTIPLEINDEX);
-    indexes_ = (uint32_t) (indexes_ | multipleIndex);
-  }
-
-  void setWheelIndex(uint64_t wheelIndex)
-  {
-    assert(wheelIndex <= MAX_WHEELINDEX);
-    indexes_ = (uint32_t) (wheelIndex << 23);
   }
 
 private:
@@ -109,8 +97,6 @@ public:
   SievingPrime* begin() { return &sievingPrimes_[0]; }
   SievingPrime* end()   { return end_; }
   Bucket* next()        { return next_; }
-  bool hasNext() const  { return next_ != nullptr; }
-  bool empty()          { return begin() == end(); }
   void setNext(Bucket* next) { next_ = next; }
   void setEnd(SievingPrime* end) { end_ = end; }
   void reset() { end_ = begin(); }

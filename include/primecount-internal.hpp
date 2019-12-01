@@ -64,7 +64,6 @@ double get_alpha_z(int64_t y, int64_t z);
 std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
-
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 maxint_t to_maxint(const std::string& expr);
 double get_time();
@@ -113,7 +112,6 @@ bool is_mpi_master_proc();
 int mpi_num_procs();
 int mpi_proc_id();
 int mpi_master_proc_id();
-
 int64_t P2_mpi(int64_t x, int64_t y, int threads);
 
 #ifdef HAVE_INT128_T

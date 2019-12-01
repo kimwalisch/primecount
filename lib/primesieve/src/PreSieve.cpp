@@ -31,7 +31,6 @@
 #include <primesieve/PreSieve.hpp>
 #include <primesieve/EratSmall.hpp>
 #include <primesieve/pmath.hpp>
-#include <primesieve/types.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -43,10 +42,10 @@ using namespace std;
 
 namespace {
 
-// small primes >= 7
+// Small primes >= 7
 const array<uint64_t, 5> primes = { 7, 11, 13, 17, 19 };
 
-// prime products of primes >= 7
+// Prime products of primes >= 7
 const array<uint64_t, 5> primeProducts = { 210, 2310, 30030, 510510, 9699690 };
 
 } // namespace
@@ -56,9 +55,9 @@ namespace primesieve {
 void PreSieve::init(uint64_t start,
                     uint64_t stop)
 {
-  // the pre-sieve buffer should be at least 10
+  // The pre-sieve buffer should be at least 100
   // times smaller than the sieving distance
-  // in order to reduce initialization overhead
+  // in order to reduce initialization overhead.
   uint64_t dist = stop - start;
   uint64_t threshold = max(dist, isqrt(stop)) / 100;
   auto last =  primeProducts.end() - 1;
@@ -79,9 +78,9 @@ void PreSieve::initBuffer(uint64_t maxPrime,
   primeProduct_ = primeProduct;
   size_ = primeProduct_ / 30;
 
-  buffer_ = new byte_t[size_];
+  buffer_ = new uint8_t[size_];
   deleter_.reset(buffer_);
-  fill_n(buffer_, size_, (byte_t) 0xff);
+  fill_n(buffer_, size_, (uint8_t) 0xff);
 
   EratSmall eratSmall;
   uint64_t stop = primeProduct_ * 2;
@@ -95,11 +94,11 @@ void PreSieve::initBuffer(uint64_t maxPrime,
 }
 
 /// Copy pre-sieved buffer to sieve array
-void PreSieve::copy(byte_t* sieve,
+void PreSieve::copy(uint8_t* sieve,
                     uint64_t sieveSize,
                     uint64_t segmentLow) const
 {
-  // find segmentLow index
+  // Find segmentLow index
   uint64_t remainder = segmentLow % primeProduct_;
   uint64_t i = remainder / 30;
   uint64_t sizeLeft = size_ - i;
@@ -108,15 +107,15 @@ void PreSieve::copy(byte_t* sieve,
     copy_n(&buffer_[i], sieveSize, sieve);
   else
   {
-    // copy the last remaining bytes of buffer
+    // Copy the last remaining bytes of buffer
     // to the beginning of the sieve array
     copy_n(&buffer_[i], sizeLeft, sieve);
 
-    // restart copying at the beginning of buffer
+    // Restart copying at the beginning of buffer
     for (i = sizeLeft; i + size_ < sieveSize; i += size_)
       copy_n(buffer_, size_, &sieve[i]);
 
-    // copy the last remaining bytes
+    // Copy the last remaining bytes
     copy_n(buffer_, sieveSize - i, &sieve[i]);
   }
 }

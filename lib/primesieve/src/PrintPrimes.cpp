@@ -1,9 +1,9 @@
 ///
 /// @file   PrintPrimes.cpp
-/// @brief  PrintPrimes is used for printing primes to stdout and
-///         for counting primes. After a segment has been sieved
-///         (using Erat) PrintPrimes is used to reconstruct primes
-///         and prime k-tuplets from 1 bits of the sieve array.
+/// @brief  PrintPrimes is used for printing primes to stdout and for
+///         counting primes. After a segment has been sieved (using
+///         Erat) PrintPrimes is used to reconstruct primes and prime
+///         k-tuplets from 1 bits of the sieve array.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -11,13 +11,13 @@
 /// file in the top level directory.
 ///
 
+#include <primesieve/forward.hpp>
 #include <primesieve/littleendian_cast.hpp>
 #include <primesieve/pmath.hpp>
 #include <primesieve/PrintPrimes.hpp>
 #include <primesieve/PrimeSieve.hpp>
 #include <primesieve/Erat.hpp>
 #include <primesieve/SievingPrimes.hpp>
-#include <primesieve/types.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -26,17 +26,21 @@
 
 using namespace std;
 
-namespace primesieve {
+namespace {
 
-const uint64_t PrintPrimes::bitmasks_[6][5] =
+const uint64_t bitmasks[6][5] =
 {
-  { END },
-  { 0x06, 0x18, 0xc0, END },       // Twin primes:       b00000110, b00011000, b11000000
-  { 0x07, 0x0e, 0x1c, 0x38, END }, // Prime triplets:    b00000111, b00001110, ...
-  { 0x1e, END },                   // Prime quadruplets: b00011110
-  { 0x1f, 0x3e, END },             // Prime quintuplets
-  { 0x3f, END }                    // Prime sextuplets
+  { ~0ull },                         // Prime numbers, unused
+  { 0x06, 0x18, 0xc0, ~0ull },       // Twin primes: b00000110, b00011000, b11000000
+  { 0x07, 0x0e, 0x1c, 0x38, ~0ull }, // Prime triplets: b00000111, b00001110, ...
+  { 0x1e, ~0ull },                   // Prime quadruplets: b00011110
+  { 0x1f, 0x3e, ~0ull },             // Prime quintuplets: b00011111, b00111110
+  { 0x3f, ~0ull }                    // Prime sextuplets: b00111111
 };
+
+} // namespace
+
+namespace primesieve {
 
 PrintPrimes::PrintPrimes(PrimeSieve& ps) :
   counts_(ps.getCounts()),
@@ -58,7 +62,7 @@ PrintPrimes::PrintPrimes(PrimeSieve& ps) :
 ///
 void PrintPrimes::initCounts()
 {
-  for (uint_t i = 1; i < counts_.size(); i++)
+  for (unsigned i = 1; i < counts_.size(); i++)
   {
     if (!ps_.isCount(i))
       continue;
@@ -67,8 +71,8 @@ void PrintPrimes::initCounts()
 
     for (uint64_t j = 0; j < 256; j++)
     {
-      byte_t count = 0;
-      for (const uint64_t* b = bitmasks_[i]; *b <= j; b++)
+      uint8_t count = 0;
+      for (auto* b = bitmasks[i]; *b <= j; b++)
       {
         if ((j & *b) == *b)
           count++;
@@ -120,7 +124,7 @@ void PrintPrimes::countPrimes()
 void PrintPrimes::countkTuplets()
 {
   // i = 1 twins, i = 2 triplets, ...
-  for (uint_t i = 1; i < counts_.size(); i++)
+  for (unsigned i = 1; i < counts_.size(); i++)
   {
     if (!ps_.isCount(i))
       continue;
@@ -147,7 +151,8 @@ void PrintPrimes::printPrimes() const
 
   while (i < sieveSize_)
   {
-    uint64_t size = min(i + (1 << 16), sieveSize_);
+    uint64_t size = i + (1 << 16);
+    size = std::min(size, sieveSize_);
     ostringstream primes;
 
     for (; i < size; i += 8)
@@ -166,16 +171,16 @@ void PrintPrimes::printPrimes() const
 /// Print prime k-tuplets to stdout
 void PrintPrimes::printkTuplets() const
 {
-  ostringstream kTuplets;
   // i = 1 twins, i = 2 triplets, ...
-  uint_t i = 1;
+  unsigned i = 1;
   uint64_t low = low_;
+  ostringstream kTuplets;
 
   for (; !ps_.isPrint(i); i++);
 
   for (uint64_t j = 0; j < sieveSize_; j++, low += 30)
   {
-    for (const uint64_t* bitmask = bitmasks_[i]; *bitmask <= sieve_[j]; bitmask++)
+    for (auto* bitmask = bitmasks[i]; *bitmask <= sieve_[j]; bitmask++)
     {
       if ((sieve_[j] & *bitmask) == *bitmask)
       {

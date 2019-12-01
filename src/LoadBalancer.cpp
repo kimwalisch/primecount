@@ -295,7 +295,7 @@ bool LoadBalancer::get_work(int thread_id,
       status_.print(sum_, sum_approx_);
   }
 
-  return *low <= sieve_limit_;
+  return *low < sieve_limit_;
 }
 
 void LoadBalancer::update(int64_t* low,

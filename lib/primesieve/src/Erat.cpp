@@ -29,7 +29,7 @@ using namespace primesieve;
 namespace {
 
 /// unset bits < start
-const array<byte_t, 37> unsetSmaller =
+const array<uint8_t, 37> unsetSmaller =
 {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xfe, 0xfe, 0xfe, 0xfe, 0xfc, 0xfc, 0xf8, 0xf8,
@@ -39,7 +39,7 @@ const array<byte_t, 37> unsetSmaller =
 };
 
 /// unset bits > stop
-const array<byte_t, 37> unsetLarger =
+const array<uint8_t, 37> unsetLarger =
 {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
   0x01, 0x01, 0x01, 0x03, 0x03, 0x07, 0x07, 0x07,
@@ -51,18 +51,6 @@ const array<byte_t, 37> unsetLarger =
 } // namespace
 
 namespace primesieve {
-
-const array<uint64_t, 64> Erat::bruijnBitValues_ =
-{
-    7,  47,  11,  49,  67, 113,  13,  53,
-   89,  71, 161, 101, 119, 187,  17, 233,
-   59,  79,  91,  73, 133, 139, 163, 103,
-  149, 121, 203, 169, 191, 217,  19, 239,
-   43,  61, 109,  83, 157,  97, 181, 229,
-   77, 131, 137, 143, 199, 167, 211,  41,
-  107, 151, 179, 227, 127, 197, 209,  37,
-  173, 223, 193,  31, 221,  29,  23, 241
-};
 
 Erat::Erat() = default;
 
@@ -94,6 +82,11 @@ void Erat::init(uint64_t start,
   maxPreSieve_ = preSieve_->getMaxPrime();
   initSieve(sieveSize);
 
+  // The 8 bits of each byte of the sieve array correspond to
+  // the offsets { 7, 11, 13, 17, 19, 23, 29, 31 }. If we
+  // would set dist = sieveSize * 30 we would not include the
+  // last bit of the last byte which corresponds to the offset
+  // 31. For this reason we set dist = sieveSize * 30 + 6.
   uint64_t rem = byteRemainder(start);
   uint64_t dist = sieveSize_ * 30 + 6;
   segmentLow_ = start_ - rem;
@@ -109,7 +102,7 @@ void Erat::initSieve(uint64_t sieveSize)
   sieveSize_ = inBetween(8, sieveSize_, 4096);
   sieveSize_ *= 1024;
 
-  sieve_ = new byte_t[sieveSize_];
+  sieve_ = new uint8_t[sieveSize_];
   deleter_.reset(sieve_);
 }
 
@@ -199,7 +192,7 @@ void Erat::sieveLastSegment()
   // unset bytes > stop
   uint64_t bytes = sieveSize_ % 8;
   bytes = (8 - bytes) % 8;
-  fill_n(&sieve_[sieveSize_], bytes, (byte_t) 0);
+  fill_n(&sieve_[sieveSize_], bytes, (uint8_t) 0);
 
   segmentLow_ = stop_;
 }

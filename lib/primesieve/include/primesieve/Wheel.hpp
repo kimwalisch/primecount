@@ -12,10 +12,8 @@
 #ifndef WHEEL_HPP
 #define WHEEL_HPP
 
-#include "config.hpp"
-#include "primesieve_error.hpp"
 #include "Bucket.hpp"
-#include "types.hpp"
+#include "primesieve_error.hpp"
 
 #include <stdint.h>
 #include <algorithm>
@@ -67,14 +65,20 @@ class Wheel
 {
 public:
   /// Add a new sieving prime to the sieving algorithm.
-  /// Calculate the first multiple > segmentLow of prime and the
-  /// position within the sieve array of that multiple
+  /// Calculate the first multiple > segmentLow of prime and
+  /// the position within the sieve array of that multiple
   /// and its wheel index. When done store the sieving prime.
   ///
   void addSievingPrime(uint64_t prime, uint64_t segmentLow)
   {
     assert(segmentLow % 30 == 0);
+
+    // This hack is required because in primesieve the 8
+    // bits of each byte (of the sieve array) correspond to
+    // the offsets { 7, 11, 13, 17, 19, 23, 29, 31 }.
+    // So we are looking for: multiples > segmentLow + 6.
     segmentLow += 6;
+
     // calculate the first multiple (of prime) > segmentLow
     uint64_t quotient = (segmentLow / prime) + 1;
     quotient = std::max(prime, quotient);
@@ -83,12 +87,14 @@ public:
     if (multiple > stop_ ||
         multiple < segmentLow)
       return;
+
     // calculate the next multiple of prime that is not
     // divisible by any of the wheel's factors
     uint64_t nextMultipleFactor = INIT[quotient % MODULO].nextMultipleFactor;
     uint64_t nextMultiple = prime * nextMultipleFactor;
     if (nextMultiple > stop_ - multiple)
       return;
+
     nextMultiple += multiple - segmentLow;
     uint64_t multipleIndex = nextMultiple / 30;
     uint64_t wheelIndex = wheelOffsets_[prime % 30] + INIT[quotient % MODULO].wheelIndex;
@@ -116,7 +122,7 @@ protected:
   /// Cross-off the current multiple of sievingPrime
   /// and calculate its next multiple
   ///
-  static void unsetBit(byte_t* sieve,
+  static void unsetBit(uint8_t* sieve,
                        uint64_t sievingPrime,
                        uint64_t* multipleIndex,
                        uint64_t* wheelIndex)

@@ -1,7 +1,7 @@
 ///
 /// @file  Erat.hpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,10 +10,11 @@
 #ifndef ERAT_HPP
 #define ERAT_HPP
 
+#include "forward.hpp"
 #include "EratSmall.hpp"
 #include "EratMedium.hpp"
 #include "EratBig.hpp"
-#include "types.hpp"
+#include "noinline.hpp"
 
 #include <stdint.h>
 #include <array>
@@ -47,21 +48,20 @@ protected:
   /// Upper bound of the current segment
   uint64_t segmentHigh_ = 0;
   /// Sieve of Eratosthenes array
-  byte_t* sieve_ = nullptr;
+  uint8_t* sieve_ = nullptr;
   Erat();
   Erat(uint64_t, uint64_t);
   void init(uint64_t, uint64_t, uint64_t, PreSieve&);
   void addSievingPrime(uint64_t);
-  void sieveSegment();
+  NOINLINE void sieveSegment();
   bool hasNextSegment() const;
   static uint64_t nextPrime(uint64_t*, uint64_t);
 
 private:
-  static const std::array<uint64_t, 64> bruijnBitValues_;
   uint64_t maxPreSieve_ = 0;
   uint64_t maxEratSmall_ = 0;
   uint64_t maxEratMedium_ = 0;
-  std::unique_ptr<byte_t[]> deleter_;
+  std::unique_ptr<uint8_t[]> deleter_;
   PreSieve* preSieve_ = nullptr;
   EratSmall eratSmall_;
   EratBig eratBig_;
@@ -74,16 +74,20 @@ private:
   void sieveLastSegment();
 };
 
-/// Reconstruct the prime number corresponding to
-/// the first set bit and unset that bit
+/// Find the first set bit and calculate the
+/// corresponding prime, then unset that bit.
 ///
 inline uint64_t Erat::nextPrime(uint64_t* bits, uint64_t low)
 {
-  // calculate bitValues_[bitScanForward(*bits)]
-  // using a custom De Bruijn bitscan
+  // Calculate bitValues[bitScanForward(*bits)] using a custom
+  // De Bruijn bitscan (that directly computes the bitValue
+  // without ever computing the bitIndex). For primesieve's
+  // use case this is as fast as the bsf or tzcnt instructions
+  // on x64 but more portable.
+  // https://www.chessprogramming.org/BitScan#De_Bruijn_Multiplication
   uint64_t debruijn = 0x3F08A4C6ACB9DBDull;
   uint64_t mask = *bits - 1;
-  uint64_t bitValue = bruijnBitValues_[((*bits ^ mask) * debruijn) >> 58];
+  uint64_t bitValue = bruijnBitValues[((*bits ^ mask) * debruijn) >> 58];
   uint64_t prime = low + bitValue;
   *bits &= mask;
   return prime;

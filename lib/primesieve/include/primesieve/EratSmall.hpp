@@ -11,8 +11,8 @@
 #define ERATSMALL_HPP
 
 #include "Bucket.hpp"
+#include "noinline.hpp"
 #include "Wheel.hpp"
-#include "types.hpp"
 
 #include <stdint.h>
 #include <vector>
@@ -28,7 +28,7 @@ class EratSmall : public Wheel30_t
 public:
   static uint64_t getL1CacheSize(uint64_t);
   void init(uint64_t, uint64_t, uint64_t);
-  void crossOff(byte_t*, uint64_t);
+  void crossOff(uint8_t*, uint64_t);
   bool enabled() const { return enabled_; }
 private:
   uint64_t maxPrime_ = 0;
@@ -36,7 +36,7 @@ private:
   std::vector<SievingPrime> primes_;
   bool enabled_ = false;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
-  void crossOff(byte_t*, byte_t*);
+  NOINLINE void crossOff(uint8_t*, uint8_t*);
 };
 
 } // namespace
