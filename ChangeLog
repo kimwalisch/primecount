@@ -1,3 +1,18 @@
+2019-12-01 Kim Walisch  <kim.walisch@gmail.com>
+
+  libprimesieve has been updated to the latest version which
+  provides a minor speedup for all formulas that use
+  primesieve::iterator e.g. P2, B, pi_lehmer, ... Also some
+  functions have been annotated with NOINLINE which provides a
+  minor speedup when primecount is compiled using link time
+  optimization (-flto).
+
+  * Sieve.hpp: Use NOINLINE.
+  * S2Status.hpp: Use NOINLINE.
+  * D4.cpp: Simplify bounds.
+  * S2_hard.cpp: Simplify bounds.
+  * LoadBalancer.cpp: Simplify bounds.
+
 2019-11-17 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.2 released.
