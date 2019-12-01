@@ -1,7 +1,7 @@
 ///
 /// @file  SievingPrimes.hpp
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,8 +11,10 @@
 #define SIEVINGPRIMES_HPP
 
 #include "Erat.hpp"
+#include "noinline.hpp"
 
 #include <stdint.h>
+#include <array>
 #include <vector>
 
 namespace primesieve {
@@ -32,9 +34,9 @@ private:
   uint64_t low_ = 0;
   uint64_t tinyIdx_ = 0;
   uint64_t sieveIdx_ = ~0ull;
-  uint64_t primes_[64];
+  std::array<uint64_t, 128> primes_;
   std::vector<char> tinySieve_;
-  void fill();
+  NOINLINE void fill();
   void tinySieve();
   bool sieveSegment();
 };
