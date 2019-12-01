@@ -22,6 +22,7 @@
 #include <aligned_vector.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
+#include <noinline.hpp>
 #include <imath.hpp>
 #include <print.hpp>
 
@@ -71,7 +72,7 @@ void balanceLoad(int64_t* thread_distance,
 }
 
 template <typename T>
-std::tuple<T, int64_t, int64_t>
+NOINLINE std::tuple<T, int64_t, int64_t>
 B_thread(T x,
          int64_t y,
          int64_t z,
