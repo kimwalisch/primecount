@@ -29,31 +29,31 @@ long double li(long double x)
 {
   assert(x >= 2);
 
-  long double gamma = 0.57721566490153286061;
+  long double gamma = 0.57721566490153286061L;
   long double sum = 0;
   long double inner_sum = 0;
   long double factorial = 1;
   long double p = -1;
   long double q = 0;
   long double power2 = 1;
-  long double term;
+  long double logx = log(x);
   int k = 0;
 
   for (int n = 1; n < 200; n++)
   {
-    p *= -log(x);
+    p *= -logx;
     factorial *= n;
     q = factorial * power2;
     power2 *= 2;
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0L / (2 * k + 1);
-    term = (p / q) * inner_sum;
+    long double term = (p / q) * inner_sum;
     sum += term;
-    if (abs(term) < numeric_limits<double>::epsilon())
+    if (abs(term) < numeric_limits<long double>::epsilon())
       break;
   }
 
-  return gamma + log(log(x)) + sqrt(x) * sum;
+  return gamma + log(logx) + sqrt(x) * sum;
 }
 
 /// Calculate the offset logarithmic integral which is a very
@@ -65,7 +65,7 @@ long double Li(long double x)
   if (x < 2)
     return 0;
 
-  long double li2 = 1.04516378011749278484;
+  long double li2 = 1.04516378011749278484L;
 
   return li(x) - li2;
 }
@@ -106,17 +106,15 @@ long double Ri(long double x)
   int terms = 200;
   auto mu = generate_moebius(terms);
   long double sum = 0;
-  long double root;
-  long double term;
 
   for (int n = 1; n < terms; n++)
   {
     if (mu[n])
     {
-      root = pow(x, 1.0L / n);
-      term = (Li(root) * mu[n]) / n;
+      long double root = pow(x, 1.0L / n);
+      long double term = (Li(root) * mu[n]) / n;
       sum += term;
-      if (abs(term) < numeric_limits<double>::epsilon())
+      if (abs(term) < numeric_limits<long double>::epsilon())
         break;
     }
   }
