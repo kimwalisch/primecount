@@ -40,7 +40,7 @@ long double li(long double x)
 {
   assert(x >= 2);
 
-  long double gamma = 0.57721566490153286061L;
+  long double gamma = 0.577215664901532860606512090082402431;
   long double sum = 0;
   long double inner_sum = 0;
   long double factorial = 1;
@@ -76,7 +76,7 @@ long double Li(long double x)
   if (x < 2)
     return 0;
 
-  long double li2 = 1.04516378011749278484L;
+  long double li2 = 1.045163780117492784844588889194613136;
 
   return li(x) - li2;
 }
@@ -167,7 +167,7 @@ __float128 li(__float128 x)
 {
   assert(x >= 2);
 
-  __float128 gamma = 0.577215664901532860606512090082402431Q;
+  __float128 gamma = 0.577215664901532860606512090082402431;
   __float128 sum = 0;
   __float128 inner_sum = 0;
   __float128 factorial = 1;
@@ -203,7 +203,7 @@ __float128 Li(__float128 x)
   if (x < 2)
     return 0;
 
-  __float128 li2 = 1.045163780117492784844588889194613136Q;
+  __float128 li2 = 1.045163780117492784844588889194613136;
 
   return li(x) - li2;
 }
