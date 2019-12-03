@@ -6,6 +6,13 @@
 ///        Logarithmic integral and the inverse Riemann R function are
 ///        very accurate approximations of the nth prime.
 ///
+///        Note that these implementations are only accurate up to
+///        about 10^19 if the compiler supports the long double type.
+///        We also include implementations based on libquadmath and the
+///        non-standard __float128 type. However it is currently
+///        impossible to compile this code without warnings because of
+///        a GCC but and hence this code is disabled for the time being.
+///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
