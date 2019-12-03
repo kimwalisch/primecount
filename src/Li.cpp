@@ -1,8 +1,12 @@
 ///
 /// @file  Li.cpp
-/// @brief Logarithmic integral and Riemann R functions
+/// @brief Logarithmic integral and Riemann R function.
+///        Both the Logarithmic integral and the Riemann R function
+///        are very accurate approximations of PrimePi(x). The inverse
+///        Logarithmic integral and the inverse Riemann R function are
+///        very accurate approximations of the nth prime.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
