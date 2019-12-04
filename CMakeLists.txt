@@ -6,16 +6,18 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(WITH_POPCNT         "Enable POPCNT instruction"     ON)
-option(WITH_LIBDIVIDE      "Use libdivide.h"               ON)
-option(WITH_OPENMP         "Enable OpenMP support"         ON)
-option(WITH_MPI            "Enable MPI support"            OFF)
-option(BUILD_PRIMECOUNT    "Build primecount binary"       ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"           ON)
-option(BUILD_SHARED_LIBS   "Build shared libprimecount"    OFF)
-option(BUILD_STATIC_LIBS   "Build static libprimecount"    ON)
-option(BUILD_MANPAGE       "Regenerate man page using a2x" OFF)
-option(BUILD_TESTS         "Build test programs"           OFF)
+option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
+option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
+option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
+option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
+option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
+option(BUILD_TESTS         "Build the test programs"               OFF)
+
+option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
+option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
+option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
+option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
+option(WITH_MPI            "Enable MPI support"                    OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -112,6 +114,13 @@ if(libdivide_branchfree)
 else()
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
+endif()
+
+# Enable __float128 support (requires libquadmath) ###################
+
+if(WITH_FLOAT128)
+    set(LIB_QUADMATH "quadmath")
+    set_source_files_properties(src/Li.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
@@ -275,7 +284,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
     PRIVATE
@@ -300,7 +309,7 @@ if(BUILD_STATIC_LIBS)
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${HAVE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(NOT BUILD_SHARED_LIBS)
         # make sure libprimecount is always defined

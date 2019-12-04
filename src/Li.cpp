@@ -7,12 +7,12 @@
 ///        very accurate approximations of the nth prime.
 ///
 ///        Note that these implementations are only accurate up to
-///        about 10^19 (for the 80-bit long double type). We also
-///        include implementations based on libquadmath and the non
-///        standard __float128 type that can be enabled using
-///        'cmake -DWITH_LIBQUARDMATH=ON'. Currently libquadmath
-///        support is disabled by default because there are warnings
-///        during compilation (using -Wpedantic) although the code
+///        about 10^19 (if the long double type has 80 bits). We also
+///        include implementations based on the non standard __float128
+///        type and libquadmath that can be enabled using
+///        'cmake -DWITH_FLOAT128=ON'. Currently __float128 support
+///        is disabled by default because there are warnings during
+///        compilation (using -Wpedantic) although the code
 ///        works perfectly fine.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
@@ -30,7 +30,7 @@
 #include <cmath>
 #include <limits>
 
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   #include <quadmath.h>
 #endif
 
@@ -168,7 +168,7 @@ long double Ri_inverse(long double x)
   return t;
 }
 
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
 
 /// Calculate the logarithmic integral using
 /// Ramanujan's formula:
@@ -307,7 +307,7 @@ namespace primecount {
 
 int64_t Li(int64_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int64_t) ::Li((__float128) x);
 #endif
@@ -317,7 +317,7 @@ int64_t Li(int64_t x)
 
 int64_t Li_inverse(int64_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int64_t) ::Li_inverse((__float128) x);
 #endif
@@ -327,7 +327,7 @@ int64_t Li_inverse(int64_t x)
 
 int64_t Ri(int64_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int64_t) ::Ri((__float128) x);
 #endif
@@ -337,7 +337,7 @@ int64_t Ri(int64_t x)
 
 int64_t Ri_inverse(int64_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int64_t) ::Ri_inverse((__float128) x);
 #endif
@@ -349,7 +349,7 @@ int64_t Ri_inverse(int64_t x)
 
 int128_t Li(int128_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int128_t) ::Li((__float128) x);
 #endif
@@ -359,7 +359,7 @@ int128_t Li(int128_t x)
 
 int128_t Li_inverse(int128_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int128_t) ::Li_inverse((__float128) x);
 #endif
@@ -369,7 +369,7 @@ int128_t Li_inverse(int128_t x)
 
 int128_t Ri(int128_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int128_t) ::Ri((__float128) x);
 #endif
@@ -379,7 +379,7 @@ int128_t Ri(int128_t x)
 
 int128_t Ri_inverse(int128_t x)
 {
-#if defined(HAVE_QUADMATH)
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int128_t) ::Ri_inverse((__float128) x);
 #endif
