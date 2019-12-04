@@ -101,7 +101,7 @@ long double Li_inverse(long double x)
   {
     long double term = (Li(t) - x) * log(t);
     t -= term;
-    // not converging anymore
+    // Not converging anymore
     if (abs(term) >= abs(old_term))
       break;
     old_term = term;
@@ -152,7 +152,7 @@ long double Ri_inverse(long double x)
   {
     long double term = (Ri(t) - x) * log(t);
     t -= term;
-    // not converging anymore
+    // Not converging anymore
     if (abs(term) >= abs(old_term))
       break;
     old_term = term;
