@@ -98,13 +98,15 @@ long double Li_inverse(long double x)
   long double t = x * log(x);
   long double old_term = numeric_limits<long double>::infinity();
 
-  for (int i = 0; i < 100; i++)
+  while (true)
   {
     long double term = (Li(t) - x) * log(t);
-    t -= term;
+
     // Not converging anymore
     if (abs(term) >= abs(old_term))
       break;
+
+    t -= term;
     old_term = term;
   }
 
@@ -149,13 +151,15 @@ long double Ri_inverse(long double x)
   long double t = Li_inverse(x);
   long double old_term = numeric_limits<long double>::infinity();
 
-  for (int i = 0; i < 100; i++)
+  while (true)
   {
     long double term = (Ri(t) - x) * log(t);
-    t -= term;
+
     // Not converging anymore
     if (abs(term) >= abs(old_term))
       break;
+
+    t -= term;
     old_term = term;
   }
 
@@ -225,13 +229,15 @@ __float128 Li_inverse(__float128 x)
   __float128 t = x * logq(x);
   __float128 old_term = FLT128_MAX;
 
-  for (int i = 0; i < 200; i++)
+  while (true)
   {
     __float128 term = (Li(t) - x) * logq(t);
-    t -= term;
+
     // Not converging anymore
     if (fabsq(term) >= fabsq(old_term))
       break;
+
+    t -= term;
     old_term = term;
   }
 
@@ -276,13 +282,15 @@ __float128 Ri_inverse(__float128 x)
   __float128 t = Li_inverse(x);
   __float128 old_term = FLT128_MAX;
 
-  for (int i = 0; i < 200; i++)
+  while (true)
   {
     __float128 term = (Ri(t) - x) * logq(t);
-    t -= term;
+
     // Not converging anymore
     if (fabsq(term) >= fabsq(old_term))
       break;
+
+    t -= term;
     old_term = term;
   }
 
