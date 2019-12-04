@@ -7,12 +7,13 @@
 ///        very accurate approximations of the nth prime.
 ///
 ///        Note that these implementations are only accurate up to
-///        about 10^19 (if the compiler supports the long double type).
-///        We also include implementations based on libquadmath and the
-///        non standard __float128 type. However it is currently
-///        impossible to compile this code without warnings
-///        (using -Wpedantic) because of a GCC bug and hence this code
-///        is disabled for the time being.
+///        about 10^19 (for the 80-bit long double type). We also
+///        include implementations based on libquadmath and the non
+///        standard __float128 type that can be enabled using
+///        'cmake -DWITH_LIBQUARDMATH=ON'. Currently libquadmath
+///        support is disabled by default because there are warnings
+///        during compilation (using -Wpedantic) although the code
+///        works perfectly fine.
 ///
 /// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -33,9 +34,10 @@
   #include <quadmath.h>
 #endif
 
-using namespace std;
+namespace {
 
-namespace primecount {
+using namespace std;
+using namespace primecount;
 
 /// Calculate the logarithmic integral using
 /// Ramanujan's formula:
@@ -299,50 +301,90 @@ __float128 Ri_inverse(__float128 x)
 
 #endif
 
+} // namespace
+
+namespace primecount {
+
 int64_t Li(int64_t x)
 {
-  return (int64_t) Li((long double) x);
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int64_t) ::Li((__float128) x);
+#endif
+
+  return (int64_t) ::Li((long double) x);
 }
 
 int64_t Li_inverse(int64_t x)
 {
-  return (int64_t) Li_inverse((long double) x);
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int64_t) ::Li_inverse((__float128) x);
+#endif
+
+  return (int64_t) ::Li_inverse((long double) x);
+}
+
+int64_t Ri(int64_t x)
+{
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int64_t) ::Ri((__float128) x);
+#endif
+
+  return (int64_t) ::Ri((long double) x);
+}
+
+int64_t Ri_inverse(int64_t x)
+{
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int64_t) ::Ri_inverse((__float128) x);
+#endif
+
+  return (int64_t) ::Ri_inverse((long double) x);
 }
 
 #ifdef HAVE_INT128_T
 
 int128_t Li(int128_t x)
 {
-  return (int128_t) Li((long double) x);
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int128_t) ::Li((__float128) x);
+#endif
+
+  return (int128_t) ::Li((long double) x);
 }
 
 int128_t Li_inverse(int128_t x)
 {
-  return (int128_t) Li_inverse((long double) x);
-}
-
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int128_t) ::Li_inverse((__float128) x);
 #endif
 
-int64_t Ri(int64_t x)
-{
-  return (int64_t) Ri((long double) x);
+  return (int128_t) ::Li_inverse((long double) x);
 }
-
-int64_t Ri_inverse(int64_t x)
-{
-  return (int64_t) Ri_inverse((long double) x);
-}
-
-#ifdef HAVE_INT128_T
 
 int128_t Ri(int128_t x)
 {
-  return (int128_t) Ri((long double) x);
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int128_t) ::Ri((__float128) x);
+#endif
+
+  return (int128_t) ::Ri((long double) x);
 }
 
 int128_t Ri_inverse(int128_t x)
 {
-  return (int128_t) Ri_inverse((long double) x);
+#if defined(HAVE_QUADMATH)
+  if (x > 1e14)
+    return (int128_t) ::Ri_inverse((__float128) x);
+#endif
+
+  return (int128_t) ::Ri_inverse((long double) x);
 }
 
 #endif
