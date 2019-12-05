@@ -63,6 +63,36 @@ int main()
           Ri_inverse(Ri_table[i] + 1) >= x);
   }
 
+  // Sanity checks for small values of Ri(x)
+  for (int64_t x = 0; x < 50000; x++)
+  {
+    int64_t rix = Ri(x);
+    double logx = log(max((double) x, 2.0));
+
+    if (rix < 0 ||
+        (x >= 20 && rix < x / logx) ||
+        (x >= 2  && rix > x * logx))
+    {
+      cout << "Ri(" << x << ") = " << rix << "   ERROR" << endl;
+      exit(1);
+    }
+  }
+
+  // Sanity checks for small values of Ri_inverse(x)
+  for (int64_t x = 2; x < 10000; x++)
+  {
+    int64_t res = Ri_inverse(x);
+    double logx = log((double) x);
+
+    if (res < 0 ||
+        res < x ||
+        (x >= 5 && res > x * logx * logx))
+    {
+      cout << "Ri_inverse(" << x << ") = " << res << "   ERROR" << endl;
+      exit(1);
+    }
+  }
+
   cout << endl;
   cout << "All tests passed successfully!" << endl;
 

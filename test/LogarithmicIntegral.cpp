@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <cmath>
 #include <cstdlib>
 #include <vector>
 
@@ -36,9 +37,7 @@ vector<int64_t> Li_table =
          37607950279ll, // Li(10^12)
         346065645809ll, // Li(10^13)
        3204942065690ll, // Li(10^14)
-      29844571475286ll, // Li(10^15)
-     279238344248555ll, // Li(10^16)
-    2623557165610820ll  // Li(10^17)
+      29844571475286ll  // Li(10^15)
 };
 
 void check(bool OK)
@@ -50,12 +49,7 @@ void check(bool OK)
 
 int main()
 {
-  size_t size = 15;
-
-  if (sizeof(long double) > 8)
-    size = Li_table.size();
-
-  for (size_t i = 0; i < size; i++)
+  for (size_t i = 0; i < Li_table.size(); i++)
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
@@ -63,13 +57,43 @@ int main()
     check(Li(x) == Li_table[i]);
   }
 
-  for (size_t i = 0; i < size; i++)
+  for (size_t i = 0; i < Li_table.size(); i++)
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
     cout << "Li_inverse(" << Li_table[i] << ") = " << Li_inverse(Li_table[i]);
     check(Li_inverse(Li_table[i]) <= x &&
           Li_inverse(Li_table[i] + 1) > x);
+  }
+
+  // Sanity checks for small values of Li(x)
+  for (int64_t x = 0; x < 1000000; x++)
+  {
+    int64_t lix = Li(x);
+    double logx = log(max((double) x, 2.0));
+
+    if (lix < 0 ||
+        (x >= 11 && lix < x / logx) ||
+        (x >= 2  && lix > x * logx))
+    {
+      cout << "Li(" << x << ") = " << lix << "   ERROR" << endl;
+      exit(1);
+    }
+  }
+
+  // Sanity checks for small values of Li_inverse(x)
+  for (int64_t x = 2; x < 100000; x++)
+  {
+    int64_t res = Li_inverse(x);
+    double logx = log((double) x);
+
+    if (res < 0 ||
+        res < x ||
+        (x >= 4 && res > x * logx * logx))
+    {
+      cout << "Li_inverse(" << x << ") = " << res << "   ERROR" << endl;
+      exit(1);
+    }
   }
 
   cout << endl;
