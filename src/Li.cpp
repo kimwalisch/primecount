@@ -123,15 +123,12 @@ long double Ri(long double x)
   if (x < 2)
     return 0;
 
-  double terms = log2(x) + 10;
-  auto mu = generate_moebius((int) terms);
+  auto terms = (int) (log2(x) + 10);
+  auto mu = generate_moebius(terms);
   long double sum = 0;
 
-  for (size_t n = 1; true; n++)
+  for (int n = 1; n < terms; n++)
   {
-    if (n > mu.size())
-      mu = generate_moebius(n * 2);
-
     if (mu[n])
     {
       long double root = pow(x, 1.0L / n);
@@ -257,15 +254,12 @@ __float128 Ri(__float128 x)
   if (x < 2)
     return 0;
 
-  __float128 terms = log2q(x) + 10;
-  auto mu = generate_moebius((int) terms);
+  auto terms = (int) (log2q(x) + 10);
+  auto mu = generate_moebius(terms);
   __float128 sum = 0;
 
-  for (size_t n = 1; true; n++)
+  for (int n = 1; n < terms; n++)
   {
-    if (n > mu.size())
-      mu = generate_moebius(n * 2);
-
     if (mu[n])
     {
       __float128 root = powq(x, 1.0Q / n);
