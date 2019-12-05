@@ -57,7 +57,7 @@ long double li(long double x)
   long double logx = log(x);
   int k = 0;
 
-  for (int n = 1; n < 200; n++)
+  for (int n = 1; true; n++)
   {
     p *= -logx;
     factorial *= n;
@@ -123,12 +123,15 @@ long double Ri(long double x)
   if (x < 2)
     return 0;
 
-  int terms = 200;
-  auto mu = generate_moebius(terms);
+  double terms = log2(x) + 10;
+  auto mu = generate_moebius((int) terms);
   long double sum = 0;
 
-  for (int n = 1; n < terms; n++)
+  for (size_t n = 1; true; n++)
   {
+    if (n > mu.size())
+      mu = generate_moebius(n * 2);
+
     if (mu[n])
     {
       long double root = pow(x, 1.0L / n);
@@ -188,7 +191,7 @@ __float128 li(__float128 x)
   __float128 logx = logq(x);
   int k = 0;
 
-  for (int n = 1; n < 300; n++)
+  for (int n = 1; true; n++)
   {
     p *= -logx;
     factorial *= n;
@@ -254,12 +257,15 @@ __float128 Ri(__float128 x)
   if (x < 2)
     return 0;
 
-  int terms = 300;
-  auto mu = generate_moebius(terms);
+  __float128 terms = log2q(x) + 10;
+  auto mu = generate_moebius((int) terms);
   __float128 sum = 0;
 
-  for (int n = 1; n < terms; n++)
+  for (size_t n = 1; true; n++)
   {
+    if (n > mu.size())
+      mu = generate_moebius(n * 2);
+
     if (mu[n])
     {
       __float128 root = powq(x, 1.0Q / n);
