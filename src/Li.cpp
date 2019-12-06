@@ -63,11 +63,15 @@ long double li(long double x)
     factorial *= n;
     q = factorial * power2;
     power2 *= 2;
+
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0L / (2 * k + 1);
-    long double term = (p / q) * inner_sum;
-    sum += term;
-    if (abs(term) < numeric_limits<long double>::epsilon())
+
+    auto old_sum = sum;
+    sum += (p / q) * inner_sum;
+
+    // Not converging anymore
+    if (abs(sum - old_sum) < numeric_limits<long double>::epsilon())
       break;
   }
 
@@ -133,8 +137,11 @@ long double Ri(long double x)
     {
       long double root = pow(x, 1.0L / n);
       long double term = (Li(root) * mu[n]) / n;
+      long double old_sum = sum;
       sum += term;
-      if (abs(term) < numeric_limits<long double>::epsilon())
+
+      // Not converging anymore
+      if (abs(sum - old_sum) < numeric_limits<long double>::epsilon())
         break;
     }
   }
@@ -194,11 +201,15 @@ __float128 li(__float128 x)
     factorial *= n;
     q = factorial * power2;
     power2 *= 2;
+
     for (; k <= (n - 1) / 2; k++)
       inner_sum += 1.0Q / (2 * k + 1);
-    __float128 term = (p / q) * inner_sum;
-    sum += term;
-    if (fabsq(term) < FLT128_EPSILON)
+
+    auto old_sum = sum;
+    sum += (p / q) * inner_sum;
+
+    // Not converging anymore
+    if (fabsq(sum - old_sum) < FLT128_EPSILON)
       break;
   }
 
@@ -264,8 +275,11 @@ __float128 Ri(__float128 x)
     {
       __float128 root = powq(x, 1.0Q / n);
       __float128 term = (Li(root) * mu[n]) / n;
+      __float128 old_sum = sum;
       sum += term;
-      if (fabsq(term) < FLT128_EPSILON)
+
+      // Not converging anymore
+      if (fabsq(sum - old_sum) < FLT128_EPSILON)
         break;
     }
   }
