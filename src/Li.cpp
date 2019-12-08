@@ -163,6 +163,15 @@ long double Ri(long double x)
 
 /// Calculate the inverse Riemann R function which is a very
 /// accurate approximation of the nth prime.
+/// This implementation computes Ri^-1(x) as the zero of the
+/// function f(z) = Ri(z) - x using the Newton–Raphson method.
+/// Note that Ri'(z) = 1 / log(z).
+/// https://math.stackexchange.com/a/853192
+///
+/// Newton–Raphson method:
+/// zn+1 = zn - (f(zn) / f'(zn)).
+/// zn+1 = zn - (Ri(zn) - x) / (1 / log(zn))
+/// zn+1 = zn - (Ri(zn) - x) * log(zn)
 ///
 long double Ri_inverse(long double x)
 {
@@ -314,6 +323,15 @@ __float128 Ri(__float128 x)
 
 /// Calculate the inverse Riemann R function which is a very
 /// accurate approximation of the nth prime.
+/// This implementation computes Ri^-1(x) as the zero of the
+/// function f(z) = Ri(z) - x using the Newton–Raphson method.
+/// Note that Ri'(z) = 1 / log(z).
+/// https://math.stackexchange.com/a/853192
+///
+/// Newton–Raphson method:
+/// zn+1 = zn - (f(zn) / f'(zn)).
+/// zn+1 = zn - (Ri(zn) - x) / (1 / log(zn))
+/// zn+1 = zn - (Ri(zn) - x) * log(zn)
 ///
 __float128 Ri_inverse(__float128 x)
 {
