@@ -26,7 +26,6 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <cmath>
 #include <limits>
 
@@ -45,7 +44,8 @@ using namespace primecount;
 ///
 long double li(long double x)
 {
-  assert(x >= 2);
+  if (x <= 1)
+    return 0;
 
   long double gamma = 0.577215664901532860606512090082402431L;
   long double sum = 0;
@@ -84,12 +84,12 @@ long double li(long double x)
 ///
 long double Li(long double x)
 {
-  if (x < 2)
-    return 0;
-
   long double li2 = 1.045163780117492784844588889194613136L;
 
-  return li(x) - li2;
+  if (x <= li2)
+    return 0;
+  else
+    return li(x) - li2;
 }
 
 /// Calculate the inverse offset logarithmic integral which
@@ -136,7 +136,7 @@ long double Li_inverse(long double x)
 ///
 long double Ri(long double x)
 {
-  if (x < 2)
+  if (x <= 1)
     return 0;
 
   auto terms = (int) (log2(x) + 10);
@@ -148,7 +148,7 @@ long double Ri(long double x)
     if (mu[n])
     {
       long double root = pow(x, 1.0L / n);
-      long double term = (Li(root) * mu[n]) / n;
+      long double term = (li(root) * mu[n]) / n;
       long double old_sum = sum;
       sum += term;
 
@@ -195,7 +195,8 @@ long double Ri_inverse(long double x)
 ///
 __float128 li(__float128 x)
 {
-  assert(x >= 2);
+  if (x <= 1)
+    return 0;
 
   __float128 gamma = 0.577215664901532860606512090082402431Q;
   __float128 sum = 0;
@@ -234,12 +235,12 @@ __float128 li(__float128 x)
 ///
 __float128 Li(__float128 x)
 {
-  if (x < 2)
-    return 0;
-
   __float128 li2 = 1.045163780117492784844588889194613136Q;
 
-  return li(x) - li2;
+  if (x <= li2)
+    return 0;
+  else
+    return li(x) - li2;
 }
 
 /// Calculate the inverse offset logarithmic integral which
@@ -286,7 +287,7 @@ __float128 Li_inverse(__float128 x)
 ///
 __float128 Ri(__float128 x)
 {
-  if (x < 2)
+  if (x <= 1)
     return 0;
 
   auto terms = (int) (log2q(x) + 10);
@@ -298,7 +299,7 @@ __float128 Ri(__float128 x)
     if (mu[n])
     {
       __float128 root = powq(x, 1.0Q / n);
-      __float128 term = (Li(root) * mu[n]) / n;
+      __float128 term = (li(root) * mu[n]) / n;
       __float128 old_sum = sum;
       sum += term;
 
