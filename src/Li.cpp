@@ -96,6 +96,16 @@ long double Li(long double x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
+/// This implementation computes Li^-1(x) as the zero of the
+/// function f(z) = Li(z) - x using the Newton–Raphson method.
+/// Note that Li'(z) = 1 / log(z).
+/// https://math.stackexchange.com/a/853192
+///
+/// Newton–Raphson method:
+/// zn+1 = zn - (f(zn) / f'(zn)).
+/// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
+/// zn+1 = zn - (Li(zn) - x) * log(zn)
+///
 long double Li_inverse(long double x)
 {
   if (x < 2)
@@ -121,6 +131,8 @@ long double Li_inverse(long double x)
 
 /// Calculate the Riemann R function which is a very accurate
 /// approximation of the number of primes below x.
+/// RiemannR(x) = \sum_{n=1}^{∞} μ(n)/n * li(x^(1/n))
+/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
 ///
 long double Ri(long double x)
 {
@@ -234,6 +246,16 @@ __float128 Li(__float128 x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
+/// This implementation computes Li^-1(x) as the zero of the
+/// function f(z) = Li(z) - x using the Newton–Raphson method.
+/// Note that Li'(z) = 1 / log(z).
+/// https://math.stackexchange.com/a/853192
+///
+/// Newton–Raphson method:
+/// zn+1 = zn - (f(zn) / f'(zn)).
+/// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
+/// zn+1 = zn - (Li(zn) - x) * log(zn)
+///
 __float128 Li_inverse(__float128 x)
 {
   if (x < 2)
@@ -259,6 +281,8 @@ __float128 Li_inverse(__float128 x)
 
 /// Calculate the Riemann R function which is a very accurate
 /// approximation of the number of primes below x.
+/// RiemannR(x) = \sum_{n=1}^{∞} μ(n)/n * li(x^(1/n))
+/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
 ///
 __float128 Ri(__float128 x)
 {
