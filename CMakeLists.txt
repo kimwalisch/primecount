@@ -50,7 +50,7 @@ set(BIN_SRC src/app/cmdoptions.cpp
 # primecount library source files ####################################
 
 set(LIB_SRC src/FactorTable.cpp
-            src/Li.cpp
+            src/RiemannR.cpp
             src/P2.cpp
             src/P3.cpp
             src/PhiTiny.cpp
