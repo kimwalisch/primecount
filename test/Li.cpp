@@ -1,9 +1,9 @@
 ///
-/// @file   LogarithmicIntegral.cpp
-/// @brief  Test the offset logarithmic integral function
+/// @file   Li.cpp
+/// @brief  Test the offset logarithmic integral function.
 ///         Li(x) = li(x) - li(2)
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

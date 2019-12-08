@@ -1,5 +1,5 @@
 ///
-/// @file  Li.cpp
+/// @file  RiemannR.cpp
 /// @brief Logarithmic integral and Riemann R function.
 ///        Both the Logarithmic integral and the Riemann R function
 ///        are very accurate approximations of PrimePi(x). The inverse
