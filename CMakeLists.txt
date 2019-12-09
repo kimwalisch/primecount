@@ -120,7 +120,7 @@ endif()
 
 if(WITH_FLOAT128)
     set(LIB_QUADMATH "quadmath")
-    set_source_files_properties(src/Li.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
+    set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
 endif()
 
 # Check for MPI (Message Passing Interface) ##########################
