@@ -139,9 +139,10 @@ long double Ri(long double x)
   if (x <= 1)
     return 0;
 
-  auto terms = (int) (log2(x) + 10);
-  auto mu = generate_moebius(terms);
   long double sum = 0;
+  long double old_term = numeric_limits<long double>::infinity();
+  auto terms = (int) (log2(x) * 2 + 10);
+  auto mu = generate_moebius(terms);
 
   for (int n = 1; n < terms; n++)
   {
@@ -149,12 +150,13 @@ long double Ri(long double x)
     {
       long double root = pow(x, 1.0L / n);
       long double term = (li(root) * mu[n]) / n;
-      long double old_sum = sum;
-      sum += term;
 
       // Not converging anymore
-      if (abs(sum - old_sum) < numeric_limits<long double>::epsilon())
+      if (abs(term) >= abs(old_term))
         break;
+
+      sum += term;
+      old_term = term;
     }
   }
 
@@ -299,9 +301,10 @@ __float128 Ri(__float128 x)
   if (x <= 1)
     return 0;
 
-  auto terms = (int) (log2q(x) + 10);
-  auto mu = generate_moebius(terms);
   __float128 sum = 0;
+  __float128 old_term = FLT128_MAX;
+  auto terms = (int) (log2q(x) * 2 + 10);
+  auto mu = generate_moebius(terms);
 
   for (int n = 1; n < terms; n++)
   {
@@ -309,12 +312,13 @@ __float128 Ri(__float128 x)
     {
       __float128 root = powq(x, 1.0Q / n);
       __float128 term = (li(root) * mu[n]) / n;
-      __float128 old_sum = sum;
-      sum += term;
 
       // Not converging anymore
-      if (fabsq(sum - old_sum) < FLT128_EPSILON)
+      if (fabsq(term) >= fabsq(old_term))
         break;
+
+      sum += term;
+      old_term = term;
     }
   }
 
