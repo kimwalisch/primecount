@@ -188,49 +188,6 @@ size_t PrimeGenerator::getStopIdx() const
   return stopIdx;
 }
 
-/// Used by iterator::prev_prime()
-bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes)
-{
-  if (!isInit_)
-    init(primes);
-
-  if (!hasNextSegment())
-    return false;
-
-  sieveSegment();
-  return true;
-}
-
-/// Used by iterator::next_prime()
-bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes, size_t* size)
-{
-  if (!isInit_)
-  {
-    init(primes, size);
-    if (*size > 0)
-      return false;
-  }
-
-  if (!hasNextSegment())
-  {
-    *size = 1;
-    primes[0] = ~0ull;
-    // The current PrimeGenerator object cannot be used to
-    // generate more primes. So we set finished = true and then
-    // create a new PrimeGenerator object in iterator.cpp and
-    // iterator-c.cpp that will be used to generate more primes.
-    // The only case where we set finished = false is when
-    // stop = 2^64-1. In this case the next prime would be > 2^64
-    // However since primesieve only supports primes < 2^64 we
-    // simply return UINT64_MAX.
-    finished_ = (stop_ < primes[0]);
-    return false;
-  }
-
-  sieveSegment();
-  return true;
-}
-
 void PrimeGenerator::sieveSegment()
 {
   uint64_t sqrtHigh = isqrt(segmentHigh_);
@@ -248,6 +205,50 @@ void PrimeGenerator::sieveSegment()
   }
 
   Erat::sieveSegment();
+}
+
+/// Used by iterator::prev_prime()
+bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes)
+{
+  if (!isInit_)
+    init(primes);
+
+  if (hasNextSegment())
+  {
+    sieveSegment();
+    return true;
+  }
+
+  return false;
+}
+
+/// Used by iterator::next_prime()
+bool PrimeGenerator::sieveSegment(vector<uint64_t>& primes, size_t* size)
+{
+  *size = 0;
+
+  if (!isInit_)
+  {
+    init(primes, size);
+    if (*size > 0)
+      return false;
+  }
+
+  if (hasNextSegment())
+  {
+    sieveSegment();
+    return true;
+  }
+
+  // primesieve only supports primes < 2^64. In case the next
+  // prime would be > 2^64 we simply return UINT64_MAX.
+  if (stop_ >= numeric_limits<uint64_t>::max())
+  {
+    primes[0] = ~0ull;
+    *size = 1;
+  }
+
+  return false;
 }
 
 /// This method is used by iterator::prev_prime().
@@ -284,33 +285,36 @@ void PrimeGenerator::fill(vector<uint64_t>& primes)
 void PrimeGenerator::fill(vector<uint64_t>& primes,
                           size_t* size)
 {
-  if (sieveIdx_ >= sieveSize_)
-    if (!sieveSegment(primes, size))
-      return;
-
-  size_t i = 0;
-  size_t maxSize = primes.size();
-
-  while (true)
+  do
   {
-    uint64_t bits = littleendian_cast<uint64_t>(&sieve_[sieveIdx_]);
+    if (sieveIdx_ >= sieveSize_)
+      if (!sieveSegment(primes, size))
+        return;
 
-    for (; bits != 0; i++)
-      primes[i] = nextPrime(&bits, low_);
+    size_t i = 0;
+    size_t maxSize = primes.size();
+    assert(maxSize >= 64);
 
-    low_ += 8 * 30;
-    sieveIdx_ += 8;
-
-    // Fill the buffer with at least maxSize - 64 primes.
+    // Fill the buffer with at least (maxSize - 64) primes.
     // Each loop iteration can generate up to 64 primes
     // so we have to stop generating primes once there is
     // not enough space for 64 more primes.
-    if (maxSize - i < 64 ||
-        sieveIdx_ >= sieveSize_)
-      break;
-  }
+    do
+    {
+      uint64_t bits = littleendian_cast<uint64_t>(&sieve_[sieveIdx_]);
 
-  *size = i;
+      for (; bits != 0; i++)
+        primes[i] = nextPrime(&bits, low_);
+
+      low_ += 8 * 30;
+      sieveIdx_ += 8;
+    }
+    while (i <= maxSize - 64 &&
+           sieveIdx_ < sieveSize_);
+
+    *size = i;
+  }
+  while (*size == 0);
 }
 
 } // namespace

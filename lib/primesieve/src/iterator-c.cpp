@@ -102,10 +102,19 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
         it->primes = &primes[0];
       }
 
-      for (it->last_idx = 0; !it->last_idx;)
-        primeGenerator->fill(primes, &it->last_idx);
+      primeGenerator->fill(primes, &it->last_idx);
 
-      if (primeGenerator->finished())
+      // There are 3 different cases here:
+      // 1) The primes array contains a few primes (<= 256).
+      //    In this case we return the primes to the user.
+      // 2) The primes array is empty because the next
+      //    prime > stop. In this case we reset the
+      //    primeGenerator object, increase the start & stop
+      //    numbers and sieve the next segment.
+      // 3) The next prime > 2^64. In this case the primes
+      //    array contains an error code (UINT64_MAX) which
+      //    is returned to the user.
+      if (it->last_idx == 0)
         clearPrimeGenerator(it);
       else
         break;

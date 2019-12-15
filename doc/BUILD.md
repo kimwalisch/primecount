@@ -86,12 +86,14 @@ libprimesieve will be built. The build options can be modified at
 the configure step using e.g. ```cmake . -DBUILD_TESTS=ON```.
 
 ```CMake
-option(WITH_POPCNT         "Enable POPCNT instruction"   ON)
-option(WITH_LIBDIVIDE      "Use libdivide.h"             ON)
-option(WITH_OPENMP         "Enable OpenMP support"       ON)
-option(BUILD_PRIMECOUNT    "Build primecount binary"     ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"         ON)
-option(BUILD_SHARED_LIBS   "Build shared libprimecount"  OFF)
-option(BUILD_STATIC_LIBS   "Build static libprimecount"  ON)
-option(BUILD_TESTS         "Build test programs"         OFF)
+option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
+option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
+option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
+option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
+option(BUILD_TESTS         "Build the test programs"               OFF)
+
+option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
+option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
+option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
+option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 ```
