@@ -1,4 +1,4 @@
-2019-12-09 Kim Walisch  <kim.walisch@gmail.com>
+2019-12-30 Kim Walisch  <kim.walisch@gmail.com>
 
   libprimesieve has been updated to the latest version which
   provides a minor speedup for all formulas that use
@@ -13,6 +13,7 @@
   * S2_hard.cpp: Simplify bounds.
   * LoadBalancer.cpp: Simplify bounds.
   * RiemannR.cpp: Add support for __float128 type.
+  * popcnt.hpp: Faster ARM64 popcount implementation.
 
 2019-11-17 Kim Walisch  <kim.walisch@gmail.com>
 

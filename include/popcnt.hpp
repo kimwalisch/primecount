@@ -3,7 +3,7 @@
 /// @brief Functions to count the number of 1 bits inside
 ///        an array or a 64-bit word.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,37 +16,51 @@
 
 #if !defined(DISABLE_POPCNT)
 
-#ifndef __has_builtin
-  #define __has_builtin(x) 0
-#endif
+#if defined(__GNUC__) || \
+   (defined(__has_builtin) && \
+    __has_builtin(__builtin_popcountll))
 
-#if defined(__GNUC__) || __has_builtin(__builtin_popcountll)
+namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
   return __builtin_popcountll(x);
 }
 
+} // namespace
+
 #elif defined(_MSC_VER) && \
-      defined(_WIN64)
+      defined(_WIN64) && \
+    (!defined(__has_include) || \
+      __has_include(<nmmintrin.h>))
 
 #include <nmmintrin.h>
+
+namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
   return _mm_popcnt_u64(x);
 }
 
+} // namespace
+
 #elif defined(_MSC_VER) && \
-      defined(_WIN32)
+      defined(_WIN32) && \
+    (!defined(__has_include) || \
+      __has_include(<nmmintrin.h>))
 
 #include <nmmintrin.h>
+
+namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
   return _mm_popcnt_u32((uint32_t) x) +
          _mm_popcnt_u32((uint32_t)(x >> 32));
 }
+
+} // namespace
 
 #else
 
@@ -56,33 +70,9 @@ inline uint64_t popcnt64(uint64_t x)
 #endif
 #endif
 
-namespace {
-
-#if !defined(DISABLE_POPCNT)
-
-inline uint64_t popcnt(const uint64_t* data, uint64_t size)
-{
-  uint64_t cnt = 0;
-  uint64_t i = 0;
-  uint64_t limit = size - size % 4;
-
-  for (; i < limit; i += 4)
-  {
-    cnt += popcnt64(data[i+0]);
-    cnt += popcnt64(data[i+1]);
-    cnt += popcnt64(data[i+2]);
-    cnt += popcnt64(data[i+3]);
-  }
-
-  for (; i < size; i++)
-    cnt += popcnt64(data[i]);
-
-  return cnt;
-}
-
-#endif
-
 #if defined(DISABLE_POPCNT)
+
+namespace {
 
 /// This uses fewer arithmetic operations than any other known
 /// implementation on machines with fast multiplication.
@@ -151,8 +141,126 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
   return cnt;
 }
 
-#endif
+} // namespace
+
+#elif (defined(__ARM_NEON) || \
+       defined(__aarch64__)) && \
+     (!defined(__has_include) || \
+       __has_include(<arm_neon.h>))
+
+#include <arm_neon.h>
+
+namespace {
+
+inline uint64x2_t vpadalq(uint64x2_t sum, uint8x16_t t)
+{
+  return vpadalq_u32(sum, vpaddlq_u16(vpaddlq_u8(t)));
+}
+
+/// Count the number of 1 bits in the data array.
+/// ARM NEON has a vector popcount instruction but no scalar
+/// popcount instruction that's why the ARM popcount function
+/// is more complicated than the x86 popcount function.
+/// This function has been copied from:
+/// https://github.com/kimwalisch/libpopcnt
+///
+inline uint64_t popcnt(const uint64_t* data, uint64_t size)
+{
+  uint64_t i = 0;
+  uint64_t cnt = 0;
+
+  if (size >= 8)
+  {
+    const uint8_t* data8 = (const uint8_t*) data;
+    uint64_t bytes = size * sizeof(uint64_t);
+    uint64_t chunk_size = 64;
+    uint64_t iters = bytes / chunk_size;
+    uint64_t is_sum = 31;
+
+    uint64x2_t sum = vcombine_u64(vcreate_u64(0), vcreate_u64(0));
+    uint8x16_t zero = vcombine_u8(vcreate_u8(0), vcreate_u8(0));
+
+    uint8x16_t t0 = zero;
+    uint8x16_t t1 = zero;
+    uint8x16_t t2 = zero;
+    uint8x16_t t3 = zero;
+
+    // Each iteration processes 64 bytes
+    for (; i < iters; i++)
+    {
+      uint8x16x4_t input = vld4q_u8(data8);
+      data8 += chunk_size;
+
+      t0 = vaddq_u8(t0, vcntq_u8(input.val[0]));
+      t1 = vaddq_u8(t1, vcntq_u8(input.val[1]));
+      t2 = vaddq_u8(t2, vcntq_u8(input.val[2]));
+      t3 = vaddq_u8(t3, vcntq_u8(input.val[3]));
+
+      // After every 31 iterations we need to add the
+      // temporary sums (t0, t1, ...) to the total sum.
+      // We must ensure that the temporary sums <= 255
+      // and 31 * 8 bits = 248 which is OK.
+      if (i == is_sum)
+      {
+        sum = vpadalq(sum, t0);
+        sum = vpadalq(sum, t1);
+        sum = vpadalq(sum, t2);
+        sum = vpadalq(sum, t3);
+        t0 = t1 = t2 = t3 = zero;
+        is_sum += 31;
+      }
+    }
+
+    sum = vpadalq(sum, t0);
+    sum = vpadalq(sum, t1);
+    sum = vpadalq(sum, t2);
+    sum = vpadalq(sum, t3);
+
+    uint64_t tmp[2];
+    vst1q_u64(tmp, sum);
+    cnt += tmp[0];
+    cnt += tmp[1];
+
+    uint64_t bytes_processed = iters * chunk_size;
+    i = bytes_processed / sizeof(uint64_t);
+  }
+
+  // Process the remaining bytes
+  for (; i < size; i++)
+    cnt += popcnt64(data[i]);
+
+  return cnt;
+}
 
 } // namespace
+
+#else
+
+namespace {
+
+/// Used for all CPUs except ARM
+inline uint64_t popcnt(const uint64_t* data, uint64_t size)
+{
+  uint64_t cnt = 0;
+  uint64_t i = 0;
+  uint64_t limit = size - size % 4;
+
+  for (; i < limit; i += 4)
+  {
+    cnt += popcnt64(data[i+0]);
+    cnt += popcnt64(data[i+1]);
+    cnt += popcnt64(data[i+2]);
+    cnt += popcnt64(data[i+3]);
+  }
+
+  for (; i < size; i++)
+    cnt += popcnt64(data[i]);
+
+  return cnt;
+}
+
+} // namespace
+
+#endif
 
 #endif // POPCNT_HPP
