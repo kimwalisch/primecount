@@ -14,11 +14,26 @@
 
 #include <stdint.h>
 
+#if defined(__has_include)
+  #define HAS_INCLUDE(header) __has_include(header)
+#else
+  // If the __has_include() macro does not exist
+  // we assume that the header file exists.
+  #define HAS_INCLUDE(header) 1
+#endif
+
 #if !defined(DISABLE_POPCNT)
 
-#if defined(__GNUC__) || \
-   (defined(__has_builtin) && \
-    __has_builtin(__builtin_popcountll))
+#if defined(__has_builtin)
+  #define HAS_BUILTIN_POPCOUNTLL __has_builtin(__builtin_popcountll)
+#elif defined(__GNUC__)
+  // GCC does not yet support __has_builtin()
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66970
+  #define HAS_BUILTIN_POPCOUNTLL 1
+#endif
+
+// GCC & Clang
+#if HAS_BUILTIN_POPCOUNTLL
 
 namespace {
 
@@ -31,8 +46,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 #elif defined(_MSC_VER) && \
       defined(_WIN64) && \
-    (!defined(__has_include) || \
-      __has_include(<nmmintrin.h>))
+      HAS_INCLUDE(<nmmintrin.h>)
 
 #include <nmmintrin.h>
 
@@ -47,8 +61,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 #elif defined(_MSC_VER) && \
       defined(_WIN32) && \
-    (!defined(__has_include) || \
-      __has_include(<nmmintrin.h>))
+      HAS_INCLUDE(<nmmintrin.h>)
 
 #include <nmmintrin.h>
 
@@ -64,7 +77,8 @@ inline uint64_t popcnt64(uint64_t x)
 
 #else
 
-// fallback mode
+// Enable fallback mode. Compute popcount using an algorithm
+// that uses only integer instructions.
 #define DISABLE_POPCNT
 
 #endif
@@ -145,8 +159,7 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 
 #elif (defined(__ARM_NEON) || \
        defined(__aarch64__)) && \
-     (!defined(__has_include) || \
-       __has_include(<arm_neon.h>))
+       HAS_INCLUDE(<arm_neon.h>)
 
 #include <arm_neon.h>
 
