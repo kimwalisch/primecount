@@ -12,6 +12,7 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
+#include <algorithm>
 #include <stdint.h>
 
 #if defined(__has_include)
@@ -188,46 +189,41 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
     uint64_t bytes = size * sizeof(uint64_t);
     uint64_t chunk_size = 64;
     uint64_t iters = bytes / chunk_size;
-    uint64_t is_sum = 31;
 
     uint64x2_t sum = vcombine_u64(vcreate_u64(0), vcreate_u64(0));
     uint8x16_t zero = vcombine_u8(vcreate_u8(0), vcreate_u8(0));
 
-    uint8x16_t t0 = zero;
-    uint8x16_t t1 = zero;
-    uint8x16_t t2 = zero;
-    uint8x16_t t3 = zero;
-
-    // Each iteration processes 64 bytes
-    for (; i < iters; i++)
+    do
     {
-      uint8x16x4_t input = vld4q_u8(data8);
-      data8 += chunk_size;
-
-      t0 = vaddq_u8(t0, vcntq_u8(input.val[0]));
-      t1 = vaddq_u8(t1, vcntq_u8(input.val[1]));
-      t2 = vaddq_u8(t2, vcntq_u8(input.val[2]));
-      t3 = vaddq_u8(t3, vcntq_u8(input.val[3]));
+      uint8x16_t t0 = zero;
+      uint8x16_t t1 = zero;
+      uint8x16_t t2 = zero;
+      uint8x16_t t3 = zero;
 
       // After every 31 iterations we need to add the
-      // temporary sums (t0, t1, ...) to the total sum.
+      // temporary sums (t0, t1, t2, t3) to the total sum.
       // We must ensure that the temporary sums <= 255
       // and 31 * 8 bits = 248 which is OK.
-      if (i == is_sum)
-      {
-        sum = vpadalq(sum, t0);
-        sum = vpadalq(sum, t1);
-        sum = vpadalq(sum, t2);
-        sum = vpadalq(sum, t3);
-        t0 = t1 = t2 = t3 = zero;
-        is_sum += 31;
-      }
-    }
+      uint64_t limit = std::min(i + 31, iters);
 
-    sum = vpadalq(sum, t0);
-    sum = vpadalq(sum, t1);
-    sum = vpadalq(sum, t2);
-    sum = vpadalq(sum, t3);
+      // Each iteration processes 64 bytes
+      for (; i < limit; i++)
+      {
+        uint8x16x4_t input = vld4q_u8(data8);
+        data8 += chunk_size;
+
+        t0 = vaddq_u8(t0, vcntq_u8(input.val[0]));
+        t1 = vaddq_u8(t1, vcntq_u8(input.val[1]));
+        t2 = vaddq_u8(t2, vcntq_u8(input.val[2]));
+        t3 = vaddq_u8(t3, vcntq_u8(input.val[3]));
+      }
+
+      sum = vpadalq(sum, t0);
+      sum = vpadalq(sum, t1);
+      sum = vpadalq(sum, t2);
+      sum = vpadalq(sum, t3);
+    }
+    while (i < iters);
 
     uint64_t tmp[2];
     vst1q_u64(tmp, sum);
