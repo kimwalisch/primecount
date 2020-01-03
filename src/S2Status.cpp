@@ -1,9 +1,12 @@
 ///
 /// @file  S2Status.cpp
-/// @brief Print the status of S2(x, y) in percent,
-///        requires --status[=N] option.
+/// @brief The S2Status class is used to print the status (in percent)
+///        of the formulas related to special leaves. It is used by
+///        the S2_trivial, S2_easy and S2_hard formulas of the
+///        Deleglise-Rivat algorithm. And it is also used by the A, C
+///        and D formulas of Xavier Gourdon's algorithm.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -59,23 +62,6 @@ double S2Status::skewed_percent(maxint_t x, maxint_t y)
   return percent;
 }
 
-#if defined(_OPENMP)
-
-bool S2Status::is_print(double time)
-{
-  TryLock lock(lock_);
-  if (lock.ownsLock())
-  {
-    double old = time_;
-    return old == 0 ||
-          (time - old) >= is_print_;
-  }
-
-  return false;
-}
-
-#else
-
 bool S2Status::is_print(double time)
 {
   double old = time_;
@@ -83,32 +69,44 @@ bool S2Status::is_print(double time)
         (time - old) >= is_print_;
 }
 
-#endif
-
 void S2Status::print(maxint_t n, maxint_t limit)
 {
-  double time = get_time();
+#if defined(_OPENMP)
+  TryLock lock(lock_);
 
-  if (is_print(time))
+  // Only one thread at a time can enter this code section.
+  // Since printing the current status is not important,
+  // we simply do not print the status if there is already
+  // another thread which is currently printing the status
+  // and which holds the lock.
+  if (lock.ownsLock())
   {
-    time_ = time;
+#endif
+    double time = get_time();
 
-    double percent = skewed_percent(n, limit);
-    double old = percent_;
-
-    if ((percent - old) >= epsilon_)
+    if (is_print(time))
     {
-      percent_ = percent;
-      ostringstream status;
-      ostringstream out;
+      time_ = time;
 
-      status << "Status: " << fixed << setprecision(precision_) << percent << "%";
-      size_t spaces = status.str().length();
-      string reset_line = "\r" + string(spaces,' ') + "\r";
-      out << reset_line << status.str();
-      cout << out.str() << flush;
+      double percent = skewed_percent(n, limit);
+      double old = percent_;
+
+      if ((percent - old) >= epsilon_)
+      {
+        percent_ = percent;
+        ostringstream status;
+        ostringstream out;
+
+        status << "Status: " << fixed << setprecision(precision_) << percent << "%";
+        size_t spaces = status.str().length();
+        string reset_line = "\r" + string(spaces,' ') + "\r";
+        out << reset_line << status.str();
+        cout << out.str() << flush;
+      }
     }
+#if defined(_OPENMP)
   }
+#endif
 }
 
 } // namespace
