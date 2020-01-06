@@ -78,9 +78,14 @@ inline uint64_t popcnt64(uint64_t x)
 
 #else
 
-// Enable fallback mode. Compute popcount using an algorithm
-// that uses only integer instructions.
-#define DISABLE_POPCNT
+// Since hardware popcount support is very important for
+// performance in primecount we want the compilation to fail in
+// case the compiler does not select any of the implementations
+// above (which use compiler intrinsics to enable hardware
+// popcount support). This way we can be relatively sure that
+// when primecount has been compiled successfully, primecount
+// will have hardware popcount support.
+#error "No fast popcount function implemented for this compiler!"
 
 #endif
 #endif
