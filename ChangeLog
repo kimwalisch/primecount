@@ -1,4 +1,4 @@
-2020-01-03 Kim Walisch  <kim.walisch@gmail.com>
+2020-01-09 Kim Walisch  <kim.walisch@gmail.com>
 
   libprimesieve has been updated to the latest version which
   provides a minor speedup for all formulas that use
@@ -15,6 +15,7 @@
   * RiemannR.cpp: Add support for __float128 type.
   * popcnt.hpp: Faster ARM64 popcount implementation.
   * S2Status.cpp: Fix non-critical data race.
+  * LoadBalancer.cpp: Improve thread load balancing.
 
 2019-11-17 Kim Walisch  <kim.walisch@gmail.com>
 
