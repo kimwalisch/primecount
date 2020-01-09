@@ -149,17 +149,15 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // threads finish nearly at the same time. Since the
   // remaining time is just a rough estimation we want to be
   // very conservative so we divide the remaining time by 4.
-  double min_secs = 0.01;
   double rem_secs = remaining_secs() / 4;
-  rem_secs = max(min_secs, rem_secs);
 
   // If the previous thread runtime is larger than the
   // estimated remaining time the factor that we calculate
   // below will be < 1 and we will reduce the number of
   // segments per thread. Otherwise if the factor > 1 we
   // will increase the number of segments per thread.
-  double min_divider = min_secs / 10;
-  double divider = max(min_divider, runtime.secs);
+  double min_secs = 0.01;
+  double divider = max(min_secs, runtime.secs);
   double factor = rem_secs / divider;
 
   // For small and medium computations the thread runtime
@@ -169,7 +167,7 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // backup frequency. If the thread runtime is > 12 hours
   // we reduce the thread runtime to about 50x the thread
   // initialization time.
-  double init_secs = max(runtime.init, min_secs);
+  double init_secs = max(min_secs, runtime.init);
   double init_factor = in_between(50, (3600 * 12) / init_secs, 1000);
 
   // Reduce the thread runtime if it is much larger than
@@ -200,10 +198,25 @@ void LoadBalancer::update_segments(Runtime& runtime)
     factor = next_runtime / current_runtime;
   }
 
+  // Since the distribution of the special leaves is highly
+  // skewed (at the beginning) we want to increase the
+  // number of segments per thread very slowly. Because if
+  // the previously sieved interval contained no special
+  // leaves but the next interval contains many special
+  // leaves then sieving the next interval might take orders
+  // of magnitude more time even if the interval size is
+  // identical.
   factor = in_between(0.5, factor, 2.0);
-  double new_segments = round(segments_ * factor);
-  segments_ = (int64_t) new_segments;
-  segments_ = max(segments_, 1);
+  double next_runtime = runtime.secs * factor;
+
+  if (next_runtime < min_secs)
+    segments_ *= 2;
+  else
+  {
+    double new_segments = round(segments_ * factor);
+    segments_ = (int64_t) new_segments;
+    segments_ = max(segments_, 1);
+  }
 }
 
 } // namespace
