@@ -164,11 +164,11 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // should be about 1000x the thread initialization time.
   // However for very large computations we want to further
   // reduce the thread runtimes in order to increase the
-  // backup frequency. If the thread runtime is > 12 hours
+  // backup frequency. If the thread runtime is > 6 hours
   // we reduce the thread runtime to about 50x the thread
   // initialization time.
   double init_secs = max(min_secs, runtime.init);
-  double init_factor = in_between(50, (3600 * 12) / init_secs, 1000);
+  double init_factor = in_between(50, (3600 * 6) / init_secs, 1000);
 
   // Reduce the thread runtime if it is much larger than
   // its initialization time. This increases the number of
