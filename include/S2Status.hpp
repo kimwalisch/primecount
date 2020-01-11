@@ -24,8 +24,8 @@ class S2Status
 public:
   S2Status(maxint_t x);
   NOINLINE void print(int64_t n, int64_t limit);
-  NOINLINE void print(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
-  static double getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx);
+  NOINLINE void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
+  static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
 private:
   bool isPrint(double time);
   void print(double percent);

@@ -60,10 +60,10 @@ S2Status::S2Status(maxint_t x)
   epsilon_ = 1.0 / q;
 }
 
-double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
+double S2Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double p1 = skewed_percent(low, limit);
-  double p2 = skewed_percent(S2, S2_approx);
+  double p2 = skewed_percent(sum, sum_approx);
   double percent = max(p1, p2);
 
   // p2 is just an approximation,
@@ -111,14 +111,14 @@ void S2Status::print(int64_t n, int64_t limit)
 /// LoadBalancer.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-void S2Status::print(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
+void S2Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
 
   if (isPrint(time))
   {
     time_ = time;
-    double percent = getPercent(low, limit, S2, S2_approx);
+    double percent = getPercent(low, limit, sum, sum_approx);
     print(percent);
   }
 }
