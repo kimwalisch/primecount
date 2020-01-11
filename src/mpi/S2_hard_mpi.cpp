@@ -272,7 +272,7 @@ T S2_hard_mpi_master(T x,
       msg.send(msg.proc_id());
 
       if (is_print())
-        status.print(s2_hard, s2_hard_approx);
+        status.print(msg.low(), z, s2_hard, s2_hard_approx);
     }
   }
 

@@ -91,15 +91,15 @@ bool LoadBalancer::get_work(int64_t* low,
   {
     sum_ += sum;
 
+    if (is_print())
+      status_.print(low_, sieve_limit_, sum_, sum_approx_);
+
     update(low, segments, runtime);
 
     *low = low_;
     *segments = segments_;
     *segment_size = segment_size_;
     low_ += segments_ * segment_size_;
-
-    if (is_print())
-      status_.print(sum_, sum_approx_);
   }
 
   return *low < sieve_limit_;
