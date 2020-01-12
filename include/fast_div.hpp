@@ -49,34 +49,22 @@ struct fastdiv
 ///
 /// 1) We use 32-bit integer division for (64-bit / 32-bit)
 ///    if the dividend is < 2^32.
-/// 2) We use 32-bit integer division for (64-bit / 64-bit)
-///    if both the dividend and divisor are < 2^32.
+/// 2) We use 64-bit integer division for (64-bit / 64-bit).
 /// 3) We use 64-bit integer division for (128-bit / 64-bit)
 ///    if the dividend is < 2^64.
-/// 4) We use 64-bit integer division for (128-bit / 128-bit)
-///    if both the dividend and divisor are < 2^64.
 ///
 #if defined(ENABLE_DIV32)
 
-/// Optimized  (64-bit / 64-bit) =  64-bit.
-/// Optimized (128-bit / 64-bit) = 128-bit.
+/// Regular (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
+typename std::enable_if<(sizeof(X) == sizeof(Y) &&
+                         sizeof(X) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
-  static_assert(prt::is_integral<X>::value &&
-                prt::is_integral<Y>::value,
-                "fast_div(x, y): types must be integral");
-
-  using fastdiv_t = typename fastdiv<X>::type;
-
-  if (x <= std::numeric_limits<fastdiv_t>::max() &&
-      y <= std::numeric_limits<fastdiv_t>::max())
-  {
-    return (fastdiv_t) x / (fastdiv_t) y;
-  }
-
-  return x / y;
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using fastdiv_t = typename std::make_unsigned<X>::type;
+  return (fastdiv_t) x / (fastdiv_t) y;
 }
 
 /// Optimized  (64-bit / 32-bit) =  64-bit.
@@ -105,28 +93,17 @@ fast_div(X x, Y y)
 /// 2) We use 64-bit integer division for (64-bit / 64-bit).
 /// 3) We use 64-bit integer division for (128-bit / 64-bit)
 ///    if the dividend is < 2^64.
-/// 4) We use 64-bit integer division for (128-bit / 128-bit)
-///    if both the dividend and divisor are < 2^64.
 ///
 
 /// Regular (64-bit / 32-bit) = 64-bit.
+/// Regular (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) > sizeof(Y) &&
+typename std::enable_if<(sizeof(X) >= sizeof(Y) &&
                          sizeof(X) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
   // Unsigned integer division is usually
   // faster than signed integer division.
-  using fastdiv_t = typename std::make_unsigned<X>::type;
-  return (fastdiv_t) x / (fastdiv_t) y;
-}
-
-/// Regular (64-bit / 64-bit) = 64-bit.
-template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y) &&
-                         sizeof(X) <= sizeof(uint64_t)), X>::type
-fast_div(X x, Y y)
-{
   using fastdiv_t = typename std::make_unsigned<X>::type;
   return (fastdiv_t) x / (fastdiv_t) y;
 }
@@ -145,27 +122,6 @@ fast_div(X x, Y y)
 
   if (x <= std::numeric_limits<fastdiv_t>::max())
     return (fastdiv_t) x / (fastdiv_t) y;
-
-  return x / y;
-}
-
-/// Optimized (128-bit / 128-bit) = 128-bit.
-template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y) &&
-                         sizeof(X) > sizeof(uint64_t)), X>::type
-fast_div(X x, Y y)
-{
-  static_assert(prt::is_integral<X>::value &&
-                prt::is_integral<Y>::value,
-                "fast_div(x, y): types must be integral");
-
-  using fastdiv_t = typename fastdiv<X>::type;
-
-  if (x <= std::numeric_limits<fastdiv_t>::max() &&
-      y <= std::numeric_limits<fastdiv_t>::max())
-  {
-    return (fastdiv_t) x / (fastdiv_t) y;
-  }
 
   return x / y;
 }
