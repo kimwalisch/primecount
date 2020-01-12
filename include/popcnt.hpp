@@ -22,7 +22,7 @@
   #define HAS_INCLUDE(header) 1
 #endif
 
-#if !defined(DISABLE_POPCNT)
+#if defined(ENABLE_POPCNT)
 
 #if !defined(__has_builtin)
   #define __has_builtin(x) 0
@@ -86,7 +86,7 @@ inline uint64_t popcnt64(uint64_t x)
 #endif
 #endif
 
-#if defined(DISABLE_POPCNT)
+#if !defined(ENABLE_POPCNT)
 
 namespace {
 

@@ -5,15 +5,16 @@
 ///        function tries to take advantage of this by casting x and y
 ///        to smaller types (if possible) before doing the division.
 ///
-///        If FAST_DIV32 is defined we try to use 32-bit division
-///        instead of 64-bit division whenever possible. This performs
-///        best on CPUs where 64-bit division is much slower than
-///        32-bit division (most CPUs before 2020).
+///        If ENABLE_DIV32 is defined we check at runtime if the
+///        dividend and divisor are < 2^32 and if so we use 32-bit
+///        integer division instead of 64-bit integer division. On
+///        most CPUs before 2020 this significantly improves
+///        performance.
 ///
 ///        On some new CPUs (such as Intel Cannonlake & IBM POWER 9)
 ///        64-bit integer division has been improved significantly and
 ///        runs as fast as 32-bit integer division. For such CPUs it
-///        is best to disable FAST_DIV32.
+///        is best to disable ENABLE_DIV32.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -44,14 +45,21 @@ struct fastdiv
           T>::type>::type type;
 };
 
-/// If FAST_DIV32 is defined we:
-/// 1) Optimize  64-bit integer division.
-/// 2) Optimize 128-bit integer division.
+/// If ENABLE_DIV32 is defined:
 ///
-#if defined(FAST_DIV32)
+/// 1) We use 32-bit integer division for (64-bit / 32-bit)
+///    if the dividend is < 2^32.
+/// 2) We use 32-bit integer division for (64-bit / 64-bit)
+///    if both the dividend and divisor are < 2^32.
+/// 3) We use 64-bit integer division for (128-bit / 64-bit)
+///    if the dividend is < 2^64.
+/// 4) We use 64-bit integer division for (128-bit / 128-bit)
+///    if both the dividend and divisor are < 2^64.
+///
+#if defined(ENABLE_DIV32)
 
-/// Optimize  (64-bit / 64-bit) =  64-bit.
-/// Optimize (128-bit / 64-bit) = 128-bit.
+/// Optimized  (64-bit / 64-bit) =  64-bit.
+/// Optimized (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
 fast_div(X x, Y y)
@@ -71,8 +79,8 @@ fast_div(X x, Y y)
   return x / y;
 }
 
-/// Optimize  (64-bit / 32-bit) =  64-bit.
-/// Optimize (128-bit / 64-bit) = 128-bit.
+/// Optimized  (64-bit / 32-bit) =  64-bit.
+/// Optimized (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
 fast_div(X x, Y y)
@@ -90,14 +98,20 @@ fast_div(X x, Y y)
 }
 
 #else
-/// If FAST_DIV32 is not defined we:
-/// 1) Use the regular 64-bit integer division.
-/// 2) Optimize 128-bit integer division.
 
-/// Regular (32-bit / 32-bit) = 32-bit.
-/// Regular (64-bit / 64-bit) = 64-bit.
+/// If ENABLE_DIV32 is not defined:
+///
+/// 1) We use 64-bit integer division for (64-bit / 32-bit).
+/// 2) We use 64-bit integer division for (64-bit / 64-bit).
+/// 3) We use 64-bit integer division for (128-bit / 64-bit)
+///    if the dividend is < 2^64.
+/// 4) We use 64-bit integer division for (128-bit / 128-bit)
+///    if both the dividend and divisor are < 2^64.
+///
+
+/// Regular (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y) &&
+typename std::enable_if<(sizeof(X) > sizeof(Y) &&
                          sizeof(X) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
@@ -107,9 +121,9 @@ fast_div(X x, Y y)
   return (fastdiv_t) x / (fastdiv_t) y;
 }
 
-/// Regular (64-bit / 32-bit) = 64-bit.
+/// Regular (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) > sizeof(Y) &&
+typename std::enable_if<(sizeof(X) == sizeof(Y) &&
                          sizeof(X) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
@@ -117,7 +131,7 @@ fast_div(X x, Y y)
   return (fastdiv_t) x / (fastdiv_t) y;
 }
 
-/// Optimize (128-bit / 64-bit) = 128-bit.
+/// Optimized (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) > sizeof(Y) &&
                          sizeof(X) > sizeof(uint64_t)), X>::type
@@ -135,7 +149,7 @@ fast_div(X x, Y y)
   return x / y;
 }
 
-/// Optimize (128-bit / 128-bit) = 128-bit.
+/// Optimized (128-bit / 128-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) == sizeof(Y) &&
                          sizeof(X) > sizeof(uint64_t)), X>::type
@@ -158,7 +172,10 @@ fast_div(X x, Y y)
 
 #endif
 
-/// Optimize (128-bit / 64-bit) = 64-bit, for x64.
+/// Optimized (128-bit / 64-bit) = 64-bit, for x64.
+/// Use this function only when you know for sure
+/// that the result is < 2^64.
+///
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) == sizeof(uint64_t) * 2 &&
                          sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
@@ -190,6 +207,9 @@ fast_div64(X x, Y y)
 }
 
 /// (?-bit / 64-bit) = 64-bit
+/// Use this function only when you know for
+/// sure that the result is < 2^64.
+///
 template <typename X, typename Y>
 typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
                           sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type

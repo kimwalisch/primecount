@@ -120,7 +120,7 @@ T D_approx(T x, T sigma, T phi0, T ac, T b)
   return d_approx;
 }
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
 
 class PiTable;
 

@@ -247,7 +247,7 @@ int64_t S2_hard(int64_t x,
                 int64_t s2_hard_approx,
                 int threads)
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return S2_hard_mpi(x, y, z, c, s2_hard_approx, threads);
 #endif
@@ -276,7 +276,7 @@ int128_t S2_hard(int128_t x,
                  int128_t s2_hard_approx,
                  int threads)
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return S2_hard_mpi(x, y, z, c, s2_hard_approx, threads);
 #endif

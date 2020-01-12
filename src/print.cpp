@@ -34,7 +34,7 @@ namespace primecount {
 
 void set_print(bool print)
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   print_ = print && is_mpi_master_proc();
 #else
   print_ = print;
@@ -43,7 +43,7 @@ void set_print(bool print)
 
 void set_print_variables(bool print_variables)
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   print_variables_ = print_variables && is_mpi_master_proc();
 #else
   print_variables_ = print_variables;
@@ -61,7 +61,7 @@ bool is_print()
 ///
 bool is_print_combined_result()
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   return !is_print_variables() && is_mpi_master_proc();
 #else
   return !is_print_variables();
@@ -70,7 +70,7 @@ bool is_print_combined_result()
 
 void print_threads(int threads)
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   cout << "processes = " << mpi_num_procs() << endl;
   cout << "threads = " << mpi_num_procs() << " * " << threads << endl;
 #else

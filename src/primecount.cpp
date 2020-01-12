@@ -33,7 +33,7 @@
   #include <omp.h>
 #endif
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
 
 #include <mpi.h>
 
@@ -116,7 +116,7 @@ int64_t pi(int64_t x, int threads)
     return pi_lmo5(x);
   else
   {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
     // So far only the Deleglise-Rivat algorithm has been distributed
     if (mpi_num_procs() > 1)
       return pi_deleglise_rivat_64(x, threads);
@@ -140,7 +140,7 @@ int128_t pi(int128_t x, int threads)
     return pi((int64_t) x, threads);
   else
   {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
     // So far only the Deleglise-Rivat algorithm has been distributed
     if (mpi_num_procs() > 1)
       return pi_deleglise_rivat_128(x, threads);

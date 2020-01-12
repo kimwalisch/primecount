@@ -31,7 +31,7 @@ int128_t S2_hard(int128_t x, int64_t y, int64_t z, int64_t c, int128_t s2_hard_a
 
 #endif
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
 
 int64_t S2_easy_mpi(int64_t x, int64_t y, int64_t z, int64_t c, int threads);
 int64_t S2_hard_mpi(int64_t x, int64_t y, int64_t z, int64_t c, int64_t s2_hard_approx, int threads);

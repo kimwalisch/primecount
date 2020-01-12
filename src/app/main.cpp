@@ -25,7 +25,7 @@
 #include <limits>
 #include <string>
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   #include <mpi.h>
 #endif
 
@@ -339,7 +339,7 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
   MPI_Init(&argc, &argv);
 #endif
 
@@ -439,7 +439,7 @@ int main (int argc, char* argv[])
   }
   catch (exception& e)
   {
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
     MPI_Finalize();
 #endif
     cerr << "primecount: " << e.what() << endl
@@ -447,7 +447,7 @@ int main (int argc, char* argv[])
     return 1;
   }
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
     MPI_Finalize();
 #endif
 
