@@ -119,7 +119,7 @@ if(WITH_LIBDIVIDE)
     cmake_pop_check_state()
 endif()
 
-if(libdivide_branchfree)
+if(WITH_LIBDIVIDE AND libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
 else()
