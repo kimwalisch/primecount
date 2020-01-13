@@ -24,6 +24,7 @@
 #include <array>
 #include <cassert>
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 namespace primecount {
@@ -83,7 +84,18 @@ inline bool is_phi_tiny(int64_t a)
 }
 
 template <typename T>
-T phi_tiny(T x, int64_t a)
+typename std::enable_if<(sizeof(T) == sizeof(typename make_smaller<T>::type)), T>::type
+phi_tiny(T x, int64_t a)
+{
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UT = typename std::make_unsigned<T>::type;
+  return phiTiny.phi((UT) x, a);
+}
+
+template <typename T>
+typename std::enable_if<(sizeof(T) > sizeof(typename make_smaller<T>::type)), T>::type
+phi_tiny(T x, int64_t a)
 {
   using smaller_t = typename make_smaller<T>::type;
 
