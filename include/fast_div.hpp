@@ -56,10 +56,9 @@ struct make_smaller
                T>::type>::type;
 };
 
-/// Regular (64-bit / 64-bit) = 64-bit.
+/// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y) &&
-                         sizeof(X) <= sizeof(uint64_t)), X>::type
+typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
   // Unsigned integer division is usually
@@ -68,8 +67,8 @@ fast_div(X x, Y y)
   return (UX) x / (UX) y;
 }
 
-/// Optimized  (64-bit / 32-bit) =  64-bit.
-/// Optimized (128-bit / 64-bit) = 128-bit.
+/// Used for  (64-bit / 32-bit) =  64-bit.
+/// Used for (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
 fast_div(X x, Y y)
@@ -111,8 +110,8 @@ struct make_smaller
                      uint64_t, T>::type>::type;
 };
 
-/// Regular (64-bit / 32-bit) = 64-bit.
-/// Regular (64-bit / 64-bit) = 64-bit.
+/// Used for (64-bit / 32-bit) = 64-bit.
+/// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) >= sizeof(Y) &&
                          sizeof(X) <= sizeof(uint64_t)), X>::type
@@ -124,7 +123,7 @@ fast_div(X x, Y y)
   return (UX) x / (UX) y;
 }
 
-/// Optimized (128-bit / 64-bit) = 128-bit.
+/// Used for (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) > sizeof(Y) &&
                          sizeof(X) > sizeof(uint64_t)), X>::type
