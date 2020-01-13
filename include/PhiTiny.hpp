@@ -1,15 +1,14 @@
 ///
 /// @file  PhiTiny.hpp
-/// @brief phi(x, a) counts the numbers <= x that are not
-///        divisible by any of the first a primes.
-///        PhiTiny computes phi(x, a) in constant time
-///        for a <= 6 using lookup tables.
+/// @brief phi(x, a) counts the numbers <= x that are not divisible
+///        by any of the first a primes. PhiTiny computes phi(x, a)
+///        in constant time for a <= 6 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
 ///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -86,14 +85,19 @@ inline bool is_phi_tiny(int64_t a)
 template <typename T>
 T phi_tiny(T x, int64_t a)
 {
-  using fastdiv_t = typename fastdiv<T>::type;
+  using smaller_t = typename make_smaller<T>::type;
 
   // If possible use smaller integer type
-  // to speed up integer division
-  if (x <= std::numeric_limits<fastdiv_t>::max())
-    return phiTiny.phi((fastdiv_t) x, a);
+  // to speed up integer division.
+  if (x <= std::numeric_limits<smaller_t>::max())
+    return phiTiny.phi((smaller_t) x, a);
   else
-    return phiTiny.phi(x, a);
+  {
+    // Unsigned integer division is usually
+    // faster than signed integer division.
+    using UT = typename std::make_unsigned<T>::type;
+    return phiTiny.phi((UT) x, a);
+  }
 }
 
 } // namespace
