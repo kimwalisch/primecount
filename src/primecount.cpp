@@ -33,7 +33,7 @@
   #include <omp.h>
 #endif
 
-#ifdef HAVE_MPI
+#ifdef ENABLE_MPI
 
 #include <mpi.h>
 

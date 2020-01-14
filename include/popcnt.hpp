@@ -3,7 +3,7 @@
 /// @brief Functions to count the number of 1 bits inside
 ///        an array or a 64-bit word.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,7 +12,6 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
-#include <algorithm>
 #include <stdint.h>
 
 #if defined(__has_include)
@@ -23,18 +22,15 @@
   #define HAS_INCLUDE(header) 1
 #endif
 
-#if !defined(DISABLE_POPCNT)
+#if defined(ENABLE_POPCNT)
 
-#if defined(__has_builtin)
-  #define HAS_BUILTIN_POPCOUNTLL __has_builtin(__builtin_popcountll)
-#elif defined(__GNUC__)
-  // GCC does not yet support __has_builtin()
-  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66970
-  #define HAS_BUILTIN_POPCOUNTLL 1
+#if !defined(__has_builtin)
+  #define __has_builtin(x) 0
 #endif
 
 // GCC & Clang
-#if HAS_BUILTIN_POPCOUNTLL
+#if defined(__GNUC__) || \
+    __has_builtin(__builtin_popcountll)
 
 namespace {
 
@@ -90,7 +86,7 @@ inline uint64_t popcnt64(uint64_t x)
 #endif
 #endif
 
-#if defined(DISABLE_POPCNT)
+#if !defined(ENABLE_POPCNT)
 
 namespace {
 
@@ -167,6 +163,7 @@ inline uint64_t popcnt(const uint64_t* data, uint64_t size)
        defined(__aarch64__)) && \
        HAS_INCLUDE(<arm_neon.h>)
 
+#include <algorithm>
 #include <arm_neon.h>
 
 namespace {

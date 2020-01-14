@@ -21,6 +21,28 @@
 using namespace std;
 using namespace primecount;
 
+static_assert(is_same<make_smaller<int32_t>::type, uint32_t>::value,
+              "make_smaller<int32_t>::type != uint32_t");
+
+#if defined(ENABLE_DIV32)
+
+static_assert(is_same<make_smaller<uint64_t>::type, uint32_t>::value,
+              "make_smaller<uint64_t>::type != uint32_t");
+
+#else
+
+static_assert(is_same<make_smaller<uint64_t>::type, uint64_t>::value,
+              "make_smaller<uint64_t>::type != uint64_t");
+
+#endif
+
+#ifdef HAVE_INT128_T
+
+static_assert(is_same<make_smaller<int128_t>::type, uint64_t>::value,
+              "make_smaller<int128_t>::type != uint64_t");
+
+#endif
+
 void check(bool OK)
 {
   cout << "   " << (OK ? "OK" : "ERROR") << "\n";
@@ -35,12 +57,6 @@ int main()
 
   uniform_int_distribution<int32_t> dist_i32(1, std::numeric_limits<int32_t>::max());
   uniform_int_distribution<uint64_t> dist_u64(0, std::numeric_limits<uint64_t>::max());
-
-  static_assert(is_same<fastdiv<int32_t>::type, uint32_t>::value,
-                "fastdiv<int32_t>::type != uint32_t");
-
-  static_assert(is_same<fastdiv<uint64_t>::type, uint32_t>::value,
-                "fastdiv<uint64_t>::type != uint32_t");
 
   for (int i = 0; i < 10000; i++)
   {
@@ -62,9 +78,6 @@ int main()
 #ifdef HAVE_INT128_T
 
   uniform_int_distribution<int128_t> dist_i128(0, prt::numeric_limits<int128_t>::max());
-
-  static_assert(is_same<fastdiv<int128_t>::type, uint64_t>::value,
-                "fastdiv<int128_t>::type != uint64_t");
 
   for (int i = 0; i < 10000; i++)
   {

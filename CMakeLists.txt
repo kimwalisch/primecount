@@ -15,6 +15,7 @@ option(BUILD_TESTS         "Build the test programs"               OFF)
 option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
 option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
+option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 
 if(WIN32)
@@ -78,6 +79,16 @@ include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
 include(CMakePushCheckState)
 
+# Use 32-bit integer division ########################################
+
+# Check at runtime if the dividend and divisor are < 2^32 and
+# if so use 32-bit integer division instead of 64-bit integer
+# division. On most CPUs before 2020 this significantly
+# improves performance.
+if(WITH_DIV32)
+    set(ENABLE_DIV32 "ENABLE_DIV32")
+endif()
+
 # Check if libdivide.h compiles ######################################
 
 if(WITH_LIBDIVIDE)
@@ -96,7 +107,7 @@ if(WITH_LIBDIVIDE)
     cmake_pop_check_state()
 endif()
 
-if(libdivide_branchfree)
+if(WITH_LIBDIVIDE AND libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
 else()
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
@@ -179,6 +190,8 @@ endif()
 # Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
+    set(ENABLE_POPCNT "ENABLE_POPCNT")
+
     if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
         cmake_push_check_state()
         set(CMAKE_REQUIRED_FLAGS -Werror)
@@ -200,10 +213,6 @@ if(WITH_POPCNT)
             set(POPCNT_FLAG "-mpopcnt")
         endif()
     endif()
-endif()
-
-if(NOT WITH_POPCNT)
-    set(DISABLE_POPCNT "DISABLE_POPCNT")
 endif()
 
 # libprimesieve ######################################################
@@ -238,7 +247,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}")
+    target_compile_definitions(libprimecount PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -263,7 +272,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}")
+    target_compile_definitions(libprimecount-static PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 

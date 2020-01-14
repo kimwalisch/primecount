@@ -25,32 +25,19 @@
 #include <string>
 
 using namespace std;
+using namespace primecount;
 
-namespace primecount {
+namespace {
 
-S2Status::S2Status(maxint_t x)
-{
-  precision_ = get_status_precision(x);
-  int q = ipow(10, precision_);
-  epsilon_ = 1.0 / q;
-}
-
-double S2Status::getPercent(int64_t low, int64_t limit, maxint_t S2, maxint_t S2_approx)
-{
-  double p1 = skewed_percent(low, limit);
-  double p2 = skewed_percent(S2, S2_approx);
-  double percent = max(p1, p2);
-
-  // p2 is just an approximation,
-  // use p1 near the end
-  if (p2 > 95.0)
-    percent = max(p1, 95.0);
-
-  return percent;
-}
-
-/// Dirty hack!
-double S2Status::skewed_percent(maxint_t x, maxint_t y)
+/// Since the distribution of the special leaves is highly skewed
+/// we cannot simply calculate the percentage of the current
+/// computation using the well known linear formula. The
+/// implementation below is a hack which skews the percent result
+/// in order to get a more accurate estimation of the current
+/// computation status.
+///
+template <typename T>
+double skewed_percent(T x, T y)
 {
   double exp = 0.96;
   double percent = get_percent(x, y);
@@ -62,14 +49,39 @@ double S2Status::skewed_percent(maxint_t x, maxint_t y)
   return percent;
 }
 
-bool S2Status::is_print(double time)
+} // namespace
+
+namespace primecount {
+
+S2Status::S2Status(maxint_t x)
+{
+  precision_ = get_status_precision(x);
+  int q = ipow(10, precision_);
+  epsilon_ = 1.0 / q;
+}
+
+double S2Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+{
+  double p1 = skewed_percent(low, limit);
+  double p2 = skewed_percent(sum, sum_approx);
+  double percent = max(p1, p2);
+
+  // p2 is just an approximation,
+  // use p1 near the end
+  if (p2 > 95.0)
+    percent = max(p1, 95.0);
+
+  return percent;
+}
+
+bool S2Status::isPrint(double time)
 {
   double old = time_;
   return old == 0 ||
         (time - old) >= is_print_;
 }
 
-void S2Status::print(maxint_t n, maxint_t limit)
+void S2Status::print(int64_t n, int64_t limit)
 {
 #if defined(_OPENMP)
   TryLock lock(lock_);
@@ -79,34 +91,49 @@ void S2Status::print(maxint_t n, maxint_t limit)
   // we simply do not print the status if there is already
   // another thread which is currently printing the status
   // and which holds the lock.
-  if (lock.ownsLock())
+  if (!lock.ownsLock())
+    return;
+#endif
+
+  double time = get_time();
+
+  if (isPrint(time))
   {
-#endif
-    double time = get_time();
-
-    if (is_print(time))
-    {
-      time_ = time;
-
-      double percent = skewed_percent(n, limit);
-      double old = percent_;
-
-      if ((percent - old) >= epsilon_)
-      {
-        percent_ = percent;
-        ostringstream status;
-        ostringstream out;
-
-        status << "Status: " << fixed << setprecision(precision_) << percent << "%";
-        size_t spaces = status.str().length();
-        string reset_line = "\r" + string(spaces,' ') + "\r";
-        out << reset_line << status.str();
-        cout << out.str() << flush;
-      }
-    }
-#if defined(_OPENMP)
+    time_ = time;
+    double percent = skewed_percent(n, limit);
+    print(percent);
   }
-#endif
+}
+
+/// This method is used by: S2_hard() and D().
+/// This method does not use a lock to synchronize threads
+/// as it is only used inside of a critical section inside
+/// LoadBalancer.cpp and hence it can never be accessed
+/// simultaneously from multiple threads.
+///
+void S2Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+{
+  double time = get_time();
+
+  if (isPrint(time))
+  {
+    time_ = time;
+    double percent = getPercent(low, limit, sum, sum_approx);
+    print(percent);
+  }
+}
+
+void S2Status::print(double percent)
+{
+  double old = percent_;
+
+  if ((percent - old) >= epsilon_)
+  {
+    percent_ = percent;
+    ostringstream status;
+    status << "\rStatus: " << fixed << setprecision(precision_) << percent << "%";
+    cout << status.str() << flush;
+  }
 }
 
 } // namespace

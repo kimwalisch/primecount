@@ -21,7 +21,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -281,6 +281,9 @@ bool LoadBalancer::get_work(int thread_id,
   {
     sum_ += sum;
 
+    if (is_print())
+      status_.print(low_, sieve_limit_, sum_, sum_approx_);
+
     update(low, segments, runtime);
 
     *low = low_;
@@ -290,9 +293,6 @@ bool LoadBalancer::get_work(int thread_id,
     low_ = min(low_, sieve_limit_ + 1);
 
     backup(thread_id, *low, *segments, *segment_size);
-
-    if (is_print())
-      status_.print(sum_, sum_approx_);
   }
 
   return *low < sieve_limit_;
@@ -332,40 +332,84 @@ double LoadBalancer::remaining_secs() const
   return secs;
 }
 
-/// Increase or decrease the number of segments based on the
-/// remaining runtime. Near the end it is important that
-/// threads run only for a short amount of time in order to
-/// ensure all threads finish nearly at the same time.
+/// Increase or decrease the number of segments per thread
+/// based on the remaining runtime.
 ///
 void LoadBalancer::update_segments(Runtime& runtime)
 {
-  double rem = remaining_secs();
-  double threshold = rem / 4;
+  // Near the end it is important that threads run only for
+  // a short amount of time in order to ensure that all
+  // threads finish nearly at the same time. Since the
+  // remaining time is just a rough estimation we want to be
+  // very conservative so we divide the remaining time by 4.
+  double rem_secs = remaining_secs() / 4;
+
+  // If the previous thread runtime is larger than the
+  // estimated remaining time the factor that we calculate
+  // below will be < 1 and we will reduce the number of
+  // segments per thread. Otherwise if the factor > 1 we
+  // will increase the number of segments per thread.
   double min_secs = 0.01;
+  double divider = max(min_secs, runtime.secs);
+  double factor = rem_secs / divider;
 
-  // Each thread should run at least 10x
-  // longer than its initialization time
-  threshold = max(threshold, runtime.init * 10);
-  threshold = max(threshold, min_secs);
+  // For small and medium computations the thread runtime
+  // should be about 1000x the thread initialization time.
+  // However for very large computations we want to further
+  // reduce the thread runtimes in order to increase the
+  // backup frequency. If the thread runtime is > 6 hours
+  // we reduce the thread runtime to about 50x the thread
+  // initialization time.
+  double init_secs = max(min_secs, runtime.init);
+  double init_factor = in_between(50, (3600 * 6) / init_secs, 1000);
 
-  // divider must not be 0
-  double divider = max(runtime.secs, min_secs / 10);
-  double factor = threshold / divider;
-
-  // Reduce the thread runtime if it is much
-  // larger than its initialization time
+  // Reduce the thread runtime if it is much larger than
+  // its initialization time. This increases the number of
+  // backups without deteriorating performance as we make
+  // sure that the thread runtime is still much larger than
+  // the thread initialization time.
   if (runtime.secs > min_secs &&
-      runtime.secs > runtime.init * 200)
+      runtime.secs > runtime.init * init_factor)
   {
     double old = factor;
-    factor = (runtime.init * 200) / runtime.secs;
+    double next_runtime = runtime.init * init_factor;
+    factor = next_runtime / runtime.secs;
     factor = min(factor, old);
   }
 
+  // Near the end when the remaining time goes close to 0
+  // the load balancer tends to reduce the number of
+  // segments per thread also close to 0 which is very bad
+  // for performance. The condition below fixes this issue
+  // and ensures that the thread runtime is always at
+  // least 10x the thread initialization time.
+  if (runtime.secs > 0 &&
+      runtime.secs * factor < runtime.init * 10)
+  {
+    double next_runtime = runtime.init * 10;
+    double current_runtime = runtime.secs;
+    factor = next_runtime / current_runtime;
+  }
+
+  // Since the distribution of the special leaves is highly
+  // skewed (at the beginning) we want to increase the
+  // number of segments per thread very slowly. Because if
+  // the previously sieved interval contained no special
+  // leaves but the next interval contains many special
+  // leaves then sieving the next interval might take orders
+  // of magnitude more time even if the interval size is
+  // identical.
   factor = in_between(0.5, factor, 2.0);
-  double new_segments = round(segments_ * factor);
-  segments_ = (int64_t) new_segments;
-  segments_ = max(segments_, 1);
+  double next_runtime = runtime.secs * factor;
+
+  if (next_runtime < min_secs)
+    segments_ *= 2;
+  else
+  {
+    double new_segments = round(segments_ * factor);
+    segments_ = (int64_t) new_segments;
+    segments_ = max(segments_, 1);
+  }
 }
 
 } // namespace

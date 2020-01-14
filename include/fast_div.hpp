@@ -1,12 +1,23 @@
 ///
 /// @file  fast_div.hpp
-/// @brief Integer division of small types is much faster than
-///        integer division of large types on most CPUs. The
-///        fast_div(x, y) function tries to take advantage of
-///        this by casting x and y to smaller types (if possible)
-///        before doing the division.
+/// @brief Integer division of small types is much faster than integer
+///        division of large types on most CPUs. The fast_div(x, y)
+///        function tries to take advantage of this by casting x and y
+///        to smaller types (if possible) before doing the division.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+///        If ENABLE_DIV32 is defined we check at runtime if the
+///        dividend and divisor are < 2^32 and if so we use 32-bit
+///        integer division instead of 64-bit integer division. On
+///        most CPUs before 2020 this significantly improves
+///        performance.
+///
+///        On some new CPUs (such as Intel Cannonlake) 64-bit integer
+///        division has been improved significantly and runs as fast
+///        as 32-bit integer division. For such CPUs it is best to
+///        disable ENABLE_DIV32 (using cmake -DWITH_DIV32=OFF) as this
+///        avoids runtime checks for (64-bit / 32-bit) divisions.
+///
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,59 +26,129 @@
 #ifndef FAST_DIV_HPP
 #define FAST_DIV_HPP
 
-#include <int128_t.hpp>
-
 #include <cassert>
 #include <limits>
+#include <stdint.h>
 #include <type_traits>
 
 namespace primecount {
 
+/// If ENABLE_DIV32 is defined:
+///
+/// 1) We use 32-bit integer division for (64-bit / 32-bit)
+///    if the dividend is < 2^32.
+/// 2) We use 64-bit integer division for (64-bit / 64-bit).
+/// 3) We use 64-bit integer division for (128-bit / 64-bit)
+///    if the dividend is < 2^64.
+///
+#if defined(ENABLE_DIV32)
+
+/// Get the next smaller integer type
+/// and convert it to unsigned.
+/// make_smaller< uint64_t>::type -> uint32_t.
+/// make_smaller<uint128_t>::type -> uint64_t.
+///
 template <typename T>
-struct fastdiv
+struct make_smaller
 {
-  typedef typename std::conditional<sizeof(T) / 2 <= sizeof(uint32_t), uint32_t,
-          typename std::conditional<sizeof(T) / 2 <= sizeof(uint64_t), uint64_t,
-          T>::type>::type type;
+  using type = typename std::conditional<sizeof(T) / 2 <= sizeof(uint32_t), uint32_t,
+               typename std::conditional<sizeof(T) / 2 <= sizeof(uint64_t), uint64_t,
+               T>::type>::type;
 };
 
+/// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
-  static_assert(prt::is_integral<X>::value &&
-                prt::is_integral<Y>::value,
-                "fast_div(x, y): types must be integral");
-
-  using fastdiv_t = typename fastdiv<X>::type;
-
-  if (x <= std::numeric_limits<fastdiv_t>::max() &&
-      y <= std::numeric_limits<fastdiv_t>::max())
-  {
-    return (fastdiv_t) x / (fastdiv_t) y;
-  }
-
-  return x / y;
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UX = typename std::make_unsigned<X>::type;
+  return (UX) x / (UX) y;
 }
 
+/// Used for  (64-bit / 32-bit) =  64-bit.
+/// Used for (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
-  static_assert(prt::is_integral<X>::value &&
-                prt::is_integral<Y>::value,
-                "fast_div(x, y): types must be integral");
+  using smaller_t = typename make_smaller<X>::type;
 
-  using fastdiv_t = typename fastdiv<X>::type;
-
-  if (x <= std::numeric_limits<fastdiv_t>::max())
-    return (fastdiv_t) x / (fastdiv_t) y;
-
-  return x / y;
+  if (x <= std::numeric_limits<smaller_t>::max())
+    return (smaller_t) x / (smaller_t) y;
+  else
+  {
+    // Unsigned integer division is usually
+    // faster than signed integer division.
+    using UX = typename std::make_unsigned<X>::type;
+    using UY = typename std::make_unsigned<Y>::type;
+    return (UX) x / (UY) y;
+  }
 }
 
+#else
+
+/// If ENABLE_DIV32 is not defined:
+///
+/// 1) We use 64-bit integer division for (64-bit / 32-bit).
+/// 2) We use 64-bit integer division for (64-bit / 64-bit).
+/// 3) We use 64-bit integer division for (128-bit / 64-bit)
+///    if the dividend is < 2^64.
+///
+
+/// Get the next smaller integer type
+/// and convert it to unsigned.
+/// make_smaller<uint128_t>::type -> uint64_t.
+///
+template <typename T>
+struct make_smaller
+{
+  using type = typename std::make_unsigned<
+                 typename std::conditional<
+                   sizeof(T) == sizeof(uint64_t) * 2,
+                     uint64_t, T>::type>::type;
+};
+
+/// Used for (64-bit / 32-bit) = 64-bit.
+/// Used for (64-bit / 64-bit) = 64-bit.
+template <typename X, typename Y>
+typename std::enable_if<(sizeof(X) >= sizeof(Y) &&
+                         sizeof(X) <= sizeof(uint64_t)), X>::type
+fast_div(X x, Y y)
+{
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UX = typename std::make_unsigned<X>::type;
+  return (UX) x / (UX) y;
+}
+
+/// Used for (128-bit / 64-bit) = 128-bit.
+template <typename X, typename Y>
+typename std::enable_if<(sizeof(X) > sizeof(Y) &&
+                         sizeof(X) > sizeof(uint64_t)), X>::type
+fast_div(X x, Y y)
+{
+  using smaller_t = typename make_smaller<X>::type;
+
+  if (x <= std::numeric_limits<smaller_t>::max())
+    return (smaller_t) x / (smaller_t) y;
+  else
+  {
+    // Unsigned integer division is usually
+    // faster than signed integer division.
+    using UX = typename std::make_unsigned<X>::type;
+    using UY = typename std::make_unsigned<Y>::type;
+    return (UX) x / (UY) y;
+  }
+}
+
+#endif
+
 /// Optimized (128-bit / 64-bit) = 64-bit, for x64.
-/// uint64_t fast_div64(uint128_t x, uint64_t x)
+/// Use this function only when you know for sure
+/// that the result is < 2^64.
+///
 template <typename X, typename Y>
 typename std::enable_if<(sizeof(X) == sizeof(uint64_t) * 2 &&
                          sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
@@ -99,6 +180,9 @@ fast_div64(X x, Y y)
 }
 
 /// (?-bit / 64-bit) = 64-bit
+/// Use this function only when you know for
+/// sure that the result is < 2^64.
+///
 template <typename X, typename Y>
 typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
                           sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
