@@ -1,11 +1,8 @@
-2020-01-09 Kim Walisch  <kim.walisch@gmail.com>
+2020-01-15 Kim Walisch  <kim.walisch@gmail.com>
 
   libprimesieve has been updated to the latest version which
   provides a minor speedup for all formulas that use
-  primesieve::iterator e.g. P2, B, pi_lehmer, ... Also some
-  functions have been annotated with NOINLINE which provides a
-  minor speedup when primecount is compiled using link time
-  optimization (-flto).
+  primesieve::iterator e.g. P2, B, pi_lehmer, ...
 
   * Sieve.hpp: Use NOINLINE.
   * S2Status.hpp: Use NOINLINE.
@@ -14,6 +11,7 @@
   * LoadBalancer.cpp: Simplify bounds.
   * RiemannR.cpp: Add support for __float128 type.
   * popcnt.hpp: Faster ARM64 popcount implementation.
+  * fast_div.hpp: Add ENABLE_DIV32 macro.
   * S2Status.cpp: Fix non-critical data race.
   * LoadBalancer.cpp: Improve thread load balancing.
 
