@@ -145,7 +145,7 @@ fast_div(X x, Y y)
 
 #endif
 
-/// Optimized (128-bit / 64-bit) = 64-bit, for x64.
+/// Used for (128-bit / 64-bit) = 64-bit.
 /// Use this function only when you know for sure
 /// that the result is < 2^64.
 ///
@@ -179,10 +179,8 @@ fast_div64(X x, Y y)
 #endif
 }
 
-/// (?-bit / 64-bit) = 64-bit
-/// Use this function only when you know for
-/// sure that the result is < 2^64.
-///
+/// Used for (64-bit / 32-bit) = 64-bit.
+/// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
 typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
                           sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
