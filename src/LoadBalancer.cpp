@@ -266,7 +266,7 @@ void LoadBalancer::update_result(int thread_id, maxint_t sum)
     backup(thread_id);
 
     if (is_print())
-      status_.print(sum_, sum_approx_);
+      status_.print(low_, sieve_limit_, sum_, sum_approx_);
   }
 }
 
