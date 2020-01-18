@@ -1,4 +1,6 @@
-2020-01-15 Kim Walisch  <kim.walisch@gmail.com>
+2020-01-18 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.3 released.
 
   libprimesieve has been updated to the latest version which
   provides a minor speedup for all formulas that use
