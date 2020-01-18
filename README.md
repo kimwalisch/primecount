@@ -42,9 +42,9 @@ Windows, Linux and macOS. These binaries are statically linked
 and require a CPU which supports the POPCNT instruction (2008 or
 later).
 
-* [primecount-5.2-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.2/primecount-5.2-win64.zip), 553 KB
-* [primecount-5.2-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v5.2/primecount-5.2-linux-x64.tar.xz), 849 KB
-* [primecount-5.2-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.2/primecount-5.2-macOS-x64.zip), 394 KB
+* [primecount-5.3-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.3/primecount-5.3-win64.zip), 589 kB
+* [primecount-5.3-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v5.3/primecount-5.3-linux-x64.tar.xz), 867 kB
+* [primecount-5.3-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v5.3/primecount-5.3-macOS-x64.zip), 390 kB
 * Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
 
 ## Usage examples
