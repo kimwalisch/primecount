@@ -83,7 +83,7 @@ int64_t S2_thread(int64_t x,
     low1 = max(low, 1);
 
     sieve.pre_sieve(primes, c, low, high);
-    int64_t count_low_high = sieve.count((high - 1) - low);
+    sieve.init_counters(low, high);
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
@@ -95,8 +95,7 @@ int64_t S2_thread(int64_t x,
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
       int64_t max_m = min(x / (prime * low1), y);
-      int64_t count = 0;
-      int64_t i = 0;
+      sieve.reset_counters();
 
       if (prime >= max_m)
         goto next_segment;
@@ -107,15 +106,13 @@ int64_t S2_thread(int64_t x,
         {
           int64_t xpm = x / (prime * m);
           int64_t stop = xpm - low;
-          count += sieve.count(i, stop);
-          i = stop + 1;
-          int64_t phi_xpm = phi[b] + count;
+          int64_t phi_xpm = phi[b] + sieve.count(stop);
           s2_thread -= mu[m] * phi_xpm;
         }
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrty < b < pi_y
@@ -127,8 +124,7 @@ int64_t S2_thread(int64_t x,
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low1), y)];
       int64_t min_m = max(x / (prime * high), prime);
-      int64_t count = 0;
-      int64_t i = 0;
+      sieve.reset_counters();
 
       if (prime >= primes[l])
         goto next_segment;
@@ -137,14 +133,12 @@ int64_t S2_thread(int64_t x,
       {
         int64_t xpq = x / (prime * primes[l]);
         int64_t stop = xpq - low;
-        count += sieve.count(i, stop);
-        i = stop + 1;
-        int64_t phi_xpq = phi[b] + count;
+        int64_t phi_xpq = phi[b] + sieve.count(stop);
         s2_thread += phi_xpq;
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     next_segment:;

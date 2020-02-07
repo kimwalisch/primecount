@@ -96,7 +96,7 @@ T S2_hard_thread(T x,
     low1 = max(low, 1);
 
     sieve.pre_sieve(primes, min_b - 1, low, high);
-    int64_t count_low_high = sieve.count((high - 1) - low);
+    sieve.init_counters(low, high);
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
@@ -116,9 +116,7 @@ T S2_hard_thread(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
-
-      int64_t count = 0;
-      int64_t start = 0;
+      sieve.reset_counters();
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -127,16 +125,14 @@ T S2_hard_thread(T x,
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t stop = xpm - low;
-          count += sieve.count(start, stop, low, high, count, count_low_high);
-          start = stop + 1;
-          int64_t phi_xpm = phi[b] + count;
+          int64_t phi_xpm = phi[b] + sieve.count(stop);
           int64_t mu_m = factor.mu(m);
           s2_hard -= mu_m * phi_xpm;
         }
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrty < b <= pi_sqrtz
@@ -151,8 +147,7 @@ T S2_hard_thread(T x,
       int64_t xp_div_high = min(fast_div(xp, high), y);
       int64_t l = pi[min(xp_div_low, z / prime)];
       int64_t min_hard = max(xp_div_high, prime);
-      int64_t count = 0;
-      int64_t start = 0;
+      sieve.reset_counters();
 
       if (prime >= primes[l])
         goto next_segment;
@@ -161,14 +156,12 @@ T S2_hard_thread(T x,
       {
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
-        count += sieve.count(start, stop, low, high, count, count_low_high);
-        start = stop + 1;
-        int64_t phi_xpq = phi[b] + count;
+        int64_t phi_xpq = phi[b] + sieve.count(stop);
         s2_hard += phi_xpq;
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     next_segment:;
