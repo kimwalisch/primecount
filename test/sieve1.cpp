@@ -49,7 +49,10 @@ int main()
   for (size_t i = 1; i < primes.size(); i++)
   {
     if (primes[i] <= 5)
+    {
       sieve.pre_sieve(primes, i, low, high);
+      sieve.init_counters(low, high);
+    }
     else
       sieve.cross_off(primes[i], i);
 

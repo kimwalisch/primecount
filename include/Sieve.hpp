@@ -50,6 +50,7 @@ class Sieve
 public:
   Sieve(uint64_t start, uint64_t segment_size, uint64_t wheel_size);
   static uint64_t get_segment_size(uint64_t size);
+  uint64_t count(uint64_t start, uint64_t stop) const;
   NOINLINE uint64_t count(uint64_t stop);
   NOINLINE void cross_off(uint64_t prime, uint64_t i);
   NOINLINE void cross_off_count(uint64_t prime, uint64_t i);
@@ -82,7 +83,6 @@ public:
 private:
   void add(uint64_t prime);
   void reset_sieve(uint64_t low, uint64_t high);
-  uint64_t count(uint64_t start, uint64_t stop) const;
   uint64_t segment_size() const;
 
   uint64_t start_;
