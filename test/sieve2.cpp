@@ -49,10 +49,10 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int64_t cnt1 = 0;
-    int64_t cnt2 = 0;
-    int64_t total1 = 0;
-    int64_t total2 = 0;
+    uint64_t cnt1 = 0;
+    uint64_t cnt2 = 0;
+    uint64_t total1 = 0;
+    uint64_t total2 = 0;
 
     if (primes[i] <= 5)
     {
@@ -61,7 +61,7 @@ int main()
     }
     else
     {
-      int64_t prev_count = sieve.get_total_count();
+      uint64_t prev_count = sieve.get_total_count();
       sieve.cross_off_count(primes[i], i);
       cnt1 = prev_count - sieve.get_total_count();
 
