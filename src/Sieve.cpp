@@ -38,7 +38,7 @@
 #define count_and_unset_bit(bit_index, i) \
   is_bit = (sieve[i] >> bit_index) & 1; \
   count_removed += is_bit; \
-  counters[i >> counters_shift] -= is_bit; \
+  counters[(i) >> counters_shift] -= is_bit; \
   sieve[i] &= ~(1 << bit_index);
 
 using namespace std;
