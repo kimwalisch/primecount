@@ -64,8 +64,8 @@ public:
   void reset_counters()
   {
     counters_i_ = 0;
-    counters_sum_ = 0;
     counters_count_ = 0;
+    counters_base_count_ = 0;
     counters_prev_stop_ = 0;
     counters_dist_sum_ = counters_dist_;
   }
@@ -89,11 +89,11 @@ private:
   uint64_t sieve_size_;
   uint64_t total_count_;
   uint64_t counters_i_;
-  uint64_t counters_sum_;
   uint64_t counters_count_;
+  uint64_t counters_base_count_;
   uint64_t counters_dist_;
-  uint64_t counters_shift_;
   uint64_t counters_dist_sum_;
+  uint64_t counters_shift_;
   uint64_t counters_prev_stop_;
   uint8_t* sieve_;
   std::unique_ptr<uint8_t[]> deleter_;

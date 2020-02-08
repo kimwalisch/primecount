@@ -185,8 +185,8 @@ uint64_t Sieve::count(uint64_t stop)
   {
     start = counters_dist_sum_;
     counters_dist_sum_ += counters_dist_;
-    counters_sum_ += counters_[counters_i_++];
-    counters_count_ = counters_sum_;
+    counters_base_count_ += counters_[counters_i_++];
+    counters_count_ = counters_base_count_;
   }
 
   counters_count_ += count(start, stop);
