@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

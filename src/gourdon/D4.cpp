@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

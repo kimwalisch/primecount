@@ -13,7 +13,7 @@
 ///        elements that have been crossed off for the first
 ///        time in the sieve array.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -172,7 +172,9 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
   }
 }
 
-/// Count 1 bits inside [0, stop]
+/// Count 1 bits inside [0, stop].
+/// Runtime complexity: O(sqrt(sieve_size)) operations.
+///
 uint64_t Sieve::count(uint64_t stop)
 {
   uint64_t start = counters_prev_stop_ + 1;
@@ -181,6 +183,14 @@ uint64_t Sieve::count(uint64_t stop)
   if (start > stop)
     return counters_count_;
 
+  // Quickly count the number of unsieved elements (in
+  // the sieve array) up to a value that is close to
+  // the stop number i.e. (stop - value) <= sqrt(sieve_size).
+  // We do this using the counters array, each element
+  // of the counters array contains the number of
+  // unsieved elements in the interval:
+  // [i * sqrt(sieve_size), (i + 1) * sqrt(sieve_size)[.
+  // This uses at most O(sqrt(stop)) operations.
   while (counters_dist_sum_ <= stop)
   {
     start = counters_dist_sum_;
@@ -189,6 +199,10 @@ uint64_t Sieve::count(uint64_t stop)
     counters_count_ = counters_base_count_;
   }
 
+  // Here the remaining distance is relatively small
+  // i.e. (stop - start) <= sqrt(sieve_size), hence we
+  // simply count the remaining number of unsieved
+  // elements by linearly iterating over the sieve array.
   counters_count_ += count(start, stop);
   return counters_count_;
 }
