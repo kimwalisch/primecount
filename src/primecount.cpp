@@ -398,10 +398,10 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
 
-  double a = 0.00279759;
-  double b = -0.189038;
-  double c = 4.56549;
-  double d = -34.0243;
+  double a = 0.00231634;
+  double b = -0.146474;
+  double c = 3.37457;
+  double d = -23.5761;
   double logx = log((double) x);
   double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
 
