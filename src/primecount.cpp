@@ -412,12 +412,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // decreased because alpha_y = alpha_yz / alpha_z. When alpha_z
     // is increased this increases the runtime of the B formula but at
     // the same time reduces the runtime of the C and D formulas.
-
-    if (x < 1e21)
-      alpha_z = 1.5;
-    else
-      alpha_z = 1.25;
-
+    // Increasing alpha_z also slightly reduces memory usage.
+    alpha_z = 1.5;
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
