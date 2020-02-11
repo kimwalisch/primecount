@@ -398,10 +398,10 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
 
-  double a = 0.00235395;
-  double b = -0.148461;
-  double c = 3.39764;
-  double d = -23.5499;
+  double a = 0.00279759;
+  double b = -0.189038;
+  double c = 4.56549;
+  double d = -34.0243;
   double logx = log((double) x);
   double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
 
@@ -412,9 +412,12 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // decreased because alpha_y = alpha_yz / alpha_z. When alpha_z
     // is increased this increases the runtime of the B formula but at
     // the same time reduces the runtime of the C and D formulas.
-    // By running many benchmarks I have found that alpha_z = 1.5
-    // performs best for primecount's current implementation.
-    alpha_z = 1.5;
+
+    if (x < 1e21)
+      alpha_z = 1.5;
+    else
+      alpha_z = 1.25;
+
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
