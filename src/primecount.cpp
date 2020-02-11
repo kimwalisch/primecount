@@ -6,7 +6,7 @@
 ///        contains helper functions and global variables that are
 ///        initialized with default settings.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -394,28 +394,16 @@ double get_alpha_deleglise_rivat(maxint_t x)
 ///
 std::pair<double, double> get_alpha_gourdon(maxint_t x)
 {
-  // alpha_yz = alpha_y * alpha_z
-  double alpha_yz;
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
 
-  if (x < 1e10)
-  {
-    double a = 0.078173;
-    double b = 1;
-    double logx = log((double) x);
-    alpha_yz = a * logx + b;
-  }
-  else
-  {
-    double a = 0.00223533;
-    double b = -0.144108;
-    double c = 3.07786;
-    double d = -18.8831;
-    double logx = log((double) x);
-    alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
-  }
+  double a = 0.00235395;
+  double b = -0.148461;
+  double c = 3.39764;
+  double d = -23.5499;
+  double logx = log((double) x);
+  double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
 
   // Use default alpha_z
   if (alpha_z < 1)
