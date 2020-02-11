@@ -1,3 +1,24 @@
+2020-02-11 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.4 work in progress.
+
+  This version fixes a scaling issue that has been present in
+  primecount since the first version. The computation of the
+  hard special leaves (S2_hard & D formulas) used a flawed
+  optimization that deteriorated the runtime complexity of the
+  algorithm. The new version should run much faster for record
+  computations >= 10^23. For smaller values there will be no
+  speedup.
+
+  * Sieve.cpp: Implemented O(sqrt(sieve_size)) counting,
+    previously counting was O(sieve_size).
+  * D.cpp: Use improved Sieve::count() method.
+  * S2_hard.cpp: Use improved Sieve::count() method.
+  * pi_lmo_parallel.cpp: Use improved Sieve::count() method.
+  * primecount.cpp: Tune Gourdon alpha factors.
+  * find_optimal_alpha_y.sh: New script that finds optimal
+    alpha factors for Xavier Gourdon's algorithm.
+
 2020-01-18 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.3 released.
