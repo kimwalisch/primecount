@@ -144,6 +144,7 @@ do
     fastest_alpha_y=$alpha_y
     found_fastest=false
     too_fast=false
+    div_increment=2
 
     echo ""
     echo "PrimePi(10^$i)"
@@ -163,7 +164,7 @@ do
             max_alpha_y=$(calc "$alpha_y + $pivot")
             new_alpha_y=$(calc "$alpha_y - $pivot")
             new_alpha_y=$(maximum 1.000 $new_alpha_y)
-            increment=$(calc "($max_alpha_y - $new_alpha_y) / 2")
+            increment=$(calc "($max_alpha_y - $new_alpha_y) / $div_increment")
             increment=$(maximum 0.1 $increment)
 
             while [[ $(is_smaller_equal $new_alpha_y $max_alpha_y) -eq 1 ]]
@@ -199,6 +200,8 @@ do
 
                 new_alpha_y=$(calc "$new_alpha_y + $increment")
             done
+
+            div_increment=1
         done
     done
 
