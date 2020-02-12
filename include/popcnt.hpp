@@ -253,18 +253,8 @@ namespace {
 inline uint64_t popcnt(const uint64_t* data, uint64_t size)
 {
   uint64_t cnt = 0;
-  uint64_t i = 0;
-  uint64_t limit = size - size % 4;
 
-  for (; i < limit; i += 4)
-  {
-    cnt += popcnt64(data[i+0]);
-    cnt += popcnt64(data[i+1]);
-    cnt += popcnt64(data[i+2]);
-    cnt += popcnt64(data[i+3]);
-  }
-
-  for (; i < size; i++)
+  for (uint64_t i = 0; i < size; i++)
     cnt += popcnt64(data[i]);
 
   return cnt;
