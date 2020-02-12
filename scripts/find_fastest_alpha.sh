@@ -144,6 +144,7 @@ do
     fastest_alpha_y=$alpha_y
     found_fastest=false
     too_fast=false
+    iter_count=0
     div_increment=2
 
     echo ""
@@ -152,6 +153,8 @@ do
 
     for div in 2 4 8;
     do
+        copy_fastest_alpha_y=$fastest_alpha_y
+
         for ((j = 0; j < repeat; j++))
         do
             # Benchmark runs too quickly for this small input
@@ -160,9 +163,9 @@ do
                 break
             fi
 
-            pivot=$(calc "$fastest_alpha_y / $div")
-            max_alpha_y=$(calc "$alpha_y + $pivot")
-            new_alpha_y=$(calc "$alpha_y - $pivot")
+            pivot=$(calc "$copy_fastest_alpha_y / $div")
+            max_alpha_y=$(calc "$copy_fastest_alpha_y + $pivot")
+            new_alpha_y=$(calc "$copy_fastest_alpha_y - $pivot")
             new_alpha_y=$(maximum 1.000 $new_alpha_y)
             increment=$(calc "($max_alpha_y - $new_alpha_y) / $div_increment")
             increment=$(maximum 0.1 $increment)
@@ -171,6 +174,12 @@ do
             do
                 seconds=$(get_primecount_seconds "1e$i -t$threads --alpha-z=1 --alpha-y=$new_alpha_y")
                 echo "1e$i -t$threads --alpha-z=1 --alpha-y=$new_alpha_y, seconds: $seconds"
+                iter_count=$(($iter_count + 1))
+
+                if [[ $iter_count -eq 2 ]]
+                then
+                    old_seconds=$seconds
+                fi
 
                 # Benchmark runs too quickly for this small input
                 if [[ $(is_equal $seconds 0) -eq 1 ]]
@@ -200,9 +209,9 @@ do
 
                 new_alpha_y=$(calc "$new_alpha_y + $increment")
             done
-
-            div_increment=1
         done
+
+        div_increment=1
     done
 
     if [[ "$found_fastest" != "true" ]] || \
@@ -210,7 +219,8 @@ do
     then
         fastest_alpha_y="undef"
         fastest_seconds="undef"
+        old_seconds="undef"
     fi
 
-    echo "Result: old_alpha_y=$alpha_y, fastest_alpha_y=$fastest_alpha_y, seconds=$fastest_seconds"
+    echo "Result: fastest_alpha_y=$fastest_alpha_y, seconds=$fastest_seconds, old_alpha_y=$alpha_y, old_seconds=$old_seconds"
 done
