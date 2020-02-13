@@ -152,6 +152,15 @@ void Sieve::reset_sieve(uint64_t low, uint64_t high)
   }
 }
 
+void Sieve::reset_counters()
+{
+  counters_i_ = 0;
+  counters_count_ = 0;
+  counters_base_count_ = 0;
+  counters_prev_stop_ = 0;
+  counters_dist_sum_ = counters_dist_;
+}
+
 void Sieve::init_counters(uint64_t low, uint64_t high)
 {
   reset_counters();
@@ -850,6 +859,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   // update for the next segment
   wheel.multiple = (uint32_t) (m - sieve_size);
   total_count_ -= count_removed;
+  reset_counters();
 }
 
 } // namespace

@@ -54,20 +54,10 @@ public:
   NOINLINE uint64_t count(uint64_t stop);
   NOINLINE void cross_off(uint64_t prime, uint64_t i);
   NOINLINE void cross_off_count(uint64_t prime, uint64_t i);
-  NOINLINE void init_counters(uint64_t low, uint64_t high);
 
   uint64_t get_total_count() const
   {
     return total_count_;
-  }
-
-  void reset_counters()
-  {
-    counters_i_ = 0;
-    counters_count_ = 0;
-    counters_base_count_ = 0;
-    counters_prev_stop_ = 0;
-    counters_dist_sum_ = counters_dist_;
   }
 
   template <typename T>
@@ -78,12 +68,16 @@ public:
 
     for (uint64_t i = 4; i <= c; i++)
       cross_off(primes[i], i);
+
+    init_counters(low, high);
   }
 
 private:
   void add(uint64_t prime);
+  void reset_counters();
   void reset_sieve(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
+  NOINLINE void init_counters(uint64_t low, uint64_t high);
 
   uint64_t start_;
   uint64_t sieve_size_;

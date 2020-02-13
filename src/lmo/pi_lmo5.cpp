@@ -73,7 +73,6 @@ int64_t S2(int64_t x,
     int64_t low1 = max(low, 1);
 
     sieve.pre_sieve(primes, c, low, high);
-    sieve.init_counters(low, high);
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
@@ -85,7 +84,6 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
       int64_t max_m = min(x / (prime * low1), y);
-      sieve.reset_counters();
 
       if (prime >= max_m)
         goto next_segment;
@@ -114,7 +112,6 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low1), y)];
       int64_t min_m = max(x / (prime * high), prime);
-      sieve.reset_counters();
 
       if (prime >= primes[l])
         goto next_segment;

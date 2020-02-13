@@ -88,7 +88,6 @@ T D_thread(T x,
     // For i < min_b there are no special leaves:
     // low <= x / (primes[i] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counters(low, high);
     int64_t b = min_b;
 
     // For k + 1 <= b <= pi_sqrtz
@@ -109,7 +108,6 @@ T D_thread(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
-      sieve.reset_counters();
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -143,7 +141,6 @@ T D_thread(T x,
       int64_t min_m = max(xp_div_high, prime);
       int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
       int64_t l = pi[max_m];
-      sieve.reset_counters();
 
       if (prime >= primes[l])
         goto next_segment;

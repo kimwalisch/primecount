@@ -96,7 +96,6 @@ T S2_hard_thread(T x,
     low1 = max(low, 1);
 
     sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counters(low, high);
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
@@ -116,7 +115,6 @@ T S2_hard_thread(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
-      sieve.reset_counters();
 
       for (int64_t m = max_m; m > min_m; m--)
       {
@@ -147,7 +145,6 @@ T S2_hard_thread(T x,
       int64_t xp_div_high = min(fast_div(xp, high), y);
       int64_t l = pi[min(xp_div_low, z / prime)];
       int64_t min_hard = max(xp_div_high, prime);
-      sieve.reset_counters();
 
       if (prime >= primes[l])
         goto next_segment;
