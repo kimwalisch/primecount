@@ -101,9 +101,12 @@ Sieve::Sieve(uint64_t start,
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
 
-  // The number of counters must be proportional
-  // to sqrt(sieve_size) otherwise the runtime
-  // complexity of the algorithm deteriorates.
+  // Each element of the counters array contains the
+  // number of unsieved elements in the interval:
+  // [i * sqrt(sieve_size), (i + 1) * sqrt(sieve_size)[.
+  // This data structure is required to reduce the
+  // runtime complexity to count the number of 1 bits
+  // in the sieve array from O(n) to O(sqrt(n)).
   uint64_t byte_dist = isqrt(sieve_size_);
   byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
