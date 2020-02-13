@@ -32,7 +32,7 @@ then
 fi
 
 start=1
-stop=23
+stop=25
 instructions=0
 repeat=2
 threads=$(./primecount 1e18 --Sigma --alpha-z=1 -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)

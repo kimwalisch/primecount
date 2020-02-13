@@ -140,7 +140,7 @@ function get_primecount_seconds
 for ((i = start; i <= stop; i++))
 do
     alpha=$(get_primecount_alpha "1e$i")
-    fastest_seconds=100000000000000
+    fastest_seconds=10^30
     fastest_alpha=$alpha
     found_fastest=false
     too_fast=false

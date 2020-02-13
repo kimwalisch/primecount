@@ -32,7 +32,7 @@ then
 fi
 
 start=1
-stop=23
+stop=25
 seconds=0
 repeat=3
 threads=$(./primecount 1e18 --Sigma --alpha-z=1 -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
@@ -140,7 +140,7 @@ function get_primecount_seconds
 for ((i = start; i <= stop; i++))
 do
     alpha_y=$(get_primecount_alpha_y "1e$i")
-    fastest_seconds=100000000000000
+    fastest_seconds=10^30
     fastest_alpha_y=$alpha_y
     found_fastest=false
     too_fast=false
