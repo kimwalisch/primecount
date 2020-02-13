@@ -2,7 +2,7 @@
 
 # Find the fastest alpha tuning factors for primecount.
 # Usage:
-#   ./find_fastest_alpha.sh [--start=n] [--stop=n] [-t=threads]
+#   ./find_fastest_alpha_gourdon.sh [--start=n] [--stop=n] [-t=threads]
 # Description:
 #   This script calculates pi(10^n) for start <= n <= stop using different
 #   alpha tuning factors and prints out the fastest alphas. The fastest
@@ -55,7 +55,7 @@ do
         *)
         echo "Find the fastest alpha tuning factors for primecount."
         echo "Usage:"
-        echo "  ./find_fastest_alpha.sh [--start=n] [--stop=n] [-t=threads]"
+        echo "  ./find_fastest_alpha_gourdon.sh [--start=n] [--stop=n] [-t=threads]"
         echo "Description:"
         echo "  This script calculates pi(10^n) for start <= n <= stop using different"
         echo "  alpha tuning factors and prints out the fastest alphas. The fastest"
