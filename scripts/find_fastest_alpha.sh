@@ -151,7 +151,7 @@ do
     echo "PrimePi(10^$i)"
     echo "==========================================================="
 
-    for div in 2 4 8;
+    for div in 2 4 8 16 32;
     do
         copy_fastest_alpha_y=$fastest_alpha_y
 
@@ -169,6 +169,11 @@ do
             new_alpha_y=$(maximum 1.000 $new_alpha_y)
             increment=$(calc "($max_alpha_y - $new_alpha_y) / $div_increment")
             increment=$(maximum 0.1 $increment)
+
+            if [[ $(is_smaller $increment 0.1) -eq 1 ]]
+            then
+                break
+            fi
 
             while [[ $(is_smaller_equal $new_alpha_y $max_alpha_y) -eq 1 ]]
             do
