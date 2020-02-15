@@ -228,7 +228,8 @@ T D_OpenMP(T x,
         // faster than signed integer division
         using UT = typename make_unsigned<T>::type;
         sum = D_thread((UT) x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
-        loadBalancer.update_result(j, sum);
+        uint64_t high = low + segments * segment_size;
+        loadBalancer.update_result(j, high, sum);
         runtime.stop();
       }
     }

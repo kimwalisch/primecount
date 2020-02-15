@@ -39,8 +39,8 @@ public:
   maxint_t get_sum() const;
 
   bool resume(int thread_id, int64_t& low, int64_t& segments, int64_t& segment_size) const;
-  bool resume(maxint_t& s2_hard, double& time) const;
-  void update_result(int thread_id, maxint_t s2);
+  bool resume(maxint_t& sum, double& time) const;
+  void update_result(int thread_id, uint64_t high, maxint_t s2);
   int get_resume_threads() const;
   double get_wtime() const;
   void finish_backup();
