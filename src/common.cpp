@@ -1,10 +1,7 @@
 ///
-/// @file  primecount.cpp
-///        This file contains pi(x) function definitions that redirect
-///        to the actual implementations e.g. pi(x) redirects to
-///        pi_gourdon_64(x) or pi_gourdon_128(x). This file also
-///        contains helper functions and global variables that are
-///        initialized with default settings.
+/// @file  common.cpp
+///        This file contains helper functions and global variables
+///        that are initialized with default settings.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,7 +9,6 @@
 /// file in the top level directory.
 ///
 
-#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <calculator.hpp>
@@ -75,9 +71,6 @@ namespace {
   int threads_ = 0;
 #endif
 
-// Below 10^7 LMO is faster than Gourdon's algorithm
-const int lmo_threshold_ = 10000000;
-
 int status_precision_ = -1;
 
 // Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -105,130 +98,64 @@ double truncate3(double n)
 
 namespace primecount {
 
-int64_t pi(int64_t x)
+string to_str(maxint_t x)
 {
-  return pi(x, get_num_threads());
-}
-
-int64_t pi(int64_t x, int threads)
-{
-  if (x <= lmo_threshold_)
-    return pi_lmo5(x);
-  else
-  {
-#ifdef ENABLE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_64(x, threads);
-#endif
-
-    return pi_gourdon_64(x, threads);
-  }
-}
-
-#ifdef HAVE_INT128_T
-
-int128_t pi(int128_t x)
-{
-  return pi(x, get_num_threads());
-}
-
-int128_t pi(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi((int64_t) x, threads);
-  else
-  {
-#ifdef ENABLE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_128(x, threads);
-#endif
-
-    return pi_gourdon_128(x, threads);
-  }
-}
-
-#endif
-
-string pi(const string& x)
-{
-  return pi(x, get_num_threads());
-}
-
-string pi(const string& x, int threads)
-{
-  maxint_t pi_x = pi(to_maxint(x), threads);
   ostringstream oss;
-  oss << pi_x;
+  oss << x;
   return oss.str();
 }
 
-int64_t pi_deleglise_rivat(int64_t x, int threads)
+maxint_t to_maxint(const string& expr)
 {
-  return pi_deleglise_rivat_64(x, threads);
+  maxint_t n = calculator::eval<maxint_t>(expr);
+  return n;
 }
 
-int64_t pi_gourdon(int64_t x, int threads)
+int get_num_threads()
 {
-  return pi_gourdon_64(x, threads);
-}
-
-#ifdef HAVE_INT128_T
-
-int128_t pi_deleglise_rivat(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi_deleglise_rivat_64((int64_t) x, threads);
+#ifdef _OPENMP
+  if (threads_)
+    return threads_;
   else
-    return pi_deleglise_rivat_128(x, threads);
-}
-
-int128_t pi_gourdon(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi_gourdon_64((int64_t) x, threads);
-  else
-    return pi_gourdon_128(x, threads);
-}
-
-#endif
-
-int64_t nth_prime(int64_t n)
-{
-  return nth_prime(n, get_num_threads());
-}
-
-int64_t phi(int64_t x, int64_t a)
-{
-  return phi(x, a, get_num_threads());
-}
-
-/// Returns the largest x supported by pi(x).
-/// The S2_hard, P2, B and D functions are limited by:
-/// x / y <= 2^62, with y = x^(1/3) * alpha_y
-/// Hence x^(2/3) / alpha_y <= 2^62
-/// x <= (2^62 * alpha_y)^(3/2)
-///
-maxint_t get_max_x(double alpha_y)
-{
-#ifdef HAVE_INT128_T
-  double max_x = pow(pow(2.0, 62.0) * alpha_y, 3.0 / 2.0);
-  return (int128_t) max_x; 
+    return max(1, omp_get_max_threads());
 #else
-  unused_param(alpha_y); 
-  return numeric_limits<int64_t>::max();
+  return 1;
 #endif
 }
 
-std::string get_max_x()
+void set_num_threads(int threads)
 {
-  ostringstream oss;
-  oss << get_max_x(1.0);
-  return oss.str();
+#ifdef _OPENMP
+  threads_ = in_between(1, threads, omp_get_max_threads());
+#endif
+  primesieve::set_num_threads(threads);
+}
+
+int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
+{
+  thread_threshold = max((int64_t) 1, thread_threshold);
+  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = max(1, threads);
+  return threads;
+}
+
+int get_status_precision(maxint_t x)
+{
+  // use default precision when no command-line precision provided
+  if (status_precision_ < 0)
+  {
+    if ((double) x >= 1e23)
+      return 2;
+    if ((double) x >= 1e21)
+      return 1;
+  }
+
+  return max(status_precision_, 0);
+}
+
+void set_status_precision(int precision)
+{
+  status_precision_ = in_between(0, precision, 5);
 }
 
 /// Get the time in seconds
@@ -238,14 +165,6 @@ double get_time()
   auto time = now.time_since_epoch();
   auto micro = chrono::duration_cast<chrono::microseconds>(time);
   return (double) micro.count() / 1e6;
-}
-
-int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
-{
-  thread_threshold = max((int64_t) 1, thread_threshold);
-  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
-  threads = max(1, threads);
-  return threads;
 }
 
 void set_alpha(double alpha)
@@ -470,63 +389,6 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
   x_star = max(x_star, (int64_t) 1);
 
   return x_star;
-}
-
-void set_num_threads(int threads)
-{
-#ifdef _OPENMP
-  threads_ = in_between(1, threads, omp_get_max_threads());
-#endif
-  primesieve::set_num_threads(threads);
-}
-
-int get_num_threads()
-{
-#ifdef _OPENMP
-  if (threads_)
-    return threads_;
-  else
-    return max(1, omp_get_max_threads());
-#else
-  return 1;
-#endif
-}
-
-void set_status_precision(int precision)
-{
-  status_precision_ = in_between(0, precision, 5);
-}
-
-int get_status_precision(maxint_t x)
-{
-  // use default precision when no command-line precision provided
-  if (status_precision_ < 0)
-  {
-    if ((double) x >= 1e23)
-      return 2;
-    if ((double) x >= 1e21)
-      return 1;
-  }
-
-  return max(status_precision_, 0);
-}
-
-maxint_t to_maxint(const string& expr)
-{
-  maxint_t n = calculator::eval<maxint_t>(expr);
-  return n;
-}
-
-string to_str(maxint_t x)
-{
-  ostringstream oss;
-  oss << x;
-  return oss.str();
-}
-
-string primecount_version()
-{
-  return PRIMECOUNT_VERSION;
 }
 
 } // namespace

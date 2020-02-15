@@ -50,7 +50,9 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 # primecount library source files ####################################
 
-set(LIB_SRC src/FactorTable.cpp
+set(LIB_SRC src/api.cpp
+            src/common.cpp
+            src/FactorTable.cpp
             src/RiemannR.cpp
             src/P2.cpp
             src/P3.cpp
@@ -68,7 +70,6 @@ set(LIB_SRC src/FactorTable.cpp
             src/pi_lehmer.cpp
             src/pi_meissel.cpp
             src/pi_primesieve.cpp
-            src/primecount.cpp
             src/print.cpp
             src/lmo/pi_lmo1.cpp
             src/lmo/pi_lmo2.cpp
