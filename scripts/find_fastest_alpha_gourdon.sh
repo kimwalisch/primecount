@@ -151,7 +151,7 @@ do
     echo "PrimePi(10^$i)"
     echo "==============================================================="
 
-    for div in 2 4 8 16 32;
+    for div in 2 4 8 16 32 64;
     do
         copy_fastest_alpha_y=$fastest_alpha_y
 
