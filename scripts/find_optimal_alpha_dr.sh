@@ -167,12 +167,7 @@ do
             new_alpha=$(calc "$copy_optimal_alpha - $pivot")
             new_alpha=$(maximum 1.000 $new_alpha)
             increment=$(calc "($max_alpha - $new_alpha) / $div_increment")
-            increment=$(maximum 0.1 $increment)
-
-            if [[ $(is_smaller $increment 0.1) -eq 1 ]]
-            then
-                break
-            fi
+            increment=$(maximum 0.01 $increment)
 
             while [[ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]]
             do
