@@ -330,7 +330,7 @@ double get_alpha_z(int64_t y, int64_t z)
 /// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
 /// alpha = a log(x)^2 + b log(x) + c
 /// a, b and c have been determined empirically.
-/// @see doc/alpha-factor-tuning.pdf
+/// @see doc/alpha-factor-lmo.pdf
 ///
 double get_alpha_lmo(maxint_t x)
 {
@@ -340,9 +340,9 @@ double get_alpha_lmo(maxint_t x)
   // use default alpha if no command-line alpha provided
   if (alpha < 1)
   {
-    double a = 0.00156512;
-    double b = -0.0261411;
-    double c = 0.990948;
+    double a = 0.001103;
+    double b = -0.00896211;
+    double c = 1.00404;
     double logx = log((double) x);
     alpha = a * pow(logx, 2) + b * logx + c;
   }
@@ -357,7 +357,7 @@ double get_alpha_lmo(maxint_t x)
 /// Get the Deleglise-Rivat alpha tuning factor.
 /// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
 /// a, b, c and d have been determined empirically.
-/// @see doc/alpha-tuning-factor.pdf
+/// @see doc/alpha-factor-dr.pdf
 ///
 double get_alpha_deleglise_rivat(maxint_t x)
 {
@@ -387,6 +387,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
 /// O(log(x)^3) and the alpha_z tuning factor is a small
 /// constant. Both alpha_y and alpha_z should be determined
 /// experimentally by running benchmarks.
+/// @see doc/alpha-factor-gourdon.pdf
 ///
 /// y = x^(1/3) * alpha_y, with alpha_y >= 1.
 /// z = y * alpha_z, with alpha_z >= 1.
