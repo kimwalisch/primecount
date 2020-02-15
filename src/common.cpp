@@ -12,7 +12,6 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <calculator.hpp>
-#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 
