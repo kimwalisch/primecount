@@ -68,11 +68,11 @@ int64_t phi(int64_t x, int64_t a);
 ///
 int64_t nth_prime(int64_t n);
 
-/// Set the number of threads
-void set_num_threads(int num_threads);
-
 /// Get the currently set number of threads
 int get_num_threads();
+
+/// Set the number of threads
+void set_num_threads(int num_threads);
 
 /// Largest number supported by pi(const std::string& x).
 /// @return 64-bit CPUs: max >= 10^27,

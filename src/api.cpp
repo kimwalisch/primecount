@@ -10,6 +10,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <primesieve.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
 
@@ -19,9 +20,17 @@
 #include <string>
 #include <stdint.h>
 
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
+
 using namespace std;
 
 namespace {
+
+#ifdef _OPENMP
+  int threads_ = 0;
+#endif
 
 // Below 10^7 LMO is faster than Gourdon's algorithm
 const int lmo_threshold_ = 10000000;
@@ -159,6 +168,26 @@ std::string get_max_x()
   ostringstream oss;
   oss << get_max_x(1.0);
   return oss.str();
+}
+
+int get_num_threads()
+{
+#ifdef _OPENMP
+  if (threads_)
+    return threads_;
+  else
+    return max(1, omp_get_max_threads());
+#else
+  return 1;
+#endif
+}
+
+void set_num_threads(int threads)
+{
+#ifdef _OPENMP
+  threads_ = in_between(1, threads, omp_get_max_threads());
+#endif
+  primesieve::set_num_threads(threads);
 }
 
 } // namespace

@@ -34,18 +34,6 @@ extern "C" {
 int64_t primecount_pi(int64_t x);
 
 /*
- * Count the number of primes <= x using Xavier Gourdon's
- * algorithm. Uses all CPU cores by default.
- * @param x Number or arithmetic expression e.g. "1000", "10^22"
- * @pre x <= 10^31 on 64-bit systems, x < 2^63 on 32-bit systems.
- * Returns -1 if an error occurs.
- * 
- * Run time: O(x^(2/3) / (log x)^2)
- * Memory usage: O(x^(1/3) * (log x)^3)
- */
-char* primecount_pi_str(char* x);
-
-/*
  * Partial sieve function (a.k.a. Legendre-sum).
  * phi(x, a) counts the numbers <= x that are not divisible
  * by any of the first a primes.
@@ -64,11 +52,11 @@ int64_t primecount_phi(int64_t x, int64_t a);
  */
 int64_t primecount_nth_prime(int64_t n);
 
-/*  Set the number of threads */
-void primecount_set_num_threads(int num_threads);
-
 /*  Get the currently set number of threads */
 int primecount_get_num_threads();
+
+/*  Set the number of threads */
+void primecount_set_num_threads(int num_threads);
 
 /*
  * Largest number supported by primecount_pi_str(char* x).
@@ -77,10 +65,10 @@ int primecount_get_num_threads();
  * The return type is a char* as primecount_get_max_x() may be a
  * 128-bit integer which is not supported by some compilers.
  */
-char* primecount_get_max_x();
+const char* primecount_get_max_x();
 
 /* Get the primecount version number, in the form “i.j” */
-char* primecount_version();
+const char* primecount_version();
 
 #ifdef __cplusplus
 } /* extern "C" */

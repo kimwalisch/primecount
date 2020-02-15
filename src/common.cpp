@@ -10,7 +10,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
@@ -23,10 +22,6 @@
 #include <string>
 #include <stdint.h>
 #include <utility>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 #ifdef ENABLE_MPI
 
@@ -66,10 +61,6 @@ using namespace std;
 
 namespace {
 
-#ifdef _OPENMP
-  int threads_ = 0;
-#endif
-
 int status_precision_ = -1;
 
 // Tuning factor used in the Lagarias-Miller-Odlyzko
@@ -108,26 +99,6 @@ maxint_t to_maxint(const string& expr)
 {
   maxint_t n = calculator::eval<maxint_t>(expr);
   return n;
-}
-
-int get_num_threads()
-{
-#ifdef _OPENMP
-  if (threads_)
-    return threads_;
-  else
-    return max(1, omp_get_max_threads());
-#else
-  return 1;
-#endif
-}
-
-void set_num_threads(int threads)
-{
-#ifdef _OPENMP
-  threads_ = in_between(1, threads, omp_get_max_threads());
-#endif
-  primesieve::set_num_threads(threads);
 }
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
