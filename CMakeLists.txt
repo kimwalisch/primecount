@@ -354,7 +354,8 @@ endif()
 
 # Install header #####################################################
 
-install(FILES include/primecount.hpp
+install(FILES include/primecount.h
+              include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Regenerate man page ################################################
