@@ -171,9 +171,21 @@ do
 
             while [[ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]]
             do
-                instructions=$(get_primecount_instructions "1e$i -t$threads --alpha=$new_alpha")
-                echo "1e$i --threads=$threads --alpha=$new_alpha, instructions: $instructions"
                 iter_count=$(($iter_count + 1))
+                test_case="1e$i --threads=$threads --alpha=$new_alpha"
+                instructions=""
+    
+                if [[ -f "bench.txt" ]]
+                then
+                    instructions=$(grep "$test_case" bench.txt 2>/dev/null | head -1 | cut -f2 -d':' | tr -d '[:space:]')
+                fi
+
+                if [[ -z "$instructions" ]]
+                then
+                    instructions=$(get_primecount_instructions "$test_case")
+                fi
+
+                echo "$test_case, instructions: $instructions"
 
                 if [[ $iter_count -eq 2 ]]
                 then
