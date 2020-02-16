@@ -287,13 +287,27 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
+  double alpha_yz;
 
-  double a = 0.00183912;
-  double b = -0.0917178;
-  double c = 1.43715;
-  double d = -2.39365;
-  double logx = log((double) x);
-  double alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  // For x <= 10^8 our default formula does not
+  // generate good alpha values. Hence we use
+  // another formula optimized for small values.
+  if (x <= 1e8)
+  {
+    double a = 0.078173;
+    double b = 1;
+    double logx = log((double) x);
+    alpha_yz = a * logx + b;
+  }
+  else
+  {
+    double a = 0.00189716;
+    double b = -0.0958799;
+    double c = 1.51385;
+    double d = -2.60402;
+    double logx = log((double) x);
+    alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+  }
 
   // Use default alpha_z
   if (alpha_z < 1)
