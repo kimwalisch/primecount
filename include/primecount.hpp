@@ -45,8 +45,8 @@ int64_t pi(int64_t x);
 /// algorithm. Uses all CPU cores by default.
 ///
 /// @param x Number or arithmetic expression e.g. "1000", "10^22".
-///          Note that x must be <= 10^31 on 64-bit systems
-///          and x must be x < 2^63 on 32-bit systems.
+///          Note that x must be <= get_max_x() which is 10^31 on
+///          64-bit systems and 2^63-1 on 32-bit systems.
 /// Throws a primecount_error if an error occurs.
 ///
 /// Run time: O(x^(2/3) / (log x)^2)
