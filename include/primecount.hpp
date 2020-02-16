@@ -40,10 +40,13 @@ public:
 ///
 int64_t pi(int64_t x);
 
+/// 128-bit prime counting function.
 /// Count the number of primes <= x using Xavier Gourdon's
 /// algorithm. Uses all CPU cores by default.
-/// @param x Number or arithmetic expression e.g. "1000", "10^22"
-/// @pre x <= 10^31 on 64-bit systems, x < 2^63 on 32-bit systems.
+///
+/// @param x Number or arithmetic expression e.g. "1000", "10^22".
+///          Note that x must be <= 10^31 on 64-bit systems
+///          and x must be x < 2^63 on 32-bit systems.
 /// Throws a primecount_error if an error occurs.
 ///
 /// Run time: O(x^(2/3) / (log x)^2)
@@ -75,8 +78,8 @@ int get_num_threads();
 void set_num_threads(int num_threads);
 
 /// Largest number supported by pi(const std::string& x).
-/// @return 64-bit CPUs: max >= 10^27,
-///         32-bit CPUs: 2^63-1
+/// @return 64-bit CPUs: 10^31,
+///         32-bit CPUs: 2^63-1.
 /// The return type is a string as get_max_x() may be a 128-bit
 /// integer which is not supported by some compilers.
 ///

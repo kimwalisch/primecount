@@ -165,9 +165,13 @@ maxint_t get_max_x(double alpha_y)
 
 std::string get_max_x()
 {
-  ostringstream oss;
-  oss << get_max_x(1.0);
-  return oss.str();
+#ifdef HAVE_INT128_T
+  // 10^31
+  return "10000000000000000000000000000000";
+#else
+  // 2^63-1
+  return "9223372036854775807";
+#endif
 }
 
 int get_num_threads()

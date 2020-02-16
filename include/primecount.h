@@ -13,6 +13,7 @@
 #ifndef PRIMECOUNT_H
 #define PRIMECOUNT_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define PRIMECOUNT_VERSION "5.4"
@@ -32,6 +33,26 @@ extern "C" {
  * Memory usage: O(x^(1/3) * (log x)^3)
  */
 int64_t primecount_pi(int64_t x);
+
+/*
+ * 128-bit prime counting function.
+ * Count the number of primes <= x using Xavier Gourdon's
+ * algorithm. Uses all CPU cores by default.
+ * 
+ * @param x    Number or arithmetic expression e.g. "1000", "10^22".
+ *             Note that x must be <= 10^31 on 64-bit systems
+ *             and x must be x < 2^63 on 32-bit systems.
+ * @param res  Result output buffer.
+ * @param len  Length of the res buffer. The length must be sufficiently
+ *             large to fit the result, 32 is always enough.
+ * @return     Returns -1 if an error occurs, else returns the
+ *             number of characters that have been written to the
+ *             res buffer, not counting the terminating null character.
+ * 
+ * Run time: O(x^(2/3) / (log x)^2)
+ * Memory usage: O(x^(1/3) * (log x)^3)
+ */
+int primecount_pi128(char* x, char* res, size_t len);
 
 /*
  * Partial sieve function (a.k.a. Legendre-sum).
@@ -59,8 +80,8 @@ int primecount_get_num_threads();
 void primecount_set_num_threads(int num_threads);
 
 /*
- * Largest number supported by primecount_pi_str(char* x).
- * @return 64-bit CPUs: max >= 10^27,
+ * Largest number supported by primecount_pi128(x).
+ * @return 64-bit CPUs: 10^31,
  *         32-bit CPUs: 2^63-1
  * The return type is a char* as primecount_get_max_x() may be a
  * 128-bit integer which is not supported by some compilers.
