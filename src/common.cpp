@@ -253,15 +253,28 @@ double get_alpha_deleglise_rivat(maxint_t x)
   double alpha = alpha_;
   double x16 = (double) iroot<6>(x);
 
-  // use default alpha if no command-line alpha provided
+  // Use default alpha
   if (alpha < 1)
   {
-    double a = 0.00033826;
-    double b = 0.0018113;
-    double c = -0.110407;
-    double d = 1.3724;
-    double logx = log((double) x);
-    alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    // For x <= 10^9 our default formula does not
+    // generate good alpha values. Hence we use
+    // another formula optimized for small values.
+    if (x <= 1e9)
+    {
+      double a = 0.078173;
+      double b = 1;
+      double logx = log((double) x);
+      alpha = a * logx + b;
+    }
+    else
+    {
+      double a = 0.00148918;
+      double b = -0.0691909;
+      double c = 1.00165;
+      double d = 0.372253;
+      double logx = log((double) x);
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
   }
 
   // Preserve 3 digits after decimal point
