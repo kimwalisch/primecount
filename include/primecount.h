@@ -52,7 +52,7 @@ int64_t primecount_pi(int64_t x);
  * Run time: O(x^(2/3) / (log x)^2)
  * Memory usage: O(x^(1/3) * (log x)^3)
  */
-int primecount_pi128(char* x, char* res, size_t len);
+int primecount_pi128(const char* x, char* res, size_t len);
 
 /*
  * Partial sieve function (a.k.a. Legendre-sum).

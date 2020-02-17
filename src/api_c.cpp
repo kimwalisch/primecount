@@ -31,7 +31,7 @@ int64_t primecount_pi(int64_t x)
   }
 }
 
-int primecount_pi128(char* x, char* res, size_t len)
+int primecount_pi128(const char* x, char* res, size_t len)
 {
   try
   {
