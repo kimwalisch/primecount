@@ -31,9 +31,6 @@ namespace {
   int threads_ = 0;
 #endif
 
-// Below 10^7 LMO is faster than Gourdon's algorithm
-const int lmo_threshold_ = 10000000;
-
 } // namespace
 
 namespace primecount {
@@ -45,18 +42,21 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  if (x <= lmo_threshold_)
+  // For [0, 10^3] Legendre's algorithm runs fastest
+  if (x <= (int64_t) 1e3)
+    return pi_legendre(x, threads);
+
+  // For ]10^3, 10^7] the Lagarias-Miller-Odlyzko algorithm runs fastest
+  if (x <= (int64_t) 1e7)
     return pi_lmo5(x);
-  else
-  {
+
 #ifdef ENABLE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_64(x, threads);
+  if (mpi_num_procs() > 1)
+    return pi_deleglise_rivat_64(x, threads);
 #endif
 
-    return pi_gourdon_64(x, threads);
-  }
+  // Above 10^7 Xavier Gourdon's algorithm runs fastest
+  return pi_gourdon_64(x, threads);
 }
 
 #ifdef HAVE_INT128_T
