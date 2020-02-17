@@ -71,16 +71,13 @@ int128_t pi(int128_t x, int threads)
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
-  else
-  {
+
 #ifdef ENABLE_MPI
-    // So far only the Deleglise-Rivat algorithm has been distributed
-    if (mpi_num_procs() > 1)
-      return pi_deleglise_rivat_128(x, threads);
+  if (mpi_num_procs() > 1)
+    return pi_deleglise_rivat_128(x, threads);
 #endif
 
-    return pi_gourdon_128(x, threads);
-  }
+  return pi_gourdon_128(x, threads);
 }
 
 #endif
