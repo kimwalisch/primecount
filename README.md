@@ -352,7 +352,7 @@ error stream.
 int main()
 {
     int64_t pix = primecount_pi(1000);
-    printf("primes below 1000 = %ld", pix);
+    printf("primes below 1000 = %ld\n", pix);
 
     return 0;
 }
