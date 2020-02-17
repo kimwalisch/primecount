@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <sstream>
 #include <string>
 #include <exception>
 #include <iostream>
@@ -35,9 +36,11 @@ int primecount_pi128(const char* x, char* res, size_t len)
 {
   try
   {
-    // NULL pointer, nothing to do
     if (!x)
-      return -1;
+      throw primecount::primecount_error("x must not be a NULL pointer");
+
+    if (!res)
+      throw primecount::primecount_error("res must not be a NULL pointer");
 
     std::string str(x);
     std::string pix = primecount::pi(str);
@@ -45,20 +48,25 @@ int primecount_pi128(const char* x, char* res, size_t len)
     // +1 required to add null at the end of the string
     if (len < pix.length() + 1)
     {
-      std::cerr << "primecount: res buffer too small, res.len = " << len << " < required = " << pix.length() + 1 << std::endl;
-      return -1;
+      std::ostringstream oss;
+      oss << "res buffer too small, res.len = " << len << " < required = " << pix.length() + 1;
+      throw primecount::primecount_error(oss.str());
     }
 
     pix.copy(res, pix.length());
     // std::string::copy does not append a null character
     // at the end of the copied content.
-    res[pix.length()] = (char) 0;
+    res[pix.length()] = '\0';
 
     return (int) pix.length();
   }
   catch(const std::exception& e)
   {
     std::cerr << "primecount: " << e.what() << std::endl;
+
+    if (res && len > 0)
+      res[0] = '\0';
+
     return -1;
   }
 }
