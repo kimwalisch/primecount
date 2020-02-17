@@ -50,8 +50,8 @@ int main()
 
   const char* in = "1000000000000";
   char out[32];
-  primecount_pi128(in, out, 32);
-  cout << "primecount_pi128(" << in << ") = " << out;
+  primecount_pi_str(in, out, 32);
+  cout << "primecount_pi_str(" << in << ") = " << out;
   check(string(out) == "37607912018");
 
   cout << endl;

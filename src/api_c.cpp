@@ -32,7 +32,7 @@ int64_t primecount_pi(int64_t x)
   }
 }
 
-int primecount_pi128(const char* x, char* res, size_t len)
+int primecount_pi_str(const char* x, char* res, size_t len)
 {
   try
   {
@@ -62,7 +62,7 @@ int primecount_pi128(const char* x, char* res, size_t len)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount_pi128: " << e.what() << std::endl;
+    std::cerr << "primecount_pi_str: " << e.what() << std::endl;
 
     if (res && len > 0)
       res[0] = '\0';

@@ -52,7 +52,7 @@ int64_t primecount_pi(int64_t x);
  * Run time: O(x^(2/3) / (log x)^2)
  * Memory usage: O(x^(1/3) * (log x)^3)
  */
-int primecount_pi128(const char* x, char* res, size_t len);
+int primecount_pi_str(const char* x, char* res, size_t len);
 
 /*
  * Partial sieve function (a.k.a. Legendre-sum).
@@ -74,7 +74,7 @@ int64_t primecount_phi(int64_t x, int64_t a);
 int64_t primecount_nth_prime(int64_t n);
 
 /*
- * Largest number supported by primecount_pi128(x).
+ * Largest number supported by primecount_pi_str(x).
  * @return 64-bit CPUs: 10^31,
  *         32-bit CPUs: 2^63-1
  * The return type is a char* as primecount_get_max_x() may be a
