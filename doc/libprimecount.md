@@ -1,9 +1,9 @@
 # libprimecount
 
-primecount can be built as a static and shared C/C++ library for use in
-other math projects. libprimecount has both a [C API](../README.md#c-api) and
-a [C++ API](../README.md#c-api-1) so you are free to pick the one that best
-fits your needs. The C API has been added to make it easier to write
+primecount can be built as a static and shared C/C++ library for use in other
+math projects. libprimecount has both a C API (```<primecount.h>``` header) and
+a C++ API (```<primecount.hpp>``` header) so you are free to pick the one that
+best fits your needs. The C API has been added to make it easier to write
 libprimecount bindings for other programming languages.
 
 primecount's prime counting function implementation and nth prime function are
@@ -11,6 +11,50 @@ currently (March 2018) orders of magnitude faster than e.g. Mathematica, PARI/GP
 SageMath and SymPy. libprimecount is also very portable, it has been tested
 successfully on a wide range of operating systems, compilers (GCC, Clang, MSVC)
 and CPU architectures (x86, x64, ARM, ARM64, PowerPC, PP64, Sparc).
+
+## C API
+
+Include the ```<primecount.h>``` header to use primecount's C API.
+All functions that are part of primecount's C API return ```-1``` in case an
+error occurs and print the corresponding error message to the standard error
+stream.
+
+```C
+#include <primecount.h>
+#include <stdio.h>
+
+int main()
+{
+    int64_t pix = primecount_pi(1000);
+    printf("primes below 1000 = %ld\n", pix);
+
+    return 0;
+}
+```
+
+* [C API reference](include/primecount.h)
+
+## C++ API
+
+Include the ```<primecount.hpp>``` header to use primecount's C++ API.
+All functions that are part of primecount's C++ API throw a
+```primecount_error``` exception (which is derived from
+```std::exception```) in case an error occurs.
+
+```C++
+#include <primecount.hpp>
+#include <iostream>
+
+int main()
+{
+    int64_t pix = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << pix << std::endl;
+
+    return 0;
+}
+```
+
+* [C++ API reference](include/primecount.hpp)
 
 ## Build instructions
 
