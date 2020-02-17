@@ -9,6 +9,7 @@
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <calculator.hpp>
 #include <int128_t.hpp>
@@ -97,8 +98,24 @@ string to_str(maxint_t x)
 
 maxint_t to_maxint(const string& expr)
 {
-  maxint_t n = calculator::eval<maxint_t>(expr);
-  return n;
+  // check n <= max
+  if (expr.find_first_not_of("0123456789") == string::npos)
+  {
+    // remove leading zeros
+    size_t pos = expr.find_first_not_of("0");
+    string n = expr.substr(pos);
+    maxint_t limit = prt::numeric_limits<maxint_t>::max();
+    string max_n = to_str(limit);
+
+    if (n.size() > max_n.size() ||
+      (n.size() == max_n.size() && n > max_n))
+    {
+      string msg = "number too large: " + n;
+      throw primecount_error(msg);
+    }
+  }
+
+  return calculator::eval<maxint_t>(expr);
 }
 
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
