@@ -27,7 +27,7 @@ int64_t primecount_pi(int64_t x)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount: " << e.what() << std::endl;
+    std::cerr << "primecount_pi: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -62,7 +62,7 @@ int primecount_pi128(const char* x, char* res, size_t len)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount: " << e.what() << std::endl;
+    std::cerr << "primecount_pi128: " << e.what() << std::endl;
 
     if (res && len > 0)
       res[0] = '\0';
@@ -79,7 +79,7 @@ int64_t primecount_nth_prime(int64_t n)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount: " << e.what() << std::endl;
+    std::cerr << "primecount_nth_prime: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -92,7 +92,7 @@ int64_t primecount_phi(int64_t x, int64_t a)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount: " << e.what() << std::endl;
+    std::cerr << "primecount_phi: " << e.what() << std::endl;
     return -1;
   }
 }
