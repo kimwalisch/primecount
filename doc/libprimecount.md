@@ -1,10 +1,10 @@
 # libprimecount
 
 primecount can be built as a static and shared C/C++ library for use in
-other math projects. libprimecount has both a C API (```<primecount.h>``` header)
-and a C++ API (```<primecount.hpp>``` header) so you are free to pick the one
-that best fits your needs. The C API has been added to make it easier to write
-bindings for other programming languages for libprimecount.
+other math projects. libprimecount has both a [C API](../README.md#c-api) and
+a [C++ API](../README.md#c-api-1) so you are free to pick the one that best
+fits your needs. The C API has been added to make it easier to write
+libprimecount bindings for other programming languages.
 
 primecount's prime counting function implementation and nth prime function are
 currently (March 2018) orders of magnitude faster than e.g. Mathematica, PARI/GP,
