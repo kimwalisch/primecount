@@ -22,7 +22,7 @@ make -j
 sudo make install
 ```
 
-#### Run the tests
+## Run the tests
 
 ```sh
 cmake . -DBUILD_TESTS=ON
@@ -30,19 +30,26 @@ make -j
 make test
 ```
 
-#### Maximum portability
+## Linking
 
-By default primecount uses the ```POPCNT``` instruction in order to achieve the
-best performance. As a drawback primecount won't work on CPUs that do not
+```sh
+cc -O2 primes.c -lprimecount
+c++ -O2 primes.cpp -lprimecount
+```
+
+## Maximum portability
+
+By default libprimecount uses the ```POPCNT``` instruction in order to achieve the
+best performance. As a drawback libprimecount won't work on CPUs that do not
 have the ```POPCNT``` instruction e.g. all x86 CPUs built before 2010 do not
-have the ```POPCNT``` instruction. If you require primecount to run on all CPUs
+have the ```POPCNT``` instruction. If you require libprimecount to run on all CPUs
 you have to disable ```POPCNT```:
 
 ```
 cmake . -DWITH_POPCNT=OFF
 ```
 
-#### CMake build options
+## CMake build options
 
 Here are all available cmake configuration options:
 
@@ -59,11 +66,4 @@ option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 option(WITH_MPI            "Enable MPI support"                    OFF)
-```
-
-## Linking
-
-```sh
-cc -O2 primes.c -lprimecount
-c++ -O2 primes.cpp -lprimecount
 ```
