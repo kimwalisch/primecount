@@ -45,8 +45,8 @@ int64_t primecount_pi(int64_t x);
  * @param res  Result output buffer.
  * @param len  Length of the res buffer. The length must be sufficiently
  *             large to fit the result, 32 is always enough.
- * @return     Returns -1 if an error occurs, else returns the
- *             number of characters that have been written to the
+ * @return     Returns -1 if an error occurs, else returns the number
+ *             of characters (>= 1) that have been written to the
  *             res buffer, not counting the terminating null character.
  * 
  * Run time: O(x^(2/3) / (log x)^2)
