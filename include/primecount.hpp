@@ -44,7 +44,7 @@ int64_t pi(int64_t x);
 /// Count the number of primes <= x using Xavier Gourdon's
 /// algorithm. Uses all CPU cores by default.
 ///
-/// @param x Number or arithmetic expression e.g. "1000", "10^22".
+/// @param x Null-terminated string integer e.g. "12345".
 ///          Note that x must be <= get_max_x() which is 10^31 on
 ///          64-bit systems and 2^63-1 on 32-bit systems.
 /// Throws a primecount_error if an error occurs.
