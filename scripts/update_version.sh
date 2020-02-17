@@ -32,6 +32,7 @@ echo ""
 
 # Update version
 for i in $(echo README.md \
+                include/primecount.h \
                 include/primecount.hpp)
 do
     echo "Update version in $i"
@@ -41,6 +42,7 @@ done
 
 # Update version
 for i in $(echo CMakeLists.txt \
+                include/primecount.h \
                 include/primecount.hpp)
 do
     sed "s/PRIMECOUNT_VERSION_MAJOR $old_major/PRIMECOUNT_VERSION_MAJOR $new_major/g" $i > $i.tmp
