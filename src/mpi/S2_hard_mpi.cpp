@@ -254,6 +254,7 @@ T S2_hard_mpi_master(T x,
     else
     {
       s2_hard += msg.s2_hard<T>();
+      int64_t high = msg.low() + msg.segments() * msg.segment_size();
 
       // update msg with new work
       loadBalancer.get_work(&msg);
@@ -262,7 +263,7 @@ T S2_hard_mpi_master(T x,
       msg.send(msg.proc_id());
 
       if (is_print())
-        status.print(msg.low(), z, s2_hard, s2_hard_approx);
+        status.print(high, z, s2_hard, s2_hard_approx);
     }
   }
 
