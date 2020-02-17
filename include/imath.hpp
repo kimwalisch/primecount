@@ -67,6 +67,25 @@ inline int ilog(T x)
 }
 
 template <typename T>
+inline T ilog2(T x)
+{
+  T log2 = 0;
+  T bits = number_of_bits(x);
+
+  for (T i = bits / 2; i > 0; i /= 2)
+  {
+    T one = 1;
+    if (x >= (one << i))
+    {
+      x >>= i;
+      log2 += i;
+    }
+  }
+
+  return log2;
+}
+
+template <typename T>
 inline T ipow(T x, int n)
 {
   T r = 1;

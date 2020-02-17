@@ -49,13 +49,20 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int64_t cnt1 = 0;
-    int64_t cnt2 = 0;
+    uint64_t cnt1 = 0;
+    uint64_t cnt2 = 0;
+    uint64_t total1 = 0;
+    uint64_t total2 = 0;
 
     if (primes[i] <= 5)
       sieve.pre_sieve(primes, i, low, high);
     else
-      cnt1 = sieve.cross_off_count(primes[i], i);
+    {
+      uint64_t prev_count = sieve.get_total_count();
+      sieve.cross_off_count(primes[i], i);
+      cnt1 = prev_count - sieve.get_total_count();
+      total1 = sieve.count(high - 1);
+    }
 
     for (int j = primes[i]; j < high; j += primes[i])
     {
@@ -63,10 +70,16 @@ int main()
       sieve2[j] = 0;
     }
 
+    for (int j = 0; j < high; j++)
+      total2 += sieve2[j];
+
     if (primes[i] > 5)
     {
       cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
       check(cnt1 == cnt2);
+
+      cout << "sieve.count(" << high - 1 << ") = " << total1;
+      check((total1 == total2) && (total2 == sieve.get_total_count()));
     }
   }
 

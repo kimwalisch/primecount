@@ -17,7 +17,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -73,7 +73,6 @@ int64_t S2(int64_t x,
     int64_t low1 = max(low, 1);
 
     sieve.pre_sieve(primes, c, low, high);
-    int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
@@ -85,8 +84,6 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
       int64_t max_m = min(x / (prime * low1), y);
-      int64_t count = 0;
-      int64_t i = 0;
 
       if (prime >= max_m)
         goto next_segment;
@@ -97,15 +94,13 @@ int64_t S2(int64_t x,
         {
           int64_t xpm = x / (prime * m);
           int64_t stop = xpm - low;
-          count += sieve.count(i, stop);
-          i = stop + 1;
-          int64_t phi_xpm = phi[b] + count;
+          int64_t phi_xpm = phi[b] + sieve.count(stop);
           s2 -= mu[m] * phi_xpm;
         }
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrty < b < pi_y
@@ -117,8 +112,6 @@ int64_t S2(int64_t x,
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low1), y)];
       int64_t min_m = max(x / (prime * high), prime);
-      int64_t count = 0;
-      int64_t i = 0;
 
       if (prime >= primes[l])
         goto next_segment;
@@ -127,14 +120,12 @@ int64_t S2(int64_t x,
       {
         int64_t xpq = x / (prime * primes[l]);
         int64_t stop = xpq - low;
-        count += sieve.count(i, stop);
-        i = stop + 1;
-        int64_t phi_xpq = phi[b] + count;
+        int64_t phi_xpq = phi[b] + sieve.count(stop);
         s2 += phi_xpq;
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     next_segment:;

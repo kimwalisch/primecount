@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 5)
-set(PRIMECOUNT_VERSION_MINOR 3)
+set(PRIMECOUNT_VERSION_MINOR 4)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 
 # Build options ######################################################
@@ -50,7 +50,10 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 # primecount library source files ####################################
 
-set(LIB_SRC src/FactorTable.cpp
+set(LIB_SRC src/api.cpp
+            src/api_c.cpp
+            src/common.cpp
+            src/FactorTable.cpp
             src/RiemannR.cpp
             src/P2.cpp
             src/P3.cpp
@@ -68,7 +71,6 @@ set(LIB_SRC src/FactorTable.cpp
             src/pi_lehmer.cpp
             src/pi_meissel.cpp
             src/pi_primesieve.cpp
-            src/primecount.cpp
             src/print.cpp
             src/lmo/pi_lmo1.cpp
             src/lmo/pi_lmo2.cpp
@@ -353,7 +355,8 @@ endif()
 
 # Install header #####################################################
 
-install(FILES include/primecount.hpp
+install(FILES include/primecount.h
+              include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Regenerate man page ################################################

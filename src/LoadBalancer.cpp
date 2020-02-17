@@ -92,7 +92,11 @@ bool LoadBalancer::get_work(int64_t* low,
     sum_ += sum;
 
     if (is_print())
-      status_.print(low_, sieve_limit_, sum_, sum_approx_);
+    {
+      uint64_t dist = *segments * *segment_size;
+      uint64_t high = *low + dist;
+      status_.print(high, sieve_limit_, sum_, sum_approx_);
+    }
 
     update(low, segments, runtime);
 

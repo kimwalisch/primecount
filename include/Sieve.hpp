@@ -13,7 +13,7 @@
 ///        elements that have been crossed off for the first
 ///        time in the sieve array.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,8 +30,6 @@
 #include <vector>
 
 namespace primecount {
-
-using byte_t = uint8_t;
 
 struct Wheel
 {
@@ -52,11 +50,15 @@ class Sieve
 public:
   Sieve(uint64_t start, uint64_t segment_size, uint64_t wheel_size);
   static uint64_t get_segment_size(uint64_t size);
-  uint64_t segment_size() const;
-  /// Count 1 bits inside [start, stop]
-  NOINLINE uint64_t count(uint64_t start, uint64_t stop) const;
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  NOINLINE uint64_t count(uint64_t stop);
   NOINLINE void cross_off(uint64_t prime, uint64_t i);
-  NOINLINE uint64_t cross_off_count(uint64_t prime, uint64_t i);
+  NOINLINE void cross_off_count(uint64_t prime, uint64_t i);
+
+  uint64_t get_total_count() const
+  {
+    return total_count_;
+  }
 
   template <typename T>
   void pre_sieve(const std::vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
@@ -66,42 +68,30 @@ public:
 
     for (uint64_t i = 4; i <= c; i++)
       cross_off(primes[i], i);
-  }
 
-  /// Count 1 bits inside [0, stop]
-  uint64_t count(uint64_t stop) const
-  {
-    return count(0, stop);
-  }
-
-  /// Count 1 bits inside [start, stop].
-  /// This method counts either forwards or backwards 
-  /// depending on what's faster.
-  ///
-  uint64_t count(uint64_t start,
-                 uint64_t stop,
-                 uint64_t low,
-                 uint64_t high,
-                 uint64_t count_0_start,
-                 uint64_t count_low_high) const
-  {
-    if (start > stop)
-      return 0;
-
-    if (stop - start < ((high - 1) - low) - stop)
-      return count(start, stop);
-    else
-      return count_low_high - count_0_start - count(stop + 1, (high - 1) - low);
+    init_counters(low, high);
   }
 
 private:
-  void reset_sieve(uint64_t low, uint64_t high);
   void add(uint64_t prime);
+  void reset_counters();
+  void reset_sieve(uint64_t low, uint64_t high);
+  uint64_t segment_size() const;
+  NOINLINE void init_counters(uint64_t low, uint64_t high);
 
-  uint64_t start_;
-  uint64_t sieve_size_;
-  byte_t* sieve_;
-  std::unique_ptr<byte_t[]> deleter_;
+  uint64_t start_ = 0;
+  uint64_t sieve_size_ = 0;
+  uint64_t total_count_ = 0;
+  uint64_t counters_i_ = 0;
+  uint64_t counters_count_ = 0;
+  uint64_t counters_base_count_ = 0;
+  uint64_t counters_dist_ = 0;
+  uint64_t counters_dist_sum_ = 0;
+  uint64_t counters_shift_ = 0;
+  uint64_t counters_prev_stop_ = 0;
+  uint8_t* sieve_ = nullptr;
+  std::unique_ptr<uint8_t[]> deleter_;
+  std::vector<uint64_t> counters_;
   std::vector<Wheel> wheel_;
 };
 
