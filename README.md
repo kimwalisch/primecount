@@ -4,7 +4,7 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
-primecount is a command-line program and [C++ library](doc/libprimecount.md)
+primecount is a command-line program and [C/C++ library](doc/libprimecount.md)
 that counts the primes below an integer x&nbsp;≤&nbsp;10<sup>31</sup> using
 **highly optimized** implementations of the combinatorial
 [prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
@@ -262,26 +262,6 @@ could have potentially been reduced to 4,000 CPU core hours. However using prime
 and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 850 CPU
 core hours!
 
-## C++ library
-
-primecount can be built as a static and shared C++ library for use in
-other math projects.
-
-```C++
-#include <primecount.hpp>
-#include <iostream>
-
-int main()
-{
-    int64_t primes = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << primes << std::endl;
-
-    return 0;
-}
-```
-
-[libprimecount.md](doc/libprimecount.md) contains more information.
-
 ## Algorithms
 
 <table>
@@ -357,3 +337,49 @@ this way (option: ```--nth-prime```), it finds the nth prime in
 operations using
 <img src="https://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
 space.
+
+## C API
+
+Include the ```<primecount.h>``` header to use primecount's C API.
+All functions that are part of primecount's C API return ```-1```
+in case an error occurs and print an error message to the standard
+error stream.
+
+```C
+#include <primecount.h>
+#include <stdio.h>
+
+int main()
+{
+    int64_t pix = primecount_pi(1000);
+    printf("primes below 1000 = %ll", pix);
+
+    return 0;
+}
+```
+
+* [C API reference](include/primecount.h)
+* [libprimecount build instructions](doc/libprimecount.md)
+
+## C++ API
+
+Include the ```<primecount.hpp>``` header to use primecount's C++ API.
+All functions that are part of primecount's C++ API throw a
+```primecount_error``` exception (which is derived from
+```std::exception```) in case an error occurs.
+
+```C++
+#include <primecount.hpp>
+#include <iostream>
+
+int main()
+{
+    int64_t pix = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << pix << std::endl;
+
+    return 0;
+}
+```
+
+* [C++ API reference](include/primecount.hpp)
+* [libprimecount build instructions](doc/libprimecount.md)
