@@ -71,12 +71,6 @@ int64_t phi(int64_t x, int64_t a);
 ///
 int64_t nth_prime(int64_t n);
 
-/// Get the currently set number of threads
-int get_num_threads();
-
-/// Set the number of threads
-void set_num_threads(int num_threads);
-
 /// Largest number supported by pi(const std::string& x).
 /// @return 64-bit CPUs: 10^31,
 ///         32-bit CPUs: 2^63-1.
@@ -84,6 +78,12 @@ void set_num_threads(int num_threads);
 /// integer which is not supported by some compilers.
 ///
 std::string get_max_x();
+
+/// Get the currently set number of threads
+int get_num_threads();
+
+/// Set the number of threads
+void set_num_threads(int num_threads);
 
 /// Get the primecount version number, in the form “i.j”
 std::string primecount_version();
