@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include <limits>
-#include <sstream>
 #include <string>
 #include <stdint.h>
 
@@ -93,10 +92,9 @@ string pi(const string& x)
 
 string pi(const string& x, int threads)
 {
-  maxint_t pi_x = pi(to_maxint(x), threads);
-  ostringstream oss;
-  oss << pi_x;
-  return oss.str();
+  maxint_t n = to_maxint(x);
+  maxint_t res = pi(n, threads);
+  return to_str(res);
 }
 
 int64_t pi_deleglise_rivat(int64_t x, int threads)
