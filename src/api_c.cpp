@@ -105,6 +105,7 @@ int primecount_get_num_threads()
   }
   catch(const std::exception& e)
   {
+    std::cerr << "primecount_get_num_threads: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -115,8 +116,10 @@ void primecount_set_num_threads(int threads)
   {
     primecount::set_num_threads(threads);
   }
-  catch(const std::exception&)
-  { }
+  catch(const std::exception& e)
+  {
+    std::cerr << "primecount_set_num_threads: " << e.what() << std::endl;
+  }
 }
 
 const char* primecount_get_max_x()
