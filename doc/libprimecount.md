@@ -32,7 +32,7 @@ int main()
 }
 ```
 
-* [C API reference](include/primecount.h)
+* [C API reference](../include/primecount.h)
 
 ## C++ API
 
@@ -54,7 +54,7 @@ int main()
 }
 ```
 
-* [C++ API reference](include/primecount.hpp)
+* [C++ API reference](../include/primecount.hpp)
 
 ## Build instructions
 
