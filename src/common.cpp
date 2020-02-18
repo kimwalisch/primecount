@@ -319,10 +319,10 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double x16 = (double) iroot<6>(x);
   double alpha_yz;
 
-  // For x <= 10^8 our default formula does not
+  // For x <= 10^11 our default formula does not
   // generate good alpha values. Hence we use
   // another formula optimized for small values.
-  if (x <= 1e8)
+  if (x <= 1e11)
   {
     double a = 0.078173;
     double b = 1;
