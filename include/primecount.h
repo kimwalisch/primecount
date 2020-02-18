@@ -1,5 +1,5 @@
 /*
- * @file  primecount.hpp
+ * @file  primecount.h
  * @brief primecount C API. primecount is a C/C++ library for
  *        counting the number of primes <= x using highly
  *        optimized implementations of the combinatorial type
