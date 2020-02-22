@@ -118,8 +118,8 @@ void Sieve::allocate_counters(double alpha)
 {
   double size = (double) segment_size();
   double sqrt_segment_size = std::sqrt(size);
-  double log_alpha = std::log(alpha);
-  log_alpha = std::max(log_alpha, 1.0);
+  double log_alpha = log(alpha);
+  log_alpha = max(log_alpha, 1.0);
 
   counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
   uint64_t byte_dist = counters_dist_ / 30;
