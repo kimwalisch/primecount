@@ -217,9 +217,6 @@ uint64_t Sieve::count(uint64_t stop)
   // of the counters array contains the number of
   // unsieved elements in the interval:
   // [i * counters_dist, (i + 1) * counters_dist[.
-  // Note that the average runtime complexity is lowest if
-  // we use O(sqrt(segment_size) * log(alpha)) counters
-  // of size O(sqrt(segment_size) / log(alpha)).
   while (counters_dist_sum_ <= stop)
   {
     start = counters_dist_sum_;
