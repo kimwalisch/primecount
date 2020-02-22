@@ -83,7 +83,8 @@ namespace primecount {
 
 Sieve::Sieve(uint64_t start,
              uint64_t segment_size, 
-             uint64_t wheel_size)
+             uint64_t wheel_size,
+             double alpha)
 {
   assert(start % 30 == 0);
   assert(segment_size % 240 == 0);
@@ -100,16 +101,32 @@ Sieve::Sieve(uint64_t start,
 
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
+  allocate_counters(alpha);
+}
 
-  // Each element of the counters array contains the
-  // number of unsieved elements in the interval:
-  // [i * sqrt(sieve_size), (i + 1) * sqrt(sieve_size)[.
-  // This data structure is required to reduce the
-  // runtime complexity to count the number of 1 bits
-  // in the sieve array from O(n) to O(sqrt(n)).
-  uint64_t byte_dist = isqrt(sieve_size_);
+/// Each element of the counters array contains the current
+/// number of unsieved elements in the interval:
+/// [i * counters_dist_, (i + 1) * counters_dist_[.
+/// The average runtime complexity for counting the number of
+/// unsieved elements in the sieve array will be lowest if we
+/// allocate O(sqrt(segment_size) * log(alpha)) counters and
+/// each element of the counters array contains the number of
+/// unsieved elements in an interval of size
+/// O(sqrt(segment_size) / log(alpha)).
+///
+void Sieve::allocate_counters(double alpha)
+{
+  double size = (double) segment_size();
+  double sqrt_segment_size = std::sqrt(size);
+  double log_alpha = std::log(alpha);
+  log_alpha = std::max(log_alpha, 1.0);
+
+  counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
+  uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
+
+  // (counters_dist_ / 30) is now a power of 2 
   counters_dist_ = byte_dist * 30;
   counters_shift_ = ilog2(byte_dist);
   assert(byte_dist == 1ull << counters_shift_);
@@ -184,9 +201,7 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
   }
 }
 
-/// Count 1 bits inside [0, stop].
-/// Runtime complexity: O(sqrt(sieve_size)) operations.
-///
+/// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
   uint64_t start = counters_prev_stop_ + 1;
@@ -197,12 +212,14 @@ uint64_t Sieve::count(uint64_t stop)
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - value) <= sqrt(sieve_size).
+  // the stop number i.e. (stop - value) <= counters_dist_.
   // We do this using the counters array, each element
   // of the counters array contains the number of
   // unsieved elements in the interval:
-  // [i * sqrt(sieve_size), (i + 1) * sqrt(sieve_size)[.
-  // This uses at most O(sqrt(stop)) operations.
+  // [i * counters_dist_, (i + 1) * counters_dist_[.
+  // Note that the average runtime complexity is lowest if
+  // we use O(sqrt(segment_size) * log(alpha)) counters
+  // of size O(sqrt(segment_size) / log(alpha)).
   while (counters_dist_sum_ <= stop)
   {
     start = counters_dist_sum_;
@@ -211,10 +228,10 @@ uint64_t Sieve::count(uint64_t stop)
     counters_count_ = counters_base_count_;
   }
 
-  // Here the remaining distance is relatively small
-  // i.e. (stop - start) <= sqrt(sieve_size), hence we
-  // simply count the remaining number of unsieved
-  // elements by linearly iterating over the sieve array.
+  // Here the remaining distance is relatively small i.e.
+  // (stop - start) <= counters_dist_, hence we simply
+  // count the remaining number of unsieved elements by
+  // linearly iterating over the sieve array.
   counters_count_ += count(start, stop);
   return counters_count_;
 }

@@ -84,7 +84,8 @@ T S2_hard_thread(T x,
     return 0;
 
   runtime.init_start();
-  Sieve sieve(low, segment_size, max_b);
+  double alpha = get_alpha(x, y);
+  Sieve sieve(low, segment_size, max_b, alpha);
   auto phi = generate_phi(low, max_b, primes, pi);
   runtime.init_stop();
 

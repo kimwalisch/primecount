@@ -62,17 +62,17 @@ int64_t S2_thread(int64_t x,
 {
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
-  int64_t size = pi[min(isqrt(x / low1), y)] + 1;
+  int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t pi_y = pi[y];
   int64_t s2_thread = 0;
 
-  if (c >= size - 1)
+  if (c >= max_b)
     return 0;
 
   runtime.init_start();
-  Sieve sieve(low, segment_size, size - 1);
-  auto phi = generate_phi(low, size - 1, primes, pi);
+  double alpha = get_alpha(x, y);
+  Sieve sieve(low, segment_size, max_b, alpha);
+  auto phi = generate_phi(low, max_b, primes, pi);
   runtime.init_stop();
 
   // segmented sieve of Eratosthenes
@@ -89,7 +89,7 @@ int64_t S2_thread(int64_t x,
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
-    for (; b <= min(pi_sqrty, size - 1); b++)
+    for (; b <= min(pi_sqrty, max_b); b++)
     {
       int64_t prime = primes[b];
       int64_t min_m = max(x / (prime * high), y / prime);
@@ -117,7 +117,7 @@ int64_t S2_thread(int64_t x,
     // Find all special leaves in the current segment
     // that are composed of 2 primes:
     // low <= x / (primes[b] * primes[l]) < high
-    for (; b < min(pi_y, size); b++)
+    for (; b <= max_b; b++)
     {
       int64_t prime = primes[b];
       int64_t l = pi[min(x / (prime * low1), y)];
