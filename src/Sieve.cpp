@@ -121,14 +121,9 @@ void Sieve::allocate_counters(double alpha)
   double log_alpha = std::log(alpha);
   log_alpha = std::max(log_alpha, 1.0);
 
-  // The tuning factor is implementation dependent and
-  // should be determined experimentally.
-  double tuning_factor = 0.5;
-  double quotient = log_alpha * tuning_factor;
-
-  counters_dist_ = (uint64_t) (sqrt_segment_size / quotient);
+  counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
   uint64_t byte_dist = counters_dist_ / 30;
-  byte_dist = max(byte_dist, 64);
+  byte_dist = max(byte_dist, 256);
   byte_dist = next_power_of_2(byte_dist);
 
   // (counters_dist_ / 30) is now a power of 2 
