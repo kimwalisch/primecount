@@ -106,7 +106,7 @@ Sieve::Sieve(uint64_t start,
 
 /// Each element of the counters array contains the current
 /// number of unsieved elements in the interval:
-/// [i * counters_dist_, (i + 1) * counters_dist_[.
+/// [i * counters_dist, (i + 1) * counters_dist[.
 /// The average runtime complexity for counting the number of
 /// unsieved elements in the sieve array will be lowest if we
 /// allocate O(sqrt(segment_size) * log(alpha)) counters and
@@ -121,7 +121,12 @@ void Sieve::allocate_counters(double alpha)
   double log_alpha = std::log(alpha);
   log_alpha = std::max(log_alpha, 1.0);
 
-  counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
+  // The tuning factor is implementation dependent and
+  // should be determined experimentally.
+  double tuning_factor = 0.5;
+  double quotient = log_alpha * tuning_factor;
+
+  counters_dist_ = (uint64_t) (sqrt_segment_size / quotient);
   uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
@@ -212,11 +217,11 @@ uint64_t Sieve::count(uint64_t stop)
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - value) <= counters_dist_.
+  // the stop number i.e. (stop - value) <= counters_dist.
   // We do this using the counters array, each element
   // of the counters array contains the number of
   // unsieved elements in the interval:
-  // [i * counters_dist_, (i + 1) * counters_dist_[.
+  // [i * counters_dist, (i + 1) * counters_dist[.
   // Note that the average runtime complexity is lowest if
   // we use O(sqrt(segment_size) * log(alpha)) counters
   // of size O(sqrt(segment_size) / log(alpha)).
@@ -229,7 +234,7 @@ uint64_t Sieve::count(uint64_t stop)
   }
 
   // Here the remaining distance is relatively small i.e.
-  // (stop - start) <= counters_dist_, hence we simply
+  // (stop - start) <= counters_dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
   counters_count_ += count(start, stop);
