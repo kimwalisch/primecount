@@ -124,7 +124,7 @@ void Sieve::allocate_counters(double alpha)
   counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
   uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 256);
-  byte_dist = next_power_of_2(byte_dist);
+  byte_dist = nearest_power_of_2(byte_dist);
 
   // (counters_dist_ / 30) is now a power of 2 
   counters_dist_ = byte_dist * 30;
