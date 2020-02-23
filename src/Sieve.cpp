@@ -126,7 +126,7 @@ void Sieve::allocate_counters(double alpha)
   byte_dist = max(byte_dist, 256);
   byte_dist = nearest_power_of_2(byte_dist);
 
-  // (counters_dist_ / 30) is now a power of 2 
+  // (counters_dist_ / 30) is now a power of 2
   counters_dist_ = byte_dist * 30;
   counters_shift_ = ilog2(byte_dist);
   assert(byte_dist == 1ull << counters_shift_);
