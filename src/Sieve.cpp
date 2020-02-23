@@ -258,7 +258,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 }
 
 /// Add a sieving prime to the sieve.
-/// Calculates the first multiple > start_ of prime that
+/// Calculates the first multiple > start of prime that
 /// is not divisible by 2, 3, 5 and its wheel index.
 ///
 void Sieve::add(uint64_t prime)
