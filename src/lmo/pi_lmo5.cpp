@@ -57,8 +57,7 @@ int64_t S2(int64_t x,
   int64_t segment_size = Sieve::get_segment_size(isqrt(limit));
   int64_t low = 0;
 
-  double alpha = get_alpha(x, y);
-  Sieve sieve(low, segment_size, primes.size(), alpha);
+  Sieve sieve(low, segment_size, primes.size());
   vector<int32_t> pi = generate_pi(y);
   vector<int64_t> phi(primes.size(), 0);
 

@@ -48,7 +48,7 @@ struct Wheel
 class Sieve
 {
 public:
-  Sieve(uint64_t start, uint64_t segment_size, uint64_t wheel_size, double alpha = 1.0);
+  Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
   static uint64_t get_segment_size(uint64_t size);
   uint64_t count(uint64_t start, uint64_t stop) const;
   NOINLINE uint64_t count(uint64_t stop);
@@ -74,7 +74,7 @@ public:
 
 private:
   void add(uint64_t prime);
-  void allocate_counters(double alpha);
+  void allocate_counters(uint64_t low);
   void reset_counters();
   void reset_sieve(uint64_t low, uint64_t high);
   uint64_t segment_size() const;

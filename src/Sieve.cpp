@@ -81,15 +81,14 @@ const WheelInit wheel_init[30] =
 
 namespace primecount {
 
-Sieve::Sieve(uint64_t start,
+Sieve::Sieve(uint64_t low,
              uint64_t segment_size, 
-             uint64_t wheel_size,
-             double alpha)
+             uint64_t wheel_size)
 {
-  assert(start % 30 == 0);
+  assert(low % 30 == 0);
   assert(segment_size % 240 == 0);
 
-  start_ = start;
+  start_ = low;
   segment_size = get_segment_size(segment_size);
 
   // sieve_size = segment_size / 30 as each byte corresponds
@@ -101,32 +100,28 @@ Sieve::Sieve(uint64_t start,
 
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
-  allocate_counters(alpha);
+  allocate_counters(low);
 }
 
 /// Each element of the counters array contains the current
 /// number of unsieved elements in the interval:
 /// [i * counters_dist, (i + 1) * counters_dist[.
 /// The average runtime complexity for counting the number of
-/// unsieved elements in the sieve array will be lowest if we
-/// allocate O(sqrt(segment_size) * log(alpha)) counters and
-/// each element of the counters array contains the number of
-/// unsieved elements in an interval of size
-/// O(sqrt(segment_size) / log(alpha)).
+/// unsieved elements in the sieve array will be lowest if
+/// each element of the counters array spans over an interval
+/// of size segment_low^(1/4). Ideally the size of the
+/// counters array should be adjusted dynamically whilst
+/// sieving.
 ///
-void Sieve::allocate_counters(double alpha)
+void Sieve::allocate_counters(uint64_t low)
 {
-  double size = (double) segment_size();
-  double sqrt_segment_size = std::sqrt(size);
-  double log_alpha = log(alpha);
-  log_alpha = max(log_alpha, 1.0);
-
-  counters_dist_ = (uint64_t) (sqrt_segment_size / log_alpha);
+  counters_dist_ = isqrt(isqrt(low));
   uint64_t byte_dist = counters_dist_ / 30;
+  // counters_dist should be >= log(x)
   byte_dist = max(byte_dist, 256);
   byte_dist = nearest_power_of_2(byte_dist);
 
-  // (counters_dist_ / 30) is now a power of 2
+  // (counters_dist / 30) is now a power of 2
   counters_dist_ = byte_dist * 30;
   counters_shift_ = ilog2(byte_dist);
   assert(byte_dist == 1ull << counters_shift_);
