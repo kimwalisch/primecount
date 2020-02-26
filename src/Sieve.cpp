@@ -106,12 +106,14 @@ Sieve::Sieve(uint64_t low,
 /// Each element of the counters array contains the current
 /// number of unsieved elements in the interval:
 /// [i * counters_dist, (i + 1) * counters_dist[.
-/// The average runtime complexity for counting the number of
-/// unsieved elements in the sieve array will be lowest if
-/// each element of the counters array spans over an interval
-/// of size segment_low^(1/4). Ideally the size of the
-/// counters array should be adjusted dynamically whilst
-/// sieving.
+/// Ideally each element of the counters array should
+/// represent an interval of size:
+/// min(sqrt(average leaf distance), sqrt(segment_size)).
+/// Also the counter distance should be adjusted whilst
+/// sieving e.g. after each sieved segment. The distance
+/// between consecutive leaves is very small (~ log(x)) at
+/// the beginning of the sieve algorithm but grows up to
+/// segment_size towards the end of the sieve.
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
