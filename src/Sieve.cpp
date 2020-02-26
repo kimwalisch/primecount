@@ -119,7 +119,7 @@ void Sieve::allocate_counters(uint64_t low)
   uint64_t byte_dist = counters_dist_ / 30;
   // counters_dist should be >= log(x)
   byte_dist = max(byte_dist, 256);
-  byte_dist = next_power_of_2(byte_dist);
+  byte_dist = nearest_power_of_2(byte_dist);
 
   // (counters_dist / 30) is now a power of 2
   counters_dist_ = byte_dist * 30;
