@@ -66,7 +66,6 @@ int64_t D(int64_t x,
     int64_t low1 = max(low, 1);
 
     sieve.pre_sieve(primes, k, low, high);
-    int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = k + 1;
 
     // For k + 1 <= b <= pi_sqrtz
@@ -85,9 +84,6 @@ int64_t D(int64_t x,
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
 
-      int64_t count = 0;
-      int64_t start = 0;
-
       for (int64_t m = max_m; m > min_m; m--)
       {
         // mu[m] != 0 && 
@@ -97,15 +93,13 @@ int64_t D(int64_t x,
         {
           int64_t xpm = x / (prime * factor.to_number(m));
           int64_t stop = xpm - low;
-          count += sieve.count(start, stop);
-          start = stop + 1;
-          int64_t phi_xpm = phi[b] + count;
+          int64_t phi_xpm = phi[b] + sieve.count(stop);
           sum -= factor.mu(m) * phi_xpm;
         }
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrtz < b <= pi_x_star
@@ -118,8 +112,6 @@ int64_t D(int64_t x,
       int64_t max_m = min3(x / (prime * low1), x / ipow(prime, 3), y);
       int64_t min_m = max3(x / (prime * high), z / prime, prime);
       int64_t l = pi[max_m];
-      int64_t start = 0;
-      int64_t count = 0;
 
       if (prime >= primes[l])
         goto next_segment;
@@ -128,14 +120,12 @@ int64_t D(int64_t x,
       {
         int64_t xpq = x / (prime * primes[l]);
         int64_t stop = xpq - low;
-        count += sieve.count(start, stop);
-        start = stop + 1;
-        int64_t phi_xpq = phi[b] + count;
+        int64_t phi_xpq = phi[b] + sieve.count(stop);
         sum += phi_xpq;
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     next_segment:;

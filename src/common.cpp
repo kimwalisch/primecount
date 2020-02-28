@@ -1,12 +1,9 @@
 ///
-/// @file  primecount.cpp
-///        This file contains pi(x) function definitions that redirect
-///        to the actual implementations e.g. pi(x) redirects to
-///        pi_gourdon_64(x) or pi_gourdon_128(x). This file also
-///        contains helper functions and global variables that are
-///        initialized with default settings.
+/// @file  common.cpp
+///        This file contains helper functions and global variables
+///        that are initialized with default settings.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,9 +11,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <calculator.hpp>
-#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 
@@ -28,10 +23,6 @@
 #include <string>
 #include <stdint.h>
 #include <utility>
-
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
 
 #ifdef ENABLE_MPI
 
@@ -71,14 +62,11 @@ using namespace std;
 
 namespace {
 
-#ifdef _OPENMP
-  int threads_ = 0;
-#endif
-
-// Below 10^5 Meissel is faster than Gourdon's algorithm
-const int meissel_threshold_ = 100000;
-
 int status_precision_ = -1;
+
+// Tuning factor used in the Lagarias-Miller-Odlyzko
+// and Deleglise-Rivat algorithms.
+double alpha_ = -1;
 
 // Tuning factor used in Xavier Gourdon's algorithm
 double alpha_y_ = -1;
@@ -101,100 +89,60 @@ double truncate3(double n)
 
 namespace primecount {
 
-int64_t pi(int64_t x)
+string to_str(maxint_t x)
 {
-  return pi(x, get_num_threads());
-}
-
-int64_t pi(int64_t x, int threads)
-{
-  if (x <= meissel_threshold_)
-    return pi_meissel(x, threads);
-  else
-    return pi_gourdon_64(x, threads);
-}
-
-#ifdef HAVE_INT128_T
-
-int128_t pi(int128_t x)
-{
-  return pi(x, get_num_threads());
-}
-
-int128_t pi(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi((int64_t) x, threads);
-  else
-    return pi_gourdon_128(x, threads);
-}
-
-#endif
-
-string pi(const string& x)
-{
-  return pi(x, get_num_threads());
-}
-
-string pi(const string& x, int threads)
-{
-  maxint_t pi_x = pi(to_maxint(x), threads);
   ostringstream oss;
-  oss << pi_x;
+  oss << x;
   return oss.str();
 }
 
-int64_t pi_gourdon(int64_t x, int threads)
+maxint_t to_maxint(const string& expr)
 {
-  return pi_gourdon_64(x, threads);
+  // check n <= max
+  if (expr.find_first_not_of("0123456789") == string::npos)
+  {
+    // remove leading zeros
+    size_t pos = expr.find_first_not_of("0");
+    string n = expr.substr(pos);
+    maxint_t limit = prt::numeric_limits<maxint_t>::max();
+    string max_n = to_str(limit);
+
+    if (n.size() > max_n.size() ||
+      (n.size() == max_n.size() && n > max_n))
+    {
+      string msg = "number too large: " + n;
+      throw primecount_error(msg);
+    }
+  }
+
+  return calculator::eval<maxint_t>(expr);
 }
 
-#ifdef HAVE_INT128_T
-
-int128_t pi_gourdon(int128_t x, int threads)
+int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
-  // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
-    return pi_gourdon_64((int64_t) x, threads);
-  else
-    return pi_gourdon_128(x, threads);
+  thread_threshold = max((int64_t) 1, thread_threshold);
+  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
+  threads = max(1, threads);
+  return threads;
 }
 
-#endif
-
-int64_t nth_prime(int64_t n)
+int get_status_precision(maxint_t x)
 {
-  return nth_prime(n, get_num_threads());
+  // use default precision when no command-line precision provided
+  if (status_precision_ < 0)
+  {
+    if ((double) x >= 1e23)
+      return 2;
+    if ((double) x >= 1e21)
+      return 1;
+  }
+
+  return max(status_precision_, 0);
 }
 
-int64_t phi(int64_t x, int64_t a)
+void set_status_precision(int precision)
 {
-  return phi(x, a, get_num_threads());
-}
-
-/// Returns the largest x supported by pi(x).
-/// The S2_hard, P2, B and D functions are limited by:
-/// x / y <= 2^62, with y = x^(1/3) * alpha_y
-/// Hence x^(2/3) / alpha_y <= 2^62
-/// x <= (2^62 * alpha_y)^(3/2)
-///
-maxint_t get_max_x(double alpha_y)
-{
-#ifdef HAVE_INT128_T
-  double max_x = pow(pow(2.0, 62.0) * alpha_y, 3.0 / 2.0);
-  return (int128_t) max_x; 
-#else
-  unused_param(alpha_y); 
-  return numeric_limits<int64_t>::max();
-#endif
-}
-
-std::string get_max_x()
-{
-  ostringstream oss;
-  oss << get_max_x(1.0);
-  return oss.str();
+  status_precision_ = in_between(0, precision, 5);
 }
 
 /// Get the time in seconds
@@ -206,12 +154,14 @@ double get_time()
   return (double) micro.count() / 1e6;
 }
 
-int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
+void set_alpha(double alpha)
 {
-  thread_threshold = max((int64_t) 1, thread_threshold);
-  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
-  threads = max(1, threads);
-  return threads;
+  // If alpha < 1 then we compute a good
+  // alpha tuning factor at runtime.
+  if (alpha < 1.0)
+    alpha_ = -1;
+  else
+    alpha_ = truncate3(alpha);
 }
 
 void set_alpha_y(double alpha_y)
@@ -283,11 +233,80 @@ double get_alpha_z(int64_t y, int64_t z)
   return alpha_z;
 }
 
+/// Get the Lagarias-Miller-Odlyzko alpha tuning factor.
+/// alpha = a log(x)^2 + b log(x) + c
+/// a, b and c have been determined empirically.
+/// @see doc/alpha-factor-lmo.pdf
+///
+double get_alpha_lmo(maxint_t x)
+{
+  double alpha = alpha_;
+  double x16 = (double) iroot<6>(x);
+
+  // use default alpha if no command-line alpha provided
+  if (alpha < 1)
+  {
+    double a = 0.001103;
+    double b = -0.00896211;
+    double c = 1.00404;
+    double logx = log((double) x);
+    alpha = a * pow(logx, 2) + b * logx + c;
+  }
+
+  // Preserve 3 digits after decimal point
+  alpha = in_between(1, alpha, x16);
+  alpha = truncate3(alpha);
+
+  return in_between(1, alpha, x16);
+}
+
+/// Get the Deleglise-Rivat alpha tuning factor.
+/// alpha = a log(x)^3 + b log(x)^2 + c log(x) + d
+/// a, b, c and d have been determined empirically.
+/// @see doc/alpha-factor-dr.pdf
+///
+double get_alpha_deleglise_rivat(maxint_t x)
+{
+  double alpha = alpha_;
+  double x16 = (double) iroot<6>(x);
+
+  // Use default alpha
+  if (alpha < 1)
+  {
+    // For x <= 10^9 our default formula does not
+    // generate good alpha values. Hence we use
+    // another formula optimized for small values.
+    if (x <= 1e9)
+    {
+      double a = 0.078173;
+      double b = 1;
+      double logx = log((double) x);
+      alpha = a * logx + b;
+    }
+    else
+    {
+      double a = 0.00148918;
+      double b = -0.0691909;
+      double c = 1.00165;
+      double d = 0.372253;
+      double logx = log((double) x);
+      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    }
+  }
+
+  // Preserve 3 digits after decimal point
+  alpha = in_between(1, alpha, x16);
+  alpha = truncate3(alpha);
+
+  return in_between(1, alpha, x16);
+}
+
 /// In Xavier Gourdon's algorithm there are 2 alpha tuning
 /// factors. The alpha_y tuning factor should grow like
 /// O(log(x)^3) and the alpha_z tuning factor is a small
 /// constant. Both alpha_y and alpha_z should be determined
 /// experimentally by running benchmarks.
+/// @see doc/alpha-factor-gourdon.pdf
 ///
 /// y = x^(1/3) * alpha_y, with alpha_y >= 1.
 /// z = y * alpha_z, with alpha_z >= 1.
@@ -295,13 +314,15 @@ double get_alpha_z(int64_t y, int64_t z)
 ///
 std::pair<double, double> get_alpha_gourdon(maxint_t x)
 {
-  // alpha_yz = alpha_y * alpha_z
-  double alpha_yz;
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
+  double alpha_yz;
 
-  if (x < 1e10)
+  // For x <= 10^11 our default formula does not
+  // generate good alpha values. Hence we use
+  // another formula optimized for small values.
+  if (x <= 1e11)
   {
     double a = 0.078173;
     double b = 1;
@@ -310,10 +331,10 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   }
   else
   {
-    double a = 0.00223533;
-    double b = -0.144108;
-    double c = 3.07786;
-    double d = -18.8831;
+    double a = 0.00464541;
+    double b = -0.41743;
+    double c = 13.6067;
+    double d = -148.127;
     double logx = log((double) x);
     alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
   }
@@ -325,11 +346,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // decreased because alpha_y = alpha_yz / alpha_z. When alpha_z
     // is increased this increases the runtime of the B formula but at
     // the same time reduces the runtime of the C and D formulas.
-    // Since the B formula scales extremely well even up to very large
-    // input values e.g. x > 10^24 and the D formula scales poorly when
-    // x > 10^24 it makes sense to use a small alpha_z when x <= 10^24
-    // and a large alpha_z when x > 10^24.
-    alpha_z = (x <= 1e24) ? 1.3 : 2.0;
+    // Increasing alpha_z also slightly reduces memory usage.
+    alpha_z = 1.5;
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
@@ -385,56 +403,6 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
   x_star = max(x_star, (int64_t) 1);
 
   return x_star;
-}
-
-void set_num_threads(int threads)
-{
-#ifdef _OPENMP
-  threads_ = in_between(1, threads, omp_get_max_threads());
-#endif
-  primesieve::set_num_threads(threads);
-}
-
-int get_num_threads()
-{
-#ifdef _OPENMP
-  if (threads_)
-    return threads_;
-  else
-    return max(1, omp_get_max_threads());
-#else
-  return 1;
-#endif
-}
-
-void set_status_precision(int precision)
-{
-  status_precision_ = in_between(0, precision, 5);
-}
-
-int get_status_precision(maxint_t x)
-{
-  // use default precision when no command-line precision provided
-  if (status_precision_ < 0)
-  {
-    if ((double) x >= 1e23)
-      return 2;
-    if ((double) x >= 1e21)
-      return 1;
-  }
-
-  return max(status_precision_, 0);
-}
-
-maxint_t to_maxint(const string& expr)
-{
-  maxint_t n = calculator::eval<maxint_t>(expr);
-  return n;
-}
-
-string primecount_version()
-{
-  return PRIMECOUNT_VERSION;
 }
 
 } // namespace

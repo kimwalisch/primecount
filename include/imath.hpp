@@ -52,6 +52,17 @@ inline T next_power_of_2(T x)
 }
 
 template <typename T>
+inline T nearest_power_of_2(T x)
+{
+  if (x == 0)
+    return 1;
+
+  double log2 = std::log2((double) x);
+  log2 = std::round(log2);
+  return ((T) 1) << (T) log2;
+}
+
+template <typename T>
 inline T prev_power_of_2(T x)
 {
   for (T i = 1; i < number_of_bits(x); i += i)
@@ -64,6 +75,25 @@ template <typename T>
 inline int ilog(T x)
 {
   return (int) std::log((double) x);
+}
+
+template <typename T>
+inline T ilog2(T x)
+{
+  T log2 = 0;
+  T bits = number_of_bits(x);
+
+  for (T i = bits / 2; i > 0; i /= 2)
+  {
+    T one = 1;
+    if (x >= (one << i))
+    {
+      x >>= i;
+      log2 += i;
+    }
+  }
+
+  return log2;
 }
 
 template <typename T>

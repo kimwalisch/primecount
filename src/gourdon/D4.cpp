@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -88,7 +88,6 @@ T D_thread(T x,
     // For i < min_b there are no special leaves:
     // low <= x / (primes[i] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
-    int64_t count_low_high = sieve.count((high - 1) - low);
     int64_t b = min_b;
 
     // For k + 1 <= b <= pi_sqrtz
@@ -110,9 +109,6 @@ T D_thread(T x,
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
 
-      int64_t count = 0;
-      int64_t start = 0;
-
       for (int64_t m = max_m; m > min_m; m--)
       {
         // mu[m] != 0 && 
@@ -122,16 +118,14 @@ T D_thread(T x,
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t stop = xpm - low;
-          count += sieve.count(start, stop, low, high, count, count_low_high);
-          start = stop + 1;
-          int64_t phi_xpm = phi[b] + count;
+          int64_t phi_xpm = phi[b] + sieve.count(stop);
           int64_t mu_m = factor.mu(m);
           sum -= mu_m * phi_xpm;
         }
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     // For pi_sqrtz < b <= pi_x_star
@@ -147,8 +141,6 @@ T D_thread(T x,
       int64_t min_m = max(xp_div_high, prime);
       int64_t max_m = min(x / ipow<T>(prime, 3), xp_div_low);
       int64_t l = pi[max_m];
-      int64_t count = 0;
-      int64_t start = 0;
 
       if (prime >= primes[l])
         goto next_segment;
@@ -157,14 +149,12 @@ T D_thread(T x,
       {
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
-        count += sieve.count(start, stop, low, high, count, count_low_high);
-        start = stop + 1;
-        int64_t phi_xpq = phi[b] + count;
+        int64_t phi_xpq = phi[b] + sieve.count(stop);
         sum += phi_xpq;
       }
 
-      phi[b] += count_low_high;
-      count_low_high -= sieve.cross_off_count(prime, b);
+      phi[b] += sieve.get_total_count();
+      sieve.cross_off_count(prime, b);
     }
 
     next_segment:;

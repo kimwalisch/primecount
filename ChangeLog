@@ -1,3 +1,27 @@
+2020-02-17 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 5.4 work in progress.
+
+  This version fixes a scaling issue that has been present in
+  primecount since the first version. The computation of the
+  hard special leaves (S2_hard & D formulas) used a flawed
+  optimization that deteriorated the runtime complexity of the
+  algorithm. The new version should run much faster for record
+  computations >= 10^23.
+
+  * primecount.h: New C API. primecount now has both a C API
+    (primecount.h) and a C++ API (primecount.hpp).
+  * app.cpp: Contains C++ API function implementations.
+  * app_c.cpp: Contains C API function implementations.
+  * Sieve.cpp: Implemented O(sqrt(sieve_size)) counting,
+    previously counting was O(sieve_size).
+  * D.cpp: Use improved Sieve::count() method.
+  * S2_hard.cpp: Use improved Sieve::count() method.
+  * pi_lmo_parallel.cpp: Use improved Sieve::count() method.
+  * common.cpp: Tune alpha factors.
+  * find_optimal_alpha_*.sh: New scripts that find optimal
+    alpha tuning factors using the Linux perf tool.
+
 2020-01-18 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.3 released.

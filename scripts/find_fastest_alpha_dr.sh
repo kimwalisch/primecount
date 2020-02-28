@@ -2,7 +2,7 @@
 
 # Find the fastest alpha tuning factors for primecount.
 # Usage:
-#   ./find_fastest_alpha.sh [--start=n] [--stop=n] [-t=threads]
+#   ./find_fastest_alpha_dr.sh [--start=n] [--stop=n] [-t=threads]
 # Description:
 #   This script calculates pi(10^n) for start <= n <= stop using different
 #   alpha tuning factors and prints out the fastest alphas. The fastest
@@ -12,30 +12,30 @@
 #   alpha tuning function for use in primecount's source code.
 
 # Execute in base directory
-if [ "$(basename $(pwd))" = "scripts" ]
+if [[ "$(basename $(pwd))" = "scripts" ]]
 then
     cd ..
 fi
 
 command -v ./primecount >/dev/null 2>/dev/null
-if [ $? -ne 0 ]
+if [[ $? -ne 0 ]]
 then
     echo "Error: no primecount binary in current directory."
     exit 1
 fi
 
 command -v bc >/dev/null 2>/dev/null
-if [ $? -ne 0 ]
+if [[ $? -ne 0 ]]
 then
     echo "Error: GNU bc is not installed."
     exit 1
 fi
 
 start=1
-stop=21
+stop=25
 seconds=0
 repeat=3
-threads=$(./primecount 1e18 --S2-trivial -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
+threads=$(./primecount 1e18 --Sigma -s | grep threads | cut -d'=' -f2 | cut -d' ' -f2)
 
 for i in "$@"
 do
@@ -55,7 +55,7 @@ do
         *)
         echo "Find the fastest alpha tuning factors for primecount."
         echo "Usage:"
-        echo "  ./find_fastest_alpha.sh [--start=n] [--stop=n] [-t=threads]"
+        echo "  ./find_fastest_alpha_dr.sh [--start=n] [--stop=n] [-t=threads]"
         echo "Description:"
         echo "  This script calculates pi(10^n) for start <= n <= stop using different"
         echo "  alpha tuning factors and prints out the fastest alphas. The fastest"
@@ -102,7 +102,7 @@ function calc
 # Given 2 numbers, returns the greatest number 
 function maximum
 {
-    if [ $(is_greater $1 $2) -eq 1 ]
+    if [[ $(is_greater $1 $2) -eq 1 ]]
     then
         echo $1
     else
@@ -113,7 +113,7 @@ function maximum
 # Given 2 numbers, returns the greatest number 
 function minimum
 {
-    if [ $(is_smaller $1 $2) -eq 1 ]
+    if [[ $(is_smaller $1 $2) -eq 1 ]]
     then
         echo $1
     else
@@ -132,7 +132,7 @@ function get_primecount_alpha
 function get_primecount_seconds
 {
     sleep 0.2
-    seconds=$(./primecount $1 --time | grep Seconds | cut -d':' -f2 | cut -d' ' -f2)
+    seconds=$(./primecount $1 -d --time | grep Seconds | cut -d':' -f2 | cut -d' ' -f2)
     echo $seconds
 }
 
@@ -140,83 +140,87 @@ function get_primecount_seconds
 for ((i = start; i <= stop; i++))
 do
     alpha=$(get_primecount_alpha "1e$i")
-    fastest_seconds=$(calc "10^9")
-    fastest_alpha="1.000"
+    fastest_seconds=10^30
+    fastest_alpha=$alpha
+    found_fastest=false
+    too_fast=false
+    iter_count=0
+    div_increment=2
 
-    # This loops tries to get close (< 25%) to the fastest alpha
-    for ((j = 0; j < repeat; j++))
+    echo ""
+    echo "PrimePi(10^$i)"
+    echo "==============================================================="
+
+    for div in 2 4 8 16 32 64;
     do
-        pivot=$(calc "$alpha / 2")
-        max_alpha=$(calc "$alpha + $pivot")
-        new_alpha=$(calc "$alpha - $pivot")
-        new_alpha=$(maximum 1.000 $new_alpha)
-        increment=$(calc "($max_alpha - $new_alpha) / 4")
-        increment=$(maximum 0.1 $increment)
+        copy_fastest_alpha=$fastest_alpha
 
-        while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
+        for ((j = 0; j < repeat; j++))
         do
-            seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
-
-            if [ $(is_smaller $seconds $fastest_seconds) -eq 1 ]
-            then
-                fastest_alpha=$new_alpha
-                fastest_seconds=$seconds
-            fi
-
-            # Reduce the number of long running primecount benchmarks
-            if [ $(is_greater $seconds 20) -eq 1 ]
-            then
-                repeat=1
-            elif [ $(is_greater $seconds 3) -eq 1 ]
-            then
-                repeat=2
-            fi
-
             # Benchmark runs too quickly for this small input
-            if [ $(is_equal $seconds 0) -eq 1 ]
+            if [[ "$too_fast" = "true" ]]
             then
                 break
             fi
 
-            new_alpha=$(calc "$new_alpha + $increment")
-        done
-    done
-
-    if [ $(is_greater $fastest_seconds 0) -eq 1 ]
-    then
-        # This loops tries to get very close (< 1.6%) to the fastest alpha
-        for ((j = 0; j < repeat; j++))
-        do
-            pivot=$(calc "$fastest_alpha / 8")
-            max_alpha=$(calc "$fastest_alpha + $pivot")
-            new_alpha=$(calc "$fastest_alpha - $pivot")
+            pivot=$(calc "$copy_fastest_alpha / $div")
+            max_alpha=$(calc "$copy_fastest_alpha + $pivot")
+            new_alpha=$(calc "$copy_fastest_alpha - $pivot")
             new_alpha=$(maximum 1.000 $new_alpha)
-            increment=$(calc "($max_alpha - $new_alpha) / 8")
-            increment=$(maximum 0.1 $increment)
+            increment=$(calc "($max_alpha - $new_alpha) / $div_increment")
+            increment=$(maximum 0.01 $increment)
 
-            while [ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]
+            while [[ $(is_smaller_equal $new_alpha $max_alpha) -eq 1 ]]
             do
-                seconds=$(get_primecount_seconds "1e$i -t$threads -a$new_alpha")
+                seconds=$(get_primecount_seconds "1e$i -t$threads --alpha=$new_alpha")
+                echo "1e$i --threads=$threads --alpha=$new_alpha, seconds: $seconds"
+                iter_count=$(($iter_count + 1))
 
-                if [ $(is_smaller $seconds $fastest_seconds) -eq 1 ]
+                if [[ $iter_count -eq 2 ]]
                 then
+                    old_seconds=$seconds
+                fi
+
+                # Benchmark runs too quickly for this small input
+                if [[ $(is_equal $seconds 0) -eq 1 ]]
+                then
+                    too_fast=true
+                    break
+                fi
+
+                if [[ $(is_smaller $seconds $fastest_seconds) -eq 1 ]]
+                then
+                    found_fastest=true
                     fastest_alpha=$new_alpha
                     fastest_seconds=$seconds
+                fi
+
+                # Reduce the number of long running primecount benchmarks
+                if [[ $(is_greater $repeat 1) -eq 1 ]]
+                then
+                    if [[ $(is_greater $seconds 20) -eq 1 ]]
+                    then
+                        repeat=1
+                    elif [[ $(is_greater $seconds 3) -eq 1 ]]
+                    then
+                        repeat=2
+                    fi
                 fi
 
                 new_alpha=$(calc "$new_alpha + $increment")
             done
         done
-    fi
 
-    # When fastest_alpha=1.000 the benchmark ran too quickly to get
-    # any meaningful result, so we report undef
-    if [ $(is_equal $fastest_alpha 1) -eq 1 ] || \
-       [ $(is_equal $fastest_seconds 0) -eq 1 ]
+        div_increment=1
+    done
+
+    if [[ "$found_fastest" != "true" ]] || \
+       [[ "$too_fast" = "true" ]]
     then
         fastest_alpha="undef"
+        fastest_seconds="undef"
+        old_seconds="undef"
     fi
 
-    # Print fastest alpha found for pi(10^$i)
-    printf '%-11s %-12s %-18s %-22s %-20s\n' "pi(10^$i)" "threads=$threads" "old_alpha=$alpha" "fastest_alpha=$fastest_alpha" "seconds=$fastest_seconds"
+    echo "Result: fastest_alpha=$fastest_alpha, seconds=$fastest_seconds, old_alpha=$alpha, old_seconds=$old_seconds"
 done
