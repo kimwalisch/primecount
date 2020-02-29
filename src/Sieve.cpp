@@ -37,7 +37,7 @@
 
 #define count_and_unset_bit(bit_index, i) \
   is_bit = (sieve[i] >> bit_index) & 1; \
-  count_removed += is_bit; \
+  total_count -= is_bit; \
   counters[(i) >> counters_shift] -= is_bit; \
   sieve[i] &= ~(1 << bit_index);
 
@@ -588,7 +588,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   prime /= 30;
 
   uint64_t is_bit = 0;
-  uint64_t count_removed = 0;
+  uint64_t total_count = total_count_;
   uint64_t m = wheel.multiple;
   uint64_t sieve_size = sieve_size_;
   uint64_t counters_shift = counters_shift_;
@@ -872,7 +872,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   // update for the next segment
   wheel.multiple = (uint32_t) (m - sieve_size);
-  total_count_ -= count_removed;
+  total_count_ = total_count;
   reset_counters();
 }
 
