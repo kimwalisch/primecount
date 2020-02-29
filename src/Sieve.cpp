@@ -171,10 +171,10 @@ void Sieve::reset_sieve(uint64_t low, uint64_t high)
 
 void Sieve::reset_counters()
 {
+  prev_stop_ = 0;
+  count_ = 0;
   counters_i_ = 0;
   counters_count_ = 0;
-  counters_base_count_ = 0;
-  counters_prev_stop_ = 0;
   counters_dist_sum_ = counters_dist_;
 }
 
@@ -201,11 +201,11 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
-  uint64_t start = counters_prev_stop_ + 1;
-  counters_prev_stop_ = stop;
+  uint64_t start = prev_stop_ + 1;
+  prev_stop_ = stop;
 
   if (start > stop)
-    return counters_count_;
+    return count_;
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
@@ -218,16 +218,16 @@ uint64_t Sieve::count(uint64_t stop)
   {
     start = counters_dist_sum_;
     counters_dist_sum_ += counters_dist_;
-    counters_base_count_ += counters_[counters_i_++];
-    counters_count_ = counters_base_count_;
+    counters_count_ += counters_[counters_i_++];
+    count_ = counters_count_;
   }
 
   // Here the remaining distance is relatively small i.e.
   // (stop - start) <= counters_dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  counters_count_ += count(start, stop);
-  return counters_count_;
+  count_ += count(start, stop);
+  return count_;
 }
 
 /// Count 1 bits inside [start, stop]
