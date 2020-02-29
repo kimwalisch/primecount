@@ -88,8 +88,8 @@ private:
   uint64_t counters_i_ = 0;
   uint64_t counters_count_ = 0;
   uint64_t counters_dist_ = 0;
-  uint64_t counters_dist_sum_ = 0;
-  uint64_t counters_shift_ = 0;
+  uint64_t counters_dist_log2_ = 0;
+  uint64_t counters_stop_ = 0;
   uint8_t* sieve_ = nullptr;
   std::unique_ptr<uint8_t[]> deleter_;
   std::vector<uint64_t> counters_;
