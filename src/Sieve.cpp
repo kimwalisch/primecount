@@ -37,8 +37,8 @@
 
 #define count_and_unset_bit(bit_index, i) \
   is_bit = (sieve[i] >> bit_index) & 1; \
-  count_removed += is_bit; \
-  counters[(i) >> counters_shift] -= is_bit; \
+  total_count -= is_bit; \
+  counters[(i) >> counters_dist_log2] -= is_bit; \
   sieve[i] &= ~(1 << bit_index);
 
 using namespace std;
@@ -108,25 +108,24 @@ Sieve::Sieve(uint64_t low,
 /// [i * counters_dist, (i + 1) * counters_dist[.
 /// Ideally each element of the counters array should
 /// represent an interval of size:
-/// min(sqrt(average leaf distance), sqrt(segment_size)).
+/// min(sqrt(average_leaf_dist), sqrt(segment_size)).
 /// Also the counter distance should be adjusted whilst
 /// sieving e.g. after each sieved segment. The distance
-/// between consecutive leaves is very small (~ log(x)) at
-/// the beginning of the sieve algorithm but grows up to
-/// segment_size towards the end of the sieve.
+/// between consecutive leaves is very small (~ log(x))
+/// at the beginning of the sieve algorithm but grows up
+/// to segment_size towards the end of the sieve.
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
-  counters_dist_ = isqrt(isqrt(low));
+  uint64_t average_leaf_dist = isqrt(low);
+  counters_dist_ = isqrt(average_leaf_dist);
+
+  // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
-  // counters_dist should be >= log(x)
   byte_dist = max(byte_dist, 256);
   byte_dist = nearest_power_of_2(byte_dist);
-
-  // (counters_dist / 30) is now a power of 2
   counters_dist_ = byte_dist * 30;
-  counters_shift_ = ilog2(byte_dist);
-  assert(byte_dist == 1ull << counters_shift_);
+  counters_dist_log2_ = ilog2(byte_dist);
 
   uint64_t counters_size = ceil_div(sieve_size_, byte_dist);
   counters_.resize(counters_size);
@@ -171,11 +170,11 @@ void Sieve::reset_sieve(uint64_t low, uint64_t high)
 
 void Sieve::reset_counters()
 {
+  prev_stop_ = 0;
+  count_ = 0;
   counters_i_ = 0;
   counters_count_ = 0;
-  counters_base_count_ = 0;
-  counters_prev_stop_ = 0;
-  counters_dist_sum_ = counters_dist_;
+  counters_stop_ = counters_dist_;
 }
 
 void Sieve::init_counters(uint64_t low, uint64_t high)
@@ -193,7 +192,7 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
     uint64_t cnt = count(start, stop);
     uint64_t byte_index = i / 30;
 
-    counters_[byte_index >> counters_shift_] = cnt;
+    counters_[byte_index >> counters_dist_log2_] = cnt;
     total_count_ += cnt;
   }
 }
@@ -201,11 +200,11 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
-  uint64_t start = counters_prev_stop_ + 1;
-  counters_prev_stop_ = stop;
+  uint64_t start = prev_stop_ + 1;
+  prev_stop_ = stop;
 
   if (start > stop)
-    return counters_count_;
+    return count_;
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
@@ -214,20 +213,20 @@ uint64_t Sieve::count(uint64_t stop)
   // of the counters array contains the number of
   // unsieved elements in the interval:
   // [i * counters_dist, (i + 1) * counters_dist[.
-  while (counters_dist_sum_ <= stop)
+  while (counters_stop_ <= stop)
   {
-    start = counters_dist_sum_;
-    counters_dist_sum_ += counters_dist_;
-    counters_base_count_ += counters_[counters_i_++];
-    counters_count_ = counters_base_count_;
+    start = counters_stop_;
+    counters_stop_ += counters_dist_;
+    counters_count_ += counters_[counters_i_++];
+    count_ = counters_count_;
   }
 
   // Here the remaining distance is relatively small i.e.
   // (stop - start) <= counters_dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  counters_count_ += count(start, stop);
-  return counters_count_;
+  count_ += count(start, stop);
+  return count_;
 }
 
 /// Count 1 bits inside [start, stop]
@@ -588,10 +587,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   prime /= 30;
 
   uint64_t is_bit = 0;
-  uint64_t count_removed = 0;
+  uint64_t total_count = total_count_;
   uint64_t m = wheel.multiple;
   uint64_t sieve_size = sieve_size_;
-  uint64_t counters_shift = counters_shift_;
+  uint64_t counters_dist_log2 = counters_dist_log2_;
   uint64_t* counters = counters_.data();
   uint8_t* sieve = sieve_;
 
@@ -872,7 +871,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   // update for the next segment
   wheel.multiple = (uint32_t) (m - sieve_size);
-  total_count_ -= count_removed;
+  total_count_ = total_count;
   reset_counters();
 }
 
