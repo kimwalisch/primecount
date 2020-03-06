@@ -3,7 +3,7 @@
 /// @brief The MpiLoadBalancer evenly distributes the computation
 ///        of the hard special leaves onto cluster nodes.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -28,7 +28,7 @@ public:
   void get_work(MpiMsg* msg);
 
 private:
-  void update_segments(Runtime& runtime);
+  void update_segments(ThreadSettings& thread);
   double remaining_secs() const;
 
   int64_t low_;

@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,7 +54,7 @@ template <typename Primes>
 class PhiCache
 {
 public:
-  PhiCache(Primes& primes, PiTable& pi)
+  PhiCache(const Primes& primes, const PiTable& pi)
     : primes_(primes),
       pi_(pi)
   { }
@@ -111,8 +111,8 @@ public:
 private:
   using T = uint16_t;
   array<vector<T>, MAX_A> cache_;
-  Primes& primes_;
-  PiTable& pi_;
+  const Primes& primes_;
+  const PiTable& pi_;
 
   int64_t prime(int64_t i) const
   {
@@ -151,7 +151,10 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-vector<int64_t> generate_phi(int64_t x, int64_t a, Primes& primes, PiTable& pi)
+vector<int64_t> generate_phi(int64_t x,
+                             int64_t a,
+                             const Primes& primes,
+                             const PiTable& pi)
 {
   int64_t size = a + 1;
 

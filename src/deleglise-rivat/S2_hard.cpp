@@ -64,15 +64,16 @@ T S2_hard_thread(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 int64_t low,
-                 int64_t segments,
-                 int64_t segment_size,
-                 FactorTable& factor,
-                 PiTable& pi,
-                 Primes& primes,
-                 Runtime& runtime)
+                 ThreadSettings& thread,
+                 const FactorTable& factor,
+                 const PiTable& pi,
+                 const Primes& primes)
 {
-  T s2_hard = 0;
+  T sum = 0;
+
+  int64_t low = thread.low;
+  int64_t segments = thread.segments;
+  int64_t segment_size = thread.segment_size;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z);
@@ -83,10 +84,10 @@ T S2_hard_thread(T x,
   if (min_b > max_b)
     return 0;
 
-  runtime.init_start();
+  thread.start_init_time();
   Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
-  runtime.init_stop();
+  thread.stop_init_time();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -125,7 +126,7 @@ T S2_hard_thread(T x,
           int64_t stop = xpm - low;
           int64_t phi_xpm = phi[b] + sieve.count(stop);
           int64_t mu_m = factor.mu(m);
-          s2_hard -= mu_m * phi_xpm;
+          sum -= mu_m * phi_xpm;
         }
       }
 
@@ -154,7 +155,7 @@ T S2_hard_thread(T x,
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
         int64_t phi_xpq = phi[b] + sieve.count(stop);
-        s2_hard += phi_xpq;
+        sum += phi_xpq;
       }
 
       phi[b] += sieve.get_total_count();
@@ -164,7 +165,7 @@ T S2_hard_thread(T x,
     next_segment:;
   }
 
-  return s2_hard;
+  return sum;
 }
 
 /// Calculate the contribution of the hard special leaves.
@@ -191,8 +192,8 @@ T S2_hard_OpenMP(T x,
                  int64_t z,
                  int64_t c,
                  T s2_hard_approx,
-                 Primes& primes,
-                 FactorTable& factor,
+                 const Primes& primes,
+                 const FactorTable& factor,
                  int threads)
 {
   threads = ideal_num_threads(threads, z);
@@ -204,26 +205,24 @@ T S2_hard_OpenMP(T x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low = 0;
-    int64_t segments = 0;
-    int64_t segment_size = 0;
-    T s2_hard = 0;
-    Runtime runtime;
+    ThreadSettings thread;
 
-    while (loadBalancer.get_work(&low, &segments, &segment_size, s2_hard, runtime))
+    while (loadBalancer.get_work(thread))
     {
-      runtime.start();
       // Unsigned integer division is usually slightly
       // faster than signed integer division
       using UT = typename make_unsigned<T>::type;
-      s2_hard = S2_hard_thread((UT) x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
-      runtime.stop();
+
+      thread.start_time();
+      UT sum = S2_hard_thread((UT) x, y, z, c, thread, factor, pi, primes);
+      thread.sum = (T) sum;
+      thread.stop_time();
     }
   }
 
-  T s2_hard = (T) loadBalancer.get_sum();
+  T sum = (T) loadBalancer.get_sum();
 
-  return s2_hard;
+  return sum;
 }
 
 } // namespace
@@ -251,10 +250,10 @@ int64_t S2_hard(int64_t x,
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
   auto primes = generate_primes<int32_t>(max_prime);
-  int64_t s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
+  int64_t sum = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
 
-  print("S2_hard", s2_hard, time);
-  return s2_hard;
+  print("S2_hard", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -277,7 +276,7 @@ int128_t S2_hard(int128_t x,
   print_vars(x, y, c, threads);
 
   double time = get_time();
-  int128_t s2_hard;
+  int128_t sum;
 
   // uses less memory
   if (y <= FactorTable<uint16_t>::max())
@@ -285,18 +284,18 @@ int128_t S2_hard(int128_t x,
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<uint32_t>(max_prime);
-    s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
+    sum = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
     auto primes = generate_primes<int64_t>(max_prime);
-    s2_hard = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
+    sum = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads);
   }
 
-  print("S2_hard", s2_hard, time);
-  return s2_hard;
+  print("S2_hard", sum, time);
+  return sum;
 }
 
 #endif

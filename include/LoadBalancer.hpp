@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancer.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,28 +18,31 @@
 
 namespace primecount {
 
-struct Runtime
+struct ThreadSettings
 {
-  Runtime() { reset(); }
-  void reset() { init = 0; secs = 0; }
-  void start() { reset(); secs = get_time(); }
-  void stop() { secs = get_time() - secs; }
-  void init_start() { init = get_time(); }
-  void init_stop() { init = get_time() - init; }
-  double init;
-  double secs;
+  int64_t low = 0;
+  int64_t segments = 0;
+  int64_t segment_size = 0;
+  maxint_t sum = 0;
+  double init_secs = 0;
+  double secs = 0;
+
+  void start_time() { init_secs = 0; secs = get_time(); }
+  void stop_time() { secs = get_time() - secs; }
+  void start_init_time() { init_secs = get_time(); }
+  void stop_init_time() { init_secs = get_time() - init_secs; }
 };
 
 class LoadBalancer
 {
 public:
   LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
-  bool get_work(int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t sum, Runtime& runtime);
+  bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
 private:
-  void update(int64_t* low, int64_t* segments, Runtime& runtime);
-  void update_segments(Runtime& runtime);
+  void update(ThreadSettings& thread);
+  void update_segments(ThreadSettings& thread);
   double remaining_secs() const;
 
   int64_t low_;

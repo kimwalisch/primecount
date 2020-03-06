@@ -19,7 +19,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -95,10 +95,10 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
         segment_size_ = min(segment_size_ * 2, max_size_);
       else
       {
-        Runtime runtime;
-        runtime.init = msg->init_seconds();
-        runtime.secs = msg->seconds();
-        update_segments(runtime);
+        ThreadSettings thread;
+        thread.init_secs = msg->init_seconds();
+        thread.secs = msg->seconds();
+        update_segments(thread);
       }
     }
   }
@@ -124,7 +124,7 @@ double MpiLoadBalancer::remaining_secs() const
 /// threads run only for a short amount of time in order to
 /// ensure all threads finish nearly at the same time.
 ///
-void MpiLoadBalancer::update_segments(Runtime& runtime)
+void MpiLoadBalancer::update_segments(ThreadSettings& thread)
 {
   double rem = remaining_secs();
   double threshold = rem / 4;
@@ -132,20 +132,20 @@ void MpiLoadBalancer::update_segments(Runtime& runtime)
 
   // Each thread should run at least 10x
   // longer than its initialization time
-  threshold = max(threshold, runtime.init * 10);
+  threshold = max(threshold, thread.init_secs * 10);
   threshold = max(threshold, min_secs);
 
   // divider must not be 0
-  double divider = max(runtime.secs, min_secs / 10);
+  double divider = max(thread.secs, min_secs / 10);
   double factor = threshold / divider;
 
   // Reduce the thread runtime if it is much
   // larger than its initialization time
-  if (runtime.secs > min_secs &&
-      runtime.secs > runtime.init * 1000)
+  if (thread.secs > min_secs &&
+      thread.secs > thread.init_secs * 1000)
   {
     double old = factor;
-    factor = (runtime.init * 1000) / runtime.secs;
+    factor = (thread.init_secs * 1000) / thread.secs;
     factor = min(factor, old);
   }
 

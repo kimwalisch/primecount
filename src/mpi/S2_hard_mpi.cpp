@@ -66,15 +66,16 @@ T S2_hard_thread(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 int64_t low,
-                 int64_t segments,
-                 int64_t segment_size,
-                 FactorTable& factor,
-                 PiTable& pi,
-                 Primes& primes,
-                 Runtime& runtime)
+                 ThreadSettings& thread,
+                 const FactorTable& factor,
+                 const PiTable& pi,
+                 const Primes& primes)
 {
-  T s2_hard = 0;
+  T sum = 0;
+
+  int64_t low = thread.low;
+  int64_t segments = thread.segments;
+  int64_t segment_size = thread.segment_size;
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z);
@@ -85,10 +86,10 @@ T S2_hard_thread(T x,
   if (min_b > max_b)
     return 0;
 
-  runtime.init_start();
+  thread.start_init_time();
   Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
-  runtime.init_stop();
+  thread.stop_init_time();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -126,7 +127,7 @@ T S2_hard_thread(T x,
           int64_t stop = xpm - low;
           int64_t phi_xpm = phi[b] + sieve.count(stop);
           int64_t mu_m = factor.mu(m);
-          s2_hard -= mu_m * phi_xpm;
+          sum -= mu_m * phi_xpm;
         }
       }
 
@@ -154,7 +155,7 @@ T S2_hard_thread(T x,
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
         int64_t phi_xpq = phi[b] + sieve.count(stop);
-        s2_hard += phi_xpq;
+        sum += phi_xpq;
       }
 
       phi[b] += sieve.get_total_count();
@@ -164,7 +165,7 @@ T S2_hard_thread(T x,
     next_segment:;
   }
 
-  return s2_hard;
+  return sum;
 }
 
 /// S2_hard MPI slave process.
@@ -176,8 +177,8 @@ void S2_hard_slave(T x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
-                   Primes& primes,
-                   FactorTable& factor,
+                   const Primes& primes,
+                   const FactorTable& factor,
                    int threads)
 {
   threads = ideal_num_threads(threads, z);
@@ -192,36 +193,34 @@ void S2_hard_slave(T x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    T s2_hard = 0;
-    int64_t low = 0;
-    int64_t segments = 0;
-    int64_t segment_size = 0;
-    Runtime runtime;
+    ThreadSettings thread;
 
     while (true)
     {
       #pragma omp critical (mpi_sync)
       {
         // send result to master process
-        msg.set(proc_id, i, low, segments, segment_size, s2_hard, runtime.init, runtime.secs);
+        msg.set(proc_id, i, thread.low, thread.segments, thread.segment_size, thread.sum, thread.init_secs, thread.secs);
         msg.send(master_proc_id);
 
         // receive new work todo
         msg.recv(proc_id);
-        low = msg.low();
-        segments = msg.segments();
-        segment_size = msg.segment_size();
+        thread.low = msg.low();
+        thread.segments = msg.segments();
+        thread.segment_size = msg.segment_size();
       }
 
-      if (low >= z)
+      if (thread.low >= z)
         break;
 
-      runtime.start();
       // Unsigned integer division is usually slightly
       // faster than signed integer division
       using UT = typename make_unsigned<T>::type;
-      s2_hard = S2_hard_thread((UT) x, y, z, c, low, segments, segment_size, factor, pi, primes, runtime);
-      runtime.stop();
+
+      thread.start_time();
+      UT sum = S2_hard_thread((UT) x, y, z, c, thread, factor, pi, primes);
+      thread.sum = (T) sum;
+      thread.stop_time();
     }
   }
 
@@ -237,7 +236,7 @@ T S2_hard_mpi_master(T x,
                      int64_t z,
                      T s2_hard_approx)
 {
-  T s2_hard = 0;
+  T sum = 0;
   int slaves = mpi_num_procs() - 1;
 
   MpiMsg msg;
@@ -253,7 +252,7 @@ T S2_hard_mpi_master(T x,
       slaves--;
     else
     {
-      s2_hard += msg.s2_hard<T>();
+      sum += msg.s2_hard<T>();
       int64_t high = msg.low() + msg.segments() * msg.segment_size();
 
       // update msg with new work
@@ -263,11 +262,11 @@ T S2_hard_mpi_master(T x,
       msg.send(msg.proc_id());
 
       if (is_print())
-        status.print(high, z, s2_hard, s2_hard_approx);
+        status.print(high, z, sum, s2_hard_approx);
     }
   }
 
-  return s2_hard;
+  return sum;
 }
 
 } // namespace
@@ -286,11 +285,11 @@ int64_t S2_hard_mpi(int64_t x,
   print("Computation of the hard special leaves");
   print_vars(x, y, c, threads);
 
-  int64_t s2_hard = 0;
+  int64_t sum = 0;
   double time = get_time();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, z, s2_hard_approx);
+    sum = S2_hard_mpi_master(x, z, s2_hard_approx);
   else
   {
     FactorTable<uint16_t> factor(y, threads);
@@ -299,8 +298,8 @@ int64_t S2_hard_mpi(int64_t x,
     S2_hard_slave(x, y, z, c, primes, factor, threads);
   }
 
-  print("S2_hard", s2_hard, time);
-  return s2_hard;
+  print("S2_hard", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -317,11 +316,11 @@ int128_t S2_hard_mpi(int128_t x,
   print("Computation of the hard special leaves");
   print_vars(x, y, c, threads);
 
-  int128_t s2_hard = 0;
+  int128_t sum = 0;
   double time = get_time();
 
   if (is_mpi_master_proc())
-    s2_hard = S2_hard_mpi_master(x, z, s2_hard_approx);
+    sum = S2_hard_mpi_master(x, z, s2_hard_approx);
   else
   {
     // uses less memory
@@ -341,8 +340,8 @@ int128_t S2_hard_mpi(int128_t x,
     }
   }
 
-  print("S2_hard", s2_hard, time);
-  return s2_hard;
+  print("S2_hard", sum, time);
+  return sum;
 }
 
 #endif

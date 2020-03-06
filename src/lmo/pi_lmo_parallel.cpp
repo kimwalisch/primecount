@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -45,34 +45,34 @@ using namespace primecount;
 namespace {
 
 /// Compute the S2 contribution of the interval
-/// [low, low + segments * segment_size[
+/// [low, low + segments * segment_size[.
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t z,
                   int64_t c,
-                  int64_t low,
-                  int64_t segments,
-                  int64_t segment_size,
-                  PiTable& pi,
-                  vector<int32_t>& primes,
-                  vector<int32_t>& lpf,
-                  vector<int32_t>& mu,
-                  Runtime& runtime)
+                  ThreadSettings& thread,
+                  const PiTable& pi,
+                  const vector<int32_t>& primes,
+                  const vector<int32_t>& lpf,
+                  const vector<int32_t>& mu)
 {
+  int64_t sum = 0;
+  int64_t low = thread.low;
+  int64_t segments = thread.segments;
+  int64_t segment_size = thread.segment_size;
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t s2_thread = 0;
 
   if (c >= max_b)
     return 0;
 
-  runtime.init_start();
+  thread.start_init_time();
   Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
-  runtime.init_stop();
+  thread.stop_init_time();
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -104,7 +104,7 @@ int64_t S2_thread(int64_t x,
           int64_t xpm = x / (prime * m);
           int64_t stop = xpm - low;
           int64_t phi_xpm = phi[b] + sieve.count(stop);
-          s2_thread -= mu[m] * phi_xpm;
+          sum -= mu[m] * phi_xpm;
         }
       }
 
@@ -130,7 +130,7 @@ int64_t S2_thread(int64_t x,
         int64_t xpq = x / (prime * primes[l]);
         int64_t stop = xpq - low;
         int64_t phi_xpq = phi[b] + sieve.count(stop);
-        s2_thread += phi_xpq;
+        sum += phi_xpq;
       }
 
       phi[b] += sieve.get_total_count();
@@ -140,7 +140,7 @@ int64_t S2_thread(int64_t x,
     next_segment:;
   }
 
-  return s2_thread;
+  return sum;
 }
 
 /// Calculate the contribution of thes pecial leaves.
@@ -166,9 +166,9 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            int64_t s2_approx,
-           vector<int32_t>& primes,
-           vector<int32_t>& lpf,
-           vector<int32_t>& mu,
+           const vector<int32_t>& primes,
+           const vector<int32_t>& lpf,
+           const vector<int32_t>& mu,
            int threads)
 {
   print("");
@@ -183,24 +183,20 @@ int64_t S2(int64_t x,
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
   {
-    int64_t low = 0;
-    int64_t segments = 0;
-    int64_t segment_size = 0;
-    int64_t s2 = 0;
-    Runtime runtime;
+    ThreadSettings thread;
 
-    while (loadBalancer.get_work(&low, &segments, &segment_size, s2, runtime))
+    while (loadBalancer.get_work(thread))
     {
-      runtime.start();
-      s2 = S2_thread(x, y, z, c, low, segments, segment_size, pi, primes, lpf, mu, runtime);
-      runtime.stop();
+      thread.start_time();
+      thread.sum = S2_thread(x, y, z, c, thread, pi, primes, lpf, mu);
+      thread.stop_time();
     }
   }
 
-  int64_t s2 = (int64_t) loadBalancer.get_sum();
-  print("S2", s2, time);
+  int64_t sum = (int64_t) loadBalancer.get_sum();
+  print("S2", sum, time);
 
-  return s2;
+  return sum;
 }
 
 } // namespace
