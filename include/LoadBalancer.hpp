@@ -27,9 +27,9 @@ struct ThreadSettings
   double init_secs = 0;
   double secs = 0;
 
-  void start_time() { init_secs = 0; secs = get_time(); }
+  void start_time() { secs = get_time(); }
   void stop_time() { secs = get_time() - secs; }
-  void stop_init_time() { init_secs = get_time() - secs; }
+  void init_finished() { init_secs = get_time() - secs; }
 };
 
 class LoadBalancer

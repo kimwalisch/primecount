@@ -96,10 +96,13 @@ bool LoadBalancer::get_work(ThreadSettings& thread)
 
     update(thread);
 
-    thread.sum = 0;
     thread.low = low_;
     thread.segments = segments_;
     thread.segment_size = segment_size_;
+    thread.sum = 0;
+    thread.secs = 0;
+    thread.init_secs = 0;
+
     low_ += segments_ * segment_size_;
   }
 
