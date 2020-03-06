@@ -69,7 +69,6 @@ int64_t S2_thread(int64_t x,
   if (c >= max_b)
     return 0;
 
-  thread.start_init_time();
   Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
   thread.stop_init_time();
