@@ -76,7 +76,7 @@ MpiLoadBalancer::MpiLoadBalancer(maxint_t x,
 
 void MpiLoadBalancer::get_work(MpiMsg* msg)
 {
-  sum_ += msg->s2_hard<maxint_t>();
+  sum_ += msg->sum();
 
   if (msg->low() > max_low_)
   {

@@ -252,7 +252,7 @@ T S2_hard_mpi_master(T x,
       slaves--;
     else
     {
-      sum += msg.s2_hard<T>();
+      sum += (T) msg.sum();
       int64_t high = msg.low() + msg.segments() * msg.segment_size();
 
       // update msg with new work

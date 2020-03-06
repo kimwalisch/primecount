@@ -4,7 +4,7 @@
 ///        the MPI master process and the MPI slave processes
 ///        during the computation of the hard special leaves.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -33,11 +33,30 @@ MpiMsg::MpiMsg()
   msgData_.low = 0;
   msgData_.segments = 0;
   msgData_.segment_size = 0;
-  msgData_.s2_hard[0] = 0;
-  msgData_.s2_hard[1] = 0;
+  msgData_.sum[0] = 0;
+  msgData_.sum[1] = 0;
   msgData_.init_seconds = 0;
   msgData_.seconds = 0;
   msgData_.finished = 0;
+}
+
+void MpiMsg::set(int proc_id,
+                 int thread_id,
+                 int64_t low,
+                 int64_t segments,
+                 int64_t segment_size,
+                 maxint_t sum,
+                 double init_seconds,
+                 double seconds)
+{
+  msgData_.proc_id = proc_id;
+  msgData_.thread_id = thread_id;
+  msgData_.low = low;
+  msgData_.segments = segments;
+  msgData_.segment_size = segment_size;
+  *((maxint_t*) msgData_.sum) = sum;
+  msgData_.init_seconds = init_seconds;
+  msgData_.seconds = seconds;
 }
 
 void MpiMsg::set_finished()
@@ -69,7 +88,7 @@ void MpiMsg::init_MPI_struct()
                             MPI_INT64_T, // low
                             MPI_INT64_T, // segments
                             MPI_INT64_T, // segment_size
-                            MPI_INT64_T, // s2_hard
+                            MPI_INT64_T, // sum
                             MPI_DOUBLE,  // init_seconds
                             MPI_DOUBLE,  // seconds
                             MPI_INT };   // finished
@@ -80,7 +99,7 @@ void MpiMsg::init_MPI_struct()
   offsets[2] = offsetof(MsgData, low);
   offsets[3] = offsetof(MsgData, segments);
   offsets[4] = offsetof(MsgData, segment_size);
-  offsets[5] = offsetof(MsgData, s2_hard);
+  offsets[5] = offsetof(MsgData, sum);
   offsets[6] = offsetof(MsgData, init_seconds);
   offsets[7] = offsetof(MsgData, seconds);
   offsets[8] = offsetof(MsgData, finished);
@@ -134,6 +153,11 @@ int64_t MpiMsg::segments() const
 int64_t MpiMsg::segment_size() const
 {
   return msgData_.segment_size;
+}
+
+maxint_t MpiMsg::sum() const
+{
+  return *((maxint_t*) msgData_.sum);
 }
 
 double MpiMsg::init_seconds() const

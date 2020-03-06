@@ -4,7 +4,7 @@
 ///        the MPI master process and the MPI slave processes
 ///        during the computation of the hard special leaves.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,6 +34,7 @@ public:
   int64_t low() const;
   int64_t segments() const;
   int64_t segment_size() const;
+  maxint_t sum() const;
   double init_seconds() const;
   double seconds() const;
 
@@ -41,31 +42,14 @@ public:
               int64_t segments,
               int64_t segment_size);
 
-  template <typename T>
   void set(int proc_id,
            int thread_id,
            int64_t low,
            int64_t segments,
            int64_t segment_size,
-           T s2_hard,
+           maxint_t sum,
            double init_seconds,
-           double seconds)
-  {
-    msgData_.proc_id = proc_id;
-    msgData_.thread_id = thread_id;
-    msgData_.low = low;
-    msgData_.segments = segments;
-    msgData_.segment_size = segment_size;
-    *((T*) msgData_.s2_hard) = s2_hard;
-    msgData_.init_seconds = init_seconds;
-    msgData_.seconds = seconds;
-  }
-
-  template <typename T>
-  T s2_hard() const
-  {
-    return *((T*) msgData_.s2_hard);
-  }
+           double seconds);
 
 private:
   struct MsgData
@@ -75,7 +59,7 @@ private:
     int64_t low;
     int64_t segments;
     int64_t segment_size;
-    int64_t s2_hard[2];
+    int64_t sum[2];
     double init_seconds;
     double seconds;
     int finished;
