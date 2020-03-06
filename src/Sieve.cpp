@@ -109,11 +109,11 @@ Sieve::Sieve(uint64_t low,
 /// Ideally each element of the counters array should
 /// represent an interval of size:
 /// min(sqrt(average_leaf_dist), sqrt(segment_size)).
-/// Also the counter distance should be adjusted whilst
-/// sieving e.g. after each sieved segment. The distance
-/// between consecutive leaves is very small (~ log(x))
-/// at the beginning of the sieve algorithm but grows up
-/// to segment_size towards the end of the sieve.
+/// Also the counter distance should be regularly adjusted
+/// whilst sieving. The distance between consecutive leaves
+/// is very small ~ log(x) at the beginning of the sieving
+/// algorithm but grows up to segment_size towards the end
+/// of the sieve.
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
