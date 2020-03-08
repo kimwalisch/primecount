@@ -54,15 +54,16 @@ T D_thread(T x,
            int64_t y,
            int64_t z,
            int64_t k,
-           int64_t low,
-           int64_t segments,
-           int64_t segment_size,
-           DFactorTable& factor,
-           PiTable& pi,
-           Primes& primes,
-           Runtime& runtime)
+           ThreadSettings& thread,
+           const DFactorTable& factor,
+           const PiTable& pi,
+           const Primes& primes)
 {
   T sum = 0;
+
+  int64_t low = thread.low;
+  int64_t segments = thread.segments;
+  int64_t segment_size = thread.segment_size;
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, xz);
@@ -73,10 +74,9 @@ T D_thread(T x,
   if (min_b > max_b)
     return 0;
 
-  runtime.init_start();
   Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
-  runtime.init_stop();
+  thread.init_finished();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -187,8 +187,8 @@ T D_OpenMP(T x,
            int64_t z,
            int64_t k,
            T d_approx,
-           Primes& primes,
-           DFactorTable& factor,
+           const Primes& primes,
+           const DFactorTable& factor,
            int threads,
            double& time)
 {
@@ -205,40 +205,38 @@ T D_OpenMP(T x,
     // 1st resume computations from backup file
     for (int j = i; j < resume_threads; j += threads)
     {
-      int64_t low = 0;
-      int64_t segments = 0;
-      int64_t segment_size = 0;
-      T sum = 0;
-      Runtime runtime;
+      ThreadSettings thread;
+      thread.thread_id = j;
 
-      if (loadBalancer.resume(j, low, segments, segment_size))
+      if (loadBalancer.resume(thread))
       {
-        runtime.start();
         // Unsigned integer division is usually slightly
         // faster than signed integer division
         using UT = typename make_unsigned<T>::type;
-        sum = D_thread((UT) x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
-        uint64_t high = low + segments * segment_size;
-        loadBalancer.update_result(j, high, sum);
-        runtime.stop();
+
+        thread.start_time();
+        UT sum = D_thread((UT) x, x_star, xz, y, z, k, thread, factor, pi, primes);
+        thread.sum = (T) sum;
+        thread.stop_time();
+
+        loadBalancer.update_result(thread);
       }
     }
 
-    int64_t low = 0;
-    int64_t segments = 0;
-    int64_t segment_size = 0;
-    T sum = 0;
-    Runtime runtime;
+    ThreadSettings thread;
+    thread.thread_id = i;
 
     // 2nd get new work from loadBalancer
-    while (loadBalancer.get_work(i, &low, &segments, &segment_size, sum, runtime))
+    while (loadBalancer.get_work(thread))
     {
-      runtime.start();
       // Unsigned integer division is usually slightly
       // faster than signed integer division
       using UT = typename make_unsigned<T>::type;
-      sum = D_thread((UT) x, x_star, xz, y, z, k, low, segments, segment_size, factor, pi, primes, runtime);
-      runtime.stop();
+
+      thread.start_time();
+      UT sum = D_thread((UT) x, x_star, xz, y, z, k, thread, factor, pi, primes);
+      thread.sum = (T) sum;
+      thread.stop_time();
     }
   }
 

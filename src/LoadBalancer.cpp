@@ -76,10 +76,7 @@ void LoadBalancer::backup(int thread_id)
 }
 
 /// backup regular thread
-void LoadBalancer::backup(int thread_id,
-                          int64_t low,
-                          int64_t segments,
-                          int64_t segment_size)
+void LoadBalancer::backup(ThreadSettings& thread)
 {
   double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
   double last_backup_seconds = get_time() - backup_time_;
@@ -100,13 +97,13 @@ void LoadBalancer::backup(int thread_id,
   D["percent"] = percent;
   D["seconds"] = get_time() - time_;
 
-  string tid = "thread" + to_str(thread_id);
+  string tid = "thread" + to_str(thread.thread_id);
 
-  if (low <= sieve_limit_)
+  if (thread.low <= sieve_limit_)
   {
-    D[tid]["low"] = low;
-    D[tid]["segments"] = segments;
-    D[tid]["segment_size"] = segment_size;
+    D[tid]["low"] = thread.low;
+    D[tid]["segments"] = thread.segments;
+    D[tid]["segment_size"] = thread.segment_size;
   }
   else
   {
@@ -144,17 +141,14 @@ void LoadBalancer::finish_backup()
 }
 
 /// resume thread
-bool LoadBalancer::resume(int thread_id,
-                          int64_t& low,
-                          int64_t& segments,
-                          int64_t& segment_size) const
+bool LoadBalancer::resume(ThreadSettings& thread) const
 {
-  if (is_resume(copy_, "D", thread_id, x_, y_, z_, k_))
+  if (is_resume(copy_, "D", thread.thread_id, x_, y_, z_, k_))
   {
-    string tid = "thread" + to_str(thread_id);
-    low = copy_["D"][tid]["low"];
-    segments = copy_["D"][tid]["segments"];
-    segment_size = copy_["D"][tid]["segment_size"];
+    string tid = "thread" + to_str(thread.thread_id);
+    thread.low = copy_["D"][tid]["low"];
+    thread.segments = copy_["D"][tid]["segments"];
+    thread.segment_size = copy_["D"][tid]["segment_size"];
     return true;
   }
 
@@ -258,58 +252,58 @@ double LoadBalancer::get_wtime() const
 }
 
 // Used by resume threads
-void LoadBalancer::update_result(int thread_id, uint64_t high, maxint_t sum)
+void LoadBalancer::update_result(ThreadSettings& thread)
 {
   #pragma omp critical (get_work)
   {
-    sum_ += sum;
-    backup(thread_id);
-
-    if (is_print())
-      status_.print(high, sieve_limit_, sum_, sum_approx_);
-  }
-}
-
-bool LoadBalancer::get_work(int thread_id,
-                            int64_t* low,
-                            int64_t* segments,
-                            int64_t* segment_size,
-                            maxint_t sum,
-                            Runtime& runtime)
-{
-  #pragma omp critical (get_work)
-  {
-    sum_ += sum;
+    sum_ += thread.sum;
+    backup(thread.thread_id);
 
     if (is_print())
     {
-      uint64_t dist = *segments * *segment_size;
-      uint64_t high = *low + dist;
+      int64_t high = thread.low + thread.segments * thread.segment_size;
+      status_.print(high, sieve_limit_, sum_, sum_approx_);
+    }
+  }
+}
+
+bool LoadBalancer::get_work(ThreadSettings& thread)
+{
+  #pragma omp critical (get_work)
+  {
+    sum_ += thread.sum;
+
+    if (is_print())
+    {
+      uint64_t dist = thread.segments * thread.segment_size;
+      uint64_t high = thread.low + dist;
       status_.print(high, sieve_limit_, sum_, sum_approx_);
     }
 
-    update(low, segments, runtime);
+    update(thread);
 
-    *low = low_;
-    *segments = segments_;
-    *segment_size = segment_size_;
+    thread.low = low_;
+    thread.segments = segments_;
+    thread.segment_size = segment_size_;
+    thread.sum = 0;
+    thread.secs = 0;
+    thread.init_secs = 0;
+
     low_ += segments_ * segment_size_;
     low_ = min(low_, sieve_limit_ + 1);
 
-    backup(thread_id, *low, *segments, *segment_size);
+    backup(thread);
   }
 
-  return *low < sieve_limit_;
+  return thread.low < sieve_limit_;
 }
 
-void LoadBalancer::update(int64_t* low,
-                          int64_t* segments,
-                          Runtime& runtime)
+void LoadBalancer::update(ThreadSettings& thread)
 {
-  if (*low > max_low_)
+  if (thread.low > max_low_)
   {
-    max_low_ = *low;
-    segments_ = *segments;
+    max_low_ = thread.low;
+    segments_ = thread.segments;
 
     // We only start increasing the segment_size and segments
     // per thread once the first special leaves have been
@@ -322,7 +316,7 @@ void LoadBalancer::update(int64_t* low,
     if (segment_size_ < max_size_)
       segment_size_ = min(segment_size_ * 2, max_size_);
     else
-      update_segments(runtime);
+      update_segments(thread);
   }
 }
 
@@ -339,7 +333,7 @@ double LoadBalancer::remaining_secs() const
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
-void LoadBalancer::update_segments(Runtime& runtime)
+void LoadBalancer::update_segments(ThreadSettings& thread)
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
@@ -354,7 +348,7 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // segments per thread. Otherwise if the factor > 1 we
   // will increase the number of segments per thread.
   double min_secs = 0.01;
-  double divider = max(min_secs, runtime.secs);
+  double divider = max(min_secs, thread.secs);
   double factor = rem_secs / divider;
 
   // For small and medium computations the thread runtime
@@ -364,7 +358,7 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // backup frequency. If the thread runtime is > 6 hours
   // we reduce the thread runtime to about 50x the thread
   // initialization time.
-  double init_secs = max(min_secs, runtime.init);
+  double init_secs = max(min_secs, thread.init_secs);
   double init_factor = in_between(50, (3600 * 6) / init_secs, 1000);
 
   // Reduce the thread runtime if it is much larger than
@@ -372,12 +366,12 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // backups without deteriorating performance as we make
   // sure that the thread runtime is still much larger than
   // the thread initialization time.
-  if (runtime.secs > min_secs &&
-      runtime.secs > runtime.init * init_factor)
+  if (thread.secs > min_secs &&
+      thread.secs > thread.init_secs * init_factor)
   {
     double old = factor;
-    double next_runtime = runtime.init * init_factor;
-    factor = next_runtime / runtime.secs;
+    double next_runtime = thread.init_secs * init_factor;
+    factor = next_runtime / thread.secs;
     factor = min(factor, old);
   }
 
@@ -387,11 +381,11 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // for performance. The condition below fixes this issue
   // and ensures that the thread runtime is always at
   // least 10x the thread initialization time.
-  if (runtime.secs > 0 &&
-      runtime.secs * factor < runtime.init * 10)
+  if (thread.secs > 0 &&
+      thread.secs * factor < thread.init_secs * 10)
   {
-    double next_runtime = runtime.init * 10;
-    double current_runtime = runtime.secs;
+    double next_runtime = thread.init_secs * 10;
+    double current_runtime = thread.secs;
     factor = next_runtime / current_runtime;
   }
 
@@ -404,7 +398,7 @@ void LoadBalancer::update_segments(Runtime& runtime)
   // of magnitude more time even if the interval size is
   // identical.
   factor = in_between(0.5, factor, 2.0);
-  double next_runtime = runtime.secs * factor;
+  double next_runtime = thread.secs * factor;
 
   if (next_runtime < min_secs)
     segments_ *= 2;

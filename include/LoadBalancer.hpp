@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancer.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,37 +19,39 @@
 
 namespace primecount {
 
-struct Runtime
+struct ThreadSettings
 {
-  Runtime() { reset(); }
-  void reset() { init = 0; secs = 0; }
-  void start() { reset(); secs = get_time(); }
-  void stop() { secs = get_time() - secs; }
-  void init_start() { init = get_time(); }
-  void init_stop() { init = get_time() - init; }
-  double init;
-  double secs;
+  int64_t low = 0;
+  int64_t segments = 0;
+  int64_t segment_size = 0;
+  maxint_t sum = 0;
+  double init_secs = 0;
+  double secs = 0;
+  int thread_id = -1;
+
+  void start_time() { secs = get_time(); }
+  void stop_time() { secs = get_time() - secs; }
+  void init_finished() { init_secs = get_time() - secs; }
 };
 
 class LoadBalancer
 {
 public:
   LoadBalancer(maxint_t x, int64_t y, int64_t z, int64_t k, int64_t sieve_limit, maxint_t sum_approx);
-  bool get_work(int thread_id, int64_t* low, int64_t* segments, int64_t* segment_size, maxint_t sum, Runtime& runtime);
-  maxint_t get_sum() const;
-
-  bool resume(int thread_id, int64_t& low, int64_t& segments, int64_t& segment_size) const;
+  bool get_work(ThreadSettings& thread);
+  void update_result(ThreadSettings& thread);
+  void finish_backup();
+  bool resume(ThreadSettings& thread) const;
   bool resume(maxint_t& sum, double& time) const;
-  void update_result(int thread_id, uint64_t high, maxint_t s2);
   int get_resume_threads() const;
   double get_wtime() const;
-  void finish_backup();
+  maxint_t get_sum() const;
 
 private:
-  void update(int64_t* low, int64_t* segments, Runtime& runtime);
-  void update_segments(Runtime& runtime);
-  void backup(int thread_id, int64_t low, int64_t segments, int64_t segment_size);
+  void backup(ThreadSettings& thread);
   void backup(int thread_id);
+  void update(ThreadSettings& thread);
+  void update_segments(ThreadSettings& thread);
   double remaining_secs() const;
 
   maxint_t x_;

@@ -1,4 +1,4 @@
-2020-02-17 Kim Walisch  <kim.walisch@gmail.com>
+2020-03-07 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 5.4 work in progress.
 
@@ -19,6 +19,7 @@
   * S2_hard.cpp: Use improved Sieve::count() method.
   * pi_lmo_parallel.cpp: Use improved Sieve::count() method.
   * common.cpp: Tune alpha factors.
+  * LoadBalancer.cpp: Refactor using new ThreadSettings struct.
   * find_optimal_alpha_*.sh: New scripts that find optimal
     alpha tuning factors using the Linux perf tool.
 
