@@ -107,7 +107,7 @@ Sieve::Sieve(uint64_t low,
 /// number of unsieved elements in the interval:
 /// [i * counters_dist, (i + 1) * counters_dist[.
 /// Ideally each element of the counters array should
-/// represent an interval of size O(sqrt(average_leaf_dist).
+/// represent an interval of size O(sqrt(average_leaf_dist)).
 /// Also the counter distance should be adjusted regularly
 /// whilst sieving as the distance between consecutive
 /// leaves is very small ~ log(x) at the beginning of the
@@ -124,15 +124,14 @@ void Sieve::allocate_counters(uint64_t low)
   // instruction. Since the POPCNT instructions allows to
   // count a distance of 240 using a single instruction we
   // slightly increase the counter distance and slightly
-  // decrease the counter array size.
-  auto bits_sizet = numeric_limits<size_t>::digits;
+  // decrease the counters array size.
+  double bits_sizet = numeric_limits<size_t>::digits;
   double popcnt_dist = (bits_sizet / 8) * 30;
-  double sqrt_popcnt_dist = sqrt(popcnt_dist);
   counters_dist_ = (uint64_t) (counters_dist * sqrt(popcnt_dist));
 
   // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
-  byte_dist = max(byte_dist, 256);
+  byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
   counters_dist_ = byte_dist * 30;
   counters_dist_log2_ = ilog2(byte_dist);
