@@ -124,7 +124,7 @@ void Sieve::allocate_counters(uint64_t low)
   // instruction. Since the POPCNT instructions allows to
   // count a distance of 240 using a single instruction we
   // slightly increase the counter distance and slightly
-  // decrease the counters array size.
+  // decrease the size of the counters array.
   double bits_sizet = numeric_limits<size_t>::digits;
   double popcnt_dist = (bits_sizet / 8) * 30;
   counters_dist_ = (uint64_t) (counters_dist * sqrt(popcnt_dist));
