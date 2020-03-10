@@ -107,26 +107,33 @@ Sieve::Sieve(uint64_t low,
 /// number of unsieved elements in the interval:
 /// [i * counters_dist, (i + 1) * counters_dist[.
 /// Ideally each element of the counters array should
-/// represent an interval of size:
-/// min(sqrt(average_leaf_dist), sqrt(segment_size)).
-/// Also the counter distance should be regularly adjusted
-/// whilst sieving. The distance between consecutive leaves
-/// is very small ~ log(x) at the beginning of the sieving
-/// algorithm but grows up to segment_size towards the end
-/// of the sieve.
+/// represent an interval of size O(sqrt(average_leaf_dist).
+/// Also the counter distance should be adjusted regularly
+/// whilst sieving as the distance between consecutive
+/// leaves is very small ~ log(x) at the beginning of the
+/// sieving algorithm but grows up to segment_size towards
+/// the end of the algorithm.
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
   double average_leaf_dist = sqrt((double) low);
-  double sqrt_average_leaf_dist = sqrt(average_leaf_dist);
-  double popcnt_dist = sizeof(size_t) * 30;
+  double counters_dist = sqrt(average_leaf_dist);
+
+  // Here we balance counting with the counters array and
+  // counting from the sieve array using the POPCNT
+  // instruction. Since the POPCNT instructions allows to
+  // count a distance of 240 using a single instruction we
+  // slightly increase the counter distance and slightly
+  // decrease the counter array size.
+  auto bits_sizet = numeric_limits<size_t>::digits;
+  double popcnt_dist = (bits_sizet / 8) * 30;
   double sqrt_popcnt_dist = sqrt(popcnt_dist);
-  counters_dist_ = (uint64_t) (sqrt_average_leaf_dist * sqrt_popcnt_dist);
+  counters_dist_ = (uint64_t) (counters_dist * sqrt(popcnt_dist));
 
   // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 256);
-  byte_dist = nearest_power_of_2(byte_dist);
+  byte_dist = next_power_of_2(byte_dist);
   counters_dist_ = byte_dist * 30;
   counters_dist_log2_ = ilog2(byte_dist);
 
