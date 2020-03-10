@@ -117,8 +117,11 @@ Sieve::Sieve(uint64_t low,
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
-  uint64_t average_leaf_dist = isqrt(low);
-  counters_dist_ = isqrt(average_leaf_dist);
+  double average_leaf_dist = sqrt((double) low);
+  double sqrt_average_leaf_dist = sqrt(average_leaf_dist);
+  double popcnt_dist = sizeof(size_t) * 30;
+  double sqrt_popcnt_dist = sqrt(popcnt_dist);
+  counters_dist_ = (uint64_t) (sqrt_average_leaf_dist * sqrt_popcnt_dist);
 
   // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
