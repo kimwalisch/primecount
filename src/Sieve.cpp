@@ -209,6 +209,7 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
+  assert(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
 
