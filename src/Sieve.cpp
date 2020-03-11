@@ -107,23 +107,32 @@ Sieve::Sieve(uint64_t low,
 /// number of unsieved elements in the interval:
 /// [i * counters_dist, (i + 1) * counters_dist[.
 /// Ideally each element of the counters array should
-/// represent an interval of size:
-/// min(sqrt(average_leaf_dist), sqrt(segment_size)).
-/// Also the counter distance should be regularly adjusted
-/// whilst sieving. The distance between consecutive leaves
-/// is very small ~ log(x) at the beginning of the sieving
-/// algorithm but grows up to segment_size towards the end
-/// of the sieve.
+/// represent an interval of size O(sqrt(average_leaf_dist)).
+/// Also the counter distance should be adjusted regularly
+/// whilst sieving as the distance between consecutive
+/// leaves is very small ~ log(x) at the beginning of the
+/// sieving algorithm but grows up to segment_size towards
+/// the end of the algorithm.
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
-  uint64_t average_leaf_dist = isqrt(low);
-  counters_dist_ = isqrt(average_leaf_dist);
+  double average_leaf_dist = sqrt((double) low);
+  double counters_dist = sqrt(average_leaf_dist);
+
+  // Here we balance counting with the counters array and
+  // counting from the sieve array using the POPCNT
+  // instruction. Since the POPCNT instructions allows to
+  // count a distance of 240 using a single instruction we
+  // slightly increase the counter distance and slightly
+  // decrease the size of the counters array.
+  double bits_sizet = numeric_limits<size_t>::digits;
+  double popcnt_dist = (bits_sizet / 8) * 30;
+  counters_dist_ = (uint64_t) (counters_dist * sqrt(popcnt_dist));
 
   // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
-  byte_dist = max(byte_dist, 256);
-  byte_dist = nearest_power_of_2(byte_dist);
+  byte_dist = max(byte_dist, 64);
+  byte_dist = next_power_of_2(byte_dist);
   counters_dist_ = byte_dist * 30;
   counters_dist_log2_ = ilog2(byte_dist);
 
@@ -200,11 +209,9 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
+  assert(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
-
-  if (start > stop)
-    return count_;
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
@@ -232,6 +239,9 @@ uint64_t Sieve::count(uint64_t stop)
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
+  if (start > stop)
+    return 0;
+
   assert(stop - start < segment_size());
 
   uint64_t bit_count = 0;
