@@ -212,9 +212,6 @@ uint64_t Sieve::count(uint64_t stop)
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
 
-  if (start > stop)
-    return count_;
-
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
   // the stop number i.e. (stop - value) <= counters_dist.
@@ -241,6 +238,9 @@ uint64_t Sieve::count(uint64_t stop)
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
+  if (start > stop)
+    return 0;
+
   assert(stop - start < segment_size());
 
   uint64_t bit_count = 0;
