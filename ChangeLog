@@ -1,6 +1,6 @@
 2020-03-14 Kim Walisch  <kim.walisch@gmail.com>
 
-  Version 6.0 work in progress.
+  Version 6.0 released.
 
   This version fixes a scaling issue that has been present in
   primecount since the first version. The computation of the
