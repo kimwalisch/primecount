@@ -262,6 +262,26 @@ could have potentially been reduced to 4,000 CPU core hours. However using prime
 and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 850 CPU
 core hours!
 
+## Performance tips
+
+By default primecount scales nicely up until 10^24 on current x64 CPUs.
+For larger values primecount's large memory usage causes many
+[TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
+cache misses that severely deteriorate primecount's performance.
+Fortunately the Linux kernel allows to enable
+[transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
+so that large memory allocations will automatically be done using huge
+pages instead of ordinary pages which dramatically reduces the number of
+TLB cache misses.
+
+```bash
+sudo su
+
+# Enable transparent huge pages until next reboot
+echo always > /sys/kernel/mm/transparent_hugepage/enabled
+echo always > /sys/kernel/mm/transparent_hugepage/defrag
+```
+
 ## Algorithms
 
 <table>
