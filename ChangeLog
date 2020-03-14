@@ -1,4 +1,4 @@
-2020-03-11 Kim Walisch  <kim.walisch@gmail.com>
+2020-03-14 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 6.0 work in progress.
 
@@ -6,7 +6,8 @@
   primecount since the first version. The computation of the
   hard special leaves (S2_hard & D formulas) used a flawed
   optimization that deteriorated the runtime complexity of the
-  algorithm. The new version should run much faster for record
+  algorithm. The doc/Special-Leaves.md document contains more
+  information. The new version should run much faster for large
   computations >= 10^23.
 
   * primecount.h: New C API. primecount now has both a C API
