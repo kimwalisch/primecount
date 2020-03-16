@@ -64,9 +64,9 @@ template <typename T,
 T A_64(T xp128,
        T xlow,
        T xhigh,
-       uint64_t prime,
        uint64_t y,
        uint64_t b,
+       uint64_t prime,
        const PiTable& pi,
        const LibdividePrimes& primes,
        const SegmentedPiTable& segmentedPi)
@@ -106,9 +106,9 @@ template <typename T,
 T A_128(T xp,
         T xlow,
         T xhigh,
-        uint64_t prime,
         uint64_t y,
         uint64_t b,
+        uint64_t prime,
         const PiTable& pi,
         const Primes& primes,
         const SegmentedPiTable& segmentedPi)
@@ -190,9 +190,9 @@ T C2_64(T x,
         T xp128,
         T xlow,
         T xhigh,
-        uint64_t prime,
         uint64_t y,
         uint64_t b,
+        uint64_t prime,
         const PiTable& pi,
         const LibdividePrimes& primes,
         const SegmentedPiTable& segmentedPi)
@@ -243,9 +243,9 @@ T C2_128(T x,
          T xp,
          T xlow,
          T xhigh,
-         uint64_t prime,
          uint64_t y,
          uint64_t b,
+         uint64_t prime,
          const PiTable& pi,
          const Primes& primes,
          const SegmentedPiTable& segmentedPi)
@@ -377,16 +377,16 @@ T AC_OpenMP(T x,
       if (b <= pi_x_star)
       {
         if (xp <= numeric_limits<uint64_t>::max())
-          sum += C2_64(x, xp, xlow, xhigh, prime, y, b, pi, lprimes, segmentedPi);
+          sum += C2_64(x, xp, xlow, xhigh, y, b, prime, pi, lprimes, segmentedPi);
         else
-          sum += C2_128(x, xp, xlow, xhigh, prime, y, b, pi, primes, segmentedPi);
+          sum += C2_128(x, xp, xlow, xhigh, y, b, prime, pi, primes, segmentedPi);
       }
       else
       {
         if (xp <= numeric_limits<uint64_t>::max())
-          sum += A_64(xp, xlow, xhigh, prime, y, b, pi, lprimes, segmentedPi);
+          sum += A_64(xp, xlow, xhigh, y, b, prime, pi, lprimes, segmentedPi);
         else
-          sum += A_128(xp, xlow, xhigh, prime, y, b, pi, primes, segmentedPi);
+          sum += A_128(xp, xlow, xhigh, y, b, prime, pi, primes, segmentedPi);
       }
 
       if (is_print())

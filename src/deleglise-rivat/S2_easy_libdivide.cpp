@@ -53,10 +53,10 @@ libdivide_primes(const Primes& primes)
 /// xp < 2^64
 template <typename T, typename LibdividePrimes>
 T S2_easy_64(T xp128,
-             uint64_t prime,
              uint64_t y,
              uint64_t z,
              uint64_t b,
+             uint64_t prime,
              const PiTable& pi,
              const LibdividePrimes& primes)
 {
@@ -104,10 +104,10 @@ T S2_easy_64(T xp128,
 /// xp >= 2^64
 template <typename T, typename Primes>
 T S2_easy_128(T xp,
-              uint64_t prime,
               uint64_t y,
               uint64_t z,
               uint64_t b,
+              uint64_t prime,
               const PiTable& pi,
               const Primes& primes)
 {
@@ -183,9 +183,9 @@ T S2_easy_OpenMP(T x,
     UT xp = x / prime;
 
     if (xp <= numeric_limits<uint64_t>::max())
-      s2_easy += S2_easy_64(xp, prime, y, z, b, pi, lprimes);
+      s2_easy += S2_easy_64(xp, y, z, b, prime, pi, lprimes);
     else
-      s2_easy += S2_easy_128(xp, prime, y, z, b, pi, primes);
+      s2_easy += S2_easy_128(xp, y, z, b, prime, pi, primes);
 
     if (is_print())
       status.print(b, pi_x13);
