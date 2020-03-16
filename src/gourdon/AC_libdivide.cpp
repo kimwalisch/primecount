@@ -68,7 +68,7 @@ T A_64(T xp128,
        T x_div_low,
        T x_div_high,
        const PiTable& pi,
-       const LibdividePrimes& lprimes,
+       const LibdividePrimes& primes,
        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
@@ -84,7 +84,7 @@ T A_64(T xp128,
   // x / (p * q) >= y
   for (; i <= max_i; i++)
   {
-    uint64_t xpq = xp / lprimes[i];
+    uint64_t xpq = xp / primes[i];
     if (xpq < y)
       break;
     sum += segmentedPi[xpq];
@@ -93,7 +93,7 @@ T A_64(T xp128,
   // x / (p * q) < y
   for (; i <= max_i; i++)
   {
-    uint64_t xpq = xp / lprimes[i];
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2;
   }
 
@@ -194,7 +194,7 @@ T C2_64(T x,
         T x_div_low,
         T x_div_high,
         const PiTable& pi,
-        const LibdividePrimes& lprimes,
+        const LibdividePrimes& primes,
         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
@@ -215,9 +215,9 @@ T C2_64(T x,
   // Which satisfy: n > z && primes[i] <= y
   while (i > pi_min_clustered)
   {
-    uint64_t xpq = xp / lprimes[i];
+    uint64_t xpq = xp / primes[i];
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
-    uint64_t xpq2 = xp / lprimes[b + phi_xpq - 1];
+    uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
     uint64_t i2 = segmentedPi[xpq2];
     sum += phi_xpq * (i - i2);
     i = i2;
@@ -229,7 +229,7 @@ T C2_64(T x,
   // Which satisfy: n > z && primes[i] <= y
   for (; i > pi_min_m; i--)
   {
-    uint64_t xpq = xp / lprimes[i];
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
   }
 
