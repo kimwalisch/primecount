@@ -13,7 +13,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,21 +39,116 @@ using namespace primecount;
 
 namespace {
 
-template <typename T>
-bool is_libdivide(T x)
-{
-  return x <= numeric_limits<uint64_t>::max();
-}
-
 using fastdiv_t = libdivide::branchfree_divider<uint64_t>;
 
 template <typename Primes>
 vector<fastdiv_t>
-libdivide_vector(Primes& primes)
+libdivide_primes(const Primes& primes)
 {
-  vector<fastdiv_t> fastdiv(1);
-  fastdiv.insert(fastdiv.end(), primes.begin() + 1, primes.end());
-  return fastdiv;
+  vector<fastdiv_t> lprimes(1);
+  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
+  return lprimes;
+}
+
+/// xp < 2^64
+template <typename T, typename LibdividePrimes>
+T S2_easy_64(T xp128,
+             uint64_t prime,
+             uint64_t y,
+             uint64_t z,
+             uint64_t b,
+             const PiTable& pi,
+             const LibdividePrimes& primes)
+{
+  uint64_t xp = (uint64_t) xp128;
+  uint64_t min_trivial = min(xp / prime, y);
+  uint64_t min_clustered = (uint64_t) isqrt(xp);
+  uint64_t min_sparse = z / prime;
+  min_clustered = in_between(prime, min_clustered, y);
+  min_sparse = in_between(prime, min_sparse, y);
+  uint64_t l = pi[min_trivial];
+  uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t pi_min_sparse = pi[min_sparse];
+
+  T s2_easy = 0;
+
+  // Find all clustered easy leaves where
+  // successive leaves are identical.
+  // pq = primes[b] * primes[l]
+  // Which satisfy: pq > z && x / pq <= y
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+  while (l > pi_min_clustered)
+  {
+    uint64_t xpq = xp / primes[l];
+    uint64_t phi_xpq = pi[xpq] - b + 2;
+    uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
+    uint64_t l2 = pi[xpq2];
+    s2_easy += phi_xpq * (l - l2);
+    l = l2;
+  }
+
+  // Find all sparse easy leaves where
+  // successive leaves are different.
+  // pq = primes[b] * primes[l]
+  // Which satisfy: pq > z && x / pq <= y
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+  for (; l > pi_min_sparse; l--)
+  {
+    uint64_t xpq = xp / primes[l];
+    s2_easy += pi[xpq] - b + 2;
+  }
+
+  return s2_easy;
+}
+
+/// xp >= 2^64
+template <typename T, typename Primes>
+T S2_easy_128(T xp,
+              uint64_t prime,
+              uint64_t y,
+              uint64_t z,
+              uint64_t b,
+              const PiTable& pi,
+              const Primes& primes)
+{
+  uint64_t min_trivial = min(xp / prime, y);
+  uint64_t min_clustered = (uint64_t) isqrt(xp);
+  uint64_t min_sparse = z / prime;
+  min_clustered = in_between(prime, min_clustered, y);
+  min_sparse = in_between(prime, min_sparse, y);
+  uint64_t l = pi[min_trivial];
+  uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t pi_min_sparse = pi[min_sparse];
+
+  T s2_easy = 0;
+
+  // Find all clustered easy leaves where
+  // successive leaves are identical.
+  // pq = primes[b] * primes[l]
+  // Which satisfy: pq > z && x / pq <= y
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+  while (l > pi_min_clustered)
+  {
+    uint64_t xpq = fast_div64(xp, primes[l]);
+    uint64_t phi_xpq = pi[xpq] - b + 2;
+    uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+    uint64_t l2 = pi[xpq2];
+    s2_easy += phi_xpq * (l - l2);
+    l = l2;
+  }
+
+  // Find all sparse easy leaves where
+  // successive leaves are different.
+  // pq = primes[b] * primes[l]
+  // Which satisfy: pq > z && x / pq <= y
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+  for (; l > pi_min_sparse; l--)
+  {
+    uint64_t xpq = fast_div64(xp, primes[l]);
+    s2_easy += pi[xpq] - b + 2;
+  }
+
+  return s2_easy;
 }
 
 /// Calculate the contribution of the clustered easy
@@ -64,13 +159,13 @@ T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 Primes& primes,
+                 const Primes& primes,
                  int threads)
 {
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   threads = ideal_num_threads(threads, x13, 1000);
-  auto fastdiv = libdivide_vector(primes);
+  auto lprimes = libdivide_primes(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
@@ -80,75 +175,17 @@ T S2_easy_OpenMP(T x,
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
+    // Unsigned integer division is usually slightly
+    // faster than signed integer division
+    using UT = typename make_unsigned<T>::type;
+
     int64_t prime = primes[b];
-    T xp = x / prime;
-    int64_t min_trivial = min(xp / prime, y);
-    int64_t min_clustered = (int64_t) isqrt(xp);
-    int64_t min_sparse = z / prime;
+    UT xp = x / prime;
 
-    min_clustered = in_between(prime, min_clustered, y);
-    min_sparse = in_between(prime, min_sparse, y);
-
-    int64_t l = pi[min_trivial];
-    int64_t pi_min_clustered = pi[min_clustered];
-    int64_t pi_min_sparse = pi[min_sparse];
-
-    if (is_libdivide(xp))
-    {
-      // Find all clustered easy leaves where
-      // successive leaves are identical.
-      // pq = primes[b] * primes[l]
-      // Which satisfy: pq > z && x / pq <= y
-      // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-      while (l > pi_min_clustered)
-      {
-        int64_t xpq = (uint64_t) xp / fastdiv[l];
-        int64_t phi_xpq = pi[xpq] - b + 2;
-        int64_t xpq2 = (uint64_t) xp / fastdiv[b + phi_xpq - 1];
-        int64_t l2 = pi[xpq2];
-        s2_easy += phi_xpq * (l - l2);
-        l = l2;
-      }
-
-      // Find all sparse easy leaves where
-      // successive leaves are different.
-      // pq = primes[b] * primes[l]
-      // Which satisfy: pq > z && x / pq <= y
-      // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-      for (; l > pi_min_sparse; l--)
-      {
-        int64_t xpq = (uint64_t) xp / fastdiv[l];
-        s2_easy += pi[xpq] - b + 2;
-      }
-    }
+    if (xp <= numeric_limits<uint64_t>::max())
+      s2_easy += S2_easy_64(xp, prime, y, z, b, pi, lprimes);
     else
-    {
-      // Find all clustered easy leaves where
-      // successive leaves are identical.
-      // pq = primes[b] * primes[l]
-      // Which satisfy: pq > z && x / pq <= y
-      // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-      while (l > pi_min_clustered)
-      {
-        int64_t xpq = fast_div64(xp, primes[l]);
-        int64_t phi_xpq = pi[xpq] - b + 2;
-        int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-        int64_t l2 = pi[xpq2];
-        s2_easy += phi_xpq * (l - l2);
-        l = l2;
-      }
-
-      // Find all sparse easy leaves where
-      // successive leaves are different.
-      // pq = primes[b] * primes[l]
-      // Which satisfy: pq > z && x / pq <= y
-      // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-      for (; l > pi_min_sparse; l--)
-      {
-        int64_t xpq = fast_div64(xp, primes[l]);
-        s2_easy += pi[xpq] - b + 2;
-      }
-    }
+      s2_easy += S2_easy_128(xp, prime, y, z, b, pi, primes);
 
     if (is_print())
       status.print(b, pi_x13);
@@ -178,8 +215,8 @@ int64_t S2_easy(int64_t x,
   print_vars(x, y, c, threads);
 
   double time = get_time();
-  auto primes = generate_primes<int32_t>(y);
-  int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads);
+  auto primes = generate_primes<uint32_t>(y);
+  int64_t s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -210,12 +247,12 @@ int128_t S2_easy(int128_t x,
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
   }
 
   print("S2_easy", s2_easy, time);
