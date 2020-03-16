@@ -48,8 +48,8 @@ template <typename T, typename Primes>
 T A(T x,
     int64_t y,
     int64_t b,
-    T x_div_low,
-    T x_div_high,
+    T xlow,
+    T xhigh,
     Primes& primes,
     PiTable& pi,
     SegmentedPiTable& segmentedPi)
@@ -59,10 +59,10 @@ T A(T x,
   T sum = 0;
 
   int64_t sqrt_xp = isqrt(xp);
-  int64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
+  int64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   int64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
-  int64_t max_2nd_prime = min(x_div_low / prime, sqrt_xp);
+  int64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   int64_t max_i = pi[max_2nd_prime];
 
   // x / (p * q) >= y
@@ -134,8 +134,8 @@ template <typename T, typename Primes>
 T C2(T x,
      int64_t y,
      int64_t b,
-     T x_div_low,
-     T x_div_high,
+     T xlow,
+     T xhigh,
      Primes& primes,
      PiTable& pi,
      SegmentedPiTable& segmentedPi)
@@ -144,8 +144,8 @@ T C2(T x,
   T xp = x / prime;
   T sum = 0;
 
-  int64_t max_m = min3(x_div_low / prime, xp / prime, y);
-  T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
+  int64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
   int64_t min_m = min(min_m128, max_m);
 
   int64_t i = pi[max_m];
@@ -243,18 +243,18 @@ T AC_OpenMP(T x,
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
-    T x_div_low = x / low;
-    T x_div_high = x / high;
+    T xlow = x / low;
+    T xhigh = x / high;
 
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[isqrt(low)]);
-    min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
+    min_b = max(min_b, pi[min(xhigh / y, x_star)]);
     min_b = min(min_b, pi_x_star) + 1;
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] <= floor(sqrt(x / low))
-    int64_t sqrt_low = min(isqrt(x_div_low), x13);
+    int64_t sqrt_low = min(isqrt(xlow), x13);
     int64_t max_b = pi[sqrt_low];
     max_b = max(max_b, pi_x_star);
 
@@ -264,9 +264,9 @@ T AC_OpenMP(T x,
     for (int64_t b = min_b; b <= max_b; b++)
     {
       if (b <= pi_x_star)
-        sum += C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+        sum += C2(x, y, b, xlow, xhigh, primes, pi, segmentedPi);
       else
-        sum +=  A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+        sum +=  A(x, y, b, xlow, xhigh, primes, pi, segmentedPi);
 
       if (is_print())
         status.print(b, pi_x13);

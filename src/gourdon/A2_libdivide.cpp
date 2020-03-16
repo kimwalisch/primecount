@@ -82,13 +82,13 @@ T A_OpenMP(T x,
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
-    T x_div_low = x / low;
-    T x_div_high = x / high;
+    T xlow = x / low;
+    T xhigh = x / high;
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] <= floor(sqrt(x / low))
-    int64_t sqrt_low = min(isqrt(x_div_low), x13);
+    int64_t sqrt_low = min(isqrt(xlow), x13);
     int64_t max_b = pi[sqrt_low];
 
     // Process all leaves that satisfiy:
@@ -99,10 +99,10 @@ T A_OpenMP(T x,
       int64_t prime = primes[b];
       T xp = x / prime;
       int64_t sqrt_xp = isqrt(xp);
-      int64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
+      int64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
       int64_t j = pi[min_2nd_prime];
       j = max(j, b) + 1;
-      int64_t max_2nd_prime = min(x_div_low / prime, sqrt_xp);
+      int64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
       int64_t max_j = pi[max_2nd_prime];
 
       if (is_libdivide(xp))

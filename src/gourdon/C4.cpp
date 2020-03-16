@@ -132,12 +132,12 @@ T C_OpenMP(T x,
     int64_t low = segmentedPi.low();
     int64_t high = segmentedPi.high();
     low = max(low, 1);
-    T x_div_low = x / low;
-    T x_div_high = x / high;
+    T xlow = x / low;
+    T xhigh = x / high;
 
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[isqrt(low)]);
-    min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
+    min_b = max(min_b, pi[min(xhigh / y, x_star)]);
     min_b += 1;
 
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
@@ -145,8 +145,8 @@ T C_OpenMP(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t max_m = min3(x_div_low / prime, xp / prime, y);
-      T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
+      int64_t max_m = min3(xlow / prime, xp / prime, y);
+      T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
       int64_t min_m = min(min_m128, max_m);
 
       int64_t i = pi[max_m];
