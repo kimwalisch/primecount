@@ -1,5 +1,5 @@
 ///
-/// @file  pi_deleglise_rivat3.cpp
+/// @file  pi_deleglise_rivat.cpp
 /// @brief 64-bit and 128-bit parallel implementations of the
 ///        Deleglise-Rivat prime counting algorithm.
 ///
@@ -13,7 +13,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
