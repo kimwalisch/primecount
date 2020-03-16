@@ -80,11 +80,11 @@ set(LIB_SRC src/api.cpp
             src/lmo/pi_lmo_parallel.cpp
             src/deleglise-rivat/S2_hard.cpp
             src/deleglise-rivat/S2_trivial.cpp
-            src/deleglise-rivat/pi_deleglise_rivat3.cpp
+            src/deleglise-rivat/pi_deleglise_rivat.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
-            src/gourdon/D4.cpp
+            src/gourdon/D.cpp
             src/gourdon/Sigma.cpp)
 
 # Required includes ##################################################
