@@ -9,7 +9,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,7 +43,7 @@ T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 Primes& primes,
+                 const Primes& primes,
                  int threads)
 {
   T s2_easy = 0;
