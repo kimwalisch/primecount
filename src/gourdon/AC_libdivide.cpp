@@ -74,7 +74,7 @@ T A_64(T xp128,
   T sum = 0;
 
   uint64_t xp = (uint64_t) xp128;
-  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
@@ -205,7 +205,7 @@ T C2_64(T x,
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
-  uint64_t min_clustered = (uint64_t) isqrt(xp);
+  uint64_t min_clustered = isqrt(xp);
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
