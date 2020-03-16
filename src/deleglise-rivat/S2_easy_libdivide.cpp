@@ -62,7 +62,7 @@ T S2_easy_64(T xp128,
 {
   uint64_t xp = (uint64_t) xp128;
   uint64_t min_trivial = min(xp / prime, y);
-  uint64_t min_clustered = (uint64_t) isqrt(xp);
+  uint64_t min_clustered = isqrt(xp);
   uint64_t min_sparse = z / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
