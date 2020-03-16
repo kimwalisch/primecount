@@ -48,8 +48,8 @@ template <typename T, typename Primes>
 T A(T x,
     T xlow,
     T xhigh,
-    int64_t y,
-    int64_t b,
+    uint64_t y,
+    uint64_t b,
     const PiTable& pi,
     const Primes& primes,
     const SegmentedPiTable& segmentedPi)
