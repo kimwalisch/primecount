@@ -46,29 +46,29 @@ namespace {
 ///
 template <typename T, typename Primes>
 T A(T x,
-    int64_t y,
-    int64_t b,
     T xlow,
     T xhigh,
-    Primes& primes,
-    PiTable& pi,
-    SegmentedPiTable& segmentedPi)
+    int64_t y,
+    int64_t b,
+    const PiTable& pi,
+    const Primes& primes,
+    const SegmentedPiTable& segmentedPi)
 {
-  int64_t prime = primes[b];
+  uint64_t prime = primes[b];
   T xp = x / prime;
   T sum = 0;
 
-  int64_t sqrt_xp = isqrt(xp);
-  int64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
-  int64_t i = pi[min_2nd_prime];
+  uint64_t sqrt_xp = isqrt(xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
-  int64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
-  int64_t max_i = pi[max_2nd_prime];
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t max_i = pi[max_2nd_prime];
 
   // x / (p * q) >= y
   for (; i <= max_i; i++)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     if (xpq < y)
       break;
     sum += segmentedPi[xpq];
@@ -77,7 +77,7 @@ T A(T x,
   // x / (p * q) < y
   for (; i <= max_i; i++)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2;
   }
 
@@ -102,8 +102,8 @@ T C1(T xp,
      int64_t m,
      int64_t min_m,
      int64_t max_m,
-     Primes& primes,
-     PiTable& pi)
+     const PiTable& pi,
+     const Primes& primes)
 {
   T sum = 0;
 
@@ -120,7 +120,7 @@ T C1(T xp,
       sum += MU * (pi[xpm] - b + 2);
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
+    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, pi, primes);
   }
 
   return sum;
@@ -132,27 +132,27 @@ T C1(T xp,
 ///
 template <typename T, typename Primes>
 T C2(T x,
-     int64_t y,
-     int64_t b,
      T xlow,
      T xhigh,
-     Primes& primes,
-     PiTable& pi,
-     SegmentedPiTable& segmentedPi)
+     uint64_t y,
+     uint64_t b,
+     const PiTable& pi,
+     const Primes& primes,
+     const SegmentedPiTable& segmentedPi)
 {
-  int64_t prime = primes[b];
+  uint64_t prime = primes[b];
   T xp = x / prime;
   T sum = 0;
 
-  int64_t max_m = min3(xlow / prime, xp / prime, y);
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
-  int64_t min_m = min(min_m128, max_m);
+  uint64_t min_m = min(min_m128, max_m);
 
-  int64_t i = pi[max_m];
-  int64_t pi_min_m = pi[min_m];
-  int64_t min_clustered = (int64_t) isqrt(xp);
+  uint64_t i = pi[max_m];
+  uint64_t pi_min_m = pi[min_m];
+  uint64_t min_clustered = (int64_t) isqrt(xp);
   min_clustered = in_between(min_m, min_clustered, max_m);
-  int64_t pi_min_clustered = pi[min_clustered];
+  uint64_t pi_min_clustered = pi[min_clustered];
 
   // Find all clustered easy leaves where
   // successive leaves are identical.
@@ -160,10 +160,10 @@ T C2(T x,
   // Which satisfy: n > z && primes[i] <= y
   while (i > pi_min_clustered)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
-    int64_t phi_xpq = segmentedPi[xpq] - b + 2;
-    int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    int64_t i2 = segmentedPi[xpq2];
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
+    uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+    uint64_t i2 = segmentedPi[xpq2];
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -174,7 +174,7 @@ T C2(T x,
   // Which satisfy: n > z && primes[i] <= y
   for (; i > pi_min_m; i--)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
@@ -189,7 +189,7 @@ T AC_OpenMP(T x,
             int64_t k,
             int64_t x_star,
             int64_t max_a_prime,
-            Primes& primes,
+            const Primes& primes,
             int threads)
 {
   T sum = 0;
@@ -224,7 +224,7 @@ T AC_OpenMP(T x,
     T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
     int64_t min_m = min(min_m128, max_m);
 
-    sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+    sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
 
     if (is_print())
       status.print(b, pi_x13);
@@ -264,9 +264,9 @@ T AC_OpenMP(T x,
     for (int64_t b = min_b; b <= max_b; b++)
     {
       if (b <= pi_x_star)
-        sum += C2(x, y, b, xlow, xhigh, primes, pi, segmentedPi);
+        sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
       else
-        sum +=  A(x, y, b, xlow, xhigh, primes, pi, segmentedPi);
+        sum +=  A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
 
       if (is_print())
         status.print(b, pi_x13);
@@ -295,7 +295,7 @@ int64_t AC(int64_t x,
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
-  auto primes = generate_primes<int32_t>(max_prime);
+  auto primes = generate_primes<uint32_t>(max_prime);
 
   int64_t sum = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
 
