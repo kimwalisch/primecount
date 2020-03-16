@@ -1,5 +1,5 @@
 ///
-/// @file  D4.cpp
+/// @file  D.cpp
 /// @brief This is a highly optimized implementation of the D(x, y)
 ///        formula in Xavier Gourdon's prime counting algorithm. The D
 ///        formula is very similar to the formula of the hard special

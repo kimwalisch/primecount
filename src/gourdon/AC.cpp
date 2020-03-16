@@ -233,29 +233,29 @@ bool resume(nlohmann::json& json,
 ///
 template <typename T, typename Primes>
 T A(T x,
-    int64_t y,
-    int64_t b,
-    T x_div_low,
-    T x_div_high,
-    Primes& primes,
-    PiTable& pi,
-    SegmentedPiTable& segmentedPi)
+    T xlow,
+    T xhigh,
+    uint64_t y,
+    uint64_t b,
+    const PiTable& pi,
+    const Primes& primes,
+    const SegmentedPiTable& segmentedPi)
 {
-  int64_t prime = primes[b];
+  uint64_t prime = primes[b];
   T xp = x / prime;
   T sum = 0;
 
-  int64_t sqrt_xp = isqrt(xp);
-  int64_t min_2nd_prime = min(x_div_high / prime, sqrt_xp);
-  int64_t i = pi[min_2nd_prime];
+  uint64_t sqrt_xp = isqrt(xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
-  int64_t max_2nd_prime = min(x_div_low / prime, sqrt_xp);
-  int64_t max_i = pi[max_2nd_prime];
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t max_i = pi[max_2nd_prime];
 
   // x / (p * q) >= y
   for (; i <= max_i; i++)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     if (xpq < y)
       break;
     sum += segmentedPi[xpq];
@@ -264,7 +264,7 @@ T A(T x,
   // x / (p * q) < y
   for (; i <= max_i; i++)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2;
   }
 
@@ -281,16 +281,18 @@ T A(T x,
 /// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
 /// 2015.
 ///
-template <int MU, typename T, typename Primes>
+template <int MU, 
+          typename T, 
+          typename Primes>
 T C1(T xp,
-     int64_t b,
-     int64_t i,
-     int64_t pi_y,
-     int64_t m,
-     int64_t min_m,
-     int64_t max_m,
-     Primes& primes,
-     PiTable& pi)
+     uint64_t b,
+     uint64_t i,
+     uint64_t pi_y,
+     uint64_t m,
+     uint64_t min_m,
+     uint64_t max_m,
+     const PiTable& pi,
+     const Primes& primes)
 {
   T sum = 0;
 
@@ -298,16 +300,21 @@ T C1(T xp,
   {
     // Calculate next m
     T m128 = (T) m * primes[i];
-    if (m128 > (T) max_m)
+    if (m128 > max_m)
       return sum;
 
-    int64_t m64 = (int64_t) m128;
+    uint64_t m64 = (uint64_t) m128;
+
     if (m64 > min_m) {
-      int64_t xpm = fast_div64(xp, m64);
-      sum += MU * (pi[xpm] - b + 2);
+      uint64_t xpm = fast_div64(xp, m64);
+
+      if (MU > 0)
+        sum += pi[xpm] - b + 2;
+      else
+        sum -= pi[xpm] - b + 2;
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
+    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, pi, primes);
   }
 
   return sum;
@@ -318,8 +325,8 @@ T C1(T x,
      int64_t z,
      int64_t b,
      int64_t pi_y,
-     Primes& primes,
-     PiTable& pi)
+     const PiTable& pi,
+     const Primes& primes)
 {
   int64_t prime = primes[b];
   T xp = x / prime;
@@ -327,7 +334,7 @@ T C1(T x,
   T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
   int64_t min_m = min(min_m128, max_m);
 
-  return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+  return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
 }
 
 /// Compute the 2nd part of the C formula.
@@ -336,27 +343,27 @@ T C1(T x,
 ///
 template <typename T, typename Primes>
 T C2(T x,
-     int64_t y,
-     int64_t b,
-     T x_div_low,
-     T x_div_high,
-     Primes& primes,
-     PiTable& pi,
-     SegmentedPiTable& segmentedPi)
+     T xlow,
+     T xhigh,
+     uint64_t y,
+     uint64_t b,
+     const PiTable& pi,
+     const Primes& primes,
+     const SegmentedPiTable& segmentedPi)
 {
-  int64_t prime = primes[b];
+  uint64_t prime = primes[b];
   T xp = x / prime;
   T sum = 0;
 
-  int64_t max_m = min3(x_div_low / prime, xp / prime, y);
-  T min_m128 = max3(x_div_high / prime, x / ipow<T>(prime, 3), prime);
-  int64_t min_m = min(min_m128, max_m);
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
+  uint64_t min_m = min(min_m128, max_m);
 
-  int64_t i = pi[max_m];
-  int64_t pi_min_m = pi[min_m];
-  int64_t min_clustered = (int64_t) isqrt(xp);
+  uint64_t i = pi[max_m];
+  uint64_t pi_min_m = pi[min_m];
+  uint64_t min_clustered = (uint64_t) isqrt(xp);
   min_clustered = in_between(min_m, min_clustered, max_m);
-  int64_t pi_min_clustered = pi[min_clustered];
+  uint64_t pi_min_clustered = pi[min_clustered];
 
   // Find all clustered easy leaves where
   // successive leaves are identical.
@@ -364,10 +371,10 @@ T C2(T x,
   // Which satisfy: n > z && primes[i] <= y
   while (i > pi_min_clustered)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
-    int64_t phi_xpq = segmentedPi[xpq] - b + 2;
-    int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    int64_t i2 = segmentedPi[xpq2];
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
+    uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+    uint64_t i2 = segmentedPi[xpq2];
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -378,7 +385,7 @@ T C2(T x,
   // Which satisfy: n > z && primes[i] <= y
   for (; i > pi_min_m; i--)
   {
-    int64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
@@ -393,7 +400,7 @@ T AC_OpenMP(T x,
             int64_t k,
             int64_t x_star,
             int64_t max_a_prime,
-            Primes& primes,
+            const Primes& primes,
             int threads,
             double& time)
 {
@@ -454,7 +461,7 @@ T AC_OpenMP(T x,
       {
         if (resume(copy, x, y, z, k, b, j))
         {
-          T sum_thread = C1(x, z, b, pi_y, primes, pi);
+          T sum_thread = C1(x, z, b, pi_y, pi, primes);
           string thread_id = "thread" + to_str(j);
 
           #pragma omp critical (ac)
@@ -493,7 +500,7 @@ T AC_OpenMP(T x,
         if (b > pi_sqrtz)
           break;
 
-        sum_thread = C1(x, z, b, pi_y, primes, pi);
+        sum_thread = C1(x, z, b, pi_y, pi, primes);
       }
     }
 
@@ -521,19 +528,19 @@ T AC_OpenMP(T x,
     json["AC"]["low"] = segmentedPi.low();
 
     low = max(low, 1);
-    T x_div_low = x / low;
-    T x_div_high = x / high;
+    T xlow = x / low;
+    T xhigh = x / high;
 
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[isqrt(low)]);
-    min_b = max(min_b, pi[min(x_div_high / y, x_star)]);
+    min_b = max(min_b, pi[min(xhigh / y, x_star)]);
     min_b = min(min_b, pi_x_star) + 1;
     next_b = max(next_b, min_b);
 
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] <= floor(sqrt(x / low))
-    int64_t sqrt_low = min(isqrt(x_div_low), x13);
+    int64_t sqrt_low = min(isqrt(xlow), x13);
     int64_t max_b = pi[sqrt_low];
     max_b = max(max_b, pi_x_star);
 
@@ -551,9 +558,9 @@ T AC_OpenMP(T x,
           string thread_id = "thread" + to_str(j);
 
           if (b <= pi_x_star)
-            sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+            sum_thread = C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
           else
-            sum_thread = A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+            sum_thread = A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
 
           #pragma omp critical (ac)
           {
@@ -592,9 +599,9 @@ T AC_OpenMP(T x,
           break;
 
         if (b <= pi_x_star)
-          sum_thread = C2(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+          sum_thread = C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
         else
-          sum_thread = A(x, y, b, x_div_low, x_div_high, primes, pi, segmentedPi);
+          sum_thread = A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
       }
     }
 
@@ -635,7 +642,7 @@ int64_t AC(int64_t x,
 
   if (!resume(json, x, y, z, k, sum, time))
   {
-    auto primes = generate_primes<int32_t>(max_prime);
+    auto primes = generate_primes<uint32_t>(max_prime);
     sum = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
   }
 
