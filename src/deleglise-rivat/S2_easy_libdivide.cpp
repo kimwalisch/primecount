@@ -39,17 +39,6 @@ using namespace primecount;
 
 namespace {
 
-using fastdiv_t = libdivide::branchfree_divider<uint64_t>;
-
-template <typename Primes>
-vector<fastdiv_t>
-libdivide_primes(const Primes& primes)
-{
-  vector<fastdiv_t> lprimes(1);
-  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
-  return lprimes;
-}
-
 /// xp < 2^64
 template <typename T, typename LibdividePrimes>
 T S2_easy_64(T xp128,
@@ -162,10 +151,16 @@ T S2_easy_OpenMP(T x,
                  const Primes& primes,
                  int threads)
 {
+  // Initialize libdivide vector using primes
+  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
+  vector<libdivide_t> lprimes(1);
+  lprimes.insert(lprimes.end(),
+                 primes.begin() + 1,
+                 primes.end());
+
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
   threads = ideal_num_threads(threads, x13, 1000);
-  auto lprimes = libdivide_primes(primes);
 
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];

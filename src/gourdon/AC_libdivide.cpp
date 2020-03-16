@@ -47,17 +47,6 @@ using namespace primecount;
 
 namespace {
 
-using fastdiv_t = libdivide::branchfree_divider<uint64_t>;
-
-template <typename Primes>
-vector<fastdiv_t>
-libdivide_primes(const Primes& primes)
-{
-  vector<fastdiv_t> lprimes(1);
-  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
-  return lprimes;
-}
-
 /// xp < 2^64
 template <typename T,
           typename LibdividePrimes>
@@ -314,7 +303,13 @@ T AC_OpenMP(T x,
   S2Status status(x);
   PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
-  auto lprimes = libdivide_primes(primes);
+
+  // Initialize libdivide vector using primes
+  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
+  vector<libdivide_t> lprimes(1);
+  lprimes.insert(lprimes.end(),
+                 primes.begin() + 1,
+                 primes.end());
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
