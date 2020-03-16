@@ -94,14 +94,16 @@ T A(T x,
 /// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
 /// 2015.
 ///
-template <int MU, typename T, typename Primes>
+template <int MU, 
+          typename T, 
+          typename Primes>
 T C1(T xp,
-     int64_t b,
-     int64_t i,
-     int64_t pi_y,
-     int64_t m,
-     int64_t min_m,
-     int64_t max_m,
+     uint64_t b,
+     uint64_t i,
+     uint64_t pi_y,
+     uint64_t m,
+     uint64_t min_m,
+     uint64_t max_m,
      const PiTable& pi,
      const Primes& primes)
 {
@@ -111,13 +113,18 @@ T C1(T xp,
   {
     // Calculate next m
     T m128 = (T) m * primes[i];
-    if (m128 > (T) max_m)
+    if (m128 > max_m)
       return sum;
 
-    int64_t m64 = (int64_t) m128;
+    uint64_t m64 = (uint64_t) m128;
+
     if (m64 > min_m) {
-      int64_t xpm = fast_div64(xp, m64);
-      sum += MU * (pi[xpm] - b + 2);
+      uint64_t xpm = fast_div64(xp, m64);
+
+      if (MU > 0)
+        sum += pi[xpm] - b + 2;
+      else
+        sum -= pi[xpm] - b + 2;
     }
 
     sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, pi, primes);
@@ -150,7 +157,7 @@ T C2(T x,
 
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
-  uint64_t min_clustered = (int64_t) isqrt(xp);
+  uint64_t min_clustered = (uint64_t) isqrt(xp);
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 

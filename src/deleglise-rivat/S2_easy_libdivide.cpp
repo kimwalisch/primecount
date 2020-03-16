@@ -175,12 +175,8 @@ T S2_easy_OpenMP(T x,
   #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
   for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
   {
-    // Unsigned integer division is usually slightly
-    // faster than signed integer division
-    using UT = typename make_unsigned<T>::type;
-
     int64_t prime = primes[b];
-    UT xp = x / prime;
+    T xp = x / prime;
 
     if (xp <= numeric_limits<uint64_t>::max())
       s2_easy += S2_easy_64(xp, y, z, b, prime, pi, lprimes);
@@ -216,7 +212,7 @@ int64_t S2_easy(int64_t x,
 
   double time = get_time();
   auto primes = generate_primes<uint32_t>(y);
-  int64_t s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
+  int64_t s2_easy = S2_easy_OpenMP((intfast64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -247,12 +243,12 @@ int128_t S2_easy(int128_t x,
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_OpenMP(x, y, z, c, primes, threads);
+    s2_easy = S2_easy_OpenMP((intfast128_t) x, y, z, c, primes, threads);
   }
 
   print("S2_easy", s2_easy, time);
