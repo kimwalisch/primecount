@@ -297,7 +297,8 @@ T C2(T x,
 }
 
 /// Compute A + C
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T AC_OpenMP(T x,
             int64_t y,
             int64_t z,

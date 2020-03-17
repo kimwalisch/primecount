@@ -40,7 +40,8 @@ using namespace primecount;
 namespace {
 
 /// xp < 2^64
-template <typename T, typename LibdividePrimes>
+template <typename T,
+          typename LibdividePrimes>
 T S2_easy_64(T xp128,
              uint64_t y,
              uint64_t z,
@@ -91,7 +92,8 @@ T S2_easy_64(T xp128,
 }
 
 /// xp >= 2^64
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T S2_easy_128(T xp,
               uint64_t y,
               uint64_t z,
@@ -143,7 +145,8 @@ T S2_easy_128(T xp,
 /// Calculate the contribution of the clustered easy
 /// leaves and the sparse easy leaves.
 ///
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t z,
