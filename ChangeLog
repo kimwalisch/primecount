@@ -1,4 +1,4 @@
-2020-03-14 Kim Walisch  <kim.walisch@gmail.com>
+2020-03-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 6.0 released.
 
@@ -10,16 +10,12 @@
   information. The new version should run much faster for large
   computations >= 10^23.
 
-  * primecount.h: New C API. primecount now has both a C API
-    (primecount.h) and a C++ API (primecount.hpp).
-  * app.cpp: Contains C++ API function implementations.
-  * app_c.cpp: Contains C API function implementations.
   * Sieve.cpp: Implemented O(sqrt(sieve_size)) counting,
     previously counting was O(sieve_size).
-  * D.cpp: Use improved Sieve::count() method.
-  * S2_hard.cpp: Use improved Sieve::count() method.
-  * pi_lmo_parallel.cpp: Use improved Sieve::count() method.
-  * common.cpp: Tune alpha factors.
+  * AC_libdivide.cpp: Up to 20% faster using GCC.
+  * S2_easy_libdivide.cpp: Up to 20% faster using GCC.
+  * primecount.h: New C API. primecount now has both a C API
+    (primecount.h) and a C++ API (primecount.hpp).
   * LoadBalancer.cpp: Refactor using new ThreadSettings struct.
   * find_optimal_alpha_*.sh: New scripts that find optimal
     alpha tuning factors using the Linux perf tool.
