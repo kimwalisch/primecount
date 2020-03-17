@@ -321,7 +321,7 @@ int64_t B(int64_t x, int64_t y, int threads)
   if (!resume(x, y, sum, time))
   {
     int64_t z = (int64_t)(x / max(y, 1));
-    sum = B_OpenMP((intfast64_t) x, y, z, threads, time);
+    sum = B_OpenMP((uint64_t) x, y, z, threads, time);
     backup(x, y, z, sum, time);
   }
 
@@ -343,7 +343,7 @@ int128_t B(int128_t x, int64_t y, int threads)
   if (!resume(x, y, sum, time))
   {
     int64_t z = (int64_t)(x / max(y, 1));
-    sum = B_OpenMP((intfast128_t) x, y, z, threads, time);
+    sum = B_OpenMP((uint128_t) x, y, z, threads, time);
     backup(x, y, z, sum, time);
   }
 

@@ -15,7 +15,7 @@
 ///        data structures twice. Merging the A & C formulas also
 ///        improves scaling on systems with many CPU cores.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -231,7 +231,8 @@ bool resume(nlohmann::json& json,
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T A(T x,
     T xlow,
     T xhigh,
@@ -320,19 +321,20 @@ T C1(T xp,
   return sum;
 }
 
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T C1(T x,
-     int64_t z,
-     int64_t b,
-     int64_t pi_y,
+     uint64_t z,
+     uint64_t b,
+     uint64_t pi_y,
      const PiTable& pi,
      const Primes& primes)
 {
-  int64_t prime = primes[b];
+  uint64_t prime = primes[b];
   T xp = x / prime;
-  int64_t max_m = min(xp / prime, z);
+  uint64_t max_m = min(xp / prime, z);
   T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
-  int64_t min_m = min(min_m128, max_m);
+  uint64_t min_m = min(min_m128, max_m);
 
   return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
 }
@@ -341,7 +343,8 @@ T C1(T x,
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T C2(T x,
      T xlow,
      T xhigh,
@@ -393,7 +396,8 @@ T C2(T x,
 }
 
 /// Compute A + C
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T AC_OpenMP(T x,
             int64_t y,
             int64_t z,
@@ -643,7 +647,7 @@ int64_t AC(int64_t x,
   if (!resume(json, x, y, z, k, sum, time))
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+    sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
   }
 
   print("A + C", sum, time);
@@ -677,12 +681,12 @@ int128_t AC(int128_t x,
     if (max_prime <= numeric_limits<uint32_t>::max())
     {
       auto primes = generate_primes<uint32_t>(max_prime);
-      sum = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+      sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
     }
     else
     {
       auto primes = generate_primes<int64_t>(max_prime);
-      sum = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
+      sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
     }
   }
 

@@ -2,7 +2,7 @@
 /// @file   int128_t.hpp
 /// @brief  Support for int128_t, uint128_t types.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -115,25 +115,6 @@ using maxuint_t = uint64_t;
 #endif
 
 namespace primecount {
-
-/// Fastest 64-bit integer type for division.
-/// On most Intel CPUs before 2015 unsigned 64-bit division
-/// is about 10 percent faster than signed division. It is
-/// likely that in a few years signed and unsigned division
-/// will run equally fast.
-///
-using intfast64_t = uint64_t;
-
-#if defined(HAVE_INT128_T)
-
-/// Fastest 128-bit integer type for division.
-/// On the author's Intel Core-i7 4770 CPU from 2013 using
-/// uint128_t instead of int128_t gives 10 percent better
-/// performance.
-///
-using intfast128_t = uint128_t;
-
-#endif
 
 /// Portable namespace, includes functions which (unlike the
 /// versions form the C++ standard library) work with the
