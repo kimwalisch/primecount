@@ -191,8 +191,7 @@ T C1(T xp,
 ///
 template <typename T, 
           typename LibdividePrimes>
-T C2(T x,
-     T xlow,
+T C2(T xlow,
      T xhigh,
      uint64_t xp,
      uint64_t y,
@@ -205,7 +204,7 @@ T C2(T x,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
+  T min_m128 = max3(xhigh / prime, xp / ipow<T>(prime, 2), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -247,8 +246,7 @@ T C2(T x,
 ///
 template <typename T,
           typename Primes>
-T C2(T x,
-     T xlow,
+T C2(T xlow,
      T xhigh,
      T xp,
      uint64_t y,
@@ -261,7 +259,7 @@ T C2(T x,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
+  T min_m128 = max3(xhigh / prime, xp / ipow<T>(prime, 2), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -392,9 +390,9 @@ T AC_OpenMP(T x,
       if (b <= pi_x_star)
       {
         if (xp <= numeric_limits<uint64_t>::max())
-          sum += C2(x, xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+          sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
         else
-          sum += C2(x, xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+          sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
       }
       else
       {
