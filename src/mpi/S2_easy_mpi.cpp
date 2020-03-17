@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -40,12 +40,12 @@ namespace {
 /// @param T  either int64_t or uint128_t.
 ///
 template <typename T, typename Primes>
-T S2_easy_mpi_master(T x,
-                     int64_t y,
-                     int64_t z,
-                     int64_t c,
-                     Primes& primes,
-                     int threads)
+T S2_easy_mpi(T x,
+              int64_t y,
+              int64_t z,
+              int64_t c,
+              const Primes& primes,
+              int threads)
 {
   T s2_easy = 0;
   int64_t x13 = iroot<3>(x);
@@ -128,7 +128,7 @@ int64_t S2_easy_mpi(int64_t x,
 
   double time = get_time();
   auto primes = generate_primes<int32_t>(y);
-  int64_t s2_easy = S2_easy_mpi_master((intfast64_t) x, y, z, c, primes, threads);
+  int64_t s2_easy = ::S2_easy_mpi((uint64_t) x, y, z, c, primes, threads);
 
   print("S2_easy", s2_easy, time);
   return s2_easy;
@@ -154,12 +154,12 @@ int128_t S2_easy_mpi(int128_t x,
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = ::S2_easy_mpi((uint128_t) x, y, z, c, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_mpi_master((intfast128_t) x, y, z, c, primes, threads);
+    s2_easy = ::S2_easy_mpi((uint128_t) x, y, z, c, primes, threads);
   }
 
   print("S2_easy", s2_easy, time);
