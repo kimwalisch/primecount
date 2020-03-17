@@ -259,7 +259,7 @@ mentions in <a href="doc/References.md">[11]</a> that he computed pi(10<sup>25</
 in 40,000 CPU core hours using the analytic prime counting function algorithm.
 Büthe also mentions that by using additional zeros of the zeta function the runtime
 could have potentially been reduced to 4,000 CPU core hours. However using primecount
-and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 850 CPU
+and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 800 CPU
 core hours!
 
 ## Performance tips
@@ -267,7 +267,7 @@ core hours!
 By default primecount scales nicely up until 10^24 on current x64 CPUs.
 For larger values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
-cache misses that severely deteriorate primecount's performance.
+cache misses that significantly deteriorate primecount's performance.
 Fortunately the Linux kernel allows to enable
 [transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
 so that large memory allocations will automatically be done using huge
