@@ -15,7 +15,7 @@
 ///        data structures twice. Merging the A & C formulas also
 ///        improves scaling on systems with many CPU cores.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -44,7 +44,8 @@ namespace {
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T A(T x,
     T xlow,
     T xhigh,
@@ -137,7 +138,8 @@ T C1(T xp,
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T C2(T x,
      T xlow,
      T xhigh,
@@ -189,7 +191,8 @@ T C2(T x,
 }
 
 /// Compute A + C
-template <typename T, typename Primes>
+template <typename T,
+          typename Primes>
 T AC_OpenMP(T x,
             int64_t y,
             int64_t z,
