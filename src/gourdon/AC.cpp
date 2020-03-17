@@ -304,7 +304,7 @@ int64_t AC(int64_t x,
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<uint32_t>(max_prime);
 
-  int64_t sum = AC_OpenMP((intfast64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
 
   print("A + C", sum, time);
   return sum;
@@ -333,12 +333,12 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(max_prime);
-    sum = AC_OpenMP((intfast128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
   }
 
   print("A + C", sum, time);
