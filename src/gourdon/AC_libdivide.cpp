@@ -91,21 +91,23 @@ T A(T xlow,
   return sum;
 }
 
+/// 128-bit function.
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename Primes>
-uint128_t A(uint128_t xlow,
-            uint128_t xhigh,
-            uint128_t xp,
-            uint64_t y,
-            uint64_t b,
-            const PiTable& pi,
-            const Primes& primes,
-            const SegmentedPiTable& segmentedPi)
+template <typename T,
+          typename Primes>
+T A(T xlow,
+    T xhigh,
+    T xp,
+    uint64_t y,
+    uint64_t b,
+    const PiTable& pi,
+    const Primes& primes,
+    const SegmentedPiTable& segmentedPi)
 {
-  uint128_t sum = 0;
+  T sum = 0;
 
   uint64_t prime = primes[b];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
@@ -238,26 +240,28 @@ T C2(T x,
   return sum;
 }
 
+/// 128-bit function.
 /// Compute the 2nd part of the C formula.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
-template <typename Primes>
-uint128_t C2(uint128_t x,
-             uint128_t xlow,
-             uint128_t xhigh,
-             uint128_t xp,
-             uint64_t y,
-             uint64_t b,
-             const PiTable& pi,
-             const Primes& primes,
-             const SegmentedPiTable& segmentedPi)
+template <typename T,
+          typename Primes>
+T C2(T x,
+     T xlow,
+     T xhigh,
+     T xp,
+     uint64_t y,
+     uint64_t b,
+     const PiTable& pi,
+     const Primes& primes,
+     const SegmentedPiTable& segmentedPi)
 {
-  uint128_t sum = 0;
+  T sum = 0;
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint128_t min_m128 = max3(xhigh / prime, x / ipow<uint128_t>(prime, 3), prime);
+  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
