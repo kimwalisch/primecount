@@ -344,7 +344,7 @@ prime counting papers so far. Instead of using a binary indexed tree
 for counting which is very cache inefficient primecount uses a linear
 counters array in combination with the POPCNT instruction which is more
 cache efficient and much faster. The
-[Special-leaves.md](doc/Special-leaves.md) document contains more
+[Special-Leaves.md](doc/Special-Leaves.md) document contains more
 information.
 
 ## Fast nth prime calculation
