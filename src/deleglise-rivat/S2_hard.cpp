@@ -106,8 +106,8 @@ T S2_hard_thread(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_div_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_div_high, y / prime);
+      int64_t xp_high = min(fast_div(xp, high), y);
+      int64_t min_m = max(xp_high, y / prime);
       int64_t max_m = min(fast_div(xp, low1), y);
 
       if (prime >= max_m)
@@ -141,10 +141,10 @@ T S2_hard_thread(T x,
     {
       int64_t prime = primes[b];
       T xp = x / prime;
-      int64_t xp_div_low = min(fast_div(xp, low1), y);
-      int64_t xp_div_high = min(fast_div(xp, high), y);
-      int64_t l = pi[min(xp_div_low, z / prime)];
-      int64_t min_hard = max(xp_div_high, prime);
+      int64_t xp_low = min(fast_div(xp, low1), y);
+      int64_t xp_high = min(fast_div(xp, high), y);
+      int64_t l = pi[min(xp_low, z / prime)];
+      int64_t min_hard = max(xp_high, prime);
 
       if (prime >= primes[l])
         goto next_segment;
