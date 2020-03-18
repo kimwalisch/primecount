@@ -4,7 +4,7 @@
 ///        different types if both types are integral
 ///        and sizeof(A) >= sizeof(B).
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,8 +12,6 @@
 
 #ifndef MIN_HPP
 #define MIN_HPP
-
-#include <int128_t.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -25,8 +23,8 @@ struct is_comparable
 {
   enum {
     value = std::is_same<A, B>::value || (
-            prt::is_integral<A>::value &&
-            prt::is_integral<B>::value &&
+            std::is_integral<A>::value &&
+            std::is_integral<B>::value &&
             sizeof(A) >= sizeof(B))
   };
 };
@@ -35,9 +33,9 @@ template <typename A, typename B, typename C>
 struct is_comparable_3
 {
   enum {
-    value = prt::is_integral<A>::value &&
-            prt::is_integral<B>::value &&
-            prt::is_integral<C>::value &&
+    value = std::is_integral<A>::value &&
+            std::is_integral<B>::value &&
+            std::is_integral<C>::value &&
             sizeof(A) >= sizeof(B) &&
             sizeof(B) >= sizeof(C)
   };

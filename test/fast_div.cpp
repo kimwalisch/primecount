@@ -2,7 +2,7 @@
 /// @file  fast_div.cpp
 /// @brief Test fast_div(x, y) function
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -55,8 +55,8 @@ int main()
   random_device rd;
   mt19937 gen(rd());
 
-  uniform_int_distribution<int32_t> dist_i32(1, std::numeric_limits<int32_t>::max());
-  uniform_int_distribution<uint64_t> dist_u64(0, std::numeric_limits<uint64_t>::max());
+  uniform_int_distribution<int32_t> dist_i32(1, numeric_limits<int32_t>::max());
+  uniform_int_distribution<uint64_t> dist_u64(0, numeric_limits<uint64_t>::max());
 
   for (int i = 0; i < 10000; i++)
   {
@@ -77,7 +77,7 @@ int main()
 
 #ifdef HAVE_INT128_T
 
-  uniform_int_distribution<int128_t> dist_i128(0, prt::numeric_limits<int128_t>::max());
+  uniform_int_distribution<int128_t> dist_i128(0, numeric_limits<int128_t>::max());
 
   for (int i = 0; i < 10000; i++)
   {

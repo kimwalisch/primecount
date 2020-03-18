@@ -2,7 +2,7 @@
 /// @file   isqrt_constexpr.cpp
 /// @brief  Test compile time square root function.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -104,19 +104,19 @@ int main()
   static_assert(ct_sqrt(9223372037000250000ull) == 3037000500ull, "ct_sqrt(3037000500^2) failed!");
   static_assert(ct_sqrt(9223372037000250001ull) == 3037000500ull, "ct_sqrt(3037000500^2+1) failed!");
 
-  static_assert(ct_sqrt(prt::numeric_limits<int8_t>::max()) == 11, "ct_sqrt(2^7-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<uint8_t>::max()) == 15, "ct_sqrt(2^8-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<int16_t>::max()) == 181, "ct_sqrt(2^15-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<uint16_t>::max()) == 255, "ct_sqrt(2^16-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<int32_t>::max()) == 46340, "ct_sqrt(2^31-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<uint32_t>::max()) == 65535, "ct_sqrt(2^32-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<int64_t>::max()) == 3037000499ll, "ct_sqrt(2^63-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<uint64_t>::max()) == 4294967295ull, "ct_sqrt(2^64-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<int8_t>::max()) == 11, "ct_sqrt(2^7-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<uint8_t>::max()) == 15, "ct_sqrt(2^8-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<int16_t>::max()) == 181, "ct_sqrt(2^15-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<uint16_t>::max()) == 255, "ct_sqrt(2^16-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<int32_t>::max()) == 46340, "ct_sqrt(2^31-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<uint32_t>::max()) == 65535, "ct_sqrt(2^32-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<int64_t>::max()) == 3037000499ll, "ct_sqrt(2^63-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<uint64_t>::max()) == 4294967295ull, "ct_sqrt(2^64-1) failed!");
 
 #if defined(HAVE_INT128_T)
 
-  static_assert(ct_sqrt(prt::numeric_limits<int128_t>::max()) == 13043817825332782212ull, "ct_sqrt(2^127-1) failed!");
-  static_assert(ct_sqrt(prt::numeric_limits<uint128_t>::max()) == 18446744073709551615ull, "ct_sqrt(2^128-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<int128_t>::max()) == 13043817825332782212ull, "ct_sqrt(2^127-1) failed!");
+  static_assert(ct_sqrt(numeric_limits<uint128_t>::max()) == 18446744073709551615ull, "ct_sqrt(2^128-1) failed!");
 
 #endif
 

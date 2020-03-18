@@ -12,9 +12,7 @@
 #define INT128_T_HPP
 
 #include <stdint.h>
-#include <limits>
 #include <string>
-#include <type_traits>
 
 namespace primecount {
 
@@ -113,86 +111,5 @@ using maxuint_t = uint64_t;
 }
 
 #endif
-
-namespace primecount {
-
-/// Portable namespace, includes functions which (unlike the
-/// versions form the C++ standard library) work with the
-/// int128_t and uint128_t types (2014).
-///
-namespace prt {
-
-template <typename T>
-struct numeric_limits
-{
-  static constexpr T max()
-  {
-    return std::numeric_limits<T>::max();
-  }
-};
-
-#if defined(HAVE_INT128_T)
-
-template <>
-struct numeric_limits<int128_t>
-{
-  static constexpr int128_t min() { return ((int128_t) 1) << 127; }
-  static constexpr int128_t max() { return ~min(); }
-};
-
-template <>
-struct numeric_limits<uint128_t>
-{
-  static constexpr uint128_t min() { return 0; }
-  static constexpr uint128_t max() { return ~min(); }
-};
-
-#endif
-
-template <typename T>
-struct is_integral
-{
-  enum
-  {
-#if !defined(HAVE_INT128_T)
-    value = std::is_integral<T>::value
-#else
-    value = std::is_integral<T>::value ||
-            std::is_same<T, int128_t>::value ||
-            std::is_same<T, uint128_t>::value
-#endif
-  };
-};
-
-template <typename T>
-struct is_signed
-{
-  enum
-  {
-#if !defined(HAVE_INT128_T)
-    value = std::is_signed<T>::value
-#else
-    value = std::is_signed<T>::value ||
-            std::is_same<T, int128_t>::value
-#endif
-  };
-};
-
-template <typename T>
-struct is_unsigned
-{
-  enum
-  {
-#if !defined(HAVE_INT128_T)
-    value = std::is_unsigned<T>::value
-#else
-    value = std::is_unsigned<T>::value ||
-            std::is_same<T, uint128_t>::value
-#endif
-  };
-};
-
-} // namespace prt
-} // namespace primecount
 
 #endif
