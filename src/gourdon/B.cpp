@@ -10,7 +10,7 @@
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -33,6 +33,7 @@
 #include <iostream>
 #include <iomanip>
 #include <tuple>
+#include <type_traits>
 
 using namespace std;
 using namespace primecount;
@@ -47,16 +48,18 @@ bool is_backup(double time)
 }
 
 /// backup intermediate result
+template <typename T>
 void backup(nlohmann::json& json,
-            maxint_t x,
+            T x,
             int64_t y,
             int64_t z,
             int64_t low,
             int64_t pi_low_minus_1,
             int64_t thread_distance,
-            maxint_t sum,
+            T sum,
             double time)
 {
+  using ST = typename make_signed<T>::type;
   double percent = get_percent(low, z);
 
   auto& B = json["B"];
@@ -67,7 +70,7 @@ void backup(nlohmann::json& json,
   B["pi_low_minus_1"] = pi_low_minus_1;
   B["thread_distance"] = thread_distance;
   B["sieve_limit"] = z;
-  B["sum"] = to_str(sum);
+  B["sum"] = to_str((ST) sum);
   B["percent"] = percent;
   B["seconds"] = get_time() - time;
 
@@ -75,12 +78,14 @@ void backup(nlohmann::json& json,
 }
 
 /// backup result
-void backup(maxint_t x,
+template <typename T>
+void backup(T x,
             int64_t y,
             int64_t z,
-            maxint_t sum,
+            T sum,
             double time)
 {
+  using ST = typename make_signed<T>::type;
   auto json = load_backup();
 
   if (json.find("B") != json.end())
@@ -90,7 +95,7 @@ void backup(maxint_t x,
   B["x"] = to_str(x);
   B["y"] = y;
   B["alpha_y"] = get_alpha_y(x, y);
-  B["sum"] = to_str(sum);
+  B["sum"] = to_str((ST) sum);
   B["sieve_limit"] = z;
   B["percent"] = 100.0;
   B["seconds"] = get_time() - time;

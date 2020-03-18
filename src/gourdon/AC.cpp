@@ -37,6 +37,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include <type_traits>
 
 using namespace std;
 using namespace primecount;
@@ -51,8 +52,9 @@ bool is_backup(double time)
 }
 
 /// backup intermediate result
+template <typename T>
 void backup(nlohmann::json& json,
-            maxint_t x,
+            T x,
             int64_t y,
             int64_t z,
             int64_t k,
@@ -80,18 +82,20 @@ void backup(nlohmann::json& json,
 }
 
 /// backup result
+template <typename T>
 void backup_result(nlohmann::json& json,
-                   maxint_t x,
+                   T x,
                    int64_t y,
                    int64_t z,
                    int64_t k,
                    int64_t x_star,
-                   maxint_t sum,
+                   T sum,
                    double time)
 {
   if (json.find("AC") != json.end())
     json.erase("AC");
 
+  using ST = typename make_signed<T>::type;
   json["AC"]["x"] = to_str(x);
   json["AC"]["y"] = y;
   json["AC"]["z"] = z;
@@ -99,25 +103,42 @@ void backup_result(nlohmann::json& json,
   json["AC"]["x_star"] = x_star;
   json["AC"]["alpha_y"] = get_alpha_y(x, y);
   json["AC"]["alpha_z"] = get_alpha_z(y, z);
-  json["AC"]["sum"] = to_str(sum);
+  json["AC"]["sum"] = to_str((ST) sum);
   json["AC"]["percent"] = 100.0;
   json["AC"]["seconds"] = get_time() - time;
 
   store_backup(json);
 }
 
-/// update backup (without storing to disk)
+/// Update from resume thread.
+/// Update backup without storing to disk.
+template <typename T>
+void update(nlohmann::json& json,
+            const std::string& tid,
+            const std::string& formula,
+            T sum)
+{
+  using ST = typename make_signed<T>::type;
+  auto& AC = json["AC"];
+  AC[formula] = to_str((ST) sum);
+  AC.erase(tid);
+}
+
+/// Update from regular thread.
+/// Update backup without storing to disk.
+template <typename T>
 void update(nlohmann::json& json,
             const std::string& tid,
             const std::string& formula,
             int64_t b,
             int64_t next_b,
             int64_t max_b,
-            maxint_t sum)
+            T sum)
 {
+  using ST = typename make_signed<T>::type;
   auto& AC = json["AC"];
   AC["next_b"] = next_b;
-  AC[formula] = to_str(sum);
+  AC[formula] = to_str((ST) sum);
 
   if (b <= max_b)
     AC[tid]["b"] = b;
@@ -130,8 +151,9 @@ void update(nlohmann::json& json,
 }
 
 /// resume thread
+template <typename T>
 bool resume(nlohmann::json& json,
-            maxint_t x,
+            T x,
             int64_t y,
             int64_t z,
             int64_t k,
@@ -471,8 +493,7 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum -= sum_thread;
-            json["AC"]["sum_c1"] = to_str(sum);
-            json["AC"].erase(thread_id);
+            update(json, thread_id, "sum_c1", sum);
           }
         }
       }
@@ -569,8 +590,7 @@ T AC_OpenMP(T x,
           #pragma omp critical (ac)
           {
             sum += sum_thread;
-            json["AC"]["sum_ac"] = to_str(sum);
-            json["AC"].erase(thread_id);
+            update(json, thread_id, "sum_ac", sum);
           }
         }
       }

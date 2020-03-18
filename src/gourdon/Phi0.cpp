@@ -31,19 +31,22 @@
 
 #include <stdint.h>
 #include <vector>
+#include <type_traits>
 
 using namespace std;
 using namespace primecount;
 
 namespace {
 
-void backup(maxint_t x,
+template <typename T>
+void backup(T x,
             int64_t y,
             int64_t z,
             int64_t k,
-            maxint_t sum,
+            T sum,
             double time)
 {
+  using ST = typename make_signed<T>::type;
   auto json = load_backup();
 
   json["Phi0"]["x"] = to_str(x);
@@ -52,7 +55,7 @@ void backup(maxint_t x,
   json["Phi0"]["k"] = k;
   json["Phi0"]["alpha_y"] = get_alpha_y(x, y);
   json["Phi0"]["alpha_z"] = get_alpha_z(y, z);
-  json["Phi0"]["sum"] = to_str(sum);
+  json["Phi0"]["sum"] = to_str((ST) sum);
   json["Phi0"]["percent"] = 100.0;
   json["Phi0"]["seconds"] = get_time() - time;
 

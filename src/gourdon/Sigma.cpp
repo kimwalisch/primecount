@@ -6,7 +6,7 @@
 ///        have a runtime complexity of O(y) and hence it does not
 ///        make much sense to use multi-threading.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,25 +25,28 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <type_traits>
 
 using namespace std;
 using namespace primecount;
 
 namespace {
 
-void backup(maxint_t x,
+template <typename T>
+void backup(T x,
             int64_t y,
             int64_t x_star,
-            maxint_t sum,
+            T sum,
             double time)
 {
+  using ST = typename make_signed<T>::type;
   auto json = load_backup();
 
   json["Sigma"]["x"] = to_str(x);
   json["Sigma"]["y"] = y;
   json["Sigma"]["x_star"] = x_star;
   json["Sigma"]["alpha_y"] = get_alpha_y(x, y);
-  json["Sigma"]["sum"] = to_str(sum);
+  json["Sigma"]["sum"] = to_str((ST) sum);
   json["Sigma"]["percent"] = 100.0;
   json["Sigma"]["seconds"] = get_time() - time;
 
