@@ -204,7 +204,7 @@ T C2(T xlow,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / ipow<T>(prime, 2), prime);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -259,7 +259,7 @@ T C2(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / ipow<T>(prime, 2), prime);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -342,7 +342,7 @@ T AC_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
     int64_t max_m = min(xp / prime, z);
-    T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
+    T min_m128 = max(xp / (prime * prime), z / prime);
     int64_t min_m = min(min_m128, max_m);
 
     sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
