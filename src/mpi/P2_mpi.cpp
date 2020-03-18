@@ -121,7 +121,7 @@ P2_thread(T x,
 template <typename T>
 T P2_mpi_master(T x, int64_t y, int threads)
 {
-  static_assert(prt::is_signed<T>::value,
+  static_assert(is_signed<T>::value,
                 "T must be signed integer type");
 
   if (x < 4)

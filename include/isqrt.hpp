@@ -2,7 +2,7 @@
 /// @file  isqrt.hpp
 /// @brief Integer square root function
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,8 +10,6 @@
 
 #ifndef ISQRT_HPP
 #define ISQRT_HPP
-
-#include <int128_t.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -66,7 +64,7 @@ inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
 
-  constexpr T sqrt_max = ct_sqrt(prt::numeric_limits<T>::max());
+  constexpr T sqrt_max = ct_sqrt(std::numeric_limits<T>::max());
   r = std::min(r, sqrt_max);
 
   while (r * r > x)

@@ -104,7 +104,7 @@ maxint_t to_maxint(const string& expr)
     // remove leading zeros
     size_t pos = expr.find_first_not_of("0");
     string n = expr.substr(pos);
-    maxint_t limit = prt::numeric_limits<maxint_t>::max();
+    maxint_t limit = numeric_limits<maxint_t>::max();
     string max_n = to_str(limit);
 
     if (n.size() > max_n.size() ||
