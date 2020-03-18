@@ -333,7 +333,7 @@ T C1(T x,
   uint64_t prime = primes[b];
   T xp = x / prime;
   uint64_t max_m = min(xp / prime, z);
-  T min_m128 = max(x / ipow<T>(prime, 3), z / prime);
+  T min_m128 = max(xp / (prime * prime), z / prime);
   uint64_t min_m = min(min_m128, max_m);
 
   return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
@@ -359,7 +359,7 @@ T C2(T x,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, x / ipow<T>(prime, 3), prime);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
 
   uint64_t i = pi[max_m];

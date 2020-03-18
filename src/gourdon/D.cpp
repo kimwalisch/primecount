@@ -101,7 +101,7 @@ T D_thread(T x,
       int64_t xp_low = min(fast_div(xp, low1), z);
       int64_t xp_high = min(fast_div(xp, high), z);
       int64_t min_m = max(xp_high, z / prime);
-      int64_t max_m = min(x / ipow<T>(prime, 3), xp_low);
+      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
 
       if (prime >= max_m)
         goto next_segment;
@@ -139,7 +139,7 @@ T D_thread(T x,
       int64_t xp_low = min(fast_div(xp, low1), y);
       int64_t xp_high = min(fast_div(xp, high), y);
       int64_t min_m = max(xp_high, prime);
-      int64_t max_m = min(x / ipow<T>(prime, 3), xp_low);
+      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
       int64_t l = pi[max_m];
 
       if (prime >= primes[l])
