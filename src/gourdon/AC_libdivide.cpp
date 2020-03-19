@@ -842,7 +842,7 @@ int128_t AC(int128_t x,
     }
     else
     {
-      auto primes = generate_primes<int64_t>(max_prime);
+      auto primes = generate_primes<uint64_t>(max_prime);
       sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, time);
     }
   }
