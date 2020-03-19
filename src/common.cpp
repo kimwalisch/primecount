@@ -98,20 +98,25 @@ string to_str(maxint_t x)
 
 maxint_t to_maxint(const string& expr)
 {
-  // check n <= max
+  // Check if n <= max, if n is only
+  // composed of regular digits.
   if (expr.find_first_not_of("0123456789") == string::npos)
   {
-    // remove leading zeros
+    // Remove leading zeros
     size_t pos = expr.find_first_not_of("0");
-    string n = expr.substr(pos);
-    maxint_t limit = numeric_limits<maxint_t>::max();
-    string max_n = to_str(limit);
 
-    if (n.size() > max_n.size() ||
-      (n.size() == max_n.size() && n > max_n))
+    if (pos != string::npos)
     {
-      string msg = "number too large: " + n;
-      throw primecount_error(msg);
+      string n = expr.substr(pos);
+      maxint_t limit = numeric_limits<maxint_t>::max();
+      string max_n = to_str(limit);
+
+      if (n.size() > max_n.size() ||
+        (n.size() == max_n.size() && n > max_n))
+      {
+        string msg = "number too large: " + n;
+        throw primecount_error(msg);
+      }
     }
   }
 
