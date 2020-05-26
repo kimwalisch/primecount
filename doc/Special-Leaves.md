@@ -194,7 +194,7 @@ issue in the computation of the special leaves that had been present in primecou
 since the very beginning. Below 10^20 there are no performance improvements,
 however above 10^20, the higher you go the more efficient the new method becomes
 compared to primecount's old implementation. At 10^25 the new method is already
-2x faster. Note that new method works best with the Deleglise-Rivat and Gourdon
+2x faster. Note that the new method works best with the Deleglise-Rivat and Gourdon
 variants of the combinatorial prime counting algorithm as the average distance
 between consecutive special leaves is relatively large in those algorithms. In
 the Lagarias-Miller-Odlyzko algorithm the average distance between consecutive
