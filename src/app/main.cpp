@@ -420,7 +420,10 @@ int main (int argc, char* argv[])
         res = Ri_inverse(x); break;
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads);
-        time = backup_time(time); break;
+        // Below 10^5 nth_prime uses primesieve instead of Gourdon's algorithm
+        if (x >= 100000)
+          time = backup_time(time);
+        break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_AC:

@@ -42,13 +42,6 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  // For [0, 10^3] Legendre's algorithm runs fastest
-  if (x <= (int64_t) 1e3)
-    return pi_legendre(x, threads);
-  if (x <= (int64_t) 1e5)
-    return pi_meissel(x, threads);
-
-  // Above 10^5 Xavier Gourdon's algorithm runs fastest
   return pi_gourdon_64(x, threads);
 }
 
