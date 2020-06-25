@@ -45,6 +45,7 @@ double skewed_percent(T x, T y)
   double low = pow(base, 100.0);
   double dividend = pow(base, percent) - low;
   percent = 100 - (100 * dividend / (1 - low));
+  percent = in_between(0, percent, 100);
 
   return percent;
 }
@@ -64,12 +65,16 @@ double S2Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
 {
   double p1 = skewed_percent(low, limit);
   double p2 = skewed_percent(sum, sum_approx);
-  double percent = max(p1, p2);
 
-  // p2 is just an approximation,
-  // use p1 near the end
-  if (p2 > 95.0)
-    percent = max(p1, 95.0);
+  // When p1 is larger then p2 it is
+  // always much more accurate.
+  if (p1 > p2)
+    return p1;
+
+  // p2 is a very rough estimation, hence
+  // we want to decrease its contribution
+  // to the final percent value.
+  double percent = (p1 * 6 + p2 * 4) / 10;
 
   return percent;
 }

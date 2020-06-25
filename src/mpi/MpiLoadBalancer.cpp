@@ -127,7 +127,7 @@ double MpiLoadBalancer::remaining_secs() const
 void MpiLoadBalancer::update_segments(ThreadSettings& thread)
 {
   double rem = remaining_secs();
-  double threshold = rem / 4;
+  double threshold = rem / 3;
   double min_secs = 0.01;
 
   // Each thread should run at least 10x

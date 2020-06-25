@@ -150,8 +150,8 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
   // a short amount of time in order to ensure that all
   // threads finish nearly at the same time. Since the
   // remaining time is just a rough estimation we want to be
-  // very conservative so we divide the remaining time by 4.
-  double rem_secs = remaining_secs() / 4;
+  // very conservative so we divide the remaining time by 3.
+  double rem_secs = remaining_secs() / 3;
 
   // If the previous thread runtime is larger than the
   // estimated remaining time the factor that we calculate
