@@ -1,3 +1,8 @@
+2020-06-25 Kim Walisch  <kim.walisch@gmail.com>
+
+  * S2Status.cpp: Improve S2_hard & D status accuracy.
+  * Fixed #32: primecount-backup prints incorrect time elapsed.
+
 2020-03-16 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 6.0 released.
