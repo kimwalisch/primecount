@@ -217,7 +217,8 @@ slowly we can calculate the average leaf distance of the previous segment and us
 that for the next segment. My measurements using primecount indicate that adaptively
 resizing the counters further improves counting by more than a constant factor.
 Another option that works quite well in practice is to approximately calculate the
-average leaf distance using ```average_leaf_distance = sqrt(segment_low)```.
+average leaf distance using ```average_leaf_distance = sqrt(segment_low)```
+(primecount uses this).
 
 ```C++
 // Each element of the counters array contains the current
