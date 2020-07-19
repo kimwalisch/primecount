@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -77,7 +77,9 @@ map<string, std::pair<OptionID, IsParam>> optionMap =
   { "--Ri-inverse", make_pair(OPTION_RIINV, NO_PARAM) },
   { "--phi", make_pair(OPTION_PHI, NO_PARAM) },
   { "--AC", make_pair(OPTION_AC, NO_PARAM) },
+  { "-B", make_pair(OPTION_B, NO_PARAM) },
   { "--B", make_pair(OPTION_B, NO_PARAM) },
+  { "-D", make_pair(OPTION_D, NO_PARAM) },
   { "--D", make_pair(OPTION_D, NO_PARAM) },
   { "--Phi0", make_pair(OPTION_PHI0, NO_PARAM) },
   { "--Sigma", make_pair(OPTION_SIGMA, NO_PARAM) },
