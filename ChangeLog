@@ -1,6 +1,8 @@
-2020-06-25 Kim Walisch  <kim.walisch@gmail.com>
+2020-07-19 Kim Walisch  <kim.walisch@gmail.com>
 
   * S2Status.cpp: Improve S2_hard & D status accuracy.
+  * LoadBalancer.cpp: Slightly increase thread workloads.
+  * cmdoptions.cpp: Add -B & -D options.
   * Fixed #32: primecount-backup prints incorrect time elapsed.
 
 2020-03-16 Kim Walisch  <kim.walisch@gmail.com>
