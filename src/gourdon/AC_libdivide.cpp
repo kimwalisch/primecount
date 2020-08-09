@@ -70,19 +70,19 @@ T A(T xlow,
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
-  uint64_t max_i = pi[max_2nd_prime];
+  uint64_t xpy = xp / y;
+  uint64_t max_i1 = pi[min(xpy, max_2nd_prime)];
+  uint64_t max_i2 = pi[max_2nd_prime];
 
   // x / (p * q) >= y
-  for (; i <= max_i; i++)
+  for (; i <= max_i1; i++)
   {
     uint64_t xpq = xp / primes[i];
-    if (xpq < y)
-      break;
     sum += segmentedPi[xpq];
   }
 
   // x / (p * q) < y
-  for (; i <= max_i; i++)
+  for (; i <= max_i2; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2;
@@ -115,19 +115,19 @@ T A(T xlow,
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
-  uint64_t max_i = pi[max_2nd_prime];
+  uint64_t xpy = xp / y;
+  uint64_t max_i1 = pi[min(xpy, max_2nd_prime)];
+  uint64_t max_i2 = pi[max_2nd_prime];
 
   // x / (p * q) >= y
-  for (; i <= max_i; i++)
+  for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
-    if (xpq < y)
-      break;
     sum += segmentedPi[xpq];
   }
 
   // x / (p * q) < y
-  for (; i <= max_i; i++)
+  for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2;
