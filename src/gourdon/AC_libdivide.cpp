@@ -375,8 +375,8 @@ T AC_OpenMP(T x,
     // x / (primes[i] * primes[i+1]) >= low
     // primes[i] * primes[i+1] <= x / low
     // primes[i] <= floor(sqrt(x / low))
-    int64_t sqrt_low = min(isqrt(xlow), x13);
-    int64_t max_b = pi[sqrt_low];
+    int64_t sqrt_xlow = min(isqrt(xlow), x13);
+    int64_t max_b = pi[sqrt_xlow];
     max_b = max(max_b, pi_x_star);
 
     // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
