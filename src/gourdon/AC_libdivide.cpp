@@ -678,7 +678,6 @@ T AC_OpenMP(T x,
     // primes[i] <= floor(sqrt(x / low))
     int64_t sqrt_xlow = min(isqrt(xlow), x13);
     int64_t max_b = pi[sqrt_xlow];
-    max_b = max(max_b, pi_x_star);
 
     #pragma omp parallel for num_threads(threads)
     for (int i = 0; i < threads; i++)

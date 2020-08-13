@@ -1,7 +1,7 @@
-2020-08-09 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-13 Kim Walisch  <kim.walisch@gmail.com>
 
+  * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop.
-  * AC_libdivide.cpp: Avoid branch inside hot loop.
   * S2Status.cpp: Improve S2_hard & D status accuracy.
   * LoadBalancer.cpp: Slightly increase thread workloads.
   * cmdoptions.cpp: Add -B & -D options.
