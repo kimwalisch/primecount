@@ -374,7 +374,7 @@ T AC_OpenMP(T x,
     min_b += 1;
 
     // Upper bound of A & C2 formulas:
-    // x / (p * m) >= low
+    // x / (p * q) >= low
     // p * next_prime(p) <= x / low
     // p <= sqrt(x / low)
     int64_t sqrt_xlow = min(isqrt(xlow), x13);
