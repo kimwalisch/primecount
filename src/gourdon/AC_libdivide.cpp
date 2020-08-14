@@ -279,8 +279,7 @@ T A(T xlow,
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
-  uint64_t xpy = xp / y;
-  uint64_t max_i1 = pi[min(xpy, max_2nd_prime)];
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
   // x / (p * q) >= y
@@ -324,8 +323,7 @@ T A(T xlow,
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
-  uint64_t xpy = xp / y;
-  uint64_t max_i1 = pi[min(xpy, max_2nd_prime)];
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
   // x / (p * q) >= y
