@@ -367,14 +367,16 @@ T AC_OpenMP(T x,
     T xlow = x / low;
     T xhigh = x / high;
 
+    // Lower bounds of the C2 formula
     min_b = max3(k, pi_sqrtz, pi_root3_xy);
     min_b = max(min_b, pi[isqrt(low)]);
-    min_b = max(min_b, pi[min(xhigh / y, x_star)]);
-    min_b = min(min_b, pi_x_star) + 1;
+    min_b = max(min_b, pi[min(xhigh / y, x13)]);
+    min_b += 1;
 
-    // x / (primes[i] * primes[i+1]) >= low
-    // primes[i] * primes[i+1] <= x / low
-    // primes[i] <= floor(sqrt(x / low))
+    // Upper bound of the A & C2 formulas:
+    // x / (p * m) >= low
+    // p * next_prime(p) <= x / low
+    // p <= sqrt(x / low)
     int64_t sqrt_xlow = min(isqrt(xlow), x13);
     int64_t max_b = pi[sqrt_xlow];
 
