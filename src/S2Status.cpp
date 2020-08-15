@@ -2,9 +2,9 @@
 /// @file  S2Status.cpp
 /// @brief The S2Status class is used to print the status (in percent)
 ///        of the formulas related to special leaves. It is used by
-///        the S2_trivial, S2_easy and S2_hard formulas of the
-///        Deleglise-Rivat algorithm. And it is also used by the A, C
-///        and D formulas of Xavier Gourdon's algorithm.
+///        the S2_easy and S2_hard formulas of the Deleglise-Rivat
+///        algorithm. And it is also used by the A, C and D formulas
+///        of Xavier Gourdon's algorithm.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -23,6 +23,10 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+
+#if defined(_OPENMP)
+  #include <omp.h>
+#endif
 
 using namespace std;
 using namespace primecount;
@@ -89,19 +93,23 @@ bool S2Status::isPrint(double time)
 void S2Status::print(int64_t n, int64_t limit)
 {
 #if defined(_OPENMP)
-  TryLock lock(lock_);
-
-  // Only one thread at a time can enter this code section.
-  // Since printing the current status is not important,
-  // we simply do not print the status if there is already
-  // another thread which is currently printing the status
-  // and which holds the lock.
-  if (!lock.ownsLock())
+  // In order to prevent data races only one thread at a time
+  // can enter this code section. In order to make sure that
+  // our code scales well up to a very large number of CPU
+  // cores, we don't want to use any thread synchronization!
+  // In order to achieve this only one of the threads (the
+  // master thread) is allowed to print the status, while all
+  // other threads do nothing.
+  if (omp_get_thread_num() != 0)
     return;
 #endif
 
   double time = get_time();
 
+  // In order to prevent printing the status from deteriorating
+  // performance, the master thread is only allowed to print
+  // the status if 0.05 seconds (or more) have elapsed since
+  // the last time the status has been printed.
   if (isPrint(time))
   {
     time_ = time;

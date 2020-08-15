@@ -13,10 +13,6 @@
 #include <int128_t.hpp>
 #include <noinline.hpp>
 
-#if defined(_OPENMP)
-  #include <OmpLock.hpp>
-#endif
-
 namespace primecount {
 
 class S2Status
@@ -34,10 +30,6 @@ private:
   double time_ = 0;
   double is_print_ = 1.0 / 20;
   int precision_;
-
-#if defined(_OPENMP)
-  OmpLock lock_;
-#endif
 };
 
 } // namespace
