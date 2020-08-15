@@ -15,7 +15,7 @@
 #include <mpi.h>
 #include <LoadBalancer.hpp>
 #include <MpiMsg.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <int128_t.hpp>
 #include <stdint.h>
 
@@ -40,7 +40,7 @@ private:
   maxint_t sum_;
   maxint_t sum_approx_;
   double time_;
-  S2Status status_;
+  Status status_;
 };
 
 } // namespace

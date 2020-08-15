@@ -35,7 +35,7 @@
 #include <MpiLoadBalancer.hpp>
 #include <MpiMsg.hpp>
 #include <imath.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <S.hpp>
 #include <Sieve.hpp>
 #include <print.hpp>
@@ -240,7 +240,7 @@ T S2_hard_mpi_master(T x,
 
   MpiMsg msg;
   MpiLoadBalancer loadBalancer(x, z, s2_hard_approx);
-  S2Status status(x);
+  Status status(x);
 
   while (slaves > 0)
   {

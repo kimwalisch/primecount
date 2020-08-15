@@ -1,6 +1,6 @@
 ///
-/// @file  S2Status.cpp
-/// @brief The S2Status class is used to print the status (in percent)
+/// @file  Status.cpp
+/// @brief The Status class is used to print the status (in percent)
 ///        of the formulas related to special leaves. It is used by
 ///        the S2_easy and S2_hard formulas of the Deleglise-Rivat
 ///        algorithm. And it is also used by the A, C and D formulas
@@ -12,7 +12,7 @@
 /// file in the top level directory.
 ///
 
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -58,14 +58,14 @@ double skewed_percent(T x, T y)
 
 namespace primecount {
 
-S2Status::S2Status(maxint_t x)
+Status::Status(maxint_t x)
 {
   precision_ = get_status_precision(x);
   int q = ipow(10, precision_);
   epsilon_ = 1.0 / q;
 }
 
-double S2Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double p1 = skewed_percent(low, limit);
   double p2 = skewed_percent(sum, sum_approx);
@@ -83,14 +83,14 @@ double S2Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
   return percent;
 }
 
-bool S2Status::isPrint(double time)
+bool Status::isPrint(double time)
 {
   double old = time_;
   return old == 0 ||
         (time - old) >= is_print_;
 }
 
-void S2Status::print(int64_t n, int64_t limit)
+void Status::print(int64_t n, int64_t limit)
 {
 #if defined(_OPENMP)
   // In order to prevent data races only one thread at a time
@@ -124,7 +124,7 @@ void S2Status::print(int64_t n, int64_t limit)
 /// LoadBalancer.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-void S2Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
 
@@ -136,7 +136,7 @@ void S2Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_appr
   }
 }
 
-void S2Status::print(double percent)
+void Status::print(double percent)
 {
   double old = percent_;
 

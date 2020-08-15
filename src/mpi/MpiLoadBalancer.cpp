@@ -28,7 +28,7 @@
 #include <primecount-internal.hpp>
 #include <MpiLoadBalancer.hpp>
 #include <MpiMsg.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>

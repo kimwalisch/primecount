@@ -63,7 +63,7 @@ set(LIB_SRC src/api.cpp
             src/S1.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
-            src/S2Status.cpp
+            src/Status.cpp
             src/generate.cpp
             src/nth_prime.cpp
             src/phi.cpp

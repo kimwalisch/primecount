@@ -30,7 +30,7 @@
 #include <min.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <imath.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <print.hpp>
 
 #include <libdivide.h>
@@ -171,7 +171,7 @@ T S2_easy_mpi(T x,
   PiTable pi(y);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  S2Status status(x);
+  Status status(x);
 
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();

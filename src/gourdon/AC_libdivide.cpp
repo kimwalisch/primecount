@@ -37,7 +37,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -309,7 +309,7 @@ T AC_OpenMP(T x,
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
-  S2Status status(x);
+  Status status(x);
   PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
