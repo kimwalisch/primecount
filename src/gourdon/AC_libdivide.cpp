@@ -37,7 +37,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <json.hpp>
 #include <backup.hpp>
 
@@ -537,7 +537,7 @@ T AC_OpenMP(T x,
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
-  S2Status status(x);
+  Status status(x);
   PiTable pi(max(z, max_a_prime));
 
   int64_t pi_y = pi[y];

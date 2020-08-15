@@ -60,7 +60,7 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/SegmentedPiTable.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
-            src/S2Status.cpp
+            src/Status.cpp
             src/generate.cpp
             src/nth_prime.cpp
             src/phi.cpp

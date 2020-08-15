@@ -12,8 +12,8 @@
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
-#include <S2Status.hpp>
 #include <json.hpp>
+#include <Status.hpp>
 
 #include <stdint.h>
 
@@ -69,7 +69,7 @@ private:
   maxint_t sum_approx_;
   double time_;
   double backup_time_;
-  S2Status status_;
+  Status status_;
   nlohmann::json json_;
   nlohmann::json copy_;
 };

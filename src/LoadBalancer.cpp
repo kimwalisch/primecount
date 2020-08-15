@@ -31,7 +31,7 @@
 #include <primecount-internal.hpp>
 #include <json.hpp>
 #include <backup.hpp>
-#include <S2Status.hpp>
+#include <Status.hpp>
 #include <Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>

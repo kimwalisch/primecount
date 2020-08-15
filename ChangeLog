@@ -1,8 +1,10 @@
-2020-08-13 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-15 Kim Walisch  <kim.walisch@gmail.com>
 
   * AC.cpp: Improve upper bound of C2 formula.
-  * AC.cpp: Avoid branch inside hot loop.
-  * S2Status.cpp: Improve S2_hard & D status accuracy.
+  * AC.cpp: Avoid branch inside hot loop of A formula.
+  * Status.cpp: Avoid thread synchronization when printing in
+    order to improve scaling of AC and S2_easy.
+  * Status.cpp: Improve S2_hard & D status accuracy.
   * LoadBalancer.cpp: Slightly increase thread workloads.
   * cmdoptions.cpp: Add -B & -D options.
   * Fixed #32: primecount-backup prints incorrect time elapsed.
