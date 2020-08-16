@@ -101,10 +101,10 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   // In order to simplify multi-threading we set low,
   // high and segment_size % 128 == 0.
   segment_size_ += 128 - segment_size_ % 128;
+  pi_.resize(segment_size_ / 128);
 
   high_ = segment_size_;
   high_ = std::min(high_, max_high_);
-  pi_.resize(segment_size_ / 128);
 }
 
 void SegmentedPiTable::next()
@@ -164,7 +164,7 @@ void SegmentedPiTable::init()
 #else
   uint64_t thread_size = segment_size_ / omp_get_num_threads();
   uint64_t min_thread_size = (uint64_t) 1e7;
-  thread_size = max(thread_size, min_thread_size);
+  thread_size = max(min_thread_size, thread_size);
   thread_size += 128 - thread_size % 128;
 
   uint64_t thread_num = omp_get_thread_num();
