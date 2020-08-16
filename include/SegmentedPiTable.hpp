@@ -68,9 +68,9 @@ public:
     return prime_count + bit_count;
   }
 
-  bool finished() const
+  bool has_next() const
   {
-    return low_ >= max_high_;
+    return low_ < max_high_;
   }
 
   int64_t low() const

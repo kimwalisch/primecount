@@ -358,11 +358,10 @@ T AC_OpenMP(T x,
     // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
     // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
     // in order to reduce the memory usage.
-    for (; !segmentedPi.finished(); segmentedPi.next())
+    for (; segmentedPi.has_next(); segmentedPi.next())
     {
-      segmentedPi.init();
-
       // Current segment [low, high[
+      segmentedPi.init();
       int64_t low = segmentedPi.low();
       int64_t high = segmentedPi.high();
       low = max(low, 1);
