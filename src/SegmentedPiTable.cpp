@@ -111,11 +111,14 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
 /// Increase low & high and initialize the next segment.
 void SegmentedPiTable::next()
 {
-  uint64_t pi_low_minus_1 = operator[](high_ - 1);
+  #pragma omp single
+  {
+    pi_low_minus_1 = operator[](high_ - 1);
 
-  low_ = high_;
-  high_ = low_ + segment_size_;
-  high_ = std::min(high_, max_high_);
+    low_ = high_;
+    high_ = low_ + segment_size_;
+    high_ = std::min(high_, max_high_);
+  }
 
   if (finished())
     return;
@@ -164,7 +167,7 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 ///
 void SegmentedPiTable::init_next_segment(uint64_t pi_low_minus_1)
 {
-  #pragma omp parallel for num_threads(threads_)
+  #pragma omp for
   for (int t = 0; t < threads_; t++)
   {
     uint64_t thread_size = segment_size_ / threads_;

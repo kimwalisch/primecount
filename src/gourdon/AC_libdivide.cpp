@@ -416,7 +416,6 @@ T AC_OpenMP(T x,
           status.print(b, pi_x13);
       }
 
-      #pragma omp single
       segmentedPi.next();
     }
   }

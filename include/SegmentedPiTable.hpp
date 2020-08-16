@@ -101,6 +101,7 @@ private:
   uint64_t max_high_;
   uint64_t segment_size_;
   int threads_;
+  uint64_t pi_low_minus_1 = 0;
 };
 
 } // namespace
