@@ -326,13 +326,7 @@ T AC_OpenMP(T x,
   int64_t pi_x13 = pi[x13];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
-  int64_t min_b = max(k, pi_root3_xz) + 1;
-
-  int64_t max_b = 0;
-  int64_t low = 0;
-  int64_t high = 0;
-  T xlow = 0;
-  T xhigh = 0;
+  int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
   #pragma omp parallel num_threads(threads)
   {
@@ -343,7 +337,7 @@ T AC_OpenMP(T x,
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
     #pragma omp for schedule(dynamic) reduction(-: sum)
-    for (int64_t b = min_b; b <= pi_sqrtz; b++)
+    for (int64_t b = min_c1; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -364,30 +358,28 @@ T AC_OpenMP(T x,
     // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
     // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
     // in order to reduce the memory usage.
-    while (!segmentedPi.finished())
+    for (; !segmentedPi.finished(); segmentedPi.next())
     {
-      #pragma omp single
-      {
-        // Current segment [low, high[
-        low = segmentedPi.low();
-        high = segmentedPi.high();
-        low = max(low, 1);
-        xlow = x / low;
-        xhigh = x / high;
+      // Current segment [low, high[
+      int64_t low = segmentedPi.low();
+      int64_t high = segmentedPi.high();
+      low = max(low, 1);
+      T xlow = x / low;
+      T xhigh = x / high;
 
-        // Lower bounds of C2 formula
-        min_b = max3(k, pi_sqrtz, pi_root3_xy);
-        min_b = max(min_b, pi[isqrt(low)]);
-        min_b = max(min_b, pi[min(xhigh / y, x_star)]);
-        min_b += 1;
+      // Lower bounds of C2 formula
+      int64_t min_b = max(k, pi_root3_xy);
+      min_b = max(min_b, pi_sqrtz);
+      min_b = max(min_b, pi[isqrt(low)]);
+      min_b = max(min_b, pi[min(xhigh / y, x_star)]);
+      min_b += 1;
 
-        // Upper bound of A & C2 formulas:
-        // x / (p * q) >= low
-        // p * next_prime(p) <= x / low
-        // p <= sqrt(x / low)
-        int64_t sqrt_xlow = min(isqrt(xlow), x13);
-        max_b = pi[sqrt_xlow];
-      }
+      // Upper bound of A & C2 formulas:
+      // x / (p * q) >= low
+      // p * next_prime(p) <= x / low
+      // p <= sqrt(x / low)
+      int64_t sqrt_xlow = min(isqrt(xlow), x13);
+      int64_t max_b = pi[sqrt_xlow];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       // A  formula: pi[x_star] < b <= pi[x13]
@@ -415,8 +407,6 @@ T AC_OpenMP(T x,
         if (is_print())
           status.print(b, pi_x13);
       }
-
-      segmentedPi.next();
     }
   }
 
