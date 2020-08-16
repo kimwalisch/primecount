@@ -328,81 +328,96 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_b = max(k, pi_root3_xz) + 1;
 
-  // This computes the 1st part of the C formula.
-  // Find all special leaves of type:
-  // x / (primes[b] * m) <= z.
-  // m may be a prime <= y or a square free number <= z
-  // who is coprime to the first b primes and whose
-  // largest prime factor <= y.
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(-: sum)
-  for (int64_t b = min_b; b <= pi_sqrtz; b++)
+  int64_t max_b = 0;
+  int64_t low = 0;
+  int64_t high = 0;
+  T xlow = 0;
+  T xhigh = 0;
+
+  #pragma omp parallel num_threads(threads)
   {
-    int64_t prime = primes[b];
-    T xp = x / prime;
-    int64_t max_m = min(xp / prime, z);
-    T min_m128 = max(xp / (prime * prime), z / prime);
-    int64_t min_m = min(min_m128, max_m);
-
-    sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
-
-    if (is_print())
-      status.print(b, pi_x13);
-  }
-
-  // This computes A and the 2nd part of the C formula.
-  // Find all special leaves of type:
-  // x / (primes[b] * primes[i]) <= x^(1/2)
-  // with z^(1/2) < primes[b] <= x^(1/3).
-  // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
-  // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
-  // in order to reduce the memory usage.
-  for (; !segmentedPi.finished(); segmentedPi.next())
-  {
-    // Current segment [low, high[
-    int64_t low = segmentedPi.low();
-    int64_t high = segmentedPi.high();
-    low = max(low, 1);
-    T xlow = x / low;
-    T xhigh = x / high;
-
-    // Lower bounds of C2 formula
-    min_b = max3(k, pi_sqrtz, pi_root3_xy);
-    min_b = max(min_b, pi[isqrt(low)]);
-    min_b = max(min_b, pi[min(xhigh / y, x_star)]);
-    min_b += 1;
-
-    // Upper bound of A & C2 formulas:
-    // x / (p * q) >= low
-    // p * next_prime(p) <= x / low
-    // p <= sqrt(x / low)
-    int64_t sqrt_xlow = min(isqrt(xlow), x13);
-    int64_t max_b = pi[sqrt_xlow];
-
-    // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-    // A  formula: pi[x_star] < b <= pi[x13]
-    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
-    for (int64_t b = min_b; b <= max_b; b++)
+    // This computes the 1st part of the C formula.
+    // Find all special leaves of type:
+    // x / (primes[b] * m) <= z.
+    // m may be a prime <= y or a square free number <= z
+    // who is coprime to the first b primes and whose
+    // largest prime factor <= y.
+    #pragma omp for schedule(dynamic) reduction(-: sum)
+    for (int64_t b = min_b; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
+      int64_t max_m = min(xp / prime, z);
+      T min_m128 = max(xp / (prime * prime), z / prime);
+      int64_t min_m = min(min_m128, max_m);
 
-      if (b <= pi_x_star)
-      {
-        if (xp <= numeric_limits<uint64_t>::max())
-          sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
-        else
-          sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
-      }
-      else
-      {
-        if (xp <= numeric_limits<uint64_t>::max())
-          sum += A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
-        else
-          sum += A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
-      }
+      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
 
       if (is_print())
         status.print(b, pi_x13);
+    }
+
+    // This computes A and the 2nd part of the C formula.
+    // Find all special leaves of type:
+    // x / (primes[b] * primes[i]) <= x^(1/2)
+    // with z^(1/2) < primes[b] <= x^(1/3).
+    // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
+    // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
+    // in order to reduce the memory usage.
+    while (!segmentedPi.finished())
+    {
+      #pragma omp single
+      {
+        // Current segment [low, high[
+        low = segmentedPi.low();
+        high = segmentedPi.high();
+        low = max(low, 1);
+        xlow = x / low;
+        xhigh = x / high;
+
+        // Lower bounds of C2 formula
+        min_b = max3(k, pi_sqrtz, pi_root3_xy);
+        min_b = max(min_b, pi[isqrt(low)]);
+        min_b = max(min_b, pi[min(xhigh / y, x_star)]);
+        min_b += 1;
+
+        // Upper bound of A & C2 formulas:
+        // x / (p * q) >= low
+        // p * next_prime(p) <= x / low
+        // p <= sqrt(x / low)
+        int64_t sqrt_xlow = min(isqrt(xlow), x13);
+        max_b = pi[sqrt_xlow];
+      }
+
+      // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+      // A  formula: pi[x_star] < b <= pi[x13]
+      #pragma omp for schedule(dynamic) reduction(+: sum)
+      for (int64_t b = min_b; b <= max_b; b++)
+      {
+        int64_t prime = primes[b];
+        T xp = x / prime;
+
+        if (b <= pi_x_star)
+        {
+          if (xp <= numeric_limits<uint64_t>::max())
+            sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+          else
+            sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+        }
+        else
+        {
+          if (xp <= numeric_limits<uint64_t>::max())
+            sum += A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+          else
+            sum += A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+        }
+
+        if (is_print())
+          status.print(b, pi_x13);
+      }
+
+      #pragma omp single
+      segmentedPi.next();
     }
   }
 
