@@ -42,10 +42,9 @@ class SegmentedPiTable
 {
 public:
   SegmentedPiTable(uint64_t limit,
-                   uint64_t segment_size,
-                   int threads);
+                   uint64_t segment_size);
 
-  /// Increase low & high and initialize the next segment.
+  void init();
   void next();
 
   /// Get number of primes <= n
@@ -86,7 +85,6 @@ public:
 
 private:
   void reset_pi(uint64_t start, uint64_t stop);
-  void init_next_segment();
 
   struct PiData
   {

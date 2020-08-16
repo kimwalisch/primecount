@@ -13,7 +13,7 @@
 ///        only (n / 8) bytes of memory and returns the number of
 ///        primes <= n in O(1) operations.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -79,8 +79,7 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 };
 
 SegmentedPiTable::SegmentedPiTable(uint64_t limit,
-                                   uint64_t segment_size,
-                                   int threads)
+                                   uint64_t segment_size)
   : max_high_(limit + 1)
 {
   // Each bit of the pi[x] lookup table corresponds
@@ -103,10 +102,8 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   high_ = segment_size_;
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
-  init_next_segment();
 }
 
-/// Increase low & high and initialize the next segment.
 void SegmentedPiTable::next()
 {
   #pragma omp single
@@ -117,11 +114,6 @@ void SegmentedPiTable::next()
     high_ = low_ + segment_size_;
     high_ = std::min(high_, max_high_);
   }
-
-  if (finished())
-    return;
-
-  init_next_segment();
 }
 
 /// Reset the pi[x] lookup table using multi-threading.
@@ -163,14 +155,13 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 /// lookup table returns the number of primes <= x for
 /// low <= x < high.
 ///
-void SegmentedPiTable::init_next_segment()
+void SegmentedPiTable::init()
 {
-  uint64_t threads = omp_get_num_threads();
-  uint64_t min_thread_size = (uint64_t) 1e7;
-  uint64_t thread_size = ceil_div(segment_size_, threads);
-  thread_size = max(thread_size, min_thread_size);
-  thread_size += 128 - thread_size % 128;
+  if (finished())
+    return;
 
+  uint64_t thread_size = (uint64_t) 1e7;
+  thread_size += 128 - thread_size % 128;
   uint64_t thread_id = omp_get_thread_num();
   uint64_t start = low_ + thread_size * thread_id;
   uint64_t stop = start + thread_size;

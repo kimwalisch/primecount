@@ -311,7 +311,7 @@ T AC_OpenMP(T x,
 
   Status status(x);
   PiTable pi(max(z, max_a_prime));
-  SegmentedPiTable segmentedPi(isqrt(x), z, threads);
+  SegmentedPiTable segmentedPi(isqrt(x), z);
 
   // Initialize libdivide vector using primes
   using libdivide_t = libdivide::branchfree_divider<uint64_t>;
@@ -360,6 +360,8 @@ T AC_OpenMP(T x,
     // in order to reduce the memory usage.
     for (; !segmentedPi.finished(); segmentedPi.next())
     {
+      segmentedPi.init();
+
       // Current segment [low, high[
       int64_t low = segmentedPi.low();
       int64_t high = segmentedPi.high();
@@ -368,23 +370,23 @@ T AC_OpenMP(T x,
       T xhigh = x / high;
 
       // Lower bounds of C2 formula
-      int64_t min_c2 = max(k, pi_root3_xy);
-      min_c2 = max(min_c2, pi_sqrtz);
-      min_c2 = max(min_c2, pi[isqrt(low)]);
-      min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-      min_c2 += 1;
+      int64_t min_b = max(k, pi_root3_xy);
+      min_b = max(min_b, pi_sqrtz);
+      min_b = max(min_b, pi[isqrt(low)]);
+      min_b = max(min_b, pi[min(xhigh / y, x_star)]);
+      min_b += 1;
 
       // Upper bound of A & C2 formulas:
       // x / (p * q) >= low
       // p * next_prime(p) <= x / low
       // p <= sqrt(x / low)
-      int64_t sqrt_xlow = min(isqrt(xlow), x13);
-      int64_t max_b = pi[sqrt_xlow];
+      T sqrt_xlow = isqrt(xlow);
+      int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       // A  formula: pi[x_star] < b <= pi[x13]
       #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = min_c2; b <= max_b; b++)
+      for (int64_t b = min_b; b <= max_b; b++)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
