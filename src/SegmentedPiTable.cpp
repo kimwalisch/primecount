@@ -23,10 +23,12 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <min.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <array>
 #include <vector>
+#include <omp.h>
 
 namespace {
 
@@ -97,15 +99,11 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   // In order to simplify multi-threading we set low,
   // high and segment_size % 128 == 0.
   segment_size_ += 128 - segment_size_ % 128;
-  int thread_threshold = (int) 1e7;
-  threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = segment_size_;
   high_ = std::min(high_, max_high_);
   pi_.resize(segment_size_ / 128);
-
-  uint64_t pi_low_minus_1 = 0;
-  init_next_segment(pi_low_minus_1);
+  init_next_segment();
 }
 
 /// Increase low & high and initialize the next segment.
@@ -113,7 +111,7 @@ void SegmentedPiTable::next()
 {
   #pragma omp single
   {
-    pi_low_minus_1 = operator[](high_ - 1);
+    pi_low_minus_1_ = operator[](high_ - 1);
 
     low_ = high_;
     high_ = low_ + segment_size_;
@@ -123,7 +121,7 @@ void SegmentedPiTable::next()
   if (finished())
     return;
 
-  init_next_segment(pi_low_minus_1);
+  init_next_segment();
 }
 
 /// Reset the pi[x] lookup table using multi-threading.
@@ -165,17 +163,21 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 /// lookup table returns the number of primes <= x for
 /// low <= x < high.
 ///
-void SegmentedPiTable::init_next_segment(uint64_t pi_low_minus_1)
+void SegmentedPiTable::init_next_segment()
 {
-  #pragma omp for
-  for (int t = 0; t < threads_; t++)
-  {
-    uint64_t thread_size = segment_size_ / threads_;
-    thread_size += 128 - thread_size % 128;
-    uint64_t start = low_ + thread_size * t;
-    uint64_t stop = start + thread_size;
-    stop = min(stop, high_);
+  uint64_t threads = omp_get_num_threads();
+  uint64_t min_thread_size = (uint64_t) 1e7;
+  uint64_t thread_size = ceil_div(segment_size_, threads);
+  thread_size = max(thread_size, min_thread_size);
+  thread_size += 128 - thread_size % 128;
 
+  uint64_t thread_id = omp_get_thread_num();
+  uint64_t start = low_ + thread_size * thread_id;
+  uint64_t stop = start + thread_size;
+  stop = min3(stop, low_ + segment_size_, high_);
+
+  if (start < stop)
+  {
     reset_pi(start, stop);
 
     // Since we store only odd numbers in our lookup table,
@@ -201,10 +203,12 @@ void SegmentedPiTable::init_next_segment(uint64_t pi_low_minus_1)
   }
 
   // Update prime counts
+  #pragma omp barrier
+  #pragma omp single
   for (auto& i : pi_)
   {
-    i.prime_count = pi_low_minus_1;
-    pi_low_minus_1 += popcnt64(i.bits);
+    i.prime_count = pi_low_minus_1_;
+    pi_low_minus_1_ += popcnt64(i.bits);
   }
 }
 

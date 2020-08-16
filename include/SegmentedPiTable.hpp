@@ -86,7 +86,7 @@ public:
 
 private:
   void reset_pi(uint64_t start, uint64_t stop);
-  void init_next_segment(uint64_t pi_low);
+  void init_next_segment();
 
   struct PiData
   {
@@ -97,11 +97,10 @@ private:
   static const std::array<uint64_t, 128> unset_bits_;
   std::vector<PiData> pi_;
   uint64_t low_ = 0;
+  uint64_t pi_low_minus_1_ = 0;
   uint64_t high_;
   uint64_t max_high_;
   uint64_t segment_size_;
-  int threads_;
-  uint64_t pi_low_minus_1 = 0;
 };
 
 } // namespace
