@@ -28,7 +28,10 @@
 #include <stdint.h>
 #include <array>
 #include <vector>
-#include <omp.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 namespace {
 
@@ -125,8 +128,6 @@ void SegmentedPiTable::reset_pi(uint64_t start,
   // Already intialized to 0
   if (start == 0)
     return;
-  if (start >= stop)
-    return;
 
   if (stop % 128 != 0)
     stop += 128 - stop % 128;
@@ -157,15 +158,20 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 ///
 void SegmentedPiTable::init()
 {
-  if (finished())
-    return;
-
-  uint64_t thread_size = (uint64_t) 1e7;
+#if !defined(_OPENMP)
+  uint64_t start = low_;
+  uint64_t stop = high_;
+#else
+  uint64_t thread_size = segment_size_ / omp_get_num_threads();
+  uint64_t min_thread_size = (uint64_t) 1e7;
+  thread_size = max(thread_size, min_thread_size);
   thread_size += 128 - thread_size % 128;
-  uint64_t thread_id = omp_get_thread_num();
-  uint64_t start = low_ + thread_size * thread_id;
+
+  uint64_t thread_num = omp_get_thread_num();
+  uint64_t start = low_ + thread_size * thread_num;
   uint64_t stop = start + thread_size;
-  stop = min3(stop, low_ + segment_size_, high_);
+  stop = min(stop, high_);
+#endif
 
   if (start < stop)
   {
@@ -193,8 +199,10 @@ void SegmentedPiTable::init()
     }
   }
 
-  // Update prime counts
+  // Wait until all threads have finished
   #pragma omp barrier
+
+  // Update prime counts
   #pragma omp single
   for (auto& i : pi_)
   {
