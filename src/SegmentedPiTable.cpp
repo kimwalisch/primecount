@@ -84,8 +84,8 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 SegmentedPiTable::SegmentedPiTable(uint64_t limit,
                                    uint64_t segment_size,
                                    int threads)
-  : max_high_(limit + 1),
-    counts_(threads),
+  : counts_(threads),
+    max_high_(limit + 1),
     threads_(threads)
 {
   // Each bit of the pi[x] lookup table corresponds
