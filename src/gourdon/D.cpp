@@ -198,8 +198,7 @@ T D_OpenMP(T x,
   PiTable pi(y);
   LoadBalancer loadBalancer(x, xz, d_approx);
 
-  #pragma omp parallel for num_threads(threads)
-  for (int i = 0; i < threads; i++)
+  #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
 
