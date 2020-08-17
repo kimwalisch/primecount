@@ -179,8 +179,7 @@ int64_t S2(int64_t x,
   LoadBalancer loadBalancer(x, z, s2_approx);
   PiTable pi(y);
 
-  #pragma omp parallel for num_threads(threads)
-  for (int i = 0; i < threads; i++)
+  #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
 
