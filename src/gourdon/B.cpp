@@ -10,7 +10,7 @@
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,6 +31,10 @@
 #include <iostream>
 #include <iomanip>
 #include <tuple>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 using namespace std;
 using namespace primecount;
@@ -83,35 +87,36 @@ B_thread(T x,
   T sum = 0;
   int64_t pix = 0;
   int64_t pix_count = 0;
-
-  // thread sieves [low, z[
   low += thread_distance * thread_num;
-  z = min(low + thread_distance, z);
-  int64_t start = (int64_t) max(x / z, y);
-  int64_t stop = (int64_t) min(x / low, isqrt(x));
 
-  primesieve::iterator rit(stop + 1, start);
-  primesieve::iterator it(low - 1, z);
-
-  int64_t next = it.next_prime();
-  int64_t prime = rit.prev_prime();
-
-  // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
-  while (prime > start)
+  if (low < z)
   {
-    int64_t xp = (int64_t)(x / prime);
-    if (xp >= z) break;
-    pix += count_primes(it, next, xp);
-    pix_count++;
-    sum += pix;
-    prime = rit.prev_prime();
+    // thread sieves [low, z[
+    z = min(low + thread_distance, z);
+    int64_t start = (int64_t) max(x / z, y);
+    int64_t stop = (int64_t) min(x / low, isqrt(x));
+
+    primesieve::iterator rit(stop + 1, start);
+    primesieve::iterator it(low - 1, z);
+    int64_t next = it.next_prime();
+    int64_t prime = rit.prev_prime();
+
+    // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
+    while (prime > start)
+    {
+      int64_t xp = (int64_t)(x / prime);
+      if (xp >= z) break;
+      pix += count_primes(it, next, xp);
+      pix_count++;
+      sum += pix;
+      prime = rit.prev_prime();
+    }
+
+    // Count the remaining primes
+    pix += count_primes(it, next, z - 1);
   }
 
-  // prime count [low, z[
-  pix += count_primes(it, next, z - 1);
-  auto res = make_tuple(sum, pix, pix_count);
-
-  return res;
+  return make_tuple(sum, pix, pix_count);
 }
 
 /// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -127,50 +132,57 @@ T B_OpenMP(T x, int64_t y, int threads)
   T sum = 0;
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t min_distance = 1 << 23;
-  int64_t thread_distance = min_distance;
   int64_t pi_low_minus_1 = 0;
-
-  // prevents CPU false sharing
+  int64_t thread_distance = 1 << 23;
+  threads = ideal_num_threads(threads, z, thread_distance);
   using res_t = std::tuple<T, int64_t, int64_t>;
   aligned_vector<res_t> res(threads);
 
-  while (low < z)
+  #pragma omp parallel num_threads(threads)
   {
-    int64_t max_threads = ceil_div(z - low, thread_distance);
-    threads = in_between(1, threads, max_threads);
-    double time = get_time();
+  #ifdef _OPENMP
+      int64_t t = omp_get_thread_num();
+  #else
+      int64_t t = 0;
+  #endif
 
-    #pragma omp parallel for num_threads(threads)
-    for (int i = 0; i < threads; i++)
-      res[i] = B_thread(x, y, z, low, i, thread_distance);
-
-    // The threads above have computed the sum of:
-    // PrimePi(n) - PrimePi(thread_low - 1)
-    // for many different values of n. However we actually want to
-    // compute the sum of PrimePi(n). In order to get the complete
-    // sum we now have to calculate the missing sum contributions in
-    // sequential order as each thread depends on values from the
-    // previous thread. The missing sum contribution for each thread
-    // can be calculated using pi_low_minus_1 * thread_count.
-    for (int i = 0; i < threads; i++)
+    while (low < z)
     {
-      auto thread_sum = std::get<0>(res[i]);
-      auto thread_pix = std::get<1>(res[i]);
-      auto thread_count = std::get<2>(res[i]);
-      thread_sum += (T) pi_low_minus_1 * thread_count;
-      sum += thread_sum;
-      pi_low_minus_1 += thread_pix;
-    }
+      double time = get_time();
+      res[t] = B_thread(x, y, z, low, t, thread_distance);
 
-    low += thread_distance * threads;
-    balanceLoad(&thread_distance, low, z, threads, time);
+      // All threads have to wait here
+      #pragma omp barrier
+      #pragma omp single
+      {
+        // The threads above have computed the sum of:
+        // PrimePi(n) - PrimePi(thread_low - 1)
+        // for many different values of n. However we actually want to
+        // compute the sum of PrimePi(n). In order to get the complete
+        // sum we now have to calculate the missing sum contributions in
+        // sequential order as each thread depends on values from the
+        // previous thread. The missing sum contribution for each thread
+        // can be calculated using pi_low_minus_1 * thread_count.
+        for (int i = 0; i < threads; i++)
+        {
+          auto thread_sum = std::get<0>(res[i]);
+          auto thread_pix = std::get<1>(res[i]);
+          auto thread_count = std::get<2>(res[i]);
+          thread_sum += (T) pi_low_minus_1 * thread_count;
+          sum += thread_sum;
+          pi_low_minus_1 += thread_pix;
+        }
 
-    if (is_print())
-    {
-      double percent = get_percent(low, z);
-      cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
-           << percent << '%' << flush;
+        low += thread_distance * threads;
+        balanceLoad(&thread_distance, low, z, threads, time);
+
+        if (is_print())
+        {
+          double percent = get_percent(low, z);
+          cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
+              << percent << '%' << flush;
+        }
+      }
     }
   }
 
