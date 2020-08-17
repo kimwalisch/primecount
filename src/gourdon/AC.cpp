@@ -55,11 +55,11 @@ T A(T x,
     const Primes& primes,
     const SegmentedPiTable& segmentedPi)
 {
-  uint64_t prime = primes[b];
-  T xp = x / prime;
   T sum = 0;
 
-  uint64_t sqrt_xp = isqrt(xp);
+  uint64_t prime = primes[b];
+  T xp = x / prime;
+  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t i = pi[min_2nd_prime];
   i = max(i, b) + 1;
@@ -148,14 +148,13 @@ T C2(T x,
      const Primes& primes,
      const SegmentedPiTable& segmentedPi)
 {
-  uint64_t prime = primes[b];
-  T xp = x / prime;
   T sum = 0;
 
+  uint64_t prime = primes[b];
+  T xp = x / prime;
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
-
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t min_clustered = (uint64_t) isqrt(xp);
@@ -218,6 +217,15 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
+  // In order to reduce the thread creation & destruction
+  // overhead we reuse the same threads throughout the
+  // entire computation. The same threads are used for:
+  //
+  // 1) Computation of the C1 formula.
+  // 2) Initialization of the segmentedPi lookup table.
+  // 3) Computation of the C2 formula.
+  // 4) Computation of the A formula.
+  //
   #pragma omp parallel num_threads(threads)
   {
     // This computes the 1st part of the C formula.
@@ -226,7 +234,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    #pragma omp for schedule(dynamic) reduction(-: sum)
+    #pragma omp for nowait schedule(dynamic) reduction(-: sum)
     for (int64_t b = min_c1; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
@@ -258,29 +266,35 @@ T AC_OpenMP(T x,
       T xlow = x / low;
       T xhigh = x / high;
 
-      // Lower bounds of C2 formula
-      int64_t min_b = max(k, pi_root3_xy);
-      min_b = max(min_b, pi_sqrtz);
-      min_b = max(min_b, pi[isqrt(low)]);
-      min_b = max(min_b, pi[min(xhigh / y, x_star)]);
-      min_b += 1;
+      int64_t min_c2 = max(k, pi_root3_xy);
+      min_c2 = max(min_c2, pi_sqrtz);
+      min_c2 = max(min_c2, pi[isqrt(low)]);
+      min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
+      min_c2 += 1;
 
       // Upper bound of A & C2 formulas:
       // x / (p * q) >= low
       // p * next_prime(p) <= x / low
       // p <= sqrt(x / low)
       T sqrt_xlow = isqrt(xlow);
-      int64_t max_b = pi[min(sqrt_xlow, x13)];
+      int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+      int64_t max_a = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      // A  formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = min_b; b <= max_b; b++)
+      #pragma omp for nowait schedule(dynamic) reduction(+: sum)
+      for (int64_t b = min_c2; b <= max_c2; b++)
       {
-        if (b <= pi_x_star)
-          sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
-        else
-          sum +=  A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+        sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+
+        if (is_print())
+          status.print(b, pi_x13);
+      }
+
+      // A formula: pi[x_star] < b <= pi[x13]
+      #pragma omp for schedule(dynamic) reduction(+: sum)
+      for (int64_t b = pi_x_star + 1; b <= max_a; b++)
+      {
+        sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
 
         if (is_print())
           status.print(b, pi_x13);
