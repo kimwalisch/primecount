@@ -1,7 +1,9 @@
-2020-08-15 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-17 Kim Walisch  <kim.walisch@gmail.com>
 
+  * AC.cpp: Reduce thread creation & destruction overhead.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
+  * SegmentedPiTable.cpp: Reuse threads from AC.cpp.
   * Status.cpp: Avoid thread synchronization when printing in
     order to improve scaling of AC and S2_easy.
   * Status.cpp: Improve S2_hard & D status accuracy.

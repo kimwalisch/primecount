@@ -2,7 +2,7 @@
 /// @file   segmented_pi_table.cpp
 /// @brief  Test the SegmentedPiTable class
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,7 +10,6 @@
 
 #include <PiTable.hpp>
 #include <SegmentedPiTable.hpp>
-#include <primecount.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -37,17 +36,21 @@ int main()
 
   int64_t limit = dist(gen);
   int64_t segment_size = iroot<3>(limit);
-  int threads = get_num_threads();
+  int threads = 1;
 
   PiTable pi(limit);
   SegmentedPiTable segmentedPi(limit, segment_size, threads);
+  segmentedPi.init();
   int64_t i = 0;
 
   // Check small pi(x) values
   for (; i <= 1000; i++)
   {
     while (i >= segmentedPi.high())
+    {
       segmentedPi.next();
+      segmentedPi.init();
+    }
 
     cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
     check(segmentedPi[i] == pi[i]);
@@ -57,14 +60,20 @@ int main()
   for (; i < limit; i += dist2(gen))
   {
     while (i >= segmentedPi.high())
+    {
       segmentedPi.next();
+      segmentedPi.init();
+    }
 
     cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
     check(segmentedPi[i] == pi[i]);
   }
 
   while (limit >= segmentedPi.high())
+  {
     segmentedPi.next();
+    segmentedPi.init();
+  }
 
   // Check max pi(x) value
   cout << "segmentedPi(" << limit << ") = " << segmentedPi[limit];
