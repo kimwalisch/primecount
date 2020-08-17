@@ -23,7 +23,6 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <min.hpp>
-#include <imath.hpp>
 
 #include <stdint.h>
 #include <array>

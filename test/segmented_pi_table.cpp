@@ -10,7 +10,6 @@
 
 #include <PiTable.hpp>
 #include <SegmentedPiTable.hpp>
-#include <primecount.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
