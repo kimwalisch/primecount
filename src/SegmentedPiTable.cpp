@@ -82,8 +82,11 @@ const std::array<uint64_t, 128> SegmentedPiTable::unset_bits_ =
 };
 
 SegmentedPiTable::SegmentedPiTable(uint64_t limit,
-                                   uint64_t segment_size)
-  : max_high_(limit + 1)
+                                   uint64_t segment_size,
+                                   int threads)
+  : max_high_(limit + 1),
+    counts_(threads),
+    threads_(threads)
 {
   // Each bit of the pi[x] lookup table corresponds
   // to an odd integer, so there are 16 numbers per
@@ -95,8 +98,8 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   // Minimum segment size = 256 KiB (L2 cache size),
   // a large segment size improves load balancing.
   uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
-  segment_size_ = std::max(segment_size, min_segment_size);
-  segment_size_ = std::min(segment_size_, max_high_);
+  segment_size_ = max(segment_size, min_segment_size);
+  segment_size_ = min(segment_size_, max_high_);
 
   // In order to simplify multi-threading we set low,
   // high and segment_size % 128 == 0.
@@ -104,14 +107,79 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
   pi_.resize(segment_size_ / 128);
 
   high_ = segment_size_;
-  high_ = std::min(high_, max_high_);
+  high_ = min(high_, max_high_);
+}
+
+/// Iterate over the primes inside the segment [low, high[
+/// and initialize the pi[x] lookup table. The pi[x]
+/// lookup table returns the number of primes <= x for
+/// low <= x < high.
+///
+void SegmentedPiTable::init()
+{
+#if !defined(_OPENMP)
+  uint64_t start = low_;
+  uint64_t stop = high_;
+  uint64_t thread_num = 0;
+#else
+  assert(threads_ == omp_get_num_threads());
+  uint64_t thread_size = segment_size_ / threads_;
+  uint64_t min_thread_size = (uint64_t) 1e7;
+  thread_size = max(min_thread_size, thread_size);
+  thread_size += 128 - thread_size % 128;
+
+  uint64_t thread_num = omp_get_thread_num();
+  uint64_t start = low_ + thread_size * thread_num;
+  uint64_t stop = start + thread_size;
+  stop = min(stop, high_);
+#endif
+
+  if (start < stop)
+  {
+    reset_pi(start, stop);
+
+    // Since we store only odd numbers in our lookup table,
+    // we cannot store 2 which is the only even prime.
+    // As a workaround we mark 1 as a prime (1st bit) and
+    // add a check to return 0 for pi[1].
+    if (start <= 1)
+      pi_[0].bits |= 1;
+
+    // Iterate over primes > 2
+    primesieve::iterator it(max(start, 2), stop);
+    uint64_t count = (start <= 2);
+    uint64_t prime = 0;
+
+    // Each thread iterates over the primes
+    // inside [start, stop[ and initializes
+    // the pi[x] lookup table.
+    while ((prime = it.next_prime()) < stop)
+    {
+      count += 1;
+      uint64_t p = prime - low_;
+      pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+    }
+
+    counts_[thread_num] = count;
+  }
+
+  // Wait until all threads have finished
+  #pragma omp barrier
+
+  if (start < stop)
+    update_prime_count(start, stop, thread_num);
+
+  // Wait until all threads have finished
+  #pragma omp barrier
 }
 
 void SegmentedPiTable::next()
 {
   #pragma omp single
   {
-    pi_low_minus_1_ = operator[](high_ - 1);
+    // pi_low_ must be initialized before updating the
+    // member variables for the next segment.
+    pi_low_ = operator[](high_ - 1);
 
     low_ = high_;
     high_ = low_ + segment_size_;
@@ -119,9 +187,7 @@ void SegmentedPiTable::next()
   }
 }
 
-/// Reset the pi[x] lookup table using multi-threading.
-/// Each thread resets the chunk [start, stop[.
-///
+/// Each thread resets [start, stop[
 void SegmentedPiTable::reset_pi(uint64_t start,
                                 uint64_t stop)
 {
@@ -151,63 +217,35 @@ void SegmentedPiTable::reset_pi(uint64_t start,
   }
 }
 
-/// Iterate over the primes inside the segment [low, high[
-/// and initialize the pi[x] lookup table. The pi[x]
-/// lookup table returns the number of primes <= x for
-/// low <= x < high.
-///
-void SegmentedPiTable::init()
+/// Each thread computes PrimePi [start, stop[
+void SegmentedPiTable::update_prime_count(uint64_t start,
+                                          uint64_t stop,
+                                          uint64_t thread_num)
 {
-#if !defined(_OPENMP)
-  uint64_t start = low_;
-  uint64_t stop = high_;
-#else
-  uint64_t thread_size = segment_size_ / omp_get_num_threads();
-  uint64_t min_thread_size = (uint64_t) 1e7;
-  thread_size = max(min_thread_size, thread_size);
-  thread_size += 128 - thread_size % 128;
+  if (stop % 128 != 0)
+    stop += 128 - stop % 128;
 
-  uint64_t thread_num = omp_get_thread_num();
-  uint64_t start = low_ + thread_size * thread_num;
-  uint64_t stop = start + thread_size;
-  stop = min(stop, high_);
-#endif
+  // Make sure threads never write to
+  // the same pi[x] location.
+  assert(start >= low_);
+  assert(stop - low_ <= segment_size_);
+  assert(low_ % 128 == 0);
+  assert(start % 128 == 0);
+  assert(stop % 128 == 0);
 
-  if (start < stop)
+  // First compute PrimePi[start - 1]
+  uint64_t count = pi_low_;
+  for (uint64_t i = 0; i < thread_num; i++)
+    count += counts_[i];
+
+  // Convert to array indexes
+  start = (start - low_) / 128;
+  stop = (stop - low_) / 128;
+
+  for (uint64_t i = start; i < stop; i++)
   {
-    reset_pi(start, stop);
-
-    // Since we store only odd numbers in our lookup table,
-    // we cannot store 2 which is the only even prime.
-    // As a workaround we mark 1 as a prime (1st bit) and
-    // add a check to return 0 for pi[1].
-    if (start <= 1)
-      pi_[0].bits |= 1;
-
-    // Iterate over primes > 2
-    start = max(start, 2);
-    primesieve::iterator it(start, stop);
-    uint64_t prime = 0;
-
-    // Each thread iterates over the primes
-    // inside [start, stop[ and initializes
-    // the pi[x] lookup table.
-    while ((prime = it.next_prime()) < stop)
-    {
-      uint64_t p = prime - low_;
-      pi_[p / 128].bits |= 1ull << (p % 128 / 2);
-    }
-  }
-
-  // Wait until all threads have finished
-  #pragma omp barrier
-
-  // Update prime counts
-  #pragma omp single
-  for (auto& i : pi_)
-  {
-    i.prime_count = pi_low_minus_1_;
-    pi_low_minus_1_ += popcnt64(i.bits);
+    pi_[i].prime_count = count;
+    count += popcnt64(pi_[i].bits);
   }
 }
 

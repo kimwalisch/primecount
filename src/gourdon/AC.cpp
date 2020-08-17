@@ -208,7 +208,7 @@ T AC_OpenMP(T x,
 
   Status status(x);
   PiTable pi(max(z, max_a_prime));
-  SegmentedPiTable segmentedPi(isqrt(x), z);
+  SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];

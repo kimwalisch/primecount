@@ -37,9 +37,10 @@ int main()
 
   int64_t limit = dist(gen);
   int64_t segment_size = iroot<3>(limit);
+  int64_t threads = 1;
 
   PiTable pi(limit);
-  SegmentedPiTable segmentedPi(limit, segment_size);
+  SegmentedPiTable segmentedPi(limit, segment_size, threads);
   segmentedPi.init();
   int64_t i = 0;
 

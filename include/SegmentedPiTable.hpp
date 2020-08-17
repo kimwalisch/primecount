@@ -13,7 +13,7 @@
 ///        only (n / 8) bytes of memory and returns the number of
 ///        primes <= n in O(1) operations.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,6 +23,7 @@
 #define SEGMENTEDPITABLE_HPP
 
 #include <popcnt.hpp>
+#include <aligned_vector.hpp>
 
 #include <stdint.h>
 #include <array>
@@ -42,7 +43,8 @@ class SegmentedPiTable
 {
 public:
   SegmentedPiTable(uint64_t limit,
-                   uint64_t segment_size);
+                   uint64_t segment_size,
+                   int threads);
 
   void init();
   void next();
@@ -85,6 +87,7 @@ public:
 
 private:
   void reset_pi(uint64_t start, uint64_t stop);
+  void update_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
 
   struct PiData
   {
@@ -94,11 +97,13 @@ private:
 
   static const std::array<uint64_t, 128> unset_bits_;
   std::vector<PiData> pi_;
+  aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
-  uint64_t pi_low_minus_1_ = 0;
+  uint64_t pi_low_ = 0;
   uint64_t high_;
   uint64_t max_high_;
   uint64_t segment_size_;
+  int threads_;
 };
 
 } // namespace

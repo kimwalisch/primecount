@@ -311,7 +311,7 @@ T AC_OpenMP(T x,
 
   Status status(x);
   PiTable pi(max(z, max_a_prime));
-  SegmentedPiTable segmentedPi(isqrt(x), z);
+  SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
   // Initialize libdivide vector using primes
   using libdivide_t = libdivide::branchfree_divider<uint64_t>;
