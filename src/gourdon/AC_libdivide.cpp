@@ -331,10 +331,11 @@ T AC_OpenMP(T x,
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
   // entire computation. The same threads are used for:
+  //
   // 1) Computation of the C1 formula.
-  // 2) Computation of the C2 formula.
-  // 3) Computation of the A formula.
-  // 4) Initialization of the segmentedPi lookup table.
+  // 2) Initialization of the segmentedPi lookup table.
+  // 3) Computation of the C2 formula.
+  // 4) Computation of the A formula.
   //
   #pragma omp parallel num_threads(threads)
   {
