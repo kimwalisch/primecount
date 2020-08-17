@@ -117,22 +117,21 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
 ///
 void SegmentedPiTable::init()
 {
-#if !defined(_OPENMP)
-  uint64_t start = low_;
-  uint64_t stop = high_;
-  uint64_t thread_num = 0;
-#else
+#if defined(_OPENMP)
+  uint64_t thread_num = omp_get_thread_num();
   assert(threads_ == omp_get_num_threads());
+#else
+  uint64_t thread_num = 0;
+  assert(threads_ == 1);
+#endif
+
   uint64_t thread_size = segment_size_ / threads_;
   uint64_t min_thread_size = (uint64_t) 1e7;
   thread_size = max(min_thread_size, thread_size);
   thread_size += 128 - thread_size % 128;
-
-  uint64_t thread_num = omp_get_thread_num();
   uint64_t start = low_ + thread_size * thread_num;
   uint64_t stop = start + thread_size;
   stop = min(stop, high_);
-#endif
 
   if (start < stop)
   {
