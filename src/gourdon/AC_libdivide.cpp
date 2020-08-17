@@ -328,6 +328,14 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
+  // In order to reduce the thread creation & destruction
+  // overhead we reuse the same threads throughout the
+  // entire computation. The same threads are used for:
+  // 1) Computation of the C1 formula.
+  // 2) Computation of the C2 formula.
+  // 3) Computation of the A formula.
+  // 4) Initialization of the segmentedPi lookup table.
+  //
   #pragma omp parallel num_threads(threads)
   {
     // This computes the 1st part of the C formula.
@@ -336,7 +344,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    #pragma omp for schedule(dynamic) reduction(-: sum)
+    #pragma omp for nowait schedule(dynamic) reduction(-: sum)
     for (int64_t b = min_c1; b <= pi_sqrtz; b++)
     {
       int64_t prime = primes[b];
@@ -368,42 +376,47 @@ T AC_OpenMP(T x,
       T xlow = x / low;
       T xhigh = x / high;
 
-      // Lower bounds of C2 formula
-      int64_t min_b = max(k, pi_root3_xy);
-      min_b = max(min_b, pi_sqrtz);
-      min_b = max(min_b, pi[isqrt(low)]);
-      min_b = max(min_b, pi[min(xhigh / y, x_star)]);
-      min_b += 1;
+      int64_t min_c2 = max(k, pi_root3_xy);
+      min_c2 = max(min_c2, pi_sqrtz);
+      min_c2 = max(min_c2, pi[isqrt(low)]);
+      min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
+      min_c2 += 1;
 
       // Upper bound of A & C2 formulas:
       // x / (p * q) >= low
       // p * next_prime(p) <= x / low
       // p <= sqrt(x / low)
       T sqrt_xlow = isqrt(xlow);
-      int64_t max_b = pi[min(sqrt_xlow, x13)];
+      int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+      int64_t max_a = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      // A  formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = min_b; b <= max_b; b++)
+      #pragma omp for nowait schedule(dynamic) reduction(+: sum)
+      for (int64_t b = min_c2; b <= max_c2; b++)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
 
-        if (b <= pi_x_star)
-        {
-          if (xp <= numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
-          else
-            sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
-        }
+        if (xp <= numeric_limits<uint64_t>::max())
+          sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
         else
-        {
-          if (xp <= numeric_limits<uint64_t>::max())
-            sum += A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
-          else
-            sum += A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
-        }
+          sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+
+        if (is_print())
+          status.print(b, pi_x13);
+      }
+
+      // A formula: pi[x_star] < b <= pi[x13]
+      #pragma omp for schedule(dynamic) reduction(+: sum)
+      for (int64_t b = pi_x_star + 1; b <= max_a; b++)
+      {
+        int64_t prime = primes[b];
+        T xp = x / prime;
+
+        if (xp <= numeric_limits<uint64_t>::max())
+          sum += A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+        else
+          sum += A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
 
         if (is_print())
           status.print(b, pi_x13);
