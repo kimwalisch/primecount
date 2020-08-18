@@ -1,5 +1,7 @@
 2020-08-18 Kim Walisch  <kim.walisch@gmail.com>
 
+  * Xavier Gourdon's algorithm has been distributed using MPI
+    so that computations can now run on HPC clusters.
   *  B.cpp: Reuse the same threads throughout the computation.
   * P2.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Reuse the same threads throughout the computation.
