@@ -56,13 +56,15 @@ int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
 /// gradually increase the thread_distance in order to
 /// keep all CPU cores busy.
 ///
-void balanceLoad(int64_t* thread_distance, 
+void balanceLoad(double* time,
+                 int64_t* thread_distance,
                  int64_t low,
                  int64_t z,
-                 int threads,
-                 double start_time)
+                 int threads)
 {
-  double seconds = get_time() - start_time;
+  double start_time = *time;
+  *time = get_time();
+  double seconds = *time - start_time;
 
   int64_t min_distance = 1 << 23;
   int64_t max_distance = ceil_div(z - low, threads);
@@ -137,6 +139,7 @@ T B_OpenMP(T x, int64_t y, int threads)
   threads = ideal_num_threads(threads, z, thread_distance);
   using res_t = std::tuple<T, int64_t, int64_t>;
   aligned_vector<res_t> res(threads);
+  double time = get_time();
 
   #pragma omp parallel num_threads(threads)
   {
@@ -148,7 +151,6 @@ T B_OpenMP(T x, int64_t y, int threads)
 
     while (low < z)
     {
-      double time = get_time();
       res[t] = B_thread(x, y, z, low, t, thread_distance);
 
       // All threads have to wait here
@@ -174,14 +176,17 @@ T B_OpenMP(T x, int64_t y, int threads)
         }
 
         low += thread_distance * threads;
-        balanceLoad(&thread_distance, low, z, threads, time);
+        balanceLoad(&time, &thread_distance, low, z, threads);
+      }
 
-        if (is_print())
-        {
-          double percent = get_percent(low, z);
-          cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
-              << percent << '%' << flush;
-        }
+      // Only the master thread prints the status while the other
+      // threads already start their next computation.
+      #pragma omp master
+      if (is_print())
+      {
+        double percent = get_percent(low, z);
+        cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
+            << percent << '%' << flush;
       }
     }
   }
