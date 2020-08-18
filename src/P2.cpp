@@ -23,7 +23,6 @@
 #include <aligned_vector.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
-#include <noinline.hpp>
 #include <imath.hpp>
 #include <print.hpp>
 
@@ -79,7 +78,15 @@ void balanceLoad(double* time,
 }
 
 template <typename T>
-NOINLINE std::tuple<T, int64_t, int64_t>
+struct ThreadResult
+{
+  T sum;
+  int64_t pix;
+  int64_t iters;
+};
+
+template <typename T>
+ThreadResult<T>
 P2_thread(T x,
           int64_t y,
           int64_t z,
@@ -89,7 +96,7 @@ P2_thread(T x,
 {
   T sum = 0;
   int64_t pix = 0;
-  int64_t pix_count = 0;
+  int64_t iters = 0;
   low += thread_distance * thread_num;
 
   if (low < z)
@@ -110,7 +117,7 @@ P2_thread(T x,
       int64_t xp = (int64_t)(x / prime);
       if (xp >= z) break;
       pix += count_primes(it, next, xp);
-      pix_count++;
+      iters++;
       sum += pix;
       prime = rit.prev_prime();
     }
@@ -119,7 +126,7 @@ P2_thread(T x,
     pix += count_primes(it, next, z - 1);
   }
 
-  return make_tuple(sum, pix, pix_count);
+  return { sum, pix, iters };
 }
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
@@ -149,8 +156,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
   int64_t pi_low_minus_1 = 0;
   int64_t thread_distance = 1 << 23;
   threads = ideal_num_threads(threads, z, thread_distance);
-  using res_t = std::tuple<T, int64_t, int64_t>;
-  aligned_vector<res_t> res(threads);
+  aligned_vector<ThreadResult<T>> res(threads);
   double time = get_time();
 
   #pragma omp parallel num_threads(threads)
@@ -177,15 +183,12 @@ T P2_OpenMP(T x, int64_t y, int threads)
         // sum we now have to calculate the missing sum contributions in
         // sequential order as each thread depends on values from the
         // previous thread. The missing sum contribution for each thread
-        // can be calculated using pi_low_minus_1 * thread_count.
+        // can be calculated using pi_low_minus_1 * iters.
         for (int i = 0; i < threads; i++)
         {
-          auto thread_sum = std::get<0>(res[i]);
-          auto thread_pix = std::get<1>(res[i]);
-          auto thread_count = std::get<2>(res[i]);
-          thread_sum += (T) pi_low_minus_1 * thread_count;
-          sum += thread_sum;
-          pi_low_minus_1 += thread_pix;
+          res[i].sum += (T) pi_low_minus_1 * res[i].iters;
+          sum += res[i].sum;
+          pi_low_minus_1 += res[i].pix;
         }
 
         low += thread_distance * threads;
