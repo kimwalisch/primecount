@@ -4,13 +4,13 @@
 ///         (moebius), lpf (least prime factor) and mpf (max prime
 ///         factor).
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include "../src/gourdon/DFactorTable.hpp"
+#include <DFactorTable.hpp>
 #include <generate.hpp>
 
 #include <stdint.h>
