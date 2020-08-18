@@ -35,7 +35,7 @@ namespace primecount {
 void set_print(bool print)
 {
 #ifdef ENABLE_MPI
-  print_ = print && is_mpi_master_proc();
+  print_ = print && is_mpi_main_proc();
 #else
   print_ = print;
 #endif
@@ -44,7 +44,7 @@ void set_print(bool print)
 void set_print_variables(bool print_variables)
 {
 #ifdef ENABLE_MPI
-  print_variables_ = print_variables && is_mpi_master_proc();
+  print_variables_ = print_variables && is_mpi_main_proc();
 #else
   print_variables_ = print_variables;
 #endif
@@ -62,7 +62,7 @@ bool is_print()
 bool is_print_combined_result()
 {
 #ifdef ENABLE_MPI
-  return !is_print_variables() && is_mpi_master_proc();
+  return !is_print_variables() && is_mpi_main_proc();
 #else
   return !is_print_variables();
 #endif

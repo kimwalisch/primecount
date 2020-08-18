@@ -1,19 +1,8 @@
 ///
-/// @file  AC.cpp
-/// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(z) by segmenting
-///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime * m) < high.
-///
-///        The A & C formulas roughly correspond to the easy special
-///        leaves in the Deleglise-Rivat algorithm. Since both
-///        formulas use a very similar segmented algorithm that goes
-///        up to x^(1/2) it makes sense to merge the A & C formulas
-///        hence reducing the runtime complexity by a factor of
-///        O(x^(1/2) * ln ln x^(1/2)) and avoiding initializing some
-///        data structures twice. Merging the A & C formulas also
-///        improves scaling on systems with many CPU cores.
+/// @file  AC_mpi_libdivide.cpp
+/// @brief Implementation of the A + C formulas (from Xavier Gourdon's
+///        algorithm) that have been distributed using MPI (Message
+///        Passing Interface) and multi-threaded using OpenMP.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -24,10 +13,11 @@
 #include <PiTable.hpp>
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <gourdon.hpp>
 #include <int128_t.hpp>
+#include <libdivide.h>
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
@@ -46,10 +36,54 @@ namespace {
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
 template <typename T,
-          typename Primes>
-T A(T x,
-    T xlow,
+          typename LibdividePrimes>
+T A(T xlow,
     T xhigh,
+    uint64_t xp,
+    uint64_t y,
+    uint64_t b,
+    uint64_t prime,
+    const PiTable& pi,
+    const LibdividePrimes& primes,
+    const SegmentedPiTable& segmentedPi)
+{
+  T sum = 0;
+
+  uint64_t sqrt_xp = isqrt(xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t i = pi[min_2nd_prime];
+  i = max(i, b) + 1;
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
+  uint64_t max_i2 = pi[max_2nd_prime];
+
+  // x / (p * q) >= y
+  for (; i <= max_i1; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq];
+  }
+
+  // x / (p * q) < y
+  for (; i <= max_i2; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] * 2;
+  }
+
+  return sum;
+}
+
+/// 128-bit function.
+/// Compute the A formula.
+/// pi[x_star] < b <= pi[x^(1/3)]
+/// x / (primes[b] * primes[i]) <= x^(1/2)
+///
+template <typename T,
+          typename Primes>
+T A(T xlow,
+    T xhigh,
+    T xp,
     uint64_t y,
     uint64_t b,
     const PiTable& pi,
@@ -59,7 +93,6 @@ T A(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = x / prime;
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t i = pi[min_2nd_prime];
@@ -138,11 +171,66 @@ T C1(T xp,
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) <= x^(1/2)
 ///
+template <typename T, 
+          typename LibdividePrimes>
+T C2(T xlow,
+     T xhigh,
+     uint64_t xp,
+     uint64_t y,
+     uint64_t b,
+     uint64_t prime,
+     const PiTable& pi,
+     const LibdividePrimes& primes,
+     const SegmentedPiTable& segmentedPi)
+{
+  T sum = 0;
+
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t min_m = min(min_m128, max_m);
+  uint64_t i = pi[max_m];
+  uint64_t pi_min_m = pi[min_m];
+  uint64_t min_clustered = isqrt(xp);
+  min_clustered = in_between(min_m, min_clustered, max_m);
+  uint64_t pi_min_clustered = pi[min_clustered];
+
+  // Find all clustered easy leaves where
+  // successive leaves are identical.
+  // n = primes[b] * primes[i]
+  // Which satisfy: n > z && primes[i] <= y
+  while (i > pi_min_clustered)
+  {
+    uint64_t xpq = xp / primes[i];
+    uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
+    uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
+    uint64_t i2 = segmentedPi[xpq2];
+    sum += phi_xpq * (i - i2);
+    i = i2;
+  }
+
+  // Find all sparse easy leaves where
+  // successive leaves are different.
+  // n = primes[b] * primes[i]
+  // Which satisfy: n > z && primes[i] <= y
+  for (; i > pi_min_m; i--)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] - b + 2;
+  }
+
+  return sum;
+}
+
+/// 128-bit function.
+/// Compute the 2nd part of the C formula.
+/// pi[sqrt(z)] < b <= pi[x_star]
+/// x / (primes[b] * primes[i]) <= x^(1/2)
+///
 template <typename T,
           typename Primes>
-T C2(T x,
-     T xlow,
+T C2(T xlow,
      T xhigh,
+     T xp,
      uint64_t y,
      uint64_t b,
      const PiTable& pi,
@@ -152,7 +240,6 @@ T C2(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = x / prime;
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
@@ -210,6 +297,13 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime));
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
+  // Initialize libdivide vector using primes
+  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
+  vector<libdivide_t> lprimes(1);
+  lprimes.insert(lprimes.end(),
+                 primes.begin() + 1,
+                 primes.end());
+
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
@@ -217,6 +311,9 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
+
+  int proc_id = mpi_proc_id();
+  int procs = mpi_num_procs();
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -236,7 +333,7 @@ T AC_OpenMP(T x,
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
     #pragma omp for nowait schedule(dynamic) reduction(-: sum)
-    for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+    for (int64_t b = min_c1 + proc_id; b <= pi_sqrtz; b += procs)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -283,9 +380,15 @@ T AC_OpenMP(T x,
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       #pragma omp for nowait schedule(dynamic) reduction(+: sum)
-      for (int64_t b = min_c2; b <= max_c2; b++)
+      for (int64_t b = min_c2 + proc_id; b <= max_c2; b += procs)
       {
-        sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+        int64_t prime = primes[b];
+        T xp = x / prime;
+
+        if (xp <= numeric_limits<uint64_t>::max())
+          sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+        else
+          sum += C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
 
         if (is_print())
           status.print(b, pi_x13);
@@ -293,15 +396,23 @@ T AC_OpenMP(T x,
 
       // A formula: pi[x_star] < b <= pi[x13]
       #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = pi_x_star + 1; b <= max_a; b++)
+      for (int64_t b = pi_x_star + 1 + proc_id; b <= max_a; b += procs)
       {
-        sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+        int64_t prime = primes[b];
+        T xp = x / prime;
+
+        if (xp <= numeric_limits<uint64_t>::max())
+          sum += A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+        else
+          sum += A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
 
         if (is_print())
           status.print(b, pi_x13);
       }
     }
   }
+
+  sum = mpi_reduce_sum(sum);
 
   return sum;
 }
@@ -310,19 +421,14 @@ T AC_OpenMP(T x,
 
 namespace primecount {
 
-int64_t AC(int64_t x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           int threads)
+int64_t AC_mpi(int64_t x,
+               int64_t y,
+               int64_t z,
+               int64_t k,
+               int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== AC(x, y) ===");
+  print("=== AC_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
@@ -340,19 +446,14 @@ int64_t AC(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t AC(int128_t x,
-            int64_t y,
-            int64_t z,
-            int64_t k,
-            int threads)
+int128_t AC_mpi(int128_t x,
+                int64_t y,
+                int64_t z,
+                int64_t k,
+                int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== AC(x, y) ===");
+  print("=== AC_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();

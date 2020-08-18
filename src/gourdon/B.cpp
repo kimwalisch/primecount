@@ -181,7 +181,7 @@ T B_OpenMP(T x, int64_t y, int threads)
         balanceLoad(&time, &thread_distance, low, z, threads);
       }
 
-      // Only the master thread prints the status while the other
+      // Only the main thread prints the status while the other
       // threads already start their next computation.
       #pragma omp master
       if (is_print())
@@ -202,6 +202,11 @@ namespace primecount {
 
 int64_t B(int64_t x, int64_t y, int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return B_mpi(x, y, threads);
+#endif
+
   print("");
   print("=== B(x, y) ===");
   print_gourdon_vars(x, y, threads);
@@ -217,6 +222,11 @@ int64_t B(int64_t x, int64_t y, int threads)
 
 int128_t B(int128_t x, int64_t y, int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return B_mpi(x, y, threads);
+#endif
+
   print("");
   print("=== B(x, y) ===");
   print_gourdon_vars(x, y, threads);

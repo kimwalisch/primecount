@@ -195,7 +195,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
         balanceLoad(&time, &thread_distance, low, z, threads);
       }
 
-      // Only the master thread prints the status while the other
+      // Only the main thread prints the status while the other
       // threads already start their next computation.
       #pragma omp master
       if (is_print())
@@ -216,11 +216,6 @@ namespace primecount {
 
 int64_t P2(int64_t x, int64_t y, int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return P2_mpi(x, y, threads);
-#endif
-
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");
@@ -237,11 +232,6 @@ int64_t P2(int64_t x, int64_t y, int threads)
 
 int128_t P2(int128_t x, int64_t y, int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return P2_mpi(x, y, threads);
-#endif
-
   print("");
   print("=== P2(x, y) ===");
   print("Computation of the 2nd partial sieve function");

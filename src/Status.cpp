@@ -98,7 +98,7 @@ void Status::print(int64_t n, int64_t limit)
   // our code scales well up to a very large number of CPU
   // cores, we don't want to use any thread synchronization!
   // In order to achieve this only one of the threads (the
-  // master thread) is allowed to print the status, while all
+  // main thread) is allowed to print the status, while all
   // other threads do nothing.
   if (omp_get_thread_num() != 0)
     return;
@@ -107,7 +107,7 @@ void Status::print(int64_t n, int64_t limit)
   double time = get_time();
 
   // In order to prevent printing the status from deteriorating
-  // performance, the master thread is only allowed to print
+  // performance, the main thread is only allowed to print
   // the status if 0.05 seconds (or more) have elapsed since
   // the last time the status has been printed.
   if (isPrint(time))

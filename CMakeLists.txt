@@ -149,15 +149,15 @@ if(WITH_MPI)
 
     set(ENABLE_MPI "ENABLE_MPI")
     set(LIB_SRC ${LIB_SRC}
-                src/mpi/P2_mpi.cpp
-                src/mpi/S2_hard_mpi.cpp
+                src/mpi/B_mpi.cpp
+                src/mpi/D_mpi.cpp
                 src/mpi/MpiLoadBalancer.cpp
                 src/mpi/MpiMsg.cpp)
 
     if(libdivide_branchfree)
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi_libdivide.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi_libdivide.cpp)
     else()
-        set(LIB_SRC ${LIB_SRC} src/mpi/S2_easy_mpi.cpp)
+        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi.cpp)
     endif()
 endif()
 

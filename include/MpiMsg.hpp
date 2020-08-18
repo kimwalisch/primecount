@@ -1,7 +1,7 @@
 ///
 /// @file  MpiMsg.hpp
 /// @brief MpiMsg is used to send and receive messages between
-///        the MPI master process and the MPI slave processes
+///        the MPI main process and the MPI worker processes
 ///        during the computation of the hard special leaves.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>

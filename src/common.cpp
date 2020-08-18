@@ -44,14 +44,14 @@ int mpi_proc_id()
   return proc_id;
 }
 
-int mpi_master_proc_id()
+int mpi_main_proc_id()
 {
   return 0;
 }
 
-bool is_mpi_master_proc()
+bool is_mpi_main_proc()
 {
-  return mpi_proc_id() == mpi_master_proc_id();
+  return mpi_proc_id() == mpi_main_proc_id();
 }
 
 } // namespace

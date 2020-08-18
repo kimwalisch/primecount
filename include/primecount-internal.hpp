@@ -122,19 +122,10 @@ T D_approx(T x, T sigma, T phi0, T ac, T b)
 
 #ifdef ENABLE_MPI
 
-class PiTable;
-
-bool is_mpi_master_proc();
+bool is_mpi_main_proc();
 int mpi_num_procs();
 int mpi_proc_id();
-int mpi_master_proc_id();
-int64_t P2_mpi(int64_t x, int64_t y, int threads);
-
-#ifdef HAVE_INT128_T
-
-int128_t P2_mpi(int128_t x, int64_t y, int threads);
-
-#endif
+int mpi_main_proc_id();
 
 #endif
 

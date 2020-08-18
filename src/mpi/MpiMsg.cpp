@@ -1,7 +1,7 @@
 ///
 /// @file  MpiMsg.cpp
 /// @brief MpiMsg is used to send and receive messages between
-///        the MPI master process and the MPI slave processes
+///        the MPI main process and the MPI worker processes
 ///        during the computation of the hard special leaves.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
@@ -116,13 +116,13 @@ void MpiMsg::send(int proc_id)
 void MpiMsg::recv(int proc_id)
 {
   MPI_Status status;
-  MPI_Recv(&msgData_, 1, mpi_type_, mpi_master_proc_id(), proc_id, MPI_COMM_WORLD, &status);
+  MPI_Recv(&msgData_, 1, mpi_type_, mpi_main_proc_id(), proc_id, MPI_COMM_WORLD, &status);
 }
 
 void MpiMsg::recv_any()
 {
   MPI_Status status;
-  MPI_Recv(&msgData_, 1, mpi_type_, MPI_ANY_SOURCE, mpi_master_proc_id(), MPI_COMM_WORLD, &status);
+  MPI_Recv(&msgData_, 1, mpi_type_, MPI_ANY_SOURCE, mpi_main_proc_id(), MPI_COMM_WORLD, &status);
 }
 
 int MpiMsg::proc_id() const

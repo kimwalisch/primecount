@@ -32,6 +32,7 @@
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
+#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>
 #include <min.hpp>
@@ -438,6 +439,11 @@ int64_t AC(int64_t x,
            int64_t k,
            int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return AC_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== AC(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
@@ -463,6 +469,11 @@ int128_t AC(int128_t x,
             int64_t k,
             int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return AC_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== AC(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);

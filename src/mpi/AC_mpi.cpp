@@ -1,19 +1,8 @@
 ///
-/// @file  AC.cpp
-/// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(z) by segmenting
-///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime * m) < high.
-///
-///        The A & C formulas roughly correspond to the easy special
-///        leaves in the Deleglise-Rivat algorithm. Since both
-///        formulas use a very similar segmented algorithm that goes
-///        up to x^(1/2) it makes sense to merge the A & C formulas
-///        hence reducing the runtime complexity by a factor of
-///        O(x^(1/2) * ln ln x^(1/2)) and avoiding initializing some
-///        data structures twice. Merging the A & C formulas also
-///        improves scaling on systems with many CPU cores.
+/// @file  AC_mpi.cpp
+/// @brief Implementation of the A + C formulas (from Xavier Gourdon's
+///        algorithm) that have been distributed using MPI (Message
+///        Passing Interface) and multi-threaded using OpenMP.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -24,9 +13,9 @@
 #include <PiTable.hpp>
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
@@ -218,6 +207,9 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
+  int proc_id = mpi_proc_id();
+  int procs = mpi_num_procs();
+
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
   // entire computation. The same threads are used for:
@@ -236,7 +228,7 @@ T AC_OpenMP(T x,
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
     #pragma omp for nowait schedule(dynamic) reduction(-: sum)
-    for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+    for (int64_t b = min_c1 + proc_id; b <= pi_sqrtz; b += procs)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -283,7 +275,7 @@ T AC_OpenMP(T x,
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       #pragma omp for nowait schedule(dynamic) reduction(+: sum)
-      for (int64_t b = min_c2; b <= max_c2; b++)
+      for (int64_t b = min_c2 + proc_id; b <= max_c2; b += procs)
       {
         sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
 
@@ -293,7 +285,7 @@ T AC_OpenMP(T x,
 
       // A formula: pi[x_star] < b <= pi[x13]
       #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = pi_x_star + 1; b <= max_a; b++)
+      for (int64_t b = pi_x_star + 1 + proc_id; b <= max_a; b += procs)
       {
         sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
 
@@ -303,6 +295,8 @@ T AC_OpenMP(T x,
     }
   }
 
+  sum = mpi_reduce_sum(sum);
+
   return sum;
 }
 
@@ -310,19 +304,14 @@ T AC_OpenMP(T x,
 
 namespace primecount {
 
-int64_t AC(int64_t x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           int threads)
+int64_t AC_mpi(int64_t x,
+               int64_t y,
+               int64_t z,
+               int64_t k,
+               int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== AC(x, y) ===");
+  print("=== AC_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
@@ -340,19 +329,14 @@ int64_t AC(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t AC(int128_t x,
-            int64_t y,
-            int64_t z,
-            int64_t k,
-            int threads)
+int128_t AC_mpi(int128_t x,
+                int64_t y,
+                int64_t z,
+                int64_t k,
+                int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== AC(x, y) ===");
+  print("=== AC_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();

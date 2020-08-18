@@ -50,11 +50,6 @@ int64_t pi(int64_t x, int threads)
   if (x <= (int64_t) 1e7)
     return pi_lmo5(x);
 
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return pi_deleglise_rivat_64(x, threads);
-#endif
-
   // Above 10^7 Xavier Gourdon's algorithm runs fastest
   return pi_gourdon_64(x, threads);
 }
@@ -71,11 +66,6 @@ int128_t pi(int128_t x, int threads)
   // use 64-bit if possible
   if (x <= numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
-
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return pi_deleglise_rivat_128(x, threads);
-#endif
 
   return pi_gourdon_128(x, threads);
 }

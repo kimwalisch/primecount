@@ -1,19 +1,8 @@
 ///
-/// @file  D.cpp
-/// @brief This is a highly optimized implementation of the D(x, y)
-///        formula in Xavier Gourdon's prime counting algorithm. The D
-///        formula is very similar to the formula of the hard special
-///        leaves in the Deleglise-Rivat algorithm. Hence this
-///        implementation is basically identical to S2_hard.cpp except
-///        that the bounds have been changed slightly.
-///
-///        This implementation uses multi-threading with advanced load
-///        balancing, it scales well up to a large number of CPU cores
-///        because the compute threads are completely independent from
-///        each other. This implementation also uses the highly
-///        optimized Sieve class and the DFactorTable class which is a
-///        compressed lookup table of moebius function values,
-///        least prime factors and max prime factors.
+/// @file  D_mpi.cpp
+/// @brief Implementation of the D formula (from Xavier Gourdon's
+///        algorithm) that has been distributed using MPI (Message
+///        Passing Interface) and multi-threaded using OpenMP.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -29,11 +18,12 @@
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
-#include <gourdon.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <print.hpp>
+#include <mpi_reduce_sum.hpp>
+#include <MpiLoadBalancer.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -163,47 +153,51 @@ T D_thread(T x,
   return sum;
 }
 
-/// Calculate the contribution of the hard special leaves.
-///
-/// This is a parallel D(x, y) implementation with advanced load
-/// balancing. As most special leaves tend to be in the first segments
-/// we start off with a tiny segment size and one segment per thread.
-/// After each iteration we dynamically increase the segment size (until
-/// it reaches some limit) or the number of segments.
-///
-/// D(x, y) has been parallelized using an idea devised by Xavier
-/// Gourdon. The idea is to make the individual threads completely
-/// independent from each other so that no thread depends on values
-/// calculated by another thread. The benefit of this approach is that
-/// the algorithm will scale well up to a very large number of CPU
-/// cores. In order to make the threads independent from each other
-/// each thread needs to precompute a lookup table of phi(x, a) values
-/// (this is done in D_thread(x, y)) every time the thread starts
-/// a new computation.
+/// D MPI worker process.
+/// Asks MPI main process for new work and reports
+/// partial results to MPI main process.
 ///
 template <typename T, typename DFactorTable, typename Primes>
-T D_OpenMP(T x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           T d_approx,
-           const Primes& primes,
-           const DFactorTable& factor,
-           int threads)
+void D_mpi_worker(T x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t k,
+                  const Primes& primes,
+                  const DFactorTable& factor,
+                  int threads)
 {
+  PiTable pi(y);
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);
 
-  PiTable pi(y);
-  LoadBalancer loadBalancer(x, xz, d_approx);
+  MpiMsg msg;
+  int main_proc_id = mpi_main_proc_id();
+  int proc_id = mpi_proc_id();
 
-  #pragma omp parallel num_threads(threads)
+  #pragma omp parallel for num_threads(threads)
+  for (int i = 0; i < threads; i++)
   {
     ThreadSettings thread;
 
-    while (loadBalancer.get_work(thread))
+    while (true)
     {
+      #pragma omp critical (mpi_sync)
+      {
+        // send result to main process
+        msg.set(proc_id, i, thread.low, thread.segments, thread.segment_size, thread.sum, thread.init_secs, thread.secs);
+        msg.send(main_proc_id);
+
+        // receive new work todo
+        msg.recv(proc_id);
+        thread.low = msg.low();
+        thread.segments = msg.segments();
+        thread.segment_size = msg.segment_size();
+      }
+
+      if (thread.low >= xz)
+        break;
+
       // Unsigned integer division is usually slightly
       // faster than signed integer division
       using UT = typename make_unsigned<T>::type;
@@ -215,7 +209,48 @@ T D_OpenMP(T x,
     }
   }
 
-  T sum = (T) loadBalancer.get_sum();
+  msg.set_finished();
+  msg.send(main_proc_id);
+}
+
+/// D MPI main process.
+/// Assigns work to the MPI worker processes.
+///
+template <typename T>
+T D_mpi_main(T x,
+             int64_t z,
+             T d_approx)
+{
+  T sum = 0;
+  int64_t xz = x / z;
+  int workers = mpi_num_procs() - 1;
+
+  MpiMsg msg;
+  MpiLoadBalancer loadBalancer(x, xz, d_approx);
+  Status status(x);
+
+  while (workers > 0)
+  {
+    // wait for results from worker process
+    msg.recv_any();
+
+    if (msg.finished())
+      workers--;
+    else
+    {
+      sum += (T) msg.sum();
+      int64_t high = msg.low() + msg.segments() * msg.segment_size();
+
+      // update msg with new work
+      loadBalancer.get_work(&msg);
+
+      // send new work to worker process
+      msg.send(msg.proc_id());
+
+      if (is_print())
+        status.print(high, xz, sum, d_approx);
+    }
+  }
 
   return sum;
 }
@@ -224,26 +259,28 @@ T D_OpenMP(T x,
 
 namespace primecount {
 
-int64_t D(int64_t x,
-          int64_t y,
-          int64_t z,
-          int64_t k,
-          int64_t d_approx,
-          int threads)
+int64_t D_mpi(int64_t x,
+              int64_t y,
+              int64_t z,
+              int64_t k,
+              int64_t d_approx,
+              int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return D_mpi(x, y, z, k, d_approx, threads);
-#endif
-
   print("");
-  print("=== D(x, y) ===");
+  print("=== D_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
+  int64_t sum = 0;
   double time = get_time();
-  DFactorTable<uint16_t> factor(y, z, threads);
-  auto primes = generate_primes<int32_t>(y);
-  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+
+  if (is_mpi_main_proc())
+    sum = D_mpi_main(x, z, d_approx);
+  else
+  {
+    DFactorTable<uint16_t> factor(y, z, threads);
+    auto primes = generate_primes<int32_t>(y);
+    D_mpi_worker(x, y, z, k, primes, factor, threads);
+  }
 
   print("D", sum, time);
   return sum;
@@ -251,37 +288,37 @@ int64_t D(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t D(int128_t x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           int128_t d_approx,
-           int threads)
+int128_t D_mpi(int128_t x,
+               int64_t y,
+               int64_t z,
+               int64_t k,
+               int128_t d_approx,
+               int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return D_mpi(x, y, z, k, d_approx, threads);
-#endif
-
   print("");
-  print("=== D(x, y) ===");
+  print("=== D_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
+  int128_t sum = 0;
   double time = get_time();
-  int128_t sum;
 
-  // uses less memory
-  if (z <= DFactorTable<uint16_t>::max())
-  {
-    DFactorTable<uint16_t> factor(y, z, threads);
-    auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
-  }
+  if (is_mpi_main_proc())
+    sum = D_mpi_main(x, z, d_approx);
   else
   {
-    DFactorTable<uint32_t> factor(y, z, threads);
-    auto primes = generate_primes<int64_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+    // uses less memory
+    if (y <= FactorTable<uint16_t>::max())
+    {
+      DFactorTable<uint16_t> factor(y, z, threads);
+      auto primes = generate_primes<uint32_t>(y);
+      D_mpi_worker(x, y, z, k, primes, factor, threads);
+    }
+    else
+    {
+      DFactorTable<uint32_t> factor(y, z, threads);
+      auto primes = generate_primes<int64_t>(y);
+      D_mpi_worker(x, y, z, k, primes, factor, threads);
+    }
   }
 
   print("D", sum, time);
@@ -289,5 +326,6 @@ int128_t D(int128_t x,
 }
 
 #endif
+
 
 } // namespace

@@ -1,16 +1,8 @@
 ///
-/// @file  P2_mpi.cpp
-/// @brief P2(x, a) is the 2nd partial sieve function.
-///        P2(x, a) counts the numbers <= x that have exactly 2 prime
-///        factors each exceeding the a-th prime. This implementation
-///        uses the primesieve library for quickly iterating over
-///        primes using next_prime() and prev_prime() which greatly
-///        simplifies the implementation.
-///
-///        This implementation is based on the paper:
-///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
-///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
-///        pp. 759-768.
+/// @file  B_mpi.cpp
+/// @brief Implementation of the B formula (from Xavier Gourdon's
+///        algorithm) that has been distributed using MPI (Message
+///        Passing Interface) and multi-threaded using OpenMP.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -86,12 +78,12 @@ struct ThreadResult
 
 template <typename T>
 ThreadResult<T>
-P2_thread(T x,
-          int64_t y,
-          int64_t z,
-          int64_t low,
-          int64_t thread_num,
-          int64_t thread_distance)
+B_thread(T x,
+         int64_t y,
+         int64_t z,
+         int64_t low,
+         int64_t thread_num,
+         int64_t thread_distance)
 {
   T sum = 0;
   int64_t pix = 0;
@@ -128,31 +120,19 @@ P2_thread(T x,
   return { sum, pix, iters };
 }
 
-/// P2(x, y) counts the numbers <= x that have exactly 2
-/// prime factors each exceeding the a-th prime.
+/// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
+/// Run time: O(z log log z)
 /// Memory usage: O(z^(1/2))
 ///
 template <typename T>
-T P2_mpi_master(T x, int64_t y, int threads)
+T B_OpenMP(T x, int64_t y, int threads)
 {
-  static_assert(is_signed<T>::value,
-                "T must be signed integer type");
-
   if (x < 4)
     return 0;
 
   T sum = 0;
-  T a = pi_simple(y, threads);
-  T b = pi_simple((int64_t) isqrt(x), threads);
-
-  if (a >= b)
-    return 0;
-
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
-
-  if (is_mpi_master_proc())
-    sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   int64_t low = 2;
   int64_t z = (int64_t)(x / max(y, 1));
@@ -174,10 +154,9 @@ T P2_mpi_master(T x, int64_t y, int threads)
       int64_t t = 0;
   #endif
 
-    // \sum_{i=a+1}^{b} pi(x / primes[i])
     while (low < z)
     {
-      res[t] = P2_thread(x, y, z, low, t, thread_distance);
+      res[t] = B_thread(x, y, z, low, t, thread_distance);
 
       // All threads have to wait here
       #pragma omp barrier
@@ -193,16 +172,16 @@ T P2_mpi_master(T x, int64_t y, int threads)
         // can be calculated using pi_low_minus_1 * iters.
         for (int i = 0; i < threads; i++)
         {
-            res[i].sum += (T) pi_low_minus_1 * res[i].iters;
-            sum += res[i].sum;
-            pi_low_minus_1 += res[i].pix;
+          res[i].sum += (T) pi_low_minus_1 * res[i].iters;
+          sum += res[i].sum;
+          pi_low_minus_1 += res[i].pix;
         }
 
         low += thread_distance * threads;
         balanceLoad(&time, &thread_distance, low, z, threads);
       }
 
-      // Only the master thread prints the status while the other
+      // Only the main thread prints the status while the other
       // threads already start their next computation.
       #pragma omp master
       if (is_print())
@@ -223,33 +202,31 @@ T P2_mpi_master(T x, int64_t y, int threads)
 
 namespace primecount {
 
-int64_t P2_mpi(int64_t x, int64_t y, int threads)
+int64_t B_mpi(int64_t x, int64_t y, int threads)
 {
   print("");
-  print("=== P2_mpi(x, y) ===");
-  print("Computation of the 2nd partial sieve function");
-  print_vars(x, y, threads);
+  print("=== B_mpi(x, y) ===");
+  print_gourdon_vars(x, y, threads);
 
   double time = get_time();
-  int64_t sum = P2_mpi_master(x, y, threads);
+  int64_t sum = B_OpenMP((uint64_t) x, y, threads);
 
-  print("P2", sum, time);
+  print("B", sum, time);
   return sum;
 }
 
 #ifdef HAVE_INT128_T
 
-int128_t P2_mpi(int128_t x, int64_t y, int threads)
+int128_t B_mpi(int128_t x, int64_t y, int threads)
 {
   print("");
-  print("=== P2_mpi(x, y) ===");
-  print("Computation of the 2nd partial sieve function");
-  print_vars(x, y, threads);
+  print("=== B_mpi(x, y) ===");
+  print_gourdon_vars(x, y, threads);
 
   double time = get_time();
-  int128_t sum = P2_mpi_master(x, y, threads);
+  int128_t sum = B_OpenMP((uint128_t) x, y, threads);
 
-  print("P2", sum, time);
+  print("B", sum, time);
   return sum;
 }
 
