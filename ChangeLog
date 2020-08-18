@@ -1,6 +1,8 @@
-2020-08-17 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-18 Kim Walisch  <kim.walisch@gmail.com>
 
-  * AC.cpp: Reduce thread creation & destruction overhead.
+  *  B.cpp: Reuse the same threads throughout the computation.
+  * P2.cpp: Reuse the same threads throughout the computation.
+  * AC.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
   * SegmentedPiTable.cpp: Reuse threads from AC.cpp.
