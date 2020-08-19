@@ -44,7 +44,7 @@ T S2(T x,
      T s2_approx,
      int threads)
 {
-  T s2_trivial = S2_trivial(x, y, z, c);
+  T s2_trivial = S2_trivial(x, y, z, c, threads);
   T s2_easy = S2_easy(x, y, z, c, threads);
   T s2_hard_approx = s2_approx - (s2_trivial + s2_easy);
   T s2_hard = S2_hard(x, y, z, c, s2_hard_approx, threads);

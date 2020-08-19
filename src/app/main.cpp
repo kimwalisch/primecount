@@ -263,7 +263,7 @@ maxint_t S1(maxint_t x, int threads)
     return S1(x, y, c, threads);
 }
 
-maxint_t S2_trivial(maxint_t x)
+maxint_t S2_trivial(maxint_t x, int threads)
 {
   if (x < 1)
     return 0;
@@ -282,9 +282,9 @@ maxint_t S2_trivial(maxint_t x)
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= numeric_limits<int64_t>::max())
-    return S2_trivial((int64_t) x, y, z, c);
+    return S2_trivial((int64_t) x, y, z, c, threads);
   else
-    return S2_trivial(x, y, z, c);
+    return S2_trivial(x, y, z, c, threads);
 }
 
 maxint_t S2_easy(maxint_t x, int threads)
@@ -406,7 +406,7 @@ int main (int argc, char* argv[])
       case OPTION_S2_HARD:
         res = S2_hard(x, threads); break;
       case OPTION_S2_TRIVIAL:
-        res = S2_trivial(x); break;
+        res = S2_trivial(x, threads); break;
       case OPTION_AC:
         res = AC(x, threads); break;
       case OPTION_B:

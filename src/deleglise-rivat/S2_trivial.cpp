@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -40,9 +40,10 @@ template <typename T>
 T get_S2_trivial(T x,
                  int64_t y,
                  int64_t z,
-                 int64_t c)
+                 int64_t c,
+                 int threads)
 {
-  PiTable pi(y, 1);
+  PiTable pi(y, threads);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
@@ -89,14 +90,15 @@ namespace primecount {
 int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t z,
-                   int64_t c)
+                   int64_t c,
+                   int threads)
 {
   print("");
   print("=== S2_trivial(x, y) ===");
-  print_vars(x, y, c, 1);
+  print_vars(x, y, c, threads);
 
   double time = get_time();
-  int64_t s2_trivial = get_S2_trivial(x, y, z, c);
+  int64_t s2_trivial = get_S2_trivial(x, y, z, c, threads);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;
@@ -107,14 +109,15 @@ int64_t S2_trivial(int64_t x,
 int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t z,
-                    int64_t c)
+                    int64_t c,
+                    int threads)
 {
   print("");
   print("=== S2_trivial(x, y) ===");
-  print_vars(x, y, c, 1);
+  print_vars(x, y, c, threads);
 
   double time = get_time();
-  int128_t s2_trivial = get_S2_trivial(x, y, z, c);
+  int128_t s2_trivial = get_S2_trivial(x, y, z, c, threads);
 
   print("S2_trivial", s2_trivial, time);
   return s2_trivial;

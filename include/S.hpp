@@ -18,14 +18,14 @@
 namespace primecount {
 
 int64_t S1(int64_t x, int64_t y, int64_t c, int threads);
-int64_t S2_trivial(int64_t x, int64_t y, int64_t z, int64_t c);
+int64_t S2_trivial(int64_t x, int64_t y, int64_t z, int64_t c, int threads);
 int64_t S2_easy(int64_t x, int64_t y, int64_t z, int64_t c, int threads);
 int64_t S2_hard(int64_t x, int64_t y, int64_t z, int64_t c, int64_t s2_hard_approx, int threads);
 
 #ifdef HAVE_INT128_T
 
 int128_t S1(int128_t x, int64_t y, int64_t c, int threads);
-int128_t S2_trivial(int128_t x, int64_t y, int64_t z, int64_t c);
+int128_t S2_trivial(int128_t x, int64_t y, int64_t z, int64_t c, int threads);
 int128_t S2_easy(int128_t x, int64_t y, int64_t z, int64_t c, int threads);
 int128_t S2_hard(int128_t x, int64_t y, int64_t z, int64_t c, int128_t s2_hard_approx, int threads);
 
