@@ -8,7 +8,7 @@
 ///         phi(x / n, b - 1) = 1
 ///         with n = primes[b] * primes[l]
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,6 +41,7 @@ int main()
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(0, 10000000);
+  int threads = 1;
 
   for (int i = 0; i < 100; i++)
   {
@@ -68,7 +69,7 @@ int main()
     }
 
     cout << "S2_trivial(" << x << ", " << y << ") = " << s2_trivial;
-    check(s2_trivial == S2_trivial(x, y, z, c));
+    check(s2_trivial == S2_trivial(x, y, z, c, threads));
   }
 
   cout << endl;
