@@ -150,12 +150,10 @@ void PiTable::init_prime_count(uint64_t start,
     count += counts_[i];
 
   // Convert to array indexes
-  if (stop % 128 != 0)
-    stop += 128 - stop % 128;
-  uint64_t start_idx = start / 128;
-  uint64_t stop_idx = stop / 128;
+  uint64_t i = start / 128;
+  uint64_t stop_idx = ceil_div(stop, 128);
 
-  for (uint64_t i = start_idx; i < stop_idx; i++)
+  for (; i < stop_idx; i++)
   {
     pi_[i].prime_count = count;
     count += popcnt64(pi_[i].bits);

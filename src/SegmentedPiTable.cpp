@@ -22,6 +22,7 @@
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <imath.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
@@ -150,6 +151,12 @@ void SegmentedPiTable::init_bits(uint64_t start,
                                  uint64_t stop,
                                  uint64_t thread_num)
 {
+  // Make sure threads never write
+  // to the same pi[x] location.
+  assert(stop - low_ <= segment_size_);
+  assert(low_ % 128 == 0);
+  assert(start % 128 == 0);
+
   reset_pi(start, stop);
 
   // Since we store only odd numbers in our lookup table,
@@ -182,27 +189,16 @@ void SegmentedPiTable::init_prime_count(uint64_t start,
                                         uint64_t stop,
                                         uint64_t thread_num)
 {
-  if (stop % 128 != 0)
-    stop += 128 - stop % 128;
-
-  // Make sure threads never write to
-  // the same pi[x] location.
-  assert(start >= low_);
-  assert(stop - low_ <= segment_size_);
-  assert(low_ % 128 == 0);
-  assert(start % 128 == 0);
-  assert(stop % 128 == 0);
-
   // First compute PrimePi[start - 1]
   uint64_t count = pi_low_;
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 
   // Convert to array indexes
-  start = (start - low_) / 128;
-  stop = (stop - low_) / 128;
+  uint64_t i = (start - low_) / 128;
+  uint64_t stop_idx = ceil_div((stop - low_), 128);
 
-  for (uint64_t i = start; i < stop; i++)
+  for (; i < stop_idx; i++)
   {
     pi_[i].prime_count = count;
     count += popcnt64(pi_[i].bits);
@@ -217,22 +213,11 @@ void SegmentedPiTable::reset_pi(uint64_t start,
   if (start == 0)
     return;
 
-  if (stop % 128 != 0)
-    stop += 128 - stop % 128;
-
-  // Make sure threads never write to
-  // the same pi[x] location.
-  assert(start >= low_);
-  assert(stop - low_ <= segment_size_);
-  assert(low_ % 128 == 0);
-  assert(start % 128 == 0);
-  assert(stop % 128 == 0);
-
   // Convert to array indexes
-  start = (start - low_) / 128;
-  stop = (stop - low_) / 128;
+  uint64_t i = (start - low_) / 128;
+  uint64_t stop_idx = ceil_div((stop - low_), 128);
 
-  for (uint64_t i = start; i < stop; i++)
+  for (; i < stop_idx; i++)
   {
     pi_[i].prime_count = 0;
     pi_[i].bits = 0;
