@@ -17,6 +17,7 @@
 #define PITABLE_HPP
 
 #include <popcnt.hpp>
+#include <aligned_vector.hpp>
 
 #include <stdint.h>
 #include <array>
@@ -67,8 +68,11 @@ private:
     uint64_t bits = 0;
   };
 
+  void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
   static const std::array<uint64_t, 128> unset_bits_;
   std::vector<PiData> pi_;
+  aligned_vector<uint64_t> counts_;
   uint64_t limit_;
 };
 

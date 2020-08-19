@@ -1,7 +1,7 @@
 ///
 /// @file  aligned_vector.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -38,8 +38,10 @@ class aligned_vector
                 "sizeof(T) must be < CACHE_LINE_SIZE");
 
 public:
+  aligned_vector() { }
   aligned_vector(std::size_t size)
     : vect_(size) { }
+  void resize(std::size_t size) { vect_.resize(size); }
   std::size_t size() const { return vect_.size(); }
   T& operator[](std::size_t pos) { return vect_[pos].val; }
   char unused()

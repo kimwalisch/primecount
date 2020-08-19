@@ -84,8 +84,8 @@ PiTable::PiTable(uint64_t limit, int threads) :
   uint64_t size = limit + 1;
   uint64_t thread_threshold = (uint64_t) 1e7;
   threads = ideal_num_threads(threads, size, thread_threshold);
-  aligned_vector<uint64_t> counts(threads);
   pi_.resize(ceil_div(size, 128));
+  counts_.resize(threads);
 
   #pragma omp parallel num_threads(threads)
   {
@@ -103,50 +103,62 @@ PiTable::PiTable(uint64_t limit, int threads) :
     stop = min(stop, size);
 
     if (start < stop)
-    {
-      // Since we store only odd numbers in our lookup table,
-      // we cannot store 2 which is the only even prime.
-      // As a workaround we mark 1 as a prime (1st bit) and
-      // add a check to return 0 for pi[1].
-      if (start <= 2)
-        pi_[0].bits = 1;
-
-      // Iterate over primes > 2
-      primesieve::iterator it(max(start, 2), stop);
-      uint64_t count = (start <= 2);
-      uint64_t prime = 0;
-
-      while ((prime = it.next_prime()) < stop)
-      {
-        pi_[prime / 128].bits |= 1ull << (prime % 128 / 2);
-        count += 1;
-      }
-
-      counts[thread_num] = count;
-    }
+      init_bits(start, stop, thread_num);
 
     // All threads have to wait here
     #pragma omp barrier
 
     if (start < stop)
-    {
-      // First compute PrimePi[start - 1]
-      uint64_t count = 0;
-      for (uint64_t i = 0; i < thread_num; i++)
-        count += counts[i];
+      init_prime_count(start, stop, thread_num);
+  }
+}
 
-      // Convert to array indexes
-      if (stop % 128 != 0)
-        stop += 128 - stop % 128;
-      uint64_t start_idx = start / 128;
-      uint64_t stop_idx = stop / 128;
+/// Each thread computes PrimePi [start, stop[
+void PiTable::init_bits(uint64_t start,
+                        uint64_t stop,
+                        uint64_t thread_num)
+{
+  // Since we store only odd numbers in our lookup table,
+  // we cannot store 2 which is the only even prime.
+  // As a workaround we mark 1 as a prime (1st bit) and
+  // add a check to return 0 for pi[1].
+  if (start <= 2)
+    pi_[0].bits = 1;
 
-      for (uint64_t i = start_idx; i < stop_idx; i++)
-      {
-        pi_[i].prime_count = count;
-        count += popcnt64(pi_[i].bits);
-      }
-    }
+  // Iterate over primes > 2
+  primesieve::iterator it(max(start, 2), stop);
+  uint64_t count = (start <= 2);
+  uint64_t prime = 0;
+
+  while ((prime = it.next_prime()) < stop)
+  {
+    pi_[prime / 128].bits |= 1ull << (prime % 128 / 2);
+    count += 1;
+  }
+
+  counts_[thread_num] = count;
+}
+
+/// Each thread computes PrimePi [start, stop[
+void PiTable::init_prime_count(uint64_t start,
+                               uint64_t stop,
+                               uint64_t thread_num)
+{
+  // First compute PrimePi[start - 1]
+  uint64_t count = 0;
+  for (uint64_t i = 0; i < thread_num; i++)
+    count += counts_[i];
+
+  // Convert to array indexes
+  if (stop % 128 != 0)
+    stop += 128 - stop % 128;
+  uint64_t start_idx = start / 128;
+  uint64_t stop_idx = stop / 128;
+
+  for (uint64_t i = start_idx; i < stop_idx; i++)
+  {
+    pi_[i].prime_count = count;
+    count += popcnt64(pi_[i].bits);
   }
 }
 
