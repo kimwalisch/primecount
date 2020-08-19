@@ -200,7 +200,6 @@ int64_t S2_easy(int64_t x,
 {
   print("");
   print("=== S2_easy(x, y) ===");
-  print("Computation of the easy special leaves");
   print_vars(x, y, c, threads);
 
   double time = get_time();
@@ -221,7 +220,6 @@ int128_t S2_easy(int128_t x,
 {
   print("");
   print("=== S2_easy(x, y) ===");
-  print("Computation of the easy special leaves");
   print_vars(x, y, c, threads);
 
   double time = get_time();

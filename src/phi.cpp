@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -199,7 +199,6 @@ int64_t phi_print(int64_t x, int64_t a, int threads)
 {
   print("");
   print("=== phi(x, a) ===");
-  print("Count the numbers <= x coprime to the first a primes");
 
   double time = get_time();
   int64_t sum = phi(x, a, threads);

@@ -50,7 +50,6 @@ int64_t S2(int64_t x,
 {
   print("");
   print("=== S2(x, y) ===");
-  print("Computation of the special leaves");
 
   double time = get_time();
   int64_t limit = x / y;
