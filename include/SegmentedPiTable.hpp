@@ -87,7 +87,8 @@ public:
 
 private:
   void reset_pi(uint64_t start, uint64_t stop);
-  void update_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
 
   struct PiData
   {

@@ -133,55 +133,79 @@ void SegmentedPiTable::init()
   stop = min(stop, high_);
 
   if (start < stop)
-  {
-    reset_pi(start, stop);
-
-    // Since we store only odd numbers in our lookup table,
-    // we cannot store 2 which is the only even prime.
-    // As a workaround we mark 1 as a prime (1st bit) and
-    // add a check to return 0 for pi[1].
-    if (start <= 1)
-      pi_[0].bits |= 1;
-
-    // Iterate over primes > 2
-    primesieve::iterator it(max(start, 2), stop);
-    uint64_t count = (start <= 2);
-    uint64_t prime = 0;
-
-    // Each thread iterates over the primes
-    // inside [start, stop[ and initializes
-    // the pi[x] lookup table.
-    while ((prime = it.next_prime()) < stop)
-    {
-      count += 1;
-      uint64_t p = prime - low_;
-      pi_[p / 128].bits |= 1ull << (p % 128 / 2);
-    }
-
-    counts_[thread_num] = count;
-  }
+    init_bits(start, stop, thread_num);
 
   // Wait until all threads have finished
   #pragma omp barrier
 
   if (start < stop)
-    update_prime_count(start, stop, thread_num);
+    init_prime_count(start, stop, thread_num);
 
   // Wait until all threads have finished
   #pragma omp barrier
 }
 
-void SegmentedPiTable::next()
+/// Each thread computes PrimePi [start, stop[
+void SegmentedPiTable::init_bits(uint64_t start,
+                                 uint64_t stop,
+                                 uint64_t thread_num)
 {
-  #pragma omp single
-  {
-    // pi_low_ must be initialized before updating the
-    // member variables for the next segment.
-    pi_low_ = operator[](high_ - 1);
+  reset_pi(start, stop);
 
-    low_ = high_;
-    high_ = low_ + segment_size_;
-    high_ = std::min(high_, max_high_);
+  // Since we store only odd numbers in our lookup table,
+  // we cannot store 2 which is the only even prime.
+  // As a workaround we mark 1 as a prime (1st bit) and
+  // add a check to return 0 for pi[1].
+  if (start <= 1)
+    pi_[0].bits |= 1;
+
+  // Iterate over primes > 2
+  primesieve::iterator it(max(start, 2), stop);
+  uint64_t count = (start <= 2);
+  uint64_t prime = 0;
+
+  // Each thread iterates over the primes
+  // inside [start, stop[ and initializes
+  // the pi[x] lookup table.
+  while ((prime = it.next_prime()) < stop)
+  {
+    count += 1;
+    uint64_t p = prime - low_;
+    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+  }
+
+  counts_[thread_num] = count;
+}
+
+/// Each thread computes PrimePi [start, stop[
+void SegmentedPiTable::init_prime_count(uint64_t start,
+                                        uint64_t stop,
+                                        uint64_t thread_num)
+{
+  if (stop % 128 != 0)
+    stop += 128 - stop % 128;
+
+  // Make sure threads never write to
+  // the same pi[x] location.
+  assert(start >= low_);
+  assert(stop - low_ <= segment_size_);
+  assert(low_ % 128 == 0);
+  assert(start % 128 == 0);
+  assert(stop % 128 == 0);
+
+  // First compute PrimePi[start - 1]
+  uint64_t count = pi_low_;
+  for (uint64_t i = 0; i < thread_num; i++)
+    count += counts_[i];
+
+  // Convert to array indexes
+  start = (start - low_) / 128;
+  stop = (stop - low_) / 128;
+
+  for (uint64_t i = start; i < stop; i++)
+  {
+    pi_[i].prime_count = count;
+    count += popcnt64(pi_[i].bits);
   }
 }
 
@@ -215,35 +239,17 @@ void SegmentedPiTable::reset_pi(uint64_t start,
   }
 }
 
-/// Each thread computes PrimePi [start, stop[
-void SegmentedPiTable::update_prime_count(uint64_t start,
-                                          uint64_t stop,
-                                          uint64_t thread_num)
+void SegmentedPiTable::next()
 {
-  if (stop % 128 != 0)
-    stop += 128 - stop % 128;
-
-  // Make sure threads never write to
-  // the same pi[x] location.
-  assert(start >= low_);
-  assert(stop - low_ <= segment_size_);
-  assert(low_ % 128 == 0);
-  assert(start % 128 == 0);
-  assert(stop % 128 == 0);
-
-  // First compute PrimePi[start - 1]
-  uint64_t count = pi_low_;
-  for (uint64_t i = 0; i < thread_num; i++)
-    count += counts_[i];
-
-  // Convert to array indexes
-  start = (start - low_) / 128;
-  stop = (stop - low_) / 128;
-
-  for (uint64_t i = start; i < stop; i++)
+  #pragma omp single
   {
-    pi_[i].prime_count = count;
-    count += popcnt64(pi_[i].bits);
+    // pi_low_ must be initialized before updating the
+    // member variables for the next segment.
+    pi_low_ = operator[](high_ - 1);
+
+    low_ = high_;
+    high_ = low_ + segment_size_;
+    high_ = std::min(high_, max_high_);
   }
 }
 
