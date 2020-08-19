@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,7 +14,6 @@
 #include <isqrt.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <cmath>
 #include <limits>
 
@@ -28,7 +27,6 @@ inline int64_t isquare(int64_t x)
 template <typename A, typename B>
 inline A ceil_div(A a, B b)
 {
-  assert(b > 0);
   return (A) ((a + b - 1) / b);
 }
 
