@@ -42,7 +42,7 @@ T get_S2_trivial(T x,
                  int64_t z,
                  int64_t c)
 {
-  PiTable pi(y);
+  PiTable pi(y, 1);
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);

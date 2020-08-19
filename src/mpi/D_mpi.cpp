@@ -166,7 +166,7 @@ void D_mpi_worker(T x,
                   const DFactorTable& factor,
                   int threads)
 {
-  PiTable pi(y);
+  PiTable pi(y, threads);
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);

@@ -169,7 +169,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     {
       // use large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
-      PiTable pi(max(sqrtx, primes[a]));
+      PiTable pi(max(sqrtx, primes[a]), threads);
       PhiCache cache(primes, pi);
 
       int64_t c = PhiTiny::get_c(sqrtx);

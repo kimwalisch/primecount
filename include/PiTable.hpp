@@ -7,7 +7,7 @@
 ///        memory and returns the number of primes <= n in O(1)
 ///        operations.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,12 +35,12 @@ namespace primecount {
 class PiTable
 {
 public:
-  PiTable(uint64_t max);
+  PiTable(uint64_t limit, int threads);
 
   /// Get number of primes <= n
   int64_t operator[](uint64_t n) const
   {
-    assert(n <= max_);
+    assert(n <= limit_);
 
     // Since we store only odd numbers in our lookup table,
     // we cannot store 2 which is the only even prime.
@@ -57,7 +57,7 @@ public:
 
   int64_t size() const
   {
-    return max_ + 1;
+    return limit_ + 1;
   }
 
 private:
@@ -69,7 +69,7 @@ private:
 
   static const std::array<uint64_t, 128> unset_bits_;
   std::vector<PiData> pi_;
-  uint64_t max_;
+  uint64_t limit_;
 };
 
 } // namespace

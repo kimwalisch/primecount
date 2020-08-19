@@ -176,7 +176,7 @@ int64_t S2(int64_t x,
   double time = get_time();
   threads = ideal_num_threads(threads, z);
   LoadBalancer loadBalancer(x, z, s2_approx);
-  PiTable pi(y);
+  PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
   {

@@ -40,7 +40,7 @@ int64_t P3(int64_t x, int64_t y, int threads)
     int64_t max_prime = std::max(x13, isqrt(x / y));
     int64_t max_pix = std::max(x13, x / (y * y));
     auto primes = generate_primes<int32_t>(max_prime);
-    PiTable pi(max_pix);
+    PiTable pi(max_pix, threads);
     int64_t pi_x13 = pi[x13];
 
     threads = ideal_num_threads(threads, pi_x13, 100);

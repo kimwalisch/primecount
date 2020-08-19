@@ -199,7 +199,7 @@ T S2_hard_OpenMP(T x,
 
   LoadBalancer loadBalancer(x, z, s2_hard_approx);
   int64_t max_prime = min(y, z / isqrt(y));
-  PiTable pi(max_prime);
+  PiTable pi(max_prime, threads);
 
   #pragma omp parallel num_threads(threads)
   {

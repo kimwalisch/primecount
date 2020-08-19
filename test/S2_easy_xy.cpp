@@ -43,7 +43,7 @@ int main()
 
   {
     auto primes = generate_primes<int64_t>(max_y);
-    PiTable pi(max_y);
+    PiTable pi(max_y, 1);
 
     // test small x
     for (int64_t i = 1; i < max_x; i++)
@@ -80,7 +80,7 @@ int main()
 
   {
     auto primes = generate_primes<int64_t>(max_y);
-    PiTable pi(max_y);
+    PiTable pi(max_y, 1);
 
     random_device rd;
     mt19937 gen(rd());

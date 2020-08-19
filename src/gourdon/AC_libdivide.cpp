@@ -311,7 +311,7 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
   Status status(x);
-  PiTable pi(max(z, max_a_prime));
+  PiTable pi(max(z, max_a_prime), threads);
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
   // Initialize libdivide vector using primes

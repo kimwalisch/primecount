@@ -129,7 +129,7 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
   int64_t max_pix_sigma5 = y;
   int64_t max_pix_sigma6 = isqrt(x / x_star);
   int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-  PiTable pi(max_pix);
+  PiTable pi(max_pix, threads);
 
   int64_t a = pi[y];
   int64_t b = pi[iroot<3>(x)];
@@ -167,7 +167,7 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
   int64_t max_pix_sigma5 = y;
   int64_t max_pix_sigma6 = isqrt(x / x_star);
   int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-  PiTable pi(max_pix);
+  PiTable pi(max_pix, threads);
 
   int128_t a = pi[y];
   int128_t b = pi[iroot<3>(x)];

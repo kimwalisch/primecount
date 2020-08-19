@@ -165,7 +165,7 @@ T S2_easy_OpenMP(T x,
   int64_t x13 = iroot<3>(x);
   threads = ideal_num_threads(threads, x13, 1000);
 
-  PiTable pi(y);
+  PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   Status status(x);
