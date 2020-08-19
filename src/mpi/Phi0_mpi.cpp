@@ -1,19 +1,10 @@
 ///
-/// @file  Phi0.cpp
-/// @brief Calculate the contribution of the ordinary leaves in
-///        Xavier Gourdon's prime counting algorithm. Note that the
-///        Phi0 formula on the 7th page of Gourdon's paper is not
-///        correct, however the correct Phi0 formula can be found on
-///        page 3 of Gourdon's paper.
+/// @file  Phi0_mpi.cpp
+/// @brief Implementation of the Phi0 formula (from Xavier Gourdon's
+///        algorithm) that has been distributed using MPI (Message
+///        Passing Interface) and multi-threaded using OpenMP.
 ///
-///        The only difference in the computation of the ordinary
-///        leaves compared to the Deleglise-Rivat algorithm is that we
-///        iterate over all square free numbers <= z (instead of y)
-///        whose largest prime factor <= y, with z >= y and
-///        z < x^(1/2). Also the small constant is named k instead
-///        of c.
-///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,6 +12,7 @@
 
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
+#include <mpi_reduce_sum.hpp>
 #include <PhiTiny.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
@@ -75,17 +67,23 @@ X Phi0_OpenMP(X x,
               int threads)
 {
   threads = ideal_num_threads(threads, y);
-
+  int proc_id = mpi_proc_id();
+  int procs = mpi_num_procs();
   auto primes = generate_primes<Y>(y);
   int64_t pi_y = primes.size() - 1;
-  X phi0 = phi_tiny(x, k);
+  X phi0 = 0;
+
+  if (proc_id == 0)
+    phi0 += phi_tiny(x, k);
 
   #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: phi0)
-  for (int64_t b = k + 1; b <= pi_y; b++)
+  for (int64_t b = k + 1 + proc_id; b <= pi_y; b += procs)
   {
     phi0 -= phi_tiny(x / primes[b], k);
     phi0 += Phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
   }
+
+  phi0 = mpi_reduce_sum(phi0);
 
   return phi0;
 }
@@ -94,19 +92,14 @@ X Phi0_OpenMP(X x,
 
 namespace primecount {
 
-int64_t Phi0(int64_t x,
-             int64_t y,
-             int64_t z,
-             int64_t k,
-             int threads)
+int64_t Phi0_mpi(int64_t x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t k,
+                 int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return Phi0_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== Phi0(x, y) ===");
+  print("=== Phi0_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
@@ -118,19 +111,14 @@ int64_t Phi0(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t Phi0(int128_t x,
-              int64_t y,
-              int64_t z,
-              int64_t k,
-              int threads)
+int128_t Phi0_mpi(int128_t x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t k,
+                  int threads)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return Phi0_mpi(x, y, z, k, threads);
-#endif
-
   print("");
-  print("=== Phi0(x, y) ===");
+  print("=== Phi0_mpi(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();

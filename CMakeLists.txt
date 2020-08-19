@@ -151,6 +151,7 @@ if(WITH_MPI)
     set(LIB_SRC ${LIB_SRC}
                 src/mpi/B_mpi.cpp
                 src/mpi/D_mpi.cpp
+                src/mpi/Phi0_mpi.cpp
                 src/mpi/MpiLoadBalancer.cpp
                 src/mpi/MpiMsg.cpp)
 

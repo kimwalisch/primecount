@@ -24,6 +24,7 @@ int64_t D(int64_t x, int64_t y, int64_t z, int64_t k, int64_t d_approx, int thre
 
 #ifdef ENABLE_MPI
 
+int64_t Phi0_mpi(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
 int64_t AC_mpi(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
 int64_t B_mpi(int64_t x, int64_t y, int threads);
 int64_t D_mpi(int64_t x, int64_t y, int64_t z, int64_t k, int64_t d_approx, int threads);
@@ -42,6 +43,7 @@ int128_t D(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int t
 
 #ifdef ENABLE_MPI
 
+int128_t Phi0_mpi(int128_t x, int64_t y, int64_t z, int64_t k, int threads);
 int128_t AC_mpi(int128_t x, int64_t y, int64_t z, int64_t k, int threads);
 int128_t B_mpi(int128_t x, int64_t y, int threads);
 int128_t D_mpi(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int threads);
