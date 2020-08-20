@@ -12,12 +12,11 @@ SageMath and SymPy. libprimecount is also very portable, it has been tested
 successfully on a wide range of operating systems, compilers (GCC, Clang, MSVC)
 and CPU architectures (x86, x64, ARM, ARM64, PowerPC, PP64, Sparc).
 
-## C API
+# C example
 
-Include the ```<primecount.h>``` header to use primecount's C API.
-All functions that are part of primecount's C API return ```-1``` in case an
-error occurs and print the corresponding error message to the standard error
-stream.
+The C example below counts the primes ≤ 1000 and prints the result to the screen.
+Note that primecount is multi-threaded by default, it uses all available CPU
+cores if the input is sufficiently large.
 
 ```C
 #include <primecount.h>
@@ -32,14 +31,12 @@ int main()
 }
 ```
 
-* [C API reference](../include/primecount.h)
+# C++ example
 
-## C++ API
 
-Include the ```<primecount.hpp>``` header to use primecount's C++ API.
-All functions that are part of primecount's C++ API throw a
-```primecount_error``` exception (which is derived from
-```std::exception```) in case an error occurs.
+The C++ example below counts the primes ≤ 1000 and prints the result to the screen.
+Note that primecount is multi-threaded by default, it uses all available CPU
+cores if the input is sufficiently large.
 
 ```C++
 #include <primecount.hpp>
@@ -54,9 +51,62 @@ int main()
 }
 ```
 
-* [C++ API reference](../include/primecount.hpp)
+# C API reference
 
-## Build instructions
+Include the ```<primecount.h>``` header to use primecount's C API.
+All functions that are part of primecount's C API return ```-1``` in case an
+error occurs and print the corresponding error message to the standard error
+stream.
+
+```C
+// Count the number of primes <= x
+int64_t primecount_pi(int64_t x);
+
+// Count the number of primes <= x (supports 128-bit)
+int primecount_pi_str(const char* x, char* res, size_t len);
+
+// Find the nth prime e.g.: nth_prime(25) = 97
+int64_t primecount_nth_prime(int64_t n);
+
+// Count the numbers <= x that are not divisible by any of the first a primes
+int64_t primecount_phi(int64_t x, int64_t a);
+```
+
+Please see [primecount.h](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
+for more information.
+
+# C++ API reference
+
+Include the ```<primecount.hpp>``` header to use primecount's C++ API.
+All functions that are part of primecount's C++ API throw a
+```primecount_error``` exception (which is derived from
+```std::exception```) in case an error occurs.
+
+```C++
+// Count the number of primes <= x
+int64_t primecount::pi(int64_t x);
+
+// Count the number of primes <= x (supports 128-bit)
+std::string primecount::pi(const std::string& x);
+
+// Find the nth prime e.g.: nth_prime(25) = 97
+int64_t primecount::nth_prime(int64_t n);
+
+// Count the numbers <= x that are not divisible by any of the first a primes
+int64_t primecount::phi(int64_t x, int64_t a);
+```
+
+Please see [primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
+for more information.
+
+# How to compile
+
+```sh
+cc -O2 primes.c -lprimecount
+c++ -O2 primes.cpp -lprimecount
+```
+
+# Build instructions
 
 You need to have installed a C++ compiler, cmake and make.
 
@@ -66,7 +116,7 @@ make -j
 sudo make install
 ```
 
-## Run the tests
+# Run the tests
 
 ```sh
 cmake . -DBUILD_TESTS=ON
@@ -74,14 +124,7 @@ make -j
 make test
 ```
 
-## Linking
-
-```sh
-cc -O2 primes.c -lprimecount
-c++ -O2 primes.cpp -lprimecount
-```
-
-## Maximum portability
+# Maximum portability
 
 By default libprimecount uses the ```POPCNT``` instruction in order to achieve the
 best performance. As a drawback libprimecount won't work on CPUs that do not
@@ -93,7 +136,7 @@ you have to disable ```POPCNT```:
 cmake . -DWITH_POPCNT=OFF
 ```
 
-## CMake build options
+# CMake build options
 
 Here are all available cmake configuration options:
 
