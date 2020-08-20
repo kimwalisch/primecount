@@ -37,6 +37,30 @@ Compile using:
 cc -O2 primes.c -lprimecount
 ```
 
+# C API reference
+
+Include the ```<primecount.h>``` header to use primecount's C API.
+All functions that are part of primecount's C API return ```-1``` in case an
+error occurs and print the corresponding error message to the standard error
+stream.
+
+```C
+// Count the number of primes <= x
+int64_t primecount_pi(int64_t x);
+
+// Count the number of primes <= x (supports 128-bit)
+int primecount_pi_str(const char* x, char* res, size_t len);
+
+// Find the nth prime e.g.: nth_prime(25) = 97
+int64_t primecount_nth_prime(int64_t n);
+
+// Count the numbers <= x that are not divisible by any of the first a primes
+int64_t primecount_phi(int64_t x, int64_t a);
+```
+
+Please see [primecount.h](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
+for more information.
+
 # C++ example
 
 
@@ -62,30 +86,6 @@ Compile using:
 ```sh
 c++ -O2 primes.cpp -lprimecount
 ```
-
-# C API reference
-
-Include the ```<primecount.h>``` header to use primecount's C API.
-All functions that are part of primecount's C API return ```-1``` in case an
-error occurs and print the corresponding error message to the standard error
-stream.
-
-```C
-// Count the number of primes <= x
-int64_t primecount_pi(int64_t x);
-
-// Count the number of primes <= x (supports 128-bit)
-int primecount_pi_str(const char* x, char* res, size_t len);
-
-// Find the nth prime e.g.: nth_prime(25) = 97
-int64_t primecount_nth_prime(int64_t n);
-
-// Count the numbers <= x that are not divisible by any of the first a primes
-int64_t primecount_phi(int64_t x, int64_t a);
-```
-
-Please see [primecount.h](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
-for more information.
 
 # C++ API reference
 
