@@ -31,6 +31,12 @@ int main()
 }
 ```
 
+Compile using:
+
+```sh
+cc -O2 primes.c -lprimecount
+```
+
 # C++ example
 
 
@@ -49,6 +55,12 @@ int main()
 
     return 0;
 }
+```
+
+Compile using:
+
+```sh
+c++ -O2 primes.cpp -lprimecount
 ```
 
 # C API reference
@@ -98,13 +110,6 @@ int64_t primecount::phi(int64_t x, int64_t a);
 
 Please see [primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
 for more information.
-
-# How to compile
-
-```sh
-cc -O2 primes.c -lprimecount
-c++ -O2 primes.cpp -lprimecount
-```
 
 # Build instructions
 
