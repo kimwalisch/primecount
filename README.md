@@ -386,8 +386,8 @@ int main()
 }
 ```
 
-* [C API reference](include/primecount.h)
-* [libprimecount build instructions](doc/libprimecount.md)
+* [C API reference](doc/libprimecount.md#c-api-reference)
+* [libprimecount build instructions](doc/libprimecount.md#build-instructions)
 
 ## C++ API
 
@@ -409,5 +409,5 @@ int main()
 }
 ```
 
-* [C++ API reference](include/primecount.hpp)
-* [libprimecount build instructions](doc/libprimecount.md)
+* [C++ API reference](doc/libprimecount.md#c-api-reference-1)
+* [libprimecount build instructions](doc/libprimecount.md#build-instructions)
