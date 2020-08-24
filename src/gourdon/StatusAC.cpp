@@ -92,7 +92,7 @@ void StatusAC::next()
 #endif
 
   percent_total_ += percent_segment_;
-  percent_segment_ = (100 - percent_total_) / 3;
+  percent_segment_ = (100 - percent_total_) / 3.5;
 }
 
 void StatusAC::print(int64_t b, int64_t max_b)
