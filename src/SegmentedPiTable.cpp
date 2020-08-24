@@ -226,7 +226,7 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 
 void SegmentedPiTable::next()
 {
-  #pragma omp single
+  #pragma omp master
   {
     // pi_low_ must be initialized before updating the
     // member variables for the next segment.
@@ -236,6 +236,8 @@ void SegmentedPiTable::next()
     high_ = low_ + segment_size_;
     high_ = std::min(high_, max_high_);
   }
+
+  #pragma omp barrier
 }
 
 } // namespace
