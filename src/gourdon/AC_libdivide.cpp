@@ -372,8 +372,7 @@ T AC_OpenMP(T x,
       segmentedPi.init();
       int64_t low = segmentedPi.low();
       int64_t high = segmentedPi.high();
-      low = max(low, 1);
-      T xlow = x / low;
+      T xlow = x / max(low, 1);
       T xhigh = x / high;
 
       int64_t min_c2 = max(k, pi_root3_xy);
