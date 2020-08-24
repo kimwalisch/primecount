@@ -83,28 +83,16 @@ void StatusAC::print(double percent)
   }
 }
 
-/// Executed at the beginning of each segment
-void StatusAC::init()
+/// Initialize for next segment
+void StatusAC::next()
 {
-  // check --status option used
-  if (!is_print())
-    return;
-
 #if defined(_OPENMP)
   if (omp_get_thread_num() != 0)
     return;
 #endif
 
-  if (percent_segment_ == -1)
-  {
-    percent_total_ = 0;
-    percent_segment_ = 80;
-  }
-  else
-  {
-    percent_total_ += percent_segment_;
-    percent_segment_ = (100 - percent_total_) / 3;
-  }
+  percent_total_ += percent_segment_;
+  percent_segment_ = (100 - percent_total_) / 3;
 }
 
 void StatusAC::print(int64_t b, int64_t max_b)

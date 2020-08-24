@@ -20,14 +20,14 @@ class StatusAC
 public:
   StatusAC(maxint_t x);
   NOINLINE void print(int64_t b, int64_t max_b);
-  NOINLINE void init();
+  NOINLINE void next();
 private:
   bool isPrint(double time);
   void print(double percent);
   double epsilon_;
   double percent_ = -1;
-  double percent_total_ = -1;
-  double percent_segment_ = -1;
+  double percent_total_ = 0;
+  double percent_segment_ = 80;
   double time_ = 0;
   double is_print_ = 1.0 / 20;
   int precision_;
