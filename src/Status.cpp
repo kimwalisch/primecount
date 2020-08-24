@@ -2,9 +2,7 @@
 /// @file  Status.cpp
 /// @brief The Status class is used to print the status (in percent)
 ///        of the formulas related to special leaves. It is used by
-///        the S2_easy and S2_hard formulas of the Deleglise-Rivat
-///        algorithm. And it is also used by the A, C and D formulas
-///        of Xavier Gourdon's algorithm.
+///        the D, S2_easy and S2_hard formulas.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
