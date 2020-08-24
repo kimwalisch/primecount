@@ -86,6 +86,7 @@ void StatusAC::print(double percent)
 /// Executed at the beginning of each segment
 void StatusAC::init()
 {
+  // check --status option used
   if (!is_print())
     return;
 
@@ -108,6 +109,7 @@ void StatusAC::init()
 
 void StatusAC::print(int64_t b, int64_t max_b)
 {
+  // check --status option used
   if (!is_print())
     return;
 

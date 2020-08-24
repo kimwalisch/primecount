@@ -181,8 +181,7 @@ T S2_easy_OpenMP(T x,
     else
       s2_easy += S2_easy_128(xp, y, z, b, prime, pi, primes);
 
-    if (is_print())
-      status.print(b, pi_x13);
+    status.print(b, pi_x13);
   }
 
   return s2_easy;
