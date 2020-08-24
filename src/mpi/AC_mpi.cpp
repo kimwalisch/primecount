@@ -20,7 +20,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <Status.hpp>
+#include <StatusAC.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -195,7 +195,7 @@ T AC_OpenMP(T x,
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
-  Status status(x);
+  StatusAC status(x);
   PiTable pi(max(z, max_a_prime), threads);
   SegmentedPiTable segmentedPi(isqrt(x), z, threads);
 
@@ -237,9 +237,7 @@ T AC_OpenMP(T x,
       int64_t min_m = min(min_m128, max_m);
 
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
-
-      if (is_print())
-        status.print(b, pi_x13);
+      status.print(b, pi_x13);
     }
 
     // This computes A and the 2nd part of the C formula.
@@ -252,6 +250,7 @@ T AC_OpenMP(T x,
     for (; segmentedPi.has_next(); segmentedPi.next())
     {
       // Current segment [low, high[
+      status.init();
       segmentedPi.init();
       int64_t low = segmentedPi.low();
       int64_t high = segmentedPi.high();
@@ -271,26 +270,22 @@ T AC_OpenMP(T x,
       // p <= sqrt(x / low)
       T sqrt_xlow = isqrt(xlow);
       int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-      int64_t max_a = pi[min(sqrt_xlow, x13)];
+      int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       #pragma omp for nowait schedule(dynamic) reduction(+: sum)
       for (int64_t b = min_c2 + proc_id; b <= max_c2; b += procs)
       {
         sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
-
-        if (is_print())
-          status.print(b, pi_x13);
+        status.print(b, max_b);
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
       #pragma omp for schedule(dynamic) reduction(+: sum)
-      for (int64_t b = pi_x_star + 1 + proc_id; b <= max_a; b += procs)
+      for (int64_t b = pi_x_star + 1 + proc_id; b <= max_b; b += procs)
       {
         sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
-
-        if (is_print())
-          status.print(b, pi_x13);
+        status.print(b, max_b);
       }
     }
   }

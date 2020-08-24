@@ -85,7 +85,8 @@ set(LIB_SRC src/api.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
-            src/gourdon/Sigma.cpp)
+            src/gourdon/Sigma.cpp
+            src/gourdon/StatusAC.cpp)
 
 # Required includes ##################################################
 
