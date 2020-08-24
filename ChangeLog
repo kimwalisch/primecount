@@ -1,4 +1,4 @@
-2020-08-19 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-24 Kim Walisch  <kim.walisch@gmail.com>
 
   * Xavier Gourdon's algorithm has been distributed using MPI
     so that computations can now run on HPC clusters.
@@ -7,6 +7,7 @@
   * AC.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
+  * StatusAC.cpp: More accurate status for AC formula.
   * SegmentedPiTable.cpp: Reuse threads from AC.cpp.
   * PiTable.cpp: Multi-threaded initialization.
   * Status.cpp: Avoid thread synchronization when printing in
