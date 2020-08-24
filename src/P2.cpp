@@ -174,7 +174,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
 
       // All threads have to wait here
       #pragma omp barrier
-      #pragma omp single
+      #pragma omp master
       {
         // The threads above have computed the sum of:
         // PrimePi(n) - PrimePi(thread_low - 1)
@@ -197,6 +197,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
 
       // Only the main thread prints the status while the other
       // threads already start their next computation.
+      #pragma omp barrier
       #pragma omp master
       if (is_print())
       {

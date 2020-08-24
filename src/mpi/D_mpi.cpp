@@ -246,9 +246,7 @@ T D_mpi_main(T x,
 
       // send new work to worker process
       msg.send(msg.proc_id());
-
-      if (is_print())
-        status.print(high, xz, sum, d_approx);
+      status.print(high, xz, sum, d_approx);
     }
   }
 

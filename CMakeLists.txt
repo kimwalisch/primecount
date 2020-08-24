@@ -59,7 +59,6 @@ set(LIB_SRC src/api.cpp
             src/P3.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
-            src/SegmentedPiTable.cpp
             src/S1.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
@@ -85,7 +84,9 @@ set(LIB_SRC src/api.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
-            src/gourdon/Sigma.cpp)
+            src/gourdon/SegmentedPiTable.cpp
+            src/gourdon/Sigma.cpp
+            src/gourdon/StatusAC.cpp)
 
 # Required includes ##################################################
 

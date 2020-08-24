@@ -98,8 +98,7 @@ T S2_easy_OpenMP(T x,
       s2_easy += pi[xpq] - b + 2;
     }
 
-    if (is_print())
-      status.print(b, pi_x13);
+    status.print(b, pi_x13);
   }
 
   return s2_easy;

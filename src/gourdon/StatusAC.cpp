@@ -1,8 +1,7 @@
 ///
-/// @file  Status.cpp
-/// @brief The Status class is used to print the status (in percent)
-///        of the formulas related to special leaves. It is used by
-///        the D, S2_easy and S2_hard formulas.
+/// @file  StatusAC.cpp
+/// @brief The StatusAC class is used to print the status (in percent)
+///        of the A & C formulas in Xavier Gourdon's algorithm.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -10,7 +9,7 @@
 /// file in the top level directory.
 ///
 
-#include <Status.hpp>
+#include <StatusAC.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -57,21 +56,21 @@ double skewed_percent(T x, T y)
 
 namespace primecount {
 
-Status::Status(maxint_t x)
+StatusAC::StatusAC(maxint_t x)
 {
   precision_ = get_status_precision(x);
   int q = ipow(10, precision_);
   epsilon_ = 1.0 / q;
 }
 
-bool Status::isPrint(double time)
+bool StatusAC::isPrint(double time)
 {
   double old = time_;
   return old == 0 ||
         (time - old) >= is_print_;
 }
 
-void Status::print(double percent)
+void StatusAC::print(double percent)
 {
   double old = percent_;
 
@@ -84,54 +83,19 @@ void Status::print(double percent)
   }
 }
 
-/// This method is used by S2_hard() and D().
-/// This method does not use a lock to synchronize threads
-/// as it is only used inside of a critical section inside
-/// LoadBalancer.cpp and hence it can never be accessed
-/// simultaneously from multiple threads.
-///
-double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+/// Initialize for next segment
+void StatusAC::next()
 {
-  double p1 = skewed_percent(low, limit);
-  double p2 = skewed_percent(sum, sum_approx);
-
-  // When p1 is larger then p2 it is
-  // always much more accurate.
-  if (p1 > p2)
-    return p1;
-
-  // p2 is a very rough estimation, hence
-  // we want to decrease its contribution
-  // to the final percent value.
-  double percent = (p1 * 6 + p2 * 4) / 10;
-
-  return percent;
-}
-
-/// This method is used by S2_hard() and D().
-/// This method does not use a lock to synchronize threads
-/// as it is only used inside of a critical section inside
-/// LoadBalancer.cpp and hence it can never be accessed
-/// simultaneously from multiple threads.
-///
-void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
-{
-  // check --status option used
-  if (!is_print())
+#if defined(_OPENMP)
+  if (omp_get_thread_num() != 0)
     return;
+#endif
 
-  double time = get_time();
-
-  if (isPrint(time))
-  {
-    time_ = time;
-    double percent = getPercent(low, limit, sum, sum_approx);
-    print(percent);
-  }
+  percent_total_ += percent_segment_;
+  percent_segment_ = (100 - percent_total_) / 3.5;
 }
 
-/// Used by S2_easy
-void Status::print(int64_t b, int64_t max_b)
+void StatusAC::print(int64_t b, int64_t max_b)
 {
   // check --status option used
   if (!is_print())
@@ -155,6 +119,7 @@ void Status::print(int64_t b, int64_t max_b)
   {
     time_ = time;
     double percent = skewed_percent(b, max_b);
+    percent = percent_total_ + (percent_segment_ / 100 * percent);
     print(percent);
   }
 }
