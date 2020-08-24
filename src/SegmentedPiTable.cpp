@@ -226,6 +226,9 @@ void SegmentedPiTable::reset_pi(uint64_t start,
 
 void SegmentedPiTable::next()
 {
+  // Wait until all threads have finished
+  // computing the current segment.
+  #pragma omp barrier
   #pragma omp master
   {
     // pi_low_ must be initialized before updating the

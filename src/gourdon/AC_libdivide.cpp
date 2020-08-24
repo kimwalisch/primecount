@@ -406,7 +406,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for schedule(dynamic) reduction(+: sum)
+      #pragma omp for nowait schedule(dynamic) reduction(+: sum)
       for (int64_t b = pi_x_star + 1; b <= max_b; b++)
       {
         int64_t prime = primes[b];
@@ -420,8 +420,8 @@ T AC_OpenMP(T x,
         status.print(b, max_b);
       }
 
-      status.next();
       segmentedPi.next();
+      status.next();
     }
   }
 
