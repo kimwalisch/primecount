@@ -275,10 +275,8 @@ pages instead of ordinary pages which dramatically reduces the number of
 TLB cache misses.
 
 ```bash
-sudo su
-
 # Enable transparent huge pages until next reboot
-echo always > /sys/kernel/mm/transparent_hugepage/enabled
+sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
 ```
 
 On multi-socket servers, there is a performance penalty if a CPU accesses memory
@@ -288,10 +286,8 @@ kernel tries to increase memory locality by migrating memory to the CPU socket
 balancing on a dual-socket AMD EPYC 7742 system improved performance by up to 20%.
 
 ```bash
-sudo su
-
-# Enable automatic NUMA balancing until next reboot
-echo 1 > /proc/sys/kernel/numa_balancing
+# Enable NUMA balancing until next reboot
+sudo bash -c 'echo 1 > /proc/sys/kernel/numa_balancing'
 ```
 
 ## Algorithms
