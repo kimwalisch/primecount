@@ -24,10 +24,6 @@
 #include <iostream>
 #include <iomanip>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 using namespace std;
 using namespace primecount;
 
@@ -148,18 +144,12 @@ T B_OpenMP(T x, int64_t y, int threads)
 
   #pragma omp parallel num_threads(threads)
   {
-  #ifdef _OPENMP
-      int64_t t = omp_get_thread_num();
-  #else
-      int64_t t = 0;
-  #endif
-
     while (low < z)
     {
-      res[t] = B_thread(x, y, z, low, t, thread_distance);
+      #pragma omp for
+      for (int64_t i = 0; i < threads; i++)
+        res[i] = B_thread(x, y, z, low, i, thread_distance);
 
-      // All threads have to wait here
-      #pragma omp barrier
       #pragma omp master
       {
         // The threads above have computed the sum of:
@@ -170,10 +160,11 @@ T B_OpenMP(T x, int64_t y, int threads)
         // sequential order as each thread depends on values from the
         // previous thread. The missing sum contribution for each thread
         // can be calculated using pi_low_minus_1 * iters.
-        for (int i = 0; i < threads; i++)
+        for (int64_t i = 0; i < threads; i++)
         {
-          res[i].sum += (T) pi_low_minus_1 * res[i].iters;
-          sum += res[i].sum;
+          T thread_sum = res[i].sum;
+          thread_sum += (T) pi_low_minus_1 * res[i].iters;
+          sum += thread_sum;
           pi_low_minus_1 += res[i].pix;
         }
 
