@@ -219,7 +219,7 @@ T AC_OpenMP(T x,
   // 3) Computation of the C2 formula.
   // 4) Computation of the A formula.
   //
-  #pragma omp parallel num_threads(threads)
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
     // This computes the 1st part of the C formula.
     // Find all special leaves of type:
@@ -227,7 +227,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    #pragma omp for nowait schedule(dynamic) reduction(-: sum)
+    #pragma omp for nowait schedule(dynamic)
     for (int64_t b = min_c1 + proc_id; b <= pi_sqrtz; b += procs)
     {
       int64_t prime = primes[b];
@@ -271,7 +271,7 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      #pragma omp for nowait schedule(dynamic) reduction(+: sum)
+      #pragma omp for nowait schedule(dynamic)
       for (int64_t b = min_c2 + proc_id; b <= max_c2; b += procs)
       {
         sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
@@ -279,7 +279,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for nowait schedule(dynamic) reduction(+: sum)
+      #pragma omp for nowait schedule(dynamic)
       for (int64_t b = pi_x_star + 1 + proc_id; b <= max_b; b += procs)
       {
         sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
