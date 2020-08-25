@@ -264,7 +264,7 @@ core hours on an AMD Ryzen 3950X CPU!
 
 ## Performance tips
 
-By default primecount scales nicely up until 10^24 on current x64 CPUs.
+By default primecount scales nicely up until 10^23 on current x64 CPUs.
 For larger values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
 cache misses that significantly deteriorate primecount's performance.
@@ -279,7 +279,19 @@ sudo su
 
 # Enable transparent huge pages until next reboot
 echo always > /sys/kernel/mm/transparent_hugepage/enabled
-echo always > /sys/kernel/mm/transparent_hugepage/defrag
+```
+
+On multi-socket servers, there is a performance penalty if a CPU accesses memory
+from another socket. The automatic NUMA memory balancing setting of the Linux
+kernel tries to increase memory locality by migrating memory to the CPU socket
+(node) that is accessing it frequently. In my tests enabling automatic NUMA
+balancing on a dual-socket AMD EPYC 7742 system improved performance by up to 20%.
+
+```bash
+sudo su
+
+# Enable automatic NUMA balancing until next reboot
+echo 1 > /proc/sys/kernel/numa_balancing
 ```
 
 ## Algorithms
