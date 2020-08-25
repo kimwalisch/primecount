@@ -176,9 +176,10 @@ void SegmentedPiTable::init_bits(uint64_t start,
   // the pi[x] lookup table.
   while ((prime = it.next_prime()) < stop)
   {
-    count += 1;
     uint64_t p = prime - low_;
-    pi_[p / 128].bits |= 1ull << (p % 128 / 2);
+    uint64_t prime_bit = 1ull << (p % 128 / 2);
+    pi_[p / 128].bits |= prime_bit;
+    count += 1;
   }
 
   counts_[thread_num] = count;

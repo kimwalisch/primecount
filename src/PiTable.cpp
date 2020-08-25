@@ -132,7 +132,8 @@ void PiTable::init_bits(uint64_t start,
 
   while ((prime = it.next_prime()) < stop)
   {
-    pi_[prime / 128].bits |= 1ull << (prime % 128 / 2);
+    uint64_t prime_bit = 1ull << (prime % 128 / 2);
+    pi_[prime / 128].bits |= prime_bit;
     count += 1;
   }
 
