@@ -142,46 +142,36 @@ T B_OpenMP(T x, int64_t y, int threads)
   aligned_vector<ThreadResult<T>> res(threads);
   double time = get_time();
 
-  #pragma omp parallel num_threads(threads)
+  while (low < z)
   {
-    while (low < z)
+    #pragma omp parallel for num_threads(threads)
+    for (int64_t i = 0; i < threads; i++)
+      res[i] = B_thread(x, y, z, low, i, thread_distance);
+
+    // The threads above have computed the sum of:
+    // PrimePi(n) - PrimePi(thread_low - 1)
+    // for many different values of n. However we actually want to
+    // compute the sum of PrimePi(n). In order to get the complete
+    // sum we now have to calculate the missing sum contributions in
+    // sequential order as each thread depends on values from the
+    // previous thread. The missing sum contribution for each thread
+    // can be calculated using pi_low_minus_1 * iters.
+    for (int64_t i = 0; i < threads; i++)
     {
-      #pragma omp for
-      for (int64_t i = 0; i < threads; i++)
-        res[i] = B_thread(x, y, z, low, i, thread_distance);
+      T thread_sum = res[i].sum;
+      thread_sum += (T) pi_low_minus_1 * res[i].iters;
+      sum += thread_sum;
+      pi_low_minus_1 += res[i].pix;
+    }
 
-      #pragma omp master
-      {
-        // The threads above have computed the sum of:
-        // PrimePi(n) - PrimePi(thread_low - 1)
-        // for many different values of n. However we actually want to
-        // compute the sum of PrimePi(n). In order to get the complete
-        // sum we now have to calculate the missing sum contributions in
-        // sequential order as each thread depends on values from the
-        // previous thread. The missing sum contribution for each thread
-        // can be calculated using pi_low_minus_1 * iters.
-        for (int64_t i = 0; i < threads; i++)
-        {
-          T thread_sum = res[i].sum;
-          thread_sum += (T) pi_low_minus_1 * res[i].iters;
-          sum += thread_sum;
-          pi_low_minus_1 += res[i].pix;
-        }
+    low += thread_distance * threads;
+    balanceLoad(&time, &thread_distance, low, z, threads);
 
-        low += thread_distance * threads;
-        balanceLoad(&time, &thread_distance, low, z, threads);
-      }
-
-      // Only the main thread prints the status while the other
-      // threads already start their next computation.
-      #pragma omp barrier
-      #pragma omp master
-      if (is_print())
-      {
-        double percent = get_percent(low, z);
-        cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
-            << percent << '%' << flush;
-      }
+    if (is_print())
+    {
+      double percent = get_percent(low, z);
+      cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
+          << percent << '%' << flush;
     }
   }
 
