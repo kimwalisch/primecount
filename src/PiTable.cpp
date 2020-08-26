@@ -24,10 +24,6 @@
 #include <array>
 #include <vector>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 using namespace primecount;
 
 namespace {
@@ -84,32 +80,35 @@ PiTable::PiTable(uint64_t limit, int threads) :
   uint64_t size = limit + 1;
   uint64_t thread_threshold = (uint64_t) 1e7;
   threads = ideal_num_threads(threads, size, thread_threshold);
+  uint64_t thread_size = size / threads;
+  thread_size = max(thread_threshold, thread_size);
+  thread_size += 128 - thread_size % 128;
   pi_.resize(ceil_div(size, 128));
   counts_.resize(threads);
 
   #pragma omp parallel num_threads(threads)
   {
-    #if defined(_OPENMP)
-      uint64_t thread_num = omp_get_thread_num();
-    #else
-      uint64_t thread_num = 0;
-    #endif
+    #pragma omp for
+    for (int t = 0; t < threads; t++)
+    {
+      uint64_t start = thread_size * t;
+      uint64_t stop = start + thread_size;
+      stop = min(stop, size);
 
-    uint64_t thread_size = size / threads;
-    thread_size = max(thread_threshold, thread_size);
-    thread_size += 128 - thread_size % 128;
-    uint64_t start = thread_size * thread_num;
-    uint64_t stop = start + thread_size;
-    stop = min(stop, size);
+      if (start < stop)
+        init_bits(start, stop, t);
+    }
 
-    if (start < stop)
-      init_bits(start, stop, thread_num);
+    #pragma omp for
+    for (int t = 0; t < threads; t++)
+    {
+      uint64_t start = thread_size * t;
+      uint64_t stop = start + thread_size;
+      stop = min(stop, size);
 
-    // All threads have to wait here
-    #pragma omp barrier
-
-    if (start < stop)
-      init_prime_count(start, stop, thread_num);
+      if (start < stop)
+        init_prime_count(start, stop, t);
+    }
   }
 }
 
