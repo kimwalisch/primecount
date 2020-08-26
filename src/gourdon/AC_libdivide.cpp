@@ -50,7 +50,7 @@ namespace {
 
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename LibdividePrimes>
@@ -94,7 +94,7 @@ T A(T xlow,
 /// 128-bit function.
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
@@ -186,7 +186,7 @@ T C1(T xp,
 
 /// Compute the 2nd part of the C formula.
 /// pi[sqrt(z)] < b <= pi[x_star]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T, 
           typename LibdividePrimes>
@@ -241,7 +241,7 @@ T C2(T xlow,
 /// 128-bit function.
 /// Compute the 2nd part of the C formula.
 /// pi[sqrt(z)] < b <= pi[x_star]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
@@ -307,12 +307,13 @@ T AC_OpenMP(T x,
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
   StatusAC status(x);
   PiTable pi(max(z, max_a_prime), threads);
-  SegmentedPiTable segmentedPi(isqrt(x), z, threads);
+  SegmentedPiTable segmentedPi(sqrtx, z, threads);
 
   // Initialize libdivide vector using primes
   using libdivide_t = libdivide::branchfree_divider<uint64_t>;
@@ -361,12 +362,12 @@ T AC_OpenMP(T x,
 
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
-    // x / (primes[b] * primes[i]) <= x^(1/2)
+    // x / (primes[b] * primes[i]) < x^(1/2)
     // with z^(1/2) < primes[b] <= x^(1/3).
-    // Since we need to lookup PrimePi[n] values for n <= x^(1/2)
+    // Since we need to lookup PrimePi[n] values for n < x^(1/2)
     // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
     // in order to reduce the memory usage.
-    while (segmentedPi.has_next())
+    while (segmentedPi.low() < sqrtx)
     {
       // Current segment [low, high[
       segmentedPi.init();

@@ -2,7 +2,7 @@
 /// @file  SegmentedPiTable.hpp
 /// @brief The A and C formulas in Xavier Gourdon's prime counting
 ///        algorithm require looking up PrimePi[n] values with
-///        n <= x^(1/2). Since a PrimePi[n] lookup table of size
+///        n < x^(1/2). Since a PrimePi[n] lookup table of size
 ///        x^(1/2) would use too much memory we need a segmented
 ///        PrimePi[n] lookup table that uses only O(z) memory.
 ///
@@ -54,7 +54,6 @@ public:
   {
     assert(n >= low_);
     assert(n < high_);
-    assert(n < max_high_);
 
     // Since we store only odd numbers in our lookup table,
     // we cannot store 2 which is the only even prime.
@@ -68,11 +67,6 @@ public:
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;
-  }
-
-  bool has_next() const
-  {
-    return low_ < max_high_;
   }
 
   int64_t low() const
