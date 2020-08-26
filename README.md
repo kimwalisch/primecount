@@ -262,7 +262,7 @@ could have potentially been reduced to 4,000 CPU core hours. However using prime
 and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 460 CPU
 core hours on an AMD Ryzen 3950X CPU!
 
-## Performance tips
+## Linux kernel tuning
 
 By default primecount scales nicely up until 10^23 on current x64 CPUs.
 For larger values primecount's large memory usage causes many
