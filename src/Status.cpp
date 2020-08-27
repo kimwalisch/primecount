@@ -95,18 +95,20 @@ void Status::print(double percent)
 ///
 double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
-  double p1 = skewed_percent(low, limit);
-  double p2 = skewed_percent(sum, sum_approx);
+  double p1 = skewed_percent(sum, sum_approx);
+  double p2 = skewed_percent(low, limit);
 
-  // When p1 is larger then p2 it is
+  // When p2 is larger then p1 it is
   // always much more accurate.
-  if (p1 > p2)
-    return p1;
+  if (p2 > p1)
+    return p2;
 
-  // p2 is a very rough estimation, hence
-  // we want to decrease its contribution
-  // to the final percent value.
-  double percent = (p1 * 6 + p2 * 4) / 10;
+  // Below 20% p1 is better
+  // Above 70% p2 is better
+  double c1 = 150 / max(p1, 1.0);
+  c1 = in_between(10, c1, 4);
+  double c2 = 10 - c1;
+  double percent = (c1*p1 + c2*p2) / 10;
 
   return percent;
 }
