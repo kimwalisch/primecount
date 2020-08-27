@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cmath>
 
-double skewed_percent(double percent)
+void skewed_percent(double percent)
 {
   double exp = 0.96;
   double base = exp + percent / (101 / (1 - exp));
@@ -17,7 +17,6 @@ double skewed_percent(double percent)
   percent = 100 - (100 * dividend / (1 - low));
 
   std::cout << percent << " ";
-  return percent;
 }
 
 int main()
