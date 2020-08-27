@@ -36,7 +36,7 @@ int main()
   random_device rd;
   mt19937 gen(rd());
 
-  int64_t min = ipow(10, 9);
+  int64_t min = (int64_t) 1e9;
   int64_t max = min * 2;
   uniform_int_distribution<int64_t> dist(min, max);
   int threads = get_num_threads();
@@ -56,7 +56,7 @@ int main()
     }
   }
 
-  min = ipow(10, 8);
+  min = (int64_t) 1e8;
   max = min * 2;
   uniform_int_distribution<int64_t> dist_lmo(min, max);
 

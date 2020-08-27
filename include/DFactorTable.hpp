@@ -84,7 +84,7 @@ public:
     factor_[0] ^= 1;
 
     int64_t sqrtz = isqrt(z);
-    int64_t thread_threshold = ipow(10, 7);
+    int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(threads, z, thread_threshold);
     int64_t thread_distance = ceil_div(z, threads);
 
