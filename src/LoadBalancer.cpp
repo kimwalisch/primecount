@@ -128,16 +128,6 @@ void LoadBalancer::update(ThreadSettings& thread)
   }
 }
 
-/// Remaining seconds till finished
-double LoadBalancer::remaining_secs() const
-{
-  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
-}
-
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
@@ -216,6 +206,16 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
     segments_ = (int64_t) new_segments;
     segments_ = max(segments_, 1);
   }
+}
+
+/// Remaining seconds till finished
+double LoadBalancer::remaining_secs() const
+{
+  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
 }
 
 } // namespace
