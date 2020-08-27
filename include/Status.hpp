@@ -28,7 +28,9 @@ private:
   double epsilon_;
   double percent_ = -1;
   double time_ = 0;
-  double is_print_ = 1.0 / 20;
+  // Only print status if 0.1 seconds have elapsed
+  // since last printing the status.
+  double is_print_ = 0.1;
   int precision_;
 };
 
