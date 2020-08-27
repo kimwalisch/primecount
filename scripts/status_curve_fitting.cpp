@@ -1,4 +1,4 @@
-// 1. Run the program: c++ status-curve-fitting.cpp -o status && ./status
+// 1. Run the program: c++ status_curve_fitting.cpp -o status && ./status
 // 2. Paste output into curve fitting tool: https://planetcalc.com/8735/
 // 3. Select "Function must pass through particular points" with (0, 0) and (100, 100)
 // 4. Select "4th order polynomial regression"

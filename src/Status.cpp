@@ -36,7 +36,7 @@ namespace {
 /// computation using the standard linear formula. Hence we use
 /// a polynomial formula that grows faster when the value is
 /// small and slower towards the end (100%).
-/// Curve fitting tool: https://planetcalc.com/8735/
+/// @see scripts/status_curve_fitting.cpp
 ///
 template <typename T>
 double skewed_percent(T x, T y)
