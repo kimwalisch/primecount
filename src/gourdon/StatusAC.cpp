@@ -41,7 +41,7 @@ namespace {
 template <typename T>
 double skewed_percent(T x, T y)
 {
-  double exp = 0.96;
+  double exp = 0.94;
   double percent = get_percent(x, y);
   double base = exp + percent / (101 / (1 - exp));
   double low = pow(base, 100.0);
