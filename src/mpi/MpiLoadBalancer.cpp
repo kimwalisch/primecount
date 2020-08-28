@@ -109,16 +109,6 @@ void MpiLoadBalancer::get_work(MpiMsg* msg)
   low_ = min(low_, sieve_limit_);
 }
 
-/// Remaining seconds till finished
-double MpiLoadBalancer::remaining_secs() const
-{
-  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
-}
-
 /// Increase or decrease the number of segments based on the
 /// remaining runtime. Near the end it is important that
 /// threads run only for a short amount of time in order to
@@ -153,6 +143,16 @@ void MpiLoadBalancer::update_segments(ThreadSettings& thread)
   double new_segments = round(segments_ * factor);
   segments_ = (int64_t) new_segments;
   segments_ = max(segments_, 1);
+}
+
+/// Remaining seconds till finished
+double MpiLoadBalancer::remaining_secs() const
+{
+  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
 }
 
 } // namespace
