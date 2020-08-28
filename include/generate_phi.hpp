@@ -152,11 +152,17 @@ private:
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
+    uint64_t max_x = numeric_limits<T>::max();
+
     if (a < cache_.size() &&
-        x <= numeric_limits<T>::max())
+        x <= max_x)
     {
       if (x >= cache_[a].size())
+      {
+        uint64_t max_size = max_x + 1;
+        cache_[a].reserve(max_size);
         cache_[a].resize(x + 1, 0);
+      }
 
       cache_[a][x] = (T) abs(sum);
     }
