@@ -79,7 +79,7 @@ T D_thread(T x,
     return 0;
 
   Sieve sieve(low, segment_size, max_b);
-  auto phi = generate_phi(phiCache, low, max_b);
+  auto phi = phiCache.generate_phi(low, max_b);
   thread.init_finished();
 
   // Segmented sieve of Eratosthenes

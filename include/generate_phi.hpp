@@ -56,15 +56,50 @@ public:
       pi_(pi)
   { }
 
-  const Primes& get_primes() const
+  /// Returns a vector with phi(x, i - 1) values such that
+  /// phi[i] = phi(x, i - 1) for 1 <= i <= a.
+  /// phi(x, a) counts the numbers <= x that are not
+  /// divisible by any of the first a primes.
+  ///
+  vector<int64_t> generate_phi(int64_t x, int64_t a)
   {
-    return primes_;
+    int64_t size = a + 1;
+
+    if ((int64_t) primes_[a] > x)
+      a = pi_[x];
+
+    vector<int64_t> phi_vect;
+    phi_vect.reserve(size);
+    phi_vect.resize(a + 1, (x > 0) * -1);
+    phi_vect.resize(size, x > 0);
+
+    if (size > 1)
+    {
+      phi_vect[1] = x;
+      int64_t sqrtx = isqrt(x);
+      int64_t pi_sqrtx = a;
+
+      if (sqrtx < pi_.size())
+        pi_sqrtx = min(pi_[sqrtx] + 1, a);
+
+      for (int64_t i = 2; i <= pi_sqrtx; i++)
+        phi_vect[i] = phi<-1>(x / primes_[i - 1], i - 2);
+
+      // calculate phi(x, a) using partial results
+      for (int64_t i = 2; i <= a; i++)
+        phi_vect[i] += phi_vect[i - 1];
+    }
+
+    return phi_vect;
   }
 
-  const PiTable& get_pi() const
-  {
-    return pi_;
-  }
+private:
+  /// Cache phi(x, a) results if a < MAX_A
+  enum { MAX_A = 100 };
+  using T = uint16_t;
+  array<vector<T>, MAX_A> cache_;
+  const Primes& primes_;
+  const PiTable& pi_;
 
   /// Calculate phi(x, a) using the recursive formula:
   /// phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1)
@@ -115,14 +150,6 @@ public:
     return sum;
   }
 
-private:
-  /// Cache phi(x, a) results if a < MAX_A
-  enum { MAX_A = 100 };
-  using T = uint16_t;
-  array<vector<T>, MAX_A> cache_;
-  const Primes& primes_;
-  const PiTable& pi_;
-
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
     if (a < cache_.size() &&
@@ -148,47 +175,6 @@ private:
            cache_[a][x];
   }
 };
-
-/// Returns a vector with phi(x, i - 1) values such that
-/// phi[i] = phi(x, i - 1) for 1 <= i <= a.
-/// phi(x, a) counts the numbers <= x that are not
-/// divisible by any of the first a primes.
-///
-template <typename PhiCache>
-vector<int64_t>
-generate_phi(PhiCache& cache, int64_t x, int64_t a)
-{
-  int64_t size = a + 1;
-  auto& primes = cache.get_primes();
-  auto& pi = cache.get_pi();
-
-  if (primes[a] > x)
-    a = pi[x];
-
-  vector<int64_t> phi;
-  phi.reserve(size);
-  phi.resize(a + 1, (x > 0) * -1);
-  phi.resize(size, x > 0);
-
-  if (size > 1)
-  {
-    phi[1] = x;
-    int64_t sqrtx = isqrt(x);
-    int64_t pi_sqrtx = a;
-
-    if (sqrtx < pi.size())
-      pi_sqrtx = min(pi[sqrtx] + 1, a);
-
-    for (int64_t i = 2; i <= pi_sqrtx; i++)
-      phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
-
-    // calculate phi(x, a) using partial results
-    for (int64_t i = 2; i <= a; i++)
-      phi[i] += phi[i - 1];
-  }
-
-  return phi;
-}
 
 } // namespace
 
