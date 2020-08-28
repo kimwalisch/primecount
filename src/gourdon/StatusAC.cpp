@@ -17,7 +17,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -33,22 +32,28 @@ namespace {
 
 /// Since the distribution of the special leaves is highly skewed
 /// we cannot simply calculate the percentage of the current
-/// computation using the well known linear formula. The
-/// implementation below is a hack which skews the percent result
-/// in order to get a more accurate estimation of the current
-/// computation status.
+/// computation using the standard linear formula. Hence we use
+/// a polynomial formula that grows faster when the value is
+/// small and slower towards the end (100%).
+/// @see scripts/status_curve_fitting.cpp
 ///
 template <typename T>
 double skewed_percent(T x, T y)
 {
-  double exp = 0.94;
-  double percent = get_percent(x, y);
-  double base = exp + percent / (101 / (1 - exp));
-  double low = pow(base, 100.0);
-  double dividend = pow(base, percent) - low;
-  percent = 100 - (100 * dividend / (1 - low));
-  percent = in_between(0, percent, 100);
+  double p1 = get_percent(x, y);
+  double p2 = p1 * p1;
+  double p3 = p1 * p2;
+  double p4 = p2 * p2;
+  double p5 = p2 * p3;
 
+  double c1 = 5.71586523529789379523;
+  double c2 = 0.17456675134934354428;
+  double c3 = 0.00283157450325605000;
+  double c4 = 0.00002327032697966551;
+  double c5 = 0.00000007695391846741;
+
+  double percent = c5*p5 - c4*p4 + c3*p3 - c2*p2 + c1*p1;
+  percent = in_between(0, percent, 100);
   return percent;
 }
 
