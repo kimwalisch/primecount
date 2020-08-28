@@ -47,9 +47,6 @@ namespace {
 using namespace std;
 using namespace primecount;
 
-/// Cache phi(x, a) results if a < MAX_A
-const int MAX_A = 100;
-
 template <typename Primes>
 class PhiCache
 {
@@ -59,13 +56,23 @@ public:
       pi_(pi)
   { }
 
+  const Primes& get_primes() const
+  {
+    return primes_;
+  }
+
+  const PiTable& get_pi() const
+  {
+    return pi_;
+  }
+
   /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / prime(a), a - 1)
+  /// phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1)
   ///
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
-    if (x <= prime(a))
+    if (x <= (int64_t) primes_[a])
       return SIGN;
     else if (is_phi_tiny(a))
       return phi_tiny(x, a) * SIGN;
@@ -83,10 +90,10 @@ public:
       pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if prime(a) >= x
-    // xp = x / prime(i + 1)
-    // phi(xp, i) = 1 if prime(i) >= x / prime(i + 1)
-    // phi(xp, i) = 1 if prime(i) >= sqrt(x)
+    // phi(x, a) = 1 if primes_[a] >= x
+    // xp = x / primes_[i + 1]
+    // phi(xp, i) = 1 if primes_[i] >= x / primes_[i + 1]
+    // phi(xp, i) = 1 if primes_[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
@@ -95,7 +102,7 @@ public:
 
     for (int64_t i = c; i < pi_sqrtx; i++)
     {
-      int64_t xp = fast_div(x, prime(i + 1));
+      int64_t xp = fast_div(x, primes_[i + 1]);
 
       if (is_pix(xp, i))
         sum += (pi_[xp] - i + 1) * -SIGN;
@@ -109,15 +116,12 @@ public:
   }
 
 private:
+  /// Cache phi(x, a) results if a < MAX_A
+  enum { MAX_A = 100 };
   using T = uint16_t;
   array<vector<T>, MAX_A> cache_;
   const Primes& primes_;
   const PiTable& pi_;
-
-  int64_t prime(int64_t i) const
-  {
-    return primes_[i];
-  }
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
@@ -134,7 +138,7 @@ private:
   bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
-           x < isquare(prime(a + 1));
+           x < isquare(primes_[a + 1]);
   }
 
   bool is_cached(uint64_t x, uint64_t a) const
@@ -150,13 +154,13 @@ private:
 /// phi(x, a) counts the numbers <= x that are not
 /// divisible by any of the first a primes.
 ///
-template <typename Primes>
-vector<int64_t> generate_phi(int64_t x,
-                             int64_t a,
-                             const Primes& primes,
-                             const PiTable& pi)
+template <typename PhiCache>
+vector<int64_t>
+generate_phi(PhiCache& cache, int64_t x, int64_t a)
 {
   int64_t size = a + 1;
+  auto& primes = cache.get_primes();
+  auto& pi = cache.get_pi();
 
   if (primes[a] > x)
     a = pi[x];
@@ -171,7 +175,6 @@ vector<int64_t> generate_phi(int64_t x,
     phi[1] = x;
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
-    PhiCache<Primes> cache(primes, pi);
 
     if (sqrtx < pi.size())
       pi_sqrtx = min(pi[sqrtx] + 1, a);

@@ -48,9 +48,6 @@ using namespace primecount;
 
 namespace {
 
-/// Cache phi(x, a) results if a < MAX_A
-const int MAX_A = 100;
-
 class PhiCache
 {
 public:
@@ -110,6 +107,8 @@ public:
   }
 
 private:
+  /// Cache phi(x, a) results if a < MAX_A
+  enum { MAX_A = 100 };
   using T = uint16_t;
   array<vector<T>, MAX_A> cache_;
   vector<int32_t>& primes_;
