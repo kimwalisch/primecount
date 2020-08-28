@@ -1,10 +1,15 @@
-2020-08-25 Kim Walisch  <kim.walisch@gmail.com>
+2020-08-28 Kim Walisch  <kim.walisch@gmail.com>
+
+  The scaling has been improved for PCs/servers with a large
+  number of CPU cores (e.g. > 32). Both the AC and D formulas
+  should run significantly faster for numbers < 10^20.
 
   * Xavier Gourdon's algorithm has been distributed using MPI
     so that computations can now run on HPC clusters.
   * AC.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
+  * generate_phi.hpp: Reuse phi cache throughout computation.
   * StatusAC.cpp: More accurate status for AC formula.
   * SegmentedPiTable.cpp: Reuse threads from AC.cpp.
   * PiTable.cpp: Multi-threaded initialization.
