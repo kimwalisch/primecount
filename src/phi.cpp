@@ -109,14 +109,14 @@ public:
 private:
   /// Cache phi(x, a) results if a < MAX_A
   enum { MAX_A = 100 };
-  using T = uint16_t;
-  array<vector<T>, MAX_A> cache_;
+  using U16 = uint16_t;
+  array<vector<U16>, MAX_A> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    uint64_t max_x = numeric_limits<T>::max();
+    auto max_x = numeric_limits<U16>::max();
 
     if (a < cache_.size() &&
         x <= max_x)
@@ -129,7 +129,7 @@ private:
         cache_[a].resize(x + 1, 0);
       }
 
-      cache_[a][x] = (T) abs(sum);
+      cache_[a][x] = (U16) abs(sum);
     }
   }
 
