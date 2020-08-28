@@ -174,10 +174,9 @@ void D_mpi_worker(T x,
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);
-
-  MpiMsg msg;
   int main_proc_id = mpi_main_proc_id();
   int proc_id = mpi_proc_id();
+  MpiMsg msg;
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)

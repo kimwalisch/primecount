@@ -198,9 +198,8 @@ T D_OpenMP(T x,
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   threads = ideal_num_threads(threads, xz);
-
-  PiTable pi(y, threads);
   LoadBalancer loadBalancer(x, xz, d_approx);
+  PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
   {
