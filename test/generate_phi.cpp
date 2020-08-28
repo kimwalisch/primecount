@@ -37,7 +37,9 @@ int main()
     int64_t a = pi[y];
 
     auto primes = generate_primes<int64_t>(y);
-    auto phi_vect = generate_phi(x, a, primes, pi);
+    using Primes = std::vector<int64_t>;
+    PhiCache<Primes> phiCache(primes, pi);
+    auto phi_vect = generate_phi(phiCache, x, a);
 
     for (size_t i = 1; i < phi_vect.size(); i++)
     {
