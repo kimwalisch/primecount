@@ -47,10 +47,7 @@ namespace {
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[.
 ///
-template <typename T,
-          typename Primes,
-          typename DFactorTable,
-          typename PhiCache>
+template <typename T, typename Primes, typename DFactorTable>
 T D_thread(T x,
            int64_t x_star,
            int64_t xz,
@@ -60,7 +57,6 @@ T D_thread(T x,
            const Primes& primes,
            const PiTable& pi,
            const DFactorTable& factor,
-           PhiCache& phiCache,
            ThreadSettings& thread)
 {
   T sum = 0;
@@ -79,7 +75,7 @@ T D_thread(T x,
     return 0;
 
   Sieve sieve(low, segment_size, max_b);
-  auto phi = phiCache.generate_phi(low, max_b);
+  auto phi = generate_phi(low, max_b, primes, pi);
   thread.init_finished();
 
   // Segmented sieve of Eratosthenes
@@ -185,7 +181,7 @@ T D_thread(T x,
 /// (this is done in D_thread(x, y)) every time the thread starts
 /// a new computation.
 ///
-template <typename T, typename DFactorTable, typename Primes>
+template <typename T, typename Primes, typename DFactorTable>
 T D_OpenMP(T x,
            int64_t y,
            int64_t z,
@@ -204,7 +200,6 @@ T D_OpenMP(T x,
   #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
-    PhiCache<Primes> phiCache(xz, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {
@@ -213,7 +208,7 @@ T D_OpenMP(T x,
       using UT = typename make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, phiCache, thread);
+      UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }
