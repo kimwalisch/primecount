@@ -47,7 +47,6 @@ namespace {
 /// Compute the S2 contribution of the interval
 /// [low, low + segments * segment_size[.
 ///
-template <typename PhiCache>
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t z,
@@ -56,7 +55,6 @@ int64_t S2_thread(int64_t x,
                   const vector<int32_t>& primes,
                   const vector<int32_t>& lpf,
                   const vector<int32_t>& mu,
-                  PhiCache& phiCache,
                   ThreadSettings& thread)
 {
   int64_t sum = 0;
@@ -72,7 +70,7 @@ int64_t S2_thread(int64_t x,
     return 0;
 
   Sieve sieve(low, segment_size, max_b);
-  auto phi = phiCache.generate_phi(low, max_b);
+  auto phi = generate_phi(low, max_b, primes, pi);
   thread.init_finished();
 
   // segmented sieve of Eratosthenes
@@ -183,13 +181,11 @@ int64_t S2(int64_t x,
   #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
-    using Primes = vector<int32_t>;
-    PhiCache<Primes> phiCache(z, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {
       thread.start_time();
-      thread.sum = S2_thread(x, y, z, c, pi, primes, lpf, mu, phiCache, thread);
+      thread.sum = S2_thread(x, y, z, c, pi, primes, lpf, mu, thread);
       thread.stop_time();
     }
   }

@@ -59,10 +59,7 @@ namespace {
 /// performance because of cache misses and slightly decreasing the
 /// segment size also decreases performance.
 ///
-template <typename T,
-          typename Primes,
-          typename FactorTable,
-          typename PhiCache>
+template <typename T, typename Primes, typename FactorTable>
 T S2_hard_thread(T x,
                  int64_t y,
                  int64_t z,
@@ -70,7 +67,6 @@ T S2_hard_thread(T x,
                  const Primes& primes,
                  const PiTable& pi,
                  const FactorTable& factor,
-                 PhiCache& phiCache,
                  ThreadSettings& thread)
 {
   T sum = 0;
@@ -89,7 +85,7 @@ T S2_hard_thread(T x,
     return 0;
 
   Sieve sieve(low, segment_size, max_b);
-  auto phi = phiCache.generate_phi(low, max_b);
+  auto phi = generate_phi(low, max_b, primes, pi);
   thread.init_finished();
 
   // Segmented sieve of Eratosthenes
@@ -207,7 +203,6 @@ T S2_hard_OpenMP(T x,
   #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
-    PhiCache<Primes> phiCache(z, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {
@@ -216,7 +211,7 @@ T S2_hard_OpenMP(T x,
       using UT = typename make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = S2_hard_thread((UT) x, y, z, c, primes, pi, factor, phiCache, thread);
+      UT sum = S2_hard_thread((UT) x, y, z, c, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }
