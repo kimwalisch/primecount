@@ -83,10 +83,9 @@ public:
         pi_sqrtx = min(pi_[sqrtx] + 1, a);
 
       for (int64_t i = 2; i <= pi_sqrtx; i++)
-        phi_vect[i] = phi<-1>(x / primes_[i - 1], i - 2);
+        phi_vect[i] = phi_vect[i - 1] + phi<-1>(x / primes_[i - 1], i - 2);
 
-      // calculate phi(x, a) using partial results
-      for (int64_t i = 2; i <= a; i++)
+      for (int64_t i = pi_sqrtx + 1; i <= a; i++)
         phi_vect[i] += phi_vect[i - 1];
     }
 
