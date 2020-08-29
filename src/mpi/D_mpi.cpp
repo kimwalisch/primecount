@@ -182,7 +182,7 @@ void D_mpi_worker(T x,
   for (int i = 0; i < threads; i++)
   {
     ThreadSettings thread;
-    PhiCache<Primes> phiCache(x, primes, pi);
+    PhiCache<Primes> phiCache(xz, primes, pi);
 
     while (true)
     {

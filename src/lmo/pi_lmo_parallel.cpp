@@ -184,7 +184,7 @@ int64_t S2(int64_t x,
   {
     ThreadSettings thread;
     using Primes = vector<int32_t>;
-    PhiCache<Primes> phiCache(x, primes, pi);
+    PhiCache<Primes> phiCache(z, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {

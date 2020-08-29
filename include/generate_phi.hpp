@@ -40,6 +40,7 @@
 
 #include <stdint.h>
 #include <array>
+#include <cmath>
 #include <vector>
 #include <limits>
 
@@ -52,16 +53,16 @@ template <typename Primes>
 class PhiCache
 {
 public:
-  template <typename T>
-  PhiCache(T x,
+  PhiCache(int64_t limit,
            const Primes& primes,
            const PiTable& pi)
     : primes_(primes),
       pi_(pi)
   {
     // Cache phi(x, a) results if x <= max_x
-    max_x_ = numeric_limits<uint16_t>::max();
-    max_x_ = min(iroot<4>(x), max_x_);
+    auto root = pow((double) limit, 1.0 / 2.5);
+    auto u16_max = numeric_limits<uint16_t>::max();
+    max_x_ = min((uint64_t) root, u16_max);
   }
 
   /// Returns a vector with phi(x, i - 1) values such that

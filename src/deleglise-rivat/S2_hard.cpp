@@ -207,7 +207,7 @@ T S2_hard_OpenMP(T x,
   #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
-    PhiCache<Primes> phiCache(x, primes, pi);
+    PhiCache<Primes> phiCache(z, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {
