@@ -51,11 +51,16 @@ namespace {
 class PhiCache
 {
 public:
-  PhiCache(vector<int32_t>& primes,
+  PhiCache(int64_t x,
+           vector<int32_t>& primes,
            PiTable& pi) :
     primes_(primes),
     pi_(pi)
-  { }
+  {
+    // Cache phi(x, a) results if x <= max_x
+    max_x_ = numeric_limits<uint16_t>::max();
+    max_x_ = min(iroot<3>(x), max_x_);
+  }
 
   /// Calculate phi(x, a) using the recursive formula:
   /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1)
@@ -107,29 +112,26 @@ public:
   }
 
 private:
-  /// Cache phi(x, a) results if a < MAX_A
+  /// Cache phi(x, a) results if x <= max_x && a < MAX_A
+  uint64_t max_x_ = 0;
   enum { MAX_A = 100 };
-  using U16 = uint16_t;
-  array<vector<U16>, MAX_A> cache_;
+  array<vector<uint16_t>, MAX_A> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    auto max_x = numeric_limits<U16>::max();
-
-    if (a < cache_.size() &&
-        x <= max_x)
+    if (x <= max_x_ &&
+        a < cache_.size())
     {
       if (x >= cache_[a].size())
       {
-        uint64_t max_size = max_x + 1;
-        uint64_t size = min(x * 2, max_size);
-        cache_[a].reserve(size);
+        cache_[a].reserve(max_x_ + 1);
         cache_[a].resize(x + 1, 0);
       }
 
-      cache_[a][x] = (U16) abs(sum);
+      sum = abs(sum);
+      cache_[a][x] = (uint16_t) sum;
     }
   }
 
@@ -176,7 +178,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
       // use large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
       PiTable pi(max(sqrtx, primes[a]), threads);
-      PhiCache cache(primes, pi);
+      PhiCache cache(x, primes, pi);
 
       int64_t c = PhiTiny::get_c(sqrtx);
       int64_t pi_sqrtx = min(pi[sqrtx], a);
