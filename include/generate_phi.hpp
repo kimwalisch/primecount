@@ -40,7 +40,6 @@
 
 #include <stdint.h>
 #include <array>
-#include <cmath>
 #include <vector>
 #include <limits>
 
@@ -60,9 +59,8 @@ public:
       pi_(pi)
   {
     // Cache phi(x, a) results if x <= max_x
-    auto root = pow((double) limit, 1.0 / 2.5);
     auto u16_max = numeric_limits<uint16_t>::max();
-    max_x_ = min((uint64_t) root, u16_max);
+    max_x_ = min(isqrt(limit), u16_max);
   }
 
   /// Returns a vector with phi(x, i - 1) values such that

@@ -40,7 +40,6 @@
 #include <stdint.h>
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <vector>
 #include <limits>
 
@@ -52,16 +51,15 @@ namespace {
 class PhiCache
 {
 public:
-  PhiCache(int64_t x,
+  PhiCache(int64_t limit,
            vector<int32_t>& primes,
            PiTable& pi) :
     primes_(primes),
     pi_(pi)
   {
     // Cache phi(x, a) results if x <= max_x
-    auto root = pow((double) x, 1.0 / 2.5);
     auto u16_max = numeric_limits<uint16_t>::max();
-    max_x_ = min((uint64_t) root, u16_max);
+    max_x_ = min(isqrt(limit), u16_max);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
