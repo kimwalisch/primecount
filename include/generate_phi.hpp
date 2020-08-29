@@ -101,9 +101,9 @@ public:
   }
 
 private:
-  /// Cache phi(x, a) results if a < MAX_A && x <= max_x
-  enum { MAX_A = 100 };
+  /// Cache phi(x, a) results if x <= max_x && a < MAX_A
   uint64_t max_x_ = 0;
+  enum { MAX_A = 100 };
   array<vector<uint16_t>, MAX_A> cache_;
   const Primes& primes_;
   const PiTable& pi_;
@@ -159,8 +159,8 @@ private:
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    if (a < cache_.size() &&
-        x <= max_x_)
+    if (x <= max_x_ && 
+        a < cache_.size())
     {
       if (x >= cache_[a].size())
       {
