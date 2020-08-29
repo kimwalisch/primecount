@@ -34,6 +34,7 @@
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 
@@ -51,10 +52,17 @@ template <typename Primes>
 class PhiCache
 {
 public:
-  PhiCache(const Primes& primes, const PiTable& pi)
+  template <typename T>
+  PhiCache(T x,
+           const Primes& primes,
+           const PiTable& pi)
     : primes_(primes),
       pi_(pi)
-  { }
+  {
+    // Cache phi(x, a) results if x <= max_x
+    max_x_ = numeric_limits<uint16_t>::max();
+    max_x_ = min(iroot<4>(x), max_x_);
+  }
 
   /// Returns a vector with phi(x, i - 1) values such that
   /// phi[i] = phi(x, i - 1) for 1 <= i <= a.
@@ -93,10 +101,10 @@ public:
   }
 
 private:
-  /// Cache phi(x, a) results if a < MAX_A
+  /// Cache phi(x, a) results if a < MAX_A && x <= max_x
   enum { MAX_A = 100 };
-  using U16 = uint16_t;
-  array<vector<U16>, MAX_A> cache_;
+  uint64_t max_x_ = 0;
+  array<vector<uint16_t>, MAX_A> cache_;
   const Primes& primes_;
   const PiTable& pi_;
 
@@ -151,19 +159,17 @@ private:
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    auto max_x = numeric_limits<U16>::max();
-
     if (a < cache_.size() &&
-        x <= max_x)
+        x <= max_x_)
     {
       if (x >= cache_[a].size())
       {
-        uint64_t max_size = max_x + 1;
-        cache_[a].reserve(max_size);
+        cache_[a].reserve(max_x_ + 1);
         cache_[a].resize(x + 1, 0);
       }
 
-      cache_[a][x] = (U16) abs(sum);
+      sum = abs(sum);
+      cache_[a][x] = (uint16_t) sum;
     }
   }
 

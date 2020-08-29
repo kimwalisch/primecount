@@ -204,7 +204,7 @@ T D_OpenMP(T x,
   #pragma omp parallel num_threads(threads)
   {
     ThreadSettings thread;
-    PhiCache<Primes> phiCache(primes, pi);
+    PhiCache<Primes> phiCache(x, primes, pi);
 
     while (loadBalancer.get_work(thread))
     {
