@@ -66,8 +66,8 @@ public:
     int64_t max_dist = ceil_div(z_ - low, threads_);
     thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
     int64_t t = ceil_div(z_ - low, thread_dist_);
+    *threads = (int) in_between(1, t, threads_);
     *thread_dist = thread_dist_;
-    *threads = in_between(1, t, threads_);
   }
 
 private:
