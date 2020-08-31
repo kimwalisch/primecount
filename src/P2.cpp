@@ -72,7 +72,7 @@ public:
 
 private:
   double time_ = -1;
-  int64_t min_dist_ = 1 << 22;
+  int64_t min_dist_ = 1 << 20;
   int64_t thread_dist_ = min_dist_;
   int64_t z_;
 };
