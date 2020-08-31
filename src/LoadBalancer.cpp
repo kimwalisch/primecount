@@ -3,7 +3,8 @@
 /// @brief The LoadBalancer assigns work to the individual threads
 ///        in the computation of the special leaves in the
 ///        Lagarias-Miller-Odlyzko, Deleglise-Rivat and Gourdon
-///        prime counting algorithms.
+///        prime counting algorithms. This load balancer is used
+///        by the S2_hard(x, y) and D(x, y) functions.
 ///
 ///        Simply parallelizing the computation of the special
 ///        leaves in the Lagarias-Miller-Odlyzko algorithm by

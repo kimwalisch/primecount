@@ -21,6 +21,7 @@
 #include <primesieve.hpp>
 #include <aligned_vector.hpp>
 #include <int128_t.hpp>
+#include <LoadBalancerP2.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
@@ -34,47 +35,6 @@ using namespace std;
 using namespace primecount;
 
 namespace {
-
-/// Calculate the thread sieving distance. The idea
-/// is to gradually increase the thread_dist in
-/// order to keep all CPU cores busy.
-///
-class LoadBalancer
-{
-public:
-  LoadBalancer(int64_t z)
-    : z_(z)
-  { }
-
-  void get_work(int64_t low,
-                int* threads,
-                int64_t* thread_dist)
-  {
-    double start_time = time_;
-    time_ = get_time();
-    double seconds = time_ - start_time;
-
-    if (start_time > 0)
-    {
-      if (seconds < 60)
-        thread_dist_ *= 2;
-      if (seconds > 60)
-        thread_dist_ /= 2;
-    }
-
-    int64_t dist = z_ - min(low, z_);
-    int64_t max_dist = ceil_div(dist, *threads);
-    thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
-    *threads = ideal_num_threads(*threads, dist, thread_dist_);
-    *thread_dist = thread_dist_;
-  }
-
-private:
-  double time_ = -1;
-  int64_t min_dist_ = 1 << 20;
-  int64_t thread_dist_ = min_dist_;
-  int64_t z_;
-};
 
 /// Count the primes inside [prime, stop]
 int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
@@ -152,14 +112,15 @@ T B_OpenMP(T x, int64_t y, int threads)
   T sum = 0;
   int64_t low = 2;
   int64_t pi_low_minus_1 = 0;
-  int64_t thread_dist = 0;
   int64_t z = (int64_t)(x / max(y, 1));
-  LoadBalancer loadBalancer(z);
-  loadBalancer.get_work(low, &threads, &thread_dist);
+  LoadBalancerP2 loadBalancer(z, threads);
+  threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
 
   while (low < z)
   {
+    int64_t thread_dist = loadBalancer.get_thread_dist(low);
+
     #pragma omp parallel for num_threads(threads)
     for (int64_t i = 0; i < threads; i++)
       res[i] = B_thread(x, y, z, low, i, thread_dist);
@@ -181,7 +142,6 @@ T B_OpenMP(T x, int64_t y, int threads)
     }
 
     low += thread_dist * threads;
-    loadBalancer.get_work(low, &threads, &thread_dist);
 
     if (is_print())
     {
