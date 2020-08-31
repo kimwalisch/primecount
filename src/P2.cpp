@@ -44,9 +44,8 @@ class LoadBalancer
 {
 public:
   LoadBalancer(int64_t z, int threads)
-    : z_(z),
-      time_(get_time()),
-      threads_(ideal_num_threads(threads, z, min_dist_))
+    : threads_(ideal_num_threads(threads, z, min_dist_)),
+      z_(z)
   { }
 
   void update(int64_t low,
@@ -57,10 +56,13 @@ public:
     time_ = get_time();
     double seconds = time_ - start_time;
 
-    if (seconds < 60)
-      thread_dist_ *= 2;
-    if (seconds > 60)
-      thread_dist_ /= 2;
+    if (start_time > 0)
+    {
+      if (seconds < 60)
+        thread_dist_ *= 2;
+      if (seconds > 60)
+        thread_dist_ /= 2;
+    }
 
     low = min(low, z_);
     int64_t max_dist = ceil_div(z_ - low, threads_);
@@ -71,11 +73,11 @@ public:
   }
 
 private:
+  double time_ = -1;
   int64_t min_dist_ = 1 << 22;
   int64_t thread_dist_ = min_dist_;
+  int64_t threads_;
   int64_t z_;
-  double time_;
-  int threads_;
 };
 
 /// Count the primes inside [prime, stop]

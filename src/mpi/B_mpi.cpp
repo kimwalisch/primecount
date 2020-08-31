@@ -29,6 +29,51 @@ using namespace primecount;
 
 namespace {
 
+/// Calculate the thread sieving distance. The idea
+/// is to gradually increase the thread_dist in
+/// order to keep all CPU cores busy.
+///
+class LoadBalancer
+{
+public:
+  LoadBalancer(int64_t z, int threads)
+    : threads_(ideal_num_threads(threads, z, min_dist_)),
+      z_(z)
+  { }
+
+  void update(int64_t low,
+              int* threads,
+              int64_t* thread_dist)
+  {
+    double start_time = time_;
+    time_ = get_time();
+    double seconds = time_ - start_time;
+
+    if (start_time > 0)
+    {
+      if (seconds < 60)
+        thread_dist_ *= 2;
+      if (seconds > 60)
+        thread_dist_ /= 2;
+    }
+
+    low = min(low, z_);
+    int64_t max_dist = ceil_div(z_ - low, threads_);
+    thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
+    int64_t t = ceil_div(z_ - low, thread_dist_);
+    *threads = (int) in_between(1, t, threads_);
+    *thread_dist = thread_dist_;
+  }
+
+private:
+  double time_ = -1;
+  int64_t min_dist_ = 1 << 22;
+  int64_t thread_dist_ = min_dist_;
+  int64_t threads_;
+  int64_t z_;
+};
+
+/// Count the primes inside [prime, stop]
 int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
 {
   int64_t count = 0;
@@ -37,31 +82,6 @@ int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
     prime = it.next_prime();
 
   return count;
-}
-
-/// Calculate the thread sieving distance. The idea is to
-/// gradually increase the thread_distance in order to
-/// keep all CPU cores busy.
-///
-void balanceLoad(double* time,
-                 int64_t* thread_distance,
-                 int64_t low,
-                 int64_t z,
-                 int threads)
-{
-  double start_time = *time;
-  *time = get_time();
-  double seconds = *time - start_time;
-
-  int64_t min_distance = 1 << 23;
-  int64_t max_distance = ceil_div(z - low, threads);
-
-  if (seconds < 60)
-    *thread_distance *= 2;
-  if (seconds > 60)
-    *thread_distance /= 2;
-
-  *thread_distance = in_between(min_distance, *thread_distance, max_distance);
 }
 
 template <typename T>
@@ -79,17 +99,17 @@ B_thread(T x,
          int64_t z,
          int64_t low,
          int64_t thread_num,
-         int64_t thread_distance)
+         int64_t thread_dist)
 {
   T sum = 0;
   int64_t pix = 0;
   int64_t iters = 0;
-  low += thread_distance * thread_num;
+  low += thread_dist * thread_num;
 
   if (low < z)
   {
     // thread sieves [low, z[
-    z = min(low + thread_distance, z);
+    z = min(low + thread_dist, z);
     int64_t start = (int64_t) max(x / z, y);
     int64_t stop = (int64_t) min(x / low, isqrt(x));
 
@@ -131,22 +151,22 @@ T B_OpenMP(T x, int64_t y, int threads)
   int procs = mpi_num_procs();
 
   int64_t low = 2;
+  int64_t thread_dist = 0;
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t thread_distance = 1 << 23;
-  threads = ideal_num_threads(threads, z, thread_distance);
-  aligned_vector<ThreadResult<T>> res(threads);
-  int64_t distance = z - low;
-  int64_t proc_distance = ceil_div(distance, procs);
-  low += proc_distance * proc_id;
+  int64_t proc_dist = ceil_div(z, procs);
+  low += proc_dist * proc_id;
   int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
-  z = min(low + proc_distance, z);
-  double time = get_time();
+  z = min(low + proc_dist, z);
+
+  LoadBalancer loadBalancer(z, threads);
+  loadBalancer.update(low, &threads, &thread_dist);
+  aligned_vector<ThreadResult<T>> res(threads);
 
   while (low < z)
   {
     #pragma omp parallel for num_threads(threads)
     for (int64_t i = 0; i < threads; i++)
-      res[i] = B_thread(x, y, z, low, i, thread_distance);
+      res[i] = B_thread(x, y, z, low, i, thread_dist);
 
     // The threads above have computed the sum of:
     // PrimePi(n) - PrimePi(thread_low - 1)
@@ -164,8 +184,8 @@ T B_OpenMP(T x, int64_t y, int threads)
       pi_low_minus_1 += res[i].pix;
     }
 
-    low += thread_distance * threads;
-    balanceLoad(&time, &thread_distance, low, z, threads);
+    low += thread_dist * threads;
+    loadBalancer.update(low, &threads, &thread_dist);
 
     if (is_print())
     {
