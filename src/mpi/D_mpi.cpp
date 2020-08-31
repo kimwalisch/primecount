@@ -169,7 +169,8 @@ void D_mpi_worker(T x,
   PiTable pi(y, threads);
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
-  threads = ideal_num_threads(threads, xz);
+  int64_t thread_threshold = 1 << 19;
+  threads = ideal_num_threads(threads, xz, thread_threshold);
   int main_proc_id = mpi_main_proc_id();
   int proc_id = mpi_proc_id();
   MpiMsg msg;
