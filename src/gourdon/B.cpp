@@ -42,14 +42,13 @@ namespace {
 class LoadBalancer
 {
 public:
-  LoadBalancer(int64_t z, int threads)
-    : threads_(ideal_num_threads(threads, z, min_dist_)),
-      z_(z)
+  LoadBalancer(int64_t z)
+    : z_(z)
   { }
 
-  void update(int64_t low,
-              int* threads,
-              int64_t* thread_dist)
+  void get_work(int64_t low,
+                int* threads,
+                int64_t* thread_dist)
   {
     double start_time = time_;
     time_ = get_time();
@@ -63,11 +62,10 @@ public:
         thread_dist_ /= 2;
     }
 
-    low = min(low, z_);
-    int64_t max_dist = ceil_div(z_ - low, threads_);
+    int64_t dist = z_ - min(low, z_);
+    int64_t max_dist = ceil_div(dist, *threads);
     thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
-    int64_t t = ceil_div(z_ - low, thread_dist_);
-    *threads = (int) in_between(1, t, threads_);
+    *threads = ideal_num_threads(*threads, dist, thread_dist_);
     *thread_dist = thread_dist_;
   }
 
@@ -75,7 +73,6 @@ private:
   double time_ = -1;
   int64_t min_dist_ = 1 << 22;
   int64_t thread_dist_ = min_dist_;
-  int64_t threads_;
   int64_t z_;
 };
 
@@ -157,8 +154,8 @@ T B_OpenMP(T x, int64_t y, int threads)
   int64_t pi_low_minus_1 = 0;
   int64_t thread_dist = 0;
   int64_t z = (int64_t)(x / max(y, 1));
-  LoadBalancer loadBalancer(z, threads);
-  loadBalancer.update(low, &threads, &thread_dist);
+  LoadBalancer loadBalancer(z);
+  loadBalancer.get_work(low, &threads, &thread_dist);
   aligned_vector<ThreadResult<T>> res(threads);
 
   while (low < z)
@@ -184,7 +181,7 @@ T B_OpenMP(T x, int64_t y, int threads)
     }
 
     low += thread_dist * threads;
-    loadBalancer.update(low, &threads, &thread_dist);
+    loadBalancer.get_work(low, &threads, &thread_dist);
 
     if (is_print())
     {
