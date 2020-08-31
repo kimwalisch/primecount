@@ -126,9 +126,8 @@ maxint_t to_maxint(const string& expr)
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
 {
   thread_threshold = max((int64_t) 1, thread_threshold);
-  threads = (int) min((int64_t) threads, sieve_limit / thread_threshold);
-  threads = max(1, threads);
-  return threads;
+  int64_t max_threads = ceil_div(sieve_limit, thread_threshold);
+  return in_between(1, threads, max_threads);
 }
 
 int get_status_precision(maxint_t x)
