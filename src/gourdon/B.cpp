@@ -145,9 +145,9 @@ T B_OpenMP(T x, int64_t y, int threads)
 
     if (is_print())
     {
-      double percent = get_percent(low, z);
-      cout << "\rStatus: " << fixed << setprecision(get_status_precision(x))
-          << percent << '%' << flush;
+      int precision = get_status_precision(x);
+      cout << "\rStatus: " << fixed << setprecision(precision)
+           << get_percent(low, z) << '%' << flush;
     }
   }
 
