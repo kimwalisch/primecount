@@ -195,7 +195,7 @@ T S2_hard_OpenMP(T x,
                  const FactorTable& factor,
                  int threads)
 {
-  int64_t thread_threshold = 1 << 19;
+  int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, z, thread_threshold);
   LoadBalancer loadBalancer(x, z, s2_hard_approx);
   int64_t max_prime = min(y, z / isqrt(y));

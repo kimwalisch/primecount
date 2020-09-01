@@ -193,7 +193,7 @@ T D_OpenMP(T x,
 {
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t thread_threshold = 1 << 19;
+  int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, xz, thread_threshold);
   LoadBalancer loadBalancer(x, xz, d_approx);
   PiTable pi(y, threads);
