@@ -21,8 +21,8 @@ class LoadBalancerP2
 {
 public:
   LoadBalancerP2(int64_t z, int threads);
-  int get_threads() const;
   int64_t get_thread_dist(int64_t low);
+  int get_threads() const;
 
 private:
   double time_ = -1;
