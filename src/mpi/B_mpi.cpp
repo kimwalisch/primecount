@@ -30,17 +30,6 @@ using namespace primecount;
 
 namespace {
 
-/// Count the primes inside [prime, stop]
-int64_t count_primes(primesieve::iterator& it, int64_t& prime, int64_t stop)
-{
-  int64_t count = 0;
-
-  for (; prime <= stop; count++)
-    prime = it.next_prime();
-
-  return count;
-}
-
 template <typename T>
 struct ThreadResult
 {
@@ -48,6 +37,21 @@ struct ThreadResult
   int64_t pix;
   int64_t iters;
 };
+
+/// Count primes inside [prime, stop]
+int64_t count_primes(primesieve::iterator& it,
+                     int64_t& prime,
+                     int64_t stop)
+{
+  int64_t count = 0;
+  int64_t p = prime;
+
+  for (; p <= stop; count++)
+    p = it.next_prime();
+
+  prime = p;
+  return count;
+}
 
 template <typename T>
 ThreadResult<T>
