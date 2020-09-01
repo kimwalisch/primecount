@@ -35,6 +35,7 @@ using maxuint_t = uint128_t;
 #elif defined(__SIZEOF_INT128__)
 #define HAVE_INT128_T
 
+#include <algorithm>
 #include <ostream>
 #include <string>
 
@@ -58,7 +59,9 @@ inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
   if (str.empty())
     str = "0";
 
-  stream << std::string(str.rbegin(), str.rend());
+  std::reverse(str.begin(), str.end());
+  stream << str;
+
   return stream;
 }
 
