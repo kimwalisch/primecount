@@ -19,7 +19,6 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
-#include <sstream>
 #include <string>
 
 #if defined(_OPENMP)
@@ -81,9 +80,8 @@ void Status::print(double percent)
   if ((percent - old) >= epsilon_)
   {
     percent_ = percent;
-    ostringstream status;
-    status << "\rStatus: " << fixed << setprecision(precision_) << percent << "%";
-    cout << status.str() << flush;
+    cout << "\rStatus: " << fixed << setprecision(precision_)
+         << percent << "%" << flush;
   }
 }
 
