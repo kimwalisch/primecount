@@ -90,7 +90,6 @@ P2_thread(T x,
     while (prime > start)
     {
       int64_t xp = (int64_t)(x / prime);
-      if (xp >= z) break;
       pix += count_primes(it, next, xp);
       iters++;
       sum += pix;
