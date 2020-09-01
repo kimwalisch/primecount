@@ -19,7 +19,6 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
-#include <string>
 
 #if defined(_OPENMP)
   #include <omp.h>
