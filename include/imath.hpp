@@ -97,10 +97,12 @@ inline T ipow(T x, int n)
 template <int N, typename T>
 inline T iroot(T x)
 {
-  if (N == 0)
-    return 0;
+  T r;
 
-  T r = (T) std::pow((double) x, 1.0 / N);
+  if (N == 3)
+    r = (T) std::cbrt((double) x);
+  else
+    r = (T) std::pow((double) x, 1.0 / N);
 
   // fix root too large
   for (; r > 0; r--)
