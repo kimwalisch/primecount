@@ -140,7 +140,7 @@ string primecount_version()
 maxint_t get_max_x(double alpha_y)
 {
 #ifdef HAVE_INT128_T
-  double max_x = pow(pow(2.0, 62.0) * alpha_y, 3.0 / 2.0);
+  double max_x = pow((1ull << 62) * alpha_y, 3.0 / 2.0);
   return (int128_t) max_x; 
 #else
   unused_param(alpha_y); 
