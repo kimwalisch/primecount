@@ -177,19 +177,24 @@ int64_t phi(int64_t x, int64_t a, int threads)
     {
       // use large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
-      PiTable pi(max(sqrtx, primes[a]), threads);
-      PhiCache cache(x, primes, pi);
-
       int64_t c = PhiTiny::get_c(sqrtx);
+      PiTable pi(max(sqrtx, primes[a]), threads);
       int64_t pi_sqrtx = min(pi[sqrtx], a);
       int64_t thread_threshold = (int64_t) 1e10;
       threads = ideal_num_threads(threads, x, thread_threshold);
 
       sum = phi_tiny(x, c) - a + pi_sqrtx;
 
-      #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache) reduction(+: sum)
-      for (int64_t i = c; i < pi_sqrtx; i++)
-        sum += cache.phi<-1>(x / primes[i + 1], i);
+      #pragma omp parallel num_threads(threads) reduction(+: sum)
+      {
+        // Each thread uses its own PhiCache object in
+        // order to avoid thread synchronization.
+        PhiCache cache(x, primes, pi);
+
+        #pragma omp for nowait schedule(dynamic, 16)
+        for (int64_t i = c; i < pi_sqrtx; i++)
+          sum += cache.phi<-1>(x / primes[i + 1], i);
+      }
     }
   }
 
