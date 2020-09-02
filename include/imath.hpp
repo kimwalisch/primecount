@@ -106,10 +106,8 @@ inline T iroot(T x)
 
   // fix root too large
   for (; r > 0; r--)
-  {
     if (ipow(r, N - 1) <= x / r)
       break;
-  }
 
   // fix root too small
   while (ipow(r + 1, N - 1) <= x / (r + 1))
