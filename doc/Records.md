@@ -1,4 +1,11 @@
-## [A006880](https://oeis.org/A006880) world records
+# Records computed using primecount
+
+Below is a selection of records that have been computed using primecount. For a
+more complete list [search for primecount on OEIS.org](https://oeis.org/search?q=primecount&language=english&go=Search).
+There is also a [mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
+where we have announced important records as well as details about these computations.
+
+## [A006880](https://oeis.org/A006880) records
 
 <table>
   <tr align="center">
@@ -27,7 +34,7 @@ parameters. Here is a link to the
 [mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
 where we announced these records.
 
-## [A006988](https://oeis.org/A006988) world records
+## [A006988](https://oeis.org/A006988) records
 
 <table>
   <tr align="center">
@@ -51,7 +58,7 @@ where we announced these records.
 </table>
 
 
-## [A040014](https://oeis.org/A040014) world records
+## [A040014](https://oeis.org/A040014) records
 
 <table>
   <tr align="center">
