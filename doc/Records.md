@@ -30,7 +30,7 @@ parameters.
 <table>
   <tr align="center">
     <td><b>x</b></td>
-    <td><b>(10^n)-th prime.</b></td>
+    <td><b>(10^n)-th prime</b></td>
     <td><b>Date</b></td>
     <td><b>Computed by</b></td>
   </tr>
@@ -44,6 +44,126 @@ parameters.
     <td>10<sup>24</sup></td>
     <td>58,310,039,994,836,584,070,534,263</td>
     <td>2015-11-11</td>
+    <td>David Baugh</td>
+  </tr>
+</table>
+
+
+## [A040014](https://oeis.org/A040014) world records
+
+<table>
+  <tr align="center">
+    <td><b>x</b></td>
+    <td><b>Number of primes < e^n</b></td>
+    <td><b>Date</b></td>
+    <td><b>Computed by</b></td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>40</sup></td>
+    <td>6,039,718,251,063,248</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>41</sup></td>
+    <td>16,006,649,119,924,029</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>42</sup></td>
+    <td>42,447,960,883,276,127</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>43</sup></td>
+    <td>112,634,828,955,211,076</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>44</sup></td>
+    <td>299,044,471,755,161,946</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>45</sup></td>
+    <td>794,391,603,395,859,861</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>46</sup></td>
+    <td>2,111,342,388,443,325,930</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>47</sup></td>
+    <td>5,614,329,680,424,719,264</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>48</sup></td>
+    <td>14,936,302,130,478,888,296</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+    <tr align="right">
+    <td>10<sup>49</sup></td>
+    <td>39,754,427,477,873,197,008</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>50</sup></td>
+    <td>105,856,368,969,311,706,141</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>51</sup></td>
+    <td>281,987,525,487,483,629,729</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>52</sup></td>
+    <td>751,479,276,811,434,164,860</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>53</sup></td>
+    <td>2,003,417,881,848,387,803,588</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>54</sup></td>
+    <td>5,343,023,851,430,824,336,740</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>55</sup></td>
+    <td>14,254,686,649,867,417,156,723</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>56</sup></td>
+    <td>38,043,242,922,236,683,117,535</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>57</sup></td>
+    <td>101,564,348,447,358,891,206,901</td>
+    <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
 </table>
