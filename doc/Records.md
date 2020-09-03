@@ -21,7 +21,7 @@
   </tr>
 </table>
 
-Note that the 10^28 result has not yet been verified. We are currently
+Note that the 10<sup>28</sup> result has not yet been verified. We are currently
 recomputing it a second time using slightly different configuration
 parameters.
 
