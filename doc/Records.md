@@ -12,7 +12,7 @@ and I will add your record to this page.
 <table>
   <tr align="center">
     <td><b>x</b></td>
-    <td><b>Number of primes ≤ 10^n</b></td>
+    <td><b>Number of primes ≤ 10<sup>n</sup></b></td>
     <td><b>Date</b></td>
     <td><b>Computed by</b></td>
   </tr>
@@ -41,7 +41,7 @@ where we announced these records.
 <table>
   <tr align="center">
     <td><b>x</b></td>
-    <td><b>(10^n)-th prime</b></td>
+    <td><b>10<sup>n</sup>-th prime</b></td>
     <td><b>Date</b></td>
     <td><b>Computed by</b></td>
   </tr>
@@ -59,13 +59,12 @@ where we announced these records.
   </tr>
 </table>
 
-
 ## [A040014](https://oeis.org/A040014) records
 
 <table>
   <tr align="center">
     <td><b>x</b></td>
-    <td><b>Number of primes < e^n</b></td>
+    <td><b>Number of primes < e<sup>n</sup></b></td>
     <td><b>Date</b></td>
     <td><b>Computed by</b></td>
   </tr>
@@ -174,6 +173,53 @@ where we announced these records.
   <tr align="right">
     <td>e<sup>57</sup></td>
     <td>101,564,348,447,358,891,206,901</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+</table>
+
+## [A122121](https://oeis.org/A122121) records
+
+<table>
+  <tr align="center">
+    <td><b>x</b></td>
+    <td><b>Number of primes ≤ 10<sup>n/2</sup></b></td>
+    <td><b>Date</b></td>
+    <td><b>Computed by</b></td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>47</sup></td>
+    <td>5,956,317,545,928,249,075,039</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>48</sup></td>
+    <td>18,435,599,767,349,200,867,866</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+    <tr align="right">
+    <td>10<sup>49</sup></td>
+    <td>57,086,403,558,149,290,301,868</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+    <tr align="right">
+    <td>10<sup>50</sup></td>
+    <td>176,846,309,399,143,769,411,680</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+    <tr align="right">
+    <td>10<sup>51</sup></td>
+    <td>548,074,549,053,620,897,173,483</td>
+    <td>2016-06-19</td>
+    <td>David Baugh</td>
+  </tr>
+    <tr align="right">
+    <td>10<sup>52</sup></td>
+    <td>1,699,246,750,872,437,141,327,603</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
