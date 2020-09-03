@@ -6,7 +6,8 @@ There is also a [mersenneforum thread](https://www.mersenneforum.org/showthread.
 where we have announced important records as well as details about these computations.
 If you have used primecount to compute an important new record please let me know
 and I will add your record to this page. Please note that most of these records
-have been set using the [primecount version with backup support](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
+have been computed using the
+[primecount version with backup support](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
 as these record computations often take weeks or months to complete and power
 outage(s) may occur in such time frames.
 
