@@ -2,7 +2,7 @@
 
 Below is a selection of records that have been computed using primecount. For a
 more complete list [search for primecount on OEIS.org](https://oeis.org/search?q=primecount&language=english&go=Search).
-There is also a [mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
+There is also a [mersenneforum thread](https://www.mersenneforum.org/showthread.php?t=20473)
 where we have announced important records as well as details about these computations.
 If you have used primecount to compute an important new record please let me know
 and I will add your record to this page. Please note that most of these records
