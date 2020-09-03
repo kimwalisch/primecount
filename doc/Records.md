@@ -5,7 +5,10 @@ more complete list [search for primecount on OEIS.org](https://oeis.org/search?q
 There is also a [mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
 where we have announced important records as well as details about these computations.
 If you have used primecount to compute an important new record please let me know
-and I will add your record to this page.
+and I will add your record to this page. Please note that most of these records
+have been set using the [primecount version with backup support](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
+as these record computations often take weeks or months to complete and power
+outage(s) may occur in such time frames.
 
 ## [A006880](https://oeis.org/A006880) records
 
