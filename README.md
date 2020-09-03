@@ -17,9 +17,7 @@ the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
 that is shared amongst all implementations and that scales up to
 hundreds of CPU cores. primecount has already been used to compute
-several world records e.g.
-[pi(10<sup>27</sup>)](http://www.mersenneforum.org/showthread.php?t=20473) and
-[nth_prime(10<sup>24</sup>)](https://oeis.org/A006988).
+several [world records](doc/Records.md).
 
 ## Build instructions
 
