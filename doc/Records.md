@@ -69,54 +69,6 @@ where we announced these records.
     <td><b>Computed by</b></td>
   </tr>
   <tr align="right">
-    <td>e<sup>40</sup></td>
-    <td>6,039,718,251,063,248</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>41</sup></td>
-    <td>16,006,649,119,924,029</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>42</sup></td>
-    <td>42,447,960,883,276,127</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>43</sup></td>
-    <td>112,634,828,955,211,076</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>44</sup></td>
-    <td>299,044,471,755,161,946</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>45</sup></td>
-    <td>794,391,603,395,859,861</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>46</sup></td>
-    <td>2,111,342,388,443,325,930</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
-    <td>e<sup>47</sup></td>
-    <td>5,614,329,680,424,719,264</td>
-    <td>2016-06-19</td>
-    <td>David Baugh</td>
-  </tr>
-  <tr align="right">
     <td>e<sup>48</sup></td>
     <td>14,936,302,130,478,888,296</td>
     <td>2016-06-19</td>
