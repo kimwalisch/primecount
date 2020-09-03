@@ -118,10 +118,6 @@ double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum
 ///
 void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
-  // check --status option used
-  if (!is_print())
-    return;
-
   double time = get_time();
 
   if (isPrint(time))
