@@ -24,3 +24,26 @@
 Note that the 10^28 result has not yet been verified. We are currently
 recomputing it a second time using slightly different configuration
 parameters.
+
+## [A006988](https://oeis.org/A006988) world records
+
+<table>
+  <tr align="center">
+    <td><b>x</b></td>
+    <td><b>(10^n)-th prime.</b></td>
+    <td><b>Date</b></td>
+    <td><b>Computed by</b></td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>23</sup></td>
+    <td>5,596,564,467,986,980,643,073,683</td>
+    <td>2015-11-11</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>10<sup>24</sup></td>
+    <td>58,310,039,994,836,584,070,534,263</td>
+    <td>2015-11-11</td>
+    <td>David Baugh</td>
+  </tr>
+</table>
