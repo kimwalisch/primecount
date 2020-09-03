@@ -1,4 +1,4 @@
-# Records computed using primecount
+# Records set using primecount
 
 Below is a selection of records that have been computed using primecount. For a
 more complete list [search for primecount on OEIS.org](https://oeis.org/search?q=primecount&language=english&go=Search).
