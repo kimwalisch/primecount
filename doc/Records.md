@@ -23,7 +23,9 @@
 
 Note that the 10<sup>28</sup> result has not yet been verified. We are currently
 recomputing it a second time using slightly different configuration
-parameters.
+parameters. Here is a link to the
+[mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
+where we announced these records.
 
 ## [A006988](https://oeis.org/A006988) world records
 
