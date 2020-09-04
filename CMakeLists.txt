@@ -52,7 +52,6 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 set(LIB_SRC src/api.cpp
             src/api_c.cpp
-            src/common.cpp
             src/FactorTable.cpp
             src/RiemannR.cpp
             src/P2.cpp
@@ -72,6 +71,7 @@ set(LIB_SRC src/api.cpp
             src/pi_meissel.cpp
             src/pi_primesieve.cpp
             src/print.cpp
+            src/util.cpp
             src/lmo/pi_lmo1.cpp
             src/lmo/pi_lmo2.cpp
             src/lmo/pi_lmo3.cpp

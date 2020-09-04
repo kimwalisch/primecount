@@ -1,5 +1,5 @@
 ///
-/// @file  common.cpp
+/// @file  util.cpp
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
@@ -19,7 +19,6 @@
 #include <chrono>
 #include <cmath>
 #include <limits>
-#include <sstream>
 #include <string>
 #include <stdint.h>
 #include <utility>
@@ -89,11 +88,32 @@ double truncate3(double n)
 
 namespace primecount {
 
-string to_str(maxint_t x)
+/// Supports 128-bit integers, unlike std::to_string().
+std::string to_str(maxuint_t n)
 {
-  ostringstream oss;
-  oss << x;
-  return oss.str();
+  std::string str;
+
+  while (n > 0)
+  {
+    str += '0' + n % 10;
+    n /= 10;
+  }
+
+  if (str.empty())
+    str = "0";
+
+  std::reverse(str.begin(), str.end());
+
+  return str;
+}
+
+/// Supports 128-bit integers, unlike std::to_string().
+std::string to_str(maxint_t n)
+{
+  if (n >= 0)
+    return to_str((maxuint_t) n);
+  else
+    return "-" + to_str((maxuint_t) -n);
 }
 
 maxint_t to_maxint(const string& expr)
