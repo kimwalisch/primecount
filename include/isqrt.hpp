@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace primecount {
+namespace {
 
 #if __cplusplus >= 201402L
 

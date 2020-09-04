@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <type_traits>
 
-namespace primecount {
+namespace {
 
 /// If ENABLE_DIV32 is defined:
 ///
