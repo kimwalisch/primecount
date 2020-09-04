@@ -35,7 +35,7 @@
 ///        * Old: if (mu[n] != 0 && prime < lpf[n])
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -93,6 +93,12 @@ private:
   static const uint16_t coprime_[480];
   static const int16_t coprime_indexes_[2310];
 };
+
+} // namespace 
+
+namespace {
+
+using namespace primecount;
 
 template <typename T>
 class FactorTable : public AbstractFactorTable

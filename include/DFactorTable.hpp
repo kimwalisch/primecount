@@ -37,7 +37,7 @@
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -58,7 +58,9 @@
 #include <stdint.h>
 #include <vector>
 
-namespace primecount {
+namespace {
+
+using namespace primecount;
 
 template <typename T>
 class DFactorTable : public AbstractFactorTable
