@@ -136,19 +136,14 @@ sudo make install
 
 ## C++ API
 
-Below is a C++ example with the most common libprimesieve use cases.
+Below is a C++ example with the most common libprimesieve use case.
 
 ```C++
 #include <primesieve.hpp>
 #include <iostream>
-#include <vector>
 
 int main()
 {
-  // Store the primes below 1000
-  std::vector<int> primes;
-  primesieve::generate_primes(1000, &primes);
-
   primesieve::iterator it;
   uint64_t prime = it.next_prime();
 
@@ -160,8 +155,8 @@ int main()
 }
 ```
 
-* [More C++ examples](examples/cpp)
-* [Browse libprimesieve's C++ API online](https://primesieve.org/api)
+* [More C++ examples](doc/CPP_Examples.md)
+* [C++ API documentation](https://primesieve.org/api)
 
 ## C API
 
@@ -186,8 +181,8 @@ int main()
 }
 ```
 
-* [More C examples](examples/c)
-* [Browse libprimesieve's C API online](https://primesieve.org/api)
+* [More C examples](doc/C_Examples.md)
+* [C API documentation](https://primesieve.org/api)
 
 ## libprimesieve performance tips
 
@@ -289,7 +284,7 @@ cc  -O2 primes.c   -lprimesieve
 
 If you have built primesieve yourself then the default installation path is 
 ```/usr/local/lib``` which is not part of ```LD_LIBRARY_PATH``` on many OSes.
-Hence you need to export some environment variables:
+Hence you may need to export some environment variables:
 
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
@@ -335,6 +330,10 @@ primesieve natively supports C and C++ and has bindings available for:
         <td><a href="https://hackage.haskell.org/package/primesieve">primesieve-haskell</a></td>
     </tr>
     <tr>
+        <td><b>Pascal:</b></td>
+        <td><a href="https://github.com/JulStrat/primesieve-pas">primesieve-pas</a></td>
+    </tr> 
+    <tr>
         <td><b>Perl:</b></td>
         <td><a href="https://gitlab.com/oesiman/primesieve">Primesieve</a></td>
     </tr>
@@ -353,7 +352,7 @@ primesieve natively supports C and C++ and has bindings available for:
     <tr>
         <td><b>Rust:</b></td>
         <td><a href="https://github.com/pthariensflame/primesieve.rs">primesieve.rs</a></td>
-    </tr>
+    </tr>   
 </table>
 
 Many thanks to the developers of these bindings!
