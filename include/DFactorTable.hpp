@@ -201,25 +201,6 @@ public:
   }
 
 private:
-
-  /// Find the first multiple (of prime) > low which
-  /// is not divisible by any prime <= 11.
-  ///
-  static int64_t next_multiple(int64_t prime,
-                               int64_t low,
-                               int64_t* index)
-  {
-    int64_t quotient = ceil_div(low, prime);
-    int64_t i = std::max(*index, to_index(quotient));
-    int64_t multiple = 0;
-
-    for (; multiple <= low; i++)
-      multiple = prime * to_number(i);
-
-    *index = i;
-    return multiple;
-  }
-
   std::vector<T> factor_;
 };
 
