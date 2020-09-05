@@ -51,6 +51,7 @@
 #include <int128_t.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <limits>
 #include <stdint.h>
@@ -109,8 +110,8 @@ protected:
   }
 
 private:
-  static const uint16_t coprime_[480];
-  static const int16_t coprime_indexes_[2310];
+  static const std::array<uint16_t, 480> coprime_;
+  static const std::array<int16_t, 2310> coprime_indexes_;
 };
 
 } // namespace 
