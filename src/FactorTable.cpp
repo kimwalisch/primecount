@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <FactorTable.hpp>
+#include <AbstractFactorTable.hpp>
 #include <stdint.h>
 
 namespace primecount {

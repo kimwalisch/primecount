@@ -48,8 +48,8 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <AbstractFactorTable.hpp>
 #include <primesieve.hpp>
-#include <FactorTable.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <pod_vector.hpp>
