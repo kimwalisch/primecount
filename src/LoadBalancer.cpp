@@ -84,30 +84,29 @@ maxint_t LoadBalancer::get_sum() const
 
 bool LoadBalancer::get_work(ThreadSettings& thread)
 {
-  #pragma omp critical (get_work)
+  LockGuard lockGuard(lock_);
+  sum_ += thread.sum;
+
+  if (is_print())
   {
-    sum_ += thread.sum;
-
-    if (is_print())
-    {
-      uint64_t dist = thread.segments * thread.segment_size;
-      uint64_t high = thread.low + dist;
-      status_.print(high, sieve_limit_, sum_, sum_approx_);
-    }
-
-    update(thread);
-
-    thread.low = low_;
-    thread.segments = segments_;
-    thread.segment_size = segment_size_;
-    thread.sum = 0;
-    thread.secs = 0;
-    thread.init_secs = 0;
-
-    low_ += segments_ * segment_size_;
+    uint64_t dist = thread.segments * thread.segment_size;
+    uint64_t high = thread.low + dist;
+    status_.print(high, sieve_limit_, sum_, sum_approx_);
   }
 
-  return thread.low < sieve_limit_;
+  update(thread);
+
+  thread.low = low_;
+  thread.segments = segments_;
+  thread.segment_size = segment_size_;
+  thread.sum = 0;
+  thread.secs = 0;
+  thread.init_secs = 0;
+
+  low_ += segments_ * segment_size_;
+  bool is_work = thread.low < sieve_limit_;
+
+  return is_work;
 }
 
 void LoadBalancer::update(ThreadSettings& thread)
