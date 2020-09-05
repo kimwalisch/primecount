@@ -45,7 +45,7 @@ public:
     size_ = size;
   }
   pod_vector() = default;
-  ~pod_vector() { delete array_; }
+  ~pod_vector() { delete[] array_; }
   std::size_t size() const { return size_; }
   T* data() { return array_; }
   const T* data() const { return array_; }
