@@ -10,8 +10,9 @@
 #ifndef ALIGNED_VECTOR_HPP
 #define ALIGNED_VECTOR_HPP
 
+#include <pod_vector.hpp>
 #include <cstddef>
-#include <vector>
+#include <cstring>
 
 /// Maximum cache line size of current CPUs.
 /// Note that in 2019 all x86 CPU have a cache line size of 64 bytes.
@@ -38,17 +39,24 @@ class aligned_vector
                 "sizeof(T) must be < CACHE_LINE_SIZE");
 
 public:
-  aligned_vector() { }
-  aligned_vector(std::size_t size)
-    : vect_(size) { }
-  void resize(std::size_t size) { vect_.resize(size); }
-  std::size_t size() const { return vect_.size(); }
-  T& operator[](std::size_t pos) { return vect_[pos].val; }
+  void resize(std::size_t size)
+  {
+    vect_.resize(size);
+
+    // Do not initialize the padding memory
+    for (std::size_t i = 0; i < size; i++)
+      std::memset(&vect_[i], 0, sizeof(T));
+  }
   char unused()
   {
-    vect_.back().pad[0] = 123;
-    return vect_.back().pad[0];
+    vect_[0].pad[0] = 123;
+    return vect_[0].pad[0];
   }
+
+  aligned_vector() = default;
+  aligned_vector(std::size_t size) { resize(size); }
+  std::size_t size() const { return vect_.size(); }
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
 
 private:
   struct CacheLine {
@@ -61,7 +69,7 @@ private:
     char pad[CACHE_LINE_SIZE - sizeof(T)];
   };
 
-  std::vector<CacheLine> vect_;
+  pod_vector<CacheLine> vect_;
 };
 
 } // namespace
