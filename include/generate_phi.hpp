@@ -37,10 +37,10 @@
 #include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <array>
-#include <vector>
 #include <limits>
 
 namespace {
@@ -87,10 +87,10 @@ public:
       pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if primes_[a] >= x
-    // xp = x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(x, a) = 1 if primes[a] >= x
+    // xp = x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
@@ -156,24 +156,21 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-vector<int64_t>
+pod_vector<int64_t>
 generate_phi(int64_t x,
              int64_t a,
              const Primes& primes,
              const PiTable& pi)
 {
   int64_t size = a + 1;
-
-  if ((int64_t) primes[a] > x)
-    a = pi[x];
-
-  vector<int64_t> phi;
-  phi.reserve(size);
-  phi.resize(a + 1, (x > 0) * -1);
-  phi.resize(size, x > 0);
+  pod_vector<int64_t> phi(size);
+  phi[0] = 0;
 
   if (size > 1)
   {
+    if ((int64_t) primes[a] > x)
+      a = pi[x];
+
     phi[1] = x;
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
@@ -186,7 +183,10 @@ generate_phi(int64_t x,
       phi[i] = phi[i - 1] + cache.template phi<-1>(x / primes[i - 1], i - 2);
 
     for (int64_t i = pi_sqrtx + 1; i <= a; i++)
-      phi[i] += phi[i - 1];
+      phi[i] = phi[i - 1] - (x > 0);
+
+    for (int64_t i = a + 1; i < size; i++)
+      phi[i] = x > 0;
   }
 
   return phi;

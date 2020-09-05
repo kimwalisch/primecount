@@ -63,7 +63,7 @@ public:
   }
 
   /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1)
+  /// phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1)
   ///
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
@@ -86,10 +86,10 @@ public:
       pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if primes_[a] >= x
-    // xp = x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(x, a) = 1 if primes[a] >= x
+    // xp = x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
