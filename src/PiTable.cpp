@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <array>
-#include <vector>
 
 using namespace primecount;
 
@@ -117,6 +116,13 @@ void PiTable::init_bits(uint64_t start,
                         uint64_t stop,
                         uint64_t thread_num)
 {
+  // Convert to array indexes
+  uint64_t i = start / 128;
+  uint64_t stop_idx = ceil_div(stop, 128);
+
+  for (; i < stop_idx; i++)
+    pi_[i].bits = 0;
+
   // Since we store only odd numbers in our lookup table,
   // we cannot store 2 which is the only even prime.
   // As a workaround we mark 1 as a prime (1st bit) and

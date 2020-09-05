@@ -27,8 +27,6 @@
 
 #include <stdint.h>
 #include <array>
-#include <cassert>
-#include <vector>
 
 namespace {
 
@@ -147,13 +145,12 @@ void SegmentedPiTable::init_bits(uint64_t start,
                                  uint64_t stop,
                                  uint64_t thread_num)
 {
-  // Make sure threads never write
-  // to the same pi[x] location.
-  assert(stop - low_ <= segment_size_);
-  assert(low_ % 128 == 0);
-  assert(start % 128 == 0);
+  // Convert to array indexes
+  uint64_t i = (start - low_) / 128;
+  uint64_t stop_idx = ceil_div((stop - low_), 128);
 
-  reset_pi(start, stop);
+  for (; i < stop_idx; i++)
+    pi_[i].bits = 0;
 
   // Since we store only odd numbers in our lookup table,
   // we cannot store 2 which is the only even prime.
@@ -199,25 +196,6 @@ void SegmentedPiTable::init_prime_count(uint64_t start,
   {
     pi_[i].prime_count = count;
     count += popcnt64(pi_[i].bits);
-  }
-}
-
-/// Each thread resets [start, stop[
-void SegmentedPiTable::reset_pi(uint64_t start,
-                                uint64_t stop)
-{
-  // Already intialized to 0
-  if (start == 0)
-    return;
-
-  // Convert to array indexes
-  uint64_t i = (start - low_) / 128;
-  uint64_t stop_idx = ceil_div((stop - low_), 128);
-
-  for (; i < stop_idx; i++)
-  {
-    pi_[i].prime_count = 0;
-    pi_[i].bits = 0;
   }
 }
 

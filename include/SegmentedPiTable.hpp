@@ -24,11 +24,11 @@
 
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <array>
 #include <cassert>
-#include <vector>
 
 #if defined(__GNUC__) || \
     defined(__clang__)
@@ -80,18 +80,17 @@ public:
   }
 
 private:
-  void reset_pi(uint64_t start, uint64_t stop);
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
   void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
 
   struct PiData
   {
-    uint64_t prime_count = 0;
-    uint64_t bits = 0;
+    uint64_t prime_count;
+    uint64_t bits;
   };
 
   static const std::array<uint64_t, 128> unset_bits_;
-  std::vector<PiData> pi_;
+  pod_vector<PiData> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
   uint64_t pi_low_ = 0;
