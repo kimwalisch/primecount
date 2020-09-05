@@ -49,13 +49,13 @@
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <pod_vector.hpp>
 
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <limits>
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
@@ -132,61 +132,74 @@ public:
 
     y = std::max<int64_t>(1, y);
     T T_MAX = std::numeric_limits<T>::max();
-    factor_.resize(to_index(y) + 1, T_MAX);
+    factor_.resize(to_index(y) + 1);
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
     // number of prime factors. We use the least
     // significant bit to indicate whether the number
     // has an even or odd number of prime factors.
-    factor_[0] ^= 1;
+    factor_[0] = T_MAX ^ 1;
 
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(threads, y, thread_threshold);
     int64_t thread_distance = ceil_div(y, threads);
+    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
-      int64_t low = 1;
-      low += thread_distance * t;
-      int64_t high = std::min(low + thread_distance, y);
-      int64_t start = get_first_coprime() - 1;
-      primesieve::iterator it(start);
+      // Thread processes interval [low, high[
+      int64_t low = thread_distance * t;
+      int64_t high = low + thread_distance;
+      low = std::max(low, to_number(1));
+      high = std::min(high, y + 1);
 
-      while (true)
+      if (low <= y)
       {
-        int64_t i = 1;
-        int64_t prime = it.next_prime();
-        int64_t multiple = next_multiple(prime, low, &i);
-        int64_t min_m = prime * get_first_coprime();
+        // Default initialize memory to all bits set
+        int64_t size = to_index(high);
+        int64_t max_size = factor_.size();
+        size = std::min(size, max_size) - to_index(low);
+        std::fill_n(&factor_[low_idx], size, T_MAX);
 
-        if (min_m > high)
-          break;
+        int64_t start = get_first_coprime() - 1;
+        primesieve::iterator it(start);
 
-        for (; multiple <= high; multiple = prime * to_number(i++))
+        while (true)
         {
-          int64_t mi = to_index(multiple);
-          // prime is smallest factor of multiple
-          if (factor_[mi] == T_MAX)
-            factor_[mi] = (T) prime;
-          // the least significant bit indicates
-          // whether multiple has an even (0) or odd (1)
-          // number of prime factors
-          else if (factor_[mi] != 0)
-            factor_[mi] ^= 1;
-        }
+          int64_t i = 1;
+          int64_t prime = it.next_prime();
+          int64_t multiple = next_multiple(prime, low, &i);
+          int64_t min_m = prime * get_first_coprime();
 
-        if (prime <= sqrty)
-        {
-          int64_t j = 0;
-          int64_t square = prime * prime;
-          multiple = next_multiple(square, low, &j);
+          if (min_m >= high)
+            break;
 
-          // moebius(n) = 0
-          for (; multiple <= high; multiple = square * to_number(j++))
-            factor_[to_index(multiple)] = 0;
+          for (; multiple < high; multiple = prime * to_number(i++))
+          {
+            int64_t mi = to_index(multiple);
+            // prime is smallest factor of multiple
+            if (factor_[mi] == T_MAX)
+              factor_[mi] = (T) prime;
+            // the least significant bit indicates
+            // whether multiple has an even (0) or odd (1)
+            // number of prime factors
+            else if (factor_[mi] != 0)
+              factor_[mi] ^= 1;
+          }
+
+          if (prime <= sqrty)
+          {
+            int64_t j = 0;
+            int64_t square = prime * prime;
+            multiple = next_multiple(square, low, &j);
+
+            // moebius(n) = 0
+            for (; multiple < high; multiple = square * to_number(j++))
+              factor_[to_index(multiple)] = 0;
+          }
         }
       }
     }
@@ -232,7 +245,7 @@ public:
   }
 
 private:
-  std::vector<T> factor_;
+  pod_vector<T> factor_;
 };
 
 } // namespace
