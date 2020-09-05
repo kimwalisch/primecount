@@ -91,7 +91,7 @@ public:
   }
 
 protected:
-  /// Find the first multiple (of prime) > low which
+  /// Find the first multiple (of prime) >= low which
   /// is not divisible by any prime <= 11.
   ///
   static int64_t next_multiple(int64_t prime,
@@ -102,14 +102,13 @@ protected:
     int64_t i = std::max(*index, to_index(quotient));
     int64_t multiple = 0;
 
-    for (; multiple <= low; i++)
+    for (; multiple < low; i++)
       multiple = prime * to_number(i);
 
     *index = i;
     return multiple;
   }
 
-private:
   static const std::array<uint16_t, 480> coprime_;
   static const std::array<int16_t, 2310> coprime_indexes_;
 };
@@ -150,19 +149,18 @@ public:
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
-      // Thread processes interval [low, high[
+      // Thread processes interval [low, high]
       int64_t low = thread_distance * t;
       int64_t high = low + thread_distance;
-      low = std::max(low, to_number(1));
-      high = std::min(high, y + 1);
+      low = std::max(get_first_coprime(), low + 1);
+      high = std::min(high, y);
 
-      if (low <= y)
+      if (low <= high)
       {
         // Default initialize memory to all bits set
-        int64_t size = to_index(high);
-        int64_t max_size = factor_.size();
-        size = std::min(size, max_size) - to_index(low);
-        std::fill_n(&factor_[low_idx], size, T_MAX);
+        int64_t low_idx = to_index(low);
+        int64_t size = to_index(high) + 1;
+        std::fill_n(&factor_[low_idx], size - low_idx, T_MAX);
 
         int64_t start = get_first_coprime() - 1;
         primesieve::iterator it(start);
@@ -174,10 +172,10 @@ public:
           int64_t multiple = next_multiple(prime, low, &i);
           int64_t min_m = prime * get_first_coprime();
 
-          if (min_m >= high)
+          if (min_m > high)
             break;
 
-          for (; multiple < high; multiple = prime * to_number(i++))
+          for (; multiple <= high; multiple = prime * to_number(i++))
           {
             int64_t mi = to_index(multiple);
             // prime is smallest factor of multiple
@@ -197,7 +195,7 @@ public:
             multiple = next_multiple(square, low, &j);
 
             // moebius(n) = 0
-            for (; multiple < high; multiple = square * to_number(j++))
+            for (; multiple <= high; multiple = square * to_number(j++))
               factor_[to_index(multiple)] = 0;
           }
         }
