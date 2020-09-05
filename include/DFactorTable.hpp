@@ -52,11 +52,11 @@
 #include <FactorTable.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <pod_vector.hpp>
 
 #include <algorithm>
 #include <limits>
 #include <stdint.h>
-#include <vector>
 
 namespace {
 
@@ -76,84 +76,94 @@ public:
 
     z = std::max<int64_t>(1, z);
     T T_MAX = std::numeric_limits<T>::max();
-    factor_.resize(to_index(z) + 1, T_MAX);
+    factor_.resize(to_index(z) + 1);
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
     // number of prime factors. We use the least
     // significant bit to indicate whether the number
     // has an even or odd number of prime factors.
-    factor_[0] ^= 1;
+    factor_[0] = T_MAX ^ 1;
 
     int64_t sqrtz = isqrt(z);
     int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(threads, z, thread_threshold);
     int64_t thread_distance = ceil_div(z, threads);
+    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
-      int64_t low = 1;
-      low += thread_distance * t;
-      int64_t high = std::min(low + thread_distance, z);
-      int64_t start = get_first_coprime() - 1;
-      primesieve::iterator it(start);
+      // Thread processes interval [low, high]
+      int64_t low = thread_distance * t;
+      int64_t high = low + thread_distance;
+      low = std::max(get_first_coprime(), low + 1);
+      high = std::min(high, z);
 
-      while (true)
+      if (low <= high)
       {
-        // Find multiples > prime
-        int64_t i = 1;
-        int64_t prime = it.next_prime();
-        int64_t multiple = next_multiple(prime, low, &i);
-        int64_t min_m = prime * get_first_coprime();
+        // Default initialize memory to all bits set
+        int64_t low_idx = to_index(low);
+        int64_t size = to_index(high) + 1;
+        std::fill_n(&factor_[low_idx], size - low_idx, T_MAX);
 
-        if (min_m > high)
-          break;
+        int64_t start = get_first_coprime() - 1;
+        primesieve::iterator it(start);
 
-        // Find the smallest prime factors of the
-        // integers inside ]low, high].
-        for (; multiple <= high; multiple = prime * to_number(i++))
+        while (true)
         {
-          int64_t mi = to_index(multiple);
-          // prime is the smallest factor of multiple
-          if (factor_[mi] == T_MAX)
-            factor_[mi] = (T) prime;
-          // the least significant bit indicates
-          // whether multiple has an even (0) or odd (1)
-          // number of prime factors
-          else if (factor_[mi] != 0)
-            factor_[mi] ^= 1;
+          // Find multiples > prime
+          int64_t i = 1;
+          int64_t prime = it.next_prime();
+          int64_t multiple = next_multiple(prime, low, &i);
+          int64_t min_m = prime * get_first_coprime();
+
+          if (min_m > high)
+            break;
+
+          for (; multiple <= high; multiple = prime * to_number(i++))
+          {
+            int64_t mi = to_index(multiple);
+            // prime is the smallest factor of multiple
+            if (factor_[mi] == T_MAX)
+              factor_[mi] = (T) prime;
+            // the least significant bit indicates
+            // whether multiple has an even (0) or odd (1)
+            // number of prime factors
+            else if (factor_[mi] != 0)
+              factor_[mi] ^= 1;
+          }
+
+          if (prime <= sqrtz)
+          {
+            int64_t j = 0;
+            int64_t square = prime * prime;
+            multiple = next_multiple(square, low, &j);
+
+            // Sieve out numbers that are not square free
+            // i.e. numbers for which moebius(n) = 0.
+            for (; multiple <= high; multiple = square * to_number(j++))
+              factor_[to_index(multiple)] = 0;
+          }
         }
 
-        if (prime <= sqrtz)
+        start = std::max(start, y);
+        it.skipto(start, z);
+
+        while (true)
         {
-          int64_t j = 0;
-          int64_t square = prime * prime;
-          multiple = next_multiple(square, low, &j);
+          int64_t i = 0;
+          int64_t prime = it.next_prime();
+          int64_t next = next_multiple(prime, low, &i);
 
-          // Sieve out numbers that are not square free
-          // i.e. numbers for which moebius(n) = 0.
-          for (; multiple <= high; multiple = square * to_number(j++))
-            factor_[to_index(multiple)] = 0;
+          if (prime > high)
+            break;
+
+          // Sieve out primes > y &&
+          // Sieve out numbers with prime factors > y
+          for (; next <= high; next = prime * to_number(i++))
+            factor_[to_index(next)] = 0;
         }
-      }
-
-      start = std::max(start, y);
-      it.skipto(start, z);
-
-      while (true)
-      {
-        int64_t i = 0;
-        int64_t prime = it.next_prime();
-        int64_t next = next_multiple(prime, low, &i);
-
-        if (prime > high)
-          break;
-
-        // Sieve out primes > y &&
-        // Sieve out numbers with prime factors > y
-        for (; next <= high; next = prime * to_number(i++))
-          factor_[to_index(next)] = 0;
       }
     }
   }
@@ -201,7 +211,7 @@ public:
   }
 
 private:
-  std::vector<T> factor_;
+  pod_vector<T> factor_;
 };
 
 } // namespace
