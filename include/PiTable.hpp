@@ -62,7 +62,7 @@ public:
   }
 
 private:
-  struct PiData
+  struct pi_t
   {
     uint64_t prime_count;
     uint64_t bits;
@@ -71,7 +71,7 @@ private:
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
   void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
   static const std::array<uint64_t, 128> unset_bits_;
-  pod_vector<PiData> pi_;
+  pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t limit_;
 };

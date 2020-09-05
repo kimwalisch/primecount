@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include <array>
+#include <cstring>
 
 namespace {
 
@@ -145,12 +146,10 @@ void SegmentedPiTable::init_bits(uint64_t start,
                                  uint64_t stop,
                                  uint64_t thread_num)
 {
-  // Convert to array indexes
+  // Zero initialize pi vector
   uint64_t i = (start - low_) / 128;
-  uint64_t stop_idx = ceil_div((stop - low_), 128);
-
-  for (; i < stop_idx; i++)
-    pi_[i].bits = 0;
+  uint64_t j = ceil_div((stop - low_), 128);
+  std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
   // Since we store only odd numbers in our lookup table,
   // we cannot store 2 which is the only even prime.
