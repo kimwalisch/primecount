@@ -23,10 +23,10 @@
 #define SIEVE_HPP
 
 #include <noinline.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <cassert>
-#include <memory>
 #include <vector>
 
 namespace primecount {
@@ -84,15 +84,13 @@ private:
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  uint64_t sieve_size_ = 0;
   uint64_t counters_i_ = 0;
   uint64_t counters_count_ = 0;
   uint64_t counters_dist_ = 0;
   uint64_t counters_dist_log2_ = 0;
   uint64_t counters_stop_ = 0;
-  uint8_t* sieve_ = nullptr;
-  std::unique_ptr<uint8_t[]> deleter_;
-  std::vector<uint64_t> counters_;
+  pod_vector<uint8_t> sieve_;
+  pod_vector<uint64_t> counters_;
   std::vector<Wheel> wheel_;
 };
 

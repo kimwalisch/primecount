@@ -94,9 +94,7 @@ Sieve::Sieve(uint64_t low,
   // sieve_size = segment_size / 30 as each byte corresponds
   // to 30 numbers i.e. the 8 bits correspond to the
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
-  sieve_size_ = segment_size / 30;
-  sieve_ = new uint8_t[sieve_size_];
-  deleter_.reset(sieve_);
+  sieve_.resize(segment_size / 30);
 
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
@@ -136,16 +134,16 @@ void Sieve::allocate_counters(uint64_t low)
   counters_dist_ = byte_dist * 30;
   counters_dist_log2_ = ilog2(byte_dist);
 
-  uint64_t counters_size = ceil_div(sieve_size_, byte_dist);
+  uint64_t counters_size = ceil_div(sieve_.size(), byte_dist);
   counters_.resize(counters_size);
 }
 
-/// The segment size is sieve_size * 30 as each
+/// The segment size is sieve.size() * 30 as each
 /// byte corresponds to 30 numbers.
 ///
 uint64_t Sieve::segment_size() const
 {
-  return sieve_size_ * 30;
+  return sieve_.size() * 30;
 }
 
 /// segment_size must be a multiple of 240 as we
@@ -164,15 +162,15 @@ uint64_t Sieve::get_segment_size(uint64_t size)
 
 void Sieve::reset_sieve(uint64_t low, uint64_t high)
 {
-  fill_n(sieve_, sieve_size_, (uint8_t) 0xff);
+  fill_n(sieve_.data(), sieve_.size(), 0xff);
   uint64_t size = high - low;
 
   if (size < segment_size())
   {
     uint64_t last = size - 1;
     size = get_segment_size(size);
-    sieve_size_ = size / 30;
-    auto sieve64 = (uint64_t*) sieve_;
+    sieve_.resize(size / 30);
+    auto sieve64 = (uint64_t*) sieve_.data();
     sieve64[last / 240] &= unset_larger[last % 240];
   }
 }
@@ -249,7 +247,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   uint64_t stop_idx = stop / 240;
   uint64_t m1 = unset_smaller[start % 240];
   uint64_t m2 = unset_larger[stop % 240];
-  auto sieve64 = (uint64_t*) sieve_;
+  auto sieve64 = (uint64_t*) sieve_.data();
 
   if (start_idx == stop_idx)
     bit_count = popcnt64(sieve64[start_idx] & (m1 & m2));
@@ -300,8 +298,8 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   prime /= 30;
 
   uint64_t m = wheel.multiple;
-  uint64_t sieve_size = sieve_size_;
-  uint8_t* sieve = sieve_;
+  uint8_t* sieve = sieve_.data();
+  uint64_t sieve_size = sieve_.size();
 
   switch (wheel.index)
   {
@@ -599,10 +597,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t is_bit = 0;
   uint64_t total_count = total_count_;
   uint64_t m = wheel.multiple;
-  uint64_t sieve_size = sieve_size_;
+  uint64_t sieve_size = sieve_.size();
   uint64_t counters_dist_log2 = counters_dist_log2_;
   uint64_t* counters = counters_.data();
-  uint8_t* sieve = sieve_;
+  uint8_t* sieve = sieve_.data();
 
   switch (wheel.index)
   {

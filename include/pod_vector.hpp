@@ -30,17 +30,25 @@ public:
     array_ = new T[size];
     size_ = size;
   }
+  /// For performance reasons we don't shrink the memory
+  /// when reducing the size of our pod_vector.
   void resize(std::size_t size)
   {
-    if (size_ != 0)
-      throw primecount_error("Resizing non empty pod_vector not allowed!");
+    if (size > size_)
+    {
+      if (size_ == 0)
+        array_ = new T[size];
+      else
+        throw primecount_error("Increasing the size of non empty pod_vector not supported!");
+    }
 
-    array_ = new T[size];
     size_ = size;
   }
   pod_vector() = default;
   ~pod_vector() { delete array_; }
   std::size_t size() const { return size_; }
+  T* data() { return array_; }
+  const T* data() const { return array_; }
   T& operator[](std::size_t pos) { return array_[pos]; }
   const T& operator[](std::size_t pos) const { return array_[pos]; }
 
