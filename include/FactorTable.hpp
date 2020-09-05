@@ -94,7 +94,7 @@ public:
       // Thread processes interval [low, high]
       int64_t low = thread_distance * t;
       int64_t high = low + thread_distance;
-      low = std::max(get_first_coprime(), low + 1);
+      low = std::max(first_coprime(), low + 1);
       high = std::min(high, y);
 
       if (low <= high)
@@ -104,7 +104,7 @@ public:
         int64_t size = (to_index(high) + 1) - low_idx;
         std::fill_n(&factor_[low_idx], size, T_MAX);
 
-        int64_t start = get_first_coprime() - 1;
+        int64_t start = first_coprime() - 1;
         primesieve::iterator it(start);
 
         while (true)
@@ -112,7 +112,7 @@ public:
           int64_t i = 1;
           int64_t prime = it.next_prime();
           int64_t multiple = next_multiple(prime, low, &i);
-          int64_t min_m = prime * get_first_coprime();
+          int64_t min_m = prime * first_coprime();
 
           if (min_m > high)
             break;

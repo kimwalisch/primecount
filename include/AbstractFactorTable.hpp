@@ -48,7 +48,7 @@ public:
   /// Returns the 1st number > 1 that is not divisible
   /// by 2, 3, 5, 7 and 11. Hence 13 is returned.
   ///
-  static int64_t get_first_coprime()
+  static int64_t first_coprime()
   {
     return to_number(1);
   }
