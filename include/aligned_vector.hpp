@@ -12,7 +12,6 @@
 
 #include <pod_vector.hpp>
 #include <cstddef>
-#include <cstring>
 
 /// Maximum cache line size of current CPUs.
 /// Note that in 2019 all x86 CPU have a cache line size of 64 bytes.
@@ -43,9 +42,10 @@ public:
   {
     vect_.resize(size);
 
-    // Do not initialize the padding memory
+    // Default initialize values.
+    // Do not initialize the padding memory.
     for (std::size_t i = 0; i < size; i++)
-      std::memset(&vect_[i], 0, sizeof(T));
+      vect_[i].val = {};
   }
   char unused()
   {
