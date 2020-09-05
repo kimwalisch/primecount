@@ -104,8 +104,8 @@ public:
       {
         // Default initialize memory to all bits set
         int64_t low_idx = to_index(low);
-        int64_t size = to_index(high) + 1;
-        std::fill_n(&factor_[low_idx], size - low_idx, T_MAX);
+        int64_t size = (to_index(high) + 1) - low_idx;
+        std::fill_n(&factor_[low_idx], size, T_MAX);
 
         int64_t start = get_first_coprime() - 1;
         primesieve::iterator it(start);
