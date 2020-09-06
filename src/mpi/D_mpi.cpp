@@ -21,6 +21,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
+#include <OmpLock.hpp>
 #include <print.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <MpiLoadBalancer.hpp>
@@ -174,6 +175,7 @@ void D_mpi_worker(T x,
   int main_proc_id = mpi_main_proc_id();
   int proc_id = mpi_proc_id();
   MpiMsg msg;
+  OmpLock ompLock;
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
@@ -182,8 +184,9 @@ void D_mpi_worker(T x,
 
     while (true)
     {
-      #pragma omp critical (mpi_sync)
       {
+        LockGuard lockGuard(ompLock);
+
         // send result to main process
         msg.set(proc_id, i, thread.low, thread.segments, thread.segment_size, thread.sum, thread.init_secs, thread.secs);
         msg.send(main_proc_id);
