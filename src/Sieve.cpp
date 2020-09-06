@@ -189,18 +189,20 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
   reset_counters();
   total_count_ = 0;
 
+  uint64_t start = 0;
   uint64_t max_stop = (high - 1) - low;
 
-  for (uint64_t i = 0; i <= max_stop; i += counters_dist_)
+  while (start <= max_stop)
   {
-    uint64_t start = i;
     uint64_t stop = start + counters_dist_ - 1;
     stop = min(stop, max_stop);
     uint64_t cnt = count(start, stop);
-    uint64_t byte_index = i / 30;
+    uint64_t byte_index = start / 30;
 
     counters_[byte_index >> counters_dist_log2_] = cnt;
+
     total_count_ += cnt;
+    start += counters_dist_;
   }
 }
 
