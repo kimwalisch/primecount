@@ -51,7 +51,7 @@ public:
   Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
   static uint64_t get_segment_size(uint64_t size);
   uint64_t count(uint64_t start, uint64_t stop) const;
-  NOINLINE uint64_t count(uint64_t stop);
+  uint64_t count(uint64_t stop);
   NOINLINE void cross_off(uint64_t prime, uint64_t i);
   NOINLINE void cross_off_count(uint64_t prime, uint64_t i);
 
@@ -78,7 +78,7 @@ private:
   void reset_counters();
   void reset_sieve(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
-  NOINLINE void init_counters(uint64_t low, uint64_t high);
+  void init_counters(uint64_t low, uint64_t high);
 
   uint64_t start_ = 0;
   uint64_t prev_stop_ = 0;
