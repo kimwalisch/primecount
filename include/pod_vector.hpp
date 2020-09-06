@@ -10,8 +10,7 @@
 #ifndef POD_VECTOR_HPP
 #define POD_VECTOR_HPP
 
-#include <primecount.hpp>
-#include <cstddef>
+#include <vector>
 
 namespace primecount {
 
@@ -25,36 +24,22 @@ template <typename T>
 class pod_vector
 {
 public:
-  pod_vector(std::size_t size)
-  {
-    array_ = new T[size];
-    size_ = size;
-  }
-  /// For performance reasons we don't shrink the memory
-  /// when reducing the size of our pod_vector.
-  void resize(std::size_t size)
-  {
-    if (size > size_)
-    {
-      if (size_ == 0)
-        array_ = new T[size];
-      else
-        throw primecount_error("Increasing the size of non empty pod_vector not supported!");
-    }
-
-    size_ = size;
-  }
   pod_vector() = default;
-  ~pod_vector() { delete[] array_; }
-  std::size_t size() const { return size_; }
-  T* data() { return array_; }
-  const T* data() const { return array_; }
-  T& operator[](std::size_t pos) { return array_[pos]; }
-  const T& operator[](std::size_t pos) const { return array_[pos]; }
+  pod_vector(std::size_t size) : vect_(size) { }
+  void resize(std::size_t size) { vect_.resize(size); }
+  std::size_t size() const { return vect_.size(); }
+  T* data() { return (T*) vect_.data(); }
+  const T* data() const { return (T*) vect_.data(); }
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
+  const T& operator[](std::size_t pos) const { return vect_[pos].val; }
 
 private:
-  T* array_ = nullptr;
-  size_t size_ = 0;
+  struct NoInitType
+  {
+    NoInitType() { };
+    T val;
+  };
+  std::vector<NoInitType> vect_;
 };
 
 } // namespace
