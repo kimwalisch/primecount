@@ -26,10 +26,10 @@
 
 namespace primecount {
 
-/// The aligned_vector class aligns each of its
-/// elements on a new cache line in order to avoid
-/// false sharing (cache trashing) when multiple
-/// threads write to adjacent elements
+/// The aligned_vector class aligns each of its elements on a
+/// new cache line in order to avoid false sharing (cache
+/// trashing) when multiple threads write to adjacent elements.
+/// @warning: Does not default initialize memory.
 ///
 template <typename T>
 class aligned_vector
@@ -38,25 +38,17 @@ class aligned_vector
                 "sizeof(T) must be < CACHE_LINE_SIZE");
 
 public:
-  void resize(std::size_t size)
-  {
-    vect_.resize(size);
+  aligned_vector() = default;
+  aligned_vector(std::size_t size) { resize(size); }
+  void resize(std::size_t size) { vect_.resize(size); }
+  std::size_t size() const { return vect_.size(); }
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
 
-    // Default initialize values.
-    // Do not initialize the padding memory.
-    for (std::size_t i = 0; i < size; i++)
-      vect_[i].val = {};
-  }
   char unused()
   {
     vect_[0].pad[0] = 123;
     return vect_[0].pad[0];
   }
-
-  aligned_vector() = default;
-  aligned_vector(std::size_t size) { resize(size); }
-  std::size_t size() const { return vect_.size(); }
-  T& operator[](std::size_t pos) { return vect_[pos].val; }
 
 private:
   struct CacheLine {
