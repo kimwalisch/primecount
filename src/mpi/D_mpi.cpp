@@ -310,7 +310,7 @@ int128_t D_mpi(int128_t x,
   else
   {
     // uses less memory
-    if (y <= FactorTable<uint16_t>::max())
+    if (y <= DFactorTable<uint16_t>::max())
     {
       DFactorTable<uint16_t> factor(y, z, threads);
       auto primes = generate_primes<uint32_t>(y);
