@@ -32,14 +32,10 @@ public:
   T& operator[](std::size_t pos) { return vect_[pos].val; }
   const T& operator[](std::size_t pos) const { return vect_[pos].val; }
 
-  /// For performance reasons this implementation does not
-  /// free memory if resizing to a smaller size.
-  ///
   void resize(std::size_t size)
   {
-    if (size > size_)
-      vect_.resize(size);
     size_ = size;
+    vect_.resize(size);
   }
 
 private:
