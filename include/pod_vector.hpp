@@ -25,18 +25,13 @@ class pod_vector
 {
 public:
   pod_vector() = default;
-  pod_vector(std::size_t size) : vect_(size), size_(size) { }
-  std::size_t size() const { return size_; }
+  pod_vector(std::size_t size) : vect_(size) { }
+  void resize(std::size_t size) { vect_.resize(size); }
+  std::size_t size() const { return vect_.size(); }
   T* data() { return (T*) vect_.data(); }
   const T* data() const { return (T*) vect_.data(); }
   T& operator[](std::size_t pos) { return vect_[pos].val; }
   const T& operator[](std::size_t pos) const { return vect_[pos].val; }
-
-  void resize(std::size_t size)
-  {
-    vect_.resize(size);
-    size_ = size;
-  }
 
 private:
   struct NoInitType
@@ -45,7 +40,6 @@ private:
     T val;
   };
   std::vector<NoInitType> vect_;
-  std::size_t size_ = 0;
 };
 
 } // namespace
