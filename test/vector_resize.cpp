@@ -39,10 +39,10 @@ void check(bool OK)
 int main()
 {
   // Allocate from 1 KiB to 128 MiB
-  for (int i = 10; i <= 27; i++)
+  for (size_t i = 10; i <= 27; i++)
   {
     std::vector<char> vect;
-    vect.resize(1 << i);
+    vect.resize(size_t(1) << i);
     auto capacity1 = vect.capacity();
     vect.resize(100);
     auto capacity2 = vect.capacity();
