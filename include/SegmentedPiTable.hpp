@@ -24,6 +24,7 @@
 
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
+#include <noinline.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>
@@ -46,7 +47,7 @@ public:
                    uint64_t segment_size,
                    int threads);
 
-  void init();
+  NOINLINE void init();
   void next();
 
   /// Get number of primes <= n
