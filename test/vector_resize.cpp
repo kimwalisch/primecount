@@ -39,7 +39,7 @@ void check(bool OK)
 int main()
 {
   // Allocate from 1 KiB to 128 MiB
-  for (size_t i = 10; i <= 27; i++)
+  for (int i = 10; i <= 27; i++)
   {
     std::vector<char> vect;
     vect.resize(1 << i);
