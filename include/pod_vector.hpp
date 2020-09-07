@@ -34,8 +34,8 @@ public:
 
   void resize(std::size_t size)
   {
-    size_ = size;
     vect_.resize(size);
+    size_ = size;
   }
 
 private:
