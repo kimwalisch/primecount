@@ -1,5 +1,5 @@
 ///
-/// @file  AbstractFactorTable.hpp
+/// @file  BaseFactorTable.hpp
 ///        Static lookup tables and functions used by the
 ///        FactorTable and DFactorTable classes.
 ///        See FactorTable.hpp for more information.
@@ -22,12 +22,12 @@
 
 namespace primecount {
 
-/// AbstractFactorTable contains static lookup tables
+/// BaseFactorTable contains static lookup tables
 /// and is used to convert:
 /// 1) A number into a FactorTable index
 /// 2) A FactorTable index into a number
 ///
-class AbstractFactorTable
+class BaseFactorTable
 {
 public:
   static int64_t to_index(uint64_t number)

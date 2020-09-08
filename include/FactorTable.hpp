@@ -46,7 +46,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <AbstractFactorTable.hpp>
+#include <BaseFactorTable.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -62,7 +62,7 @@ namespace {
 using namespace primecount;
 
 template <typename T>
-class FactorTable : public AbstractFactorTable
+class FactorTable : public BaseFactorTable
 {
 public:
   /// Factor numbers <= y

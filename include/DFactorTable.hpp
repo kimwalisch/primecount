@@ -48,7 +48,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <AbstractFactorTable.hpp>
+#include <BaseFactorTable.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -63,7 +63,7 @@ namespace {
 using namespace primecount;
 
 template <typename T>
-class DFactorTable : public AbstractFactorTable
+class DFactorTable : public BaseFactorTable
 {
 public:
   /// Factor numbers <= z
