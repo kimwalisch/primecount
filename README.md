@@ -9,7 +9,7 @@ If your computer crashes or if you interrupt a computation you can resume
 the same computation from the backup file. For pi(x) computations that
 take weeks or even months to compute the backup functionality is very
 important. David Baugh and myself have used primecount-backup to compute
-pi(10^27) and many other records.
+pi(10<sup>27</sup>), pi(10<sup>28</sup>) and many other records.
 
 The primecount backup version generates the following files:
 
