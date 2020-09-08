@@ -31,20 +31,6 @@
 
 namespace primecount {
 
-struct Wheel
-{
-  Wheel()
-    : multiple(0),
-      index(0)
-  { }
-  Wheel(uint32_t m, uint32_t i)
-    : multiple(m),
-      index(i)
-  { }
-  uint32_t multiple;
-  uint32_t index;
-};
-
 class Sieve
 {
 public:
@@ -76,9 +62,23 @@ private:
   void add(uint64_t prime);
   void allocate_counters(uint64_t low);
   void reset_counters();
-  void reset_sieve(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
-  void init_counters(uint64_t low, uint64_t high);
+  NOINLINE void reset_sieve(uint64_t low, uint64_t high);
+  NOINLINE void init_counters(uint64_t low, uint64_t high);
+
+  struct Wheel
+  {
+    Wheel()
+      : multiple(0),
+        index(0)
+    { }
+    Wheel(uint32_t m, uint32_t i)
+      : multiple(m),
+        index(i)
+    { }
+    uint32_t multiple;
+    uint32_t index;
+  };
 
   uint64_t start_ = 0;
   uint64_t prev_stop_ = 0;
