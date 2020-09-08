@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef ABSTRACTFACTORTABLE_HPP
-#define ABSTRACTFACTORTABLE_HPP
+#ifndef BASEFACTORTABLE_HPP
+#define BASEFACTORTABLE_HPP
 
 #include <imath.hpp>
 
