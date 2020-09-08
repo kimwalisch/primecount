@@ -18,7 +18,7 @@ namespace primecount {
 class Status
 {
 public:
-  Status(maxint_t x);
+  NOINLINE Status(maxint_t x);
   NOINLINE void print(int64_t b, int64_t max_b);
   NOINLINE void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);

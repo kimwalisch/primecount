@@ -43,12 +43,21 @@ namespace primecount {
 class SegmentedPiTable
 {
 public:
-  SegmentedPiTable(uint64_t limit,
-                   uint64_t segment_size,
-                   int threads);
-
+  NOINLINE SegmentedPiTable(uint64_t limit,
+                            uint64_t segment_size,
+                            int threads);
   NOINLINE void init();
   void next();
+
+  int64_t low() const
+  {
+    return low_;
+  }
+
+  int64_t high() const
+  {
+    return high_;
+  }
 
   /// Get number of primes <= n
   int64_t operator[](uint64_t n) const
@@ -68,16 +77,6 @@ public:
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;
-  }
-
-  int64_t low() const
-  {
-    return low_;
-  }
-
-  int64_t high() const
-  {
-    return high_;
   }
 
 private:

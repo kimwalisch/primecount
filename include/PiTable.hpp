@@ -18,6 +18,7 @@
 
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
+#include <noinline.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>
@@ -36,7 +37,12 @@ namespace primecount {
 class PiTable
 {
 public:
-  PiTable(uint64_t limit, int threads);
+  NOINLINE PiTable(uint64_t limit, int threads);
+
+  int64_t size() const
+  {
+    return limit_ + 1;
+  }
 
   /// Get number of primes <= n
   int64_t operator[](uint64_t n) const
@@ -54,11 +60,6 @@ public:
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;
-  }
-
-  int64_t size() const
-  {
-    return limit_ + 1;
   }
 
 private:

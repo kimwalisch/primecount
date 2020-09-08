@@ -18,9 +18,9 @@ namespace primecount {
 class StatusAC
 {
 public:
-  StatusAC(maxint_t x);
+  NOINLINE StatusAC(maxint_t x);
   NOINLINE void print(int64_t b, int64_t max_b);
-  NOINLINE void next();
+  void next();
 private:
   bool isPrint(double time);
   void print(double percent);

@@ -14,6 +14,7 @@
 #include <int128_t.hpp>
 #include <OmpLock.hpp>
 #include <Status.hpp>
+#include <noinline.hpp>
 
 #include <stdint.h>
 
@@ -36,8 +37,8 @@ struct ThreadSettings
 class LoadBalancer
 {
 public:
-  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
-  bool get_work(ThreadSettings& thread);
+  NOINLINE LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
+  NOINLINE bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
 private:
