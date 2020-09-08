@@ -267,13 +267,13 @@ usually busy-waiting for a short amount of time (by spinning) before being put t
 This setting can be altered using the ```OMP_WAIT_POLICY``` environment variable. For
 primecount it is best to set ```OMP_WAIT_POLICY``` to ```PASSIVE``` in order to prevent
 the threads from busy waiting. This setting can provide a large speedup for small
-to medium sized computations below 10<sup>22</sup>.
+to medium sized computations below 10<sup>20</sup>.
 
 ```bash
 export OMP_WAIT_POLICY=PASSIVE
 ```
 
-By default primecount scales nicely up until 10<sup>23</sup> on current x64 CPUs.
+By default primecount scales nicely up until 10<sup>20</sup> on current x64 CPUs.
 For larger values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
 cache misses that significantly deteriorate primecount's performance.
