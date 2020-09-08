@@ -260,7 +260,7 @@ could have potentially been reduced to 4,000 CPU core hours. However using prime
 and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 460 CPU
 core hours on an AMD Ryzen 3950X CPU!
 
-## Performance tuning
+## Performance tips
 
 primecount uses the OpenMP multi-threading library. In OpenMP waiting threads are
 usually busy-waiting for a short amount of time (by spinning) before being put to sleep.
