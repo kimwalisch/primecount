@@ -17,7 +17,7 @@ the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancer.cpp)
 that is shared amongst all implementations and that scales up to
 hundreds of CPU cores. primecount has already been used to compute
-several [world records](doc/Records.md).
+several prime counting function [world records](doc/Records.md).
 
 ## Build instructions
 
@@ -260,9 +260,20 @@ could have potentially been reduced to 4,000 CPU core hours. However using prime
 and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 460 CPU
 core hours on an AMD Ryzen 3950X CPU!
 
-## Linux kernel tuning
+## Performance tips
 
-By default primecount scales nicely up until 10^23 on current x64 CPUs.
+primecount uses the OpenMP multi-threading library. In OpenMP waiting threads are
+usually busy-waiting for a short amount of time (by spinning) before being put to sleep.
+This setting can be altered using the ```OMP_WAIT_POLICY``` environment variable. For
+primecount it is best to set ```OMP_WAIT_POLICY``` to ```PASSIVE``` in order to prevent
+the threads from busy waiting. This setting can provide a large speedup for small
+to medium sized computations below 10<sup>20</sup>.
+
+```bash
+export OMP_WAIT_POLICY=PASSIVE
+```
+
+By default primecount scales nicely up until 10<sup>20</sup> on current x64 CPUs.
 For larger values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
 cache misses that significantly deteriorate primecount's performance.
@@ -275,17 +286,6 @@ TLB cache misses.
 ```bash
 # Enable transparent huge pages until next reboot
 sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
-```
-
-On multi-socket servers, there is a performance penalty if a CPU accesses memory
-from another socket. The automatic NUMA memory balancing setting of the Linux
-kernel tries to increase memory locality by migrating memory to the CPU socket
-(node) that is accessing it frequently. In my tests enabling automatic NUMA
-balancing on a dual-socket AMD EPYC 7742 system improved performance by up to 20%.
-
-```bash
-# Enable NUMA balancing until next reboot
-sudo bash -c 'echo 1 > /proc/sys/kernel/numa_balancing'
 ```
 
 ## Algorithms
