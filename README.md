@@ -54,8 +54,9 @@ later).
 
 ## Backup usage example
 
+We start a new computation and interrupt it using Ctrl + C.
+
 ```sh
-# We start a computation and interrupt it using Ctrl + C
 $ ./primecount 1e21 --B -s
 
 === B(x, y) ===
@@ -67,8 +68,9 @@ threads = 8
 Status: 38.7%^C
 ```
 
+Now we resume the computation from the backup file using the ```--resume``` option.
+
 ```sh
-# Now we resume the computation from the backup file
 $ ./primecount --resume
 
 === B(x, y) ===
@@ -94,6 +96,34 @@ computation was originally started. You can safely copy the
 If the new PC has a different number of CPU cores primecount will by default
 resume the computation using all available CPU cores (unless you have
 specified the number of threads using ```--threads=NUM```).
+
+## Performance tips
+
+primecount uses the OpenMP multi-threading library. In OpenMP waiting threads are
+usually busy-waiting for a short amount of time (by spinning) before being put to sleep.
+This setting can be altered using the ```OMP_WAIT_POLICY``` environment variable. For
+primecount it is best to set ```OMP_WAIT_POLICY``` to ```PASSIVE``` in order to prevent
+the threads from busy waiting. This setting can provide a large speedup for small
+to medium sized computations below 10<sup>22</sup>.
+
+```bash
+export OMP_WAIT_POLICY=PASSIVE
+```
+
+By default primecount scales nicely up until 10<sup>23</sup> on current x64 CPUs.
+For larger values primecount's large memory usage causes many
+[TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
+cache misses that significantly deteriorate primecount's performance.
+Fortunately the Linux kernel allows to enable
+[transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
+so that large memory allocations will automatically be done using huge
+pages instead of ordinary pages which dramatically reduces the number of
+TLB cache misses.
+
+```bash
+# Enable transparent huge pages until next reboot
+sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
+```
 
 ## Batch processing
 
@@ -180,24 +210,4 @@ Advanced options for Xavier Gourdon's algorithm:
       --D                  Compute the D formula
       --Phi0               Compute the Phi0 formula
       --Sigma              Compute the 7 Sigma formulas
-```
-
-## Performance tips
-
-By default primecount scales nicely up until 10^24 on current x64 CPUs.
-For larger values primecount's large memory usage causes many
-[TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
-cache misses that significantly deteriorate primecount's performance.
-Fortunately the Linux kernel allows to enable
-[transparent huge pages](https://www.kernel.org/doc/html/latest/admin-guide/mm/transhuge.html)
-so that large memory allocations will automatically be done using huge
-pages instead of ordinary pages which dramatically reduces the number of
-TLB cache misses.
-
-```bash
-sudo su
-
-# Enable transparent huge pages until next reboot
-echo always > /sys/kernel/mm/transparent_hugepage/enabled
-echo always > /sys/kernel/mm/transparent_hugepage/defrag
 ```
