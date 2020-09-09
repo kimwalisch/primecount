@@ -133,16 +133,11 @@ Count the number of primes less than or equal to x (<= 10^31).
 
 Options:
 
-  -d, --deleglise-rivat  Count primes using the Deleglise-Rivat algorithm
-  -g, --gourdon          Count primes using Xavier Gourdon's algorithm
-  -l, --legendre         Count primes using Legendre's formula
-      --lehmer           Count primes using Lehmer's formula
-      --lmo              Count primes using Lagarias-Miller-Odlyzko
-  -m, --meissel          Count primes using Meissel's formula
+  -g, --gourdon          Count primes using Xavier Gourdon's algorithm.
+                         This is the default algorithm.
       --Li               Approximate pi(x) using the logarithmic integral
       --Li-inverse       Approximate the nth prime using Li^-1(x)
   -n, --nth-prime        Calculate the nth prime
-  -p, --primesieve       Count primes using the sieve of Eratosthenes
       --phi <X> <A>      phi(x, a) counts the numbers <= x that are not
                          divisible by any of the first a primes
       --Ri               Approximate pi(x) using Riemann R
@@ -156,12 +151,13 @@ Options:
   -v, --version          Print version and license information
   -h, --help             Print this help menu
 
-Advanced options for the Deleglise-Rivat algorithm:
+Advanced options for Xavier Gourdon's algorithm:
 
-  -a, --alpha=NUM        Set tuning factor: y = x^(1/3) * alpha
-      --P2               Compute the 2nd partial sieve function
-      --S1               Compute the ordinary leaves
-      --S2-trivial       Compute the trivial special leaves
-      --S2-easy          Compute the easy special leaves
-      --S2-hard          Compute the hard special leaves
+      --alpha-y=NUM      Set tuning factor: y = x^(1/3) * alpha_y
+      --alpha-z=NUM      Set tuning factor: z = y * alpha_z
+      --AC               Compute the A + C formulas
+      --B                Compute the B formula
+      --D                Compute the D formula
+      --Phi0             Compute the Phi0 formula
+      --Sigma            Compute the 7 Sigma formulas
 ```
