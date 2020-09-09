@@ -11,11 +11,6 @@ the computation onto cluster nodes. primecount MPI scales nearly
 linearly (up to 96.8% efficiency) for large input values and has been
 tested successfully with clusters of up to 50 nodes.
 
-Breaking the next world record pi(10<sup>28</sup>) would take about 6
-years on the fastest shared memory server currently available
-(Intel Xeon, 36 CPU cores). Hence it has become necessary to go
-distributed!
-
 ## Build instructions (Unix-like OSes)
 
 First install the prerequisites:
