@@ -13,7 +13,6 @@
 #ifndef LOADBALANCERP2_HPP
 #define LOADBALANCERP2_HPP
 
-#include <noinline.hpp>
 #include <stdint.h>
 
 namespace primecount {
@@ -21,8 +20,8 @@ namespace primecount {
 class LoadBalancerP2
 {
 public:
-  NOINLINE LoadBalancerP2(int64_t z, int threads);
-  NOINLINE int64_t get_thread_dist(int64_t low);
+  LoadBalancerP2(int64_t z, int threads);
+  int64_t get_thread_dist(int64_t low);
   int get_threads() const;
 
 private:

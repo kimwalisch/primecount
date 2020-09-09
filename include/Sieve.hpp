@@ -62,9 +62,9 @@ private:
   void add(uint64_t prime);
   void allocate_counters(uint64_t low);
   void reset_counters();
+  void reset_sieve(uint64_t low, uint64_t high);
+  void init_counters(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
-  NOINLINE void reset_sieve(uint64_t low, uint64_t high);
-  NOINLINE void init_counters(uint64_t low, uint64_t high);
 
   struct Wheel
   {
