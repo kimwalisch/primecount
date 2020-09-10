@@ -1,4 +1,4 @@
-2020-09-09 Kim Walisch  <kim.walisch@gmail.com>
+2020-09-10 Kim Walisch  <kim.walisch@gmail.com>
 
   The main focus of this release has been on polishing the code
   and improving the documentation. I also tried many things to
@@ -11,6 +11,7 @@
 
   * Xavier Gourdon's algorithm has been distributed using MPI
     so that computations can now run on HPC clusters.
+  * CMakeLists.txt: New WITH_JEMALLOC option (default OFF).
   * AC.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
