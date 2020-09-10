@@ -38,7 +38,7 @@ sudo make install
 Open a terminal, cd into the primecount directory and run:
 
 ```bash
-cmake -DBUILD_TESTS=ON .
+cmake . -DBUILD_TESTS=ON
 make -j
 ctest
 ```
