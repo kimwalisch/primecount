@@ -18,6 +18,7 @@ option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
+option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
 option(WITH_MPI            "Enable MPI support"                    OFF)
 
 if(WIN32)
@@ -354,6 +355,27 @@ if(BUILD_PRIMECOUNT)
     target_link_libraries(primecount PRIVATE libprimecount primesieve::primesieve "${LIB_MPI}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
+# Use jemalloc allocator (better scaling) ############################
+
+if(WITH_JEMALLOC)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(JEMALLOC jemalloc)
+    pkg_search_module(JEMALLOC REQUIRED jemalloc)
+
+    if(BUILD_PRIMECOUNT)
+        target_link_libraries(primecount PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(primecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
+    if(BUILD_SHARED_LIBS)
+        target_link_libraries(libprimecount PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(libprimecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
+    if(BUILD_STATIC_LIBS)
+        target_link_libraries(libprimecount-static PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(libprimecount-static PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
 endif()
 
 # Install header #####################################################

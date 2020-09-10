@@ -33,6 +33,16 @@ make -j
 sudo make install
 ```
 
+## Run the tests
+
+Open a terminal, cd into the primecount directory and run:
+
+```bash
+cmake . -DBUILD_TESTS=ON
+make -j
+ctest
+```
+
 ## macOS
 
 On macOS the default C++ compiler that can be installed using ```xcode-select --install```
@@ -75,14 +85,20 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-## Run the tests
+## Best performance
 
-Open a terminal, cd into the primecount directory and run:
+You can build a slightly faster primecount binary by enabling link time optimization
+and by using the [jemalloc](https://github.com/jemalloc/jemalloc) allocator
+which scales much better than the default glibc allocator on PCs & servers with
+a large number of CPU cores. If you don't care about portability you can also
+use the ```-march=native``` compiler option to build a binary that is optimized
+for your CPU.
 
 ```bash
-cmake -DBUILD_TESTS=ON .
+# Ubuntu/Debian
+sudo apt install libjemalloc-dev pkg-config
+cmake . -DWITH_JEMALLOC=ON -DCMAKE_CXX_FLAGS="-flto -march=native"
 make -j
-ctest
 ```
 
 ## CMake configure options
@@ -104,6 +120,7 @@ option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
+option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
 option(WITH_MPI            "Enable MPI support"                    OFF)
 ```
 
