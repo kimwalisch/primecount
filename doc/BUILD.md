@@ -85,22 +85,6 @@ cmake --build . --config Release
 cmake --build . --config Release --target install
 ```
 
-## Best performance
-
-You can build a slightly faster primecount binary by enabling link time optimization
-and by using the [jemalloc](https://github.com/jemalloc/jemalloc) allocator
-which scales much better than the default glibc allocator on PCs & servers with
-a large number of CPU cores. If you don't care about portability you can also
-use the ```-march=native``` compiler option to build a binary that is optimized
-for your CPU.
-
-```bash
-# Ubuntu/Debian
-sudo apt install libjemalloc-dev pkg-config
-cmake . -DWITH_JEMALLOC=ON -DCMAKE_CXX_FLAGS="-flto -march=native"
-make -j
-```
-
 ## CMake configure options
 
 By default the primecount binary, the static libprimecount and
