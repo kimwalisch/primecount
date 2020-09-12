@@ -33,16 +33,6 @@ make -j
 sudo make install
 ```
 
-## Run the tests
-
-Open a terminal, cd into the primecount directory and run:
-
-```bash
-cmake . -DBUILD_TESTS=ON
-make -j
-ctest
-```
-
 ## macOS
 
 On macOS the default C++ compiler that can be installed using ```xcode-select --install```
@@ -83,6 +73,16 @@ cmake --build . --config Release
 
 # Optionally install using Admin shell
 cmake --build . --config Release --target install
+```
+
+## Run the tests
+
+Open a terminal, cd into the primecount directory and run:
+
+```bash
+cmake . -DBUILD_TESTS=ON
+make -j
+ctest
 ```
 
 ## CMake configure options
