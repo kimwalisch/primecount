@@ -100,15 +100,17 @@ specified the number of threads using ```--threads=NUM```).
 
 ## Performance tips
 
-primecount uses the OpenMP multi-threading library. In OpenMP waiting threads are
-usually busy-waiting for a short amount of time (by spinning) before being put to sleep.
-This setting can be altered using the ```OMP_WAIT_POLICY``` environment variable. For
-primecount it is best to set ```OMP_WAIT_POLICY``` to ```PASSIVE``` in order to prevent
-the threads from busy waiting. This setting can provide a large speedup for small
-to medium sized computations below 10<sup>20</sup>.
+primecount binaries built using the Clang compiler scale significantly better than
+primecount binaries built using GCC on PCs and servers with a large number of CPU
+cores. Unfortunately the primecount binaries that are offered for download are built
+using an old version of GCC that supports static linking of OpenMP. Hence if you
+build primecount from source I recommend using Clang. Also if you don't care about
+portability I recommend using the ```-march=native``` compiler option to build a
+primecount binary that is optimized for your CPU.
 
 ```bash
-export OMP_WAIT_POLICY=PASSIVE
+CXX=clang++ CXXFLAGS="-march=native" cmake .
+make -j
 ```
 
 By default primecount scales nicely up until 10<sup>20</sup> on current x64 CPUs.
