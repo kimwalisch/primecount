@@ -427,7 +427,7 @@ primesieve natively supports C and C++ and has bindings available for:
 <table>
     <tr>
         <td><b>Common Lisp:</b></td>
-        <td><a href="https://github.com/AaronChen0/primecount">primecount-cl</a></td>
+        <td><a href="https://github.com/AaronChen0/cl-primecount">cl-primecount</a></td>
     </tr>
     <tr>
         <td><b>Haskell:</b></td>
