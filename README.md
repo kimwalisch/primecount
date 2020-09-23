@@ -419,3 +419,28 @@ int main()
 
 * [C++ API reference](doc/libprimecount.md#c-example-1)
 * [libprimecount build instructions](doc/libprimecount.md#build-instructions)
+
+## Bindings for other languages
+
+primesieve natively supports C and C++ and has bindings available for:
+
+<table>
+    <tr>
+        <td><b>Common Lisp:</b></td>
+        <td><a href="https://github.com/AaronChen0/cl-primecount">cl-primecount</a></td>
+    </tr>
+    <tr>
+        <td><b>Haskell:</b></td>
+        <td><a href="https://github.com/erantapaa/hprimecount">hprimecount</a></td>
+    </tr>
+    <tr>
+        <td><b>Python:</b></td>
+        <td><a href="https://github.com/hearot/primecount-python">primecount-python</a></td>
+    </tr>
+    <tr>
+        <td><b>Rust:</b></td>
+        <td><a href="https://github.com/maitbayev/primecount-rs">primecount-rs</a></td>
+    </tr>
+</table>
+
+Many thanks to the developers of these bindings!
