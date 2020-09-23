@@ -52,8 +52,8 @@ T A(T x,
     T xhigh,
     uint64_t y,
     uint64_t b,
-    const PiTable& pi,
     const Primes& primes,
+    const PiTable& pi,
     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
@@ -62,9 +62,8 @@ T A(T x,
   T xp = x / prime;
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
-  uint64_t i = pi[min_2nd_prime];
-  i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
@@ -105,8 +104,8 @@ T C1(T xp,
      uint64_t m,
      uint64_t min_m,
      uint64_t max_m,
-     const PiTable& pi,
-     const Primes& primes)
+     const Primes& primes,
+     const PiTable& pi)
 {
   T sum = 0;
 
@@ -128,7 +127,7 @@ T C1(T xp,
         sum -= pi[xpm] - b + 2;
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, pi, primes);
+    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -145,8 +144,8 @@ T C2(T x,
      T xhigh,
      uint64_t y,
      uint64_t b,
-     const PiTable& pi,
      const Primes& primes,
+     const PiTable& pi,
      const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
@@ -245,7 +244,7 @@ T AC_OpenMP(T x,
       T min_m128 = max(xp / (prime * prime), z / prime);
       int64_t min_m = min(min_m128, max_m);
 
-      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
+      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
       status.print(b, pi_x13);
     }
 
@@ -283,7 +282,7 @@ T AC_OpenMP(T x,
       #pragma omp for nowait schedule(dynamic)
       for (int64_t b = min_c2; b <= max_c2; b++)
       {
-        sum += C2(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+        sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
         status.print(b, max_b);
       }
 
@@ -291,7 +290,7 @@ T AC_OpenMP(T x,
       #pragma omp for nowait schedule(dynamic)
       for (int64_t b = pi_x_star + 1; b <= max_b; b++)
       {
-        sum += A(x, xlow, xhigh, y, b, pi, primes, segmentedPi);
+        sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
         status.print(b, max_b);
       }
 
