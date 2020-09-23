@@ -48,20 +48,21 @@ using namespace primecount;
 
 namespace {
 
-/// Compute the A formula.
+/// Compute the A formula using libdivide.
+/// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename LibdividePrimes>
-T A(T xlow,
-    T xhigh,
-    uint64_t xp,
-    uint64_t y,
-    uint64_t prime,
-    const LibdividePrimes& primes,
-    const SegmentedPiTable& segmentedPi,
-    const PiTable& pi)
+T A_64(T xlow,
+       T xhigh,
+       uint64_t xp,
+       uint64_t y,
+       uint64_t prime,
+       const LibdividePrimes& primes,
+       const PiTable& pi,
+       const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -89,21 +90,21 @@ T A(T xlow,
   return sum;
 }
 
-/// 128-bit function.
 /// Compute the A formula.
+/// 128-bit function: xp >= 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
-T A(T xlow,
-    T xhigh,
-    T xp,
-    uint64_t y,
-    uint64_t prime,
-    const Primes& primes,
-    const PiTable& pi,
-    const SegmentedPiTable& segmentedPi)
+T A_128(T xlow,
+        T xhigh,
+        T xp,
+        uint64_t y,
+        uint64_t prime,
+        const Primes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -181,20 +182,21 @@ T C1(T xp,
 }
 
 /// Compute the 2nd part of the C formula.
+/// 64-bit function: xp < 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T, 
           typename LibdividePrimes>
-T C2(T xlow,
-     T xhigh,
-     uint64_t xp,
-     uint64_t y,
-     uint64_t b,
-     uint64_t prime,
-     const LibdividePrimes& primes,
-     const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
+T C2_64(T xlow,
+        T xhigh,
+        uint64_t xp,
+        uint64_t y,
+        uint64_t b,
+        uint64_t prime,
+        const LibdividePrimes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -234,21 +236,21 @@ T C2(T xlow,
   return sum;
 }
 
-/// 128-bit function.
 /// Compute the 2nd part of the C formula.
+/// 128-bit function: xp >= 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
-T C2(T xlow,
-     T xhigh,
-     T xp,
-     uint64_t y,
-     uint64_t b,
-     const Primes& primes,
-     const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
+T C2_128(T xlow,
+         T xhigh,
+         T xp,
+         uint64_t y,
+         uint64_t b,
+         const Primes& primes,
+         const PiTable& pi,
+         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -394,9 +396,9 @@ T AC_OpenMP(T x,
         T xp = x / prime;
 
         if (xp <= numeric_limits<uint64_t>::max())
-          sum += C2(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
+          sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
         else
-          sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+          sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
 
         status.print(b, max_b);
       }
@@ -409,9 +411,9 @@ T AC_OpenMP(T x,
         T xp = x / prime;
 
         if (xp <= numeric_limits<uint64_t>::max())
-          sum += A(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, segmentedPi, pi);
+          sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
         else
-          sum += A(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
+          sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
 
         status.print(b, max_b);
       }
