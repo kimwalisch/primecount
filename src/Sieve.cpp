@@ -582,9 +582,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (i >= wheel_.size())
     add(prime);
 
-  prime /= 30;
-  Wheel& wheel = wheel_[i];
   reset_counters();
+  Wheel& wheel = wheel_[i];
+  prime /= 30;
 
   uint64_t m = wheel.multiple;
   uint64_t total_count = total_count_;
