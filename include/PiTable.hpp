@@ -20,17 +20,11 @@
 #include <aligned_vector.hpp>
 #include <noinline.hpp>
 #include <pod_vector.hpp>
+#include <unlikely.hpp>
 
 #include <stdint.h>
 #include <array>
 #include <cassert>
-
-#if defined(__GNUC__) || \
-    defined(__clang__)
-  #define unlikely(x) __builtin_expect(!!(x), 0)
-#else
-  #define unlikely(x) (x)
-#endif
 
 namespace primecount {
 
@@ -53,7 +47,7 @@ public:
     // we cannot store 2 which is the only even prime.
     // As a workaround we mark 1 as a prime (1st bit) and
     // add a check to return 0 for pi[1].
-    if (unlikely(n == 1))
+    if_unlikely(n == 1)
       return 0;
 
     uint64_t bitmask = unset_bits_[n % 128];

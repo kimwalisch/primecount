@@ -24,6 +24,7 @@
 #include <imath.hpp>
 #include <min.hpp>
 #include <popcnt.hpp>
+#include <unlikely.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -293,25 +294,33 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   uint8_t* sieve = sieve_.data();
   uint64_t sieve_size = sieve_.size();
 
+  #define check_finished(wheel_index) \
+    if_unlikely(m >= sieve_size) \
+    { \
+      wheel.index = wheel_index; \
+      wheel.multiple = (uint32_t) (m - sieve_size); \
+      return; \
+    }
+
   switch (wheel.index)
   {
     for (;;)
     {
-      case 0: if (m >= sieve_size) { wheel.index = 0; break; }
+      case 0: check_finished(0);
       sieve[m] &= ~(1 << 0); m += prime * 6 + 0;
-      case 1: if (m >= sieve_size) { wheel.index = 1; break; }
+      case 1: check_finished(1);
       sieve[m] &= ~(1 << 1); m += prime * 4 + 0;
-      case 2: if (m >= sieve_size) { wheel.index = 2; break; }
+      case 2: check_finished(2);
       sieve[m] &= ~(1 << 2); m += prime * 2 + 0;
-      case 3: if (m >= sieve_size) { wheel.index = 3; break; }
+      case 3: check_finished(3);
       sieve[m] &= ~(1 << 3); m += prime * 4 + 0;
-      case 4: if (m >= sieve_size) { wheel.index = 4; break; }
+      case 4: check_finished(4);
       sieve[m] &= ~(1 << 4); m += prime * 2 + 0;
-      case 5: if (m >= sieve_size) { wheel.index = 5; break; }
+      case 5: check_finished(5);
       sieve[m] &= ~(1 << 5); m += prime * 4 + 0;
-      case 6: if (m >= sieve_size) { wheel.index = 6; break; }
+      case 6: check_finished(6);
       sieve[m] &= ~(1 << 6); m += prime * 6 + 0;
-      case 7: if (m >= sieve_size) { wheel.index = 7; break; }
+      case 7: check_finished(7);
       sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
 
       while (m + prime * 28 < sieve_size)
@@ -327,25 +336,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 1;
       }
     }
-    break;
 
     for (;;)
     {
-      case  8: if (m >= sieve_size) { wheel.index =  8; break; }
+      case  8: check_finished( 8);
       sieve[m] &= ~(1 << 1); m += prime * 6 + 1;
-      case  9: if (m >= sieve_size) { wheel.index =  9; break; }
+      case  9: check_finished( 9);
       sieve[m] &= ~(1 << 5); m += prime * 4 + 1;
-      case 10: if (m >= sieve_size) { wheel.index = 10; break; }
+      case 10: check_finished(10);
       sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
-      case 11: if (m >= sieve_size) { wheel.index = 11; break; }
+      case 11: check_finished(11);
       sieve[m] &= ~(1 << 0); m += prime * 4 + 0;
-      case 12: if (m >= sieve_size) { wheel.index = 12; break; }
+      case 12: check_finished(12);
       sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
-      case 13: if (m >= sieve_size) { wheel.index = 13; break; }
+      case 13: check_finished(13);
       sieve[m] &= ~(1 << 3); m += prime * 4 + 1;
-      case 14: if (m >= sieve_size) { wheel.index = 14; break; }
+      case 14: check_finished(14);
       sieve[m] &= ~(1 << 2); m += prime * 6 + 1;
-      case 15: if (m >= sieve_size) { wheel.index = 15; break; }
+      case 15: check_finished(15);
       sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
 
       while (m + prime * 28 + 6 < sieve_size)
@@ -361,25 +369,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 7;
       }
     }
-    break;
 
     for (;;)
     {
-      case 16: if (m >= sieve_size) { wheel.index = 16; break; }
+      case 16: check_finished(16);
       sieve[m] &= ~(1 << 2); m += prime * 6 + 2;
-      case 17: if (m >= sieve_size) { wheel.index = 17; break; }
+      case 17: check_finished(17);
       sieve[m] &= ~(1 << 4); m += prime * 4 + 2;
-      case 18: if (m >= sieve_size) { wheel.index = 18; break; }
+      case 18: check_finished(18);
       sieve[m] &= ~(1 << 0); m += prime * 2 + 0;
-      case 19: if (m >= sieve_size) { wheel.index = 19; break; }
+      case 19: check_finished(19);
       sieve[m] &= ~(1 << 6); m += prime * 4 + 2;
-      case 20: if (m >= sieve_size) { wheel.index = 20; break; }
+      case 20: check_finished(20);
       sieve[m] &= ~(1 << 1); m += prime * 2 + 0;
-      case 21: if (m >= sieve_size) { wheel.index = 21; break; }
+      case 21: check_finished(21);
       sieve[m] &= ~(1 << 7); m += prime * 4 + 2;
-      case 22: if (m >= sieve_size) { wheel.index = 22; break; }
+      case 22: check_finished(22);
       sieve[m] &= ~(1 << 3); m += prime * 6 + 2;
-      case 23: if (m >= sieve_size) { wheel.index = 23; break; }
+      case 23: check_finished(23);
       sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
 
       while (m + prime * 28 + 10 < sieve_size)
@@ -395,25 +402,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 11;
       }
     }
-    break;
 
     for (;;)
     {
-      case 24: if (m >= sieve_size) { wheel.index = 24; break; }
+      case 24: check_finished(24);
       sieve[m] &= ~(1 << 3); m += prime * 6 + 3;
-      case 25: if (m >= sieve_size) { wheel.index = 25; break; }
+      case 25: check_finished(25);
       sieve[m] &= ~(1 << 0); m += prime * 4 + 1;
-      case 26: if (m >= sieve_size) { wheel.index = 26; break; }
+      case 26: check_finished(26);
       sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
-      case 27: if (m >= sieve_size) { wheel.index = 27; break; }
+      case 27: check_finished(27);
       sieve[m] &= ~(1 << 5); m += prime * 4 + 2;
-      case 28: if (m >= sieve_size) { wheel.index = 28; break; }
+      case 28: check_finished(28);
       sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
-      case 29: if (m >= sieve_size) { wheel.index = 29; break; }
+      case 29: check_finished(29);
       sieve[m] &= ~(1 << 1); m += prime * 4 + 1;
-      case 30: if (m >= sieve_size) { wheel.index = 30; break; }
+      case 30: check_finished(30);
       sieve[m] &= ~(1 << 7); m += prime * 6 + 3;
-      case 31: if (m >= sieve_size) { wheel.index = 31; break; }
+      case 31: check_finished(31);
       sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
 
       while (m + prime * 28 + 12 < sieve_size)
@@ -429,25 +435,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 13;
       }
     }
-    break;
 
     for (;;)
     {
-      case 32: if (m >= sieve_size) { wheel.index = 32; break; }
+      case 32: check_finished(32);
       sieve[m] &= ~(1 << 4); m += prime * 6 + 3;
-      case 33: if (m >= sieve_size) { wheel.index = 33; break; }
+      case 33: check_finished(33);
       sieve[m] &= ~(1 << 7); m += prime * 4 + 3;
-      case 34: if (m >= sieve_size) { wheel.index = 34; break; }
+      case 34: check_finished(34);
       sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
-      case 35: if (m >= sieve_size) { wheel.index = 35; break; }
+      case 35: check_finished(35);
       sieve[m] &= ~(1 << 2); m += prime * 4 + 2;
-      case 36: if (m >= sieve_size) { wheel.index = 36; break; }
+      case 36: check_finished(36);
       sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
-      case 37: if (m >= sieve_size) { wheel.index = 37; break; }
+      case 37: check_finished(37);
       sieve[m] &= ~(1 << 6); m += prime * 4 + 3;
-      case 38: if (m >= sieve_size) { wheel.index = 38; break; }
+      case 38: check_finished(38);
       sieve[m] &= ~(1 << 0); m += prime * 6 + 3;
-      case 39: if (m >= sieve_size) { wheel.index = 39; break; }
+      case 39: check_finished(39);
       sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
 
       while (m + prime * 28 + 16 < sieve_size)
@@ -463,25 +468,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 17;
       }
     }
-    break;
 
     for (;;)
     {
-      case 40: if (m >= sieve_size) { wheel.index = 40; break; }
+      case 40: check_finished(40);
       sieve[m] &= ~(1 << 5); m += prime * 6 + 4;
-      case 41: if (m >= sieve_size) { wheel.index = 41; break; }
+      case 41: check_finished(41);
       sieve[m] &= ~(1 << 3); m += prime * 4 + 2;
-      case 42: if (m >= sieve_size) { wheel.index = 42; break; }
+      case 42: check_finished(42);
       sieve[m] &= ~(1 << 7); m += prime * 2 + 2;
-      case 43: if (m >= sieve_size) { wheel.index = 43; break; }
+      case 43: check_finished(43);
       sieve[m] &= ~(1 << 1); m += prime * 4 + 2;
-      case 44: if (m >= sieve_size) { wheel.index = 44; break; }
+      case 44: check_finished(44);
       sieve[m] &= ~(1 << 6); m += prime * 2 + 2;
-      case 45: if (m >= sieve_size) { wheel.index = 45; break; }
+      case 45: check_finished(45);
       sieve[m] &= ~(1 << 0); m += prime * 4 + 2;
-      case 46: if (m >= sieve_size) { wheel.index = 46; break; }
+      case 46: check_finished(46);
       sieve[m] &= ~(1 << 4); m += prime * 6 + 4;
-      case 47: if (m >= sieve_size) { wheel.index = 47; break; }
+      case 47: check_finished(47);
       sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
 
       while (m + prime * 28 + 18 < sieve_size)
@@ -497,25 +501,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 19;
       }
     }
-    break;
 
     for (;;)
     {
-      case 48: if (m >= sieve_size) { wheel.index = 48; break; }
+      case 48: check_finished(48);
       sieve[m] &= ~(1 << 6); m += prime * 6 + 5;
-      case 49: if (m >= sieve_size) { wheel.index = 49; break; }
+      case 49: check_finished(49);
       sieve[m] &= ~(1 << 2); m += prime * 4 + 3;
-      case 50: if (m >= sieve_size) { wheel.index = 50; break; }
+      case 50: check_finished(50);
       sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
-      case 51: if (m >= sieve_size) { wheel.index = 51; break; }
+      case 51: check_finished(51);
       sieve[m] &= ~(1 << 7); m += prime * 4 + 4;
-      case 52: if (m >= sieve_size) { wheel.index = 52; break; }
+      case 52: check_finished(52);
       sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
-      case 53: if (m >= sieve_size) { wheel.index = 53; break; }
+      case 53: check_finished(53);
       sieve[m] &= ~(1 << 4); m += prime * 4 + 3;
-      case 54: if (m >= sieve_size) { wheel.index = 54; break; }
+      case 54: check_finished(54);
       sieve[m] &= ~(1 << 5); m += prime * 6 + 5;
-      case 55: if (m >= sieve_size) { wheel.index = 55; break; }
+      case 55: check_finished(55);
       sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
 
       while (m + prime * 28 + 22 < sieve_size)
@@ -531,25 +534,24 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 23;
       }
     }
-    break;
 
     for (;;)
     {
-      case 56: if (m >= sieve_size) { wheel.index = 56; break; }
+      case 56: check_finished(56);
       sieve[m] &= ~(1 << 7); m += prime * 6 + 6;
-      case 57: if (m >= sieve_size) { wheel.index = 57; break; }
+      case 57: check_finished(57);
       sieve[m] &= ~(1 << 6); m += prime * 4 + 4;
-      case 58: if (m >= sieve_size) { wheel.index = 58; break; }
+      case 58: check_finished(58);
       sieve[m] &= ~(1 << 5); m += prime * 2 + 2;
-      case 59: if (m >= sieve_size) { wheel.index = 59; break; }
+      case 59: check_finished(59);
       sieve[m] &= ~(1 << 4); m += prime * 4 + 4;
-      case 60: if (m >= sieve_size) { wheel.index = 60; break; }
+      case 60: check_finished(60);
       sieve[m] &= ~(1 << 3); m += prime * 2 + 2;
-      case 61: if (m >= sieve_size) { wheel.index = 61; break; }
+      case 61: check_finished(61);
       sieve[m] &= ~(1 << 2); m += prime * 4 + 4;
-      case 62: if (m >= sieve_size) { wheel.index = 62; break; }
+      case 62: check_finished(62);
       sieve[m] &= ~(1 << 1); m += prime * 6 + 6;
-      case 63: if (m >= sieve_size) { wheel.index = 63; break; }
+      case 63: check_finished(63);
       sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
 
       while (m + prime * 28 + 28 < sieve_size)
@@ -565,18 +567,15 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         m += prime * 30 + 29;
       }
     }
-    break;
   }
 
-  // update for the next segment
-  wheel.multiple = (uint32_t) (m - sieve_size);
+  #undef check_finished
 }
 
-/// Remove the i-th prime and the multiples of the i-th
-/// prime from the sieve array. Also counts the number
-/// of elements removed for the first time i.e. the
-/// count of sieved elements whose least prime factor
-/// is the i-th prime.
+/// Remove the i-th prime and the multiples of the i-th prime
+/// from the sieve array. Also counts the number of elements
+/// removed for the first time i.e. the count of sieved elements
+/// whose least prime factor is the i-th prime.
 ///
 void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 {
@@ -585,6 +584,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   prime /= 30;
   Wheel& wheel = wheel_[i];
+  reset_counters();
+
   uint64_t m = wheel.multiple;
   uint64_t total_count = total_count_;
   uint64_t counters_dist_log2 = counters_dist_log2_;
@@ -600,181 +601,177 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     sieve[m] &= ~(1 << bit_index); \
   }
 
+  #define check_finished(wheel_index) \
+    if_unlikely(m >= sieve_size) \
+    { \
+      wheel.index = wheel_index; \
+      wheel.multiple = (uint32_t) (m - sieve_size); \
+      total_count_ = total_count; \
+      return; \
+    }
+
   switch (wheel.index)
   {
     for (;;)
     {
-      case 0: if (m >= sieve_size) { wheel.index = 0; break; }
+      case 0: check_finished(0);
       count_and_unset_bit(0); m += prime * 6 + 0;
-      case 1: if (m >= sieve_size) { wheel.index = 1; break; }
+      case 1: check_finished(1);
       count_and_unset_bit(1); m += prime * 4 + 0;
-      case 2: if (m >= sieve_size) { wheel.index = 2; break; }
+      case 2: check_finished(2);
       count_and_unset_bit(2); m += prime * 2 + 0;
-      case 3: if (m >= sieve_size) { wheel.index = 3; break; }
+      case 3: check_finished(3);
       count_and_unset_bit(3); m += prime * 4 + 0;
-      case 4: if (m >= sieve_size) { wheel.index = 4; break; }
+      case 4: check_finished(4);
       count_and_unset_bit(4); m += prime * 2 + 0;
-      case 5: if (m >= sieve_size) { wheel.index = 5; break; }
+      case 5: check_finished(5);
       count_and_unset_bit(5); m += prime * 4 + 0;
-      case 6: if (m >= sieve_size) { wheel.index = 6; break; }
+      case 6: check_finished(6);
       count_and_unset_bit(6); m += prime * 6 + 0;
-      case 7: if (m >= sieve_size) { wheel.index = 7; break; }
+      case 7: check_finished(7);
       count_and_unset_bit(7); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case  8: if (m >= sieve_size) { wheel.index =  8; break; }
+      case  8: check_finished(8);
       count_and_unset_bit(1); m += prime * 6 + 1;
-      case  9: if (m >= sieve_size) { wheel.index =  9; break; }
+      case  9: check_finished(9);
       count_and_unset_bit(5); m += prime * 4 + 1;
-      case 10: if (m >= sieve_size) { wheel.index = 10; break; }
+      case 10: check_finished(10);
       count_and_unset_bit(4); m += prime * 2 + 1;
-      case 11: if (m >= sieve_size) { wheel.index = 11; break; }
+      case 11: check_finished(11);
       count_and_unset_bit(0); m += prime * 4 + 0;
-      case 12: if (m >= sieve_size) { wheel.index = 12; break; }
+      case 12: check_finished(12);
       count_and_unset_bit(7); m += prime * 2 + 1;
-      case 13: if (m >= sieve_size) { wheel.index = 13; break; }
+      case 13: check_finished(13);
       count_and_unset_bit(3); m += prime * 4 + 1;
-      case 14: if (m >= sieve_size) { wheel.index = 14; break; }
+      case 14: check_finished(14);
       count_and_unset_bit(2); m += prime * 6 + 1;
-      case 15: if (m >= sieve_size) { wheel.index = 15; break; }
+      case 15: check_finished(15);
       count_and_unset_bit(6); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 16: if (m >= sieve_size) { wheel.index = 16; break; }
+      case 16: check_finished(16);
       count_and_unset_bit(2); m += prime * 6 + 2;
-      case 17: if (m >= sieve_size) { wheel.index = 17; break; }
+      case 17: check_finished(17);
       count_and_unset_bit(4); m += prime * 4 + 2;
-      case 18: if (m >= sieve_size) { wheel.index = 18; break; }
+      case 18: check_finished(18);
       count_and_unset_bit(0); m += prime * 2 + 0;
-      case 19: if (m >= sieve_size) { wheel.index = 19; break; }
+      case 19: check_finished(19);
       count_and_unset_bit(6); m += prime * 4 + 2;
-      case 20: if (m >= sieve_size) { wheel.index = 20; break; }
+      case 20: check_finished(20);
       count_and_unset_bit(1); m += prime * 2 + 0;
-      case 21: if (m >= sieve_size) { wheel.index = 21; break; }
+      case 21: check_finished(21);
       count_and_unset_bit(7); m += prime * 4 + 2;
-      case 22: if (m >= sieve_size) { wheel.index = 22; break; }
+      case 22: check_finished(22);
       count_and_unset_bit(3); m += prime * 6 + 2;
-      case 23: if (m >= sieve_size) { wheel.index = 23; break; }
+      case 23: check_finished(23);
       count_and_unset_bit(5); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 24: if (m >= sieve_size) { wheel.index = 24; break; }
+      case 24: check_finished(24);
       count_and_unset_bit(3); m += prime * 6 + 3;
-      case 25: if (m >= sieve_size) { wheel.index = 25; break; }
+      case 25: check_finished(25);
       count_and_unset_bit(0); m += prime * 4 + 1;
-      case 26: if (m >= sieve_size) { wheel.index = 26; break; }
+      case 26: check_finished(26);
       count_and_unset_bit(6); m += prime * 2 + 1;
-      case 27: if (m >= sieve_size) { wheel.index = 27; break; }
+      case 27: check_finished(27);
       count_and_unset_bit(5); m += prime * 4 + 2;
-      case 28: if (m >= sieve_size) { wheel.index = 28; break; }
+      case 28: check_finished(28);
       count_and_unset_bit(2); m += prime * 2 + 1;
-      case 29: if (m >= sieve_size) { wheel.index = 29; break; }
+      case 29: check_finished(29);
       count_and_unset_bit(1); m += prime * 4 + 1;
-      case 30: if (m >= sieve_size) { wheel.index = 30; break; }
+      case 30: check_finished(30);
       count_and_unset_bit(7); m += prime * 6 + 3;
-      case 31: if (m >= sieve_size) { wheel.index = 31; break; }
+      case 31: check_finished(31);
       count_and_unset_bit(4); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 32: if (m >= sieve_size) { wheel.index = 32; break; }
+      case 32: check_finished(32);
       count_and_unset_bit(4); m += prime * 6 + 3;
-      case 33: if (m >= sieve_size) { wheel.index = 33; break; }
+      case 33: check_finished(33);
       count_and_unset_bit(7); m += prime * 4 + 3;
-      case 34: if (m >= sieve_size) { wheel.index = 34; break; }
+      case 34: check_finished(34);
       count_and_unset_bit(1); m += prime * 2 + 1;
-      case 35: if (m >= sieve_size) { wheel.index = 35; break; }
+      case 35: check_finished(35);
       count_and_unset_bit(2); m += prime * 4 + 2;
-      case 36: if (m >= sieve_size) { wheel.index = 36; break; }
+      case 36: check_finished(36);
       count_and_unset_bit(5); m += prime * 2 + 1;
-      case 37: if (m >= sieve_size) { wheel.index = 37; break; }
+      case 37: check_finished(37);
       count_and_unset_bit(6); m += prime * 4 + 3;
-      case 38: if (m >= sieve_size) { wheel.index = 38; break; }
+      case 38: check_finished(38);
       count_and_unset_bit(0); m += prime * 6 + 3;
-      case 39: if (m >= sieve_size) { wheel.index = 39; break; }
+      case 39: check_finished(39);
       count_and_unset_bit(3); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 40: if (m >= sieve_size) { wheel.index = 40; break; }
+      case 40: check_finished(40);
       count_and_unset_bit(5); m += prime * 6 + 4;
-      case 41: if (m >= sieve_size) { wheel.index = 41; break; }
+      case 41: check_finished(41);
       count_and_unset_bit(3); m += prime * 4 + 2;
-      case 42: if (m >= sieve_size) { wheel.index = 42; break; }
+      case 42: check_finished(42);
       count_and_unset_bit(7); m += prime * 2 + 2;
-      case 43: if (m >= sieve_size) { wheel.index = 43; break; }
+      case 43: check_finished(43);
       count_and_unset_bit(1); m += prime * 4 + 2;
-      case 44: if (m >= sieve_size) { wheel.index = 44; break; }
+      case 44: check_finished(44);
       count_and_unset_bit(6); m += prime * 2 + 2;
-      case 45: if (m >= sieve_size) { wheel.index = 45; break; }
+      case 45: check_finished(45);
       count_and_unset_bit(0); m += prime * 4 + 2;
-      case 46: if (m >= sieve_size) { wheel.index = 46; break; }
+      case 46: check_finished(46);
       count_and_unset_bit(4); m += prime * 6 + 4;
-      case 47: if (m >= sieve_size) { wheel.index = 47; break; }
+      case 47: check_finished(47);
       count_and_unset_bit(2); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 48: if (m >= sieve_size) { wheel.index = 48; break; }
+      case 48: check_finished(48);
       count_and_unset_bit(6); m += prime * 6 + 5;
-      case 49: if (m >= sieve_size) { wheel.index = 49; break; }
+      case 49: check_finished(49);
       count_and_unset_bit(2); m += prime * 4 + 3;
-      case 50: if (m >= sieve_size) { wheel.index = 50; break; }
+      case 50: check_finished(50);
       count_and_unset_bit(3); m += prime * 2 + 1;
-      case 51: if (m >= sieve_size) { wheel.index = 51; break; }
+      case 51: check_finished(51);
       count_and_unset_bit(7); m += prime * 4 + 4;
-      case 52: if (m >= sieve_size) { wheel.index = 52; break; }
+      case 52: check_finished(52);
       count_and_unset_bit(0); m += prime * 2 + 1;
-      case 53: if (m >= sieve_size) { wheel.index = 53; break; }
+      case 53: check_finished(53);
       count_and_unset_bit(4); m += prime * 4 + 3;
-      case 54: if (m >= sieve_size) { wheel.index = 54; break; }
+      case 54: check_finished(54);
       count_and_unset_bit(5); m += prime * 6 + 5;
-      case 55: if (m >= sieve_size) { wheel.index = 55; break; }
+      case 55: check_finished(55);
       count_and_unset_bit(1); m += prime * 2 + 1;
     }
-    break;
 
     for (;;)
     {
-      case 56: if (m >= sieve_size) { wheel.index = 56; break; }
+      case 56: check_finished(56);
       count_and_unset_bit(7); m += prime * 6 + 6;
-      case 57: if (m >= sieve_size) { wheel.index = 57; break; }
+      case 57: check_finished(57);
       count_and_unset_bit(6); m += prime * 4 + 4;
-      case 58: if (m >= sieve_size) { wheel.index = 58; break; }
+      case 58: check_finished(58);
       count_and_unset_bit(5); m += prime * 2 + 2;
-      case 59: if (m >= sieve_size) { wheel.index = 59; break; }
+      case 59: check_finished(59);
       count_and_unset_bit(4); m += prime * 4 + 4;
-      case 60: if (m >= sieve_size) { wheel.index = 60; break; }
+      case 60: check_finished(60);
       count_and_unset_bit(3); m += prime * 2 + 2;
-      case 61: if (m >= sieve_size) { wheel.index = 61; break; }
+      case 61: check_finished(61);
       count_and_unset_bit(2); m += prime * 4 + 4;
-      case 62: if (m >= sieve_size) { wheel.index = 62; break; }
+      case 62: check_finished(62);
       count_and_unset_bit(1); m += prime * 6 + 6;
-      case 63: if (m >= sieve_size) { wheel.index = 63; break; }
+      case 63: check_finished(63);
       count_and_unset_bit(0); m += prime * 2 + 1;
     }
-    break;
   }
-
-  // update for the next segment
-  wheel.multiple = (uint32_t) (m - sieve_size);
-  total_count_ = total_count;
-  reset_counters();
 }
 
 } // namespace
