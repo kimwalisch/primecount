@@ -236,7 +236,6 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 
   assert(stop - start < segment_size());
 
-  uint64_t bit_count = 0;
   uint64_t start_idx = start / 240;
   uint64_t stop_idx = stop / 240;
   uint64_t m1 = unset_smaller[start % 240];
@@ -244,15 +243,15 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   auto sieve64 = (uint64_t*) sieve_.data();
 
   if (start_idx == stop_idx)
-    bit_count = popcnt64(sieve64[start_idx] & (m1 & m2));
+    return popcnt64(sieve64[start_idx] & (m1 & m2));
   else
   {
-    bit_count = popcnt64(sieve64[start_idx] & m1);
-    bit_count += popcnt(&sieve64[start_idx + 1], stop_idx - (start_idx + 1));
-    bit_count += popcnt64(sieve64[stop_idx] & m2);
+    uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
+    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
+      cnt += popcnt64(sieve64[i]);
+    cnt += popcnt64(sieve64[stop_idx] & m2);
+    return cnt;
   }
-
-  return bit_count;
 }
 
 /// Add a sieving prime to the sieve.

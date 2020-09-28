@@ -111,16 +111,6 @@ inline uint64_t popcnt64(uint64_t x)
 
 #endif
 
-inline uint64_t popcnt(const uint64_t* data, uint64_t size)
-{
-  uint64_t cnt = 0;
-
-  for (uint64_t i = 0; i < size; i++)
-    cnt += popcnt64(data[i]);
-
-  return cnt;
-}
-
 } // namespace
 
 #endif // POPCNT_HPP
