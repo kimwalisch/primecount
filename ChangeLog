@@ -1,3 +1,9 @@
+2020-09-29 Kim Walisch  <kim.walisch@gmail.com>
+
+  Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
+  AC.cpp: Reduce number of function paramaters.
+  AC_libdivide.cpp: Reduce number of function paramaters.
+
 2020-09-12 Kim Walisch  <kim.walisch@gmail.com>
 
   Version 6.1 released.
