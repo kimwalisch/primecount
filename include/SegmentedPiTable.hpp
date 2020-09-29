@@ -24,9 +24,8 @@
 
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
-#include <noinline.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
-#include <unlikely.hpp>
 
 #include <stdint.h>
 #include <array>

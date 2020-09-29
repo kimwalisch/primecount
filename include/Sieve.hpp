@@ -22,7 +22,7 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
-#include <noinline.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>

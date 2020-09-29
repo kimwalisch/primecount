@@ -22,9 +22,9 @@
 #include <Sieve.hpp>
 #include <SieveTables.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 #include <popcnt.hpp>
-#include <unlikely.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -293,7 +293,7 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   uint8_t* sieve = sieve_.data();
   uint64_t sieve_size = sieve_.size();
 
-  #define check_finished(wheel_index) \
+  #define CHECK_FINISHED(wheel_index) \
     if_unlikely(m >= sieve_size) \
     { \
       wheel.index = wheel_index; \
@@ -310,22 +310,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   {
     for (;;)
     {
-      case 0: check_finished(0);
-      sieve[m] &= ~(1 << 0); m += prime * 6 + 0;
-      case 1: check_finished(1);
-      sieve[m] &= ~(1 << 1); m += prime * 4 + 0;
-      case 2: check_finished(2);
-      sieve[m] &= ~(1 << 2); m += prime * 2 + 0;
-      case 3: check_finished(3);
-      sieve[m] &= ~(1 << 3); m += prime * 4 + 0;
-      case 4: check_finished(4);
-      sieve[m] &= ~(1 << 4); m += prime * 2 + 0;
-      case 5: check_finished(5);
-      sieve[m] &= ~(1 << 5); m += prime * 4 + 0;
-      case 6: check_finished(6);
-      sieve[m] &= ~(1 << 6); m += prime * 6 + 0;
-      case 7: check_finished(7);
-      sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
+      case 0: CHECK_FINISHED(0); sieve[m] &= ~(1 << 0); m += prime * 6 + 0; FALLTHROUGH
+      case 1: CHECK_FINISHED(1); sieve[m] &= ~(1 << 1); m += prime * 4 + 0; FALLTHROUGH
+      case 2: CHECK_FINISHED(2); sieve[m] &= ~(1 << 2); m += prime * 2 + 0; FALLTHROUGH
+      case 3: CHECK_FINISHED(3); sieve[m] &= ~(1 << 3); m += prime * 4 + 0; FALLTHROUGH
+      case 4: CHECK_FINISHED(4); sieve[m] &= ~(1 << 4); m += prime * 2 + 0; FALLTHROUGH
+      case 5: CHECK_FINISHED(5); sieve[m] &= ~(1 << 5); m += prime * 4 + 0; FALLTHROUGH
+      case 6: CHECK_FINISHED(6); sieve[m] &= ~(1 << 6); m += prime * 6 + 0; FALLTHROUGH
+      case 7: CHECK_FINISHED(7); sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
 
       while (m + prime * 28 < sieve_size)
       {
@@ -343,22 +335,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case  8: check_finished( 8);
-      sieve[m] &= ~(1 << 1); m += prime * 6 + 1;
-      case  9: check_finished( 9);
-      sieve[m] &= ~(1 << 5); m += prime * 4 + 1;
-      case 10: check_finished(10);
-      sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
-      case 11: check_finished(11);
-      sieve[m] &= ~(1 << 0); m += prime * 4 + 0;
-      case 12: check_finished(12);
-      sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
-      case 13: check_finished(13);
-      sieve[m] &= ~(1 << 3); m += prime * 4 + 1;
-      case 14: check_finished(14);
-      sieve[m] &= ~(1 << 2); m += prime * 6 + 1;
-      case 15: check_finished(15);
-      sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
+      case  8: CHECK_FINISHED( 8); sieve[m] &= ~(1 << 1); m += prime * 6 + 1; FALLTHROUGH
+      case  9: CHECK_FINISHED( 9); sieve[m] &= ~(1 << 5); m += prime * 4 + 1; FALLTHROUGH
+      case 10: CHECK_FINISHED(10); sieve[m] &= ~(1 << 4); m += prime * 2 + 1; FALLTHROUGH
+      case 11: CHECK_FINISHED(11); sieve[m] &= ~(1 << 0); m += prime * 4 + 0; FALLTHROUGH
+      case 12: CHECK_FINISHED(12); sieve[m] &= ~(1 << 7); m += prime * 2 + 1; FALLTHROUGH
+      case 13: CHECK_FINISHED(13); sieve[m] &= ~(1 << 3); m += prime * 4 + 1; FALLTHROUGH
+      case 14: CHECK_FINISHED(14); sieve[m] &= ~(1 << 2); m += prime * 6 + 1; FALLTHROUGH
+      case 15: CHECK_FINISHED(15); sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
 
       while (m + prime * 28 + 6 < sieve_size)
       {
@@ -376,22 +360,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 16: check_finished(16);
-      sieve[m] &= ~(1 << 2); m += prime * 6 + 2;
-      case 17: check_finished(17);
-      sieve[m] &= ~(1 << 4); m += prime * 4 + 2;
-      case 18: check_finished(18);
-      sieve[m] &= ~(1 << 0); m += prime * 2 + 0;
-      case 19: check_finished(19);
-      sieve[m] &= ~(1 << 6); m += prime * 4 + 2;
-      case 20: check_finished(20);
-      sieve[m] &= ~(1 << 1); m += prime * 2 + 0;
-      case 21: check_finished(21);
-      sieve[m] &= ~(1 << 7); m += prime * 4 + 2;
-      case 22: check_finished(22);
-      sieve[m] &= ~(1 << 3); m += prime * 6 + 2;
-      case 23: check_finished(23);
-      sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
+      case 16: CHECK_FINISHED(16); sieve[m] &= ~(1 << 2); m += prime * 6 + 2; FALLTHROUGH
+      case 17: CHECK_FINISHED(17); sieve[m] &= ~(1 << 4); m += prime * 4 + 2; FALLTHROUGH
+      case 18: CHECK_FINISHED(18); sieve[m] &= ~(1 << 0); m += prime * 2 + 0; FALLTHROUGH
+      case 19: CHECK_FINISHED(19); sieve[m] &= ~(1 << 6); m += prime * 4 + 2; FALLTHROUGH
+      case 20: CHECK_FINISHED(20); sieve[m] &= ~(1 << 1); m += prime * 2 + 0; FALLTHROUGH
+      case 21: CHECK_FINISHED(21); sieve[m] &= ~(1 << 7); m += prime * 4 + 2; FALLTHROUGH
+      case 22: CHECK_FINISHED(22); sieve[m] &= ~(1 << 3); m += prime * 6 + 2; FALLTHROUGH
+      case 23: CHECK_FINISHED(23); sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
 
       while (m + prime * 28 + 10 < sieve_size)
       {
@@ -409,22 +385,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 24: check_finished(24);
-      sieve[m] &= ~(1 << 3); m += prime * 6 + 3;
-      case 25: check_finished(25);
-      sieve[m] &= ~(1 << 0); m += prime * 4 + 1;
-      case 26: check_finished(26);
-      sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
-      case 27: check_finished(27);
-      sieve[m] &= ~(1 << 5); m += prime * 4 + 2;
-      case 28: check_finished(28);
-      sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
-      case 29: check_finished(29);
-      sieve[m] &= ~(1 << 1); m += prime * 4 + 1;
-      case 30: check_finished(30);
-      sieve[m] &= ~(1 << 7); m += prime * 6 + 3;
-      case 31: check_finished(31);
-      sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
+      case 24: CHECK_FINISHED(24); sieve[m] &= ~(1 << 3); m += prime * 6 + 3; FALLTHROUGH
+      case 25: CHECK_FINISHED(25); sieve[m] &= ~(1 << 0); m += prime * 4 + 1; FALLTHROUGH
+      case 26: CHECK_FINISHED(26); sieve[m] &= ~(1 << 6); m += prime * 2 + 1; FALLTHROUGH
+      case 27: CHECK_FINISHED(27); sieve[m] &= ~(1 << 5); m += prime * 4 + 2; FALLTHROUGH
+      case 28: CHECK_FINISHED(28); sieve[m] &= ~(1 << 2); m += prime * 2 + 1; FALLTHROUGH
+      case 29: CHECK_FINISHED(29); sieve[m] &= ~(1 << 1); m += prime * 4 + 1; FALLTHROUGH
+      case 30: CHECK_FINISHED(30); sieve[m] &= ~(1 << 7); m += prime * 6 + 3; FALLTHROUGH
+      case 31: CHECK_FINISHED(31); sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
 
       while (m + prime * 28 + 12 < sieve_size)
       {
@@ -442,22 +410,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 32: check_finished(32);
-      sieve[m] &= ~(1 << 4); m += prime * 6 + 3;
-      case 33: check_finished(33);
-      sieve[m] &= ~(1 << 7); m += prime * 4 + 3;
-      case 34: check_finished(34);
-      sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
-      case 35: check_finished(35);
-      sieve[m] &= ~(1 << 2); m += prime * 4 + 2;
-      case 36: check_finished(36);
-      sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
-      case 37: check_finished(37);
-      sieve[m] &= ~(1 << 6); m += prime * 4 + 3;
-      case 38: check_finished(38);
-      sieve[m] &= ~(1 << 0); m += prime * 6 + 3;
-      case 39: check_finished(39);
-      sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
+      case 32: CHECK_FINISHED(32); sieve[m] &= ~(1 << 4); m += prime * 6 + 3; FALLTHROUGH
+      case 33: CHECK_FINISHED(33); sieve[m] &= ~(1 << 7); m += prime * 4 + 3; FALLTHROUGH
+      case 34: CHECK_FINISHED(34); sieve[m] &= ~(1 << 1); m += prime * 2 + 1; FALLTHROUGH
+      case 35: CHECK_FINISHED(35); sieve[m] &= ~(1 << 2); m += prime * 4 + 2; FALLTHROUGH
+      case 36: CHECK_FINISHED(36); sieve[m] &= ~(1 << 5); m += prime * 2 + 1; FALLTHROUGH
+      case 37: CHECK_FINISHED(37); sieve[m] &= ~(1 << 6); m += prime * 4 + 3; FALLTHROUGH
+      case 38: CHECK_FINISHED(38); sieve[m] &= ~(1 << 0); m += prime * 6 + 3; FALLTHROUGH
+      case 39: CHECK_FINISHED(39); sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
 
       while (m + prime * 28 + 16 < sieve_size)
       {
@@ -475,22 +435,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 40: check_finished(40);
-      sieve[m] &= ~(1 << 5); m += prime * 6 + 4;
-      case 41: check_finished(41);
-      sieve[m] &= ~(1 << 3); m += prime * 4 + 2;
-      case 42: check_finished(42);
-      sieve[m] &= ~(1 << 7); m += prime * 2 + 2;
-      case 43: check_finished(43);
-      sieve[m] &= ~(1 << 1); m += prime * 4 + 2;
-      case 44: check_finished(44);
-      sieve[m] &= ~(1 << 6); m += prime * 2 + 2;
-      case 45: check_finished(45);
-      sieve[m] &= ~(1 << 0); m += prime * 4 + 2;
-      case 46: check_finished(46);
-      sieve[m] &= ~(1 << 4); m += prime * 6 + 4;
-      case 47: check_finished(47);
-      sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
+      case 40: CHECK_FINISHED(40); sieve[m] &= ~(1 << 5); m += prime * 6 + 4; FALLTHROUGH
+      case 41: CHECK_FINISHED(41); sieve[m] &= ~(1 << 3); m += prime * 4 + 2; FALLTHROUGH
+      case 42: CHECK_FINISHED(42); sieve[m] &= ~(1 << 7); m += prime * 2 + 2; FALLTHROUGH
+      case 43: CHECK_FINISHED(43); sieve[m] &= ~(1 << 1); m += prime * 4 + 2; FALLTHROUGH
+      case 44: CHECK_FINISHED(44); sieve[m] &= ~(1 << 6); m += prime * 2 + 2; FALLTHROUGH
+      case 45: CHECK_FINISHED(45); sieve[m] &= ~(1 << 0); m += prime * 4 + 2; FALLTHROUGH
+      case 46: CHECK_FINISHED(46); sieve[m] &= ~(1 << 4); m += prime * 6 + 4; FALLTHROUGH
+      case 47: CHECK_FINISHED(47); sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
 
       while (m + prime * 28 + 18 < sieve_size)
       {
@@ -508,22 +460,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 48: check_finished(48);
-      sieve[m] &= ~(1 << 6); m += prime * 6 + 5;
-      case 49: check_finished(49);
-      sieve[m] &= ~(1 << 2); m += prime * 4 + 3;
-      case 50: check_finished(50);
-      sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
-      case 51: check_finished(51);
-      sieve[m] &= ~(1 << 7); m += prime * 4 + 4;
-      case 52: check_finished(52);
-      sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
-      case 53: check_finished(53);
-      sieve[m] &= ~(1 << 4); m += prime * 4 + 3;
-      case 54: check_finished(54);
-      sieve[m] &= ~(1 << 5); m += prime * 6 + 5;
-      case 55: check_finished(55);
-      sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
+      case 48: CHECK_FINISHED(48); sieve[m] &= ~(1 << 6); m += prime * 6 + 5; FALLTHROUGH
+      case 49: CHECK_FINISHED(49); sieve[m] &= ~(1 << 2); m += prime * 4 + 3; FALLTHROUGH
+      case 50: CHECK_FINISHED(50); sieve[m] &= ~(1 << 3); m += prime * 2 + 1; FALLTHROUGH
+      case 51: CHECK_FINISHED(51); sieve[m] &= ~(1 << 7); m += prime * 4 + 4; FALLTHROUGH
+      case 52: CHECK_FINISHED(52); sieve[m] &= ~(1 << 0); m += prime * 2 + 1; FALLTHROUGH
+      case 53: CHECK_FINISHED(53); sieve[m] &= ~(1 << 4); m += prime * 4 + 3; FALLTHROUGH
+      case 54: CHECK_FINISHED(54); sieve[m] &= ~(1 << 5); m += prime * 6 + 5; FALLTHROUGH
+      case 55: CHECK_FINISHED(55); sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
 
       while (m + prime * 28 + 22 < sieve_size)
       {
@@ -541,22 +485,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
     for (;;)
     {
-      case 56: check_finished(56);
-      sieve[m] &= ~(1 << 7); m += prime * 6 + 6;
-      case 57: check_finished(57);
-      sieve[m] &= ~(1 << 6); m += prime * 4 + 4;
-      case 58: check_finished(58);
-      sieve[m] &= ~(1 << 5); m += prime * 2 + 2;
-      case 59: check_finished(59);
-      sieve[m] &= ~(1 << 4); m += prime * 4 + 4;
-      case 60: check_finished(60);
-      sieve[m] &= ~(1 << 3); m += prime * 2 + 2;
-      case 61: check_finished(61);
-      sieve[m] &= ~(1 << 2); m += prime * 4 + 4;
-      case 62: check_finished(62);
-      sieve[m] &= ~(1 << 1); m += prime * 6 + 6;
-      case 63: check_finished(63);
-      sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
+      case 56: CHECK_FINISHED(56); sieve[m] &= ~(1 << 7); m += prime * 6 + 6; FALLTHROUGH
+      case 57: CHECK_FINISHED(57); sieve[m] &= ~(1 << 6); m += prime * 4 + 4; FALLTHROUGH
+      case 58: CHECK_FINISHED(58); sieve[m] &= ~(1 << 5); m += prime * 2 + 2; FALLTHROUGH
+      case 59: CHECK_FINISHED(59); sieve[m] &= ~(1 << 4); m += prime * 4 + 4; FALLTHROUGH
+      case 60: CHECK_FINISHED(60); sieve[m] &= ~(1 << 3); m += prime * 2 + 2; FALLTHROUGH
+      case 61: CHECK_FINISHED(61); sieve[m] &= ~(1 << 2); m += prime * 4 + 4; FALLTHROUGH
+      case 62: CHECK_FINISHED(62); sieve[m] &= ~(1 << 1); m += prime * 6 + 6; FALLTHROUGH
+      case 63: CHECK_FINISHED(63); sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
 
       while (m + prime * 28 + 28 < sieve_size)
       {
@@ -573,7 +509,7 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
     }
   }
 
-  #undef check_finished
+  #undef CHECK_FINISHED
 }
 
 /// Remove the i-th prime and the multiples of the i-th prime
@@ -597,21 +533,21 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t* counters = counters_.data();
   uint8_t* sieve = sieve_.data();
 
-  #define count_and_unset_bit(bit_index) \
-  { \
-    auto is_bit = (sieve[m] >> bit_index) & 1; \
-    counters[m >> counters_dist_log2] -= is_bit; \
-    total_count -= is_bit; \
-    sieve[m] &= ~(1 << bit_index); \
-  }
-
-  #define check_finished(wheel_index) \
+  #define CHECK_FINISHED(wheel_index) \
     if_unlikely(m >= sieve_size) \
     { \
       wheel.index = wheel_index; \
       wheel.multiple = (uint32_t) (m - sieve_size); \
       total_count_ = total_count; \
       return; \
+    }
+
+  #define COUNT_UNSET_BIT(bit_index) \
+    { \
+      auto is_bit = (sieve[m] >> bit_index) & 1; \
+      counters[m >> counters_dist_log2] -= is_bit; \
+      total_count -= is_bit; \
+      sieve[m] &= ~(1 << bit_index); \
     }
 
   // By using switch(n & 63) we let the compiler know that
@@ -623,162 +559,98 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   {
     for (;;)
     {
-      case 0: check_finished(0);
-      count_and_unset_bit(0); m += prime * 6 + 0;
-      case 1: check_finished(1);
-      count_and_unset_bit(1); m += prime * 4 + 0;
-      case 2: check_finished(2);
-      count_and_unset_bit(2); m += prime * 2 + 0;
-      case 3: check_finished(3);
-      count_and_unset_bit(3); m += prime * 4 + 0;
-      case 4: check_finished(4);
-      count_and_unset_bit(4); m += prime * 2 + 0;
-      case 5: check_finished(5);
-      count_and_unset_bit(5); m += prime * 4 + 0;
-      case 6: check_finished(6);
-      count_and_unset_bit(6); m += prime * 6 + 0;
-      case 7: check_finished(7);
-      count_and_unset_bit(7); m += prime * 2 + 1;
+      case 0: CHECK_FINISHED(0); COUNT_UNSET_BIT(0); m += prime * 6 + 0; FALLTHROUGH
+      case 1: CHECK_FINISHED(1); COUNT_UNSET_BIT(1); m += prime * 4 + 0; FALLTHROUGH
+      case 2: CHECK_FINISHED(2); COUNT_UNSET_BIT(2); m += prime * 2 + 0; FALLTHROUGH
+      case 3: CHECK_FINISHED(3); COUNT_UNSET_BIT(3); m += prime * 4 + 0; FALLTHROUGH
+      case 4: CHECK_FINISHED(4); COUNT_UNSET_BIT(4); m += prime * 2 + 0; FALLTHROUGH
+      case 5: CHECK_FINISHED(5); COUNT_UNSET_BIT(5); m += prime * 4 + 0; FALLTHROUGH
+      case 6: CHECK_FINISHED(6); COUNT_UNSET_BIT(6); m += prime * 6 + 0; FALLTHROUGH
+      case 7: CHECK_FINISHED(7); COUNT_UNSET_BIT(7); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case  8: check_finished(8);
-      count_and_unset_bit(1); m += prime * 6 + 1;
-      case  9: check_finished(9);
-      count_and_unset_bit(5); m += prime * 4 + 1;
-      case 10: check_finished(10);
-      count_and_unset_bit(4); m += prime * 2 + 1;
-      case 11: check_finished(11);
-      count_and_unset_bit(0); m += prime * 4 + 0;
-      case 12: check_finished(12);
-      count_and_unset_bit(7); m += prime * 2 + 1;
-      case 13: check_finished(13);
-      count_and_unset_bit(3); m += prime * 4 + 1;
-      case 14: check_finished(14);
-      count_and_unset_bit(2); m += prime * 6 + 1;
-      case 15: check_finished(15);
-      count_and_unset_bit(6); m += prime * 2 + 1;
+      case  8: CHECK_FINISHED( 8); COUNT_UNSET_BIT(1); m += prime * 6 + 1; FALLTHROUGH
+      case  9: CHECK_FINISHED( 9); COUNT_UNSET_BIT(5); m += prime * 4 + 1; FALLTHROUGH
+      case 10: CHECK_FINISHED(10); COUNT_UNSET_BIT(4); m += prime * 2 + 1; FALLTHROUGH
+      case 11: CHECK_FINISHED(11); COUNT_UNSET_BIT(0); m += prime * 4 + 0; FALLTHROUGH
+      case 12: CHECK_FINISHED(12); COUNT_UNSET_BIT(7); m += prime * 2 + 1; FALLTHROUGH
+      case 13: CHECK_FINISHED(13); COUNT_UNSET_BIT(3); m += prime * 4 + 1; FALLTHROUGH
+      case 14: CHECK_FINISHED(14); COUNT_UNSET_BIT(2); m += prime * 6 + 1; FALLTHROUGH
+      case 15: CHECK_FINISHED(15); COUNT_UNSET_BIT(6); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 16: check_finished(16);
-      count_and_unset_bit(2); m += prime * 6 + 2;
-      case 17: check_finished(17);
-      count_and_unset_bit(4); m += prime * 4 + 2;
-      case 18: check_finished(18);
-      count_and_unset_bit(0); m += prime * 2 + 0;
-      case 19: check_finished(19);
-      count_and_unset_bit(6); m += prime * 4 + 2;
-      case 20: check_finished(20);
-      count_and_unset_bit(1); m += prime * 2 + 0;
-      case 21: check_finished(21);
-      count_and_unset_bit(7); m += prime * 4 + 2;
-      case 22: check_finished(22);
-      count_and_unset_bit(3); m += prime * 6 + 2;
-      case 23: check_finished(23);
-      count_and_unset_bit(5); m += prime * 2 + 1;
+      case 16: CHECK_FINISHED(16); COUNT_UNSET_BIT(2); m += prime * 6 + 2; FALLTHROUGH
+      case 17: CHECK_FINISHED(17); COUNT_UNSET_BIT(4); m += prime * 4 + 2; FALLTHROUGH
+      case 18: CHECK_FINISHED(18); COUNT_UNSET_BIT(0); m += prime * 2 + 0; FALLTHROUGH
+      case 19: CHECK_FINISHED(19); COUNT_UNSET_BIT(6); m += prime * 4 + 2; FALLTHROUGH
+      case 20: CHECK_FINISHED(20); COUNT_UNSET_BIT(1); m += prime * 2 + 0; FALLTHROUGH
+      case 21: CHECK_FINISHED(21); COUNT_UNSET_BIT(7); m += prime * 4 + 2; FALLTHROUGH
+      case 22: CHECK_FINISHED(22); COUNT_UNSET_BIT(3); m += prime * 6 + 2; FALLTHROUGH
+      case 23: CHECK_FINISHED(23); COUNT_UNSET_BIT(5); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 24: check_finished(24);
-      count_and_unset_bit(3); m += prime * 6 + 3;
-      case 25: check_finished(25);
-      count_and_unset_bit(0); m += prime * 4 + 1;
-      case 26: check_finished(26);
-      count_and_unset_bit(6); m += prime * 2 + 1;
-      case 27: check_finished(27);
-      count_and_unset_bit(5); m += prime * 4 + 2;
-      case 28: check_finished(28);
-      count_and_unset_bit(2); m += prime * 2 + 1;
-      case 29: check_finished(29);
-      count_and_unset_bit(1); m += prime * 4 + 1;
-      case 30: check_finished(30);
-      count_and_unset_bit(7); m += prime * 6 + 3;
-      case 31: check_finished(31);
-      count_and_unset_bit(4); m += prime * 2 + 1;
+      case 24: CHECK_FINISHED(24); COUNT_UNSET_BIT(3); m += prime * 6 + 3; FALLTHROUGH
+      case 25: CHECK_FINISHED(25); COUNT_UNSET_BIT(0); m += prime * 4 + 1; FALLTHROUGH
+      case 26: CHECK_FINISHED(26); COUNT_UNSET_BIT(6); m += prime * 2 + 1; FALLTHROUGH
+      case 27: CHECK_FINISHED(27); COUNT_UNSET_BIT(5); m += prime * 4 + 2; FALLTHROUGH
+      case 28: CHECK_FINISHED(28); COUNT_UNSET_BIT(2); m += prime * 2 + 1; FALLTHROUGH
+      case 29: CHECK_FINISHED(29); COUNT_UNSET_BIT(1); m += prime * 4 + 1; FALLTHROUGH
+      case 30: CHECK_FINISHED(30); COUNT_UNSET_BIT(7); m += prime * 6 + 3; FALLTHROUGH
+      case 31: CHECK_FINISHED(31); COUNT_UNSET_BIT(4); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 32: check_finished(32);
-      count_and_unset_bit(4); m += prime * 6 + 3;
-      case 33: check_finished(33);
-      count_and_unset_bit(7); m += prime * 4 + 3;
-      case 34: check_finished(34);
-      count_and_unset_bit(1); m += prime * 2 + 1;
-      case 35: check_finished(35);
-      count_and_unset_bit(2); m += prime * 4 + 2;
-      case 36: check_finished(36);
-      count_and_unset_bit(5); m += prime * 2 + 1;
-      case 37: check_finished(37);
-      count_and_unset_bit(6); m += prime * 4 + 3;
-      case 38: check_finished(38);
-      count_and_unset_bit(0); m += prime * 6 + 3;
-      case 39: check_finished(39);
-      count_and_unset_bit(3); m += prime * 2 + 1;
+      case 32: CHECK_FINISHED(32); COUNT_UNSET_BIT(4); m += prime * 6 + 3; FALLTHROUGH
+      case 33: CHECK_FINISHED(33); COUNT_UNSET_BIT(7); m += prime * 4 + 3; FALLTHROUGH
+      case 34: CHECK_FINISHED(34); COUNT_UNSET_BIT(1); m += prime * 2 + 1; FALLTHROUGH
+      case 35: CHECK_FINISHED(35); COUNT_UNSET_BIT(2); m += prime * 4 + 2; FALLTHROUGH
+      case 36: CHECK_FINISHED(36); COUNT_UNSET_BIT(5); m += prime * 2 + 1; FALLTHROUGH
+      case 37: CHECK_FINISHED(37); COUNT_UNSET_BIT(6); m += prime * 4 + 3; FALLTHROUGH
+      case 38: CHECK_FINISHED(38); COUNT_UNSET_BIT(0); m += prime * 6 + 3; FALLTHROUGH
+      case 39: CHECK_FINISHED(39); COUNT_UNSET_BIT(3); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 40: check_finished(40);
-      count_and_unset_bit(5); m += prime * 6 + 4;
-      case 41: check_finished(41);
-      count_and_unset_bit(3); m += prime * 4 + 2;
-      case 42: check_finished(42);
-      count_and_unset_bit(7); m += prime * 2 + 2;
-      case 43: check_finished(43);
-      count_and_unset_bit(1); m += prime * 4 + 2;
-      case 44: check_finished(44);
-      count_and_unset_bit(6); m += prime * 2 + 2;
-      case 45: check_finished(45);
-      count_and_unset_bit(0); m += prime * 4 + 2;
-      case 46: check_finished(46);
-      count_and_unset_bit(4); m += prime * 6 + 4;
-      case 47: check_finished(47);
-      count_and_unset_bit(2); m += prime * 2 + 1;
+      case 40: CHECK_FINISHED(40); COUNT_UNSET_BIT(5); m += prime * 6 + 4; FALLTHROUGH
+      case 41: CHECK_FINISHED(41); COUNT_UNSET_BIT(3); m += prime * 4 + 2; FALLTHROUGH
+      case 42: CHECK_FINISHED(42); COUNT_UNSET_BIT(7); m += prime * 2 + 2; FALLTHROUGH
+      case 43: CHECK_FINISHED(43); COUNT_UNSET_BIT(1); m += prime * 4 + 2; FALLTHROUGH
+      case 44: CHECK_FINISHED(44); COUNT_UNSET_BIT(6); m += prime * 2 + 2; FALLTHROUGH
+      case 45: CHECK_FINISHED(45); COUNT_UNSET_BIT(0); m += prime * 4 + 2; FALLTHROUGH
+      case 46: CHECK_FINISHED(46); COUNT_UNSET_BIT(4); m += prime * 6 + 4; FALLTHROUGH
+      case 47: CHECK_FINISHED(47); COUNT_UNSET_BIT(2); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 48: check_finished(48);
-      count_and_unset_bit(6); m += prime * 6 + 5;
-      case 49: check_finished(49);
-      count_and_unset_bit(2); m += prime * 4 + 3;
-      case 50: check_finished(50);
-      count_and_unset_bit(3); m += prime * 2 + 1;
-      case 51: check_finished(51);
-      count_and_unset_bit(7); m += prime * 4 + 4;
-      case 52: check_finished(52);
-      count_and_unset_bit(0); m += prime * 2 + 1;
-      case 53: check_finished(53);
-      count_and_unset_bit(4); m += prime * 4 + 3;
-      case 54: check_finished(54);
-      count_and_unset_bit(5); m += prime * 6 + 5;
-      case 55: check_finished(55);
-      count_and_unset_bit(1); m += prime * 2 + 1;
+      case 48: CHECK_FINISHED(48); COUNT_UNSET_BIT(6); m += prime * 6 + 5; FALLTHROUGH
+      case 49: CHECK_FINISHED(49); COUNT_UNSET_BIT(2); m += prime * 4 + 3; FALLTHROUGH
+      case 50: CHECK_FINISHED(50); COUNT_UNSET_BIT(3); m += prime * 2 + 1; FALLTHROUGH
+      case 51: CHECK_FINISHED(51); COUNT_UNSET_BIT(7); m += prime * 4 + 4; FALLTHROUGH
+      case 52: CHECK_FINISHED(52); COUNT_UNSET_BIT(0); m += prime * 2 + 1; FALLTHROUGH
+      case 53: CHECK_FINISHED(53); COUNT_UNSET_BIT(4); m += prime * 4 + 3; FALLTHROUGH
+      case 54: CHECK_FINISHED(54); COUNT_UNSET_BIT(5); m += prime * 6 + 5; FALLTHROUGH
+      case 55: CHECK_FINISHED(55); COUNT_UNSET_BIT(1); m += prime * 2 + 1;
     }
 
     for (;;)
     {
-      case 56: check_finished(56);
-      count_and_unset_bit(7); m += prime * 6 + 6;
-      case 57: check_finished(57);
-      count_and_unset_bit(6); m += prime * 4 + 4;
-      case 58: check_finished(58);
-      count_and_unset_bit(5); m += prime * 2 + 2;
-      case 59: check_finished(59);
-      count_and_unset_bit(4); m += prime * 4 + 4;
-      case 60: check_finished(60);
-      count_and_unset_bit(3); m += prime * 2 + 2;
-      case 61: check_finished(61);
-      count_and_unset_bit(2); m += prime * 4 + 4;
-      case 62: check_finished(62);
-      count_and_unset_bit(1); m += prime * 6 + 6;
-      case 63: check_finished(63);
-      count_and_unset_bit(0); m += prime * 2 + 1;
+      case 56: CHECK_FINISHED(56); COUNT_UNSET_BIT(7); m += prime * 6 + 6; FALLTHROUGH
+      case 57: CHECK_FINISHED(57); COUNT_UNSET_BIT(6); m += prime * 4 + 4; FALLTHROUGH
+      case 58: CHECK_FINISHED(58); COUNT_UNSET_BIT(5); m += prime * 2 + 2; FALLTHROUGH
+      case 59: CHECK_FINISHED(59); COUNT_UNSET_BIT(4); m += prime * 4 + 4; FALLTHROUGH
+      case 60: CHECK_FINISHED(60); COUNT_UNSET_BIT(3); m += prime * 2 + 2; FALLTHROUGH
+      case 61: CHECK_FINISHED(61); COUNT_UNSET_BIT(2); m += prime * 4 + 4; FALLTHROUGH
+      case 62: CHECK_FINISHED(62); COUNT_UNSET_BIT(1); m += prime * 6 + 6; FALLTHROUGH
+      case 63: CHECK_FINISHED(63); COUNT_UNSET_BIT(0); m += prime * 2 + 1;
     }
   }
 }

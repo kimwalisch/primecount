@@ -12,7 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
-#include <noinline.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
 #include <algorithm>

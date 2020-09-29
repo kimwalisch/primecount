@@ -11,7 +11,7 @@
 #define STATUS_HPP
 
 #include <int128_t.hpp>
-#include <noinline.hpp>
+#include <macros.hpp>
 
 namespace primecount {
 

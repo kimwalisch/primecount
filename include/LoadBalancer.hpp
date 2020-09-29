@@ -12,9 +12,9 @@
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <OmpLock.hpp>
 #include <Status.hpp>
-#include <noinline.hpp>
 
 #include <stdint.h>
 

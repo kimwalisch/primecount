@@ -165,14 +165,6 @@ if(WITH_MPI)
     endif()
 endif()
 
-# Silence GCC switch fall through warnings ###########################
-
-check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
-
-if(Wno_fallthrough)
-    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-endif()
-
 # Check for OpenMP ###################################################
 
 if(WITH_OPENMP)

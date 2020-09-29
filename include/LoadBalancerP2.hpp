@@ -13,7 +13,7 @@
 #ifndef LOADBALANCERP2_HPP
 #define LOADBALANCERP2_HPP
 
-#include <noinline.hpp>
+#include <macros.hpp>
 #include <stdint.h>
 
 namespace primecount {
