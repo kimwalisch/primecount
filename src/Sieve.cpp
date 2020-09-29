@@ -301,7 +301,12 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       return; \
     }
 
-  switch (wheel.index)
+  // By using switch(n & 63) we let the compiler know that
+  // n is always within [0, 63]. This trick reduces the
+  // number of instructions as the compiler now does not
+  // add a check if (n > 63) which skips to the end of the
+  // switch statement.
+  switch (wheel.index & 63)
   {
     for (;;)
     {
@@ -609,7 +614,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       return; \
     }
 
-  switch (wheel.index)
+  // By using switch(n & 63) we let the compiler know that
+  // n is always within [0, 63]. This trick reduces the
+  // number of instructions as the compiler now does not
+  // add a check if (n > 63) which skips to the end of the
+  // switch statement.
+  switch (wheel.index & 63)
   {
     for (;;)
     {
