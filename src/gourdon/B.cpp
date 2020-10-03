@@ -80,19 +80,18 @@ B_thread(T x,
     int64_t start = (int64_t) max(x / z, y);
     int64_t stop = (int64_t) min(x / low, isqrt(x));
 
-    primesieve::iterator rit(stop + 1, start);
     primesieve::iterator it(low - 1, z);
+    primesieve::iterator rit(stop + 1, start);
     int64_t next = it.next_prime();
     int64_t prime = rit.prev_prime();
 
     // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i]) - pi(low - 1)
-    while (prime > start)
+    for (; prime > start; iters++)
     {
       int64_t xp = (int64_t)(x / prime);
       pix += count_primes(it, next, xp);
-      iters++;
-      sum += pix;
       prime = rit.prev_prime();
+      sum += pix;
     }
 
     // Count the remaining primes
