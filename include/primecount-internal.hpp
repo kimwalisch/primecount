@@ -12,7 +12,6 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
-#include <macros.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -55,7 +54,7 @@ int64_t Ri_inverse(int64_t);
 // optimization only functions should be inlined that are
 // called inside hot loops. This function is only used
 // for initialization and should hence not be inlined.
-NOINLINE int64_t pi_simple(int64_t x, int threads);
+int64_t pi_simple(int64_t x, int threads);
 
 #ifdef HAVE_INT128_T
 

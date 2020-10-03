@@ -22,7 +22,6 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
-#include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>
@@ -34,9 +33,9 @@ namespace primecount {
 class Sieve
 {
 public:
-  NOINLINE Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
-  NOINLINE void cross_off(uint64_t prime, uint64_t i);
-  NOINLINE void cross_off_count(uint64_t prime, uint64_t i);
+  Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
+  void cross_off(uint64_t prime, uint64_t i);
+  void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
   uint64_t count(uint64_t start, uint64_t stop) const;
   uint64_t count(uint64_t stop);

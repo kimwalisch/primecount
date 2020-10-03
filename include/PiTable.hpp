@@ -30,7 +30,7 @@ namespace primecount {
 class PiTable
 {
 public:
-  NOINLINE PiTable(uint64_t limit, int threads);
+  PiTable(uint64_t limit, int threads);
 
   int64_t size() const
   {

@@ -12,7 +12,6 @@
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
-#include <macros.hpp>
 #include <OmpLock.hpp>
 #include <Status.hpp>
 
@@ -37,8 +36,8 @@ struct ThreadSettings
 class LoadBalancer
 {
 public:
-  NOINLINE LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
-  NOINLINE bool get_work(ThreadSettings& thread);
+  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
+  bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
 private:

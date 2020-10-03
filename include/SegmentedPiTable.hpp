@@ -36,10 +36,10 @@ namespace primecount {
 class SegmentedPiTable
 {
 public:
-  NOINLINE SegmentedPiTable(uint64_t limit,
-                            uint64_t segment_size,
-                            int threads);
-  NOINLINE void init();
+  SegmentedPiTable(uint64_t limit,
+                   uint64_t segment_size,
+                   int threads);
+  void init();
   void next();
 
   int64_t low() const

@@ -11,16 +11,15 @@
 #define STATUS_HPP
 
 #include <int128_t.hpp>
-#include <macros.hpp>
 
 namespace primecount {
 
 class Status
 {
 public:
-  NOINLINE Status(maxint_t x);
-  NOINLINE void print(int64_t b, int64_t max_b);
-  NOINLINE void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
+  Status(maxint_t x);
+  void print(int64_t b, int64_t max_b);
+  void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
 private:
   bool isPrint(double time);

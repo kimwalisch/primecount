@@ -11,15 +11,14 @@
 #define STATUSAC_HPP
 
 #include <int128_t.hpp>
-#include <macros.hpp>
 
 namespace primecount {
 
 class StatusAC
 {
 public:
-  NOINLINE StatusAC(maxint_t x);
-  NOINLINE void print(int64_t b, int64_t max_b);
+  StatusAC(maxint_t x);
+  void print(int64_t b, int64_t max_b);
   void next();
 private:
   bool isPrint(double time);
