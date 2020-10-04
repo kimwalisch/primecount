@@ -75,10 +75,8 @@ Flammenkamp's [prime_sieve.c](https://wwwhomes.uni-bielefeld.de/achim/prime_siev
 Tomás Oliveira e Silva's [A1 implementation](http://sweet.ua.pt/tos/software/prime_sieve.html#s)
 and the author's older [ecprime](http://primzahlen.de/referenten/Kim_Walisch/index2.htm)
 all written in the late '90s and '00s. Furthermore primesieve contains
-new optimizations to increase
-[instruction-level parallelism](https://en.wikipedia.org/wiki/Superscalar)
-and more efficiently uses the larger number of registers in today's
-CPUs.
+new optimizations to reduce the branch misprediction rate and it
+efficiently uses the CPU's multi level cache hierarchy.
 
 ### Optimizations used in primesieve
 
@@ -88,14 +86,15 @@ CPUs.
  * Starts crossing off multiples at the square
  * Uses a modulo 210 wheel that skips multiples of 2, 3, 5 and 7
  * Uses specialized algorithms for small, medium and big sieving primes
- * Uses a custom memory pool (for big sieving primes)
- * Processes multiple sieving primes per loop iteration to increase instruction-level parallelism
+ * Uses L1 cache for small sieving primes & L2 cache for medium and big sieving primes
+ * Sorts medium sieving primes to reduce branch misprediction rate
+ * Uses a custom memory pool (for medium & big sieving primes)
  * Multi-threaded using C++11 ```std::async```
 
 ### Highly optimized inner loop
 
 primesieve's inner sieving loop has been optimized using
-[extreme loop unrolling](https://github.com/kimwalisch/primesieve/blob/master/src/EratSmall.cpp#L138),
+[extreme loop unrolling](https://github.com/kimwalisch/primesieve/blob/master/src/EratSmall.cpp#L117),
 on average crossing off a multiple uses just 1.375 instructions on
 x64 CPUs. Below is the assembly GCC generates for primesieve's inner
 sieving loop, each andb instruction unsets a bit (crosses off a

@@ -22,8 +22,6 @@
 #include <primesieve/Bucket.hpp>
 #include <primesieve/macros.hpp>
 #include <primesieve/MemoryPool.hpp>
-#include <primesieve/Wheel.hpp>
-#include <primesieve/primesieve_error.hpp>
 
 #include <stdint.h>
 #include <cassert>
@@ -38,7 +36,7 @@
   if_unlikely(p >= sieveEnd) \
   { \
     multipleIndex = (uint64_t) (p - sieveEnd); \
-    if (memoryPool_.isFullBucket(buckets_[wheelIndex])) \
+    if (Bucket::isFull(buckets_[wheelIndex])) \
       memoryPool_.addBucket(buckets_[wheelIndex]); \
     buckets_[wheelIndex]++->set(sievingPrime, multipleIndex, wheelIndex); \
     break; \
@@ -50,20 +48,17 @@ namespace primesieve {
 /// @sieveSize: Sieve size in bytes
 /// @maxPrime:  Sieving primes <= maxPrime
 ///
-void EratMedium::init(uint64_t stop, uint64_t sieveSize, uint64_t maxPrime)
+void EratMedium::init(uint64_t stop,
+                      uint64_t MAYBE_UNUSED(sieveSize),
+                      uint64_t maxPrime)
 {
-  uint64_t maxSieveSize = 4096 << 10;
-
-  if (sieveSize > maxSieveSize)
-    throw primesieve_error("EratMedium: sieveSize > 4096 KiB");
-  if (maxPrime > sieveSize * 9)
-    throw primesieve_error("EratMedium: maxPrime > sieveSize * 9");
+  assert(maxPrime <= sieveSize * 9);
+  assert(sieveSize * 2 <= SievingPrime::MAX_MULTIPLEINDEX + 1);
 
   enabled_ = true;
+  stop_ = stop;
   maxPrime_ = maxPrime;
   buckets_.fill(nullptr);
-
-  Wheel::init(stop, sieveSize);
 }
 
 /// Add a new sieving prime to EratMedium
@@ -72,7 +67,7 @@ void EratMedium::storeSievingPrime(uint64_t prime, uint64_t multipleIndex, uint6
   assert(prime <= maxPrime_);
   uint64_t sievingPrime = prime / 30;
 
-  if (memoryPool_.isFullBucket(buckets_[wheelIndex]))
+  if (Bucket::isFull(buckets_[wheelIndex]))
     memoryPool_.addBucket(buckets_[wheelIndex]);
 
   buckets_[wheelIndex]++->set(sievingPrime, multipleIndex, wheelIndex);
@@ -95,7 +90,7 @@ void EratMedium::crossOff(uint8_t* sieve, uint64_t sieveSize)
     if (!buckets[i])
       continue;
 
-    Bucket* bucket = memoryPool_.getBucket(buckets[i]);
+    Bucket* bucket = Bucket::get(buckets[i]);
     bucket->setEnd(buckets[i]);
     uint64_t wheel_index = i;
 
@@ -135,15 +130,10 @@ void EratMedium::crossOff_7(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 1;
     uint64_t dist1 = sievingPrime * 4 + 1;
     uint64_t dist2 = sievingPrime * 2 + 0;
-    uint64_t dist3 = sievingPrime * 4 + 1;
     uint64_t dist4 = sievingPrime * 2 + 1;
-    uint64_t dist5 = sievingPrime * 4 + 1;
-    uint64_t dist6 = sievingPrime * 6 + 1;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     // By using switch(n & 7) we let the compiler know that
     // n is always within [0, 7]. This trick reduces the
@@ -157,11 +147,11 @@ void EratMedium::crossOff_7(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(0); *p &= BIT0; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(1); *p &= BIT4; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(2); *p &= BIT3; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(3); *p &= BIT7; p += dist3; FALLTHROUGH
+        case 3: CHECK_FINISHED(3); *p &= BIT7; p += dist1; FALLTHROUGH
         case 4: CHECK_FINISHED(4); *p &= BIT6; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(5); *p &= BIT2; p += dist5; FALLTHROUGH
-        case 6: CHECK_FINISHED(6); *p &= BIT1; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(7); *p &= BIT5; p += dist7;
+        case 5: CHECK_FINISHED(5); *p &= BIT2; p += dist1; FALLTHROUGH
+        case 6: CHECK_FINISHED(6); *p &= BIT1; p += dist0; FALLTHROUGH
+        case 7: CHECK_FINISHED(7); *p &= BIT5; p += dist4;
       }
     }
   }
@@ -179,15 +169,11 @@ void EratMedium::crossOff_11(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 2;
     uint64_t dist1 = sievingPrime * 4 + 1;
     uint64_t dist2 = sievingPrime * 2 + 1;
     uint64_t dist3 = sievingPrime * 4 + 2;
     uint64_t dist4 = sievingPrime * 2 + 0;
-    uint64_t dist5 = sievingPrime * 4 + 2;
-    uint64_t dist6 = sievingPrime * 6 + 2;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     switch (wheelIndex & 7)
     {
@@ -198,9 +184,9 @@ void EratMedium::crossOff_11(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 2: CHECK_FINISHED(10); *p &= BIT7; p += dist2; FALLTHROUGH
         case 3: CHECK_FINISHED(11); *p &= BIT5; p += dist3; FALLTHROUGH
         case 4: CHECK_FINISHED(12); *p &= BIT0; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(13); *p &= BIT6; p += dist5; FALLTHROUGH
-        case 6: CHECK_FINISHED(14); *p &= BIT2; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(15); *p &= BIT4; p += dist7;
+        case 5: CHECK_FINISHED(13); *p &= BIT6; p += dist3; FALLTHROUGH
+        case 6: CHECK_FINISHED(14); *p &= BIT2; p += dist0; FALLTHROUGH
+        case 7: CHECK_FINISHED(15); *p &= BIT4; p += dist2;
       }
     }
   }
@@ -218,15 +204,11 @@ void EratMedium::crossOff_13(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 2;
     uint64_t dist1 = sievingPrime * 4 + 2;
     uint64_t dist2 = sievingPrime * 2 + 1;
-    uint64_t dist3 = sievingPrime * 4 + 2;
-    uint64_t dist4 = sievingPrime * 2 + 1;
     uint64_t dist5 = sievingPrime * 4 + 1;
     uint64_t dist6 = sievingPrime * 6 + 3;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     switch (wheelIndex & 7)
     {
@@ -235,11 +217,11 @@ void EratMedium::crossOff_13(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(16); *p &= BIT2; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(17); *p &= BIT7; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(18); *p &= BIT5; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(19); *p &= BIT4; p += dist3; FALLTHROUGH
-        case 4: CHECK_FINISHED(20); *p &= BIT1; p += dist4; FALLTHROUGH
+        case 3: CHECK_FINISHED(19); *p &= BIT4; p += dist1; FALLTHROUGH
+        case 4: CHECK_FINISHED(20); *p &= BIT1; p += dist2; FALLTHROUGH
         case 5: CHECK_FINISHED(21); *p &= BIT0; p += dist5; FALLTHROUGH
         case 6: CHECK_FINISHED(22); *p &= BIT6; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(23); *p &= BIT3; p += dist7;
+        case 7: CHECK_FINISHED(23); *p &= BIT3; p += dist2;
       }
     }
   }
@@ -257,15 +239,11 @@ void EratMedium::crossOff_17(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 3;
     uint64_t dist1 = sievingPrime * 4 + 3;
     uint64_t dist2 = sievingPrime * 2 + 1;
     uint64_t dist3 = sievingPrime * 4 + 2;
-    uint64_t dist4 = sievingPrime * 2 + 1;
-    uint64_t dist5 = sievingPrime * 4 + 2;
     uint64_t dist6 = sievingPrime * 6 + 4;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     switch (wheelIndex & 7)
     {
@@ -275,10 +253,10 @@ void EratMedium::crossOff_17(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 1: CHECK_FINISHED(25); *p &= BIT6; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(26); *p &= BIT0; p += dist2; FALLTHROUGH
         case 3: CHECK_FINISHED(27); *p &= BIT1; p += dist3; FALLTHROUGH
-        case 4: CHECK_FINISHED(28); *p &= BIT4; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(29); *p &= BIT5; p += dist5; FALLTHROUGH
+        case 4: CHECK_FINISHED(28); *p &= BIT4; p += dist2; FALLTHROUGH
+        case 5: CHECK_FINISHED(29); *p &= BIT5; p += dist3; FALLTHROUGH
         case 6: CHECK_FINISHED(30); *p &= BIT7; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(31); *p &= BIT2; p += dist7;
+        case 7: CHECK_FINISHED(31); *p &= BIT2; p += dist2;
       }
     }
   }
@@ -296,15 +274,11 @@ void EratMedium::crossOff_19(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 4;
     uint64_t dist1 = sievingPrime * 4 + 2;
     uint64_t dist2 = sievingPrime * 2 + 2;
-    uint64_t dist3 = sievingPrime * 4 + 2;
     uint64_t dist4 = sievingPrime * 2 + 1;
     uint64_t dist5 = sievingPrime * 4 + 3;
-    uint64_t dist6 = sievingPrime * 6 + 4;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     switch (wheelIndex & 7)
     {
@@ -313,11 +287,11 @@ void EratMedium::crossOff_19(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(32); *p &= BIT4; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(33); *p &= BIT2; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(34); *p &= BIT6; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(35); *p &= BIT0; p += dist3; FALLTHROUGH
+        case 3: CHECK_FINISHED(35); *p &= BIT0; p += dist1; FALLTHROUGH
         case 4: CHECK_FINISHED(36); *p &= BIT5; p += dist4; FALLTHROUGH
         case 5: CHECK_FINISHED(37); *p &= BIT7; p += dist5; FALLTHROUGH
-        case 6: CHECK_FINISHED(38); *p &= BIT3; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(39); *p &= BIT1; p += dist7;
+        case 6: CHECK_FINISHED(38); *p &= BIT3; p += dist0; FALLTHROUGH
+        case 7: CHECK_FINISHED(39); *p &= BIT1; p += dist4;
       }
     }
   }
@@ -335,15 +309,10 @@ void EratMedium::crossOff_23(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 5;
     uint64_t dist1 = sievingPrime * 4 + 3;
     uint64_t dist2 = sievingPrime * 2 + 1;
-    uint64_t dist3 = sievingPrime * 4 + 3;
     uint64_t dist4 = sievingPrime * 2 + 2;
-    uint64_t dist5 = sievingPrime * 4 + 3;
-    uint64_t dist6 = sievingPrime * 6 + 5;
-    uint64_t dist7 = sievingPrime * 2 + 1;
 
     switch (wheelIndex & 7)
     {
@@ -352,11 +321,11 @@ void EratMedium::crossOff_23(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(40); *p &= BIT5; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(41); *p &= BIT1; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(42); *p &= BIT2; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(43); *p &= BIT6; p += dist3; FALLTHROUGH
+        case 3: CHECK_FINISHED(43); *p &= BIT6; p += dist1; FALLTHROUGH
         case 4: CHECK_FINISHED(44); *p &= BIT7; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(45); *p &= BIT3; p += dist5; FALLTHROUGH
-        case 6: CHECK_FINISHED(46); *p &= BIT4; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(47); *p &= BIT0; p += dist7;
+        case 5: CHECK_FINISHED(45); *p &= BIT3; p += dist1; FALLTHROUGH
+        case 6: CHECK_FINISHED(46); *p &= BIT4; p += dist0; FALLTHROUGH
+        case 7: CHECK_FINISHED(47); *p &= BIT0; p += dist2;
       }
     }
   }
@@ -374,15 +343,10 @@ void EratMedium::crossOff_29(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 6;
     uint64_t dist1 = sievingPrime * 4 + 4;
     uint64_t dist2 = sievingPrime * 2 + 2;
-    uint64_t dist3 = sievingPrime * 4 + 4;
-    uint64_t dist4 = sievingPrime * 2 + 2;
-    uint64_t dist5 = sievingPrime * 4 + 4;
     uint64_t dist6 = sievingPrime * 6 + 5;
-    uint64_t dist7 = sievingPrime * 2 + 2;
 
     switch (wheelIndex & 7)
     {
@@ -391,11 +355,11 @@ void EratMedium::crossOff_29(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(48); *p &= BIT6; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(49); *p &= BIT5; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(50); *p &= BIT4; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(51); *p &= BIT3; p += dist3; FALLTHROUGH
-        case 4: CHECK_FINISHED(52); *p &= BIT2; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(53); *p &= BIT1; p += dist5; FALLTHROUGH
+        case 3: CHECK_FINISHED(51); *p &= BIT3; p += dist1; FALLTHROUGH
+        case 4: CHECK_FINISHED(52); *p &= BIT2; p += dist2; FALLTHROUGH
+        case 5: CHECK_FINISHED(53); *p &= BIT1; p += dist1; FALLTHROUGH
         case 6: CHECK_FINISHED(54); *p &= BIT0; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(55); *p &= BIT7; p += dist7;
+        case 7: CHECK_FINISHED(55); *p &= BIT7; p += dist2;
       }
     }
   }
@@ -413,15 +377,10 @@ void EratMedium::crossOff_31(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
     uint64_t sievingPrime = prime->getSievingPrime();
     uint64_t multipleIndex = prime->getMultipleIndex();
     uint8_t* p = sieve + multipleIndex;
-
     uint64_t dist0 = sievingPrime * 6 + 1;
     uint64_t dist1 = sievingPrime * 4 + 0;
     uint64_t dist2 = sievingPrime * 2 + 0;
-    uint64_t dist3 = sievingPrime * 4 + 0;
-    uint64_t dist4 = sievingPrime * 2 + 0;
-    uint64_t dist5 = sievingPrime * 4 + 0;
     uint64_t dist6 = sievingPrime * 6 + 0;
-    uint64_t dist7 = sievingPrime * 2 + 0;
 
     switch (wheelIndex & 7)
     {
@@ -430,11 +389,11 @@ void EratMedium::crossOff_31(uint8_t* sieve, uint8_t* sieveEnd, Bucket* bucket)
         case 0: CHECK_FINISHED(56); *p &= BIT7; p += dist0; FALLTHROUGH
         case 1: CHECK_FINISHED(57); *p &= BIT0; p += dist1; FALLTHROUGH
         case 2: CHECK_FINISHED(58); *p &= BIT1; p += dist2; FALLTHROUGH
-        case 3: CHECK_FINISHED(59); *p &= BIT2; p += dist3; FALLTHROUGH
-        case 4: CHECK_FINISHED(60); *p &= BIT3; p += dist4; FALLTHROUGH
-        case 5: CHECK_FINISHED(61); *p &= BIT4; p += dist5; FALLTHROUGH
+        case 3: CHECK_FINISHED(59); *p &= BIT2; p += dist1; FALLTHROUGH
+        case 4: CHECK_FINISHED(60); *p &= BIT3; p += dist2; FALLTHROUGH
+        case 5: CHECK_FINISHED(61); *p &= BIT4; p += dist1; FALLTHROUGH
         case 6: CHECK_FINISHED(62); *p &= BIT5; p += dist6; FALLTHROUGH
-        case 7: CHECK_FINISHED(63); *p &= BIT6; p += dist7;
+        case 7: CHECK_FINISHED(63); *p &= BIT6; p += dist2;
       }
     }
   }
