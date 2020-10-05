@@ -1,21 +1,7 @@
 ///
-/// @file   vector_resize.cpp
-/// @brief  The primecount::pod_vector class uses pod_vector
-///         internally. For performance reasons we want
-///         vector::resize() not to free memory when resizing to
-///         a smaller size. The C++ standard seems to indirectly
-///         guarantee this behavior, but it is not 100% clear.
-///         So this tests verifies this behavior.
-///
-///         If this test ever fails update pod_vector::resize()
-///         in primecount.hpp to (and delete this test):
-///
-///         void resize(std::size_t size)
-///         {
-///           if (size > size_)
-///             vect_.resize(size);
-///           size_ = size;
-///         }
+/// @file   pod_vector.cpp
+/// @brief  Plain old data vector, like std::vector but does not 
+///         default initialize memory.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,10 +11,10 @@
 
 #include <pod_vector.hpp>
 
-#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <random>
+#include <numeric>
 
 using namespace std;
 using namespace primecount;
@@ -42,6 +28,13 @@ void check(bool OK)
 
 int main()
 {
+  // The pod_vector class uses std::vector internally. For
+  // performance reasons we want vector::resize() not to
+  // free memory when resizing to a smaller size. The C++
+  // standard seems to indirectly guarantee this behavior,
+  // but it is not 100% clear. So this tests verifies this
+  // behavior.
+
   // Allocate from 1 KiB to 128 MiB
   for (size_t i = 10; i <= 27; i++)
   {
