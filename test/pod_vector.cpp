@@ -50,16 +50,16 @@ int main()
 
   random_device rd;
   mt19937 gen(rd());
-  uniform_int_distribution<size_t> dist(10000, 20000);
+  uniform_int_distribution<int> dist(10000, 20000);
 
-  size_t size = dist(gen);
-  pod_vector<size_t> vect(size);
+  int size = dist(gen);
+  pod_vector<int> vect(size);
   fill_n(&vect[0], size, 123);
   
   // Test if resize does not default initilize
   vect.resize(0);
   vect.resize(size);
-  size_t sum = accumulate(&vect[0], &vect[0] + size, 0);
+  int sum = accumulate(&vect[0], &vect[0] + size, 0);
   cout << "Vect sum after resize: " << sum;
   check(sum == 123 * size);
 
