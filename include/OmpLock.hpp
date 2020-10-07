@@ -16,34 +16,16 @@
   #include <omp.h>
 #else
 
-#include <primecount-internal.hpp>
-
 // If OpenMP is disabled we define the functions used by
 // the OmpLock and LockGuard classes as no-op.
 namespace {
 
 using omp_lock_t = int;
-using primecount::unused_param;
 
-inline void omp_init_lock(omp_lock_t* lock)
-{
-  unused_param(lock);
-}
-
-inline void omp_destroy_lock(omp_lock_t* lock)
-{
-  unused_param(lock);
-}
-
-inline void omp_set_lock(omp_lock_t* lock)
-{
-  unused_param(lock);
-}
-
-inline void omp_unset_lock(omp_lock_t* lock)
-{
-  unused_param(lock);
-}
+inline void omp_init_lock(omp_lock_t*) { }
+inline void omp_destroy_lock(omp_lock_t*) { }
+inline void omp_set_lock(omp_lock_t*) { }
+inline void omp_unset_lock(omp_lock_t*) { }
 
 } // namespace
 
