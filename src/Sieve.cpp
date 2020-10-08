@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <memory>
 #include <vector>
 
 using namespace std;
