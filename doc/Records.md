@@ -63,6 +63,41 @@ where we announced these records.
   </tr>
 </table>
 
+## [A007053](https://oeis.org/A007053) records
+
+<table>
+  <tr align="center">
+    <td><b>x</b></td>
+    <td><b>Number of primes ≤ 2<sup>n</sup></b></td>
+    <td><b>Date</b></td>
+    <td><b>Computed by</b></td>
+  </tr>
+  <tr align="right">
+    <td>2<sup>87</sup></td>
+    <td>2,610,087,356,951,889,016,077,639</td>
+    <td>2020-10-08</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>2<sup>88</sup></td>
+    <td>5,159,830,247,726,102,115,466,054</td>
+    <td>2020-10-08</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>2<sup>89</sup></td>
+    <td>10,201,730,804,263,125,133,012,340</td>
+    <td>2020-10-08</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>2<sup>90</sup></td>
+    <td>20,172,933,541,156,002,700,963,336</td>
+    <td>2020-10-08</td>
+    <td>David Baugh</td>
+  </tr>
+</table>
+
 ## [A040014](https://oeis.org/A040014) records
 
 <table>
