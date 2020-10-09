@@ -236,6 +236,14 @@ if(WITH_POPCNT)
         set(POPCNT_FLAG "-mpopcnt")
     endif()
 else()
+    # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
+    # POPCNT instruction and instead uses a portable integer popcount
+    # algorithm. This deteriorates performance by up to 30%.
+    # Disabling POPCNT on x86/x64 is necessary for old CPUs from
+    # before 2008. On other CPU architectures POPCNT is always used
+    # if it is available as this generally does not cause any issues.
+    # Hence WITH_POPCNT=OFF is ignored on non x86/x64 CPUs.
+
     check_cxx_source_compiles("
         int main() {
             #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
