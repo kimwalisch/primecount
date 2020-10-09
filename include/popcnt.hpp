@@ -92,7 +92,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 } // namespace
 
-#else
+#elif defined(DISABLE_POPCNT)
 
 namespace {
 
