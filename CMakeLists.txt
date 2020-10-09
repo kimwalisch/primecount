@@ -227,28 +227,28 @@ endif()
 # Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
-    set(ENABLE_POPCNT "ENABLE_POPCNT")
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    cmake_pop_check_state()
 
-    if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_FLAGS -Werror)
-        check_cxx_compiler_flag(-msse4.2 msse42)
-        cmake_pop_check_state()
-
-        if(msse42)
-            set(POPCNT_FLAG "-msse4.2")
-        endif()
+    if(mpopcnt)
+        set(POPCNT_FLAG "-mpopcnt")
     endif()
+else()
+    check_cxx_source_compiles("
+        int main() {
+            #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+                return 0;
+            #else
+                Error: not MSVC compiler
+            #endif
+        }" MSVC_x86_or_x64)
 
-    if(NOT POPCNT_FLAG)
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_FLAGS -Werror)
-        check_cxx_compiler_flag(-mpopcnt mpopcnt)
-        cmake_pop_check_state()
-
-        if(mpopcnt)
-            set(POPCNT_FLAG "-mpopcnt")
-        endif()
+    # We only need to disable POPCNT when using
+    # the MSVC compiler on x86 and x64.
+    if(MSVC_x86_or_x64)
+        set(DISABLE_POPCNT "DISABLE_POPCNT")
     endif()
 endif()
 
@@ -289,7 +289,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -314,7 +314,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 

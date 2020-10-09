@@ -22,8 +22,6 @@
   #define HAS_INCLUDE(header) 1
 #endif
 
-#if defined(ENABLE_POPCNT)
-
 #if !defined(__has_builtin)
   #define __has_builtin(x) 0
 #endif
@@ -42,37 +40,39 @@ inline uint64_t popcnt64(uint64_t x)
 } // namespace
 
 #elif defined(_MSC_VER) && \
-      defined(_WIN64) && \
-      HAS_INCLUDE(<nmmintrin.h>)
+      !defined(DISABLE_POPCNT) && \
+      defined(_M_X64) && \
+      HAS_INCLUDE(<intrin.h>)
 
-#include <nmmintrin.h>
+#include <intrin.h>
 
 namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
-  return _mm_popcnt_u64(x);
+  return __popcnt64(x);
 }
 
 } // namespace
 
 #elif defined(_MSC_VER) && \
-      defined(_WIN32) && \
-      HAS_INCLUDE(<nmmintrin.h>)
+      !defined(DISABLE_POPCNT) && \
+      defined(_M_IX86) && \
+      HAS_INCLUDE(<intrin.h>)
 
-#include <nmmintrin.h>
+#include <intrin.h>
 
 namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
-  return _mm_popcnt_u32((uint32_t) x) +
-         _mm_popcnt_u32((uint32_t)(x >> 32));
+  return __popcnt((uint32_t) x) +
+         __popcnt((uint32_t)(x >> 32));
 }
 
 } // namespace
 
-#else
+#elif __cplusplus >= 202002L
 
 #include <bit>
 
@@ -92,12 +92,9 @@ inline uint64_t popcnt64(uint64_t x)
 
 } // namespace
 
-#endif
-#endif
+#else
 
 namespace {
-
-#if !defined(ENABLE_POPCNT)
 
 /// This uses fewer arithmetic operations than any other known
 /// implementation on machines with fast multiplication.
@@ -118,8 +115,8 @@ inline uint64_t popcnt64(uint64_t x)
   return (x * h01) >> 56;
 }
 
-#endif
-
 } // namespace
+
+#endif
 
 #endif // POPCNT_HPP
