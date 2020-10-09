@@ -179,37 +179,37 @@ where we announced these records.
     <td><b>Computed by</b></td>
   </tr>
   <tr align="right">
-    <td>10<sup>47</sup></td>
+    <td>10<sup>47/2</sup></td>
     <td>5,956,317,545,928,249,075,039</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
   <tr align="right">
-    <td>10<sup>48</sup></td>
+    <td>10<sup>48/2</sup></td>
     <td>18,435,599,767,349,200,867,866</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
     <tr align="right">
-    <td>10<sup>49</sup></td>
+    <td>10<sup>49/2</sup></td>
     <td>57,086,403,558,149,290,301,868</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
     <tr align="right">
-    <td>10<sup>50</sup></td>
+    <td>10<sup>50/2</sup></td>
     <td>176,846,309,399,143,769,411,680</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
     <tr align="right">
-    <td>10<sup>51</sup></td>
+    <td>10<sup>51/2</sup></td>
     <td>548,074,549,053,620,897,173,483</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
   </tr>
     <tr align="right">
-    <td>10<sup>52</sup></td>
+    <td>10<sup>52/2</sup></td>
     <td>1,699,246,750,872,437,141,327,603</td>
     <td>2016-06-19</td>
     <td>David Baugh</td>
