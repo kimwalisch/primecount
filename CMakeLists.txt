@@ -253,8 +253,9 @@ else()
             #endif
         }" MSVC_x86_or_x64)
 
-    # We only need to disable POPCNT when using
-    # the MSVC compiler on x86 and x64.
+    # We only need to disable POPCNT for MSVC on x86/x64.
+    # For GCC/Clang __builtin_popcountll() will automatically
+    # be portable if we compile without the -mpopcnt flag.
     if(MSVC_x86_or_x64)
         set(DISABLE_POPCNT "DISABLE_POPCNT")
     endif()
