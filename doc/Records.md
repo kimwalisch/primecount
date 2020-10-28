@@ -34,7 +34,7 @@ outage(s) may occur in such time frames.
   </tr>
 </table>
 
-For verification, all results on this page have been computed twice with
+For verification, all results on this page have been computed twice using
 different alpha tuning parameters (configuration parameters).
 PrimePi(10<sup>28</sup>) was successfully verified on the 27th October 2020.
 You can read our initial PrimePi(10<sup>28</sup>) announcement and the  
