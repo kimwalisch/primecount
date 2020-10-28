@@ -34,11 +34,12 @@ outage(s) may occur in such time frames.
   </tr>
 </table>
 
-Note that the 10<sup>28</sup> result has not yet been verified. We are currently
-recomputing it a second time using slightly different configuration
-parameters. Here is a link to the
-[mersenne forum thread](https://www.mersenneforum.org/showthread.php?t=20473)
-where we announced these records.
+For verification, all results on this page have been computed twice with
+different alpha tuning parameters (configuration parameters).
+PrimePi(10<sup>28</sup>) was successfully verified on the 27th October 2020.
+You can read our initial PrimePi(10<sup>28</sup>) announcement and the  
+successful verification announcement in our
+[mersenne forum thread](https://mersenneforum.org/showthread.php?t=20473&page=3).
 
 ## [A006988](https://oeis.org/A006988) records
 
