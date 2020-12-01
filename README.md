@@ -19,6 +19,35 @@ that is shared amongst all implementations and that scales up to
 hundreds of CPU cores. primecount has already been used to compute
 several prime counting function [world records](doc/Records.md).
 
+## Installation
+
+The primecount command-line program is available in a few package managers.
+For doing development with libprimecount you may need to install
+```libprimecount-dev``` or ```libprimecount-devel```.
+
+<table>
+    <tr>
+        <td><b>Windows:</b></td>
+        <td><code>winget install primecount</code></td>
+    </tr>
+    <tr>
+        <td><b>macOS:</b></td>
+        <td><code>brew tap kimwalisch/primecount && brew install primecount</code></td>
+    </tr>
+    <tr>
+        <td><b>Arch Linux:</b></td>
+        <td><code>sudo pacman -S primecount</code></td>
+    </tr>
+    <tr>
+        <td><b>Fedora:</b></td>
+        <td><code>sudo dnf install primecount</code></td>
+    </tr>
+    <tr>
+        <td><b>openSUSE:</b></td>
+        <td><code>sudo zypper install primecount</code></td>
+    </tr>
+</table>
+
 ## Build instructions
 
 You need to have installed a C++ compiler and CMake. Ideally
@@ -32,18 +61,6 @@ sudo make install
 ```
 
 * [Detailed build instructions](doc/BUILD.md)
-
-## Binaries
-
-Below are the latest precompiled primecount binaries for
-Windows, Linux and macOS. These binaries are statically linked
-and require a CPU which supports the POPCNT instruction (2008 or
-later).
-
-* [primecount-6.1-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v6.1/primecount-6.1-win64.zip), 582 kB
-* [primecount-6.1-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v6.1/primecount-6.1-linux-x64.tar.xz), 848 kB
-* [primecount-6.1-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v6.1/primecount-6.1-macOS-x64.zip), 396 kB
-* Binaries with backup functionality are available [here](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
 
 ## Usage examples
 
@@ -264,11 +281,9 @@ core hours on an AMD Ryzen 3950X CPU!
 
 primecount binaries built using the Clang compiler scale significantly better than
 primecount binaries built using GCC on PCs and servers with a large number of CPU
-cores. Unfortunately the primecount binaries that are offered for download are built
-using an old version of GCC that supports static linking of OpenMP. Hence if you
-build primecount from source I recommend using Clang. Also if you don't care about
-portability I recommend using the ```-march=native``` compiler option to build a
-primecount binary that is optimized for your CPU.
+cores. Hence if you build primecount from source I recommend using Clang. Also if you
+don't care about portability I recommend using the ```-march=native``` compiler
+option to build a primecount binary that is optimized for your CPU.
 
 ```bash
 CXX=clang++ CXXFLAGS="-march=native" cmake .
