@@ -51,8 +51,8 @@ For doing development with libprimecount you may need to install
 ## Build instructions
 
 You need to have installed a C++ compiler and CMake. Ideally
-primecount should be compiled using a C++ compiler that supports both
-OpenMP and 128-bit integers e.g. GCC or Clang.
+primecount should be compiled using GCC or Clang as these compilers
+support both OpenMP and 128-bit integers.
 
 ```sh
 cmake .
