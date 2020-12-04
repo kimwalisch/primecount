@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,7 +14,6 @@
 #include <isqrt.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <cmath>
 #include <limits>
 
@@ -28,7 +27,6 @@ inline int64_t isquare(int64_t x)
 template <typename A, typename B>
 inline A ceil_div(A a, B b)
 {
-  assert(b > 0);
   return (A) ((a + b - 1) / b);
 }
 
@@ -99,17 +97,17 @@ inline T ipow(T x, int n)
 template <int N, typename T>
 inline T iroot(T x)
 {
-  if (N == 0)
-    return 0;
+  T r;
 
-  T r = (T) std::pow((double) x, 1.0 / N);
+  if (N == 3)
+    r = (T) std::cbrt((double) x);
+  else
+    r = (T) std::pow((double) x, 1.0 / N);
 
   // fix root too large
   for (; r > 0; r--)
-  {
     if (ipow(r, N - 1) <= x / r)
       break;
-  }
 
   // fix root too small
   while (ipow(r + 1, N - 1) <= x / (r + 1))

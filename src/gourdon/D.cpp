@@ -22,21 +22,20 @@
 ///
 
 #include <primecount-internal.hpp>
+#include <DFactorTable.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
 #include <LoadBalancer.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
+#include <gourdon.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <print.hpp>
 
-#include "DFactorTable.hpp"
-
 #include <stdint.h>
-#include <vector>
 
 using namespace std;
 using namespace primecount;
@@ -47,17 +46,17 @@ namespace {
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[.
 ///
-template <typename T, typename DFactorTable, typename Primes>
+template <typename T, typename Primes, typename DFactorTable>
 T D_thread(T x,
            int64_t x_star,
            int64_t xz,
            int64_t y,
            int64_t z,
            int64_t k,
-           ThreadSettings& thread,
-           const DFactorTable& factor,
+           const Primes& primes,
            const PiTable& pi,
-           const Primes& primes)
+           const DFactorTable& factor,
+           ThreadSettings& thread)
 {
   T sum = 0;
 
@@ -181,7 +180,7 @@ T D_thread(T x,
 /// (this is done in D_thread(x, y)) every time the thread starts
 /// a new computation.
 ///
-template <typename T, typename DFactorTable, typename Primes>
+template <typename T, typename Primes, typename DFactorTable>
 T D_OpenMP(T x,
            int64_t y,
            int64_t z,
@@ -196,8 +195,9 @@ T D_OpenMP(T x,
   LoadBalancer loadBalancer(x, y, z, k, xz, d_approx);
   int resume_threads = loadBalancer.get_resume_threads();
   int64_t x_star = get_x_star_gourdon(x, y);
-  threads = ideal_num_threads(threads, xz);
-  PiTable pi(y);
+  int64_t thread_threshold = 1 << 20;
+  threads = ideal_num_threads(threads, xz, thread_threshold);
+  PiTable pi(y, threads);
 
   #pragma omp parallel for num_threads(threads)
   for (int i = 0; i < threads; i++)
@@ -215,7 +215,7 @@ T D_OpenMP(T x,
         using UT = typename make_unsigned<T>::type;
 
         thread.start_time();
-        UT sum = D_thread((UT) x, x_star, xz, y, z, k, thread, factor, pi, primes);
+        UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);
         thread.sum = (T) sum;
         thread.stop_time();
 
@@ -234,7 +234,7 @@ T D_OpenMP(T x,
       using UT = typename make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = D_thread((UT) x, x_star, xz, y, z, k, thread, factor, pi, primes);
+      UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }
@@ -258,6 +258,11 @@ int64_t D(int64_t x,
           int64_t d_approx,
           int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return D_mpi(x, y, z, k, d_approx, threads);
+#endif
+
   print("");
   print("=== D(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
@@ -287,6 +292,11 @@ int128_t D(int128_t x,
            int128_t d_approx,
            int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return D_mpi(x, y, z, k, d_approx, threads);
+#endif
+
   print("");
   print("=== D(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 6)
-set(PRIMECOUNT_VERSION_MINOR 1)
+set(PRIMECOUNT_VERSION_MINOR 2)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 
 # Build options ######################################################
@@ -17,6 +17,8 @@ option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
+option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
+option(WITH_MPI            "Enable MPI support"                    OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -51,15 +53,15 @@ set(BIN_SRC src/app/cmdoptions.cpp
 set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/backup.cpp
             src/api.cpp
-            src/common.cpp
+            src/util.cpp
             src/FactorTable.cpp
             src/RiemannR.cpp
             src/P2.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
-            src/SegmentedPiTable.cpp
             src/Sieve.cpp
             src/LoadBalancer.cpp
+            src/LoadBalancerP2.cpp
             src/Status.cpp
             src/generate.cpp
             src/nth_prime.cpp
@@ -72,7 +74,9 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
-            src/gourdon/Sigma.cpp)
+            src/gourdon/SegmentedPiTable.cpp
+            src/gourdon/Sigma.cpp
+            src/gourdon/StatusAC.cpp)
 
 # Required includes ##################################################
 
@@ -121,12 +125,30 @@ if(WITH_FLOAT128)
     set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
 endif()
 
-# Silence GCC switch fall through warnings ###########################
+# Check for MPI (Message Passing Interface) ##########################
 
-check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
+if(WITH_MPI)
+    find_package(MPI REQUIRED)
 
-if(Wno_fallthrough)
-    set_source_files_properties(src/Sieve.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
+    if(TARGET MPI::MPI_CXX)
+        set(LIB_MPI "MPI::MPI_CXX")
+    else()
+        include_directories("${MPI_INCLUDE_PATH}")
+    endif()
+
+    set(ENABLE_MPI "ENABLE_MPI")
+    set(LIB_SRC ${LIB_SRC}
+                src/mpi/B_mpi.cpp
+                src/mpi/D_mpi.cpp
+                src/mpi/Phi0_mpi.cpp
+                src/mpi/MpiLoadBalancer.cpp
+                src/mpi/MpiMsg.cpp)
+
+    if(libdivide_branchfree)
+        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi_libdivide.cpp)
+    else()
+        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi.cpp)
+    endif()
 endif()
 
 # Check for OpenMP ###################################################
@@ -191,28 +213,37 @@ endif()
 # Find POPCNT compiler flag ##########################################
 
 if(WITH_POPCNT)
-    set(ENABLE_POPCNT "ENABLE_POPCNT")
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_FLAGS -Werror)
+    check_cxx_compiler_flag(-mpopcnt mpopcnt)
+    cmake_pop_check_state()
 
-    if("${CMAKE_CXX_COMPILER}" MATCHES "icpc")
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_FLAGS -Werror)
-        check_cxx_compiler_flag(-msse4.2 msse42)
-        cmake_pop_check_state()
-
-        if(msse42)
-            set(POPCNT_FLAG "-msse4.2")
-        endif()
+    if(mpopcnt)
+        set(POPCNT_FLAG "-mpopcnt")
     endif()
+else()
+    # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
+    # POPCNT instruction and instead uses a portable integer popcount
+    # algorithm. This deteriorates performance by up to 30%.
+    # Disabling POPCNT on x86/x64 is necessary for old CPUs from
+    # before 2008. On other CPU architectures POPCNT is always used
+    # if it is available as this generally does not cause any issues.
+    # Hence WITH_POPCNT=OFF is ignored on non x86/x64 CPUs.
 
-    if(NOT POPCNT_FLAG)
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_FLAGS -Werror)
-        check_cxx_compiler_flag(-mpopcnt mpopcnt)
-        cmake_pop_check_state()
+    check_cxx_source_compiles("
+        int main() {
+            #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+                return 0;
+            #else
+                Error: not MSVC compiler
+            #endif
+        }" MSVC_x86_or_x64)
 
-        if(mpopcnt)
-            set(POPCNT_FLAG "-mpopcnt")
-        endif()
+    # We only need to disable POPCNT for MSVC on x86/x64.
+    # For GCC/Clang __builtin_popcountll() will automatically
+    # be portable if we compile without the -mpopcnt flag.
+    if(MSVC_x86_or_x64)
+        set(DISABLE_POPCNT "DISABLE_POPCNT")
     endif()
 endif()
 
@@ -248,7 +279,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -273,7 +304,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${ENABLE_POPCNT}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -305,6 +336,27 @@ if(BUILD_PRIMECOUNT)
     target_link_libraries(primecount PRIVATE libprimecount primesieve::primesieve)
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
+# Use jemalloc allocator (better scaling) ############################
+
+if(WITH_JEMALLOC)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(JEMALLOC jemalloc)
+    pkg_search_module(JEMALLOC REQUIRED jemalloc)
+
+    if(BUILD_PRIMECOUNT)
+        target_link_libraries(primecount PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(primecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
+    if(BUILD_SHARED_LIBS)
+        target_link_libraries(libprimecount PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(libprimecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
+    if(BUILD_STATIC_LIBS)
+        target_link_libraries(libprimecount-static PRIVATE ${JEMALLOC_LIBRARIES})
+        target_include_directories(libprimecount-static PRIVATE ${JEMALLOC_INCLUDE_DIRS})
+    endif()
 endif()
 
 # Install header #####################################################

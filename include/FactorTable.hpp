@@ -35,7 +35,7 @@
 ///        * Old: if (mu[n] != 0 && prime < lpf[n])
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -46,56 +46,23 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <BaseFactorTable.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <pod_vector.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <limits>
 #include <stdint.h>
-#include <vector>
 
-namespace primecount {
+namespace {
 
-/// AbstractFactorTable contains static lookup tables
-/// and is used to convert:
-/// 1) A number into a FactorTable index
-/// 2) A FactorTable index into a number
-///
-class AbstractFactorTable
-{
-public:
-  static int64_t to_index(uint64_t number)
-  {
-    assert(number > 0);
-    uint64_t q = number / 2310;
-    uint64_t r = number % 2310;
-    return 480 * q + coprime_indexes_[r];
-  }
-
-  static int64_t to_number(uint64_t index)
-  {
-    uint64_t q = index / 480;
-    uint64_t r = index % 480;
-    return 2310 * q + coprime_[r];
-  }
-
-  /// Returns the 1st number > 1 that is not divisible
-  /// by 2, 3, 5, 7 and 11. Hence 13 is returned.
-  ///
-  static int64_t get_first_coprime()
-  {
-    return to_number(1);
-  }
-
-private:
-  static const uint16_t coprime_[480];
-  static const int16_t coprime_indexes_[2310];
-};
+using namespace primecount;
 
 template <typename T>
-class FactorTable : public AbstractFactorTable
+class FactorTable : public BaseFactorTable
 {
 public:
   /// Factor numbers <= y
@@ -106,61 +73,73 @@ public:
 
     y = std::max<int64_t>(1, y);
     T T_MAX = std::numeric_limits<T>::max();
-    factor_.resize(to_index(y) + 1, T_MAX);
+    factor_.resize(to_index(y) + 1);
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
     // number of prime factors. We use the least
     // significant bit to indicate whether the number
     // has an even or odd number of prime factors.
-    factor_[0] ^= 1;
+    factor_[0] = T_MAX ^ 1;
 
     int64_t sqrty = isqrt(y);
-    int64_t thread_threshold = ipow(10, 7);
+    int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(threads, y, thread_threshold);
     int64_t thread_distance = ceil_div(y, threads);
+    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
     {
-      int64_t low = 1;
-      low += thread_distance * t;
-      int64_t high = std::min(low + thread_distance, y);
-      int64_t start = get_first_coprime() - 1;
-      primesieve::iterator it(start);
+      // Thread processes interval [low, high]
+      int64_t low = thread_distance * t;
+      int64_t high = low + thread_distance;
+      low = std::max(first_coprime(), low + 1);
+      high = std::min(high, y);
 
-      while (true)
+      if (low <= high)
       {
-        int64_t i = 1;
-        int64_t prime = it.next_prime();
-        int64_t multiple = next_multiple(prime, low, &i);
-        int64_t min_m = prime * get_first_coprime();
+        // Default initialize memory to all bits set
+        int64_t low_idx = to_index(low);
+        int64_t size = (to_index(high) + 1) - low_idx;
+        std::fill_n(&factor_[low_idx], size, T_MAX);
 
-        if (min_m > high)
-          break;
+        int64_t start = first_coprime() - 1;
+        primesieve::iterator it(start);
 
-        for (; multiple <= high; multiple = prime * to_number(i++))
+        while (true)
         {
-          int64_t mi = to_index(multiple);
-          // prime is smallest factor of multiple
-          if (factor_[mi] == T_MAX)
-            factor_[mi] = (T) prime;
-          // the least significant bit indicates
-          // whether multiple has an even (0) or odd (1)
-          // number of prime factors
-          else if (factor_[mi] != 0)
-            factor_[mi] ^= 1;
-        }
+          int64_t i = 1;
+          int64_t prime = it.next_prime();
+          int64_t multiple = next_multiple(prime, low, &i);
+          int64_t min_m = prime * first_coprime();
 
-        if (prime <= sqrty)
-        {
-          int64_t j = 0;
-          int64_t square = prime * prime;
-          multiple = next_multiple(square, low, &j);
+          if (min_m > high)
+            break;
 
-          // moebius(n) = 0
-          for (; multiple <= high; multiple = square * to_number(j++))
-            factor_[to_index(multiple)] = 0;
+          for (; multiple <= high; multiple = prime * to_number(i++))
+          {
+            int64_t mi = to_index(multiple);
+            // prime is smallest factor of multiple
+            if (factor_[mi] == T_MAX)
+              factor_[mi] = (T) prime;
+            // the least significant bit indicates
+            // whether multiple has an even (0) or odd (1)
+            // number of prime factors
+            else if (factor_[mi] != 0)
+              factor_[mi] ^= 1;
+          }
+
+          if (prime <= sqrty)
+          {
+            int64_t j = 0;
+            int64_t square = prime * prime;
+            multiple = next_multiple(square, low, &j);
+
+            // moebius(n) = 0
+            for (; multiple <= high; multiple = square * to_number(j++))
+              factor_[to_index(multiple)] = 0;
+          }
         }
       }
     }
@@ -206,26 +185,7 @@ public:
   }
 
 private:
-
-  /// Find the first multiple (of prime) > low which
-  /// is not divisible by any prime <= 11.
-  ///
-  static int64_t next_multiple(int64_t prime,
-                               int64_t low,
-                               int64_t* index)
-  {
-    int64_t quotient = ceil_div(low, prime);
-    int64_t i = std::max(*index, to_index(quotient));
-    int64_t multiple = 0;
-
-    for (; multiple <= low; i++)
-      multiple = prime * to_number(i);
-
-    *index = i;
-    return multiple;
-  }
-
-  std::vector<T> factor_;
+  pod_vector<T> factor_;
 };
 
 } // namespace

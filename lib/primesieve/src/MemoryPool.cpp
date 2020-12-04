@@ -10,7 +10,7 @@
 ///        doing any memory allocation as long as the MemoryPool's
 ///        stock is not empty.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,11 +22,9 @@
 #include <primesieve/primesieve_error.hpp>
 
 #include <algorithm>
-#include <memory>
 #include <vector>
 
 using std::size_t;
-using std::unique_ptr;
 
 namespace primesieve {
 
@@ -45,7 +43,7 @@ void MemoryPool::addBucket(SievingPrime*& sievingPrime)
   // that was previously at the front of the list.
   if (sievingPrime)
   {
-    Bucket* old = getBucket(sievingPrime);
+    Bucket* old = Bucket::get(sievingPrime);
     old->setEnd(sievingPrime);
     bucket->setNext(old);
   }
@@ -68,7 +66,7 @@ void MemoryPool::allocateBuckets()
   // Allocate a large chunk of memory
   size_t bytes = count_ * sizeof(Bucket);
   char* memory = new char[bytes];
-  memory_.emplace_back(unique_ptr<char[]>(memory));
+  memory_.emplace_back(memory);
   void* ptr = memory;
 
   // Align pointer address to sizeof(Bucket)

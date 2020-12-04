@@ -160,6 +160,11 @@ namespace primecount {
 
 int64_t Sigma(int64_t x, int64_t y, int threads)
 {
+#ifdef ENABLE_MPI
+  if (!is_mpi_main_proc())
+    return 0;
+#endif
+
   print("");
   print("=== Sigma(x, y) ===");
   print_gourdon_vars(x, y, threads);
@@ -174,7 +179,7 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
     int64_t max_pix_sigma5 = y;
     int64_t max_pix_sigma6 = isqrt(x / x_star);
     int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-    PiTable pi(max_pix);
+    PiTable pi(max_pix, threads);
 
     int64_t a = pi[y];
     int64_t b = pi[iroot<3>(x)];
@@ -200,6 +205,11 @@ int64_t Sigma(int64_t x, int64_t y, int threads)
 
 int128_t Sigma(int128_t x, int64_t y, int threads)
 {
+#ifdef ENABLE_MPI
+  if (!is_mpi_main_proc())
+    return 0;
+#endif
+
   print("");
   print("=== Sigma(x, y) ===");
   print_gourdon_vars(x, y, threads);
@@ -214,7 +224,7 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
     int64_t max_pix_sigma5 = y;
     int64_t max_pix_sigma6 = isqrt(x / x_star);
     int64_t max_pix = max3(max_pix_sigma4, max_pix_sigma5, max_pix_sigma6);
-    PiTable pi(max_pix);
+    PiTable pi(max_pix, threads);
 
     int128_t a = pi[y];
     int128_t b = pi[iroot<3>(x)];

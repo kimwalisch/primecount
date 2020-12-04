@@ -11,7 +11,6 @@
 #define STATUS_HPP
 
 #include <int128_t.hpp>
-#include <noinline.hpp>
 
 namespace primecount {
 
@@ -19,8 +18,8 @@ class Status
 {
 public:
   Status(maxint_t x);
-  NOINLINE void print(int64_t n, int64_t limit);
-  NOINLINE void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
+  void print(int64_t b, int64_t max_b);
+  void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   void setPercent(double percent) { percent_ = percent; }
 private:
@@ -29,7 +28,9 @@ private:
   double epsilon_;
   double percent_ = -1;
   double time_ = 0;
-  double is_print_ = 1.0 / 20;
+  // Only print status if 0.1 seconds have elapsed
+  // since last printing the status.
+  double is_print_ = 0.1;
   int precision_;
 };
 

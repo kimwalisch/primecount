@@ -1,7 +1,7 @@
 ///
 /// @file  aligned_vector.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -10,8 +10,8 @@
 #ifndef ALIGNED_VECTOR_HPP
 #define ALIGNED_VECTOR_HPP
 
+#include <pod_vector.hpp>
 #include <cstddef>
-#include <vector>
 
 /// Maximum cache line size of current CPUs.
 /// Note that in 2019 all x86 CPU have a cache line size of 64 bytes.
@@ -26,10 +26,10 @@
 
 namespace primecount {
 
-/// The aligned_vector class aligns each of its
-/// elements on a new cache line in order to avoid
-/// false sharing (cache trashing) when multiple
-/// threads write to adjacent elements
+/// The aligned_vector class aligns each of its elements on a
+/// new cache line in order to avoid false sharing (cache
+/// trashing) when multiple threads write to adjacent elements.
+/// @warning: Does not default initialize memory.
 ///
 template <typename T>
 class aligned_vector
@@ -38,14 +38,16 @@ class aligned_vector
                 "sizeof(T) must be < CACHE_LINE_SIZE");
 
 public:
-  aligned_vector(std::size_t size)
-    : vect_(size) { }
+  aligned_vector() = default;
+  aligned_vector(std::size_t size) : vect_(size) { }
+  void resize(std::size_t size) { vect_.resize(size); }
   std::size_t size() const { return vect_.size(); }
   T& operator[](std::size_t pos) { return vect_[pos].val; }
+
   char unused()
   {
-    vect_.back().pad[0] = 123;
-    return vect_.back().pad[0];
+    vect_[0].pad[0] = 123;
+    return vect_[0].pad[0];
   }
 
 private:
@@ -59,7 +61,7 @@ private:
     char pad[CACHE_LINE_SIZE - sizeof(T)];
   };
 
-  std::vector<CacheLine> vect_;
+  pod_vector<CacheLine> vect_;
 };
 
 } // namespace

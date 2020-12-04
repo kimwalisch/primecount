@@ -1,11 +1,42 @@
-2020-08-15 Kim Walisch  <kim.walisch@gmail.com>
+2020-10-04 Kim Walisch  <kim.walisch@gmail.com>
 
+  Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
+  Sieve.cpp: Annotate switch cases with fallthrough.
+  AC.cpp: Reduce number of function paramaters.
+  AC_libdivide.cpp: Reduce number of function paramaters.
+  B.cpp: Improve GCC performance.
+  P2.cpp: Improve GCC performance.
+
+2020-09-12 Kim Walisch  <kim.walisch@gmail.com>
+
+  Version 6.1 released.
+
+  The main focus of this release has been on polishing the code
+  and improving the documentation. I also tried many things to
+  improve the scaling on servers with a large number of CPU cores,
+  however I only achieved minor speed ups. The only meaningful
+  improvement is that the same threads are now reused throughout
+  the entire AC computation. This improves the scaling for small
+  to medium sized computations up to 10^20. GCC benefits most
+  from this change whereas Clang performance is mostly unchanged.
+
+  * Xavier Gourdon's algorithm has been distributed using MPI
+    so that computations can now run on HPC clusters.
+  * CMakeLists.txt: New WITH_JEMALLOC option (default OFF).
+  * AC.cpp: Reuse the same threads throughout the computation.
   * AC.cpp: Improve upper bound of C2 formula.
   * AC.cpp: Avoid branch inside hot loop of A formula.
-  * Status.cpp: Avoid thread synchronization when printing in
-    order to improve scaling of AC and S2_easy.
+  * SegmentedPiTable.cpp: Reuse threads from AC.cpp.
+  * LoadBalancerP2.cpp: New load balancer for P2 & B.
+  * phi.cpp: Reduce caching for tiny numbers.
+  * generate_phi.hpp: Reduce caching for tiny numbers.
+  * pod_vector.hpp: Like std::vector, but without default
+    initialization (useful when allocating 100s of GiB).
+  * PiTable.cpp: Multi-threaded initialization.
+  * Status.cpp: Avoid thread synchronization when printing
+    in order to improve scaling of AC and S2_easy.
   * Status.cpp: Improve S2_hard & D status accuracy.
-  * LoadBalancer.cpp: Slightly increase thread workloads.
+  * StatusAC.cpp: More accurate status for AC formula.
   * cmdoptions.cpp: Add -B & -D options.
   * Fixed #32: primecount-backup prints incorrect time elapsed.
 

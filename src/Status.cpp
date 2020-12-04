@@ -2,9 +2,7 @@
 /// @file  Status.cpp
 /// @brief The Status class is used to print the status (in percent)
 ///        of the formulas related to special leaves. It is used by
-///        the S2_easy and S2_hard formulas of the Deleglise-Rivat
-///        algorithm. And it is also used by the A, C and D formulas
-///        of Xavier Gourdon's algorithm.
+///        the D, S2_easy and S2_hard formulas.
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -16,13 +14,11 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <print.hpp>
 
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
-#include <sstream>
-#include <string>
 
 #if defined(_OPENMP)
   #include <omp.h>
@@ -35,22 +31,26 @@ namespace {
 
 /// Since the distribution of the special leaves is highly skewed
 /// we cannot simply calculate the percentage of the current
-/// computation using the well known linear formula. The
-/// implementation below is a hack which skews the percent result
-/// in order to get a more accurate estimation of the current
-/// computation status.
+/// computation using the standard linear formula. Hence we use
+/// a polynomial formula that grows faster when the value is
+/// small and slower towards the end (100%).
+/// @see scripts/status_curve_fitting.cpp
 ///
 template <typename T>
 double skewed_percent(T x, T y)
 {
-  double exp = 0.96;
-  double percent = get_percent(x, y);
-  double base = exp + percent / (101 / (1 - exp));
-  double low = pow(base, 100.0);
-  double dividend = pow(base, percent) - low;
-  percent = 100 - (100 * dividend / (1 - low));
-  percent = in_between(0, percent, 100);
+  double p1 = get_percent(x, y);
+  double p2 = p1 * p1;
+  double p3 = p1 * p2;
+  double p4 = p2 * p2;
 
+  double c1 = 3.70559815037356886459;
+  double c2 = 0.07330455122609925077;
+  double c3 = 0.00067895345810494585;
+  double c4 = 0.00000216467760881310;
+
+  double percent = -c4*p4 + c3*p3 - c2*p2 + c1*p1;
+  percent = in_between(0, percent, 100);
   return percent;
 }
 
@@ -65,24 +65,6 @@ Status::Status(maxint_t x)
   epsilon_ = 1.0 / q;
 }
 
-double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
-{
-  double p1 = skewed_percent(low, limit);
-  double p2 = skewed_percent(sum, sum_approx);
-
-  // When p1 is larger then p2 it is
-  // always much more accurate.
-  if (p1 > p2)
-    return p1;
-
-  // p2 is a very rough estimation, hence
-  // we want to decrease its contribution
-  // to the final percent value.
-  double percent = (p1 * 6 + p2 * 4) / 10;
-
-  return percent;
-}
-
 bool Status::isPrint(double time)
 {
   double old = time_;
@@ -90,35 +72,45 @@ bool Status::isPrint(double time)
         (time - old) >= is_print_;
 }
 
-void Status::print(int64_t n, int64_t limit)
+void Status::print(double percent)
 {
-#if defined(_OPENMP)
-  // In order to prevent data races only one thread at a time
-  // can enter this code section. In order to make sure that
-  // our code scales well up to a very large number of CPU
-  // cores, we don't want to use any thread synchronization!
-  // In order to achieve this only one of the threads (the
-  // master thread) is allowed to print the status, while all
-  // other threads do nothing.
-  if (omp_get_thread_num() != 0)
-    return;
-#endif
+  double old = percent_;
 
-  double time = get_time();
-
-  // In order to prevent printing the status from deteriorating
-  // performance, the master thread is only allowed to print
-  // the status if 0.05 seconds (or more) have elapsed since
-  // the last time the status has been printed.
-  if (isPrint(time))
+  if ((percent - old) >= epsilon_)
   {
-    time_ = time;
-    double percent = skewed_percent(n, limit);
-    print(percent);
+    percent_ = percent;
+    cout << "\rStatus: " << fixed << setprecision(precision_)
+         << percent << "%" << flush;
   }
 }
 
-/// This method is used by: S2_hard() and D().
+/// This method is used by S2_hard() and D().
+/// This method does not use a lock to synchronize threads
+/// as it is only used inside of a critical section inside
+/// LoadBalancer.cpp and hence it can never be accessed
+/// simultaneously from multiple threads.
+///
+double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+{
+  double p1 = skewed_percent(sum, sum_approx);
+  double p2 = skewed_percent(low, limit);
+
+  // When p2 is larger then p1 it is
+  // always much more accurate.
+  if (p2 > p1)
+    return p2;
+
+  // Below 20% p1 is better
+  // Above 70% p2 is better
+  double c1 = 150 / max(p1, 1.0);
+  c1 = in_between(10, c1, 4);
+  double c2 = 10 - c1;
+  double percent = (c1*p1 + c2*p2) / 10;
+
+  return percent;
+}
+
+/// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
 /// LoadBalancer.cpp and hence it can never be accessed
@@ -136,16 +128,32 @@ void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx
   }
 }
 
-void Status::print(double percent)
+/// Used by S2_easy
+void Status::print(int64_t b, int64_t max_b)
 {
-  double old = percent_;
+  // check --status option used
+  if (!is_print())
+    return;
 
-  if ((percent - old) >= epsilon_)
+#if defined(_OPENMP)
+  // In order to prevent data races only one thread at a time
+  // can enter this code section. In order to make sure that
+  // our code scales well up to a very large number of CPU
+  // cores, we don't want to use any thread synchronization!
+  // In order to achieve this only one of the threads (the
+  // main thread) is allowed to print the status, while all
+  // other threads do nothing.
+  if (omp_get_thread_num() != 0)
+    return;
+#endif
+
+  double time = get_time();
+
+  if (isPrint(time))
   {
-    percent_ = percent;
-    ostringstream status;
-    status << "\rStatus: " << fixed << setprecision(precision_) << percent << "%";
-    cout << status.str() << flush;
+    time_ = time;
+    double percent = skewed_percent(b, max_b);
+    print(percent);
   }
 }
 

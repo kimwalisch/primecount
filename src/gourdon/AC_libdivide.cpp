@@ -32,12 +32,13 @@
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
+#include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <Status.hpp>
+#include <StatusAC.hpp>
 #include <json.hpp>
 #include <backup.hpp>
 
@@ -256,29 +257,28 @@ bool resume(nlohmann::json& json,
   return false;
 }
 
-/// Compute the A formula.
+/// Compute the A formula using libdivide.
+/// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename LibdividePrimes>
-T A(T xlow,
-    T xhigh,
-    uint64_t xp,
-    uint64_t y,
-    uint64_t b,
-    uint64_t prime,
-    const PiTable& pi,
-    const LibdividePrimes& primes,
-    const SegmentedPiTable& segmentedPi)
+T A_64(T xlow,
+       T xhigh,
+       uint64_t xp,
+       uint64_t y,
+       uint64_t prime,
+       const LibdividePrimes& primes,
+       const PiTable& pi,
+       const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
-  uint64_t i = pi[min_2nd_prime];
-  i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
@@ -299,30 +299,28 @@ T A(T xlow,
   return sum;
 }
 
-/// 128-bit function.
 /// Compute the A formula.
+/// 128-bit function: xp >= 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
-T A(T xlow,
-    T xhigh,
-    T xp,
-    uint64_t y,
-    uint64_t b,
-    const PiTable& pi,
-    const Primes& primes,
-    const SegmentedPiTable& segmentedPi)
+T A_128(T xlow,
+        T xhigh,
+        T xp,
+        uint64_t y,
+        uint64_t prime,
+        const Primes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
-  uint64_t prime = primes[b];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
-  uint64_t i = pi[min_2nd_prime];
-  i = max(i, b) + 1;
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
+  uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
@@ -363,8 +361,8 @@ T C1(T xp,
      uint64_t m,
      uint64_t min_m,
      uint64_t max_m,
-     const PiTable& pi,
-     const Primes& primes)
+     const Primes& primes,
+     const PiTable& pi)
 {
   T sum = 0;
 
@@ -386,7 +384,7 @@ T C1(T xp,
         sum -= pi[xpm] - b + 2;
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, pi, primes);
+    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -398,8 +396,8 @@ T C1(T x,
      uint64_t z,
      uint64_t b,
      uint64_t pi_y,
-     const PiTable& pi,
-     const Primes& primes)
+     const Primes& primes,
+     const PiTable& pi)
 {
   uint64_t prime = primes[b];
   T xp = x / prime;
@@ -407,24 +405,25 @@ T C1(T x,
   T min_m128 = max(xp / (prime * prime), z / prime);
   uint64_t min_m = min(min_m128, max_m);
 
-  return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, pi, primes);
+  return C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
 }
 
 /// Compute the 2nd part of the C formula.
+/// 64-bit function: xp < 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T, 
           typename LibdividePrimes>
-T C2(T xlow,
-     T xhigh,
-     uint64_t xp,
-     uint64_t y,
-     uint64_t b,
-     uint64_t prime,
-     const PiTable& pi,
-     const LibdividePrimes& primes,
-     const SegmentedPiTable& segmentedPi)
+T C2_64(T xlow,
+        T xhigh,
+        uint64_t xp,
+        uint64_t y,
+        uint64_t b,
+        uint64_t prime,
+        const LibdividePrimes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -464,21 +463,21 @@ T C2(T xlow,
   return sum;
 }
 
-/// 128-bit function.
 /// Compute the 2nd part of the C formula.
+/// 128-bit function: xp >= 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
-/// x / (primes[b] * primes[i]) <= x^(1/2)
+/// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
           typename Primes>
-T C2(T xlow,
-     T xhigh,
-     T xp,
-     uint64_t y,
-     uint64_t b,
-     const PiTable& pi,
-     const Primes& primes,
-     const SegmentedPiTable& segmentedPi)
+T C2_128(T xlow,
+         T xhigh,
+         T xp,
+         uint64_t y,
+         uint64_t b,
+         const Primes& primes,
+         const PiTable& pi,
+         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -534,11 +533,12 @@ T AC_OpenMP(T x,
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
-  Status status(x);
-  PiTable pi(max(z, max_a_prime));
+  StatusAC status(x);
+  PiTable pi(max(z, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -589,7 +589,7 @@ T AC_OpenMP(T x,
       {
         if (resume(copy, x, y, z, k, b, j))
         {
-          T sum_thread = C1(x, z, b, pi_y, pi, primes);
+          T sum_thread = C1(x, z, b, pi_y, primes, pi);
           string thread_id = "thread" + to_str(j);
 
           #pragma omp critical (ac)
@@ -618,7 +618,7 @@ T AC_OpenMP(T x,
 
           if (is_backup(backup_time))
           {
-            double percent = status.getPercent(next_b, pi_x13, next_b, pi_x13);
+            double percent = status.getPercent(next_b, pi_x13);
             backup(json, x, y, z, k, x_star, percent, time);
             backup_time = get_time();
           }
@@ -627,7 +627,7 @@ T AC_OpenMP(T x,
         if (b > pi_sqrtz)
           break;
 
-        sum_thread = C1(x, z, b, pi_y, pi, primes);
+        sum_thread = C1(x, z, b, pi_y, primes, pi);
       }
     }
 
@@ -638,7 +638,7 @@ T AC_OpenMP(T x,
     copy.clear();
   }
 
-  SegmentedPiTable segmentedPi(low, isqrt(x), z, threads);
+  SegmentedPiTable segmentedPi(low, sqrtx, z, threads);
 
   // Initialize libdivide vector using primes
   using libdivide_t = libdivide::branchfree_divider<uint64_t>;
@@ -698,16 +698,16 @@ T AC_OpenMP(T x,
           if (b <= pi_x_star)
           {
             if (xp <= numeric_limits<uint64_t>::max())
-              sum_thread = C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+              sum_thread = C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
             else
-              sum_thread = C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+              sum_thread = C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
           }
           else
           {
             if (xp <= numeric_limits<uint64_t>::max())
-              sum_thread = A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+              sum_thread = A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
             else
-              sum_thread = A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+              sum_thread = A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
           }
 
           #pragma omp critical (ac)
@@ -736,7 +736,7 @@ T AC_OpenMP(T x,
 
           if (is_backup(backup_time))
           {
-            double percent = status.getPercent(next_b, max_b, next_b, max_b);
+            double percent = status.getPercent(next_b, max_b);
             backup(json, x, y, z, k, x_star, percent, time);
             backup_time = get_time();
           }
@@ -751,16 +751,16 @@ T AC_OpenMP(T x,
         if (b <= pi_x_star)
         {
           if (xp <= numeric_limits<uint64_t>::max())
-            sum_thread = C2(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+            sum_thread = C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
           else
-            sum_thread = C2(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+            sum_thread = C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
         else
         {
           if (xp <= numeric_limits<uint64_t>::max())
-            sum_thread = A(xlow, xhigh, (uint64_t) xp, y, b, prime, pi, lprimes, segmentedPi);
+            sum_thread = A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
           else
-            sum_thread = A(xlow, xhigh, xp, y, b, pi, primes, segmentedPi);
+            sum_thread = A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
         }
       }
     }
@@ -770,6 +770,7 @@ T AC_OpenMP(T x,
     resume_threads = 0;
     next_b = 0;
     copy.clear();
+    status.next();
   }
 
   backup_result(json, x, y, z, k, x_star, sum, time);
@@ -787,6 +788,11 @@ int64_t AC(int64_t x,
            int64_t k,
            int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return AC_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== AC(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
@@ -818,6 +824,11 @@ int128_t AC(int128_t x,
             int64_t k,
             int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return AC_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== AC(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);

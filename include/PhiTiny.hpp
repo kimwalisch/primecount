@@ -19,13 +19,13 @@
 
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <array>
 #include <cassert>
 #include <limits>
 #include <type_traits>
-#include <vector>
 
 namespace primecount {
 
@@ -69,7 +69,7 @@ public:
   }
 
 private:
-  std::array<std::vector<int16_t>, 7> phi_;
+  std::array<pod_vector<int16_t>, 7> phi_;
   static const std::array<int, 7> primes;
   static const std::array<int, 7> prime_products;
   static const std::array<int, 7> totients;

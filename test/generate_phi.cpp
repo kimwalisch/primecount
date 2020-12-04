@@ -33,7 +33,7 @@ int main()
     int64_t x = dist(gen);
     int64_t y = isqrt(x) + 1000;
 
-    PiTable pi(y);
+    PiTable pi(y, 1);
     int64_t a = pi[y];
 
     auto primes = generate_primes<int64_t>(y);

@@ -60,40 +60,17 @@ using uint128_t = __uint128_t;
 using maxint_t = __int128_t;
 using maxuint_t = __uint128_t;
 
-template <>
-inline std::string to_str<uint128_t>(uint128_t n)
-{
-  std::string str;
+/// defined in util.cpp
+std::string to_str(maxint_t x);
+std::string to_str(maxuint_t x);
 
-  while (n > 0)
-  {
-    str += '0' + n % 10;
-    n /= 10;
-  }
-
-  if (str.empty())
-    str = "0";
-
-  std::reverse(str.begin(), str.end());
-  return str;
-}
-
-template <>
-inline std::string to_str<int128_t>(int128_t n)
-{
-  if (n >= 0)
-    return to_str((uint128_t) n);
-  else
-    return "-" + to_str((uint128_t) -n);
-}
-
-inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
+inline std::ostream& operator<<(std::ostream& stream, int128_t n)
 {
   stream << to_str(n);
   return stream;
 }
 
-inline std::ostream& operator<<(std::ostream& stream, int128_t n)
+inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
 {
   stream << to_str(n);
   return stream;

@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace primecount {
+namespace {
 
 template <typename A, typename B>
 struct is_comparable

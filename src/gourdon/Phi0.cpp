@@ -151,6 +151,11 @@ int64_t Phi0(int64_t x,
              int64_t k,
              int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return Phi0_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== Phi0(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);
@@ -176,6 +181,11 @@ int128_t Phi0(int128_t x,
               int64_t k,
               int threads)
 {
+#ifdef ENABLE_MPI
+  if (mpi_num_procs() > 1)
+    return Phi0_mpi(x, y, z, k, threads);
+#endif
+
   print("");
   print("=== Phi0(x, y) ===");
   print_gourdon_vars(x, y, z, k, threads);

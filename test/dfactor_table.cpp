@@ -4,13 +4,13 @@
 ///         (moebius), lpf (least prime factor) and mpf (max prime
 ///         factor).
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include "../src/gourdon/DFactorTable.hpp"
+#include <DFactorTable.hpp>
 #include <generate.hpp>
 
 #include <stdint.h>
@@ -45,7 +45,7 @@ int main()
 
   DFactorTable<uint16_t> factorTable(y, z, threads);
   int64_t uint16_max = numeric_limits<uint16_t>::max();
-  int64_t limit = factorTable.get_first_coprime();
+  int64_t limit = factorTable.first_coprime();
   vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
   for (int n = 1; n <= z; n++)

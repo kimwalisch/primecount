@@ -2,7 +2,7 @@
 /// @file   segmented_pi_table.cpp
 /// @brief  Test the SegmentedPiTable class
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,7 +39,7 @@ int main()
   int64_t segment_size = iroot<3>(limit);
   int threads = get_num_threads();
 
-  PiTable pi(limit);
+  PiTable pi(limit, threads);
   SegmentedPiTable segmentedPi(0, limit, segment_size, threads);
   int64_t i = 0;
 

@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,7 +29,6 @@ int64_t pi(int64_t x, int threads);
 int64_t pi_legendre(int64_t x, int threads);
 int64_t pi_meissel(int64_t x, int threads);
 int64_t pi_primesieve(int64_t x);
-int64_t pi_simple(int64_t x, int threads);
 
 int64_t nth_prime(int64_t n, int threads);
 int64_t phi(int64_t x, int64_t a, int threads);
@@ -40,6 +39,12 @@ int64_t Li(int64_t);
 int64_t Li_inverse(int64_t);
 int64_t Ri(int64_t);
 int64_t Ri_inverse(int64_t);
+
+// In order to get the best performance with link time
+// optimization only functions should be inlined that are
+// called inside hot loops. This function is only used
+// for initialization and should hence not be inlined.
+int64_t pi_simple(int64_t x, int threads);
 
 #ifdef HAVE_INT128_T
 
@@ -66,6 +71,8 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 maxint_t to_maxint(const std::string& expr);
+std::string to_str(maxint_t x);
+std::string to_str(maxuint_t x);
 double get_time();
 
 template <typename T1, typename T2, typename T3>
@@ -103,6 +110,15 @@ T D_approx(T x, T sigma, T phi0, T ac, T b)
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;
 }
+
+#ifdef ENABLE_MPI
+
+bool is_mpi_main_proc();
+int mpi_num_procs();
+int mpi_proc_id();
+int mpi_main_proc_id();
+
+#endif
 
 } // namespace
 

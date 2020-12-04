@@ -74,7 +74,7 @@ cmake --build . --config Release
 Open a terminal, cd into the primecount directory and run:
 
 ```bash
-cmake -DBUILD_TESTS=ON .
+cmake . -DBUILD_TESTS=ON
 make -j
 ctest
 ```
@@ -97,4 +97,5 @@ option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
+option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
 ```

@@ -39,7 +39,8 @@ const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
-  phi_[0].push_back(0);
+  phi_[0].resize(1);
+  phi_[0][0] = 0;
 
   // initialize phi(x % pp, a) lookup tables
   for (int a = 1; a <= max_a(); a++)

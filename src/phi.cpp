@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -48,20 +48,22 @@ using namespace primecount;
 
 namespace {
 
-/// Cache phi(x, a) results if a < MAX_A
-const int MAX_A = 100;
-
 class PhiCache
 {
 public:
-  PhiCache(vector<int32_t>& primes,
+  PhiCache(int64_t limit,
+           vector<int32_t>& primes,
            PiTable& pi) :
     primes_(primes),
     pi_(pi)
-  { }
+  {
+    // Cache phi(x, a) results if x <= max_x
+    auto u16_max = numeric_limits<uint16_t>::max();
+    max_x_ = min(isqrt(limit), u16_max);
+  }
 
   /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / primes_[a], a - 1)
+  /// phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1)
   ///
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
@@ -84,10 +86,10 @@ public:
       pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if primes_[a] >= x
-    // xp = x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= x / primes_[i + 1]
-    // phi(xp, i) = 1 if primes_[i] >= sqrt(x)
+    // phi(x, a) = 1 if primes[a] >= x
+    // xp = x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
@@ -110,20 +112,26 @@ public:
   }
 
 private:
-  using T = uint16_t;
-  array<vector<T>, MAX_A> cache_;
+  /// Cache phi(x, a) results if x <= max_x && a < MAX_A
+  uint64_t max_x_ = 0;
+  enum { MAX_A = 100 };
+  array<vector<uint16_t>, MAX_A> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    if (a < cache_.size() &&
-        x <= numeric_limits<T>::max())
+    if (x <= max_x_ &&
+        a < cache_.size())
     {
       if (x >= cache_[a].size())
+      {
+        cache_[a].reserve(max_x_ + 1);
         cache_[a].resize(x + 1, 0);
+      }
 
-      cache_[a][x] = (T) abs(sum);
+      sum = abs(sum);
+      cache_[a][x] = (uint16_t) sum;
     }
   }
 
@@ -169,19 +177,24 @@ int64_t phi(int64_t x, int64_t a, int threads)
     {
       // use large pi(x) lookup table for speed
       int64_t sqrtx = isqrt(x);
-      PiTable pi(max(sqrtx, primes[a]));
-      PhiCache cache(primes, pi);
-
       int64_t c = PhiTiny::get_c(sqrtx);
+      PiTable pi(max(sqrtx, primes[a]), threads);
       int64_t pi_sqrtx = min(pi[sqrtx], a);
-      int64_t thread_threshold = ipow(10ll, 10);
+      int64_t thread_threshold = (int64_t) 1e10;
       threads = ideal_num_threads(threads, x, thread_threshold);
 
       sum = phi_tiny(x, c) - a + pi_sqrtx;
 
-      #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) firstprivate(cache) reduction(+: sum)
-      for (int64_t i = c; i < pi_sqrtx; i++)
-        sum += cache.phi<-1>(x / primes[i + 1], i);
+      #pragma omp parallel num_threads(threads) reduction(+: sum)
+      {
+        // Each thread uses its own PhiCache object in
+        // order to avoid thread synchronization.
+        PhiCache cache(x, primes, pi);
+
+        #pragma omp for nowait schedule(dynamic, 16)
+        for (int64_t i = c; i < pi_sqrtx; i++)
+          sum += cache.phi<-1>(x / primes[i + 1], i);
+      }
     }
   }
 
@@ -199,7 +212,6 @@ int64_t phi_print(int64_t x, int64_t a, int threads)
 {
   print("");
   print("=== phi(x, a) ===");
-  print("Count the numbers <= x coprime to the first a primes");
 
   double time = get_time();
   int64_t sum = phi(x, a, threads);

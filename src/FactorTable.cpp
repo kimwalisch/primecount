@@ -2,22 +2,23 @@
 /// @file  FactorTable.cpp
 /// @see   FactorTable.hpp for documentation
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <FactorTable.hpp>
+#include <BaseFactorTable.hpp>
 #include <stdint.h>
 
 namespace primecount {
 
-/// This lookup table contains the first 480 numbers that are not
-/// divisible by 2, 3, 5, 7 and 11. The size of the table was obtained
-/// using the formula: \prod_{i=1}^{5} primes[i] - 1.
+/// This lookup table contains the first 480 numbers
+/// that are not divisible by 2, 3, 5, 7 and 11. The
+/// size of the table was obtained using the formula:
+/// \prod_{i=1}^{5} primes[i] - 1.
 ///
-const uint16_t AbstractFactorTable::coprime_[480] =
+const std::array<uint16_t, 480> BaseFactorTable::coprime_ =
 {
   1, 13, 17, 19, 23, 29, 31, 37, 41, 43,
   47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
@@ -69,11 +70,12 @@ const uint16_t AbstractFactorTable::coprime_[480] =
   2267, 2269, 2273, 2279, 2281, 2287, 2291, 2293, 2297, 2309
 };
 
-/// This lookup table returns the index of the closest number <= n
-/// that is not divisible by 2, 3, 5, 7 and 11. The size of the table
-/// was obtained using the formula: \prod_{i=1}^{5} primes[i].
+/// This lookup table returns the index of the closest
+/// number <= n that is not divisible by 2, 3, 5, 7
+/// and 11. The size of the table was obtained using the
+/// formula: \prod_{i=1}^{5} primes[i].
 ///
-const int16_t AbstractFactorTable::coprime_indexes_[2310] =
+const std::array<int16_t, 2310> BaseFactorTable::coprime_indexes_ =
 {
  -1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 1, 1, 1, 1, 2, 2, 3,

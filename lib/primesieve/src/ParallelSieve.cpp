@@ -2,7 +2,7 @@
 /// @file   ParallelSieve.cpp
 /// @brief  Multi-threaded prime sieve using std::async.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,17 +43,6 @@ ParallelSieve::ParallelSieve()
 {
   int threads = get_num_threads();
   setNumThreads(threads);
-}
-
-/// Used by Qt GUI app
-void ParallelSieve::init(SharedMemory& s)
-{
-  setStart(s.start);
-  setStop(s.stop);
-  setSieveSize(s.sieveSize);
-  setFlags(s.flags);
-  setNumThreads(s.threads);
-  sharedMemory_ = &s;
 }
 
 int ParallelSieve::getMaxThreads()
@@ -158,21 +147,22 @@ void ParallelSieve::sieve()
     uint64_t threadDist = getThreadDistance(threads);
     uint64_t iters = ((dist - 1) / threadDist) + 1;
     threads = inBetween(1, threads, iters);
-    atomic<uint64_t> i(0);
+    atomic<uint64_t> a(0);
 
     // Each thread executes 1 task
     auto task = [&]()
     {
       PrimeSieve ps(this);
-      uint64_t j;
+      uint64_t i;
       counts_t counts;
       counts.fill(0);
 
-      while ((j = i++) < iters)
+      while ((i = a.fetch_add(1, memory_order_relaxed)) < iters)
       {
-        uint64_t start = start_ + j * threadDist;
+        uint64_t start = start_ + threadDist * i;
         uint64_t stop = checkedAdd(start, threadDist);
         stop = align(stop);
+
         if (start > start_)
           start = align(start) + 1;
 
@@ -190,20 +180,13 @@ void ParallelSieve::sieve()
     for (int t = 0; t < threads; t++)
       futures.emplace_back(async(launch::async, task));
 
-    for (auto &f : futures)
+    for (auto& f : futures)
       counts_ += f.get();
 
     auto t2 = chrono::system_clock::now();
     chrono::duration<double> seconds = t2 - t1;
     seconds_ = seconds.count();
     setStatus(100);
-  }
-
-  if (sharedMemory_)
-  {
-    // Send results to primesieve GUI app
-    sharedMemory_->counts = counts_;
-    sharedMemory_->seconds = seconds_;
   }
 }
 

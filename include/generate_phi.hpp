@@ -34,12 +34,13 @@
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <array>
-#include <vector>
 #include <limits>
 
 namespace {
@@ -47,25 +48,28 @@ namespace {
 using namespace std;
 using namespace primecount;
 
-/// Cache phi(x, a) results if a < MAX_A
-const int MAX_A = 100;
-
 template <typename Primes>
 class PhiCache
 {
 public:
-  PhiCache(const Primes& primes, const PiTable& pi)
+  PhiCache(int64_t limit,
+           const Primes& primes,
+           const PiTable& pi)
     : primes_(primes),
       pi_(pi)
-  { }
+  {
+    // Cache phi(x, a) results if x <= max_x
+    auto u16_max = numeric_limits<uint16_t>::max();
+    max_x_ = min(isqrt(limit), u16_max);
+  }
 
   /// Calculate phi(x, a) using the recursive formula:
-  /// phi(x, a) = phi(x, a - 1) - phi(x / prime(a), a - 1)
+  /// phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1)
   ///
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
-    if (x <= prime(a))
+    if (x <= (int64_t) primes_[a])
       return SIGN;
     else if (is_phi_tiny(a))
       return phi_tiny(x, a) * SIGN;
@@ -83,10 +87,10 @@ public:
       pi_sqrtx = min(pi_[sqrtx], a);
 
     // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if prime(a) >= x
-    // xp = x / prime(i + 1)
-    // phi(xp, i) = 1 if prime(i) >= x / prime(i + 1)
-    // phi(xp, i) = 1 if prime(i) >= sqrt(x)
+    // phi(x, a) = 1 if primes[a] >= x
+    // xp = x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= x / primes[i + 1]
+    // phi(xp, i) = 1 if primes[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
     //
@@ -95,7 +99,7 @@ public:
 
     for (int64_t i = c; i < pi_sqrtx; i++)
     {
-      int64_t xp = fast_div(x, prime(i + 1));
+      int64_t xp = fast_div(x, primes_[i + 1]);
 
       if (is_pix(xp, i))
         sum += (pi_[xp] - i + 1) * -SIGN;
@@ -109,32 +113,33 @@ public:
   }
 
 private:
-  using T = uint16_t;
-  array<vector<T>, MAX_A> cache_;
+  /// Cache phi(x, a) results if x <= max_x && a < MAX_A
+  uint64_t max_x_ = 0;
+  enum { MAX_A = 100 };
+  array<vector<uint16_t>, MAX_A> cache_;
   const Primes& primes_;
   const PiTable& pi_;
 
-  int64_t prime(int64_t i) const
-  {
-    return primes_[i];
-  }
-
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    if (a < cache_.size() &&
-        x <= numeric_limits<T>::max())
+    if (x <= max_x_ && 
+        a < cache_.size())
     {
       if (x >= cache_[a].size())
+      {
+        cache_[a].reserve(max_x_ + 1);
         cache_[a].resize(x + 1, 0);
+      }
 
-      cache_[a][x] = (T) abs(sum);
+      sum = abs(sum);
+      cache_[a][x] = (uint16_t) sum;
     }
   }
 
   bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
-           x < isquare(prime(a + 1));
+           x < isquare(primes_[a + 1]);
   }
 
   bool is_cached(uint64_t x, uint64_t a) const
@@ -151,37 +156,37 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-vector<int64_t> generate_phi(int64_t x,
-                             int64_t a,
-                             const Primes& primes,
-                             const PiTable& pi)
+pod_vector<int64_t>
+generate_phi(int64_t x,
+             int64_t a,
+             const Primes& primes,
+             const PiTable& pi)
 {
   int64_t size = a + 1;
-
-  if (primes[a] > x)
-    a = pi[x];
-
-  vector<int64_t> phi;
-  phi.reserve(size);
-  phi.resize(a + 1, (x > 0) * -1);
-  phi.resize(size, x > 0);
+  pod_vector<int64_t> phi(size);
+  phi[0] = 0;
 
   if (size > 1)
   {
+    if ((int64_t) primes[a] > x)
+      a = pi[x];
+
     phi[1] = x;
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
-    PhiCache<Primes> cache(primes, pi);
+    PhiCache<Primes> cache(x, primes, pi);
 
     if (sqrtx < pi.size())
       pi_sqrtx = min(pi[sqrtx] + 1, a);
 
     for (int64_t i = 2; i <= pi_sqrtx; i++)
-      phi[i] = cache.template phi<-1>(x / primes[i - 1], i - 2);
+      phi[i] = phi[i - 1] + cache.template phi<-1>(x / primes[i - 1], i - 2);
 
-    // calculate phi(x, a) using partial results
-    for (int64_t i = 2; i <= a; i++)
-      phi[i] += phi[i - 1];
+    for (int64_t i = pi_sqrtx + 1; i <= a; i++)
+      phi[i] = phi[i - 1] - (x > 0);
+
+    for (int64_t i = a + 1; i < size; i++)
+      phi[i] = x > 0;
   }
 
   return phi;

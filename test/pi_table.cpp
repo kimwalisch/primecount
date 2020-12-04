@@ -45,7 +45,7 @@ int main()
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(1000000, 2000000);
-  PiTable pi(dist(gen));
+  PiTable pi(dist(gen), 1);
 
   for (size_t i = 0; i < pix.size(); i++)
   {

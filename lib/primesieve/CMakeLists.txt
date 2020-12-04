@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "7.5")
-set(PRIMESIEVE_SOVERSION "9.5.0")
+set(PRIMESIEVE_VERSION "7.6")
+set(PRIMESIEVE_SOVERSION "9.6.0")
 
 # Build options ######################################################
 
@@ -32,19 +32,20 @@ endif()
 
 # primesieve binary source files #####################################
 
-set(BIN_SRC src/console/cmdoptions.cpp
-            src/console/help.cpp
-            src/console/main.cpp
-            src/console/test.cpp)
+set(BIN_SRC src/app/cmdoptions.cpp
+            src/app/help.cpp
+            src/app/main.cpp
+            src/app/test.cpp)
 
 # primesieve library source files ####################################
 
 set(LIB_SRC src/api-c.cpp
             src/api.cpp
             src/CpuInfo.cpp
-            src/EratBig.cpp
-            src/EratMedium.cpp
+            src/Erat.cpp
             src/EratSmall.cpp
+            src/EratMedium.cpp
+            src/EratBig.cpp
             src/iterator-c.cpp
             src/iterator.cpp
             src/IteratorHelper.cpp
@@ -57,14 +58,12 @@ set(LIB_SRC src/api-c.cpp
             src/PreSieve.cpp
             src/PrintPrimes.cpp
             src/PrimeSieve.cpp
-            src/Erat.cpp
             src/SievingPrimes.cpp)
 
 # Required includes ##################################################
 
 include(GNUInstallDirs)
 include(CMakePushCheckState)
-include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
 include(CMakePackageConfigHelpers)
 
@@ -76,15 +75,6 @@ if(WIN32 AND NOT MINGW)
         # Export symbols to .def file
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     endif()
-endif()
-
-# Silence GCC switch fall through warnings ###########################
-
-check_cxx_compiler_flag(-Wno-implicit-fallthrough Wno_fallthrough)
-
-if(Wno_fallthrough)
-    set_source_files_properties(src/EratSmall.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
-    set_source_files_properties(src/EratMedium.cpp PROPERTIES COMPILE_FLAGS -Wno-implicit-fallthrough)
 endif()
 
 # Check if libatomic is needed #######################################

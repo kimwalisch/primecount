@@ -1,3 +1,21 @@
+Changes for upcoming release, 28/11/2020
+========================================
+
+* The primesieve GUI application has been deprecated/removed.
+  It only works with QT4 which has reached end-of-life.
+* CpuInfo.cpp: Linux kernel CPU detection has been updated.
+* CpuInfo.cpp: Add workaround for sysctl bug (macOS & iOS).
+* config.hpp: Tune FACTOR_ERATSMALL factor.
+* EratSmall.cpp: Get rid of goto.
+* EratSmall.cpp: Optimize switch statement.
+* EratSmall.cpp: Annotate switch cases with fallthrough.
+* EratMedium.cpp: Get rid of goto.
+* EratMedium.cpp: Optimize switch statements.
+* EratMedium.cpp: Annotate switch cases with fallthrough.
+* EratBig.cpp: Simplify main sieving loop.
+* doc/C_Examples.md: libprimesieve C code examples.
+* doc/CPP_Examples.md: libprimesieve C++ code examples.
+
 Changes in version 7.5, 27/12/2019
 ==================================
 

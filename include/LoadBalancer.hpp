@@ -13,6 +13,7 @@
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 #include <json.hpp>
+#include <OmpLock.hpp>
 #include <Status.hpp>
 
 #include <stdint.h>
@@ -72,6 +73,7 @@ private:
   Status status_;
   nlohmann::json json_;
   nlohmann::json copy_;
+  OmpLock lock_;
 };
 
 } // namespace

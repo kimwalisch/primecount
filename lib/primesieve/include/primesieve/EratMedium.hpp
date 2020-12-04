@@ -1,7 +1,7 @@
 ///
 /// @file  EratMedium.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,7 +11,7 @@
 #define ERATMEDIUM_HPP
 
 #include "Bucket.hpp"
-#include "noinline.hpp"
+#include "macros.hpp"
 #include "MemoryPool.hpp"
 #include "Wheel.hpp"
 
@@ -34,9 +34,8 @@ private:
   bool enabled_ = false;
   uint64_t maxPrime_ = 0;
   MemoryPool memoryPool_;
-  std::array<SievingPrime*, 64> sievingPrimes_;
+  std::array<SievingPrime*, 64> buckets_;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
-  void crossOff(uint8_t*, uint8_t*, Bucket*);
   NOINLINE void crossOff_7(uint8_t*, uint8_t*, Bucket*);
   NOINLINE void crossOff_11(uint8_t*, uint8_t*, Bucket*);
   NOINLINE void crossOff_13(uint8_t*, uint8_t*, Bucket*);

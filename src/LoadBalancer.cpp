@@ -3,7 +3,8 @@
 /// @brief The LoadBalancer assigns work to the individual threads
 ///        in the computation of the special leaves in the
 ///        Lagarias-Miller-Odlyzko, Deleglise-Rivat and Gourdon
-///        prime counting algorithms.
+///        prime counting algorithms. This load balancer is used
+///        by the S2_hard(x, y) and D(x, y) functions.
 ///
 ///        Simply parallelizing the computation of the special
 ///        leaves in the Lagarias-Miller-Odlyzko algorithm by
@@ -269,33 +270,31 @@ void LoadBalancer::update_result(ThreadSettings& thread)
 
 bool LoadBalancer::get_work(ThreadSettings& thread)
 {
-  #pragma omp critical (get_work)
+  LockGuard lockGuard(lock_);
+  sum_ += thread.sum;
+
+  if (is_print())
   {
-    sum_ += thread.sum;
-
-    if (is_print())
-    {
-      uint64_t dist = thread.segments * thread.segment_size;
-      uint64_t high = thread.low + dist;
-      status_.print(high, sieve_limit_, sum_, sum_approx_);
-    }
-
-    update(thread);
-
-    thread.low = low_;
-    thread.segments = segments_;
-    thread.segment_size = segment_size_;
-    thread.sum = 0;
-    thread.secs = 0;
-    thread.init_secs = 0;
-
-    low_ += segments_ * segment_size_;
-    low_ = min(low_, sieve_limit_ + 1);
-
-    backup(thread);
+    uint64_t dist = thread.segments * thread.segment_size;
+    uint64_t high = thread.low + dist;
+    status_.print(high, sieve_limit_, sum_, sum_approx_);
   }
 
-  return thread.low < sieve_limit_;
+  update(thread);
+
+  thread.low = low_;
+  thread.segments = segments_;
+  thread.segment_size = segment_size_;
+  thread.sum = 0;
+  thread.secs = 0;
+  thread.init_secs = 0;
+
+  low_ += segments_ * segment_size_;
+  low_ = min(low_, sieve_limit_ + 1);
+  bool is_work = thread.low < sieve_limit_;
+  backup(thread);
+
+  return is_work;
 }
 
 void LoadBalancer::update(ThreadSettings& thread)
@@ -318,16 +317,6 @@ void LoadBalancer::update(ThreadSettings& thread)
     else
       update_segments(thread);
   }
-}
-
-/// Remaining seconds till finished
-double LoadBalancer::remaining_secs() const
-{
-  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
 }
 
 /// Increase or decrease the number of segments per thread
@@ -408,6 +397,16 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
     segments_ = (int64_t) new_segments;
     segments_ = max(segments_, 1);
   }
+}
+
+/// Remaining seconds till finished
+double LoadBalancer::remaining_secs() const
+{
+  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
 }
 
 } // namespace
