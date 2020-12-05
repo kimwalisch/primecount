@@ -47,8 +47,8 @@ T S2_easy_64(T xp128,
              uint64_t z,
              uint64_t b,
              uint64_t prime,
-             const PiTable& pi,
-             const LibdividePrimes& primes)
+             const LibdividePrimes& primes,
+             const PiTable& pi)
 {
   uint64_t xp = (uint64_t) xp128;
   uint64_t min_trivial = min(xp / prime, y);
@@ -99,8 +99,8 @@ T S2_easy_128(T xp,
               uint64_t z,
               uint64_t b,
               uint64_t prime,
-              const PiTable& pi,
-              const Primes& primes)
+              const Primes& primes,
+              const PiTable& pi)
 {
   uint64_t min_trivial = min(xp / prime, y);
   uint64_t min_clustered = (uint64_t) isqrt(xp);
@@ -177,9 +177,9 @@ T S2_easy_OpenMP(T x,
     T xp = x / prime;
 
     if (xp <= numeric_limits<uint64_t>::max())
-      s2_easy += S2_easy_64(xp, y, z, b, prime, pi, lprimes);
+      s2_easy += S2_easy_64(xp, y, z, b, prime, lprimes, pi);
     else
-      s2_easy += S2_easy_128(xp, y, z, b, prime, pi, primes);
+      s2_easy += S2_easy_128(xp, y, z, b, prime, primes, pi);
 
     status.print(b, pi_x13);
   }
