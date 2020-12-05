@@ -86,7 +86,7 @@ PiTable::PiTable(uint64_t limit, int threads) :
 
   #pragma omp parallel num_threads(threads)
   {
-    #pragma omp for
+    #pragma omp for schedule(dynamic)
     for (int t = 0; t < threads; t++)
     {
       uint64_t start = thread_size * t;
@@ -97,7 +97,7 @@ PiTable::PiTable(uint64_t limit, int threads) :
         init_bits(start, stop, t);
     }
 
-    #pragma omp for
+    #pragma omp for schedule(dynamic)
     for (int t = 0; t < threads; t++)
     {
       uint64_t start = thread_size * t;
