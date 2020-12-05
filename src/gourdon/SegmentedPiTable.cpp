@@ -145,7 +145,7 @@ void SegmentedPiTable::init()
 
   #pragma omp parallel num_threads(threads_)
   {
-    #pragma omp for schedule(dynamic)
+    #pragma omp for
     for (int t = 0; t < threads_; t++)
     {
       uint64_t start = low_ + thread_size * t;
@@ -156,7 +156,7 @@ void SegmentedPiTable::init()
         init_bits(start, stop, t);
     }
 
-    #pragma omp for schedule(dynamic)
+    #pragma omp for
     for (int t = 0; t < threads_; t++)
     {
       uint64_t start = low_ + thread_size * t;
