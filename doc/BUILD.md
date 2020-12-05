@@ -28,6 +28,9 @@ You need to have installed a C++ compiler which supports C++11 (or later) and CM
 Open a terminal, cd into the primecount directory and run:
 
 ```bash
+# Only needed if you have cloned the repo using git
+git checkout backup3
+
 cmake .
 make -j
 ```

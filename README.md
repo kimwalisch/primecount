@@ -36,22 +36,14 @@ primecount should be compiled using GCC or Clang as these compilers
 support both OpenMP (multi-threading library) and 128-bit integers.
 
 ```sh
+# Only needed if you have cloned the repo using git
+git checkout backup3
+
 cmake .
 make -j
 ```
 
 * [Detailed build instructions](doc/BUILD.md)
-
-## Binaries
-
-Below are the latest precompiled primecount binaries for
-Windows and Linux. These binaries are statically linked and
-require a CPU which supports the POPCNT instruction (2008 or
-later).
-
-* [primecount-backup-6.0-win64.zip](https://github.com/kimwalisch/primecount/releases/download/v6.0-backup/primecount-backup-6.0-win64.zip), 681 kB
-* [primecount-backup-6.0-linux-x64.tar.xz](https://github.com/kimwalisch/primecount/releases/download/v6.0-backup/primecount-backup-6.0-linux-x64.tar.xz), 870 kB
-* [primecount-backup-6.0-macOS-x64.zip](https://github.com/kimwalisch/primecount/releases/download/v6.0-backup/primecount-backup-6.0-macOS-x64.zip), 433 kB
 
 ## Backup usage example
 
