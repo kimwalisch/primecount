@@ -118,7 +118,7 @@ void SegmentedPiTable::init()
   thread_size = max(min_thread_size, thread_size);
   thread_size += 128 - thread_size % 128;
 
-  #pragma omp for schedule(dynamic)
+  #pragma omp for
   for (int t = 0; t < threads_; t++)
   {
     uint64_t start = low_ + thread_size * t;
@@ -129,7 +129,7 @@ void SegmentedPiTable::init()
       init_bits(start, stop, t);
   }
 
-  #pragma omp for schedule(dynamic)
+  #pragma omp for
   for (int t = 0; t < threads_; t++)
   {
     uint64_t start = low_ + thread_size * t;
@@ -203,7 +203,7 @@ void SegmentedPiTable::next()
   // Wait until all threads have finished
   // computing the current segment.
   #pragma omp barrier
-  #pragma omp single
+  #pragma omp master
   {
     // pi_low_ must be initialized before updating the
     // member variables for the next segment.
@@ -213,6 +213,8 @@ void SegmentedPiTable::next()
     high_ = low_ + segment_size_;
     high_ = std::min(high_, max_high_);
   }
+
+  #pragma omp barrier
 }
 
 } // namespace

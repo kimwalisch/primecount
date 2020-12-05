@@ -124,7 +124,7 @@ T B_OpenMP(T x, int64_t y, int threads)
   {
     int64_t thread_dist = loadBalancer.get_thread_dist(low);
 
-    #pragma omp parallel for schedule(dynamic) num_threads(threads)
+    #pragma omp parallel for num_threads(threads)
     for (int64_t i = 0; i < threads; i++)
       res[i] = B_thread(x, y, z, low, i, thread_dist);
 
