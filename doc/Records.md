@@ -97,6 +97,12 @@ successful verification announcement in our
     <td>2020-10-08</td>
     <td>David Baugh</td>
   </tr>
+  <tr align="right">
+    <td>2<sup>91</sup></td>
+    <td>39,895,115,987,049,029,184,882,256</td>
+    <td>2020-11-14</td>
+    <td>David Baugh</td>
+  </tr>
 </table>
 
 ## [A040014](https://oeis.org/A040014) records

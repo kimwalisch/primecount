@@ -1,11 +1,13 @@
-2020-10-04 Kim Walisch  <kim.walisch@gmail.com>
+2020-12-07 Kim Walisch  <kim.walisch@gmail.com>
 
+  README.md: primecount can now be installed using package managers.
   Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
   Sieve.cpp: Annotate switch cases with fallthrough.
   AC.cpp: Reduce number of function paramaters.
   AC_libdivide.cpp: Reduce number of function paramaters.
   B.cpp: Improve GCC performance.
   P2.cpp: Improve GCC performance.
+  popcnt.hpp: Improve GCC performance.
 
 2020-09-12 Kim Walisch  <kim.walisch@gmail.com>
 
