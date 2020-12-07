@@ -1,4 +1,4 @@
-2020-12-07 Kim Walisch  <kim.walisch@gmail.com>
+Changes in primecount-6.2, 2020-12-07
 
   README.md: primecount can now be installed using package managers.
   Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
@@ -9,9 +9,7 @@
   P2.cpp: Improve GCC performance.
   popcnt.hpp: Improve GCC performance.
 
-2020-09-12 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 6.1 released.
+Changes in primecount-6.1, 2020-09-12
 
   The main focus of this release has been on polishing the code
   and improving the documentation. I also tried many things to
@@ -42,9 +40,7 @@
   * cmdoptions.cpp: Add -B & -D options.
   * Fixed #32: primecount-backup prints incorrect time elapsed.
 
-2020-03-16 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 6.0 released.
+Changes in primecount-6.0, 2020-03-16
 
   This version fixes a scaling issue that has been present in
   primecount since the first version. The computation of the
@@ -64,9 +60,7 @@
   * find_optimal_alpha_*.sh: New scripts that find optimal
     alpha tuning factors using the Linux perf tool.
 
-2020-01-18 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 5.3 released.
+Changes in primecount-5.3, 2020-01-18
 
   libprimesieve has been updated to the latest version which
   provides a minor speedup for all formulas that use
@@ -83,9 +77,7 @@
   * S2Status.cpp: Fix non-critical data race.
   * LoadBalancer.cpp: Improve thread load balancing.
 
-2019-11-17 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 5.2 released.
+Changes in primecount-5.2, 2019-11-17
 
   I have now implemented Xavier Gourdon's algorithm in the
   primecount-backup version (branch backup3). Other than that
@@ -108,9 +100,7 @@
       --S2_easy         -> --S2-easy
       --S2_hard         -> --S2-hard
 
-2019-09-02 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 5.1 released.
+Changes in primecount-5.1, 2019-09-02
 
   The memory usage of Xavier Gourdon's algorithm has been
   reduced from O(x^(1/2)) to O(x^(1/3) * log^3 x). Xavier
@@ -144,9 +134,7 @@
   fastest prime counting function implementation in
   primecount.
 
-2019-08-13 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 5.0 released.
+Changes in primecount-5.0, 2019-08-13
 
   I have finally implemented Xavier Gourdon's prime counting
   algorithm! Xavier Gourdon's algorithm is an improved
@@ -162,9 +150,7 @@
   * test.cpp: Test Gourdon's algorithm.
   * README.md: Update benchmarks.
 
-2019-07-14 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.8 released.
+Changes in primecount-4.8, 2019-07-14
 
   This version reduces the memory usage of S2_easy(n) by
   15% and the memory usage of S2_hard(n) by 10%.
@@ -181,9 +167,7 @@
   * libdivide.h: Update to libdivide-2.0.
   * appveyor.yml: Treat compiler warnings as errors.
 
-2019-04-16 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.7 released.
+Changes in primecount-4.7, 2019-04-16
 
   This version fixes an issue with the new MD5 checksum
   feature introduced in primecount-backup-4.6 that I
@@ -192,9 +176,7 @@
   * json.hpp: Fix incorrect MD5 formatting, bytes with the
     first 4 bits masked off must be prefixed with '0'.
 
-2019-04-13 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.6 released.
+Changes in primecount-4.6, 2019-04-13
 
   This version fixes 2 bugs in the CMakeLists.txt build script
   and improves the primecount backup version that stores
@@ -209,9 +191,7 @@
   * S2_hard.cpp: Allow resuming using fewer/more threads.
   * primecount.backup: Add MD5 checksum.
 
-2019-02-20 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.5 released.
+Changes in primecount-4.5, 2019-02-20
 
   This is a maintenance release that contains minor
   improvements e.g. tests should run 10% faster.
@@ -220,9 +200,7 @@
   * travis.yml: Test using many different compiler versions.
   * calculator.hpp: Silence clang-cl -Wdeprecated warning.
 
-2018-05-09 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.4 released.
+Changes in primecount-4.4, 2018-05-09
 
   The computation of the second partial sieve function
   P2(x, a) has been sped up by 30% due to an update to the
@@ -235,9 +213,7 @@
   * pi_primesieve.cpp: Fix non-critical data race.
   * make test: Runs twice as fast.
 
-2018-03-18 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.3 released.
+Changes in primecount-4.3, 2018-03-18
 
   * Support big-endian CPUs.
   * Speed up x86 without POPCNT.
@@ -248,9 +224,7 @@
   * CMakeLists.txt: Get rid of int128_t, __int128_t checks.
   * isqrt_constexpr.cpp: Add test for compile time square root.
 
-2017-12-02 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.2 released.
+Changes in primecount-4.2, 2017-12-02
 
   The computation of the second partial sieve function
   P2(x, a) has been sped up by 10% due to an upgrade to the
@@ -262,9 +236,7 @@
   * CMakeLists.txt: Silence GCC 7 warnings.
   * .travis.yml: Update to Ubuntu 14.
 
-2017-07-19 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.1 released.
+Changes in primecount-4.1, 2017-07-19
 
   This version improves the backup & resume functionality
   and uses up to 8% less memory due to a reduced alpha
@@ -277,9 +249,7 @@
   * results.txt: Fix incorrect time elapsed.
   * primecount.cpp: smaller alpha tuning factor.
 
-2017-07-06 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 4.0 released.
+Changes in primecount-4.0, 2017-07-06
 
   This version features a new highly optimized sieve of
   Eratosthenes implementation for the computation of the
@@ -294,9 +264,7 @@
   * LoadBalancer.cpp: L1 cache size optimization.
   * MpiLoadBalancer.cpp: L1 cache size optimization.
 
-2017-06-27 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.8 released.
+Changes in primecount-3.8, 2017-06-27
 
   This version reduces the memory usage by a factor of 2
   above 10^20! Furthermore the S2_hard algorithm for
@@ -311,9 +279,7 @@
   * S2_hard_mpi.cpp: Remove binary indexed tree.
   * primecount.cpp: Update alpha tuning factor formula.
 
-2017-06-07 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.7 released.
+Changes in primecount-3.7, 2017-06-07
 
   This version features a new multi-threading load balancer
   for the computation of the hard special leaves. The new
@@ -333,9 +299,7 @@
   * CMakeLists.txt: Faster C++ compilation.
   * S2Status.cpp: Reduce --status overhead.
 
-2017-03-04 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.6 released.
+Changes in primecount-3.6, 2017-03-04
 
   This version features a new AVX2 popcount algorithm which
   computes the hard special leaves up to 15% faster on x86 CPUs
@@ -346,16 +310,12 @@
   * primecount.cpp: Fix clang time measuring.
   * CMakeLists.txt: Add AVX2 check.
 
-2016-12-16 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.5 released.
+Changes in primecount-3.5, 2016-12-16
 
   * CMake: Use CMake build system instead of Autotools.
   * README.md: Update build instructions.
 
-2016-08-06 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.4 released.
+Changes in primecount-3.4, 2016-08-06
 
   * Makfile.msvc: Use libdivide also with MSVC compiler.
   * S2LoadBalancer.cpp: Improved load balancing.
@@ -363,9 +323,7 @@
   * P2_mpi.cpp: Improved load balancing.
   * .travis.yml: Add static C++ code analysis using cppcheck.
 
-2016-07-16 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.3 released.
+Changes in primecount-3.3, 2016-07-16
 
   * README.md: Fix error in "C++ API" section.
   * S2_hard.cpp: Refactoring.
@@ -373,9 +331,7 @@
   * P2.cpp: Refactoring.
   * P2_mpi.cpp: Refactoring.
 
-2016-05-09 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.2 released.
+Changes in primecount-3.2, 2016-05-09
 
   This version runs up to 5% faster due to an improved P2(x, a)
   implementation.
@@ -385,9 +341,7 @@
   * libdivide.h: Update to latest version.
   * autogen.sh: Print error msg if Autotools is not installed.
 
-2016-04-02 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.1 released.
+Changes in primecount-3.1, 2016-04-02
 
   This version runs up to 20% faster! The speed up is due to
   the usage of libdivide in S2_easy, libdivide allows to replace
@@ -398,9 +352,7 @@
   * S2_easy_mpi_libdivide.cpp: 40% speed up due to libdivide.
   * BitSieve.cpp: Fix broken Big-Endian CPU support.
 
-2016-03-12 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 3.0 released.
+Changes in primecount-3.0, 2016-03-12
 
   In this release I have merged the MPI (Message Passing Interface)
   branch into the master branch. primecount can now distribute
@@ -413,9 +365,7 @@
   * build.sh: Improved build script with support for primecount MPI.
   * README.md: Updated build instructions.
 
-2016-02-14 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.6 released.
+Changes in primecount-2.6, 2016-02-14
 
   primecount has been distributed using MPI (Message Passing Interface)
   and can now run computations on large clusters!
@@ -427,9 +377,7 @@
   * src/phi.cpp: 2x speed up due to pi(x) lookup table optimization.
   * scripts/build.sh: Easily build primecount.
 
-2016-01-24 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.5 released.
+Changes in primecount-2.5, 2016-01-24
 
   This version adds logging to primecount-backup and fixes 2
   integer overflow bugs in primecount-backup.
@@ -439,9 +387,7 @@
   * src/S1.cpp: Fix integer overflow bug (in backup branch).
   * src/deleglise-rivat/S2_trivial.cpp: Fix integer overflow bug (in backup branch).
 
-2015-12-27 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.4 released.
+Changes in primecount-2.4, 2015-12-27
 
   * README.md: Simplified build instructions.
   * appveyor.yml: Automated Windows (MSVC++) testing.
@@ -449,9 +395,7 @@
   * src/P2.cpp: Port to primesieve-5.5.0 library.
   * src/test.cpp: Faster nth prime testing.
 
-2015-10-07 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.3 released.
+Changes in primecount-2.3, 2015-10-07
 
   This version runs about 10% faster for x <= 10^21. Because of the
   sieving optimizations implemented in primecount-2.2 the sieving
@@ -470,12 +414,10 @@
   * src/S2Status.cpp: --status[=N], N digits after decimal point.
   * src/pi_lehmer.cpp: Remove pi_lehmer2(x).
 
-2015-09-19 Kim Walisch  <kim.walisch@gmail.com>
+Changes in primecount-2.2, 2015-09-19
 
   This version runs about 10% faster due to newly added pre-sieving
   of small primes and wheel factorization.
-
-  Version 2.2 released.
 
   * src/primecount.cpp: Increase pi(x) limit to 10^31 (previously 10^27).
   * src/BitSieve.cpp: Add pre-sieving of small primes.
@@ -485,17 +427,13 @@
   * include/popcount.hpp: Faster popcount algorithm for CPUs without POPCNT.
   * include/Wheel.hpp: New wheel factorization data structures.
 
-2015-04-12 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.1 released.
+Changes in primecount-2.1, 2015-04-12
 
   * src/S1.cpp: Fix Windows performance regression.
   * src/S2LoadBalancer.cpp: Refactoring.
   * Makefile.am: Add autogen.sh to EXTRA_DIST.
 
-2015-03-26 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 2.0 released.
+Changes in primecount-2.0, 2015-03-26
 
   This version improves the POPCNT algorithm in the computation of the
   hard special leaves and contains a new algorithm for the computation
@@ -508,9 +446,7 @@
   * src/lmo/pi_lmo_parallel3.cpp: Optimized sieving, up to 10% faster.
   * include/BitSieve.hpp: Add count backwards optimization.
 
-2015-03-08 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.9 released.
+Changes in primecount-1.9, 2015-03-08
 
   This version introduces new command-line options for calculating
   intermediate formulas of the Deleglise-Rivat algorithm. This allows
@@ -527,9 +463,7 @@
   * src/primecount.cpp: Improved alpha formula.
   * src/print.cpp: New print functions for terminal output.
 
-2015-02-28 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.8 released.
+Changes in primecount-1.8, 2015-02-28
 
   This version reduces the memory usage of the Deleglise-Rivat
   implementation by up to 30 percent. Instead of using the same set of
@@ -546,16 +480,12 @@
   * src/app/*: Add --alpha option.
   * avoid_128bit_div.patch: merged into master branch.
 
-2015-01-26 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.7.1 released.
+Changes in primecount-1.7.1, 2015-01-26
 
   * Makefile.am: Add avoid_128bit_div.patch to EXTRA_DIST
   * avoid_128bit_div.patch: Renamed
 
-2015-01-24 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.7 released.
+Changes in primecount-1.7, 2015-01-24
 
   This version runs to 20% faster on Windows for numbers >= 2^63 by
   using 64-bit divisions instead of 128-bit divisions whenever
@@ -565,9 +495,7 @@
 
   * fast_div.patch: Avoid 128-bit divisions.
 
-2015-01-05 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.6 released.
+Changes in primecount-1.6, 2015-01-05
 
   This version calculates hard special leaves much faster, above a
   certain threshold the algorithm switches to POPCNT for counting the
@@ -585,9 +513,7 @@
   * include/min.hpp: Refactoring.
   * include/int128.hpp: Add int128_t trait functions.
 
-2014-12-27 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.5 released.
+Changes in primecount-1.5, 2014-12-27
 
   This version runs up to 30 percent faster than primecount-1.4 for
   numbers > 2^64. The speed up is achieved using a clever trick:
@@ -601,9 +527,7 @@
   * src/app/cmdoptions.cpp: Set -l = --lmo instead of --lehmer.
   * README.md: Add command-line options summary.
 
-2014-12-15 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.4 released.
+Changes in primecount-1.4, 2014-12-15
 
   * src/deleglise-rivat/*.cpp: Improved computation of special leaves.
   * src/P2.cpp: Use unsigned division.
@@ -612,27 +536,21 @@
   * src/PhiCache.cpp: Update documentation.
   * include/PiTable.hpp: Update documentation.
 
-2014-11-04 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.3 released.
+Changes in primecount-1.3, 2014-11-04
 
   * Fixed bug in m4-ax_popcnt.m4 for QEMU virtual machines.
   * Limit number of threads in phi.cpp to 8.
   * Improve scaling of P2_lehmer(x, a).
   * Improve scaling of P3(x, a).
 
-2014-08-24 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.2 released.
+Changes in primecount-1.2, 2014-08-24
 
   * Add --status (-s) command-line option.
   * src/S2LoadBalancer.cpp: New faster load balancer.
   * src/S2Status.cpp: Print S2 progress.
   * Fixed integer overflow bugs in: Li_inverse(x), isqrt(x), iroot(x)
 
-2014-08-06 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.1 released.
+Changes in primecount-1.1, 2014-08-06
 
   * pi_deleglise_rivat4.cpp: 128-bit implementation.
   * pi_deleglise_rivat_parallel4.cpp: 128-bit implementation.
@@ -643,9 +561,7 @@
   * src/balance_S2_load.cpp: Improved load balancer.
   * src/generate.cpp: Contains all generate_*() functions.
 
-2014-07-19 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 1.0 released.
+Changes in primecount-1.0, 2014-07-19
 
   * src/BitSieve.cpp: Fix big-endian CPU bug.
   * src/lmo/*.cpp: Improved alpha factor.
@@ -653,168 +569,3 @@
   * include/pmath.hpp: Add max3(a, b, c).
   * m4/m4-ax_popcnt.m4: Support non x86 CPU architectures.
   * Readme.md: Update documentation.
-
-2014-07-06 Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.21 released.
-
-  * pi_deleglise_rivat_parallel3.cpp: Uses 10 times less memory!
-  * include/FactorTable.hpp: Compressed lookup table for lpf and Moebius.
-  * include/PiTable.hpp: Compressed lookup table for prime counts.
-  * include/popcount.hpp: Count bits using the POPCNT instruction.
-  * configure.ac: Check if CPU supports POPCNT.
-
-2014-06-15  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.20 released.
-
-  * src/balance_S2_load.cpp: New load balancing algorithm.
-  * src/deleglise-rivat/*: Deleglise & Rivat implementations.
-  * src/lmo/pi_lmo6.cpp: New LMO implementation.
-  * src/lmo/pi_lmo_parallel6.cpp: New parallel LMO implementation.
-  * src/lmo/init_square_free.cpp: For special leaves of type (prime * square_free).
-  * src/popcount.cpp: Fast bit population count algorithms for BitSieve.
-  * src/test.cpp: Add tests for pi_lmo*6.cpp.
-  * include/aligned_vector.hpp: vector without false sharing issues.
-  * include/BitSieve.hpp: bit vector with 8 numbers per byte.
-
-2014-05-26  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.19 released.
-
-  * src/lmo/pi_lmo_parallel1.cpp: Simple parallel LMO implementation.
-  * src/lmo/pi_lmo_parallel2.cpp: Advanced parallel LMO implementation.
-  * src/lmo/pi_lmo_parallel3.cpp: Improved load balancing.
-  * src/P2.cpp: New parallel P2(x, y) implementation.
-  * src/phi.cpp: Fix race condition.
-  * src/PhiTiny.cpp: Make thread safe.
-  * src/test.cpp: Add phi(x, a) thread safety test.
-
-2014-05-10  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.18 released.
-
-  * docs/computing-special-leaves.md: How to compute special leaves (LMO).
-  * src/pi_lmo5.cpp: Faster new LMO implementation.
-  * src/Pk.cpp: Faster new P2(x, a) implementation.
-  * src/test.cpp: Add test for pi_lmo5(x).
-  * src/pi_lmo*.cpp: Refactoring.
-
-2014-04-19  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.17 released.
-
-  * .travis.yml: Travis continuous integration testing.
-  * configure.ac: Make silent building default.
-  * Makefile.msvc: Add Microsoft Visual C++ Makefile.
-  * src/pi_lmo2.cpp: Speed improvement.
-  * src/pi_lmo3.cpp: Speed improvement.
-  * src/pi_lmo4.cpp: Speed improvement.
-  * src/nth_prime.cpp: Port to primesieve-5.2.
-  * src/test.cpp: Display testing status.
-
-2014-03-30  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.16 released.
-
-  * src/pi_lmo2.cpp: LMO using sieve of Eratosthenes.
-  * src/pi_lmo3.cpp: LMO using segmented sieve of Eratosthenes.
-  * src/pi_lmo4.cpp: LMO using special tree data structure.
-
-2014-02-02  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.15 released.
-
-  * Precompiled binaries for Windows 64-bit and Linux x64-64.
-  * Readme.md: New "Precompiled binaries" section.
-  * Readme.md: Use svg formula images.
-  * src/pi_lmo_simple.cpp: Code cleanup.
-
-2014-01-05  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.14 released.
-
-  * Moved build system to GNU Autotools.
-  * Renamed *.h to *.hpp
-  * src/test.cpp: Refactoring.
-
-2013-12-31  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.10 released.
-
-  * src/PhiCache.h: Faster phi(x, a).
-  * src/test.cpp: Update pi_lmo_simple(x) test.
-  * src/pi_primesieve.cpp: Fix primesieve API changes.
-  * src/nth_prime.cpp: Fix primesieve API changes.
-  * README: Updated timings.
-
-2013-12-26  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.9 released.
-
-  * src/pi_lmo_simple.cpp: Parallelized algorithm.
-  * src/PhiTiny.h: New class, cache of phi(x, a) values for a < 7.
-  * src/PhiCache.h:: Add PhiTiny optimization.
-  * src/phi.cpp: Add PhiTiny optimization.
-  * src/pi_bsearch.h: Refactoring.
-  * src/Pk.cpp: Refactoring.
-
-2013-12-14  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.8 released.
-
-  * src/cmdoptions.cpp: Fixed a calculator bug.
-  * src/calculator.hpp: New expression parser for command-line options.
-
-2013-10-24  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.7 released.
-
-  * src/*: Ported to primesieve-5.0.
-  * include/primecount.h: Ported to primesieve-5.0.
-  * Readme.md: Updated build instructions.
-  * Makefile: Updated.
-
-2013-09-04  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.6 released.
-
-  * src/phi.cpp: Added phi binary search optimization.
-  * Makefile: Fixed ldconfig bug.
-  * Readme.md: Updated benchmark timings.
-  * TODO: Updated.
-  * THANKS: Updated.
-
-2013-09-01  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.5 released.
-
-  * src/primecount.cpp: New functions: phi(x, a), pi_lmo_simple(x).
-  * src/cmdoptions.cpp: New command-line options: '--phi', '--lmo_simple'.
-  * src/help.cpp: Added phi and Lagarias-Miller-Odlyzko info.
-  * src/pi_lmo_simple.cpp: Simple Lagarias-Miller-Odlyzko implementation.
-  * src/phi.cpp: Fixed bug, uses less memory.
-  * include/primecount.h: Added phi(x, a) to the public API.
-  * Makefile: Added pi_lmo.o, pi_lmo_simple.o.
-
-2013-07-30  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.4 released.
-
-  * README.md: High definition math formula images.
-  * src/Pk.cpp: More accurate math formulas.
-  * src/pi_meissel.cpp: Simpler algorithm.
-  * src/pi_lehmer.cpp: Simpler algorithm.
-  * images/*.png: High definition math formula images.
-
-2013-07-26  Kim Walisch  <kim.walisch@gmail.com>
-
-  Version 0.3 released.
-
-  * README: Text version of README.md for offline reading.
-  * README.md: Added algorithms, timings and nth prime sections.
-  * THANKS: List of people that contributed to primecount.
-  * src/Pk.cpp: Partial sieve functions: P2(x, a), P3(x, a).
-  * src/*.cpp: Documented all source files.
-  * include/primecount.h: Updated API documentation.
-  * images/*.png: Math formula images.
