@@ -106,5 +106,6 @@ for:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
       - cmake --build . --config %Configuration% --target install
     test_script:
-      - ctest -C Release
-      - %Configuration%\primecount.exe --test
+      - ctest -C %Configuration%
+      - cd %Configuration%
+      - primecount.exe --test
