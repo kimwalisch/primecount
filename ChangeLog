@@ -1,13 +1,14 @@
-Changes in primecount-6.2, 2020-12-07
+Changes in primecount-6.2, 2020-12-09
 
-  README.md: primecount can now be installed using package managers.
-  Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
-  Sieve.cpp: Annotate switch cases with fallthrough.
-  AC.cpp: Reduce number of function paramaters.
-  AC_libdivide.cpp: Reduce number of function paramaters.
-  B.cpp: Improve GCC performance.
-  P2.cpp: Improve GCC performance.
-  popcnt.hpp: Improve GCC performance.
+  * Use Appveyor-CI instead of Travis-CI for testing.
+  * README.md: primecount can now be installed using package managers.
+  * Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
+  * Sieve.cpp: Annotate switch cases with fallthrough.
+  * AC.cpp: Reduce number of function paramaters.
+  * AC_libdivide.cpp: Reduce number of function paramaters.
+  * B.cpp: Improve GCC performance.
+  * P2.cpp: Improve GCC performance.
+  * popcnt.hpp: Improve GCC performance.
 
 Changes in primecount-6.1, 2020-09-12
 
