@@ -68,6 +68,7 @@ for:
       only:
         - image: Ubuntu2004
           platform: x64
+          branch: master
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
@@ -78,7 +79,7 @@ for:
       - cmake . -DWITH_MPI=ON -DCMAKE_BUILD_TYPE=$Configuration
       - make VERBOSE=1
     test_script:
-      - mpiexec -n 4 ./primecount 1e14 -t1 | grep 3204941750802
+      - mpiexec -n 2 ./primecount 1e14 -t1 | grep 3204941750802
 
   - matrix:
       only:
