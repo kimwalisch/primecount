@@ -31,8 +31,7 @@ echo "New year: $new_year"
 echo ""
 
 # Update version
-for i in $(echo README.md \
-                include/primecount.h \
+for i in $(echo include/primecount.h \
                 include/primecount.hpp)
 do
     echo "Update version in $i"
