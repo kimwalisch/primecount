@@ -1,55 +1,112 @@
-# Automated Windows (MSVC++) testing using appveyor.com
+# Automated testing using appveyor.com
 # https://ci.appveyor.com/projects
 
 version: 1.0.{build}
 
 image:
-- Visual Studio 2015
-- Visual Studio 2017
+- Ubuntu
+- Ubuntu2004
+- macos
+- Visual Studio 2019
 
 branches:
   except:
     - gh-pages
 
 platform:
-  - x86
   - x64
 
+configuration:
+  - Debug
+  - Release
+
 for:
+  # Test using GCC sanitizers
   - matrix:
       only:
-        - image: Visual Studio 2015
-          platform: x86
-    build_script:
-      - cmake . -G "Visual Studio 14 2015" -DBUILD_TESTS=ON
-      - cmake --build . --config Release --target install
-
-  - matrix:
-      only:
-        - image: Visual Studio 2015
+        - image: Ubuntu
           platform: x64
+          configuration: Debug
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
-      - cmake . -G "Visual Studio 14 2015 Win64" -DBUILD_TESTS=ON
-      - cmake --build . --config Release --target install
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$Configuration
+      - make VERBOSE=1
+    test_script:
+      - ctest
+      # Run primecount binary
+      - ./primecount --test
+      - ./primecount 1e14 --gourdon
+      - ./primecount 1e14 --deleglise-rivat
+      - ./primecount 1e12 --nth-prime
+      - ./primecount 1e11 --lehmer
+      - ./primecount 1e10 --lmo3
 
   - matrix:
       only:
-        - image: Visual Studio 2017
-          platform: x86
+        - image: Ubuntu
+          platform: x64
+          configuration: Release
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    install:
+      - sudo apt update -qq
+      - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - cmake . -G "Visual Studio 15 2017" -DBUILD_TESTS=ON
-      - cmake --build . --config Release --target install
+      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$Configuration -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - make VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
+  # Test MPI (Message Passing Interface) for distributing
+  # computations onto cluser nodes.
+  - matrix:
+      only:
+        - image: Ubuntu2004
+          platform: x64
+          branch: master
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
+    install:
+      - sudo apt update -qq
+      - sudo apt install -y openmpi-bin libopenmpi-dev
+    build_script:
+      - cmake . -DWITH_MPI=ON -DCMAKE_BUILD_TYPE=$Configuration
+      - make VERBOSE=1
+    test_script:
+      - mpiexec -n 2 ./primecount 1e14 -t1 | grep 3204941750802
 
   - matrix:
       only:
-        - image: Visual Studio 2017
+        - image: macos
           platform: x64
     environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    build_script:
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$Configuration -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - make VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
+  - matrix:
+      only:
+        - image: Visual Studio 2019
+          platform: x64
+    environment:
+      CFLAGS: "/W3 /WX /D_CRT_SECURE_NO_WARNINGS"
       CXXFLAGS: "/W3 /WX /D_CRT_SECURE_NO_WARNINGS"
     build_script:
-      - cmake . -G "Visual Studio 15 2017 Win64" -DBUILD_TESTS=ON
-      - cmake --build . --config Release --target install
-
-test_script:
-  - ctest -C Release
-  - Release\primecount.exe --test
+      - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
+      - cmake --build . --config %Configuration% --target install
+    test_script:
+      - ctest -C %Configuration%
+      - cd %Configuration%
+      - primecount.exe --test
