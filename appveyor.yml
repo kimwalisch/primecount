@@ -37,9 +37,9 @@ for:
       - ctest
       # Run primecount binary
       - ./primecount --test
-      - ./primecount 1e15 --gourdon
+      - ./primecount 1e14 --gourdon
       - ./primecount 1e12 --nth-prime
-      - ./primecount 1e13 --meissel
+      - ./primecount 1e12 --meissel
 
   - matrix:
       only:
