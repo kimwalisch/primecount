@@ -38,10 +38,8 @@ for:
       # Run primecount binary
       - ./primecount --test
       - ./primecount 1e14 --gourdon
-      - ./primecount 1e14 --deleglise-rivat
       - ./primecount 1e12 --nth-prime
-      - ./primecount 1e11 --lehmer
-      - ./primecount 1e10 --lmo3
+      - ./primecount 1e12 --meissel
 
   - matrix:
       only:
