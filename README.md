@@ -93,11 +93,9 @@ specified the number of threads using ```--threads=NUM```).
 
 primecount binaries built using the Clang compiler scale significantly better than
 primecount binaries built using GCC on PCs and servers with a large number of CPU
-cores. Unfortunately the primecount binaries that are offered for download are built
-using an old version of GCC that supports static linking of OpenMP. Hence if you
-build primecount from source I recommend using Clang. Also if you don't care about
-portability I recommend using the ```-march=native``` compiler option to build a
-primecount binary that is optimized for your CPU.
+cores. Hence if you build primecount from source I recommend using Clang. Also if
+you don't care about portability I recommend using the ```-march=native``` compiler
+option to build a primecount binary that is optimized for your CPU.
 
 ```bash
 CXX=clang++ CXXFLAGS="-march=native" cmake .
