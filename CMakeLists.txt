@@ -10,6 +10,7 @@ option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
 option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
 option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
 option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
+option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 
 option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
@@ -18,7 +19,6 @@ option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
-option(WITH_MPI            "Enable MPI support"                    OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -123,32 +123,6 @@ endif()
 if(WITH_FLOAT128)
     set(LIB_QUADMATH "quadmath")
     set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
-endif()
-
-# Check for MPI (Message Passing Interface) ##########################
-
-if(WITH_MPI)
-    find_package(MPI REQUIRED)
-
-    if(TARGET MPI::MPI_CXX)
-        set(LIB_MPI "MPI::MPI_CXX")
-    else()
-        include_directories("${MPI_INCLUDE_PATH}")
-    endif()
-
-    set(ENABLE_MPI "ENABLE_MPI")
-    set(LIB_SRC ${LIB_SRC}
-                src/mpi/B_mpi.cpp
-                src/mpi/D_mpi.cpp
-                src/mpi/Phi0_mpi.cpp
-                src/mpi/MpiLoadBalancer.cpp
-                src/mpi/MpiMsg.cpp)
-
-    if(libdivide_branchfree)
-        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi_libdivide.cpp)
-    else()
-        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi.cpp)
-    endif()
 endif()
 
 # Check for OpenMP ###################################################
@@ -256,10 +230,15 @@ endif()
 # (e.g. libprimesieve-dev) and link against that version.
 
 if(BUILD_LIBPRIMESIEVE)
+    set(COPY_BUILD_MANPAGE "${BUILD_MANPAGE}")
     set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+    set(BUILD_MANPAGE OFF CACHE BOOL "Build primesieve manpage" FORCE)
     set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
     option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
+
     add_subdirectory(lib/primesieve)
+
+    set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()
     find_package(primesieve REQUIRED)
@@ -364,3 +343,30 @@ endif()
 install(FILES include/primecount.h
               include/primecount.hpp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Regenerate man page ################################################
+
+if(BUILD_MANPAGE)
+    find_program(A2X_EXECUTABLE a2x)
+
+    if(NOT A2X_EXECUTABLE)
+        message(FATAL_ERROR "Missing a2x program (required for man page generation)!")
+    else()
+        message(STATUS "Found a2x: ${A2X_EXECUTABLE}")
+
+        add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${A2X_EXECUTABLE}
+            ARGS --format=manpage
+                 -D "${PROJECT_SOURCE_DIR}/doc"
+                 "${PROJECT_SOURCE_DIR}/doc/primecount.txt"
+            VERBATIM)
+    endif()
+endif()
+
+# Install man page ###################################################
+
+if(BUILD_PRIMECOUNT)
+    install(FILES ${PROJECT_SOURCE_DIR}/doc/primecount.1
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+endif()
