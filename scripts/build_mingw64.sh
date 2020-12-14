@@ -18,6 +18,14 @@ cd include
 VERSION=$(grep "PRIMECOUNT_VERSION " primecount.hpp | cut -f2 -d'"')
 cd ..
 
+####################################################################
+
+handle_error() {
+    echo ""
+    echo "Error: $1"
+    exit 1
+}
+
 # Build primecount binary ##########################################
 
 git checkout master
@@ -32,7 +40,7 @@ sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
 # Verify that sed has worked correctly,
 # last word should be -lkernel32.
-[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || exit 1
+[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || handle_error "failed updating linklibs.rsp"
 
 make
 strip primecount.exe
@@ -49,9 +57,9 @@ sed -i "2 s/.*/$FULL_DATE/" README.txt
 sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 
 # Verify sed has worked correctly
-[ "$(sed -n '1p' < README.txt)" = "primecount $VERSION" ] || exit 1
-[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || exit 1
-[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || exit 1
+[ "$(sed -n '1p' < README.txt)" = "primecount $VERSION" ] || handle_error "failed updating README.txt"
+[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || handle_error "failed updating README.txt"
+[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || handle_error "failed updating COPYING"
 
 zip primecount-$VERSION-win-x64.zip primecount.exe README.txt COPYING
 cp primecount-$VERSION-win-x64.zip ..
@@ -72,7 +80,7 @@ sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
 # Verify that sed has worked correctly,
 # last word should be -lkernel32.
-[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || exit 1
+[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || handle_error "failed updating linklibs.rsp"
 
 make
 strip primecount.exe
@@ -89,9 +97,9 @@ sed -i "2 s/.*/$FULL_DATE/" README.txt
 sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 
 # Verify sed has worked correctly
-[ "$(sed -n '1p' < README.txt)" = "primecount-backup $VERSION" ] || exit 1
-[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || exit 1
-[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || exit 1
+[ "$(sed -n '1p' < README.txt)" = "primecount-backup $VERSION" ] || handle_error "failed updating README.txt"
+[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || handle_error "failed updating README.txt"
+[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || handle_error "failed updating COPYING"
 
 zip primecount-backup-$VERSION-win-x64.zip primecount.exe README.txt COPYING worktodo.sh worktodo.txt
 cp primecount-backup-$VERSION-win-x64.zip ..
