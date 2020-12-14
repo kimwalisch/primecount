@@ -30,6 +30,10 @@ rm primecount.exe
 sed -i 's/-lkernel32.*/-lkernel32/g' CMakeFiles/primecount.dir/linklibs.rsp
 sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
+# Verify that sed has worked correctly,
+# last word should be -lkernel32.
+[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || exit 1
+
 make
 strip primecount.exe
 
@@ -43,6 +47,11 @@ cd primecount-$VERSION-win-x64
 sed -i "1 s/.*/primecount $VERSION/" README.txt
 sed -i "2 s/.*/$FULL_DATE/" README.txt
 sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
+
+# Verify sed has worked correctly
+[ "$(sed -n '1p' < README.txt)" = "primecount $VERSION" ] || exit 1
+[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || exit 1
+[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || exit 1
 
 zip primecount-$VERSION-win-x64.zip primecount.exe README.txt COPYING
 cp primecount-$VERSION-win-x64.zip ..
@@ -61,6 +70,10 @@ rm primecount.exe
 sed -i 's/-lkernel32.*/-lkernel32/g' CMakeFiles/primecount.dir/linklibs.rsp
 sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
+# Verify that sed has worked correctly,
+# last word should be -lkernel32.
+[ "$(grep -o '[^ ]\+$' CMakeFiles/primecount.dir/linklibs.rsp)" = "-lkernel32" ] || exit 1
+
 make
 strip primecount.exe
 
@@ -74,6 +87,11 @@ cd primecount-backup-$VERSION-win-x64
 sed -i "1 s/.*/primecount-backup $VERSION/" README.txt
 sed -i "2 s/.*/$FULL_DATE/" README.txt
 sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
+
+# Verify sed has worked correctly
+[ "$(sed -n '1p' < README.txt)" = "primecount-backup $VERSION" ] || exit 1
+[ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || exit 1
+[ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || exit 1
 
 zip primecount-backup-$VERSION-win-x64.zip primecount.exe README.txt COPYING worktodo.sh worktodo.txt
 cp primecount-backup-$VERSION-win-x64.zip ..
