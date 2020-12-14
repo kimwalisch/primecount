@@ -41,6 +41,8 @@ cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-l
 make -j8
 rm primecount.exe
 
+# Remove unnecessary libraries for linking,
+# keep only GCC libraries + kernel32.
 sed -i 's/-lkernel32.*/-lkernel32/g' CMakeFiles/primecount.dir/linklibs.rsp
 sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
@@ -55,8 +57,15 @@ strip primecount.exe
 wget https://github.com/kimwalisch/primecount/releases/download/v6.1/primecount-6.1-win64.zip
 unzip primecount-6.1-win64.zip -d primecount-$VERSION-win-x64
 rm primecount-6.1-win64.zip
-mv -f primecount.exe primecount-$VERSION-win-x64
 
+echo ""
+echo ""
+echo "Old file size: $(ls -lh primecount-$VERSION-win-x64)/primecount.exe)"
+echo "New file size: $(ls -lh primecount.exe)"
+echo ""
+echo ""
+
+mv -f primecount.exe primecount-$VERSION-win-x64
 cd primecount-$VERSION-win-x64
 sed -i "1 s/.*/primecount $VERSION/" README.txt
 sed -i "2 s/.*/$FULL_DATE/" README.txt
@@ -69,6 +78,7 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 
 zip primecount-$VERSION-win-x64.zip primecount.exe README.txt COPYING
 cp primecount-$VERSION-win-x64.zip ..
+primecount.exe --test
 cd ..
 
 # Build primecount-backup binary ###################################
@@ -81,6 +91,8 @@ cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-l
 make -j8
 rm primecount.exe
 
+# Remove unnecessary libraries for linking,
+# keep only GCC libraries + kernel32.
 sed -i 's/-lkernel32.*/-lkernel32/g' CMakeFiles/primecount.dir/linklibs.rsp
 sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
@@ -96,6 +108,13 @@ wget https://github.com/kimwalisch/primecount/releases/download/v6.0-backup/prim
 unzip primecount-backup-6.0-win64.zip -d primecount-backup-$VERSION-win-x64
 rm primecount-backup-6.0-win64.zip
 
+echo ""
+echo ""
+echo "Old file size: $(ls -lh primecount-backup-$VERSION-win-x64)/primecount.exe)"
+echo "New file size: $(ls -lh primecount.exe)"
+echo ""
+echo ""
+
 mv -f primecount.exe primecount-backup-$VERSION-win-x64
 cd primecount-backup-$VERSION-win-x64
 sed -i "1 s/.*/primecount-backup $VERSION/" README.txt
@@ -109,8 +128,16 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 
 zip primecount-backup-$VERSION-win-x64.zip primecount.exe README.txt COPYING worktodo.sh worktodo.txt
 cp primecount-backup-$VERSION-win-x64.zip ..
+
+echo ""
+echo "Testing:"
+primecount.exe 1e15
+primecount.exe 1e15
 cd ..
 
 ####################################################################
 
 git checkout master
+
+echo ""
+echo "Release binaries built successfully!"
