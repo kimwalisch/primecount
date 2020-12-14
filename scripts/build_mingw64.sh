@@ -79,6 +79,7 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 zip primecount-$VERSION-win-x64.zip primecount.exe README.txt COPYING
 cp primecount-$VERSION-win-x64.zip ..
 ./primecount --test
+echo ""
 cd ..
 
 # Build primecount-backup binary ###################################
