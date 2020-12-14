@@ -60,8 +60,8 @@ rm primecount-6.1-win64.zip
 
 echo ""
 echo ""
-echo "Old file size: $(ls -lh primecount-$VERSION-win-x64)/primecount.exe)"
-echo "New file size: $(ls -lh primecount.exe)"
+echo "Old file size: $(ls -l --block-size=K primecount-$VERSION-win-x64/primecount.exe)"
+echo "New file size: $(ls -l --block-size=K primecount.exe)"
 echo ""
 echo ""
 
@@ -110,8 +110,8 @@ rm primecount-backup-6.0-win64.zip
 
 echo ""
 echo ""
-echo "Old file size: $(ls -lh primecount-backup-$VERSION-win-x64)/primecount.exe)"
-echo "New file size: $(ls -lh primecount.exe)"
+echo "Old file size: $(ls -l --block-size=K primecount-backup-$VERSION-win-x64/primecount.exe)"
+echo "New file size: $(ls -l --block-size=K primecount.exe)"
 echo ""
 echo ""
 
