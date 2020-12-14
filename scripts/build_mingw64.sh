@@ -4,7 +4,7 @@
 # Builds primecount and primecount-backup release binaries that
 # are statically linked and ready for distribution.
 
-# Exist if any error occurs
+# Exit if any error occurs
 set -e
 
 rm -rf build*
