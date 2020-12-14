@@ -26,6 +26,12 @@ handle_error() {
     exit 1
 }
 
+####################################################################
+
+# The repo must no have any uncommited changes as we
+# switch to another branch during the script.
+git diff --exit-code > /dev/null || handle_error "repo must not have any uncommitted changes"
+
 # Build primecount binary ##########################################
 
 git checkout master
@@ -104,3 +110,7 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 zip primecount-backup-$VERSION-win-x64.zip primecount.exe README.txt COPYING worktodo.sh worktodo.txt
 cp primecount-backup-$VERSION-win-x64.zip ..
 cd ..
+
+####################################################################
+
+git checkout master
