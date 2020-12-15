@@ -1,8 +1,20 @@
-Changes in primecount-6.2, 2020-12-09
+Changes in primecount-6.2, 2020-12-11
+
+  The sieving algorithm has been improved by annotating branches
+  with likely/unlikely and __builtin_unreachable(). This improves
+  the performance of the S2_hard and D formulas by up to 5%. GCC
+  benefits most from these changes (Clang's performance was
+  already very good before). With this release there is also a new
+  primecount-backup version (last primecount-backup release was 6.0).
+
+  In order to reduce the amount of work for myself there will be no
+  precompiled binaries anymore going forward. You can now install
+  primecount using your operating system's package manager (if it
+  is available there) or by compiling it from source yourself.
 
   * Use Appveyor-CI instead of Travis-CI for testing.
   * README.md: primecount can now be installed using package managers.
-  * Sieve.cpp: Annotate branches with unlikely, up to 3% speedup.
+  * Sieve.cpp: Annotate branches with unlikely, up to 5% speedup.
   * Sieve.cpp: Annotate switch cases with fallthrough.
   * AC.cpp: Reduce number of function paramaters.
   * AC_libdivide.cpp: Reduce number of function paramaters.
