@@ -1,4 +1,4 @@
-Changes in primecount-6.2, 2020-12-11
+Changes in primecount-6.2, 2020-12-15
 
   The sieving algorithm has been improved by annotating branches
   with likely/unlikely and __builtin_unreachable(). This improves
