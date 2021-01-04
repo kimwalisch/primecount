@@ -132,8 +132,8 @@ cp primecount-backup-$VERSION-win-x64.zip ..
 
 echo ""
 echo "Testing:"
-./primecount 1e15
-./primecount 1e15
+./primecount 1e17 --time
+./primecount 1e17
 cd ..
 
 ####################################################################
