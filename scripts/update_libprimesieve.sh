@@ -17,7 +17,7 @@ mv primesieve-master primesieve
 git status
 echo ""
 
-read -p "Do you want to commit and push the changes? [y/n]" -n 1 -r
+read -p "Do you want to commit and push the changes? [y/n] " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
