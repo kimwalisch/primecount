@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.4...3.19)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 6)
 set(PRIMECOUNT_VERSION_MINOR 2)
