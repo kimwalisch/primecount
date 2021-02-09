@@ -141,7 +141,7 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    x = (x + 1) / 2;
+    x = ceil_div(x, 2);
     return a < cache_.size() &&
            x < cache_[a].size() &&
            cache_[a][x] != 0;
@@ -154,13 +154,13 @@ private:
     // because phi(x, a) only changes its result if x is odd (for the
     // same a). This trick allows us to double the capacity of our cache
     // without increasing its memory usage.
-    x = (x + 1) / 2;
+    x = ceil_div(x, 2);
     return cache_[a][x];
   }
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    x = (x + 1) / 2;
+    x = ceil_div(x, 2);
 
     if (a >= cache_.size() ||
         x > cache_limit_)
