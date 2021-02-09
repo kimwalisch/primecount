@@ -10,11 +10,11 @@
 ///        to my implementation which significantly speed up the
 ///        calculation:
 ///
-///        * Cache results of phi(x, a)
-///        * Calculate phi(x, a) using formula [2] if a <= 6
-///        * Calculate phi(x, a) using pi(x) lookup table
-///        * Calculate all phi(x, a) = 1 upfront
-///        * Stop recursion at c instead of 1
+///        * Calculate phi(x, a) in O(1) using formula [2] if a <= 6.
+///        * Calculate phi(x, a) in O(1) using pi(x) lookup table if x < prime[a+1]^2.
+///        * Cache results of phi(x, a) if x and a are small.
+///        * Calculate all phi(x, a) = 1 upfront in O(1).
+///        * Stop recursion at c instead of 1.
 ///
 ///       [1] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///           method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
@@ -57,9 +57,13 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // Cache phi(x, a) results if x <= max_x
-    auto u16_max = numeric_limits<uint16_t>::max();
-    max_x_ = min(isqrt(limit), u16_max);
+    // We cache phi(x, a) results if x <= cache_limit_ (and a <= 100).
+    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
+    // because phi(x, a) only changes its result if x is odd (for the
+    // same a). This trick allows us to double the capacity of our cache
+    // without increasing its memory usage.
+    cache_limit_ = numeric_limits<cache_t>::max();
+    cache_limit_ = min(cache_limit_, isqrt(limit));
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -75,7 +79,7 @@ public:
     else if (is_pix(x, a))
       return (pi_[x] - a + 1) * SIGN;
     else if (is_cached(x, a))
-      return cache_[a][x] * SIGN;
+      return phi_cache(x, a) * SIGN;
 
     int64_t sqrtx = isqrt(x);
     int64_t pi_sqrtx = a;
@@ -96,14 +100,23 @@ public:
     sum += (pi_sqrtx - a) * SIGN;
     sum += phi_tiny(x, c) * SIGN;
 
-    for (int64_t i = c; i < pi_sqrtx; i++)
-    {
-      int64_t xp = fast_div(x, primes_[i + 1]);
+    int64_t i;
+    int64_t xp;
 
+    for (i = c; i < pi_sqrtx; i++)
+    {
+      xp = fast_div(x, primes_[i + 1]);
       if (is_pix(xp, i))
-        sum += (pi_[xp] - i + 1) * -SIGN;
-      else
-        sum += phi<-SIGN>(xp, i);
+        goto use_faster_pix;
+
+      sum += phi<-SIGN>(xp, i);
+    }
+
+    for (; i < pi_sqrtx; i++)
+    {
+      xp = fast_div(x, primes_[i + 1]);
+      use_faster_pix:;
+      sum += (pi_[xp] - i + 1) * -SIGN;
     }
 
     update_cache(x, a, sum);
@@ -112,28 +125,13 @@ public:
   }
 
 private:
-  /// Cache phi(x, a) results if x <= max_x && a < MAX_A
-  uint64_t max_x_ = 0;
+  /// Cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
+  uint64_t cache_limit_ = 0;
   enum { MAX_A = 100 };
-  array<vector<uint16_t>, MAX_A> cache_;
+  using cache_t = uint16_t;
+  array<vector<cache_t>, MAX_A> cache_;
   vector<int32_t>& primes_;
   PiTable& pi_;
-
-  void update_cache(uint64_t x, uint64_t a, int64_t sum)
-  {
-    if (x <= max_x_ &&
-        a < cache_.size())
-    {
-      if (x >= cache_[a].size())
-      {
-        cache_[a].reserve(max_x_ + 1);
-        cache_[a].resize(x + 1, 0);
-      }
-
-      sum = abs(sum);
-      cache_[a][x] = (uint16_t) sum;
-    }
-  }
 
   bool is_pix(int64_t x, int64_t a) const
   {
@@ -143,9 +141,40 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    return a < cache_.size() && 
-           x < cache_[a].size() && 
-           cache_[a][x];
+    x = (x + 1) / 2;
+    return a < cache_.size() &&
+           x < cache_[a].size() &&
+           cache_[a][x] != 0;
+  }
+
+  int64_t phi_cache(uint64_t x, uint64_t a) const
+  {
+    // We cache phi(x, a) results if x <= cache_limit_ (and a <= 100).
+    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
+    // because phi(x, a) only changes its result if x is odd (for the
+    // same a). This trick allows us to double the capacity of our cache
+    // without increasing its memory usage.
+    x = (x + 1) / 2;
+    return cache_[a][x];
+  }
+
+  void update_cache(uint64_t x, uint64_t a, int64_t sum)
+  {
+    x = (x + 1) / 2;
+
+    if (a >= cache_.size() ||
+        x > cache_limit_)
+      return;
+
+    if (x >= cache_[a].size())
+    {
+      cache_[a].reserve(cache_limit_ + 1);
+      cache_[a].resize(x + 1, 0);
+    }
+
+    sum = abs(sum);
+    assert(sum <= numeric_limits<cache_t>::max());
+    cache_[a][x] = (cache_t) sum;
   }
 };
 
