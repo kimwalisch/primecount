@@ -63,7 +63,7 @@ public:
     // because phi(x, a) only changes its result if x is odd (for the
     // same a). This trick allows us to double the capacity of our cache
     // without increasing its memory usage.
-    cache_limit_ = numeric_limits<cache_t>::max();
+    cache_limit_ = numeric_limits<uint16_t>::max();
     cache_limit_ = min(cache_limit_, isqrt(limit));
   }
 
@@ -126,14 +126,6 @@ public:
   }
 
 private:
-  /// Cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
-  uint64_t cache_limit_ = 0;
-  enum { MAX_A = 100 };
-  using cache_t = uint16_t;
-  array<vector<cache_t>, MAX_A> cache_;
-  const Primes& primes_;
-  const PiTable& pi_;
-
   bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
@@ -174,9 +166,15 @@ private:
     }
 
     sum = abs(sum);
-    assert(sum <= numeric_limits<cache_t>::max());
-    cache_[a][x] = (cache_t) sum;
+    assert(sum <= numeric_limits<uint16_t>::max());
+    cache_[a][x] = (uint16_t) sum;
   }
+
+  uint64_t cache_limit_ = 0;
+  enum { MAX_A = 100 };
+  array<vector<uint16_t>, MAX_A> cache_;
+  const Primes& primes_;
+  const PiTable& pi_;
 };
 
 /// Returns a vector with phi(x, i - 1) values such that
