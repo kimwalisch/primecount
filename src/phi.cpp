@@ -57,13 +57,15 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
-    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
-    // because phi(x, a) only changes its result if x is odd (for the
-    // same a). This trick allows us to double the capacity of our cache
-    // without increasing its memory usage.
-    cache_limit_ = numeric_limits<uint16_t>::max();
-    cache_limit_ = min(cache_limit_, isqrt(limit));
+    // The cache limit has been tuned for both pi_legendre(x) and
+    // pi_meissel(x) as these functions are frequently used in primecount.
+    // The idea is to allocate only a small amount of cache memory for
+    // tiny computations (because initializing a lot of cache memory is
+    // slow). On the other hand, for large and long running computations
+    // we use the maximum amount of cache memory.
+    auto u16_max = numeric_limits<uint16_t>::max();
+    cache_limit_ = (uint64_t) std::pow((double) limit, 1 / 2.5);
+    cache_limit_ = min(cache_limit_, u16_max);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
