@@ -58,7 +58,7 @@ public:
     : primes_(primes),
       pi_(pi)
   {
-    // We cache phi(x, a) results if x <= cache_limit_ (and a <= 100).
+    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
     // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
     // because phi(x, a) only changes its result if x is odd (for the
     // same a). This trick allows us to double the capacity of our cache
@@ -150,7 +150,7 @@ private:
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    // We cache phi(x, a) results if x <= cache_limit_ (and a <= 100).
+    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
     // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
     // because phi(x, a) only changes its result if x is odd (for the
     // same a). This trick allows us to double the capacity of our cache
