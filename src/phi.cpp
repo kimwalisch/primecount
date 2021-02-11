@@ -64,7 +64,7 @@ public:
     // slow). On the other hand, for large and long running computations
     // we use the maximum amount of cache memory.
     auto u16_max = numeric_limits<uint16_t>::max();
-    cache_limit_ = (uint64_t) std::pow((double) limit, 1 / 2.5);
+    cache_limit_ = (uint64_t) pow((double) limit, 1 / 2.5);
     cache_limit_ = min(cache_limit_, u16_max);
   }
 
