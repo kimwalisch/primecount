@@ -127,6 +127,11 @@ public:
   }
 
 private:
+  /// phi(x, a) counts the numbers <= x that are not divisible by any of
+  /// the first a primes. If x < prime[a+1]^2 then phi(x, a) counts the
+  /// number of primes <= x, minus the first a primes, plus the number 1.
+  /// Hence if x < prime[a+1]^2: phi(x, a) = pi(x) - a + 1.
+  ///
   bool is_pix(int64_t x, int64_t a) const
   {
     return x < pi_.size() &&
@@ -143,17 +148,17 @@ private:
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
-    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
-    // because phi(x, a) only changes its result if x is odd (for the
-    // same a). This trick allows us to double the capacity of our cache
-    // without increasing its memory usage.
     x = ceil_div(x, 2);
     return cache_[a][x];
   }
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
+    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
+    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
+    // because phi(x, a) only changes its result if x is odd (for the
+    // same a). This trick allows us to double the capacity of our cache
+    // without increasing its memory usage.
     x = ceil_div(x, 2);
 
     if (a >= cache_.size() ||
