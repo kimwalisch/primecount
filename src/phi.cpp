@@ -30,12 +30,13 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <print.hpp>
-#include <generate.hpp>
-#include <imath.hpp>
-#include <PhiTiny.hpp>
+#include <primesieve.hpp>
+#include <gourdon.hpp>
 #include <fast_div.hpp>
+#include <imath.hpp>
 #include <min.hpp>
+#include <PhiTiny.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -183,6 +184,27 @@ private:
   const PiTable& pi_;
 };
 
+/// If a is very large (prime[a] >= sqrt(x)) then we need to
+/// calculate phi(x, a) using an alternative method. First, because
+/// in this case there actually exists a much faster method. And
+/// secondly, because storing the first a primes in a vector could
+/// use a huge amount of memory and cause an out of memory error. 
+///
+int64_t phi_pix(int64_t x, int64_t a, int threads)
+{
+  int64_t pix;
+
+  if (x < 1e8)
+    pix = pi_meissel(x, threads);
+  else
+    pix = pi_gourdon(x, threads);
+
+  if (a <= pix)
+    return pix - a + 1;
+  else
+    return 1;
+}
+
 } // namespace
 
 namespace primecount {
@@ -197,50 +219,61 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a > x) return 1;
   if (a < 1) return x;
 
-  int64_t sum = 0;
-
   if (is_phi_tiny(a))
-    sum = phi_tiny(x, a);
-  else
+    return phi_tiny(x, a);
+
+  int64_t sqrtx = isqrt(x);
+  if (a >= sqrtx)
+    return phi_pix(x, a, threads);
+
+  // We use 1 indexing i.e. primes[1] = 2
+  vector<int32_t> primes;
+  primes.reserve(a + 2);
+  primes.push_back(0);
+  primesieve::iterator it;
+
+  // Store the first a primes in a vector
+  for (int64_t i = 0; i < a; i++)
   {
-    auto primes = generate_n_primes<int32_t>(a);
+    int64_t prime = it.next_prime();
+    primes.push_back((int32_t) prime);
+    if (prime >= x)
+      return 1;
+    // We use if (prime > sqrtx) here instead of (prime >= sqrtx) because
+    // we want to prevent that our pi_legendre(x) uses this code path.
+    // Otherwise pi_legendre(x) would switch to using pi_gourdon(x) under
+    // the hood which is not what users expect.
+    if (prime > sqrtx)
+      return phi_pix(x, a, threads);
+  }
 
-    if (primes[a] >= x)
-      sum = 1;
-    else
-    {
-      // use large pi(x) lookup table for speed
-      int64_t sqrtx = isqrt(x);
-      int64_t c = PhiTiny::get_c(sqrtx);
-      PiTable pi(max(sqrtx, primes[a]), threads);
-      int64_t pi_sqrtx = min(pi[sqrtx], a);
-      int64_t thread_threshold = (int64_t) 1e10;
-      threads = ideal_num_threads(threads, x, thread_threshold);
+  // Use a large pi(x) lookup table for speed
+  int64_t c = PhiTiny::get_c(sqrtx);
+  PiTable pi(max(sqrtx, primes[a]), threads);
+  int64_t pi_sqrtx = min(pi[sqrtx], a);
+  int64_t sum = phi_tiny(x, c) - a + pi_sqrtx;
+  int64_t thread_threshold = (int64_t) 1e10;
+  threads = ideal_num_threads(threads, x, thread_threshold);
 
-      sum = phi_tiny(x, c) - a + pi_sqrtx;
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  {
+    // Each thread uses its own PhiCache object in
+    // order to avoid thread synchronization.
+    PhiCache cache(x, primes, pi);
 
-      #pragma omp parallel num_threads(threads) reduction(+: sum)
-      {
-        // Each thread uses its own PhiCache object in
-        // order to avoid thread synchronization.
-        PhiCache cache(x, primes, pi);
-
-        #pragma omp for nowait schedule(dynamic, 16)
-        for (int64_t i = c; i < pi_sqrtx; i++)
-          sum += cache.phi<-1>(x / primes[i + 1], i);
-      }
-    }
+    #pragma omp for nowait schedule(dynamic, 16)
+    for (int64_t i = c; i < pi_sqrtx; i++)
+      sum += cache.phi<-1>(x / primes[i + 1], i);
   }
 
   return sum;
 }
 
-/// The default phi(x, a) implementation does not print anything
-/// to the screen as it is used by pi_simple(x) which is used
-/// all over the place (e.g. to initialize S1, S2, P2, P3, ...)
-/// and we don't want to print any info about this.
-/// Hence we also provide phi_print(x, a) for use cases where we
-/// do want to print the result of phi(x, a).
+/// The default phi(x, a) implementation does not print anything to the
+/// screen as it is used by pi_simple(x) which is used all over the
+/// place (e.g. to initialize S1, S2, P2, P3, ...) and we don't want to
+/// print any info about this. Hence we also provide phi_print(x, a) for
+/// use cases where we do want to print the result of phi(x, a).
 ///
 int64_t phi_print(int64_t x, int64_t a, int threads)
 {
