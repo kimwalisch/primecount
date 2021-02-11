@@ -52,8 +52,8 @@ class PhiCache
 {
 public:
   PhiCache(int64_t limit,
-           vector<int32_t>& primes,
-           PiTable& pi) :
+           const vector<int32_t>& primes,
+           const PiTable& pi) :
     primes_(primes),
     pi_(pi)
   {
@@ -179,8 +179,8 @@ private:
   uint64_t cache_limit_ = 0;
   enum { MAX_A = 100 };
   array<vector<uint16_t>, MAX_A> cache_;
-  vector<int32_t>& primes_;
-  PiTable& pi_;
+  const vector<int32_t>& primes_;
+  const PiTable& pi_;
 };
 
 } // namespace
