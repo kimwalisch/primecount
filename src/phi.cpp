@@ -192,7 +192,11 @@ private:
 ///
 int64_t phi_pix(int64_t x, int64_t a, int threads)
 {
+  bool print = is_print();
+  set_print(false);
+
   int64_t pix;
+  int64_t sum;
 
   if (x < 1e8)
     pix = pi_meissel(x, threads);
@@ -200,9 +204,12 @@ int64_t phi_pix(int64_t x, int64_t a, int threads)
     pix = pi_gourdon(x, threads);
 
   if (a <= pix)
-    return pix - a + 1;
+    sum = pix - a + 1;
   else
-    return 1;
+    sum = 1;
+
+  set_print(print);
+  return sum;
 }
 
 } // namespace
