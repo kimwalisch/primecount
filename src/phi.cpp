@@ -85,41 +85,28 @@ public:
       return phi_cache(x, a) * SIGN;
 
     int64_t sqrtx = isqrt(x);
-    int64_t pi_sqrtx = a;
     int64_t c = PhiTiny::get_c(sqrtx);
-    int64_t sum = 0;
+    int64_t sum = phi_tiny(x, c) * SIGN;
+    int64_t i, xp;
 
-    if (sqrtx < pi_.size())
-      pi_sqrtx = min(pi_[sqrtx], a);
-
-    // Move out of the loop the calculations where phi(xp, i) = 1
-    // phi(x, a) = 1 if primes[a] >= x
-    // xp = x / primes[i + 1]
-    // phi(xp, i) = 1 if primes[i] >= x / primes[i + 1]
-    // phi(xp, i) = 1 if primes[i] >= sqrt(x)
-    // phi(xp, i) = 1 if i >= pi(sqrt(x))
-    // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
-    sum += (pi_sqrtx - a) * SIGN;
-    sum += phi_tiny(x, c) * SIGN;
-
-    int64_t i;
-    int64_t xp;
-
-    for (i = c; i < pi_sqrtx; i++)
+    for (i = c; i < a; i++)
     {
       xp = fast_div(x, primes_[i + 1]);
       if (is_pix(xp, i))
-        goto use_faster_pix;
-
+        break;
       sum += phi<-SIGN>(xp, i);
     }
 
-    for (; i < pi_sqrtx; i++)
+    for (; i < a; i++)
     {
       xp = fast_div(x, primes_[i + 1]);
-      use_faster_pix:;
+      if (xp <= primes_[i])
+        break;
       sum += (pi_[xp] - i + 1) * -SIGN;
     }
+
+    // phi(x, a) = 1 for all primes[a] >= x
+    sum += (i - a) * SIGN;
 
     update_cache(x, a, sum);
 
