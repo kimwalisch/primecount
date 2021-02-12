@@ -1,7 +1,16 @@
-Changes in primecount-6.3, 2021-02-09
+Changes in primecount-6.3, 2021-02-12
 
-  * phi.cpp: Cache 2x more phi(x, a) results.
-  * generate_phi.hpp: Cache 2x more phi(x, a) results.
+  The partial sieve function a.k.a. phi(x, a) has been improved.
+  This function is used by many other functions such as
+  pi_legendre(x), pi_meissel(x), pi_lehmer(x), ... For
+  pi_meissel(x) I have mesured a speedup of 2x for pi(1e16).
+  Note that the default pi_gourdon(x) does not benefit from this
+  improvement.
+
+  * phi.cpp: Fixed integer overflow #39.
+  * phi.cpp: Cache 4.8x more phi(x, a) results.
+  * phi.cpp: Use pi(x) if a > pi(sqrt(x)).
+  * generate_phi.hpp: Same optimizations as phi.cpp.
 
 Changes in primecount-6.2, 2021-01-07
 
