@@ -174,6 +174,7 @@ private:
 
     sum = abs(sum);
     assert(sum <= numeric_limits<uint16_t>::max());
+    assert(cache_[a][x] == 0);
     cache_[a][x] = (uint16_t) sum;
   }
 
