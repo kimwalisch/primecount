@@ -106,7 +106,7 @@ public:
     }
 
     // phi(x, a) = 1 for all primes[a] >= x
-    sum += (i - a) * SIGN;
+    sum += (a - i) * -SIGN;
 
     update_cache(x, a, sum);
 
