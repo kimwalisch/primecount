@@ -251,7 +251,8 @@ int64_t phi(int64_t x, int64_t a, int threads)
     // We use if (prime > sqrtx) here instead of (prime >= sqrtx) because
     // we want to prevent that our pi_legendre(x) uses this code path.
     // Otherwise pi_legendre(x) would switch to using pi_gourdon(x) under
-    // the hood which is not what users expect.
+    // the hood which is not what users expect. Also using (prime >= sqrtx)
+    // here would cause infinite recursion, more info at phi_pix(x, a).
     if (prime > sqrtx)
       return phi_pix(x, a, threads);
   }
