@@ -4,14 +4,14 @@
 ///         which counts the numbers <= x that are not divisible
 ///         by any of the first a primes.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount.hpp>
-#include <generate.hpp>
+#include <primesieve.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -23,45 +23,90 @@
 using namespace std;
 using namespace primecount;
 
-void check(bool OK)
+void check(size_t x, size_t a, size_t phi_xa, size_t cnt)
 {
+  bool OK = (phi_xa == cnt);
+  cout << "phi(" << x << ", " << a << ") = " << phi_xa;
   cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
     exit(1);
 }
 
-// Count the number of unsieved elements
-int count(vector<char>& sieve)
+void check2(size_t x, size_t a, size_t phi_xa, size_t cnt)
 {
-  int cnt = 0;
-
-  for (size_t i = 1; i < sieve.size(); i++)
-    cnt += sieve[i];
-
-  return cnt;
+  if (phi_xa != cnt)
+  {
+    bool OK = (phi_xa == cnt);
+    cout << "phi(" << x << ", " << a << ") = " << phi_xa;
+    cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+    exit(1);
+  }
+  // Reduce logging because it is slow
+  else if (a % 101 == 0)
+  {
+    bool OK = (phi_xa == cnt);
+    cout << "phi(" << x << ", " << a << ") = " << phi_xa;
+    cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  }
 }
 
 int main()
 {
   random_device rd;
   mt19937 gen(rd());
-  uniform_int_distribution<int> dist(10000000, 20000000);
 
-  int size = dist(gen);
-  int x = size - 1;
-
-  auto primes = generate_primes<int>(isqrt(x));
-  vector<char> sieve(size, 1);
-
-  for (size_t a = 1; a < primes.size(); a++)
   {
-    // remove primes[a] and its multiples
-    for (int j = primes[a]; j <= x; j += primes[a])
-      sieve[j] = 0;
+    uniform_int_distribution<size_t> dist(20000000, 30000000);
+    size_t size = dist(gen);
+    size_t x = size - 1;
+    size_t cnt = size - 1;
+    primesieve::iterator it;
+    vector<char> sieve(size, 1);
 
-    int64_t phi_xa = phi(x, a);
-    cout << "phi(" << x << ", " << a << ") = " << phi_xa;
-    check(phi_xa == count(sieve));
+    // test with small a values
+    for (size_t a = 1;; a++)
+    {
+      auto prime = it.next_prime();
+      if (prime * prime > x)
+        break;
+
+      // remove primes[a] and its multiples
+      for (auto j = prime; j <= x; j += prime)
+      {
+        cnt -= (sieve[j] == 1);
+        sieve[j] = 0;
+      }
+
+      int64_t phi_xa = phi(x, a);
+      check(x, a, phi_xa, cnt);
+    }
+  }
+
+  {
+    uniform_int_distribution<size_t> dist(100000, 200000);
+    size_t size = dist(gen);
+    size_t x = size - 1;
+    size_t cnt = size - 1;
+    primesieve::iterator it;
+    vector<char> sieve(size, 1);
+
+    // test with large a values
+    for (size_t a = 1;; a++)
+    {
+      auto prime = it.next_prime();
+      if (prime > x)
+        break;
+
+      // remove primes[a] and its multiples
+      for (auto j = prime; j <= x; j += prime)
+      {
+        cnt -= (sieve[j] == 1);
+        sieve[j] = 0;
+      }
+
+      int64_t phi_xa = phi(x, a);
+      check2(x, a, phi_xa, cnt);
+    }
   }
 
   cout << endl;
