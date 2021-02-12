@@ -53,7 +53,7 @@ set(BIN_SRC src/app/cmdoptions.cpp
 
 set(LIB_SRC src/api.cpp
             src/api_c.cpp
-            src/FactorTable.cpp
+            src/ModuloWheel.cpp
             src/RiemannR.cpp
             src/P2.cpp
             src/P3.cpp
