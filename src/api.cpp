@@ -50,7 +50,7 @@ int64_t pi(int64_t x, int threads)
   if (x <= (int64_t) 5e7)
     return pi_meissel(x, threads);
 
-  // Above 10^7 Xavier Gourdon's algorithm runs fastest
+  // For large x Gourdon's algorithm runs fastest
   return pi_gourdon_64(x, threads);
 }
 
