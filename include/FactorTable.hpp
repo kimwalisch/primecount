@@ -35,7 +35,7 @@
 ///        * Old: if (mu[n] != 0 && prime < lpf[n])
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -46,7 +46,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <BaseFactorTable.hpp>
+#include <ModuloWheel.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -62,7 +62,7 @@ namespace {
 using namespace primecount;
 
 template <typename T>
-class FactorTable : public BaseFactorTable
+class FactorTable : public ModuloWheel
 {
 public:
   /// Factor numbers <= y

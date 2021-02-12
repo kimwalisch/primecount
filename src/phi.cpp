@@ -22,7 +22,7 @@
 ///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 ///           with pp = 2 * 3 * ... * prime[a] 
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,6 +31,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <ModuloWheel.hpp>
 #include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
@@ -127,7 +128,7 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    x = ceil_div(x, 2);
+    x = ModuloWheel::to_index(x);
     return a < cache_.size() &&
            x < cache_[a].size() &&
            cache_[a][x] != 0;
@@ -135,18 +136,19 @@ private:
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    x = ceil_div(x, 2);
+    x = ModuloWheel::to_index(x);
     return cache_[a][x];
   }
 
   void update_cache(uint64_t x, uint64_t a, int64_t sum)
   {
-    // We cache phi(x, a) results if x <= cache_limit_ (and a < 100).
-    // Actually we cache phi(x, a) results if (x + 1) / 2 <= cache_limit_
-    // because phi(x, a) only changes its result if x is odd (for the
-    // same a). This trick allows us to double the capacity of our cache
-    // without increasing its memory usage.
-    x = ceil_div(x, 2);
+    // In order to increase the capacity of our phi cache we use a
+    // modulo 2310 wheel that does not store any numbers that are
+    // divisible by 2, 3, 5, 7 and 11. In a modulo 2310 wheel 480 array
+    // items span an interval of size 2310. Hence by using a modulo
+    // 2310 wheel we can increase our cache's capacity by 2310 / 480
+    // = 4.8125 without increasing its memory usage.
+    x = ModuloWheel::to_index(x);
 
     if (a >= cache_.size() ||
         x > cache_limit_)
