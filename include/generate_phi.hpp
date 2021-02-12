@@ -99,7 +99,6 @@ public:
     // phi(xp, i) = 1 if primes[i] >= sqrt(x)
     // phi(xp, i) = 1 if i >= pi(sqrt(x))
     // \sum_{i = pi(sqrt(x))}^{a - 1} phi(xp, i) = a - pi(sqrt(x))
-    //
     sum += (pi_sqrtx - a) * SIGN;
     sum += phi_tiny(x, c) * SIGN;
 
