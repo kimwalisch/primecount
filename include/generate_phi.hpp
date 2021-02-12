@@ -92,7 +92,8 @@ public:
     for (i = c; i < a; i++)
     {
       xp = fast_div(x, primes_[i + 1]);
-      if (is_pix(xp, i))
+      if (is_pix(xp, i) ||
+          xp <= primes_[i])
         break;
       sum += phi<-SIGN>(xp, i);
     }
