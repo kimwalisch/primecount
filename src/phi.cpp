@@ -219,8 +219,12 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  // Use a large pi(x) lookup table for speed
   int64_t sqrtx = isqrt(x);
+
+  // Inaccurate but fast (a > pi(sqrt(x)) check
+  if (a > sqrtx)
+    return phi_pix(x, a, threads);
+
   PiTable pi(sqrtx, threads);
   int64_t pi_sqrtx = pi[sqrtx];
 
