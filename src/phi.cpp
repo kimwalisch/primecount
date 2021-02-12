@@ -233,8 +233,8 @@ int64_t phi(int64_t x, int64_t a, int threads)
     return phi_pix(x, a, threads);
 
   auto primes = generate_n_primes<int32_t>(a);
-  int64_t c = PhiTiny::get_c(sqrtx);
   pi_sqrtx = min(a, pi_sqrtx);
+  int64_t c = PhiTiny::get_c(sqrtx);
   int64_t sum = phi_tiny(x, c) - a + pi_sqrtx;
   int64_t thread_threshold = (int64_t) 1e10;
   threads = ideal_num_threads(threads, x, thread_threshold);
