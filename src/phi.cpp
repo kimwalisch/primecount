@@ -185,24 +185,25 @@ private:
   const PiTable& pi_;
 };
 
-/// If a is very large (prime[a] >= sqrt(x)) then we need to
-/// calculate phi(x, a) using an alternative method. First, because
-/// in this case there actually exists a much faster method. And
-/// secondly, because storing the first a primes in a vector could
-/// use a huge amount of memory and cause an out of memory error. 
+/// If a is very large (i.e. prime[a] > sqrt(x)) then we need to
+/// calculate phi(x, a) using an alternative algorithm. First, because
+/// in this case there actually exists a much faster algorithm. And
+/// secondly, because storing the first a primes in a vector may use a
+/// huge amount of memory and cause an out of memory error.
+///
+/// This alternative algorithm works if a >= pi(sqrt(x)). However, we
+/// need to be very careful: phi_pix(x, a) may call pi_legendre(x) which
+/// calls phi(x, a) with a = pi(sqrt(x)), which would then again call
+/// phi_pix(x, a) thereby causing infinite recursion. In order to prevent
+/// this issue this function must only be called with a > pi(sqrt(x)).
 ///
 int64_t phi_pix(int64_t x, int64_t a, int threads)
 {
   bool print = is_print();
   set_print(false);
 
-  int64_t pix;
+  int64_t pix = pi(x, threads);
   int64_t sum;
-
-  if (x < 1e8)
-    pix = pi_meissel(x, threads);
-  else
-    pix = pi_gourdon(x, threads);
 
   if (a <= pix)
     sum = pix - a + 1;
@@ -231,7 +232,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
     return phi_tiny(x, a);
 
   int64_t sqrtx = isqrt(x);
-  if (a >= sqrtx)
+  if (a > sqrtx)
     return phi_pix(x, a, threads);
 
   // We use 1 indexing i.e. primes[1] = 2
