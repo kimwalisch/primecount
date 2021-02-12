@@ -30,12 +30,12 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
-#include <ModuloWheel.hpp>
+#include <generate.hpp>
 #include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <min.hpp>
+#include <ModuloWheel.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
 
@@ -219,36 +219,22 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
+  // Use a large pi(x) lookup table for speed
   int64_t sqrtx = isqrt(x);
-  if (a > sqrtx)
+  PiTable pi(sqrtx, threads);
+  int64_t pi_sqrtx = pi[sqrtx];
+
+  // We use if (a > pi(sqrt(x)) here instead of (a >= pi(sqrt(x)) because
+  // we want to prevent that our pi_legendre(x) uses this code path.
+  // Otherwise pi_legendre(x) would switch to using pi_gourdon(x) under
+  // the hood which is not what users expect. Also using (a >= pi(sqrt(x))
+  // here would cause infinite recursion, more info at phi_pix(x, a).
+  if (a > pi_sqrtx)
     return phi_pix(x, a, threads);
 
-  // We use 1 indexing i.e. primes[1] = 2
-  vector<int32_t> primes;
-  primes.reserve(a + 2);
-  primes.push_back(0);
-  primesieve::iterator it;
-
-  // Store the first a primes in a vector
-  for (int64_t i = 0; i < a; i++)
-  {
-    int64_t prime = it.next_prime();
-    primes.push_back((int32_t) prime);
-    if (prime >= x)
-      return 1;
-    // We use if (prime > sqrtx) here instead of (prime >= sqrtx) because
-    // we want to prevent that our pi_legendre(x) uses this code path.
-    // Otherwise pi_legendre(x) would switch to using pi_gourdon(x) under
-    // the hood which is not what users expect. Also using (prime >= sqrtx)
-    // here would cause infinite recursion, more info at phi_pix(x, a).
-    if (prime > sqrtx)
-      return phi_pix(x, a, threads);
-  }
-
-  // Use a large pi(x) lookup table for speed
+  auto primes = generate_n_primes<int32_t>(a);
   int64_t c = PhiTiny::get_c(sqrtx);
-  PiTable pi(max(sqrtx, primes[a]), threads);
-  int64_t pi_sqrtx = min(pi[sqrtx], a);
+  pi_sqrtx = min(a, pi_sqrtx);
   int64_t sum = phi_tiny(x, c) - a + pi_sqrtx;
   int64_t thread_threshold = (int64_t) 1e10;
   threads = ideal_num_threads(threads, x, thread_threshold);
