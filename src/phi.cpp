@@ -223,10 +223,10 @@ int64_t phi(int64_t x, int64_t a, int threads)
     return phi_tiny(x, a);
 
   // phi(x, a) = 1 if a >= pi(x)
-  // Pierre Dusart 2010 pi(x) lower bound:
+  // Pierre Dusart 2010 pi(x) upper bound:
   // https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-  if (x >= 5393 &&
-      a >= x / (log((double) x) - 1))
+  if (x >= 60184 &&
+      a >= x / (log((double) x) - 1.1))
     return 1;
 
   int64_t sqrtx = isqrt(x);
