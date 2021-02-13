@@ -216,10 +216,18 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (a < 1) return x;
 
   // phi(x, a) = 1 if prime[a] >= x
-  if (a > x / 2)
+  if (x > 0 && a > x / 2)
     return 1;
+
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
+
+  // phi(x, a) = 1 if a >= pi(x)
+  // Pierre Dusart 2010 pi(x) lower bound:
+  // https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
+  if (x >= 5393 &&
+      a >= x / (log((double) x) - 1))
+    return 1;
 
   int64_t sqrtx = isqrt(x);
 
