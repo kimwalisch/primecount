@@ -195,20 +195,20 @@ generate_phi(int64_t x,
       a = pi[x];
 
     phi[1] = x;
+    int64_t i = 2;
     int64_t sqrtx = isqrt(x);
-    int64_t pi_sqrtx = a;
     PhiCache<Primes> cache(x, primes, pi);
 
-    if (sqrtx < pi.size())
-      pi_sqrtx = min(pi[sqrtx] + 1, a);
-
-    for (int64_t i = 2; i <= pi_sqrtx; i++)
+    // 2 <= i <= pi(sqrt(x)) + 1
+    for (; i <= a && primes[i - 1] <= sqrtx; i++)
       phi[i] = phi[i - 1] + cache.template phi<-1>(x / primes[i - 1], i - 2);
 
-    for (int64_t i = pi_sqrtx + 1; i <= a; i++)
+    // pi(sqrt(x)) + 1 < i <= a
+    for (; i <= a; i++)
       phi[i] = phi[i - 1] - (x > 0);
 
-    for (int64_t i = a + 1; i < size; i++)
+    // a < i < size
+    for (; i < size; i++)
       phi[i] = x > 0;
   }
 
