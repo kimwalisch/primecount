@@ -92,18 +92,26 @@ public:
 
     for (i = c; i < a; i++)
     {
+      // phi(x / prime[i+1], prime[i]) = 1 if prime[i] * prime[i+1] >= x.
+      // However we can do slightly better:
+      // If prime[i + 1] > sqrt(x) then x / prime[i + 1] < sqrt(x).
+      // Hence x / prime[i + 1] <= sqrt(x) - 1.
+      // phi(sqrt(x) - 1, i) = 1 as prime[i] is the largest
+      // prime <= (sqrt(x) - 1) as prime[i + 1] > sqrt(x) and hence there
+      // is no other prime number inside [prime[i] + 1, sqrt(x) - 1].
+      if (primes_[i + 1] > sqrtx)
+        break;
       xp = fast_div(x, primes_[i + 1]);
-      if (is_pix(xp, i) ||
-          xp <= primes_[i])
+      if (is_pix(xp, i))
         break;
       sum += phi<-SIGN>(xp, i);
     }
 
     for (; i < a; i++)
     {
-      xp = fast_div(x, primes_[i + 1]);
-      if (xp <= primes_[i])
+      if (primes_[i + 1] > sqrtx)
         break;
+      xp = fast_div(x, primes_[i + 1]);
       sum += (pi_[xp] - i + 1) * -SIGN;
     }
 
