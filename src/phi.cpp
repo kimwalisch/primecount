@@ -213,9 +213,11 @@ namespace primecount {
 int64_t phi(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
-  if (a > x) return 1;
   if (a < 1) return x;
 
+  // phi(x, a) = 1 if prime[a] >= x
+  if (a > x / 2)
+    return 1;
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
