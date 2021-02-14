@@ -66,8 +66,15 @@ public:
     // slow). On the other hand, for large and long running computations
     // we use the maximum amount of cache memory.
     auto u16_max = numeric_limits<uint16_t>::max();
-    cache_limit_ = (uint64_t) pow((double) limit, 1 / 2.5);
-    cache_limit_ = min(cache_limit_, u16_max);
+    max_cache_index_ = (uint64_t) pow((double) limit, 1 / 2.5);
+    max_cache_index_ = min(max_cache_index_, u16_max);
+
+    // Since our cache uses the uint16_t data type, we must ensure that
+    // phi(x, 7) < 2^16 as we only cache phi(x, a) results with a >= 7.
+    // The largest x we can cache is 363030, since phi(363030, 7) = 2^16-1.
+    // This means that the maximum cache index that does not cause integer
+    // overflow is ModuloWheel::to_index(363030) = 75433.
+    assert(max_cache_index_ <= 75433);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -159,12 +166,12 @@ private:
     x = ModuloWheel::to_index(x);
 
     if (a >= cache_.size() ||
-        x > cache_limit_)
+        x > max_cache_index_)
       return;
 
     if (x >= cache_[a].size())
     {
-      cache_[a].reserve(cache_limit_ + 1);
+      cache_[a].reserve(max_cache_index_ + 1);
       cache_[a].resize(x + 1, 0);
     }
 
@@ -174,7 +181,7 @@ private:
     cache_[a][x] = (uint16_t) sum;
   }
 
-  uint64_t cache_limit_ = 0;
+  uint64_t max_cache_index_ = 0;
   enum { MAX_A = 100 };
   array<vector<uint16_t>, MAX_A> cache_;
   const Primes& primes_;
