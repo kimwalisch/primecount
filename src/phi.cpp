@@ -88,9 +88,9 @@ public:
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t sum = phi_tiny(x, c) * SIGN;
-    int64_t i, xp;
+    int64_t i = c;
 
-    for (i = c; i < a; i++)
+    for (; i < a; i++)
     {
       // phi(x / prime[i+1], prime[i]) = 1 if prime[i] * prime[i+1] >= x.
       // However we can do slightly better:
@@ -101,7 +101,7 @@ public:
       // is no other prime number inside [prime[i] + 1, sqrt(x) - 1].
       if (primes_[i + 1] > sqrtx)
         break;
-      xp = fast_div(x, primes_[i + 1]);
+      int64_t xp = fast_div(x, primes_[i + 1]);
       if (is_pix(xp, i))
         break;
       sum += phi<-SIGN>(xp, i);
@@ -111,7 +111,7 @@ public:
     {
       if (primes_[i + 1] > sqrtx)
         break;
-      xp = fast_div(x, primes_[i + 1]);
+      int64_t xp = fast_div(x, primes_[i + 1]);
       sum += (pi_[xp] - i + 1) * -SIGN;
     }
 
