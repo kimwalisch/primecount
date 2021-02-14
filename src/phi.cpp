@@ -237,11 +237,12 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  // phi(x, a) = 1 if a >= pi(x)
-  // Pierre Dusart 2010 pi(x) upper bound:
+  // phi(x, a) = 1 if a >= pi(x).
+  // pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
+  // We use x >= 10 and +10 as a safety buffer.
   // https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-  if (x >= 500000 /* 60184 */ &&
-      a >= x / (log((double) x) - 1.1))
+  if (x >= 10 &&
+      a >= x / (log((double) x) - 1.1) + 10)
     return 1;
 
   int64_t sqrtx = isqrt(x);
