@@ -41,6 +41,7 @@
 
 #include <stdint.h>
 #include <array>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -171,33 +172,37 @@ private:
 
     uint64_t i = prev_a_ + 1;
     uint64_t tiny_a = PhiTiny::max_a();
+    assert(a > tiny_a);
     prev_a_ = a;
+
+    if (i == 1)
+      sieve_[i++].resize(max_x_size_, ~0ull);
 
     for (; i <= a; i++)
     {
-      if (primes_[i] == 2)
-        sieve_[i].resize(max_x_size_, ~0ull);
+      // Initalize phi(x, i) with phi(x, i - 1)
+      if (i - 1 <= tiny_a)
+        sieve_[i] = std::move(sieve_[i - 1]);
       else
-      {
-        // Initalize phi(x, a) with phi(x, a - 1) then
-        // remove prime[a] and its multiples.
         sieve_[i] = sieve_[i - 1];
-        uint64_t prime = primes_[i];
 
-        if (prime <= max_x_)
-          sieve_[i][prime / 128] &= unset_bit_[prime % 128];
-        for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
-          sieve_[i][n / 128] &= unset_bit_[n % 128];
-      }
+      // Remove prime[i] and its multiples
+      uint64_t prime = primes_[i];
+      if (prime <= max_x_)
+        sieve_[i][prime / 128] &= unset_bit_[prime % 128];
+      for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
+        sieve_[i][n / 128] &= unset_bit_[n % 128];
 
       if (i > tiny_a)
       {
         uint64_t sum = 0;
         sieve_counts_[i].reserve(max_x_size_);
+
+        // Generate an array with prefix sums.
+        // sieve_counts_[i][j] contains the count of numbers < j * 128
+        // that are not divisible by any of the first i primes.
         for (uint64_t j = 0; j < max_x_size_; j++)
         {
-          // Count of the numbers < j * 128 that are not
-          // divisible by any of the first i primes.
           sieve_counts_[i].push_back((uint32_t) sum);
           sum += popcnt64(sieve_[i][j]);
         }
