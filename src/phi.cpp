@@ -200,7 +200,7 @@ private:
         {
           // Count of the numbers < j * 128 that are not
           // divisible by any of the first i primes.
-          sieve_counts_[i].push_back(sum);
+          sieve_counts_[i].push_back((uint32_t) sum);
           sum += popcnt64(sieve_[i][j]);
         }
       }
