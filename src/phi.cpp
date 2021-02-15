@@ -71,7 +71,7 @@ public:
     // tiny computations (because initializing a lot of cache memory is
     // slow). On the other hand, for large and long running computations
     // we use the maximum amount of cache memory.
-    uint64_t cache_limit = (uint64_t) pow((double) limit, 1 / 2.5);
+    uint64_t cache_limit = isqrt(limit);
     max_x_ = min(cache_limit, max_x_);
     max_x_size_ = ceil_div(max_x_, 128);
 
