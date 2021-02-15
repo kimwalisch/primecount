@@ -46,8 +46,8 @@ int64_t pi(int64_t x, int threads)
   if (x <= (int64_t) 1e5)
     return pi_legendre(x, threads);
 
-  // For ]10^5, 5*10^7] Meissel's algorithm runs fastest
-  if (x <= (int64_t) 5e7)
+  // For ]10^5, 10^8] Meissel's algorithm runs fastest
+  if (x <= (int64_t) 1e8)
     return pi_meissel(x, threads);
 
   // For large x Gourdon's algorithm runs fastest
