@@ -35,7 +35,6 @@
 #include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
-#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <popcnt.hpp>
@@ -44,7 +43,6 @@
 #include <algorithm>
 #include <array>
 #include <vector>
-#include <limits>
 
 using namespace std;
 using namespace primecount;

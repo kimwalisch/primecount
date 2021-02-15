@@ -35,7 +35,6 @@
 #include <BitSieve128.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
-#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <pod_vector.hpp>
@@ -43,7 +42,6 @@
 #include <stdint.h>
 #include <array>
 #include <vector>
-#include <limits>
 
 namespace {
 
