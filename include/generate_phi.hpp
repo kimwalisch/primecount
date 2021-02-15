@@ -92,11 +92,7 @@ public:
       return phi_tiny(x, a) * SIGN;
     else if (is_pix(x, a))
       return (pi_[x] - a + 1) * SIGN;
-
-    // Remove the first a primes and their multiples from the phi cache
-    sieve_cache(a);
-
-    if (is_cached(x, a))
+    else if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
 
     int64_t sqrtx = isqrt(x);
@@ -131,6 +127,8 @@ public:
 
     // phi(x, a) = 1 for all primes[a] >= x
     sum += (a - i) * -SIGN;
+    sieve_cache(a);
+
     return sum;
   }
 
