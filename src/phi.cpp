@@ -169,12 +169,12 @@ private:
   ///
   void sieve_cache(uint64_t a)
   {
-    if (a <= PhiTiny::max_a() ||
-        a <= prev_a_ ||
+    if (a <= prev_a_ ||
         a >= sieve_.size())
       return;
 
     uint64_t i = prev_a_ + 1;
+    uint64_t tiny_a = PhiTiny::max_a();
     prev_a_ = a;
 
     for (; i <= a; i++)
@@ -194,7 +194,7 @@ private:
           sieve_[i][n / 128] &= unset_bit_[n % 128];
       }
 
-      if (i > PhiTiny::max_a())
+      if (i > tiny_a)
       {
         uint64_t sum = 0;
         sieve_counts_[i].reserve(max_x_size_);
