@@ -30,14 +30,15 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <BitSieve128.hpp>
 #include <generate.hpp>
 #include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <min.hpp>
-#include <ModuloWheel.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
+#include <popcnt.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -50,7 +51,7 @@ using namespace primecount;
 
 namespace {
 
-class PhiCache
+class PhiCache : public BitSieve128
 {
 public:
   PhiCache(int64_t limit,
@@ -59,22 +60,24 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // The cache limit has been tuned for both pi_legendre(x) and
+    // sieve_[a][x] uses at most max_x_bytes
+    uint64_t max_x_bytes = 128 << 10;
+    uint64_t numbers_per_sieve_byte = 16;
+    max_x_ = max_x_bytes * numbers_per_sieve_byte;
+
+    // This cache limit has been tuned for both pi_legendre(x) and
     // pi_meissel(x) as these functions are frequently used in primecount.
     // The idea is to allocate only a small amount of cache memory for
     // tiny computations (because initializing a lot of cache memory is
     // slow). On the other hand, for large and long running computations
     // we use the maximum amount of cache memory.
-    auto u16_max = numeric_limits<uint16_t>::max();
-    max_cache_index_ = (uint64_t) pow((double) limit, 1 / 2.5);
-    max_cache_index_ = min(max_cache_index_, u16_max);
+    uint64_t cache_limit = (uint64_t) pow((double) limit, 1 / 2.5);
+    max_x_ = min(cache_limit, max_x_);
+    max_x_size_ = ceil_div(max_x_, 128);
 
-    // Since our cache uses the uint16_t data type, we must ensure that
-    // phi(x, 7) < 2^16 as we only cache phi(x, a) results with a >= 7.
-    // The largest x we can cache is 363030, since phi(363030, 7) = 2^16-1.
-    // This means that the maximum cache index that does not cause integer
-    // overflow is ModuloWheel::to_index(363030) = 75433.
-    assert(max_cache_index_ <= 75433);
+    // Make sure that there are no uninitialized
+    // bits in the last sieve array item.
+    max_x_ = max_x_size_ * 128 - 1;
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -89,7 +92,11 @@ public:
       return phi_tiny(x, a) * SIGN;
     else if (is_pix(x, a))
       return (pi_[x] - a + 1) * SIGN;
-    else if (is_cached(x, a))
+
+    // Remove the first a primes and their multiples from the phi cache
+    sieve_cache(a);
+
+    if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
 
     int64_t sqrtx = isqrt(x);
@@ -124,8 +131,6 @@ public:
 
     // phi(x, a) = 1 for all primes[a] >= x
     sum += (a - i) * -SIGN;
-    update_cache(x, a, sum);
-
     return sum;
   }
 
@@ -143,47 +148,77 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    x = ModuloWheel::to_index(x);
-    return a < cache_.size() &&
-           x < cache_[a].size() &&
-           cache_[a][x] != 0;
+    return a < sieve_.size() &&
+           x / 128 < sieve_[a].size();
   }
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    x = ModuloWheel::to_index(x);
-    return cache_[a][x];
+    assert(x / 128 < sieve_[a].size());
+    assert(x / 128 < sieve_counts_[a].size());
+    uint64_t bitmask = unset_bits_[x % 128];
+    uint64_t bits = sieve_[a][x / 128];
+    return sieve_counts_[a][x / 128] + popcnt64(bits & bitmask);
   }
 
-  void update_cache(uint64_t x, uint64_t a, int64_t sum)
+  /// Eratosthenes-like sieving algorithm that removes the first a primes
+  /// and their multiples from the sieve array. Additionally this
+  /// algorithm counts the numbers that are not divible by any of the
+  /// first a primes after sieving has completed. The sieve array and the
+  /// sieve_counts array later serve us as a phi(x, a) cache.
+  ///
+  void sieve_cache(uint64_t a)
   {
-    // In order to increase the capacity of our phi cache we use a
-    // modulo 2310 wheel that does not store any numbers that are
-    // divisible by 2, 3, 5, 7 and 11. In a modulo 2310 wheel 480 array
-    // items span an interval of size 2310. Hence by using a modulo
-    // 2310 wheel we can increase our cache's capacity by 2310 / 480
-    // = 4.8125 without increasing its memory usage.
-    x = ModuloWheel::to_index(x);
-
-    if (a >= cache_.size() ||
-        x > max_cache_index_)
+    if (a <= PhiTiny::max_a() ||
+        a <= prev_a_ ||
+        a >= sieve_.size())
       return;
 
-    if (x >= cache_[a].size())
-    {
-      cache_[a].reserve(max_cache_index_ + 1);
-      cache_[a].resize(x + 1, 0);
-    }
+    uint64_t i = prev_a_ + 1;
+    prev_a_ = a;
 
-    sum = abs(sum);
-    assert(sum <= numeric_limits<uint16_t>::max());
-    assert(cache_[a][x] == 0);
-    cache_[a][x] = (uint16_t) sum;
+    for (; i <= a; i++)
+    {
+      if (primes_[i] == 2)
+        sieve_[i].resize(max_x_size_, ~0ull);
+      else
+      {
+        // Initalize phi(x, a) with phi(x, a - 1) then
+        // remove prime[a] and its multiples.
+        sieve_[i] = sieve_[i - 1];
+        uint64_t prime = primes_[i];
+
+        if (prime <= max_x_)
+          sieve_[i][prime / 128] &= unset_bit_[prime % 128];
+        for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
+          sieve_[i][n / 128] &= unset_bit_[n % 128];
+      }
+
+      if (i > PhiTiny::max_a())
+      {
+        uint64_t sum = 0;
+        sieve_counts_[i].reserve(max_x_size_);
+        for (uint64_t j = 0; j < max_x_size_; j++)
+        {
+          // Count of the numbers < j * 128 that are not
+          // divisible by any of the first i primes.
+          sieve_counts_[i].push_back(sum);
+          sum += popcnt64(sieve_[i][j]);
+        }
+      }
+    }
   }
 
-  uint64_t max_cache_index_ = 0;
+  uint64_t max_x_ = 0;
+  uint64_t max_x_size_ = 0;
+  uint64_t prev_a_ = 0;
   enum { MAX_A = 100 };
-  array<vector<uint16_t>, MAX_A> cache_;
+  /// sieve_[a] contains only numbers (1 bits) that are
+  /// not divisible by any of the first a primes.
+  array<vector<uint64_t>, MAX_A> sieve_;
+  /// sieve_counts_[a][i] contains the count of numbers < i * 128 that
+  /// are not divisible by any of the first a primes.
+  array<vector<uint32_t>, MAX_A> sieve_counts_;
   const vector<int32_t>& primes_;
   const PiTable& pi_;
 };
