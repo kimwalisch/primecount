@@ -1,6 +1,6 @@
 ///
-/// @file  ModuloWheel.cpp
-/// @see   ModuloWheel.hpp for documentation
+/// @file  FactorTable.cpp
+/// @see   FactorTable.hpp for documentation
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <ModuloWheel.hpp>
+#include <BaseFactorTable.hpp>
 #include <stdint.h>
 
 namespace primecount {
@@ -18,7 +18,7 @@ namespace primecount {
 /// size of the table was obtained using the formula:
 /// \prod_{i=1}^{5} primes[i] - 1.
 ///
-const std::array<uint16_t, 480> ModuloWheel::coprime_ =
+const std::array<uint16_t, 480> BaseFactorTable::coprime_ =
 {
   1, 13, 17, 19, 23, 29, 31, 37, 41, 43,
   47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
@@ -75,7 +75,7 @@ const std::array<uint16_t, 480> ModuloWheel::coprime_ =
 /// and 11. The size of the table was obtained using the
 /// formula: \prod_{i=1}^{5} primes[i].
 ///
-const std::array<int16_t, 2310> ModuloWheel::coprime_indexes_ =
+const std::array<int16_t, 2310> BaseFactorTable::coprime_indexes_ =
 {
  -1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 1, 1, 1, 1, 2, 2, 3,

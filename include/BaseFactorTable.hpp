@@ -1,17 +1,17 @@
 ///
-/// @file  ModuloWheel.hpp
+/// @file  BaseFactorTable.hpp
 ///        Static lookup tables and functions used by the
 ///        FactorTable and DFactorTable classes.
 ///        See FactorTable.hpp for more information.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#ifndef MODULOWHEEL_HPP
-#define MODULOWHEEL_HPP
+#ifndef BASEFACTORTABLE_HPP
+#define BASEFACTORTABLE_HPP
 
 #include <imath.hpp>
 
@@ -22,12 +22,12 @@
 
 namespace primecount {
 
-/// ModuloWheel contains static lookup tables
+/// BaseFactorTable contains static lookup tables
 /// and is used to convert:
-/// 1) A number into a ModuloWheel index.
-/// 2) A ModuloWheel index into a number.
+/// 1) A number into a FactorTable index
+/// 2) A FactorTable index into a number
 ///
-class ModuloWheel
+class BaseFactorTable
 {
 public:
   static int64_t to_index(uint64_t number)
