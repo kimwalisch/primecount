@@ -217,6 +217,20 @@ int64_t phi_pix(int64_t x, int64_t a, int threads)
   return sum;
 }
 
+/// pi(x) <= pix_upper(x)
+/// pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
+/// We use x >= 10 and +10 as a safety buffer.
+/// https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
+///
+int64_t pix_upper(int64_t x)
+{
+  if (x <= 10)
+    return 4;
+
+  double pix = x / (log((double) x) - 1.1);
+  return (int64_t) pix + 10;
+}
+
 } // namespace
 
 namespace primecount {
@@ -237,18 +251,14 @@ int64_t phi(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  // phi(x, a) = 1 if a >= pi(x).
-  // pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
-  // We use x >= 10 and +10 as a safety buffer.
-  // https://en.wikipedia.org/wiki/Prime-counting_function#Inequalities
-  if (x >= 10 &&
-      a >= x / (log((double) x) - 1.1) + 10)
+  // phi(x, a) = 1 if a >= pi(x)
+  if (a >= pix_upper(x))
     return 1;
 
   int64_t sqrtx = isqrt(x);
 
-  // Inaccurate but fast (a > pi(sqrt(x)) check
-  if (a > sqrtx)
+  // Fast (a > pi(sqrt(x)) check with decent accuracy
+  if (a > pix_upper(sqrtx))
     return phi_pix(x, a, threads);
 
   PiTable pi(sqrtx, threads);
