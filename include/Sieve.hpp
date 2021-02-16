@@ -1,19 +1,34 @@
 ///
 /// @file  Sieve.hpp
-/// @brief The Sieve class is a highly optimized sieve of
-///        Eratosthenes implementation with 30 numbers per byte
-///        i.e. the 8 bits of each byte correspond to the offsets
-///        { 1, 7, 11, 13, 17, 19, 23, 29 }. This Sieve also
-///        skips multiples of 2, 3, 5 using wheel factorization.
+/// @brief This file implements a highly optimized prime sieving
+///        algorithm for computing the special leaves (sometimes named
+///        hard special leaves) in the combinatorial prime counting
+///        algorithms (e.g. Lagarias-Miller-Odlyzko, Deleglise-Rivat,
+///        Gourdon).
 ///
-///        Unlike a traditional prime sieve this sieve is
-///        designed for use in the combinatorial prime counting
-///        algorithms: this sieve removes primes as well as
-///        multiples of primes and it counts the number of
-///        elements that have been crossed off for the first
-///        time in the sieve array.
+///        The Sieve class contains a sieve of Eratosthenes
+///        implementation with 30 numbers per byte i.e. the 8 bits of
+///        each byte correspond to the offsets: { 1, 7, 11, 13, 17,
+///        19, 23, 29 }. Unlike a traditional prime sieve this sieve
+///        is designed for use in the combinatorial prime counting
+///        algorithms: this sieve removes primes as well as multiples
+///        of primes and it counts the number of elements that have
+///        been crossed off for the first time in the sieve array.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+///        Since there is a large number of special leaves for which
+///        we have to count the number of unsieved elements in the
+///        sieve array Lagarias-Miller-Odlyzko have suggested using a
+///        binary indexed tree data structure (a.k.a. Fenwick tree) to
+///        speedup counting. However using a binary indexed tree is
+///        bad for performance as it causes many cache misses and
+///        branch mispredictions. For this reason this implementation
+///        does not use a binary indexed tree but instead uses a
+///        linear counters array that is much more cache efficient.
+///
+///        In-depth description of this algorithm:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Special-Leaves.md
+///
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
