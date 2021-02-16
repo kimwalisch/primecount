@@ -96,7 +96,7 @@ public:
       return phi_cache(x, a) * SIGN;
 
     // Cache all small phi(x, i) results with:
-    // x <= max_x && i <= min(a, MAX_A)
+    // x <= max_x && i <= min(a, max_a)
     sieve_cache(x, a);
 
     int64_t sqrtx = isqrt(x);
