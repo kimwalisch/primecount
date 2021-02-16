@@ -35,6 +35,7 @@
 #include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <popcnt.hpp>
@@ -96,10 +97,20 @@ public:
 
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
-    int64_t sum = phi_tiny(x, c) * SIGN;
-    int64_t i = c;
+    int64_t larger_c = min(a, max_a_cached_);
+    int64_t sum, i;
 
-    for (; i < a; i++)
+    if (a <= c ||
+        !is_cached(x, larger_c))
+      sum = phi_tiny(x, c) * SIGN;
+    else
+    {
+      c = larger_c;
+      assert(larger_c > c);
+      sum = phi_cache(x, c) * SIGN;
+    }
+  
+    for (i = c; i < a; i++)
     {
       // phi(x / prime[i+1], prime[i]) = 1 if prime[i] * prime[i+1] >= x.
       // However we can do slightly better:
@@ -166,14 +177,14 @@ private:
   ///
   void sieve_cache(uint64_t a)
   {
-    if (a <= prev_a_ ||
+    if (a <= max_a_cached_ ||
         a >= sieve_.size())
       return;
 
-    uint64_t i = prev_a_ + 1;
+    uint64_t i = max_a_cached_ + 1;
     uint64_t tiny_a = PhiTiny::max_a();
     assert(a > tiny_a);
-    prev_a_ = a;
+    max_a_cached_ = a;
 
     if (i == 1)
       sieve_[i++].resize(max_x_size_, ~0ull);
@@ -212,7 +223,7 @@ private:
 
   uint64_t max_x_ = 0;
   uint64_t max_x_size_ = 0;
-  uint64_t prev_a_ = 0;
+  uint64_t max_a_cached_ = 0;
   enum { MAX_A = 100 };
   /// sieve_[a] contains only numbers (1 bits) that are
   /// not divisible by any of the first a primes.
