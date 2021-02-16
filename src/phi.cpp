@@ -97,7 +97,7 @@ public:
 
     // Cache all small phi(x, i) results with:
     // x <= max_x && i <= min(a, MAX_A)
-    sieve_cache(a);
+    sieve_cache(x, a);
 
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
@@ -171,16 +171,19 @@ private:
     return sieve_counts_[a][x / 128] + popcnt64(bits & bitmask);
   }
 
+  /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
   /// Eratosthenes-like sieving algorithm that removes the first a primes
   /// and their multiples from the sieve array. Additionally this
   /// algorithm counts the numbers that are not divible by any of the
   /// first a primes after sieving has completed. The sieve array and the
   /// sieve_counts array later serve us as a phi(x, a) cache.
   ///
-  void sieve_cache(uint64_t a)
+  void sieve_cache(uint64_t x, uint64_t a)
   {
-    if (a <= max_a_cached_ ||
-        a >= sieve_.size())
+    a = min(a, max_a_);
+
+    if (x > max_x_ ||
+        a <= max_a_cached_)
       return;
 
     uint64_t i = max_a_cached_ + 1;
@@ -227,6 +230,7 @@ private:
   uint64_t max_x_size_ = 0;
   uint64_t max_a_cached_ = 0;
   enum { MAX_A = 100 };
+  const uint64_t max_a_ = MAX_A;
   /// sieve_[a] contains only numbers (1 bits) that are
   /// not divisible by any of the first a primes.
   array<vector<uint64_t>, MAX_A + 1> sieve_;
