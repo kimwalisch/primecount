@@ -95,6 +95,10 @@ public:
     else if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
 
+    // Cache all small phi(x, i) results with:
+    // x <= max_x && i <= a && i <= MAX_A
+    sieve_cache(a);
+
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
     int64_t larger_c = min(a, max_a_cached_);
@@ -137,8 +141,6 @@ public:
 
     // phi(x, a) = 1 for all primes[a] >= x
     sum += (a - i) * -SIGN;
-    sieve_cache(a);
-
     return sum;
   }
 
@@ -227,10 +229,10 @@ private:
   enum { MAX_A = 100 };
   /// sieve_[a] contains only numbers (1 bits) that are
   /// not divisible by any of the first a primes.
-  array<vector<uint64_t>, MAX_A> sieve_;
+  array<vector<uint64_t>, MAX_A + 1> sieve_;
   /// sieve_counts_[a][i] contains the count of numbers < i * 128 that
   /// are not divisible by any of the first a primes.
-  array<vector<uint32_t>, MAX_A> sieve_counts_;
+  array<vector<uint32_t>, MAX_A + 1> sieve_counts_;
   const vector<int32_t>& primes_;
   const PiTable& pi_;
 };
