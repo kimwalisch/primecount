@@ -100,13 +100,13 @@ public:
     int64_t larger_c = min(a, max_a_cached_);
     int64_t sum, i;
 
-    if (a <= c ||
+    if (c >= larger_c ||
         !is_cached(x, larger_c))
       sum = phi_tiny(x, c) * SIGN;
     else
     {
       c = larger_c;
-      assert(larger_c > c);
+      assert(larger_c <= a);
       sum = phi_cache(x, c) * SIGN;
     }
   
