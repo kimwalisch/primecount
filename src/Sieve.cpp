@@ -15,15 +15,15 @@
 ///        of primes and it counts the number of elements that have
 ///        been crossed off for the first time in the sieve array.
 ///
-///        Since there is a large number of special leaves for which
-///        we have to count the number of unsieved elements in the
-///        sieve array Lagarias-Miller-Odlyzko have suggested using a
+///        Since there is a large number of leaves for which we have
+///        to count the number of unsieved elements in the sieve
+///        array, Lagarias-Miller-Odlyzko have suggested using a
 ///        binary indexed tree data structure (a.k.a. Fenwick tree) to
 ///        speedup counting. However using a binary indexed tree is
 ///        bad for performance as it causes many cache misses and
 ///        branch mispredictions. For this reason this implementation
-///        does not use a binary indexed tree but instead uses a
-///        linear counters array that is much more cache efficient.
+///        instead uses a counters array whose elements contain the
+///        total count of unsieved elements in a certain interval.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Special-Leaves.md
