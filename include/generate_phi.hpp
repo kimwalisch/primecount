@@ -214,7 +214,7 @@ private:
         uint64_t count = 0;
         sieve_counts_[i].reserve(max_x_size_);
 
-        // Fill an array with the cumulative bit counts.
+        // Fill an array with the cumulative 1 bit counts.
         // sieve_counts_[i][j] contains the count of numbers < j * 128
         // that are not divisible by any of the first i primes.
         for (uint64_t j = 0; j < max_x_size_; j++)
