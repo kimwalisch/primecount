@@ -211,16 +211,16 @@ private:
 
       if (i > tiny_a)
       {
-        uint64_t sum = 0;
+        uint64_t count = 0;
         sieve_counts_[i].reserve(max_x_size_);
 
-        // Generate an array with prefix sums.
+        // Fill an array with the cumulative bit counts.
         // sieve_counts_[i][j] contains the count of numbers < j * 128
         // that are not divisible by any of the first i primes.
         for (uint64_t j = 0; j < max_x_size_; j++)
         {
-          sieve_counts_[i].push_back((uint32_t) sum);
-          sum += popcnt64(sieve_[i][j]);
+          sieve_counts_[i].push_back((uint32_t) count);
+          count += popcnt64(sieve_[i][j]);
         }
       }
     }
