@@ -41,7 +41,6 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <array>
 #include <utility>
 #include <vector>
