@@ -39,6 +39,7 @@
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <pod_vector.hpp>
+#include <popcnt.hpp>
 
 #include <stdint.h>
 #include <array>
