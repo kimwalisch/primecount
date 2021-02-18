@@ -66,7 +66,7 @@ public:
       return 0;
 
     n -= low_;
-    uint64_t bitmask = unset_bits_[n % 128];
+    uint64_t bitmask = unset_larger_[n % 128];
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;

@@ -24,7 +24,7 @@ class BitSieve128
 {
 protected:
   static const std::array<uint64_t, 128> unset_bit_;
-  static const std::array<uint64_t, 128> unset_bits_;
+  static const std::array<uint64_t, 128> unset_larger_;
 };
 
 } // namespace

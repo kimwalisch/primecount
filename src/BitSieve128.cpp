@@ -98,11 +98,11 @@ const std::array<uint64_t, 128> BitSieve128::unset_bit_ =
   ~(1ull << 63), ~(1ull << 63)
 };
 
-/// unset_bits_[x % 128] returns a bitmask where the bits
+/// unset_larger_[x % 128] returns a bitmask where the bits
 /// corresponding to numbers > x % 128 have been turned off
 /// (while all the other bits are left unchanged).
 /// 
-const std::array<uint64_t, 128> BitSieve128::unset_bits_ =
+const std::array<uint64_t, 128> BitSieve128::unset_larger_ =
 {
   bitmask(0),   bitmask(1),   bitmask(2),   bitmask(3),
   bitmask(4),   bitmask(5),   bitmask(6),   bitmask(7),
