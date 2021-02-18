@@ -32,7 +32,7 @@
 #define GENERATE_PHI_HPP
 
 #include <primecount-internal.hpp>
-#include <BitSieve128.hpp>
+#include <BitSieve240.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <min.hpp>
@@ -52,7 +52,7 @@ using namespace std;
 using namespace primecount;
 
 template <typename Primes>
-class PhiCache : public BitSieve128
+class PhiCache : public BitSieve240
 {
 public:
   PhiCache(int64_t limit,
@@ -62,8 +62,8 @@ public:
     pi_(pi)
   {
     // sieve_[a][x] uses at most max_x_bytes
-    uint64_t max_x_bytes = 128 << 10;
-    uint64_t numbers_per_sieve_byte = 16;
+    uint64_t max_x_bytes = 96 << 10;
+    uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
     max_x_ = max_x_bytes * numbers_per_sieve_byte;
 
     // This cache limit has been tuned for both pi_legendre(x) and
@@ -74,11 +74,11 @@ public:
     // we use the maximum amount of cache memory.
     uint64_t cache_limit = isqrt(limit);
     max_x_ = min(cache_limit, max_x_);
-    max_x_size_ = ceil_div(max_x_, 128);
+    max_x_size_ = ceil_div(max_x_, 240);
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array item.
-    max_x_ = max_x_size_ * 128 - 1;
+    max_x_ = max_x_size_ * 240 - 1;
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -160,16 +160,14 @@ private:
   bool is_cached(uint64_t x, uint64_t a) const
   {
     return a < sieve_.size() &&
-           x / 128 < sieve_[a].size();
+           x / 240 < sieve_[a].size();
   }
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    assert(x / 128 < sieve_[a].size());
-    assert(x / 128 < sieve_counts_[a].size());
-    uint64_t bitmask = unset_bits_[x % 128];
-    uint64_t bits = sieve_[a][x / 128];
-    return sieve_counts_[a][x / 128] + popcnt64(bits & bitmask);
+    uint64_t bitmask = unset_larger_[x % 240];
+    uint64_t bits = sieve_[a][x / 240];
+    return sieve_counts_[a][x / 240] + popcnt64(bits & bitmask);
   }
 
   /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
@@ -191,37 +189,42 @@ private:
     uint64_t tiny_a = PhiTiny::max_a();
     assert(a > tiny_a);
     max_a_cached_ = a;
-
-    if (i == 1)
-      sieve_[i++].resize(max_x_size_, ~0ull);
+    i = max(i, 3);
 
     for (; i <= a; i++)
     {
-      // Initalize phi(x, i) with phi(x, i - 1)
-      if (i - 1 <= tiny_a)
-        sieve_[i] = std::move(sieve_[i - 1]);
+      // Our algorithm uses a 3rd wheel that skips the
+      // primes 2, 3 and 5 and their multiples.
+      if (i == 3)
+        sieve_[i].resize(max_x_size_, ~0ull);
       else
-        sieve_[i] = sieve_[i - 1];
-
-      // Remove prime[i] and its multiples
-      uint64_t prime = primes_[i];
-      if (prime <= max_x_)
-        sieve_[i][prime / 128] &= unset_bit_[prime % 128];
-      for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
-        sieve_[i][n / 128] &= unset_bit_[n % 128];
-
-      if (i > tiny_a)
       {
-        uint64_t count = 0;
-        sieve_counts_[i].reserve(max_x_size_);
+        // Initalize phi(x, i) with phi(x, i - 1)
+        if (i - 1 <= tiny_a)
+          sieve_[i] = std::move(sieve_[i - 1]);
+        else
+          sieve_[i] = sieve_[i - 1];
 
-        // Fill an array with the cumulative 1 bit counts.
-        // sieve_counts_[i][j] contains the count of numbers < j * 128
-        // that are not divisible by any of the first i primes.
-        for (uint64_t j = 0; j < max_x_size_; j++)
+        // Remove prime[i] and its multiples
+        uint64_t prime = primes_[i];
+        if (prime <= max_x_)
+          sieve_[i][prime / 240] &= unset_bit_[prime % 240];
+        for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
+          sieve_[i][n / 240] &= unset_bit_[n % 240];
+
+        if (i > tiny_a)
         {
-          sieve_counts_[i].push_back((uint32_t) count);
-          count += popcnt64(sieve_[i][j]);
+          uint64_t count = 0;
+          sieve_counts_[i].reserve(max_x_size_);
+
+          // Fill an array with the cumulative 1 bit counts.
+          // sieve_counts_[i][j] contains the count of numbers < j * 240
+          // that are not divisible by any of the first i primes.
+          for (uint64_t j = 0; j < max_x_size_; j++)
+          {
+            sieve_counts_[i].push_back((uint32_t) count);
+            count += popcnt64(sieve_[i][j]);
+          }
         }
       }
     }
@@ -235,7 +238,7 @@ private:
   /// sieve_[a] contains only numbers (1 bits) that are
   /// not divisible by any of the first a primes.
   array<vector<uint64_t>, MAX_A + 1> sieve_;
-  /// sieve_counts_[a][i] contains the count of numbers < i * 128 that
+  /// sieve_counts_[a][i] contains the count of numbers < i * 240 that
   /// are not divisible by any of the first a primes.
   array<vector<uint32_t>, MAX_A + 1> sieve_counts_;
   const Primes& primes_;
