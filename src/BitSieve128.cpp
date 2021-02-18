@@ -4,7 +4,7 @@
 ///        needed to implement a prime sieving algorithm where each bit
 ///        corresponds to an odd integer. The BitSieve128 class uses
 ///        the uint64_t data type for its sieve array, hence each sieve
-///        array item corresponds to an interval of 64 * 2 = 128.
+///        array element corresponds to an interval of 64 * 2 = 128.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
