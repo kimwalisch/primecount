@@ -41,6 +41,7 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
+#include <cassert>
 #include <array>
 #include <utility>
 #include <vector>
@@ -185,14 +186,14 @@ private:
 
     uint64_t i = max_a_cached_ + 1;
     uint64_t tiny_a = PhiTiny::max_a();
-    assert(a > tiny_a);
     max_a_cached_ = a;
     i = max(i, 3);
 
     for (; i <= a; i++)
     {
-      // Our algorithm uses a 3rd wheel that skips the
-      // primes 2, 3 and 5 and their multiples.
+      // Each bit in the sieve array corresponds to an integer that
+      // is not divisible by 2, 3 and 5. The 8 bits of each byte
+      // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29}.
       if (i == 3)
         sieve_[i].resize(max_x_size_, ~0ull);
       else
