@@ -56,16 +56,25 @@ template <typename Primes>
 class PhiCache : public BitSieve240
 {
 public:
-  PhiCache(int64_t limit,
+  PhiCache(uint64_t limit,
            const Primes& primes,
            const PiTable& pi) :
     primes_(primes),
     pi_(pi)
   {
-    // sieve_[a][x] uses at most max_x_bytes
-    uint64_t max_x_bytes = 96 << 10;
+    uint64_t tiny_a = PhiTiny::max_a();
+
+    if (max_a_ <= tiny_a)
+      return;
+
+    // The cache (i.e. the sieve and sieve_counts arrays)
+    // uses at most max_megabytes per thread.
+    uint64_t max_megabytes = 16;
+    uint64_t indexes = max_a_ - tiny_a;
+    uint64_t max_bytes = max_megabytes << 20;
+    uint64_t max_bytes_per_index = max_bytes / indexes;
     uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
-    max_x_ = max_x_bytes * numbers_per_sieve_byte;
+    max_x_ = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
 
     // This cache limit has been tuned for both pi_legendre(x) and
     // pi_meissel(x) as these functions are frequently used in primecount.
