@@ -202,7 +202,7 @@ private:
     {
       // Each bit in the sieve array corresponds to an integer that
       // is not divisible by 2, 3 and 5. The 8 bits of each byte
-      // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29}.
+      // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
       if (i == 3)
         sieve_[i].resize(max_x_size_, ~0ull);
       else
