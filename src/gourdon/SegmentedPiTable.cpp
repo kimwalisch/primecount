@@ -26,7 +26,6 @@
 #include <min.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <cstring>
 
 namespace primecount {
