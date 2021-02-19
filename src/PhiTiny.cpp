@@ -1,15 +1,14 @@
 ///
 /// @file  PhiTiny.cpp
-/// @brief phi(x, a) counts the numbers <= x that are not
-///        divisible by any of the first a primes.
-///        PhiTiny computes phi(x, a) in constant time
-///        for a <= 6 using lookup tables.
+/// @brief phi(x, a) counts the numbers <= x that are not divisible
+///        by any of the first a primes. PhiTiny computes phi(x, a)
+///        in constant time for a <= 6 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
 ///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,16 +38,14 @@ const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
-  phi_[0].resize(1);
-  phi_[0][0] = 0;
-
   // initialize phi(x % pp, a) lookup tables
-  for (int a = 1; a <= max_a(); a++)
+  for (int a = 0; a <= max_a(); a++)
   {
     int pp = prime_products[a];
     phi_[a].resize(pp);
+    phi_[a][0] = 0;
 
-    for (int x = 0; x < pp; x++)
+    for (int x = 1; x < pp; x++)
     {
       auto phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
       phi_[a][x] = (int16_t) phi_xa;

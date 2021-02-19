@@ -22,7 +22,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -341,14 +341,14 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
   double factor = rem_secs / divider;
 
   // For small and medium computations the thread runtime
-  // should be about 1000x the thread initialization time.
+  // should be about 5000x the thread initialization time.
   // However for very large computations we want to further
   // reduce the thread runtimes in order to increase the
   // backup frequency. If the thread runtime is > 6 hours
   // we reduce the thread runtime to about 50x the thread
   // initialization time.
   double init_secs = max(min_secs, thread.init_secs);
-  double init_factor = in_between(50, (3600 * 6) / init_secs, 1000);
+  double init_factor = in_between(50, (3600 * 6) / init_secs, 5000);
 
   // Reduce the thread runtime if it is much larger than
   // its initialization time. This increases the number of
@@ -369,11 +369,11 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
   // segments per thread also close to 0 which is very bad
   // for performance. The condition below fixes this issue
   // and ensures that the thread runtime is always at
-  // least 10x the thread initialization time.
+  // least 20x the thread initialization time.
   if (thread.secs > 0 &&
-      thread.secs * factor < thread.init_secs * 10)
+      thread.secs * factor < thread.init_secs * 20)
   {
-    double next_runtime = thread.init_secs * 10;
+    double next_runtime = thread.init_secs * 20;
     double current_runtime = thread.secs;
     factor = next_runtime / current_runtime;
   }

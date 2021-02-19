@@ -1,4 +1,20 @@
-Changes in primecount-6.2, 2021-01-04
+Changes in primecount-6.3, 2021-02-18
+
+  The partial sieve function a.k.a. phi(x, a) has been improved.
+  This function is used by many other functions such as
+  pi_legendre(x), pi_meissel(x), pi_lehmer(x), ...
+  For both pi_legendre(x) and pi_meissel(x) I have mesured a
+  speedup of 5x for pi(1e16). Note that the default pi_gourdon(x)
+  does not benefit from this improvement.
+
+  * phi.cpp: Fixed integer overflow #39.
+  * phi.cpp: Cache 40x more phi(x, a) results.
+  * phi.cpp: Use pi(x) if a > pi(sqrt(x)).
+  * phi.cpp: Use larger c constant if phi(x, larger_c) is cached.
+  * generate_phi.hpp: Same optimizations as phi.cpp.
+  * LoadBalancer.cpp: Tune for new phi(x, a) implementation.
+
+Changes in primecount-6.2, 2021-01-07
 
   The sieving algorithm has been improved by annotating branches
   with likely/unlikely and __builtin_unreachable(). This improves

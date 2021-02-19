@@ -7,7 +7,7 @@
 ///        memory and returns the number of primes <= n in O(1)
 ///        operations.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,18 +16,18 @@
 #ifndef PITABLE_HPP
 #define PITABLE_HPP
 
+#include <BitSieve128.hpp>
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
 #include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <cassert>
 
 namespace primecount {
 
-class PiTable
+class PiTable : public BitSieve128
 {
 public:
   PiTable(uint64_t limit, int threads);
@@ -49,7 +49,7 @@ public:
     if_unlikely(n == 1)
       return 0;
 
-    uint64_t bitmask = unset_bits_[n % 128];
+    uint64_t bitmask = unset_larger_[n % 128];
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;
@@ -64,7 +64,6 @@ private:
 
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
   void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
-  static const std::array<uint64_t, 128> unset_bits_;
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t limit_;

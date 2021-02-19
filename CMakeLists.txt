@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.19)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 6)
-set(PRIMECOUNT_VERSION_MINOR 2)
+set(PRIMECOUNT_VERSION_MINOR 3)
 set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
 
 # Build options ######################################################
@@ -53,7 +53,8 @@ set(BIN_SRC src/app/cmdoptions.cpp
 set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/backup.cpp
             src/api.cpp
-            src/util.cpp
+            src/BitSieve128.cpp
+            src/BitSieve240.cpp
             src/FactorTable.cpp
             src/RiemannR.cpp
             src/P2.cpp
@@ -70,6 +71,7 @@ set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/pi_meissel.cpp
             src/pi_primesieve.cpp
             src/print.cpp
+            src/util.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp

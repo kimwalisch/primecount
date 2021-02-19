@@ -13,7 +13,7 @@
 ///        only (n / 8) bytes of memory and returns the number of
 ///        primes <= n in O(1) operations.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,18 +22,18 @@
 #ifndef SEGMENTEDPITABLE_HPP
 #define SEGMENTEDPITABLE_HPP
 
+#include <BitSieve128.hpp>
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
 #include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <cassert>
 
 namespace primecount {
 
-class SegmentedPiTable
+class SegmentedPiTable : public BitSieve128
 {
 public:
   SegmentedPiTable(uint64_t low,
@@ -72,7 +72,7 @@ public:
       return 0;
 
     n -= low_;
-    uint64_t bitmask = unset_bits_[n % 128];
+    uint64_t bitmask = unset_larger_[n % 128];
     uint64_t prime_count = pi_[n / 128].prime_count;
     uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
     return prime_count + bit_count;
@@ -89,7 +89,6 @@ private:
     uint64_t bits;
   };
 
-  static const std::array<uint64_t, 128> unset_bits_;
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
