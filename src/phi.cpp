@@ -42,7 +42,6 @@
 
 #include <stdint.h>
 #include <cassert>
-#include <array>
 #include <utility>
 #include <vector>
 
@@ -54,40 +53,45 @@ namespace {
 class PhiCache : public BitSieve240
 {
 public:
-  PhiCache(uint64_t limit,
+  PhiCache(uint64_t x,
+           uint64_t a,
            const vector<int32_t>& primes,
            const PiTable& pi) :
     primes_(primes),
     pi_(pi)
   {
+    // Cache phi(n, a) if n <= sqrt(x) && a <= max_a
+    uint64_t max_a = 100;
+    uint64_t sqrtx = isqrt(x);
     uint64_t tiny_a = PhiTiny::max_a();
 
-    if (max_a_ <= tiny_a)
+    // Make sure we cache only frequently used values
+    a = a - min(a, 30);
+    max_a = min(a, max_a);
+
+    if (max_a <= tiny_a)
       return;
 
     // The cache (i.e. the sieve and sieve_counts arrays)
     // uses at most max_megabytes per thread.
     uint64_t max_megabytes = 16;
-    uint64_t indexes = max_a_ - tiny_a;
+    uint64_t indexes = max_a - tiny_a;
     uint64_t max_bytes = max_megabytes << 20;
     uint64_t max_bytes_per_index = max_bytes / indexes;
     uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
     max_x_ = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
-
-    // This cache limit has been tuned for both pi_legendre(x) and
-    // pi_meissel(x) as these functions are frequently used in primecount.
-    // The idea is to allocate only a small amount of cache memory for
-    // tiny computations (because initializing a lot of cache memory is
-    // slow). On the other hand, for large and long running computations
-    // we use the maximum amount of cache memory.
-    uint64_t cache_limit = isqrt(limit);
-    max_x_ = min(cache_limit, max_x_);
+    max_x_ = min(sqrtx, max_x_);
     max_x_size_ = ceil_div(max_x_, 240);
 
+    if (max_x_size_ == 0)
+      return;
+
     // Make sure that there are no uninitialized
-    // bits in the last sieve array item.
-    if (max_x_size_ > 0)
-      max_x_ = max_x_size_ * 240 - 1;
+    // bits in the last sieve array element.
+    max_x_ = max_x_size_ * 240 - 1;
+    max_a_ = max_a;
+    sieve_.resize(max_a_ + 1);
+    sieve_counts_.resize(max_a_ + 1);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -168,12 +172,15 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    return a < sieve_.size() &&
-           x / 240 < sieve_[a].size();
+    return x <= max_x_ &&
+           a <= max_a_cached_;
   }
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
+    assert(a < sieve_.size());
+    assert(x / 240 < sieve_[a].size());
+
     uint64_t bitmask = unset_larger_[x % 240];
     uint64_t bits = sieve_[a][x / 240];
     return sieve_counts_[a][x / 240] + popcnt64(bits & bitmask);
@@ -242,14 +249,13 @@ private:
   uint64_t max_x_ = 0;
   uint64_t max_x_size_ = 0;
   uint64_t max_a_cached_ = 0;
-  enum { MAX_A = 100 };
-  const uint64_t max_a_ = MAX_A;
+  uint64_t max_a_ = 0;
   /// sieve_[a] contains only numbers (1 bits) that are
   /// not divisible by any of the first a primes.
-  array<vector<uint64_t>, MAX_A + 1> sieve_;
+  vector<vector<uint64_t>> sieve_;
   /// sieve_counts_[a][i] contains the count of numbers < i * 240 that
   /// are not divisible by any of the first a primes.
-  array<vector<uint32_t>, MAX_A + 1> sieve_counts_;
+  vector<vector<uint32_t>> sieve_counts_;
   const vector<int32_t>& primes_;
   const PiTable& pi_;
 };
@@ -348,7 +354,7 @@ int64_t phi(int64_t x, int64_t a, int threads)
   {
     // Each thread uses its own PhiCache object in
     // order to avoid thread synchronization.
-    PhiCache cache(x, primes, pi);
+    PhiCache cache(x, a, primes, pi);
 
     #pragma omp for nowait schedule(dynamic, 16)
     for (int64_t i = c; i < a; i++)
