@@ -86,7 +86,8 @@ public:
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array item.
-    max_x_ = max_x_size_ * 240 - 1;
+    if (max_x_size_ > 0)
+      max_x_ = max_x_size_ * 240 - 1;
   }
 
   /// Calculate phi(x, a) using the recursive formula:
