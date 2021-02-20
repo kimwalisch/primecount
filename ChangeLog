@@ -1,4 +1,4 @@
-Changes in primecount-6.3, 2021-02-19
+Changes in primecount-6.3, 2021-02-20
 
   The partial sieve function a.k.a. phi(x, a) has been improved.
   This function is used by many other functions such as
