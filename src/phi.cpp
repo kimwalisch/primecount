@@ -28,7 +28,6 @@
 /// file in the top level directory.
 ///
 
-#include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
 #include <generate.hpp>
@@ -37,6 +36,7 @@
 #include <imath.hpp>
 #include <min.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 #include <popcnt.hpp>
 
