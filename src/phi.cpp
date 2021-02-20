@@ -3,12 +3,12 @@
 /// @brief The PhiCache class calculates the partial sieve function
 ///        (a.k.a. Legendre-sum) using the recursive formula:
 ///        phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
-///        phi(x, a) counts the numbers <= x that are not divisible by
-///        any of the first a primes. The algorithm used is an
-///        optimized version of the algorithm described in Tomás
-///        Oliveira e Silva's paper [1]. I have added 5 optimizations
-///        to my implementation which significantly speed up the
-///        calculation:
+///        phi(x, a) counts the numbers <= x that are not divisible
+///        by any of the first a primes. The algorithm used is an
+///        optimized version of the recursive algorithm described in
+///        Tomás Oliveira e Silva's paper [1]. I have added 5
+///        optimizations to my implementation which speed up the
+///        computation by several orders of magnitude:
 ///
 ///        * Calculate phi(x, a) in O(1) using formula [2] if a <= 6.
 ///        * Calculate phi(x, a) in O(1) using pi(x) lookup table if x < prime[a+1]^2.
@@ -60,7 +60,11 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // Cache phi(n, a) if n <= sqrt(x) && a <= max_a
+    // Cache phi(n, a) if n <= sqrt(x) && a <= max_a.
+    // The value max_a = 100 has been determined empirically
+    // by running benchmarks. Using a smaller or larger
+    // max_a with the same amount of memory (max_megabytes)
+    // decreases the performance.
     uint64_t max_a = 100;
     uint64_t sqrtx = isqrt(x);
     uint64_t tiny_a = PhiTiny::max_a();
