@@ -84,7 +84,7 @@ T D_thread(T x,
     // Find all special leaves in the current segment that are
     // composed of a prime and a square free number:
     // low <= x / (primes[b] * m) < high
-    for (int64_t end = min(pi_sqrtz, max_b); b <= end; b++)
+    for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
