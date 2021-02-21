@@ -128,13 +128,12 @@ public:
   
     for (i = c; i < a; i++)
     {
-      // phi(x / prime[i+1], prime[i]) = 1 if prime[i] * prime[i+1] >= x.
+      // phi(x / prime[i+1], i) = 1 if prime[i] * prime[i+1] >= x.
       // However we can do slightly better:
-      // If prime[i + 1] > sqrt(x) then x / prime[i + 1] < sqrt(x).
-      // Hence x / prime[i + 1] <= sqrt(x) - 1.
-      // phi(sqrt(x) - 1, i) = 1 as prime[i] is the largest
-      // prime <= (sqrt(x) - 1) as prime[i + 1] > sqrt(x) and hence there
-      // is no other prime number inside [prime[i] + 1, sqrt(x) - 1].
+      // If prime[i+1] > sqrt(x) and prime[i] <= sqrt(x) then
+      // phi(x / prime[i+1], i) = 1 even if prime[i] * prime[i+1] < x.
+      // This works because in this case there is no other prime
+      // inside the interval ]prime[i] * prime[i+1], x].
       if (primes_[i + 1] > sqrtx)
         break;
       int64_t xp = fast_div(x, primes_[i + 1]);
