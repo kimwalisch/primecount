@@ -29,6 +29,13 @@ function round()
     echo $(printf %.$2f $(echo "scale=$2;(((10^$2)*$1)+0.5)/(10^$2)" | bc))
 }
 
+function pretty_print_secs()
+{
+    secs=$1
+    first_digits=$(echo ${secs:0:${#secs}-3} | awk '{ len=length($0); res=""; for (i=0;i<=len;i++) { res=substr($0,len-i+1,1) res; if (i > 0 && i < len && i % 3 == 0) { res = "," res } }; print res }')
+    echo $first_digits${secs: -3}
+}
+
 function get_prime_count()
 {
     echo $(./primecount $1 | awk '{ len=length($0); res=""; for (i=0;i<=len;i++) { res=substr($0,len-i+1,1) res; if (i > 0 && i < len && i % 3 == 0) { res = "," res } }; print res }')
@@ -65,11 +72,11 @@ do
     echo '  <tr align="right">'
     echo "    <td>10<sup>$i</sup></td>"
     echo "    <td>$(get_prime_count 1e$i)</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --legendre) 2)s</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --meissel) 2)s</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --lmo) 2)s</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --deleglise-rivat) 2)s</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --gourdon) 2)s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --legendre) 2))s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --meissel) 2))s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --lmo) 2))s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --deleglise-rivat) 2))s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --gourdon) 2))s</td>"
     echo "  </tr>"
 done
 
@@ -81,8 +88,8 @@ do
     echo "    <td>NaN</td>"
     echo "    <td>NaN</td>"
     echo "    <td>NaN</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --deleglise-rivat) 2)s</td>"
-    echo "    <td>$(round $(primecount_benchmark 1e$i --gourdon) 2)s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --deleglise-rivat) 2))s</td>"
+    echo "    <td>$(pretty_print_secs $(round $(primecount_benchmark 1e$i --gourdon) 2))s</td>"
     echo "  </tr>"
 done
 
