@@ -60,13 +60,12 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // Cache phi(n, a) if n <= sqrt(x) && a <= max_a.
+    // We cache phi(x, a) if a <= max_a.
     // The value max_a = 100 has been determined empirically
     // by running benchmarks. Using a smaller or larger
     // max_a with the same amount of memory (max_megabytes)
     // decreases the performance.
     uint64_t max_a = 100;
-    uint64_t sqrtx = isqrt(x);
     uint64_t tiny_a = PhiTiny::max_a();
 
     // Make sure we cache only frequently used values
@@ -76,6 +75,14 @@ public:
     if (max_a <= tiny_a)
       return;
 
+    // We cache phi(x, a) results if x <= max_x.
+    // The value max_x = x^(1/2.3) has been determined by running
+    // pi_legendre(x) benchmarks from 1e10 to 1e16. For small
+    // computations it is important to not cache too much,
+    // otherwise all threads will simultaneously write to main
+    // memory during initialization which decreases performance.
+    uint64_t max_x = (uint64_t) pow(x, 1 / 2.3);
+
     // The cache (i.e. the sieve and sieve_counts arrays)
     // uses at most max_megabytes per thread.
     uint64_t max_megabytes = 16;
@@ -83,9 +90,9 @@ public:
     uint64_t max_bytes = max_megabytes << 20;
     uint64_t max_bytes_per_index = max_bytes / indexes;
     uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
-    max_x_ = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
-    max_x_ = min(sqrtx, max_x_);
-    max_x_size_ = ceil_div(max_x_, 240);
+    uint64_t cache_limit = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
+    max_x = min(max_x, cache_limit);
+    max_x_size_ = ceil_div(max_x, 240);
 
     if (max_x_size_ == 0)
       return;
