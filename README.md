@@ -152,16 +152,16 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>10</sup></td>
     <td>455,052,511</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
     <td>0.01s</td>
     <td>0.00s</td>
-    <td>0.00s</td>
+    <td>0.01s</td>
     <td>0.00s</td>
   </tr>
   <tr align="right">
     <td>10<sup>11</sup></td>
     <td>4,118,054,813</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
     <td>0.01s</td>
     <td>0.01s</td>
     <td>0.01s</td>
@@ -170,8 +170,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.09s</td>
-    <td>0.05s</td>
+    <td>0.07s</td>
+    <td>0.08s</td>
     <td>0.02s</td>
     <td>0.01s</td>
     <td>0.01s</td>
@@ -179,56 +179,56 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.39s</td>
-    <td>0.19s</td>
-    <td>0.05s</td>
+    <td>0.45s</td>
+    <td>0.44s</td>
     <td>0.03s</td>
+    <td>0.02s</td>
     <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>2.24s</td>
-    <td>0.96s</td>
-    <td>0.16s</td>
-    <td>0.12s</td>
-    <td>0.07s</td>
+    <td>0.58s</td>
+    <td>0.56s</td>
+    <td>0.08s</td>
+    <td>0.08s</td>
+    <td>0.05s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>14.58s</td>
-    <td>5.96s</td>
-    <td>0.63s</td>
-    <td>0.38s</td>
-    <td>0.21s</td>
+    <td>2.37s</td>
+    <td>1.07s</td>
+    <td>0.30s</td>
+    <td>0.24s</td>
+    <td>0.19s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>111.81s</td>
-    <td>42.91s</td>
-    <td>2.83s</td>
-    <td>1.59s</td>
-    <td>0.76s</td>
+    <td>15.64s</td>
+    <td>5.41s</td>
+    <td>1.25s</td>
+    <td>0.89s</td>
+    <td>0.48s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>938.07s</td>
-    <td>352.39s</td>
-    <td>12.70s</td>
-    <td>4.72s</td>
-    <td>2.83s</td>
+    <td>124.42s</td>
+    <td>38.70s</td>
+    <td>5.53s</td>
+    <td>2.33s</td>
+    <td>1.44s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>8,268.52s</td>
-    <td>3,144.72s</td>
-    <td>57.31s</td>
-    <td>18.96s</td>
-    <td>10.77s</td>
+    <td>1,046.74s</td>
+    <td>346.53s</td>
+    <td>25.31s</td>
+    <td>8.30s</td>
+    <td>4.85s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -236,8 +236,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>89.02s</td>
-    <td>45.56s</td>
+    <td>37.08s</td>
+    <td>19.37s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -245,8 +245,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>385.61s</td>
-    <td>188.70s</td>
+    <td>167.99s</td>
+    <td>83.17s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -254,8 +254,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,652.66s</td>
-    <td>800.57s</td>
+    <td>790.49s</td>
+    <td>363.80s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -263,19 +263,18 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>7,355.69s</td>
-    <td>3,260.95s</td>
+    <td>3,775.25s</td>
+    <td>1,611.65s</td>
   </tr>
 </table>
 
-The benchmarks above were run on a system with an Intel Xeon Platinum 8275CL CPU
-from 2019 using 8 CPU cores (16 threads) clocked at 3.00GHz. Note that Jan Büthe
-mentions in <a href="doc/References.md">[11]</a> that he computed pi(10<sup>25</sup>)
-in 40,000 CPU core hours using the analytic prime counting function algorithm.
-Büthe also mentions that by using additional zeros of the zeta function the runtime
-could have potentially been reduced to 4,000 CPU core hours. However using primecount
-and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed in only 460 CPU
-core hours on an AMD Ryzen 3950X CPU!
+The benchmarks above were run on an AMD 7R32 CPU (from 2020) with 16 cores/32 threads
+clocked at 3.30GHz. Note that Jan Büthe mentions in <a href="doc/References.md">[11]</a>
+that he computed pi(10<sup>25</sup>) in 40,000 CPU core hours using the analytic prime
+counting function algorithm. Büthe also mentions that by using additional zeros of the
+zeta function the runtime could have potentially been reduced to 4,000 CPU core hours.
+However using primecount and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed
+in only 460 CPU core hours on an AMD Ryzen 3950X CPU!
 
 ## Performance tips
 
