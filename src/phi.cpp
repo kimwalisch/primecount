@@ -75,7 +75,7 @@ public:
     if (max_a <= tiny_a)
       return;
 
-    // We cache phi(x, a) results if x <= max_x.
+    // We cache phi(x, a) if x <= max_x.
     // The value max_x = x^(1/2.3) has been determined by running
     // pi_legendre(x) benchmarks from 1e10 to 1e16. For small
     // computations it is important to not cache too much,
