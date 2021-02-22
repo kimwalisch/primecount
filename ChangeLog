@@ -1,9 +1,9 @@
-Changes in primecount-6.3, 2021-02-18
+Changes in primecount-6.3, 2021-02-21
 
   The partial sieve function a.k.a. phi(x, a) has been improved.
   This function is used by many other functions such as
   pi_legendre(x), pi_meissel(x), pi_lehmer(x), ...
-  For both pi_legendre(x) and pi_meissel(x) I have mesured a
+  For both pi_legendre(x) and pi_meissel(x) I have measured a
   speedup of 5x for pi(1e16). Note that the default pi_gourdon(x)
   does not benefit from this improvement.
 

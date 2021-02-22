@@ -3,7 +3,7 @@
 /// @brief P3(x, a) is the 3rd partial sieve function, it is used
 ///        in Lehmer's prime counting formula.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,7 +23,7 @@ namespace primecount {
 
 /// P3(x, a) counts the numbers <= x that have exactly 3
 /// prime factors each exceeding the a-th prime.
-/// Memory usage: O(pi(sqrt(x)))
+/// Memory usage: O(sqrt(x))
 ///
 int64_t P3(int64_t x, int64_t y, int threads)
 {
