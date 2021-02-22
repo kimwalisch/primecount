@@ -170,8 +170,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
-    <td>0.07s</td>
-    <td>0.08s</td>
+    <td>0.03s</td>
+    <td>0.03s</td>
     <td>0.02s</td>
     <td>0.01s</td>
     <td>0.01s</td>
@@ -179,18 +179,18 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.45s</td>
-    <td>0.44s</td>
-    <td>0.03s</td>
+    <td>0.09s</td>
+    <td>0.06s</td>
+    <td>0.04s</td>
     <td>0.02s</td>
     <td>0.02s</td>
   </tr>
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>0.58s</td>
-    <td>0.56s</td>
-    <td>0.08s</td>
+    <td>0.42s</td>
+    <td>0.20s</td>
+    <td>0.10s</td>
     <td>0.08s</td>
     <td>0.05s</td>
   </tr>
