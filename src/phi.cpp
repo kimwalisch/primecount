@@ -42,6 +42,7 @@
 
 #include <stdint.h>
 #include <cassert>
+#include <cmath>
 #include <utility>
 #include <vector>
 
