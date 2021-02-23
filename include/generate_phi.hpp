@@ -79,10 +79,7 @@ public:
 
     // We cache phi(x, a) if x <= max_x.
     // The value max_x = sqrt(x) has been determined by running
-    // S2_hard(x) and D(x) benchmarks from 1e18 to 1e21. For small
-    // computations it is important to not cache too much,
-    // otherwise all threads will simultaneously write to main
-    // memory during initialization which decreases performance.
+    // S2_hard(x) and D(x) benchmarks from 1e12 to 1e21.
     uint64_t max_x = isqrt(x);
 
     // The cache (i.e. the sieve and sieve_counts arrays)
