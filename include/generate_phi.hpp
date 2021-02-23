@@ -102,6 +102,7 @@ public:
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array element.
+    assert(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
     sieve_.resize(max_a_ + 1);
