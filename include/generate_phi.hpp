@@ -62,13 +62,12 @@ public:
     primes_(primes),
     pi_(pi)
   {
-    // Cache phi(n, a) if n <= sqrt(x) && a <= max_a.
+    // We cache phi(x, a) if a <= max_a.
     // The value max_a = 100 has been determined empirically
     // by running benchmarks. Using a smaller or larger
     // max_a with the same amount of memory (max_megabytes)
     // decreases the performance.
     uint64_t max_a = 100;
-    uint64_t sqrtx = isqrt(x);
     uint64_t tiny_a = PhiTiny::max_a();
 
     // Make sure we cache only frequently used values
@@ -78,6 +77,14 @@ public:
     if (max_a <= tiny_a)
       return;
 
+    // We cache phi(x, a) if x <= max_x.
+    // The value max_x = sqrt(x) has been determined by running
+    // S2_hard(x) and D(x) benchmarks from 1e18 to 1e21. For small
+    // computations it is important to not cache too much,
+    // otherwise all threads will simultaneously write to main
+    // memory during initialization which decreases performance.
+    uint64_t max_x = isqrt(x);
+
     // The cache (i.e. the sieve and sieve_counts arrays)
     // uses at most max_megabytes per thread.
     uint64_t max_megabytes = 16;
@@ -85,15 +92,17 @@ public:
     uint64_t max_bytes = max_megabytes << 20;
     uint64_t max_bytes_per_index = max_bytes / indexes;
     uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
-    max_x_ = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
-    max_x_ = min(sqrtx, max_x_);
-    max_x_size_ = ceil_div(max_x_, 240);
+    uint64_t cache_limit = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
+    max_x = min(max_x, cache_limit);
+    max_x_size_ = ceil_div(max_x, 240);
 
-    if (max_x_size_ == 0)
+    // For tiny computations caching is not worth it
+    if (max_x_size_ < 8)
       return;
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array element.
+    assert(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
     sieve_.resize(max_a_ + 1);
@@ -136,12 +145,12 @@ public:
   
     for (i = c; i < a; i++)
     {
-      // phi(x / prime[i+1], i) = 1 if prime[i] * prime[i+1] >= x.
+      // phi(x / prime[i+1], i) = 1 if x / prime[i+1] <= prime[i].
       // However we can do slightly better:
       // If prime[i+1] > sqrt(x) and prime[i] <= sqrt(x) then
-      // phi(x / prime[i+1], i) = 1 even if prime[i] * prime[i+1] < x.
+      // phi(x / prime[i+1], i) = 1 even if x / prime[i+1] > prime[i].
       // This works because in this case there is no other prime
-      // inside the interval ]prime[i] * prime[i+1], x].
+      // inside the interval ]prime[i], x / prime[i+1]].
       if (primes_[i + 1] > sqrtx)
         break;
       int64_t xp = fast_div(x, primes_[i + 1]);
