@@ -104,16 +104,9 @@ void SegmentedPiTable::init_bits(uint64_t start,
   uint64_t j = ceil_div((stop - low_), 128);
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
-  // Since we store only odd numbers in our lookup table,
-  // we cannot store 2 which is the only even prime.
-  // As a workaround we mark 1 as a prime (1st bit) and
-  // add a check to return 0 for pi[1].
-  if (start <= 1)
-    pi_[0].bits |= 1;
-
   // Iterate over primes > 2
   primesieve::iterator it(max(start, 2), stop);
-  uint64_t count = (start <= 2);
+  uint64_t count = 0;
   uint64_t prime = 0;
 
   // Each thread iterates over the primes

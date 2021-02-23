@@ -73,16 +73,9 @@ void PiTable::init_bits(uint64_t start,
   uint64_t j = ceil_div(stop, 128);
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
-  // Since we store only odd numbers in our lookup table,
-  // we cannot store 2 which is the only even prime.
-  // As a workaround we mark 1 as a prime (1st bit) and
-  // add a check to return 0 for pi[1].
-  if (start <= 2)
-    pi_[0].bits = 1;
-
   // Iterate over primes > 2
   primesieve::iterator it(max(start, 2), stop);
-  uint64_t count = (start <= 2);
+  uint64_t count = 0;
   uint64_t prime = 0;
 
   while ((prime = it.next_prime()) < stop)
@@ -101,7 +94,7 @@ void PiTable::init_prime_count(uint64_t start,
                                uint64_t thread_num)
 {
   // First compute PrimePi[start - 1]
-  uint64_t count = 0;
+  uint64_t count = 1;
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 

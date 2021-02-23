@@ -60,9 +60,9 @@ public:
 
     // Since we store only odd numbers in our lookup table,
     // we cannot store 2 which is the only even prime.
-    // As a workaround we mark 1 as a prime (1st bit) and
-    // add a check to return 0 for pi[1].
-    if_unlikely(n == 1)
+    // As a workaround we have set pi_[0].prime_count = 1
+    // but this requires the check below.
+    if_unlikely(n < 2)
       return 0;
 
     n -= low_;
@@ -85,7 +85,7 @@ private:
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
-  uint64_t pi_low_ = 0;
+  uint64_t pi_low_ = 1;
   uint64_t high_;
   uint64_t max_high_;
   uint64_t segment_size_;
