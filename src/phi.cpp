@@ -95,7 +95,7 @@ public:
     max_x_size_ = ceil_div(max_x, 240);
 
     // For tiny computations caching is not worth it
-    if (max_x_size_ < 4)
+    if (max_x_size_ < 8)
       return;
 
     // Make sure that there are no uninitialized

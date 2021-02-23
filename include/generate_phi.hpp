@@ -96,7 +96,8 @@ public:
     max_x = min(max_x, cache_limit);
     max_x_size_ = ceil_div(max_x, 240);
 
-    if (max_x_size_ == 0)
+    // For tiny computations caching is not worth it
+    if (max_x_size_ < 8)
       return;
 
     // Make sure that there are no uninitialized
