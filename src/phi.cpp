@@ -80,7 +80,7 @@ public:
     // The value max_x = x^(1/2.3) has been determined by running
     // pi_legendre(x) benchmarks from 1e10 to 1e16. On systems
     // with few CPU cores max_x = sqrt(x) tends to perform better
-    // however this runs into scaling issues on big servers.
+    // but this causes scaling issues on big servers.
     uint64_t max_x = (uint64_t) pow(x, 1 / 2.3);
 
     // The cache (i.e. the sieve and sieve_counts arrays)
