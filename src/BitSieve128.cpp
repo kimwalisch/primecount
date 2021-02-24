@@ -29,6 +29,9 @@ constexpr uint64_t bitmask(uint64_t n)
 
 namespace primecount {
 
+/// pi(x) for x < 3
+const std::array<uint8_t, 3> BitSieve128::pi_tiny_ = { 0, 0, 1 };
+
 /// Bitmasks needed to set a specific bit in the sieve array
 const std::array<uint64_t, 128> BitSieve128::set_bit_ =
 {

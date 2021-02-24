@@ -94,7 +94,7 @@ void PiTable::init_prime_count(uint64_t start,
                                uint64_t thread_num)
 {
   // First compute PrimePi[start - 1]
-  uint64_t count = 1;
+  uint64_t count = pi_tiny_[2];
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 
