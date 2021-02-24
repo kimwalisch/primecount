@@ -3,9 +3,10 @@
 /// @brief The BitSieve240 base class contains lookup tables that are
 ///        needed to implement a prime sieving algorithm where each
 ///        bit corresponds to an integer that is not divisible by 2,
-///        3 and 5. The 8 bits of each byte represent an interval of
-///        size 30. Hence one uint64_t sieve array element (8 bytes)
-///        corresponds to an interval of 30 * 8 = 240.
+///        3 and 5. The 8 bits of each byte correspond to the offsets
+///        { 1, 7, 11, 13, 17, 19, 23, 29 }. Since the sieve array
+///        uses the uint64_t data type, one sieve array element
+///        (8 bytes) corresponds to an interval of size 30 * 8 = 240.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -45,6 +46,62 @@ constexpr uint64_t unset_l(int n)
 } // namespace
 
 namespace primecount {
+
+/// pi(x) for x < 6
+const std::array<uint64_t, 6> BitSieve240::pi_tiny_ = { 0, 0, 1, 2, 2, 3 };
+
+/// Bitmasks needed to set a specific bit in the sieve array
+const std::array<uint64_t, 240> BitSieve240::set_bit_ =
+{
+  0ull, 1ull << 0, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 1, 0ull, 0ull,
+  0ull, 1ull << 2, 0ull, 1ull << 3, 0ull,
+  0ull, 0ull, 1ull << 4, 0ull, 1ull << 5,
+  0ull, 0ull, 0ull, 1ull << 6, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 7,
+  0ull, 1ull << 8, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 9, 0ull, 0ull,
+  0ull, 1ull << 10, 0ull, 1ull << 11, 0ull,
+  0ull, 0ull, 1ull << 12, 0ull, 1ull << 13,
+  0ull, 0ull, 0ull, 1ull << 14, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 15,
+  0ull, 1ull << 16, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 17, 0ull, 0ull,
+  0ull, 1ull << 18, 0ull, 1ull << 19, 0ull,
+  0ull, 0ull, 1ull << 20, 0ull, 1ull << 21,
+  0ull, 0ull, 0ull, 1ull << 22, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 23,
+  0ull, 1ull << 24, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 25, 0ull, 0ull,
+  0ull, 1ull << 26, 0ull, 1ull << 27, 0ull,
+  0ull, 0ull, 1ull << 28, 0ull, 1ull << 29,
+  0ull, 0ull, 0ull, 1ull << 30, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 31,
+  0ull, 1ull << 32, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 33, 0ull, 0ull,
+  0ull, 1ull << 34, 0ull, 1ull << 35, 0ull,
+  0ull, 0ull, 1ull << 36, 0ull, 1ull << 37,
+  0ull, 0ull, 0ull, 1ull << 38, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 39,
+  0ull, 1ull << 40, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 41, 0ull, 0ull,
+  0ull, 1ull << 42, 0ull, 1ull << 43, 0ull,
+  0ull, 0ull, 1ull << 44, 0ull, 1ull << 45,
+  0ull, 0ull, 0ull, 1ull << 46, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 47,
+  0ull, 1ull << 48, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 49, 0ull, 0ull,
+  0ull, 1ull << 50, 0ull, 1ull << 51, 0ull,
+  0ull, 0ull, 1ull << 52, 0ull, 1ull << 53,
+  0ull, 0ull, 0ull, 1ull << 54, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 55,
+  0ull, 1ull << 56, 0ull, 0ull, 0ull,
+  0ull, 0ull, 1ull << 57, 0ull, 0ull,
+  0ull, 1ull << 58, 0ull, 1ull << 59, 0ull,
+  0ull, 0ull, 1ull << 60, 0ull, 1ull << 61,
+  0ull, 0ull, 0ull, 1ull << 62, 0ull,
+  0ull, 0ull, 0ull, 0ull, 1ull << 63
+};
 
 /// Bitmasks needed to unset a specific bit in the sieve array
 const std::array<uint64_t, 240> BitSieve240::unset_bit_ =

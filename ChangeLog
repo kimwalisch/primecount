@@ -1,4 +1,4 @@
-Changes in primecount-6.3, 2021-02-21
+Changes in primecount-6.3, 2021-02-24
 
   The partial sieve function a.k.a. phi(x, a) has been improved.
   This function is used by many other functions such as
@@ -13,6 +13,8 @@ Changes in primecount-6.3, 2021-02-21
   * phi.cpp: Use larger c constant if phi(x, larger_c) is cached.
   * generate_phi.hpp: Same optimizations as phi.cpp.
   * LoadBalancer.cpp: Tune for new phi(x, a) implementation.
+  * PiTable.cpp: Reduce memory usage by 2x.
+  * SegmentedPiTable.cpp: Reduce memory usage by 2x.
 
 Changes in primecount-6.2, 2021-01-07
 

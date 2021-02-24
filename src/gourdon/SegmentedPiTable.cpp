@@ -2,16 +2,17 @@
 /// @file  SegmentedPiTable.cpp
 /// @brief The A and C formulas in Xavier Gourdon's prime counting
 ///        algorithm require looking up PrimePi[n] values with
-///        n < x^(1/2). Since a PrimePi[n] lookup table of size
-///        x^(1/2) would use too much memory we need a segmented
-///        PrimePi[n] lookup table that uses only O(z) memory.
+///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
+///        would use too much memory we need a segmented PrimePi[n]
+///        lookup table that uses only O(z) memory.
 ///
-///        The SegmentedPiTable is based on the PiTable class which
-///        is a compressed lookup table for prime counts. Each bit
-///        in the lookup table corresponds to an odd integer and that
-///        bit is set to 1 if the integer is a prime. PiTable uses
-///        only (n / 8) bytes of memory and returns the number of
-///        primes <= n in O(1) operations.
+///        The SegmentedPiTable class is a compressed lookup table of
+///        prime counts. Each bit of the lookup table corresponds to
+///        an integer that is not divisible by 2, 3 and 5. The 8 bits
+///        of each byte correspond to the offsets { 1, 7, 11, 13, 17,
+///        19, 23, 29 }. Since our lookup table uses the uint64_t data
+///        type, one array element (8 bytes) corresponds to an
+///        interval of size 30 * 8 = 240.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -37,23 +38,17 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
     max_high_(limit + 1),
     threads_(threads)
 {
-  // Each bit of the pi[x] lookup table corresponds
-  // to an odd integer, so there are 16 numbers per
-  // byte. However we also store 64-bit prime_count
-  // values in the pi[x] lookup table, hence each byte
-  // only corresponds to 8 numbers.
-  uint64_t numbers_per_byte = 8;
-
   // Minimum segment size = 256 KiB (L2 cache size),
   // a large segment size improves load balancing.
-  uint64_t min_segment_size = 256 * (1 << 10) * numbers_per_byte;
+  uint64_t numbers_per_byte = 240 / sizeof(pi_t);
+  uint64_t min_segment_size = (256 << 10) * numbers_per_byte;
   segment_size_ = max(segment_size, min_segment_size);
   segment_size_ = min(segment_size_, max_high_);
 
   // In order to simplify multi-threading we set low,
-  // high and segment_size % 128 == 0.
-  segment_size_ += 128 - segment_size_ % 128;
-  pi_.resize(segment_size_ / 128);
+  // high and segment_size % 240 == 0.
+  segment_size_ += 240 - segment_size_ % 240;
+  pi_.resize(segment_size_ / 240);
 
   high_ = segment_size_;
   high_ = min(high_, max_high_);
@@ -69,7 +64,7 @@ void SegmentedPiTable::init()
   uint64_t thread_size = segment_size_ / threads_;
   uint64_t min_thread_size = (uint64_t) 1e7;
   thread_size = max(min_thread_size, thread_size);
-  thread_size += 128 - thread_size % 128;
+  thread_size += 240 - thread_size % 240;
 
   #pragma omp for
   for (int t = 0; t < threads_; t++)
@@ -100,12 +95,12 @@ void SegmentedPiTable::init_bits(uint64_t start,
                                  uint64_t thread_num)
 {
   // Zero initialize pi vector
-  uint64_t i = (start - low_) / 128;
-  uint64_t j = ceil_div((stop - low_), 128);
+  uint64_t i = (start - low_) / 240;
+  uint64_t j = ceil_div((stop - low_), 240);
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
-  // Iterate over primes > 2
-  primesieve::iterator it(max(start, 2), stop);
+  // Iterate over primes > 5
+  primesieve::iterator it(max(start, 5), stop);
   uint64_t count = 0;
   uint64_t prime = 0;
 
@@ -115,7 +110,7 @@ void SegmentedPiTable::init_bits(uint64_t start,
   while ((prime = it.next_prime()) < stop)
   {
     uint64_t p = prime - low_;
-    pi_[p / 128].bits |= set_bit_[p % 128];
+    pi_[p / 240].bits |= set_bit_[p % 240];
     count += 1;
   }
 
@@ -133,8 +128,8 @@ void SegmentedPiTable::init_prime_count(uint64_t start,
     count += counts_[i];
 
   // Convert to array indexes
-  uint64_t i = (start - low_) / 128;
-  uint64_t stop_idx = ceil_div((stop - low_), 128);
+  uint64_t i = (start - low_) / 240;
+  uint64_t stop_idx = ceil_div((stop - low_), 240);
 
   for (; i < stop_idx; i++)
   {
