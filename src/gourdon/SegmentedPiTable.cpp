@@ -115,8 +115,7 @@ void SegmentedPiTable::init_bits(uint64_t start,
   while ((prime = it.next_prime()) < stop)
   {
     uint64_t p = prime - low_;
-    uint64_t prime_bit = 1ull << (p % 128 / 2);
-    pi_[p / 128].bits |= prime_bit;
+    pi_[p / 128].bits |= set_bit_[p % 128];
     count += 1;
   }
 

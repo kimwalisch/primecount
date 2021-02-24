@@ -23,6 +23,7 @@ namespace primecount {
 class BitSieve128
 {
 protected:
+  static const std::array<uint64_t, 128> set_bit_;
   static const std::array<uint64_t, 128> unset_bit_;
   static const std::array<uint64_t, 128> unset_larger_;
 };
