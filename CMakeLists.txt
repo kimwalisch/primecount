@@ -53,7 +53,6 @@ set(BIN_SRC src/app/cmdoptions.cpp
 set(LIB_SRC src/WjCryptLib_Md5.cpp
             src/backup.cpp
             src/api.cpp
-            src/BitSieve128.cpp
             src/BitSieve240.cpp
             src/FactorTable.cpp
             src/RiemannR.cpp

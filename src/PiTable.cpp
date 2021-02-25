@@ -1,11 +1,12 @@
 ///
 /// @file  PiTable.cpp
-/// @brief The PiTable class is a compressed lookup table for
-///        prime counts. Each bit in the lookup table corresponds
-///        to an odd integer and that bit is set to 1 if the
-///        integer is a prime. PiTable uses only (n / 8) bytes of
-///        memory and returns the number of primes <= n in O(1)
-///        operations.
+/// @brief The PiTable class is a compressed lookup table of prime
+///        counts. Each bit of the lookup table corresponds to an
+///        integer that is not divisible by 2, 3 and 5. The 8 bits of
+///        each byte correspond to the offsets { 1, 7, 11, 13, 17, 19,
+///        23, 29 }. Since our lookup table uses the uint64_t data
+///        type, one array element (8 bytes) corresponds to an
+///        interval of size 30 * 8 = 240.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -33,8 +34,8 @@ PiTable::PiTable(uint64_t limit, int threads) :
   threads = ideal_num_threads(threads, size, thread_threshold);
   uint64_t thread_size = size / threads;
   thread_size = max(thread_threshold, thread_size);
-  thread_size += 128 - thread_size % 128;
-  pi_.resize(ceil_div(size, 128));
+  thread_size += 240 - thread_size % 240;
+  pi_.resize(ceil_div(size, 240));
   counts_.resize(threads);
 
   #pragma omp parallel num_threads(threads)
@@ -69,26 +70,19 @@ void PiTable::init_bits(uint64_t start,
                         uint64_t thread_num)
 {
   // Zero initialize pi vector
-  uint64_t i = start / 128;
-  uint64_t j = ceil_div(stop, 128);
+  uint64_t i = start / 240;
+  uint64_t j = ceil_div(stop, 240);
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
-  // Since we store only odd numbers in our lookup table,
-  // we cannot store 2 which is the only even prime.
-  // As a workaround we mark 1 as a prime (1st bit) and
-  // add a check to return 0 for pi[1].
-  if (start <= 2)
-    pi_[0].bits = 1;
-
-  // Iterate over primes > 2
-  primesieve::iterator it(max(start, 2), stop);
-  uint64_t count = (start <= 2);
+  // Iterate over primes > 5
+  primesieve::iterator it(max(start, 5), stop);
+  uint64_t count = 0;
   uint64_t prime = 0;
 
   while ((prime = it.next_prime()) < stop)
   {
-    uint64_t prime_bit = 1ull << (prime % 128 / 2);
-    pi_[prime / 128].bits |= prime_bit;
+    uint64_t prime_bit = set_bit_[prime % 240];
+    pi_[prime / 240].bits |= prime_bit;
     count += 1;
   }
 
@@ -101,13 +95,13 @@ void PiTable::init_prime_count(uint64_t start,
                                uint64_t thread_num)
 {
   // First compute PrimePi[start - 1]
-  uint64_t count = 0;
+  uint64_t count = pi_tiny_[5];
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 
   // Convert to array indexes
-  uint64_t i = start / 128;
-  uint64_t stop_idx = ceil_div(stop, 128);
+  uint64_t i = start / 240;
+  uint64_t stop_idx = ceil_div(stop, 240);
 
   for (; i < stop_idx; i++)
   {

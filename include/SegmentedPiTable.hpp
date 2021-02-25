@@ -2,16 +2,17 @@
 /// @file  SegmentedPiTable.hpp
 /// @brief The A and C formulas in Xavier Gourdon's prime counting
 ///        algorithm require looking up PrimePi[n] values with
-///        n < x^(1/2). Since a PrimePi[n] lookup table of size
-///        x^(1/2) would use too much memory we need a segmented
-///        PrimePi[n] lookup table that uses only O(z) memory.
+///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
+///        would use too much memory we need a segmented PrimePi[n]
+///        lookup table that uses only O(z) memory.
 ///
-///        The SegmentedPiTable is based on the PiTable class which
-///        is a compressed lookup table for prime counts. Each bit
-///        in the lookup table corresponds to an odd integer and that
-///        bit is set to 1 if the integer is a prime. PiTable uses
-///        only (n / 8) bytes of memory and returns the number of
-///        primes <= n in O(1) operations.
+///        The SegmentedPiTable class is a compressed lookup table of
+///        prime counts. Each bit of the lookup table corresponds to
+///        an integer that is not divisible by 2, 3 and 5. The 8 bits
+///        of each byte correspond to the offsets { 1, 7, 11, 13, 17,
+///        19, 23, 29 }. Since our lookup table uses the uint64_t data
+///        type, one array element (8 bytes) corresponds to an
+///        interval of size 30 * 8 = 240.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -22,7 +23,7 @@
 #ifndef SEGMENTEDPITABLE_HPP
 #define SEGMENTEDPITABLE_HPP
 
-#include <BitSieve128.hpp>
+#include <BitSieve240.hpp>
 #include <popcnt.hpp>
 #include <aligned_vector.hpp>
 #include <macros.hpp>
@@ -33,7 +34,7 @@
 
 namespace primecount {
 
-class SegmentedPiTable : public BitSieve128
+class SegmentedPiTable : public BitSieve240
 {
 public:
   SegmentedPiTable(uint64_t low,
@@ -64,17 +65,13 @@ public:
     assert(n >= low_);
     assert(n < high_);
 
-    // Since we store only odd numbers in our lookup table,
-    // we cannot store 2 which is the only even prime.
-    // As a workaround we mark 1 as a prime (1st bit) and
-    // add a check to return 0 for pi[1].
-    if_unlikely(n == 1)
-      return 0;
+    if_unlikely(n < pi_tiny_.size())
+      return pi_tiny_[n];
 
     n -= low_;
-    uint64_t bitmask = unset_larger_[n % 128];
-    uint64_t prime_count = pi_[n / 128].prime_count;
-    uint64_t bit_count = popcnt64(pi_[n / 128].bits & bitmask);
+    uint64_t bitmask = unset_larger_[n % 240];
+    uint64_t prime_count = pi_[n / 240].prime_count;
+    uint64_t bit_count = popcnt64(pi_[n / 240].bits & bitmask);
     return prime_count + bit_count;
   }
 
@@ -92,7 +89,7 @@ private:
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
-  uint64_t pi_low_ = 0;
+  uint64_t pi_low_ = 3;
   uint64_t high_;
   uint64_t max_high_;
   uint64_t segment_size_;
