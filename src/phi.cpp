@@ -262,7 +262,8 @@ private:
   uint64_t max_a_cached_ = 0;
   uint64_t max_a_ = 0;
 
-  /// Packing sieve_t reduces memory usage by 25%
+  /// Packing sieve_t increases the cache's capacity by 25%
+  /// which improves performance by up to 10%.
   #pragma pack(push, 1)
   struct sieve_t
   {
