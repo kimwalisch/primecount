@@ -88,8 +88,8 @@ public:
     uint64_t indexes = max_a - tiny_a;
     uint64_t max_bytes = max_megabytes << 20;
     uint64_t max_bytes_per_index = max_bytes / indexes;
-    uint64_t numbers_per_sieve_byte = 240 / sizeof(uint64_t);
-    uint64_t cache_limit = ((max_bytes_per_index * 2) / 3) * numbers_per_sieve_byte;
+    uint64_t numbers_per_byte = 240 / sizeof(sieve_t);
+    uint64_t cache_limit = max_bytes_per_index * numbers_per_byte;
     max_x = min(max_x, cache_limit);
     max_x_size_ = ceil_div(max_x, 240);
 
@@ -103,7 +103,6 @@ public:
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
     sieve_.resize(max_a_ + 1);
-    sieve_counts_.resize(max_a_ + 1);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -192,9 +191,10 @@ private:
     assert(a < sieve_.size());
     assert(x / 240 < sieve_[a].size());
 
+    uint64_t count = sieve_[a][x / 240].count;
+    uint64_t bits = sieve_[a][x / 240].bits;
     uint64_t bitmask = unset_larger_[x % 240];
-    uint64_t bits = sieve_[a][x / 240];
-    return sieve_counts_[a][x / 240] + popcnt64(bits & bitmask);
+    return count + popcnt64(bits & bitmask);
   }
 
   /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
@@ -223,7 +223,7 @@ private:
       // is not divisible by 2, 3 and 5. The 8 bits of each byte
       // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
       if (i == 3)
-        sieve_[i].resize(max_x_size_, ~0ull);
+        sieve_[i].resize(max_x_size_);
       else
       {
         // Initalize phi(x, i) with phi(x, i - 1)
@@ -235,22 +235,21 @@ private:
         // Remove prime[i] and its multiples
         uint64_t prime = primes_[i];
         if (prime <= max_x_)
-          sieve_[i][prime / 240] &= unset_bit_[prime % 240];
+          sieve_[i][prime / 240].bits &= unset_bit_[prime % 240];
         for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
-          sieve_[i][n / 240] &= unset_bit_[n % 240];
+          sieve_[i][n / 240].bits &= unset_bit_[n % 240];
 
         if (i > tiny_a)
         {
           uint64_t count = 0;
-          sieve_counts_[i].reserve(max_x_size_);
 
           // Fill an array with the cumulative 1 bit counts.
-          // sieve_counts_[i][j] contains the count of numbers < j * 240
-          // that are not divisible by any of the first i primes.
-          for (uint64_t j = 0; j < max_x_size_; j++)
+          // sieve[i][j] contains the count of numbers < j * 240 that
+          // are not divisible by any of the first i primes.
+          for (auto& sieve : sieve_[i])
           {
-            sieve_counts_[i].push_back((uint32_t) count);
-            count += popcnt64(sieve_[i][j]);
+            sieve.count = (uint32_t) count;
+            count += popcnt64(sieve.bits);
           }
         }
       }
@@ -261,12 +260,23 @@ private:
   uint64_t max_x_size_ = 0;
   uint64_t max_a_cached_ = 0;
   uint64_t max_a_ = 0;
-  /// sieve_[a] contains only numbers (1 bits) that are
-  /// not divisible by any of the first a primes.
-  vector<vector<uint64_t>> sieve_;
-  /// sieve_counts_[a][i] contains the count of numbers < i * 240 that
-  /// are not divisible by any of the first a primes.
-  vector<vector<uint32_t>> sieve_counts_;
+
+  /// Packing sieve_t increases the cache's capacity by 25%
+  /// which improves performance by up to 10%.
+  #pragma pack(push, 1)
+  struct sieve_t
+  {
+    uint32_t count = 0;
+    uint64_t bits = ~0ull;
+  };
+
+  #pragma pack(pop)
+
+  /// sieve[a] contains only numbers that are not divisible
+  /// by any of the the first a primes. sieve[a][i].count
+  /// contains the count of numbers < i * 240 that are not
+  /// divisible by any of the first a primes.
+  vector<vector<sieve_t>> sieve_;
   const Primes& primes_;
   const PiTable& pi_;
 };

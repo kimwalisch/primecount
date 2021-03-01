@@ -1,20 +1,22 @@
-Changes in primecount-6.3, 2021-02-24
+Changes in primecount-6.3, 2021-03-01
 
-  The partial sieve function a.k.a. phi(x, a) has been improved.
-  This function is used by many other functions such as
-  pi_legendre(x), pi_meissel(x), pi_lehmer(x), ...
-  For both pi_legendre(x) and pi_meissel(x) I have measured a
-  speedup of 5x for pi(1e16). Note that the default pi_gourdon(x)
-  does not benefit from this improvement.
+  The memory usage of the PiTable and SegmentedPiTable has been
+  reduced by about 2x, this speeds up the computation of the easy
+  special leaves (S2_easy & AC formulas) by up to 30% for large pi(x)
+  computations with x >= 1e23. Furthermore the partial sieve function
+  a.k.a. phi(x, a) has been improved significantly, it now runs 3 to
+  5x faster for most input. phi(x, a) is used extensively by many
+  other functions such as pi_legendre(x) and pi_meissel(x) which now
+  also run up to 5x faster.
 
+  * PiTable.cpp: Reduce memory usage by 2x.
+  * SegmentedPiTable.cpp: Reduce memory usage by 2x.
   * phi.cpp: Fixed integer overflow #39.
   * phi.cpp: Cache 40x more phi(x, a) results.
   * phi.cpp: Use pi(x) if a > pi(sqrt(x)).
   * phi.cpp: Use larger c constant if phi(x, larger_c) is cached.
   * generate_phi.hpp: Same optimizations as phi.cpp.
   * LoadBalancer.cpp: Tune for new phi(x, a) implementation.
-  * PiTable.cpp: Reduce memory usage by 2x.
-  * SegmentedPiTable.cpp: Reduce memory usage by 2x.
 
 Changes in primecount-6.2, 2021-01-07
 

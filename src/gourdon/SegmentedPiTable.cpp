@@ -115,7 +115,7 @@ void SegmentedPiTable::init()
       stop = min(stop, high_);
 
       if (start < stop)
-        init_prime_count(start, stop, t);
+        init_count(start, stop, t);
     }
   }
 }
@@ -149,9 +149,9 @@ void SegmentedPiTable::init_bits(uint64_t start,
 }
 
 /// Each thread computes PrimePi [start, stop[
-void SegmentedPiTable::init_prime_count(uint64_t start,
-                                        uint64_t stop,
-                                        uint64_t thread_num)
+void SegmentedPiTable::init_count(uint64_t start,
+                                  uint64_t stop,
+                                  uint64_t thread_num)
 {
   // First compute PrimePi[start - 1]
   uint64_t count = pi_low_;
@@ -164,7 +164,7 @@ void SegmentedPiTable::init_prime_count(uint64_t start,
 
   for (; i < stop_idx; i++)
   {
-    pi_[i].prime_count = count;
+    pi_[i].count = count;
     count += popcnt64(pi_[i].bits);
   }
 }

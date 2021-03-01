@@ -46,21 +46,21 @@ public:
     if_unlikely(n < pi_tiny_.size())
       return pi_tiny_[n];
 
+    uint64_t count = pi_[n / 240].count;
+    uint64_t bits = pi_[n / 240].bits;
     uint64_t bitmask = unset_larger_[n % 240];
-    uint64_t prime_count = pi_[n / 240].prime_count;
-    uint64_t bit_count = popcnt64(pi_[n / 240].bits & bitmask);
-    return prime_count + bit_count;
+    return count + popcnt64(bits & bitmask);
   }
 
 private:
   struct pi_t
   {
-    uint64_t prime_count;
+    uint64_t count;
     uint64_t bits;
   };
 
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
-  void init_prime_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t limit_;
