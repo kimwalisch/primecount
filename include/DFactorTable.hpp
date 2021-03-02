@@ -37,7 +37,7 @@
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -55,6 +55,7 @@
 #include <pod_vector.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <limits>
 #include <stdint.h>
 
@@ -196,9 +197,16 @@ public:
   ///
   int64_t mu(int64_t index) const
   {
-    if (factor_[index] == 0)
-      return 0;
-    else if (factor_[index] & 1)
+    // mu(n) = 0 is disabled by default for performance
+    // reasons, we only enable it for testing.
+    #if defined(ENABLE_MU_0_TESTING)
+      if (factor_[index] == 0)
+        return 0;
+    #else
+      assert(factor_[index] != 0);
+    #endif
+
+    if (factor_[index] & 1)
       return -1;
     else
       return 1;
