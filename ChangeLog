@@ -1,4 +1,4 @@
-Changes in primecount-6.3, 2021-03-01
+Changes in primecount-6.3, 2021-03-02
 
   The memory usage of the PiTable and SegmentedPiTable has been
   reduced by about 2x, this speeds up the computation of the easy
