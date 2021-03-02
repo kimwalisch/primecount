@@ -3,11 +3,15 @@
 /// @brief  FactorTable is a compressed lookup table of mu
 ///         (moebius) and lpf (least prime factor).
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
+
+// factorTable.mu(n) = 0 is disabled by default for performance
+// reasons, we only enable it for testing.
+#define ENABLE_MU_0_TESTING
 
 #include <FactorTable.hpp>
 #include <generate.hpp>
