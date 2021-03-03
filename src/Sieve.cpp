@@ -120,7 +120,7 @@ Sieve::Sieve(uint64_t low,
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
-  double average_leaf_dist = sqrt((double) low);
+  double average_leaf_dist = sqrt(low);
   double counters_dist = sqrt(average_leaf_dist);
 
   // Here we balance counting with the counters array and
