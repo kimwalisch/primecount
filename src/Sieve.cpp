@@ -137,11 +137,17 @@ void Sieve::allocate_counters(uint64_t low)
   uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
-  counters_dist_ = byte_dist * 30;
-  counters_dist_log2_ = ilog2(byte_dist);
 
+  // Make sure the counters (32-bit) don't overflow.
+  // This can never happen since each counters array element
+  // only counts the number of unsieved elements (1 bits) in
+  // an interval of size: sieve_limit^(1/4) * sqrt(240).
+  // Hence the max(counter value) = 2^18.
+  assert(byte_dist * 8 <= numeric_limits<uint32_t>::max());
   uint64_t counters_size = ceil_div(sieve_.size(), byte_dist);
   counters_.resize(counters_size);
+  counters_dist_ = byte_dist * 30;
+  counters_dist_log2_ = ilog2(byte_dist);
 }
 
 /// The segment size is sieve.size() * 30 as each
@@ -204,9 +210,9 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
     stop = min(stop, max_stop);
     uint64_t cnt = count(start, stop);
     uint64_t byte_index = start / 30;
+    uint64_t i = byte_index >> counters_dist_log2_;
 
-    counters_[byte_index >> counters_dist_log2_] = cnt;
-
+    counters_[i] = (uint32_t) cnt;
     total_count_ += cnt;
     start += counters_dist_;
   }
@@ -541,7 +547,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t total_count = total_count_;
   uint64_t counters_dist_log2 = counters_dist_log2_;
   uint64_t sieve_size = sieve_.size();
-  uint64_t* counters = counters_.data();
+  uint32_t* counters = counters_.data();
   uint8_t* sieve = sieve_.data();
 
   #define CHECK_FINISHED(wheel_index) \

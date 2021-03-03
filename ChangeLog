@@ -11,6 +11,7 @@ Changes in primecount-6.3, 2021-03-02
 
   * PiTable.cpp: Reduce memory usage by 2x.
   * SegmentedPiTable.cpp: Reduce memory usage by 2x.
+  * Sieve.cpp: Reduce memory usage of counters array by 2x.
   * phi.cpp: Fixed integer overflow #39.
   * phi.cpp: Cache 40x more phi(x, a) results.
   * phi.cpp: Use pi(x) if a > pi(sqrt(x)).

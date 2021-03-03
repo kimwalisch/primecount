@@ -104,7 +104,7 @@ private:
   uint64_t counters_dist_log2_ = 0;
   uint64_t counters_stop_ = 0;
   pod_vector<uint8_t> sieve_;
-  pod_vector<uint64_t> counters_;
+  pod_vector<uint32_t> counters_;
   std::vector<Wheel> wheel_;
 };
 
