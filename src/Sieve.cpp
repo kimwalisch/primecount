@@ -61,7 +61,7 @@ struct WheelInit
 /// Categorize sieving primes according to their modulo 30
 /// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
 ///
-const array<int, 30> wheel_offsets =
+const array<uint8_t, 30> wheel_offsets =
 {
   0, 8 * 0, 0, 0, 0, 0,
   0, 8 * 1, 0, 0, 0, 8 * 2,
@@ -73,15 +73,15 @@ const array<int, 30> wheel_offsets =
 /// Used to calculate the first multiple > start of a
 /// sieving prime that is coprime to 2, 3, 5.
 ///
-const WheelInit wheel_init[30] =
-{
+const array<WheelInit, 30> wheel_init
+{{
   {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
   {2,  1}, {1,  1}, {0,  1}, {3,  2}, {2,  2},
   {1,  2}, {0,  2}, {1,  3}, {0,  3}, {3,  4},
   {2,  4}, {1,  4}, {0,  4}, {1,  5}, {0,  5},
   {3,  6}, {2,  6}, {1,  6}, {0,  6}, {5,  7},
   {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
-};
+}};
 
 } // namespace
 
