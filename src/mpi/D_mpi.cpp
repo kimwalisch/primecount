@@ -75,8 +75,8 @@ T D_thread(T x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    // For i < min_b there are no special leaves:
-    // low <= x / (primes[i] * m) < high
+    // For b < min_b there are no special leaves:
+    // low <= x / (primes[b] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
     int64_t b = min_b;
 
