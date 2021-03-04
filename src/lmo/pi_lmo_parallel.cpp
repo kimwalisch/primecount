@@ -62,11 +62,13 @@ int64_t S2_thread(int64_t x,
   int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
+  int64_t pi_sqrty = pi[isqrt(y)];
   int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
-  int64_t pi_sqrty = pi[isqrt(y)];
+  int64_t min_b = pi[min(z / limit, primes[max_b])];
+  min_b = max(c, min_b) + 1;
 
-  if (c >= max_b)
+  if (min_b > max_b)
     return 0;
 
   Sieve sieve(low, segment_size, max_b);
@@ -80,8 +82,10 @@ int64_t S2_thread(int64_t x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    sieve.pre_sieve(primes, c, low, high);
-    int64_t b = c + 1;
+    // For b < min_b there are no special leaves:
+    // low <= x / (primes[b] * m) < high
+    sieve.pre_sieve(primes, min_b - 1, low, high);
+    int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
     // Find all special leaves in the current segment that are
