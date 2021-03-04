@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -59,9 +59,9 @@ int64_t S2_thread(int64_t x,
 {
   int64_t sum = 0;
   int64_t low = thread.low;
+  int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
-  int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, z + 1);
   int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
   int64_t pi_sqrty = pi[isqrt(y)];
