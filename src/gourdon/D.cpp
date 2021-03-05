@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -61,10 +61,10 @@ T D_thread(T x,
   T sum = 0;
 
   int64_t low = thread.low;
+  int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
   int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t low1 = max(low, 1);
   int64_t limit = min(low + segments * segment_size, xz);
   int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
   int64_t min_b = pi[min(xz / limit, x_star)];
@@ -84,8 +84,8 @@ T D_thread(T x,
     int64_t high = min(low + segment_size, limit);
     low1 = max(low, 1);
 
-    // For i < min_b there are no special leaves:
-    // low <= x / (primes[i] * m) < high
+    // For b < min_b there are no special leaves:
+    // low <= x / (primes[b] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
     int64_t b = min_b;
 

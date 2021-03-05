@@ -61,7 +61,7 @@ struct WheelInit
 /// Categorize sieving primes according to their modulo 30
 /// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
 ///
-const array<int, 30> wheel_offsets =
+const array<uint8_t, 30> wheel_offsets =
 {
   0, 8 * 0, 0, 0, 0, 0,
   0, 8 * 1, 0, 0, 0, 8 * 2,
@@ -73,15 +73,15 @@ const array<int, 30> wheel_offsets =
 /// Used to calculate the first multiple > start of a
 /// sieving prime that is coprime to 2, 3, 5.
 ///
-const WheelInit wheel_init[30] =
-{
+const array<WheelInit, 30> wheel_init
+{{
   {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
   {2,  1}, {1,  1}, {0,  1}, {3,  2}, {2,  2},
   {1,  2}, {0,  2}, {1,  3}, {0,  3}, {3,  4},
   {2,  4}, {1,  4}, {0,  4}, {1,  5}, {0,  5},
   {3,  6}, {2,  6}, {1,  6}, {0,  6}, {5,  7},
   {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
-};
+}};
 
 } // namespace
 
@@ -120,7 +120,7 @@ Sieve::Sieve(uint64_t low,
 ///
 void Sieve::allocate_counters(uint64_t low)
 {
-  double average_leaf_dist = sqrt((double) low);
+  double average_leaf_dist = sqrt(low);
   double counters_dist = sqrt(average_leaf_dist);
 
   // Here we balance counting with the counters array and
@@ -137,11 +137,17 @@ void Sieve::allocate_counters(uint64_t low)
   uint64_t byte_dist = counters_dist_ / 30;
   byte_dist = max(byte_dist, 64);
   byte_dist = next_power_of_2(byte_dist);
-  counters_dist_ = byte_dist * 30;
-  counters_dist_log2_ = ilog2(byte_dist);
 
+  // Make sure the counters (32-bit) don't overflow.
+  // This can never happen since each counters array element
+  // only counts the number of unsieved elements (1 bits) in
+  // an interval of size: sieve_limit^(1/4) * sqrt(240).
+  // Hence the max(counter value) = 2^18.
+  assert(byte_dist * 8 <= numeric_limits<uint32_t>::max());
   uint64_t counters_size = ceil_div(sieve_.size(), byte_dist);
   counters_.resize(counters_size);
+  counters_dist_ = byte_dist * 30;
+  counters_dist_log2_ = ilog2(byte_dist);
 }
 
 /// The segment size is sieve.size() * 30 as each
@@ -204,9 +210,9 @@ void Sieve::init_counters(uint64_t low, uint64_t high)
     stop = min(stop, max_stop);
     uint64_t cnt = count(start, stop);
     uint64_t byte_index = start / 30;
+    uint64_t i = byte_index >> counters_dist_log2_;
 
-    counters_[byte_index >> counters_dist_log2_] = cnt;
-
+    counters_[i] = (uint32_t) cnt;
     total_count_ += cnt;
     start += counters_dist_;
   }
@@ -541,7 +547,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t total_count = total_count_;
   uint64_t counters_dist_log2 = counters_dist_log2_;
   uint64_t sieve_size = sieve_.size();
-  uint64_t* counters = counters_.data();
+  uint32_t* counters = counters_.data();
   uint8_t* sieve = sieve_.data();
 
   #define CHECK_FINISHED(wheel_index) \
