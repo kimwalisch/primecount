@@ -205,10 +205,21 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-
   StatusAC status(x);
+
+  // PiTable's size >= z because of the C1 formula.
+  // We could use segmentation for the C1 formula but this
+  // would not increase overall performance (because C1
+  // computes very quickly) and the overall memory usage
+  // would also not much be reduced.
   PiTable pi(max(z, max_a_prime), threads);
-  SegmentedPiTable segmentedPi(sqrtx, z, threads);
+
+  // SegmentedPiTable's size >= y because of the C2 formula.
+  // The C2 algorithm can be modified to work with smaller segment
+  // sizes such as x^(1/3) which improves the cache efficiency.
+  // However using a segment size < y deteriorates the algorithm's
+  // runtime complexity by a factor of log(x).
+  SegmentedPiTable segmentedPi(sqrtx, y, threads);
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
