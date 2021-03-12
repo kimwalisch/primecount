@@ -82,7 +82,7 @@ private:
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
   uint64_t low_ = 0;
-  uint64_t pi_low_ = 3;
+  uint64_t pi_low_ = pi_tiny_[5];
   uint64_t high_;
   uint64_t max_high_;
   uint64_t segment_size_;
