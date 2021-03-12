@@ -21,7 +21,7 @@
 ///        multiply instructions that will calculate the integer
 ///        division much faster.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,6 +31,7 @@
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
+#include <for_fetch_inc.hpp>
 #include <generate.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
@@ -41,6 +42,7 @@
 #include <StatusAC.hpp>
 
 #include <stdint.h>
+#include <atomic>
 #include <vector>
 
 using namespace std;
@@ -325,11 +327,8 @@ T AC_OpenMP(T x,
   SegmentedPiTable segmentedPi(sqrtx, y, threads);
 
   // Initialize libdivide vector using primes
-  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
-  vector<libdivide_t> lprimes(1);
-  lprimes.insert(lprimes.end(),
-                 primes.begin() + 1,
-                 primes.end());
+  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
+  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -338,6 +337,10 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
+
+  atomic<int64_t> atomic_a;
+  atomic<int64_t> atomic_c1;
+  atomic<int64_t> atomic_c2;
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -356,8 +359,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    #pragma omp for nowait schedule(dynamic)
-    for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+    for_fetch_inc(atomic_c1, min_c1, b <= pi_sqrtz)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -400,8 +402,7 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      #pragma omp for nowait schedule(dynamic)
-      for (int64_t b = min_c2; b <= max_c2; b++)
+      for_fetch_inc(atomic_c2, min_c2, b <= max_c2)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -415,8 +416,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for nowait schedule(dynamic)
-      for (int64_t b = pi_x_star + 1; b <= max_b; b++)
+      for_fetch_inc(atomic_a, pi_x_star + 1, b <= max_b)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
