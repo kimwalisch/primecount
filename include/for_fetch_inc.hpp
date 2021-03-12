@@ -21,13 +21,13 @@
 /// scaling issue but for_fetch_inc() runs slightly faster on GCC as
 /// well.
 ///
-/// for_fetch_inc(atomic_i, start, condition)
+/// for_fetch_inc(start, condition, atomic_i)
 /// Is the same as:
 ///
 /// #pragma omp for schedule(dynamic)
 /// for (auto b = start; condition; b++)
 ///
-#define for_fetch_inc(atomic_i, start, condition) \
+#define for_fetch_inc(start, condition, atomic_i) \
   _Pragma("omp single") \
   atomic_i = start; \
   for (auto b = atomic_i.fetch_add(1, std::memory_order_relaxed); \

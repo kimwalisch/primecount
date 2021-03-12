@@ -252,7 +252,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    for_fetch_inc(atomic_c1, min_c1, b <= pi_sqrtz)
+    for_fetch_inc(min_c1, b <= pi_sqrtz, atomic_c1)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -295,14 +295,14 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      for_fetch_inc(atomic_c2, min_c2, b <= max_c2)
+      for_fetch_inc(min_c2, b <= max_c2, atomic_c2)
       {
         sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
         status.print(b, max_b);
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for_fetch_inc(atomic_a, pi_x_star + 1, b <= max_b)
+      for_fetch_inc(pi_x_star + 1, b <= max_b, atomic_a)
       {
         sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
         status.print(b, max_b);
