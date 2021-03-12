@@ -129,9 +129,7 @@ void Sieve::allocate_counters(uint64_t low)
   // count a distance of 240 using a single instruction we
   // slightly increase the counter distance and slightly
   // decrease the size of the counters array.
-  double bits_sizet = numeric_limits<size_t>::digits;
-  double popcnt_dist = (bits_sizet / 8) * 30;
-  counters_dist_ = (uint64_t) (counters_dist * sqrt(popcnt_dist));
+  counters_dist_ = (uint64_t) (counters_dist * sqrt(240));
 
   // Each byte represents an interval of size 30
   uint64_t byte_dist = counters_dist_ / 30;
