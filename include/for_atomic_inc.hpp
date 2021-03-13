@@ -43,11 +43,11 @@
 /// scaling issue but for_atomic_add() runs slightly faster on GCC as
 /// well.
 ///
-/// for_atomic_add(start, condition, atomic_i)
+/// for_atomic_add(start, condition, atomic_i, inc)
 /// Is the same as:
 ///
 /// #pragma omp for schedule(dynamic)
-/// for (auto b = start; condition; b += (atomic_i += inc))
+/// for (auto b = start; condition; b = (atomic_i += inc))
 ///
 #define for_atomic_add(start, condition, atomic_i, inc) \
   for (decltype(start) is_first_thread = -1, \
