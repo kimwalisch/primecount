@@ -29,8 +29,9 @@
 ///
 #define for_atomic_inc(start, condition, atomic_i) \
   for (decltype(start) is_first_thread = -1, \
-       b = (atomic_i.compare_exchange_strong(is_first_thread, start + 1)) \
-       ? start : atomic_i.fetch_add(1, std::memory_order_relaxed); \
+       b = (atomic_i.compare_exchange_strong(is_first_thread, start)) \
+       ? atomic_i.fetch_add(1, std::memory_order_relaxed) \
+       : atomic_i.fetch_add(1, std::memory_order_relaxed); \
        condition; b = atomic_i.fetch_add(1, std::memory_order_relaxed))
 
 /// for_atomic_add() is a for loop with dynamic thread scheduling for
@@ -50,8 +51,9 @@
 ///
 #define for_atomic_add(start, condition, atomic_i, inc) \
   for (decltype(start) is_first_thread = -1, \
-       b = (atomic_i.compare_exchange_strong(is_first_thread, start + inc)) \
-       ? start : atomic_i.fetch_add(inc, std::memory_order_relaxed); \
+       b = (atomic_i.compare_exchange_strong(is_first_thread, start)) \
+       ? atomic_i.fetch_add(inc, std::memory_order_relaxed) \
+       : atomic_i.fetch_add(inc, std::memory_order_relaxed); \
        condition; b = atomic_i.fetch_add(inc, std::memory_order_relaxed))
 
 #endif
