@@ -338,9 +338,9 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
-  atomic<int64_t> atomic_a;
-  atomic<int64_t> atomic_c1;
-  atomic<int64_t> atomic_c2;
+  atomic<int64_t> atomic_a(-1);
+  atomic<int64_t> atomic_c1(-1);
+  atomic<int64_t> atomic_c2(-1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -429,8 +429,19 @@ T AC_OpenMP(T x,
         status.print(b, max_b);
       }
 
-      segmentedPi.next();
-      status.next();
+      // Wait until all threads have finished
+      // computing the current segment.
+      #pragma omp barrier
+      #pragma omp master
+      {
+        segmentedPi.next();
+        status.next();
+        atomic_a = -1;
+        atomic_c1 = -1;
+        atomic_c2 = -1;
+      }
+
+      #pragma omp barrier
     }
   }
 

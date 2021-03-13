@@ -140,21 +140,13 @@ void SegmentedPiTable::init_count(uint64_t start,
 
 void SegmentedPiTable::next()
 {
-  // Wait until all threads have finished
-  // computing the current segment.
-  #pragma omp barrier
-  #pragma omp master
-  {
-    // pi_low_ must be initialized before updating the
-    // member variables for the next segment.
-    pi_low_ = operator[](high_ - 1);
+  // pi_low_ must be initialized before updating the
+  // member variables for the next segment.
+  pi_low_ = operator[](high_ - 1);
 
-    low_ = high_;
-    high_ = low_ + segment_size_;
-    high_ = std::min(high_, max_high_);
-  }
-
-  #pragma omp barrier
+  low_ = high_;
+  high_ = low_ + segment_size_;
+  high_ = std::min(high_, max_high_);
 }
 
 } // namespace
