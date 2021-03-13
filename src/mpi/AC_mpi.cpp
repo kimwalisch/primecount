@@ -111,11 +111,8 @@ T C1(T xp,
 
     if (m64 > min_m) {
       uint64_t xpm = fast_div64(xp, m64);
-
-      if (MU > 0)
-        sum += pi[xpm] - b + 2;
-      else
-        sum -= pi[xpm] - b + 2;
+      T phi_xpm = pi[xpm] - b + 2;
+      sum += phi_xpm * MU;
     }
 
     sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
