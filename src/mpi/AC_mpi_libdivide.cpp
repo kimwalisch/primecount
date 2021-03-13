@@ -4,7 +4,7 @@
 ///        algorithm) that have been distributed using MPI (Message
 ///        Passing Interface) and multi-threaded using OpenMP.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,6 +15,7 @@
 #include <primecount-internal.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <fast_div.hpp>
+#include <for_atomic_inc.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>
@@ -24,6 +25,7 @@
 #include <StatusAC.hpp>
 
 #include <stdint.h>
+#include <atomic>
 #include <vector>
 
 using namespace std;
@@ -308,11 +310,8 @@ T AC_OpenMP(T x,
   SegmentedPiTable segmentedPi(sqrtx, y, threads);
 
   // Initialize libdivide vector using primes
-  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
-  vector<libdivide_t> lprimes(1);
-  lprimes.insert(lprimes.end(),
-                 primes.begin() + 1,
-                 primes.end());
+  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
+  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -321,9 +320,12 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
-
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
+
+  atomic<int64_t> atomic_a(-1);
+  atomic<int64_t> atomic_c1(-1);
+  atomic<int64_t> atomic_c2(-1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -342,8 +344,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    #pragma omp for nowait schedule(dynamic)
-    for (int64_t b = min_c1 + proc_id; b <= pi_sqrtz; b += procs)
+    for_atomic_add(min_c1 + proc_id, b <= pi_sqrtz, atomic_c1, procs)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -386,8 +387,7 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      #pragma omp for nowait schedule(dynamic)
-      for (int64_t b = min_c2 + proc_id; b <= max_c2; b += procs)
+      for_atomic_add(min_c2 + proc_id, b <= max_c2, atomic_c2, procs)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -401,8 +401,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      #pragma omp for nowait schedule(dynamic)
-      for (int64_t b = pi_x_star + 1 + proc_id; b <= max_b; b += procs)
+      for_atomic_add(pi_x_star + 1 + proc_id, b <= max_b, atomic_a, procs)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -415,8 +414,19 @@ T AC_OpenMP(T x,
         status.print(b, max_b);
       }
 
-      segmentedPi.next();
-      status.next();
+      // Wait until all threads have finished
+      // computing the current segment.
+      #pragma omp barrier
+      #pragma omp master
+      {
+        segmentedPi.next();
+        status.next();
+        atomic_a = -1;
+        atomic_c1 = -1;
+        atomic_c2 = -1;
+      }
+
+      #pragma omp barrier
     }
   }
 
