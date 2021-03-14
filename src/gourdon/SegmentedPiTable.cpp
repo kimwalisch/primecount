@@ -40,10 +40,10 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
     max_high_(limit + 1),
     threads_(threads)
 {
-  // Minimum segment size = 256 KiB (L2 cache size),
+  // Minimum segment size = 512 KiB (L2 cache size),
   // a large segment size improves load balancing.
   uint64_t numbers_per_byte = 240 / sizeof(pi_t);
-  uint64_t min_segment_size = (256 << 10) * numbers_per_byte;
+  uint64_t min_segment_size = (512 << 10) * numbers_per_byte;
   segment_size_ = max(segment_size, min_segment_size);
   segment_size_ = min(segment_size_, max_high_);
 
@@ -61,23 +61,6 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
     pi_low_ = pi_tiny_[5];
   else
     pi_low_ = pi_simple(low - 1, threads);
-
-  init();
-}
-
-/// Increase low & high and initialize the next segment.
-void SegmentedPiTable::next()
-{
-  // pi_low_ must be initialized before updating the
-  // member variables for the next segment.
-  pi_low_ = operator[](high_ - 1);
-
-  low_ = high_;
-  high_ = low_ + segment_size_;
-  high_ = std::min(high_, max_high_);
-
-  if (finished())
-    return;
 
   init();
 }
@@ -167,6 +150,23 @@ void SegmentedPiTable::init_count(uint64_t start,
     pi_[i].count = count;
     count += popcnt64(pi_[i].bits);
   }
+}
+
+/// Increase low & high and initialize the next segment.
+void SegmentedPiTable::next()
+{
+  // pi_low_ must be initialized before updating the
+  // member variables for the next segment.
+  pi_low_ = operator[](high_ - 1);
+
+  low_ = high_;
+  high_ = low_ + segment_size_;
+  high_ = std::min(high_, max_high_);
+
+  if (finished())
+    return;
+
+  init();
 }
 
 } // namespace

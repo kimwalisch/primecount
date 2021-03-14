@@ -15,7 +15,7 @@
 ///        data structures twice. Merging the A & C formulas also
 ///        improves scaling on systems with many CPU cores.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -329,11 +329,8 @@ T C1(T xp,
 
     if (m64 > min_m) {
       uint64_t xpm = fast_div64(xp, m64);
-
-      if (MU > 0)
-        sum += pi[xpm] - b + 2;
-      else
-        sum -= pi[xpm] - b + 2;
+      T phi_xpm = pi[xpm] - b + 2;
+      sum += phi_xpm * MU;
     }
 
     sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
@@ -433,8 +430,13 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-
   StatusAC status(x);
+
+  // PiTable's size >= z because of the C1 formula.
+  // We could use segmentation for the C1 formula but this
+  // would not increase overall performance (because C1
+  // computes very quickly) and the overall memory usage
+  // would also not much be reduced.
   PiTable pi(max(z, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
@@ -535,7 +537,12 @@ T AC_OpenMP(T x,
     copy.clear();
   }
 
-  SegmentedPiTable segmentedPi(low, sqrtx, z, threads);
+  // SegmentedPiTable's size >= y because of the C2 formula.
+  // The C2 algorithm can be modified to work with smaller segment
+  // sizes such as x^(1/3) which improves the cache efficiency.
+  // However using a segment size < y deteriorates the algorithm's
+  // runtime complexity by a factor of log(x).
+  SegmentedPiTable segmentedPi(low, sqrtx, y, threads);
 
   // This computes A and the 2nd part of the C formula.
   // Find all special leaves of type:

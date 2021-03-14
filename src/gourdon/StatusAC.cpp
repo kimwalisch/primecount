@@ -88,11 +88,6 @@ void StatusAC::print(double percent)
 /// Initialize for next segment
 void StatusAC::next()
 {
-#if defined(_OPENMP)
-  if (omp_get_thread_num() != 0)
-    return;
-#endif
-
   percent_total_ += percent_segment_;
   percent_segment_ = (100 - percent_total_) / 3.5;
 }
