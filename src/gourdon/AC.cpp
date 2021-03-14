@@ -305,6 +305,10 @@ T AC_OpenMP(T x,
         status.print(b, max_b);
       }
 
+      // Is this the last segment?
+      if (high >= sqrtx)
+        break;
+
       // Wait until all threads have finished
       // computing the current segment.
       #pragma omp barrier

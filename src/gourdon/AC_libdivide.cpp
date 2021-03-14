@@ -309,6 +309,10 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
   StatusAC status(x);
 
+  // Initialize libdivide vector using primes
+  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
+  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
+
   // PiTable's size >= z because of the C1 formula.
   // We could use segmentation for the C1 formula but this
   // would not increase overall performance (because C1
@@ -322,10 +326,6 @@ T AC_OpenMP(T x,
   // However using a segment size < y deteriorates the algorithm's
   // runtime complexity by a factor of log(x).
   SegmentedPiTable segmentedPi(sqrtx, y, threads);
-
-  // Initialize libdivide vector using primes
-  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
-  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -425,6 +425,10 @@ T AC_OpenMP(T x,
 
         status.print(b, max_b);
       }
+
+      // Is this the last segment?
+      if (high >= sqrtx)
+        break;
 
       // Wait until all threads have finished
       // computing the current segment.
