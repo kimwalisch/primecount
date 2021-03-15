@@ -9,7 +9,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,6 +18,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
+#include <for_atomic_inc.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -46,7 +47,7 @@ T S2_easy_OpenMP(T x,
                  const Primes& primes,
                  int threads)
 {
-  T s2_easy = 0;
+  T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
@@ -54,10 +55,11 @@ T S2_easy_OpenMP(T x,
   PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
+  int64_t min_b = max(c, pi_sqrty) + 1;
   Status status(x);
 
-  #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: s2_easy)
-  for (int64_t b = max(c, pi_sqrty) + 1; b <= pi_x13; b++)
+  // for (b = min_b; b <= pi_x13; b++)
+  parallel_for_atomic_inc(min_b, b <= pi_x13)
   {
     int64_t prime = primes[b];
     T xp = x / prime;
@@ -83,7 +85,7 @@ T S2_easy_OpenMP(T x,
       int64_t phi_xpq = pi[xpq] - b + 2;
       int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
       int64_t l2 = pi[xpq2];
-      s2_easy += phi_xpq * (l - l2);
+      sum += phi_xpq * (l - l2);
       l = l2;
     }
 
@@ -95,13 +97,13 @@ T S2_easy_OpenMP(T x,
     for (; l > pi_min_sparse; l--)
     {
       int64_t xpq = fast_div64(xp, primes[l]);
-      s2_easy += pi[xpq] - b + 2;
+      sum += pi[xpq] - b + 2;
     }
 
     status.print(b, pi_x13);
   }
 
-  return s2_easy;
+  return sum;
 }
 
 } // namespace
@@ -120,10 +122,10 @@ int64_t S2_easy(int64_t x,
 
   double time = get_time();
   auto primes = generate_primes<int32_t>(y);
-  int64_t s2_easy = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads);
+  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads);
 
-  print("S2_easy", s2_easy, time);
-  return s2_easy;
+  print("S2_easy", sum, time);
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -139,22 +141,22 @@ int128_t S2_easy(int128_t x,
   print_vars(x, y, c, threads);
 
   double time = get_time();
-  int128_t s2_easy;
+  int128_t sum;
 
   // uses less memory
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    s2_easy = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    s2_easy = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
   }
 
-  print("S2_easy", s2_easy, time);
-  return s2_easy;
+  print("S2_easy", sum, time);
+  return sum;
 }
 
 #endif
