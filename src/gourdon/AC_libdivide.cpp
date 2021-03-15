@@ -31,7 +31,7 @@
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
-#include <for_atomic_inc.hpp>
+#include <for_atomic.hpp>
 #include <generate.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>

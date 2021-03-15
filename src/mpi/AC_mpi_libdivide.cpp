@@ -15,7 +15,7 @@
 #include <primecount-internal.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <fast_div.hpp>
-#include <for_atomic_inc.hpp>
+#include <for_atomic.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>

@@ -9,7 +9,7 @@ server. Because of the severity of this scaling issue I have
 replaced OpenMP dynamic thread scheduling with my own dynamic
 thread scheduling built using std::atomic and lock-free programming.
 
-* for_atomic_inc.hpp: Lock-free for loop built with std::atomic.
+* for_atomic.hpp: Lock-free for loop built with std::atomic.
 * AC.cpp: Fix Clang/OpenMP scaling issue.
 * AC.cpp: Decrease size of SegmentedPiTable by 1.5x.
 * AC_libdivide.cpp: Fix Clang/OpenMP scaling issue.

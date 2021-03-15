@@ -1,5 +1,5 @@
 ///
-/// @file  for_atomic_inc.hpp
+/// @file  for_atomic.hpp
 ///        The for_atomic_inc() macro is a workaround for a severe
 ///        scaling issue in Clang's OpenMP library when using a
 ///        parallel for loop with schedule(dynamic).
@@ -13,8 +13,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef FOR_ATOMIC_INC
-#define FOR_ATOMIC_INC
+#ifndef FOR_ATOMIC
+#define FOR_ATOMIC
 
 #include <atomic>
 
