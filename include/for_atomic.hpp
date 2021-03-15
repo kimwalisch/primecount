@@ -35,7 +35,7 @@
 /// for_atomic_inc(start, condition, atomic_b)
 /// Is the same as:
 ///
-/// #pragma omp for schedule(dynamic)
+/// #pragma omp for nowait schedule(dynamic)
 /// for (auto b = start; condition; b++)
 ///
 #define for_atomic_inc(start, condition, atomic_b) \
@@ -62,13 +62,13 @@
 /// large number of CPU cores. The scaling issue occurred when computing
 /// AC(x) with x >= 1e22.
 ///
-/// for_atomic_add(start, condition, atomic_b, inc)
+/// for_atomic_add(start, condition, inc, atomic_b)
 /// Is the same as:
 ///
-/// #pragma omp for schedule(dynamic)
-/// for (auto b = start; condition; b = (atomic_b += inc))
+/// #pragma omp for nowait schedule(dynamic)
+/// for (auto b = start; condition; b += inc)
 ///
-#define for_atomic_add(start, condition, atomic_b, inc) \
+#define for_atomic_add(start, condition, inc, atomic_b) \
   /* for_atomic_add() is used in the computation of the AC formula */ \
   /* where the individual threads are completely independent of each */ \
   /* other, hence there is no communication between the threads and the */ \
