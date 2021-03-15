@@ -94,7 +94,7 @@
 /// parallel_for_atomic_inc(start, condition)
 /// Is the same as:
 ///
-/// #pragma omp parallel for num_threads(threads) reduction(+:sum)
+/// #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
 /// for (auto b = start; condition; b++)
 ///
 #define parallel_for_atomic_inc(start, condition) \
