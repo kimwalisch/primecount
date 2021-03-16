@@ -2,7 +2,7 @@
 /// @file  isqrt.hpp
 /// @brief Integer square root function
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,10 +13,34 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace {
 
-#if __cplusplus >= 201402L
+#if __cplusplus >= 202002L
+
+/// C++20 compile time square root using binary search
+template <typename T>
+consteval T sqrt_helper(T x, T lo, T hi)
+{
+  if (lo == hi)
+    return lo;
+
+  const T mid = (lo + hi + 1) / 2;
+
+  if (x / mid < mid)
+    return sqrt_helper<T>(x, lo, mid - 1);
+  else
+    return sqrt_helper(x, mid, hi);
+}
+
+template <typename T>
+consteval T ct_sqrt(T x)
+{
+  return sqrt_helper<T>(x, 0, x / 2 + 1);
+}
+
+#elif __cplusplus >= 201402L
 
 /// C++14 compile time square root using binary search
 template <typename T>

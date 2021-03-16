@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,6 +17,11 @@
 #include <cmath>
 #include <limits>
 
+#if __cplusplus >= 202002L
+  #include <bit>
+  #include <type_traits>
+#endif
+
 namespace {
 
 inline int64_t isquare(int64_t x)
@@ -30,32 +35,25 @@ inline A ceil_div(A a, B b)
   return (A) ((a + b - 1) / b);
 }
 
-template <typename T>
-inline T number_of_bits(T)
-{
-  return (T) std::numeric_limits<T>::digits;
-}
-
+/// Next power of 2 >= x
 template <typename T>
 inline T next_power_of_2(T x)
 {
+#if __cplusplus >= 202002L
+  auto ux = std::make_unsigned_t<T>(x);
+  return std::bit_ceil(ux);
+#else
   if (x == 0)
     return 1;
 
   x--;
-  for (T i = 1; i < number_of_bits(x); i += i)
+  T bits = std::numeric_limits<T>::digits;
+
+  for (T i = 1; i < bits; i += i)
     x |= (x >> i);
 
   return ++x;
-}
-
-template <typename T>
-inline T prev_power_of_2(T x)
-{
-  for (T i = 1; i < number_of_bits(x); i += i)
-    x |= (x >> i);
-
-  return x - (x >> 1);
+#endif
 }
 
 template <typename T>
@@ -67,8 +65,13 @@ inline int ilog(T x)
 template <typename T>
 inline T ilog2(T x)
 {
+#if __cplusplus >= 202002L
+  auto ux = std::make_unsigned_t<T>(x);
+  ux = (ux > 0) ? ux : 1;
+  return std::bit_width(ux) - 1;
+#else
   T log2 = 0;
-  T bits = number_of_bits(x);
+  T bits = std::numeric_limits<T>::digits;
 
   for (T i = bits / 2; i > 0; i /= 2)
   {
@@ -81,6 +84,7 @@ inline T ilog2(T x)
   }
 
   return log2;
+#endif
 }
 
 template <typename T>
