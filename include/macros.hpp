@@ -1,7 +1,7 @@
 ///
 /// @file  macros.hpp
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,6 +20,18 @@
 
 #ifndef __has_cpp_attribute
   #define __has_cpp_attribute(x) 0
+#endif
+
+/// Unfortunately compilers cannot be trusted (especially GCC)
+/// to inline performance critical functions. We must ensure
+/// that e.g. pi[x] and segmentedPi[x] are inlined.
+///
+#if __has_attribute(always_inline)
+  #define ALWAYS_INLINE __attribute__((always_inline))
+#elif defined(_MSC_VER)
+  #define ALWAYS_INLINE __forceinline
+#else
+  #define ALWAYS_INLINE
 #endif
 
 #if __cplusplus >= 202002L && \

@@ -39,7 +39,7 @@ public:
   }
 
   /// Get number of primes <= n
-  int64_t operator[](uint64_t n) const
+  ALWAYS_INLINE int64_t operator[](uint64_t n) const
   {
     assert(n <= limit_);
 

@@ -15,7 +15,7 @@
 #include <primecount-internal.hpp>
 #include <mpi_reduce_sum.hpp>
 #include <fast_div.hpp>
-#include <for_atomic_inc.hpp>
+#include <for_atomic.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>
@@ -341,7 +341,7 @@ T AC_OpenMP(T x,
     // m may be a prime <= y or a square free number <= z
     // who is coprime to the first b primes and whose
     // largest prime factor <= y.
-    for_atomic_add(min_c1 + proc_id, b <= pi_sqrtz, atomic_c1, procs)
+    for_atomic_add(min_c1 + proc_id, b <= pi_sqrtz, procs, atomic_c1)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -384,7 +384,7 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      for_atomic_add(min_c2 + proc_id, b <= max_c2, atomic_c2, procs)
+      for_atomic_add(min_c2 + proc_id, b <= max_c2, procs, atomic_c2)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -398,7 +398,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for_atomic_add(pi_x_star + 1 + proc_id, b <= max_b, atomic_a, procs)
+      for_atomic_add(pi_x_star + 1 + proc_id, b <= max_b, procs, atomic_a)
       {
         int64_t prime = primes[b];
         T xp = x / prime;

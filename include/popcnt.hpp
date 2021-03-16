@@ -3,7 +3,7 @@
 /// @brief Functions to count the number of 1 bits inside
 ///        an array or a 64-bit word.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -28,13 +28,22 @@
 
 // GCC & Clang
 #if defined(__GNUC__) || \
-    __has_builtin(__builtin_popcountll)
+    __has_builtin(__builtin_popcountl)
 
 namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
-  return __builtin_popcountll(x);
+#if __cplusplus >= 201703L
+  if constexpr(sizeof(int) >= sizeof(uint64_t))
+    return (uint64_t) __builtin_popcount(x);
+  else if constexpr(sizeof(long) >= sizeof(uint64_t))
+    return (uint64_t) __builtin_popcountl(x);
+  else if constexpr(sizeof(long long) >= sizeof(uint64_t))
+    return (uint64_t) __builtin_popcountll(x);
+#else
+    return (uint64_t) __builtin_popcountll(x);
+#endif
 }
 
 } // namespace
