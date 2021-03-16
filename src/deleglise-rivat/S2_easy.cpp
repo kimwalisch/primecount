@@ -58,7 +58,7 @@ T S2_easy_OpenMP(T x,
   int64_t min_b = max(c, pi_sqrty) + 1;
   Status status(x);
 
-  // for (b = min_b; b <= pi_x13; b++)
+  // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   parallel_for_atomic_inc(min_b, b <= pi_x13)
   {
     int64_t prime = primes[b];

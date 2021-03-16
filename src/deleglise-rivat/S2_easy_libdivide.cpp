@@ -156,11 +156,8 @@ T S2_easy_OpenMP(T x,
                  int threads)
 {
   // Initialize libdivide vector using primes
-  using libdivide_t = libdivide::branchfree_divider<uint64_t>;
-  vector<libdivide_t> lprimes(1);
-  lprimes.insert(lprimes.end(),
-                 primes.begin() + 1,
-                 primes.end());
+  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
+  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
 
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -172,7 +169,7 @@ T S2_easy_OpenMP(T x,
   int64_t min_b = max(c, pi_sqrty) + 1;
   Status status(x);
 
-  // for (b = min_b; b <= pi_x13; b++)
+  // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   parallel_for_atomic_inc(min_b, b <= pi_x13)
   {
     int64_t prime = primes[b];
