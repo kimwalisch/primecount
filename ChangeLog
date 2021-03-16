@@ -1,4 +1,4 @@
-Changes in primecount-6.4, 2021-03-15
+Changes in primecount-6.4, 2021-03-16
 
 Clang's OpenMP library currently (Clang 11, 2021) has a severe
 scaling issue when using dynamic thread scheduling combined with
@@ -18,6 +18,8 @@ thread scheduling built using std::atomic and lock-free programming.
 * S2_easy_libdivide.cpp: Fix Clang/OpenMP scaling issue.
 * SegmentedPiTable.cpp: Increase minimum segment size.
 * Sieve.cpp: Simplify counters_dist initialization.
+* PiTable.cpp: Annotate pi(x) with ALWAYS_INLINE.
+* SegmentedPiTable.cpp: Annotate pi(x) with ALWAYS_INLINE.
 
 Changes in primecount-6.3, 2021-03-05
 
