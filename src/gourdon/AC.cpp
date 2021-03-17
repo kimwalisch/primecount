@@ -313,7 +313,6 @@ T AC_OpenMP(T x,
         segmentedPi.next();
         status.next();
         atomic_a = -1;
-        atomic_c1 = -1;
         atomic_c2 = -1;
       }
 
