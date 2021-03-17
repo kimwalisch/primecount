@@ -251,10 +251,10 @@ T AC_OpenMP(T x,
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
     // x / (primes[b] * primes[i]) < x^(1/2)
-    // with z^(1/2) < primes[b] <= x^(1/3).
+    // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
-    // in order to reduce the memory usage.
+    // we use a segmented PrimePi[n] table of size y
+    // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
     while (segmentedPi.low() < sqrtx)
     {
       // Current segment [low, high[
