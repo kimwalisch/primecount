@@ -11,7 +11,7 @@
 ///        computation by several orders of magnitude:
 ///
 ///        * Calculate phi(x, a) in O(1) using formula [2] if a <= 6.
-///        * Calculate phi(x, a) in O(1) using pi(x) lookup table if x < prime[a+1]^2.
+///        * Calculate phi(x, a) in O(1) using pi(x) lookup table if a > pi(sqrt(x))-1.
 ///        * Cache results of phi(x, a) if x and a are small.
 ///        * Calculate all phi(x, a) = 1 upfront in O(1).
 ///        * Stop recursion at c instead of 1.
