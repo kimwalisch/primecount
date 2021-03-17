@@ -76,14 +76,15 @@ T A(T x,
 }
 
 /// Compute the 1st part of the C formula.
-/// k < b <= pi[sqrt(z)]
+/// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
-/// 
-/// Recursively iterate over the square free numbers coprime
-/// to the first b primes. This algorithm is described in
+///
+/// m may be a prime <= y or a square free number <= z which is
+/// coprime to the first b primes and whose largest prime factor <= y.
+/// This algorithm recursively iterates over the square free numbers
+/// coprime to the first b primes. This algorithm is described in
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
-/// 2015.
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
 ///
 template <int MU, 
           typename T, 
@@ -234,12 +235,7 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    // This computes the 1st part of the C formula.
-    // Find all special leaves of type:
-    // x / (primes[b] * m) <= z.
-    // m may be a prime <= y or a square free number <= z
-    // who is coprime to the first b primes and whose
-    // largest prime factor <= y.
+    // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_add(min_c1 + proc_id, b <= pi_sqrtz, procs, atomic_c1)
     {
       int64_t prime = primes[b];
