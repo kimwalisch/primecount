@@ -2,7 +2,7 @@
 /// @file  AC.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
 ///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(z) by segmenting
+///        has been reduced from O(x^(1/2)) to O(y) by segmenting
 ///        the pi[x] lookup table. In each segment we process the
 ///        leaves that satisfy: low <= x / (prime * m) < high.
 ///
