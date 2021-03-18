@@ -2,7 +2,7 @@
 /// @file   isqrt.cpp
 /// @brief  Test integer square root function.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,7 @@
 #include <isqrt.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <calculator.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -63,7 +64,42 @@ int main()
   cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 1000000000);
 
-  n = 18446744073709551615ull;
+  n = numeric_limits<int8_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 11);
+
+  n = numeric_limits<uint8_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 15);
+
+  n = numeric_limits<int16_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 181);
+
+  n = numeric_limits<uint16_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 255);
+
+  n = numeric_limits<int32_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 46340);
+
+  n = numeric_limits<uint32_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 65535);
+
+  n = numeric_limits<int64_t>::max();
+  res1 = isqrt(n);
+  cout << "isqrt(" << n << ") = " << res1;
+  check(res1 == 3037000499ll);
+
+  n = numeric_limits<uint64_t>::max();
   res1 = isqrt(n);
   cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 4294967295ull);
@@ -81,27 +117,58 @@ int main()
   int128_t x = ((int128_t) 1) << 100;
   int128_t res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1ull << 50);
+  check(res3 == 1ll << 50);
 
   x -= 1;
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1125899906842623ull);
+  check(res3 == 1125899906842623ll);
 
   x = ipow((int128_t) 10, 31);
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 3162277660168379ull);
+  check(res3 == 3162277660168379ll);
 
   x = ipow((int128_t) 10, 30);
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1000000000000000ull);
+  check(res3 == 1000000000000000ll);
 
   x -= 1;
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 999999999999999ull);
+  check(res3 == 999999999999999ll);
+
+  // In my tests the first occurrences where std::sqrt((double) x)
+  // is off by more than 1 happened above 10^32. If std::sqrt(x)
+  // is off by more than 1 our isqrt(x) function corrects the
+  // result using a while loop. Since primecount can only compute
+  // pi(x) for x <= 10^31 our isqrt(x) function is guaranteed to
+  // execute in O(1) instructions.
+
+  // here std::sqrt((double) x) is 1 too small
+  x = calculator::eval<int128_t>("443075998594972078030832658571409090");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271553ll);
+
+  // here std::sqrt((double) x) is 1 too large
+  x = calculator::eval<int128_t>("443075998594972075382716071791084150");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271551ll);
+
+  // here std::sqrt((double) x) is 38 too small
+  x = calculator::eval<int128_t>("443075998594971958032420320541208365");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271462ll);
+
+  // here std::sqrt((double) x) is 81 too large
+  x = calculator::eval<int128_t>("443075998594971969939937761777907585");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271471ll);
 
 #endif
 

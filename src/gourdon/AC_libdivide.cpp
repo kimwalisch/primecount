@@ -2,7 +2,7 @@
 /// @file  AC_libdivide.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
 ///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(z) by segmenting
+///        has been reduced from O(x^(1/2)) to O(y) by segmenting
 ///        the pi[x] lookup table. In each segment we process the
 ///        leaves that satisfy: low <= x / (prime * m) < high.
 ///
@@ -342,14 +342,15 @@ T A_128(T xlow,
 }
 
 /// Compute the 1st part of the C formula.
-/// k < b <= pi[sqrt(z)]
+/// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
-/// 
-/// Recursively iterate over the square free numbers coprime
-/// to the first b primes. This algorithm is described in
+///
+/// m may be a prime <= y or a square free number <= z which is
+/// coprime to the first b primes and whose largest prime factor <= y.
+/// This algorithm recursively iterates over the square free numbers
+/// coprime to the first b primes. This algorithm is described in
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
-/// 2015.
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
 ///
 template <int MU, 
           typename T, 

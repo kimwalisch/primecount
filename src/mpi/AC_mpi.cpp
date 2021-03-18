@@ -76,14 +76,15 @@ T A(T x,
 }
 
 /// Compute the 1st part of the C formula.
-/// k < b <= pi[sqrt(z)]
+/// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
-/// 
-/// Recursively iterate over the square free numbers coprime
-/// to the first b primes. This algorithm is described in
+///
+/// m may be a prime <= y or a square free number <= z which is
+/// coprime to the first b primes and whose largest prime factor <= y.
+/// This algorithm recursively iterates over the square free numbers
+/// coprime to the first b primes. This algorithm is described in
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
-/// 2015.
+/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
 ///
 template <int MU, 
           typename T, 
@@ -234,12 +235,7 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    // This computes the 1st part of the C formula.
-    // Find all special leaves of type:
-    // x / (primes[b] * m) <= z.
-    // m may be a prime <= y or a square free number <= z
-    // who is coprime to the first b primes and whose
-    // largest prime factor <= y.
+    // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_add(min_c1 + proc_id, b <= pi_sqrtz, procs, atomic_c1)
     {
       int64_t prime = primes[b];
@@ -255,10 +251,10 @@ T AC_OpenMP(T x,
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
     // x / (primes[b] * primes[i]) < x^(1/2)
-    // with z^(1/2) < primes[b] <= x^(1/3).
+    // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size z (~O(x^1/3))
-    // in order to reduce the memory usage.
+    // we use a segmented PrimePi[n] table of size y
+    // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
     while (segmentedPi.low() < sqrtx)
     {
       // Current segment [low, high[
@@ -308,7 +304,6 @@ T AC_OpenMP(T x,
         segmentedPi.next();
         status.next();
         atomic_a = -1;
-        atomic_c1 = -1;
         atomic_c2 = -1;
       }
 
