@@ -2,7 +2,7 @@
 /// @file   isqrt.cpp
 /// @brief  Test integer square root function.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,7 @@
 #include <isqrt.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <calculator.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -102,6 +103,37 @@ int main()
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
   check(res3 == 999999999999999ull);
+
+  // In my tests the first occurrences where std::sqrt((double) x)
+  // is off by more than 1 happened above 10^32. If std::sqrt(x)
+  // is off by more than 1 our isqrt(x) function corrects the
+  // result using a while loop. Since primecount can only compute
+  // pi(x) for x <= 10^31 our isqrt(x) function is guaranteed to
+  // execute in O(1) instructions.
+
+  // here std::sqrt((double) x) is 1 too small
+  x = calculator::eval<__int128_t>("443075998594972078030832658571409090");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271553ull);
+
+  // here std::sqrt((double) x) is 1 too large
+  x = calculator::eval<__int128_t>("443075998594972075382716071791084150");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271551ull);
+
+  // here std::sqrt((double) x) is 38 too small
+  x = calculator::eval<__int128_t>("443075998594971958032420320541208365");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271462ull);
+
+  // here std::sqrt((double) x) is 81 too large
+  x = calculator::eval<__int128_t>("443075998594971969939937761777907585");
+  res3 = isqrt(x);
+  cout << "isqrt(" << x << ") = " << res3;
+  check(res3 == 665639541039271471ull);
 
 #endif
 
