@@ -82,27 +82,27 @@ int main()
   int128_t x = ((int128_t) 1) << 100;
   int128_t res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1ull << 50);
+  check(res3 == 1ll << 50);
 
   x -= 1;
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1125899906842623ull);
+  check(res3 == 1125899906842623ll);
 
   x = ipow((int128_t) 10, 31);
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 3162277660168379ull);
+  check(res3 == 3162277660168379ll);
 
   x = ipow((int128_t) 10, 30);
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 1000000000000000ull);
+  check(res3 == 1000000000000000ll);
 
   x -= 1;
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 999999999999999ull);
+  check(res3 == 999999999999999ll);
 
   // In my tests the first occurrences where std::sqrt((double) x)
   // is off by more than 1 happened above 10^32. If std::sqrt(x)
@@ -112,28 +112,28 @@ int main()
   // execute in O(1) instructions.
 
   // here std::sqrt((double) x) is 1 too small
-  x = calculator::eval<__int128_t>("443075998594972078030832658571409090");
+  x = calculator::eval<int128_t>("443075998594972078030832658571409090");
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 665639541039271553ull);
+  check(res3 == 665639541039271553ll);
 
   // here std::sqrt((double) x) is 1 too large
-  x = calculator::eval<__int128_t>("443075998594972075382716071791084150");
+  x = calculator::eval<int128_t>("443075998594972075382716071791084150");
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 665639541039271551ull);
+  check(res3 == 665639541039271551ll);
 
   // here std::sqrt((double) x) is 38 too small
-  x = calculator::eval<__int128_t>("443075998594971958032420320541208365");
+  x = calculator::eval<int128_t>("443075998594971958032420320541208365");
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 665639541039271462ull);
+  check(res3 == 665639541039271462ll);
 
   // here std::sqrt((double) x) is 81 too large
-  x = calculator::eval<__int128_t>("443075998594971969939937761777907585");
+  x = calculator::eval<int128_t>("443075998594971969939937761777907585");
   res3 = isqrt(x);
   cout << "isqrt(" << x << ") = " << res3;
-  check(res3 == 665639541039271471ull);
+  check(res3 == 665639541039271471ll);
 
 #endif
 
