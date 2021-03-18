@@ -73,7 +73,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
 void SegmentedPiTable::init()
 {
   uint64_t thread_size = segment_size_ / threads_;
-  uint64_t min_thread_size = (uint64_t) 1e7;
+  uint64_t min_thread_size = (uint64_t) 1e6;
   thread_size = max(min_thread_size, thread_size);
   thread_size += 240 - thread_size % 240;
 
