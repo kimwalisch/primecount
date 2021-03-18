@@ -50,7 +50,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
   // In order to simplify multi-threading we set low,
   // high and segment_size % 240 == 0.
   segment_size_ += 240 - segment_size_ % 240;
-  int thread_threshold = (int) 1e7;
+  int thread_threshold = (int) 1e6;
   threads_ = ideal_num_threads(threads, segment_size_, thread_threshold);
 
   high_ = low_ + segment_size_;
