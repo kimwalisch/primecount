@@ -118,6 +118,18 @@ int main()
   static_assert(ct_sqrt(numeric_limits<int128_t>::max()) == 13043817825332782212ull, "ct_sqrt(2^127-1) failed!");
   static_assert(ct_sqrt(numeric_limits<uint128_t>::max()) == 18446744073709551615ull, "ct_sqrt(2^128-1) failed!");
 
+  // here std::sqrt((double) 443075998594972078030832658571409090) is 1 too small
+  static_assert(ct_sqrt((((int128_t) 24019198012642651) << 64) | 15864680554123835074ull) == 665639541039271553ll, "ct_sqrt(443075998594972078030832658571409090) failed!");
+  
+  // here std::sqrt((double) 443075998594972075382716071791084150) is 1 too large
+  static_assert(ct_sqrt((((int128_t) 24019198012642651) << 64) | 13216563967343510134ull) == 665639541039271551ll, "ct_sqrt(443075998594972075382716071791084150) failed!");
+  
+  // here std::sqrt((double) 443075998594971958032420320541208365) is 38 too small
+  static_assert(ct_sqrt((((int128_t) 24019198012642645) << 64) | 6546732658350944045ull) == 665639541039271462ll, "ct_sqrt(443075998594971958032420320541208365) failed!");
+
+  // here std::sqrt((double) 443075998594971969939937761777907585) is 81 too large
+  static_assert(ct_sqrt((((int128_t) 24019198012642646) << 64) | 7506025878091649ull) == 665639541039271471ll, "ct_sqrt(443075998594971969939937761777907585) failed!");
+
 #endif
 
   cout << "All tests passed successfully!" << endl;
