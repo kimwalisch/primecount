@@ -12,7 +12,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -78,8 +78,10 @@ P2_thread(T x,
   {
     // thread sieves [low, z[
     z = min(low + thread_dist, z);
-    int64_t start = (int64_t) max(x / z, y);
-    int64_t stop = (int64_t) min(x / low, isqrt(x));
+    int64_t sqrtx = isqrt(x);
+    int64_t xz = min(x / z, sqrtx);
+    int64_t stop = min(x / low, sqrtx);
+    int64_t start = max(xz, y);
 
     primesieve::iterator it(low - 1, z);
     primesieve::iterator rit(stop + 1, start);
@@ -115,8 +117,9 @@ T P2_OpenMP(T x, int64_t y, int threads)
   if (x < 4)
     return 0;
 
+  int64_t sqrtx = isqrt(x);
   T a = pi_simple(y, threads);
-  T b = pi_simple((int64_t) isqrt(x), threads);
+  T b = pi_simple(sqrtx, threads);
 
   if (a >= b)
     return 0;
@@ -124,10 +127,10 @@ T P2_OpenMP(T x, int64_t y, int threads)
   // \sum_{i=a+1}^{b} -(i - 1)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
-  int64_t low = 2;
-  int64_t pi_low_minus_1 = 0;
+  int64_t low = sqrtx;
+  int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
   int64_t z = (int64_t)(x / max(y, 1));
-  LoadBalancerP2 loadBalancer(z, threads);
+  LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
 

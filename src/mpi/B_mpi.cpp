@@ -4,7 +4,7 @@
 ///        algorithm) that has been distributed using MPI (Message
 ///        Passing Interface) and multi-threaded using OpenMP.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -71,8 +71,10 @@ B_thread(T x,
   {
     // thread sieves [low, z[
     z = min(low + thread_dist, z);
-    int64_t start = (int64_t) max(x / z, y);
-    int64_t stop = (int64_t) min(x / low, isqrt(x));
+    int64_t sqrtx = isqrt(x);
+    int64_t xz = min(x / z, sqrtx);
+    int64_t stop = min(x / low, sqrtx);
+    int64_t start = max(xz, y);
 
     primesieve::iterator it(low - 1, z);
     primesieve::iterator rit(stop + 1, start);
@@ -109,14 +111,15 @@ T B_OpenMP(T x, int64_t y, int threads)
   int proc_id = mpi_proc_id();
   int procs = mpi_num_procs();
 
-  int64_t low = 2;
+  int64_t low = isqrt(x);
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t proc_dist = ceil_div(z, procs);
+  int64_t dist = z - min(low, z);
+  int64_t proc_dist = ceil_div(dist, procs);
   low += proc_dist * proc_id;
   int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
   z = min(low + proc_dist, z);
 
-  LoadBalancerP2 loadBalancer(z, threads);
+  LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
 

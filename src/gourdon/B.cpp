@@ -10,7 +10,7 @@
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -193,8 +193,10 @@ B_thread(T x,
   {
     // thread sieves [low, z[
     z = min(low + thread_dist, z);
-    int64_t start = (int64_t) max(x / z, y);
-    int64_t stop = (int64_t) min(x / low, isqrt(x));
+    int64_t sqrtx = isqrt(x);
+    int64_t xz = min(x / z, sqrtx);
+    int64_t stop = min(x / low, sqrtx);
+    int64_t start = max(xz, y);
 
     primesieve::iterator it(low - 1, z);
     primesieve::iterator rit(stop + 1, start);
@@ -232,10 +234,10 @@ T B_OpenMP(T x,
     return 0;
 
   T sum = 0;
-  int64_t low = 2;
   int64_t thread_dist = 0;
-  int64_t pi_low_minus_1 = 0;
-  LoadBalancerP2 loadBalancer(z, threads);
+  int64_t low = isqrt(x);
+  int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
+  LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
 

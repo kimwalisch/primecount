@@ -1,14 +1,19 @@
-Changes in primecount-6.4, 2021-03-16
+Changes in primecount-6.4, 2021-03-19
 
-Clang's OpenMP library currently (Clang 11, 2021) has a severe
-scaling issue when using dynamic thread scheduling combined with
-long running computations. Because of this issue primecount-6.3
-compiled with Clang takes 2.5x longer to compute AC(1e24) than
-primecount-6.3 compiled with GCC on my dual-socket AMD EPYC Rome
-server. Because of the severity of this scaling issue I have
-replaced OpenMP dynamic thread scheduling with my own dynamic
-thread scheduling built using std::atomic and lock-free programming.
+This version fixes a critical integer overflow in the B formula
+which is part of Xavier Gourdon's prime counting algorithm. The
+integer overflow occurred when computing B(x) with x > 1e25, this bug
+has been present in primecount-6.1, 6.2 and 6.3. This version also
+adds a workaround for a severe scaling issue in Clang's OpenMP 
+library (Clang 11, 2021) that occurs when using dynamic thread
+scheduling combined with long running computations. Because of this
+issue primecount-6.3 compiled with Clang takes 2.5x longer to
+compute AC(1e24) than primecount-6.3 compiled with GCC on my
+dual-socket AMD EPYC Rome server. I have submitted a bug report
+to LLVM which contains more information:
+https://bugs.llvm.org/show_bug.cgi?id=49588
 
+* B.cpp: Fix integer overflow (thanks to David Baugh for reporting it)
 * for_atomic.hpp: Lock-free for loop built with std::atomic.
 * AC.cpp: Fix Clang/OpenMP scaling issue.
 * AC.cpp: Decrease size of SegmentedPiTable by 1.5x.
