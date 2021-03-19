@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,6 +29,7 @@ int64_t pi(int64_t x, int threads);
 int64_t pi_legendre(int64_t x, int threads);
 int64_t pi_meissel(int64_t x, int threads);
 int64_t pi_primesieve(int64_t x);
+int64_t pi_simple(int64_t x, int threads);
 
 int64_t nth_prime(int64_t n, int threads);
 int64_t phi(int64_t x, int64_t a, int threads);
@@ -39,12 +40,6 @@ int64_t Li(int64_t);
 int64_t Li_inverse(int64_t);
 int64_t Ri(int64_t);
 int64_t Ri_inverse(int64_t);
-
-// In order to get the best performance with link time
-// optimization only functions should be inlined that are
-// called inside hot loops. This function is only used
-// for initialization and should hence not be inlined.
-int64_t pi_simple(int64_t x, int threads);
 
 #ifdef HAVE_INT128_T
 
