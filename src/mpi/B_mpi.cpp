@@ -113,7 +113,8 @@ T B_OpenMP(T x, int64_t y, int threads)
 
   int64_t low = isqrt(x);
   int64_t z = (int64_t)(x / max(y, 1));
-  int64_t proc_dist = ceil_div(z, procs);
+  int64_t dist = z - min(low, z);
+  int64_t proc_dist = ceil_div(dist, procs);
   low += proc_dist * proc_id;
   int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
   z = min(low + proc_dist, z);
