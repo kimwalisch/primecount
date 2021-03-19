@@ -14,8 +14,8 @@ to LLVM which contains more information:
 https://bugs.llvm.org/show_bug.cgi?id=49588
 
 * B.cpp: Fix integer overflow (thanks to David Baugh for reporting it)
-* B_mpi.cpp: Fix integer overflow (same as B.cpp).
-* P2.cpp: Fix integer overflow (same as B.cpp).
+* B_mpi.cpp: Fix integer overflow (same as in B.cpp).
+* P2.cpp: Fix integer overflow (same as in B.cpp).
 * for_atomic.hpp: Lock-free for loop built with std::atomic.
 * AC.cpp: Fix Clang/OpenMP scaling issue.
 * AC.cpp: Decrease size of SegmentedPiTable by 1.5x.
