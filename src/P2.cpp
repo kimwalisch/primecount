@@ -79,9 +79,8 @@ P2_thread(T x,
     // thread sieves [low, z[
     z = min(low + thread_dist, z);
     int64_t sqrtx = isqrt(x);
-    int64_t xz = min(x / z, sqrtx);
+    int64_t start = max(y, min(x / z, sqrtx));
     int64_t stop = min(x / low, sqrtx);
-    int64_t start = max(xz, y);
 
     primesieve::iterator it(low - 1, z);
     primesieve::iterator rit(stop + 1, start);
