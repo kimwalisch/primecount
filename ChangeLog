@@ -24,9 +24,10 @@ https://bugs.llvm.org/show_bug.cgi?id=49588
 * S2_easy.cpp: Fix Clang/OpenMP scaling issue.
 * S2_easy_libdivide.cpp: Fix Clang/OpenMP scaling issue.
 * SegmentedPiTable.cpp: Increase minimum segment size.
+* SegmentedPiTable.cpp: Annotate pi(x) with ALWAYS_INLINE.
 * Sieve.cpp: Simplify counters_dist initialization.
 * PiTable.cpp: Annotate pi(x) with ALWAYS_INLINE.
-* SegmentedPiTable.cpp: Annotate pi(x) with ALWAYS_INLINE.
+* LoadBalancerP2.cpp: Fix last iteration detection.
 
 Changes in primecount-6.3, 2021-03-05
 
