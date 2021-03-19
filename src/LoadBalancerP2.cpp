@@ -69,8 +69,8 @@ int64_t LoadBalancerP2::get_thread_dist(int64_t low)
   int64_t next_dist = threads_ * thread_dist_;
   int64_t last_dist = threads_ * min_dist_;
 
-  // Keep all threads busy in the last iteration 
-  if (low + next_dist + last_dist > dist)
+  // Keep all threads busy in the last iteration
+  if (low + next_dist + last_dist > z_)
     thread_dist_ = max(min_dist_, max_dist);
 
   return thread_dist_;
