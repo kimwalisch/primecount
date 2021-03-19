@@ -118,7 +118,7 @@ T B_OpenMP(T x, int64_t y, int threads)
   int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
   z = min(low + proc_dist, z);
 
-  LoadBalancerP2 loadBalancer(z, threads);
+  LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
 
