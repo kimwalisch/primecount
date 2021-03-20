@@ -35,6 +35,7 @@ git diff --exit-code > /dev/null || handle_error "repo must not have any uncommi
 # Build primecount binary ##########################################
 
 git checkout master
+git pull
 mkdir build-master
 cd build-master
 cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
@@ -86,6 +87,7 @@ cd ..
 
 cd ..
 git checkout backup3
+git pull
 mkdir build-backup3
 cd build-backup3
 cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
