@@ -233,21 +233,30 @@ T B_OpenMP(T x,
     return 0;
 
   T sum = 0;
+  int64_t low = 0;
+  int64_t pi_low_minus_1 = 0;
   int64_t thread_dist = 0;
-  int64_t low = isqrt(x);
-  int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
+
+  auto json = load_backup();
+  if (!resume(json, x, y, low, pi_low_minus_1, thread_dist, sum, time))
+    if (json.find("B") != json.end())
+      json.erase("B");
+
+  // Initialize if not resumed
+  if (!low)
+    low = isqrt(x);
+  if (!pi_low_minus_1)
+    pi_low_minus_1 = pi_simple(low - 1, threads);
+
   LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
   aligned_vector<ThreadResult<T>> res(threads);
-
-  auto json = load_backup();
-  if (resume(json, x, y, low, pi_low_minus_1, thread_dist, sum, time))
-    loadBalancer.set_thread_dist(thread_dist);
-  else if (json.find("B") != json.end())
-      json.erase("B");
-
-  thread_dist = loadBalancer.get_thread_dist(low);
   double last_backup_time = get_time();
+
+  if (!thread_dist)
+    thread_dist = loadBalancer.get_thread_dist(low);
+  else
+    loadBalancer.set_thread_dist(thread_dist);
 
   while (low < z)
   {
