@@ -1,4 +1,4 @@
-Changes in primecount-6.4, 2021-03-19
+Changes in primecount-6.4, 2021-03-20
 
 This version fixes a critical integer overflow in the B formula
 which is part of Xavier Gourdon's prime counting algorithm. The
