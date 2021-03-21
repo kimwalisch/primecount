@@ -253,10 +253,14 @@ T B_OpenMP(T x,
   aligned_vector<ThreadResult<T>> res(threads);
   double last_backup_time = get_time();
 
-  if (!thread_dist)
-    thread_dist = loadBalancer.get_thread_dist(low);
-  else
+  if (thread_dist)
     loadBalancer.set_thread_dist(thread_dist);
+
+  // Even if this computation is resumed from a backup file we don't
+  // simply use the thread_dist from the backup file since the
+  // computation may have been resumed on another PC with a different
+  // number of threads in which case thread_dist might change.
+  thread_dist = loadBalancer.get_thread_dist(low);
 
   while (low < z)
   {
