@@ -170,7 +170,7 @@ T C2(T x,
     uint64_t xpq = fast_div64(xp, primes[i]);
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
     uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    uint64_t i2 = segmentedPi[xpq2];
+    uint64_t i2 = pi[max(xpq2, min_clustered)];
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -214,12 +214,17 @@ T AC_OpenMP(T x,
   // would also not much be reduced.
   PiTable pi(max(z, max_a_prime), threads);
 
-  // SegmentedPiTable's size >= y because of the C2 formula.
-  // The C2 algorithm can be modified to work with smaller segment
-  // sizes such as x^(1/3) which improves the cache efficiency.
-  // However using a segment size < y deteriorates the algorithm's
-  // runtime complexity by a factor of log(x).
-  SegmentedPiTable segmentedPi(sqrtx, y, threads);
+  // PiTable's size = z because of the C1 formula.
+  // PiTable is accessed much less frequently than
+  // SegmentedPiTable, hence it is OK that PiTable's size
+  // is fairly large and does not fit into the CPU's cache. 
+  PiTable pi(max(z, max_a_prime), threads);
+
+  // SegmentedPiTable is accessed very frequently.
+  // In order to get good performance it is important that
+  // SegmentedPiTable fits into the CPU's cache.
+  // Hence we use a small size of x^(1/3).
+  SegmentedPiTable segmentedPi(sqrtx, x13, threads);
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
