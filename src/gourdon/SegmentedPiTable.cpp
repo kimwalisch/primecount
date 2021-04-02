@@ -35,7 +35,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t limit,
                                    uint64_t segment_size,
                                    int threads)
   : counts_(threads),
-    max_high_(limit + 1),
+    max_high_(limit),
     threads_(threads)
 {
   // Minimum segment size = 512 KiB (L2 cache size),

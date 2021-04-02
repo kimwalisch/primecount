@@ -69,15 +69,17 @@ int main()
     check(segmentedPi[i] == pi[i]);
   }
 
-  while (limit >= segmentedPi.high())
+  while (limit > segmentedPi.high())
   {
     segmentedPi.next();
     segmentedPi.init();
   }
 
-  // Check max pi(x) value
-  cout << "segmentedPi(" << limit << ") = " << segmentedPi[limit];
-  check(segmentedPi[limit] == pi[limit]);
+  // Check max pi(x) value.
+  // PiTable can lookup numbers <= limit.
+  // SegmentedPiTable can lookup numbers < limit.
+  cout << "segmentedPi(" << limit-1 << ") = " << segmentedPi[limit-1];
+  check(segmentedPi[limit-1] == pi[limit-1]);
 
   cout << endl;
   cout << "All tests passed successfully!" << endl;
