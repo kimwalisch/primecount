@@ -1,10 +1,11 @@
 ///
 /// @file  AC.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(y) by segmenting
-///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime * m) < high.
+///        prime counting algorithm. In this implementation the memory
+///        usage of the pi[x] lookup table has been reduced from
+///        O(x^(1/2)) to O(x^(1/3)) by using a segmented pi[x] lookup
+///        table. In each segment we process the leaves that satisfy:
+///        low <= x / (prime * m) < high.
 ///
 ///        The A & C formulas roughly correspond to the easy special
 ///        leaves in the Deleglise-Rivat algorithm. Since both
