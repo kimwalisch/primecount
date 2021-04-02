@@ -31,11 +31,11 @@
 
 namespace primecount {
 
-SegmentedPiTable::SegmentedPiTable(uint64_t limit,
+SegmentedPiTable::SegmentedPiTable(uint64_t max_high,
                                    uint64_t segment_size,
                                    int threads)
   : counts_(threads),
-    max_high_(limit),
+    max_high_(max_high),
     threads_(threads)
 {
   // Minimum segment size = 512 KiB (L2 cache size),

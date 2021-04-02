@@ -37,7 +37,7 @@ namespace primecount {
 class SegmentedPiTable : public BitSieve240
 {
 public:
-  SegmentedPiTable(uint64_t limit,
+  SegmentedPiTable(uint64_t max_high,
                    uint64_t segment_size,
                    int threads);
   void init();
