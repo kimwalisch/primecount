@@ -38,10 +38,15 @@ SegmentedPiTable::SegmentedPiTable(uint64_t max_high,
     max_high_(max_high),
     threads_(threads)
 {
-  // Minimum segment size = 512 KiB (L2 cache size),
-  // a large segment size improves load balancing.
+  // The threads in our AC algorithm are not completely
+  // independent from each other. After each segment all
+  // threads need to be synchronized. On servers with a
+  // large number of CPU cores this can add a lot of
+  // overhead. For this reason we set a large minimum
+  // segment size here (2 MiB, should be >= CPU L2 cache
+  // and <= CPU L3 cache) to avoid such scaling issues.
   uint64_t numbers_per_byte = 240 / sizeof(pi_t);
-  uint64_t min_segment_size = (512 << 10) * numbers_per_byte;
+  uint64_t min_segment_size = (2 << 20) * numbers_per_byte;
   segment_size_ = max(segment_size, min_segment_size);
   segment_size_ = min(segment_size_, max_high_);
 
