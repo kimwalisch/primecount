@@ -218,7 +218,8 @@ T C2_64(T xlow,
     uint64_t xpq = xp / primes[i];
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
     uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
-    uint64_t i2 = segmentedPi[xpq2];
+    uint64_t i2 = pi[xpq2];
+    i2 = max(i2, pi_min_clustered);
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -273,7 +274,8 @@ T C2_128(T xlow,
     uint64_t xpq = fast_div64(xp, primes[i]);
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
     uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    uint64_t i2 = segmentedPi[xpq2];
+    uint64_t i2 = pi[xpq2];
+    i2 = max(i2, pi_min_clustered);
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -326,7 +328,7 @@ T AC_OpenMP(T x,
   // sizes such as x^(1/3) which improves the cache efficiency.
   // However using a segment size < y deteriorates the algorithm's
   // runtime complexity by a factor of log(x).
-  SegmentedPiTable segmentedPi(sqrtx, y, threads);
+  
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -335,6 +337,8 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
+  int64_t segment_size = max(isqrt(sqrtx), (16 << 10) * 15);
+  segment_size += 240 - segment_size % 240;
 
   atomic<int64_t> atomic_a(-1);
   atomic<int64_t> atomic_c1(-1);
@@ -371,11 +375,11 @@ T AC_OpenMP(T x,
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
     // we use a segmented PrimePi[n] table of size y
     // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
-    while (segmentedPi.low() < sqrtx)
+    #pragma omp for nowait schedule(dynamic, 1)
+    for (int64_t low = 0; low < sqrtx; low += segment_size)
     {
       // Current segment [low, high[
-      segmentedPi.init();
-      int64_t low = segmentedPi.low();
+      SegmentedPiTable segmentedPi(low, segment_size);
       int64_t high = segmentedPi.high();
       T xlow = x / max(low, 1);
       T xhigh = x / high;
@@ -395,7 +399,7 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      for_atomic_inc(min_c2, b <= max_c2, atomic_c2)
+      for (int64_t b = min_c2; b <= max_c2; b++)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -405,11 +409,11 @@ T AC_OpenMP(T x,
         else
           sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
 
-        status.print(b, max_b);
+        //status.print(b, max_b);
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for_atomic_inc(pi_x_star + 1, b <= max_b, atomic_a)
+      for (int64_t b = pi_x_star + 1; b <= max_b; b++)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
@@ -419,25 +423,8 @@ T AC_OpenMP(T x,
         else
           sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
 
-        status.print(b, max_b);
+        //status.print(b, max_b);
       }
-
-      // Is this the last segment?
-      if (high >= sqrtx)
-        break;
-
-      // Wait until all threads have finished
-      // computing the current segment.
-      #pragma omp barrier
-      #pragma omp master
-      {
-        segmentedPi.next();
-        status.next();
-        atomic_a = -1;
-        atomic_c2 = -1;
-      }
-
-      #pragma omp barrier
     }
   }
 

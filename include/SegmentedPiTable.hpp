@@ -25,23 +25,19 @@
 
 #include <BitSieve240.hpp>
 #include <popcnt.hpp>
-#include <aligned_vector.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <cassert>
+#include <vector>
 
 namespace primecount {
 
 class SegmentedPiTable : public BitSieve240
 {
 public:
-  SegmentedPiTable(uint64_t limit,
-                   uint64_t segment_size,
-                   int threads);
-  void init();
-  void next();
+  SegmentedPiTable(uint64_t low,
+                   uint64_t segment_size);
 
   int64_t low() const
   {
@@ -70,23 +66,20 @@ public:
   }
 
 private:
-  void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
-  void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_bits(uint64_t start, uint64_t stop);
+  void init_count(uint64_t start, uint64_t stop);
 
   struct pi_t
   {
-    uint64_t count;
-    uint64_t bits;
+    uint64_t count = 0;
+    uint64_t bits = 0;
   };
 
-  pod_vector<pi_t> pi_;
-  aligned_vector<uint64_t> counts_;
-  uint64_t low_ = 0;
-  uint64_t pi_low_ = pi_tiny_[5];
+  std::vector<pi_t> pi_;
+  uint64_t low_;
+  uint64_t pi_low_;
   uint64_t high_;
-  uint64_t max_high_;
   uint64_t segment_size_;
-  int threads_;
 };
 
 } // namespace
