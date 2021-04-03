@@ -240,12 +240,22 @@ int64_t D(int64_t x,
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
-  DFactorTable<uint16_t> factor(y, z, threads);
-  auto primes = generate_primes<int32_t>(y);
-  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+  int64_t sum = D_noprint(x, y, z, k, d_approx, threads);
 
   print("D", sum, time);
   return sum;
+}
+
+int64_t D_noprint(int64_t x,
+                  int64_t y,
+                  int64_t z,
+                  int64_t k,
+                  int64_t d_approx,
+                  int threads)
+{
+  DFactorTable<uint16_t> factor(y, z, threads);
+  auto primes = generate_primes<int32_t>(y);
+  return D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
 }
 
 #ifdef HAVE_INT128_T

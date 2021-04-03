@@ -446,16 +446,25 @@ int64_t AC(int64_t x,
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
+  int64_t sum = AC_noprint(x, y, z, k, threads);
+
+  print("A + C", sum, time);
+  return sum;
+}
+
+int64_t AC_noprint(int64_t x,
+                   int64_t y,
+                   int64_t z,
+                   int64_t k,
+                   int threads)
+{
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<uint32_t>(max_prime);
 
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
-
-  print("A + C", sum, time);
-  return sum;
+  return AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
 }
 
 #ifdef HAVE_INT128_T

@@ -182,7 +182,7 @@ int64_t P2(int64_t x, int64_t y, int threads)
   print_vars(x, y, threads);
 
   double time = get_time();
-  int64_t sum = P2_OpenMP(x, y, threads);
+  int64_t sum = P2_noprint(x, y, threads);
 
   print("P2", sum, time);
   return sum;

@@ -99,12 +99,12 @@ int64_t pi_gourdon_64_noprint(int64_t x, int threads)
   z = std::min(z, sqrtx - 1);
   z = std::max(z, (int64_t) 1);
 
-  int64_t sigma = Sigma(x, y, threads);
-  int64_t phi0 = Phi0(x, y, z, k, threads);
-  int64_t b = B(x, y, threads);
-  int64_t ac = AC(x, y, z, k, threads);
+  int64_t sigma = Sigma_noprint(x, y, threads);
+  int64_t phi0 = Phi0_noprint(x, y, z, k, threads);
+  int64_t b = B_noprint(x, y, threads);
+  int64_t ac = AC_noprint(x, y, z, k, threads);
   int64_t d_approx = D_approx(x, sigma, phi0, ac, b);
-  int64_t d = D(x, y, z, k, d_approx, threads);
+  int64_t d = D_noprint(x, y, z, k, d_approx, threads);
   int64_t sum = ac - b + d + phi0 + sigma;
 
   return sum;

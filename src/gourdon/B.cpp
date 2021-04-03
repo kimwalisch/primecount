@@ -173,10 +173,15 @@ int64_t B(int64_t x, int64_t y, int threads)
   print_gourdon_vars(x, y, threads);
 
   double time = get_time();
-  int64_t sum = B_OpenMP((uint64_t) x, y, threads);
+  int64_t sum = B_noprint(x, y, threads);
 
   print("B", sum, time);
   return sum;
+}
+
+int64_t B_noprint(int64_t x, int64_t y, int threads)
+{
+  return B_OpenMP((uint64_t) x, y, threads);
 }
 
 #ifdef HAVE_INT128_T
