@@ -123,7 +123,7 @@ int64_t nth_prime(int64_t n)
 
 int64_t phi(int64_t x, int64_t a)
 {
-  return phi(x, a, get_num_threads());
+  return phi_noprint(x, a, get_num_threads());
 }
 
 string primecount_version()
