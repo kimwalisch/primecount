@@ -321,14 +321,7 @@ T AC_OpenMP(T x,
   // would not increase overall performance (because C1
   // computes very quickly) and the overall memory usage
   // would also not much be reduced.
-  PiTable pi(max(z, max_a_prime), threads);
-
-  // SegmentedPiTable's size >= y because of the C2 formula.
-  // The C2 algorithm can be modified to work with smaller segment
-  // sizes such as x^(1/3) which improves the cache efficiency.
-  // However using a segment size < y deteriorates the algorithm's
-  // runtime complexity by a factor of log(x).
-  
+  PiTable pi(max(z, max_a_prime), threads);  
 
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
@@ -368,6 +361,8 @@ T AC_OpenMP(T x,
       status.print(b, pi_x13);
     }
 
+    SegmentedPiTable segmentedPi(sqrtx, segment_size);
+
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
     // x / (primes[b] * primes[i]) < x^(1/2)
@@ -379,7 +374,7 @@ T AC_OpenMP(T x,
     for (int64_t low = 0; low < sqrtx; low += segment_size)
     {
       // Current segment [low, high[
-      SegmentedPiTable segmentedPi(low, segment_size);
+      segmentedPi.init(low);
       int64_t high = segmentedPi.high();
       T xlow = x / max(low, 1);
       T xhigh = x / high;

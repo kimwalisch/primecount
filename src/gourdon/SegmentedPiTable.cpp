@@ -31,18 +31,28 @@
 
 namespace primecount {
 
-SegmentedPiTable::SegmentedPiTable(uint64_t low,
-                                   uint64_t segment_size)
+SegmentedPiTable::SegmentedPiTable(uint64_t max_high, uint64_t segment_size)
+  : max_high_(max_high),
+    segment_size_(segment_size)
+{ }
+
+void SegmentedPiTable::init(uint64_t low)
 {
+  assert(low < max_high_);
+  assert(low % 2 == 0);
+
   if (low <= 5)
     pi_low_ = pi_tiny_[5];
+  else if (low == high_)
+    pi_low_ = operator[](low - 1);
   else
     pi_low_ = pi_noprint(low - 1, 1);
 
-  segment_size_ = segment_size;
-  pi_.resize(segment_size_ / 240);
   low_ = low;
-  high_ = low + segment_size;
+  high_ = low + segment_size_;
+  pi_.clear();
+  pi_.resize(segment_size_ / 240);
+
   init_bits(low_, high_);
   init_count(low_, high_);
 }
