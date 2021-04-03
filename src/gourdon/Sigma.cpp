@@ -32,7 +32,7 @@ namespace {
 template <typename T>
 T Sigma0(T x, T a, int threads)
 {
-  T pi_sqrtx = pi_simple(isqrt(x), threads);
+  T pi_sqrtx = pi_noprint(isqrt(x), threads);
   return a - 1 + (pi_sqrtx * (pi_sqrtx - 1)) / 2 - (a * (a - 1)) / 2;
 }
 

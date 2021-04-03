@@ -35,7 +35,7 @@ int64_t pi_legendre(int64_t x, int threads)
     return 0;
 
   int64_t y = isqrt(x);
-  int64_t a = pi_simple(y, threads);
+  int64_t a = pi_noprint(y, threads);
 
   print("");
   print("=== pi_legendre(x) ===");
@@ -50,17 +50,13 @@ int64_t pi_legendre(int64_t x, int threads)
   return sum;
 }
 
-/// This is an internal pi(x) helper function which uses Legendre's
-/// formula but which does not print anything to the screen.
-/// It is used all over the place to initialize other algorithms.
-///
-int64_t pi_simple(int64_t x, int threads)
+int64_t pi_legendre_noprint(int64_t x, int threads)
 {
   if (x < 2)
     return 0;
 
   int64_t y = isqrt(x);
-  int64_t a = pi_simple(y, threads);
+  int64_t a = pi_noprint(y, threads);
   int64_t sum = phi_noprint(x, a, threads) + a - 1;
 
   return sum;

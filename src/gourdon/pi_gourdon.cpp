@@ -9,7 +9,7 @@
 ///        Xavier Gourdon formula:
 ///        pi(x) = A - B + C + D + Phi0 + Sigma
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -62,6 +62,42 @@ int64_t pi_gourdon_64(int64_t x, int threads)
   print("=== pi_gourdon_64(x) ===");
   print("pi(x) = A - B + C + D + Phi0 + Sigma");
   print_gourdon(x, y, z, k, threads);
+
+  int64_t sigma = Sigma(x, y, threads);
+  int64_t phi0 = Phi0(x, y, z, k, threads);
+  int64_t b = B(x, y, threads);
+  int64_t ac = AC(x, y, z, k, threads);
+  int64_t d_approx = D_approx(x, sigma, phi0, ac, b);
+  int64_t d = D(x, y, z, k, d_approx, threads);
+  int64_t sum = ac - b + d + phi0 + sigma;
+
+  return sum;
+}
+
+int64_t pi_gourdon_64_noprint(int64_t x, int threads)
+{
+  if (x < 2)
+    return 0;
+
+  auto alpha = get_alpha_gourdon(x);
+  double alpha_y = alpha.first;
+  double alpha_z = alpha.second;
+  int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
+  int64_t y = (int64_t)(x13 * alpha_y);
+
+  // x^(1/3) < y < x^(1/2)
+  y = std::max(y, x13 + 1);
+  y = std::min(y, sqrtx - 1);
+  y = std::max(y, (int64_t) 1);
+
+  int64_t k = PhiTiny::get_k(x);
+  int64_t z = (int64_t)(y * alpha_z);
+
+  // y <= z < x^(1/2)
+  z = std::max(z, y);
+  z = std::min(z, sqrtx - 1);
+  z = std::max(z, (int64_t) 1);
 
   int64_t sigma = Sigma(x, y, threads);
   int64_t phi0 = Phi0(x, y, z, k, threads);

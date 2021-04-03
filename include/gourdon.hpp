@@ -16,6 +16,7 @@ namespace primecount {
 
 int64_t pi_gourdon(int64_t x, int threads);
 int64_t pi_gourdon_64(int64_t x, int threads);
+int64_t pi_gourdon_64_noprint(int64_t x, int threads);
 int64_t Sigma(int64_t x, int64_t y, int threads);
 int64_t Phi0(int64_t x, int64_t y, int64_t z, int64_t k, int threads);
 int64_t AC(int64_t x, int64_t y, int64_t z, int64_t k, int threads);

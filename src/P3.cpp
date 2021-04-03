@@ -36,7 +36,7 @@ int64_t P3(int64_t x, int64_t y, int threads)
 
   if (y <= x13)
   {
-    int64_t a = pi_simple(y, threads);
+    int64_t a = pi_noprint(y, threads);
     int64_t max_prime = std::max(x13, isqrt(x / y));
     int64_t max_pix = std::max(x13, x / (y * y));
     auto primes = generate_primes<int32_t>(max_prime);

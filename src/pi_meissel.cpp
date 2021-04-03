@@ -33,7 +33,7 @@ int64_t pi_meissel(int64_t x, int threads)
     return 0;
 
   int64_t y = iroot<3>(x);
-  int64_t a = pi_simple(y, threads);
+  int64_t a = pi_noprint(y, threads);
 
   print("");
   print("=== pi_meissel(x) ===");
@@ -45,6 +45,20 @@ int64_t pi_meissel(int64_t x, int threads)
 
   int64_t phi_xa = phi(x, a, threads);
   int64_t p2 = P2(x, y, threads);
+  int64_t sum = phi_xa + a - 1 - p2;
+
+  return sum;
+}
+
+int64_t pi_meissel_noprint(int64_t x, int threads)
+{
+  if (x < 2)
+    return 0;
+
+  int64_t y = iroot<3>(x);
+  int64_t a = pi_noprint(y, threads);
+  int64_t phi_xa = phi_noprint(x, a, threads);
+  int64_t p2 = P2_noprint(x, y, threads);
   int64_t sum = phi_xa + a - 1 - p2;
 
   return sum;

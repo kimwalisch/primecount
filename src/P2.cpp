@@ -117,8 +117,8 @@ T P2_OpenMP(T x, int64_t y, int threads)
     return 0;
 
   int64_t sqrtx = isqrt(x);
-  T a = pi_simple(y, threads);
-  T b = pi_simple(sqrtx, threads);
+  T a = pi_noprint(y, threads);
+  T b = pi_noprint(sqrtx, threads);
 
   if (a >= b)
     return 0;
@@ -127,7 +127,7 @@ T P2_OpenMP(T x, int64_t y, int threads)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
   int64_t low = sqrtx;
-  int64_t pi_low_minus_1 = pi_simple(low - 1, threads);
+  int64_t pi_low_minus_1 = pi_noprint(low - 1, threads);
   int64_t z = (int64_t)(x / max(y, 1));
   LoadBalancerP2 loadBalancer(low, z, threads);
   threads = loadBalancer.get_threads();
@@ -186,6 +186,11 @@ int64_t P2(int64_t x, int64_t y, int threads)
 
   print("P2", sum, time);
   return sum;
+}
+
+int64_t P2_noprint(int64_t x, int64_t y, int threads)
+{
+  return P2_OpenMP(x, y, threads);
 }
 
 #ifdef HAVE_INT128_T

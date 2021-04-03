@@ -54,6 +54,16 @@ int64_t pi(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
+int64_t pi_noprint(int64_t x, int threads)
+{
+  if (x <= (int64_t) 1e5)
+    return pi_legendre_noprint(x, threads);
+  else if (x <= (int64_t) 1e8)
+    return pi_meissel_noprint(x, threads);
+  else
+    return pi_gourdon_64_noprint(x, threads);
+}
+
 #ifdef HAVE_INT128_T
 
 int128_t pi(int128_t x)

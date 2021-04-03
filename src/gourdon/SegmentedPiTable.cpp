@@ -37,7 +37,7 @@ SegmentedPiTable::SegmentedPiTable(uint64_t low,
   if (low <= 5)
     pi_low_ = pi_tiny_[5];
   else
-    pi_low_ = pi_simple(low - 1, 1);
+    pi_low_ = pi_noprint(low - 1, 1);
 
   segment_size_ = segment_size;
   pi_.resize(segment_size_ / 240);
