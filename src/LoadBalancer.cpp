@@ -55,7 +55,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   sum_(0),
   sum_approx_(sum_approx),
   time_(get_time()),
-  is_print_(is_print_),
+  is_print_(is_print),
   status_(x)
 {
   // start with a tiny segment_size as most
