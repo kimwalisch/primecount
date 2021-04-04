@@ -17,13 +17,15 @@ namespace primecount {
 class StatusAC
 {
 public:
+  StatusAC(bool is_print);
   void print(int64_t low, int64_t limit, int64_t segment_size);
 private:
   bool isPrint(double time);
-  double time_ = 0;
+  bool is_print_;
   // Only print status if 0.1 seconds have elapsed
   // since last printing the status.
-  double is_print_ = 0.1;
+  double threshold_ = 0.1;
+  double time_ = 0;
 };
 
 } // namespace

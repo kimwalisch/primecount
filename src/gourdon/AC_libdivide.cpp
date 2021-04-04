@@ -303,10 +303,11 @@ T AC_OpenMP(T x,
             int64_t x_star,
             int64_t max_a_prime,
             const Primes& primes,
+            bool is_print,
             int threads)
 {
   T sum = 0;
-  StatusAC status;
+  StatusAC status(is_print);
 
   // Initialize libdivide vector using primes
   vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
@@ -438,7 +439,13 @@ int64_t AC(int64_t x,
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
-  int64_t sum = AC_noprint(x, y, z, k, threads);
+  int64_t x_star = get_x_star_gourdon(x, y);
+  int64_t max_c_prime = y;
+  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
+  int64_t max_prime = max(max_a_prime, max_c_prime);
+  auto primes = generate_primes<uint32_t>(max_prime);
+
+  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
 
   print("A + C", sum, time);
   return sum;
@@ -455,8 +462,9 @@ int64_t AC_noprint(int64_t x,
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<uint32_t>(max_prime);
+  bool is_print = false;
 
-  return AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+  return AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -487,12 +495,12 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
   }
   else
   {
     auto primes = generate_primes<uint64_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
   }
 
   print("A + C", sum, time);

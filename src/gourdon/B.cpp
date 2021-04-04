@@ -107,7 +107,7 @@ B_thread(T x,
 /// Memory usage: O(z^(1/2))
 ///
 template <typename T>
-T B_OpenMP(T x, int64_t y, int threads)
+T B_OpenMP(T x, int64_t y, bool is_print, int threads)
 {
   if (x < 4)
     return 0;
@@ -146,7 +146,7 @@ T B_OpenMP(T x, int64_t y, int threads)
 
     low += thread_dist * threads;
 
-    if (is_print())
+    if (is_print)
     {
       int precision = get_status_precision(x);
       cout << "\rStatus: " << fixed << setprecision(precision)
@@ -173,7 +173,7 @@ int64_t B(int64_t x, int64_t y, int threads)
   print_gourdon_vars(x, y, threads);
 
   double time = get_time();
-  int64_t sum = B_noprint(x, y, threads);
+  int64_t sum = B_OpenMP((uint64_t) x, y, is_print(), threads);
 
   print("B", sum, time);
   return sum;
@@ -181,7 +181,8 @@ int64_t B(int64_t x, int64_t y, int threads)
 
 int64_t B_noprint(int64_t x, int64_t y, int threads)
 {
-  return B_OpenMP((uint64_t) x, y, threads);
+  bool is_print = false;
+  return B_OpenMP((uint64_t) x, y, is_print, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -198,7 +199,7 @@ int128_t B(int128_t x, int64_t y, int threads)
   print_gourdon_vars(x, y, threads);
 
   double time = get_time();
-  int128_t sum = B_OpenMP((uint128_t) x, y, threads);
+  int128_t sum = B_OpenMP((uint128_t) x, y, is_print(), threads);
 
   print("B", sum, time);
   return sum;

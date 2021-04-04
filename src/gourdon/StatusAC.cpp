@@ -25,17 +25,20 @@ using namespace primecount;
 
 namespace primecount {
 
+StatusAC::StatusAC(bool is_print)
+  : is_print_(is_print)
+{ }
+
 bool StatusAC::isPrint(double time)
 {
   double old = time_;
   return old == 0 ||
-        (time - old) >= is_print_;
+        (time - old) >= threshold_;
 }
 
 void StatusAC::print(int64_t low, int64_t limit, int64_t segment_size)
 {
-  // check --status option used
-  if (!is_print())
+  if (!is_print_)
     return;
 
 #if defined(_OPENMP)
