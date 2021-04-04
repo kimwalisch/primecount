@@ -46,7 +46,8 @@ namespace primecount {
 
 LoadBalancer::LoadBalancer(maxint_t x,
                            int64_t sieve_limit,
-                           maxint_t sum_approx) :
+                           maxint_t sum_approx,
+                           bool is_print) :
   low_(0),
   max_low_(0),
   sieve_limit_(sieve_limit),
@@ -54,6 +55,7 @@ LoadBalancer::LoadBalancer(maxint_t x,
   sum_(0),
   sum_approx_(sum_approx),
   time_(get_time()),
+  is_print_(is_print_),
   status_(x)
 {
   // start with a tiny segment_size as most
@@ -87,7 +89,7 @@ bool LoadBalancer::get_work(ThreadSettings& thread)
   LockGuard lockGuard(lock_);
   sum_ += thread.sum;
 
-  if (is_print())
+  if (is_print_)
   {
     uint64_t dist = thread.segments * thread.segment_size;
     uint64_t high = thread.low + dist;

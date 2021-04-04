@@ -180,7 +180,7 @@ int64_t S2(int64_t x,
   double time = get_time();
   int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, z, thread_threshold);
-  LoadBalancer loadBalancer(x, z, s2_approx);
+  LoadBalancer loadBalancer(x, z, s2_approx, is_print());
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)

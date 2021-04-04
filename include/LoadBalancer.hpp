@@ -36,7 +36,7 @@ struct ThreadSettings
 class LoadBalancer
 {
 public:
-  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx);
+  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, bool is_print);
   bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
@@ -54,6 +54,7 @@ private:
   maxint_t sum_;
   maxint_t sum_approx_;
   double time_;
+  bool is_print_;
   Status status_;
   OmpLock lock_;
 };

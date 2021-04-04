@@ -188,13 +188,14 @@ T D_OpenMP(T x,
            T d_approx,
            const Primes& primes,
            const DFactorTable& factor,
+           bool is_print,
            int threads)
 {
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, xz, thread_threshold);
-  LoadBalancer loadBalancer(x, xz, d_approx);
+  LoadBalancer loadBalancer(x, xz, d_approx, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
@@ -240,7 +241,9 @@ int64_t D(int64_t x,
   print_gourdon_vars(x, y, z, k, threads);
 
   double time = get_time();
-  int64_t sum = D_noprint(x, y, z, k, d_approx, threads);
+  DFactorTable<uint16_t> factor(y, z, threads);
+  auto primes = generate_primes<int32_t>(y);
+  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, is_print(), threads);
 
   print("D", sum, time);
   return sum;
@@ -255,7 +258,8 @@ int64_t D_noprint(int64_t x,
 {
   DFactorTable<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
-  return D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+  bool is_print = false;
+  return D_OpenMP(x, y, z, k, d_approx, primes, factor, is_print, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -284,13 +288,13 @@ int128_t D(int128_t x,
   {
     DFactorTable<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, is_print(), threads);
   }
   else
   {
     DFactorTable<uint32_t> factor(y, z, threads);
     auto primes = generate_primes<int64_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads);
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, is_print(), threads);
   }
 
   print("D", sum, time);
