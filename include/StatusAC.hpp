@@ -1,7 +1,7 @@
 ///
 /// @file  StatusAC.hpp
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,21 +17,13 @@ namespace primecount {
 class StatusAC
 {
 public:
-  StatusAC(maxint_t x);
-  void print(int64_t b, int64_t max_b);
-  void next();
+  void print(int64_t low, int64_t limit, int64_t segment_size);
 private:
   bool isPrint(double time);
-  void print(double percent);
-  double epsilon_;
-  double percent_ = -1;
-  double percent_total_ = 0;
-  double percent_segment_ = 80;
   double time_ = 0;
   // Only print status if 0.1 seconds have elapsed
   // since last printing the status.
   double is_print_ = 0.1;
-  int precision_;
 };
 
 } // namespace

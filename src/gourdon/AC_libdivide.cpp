@@ -306,9 +306,7 @@ T AC_OpenMP(T x,
             int threads)
 {
   T sum = 0;
-  int64_t x13 = iroot<3>(x);
-  int64_t sqrtx = isqrt(x);
-  StatusAC status(x);
+  StatusAC status;
 
   // Initialize libdivide vector using primes
   vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
@@ -321,16 +319,17 @@ T AC_OpenMP(T x,
   // would also not much be reduced.
   PiTable pi(max(z, max_a_prime), threads);  
 
+  int64_t sqrtx = isqrt(x);
+  int64_t x13 = iroot<3>(x);
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
-  int64_t pi_x13 = pi[x13];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
+
   int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
   threads = ideal_num_threads(threads, sqrtx, segment_size);
-
   atomic<int64_t> atomic_b(min_c1);
   atomic<int64_t> atomic_low(0);
 
@@ -346,6 +345,7 @@ T AC_OpenMP(T x,
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
     SegmentedPiTable segmentedPi;
+    status.print(0, sqrtx, segment_size);
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_add(b, b <= pi_sqrtz, 1)
@@ -370,6 +370,7 @@ T AC_OpenMP(T x,
     {
       // Current segment [low, high[
       int64_t high = min(low + segment_size, sqrtx);
+      status.print(low, sqrtx, segment_size);
       segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;
