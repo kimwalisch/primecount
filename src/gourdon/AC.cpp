@@ -215,7 +215,6 @@ T AC_OpenMP(T x,
   int64_t x13 = iroot<3>(x);
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t pi_x_star = pi[x_star];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
@@ -277,20 +276,23 @@ T AC_OpenMP(T x,
       min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
       min_c2 += 1;
 
+      int64_t min_a = min(xhigh / high, x13);
+      min_a = pi[max(x_star, min_a)] + 1;
+    
       // Upper bound of A & C2 formulas:
       // x / (p * q) >= low
       // p * next_prime(p) <= x / low
       // p <= sqrt(x / low)
       T sqrt_xlow = isqrt(xlow);
       int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-      int64_t max_b = pi[min(sqrt_xlow, x13)];
+      int64_t max_a = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       for (int64_t b = min_c2; b <= max_c2; b++)
         sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for (int64_t b = pi_x_star + 1; b <= max_b; b++)
+      for (int64_t b = min_a; b <= max_a; b++)
         sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
     }
   }
