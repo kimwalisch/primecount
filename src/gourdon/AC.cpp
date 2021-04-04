@@ -198,54 +198,48 @@ T AC_OpenMP(T x,
             int64_t x_star,
             int64_t max_a_prime,
             const Primes& primes,
+            bool is_print,
             int threads)
 {
   T sum = 0;
-  int64_t x13 = iroot<3>(x);
-  int64_t sqrtx = isqrt(x);
-  int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
-  StatusAC status(x);
+  StatusAC status(is_print);
 
   // PiTable's size >= z because of the C1 formula.
   // We could use segmentation for the C1 formula but this
   // would not increase overall performance (because C1
   // computes very quickly) and the overall memory usage
   // would also not much be reduced.
-  PiTable pi(max(z, max_a_prime), threads);
+  PiTable pi(max(z, max_a_prime), threads);  
 
-  // SegmentedPiTable's size >= y because of the C2 formula.
-  // The C2 algorithm can be modified to work with smaller segment
-  // sizes such as x^(1/3) which improves the cache efficiency.
-  // However using a segment size < y deteriorates the algorithm's
-  // runtime complexity by a factor of log(x).
-  SegmentedPiTable segmentedPi(sqrtx, y, threads);
-
+  int64_t sqrtx = isqrt(x);
+  int64_t x13 = iroot<3>(x);
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_x_star = pi[x_star];
-  int64_t pi_x13 = pi[x13];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
-  atomic<int64_t> atomic_a(-1);
-  atomic<int64_t> atomic_c1(-1);
-  atomic<int64_t> atomic_c2(-1);
+  int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
+  threads = ideal_num_threads(threads, sqrtx, segment_size);
+  atomic<int64_t> atomic_b(min_c1);
+  atomic<int64_t> atomic_low(0);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
   // entire computation. The same threads are used for:
   //
   // 1) Computation of the C1 formula.
-  // 2) Initialization of the segmentedPi lookup table.
-  // 3) Computation of the C2 formula.
-  // 4) Computation of the A formula.
+  // 2) Computation of the C2 formula.
+  // 3) Computation of the A formula.
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
+    SegmentedPiTable segmentedPi;
+    status.print(0, sqrtx, segment_size);
+
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    for_atomic_inc(min_c1, b <= pi_sqrtz, atomic_c1)
+    for_atomic_add(b, b <= pi_sqrtz, 1)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -254,7 +248,6 @@ T AC_OpenMP(T x,
       int64_t min_m = min(min_m128, max_m);
 
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
-      status.print(b, pi_x13);
     }
 
     // This computes A and the 2nd part of the C formula.
@@ -262,14 +255,14 @@ T AC_OpenMP(T x,
     // x / (primes[b] * primes[i]) < x^(1/2)
     // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size y
-    // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
-    while (segmentedPi.low() < sqrtx)
+    // we use a segmented PrimePi[n] table of size 
+    // O(x^(1/4)) to reduce the memory usage.
+    for_atomic_add(low, low < sqrtx, segment_size)
     {
       // Current segment [low, high[
-      segmentedPi.init();
-      int64_t low = segmentedPi.low();
-      int64_t high = segmentedPi.high();
+      int64_t high = min(low + segment_size, sqrtx);
+      status.print(low, sqrtx, segment_size);
+      segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;
 
@@ -288,35 +281,12 @@ T AC_OpenMP(T x,
       int64_t max_b = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      for_atomic_inc(min_c2, b <= max_c2, atomic_c2)
-      {
+      for (int64_t b = min_c2; b <= max_c2; b++)
         sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
-        status.print(b, max_b);
-      }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for_atomic_inc(pi_x_star + 1, b <= max_b, atomic_a)
-      {
+      for (int64_t b = pi_x_star + 1; b <= max_b; b++)
         sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
-        status.print(b, max_b);
-      }
-
-      // Is this the last segment?
-      if (high >= sqrtx)
-        break;
-
-      // Wait until all threads have finished
-      // computing the current segment.
-      #pragma omp barrier
-      #pragma omp master
-      {
-        segmentedPi.next();
-        status.next();
-        atomic_a = -1;
-        atomic_c2 = -1;
-      }
-
-      #pragma omp barrier
     }
   }
 
@@ -349,10 +319,26 @@ int64_t AC(int64_t x,
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<uint32_t>(max_prime);
 
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
 
   print("A + C", sum, time);
   return sum;
+}
+
+int64_t AC_noprint(int64_t x,
+                   int64_t y,
+                   int64_t z,
+                   int64_t k,
+                   int threads)
+{
+  int64_t x_star = get_x_star_gourdon(x, y);
+  int64_t max_c_prime = y;
+  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
+  int64_t max_prime = max(max_a_prime, max_c_prime);
+  auto primes = generate_primes<uint32_t>(max_prime);
+  bool is_print = false;
+
+  return AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -383,12 +369,12 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
   }
   else
   {
     auto primes = generate_primes<uint64_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
   }
 
   print("A + C", sum, time);

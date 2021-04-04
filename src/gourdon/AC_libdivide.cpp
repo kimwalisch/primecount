@@ -2,7 +2,7 @@
 /// @file  AC_libdivide.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
 ///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(y) by segmenting
+///        has been reduced from O(x^(1/2)) to O(x^(1/4)) by segmenting
 ///        the pi[x] lookup table. In each segment we process the
 ///        leaves that satisfy: low <= x / (prime * m) < high.
 ///
@@ -339,9 +339,8 @@ T AC_OpenMP(T x,
   // entire computation. The same threads are used for:
   //
   // 1) Computation of the C1 formula.
-  // 2) Initialization of the segmentedPi lookup table.
-  // 3) Computation of the C2 formula.
-  // 4) Computation of the A formula.
+  // 2) Computation of the C2 formula.
+  // 3) Computation of the A formula.
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
@@ -365,8 +364,8 @@ T AC_OpenMP(T x,
     // x / (primes[b] * primes[i]) < x^(1/2)
     // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size y
-    // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
+    // we use a segmented PrimePi[n] table of size 
+    // O(x^(1/4)) to reduce the memory usage.
     for_atomic_add(low, low < sqrtx, segment_size)
     {
       // Current segment [low, high[
