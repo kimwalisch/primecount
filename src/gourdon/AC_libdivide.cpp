@@ -326,8 +326,8 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
-  int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
-  int64_t thread_threshold = segment_size * 16;
+  int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, x13, threads);
+  int64_t thread_threshold = segment_size * 8;
   threads = ideal_num_threads(threads, sqrtx, thread_threshold);
   atomic<int64_t> atomic_b(min_c1);
   atomic<int64_t> atomic_low(0);

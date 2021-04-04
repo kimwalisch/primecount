@@ -37,7 +37,7 @@ class SegmentedPiTable : public BitSieve240
 {
 public:
   void init(uint64_t low, uint64_t high);
-  static int64_t get_segment_size(uint64_t max_high, int threads);
+  static int64_t get_segment_size(uint64_t max_high, uint64_t x13, int threads);
 
   int64_t low() const
   {
