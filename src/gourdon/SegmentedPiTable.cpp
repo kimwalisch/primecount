@@ -86,26 +86,35 @@ void SegmentedPiTable::init_count(uint64_t pi_low)
 
 int64_t SegmentedPiTable::get_segment_size(uint64_t max_high, int threads)
 {
-  int64_t segment_size;
+  // CPU cache sizes per core
+  int64_t l1_cache_size = 32 << 10;
+  int64_t l2_cache_size = 512 << 10;
   int64_t numbers_per_byte = 240 / sizeof(pi_t);
+  int64_t segment_size;
 
   if (threads == 1)
-  {
-    // CPU L2 cache size per core
-    int64_t l2_cache_size = 256 << 10;
     segment_size = l2_cache_size * numbers_per_byte;
-  }
   else
   {
-    segment_size = isqrt(max_high) * 2;
+    segment_size = isqrt(max_high);
 
-    // Minimum segment size = 4 KiB
-    int64_t min_segment_size = (4 << 10) * numbers_per_byte;
+    // We use a segment_size that is slightly larger than
+    // x^(1/4) but that still fits into the CPU's cache.
+    if (segment_size * 8 <= l1_cache_size)
+      segment_size *= 8;
+    else if (segment_size * 4 <= l2_cache_size)
+      segment_size *= 4;
+    else
+      segment_size *= 2;
+
+    // Minimum segment size = 1 KiB
+    int64_t min_segment_size = (1 << 10) * numbers_per_byte;
     segment_size = max(min_segment_size, segment_size);
   }
 
   segment_size = min(segment_size, max_high);
   segment_size += 240 - segment_size % 240;
+  assert(segment_size % 240 == 0);
 
   return segment_size;
 }

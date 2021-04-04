@@ -308,7 +308,6 @@ T AC_OpenMP(T x,
   T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  atomic<int64_t> atomic_c1(-1);
   StatusAC status(x);
 
   // Initialize libdivide vector using primes
@@ -332,6 +331,9 @@ T AC_OpenMP(T x,
   int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
   threads = ideal_num_threads(threads, sqrtx, segment_size);
 
+  atomic<int64_t> atomic_b(min_c1);
+  atomic<int64_t> atomic_low(0);
+
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
   // entire computation. The same threads are used for:
@@ -343,8 +345,10 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
+    SegmentedPiTable segmentedPi;
+
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    for_atomic_inc(min_c1, b <= pi_sqrtz, atomic_c1)
+    for_atomic_add(b, b <= pi_sqrtz, 1)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
@@ -355,8 +359,6 @@ T AC_OpenMP(T x,
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
     }
 
-    SegmentedPiTable segmentedPi;
-
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
     // x / (primes[b] * primes[i]) < x^(1/2)
@@ -364,8 +366,7 @@ T AC_OpenMP(T x,
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
     // we use a segmented PrimePi[n] table of size y
     // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
-    #pragma omp for nowait schedule(dynamic, 1)
-    for (int64_t low = 0; low < sqrtx; low += segment_size)
+    for_atomic_add(low, low < sqrtx, segment_size)
     {
       // Current segment [low, high[
       int64_t high = min(low + segment_size, sqrtx);
