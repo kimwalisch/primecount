@@ -367,8 +367,8 @@ T AC_OpenMP(T x,
     // x / (primes[b] * primes[i]) < x^(1/2)
     // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size y
-    // (y = O(x^(1/3) * log(x)^3)) to reduce the memory usage.
+    // we use a segmented PrimePi[n] table of size O(x^(1/3))
+    // to reduce the memory usage.
     while (segmentedPi.low() < sqrtx)
     {
       // Current segment [low, high[
@@ -385,13 +385,16 @@ T AC_OpenMP(T x,
       min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
       min_c2 += 1;
 
+      int64_t min_a = min(xhigh / high, x13);
+      min_a = pi[max(x_star, min_a)] + 1;
+
       // Upper bound of A & C2 formulas:
       // x / (p * q) >= low
       // p * next_prime(p) <= x / low
       // p <= sqrt(x / low)
       T sqrt_xlow = isqrt(xlow);
       int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-      int64_t max_b = pi[min(sqrt_xlow, x13)];
+      int64_t max_a = pi[min(sqrt_xlow, x13)];
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       for_atomic_inc(min_c2, b <= max_c2, atomic_c2)
@@ -406,7 +409,7 @@ T AC_OpenMP(T x,
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
-      for_atomic_inc(pi_x_star + 1, b <= max_b, atomic_a)
+      for_atomic_inc(min_a, b <= max_a, atomic_a)
       {
         int64_t prime = primes[b];
         T xp = x / prime;
