@@ -36,8 +36,8 @@ namespace primecount {
 class SegmentedPiTable : public BitSieve240
 {
 public:
-  SegmentedPiTable(uint64_t max_high, uint64_t segment_size);
-  void init(uint64_t low);
+  void init(uint64_t low, uint64_t high);
+  static int64_t get_segment_size(uint64_t max_high, int threads);
 
   int64_t low() const
   {
@@ -66,8 +66,8 @@ public:
   }
 
 private:
-  void init_bits(uint64_t start, uint64_t stop);
-  void init_count(uint64_t start, uint64_t stop);
+  void init_bits();
+  void init_count(uint64_t pi_low);
 
   struct pi_t
   {
@@ -76,11 +76,8 @@ private:
   };
 
   std::vector<pi_t> pi_;
-  uint64_t pi_low_ = 0;
   uint64_t low_ = 0;
   uint64_t high_ = 0;
-  uint64_t max_high_ = 0;
-  uint64_t segment_size_ = 0;
 };
 
 } // namespace

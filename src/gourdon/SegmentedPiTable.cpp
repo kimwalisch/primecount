@@ -27,68 +27,87 @@
 #include <min.hpp>
 
 #include <stdint.h>
-#include <cstring>
+#include <cassert>
 
 namespace primecount {
 
-SegmentedPiTable::SegmentedPiTable(uint64_t max_high, uint64_t segment_size)
-  : max_high_(max_high),
-    segment_size_(segment_size)
-{ }
-
-void SegmentedPiTable::init(uint64_t low)
+void SegmentedPiTable::init(uint64_t low, uint64_t high)
 {
-  assert(low < max_high_);
-  assert(low % 2 == 0);
+  assert(low < high);
+  assert(low % 240 == 0);
+  uint64_t pi_low;
 
   if (low <= 5)
-    pi_low_ = pi_tiny_[5];
+    pi_low = pi_tiny_[5];
   else if (low == high_)
-    pi_low_ = operator[](low - 1);
+    pi_low = operator[](low - 1);
   else
-    pi_low_ = pi_noprint(low - 1, 1);
+    pi_low = pi_noprint(low - 1, 1);
 
   low_ = low;
-  high_ = low + segment_size_;
+  high_ = high;
+  uint64_t segment_size = high - low;
+  uint64_t size = ceil_div(segment_size, 240);
   pi_.clear();
-  pi_.resize(segment_size_ / 240);
+  pi_.resize(size);
 
-  init_bits(low_, high_);
-  init_count(low_, high_);
+  init_bits();
+  init_count(pi_low);
 }
 
-/// Each thread computes PrimePi [start, stop[
-void SegmentedPiTable::init_bits(uint64_t start, uint64_t stop)
+/// Each thread computes PrimePi [low, high[
+void SegmentedPiTable::init_bits()
 {
   // Iterate over primes > 5
-  primesieve::iterator it(max(start, 5), stop);
+  primesieve::iterator it(max(low_, 5), high_);
   uint64_t prime = 0;
 
   // Each thread iterates over the primes
-  // inside [start, stop[ and initializes
+  // inside [low, high[ and initializes
   // the pi[x] lookup table.
-  while ((prime = it.next_prime()) < stop)
+  while ((prime = it.next_prime()) < high_)
   {
     uint64_t p = prime - low_;
     pi_[p / 240].bits |= set_bit_[p % 240];
   }
 }
 
-/// Each thread computes PrimePi [start, stop[
-void SegmentedPiTable::init_count(uint64_t start, uint64_t stop)
+/// Each thread computes PrimePi [low, high[
+void SegmentedPiTable::init_count(uint64_t pi_low)
 {
-  // First compute PrimePi[start - 1]
-  uint64_t count = pi_low_;
+  uint64_t high_idx = ceil_div((high_ - low_), 240);
 
-  // Convert to array indexes
-  uint64_t i = (start - low_) / 240;
-  uint64_t stop_idx = ceil_div((stop - low_), 240);
-
-  for (; i < stop_idx; i++)
+  for (uint64_t i = 0; i < high_idx; i++)
   {
-    pi_[i].count = count;
-    count += popcnt64(pi_[i].bits);
+    pi_[i].count = pi_low;
+    pi_low += popcnt64(pi_[i].bits);
   }
+}
+
+int64_t SegmentedPiTable::get_segment_size(uint64_t max_high, int threads)
+{
+  int64_t segment_size;
+  int64_t numbers_per_byte = 240 / sizeof(pi_t);
+
+  if (threads == 1)
+  {
+    // CPU L2 cache size per core
+    int64_t l2_cache_size = 256 << 10;
+    segment_size = l2_cache_size * numbers_per_byte;
+  }
+  else
+  {
+    segment_size = isqrt(max_high) * 2;
+
+    // Minimum segment size = 4 KiB
+    int64_t min_segment_size = (4 << 10) * numbers_per_byte;
+    segment_size = max(min_segment_size, segment_size);
+  }
+
+  segment_size = min(segment_size, max_high);
+  segment_size += 240 - segment_size % 240;
+
+  return segment_size;
 }
 
 } // namespace

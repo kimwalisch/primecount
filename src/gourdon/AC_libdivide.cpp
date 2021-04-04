@@ -308,8 +308,7 @@ T AC_OpenMP(T x,
   T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
-  int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
+  atomic<int64_t> atomic_c1(-1);
   StatusAC status(x);
 
   // Initialize libdivide vector using primes
@@ -330,12 +329,8 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
-  int64_t segment_size = max(isqrt(sqrtx), (16 << 10) * 15);
-  segment_size += 240 - segment_size % 240;
-
-  atomic<int64_t> atomic_a(-1);
-  atomic<int64_t> atomic_c1(-1);
-  atomic<int64_t> atomic_c2(-1);
+  int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
+  threads = ideal_num_threads(threads, sqrtx, segment_size);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -358,10 +353,9 @@ T AC_OpenMP(T x,
       int64_t min_m = min(min_m128, max_m);
 
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
-      status.print(b, pi_x13);
     }
 
-    SegmentedPiTable segmentedPi(sqrtx, segment_size);
+    SegmentedPiTable segmentedPi;
 
     // This computes A and the 2nd part of the C formula.
     // Find all special leaves of type:
@@ -374,8 +368,8 @@ T AC_OpenMP(T x,
     for (int64_t low = 0; low < sqrtx; low += segment_size)
     {
       // Current segment [low, high[
-      segmentedPi.init(low);
-      int64_t high = segmentedPi.high();
+      int64_t high = min(low + segment_size, sqrtx);
+      segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;
 
@@ -403,8 +397,6 @@ T AC_OpenMP(T x,
           sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
         else
           sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
-
-        //status.print(b, max_b);
       }
 
       // A formula: pi[x_star] < b <= pi[x13]
@@ -417,8 +409,6 @@ T AC_OpenMP(T x,
           sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
         else
           sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
-
-        //status.print(b, max_b);
       }
     }
   }
