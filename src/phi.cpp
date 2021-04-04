@@ -296,10 +296,7 @@ private:
 ///
 int64_t phi_pix(int64_t x, int64_t a, int threads)
 {
-  bool print = is_print();
-  set_print(false);
-
-  int64_t pix = pi(x, threads);
+  int64_t pix = pi_noprint(x, threads);
   int64_t sum;
 
   if (a <= pix)
@@ -307,7 +304,6 @@ int64_t phi_pix(int64_t x, int64_t a, int threads)
   else
     sum = 1;
 
-  set_print(print);
   return sum;
 }
 
