@@ -1,10 +1,11 @@
 ///
 /// @file  AC.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(y) by segmenting
-///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime * m) < high.
+///        prime counting algorithm. In this implementation the memory
+///        usage of the pi[x] lookup table has been reduced from
+///        O(x^(1/2)) to O(x^(1/4)) by using a segmented pi[x] lookup
+///        table. In each segment we process the leaves that satisfy:
+///        low <= x / (prime * m) < high.
 ///
 ///        The A & C formulas roughly correspond to the easy special
 ///        leaves in the Deleglise-Rivat algorithm. Since both
@@ -204,12 +205,11 @@ T AC_OpenMP(T x,
   T sum = 0;
   StatusAC status(is_print);
 
-  // PiTable's size >= z because of the C1 formula.
-  // We could use segmentation for the C1 formula but this
-  // would not increase overall performance (because C1
-  // computes very quickly) and the overall memory usage
-  // would also not much be reduced.
-  PiTable pi(max(z, max_a_prime), threads);  
+  // PiTable's size = z because of the C1 formula.
+  // PiTable is accessed much less frequently than
+  // SegmentedPiTable, hence it is OK that PiTable's size
+  // is fairly large and does not fit into the CPU's cache.
+  PiTable pi(max(z, max_a_prime), threads);
 
   int64_t sqrtx = isqrt(x);
   int64_t x13 = iroot<3>(x);
@@ -221,7 +221,8 @@ T AC_OpenMP(T x,
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
   int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, threads);
-  threads = ideal_num_threads(threads, sqrtx, segment_size);
+  int64_t thread_threshold = segment_size * 16;
+  threads = ideal_num_threads(threads, sqrtx, thread_threshold);
   atomic<int64_t> atomic_b(min_c1);
   atomic<int64_t> atomic_low(0);
 
@@ -235,6 +236,10 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
+    // SegmentedPiTable is accessed very frequently.
+    // In order to get good performance it is important that
+    // SegmentedPiTable fits into the CPU's cache.
+    // Hence we use a small segment_size of x^(1/4).
     SegmentedPiTable segmentedPi;
     status.print(0, sqrtx, segment_size);
 

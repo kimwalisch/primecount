@@ -4,7 +4,7 @@
 ///        algorithm require looking up PrimePi[n] values with
 ///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
 ///        would use too much memory we need a segmented PrimePi[n]
-///        lookup table that uses only O(y) memory.
+///        lookup table that uses only O(x^(1/4)) memory.
 ///
 ///        The SegmentedPiTable class is a compressed lookup table of
 ///        prime counts. Each bit of the lookup table corresponds to
@@ -87,10 +87,11 @@ void SegmentedPiTable::init_count(uint64_t pi_low)
 int64_t SegmentedPiTable::get_segment_size(uint64_t max_high, int threads)
 {
   // CPU cache sizes per core
-  int64_t l1_cache_size = 32 << 10;
-  int64_t l2_cache_size = 512 << 10;
-  int64_t numbers_per_byte = 240 / sizeof(pi_t);
-  int64_t segment_size;
+  uint64_t l1_cache_size = 32 << 10;
+  uint64_t l2_cache_size = 512 << 10;
+  uint64_t l3_cache_size = 16 << 20;
+  uint64_t numbers_per_byte = 240 / sizeof(pi_t);
+  uint64_t segment_size;
 
   if (threads == 1)
     segment_size = l2_cache_size * numbers_per_byte;
@@ -100,11 +101,11 @@ int64_t SegmentedPiTable::get_segment_size(uint64_t max_high, int threads)
 
     // We use a segment_size that is slightly larger than
     // x^(1/4) but that still fits into the CPU's cache.
-    if (segment_size * 8 <= l1_cache_size)
+         if ((segment_size * 8) / sizeof(pi_t) <= l1_cache_size)
       segment_size *= 8;
-    else if (segment_size * 4 <= l2_cache_size)
+    else if ((segment_size * 4) / sizeof(pi_t) <= l2_cache_size)
       segment_size *= 4;
-    else
+    else if ((segment_size * 2) / sizeof(pi_t) <= l3_cache_size)
       segment_size *= 2;
 
     // Minimum segment size = 1 KiB
