@@ -44,6 +44,7 @@ int64_t pi_primesieve(int64_t x);
 
 int64_t nth_prime(int64_t n, int threads);
 int64_t phi(int64_t x, int64_t a, int threads);
+int64_t phi_noprint(int64_t x, int64_t a);
 int64_t phi_noprint(int64_t x, int64_t a, int threads);
 int64_t P2(int64_t x, int64_t y, int threads);
 int64_t P2_noprint(int64_t x, int64_t y, int threads);

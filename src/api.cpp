@@ -133,6 +133,11 @@ int64_t nth_prime(int64_t n)
 
 int64_t phi(int64_t x, int64_t a)
 {
+  return phi(x, a, get_num_threads());
+}
+
+int64_t phi_noprint(int64_t x, int64_t a)
+{
   return phi_noprint(x, a, get_num_threads());
 }
 
