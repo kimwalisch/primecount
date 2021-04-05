@@ -59,11 +59,6 @@ public:
     return high_;
   }
 
-  int64_t max_high() const
-  {
-    return max_high_;
-  }
-
   /// Get number of primes <= n
   ALWAYS_INLINE int64_t operator[](uint64_t n) const
   {
