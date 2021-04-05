@@ -14,18 +14,24 @@
 
 namespace primecount {
 
-class SegmentedPiTable;
-
 class StatusAC
 {
 public:
-  void print(const SegmentedPiTable& segmentedPi);
+  StatusAC(maxint_t x);
+  void print(int64_t b, int64_t max_b);
+  void next();
 private:
   bool isPrint(double time);
+  void print(double percent);
+  double epsilon_;
+  double percent_ = -1;
+  double percent_total_ = 0;
+  double percent_segment_ = 70;
   double time_ = 0;
   // Only print status if 0.1 seconds have elapsed
   // since last printing the status.
   double is_print_ = 0.1;
+  int precision_;
 };
 
 } // namespace

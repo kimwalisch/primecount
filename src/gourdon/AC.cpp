@@ -206,7 +206,7 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-  StatusAC status;
+  StatusAC status(x);
 
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than
@@ -220,6 +220,7 @@ T AC_OpenMP(T x,
   // Hence we use a small size of x^(1/3).
   SegmentedPiTable segmentedPi(sqrtx, x13, threads);
 
+  int64_t pi_x13 = pi[x13];
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
@@ -241,8 +242,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    status.print(segmentedPi);
-
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_inc(min_c1, b <= pi_sqrtz, atomic_c1)
     {
@@ -251,7 +250,9 @@ T AC_OpenMP(T x,
       int64_t max_m = min(xp / prime, z);
       T min_m128 = max(xp / (prime * prime), z / prime);
       int64_t min_m = min(min_m128, max_m);
+
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+      status.print(b, pi_x13);
     }
 
     // This computes A and the 2nd part of the C formula.
@@ -265,7 +266,6 @@ T AC_OpenMP(T x,
     {
       // Current segment [low, high[
       segmentedPi.init();
-      status.print(segmentedPi);
       int64_t low = segmentedPi.low();
       int64_t high = segmentedPi.high();
       T xlow = x / max(low, 1);
@@ -290,11 +290,17 @@ T AC_OpenMP(T x,
 
       // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
       for_atomic_inc(min_c2, b <= max_c2, atomic_c2)
+      {
         sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
+        status.print(b, max_a);
+      }
 
       // A formula: pi[x_star] < b <= pi[x13]
       for_atomic_inc(min_a, b <= max_a, atomic_a)
+      {
         sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
+        status.print(b, max_a);
+      }
 
       // Is this the last segment?
       if (high >= sqrtx)
@@ -306,6 +312,7 @@ T AC_OpenMP(T x,
       #pragma omp master
       {
         segmentedPi.next();
+        status.next();
         atomic_a = -1;
         atomic_c2 = -1;
       }
