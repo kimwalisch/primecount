@@ -1,4 +1,19 @@
-Changes in primecount-6.4, 2021-03-19
+Changes in primecount-6.5, 2021-04-02
+
+In primecout-6.4 (and earlier) the AC formula scales very badly on
+servers with a large number of CPU cores. The root cause of this
+scaling issue is the SegmentedPiTable lookup table which is accessed
+randomly and which is much too large to fit into the CPU's cache. In
+primecount-6.5 the AC algorithm as been slightly modified to allow a
+much smaller SegmentedPiTable without deteriorating the runtime
+complexity of the algorithm.
+
+* AC.cpp: Decrease SegmentedPiTable by a factor > log(x).
+* AC_libdivide.cpp: Decrease SegmentedPiTable by a factor > log(x).
+* SegmentedPiTable.cpp: Increase minimum segment size to 2 MiB.
+* StatusAC.cpp: Display segment number instead of percent.
+
+Changes in primecount-6.4, 2021-03-20
 
 This version fixes a critical integer overflow in the B formula
 which is part of Xavier Gourdon's prime counting algorithm. The

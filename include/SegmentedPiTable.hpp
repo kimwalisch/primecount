@@ -4,7 +4,7 @@
 ///        algorithm require looking up PrimePi[n] values with
 ///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
 ///        would use too much memory we need a segmented PrimePi[n]
-///        lookup table that uses only O(y) memory.
+///        lookup table that uses only O(x^(1/3)) memory.
 ///
 ///        The SegmentedPiTable class is a compressed lookup table of
 ///        prime counts. Each bit of the lookup table corresponds to
@@ -38,7 +38,7 @@ class SegmentedPiTable : public BitSieve240
 {
 public:
   SegmentedPiTable(uint64_t low,
-                   uint64_t limit,
+                   uint64_t max_high,
                    uint64_t segment_size,
                    int threads);
 
@@ -57,6 +57,11 @@ public:
   int64_t high() const
   {
     return high_;
+  }
+
+  int64_t max_high() const
+  {
+    return max_high_;
   }
 
   /// Get number of primes <= n

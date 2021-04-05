@@ -44,7 +44,7 @@ int64_t pi_legendre(int64_t x, int threads)
   print("a", a);
   print("threads", threads);
 
-  int64_t phi_xa = phi_print(x, a, threads);
+  int64_t phi_xa = phi(x, a, threads);
   int64_t sum = phi_xa + a - 1;
 
   return sum;
@@ -61,7 +61,7 @@ int64_t pi_simple(int64_t x, int threads)
 
   int64_t y = isqrt(x);
   int64_t a = pi_simple(y, threads);
-  int64_t sum = phi(x, a, threads) + a - 1;
+  int64_t sum = phi_noprint(x, a, threads) + a - 1;
 
   return sum;
 }

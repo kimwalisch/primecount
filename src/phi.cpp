@@ -335,6 +335,22 @@ namespace primecount {
 ///
 int64_t phi(int64_t x, int64_t a, int threads)
 {
+  print("");
+  print("=== phi(x, a) ===");
+
+  double time = get_time();
+  int64_t sum = phi_noprint(x, a, threads);
+  print("phi", sum, time);
+
+  return sum;
+}
+
+/// Partial sieve function (a.k.a. Legendre-sum).
+/// phi(x, a) counts the numbers <= x that are not divisible
+/// by any of the first a primes.
+///
+int64_t phi_noprint(int64_t x, int64_t a, int threads)
+{
   if (x < 1) return 0;
   if (a < 1) return x;
 
@@ -382,24 +398,6 @@ int64_t phi(int64_t x, int64_t a, int threads)
     for (int64_t i = c; i < a; i++)
       sum += cache.phi<-1>(x / primes[i + 1], i);
   }
-
-  return sum;
-}
-
-/// The default phi(x, a) implementation does not print anything to the
-/// screen as it is used by pi_simple(x) which is used all over the
-/// place (e.g. to initialize S1, S2, P2, P3, ...) and we don't want to
-/// print any info about this. Hence we also provide phi_print(x, a) for
-/// use cases where we do want to print the result of phi(x, a).
-///
-int64_t phi_print(int64_t x, int64_t a, int threads)
-{
-  print("");
-  print("=== phi(x, a) ===");
-
-  double time = get_time();
-  int64_t sum = phi(x, a, threads);
-  print("phi", sum, time);
 
   return sum;
 }

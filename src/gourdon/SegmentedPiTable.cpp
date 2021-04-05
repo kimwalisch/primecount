@@ -4,7 +4,7 @@
 ///        algorithm require looking up PrimePi[n] values with
 ///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
 ///        would use too much memory we need a segmented PrimePi[n]
-///        lookup table that uses only O(y) memory.
+///        lookup table that uses only O(x^(1/3)) memory.
 ///
 ///        The SegmentedPiTable class is a compressed lookup table of
 ///        prime counts. Each bit of the lookup table corresponds to
@@ -32,18 +32,23 @@
 namespace primecount {
 
 SegmentedPiTable::SegmentedPiTable(uint64_t low,
-                                   uint64_t limit,
+                                   uint64_t max_high,
                                    uint64_t segment_size,
                                    int threads)
   : counts_(threads),
     low_(low),
-    max_high_(limit + 1),
+    max_high_(max_high),
     threads_(threads)
 {
-  // Minimum segment size = 512 KiB (L2 cache size),
-  // a large segment size improves load balancing.
+  // The threads in our AC algorithm are not completely
+  // independent from each other. After each segment all
+  // threads need to be synchronized. On servers with a
+  // large number of CPU cores this can add a lot of
+  // overhead. For this reason we set a large minimum
+  // segment size here (2 MiB, should be >= CPU L2 cache
+  // and <= CPU L3 cache) to avoid such scaling issues.
   uint64_t numbers_per_byte = 240 / sizeof(pi_t);
-  uint64_t min_segment_size = (512 << 10) * numbers_per_byte;
+  uint64_t min_segment_size = (2 << 20) * numbers_per_byte;
   segment_size_ = max(segment_size, min_segment_size);
   segment_size_ = min(segment_size_, max_high_);
 

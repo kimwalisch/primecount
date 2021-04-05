@@ -1,10 +1,11 @@
 ///
 /// @file  AC_libdivide.cpp
 /// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this version the memory usage
-///        has been reduced from O(x^(1/2)) to O(y) by segmenting
-///        the pi[x] lookup table. In each segment we process the
-///        leaves that satisfy: low <= x / (prime * m) < high.
+///        prime counting algorithm. In this implementation the memory
+///        usage of the pi[x] lookup table has been reduced from
+///        O(x^(1/2)) to O(x^(1/3)) by using a segmented pi[x] lookup
+///        table. In each segment we process the leaves that satisfy:
+///        low <= x / (prime * m) < high.
 ///
 ///        The A & C formulas roughly correspond to the easy special
 ///        leaves in the Deleglise-Rivat algorithm. Since both
@@ -443,7 +444,7 @@ T C2_64(T xlow,
     uint64_t xpq = xp / primes[i];
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
     uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
-    uint64_t i2 = segmentedPi[xpq2];
+    uint64_t i2 = pi[max(xpq2, min_clustered)];
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -498,7 +499,7 @@ T C2_128(T xlow,
     uint64_t xpq = fast_div64(xp, primes[i]);
     uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
     uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    uint64_t i2 = segmentedPi[xpq2];
+    uint64_t i2 = pi[max(xpq2, min_clustered)];
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -536,11 +537,10 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
   StatusAC status(x);
 
-  // PiTable's size >= z because of the C1 formula.
-  // We could use segmentation for the C1 formula but this
-  // would not increase overall performance (because C1
-  // computes very quickly) and the overall memory usage
-  // would also not much be reduced.
+  // PiTable's size = z because of the C1 formula.
+  // PiTable is accessed much less frequently than
+  // SegmentedPiTable, hence it is OK that PiTable's size
+  // is fairly large and does not fit into the CPU's cache. 
   PiTable pi(max(z, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
@@ -641,12 +641,11 @@ T AC_OpenMP(T x,
     copy.clear();
   }
 
-  // SegmentedPiTable's size >= y because of the C2 formula.
-  // The C2 algorithm can be modified to work with smaller segment
-  // sizes such as x^(1/3) which improves the cache efficiency.
-  // However using a segment size < y deteriorates the algorithm's
-  // runtime complexity by a factor of log(x).
-  SegmentedPiTable segmentedPi(low, sqrtx, y, threads);
+  // SegmentedPiTable is accessed very frequently.
+  // In order to get good performance it is important that
+  // SegmentedPiTable fits into the CPU's cache.
+  // Hence we use a small size of x^(1/3).
+  SegmentedPiTable segmentedPi(low, sqrtx, x13, threads);
 
   // Initialize libdivide vector using primes
   vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
@@ -676,6 +675,10 @@ T AC_OpenMP(T x,
     min_b = max(min_b, pi[min(xhigh / y, x_star)]);
     min_b += 1;
     next_b = max(next_b, min_b);
+
+    int64_t min_a = min(xhigh / high, x13);
+    min_a = pi[max(x_star, min_a)] + 1;
+    if (next_b == pi_x_star + 1) next_b = min_a;
 
     // Upper bound of A & C2 formulas:
     // x / (p * q) >= low
@@ -735,6 +738,7 @@ T AC_OpenMP(T x,
         #pragma omp critical (ac)
         {
           sum += sum_thread;
+          if (next_b == pi_x_star + 1) next_b = min_a;
           b = next_b++;
 
           update(json, thread_id, "sum_ac", b, next_b, max_b, sum);
