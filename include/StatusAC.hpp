@@ -28,7 +28,7 @@ private:
   double epsilon_;
   double percent_ = -1;
   double percent_total_ = 0;
-  double percent_segment_ = 80;
+  double percent_segment_ = 70;
   double time_ = 0;
   // Only print status if 0.1 seconds have elapsed
   // since last printing the status.
