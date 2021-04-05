@@ -63,14 +63,6 @@ SegmentedPiTable::SegmentedPiTable(uint64_t max_high,
 ///
 void SegmentedPiTable::init(uint64_t low, uint64_t high)
 {
-  #pragma omp master
-  {
-    if (low > 0)
-      pi_low_ = operator[](low - 1);
-    low_ = low;
-    high_ = min(high, max_high_);
-  }
-
   uint64_t thread_size = segment_size_ / threads_;
   uint64_t min_thread_size = (uint64_t) 1e6;
   thread_size = max(min_thread_size, thread_size);
@@ -84,7 +76,22 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
     thread_high = min(thread_high, high);
 
     if (thread_low < thread_high)
+    {
+      // Initialize pi[low] using value from previous segment
+      if (low > 0 && thread_high == high)
+        pi_low_ = operator[](low - 1);
+
       init_bits(low, thread_low, thread_high, t);
+    }
+  }
+
+  #pragma omp master
+  {
+    // low & high must be initialized after
+    // pi_low because pi[low] requires value
+    // from previous segment.
+    low_ = low;
+    high_ = min(high, max_high_);
   }
 
   #pragma omp for
