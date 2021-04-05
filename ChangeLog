@@ -11,7 +11,6 @@ complexity of the algorithm.
 * AC.cpp: Decrease SegmentedPiTable by a factor > log(x).
 * AC_libdivide.cpp: Decrease SegmentedPiTable by a factor > log(x).
 * SegmentedPiTable.cpp: Increase minimum segment size to 2 MiB.
-* StatusAC.cpp: Display segment number instead of percent.
 
 Changes in primecount-6.4, 2021-03-20
 
