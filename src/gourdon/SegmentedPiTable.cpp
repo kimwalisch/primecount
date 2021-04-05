@@ -77,21 +77,19 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
 
     if (thread_low < thread_high)
     {
-      // Initialize pi[low] using value from previous segment
-      if (low > 0 && thread_high == high)
-        pi_low_ = operator[](low - 1);
+      // Initialize pi_low using value from previous segment.
+      // This must be done by the last thread before this
+      // thread overwrites the data from the previous segment.
+      if (thread_high == high)
+      {
+        if (low > 0)
+          pi_low_ = operator[](low - 1);
+        low_ = low;
+        high_ = min(high, max_high_);
+      }
 
       init_bits(low, thread_low, thread_high, t);
     }
-  }
-
-  #pragma omp master
-  {
-    // low & high must be initialized after
-    // pi_low because pi[low] requires value
-    // from previous segment.
-    low_ = low;
-    high_ = min(high, max_high_);
   }
 
   #pragma omp for
