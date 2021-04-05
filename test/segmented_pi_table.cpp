@@ -40,16 +40,21 @@ int main()
 
   PiTable pi(limit, threads);
   SegmentedPiTable segmentedPi(limit, segment_size, threads);
-  segmentedPi.init();
+  segment_size = segmentedPi.segment_size();
+
   int64_t i = 0;
+  int64_t low = 0;
+  int64_t high = segment_size;
+  segmentedPi.init(low, high); 
 
   // Check small pi(x) values
   for (; i <= 1000; i++)
   {
-    while (i >= segmentedPi.high())
+    while (i >= high)
     {
-      segmentedPi.next();
-      segmentedPi.init();
+      low = high;
+      high = low + segment_size;
+      segmentedPi.init(low, high);
     }
 
     cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
@@ -59,20 +64,22 @@ int main()
   // Check large pi(x) values
   for (; i < limit; i += dist2(gen))
   {
-    while (i >= segmentedPi.high())
+    while (i >= high)
     {
-      segmentedPi.next();
-      segmentedPi.init();
+      low = high;
+      high = low + segment_size;
+      segmentedPi.init(low, high);
     }
 
     cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
     check(segmentedPi[i] == pi[i]);
   }
 
-  while (limit > segmentedPi.high())
+  while (limit > high)
   {
-    segmentedPi.next();
-    segmentedPi.init();
+    low = high;
+    high = low + segment_size;
+    segmentedPi.init(low, high);
   }
 
   // Check max pi(x) value.

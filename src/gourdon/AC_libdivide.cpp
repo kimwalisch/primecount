@@ -326,6 +326,7 @@ T AC_OpenMP(T x,
   // SegmentedPiTable fits into the CPU's cache.
   // Hence we use a small size of x^(1/3).
   SegmentedPiTable segmentedPi(sqrtx, x13, threads);
+  int64_t segment_size = segmentedPi.segment_size();
 
   int64_t pi_x13 = pi[x13];
   int64_t pi_y = pi[y];
@@ -369,12 +370,12 @@ T AC_OpenMP(T x,
     // Since we need to lookup PrimePi[n] values for n < x^(1/2)
     // we use a segmented PrimePi[n] table of size O(x^(1/3))
     // to reduce the memory usage.
-    while (segmentedPi.low() < sqrtx)
+    for (int64_t low = 0; low < sqrtx; low += segment_size)
     {
       // Current segment [low, high[
-      segmentedPi.init();
-      int64_t low = segmentedPi.low();
-      int64_t high = segmentedPi.high();
+      int64_t high = low + segment_size;
+      high = min(high, sqrtx);
+      segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;
 
@@ -432,13 +433,10 @@ T AC_OpenMP(T x,
       #pragma omp barrier
       #pragma omp master
       {
-        segmentedPi.next();
         status.next();
         atomic_a = -1;
         atomic_c2 = -1;
       }
-
-      #pragma omp barrier
     }
   }
 

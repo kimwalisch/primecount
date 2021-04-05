@@ -40,7 +40,8 @@ public:
   SegmentedPiTable(uint64_t max_high,
                    uint64_t segment_size,
                    int threads);
-  void init();
+
+  void init(uint64_t low, uint64_t high);
   void next();
 
   int64_t low() const
@@ -51,6 +52,11 @@ public:
   int64_t high() const
   {
     return high_;
+  }
+
+  int64_t segment_size() const
+  {
+    return segment_size_;
   }
 
   /// Get number of primes <= n
@@ -70,8 +76,8 @@ public:
   }
 
 private:
-  void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
-  void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init_bits(uint64_t low, uint64_t thread_low, uint64_t thread_high, uint64_t thread_num);
+  void init_count(uint64_t low, uint64_t thread_low, uint64_t thread_high, uint64_t thread_num);
 
   struct pi_t
   {
@@ -81,9 +87,9 @@ private:
 
   pod_vector<pi_t> pi_;
   aligned_vector<uint64_t> counts_;
-  uint64_t low_ = 0;
   uint64_t pi_low_ = pi_tiny_[5];
-  uint64_t high_;
+  uint64_t low_ = 0;
+  uint64_t high_ = 0;
   uint64_t max_high_;
   uint64_t segment_size_;
   int threads_;
