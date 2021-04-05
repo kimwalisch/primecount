@@ -9,7 +9,7 @@
 ///        pi(x) = pi(y) + phi(x, a) - 1 - P2(x, a)
 ///        with y = x^1/3, a = pi(y)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,7 +43,7 @@ int64_t pi_meissel(int64_t x, int threads)
   print("a", a);
   print("threads", threads);
 
-  int64_t phi_xa = phi_print(x, a, threads);
+  int64_t phi_xa = phi(x, a, threads);
   int64_t p2 = P2(x, y, threads);
   int64_t sum = phi_xa + a - 1 - p2;
 

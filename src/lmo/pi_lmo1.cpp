@@ -11,7 +11,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -53,13 +53,13 @@ int64_t pi_lmo1(int64_t x)
   // ordinary leaves
   for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > primes[c])
-      S1 += mu[n] * phi(x / n, c);
+      S1 += mu[n] * phi_noprint(x / n, c);
 
   // special leaves
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])
-        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
+        S2 -= mu[m] * phi_noprint(x / (primes[b] * m), b - 1);
 
   int64_t phi = S1 + S2;
   int64_t sum = phi + pi_y - 1 - P2(x, y, 1);
