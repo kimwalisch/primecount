@@ -1,8 +1,8 @@
 ///
-/// @file  LoadBalancerAC.cpp
+/// @file  LoadBalancerAC.hpp
 /// @brief This load balancer assigns work to the threads in the
-///        computation of the 2nd partial sieve function.
-///        It is used by the P2(x, a) and B(x, y) functions.
+///        computation of the A & C formulas (AC.cpp) in
+///        Xavier Gourdon's algorithm.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///

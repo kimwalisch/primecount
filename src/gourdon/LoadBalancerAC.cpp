@@ -1,5 +1,8 @@
 ///
 /// @file  LoadBalancerAC.cpp
+/// @brief This load balancer assigns work to the threads in the
+///        computation of the A & C formulas (AC.cpp) in
+///        Xavier Gourdon's algorithm.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///

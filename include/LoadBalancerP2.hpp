@@ -1,5 +1,5 @@
 ///
-/// @file  LoadBalancerP2.cpp
+/// @file  LoadBalancerP2.hpp
 /// @brief This load balancer assigns work to the threads in the
 ///        computation of the 2nd partial sieve function.
 ///        It is used by the P2(x, a) and B(x, y) functions.
