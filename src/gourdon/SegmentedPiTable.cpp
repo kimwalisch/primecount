@@ -59,8 +59,9 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
 void SegmentedPiTable::init_bits()
 {
   // Iterate over primes > 5
-  primesieve::iterator it(max(low_, 5), high_);
+  uint64_t start = max(low_, 5);
   uint64_t prime = 0;
+  primesieve::iterator it(start, high_);
 
   // Each thread iterates over the primes
   // inside [low, high[ and initializes
