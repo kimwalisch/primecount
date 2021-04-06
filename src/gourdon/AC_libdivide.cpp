@@ -327,7 +327,7 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
-  threads = ideal_num_threads(threads, sqrtx, x13);
+  threads = ideal_num_threads(threads, x13, 1000);
   LoadBalancerAC loadBalancer(sqrtx, x13, y, threads); 
   atomic<int64_t> atomic_b(min_c1);
 
