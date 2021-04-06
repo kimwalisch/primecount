@@ -14,21 +14,18 @@
 #include <imath.hpp>
 
 #include <stdint.h>
-#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
 namespace primecount {
 
 LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
-                               int64_t x13,
                                int64_t y,
                                int threads) :
   low_(0),
   sqrtx_(sqrtx),
-  x13_(x13),
   x14_(isqrt(sqrtx)),
-  x29_(std::pow(x13, 2.0 / 3)),
   y_(y),
   threads_(threads)
 { }
@@ -53,23 +50,23 @@ bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
     // This is tiny, will fit into the CPU's cache.
     segment_size = x14_;
 
-    // Most special leaves are below x^(1/3).
+    // Most special leaves are below y (~ x^(1/3) * log(x)).
     // We make sure this interval is evenly distributed
-    // amongst all threads. Above x^(1/3) we slowly
-    // increase the segment size but still ensure that
-    // it fits into the CPU's cache.
-    if (low_ <= x13_ && x14_ * threads_ > x13_)
-      segment_size = x29_;
-    else if (low_ <= x13_ * 4)
-      segment_size = x14_;
-    else if (low_ <= y_)
-      segment_size = x14_ * 2;
-    else if (segment_size / numbers_per_byte <= l2_cache_size &&
-              low_ + (l2_cache_size * numbers_per_byte * threads_) / 4 <= sqrtx_)
-      segment_size = l2_cache_size * numbers_per_byte;
-    else if (segment_size / numbers_per_byte <= l1_cache_size &&
-              low_ + (l1_cache_size * numbers_per_byte * threads_) / 2 <= sqrtx_)
-      segment_size = l1_cache_size * numbers_per_byte;
+    // amongst all threads. Above y we slowly increase the
+    // segment size but still ensure that it fits into the
+    // CPU's cache.
+    if (low_ > y_)
+    {
+      if (segment_size <= l2_cache_size * numbers_per_byte &&
+          low_ + (l2_cache_size * numbers_per_byte * threads_) / 4 <= sqrtx_)
+        segment_size = l2_cache_size * numbers_per_byte;
+      else if (segment_size <= l1_cache_size * numbers_per_byte &&
+               low_ + (l1_cache_size * numbers_per_byte * threads_) / 2 <= sqrtx_)
+        segment_size = l1_cache_size * numbers_per_byte;
+      else if (segment_size * 4 <= l1_cache_size * numbers_per_byte &&
+               low_ + (segment_size * 4 * threads_) / 2 <= sqrtx_)
+        segment_size *= 4;
+    }
   }
 
   // Minimum segment size = 1 KiB

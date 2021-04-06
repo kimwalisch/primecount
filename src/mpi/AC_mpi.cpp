@@ -196,7 +196,7 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, x13, y, threads);
+  LoadBalancerAC loadBalancer(sqrtx, y, threads);
   StatusAC status(is_print);
 
   // PiTable's size = z because of the C1 formula.

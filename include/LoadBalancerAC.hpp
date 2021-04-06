@@ -21,15 +21,13 @@ namespace primecount {
 class LoadBalancerAC
 {
 public:
-  LoadBalancerAC(int64_t sqrtx, int64_t x13, int64_t y, int threads);
+  LoadBalancerAC(int64_t sqrtx, int64_t y, int threads);
   bool get_work(int64_t& low, int64_t& high);
 
 private:
   int64_t low_;
   int64_t sqrtx_;
-  int64_t x13_;
   int64_t x14_;
-  int64_t x29_;
   int64_t y_;
   int threads_;
   OmpLock lock_;
