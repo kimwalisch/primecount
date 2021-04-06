@@ -51,10 +51,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     segment_size_ = x14_;
   }
 
-  segment_size_ = std::max(min_segment_size, segment_size_);
-
-  if (segment_size_ % 240)
-    segment_size_ += 240 - segment_size_ % 240;
+  validate_segment_size();
 }
 
 bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
@@ -79,16 +76,20 @@ bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
       segment_size_ *= 4;
   }
 
-  segment_size_ = std::max(min_segment_size, segment_size_);
-
-  if (segment_size_ % 240)
-    segment_size_ += 240 - segment_size_ % 240;
-
+  validate_segment_size();
   low = low_;
   high = std::min(low + segment_size_, sqrtx_);
   low_ = high;
 
   return low < sqrtx_;
+}
+
+void LoadBalancerAC::validate_segment_size()
+{
+  segment_size_ = std::max(min_segment_size, segment_size_);
+
+  if (segment_size_ % 240)
+    segment_size_ += 240 - segment_size_ % 240;
 }
 
 } // namespace

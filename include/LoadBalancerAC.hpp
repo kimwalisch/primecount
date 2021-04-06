@@ -25,6 +25,7 @@ public:
   bool get_work(int64_t& low, int64_t& high);
 
 private:
+  void validate_segment_size();
   int64_t low_;
   int64_t sqrtx_;
   int64_t x14_;
