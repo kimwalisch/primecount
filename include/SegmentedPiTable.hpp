@@ -48,6 +48,11 @@ public:
     return high_;
   }
 
+  static constexpr int64_t numbers_per_byte()
+  {
+    return 240 / sizeof(pi_t);
+  }
+
   /// Get number of primes <= n
   ALWAYS_INLINE int64_t operator[](uint64_t n) const
   {

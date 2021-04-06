@@ -11,6 +11,7 @@
 ///
 
 #include <LoadBalancerAC.hpp>
+#include <SegmentedPiTable.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -22,8 +23,8 @@ namespace {
 const int64_t l1_cache_size = 32 << 10;
 const int64_t l2_cache_size = 256 << 10;
 
-// numbers_per_byte = 240 / sizeof(SegmentedPiTable::pi_t)
-const int64_t numbers_per_byte = 15;
+using primecount::SegmentedPiTable;
+const int64_t numbers_per_byte = SegmentedPiTable::numbers_per_byte();
 
 // Minimum segment size = 1 KiB
 const int64_t min_segment_size = (1 << 10) * numbers_per_byte;
@@ -48,11 +49,6 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     // The default segment size is x^(1/4).
     // This is tiny, will fit into the CPU's cache.
     segment_size_ = x14_;
-
-    int64_t tiny_segments = ceil_div(y_, segment_size_);
-    if (segment_size_ * 4 <= l2_cache_size * numbers_per_byte &&
-        tiny_segments > threads * 8)
-      segment_size_ *= 4;
   }
 
   segment_size_ = std::max(min_segment_size, segment_size_);
