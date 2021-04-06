@@ -29,6 +29,7 @@ private:
   int64_t sqrtx_;
   int64_t x14_;
   int64_t y_;
+  int64_t segment_size_;
   int threads_;
   OmpLock lock_;
 };
