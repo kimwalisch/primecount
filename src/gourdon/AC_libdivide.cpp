@@ -346,8 +346,7 @@ T AC_OpenMP(T x,
     // SegmentedPiTable fits into the CPU's cache.
     // Hence we use a small segment_size of x^(1/4).
     SegmentedPiTable segmentedPi;
-    int64_t low;
-    int64_t high;
+    int64_t low, high;
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_add(b, b <= pi_sqrtz, 1)
