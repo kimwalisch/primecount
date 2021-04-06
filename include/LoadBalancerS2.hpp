@@ -1,5 +1,5 @@
 ///
-/// @file  LoadBalancer.hpp
+/// @file  LoadBalancerS2.hpp
 ///
 /// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef LOADBALANCER_HPP
-#define LOADBALANCER_HPP
+#ifndef LOADBALANCERS2_HPP
+#define LOADBALANCERS2_HPP
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
@@ -33,10 +33,10 @@ struct ThreadSettings
   void init_finished() { init_secs = get_time() - secs; }
 };
 
-class LoadBalancer
+class LoadBalancerS2
 {
 public:
-  LoadBalancer(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, bool is_print);
+  LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, bool is_print);
   bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 

@@ -25,7 +25,7 @@
 #include <DFactorTable.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
-#include <LoadBalancer.hpp>
+#include <LoadBalancerS2.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>
@@ -195,7 +195,7 @@ T D_OpenMP(T x,
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, xz, thread_threshold);
-  LoadBalancer loadBalancer(x, xz, d_approx, is_print);
+  LoadBalancerS2 loadBalancer(x, xz, d_approx, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)

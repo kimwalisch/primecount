@@ -13,7 +13,7 @@
 #define MPILOADBALANCER_HPP
 
 #include <mpi.h>
-#include <LoadBalancer.hpp>
+#include <LoadBalancerS2.hpp>
 #include <MpiMsg.hpp>
 #include <Status.hpp>
 #include <int128_t.hpp>

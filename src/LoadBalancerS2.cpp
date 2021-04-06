@@ -1,6 +1,6 @@
 ///
-/// @file  LoadBalancer.cpp
-/// @brief The LoadBalancer assigns work to the individual threads
+/// @file  LoadBalancerS2.cpp
+/// @brief The LoadBalancerS2 assigns work to the individual threads
 ///        in the computation of the special leaves in the
 ///        Lagarias-Miller-Odlyzko, Deleglise-Rivat and Gourdon
 ///        prime counting algorithms. This load balancer is used
@@ -14,10 +14,10 @@
 ///        and most special leaves are in the first few segments
 ///        whereas later on there are very few special leaves.
 ///
-///        This LoadBalancer gradually increases the number of
+///        This LoadBalancerS2 gradually increases the number of
 ///        segments to sieve as long the expected runtime of the
 ///        sieve distance is smaller than the expected finish time
-///        of the algorithm. Near the end the LoadBalancer will
+///        of the algorithm. Near the end the LoadBalancerS2 will
 ///        gradually decrease the number of segments to sieve in
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
@@ -28,7 +28,7 @@
 /// file in the top level directory.
 ///
 
-#include <LoadBalancer.hpp>
+#include <LoadBalancerS2.hpp>
 #include <primecount-internal.hpp>
 #include <Status.hpp>
 #include <Sieve.hpp>
@@ -44,10 +44,10 @@ using namespace std;
 
 namespace primecount {
 
-LoadBalancer::LoadBalancer(maxint_t x,
-                           int64_t sieve_limit,
-                           maxint_t sum_approx,
-                           bool is_print) :
+LoadBalancerS2::LoadBalancerS2(maxint_t x,
+                               int64_t sieve_limit,
+                               maxint_t sum_approx,
+                               bool is_print) :
   low_(0),
   max_low_(0),
   sieve_limit_(sieve_limit),
@@ -79,12 +79,12 @@ LoadBalancer::LoadBalancer(maxint_t x,
   max_size_ = Sieve::get_segment_size(max_size_);
 }
 
-maxint_t LoadBalancer::get_sum() const
+maxint_t LoadBalancerS2::get_sum() const
 {
   return sum_;
 }
 
-bool LoadBalancer::get_work(ThreadSettings& thread)
+bool LoadBalancerS2::get_work(ThreadSettings& thread)
 {
   LockGuard lockGuard(lock_);
   sum_ += thread.sum;
@@ -111,7 +111,7 @@ bool LoadBalancer::get_work(ThreadSettings& thread)
   return is_work;
 }
 
-void LoadBalancer::update(ThreadSettings& thread)
+void LoadBalancerS2::update(ThreadSettings& thread)
 {
   if (thread.low > max_low_)
   {
@@ -136,7 +136,7 @@ void LoadBalancer::update(ThreadSettings& thread)
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
-void LoadBalancer::update_segments(ThreadSettings& thread)
+void LoadBalancerS2::update_segments(ThreadSettings& thread)
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
@@ -214,7 +214,7 @@ void LoadBalancer::update_segments(ThreadSettings& thread)
 }
 
 /// Remaining seconds till finished
-double LoadBalancer::remaining_secs() const
+double LoadBalancerS2::remaining_secs() const
 {
   double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
   percent = in_between(10, percent, 100);

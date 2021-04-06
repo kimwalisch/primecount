@@ -33,7 +33,7 @@
 #include <generate_phi.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
-#include <LoadBalancer.hpp>
+#include <LoadBalancerS2.hpp>
 #include <min.hpp>
 #include <print.hpp>
 #include <S.hpp>
@@ -199,7 +199,7 @@ T S2_hard_OpenMP(T x,
 {
   int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, z, thread_threshold);
-  LoadBalancer loadBalancer(x, z, s2_hard_approx, is_print());
+  LoadBalancerS2 loadBalancer(x, z, s2_hard_approx, is_print());
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime, threads);
 

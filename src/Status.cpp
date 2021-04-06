@@ -87,7 +87,7 @@ void Status::print(double percent)
 /// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
-/// LoadBalancer.cpp and hence it can never be accessed
+/// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
 double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
@@ -113,7 +113,7 @@ double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum
 /// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
-/// LoadBalancer.cpp and hence it can never be accessed
+/// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
 void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)

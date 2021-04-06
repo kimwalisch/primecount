@@ -14,7 +14,7 @@
 #include <DFactorTable.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
-#include <LoadBalancer.hpp>
+#include <LoadBalancerS2.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
 #include <generate_phi.hpp>

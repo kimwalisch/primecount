@@ -62,8 +62,8 @@ set(LIB_SRC src/api.cpp
             src/PiTable.cpp
             src/S1.cpp
             src/Sieve.cpp
-            src/LoadBalancer.cpp
             src/LoadBalancerP2.cpp
+            src/LoadBalancerS2.cpp
             src/Status.cpp
             src/generate.cpp
             src/nth_prime.cpp
