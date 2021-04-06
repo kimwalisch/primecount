@@ -10,8 +10,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef LoadBalancerAC_HPP
-#define LoadBalancerAC_HPP
+#ifndef LOADBALANCERAC_HPP
+#define LOADBALANCERAC_HPP
 
 #include <OmpLock.hpp>
 #include <stdint.h>
