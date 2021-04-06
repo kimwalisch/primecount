@@ -84,46 +84,4 @@ void SegmentedPiTable::init_count(uint64_t pi_low)
   }
 }
 
-int64_t SegmentedPiTable::get_segment_size(uint64_t max_high, uint64_t x13, int threads)
-{
-  // CPU cache sizes per core
-  uint64_t l1_cache_size = 32 << 10;
-  uint64_t l2_cache_size = 512 << 10;
-  uint64_t l3_cache_size = 16 << 20;
-  uint64_t numbers_per_byte = 240 / sizeof(pi_t);
-  uint64_t segment_size;
-
-  if (threads == 1)
-    segment_size = l2_cache_size * numbers_per_byte;
-  else
-  {
-    // Segment size is tiny: x^(1/4)
-    segment_size = isqrt(max_high);
-
-    // Minimum segment size = 1 KiB
-    uint64_t min_size = (1 << 10) * numbers_per_byte;
-    // Most special leaves are below x^(1/3)
-    uint64_t max_size = x13 / threads;
-    max_size = max(segment_size, max_size);
-
-    // Using a segment_size > x^(1/4) reduces thread scheduling
-    // overhead. But we must ensure that the segment_size is
-    // not larger than the CPU's cache (per core).
-         if ((segment_size * 8) / sizeof(pi_t) <= l1_cache_size)
-      segment_size *= 8;
-    else if ((segment_size * 4) / sizeof(pi_t) <= l2_cache_size)
-      segment_size *= 4;
-    else if ((segment_size * 2) / sizeof(pi_t) <= l3_cache_size)
-      segment_size *= 2;
-
-    segment_size = in_between(min_size, segment_size, max_size);
-  }
-
-  segment_size = min(segment_size, max_high);
-  segment_size += 240 - segment_size % 240;
-  assert(segment_size % 240 == 0);
-
-  return segment_size;
-}
-
 } // namespace

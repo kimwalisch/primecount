@@ -87,6 +87,7 @@ set(LIB_SRC src/api.cpp
             src/gourdon/Phi0.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
+            src/gourdon/LoadBalancerAC.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp
             src/gourdon/StatusAC.cpp)

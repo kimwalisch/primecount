@@ -31,6 +31,7 @@
 #include <PiTable.hpp>
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
+#include <LoadBalancerAC.hpp>
 #include <fast_div.hpp>
 #include <for_atomic.hpp>
 #include <generate.hpp>
@@ -326,11 +327,9 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
 
-  int64_t segment_size = SegmentedPiTable::get_segment_size(sqrtx, x13, threads);
-  int64_t thread_threshold = segment_size * 8;
-  threads = ideal_num_threads(threads, sqrtx, thread_threshold);
+  threads = ideal_num_threads(threads, sqrtx, x13);
+  LoadBalancerAC loadBalancer(sqrtx, x13, y, threads); 
   atomic<int64_t> atomic_b(min_c1);
-  atomic<int64_t> atomic_low(0);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -347,7 +346,8 @@ T AC_OpenMP(T x,
     // SegmentedPiTable fits into the CPU's cache.
     // Hence we use a small segment_size of x^(1/4).
     SegmentedPiTable segmentedPi;
-    status.print(0, sqrtx, segment_size);
+    int64_t low;
+    int64_t high;
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     for_atomic_add(b, b <= pi_sqrtz, 1)
@@ -361,18 +361,11 @@ T AC_OpenMP(T x,
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
     }
 
-    // This computes A and the 2nd part of the C formula.
-    // Find all special leaves of type:
-    // x / (primes[b] * primes[i]) < x^(1/2)
-    // where b is bounded by pi[z^(1/2)] < b <= pi[x^(1/3)].
-    // Since we need to lookup PrimePi[n] values for n < x^(1/2)
-    // we use a segmented PrimePi[n] table of size 
-    // O(x^(1/4)) to reduce the memory usage.
-    for_atomic_add(low, low < sqrtx, segment_size)
+    // for (low = 0; low < sqrt; low += segment_size)
+    while (loadBalancer.get_work(low, high))
     {
       // Current segment [low, high[
-      int64_t high = min(low + segment_size, sqrtx);
-      status.print(low, sqrtx, segment_size);
+      status.print(low, sqrtx, high - low);
       segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;
