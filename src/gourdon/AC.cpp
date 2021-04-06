@@ -204,6 +204,11 @@ T AC_OpenMP(T x,
             int threads)
 {
   T sum = 0;
+  int64_t x13 = iroot<3>(x);
+  int64_t sqrtx = isqrt(x);
+  int64_t thread_threshold = 1000;
+  threads = ideal_num_threads(threads, x13, thread_threshold);
+  LoadBalancerAC loadBalancer(sqrtx, x13, y, threads);
   StatusAC status(is_print);
 
   // PiTable's size = z because of the C1 formula.
@@ -212,17 +217,12 @@ T AC_OpenMP(T x,
   // is fairly large and does not fit into the CPU's cache.
   PiTable pi(max(z, max_a_prime), threads);
 
-  int64_t sqrtx = isqrt(x);
-  int64_t x13 = iroot<3>(x);
   int64_t pi_y = pi[y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
   int64_t min_c1 = max(k, pi_root3_xz) + 1;
-
-  threads = ideal_num_threads(threads, x13, 1000);
-  LoadBalancerAC loadBalancer(sqrtx, x13, y, threads); 
-  atomic<int64_t> atomic_b(min_c1);
+  atomic<int64_t> atomic_c1(-1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -242,7 +242,7 @@ T AC_OpenMP(T x,
     int64_t low, high;
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    for_atomic_add(b, b <= pi_sqrtz, 1)
+    for_atomic_inc(min_c1, b <= pi_sqrtz, atomic_c1)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
