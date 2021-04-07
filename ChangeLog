@@ -1,3 +1,21 @@
+Changes in primecount-6.5, 2021-04-07
+
+In primecout-6.4 (and earlier) the AC algorithm scales very badly on
+servers with a large number of CPU cores. The root causes of this
+scaling issue are thread synchronization overhead and cache misses.
+In primecount-6.5 the AC algorithm has been rewritten, now all
+threads are independent from each other and require only minimal
+synchronization. Furthermore each thread operates on its own tiny
+chunk of memory that fits into the CPU's cache. On my dual socket
+AMD EPYC server this improves performance by more than 2x for large
+AC computation with x >= 1e23.
+
+* AC.cpp: New algorithm with improved scaling.
+* AC_libdivide.cpp: New algorithm with improved scaling.
+* LoadBalancerAC.cpp: New thread scheduler for AC algorithm.
+* SegmentedPiTable.cpp: Decrease size to x^(1/4).
+* Remove MPI support: No users, too much work to maintain.
+
 Changes in primecount-6.4, 2021-03-20
 
 This version fixes a critical integer overflow in the B formula
