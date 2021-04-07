@@ -11,7 +11,7 @@
 ///        pi(x) = pi(y) + phi(x, pi(y)) - 1
 ///        with y = x^(1/2)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
