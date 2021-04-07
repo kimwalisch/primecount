@@ -31,11 +31,11 @@ int main()
 {
   random_device rd;
   mt19937 gen(rd());
-  uniform_int_distribution<int> dist(90000000, 100000000);
+  uniform_int_distribution<int> dist(9000000, 10000000);
   uniform_int_distribution<int> dist2(1, 1000);
 
   int64_t limit = dist(gen);
-  int64_t segment_size = iroot<3>(limit);
+  int64_t segment_size = isqrt(limit);
   segment_size += 240 - segment_size % 240;
   int threads = 1;
 
@@ -50,7 +50,7 @@ int main()
   // Check small pi(x) values
   for (; i <= 1000; i++)
   {
-    while (i >= high)
+    while (high <= i)
     {
       low = high;
       high = low + segment_size;
@@ -64,7 +64,7 @@ int main()
   // Check large pi(x) values
   for (; i < limit; i += dist2(gen))
   {
-    while (i >= high)
+    while (high <= i)
     {
       low = high;
       high = low + segment_size;
@@ -75,7 +75,7 @@ int main()
     check(segmentedPi[i] == pi[i]);
   }
 
-  while (limit > high)
+  while (high < limit)
   {
     low = high;
     high = low + segment_size;
