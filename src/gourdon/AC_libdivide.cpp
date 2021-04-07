@@ -41,7 +41,6 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <StatusAC.hpp>
 
 #include <stdint.h>
 #include <atomic>
@@ -311,8 +310,7 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, y, threads);
-  StatusAC status(is_print);
+  LoadBalancerAC loadBalancer(sqrtx, y, is_print, threads);
 
   // Initialize libdivide vector using primes
   vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
@@ -364,7 +362,6 @@ T AC_OpenMP(T x,
     while (loadBalancer.get_work(low, high))
     {
       // Current segment [low, high[
-      status.print(low, sqrtx, high - low);
       segmentedPi.init(low, high);
       T xlow = x / max(low, 1);
       T xhigh = x / high;

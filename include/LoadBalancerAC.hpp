@@ -21,17 +21,25 @@ namespace primecount {
 class LoadBalancerAC
 {
 public:
-  LoadBalancerAC(int64_t sqrtx, int64_t y, int threads);
+  LoadBalancerAC(int64_t sqrtx, int64_t y, bool is_print, int threads);
   bool get_work(int64_t& low, int64_t& high);
 
 private:
-  void validate_segment_size();
-  int64_t low_;
-  int64_t sqrtx_;
-  int64_t x14_;
-  int64_t y_;
-  int64_t segment_size_;
-  int threads_;
+  void validate_segment_sizes();
+  void compute_total_segments();
+  void print_status();
+
+  int64_t low_ = 0;
+  int64_t sqrtx_ = 0;
+  int64_t x14_ = 0;
+  int64_t y_ = 0;
+  int64_t segment_size_ = 0;
+  int64_t large_segment_size_ = 0;
+  int64_t segment_nr_ = 0;
+  int64_t total_segments_ = 0;
+  bool is_print_ = false;
+  int threads_ = 0;
+  double time_ = 0;
   OmpLock lock_;
 };
 

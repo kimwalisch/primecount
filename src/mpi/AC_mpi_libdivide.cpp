@@ -293,7 +293,7 @@ T AC_OpenMP(T x,
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, y, threads);
+  LoadBalancerAC loadBalancer(sqrtx, y, is_print, threads);
   StatusAC status(is_print);
 
   // Initialize libdivide vector using primes

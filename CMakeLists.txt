@@ -89,8 +89,7 @@ set(LIB_SRC src/api.cpp
             src/gourdon/D.cpp
             src/gourdon/LoadBalancerAC.cpp
             src/gourdon/SegmentedPiTable.cpp
-            src/gourdon/Sigma.cpp
-            src/gourdon/StatusAC.cpp)
+            src/gourdon/Sigma.cpp)
 
 # Required includes ##################################################
 
