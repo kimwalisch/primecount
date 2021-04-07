@@ -75,7 +75,8 @@ void PiTable::init_bits(uint64_t start,
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
   // Iterate over primes > 5
-  primesieve::iterator it(max(start, 5), stop);
+  start = max(start, 5);
+  primesieve::iterator it(start, stop);
   uint64_t count = 0;
   uint64_t prime = 0;
 
