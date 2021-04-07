@@ -185,7 +185,9 @@ void test()
 #endif
 
     TEST0(pi_legendre,            pi_primesieve,    100);
+    TEST0(pi_legendre_noprint,    pi_primesieve,    100);
     TEST2(pi_meissel,             pi_legendre,      500);
+    TEST2(pi_meissel_noprint,     pi_legendre,      500);
     TEST2(pi_lehmer,              pi_meissel,       500);
     TEST1(pi_lmo1,                pi_meissel,        50);
     TEST1(pi_lmo2,                pi_meissel,       200);
@@ -199,9 +201,10 @@ void test()
     TEST2(pi_deleglise_rivat_128, pi_lmo_parallel, 1500);
 #endif
 
-    TEST2(pi_gourdon_64,  pi_lmo_parallel, 1500);
+    TEST2(pi_gourdon_64,          pi_lmo_parallel, 1500);
+    TEST2(pi_gourdon_64_noprint,  pi_lmo_parallel, 1500);
 #ifdef HAVE_INT128_T
-    TEST2(pi_gourdon_128, pi_lmo_parallel, 1500);
+    TEST2(pi_gourdon_128,         pi_lmo_parallel, 1500);
 #endif
 
     test_nth_prime(300);
