@@ -60,25 +60,6 @@ for:
       - ctest
       - ./primecount --test
 
-  # Test MPI (Message Passing Interface) for distributing
-  # computations onto cluser nodes.
-  - matrix:
-      only:
-        - image: Ubuntu2004
-          platform: x64
-          branch: master
-    environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -Wno-literal-suffix -Wno-strict-aliasing"
-    install:
-      - sudo apt update -qq
-      - sudo apt install -y openmpi-bin libopenmpi-dev
-    build_script:
-      - cmake . -DWITH_MPI=ON -DCMAKE_BUILD_TYPE=$Configuration
-      - make VERBOSE=1
-    test_script:
-      - mpiexec -n 2 ./primecount 1e14 -t1 | grep 3204941750802
-
   - matrix:
       only:
         - image: macos

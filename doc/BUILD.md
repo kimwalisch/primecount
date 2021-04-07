@@ -105,7 +105,6 @@ option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
-option(WITH_MPI            "Enable MPI support"                    OFF)
 ```
 
 ## Packaging primecount

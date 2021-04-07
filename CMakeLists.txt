@@ -19,7 +19,6 @@ option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_DIV32          "Use 32-bit division instead of 64-bit division whenever possible" ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
 option(WITH_JEMALLOC       "Use jemalloc allocator"                OFF)
-option(WITH_MPI            "Enable MPI support"                    OFF)
 
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
@@ -138,32 +137,6 @@ endif()
 if(WITH_FLOAT128)
     set(LIB_QUADMATH "quadmath")
     set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
-endif()
-
-# Check for MPI (Message Passing Interface) ##########################
-
-if(WITH_MPI)
-    find_package(MPI REQUIRED)
-
-    if(TARGET MPI::MPI_CXX)
-        set(LIB_MPI "MPI::MPI_CXX")
-    else()
-        include_directories("${MPI_INCLUDE_PATH}")
-    endif()
-
-    set(ENABLE_MPI "ENABLE_MPI")
-    set(LIB_SRC ${LIB_SRC}
-                src/mpi/B_mpi.cpp
-                src/mpi/D_mpi.cpp
-                src/mpi/Phi0_mpi.cpp
-                src/mpi/MpiLoadBalancer.cpp
-                src/mpi/MpiMsg.cpp)
-
-    if(libdivide_branchfree)
-        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi_libdivide.cpp)
-    else()
-        set(LIB_SRC ${LIB_SRC} src/mpi/AC_mpi.cpp)
-    endif()
 endif()
 
 # Check for OpenMP ###################################################
@@ -299,7 +272,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -324,7 +297,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}" "${ENABLE_MPI}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_MPI}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
