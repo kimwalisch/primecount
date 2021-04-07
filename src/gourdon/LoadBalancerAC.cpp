@@ -14,6 +14,7 @@
 #include <SegmentedPiTable.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -21,11 +22,10 @@
 
 namespace {
 
-// CPU cache sizes per core
-const int64_t l1_cache_size = 32 << 10;
-const int64_t l2_cache_size = 256 << 10;
-
+// CPU L2 cache sizes per core
+const int64_t l2_cache_size = 512 << 10;
 const int64_t numbers_per_byte = primecount::SegmentedPiTable::numbers_per_byte();
+const int64_t l2_segment_size = l2_cache_size * numbers_per_byte;
 
 // Minimum segment size = 1 KiB
 const int64_t min_segment_size = (1 << 10) * numbers_per_byte;
@@ -45,7 +45,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   threads_(threads)
 {
   if (threads_ == 1)
-    segment_size_ = std::max(x14_, l2_cache_size * numbers_per_byte);
+    segment_size_ = std::max(x14_, l2_segment_size);
   else
   {
     // The default segment size is x^(1/4).
@@ -59,15 +59,10 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     // that it fits into the CPU's cache.
     if (y_ < sqrtx_)
     {
-      if (segment_size_ <= l1_cache_size * numbers_per_byte &&
-          y_ + (l1_cache_size * numbers_per_byte * threads_) * 4 <= sqrtx_)
-        large_segment_size_ = l1_cache_size * numbers_per_byte;
-      else if (segment_size_ * 4 <= l1_cache_size * numbers_per_byte &&
-               y_ + (segment_size_ * 4 * threads_) * 4 <= sqrtx_)
-        large_segment_size_ = segment_size_ * 4;
-      else if (segment_size_ <= l2_cache_size * numbers_per_byte &&
-               y_ + (l2_cache_size * numbers_per_byte * threads_) * 8 <= sqrtx_)
-        large_segment_size_ = l2_cache_size * numbers_per_byte;
+      int64_t max_segment_size = (sqrtx_ - y_) / (threads_ * 8);
+      large_segment_size_ = segment_size_ * 16;
+      large_segment_size_ = min3(large_segment_size_, l2_segment_size, max_segment_size);
+      large_segment_size_ = std::max(segment_size_, large_segment_size_);
     }
   }
 
