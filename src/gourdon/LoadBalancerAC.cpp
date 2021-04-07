@@ -59,15 +59,15 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     // that it fits into the CPU's cache.
     if (y_ < sqrtx_)
     {
-      if (segment_size_ <= l2_cache_size * numbers_per_byte &&
-          y_ + (l2_cache_size * numbers_per_byte * threads_) / 4 <= sqrtx_)
-        large_segment_size_ = l2_cache_size * numbers_per_byte;
-      else if (segment_size_ <= l1_cache_size * numbers_per_byte &&
-               y_ + (l1_cache_size * numbers_per_byte * threads_) / 2 <= sqrtx_)
+      if (segment_size_ <= l1_cache_size * numbers_per_byte &&
+          y_ + (l1_cache_size * numbers_per_byte * threads_) * 4 <= sqrtx_)
         large_segment_size_ = l1_cache_size * numbers_per_byte;
       else if (segment_size_ * 4 <= l1_cache_size * numbers_per_byte &&
-               y_ + (segment_size_ * 4 * threads_) / 2 <= sqrtx_)
+               y_ + (segment_size_ * 4 * threads_) * 4 <= sqrtx_)
         large_segment_size_ = segment_size_ * 4;
+      else if (segment_size_ <= l2_cache_size * numbers_per_byte &&
+               y_ + (l2_cache_size * numbers_per_byte * threads_) * 8 <= sqrtx_)
+        large_segment_size_ = l2_cache_size * numbers_per_byte;
     }
   }
 
