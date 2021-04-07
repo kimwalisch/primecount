@@ -55,36 +55,6 @@
        : atomic_b.fetch_add(1, std::memory_order_relaxed); \
        condition; b = atomic_b.fetch_add(1, std::memory_order_relaxed))
 
-/// for_atomic_add() is a for loop with dynamic thread scheduling for use
-/// inside of an OpenMP parallel region. We use this instead of OpenMP's
-/// dynamic thread scheduling because the Clang compiler currently
-/// (Clang 11, 2021) has a severe scaling issue on PCs & servers with a
-/// large number of CPU cores. The scaling issue occurred when computing
-/// AC(x) with x >= 1e22.
-///
-/// for_atomic_add(start, condition, inc, atomic_b)
-/// Is the same as:
-///
-/// #pragma omp for nowait schedule(dynamic)
-/// for (auto b = start; condition; b += inc)
-///
-#define for_atomic_add(start, condition, inc, atomic_b) \
-  /* for_atomic_add() is used in the computation of the AC formula */ \
-  /* where the individual threads are completely independent of each */ \
-  /* other, hence there is no communication between the threads and the */ \
-  /* threads only read from memory but do not write to memory. */ \
-  /* Because of these constraints we can use relaxed atomics, i.e. our */ \
-  /* program will work correctly even if the CPU reorders memory reads */ \
-  /* and writes before or after the atomic_b variable we use as loop */ \
-  /* counter. Note that the fetch_add() instruction can never be */ \
-  /* reordered before compare_exchange_strong() by the CPU because this */ \
-  /* would change the program behavior in single-thread mode. */ \
-  for (decltype(start) is_first_thread = -1, \
-       b = (atomic_b.compare_exchange_strong(is_first_thread, start, std::memory_order_relaxed)) \
-       ? atomic_b.fetch_add(inc, std::memory_order_relaxed) \
-       : atomic_b.fetch_add(inc, std::memory_order_relaxed); \
-       condition; b = atomic_b.fetch_add(inc, std::memory_order_relaxed))
-
 /// parallel_for_atomic_inc() is a parallel for loop with dynamic thread
 /// scheduling. We use this instead of OpenMP's dynamic thread scheduling
 /// because the Clang compiler currently (Clang 11, 2021) has a severe
