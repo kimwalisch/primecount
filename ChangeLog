@@ -1,4 +1,4 @@
-Changes in primecount-6.5, 2021-04-07
+Changes in primecount-6.5, 2021-04-08
 
 In primecout-6.4 (and earlier) the AC algorithm scales very badly on
 servers with a large number of CPU cores. The root causes of this
@@ -10,6 +10,7 @@ chunk of memory that fits into the CPU's cache. On my dual socket
 AMD EPYC server this improves performance by more than 2x for large
 AC computation with x >= 1e23.
 
+* Easy-Special-Leaves.md: Description of the new algorithm.
 * AC.cpp: New algorithm with improved scaling.
 * AC_libdivide.cpp: New algorithm with improved scaling.
 * LoadBalancerAC.cpp: New thread scheduler for AC algorithm.
