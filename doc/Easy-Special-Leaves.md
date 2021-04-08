@@ -24,6 +24,12 @@ size of x^(1/4) does not deteriorate the runtime complexity of the algorithm be
 used to initialize the SegmentedPrimePi[n] lookup table has the same runtime complexity as the sieve of Eratosthenes as long as
 the segment size is not smaller than the square root of the total sieving distance.
 
+Note that Deleglise-Rivat have split up the easy special leaves into many formulas and suggest using segmentation only for the 2
+formulas that need to lookup the number of primes < x^(1/2) whereas all other formulas that only need to lookup the number of
+primes ≤ y should be computed without segmentation. As a PrimePi[n] lookup table of size y is much too large to fit into the CPU's
+cache and as the PrimePi[n] lookup table is accessed in random order, I suggest segmenting all easy special leaves formulas that
+are computationally expensive using a segment size of x^(1/4) in order to improve performance.
+
 So far we have focused on improving the cache efficiency of the computation of the easy special leaves. Now we will have a look at
 how to parallelize the computation of the easy special leaves so that it scales well. Generally parallel algorithms scale well on
 current CPU architectures if they accomplish the 3 properties below:
