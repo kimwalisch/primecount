@@ -218,10 +218,10 @@ T C2_64(T xlow,
   {
     uint64_t xpq = xp / primes[i];
     uint64_t pi_xpq = segmentedPi[xpq];
-    if (pi_xpq < i) break;
+    uint64_t phi_xpq = pi_xpq - b + 2;
+    if (pi_xpq < i) { sum += phi_xpq; i--; break; }
     uint64_t xpq2 = xp / primes[pi_xpq + 1];
     uint64_t i2 = segmentedPi[xpq2];
-    uint64_t phi_xpq = pi_xpq - b + 2;
     sum += phi_xpq * (i - i2);
     i = i2;
   }
@@ -275,10 +275,10 @@ T C2_128(T xlow,
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     uint64_t pi_xpq = segmentedPi[xpq];
-    if (pi_xpq < i) break;
+    uint64_t phi_xpq = pi_xpq - b + 2;
+    if (pi_xpq < i) { sum += phi_xpq; i--; break; }
     uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
     uint64_t i2 = segmentedPi[xpq2];
-    uint64_t phi_xpq = pi_xpq - b + 2;
     sum += phi_xpq * (i - i2);
     i = i2;
   }
