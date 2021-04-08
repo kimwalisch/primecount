@@ -37,6 +37,11 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   assert(low % 240 == 0);
   uint64_t pi_low;
 
+  // In order to make the threads completely independent
+  // from each other each thread needs compute PrimePi[low]
+  // at the start of each new segment. If only a single
+  // thread is used we can compute PrimePi[low] in O(1) by
+  // getting that value from the previous segment.
   if (low <= 5)
     pi_low = pi_tiny_[5];
   else if (low == high_)
