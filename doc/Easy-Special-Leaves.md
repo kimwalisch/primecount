@@ -3,7 +3,7 @@
 In the combinatorial prime counting algorithms the computation of the special leaves is the computationally most expensive task.
 In order to speed up that computation Deleglise and Rivat have split up the special leaves into easy special leaves and hard
 special leaves. The contribution of each easy special leaf can be computed in O(1) using a PrimePi[n] lookup table whereas the
-contribution of each hard special leaf requires use of the partial sieve function phi(x, a) and can hence not be computed in O(1).
+contribution of each hard special leaf requires evaluating the partial sieve function phi(x, a) and cannot be computed in O(1).
 
 In the computation of the easy special leaves we need to look up the number of primes below n with n < x^(1/2). Since a
 PrimePi[n] lookup table of size x^(1/2) is much too large to be practical, Deleglise-Rivat have suggested segmenting the Interval
@@ -17,22 +17,23 @@ smaller and generally a good practical improvement.
 The SegmentedPrimePi[n] lookup table is accessed very frequently in the computation of the easy special leaves (about once for each
 easy special leaf) and these memory accesses are non sequential. It is therefore important that the SegmentedPrimePi[n] fits into
 the CPU's cache. While Xavier Gourdon's smaller segment size is already considerably smaller it is still too large for new record
-computations i.e. the SegmentedPrimePi[n] won't fit into the CPU's cache. For this reason **I suggest using an even smaller segment
-size of x^(1/4)** for the computation of the easy special leaves. With a segment size of x^(1/4) the SegmentedPrimePi[n] lookup table fits
+computations. For this reason **I suggest using an even smaller segment size of x^(1/4)** for the computation of the easy special
+leaves. With a segment size of x^(1/4) the SegmentedPrimePi[n] lookup table fits
 into the CPU's cache even for record computations e.g. at 10^30 the SegmentedPrimePi[n] is only about 2 MiB in primecount. A segment
 size of x^(1/4) does not deteriorate the runtime complexity of the algorithm because the segmented sieve of Eratosthenes which is
 used to initialize the SegmentedPrimePi[n] lookup table has the same runtime complexity as the sieve of Eratosthenes as long as
 the segment size is not smaller than the square root of the total sieving distance.
 
 Note that Deleglise-Rivat have split up the easy special leaves into many formulas and suggest using segmentation only for the 2
-formulas that need to lookup the number of primes < x^(1/2) whereas all other formulas that only need to lookup the number of
+formulas that need to lookup the number of primes < x^(1/2), whereas all other formulas that only need to lookup the number of
 primes ≤ y should be computed without segmentation. As a PrimePi[n] lookup table of size y is much too large to fit into the CPU's
 cache and as the PrimePi[n] lookup table is accessed in random order, I suggest segmenting all easy special leaves formulas that
 are computationally expensive using a segment size of x^(1/4) in order to improve performance. However special care needs to be
 used for the formulas that compute identical consecutive easy leaves more efficiently, sometimes these formulas are named clustered
 easy leaves. In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy leaves. These formulas
-need to access PrimePi[n] values with n ≤ y but n may be slightly outside of the segment [low, low + segment_size[. In these rare
-cases one should use a PrimePi[n] lookup table of size y instead of the SegmentedPrimePi[n] lookup table.
+need to access PrimePi[n] values with n ≤ y but some of these memory accesses (i.e. those that compute how many consecutive leaves
+are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using a PrimePi[n] lookup
+table of size y instead of the SegmentedPrimePi[n] lookup table.
 
 So far we have focused on improving the cache efficiency of the computation of the easy special leaves. Now we will have a look at
 how to parallelize the computation of the easy special leaves so that it scales well. Generally parallel algorithms scale well on
