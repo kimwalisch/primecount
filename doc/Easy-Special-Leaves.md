@@ -51,9 +51,9 @@ current CPU architectures if they accomplish the 3 properties below:
 * The work must be equally shared between all threads in order to avoid load imbalance. 
 
 A segment size of x^(1/4) already accomplishes the first property. So next we have to design our parallel algorithm in a way that
-all threads are independent from each other. Luckily Xavier Gourdon already devised an idea for how to do this: at the start of
+all threads are independent from each other. Luckily Xavier Gourdon already devised an idea for how to do this: **at the start of
 each new segment [low, low + segment_size[ each thread computes ```PrimePi[low] ``` using a prime counting function implementation in
-O(low^(2/3)) or less. This way no thread requires any data from another thread. This algorithm has been implemented in
+O(low^(2/3)) or less**. This way no thread requires any data from another thread. This algorithm has been implemented in
 primecount-6.5 (see [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp) &
 [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp)), it improved performance
 by more than 2x at 10^23 on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
@@ -64,8 +64,8 @@ have a runtime complexity of O((x^(1/2))^(2/3) * x^(1/4)) = O(x^(7/12)) which do
 of the algorithm.
 
 Lastly we have to ensure that the work is distributed evenly amongst all threads. Most of the easy special leaves are below y
-(~ x^(1/3) * log(x)^3), hence it is critical that this region is distributed evenly amongst all threads. Based on my emprical
-benchmarks **a segment size of x^(1/4) evenly distributes the work** even on servers with a large number of CPU cores such as my
+(~ x^(1/3) * log(x)^3), hence it is critical that this region is distributed evenly amongst all threads. Based on my benchmarks
+**a segment size of x^(1/4) evenly distributes the work** even on servers with a large number of CPU cores such as my
 dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) causes significant load imbalance
 which deteriorates performance i.e. some threads will be assigned much more work than others and keep on computing while most
 threads have already finished their computations. Above y there are much fewer easy special leaves hence the segment size can be
