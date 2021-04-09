@@ -126,7 +126,7 @@ void LoadBalancerAC::print_status()
     if (old == 0 || (time - old) >= threshold)
     {
       time_ = time;
-      std::cout << "\rStatus: " << segment_nr_ << "/" << total_segments_ << std::flush;
+      std::cout << "\rSegments: " << segment_nr_ << "/" << total_segments_ << std::flush;
     }
   }
 }
