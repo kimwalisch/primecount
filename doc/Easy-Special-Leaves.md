@@ -1,4 +1,4 @@
-# Improved cache efficiency and load-balancing in the computation of the easy special leaves
+# Computation of the easy special leaves
 
 In the combinatorial prime counting algorithms the computation of the special leaves is the computationally most expensive task.
 In order to speed up that computation Deleglise and Rivat have split up the special leaves into easy special leaves and hard
@@ -13,6 +13,8 @@ a SegmentedPrimePi[n] lookup table of size y which also returns the number of pr
 for large computations > 10^22 as the SegmentedPrimePi[n] becomes exceedingly large e.g. at 10^30 its size was 137 GiB in
 primecount. For this reason Xavier Gourdon suggested using a smaller segment size of (x/y)^(1/2) which is orders of magnitude
 smaller and generally a good practical improvement.
+
+# Improving the cache efficiency
 
 The SegmentedPrimePi[n] lookup table is accessed very frequently in the computation of the easy special leaves (about once for each
 easy special leaf) and these memory accesses are non sequential. It is therefore important that the SegmentedPrimePi[n] fits into
@@ -34,6 +36,8 @@ easy leaves. In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clu
 need to access PrimePi[n] values with n ≤ y but some of these memory accesses (i.e. those that compute how many consecutive leaves
 are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using a PrimePi[n] lookup
 table of size y instead of the SegmentedPrimePi[n] lookup table.
+
+ # Parallel computation and load-balancing
 
 So far we have focused on improving the cache efficiency of the computation of the easy special leaves. Now we will have a look at
 how to parallelize the computation of the easy special leaves so that it scales well. Generally parallel algorithms scale well on
