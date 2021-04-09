@@ -19,7 +19,7 @@ smaller and generally a good practical improvement.
 The SegmentedPrimePi[n] lookup table is accessed very frequently in the computation of the easy special leaves (about once for each
 easy special leaf) and these memory accesses are non sequential. It is therefore important that the SegmentedPrimePi[n] fits into
 the CPU's cache. While Xavier Gourdon's smaller segment size is already considerably smaller it is still too large for new record
-computations. For this reason **I suggest using an even smaller segment size of x^(1/4)** for the computation of the easy special
+computations. For this reason I suggest using an **even smaller segment size of x^(1/4)** for the computation of the easy special
 leaves. With a segment size of x^(1/4) the SegmentedPrimePi[n] lookup table fits
 into the CPU's cache even for record computations e.g. at 10^30 the SegmentedPrimePi[n] is only about 2 MiB in primecount. A segment
 size of x^(1/4) does not deteriorate the runtime complexity of the algorithm because the segmented sieve of Eratosthenes which is
