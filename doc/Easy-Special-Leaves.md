@@ -52,8 +52,8 @@ current CPU architectures if they accomplish the 3 properties below:
 
 A segment size of x^(1/4) already accomplishes the first property. So next we have to design our parallel algorithm in a way that
 all threads are independent from each other. Luckily Xavier Gourdon already devised an idea for how to do this: **at the start of
-each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation in
-O(low^(2/3)) or less**. This way no thread requires any data from another thread. This algorithm has been implemented in
+each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation**
+in O(low^(2/3)) or less. This way no thread requires any data from another thread. This algorithm has been implemented in
 primecount-6.5 (see [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp) &
 [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp)), it improved performance
 by more than 2x at 10^23 on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
