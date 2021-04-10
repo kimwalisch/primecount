@@ -6,13 +6,13 @@ special leaves. The contribution of each easy special leaf can be computed in O
 contribution of each hard special leaf requires evaluating the partial sieve function phi(x, a) and cannot be computed in O(1).
 
 In the computation of the easy special leaves we need to look up the number of primes below n with n < x^(1/2). Since a
-```PrimePi[n]``` lookup table of size x^(1/2) is much too large to be practical, Deleglise-Rivat have suggested segmenting the Interval
+```PrimePi[n]``` lookup table of size x^(1/2) is much too large to be practical, Deleglise-Rivat [[1]](#references) have suggested segmenting the Interval
 [0, x^(1/2)[ using a segment size of y (~ x^(1/3) * log(x)^3). So instead of using a ```PrimePi[n]``` lookup table of size x^(1/2) we now use
 a ```SegmentedPrimePi[n]``` lookup table of size y which also returns the number of primes ≤ n but requires n to be within the current segment
 [low, low + y[. This approach was used in primecount up to version 6.4. However this segment size causes severe scaling issues
 for large computations > 10^22 as the ```SegmentedPrimePi[n]``` lookup table becomes exceedingly large e.g. at 10^30 its size was
-137 GiB in primecount. For this reason Xavier Gourdon suggested using a smaller segment size of sqrt(x/y) which is orders of magnitude
-smaller and generally a good practical improvement.
+137 GiB in primecount. For this reason Xavier Gourdon [[2]](#references) suggested using a smaller segment size of sqrt(x/y) which
+is orders of magnitude smaller and generally a good practical improvement.
 
 Here are links to primecount's [PiTable](https://github.com/kimwalisch/primecount/blob/master/src/PiTable.cpp) and
 [SegmentedPiTable](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp) implementations.
@@ -29,7 +29,7 @@ size of x^(1/4) does not deteriorate the runtime complexity of the algorithm be
 used to initialize the ```SegmentedPrimePi[n]``` lookup table has the same runtime complexity as the sieve of Eratosthenes as long as
 the segment size is not smaller than the square root of the total sieving distance.
 
-Note that Deleglise-Rivat have split up the easy special leaves into many formulas and suggest using segmentation only for the 2
+Note that Deleglise-Rivat [[1]](#references) have split up the easy special leaves into many formulas and suggest using segmentation only for the 2
 formulas that need to lookup the number of primes < x^(1/2), whereas all other formulas that only need to lookup the number of
 primes ≤ y should be computed without segmentation. As a ```PrimePi[n]``` lookup table of size y is much too large to fit into the CPU's
 cache and as the ```PrimePi[n]``` lookup table is accessed in random order, I suggest segmenting all easy special leaves formulas that
@@ -51,7 +51,7 @@ current CPU architectures if they accomplish the 3 properties below:
 * The work must be distributed evenly among all threads in order to avoid load imbalance. 
 
 A segment size of x^(1/4) already accomplishes the first property. So next we have to design our parallel algorithm in a way that
-all threads are independent from each other. Luckily Xavier Gourdon already devised an idea for how to do this: **at the start of
+all threads are independent from each other. Luckily Xavier Gourdon [[2]](#references) already devised an idea for how to do this: **at the start of
 each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation**
 in O(low^(2/3)) or less. The result of ```PrimePi[low]``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
 for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-6.5
@@ -73,3 +73,8 @@ computing after most of the threads have already finished their computations) wh
 on PCs and servers with a large number of CPU cores. Above y there are much fewer easy special leaves hence the segment size can
 be increased by a small constant factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the
 new segment size still fits into the CPU's cache.
+
+# References
+
+1. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
+2. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
