@@ -66,9 +66,9 @@ have a runtime complexity of O((x^(1/2))^(2/3) * x^(1/4)) = O(x^(7/12)) which do
 of the algorithm.
 
 Lastly we have to ensure that the work is distributed evenly among all threads. The easy special leaves are distributed very
-unevenly, most the leaves are located below y (~ x^(1/3) * log(x)^3) whereas above y the number of leaves slowly decreases and
+unevenly, most of the leaves are located below y (~ x^(1/3) * log(x)^3) whereas above y the number of leaves slowly decreases and
 they become more and more sparse as they approach x^(1/2). Hence it is critical that the region below y is distributed evenly
-among all threads. Based on my benchmarks **a segment size of x^(1/4) evenly distributes the work** even on servers with a
+among all threads. Based on my benchmarks **a small segment size of x^(1/4) evenly distributes the work** even on servers with a
 large number of CPU cores such as my dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) such
 as x^(1/3) or y causes significant load imbalance (i.e. some threads will be assigned much more work than others and keep on
 computing after most of the threads have already finished their computations) which severely deteriorates performance especially
