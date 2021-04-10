@@ -5,8 +5,8 @@ In order to speed up that computation Lagarias-Miller-Odlyzko [[1]](#references)
 special leaves. The contribution of each easy special leaf can be computed in O(1) using a ```PrimePi[n]``` lookup table whereas the
 contribution of each hard special leaf requires evaluating the partial sieve function phi(x, a) and cannot be computed in O(1).
 
-In the computation of the easy special leaves in the Deleglise-Rivat [[2]](#references) and Gourdon [[3]](#references) prime counting
-algorithms (which are based on the Lagarias-Miller-Odlyzko algorithm) we need to look up the number of primes below n with n < x^(1/2).
+In the Deleglise-Rivat [[2]](#references) and Gourdon [[3]](#references) prime counting algorithms (which are based on the
+Lagarias-Miller-Odlyzko algorithm) the computation of the easy special leaves requires looking up the number of primes below n with n < x^(1/2).
 Since a ```PrimePi[n]``` lookup table of size x^(1/2) is much too large to be practical, Deleglise-Rivat [[2]](#references) have
 suggested segmenting the Interval [0, x^(1/2)[ using a segment size of y (~ x^(1/3) * log(x)^3). So instead of using a
 ```PrimePi[n]``` lookup table of size x^(1/2) we now use a ```SegmentedPrimePi[n]```
