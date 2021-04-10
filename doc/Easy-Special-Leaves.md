@@ -63,12 +63,13 @@ segments. For each segment we need to compute ```PrimePi[low]``` with low < x^(1
 have a runtime complexity of O((x^(1/2))^(2/3) * x^(1/4)) = O(x^(7/12)) which does not deteriorate the overall runtime complexity
 of the algorithm.
 
-Lastly we have to ensure that the work is distributed evenly amongst all threads. Most of the easy special leaves are below y
-(~ x^(1/3) * log(x)^3), hence it is critical that this region is distributed evenly amongst all threads. Based on my benchmarks
-**a segment size of x^(1/4) evenly distributes the work** even on servers with a large number of CPU cores such as my
-dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) such as x^(1/3) or y causes significant load
-imbalance (i.e. some threads will be assigned much more work than others and keep on computing after most of the threads have
-already finished their computations) which severely deteriorates performance especially on PCs and servers with a large number
-of CPU cores. Above y there are much fewer easy special leaves hence the segment size can be increased by a small constant
-factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the new segment size still fits into
-the CPU's cache.
+Lastly we have to ensure that the work is distributed evenly amongst all threads. The easy special leaves are distributed very
+unevenly, most the leaves are located below y (~ x^(1/3) * log(x)^3) whereas above y the number of leaves slowly decreases and
+they become more and more sparse as they approach x^(1/2). Hence it is critical that the region below y is distributed evenly
+amongst all threads. Based on my benchmarks **a segment size of x^(1/4) evenly distributes the work** even on servers with a
+large number of CPU cores such as my dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) such
+as x^(1/3) or y causes significant load imbalance (i.e. some threads will be assigned much more work than others and keep on
+computing after most of the threads have already finished their computations) which severely deteriorates performance especially
+on PCs and servers with a large number of CPU cores. Above y there are much fewer easy special leaves hence the segment size can
+be increased by a small constant factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the
+new segment size still fits into the CPU's cache.
