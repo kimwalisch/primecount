@@ -7,14 +7,14 @@ contribution of each hard special leaf requires evaluating the partial sieve fun
 
 In the computation of the easy special leaves we need to look up the number of primes below n with n < x^(1/2). Since a
 ```PrimePi[n]``` lookup table of size x^(1/2) is much too large to be practical, Deleglise-Rivat have suggested segmenting the Interval
-[0, x^(1/2)[ using a segment size of y (~ x^(1/3) * log(x)^3). So instead of using a ```PrimePi[n]``` lookup of size x^(1/2) we now use
+[0, x^(1/2)[ using a segment size of y (~ x^(1/3) * log(x)^3). So instead of using a ```PrimePi[n]``` lookup table of size x^(1/2) we now use
 a ```SegmentedPrimePi[n]``` lookup table of size y which also returns the number of primes ≤ n but requires n to be within the current segment
 [low, low + y[. This approach was used in primecount up to version 6.4. However this segment size causes severe scaling issues
-for large computations > 10^22 as the ```SegmentedPrimePi[n]``` becomes exceedingly large e.g. at 10^30 its size was 137 GiB in
-primecount. For this reason Xavier Gourdon suggested using a smaller segment size of sqrt(x/y) which is orders of magnitude
+for large computations > 10^22 as the ```SegmentedPrimePi[n]``` lookup table becomes exceedingly large e.g. at 10^30 its size was
+137 GiB in primecount. For this reason Xavier Gourdon suggested using a smaller segment size of sqrt(x/y) which is orders of magnitude
 smaller and generally a good practical improvement.
 
-Hare are links to primecount's [PiTable](https://github.com/kimwalisch/primecount/blob/master/src/PiTable.cpp) and
+Here are links to primecount's [PiTable](https://github.com/kimwalisch/primecount/blob/master/src/PiTable.cpp) and
 [SegmentedPiTable](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp) implementations.
 
 # Improving the cache efficiency
