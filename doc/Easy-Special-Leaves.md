@@ -66,8 +66,9 @@ of the algorithm.
 Lastly we have to ensure that the work is distributed evenly amongst all threads. Most of the easy special leaves are below y
 (~ x^(1/3) * log(x)^3), hence it is critical that this region is distributed evenly amongst all threads. Based on my benchmarks
 **a segment size of x^(1/4) evenly distributes the work** even on servers with a large number of CPU cores such as my
-dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) causes significant load imbalance
-which deteriorates performance i.e. some threads will be assigned much more work than others and keep on computing while most
-threads have already finished their computations. Above y there are much fewer easy special leaves hence the segment size can be
-increased by a small constant factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the new
-segment size still fits into the CPU's cache.
+dual-socket AMD EPYC server with 196 threads. Using a segment size larger than x^(1/4) such as x^(1/3) or y causes significant load
+imbalance (i.e. some threads will be assigned much more work than others and keep on computing after most of the threads have
+already finished their computations) which severely deteriorates performance especially on PCs and servers with a large number
+of CPU cores. Above y there are much fewer easy special leaves hence the segment size can be increased by a small constant
+factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the new segment size still fits into
+the CPU's cache.
