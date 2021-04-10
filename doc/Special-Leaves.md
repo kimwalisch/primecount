@@ -251,6 +251,8 @@ void Sieve::allocate_counters(uint64_t segment_low)
 }
 ```
 
+## Open questions
+
 There are still a few open questions to which I have no answers yet. The most
 important one being: What's the runtime complexity of this alternative algorithm?
 Unfortunately it is not easy to answer this question as the algorithm
