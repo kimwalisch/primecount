@@ -45,8 +45,8 @@ table of size y instead of the ```SegmentedPrimePi[n]``` lookup table.
  # Parallel computation and load-balancing
 
 So far we have focused on improving the cache efficiency of the computation of the easy special leaves. Now we will have a look at
-how to parallelize the computation of the easy special leaves so that it scales well. Generally parallel algorithms scale well on
-current CPU architectures if they accomplish the 3 properties below:
+how to parallelize the computation of the easy special leaves so that the algorithm scales well. Generally parallel algorithms
+scale well on current CPU architectures if they accomplish the 3 properties below:
 
 * Each thread only operates on his own tiny chunk of memory that fits into the CPU's cache.
 * All threads must be independent from each other (i.e. require no synchronization).
