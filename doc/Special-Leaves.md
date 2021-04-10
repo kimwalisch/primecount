@@ -22,6 +22,8 @@ which consists of 2 main parts that are executed alternately:
 1) Sieve out primes and multiples of primes.
 2) Count the number of unsieved elements in the sieve array.
 
+## Speed up counting using binary indexed tree
+
 Since there is a large number of leaves for which we have to count the number of
 unsieved elements in the sieve array Lagarias-Miller-Odlyzko [[1]](#References)
 have suggested using a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree)
@@ -47,6 +49,8 @@ int count(const int* tree, int pos)
   return sum;
 }
 ```
+
+## Alternative counting method
 
 Despite the theoretical benefits of the binary indexed tree data structure it
 has two significant practical drawbacks:
@@ -93,6 +97,8 @@ the hard special leaves formula which used the alternative method described abov
 starts scaling badly above 10^23. For record computations this became a serious
 issue e.g. I had initially expected the computation of PrimePi(10^28) to take
 about 8 months, however it ended up taking 2.5 years!
+
+## Improved alternative counting method
 
 The scaling issue is caused by our change to count the number of unsieved elements
 by simply iterating over the sieve array. When there are many consecutive leaves
@@ -202,6 +208,8 @@ the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance be
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
+## Gradually adjusting the size of the counters array
+
 But this is not the end! So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
 Generally there is a very large number of leaves that are very close to each other
@@ -249,7 +257,7 @@ Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
 tiny factor.
 
-# References
+## References
 
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
 2. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
