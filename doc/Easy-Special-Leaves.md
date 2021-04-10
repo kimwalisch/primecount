@@ -57,7 +57,7 @@ all threads are independent from each other. Luckily Xavier Gourdon [[3]](#refer
 each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation**
 in O(low^(2/3)) or less. The result of ```PrimePi[low]``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
 for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-6.5
-(see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp)), it improved performance
+(see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp), [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp)), it improved performance
 by more than 2x at 10^23 on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
 required frequent synchronization of threads. It is important to ensure that the additional pre-computations do not deteriorate
 the runtime complexity of the algorithm. When sieving up to x^(1/2) using a segment size of x^(1/4) there will by exactly x^(1/4)
