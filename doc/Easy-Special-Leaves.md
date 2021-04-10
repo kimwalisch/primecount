@@ -36,8 +36,8 @@ formulas that need to lookup the number of primes < x^(1/2), whereas all other f
 primes ≤ y should be computed without segmentation. As a ```PrimePi[n]``` lookup table of size y is much too large to fit into the CPU's
 cache and as the ```PrimePi[n]``` lookup table is accessed in random order, I suggest segmenting all easy special leaves formulas that
 are computationally expensive using a segment size of x^(1/4) in order to improve performance. However special care needs to be
-used for the formulas that compute identical consecutive easy leaves more efficiently, sometimes these formulas are named clustered
-easy leaves. In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy leaves. These formulas
+used for the formulas that compute identical consecutive easy leaves more efficiently, sometimes these leaves are named clustered
+easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy leaves. These formulas
 need to access ```PrimePi[n]``` values with n ≤ y but some of these memory accesses (i.e. those that compute how many consecutive leaves
 are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using a ```PrimePi[n]``` lookup
 table of size y instead of the ```SegmentedPrimePi[n]``` lookup table.
@@ -81,3 +81,4 @@ new segment size still fits into the CPU's cache.
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
 2. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
 3. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
+4. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
