@@ -37,8 +37,9 @@ using the binary indexed tree data structure for counting the number of unsieved
 elements in the sieve array.
 
 ```C++
-// Count the number of unsieved elements <= pos in the
-// sieve array using a binary indexed tree.
+// Count the number of unsieved elements <= pos in
+// the sieve array using a binary indexed tree.
+// Code from: Tomás Oliveira e Silva [4]
 // Runtime: O(log n).
 //
 int count(const int* tree, int pos)
@@ -264,3 +265,4 @@ tiny factor.
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
 2. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
 3. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
+4. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
