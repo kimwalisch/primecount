@@ -23,9 +23,9 @@ which consists of 2 main parts that are executed alternately:
 2) Count the number of unsieved elements in the sieve array.
 
 Since there is a large number of leaves for which we have to count the number of
-unsieved elements in the sieve array Lagarias-Miller-Odlyzko have suggested using
-a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree) data structure
-(a.k.a. Fenwick tree) to speedup counting.
+unsieved elements in the sieve array Lagarias-Miller-Odlyzko [[1]](#References)
+have suggested using a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree)
+data structure (a.k.a. Fenwick tree) to speedup counting.
 For any number n the binary indexed tree allows to count the number of unsieved
 elements ≤ n using only O(log(n)) operations. However the binary indexed tree
 must also be updated whilst sieving which slows down the sieving part of the
@@ -194,10 +194,11 @@ issue in the computation of the special leaves that had been present in primecou
 since the very beginning. Below 10^20 there are no performance improvements,
 however above 10^20, the higher you go the more efficient the new method becomes
 compared to primecount's old implementation. At 10^25 the new method is already
-2x faster. Note that the new method works best with the Deleglise-Rivat and Gourdon
+2x faster. Note that the new method works best with the Deleglise-Rivat
+[[2]](#References) and Gourdon [[3]](#References)
 variants of the combinatorial prime counting algorithm as the average distance
 between consecutive special leaves is relatively large in those algorithms. In
-the Lagarias-Miller-Odlyzko algorithm the average distance between consecutive
+the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance between consecutive
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
@@ -247,3 +248,9 @@ important one being: What's the runtime complexity of this alternative algorithm
 Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
 tiny factor.
+
+# References
+
+1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
+2. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
+3. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
