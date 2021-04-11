@@ -49,21 +49,22 @@ int64_t pi_lmo1(int64_t x)
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
+  int threads = 1;
   bool is_print = false;
 
   // ordinary leaves
   for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > primes[c])
-      S1 += mu[n] * phi(x / n, c, is_print);
+      S1 += mu[n] * phi(x / n, c, threads, is_print);
 
   // special leaves
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])
-        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, is_print);
+        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, threads, is_print);
 
   int64_t phi = S1 + S2;
-  int64_t sum = phi + pi_y - 1 - P2(x, y, 1);
+  int64_t sum = phi + pi_y - 1 - P2(x, y, threads);
 
   return sum;
 }
