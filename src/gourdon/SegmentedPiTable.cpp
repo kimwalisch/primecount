@@ -35,6 +35,7 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
 {
   assert(low < high);
   assert(low % 240 == 0);
+  int threads = 1;
   uint64_t pi_low;
 
   // In order to make the threads completely independent
@@ -47,7 +48,7 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   else if (low == high_)
     pi_low = operator[](low - 1);
   else
-    pi_low = pi_noprint(low - 1, 1);
+    pi_low = pi_noprint(low - 1, threads);
 
   low_ = low;
   high_ = high;
@@ -81,9 +82,9 @@ void SegmentedPiTable::init_bits()
 /// Each thread computes PrimePi [low, high[
 void SegmentedPiTable::init_count(uint64_t pi_low)
 {
-  uint64_t high_idx = ceil_div((high_ - low_), 240);
+  uint64_t j = ceil_div((high_ - low_), 240);
 
-  for (uint64_t i = 0; i < high_idx; i++)
+  for (uint64_t i = 0; i < j; i++)
   {
     pi_[i].count = pi_low;
     pi_low += popcnt64(pi_[i].bits);

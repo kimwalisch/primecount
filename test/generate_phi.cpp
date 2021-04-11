@@ -33,7 +33,8 @@ int main()
     int64_t x = dist(gen);
     int64_t y = isqrt(x) + 1000;
 
-    PiTable pi(y, 1);
+    int threads = 1;
+    PiTable pi(y, threads);
     int64_t a = pi[y];
 
     auto primes = generate_primes<int64_t>(y);

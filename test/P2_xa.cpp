@@ -36,6 +36,7 @@ int main()
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(50000, 70000);
 
+  int threads = 1;
   int64_t x = dist(gen);
   auto primes = generate_primes<int64_t>(x);
 
@@ -49,7 +50,7 @@ int main()
           p2++;
 
     cout << "P2(" << x << ", " << a << ") = " << p2;
-    check(p2 == P2(x, primes[a], 1));
+    check(p2 == P2(x, primes[a], threads));
   }
 
   cout << endl;

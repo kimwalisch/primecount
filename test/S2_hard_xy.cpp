@@ -42,13 +42,14 @@ int main()
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(1, 10000000);
+  int threads = 1;
 
   // test small x
   for (int i = 1; i < 30000; i++)
   {
     int64_t x = i;
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_noprint(y, 1);
+    int64_t pi_y = pi_noprint(y, threads);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
@@ -64,7 +65,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Ri(x), 1));
+    check(s2 == S2_hard(x, y, z, c, Ri(x), threads));
   }
 
   // test random x
@@ -72,7 +73,7 @@ int main()
   {
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
-    int64_t pi_y = pi_noprint(y, 1);
+    int64_t pi_y = pi_noprint(y, threads);
     int64_t z = x / y;
     int64_t c = PhiTiny::get_c(y);
     int64_t s2 = 0;
@@ -88,7 +89,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Ri(x), 1));
+    check(s2 == S2_hard(x, y, z, c, Ri(x), threads));
   }
 
   cout << endl;

@@ -40,10 +40,11 @@ int main()
   double max_alpha = get_alpha_deleglise_rivat(max_x);
   int64_t max_x13 = iroot<3>(max_x);
   int64_t max_y = (int64_t) (max_alpha * max_x13);
+  int threads = 1;
 
   {
     auto primes = generate_primes<int64_t>(max_y);
-    PiTable pi(max_y, 1);
+    PiTable pi(max_y, threads);
 
     // test small x
     for (int64_t i = 1; i < max_x; i++)
@@ -69,7 +70,7 @@ int main()
       }
 
       cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-      check(s2_easy == S2_easy(x, y, z, c, 1));
+      check(s2_easy == S2_easy(x, y, z, c, threads));
     }
   }
 
@@ -80,7 +81,7 @@ int main()
 
   {
     auto primes = generate_primes<int64_t>(max_y);
-    PiTable pi(max_y, 1);
+    PiTable pi(max_y, threads);
 
     random_device rd;
     mt19937 gen(rd());
@@ -110,7 +111,7 @@ int main()
       }
 
       cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
-      check(s2_easy == S2_easy(x, y, z, c, 1));
+      check(s2_easy == S2_easy(x, y, z, c, threads));
     }
   }
 

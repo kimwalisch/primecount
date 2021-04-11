@@ -36,6 +36,7 @@ int main()
   random_device rd;
   mt19937 gen(rd());
   uniform_int_distribution<int> dist(0, 10000000);
+  int threads = 1;
 
   for (int i = 0; i < 1000; i++)
   {
@@ -54,7 +55,7 @@ int main()
         s1 += mu[n] * phi_tiny(x / n, c);
 
     cout << "S1(" << x << ", " << y << ") = " << s1;
-    check(s1 == S1(x, y, c, 1));
+    check(s1 == S1(x, y, c, threads));
   }
 
   cout << endl;
