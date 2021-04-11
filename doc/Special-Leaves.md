@@ -37,8 +37,9 @@ using the binary indexed tree data structure for counting the number of unsieved
 elements in the sieve array.
 
 ```C++
-// Count the number of unsieved elements <= pos in the
-// sieve array using a binary indexed tree.
+// Count the number of unsieved elements <= pos in
+// the sieve array using a binary indexed tree.
+// Code from: Tomás Oliveira e Silva [4]
 // Runtime: O(log n).
 //
 int count(const int* tree, int pos)
@@ -191,16 +192,15 @@ grows about as fast as the alpha tuning factor which grows like O(log(x)^3). For
 this reason I believe that the improved counting method described above has an
 average runtime complexity of O(log(x)^3) per leaf. If this is true then the runtime
 complexity of our alternative algorithm would not be worse anymore than the runtime
-complexity of the original algorithm with the binary indexed tree. This would
-be meaningful as I am not aware of any other algorithm that has the same runtime
-complexity as the algorithm with the binary indexed tree and because the binary
-indexed tree is practically a performance nightmare. When I implemented the above
-alternative counting method in primecount it completely fixed the severe scaling
-issue in the computation of the special leaves that had been present in primecount
-since the very beginning. Below 10^20 there are no performance improvements,
-however above 10^20, the higher you go the more efficient the new method becomes
-compared to primecount's old implementation. At 10^25 the new method is already
-2x faster. Note that the new method works best with the Deleglise-Rivat
+complexity of the original algorithm with the binary indexed tree. Unfortunately
+I have not been able yet to accurately calculate the runtime complexity of this
+alternative algorithm, see the [Open questions](#Open-questions) for further details.
+However when I implemented the above alternative counting method in primecount it completely fixed
+the severe scaling issue in the computation of the special leaves that had been
+present in primecount since the very beginning. Below 10^20 there are no performance
+improvements, however above 10^20, the higher you go the more efficient the new method
+becomes compared to primecount's old implementation. At 10^25 the new method is
+already 2x faster. Note that the new method works best with the Deleglise-Rivat
 [[2]](#References) and Gourdon [[3]](#References)
 variants of the combinatorial prime counting algorithm as the average distance
 between consecutive special leaves is relatively large in those algorithms. In
@@ -208,7 +208,7 @@ the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance be
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
-## Gradually adjusting the size of the counters array
+## Gradually increasing the size of the counters array
 
 But this is not the end! So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
@@ -257,10 +257,11 @@ There are still a few open questions to which I have no answers yet. The most
 important one being: What's the runtime complexity of this alternative algorithm?
 Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
-tiny factor.
+small factor.
 
 ## References
 
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
 2. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
 3. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
+4. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
