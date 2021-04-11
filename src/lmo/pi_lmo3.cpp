@@ -38,9 +38,9 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
            int64_t pi_y,
-           vector<int32_t>& primes,
-           vector<int32_t>& lpf,
-           vector<int32_t>& mu)
+           const vector<int32_t>& primes,
+           const vector<int32_t>& lpf,
+           const vector<int32_t>& mu)
 {
   int64_t limit = x / y;
   int64_t segment_size = isqrt(limit);
