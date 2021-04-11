@@ -122,15 +122,6 @@ T D_approx(T x, T sigma, T phi0, T ac, T b)
   return d_approx;
 }
 
-#ifdef ENABLE_MPI
-
-bool is_mpi_main_proc();
-int mpi_num_procs();
-int mpi_proc_id();
-int mpi_main_proc_id();
-
-#endif
-
 } // namespace
 
 #endif

@@ -118,11 +118,6 @@ int64_t Sigma(int64_t x,
               int threads,
               bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (!is_mpi_main_proc())
-    return 0;
-#endif
-
   if (is_print)
   {
     print("");
@@ -164,11 +159,6 @@ int128_t Sigma(int128_t x,
                int threads,
                bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (!is_mpi_main_proc())
-    return 0;
-#endif
-
   if (is_print)
   {
     print("");

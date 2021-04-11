@@ -303,11 +303,6 @@ int64_t AC(int64_t x,
            int threads,
            bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   if (is_print)
   {
     print("");
@@ -339,11 +334,6 @@ int128_t AC(int128_t x,
             int threads,
             bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return AC_mpi(x, y, z, k, threads);
-#endif
-
   if (is_print)
   {
     print("");

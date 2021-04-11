@@ -2,7 +2,7 @@
 /// @file   main.cpp
 /// @brief  primecount console application
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,10 +24,6 @@
 #include <iostream>
 #include <limits>
 #include <string>
-
-#ifdef ENABLE_MPI
-  #include <mpi.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -339,10 +335,6 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
-#ifdef ENABLE_MPI
-  MPI_Init(&argc, &argv);
-#endif
-
   try
   {
     CmdOptions opt = parseOptions(argc, argv);
@@ -439,17 +431,10 @@ int main (int argc, char* argv[])
   }
   catch (exception& e)
   {
-#ifdef ENABLE_MPI
-    MPI_Finalize();
-#endif
     cerr << "primecount: " << e.what() << endl
          << "Try 'primecount --help' for more information." << endl;
     return 1;
   }
-
-#ifdef ENABLE_MPI
-    MPI_Finalize();
-#endif
 
   return 0;
 }

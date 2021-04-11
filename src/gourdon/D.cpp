@@ -232,11 +232,6 @@ int64_t D(int64_t x,
           int threads,
           bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return D_mpi(x, y, z, k, d_approx, threads);
-#endif
-
   if (is_print)
   {
     print("");
@@ -265,11 +260,6 @@ int128_t D(int128_t x,
            int threads,
            bool is_print)
 {
-#ifdef ENABLE_MPI
-  if (mpi_num_procs() > 1)
-    return D_mpi(x, y, z, k, d_approx, threads);
-#endif
-
   if (is_print)
   {
     print("");

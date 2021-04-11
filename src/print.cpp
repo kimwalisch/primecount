@@ -30,13 +30,7 @@ bool is_print_variables()
 
 void print_threads(int threads)
 {
-#ifdef ENABLE_MPI
-  using primecount::mpi_num_procs;
-  cout << "processes = " << mpi_num_procs() << endl;
-  cout << "threads = " << mpi_num_procs() << " * " << threads << endl;
-#else
   cout << "threads = " << threads << endl;
-#endif
 }
 
 } // naespace
@@ -54,29 +48,17 @@ bool is_print()
 ///
 bool is_print_combined_result()
 {
-#ifdef ENABLE_MPI
-  return !is_print_variables() && is_mpi_main_proc();
-#else
   return !is_print_variables();
-#endif
 }
 
 void set_print(bool print)
 {
-#ifdef ENABLE_MPI
-  print_ = print && is_mpi_main_proc();
-#else
   print_ = print;
-#endif
 }
 
 void set_print_variables(bool print_variables)
 {
-#ifdef ENABLE_MPI
-  print_variables_ = print_variables && is_mpi_main_proc();
-#else
   print_variables_ = print_variables;
-#endif
 }
 
 void print_seconds(double seconds)

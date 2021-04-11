@@ -3,7 +3,7 @@
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,40 +22,6 @@
 #include <string>
 #include <stdint.h>
 #include <utility>
-
-#ifdef ENABLE_MPI
-
-#include <mpi.h>
-
-namespace primecount {
-
-int mpi_num_procs()
-{
-  int procs;
-  MPI_Comm_size(MPI_COMM_WORLD, &procs);
-  return procs;
-}
-
-int mpi_proc_id()
-{
-  int proc_id;
-  MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
-  return proc_id;
-}
-
-int mpi_main_proc_id()
-{
-  return 0;
-}
-
-bool is_mpi_main_proc()
-{
-  return mpi_proc_id() == mpi_main_proc_id();
-}
-
-} // namespace
-
-#endif
 
 using namespace std;
 
