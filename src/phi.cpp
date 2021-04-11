@@ -83,7 +83,7 @@ public:
     // but this causes scaling issues on big servers.
     uint64_t max_x = (uint64_t) pow(x, 1 / 2.3);
 
-    // The cache (i.e. the sieve and sieve_counts arrays)
+    // The cache (i.e. the sieve array)
     // uses at most max_megabytes per thread.
     uint64_t max_megabytes = 16;
     uint64_t indexes = max_a - tiny_a;
@@ -201,9 +201,10 @@ private:
   /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
   /// Eratosthenes-like sieving algorithm that removes the first a primes
   /// and their multiples from the sieve array. Additionally this
-  /// algorithm counts the numbers that are not divible by any of the
-  /// first a primes after sieving has completed. The sieve array and the
-  /// sieve_counts array later serve us as a phi(x, a) cache.
+  /// algorithm counts the numbers that are not divisible by any of the
+  /// first a primes after sieving has completed. After sieving and
+  /// counting has finished phi(x, a) results can be retrieved from the
+  /// cache in O(1) using the phi_cache(x, a) method.
   ///
   void sieve_cache(uint64_t x, uint64_t a)
   {
