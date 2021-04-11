@@ -98,31 +98,28 @@ int64_t Phi0(int64_t x,
              int64_t y,
              int64_t z,
              int64_t k,
-             int threads)
+             int threads,
+             bool is_print)
 {
 #ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return Phi0_mpi(x, y, z, k, threads);
 #endif
 
-  print("");
-  print("=== Phi0(x, y) ===");
-  print_gourdon_vars(x, y, z, k, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== Phi0(x, y) ===");
+    print_gourdon_vars(x, y, z, k, threads);
+  }
 
   double time = get_time();
-  int64_t phi0 = Phi0_noprint(x, y, z, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
 
-  print("Phi0", phi0, time);
+  if (is_print)
+    print("Phi0", phi0, time);
+
   return phi0;
-}
-
-int64_t Phi0_noprint(int64_t x,
-                     int64_t y,
-                     int64_t z,
-                     int64_t k,
-                     int threads)
-{
-  return Phi0_OpenMP(x, y, z, k, threads);
 }
 
 #ifdef HAVE_INT128_T

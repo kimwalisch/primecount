@@ -56,12 +56,14 @@ int64_t pi(int64_t x, int threads)
 
 int64_t pi_noprint(int64_t x, int threads)
 {
+  bool is_print = false;
+
   if (x <= (int64_t) 1e5)
-    return pi_legendre_noprint(x, threads);
+    return pi_legendre(x, threads, is_print);
   else if (x <= (int64_t) 1e8)
-    return pi_meissel_noprint(x, threads);
+    return pi_meissel(x, threads, is_print);
   else
-    return pi_gourdon_64_noprint(x, threads);
+    return pi_gourdon_64(x, threads, is_print);
 }
 
 #ifdef HAVE_INT128_T
@@ -134,11 +136,6 @@ int64_t nth_prime(int64_t n)
 int64_t phi(int64_t x, int64_t a)
 {
   return phi(x, a, get_num_threads());
-}
-
-int64_t phi_noprint(int64_t x, int64_t a)
-{
-  return phi_noprint(x, a, get_num_threads());
 }
 
 string primecount_version()

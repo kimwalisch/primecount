@@ -29,7 +29,7 @@ namespace primecount {
 /// Run time: O(x)
 /// Memory usage: O(x^(1/2))
 ///
-int64_t pi_legendre(int64_t x, int threads)
+int64_t pi_legendre(int64_t x, int threads, bool is_print)
 {
   if (x < 2)
     return 0;
@@ -37,27 +37,18 @@ int64_t pi_legendre(int64_t x, int threads)
   int64_t y = isqrt(x);
   int64_t a = pi_noprint(y, threads);
 
-  print("");
-  print("=== pi_legendre(x) ===");
-  print("pi(x) = phi(x, a) + a - 1");
-  print("x", x);
-  print("a", a);
-  print("threads", threads);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_legendre(x) ===");
+    print("pi(x) = phi(x, a) + a - 1");
+    print("x", x);
+    print("a", a);
+    print("threads", threads);
+  }
 
-  int64_t phi_xa = phi(x, a, threads);
+  int64_t phi_xa = phi(x, a, threads, is_print);
   int64_t sum = phi_xa + a - 1;
-
-  return sum;
-}
-
-int64_t pi_legendre_noprint(int64_t x, int threads)
-{
-  if (x < 2)
-    return 0;
-
-  int64_t y = isqrt(x);
-  int64_t a = pi_noprint(y, threads);
-  int64_t sum = phi_noprint(x, a, threads) + a - 1;
 
   return sum;
 }

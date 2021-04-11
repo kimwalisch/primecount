@@ -202,15 +202,15 @@ T AC_OpenMP(T x,
             int64_t x_star,
             int64_t max_a_prime,
             const Primes& primes,
-            bool is_print,
-            int threads)
+            int threads,
+            bool is_print)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, y, is_print, threads);
+  LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than
@@ -300,16 +300,20 @@ int64_t AC(int64_t x,
            int64_t y,
            int64_t z,
            int64_t k,
-           int threads)
+           int threads,
+           bool is_print)
 {
 #ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return AC_mpi(x, y, z, k, threads);
 #endif
 
-  print("");
-  print("=== AC(x, y) ===");
-  print_gourdon_vars(x, y, z, k, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== AC(x, y) ===");
+    print_gourdon_vars(x, y, z, k, threads);
+  }
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
@@ -318,26 +322,12 @@ int64_t AC(int64_t x,
   int64_t max_prime = max(max_a_prime, max_c_prime);
   auto primes = generate_primes<uint32_t>(max_prime);
 
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
+  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print);
 
-  print("A + C", sum, time);
+  if (is_print)
+    print("A + C", sum, time);
+
   return sum;
-}
-
-int64_t AC_noprint(int64_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t k,
-                   int threads)
-{
-  int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
-  auto primes = generate_primes<uint32_t>(max_prime);
-  bool is_print = false;
-
-  return AC_OpenMP((uint64_t) x, y, z, k, x_star, max_a_prime, primes, is_print, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -368,12 +358,12 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print());
   }
   else
   {
     auto primes = generate_primes<uint64_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, is_print(), threads);
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print());
   }
 
   print("A + C", sum, time);

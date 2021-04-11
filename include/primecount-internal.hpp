@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -29,8 +30,7 @@ int64_t pi(int64_t x, int threads);
 int64_t pi_noprint(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);
 int64_t pi_deleglise_rivat_64(int64_t x, int threads);
-int64_t pi_legendre(int64_t x, int threads);
-int64_t pi_legendre_noprint(int64_t x, int threads);
+int64_t pi_legendre(int64_t x, int threads, bool print = is_print());
 int64_t pi_lehmer(int64_t x, int threads);
 int64_t pi_lmo1(int64_t x);
 int64_t pi_lmo2(int64_t x);
@@ -38,16 +38,12 @@ int64_t pi_lmo3(int64_t x);
 int64_t pi_lmo4(int64_t x);
 int64_t pi_lmo5(int64_t x);
 int64_t pi_lmo_parallel(int64_t x, int threads);
-int64_t pi_meissel(int64_t x, int threads);
-int64_t pi_meissel_noprint(int64_t x, int threads);
+int64_t pi_meissel(int64_t x, int threads, bool print = is_print());
 int64_t pi_primesieve(int64_t x);
 
 int64_t nth_prime(int64_t n, int threads);
-int64_t phi(int64_t x, int64_t a, int threads);
-int64_t phi_noprint(int64_t x, int64_t a);
-int64_t phi_noprint(int64_t x, int64_t a, int threads);
-int64_t P2(int64_t x, int64_t y, int threads);
-int64_t P2_noprint(int64_t x, int64_t y, int threads);
+int64_t phi(int64_t x, int64_t a, int threads, bool print = is_print());
+int64_t P2(int64_t x, int64_t y, int threads, bool print = is_print());
 int64_t P3(int64_t x, int64_t y, int threads);
 
 int64_t Li(int64_t);

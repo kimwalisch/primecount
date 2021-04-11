@@ -36,13 +36,13 @@ namespace primecount {
 
 LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
                                int64_t y,
-                               bool is_print,
-                               int threads) :
+                               int threads,
+                               bool is_print) :
   sqrtx_(sqrtx),
   x14_(isqrt(sqrtx)),
   y_(y),
-  is_print_(is_print),
-  threads_(threads)
+  threads_(threads),
+  is_print_(is_print)
 {
   if (threads_ == 1)
     segment_size_ = std::max(x14_, l2_segment_size);
