@@ -14,6 +14,10 @@
 ///        type, one array element (8 bytes) corresponds to an
 ///        interval of size 30 * 8 = 240.
 ///
+///        The algorithm of the easy special leaves and the usage of
+///        the SegmentedPiTable are described in more detail in:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
+///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
