@@ -91,17 +91,23 @@ int64_t S2_trivial(int64_t x,
                    int64_t y,
                    int64_t z,
                    int64_t c,
-                   int threads)
+                   int threads,
+                   bool is_print)
 {
-  print("");
-  print("=== S2_trivial(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S2_trivial(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
-  int64_t s2_trivial = get_S2_trivial(x, y, z, c, threads);
+  int64_t sum = get_S2_trivial(x, y, z, c, threads);
 
-  print("S2_trivial", s2_trivial, time);
-  return s2_trivial;
+  if (is_print)
+    print("S2_trivial", sum, time);
+
+  return sum;
 }
 
 #ifdef HAVE_INT128_T
@@ -110,17 +116,23 @@ int128_t S2_trivial(int128_t x,
                     int64_t y,
                     int64_t z,
                     int64_t c,
-                    int threads)
+                    int threads,
+                    bool is_print)
 {
-  print("");
-  print("=== S2_trivial(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S2_trivial(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
-  int128_t s2_trivial = get_S2_trivial(x, y, z, c, threads);
+  int128_t sum = get_S2_trivial(x, y, z, c, threads);
 
-  print("S2_trivial", s2_trivial, time);
-  return s2_trivial;
+  if (is_print)
+    print("S2_trivial", sum, time);
+
+  return sum;
 }
 
 #endif

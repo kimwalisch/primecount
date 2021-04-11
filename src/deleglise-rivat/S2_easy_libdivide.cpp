@@ -153,7 +153,8 @@ T S2_easy_OpenMP(T x,
                  int64_t z,
                  int64_t c,
                  const Primes& primes,
-                 int threads)
+                 int threads,
+                 bool is_print)
 {
   // Initialize libdivide vector using primes
   vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
@@ -180,7 +181,8 @@ T S2_easy_OpenMP(T x,
     else
       sum += S2_easy_128(xp, y, z, b, prime, primes, pi);
 
-    status.print(b, pi_x13);
+    if (is_print)
+      status.print(b, pi_x13);
   }
 
   return sum;
@@ -194,17 +196,23 @@ int64_t S2_easy(int64_t x,
                 int64_t y,
                 int64_t z,
                 int64_t c,
-                int threads)
+                int threads,
+                bool is_print)
 {
-  print("");
-  print("=== S2_easy(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S2_easy(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
   auto primes = generate_primes<uint32_t>(y);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads);
+  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads, is_print);
 
-  print("S2_easy", sum, time);
+  if (is_print)
+    print("S2_easy", sum, time);
+
   return sum;
 }
 
@@ -214,11 +222,15 @@ int128_t S2_easy(int128_t x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
-                 int threads)
+                 int threads,
+                 bool is_print)
 {
-  print("");
-  print("=== S2_easy(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S2_easy(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
   int128_t sum;
@@ -227,15 +239,17 @@ int128_t S2_easy(int128_t x,
   if (y <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads, is_print);
   }
   else
   {
     auto primes = generate_primes<int64_t>(y);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads, is_print);
   }
 
-  print("S2_easy", sum, time);
+  if (is_print)
+    print("S2_easy", sum, time);
+
   return sum;
 }
 

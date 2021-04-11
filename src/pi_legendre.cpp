@@ -29,7 +29,9 @@ namespace primecount {
 /// Run time: O(x)
 /// Memory usage: O(x^(1/2))
 ///
-int64_t pi_legendre(int64_t x, int threads, bool is_print)
+int64_t pi_legendre(int64_t x,
+                    int threads,
+                    bool is_print)
 {
   if (x < 2)
     return 0;

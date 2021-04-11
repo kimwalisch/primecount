@@ -159,16 +159,22 @@ int64_t Sigma(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t Sigma(int128_t x, int64_t y, int threads)
+int128_t Sigma(int128_t x,
+               int64_t y,
+               int threads,
+               bool is_print)
 {
 #ifdef ENABLE_MPI
   if (!is_mpi_main_proc())
     return 0;
 #endif
 
-  print("");
-  print("=== Sigma(x, y) ===");
-  print_gourdon_vars(x, y, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== Sigma(x, y) ===");
+    print_gourdon_vars(x, y, threads);
+  }
 
   int128_t x_star = get_x_star_gourdon(x, y);
   int64_t max_pix_sigma4 = x / (x_star * y);
@@ -191,7 +197,9 @@ int128_t Sigma(int128_t x, int64_t y, int threads)
                  Sigma5(x, y, pi) +
                  Sigma6(x, x_star, pi);
 
-  print("Sigma", sum, time);
+  if (is_print)
+    print("Sigma", sum, time);
+
   return sum;
 }
 

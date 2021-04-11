@@ -262,16 +262,20 @@ int128_t D(int128_t x,
            int64_t z,
            int64_t k,
            int128_t d_approx,
-           int threads)
+           int threads,
+           bool is_print)
 {
 #ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return D_mpi(x, y, z, k, d_approx, threads);
 #endif
 
-  print("");
-  print("=== D(x, y) ===");
-  print_gourdon_vars(x, y, z, k, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== D(x, y) ===");
+    print_gourdon_vars(x, y, z, k, threads);
+  }
 
   double time = get_time();
   int128_t sum;
@@ -281,16 +285,18 @@ int128_t D(int128_t x,
   {
     DFactorTable<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print());
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
   }
   else
   {
     DFactorTable<uint32_t> factor(y, z, threads);
     auto primes = generate_primes<int64_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print());
+    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
   }
 
-  print("D", sum, time);
+  if (is_print)
+    print("D", sum, time);
+
   return sum;
 }
 

@@ -86,39 +86,31 @@ void print_seconds(double seconds)
 
 void print(const string& str)
 {
-  if (is_print())
-    cout << str << endl;
+  cout << str << endl;
 }
 
 void print(const string& str, maxint_t res)
 {
-  if (is_print())
-    cout << str << " = " << res << endl;
+  cout << str << " = " << res << endl;
 }
 
 void print(const string& str, maxint_t res, double time)
 {
-  if (is_print())
-  {
-    cout << "\r" << string(50,' ') << "\r";
-    cout << "Status: 100%" << endl;
-    cout << str << " = " << res << endl;
-    print_seconds(get_time() - time);
-  }
+  cout << "\r" << string(50,' ') << "\r";
+  cout << "Status: 100%" << endl;
+  cout << str << " = " << res << endl;
+  print_seconds(get_time() - time);
 }
 
 /// Used by pi_lmo(x), pi_deleglise_rivat(x)
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
 {
-  if (is_print())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "c = " << c << endl;
-    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
-    print_threads(threads);
-  }
+  cout << "x = " << x << endl;
+  cout << "y = " << y << endl;
+  cout << "z = " << z << endl;
+  cout << "c = " << c << endl;
+  cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+  print_threads(threads);
 }
 
 /// Only enabled for partial formulas
@@ -150,17 +142,14 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
 /// Used by pi_gourdon(x)
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
-  if (is_print())
-  {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "k = " << k << endl;
-    cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
-    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
-    cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
-    print_threads(threads);
-  }
+  cout << "x = " << x << endl;
+  cout << "y = " << y << endl;
+  cout << "z = " << z << endl;
+  cout << "k = " << k << endl;
+  cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
+  cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+  cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
+  print_threads(threads);
 }
 
 /// Only enabled for partial formulas

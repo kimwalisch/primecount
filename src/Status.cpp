@@ -131,10 +131,6 @@ void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx
 /// Used by S2_easy
 void Status::print(int64_t b, int64_t max_b)
 {
-  // check --status option used
-  if (!is_print())
-    return;
-
 #if defined(_OPENMP)
   // In order to prevent data races only one thread at a time
   // can enter this code section. In order to make sure that

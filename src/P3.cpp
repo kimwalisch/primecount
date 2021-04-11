@@ -25,10 +25,16 @@ namespace primecount {
 /// prime factors each exceeding the a-th prime.
 /// Memory usage: O(sqrt(x))
 ///
-int64_t P3(int64_t x, int64_t y, int threads)
+int64_t P3(int64_t x,
+           int64_t y,
+           int threads,
+           bool is_print)
 {
-  print("");
-  print("=== P3(x, y) ===");
+  if (is_print)
+  {
+    print("");
+    print("=== P3(x, y) ===");
+  }
 
   double time = get_time();
   int64_t sum = 0;
@@ -56,7 +62,9 @@ int64_t P3(int64_t x, int64_t y, int threads)
     }
   }
 
-  print("P3", sum, time);
+  if (is_print)
+    print("P3", sum, time);
+
   return sum;
 }
 

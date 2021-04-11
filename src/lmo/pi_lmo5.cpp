@@ -46,10 +46,14 @@ int64_t S2(int64_t x,
            int64_t c,
            vector<int32_t>& primes,
            vector<int32_t>& lpf,
-           vector<int32_t>& mu)
+           vector<int32_t>& mu,
+           bool is_print)
 {
-  print("");
-  print("=== S2(x, y) ===");
+  if (is_print)
+  {
+    print("");
+    print("=== S2(x, y) ===");
+  }
 
   double time = get_time();
   int64_t limit = x / y;
@@ -130,7 +134,9 @@ int64_t S2(int64_t x,
     next_segment:;
   }
 
-  print("S2", s2, time);
+  if (is_print)
+    print("S2", s2, time);
+
   return s2;
 }
 
@@ -143,7 +149,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / log x)
 /// Memory usage: O(x^(1/3) * (log x)^2)
 ///
-int64_t pi_lmo5(int64_t x)
+int64_t pi_lmo5(int64_t x, bool is_print)
 {
   if (x < 2)
     return 0;
@@ -154,19 +160,22 @@ int64_t pi_lmo5(int64_t x)
   int64_t z = x / y;
   int64_t c = PhiTiny::get_c(y);
 
-  print("");
-  print("=== pi_lmo5(x) ===");
-  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, 1);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_lmo5(x) ===");
+    print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+    print(x, y, z, c, 1);
+  }
 
-  int64_t p2 = P2(x, y, 1);
+  int64_t p2 = P2(x, y, 1, is_print);
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t s1 = S1(x, y, c, 1);
-  int64_t s2 = S2(x, y, c, primes, lpf, mu);
+  int64_t s1 = S1(x, y, c, 1, is_print);
+  int64_t s2 = S2(x, y, c, primes, lpf, mu, is_print);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

@@ -108,7 +108,10 @@ P2_thread(T x,
 /// Run-time: O(z log log z)
 ///
 template <typename T>
-T P2_OpenMP(T x, int64_t y, int threads, bool is_print)
+T P2_OpenMP(T x,
+            int64_t y,
+            int threads,
+            bool is_print)
 {
   static_assert(is_signed<T>::value,
                 "T must be signed integer type");
@@ -198,16 +201,24 @@ int64_t P2(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t P2(int128_t x, int64_t y, int threads)
+int128_t P2(int128_t x,
+            int64_t y,
+            int threads,
+            bool is_print)
 {
-  print("");
-  print("=== P2(x, y) ===");
-  print_vars(x, y, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== P2(x, y) ===");
+    print_vars(x, y, threads);
+  }
 
   double time = get_time();
-  int128_t sum = P2_OpenMP(x, y, threads, is_print());
+  int128_t sum = P2_OpenMP(x, y, threads, is_print);
 
-  print("P2", sum, time);
+  if (is_print)
+    print("P2", sum, time);
+
   return sum;
 }
 

@@ -90,16 +90,22 @@ namespace primecount {
 int64_t S1(int64_t x,
            int64_t y,
            int64_t c,
-           int threads)
+           int threads,
+           bool is_print)
 {
-  print("");
-  print("=== S1(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S1(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
   int64_t s1 = S1_OpenMP(x, y, c, threads);
 
-  print("S1", s1, time);
+  if (is_print)
+    print("S1", s1, time);
+
   return s1;
 }
 
@@ -108,11 +114,15 @@ int64_t S1(int64_t x,
 int128_t S1(int128_t x,
             int64_t y,
             int64_t c,
-            int threads)
+            int threads,
+            bool is_print)
 {
-  print("");
-  print("=== S1(x, y) ===");
-  print_vars(x, y, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== S1(x, y) ===");
+    print_vars(x, y, c, threads);
+  }
 
   double time = get_time();
   int128_t s1;
@@ -123,7 +133,9 @@ int128_t S1(int128_t x,
   else
     s1 = S1_OpenMP(x, y, c, threads);
 
-  print("S1", s1, time);
+  if (is_print)
+    print("S1", s1, time);
+
   return s1;
 }
 

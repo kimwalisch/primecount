@@ -107,7 +107,10 @@ B_thread(T x,
 /// Memory usage: O(z^(1/2))
 ///
 template <typename T>
-T B_OpenMP(T x, int64_t y, int threads, bool is_print)
+T B_OpenMP(T x,
+           int64_t y,
+           int threads,
+           bool is_print)
 {
   if (x < 4)
     return 0;
@@ -189,21 +192,29 @@ int64_t B(int64_t x,
 
 #ifdef HAVE_INT128_T
 
-int128_t B(int128_t x, int64_t y, int threads)
+int128_t B(int128_t x,
+           int64_t y,
+           int threads,
+           bool is_print)
 {
 #ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return B_mpi(x, y, threads);
 #endif
 
-  print("");
-  print("=== B(x, y) ===");
-  print_gourdon_vars(x, y, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== B(x, y) ===");
+    print_gourdon_vars(x, y, threads);
+  }
 
   double time = get_time();
-  int128_t sum = B_OpenMP((uint128_t) x, y, threads, is_print());
+  int128_t sum = B_OpenMP((uint128_t) x, y, threads, is_print);
 
-  print("B", sum, time);
+  if (is_print)
+    print("B", sum, time);
+
   return sum;
 }
 

@@ -172,15 +172,19 @@ int64_t S2(int64_t x,
            const vector<int32_t>& primes,
            const vector<int32_t>& lpf,
            const vector<int32_t>& mu,
-           int threads)
+           int threads,
+           bool is_print)
 {
-  print("");
-  print("=== S2(x, y) ===");
+  if (is_print)
+  {
+    print("");
+    print("=== S2(x, y) ===");
+  }
 
   double time = get_time();
   int64_t thread_threshold = 1 << 20;
   threads = ideal_num_threads(threads, z, thread_threshold);
-  LoadBalancerS2 loadBalancer(x, z, s2_approx, is_print());
+  LoadBalancerS2 loadBalancer(x, z, s2_approx, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
@@ -196,7 +200,9 @@ int64_t S2(int64_t x,
   }
 
   int64_t sum = (int64_t) loadBalancer.get_sum();
-  print("S2", sum, time);
+
+  if (is_print)
+    print("S2", sum, time);
 
   return sum;
 }
@@ -210,7 +216,9 @@ namespace primecount {
 /// Run time: O(x^(2/3) / log x)
 /// Memory usage: O(x^(1/3) * (log x)^2)
 ///
-int64_t pi_lmo_parallel(int64_t x, int threads)
+int64_t pi_lmo_parallel(int64_t x,
+                        int threads,
+                        bool is_print)
 {
   if (x < 2)
     return 0;
@@ -221,20 +229,23 @@ int64_t pi_lmo_parallel(int64_t x, int threads)
   int64_t z = x / y;
   int64_t c = PhiTiny::get_c(y);
 
-  print("");
-  print("=== pi_lmo_parallel(x) ===");
-  print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
-  print(x, y, z, c, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_lmo_parallel(x) ===");
+    print("pi(x) = S1 + S2 + pi(y) - 1 - P2");
+    print(x, y, z, c, threads);
+  }
 
-  int64_t p2 = P2(x, y, threads);
+  int64_t p2 = P2(x, y, threads, is_print);
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
-  int64_t s1 = S1(x, y, c, threads);
+  int64_t s1 = S1(x, y, c, threads, is_print);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
-  int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads);
+  int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t sum = phi + pi_y - 1 - p2;
 

@@ -27,7 +27,9 @@ namespace primecount {
 /// Run time: O(x/(log x)^4)
 /// Memory usage: O(x^(1/2))
 ///
-int64_t pi_lehmer(int64_t x, int threads)
+int64_t pi_lehmer(int64_t x,
+                  int threads,
+                  bool is_print)
 {
   if (x < 2)
     return 0;
@@ -35,17 +37,20 @@ int64_t pi_lehmer(int64_t x, int threads)
   int64_t y = iroot<4>(x);
   int64_t a = pi_noprint(y, threads);
 
-  print("");
-  print("=== pi_lehmer(x) ===");
-  print("pi(x) = phi(x, a) + a - 1 - P2 - P3");
-  print("x", x);
-  print("y", y);
-  print("a", a);
-  print("threads", threads);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_lehmer(x) ===");
+    print("pi(x) = phi(x, a) + a - 1 - P2 - P3");
+    print("x", x);
+    print("y", y);
+    print("a", a);
+    print("threads", threads);
+  }
 
-  int64_t phi_xa = phi(x, a, threads);
-  int64_t p2 = P2(x, y, threads);
-  int64_t p3 = P3(x, y, threads);
+  int64_t phi_xa = phi(x, a, threads, is_print);
+  int64_t p2 = P2(x, y, threads, is_print);
+  int64_t p3 = P3(x, y, threads, is_print);
   int64_t sum = phi_xa + a - 1 - p2 - p3;
 
   return sum;

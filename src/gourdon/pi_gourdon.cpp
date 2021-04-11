@@ -33,7 +33,9 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t pi_gourdon_64(int64_t x, int threads, bool is_print)
+int64_t pi_gourdon_64(int64_t x,
+                      int threads,
+                      bool is_print)
 {
   if (x < 2)
     return 0;
@@ -84,7 +86,9 @@ int64_t pi_gourdon_64(int64_t x, int threads, bool is_print)
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int128_t pi_gourdon_128(int128_t x, int threads)
+int128_t pi_gourdon_128(int128_t x,
+                        int threads,
+                        bool is_print)
 {
   if (x < 2)
     return 0;
@@ -114,17 +118,20 @@ int128_t pi_gourdon_128(int128_t x, int threads)
   z = std::min(z, sqrtx - 1);
   z = std::max(z, (int64_t) 1);
 
-  print("");
-  print("=== pi_gourdon_128(x) ===");
-  print("pi(x) = A - B + C + D + Phi0 + Sigma");
-  print_gourdon(x, y, z, k, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_gourdon_128(x) ===");
+    print("pi(x) = A - B + C + D + Phi0 + Sigma");
+    print_gourdon(x, y, z, k, threads);
+  }
 
-  int128_t sigma = Sigma(x, y, threads);
-  int128_t phi0 = Phi0(x, y, z, k, threads);
-  int128_t b = B(x, y, threads);
-  int128_t ac = AC(x, y, z, k, threads);
+  int128_t sigma = Sigma(x, y, threads, is_print);
+  int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
+  int128_t b = B(x, y, threads, is_print);
+  int128_t ac = AC(x, y, z, k, threads, is_print);
   int128_t d_approx = D_approx(x, sigma, phi0, ac, b);
-  int128_t d = D(x, y, z, k, d_approx, threads);
+  int128_t d = D(x, y, z, k, d_approx, threads, is_print);
   int128_t sum = ac - b + d + phi0 + sigma;
 
   return sum;

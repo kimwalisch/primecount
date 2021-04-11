@@ -459,16 +459,20 @@ int128_t AC(int128_t x,
             int64_t y,
             int64_t z,
             int64_t k,
-            int threads)
+            int threads,
+            bool is_print)
 {
 #ifdef ENABLE_MPI
   if (mpi_num_procs() > 1)
     return AC_mpi(x, y, z, k, threads);
 #endif
 
-  print("");
-  print("=== AC(x, y) ===");
-  print_gourdon_vars(x, y, z, k, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== AC(x, y) ===");
+    print_gourdon_vars(x, y, z, k, threads);
+  }
 
   double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
@@ -481,15 +485,17 @@ int128_t AC(int128_t x,
   if (max_prime <= numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print());
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print);
   }
   else
   {
     auto primes = generate_primes<uint64_t>(max_prime);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print());
+    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print);
   }
 
-  print("A + C", sum, time);
+  if (is_print)
+    print("A + C", sum, time);
+
   return sum;
 }
 
