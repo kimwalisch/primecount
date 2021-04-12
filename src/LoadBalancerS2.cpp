@@ -136,8 +136,8 @@ void LoadBalancerS2::update(ThreadSettings& thread)
       segment_size_ = min(segment_size_, max_size_);
       segment_size_ = Sieve::get_segment_size(segment_size_);
     }
-
-    update_segments(thread);
+    else
+      update_segments(thread);
   }
 }
 
