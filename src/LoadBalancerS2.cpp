@@ -57,7 +57,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   // Start with a tiny segment size of x^(1/4) as
   // most special leaves are in the first few
-  // segments and we need to ensure that all
+  // segments and as we need to ensure that all
   // threads are assigned an equal amount of work.
   segment_size_ = isqrt(isqrt(x));
   int64_t min_size = 1 << 9;
@@ -128,7 +128,7 @@ void LoadBalancerS2::update(ThreadSettings& thread)
 
     // Slowly increase the segment size until it reaches
     // sqrt(sieve_limit). Most special leaves are located
-    // below y, hence we need to be careful to not assign too
+    // around y, hence we need to be careful to not assign too
     // much work to a single thread in this region.
     if (segment_size_ < max_size_)
     {
