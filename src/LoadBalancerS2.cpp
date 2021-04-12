@@ -38,9 +38,6 @@
 #include <print.hpp>
 
 #include <stdint.h>
-#include <cmath>
-
-using namespace std;
 
 namespace primecount {
 
@@ -58,24 +55,27 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   is_print_(is_print),
   status_(x)
 {
-  // start with a tiny segment_size as most
-  // special leaves are in the first few segments
-  // and we need to ensure that all threads are
-  // assigned an equal amount of work
-  int64_t sqrt_limit = isqrt(sieve_limit);
-  int64_t log = ilog(sqrt_limit);
-  log = max(log, 1);
-  segment_size_ = sqrt_limit / log;
-
+  // Start with a tiny segment size of x^(1/4) as
+  // most special leaves are in the first few
+  // segments and we need to ensure that all
+  // threads are assigned an equal amount of work.
+  segment_size_ = isqrt(isqrt(x));
   int64_t min_size = 1 << 9;
   segment_size_ = max(segment_size_, min_size);
   segment_size_ = Sieve::get_segment_size(segment_size_);
 
-  // try to use a segment size that fits exactly
-  // into the CPUs L1 data cache
-  int64_t l1_dcache_size = 1 << 15;
-  max_size_ = l1_dcache_size * 30;
-  max_size_ = max(max_size_, sqrt_limit);
+  // After we have found the first special leaves
+  // we slowly increase the segment size to
+  // sqrt(sieve_limit) as we use the segmented
+  // sieve of Eratosthenes which requires the
+  // segment size to be >= sqrt(sieve_limit).
+  max_size_ = isqrt(sieve_limit);
+
+  // Try to use a segment size that fits exactly
+  // into the CPU's L1 data cache.
+  int64_t l1_dcache_size = 32 * (1 << 10);
+  int64_t numbers_per_byte = 30;
+  max_size_ = max(max_size_, l1_dcache_size * numbers_per_byte);
   max_size_ = Sieve::get_segment_size(max_size_);
 }
 
@@ -126,10 +126,18 @@ void LoadBalancerS2::update(ThreadSettings& thread)
     if (sum_ == 0)
       return;
 
+    // Slowly increase the segment size until it reaches
+    // sqrt(sieve_limit). Most special leaves are located
+    // below y, hence we need to be careful to not assign too
+    // much work to a single thread in this region.
     if (segment_size_ < max_size_)
-      segment_size_ = min(segment_size_ * 2, max_size_);
-    else
-      update_segments(thread);
+    {
+      segment_size_ += segment_size_ / 8;
+      segment_size_ = min(segment_size_, max_size_);
+      segment_size_ = Sieve::get_segment_size(segment_size_);
+    }
+
+    update_segments(thread);
   }
 }
 
@@ -150,7 +158,7 @@ void LoadBalancerS2::update_segments(ThreadSettings& thread)
   // below will be < 1 and we will reduce the number of
   // segments per thread. Otherwise if the factor > 1 we
   // will increase the number of segments per thread.
-  double min_secs = 0.01;
+  double min_secs = 0.001;
   double divider = max(min_secs, thread.secs);
   double factor = rem_secs / divider;
 
