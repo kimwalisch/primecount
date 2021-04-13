@@ -30,12 +30,14 @@ public:
 private:
   void print_status();
 
-  int64_t low_;
-  int64_t sieve_limit_;
-  int64_t thread_dist_;
-  double precision_;
-  int threads_;
-  bool is_print_;
+  int64_t low_ = 0;
+  int64_t sieve_limit_ = 0;
+  int64_t min_thread_dist_ = 0;
+  int64_t thread_dist_ = 0;
+  double precision_ = 0;
+  double time_ = 0;
+  int threads_ = 0;
+  bool is_print_ = false;
   OmpLock lock_;
 };
 
