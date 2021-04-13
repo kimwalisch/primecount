@@ -49,6 +49,7 @@ int64_t count_primes(primesieve::iterator& it,
   return count;
 }
 
+/// Thread sieves [low, high[
 template <typename T>
 T B_thread(T x,
            int64_t y,
@@ -57,10 +58,9 @@ T B_thread(T x,
 {
   assert(low > 0);
   assert(low < high);
+
   int threads = 1;
   int64_t pix = pi_noprint(low - 1, threads);
-
-  // thread sieves [low, high[
   int64_t sqrtx = isqrt(x);
   int64_t start = max(y, min(x / high, sqrtx));
   int64_t stop = min(x / low, sqrtx);
