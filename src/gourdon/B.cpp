@@ -72,11 +72,10 @@ T B_thread(T x,
   T sum = 0;
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
-  while (prime > start)
+  for (; prime > start; prime = rit.prev_prime())
   {
     int64_t xp = (int64_t)(x / prime);
     pix += count_primes(it, next, xp);
-    prime = rit.prev_prime();
     sum += pix;
   }
 
