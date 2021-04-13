@@ -58,25 +58,33 @@ T B_thread(T x,
 {
   assert(low > 0);
   assert(low < high);
-
-  int threads = 1;
-  int64_t pix = pi_noprint(low - 1, threads);
   int64_t sqrtx = isqrt(x);
   int64_t start = max(y, min(x / high, sqrtx));
   int64_t stop = min(x / low, sqrtx);
-
-  primesieve::iterator it(low - 1, high);
   primesieve::iterator rit(stop + 1, start);
-  int64_t next = it.next_prime();
   int64_t prime = rit.prev_prime();
-  T sum = 0;
+
+  if (prime <= start)
+    return 0;
+
+  // The first iteration requires computing pi(x / prime)
+  // using the prime counting function.
+  int threads = 1;
+  int64_t xp = (int64_t)(x / prime);
+  int64_t pi_xp = pi_noprint(xp, threads);
+  T sum = pi_xp;
+
+  // All other iterations compute pi(x / prime)
+  // using a prime sieve.
+  primesieve::iterator it(xp, high);
+  int64_t next = it.next_prime();
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
-  for (; prime > start; prime = rit.prev_prime())
+  for (prime = rit.prev_prime(); prime > start; prime = rit.prev_prime())
   {
-    int64_t xp = (int64_t)(x / prime);
-    pix += count_primes(it, next, xp);
-    sum += pix;
+    xp = (int64_t)(x / prime);
+    pi_xp += count_primes(it, next, xp);
+    sum += pi_xp;
   }
 
   return sum;
