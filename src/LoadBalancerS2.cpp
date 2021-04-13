@@ -132,7 +132,7 @@ void LoadBalancerS2::update(ThreadSettings& thread)
     // much work to a single thread in this region.
     if (segment_size_ < max_size_)
     {
-      segment_size_ += segment_size_ / 8;
+      segment_size_ += segment_size_ / 16;
       segment_size_ = min(segment_size_, max_size_);
       segment_size_ = Sieve::get_segment_size(segment_size_);
     }
