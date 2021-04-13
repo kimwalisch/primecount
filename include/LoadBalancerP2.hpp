@@ -34,9 +34,9 @@ private:
   int64_t sieve_limit_ = 0;
   int64_t min_thread_dist_ = 0;
   int64_t thread_dist_ = 0;
-  double precision_ = 0;
   double time_ = 0;
   int threads_ = 0;
+  int precision_ = 0;
   bool is_print_ = false;
   OmpLock lock_;
 };
