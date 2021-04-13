@@ -13,6 +13,9 @@
 #ifndef LOADBALANCERP2_HPP
 #define LOADBALANCERP2_HPP
 
+#include <int128_t.hpp>
+#include <OmpLock.hpp>
+
 #include <stdint.h>
 
 namespace primecount {
@@ -20,16 +23,20 @@ namespace primecount {
 class LoadBalancerP2
 {
 public:
-  LoadBalancerP2(int64_t low, int64_t z, int threads);
-  int64_t get_thread_dist(int64_t low);
+  LoadBalancerP2(maxint_t x, int64_t sieve_limit, int threads, bool is_print);
+  bool get_work(int64_t& low, int64_t& high);
   int get_threads() const;
 
 private:
-  int64_t z_;
-  int64_t min_dist_;
+  void print_status();
+
+  int64_t low_;
+  int64_t sieve_limit_;
   int64_t thread_dist_;
-  double time_;
+  double precision_;
   int threads_;
+  bool is_print_;
+  OmpLock lock_;
 };
 
 } // namespace

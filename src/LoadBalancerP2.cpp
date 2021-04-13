@@ -16,21 +16,30 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 
 namespace primecount {
 
-LoadBalancerP2::LoadBalancerP2(int64_t low,
-                               int64_t z,
-                               int threads) :
-  z_(z),
-  min_dist_(1 << 22),
-  thread_dist_(min_dist_),
-  time_(-1)
+LoadBalancerP2::LoadBalancerP2(maxint_t x,
+                               int64_t sieve_limit,
+                               int threads,
+                               bool is_print) :
+  low_(isqrt(x)),
+  sieve_limit_(sieve_limit),
+  precision_(get_status_precision(x)),
+  is_print_(is_print)
 {
-  int64_t dist = z_ - min(low, z_);
+  int64_t min_dist = 1 << 22;
+  int64_t dist = sieve_limit_ - min(low_, sieve_limit_);
+  thread_dist_ = dist / (threads * 8);
+  thread_dist_ = max(min_dist, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
+
+  if (!is_print && threads_ == 1)
+    thread_dist_ = dist;
 }
 
 int LoadBalancerP2::get_threads() const
@@ -38,37 +47,26 @@ int LoadBalancerP2::get_threads() const
   return threads_;
 }
 
-/// Calculate the thread sieving distance for the next
-/// iteration. Since all threads must synchronize after
-/// each iteration we want to gradually increase the
-/// thread distance in order to ensure that all threads
-/// run for approximately the same amount of time.
-///
-int64_t LoadBalancerP2::get_thread_dist(int64_t low)
+bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
-  double start_time = time_;
-  time_ = get_time();
-  double seconds = time_ - start_time;
+  LockGuard lockGuard(lock_);
 
-  if (start_time > 0)
+  print_status();
+  low = low_;
+  low_ += thread_dist_;
+  low_ = min(low_, sieve_limit_);
+  high = low_;
+
+  return low < sieve_limit_;
+}
+
+void LoadBalancerP2::print_status()
+{
+  if (is_print_)
   {
-    if (seconds < 60)
-      thread_dist_ *= 2;
-    if (seconds > 60)
-      thread_dist_ /= 2;
+    cout << "\rStatus: " << fixed << setprecision(precision_)
+         << get_percent(low_, sieve_limit_) << '%' << flush;
   }
-
-  int64_t dist = z_ - min(low, z_);
-  int64_t max_dist = ceil_div(dist, threads_);
-  thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
-  int64_t next_dist = threads_ * thread_dist_;
-  int64_t last_dist = threads_ * min_dist_;
-
-  // Keep all threads busy in the last iteration
-  if (low + next_dist + last_dist > z_)
-    thread_dist_ = max(min_dist_, max_dist);
-
-  return thread_dist_;
 }
 
 } // namespace
