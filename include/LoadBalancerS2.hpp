@@ -36,13 +36,13 @@ struct ThreadSettings
 class LoadBalancerS2
 {
 public:
-  LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, bool is_print);
+  LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, int threads, bool is_print);
   bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
 private:
-  void update(ThreadSettings& thread);
-  void update_segments(ThreadSettings& thread);
+  void update_load_balancing(const ThreadSettings& thread);
+  void update_segments(const ThreadSettings& thread);
   double remaining_secs() const;
 
   int64_t low_ = 0;

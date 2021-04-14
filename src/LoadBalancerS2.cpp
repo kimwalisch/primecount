@@ -44,6 +44,7 @@ namespace primecount {
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int64_t sieve_limit,
                                maxint_t sum_approx,
+                               int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),
   segments_(1),
@@ -52,28 +53,31 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   is_print_(is_print),
   status_(x)
 {
-  // Start with a tiny segment size of x^(1/4) as
-  // most special leaves are in the first few
-  // segments and as we need to ensure that all
-  // threads are assigned an equal amount of work.
-  segment_size_ = isqrt(isqrt(x));
-  int64_t min_size = 1 << 9;
-  segment_size_ = max(segment_size_, min_size);
-  segment_size_ = Sieve::get_segment_size(segment_size_);
-
-  // After we have found the first special leaves
-  // we slowly increase the segment size to
-  // sqrt(sieve_limit) as we use the segmented
-  // sieve of Eratosthenes which requires the
-  // segment size to be >= sqrt(sieve_limit).
-  max_size_ = isqrt(sieve_limit);
-
   // Try to use a segment size that fits exactly
   // into the CPU's L1 data cache.
   int64_t l1_dcache_size = 32 * (1 << 10);
   int64_t numbers_per_byte = 30;
-  max_size_ = max(max_size_, l1_dcache_size * numbers_per_byte);
-  max_size_ = Sieve::get_segment_size(max_size_);
+  int64_t sqrt_limit = isqrt(sieve_limit);
+  max_size_ = max(sqrt_limit, l1_dcache_size * numbers_per_byte);
+
+  // When a single thread is used (and printing
+  // is disabled) we can set segment_size to
+  // its maximum size as load balancing is only
+  // useful for multi-threading.
+  if (threads == 1 && !is_print)
+    segment_size_ = max_size_;
+  else
+  {
+    // Start with a tiny segment size of x^(1/4) as
+    // most special leaves are in the first few
+    // segments and as we need to ensure that all
+    // threads are assigned an equal amount of work.
+    segment_size_ = isqrt(isqrt(x));
+  }
+
+  int64_t min_size = 1 << 9;
+  segment_size_ = max(min_size, segment_size_);
+  segment_size_ = Sieve::get_segment_size(segment_size_);
 }
 
 maxint_t LoadBalancerS2::get_sum() const
@@ -93,7 +97,7 @@ bool LoadBalancerS2::get_work(ThreadSettings& thread)
     status_.print(high, sieve_limit_, sum_, sum_approx_);
   }
 
-  update(thread);
+  update_load_balancing(thread);
 
   thread.low = low_;
   thread.segments = segments_;
@@ -108,7 +112,7 @@ bool LoadBalancerS2::get_work(ThreadSettings& thread)
   return is_work;
 }
 
-void LoadBalancerS2::update(ThreadSettings& thread)
+void LoadBalancerS2::update_load_balancing(const ThreadSettings& thread)
 {
   if (thread.low > max_low_)
   {
@@ -141,7 +145,7 @@ void LoadBalancerS2::update(ThreadSettings& thread)
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
-void LoadBalancerS2::update_segments(ThreadSettings& thread)
+void LoadBalancerS2::update_segments(const ThreadSettings& thread)
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
