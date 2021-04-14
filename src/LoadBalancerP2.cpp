@@ -35,23 +35,19 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   precision_(get_status_precision(x)),
   is_print_(is_print)
 {
+  min_thread_dist_ = 1 << 22;
+  int64_t load_balancing_factor = 8;
+
   // Ensure that the thread initialization (i.e. the
   // computation of PrimePi(low)) is at most 10%
   // of the entire thread computation.
   int64_t O_primepi = (int64_t) std::pow(sieve_limit, 2.0 / 3.0);
   min_thread_dist_ = O_primepi * 10;
-  min_thread_dist_ = max(O_primepi, 1 << 22);
+  min_thread_dist_ = max(min_thread_dist_, O_primepi);
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
-
-  // For large sieving distances we can reduce the
-  // thread distance as the additional overhead becomes
-  // less of an issue. This improves load balancing and
-  // the status is updated more frequently.
-  int64_t log2_dist = ilog2(dist);
-  int64_t load_balancing_factor = (log2_dist / 8) + log2_dist - min(log2_dist, 30);
-  thread_dist_ = dist / (threads * max(load_balancing_factor, 1));
+  thread_dist_ = dist / (threads * load_balancing_factor);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
 }
@@ -71,6 +67,10 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
 
+  // When a single thread is used (and printing is
+  // disabled) we can set thread_dist to the entire
+  // sieving distance as load balancing is only
+  // useful for multi-threading.
   if (threads_ == 1)
   {
     if (!is_print_)
