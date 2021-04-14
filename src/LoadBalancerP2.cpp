@@ -44,7 +44,14 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
-  thread_dist_ = dist / (threads * 8);
+
+  // For large sieving distances we can reduce the
+  // thread distance as the additional overhead becomes
+  // less of an issue. This improves load balancing and
+  // the status is updated more frequently.
+  int64_t log2_dist = ilog2(dist);
+  int64_t load_balancing_factor = (log2_dist / 8) + log2_dist - min(log2_dist, 30);
+  thread_dist_ = dist / (threads * max(load_balancing_factor, 1));
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
 }
@@ -97,6 +104,7 @@ void LoadBalancerP2::print_status()
 
     if (old == 0 || (time - old) >= threshold)
     {
+      time_ = time;
       cout << "\rStatus: " << fixed << setprecision(precision_)
            << get_percent(low_, sieve_limit_) << '%' << flush;
     }
