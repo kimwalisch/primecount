@@ -35,7 +35,6 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   precision_(get_status_precision(x)),
   is_print_(is_print)
 {
-  min_thread_dist_ = 1 << 22;
   int64_t load_balancing_factor = 8;
 
   // Ensure that the thread initialization (i.e. the
@@ -43,7 +42,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   // of the entire thread computation.
   int64_t O_primepi = (int64_t) std::pow(sieve_limit, 2.0 / 3.0);
   min_thread_dist_ = O_primepi * 10;
-  min_thread_dist_ = max(min_thread_dist_, O_primepi);
+  min_thread_dist_ = max(min_thread_dist_, 1 << 22);
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
