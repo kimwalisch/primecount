@@ -54,7 +54,9 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   status_(x)
 {
   // Try to use a segment size that fits exactly
-  // into the CPU's L1 data cache.
+  // into the CPU's L1 data cache. Also the
+  // segmented sieve of Eratosthenes requires the
+  // segment size to be >= sqrt(sieve_limit).
   int64_t l1_dcache_size = 32 * (1 << 10);
   int64_t numbers_per_byte = 30;
   int64_t sqrt_limit = isqrt(sieve_limit);
