@@ -22,7 +22,6 @@
 #include <print.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 
 using namespace std;
 using namespace primecount;

@@ -31,7 +31,6 @@
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
 #include <generate.hpp>
-#include <gourdon.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <min.hpp>
