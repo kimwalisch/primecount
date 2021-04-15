@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancerS2.hpp
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,25 +36,25 @@ struct ThreadSettings
 class LoadBalancerS2
 {
 public:
-  LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, bool is_print);
+  LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, int threads, bool is_print);
   bool get_work(ThreadSettings& thread);
   maxint_t get_sum() const;
 
 private:
-  void update(ThreadSettings& thread);
-  void update_segments(ThreadSettings& thread);
+  void update_load_balancing(const ThreadSettings& thread);
+  void update_segments(const ThreadSettings& thread);
   double remaining_secs() const;
 
-  int64_t low_;
-  int64_t max_low_;
-  int64_t sieve_limit_;
-  int64_t segments_;
-  int64_t segment_size_;
-  int64_t max_size_;
-  maxint_t sum_;
-  maxint_t sum_approx_;
-  double time_;
-  bool is_print_;
+  int64_t low_ = 0;
+  int64_t max_low_ = 0;
+  int64_t sieve_limit_ = 0;
+  int64_t segments_ = 0;
+  int64_t segment_size_ = 0;
+  int64_t max_size_ = 0;
+  maxint_t sum_ = 0;
+  maxint_t sum_approx_ = 0;
+  double time_ = 0;
+  bool is_print_ = false;
   Status status_;
   OmpLock lock_;
 };

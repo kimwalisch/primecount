@@ -4,6 +4,9 @@
 ///        computation of the A & C formulas (AC.cpp) in
 ///        Xavier Gourdon's algorithm.
 ///
+///        Load balancing is described in more detail at:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
+///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -100,11 +103,8 @@ void LoadBalancerAC::validate_segment_sizes()
 {
   segment_size_ = std::max(min_segment_size, segment_size_);
   large_segment_size_ = std::max(segment_size_, large_segment_size_);
-
-  if (segment_size_ % 240)
-    segment_size_ += 240 - segment_size_ % 240;
-  if (large_segment_size_ % 240)
-    large_segment_size_ += 240 - large_segment_size_ % 240;
+  segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+  large_segment_size_ = SegmentedPiTable::get_segment_size(large_segment_size_);
 }
 
 void LoadBalancerAC::compute_total_segments()

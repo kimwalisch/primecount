@@ -19,7 +19,6 @@
 
 #include <BitSieve240.hpp>
 #include <popcnt.hpp>
-#include <aligned_vector.hpp>
 #include <macros.hpp>
 #include <pod_vector.hpp>
 
@@ -62,7 +61,7 @@ private:
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
   void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
   pod_vector<pi_t> pi_;
-  aligned_vector<uint64_t> counts_;
+  pod_vector<uint64_t> counts_;
   uint64_t limit_;
 };
 

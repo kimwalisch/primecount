@@ -13,23 +13,43 @@
 #include <LoadBalancerP2.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 
 namespace primecount {
 
-LoadBalancerP2::LoadBalancerP2(int64_t low,
-                               int64_t z,
-                               int threads) :
-  z_(z),
-  min_dist_(1 << 22),
-  thread_dist_(min_dist_),
-  time_(-1)
+/// We need to sieve [sqrt(x), sieve_limit[
+LoadBalancerP2::LoadBalancerP2(maxint_t x,
+                               int64_t sieve_limit,
+                               int threads,
+                               bool is_print) :
+  low_(isqrt(x)),
+  sieve_limit_(sieve_limit),
+  precision_(get_status_precision(x)),
+  is_print_(is_print)
 {
-  int64_t dist = z_ - min(low, z_);
+  // Using more chunks per thread improves load
+  // balancing but also adds some overhead.
+  int64_t chunks_per_thread = 8;
+
+  // Ensure that the thread initialization (i.e. the
+  // computation of PrimePi(low)) is at most 10%
+  // of the entire thread computation.
+  int64_t O_primepi = (int64_t) std::pow(sieve_limit, 2.0 / 3.0);
+  min_thread_dist_ = O_primepi * 10;
+  min_thread_dist_ = max(min_thread_dist_, 1 << 22);
+
+  low_ = min(low_, sieve_limit_);
+  int64_t dist = sieve_limit_ - low_;
+  thread_dist_ = dist / (threads * chunks_per_thread);
+  thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
 }
 
@@ -38,37 +58,58 @@ int LoadBalancerP2::get_threads() const
   return threads_;
 }
 
-/// Calculate the thread sieving distance for the next
-/// iteration. Since all threads must synchronize after
-/// each iteration we want to gradually increase the
-/// thread distance in order to ensure that all threads
-/// run for approximately the same amount of time.
-///
-int64_t LoadBalancerP2::get_thread_dist(int64_t low)
+/// The thread needs to sieve [low, high[
+bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
-  double start_time = time_;
-  time_ = get_time();
-  double seconds = time_ - start_time;
+  LockGuard lockGuard(lock_);
+  print_status();
 
-  if (start_time > 0)
+  // Calculate the remaining sieving distance
+  low_ = min(low_, sieve_limit_);
+  int64_t dist = sieve_limit_ - low_;
+
+  // When a single thread is used (and printing is
+  // disabled) we can set thread_dist to the entire
+  // sieving distance as load balancing is only
+  // useful for multi-threading.
+  if (threads_ == 1)
   {
-    if (seconds < 60)
-      thread_dist_ *= 2;
-    if (seconds > 60)
-      thread_dist_ /= 2;
+    if (!is_print_)
+      thread_dist_ = dist;
+  }
+  else
+  {
+    int64_t max_thread_dist = dist / threads_;
+
+    // Reduce the thread distance near to end to keep all
+    // threads busy until the computation finishes.
+    if (thread_dist_ > max_thread_dist)
+      thread_dist_ = max(min_thread_dist_, max_thread_dist);
   }
 
-  int64_t dist = z_ - min(low, z_);
-  int64_t max_dist = ceil_div(dist, threads_);
-  thread_dist_ = in_between(min_dist_, thread_dist_, max_dist);
-  int64_t next_dist = threads_ * thread_dist_;
-  int64_t last_dist = threads_ * min_dist_;
+  low = low_;
+  low_ += thread_dist_;
+  low_ = min(low_, sieve_limit_);
+  high = low_;
 
-  // Keep all threads busy in the last iteration
-  if (low + next_dist + last_dist > z_)
-    thread_dist_ = max(min_dist_, max_dist);
+  return low < sieve_limit_;
+}
 
-  return thread_dist_;
+void LoadBalancerP2::print_status()
+{
+  if (is_print_)
+  {
+    double time = get_time();
+    double old = time_;
+    double threshold = 0.1;
+
+    if (old == 0 || (time - old) >= threshold)
+    {
+      time_ = time;
+      cout << "\rStatus: " << fixed << setprecision(precision_)
+           << get_percent(low_, sieve_limit_) << '%' << flush;
+    }
+  }
 }
 
 } // namespace

@@ -32,6 +32,7 @@
 #include <macros.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cassert>
 #include <vector>
 
@@ -55,6 +56,17 @@ public:
   static constexpr int64_t numbers_per_byte()
   {
     return 240 / sizeof(pi_t);
+  }
+
+  /// Make sure size % 240 == 0
+  static int64_t get_segment_size(uint64_t size)
+  {
+    size = std::max<uint64_t>(240, size);
+
+    if (size % 240)
+      size += 240 - size % 240;
+
+    return size;
   }
 
   /// Get number of primes <= n
