@@ -34,21 +34,6 @@ using namespace primecount;
 
 namespace {
 
-/// Count primes inside [prime, stop]
-int64_t count_primes(primesieve::iterator& it,
-                     int64_t& prime,
-                     int64_t stop)
-{
-  int64_t count = 0;
-  int64_t p = prime;
-
-  for (; p <= stop; count++)
-    p = it.next_prime();
-
-  prime = p;
-  return count;
-}
-
 /// Thread sieves [low, high[
 template <typename T>
 T B_thread(T x,
@@ -73,17 +58,19 @@ T B_thread(T x,
   int64_t xp = (int64_t)(x / prime);
   int64_t pi_xp = pi_noprint(xp, threads);
   T sum = pi_xp;
+  prime = rit.prev_prime();
 
   // All other iterations compute pi(x / prime)
   // using a prime sieve.
   primesieve::iterator it(xp, high);
-  int64_t next = it.next_prime();
+  int64_t p = it.next_prime();
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
-  for (prime = rit.prev_prime(); prime > start; prime = rit.prev_prime())
+  for (; prime > start; prime = rit.prev_prime())
   {
     xp = (int64_t)(x / prime);
-    pi_xp += count_primes(it, next, xp);
+    for (; p <= xp; p = it.next_prime())
+      pi_xp++;
     sum += pi_xp;
   }
 
