@@ -17,7 +17,6 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <aligned_vector.hpp>
 #include <imath.hpp>
 #include <min.hpp>
 
