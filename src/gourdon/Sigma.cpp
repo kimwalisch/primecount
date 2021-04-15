@@ -6,7 +6,7 @@
 ///        have a runtime complexity of O(y) and hence it does not
 ///        make much sense to use multi-threading.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,59 +54,47 @@ T Sigma3(T b, T d)
   return (b * (b - 1) * (2 * b - 1)) / 6 - b - (d * (d - 1) * (2 * d - 1)) / 6 + d;
 }
 
-/// Memory usage: O(x^(1/3)) or less
+/// Memory usage: O(x^(3/8))
 template <typename T>
-T Sigma4(T x, int64_t y, int64_t a, int64_t x_star, const PiTable& pi)
+T Sigma456(T x,
+           int64_t y,
+           int64_t a,
+           int64_t x_star,
+           const PiTable& pi)
 {
-  T sum = 0;
+  T sigma4 = 0;
+  T sigma5 = 0;
+  T sigma6 = 0;
+
   int64_t sqrt_xy = isqrt(x / y);
   primesieve::iterator it(x_star, sqrt_xy);
   int64_t prime = it.next_prime();
-
-  for (; prime <= sqrt_xy; prime = it.next_prime())
-    sum += pi[x / (prime * (T) y)];
-
-  sum *= a;
-  return sum;
-}
-
-/// Memory usage: O(y)
-template <typename T>
-T Sigma5(T x, int64_t y, const PiTable& pi)
-{
-  T sum = 0;
   int64_t x13 = iroot<3>(x);
-  int64_t sqrt_xy = isqrt(x / y);
-  primesieve::iterator it(sqrt_xy, x13);
-  int64_t prime = it.next_prime();
 
-  for (; prime <= x13; prime = it.next_prime())
-    sum += pi[x / (prime * (T) prime)];
-
-  return sum;
-}
-
-/// Memory usage: O(x^(3/8))
-template <typename T>
-T Sigma6(T x, int64_t x_star, const PiTable& pi)
-{
-  T sum = 0;
-  int64_t x13 = iroot<3>(x);
-  primesieve::iterator it(x_star, x13);
-  int64_t prime = it.next_prime();
-
+  // Sigma4: x_star < prime <= sqrt(x / y)
+  // Sigma5: sqrt(x / y) < prime <= x^(1/3)
+  // Sigma6: x_star < prime <= x^(1/3)
   for (; prime <= x13; prime = it.next_prime())
   {
+    if (prime <= sqrt_xy)
+      sigma4 += pi[x / (prime * (T) y)];
+    else
+      sigma5 += pi[x / (prime * (T) prime)];
+
     // Note that in Xavier Gourdon's paper the actual
     // formula for Σ6 is: sum += pi(x^(1/2) / prime^(1/2))^2.
     // However when implemented this way using integers
     // the formula returns incorrect results.
     // Hence the formula must be implemented as below:
-    T pix = pi[isqrt(x / prime)];
-    sum += pix * pix;
+    int64_t sqrt_xp = isqrt(x / prime);
+    int64_t pi_sqrt_xp = pi[sqrt_xp];
+    sigma6 += pi_sqrt_xp * (T) pi_sqrt_xp;
   }
 
-  return -sum;
+  sigma4 *= a;
+  sigma6 = -sigma6;
+
+  return sigma4 + sigma5 + sigma6;
 }
 
 } // namespace
@@ -142,9 +130,7 @@ int64_t Sigma(int64_t x,
                 Sigma1(a, b) +
                 Sigma2(a, b, c, d) +
                 Sigma3(b, d) +
-                Sigma4(x, y, a, x_star, pi) +
-                Sigma5(x, y, pi) +
-                Sigma6(x, x_star, pi);
+                Sigma456(x, y, a, x_star, pi);
 
   if (is_print)
     print("Sigma", sum, time);
@@ -183,9 +169,7 @@ int128_t Sigma(int128_t x,
                  Sigma1(a, b) +
                  Sigma2(a, b, c, d) +
                  Sigma3(b, d) +
-                 Sigma4(x, y, a, x_star, pi) +
-                 Sigma5(x, y, pi) +
-                 Sigma6(x, x_star, pi);
+                 Sigma456(x, y, a, x_star, pi);
 
   if (is_print)
     print("Sigma", sum, time);
