@@ -1,4 +1,4 @@
-Changes in primecount-6.5, 2021-04-12
+Changes in primecount-6.5, 2021-04-15
 
 In primecout-6.4 (and earlier) the AC algorithm scales very badly on
 servers with a large number of CPU cores. The root causes of this
@@ -13,8 +13,11 @@ AC computation with x >= 1e23.
 * Easy-Special-Leaves.md: Description of the new algorithm.
 * AC.cpp: New algorithm with improved scaling.
 * AC_libdivide.cpp: New algorithm with improved scaling.
+* B.cpp: Improved scaling due to independent threads.
+* P2.cpp: Improved scaling due to independent threads.
 * LoadBalancerAC.cpp: New thread scheduler for AC algorithm.
 * LoadBalancerS2.cpp: Improve load balancing of S2_hard & D.
+* LoadBalancerP2.cpp: Rewritten, now similar to other load balancers.
 * SegmentedPiTable.cpp: Decrease size to x^(1/4).
 * Remove MPI support: No users, too much work to maintain.
 
