@@ -4,7 +4,7 @@
 ///        of the formulas related to special leaves. It is used by
 ///        the D, S2_easy and S2_hard formulas.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,15 +14,10 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
-#include <print.hpp>
 
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
-
-#if defined(_OPENMP)
-  #include <omp.h>
-#endif
 
 using namespace std;
 using namespace primecount;
@@ -65,11 +60,11 @@ Status::Status(maxint_t x)
   epsilon_ = 1.0 / q;
 }
 
-bool Status::isPrint(double time)
+bool Status::isPrint(double time) const
 {
   double old = time_;
   return old == 0 ||
-        (time - old) >= is_print_;
+        (time - old) >= threshold_;
 }
 
 void Status::print(double percent)
@@ -131,7 +126,6 @@ void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx
 /// Used by S2_easy
 void Status::print(int64_t b, int64_t max_b)
 {
-#if defined(_OPENMP)
   // In order to prevent data races only one thread at a time
   // can enter this code section. In order to make sure that
   // our code scales well up to a very large number of CPU
@@ -139,17 +133,16 @@ void Status::print(int64_t b, int64_t max_b)
   // In order to achieve this only one of the threads (the
   // main thread) is allowed to print the status, while all
   // other threads do nothing.
-  if (omp_get_thread_num() != 0)
-    return;
-#endif
-
-  double time = get_time();
-
-  if (isPrint(time))
+  #pragma omp master
   {
-    time_ = time;
-    double percent = skewed_percent(b, max_b);
-    print(percent);
+    double time = get_time();
+
+    if (isPrint(time))
+    {
+      time_ = time;
+      double percent = skewed_percent(b, max_b);
+      print(percent);
+    }
   }
 }
 

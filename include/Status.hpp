@@ -1,7 +1,7 @@
 ///
 /// @file  Status.hpp
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,15 +22,15 @@ public:
   void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
 private:
-  bool isPrint(double time);
+  bool isPrint(double time) const;
   void print(double percent);
-  double epsilon_;
+  double epsilon_ = 0;
   double percent_ = -1;
   double time_ = 0;
   // Only print status if 0.1 seconds have elapsed
   // since last printing the status.
-  double is_print_ = 0.1;
-  int precision_;
+  double threshold_ = 0.1;
+  int precision_ = 0;
 };
 
 } // namespace
