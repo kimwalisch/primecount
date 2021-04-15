@@ -35,7 +35,9 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   precision_(get_status_precision(x)),
   is_print_(is_print)
 {
-  int64_t load_balancing_factor = 8;
+  // Using more chunks per thread improves load
+  // balancing but also adds some overhead.
+  int64_t chunks_per_thread = 8;
 
   // Ensure that the thread initialization (i.e. the
   // computation of PrimePi(low)) is at most 10%
@@ -46,7 +48,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
-  thread_dist_ = dist / (threads * load_balancing_factor);
+  thread_dist_ = dist / (threads * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
 }
