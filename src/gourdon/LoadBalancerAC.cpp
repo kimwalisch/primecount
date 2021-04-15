@@ -100,11 +100,8 @@ void LoadBalancerAC::validate_segment_sizes()
 {
   segment_size_ = std::max(min_segment_size, segment_size_);
   large_segment_size_ = std::max(segment_size_, large_segment_size_);
-
-  if (segment_size_ % 240)
-    segment_size_ += 240 - segment_size_ % 240;
-  if (large_segment_size_ % 240)
-    large_segment_size_ += 240 - large_segment_size_ % 240;
+  segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+  large_segment_size_ = SegmentedPiTable::get_segment_size(large_segment_size_);
 }
 
 void LoadBalancerAC::compute_total_segments()
