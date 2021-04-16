@@ -123,26 +123,19 @@ void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx
   }
 }
 
-/// Used by S2_easy
+/// Used by S2_easy.
+/// The calling code has to ensure that only 1 thread at a
+/// time executes this method.
+///
 void Status::print(int64_t b, int64_t max_b)
 {
-  // In order to prevent data races only one thread at a time
-  // can enter this code section. In order to make sure that
-  // our code scales well up to a very large number of CPU
-  // cores, we don't want to use any thread synchronization!
-  // In order to achieve this only one of the threads (the
-  // main thread) is allowed to print the status, while all
-  // other threads do nothing.
-  #pragma omp master
-  {
-    double time = get_time();
+  double time = get_time();
 
-    if (isPrint(time))
-    {
-      time_ = time;
-      double percent = skewed_percent(b, max_b);
-      print(percent);
-    }
+  if (isPrint(time))
+  {
+    time_ = time;
+    double percent = skewed_percent(b, max_b);
+    print(percent);
   }
 }
 

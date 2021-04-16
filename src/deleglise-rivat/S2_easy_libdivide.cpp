@@ -181,6 +181,7 @@ T S2_easy_OpenMP(T x,
     else
       sum += S2_easy_128(xp, y, z, b, prime, primes, pi);
 
+    #pragma omp master
     if (is_print)
       status.print(b, pi_x13);
   }

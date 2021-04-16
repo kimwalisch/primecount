@@ -101,6 +101,7 @@ T S2_easy_OpenMP(T x,
       sum += pi[xpq] - b + 2;
     }
 
+    #pragma omp master
     if (is_print)
       status.print(b, pi_x13);
   }
