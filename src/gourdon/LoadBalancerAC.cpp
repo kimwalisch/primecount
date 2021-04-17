@@ -47,12 +47,16 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   threads_(threads),
   is_print_(is_print)
 {
-  if (threads_ == 1)
+  // When a single thread is used (and printing is
+  // disabled) we can use a segment size larger
+  // than x^(1/4) because load balancing is only
+  // useful for multi-threading.
+  if (threads == 1 && !is_print)
     segment_size_ = std::max(x14_, l2_segment_size);
   else
   {
-    // The default segment size is x^(1/4).
-    // This is tiny, will fit into the CPU's cache.
+    // The default segment size is x^(1/4). This
+    // is tiny, will fit into the CPU's cache.
     segment_size_ = x14_;
 
     // Most special leaves are below y (~ x^(1/3) * log(x)).
