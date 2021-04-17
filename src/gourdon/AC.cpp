@@ -178,9 +178,9 @@ T C2(T x,
     uint64_t pi_xpq = segmentedPi[xpq];
     uint64_t phi_xpq = pi_xpq - b + 2;
     uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
-    uint64_t i2 = pi[max(xpq2, min_clustered)];
-    sum += phi_xpq * (i - i2);
-    i = i2;
+    uint64_t imin = pi[max(xpq2, min_clustered)];
+    sum += phi_xpq * (i - imin);
+    i = imin;
   }
 
   // Find all sparse easy leaves where
