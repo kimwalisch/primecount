@@ -149,22 +149,26 @@ public:
           }
         }
 
-        start = std::max(start, y);
-        it.skipto(start, z);
-
-        while (true)
+        if (high > y)
         {
-          int64_t i = 0;
-          int64_t prime = it.next_prime();
-          int64_t next = next_multiple(prime, low, &i);
+          start = std::max(start, y);
+          it.skipto(start, high);
 
-          if (prime > high)
-            break;
+          // y < prime <= z
+          while (true)
+          {
+            int64_t i = 0;
+            int64_t prime = it.next_prime();
+            int64_t next = next_multiple(prime, low, &i);
 
-          // Sieve out primes > y &&
-          // Sieve out numbers with prime factors > y
-          for (; next <= high; next = prime * to_number(i++))
-            factor_[to_index(next)] = 0;
+            if (prime > high)
+              break;
+
+            // Sieve out primes > y &&
+            // Sieve out numbers with prime factors > y
+            for (; next <= high; next = prime * to_number(i++))
+              factor_[to_index(next)] = 0;
+          }
         }
       }
     }
