@@ -73,14 +73,16 @@ T A(T x,
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
-  // x / (p * q) >= y
+  // pq = primes[b] * primes[i]
+  // x / pq >= y && low <= x / pq < high
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq];
   }
 
-  // x / (p * q) < y
+  // pq = primes[b] * primes[i]
+  // x / pq < y && low <= x / pq < high
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
