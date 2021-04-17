@@ -46,7 +46,6 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),
-  segments_(1),
   sum_approx_(sum_approx),
   time_(get_time()),
   is_print_(is_print),
@@ -65,8 +64,12 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   // is disabled) we can set segment_size to
   // its maximum size as load balancing is only
   // useful for multi-threading.
-  if (threads == 1 && !is_print)
+  if (threads == 1 &&
+      !is_print)
+  {
     segment_size_ = max_size_;
+    segments_ = 100;
+  }
   else
   {
     // Start with a tiny segment size of x^(1/4) as
@@ -74,6 +77,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // segments and as we need to ensure that all
     // threads are assigned an equal amount of work.
     segment_size_ = isqrt(isqrt(x));
+    segments_ = 1;
   }
 
   int64_t min_size = 1 << 9;
