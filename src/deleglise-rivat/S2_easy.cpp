@@ -83,8 +83,9 @@ T S2_easy_OpenMP(T x,
     while (l > pi_min_clustered)
     {
       int64_t xpq = fast_div64(xp, primes[l]);
-      int64_t phi_xpq = pi[xpq] - b + 2;
-      int64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+      int64_t pi_xpq = pi[xpq];
+      int64_t phi_xpq = pi_xpq - b + 2;
+      int64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
       int64_t l2 = pi[xpq2];
       sum += phi_xpq * (l - l2);
       l = l2;

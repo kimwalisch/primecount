@@ -220,8 +220,9 @@ T C2_64(T xlow,
   while (i > pi_min_clustered)
   {
     uint64_t xpq = xp / primes[i];
-    uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
-    uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
+    uint64_t pi_xpq = segmentedPi[xpq];
+    uint64_t phi_xpq = pi_xpq - b + 2;
+    uint64_t xpq2 = xp / primes[pi_xpq + 1];
     uint64_t i2 = pi[max(xpq2, min_clustered)];
     sum += phi_xpq * (i - i2);
     i = i2;
@@ -275,8 +276,9 @@ T C2_128(T xlow,
   while (i > pi_min_clustered)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
-    uint64_t phi_xpq = segmentedPi[xpq] - b + 2;
-    uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
+    uint64_t pi_xpq = segmentedPi[xpq];
+    uint64_t phi_xpq = pi_xpq - b + 2;
+    uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
     uint64_t i2 = pi[max(xpq2, min_clustered)];
     sum += phi_xpq * (i - i2);
     i = i2;

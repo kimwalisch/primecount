@@ -71,8 +71,9 @@ T S2_easy_64(T xp128,
   while (l > pi_min_clustered)
   {
     uint64_t xpq = xp / primes[l];
-    uint64_t phi_xpq = pi[xpq] - b + 2;
-    uint64_t xpq2 = xp / primes[b + phi_xpq - 1];
+    uint64_t pi_xpq = pi[xpq];
+    uint64_t phi_xpq = pi_xpq - b + 2;
+    uint64_t xpq2 = xp / primes[pi_xpq + 1];
     uint64_t l2 = pi[xpq2];
     sum += phi_xpq * (l - l2);
     l = l2;
