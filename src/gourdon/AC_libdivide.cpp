@@ -215,8 +215,9 @@ T C2_64(T xlow,
 
   // Find all clustered easy leaves where
   // successive leaves are identical.
-  // n = primes[b] * primes[i]
-  // Which satisfy: n > z && primes[i] <= y
+  // pq = primes[b] * primes[i]
+  // Which satisfy: low <= x / pq < high && q <= y && pq > z
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   while (i > pi_min_clustered)
   {
     uint64_t xpq = xp / primes[i];
@@ -230,8 +231,9 @@ T C2_64(T xlow,
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // n = primes[b] * primes[i]
-  // Which satisfy: n > z && primes[i] <= y
+  // pq = primes[b] * primes[i]
+  // Which satisfy: low <= x / pq < high && q <= y && pq > z
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   for (; i > pi_min_m; i--)
   {
     uint64_t xpq = xp / primes[i];
@@ -271,8 +273,9 @@ T C2_128(T xlow,
 
   // Find all clustered easy leaves where
   // successive leaves are identical.
-  // n = primes[b] * primes[i]
-  // Which satisfy: n > z && primes[i] <= y
+  // pq = primes[b] * primes[i]
+  // Which satisfy: low <= x / pq < high && q <= y && pq > z
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   while (i > pi_min_clustered)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -286,8 +289,9 @@ T C2_128(T xlow,
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // n = primes[b] * primes[i]
-  // Which satisfy: n > z && primes[i] <= y
+  // pq = primes[b] * primes[i]
+  // Which satisfy: low <= x / pq < high && q <= y && pq > z
+  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
   for (; i > pi_min_m; i--)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
