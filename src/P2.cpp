@@ -80,7 +80,8 @@ T P2_thread(T x,
 
 /// P2(x, y) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
-/// Run-time: O(z log log z)
+/// Run time: O(n log log n), with n = x / y
+/// Memory usage: O(n^(1/2))
 ///
 template <typename T>
 T P2_OpenMP(T x,
@@ -104,11 +105,11 @@ T P2_OpenMP(T x,
   // \sum_{i=a+1}^{b} -(i - 1)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
 
-  int64_t z = (int64_t)(x / max(y, 1));
-  LoadBalancerP2 loadBalancer(x, z, threads, is_print);
+  int64_t xy = (int64_t)(x / max(y, 1));
+  LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
   threads = loadBalancer.get_threads();
 
-  // for (low = sqrt(x); low < z; low += dist)
+  // for (low = sqrt(x); low < x / y; low += dist)
   #pragma omp parallel num_threads(threads) reduction(+:sum)
   {
     int64_t low, high;

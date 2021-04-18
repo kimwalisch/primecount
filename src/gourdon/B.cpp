@@ -5,7 +5,7 @@
 ///        prime counting algorithms. P2(x, a) counts the numbers <= x
 ///        that have exactly 2 prime factors each exceeding the a-th
 ///        prime. Both P2 and B have a runtime complexity of
-///        O(z log log z) and use O(z^(1/2)) memory, with z = x / y.
+///        O(n log log n) and use O(n^(1/2)) memory, with n = x / y.
 ///
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
@@ -78,8 +78,8 @@ T B_thread(T x,
 }
 
 /// \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
-/// Run time: O(z log log z)
-/// Memory usage: O(z^(1/2))
+/// Run time: O(n log log n), with n = x / y
+/// Memory usage: O(n^(1/2))
 ///
 template <typename T>
 T B_OpenMP(T x,
@@ -91,11 +91,11 @@ T B_OpenMP(T x,
     return 0;
 
   T sum = 0;
-  int64_t z = (int64_t)(x / max(y, 1));
-  LoadBalancerP2 loadBalancer(x, z, threads, is_print);
+  int64_t xy = (int64_t)(x / max(y, 1));
+  LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
   threads = loadBalancer.get_threads();
 
-  // for (low = sqrt(x); low < z; low += dist)
+  // for (low = sqrt(x); low < x / y; low += dist)
   #pragma omp parallel num_threads(threads) reduction(+:sum)
   {
     int64_t low, high;
