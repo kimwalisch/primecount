@@ -11,7 +11,7 @@
 ///        balancing, it scales well up to a large number of CPU cores
 ///        because the compute threads are completely independent from
 ///        each other. This implementation also uses the highly
-///        optimized Sieve class and the DFactorTable class which is a
+///        optimized Sieve class and the FactorTableD class which is a
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
@@ -22,7 +22,7 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <DFactorTable.hpp>
+#include <FactorTableD.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
 #include <LoadBalancerS2.hpp>
@@ -46,7 +46,7 @@ namespace {
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segments * segment_size[.
 ///
-template <typename T, typename Primes, typename DFactorTable>
+template <typename T, typename Primes, typename FactorTableD>
 T D_thread(T x,
            int64_t x_star,
            int64_t xz,
@@ -55,7 +55,7 @@ T D_thread(T x,
            int64_t k,
            const Primes& primes,
            const PiTable& pi,
-           const DFactorTable& factor,
+           const FactorTableD& factor,
            ThreadSettings& thread)
 {
   T sum = 0;
@@ -180,14 +180,14 @@ T D_thread(T x,
 /// (this is done in D_thread(x, y)) every time the thread starts
 /// a new computation.
 ///
-template <typename T, typename Primes, typename DFactorTable>
+template <typename T, typename Primes, typename FactorTableD>
 T D_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
            T d_approx,
            const Primes& primes,
-           const DFactorTable& factor,
+           const FactorTableD& factor,
            int threads,
            bool is_print)
 {
@@ -240,7 +240,7 @@ int64_t D(int64_t x,
   }
 
   double time = get_time();
-  DFactorTable<uint16_t> factor(y, z, threads);
+  FactorTableD<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
   int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
 
@@ -271,15 +271,15 @@ int128_t D(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (z <= DFactorTable<uint16_t>::max())
+  if (z <= FactorTableD<uint16_t>::max())
   {
-    DFactorTable<uint16_t> factor(y, z, threads);
+    FactorTableD<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
     sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
   }
   else
   {
-    DFactorTable<uint32_t> factor(y, z, threads);
+    FactorTableD<uint32_t> factor(y, z, threads);
     auto primes = generate_primes<int64_t>(y);
     sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
   }

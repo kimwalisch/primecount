@@ -1,6 +1,6 @@
 ///
-/// @file   dfactor_table.cpp
-/// @brief  DFactorTable is a compressed lookup table of mu (moebius),
+/// @file   factor_table_d.cpp
+/// @brief  FactorTableD is a compressed lookup table of mu (moebius),
 ///         lpf (least prime factor) and mpf (max prime factor).
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
@@ -13,7 +13,7 @@
 // reasons, we only enable it for testing.
 #define ENABLE_MU_0_TESTING
 
-#include <DFactorTable.hpp>
+#include <FactorTableD.hpp>
 #include <generate.hpp>
 
 #include <stdint.h>
@@ -46,7 +46,7 @@ int main()
   auto mpf = generate_mpf(z);
   auto mu = generate_moebius(z);
 
-  DFactorTable<uint16_t> factorTable(y, z, threads);
+  FactorTableD<uint16_t> factorTable(y, z, threads);
   int64_t uint16_max = numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
   vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
@@ -66,7 +66,7 @@ int main()
     }
 
     // primes > y and square free numbers with a prime factor > y
-    // have been removed from the DFactorTable.
+    // have been removed from the FactorTableD.
     if (mpf[n] > y)
     {
       cout << "prime_factor_larger_y(" << n << ") = " << (factorTable.is_leaf(i) == 0);

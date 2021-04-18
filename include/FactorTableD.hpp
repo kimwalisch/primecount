@@ -1,6 +1,6 @@
 ///
-/// @file  DFactorTable.hpp
-/// @brief The DFactorTable class combines the lpf[n] (least prime
+/// @file  FactorTableD.hpp
+/// @brief The FactorTableD class combines the lpf[n] (least prime
 ///        factor), mpf[n] (max prime factor) and mu[n] (Möbius
 ///        function) lookup tables into a single factor[n] lookup
 ///        table which furthermore only contains entries for numbers
@@ -43,8 +43,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef DFACTORTABLE_HPP
-#define DFACTORTABLE_HPP
+#ifndef FACTORTABLED_HPP
+#define FACTORTABLED_HPP
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
@@ -64,11 +64,11 @@ namespace {
 using namespace primecount;
 
 template <typename T>
-class DFactorTable : public BaseFactorTable
+class FactorTableD : public BaseFactorTable
 {
 public:
   /// Factor numbers <= z
-  DFactorTable(int64_t y,
+  FactorTableD(int64_t y,
                int64_t z,
                int threads)
   {

@@ -1,10 +1,10 @@
 ///
 /// @file  BaseFactorTable.hpp
 ///        Static lookup tables and functions used by the
-///        FactorTable and DFactorTable classes.
+///        FactorTable and FactorTableD classes.
 ///        See FactorTable.hpp for more information.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
