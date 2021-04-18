@@ -28,7 +28,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <Status.hpp>
+#include <StatusS2.hpp>
 #include <S.hpp>
 
 #include <libdivide.h>
@@ -169,7 +169,7 @@ T S2_easy_OpenMP(T x,
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   int64_t min_b = max(c, pi_sqrty) + 1;
-  Status status(x);
+  StatusS2 status(x);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   parallel_for_atomic_inc(min_b, b <= pi_x13)

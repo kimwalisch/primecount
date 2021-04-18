@@ -30,7 +30,7 @@
 
 #include <LoadBalancerS2.hpp>
 #include <primecount-internal.hpp>
-#include <Status.hpp>
+#include <StatusS2.hpp>
 #include <Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>

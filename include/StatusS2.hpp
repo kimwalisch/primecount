@@ -1,5 +1,5 @@
 ///
-/// @file  Status.hpp
+/// @file  StatusS2.hpp
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -14,10 +14,10 @@
 
 namespace primecount {
 
-class Status
+class StatusS2
 {
 public:
-  Status(maxint_t x);
+  StatusS2(maxint_t x);
   void print(int64_t b, int64_t max_b);
   void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);

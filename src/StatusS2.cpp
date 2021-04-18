@@ -1,6 +1,6 @@
 ///
-/// @file  Status.cpp
-/// @brief The Status class is used to print the status (in percent)
+/// @file  StatusS2.cpp
+/// @brief The StatusS2 class is used to print the status (in percent)
 ///        of the formulas related to special leaves. It is used by
 ///        the D, S2_easy and S2_hard formulas.
 ///
@@ -10,7 +10,7 @@
 /// file in the top level directory.
 ///
 
-#include <Status.hpp>
+#include <StatusS2.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -53,21 +53,21 @@ double skewed_percent(T x, T y)
 
 namespace primecount {
 
-Status::Status(maxint_t x)
+StatusS2::StatusS2(maxint_t x)
 {
   precision_ = get_status_precision(x);
   int q = ipow(10, precision_);
   epsilon_ = 1.0 / q;
 }
 
-bool Status::isPrint(double time) const
+bool StatusS2::isPrint(double time) const
 {
   double old = time_;
   return old == 0 ||
         (time - old) >= threshold_;
 }
 
-void Status::print(double percent)
+void StatusS2::print(double percent)
 {
   double old = percent_;
 
@@ -85,7 +85,7 @@ void Status::print(double percent)
 /// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double p1 = skewed_percent(sum, sum_approx);
   double p2 = skewed_percent(low, limit);
@@ -111,7 +111,7 @@ double Status::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum
 /// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+void StatusS2::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
 
@@ -127,7 +127,7 @@ void Status::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx
 /// The calling code has to ensure that only 1 thread at a
 /// time executes this method.
 ///
-void Status::print(int64_t b, int64_t max_b)
+void StatusS2::print(int64_t b, int64_t max_b)
 {
   double time = get_time();
 

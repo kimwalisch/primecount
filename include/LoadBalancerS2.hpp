@@ -13,7 +13,7 @@
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 #include <OmpLock.hpp>
-#include <Status.hpp>
+#include <StatusS2.hpp>
 
 #include <stdint.h>
 
@@ -55,7 +55,7 @@ private:
   maxint_t sum_approx_ = 0;
   double time_ = 0;
   bool is_print_ = false;
-  Status status_;
+  StatusS2 status_;
   OmpLock lock_;
 };
 
