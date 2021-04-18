@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef STATUS_HPP
-#define STATUS_HPP
+#ifndef STATUSS2_HPP
+#define STATUSS2_HPP
 
 #include <int128_t.hpp>
 
