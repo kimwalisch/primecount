@@ -16,6 +16,7 @@
 #include <imath.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
@@ -135,12 +136,19 @@ void set_status_precision(int precision)
   status_precision_ = in_between(0, precision, 5);
 }
 
-/// Get the time in seconds
+/// Get the time in seconds (with microsecond accuracy).
+/// Note that according to the documentation of
+/// std::chrono::steady_clock: "This clock is not related to wall
+/// clock time (for example, it can be time since last reboot)".
+/// Hence time will always be fairly small and there won't be any
+/// precision issues if we convert the time to double.
+///
 double get_time()
 {
   auto now = chrono::steady_clock::now();
   auto time = now.time_since_epoch();
   auto micro = chrono::duration_cast<chrono::microseconds>(time);
+  assert(micro.count() < (1ll << 52));
   return (double) micro.count() / 1e6;
 }
 
