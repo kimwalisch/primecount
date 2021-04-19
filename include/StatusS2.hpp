@@ -22,7 +22,6 @@ public:
   void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
 private:
-  bool isPrint(double time) const;
   void print(double percent);
   double epsilon_ = 0;
   double percent_ = -1;

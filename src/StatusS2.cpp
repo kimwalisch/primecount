@@ -60,25 +60,6 @@ StatusS2::StatusS2(maxint_t x)
   epsilon_ = 1.0 / q;
 }
 
-bool StatusS2::isPrint(double time) const
-{
-  double old = time_;
-  return old == 0 ||
-        (time - old) >= threshold_;
-}
-
-void StatusS2::print(double percent)
-{
-  double old = percent_;
-
-  if ((percent - old) >= epsilon_)
-  {
-    percent_ = percent;
-    cout << "\rStatus: " << fixed << setprecision(precision_)
-         << percent << "%" << flush;
-  }
-}
-
 /// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
@@ -105,6 +86,18 @@ double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
   return percent;
 }
 
+void StatusS2::print(double percent)
+{
+  double old = percent_;
+
+  if ((percent - old) >= epsilon_)
+  {
+    percent_ = percent;
+    cout << "\rStatus: " << fixed << setprecision(precision_)
+         << percent << "%" << flush;
+  }
+}
+
 /// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
@@ -114,8 +107,9 @@ double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
 void StatusS2::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
+  double old = time_;
 
-  if (isPrint(time))
+  if ((time - old) >= threshold_)
   {
     time_ = time;
     double percent = getPercent(low, limit, sum, sum_approx);
@@ -130,8 +124,9 @@ void StatusS2::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_appr
 void StatusS2::print(int64_t b, int64_t max_b)
 {
   double time = get_time();
+  double old = time_;
 
-  if (isPrint(time))
+  if ((time - old) >= threshold_)
   {
     time_ = time;
     double percent = skewed_percent(b, max_b);
