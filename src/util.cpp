@@ -248,7 +248,8 @@ double get_alpha_lmo(maxint_t x)
     double b = -0.00896211;
     double c = 1.00404;
     double logx = log((double) x);
-    alpha = a * pow(logx, 2) + b * logx + c;
+    double logx2 = logx * logx;
+    alpha = a * logx2 + b * logx + c;
   }
 
   // Preserve 3 digits after decimal point
@@ -288,7 +289,9 @@ double get_alpha_deleglise_rivat(maxint_t x)
       double c = 1.00165;
       double d = 0.372253;
       double logx = log((double) x);
-      alpha = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+      double logx2 = logx * logx;
+      double logx3 = logx * logx * logx;
+      alpha = a * logx3 + b * logx2 + c * logx + d;
     }
   }
 
@@ -334,7 +337,9 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     double c = 13.6067;
     double d = -148.127;
     double logx = log((double) x);
-    alpha_yz = a * pow(logx, 3) + b * pow(logx, 2) + c * logx + d;
+    double logx2 = logx * logx;
+    double logx3 = logx * logx * logx;
+    alpha_yz = a * logx3 + b * logx2 + c * logx + d;
   }
 
   // Use default alpha_z
