@@ -340,12 +340,28 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   // Use default alpha_z
   if (alpha_z < 1)
   {
-    // In primecount when alpha_z is increased alpha_y is automatically
-    // decreased because alpha_y = alpha_yz / alpha_z. When alpha_z
-    // is increased this increases the runtime of the B formula but at
-    // the same time reduces the runtime of the C and D formulas.
-    // Increasing alpha_z also slightly reduces memory usage.
-    alpha_z = 1.5;
+    // y = x^(1/3) * alpha_y
+    // z = y * alpha_z
+    //
+    // alpha_y should grow like O(log(x)^3) just like in the
+    // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
+    // constant usually within [1, 3]. In my opinion the algorithm is
+    // theoretically most efficient if y == z, hence if alpha_z = 1.
+    // Because when setting y to a value smaller than z this will
+    // decrease the number of sparse easy leaves (which can be
+    // computed more efficiently than other types of leaves) and
+    // increase the number of other types of leaves.
+    //
+    // Up to about 10^20 primecount performs best when setting alpha_z
+    // to a value within [1.5, 2]. However for larger computations the
+    // best performance is achieved using an alpha_z value that is
+    // closer to 1 which makes sense given the explanations above.
+    //
+    if (x > 1e22)
+      alpha_z = 1.2;
+    else
+      alpha_z = 1.5;
+
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
