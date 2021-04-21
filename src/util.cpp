@@ -350,7 +350,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     //
     // alpha_y should grow like O(log(x)^3) just like in the
     // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
-    // constant usually within [1, 4]. In my opinion the algorithm is
+    // factor usually within [1, 2]. In my opinion the algorithm is
     // theoretically most efficient if y == z, hence if alpha_z = 1.
     // Because when setting y to a value smaller than z this will
     // decrease the number of sparse easy leaves (which can be
@@ -367,6 +367,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // C1 formula (in AC.cpp) which has not been segmented and hence
     // does not scale well.
     //
+    // alpha_z is a small tuning factor within [1, 2].
+    // alpha_z = 2 for small x, however approaches 1 for large x.
     alpha_z = 6.5 / log(max(alpha_yz, 20.0));
     alpha_z = in_between(1, alpha_z, 2);
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
