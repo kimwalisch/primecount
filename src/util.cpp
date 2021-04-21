@@ -318,6 +318,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
+  double logx = log((double) x);
   double alpha_yz;
 
   // For x <= 10^11 our default formula does not
@@ -327,7 +328,6 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   {
     double a = 0.078173;
     double b = 1;
-    double logx = log((double) x);
     alpha_yz = a * logx + b;
   }
   else
@@ -336,7 +336,6 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     double b = -0.41743;
     double c = 13.6067;
     double d = -148.127;
-    double logx = log((double) x);
     double logx2 = logx * logx;
     double logx3 = logx * logx * logx;
     alpha_yz = a * logx3 + b * logx2 + c * logx + d;
@@ -365,11 +364,11 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // minimizes the number of instructions used by the algorithm.
     // Also using a smaller alpha_z reduces the amount of work in the
     // C1 formula (in AC.cpp) which has not been segmented and hence
-    // does not scale well.
+    // does not scale well above 10^24.
     //
-    // alpha_z is a small tuning factor within [1, 2].
-    // alpha_z = 2 for small x, however approaches 1 for large x.
-    alpha_z = 6.5 / log(max(alpha_yz, 20.0));
+    // For x <= 10^16 alpha_z = 2.
+    // For x > 10^16 alpha_z slowly decreases towards 1.
+    alpha_z = 77 / max(logx, 1.0);
     alpha_z = in_between(1, alpha_z, 2);
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
