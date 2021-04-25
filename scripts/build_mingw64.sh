@@ -38,7 +38,7 @@ git checkout master
 git pull
 mkdir build-master
 cd build-master
-cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
+cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-flto -static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
 make -j8
 rm primecount.exe
 
@@ -90,7 +90,7 @@ git checkout backup3
 git pull
 mkdir build-backup3
 cd build-backup3
-cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
+cmake .. -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-flto -static -static-libgcc -static-libstdc++ -Wall -Wextra -pedantic -D_WIN32_WINNT=0x601" -DWITH_FLOAT128=ON
 make -j8
 rm primecount.exe
 
