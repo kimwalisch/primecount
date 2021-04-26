@@ -22,6 +22,10 @@
   #include <type_traits>
 #endif
 
+#if !defined(__has_builtin)
+  #define __has_builtin(x) 0
+#endif
+
 namespace {
 
 inline int64_t isquare(int64_t x)
@@ -42,6 +46,16 @@ inline T next_power_of_2(T x)
 #if __cplusplus >= 202002L
   auto ux = std::make_unsigned_t<T>(x);
   return std::bit_ceil(ux);
+
+#elif __has_builtin(__builtin_clzll)
+  if (x == 0 || x == 1)
+    return 1;
+
+  static_assert(sizeof(T) <= sizeof(unsigned long long), "Unsupported type, wider than long long!");
+  auto bits = std::numeric_limits<unsigned long long>::digits;
+  auto shift = bits - __builtin_clzll(x - 1);
+  return (T) (1ull << shift);
+
 #else
   if (x == 0)
     return 1;
@@ -69,6 +83,16 @@ inline T ilog2(T x)
   auto ux = std::make_unsigned_t<T>(x);
   ux = (ux > 0) ? ux : 1;
   return std::bit_width(ux) - 1;
+
+#elif __has_builtin(__builtin_clzll)
+  static_assert(sizeof(T) <= sizeof(unsigned long long), "Unsupported type, wider than long long!");
+  auto bits = std::numeric_limits<unsigned long long>::digits;
+
+  // Workaround to avoid undefined behavior,
+  // __builtin_clz(0) is undefined.
+  x = (x > 0) ? x : 1;
+  return (T) ((bits - 1) - __builtin_clzll(x));
+
 #else
   T log2 = 0;
   T bits = std::numeric_limits<T>::digits;
