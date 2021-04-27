@@ -88,18 +88,26 @@ inline T isqrt(T x)
 {
   T r = (T) std::sqrt((double) x);
 
-  // By using constexpr for the sqrt_max variable type it is
-  // guaranteed that ct_sqrt() is evaluated at compile time.
-  // Compilation will fail if the compiler fails to evaluate
-  // ct_sqrt() at compile time. Without declaring the sqrt_max
-  // variable as constexpr the compiler may compute ct_sqrt()
-  // either at compile time or at run time e.g. GCC-11 computes
+  // By using constexpr for the sqrt_max variable type it
+  // is guaranteed that ct_sqrt() is evaluated at compile
+  // time. Compilation will fail if the compiler fails to
+  // evaluate ct_sqrt() at compile time. This is great,
+  // ct_sqrt() must be evaluated at compile time otherwise
+  // the runtime complexity of isqrt(x) would deteriorate
+  // from O(1) to O(log2(x)).
+  //
+  // If sqrt_max were declared without constexpr than the
+  // compiler would be free to compute ct_sqrt() either at
+  // compile time or at run time e.g. GCC-11 computes
   // ct_sqrt(MAX_INT128) at compile time whereas Clang-12
   // computes ct_sqrt(MAX_INT128) at run time even at -O2.
   //
-  // C++20 fixed this annoying issue by adding consteval to
-  // C++. Hence if the compiler supports C++20 ct_sqrt() is
-  // defined as consteval instead of constexpr.
+  // C++20 fixed this annoying issue by adding consteval
+  // to C++. Hence if the compiler supports C++20 ct_sqrt()
+  // is defined as consteval instead of constexpr. Hence
+  // using C++20 ct_sqrt() will be evaluated at compile
+  // time in all cases i.e. even if sqrt_max were declared
+  // without constexpr.
   //
   constexpr T sqrt_max = ct_sqrt(std::numeric_limits<T>::max());
   r = std::min(r, sqrt_max);
