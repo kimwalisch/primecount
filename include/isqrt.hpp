@@ -96,7 +96,7 @@ inline T isqrt(T x)
   // the runtime complexity of isqrt(x) would deteriorate
   // from O(1) to O(log2(x)).
   //
-  // If sqrt_max were declared without constexpr than the
+  // If sqrt_max were declared without constexpr then the
   // compiler would be free to compute ct_sqrt() either at
   // compile time or at run time e.g. GCC-11 computes
   // ct_sqrt(MAX_INT128) at compile time whereas Clang-12
