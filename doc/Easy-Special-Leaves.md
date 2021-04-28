@@ -35,12 +35,15 @@ Note that Deleglise-Rivat [[2]](#references) have split up the easy special leav
 formulas that need to lookup the number of primes < x^(1/2), whereas all other formulas that only need to lookup the number of
 primes ≤ y should be computed without segmentation. As a ```PrimePi[n]``` lookup table of size y is much too large to fit into the CPU's
 cache and as the ```PrimePi[n]``` lookup table is accessed in random order, I suggest segmenting all easy special leaves formulas that
-are computationally expensive using a segment size of x^(1/4) in order to improve performance. However special care needs to be
-used for the formulas that compute identical consecutive easy leaves more efficiently, sometimes these leaves are named clustered
-easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy leaves. These formulas
-need to access ```PrimePi[n]``` values with n ≤ y but some of these memory accesses (i.e. those that compute how many consecutive leaves
-are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using a ```PrimePi[n]``` lookup
-table of size y instead of the ```SegmentedPrimePi[n]``` lookup table.
+are computationally expensive using a segment size of x^(1/4) in order to improve performance. To reduce the amount of work for
+the programmer it is best to sieve the interval [0, x^(1/2)[ only once and compute all easy special leaf formulas within that sieve.
+
+Extra care needs to be used when segmenting the formulas that compute consecutive identical easy leaves more efficiently, sometimes these
+leaves are named clustered easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy
+leaves. These formulas need to access ```PrimePi[n]``` values with n ≤ y but some of these memory accesses (i.e. those that compute how
+many consecutive leaves are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using
+a ```PrimePi[n]``` lookup table of size y instead of the ```SegmentedPrimePi[n]``` lookup table. Note that it is important for performance
+to segment the clustered easy leaves as there is a proportionally large number of these leaves and their computation is expensive.
 
  # Parallel computation and load-balancing
 
