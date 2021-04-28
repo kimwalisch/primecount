@@ -29,7 +29,7 @@ leaves. With a segment size of x^(1/4) the ```SegmentedPrimePi[n]``` lookup tabl
 into the CPU's cache even for record computations e.g. at 10^30 the ```SegmentedPrimePi[n]``` is only about 2 MiB in primecount. A segment
 size of x^(1/4) does not deteriorate the runtime complexity of the algorithm because the segmented sieve of Eratosthenes which is
 used to initialize the ```SegmentedPrimePi[n]``` lookup table has the same runtime complexity as the sieve of Eratosthenes as long as
-the segment size is not smaller than the square root of the total sieving distance.
+the segment size is not smaller than the square root of the total sieving distance (which is x^(1/2)).
 
 Note that Deleglise-Rivat [[2]](#references) have split up the easy special leaves into many formulas and suggest using segmentation only for the 2
 formulas that need to lookup the number of primes < x^(1/2), whereas all other formulas that only need to lookup the number of
@@ -48,15 +48,15 @@ So far we have focused on improving the cache efficiency of the computation of t
 how to parallelize the computation of the easy special leaves so that the algorithm scales well. Generally parallel algorithms
 scale well on current CPU architectures if they accomplish the 3 properties below:
 
-* Each thread only operates on his own tiny chunk of memory that fits into the CPU's cache.
+* Each thread only operates on its own tiny chunk of memory that fits into the CPU's cache.
 * All threads must be independent from each other (i.e. require no synchronization).
-* The work must be distributed evenly among all threads in order to avoid load imbalance. 
+* The work must be distributed evenly among all threads in order to avoid load imbalance.
 
 A segment size of x^(1/4) already accomplishes the first property. So next we have to design our parallel algorithm in a way that
 all threads are independent from each other. Luckily Xavier Gourdon [[3]](#references) already devised an idea for how to do this: **at the start of
 each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation**
 in O(low^(2/3)) or less. The result of ```PrimePi[low]``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
-for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-6.5
+for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-7.0
 (see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp), [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp)), it improved performance
 by more than 2x at 10^23 on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
 required frequent synchronization of threads. It is important to ensure that the additional pre-computations do not deteriorate
