@@ -447,6 +447,10 @@ primesieve natively supports C and C++ and has bindings available for:
         <td><a href="https://github.com/AaronChen0/cl-primecount">cl-primecount</a></td>
     </tr>
     <tr>
+        <td><b>Julia:</b></td>
+        <td><a href="https://github.com/JuliaBinaryWrappers/primecount_jll.jl">primecount_jll.jl</a></td>
+    </tr>
+    <tr>
         <td><b>Haskell:</b></td>
         <td><a href="https://github.com/erantapaa/hprimecount">hprimecount</a></td>
     </tr>
