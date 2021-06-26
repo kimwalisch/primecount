@@ -9,6 +9,6 @@
 
 # Algorithms
 
-* [Special-Leaves.md](Special-Leaves.md)
 * [Easy-Special-Leaves.md](Easy-Special-Leaves.md)
+* [Hard-Special-Leaves.md](Hard-Special-Leaves.md)
 * [References.md](References.md)

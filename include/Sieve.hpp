@@ -26,7 +26,7 @@
 ///        total count of unsieved elements in a certain interval.
 ///
 ///        In-depth description of this algorithm:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Special-Leaves.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///

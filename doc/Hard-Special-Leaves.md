@@ -1,20 +1,23 @@
-# Computation of the special leaves in the combinatorial type prime counting algorithms
+# Computation of the hard special leaves
 
 The combinatorial type prime counting algorithms
 ([Lagarias-Miller-Odlyzko](https://www.ams.org/journals/mcom/1985-44-170/S0025-5718-1985-0777285-5/S0025-5718-1985-0777285-5.pdf),
 [Deleglise-Rivat](https://www.ams.org/journals/mcom/1996-65-213/S0025-5718-96-00674-6/S0025-5718-96-00674-6.pdf),
 [Gourdon](http://numbers.computation.free.fr/Constants/Primes/Pix/piNalgorithm.ps))
-consist of many formulas and the formula that usually
-takes longest to compute and is by far the most difficult to implement is the formula
-of the so-called special leaves (sometimes called hard special leaves).
+consist of many formulas and the formula that usually takes longest to compute and
+is by far the most difficult to implement is the formula of the so-called hard special leaves.
+Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md),
+which can be computed in O(1) using a ```PrimePi``` lookup table, the computation of
+the hard special leaves requires evaluating the partial sieve function phi(x, a) which
+generally cannot be computed in O(1).
 [primecount's implementation](https://github.com/kimwalisch/primecount/blob/master/src/deleglise-rivat/S2_hard.cpp)
-of the special leaves formula is different from the algorithms that have
+of the hard special leaves formula is different from the algorithms that have
 been described in any of the combinatorial prime counting papers so far. This document
 describes the history of how primecount's implementation came to be and it describes
-a practical improvement for the computation of the special leaves that I found in
-February 2020 that I consider important.
+a practical improvement for the computation of the hard special leaves that I found in
+February 2020 and that I consider important.
 
-Implementing the special leaves formula requires use of a prime sieve. The algorithm
+Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
 [segmented sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes)
 which consists of 2 main parts that are executed alternately:

@@ -361,13 +361,13 @@ its Lagarias-Miller-Odlyzko and Deleglise-Rivat implementations are
 based on Tomás Oliveira's paper <a href="doc/References.md">[9]</a>
 and the implementation of Xavier Gourdon's algorithm is based
 on Xavier Gourdon's paper <a href="doc/References.md">[7]</a>.
-primecount's implementation of the special leaves formula is different
+primecount's implementation of the so-called hard special leaves is different
 from the algorithms that have been described in any of the combinatorial
 prime counting papers so far. Instead of using a binary indexed tree
 for counting which is very cache inefficient primecount uses a linear
 counters array in combination with the POPCNT instruction which is more
 cache efficient and much faster. The
-[Special-Leaves.md](doc/Special-Leaves.md) document contains more
+[Hard-Special-Leaves.md](doc/Hard-Special-Leaves.md) document contains more
 information. primecount's implementation of the easy special leaves
 is also noteworthy and described in
 [Easy-Special-Leaves.md](doc/Easy-Special-Leaves.md).
