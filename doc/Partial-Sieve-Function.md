@@ -123,7 +123,7 @@ the count of numbers ≤ n that are not divisible by any of the first a primes, 
 the bit array and count all set bits that correspond to numbers ≤ n. This means the access time of
 our cache would be O(n) which is not great. Therefore we introduce a second array which contains the
 count of set bits in the first array below the current index. Using these two arrays we can now count
-the numbers ≤ n that are no divisible by any of the first a primes in O(1) operations. Note that the
+the numbers ≤ n that are not divisible by any of the first a primes in O(1) operations. Note that the
 two arrays may be interleaved which makes our cache slightly more memory efficient. Below is the
 corresponding code from primecount:
 
