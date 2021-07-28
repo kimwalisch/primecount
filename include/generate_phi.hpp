@@ -6,21 +6,15 @@
 ///        phi(x, a) counts the numbers <= x that are not divisible
 ///        by any of the first a primes. The algorithm used is an
 ///        optimized version of the recursive algorithm described in
-///        Tomás Oliveira e Silva's paper [1]. I have added 5
+///        Tomás Oliveira e Silva's paper [2]. I have added 5
 ///        optimizations to my implementation which speed up the
-///        computation by several orders of magnitude:
+///        computation by several orders of magnitude.
 ///
-///        * Calculate phi(x, a) in O(1) using formula [2] if a <= 6.
-///        * Calculate phi(x, a) in O(1) using pi(x) lookup table if a > pi(sqrt(x))-1.
-///        * Cache results of phi(x, a) if x and a are small.
-///        * Calculate all phi(x, a) = 1 upfront in O(1).
-///        * Stop recursion at c instead of 1.
-///
-///       [1] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
-///           method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
-///           http://sweet.ua.pt/tos/bib/5.4.pdf
-///       [2] phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
-///           with pp = 2 * 3 * ... * prime[a] 
+///    [1] In-depth description of primecount's phi(x, a) implementation:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md
+///    [2] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
+///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
+///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -170,9 +164,9 @@ public:
 
 private:
   /// phi(x, a) counts the numbers <= x that are not divisible by any of
-  /// the first a primes. If a > pi(sqrt(x))-1 then phi(x, a) counts the
+  /// the first a primes. If a >= pi(sqrt(x)) then phi(x, a) counts the
   /// number of primes <= x, minus the first a primes, plus the number 1.
-  /// Hence if a > pi(sqrt(x))-1: phi(x, a) = pi(x) - a + 1.
+  /// Hence if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1.
   ///
   bool is_pix(int64_t x, int64_t a) const
   {
