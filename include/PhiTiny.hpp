@@ -67,14 +67,14 @@ public:
     return sum;
   }
 
-  static int64_t get_c(int64_t y)
+  static int64_t get_c(uint64_t y)
   {
     assert(y >= 0);
 
-    if (y >= primes.back())
-      return max_a();
-    else
+    if (y < pi.size())
       return pi[y];
+    else
+      return max_a();
   }
 
   /// In Xavier Gourdon's algorithm the small
@@ -96,7 +96,7 @@ private:
   static const std::array<int, 8> primes;
   static const std::array<int, 8> prime_products;
   static const std::array<int, 8> totients;
-  static const std::array<uint8_t, 19> pi;
+  static const std::array<uint8_t, 18> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.

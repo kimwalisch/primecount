@@ -33,14 +33,19 @@ const std::array<int, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 300
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
 const std::array<int, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
-// Number of primes below x
-const std::array<uint8_t, 19> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7 };
+// Number of primes <= primes.back()
+const std::array<uint8_t, 18> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7 };
 
 // Singleton
 const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
+  // The pi[x] lookup table should contain the
+  // number of primes <= primes.back().
+  assert(pi.back() == primes.size() - 1);
+  assert(primes.back() == pi.size() - 1);
+
   for (uint64_t a = 0; a < sieve_.size(); a++)
   {
     // For primes <= 5 our phi(x % pp, a) lookup table
