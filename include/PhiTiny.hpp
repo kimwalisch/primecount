@@ -69,8 +69,6 @@ public:
 
   static int64_t get_c(uint64_t y)
   {
-    assert(y >= 0);
-
     if (y < pi.size())
       return pi[y];
     else
@@ -93,9 +91,9 @@ public:
   }
 
 private:
-  static const std::array<int, 8> primes;
-  static const std::array<int, 8> prime_products;
-  static const std::array<int, 8> totients;
+  static const std::array<uint32_t, 8> primes;
+  static const std::array<uint32_t, 8> prime_products;
+  static const std::array<uint32_t, 8> totients;
   static const std::array<uint8_t, 18> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%

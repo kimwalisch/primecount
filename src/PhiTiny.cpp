@@ -25,13 +25,13 @@
 
 namespace primecount {
 
-const std::array<int, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
+const std::array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
-const std::array<int, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
+const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const std::array<int, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
+const std::array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes <= primes.back()
 const std::array<uint8_t, 18> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7 };
@@ -58,7 +58,7 @@ PhiTiny::PhiTiny()
 
       for (uint64_t x = 1; x < pp; x++)
       {
-        auto phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
+        uint64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
         assert(phi_xa <= std::numeric_limits<uint8_t>::max());
         phi_[a][x] = (uint8_t) phi_xa;
       }
