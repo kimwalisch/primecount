@@ -2,7 +2,7 @@
 /// @file  PhiTiny.hpp
 /// @brief phi(x, a) counts the numbers <= x that are not divisible
 ///        by any of the first a primes. PhiTiny computes phi(x, a)
-///        in constant time for a <= 8 using lookup tables.
+///        in constant time for a <= 7 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -37,10 +37,9 @@ public:
   PhiTiny();
 
   template <typename T>
-  T phi(T x, int64_t a) const
+  T phi(T x, uint64_t a) const
   {
-    assert(a <= max_a());
-
+    assert(a < prime_products.size());
     uint64_t pp = prime_products[a];
     uint64_t remainder = (uint64_t)(x % pp);
     T xpp = x / pp;
@@ -94,10 +93,10 @@ public:
   }
 
 private:
-  static const std::array<int, 9> primes;
-  static const std::array<int, 9> prime_products;
-  static const std::array<int, 9> totients;
-  static const std::array<int, 23> pi;
+  static const std::array<int, 8> primes;
+  static const std::array<int, 8> prime_products;
+  static const std::array<int, 8> totients;
+  static const std::array<uint8_t, 19> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
@@ -114,8 +113,8 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  std::array<std::vector<sieve_t>, 9> sieve_;
-  std::array<std::vector<int16_t>, 4> phi_;
+  std::array<std::vector<sieve_t>, 8> sieve_;
+  std::array<std::vector<uint8_t>, 4> phi_;
 };
 
 extern const PhiTiny phiTiny;

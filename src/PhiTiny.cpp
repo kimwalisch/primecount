@@ -2,7 +2,7 @@
 /// @file  PhiTiny.cpp
 /// @brief phi(x, a) counts the numbers <= x that are not divisible
 ///        by any of the first a primes. PhiTiny computes phi(x, a)
-///        in constant time for a <= 8 using lookup tables.
+///        in constant time for a <= 7 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -20,41 +20,42 @@
 
 #include <stdint.h>
 #include <array>
+#include <limits>
 #include <vector>
 
 namespace primecount {
 
-const std::array<int, 9> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+const std::array<int, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
-const std::array<int, 9> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510, 9699690 };
+const std::array<int, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const std::array<int, 9> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160, 1658880 };
+const std::array<int, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes below x
-const std::array<int, 23> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8 };
+const std::array<uint8_t, 19> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7 };
 
 // Singleton
 const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
-  // Initialize phi(x % pp, a) lookup tables
-  for (int a = 0; a <= max_a(); a++)
+  for (uint64_t a = 0; a < sieve_.size(); a++)
   {
     // For primes <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.
-    if (primes[a] <= 5)
+    if (a < phi_.size())
     {
-      int pp = prime_products[a];
+      uint64_t pp = prime_products[a];
       phi_[a].resize(pp);
       phi_[a][0] = 0;
 
-      for (int x = 1; x < pp; x++)
+      for (uint64_t x = 1; x < pp; x++)
       {
         auto phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
-        phi_[a][x] = (int16_t) phi_xa;
+        assert(phi_xa <= std::numeric_limits<uint8_t>::max());
+        phi_[a][x] = (uint8_t) phi_xa;
       }
     }
     else
