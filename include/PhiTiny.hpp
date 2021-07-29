@@ -40,8 +40,8 @@ public:
   T phi(T x, uint64_t a) const
   {
     assert(a < prime_products.size());
-    uint32_t pp = prime_products[a];
-    uint32_t remainder = (uint32_t)(x % pp);
+    auto pp = prime_products[a];
+    auto remainder = (uint64_t)(x % pp);
     T xpp = x / pp;
     T sum = xpp * totients[a];
 
