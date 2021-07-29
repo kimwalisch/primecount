@@ -40,8 +40,8 @@ public:
   T phi(T x, uint64_t a) const
   {
     assert(a < prime_products.size());
-    uint64_t pp = prime_products[a];
-    uint64_t remainder = (uint64_t)(x % pp);
+    uint32_t pp = prime_products[a];
+    uint32_t remainder = (uint32_t)(x % pp);
     T xpp = x / pp;
     T sum = xpp * totients[a];
 
@@ -61,7 +61,7 @@ public:
       uint64_t count = sieve_[a][remainder / 240].count;
       uint64_t bits = sieve_[a][remainder / 240].bits;
       uint64_t bitmask = unset_larger_[remainder % 240];
-      sum += count + popcnt64(bits & bitmask);
+      sum += (T)(count + popcnt64(bits & bitmask));
     }
 
     return sum;
