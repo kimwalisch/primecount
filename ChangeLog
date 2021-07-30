@@ -1,3 +1,8 @@
+Changes in primecount-7.1, 2021-07-29
+
+* PhiTiny.cpp: Use compressed phi(x, a) lookup table.
+* Partial-Sieve-Function.md: Description of phi(x, a) algorithm.
+
 Changes in primecount-7.0, 2021-04-28
 
 In primecout-6.x the AC algorithm scales very badly on PCs & servers

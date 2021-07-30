@@ -2,9 +2,9 @@
 /// @file   phi_tiny.cpp
 /// @brief  Test the partial sieve function phi_tiny(x, a)
 ///         which counts the numbers <= x that are not divisible
-///         by any of the first a primes with a <= 6.
+///         by any of the first a primes with a <= 7.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
