@@ -71,13 +71,12 @@ PhiTiny::PhiTiny()
       // the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
 
-      uint64_t max_x = prime_products[a];
-      uint64_t max_x_size = ceil_div(max_x, 240);
-      max_x = max_x_size * 240 - 1;
-      sieve_[a].resize(max_x_size);
+      uint64_t pp = prime_products[a];
+      uint64_t size = ceil_div(pp, 240);
+      sieve_[a].resize(size);
 
       for (uint64_t i = pi[7]; i <= a; i++)
-        for (uint64_t n = primes[i]; n <= max_x; n += primes[i] * 2)
+        for (uint64_t n = primes[i]; n < pp; n += primes[i] * 2)
           sieve_[a][n / 240].bits &= unset_bit_[n % 240];
 
       // Fill an array with the cumulative 1 bit counts.
