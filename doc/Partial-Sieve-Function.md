@@ -58,8 +58,8 @@ loop:
 # Optimizations
 
 There are a large number of known optimizations, that can be used in conjunction with the recursive
-phi(x, a) formula and which, when combined, can speed up the computation by many orders for magnitude. I will
-now briefly describe all known optimizations and then, at the end of this document, present a new
+phi(x, a) formula and which, when combined, can speed up the computation by many orders for magnitude.
+I will now briefly describe all known optimizations, and then further down I will present a new
 optimization that I have devised and that has first been implemented in primecount.
 
 ### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
@@ -227,6 +227,36 @@ accessed much more frequently than larger values. I also limit the size of the c
 megabytes in primecount which is slightly larger than my CPU's L3 cache size. Using an even
 larger cache size deteriorates performance especially when using multi-threading.
 
+# Generate phi(x, i) lookup table
+
+In 2002 Xavier Gourdon [[5]](#References) devised a modification to the hard special leaves
+algorithm so that the computation can be slit up into independent chunks. This modification is
+particularly useful for parallelizing the hard special leaves algorithm, since it avoids the
+need for frequent thread synchronization. This modification relies on the partial sieve
+function for generating a lookup table of phi(x, i) results for 0 ≤ i ≤ a. The idea of the
+algorithm is described very shortly in Gourdon's paper [[5]](#References) and it is also
+described in some more detail in Douglas Staple's paper [[7]](#References), however no pseudocode
+is provided in both papers.
+
+Computing phi(x, i) individually for all 0 ≤ i ≤ a would be far too slow. However, by taking
+advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
+we can actually generate a lookup table of phi(x, i) results for 0 ≤ i ≤ a in the same
+amount of time it takes to compute phi(x, a)! We first compute phi(x, 0), next we compute
+phi(x, 1) and reuse the phi(x, 0) result have computed previously. Then we compute
+phi(x, 2) and reuse our previous phi(x, 1) result and so forth. The code below shows how
+this algorithm can be implemented using a simple for loop. The ```phi_recursive(x / primes[i], i - 1)```
+part needs to be computed using the recursive phi(x, a) formula in conjunction with the
+optimizations described in this document.
+
+```C++
+int* phi = new int[a + 1];
+phi[0] = x;
+
+// Fill an array with phi(x, i) results
+for (int i = 1; i <= a; i++)
+    phi[i] = phi[i-1] - phi_recursive(x / primes[i], i - 1);
+```
+
 # References
 
 1. A. M. Legendre, Théorie des nombres, Third edition, Paris, 1830. Vol. 2, p. 65.
@@ -235,3 +265,4 @@ larger cache size deteriorates performance especially when using multi-threading
 4. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
 5. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
 6. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
+7. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
