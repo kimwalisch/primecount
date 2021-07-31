@@ -91,6 +91,15 @@ of x due to its excessive memory requirement. However, for large
 values of x we can compute the pi(x) part of this formula using a prime counting function
 implementation in O(x^(2/3)) or less instead of a lookup table which uses much less memory.
 
+### if (a ≥ pi(3√x) && a < pi(√x)) phi(x, a) = pi(x) + P2(x, a) - a + 1
+
+In the formula above 3√x denotes the 3rd root of x and P2(x, a) is the 2nd partial sieve function
+which counts the numbers ≤ x that have exactly 2 prime factors each exceeding the a-th prime.
+If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the P3(x, a) term i.e.
+phi(x, a) = pi(x) + P2(x, a) + P3(x, a) - a + 1. Of all optimizations presented in this section,
+this is the only one that is not implemented in primecount as its use would not provide much
+benefit to primecount.
+
 ### Calculate all phi(x / p, i) = 1 upfront in O(1)
 
 Once phi(x / p, i) = 1 occurs in the main
