@@ -133,32 +133,35 @@ public:
       sum = phi_cache(x, c) * SIGN;
     }
   
-    for (i = c; i < a; i++)
+    for (i = c + 1; i <= a; i++)
     {
-      // phi(x / prime[i+1], i) = 1 if x / prime[i+1] <= prime[i].
+      // phi(x / prime[i], i - 1) = 1 if x / prime[i] <= prime[i-1].
       // However we can do slightly better:
-      // If prime[i+1] > sqrt(x) and prime[i] <= sqrt(x) then
-      // phi(x / prime[i+1], i) = 1 even if x / prime[i+1] > prime[i].
+      // If prime[i] > sqrt(x) and prime[i-1] <= sqrt(x) then
+      // phi(x / prime[i], i - 1) = 1 even if x / prime[i] > prime[i-1].
       // This works because in this case there is no other prime
-      // inside the interval ]prime[i], x / prime[i+1]].
-      if (primes_[i + 1] > sqrtx)
+      // inside the interval ]prime[i-1], x / prime[i]].
+      if (primes_[i] > sqrtx)
         break;
-      int64_t xp = fast_div(x, primes_[i + 1]);
-      if (is_pix(xp, i))
+      int64_t xp = fast_div(x, primes_[i]);
+      if (is_pix(xp, i - 1))
         break;
-      sum += phi<-SIGN>(xp, i);
+      sum += phi<-SIGN>(xp, i - 1);
     }
 
-    for (; i < a; i++)
+    for (; i <= a; i++)
     {
-      if (primes_[i + 1] > sqrtx)
+      if (primes_[i] > sqrtx)
         break;
-      int64_t xp = fast_div(x, primes_[i + 1]);
-      sum += (pi_[xp] - i + 1) * -SIGN;
+      int64_t xp = fast_div(x, primes_[i]);
+      // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
+      // phi(x, i - 1) = pi(x) - (i - 1) + 1
+      // phi(x, i - 1) = pi(x) - i + 2
+      sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
     // phi(x, a) = 1 for all primes[a] >= x
-    sum += (a - i) * -SIGN;
+    sum += (a + 1 - i) * -SIGN;
     return sum;
   }
 
