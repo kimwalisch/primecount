@@ -22,6 +22,8 @@ devised a modification to the hard special leaves algorithm so that the computat
 independent chunks. This modification relies on the partial sieve function for generating a lookup
 table of phi(x, i) values for 0 ≤ i ≤ a. Hence now the partial sieve function's performance
 has become critical for parallel implementations of the combinatorial prime counting algorithms.
+The [Generate phi(x, i) lookup table](https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md#generate-phix-i-lookup-table)
+paragraph contains more information.
 
 # Recursive formula
 
