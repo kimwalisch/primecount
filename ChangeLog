@@ -1,7 +1,9 @@
-Changes in primecount-7.1, 2021-07-29
+Changes in primecount-7.1, 2021-07-31
 
-* PhiTiny.cpp: Use compressed phi(x, a) lookup table.
 * Partial-Sieve-Function.md: Description of phi(x, a) algorithm.
+* PhiTiny.cpp: Use compressed phi(x, a) lookup table.
+* phi.cpp: More correct usage of recursive phi(x, a) formula.
+* generate_phi.hpp: More correct usage of recursive phi(x, a) formula.
 
 Changes in primecount-7.0, 2021-04-28
 
