@@ -79,6 +79,14 @@ Using the formula from the previous paragraph it is possible to compute phi(x, c
 values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead of 1 in the main
 [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum by phi(x, c).
 
+### Calculate all phi(x / p, i) = 1 upfront in O(1)
+
+Once phi(x / p, i) = 1 occurs in the main
+[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / p, j)
+computations with i < j ≤ a will also be 1. Generally phi(x / prime[i+1], i) = 1 if
+(x / prime[i+1] ≤ prime[i]). Hence instead of computing phi(x / p, j) for i < j ≤ a we can
+simply increase the sum by a - i.
+
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
 This formula also allows computing phi(x, a) in O(1) provided that a is relatively large and x is
@@ -99,14 +107,6 @@ If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the P3(x, a) term i.
 phi(x, a) = pi(x) + P2(x, a) + P3(x, a) - a + 1. Of all optimizations presented in this section,
 this is the only one that is not implemented in primecount as its use would not provide much
 benefit to primecount.
-
-### Calculate all phi(x / p, i) = 1 upfront in O(1)
-
-Once phi(x / p, i) = 1 occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / p, j)
-computations with i < j ≤ a will also be 1. Generally phi(x / prime[i+1], i) = 1 if
-(x / prime[i+1] ≤ prime[i]). Hence instead of computing phi(x / p, j) for i < j ≤ a we can
-simply increase the sum by a - i.
 
 # New optimization
 
