@@ -81,13 +81,13 @@ Using the formula from the previous paragraph it is possible to compute phi(x, c
 values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead of 1 in the main
 [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum by phi(x, c).
 
-### Calculate all phi(x / p, i) = 1 upfront in O(1)
+### Calculate all phi(x / prime[i], i - 1) = 1 upfront in O(1)
 
-Once phi(x / p, i) = 1 occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / p, j)
+Once phi(x / prime[i], i - 1) = 1 occurs in the main
+[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / prime[j], j - 1)
 computations with i < j ≤ a will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
-(x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / p, j) for i < j ≤ a we can
-simply increase the sum by a - i.
+(x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
+i < j ≤ a we can simply increase the sum by a - i.
 
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
