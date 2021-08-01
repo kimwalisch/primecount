@@ -162,6 +162,7 @@ public:
 
     // phi(xp, i - 1) = 1 for i in [i, a]
     sum += (a + 1 - i) * -SIGN;
+    return sum;
   }
 
 private:
