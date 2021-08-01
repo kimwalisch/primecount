@@ -20,7 +20,7 @@ that the threads have exclusive access to the CPU's resources and in order to pr
 to wait idle for data from another thread. In 2002 Xavier Gourdon [[5]](#References)
 devised a modification to the hard special leaves algorithm so that the computation can be slit up into
 independent chunks. This modification relies on the partial sieve function for generating a lookup
-table of phi(x, i) values for 0 ≤ i ≤ a. Hence now the partial sieve function's performance
+table of phi(x, i) results for i ∈ [0, a]. Hence now the partial sieve function's performance
 has become critical for parallel implementations of the combinatorial prime counting algorithms.
 The [Generate phi(x, i) lookup table](https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md#generate-phix-i-lookup-table)
 paragraph contains more information.
@@ -236,14 +236,14 @@ In 2002 Xavier Gourdon [[5]](#References) devised a modification to the hard spe
 algorithm so that the computation can be slit up into independent chunks. This modification is
 particularly useful for parallelizing the hard special leaves algorithm, since it avoids the
 need for frequent thread synchronization. This modification relies on the partial sieve
-function for generating a lookup table of phi(x, i) results for 0 ≤ i ≤ a. The idea of the
+function for generating a lookup table of phi(x, i) results for i ∈ [0, a]. The idea of the
 algorithm is described very shortly in Gourdon's paper [[5]](#References) and it is also
 described in some more detail in Douglas Staple's paper [[7]](#References), however no pseudocode
 is provided in both papers.
 
-Computing phi(x, i) individually for all 0 ≤ i ≤ a would be far too slow. However, by taking
+Computing phi(x, i) individually for all i ∈ [0, a] would be far too slow. However, by taking
 advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
-we can actually generate a lookup table of phi(x, i) results for 0 ≤ i ≤ a in the same
+we can actually generate a lookup table of phi(x, i) results for i ∈ [0, a] in the same
 amount of time it takes to compute phi(x, a)! We first compute phi(x, 0), next we compute
 phi(x, 1) and reuse the phi(x, 0) result have computed previously. Then we compute
 phi(x, 2) and reuse our previous phi(x, 1) result and so forth. The code below shows how
