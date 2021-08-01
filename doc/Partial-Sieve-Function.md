@@ -85,9 +85,9 @@ values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead 
 
 Once phi(x / prime[i], i - 1) = 1 occurs in the main
 [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / prime[j], j - 1)
-computations with i < j ≤ a will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
+computations with j ∈ ]i, a] will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
 (x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
-i < j ≤ a we can simply increase the sum by a - i.
+j ∈ ]i, a] we can simply increase the sum by a - i.
 
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
