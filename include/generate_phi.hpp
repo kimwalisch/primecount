@@ -155,14 +155,13 @@ public:
         break;
       int64_t xp = fast_div(x, primes_[i]);
       // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
-      // phi(x, i - 1) = pi(x) - (i - 1) + 1
-      // phi(x, i - 1) = pi(x) - i + 2
+      // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
+      // phi(xp, i - 1) = pi(xp) - i + 2
       sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
-    // phi(x, a) = 1 for all primes[a] >= x
+    // phi(xp, i - 1) = 1 for i in [i, a]
     sum += (a + 1 - i) * -SIGN;
-    return sum;
   }
 
 private:
