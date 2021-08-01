@@ -68,7 +68,7 @@ optimization that I have devised and that has first been implemented in primecou
 
 The above formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
 Its use requires initializing a lookup table of size pp = 2 * 3 * ... * prime[a] with
-phi(i, a) values for i < pp. This formula is already present in Lehmer's paper from 1959
+phi(i, a) results for i in [0, pp[. This formula is already present in Lehmer's paper from 1959
 [[2]](#References) and is also described in more detail in most of the other combinatorial prime
 counting papers. In primecount this formula is implemented in
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
@@ -92,7 +92,7 @@ i < j ≤ a we can simply increase the sum by a - i.
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
 This formula also allows computing phi(x, a) in O(1) provided that a is relatively large and x is
-relatively small. If (a ≥ pi(√x)) then phi(x, a) counts the number of primes <= x, minus the first
+relatively small. If (a ≥ pi(√x)) then phi(x, a) counts the number of primes ≤ x, minus the first
 a primes, plus the number 1. Using this formula requires the use of a pi(x) lookup table of size x.
 In order to reduce the memory usage it is best to use a compressed pi(x) lookup table such as
 primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PiTable.hpp).
