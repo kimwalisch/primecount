@@ -1,8 +1,8 @@
 ///
 /// @file  PhiTiny.cpp
 /// @brief phi(x, a) counts the numbers <= x that are not divisible
-///        by any of the first a primes. PhiTiny computes phi(x, a)
-///        in constant time for a <= 7 using lookup tables.
+///        by any of the first a primes. PhiTiny computes phi(x, a) in
+///        constant time for a <= 8 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -25,7 +25,7 @@
 
 namespace primecount {
 
-const std::array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
+const std::array<uint32_t, 9> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
 const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
@@ -34,7 +34,7 @@ const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310
 const std::array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes <= primes.back()
-const std::array<uint8_t, 18> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7 };
+const std::array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
 
 // Singleton
 const PhiTiny phiTiny;
@@ -45,6 +45,10 @@ PhiTiny::PhiTiny()
   // number of primes <= primes.back().
   assert(pi.back() == primes.size() - 1);
   assert(primes.back() == pi.size() - 1);
+  assert(phi_.size() == pi[5] + 1);
+  assert(sieve.size() + 1 == primes.size());
+  static_assert(prime_products.size() + 1 == primes.size(), "Invalid prime_products size!");
+  static_assert(totients.size() + 1 == primes.size(), "Invalid totients size!");
 
   for (uint64_t a = 0; a < sieve_.size(); a++)
   {

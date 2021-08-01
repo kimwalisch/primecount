@@ -1,8 +1,8 @@
 ///
 /// @file  PhiTiny.hpp
 /// @brief phi(x, a) counts the numbers <= x that are not divisible
-///        by any of the first a primes. PhiTiny computes phi(x, a)
-///        in constant time for a <= 7 using lookup tables.
+///        by any of the first a primes. PhiTiny computes phi(x, a) in
+///        constant time for a <= 8 using lookup tables.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -35,6 +35,22 @@ class PhiTiny : public BitSieve240
 {
 public:
   PhiTiny();
+
+  // Uses at most 1 recursion level
+  template <typename T>
+  T phi_recursive(T x, int64_t a) const
+  {
+    // Unsigned integer division is usually
+    // faster than signed integer division,
+    // especially for int128_t.
+    using UT = typename std::make_unsigned<T>::type;
+    assert(a <= max_a());
+
+    if (a < max_a())
+      return phi((UT) x, a);
+    else // a == max_a()
+      return phi((UT) x, a - 1) - phi((UT) x / primes[a], a - 1);
+  }
 
   template <typename T>
   T phi(T x, uint64_t a) const
@@ -91,10 +107,10 @@ public:
   }
 
 private:
-  static const std::array<uint32_t, 8> primes;
+  static const std::array<uint32_t, 9> primes;
   static const std::array<uint32_t, 8> prime_products;
   static const std::array<uint32_t, 8> totients;
-  static const std::array<uint8_t, 18> pi;
+  static const std::array<uint8_t, 20> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
@@ -126,10 +142,7 @@ template <typename T>
 typename std::enable_if<(sizeof(T) == sizeof(typename make_smaller<T>::type)), T>::type
 phi_tiny(T x, int64_t a)
 {
-  // Unsigned integer division is usually
-  // faster than signed integer division.
-  using UT = typename std::make_unsigned<T>::type;
-  return phiTiny.phi((UT) x, a);
+  return phiTiny.phi_recursive(x, a);
 }
 
 template <typename T>
@@ -141,14 +154,9 @@ phi_tiny(T x, int64_t a)
   // If possible use smaller integer type
   // to speed up integer division.
   if (x <= std::numeric_limits<smaller_t>::max())
-    return phiTiny.phi((smaller_t) x, a);
+    return phiTiny.phi_recursive((smaller_t) x, a);
   else
-  {
-    // Unsigned integer division is usually
-    // faster than signed integer division.
-    using UT = typename std::make_unsigned<T>::type;
-    return phiTiny.phi((UT) x, a);
-  }
+    return phiTiny.phi_recursive(x, a);
 }
 
 } // namespace
