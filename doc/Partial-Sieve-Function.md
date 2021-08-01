@@ -118,7 +118,7 @@ medium values of i and j. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp
 avoid recursion, however it is limited to small values of a ≤ c with c being a small constant e.g.
 c = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute phi(x, a) in O(1), however
 it is limited to large values of a ≥ pi(√x). Hence there is currently no known optimization for
-computing phi(x, a) for medium values of a ∈ ]c, pi(√x)].
+computing phi(x, a) for medium values of a ∈ ]c, pi(√x)[.
 
 The new optimization that I have devised is a **phi(i, j) cache** for small to medium
 values of i and j e.g. i ≤ √x and j ≤ 100. The more phi(i, j) results are cached, the fewer recursive
