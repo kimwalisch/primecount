@@ -68,7 +68,7 @@ optimization that I have devised and that has first been implemented in primecou
 
 The above formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
 Its use requires initializing a lookup table of size pp = 2 * 3 * ... * prime[a] with
-phi(i, a) results for i in [0, pp[. This formula is already present in Lehmer's paper from 1959
+phi(i, a) results for i ∈ [0, pp[. This formula is already present in Lehmer's paper from 1959
 [[2]](#References) and is also described in more detail in most of the other combinatorial prime
 counting papers. In primecount this formula is implemented in
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
@@ -118,7 +118,7 @@ medium values of i and j. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp
 avoid recursion, however it is limited to small values of a ≤ c with c being a small constant e.g.
 c = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute phi(x, a) in O(1), however
 it is limited to large values of a ≥ pi(√x). Hence there is currently no known optimization for
-computing phi(x, a) for a in ]c, pi(√x)].
+computing phi(x, a) for medium values of a ∈ ]c, pi(√x)].
 
 The new optimization that I have devised is a **phi(i, j) cache** for small to medium
 values of i and j e.g. i ≤ √x and j ≤ 100. The more phi(i, j) results are cached, the fewer recursive
