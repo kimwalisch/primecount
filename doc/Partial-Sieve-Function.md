@@ -20,7 +20,7 @@ that the threads have exclusive access to the CPU's resources and in order to pr
 to wait idle for data from another thread. In 2002 Xavier Gourdon [[5]](#References)
 devised a modification to the hard special leaves algorithm so that the computation can be slit up into
 independent chunks. This modification relies on the partial sieve function for generating a lookup
-table of phi(x, i) values for 0 ≤ i ≤ a. Hence now the partial sieve function's performance
+table of phi(x, i) results for i ∈ [0, a]. Hence now the partial sieve function's performance
 has become critical for parallel implementations of the combinatorial prime counting algorithms.
 The [Generate phi(x, i) lookup table](https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md#generate-phix-i-lookup-table)
 paragraph contains more information.
@@ -68,7 +68,7 @@ optimization that I have devised and that has first been implemented in primecou
 
 The above formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
 Its use requires initializing a lookup table of size pp = 2 * 3 * ... * prime[a] with
-phi(i, a) values for i < pp. This formula is already present in Lehmer's paper from 1959
+phi(i, a) results for i ∈ [0, pp[. This formula is already present in Lehmer's paper from 1959
 [[2]](#References) and is also described in more detail in most of the other combinatorial prime
 counting papers. In primecount this formula is implemented in
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
@@ -85,14 +85,14 @@ values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead 
 
 Once phi(x / prime[i], i - 1) = 1 occurs in the main
 [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / prime[j], j - 1)
-computations with i < j ≤ a will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
+computations with j ∈ ]i, a] will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
 (x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
-i < j ≤ a we can simply increase the sum by a - i.
+j ∈ ]i, a] we can simply increase the sum by a - i.
 
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
 This formula also allows computing phi(x, a) in O(1) provided that a is relatively large and x is
-relatively small. If (a ≥ pi(√x)) then phi(x, a) counts the number of primes <= x, minus the first
+relatively small. If (a ≥ pi(√x)) then phi(x, a) counts the number of primes ≤ x, minus the first
 a primes, plus the number 1. Using this formula requires the use of a pi(x) lookup table of size x.
 In order to reduce the memory usage it is best to use a compressed pi(x) lookup table such as
 primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PiTable.hpp).
@@ -115,9 +115,10 @@ benefit to primecount.
 Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1)
 the same values of phi(i, j) are calculated over and over again, this is especially true for small to
 medium values of i and j. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) can be used to
-avoid recursion, however it is limited to small values of a ≤ 7. The formula phi(x, a) = pi(x) - a + 1
-can also be used to compute phi(x, a) in O(1), however it is limited to large values of a ≥ pi(√x).
-Hence there is currently no known optimization for computing phi(x, a) for 7 < a < pi(√x).
+avoid recursion, however it is limited to small values of a ≤ c with c being a small constant e.g.
+c = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute phi(x, a) in O(1), however
+it is limited to large values of a ≥ pi(√x). Hence there is currently no known optimization for
+computing phi(x, a) for medium values of a ∈ ]c, pi(√x)[.
 
 The new optimization that I have devised is a **phi(i, j) cache** for small to medium
 values of i and j e.g. i ≤ √x and j ≤ 100. The more phi(i, j) results are cached, the fewer recursive
@@ -235,14 +236,14 @@ In 2002 Xavier Gourdon [[5]](#References) devised a modification to the hard spe
 algorithm so that the computation can be slit up into independent chunks. This modification is
 particularly useful for parallelizing the hard special leaves algorithm, since it avoids the
 need for frequent thread synchronization. This modification relies on the partial sieve
-function for generating a lookup table of phi(x, i) results for 0 ≤ i ≤ a. The idea of the
+function for generating a lookup table of phi(x, i) results for i ∈ [0, a]. The idea of the
 algorithm is described very shortly in Gourdon's paper [[5]](#References) and it is also
 described in some more detail in Douglas Staple's paper [[7]](#References), however no pseudocode
 is provided in both papers.
 
-Computing phi(x, i) individually for all 0 ≤ i ≤ a would be far too slow. However, by taking
+Computing phi(x, i) individually for all i ∈ [0, a] would be far too slow. However, by taking
 advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
-we can actually generate a lookup table of phi(x, i) results for 0 ≤ i ≤ a in the same
+we can actually generate a lookup table of phi(x, i) results for i ∈ [0, a] in the same
 amount of time it takes to compute phi(x, a)! We first compute phi(x, 0), next we compute
 phi(x, 1) and reuse the phi(x, 0) result have computed previously. Then we compute
 phi(x, 2) and reuse our previous phi(x, 1) result and so forth. The code below shows how
