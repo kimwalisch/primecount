@@ -51,6 +51,9 @@ public:
     else
     {
       assert(a == 8);
+      // This code path will be executed most of the time.
+      // In phi7(x) the variable a has been hardcoded to 7
+      // which makes it run slightly faster than phi(x, a).
       // phi(x, 8) = phi(x, 7) - phi(x / prime[8], 7)
       return phi7((UT) x) - phi7((UT) x / 19);
     }
