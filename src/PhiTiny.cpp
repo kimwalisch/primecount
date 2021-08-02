@@ -5,9 +5,9 @@
 ///        computes phi(x, a) in constant time for a <= 8 using
 ///        lookup tables and the formula below.
 ///
-///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
-///        pp = 2 * 3 * ... * prime[a]
-///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
+///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+///        with pp = 2 * 3 * ... * prime[a]
+///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///

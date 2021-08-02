@@ -5,9 +5,9 @@
 ///        computes phi(x, a) in constant time for a <= 8 using
 ///        lookup tables and the formula below.
 ///
-///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
-///        pp = 2 * 3 * ... * prime[a]
-///        φ(a) = \prod_{i=1}^{a} (prime[i] - 1)
+///        phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+///        with pp = 2 * 3 * ... * prime[a]
+///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -95,20 +95,22 @@ public:
   template <typename T>
   T phi7(T x) const
   {
+    constexpr uint32_t a = 7;
     constexpr uint32_t pp = 510510;
+    constexpr uint32_t totient = 92160;
     auto remainder = (uint64_t)(x % pp);
     T xpp = x / pp;
-    T sum = xpp * 92160;
+    T sum = xpp * totient;
 
     // For prime[a] > 5 we use a compressed phi(x % pp, a)
     // lookup table. Each bit of the sieve array corresponds
     // to an integer that is not divisible by 2, 3 and 5.
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-    assert(sieve_.size() - 1 == 7);
-    assert(remainder / 240 < sieve_[7].size());
-    uint64_t count = sieve_[7][remainder / 240].count;
-    uint64_t bits = sieve_[7][remainder / 240].bits;
+    assert(sieve_.size() - 1 == a);
+    assert(remainder / 240 < sieve_[a].size());
+    uint64_t count = sieve_[a][remainder / 240].count;
+    uint64_t bits = sieve_[a][remainder / 240].bits;
     uint64_t bitmask = unset_larger_[remainder % 240];
     sum += (T)(count + popcnt64(bits & bitmask));
 
