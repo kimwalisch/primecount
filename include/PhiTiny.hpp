@@ -37,7 +37,8 @@ class PhiTiny : public BitSieve240
 public:
   PhiTiny();
 
-  // Uses at most 1 recursion level
+  /// Uses at most one level of phi(x, a) recursion to
+  /// ensure that the execution time is O(1).
   template <typename T>
   T phi_recursive(T x, int64_t a) const
   {
