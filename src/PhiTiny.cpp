@@ -1,8 +1,9 @@
 ///
 /// @file  PhiTiny.cpp
-/// @brief phi(x, a) counts the numbers <= x that are not divisible
-///        by any of the first a primes. PhiTiny computes phi(x, a) in
-///        constant time for a <= 8 using lookup tables.
+/// @brief phi_tiny(x, a) counts the numbers <= x that are not
+///        divisible by any of the first a primes. phi_tiny(x, a)
+///        computes phi(x, a) in constant time for a <= 8 using
+///        lookup tables and the formula below.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -25,7 +26,7 @@
 
 namespace primecount {
 
-const std::array<uint32_t, 9> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+const std::array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
 const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
@@ -46,13 +47,13 @@ PhiTiny::PhiTiny()
   assert(pi.back() == primes.size() - 1);
   assert(primes.back() == pi.size() - 1);
   assert(phi_.size() == pi[5] + 1);
-  assert(sieve_.size() + 1 == primes.size());
-  static_assert(prime_products.size() + 1 == primes.size(), "Invalid prime_products size!");
-  static_assert(totients.size() + 1 == primes.size(), "Invalid totients size!");
+  assert(sieve_.size() == primes.size());
+  static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
+  static_assert(totients.size() == primes.size(), "Invalid totients size!");
 
   for (uint64_t a = 0; a < sieve_.size(); a++)
   {
-    // For primes <= 5 our phi(x % pp, a) lookup table
+    // For prime[a] <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.
     if (a < phi_.size())
     {
@@ -69,12 +70,11 @@ PhiTiny::PhiTiny()
     }
     else
     {
-      // For primes > 5 we use a compressed phi(x % pp, a) lookup
-      // table. Each bit of the sieve array corresponds to
-      // an integer that is not divisible by 2, 3 and 5. Hence
-      // the 8 bits of each byte correspond to the offsets
+      // For prime[a] > 5 we use a compressed phi(x % pp, a)
+      // lookup table. Each bit of the sieve array corresponds
+      // to an integer that is not divisible by 2, 3 and 5.
+      // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-
       uint64_t pp = prime_products[a];
       uint64_t size = ceil_div(pp, 240);
       sieve_[a].resize(size);

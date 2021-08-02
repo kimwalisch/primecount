@@ -1,8 +1,9 @@
 ///
 /// @file  PhiTiny.hpp
-/// @brief phi(x, a) counts the numbers <= x that are not divisible
-///        by any of the first a primes. PhiTiny computes phi(x, a) in
-///        constant time for a <= 8 using lookup tables.
+/// @brief phi_tiny(x, a) counts the numbers <= x that are not
+///        divisible by any of the first a primes. phi_tiny(x, a)
+///        computes phi(x, a) in constant time for a <= 8 using
+///        lookup tables and the formula below.
 ///
 ///        phi(x, a) = (x / pp) * φ(a) + phi(x % pp, a)
 ///        pp = 2 * 3 * ... * prime[a]
@@ -44,12 +45,15 @@ public:
     // faster than signed integer division,
     // especially for int128_t.
     using UT = typename std::make_unsigned<T>::type;
-    assert(a <= max_a());
 
     if (a < max_a())
       return phi((UT) x, a);
-    else // a == max_a()
-      return phi((UT) x, a - 1) - phi((UT) x / primes[a], a - 1);
+    else
+    {
+      assert(a == 8);
+      // phi(x, 8) = phi(x, 7) - phi(x / prime[8], 7)
+      return phi7((UT) x) - phi7((UT) x / 19);
+    }
   }
 
   template <typename T>
@@ -61,16 +65,16 @@ public:
     T xpp = x / pp;
     T sum = xpp * totients[a];
 
-    // For primes <= 5 our phi(x % pp, a) lookup table
+    // For prime[a] <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.
     if (a < phi_.size())
       sum += phi_[a][remainder];
     else
     {
-      // For primes > 5 we use a compressed phi(x % pp, a) lookup
-      // table. Each bit of the sieve array corresponds to
-      // an integer that is not divisible by 2, 3 and 5. Hence
-      // the 8 bits of each byte correspond to the offsets
+      // For prime[a] > 5 we use a compressed phi(x % pp, a)
+      // lookup table. Each bit of the sieve array corresponds
+      // to an integer that is not divisible by 2, 3 and 5.
+      // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
       assert(a < sieve_.size());
       assert(remainder / 240 < sieve_[a].size());
@@ -79,6 +83,34 @@ public:
       uint64_t bitmask = unset_larger_[remainder % 240];
       sum += (T)(count + popcnt64(bits & bitmask));
     }
+
+    return sum;
+  }
+
+  /// In phi7(x) the variable a has been hardcoded to 7.
+  /// phi7(x) uses division by a constant instead of regular
+  /// integer division and hence phi7(x) is expected to run
+  /// faster than the phi(x, a) implementation above.
+  ///
+  template <typename T>
+  T phi7(T x) const
+  {
+    constexpr uint32_t pp = 510510;
+    auto remainder = (uint64_t)(x % pp);
+    T xpp = x / pp;
+    T sum = xpp * 92160;
+
+    // For prime[a] > 5 we use a compressed phi(x % pp, a)
+    // lookup table. Each bit of the sieve array corresponds
+    // to an integer that is not divisible by 2, 3 and 5.
+    // Hence the 8 bits of each byte correspond to the offsets
+    // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
+    assert(sieve_.size() - 1 == 7);
+    assert(remainder / 240 < sieve_[7].size());
+    uint64_t count = sieve_[7][remainder / 240].count;
+    uint64_t bits = sieve_[7][remainder / 240].bits;
+    uint64_t bitmask = unset_larger_[remainder % 240];
+    sum += (T)(count + popcnt64(bits & bitmask));
 
     return sum;
   }
@@ -103,11 +135,11 @@ public:
 
   static int64_t max_a()
   {
-    return primes.size() - 1;
+    return primes.size();
   }
 
 private:
-  static const std::array<uint32_t, 9> primes;
+  static const std::array<uint32_t, 8> primes;
   static const std::array<uint32_t, 8> prime_products;
   static const std::array<uint32_t, 8> totients;
   static const std::array<uint8_t, 20> pi;
