@@ -140,15 +140,15 @@ two arrays may be interleaved which makes our cache slightly more memory efficie
 corresponding code from primecount:
 
 ```C++
-  int64_t phi_cache(uint64_t x, uint64_t a) const
-  {
-    // We devide by 240 instead of 30 here because our arrays
-    // use the uint64_t type instead of std::byte.
-    uint64_t count = sieve_[a][x / 240].count;
-    uint64_t bits = sieve_[a][x / 240].bits;
-    uint64_t bitmask = unset_larger_[x % 240];
-    return count + popcnt64(bits & bitmask);
-  }
+int64_t phi_cache(uint64_t x, uint64_t a) const
+{
+  // We devide by 240 instead of 30 here because our arrays
+  // use the uint64_t type instead of std::byte.
+  uint64_t count = sieve_[a][x / 240].count;
+  uint64_t bits = sieve_[a][x / 240].bits;
+  uint64_t bitmask = unset_larger_[x % 240];
+  return count + popcnt64(bits & bitmask);
+}
 ```
 
 Before being able to use the phi(x, a) cache it needs to be initialized. The cache can be initialized
@@ -233,7 +233,7 @@ phi[0] = x;
 
 // Fill an array with phi(x, i) results
 for (int i = 1; i <= a; i++)
-    phi[i] = phi[i-1] - phi_recursive(x / primes[i], i - 1);
+  phi[i] = phi[i-1] - phi_recursive(x / primes[i], i - 1);
 ```
 
 # References
