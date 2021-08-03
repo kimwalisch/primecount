@@ -245,7 +245,7 @@ Computing phi(x, i) individually for all i ∈ [0, a] would be far too slow. How
 advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
 we can actually generate a lookup table of phi(x, i) results for i ∈ [0, a] in the same
 amount of time it takes to compute phi(x, a)! We first compute phi(x, 0), next we compute
-phi(x, 1) and reuse the phi(x, 0) result have computed previously. Then we compute
+phi(x, 1) and reuse the phi(x, 0) result we have computed previously. Then we compute
 phi(x, 2) and reuse our previous phi(x, 1) result and so forth. The code below shows how
 this algorithm can be implemented using a simple for loop. The ```phi_recursive(x / primes[i], i - 1)```
 part needs to be computed using the recursive phi(x, a) formula in conjunction with the
