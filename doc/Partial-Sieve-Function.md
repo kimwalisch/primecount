@@ -177,7 +177,7 @@ void init_cache(uint64_t x, uint64_t a)
   // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
   sieve_[3].resize(max_x_size_);
 
-  for (int i = 4; i <= a; i++)
+  for (uint64_t i = 4; i <= a; i++)
   {
     // Initalize phi(x, i) with phi(x, i - 1)
     sieve_[i] = sieve_[i - 1];
