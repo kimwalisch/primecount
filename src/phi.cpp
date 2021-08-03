@@ -116,7 +116,7 @@ public:
 
     // Cache all small phi(x, i) results with:
     // x <= max_x && i <= min(a, max_a)
-    sieve_cache(x, a);
+    init_cache(x, a);
 
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
@@ -202,7 +202,7 @@ private:
   /// counting has finished phi(x, a) results can be retrieved from the
   /// cache in O(1) using the phi_cache(x, a) method.
   ///
-  void sieve_cache(uint64_t x, uint64_t a)
+  void init_cache(uint64_t x, uint64_t a)
   {
     a = min(a, max_a_);
 

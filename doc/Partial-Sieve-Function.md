@@ -162,66 +162,42 @@ finished we proceed to the second part of the algorithm where we compute and sto
 below each index. Below is the corresponding code from primecount:
 
 ```C++
-  /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
-  /// Eratosthenes-like sieving algorithm that removes the first a primes
-  /// and their multiples from the sieve array. Additionally this
-  /// algorithm counts the numbers that are not divisible by any of the
-  /// first a primes after sieving has completed. After sieving and
-  /// counting has finished phi(x, a) results can be retrieved from the
-  /// cache in O(1) using the phi_cache(x, a) method.
-  ///
-  void sieve_cache(uint64_t x, uint64_t a)
+/// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
+/// Eratosthenes-like sieving algorithm that removes the first a primes
+/// and their multiples from the sieve array. Additionally this
+/// algorithm counts the numbers that are not divisible by any of the
+/// first a primes after sieving has completed. After sieving and
+/// counting has finished phi(x, a) results can be retrieved from the
+/// cache in O(1) using the phi_cache(x, a) method.
+///
+void init_cache(uint64_t x, uint64_t a)
+{
+  // Each bit in the sieve array corresponds to an integer that
+  // is not divisible by 2, 3 and 5. The 8 bits of each byte
+  // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
+  sieve_[3].resize(max_x_size_);
+
+  for (int i = 4; i <= a; i++)
   {
-    a = min(a, max_a_);
+    // Initalize phi(x, i) with phi(x, i - 1)
+    sieve_[i] = sieve_[i - 1];
 
-    if (x > max_x_ ||
-        a <= max_a_cached_)
-      return;
+    // Remove prime[i] and its multiples
+    for (uint64_t n = primes_[i]; n <= max_x_; n += primes_[i] * 2)
+      sieve_[i][n / 240].bits &= unset_bit_[n % 240];
 
-    uint64_t i = max_a_cached_ + 1;
-    uint64_t tiny_a = PhiTiny::max_a();
-    max_a_cached_ = a;
-    i = max(i, 3);
-
-    for (; i <= a; i++)
+    // Fill an array with the cumulative 1 bit counts.
+    // sieve[i][j] contains the count of numbers < j * 240 that
+    // are not divisible by any of the first i primes.
+    uint64_t count = 0;
+    for (auto& sieve : sieve_[i])
     {
-      // Each bit in the sieve array corresponds to an integer that
-      // is not divisible by 2, 3 and 5. The 8 bits of each byte
-      // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-      if (i == 3)
-        sieve_[i].resize(max_x_size_);
-      else
-      {
-        // Initalize phi(x, i) with phi(x, i - 1)
-        if (i - 1 <= tiny_a)
-          sieve_[i] = std::move(sieve_[i - 1]);
-        else
-          sieve_[i] = sieve_[i - 1];
-
-        // Remove prime[i] and its multiples
-        uint64_t prime = primes_[i];
-        if (prime <= max_x_)
-          sieve_[i][prime / 240].bits &= unset_bit_[prime % 240];
-        for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
-          sieve_[i][n / 240].bits &= unset_bit_[n % 240];
-
-        if (i > tiny_a)
-        {
-          uint64_t count = 0;
-
-          // Fill an array with the cumulative 1 bit counts.
-          // sieve[i][j] contains the count of numbers < j * 240 that
-          // are not divisible by any of the first i primes.
-          for (auto& sieve : sieve_[i])
-          {
-            sieve.count = (uint32_t) count;
-            count += popcnt64(sieve.bits);
-          }
-        }
-      }
+      sieve.count = (uint32_t) count;
+      count += popcnt64(sieve.bits);
     }
   }
-  ```
+}
+```
 
 According to my own benchmarks the cache, as implemented above, speeds up primecount's phi(x, a)
 implementation by more than 10x. Based on my empirical tests caching phi(x, a) results for
