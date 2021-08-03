@@ -132,7 +132,7 @@ public:
       assert(c_cached <= a);
       sum = phi_cache(x, c) * SIGN;
     }
-  
+
     for (i = c + 1; i <= a; i++)
     {
       // phi(x / prime[i], i - 1) = 1 if x / prime[i] <= prime[i-1].
