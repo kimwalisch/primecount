@@ -192,7 +192,7 @@ void init_cache(uint64_t x, uint64_t a)
     uint64_t count = 0;
     for (auto& sieve : sieve_[i])
     {
-      sieve.count = (uint32_t) count;
+      sieve.count = count;
       count += popcnt64(sieve.bits);
     }
   }
