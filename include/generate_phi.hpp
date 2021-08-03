@@ -120,16 +120,16 @@ public:
 
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
-    int64_t larger_c = min(a, max_a_cached_);
+    int64_t c_cached = min(a, max_a_cached_);
     int64_t sum, i;
 
-    if (c >= larger_c ||
-        !is_cached(x, larger_c))
+    if (c >= c_cached ||
+        !is_cached(x, c_cached))
       sum = phi_tiny(x, c) * SIGN;
     else
     {
-      c = larger_c;
-      assert(larger_c <= a);
+      c = c_cached;
+      assert(c_cached <= a);
       sum = phi_cache(x, c) * SIGN;
     }
   
