@@ -23,8 +23,8 @@ Here are links to primecount's [PiTable](https://github.com/kimwalisch/primecoun
 
 The ```SegmentedPrimePi[n]``` lookup table is accessed very frequently in the computation of the easy special leaves (about once for each
 easy special leaf) and these memory accesses are non sequential. It is therefore important that the ```SegmentedPrimePi[n]``` fits into
-the CPU's cache. While Xavier Gourdon's smaller segment size is already considerably smaller it is still too large for new record
-computations. For this reason I suggest using an **even smaller segment size of x^(1/4)** for the computation of the easy special
+the CPU's fast cache memory. While Xavier Gourdon's smaller segment size is already considerably smaller it is still too large for new
+record computations. For this reason I suggest using an **even smaller segment size of x^(1/4)** for the computation of the easy special
 leaves. With a segment size of x^(1/4) the ```SegmentedPrimePi[n]``` lookup table fits
 into the CPU's cache even for record computations e.g. at 10^30 the ```SegmentedPrimePi[n]``` is only about 2 MiB in primecount. A segment
 size of x^(1/4) does not deteriorate the runtime complexity of the algorithm because the segmented sieve of Eratosthenes which is
@@ -40,7 +40,7 @@ the programmer it is best to sieve the interval [0, x^(1/2)[ only once and compu
 
 Extra care needs to be used when segmenting the formulas that compute consecutive identical easy leaves more efficiently, sometimes these
 leaves are named clustered easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy
-leaves. These formulas need to access ```PrimePi[n]``` values with n ≤ y but some of these memory accesses (i.e. those that compute how
+leaves. These formulas need to access ```PrimePi[n]``` values with n ≤ y, but some of these memory accesses (i.e. those that compute how
 many consecutive leaves are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using
 a ```PrimePi[n]``` lookup table of size y instead of the ```SegmentedPrimePi[n]``` lookup table. Note that it is important for performance
 to segment the clustered easy leaves as there is a proportionally large number of these leaves and their computation is expensive.
@@ -57,14 +57,14 @@ scale well on current CPU architectures if they accomplish the 3 properties be
 
 A segment size of x^(1/4) already accomplishes the first property. So next we have to design our parallel algorithm in a way that
 all threads are independent from each other. Luckily Xavier Gourdon [[3]](#references) already devised an idea for how to do this: **at the start of
-each new segment [low, low + segment_size[ each thread computes ```PrimePi[low]``` using a prime counting function implementation**
-in O(low^(2/3)) or less. The result of ```PrimePi[low]``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
+each new segment [low, low + segment_size[ each thread computes ```PrimePi(low)``` using a prime counting function implementation**
+in O(low^(2/3)) or less. The result of ```PrimePi(low)``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
 for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-7.0
 (see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp), [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp)), it improved performance
 by more than 2x at 10^23 on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
 required frequent synchronization of threads. It is important to ensure that the additional pre-computations do not deteriorate
 the runtime complexity of the algorithm. When sieving up to x^(1/2) using a segment size of x^(1/4) there will by exactly x^(1/4)
-segments. For each segment we need to compute ```PrimePi[low]``` with low < x^(1/2). Hence in total the additional pre-computations
+segments. For each segment we need to compute ```PrimePi(low)``` with low < x^(1/2). Hence in total the additional pre-computations
 have a runtime complexity of O((x^(1/2))^(2/3) * x^(1/4)) = O(x^(7/12)) which does not deteriorate the overall runtime complexity
 of the algorithm.
 
