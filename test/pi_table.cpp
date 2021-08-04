@@ -56,8 +56,8 @@ int main()
   }
 
   primesieve::iterator it;
-  int64_t prime = it.next_prime();
-  int64_t count = 1;
+  uint64_t prime = it.next_prime();
+  uint64_t count = 1;
 
   while (prime < pi.size())
   {

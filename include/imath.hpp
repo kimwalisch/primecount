@@ -28,7 +28,7 @@
 
 namespace {
 
-inline int64_t isquare(int64_t x)
+inline uint64_t isquare(uint64_t x)
 {
   return x * x;
 }

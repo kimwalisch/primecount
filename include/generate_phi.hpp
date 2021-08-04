@@ -170,7 +170,7 @@ private:
   /// number of primes <= x, minus the first a primes, plus the number 1.
   /// Hence if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1.
   ///
-  bool is_pix(int64_t x, int64_t a) const
+  bool is_pix(uint64_t x, uint64_t a) const
   {
     return x < pi_.size() &&
            x < isquare(primes_[a + 1]);

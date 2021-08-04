@@ -32,7 +32,7 @@ class PiTable : public BitSieve240
 public:
   PiTable(uint64_t limit, int threads);
 
-  int64_t size() const
+  uint64_t size() const
   {
     return limit_ + 1;
   }
