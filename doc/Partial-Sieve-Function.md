@@ -17,14 +17,18 @@ algorithms does not meaningfully depend upon the execution speed of the partial 
 However, with the advent of multi-core CPUs, the partial sieve function has found another important
 use case within the combinatorial prime counting algorithms. For software programs to scale well on
 multi-core CPUs it is crucial that the individual worker threads are independent from each other, so
-that the threads have exclusive access to the CPU's resources and in order to prevent that a thread has
-to wait idle for data from another thread. In 2002 Xavier Gourdon [[5]](#References)
+that the threads have exclusive access to the CPU's resources and in order to prevent that a thread
+has to wait idle for data from another thread. In 2002 Xavier Gourdon [[5]](#References)
 devised a modification to the hard special leaves algorithm so that the computation can be slit up into
 independent chunks. This modification relies on the partial sieve function for generating a lookup
-table of phi(x, i) results for i ∈ [0, a]. Hence now the partial sieve function's performance
-has become critical for parallel implementations of the combinatorial prime counting algorithms.
-The [Generate phi(x, i) lookup table](https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md#generate-phix-i-lookup-table)
-paragraph contains more information.
+table of phi(x, i) results for i ∈ [0, a]. The
+[Generate phi(x, i) lookup table](#generate-phix-i-lookup-table) paragraph contains more information.
+
+Hence now the partial sieve function's performance has become critical for parallel implementations
+of the combinatorial prime counting algorithms. This document describes the many
+[known optimizations](#optimizations) that can be used to speed up the phi(x, a) computation and
+it describes a [new optimization](#new-optimization) that I have devised and that has first been
+implemented in primecount.
 
 # phi(x, a) in primecount
 
@@ -46,7 +50,6 @@ introduction this formula was first described by Legendre in his book "Théorie 
 [[1]](#References). When implemented in a computer program the above recursive
 phi(x, a) formula with a = pi(√x) allows computing Legendre's prime counting function
 pi(x) = pi(√x) + phi(x, pi(√x)) - 1 in O(x / log(x)) operations and using O(√x / log(x)) space.
-
 Tomás Oliveira e Silva's paper [[6]](#References) contains a simple C implementation of this formula:
 
 ```C
@@ -70,8 +73,9 @@ loop:
 
 There are a large number of known optimizations, that can be used in conjunction with the recursive
 phi(x, a) formula and which, when combined, can speed up the computation by many orders for magnitude.
-I will now briefly describe all known optimizations, and then further down I will present a new
-optimization that I have devised and that has first been implemented in primecount.
+I will now briefly describe all known optimizations, and then further down I will present a
+[new optimization](#new-optimization) that I have devised and that has first been implemented in
+primecount.
 
 ### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 
