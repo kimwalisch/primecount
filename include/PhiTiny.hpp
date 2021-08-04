@@ -148,7 +148,7 @@ private:
   static const std::array<uint32_t, 8> primes;
   static const std::array<uint32_t, 8> prime_products;
   static const std::array<uint32_t, 8> totients;
-  static const std::array<uint8_t, 20> pi;
+  static const std::array<uint8_t, 18> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
