@@ -37,10 +37,10 @@ class PhiTiny : public BitSieve240
 public:
   PhiTiny();
 
-  /// Uses at most one level of phi(x, a) recursion to
-  /// ensure that the execution time is O(1).
+  /// Uses at most one level of phi(x, a) recursion
+  /// to ensure that the runtime is O(1).
   template <typename T>
-  T phi_recursive(T x, int64_t a) const
+  T phi_recursive(T x, uint64_t a) const
   {
     // Unsigned integer division is usually
     // faster than signed integer division,
@@ -121,7 +121,7 @@ public:
     return sum;
   }
 
-  static int64_t get_c(uint64_t y)
+  static uint64_t get_c(uint64_t y)
   {
     if (y < pi.size())
       return pi[y];
@@ -134,12 +134,12 @@ public:
   /// k <= PrimePi[min(x_star, sqrt(x / y))]
   ///
   template <typename T>
-  static int64_t get_k(T x)
+  static uint64_t get_k(T x)
   {
     return get_c(iroot<4>(x));
   }
 
-  static int64_t max_a()
+  static constexpr uint64_t max_a()
   {
     return primes.size();
   }
@@ -171,21 +171,21 @@ private:
 
 extern const PhiTiny phiTiny;
 
-inline bool is_phi_tiny(int64_t a)
+inline bool is_phi_tiny(uint64_t a)
 {
   return a <= PhiTiny::max_a();
 }
 
 template <typename T>
 typename std::enable_if<(sizeof(T) == sizeof(typename make_smaller<T>::type)), T>::type
-phi_tiny(T x, int64_t a)
+phi_tiny(T x, uint64_t a)
 {
   return phiTiny.phi_recursive(x, a);
 }
 
 template <typename T>
 typename std::enable_if<(sizeof(T) > sizeof(typename make_smaller<T>::type)), T>::type
-phi_tiny(T x, int64_t a)
+phi_tiny(T x, uint64_t a)
 {
   using smaller_t = typename make_smaller<T>::type;
 

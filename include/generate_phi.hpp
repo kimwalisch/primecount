@@ -62,13 +62,12 @@ public:
     // max_a with the same amount of memory (max_megabytes)
     // decreases the performance.
     uint64_t max_a = 100;
-    uint64_t tiny_a = PhiTiny::max_a();
 
     // Make sure we cache only frequently used values
     a = a - min(a, 30);
     max_a = min(a, max_a);
 
-    if (max_a <= tiny_a)
+    if (max_a <= PhiTiny::max_a())
       return;
 
     // We cache phi(x, a) if x <= max_x.
@@ -79,7 +78,7 @@ public:
     // The cache (i.e. the sieve array)
     // uses at most max_megabytes per thread.
     uint64_t max_megabytes = 16;
-    uint64_t indexes = max_a - tiny_a;
+    uint64_t indexes = max_a - PhiTiny::max_a();
     uint64_t max_bytes = max_megabytes << 20;
     uint64_t max_bytes_per_index = max_bytes / indexes;
     uint64_t numbers_per_byte = 240 / sizeof(sieve_t);
@@ -211,7 +210,6 @@ private:
       return;
 
     uint64_t i = max_a_cached_ + 1;
-    uint64_t tiny_a = PhiTiny::max_a();
     max_a_cached_ = a;
     i = max(i, 3);
 
@@ -225,7 +223,7 @@ private:
       else
       {
         // Initalize phi(x, i) with phi(x, i - 1)
-        if (i - 1 <= tiny_a)
+        if (i - 1 <= PhiTiny::max_a())
           sieve_[i] = std::move(sieve_[i - 1]);
         else
           sieve_[i] = sieve_[i - 1];
@@ -237,13 +235,12 @@ private:
         for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
           sieve_[i][n / 240].bits &= unset_bit_[n % 240];
 
-        if (i > tiny_a)
+        if (i > PhiTiny::max_a())
         {
-          uint64_t count = 0;
-
           // Fill an array with the cumulative 1 bit counts.
           // sieve[i][j] contains the count of numbers < j * 240 that
           // are not divisible by any of the first i primes.
+          uint64_t count = 0;
           for (auto& sieve : sieve_[i])
           {
             sieve.count = (uint32_t) count;
