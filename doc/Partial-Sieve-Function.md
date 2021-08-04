@@ -2,11 +2,12 @@
 
 The partial sieve function phi(x, a) counts the numbers ≤ x that are not divisible by any of the
 first a primes. This function is sometimes also named "Legendre's sum" after the French mathematician
-Adrien-Marie Legendre who first studied it in the 19th century [[1]](#References). The
-partial sieve function is at the heart of all combinatorial prime counting
-algorithms. In fact Legendre's prime counting function pi(x) = pi(√x) + phi(x, pi(√x)) - 1 can
-be computed using solely the partial sieve function, whereas the other more advanced combinatorial
-prime counting algorithms require evaluating the partial sieve function as well as other functions.
+[Adrien-Marie Legendre](https://en.wikipedia.org/wiki/Adrien-Marie_Legendre) who first studied it in
+the 19th century [[1]](#References). The partial sieve function is at the heart of all combinatorial
+prime counting algorithms. In fact Legendre's prime counting function
+pi(x) = pi(√x) + phi(x, pi(√x)) - 1 can be computed using solely the partial sieve function, whereas
+the other more advanced combinatorial prime counting algorithms require evaluating the partial sieve
+function as well as other functions.
 
 In the advanced combinatorial prime counting algorithms such as the Lagarias-Miller-Odlyzko algorithm
 [[3]](#References) and the Deléglise-Rivat algorithm [[4]](#References) the partial sieve function is
@@ -66,11 +67,15 @@ optimization that I have devised and that has first been implemented in primecou
 
 ### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 
-This formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7 and pp
+This formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
+[φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and pp
 denotes the product of the first a primes pp = 2 * 3 * ... * prime[a]. The use of this formula
-requires initializing a lookup table of phi(i, a) results for i ∈ [0, pp[. This formula is already
-present in Lehmer's paper from 1959 [[2]](#References) and is also described in more detail in most of
-the other combinatorial prime counting papers. In primecount this formula is implemented in
+requires initializing a lookup table of phi(i, a) results for i ∈ [0, pp[, hence the lookup table has
+a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
+the first who used this formula for the computation of the number of primes below 1 billion at the end
+of the 19th century. This formula is also present in Lehmer's paper from 1959 [[2]](#References)
+and is described in more detail in most of the other combinatorial prime counting papers. In
+primecount this formula is implemented in
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
