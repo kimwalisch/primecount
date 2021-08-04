@@ -26,6 +26,17 @@ has become critical for parallel implementations of the combinatorial prime coun
 The [Generate phi(x, i) lookup table](https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md#generate-phix-i-lookup-table)
 paragraph contains more information.
 
+# phi(x, a) in primecount
+
+In primecount the partial sieve function is implemented in the file
+[phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) (and in
+[PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) &
+[PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp)).
+The partial sieve function phi(x, a) is also part of
+[primecount's C/C++ API](https://github.com/kimwalisch/primecount/blob/master/doc/libprimecount.md#c-api-reference)
+and is available in the [primecount command-line application](https://github.com/kimwalisch/primecount#installation)
+via the ```--phi``` option, e.g. phi(1000, 10) can be computed using: ```primecount 1000 10 --phi```.
+
 # Recursive formula
 
 ### phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1)
@@ -35,9 +46,6 @@ introduction this formula was first described by Legendre in his book "Théorie 
 [[1]](#References). When implemented in a computer program the above recursive
 phi(x, a) formula with a = pi(√x) allows computing Legendre's prime counting function
 pi(x) = pi(√x) + phi(x, pi(√x)) - 1 in O(x / log(x)) operations and using O(√x / log(x)) space.
-In primecount this formula is implemented in
-[phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) (together with all
-optimizations described in this document).
 
 Tomás Oliveira e Silva's paper [[6]](#References) contains a simple C implementation of this formula:
 
