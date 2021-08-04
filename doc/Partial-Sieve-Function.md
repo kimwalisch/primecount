@@ -66,20 +66,29 @@ optimization that I have devised and that has first been implemented in primecou
 
 ### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 
-The above formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
-Its use requires initializing a lookup table of size pp = 2 * 3 * ... * prime[a] with
-phi(i, a) results for i ∈ [0, pp[. This formula is already present in Lehmer's paper from 1959
-[[2]](#References) and is also described in more detail in most of the other combinatorial prime
-counting papers. In primecount this formula is implemented in
+This formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7 and pp
+denotes the product of the first a primes pp = 2 * 3 * ... * prime[a]. The use of this formula
+requires initializing a lookup table of phi(i, a) results for i ∈ [0, pp[. This formula is already
+present in Lehmer's paper from 1959 [[2]](#References) and is also described in more detail in most of
+the other combinatorial prime counting papers. In primecount this formula is implemented in
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
 
+### if (x > pp/2 && x ≤ pp) phi(x, a) = φ(pp) - phi(pp - x, a)
+
+In the formula above pp corresponds to the product of the first a primes pp = 2 * 3 * ... * prime[a].
+This formula can be used in combination with the formula from the previous paragraph to reduce the size
+of the phi(i, a) lookup table to half of its original size, at the expense of slightly increasing the
+number of executed instructions. This formula is not being used in primecount and I am also not aware
+of any other math library that uses it.
+
 ### Stop recursion at c instead of 1
 
-Using the formula from the previous paragraph it is possible to compute phi(x, c) in O(1) for small
-values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead of 1 in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum by phi(x, c).
+Using the formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) it is possible to compute phi(x, c)
+in O(1) for small values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead of 1 in
+the main [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum
+by phi(x, c).
 
 ### Calculate all phi(x / prime[i], i - 1) = 1 upfront in O(1)
 
@@ -106,9 +115,9 @@ implementation in O(x^(2/3)) or less instead of a lookup table which uses much l
 In the formula above 3√x denotes the 3rd root of x and P2(x, a) is the 2nd partial sieve function
 which counts the numbers ≤ x that have exactly 2 prime factors each exceeding the a-th prime.
 If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the P3(x, a) term i.e.
-phi(x, a) = pi(x) + P2(x, a) + P3(x, a) - a + 1. Of all optimizations presented in this section,
-this is the only one that is not implemented in primecount as its use would not provide much
-benefit to primecount.
+phi(x, a) = pi(x) + P2(x, a) + P3(x, a) - a + 1. The formulas from this paragraph are not yet
+being used in primecount, even though I expect that their use could significantly speed up some
+phi(x, a) computations.
 
 # New optimization
 
