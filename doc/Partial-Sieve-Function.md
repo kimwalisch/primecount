@@ -81,7 +81,7 @@ primecount.
 
 This formula allows computing phi(x, a) in O(1) for small values of a e.g. for a ≤ 7.
 [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and pp
-denotes the product of the first a primes pp = 2 * 3 * ... * prime[a]. The use of this formula
+denotes the product of the first a primes: pp = 2 * 3 * ... * prime[a]. The use of this formula
 requires initializing a lookup table of phi(i, a) results for i ∈ [0, pp[, hence the lookup table has
 a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
 the first who used this formula for the computation of the number of primes below 1 billion at the end
@@ -94,7 +94,7 @@ the initialization of the lookup table is implemented in
 
 ### if (x > pp/2 && x ≤ pp) phi(x, a) = φ(pp) - phi(pp - x, a)
 
-In the formula above pp corresponds to the product of the first a primes pp = 2 * 3 * ... * prime[a].
+In the formula above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a].
 This formula can be used in combination with the formula from the previous paragraph to reduce the size
 of the phi(i, a) lookup table to half of its original size, at the expense of slightly increasing the
 number of executed instructions. Practically this formula does not seem very useful, its use will most
