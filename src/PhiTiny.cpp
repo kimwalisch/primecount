@@ -46,7 +46,7 @@ PhiTiny::PhiTiny()
   // number of primes <= primes.back().
   assert(pi.back() == primes.size() - 1);
   assert(primes.back() == pi.size() - 1);
-  assert(phi_.size() == pi[5] + 1);
+  assert(phi_.size() - 1 == (uint64_t) pi[5]);
   assert(sieve_.size() == primes.size());
   static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
   static_assert(totients.size() == primes.size(), "Invalid totients size!");
