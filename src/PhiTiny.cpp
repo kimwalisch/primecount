@@ -34,18 +34,17 @@ const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
 const std::array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
-// Number of primes <= primes.back()
-const std::array<uint8_t, 18> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7 };
+// Number of primes <= next_prime(primes.back())
+const std::array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
 
 // Singleton
 const PhiTiny phiTiny;
 
 PhiTiny::PhiTiny()
 {
-  // The pi[x] lookup table should contain the
-  // number of primes <= primes.back().
-  assert(pi.back() == primes.size() - 1);
-  assert(primes.back() == pi.size() - 1);
+  // The pi[x] lookup table must contain the number
+  // of primes <= next_prime(primes.back()).
+  assert(pi.back() == primes.size());
   assert(phi_.size() - 1 == (uint64_t) pi[5]);
   assert(sieve_.size() == primes.size());
   static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
