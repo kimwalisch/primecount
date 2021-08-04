@@ -85,8 +85,9 @@ the initialization of the lookup table is implemented in
 In the formula above pp corresponds to the product of the first a primes pp = 2 * 3 * ... * prime[a].
 This formula can be used in combination with the formula from the previous paragraph to reduce the size
 of the phi(i, a) lookup table to half of its original size, at the expense of slightly increasing the
-number of executed instructions. This formula is not being used in primecount and I am also not aware
-of any other math library that uses it.
+number of executed instructions. Practically this formula does not seem very useful, its use will most
+likely slow down your phi(x, a) implementation. This formula is not being used in primecount and I am
+also not aware of any other math library that uses it.
 
 ### Stop recursion at c instead of 1
 
