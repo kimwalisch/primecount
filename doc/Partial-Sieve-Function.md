@@ -108,13 +108,13 @@ j ∈ ]i, a] we can simply increase the sum by a - i.
 
 This formula also allows computing phi(x, a) in O(1) provided that a is relatively large and x is
 relatively small. If (a ≥ pi(√x)) then phi(x, a) counts the number of primes ≤ x, minus the first
-a primes, plus the number 1. Using this formula requires the use of a pi(x) lookup table of size x.
+a primes, plus the number 1. The use of this formula requires using a pi(x) lookup table of size x.
 In order to reduce the memory usage it is best to use a compressed pi(x) lookup table such as
 primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PiTable.hpp).
 The use of a lookup table makes this formula unsuitable for computing phi(x, a) for large values
-of x due to its excessive memory requirement. However, for large
-values of x we can compute the pi(x) part of this formula using a prime counting function
-implementation in O(x^(2/3)) or less instead of a lookup table which uses much less memory.
+of x due to its excessive memory requirement. However, for large values of x we can compute the
+pi(x) part of this formula using a prime counting function implementation in O(x^(2/3)) or less
+instead of a lookup table which uses much less memory.
 
 ### if (a ≥ pi(3√x) && a < pi(√x)) phi(x, a) = pi(x) + P2(x, a) - a + 1
 
@@ -155,7 +155,7 @@ two arrays may be interleaved which makes our cache slightly more memory efficie
 corresponding code from primecount:
 
 ```C++
-int64_t phi_cache(uint64_t x, uint64_t a) const
+int64_t phi_cache(uint64_t x, uint64_t a)
 {
   // We devide by 240 instead of 30 here because our arrays
   // use the uint64_t type instead of std::byte.
