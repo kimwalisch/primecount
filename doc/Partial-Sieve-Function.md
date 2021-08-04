@@ -39,7 +39,7 @@ In primecount the partial sieve function is implemented in the file
 The partial sieve function phi(x, a) is also part of
 [primecount's C/C++ API](https://github.com/kimwalisch/primecount/blob/master/doc/libprimecount.md#c-api-reference)
 and it is available in the [primecount command-line application](https://github.com/kimwalisch/primecount#installation)
-via the ```--phi``` option, e.g. phi(1000, 10) can be computed using: ```primecount 1000 10 --phi```.
+via the ```--phi``` option, e.g. phi(1000, 10) can be computed using: ```primecount 1000 10 --phi```
 
 # Recursive formula
 
