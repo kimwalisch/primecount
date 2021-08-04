@@ -33,7 +33,7 @@ paragraph contains more information.
 This is the main formula for the computation of the partial sieve function. As mentioned in the
 introduction this formula was first described by Legendre in his book "Théorie des nombres"
 [[1]](#References). When implemented in a computer program the above recursive
-phi(x, a) formula with a = pi(√x) allows to compute Legendre's prime counting function
+phi(x, a) formula with a = pi(√x) allows computing Legendre's prime counting function
 pi(x) = pi(√x) + phi(x, pi(√x)) - 1 in O(x / log(x)) operations and using O(√x / log(x)) space.
 In primecount this formula is implemented in
 [phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) (together with all
