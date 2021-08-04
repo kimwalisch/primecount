@@ -185,8 +185,8 @@ In primecount the cache is lazily initialized during the execution of the
 is started we first check whether that result is not yet present in the cache and if x & i meet the caching
 criteria. If these conditions apply the cache will be filled up to x & i. In the first part of this algorithm
 we unset the bits that correspond to numbers that are divisible by the i-th prime. When sieving has
-finished we proceed to the second part of the algorithm where we compute and store the sum of all set bits
-below each index. Below is the corresponding code from primecount:
+finished, we proceed to the second part of the algorithm where we count all set bits (below each index)
+in the first array and store that count in the second array. Below is the corresponding code from primecount:
 
 ```C++
 /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
