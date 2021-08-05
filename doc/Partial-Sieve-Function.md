@@ -97,13 +97,12 @@ the initialization of the lookup table is implemented in
 In the formula above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a]
 and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
 When it is not possible to compute phi(x, a) in O(1) using the formula from the first paragraph this
-formula can be used to reduce the phi(x, a) computation size to about half on average. If (x%pp > pp/2)
-then this formula allows computing phi(pp - 1 - x%pp, a) instead of phi(x, a) where pp - 1 - x%pp is
-smaller than x. I tested this formula in primecount, however it did not provide any speedup. The main issue
-with this formula is that it involves the product of the first a primes which grows rather quickly and
-hence this formula can only be used for small values of a. In computer programs that use 64-bit
-integers this formula can be used for a ≤ 16. This formula is described in more detail in
-R.P. Leopold's paper [[7]](#References).
+formula can be used to avoid computing phi(x, a) where x may be large, and instead compute
+phi(pp - 1 - x%pp, a) where pp - 1 - x%pp may be orders of magnitude smaller than x. I have tested this
+formula in primecount, however it did not provide a general speedup. The main issue with this formula
+is that it is limited to small values of a because it involves the product of the first a primes which
+grows rather quickly. In computer programs that use 64-bit integers this formula can be used for a ≤ 16.
+This formula is described in more detail in R.P. Leopold's paper [[7]](#References).
 
 ### Stop recursion at c instead of 1
 
