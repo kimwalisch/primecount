@@ -99,11 +99,11 @@ and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's
 When it is not possible to compute phi(x, a) in O(1) using the formula from the first paragraph, these
 formulas can be used to avoid computing phi(x, a) where x may be large, and instead compute
 phi(x%pp, a) or phi(pp - 1 - x%pp, a) where x%pp and pp - 1 - x%pp may be orders of magnitude smaller
-than x. I have tested these formulas in primecount, however they did not provide a general speedup. The main
-issue with these formulas is that they are limited to small values of a because they involve the product of
-the first a primes which grows rather quickly. In computer programs that use 64-bit integers these
-formulas can be used for a ≤ 16. These formulas are partially described in R.P. Leopold's
-paper [[7]](#References).
+than x. I have tested these formulas in primecount, however they did not provide a general speedup.
+The main issue with these formulas is that they are only useful for relatively large values of x and
+they are limited to small values of a because they involve the product of the first a primes which
+grows rather quickly. In computer programs that use 64-bit integers these formulas can be used for
+a ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]](#References).
 
 ### Stop recursion at c instead of 1
 
