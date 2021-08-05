@@ -92,17 +92,18 @@ primecount this formula is implemented in
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
 
-### if (x%pp > pp/2) phi(x, a) = x/pp * φ(pp) + φ(pp) - phi(pp - 1 - x%pp, a)
+### if (x%pp ≤ pp/2) phi(x, a) = x/pp * φ(pp) + phi(x%pp, a)<br/>if (x%pp > pp/2) phi(x, a) = x/pp * φ(pp) + φ(pp) - phi(pp - 1 - x%pp, a)
 
-In the formula above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a]
+In the formulas above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a]
 and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
-When it is not possible to compute phi(x, a) in O(1) using the formula from the first paragraph this
-formula can be used to avoid computing phi(x, a) where x may be large, and instead compute
-phi(pp - 1 - x%pp, a) where pp - 1 - x%pp may be orders of magnitude smaller than x. I have tested this
-formula in primecount, however it did not provide a general speedup. The main issue with this formula
-is that it is limited to small values of a because it involves the product of the first a primes which
-grows rather quickly. In computer programs that use 64-bit integers this formula can be used for a ≤ 16.
-This formula is described in more detail in R.P. Leopold's paper [[7]](#References).
+When it is not possible to compute phi(x, a) in O(1) using the formula from the first paragraph these
+formulas can be used to avoid computing phi(x, a) where x may be large, and instead compute
+phi(x%pp, a) or phi(pp - 1 - x%pp, a) where x%pp and pp - 1 - x%pp may be orders of magnitude smaller
+than x. I have tested these formulas in primecount, however they did not provide a general speedup. The main
+issue with these formulas is that they are limited to small values of a because they involve the product of
+the first a primes which grows rather quickly. In computer programs that use 64-bit integers these
+formulas can be used for a ≤ 16. This formula is partially described in R.P. Leopold's
+paper [[7]](#References).
 
 ### Stop recursion at c instead of 1
 
