@@ -92,14 +92,18 @@ primecount this formula is implemented in
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
 
-### if (x > pp/2 && x ≤ pp) phi(x, a) = φ(pp) - phi(pp - x, a)
+### if (x%pp > pp/2) phi(x, a) = x/pp * φ(pp) + φ(pp) - phi(pp - 1 - x%pp, a)
 
-In the formula above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a].
-This formula can be used in combination with the formula from the previous paragraph to reduce the size
-of the phi(i, a) lookup table to half of its original size, at the expense of slightly increasing the
-number of executed instructions. Practically this formula does not seem very useful, its use will most
-likely slow down your phi(x, a) implementation. This formula is not being used in primecount and I am
-also not aware of any other math library that uses it.
+In the formula above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a]
+and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
+When it is not possible to compute phi(x, a) in O(1) using the formula from the first paragraph this
+formula can be used to reduce the phi(x, a) computation size to about half on average. If (x%pp > pp/2)
+then this formula allows computing phi(pp - 1 - x%pp, a) instead of phi(x, a) where pp - 1 - x%pp is
+smaller than x. I tested this formula in primecount, however it did not provide any speedup. The main issue
+with this formula is that it involves the product of the first a primes which grows rather quickly and
+hence this formula can only be used for small values of a. In computer programs that use 64-bit
+integers this formula can be used for a ≤ 16. This formula is described in more detail in
+R.P. Leopold's paper [[7]](#References).
 
 ### Stop recursion at c instead of 1
 
@@ -241,7 +245,7 @@ particularly useful for parallelizing the hard special leaves algorithm, since i
 need for frequent thread synchronization. This modification relies on the partial sieve
 function for generating a lookup table of phi(x, i) results for i ∈ [0, a]. The idea of the
 algorithm is described very shortly in Gourdon's paper [[5]](#References) and it is also
-described in some more detail in Douglas Staple's paper [[7]](#References), however no pseudocode
+described in some more detail in Douglas Staple's paper [[8]](#References), however no pseudocode
 is provided in both papers.
 
 Computing phi(x, i) individually for all i ∈ [0, a] would be far too slow. However, by taking
@@ -271,4 +275,5 @@ for (int i = 1; i <= a; i++)
 4. M. Deleglise and J. Rivat, "Computing pi(x): The Meissel, Lehmer, Lagarias, Miller, Odlyzko Method", Mathematics of Computation, Volume 65, Number 213, 1996, pp 235–245.
 5. Xavier Gourdon, Computation of pi(x) : improvements to the Meissel, Lehmer, Lagarias, Miller, Odllyzko, Deléglise and Rivat method, February 15, 2001.
 6. Tomás Oliveira e Silva, Computing pi(x): the combinatorial method, Revista do DETUA, vol. 4, no. 6, March 2006, pp. 759-768.
-7. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
+7. R.P. Leopold, On Methods for Computing pi(x), 2007.
+8. Douglas B. Staple, The combinatorial algorithm for computing pi(x), Master of Science Thesis, Dalhousie University Halifax, Nova Scotia, August 2015.
