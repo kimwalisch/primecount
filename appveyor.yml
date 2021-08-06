@@ -31,7 +31,7 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$Configuration
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       - make VERBOSE=1
     test_script:
       - ctest
@@ -53,7 +53,7 @@ for:
       - sudo apt update -qq
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$Configuration -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - make VERBOSE=1
       - make install
     test_script:
@@ -68,7 +68,7 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$Configuration -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - make VERBOSE=1
       - make install
     test_script:
