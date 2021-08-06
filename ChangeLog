@@ -1,9 +1,17 @@
-Changes in primecount-7.1, 2021-07-31
+Changes in primecount-7.1, 2021-08-06
+
+primecount's partial sieve function phi(x, a) implementation now uses
+a compressed lookup table for small values of a. It can now compute
+phi(x, a) in O(1) for a <= 8 (previously 6). The compressed lookup
+table also reduces the memory usage and speeds up initialization. The
+improved phi(x, a) also benefits the computation of the hard special
+leaves which now does more pre-sieving and hence runs slightly faster.
 
 * Partial-Sieve-Function.md: Description of phi(x, a) algorithm.
 * PhiTiny.cpp: Use compressed phi(x, a) lookup table.
 * phi.cpp: More correct usage of recursive phi(x, a) formula.
 * generate_phi.hpp: More correct usage of recursive phi(x, a) formula.
+* appveyor.yml: Fix debug build.
 
 Changes in primecount-7.0, 2021-04-28
 
