@@ -37,6 +37,11 @@ public:
     return limit_ + 1;
   }
 
+  static int64_t max_cached()
+  {
+    return pi_cache_.size() * 240 - 1;
+  }
+
   /// Get number of primes <= n
   ALWAYS_INLINE int64_t operator[](uint64_t n) const
   {
@@ -51,6 +56,20 @@ public:
     return count + popcnt64(bits & bitmask);
   }
 
+  /// Get number of primes <= n
+  static int64_t pi_cache(uint64_t n)
+  {
+    assert(n <= max_cached());
+
+    if_unlikely(n < pi_tiny_.size())
+      return pi_tiny_[n];
+
+    uint64_t count = pi_cache_[n / 240].count;
+    uint64_t bits = pi_cache_[n / 240].bits;
+    uint64_t bitmask = unset_larger_[n % 240];
+    return count + popcnt64(bits & bitmask);
+  }
+
 private:
   struct pi_t
   {
@@ -58,8 +77,10 @@ private:
     uint64_t bits;
   };
 
+  void init(uint64_t limit, int threads);
   void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
   void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  static const std::array<pi_t, 64> pi_cache_;
   pod_vector<pi_t> pi_;
   pod_vector<uint64_t> counts_;
   uint64_t limit_;

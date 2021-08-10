@@ -2,7 +2,7 @@
 /// @file  api.cpp
 ///        primecount's C++ API.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,7 @@
 #include <primesieve.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
+#include <PiTable.hpp>
 
 #include <cmath>
 #include <limits>
@@ -58,7 +59,9 @@ int64_t pi_noprint(int64_t x, int threads)
 {
   bool is_print = false;
 
-  if (x <= (int64_t) 1e5)
+  if (x <= PiTable::max_cached())
+    return PiTable::pi_cache(x);
+  else if (x <= (int64_t) 1e5)
     return pi_legendre(x, threads, is_print);
   else if (x <= (int64_t) 1e8)
     return pi_meissel(x, threads, is_print);

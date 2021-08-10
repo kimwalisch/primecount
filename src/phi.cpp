@@ -291,14 +291,11 @@ private:
 int64_t phi_pix(int64_t x, int64_t a, int threads)
 {
   int64_t pix = pi_noprint(x, threads);
-  int64_t sum;
 
   if (a <= pix)
-    sum = pix - a + 1;
+    return pix - a + 1;
   else
-    sum = 1;
-
-  return sum;
+    return 1;
 }
 
 /// pi(x) <= pix_upper(x)
@@ -336,6 +333,18 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
     return 1;
 
   int64_t sqrtx = isqrt(x);
+
+  // Use PrimePi(x) cache for small values of x
+  if (x <= PiTable::max_cached() &&
+      a >= PiTable::pi_cache(sqrtx))
+  {
+    int64_t pix = PiTable::pi_cache(x);
+
+    if (a <= pix)
+      return pix - a + 1;
+    else
+      return 1;
+  }
 
   // Fast (a > pi(sqrt(x)) check with decent accuracy
   if (a > pix_upper(sqrtx))
