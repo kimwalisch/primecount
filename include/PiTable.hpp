@@ -23,6 +23,7 @@
 #include <pod_vector.hpp>
 
 #include <stdint.h>
+#include <array>
 #include <cassert>
 
 namespace primecount {
