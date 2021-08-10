@@ -3,7 +3,7 @@
 /// @brief  Test the PiTable class
 /// @link   https://en.wikipedia.org/wiki/Prime-counting_function
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,36 +42,57 @@ void check(bool OK)
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1000000, 2000000);
-
-  int threads = 1;
-  PiTable pi(dist(gen), threads);
-
-  for (size_t i = 0; i < pix.size(); i++)
+  // Test PiTable::pi_cache(x)
   {
-    cout << "pi(" << i << ") = " << pi[i];
-    check(pi[i] == pix[i]);
+    primesieve::iterator it;
+    int64_t prime = it.next_prime();
+    int64_t count = 0;
+
+    for (int64_t i = 0; i <= PiTable::max_cached(); i++)
+    {
+      if (i == prime)
+      {
+        count++;
+        prime = it.next_prime();
+      }
+      cout << "pi_cache(" << i << ") = " << PiTable::pi_cache(i);
+      check(PiTable::pi_cache(i) == count);
+    }
   }
 
-  primesieve::iterator it;
-  uint64_t prime = it.next_prime();
-  int count = 1;
-
-  while (prime < pi.size())
+  // Test PiTable::pi(x)
   {
-    cout << "pi(" << prime << ") = " << pi[prime];
-    check(pi[prime] == count);
-    prime = it.next_prime();
-    count++;
-  }
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> dist(1000000, 2000000);
 
-  for (int i = 0; i < 10000; i++)
-  {
-    int n = dist(gen) % pi.size();
-    cout << "pi(" << n << ") = " << pi[n];
-    check(pi[n] == (int64_t) primesieve::count_primes(0, n));
+    int threads = 1;
+    PiTable pi(dist(gen), threads);
+
+    for (size_t i = 0; i < pix.size(); i++)
+    {
+      cout << "pi(" << i << ") = " << pi[i];
+      check(pi[i] == pix[i]);
+    }
+
+    primesieve::iterator it;
+    uint64_t prime = it.next_prime();
+    int count = 1;
+
+    while (prime < pi.size())
+    {
+      cout << "pi(" << prime << ") = " << pi[prime];
+      check(pi[prime] == count);
+      prime = it.next_prime();
+      count++;
+    }
+
+    for (int i = 0; i < 10000; i++)
+    {
+      int n = dist(gen) % pi.size();
+      cout << "pi(" << n << ") = " << pi[n];
+      check(pi[n] == (int64_t) primesieve::count_primes(0, n));
+    }
   }
 
   cout << endl;
