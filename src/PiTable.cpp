@@ -27,10 +27,10 @@
 namespace primecount {
 
 /// Compressed PrimePi(x) lookup table for x < 64 * 240.
-/// This lookup table has a size of 1 KiB and stores the count of
-/// primes < 15,360. The 8 bits of each byte correspond to the
-/// offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-/// Array format: { pi[5] + count of 1-bits < current_index, 1-bits that correspond to primes }
+/// This lookup table has a size of 1 KiB. The 8 bits of each byte
+/// correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
+/// Array format: { PrimePi(5) + count of 1-bits < current_index, 
+///                 64-bit word where 1-bits correspond to primes }
 ///
 const std::array<PiTable::pi_t, 64> PiTable::pi_cache_ =
 {{
