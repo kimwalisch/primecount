@@ -328,10 +328,6 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  // phi(x, a) = 1 if a >= pi(x)
-  if (a >= pix_upper(x))
-    return 1;
-
   int64_t sqrtx = isqrt(x);
 
   // Use PrimePi(x) cache for small values of x
@@ -345,6 +341,10 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
     else
       return 1;
   }
+
+  // phi(x, a) = 1 if a >= pi(x)
+  if (a >= pix_upper(x))
+    return 1;
 
   // Fast (a > pi(sqrt(x)) check with decent accuracy
   if (a > pix_upper(sqrtx))
