@@ -74,7 +74,7 @@ PiTable::PiTable(uint64_t max_x, int threads) :
   // Initialize PiTable from cache
   uint64_t limit = max_x + 1;
   pi_.resize(ceil_div(limit, 240));
-  uint64_t n = min(pi_cache_.size(), pi_.size());
+  std::size_t n = min(pi_cache_.size(), pi_.size());
   std::copy_n(pi_cache_.begin(), n, &pi_[0]);
 
   uint64_t cache_limit = pi_cache_.size() * 240;
