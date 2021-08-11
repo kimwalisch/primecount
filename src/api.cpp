@@ -14,6 +14,7 @@
 #include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <PiTable.hpp>
+#include <print.hpp>
 
 #include <cmath>
 #include <limits>
@@ -36,6 +37,19 @@ namespace {
 
 namespace primecount {
 
+int64_t pi_cache(int64_t x, bool is_print)
+{
+  if (is_print)
+  {
+    print("");
+    print("=== pi_cache(x) ===");
+    print("x", x);
+    print("threads", 1);
+  }
+
+  return PiTable::pi_cache(x);
+}
+
 int64_t pi(int64_t x)
 {
   return pi(x, get_num_threads());
@@ -43,7 +57,11 @@ int64_t pi(int64_t x)
 
 int64_t pi(int64_t x, int threads)
 {
-  // For [0, 10^5] Legendre's algorithm runs fastest
+  // Compute pi(x) in O(1) for small values of x
+  if (x <= PiTable::max_cached())
+    return pi_cache(x);
+
+  // For ]10^4, 10^5] Legendre's algorithm runs fastest
   if (x <= (int64_t) 1e5)
     return pi_legendre(x, threads);
 
@@ -55,12 +73,13 @@ int64_t pi(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
+/// Used internally for initialization
 int64_t pi_noprint(int64_t x, int threads)
 {
   bool is_print = false;
 
   if (x <= PiTable::max_cached())
-    return PiTable::pi_cache(x);
+    return pi_cache(x, is_print);
   else if (x <= (int64_t) 1e5)
     return pi_legendre(x, threads, is_print);
   else if (x <= (int64_t) 1e8)
