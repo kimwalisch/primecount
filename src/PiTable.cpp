@@ -71,26 +71,29 @@ const std::array<PiTable::pi_t, 64> PiTable::pi_cache_ =
 PiTable::PiTable(uint64_t max_x, int threads) :
   max_x_(max_x)
 {
-  if (max_x_ >= pi_cache_.size() * 240)
-    init(max_x, threads);
-  else
-  {
-    uint64_t limit = max_x + 1;
-    pi_.resize(ceil_div(limit, 240));
-    std::copy_n(pi_cache_.begin(), pi_.size(), &pi_[0]);
-  }
+  // Initialize PiTable from cache
+  uint64_t limit = max_x + 1;
+  pi_.resize(ceil_div(limit, 240));
+  uint64_t n = min(pi_cache_.size(), pi_.size());
+  std::copy_n(pi_cache_.begin(), n, &pi_[0]);
+
+  uint64_t cache_limit = pi_cache_.size() * 240;
+  if (limit > cache_limit)
+    init(limit, cache_limit, threads);
 }
 
-/// Used for large PiTable
-void PiTable::init(uint64_t max_x, int threads)
+/// Used if PiTable larger than pi_cache
+void PiTable::init(uint64_t limit,
+                   uint64_t cache_limit,
+                   int threads)
 {
-  uint64_t limit = max_x + 1;
+  assert(cache_limit < limit);
+  uint64_t dist = limit - cache_limit;
   uint64_t thread_threshold = (uint64_t) 1e7;
-  threads = ideal_num_threads(threads, limit, thread_threshold);
-  uint64_t thread_dist = limit / threads;
+  threads = ideal_num_threads(threads, dist, thread_threshold);
+  uint64_t thread_dist = dist / threads;
   thread_dist = max(thread_threshold, thread_dist);
   thread_dist += 240 - thread_dist % 240;
-  pi_.resize(ceil_div(limit, 240));
   counts_.resize(threads);
 
   #pragma omp parallel num_threads(threads)
@@ -98,7 +101,7 @@ void PiTable::init(uint64_t max_x, int threads)
     #pragma omp for
     for (int t = 0; t < threads; t++)
     {
-      uint64_t low = thread_dist * t;
+      uint64_t low = cache_limit + thread_dist * t;
       uint64_t high = low + thread_dist;
       high = min(high, limit);
 
@@ -109,7 +112,7 @@ void PiTable::init(uint64_t max_x, int threads)
     #pragma omp for
     for (int t = 0; t < threads; t++)
     {
-      uint64_t low = thread_dist * t;
+      uint64_t low = cache_limit + thread_dist * t;
       uint64_t high = low + thread_dist;
       high = min(high, limit);
 
@@ -151,7 +154,8 @@ void PiTable::init_count(uint64_t low,
                          uint64_t thread_num)
 {
   // First compute PrimePi[low - 1]
-  uint64_t count = pi_tiny_[5];
+  pi_t cache_last = pi_cache_.back();
+  uint64_t count = cache_last.count + popcnt64(cache_last.bits);
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 
