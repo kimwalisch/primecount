@@ -4,7 +4,7 @@
 ///        These tests are also used (by the author) for
 ///        benchmarking code changes.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,6 +15,7 @@
 #include <primesieve.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 
 #include <stdint.h>
@@ -113,6 +114,16 @@ void check_equal(const string& f1,
   }
 }
 
+void test_pi_cache()
+{
+  cout << "Testing pi_cache(x)" << flush;
+
+  for (int64_t x = 0; x <= PiTable::max_cached(); x++)
+    check_equal("pi_cache", x, pi_cache(x), pi_primesieve(x));
+
+  cout << " 100%" << endl;
+}
+
 void test_nth_prime(int64_t iters)
 {
   cout << "Testing nth_prime(x)" << flush;
@@ -142,30 +153,6 @@ void test_nth_prime(int64_t iters)
   cout << endl;
 }
 
-#ifdef _OPENMP
-
-void test_phi(int64_t iters)
-{
-  cout << "Testing phi(x, a)" << flush;
-
-  int64_t sum1 = 0;
-  int64_t sum2 = 0;
-
-  #pragma omp parallel for reduction(+: sum1)
-  for (int64_t i = 0; i < iters; i++)
-    sum1 += pi_legendre(10000000 + i, 1);
-
-  for (int64_t i = 0; i < iters; i++)
-    sum2 += pi_legendre(10000000 + i, 1);
-
-  if (sum1 != sum2)
-    throw primecount_error("Error: multi-threaded phi(x, a) is broken.");
-
-  cout << "\rTesting phi(x, a) 100%" << endl;
-}
-
-#endif
-
 } // namespace
 
 namespace primecount {
@@ -180,9 +167,7 @@ void test()
 
   try
   {
-#ifdef _OPENMP
-    test_phi(100);
-#endif
+    test_pi_cache();
 
     TEST0(pi_legendre,            pi_primesieve,    100);
     TEST2(pi_meissel,             pi_legendre,      500);
