@@ -328,23 +328,11 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
   if (is_phi_tiny(a))
     return phi_tiny(x, a);
 
-  int64_t sqrtx = isqrt(x);
-
-  // Use PrimePi(x) cache for small values of x
-  if (x <= PiTable::max_cached() &&
-      a >= PiTable::pi_cache(sqrtx))
-  {
-    int64_t pix = PiTable::pi_cache(x);
-
-    if (a <= pix)
-      return pix - a + 1;
-    else
-      return 1;
-  }
-
   // phi(x, a) = 1 if a >= pi(x)
   if (a >= pix_upper(x))
     return 1;
+
+  int64_t sqrtx = isqrt(x);
 
   // Fast (a > pi(sqrt(x)) check with decent accuracy
   if (a > pix_upper(sqrtx))
