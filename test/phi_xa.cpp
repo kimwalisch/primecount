@@ -11,6 +11,7 @@
 ///
 
 #include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
 
@@ -106,6 +107,32 @@ int main()
 
       int64_t phi_xa = phi(x, a);
       check2(x, a, phi_xa, cnt);
+    }
+  }
+
+  {
+    cout << "Testing phi(x, a) multi-threading" << endl;
+
+    int64_t iters = 500;
+    int64_t sum1 = 0;
+    int64_t sum2 = 0;
+
+    #pragma omp parallel for reduction(+: sum1)
+    for (int64_t i = 0; i < iters; i++)
+      sum1 += pi_legendre(10000000 + i, 1);
+
+    for (int64_t i = 0; i < iters; i++)
+      sum2 += pi_legendre(10000000 + i, 1);
+
+    if (sum1 == sum2)
+    {
+      cout << "Multi-thread sum: " << sum1 << " == Single-thread sum: " << sum2 << "   OK" << endl;
+      cout << "phi(x, a) multi-threading: no data races detected!" << endl;
+    }
+    else
+    {
+      cout << "Multi-thread sum: " << sum1 << " != Single-thread sum: " << sum2 << "   ERROR" << endl;
+      exit(1);
     }
   }
 
