@@ -1,9 +1,9 @@
 ///
 /// @file  SegmentedPiTable.hpp
 /// @brief The A and C formulas in Xavier Gourdon's prime counting
-///        algorithm require looking up PrimePi[n] values with
-///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
-///        would use too much memory we need a segmented PrimePi[n]
+///        algorithm require looking up PrimePi[x] values with
+///        x < x^(1/2). Since a PrimePi[x] lookup table of size x^(1/2)
+///        would use too much memory we need a segmented PrimePi[x]
 ///        lookup table that uses only O(x^(1/4)) memory.
 ///
 ///        The SegmentedPiTable class is a compressed lookup table of
@@ -69,19 +69,19 @@ public:
     return size;
   }
 
-  /// Get number of primes <= n
-  ALWAYS_INLINE int64_t operator[](uint64_t n) const
+  /// Get number of primes <= x
+  ALWAYS_INLINE int64_t operator[](uint64_t x) const
   {
-    assert(n >= low_);
-    assert(n < high_);
+    assert(x >= low_);
+    assert(x < high_);
 
-    if_unlikely(n < pi_tiny_.size())
-      return pi_tiny_[n];
+    if_unlikely(x < pi_tiny_.size())
+      return pi_tiny_[x];
 
-    n -= low_;
-    uint64_t count = pi_[n / 240].count;
-    uint64_t bits = pi_[n / 240].bits;
-    uint64_t bitmask = unset_larger_[n % 240];
+    x -= low_;
+    uint64_t count = pi_[x / 240].count;
+    uint64_t bits = pi_[x / 240].bits;
+    uint64_t bitmask = unset_larger_[x % 240];
     return count + popcnt64(bits & bitmask);
   }
 

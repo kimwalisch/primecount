@@ -31,11 +31,11 @@ namespace primecount {
 class PiTable : public BitSieve240
 {
 public:
-  PiTable(uint64_t limit, int threads);
+  PiTable(uint64_t max_x, int threads);
 
   uint64_t size() const
   {
-    return limit_ + 1;
+    return max_x_ + 1;
   }
 
   static int64_t max_cached()
@@ -43,31 +43,31 @@ public:
     return pi_cache_.size() * 240 - 1;
   }
 
-  /// Get number of primes <= n
-  ALWAYS_INLINE int64_t operator[](uint64_t n) const
+  /// Get number of primes <= x
+  ALWAYS_INLINE int64_t operator[](uint64_t x) const
   {
-    assert(n <= limit_);
+    assert(x <= max_x_);
 
-    if_unlikely(n < pi_tiny_.size())
-      return pi_tiny_[n];
+    if_unlikely(x < pi_tiny_.size())
+      return pi_tiny_[x];
 
-    uint64_t count = pi_[n / 240].count;
-    uint64_t bits = pi_[n / 240].bits;
-    uint64_t bitmask = unset_larger_[n % 240];
+    uint64_t count = pi_[x / 240].count;
+    uint64_t bits = pi_[x / 240].bits;
+    uint64_t bitmask = unset_larger_[x % 240];
     return count + popcnt64(bits & bitmask);
   }
 
-  /// Get number of primes <= n
-  static int64_t pi_cache(uint64_t n)
+  /// Get number of primes <= x
+  static int64_t pi_cache(uint64_t x)
   {
-    assert(n < pi_cache_.size() * 240);
+    assert(x < pi_cache_.size() * 240);
 
-    if_unlikely(n < pi_tiny_.size())
-      return pi_tiny_[n];
+    if_unlikely(x < pi_tiny_.size())
+      return pi_tiny_[x];
 
-    uint64_t count = pi_cache_[n / 240].count;
-    uint64_t bits = pi_cache_[n / 240].bits;
-    uint64_t bitmask = unset_larger_[n % 240];
+    uint64_t count = pi_cache_[x / 240].count;
+    uint64_t bits = pi_cache_[x / 240].bits;
+    uint64_t bitmask = unset_larger_[x % 240];
     return count + popcnt64(bits & bitmask);
   }
 
@@ -78,13 +78,13 @@ private:
     uint64_t bits;
   };
 
-  void init(uint64_t limit, int threads);
-  void init_bits(uint64_t start, uint64_t stop, uint64_t thread_num);
-  void init_count(uint64_t start, uint64_t stop, uint64_t thread_num);
+  void init(uint64_t max_x, int threads);
+  void init_bits(uint64_t low, uint64_t high, uint64_t thread_num);
+  void init_count(uint64_t low, uint64_t high, uint64_t thread_num);
   static const std::array<pi_t, 64> pi_cache_;
   pod_vector<pi_t> pi_;
   pod_vector<uint64_t> counts_;
-  uint64_t limit_;
+  uint64_t max_x_;
 };
 
 } // namespace

@@ -68,29 +68,29 @@ const std::array<PiTable::pi_t, 64> PiTable::pi_cache_ =
   { 1743, 0x155941180896A816ull }, { 1765, 0xA1AAB3E1522A44B5ull }
 }};
 
-PiTable::PiTable(uint64_t limit, int threads) :
-  limit_(limit)
+PiTable::PiTable(uint64_t max_x, int threads) :
+  max_x_(max_x)
 {
-  if (limit_ >= pi_cache_.size() * 240)
-    init(limit, threads);
+  if (max_x_ >= pi_cache_.size() * 240)
+    init(max_x, threads);
   else
   {
-    uint64_t size = limit + 1;
-    pi_.resize(ceil_div(size, 240));
+    uint64_t limit = max_x + 1;
+    pi_.resize(ceil_div(limit, 240));
     std::copy_n(pi_cache_.begin(), pi_.size(), &pi_[0]);
   }
 }
 
-/// Used for large limits
-void PiTable::init(uint64_t limit, int threads)
+/// Used for large PiTable
+void PiTable::init(uint64_t max_x, int threads)
 {
-  uint64_t size = limit + 1;
+  uint64_t limit = max_x + 1;
   uint64_t thread_threshold = (uint64_t) 1e7;
-  threads = ideal_num_threads(threads, size, thread_threshold);
-  uint64_t thread_size = size / threads;
-  thread_size = max(thread_threshold, thread_size);
-  thread_size += 240 - thread_size % 240;
-  pi_.resize(ceil_div(size, 240));
+  threads = ideal_num_threads(threads, limit, thread_threshold);
+  uint64_t thread_dist = limit / threads;
+  thread_dist = max(thread_threshold, thread_dist);
+  thread_dist += 240 - thread_dist % 240;
+  pi_.resize(ceil_div(limit, 240));
   counts_.resize(threads);
 
   #pragma omp parallel num_threads(threads)
@@ -98,44 +98,44 @@ void PiTable::init(uint64_t limit, int threads)
     #pragma omp for
     for (int t = 0; t < threads; t++)
     {
-      uint64_t start = thread_size * t;
-      uint64_t stop = start + thread_size;
-      stop = min(stop, size);
+      uint64_t low = thread_dist * t;
+      uint64_t high = low + thread_dist;
+      high = min(high, limit);
 
-      if (start < stop)
-        init_bits(start, stop, t);
+      if (low < high)
+        init_bits(low, high, t);
     }
 
     #pragma omp for
     for (int t = 0; t < threads; t++)
     {
-      uint64_t start = thread_size * t;
-      uint64_t stop = start + thread_size;
-      stop = min(stop, size);
+      uint64_t low = thread_dist * t;
+      uint64_t high = low + thread_dist;
+      high = min(high, limit);
 
-      if (start < stop)
-        init_count(start, stop, t);
+      if (low < high)
+        init_count(low, high, t);
     }
   }
 }
 
-/// Each thread computes PrimePi [start, stop[
-void PiTable::init_bits(uint64_t start,
-                        uint64_t stop,
+/// Each thread computes PrimePi [low, high[
+void PiTable::init_bits(uint64_t low,
+                        uint64_t high,
                         uint64_t thread_num)
 {
   // Zero initialize pi vector
-  uint64_t i = start / 240;
-  uint64_t j = ceil_div(stop, 240);
+  uint64_t i = low / 240;
+  uint64_t j = ceil_div(high, 240);
   std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
 
   // Iterate over primes > 5
-  start = max(start, 5);
-  primesieve::iterator it(start, stop);
+  low = max(low, 5);
+  primesieve::iterator it(low, high);
   uint64_t count = 0;
   uint64_t prime = 0;
 
-  while ((prime = it.next_prime()) < stop)
+  while ((prime = it.next_prime()) < high)
   {
     uint64_t prime_bit = set_bit_[prime % 240];
     pi_[prime / 240].bits |= prime_bit;
@@ -145,19 +145,19 @@ void PiTable::init_bits(uint64_t start,
   counts_[thread_num] = count;
 }
 
-/// Each thread computes PrimePi [start, stop[
-void PiTable::init_count(uint64_t start,
-                         uint64_t stop,
+/// Each thread computes PrimePi [low, high[
+void PiTable::init_count(uint64_t low,
+                         uint64_t high,
                          uint64_t thread_num)
 {
-  // First compute PrimePi[start - 1]
+  // First compute PrimePi[low - 1]
   uint64_t count = pi_tiny_[5];
   for (uint64_t i = 0; i < thread_num; i++)
     count += counts_[i];
 
   // Convert to array indexes
-  uint64_t i = start / 240;
-  uint64_t stop_idx = ceil_div(stop, 240);
+  uint64_t i = low / 240;
+  uint64_t stop_idx = ceil_div(high, 240);
 
   for (; i < stop_idx; i++)
   {

@@ -1,9 +1,9 @@
 ///
 /// @file  SegmentedPiTable.cpp
 /// @brief The A and C formulas in Xavier Gourdon's prime counting
-///        algorithm require looking up PrimePi[n] values with
-///        n < x^(1/2). Since a PrimePi[n] lookup table of size x^(1/2)
-///        would use too much memory we need a segmented PrimePi[n]
+///        algorithm require looking up PrimePi[x] values with
+///        x < x^(1/2). Since a PrimePi[x] lookup table of size x^(1/2)
+///        would use too much memory we need a segmented PrimePi[x]
 ///        lookup table that uses only O(x^(1/4)) memory.
 ///
 ///        The SegmentedPiTable class is a compressed lookup table of
@@ -69,9 +69,9 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
 void SegmentedPiTable::init_bits()
 {
   // Iterate over primes > 5
-  uint64_t start = max(low_, 5);
+  uint64_t low = max(low_, 5);
   uint64_t prime = 0;
-  primesieve::iterator it(start, high_);
+  primesieve::iterator it(low, high_);
 
   // Each thread iterates over the primes
   // inside [low, high[ and initializes
