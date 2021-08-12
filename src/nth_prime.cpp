@@ -69,22 +69,19 @@ int64_t nth_prime(int64_t n, int threads)
   if (n > max_n)
     throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
-  int64_t prime = 0;
-
+  // For small n use the segmented sieve of Eratosthenes
   if (n < 100000)
-    prime = primesieve::nth_prime(n, 0);
-  else
-  {
-    int64_t prime_approx = Ri_inverse(n);
-    int64_t count_approx = pi(prime_approx, threads);
+    return primesieve::nth_prime(n, 0);
 
-    if (count_approx < n)
-      prime = primesieve::nth_prime(n - count_approx, prime_approx);
-    else // count_approx >= n
-      prime = primesieve::nth_prime(n - count_approx - 1, prime_approx + 1);
-  }
+  // For large n use the prime counting function
+  // and the segmented sieve of Eratosthenes.
+  int64_t prime_approx = Ri_inverse(n);
+  int64_t count_approx = pi(prime_approx, threads);
 
-  return prime;
+  if (count_approx < n)
+    return primesieve::nth_prime(n - count_approx, prime_approx);
+  else // count_approx >= n
+    return primesieve::nth_prime(n - count_approx - 1, prime_approx + 1);
 }
 
 } // namespace
