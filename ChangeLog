@@ -1,4 +1,4 @@
-Changes in primecount-7.1, 2021-08-12
+Changes in primecount-7.1, 2021-08-13
 
 PrimePi(x) is now computed in O(1) for small values of x < 64 * 240
 using a lookup table. primecount's partial sieve function phi(x, a)
@@ -13,6 +13,7 @@ leaves which now does more pre-sieving and hence runs slightly faster.
 * PiTable.cpp: Add PrimePi(x) lookup table for x < 64 * 240.
 * generate_phi.hpp: More correct usage of recursive phi(x, a) formula.
 * nth_prime.cpp: Cache small primes <= 1009.
+* nth_prime.cpp: Improve error handling, n must be >= 1.
 * appveyor.yml: Fix debug build.
 
 Changes in primecount-7.0, 2021-04-28

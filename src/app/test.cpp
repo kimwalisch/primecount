@@ -128,7 +128,7 @@ void test_nth_prime(int64_t iters)
 {
   cout << "Testing nth_prime(x)" << flush;
 
-  int64_t n = 0;
+  int64_t n = 1;
   int64_t prime = 0;
   int64_t next = 10000;
 

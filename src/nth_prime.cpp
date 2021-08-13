@@ -54,20 +54,14 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  // When I first implemented nth_prime(n) in primesieve I used
-  // nth_prime(0) = 2 because Mathematica's Prime[n] function
-  // also returned Prime[0] = 2. However nowadays Mathematica
-  // and most other libraries return an error if the user enters
-  // Prime[0]. In order not to break backwards compatibility I
-  // keep nth_prime(0) = 2 in both primesieve and primecount.
   if (n < 1)
-    return primes[1];
-
-  if (n < (int64_t) primes.size())
-    return primes[n];
+    throw primecount_error("nth_prime(n): n must be >= 1");
 
   if (n > max_n)
     throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
+
+  if (n < (int64_t) primes.size())
+    return primes[n];
 
   // For small n use the segmented sieve of Eratosthenes
   if (n < 100000)
