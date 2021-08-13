@@ -305,9 +305,10 @@ int64_t phi_pix(int64_t x, int64_t a, int threads)
 ///
 int64_t pix_upper(int64_t x)
 {
-  if (x <= 10)
-    return 4;
+  if (x <= PiTable::max_cached())
+    return PiTable::pi_cache(x);
 
+  assert(x >= 10);
   double pix = x / (log((double) x) - 1.1);
   return (int64_t) pix + 10;
 }
