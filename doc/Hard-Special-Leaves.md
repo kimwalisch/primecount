@@ -264,17 +264,16 @@ small factor.
 
 Another open question is whether it is possible to further reduce the runtime
 complexity of the alternative counting method by using more than one counters
-array. By using one counters array of size O(segment_size^(1/2)) (which is the same as
-O(z^(1/4)) the worst-case complexity for counting the number of unsieved elements
-for a single special leaf is O(segment_size^(1/2)), this is what is currently
-implemented in primecount. It is also possible to use two counters arrays of size
-O(segment_size^(1/3)) (which is the same as O(z^(1/6))), the first array being coarse
-grained and spanning over intervals of size O(segment_size^(2/3)), whereas the second
-array being fine grained and spanning over intervals of size O(segment_size^(1/3)).
-This scheme will reduce the worst-case complexity for counting the number of unsieved
-elements for a single special leaf to O(segment_size^(1/3)). It seems plausible that
-this should further improve the runtime complexity, however I guess that in practice
-the additional constant time overhead will deteriorate performance.
+array. By using one counters array of size O(segment_size^(1/2)) the worst-case
+complexity for counting the number of unsieved elements for a single special leaf is
+O(segment_size^(1/2)), this is what is currently implemented in primecount. It is
+also possible to use two counters arrays: the first array is coarse grained and
+spans over intervals of size O(segment_size^(2/3)), whereas the second array is fine
+grained and spans over intervals of size O(segment_size^(1/3)). This scheme will
+reduce the worst-case complexity for counting the number of unsieved elements for a
+single special leaf to O(segment_size^(1/3)). It seems plausible that this should
+further improve the runtime complexity, however I guess that in practice the
+additional constant time overhead will deteriorate performance.
 
 ## References
 
