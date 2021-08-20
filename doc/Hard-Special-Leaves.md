@@ -279,8 +279,8 @@ used 7.66% more instructions at 10^20, 7.45% more instructions at 10^21, 7.31% m
 instructions at 10^22 and used 5.51% more instructions at 10^23. Hence for practical
 use, using a single counters array in primecount both runs faster and uses fewer
 instructions. It is likely though that using two counters arrays will use fewer
-instructions for huge input numbers ≥ 10^30 since the gap of used instructions is
-slowly decreasing in favour of two counters arrays.
+instructions for huge input numbers ≥ 10^30 since the difference of used instructions
+is slowly decreasing in favour of two counters arrays.
 
 ## References
 
