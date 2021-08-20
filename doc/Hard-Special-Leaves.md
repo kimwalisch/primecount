@@ -270,17 +270,17 @@ O(segment_size^(1/2)), this is what is currently implemented in primecount. It i
 also possible to use two counters arrays: the first array is coarse-grained and
 spans over large intervals of size O(segment_size^(2/3)), whereas the second array is
 fine-grained and spans over small intervals of size O(segment_size^(1/3)). This scheme
-will reduce the worst-case complexity for counting the number of unsieved elements for
-a single special leaf to O(segment_size^(1/3)) but on the other hand will slightly
-slow down sieving as the second counters array needs to be updated whilst sieving.
+reduces the worst-case complexity for counting the number of unsieved elements for
+a single special leaf to O(segment_size^(1/3)) but on the other hand it slightly
+slows down sieving as the second counters array needs to be updated whilst sieving.
 I have benchmarked using two counters arrays vs. using a single counters array in
 primecount. When using two counters arrays, the computation of the hard special leaves
 used 7.66% more instructions at 10^20, 7.45% more instructions at 10^21, 7.31% more
-instructions at 10^22. Hence using a
-single counters array in primecount both runs faster and uses fewer instructions.
-It may be possible that using two counters arrays will use fewer instructions for
-huge input numbers > 10^30 (which cannot be computed on currently available hardware),
-but for practical use, using a single counters array will run faster.
+instructions at 10^22 and used 5.51% more instructions at 10^23. Hence for practical
+use, using a single counters array in primecount both runs faster and uses fewer
+instructions. It is likely though that using two counters arrays will use fewer
+instructions for huge input numbers ≥ 10^30 since the gap of used instructions is
+slowly decreasing in favour of two counters arrays.
 
 ## References
 
