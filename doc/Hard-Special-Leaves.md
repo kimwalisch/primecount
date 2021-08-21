@@ -213,7 +213,7 @@ performance in practice.
 
 ## Gradually increasing the size of the counters array
 
-But this is not the end! So far we have focused on improving counting for the case
+So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
 Generally there is a very large number of leaves that are very close to each other
 at the beginning of the sieving algorithm and gradually as we sieve up the leaves
@@ -222,15 +222,10 @@ become sparser and the distance between the leaves increases. So what we can do 
 but increase their distance**. We can update the counters size and distance
 e.g. at the start of each new segment as the counters have to be reinitialized at
 each new segment anyway. The ideal counter distance for the next segment is
-```sqrt(average_leaf_distance)```. The only method to accurately calculate the
-average leaf distance that I am currently aware of is to sum all leaf distances at
-runtime and divide by their number. Since the average leaf distance increases very
-slowly we can calculate the average leaf distance of the previous segment and use
-that for the next segment. My measurements using primecount indicate that adaptively
-resizing the counters further improves counting by more than a constant factor.
-Another option that works quite well in practice is to approximately calculate the
-average leaf distance using ```average_leaf_distance = sqrt(segment_low)```
-(primecount uses this).
+```sqrt(average_leaf_distance)```. In practice we can approximate the
+average leaf distance using ```average_leaf_distance = sqrt(segment_low)```. My
+measurements using primecount indicate that adaptively resizing the counters further
+improves counting by more than a constant factor.
 
 ```C++
 // Each element of the counters array contains the current
@@ -254,20 +249,14 @@ void Sieve::allocate_counters(uint64_t segment_low)
 }
 ```
 
-## Open questions
+## Multiple layers of counters
 
-There are still a few open questions to which I have no answers yet. The most
-important one being: What's the runtime complexity of this alternative algorithm?
-Unfortunately it is not easy to answer this question as the algorithm
-depends on many optimizations all of which improve the runtime complexity by a
-small factor.
+When using a single counters array which spans over intervals of size O(segment_size^(1/2))
+the worst-case complexity for counting the number of unsieved elements for a single
+special leaf is O(segment_size^(1/2)). This is what is currently implemented in
+primecount.
 
-Another open question is whether it is possible to further reduce the runtime
-complexity of the alternative counting method by using more than one counters
-array. By using one counters array of size O(segment_size^(1/2)) the worst-case
-complexity for counting the number of unsieved elements for a single special leaf is
-O(segment_size^(1/2)), this is what is currently implemented in primecount. It is
-also possible to use two counters arrays: the first array is coarse-grained and
+It is also possible to use two counters arrays: the first array is coarse-grained and
 spans over large intervals of size O(segment_size^(2/3)), whereas the second array is
 fine-grained and spans over small intervals of size O(segment_size^(1/3)). This scheme
 reduces the worst-case complexity for counting the number of unsieved elements for
@@ -275,12 +264,28 @@ a single special leaf to O(segment_size^(1/3)) but on the other hand it slightly
 slows down sieving as the second counters array needs to be updated whilst sieving.
 I have benchmarked using two counters arrays vs. using a single counters array in
 primecount. When using two counters arrays, the computation of the hard special leaves
-used 7.66% more instructions at 10^20, 7.45% more instructions at 10^21, 7.31% more
+used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% more
 instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical
 use, using a single counters array in primecount both runs faster and uses fewer
 instructions. It is likely though that using two counters arrays will use fewer
-instructions for huge input numbers ≥ 10^30 since the difference of used instructions
-is slowly decreasing (for larger input values) in favour of two counters arrays.
+instructions for huge input numbers > 10^28 since the difference of used instructions
+is slowly decreasing (for larger input values) in favor of two counters arrays.
+
+Unfortunately this means that there is no one-size-fits-all algorithm, for small
+numbers x ≤ 10^16 not using a counters array runs fastest, for x ∈ ]10^16, 10^28]
+using a single counters array runs fastest and for x > 10^28 two counters arrays
+perform best. Also note that when using two counters arrays my measurements indicate
+that there is no benefit to
+[gradually resizing](#gradually-increasing-the-size-of-the-counters-array) the counters
+arrays, hence this optimization only applies to a single counters array.
+
+## Open questions
+
+There are still a few open questions to which I have no answers yet. The most
+important one being: What's the runtime complexity of this alternative algorithm?
+Unfortunately it is not easy to answer this question as the algorithm
+depends on many optimizations all of which improve the runtime complexity by a
+small factor.
 
 ## References
 
