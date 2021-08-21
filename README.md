@@ -365,7 +365,7 @@ primecount's implementation of the so-called hard special leaves is different
 from the algorithms that have been described in any of the combinatorial
 prime counting papers so far. Instead of using a binary indexed tree
 for counting which is very cache inefficient primecount uses a linear
-counters array in combination with the POPCNT instruction which is more
+counter array in combination with the POPCNT instruction which is more
 cache efficient and much faster. The
 [Hard-Special-Leaves.md](doc/Hard-Special-Leaves.md) document contains more
 information. primecount's [easy special leaf](doc/Easy-Special-Leaves.md)

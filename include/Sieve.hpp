@@ -22,7 +22,7 @@
 ///        speedup counting. However using a binary indexed tree is
 ///        bad for performance as it causes many cache misses and
 ///        branch mispredictions. For this reason this implementation
-///        instead uses a counters array whose elements contain the
+///        instead uses a counter array whose elements contain the
 ///        total count of unsieved elements in a certain interval.
 ///
 ///        In-depth description of this algorithm:
@@ -69,43 +69,60 @@ public:
     for (uint64_t i = 4; i <= c; i++)
       cross_off(primes[i], i);
 
-    init_counters(low, high);
+    init_counter(low, high);
   }
 
 private:
   void add(uint64_t prime);
-  void allocate_counters(uint64_t low);
-  void reset_counters();
+  void allocate_counter(uint64_t low);
+  void init_counter(uint64_t low, uint64_t high);
+  void reset_counter();
   void reset_sieve(uint64_t low, uint64_t high);
-  void init_counters(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
 
   struct Wheel
   {
+    uint32_t multiple;
+    uint32_t index;
+
     Wheel()
       : multiple(0),
         index(0)
     { }
+
     Wheel(uint32_t m, uint32_t i)
       : multiple(m),
         index(i)
     { }
-    uint32_t multiple;
-    uint32_t index;
+  };
+
+  struct Counter
+  {
+    uint64_t stop = 0;
+    uint64_t dist = 0;
+    uint64_t log2_dist = 0;
+    uint64_t sum = 0;
+    uint64_t i = 0;
+    pod_vector<uint32_t> counter;
+
+    uint32_t& operator[](std::size_t pos)
+    {
+      return counter[pos];
+    }
+  
+    uint32_t operator[](std::size_t pos) const
+    {
+      return counter[pos];
+    }
   };
 
   uint64_t start_ = 0;
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  uint64_t counters_i_ = 0;
-  uint64_t counters_count_ = 0;
-  uint64_t counters_dist_ = 0;
-  uint64_t counters_dist_log2_ = 0;
-  uint64_t counters_stop_ = 0;
-  pod_vector<uint8_t> sieve_;
-  pod_vector<uint32_t> counters_;
+  Counter counter_;
   std::vector<Wheel> wheel_;
+  pod_vector<uint8_t> sieve_;
 };
 
 } // namespace

@@ -120,30 +120,30 @@ of the algorithm.
 So now that we have identified the problem we can think about whether it is possible
 to further improve counting of our alternative algorithm by more than a constant factor.
 It turns out this is possible and even relatively simple to implement: **We add a
-counters array to our sieving algorithm**. The counters array has a size of O(z^(1/4))
-and each element of the counters array contains the current count of unsieved elements
+counter array to our sieving algorithm**. The counter array has a size of O(z^(1/4))
+and each element of the counter array contains the current count of unsieved elements
 in the sieve array for the interval [i * z^(1/4), (i + 1) * z^(1/4)[. Similar to the
-algorithm with the binary indexed tree data structure this counters array must
+algorithm with the binary indexed tree data structure this counter array must
 be updated whilst sieving i.e. whenever an element is crossed-off for the first
 time in the sieve array we need to decrement the corresponding counter element.
 However since we only need to decrement at most 1 counter when crossing of an
 element in the sieve array this does not deteriorate the sieving runtime complexity
 of the algorithm (unlike the binary indexed tree which deteriorates sieving by a
 factor of log(z)). I have to give credit to Christian Bau here who already used
-such a counters array back in 2003 however he chose a size of O(n) which does
+such a counter array back in 2003 however he chose a size of O(n) which does
 not improve the runtime complexity.
 
 ```C++
 // Sieve out a bit from the sieve array and update the
-// counters array if the bit was previously 1
+// counter array if the bit was previously 1
 is_bit = (sieve[i] >> bit_index) & 1;
 total_count -= is_bit;
-counters[i >> counters_dist_log2] -= is_bit;
+counter[i >> counter_log2_dist] -= is_bit;
 sieve[i] &= ~(1 << bit_index);
 ```
 
 Now whenever we need to count the number of unsieved elements in the sieve array
-we can quickly iterate over the new counters array and sum the counts. We do this
+we can quickly iterate over the new counter array and sum the counts. We do this
 until we are close (≤ O(z^(1/4))) to the limit up to which we need to count.
 Once we are close we switch to our old counting method: we simply iterate
 over the sieve array and count the number of unsieved elements using the POPCNT
@@ -159,21 +159,21 @@ uint64_t Sieve::count(uint64_t stop)
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - value) <= counters_dist.
-  // We do this using the counters array, each element
-  // of the counters array contains the number of
+  // the stop number i.e. (stop - value) <= counter_dist.
+  // We do this using the counter array, each element
+  // of the counter array contains the number of
   // unsieved elements in the interval:
-  // [i * counters_dist, (i + 1) * counters_dist[.
-  while (counters_stop_ <= stop)
+  // [i * counter_dist, (i + 1) * counter_dist[.
+  while (counter_stop_ <= stop)
   {
-    start = counters_stop_;
-    counters_stop_ += counters_dist_;
-    counters_count_ += counters_[counters_i_++];
-    count_ = counters_count_;
+    start = counter_stop_;
+    counter_stop_ += counter_dist_;
+    counter_sum_ += counter_[counter_i_++];
+    count_ = counter_sum_;
   }
 
   // Here the remaining distance is relatively small i.e.
-  // (stop - start) <= counters_dist, hence we simply
+  // (stop - start) <= counter_dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
   count_ += count(start, stop);
@@ -211,73 +211,73 @@ the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance be
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
-## Gradually increase the size of the counters array
+## Gradually increase the size of the counter array
 
 So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
 Generally there is a very large number of leaves that are very close to each other
 at the beginning of the sieving algorithm and gradually as we sieve up the leaves
 become sparser and the distance between the leaves increases. So what we can do is
-**start with more but shorter counters and gradually decrease the number of counters
-but increase their distance**. We can update the counters size and distance
-e.g. at the start of each new segment as the counters have to be reinitialized at
-each new segment anyway. The ideal counter distance for the next segment is
+**start with a counter array whose elements span over small intervals and
+then gradually increase the interval size**. We can update the counter size and distance
+e.g. at the start of each new segment as the counter needs to be reinitialized at the
+start of each new segment anyway. The ideal counter distance for the next segment is
 ```sqrt(average_leaf_distance)```. In practice we can approximate the
 average leaf distance using ```sqrt(segment_low)```. My measurements using primecount
-indicate that adaptively resizing the counters further improves counting by more than
-a constant factor.
+indicate that gradually resizing the counter array further improves counting by more
+than a constant factor.
 
 ```C++
-// Each element of the counters array contains the current
+// Each element of the counter array contains the current
 // number of unsieved elements in the interval:
-// [i * counters_dist, (i + 1) * counters_dist[.
-// Ideally each element of the counters array should
+// [i * counter_dist, (i + 1) * counter_dist[.
+// Ideally each element of the counter array should
 // represent an interval of size:
 // min(sqrt(average_leaf_dist), sqrt(segment_size)).
 // Also the counter distance should be regularly adjusted
 // whilst sieving.
 //
-void Sieve::allocate_counters(uint64_t segment_low)
+void Sieve::allocate_counter(uint64_t segment_low)
 {
   uint64_t average_leaf_dist = sqrt(segment_low);
-  counters_dist_ = sqrt(average_leaf_dist);
-  counters_dist_ = nearest_power_of_2(counters_dist_);
-  counters_dist_log2_ = log2(counters_dist_);
+  counter_dist_ = sqrt(average_leaf_dist);
+  counter_dist_ = nearest_power_of_2(counter_dist_);
+  counter_log2_dist_ = log2(counter_dist_);
 
-  uint64_t counters_size = (sieve_size_ / counters_dist_) + 1;
-  counters_.resize(counters_size);
+  uint64_t counter_size = (sieve_size_ / counter_dist_) + 1;
+  counter_.resize(counter_size);
 }
 ```
 
-## Multiple layers of counters
+## Multiple levels of counters
 
-When using a single counters array which spans over intervals of size O(segment_size^(1/2))
-the worst-case complexity for counting the number of unsieved elements for a single
-special leaf is O(segment_size^(1/2)). This is what is currently implemented in
-primecount.
+When using a single counter array whose elements correspond to intervals of size
+O(segment_size^(1/2)), the worst-case complexity for counting the number of unsieved
+elements for a single special leaf is O(segment_size^(1/2)). This is what is currently
+implemented in primecount.
 
-It is also possible to use two counters arrays: the first array is coarse-grained and
+It is also possible to use two counter arrays: the first array is coarse-grained and
 spans over large intervals of size O(segment_size^(2/3)), whereas the second array is
 fine-grained and spans over small intervals of size O(segment_size^(1/3)). This scheme
 reduces the worst-case complexity for counting the number of unsieved elements for
 a single special leaf to O(segment_size^(1/3)) but on the other hand it slightly
-slows down sieving as the second counters array needs to be updated whilst sieving.
-I have benchmarked using two counters arrays vs. using a single counters array in
-primecount. When using two counters arrays, the computation of the hard special leaves
+slows down sieving as the second counter array needs to be updated whilst sieving.
+I have benchmarked using two counter arrays vs. using a single counter array in
+primecount. When using two counter arrays, the computation of the hard special leaves
 used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% more
 instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical
-use, using a single counters array in primecount both runs faster and uses fewer
-instructions. It is likely though that using two counters arrays will use fewer
+use, using a single counter array in primecount both runs faster and uses fewer
+instructions. It is likely though that using two counter arrays will use fewer
 instructions for huge input numbers > 10^28 since the difference of used instructions
-is slowly decreasing (for larger input values) in favor of two counters arrays.
+is slowly decreasing (for larger input values) in favor of two counter arrays.
 
 Unfortunately this means that there is no one-size-fits-all algorithm. For small
-numbers x ≤ 10^16 not using a counters array runs fastest, for x ∈ ]10^16, 10^28]
-using a single counters array runs fastest and for x > 10^28 two counters arrays
-perform best. Also note that when using two counters arrays my measurements indicate
-that there is no benefit to
-[gradually resizing](#gradually-increasing-the-size-of-the-counters-array) the counters
-arrays, hence this optimization only applies to a single counters array.
+numbers x ≤ 10^16 not using any counter array runs fastest, for x ∈ ]10^16, 10^28]
+using a single counter array runs fastest and for x > 10^28 two counter arrays
+likely perform best. Also note that when using two counter arrays my measurements
+indicate that there is no benefit to
+[gradually resizing](#gradually-increasing-the-size-of-the-counter-array) the counter
+arrays, hence this optimization only applies to a single counter array.
 
 ## Open questions
 
@@ -287,10 +287,11 @@ Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
 small factor.
 
-Another open question is: What is the ideal number of counters for which the computation
-of the hard special leaves will theoretically use the fewest number of instructions?
-In primecount I currently use a single counters array for all computations even though
-I expect that using two counters could speed computations for huge input numbers > 10^28.
+Another open question is: What is the ideal number of counter arrays (number of levels)
+for which the computation of the hard special leaves will theoretically yield the
+fewest number of instructions? In primecount I currently use a single counter array for
+all computations even though I expect that using two counters could speed up huge
+computations with input numbers > 10^28.
 
 ## References
 
