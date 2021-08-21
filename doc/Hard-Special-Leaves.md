@@ -211,7 +211,7 @@ the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance be
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
-## Gradually increasing the size of the counters array
+## Gradually increase the size of the counters array
 
 So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
