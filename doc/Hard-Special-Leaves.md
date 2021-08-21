@@ -223,9 +223,9 @@ but increase their distance**. We can update the counters size and distance
 e.g. at the start of each new segment as the counters have to be reinitialized at
 each new segment anyway. The ideal counter distance for the next segment is
 ```sqrt(average_leaf_distance)```. In practice we can approximate the
-average leaf distance using ```average_leaf_distance = sqrt(segment_low)```. My
-measurements using primecount indicate that adaptively resizing the counters further
-improves counting by more than a constant factor.
+average leaf distance using ```sqrt(segment_low)```. My measurements using primecount
+indicate that adaptively resizing the counters further improves counting by more than
+a constant factor.
 
 ```C++
 // Each element of the counters array contains the current
