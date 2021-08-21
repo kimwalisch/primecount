@@ -271,7 +271,7 @@ instructions. It is likely though that using two counters arrays will use fewer
 instructions for huge input numbers > 10^28 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of two counters arrays.
 
-Unfortunately this means that there is no one-size-fits-all algorithm, for small
+Unfortunately this means that there is no one-size-fits-all algorithm. For small
 numbers x ≤ 10^16 not using a counters array runs fastest, for x ∈ ]10^16, 10^28]
 using a single counters array runs fastest and for x > 10^28 two counters arrays
 perform best. Also note that when using two counters arrays my measurements indicate
