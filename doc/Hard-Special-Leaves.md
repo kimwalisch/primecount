@@ -287,6 +287,11 @@ Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
 small factor.
 
+Another open question is: What is the ideal number of counters for which the computation
+of the hard special leaves will theoretically use the fewest number of instructions?
+In primecount I currently use a single counters array for all computations even though
+I expect that using two counters could speed computations for huge input numbers > 10^28.
+
 ## References
 
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
