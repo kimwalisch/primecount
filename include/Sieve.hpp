@@ -120,9 +120,9 @@ private:
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  Counter counter_;
-  std::vector<Wheel> wheel_;
   pod_vector<uint8_t> sieve_;
+  std::vector<Wheel> wheel_;
+  Counter counter_;
 };
 
 } // namespace
