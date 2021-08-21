@@ -211,7 +211,7 @@ the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance be
 special leaves is much smaller so there the new counting method will not improve
 performance in practice.
 
-## Gradually increase the size of the counter array
+## Gradually increase counter distance
 
 So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
@@ -276,7 +276,7 @@ numbers x ≤ 10^16 not using any counter array runs fastest, for x ∈ ]10^16, 
 using a single counter array runs fastest and for x > 10^28 two counter arrays
 likely perform best. Also note that when using two counter arrays my measurements
 indicate that there is no benefit to
-[gradually resizing](#gradually-increasing-the-size-of-the-counter-array) the counter
+[gradually resizing](#gradually-increase-counter-distance) the counter
 arrays, hence this optimization only applies to a single counter array.
 
 ## Open questions
