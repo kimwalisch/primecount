@@ -286,9 +286,15 @@ There are still a few open questions to which I have no answers yet.
 The most important one being: What's the runtime complexity of this alternative
 algorithm? Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
-small factor. Since this algorithm counts the number of unsieved elements between
-consecutive hard special leaves its runtime complexity is: number of special
-leaves * average number of count operations per special leaf.
+small factor. Since the algorithm of the hard special leaves consists of two main
+parts: sieving & counting, and since the alternative counting method counts the
+number of unsieved elements between consecutive hard special leaves, the runtime
+complexity of the algorithm is: max(Number of sieve operations, Number of hard
+special leaves * Average number of count operations per special leaf). The number
+of sieve operations and the number of hard special leaves are already known and
+have been published before, what is not known is the average number of count
+operations per special leaf (and the total number of count operations) using the
+alternative counting method.
 
 Another open question is: What is the ideal number of counter arrays (number of levels)
 for which the computation of the hard special leaves will theoretically yield the
