@@ -283,24 +283,34 @@ arrays, hence this optimization only applies to a single counter array.
 
 There are still a few open questions to which I have no answers yet.
 
-The most important one being: What's the runtime complexity of this alternative
-algorithm? Unfortunately it is not easy to answer this question as the algorithm
-depends on many optimizations all of which improve the runtime complexity by a
-small factor. Since the algorithm of the hard special leaves consists of two main
-parts: sieving & counting, and since the alternative counting method counts the
-number of unsieved elements between consecutive hard special leaves, the runtime
-complexity of the algorithm is: max(Number of sieve operations, Number of hard
-special leaves * Average number of count operations per special leaf). The number
-of sieve operations and the number of hard special leaves are already known and
-have been published before, what is not known is the average number of count
-operations per special leaf (and the total number of count operations) using the
-alternative counting method.
+* What's the runtime complexity of this alternative algorithm? Unfortunately it is
+  not easy to answer this question as the algorithm depends on many optimizations
+  all of which improve the runtime complexity by a small factor. Since the algorithm
+  of the hard special leaves consists of two main parts: sieving & counting, and since
+  the alternative counting method counts the number of unsieved elements between
+  consecutive hard special leaves, the runtime complexity of the algorithm is:
+  max(Number of sieve operations, Number of hard special leaves * Average number of
+  count operations per special leaf). The number of sieve operations and the number
+  of hard special leaves are already known and have been published before, what is not
+  known is the average number of count operations per special leaf (and the total
+  number of count operations) using the alternative counting method.
 
-Another open question is: What is the ideal number of counter arrays (number of levels)
-for which the computation of the hard special leaves will theoretically yield the
-fewest number of instructions? In primecount I currently use a single counter array for
-all computations even though I expect that using two counters could speed up huge
-computations with input numbers > 10^28.
+  In the original algorithm with the binary indexed tree, sieving uses O(z log z)
+  operations [[4]](#References). In the alternative algorithm sieving uses only
+  O(z log log z) operations since for each sieving operation we need to decrement
+  at most a constant number of counter elements (provided that we use a constant
+  number of counter arrays). The number of hard special leaves in
+  the Deléglise-Rivat algorithm is O(z / (log x)^2 * log α) [[4]](#References), hence
+  if the average number of count operations per special leaf in the alternative
+  counting algorithm is less than O(log z * (log x)^2 / log α), then the
+  alternative algorithm would have a better runtime complexity than the original
+  algorithm.
+
+* What is the ideal number of counter arrays (number of levels) for which the
+  computation of the hard special leaves will theoretically yield the fewest number
+  of instructions? In primecount I currently use a single counter array for all
+  computations even though I expect that using two counters could speed up huge
+  computations with input numbers > 10^28.
 
 ## References
 
