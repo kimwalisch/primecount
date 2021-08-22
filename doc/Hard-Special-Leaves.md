@@ -73,13 +73,13 @@ count the number of unsieved elements by simply iterating over the sieve array.
 There are many known optimizations that can be used to speedup counting e.g.:
 
 * Using the [POPCNT instruction](https://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
-  in combination with a bit sieve array allows to count many unsieved sieve
+  in combination with a bit sieve array allows counting many unsieved sieve
   elements using a single instruction. This improves the runtime complexity by a
   large constant factor.
 * One can keep track of the total number of unsieved elements that are
   currently in the sieve array as the total number of unsieved elements is
   [used frequently](https://github.com/kimwalisch/primecount/blob/v5.3/src/lmo/pi_lmo5.cpp#L107)
-  (once per sieving prime for each segment).
+  (once per sieving prime in each segment).
 * We can 
   [batch count the number of unsieved elements](https://github.com/kimwalisch/primecount/blob/v5.3/src/lmo/pi_lmo2.cpp#L65)
   in the sieve array for many
@@ -224,8 +224,8 @@ e.g. at the start of each new segment as the counter needs to be reinitialized a
 start of each new segment anyway. The ideal counter distance for the next segment is
 ```sqrt(average_leaf_distance)```. In practice we can approximate the
 average leaf distance using ```sqrt(segment_low)```. My measurements using primecount
-indicate that gradually resizing the counter array further improves counting by more
-than a constant factor.
+indicate that gradually increasing the counter distance further improves counting by
+more than a constant factor.
 
 ```C++
 // Each element of the counter array contains the current
@@ -281,11 +281,14 @@ arrays, hence this optimization only applies to a single counter array.
 
 ## Open questions
 
-There are still a few open questions to which I have no answers yet. The most
-important one being: What's the runtime complexity of this alternative algorithm?
-Unfortunately it is not easy to answer this question as the algorithm
+There are still a few open questions to which I have no answers yet.
+
+The most important one being: What's the runtime complexity of this alternative
+algorithm? Unfortunately it is not easy to answer this question as the algorithm
 depends on many optimizations all of which improve the runtime complexity by a
-small factor.
+small factor. Since this algorithm counts the number of unsieved elements between
+consecutive hard special leaves its runtime complexity is: number of special
+leaves * average number of count operations per special leaf.
 
 Another open question is: What is the ideal number of counter arrays (number of levels)
 for which the computation of the hard special leaves will theoretically yield the
