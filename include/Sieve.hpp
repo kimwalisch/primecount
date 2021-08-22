@@ -22,8 +22,8 @@
 ///        speedup counting. However using a binary indexed tree is
 ///        bad for performance as it causes many cache misses and
 ///        branch mispredictions. For this reason this implementation
-///        instead uses a counter array whose elements contain the
-///        total count of unsieved elements in a certain interval.
+///        instead uses a linear counter array whose elements contain
+///        the total count of unsieved elements in a certain interval.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
