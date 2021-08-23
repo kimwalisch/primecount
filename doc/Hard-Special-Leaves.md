@@ -271,13 +271,17 @@ instructions. It is likely though that using two counter arrays will use fewer
 instructions for huge input numbers > 10^28 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of two counter arrays.
 
-Unfortunately this means that there is no one-size-fits-all algorithm. For small
-numbers x ≤ 10^16 not using any counter array runs fastest, for x ∈ ]10^16, 10^28]
-using a single counter array runs fastest and for x > 10^28 two counter arrays
-likely perform best. Also note that when using two counter arrays my measurements
-indicate that there is no benefit to
-[gradually resizing](#gradually-increase-counter-distance) the counter
-arrays, hence this optimization only applies to a single counter array.
+Even though using multiple counter arrays does not seem particularly useful from a
+practical point of view, it is very interesting from a theoretical point of view.
+If we used O(log z) counter arrays (number of levels) the worst-case runtime complexity
+for counting the number of unsieved elements for a single special leaf would be
+O(segment_size^(1/log z)) which is the same number of operations as the original
+algorithm with the binary indexed tree which uses O(log z) operations. This means that
+using O(log z) counter arrays our alternative algorithm has the same runtime complexity
+as the original algorithm with the binary indexed tree. This leads to the following
+question: Is it possible to use less than O(log z) counter arrays and thereby improve
+the runtime complexity of the hard special leaf algorithm? See the
+[Open questions](#Open-questions) for more details.
 
 ## Open questions
 
