@@ -188,28 +188,22 @@ the alternative counting method had a runtime complexity of about (number of
 special leaves * O(z^(1/4)) since counting the number of unsieved elements for a
 single leaf is O(z^(1/4)). However when I measured the average number of
 count operations per leaf the number was much lower than expected. It turns out
-that batch counting the number of unsieved elements for many consecutive leaves
-improves the runtime complexity by more than a constant factor. My measurements
-using primecount indicate that the average number of count operations per leaf
-grows about as fast as the alpha tuning factor which grows like O(log(x)^3). For
-this reason I believe that the improved counting method described above has an
-average runtime complexity of O(log(x)^3) per leaf. If this is true then the runtime
-complexity of our alternative algorithm would not be worse anymore than the runtime
-complexity of the original algorithm with the binary indexed tree. Unfortunately
-I have not been able yet to accurately calculate the runtime complexity of this
-alternative algorithm, see the [Open questions](#Open-questions) for further details.
-However when I implemented the above alternative counting method in primecount it completely fixed
-the severe scaling issue in the computation of the special leaves that had been
-present in primecount since the very beginning. Below 10^20 there are no performance
-improvements, however above 10^20, the higher you go the more efficient the new method
-becomes compared to primecount's old implementation. At 10^25 the new method is
-already 2x faster. Note that the new method works best with the Deleglise-Rivat
-[[2]](#References) and Gourdon [[3]](#References)
-variants of the combinatorial prime counting algorithm as the average distance
-between consecutive special leaves is relatively large in those algorithms. In
-the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average distance between consecutive
-special leaves is much smaller so there the new counting method will not improve
-performance in practice.
+that [batch counting](#alternative-counting-method) the number of unsieved elements
+for many consecutive leaves improves the runtime complexity by more than a constant
+factor. Unfortunately I have not been able yet to accurately calculate the runtime
+complexity of this alternative algorithm, see the [open questions](#Open-questions)
+for further details. However when I implemented the above alternative counting
+method in primecount it completely fixed the severe scaling issue in the computation
+of the special leaves that had been present in primecount since the very beginning.
+Below 10^20 there are no performance improvements, however above 10^20, the higher
+you go the more efficient the new method becomes compared to primecount's old
+implementation. At 10^25 the new method is already 2x faster. Note that the new
+method works best with the Deleglise-Rivat [[2]](#References) and
+Gourdon [[3]](#References) variants of the combinatorial prime counting algorithm as
+the average distance between consecutive special leaves is relatively large in those
+algorithms. In the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average
+distance between consecutive special leaves is much smaller so there the new counting
+method will not improve performance in practice.
 
 ## Gradually increase counter distance
 
@@ -287,30 +281,28 @@ the runtime complexity of the hard special leaf algorithm? See the
 
 There are still a few open questions to which I have no answers yet.
 
-What's the runtime complexity of this alternative algorithm? Unfortunately it is
-not easy to answer this question as the algorithm depends on many optimizations
-all of which improve the runtime complexity by a small factor. What I do know is that
-when using O(log z) counter arrays the runtime complexity of the alternative
-algorithm is O(z log z) operations which is the same runtime complexity as the
-original algorithm with the binary indexed tree, see
-[here](https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md#multiple-levels-of-counters).
-The next interesting question is: is it possible to use fewer than
-O(log z) counter arrays and thereby improve the runtime complexity of the hard
-special leaf algorithm? Unlike the original algorithm with the binary indexed tree
-the alternative algorithm [batch counts](https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md#alternative-counting-method)
-consecutive hard special leaves which could make it possible to use fewer than
-O(log z) counters and thereby improve the runtime complexity.
+What's the runtime complexity of this alternative algorithm? Unfortunately it is not
+easy to answer this question as the algorithm depends on many optimizations all of
+which improve the runtime complexity by a small factor. What I do know is that when
+using O(log z) counter arrays the runtime complexity of the alternative algorithm is
+O(z log z) operations which is the same runtime complexity as the original algorithm
+with the binary indexed tree, see [here](#multiple-levels-of-counters). The next
+interesting question is: is it possible to use fewer than O(log z) counter arrays and
+thereby improve the runtime complexity of the hard special leaf algorithm? Unlike the
+original algorithm with the binary indexed tree the alternative algorithm
+[batch counts](#alternative-counting-method) consecutive hard special leaves which
+could make it possible to use fewer than O(log z) counters and thereby improve the
+runtime complexity.
 
 In the original algorithm with the binary indexed tree, sieving uses O(z log z)
 operations [[4]](#References). In the alternative algorithm sieving uses only
-O(z log log z) operations since for each sieving operation we need to decrement
-at most a constant number of counter elements (provided that we use a constant
-number of counter arrays). The number of hard special leaves in
-the Deléglise-Rivat algorithm is O(z / (log x)^2 * log α) [[4]](#References), hence
-if the average number of count operations per special leaf in the alternative
-counting algorithm is less than O(log z * (log x)^2 / log α), then the
-alternative algorithm would have a better runtime complexity than the original
-algorithm.
+O(z log log z) operations since for each sieving operation we need to decrement at
+most a constant number of counter elements (provided that we use a constant number of
+counter arrays). The number of hard special leaves in the Deléglise-Rivat algorithm is
+O(z / (log x)^2 * log α) [[4]](#References), hence if the average number of count
+operations per special leaf in the alternative counting algorithm is less than
+O(log z * (log x)^2 / log α), then the alternative algorithm would have a better runtime
+complexity than the original algorithm.
 
 ## References
 
