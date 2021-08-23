@@ -275,13 +275,13 @@ Even though using multiple counter arrays does not seem particularly useful from
 practical point of view, it is very interesting from a theoretical point of view.
 If we used O(log z) counter arrays (number of levels) the worst-case runtime complexity
 for counting the number of unsieved elements for a single special leaf would be
-O(segment_size^(1/log z)) which is the same number of operations as the original
+O(log z * segment_size^(1/log z)) which is the same number of operations as the original
 algorithm with the binary indexed tree which uses O(log z) operations. This means that
 using O(log z) counter arrays our alternative algorithm has the same runtime complexity
 as the original algorithm with the binary indexed tree. This leads to the following
 question: Is it possible to use less than O(log z) counter arrays and thereby improve
 the runtime complexity of the hard special leaf algorithm? See the
-[Open questions](#Open-questions) for more details.
+[open questions](#Open-questions) for more details.
 
 ## Open questions
 
