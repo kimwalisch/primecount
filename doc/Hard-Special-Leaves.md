@@ -312,6 +312,12 @@ There are still a few open questions to which I have no answers yet.
   computations even though I expect that using two counters could speed up huge
   computations with input numbers > 10^28.
 
+  Note that if we want our alternative algorithm to have a better runtime complexity
+  than the original algorithm with the binary indexed tree, then we must use less than
+  O(log z) counter arrays (number of levels). If we would use O(log z) counter arrays,
+  then the sieving part of our alternative algorithm would have the same O(z log z)
+  [[4]](#References) runtime complexity as the original algorithm.
+
 ## References
 
 1. J. C. Lagarias, V. S. Miller, and A. M. Odlyzko, Computing pi(x): The Meissel-Lehmer method, Mathematics of Computation, 44 (1985), pp. 537–560.
