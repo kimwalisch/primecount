@@ -302,7 +302,9 @@ counter arrays). The number of hard special leaves in the Deléglise-Rivat algor
 O(z / (log x)^2 * log α) [[4]](#References), hence if the average number of count
 operations per special leaf in the alternative counting algorithm is less than
 O(log z * (log x)^2 / log α), then the alternative algorithm would have a better runtime
-complexity than the original algorithm.
+complexity than the original algorithm. The difficult part, which I have not yet been able
+to determine, is the average number of count operations per hard special leaf (and
+the total number of count operations) in the alternative algorithm.
 
 ## References
 
