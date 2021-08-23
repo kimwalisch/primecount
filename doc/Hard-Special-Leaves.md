@@ -279,7 +279,7 @@ O(log z * segment_size^(1/log z)) which is the same number of operations as the 
 algorithm with the binary indexed tree which uses O(log z) operations. This means that
 using O(log z) counter arrays our alternative algorithm has the same runtime complexity
 as the original algorithm with the binary indexed tree. This leads to the following
-question: Is it possible to use less than O(log z) counter arrays and thereby improve
+question: is it possible to use fewer than O(log z) counter arrays and thereby improve
 the runtime complexity of the hard special leaf algorithm? See the
 [open questions](#Open-questions) for more details.
 
@@ -294,7 +294,7 @@ when using O(log z) counter arrays the runtime complexity of the alternative
 algorithm is O(z log z) operations which is the same runtime complexity as the
 original algorithm with the binary indexed tree, see
 [here](https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md#multiple-levels-of-counters).
-The next interesting question is: Is it possible to use less than
+The next interesting question is: is it possible to use fewer than
 O(log z) counter arrays and thereby improve the runtime complexity of the hard
 special leaf algorithm? Unlike the original algorithm with the binary indexed tree
 the alternative algorithm [batch counts](https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md#alternative-counting-method)
