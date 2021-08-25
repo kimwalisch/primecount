@@ -294,17 +294,21 @@ original algorithm with the binary indexed tree the alternative algorithm
 could make it possible to use fewer than O(log z) counters and thereby improve the
 runtime complexity.
 
-In the original algorithm with the binary indexed tree, sieving uses O(z log z)
-operations [[4]](#References). In the alternative algorithm sieving uses only
-O(z log log z) operations since for each sieving operation we need to decrement at
-most a constant number of counter elements (provided that we use a constant number of
-counter arrays). The number of hard special leaves in the Deléglise-Rivat algorithm is
-O(z / (log x)^2 * log α) [[4]](#References), hence if the average number of count
-operations per special leaf in the alternative counting algorithm is less than
-O(log z * (log x)^2 / log α), then the alternative algorithm would have a better runtime
-complexity than the original algorithm. The difficult part, which I have not yet been able
-to determine, is the average number of count operations per hard special leaf (and
-the total number of count operations) in the alternative algorithm.
+In the original Deléglise-Rivat algorithm with the binary indexed tree, sieving uses
+O(z log z) operations [[4]](#References), the number of hard special leaves is
+O(z / (log x)^2 * log α) and for each leaf it takes O(log z) operations to count the
+number of unsieved elements. This means that the original algorithm is not perfectly
+balanced, sieving is slightly more expensive than counting. Using the alternative algorithm,
+it is possible to achieve perfect balancing by using fewer than O(log z) levels of counters,
+if the number of counter levels is decreased sieving becomes more efficient but on the
+other hand counting becomes more expensive. Based on my measurements I believe that it
+is possible to use O(log z / log log z) levels of counters (possibly even less) and
+thereby reduce the runtime complexity of the algorithm to O(z log z / log log z)
+operations. The difficult part, which I have not yet been able to calculate, is the
+average number of count operations per hard special leaf (and the total number of count
+operations) in the alternative algorithm. Please note that for practical purposes, there
+is no need to use multiple levels of counters, using a single counter array provides
+the best performance up to at least 10^28.
 
 ## References
 
