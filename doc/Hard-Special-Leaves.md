@@ -248,7 +248,8 @@ void Sieve::allocate_counter(uint64_t segment_low)
 When using a single counter array whose elements correspond to intervals of size
 O(segment_size^(1/2)), the worst-case complexity for counting the number of unsieved
 elements for a single special leaf is O(segment_size^(1/2)). This is what is currently
-implemented in primecount.
+implemented in primecount (in combination with
+[gradually increasing](#gradually-increase-counter-distance) the counter distance).
 
 It is also possible to use two counter arrays: the first array is coarse-grained and
 spans over large intervals of size O(segment_size^(2/3)), whereas the second array is
