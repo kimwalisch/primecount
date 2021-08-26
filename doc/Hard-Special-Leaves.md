@@ -56,10 +56,10 @@ int count(const int* tree, int pos)
 
 ## Alternative counting method
 
-Despite the theoretical benefits of the binary indexed tree data structure it
+Despite the theoretical benefits of the binary indexed tree data structure, it
 has two significant practical drawbacks:
 it uses a lot of memory since each thread needs to allocate its own binary indexed
-tree and more importantly it is horribly slow because all memory accesses are non
+tree and more importantly, it is horribly slow because all memory accesses are non
 sequential which CPUs are very bad at. For this reason many programmers that have
 implemented any of the combinatorial prime counting algorithms
 ([Christian Bau 2003](http://cs.swan.ac.uk/~csoliver/ok-sat-library/OKplatform/ExternalSources/sources/NumberTheory/ChristianBau/),
