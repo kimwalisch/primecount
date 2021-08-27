@@ -269,7 +269,7 @@ Even though using multiple counter arrays does not seem particularly useful from
 practical point of view, it is very interesting from a theoretical point of view.
 If we used O(log z) counter arrays (number of levels) the worst-case runtime complexity
 for counting the number of unsieved elements for a single special leaf would be
-O(log z * segment_size^(1/log z)) which can be simplified to O(log(z) * e) and which is
+O(log z * segment_size^(1/log z)), which can be simplified to O(log(z) * e) and which is
 the same number of operations as the original algorithm with the binary indexed tree which
 uses O(log z) operations. This means that using O(log z) counter arrays our alternative
 algorithm has the same runtime complexity as the original algorithm with the binary indexed
