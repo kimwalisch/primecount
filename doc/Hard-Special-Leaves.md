@@ -32,10 +32,10 @@ unsieved elements in the sieve array Lagarias-Miller-Odlyzko [[1]](#References)
 have suggested using a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree)
 data structure (a.k.a. Fenwick tree) to speedup counting.
 For any number n the binary indexed tree allows to count the number of unsieved
-elements ≤ n using only O(log(n)) operations. However the binary indexed tree
+elements ≤ n using only O(log n) operations. However the binary indexed tree
 must also be updated whilst sieving which slows down the sieving part of the
-algorithm by a factor of O(log(n)) operations. All more recent papers about the
-combinatorial type prime counting algorithms that I am aware of have also suggested
+algorithm by a factor of O(log n / log log n) operations. All more recent papers about
+the combinatorial type prime counting algorithms that I am aware of have also suggested
 using the binary indexed tree data structure for counting the number of unsieved
 elements in the sieve array.
 
@@ -67,9 +67,9 @@ implemented any of the combinatorial prime counting algorithms
 [James F. King 2014](https://github.com/jfkingiii/meissel-lehmer),
 [Kim Walisch 2014](https://github.com/kimwalisch/primecount)) have avoided using
 the binary indexed tree and implemented something else. The method that has turned
-out to perform best so far is to get rid of the binary indexed tree data structure
-(which speeds up the sieving part of the algorithm by a factor of log(n)) and
-count the number of unsieved elements by simply iterating over the sieve array.
+out to perform best so far is to get rid of the binary indexed tree data structure,
+which speeds up the sieving part of the algorithm by a factor of O(log n / log log n)
+and count the number of unsieved elements by simply iterating over the sieve array.
 There are many known optimizations that can be used to speedup counting e.g.:
 
 * Using the [POPCNT instruction](https://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
@@ -114,7 +114,7 @@ using a modified version of the segmented sieve of Eratosthenes the size of the
 sieve array will be O(sqrt(z)). This means that if e.g. there is a single leaf in the
 current segment we will use O(sqrt(z)) operations to count the number of unsieved
 elements in the sieve array (whereas the binary indexed tree would have used only
-O(log(z)) operations). This is too much, this deteriorates the runtime complexity
+O(log z) operations). This is too much, this deteriorates the runtime complexity
 of the algorithm.
 
 So now that we have identified the problem we can think about whether it is possible
@@ -129,9 +129,9 @@ time in the sieve array we need to decrement the corresponding counter element.
 However since we only need to decrement at most 1 counter when crossing of an
 element in the sieve array this does not deteriorate the sieving runtime complexity
 of the algorithm (unlike the binary indexed tree which deteriorates sieving by a
-factor of log(z)). I have to give credit to Christian Bau here who already used
-such a counter array back in 2003 however he chose a size of O(n) which does
-not improve the runtime complexity.
+factor of log z / log log z). I have to give credit to Christian Bau here who already
+used such a counter array back in 2003 however he chose a size of O(n) with a constant
+interval size which does not improve the runtime complexity.
 
 ```C++
 // Sieve out a bit from the sieve array and update the
@@ -211,8 +211,8 @@ when there are very few leaves per segment which are far away from each other.
 Generally there is a very large number of leaves that are very close to each other
 at the beginning of the sieving algorithm and gradually as we sieve up the leaves
 become sparser and the distance between the leaves increases. So what we can do is
-**start with a counter array whose elements span over small intervals and
-then gradually increase the interval size**. We can update the counter size and distance
+start with a counter array whose elements span over small intervals and
+then gradually increase the interval size. We can update the counter size and distance
 e.g. at the start of each new segment as the counter needs to be reinitialized at the
 start of each new segment anyway. The ideal counter distance for the next segment is
 ```sqrt(average_leaf_distance)```. In practice we can approximate the
