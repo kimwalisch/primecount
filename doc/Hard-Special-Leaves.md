@@ -117,8 +117,8 @@ elements in the sieve array (whereas the binary indexed tree would have used onl
 O(log z) operations). This is too much, this deteriorates the runtime complexity
 of the algorithm.
 
-So now that we have identified the problem we can think about whether it is possible
-to further improve counting of our alternative algorithm by more than a constant factor.
+So now that we have identified the problem, we can think about whether it is possible
+to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: **We add a
 counter array to our sieving algorithm**. The counter array has a size of O(z^(1/4))
 and each element of the counter array contains the current count of unsieved elements
@@ -130,7 +130,7 @@ However since we only need to decrement at most 1 counter when crossing of an
 element in the sieve array this does not deteriorate the sieving runtime complexity
 of the algorithm (unlike the binary indexed tree which deteriorates sieving by a
 factor of log z / log log z). I have to give credit to Christian Bau here who already
-used such a counter array back in 2003 however he chose a size of O(n) with a constant
+used such a counter array back in 2003, however he chose a size of O(n) with a constant
 interval size which does not improve the runtime complexity.
 
 ```C++
@@ -318,7 +318,7 @@ leaf algorithm by a factor of O(log log z) to O(z log z / log log z) operations.
 primecount also uses [batch counting](#alternative-counting-method) which further
 reduces the number of count operations by a small amount, so it might be possible to use
 an even smaller number of counter levels. The difficult part, which I have not yet been
-able to calculate, is the average number of count operations per hard special leaf (and
+able to figure out, is the average number of count operations per hard special leaf (and
 the total number of count operations) in the alternative algorithm. Please note that for
 practical purposes, there is no need to use multiple levels of counters, using a single
 counter array provides the best performance up to at least 10^28.
