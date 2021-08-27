@@ -190,11 +190,10 @@ single leaf is O(z^(1/4)). However when I measured the average number of
 count operations per leaf the number was much lower than expected. It turns out
 that [batch counting](#alternative-counting-method) the number of unsieved elements
 for many consecutive leaves improves the runtime complexity by more than a constant
-factor. Unfortunately I have not been able yet to accurately calculate the runtime
-complexity of this alternative algorithm, see the [open questions](#Open-questions)
-for further details. However when I implemented the above alternative counting
-method in primecount it completely fixed the severe scaling issue in the computation
-of the special leaves that had been present in primecount since the very beginning.
+factor. See the [runtime complexity](#Runtime-complexity) section for more details.
+When I implemented the above alternative counting method in primecount it completely
+fixed the severe scaling issue in the computation of the special leaves that had
+been present in primecount since the very beginning.
 Below 10^20 there are no performance improvements, however above 10^20, the higher
 you go the more efficient the new method becomes compared to primecount's old
 implementation. At 10^25 the new method is already 2x faster. Note that the new
@@ -276,24 +275,20 @@ using O(log z) counter arrays our alternative algorithm has the same runtime com
 as the original algorithm with the binary indexed tree. This leads to the following
 question: is it possible to use fewer than O(log z) counter arrays and thereby improve
 the runtime complexity of the hard special leaf algorithm? See the
-[open questions](#Open-questions) for more details.
+[runtime complexity](#Runtime-complexity) section for more details.
 
-## Open questions
+## Runtime complexity
 
-There are still a few open questions to which I have no answers yet.
+What's the runtime complexity of this alternative algorithm?
 
-What's the runtime complexity of this alternative algorithm? Unfortunately it is not
-easy to answer this question as the algorithm depends on many optimizations all of
-which improve the runtime complexity by a small factor. What I do know is that when
-using O(log z) counter arrays the runtime complexity of the alternative algorithm is
-O(z log z) operations which is the same runtime complexity as the original algorithm
-with the binary indexed tree, see [here](#multiple-levels-of-counters). The next
-interesting question is: is it possible to use fewer than O(log z) counter arrays and
-thereby improve the runtime complexity of the hard special leaf algorithm? Unlike the
-original algorithm with the binary indexed tree the alternative algorithm
-[batch counts](#alternative-counting-method) consecutive hard special leaves which
-could make it possible to use fewer than O(log z) counters and thereby improve the
-runtime complexity.
+Unfortunately it is not easy to answer this question as the algorithm depends on many
+optimizations all of which improve the runtime complexity by a small factor. What I do
+know is that when using O(log z) counter arrays the runtime complexity of the alternative
+algorithm is O(z log z) operations which is the same runtime complexity as the original
+algorithm with the binary indexed tree, see [here](#multiple-levels-of-counters) for more
+information. The next interesting question is: is it possible to use fewer than O(log z)
+counter arrays and thereby improve the runtime complexity of the hard special leaf
+algorithm?
 
 In the original Deléglise-Rivat algorithm with the binary indexed tree, sieving uses
 O(z log z) operations [[4]](#References), the number of hard special leaves is
@@ -302,14 +297,31 @@ number of unsieved elements. This means that the original algorithm is not perfe
 balanced, sieving is slightly more expensive than counting. Using the alternative algorithm,
 it is possible to achieve perfect balancing by using fewer than O(log z) levels of counters,
 if the number of counter levels is decreased sieving becomes more efficient but on the
-other hand counting becomes more expensive. Based on my measurements I believe that it
-is possible to use O(log z / log log z) levels of counters (possibly even less) and
-thereby reduce the runtime complexity of the algorithm to O(z log z / log log z)
-operations. The difficult part, which I have not yet been able to calculate, is the
-average number of count operations per hard special leaf (and the total number of count
-operations) in the alternative algorithm. Please note that for practical purposes, there
-is no need to use multiple levels of counters, using a single counter array provides
-the best performance up to at least 10^28.
+other hand counting becomes more expensive. The maximum number of allowed counting
+operations per leaf that do not deteriorate the runtime complexity of the algorithm is
+about O((log z)^2). This can be achieved by using O(log z / log log z) levels of counters,
+if we set the number of counter levels l = log z / log log z, then the number of count
+operations per leaf becomes O(l * z^(1/l)) which is smaller than O((log z)^2) since:
+
+```
+l * z^(1/l) < (log z)^2
+log(z) / log(log(z)) * z^(log(log(z))/log(z)) < ln(z)^2
+log(z) / log(log(z)) * (z^(1/log(z)))^log(log(z)) < ln(z)^2
+log(z) / log(log(z)) * e^log(log(z)) < ln(z)^2
+log(z) / log(log(z)) * ln(z) < ln(z)^2
+log(z)^2 / log(log(z)) < ln(z)^2
+```
+
+Hence, by using O(log z / log log z) levels of counters we improve the balancing of
+sieve and count operations and reduce the runtime complexity of the hard special
+leaf algorithm by a factor of O(log log z) to O(z log z / log log z) operations.
+primecount also uses [batch counting](#alternative-counting-method) which further
+reduces the number of count operations by a small amount, so it might be possible to use
+an even smaller number of counter levels. The difficult part, which I have not yet been
+able to calculate, is the average number of count operations per hard special leaf (and
+the total number of count operations) in the alternative algorithm. Please note that for
+practical purposes, there is no need to use multiple levels of counters, using a single
+counter array provides the best performance up to at least 10^28.
 
 ## References
 
