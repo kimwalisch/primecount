@@ -9,8 +9,8 @@ to the hard special leaf algorithms from the Deléglise-Rivat and
 Gourdon papers.
 
 * Hard-Special-Leaves.md: Added new "Multiple levels of counters"
-  and "Runtime complexity" sections with detailed analysis of
-  primecount's hard special leaf algorithm.
+  and "Runtime complexity" sections with a detailed analysis
+  of primecount's hard special leaf algorithm.
 * Sieve.hpp: Add Counter struct.
 * Sieve.cpp: Use new Counter struct.
 
