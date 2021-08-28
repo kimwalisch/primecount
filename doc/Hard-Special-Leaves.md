@@ -299,23 +299,22 @@ it is possible to achieve perfect balancing by using fewer than O(log z) levels 
 if the number of counter levels is decreased sieving becomes more efficient but on the
 other hand counting becomes more expensive. The maximum number of allowed counting
 operations per leaf that do not deteriorate the runtime complexity of the algorithm is
-slightly larger than O((log z)^2). This bound can be achieved by using O(log z / log log z)
-levels of counters, if we set the number of counter levels l = log z / log log z, then the
+slightly larger than O((log x)^2). This bound can be achieved by using O(log z / log log x)
+levels of counters, if we set the number of counter levels l = log z / log log x, then the
 number of count operations per leaf becomes O(l * z^(1/l)) which is smaller than
-O((log z)^2) since:
+O((log x)^2) since:
 
 ```
-l * z^(1/l) < (log z)^2
-log(z) / log(log(z)) * z^(log(log(z))/log(z)) < log(z)^2
-log(z) / log(log(z)) * (z^(1/log(z)))^log(log(z)) < log(z)^2
-log(z) / log(log(z)) * e^log(log(z)) < log(z)^2
-log(z) / log(log(z)) * log(z) < log(z)^2
-log(z)^2 / log(log(z)) < log(z)^2
+l * z^(1/l) < (log x)^2
+log(z) / log(log(x)) * z^(log(log(x))/log(z)) < log(x)^2
+log(z) / log(log(x)) * (z^(1/log(z)))^log(log(x)) < log(x)^2
+log(z) / log(log(x)) * e^log(log(x)) < log(x)^2
+log(z) / log(log(x)) * log(x) < log(x)^2
 ```
 
-Hence, by using O(log z / log log z) levels of counters we improve the balancing of
+Hence, by using O(log z / log log x) levels of counters we improve the balancing of
 sieve and count operations and reduce the runtime complexity of the hard special
-leaf algorithm by a factor of O(log log z) to O(z log z / log log z) operations.
+leaf algorithm by a factor of O(log log x) to O(z log z / log log x) operations.
 primecount also uses [batch counting](#alternative-counting-method) which further
 reduces the number of count operations by a small amount, so it might be possible to use
 an even smaller number of counter levels. The difficult part, which I have not yet been
