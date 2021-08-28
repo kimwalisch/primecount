@@ -1,16 +1,16 @@
-Changes in primecount-7.2, 2021-08-23
+Changes in primecount-7.2, 2021-08-28
 
-I was able to prove that primecount's hard special leaf algorithm
-has the same runtime complexity as the original algorithm with the
-binary indexed tree, provided that primecount's algorithm uses
-O(log z) levels of counters. What I don't know yet is whether it is
-possible to use fewer levels of counters and thereby improve the
-overall runtime complexity of primecount's algorithm. The "Multiple
-levels of counters" and "Open question" sections, in the
-Hard-Special-Leaves.md document, contain more information.
+I have been able to prove that primecount's hard special leaf
+algorithm has a runtime complexity of only O(z log z / log log x)
+operations, provided that the algorithm uses O(log z / log log x)
+levels of counters. Hence the runtime complexity of primecount's hard
+special leaf algorithm is lower by a factor of O(log log x) compared
+to the hard special leaf algorithms from the Deléglise-Rivat and
+Gourdon papers.
 
 * Hard-Special-Leaves.md: Added new "Multiple levels of counters"
-  section and updated "Open questions" section.
+  and "Runtime complexity" sections with detailed analysis of
+  primecount's hard special leaf algorithm.
 * Sieve.hpp: Add Counter struct.
 * Sieve.cpp: Use new Counter struct.
 
