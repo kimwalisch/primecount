@@ -281,14 +281,14 @@ algorithm? See the [runtime complexity](#Runtime-complexity) section for more de
 
 What's the runtime complexity of this alternative algorithm?
 
-Unfortunately it is not easy to answer this question as the algorithm depends on many
-optimizations all of which improve the runtime complexity by a small factor. What I do
-know is that when using O(log z) counter arrays the runtime complexity of the alternative
-algorithm is O(z log z) operations which is the same runtime complexity as the original
-algorithm with the binary indexed tree, see [here](#multiple-levels-of-counters) for more
-information. The next interesting question is: is it possible to use fewer than O(log z)
-counter arrays and thereby improve the runtime complexity of the hard special leaf
-algorithm?
+Unfortunately it is not easy to determine the exact runtime complexity, since the
+alternative algorithm depends on many optimizations all of which improve the runtime
+complexity by a small factor. What I do know is that when using O(log z) counter arrays
+the runtime complexity of the alternative algorithm is O(z log z) operations which is the
+same runtime complexity as the original algorithm with the binary indexed tree, see
+[here](#multiple-levels-of-counters) for more information. The next interesting question
+is: is it possible to use fewer than O(log z) counter arrays and thereby improve the
+runtime complexity of the hard special leaf algorithm?
 
 In the original Deléglise-Rivat algorithm with the binary indexed tree, sieving uses
 O(z log z) operations [[4]](#References), the number of hard special leaves is
@@ -299,17 +299,18 @@ it is possible to achieve perfect balancing by using fewer than O(log z) levels 
 if the number of counter levels is decreased sieving becomes more efficient but on the
 other hand counting becomes more expensive. The maximum number of allowed counting
 operations per leaf that do not deteriorate the runtime complexity of the algorithm is
-about O((log z)^2). This can be achieved by using O(log z / log log z) levels of counters,
-if we set the number of counter levels l = log z / log log z, then the number of count
-operations per leaf becomes O(l * z^(1/l)) which is smaller than O((log z)^2) since:
+slightly larger than O((log z)^2). This bound can be achieved by using O(log z / log log z)
+levels of counters, if we set the number of counter levels l = log z / log log z, then the
+number of count operations per leaf becomes O(l * z^(1/l)) which is smaller than
+O((log z)^2) since:
 
 ```
 l * z^(1/l) < (log z)^2
-log(z) / log(log(z)) * z^(log(log(z))/log(z)) < ln(z)^2
-log(z) / log(log(z)) * (z^(1/log(z)))^log(log(z)) < ln(z)^2
-log(z) / log(log(z)) * e^log(log(z)) < ln(z)^2
-log(z) / log(log(z)) * ln(z) < ln(z)^2
-log(z)^2 / log(log(z)) < ln(z)^2
+log(z) / log(log(z)) * z^(log(log(z))/log(z)) < log(z)^2
+log(z) / log(log(z)) * (z^(1/log(z)))^log(log(z)) < log(z)^2
+log(z) / log(log(z)) * e^log(log(z)) < log(z)^2
+log(z) / log(log(z)) * log(z) < log(z)^2
+log(z)^2 / log(log(z)) < log(z)^2
 ```
 
 Hence, by using O(log z / log log z) levels of counters we improve the balancing of
