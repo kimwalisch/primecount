@@ -290,19 +290,19 @@ same runtime complexity as the original algorithm with the binary indexed tree, 
 is: is it possible to use fewer than O(log z) counter arrays and thereby improve the
 runtime complexity of the hard special leaf algorithm?
 
-In the original Deléglise-Rivat algorithm with the binary indexed tree, sieving uses
-O(z log z) operations [[4]](#References), the number of hard special leaves is
-O(z / (log x)^2 * log α) and for each leaf it takes O(log z) operations to count the
-number of unsieved elements. This means that the original algorithm is not perfectly
-balanced, sieving is slightly more expensive than counting. Using the alternative algorithm,
-it is possible to achieve perfect balancing by using fewer than O(log z) levels of counters,
-if the number of counter levels is decreased sieving becomes more efficient but on the
-other hand counting becomes more expensive. The maximum number of allowed counting
-operations per leaf that do not deteriorate the runtime complexity of the algorithm is
-slightly larger than O((log x)^2). This bound can be achieved by using O(log z / log log x)
-levels of counters, if we set the number of counter levels l = log z / log log x, then the
-number of count operations per leaf becomes O(l * z^(1/l)) which is smaller than
-O((log x)^2) since:
+Tomás Oliveira e Silva's paper [[4]](#References) provides the following runtime
+complexities for the computation of the hard special leaves in the Deléglise-Rivat
+algorithm: sieving uses O(z log z) operations, the number of hard special leaves is
+O(z / (log x)^2 * log α) and for each leaf it takes O(log z) operations to count the number
+of unsieved elements. This means that the original algorithm is not perfectly balanced,
+sieving is slightly more expensive than counting. Using the alternative algorithm, it is
+possible to achieve perfect balancing by using fewer than O(log z) levels of counters, if
+the number of counter levels is decreased sieving becomes more efficient but on the other
+hand counting becomes more expensive. The maximum number of allowed counting operations per
+leaf that do not deteriorate the runtime complexity of the algorithm is slightly larger
+than O((log x)^2). This bound can be achieved by using O(log z / log log x) levels of
+counters, if we set the number of counter levels l = log z / log log x, then the number of
+count operations per leaf becomes O(l * z^(1/l)) which is smaller than O((log x)^2) since:
 
 ```
 l * z^(1/l) < (log x)^2
