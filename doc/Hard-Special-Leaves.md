@@ -133,8 +133,8 @@ at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
 tree which deteriorates sieving by a factor of log z / log log z). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
-chose a counter array size of O(n) with a constant interval size which does not improve
-the runtime complexity.
+chose a counter array size of O(segment_size) with a constant interval size which does
+not improve the runtime complexity.
 
 ```C++
 // Sieve out a bit from the sieve array and update the
