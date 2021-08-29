@@ -70,7 +70,8 @@ the binary indexed tree and implemented something else. The method that has turn
 out to perform best so far is to get rid of the binary indexed tree data structure,
 which speeds up the sieving part of the algorithm by a factor of O(log n / log log n)
 and count the number of unsieved elements by simply iterating over the sieve array.
-There are many known optimizations that can be used to speedup counting e.g.:
+
+There are many known optimizations that can be used to speedup counting:
 
 * Using the [POPCNT instruction](https://en.wikipedia.org/wiki/SSE4#POPCNT_and_LZCNT)
   in combination with a bit sieve array allows counting many unsieved sieve
@@ -113,8 +114,8 @@ to compute the special leaves we need to sieve up to some limit z. Since we are
 using a modified version of the segmented sieve of Eratosthenes the size of the
 sieve array will be O(sqrt(z)). This means that if e.g. there is a single leaf in the
 current segment we will use O(sqrt(z)) operations to count the number of unsieved
-elements in the sieve array (whereas the binary indexed tree would have used only
-O(log z) operations). This is too much, this deteriorates the runtime complexity
+elements in the sieve array whereas the binary indexed tree would have used only
+O(log z) operations. This is too much, this deteriorates the runtime complexity
 of the algorithm.
 
 So now that we have identified the problem, we can think about whether it is possible
@@ -131,8 +132,8 @@ at most 1 counter when crossing of an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
 tree which deteriorates sieving by a factor of log z / log log z). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
-chose a size of O(n) with a constant interval size which does not improve the runtime
-complexity.
+chose a counter array size of O(n) with a constant interval size which does not improve
+the runtime complexity.
 
 ```C++
 // Sieve out a bit from the sieve array and update the
@@ -186,8 +187,8 @@ uint64_t Sieve::count(uint64_t stop)
 Initially when I found this improvement I thought it would fix my particular
 scaling issue only up to some large threshold above which the alternative method
 would become inefficient again due to its worse runtime complexity. I thought that
-the alternative counting method had a runtime complexity of about (number of
-special leaves * O(segment_size^(1/2)) since counting the number of unsieved elements
+the alternative counting method had a runtime complexity of about O(number of
+special leaves * segment_size^(1/2)) since counting the number of unsieved elements
 for a single leaf is O(segment_size^(1/2)). However when I measured the average
 number of count operations per leaf the number was much lower than expected. It turns
 out that [batch counting](#alternative-counting-method) the number of unsieved
