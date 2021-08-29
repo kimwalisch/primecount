@@ -319,12 +319,13 @@ Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is i
 as O(PrimePi(x^(1/4)) * y), which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
 it possible to use even fewer counter levels and further improve the runtime complexity of
-the algorithm. However, in primecount the number of hard special leaves is more in line
-with Tomás Oliveira e Silva's paper, which makes sense considering that primecount's
-implementation of the Deléglise-Rivat algorithm is based on Tomás Oliveira e Silva's paper.
-primecount also uses [batch counting](#alternative-counting-method) which further reduces
-the number of count operations by a small amount, but so far I have not yet been able to
-figure out by how much.
+the algorithm, here we could use only O(log log z) levels of counters which would reduce the
+runtime complexity of the algorithm to O(z log log z) operations. However, in primecount the
+number of hard special leaves is more in line with Tomás Oliveira e Silva's paper, which
+makes sense considering that primecount's implementation of the Deléglise-Rivat algorithm is
+based on Tomás Oliveira e Silva's paper. primecount also uses
+[batch counting](#alternative-counting-method) which further reduces the number of count
+operations by a small amount, but so far I have not yet been able to figure out by how much.
 
 Please note that for practical purposes, there is no need to use multiple levels of
 counters, [my benchmarks](#multiple-levels-of-counters) indicate that using a single
