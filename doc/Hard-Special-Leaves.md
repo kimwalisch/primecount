@@ -312,38 +312,13 @@ log(z) / log(log(x)) * e^log(log(x)) < log(x)^2
 log(z) / log(log(x)) * log(x) < log(x)^2
 ```
 
-Initially I thought that using O(log z / log log x) levels of counters would reduce the
-runtime complexity of the hard special leaf algorithm by a factor of O(log log x) to
-O(z log z / log log x) operations. But then I found a problem: there are two types of hard
-special leaves, those that are a product of two primes and those that are a product of a
-prime and a square free number. And unfortunately iterating over the leaves that are a
-product of a prime and a square free number adds an additional factor of O(log z) to the
-count operations and so we end up at the same overall O(z log z) runtime complexity
-as the original algorithm. primecount also uses [batch counting](#alternative-counting-method)
-which further reduces the number of count operations by a small amount, hence it may be
-possible that using O(log z / log log x) levels of counters with batch counting is fine and
-does indeed improve the runtime complexity, but so far I have not been able to prove that
-yet. Another option to work around this issue is to use slightly more levels of counters,
-e.g. if we set the number of counter levels to l = log z / (log(log(x)) * 0.9), then the
-number of count operations per leaf becomes O(l * z^(1/l)):
-
-```
-l * z^(1/l)
-log(z) / (log(log(x)*0.9) * z^((log(log(x)*0.9))/log(z))
-log(z) / (log(log(x)*0.9) * (z^(1/log(z)))^(log(log(x)*0.9)
-log(z) / (log(log(x)*0.9) * e^(log(log(x)*0.9)
-log(z) / (log(log(x)*0.9) * (e^log(log(x))^0.9
-log(z) / (log(log(x)*0.9) * log(x)^0.9
-```
-
-Using log z / (log(log(x) * 0.9) levels of counters does seem to improve the runtime
-complexity to O(log z / log log x) operations, but it sure looks like an ugly hack. I did some
-measurements with primecount using both primecount's implementation of the Deleglise-Rivat
-algorithm and Gourdon's algorithm and the number of hard special leaves was significantly
-larger than what theory suggests, which makes it very hard to test my assumptions. So as a
-conclusion, I will say that despite these theoretical uncertainties, the alternative algorithm
-works great in practice and that for practical purposes, there is no need to use multiple
-levels of counters, [my benchmarks](#multiple-levels-of-counters) indicate that using a single
+Hence, by using O(log z / log log x) levels of counters we improve the balancing of sieve
+and count operations and reduce the runtime complexity of the hard special leaf algorithm
+by a factor of O(log log x) to O(z log z / log log x) operations. primecount also uses
+[batch counting](#alternative-counting-method) which further reduces the number of count
+operations by a small amount, however so far I have not yet been able to figure out by
+how much. Please note that for practical purposes, there is no need to use multiple levels
+of counters, [my benchmarks](#multiple-levels-of-counters) indicate that using a single
 counter array provides the best performance up to at least 10^28.
 
 ## References
