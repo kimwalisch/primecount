@@ -126,9 +126,9 @@ O(segment_size^(1/2)), with segment_size = sqrt(z). Each element of the counter 
 contains the current count of unsieved elements in the sieve array for the interval
 [i * segment_size^(1/2), (i + 1) * segment_size^(1/2)[. Similar to the algorithm with the
 binary indexed tree data structure this counter array must be updated whilst sieving
-i.e. whenever an element is crossed-off for the first time in the sieve array we need
+i.e. whenever an element is crossed off for the first time in the sieve array we need
 to decrement the corresponding counter element. However since we only need to decrement
-at most 1 counter when crossing of an element in the sieve array this does not
+at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
 tree which deteriorates sieving by a factor of log z / log log z). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
