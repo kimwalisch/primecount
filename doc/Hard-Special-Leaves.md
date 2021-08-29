@@ -119,8 +119,8 @@ of the algorithm.
 
 So now that we have identified the problem, we can think about whether it is possible
 to further improve counting by more than a constant factor in our alternative algorithm.
-It turns out this is possible and even relatively simple to implement: **We add a
-counter array to our sieving algorithm**. The counter array has a size of O(z^(1/4)),
+It turns out this is possible and even relatively simple to implement: We add a
+**counter array** to our sieving algorithm. The counter array has a size of O(z^(1/4)),
 where z^(1/4) is the square root of the sieve size which is z^(1/2). Each element of
 the counter array contains the current count of unsieved elements in the sieve array
 for the interval [i * z^(1/4), (i + 1) * z^(1/4)[. Similar to the algorithm with the
