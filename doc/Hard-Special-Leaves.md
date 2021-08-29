@@ -271,16 +271,16 @@ remaining unsieved elements ≤ n by simply iterating of the sieve array.
 Using 3 counter levels reduces the worst-case complexity for counting the number of
 unsieved elements for a single special leaf to O(segment_size^(1/3)) but on the other
 hand it slightly slows down sieving as we also need to update the two counter arrays
-whilst sieving. I have benchmarked using two counter arrays vs. using a single counter
-array in primecount. When using two counter arrays, the computation of the hard
-special leaves used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21,
-5.73% more instructions at 10^22 and 5.51% more instructions at 10^23. Hence for
-practical use, using a single counter array in primecount both runs faster and uses
-fewer instructions. It is likely though that using two counter arrays will use fewer
+whilst sieving. I have benchmarked using 3 counter levels vs. using 2 counter levels
+in primecount. When using 3 counter levels, the computation of the hard special leaves
+used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% more
+instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical use,
+using 2 counter levels (i.e. a single counter array) in primecount both runs faster and
+uses fewer instructions. It is likely though that using 3 counter levels will use fewer
 instructions for huge input numbers > 10^28 since the difference of used instructions
-is slowly decreasing (for larger input values) in favor of two counter arrays.
+is slowly decreasing (for larger input values) in favor of 3 counter levels.
 
-Even though using multiple counter arrays does not seem particularly useful from a
+Even though using more than 2 counter levels does not seem particularly useful from a
 practical point of view, it is very interesting from a theoretical point of view.
 If we used O(log z) counter levels, then the worst-case runtime complexity for counting
 the number of unsieved elements for a single special leaf would be
