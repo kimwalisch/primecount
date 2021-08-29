@@ -120,10 +120,10 @@ of the algorithm.
 So now that we have identified the problem, we can think about whether it is possible
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: We add a
-**counter array** to our sieving algorithm. The counter array has a size of O(z^(1/4)),
-where z^(1/4) is the square root of the sieve size which is z^(1/2). Each element of
-the counter array contains the current count of unsieved elements in the sieve array
-for the interval [i * z^(1/4), (i + 1) * z^(1/4)[. Similar to the algorithm with the
+**counter array** to our sieving algorithm. The counter array has a size of
+O(segment_size^(1/2)), with segment_size = sqrt(z). Each element of the counter array
+contains the current count of unsieved elements in the sieve array for the interval
+[i * segment_size^(1/2), (i + 1) * segment_size^(1/2)[. Similar to the algorithm with the
 binary indexed tree data structure this counter array must be updated whilst sieving
 i.e. whenever an element is crossed-off for the first time in the sieve array we need
 to decrement the corresponding counter element. However since we only need to decrement
@@ -145,11 +145,12 @@ sieve[i] &= ~(1 << bit_index);
 
 Now whenever we need to count the number of unsieved elements in the sieve array
 we can quickly iterate over the new counter array and sum the counts. We do this
-until we are close (≤ O(z^(1/4))) to the limit up to which we need to count.
+until we are close ≤ O(segment_size^(1/2)) to the limit up to which we need to count.
 Once we are close we switch to our old counting method: we simply iterate
 over the sieve array and count the number of unsieved elements using the POPCNT
 instruction. With this modification we improve the runtime complexity for counting
-the number of unsieved elements for a single leaf from O(z^(1/2)) to O(z^(1/4)).
+the number of unsieved elements for a single leaf from O(segment_size) to
+O(segment_size^(1/2)).
 
 ```C++
 /// Count 1 bits inside [0, stop]
@@ -186,15 +187,15 @@ Initially when I found this improvement I thought it would fix my particular
 scaling issue only up to some large threshold above which the alternative method
 would become inefficient again due to its worse runtime complexity. I thought that
 the alternative counting method had a runtime complexity of about (number of
-special leaves * O(z^(1/4)) since counting the number of unsieved elements for a
-single leaf is O(z^(1/4)). However when I measured the average number of
-count operations per leaf the number was much lower than expected. It turns out
-that [batch counting](#alternative-counting-method) the number of unsieved elements
-for many consecutive leaves improves the runtime complexity by more than a constant
-factor. See the [runtime complexity](#Runtime-complexity) section for more details.
-When I implemented the above alternative counting method in primecount it completely
-fixed the severe scaling issue in the computation of the special leaves that had
-been present in primecount since the very beginning.
+special leaves * O(segment_size^(1/2)) since counting the number of unsieved elements
+for a single leaf is O(segment_size^(1/2)). However when I measured the average
+number of count operations per leaf the number was much lower than expected. It turns
+out that [batch counting](#alternative-counting-method) the number of unsieved
+elements for many consecutive leaves improves the runtime complexity by more than a
+constant factor. See the [runtime complexity](#Runtime-complexity) section for more
+details. When I implemented the above alternative counting method in primecount it
+completely fixed the severe scaling issue in the computation of the special leaves
+that had been present in primecount since the very beginning.
 Below 10^20 there are no performance improvements, however above 10^20, the higher
 you go the more efficient the new method becomes compared to primecount's old
 implementation. At 10^25 the new method is already 2x faster. Note that the new
