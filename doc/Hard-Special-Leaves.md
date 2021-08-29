@@ -250,31 +250,46 @@ elements for a single special leaf is O(segment_size^(1/2)). This is what is cur
 implemented in primecount (in combination with
 [gradually increasing](#gradually-increase-counter-distance) the counter distance).
 
-It is also possible to use two counter arrays: the first array is coarse-grained and
-spans over large intervals of size O(segment_size^(2/3)), whereas the second array is
-fine-grained and spans over small intervals of size O(segment_size^(1/3)). This scheme
-reduces the worst-case complexity for counting the number of unsieved elements for
-a single special leaf to O(segment_size^(1/3)) but on the other hand it slightly
-slows down sieving as the second counter array needs to be updated whilst sieving.
-I have benchmarked using two counter arrays vs. using a single counter array in
-primecount. When using two counter arrays, the computation of the hard special leaves
-used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% more
-instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical
-use, using a single counter array in primecount both runs faster and uses fewer
-instructions. It is likely though that using two counter arrays will use fewer
+It is also possible to use multiple levels of counters. As an example, let's consider
+the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays. We
+only need to use 2 counter arrays because for the last level we will count the number
+of unsieved elements by iterating over the sieve array. Our first counter array (1st
+level) is coarse-grained and its elements span over large intervals of size
+O(segment_size^(2/3)). This means that each element of the first counter array contains
+the current number of unsieved elements in the interval
+[i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array
+(2nd level) is fine-grained and its elements span over smaller intervals of size
+O(segment_size^(1/3)). Hence each element of the second counter array contains the
+current number of unsieved elements in the interval
+[i * segment_size^(1/3), (i + 1) * segment_size^(1/3)[. Now when we need to count the
+number of unsieved elements ≤ n, we first iterate over the first counter array and
+sum the counts of its elements. Once the remaining distance becomes < segment_size^(2/3),
+we switch to our second counter array and sum the counts of its elements until the
+remaining distance becomes < segment_size^(1/3). When this happens, we count the
+remaining unsieved elements ≤ n by simply iterating of the sieve array.
+
+Using 3 counter levels reduces the worst-case complexity for counting the number of
+unsieved elements for a single special leaf to O(segment_size^(1/3)) but on the other
+hand it slightly slows down sieving as we also need to update the two counter arrays
+whilst sieving. I have benchmarked using two counter arrays vs. using a single counter
+array in primecount. When using two counter arrays, the computation of the hard
+special leaves used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21,
+5.73% more instructions at 10^22 and 5.51% more instructions at 10^23. Hence for
+practical use, using a single counter array in primecount both runs faster and uses
+fewer instructions. It is likely though that using two counter arrays will use fewer
 instructions for huge input numbers > 10^28 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of two counter arrays.
 
 Even though using multiple counter arrays does not seem particularly useful from a
 practical point of view, it is very interesting from a theoretical point of view.
-If we used O(log z) counter arrays (number of levels) the worst-case runtime complexity
-for counting the number of unsieved elements for a single special leaf would be
+If we used O(log z) counter levels, then the worst-case runtime complexity for counting
+the number of unsieved elements for a single special leaf would be
 O(log z * segment_size^(1/log z)), which can be simplified to O(log(z) * e) and which is
 the same number of operations as the original algorithm with the binary indexed tree which
-uses O(log z) operations. This means that using O(log z) counter arrays our alternative
+uses O(log z) operations. This means that using O(log z) counter levels our alternative
 algorithm has the same runtime complexity as the original algorithm with the binary indexed
 tree. This leads to the following question: is it possible to use fewer than O(log z)
-counter arrays and thereby improve the runtime complexity of the hard special leaf
+counter levels and thereby improve the runtime complexity of the hard special leaf
 algorithm? See the [runtime complexity](#Runtime-complexity) section for more details.
 
 ## Runtime complexity
