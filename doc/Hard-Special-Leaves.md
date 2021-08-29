@@ -296,14 +296,11 @@ algorithm? See the [runtime complexity](#Runtime-complexity) section for more de
 
 What's the runtime complexity of this alternative algorithm?
 
-Unfortunately it is not easy to determine the exact runtime complexity, since the
-alternative algorithm depends on many optimizations all of which improve the runtime
-complexity by a small factor. What I do know is that when using O(log z) counter arrays
-the runtime complexity of the alternative algorithm is O(z log z) operations which is the
-same runtime complexity as the original algorithm with the binary indexed tree, see
-[here](#multiple-levels-of-counters) for more information. The next interesting question
-is: is it possible to use fewer than O(log z) counter arrays and thereby improve the
-runtime complexity of the hard special leaf algorithm?
+When using O(log z) counter levels the runtime complexity of the alternative algorithm is
+O(z log z) operations which is the same runtime complexity as the original algorithm with
+the binary indexed tree, see [here](#multiple-levels-of-counters) for more information. The
+next interesting question is: is it possible to use fewer than O(log z) counter levels and
+thereby improve the runtime complexity of the hard special leaf algorithm?
 
 Tomás Oliveira e Silva's paper [[4]](#References) provides the following runtime
 complexities for the computation of the hard special leaves in the Deléglise-Rivat
@@ -342,9 +339,9 @@ based on Tomás Oliveira e Silva's paper. primecount also uses
 [batch counting](#alternative-counting-method) which further reduces the number of count
 operations by a small amount, but so far I have not yet been able to figure out by how much.
 
-Please note that for practical purposes, there is no need to use multiple levels of
-counters, [my benchmarks](#multiple-levels-of-counters) indicate that using a single
-counter array provides the best performance up to at least 10^28.
+Please note that for practical purposes, there is no need to use more than 2 counter levels,
+[my benchmarks](#multiple-levels-of-counters) indicate that using 2 counter levels (i.e. a
+single counter array) provides the best performance up to at least 10^28.
 
 ## References
 
