@@ -14,8 +14,9 @@ generally cannot be computed in O(1).
 of the hard special leaves formula is different from the algorithms that have
 been described in any of the combinatorial prime counting papers so far. This document
 describes the history of how primecount's implementation came to be and it describes
-a practical improvement for the computation of the hard special leaves that I found in
-February 2020 and that I consider important.
+a significant improvement for the computation of the hard special leaves that I found in
+February 2020. This improvement is of practical use and it also improves the runtime
+complexity of the hard special leaf algorithm by a factor O(log log x).
 
 Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
