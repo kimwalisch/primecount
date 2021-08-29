@@ -120,18 +120,19 @@ of the algorithm.
 So now that we have identified the problem, we can think about whether it is possible
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: **We add a
-counter array to our sieving algorithm**. The counter array has a size of O(z^(1/4))
-and each element of the counter array contains the current count of unsieved elements
-in the sieve array for the interval [i * z^(1/4), (i + 1) * z^(1/4)[. Similar to the
-algorithm with the binary indexed tree data structure this counter array must
-be updated whilst sieving i.e. whenever an element is crossed-off for the first
-time in the sieve array we need to decrement the corresponding counter element.
-However since we only need to decrement at most 1 counter when crossing of an
-element in the sieve array this does not deteriorate the sieving runtime complexity
-of the algorithm (unlike the binary indexed tree which deteriorates sieving by a
-factor of log z / log log z). I have to give credit to Christian Bau here who already
-used such a counter array back in 2003, however he chose a size of O(n) with a constant
-interval size which does not improve the runtime complexity.
+counter array to our sieving algorithm**. The counter array has a size of O(z^(1/4)),
+where z^(1/4) is the square root of the sieve size which is z^(1/2). Each element of
+the counter array contains the current count of unsieved elements in the sieve array
+for the interval [i * z^(1/4), (i + 1) * z^(1/4)[. Similar to the algorithm with the
+binary indexed tree data structure this counter array must be updated whilst sieving
+i.e. whenever an element is crossed-off for the first time in the sieve array we need
+to decrement the corresponding counter element. However since we only need to decrement
+at most 1 counter when crossing of an element in the sieve array this does not
+deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
+tree which deteriorates sieving by a factor of log z / log log z). I have to give credit
+to Christian Bau here who already used such a counter array back in 2003, however he
+chose a size of O(n) with a constant interval size which does not improve the runtime
+complexity.
 
 ```C++
 // Sieve out a bit from the sieve array and update the
