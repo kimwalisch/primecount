@@ -21,7 +21,7 @@ leaf algorithm and thereby improves its runtime complexity by a factor O(log log
 Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
 [segmented sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes)
-which consists of 2 main parts that are executed alternately:
+which consists of two main parts that are executed alternately:
 
 1) Sieve out primes and multiples of primes.
 2) Count the number of unsieved elements in the sieve array.
