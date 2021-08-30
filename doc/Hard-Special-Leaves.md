@@ -140,9 +140,8 @@ not improve the runtime complexity.
 // Sieve out a bit from the sieve array and update the
 // counter array if the bit was previously 1
 is_bit = (sieve[i] >> bit_index) & 1;
-total_count -= is_bit;
-counter[i >> counter_log2_dist] -= is_bit;
 sieve[i] &= ~(1 << bit_index);
+counter[i >> counter_log2_dist] -= is_bit;
 ```
 
 Now whenever we need to count the number of unsieved elements in the sieve array
