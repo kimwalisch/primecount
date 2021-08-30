@@ -373,9 +373,10 @@ operations by a small amount, but so far I have not yet been able to figure out 
   levels, it is important for performance that on average the same number of count operations is
   executed on each level. However, using the POPCNT instruction dramatically reduces the number
   of count operations on the last level and hence causes a significant imbalance. To fix this
-  imbalance we can multiply all counter level distances by POPCNT_distance^(1/levels). Here is
-  the corresponding [source code](https://github.com/kimwalisch/primecount/blob/v7.1/src/Sieve.cpp#L126)
-  in primecount.
+  imbalance we can multiply the counter distance for each level by
+  POPCNT_distance^(level/levels). In primecount the POPCNT distance is 240, if primecount used 3
+  counter levels we would multiply the counter distance of the 1st level by 240^(1/3) and the
+  counter distance of the 2nd level by 240^(2/3).
 
 ## References
 
