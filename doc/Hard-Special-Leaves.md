@@ -342,9 +342,40 @@ based on Tomás Oliveira e Silva's paper. primecount also uses
 [batch counting](#alternative-counting-method) which further reduces the number of count
 operations by a small amount, but so far I have not yet been able to figure out by how much.
 
-Please note that for practical purposes, there is no need to use more than 2 counter levels,
-[my benchmarks](#multiple-levels-of-counters) indicate that using 2 counter levels (i.e. a
-single counter array) provides the best performance up to at least 10^28.
+## Appendix
+
+* In the original Deléglise-Rivat paper [[2]](#References) its authors indicate that the use
+  of a binary indexed tree deteriorates the sieving part of the hard special leaf algorithm by
+  a factor of O(log z) to O(z * log z * log log z) operations. Tomás Oliveira e Silva in
+  [[4]](#References) rightfully points out that this is incorrect and that it only
+  deteriorates the sieving part of the algorithm by a factor of O(log z / log log z). This is
+  because we don't need to need to perform O(log z) binary indexed tree updates for each
+  elementary sieve operation, of which there are O(z log log z). But instead we only need to
+  perform O(log z) binary indexed tree updates whenever an element is crossed off for the first
+  time in the sieve array. When we sieve up to z, there are at most z elements that can be
+  crossed off for the first time, therefore the runtime complexity of the sieving part of the
+  hard special leaf algorithm with a binary indexed tree is O(z log z) operations.
+  
+  The new alternative algorithm also relies on the above subtlety to improve the runtime
+  complexity. When using multiple counter levels, the related counter arrays should only be
+  updated whenever an element is crossed off for the first time in the sieve array. However,
+  when using a small constant number of counter levels (e.g. ≤ 3) it may be advantages to
+  always update the counter array(s) when an element is crossed off in the sieve array. This
+  reduces the branch mispredictions and can significantly improve performance. See the first
+  code section in [Improved alternative counting method](#improved-alternative-counting-method)
+  for how to implement this.
+  
+* When using a bit sieve array it is advantages to count the number of unsieved elements in the
+  sieve array using the POPCNT instruction. The use of the POPCNT instruction allows counting
+  many unsieved elements (1-bits) using a single instruction. In primecount each POPCNT
+  instruction counts the number of unsieved elements within the next 8 bytes of the sieve array
+  and these 8 bytes correspond to an interval of size 8 * 30 = 240. When using multiple counter
+  levels, it is important for performance that on average the same number of count operations is
+  executed on each level. However, using the POPCNT instruction dramatically reduces the number
+  of count operations on the last level and hence causes a significant imbalance. To fix this
+  imbalance we can multiply all counter level distances by POPCNT_distance^(1/levels). Here is
+  the corresponding [source code](https://github.com/kimwalisch/primecount/blob/v7.1/src/Sieve.cpp#L126)
+  in primecount.
 
 ## References
 
