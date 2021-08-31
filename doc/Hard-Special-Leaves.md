@@ -218,20 +218,17 @@ start with a counter array whose elements span over small intervals and
 then gradually increase the interval size. We can update the counter size and distance
 e.g. at the start of each new segment as the counter needs to be reinitialized at the
 start of each new segment anyway. The ideal counter distance for the next segment is
-```sqrt(average_leaf_distance)```. In practice we can approximate the
-average leaf distance using ```sqrt(segment_low)```. My measurements using primecount
-indicate that gradually increasing the counter distance further improves counting by
-more than a constant factor.
+```sqrt(average_leaf_distance)```. In practice we can approximate the average leaf
+distance using ```sqrt(segment_low)```. My measurements using primecount indicate that
+gradually increasing the counter distance further improves counting by more than a
+constant factor.
 
 ```C++
-// Each element of the counter array contains the current
-// number of unsieved elements in the interval:
-// [i * counter_dist, (i + 1) * counter_dist[.
-// Ideally each element of the counter array should
-// represent an interval of size:
-// min(sqrt(average_leaf_dist), sqrt(segment_size)).
-// Also the counter distance should be regularly adjusted
-// whilst sieving.
+// Ideally each element of the counter array
+// should represent an interval of size:
+// min(sqrt(average_leaf_dist), sqrt(segment_size))
+// Also the counter distance should be regularly
+// adjusted whilst sieving.
 //
 void Sieve::allocate_counter(uint64_t segment_low)
 {
@@ -246,12 +243,6 @@ void Sieve::allocate_counter(uint64_t segment_low)
 ```
 
 ## Multiple levels of counters
-
-When using a single counter array whose elements correspond to intervals of size
-O(segment_size^(1/2)), the worst-case complexity for counting the number of unsieved
-elements for a single special leaf is O(segment_size^(1/2)). This is what is currently
-implemented in primecount (in combination with
-[gradually increasing](#gradually-increase-counter-distance) the counter distance).
 
 It is also possible to use multiple levels of counters. As an example, let's consider
 the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays. We
@@ -283,7 +274,7 @@ uses fewer instructions. It is likely though that using 3 counter levels will us
 instructions for huge input numbers > 10^27 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of 3 counter levels.
 
-Here is an example implementation with multiple counter levels:
+Here is an example implementation of the counting method with multiple counter levels:
 
 ```C++
 /// Count 1 bits inside [0, stop]
