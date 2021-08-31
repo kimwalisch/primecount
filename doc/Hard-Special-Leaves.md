@@ -245,14 +245,17 @@ void Sieve::allocate_counter(uint64_t segment_low)
 ## Multiple levels of counters
 
 It is also possible to use multiple levels of counters. As an example, let's consider
-the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays. We
-only need to use 2 counter arrays because for the last level we will count the number
-of unsieved elements by iterating over the sieve array. Our first counter array (1st
-level) is coarse-grained and its elements span over large intervals of size
-O(segment_size^(2/3)). This means that each element of the first counter array contains
-the current number of unsieved elements in the interval
-[i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array
-(2nd level) is fine-grained and its elements span over smaller intervals of size
+the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays.
+We only need to use 2 counter arrays because for the last level we will count the
+number of unsieved elements by iterating over the sieve array. For each level the size
+of the counter array can be calculated using segment_size^(level/levels) and the
+interval size of the counter array's elements can be calculated using
+segment_size^((levels - level) / levels). Hence our first counter array (1st level) is
+coarse-grained, its elements span over large intervals of size O(segment_size^(2/3)).
+This means that each element of the first counter array contains the current number of
+unsieved elements in the interval
+[i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array (2nd
+level) is more fine-grained, its elements span over smaller intervals of size
 O(segment_size^(1/3)). Hence each element of the second counter array contains the
 current number of unsieved elements in the interval
 [i * segment_size^(1/3), (i + 1) * segment_size^(1/3)[. Now when we need to count the
