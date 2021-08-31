@@ -280,8 +280,48 @@ used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% m
 instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical use,
 using 2 counter levels (i.e. a single counter array) in primecount both runs faster and
 uses fewer instructions. It is likely though that using 3 counter levels will use fewer
-instructions for huge input numbers > 10^28 since the difference of used instructions
+instructions for huge input numbers > 10^27 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of 3 counter levels.
+
+Here is an example implementation with multiple counter levels:
+
+```C++
+/// Count 1 bits inside [0, stop]
+uint64_t Sieve::count(uint64_t stop)
+{
+  uint64_t start = prev_stop_ + 1;
+  prev_stop_ = stop;
+
+  // Each iteration corresponds to one counter level
+  for (size_t i = 0; i < counters_.size(); i++)
+  {
+    // If the counter values of any of the levels
+    // above have been modified we need to update
+    // the counter values of the current level.
+    if (i > 0 && counters_[i].start < counters_[i-1].start)
+    {
+      counters_[i].start = counters_[i-1].start;
+      counters_[i].sum = counters_[i-1].sum;
+      counters_[i].i = counters_[i-1].i << (counters_[i-1].log2_dist - counters_[i].log2_dist);
+    }
+
+    while (counters_[i].start + counters_[i].dist <= stop)
+    {
+      counters_[i].start += counters_[i].dist;
+      counters_[i].sum += counters_[i][counters_[i].i++];
+      start = counters_[i].start;
+      count_ = counters_[i].sum;
+    }
+  }
+
+  // Here the remaining distance is very small i.e.
+  // (stop - start) <= segment_size^(1/levels), hence we
+  // simply count the remaining number of unsieved elements
+  // by linearly iterating over the sieve array.
+  count_ += count(start, stop);
+  return count_;
+}
+```
 
 Even though using more than 2 counter levels does not seem particularly useful from a
 practical point of view, it is very interesting from a theoretical point of view.
