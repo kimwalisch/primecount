@@ -293,13 +293,13 @@ uint64_t Sieve::count(uint64_t stop)
     {
       counters_[i].start = counters_[i-1].start;
       counters_[i].sum = counters_[i-1].sum;
-      counters_[i].i = counters_[i-1].i << (counters_[i-1].log2_dist - counters_[i].log2_dist);
     }
 
     while (counters_[i].start + counters_[i].dist <= stop)
     {
+      uint64_t j = counters_[i].start >> counters_[i].log2_dist;
+      counters_[i].sum += counters_[i][j];
       counters_[i].start += counters_[i].dist;
-      counters_[i].sum += counters_[i][counters_[i].i++];
       start = counters_[i].start;
       count_ = counters_[i].sum;
     }
