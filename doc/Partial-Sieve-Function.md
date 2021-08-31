@@ -28,7 +28,8 @@ Hence now the partial sieve function's performance has become critical for paral
 of the combinatorial prime counting algorithms. This document describes the many
 [known optimizations](#optimizations) that can be used to speed up the phi(x, a) computation and
 it describes a [new optimization](#new-optimization) that I have devised and that has first been
-implemented in primecount.
+implemented in primecount. It's a compressed cache of phi(x, a) results that speeds up most computations
+by more than 10x.
 
 # phi(x, a) in primecount
 
