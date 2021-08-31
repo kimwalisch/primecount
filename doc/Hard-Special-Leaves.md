@@ -284,15 +284,17 @@ Here is an example implementation of the counting method with multiple counter l
 uint64_t Sieve::count(uint64_t stop)
 {
   uint64_t start = prev_stop_ + 1;
+  uint64_t prev_start = start;
   prev_stop_ = stop;
 
   // Each iteration corresponds to one counter level
   for (size_t i = 0; i < counters_.size(); i++)
   {
-    // If the counter values of any of the levels
-    // above have been modified we need to update
-    // the counter values of the current level.
-    if (i > 0 && counters_[i].start < counters_[i-1].start)
+    // If the start number has been increased by any of the
+    // previous levels, then we need to update some values
+    // of the current counter level. This is required to
+    // support resuming from the previous stop number.
+    if (start > prev_start)
     {
       counters_[i].start = counters_[i-1].start;
       counters_[i].sum = counters_[i-1].sum;
