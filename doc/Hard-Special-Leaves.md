@@ -162,7 +162,7 @@ uint64_t Sieve::count(uint64_t stop)
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - value) <= counter_dist.
+  // the stop number i.e. (stop - start) < segment_size^(1/2).
   // We do this using the counter array, each element
   // of the counter array contains the number of
   // unsieved elements in the interval:
@@ -176,7 +176,7 @@ uint64_t Sieve::count(uint64_t stop)
   }
 
   // Here the remaining distance is relatively small i.e.
-  // (stop - start) <= counter_dist, hence we simply
+  // (stop - start) < counter_dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
   count_ += count(start, stop);
@@ -300,6 +300,7 @@ uint64_t Sieve::count(uint64_t stop)
       counters_[i].sum = counters_[i-1].sum;
     }
 
+    // Sum counts until remaining distance < segment_size^((levels - level) / levels)
     while (counters_[i].start + counters_[i].dist <= stop)
     {
       uint64_t j = counters_[i].start >> counters_[i].log2_dist;
@@ -311,7 +312,7 @@ uint64_t Sieve::count(uint64_t stop)
   }
 
   // Here the remaining distance is very small i.e.
-  // (stop - start) <= segment_size^(1/levels), hence we
+  // (stop - start) < segment_size^(1/levels), hence we
   // simply count the remaining number of unsieved elements
   // by linearly iterating over the sieve array.
   count_ += count(start, stop);
