@@ -296,8 +296,8 @@ uint64_t Sieve::count(uint64_t stop)
     // support resuming from the previous stop number.
     if (start > prev_start)
     {
-      counters_[i].start = counters_[i-1].start;
-      counters_[i].sum = counters_[i-1].sum;
+      counters_[i].start = start;
+      counters_[i].sum = count_;
     }
 
     // Sum counts until remaining distance < segment_size^((levels - level) / levels),
