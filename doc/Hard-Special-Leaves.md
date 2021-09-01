@@ -146,7 +146,7 @@ counter[i >> counter_log2_dist] -= is_bit;
 
 Now whenever we need to count the number of unsieved elements in the sieve array
 we can quickly iterate over the new counter array and sum the counts. We do this
-until we are close ≤ O(segment_size^(1/2)) to the limit up to which we need to count.
+until we are close < O(segment_size^(1/2)) to the limit up to which we need to count.
 Once we are close we switch to our old counting method: we simply iterate
 over the sieve array and count the number of unsieved elements using the POPCNT
 instruction. With this modification we improve the runtime complexity for counting
