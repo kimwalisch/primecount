@@ -224,7 +224,7 @@ uint64_t Sieve::count(uint64_t stop)
 
   // Quickly count the number of unsieved elements (in
   // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - value) <= counter_.dist.
+  // the stop number i.e. (stop - start) < counter_.dist.
   // We do this using the counter array, each element
   // of the counter array contains the number of
   // unsieved elements in the interval:
@@ -238,7 +238,7 @@ uint64_t Sieve::count(uint64_t stop)
   }
 
   // Here the remaining distance is relatively small i.e.
-  // (stop - start) <= counter_.dist, hence we simply
+  // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
   count_ += count(start, stop);
