@@ -167,11 +167,11 @@ uint64_t Sieve::count(uint64_t stop)
   // of the counter array contains the number of
   // unsieved elements in the interval:
   // [i * counter_dist, (i + 1) * counter_dist[.
-  while (counter_stop_ <= stop)
+  while (counter_start_ + counter_dist_ <= stop)
   {
-    start = counter_stop_;
-    counter_stop_ += counter_dist_;
     counter_sum_ += counter_[counter_i_++];
+    counter_start_ += counter_dist_;
+    start = counter_start_;
     count_ = counter_sum_;
   }
 
