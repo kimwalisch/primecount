@@ -288,7 +288,7 @@ uint64_t Sieve::count(uint64_t stop)
   prev_stop_ = stop;
 
   // Each iteration corresponds to one counter level
-  for (size_t i = 0; i < counters_.size(); i++)
+  for (Counter& counter : counters_)
   {
     // If the start number has been increased by any of the
     // previous levels, then we need to update some values
@@ -296,19 +296,18 @@ uint64_t Sieve::count(uint64_t stop)
     // support resuming from the previous stop number.
     if (start > prev_start)
     {
-      counters_[i].start = start;
-      counters_[i].sum = count_;
+      counter.start = start;
+      counter.sum = count_;
     }
 
     // Sum counts until remaining distance < segment_size^((levels - level) / levels),
     // this uses at most segment_size^(1/levels) iterations.
-    while (counters_[i].start + counters_[i].dist <= stop)
+    while (counter.start + counter.dist <= stop)
     {
-      uint64_t j = counters_[i].start >> counters_[i].log2_dist;
-      counters_[i].sum += counters_[i][j];
-      counters_[i].start += counters_[i].dist;
-      start = counters_[i].start;
-      count_ = counters_[i].sum;
+      counter.sum += counter[counter.start >> counter.log2_dist];
+      counter.start += counter.dist;
+      start = counter.start;
+      count_ = counter.sum;
     }
   }
 
