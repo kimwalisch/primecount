@@ -290,10 +290,10 @@ uint64_t Sieve::count(uint64_t stop)
   // Each iteration corresponds to one counter level
   for (Counter& counter : counters_)
   {
-    // If the start number has been increased by any of the
-    // previous levels, then we need to update some values
-    // of the current counter level. This is required to
-    // support resuming from the previous stop number.
+    // To support resuming from the previous stop number,
+    // we have to update the current counter level's
+    // values if the start number has been increased
+    // in any of the previous levels.
     if (start > prev_start)
     {
       counter.start = start;
