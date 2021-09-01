@@ -300,7 +300,8 @@ uint64_t Sieve::count(uint64_t stop)
       counters_[i].sum = counters_[i-1].sum;
     }
 
-    // Sum counts until remaining distance < segment_size^((levels - level) / levels)
+    // Sum counts until remaining distance < segment_size^((levels - level) / levels),
+    // this uses at most segment_size^(1/levels) iterations.
     while (counters_[i].start + counters_[i].dist <= stop)
     {
       uint64_t j = counters_[i].start >> counters_[i].log2_dist;
