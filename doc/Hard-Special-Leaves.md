@@ -335,8 +335,8 @@ algorithm? See the [runtime complexity](#Runtime-complexity) section for more de
 
 Whenever we have removed the i-th prime and its multiples from the sieve array in the hard
 special leaf algorithm, we proceed to the counting part of the algorithm. For each hard leaf
-that is composed of two distinct primes > i-th prime and that is located within the current
-segment we have to count the number of unsieved elements (in the sieve array) ≤ leaf. When
+that is composed of the (i+1)-th prime and another larger prime and that is located within the
+current segment we have to count the number of unsieved elements (in the sieve array) ≤ leaf. When
 [iterating over these hard leaves](https://github.com/kimwalisch/primecount/blob/v7.1/src/lmo/pi_lmo3.cpp#L84)
 their locations in the sieve array steadily increase. This property can be exploited, i.e.
 instead of counting the number of unsieved elements from the beginning of the sieve array for
