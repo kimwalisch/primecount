@@ -217,8 +217,9 @@ e.g. at the start of each new segment as the counter needs to be reinitialized a
 start of each new segment anyway. The ideal counter distance for the next segment is
 ```sqrt(average_leaf_distance)```. In practice we can approximate the average leaf
 distance using ```sqrt(segment_low)```. My measurements using primecount indicate that
-gradually increasing the counter distance further improves counting by more than a
-constant factor.
+gradually increasing the counter distance further improves counting by a small factor.
+This optimization is primarily useful when using a very small number of counter levels
+e.g. 2.
 
 ```C++
 // Ideally each element of the counter array
