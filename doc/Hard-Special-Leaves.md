@@ -82,12 +82,10 @@ There are many known optimizations that can be used to speedup counting:
   currently in the sieve array as the total number of unsieved elements is
   [used frequently](https://github.com/kimwalisch/primecount/blob/v5.3/src/lmo/pi_lmo5.cpp#L107)
   (once per sieving prime in each segment).
-* We can 
-  [batch count the number of unsieved elements](https://github.com/kimwalisch/primecount/blob/v5.3/src/lmo/pi_lmo2.cpp#L65)
-  in the sieve array for many
-  consecutive leaves i.e. instead of starting to count from the beginning of
-  the sieve array for each leaf we resume counting from the last sieve index of
-  the previous leaf.
+* We can [batch count](#Batch-counting) the number of unsieved elements in the
+  sieve array for many consecutive leaves i.e. instead of starting to count from
+  the beginning of the sieve array for each leaf we resume counting from the last
+  sieve index of the previous leaf.
 
 This alternative method with the 3 optimizations described above was used in
 primecount up to version 5.3 (January 2020). According to my own benchmarks
@@ -191,7 +189,7 @@ the alternative counting method had a runtime complexity of about O(number of
 special leaves * segment_size^(1/2)) since counting the number of unsieved elements
 for a single leaf is O(segment_size^(1/2)). However when I measured the average
 number of count operations per leaf the number was much lower than expected. It turns
-out that [batch counting](#alternative-counting-method) the number of unsieved
+out that [batch counting](#Batch-counting) the number of unsieved
 elements for many consecutive leaves improves the runtime complexity by more than a
 constant factor. See the [runtime complexity](#Runtime-complexity) section for more
 details. When I implemented the above alternative counting method in primecount it
@@ -375,9 +373,37 @@ the algorithm, here we could use only O(log log z) levels of counters which woul
 runtime complexity of the algorithm to O(z log log z) operations. However, in primecount the
 number of hard special leaves is more in line with Tomás Oliveira e Silva's paper, which
 makes sense considering that primecount's implementation of the Deléglise-Rivat algorithm is
-based on Tomás Oliveira e Silva's paper. primecount also uses
-[batch counting](#alternative-counting-method) which further reduces the number of count
-operations by a small amount, but so far I have not yet been able to figure out by how much.
+based on Tomás Oliveira e Silva's paper.
+
+## Batch counting
+
+Whenever we have removed the i-th prime and its multiples from the sieve array in the hard
+special leaf algorithm, we proceed to the counting part of the algorithm. For each hard leaf
+that is composed of two distinct primes > i-th prime and that is located within the current
+segment we have to count the number of unsieved elements (in the sieve array) ≤ leaf. When
+[iterating over these hard leaves](https://github.com/kimwalisch/primecount/blob/v7.1/src/lmo/pi_lmo3.cpp#L84)
+their locations in the sieve array steadily increase. This property can be exploited, i.e.
+instead of counting the number of unsieved elements from the beginning of the sieve array for
+each leaf, we resume counting from the last sieve array index of the previous hard leaf. I
+call this technique batch counting as we count the number of unsieved elements for many
+consecutive leaves by iterating over the sieve array only once.
+
+Nowadays, most open source implementations of the combinatorial prime counting algorithms
+use batch counting, the earliest implementation that used batch counting that I am aware of
+is from [Christian Bau](http://cs.swan.ac.uk/~csoliver/ok-sat-library/OKplatform/ExternalSources/sources/NumberTheory/ChristianBau/)
+and dates back to 2003. But so far there have been no publications that analyse its runtime
+complexity implications and I have also not been able to figure out by how much it improves
+the runtime complexity of the hard special leaf algorithm. The alternative counting methods
+that are presented in this document have batch counting built in. When I turn off batch
+counting in primecount its performance deteriorates by more than 20x when computing the hard
+special leaves ≤ 10^17. So it is clear that batch counting is hugely important for performance.
+It is likely that the use of batch counting allows to use even fewer levels of counters
+and thereby further improves the runtime complexity of the hard special leaf algorithm. I have
+run extensive benchmarks up 10^26 using primecount and I found that in practice using only
+two counter levels provides the best performance. So my benchmarks seem to confirm that it is
+possible to use fewer than O(log z / log log x) levels of counters using batch counting,
+though I assume that using a constant number of counter levels deteriorates the runtime
+complexity of the algorithm.
 
 ## Appendix
 
