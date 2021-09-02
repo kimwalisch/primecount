@@ -274,7 +274,8 @@ uses fewer instructions. It is likely though that using 3 counter levels will us
 instructions for huge input numbers > 10^27 since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of 3 counter levels.
 
-Here is an example implementation of the counting method with multiple counter levels:
+Here is an example implementation of the counting method which supports multiple counter
+levels:
 
 ```C++
 /// Count 1 bits inside [0, stop]
