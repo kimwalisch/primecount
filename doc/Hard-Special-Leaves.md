@@ -191,10 +191,9 @@ for a single leaf is O(segment_size^(1/2)). However when I measured the average
 number of count operations per leaf the number was much lower than expected. It turns
 out that [batch counting](#Batch-counting) the number of unsieved
 elements for many consecutive leaves improves the runtime complexity by more than a
-constant factor. See the [runtime complexity](#Runtime-complexity) section for more
-details. When I implemented the above alternative counting method in primecount it
-completely fixed the severe scaling issue in the computation of the special leaves
-that had been present in primecount since the very beginning.
+constant factor. When I implemented the above alternative counting method in
+primecount it completely fixed the severe scaling issue in the computation of the
+special leaves that had been present in primecount since the very beginning.
 Below 10^20 there are no performance improvements, however above 10^20, the higher
 you go the more efficient the new method becomes compared to primecount's old
 implementation. At 10^25 the new method is already 2x faster. Note that the new
