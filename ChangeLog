@@ -1,4 +1,4 @@
-Changes in primecount-7.2, 2021-08-28
+Changes in primecount-7.2, 2021-09-02
 
 I have been able to prove that primecount's hard special leaf
 algorithm has a runtime complexity of only O(z log z / log log x)
@@ -8,9 +8,8 @@ special leaf algorithm is lower by a factor of O(log log x) compared
 to the hard special leaf algorithms from the Deléglise-Rivat and
 Gourdon papers.
 
-* Hard-Special-Leaves.md: Added new "Multiple levels of counters"
-  and "Runtime complexity" sections with a detailed analysis
-  of primecount's hard special leaf algorithm.
+* Hard-Special-Leaves.md: Many new paragraphs: "Multiple levels of
+  counters", "Batch counting", "Runtime complexity" and "Appendix".
 * Sieve.hpp: Add Counter struct.
 * Sieve.cpp: Use new Counter struct.
 
