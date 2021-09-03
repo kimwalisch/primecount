@@ -351,7 +351,7 @@ is from [Christian Bau](http://cs.swan.ac.uk/~csoliver/ok-sat-library/OKplatform
 and dates back to 2003. But so far there have been no publications that analyse its runtime
 complexity implications and I have also not been able to figure out by how much it improves
 the runtime complexity of the hard special leaf algorithm. The alternative counting methods
-that are presented in this document have batch counting built in. When I turn off batch
+that are presented in this document have batch counting built-in. When I turn off batch
 counting in primecount its performance deteriorates by more than 20x when computing the hard
 special leaves ≤ 10^17. So it is clear that batch counting is hugely important for performance.
 It is likely that the use of batch counting allows to use even fewer counter levels
@@ -406,6 +406,26 @@ runtime complexity of the algorithm to O(z log log z) operations. However, in pr
 number of hard special leaves is more in line with Tomás Oliveira e Silva's paper, which
 makes sense considering that primecount's implementation of the Deléglise-Rivat algorithm is
 based on Tomás Oliveira e Silva's paper.
+
+## Open questions
+
+The alternative counting methods presented in this document have batch counting built-in, but
+as mentioned in the [Batch counting](#Batch-counting) paragraph I don't know whether the use
+of batch counting allows using fewer than O(log z / log log x) counter levels and thereby
+improve the runtime complexity of the hard special leaf algorithm. Ideally, we want to use
+only O(log log z) counter levels in which case the runtime complexity of the hard special
+leaf algorithm would be O(z log log z) operations, provided that the use of O(log log z)
+counter levels does not deteriorate the runtime complexity of the algorithm.
+
+There is one last trick that I am aware of that would likely further improve the runtime
+complexity of the hard special leaf algorithm: The distribution of the hard special leaves is
+highly skewed, most leaves are located at the beginning of the sieving algorithm and as we
+sieve up the leaves become sparser and the distance between consecutive leaves increases. In
+the [Runtime complexity](#Runtime-complexity) paragraph I have suggested using a fixed number
+of counter levels for the entire algorithm. But this is not ideal, we can further improve the
+balancing of sieve and count operations by adjusting the number of counter levels for each
+segment. However, I don't know how to calculate the optimal number of counter levels for the
+individual segments and I also don't know how much this would improve the runtime complexity.
 
 ## Appendix
 
