@@ -418,7 +418,7 @@ leaf algorithm would be O(z log log z) operations, provided that the use of O(lo
 counter levels does not deteriorate the runtime complexity of the algorithm.
 
 There is one last trick that I am aware of that would likely further improve the runtime
-complexity of the hard special leaf algorithm: The distribution of the hard special leaves is
+complexity of the hard special leaf algorithm: the distribution of the hard special leaves is
 highly skewed, most leaves are located at the beginning of the sieving algorithm and as we
 sieve up the leaves become sparser and the distance between consecutive leaves increases. In
 the [Runtime complexity](#Runtime-complexity) paragraph I have suggested using a fixed number
