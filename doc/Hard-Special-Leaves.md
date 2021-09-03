@@ -354,7 +354,7 @@ the runtime complexity of the hard special leaf algorithm. The alternative count
 that are presented in this document have batch counting built-in. When I turn off batch
 counting in primecount its performance deteriorates by more than 20x when computing the hard
 special leaves ≤ 10^17. So it is clear that batch counting is hugely important for performance.
-It is likely that the use of batch counting allows to use even fewer counter levels
+It is likely that the use of batch counting enables using even fewer counter levels
 and thereby further improves the runtime complexity of the hard special leaf algorithm. I have
 run extensive benchmarks up 10^26 using primecount and I found that in practice using only
 two counter levels provides the best performance. So my benchmarks seem to confirm that it is
