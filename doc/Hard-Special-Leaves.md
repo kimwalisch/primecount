@@ -422,8 +422,8 @@ complexity of the hard special leaf algorithm: the distribution of the hard spec
 highly skewed, most leaves are located at the beginning of the sieving algorithm and as we
 sieve up the leaves become sparser and the distance between consecutive leaves increases. In
 the [Runtime complexity](#Runtime-complexity) paragraph I have suggested using a fixed number
-of counter levels for the entire algorithm. But this is not ideal, we can further improve the
-balancing of sieve and count operations by adjusting the number of counter levels for each
+of counter levels for the entire computation. But this is not ideal, we can further improve
+the balancing of sieve and count operations by adjusting the number of counter levels for each
 segment. However, I don't know how to calculate the optimal number of counter levels for the
 individual segments and I also don't know how much this would improve the runtime complexity.
 
