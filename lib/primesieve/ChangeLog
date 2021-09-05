@@ -1,3 +1,19 @@
+Changes in version 7.7, 05/09/2021
+==================================
+
+The behavior of the -q/--quiet option has been modified. Before it
+printed e.g. "Primes: 1229", while with the new behavior the
+"Primes:" label will not be printed anymore. Hence the new output
+will be "1229". This is a backwards incompatible change, however I
+won't increase primesieve's major version since this change does not
+affect primesieve's API/ABI.
+
+* main.cpp: Improve -q/--quiet option #102.
+* api.cpp: Simplify private L2 cache size detection #103.
+* doc/primesieve.1: Update man page.
+* help.cpp: Update documentation of --size option.
+* README.md: Update documentation of --size option.
+
 Changes in version 7.6, 18/12/2020
 ==================================
 
