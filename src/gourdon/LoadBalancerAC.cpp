@@ -25,7 +25,7 @@
 
 namespace {
 
-// CPU L2 cache sizes per core
+// CPU L2 cache size per core
 const int64_t l2_cache_size = 512 << 10;
 const int64_t numbers_per_byte = primecount::SegmentedPiTable::numbers_per_byte();
 const int64_t l2_segment_size = l2_cache_size * numbers_per_byte;
