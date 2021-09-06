@@ -55,8 +55,8 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   // a sieve array size that matches your CPU's L1
   // data cache size (per core) or that is slightly
   // larger than your L1 cache size but smaller than
-  // your L2 cache size (per core). Also, the sieve
-  // array size must be >= sqrt(sieve_limit).
+  // your L2 cache size (per core). Also, the
+  // segment_size must be >= sqrt(sieve_limit).
   int64_t sieve_bytes = 128 << 10;
   int64_t numbers_per_byte = 30;
   int64_t sqrt_limit = isqrt(sieve_limit);
