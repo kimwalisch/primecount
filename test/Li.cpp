@@ -3,7 +3,7 @@
 /// @brief  Test the offset logarithmic integral function.
 ///         Li(x) = li(x) - li(2)
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -67,7 +67,7 @@ int main()
   }
 
   // Sanity checks for small values of Li(x)
-  for (int64_t x = 0; x < 1000000; x++)
+  for (int64_t x = 0; x < 300000; x++)
   {
     int64_t lix = Li(x);
     double logx = log(max((double) x, 2.0));
@@ -82,7 +82,7 @@ int main()
   }
 
   // Sanity checks for small values of Li_inverse(x)
-  for (int64_t x = 2; x < 100000; x++)
+  for (int64_t x = 2; x < 30000; x++)
   {
     int64_t res = Li_inverse(x);
     double logx = log((double) x);
