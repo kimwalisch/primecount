@@ -1,4 +1,4 @@
-Changes in primecount-7.2, 2021-09-05
+Changes in primecount-7.2, 2021-09-06
 
 I have been able to prove that primecount's hard special leaf
 algorithm has a runtime complexity of only O(z log z / log log x)
@@ -12,6 +12,7 @@ Gourdon papers.
   counters", "Batch counting", "Runtime complexity" and "Appendix".
 * Sieve.hpp: Add Counter struct.
 * Sieve.cpp: Use new Counter struct.
+* LoadBalancerS2.cpp: Increase default sieve array size to 128 KiB.
 * Updated to libprimesieve-7.7 (improved CPU cache size detection).
 
 Changes in primecount-7.1, 2021-08-13
