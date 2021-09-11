@@ -11,6 +11,7 @@
 ///
 
 #include <primesieve.hpp>
+#include <primesieve/config.hpp>
 #include <primesieve/CpuInfo.hpp>
 #include <primesieve/pmath.hpp>
 #include <primesieve/PrimeSieve.hpp>
@@ -150,21 +151,18 @@ int get_sieve_size()
   if (sieve_size)
     return sieve_size;
 
-  // The CPU cache hierarchy has become very complex and hence
-  // accurately detecting the private L2 cache size has become
-  // very difficult. The problem is that there are now big.LITTLE
-  // CPUs and that L2 caches can now be private and shared at the
-  // same time e.g. in the IBM Telum CPU from 2021. Therefore, we
-  // don't want to use a sieve size that matches the CPU's L2
-  // cache size, instead we use a sieve size that is 8x larger
-  // than the L1 cache size. But if the L1 cache is very large
-  // e.g. >= 512 KiB then we don't need the L2 cache and use a
-  // sieve size that matches the L1 cache size.
+  // The CPU cache hierarchy has become very complex and
+  // hence accurately detecting the private L2 cache size has
+  // become very difficult. The problem is that there are now
+  // big.LITTLE CPUs and that L2 caches can now be private and
+  // shared at the same time e.g. in the IBM Telum CPU from
+  // 2021. Therefore, we don't want to use a sieve size that
+  // matches the CPU's L2 cache size, instead we use a sieve
+  // size that is 8x larger than the L1 cache size.
   // https://github.com/kimwalisch/primesieve/issues/103
   // https://github.com/kimwalisch/primesieve/issues/96
   if (cpuInfo.hasL1Cache() &&
-      cpuInfo.hasL2Cache() &&
-      cpuInfo.l1CacheSize() < (512 << 10))
+      cpuInfo.hasL2Cache())
   {
     // Convert bytes to KiB
     size_t l1Size = cpuInfo.l1CacheSize() >> 10;
@@ -193,7 +191,7 @@ int get_sieve_size()
   else
   {
     // Default sieve size in KiB
-    size_t size = 32;
+    size_t size = config::SIEVE_BYTES >> 10;
     size = inBetween(8, size, 4096);
     size = floorPow2(size);
     return (int) size;
