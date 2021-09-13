@@ -7,10 +7,25 @@ best fits your needs. The C API has been added to make it easier to write
 libprimecount bindings for other programming languages.
 
 primecount's prime counting function implementation and nth prime function are
-currently (March 2018) orders of magnitude faster than e.g. Mathematica, PARI/GP,
-SageMath and SymPy. libprimecount is also very portable, it has been tested
-successfully on a wide range of operating systems, compilers (GCC, Clang, MSVC)
-and CPU architectures (x86, x64, ARM, ARM64, PowerPC, PP64, Sparc).
+generally orders of magnitude faster than other publicly available prime counting
+function implementations. As of 2021 libprimecount is the only prime counting
+function library that I am aware of that supports multi-threading. libprimecount
+is also very portable, it has been tested successfully on a wide range of
+operating systems, compilers (GCC, Clang, MSVC) and CPU architectures (x86, x64,
+ARM, ARM64, PowerPC, PP64, Sparc).
+
+libprimecount has been integerated into a few other computer algebra systems:
+Since 2021
+[Mathematica's PrimePi(x)](https://reference.wolfram.com/language/ref/PrimePi.html)
+uses libprimecount under the hood, primecount is available as an
+optional package in
+[SageMath](https://doc.sagemath.org/html/en/reference/spkg/primecount.html) and
+there are bindings available for a few
+[other programming languages](https://github.com/kimwalisch/primecount#bindings-for-other-languages).
+If libprimecount is useful to your company, please consider
+[sponsoring](https://github.com/sponsors/kimwalisch) the project. It personally
+cost me a lot of money to develop it due to the need of running extensive
+benchmarks on a wide range of high end servers.
 
 # C example
 
