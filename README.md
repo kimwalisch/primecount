@@ -411,7 +411,7 @@ int main()
 }
 ```
 
-* [C API reference](doc/libprimecount.md#libprimecount)
+* [C API documentation](doc/libprimecount.md#libprimecount)
 * [libprimecount build instructions](doc/libprimecount.md#build-instructions)
 
 ## C++ API
@@ -434,7 +434,7 @@ int main()
 }
 ```
 
-* [C++ API reference](doc/libprimecount.md#libprimecount)
+* [C++ API documentation](doc/libprimecount.md#libprimecount)
 * [libprimecount build instructions](doc/libprimecount.md#build-instructions)
 
 ## Bindings for other languages
