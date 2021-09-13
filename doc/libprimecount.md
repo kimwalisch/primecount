@@ -14,7 +14,7 @@ is also very portable, it has been tested successfully on a wide range of
 operating systems, compilers (GCC, Clang, MSVC) and CPU architectures (x86, x64,
 ARM, ARM64, PowerPC, PP64, Sparc).
 
-libprimecount has been integerated into a few other computer algebra systems:
+libprimecount has been integrated into a few other computer algebra systems:
 Since 2021
 [Mathematica's PrimePi(x)](https://reference.wolfram.com/language/ref/PrimePi.html)
 uses libprimecount under the hood, primecount is available as an
