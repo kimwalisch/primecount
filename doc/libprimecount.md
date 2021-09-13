@@ -113,7 +113,7 @@ for more information.
 
 # Build instructions
 
-You need to have installed a C++ compiler, cmake and make.
+You need to have [installed](BUILD.md#prerequisites) a C++ compiler, cmake and make.
 
 ```sh
 cmake . -DBUILD_SHARED_LIBS=ON
@@ -157,5 +157,4 @@ option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
 option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
 option(WITH_LIBDIVIDE      "Use libdivide.h"                       ON)
 option(WITH_FLOAT128       "Use __float128 (requires libquadmath)" OFF)
-option(WITH_MPI            "Enable MPI support"                    OFF)
 ```
