@@ -25,7 +25,7 @@ there are bindings available for a few
 If libprimecount is useful to your company, please consider
 [sponsoring](https://github.com/sponsors/kimwalisch) the project. The
 development of primecount has personally cost me a lot of money due to the need
-of running extensive benchmarks on a wide range of high end servers. 
+of frequently running extensive benchmarks on high end servers. 
 
 # C example
 
