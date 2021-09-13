@@ -23,9 +23,9 @@ optional package in
 there are bindings available for a few
 [other programming languages](https://github.com/kimwalisch/primecount#bindings-for-other-languages).
 If libprimecount is useful to your company, please consider
-[sponsoring](https://github.com/sponsors/kimwalisch) the project. It personally
-cost me a lot of money to develop it due to the need of running extensive
-benchmarks on a wide range of high end servers.
+[sponsoring](https://github.com/sponsors/kimwalisch) the project. The
+development of primecount has personally cost me a lot of money due to the need
+of running extensive benchmarks on a wide range of high end servers. 
 
 # C example
 
