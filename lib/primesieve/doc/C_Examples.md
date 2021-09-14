@@ -6,7 +6,7 @@ useful feature provided by libprimesieve is the ```primesieve_iterator``` which 
 iterate over primes using the ```primesieve_next_prime()``` or ```primesieve_prev_prime()```
 functions.
 
-For in-depth documentation please refer to the [C API documentation](https://primesieve.org/api).
+For in-depth documentation please refer to the [C API Reference](https://kimwalisch.github.io/primesieve/api).
 
 ## ```primesieve_next_prime()```
 
@@ -32,6 +32,8 @@ int main()
   return 0;
 }
 ```
+
+* [Build instructions](#how-to-compile)
 
 ## ```primesieve_skipto()```
 
@@ -62,6 +64,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve_prev_prime()```
 
 Before using ```primesieve_prev_prime()``` you must first change the start
@@ -89,6 +93,8 @@ int main()
   return 0;
 }
 ```
+
+* [Build instructions](#how-to-compile)
 
 ## ```primesieve_generate_primes()```
 
@@ -119,6 +125,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve_generate_n_primes()```
 
 Stores n primes in an array.
@@ -145,6 +153,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve_count_primes()```
 
 Counts the primes inside [start, stop]. This method is multi-threaded and uses all
@@ -164,6 +174,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve_nth_prime()```
 
 This method finds the nth prime e.g. ```nth_prime(25) = 97```. This method is
@@ -176,17 +188,80 @@ multi-threaded and uses all available CPU cores by default.
 int main(int argc, char** argv)
 {
   /* primesieve_nth_prime(n, start) */
-  uint64_t prime = primesieve_nth_prime(25, 0);
+  uint64_t n = 25;
+  uint64_t prime = primesieve_nth_prime(n, 0);
   printf("%" PRIu64 "th prime = %" PRIu64 "\n", n, prime);
 
   return 0;
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 # How to compile
 
-You can compile any of the C example programs above using:
+On Unix-like OSes if [libprimesieve is installed](BUILD.md#primesieve-build-instructions) on
+your system, then you can compile any of the C example programs above using:
 
-```C
+```bash
 cc -O2 primes.c -o primes -lprimesieve
+```
+
+Using the MSVC compiler (Windows):
+
+```bash
+cl /O2 /MD primes.c /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
+```
+
+# CMake support
+
+If you are using the CMake build system to compile your program and libprimesieve has been
+[installed](BUILD.md#primesieve-build-instructions) on your system, then you can add the
+following two lines to your ```CMakeLists.txt``` to link your program against libprimesieve.
+
+```CMake
+find_package(primesieve REQUIRED)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
+To link against the static libprimesieve use:
+
+```CMake
+find_package(primesieve REQUIRED static)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
+# Minimal CMake project file
+
+If you wish to build your C program (named ```primes.c```) using CMake, then you can use
+the minimal ```CMakeLists.txt``` below. Note that this requires that libprimesieve has been
+[installed](BUILD.md#primesieve-build-instructions) on your system. Using CMake has the
+advantage that you don't need to specify the libprimesieve include path and the
+```-lprimesieve``` linker option when building your project.
+
+```CMake
+# File: CMakeLists.txt
+cmake_minimum_required(VERSION 3.4...3.19)
+project(primes C CXX)
+find_package(primesieve REQUIRED)
+add_executable(primes primes.c)
+target_link_libraries(primes primesieve::primesieve)
+```
+
+Put the ```CMakeLists.txt``` file from above into the same directory as your ```primes.c``` file.<br/>
+Then open a terminal, cd into that directory and build your project using:
+
+```
+cmake . -DCMAKE_BUILD_TYPE=Release
+cmake --build .
+```
+
+Using the MSVC compiler (Windows) the build instructions are slightly different. First you should link
+against the static libprimesieve in your ```CMakeLists.txt``` using:
+```find_package(primesieve REQUIRED static)```. Next open a Visual Studio Command Prompt, cd into your
+project's directory and build your project using:
+
+```
+cmake -G "Visual Studio 16 2019" .
+cmake --build . --config Release
 ```

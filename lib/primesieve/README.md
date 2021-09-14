@@ -149,7 +149,7 @@ int main()
 ```
 
 * [More C++ examples](doc/CPP_Examples.md)
-* [C++ API documentation](https://primesieve.org/api)
+* [C++ API documentation](https://kimwalisch.github.io/primesieve/api)
 
 ## C API
 
@@ -175,7 +175,7 @@ int main()
 ```
 
 * [More C examples](doc/C_Examples.md)
-* [C API documentation](https://primesieve.org/api)
+* [C API documentation](https://kimwalisch.github.io/primesieve/api)
 
 ## libprimesieve performance tips
 
@@ -259,7 +259,7 @@ int main()
 
 ```bash
 # Unix-like OSes
-wget https://primesieve.org/primesum.cpp
+wget https://kimwalisch.github.io/primesieve/primesum.cpp
 c++ -O3 -fopenmp primesum.cpp -o primesum -lprimesieve
 time ./primesum
 ```
@@ -289,7 +289,7 @@ export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 #### Microsoft Visual C++
 
 ```sh
-cl /O2 /EHsc primes.cpp /I primesieve\include /link primesieve.lib
+cl /O2 /MD /EHsc primes.cpp /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
 ```
 
 ## CMake support

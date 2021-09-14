@@ -5,7 +5,7 @@ These examples cover the most frequently used functionality of libprimesieve. Ar
 useful feature provided by libprimesieve is the ```primesieve::iterator``` which lets you
 iterate over primes using the ```next_prime()``` or ```prev_prime()``` methods.
 
-For in-depth documentation please refer to the [C++ API documentation](https://primesieve.org/api).
+For in-depth documentation please refer to the [C++ API Reference](https://kimwalisch.github.io/primesieve/api).
 
 ## ```primesieve::iterator::next_prime()```
 
@@ -30,6 +30,8 @@ int main()
   return 0;
 }
 ```
+
+* [Build instructions](#how-to-compile)
 
 ## ```primesieve::iterator::skipto()```
 
@@ -57,8 +59,10 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 The ```primesieve::iterator::skipto()``` method (and the ```primesieve::iterator```
-constructor) take an optional **stop_hint** parameter for performance optimization.
+constructor) take an optional ```stop_hint``` parameter for performance optimization.
 If ```stop_hint``` is set ```primesieve::iterator``` will only buffer primes up to
 this limit.
 
@@ -81,6 +85,8 @@ int main()
   return 0;
 }
 ```
+
+* [Build instructions](#how-to-compile)
 
 ## ```primesieve::iterator::prev_prime()```
 
@@ -105,6 +111,8 @@ int main()
   return 0;
 }
 ```
+
+* [Build instructions](#how-to-compile)
 
 ## ```primesieve::generate_primes()```
 
@@ -132,6 +140,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve::generate_n_primes()```
 
 Stores n primes in a ```std::vector```.
@@ -156,6 +166,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve::count_primes()```
 
 Counts the primes inside [start, stop]. This method is multi-threaded and uses all
@@ -174,6 +186,8 @@ int main()
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 ## ```primesieve::nth_prime()```
 
 This method finds the nth prime e.g. ```nth_prime(25) = 97```. This method is
@@ -185,17 +199,80 @@ multi-threaded and uses all available CPU cores by default.
 
 int main()
 {
-  uint64_t nth_prime = primesieve::nth_prime(25);
+  uint64_t n = 25;
+  uint64_t nth_prime = primesieve::nth_prime(n);
   std::cout << n << "th prime = " << nth_prime << std::endl;
 
   return 0;
 }
 ```
 
+* [Build instructions](#how-to-compile)
+
 # How to compile
 
-You can compile any of the C++ example programs above using:
+On Unix-like OSes if [libprimesieve is installed](BUILD.md#primesieve-build-instructions) on
+your system, then you can compile any of the C++ example programs above using:
 
 ```C
 c++ -O2 primes.cpp -o primes -lprimesieve
+```
+
+Using the MSVC compiler (Windows):
+
+```bash
+cl /O2 /MD /EHsc primes.cpp /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
+```
+
+# CMake support
+
+If you are using the CMake build system to compile your program and libprimesieve has been
+[installed](BUILD.md#primesieve-build-instructions) on your system, then you can add the
+following two lines to your ```CMakeLists.txt``` to link your program against libprimesieve.
+
+```CMake
+find_package(primesieve REQUIRED)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
+To link against the static libprimesieve use:
+
+```CMake
+find_package(primesieve REQUIRED static)
+target_link_libraries(your_target primesieve::primesieve)
+```
+
+# Minimal CMake project file
+
+If you wish to build your C++ program (named ```primes.cpp```) using CMake, then you can use
+the minimal ```CMakeLists.txt``` below. Note that this requires that libprimesieve has been
+[installed](BUILD.md#primesieve-build-instructions) on your system. Using CMake has the
+advantage that you don't need to specify the libprimesieve include path and the
+```-lprimesieve``` linker option when building your project.
+
+```CMake
+# File: CMakeLists.txt
+cmake_minimum_required(VERSION 3.4...3.19)
+project(primes CXX)
+find_package(primesieve REQUIRED)
+add_executable(primes primes.cpp)
+target_link_libraries(primes primesieve::primesieve)
+```
+
+Put the ```CMakeLists.txt``` file from above into the same directory as your ```primes.cpp``` file.<br/>
+Then open a terminal, cd into that directory and build your project using:
+
+```
+cmake . -DCMAKE_BUILD_TYPE=Release
+cmake --build .
+```
+
+Using the MSVC compiler (Windows) the build instructions are slightly different. First you should link
+against the static libprimesieve in your ```CMakeLists.txt``` using:
+```find_package(primesieve REQUIRED static)```. Next open a Visual Studio Command Prompt, cd into your
+project's directory and build your project using:
+
+```
+cmake -G "Visual Studio 16 2019" .
+cmake --build . --config Release
 ```
