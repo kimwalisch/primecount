@@ -21,6 +21,10 @@ option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath)" OFF)
 option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
 
+# libprimecount sanity checks ########################################
+
+# We don't yet support building libprimecount as a shared DLL
+# library on Windows. If you need this let me know...
 if(WIN32)
     set(BUILD_SHARED_LIBS OFF)
 endif()
