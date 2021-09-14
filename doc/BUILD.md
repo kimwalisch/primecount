@@ -98,6 +98,7 @@ option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
 option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
 option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
+option(MSVC_CRT_STATIC     "Link primecount.lib with /MT instead of the default /MD" OFF)
 
 option(WITH_POPCNT         "Use the POPCNT instruction"            ON)
 option(WITH_OPENMP         "Enable OpenMP multi-threading"         ON)
