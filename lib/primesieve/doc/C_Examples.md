@@ -200,44 +200,58 @@ int main(int argc, char** argv)
 
 # How to compile
 
-On Unix-like OSes if [libprimesieve is installed](BUILD.md#primesieve-build-instructions) on
-your system, then you can compile any of the C example programs above using:
+### Unix-like OSes
 
-```bash
-cc -O2 primes.c -o primes -lprimesieve
+If [libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation)
+on your system, then you can compile any of the C example programs above using:
+
+```sh
+cc -O3 primes.c -o primes -lprimesieve
 ```
 
-Using the MSVC compiler (Windows):
+If you have [built libprimesieve yourself](BUILD.md#primesieve-build-instructions)
+then the default installation path is usually ```/usr/local/lib``` which is not
+part of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
+environment variables:
 
-```bash
-cl /O2 /MD primes.c /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
+```sh
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
+```
+
+### Microsoft Visual C++
+
+```sh
+cl /O2 /EHsc /MD primes.c /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
 ```
 
 # CMake support
 
-If you are using the CMake build system to compile your program and libprimesieve has been
-[installed](BUILD.md#primesieve-build-instructions) on your system, then you can add the
-following two lines to your ```CMakeLists.txt``` to link your program against libprimesieve.
+If you are using the CMake build system to compile your program and
+[libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation) on your
+system, then you can add the following two lines to your ```CMakeLists.txt``` to link your
+program against libprimesieve.
 
 ```CMake
 find_package(primesieve REQUIRED)
-target_link_libraries(your_target primesieve::primesieve)
+target_link_libraries(your_program primesieve::primesieve)
 ```
 
 To link against the static libprimesieve use:
 
 ```CMake
 find_package(primesieve REQUIRED static)
-target_link_libraries(your_target primesieve::primesieve)
+target_link_libraries(your_program primesieve::primesieve)
 ```
 
 # Minimal CMake project file
 
 If you wish to build your C program (named ```primes.c```) using CMake, then you can use
-the minimal ```CMakeLists.txt``` below. Note that this requires that libprimesieve has been
-[installed](BUILD.md#primesieve-build-instructions) on your system. Using CMake has the
-advantage that you don't need to specify the libprimesieve include path and the
-```-lprimesieve``` linker option when building your project.
+the minimal ```CMakeLists.txt``` below. Note that this requires that
+[libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation) on your
+CMake has the advantage that you don't need to specify the libprimesieve include path and
+the ```-lprimesieve``` linker option when building your project.
 
 ```CMake
 # File: CMakeLists.txt

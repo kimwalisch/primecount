@@ -271,13 +271,15 @@ time ./primesum
 #### Unix-like OSes
 
 ```sh
-c++ -O2 primes.cpp -lprimesieve
-cc  -O2 primes.c   -lprimesieve
+c++ -O3 primes.cpp -lprimesieve
+cc  -O3 primes.c   -lprimesieve
 ```
 
-If you have built primesieve yourself then the default installation path is 
-```/usr/local/lib``` which is not part of ```LD_LIBRARY_PATH``` on many OSes.
-Hence you may need to export some environment variables:
+If you have
+[built libprimesieve yourself](doc/BUILD.md#primesieve-build-instructions) then
+the default installation path is usually ```/usr/local/lib``` which is not part
+of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
+environment variables:
 
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
@@ -289,24 +291,26 @@ export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 #### Microsoft Visual C++
 
 ```sh
-cl /O2 /MD /EHsc primes.cpp /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
+cl /O2 /EHsc /MD primes.cpp /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
 ```
 
 ## CMake support
 
-Since primesieve-6.4 you can easily link against libprimesieve in your
-```CMakeLists.txt```:
+If you are using the CMake build system to compile your program and
+[libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation) on your
+system, then you can add the following two lines to your ```CMakeLists.txt``` to link your
+program against libprimesieve.
 
 ```CMake
 find_package(primesieve REQUIRED)
-target_link_libraries(your_target primesieve::primesieve)
+target_link_libraries(your_program primesieve::primesieve)
 ```
 
 To link against the static libprimesieve use:
 
 ```CMake
 find_package(primesieve REQUIRED static)
-target_link_libraries(your_target primesieve::primesieve)
+target_link_libraries(your_program primesieve::primesieve)
 ```
 
 * Example [CMakeLists.txt](doc/C_Examples.md#minimal-cmake-project-file) for C programs
