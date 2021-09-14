@@ -27,31 +27,6 @@ If libprimecount is useful to your company, please consider
 development of primecount has personally cost me a lot of money, as I frequently
 needed to run extensive benchmarks on a wide range of high end servers.
 
-# C example
-
-The C example below counts the primes ≤ 1000 and prints the result to the screen.
-Note that primecount is multi-threaded by default, it uses all available CPU
-cores if the input is sufficiently large.
-
-```C
-#include <primecount.h>
-#include <stdio.h>
-
-int main()
-{
-    int64_t pix = primecount_pi(1000);
-    printf("primes below 1000 = %ld\n", pix);
-
-    return 0;
-}
-```
-
-Compile using:
-
-```sh
-cc -O2 primes.c -lprimecount
-```
-
 # C API reference
 
 Include the ```<primecount.h>``` header to use primecount's C API.
@@ -76,21 +51,20 @@ int64_t primecount_phi(int64_t x, int64_t a);
 Please see [primecount.h](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
 for more information.
 
-# C++ example
+# C example
 
-
-The C++ example below counts the primes ≤ 1000 and prints the result to the screen.
+The C example below counts the primes ≤ 1000 and prints the result to the screen.
 Note that primecount is multi-threaded by default, it uses all available CPU
 cores if the input is sufficiently large.
 
-```C++
-#include <primecount.hpp>
-#include <iostream>
+```C
+#include <primecount.h>
+#include <stdio.h>
 
 int main()
 {
-    int64_t pix = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << pix << std::endl;
+    int64_t pix = primecount_pi(1000);
+    printf("primes below 1000 = %ld\n", pix);
 
     return 0;
 }
@@ -99,7 +73,18 @@ int main()
 Compile using:
 
 ```sh
-c++ -O2 primes.cpp -lprimecount
+cc -O3 primes.c -o primes -lprimecount
+```
+
+If you have [built libprimecount yourself](#Build-instructions)
+then the default installation path is usually ```/usr/local/lib``` which is not
+part of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
+environment variables:
+
+```sh
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 ```
 
 # C++ API reference
@@ -125,6 +110,42 @@ int64_t primecount::phi(int64_t x, int64_t a);
 
 Please see [primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
 for more information.
+
+# C++ example
+
+The C++ example below counts the primes ≤ 1000 and prints the result to the screen.
+Note that primecount is multi-threaded by default, it uses all available CPU
+cores if the input is sufficiently large.
+
+```C++
+#include <primecount.hpp>
+#include <iostream>
+
+int main()
+{
+    int64_t pix = primecount::pi(1000);
+    std::cout << "primes below 1000 = " << pix << std::endl;
+
+    return 0;
+}
+```
+
+Compile using:
+
+```sh
+c++ -O3 primes.cpp -o primes -lprimecount
+```
+
+If you have [built libprimecount yourself](#Build-instructions)
+then the default installation path is usually ```/usr/local/lib``` which is not
+part of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
+environment variables:
+
+```sh
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
+```
 
 # Build instructions
 
