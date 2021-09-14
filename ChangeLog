@@ -13,7 +13,7 @@ Gourdon papers.
 * Sieve.hpp: Add Counter struct.
 * Sieve.cpp: Use new Counter struct.
 * LoadBalancerS2.cpp: Increase default sieve array size to 128 KiB.
-* CMakeLists.txt: Add MSVC_CRT_STATIC option to force static linking.
+* CMakeLists.txt: Add WITH_MSVC_CRT_STATIC option to force static linking.
 * Updated to libprimesieve-7.7 (improved CPU cache size detection).
 
 Changes in primecount-7.1, 2021-08-13
