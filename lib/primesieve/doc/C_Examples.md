@@ -18,6 +18,7 @@ By default ```primesieve_next_prime()``` generates primes > 0 i.e. 2, 3, 5, 7, .
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main()
@@ -44,12 +45,13 @@ int main()
 ## ```primesieve_skipto()```
 
 This method changes the start number of the ```primesieve_iterator``` object. (By
-default the start number is initialized to 0). The ```stop_hint``` paramater is
+default the start number is initialized to 0). The ```stop_hint``` parameter is
 used for performance optimization, ```primesieve_iterator``` only buffers primes
 up to this limit.
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main()
@@ -80,6 +82,7 @@ initialized to 0 be default.
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main()
@@ -104,10 +107,11 @@ int main()
 
 ## ```primesieve_generate_primes()```
 
-Stores the primes inside [start, stop] in an array. If you are iterating over
-the same primes many times in a loop you will likely get better performance
-if you store the primes in an array instead of using a ```primesieve_iterator```
-(provided your system has enough memory).
+Stores the primes inside [start, stop] in an array. The last primes ```type``` parameter
+may be one of: ```SHORT_PRIMES```, ```USHORT_PRIMES```, ```INT_PRIMES```, ```UINT_PRIMES```,
+```LONG_PRIMES```, ```ULONG_PRIMES```, ```LONGLONG_PRIMES```, ```ULONGLONG_PRIMES```,
+```INT16_PRIMES```, ```UINT16_PRIMES```, ```INT32_PRIMES```, ```UINT32_PRIMES```,
+```INT64_PRIMES```, ```UINT64_PRIMES```.
 
 ```C
 #include <primesieve.h>
@@ -135,7 +139,11 @@ int main()
 
 ## ```primesieve_generate_n_primes()```
 
-Stores n primes in an array.
+Stores the first n primes ≥ start in an array. The last primes ```type``` parameter may
+be one of: ```SHORT_PRIMES```, ```USHORT_PRIMES```, ```INT_PRIMES```, ```UINT_PRIMES```,
+```LONG_PRIMES```, ```ULONG_PRIMES```, ```LONGLONG_PRIMES```, ```ULONGLONG_PRIMES```,
+```INT16_PRIMES```, ```UINT16_PRIMES```, ```INT32_PRIMES```, ```UINT32_PRIMES```,
+```INT64_PRIMES```, ```UINT64_PRIMES```.
 
 ```C
 #include <primesieve.h>
@@ -152,7 +160,7 @@ int main()
   int64_t* primes = (int64_t*) primesieve_generate_n_primes(n, start, INT64_PRIMES);
 
   for (i = 0; i < n; i++)
-    printf("%i\n", primes[i]);
+    printf("%li\n", primes[i]);
 
   primesieve_free(primes);
   return 0;
@@ -168,6 +176,7 @@ available CPU cores by default.
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main()
@@ -189,6 +198,7 @@ multi-threaded and uses all available CPU cores by default.
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main(int argc, char** argv)
@@ -215,6 +225,7 @@ libprimesieve functions with a ```void``` return type.
 
 ```C
 #include <primesieve.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 int main()
