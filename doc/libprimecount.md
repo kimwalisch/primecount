@@ -169,11 +169,12 @@ sudo make install
 
 # Maximum portability
 
-By default libprimecount uses the ```POPCNT``` instruction in order to achieve the
-best performance. As a drawback libprimecount won't work on old x86 CPUs that do not
-have the ```POPCNT``` instruction i.e. all x86 CPUs built before 2010 do not
-have the ```POPCNT``` instruction. If you require that libprimecount works on old
-x86 CPUs, then you have to disable ```POPCNT```:
+For performance reasons primecount uses the ```POPCNT``` instruction on all CPU architectures that
+support it. On x86/x64 the ```POPCNT``` instruction was added to Intel's and AMD's CPUs alongside the
+SSE4 instruction set in 2008. If you need to support older x86/x64 CPUs you can disable ```POPCNT``` but
+this will deteriorate performance by about 50%. Note that disabling ```POPCNT``` only has an effect on
+x86/x64, on other CPU architectures ```POPCNT``` is always used if it is available (as this generally
+does not cause any issues).
 
 ```
 cmake . -DWITH_POPCNT=OFF

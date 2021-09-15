@@ -127,12 +127,12 @@ libprimecount using:
 
 * ```cmake . -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF```
 
-For performance reasons primecount uses the POPCNT instruction on all
-CPU architectures that support it. On x86/x64 the POPCNT instruction was
+For performance reasons primecount uses the ```POPCNT``` instruction on all
+CPU architectures that support it. On x86/x64 the ```POPCNT``` instruction was
 added to Intel's and AMD's CPUs alongside the SSE4 instruction set in 2008.
-If you need to support older x86/x64 CPUs you can disable POPCNT but this
-will deteriorate performance by about 30%. Note that disabling POPCNT
-only has an effect on x86/x64, on other CPU architectures POPCNT is always
+If you need to support older x86/x64 CPUs you can disable ```POPCNT``` but this
+will deteriorate performance by about 50%. Note that disabling ```POPCNT```
+only has an effect on x86/x64, on other CPU architectures ```POPCNT``` is always
 used if it is available (as this generally does not cause any issues).
 
 * ```cmake . -DWITH_POPCNT=OFF```

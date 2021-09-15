@@ -217,7 +217,7 @@ if(WITH_POPCNT)
 else()
     # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
     # POPCNT instruction and instead uses a portable integer popcount
-    # algorithm. This deteriorates performance by up to 30%.
+    # algorithm. This deteriorates performance by up to 50%.
     # Disabling POPCNT on x86/x64 is necessary for old CPUs from
     # before 2008. On other CPU architectures POPCNT is always used
     # if it is available as this generally does not cause any issues.
