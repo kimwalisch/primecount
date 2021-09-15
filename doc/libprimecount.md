@@ -165,21 +165,15 @@ make -j
 sudo make install
 ```
 
-# Run the tests
-
-```sh
-cmake . -DBUILD_TESTS=ON
-make -j
-make test
-```
+* [Detailed build instructions](BUILD.md#primecount-build-instructions)
 
 # Maximum portability
 
 By default libprimecount uses the ```POPCNT``` instruction in order to achieve the
-best performance. As a drawback libprimecount won't work on CPUs that do not
-have the ```POPCNT``` instruction e.g. all x86 CPUs built before 2010 do not
-have the ```POPCNT``` instruction. If you require libprimecount to run on all CPUs
-you have to disable ```POPCNT```:
+best performance. As a drawback libprimecount won't work on old x86 CPUs that do not
+have the ```POPCNT``` instruction i.e. all x86 CPUs built before 2010 do not
+have the ```POPCNT``` instruction. If you require that libprimecount works on old
+x86 CPUs, then you have to disable ```POPCNT```:
 
 ```
 cmake . -DWITH_POPCNT=OFF
