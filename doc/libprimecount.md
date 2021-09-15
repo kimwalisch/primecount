@@ -154,7 +154,10 @@ export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 
 # Build instructions
 
-You need to have [installed](BUILD.md#prerequisites) a C++ compiler, cmake and make.
+You need to have [installed a C++ compiler, cmake and make](BUILD.md#prerequisites). By default,
+only the static libprimecount is built, but for doing development with libprimecount you will
+most likely want to use the shared libprimecount. Hence we use the ```-DBUILD_SHARED_LIBS=ON```
+option to enable building libprimecount as a shared library.
 
 ```sh
 cmake . -DBUILD_SHARED_LIBS=ON
