@@ -1,4 +1,4 @@
-# primesieve C examples
+# libprimesieve C examples
 
 This is a short selection of C code snippets that use libprimesieve to generate prime numbers.
 These examples cover the most frequently used functionality of libprimesieve. Arguably the most
@@ -29,6 +29,8 @@ int main()
     sum += prime;
 
   printf("Sum of the primes below 10^9 = %" PRIu64 "\n", sum);
+  primesieve_free_iterator(&it);
+
   return 0;
 }
 ```
@@ -247,11 +249,11 @@ target_link_libraries(your_program primesieve::primesieve)
 
 # Minimal CMake project file
 
-If you wish to build your C program (named ```primes.c```) using CMake, then you can use
+If you want to build your C program (named ```primes.c```) using CMake, then you can use
 the minimal ```CMakeLists.txt``` below. Note that this requires that
 [libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation) on your
-CMake has the advantage that you don't need to specify the libprimesieve include path and
-the ```-lprimesieve``` linker option when building your project.
+system. Using CMake has the advantage that you don't need to specify the libprimesieve include
+path and the ```-lprimesieve``` linker option when building your project.
 
 ```CMake
 # File: CMakeLists.txt

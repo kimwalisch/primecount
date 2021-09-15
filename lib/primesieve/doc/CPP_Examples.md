@@ -1,4 +1,4 @@
-# primesieve C++ examples
+# libprimesieve C++ examples
 
 This is a short selection of C++ code snippets that use libprimesieve to generate prime numbers.
 These examples cover the most frequently used functionality of libprimesieve. Arguably the most
@@ -258,7 +258,7 @@ target_link_libraries(your_program primesieve::primesieve)
 
 # Minimal CMake project file
 
-If you wish to build your C++ program (named ```primes.cpp```) using CMake, then you can use
+If you want to build your C++ program (named ```primes.cpp```) using CMake, then you can use
 the minimal ```CMakeLists.txt``` below. Note that this requires that
 [libprimesieve is installed](https://github.com/kimwalisch/primesieve#installation) on your
 system. Using CMake has the advantage that you don't need to specify the libprimesieve include
