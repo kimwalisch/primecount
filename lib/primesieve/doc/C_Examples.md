@@ -6,7 +6,11 @@ useful feature provided by libprimesieve is the ```primesieve_iterator``` which 
 iterate over primes using the ```primesieve_next_prime()``` or ```primesieve_prev_prime()```
 functions.
 
-For in-depth documentation please refer to the [C API Reference](https://kimwalisch.github.io/primesieve/api).
+Additional libprimesieve documentation links:
+
+* [Install libprimesieve](https://github.com/kimwalisch/primesieve#installation)
+* [C API Reference](https://kimwalisch.github.io/primesieve/api)
+* [libprimesieve performance tips](https://github.com/kimwalisch/primesieve#libprimesieve-performance-tips)
 
 ## ```primesieve_next_prime()```
 
@@ -200,6 +204,33 @@ int main(int argc, char** argv)
 
 * [Build instructions](#how-to-compile)
 
+# Error handling
+
+If an error occurs, libprimesieve functions with a ```uint64_t``` return type return
+```PRIMESIEVE_ERROR``` (which is defined as ```UINT64_MAX``` in ```<primesieve.h>```)
+and the corresponding error message is printed to the standard error stream.
+libprimesieve also sets the global C ```errno``` variable to ```EDOM``` if an error
+occurs, this is mainly useful for checking if an error has occurred in
+libprimesieve functions with a ```void``` return type.
+
+```C
+#include <primesieve.h>
+#include <stdio.h>
+
+int main()
+{
+  /* primesieve_count_primes(start, stop) */
+  uint64_t count = primesieve_count_primes(0, 1000);
+
+  if (count != PRIMESIEVE_ERROR)
+    printf("Primes below 1000 = %" PRIu64 "\n", count);
+  else
+    printf("Error in libprimesieve!");
+
+  return 0;
+}
+```
+
 # How to compile
 
 ### Unix-like OSes
@@ -267,7 +298,7 @@ target_link_libraries(primes primesieve::primesieve)
 Put the ```CMakeLists.txt``` file from above into the same directory as your ```primes.c``` file.<br/>
 Then open a terminal, cd into that directory and build your project using:
 
-```
+```sh
 cmake . -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ```
@@ -277,7 +308,7 @@ against the static libprimesieve in your ```CMakeLists.txt``` using:
 ```find_package(primesieve REQUIRED static)```. Next open a Visual Studio Command Prompt, cd into your
 project's directory and build your project using:
 
-```
+```sh
 cmake -G "Visual Studio 16 2019" .
 cmake --build . --config Release
 ```

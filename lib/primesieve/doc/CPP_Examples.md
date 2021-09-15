@@ -5,7 +5,11 @@ These examples cover the most frequently used functionality of libprimesieve. Ar
 useful feature provided by libprimesieve is the ```primesieve::iterator``` which lets you
 iterate over primes using the ```next_prime()``` or ```prev_prime()``` methods.
 
-For in-depth documentation please refer to the [C++ API Reference](https://kimwalisch.github.io/primesieve/api).
+Additional libprimesieve documentation links:
+
+* [Install libprimesieve](https://github.com/kimwalisch/primesieve#installation)
+* [C++ API Reference](https://kimwalisch.github.io/primesieve/api)
+* [libprimesieve performance tips](https://github.com/kimwalisch/primesieve#libprimesieve-performance-tips)
 
 ## ```primesieve::iterator::next_prime()```
 
@@ -209,6 +213,37 @@ int main()
 
 * [Build instructions](#how-to-compile)
 
+# Error handling
+
+If an error occurs libprimesieve throws a ```primesieve::primesieve_error``` exception that is
+derived from ```std::runtime_error```. Note that libprimesieve very rarely throws an exception,
+the two main cases which will trigger an exception are: memory allocation failure (throws
+```std::bad_alloc```) and trying to generate primes > 2^64 (throws
+```primesieve::primesieve_error```).
+
+```C++
+#include <primesieve.hpp>
+#include <iostream>
+
+int main()
+{
+  try
+  {
+    // Try generating primes > 2^64
+    uint64_t start = ~0ull - 1;
+    uint64_t n = 1000;
+    std::vector<uint64_t> primes;
+    primesieve::generate_n_primes(n, start, &primes);
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
+
+  return 0;
+}
+```
+
 # How to compile
 
 ### Unix-like OSes
@@ -276,7 +311,7 @@ target_link_libraries(primes primesieve::primesieve)
 Put the ```CMakeLists.txt``` file from above into the same directory as your ```primes.cpp``` file.<br/>
 Then open a terminal, cd into that directory and build your project using:
 
-```
+```sh
 cmake . -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ```
@@ -286,7 +321,7 @@ against the static libprimesieve in your ```CMakeLists.txt``` using:
 ```find_package(primesieve REQUIRED static)```. Next open a Visual Studio Command Prompt, cd into your
 project's directory and build your project using:
 
-```
+```sh
 cmake -G "Visual Studio 16 2019" .
 cmake --build . --config Release
 ```
