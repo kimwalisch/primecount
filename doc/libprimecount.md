@@ -27,6 +27,11 @@ If libprimecount is useful to your company, please consider
 development of primecount has personally cost me a lot of money, as I frequently
 needed to run extensive benchmarks on a wide range of high end servers.
 
+# Installation
+
+* [Install libprimecount using package manager](https://github.com/kimwalisch/primecount#installation)
+* [Build libprimecount from source](#build-instructions)
+
 # C API reference
 
 Include the ```<primecount.h>``` header to use primecount's C API.
