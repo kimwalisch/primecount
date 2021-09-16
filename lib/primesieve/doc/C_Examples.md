@@ -30,7 +30,7 @@ int main()
   uint64_t prime = 0;
 
   /* iterate over the primes < 10^9 */
-  while ((prime = primesieve_next_prime(&it)) < 1000000000ull)
+  while ((prime = primesieve_next_prime(&it)) < 1000000000)
     sum += prime;
 
   printf("Sum of the primes below 10^9 = %" PRIu64 "\n", sum);
@@ -59,7 +59,7 @@ int main()
   primesieve_iterator it;
   primesieve_init(&it);
 
-  /* primesieve_skipto(&it, start_number, stop_hint) */
+  /* primesieve_skipto(&it, start, stop_hint) */
   primesieve_skipto(&it, 1000, 1100);
   uint64_t prime;
 
@@ -90,7 +90,7 @@ int main()
   primesieve_iterator it;
   primesieve_init(&it);
 
-  /* primesieve_skipto(&it, start_number, stop_hint) */
+  /* primesieve_skipto(&it, start, stop_hint) */
   primesieve_skipto(&it, 2000, 1000);
   uint64_t prime;
 
@@ -121,13 +121,12 @@ int main()
 {
   uint64_t start = 0;
   uint64_t stop = 1000;
-  size_t i;
   size_t size;
 
   /* Get an array with the primes inside [start, stop] */
   int* primes = (int*) primesieve_generate_primes(start, stop, &size, INT_PRIMES);
 
-  for (i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     printf("%i\n", primes[i]);
 
   primesieve_free(primes);
@@ -153,13 +152,11 @@ int main()
 {
   uint64_t n = 1000;
   uint64_t start = 0;
-  size_t i;
-  size_t size;
 
   /* Get an array with the first 1000 primes */
   int64_t* primes = (int64_t*) primesieve_generate_n_primes(n, start, INT64_PRIMES);
 
-  for (i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++)
     printf("%li\n", primes[i]);
 
   primesieve_free(primes);
@@ -201,7 +198,7 @@ multi-threaded and uses all available CPU cores by default.
 #include <inttypes.h>
 #include <stdio.h>
 
-int main(int argc, char** argv)
+int main()
 {
   /* primesieve_nth_prime(n, start) */
   uint64_t n = 25;
@@ -219,9 +216,6 @@ int main(int argc, char** argv)
 If an error occurs, libprimesieve functions with a ```uint64_t``` return type return
 ```PRIMESIEVE_ERROR``` (which is defined as ```UINT64_MAX``` in ```<primesieve.h>```)
 and the corresponding error message is printed to the standard error stream.
-libprimesieve also sets the global C ```errno``` variable to ```EDOM``` if an error
-occurs, this is mainly useful for checking if an error has occurred in
-libprimesieve functions with a ```void``` return type.
 
 ```C
 #include <primesieve.h>
@@ -230,14 +224,49 @@ libprimesieve functions with a ```void``` return type.
 
 int main()
 {
-  /* primesieve_count_primes(start, stop) */
   uint64_t count = primesieve_count_primes(0, 1000);
 
   if (count != PRIMESIEVE_ERROR)
     printf("Primes below 1000 = %" PRIu64 "\n", count);
   else
-    printf("Error in libprimesieve!");
+    printf("Error in libprimesieve!\n");
 
+  return 0;
+}
+```
+
+libprimesieve also sets the C ```errno``` variable to ```EDOM``` if an error
+occurs. This makes it possible to check if an error has occurred in libprimesieve
+functions with a ```void``` return type. ```errno``` is also useful for checking
+after a computation that no error has occurred, this way you don't have to
+check the return value of every single primesieve function call.
+
+```C
+#include <primesieve.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <stdio.h>
+
+int main()
+{
+  /* Reset errno before computation */
+  errno = 0;
+
+  primesieve_iterator it;
+  primesieve_init(&it);
+  uint64_t sum = 0;
+  uint64_t prime = 0;
+
+  while ((prime = primesieve_next_prime(&it)) < 1000000000)
+    sum += prime;
+
+  /* Check errno after computation */
+  if (errno != EDOM)
+    printf("Sum of the primes below 10^9 = %" PRIu64 "\n", sum);
+  else
+    printf("Error in libprimesieve!\n");
+
+  primesieve_free_iterator(&it);
   return 0;
 }
 ```
