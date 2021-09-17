@@ -22,10 +22,10 @@ optional package in
 [SageMath](https://doc.sagemath.org/html/en/reference/spkg/primecount.html) and
 there are bindings available for a few
 [other programming languages](https://github.com/kimwalisch/primecount#bindings-for-other-languages).
-If libprimecount is useful to your company, please consider
-[sponsoring](https://github.com/sponsors/kimwalisch) the project. The
+If your company uses primecount then I would greatly appreciate if you would
+[sponsor](https://github.com/sponsors/kimwalisch) its maintenance. The
 development of primecount has personally cost me a lot of money, as I frequently
-needed to run extensive benchmarks on a wide range of high end servers.
+needed to run extensive benchmarks on a wide variety of high end cloud servers.
 
 # Installation
 
