@@ -402,7 +402,7 @@ Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is i
 as O(PrimePi(x^(1/4)) * y), which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
 it possible to use even fewer counter levels and further improve the runtime complexity of
-the algorithm, here we could use only O(log log z) levels of counters which would reduce the
+the algorithm, here we can use only O(log log z) levels of counters which reduces the
 runtime complexity of the algorithm to O(z log log z) operations.
 
 ## Open questions
