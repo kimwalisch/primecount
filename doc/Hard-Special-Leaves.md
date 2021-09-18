@@ -410,8 +410,8 @@ complexity of the algorithm to O(z log log z) operations.
 The alternative counting methods presented in this document have batch counting built-in, but
 as mentioned in the [Batch counting](#Batch-counting) paragraph I don't know whether the use
 of batch counting enables using fewer than O(log z / log log x) counter levels and thereby
-improves the runtime complexity of the hard special leaf algorithm. Ideally, we want to use
-only O(log log z) counter levels in which case the runtime complexity of the hard special
+further improves the runtime complexity of the hard special leaf algorithm. Ideally, we want
+to use only O(log log z) counter levels in which case the runtime complexity of the hard special
 leaf algorithm would be O(z log log z) operations, provided that the use of O(log log z)
 counter levels does not deteriorate the runtime complexity of the algorithm.
 
