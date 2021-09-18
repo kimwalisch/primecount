@@ -16,7 +16,8 @@ been described in any of the combinatorial prime counting papers so far. This do
 describes the history of how primecount's implementation came to be and it describes
 an alternative counting method that I have devised in February 2020. This alternative
 counting method improves the balancing of sieve and count operations in the hard special
-leaf algorithm and thereby improves its runtime complexity by a factor O(log log x).
+leaf algorithm and thereby improves its runtime complexity by a factor of at least
+O(log log x).
 
 Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
@@ -402,10 +403,7 @@ as O(PrimePi(x^(1/4)) * y), which is significantly smaller than in Tomás Olivei
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
 it possible to use even fewer counter levels and further improve the runtime complexity of
 the algorithm, here we could use only O(log log z) levels of counters which would reduce the
-runtime complexity of the algorithm to O(z log log z) operations. However, in primecount the
-number of hard special leaves is more in line with Tomás Oliveira e Silva's paper, which
-makes sense considering that primecount's implementation of the Deléglise-Rivat algorithm is
-based on Tomás Oliveira e Silva's paper.
+runtime complexity of the algorithm to O(z log log z) operations.
 
 ## Open questions
 
