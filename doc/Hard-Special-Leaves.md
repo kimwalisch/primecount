@@ -262,10 +262,17 @@ number of unsieved elements ≤ n, we first iterate over the first counter array
 sum the counts of its elements. Once the remaining distance becomes < segment_size^(2/3),
 we switch to our second counter array and sum the counts of its elements until the
 remaining distance becomes < segment_size^(1/3). When this happens, we count the
-remaining unsieved elements ≤ n by simply iterating over the sieve array.
+remaining unsieved elements ≤ n by simply iterating over the sieve array. Below is a
+graphical representation of 3 counter levels with a segment_size of 8 (last level).
+At each level we perform at most segment_size^(1/levels) count operations to find the
+number of unsieved element ≤ n.
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg" width="65%">
+</p>
 
 Using 3 counter levels reduces the worst-case complexity for counting the number of
-unsieved elements for a single special leaf to O(segment_size^(1/3)) but on the other
+unsieved elements for a single special leaf to O(3 * segment_size^(1/3)) but on the other
 hand it slightly slows down sieving as we also need to update the two counter arrays
 whilst sieving. I have benchmarked using 3 counter levels vs. using 2 counter levels
 in primecount. When using 3 counter levels, the computation of the hard special leaves
