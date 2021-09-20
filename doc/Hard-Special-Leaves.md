@@ -267,9 +267,7 @@ graphical representation of 3 counter levels with a segment_size of 8 (last leve
 At each level we perform at most segment_size^(1/levels) count operations to find the
 number of unsieved element ≤ n.
 
-<p align="center">
-    <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg" width="65%">
-</p>
+<img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg">
 
 Using 3 counter levels reduces the worst-case complexity for counting the number of
 unsieved elements for a single special leaf to O(3 * segment_size^(1/3)) but on the other
