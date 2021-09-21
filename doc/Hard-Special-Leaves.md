@@ -118,6 +118,8 @@ elements in the sieve array whereas the binary indexed tree would have used only
 O(log z) operations. This is too much, this deteriorates the runtime complexity
 of the algorithm.
 
+<img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_2_counter_levels.svg">
+
 So now that we have identified the problem, we can think about whether it is possible
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: We add a
