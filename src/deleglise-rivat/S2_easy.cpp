@@ -18,12 +18,12 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
-#include <for_atomic.hpp>
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
+#include <RelaxedAtomic.hpp>
 #include <StatusS2.hpp>
 #include <S.hpp>
 
@@ -53,14 +53,15 @@ T S2_easy_OpenMP(T x,
   int64_t thread_threshold = 1000;
   threads = ideal_num_threads(threads, x13, thread_threshold);
 
+  StatusS2 status(x);
   PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  int64_t min_b = max(c, pi_sqrty) + 1;
-  StatusS2 status(x);
+  RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
-  parallel_for_atomic_inc(min_b, b <= pi_x13)
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
+  for (int64_t b = min_b++; b <= pi_x13; b = min_b++)
   {
     int64_t prime = primes[b];
     T xp = x / prime;

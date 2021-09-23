@@ -36,7 +36,6 @@
 #include <primecount-internal.hpp>
 #include <LoadBalancerAC.hpp>
 #include <fast_div.hpp>
-#include <for_atomic.hpp>
 #include <generate.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
@@ -44,9 +43,9 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
+#include <RelaxedAtomic.hpp>
 
 #include <stdint.h>
-#include <atomic>
 #include <vector>
 
 using namespace std;
@@ -339,7 +338,7 @@ T AC_OpenMP(T x,
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(x / y)];
   int64_t pi_root3_xz = pi[iroot<3>(x / z)];
-  atomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
+  RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -359,7 +358,7 @@ T AC_OpenMP(T x,
     int64_t low, high;
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    for_atomic_inc(min_c1, b <= pi_sqrtz)
+    for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
     {
       int64_t prime = primes[b];
       T xp = x / prime;
