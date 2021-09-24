@@ -25,13 +25,13 @@
 
 namespace {
 
-// CPU L2 cache size per core
-const int64_t l2_cache_size = 512 << 10;
-const int64_t numbers_per_byte = primecount::SegmentedPiTable::numbers_per_byte();
-const int64_t l2_segment_size = l2_cache_size * numbers_per_byte;
+// CPU L2 cache size per core (in bytes)
+constexpr int64_t l2_cache_bytes = 512 << 10;
+constexpr int64_t numbers_per_byte = primecount::SegmentedPiTable::numbers_per_byte();
+constexpr int64_t l2_segment_size = l2_cache_bytes * numbers_per_byte;
 
 // Minimum segment size = 1 KiB
-const int64_t min_segment_size = (1 << 10) * numbers_per_byte;
+constexpr int64_t min_segment_size = (1 << 10) * numbers_per_byte;
 
 } // namespace
 
