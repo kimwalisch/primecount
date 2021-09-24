@@ -15,7 +15,7 @@
 ///        compilation (using -Wpedantic) although the code
 ///        works perfectly fine.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,10 +35,6 @@
 
 namespace {
 
-using std::abs;
-using std::log;
-using std::sqrt;
-using std::numeric_limits;
 using namespace primecount;
 
 /// Calculate the logarithmic integral using
@@ -57,7 +53,7 @@ long double li(long double x)
   long double p = -1;
   long double q = 0;
   long double power2 = 1;
-  long double logx = log(x);
+  long double logx = std::log(x);
   int k = 0;
 
   for (int n = 1; true; n++)
@@ -74,11 +70,11 @@ long double li(long double x)
     sum += (p / q) * inner_sum;
 
     // Not converging anymore
-    if (abs(sum - old_sum) < numeric_limits<long double>::epsilon())
+    if (std::abs(sum - old_sum) < std::numeric_limits<long double>::epsilon())
       break;
   }
 
-  return gamma + log(logx) + sqrt(x) * sum;
+  return gamma + std::log(logx) + std::sqrt(x) * sum;
 }
 
 /// Calculate the offset logarithmic integral which is a very
@@ -114,15 +110,15 @@ long double Li_inverse(long double x)
   if (x < 2)
     return 0;
 
-  long double t = x * log(x);
-  long double old_term = numeric_limits<long double>::infinity();
+  long double t = x * std::log(x);
+  long double old_term = std::numeric_limits<long double>::infinity();
 
   while (true)
   {
-    long double term = (Li(t) - x) * log(t);
+    long double term = (Li(t) - x) * std::log(t);
 
     // Not converging anymore
-    if (abs(term) >= abs(old_term))
+    if (std::abs(term) >= std::abs(old_term))
       break;
 
     t -= term;
@@ -143,19 +139,19 @@ long double Ri(long double x)
     return 0;
 
   long double sum = 0;
-  long double old_term = numeric_limits<long double>::infinity();
-  auto terms = (int) (log2(x) * 2 + 10);
+  long double old_term = std::numeric_limits<long double>::infinity();
+  auto terms = (int) (std::log2(x) * 2 + 10);
   auto mu = generate_moebius(terms);
 
   for (int n = 1; n < terms; n++)
   {
     if (mu[n])
     {
-      long double root = pow(x, 1.0L / n);
+      long double root = std::pow(x, 1.0L / n);
       long double term = (li(root) * mu[n]) / n;
 
       // Not converging anymore
-      if (abs(term) >= abs(old_term))
+      if (std::abs(term) >= std::abs(old_term))
         break;
 
       sum += term;
@@ -184,14 +180,14 @@ long double Ri_inverse(long double x)
     return 0;
 
   long double t = Li_inverse(x);
-  long double old_term = numeric_limits<long double>::infinity();
+  long double old_term = std::numeric_limits<long double>::infinity();
 
   while (true)
   {
-    long double term = (Ri(t) - x) * log(t);
+    long double term = (Ri(t) - x) * std::log(t);
 
     // Not converging anymore
-    if (abs(term) >= abs(old_term))
+    if (std::abs(term) >= std::abs(old_term))
       break;
 
     t -= term;
