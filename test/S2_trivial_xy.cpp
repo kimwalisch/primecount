@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <random>
 
+using std::size_t;
 using namespace primecount;
 
 void check(bool OK)

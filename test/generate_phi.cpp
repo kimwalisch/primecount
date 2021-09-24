@@ -19,6 +19,7 @@
 #include <random>
 #include <vector>
 
+using std::size_t;
 using namespace primecount;
 
 int main()

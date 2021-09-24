@@ -20,6 +20,7 @@
 
 using std::log;
 using std::max;
+using std::size_t;
 using namespace primecount;
 
 std::vector<int64_t> Li_table =
