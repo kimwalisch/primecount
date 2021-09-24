@@ -99,7 +99,7 @@ int128_t pi_gourdon_128(int128_t x,
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("pi(x): x must be <= " + to_str(limit));
+    throw primecount_error("pi(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);

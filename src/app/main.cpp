@@ -25,14 +25,13 @@
 #include <limits>
 #include <string>
 
-using namespace std;
 using namespace primecount;
 
 namespace primecount {
 
 int64_t to_int64(maxint_t x)
 {
-  if (x > numeric_limits<int64_t>::max())
+  if (x > std::numeric_limits<int64_t>::max())
     throw primecount_error("x must be < 2^63");
   return (int64_t) x;
 }
@@ -48,7 +47,7 @@ maxint_t AC(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("AC(x): x must be <= " + to_str(limit));
+    throw primecount_error("AC(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -70,7 +69,7 @@ maxint_t AC(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return AC((int64_t) x, y, z, k, threads);
   else
     return AC(x, y, z, k, threads);
@@ -86,7 +85,7 @@ maxint_t B(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("B(x): x must be <= " + to_str(limit));
+    throw primecount_error("B(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -100,7 +99,7 @@ maxint_t B(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return B((int64_t) x, y, threads);
   else
     return B(x, y, threads);
@@ -117,7 +116,7 @@ maxint_t D(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("D(x): x must be <= " + to_str(limit));
+    throw primecount_error("D(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -139,7 +138,7 @@ maxint_t D(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return D((int64_t) x, y, z, k, (int64_t) Ri(x), threads);
   else
     return D(x, y, z, k, Ri(x), threads);
@@ -156,7 +155,7 @@ maxint_t Phi0(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("Phi0(x): x must be <= " + to_str(limit));
+    throw primecount_error("Phi0(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -178,7 +177,7 @@ maxint_t Phi0(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return Phi0((int64_t) x, y, z, k, threads);
   else
     return Phi0(x, y, z, k, threads);
@@ -194,7 +193,7 @@ maxint_t Sigma(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha_y);
 
   if (x > limit)
-    throw primecount_error("Sigma(x): x must be <= " + to_str(limit));
+    throw primecount_error("Sigma(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -208,7 +207,7 @@ maxint_t Sigma(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return Sigma((int64_t) x, y, threads);
   else
     return Sigma(x, y, threads);
@@ -223,14 +222,14 @@ maxint_t P2(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("P2(x): x must be <= " + to_str(limit));
+    throw primecount_error("P2(x): x must be <= " + to_string(limit));
 
   if (is_print())
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return P2((int64_t) x, y, threads);
   else
     return P2(x, y, threads);
@@ -245,7 +244,7 @@ maxint_t S1(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("S1(x): x must be <= " + to_str(limit));
+    throw primecount_error("S1(x): x must be <= " + to_string(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -253,7 +252,7 @@ maxint_t S1(maxint_t x, int threads)
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return S1((int64_t) x, y, c, threads);
   else
     return S1(x, y, c, threads);
@@ -268,7 +267,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("S2_trivial(x): x must be <= " + to_str(limit));
+    throw primecount_error("S2_trivial(x): x must be <= " + to_string(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -277,7 +276,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return S2_trivial((int64_t) x, y, z, c, threads);
   else
     return S2_trivial(x, y, z, c, threads);
@@ -292,7 +291,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("S2_easy(x): x must be <= " + to_str(limit));
+    throw primecount_error("S2_easy(x): x must be <= " + to_string(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -301,7 +300,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return S2_easy((int64_t) x, y, z, c, threads);
   else
     return S2_easy(x, y, z, c, threads);
@@ -316,7 +315,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("S2_hard(x): x must be <= " + to_str(limit));
+    throw primecount_error("S2_hard(x): x must be <= " + to_string(limit));
 
   if (is_print())
     set_print_variables(true);
@@ -325,7 +324,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return S2_hard((int64_t) x, y, z, c, (int64_t) Ri(x), threads);
   else
     return S2_hard(x, y, z, c, Ri(x), threads);
@@ -421,18 +420,18 @@ int main (int argc, char* argv[])
     {
       // Add empty line after last partial formula
       if (is_print())
-        cout << endl;
+        std::cout << std::endl;
 
-      cout << res << endl;
+      std::cout << res << std::endl;
 
       if (opt.time)
         print_seconds(get_time() - time);
     }
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
-    cerr << "primecount: " << e.what() << endl
-         << "Try 'primecount --help' for more information." << endl;
+    std::cerr << "primecount: " << e.what() << std::endl
+              << "Try 'primecount --help' for more information." << std::endl;
     return 1;
   }
 

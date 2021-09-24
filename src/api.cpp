@@ -113,7 +113,7 @@ std::string pi(const std::string& x, int threads)
 {
   maxint_t n = to_maxint(x);
   maxint_t res = pi(n, threads);
-  return to_str(res);
+  return to_string(res);
 }
 
 int64_t pi_deleglise_rivat(int64_t x, int threads)

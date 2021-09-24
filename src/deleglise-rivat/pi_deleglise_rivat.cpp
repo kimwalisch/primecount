@@ -112,7 +112,7 @@ int128_t pi_deleglise_rivat_128(int128_t x,
   maxint_t limit = get_max_x(alpha);
 
   if (x > limit)
-    throw primecount_error("pi(x): x must be <= " + to_str(limit));
+    throw primecount_error("pi(x): x must be <= " + to_string(limit));
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t z = (int64_t) (x / y);

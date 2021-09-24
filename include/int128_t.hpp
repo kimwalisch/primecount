@@ -2,7 +2,7 @@
 /// @file   int128_t.hpp
 /// @brief  Support for int128_t, uint128_t types.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,9 +12,10 @@
 #define INT128_T_HPP
 
 #include <stdint.h>
+#include <string>
 
 /// If INT128_MAX is defined we know that int128_t and
-/// uint128_t are available in stdint.h.
+/// uint128_t are available in <stdint.h>.
 ///
 #if defined(INT128_MAX)
 #define HAVE_INT128_T
@@ -23,6 +24,7 @@ namespace primecount {
 
 using maxint_t = int128_t;
 using maxuint_t = uint128_t;
+using std::to_string;
 
 }
 
@@ -34,9 +36,9 @@ using maxuint_t = uint128_t;
 ///
 #elif defined(__SIZEOF_INT128__)
 #define HAVE_INT128_T
+#define HAVE_NON_STANDARD__INT128_T
 
 #include <ostream>
-#include <string>
 
 namespace primecount {
 
@@ -46,20 +48,10 @@ using maxint_t = __int128_t;
 using maxuint_t = __uint128_t;
 
 /// defined in util.cpp
-std::string to_str(maxint_t x);
-std::string to_str(maxuint_t x);
-
-inline std::ostream& operator<<(std::ostream& stream, int128_t n)
-{
-  stream << to_str(n);
-  return stream;
-}
-
-inline std::ostream& operator<<(std::ostream& stream, uint128_t n)
-{
-  stream << to_str(n);
-  return stream;
-}
+std::string to_string(int128_t x);
+std::string to_string(uint128_t x);
+std::ostream& operator<<(std::ostream& stream, int128_t n);
+std::ostream& operator<<(std::ostream& stream, uint128_t n);
 
 } // namespace
 
@@ -69,6 +61,7 @@ namespace primecount {
 
 using maxint_t = int64_t;
 using maxuint_t = uint64_t;
+using std::to_string;
 
 }
 

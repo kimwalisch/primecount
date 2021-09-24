@@ -57,8 +57,13 @@ double truncate3(double n)
 
 namespace primecount {
 
-/// Supports 128-bit integers, unlike std::to_string().
-std::string to_str(maxuint_t n)
+/// The compiler supports the non standard __int128_t type, but the
+/// standard int128_t type is missing in <stdint.h>. We need to
+/// define a few functions that are not supported by the C++ STL.
+///
+#if defined(HAVE_NON_STANDARD__INT128_T)
+
+std::string to_string(uint128_t n)
 {
   std::string str;
 
@@ -76,14 +81,27 @@ std::string to_str(maxuint_t n)
   return str;
 }
 
-/// Supports 128-bit integers, unlike std::to_string().
-std::string to_str(maxint_t n)
+std::string to_string(int128_t n)
 {
   if (n >= 0)
-    return to_str((maxuint_t) n);
+    return to_string((uint128_t) n);
   else
-    return "-" + to_str((maxuint_t) -n);
+    return "-" + to_string((uint128_t) -n);
 }
+
+std::ostream& operator<<(std::ostream& stream, int128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, uint128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+#endif
 
 maxint_t to_maxint(const std::string& expr)
 {
@@ -98,7 +116,7 @@ maxint_t to_maxint(const std::string& expr)
     {
       std::string n = expr.substr(pos);
       maxint_t limit = std::numeric_limits<maxint_t>::max();
-      std::string max_n = to_str(limit);
+      std::string max_n = to_string(limit);
 
       if (n.size() > max_n.size() ||
         (n.size() == max_n.size() && n > max_n))

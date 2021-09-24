@@ -54,18 +54,16 @@ int64_t Ri(int64_t);
 int64_t Ri_inverse(int64_t);
 
 #ifdef HAVE_INT128_T
+  int128_t pi(int128_t x);
+  int128_t pi(int128_t x, int threads);
+  int128_t pi_deleglise_rivat(int128_t x, int threads);
+  int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
+  int128_t P2(int128_t x, int64_t y, int threads, bool print = is_print());
 
-int128_t pi(int128_t x);
-int128_t pi(int128_t x, int threads);
-int128_t pi_deleglise_rivat(int128_t x, int threads);
-int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
-int128_t P2(int128_t x, int64_t y, int threads, bool print = is_print());
-
-int128_t Li(int128_t);
-int128_t Li_inverse(int128_t);
-int128_t Ri(int128_t);
-int128_t Ri_inverse(int128_t);
-
+  int128_t Li(int128_t);
+  int128_t Li_inverse(int128_t);
+  int128_t Ri(int128_t);
+  int128_t Ri_inverse(int128_t);
 #endif
 
 void set_status_precision(int precision);
@@ -83,8 +81,6 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 maxint_t to_maxint(const std::string& expr);
-std::string to_str(maxint_t x);
-std::string to_str(maxuint_t x);
 double get_time();
 
 template <typename T1, typename T2, typename T3>
