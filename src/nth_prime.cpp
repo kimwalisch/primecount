@@ -19,7 +19,7 @@
 namespace {
 
 // Number of primes < 2^63
-const int64_t max_n = 216289611853439384ll;
+constexpr int64_t max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
 const std::array<int16_t, 170> primes =
