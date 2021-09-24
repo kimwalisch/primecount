@@ -26,10 +26,12 @@
 #include <sstream>
 #include <string>
 
+using namespace primecount;
+
 // test: f1(x, threads) == f2(x)
 #define TEST0(f1, f2, iters) \
 { \
-  cout << "Testing " << #f1 << "(x)" << flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -42,17 +44,17 @@
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
     x += dist(gen); \
   } \
  \
-  cout << endl; \
+  std::cout << std:: endl; \
 }
 
 // test: f1(x) == f2(x, threads)
 #define TEST1(f1, f2, iters) \
 { \
-  cout << "Testing " << #f1 << "(x)" << flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -65,17 +67,17 @@
   { \
     check_equal(#f1, x, f1 (x), f2 (x, threads)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
     x += dist(gen); \
   } \
  \
-  cout << endl; \
+  std::cout << std:: endl; \
 }
 
 // test: f1(x, threads) == f2(x, threads)
 #define TEST2(f1, f2, iters) \
 { \
-  cout << "Testing " << #f1 << "(x)" << flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -88,26 +90,23 @@
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x, threads)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
     x += dist(gen); \
   } \
  \
-  cout << endl; \
+  std::cout << std:: endl; \
 }
-
-using namespace std;
-using namespace primecount;
 
 namespace {
 
-void check_equal(const string& f1,
+void check_equal(const std::string& f1,
                  int64_t x,
                  int64_t res1,
                  int64_t res2)
 {
   if (res1 != res2)
   {
-    ostringstream oss;
+    std::ostringstream oss;
     oss << f1 << "(" << x << ") = " << res1
         << " is an error, the correct result is " << res2;
     throw primecount_error(oss.str());
@@ -116,25 +115,25 @@ void check_equal(const string& f1,
 
 void test_pi_cache()
 {
-  cout << "Testing pi_cache(x)" << flush;
+  std::cout << "Testing pi_cache(x)" << std:: flush;
 
   for (int64_t x = 0; x <= PiTable::max_cached(); x++)
     check_equal("pi_cache", x, pi_cache(x), pi_primesieve(x));
 
-  cout << " 100%" << endl;
+  std::cout << " 100%" << std:: endl;
 }
 
 void test_nth_prime(int64_t iters)
 {
-  cout << "Testing nth_prime(x)" << flush;
+  std::cout << "Testing nth_prime(x)" << std:: flush;
 
   int64_t n = 1;
   int64_t prime = 0;
   int64_t next = 10000;
 
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int64_t> dist(1, 10000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(1, 10000000);
 
   for (; n < next; n++)
     check_equal("nth_prime", n, nth_prime(n), primesieve::nth_prime(n));
@@ -145,12 +144,12 @@ void test_nth_prime(int64_t iters)
     prime = primesieve::nth_prime(next, prime);
     check_equal("nth_prime", n, nth_prime(n), prime);
     double percent = 100.0 * (i + 1.0) / iters;
-    cout << "\rTesting nth_prime(x) " << (int) percent << "%" << flush;
+    std::cout << "\rTesting nth_prime(x) " << (int) percent << "%" << std::flush;
     next = dist(gen);
     n += next;
   }
 
-  cout << endl;
+  std::cout << std:: endl;
 }
 
 } // namespace
@@ -161,9 +160,9 @@ void test()
 {
   set_print(false);
 
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int64_t> dist(1, 10000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(1, 10000000);
 
   try
   {
@@ -191,14 +190,14 @@ void test()
 
     test_nth_prime(300);
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
-    cerr << endl << e.what() << endl;
-    exit(1);
+    std::cerr << std:: endl << e.what() << std::endl;
+    std::exit(1);
   }
 
-  cout << "All tests passed successfully!" << endl;
-  exit(0);
+  std::cout << "All tests passed successfully!" << std::endl;
+  std::exit(0);
 }
 
 } // namespace

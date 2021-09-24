@@ -13,11 +13,9 @@
 #include <cstdlib>
 #include <string>
 
-using namespace std;
-
 namespace {
 
-const string helpMenu
+const std::string helpMenu
 (
   "Usage: primecount x [options]\n"
   "Count the number of primes less than or equal to x (<= 10^31).\n"
@@ -68,7 +66,7 @@ const string helpMenu
   "      --Sigma            Compute the 7 Sigma formulas\n"
 );
 
-const string versionInfo
+const std::string versionInfo
 (
   "primecount " PRIMECOUNT_VERSION ", <https://github.com/kimwalisch/primecount>\n"
   "Copyright (C) 2013 - 2021 Kim Walisch\n"
@@ -81,14 +79,14 @@ namespace primecount {
 
 void help(int exitCode)
 {
-  cout << helpMenu << endl;
-  exit(exitCode);
+  std::cout << helpMenu << std::endl;
+  std::exit(exitCode);
 }
 
 void version()
 {
-  cout << versionInfo << endl;
-  exit(0);
+  std::cout << versionInfo << std::endl;
+  std::exit(0);
 }
 
 } // namespace
