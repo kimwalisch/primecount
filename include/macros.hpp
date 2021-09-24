@@ -53,6 +53,15 @@
   #define FALLTHROUGH
 #endif
 
+#if __has_attribute(unused)
+  #define MAYBE_UNUSED __attribute__((unused))
+#elif __cplusplus >= 201703L && \
+      __has_cpp_attribute(maybe_unused)
+  #define MAYBE_UNUSED [[maybe_unused]]
+#else
+  #define MAYBE_UNUSED
+#endif
+
 #if defined(__GNUC__) || \
     __has_builtin(__builtin_unreachable)
   #define UNREACHABLE __builtin_unreachable()

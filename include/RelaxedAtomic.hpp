@@ -23,29 +23,28 @@
 #ifndef RELAXEDATOMIC_HPP
 #define RELAXEDATOMIC_HPP
 
+#include <macros.hpp>
 #include <atomic>
+
+#ifndef MAX_CACHE_LINE_SIZE
+  #define MAX_CACHE_LINE_SIZE 512
+#endif
 
 template <typename T>
 class RelaxedAtomic
 {
 public:
   RelaxedAtomic(T n) : atomic_(n) { }
-  /// Postfix Increment
+  // Postfix Increment
   T operator++(int)
   {
     return atomic_.fetch_add(1, std::memory_order_relaxed);
   }
-  char unused()
-  {
-    pad1[101] = 101;
-    pad2[102] = 102;
-    return pad1[101] | pad2[102];
-  }
 private:
   // Use padding to avoid CPU false sharing
-  char pad1[512];
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   std::atomic<T> atomic_;
-  char pad2[512];
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
 };
 
 #endif

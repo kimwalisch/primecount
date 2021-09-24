@@ -3,7 +3,7 @@
 /// @brief  The OmpLock and LockGuard classes are RAII-style
 ///         wrappers for OpenMP locks.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,12 @@
 
 #ifndef OMPLOCK_HPP
 #define OMPLOCK_HPP
+
+#include <macros.hpp>
+
+#ifndef MAX_CACHE_LINE_SIZE
+  #define MAX_CACHE_LINE_SIZE 512
+#endif
 
 #if defined(_OPENMP)
   #include <omp.h>
@@ -43,17 +49,11 @@ struct OmpLock
   {
     omp_destroy_lock(&lock_);
   }
-  char unused()
-  {
-    pad1[101] = 101;
-    pad2[102] = 102;
-    return pad1[101] | pad2[102];
-  }
 
   // Use padding to avoid CPU false sharing
-  char pad1[512];
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   omp_lock_t lock_;
-  char pad2[512];
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
 };
 
 class LockGuard
