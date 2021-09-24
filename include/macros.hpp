@@ -53,13 +53,23 @@
   #define FALLTHROUGH
 #endif
 
-#if __has_attribute(unused)
-  #define MAYBE_UNUSED __attribute__((unused))
-#elif __cplusplus >= 201703L && \
-      __has_cpp_attribute(maybe_unused)
+#if __cplusplus >= 201703L && \
+    __has_cpp_attribute(maybe_unused)
   #define MAYBE_UNUSED [[maybe_unused]]
+#elif __has_attribute(unused)
+  #define MAYBE_UNUSED __attribute__((unused))
 #else
   #define MAYBE_UNUSED
+#endif
+
+// Silence GCC < 12 warning:
+// warning: 'unused' attribute ignored [-Wattributes]
+#if defined(__GNUC__) && \
+   !defined(__clang__)
+   #if __GNUC__ < 12
+     #undef MAYBE_UNUSED
+     #define MAYBE_UNUSED
+   #endif
 #endif
 
 #if defined(__GNUC__) || \
