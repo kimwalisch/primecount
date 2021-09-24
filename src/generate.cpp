@@ -1,7 +1,7 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,7 +14,8 @@
 #include <limits>
 #include <vector>
 
-using namespace std;
+using std::vector;
+using std::numeric_limits;
 
 namespace primecount {
 

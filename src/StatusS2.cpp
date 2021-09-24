@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <iomanip>
 
-using namespace std;
 using namespace primecount;
 
 namespace {
@@ -78,7 +77,7 @@ double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
 
   // Below 20% p1 is better
   // Above 70% p2 is better
-  double c1 = 150 / max(p1, 1.0);
+  double c1 = 150 / std::max(p1, 1.0);
   c1 = in_between(10, c1, 4);
   double c2 = 10 - c1;
   double percent = (c1*p1 + c2*p2) / 10;
@@ -93,8 +92,8 @@ void StatusS2::print(double percent)
   if ((percent - old) >= epsilon_)
   {
     percent_ = percent;
-    cout << "\rStatus: " << fixed << setprecision(precision_)
-         << percent << "%" << flush;
+    std::cout << "\rStatus: " << std::fixed << std::setprecision(precision_)
+              << percent << "%" << std::flush;
   }
 }
 

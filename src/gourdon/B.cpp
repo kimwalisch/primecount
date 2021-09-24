@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <cassert>
 
-using namespace std;
 using namespace primecount;
 
 namespace {

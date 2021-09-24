@@ -24,7 +24,9 @@
 #include <stdint.h>
 #include <utility>
 
-using namespace std;
+using std::min;
+using std::max;
+using std::size_t;
 
 namespace {
 
@@ -83,25 +85,25 @@ std::string to_str(maxint_t n)
     return "-" + to_str((maxuint_t) -n);
 }
 
-maxint_t to_maxint(const string& expr)
+maxint_t to_maxint(const std::string& expr)
 {
   // Check if n <= max, if n is only
   // composed of regular digits.
-  if (expr.find_first_not_of("0123456789") == string::npos)
+  if (expr.find_first_not_of("0123456789") == std::string::npos)
   {
     // Remove leading zeros
     size_t pos = expr.find_first_not_of("0");
 
-    if (pos != string::npos)
+    if (pos != std::string::npos)
     {
-      string n = expr.substr(pos);
-      maxint_t limit = numeric_limits<maxint_t>::max();
-      string max_n = to_str(limit);
+      std::string n = expr.substr(pos);
+      maxint_t limit = std::numeric_limits<maxint_t>::max();
+      std::string max_n = to_str(limit);
 
       if (n.size() > max_n.size() ||
         (n.size() == max_n.size() && n > max_n))
       {
-        string msg = "number too large: " + n;
+        std::string msg = "number too large: " + n;
         throw primecount_error(msg);
       }
     }
@@ -145,9 +147,9 @@ void set_status_precision(int precision)
 ///
 double get_time()
 {
-  auto now = chrono::steady_clock::now();
+  auto now = std::chrono::steady_clock::now();
   auto time = now.time_since_epoch();
-  auto micro = chrono::duration_cast<chrono::microseconds>(time);
+  auto micro = std::chrono::duration_cast<std::chrono::microseconds>(time);
   assert(micro.count() < (1ll << 52));
   return (double) micro.count() / 1e6;
 }
@@ -247,7 +249,7 @@ double get_alpha_lmo(maxint_t x)
     double a = 0.001103;
     double b = -0.00896211;
     double c = 1.00404;
-    double logx = log((double) x);
+    double logx = std::log((double) x);
     double logx2 = logx * logx;
     alpha = a * logx2 + b * logx + c;
   }
@@ -279,7 +281,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
     {
       double a = 0.078173;
       double b = 1;
-      double logx = log((double) x);
+      double logx = std::log((double) x);
       alpha = a * logx + b;
     }
     else
@@ -288,7 +290,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
       double b = -0.0691909;
       double c = 1.00165;
       double d = 0.372253;
-      double logx = log((double) x);
+      double logx = std::log((double) x);
       double logx2 = logx * logx;
       double logx3 = logx * logx * logx;
       alpha = a * logx3 + b * logx2 + c * logx + d;
@@ -318,7 +320,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   double alpha_y = alpha_y_;
   double alpha_z = alpha_z_;
   double x16 = (double) iroot<6>(x);
-  double logx = log((double) x);
+  double logx = std::log((double) x);
   double alpha_yz;
 
   // For x <= 10^11 our default formula does not

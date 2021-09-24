@@ -23,7 +23,6 @@
 
 #include <stdint.h>
 
-using namespace std;
 using namespace primecount;
 
 namespace {

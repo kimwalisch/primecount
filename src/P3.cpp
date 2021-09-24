@@ -17,8 +17,6 @@
 
 #include <stdint.h>
 
-using namespace std;
-
 namespace primecount {
 
 /// P3(x, a) counts the numbers <= x that have exactly 3

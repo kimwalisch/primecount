@@ -21,8 +21,6 @@
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
-
 namespace primecount {
 
 /// We need to sieve [sqrt(x), sieve_limit[
@@ -106,8 +104,8 @@ void LoadBalancerP2::print_status()
     if ((time - old) >= threshold)
     {
       time_ = time;
-      cout << "\rStatus: " << fixed << setprecision(precision_)
-           << get_percent(low_, sieve_limit_) << '%' << flush;
+      std::cout << "\rStatus: " << std::fixed << std::setprecision(precision_)
+                << get_percent(low_, sieve_limit_) << '%' << std::flush;
     }
   }
 }

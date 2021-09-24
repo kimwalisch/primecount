@@ -40,7 +40,6 @@
 
 #include <stdint.h>
 
-using namespace std;
 using namespace primecount;
 
 namespace {
@@ -212,7 +211,7 @@ T S2_hard_OpenMP(T x,
     {
       // Unsigned integer division is usually slightly
       // faster than signed integer division
-      using UT = typename make_unsigned<T>::type;
+      using UT = typename std::make_unsigned<T>::type;
 
       thread.start_time();
       UT sum = S2_hard_thread((UT) x, y, z, c, primes, pi, factor, thread);

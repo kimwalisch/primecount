@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,8 +16,6 @@
 #include <iomanip>
 #include <string>
 
-using namespace std;
-
 namespace {
 
 bool print_ = false;
@@ -30,7 +28,7 @@ bool is_print_variables()
 
 void print_threads(int threads)
 {
-  cout << "threads = " << threads << endl;
+  std::cout << "threads = " << threads << std::endl;
 }
 
 } // naespace
@@ -63,35 +61,35 @@ void set_print_variables(bool print_variables)
 
 void print_seconds(double seconds)
 {
-  cout << "Seconds: " << fixed << setprecision(3) << seconds << endl;
+  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
 }
 
-void print(const string& str)
+void print(const std::string& str)
 {
-  cout << str << endl;
+  std::cout << str << std::endl;
 }
 
-void print(const string& str, maxint_t res)
+void print(const std::string& str, maxint_t res)
 {
-  cout << str << " = " << res << endl;
+  std::cout << str << " = " << res << std::endl;
 }
 
-void print(const string& str, maxint_t res, double time)
+void print(const std::string& str, maxint_t res, double time)
 {
-  cout << "\r" << string(50,' ') << "\r";
-  cout << "Status: 100%" << endl;
-  cout << str << " = " << res << endl;
+  std::cout << "\r" << std::string(50,' ') << "\r";
+  std::cout << "Status: 100%" << std::endl;
+  std::cout << str << " = " << res << std::endl;
   print_seconds(get_time() - time);
 }
 
 /// Used by pi_lmo(x), pi_deleglise_rivat(x)
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
 {
-  cout << "x = " << x << endl;
-  cout << "y = " << y << endl;
-  cout << "z = " << z << endl;
-  cout << "c = " << c << endl;
-  cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+  std::cout << "x = " << x << std::endl;
+  std::cout << "y = " << y << std::endl;
+  std::cout << "z = " << z << std::endl;
+  std::cout << "c = " << c << std::endl;
+  std::cout << "alpha = " << std::fixed << std::setprecision(3) << get_alpha(x, y) << std::endl;
   print_threads(threads);
 }
 
@@ -101,12 +99,12 @@ void print_vars(maxint_t x, int64_t y, int threads)
   if (is_print_variables())
   {
     maxint_t z = x / y;
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "z = " << z << endl;
-    cout << "alpha = " << fixed << setprecision(3) << get_alpha(x, y) << endl;
+    std::cout << "x = " << x << std::endl;
+    std::cout << "y = " << y << std::endl;
+    std::cout << "z = " << z << std::endl;
+    std::cout << "alpha = " << std::fixed << std::setprecision(3) << get_alpha(x, y) << std::endl;
     print_threads(threads);
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
@@ -117,20 +115,20 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
   {
     int64_t z = (int64_t)(x / y);
     print(x, y, z, c, threads);
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
 /// Used by pi_gourdon(x)
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
-  cout << "x = " << x << endl;
-  cout << "y = " << y << endl;
-  cout << "z = " << z << endl;
-  cout << "k = " << k << endl;
-  cout << "x_star = " << get_x_star_gourdon(x, y) << endl;
-  cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
-  cout << "alpha_z = " << fixed << setprecision(3) << get_alpha_z(y, z) << endl;
+  std::cout << "x = " << x << std::endl;
+  std::cout << "y = " << y << std::endl;
+  std::cout << "z = " << z << std::endl;
+  std::cout << "k = " << k << std::endl;
+  std::cout << "x_star = " << get_x_star_gourdon(x, y) << std::endl;
+  std::cout << "alpha_y = " << std::fixed << std::setprecision(3) << get_alpha_y(x, y) << std::endl;
+  std::cout << "alpha_z = " << std::fixed << std::setprecision(3) << get_alpha_z(y, z) << std::endl;
   print_threads(threads);
 }
 
@@ -139,11 +137,11 @@ void print_gourdon_vars(maxint_t x, int64_t y, int threads)
 {
   if (is_print_variables())
   {
-    cout << "x = " << x << endl;
-    cout << "y = " << y << endl;
-    cout << "alpha_y = " << fixed << setprecision(3) << get_alpha_y(x, y) << endl;
+    std::cout << "x = " << x << std::endl;
+    std::cout << "y = " << y << std::endl;
+    std::cout << "alpha_y = " << std::fixed << std::setprecision(3) << get_alpha_y(x, y) << std::endl;
     print_threads(threads);
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
@@ -153,7 +151,7 @@ void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads
   if (is_print_variables())
   {
     print_gourdon(x, y, z, k, threads);
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 

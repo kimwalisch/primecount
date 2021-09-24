@@ -39,7 +39,7 @@
 #include <utility>
 #include <vector>
 
-using namespace std;
+using std::vector;
 using namespace primecount;
 
 namespace {
@@ -309,7 +309,7 @@ int64_t pix_upper(int64_t x)
     return PiTable::pi_cache(x);
 
   assert(x >= 10);
-  double pix = x / (log((double) x) - 1.1);
+  double pix = x / (std::log(x) - 1.1);
   return (int64_t) pix + 10;
 }
 

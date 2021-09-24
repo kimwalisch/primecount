@@ -30,7 +30,6 @@
 #include <algorithm>
 #include <cassert>
 
-using namespace std;
 using namespace primecount;
 
 namespace {
@@ -89,7 +88,7 @@ T P2_OpenMP(T x,
             int threads,
             bool is_print)
 {
-  static_assert(is_signed<T>::value,
+  static_assert(std::is_signed<T>::value,
                 "T must be signed integer type");
 
   if (x < 4)

@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include <algorithm>
 
-using namespace std;
 using namespace primecount;
 
 namespace {
@@ -50,7 +49,7 @@ T S2_trivial(T x,
   int64_t pi_y = pi[y];
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
-  int64_t start = max(prime_c, sqrtz) + 1;
+  int64_t start = std::max(prime_c, sqrtz) + 1;
   primesieve::iterator it(start - 1, y);
 
   T sum = 0;

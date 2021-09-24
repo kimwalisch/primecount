@@ -30,7 +30,6 @@
 #include <stdint.h>
 #include <string>
 
-using namespace std;
 using namespace primecount;
 
 namespace {

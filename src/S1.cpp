@@ -7,7 +7,7 @@
 ///        however in many newer papers the ordinary leaves are named
 ///        S0. In primecount the ordinary leaves are named S1.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,7 +24,8 @@
 #include <stdint.h>
 #include <vector>
 
-using namespace std;
+using std::vector;
+using std::numeric_limits;
 using namespace primecount;
 
 namespace {

@@ -25,8 +25,6 @@
   #include <omp.h>
 #endif
 
-using namespace std;
-
 namespace {
 
 #ifdef _OPENMP
@@ -98,7 +96,7 @@ int128_t pi(int128_t x)
 int128_t pi(int128_t x, int threads)
 {
   // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
 
   return pi_gourdon_128(x, threads);
@@ -106,12 +104,12 @@ int128_t pi(int128_t x, int threads)
 
 #endif
 
-string pi(const string& x)
+std::string pi(const std::string& x)
 {
   return pi(x, get_num_threads());
 }
 
-string pi(const string& x, int threads)
+std::string pi(const std::string& x, int threads)
 {
   maxint_t n = to_maxint(x);
   maxint_t res = pi(n, threads);
@@ -133,7 +131,7 @@ int64_t pi_gourdon(int64_t x, int threads)
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
   // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return pi_deleglise_rivat_64((int64_t) x, threads);
   else
     return pi_deleglise_rivat_128(x, threads);
@@ -142,7 +140,7 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
 int128_t pi_gourdon(int128_t x, int threads)
 {
   // use 64-bit if possible
-  if (x <= numeric_limits<int64_t>::max())
+  if (x <= std::numeric_limits<int64_t>::max())
     return pi_gourdon_64((int64_t) x, threads);
   else
     return pi_gourdon_128(x, threads);
@@ -160,7 +158,7 @@ int64_t phi(int64_t x, int64_t a)
   return phi(x, a, get_num_threads());
 }
 
-string primecount_version()
+std::string primecount_version()
 {
   return PRIMECOUNT_VERSION;
 }
@@ -174,11 +172,11 @@ string primecount_version()
 maxint_t get_max_x(double alpha_y)
 {
 #ifdef HAVE_INT128_T
-  double max_x = pow((1ull << 62) * alpha_y, 3.0 / 2.0);
+  double max_x = std::pow((1ull << 62) * alpha_y, 3.0 / 2.0);
   return (int128_t) max_x; 
 #else
   unused_param(alpha_y); 
-  return numeric_limits<int64_t>::max();
+  return std::numeric_limits<int64_t>::max();
 #endif
 }
 
@@ -199,7 +197,7 @@ int get_num_threads()
   if (threads_)
     return threads_;
   else
-    return max(1, omp_get_max_threads());
+    return std::max(1, omp_get_max_threads());
 #else
   return 1;
 #endif

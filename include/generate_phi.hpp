@@ -42,7 +42,6 @@
 
 namespace {
 
-using namespace std;
 using namespace primecount;
 
 template <typename Primes>
@@ -271,7 +270,7 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  vector<vector<sieve_t>> sieve_;
+  std::vector<std::vector<sieve_t>> sieve_;
   const Primes& primes_;
   const PiTable& pi_;
 };

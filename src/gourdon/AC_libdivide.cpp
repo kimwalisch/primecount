@@ -48,7 +48,8 @@
 #include <stdint.h>
 #include <vector>
 
-using namespace std;
+using std::vector;
+using std::numeric_limits;
 using namespace primecount;
 
 namespace {
