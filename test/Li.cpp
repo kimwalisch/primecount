@@ -18,7 +18,6 @@
 #include <cstdlib>
 #include <vector>
 
-using std::log;
 using std::max;
 using std::size_t;
 using namespace primecount;
@@ -72,7 +71,7 @@ int main()
   for (int64_t x = 0; x < 300000; x++)
   {
     int64_t lix = Li(x);
-    double logx = log(max((double) x, 2.0));
+    double logx = std::log(max((double) x, 2.0));
 
     if (lix < 0 ||
         (x >= 11 && lix < x / logx) ||
@@ -87,7 +86,7 @@ int main()
   for (int64_t x = 2; x < 30000; x++)
   {
     int64_t res = Li_inverse(x);
-    double logx = log((double) x);
+    double logx = std::log((double) x);
 
     if (res < 0 ||
         res < x ||

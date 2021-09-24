@@ -33,20 +33,20 @@ int main()
   for (n = 1; n < 100000; n++)
   {
     res1 = ilog2(n);
-    res2 = (uint64_t) log2(n);
+    res2 = (uint64_t) std::log2(n);
     std::cout << "ilog2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
   n = (1ull << 32) - 1;
   res1 = ilog2(n);
-  res2 = (uint64_t) log2(n);
+  res2 = (uint64_t) std::log2(n);
   std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 
   n = 1ull << 32;
   res1 = ilog2(n);
-  res2 = (uint64_t) log2(n);
+  res2 = (uint64_t) std::log2(n);
   std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 

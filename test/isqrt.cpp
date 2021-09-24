@@ -37,20 +37,20 @@ int main()
   for (n = 0; n < 100000; n++)
   {
     res1 = isqrt(n);
-    res2 = sqrt((double) n);
+    res2 = std::sqrt((double) n);
     std::cout << "isqrt(" << n << ") = " << res1;
     check(res1 == (uint64_t) res2);
   }
 
   n = (1ull << 32) - 1;
   res1 = isqrt(n);
-  res2 = sqrt((double) n);
+  res2 = std::sqrt((double) n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 
   n = 1ull << 32;
   res1 = isqrt(n);
-  res2 = sqrt((double) n);
+  res2 = std::sqrt((double) n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 
@@ -109,7 +109,7 @@ int main()
   for (n = 0; n < 100000; n++)
   {
     res1 = isqrt((int128_t) n);
-    res2 = sqrt((double) n);
+    res2 = std::sqrt((double) n);
     std::cout << "isqrt(" << n << ") = " << res1;
     check(res1 == (uint64_t) res2);
   }

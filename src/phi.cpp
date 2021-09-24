@@ -73,7 +73,7 @@ public:
     // pi_legendre(x) benchmarks from 1e10 to 1e16. On systems
     // with few CPU cores max_x = sqrt(x) tends to perform better
     // but this causes scaling issues on big servers.
-    uint64_t max_x = (uint64_t) pow(x, 1 / 2.3);
+    uint64_t max_x = (uint64_t) std::pow(x, 1 / 2.3);
 
     // The cache (i.e. the sieve array)
     // uses at most max_megabytes per thread.

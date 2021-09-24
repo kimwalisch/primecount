@@ -36,7 +36,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<2>(n);
-      res2 = sqrt((long double) n);
+      res2 = std::sqrt((long double) n);
       std::cout << "iroot<2>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -44,7 +44,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<3>(n);
-      res2 = cbrt((long double) n);
+      res2 = std::cbrt((long double) n);
       std::cout << "iroot<3>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -52,7 +52,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<4>(n);
-      res2 = pow((long double) n, 1.0L / 4);
+      res2 = std::pow((long double) n, 1.0L / 4);
       std::cout << "iroot<4>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -60,7 +60,7 @@ int main()
     for (n = 0; n < 100000; n++)
     {
       res1 = iroot<6>(n);
-      res2 = pow((long double) n, 1.0L / 6);
+      res2 = std::pow((long double) n, 1.0L / 6);
       std::cout << "iroot<6>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -120,7 +120,7 @@ int main()
     for (m = 0; m < 100000; m++)
     {
       res = iroot<2>(m);
-      res2 = sqrt((long double) m);
+      res2 = std::sqrt((long double) m);
       std::cout << "iroot<2>(" << m << ") = " << res;
       check(res == (int128_t) res2);
     }
@@ -128,7 +128,7 @@ int main()
     for (m = 0; m < 100000; m++)
     {
       res = iroot<3>(m);
-      res2 = cbrt((long double) m);
+      res2 = std::cbrt((long double) m);
       std::cout << "iroot<3>(" << m << ") = " << res;
       check(res == (int128_t) res2);
     }
@@ -136,7 +136,7 @@ int main()
     for (m = 0; m < 100000; m++)
     {
       res = iroot<4>(m);
-      res2 = pow((long double) m, 1.0L / 4);
+      res2 = std::pow((long double) m, 1.0L / 4);
       std::cout << "iroot<4>(" << m << ") = " << res;
       check(res == (int128_t) res2);
     }
@@ -144,7 +144,7 @@ int main()
     for (m = 0; m < 100000; m++)
     {
       res = iroot<6>(m);
-      res2 = pow((long double) m, 1.0L / 6);
+      res2 = std::pow((long double) m, 1.0L / 6);
       std::cout << "iroot<6>(" << m << ") = " << res;
       check(res == (int128_t) res2);
     }

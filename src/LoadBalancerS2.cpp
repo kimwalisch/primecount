@@ -223,7 +223,7 @@ void LoadBalancerS2::update_segments(const ThreadSettings& thread)
     segments_ *= 2;
   else
   {
-    double new_segments = round(segments_ * factor);
+    double new_segments = std::round(segments_ * factor);
     segments_ = (int64_t) new_segments;
     segments_ = max(segments_, 1);
   }
