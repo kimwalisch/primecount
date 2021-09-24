@@ -22,21 +22,20 @@
 #include <vector>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(500000, 1000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(500000, 1000000);
 
   auto max = dist(gen);
   auto threads = max % 4;
@@ -44,9 +43,9 @@ int main()
   auto mu = generate_moebius(max);
 
   FactorTable<uint16_t> factorTable(max, threads);
-  int64_t uint16_max = numeric_limits<uint16_t>::max();
+  int64_t uint16_max = std::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
-  vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
+  std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
   for (int n = 1; n <= max; n++)
   {
@@ -62,10 +61,10 @@ int main()
         goto not_coprime;
     }
 
-    cout << "mu(" << n << ") = " << factorTable.mu(i);
+    std::cout << "mu(" << n << ") = " << factorTable.mu(i);
     check(mu[n] == factorTable.mu(i));
 
-    cout << "lpf(" << n << ") = " << lpf[n];
+    std::cout << "lpf(" << n << ") = " << lpf[n];
 
     // mu_lpf(n) is a combination of the mu(n) (Möbius function)
     // and lpf(n) (least prime factor) functions.
@@ -89,8 +88,8 @@ int main()
     not_coprime:;
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

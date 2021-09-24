@@ -17,13 +17,11 @@
 #include <cmath>
 #include <cstdlib>
 
-using namespace std;
-
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -36,39 +34,39 @@ int main()
   {
     res1 = ilog2(n);
     res2 = (uint64_t) log2(n);
-    cout << "ilog2(" << n << ") = " << res1;
+    std::cout << "ilog2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
   n = (1ull << 32) - 1;
   res1 = ilog2(n);
   res2 = (uint64_t) log2(n);
-  cout << "ilog2(" << n << ") = " << res1;
+  std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 
   n = 1ull << 32;
   res1 = ilog2(n);
   res2 = (uint64_t) log2(n);
-  cout << "ilog2(" << n << ") = " << res1;
+  std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == (uint64_t) res2);
 
   n = (1ull << 63) - 1;
   res1 = ilog2(n);
-  cout << "ilog2(" << n << ") = " << res1;
+  std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == 62);
 
   n = 1ull << 63;
   res1 = ilog2(n);
-  cout << "ilog2(" << n << ") = " << res1;
+  std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == 63);
 
   n = 18446744073709551615ull;
   res1 = ilog2(n);
-  cout << "ilog2(" << n << ") = " << res1;
+  std::cout << "ilog2(" << n << ") = " << res1;
   check(res1 == 63);
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

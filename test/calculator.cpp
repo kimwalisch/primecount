@@ -32,26 +32,25 @@
 #define EXPRa ((12|13)<<8)>>((1|127) %10&(31+7))
 #define EXPRb ((((((((((5))))))  ))))- ((((((((( 6)))))))))
 
-using namespace std;
 using namespace primecount;
 
 template <typename T>
-void compare(T result, const string& str)
+void compare(T result, const std::string& str)
 {
   T r = calculator::eval<T>(str);
-  cout << (r == result ? "Correct: " : "Error: ");
-  cout << setw(50) << str << " = " << setw(10) << r;
+  std::cout << (r == result ? "Correct: " : "Error: ");
+  std::cout << std::setw(50) << str << " = " << std::setw(10) << r;
   if (r != result)
   {
-    cout << " != " << result;
-    exit(1);
+    std::cout << " != " << result;
+    std::exit(1);
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
 int main()
 {
-  cout.setf(ios::left);
+  std::cout.setf(std::ios::left);
 
   compare(EXPR1, TOSTRING(EXPR1));
   compare(EXPR2, TOSTRING(EXPR2));
@@ -83,7 +82,7 @@ int main()
 
 #endif
 
-  cout << "All tests passed successfully!" << endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

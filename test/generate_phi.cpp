@@ -19,16 +19,15 @@
 #include <random>
 #include <vector>
 
-using namespace std;
 using namespace primecount;
 
 int main()
 {
   for (int j = 0; j < 100; j++)
   {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int64_t> dist(0, 1000000);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int64_t> dist(0, 1000000);
 
     int64_t x = dist(gen);
     int64_t y = isqrt(x) + 1000;
@@ -47,18 +46,18 @@ int main()
 
       if (phi1 != phi2)
       {
-        cerr << "Error: generate_phi(x, i - 1) = " << phi1 << endl;
-        cerr << "Correct: phi(x, i - 1) = " << phi2 << endl;
-        cerr << "x = " << x << endl;
-        cerr << "i - 1 = " << i - 1 << endl;
-        cerr << "a = " << a << endl;
-        exit(1);
+        std::cerr << "Error: generate_phi(x, i - 1) = " << phi1 << std::endl;
+        std::cerr << "Correct: phi(x, i - 1) = " << phi2 << std::endl;
+        std::cerr << "x = " << x << std::endl;
+        std::cerr << "i - 1 = " << i - 1 << std::endl;
+        std::cerr << "a = " << a << std::endl;
+        std::exit(1);
       }
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

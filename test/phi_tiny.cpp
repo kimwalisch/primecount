@@ -19,18 +19,18 @@
 #include <vector>
 #include <random>
 
-using namespace std;
+using std::size_t;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 // Count the number of unsieved elements
-int count(vector<char>& sieve)
+int count(std::vector<char>& sieve)
 {
   int cnt = 0;
 
@@ -42,16 +42,16 @@ int count(vector<char>& sieve)
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(10000000, 20000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(10000000, 20000000);
 
   int64_t max_a = PhiTiny::max_a();
   int64_t size = dist(gen);
   int64_t x = size - 1;
 
   auto primes = generate_n_primes<int>(max_a);
-  vector<char> sieve(size, 1);
+  std::vector<char> sieve(size, 1);
 
   for (int a = 1; a <= max_a; a++)
   {
@@ -59,12 +59,12 @@ int main()
     for (int j = primes[a]; j <= x; j += primes[a])
       sieve[j] = 0;
 
-    cout << "phi_tiny(" << x << ", " << a << ") = " << phi_tiny(x, a);
+    std::cout << "phi_tiny(" << x << ", " << a << ") = " << phi_tiny(x, a);
     check(phi_tiny(x, a) == count(sieve));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

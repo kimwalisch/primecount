@@ -16,12 +16,12 @@
 #include <cstdlib>
 #include <vector>
 
-using namespace std;
+using std::size_t;
 using namespace primecount;
 
 /// Values of mu(n) for the first 1000 integers
 /// https://oeis.org/A008683/b008683.txt
-vector<int> moebius =
+std::vector<int> moebius =
 {
   0, 1, -1, -1, 0, -1, 1, -1, 0, 0, 1, -1, 0, -1, 1, 1, 0, -1, 0, -1,
   0, 1, 1, -1, 0, 0, 1, 0, 0, -1, -1, -1, 0, 1, 1, 1, 0, -1, 1, 1,
@@ -77,9 +77,9 @@ vector<int> moebius =
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -88,12 +88,12 @@ int main()
 
   for (size_t i = 1; i < mu.size(); i++)
   {
-    cout << "mu(" << i << ") = " << mu[i];
+    std::cout << "mu(" << i << ") = " << mu[i];
     check(mu[i] == moebius[i]);
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

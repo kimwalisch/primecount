@@ -18,10 +18,10 @@
 #include <vector>
 #include <random>
 
-using namespace std;
+using std::size_t;
 using namespace primecount;
 
-vector<int> pix =
+std::vector<int> pix =
 {
     0, 0, 1, 2, 2, 3, 3, 4, 4, 4,
     4, 5, 5, 6, 6, 6, 6, 7, 7, 8,
@@ -35,21 +35,21 @@ vector<int> pix =
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1000000, 2000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(1000000, 2000000);
   auto pi = generate_pi(dist(gen));
 
   for (size_t i = 0; i < pix.size(); i++)
   {
-    cout << "pi(" << i << ") = " << pi[i];
+    std::cout << "pi(" << i << ") = " << pi[i];
     check(pi[i] == pix[i]);
   }
 
@@ -59,7 +59,7 @@ int main()
 
   while (prime < pi.size())
   {
-    cout << "pi(" << prime << ") = " << pi[prime];
+    std::cout << "pi(" << prime << ") = " << pi[prime];
     check(pi[prime] == count);
     prime = it.next_prime();
     count++;
@@ -68,12 +68,12 @@ int main()
   for (int i = 0; i < 10000; i++)
   {
     int n = dist(gen) % pi.size();
-    cout << "pi(" << n << ") = " << pi[n];
+    std::cout << "pi(" << n << ") = " << pi[n];
     check(pi[n] == (int) primesieve::count_primes(0, n));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

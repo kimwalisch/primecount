@@ -16,7 +16,6 @@
 #include <limits>
 #include <type_traits>
 
-using namespace std;
 using namespace primecount;
 
 #if defined(HAVE_INT128_T)
@@ -27,9 +26,9 @@ using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 #endif
@@ -38,59 +37,59 @@ int main()
 {
 #if defined(HAVE_INT128_T)
 
-  static_assert(numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
-                "numeric_limits<uint128_t>::max() is broken");
+  static_assert(std::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
+                "std::numeric_limits<uint128_t>::max() is broken");
 
-  static_assert(is_integral<int128_t>::value, 
+  static_assert(std::is_integral<int128_t>::value, 
                 "is_integral<int128_t> != true");
 
-  static_assert(is_integral<uint128_t>::value, 
+  static_assert(std::is_integral<uint128_t>::value, 
                 "is_integral<uint128_t> != true");
 
-  static_assert(is_signed<int128_t>::value, 
+  static_assert(std::is_signed<int128_t>::value, 
                 "is_signed<int128_t> != true");
 
-  static_assert(!is_signed<uint128_t>::value, 
+  static_assert(!std::is_signed<uint128_t>::value, 
                 "is_signed<uint128_t> != false");
 
-  static_assert(!is_unsigned<int128_t>::value, 
+  static_assert(!std::is_unsigned<int128_t>::value, 
                 "is_unsigned<int128_t> != false");
 
-  static_assert(is_unsigned<uint128_t>::value, 
+  static_assert(std::is_unsigned<uint128_t>::value, 
                 "is_unsigned<uint128_t> != true");
 
   {
-    ostringstream s;
+    std::ostringstream s;
     s << (((int128_t) 1 ) << 100);
-    cout << "2^100 = " << s.str();
+    std::cout << "2^100 = " << s.str();
     check(s.str() == "1267650600228229401496703205376");
   }
 
   {
-    ostringstream s;
-    s << numeric_limits<int128_t>::min() + 1;
-    cout << "-2^127+1 = " << s.str();
+    std::ostringstream s;
+    s << std::numeric_limits<int128_t>::min() + 1;
+    std::cout << "-2^127+1 = " << s.str();
     check(s.str() == "-170141183460469231731687303715884105727");
   }
 
   {
-    ostringstream s;
-    s << numeric_limits<int128_t>::max();
-    cout << "2^127-1 = " << s.str();
+    std::ostringstream s;
+    s << std::numeric_limits<int128_t>::max();
+    std::cout << "2^127-1 = " << s.str();
     check(s.str() == "170141183460469231731687303715884105727");
   }
 
   {
-    ostringstream s;
-    s << numeric_limits<uint128_t>::max();
-    cout << "2^128-1 = " << s.str();
+    std::ostringstream s;
+    s << std::numeric_limits<uint128_t>::max();
+    std::cout << "2^128-1 = " << s.str();
     check(s.str() == "340282366920938463463374607431768211455");
   }
 
 #endif
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

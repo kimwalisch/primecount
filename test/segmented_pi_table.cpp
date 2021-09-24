@@ -17,22 +17,21 @@
 #include <cstdlib>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(9000000, 10000000);
-  uniform_int_distribution<int> dist2(1, 1000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(9000000, 10000000);
+  std::uniform_int_distribution<int> dist2(1, 1000);
 
   int64_t limit = dist(gen);
   int64_t segment_size = isqrt(limit);
@@ -57,7 +56,7 @@ int main()
       segmentedPi.init(low, high);
     }
 
-    cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
+    std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
     check(segmentedPi[i] == pi[i]);
   }
 
@@ -71,7 +70,7 @@ int main()
       segmentedPi.init(low, high);
     }
 
-    cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
+    std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
     check(segmentedPi[i] == pi[i]);
   }
 
@@ -85,11 +84,11 @@ int main()
   // Check max pi(x) value.
   // PiTable can lookup numbers <= limit.
   // SegmentedPiTable can lookup numbers < limit.
-  cout << "segmentedPi(" << limit-1 << ") = " << segmentedPi[limit-1];
+  std::cout << "segmentedPi(" << limit-1 << ") = " << segmentedPi[limit-1];
   check(segmentedPi[limit-1] == pi[limit-1]);
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

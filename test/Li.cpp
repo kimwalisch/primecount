@@ -18,10 +18,11 @@
 #include <cstdlib>
 #include <vector>
 
-using namespace std;
+using std::log;
+using std::max;
 using namespace primecount;
 
-vector<int64_t> Li_table =
+std::vector<int64_t> Li_table =
 {
                      5, // Li(10^1)
                     29, // Li(10^2)
@@ -42,9 +43,9 @@ vector<int64_t> Li_table =
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -53,7 +54,7 @@ int main()
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
-    cout << "Li(" << x << ") = " << Li(x);
+    std::cout << "Li(" << x << ") = " << Li(x);
     check(Li(x) == Li_table[i]);
   }
 
@@ -61,7 +62,7 @@ int main()
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
-    cout << "Li_inverse(" << Li_table[i] << ") = " << Li_inverse(Li_table[i]);
+    std::cout << "Li_inverse(" << Li_table[i] << ") = " << Li_inverse(Li_table[i]);
     check(Li_inverse(Li_table[i]) <= x &&
           Li_inverse(Li_table[i] + 1) > x);
   }
@@ -76,8 +77,8 @@ int main()
         (x >= 11 && lix < x / logx) ||
         (x >= 2  && lix > x * logx))
     {
-      cout << "Li(" << x << ") = " << lix << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Li(" << x << ") = " << lix << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
@@ -91,13 +92,13 @@ int main()
         res < x ||
         (x >= 4 && res > x * logx * logx))
     {
-      cout << "Li_inverse(" << x << ") = " << res << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Li_inverse(" << x << ") = " << res << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

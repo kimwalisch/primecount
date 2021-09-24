@@ -21,21 +21,20 @@
 #include <vector>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(0, 10000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(0, 10000000);
   int threads = 1;
 
   for (int i = 0; i < 1000; i++)
@@ -54,12 +53,12 @@ int main()
       if (lpf[n] > primes[c])
         s1 += mu[n] * phi_tiny(x / n, c);
 
-    cout << "S1(" << x << ", " << y << ") = " << s1;
+    std::cout << "S1(" << x << ", " << y << ") = " << s1;
     check(s1 == S1(x, y, c, threads));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

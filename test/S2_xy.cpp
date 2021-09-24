@@ -23,21 +23,20 @@
 #include <vector>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1, 10000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(1, 10000000);
   int threads = 1;
 
   // test small x
@@ -61,7 +60,7 @@ int main()
         if (lpf[m] > primes[b])
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
-    cout << "S2(" << x << ", " << y << ") = " << s2;
+    std::cout << "S2(" << x << ", " << y << ") = " << s2;
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
@@ -89,15 +88,15 @@ int main()
         if (lpf[m] > primes[b])
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
-    cout << "S2(" << x << ", " << y << ") = " << s2;
+    std::cout << "S2(" << x << ", " << y << ") = " << s2;
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
                 S2_hard(x, y, z, c, Ri(x), threads));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

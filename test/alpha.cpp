@@ -21,24 +21,23 @@
 #include <cstdlib>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
+  std::random_device rd;
+  std::mt19937 gen(rd());
 
   int64_t min = (int64_t) 1e9;
   int64_t max = min * 2;
-  uniform_int_distribution<int64_t> dist(min, max);
+  std::uniform_int_distribution<int64_t> dist(min, max);
   int threads = get_num_threads();
 
   for (int i = 0; i < 10; i++)
@@ -51,14 +50,14 @@ int main()
       set_alpha(alpha);
       int64_t res2 = pi_deleglise_rivat(x, threads);
 
-      cout << "pi_deleglise_rivat(" << x << ") = " << res2;
+      std::cout << "pi_deleglise_rivat(" << x << ") = " << res2;
       check(res1 == res2);
     }
   }
 
   min = (int64_t) 1e8;
   max = min * 2;
-  uniform_int_distribution<int64_t> dist_lmo(min, max);
+  std::uniform_int_distribution<int64_t> dist_lmo(min, max);
 
   for (int i = 0; i < 10; i++)
   {
@@ -70,13 +69,13 @@ int main()
       set_alpha(alpha);
       int64_t res2 = pi_lmo_parallel(x, threads);
 
-      cout << "pi_lmo(" << x << ") = " << res2;
+      std::cout << "pi_lmo(" << x << ") = " << res2;
       check(res1 == res2);
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

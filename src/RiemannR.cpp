@@ -35,7 +35,10 @@
 
 namespace {
 
-using namespace std;
+using std::abs;
+using std::log;
+using std::sqrt;
+using std::numeric_limits;
 using namespace primecount;
 
 /// Calculate the logarithmic integral using

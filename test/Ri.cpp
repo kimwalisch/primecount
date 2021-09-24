@@ -16,10 +16,11 @@
 #include <cstdlib>
 #include <vector>
 
-using namespace std;
+using std::log;
+using std::max;
 using namespace primecount;
 
-vector<int64_t> Ri_table =
+std::vector<int64_t> Ri_table =
 {
                 4, // Ri(10^1)
                25, // Ri(10^2)
@@ -39,9 +40,9 @@ vector<int64_t> Ri_table =
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -50,7 +51,7 @@ int main()
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
-    cout << "Ri(" << x << ") = " << Ri(x);
+    std::cout << "Ri(" << x << ") = " << Ri(x);
     check(Ri(x) == Ri_table[i]);
   }
 
@@ -58,7 +59,7 @@ int main()
   {
     int p = (int) i + 1;
     int64_t x = ipow(10ll, p);
-    cout << "Ri_inverse(" << Ri_table[i] << ") = " << Ri_inverse(Ri_table[i]);
+    std::cout << "Ri_inverse(" << Ri_table[i] << ") = " << Ri_inverse(Ri_table[i]);
     check(Ri_inverse(Ri_table[i]) < x &&
           Ri_inverse(Ri_table[i] + 1) >= x);
   }
@@ -75,8 +76,8 @@ int main()
         (x >= 20 && rix < x / logx) ||
         (x >= 2  && rix > x * logx))
     {
-      cout << "Ri(" << x << ") = " << rix << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Ri(" << x << ") = " << rix << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
@@ -90,8 +91,8 @@ int main()
         (x >= 20 && rix < x / logx) ||
         (x >= 2  && rix > x * logx))
     {
-      cout << "Ri(" << x << ") = " << rix << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Ri(" << x << ") = " << rix << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
@@ -105,8 +106,8 @@ int main()
         res < x ||
         (x >= 5 && res > x * logx * logx))
     {
-      cout << "Ri_inverse(" << x << ") = " << res << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Ri_inverse(" << x << ") = " << res << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
@@ -120,13 +121,13 @@ int main()
         res < x ||
         (x >= 5 && res > x * logx * logx))
     {
-      cout << "Ri_inverse(" << x << ") = " << res << "   ERROR" << endl;
-      exit(1);
+      std::cout << "Ri_inverse(" << x << ") = " << res << "   ERROR" << std::endl;
+      std::exit(1);
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

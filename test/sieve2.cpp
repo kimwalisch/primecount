@@ -21,21 +21,20 @@
 #include <vector>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1000000, 2000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(1000000, 2000000);
 
   int low = 0;
   int high = dist(gen);
@@ -44,7 +43,7 @@ int main()
   auto segment_size = Sieve::get_segment_size(high - low);
 
   Sieve sieve(low, segment_size, primes.size());
-  vector<int> sieve2(high, 1);
+  std::vector<int> sieve2(high, 1);
   sieve2[0] = 0;
 
   for (size_t i = 1; i < primes.size(); i++)
@@ -75,16 +74,16 @@ int main()
 
     if (primes[i] > 5)
     {
-      cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
+      std::cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
       check(cnt1 == cnt2);
 
-      cout << "sieve.count(" << high - 1 << ") = " << total1;
+      std::cout << "sieve.count(" << high - 1 << ") = " << total1;
       check((total1 == total2) && (total2 == sieve.get_total_count()));
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

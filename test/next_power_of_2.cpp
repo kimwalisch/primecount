@@ -14,13 +14,11 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
-
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -34,7 +32,7 @@ int main()
     n = 1ull << i;
     res1 = next_power_of_2(n);
     res2 = n;
-    cout << "next_power_of_2(" << n << ") = " << res1;
+    std::cout << "next_power_of_2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
@@ -43,7 +41,7 @@ int main()
     n = (1ull << i) + 1;
     res1 = next_power_of_2(n);
     res2 = 1ull << (i + 1);
-    cout << "next_power_of_2(" << n << ") = " << res1;
+    std::cout << "next_power_of_2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
@@ -52,12 +50,12 @@ int main()
     n = (1ull << i) - 1;
     res1 = next_power_of_2(n);
     res2 = 1ull << i;
-    cout << "next_power_of_2(" << n << ") = " << res1;
+    std::cout << "next_power_of_2(" << n << ") = " << res1;
     check(res1 == res2);
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

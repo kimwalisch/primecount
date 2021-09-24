@@ -24,14 +24,15 @@
 #include <vector>
 #include <random>
 
-using namespace std;
+using std::min;
+using std::max;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
@@ -69,7 +70,7 @@ int main()
           s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
       }
 
-      cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
+      std::cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
       check(s2_easy == S2_easy(x, y, z, c, threads));
     }
   }
@@ -83,9 +84,9 @@ int main()
     auto primes = generate_primes<int64_t>(max_y);
     PiTable pi(max_y, threads);
 
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<int64_t> dist(1, max_x);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int64_t> dist(1, max_x);
 
     // test random x
     for (int64_t i = 0; i < 10000; i++)
@@ -110,13 +111,13 @@ int main()
           s2_easy += pi[x / (primes[b] * primes[l])] - b + 2;
       }
 
-      cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
+      std::cout << "S2_easy(" << x << ", " << y << ") = " << s2_easy;
       check(s2_easy == S2_easy(x, y, z, c, threads));
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

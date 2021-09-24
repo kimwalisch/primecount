@@ -20,21 +20,20 @@
 #include <vector>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1000000, 2000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(1000000, 2000000);
 
   int low = 0;
   int high = dist(gen);
@@ -43,7 +42,7 @@ int main()
   auto segment_size = Sieve::get_segment_size(high - low);
 
   Sieve sieve(low, segment_size, primes.size());
-  vector<int> sieve2(high, 1);
+  std::vector<int> sieve2(high, 1);
   sieve2[0] = 0;
 
   for (size_t i = 1; i < primes.size(); i++)
@@ -62,20 +61,20 @@ int main()
       int stop  = dist(gen) % high;
 
       if (start > stop)
-        swap(start, stop);
+        std::swap(start, stop);
 
       uint64_t count = 0;
 
       for (int j = start; j <= stop; j++)
         count += sieve2[j];
 
-      cout << "sieve.count(" << start << ", " << stop << ") = " << sieve.count(start, stop);
+      std::cout << "sieve.count(" << start << ", " << stop << ") = " << sieve.count(start, stop);
       check(count == sieve.count(start, stop));
     }
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

@@ -26,21 +26,20 @@
 #include <cstdlib>
 #include <random>
 
-using namespace std;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(0, 10000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(0, 10000000);
   int threads = 1;
 
   for (int i = 0; i < 100; i++)
@@ -68,12 +67,12 @@ int main()
       }
     }
 
-    cout << "S2_trivial(" << x << ", " << y << ") = " << s2_trivial;
+    std::cout << "S2_trivial(" << x << ", " << y << ") = " << s2_trivial;
     check(s2_trivial == S2_trivial(x, y, z, c, threads));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

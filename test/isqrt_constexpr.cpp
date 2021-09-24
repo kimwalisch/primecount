@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <iostream>
 
-using namespace std;
+using std::numeric_limits;
 using namespace primecount;
 
 #if defined(BAD_ISQRT)
@@ -132,7 +132,7 @@ int main()
 
 #endif
 
-  cout << "All tests passed successfully!" << endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }

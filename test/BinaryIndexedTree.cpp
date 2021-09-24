@@ -20,21 +20,21 @@
 #include <vector>
 #include <random>
 
-using namespace std;
+using std::size_t;
 using namespace primecount;
 
 void check(bool OK)
 {
-  cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
-    exit(1);
+    std::exit(1);
 }
 
 int main()
 {
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dist(1000000, 2000000);
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(1000000, 2000000);
 
   int pre_sieve = 13;
   int low = 1;
@@ -42,7 +42,7 @@ int main()
   size = next_power_of_2(size);
 
   auto primes = generate_primes<int>(isqrt(size));
-  vector<int> sieve(size, 1);
+  std::vector<int> sieve(size, 1);
   BinaryIndexedTree tree;
 
   for (size_t i = 1; i < primes.size(); i++)
@@ -63,12 +63,12 @@ int main()
     for (int j = 0; j <= rand; j++)
       count += sieve[j];
 
-    cout << "tree.count(" << rand << ") = " << tree.count(0, rand);
+    std::cout << "tree.count(" << rand << ") = " << tree.count(0, rand);
     check(count == tree.count(0, rand));
   }
 
-  cout << endl;
-  cout << "All tests passed successfully!" << endl;
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
 }
