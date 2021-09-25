@@ -85,7 +85,7 @@ int64_t S2(int64_t x,
     // current segment [low, high[
     int64_t high = min(low + segment_size, limit);
 
-    fill(sieve.begin(), sieve.end(), 1);
+    std::fill(sieve.begin(), sieve.end(), 1);
 
     // phi(y, b) nodes with b <= c do not contribute to S2, so
     // we sieve out the multiples of the first c primes

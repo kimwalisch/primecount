@@ -31,7 +31,7 @@ using namespace primecount;
 // test: f1(x, threads) == f2(x)
 #define TEST0(f1, f2, iters) \
 { \
-  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -44,17 +44,17 @@ using namespace primecount;
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
     x += dist(gen); \
   } \
  \
-  std::cout << std:: endl; \
+  std::cout << std::endl; \
 }
 
 // test: f1(x) == f2(x, threads)
 #define TEST1(f1, f2, iters) \
 { \
-  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -67,17 +67,17 @@ using namespace primecount;
   { \
     check_equal(#f1, x, f1 (x), f2 (x, threads)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
     x += dist(gen); \
   } \
  \
-  std::cout << std:: endl; \
+  std::cout << std::endl; \
 }
 
 // test: f1(x, threads) == f2(x, threads)
 #define TEST2(f1, f2, iters) \
 { \
-  std::cout << "Testing " << #f1 << "(x)" << std:: flush; \
+  std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
   int64_t x = 0; \
  \
@@ -90,11 +90,11 @@ using namespace primecount;
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x, threads)); \
     double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std:: flush; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
     x += dist(gen); \
   } \
  \
-  std::cout << std:: endl; \
+  std::cout << std::endl; \
 }
 
 namespace {
@@ -115,17 +115,17 @@ void check_equal(const std::string& f1,
 
 void test_pi_cache()
 {
-  std::cout << "Testing pi_cache(x)" << std:: flush;
+  std::cout << "Testing pi_cache(x)" << std::flush;
 
   for (int64_t x = 0; x <= PiTable::max_cached(); x++)
     check_equal("pi_cache", x, pi_cache(x), pi_primesieve(x));
 
-  std::cout << " 100%" << std:: endl;
+  std::cout << " 100%" << std::endl;
 }
 
 void test_nth_prime(int64_t iters)
 {
-  std::cout << "Testing nth_prime(x)" << std:: flush;
+  std::cout << "Testing nth_prime(x)" << std::flush;
 
   int64_t n = 1;
   int64_t prime = 0;
@@ -149,7 +149,7 @@ void test_nth_prime(int64_t iters)
     n += next;
   }
 
-  std::cout << std:: endl;
+  std::cout << std::endl;
 }
 
 } // namespace
@@ -192,7 +192,7 @@ void test()
   }
   catch (std::exception& e)
   {
-    std::cerr << std:: endl << e.what() << std::endl;
+    std::cerr << std::endl << e.what() << std::endl;
     std::exit(1);
   }
 
