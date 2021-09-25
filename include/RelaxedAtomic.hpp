@@ -30,6 +30,8 @@
   #define MAX_CACHE_LINE_SIZE 512
 #endif
 
+namespace primecount {
+
 template <typename T>
 class RelaxedAtomic
 {
@@ -46,5 +48,7 @@ private:
   std::atomic<T> atomic_;
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
 };
+
+} // namespace
 
 #endif
