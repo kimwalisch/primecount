@@ -42,7 +42,8 @@ public:
 
 private:
   void update_load_balancing(const ThreadSettings& thread);
-  void update_segments(const ThreadSettings& thread);
+  void update_number_of_segments(const ThreadSettings& thread);
+  void update_segment_size();
   double remaining_secs() const;
 
   int64_t low_ = 0;

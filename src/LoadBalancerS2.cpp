@@ -139,20 +139,24 @@ void LoadBalancerS2::update_load_balancing(const ThreadSettings& thread)
     // around y, hence we need to be careful to not assign too
     // much work to a single thread in this region.
     if (segment_size_ < max_size_)
-    {
-      segment_size_ += segment_size_ / 16;
-      segment_size_ = min(segment_size_, max_size_);
-      segment_size_ = Sieve::get_segment_size(segment_size_);
-    }
+      update_segment_size();
     else
-      update_segments(thread);
+      update_number_of_segments(thread);
   }
+}
+
+/// Slowly increase segment_size until it reaches sqrt(sieve_limit)
+void LoadBalancerS2::update_segment_size()
+{
+  segment_size_ += segment_size_ / 16;
+  segment_size_ = min(segment_size_, max_size_);
+  segment_size_ = Sieve::get_segment_size(segment_size_);
 }
 
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
-void LoadBalancerS2::update_segments(const ThreadSettings& thread)
+void LoadBalancerS2::update_number_of_segments(const ThreadSettings& thread)
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
