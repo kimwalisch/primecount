@@ -83,10 +83,13 @@ Compile using:
 cc -O3 primes.c -o primes -lprimecount
 ```
 
-If you have [built libprimecount yourself](#Build-instructions)
-then the default installation path is usually ```/usr/local/lib``` which is not
-part of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
-environment variables:
+If you have [built libprimecount yourself](#Build-instructions),
+then the default installation path is usually ```/usr/local/lib```. Executing
+the ```ldconfig``` program after ```make install``` ensures that Linux's dynamic
+linker/loader finds the shared primecount library when you execute your program.
+However, some OSes are missing the ```ldconfig``` program or ```ldconfig``` does
+not include ```/usr/local/lib``` by default. In these cases you need to export
+some environment variables:
 
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
@@ -143,10 +146,13 @@ Compile using:
 c++ -O3 primes.cpp -o primes -lprimecount
 ```
 
-If you have [built libprimecount yourself](#Build-instructions)
-then the default installation path is usually ```/usr/local/lib``` which is not
-part of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
-environment variables:
+If you have [built libprimecount yourself](#Build-instructions),
+then the default installation path is usually ```/usr/local/lib```. Executing
+the ```ldconfig``` program after ```make install``` ensures that Linux's dynamic
+linker/loader finds the shared primecount library when you execute your program.
+However, some OSes are missing the ```ldconfig``` program or ```ldconfig``` does
+not include ```/usr/local/lib``` by default. In these cases you need to export
+some environment variables:
 
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
