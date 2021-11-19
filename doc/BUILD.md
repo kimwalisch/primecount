@@ -31,6 +31,7 @@ Open a terminal, cd into the primecount directory and run:
 cmake .
 make -j
 sudo make install
+command -v ldconfig && sudo ldconfig
 ```
 
 ## macOS
