@@ -1,19 +1,22 @@
 ///
 /// @file   CpuInfo.cpp
 /// @brief  Get detailed information about the CPU's caches.
-///         We want the code to be as portable as possible, hence we
-///         try to avoid using assembly language and also don't use
-///         non standard libc extensions. Instead we query the CPU
-///         cache information from the operating system API.
-///
 ///         Ideally each primesieve thread should use a sieve array
-///         size that corresponds to the cache size of the CPU core
-///         the thread is running on. Unfortunately, due to the many
-///         different operating systems, CPU architectures and the
-///         rise of hybrid CPUs this is too difficult to implement.
-///         Hence instead, we detect the cache sizes of the 1st CPU
-///         core and all primesieve threads use a sieve array size
-///         that is related to the 1st CPU core's cache sizes.
+///         size that corresponds to the cache sizes of the CPU core
+///         the thread is currently running on. Unfortunately, due to
+///         the many different operating systems, compilers and CPU
+///         architectures this is difficult to implement (portably).
+///         Furthermore, any thread may randomly be moved to another
+///         CPU core by the operating system scheduler.
+///
+///         Hence in order to ensure good scaling we use the following
+///         alternative strategy: We detect the cache sizes of one of
+///         the CPU cores at startup and all primesieve threads use a
+///         sieve array size that is related to that CPU core's cache
+///         sizes. For homogeneous CPUs with just one type of CPU core
+///         this strategy is optimal. For hybrid CPUs with multiple
+///         types of CPU cores we try to detect the cache sizes of the
+///         CPU core type that e.g. occurs most frequently.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -39,7 +42,11 @@
 
 #if defined(_WIN32)
 
+#include <primesieve/pmath.hpp>
+
 #include <windows.h>
+#include <iterator>
+#include <map>
 
 #if defined(__i386__) || \
     defined(_M_IX86) || \
@@ -52,7 +59,6 @@
 #if defined(IS_X86)
 
 #include <algorithm>
-#include <iterator>
 
 // Check if compiler supports <intrin.h>
 #if defined(__has_include)
@@ -189,69 +195,147 @@ void CpuInfo::init()
 // Windows 7 (2009) or later
 #if _WIN32_WINNT >= 0x0601
 
-  using LPFN_GLPIEX = decltype(&GetLogicalProcessorInformationEx);
+  using LPFN_GAPC = decltype(&GetActiveProcessorCount);
+  LPFN_GAPC getCpuCoreCount = (LPFN_GAPC) (void*) GetProcAddress(
+      GetModuleHandle(TEXT("kernel32")), "GetActiveProcessorCount");
 
+  if (getCpuCoreCount)
+    logicalCpuCores_ = getCpuCoreCount(ALL_PROCESSOR_GROUPS);
+
+  using LPFN_GLPIEX = decltype(&GetLogicalProcessorInformationEx);
   LPFN_GLPIEX glpiex = (LPFN_GLPIEX) (void*) GetProcAddress(
-      GetModuleHandle(TEXT("kernel32")),
-      "GetLogicalProcessorInformationEx");
+      GetModuleHandle(TEXT("kernel32")), "GetLogicalProcessorInformationEx");
 
   if (!glpiex)
     return;
 
   DWORD bytes = 0;
-  glpiex(RelationAll, 0, &bytes);
+  glpiex(RelationCache, 0, &bytes);
 
   if (!bytes)
     return;
 
   vector<char> buffer(bytes);
-  SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX* info;
 
-  if (!glpiex(RelationAll, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer[0], &bytes))
+  if (!glpiex(RelationCache, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer[0], &bytes))
     return;
 
+  struct CpuCoreCacheInfo
+  {
+    CpuCoreCacheInfo() :
+      cacheSizes{0, 0, 0, 0},
+      cacheSharing{0, 0, 0, 0}
+    { }
+    std::array<size_t, 4> cacheSizes;
+    std::array<size_t, 4> cacheSharing;
+  };
+
+  struct L1CacheStatistics
+  {
+    long cpuCoreId = -1;
+    size_t cpuCoreCount = 0;
+  };
+
+  using CacheSize_t = size_t;
+  // Items must be sorted in ascending order
+  std::map<CacheSize_t, L1CacheStatistics> l1CacheStatistics;
+  std::vector<CpuCoreCacheInfo> cacheInfo;
+  std::size_t totalL1CpuCores = 0;
+  SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX* info;
+
+  // Fill the cacheInfo vector with the L1, L2 & L3 cache
+  // sizes and cache sharing of each CPU core.
   for (size_t i = 0; i < bytes; i += info->Size)
   {
     info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer[i];
 
-    if (info->Relationship == RelationProcessorCore)
-    {
-      size_t size = info->Processor.GroupCount;
-      for (size_t j = 0; j < size; j++)
-      {
-        // Processor.GroupMask.Mask contains one bit set for
-        // each thread associated to the current CPU core
-        for (auto mask = info->Processor.GroupMask[j].Mask; mask > 0; mask &= mask - 1)
-          logicalCpuCores_++;
-      }
-    }
-
     if (info->Relationship == RelationCache &&
-        info->Cache.GroupMask.Group == 0 &&
         info->Cache.Level >= 1 &&
         info->Cache.Level <= 3 &&
-        !cacheSizes_[info->Cache.Level] &&
         (info->Cache.Type == CacheData ||
          info->Cache.Type == CacheUnified))
     {
-      auto level = info->Cache.Level;
-      cacheSizes_[level] = info->Cache.CacheSize;
-      cacheSharing_[level] = 0;
+      size_t cpuCoreIndex = 0;
+      size_t cacheSharing = 0;
 
       // Cache.GroupMask.Mask contains one bit set for
-      // each logical CPU core sharing the cache
+      // each logical CPU core sharing the cache.
       for (auto mask = info->Cache.GroupMask.Mask; mask > 0; mask &= mask - 1)
-        cacheSharing_[level]++;
+        cacheSharing++;
+
+      auto cacheSize = info->Cache.CacheSize;
+      auto level = info->Cache.Level;
+      auto processorGroup = info->Cache.GroupMask.Group;
+      using Mask_t = decltype(info->Cache.GroupMask.Mask);
+      auto maxCpusPerProcessorGroup = numberOfBits<Mask_t>();
+      auto mask = info->Cache.GroupMask.Mask;
+      mask = (mask == 0) ? 1 : mask;
+
+      for (; mask > 0; mask &= mask - 1)
+      {
+        // Convert next 1 bit into cpuCoreIndex,
+        // by counting trailing zeros.
+        while (!(mask & (((Mask_t) 1) << cpuCoreIndex)))
+          cpuCoreIndex++;
+
+        // Note that calculating the cpuCoreId this way is not
+        // 100% correct as processor groups may not be fully
+        // filled (they may have less than maxCpusPerProcessorGroup
+        // CPU cores). However our formula yields unique
+        // cpuCoreIds which is good enough for our usage.
+        size_t cpuCoreId = processorGroup * maxCpusPerProcessorGroup + cpuCoreIndex;
+
+        if (cacheInfo.size() <= cpuCoreId)
+          cacheInfo.resize((cpuCoreId + 1) * 2);
+        cacheInfo[cpuCoreId].cacheSizes[level] = cacheSize;
+        cacheInfo[cpuCoreId].cacheSharing[level] = cacheSharing;
+
+        // Count the number of occurences of each type of L1 cache.
+        // If one of these L1 cache types is used predominantly
+        // we will use that cache as our default cache size.
+        if (level == 1)
+        {
+          auto& mapEntry = l1CacheStatistics[cacheSize];
+          totalL1CpuCores++;
+          mapEntry.cpuCoreCount++;
+          if (mapEntry.cpuCoreId == -1)
+            mapEntry.cpuCoreId = (long) cpuCoreId;
+        }
+      }
     }
   }
+
+  // Check if one of the L1 cache types is used
+  // by more than 80% of all CPU cores.
+  for (const auto& item : l1CacheStatistics)
+  {
+    if (item.second.cpuCoreCount > totalL1CpuCores * 0.80)
+    {
+      long cpuCoreId = item.second.cpuCoreId;
+      cacheSizes_ = cacheInfo[cpuCoreId].cacheSizes;
+      cacheSharing_ = cacheInfo[cpuCoreId].cacheSharing;
+      return;
+    }
+  }
+
+  // For hybrid CPUs with many different L1 cache types
+  // we pick one from the middle that is hopefully
+  // representative for the CPU's overall performance.
+  if (!l1CacheStatistics.empty())
+  {
+    auto iter = l1CacheStatistics.begin();
+    std::advance(iter, (l1CacheStatistics.size() - 1) / 2);
+    long cpuCoreId = iter->second.cpuCoreId;
+    cacheSizes_ = cacheInfo[cpuCoreId].cacheSizes;
+    cacheSharing_ = cacheInfo[cpuCoreId].cacheSharing;
+  }
+
 // Windows XP or later
 #elif _WIN32_WINNT >= 0x0501
 
   using LPFN_GLPI = decltype(&GetLogicalProcessorInformation);
-
   LPFN_GLPI glpi = (LPFN_GLPI) (void*) GetProcAddress(
-      GetModuleHandle(TEXT("kernel32")),
-      "GetLogicalProcessorInformation");
+      GetModuleHandle(TEXT("kernel32")), "GetLogicalProcessorInformation");
 
   if (!glpi)
     return;
@@ -276,12 +360,11 @@ void CpuInfo::init()
       // ProcessorMask contains one bit set for
       // each logical CPU core related to the
       // current physical CPU core
+      threadsPerCore = 0;
       for (auto mask = info[i].ProcessorMask; mask > 0; mask &= mask - 1)
-        logicalCpuCores_++
-      
-      if (!threadsPerCore)
-        for (auto mask = info[i].ProcessorMask; mask > 0; mask &= mask - 1)
-          threadsPerCore++
+        threadsPerCore++;
+
+      logicalCpuCores_ += threadsPerCore;
     }
   }
 
@@ -290,7 +373,6 @@ void CpuInfo::init()
     if (info[i].Relationship == RelationCache &&
         info[i].Cache.Level >= 1 &&
         info[i].Cache.Level <= 3 &&
-        !cacheSizes_[info[i].Cache.Level] &&
         (info[i].Cache.Type == CacheData ||
          info[i].Cache.Type == CacheUnified))
     {
@@ -625,10 +707,17 @@ void CpuInfo::init()
   string cpusOnline = "/sys/devices/system/cpu/online";
   logicalCpuCores_ = parseThreadList(cpusOnline);
 
+  // For hybrid CPUs with multiple types of CPU cores Linux seems
+  // to order the CPU cores within /sys/devices/system/cpu*
+  // from fastest to slowest. By picking a CPU core from the middle
+  // we hopefully get an average CPU core that is representative
+  // for the CPU's overall (multi-threading) performance.
+  string cpuNumber = to_string(logicalCpuCores_ / 2);
+
   // Retrieve CPU cache info
   for (size_t i = 0; i <= 3; i++)
   {
-    string path = "/sys/devices/system/cpu/cpu0/cache/index" + to_string(i);
+    string path = "/sys/devices/system/cpu" + cpuNumber + "/cpu0/cache/index" + to_string(i);
     string cacheLevel = path + "/level";
     size_t level = getValue(cacheLevel);
 
