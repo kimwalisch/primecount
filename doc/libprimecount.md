@@ -84,9 +84,9 @@ cc -O3 primes.c -o primes -lprimecount
 ```
 
 If you have [built libprimecount yourself](#Build-instructions),
-then the default installation path is usually ```/usr/local/lib```. Executing
+then the default installation path is usually ```/usr/local/lib```. Running
 the ```ldconfig``` program after ```make install``` ensures that Linux's dynamic
-linker/loader finds the shared primecount library when you execute your program.
+linker/loader will find the shared primecount library when you execute your program.
 However, some OSes are missing the ```ldconfig``` program or ```ldconfig``` does
 not include ```/usr/local/lib``` by default. In these cases you need to export
 some environment variables:
@@ -147,9 +147,9 @@ c++ -O3 primes.cpp -o primes -lprimecount
 ```
 
 If you have [built libprimecount yourself](#Build-instructions),
-then the default installation path is usually ```/usr/local/lib```. Executing
+then the default installation path is usually ```/usr/local/lib```. Running
 the ```ldconfig``` program after ```make install``` ensures that Linux's dynamic
-linker/loader finds the shared primecount library when you execute your program.
+linker/loader will find the shared primecount library when you execute your program.
 However, some OSes are missing the ```ldconfig``` program or ```ldconfig``` does
 not include ```/usr/local/lib``` by default. In these cases you need to export
 some environment variables:
