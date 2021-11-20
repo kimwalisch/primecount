@@ -193,13 +193,20 @@ if(WITH_OPENMP)
         # We made sure OpenMP works. In 2021 OpenMP
         # does e.g. not work using Apple Clang.
         if(OpenMP OR OpenMP_with_libatomic)
-            set(PKGCONFIG_LIB_OPENMP "-l${OpenMP_CXX_LIB_NAMES}")
-
             if(TARGET OpenMP::OpenMP_CXX)
                 set(LIB_OPENMP "OpenMP::OpenMP_CXX")
             else()
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
             endif()
+
+            # Create list of OpenMP libs for pkg-config/pkgconf
+            foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
+                if(NOT PKGCONFIG_LIB_OPENMP)
+                    set(PKGCONFIG_LIB_OPENMP "${PKGCONFIG_LIB_OPENMP}")
+                else()
+                    set(PKGCONFIG_LIB_OPENMP "${PKGCONFIG_LIB_OPENMP} -l${X}")
+                endif()
+            endforeach()
         endif()
     else()
         message(STATUS "Performing Test OpenMP")
