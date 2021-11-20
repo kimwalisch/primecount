@@ -9,6 +9,7 @@
 *.o
 *.dSYM
 /primecount*
+!/primecount.pc.in
 libprimecount*
 primecount.lib
 /doc/primecount.xml

@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+bindir=@CMAKE_INSTALL_FULL_BINDIR@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: primecount
+Description: Fast C/C++ prime counting function library
+Version: @PRIMECOUNT_VERSION@
+Requires.private: primesieve
+Cflags: -I${includedir}
+Libs: -L${libdir} -lprimecount
+Libs.private: @PKGCONFIG_LIB_OPENMP@

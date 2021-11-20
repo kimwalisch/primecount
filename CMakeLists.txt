@@ -190,7 +190,11 @@ if(WITH_OPENMP)
 
         cmake_pop_check_state()
 
+        # We made sure OpenMP works. In 2021 OpenMP
+        # does e.g. not work using Apple Clang.
         if(OpenMP OR OpenMP_with_libatomic)
+            set(PKGCONFIG_LIB_OPENMP "-l${OpenMP_CXX_LIB_NAMES}")
+
             if(TARGET OpenMP::OpenMP_CXX)
                 set(LIB_OPENMP "OpenMP::OpenMP_CXX")
             else()
@@ -397,3 +401,10 @@ if(BUILD_PRIMECOUNT)
     install(FILES ${PROJECT_SOURCE_DIR}/doc/primecount.1
             DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
+
+# Install primecount.pc (pkg-config) #################################
+
+configure_file(primecount.pc.in primecount.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/primecount.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
