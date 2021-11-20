@@ -201,11 +201,7 @@ if(WITH_OPENMP)
 
             # Create list of OpenMP libs for pkg-config/pkgconf
             foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
-                if(NOT PKGCONFIG_LIB_OPENMP)
-                    set(PKGCONFIG_LIB_OPENMP "${PKGCONFIG_LIB_OPENMP}")
-                else()
-                    set(PKGCONFIG_LIB_OPENMP "${PKGCONFIG_LIB_OPENMP} -l${X}")
-                endif()
+                string(APPEND PKGCONFIG_LIB_OPENMP "-l${X} ")
             endforeach()
         endif()
     else()
