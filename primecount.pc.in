@@ -9,4 +9,4 @@ Version: @PRIMECOUNT_VERSION@
 Requires.private: primesieve
 Cflags: -I${includedir}
 Libs: -L${libdir} -lprimecount
-Libs.private: @PKGCONFIG_LIB_OPENMP@
+Libs.private: @PKGCONFIG_LIBS_OPENMP@
