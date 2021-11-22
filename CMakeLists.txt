@@ -267,7 +267,7 @@ if(BUILD_LIBPRIMESIEVE)
     set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()
-    find_package(primesieve REQUIRED)
+    find_package(primesieve 7.6 REQUIRED)
 endif()
 
 # Testing ############################################################
