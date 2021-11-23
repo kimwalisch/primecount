@@ -58,7 +58,7 @@ support both OpenMP (multi-threading library) and 128-bit integers.
 cmake .
 make -j
 sudo make install
-command -v ldconfig && sudo ldconfig
+sudo ldconfig
 ```
 
 * [Detailed build instructions](doc/BUILD.md)
