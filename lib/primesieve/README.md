@@ -127,7 +127,7 @@ and CMake ≥ 3.4.
 cmake .
 make -j
 sudo make install
-command -v ldconfig && sudo ldconfig
+sudo ldconfig
 ```
 
 * [Detailed build instructions](doc/BUILD.md)
@@ -281,11 +281,13 @@ c++ -O3 primes.cpp -lprimesieve
 cc  -O3 primes.c   -lprimesieve
 ```
 
-If you have
-[built libprimesieve yourself](doc/BUILD.md#primesieve-build-instructions) then
-the default installation path is usually ```/usr/local/lib``` which is not part
-of ```LD_LIBRARY_PATH``` on many OSes. Hence you may need to export some
-environment variables:
+If you have [built libprimesieve yourself](BUILD.md#primesieve-build-instructions),
+then the default installation path is usually ```/usr/local/lib```. Running
+the ```ldconfig``` program after ```make install``` ensures that Linux's dynamic
+linker/loader will find the shared primesieve library when you execute your program.
+However, some OSes are missing the ```ldconfig``` program or ```ldconfig``` does
+not include ```/usr/local/lib``` by default. In these cases you need to export
+some environment variables:
 
 ```sh
 export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH

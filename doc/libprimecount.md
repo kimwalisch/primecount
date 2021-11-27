@@ -171,7 +171,7 @@ option to enable building libprimecount as a shared library.
 cmake . -DBUILD_SHARED_LIBS=ON
 make -j
 sudo make install
-command -v ldconfig && sudo ldconfig
+sudo ldconfig
 ```
 
 * [Detailed build instructions](BUILD.md#primecount-build-instructions)
