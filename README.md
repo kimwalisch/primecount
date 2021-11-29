@@ -457,6 +457,10 @@ primesieve natively supports C and C++ and has bindings available for:
     </tr>
     <tr>
         <td><b>Python:</b></td>
+        <td><a href="https://github.com/dimpase/primecountpy">primecountpy</a></td>
+    </tr>
+    <tr>
+        <td><b>Python:</b></td>
         <td><a href="https://github.com/hearot/primecount-python">primecount-python</a></td>
     </tr>
     <tr>
