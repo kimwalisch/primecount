@@ -43,6 +43,10 @@ For doing development with libprimecount you may need to install
         <td><code>sudo dnf install primecount</code></td>
     </tr>
     <tr>
+        <td><b>FreeBSD:</b></td>
+        <td><code>pkg install primecount</code></td>
+    </tr>
+    <tr>
         <td><b>openSUSE:</b></td>
         <td><code>sudo zypper install primecount</code></td>
     </tr>
