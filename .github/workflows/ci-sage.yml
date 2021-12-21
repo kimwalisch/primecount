@@ -49,20 +49,20 @@ env:
   # Ubuntu packages to install so that the project's "setup.py sdist" can succeed
   DIST_PREREQ: cmake
   # Name of this project in the Sage distribution
-  SPKG:        primesieve
+  SPKG:        primecount
   # Sage distribution packages to build
   TARGETS_PRE: build/make/Makefile
-  TARGETS:     SAGE_CHECK=no SAGE_CHECK_PACKAGES=primesieve primesieve
-  TARGETS_OPTIONAL: primecount
+  TARGETS:     SAGE_CHECK=no SAGE_CHECK_PACKAGES=primecount primecount
+  TARGETS_OPTIONAL: build/make/Makefile
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:   sagemath/sage
   SAGE_REF:    develop
   # Temporarily test with the branch from sage ticket https://trac.sagemath.org/ticket/25009,
   # which adds primesieve and primecount packages
   # (this is a no-op after that ticket is merged)
-  SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET: 25009
-  REMOVE_PATCHES: "*"
+  #SAGE_TRAC_GIT: https://github.com/sagemath/sagetrac-mirror.git
+  #SAGE_TICKET: 25009
+  #REMOVE_PATCHES: "*"
 
 jobs:
 
