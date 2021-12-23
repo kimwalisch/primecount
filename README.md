@@ -457,7 +457,7 @@ primesieve natively supports C and C++ and has bindings available for:
     </tr>
     <tr>
         <td><b>Haskell:</b></td>
-        <td><a href="https://github.com/erantapaa/hprimecount">hprimecount</a></td>
+        <td><a href="https://github.com/pgujjula/primecount-haskell">primecount-haskell</a></td>
     </tr>
     <tr>
         <td><b>Python:</b></td>
