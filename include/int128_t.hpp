@@ -1,6 +1,10 @@
 ///
 /// @file   int128_t.hpp
 /// @brief  Support for int128_t, uint128_t types.
+///         The code in this file uses only "old" C++ features from
+///         C++03 and C++98 because it is used in primecount's main
+///         CMakeLists.txt (CMake build script) and must work without
+///         any special compiler flags with all C++ compilers.
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -24,8 +28,8 @@
 
 namespace primecount {
 
-using maxint_t = int128_t;
-using maxuint_t = uint128_t;
+typedef int128_t maxint_t;
+typedef uint128_t maxuint_t;
 using std::to_string;
 
 }
@@ -46,10 +50,10 @@ using std::to_string;
 
 namespace primecount {
 
-using int128_t = __int128_t;
-using uint128_t = __uint128_t;
-using maxint_t = __int128_t;
-using maxuint_t = __uint128_t;
+typedef __int128_t int128_t;
+typedef __uint128_t uint128_t;
+typedef __int128_t maxint_t;
+typedef __uint128_t maxuint_t;
 
 /// defined in util.cpp
 std::string to_string(int128_t x);
@@ -63,8 +67,8 @@ std::ostream& operator<<(std::ostream& stream, uint128_t n);
 
 namespace primecount {
 
-using maxint_t = int64_t;
-using maxuint_t = uint64_t;
+typedef int64_t maxint_t;
+typedef uint64_t maxuint_t;
 using std::to_string;
 
 }
