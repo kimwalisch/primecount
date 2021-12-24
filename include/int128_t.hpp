@@ -17,7 +17,9 @@
 /// If INT128_MAX is defined we know that int128_t and
 /// uint128_t are available in <stdint.h>.
 ///
-#if defined(INT128_MAX)
+#if defined(INT128_MAX) && \
+   !defined(DISABLE_INT128)
+
 #define HAVE_INT128_T
 
 namespace primecount {
@@ -34,7 +36,9 @@ using std::to_string;
 /// can use int128_t instead of __int128_t. Once this is done
 /// int128_t can be used like a regular integer type.
 ///
-#elif defined(__SIZEOF_INT128__)
+#elif defined(__SIZEOF_INT128__) && \
+     !defined(DISABLE_INT128)
+
 #define HAVE_INT128_T
 #define HAVE_NON_STANDARD__INT128_T
 

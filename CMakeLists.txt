@@ -111,6 +111,41 @@ if(WITH_DIV32)
     set(ENABLE_DIV32 "ENABLE_DIV32")
 endif()
 
+# Check if int128_t is supported #####################################
+
+# GCC & Clang support 128-bit integers on 64-bit CPUs. However
+# support for 128-bit integers in the C++ standard library is
+# currently (2021) only enabled if the GNU extensions are enabled.
+# The GNU extensions are usually enabled by default but will be
+# disabled if the user compiles with the -std=c++* option. You
+# should use -std=gnu++* instead of -std=c++* if you want to enable
+# 128-bit integer support in primecount (or simply omit both
+# -std=c++* and -std=gnu++*).
+
+cmake_push_check_state()
+set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+check_cxx_source_compiles("
+    #include <int128_t.hpp>
+    #include <limits>
+    #include <type_traits>
+    int main() {
+        using namespace primecount;
+        static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
+        static_assert(std::is_integral<int128_t>::value, \"\");
+        static_assert(std::is_integral<uint128_t>::value, \"\");
+        static_assert(std::is_signed<int128_t>::value, \"\");
+        static_assert(std::is_unsigned<uint128_t>::value, \"\");
+        static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
+        return 0;
+    }" int128)
+
+cmake_pop_check_state()
+
+if (NOT int128)
+    set(DISABLE_INT128 "DISABLE_INT128")
+endif()
+
 # Check if libdivide.h compiles ######################################
 
 if(WITH_LIBDIVIDE)
@@ -153,6 +188,10 @@ if(WITH_OPENMP)
         cmake_push_check_state()
         set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
         set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+        if(NOT int128)
+            set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
+        endif()
 
         check_cxx_source_compiles("
             #include <int128_t.hpp>
@@ -284,7 +323,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -309,7 +348,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -343,6 +382,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE libprimecount primesieve::primesieve)
+    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
