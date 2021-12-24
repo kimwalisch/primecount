@@ -169,6 +169,8 @@ if(NOT int128)
     endif()
 endif()
 
+cmake_pop_check_state()
+
 # Check if libdivide.h compiles ######################################
 
 if(WITH_LIBDIVIDE)
