@@ -125,12 +125,6 @@ endif()
 cmake_push_check_state()
 set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-    set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-    set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-endif()
-
 check_cxx_source_compiles("
     #include <int128_t.hpp>
     #include <limits>
@@ -146,10 +140,33 @@ check_cxx_source_compiles("
         return 0;
     }" int128)
 
-cmake_pop_check_state()
-
 if(NOT int128)
-    set(DISABLE_INT128 "DISABLE_INT128")
+    # Let's try it again with C++11, this usually works for old
+    # GCC/Clang versions that use C++03 by default.
+    if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+    elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+    endif()
+
+    check_cxx_source_compiles("
+        #include <int128_t.hpp>
+        #include <limits>
+        #include <type_traits>
+        int main() {
+            using namespace primecount;
+            static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
+            static_assert(std::is_integral<int128_t>::value, \"\");
+            static_assert(std::is_integral<uint128_t>::value, \"\");
+            static_assert(std::is_signed<int128_t>::value, \"\");
+            static_assert(std::is_unsigned<uint128_t>::value, \"\");
+            static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
+            return 0;
+        }" int128_with_cpp11)
+
+    if(NOT int128_with_cpp11)
+        set(DISABLE_INT128 "DISABLE_INT128")
+    endif()
 endif()
 
 # Check if libdivide.h compiles ######################################
@@ -195,13 +212,7 @@ if(WITH_OPENMP)
         set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
         set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
 
-        if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
-        elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
-        endif()
-
-        if(NOT int128)
+        if(DISABLE_INT128)
             set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
         endif()
 
