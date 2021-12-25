@@ -275,7 +275,7 @@ if(WITH_OPENMP)
         message(STATUS "Performing Test OpenMP - Failed")
     endif()
 
-    if(NOT LIB_OPENMP)
+    if(NOT OpenMP AND NOT OpenMP_with_libatomic)
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
             message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
         elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
