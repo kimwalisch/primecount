@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4...3.19)
+cmake_minimum_required(VERSION 3.4...3.22)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 7)
 set(PRIMECOUNT_VERSION_MINOR 2)
@@ -228,6 +228,8 @@ if(WITH_OPENMP)
                 return 0;
             }" OpenMP)
 
+        # This is a workaround for Clang which currently (2021)
+        # requires libatomic when using int128_t with OpenMP.
         if(NOT OpenMP)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
@@ -271,6 +273,16 @@ if(WITH_OPENMP)
     else()
         message(STATUS "Performing Test OpenMP")
         message(STATUS "Performing Test OpenMP - Failed")
+    endif()
+
+    if(NOT LIB_OPENMP)
+        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
+            message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            message(WARNING "Install the OpenMP library (libgomp) to enable multithreading in primecount!")
+        else()
+            message(WARNING "Install the OpenMP library to enable multithreading in primecount!")
+        endif()
     endif()
 endif()
 
