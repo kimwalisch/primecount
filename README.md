@@ -50,6 +50,10 @@ For doing development with libprimecount you may need to install
         <td><b>openSUSE:</b></td>
         <td><code>sudo zypper install primecount</code></td>
     </tr>
+    <tr>
+        <td><b>Void Linux:</b></td>
+        <td><code>sudo xbps-install -S primecount</code></td>
+    </tr>
 </table>
 
 ## Build instructions
