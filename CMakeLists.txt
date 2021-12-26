@@ -175,6 +175,7 @@ if(NOT int128)
         # if this would enable 128-bit integers.
         if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION AND "${CMAKE_CXX_FLAGS}" MATCHES "-std=c\\+\\+[0-9]+")
             set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
+            set(CMAKE_REQUIRED_QUIET TRUE)
 
             check_cxx_source_compiles("
                 #include <int128_t.hpp>
