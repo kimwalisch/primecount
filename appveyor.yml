@@ -91,8 +91,6 @@ for:
     build_script:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
       - cmake --build . --config %Configuration% --target install
-      # Test x64 CPU POPCNT instruction detection
-      - C:\msys64\usr\bin\grep.exe "^cpu_supports_popcnt.*=1$" CMakeCache.txt
     test_script:
       - ctest -C %Configuration%
       - cd %Configuration%
