@@ -32,6 +32,8 @@ for:
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
       - make VERBOSE=1
     test_script:
       - ctest
@@ -54,6 +56,8 @@ for:
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
       - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
       - make VERBOSE=1
       - make install
     test_script:
@@ -69,6 +73,8 @@ for:
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
       - make VERBOSE=1
       - make install
     test_script:
@@ -85,6 +91,8 @@ for:
     build_script:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
       - cmake --build . --config %Configuration% --target install
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
     test_script:
       - ctest -C %Configuration%
       - cd %Configuration%
