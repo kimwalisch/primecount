@@ -99,6 +99,8 @@ set(LIB_SRC src/api.cpp
 
 include(GNUInstallDirs)
 include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
+include(CheckCXXSourceRuns)
 include(CMakePushCheckState)
 
 # Use 32-bit integer division ########################################
@@ -319,7 +321,7 @@ if(WITH_OPENMP)
     endif()
 endif()
 
-# Find POPCNT compiler flag ##########################################
+# Check if x86 CPU supports POPCNT instruction #######################
 
 if(WITH_POPCNT)
     cmake_push_check_state()
@@ -330,6 +332,72 @@ if(WITH_POPCNT)
     if(mpopcnt)
         set(POPCNT_FLAG "-mpopcnt")
     endif()
+
+    # Since the POPCNT instruction is very important for performance
+    # (up to 50% speedup), we will only disable POPCNT if we can
+    # prove (using 2 tests) that the CPU does not support it.
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    set(CMAKE_REQUIRED_QUIET TRUE)
+
+    if(NOT CMAKE_CROSSCOMPILING)
+        # GCC/Clang & x86 CPU
+        if(mpopcnt)
+            check_cxx_source_runs("
+                #include <popcnt.hpp>
+                int main(int argc, char**) {
+                    return (int) (popcnt64(argc) >> 16);
+                }" popcnt64_without_mpopcnt)
+
+            if(popcnt64_without_mpopcnt)
+                set(CMAKE_REQUIRED_FLAGS "${POPCNT_FLAG}")
+                set(CMAKE_REQUIRED_QUIET FALSE)
+
+                check_cxx_source_runs("
+                    #include <popcnt.hpp>
+                    int main(int argc, char**) {
+                        return (int) (popcnt64(argc) >> 16);
+                    }" cpu_supports_popcnt)
+
+                if(NOT cpu_supports_popcnt)
+                    set(POPCNT_FLAG "")
+                endif()
+            endif()
+        # MSVC compiler & x86 CPU
+        else()
+            set(CMAKE_REQUIRED_DEFINITIONS "-DDISABLE_POPCNT")
+            check_cxx_source_runs("
+                #include <popcnt.hpp>
+                int main(int argc, char**) {
+                    #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+                        return (int) (popcnt64(argc) >> 16);
+                    #else
+                        Error: not MSVC compiler
+                    #endif
+                }" MSVC_without_popcnt64)
+
+            if(MSVC_without_popcnt64)
+                set(CMAKE_REQUIRED_DEFINITIONS "")
+                set(CMAKE_REQUIRED_QUIET FALSE)
+
+                check_cxx_source_runs("
+                    #include <popcnt.hpp>
+                    int main(int argc, char**) {
+                        #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+                            return (int) (popcnt64(argc) >> 16);
+                        #else
+                            Error: not MSVC compiler
+                        #endif
+                    }" cpu_supports_popcnt)
+
+                if(NOT cpu_supports_popcnt)
+                    set(DISABLE_POPCNT "DISABLE_POPCNT")
+                endif()
+            endif()
+        endif()
+    endif()
+
+    cmake_pop_check_state()
 else()
     # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
     # POPCNT instruction and instead uses a portable integer popcount

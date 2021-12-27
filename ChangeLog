@@ -1,8 +1,10 @@
-Changes in primecount-7.3, 2021-12-25
+Changes in primecount-7.3, 2021-12-27
 
 * CMakeLists.txt: Disable usage of int128_t if the compiler does not
   support it. The -std=c++* option usually disables int128_t, use
   -std=gnu++* instead (or omit both -std=c++* and -std=gnu++*).
+* CMakeLists.txt: Detect at build time if the host CPU (x86) supports
+  the POPCNT instruction. If not, disable the POPCNT instruction.
 * CMakeLists.txt: Print warning message if OpenMP library is missing.
 
 Changes in primecount-7.2, 2021-11-20
