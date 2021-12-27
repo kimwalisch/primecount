@@ -374,9 +374,9 @@ if(WITH_POPCNT)
                     #else
                         Error: not MSVC compiler
                     #endif
-                }" MSVC_without_popcnt64)
+                }" MSVC_without_popcnt)
 
-            if(MSVC_without_popcnt64)
+            if(MSVC_without_popcnt)
                 set(CMAKE_REQUIRED_DEFINITIONS "")
                 set(CMAKE_REQUIRED_QUIET FALSE)
 
