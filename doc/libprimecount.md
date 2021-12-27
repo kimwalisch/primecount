@@ -180,7 +180,7 @@ sudo ldconfig
 
 For performance reasons primecount uses the ```POPCNT``` instruction on all
 CPU architectures that support it. Enabling the ```POPCNT``` instruction
-usually improves primecount's performance by about 50%.
+usually improves primecount's performance by about 30%.
 
 On x86/x64 CPUs primecount will by default detect at build time if the host
 CPU supports the ```POPCNT``` instruction. If not, the ```POPCNT```
