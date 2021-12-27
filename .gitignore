@@ -1,6 +1,7 @@
 .*
 *~
 !/.gitignore
+!/.github
 *.exe
 *.tar.gz
 *.zip
