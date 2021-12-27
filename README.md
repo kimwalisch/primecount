@@ -290,7 +290,7 @@ in only 460 CPU core hours on an AMD Ryzen 3950X CPU!
 If you have an x64 CPU and you have installed primecount using the package manager of
 your Linux distribution, then it is possible that the ```POPCNT``` instruction has been
 disabled in order to ensure that primecount works on very old CPUs. Unfortunately this
-decreases performance by up to 50%. On the other hand, if you compile primecount from
+decreases performance by about 30%. On the other hand, if you compile primecount from
 source the ```POPCNT``` instruction will be enabled by default. The fastest primecount
 binary can be built using the Clang compiler and the ```-march=native``` option.
 
