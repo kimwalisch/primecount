@@ -255,11 +255,16 @@ if(WITH_OPENMP)
 
         check_cxx_source_compiles("
             #include <int128_t.hpp>
-            int main() {
+            #include <stdint.h>
+            #include <iostream>
+            int main(int, char** argv) {
+                uintptr_t n = (uintptr_t) argv;
+                int iters = (int)(n % 1000);
                 primecount::maxint_t sum = 0;
                 #pragma omp parallel for reduction(+: sum)
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < iters; i++)
                     sum += i;
+                std::cout << (int) sum;
                 return 0;
             }" OpenMP)
 
@@ -275,11 +280,16 @@ if(WITH_OPENMP)
 
                 check_cxx_source_compiles("
                     #include <int128_t.hpp>
-                    int main() {
+                    #include <stdint.h>
+                    #include <iostream>
+                    int main(int, char** argv) {
+                        uintptr_t n = (uintptr_t) argv;
+                        int iters = (int)(n % 1000);
                         primecount::maxint_t sum = 0;
                         #pragma omp parallel for reduction(+: sum)
-                        for (int i = 0; i < 100; i++)
+                        for (int i = 0; i < iters; i++)
                             sum += i;
+                        std::cout << (int) sum;
                         return 0;
                     }" OpenMP_with_libatomic)
 
@@ -345,8 +355,12 @@ if(WITH_POPCNT)
         if(mpopcnt)
             check_cxx_source_runs("
                 #include <popcnt.hpp>
-                int main(int argc, char**) {
-                    return (int) (popcnt64(argc) >> 16);
+                #include <stdint.h>
+                #include <iostream>
+                int main(int, char** argv) {
+                    uintptr_t n = (uintptr_t) argv;
+                    std::cout << popcnt64((uint64_t) n);
+                    return 0;
                 }" popcnt64_without_mpopcnt)
 
             if(popcnt64_without_mpopcnt)
@@ -355,8 +369,12 @@ if(WITH_POPCNT)
 
                 check_cxx_source_runs("
                     #include <popcnt.hpp>
-                    int main(int argc, char**) {
-                        return (int) (popcnt64(argc) >> 16);
+                    #include <stdint.h>
+                    #include <iostream>
+                    int main(int, char** argv) {
+                        uintptr_t n = (uintptr_t) argv;
+                        std::cout << popcnt64((uint64_t) n);
+                        return 0;
                     }" cpu_supports_popcnt)
 
                 if(NOT cpu_supports_popcnt)
@@ -368,9 +386,13 @@ if(WITH_POPCNT)
             set(CMAKE_REQUIRED_DEFINITIONS "-DDISABLE_POPCNT")
             check_cxx_source_runs("
                 #include <popcnt.hpp>
-                int main(int argc, char**) {
+                #include <stdint.h>
+                #include <iostream>
+                int main(int, char** argv) {
                     #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                        return (int) (popcnt64(argc) >> 16);
+                        uintptr_t n = (uintptr_t) argv;
+                        std::cout << popcnt64((uint64_t) n);
+                        return 0;
                     #else
                         Error: not MSVC compiler
                     #endif
@@ -382,9 +404,13 @@ if(WITH_POPCNT)
 
                 check_cxx_source_runs("
                     #include <popcnt.hpp>
-                    int main(int argc, char**) {
+                    #include <stdint.h>
+                    #include <iostream>
+                    int main(int, char** argv) {
                         #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                            return (int) (popcnt64(argc) >> 16);
+                            uintptr_t n = (uintptr_t) argv;
+                            std::cout << popcnt64((uint64_t) n);
+                            return 0;
                         #else
                             Error: not MSVC compiler
                         #endif
