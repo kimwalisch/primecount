@@ -33,7 +33,7 @@ for:
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       # Test x64 CPU POPCNT instruction detection
-      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make VERBOSE=1
     test_script:
       - ctest
@@ -57,7 +57,7 @@ for:
     build_script:
       - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
-      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make VERBOSE=1
       - make install
     test_script:
@@ -74,7 +74,7 @@ for:
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
-      - grep "^cpu_supports_popcnt.*=1$" CMakeCache.txt
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make VERBOSE=1
       - make install
     test_script:
