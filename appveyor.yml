@@ -91,6 +91,7 @@ for:
     build_script:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
       - dir
+      - type CMakeCache.txt
       #- findstr /i /r /c:"^cpu_supports_popcnt.*=1$" CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
