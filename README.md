@@ -299,7 +299,7 @@ CXX=clang++ CXXFLAGS="-march=native" cmake .
 make -j
 ```
 
-By default primecount scales nicely up until 10<sup>20</sup> on current x64 CPUs.
+By default primecount scales nicely up until 10<sup>23</sup> on current x64 CPUs.
 For larger values primecount's large memory usage causes many
 [TLB (translation lookaside buffer)](https://en.wikipedia.org/wiki/Translation_lookaside_buffer)
 cache misses that significantly deteriorate primecount's performance.
