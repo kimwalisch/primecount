@@ -6,6 +6,7 @@ Changes in primecount-7.3, 2021-12-29
 * CMakeLists.txt: Detect at build time if the host CPU (x86) supports
   the POPCNT instruction. If not, disable the POPCNT instruction.
 * CMakeLists.txt: Fix AppleClang OpenMP detection.
+* CMakeLists.txt: Add option STATICALLY_LINK_LIBPRIMECOUNT=ON/OFF.
 * CMakeLists.txt: Print warning message if OpenMP library is missing.
 
 Changes in primecount-7.2, 2021-11-20
