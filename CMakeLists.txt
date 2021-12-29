@@ -30,7 +30,29 @@ if(WIN32)
 endif()
 
 if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
-    message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON")
+    message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON!")
+endif()
+
+if(STATICALLY_LINK_LIBPRIMECOUNT AND NOT BUILD_STATIC_LIBS)
+    message(FATAL_ERROR "Using STATICALLY_LINK_LIBPRIMECOUNT=ON requires BUILD_STATIC_LIBS=ON!")
+endif()
+
+# Static vs. shared linking ##########################################
+
+# By default libprimecount is linked statically if only the static
+# libprimecount has been built. If libprimecount has been built as
+# both a static and shared library then the shared libprimecount will
+# be used for linking.
+
+# It is possible to force static linking by setting:
+# cmake -DSTATICALLY_LINK_LIBPRIMECOUNT=ON
+# This way libprimecount will be linked statically even if
+# libprimecount has been built as both a static and shared library.
+
+if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
+    if(BUILD_STATIC_LIBS AND NOT BUILD_SHARED_LIBS)
+        set(STATICALLY_LINK_LIBPRIMECOUNT TRUE)
+    endif()
 endif()
 
 # Set default build type to Release ##################################
@@ -532,11 +554,6 @@ if(BUILD_STATIC_LIBS)
         set_target_properties(libprimecount-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
     endif()
 
-    if(NOT BUILD_SHARED_LIBS)
-        # make sure libprimecount is always defined
-        add_library(libprimecount ALIAS libprimecount-static)
-    endif()
-
     target_compile_features(libprimecount-static
     PRIVATE
         cxx_constexpr
@@ -553,11 +570,19 @@ if(BUILD_STATIC_LIBS)
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
+# Shared vs. static linking ##########################################
+
+if(STATICALLY_LINK_LIBPRIMECOUNT)
+    add_library(primecount::primecount ALIAS libprimecount-static)
+else()
+    add_library(primecount::primecount ALIAS libprimecount)
+endif()
+
 # primecount binary ##################################################
 
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
-    target_link_libraries(primecount PRIVATE libprimecount primesieve::primesieve)
+    target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
     target_compile_definitions(primecount PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
