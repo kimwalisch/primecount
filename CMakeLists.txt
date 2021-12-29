@@ -253,6 +253,7 @@ if(WITH_OPENMP)
     # to support 128-bit integers with OpenMP.
     if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
         cmake_push_check_state()
+        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
         if(TARGET OpenMP::OpenMP_CXX)
             set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
@@ -263,8 +264,6 @@ if(WITH_OPENMP)
         if(DISABLE_INT128)
             set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
         endif()
-
-        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
         # Check if compiles without libatomic
         check_cxx_source_compiles("
@@ -288,7 +287,8 @@ if(WITH_OPENMP)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
             if(LIB_ATOMIC)
-                set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${LIB_ATOMIC}")
+                set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
+                set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
 
                 # Check if compiles with libatomic
                 check_cxx_source_compiles("
