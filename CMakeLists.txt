@@ -244,65 +244,79 @@ endif()
 if(WITH_OPENMP)
     find_package(OpenMP QUIET)
 
+    if(NOT (OpenMP_FOUND OR OpenMP_CXX_FOUND))
+        message(STATUS "Performing Test OpenMP")
+        message(STATUS "Performing Test OpenMP - Failed")
+    endif()
+
+    # Check if libatomic is required (usually by Clang)
+    # to support 128-bit integers with OpenMP.
     if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
         cmake_push_check_state()
-        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
-        set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
+
+        if(TARGET OpenMP::OpenMP_CXX)
+            set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
+        else()
+            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
+        endif()
 
         if(DISABLE_INT128)
             set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
         endif()
 
+        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+        # Check if compiles without libatomic
         check_cxx_source_compiles("
             #include <int128_t.hpp>
+            #include <omp.h>
             #include <stdint.h>
             #include <iostream>
             int main(int, char** argv) {
+                using primecount::maxint_t;
                 uintptr_t n = (uintptr_t) argv;
-                int iters = (int)(n % 1000);
-                primecount::maxint_t sum = 0;
+                maxint_t sum = (maxint_t) n;
+                int iters = (int) n;
                 #pragma omp parallel for reduction(+: sum)
                 for (int i = 0; i < iters; i++)
-                    sum += i;
-                std::cout << (int) sum;
+                    sum += (i / 3) * omp_get_thread_num();
+                std::cout << (long) sum;
                 return 0;
             }" OpenMP)
 
-        # This is a workaround for Clang which currently (2021)
-        # requires libatomic when using int128_t with OpenMP.
         if(NOT OpenMP)
             find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
 
-            if(NOT LIB_ATOMIC)
-                set(LIB_ATOMIC "")
-            else()
-                set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
+            if(LIB_ATOMIC)
+                set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${LIB_ATOMIC}")
 
+                # Check if compiles with libatomic
                 check_cxx_source_compiles("
                     #include <int128_t.hpp>
+                    #include <omp.h>
                     #include <stdint.h>
                     #include <iostream>
                     int main(int, char** argv) {
+                        using primecount::maxint_t;
                         uintptr_t n = (uintptr_t) argv;
-                        int iters = (int)(n % 1000);
-                        primecount::maxint_t sum = 0;
+                        maxint_t sum = (maxint_t) n;
+                        int iters = (int) n;
                         #pragma omp parallel for reduction(+: sum)
                         for (int i = 0; i < iters; i++)
-                            sum += i;
-                        std::cout << (int) sum;
+                            sum += (i / 3) * omp_get_thread_num();
+                        std::cout << (long) sum;
                         return 0;
                     }" OpenMP_with_libatomic)
+            endif()
 
-                if(NOT OpenMP_with_libatomic)
-                    set(LIB_ATOMIC "")
-                endif()
+            if(NOT OpenMP_with_libatomic)
+                set(LIB_ATOMIC "")
             endif()
         endif()
 
         cmake_pop_check_state()
 
-        # We made sure OpenMP works. In 2021 OpenMP
-        # does e.g. not work using Apple Clang.
+        # OpenMP has been tested successfully, enable it
         if(OpenMP OR OpenMP_with_libatomic)
             if(TARGET OpenMP::OpenMP_CXX)
                 set(LIB_OPENMP "OpenMP::OpenMP_CXX")
@@ -315,11 +329,9 @@ if(WITH_OPENMP)
                 string(APPEND PKGCONFIG_LIBS_OPENMP "-l${X} ")
             endforeach()
         endif()
-    else()
-        message(STATUS "Performing Test OpenMP")
-        message(STATUS "Performing Test OpenMP - Failed")
     endif()
 
+    # OpenMP test has failed, print warning message
     if(NOT OpenMP AND NOT OpenMP_with_libatomic)
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
             message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
