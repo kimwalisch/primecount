@@ -6,6 +6,10 @@ You need to have installed a C++ compiler which supports C++11 (or later) and CM
 
 <table>
     <tr>
+        <td><b>Arch Linux:</b></td>
+        <td><code>sudo pacman -S gcc cmake</code></td>
+    </tr>
+    <tr>
         <td><b>Debian/Ubuntu:</b></td>
         <td><code>sudo apt install g++ cmake</code></td>
     </tr>
@@ -14,16 +18,16 @@ You need to have installed a C++ compiler which supports C++11 (or later) and CM
         <td><code>sudo dnf install gcc-c++ cmake</code></td>
     </tr>
     <tr>
+        <td><b>macOS:</b></td>
+        <td><code>brew install cmake libomp</code></td>
+    </tr>
+    <tr>
         <td><b>openSUSE:</b></td>
         <td><code>sudo zypper install gcc-c++ cmake</code></td>
     </tr>
-    <tr>
-        <td><b>Arch Linux:</b></td>
-        <td><code>sudo pacman -S gcc cmake</code></td>
-    </tr>
 </table>
 
-## Unix-like OSes
+## Linux & Unix-like OSes
 
 Open a terminal, cd into the primecount directory and run:
 
@@ -36,16 +40,17 @@ sudo ldconfig
 
 ## macOS
 
-On macOS the default C++ compiler that can be installed using ```xcode-select --install```
-does not support OpenMP multi-threading. Hence I suggest installing an alternative
-C++ compiler that supports OpenMP.
+On macOS the default AppleClang C/C++ compiler can be installed using
+```xcode-select --install```. If you have installed the [homebrew package
+manager](https://brew.sh) then AppleClang is usually already installed on your Mac.
+
+Open a terminal, cd into the primecount directory and run:
 
 ```bash
-# Install C++ compiler with OpenMP support
-brew install cmake llvm libomp
+# Install CMake & the OpenMP library
+brew install cmake libomp
 
-# Build primecount with OpenMP
-LIBRARY_PATH=$(brew --prefix llvm)/lib CXX=$(brew --prefix llvm)/bin/clang++ cmake .
+cmake .
 make -j
 sudo make install
 ```
@@ -69,7 +74,7 @@ and run the commands below:
 
 ```bash
 # Use 'cmake -G' to find your Visual Studio version
-cmake -G "Visual Studio 16 2019" .
+cmake -G "Visual Studio 17 2022" .
 cmake --build . --config Release
 
 # Optionally install using Admin shell
