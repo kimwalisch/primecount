@@ -30,13 +30,13 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     install:
-      - sudo apt update -qq
+      - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
       - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
       - make install
     test_script:
       - ctest
@@ -54,7 +54,7 @@ for:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
     test_script:
       - ctest
       # Run primecount binary
@@ -72,13 +72,13 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     install:
-      - sudo apt update -qq
+      - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
       - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
       - make install
     test_script:
       - ctest
@@ -96,7 +96,7 @@ for:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
     test_script:
       - ctest
       # Run primecount binary
@@ -114,13 +114,13 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     install:
-      - sudo apt update -qq
+      - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
       - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
       - make install
     test_script:
       - ctest
@@ -138,7 +138,7 @@ for:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
       - make install
     test_script:
       - ctest
@@ -159,7 +159,7 @@ for:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make VERBOSE=1
+      - make -j8 VERBOSE=1
       - make install
     test_script:
       - ctest
@@ -170,10 +170,10 @@ for:
         - image: Visual Studio 2019
           platform: x64
     environment:
-      CFLAGS: "/W3 /WX"
-      CXXFLAGS: "/W3 /WX"
+      CFLAGS: "/W3 /WX /MP /EHsc"
+      CXXFLAGS: "/W3 /WX /MP /EHsc"
     build_script:
-      - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=%Configuration%
+      - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc" -DCMAKE_BUILD_TYPE=%Configuration%
       - findstr /b /e cpu_supports_popcnt:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
