@@ -32,7 +32,7 @@ for:
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
       - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      - grep "^OpetestnMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
