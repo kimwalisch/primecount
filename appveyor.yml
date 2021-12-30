@@ -26,30 +26,11 @@ for:
       only:
         - image: Ubuntu1604
           platform: x64
-          configuration: Debug
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
       - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      # Test x64 CPU POPCNT instruction detection
-      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - make -j8 VERBOSE=1
-      - make install
-    test_script:
-      - ctest
-      - ./primecount --test
-
-  - matrix:
-      only:
-        - image: Ubuntu1604
-          platform: x64
-          configuration: Release
-    environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-    build_script:
-      - CXX=g++-6 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
