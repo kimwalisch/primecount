@@ -21,6 +21,7 @@
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
+#include <to_string.hpp>
 
 #include <stdint.h>
 #include <algorithm>

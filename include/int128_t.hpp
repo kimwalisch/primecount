@@ -16,7 +16,6 @@
 #define INT128_T_HPP
 
 #include <stdint.h>
-#include <string>
 
 /// If INT128_MAX is defined we know that int128_t and
 /// uint128_t are available in <stdint.h>.
@@ -30,9 +29,8 @@ namespace primecount {
 
 typedef int128_t maxint_t;
 typedef uint128_t maxuint_t;
-using std::to_string;
 
-}
+} // namespace
 
 /// The __int128_t type (GCC/Clang) is not well supported by
 /// the C++ standard library (in 2016) so we have to define
@@ -56,8 +54,6 @@ typedef __int128_t maxint_t;
 typedef __uint128_t maxuint_t;
 
 /// defined in util.cpp
-std::string to_string(int128_t x);
-std::string to_string(uint128_t x);
 std::ostream& operator<<(std::ostream& stream, int128_t n);
 std::ostream& operator<<(std::ostream& stream, uint128_t n);
 
@@ -69,9 +65,8 @@ namespace primecount {
 
 typedef int64_t maxint_t;
 typedef uint64_t maxuint_t;
-using std::to_string;
 
-}
+} // namespace
 
 #endif
 

@@ -14,6 +14,7 @@
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
+#include <to_string.hpp>
 
 #include <algorithm>
 #include <cassert>

@@ -18,6 +18,7 @@
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <S.hpp>
+#include <to_string.hpp>
 
 #include <stdint.h>
 #include <exception>
