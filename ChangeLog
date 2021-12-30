@@ -1,13 +1,16 @@
-Changes in primecount-7.3, 2021-12-29
+Changes in primecount-7.3, 2021-12-30
 
-* CMakeLists.txt: Disable usage of int128_t if the compiler does not
-  support it. The -std=c++* option usually disables int128_t, use
+* CMakeLists.txt: Detect at build time if the C++ compiler and the
+  C++ Standard Library support int128_t. If not, int128_t will be
+  disabled. The -std=c++* option usually disables int128_t, use
   -std=gnu++* instead (or omit both -std=c++* and -std=gnu++*).
 * CMakeLists.txt: Detect at build time if the host CPU (x86) supports
   the POPCNT instruction. If not, disable the POPCNT instruction.
 * CMakeLists.txt: Fix AppleClang OpenMP detection.
-* CMakeLists.txt: Add option STATICALLY_LINK_LIBPRIMECOUNT=ON/OFF.
 * CMakeLists.txt: Print warning message if OpenMP library is missing.
+* CMakeLists.txt: Add option STATICALLY_LINK_LIBPRIMECOUNT=ON/OFF.
+* appveyor.yml: Test primecount using many different C++ compilers:
+  GCC-5, GCC-7, GCC-8, GCC-9, Clang-9, AppleClang 13, MSVC 2019.
 
 Changes in primecount-7.2, 2021-11-20
 
