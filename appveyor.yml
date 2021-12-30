@@ -31,9 +31,12 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
+      # Test using defaults + old gcc-5
       - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -49,9 +52,12 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
-      - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # POPCNT disabled + Release
+      - CXX=g++-5 cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+      - grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -67,13 +73,15 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
-      - CXX=g++-7 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      # POPCNT disabled + Debug
+      - CXX=g++-7 cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+      - grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
       - ctest -j2
-      # Run primecount binary
       - ./primecount --test
       - ./primecount 1e14 --gourdon
       - ./primecount 1e12 --nth-prime
@@ -88,9 +96,12 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
-      - CXX=g++-8 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # libdivide disabled + Release
+      - CXX=g++-8 cmake . -DWITH_LIBDIVIDE=OFF -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^WITH_LIBDIVIDE:BOOL=OFF$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -106,13 +117,15 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
+      # Test with GCC sanitizers
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
       - ctest -j2
-      # Run primecount binary
       - ./primecount --test
       - ./primecount 1e14 --gourdon
       - ./primecount 1e12 --nth-prime
@@ -130,9 +143,12 @@ for:
       - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
+      # Test using old clang-9 & build man page
       - CXX=clang++-9 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -148,9 +164,11 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
+      # This test should be without OpenMP
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      # No OpenMP test because libomp is not installed
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -166,12 +184,14 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     install:
-      # primecount must use the OpenMP library in this test
       - brew install libomp
     build_script:
+      # Test macOS + OpenMP
       - cmake . -DBUILD_SHARED_LIBS=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -190,6 +210,7 @@ for:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc /O1" -DCMAKE_BUILD_TYPE=%Configuration%
       - findstr /b /e OpenMP:INTERNAL=1 CMakeCache.txt
       - findstr /b /e cpu_supports_popcnt:INTERNAL=1 CMakeCache.txt
+      - findstr /b /e libdivide_branchfree:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
       - ctest -j 2 -C %Configuration%
@@ -208,6 +229,7 @@ for:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc" -DCMAKE_BUILD_TYPE=%Configuration%
       - findstr /b /e OpenMP:INTERNAL=1 CMakeCache.txt
       - findstr /b /e cpu_supports_popcnt:INTERNAL=1 CMakeCache.txt
+      - findstr /b /e libdivide_branchfree:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
       - ctest -j 2 -C %Configuration%
