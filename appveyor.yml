@@ -145,7 +145,7 @@ for:
     build_script:
       # Test using old clang-9 & build man page
       - CXX=clang++-9 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+      - grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
