@@ -26,6 +26,25 @@ for:
       only:
         - image: Ubuntu1604
           platform: x64
+          configuration: Debug
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+    build_script:
+      - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make -j8 VERBOSE=1
+      - make install
+    test_script:
+      - ctest -j2
+      - ./primecount --test
+
+  - matrix:
+      only:
+        - image: Ubuntu1604
+          platform: x64
+          configuration: Release
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
@@ -36,7 +55,7 @@ for:
       - make -j8 VERBOSE=1
       - make install
     test_script:
-      - ctest
+      - ctest -j2
       - ./primecount --test
 
   - matrix:
@@ -45,15 +64,15 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
       - CXX=g++-7 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
-      - ctest
+      - ctest -j2
       # Run primecount binary
       - ./primecount --test
       - ./primecount 1e14 --gourdon
@@ -68,17 +87,14 @@ for:
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-    install:
-      - sudo apt update
-      - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - CXX=g++-8 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - CXX=g++-8 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
-      - ctest
+      - ctest -j2
       - ./primecount --test
 
   - matrix:
@@ -95,7 +111,7 @@ for:
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
-      - ctest
+      - ctest -j2
       # Run primecount binary
       - ./primecount --test
       - ./primecount 1e14 --gourdon
@@ -120,7 +136,7 @@ for:
       - make -j8 VERBOSE=1
       - make install
     test_script:
-      - ctest
+      - ctest -j2
       - ./primecount --test
 
   - matrix:
@@ -129,8 +145,8 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
@@ -138,7 +154,7 @@ for:
       - make -j8 VERBOSE=1
       - make install
     test_script:
-      - ctest
+      - ctest -j2
       - ./primecount --test
 
   - matrix:
@@ -153,19 +169,37 @@ for:
       # primecount must use the OpenMP library in this test
       - brew install libomp
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - cmake . -DBUILD_SHARED_LIBS=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
-      - ctest
+      - ctest -j2
       - ./primecount --test
 
   - matrix:
       only:
         - image: Visual Studio 2019
           platform: x64
+          configuration: Debug
+    environment:
+      CFLAGS: "/W3 /WX /MP /EHsc /O1"
+      CXXFLAGS: "/W3 /WX /MP /EHsc /O1"
+    build_script:
+      - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc /O1" -DCMAKE_BUILD_TYPE=%Configuration%
+      - findstr /b /e cpu_supports_popcnt:INTERNAL=1 CMakeCache.txt
+      - cmake --build . --config %Configuration% --target install
+    test_script:
+      - ctest -j 2 -C %Configuration%
+      - cd %Configuration%
+      - primecount.exe --test
+
+  - matrix:
+      only:
+        - image: Visual Studio 2019
+          platform: x64
+          configuration: Release
     environment:
       CFLAGS: "/W3 /WX /MP /EHsc"
       CXXFLAGS: "/W3 /WX /MP /EHsc"
@@ -174,6 +208,6 @@ for:
       - findstr /b /e cpu_supports_popcnt:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
-      - ctest -C %Configuration%
+      - ctest -j 2 -C %Configuration%
       - cd %Configuration%
       - primecount.exe --test
