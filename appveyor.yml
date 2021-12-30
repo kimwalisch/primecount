@@ -26,14 +26,30 @@ for:
       only:
         - image: Ubuntu1604
           platform: x64
+          configuration: Debug
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-    install:
-      - sudo apt update
-      - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make -j8 VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
+  - matrix:
+      only:
+        - image: Ubuntu1604
+          platform: x64
+          configuration: Release
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    build_script:
+      - CXX=g++-6 cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
@@ -48,10 +64,10 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      - CXX=g++-7 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
@@ -75,7 +91,7 @@ for:
       - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - CXX=g++-8 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
@@ -117,7 +133,7 @@ for:
       - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
-      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      - CXX=clang++-9 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
