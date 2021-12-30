@@ -4,9 +4,10 @@
 version: 1.0.{build}
 
 image:
+- Ubuntu1604
 - Ubuntu
 - Ubuntu2004
-- macos
+- macos-bigsur
 - Visual Studio 2019
 
 branches:
@@ -21,7 +22,26 @@ configuration:
   - Release
 
 for:
-  # Test using GCC sanitizers
+  - matrix:
+      only:
+        - image: Ubuntu1604
+          platform: x64
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    install:
+      - sudo apt update -qq
+      - sudo apt install -y asciidoc libxml2-utils xmlto
+    build_script:
+      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
   - matrix:
       only:
         - image: Ubuntu
@@ -66,11 +86,75 @@ for:
 
   - matrix:
       only:
-        - image: macos
+        - image: Ubuntu2004
           platform: x64
+          configuration: Debug
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+    build_script:
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make VERBOSE=1
+    test_script:
+      - ctest
+      # Run primecount binary
+      - ./primecount --test
+      - ./primecount 1e14 --gourdon
+      - ./primecount 1e12 --nth-prime
+      - ./primecount 1e12 --meissel
+
+  - matrix:
+      only:
+        - image: Ubuntu2004
+          platform: x64
+          configuration: Release
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    install:
+      - sudo apt update -qq
+      - sudo apt install -y asciidoc libxml2-utils xmlto
+    build_script:
+      - cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
+  - matrix:
+      only:
+        - image: macos-bigsur
+          platform: x64
+          configuration: Debug
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    build_script:
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
+      # Test x64 CPU POPCNT instruction detection
+      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+      - make VERBOSE=1
+      - make install
+    test_script:
+      - ctest
+      - ./primecount --test
+
+  - matrix:
+      only:
+        - image: macos-bigsur
+          platform: x64
+          configuration: Release
+    environment:
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+    install:
+      # primecount must use the OpenMP library in this test
+      - brew install libomp
     build_script:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       # Test x64 CPU POPCNT instruction detection
