@@ -3,18 +3,51 @@ name: primecount CI tests
 on: [push, pull_request]
 
 jobs:
-  test:
+  windows_mingw64_x64:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: msys2/setup-msys2@v2
+      with:
+        install: gcc cmake make
+
+    - name: Print GCC version info
+    - run: gcc -v
+
+    - name: Build primecount
+      run: |
+          cmake . -G "Unix Makefiles"
+          grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+          grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+          grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+          grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
+          make -j2
+
+    - name: CTest (unit tests)
+      run: ctest -j2
+
+    - name: primecount --test option
+      run: ./primecount --test
+
+  linux_x64:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install valgrind
         run: |
-            sudo apt-get update
-            sudo apt-get install valgrind
+            sudo apt update
+            sudo apt install valgrind
 
       - name: Build primecount
         run: |
             cmake .
+            grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
             make -j2
 
       - name: CTest (unit tests)
@@ -44,4 +77,4 @@ jobs:
       - name: PrimePi(1e20) 128-bit test
         run: |
             ./primecount 1e20 -s | tee primecount-1e20.log
-            grep 24739954287740860 primecount-1e20.log
+            grep 2220819602560918840 primecount-1e20.log
