@@ -1,4 +1,4 @@
-Changes in primecount-7.3, 2021-12-30
+Changes in primecount-7.3, 2021-12-31
 
 * CMakeLists.txt: Detect at build time if the C++ compiler and the
   C++ Standard Library support int128_t. If not, int128_t will be
@@ -11,6 +11,8 @@ Changes in primecount-7.3, 2021-12-30
 * CMakeLists.txt: Add option STATICALLY_LINK_LIBPRIMECOUNT=ON/OFF.
 * appveyor.yml: Test primecount using many different C++ compilers:
   GCC-5, GCC-7, GCC-8, GCC-9, Clang-9, AppleClang 13, MSVC 2019.
+* ci.yml: New Github Actions tests: Windows/MinGW-w64 and Linux with
+  Valgrind and PrimePi(10^20) 128-bit test.
 
 Changes in primecount-7.2, 2021-11-20
 
