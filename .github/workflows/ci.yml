@@ -1,0 +1,47 @@
+name: primecount CI tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install valgrind
+        run: |
+            sudo apt-get update
+            sudo apt-get install valgrind
+
+      - name: Build primecount
+        run: |
+            cmake .
+            make -j2
+
+      - name: CTest (unit tests)
+        run: ctest -j2
+
+      - name: primecount --test option
+        run: ./primecount --test
+
+      - name: Valgrind legendre test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --legendre
+
+      - name: Valgrind meissel test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --meissel
+
+      - name: Valgrind lehmer test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
+
+      - name: Valgrind lmo test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --lmo
+
+      - name: Valgrind deleglise-rivat test
+        run: valgrind --error-exitcode=1 ./primecount 1e13 --deleglise-rivat
+
+      - name: Valgrind gourdon test
+        run: valgrind --error-exitcode=1 ./primecount 1e14 --gourdon
+
+      - name: PrimePi(1e20) 128-bit test
+        run: |
+            ./primecount 1e20 -s | tee primecount-1e20.log
+            grep 24739954287740860 primecount-1e20.log
