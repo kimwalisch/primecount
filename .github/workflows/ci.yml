@@ -3,7 +3,7 @@ name: primecount CI tests
 on: [push, pull_request]
 
 jobs:
-  windows_mingw64_x64:
+  windows_mingw64:
     runs-on: windows-latest
     defaults:
       run:
@@ -15,18 +15,18 @@ jobs:
           install: base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake
       - name: Build primecount
         run: |
-            cmake . -G "Unix Makefiles" -DBUILD_TESTS=ON
+            cmake . -G "Unix Makefiles" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -Wno-missing-braces"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
             grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
-            make -j2
+            make -j2 VERBOSE=1
       - name: CTest (unit tests)
         run: ctest -j2
       - name: primecount --test option
         run: ./primecount --test
 
-  linux_x64:
+  linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -34,6 +34,35 @@ jobs:
         run: |
             sudo apt update
             sudo apt install valgrind
+      - name: Build primecount
+        run: |
+            cmake . -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -Wno-missing-braces"
+            grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
+            make -j2 VERBOSE=1
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primecount --test option
+        run: ./primecount --test
+      - name: Valgrind legendre test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --legendre
+      - name: Valgrind meissel test
+        run: valgrind --error-exitcode=1 ./primecount 1e12 --meissel
+      - name: Valgrind lehmer test
+        run: valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
+      - name: Valgrind lmo test
+        run: valgrind --error-exitcode=1 ./primecount 1e12 --lmo
+      - name: Valgrind deleglise-rivat test
+        run: valgrind --error-exitcode=1 ./primecount 1e13 --deleglise-rivat
+      - name: Valgrind gourdon test
+        run: valgrind --error-exitcode=1 ./primecount 1e14 --gourdon
+
+  linux_128bit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON
@@ -44,20 +73,6 @@ jobs:
             make -j2
       - name: CTest (unit tests)
         run: ctest -j2
-      - name: primecount --test option
-        run: ./primecount --test
-      - name: Valgrind legendre test
-        run: valgrind --error-exitcode=1 ./primecount 1e11 --legendre
-      - name: Valgrind meissel test
-        run: valgrind --error-exitcode=1 ./primecount 1e11 --meissel
-      - name: Valgrind lehmer test
-        run: valgrind --error-exitcode=1 ./primecount 1e11 --lehmer
-      - name: Valgrind lmo test
-        run: valgrind --error-exitcode=1 ./primecount 1e11 --lmo
-      - name: Valgrind deleglise-rivat test
-        run: valgrind --error-exitcode=1 ./primecount 1e13 --deleglise-rivat
-      - name: Valgrind gourdon test
-        run: valgrind --error-exitcode=1 ./primecount 1e14 --gourdon
       - name: PrimePi(1e20) 128-bit test
         run: |
             ./primecount 1e20 -s | tee primecount-1e20.log
