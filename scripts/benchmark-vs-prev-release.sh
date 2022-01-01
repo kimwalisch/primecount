@@ -7,7 +7,7 @@
 #   Benchmarks the latest code vs the previous release.
 #   Computes PrimePi(1e17) 10 times with each binary and sum
 #   the elapsed seconds for each binary. The new code must
-#   not be more than 5% slower.
+#   not be more than 3% slower.
 
 # Exit if any error occurs
 set -e
@@ -37,8 +37,8 @@ cmake -S . -B build-prev-release  -G "Unix Makefiles"
 cmake --build build-prev-release -- -j4
 
 # New code must not be more than 
-# 5% slower than old code.
-factor=1.05
+# 3% slower than old code.
+factor=1.03
 
 # Test failure must be observed 3 times,
 # we try to avoid false negatives.
@@ -69,6 +69,9 @@ do
 
     if [ $new_code_is_fast -eq 1 ]
     then
+        new_code_percent=$(echo "scale=1; 100 * $total_seconds1 / $total_seconds2" | bc -l)
+        echo "Old code: 100.0%"
+        echo "New code: $new_code_percent%"
         echo "New code successfully passed performance test!"
         exit 0
     fi
