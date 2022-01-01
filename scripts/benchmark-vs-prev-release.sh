@@ -9,6 +9,9 @@
 #   the elapsed seconds for each binary. The new code must
 #   not be more than 5% slower.
 
+# Exit if any error occurs
+set -e
+
 # Execute in base directory
 if [[ "$(basename $(pwd))" = "scripts" ]]
 then
