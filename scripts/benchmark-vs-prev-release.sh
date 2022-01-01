@@ -7,7 +7,7 @@
 #   Benchmarks the latest code vs the previous release.
 #   Computes PrimePi(1e17) 10 times with each binary and sum
 #   the elapsed seconds for each binary. The new code must
-#   not be more than 3% slower.
+#   not be more than 2% slower.
 
 # Exit if any error occurs
 set -e
@@ -45,8 +45,8 @@ build-curr-release/./primecount --version
 echo ""
 
 # New code must not be more than 
-# 3% slower than old code.
-factor=1.03
+# 2% slower than old code.
+factor=1.02
 
 # Test failure must be observed 3 times,
 # we try to avoid false negatives.
@@ -77,12 +77,13 @@ do
 
     limit=$(echo "scale=3; $total_seconds1 * $factor" | bc -l)
     new_code_is_fast=$(echo $total_seconds2'<='$limit | bc -l)
+    new_code_percent=$(echo "scale=1; 100 * $total_seconds2 / $total_seconds1" | bc -l)
+
+    echo "Old code: 100.0%"
+    echo "New code: $new_code_percent%"
 
     if [ $new_code_is_fast -eq 1 ]
     then
-        new_code_percent=$(echo "scale=1; 100 * $total_seconds2 / $total_seconds1" | bc -l)
-        echo "Old code: 100.0%"
-        echo "New code: $new_code_percent%"
         echo "New code successfully passed performance test!"
         exit 0
     fi
