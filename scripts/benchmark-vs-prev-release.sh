@@ -36,6 +36,14 @@ git checkout $(git describe --tags --abbrev=0)
 cmake -S . -B build-prev-release  -G "Unix Makefiles"
 cmake --build build-prev-release -- -j4
 
+echo "=== Old code (previous release) ==="
+build-prev-release/./primecount --version
+echo ""
+
+echo "=== New code ==="
+build-curr-release/./primecount --version
+echo ""
+
 # New code must not be more than 
 # 3% slower than old code.
 factor=1.03
@@ -44,6 +52,9 @@ factor=1.03
 # we try to avoid false negatives.
 for j in {1..3}
 do
+    echo "=== Benchmark $j ===="
+    echo ""
+
     total_seconds1=0
     total_seconds2=0
 
@@ -69,7 +80,7 @@ do
 
     if [ $new_code_is_fast -eq 1 ]
     then
-        new_code_percent=$(echo "scale=1; 100 * $total_seconds1 / $total_seconds2" | bc -l)
+        new_code_percent=$(echo "scale=1; 100 * $total_seconds2 / $total_seconds1" | bc -l)
         echo "Old code: 100.0%"
         echo "New code: $new_code_percent%"
         echo "New code successfully passed performance test!"
