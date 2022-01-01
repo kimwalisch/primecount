@@ -59,6 +59,20 @@ jobs:
       - name: Valgrind gourdon test
         run: valgrind --error-exitcode=1 ./primecount 1e14 --gourdon
 
+  linux_gcc_performance_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Fetch all commits & tags
+          fetch-depth: 0
+      - name: Install GNU bc calculator
+        run: |
+            sudo apt update
+            sudo apt install bc
+      - name: Benchmark latest code vs. previous release
+        run: scripts/./benchmark-vs-prev-release.sh
+
   linux_128bit:
     runs-on: ubuntu-latest
     steps:
