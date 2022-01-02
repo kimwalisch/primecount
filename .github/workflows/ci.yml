@@ -1,6 +1,14 @@
 name: primecount CI tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - backup3
+      - gh-pages
+  pull_request:
+    branches-ignore:
+      - backup3
+      - gh-pages
 
 jobs:
   windows_mingw64:
