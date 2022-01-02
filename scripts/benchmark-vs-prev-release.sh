@@ -60,12 +60,18 @@ function benchmark_test_option {
         echo "=== Benchmark primecount --test ===="
         echo ""
 
-        seconds1=$(time --format=%e build-prev-release/./primecount -t4 --test 2>&1 | tail -n1)
+        start=$(date +%s.%N)
+        build-prev-release/./primecount -t4 --test >/dev/null
+        end=$(date +%s.%N)
+        seconds1=$(echo "scale=3; $end - $start" | bc -l)
         echo "Seconds old code: $seconds1"
         sleep 1
-        seconds2=$(time --format=%e build-curr-release/./primecount -t4 --test 2>&1 | tail -n1)
+
+        start=$(date +%s.%N)
+        build-curr-release/./primecount -t4 --test >/dev/null
+        end=$(date +%s.%N)
+        seconds2=$(echo "scale=3; $end - $start" | bc -l)
         echo "Seconds new code: $seconds2"
-        echo ""
         sleep 1
 
         limit=$(echo "scale=3; $seconds1 * $factor" | bc -l)
