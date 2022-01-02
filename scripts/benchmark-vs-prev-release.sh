@@ -51,8 +51,8 @@ echo ""
 
 function benchmark_test_option {
     # New code must not be more than 
-    # 5% slower than old code.
-    factor=1.05
+    # 3% slower than old code.
+    factor=1.03
 
     # Test failure must be observed 3 times,
     # we try to avoid false negatives.
