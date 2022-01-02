@@ -63,14 +63,14 @@ function benchmark_test_option {
         start=$(date +%s.%N)
         build-prev-release/./primecount -t4 --test >/dev/null
         end=$(date +%s.%N)
-        seconds1=$(echo "scale=3; $end - $start" | bc -l)
+        seconds1=$(echo "scale=3; ($end - $start) / 1" | bc -l)
         echo "Seconds old code: $seconds1"
         sleep 1
 
         start=$(date +%s.%N)
         build-curr-release/./primecount -t4 --test >/dev/null
         end=$(date +%s.%N)
-        seconds2=$(echo "scale=3; $end - $start" | bc -l)
+        seconds2=$(echo "scale=3; ($end - $start) / 1" | bc -l)
         echo "Seconds new code: $seconds2"
         sleep 1
 
@@ -78,6 +78,7 @@ function benchmark_test_option {
         new_code_is_fast=$(echo $seconds2'<='$limit | bc -l)
         new_code_percent=$(echo "scale=1; 100 * $seconds2 / $seconds1" | bc -l)
 
+        echo ""
         echo "Old code: 100.0%"
         echo "New code: $new_code_percent%"
 
@@ -111,12 +112,12 @@ function benchmark_pi_1e17 {
         do
             seconds1=$(build-prev-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
             echo "Seconds old code: $seconds1"
-            total_seconds1=$(echo "scale=3; $total_seconds1 + $seconds1" | bc -l)
+            total_seconds1=$(echo "scale=3; ($total_seconds1 + $seconds1) / 1" | bc -l)
             sleep 1
             seconds2=$(build-curr-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
             echo "Seconds new code: $seconds2"
             echo ""
-            total_seconds2=$(echo "scale=3; $total_seconds2 + $seconds2" | bc -l)
+            total_seconds2=$(echo "scale=3; ($total_seconds2 + $seconds2) / 1" | bc -l)
             sleep 1
         done
 
@@ -144,4 +145,5 @@ function benchmark_pi_1e17 {
 
 # Execute benchmark functions
 benchmark_test_option
+echo ""
 benchmark_pi_1e17
