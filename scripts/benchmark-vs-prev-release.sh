@@ -39,6 +39,7 @@ cmake --build build-prev-release -- -j4
 
 # Go back to initial branch
 git checkout $current_git_branch
+echo ""
 
 echo "=== Old code (previous release) ==="
 build-prev-release/./primecount --version
