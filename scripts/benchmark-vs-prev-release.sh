@@ -25,30 +25,6 @@ then
     exit 1
 fi
 
-rm -rf build-curr-release build-prev-release
-current_git_branch=$(git rev-parse --abbrev-ref HEAD)
-
-# Build the latest code
-cmake -S . -B build-curr-release  -G "Unix Makefiles"
-cmake --build build-curr-release -- -j4
-
-# Checkout the previous release tag
-git checkout $(git describe --tags --abbrev=0)
-cmake -S . -B build-prev-release  -G "Unix Makefiles"
-cmake --build build-prev-release -- -j4
-
-# Go back to initial branch
-git checkout $current_git_branch
-echo ""
-
-echo "=== Old code (previous release) ==="
-build-prev-release/./primecount --version
-echo ""
-
-echo "=== New code ==="
-build-curr-release/./primecount --version
-echo ""
-
 function benchmark_test_option {
     # New code must not be more than 
     # 3% slower than old code.
@@ -58,6 +34,7 @@ function benchmark_test_option {
     # we try to avoid false negatives.
     for j in {1..3}
     do
+        echo ""
         echo "=== Benchmark primecount --test ===="
         echo ""
 
@@ -103,6 +80,7 @@ function benchmark_pi_1e17 {
     # we try to avoid false negatives.
     for j in {1..3}
     do
+        echo ""
         echo "=== Benchmark PrimePi(1e17) ===="
         echo ""
 
@@ -144,7 +122,29 @@ function benchmark_pi_1e17 {
     exit 1
 }
 
+rm -rf build-curr-release build-prev-release
+current_git_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Build the latest code
+cmake -S . -B build-curr-release  -G "Unix Makefiles"
+cmake --build build-curr-release -- -j4
+
+# Checkout the previous release tag
+git checkout $(git describe --tags --abbrev=0)
+cmake -S . -B build-prev-release  -G "Unix Makefiles"
+cmake --build build-prev-release -- -j4
+
+# Go back to initial branch
+git checkout $current_git_branch
+echo ""
+
+echo "=== Old code (previous release) ==="
+build-prev-release/./primecount --version
+echo ""
+
+echo "=== New code ==="
+build-curr-release/./primecount --version
+
 # Execute benchmark functions
 benchmark_test_option
-echo ""
 benchmark_pi_1e17
