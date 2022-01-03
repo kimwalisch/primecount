@@ -34,8 +34,11 @@ jobs:
       - name: primecount --test option
         run: ./primecount --test
 
-  linux:
+  linux_gcc:
     runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
     steps:
       - uses: actions/checkout@v2
       - name: Install valgrind
@@ -67,19 +70,29 @@ jobs:
       - name: Valgrind gourdon test
         run: valgrind --error-exitcode=1 ./primecount 1e14 --gourdon
 
-  linux_gcc_performance_test:
+  linux_clang:
     runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
     steps:
       - uses: actions/checkout@v2
-        with:
-          # Fetch all commits & tags
-          fetch-depth: 0
-      - name: Install GNU bc calculator
+      - name: Install dependencies
         run: |
             sudo apt update
-            sudo apt install bc
-      - name: Benchmark latest code vs. previous release
-        run: scripts/./benchmark-vs-prev-release.sh
+            sudo apt install libomp-dev
+      - name: Build primecount
+        run: |
+            cmake . -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -Wno-missing-braces"
+            grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
+            make -j2 VERBOSE=1
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primecount --test option
+        run: ./primecount --test
 
   linux_128bit:
     runs-on: ubuntu-latest
@@ -99,3 +112,37 @@ jobs:
         run: |
             ./primecount 1e20 -s | tee primecount-1e20.log
             grep 2220819602560918840 primecount-1e20.log
+
+  linux_gcc_performance_test:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Fetch all commits & tags
+          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install bc
+      - name: Benchmark latest code vs. previous release
+        run: scripts/./benchmark-vs-prev-release.sh
+
+  linux_clang_performance_test:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Fetch all commits & tags
+          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install bc libomp-dev
+      - name: Benchmark latest code vs. previous release
+        run: scripts/./benchmark-vs-prev-release.sh
