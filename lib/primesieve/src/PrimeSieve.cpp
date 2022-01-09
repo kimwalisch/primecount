@@ -4,7 +4,7 @@
 ///         sieving. It is used for printing and counting primes
 ///         and for computing the nth prime.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,9 +22,6 @@
 #include <array>
 #include <chrono>
 #include <iostream>
-#include <string>
-
-using namespace std;
 
 namespace {
 
@@ -33,10 +30,10 @@ struct SmallPrime
   uint64_t first;
   uint64_t last;
   int index;
-  string str;
+  const char* str;
 };
 
-const array<SmallPrime, 8> smallPrimes
+const std::array<SmallPrime, 8> smallPrimes
 {{
   { 2,  2, 0, "2" },
   { 3,  3, 0, "3" },
@@ -226,7 +223,7 @@ void PrimeSieve::updateStatus(uint64_t dist)
     if (getDistance() > 0)
       percent = sievedDistance_ * 100.0 / getDistance();
     auto old = percent_;
-    percent_ = min(percent, 100.0);
+    percent_ = std::min(percent, 100.0);
     if (isFlag(PRINT_STATUS))
       printStatus(old, percent_);
   }
@@ -237,9 +234,9 @@ void PrimeSieve::printStatus(double old, double current)
   int percent = (int) current;
   if (percent > (int) old)
   {
-    cout << '\r' << percent << '%' << flush;
+    std::cout << '\r' << percent << '%' << std::flush;
     if (percent == 100)
-      cout << '\n';
+      std::cout << '\n';
   }
 }
 
@@ -253,7 +250,7 @@ void PrimeSieve::processSmallPrimes()
       if (isCount(p.index))
         counts_[p.index]++;
       if (isPrint(p.index))
-        cout << p.str << '\n';
+        std::cout << p.str << '\n';
     }
   }
 }
@@ -290,7 +287,7 @@ void PrimeSieve::sieve()
     return;
 
   setStatus(0);
-  auto t1 = chrono::system_clock::now();
+  auto t1 = std::chrono::system_clock::now();
 
   if (start_ <= 5)
     processSmallPrimes();
@@ -301,8 +298,8 @@ void PrimeSieve::sieve()
     printPrimes.sieve();
   }
 
-  auto t2 = chrono::system_clock::now();
-  chrono::duration<double> seconds = t2 - t1;
+  auto t2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> seconds = t2 - t1;
   seconds_ = seconds.count();
   setStatus(100);
 }
