@@ -501,6 +501,14 @@ if(BUILD_LIBPRIMESIEVE)
 
     add_subdirectory(lib/primesieve)
 
+    if(BUILD_SHARED_LIBS)
+        target_compile_options(libprimesieve PRIVATE "${POPCNT_FLAG}")
+    endif()
+
+    if(BUILD_STATIC_LIBS)
+        target_compile_options(libprimesieve-static PRIVATE "${POPCNT_FLAG}")
+    endif()
+
     set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()
