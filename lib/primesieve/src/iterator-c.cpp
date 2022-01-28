@@ -12,7 +12,6 @@
 #include <primesieve/forward.hpp>
 #include <primesieve/IteratorHelper.hpp>
 #include <primesieve/PrimeGenerator.hpp>
-#include <primesieve/resizeUninitialized.hpp>
 
 #include <stdint.h>
 #include <cerrno>
@@ -69,8 +68,6 @@ void primesieve_skipto(primesieve_iterator* it,
   it->i = 0;
   it->last_idx = 0;
   it->dist = 0;
-  auto& primes = getPrimes(it);
-  primes.clear();
   clearPrimeGenerator(it);
 }
 
@@ -89,21 +86,20 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
 {
   auto& primes = getPrimes(it);
   auto primeGenerator = getPrimeGenerator(it);
+  std::size_t size = 0;
 
   try
   {
-    while (true)
+    while (!size)
     {
       if (!it->primeGenerator)
       {
         IteratorHelper::next(&it->start, &it->stop, it->stop_hint, &it->dist);
         it->primeGenerator = new PrimeGenerator(it->start, it->stop);
         primeGenerator = getPrimeGenerator(it);
-        resizeUninitialized(primes, 512);
-        it->primes = &primes[0];
       }
 
-      primeGenerator->fillNextPrimes(primes, &it->last_idx);
+      primeGenerator->fillNextPrimes(primes, &size);
 
       // There are 3 different cases here:
       // 1) The primes array contains a few primes (<= 512).
@@ -115,47 +111,44 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
       // 3) The next prime > 2^64. In this case the primes
       //    array contains an error code (UINT64_MAX) which
       //    is returned to the user.
-      if (it->last_idx == 0)
+      if (size == 0)
         clearPrimeGenerator(it);
-      else
-        break;
     }
   }
   catch (const std::exception& e)
   {
     std::cerr << "primesieve_iterator: " << e.what() << std::endl;
     clearPrimeGenerator(it);
-    primes.resize(1);
+    size = 1;
+    primes.resize(size);
     primes[0] = PRIMESIEVE_ERROR;
-    it->last_idx = 1;
     it->is_error = true;
     errno = EDOM;
   }
 
   it->i = 0;
-  it->last_idx--;
+  it->last_idx = size - 1;
+  it->primes = &primes[0];
 }
 
 void primesieve_generate_prev_primes(primesieve_iterator* it)
 {
   auto& primes = getPrimes(it);
+  std::size_t size = 0;
 
   try
   {
     if (it->primeGenerator)
       it->start = primes.front();
 
-    primes.clear();
     clearPrimeGenerator(it);
 
-    while (primes.empty())
+    while (!size)
     {
       IteratorHelper::prev(&it->start, &it->stop, it->stop_hint, &it->dist);
       it->primeGenerator = new PrimeGenerator(it->start, it->stop);
       auto primeGenerator = getPrimeGenerator(it);
-      if (it->start <= 2)
-        primes.push_back(0);
-      primeGenerator->fillPrevPrimes(primes, &it->last_idx);
+      primeGenerator->fillPrevPrimes(primes, &size);
       clearPrimeGenerator(it);
     }
   }
@@ -163,14 +156,14 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
   {
     std::cerr << "primesieve_iterator: " << e.what() << std::endl;
     clearPrimeGenerator(it);
-    primes.resize(1);
+    size = 1;
+    primes.resize(size);
     primes[0] = PRIMESIEVE_ERROR;
-    it->last_idx = 1;
     it->is_error = true;
     errno = EDOM;
   }
 
-  it->primes = &primes[0];
-  it->last_idx--;
+  it->last_idx = size - 1;
   it->i = it->last_idx;
+  it->primes = &primes[0];
 }
