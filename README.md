@@ -39,6 +39,10 @@ For doing development with libprimecount you may need to install
         <td><code>sudo pacman -S primecount</code></td>
     </tr>
     <tr>
+        <td><b>Debian:</b></td>
+        <td><code>sudo apt install primecount</code></td>
+    </tr>
+    <tr>
         <td><b>Fedora:</b></td>
         <td><code>sudo dnf install primecount</code></td>
     </tr>
@@ -49,10 +53,6 @@ For doing development with libprimecount you may need to install
     <tr>
         <td><b>openSUSE:</b></td>
         <td><code>sudo zypper install primecount</code></td>
-    </tr>
-    <tr>
-        <td><b>Void Linux:</b></td>
-        <td><code>sudo xbps-install -S primecount</code></td>
     </tr>
 </table>
 
