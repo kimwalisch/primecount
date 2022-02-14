@@ -625,7 +625,7 @@ endif()
 
 install(FILES include/primecount.h
               include/primecount.hpp
-				COMPONENT libprimecount-headers
+        COMPONENT libprimecount-headers
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Regenerate man page ################################################
