@@ -32,13 +32,17 @@ outage(s) may occur in such time frames.
     <td>2020-08-30</td>
     <td>Kim Walisch & David Baugh</td>
   </tr>
+  <tr align="right">
+    <td>10<sup>29</sup></td>
+    <td>1,520,698,109,714,272,166,094,258,063</td>
+    <td>2022-01-03</td>
+    <td>Kim Walisch & David Baugh</td>
+  </tr>
 </table>
 
 For verification, all results on this page have been computed twice using
 different alpha tuning parameters (configuration parameters).
-PrimePi(10<sup>28</sup>) was successfully verified on the 27th October 2020.
-You can read our initial PrimePi(10<sup>28</sup>) announcement and the  
-successful verification announcement in our
+You can read our announcements of these results in our
 [mersenne forum thread](https://mersenneforum.org/showthread.php?t=20473&page=3).
 
 ## [A006988](https://oeis.org/A006988) records
