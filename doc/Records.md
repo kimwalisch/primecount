@@ -35,7 +35,7 @@ outage(s) may occur in such time frames.
   <tr align="right">
     <td>10<sup>29</sup></td>
     <td>1,520,698,109,714,272,166,094,258,063</td>
-    <td>2022-01-03</td>
+    <td>2022-02-28</td>
     <td>Kim Walisch & David Baugh</td>
   </tr>
 </table>
