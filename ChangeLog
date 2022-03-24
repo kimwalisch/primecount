@@ -1,5 +1,6 @@
-Changes in primecount-7.3, 2022-01-08
+Changes in primecount-7.3, 2022-03-24
 
+* util.cpp: Tune gourdon alpha factors for primecount-7.3.
 * CMakeLists.txt: Detect at build time if the C++ compiler and the
   C++ Standard Library support int128_t. If not, int128_t will be
   disabled. The -std=c++* option usually disables int128_t, use

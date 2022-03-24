@@ -352,10 +352,10 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   }
   else
   {
-    double a = 0.00464541;
-    double b = -0.41743;
-    double c = 13.6067;
-    double d = -148.127;
+    double a = 0.00497225;
+    double b = -0.460441;
+    double c = 15.2351;
+    double d = -167.085;
     double logx2 = logx * logx;
     double logx3 = logx * logx * logx;
     alpha_yz = a * logx3 + b * logx2 + c * logx + d;
