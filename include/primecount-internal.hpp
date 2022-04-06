@@ -104,7 +104,7 @@ double get_percent(T low, T limit)
 template <typename T>
 T S2_approx(T x, int64_t pi_y, T p2, T s1)
 {
-  T pix = Ri(x);
+  T pix = Li(x);
   T s2_approx = pix - s1 - pi_y + 1 + p2;
   s2_approx = std::max(s2_approx, (T) 0);
   return s2_approx;
@@ -113,7 +113,7 @@ T S2_approx(T x, int64_t pi_y, T p2, T s1)
 template <typename T>
 T D_approx(T x, T sigma, T phi0, T ac, T b)
 {
-  T pix = Ri(x);
+  T pix = Li(x);
   T d_approx = pix - (ac - b + phi0 + sigma);
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;

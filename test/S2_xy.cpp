@@ -64,7 +64,7 @@ int main()
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, Ri(x), threads));
+                S2_hard(x, y, z, c, Li(x), threads));
   }
 
   // test random x
@@ -92,7 +92,7 @@ int main()
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, Ri(x), threads));
+                S2_hard(x, y, z, c, Li(x), threads));
   }
 
   std::cout << std::endl;

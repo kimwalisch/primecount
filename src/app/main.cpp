@@ -140,9 +140,9 @@ maxint_t D(maxint_t x, int threads)
     set_print_variables(true);
 
   if (x <= std::numeric_limits<int64_t>::max())
-    return D((int64_t) x, y, z, k, (int64_t) Ri(x), threads);
+    return D((int64_t) x, y, z, k, (int64_t) Li(x), threads);
   else
-    return D(x, y, z, k, Ri(x), threads);
+    return D(x, y, z, k, Li(x), threads);
 }
 
 maxint_t Phi0(maxint_t x, int threads)
@@ -326,9 +326,9 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= std::numeric_limits<int64_t>::max())
-    return S2_hard((int64_t) x, y, z, c, (int64_t) Ri(x), threads);
+    return S2_hard((int64_t) x, y, z, c, (int64_t) Li(x), threads);
   else
-    return S2_hard(x, y, z, c, Ri(x), threads);
+    return S2_hard(x, y, z, c, Li(x), threads);
 }
 
 } // namespace

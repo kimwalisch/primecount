@@ -64,7 +64,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Ri(x), threads));
+    check(s2 == S2_hard(x, y, z, c, Li(x), threads));
   }
 
   // test random x
@@ -88,7 +88,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Ri(x), threads));
+    check(s2 == S2_hard(x, y, z, c, Li(x), threads));
   }
 
   std::cout << std::endl;
