@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -64,12 +64,20 @@ int64_t nth_prime(int64_t n, int threads)
     return primes[n];
 
   // For small n use the segmented sieve of Eratosthenes
-  if (n < 100000)
+  if (n < 3000)
     return primesieve::nth_prime(n, 0);
+
+  int64_t prime_approx;
+
+  // Li_inverse(x) is faster but less accurate than Ri_inverse(x).
+  // For large numbers accuracy is more important than speed.
+  if (n < 1e10)
+    prime_approx = Li_inverse(n);
+  else
+    prime_approx = Ri_inverse(n);
 
   // For large n use the prime counting function
   // and the segmented sieve of Eratosthenes.
-  int64_t prime_approx = Ri_inverse(n);
   int64_t count_approx = pi(prime_approx, threads);
 
   if (count_approx < n)
