@@ -11,10 +11,14 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <PiTable.hpp>
 
 #include <stdint.h>
 #include <string>
 #include <array>
+#include <cassert>
+
+using namespace primecount;
 
 namespace {
 
@@ -43,6 +47,32 @@ const std::array<int16_t, 170> primes =
   941, 947, 953, 967, 971, 977, 983, 991, 997, 1009
 };
 
+/// Find the nth prime using binary search
+/// and a PrimePi(x) lookup table.
+/// Run time: O(log2(n))
+///
+int64_t binary_search_nth_prime(int64_t n)
+{
+  int64_t low = n * 2;
+  int64_t hi = PiTable::max_cached();
+
+  while (low < hi)
+  {
+    int64_t mid = low + (hi - low) / 2;
+    if (PiTable::pi_cache(mid) < n)
+      low = mid + 1;
+    else
+      hi = mid;
+  }
+
+  // Find the first prime <= low
+  assert(low >= n);
+  while (PiTable::pi_cache(low - 1) >= n)
+    low -= 1;
+
+  return low;
+}
+
 } // namespace
 
 namespace primecount {
@@ -60,12 +90,13 @@ int64_t nth_prime(int64_t n, int threads)
   if (n > max_n)
     throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
+  // For tiny n <= 169
   if (n < (int64_t) primes.size())
     return primes[n];
 
-  // For small n use the segmented sieve of Eratosthenes
-  if (n < 3000)
-    return primesieve::nth_prime(n, 0);
+  // For small n <= 1794
+  if (n <= PiTable::pi_cache(PiTable::max_cached()))
+    return binary_search_nth_prime(n);
 
   int64_t prime_approx;
 
@@ -76,7 +107,7 @@ int64_t nth_prime(int64_t n, int threads)
   else
     prime_approx = Ri_inverse(n);
 
-  // For large n use the prime counting function
+  // For large n we use the prime counting function
   // and the segmented sieve of Eratosthenes.
   int64_t count_approx = pi(prime_approx, threads);
 
