@@ -16,7 +16,6 @@
 #include <stdint.h>
 #include <string>
 #include <array>
-#include <cassert>
 
 using namespace primecount;
 
@@ -64,11 +63,6 @@ int64_t binary_search_nth_prime(int64_t n)
     else
       hi = mid;
   }
-
-  // Find the first prime <= low
-  assert(low >= n);
-  while (PiTable::pi_cache(low - 1) >= n)
-    low -= 1;
 
   return low;
 }
