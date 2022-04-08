@@ -95,8 +95,8 @@ int64_t nth_prime(int64_t n, int threads)
   int64_t prime_approx;
 
   // Li_inverse(x) is faster but less accurate than Ri_inverse(x).
-  // For large numbers accuracy is more important than speed.
-  if (n < 1e10)
+  // For small n speed is more important than accuracy.
+  if (n < 1e8)
     prime_approx = Li_inverse(n);
   else
     prime_approx = Ri_inverse(n);
