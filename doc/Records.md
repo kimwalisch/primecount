@@ -66,6 +66,12 @@ You can read our announcements of these results in our
     <td>2015-10-20</td>
     <td>David Baugh</td>
   </tr>
+  <tr align="right">
+    <td>10<sup>25</sup></td>
+    <td>606,527,267,811,189,857,426,370,533</td>
+    <td>2022-04-07</td>
+    <td>David Baugh</td>
+  </tr>
 </table>
 
 ## [A007053](https://oeis.org/A007053) records
