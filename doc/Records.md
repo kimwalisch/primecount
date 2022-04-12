@@ -208,6 +208,18 @@ You can read our announcements of these results in our
     <td>2020-10-22</td>
     <td>David Baugh</td>
   </tr>
+  <tr align="right">
+    <td>e<sup>61</sup></td>
+    <td>5,175,318,892,686,816,487,170,078</td>
+    <td>2022-03-15</td>
+    <td>David Baugh</td>
+  </tr>
+  <tr align="right">
+    <td>e<sup>62</sup></td>
+    <td>13,837,220,920,267,326,266,315,383</td>
+    <td>2022-04-11</td>
+    <td>David Baugh</td>
+  </tr>
 </table>
 
 ## [A122121](https://oeis.org/A122121) records
