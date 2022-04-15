@@ -12,6 +12,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <PiTable.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -104,11 +105,29 @@ int64_t nth_prime(int64_t n, int threads)
   // For large n we use the prime counting function
   // and the segmented sieve of Eratosthenes.
   int64_t count_approx = pi(prime_approx, threads);
+  int64_t avg_prime_gap =  ilog(prime_approx) + 2;
+  int64_t prime = -1;
 
+  // Here we are very close to the nth prime < sqrt(nth_prime),
+  // we simply iterate over primes until we find it.
   if (count_approx < n)
-    return primesieve::nth_prime(n - count_approx, prime_approx);
-  else // count_approx >= n
-    return primesieve::nth_prime(n - count_approx - 1, prime_approx + 1);
+  {
+    uint64_t start = prime_approx;
+    uint64_t stop = start + (n - count_approx) * avg_prime_gap;
+    primesieve::iterator iter(start, stop);
+    for (int64_t i = count_approx; i < n; i++)
+      prime = iter.next_prime();
+  }
+  else // if (count_approx >= n)
+  {
+    uint64_t start = prime_approx + 1;
+    uint64_t stop = start - (count_approx - n) * avg_prime_gap;
+    primesieve::iterator iter(start, stop);
+    for (int64_t i = count_approx; i + 1 > n; i--)
+      prime = iter.prev_prime();
+  }
+
+  return prime;
 }
 
 } // namespace
