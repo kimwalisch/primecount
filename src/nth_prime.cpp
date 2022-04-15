@@ -109,7 +109,7 @@ int64_t nth_prime(int64_t n, int threads)
   int64_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
-  // we simply iterate over primes until we find it.
+  // we simply iterate over the primes until we find it.
   if (count_approx < n)
   {
     uint64_t start = prime_approx;
