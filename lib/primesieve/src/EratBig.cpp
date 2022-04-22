@@ -1,16 +1,22 @@
 ///
 /// @file   EratBig.cpp
-/// @brief  EratBig is a segmented sieve of Eratosthenes
-///         implementation optimized for big sieving primes. EratBig
-///         is a highly optimized implementation of Tomas Oliveira e
-///         Silva's cache-friendly bucket sieve algorithm:
+/// @brief  EratBig is a segmented sieve of Eratosthenes algorithm
+///         optimized for big sieving primes that have very few
+///         multiple occurrences per segment. EratBig is based on
+///         Tomas Oliveira e Silva's cache-friendly bucket sieve algorithm:
 ///         http://www.ieeta.pt/~tos/software/prime_sieve.html
-///         The idea is that for each segment we keep a list of buckets
-///         which contain the sieving primes that have a multiple
-///         occurrence in that segment. When we then cross off the
-///         multiples from the current segment we avoid processing
-///         sieving primes that do not have a multiple occurrence in
-///         the current segment.
+///         The idea is that for each segment we keep a list of
+///         buckets which contain the sieving primes that have
+///         multiple occurrence(s) in that segment. When we then cross
+///         off the multiples from the current segment we avoid
+///         processing sieving primes that do not have a multiple
+///         occurrence in the current segment.
+///
+///         This algorithm is also very good at avoiding branch
+///         mispredictions. Unlike the EratSmall and EratMedium
+///         algorithms, in EratBig there is no branch misprediction
+///         after the last multiple of each sieving prime is removed
+///         from the sieve array.
 ///
 /// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -123,30 +129,24 @@ namespace primesieve {
 void EratBig::init(uint64_t stop,
                    uint64_t sieveSize,
                    uint64_t maxPrime,
-                   MemoryPool& memoryPool)
+                   MemoryPool* memoryPool)
 {
   // '>> log2SieveSize' requires power of 2 sieveSize
   assert(isPow2(sieveSize));
   assert(sieveSize <= SievingPrime::MAX_MULTIPLEINDEX + 1);
 
-  enabled_ = true;
   stop_ = stop;
   maxPrime_ = maxPrime;
   log2SieveSize_ = ilog2(sieveSize);
   moduloSieveSize_ = sieveSize - 1;
-  memoryPool_ = &memoryPool;
+  memoryPool_ = memoryPool;
 
   uint64_t maxSievingPrime = maxPrime_ / 30;
   uint64_t maxNextMultiple = maxSievingPrime * getMaxFactor() + getMaxFactor();
   uint64_t maxMultipleIndex = sieveSize - 1 + maxNextMultiple;
   uint64_t maxSegmentCount = maxMultipleIndex >> log2SieveSize_;
-  uint64_t size = maxSegmentCount + 1;
-  buckets_.reserve(size);
-
-  // Start off with a single bucket list,
-  // more will be added whilst sieving.
-  buckets_.push_back(nullptr);
-  memoryPool_->addBucket(buckets_[0]);
+  uint64_t maxSize = maxSegmentCount + 1;
+  buckets_.reserve(maxSize);
 }
 
 /// Add a new sieving prime

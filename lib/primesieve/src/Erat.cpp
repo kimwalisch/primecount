@@ -65,7 +65,8 @@ Erat::Erat(uint64_t start, uint64_t stop) :
 void Erat::init(uint64_t start,
                 uint64_t stop,
                 uint64_t sieveSize,
-                PreSieve& preSieve)
+                PreSieve& preSieve,
+                MemoryPool& memoryPool)
 {
   if (start > stop)
     return;
@@ -73,6 +74,7 @@ void Erat::init(uint64_t start,
   assert(start >= 7);
   start_ = start;
   stop_ = stop;
+  memoryPool_ = &memoryPool;
   preSieve_ = &preSieve;
   preSieve_->init(start, stop);
   maxPreSieve_ = preSieve_->getMaxPrime();
@@ -95,7 +97,7 @@ void Erat::init(uint64_t start,
 void Erat::initSieve(uint64_t sieveSize)
 {
   sieveSize_ = floorPow2(sieveSize);
-  sieveSize_ = inBetween(16, sieveSize_, 4096);
+  sieveSize_ = inBetween(16, sieveSize_, 8192);
   sieveSize_ *= 1024;
 
   sieve_ = new uint8_t[sieveSize_];
@@ -129,7 +131,7 @@ uint64_t Erat::getL1CacheSize() const
 {
   uint64_t size = cpuInfo.hasL1Cache() ? cpuInfo.l1CacheBytes() : config::L1D_CACHE_BYTES;
   uint64_t minSize = 8 << 10;
-  uint64_t maxSize = 4096 << 10;
+  uint64_t maxSize = 8192 << 10;
 
   size = std::min(size, sieveSize_);
   size = inBetween(minSize, size, maxSize);
@@ -166,11 +168,11 @@ void Erat::preSieve()
 
 void Erat::crossOff()
 {
-  if (eratSmall_.enabled())
+  if (eratSmall_.hasSievingPrimes())
     eratSmall_.crossOff(sieve_, sieveSize_);
-  if (eratMedium_.enabled())
+  if (eratMedium_.hasSievingPrimes())
     eratMedium_.crossOff(sieve_, sieveSize_);
-  if (eratBig_.enabled())
+  if (eratBig_.hasSievingPrimes())
     eratBig_.crossOff(sieve_);
 }
 
