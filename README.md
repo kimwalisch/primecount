@@ -39,7 +39,7 @@ For doing development with libprimecount you may need to install
         <td><code>sudo pacman -S primecount</code></td>
     </tr>
     <tr>
-        <td><b>Debian:</b></td>
+        <td><b>Debian/Ubuntu:</b></td>
         <td><code>sudo apt install primecount</code></td>
     </tr>
     <tr>
