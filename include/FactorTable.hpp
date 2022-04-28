@@ -35,7 +35,7 @@
 ///        * Old: if (mu[n] != 0 && prime < lpf[n])
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -94,10 +94,12 @@ public:
       // Thread processes interval [low, high]
       int64_t low = thread_distance * t;
       int64_t high = low + thread_distance;
+      int64_t min_m = first_coprime() * first_coprime();
       low = std::max(first_coprime(), low + 1);
       high = std::min(high, y);
 
-      if (low <= high)
+      if (low <= high &&
+          min_m <= high)
       {
         // Default initialize memory to all bits set
         int64_t low_idx = to_index(low);
@@ -113,7 +115,7 @@ public:
           int64_t i = 1;
           int64_t prime = it.next_prime();
           int64_t multiple = next_multiple(prime, low, &i);
-          int64_t min_m = prime * first_coprime();
+          min_m = prime * first_coprime();
 
           if (min_m > high)
             break;

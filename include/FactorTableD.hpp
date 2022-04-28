@@ -37,7 +37,7 @@
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -110,48 +110,53 @@ public:
 
         int64_t start = first_coprime() - 1;
         int64_t stop = high / first_coprime();
+        int64_t min_m = first_coprime() * first_coprime();
         primesieve::iterator it(start, stop);
 
-        while (true)
+        if (min_m <= high)
         {
-          // Find multiples > prime
-          int64_t i = 1;
-          int64_t prime = it.next_prime();
-          int64_t multiple = next_multiple(prime, low, &i);
-          int64_t min_m = prime * first_coprime();
-
-          if (min_m > high)
-            break;
-
-          for (; multiple <= high; multiple = prime * to_number(i++))
+          while (true)
           {
-            int64_t mi = to_index(multiple);
-            // prime is the smallest factor of multiple
-            if (factor_[mi] == T_MAX)
-              factor_[mi] = (T) prime;
-            // the least significant bit indicates
-            // whether multiple has an even (0) or odd (1)
-            // number of prime factors
-            else if (factor_[mi] != 0)
-              factor_[mi] ^= 1;
-          }
+            // Find multiples > prime
+            int64_t i = 1;
+            int64_t prime = it.next_prime();
+            int64_t multiple = next_multiple(prime, low, &i);
+            min_m = prime * first_coprime();
 
-          if (prime <= sqrtz)
-          {
-            int64_t j = 0;
-            int64_t square = prime * prime;
-            multiple = next_multiple(square, low, &j);
+            if (min_m > high)
+              break;
 
-            // Sieve out numbers that are not square free
-            // i.e. numbers for which moebius(n) = 0.
-            for (; multiple <= high; multiple = square * to_number(j++))
-              factor_[to_index(multiple)] = 0;
+            for (; multiple <= high; multiple = prime * to_number(i++))
+            {
+              int64_t mi = to_index(multiple);
+              // prime is the smallest factor of multiple
+              if (factor_[mi] == T_MAX)
+                factor_[mi] = (T) prime;
+              // the least significant bit indicates
+              // whether multiple has an even (0) or odd (1)
+              // number of prime factors
+              else if (factor_[mi] != 0)
+                factor_[mi] ^= 1;
+            }
+
+            if (prime <= sqrtz)
+            {
+              int64_t j = 0;
+              int64_t square = prime * prime;
+              multiple = next_multiple(square, low, &j);
+
+              // Sieve out numbers that are not square free
+              // i.e. numbers for which moebius(n) = 0.
+              for (; multiple <= high; multiple = square * to_number(j++))
+                factor_[to_index(multiple)] = 0;
+            }
           }
         }
 
-        if (high > y)
+        start = std::max(start, y);
+
+        if (start < high)
         {
-          start = std::max(start, y);
           it.skipto(start, high);
 
           // y < prime <= z
