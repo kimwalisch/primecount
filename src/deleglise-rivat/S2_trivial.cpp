@@ -10,7 +10,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -50,8 +50,11 @@ T S2_trivial(T x,
   int64_t sqrtz = isqrt(z);
   int64_t prime_c = nth_prime(c);
   int64_t start = std::max(prime_c, sqrtz) + 1;
-  primesieve::iterator it(start - 1, y);
 
+  if (start >= y)
+    return 0;
+
+  primesieve::iterator it(start - 1, y);
   T sum = 0;
   int64_t prime;
 

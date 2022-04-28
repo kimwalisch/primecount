@@ -18,7 +18,7 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -70,8 +70,11 @@ void SegmentedPiTable::init_bits()
 {
   // Iterate over primes > 5
   uint64_t low = max(low_, 5);
-  uint64_t prime = 0;
+  if (low >= high_)
+    return;
+
   primesieve::iterator it(low, high_);
+  uint64_t prime = 0;
 
   // Each thread iterates over the primes
   // inside [low, high[ and initializes
