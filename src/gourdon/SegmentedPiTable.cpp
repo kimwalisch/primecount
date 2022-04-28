@@ -70,7 +70,7 @@ void SegmentedPiTable::init_bits()
 {
   // Iterate over primes > 5
   uint64_t low = max(low_, 5);
-  if (low >= high_)
+  if (low + 1 >= high_)
     return;
 
   primesieve::iterator it(low, high_);
