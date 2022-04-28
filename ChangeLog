@@ -1,7 +1,11 @@
-Changes in primecount-7.3, 2022-04-07
+Changes in primecount-7.3, 2022-04-28
 
 * util.cpp: Tune gourdon alpha factors for primecount-7.3.
 * nth_prime.cpp: Improved performance for small n.
+* FactorTable.hpp: Reduce memory allocations.
+* DFactorTable.hpp: Reduce memory allocations.
+* S2_trivial.cpp: Reduce memory allocations.
+* SegmentedPiTable.cpp: Reduce memory allocations.
 * CMakeLists.txt: Detect at build time if the C++ compiler and the
   C++ Standard Library support int128_t. If not, int128_t will be
   disabled. The -std=c++* option usually disables int128_t, use
@@ -11,7 +15,7 @@ Changes in primecount-7.3, 2022-04-07
 * CMakeLists.txt: Fix AppleClang OpenMP detection.
 * CMakeLists.txt: Print warning message if OpenMP library is missing.
 * CMakeLists.txt: Add option STATICALLY_LINK_LIBPRIMECOUNT=ON/OFF.
-* Update to latest libprimesieve-7.8.
+* Update to latest libprimesieve-7.9.
 * appveyor.yml: Test primecount using many different C++ compilers:
   GCC-5, GCC-7, GCC-8, GCC-9, Clang-9, AppleClang 13, MSVC 2019.
 * ci.yml: New Github Actions tests: Windows/MinGW-w64 and Linux with
