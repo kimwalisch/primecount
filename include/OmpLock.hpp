@@ -3,7 +3,7 @@
 /// @brief  The OmpLock and LockGuard classes are RAII-style
 ///         wrappers for OpenMP locks.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,15 +41,20 @@ namespace primecount {
 
 struct OmpLock
 {
-  OmpLock()
+  // The init() function should only be called
+  // when using >= 2 threads.
+  void init()
   {
+    enabled_ = true;
     omp_init_lock(&lock_);
   }
   ~OmpLock()
   {
-    omp_destroy_lock(&lock_);
+    if (enabled_)
+      omp_destroy_lock(&lock_);
   }
 
+  bool enabled_ = false;
   // Use padding to avoid CPU false sharing
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   omp_lock_t lock_;
@@ -61,16 +66,20 @@ class LockGuard
 public:
   LockGuard(OmpLock& lock)
   {
-    lock_ = &lock.lock_;
-    omp_set_lock(lock_);
+    if (lock.enabled_)
+    {
+      lock_ = &lock.lock_;
+      omp_set_lock(lock_);
+    }
   }
   ~LockGuard()
   {
-    omp_unset_lock(lock_);
+    if (lock_)
+      omp_unset_lock(lock_);
   }
 
 private:
-  omp_lock_t* lock_;
+  omp_lock_t* lock_ = nullptr;
 };
 
 } // namespace

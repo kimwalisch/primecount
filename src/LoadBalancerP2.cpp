@@ -4,7 +4,7 @@
 ///        computation of the 2nd partial sieve function.
 ///        It is used by the P2(x, a) and B(x, y) functions.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,13 +42,16 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   // of the entire thread computation.
   int64_t O_primepi = (int64_t) std::pow(sieve_limit, 2.0 / 3.0);
   min_thread_dist_ = O_primepi * 10;
-  min_thread_dist_ = max(min_thread_dist_, 1 << 22);
+  min_thread_dist_ = max(min_thread_dist_, 1 << 23);
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
   thread_dist_ = dist / (threads * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
+
+  if (threads_ > 1)
+    lock_.init();
 }
 
 int LoadBalancerP2::get_threads() const

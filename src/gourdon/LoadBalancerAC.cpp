@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -47,6 +47,9 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   threads_(threads),
   is_print_(is_print)
 {
+  if (threads > 1)
+    lock_.init();
+
   // When a single thread is used (and printing is
   // disabled) we can use a segment size larger
   // than x^(1/4) because load balancing is only
