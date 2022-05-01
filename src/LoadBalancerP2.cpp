@@ -4,7 +4,7 @@
 ///        computation of the 2nd partial sieve function.
 ///        It is used by the P2(x, a) and B(x, y) functions.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,6 +49,9 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   thread_dist_ = dist / (threads * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(threads, dist, thread_dist_);
+
+  if (threads_ > 1)
+    lock_.init();
 }
 
 int LoadBalancerP2::get_threads() const

@@ -22,7 +22,7 @@
 ///        order to prevent that 1 thread will run much longer
 ///        than all the other threads.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -51,6 +51,9 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   is_print_(is_print),
   status_(x)
 {
+  if (threads > 1)
+    lock_.init();
+
   // The best performance is usually achieved using
   // a sieve array size that matches your CPU's L1
   // data cache size (per core) or that is slightly
