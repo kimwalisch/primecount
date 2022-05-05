@@ -31,8 +31,7 @@ For doing development with libprimecount you may need to install
     </tr>
     <tr>
         <td><b>macOS:</b></td>
-        <td><code>brew tap kimwalisch/primecount</code><br/>
-            <code>brew install primecount</code></td>
+        <td><code>brew install primecount</code></td>
     </tr>
     <tr>
         <td><b>Arch Linux:</b></td>
