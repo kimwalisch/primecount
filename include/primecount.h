@@ -5,7 +5,7 @@
  *        optimized implementations of the combinatorial type
  *        prime counting function algorithms.
  *
- * Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+ * Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
  *
  * This file is distributed under the BSD License.
  */
@@ -16,9 +16,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "7.3"
+#define PRIMECOUNT_VERSION "7.4"
 #define PRIMECOUNT_VERSION_MAJOR 7
-#define PRIMECOUNT_VERSION_MINOR 3
+#define PRIMECOUNT_VERSION_MINOR 4
 
 #ifdef __cplusplus
 extern "C" {
