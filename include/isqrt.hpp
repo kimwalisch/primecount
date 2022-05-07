@@ -2,7 +2,7 @@
 /// @file  isqrt.hpp
 /// @brief Integer square root function
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <stdint.h>
+#include <type_traits>
 
 namespace {
 
@@ -86,7 +88,7 @@ constexpr T ct_sqrt(T x)
 template <typename T>
 inline T isqrt(T x)
 {
-  T r = (T) std::sqrt((double) x);
+  T s = (T) std::sqrt((double) x);
 
   // By using constexpr for the sqrt_max variable type it
   // is guaranteed that ct_sqrt() is evaluated at compile
@@ -110,12 +112,29 @@ inline T isqrt(T x)
   // without constexpr.
   //
   constexpr T sqrt_max = ct_sqrt(std::numeric_limits<T>::max());
-  r = std::min(r, sqrt_max);
 
-  while (r * r > x)
-    r--;
-  while (x - r * r > r * 2)
-    r++;
+  // For 128-bit integers we use uint64_t as the
+  // result type. For all other types we use the
+  // same result type as the input type.
+  using R = typename std::conditional<sizeof(T) / 2 == sizeof(uint64_t), uint64_t, T>::type;
+  R r = (R) std::min(s, sqrt_max);
+
+  // In my tests the first corrections were needed above
+  // 10^22 where the results were off by 1. Above 10^32 the
+  // first results occurred that were off by > 1. Since
+  // primecount only supports numbers up to 10^31 this is
+  // not an issue for us.
+  if (r * (T) r > x)
+  {
+    do { r--; }
+    while (r * (T) r > x);
+  }
+  // Same as (r + 1)^2 < x but overflow safe
+  else if ((T) (r * 2) < x - r * (T) r)
+  {
+    do { r++; }
+    while ((T) (r * 2) < x - r * (T) r);
+  }
 
   return r;
 }
