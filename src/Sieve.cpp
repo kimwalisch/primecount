@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -131,20 +131,26 @@ void Sieve::allocate_counter(uint64_t low)
   counter_.dist = (uint64_t) (counter_dist * sqrt(240));
 
   // Each byte represents an interval of size 30
-  uint64_t byte_dist = counter_.dist / 30;
-  byte_dist = max(byte_dist, 64);
-  byte_dist = next_power_of_2(byte_dist);
+  uint64_t bytes = counter_.dist / 30;
 
-  // Make sure the counter (32-bit) don't overflow.
+  // Increasing the minimum counter distance decreases the
+  // branch mispredictions but on the other hand increases
+  // the number of executed instructions. On newer CPUs
+  // reducing the branch mispredictions is more important
+  // than reducing the number of executed instructions.
+  bytes = max((uint64_t) sizeof(uint64_t) * 16, bytes);
+  bytes = next_power_of_2(bytes);
+
+  // Make sure the counter (32-bit) doesn't overflow.
   // This can never happen since each counter array element
   // only counts the number of unsieved elements (1 bits) in
   // an interval of size: sieve_limit^(1/4) * sqrt(240).
   // Hence the max(counter value) = 2^18.
-  assert(byte_dist * 8 <= std::numeric_limits<uint32_t>::max());
-  uint64_t counter_size = ceil_div(sieve_.size(), byte_dist);
+  assert(bytes * 8 <= std::numeric_limits<uint32_t>::max());
+  uint64_t counter_size = ceil_div(sieve_.size(), bytes);
   counter_.counter.resize(counter_size);
-  counter_.dist = byte_dist * 30;
-  counter_.log2_dist = ilog2(byte_dist);
+  counter_.dist = bytes * 30;
+  counter_.log2_dist = ilog2(bytes);
 }
 
 /// The segment size is sieve.size() * 30 as each
