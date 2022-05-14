@@ -3,13 +3,14 @@
 /// @brief  Plain old data vector, like std::vector but does not 
 ///         default initialize memory.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <pod_vector.hpp>
+#include <macros.hpp>
 
 #include <cstdlib>
 #include <iostream>
@@ -17,13 +18,19 @@
 #include <numeric>
 
 using std::size_t;
-using namespace primecount;
+using primecount::pod_vector;
 
 void check(bool OK)
 {
   std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
     std::exit(1);
+}
+
+NOINLINE void resize(pod_vector<char>& vect, size_t size)
+{
+  vect.resize(0);
+  vect.resize(size);
 }
 
 int main()
@@ -48,20 +55,30 @@ int main()
     check(capacity1 == capacity2);
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(10000, 20000);
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(10000, 20000);
 
-  int size = dist(gen);
-  pod_vector<int> vect(size);
-  std::fill_n(&vect[0], size, 123);
-  
-  // Test if resize does not default initilize
-  vect.resize(0);
-  vect.resize(size);
-  int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
-  std::cout << "Vect sum after resize: " << sum;
-  check(sum == 123 * size);
+    int size = dist(gen);
+    pod_vector<int> vect(size);
+    std::fill_n(&vect[0], size, 123);
+    
+    // Test if resize does not default initilize
+    vect.resize(0);
+    vect.resize(size);
+    int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
+    std::cout << "Vect sum after resize: " << sum;
+    check(sum == 123 * size);
+  }
+
+  // This test would take forever (3000 secs on i5-12600K
+  // CPU from 2022) using std::vector because
+  // std::vector.resize() default initializes memory
+  // (to 0) on each resize whereas pod_vector does not.
+  pod_vector<char> vect;
+  for (int i = 0; i < 1000000; i++)
+    resize(vect, /* size = 64MiB */ 64 << 20);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
