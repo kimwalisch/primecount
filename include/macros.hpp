@@ -1,7 +1,7 @@
 ///
 /// @file  macros.hpp
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,6 +20,14 @@
 
 #ifndef __has_cpp_attribute
   #define __has_cpp_attribute(x) 0
+#endif
+
+#if __has_attribute(noinline)
+  #define NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+  #define NOINLINE __declspec(noinline)
+#else
+  #define NOINLINE
 #endif
 
 /// Unfortunately compilers cannot be trusted (especially GCC)
