@@ -22,14 +22,6 @@
   #define __has_cpp_attribute(x) 0
 #endif
 
-#if __has_attribute(noinline)
-  #define NOINLINE __attribute__((noinline))
-#elif defined(_MSC_VER)
-  #define NOINLINE __declspec(noinline)
-#else
-  #define NOINLINE
-#endif
-
 /// Unfortunately compilers cannot be trusted (especially GCC)
 /// to inline performance critical functions. We must ensure
 /// that e.g. pi[x] and segmentedPi[x] are inlined.
