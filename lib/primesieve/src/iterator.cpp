@@ -15,27 +15,18 @@
 
 #include <stdint.h>
 #include <cassert>
-#include <cstring>
 
 namespace {
 
-using namespace primesieve;
-
 void deletePrimeGenerator(primesieve::iterator* it)
 {
-  delete (PrimeGenerator*) it->primeGenerator_;
-  it->primeGenerator_ = nullptr;
-}
-
-void deletePrimesVector(primesieve::iterator* it)
-{
-  delete (pod_vector<uint64_t>*) it->primesVector_;
-  it->primesVector_ = nullptr;
-}
-
-pod_vector<uint64_t>& getPrimes(primesieve::iterator* it)
-{
-  return *(pod_vector<uint64_t>*) it->primesVector_;
+  if (it->memory_)
+  {
+    using primesieve::IteratorMemory;
+    auto* memory = (IteratorMemory*) it->memory_;
+    delete memory->primeGenerator;
+    memory->primeGenerator = nullptr;
+  }
 }
 
 } // namespace
@@ -46,12 +37,9 @@ iterator::iterator() noexcept :
   i_(0),
   last_idx_(0),
   start_(0),
-  stop_(0),
   stop_hint_(std::numeric_limits<uint64_t>::max()),
-  dist_(0),
   primes_(nullptr),
-  primesVector_(nullptr),
-  primeGenerator_(nullptr)
+  memory_(nullptr)
 { }
 
 iterator::iterator(uint64_t start,
@@ -59,12 +47,9 @@ iterator::iterator(uint64_t start,
   i_(0),
   last_idx_(0),
   start_(start),
-  stop_(start),
   stop_hint_(stop_hint),
-  dist_(0),
   primes_(nullptr),
-  primesVector_(nullptr),
-  primeGenerator_(nullptr)
+  memory_(nullptr)
 { }
 
 /// Move constructor
@@ -72,22 +57,16 @@ iterator::iterator(iterator&& other) noexcept :
   i_(other.i_),
   last_idx_(other.last_idx_),
   start_(other.start_),
-  stop_(other.stop_),
   stop_hint_(other.stop_hint_),
-  dist_(other.dist_),
   primes_(other.primes_),
-  primesVector_(other.primesVector_),
-  primeGenerator_(other.primeGenerator_)
+  memory_(other.memory_)
 {
   other.i_ = 0;
   other.last_idx_ = 0;
   other.start_ = 0;
-  other.stop_ = 0;
   other.stop_hint_ = std::numeric_limits<uint64_t>::max();
-  other.dist_ = 0;
   other.primes_ = nullptr;
-  other.primesVector_ = nullptr;
-  other.primeGenerator_ = nullptr;
+  other.memory_ = nullptr;
 }
 
 /// Move assignment operator
@@ -100,22 +79,16 @@ iterator& iterator::operator=(iterator&& other) noexcept
     i_ = other.i_;
     last_idx_ = other.last_idx_;
     start_ = other.start_;
-    stop_ = other.stop_;
     stop_hint_ = other.stop_hint_;
-    dist_ = other.dist_;
     primes_ = other.primes_;
-    primesVector_ = other.primesVector_;
-    primeGenerator_ = other.primeGenerator_;
+    memory_ = other.memory_;
 
     other.i_ = 0;
     other.last_idx_ = 0;
     other.start_ = 0;
-    other.stop_ = 0;
     other.stop_hint_ = std::numeric_limits<uint64_t>::max();
-    other.dist_ = 0;
     other.primes_ = nullptr;
-    other.primesVector_ = nullptr;
-    other.primeGenerator_ = nullptr;
+    other.memory_ = nullptr;
   }
 
   return *this;
@@ -127,13 +100,16 @@ void iterator::skipto(uint64_t start,
   i_ = 0;
   last_idx_ = 0;
   start_ = start;
-  stop_ = start;
   stop_hint_ = stop_hint;
-  dist_ = 0;
   primes_ = nullptr;
-  deletePrimeGenerator(this);
-  // We don't delete/free the primesVector as
-  // it will likely be reused again.
+
+  if (memory_)
+  {
+    auto* memory = (IteratorMemory*) memory_;
+    memory->stop = start;
+    memory->dist = 0;
+    deletePrimeGenerator(this);
+  }
 }
 
 iterator::~iterator()
@@ -143,30 +119,33 @@ iterator::~iterator()
 
 void iterator::clear() noexcept
 {
-  deletePrimeGenerator(this);
-  deletePrimesVector(this);
+  if (memory_)
+  {
+    auto* memory = (IteratorMemory*) memory_;
+    delete memory->primeGenerator;
+    delete memory;
+    memory_ = nullptr;
+  }
 }
 
 void iterator::generate_next_primes()
 {
+  if (!memory_)
+    memory_ = new IteratorMemory(start_);
+
+  auto& memory = *(IteratorMemory*) memory_;
+  auto& primes = memory.primes;
   std::size_t size = 0;
 
   while (!size)
   {
-    auto* primeGenerator = (PrimeGenerator*) primeGenerator_;
-
-    if (!primeGenerator)
+    if (!memory.primeGenerator)
     {
-      deletePrimeGenerator(this);
-      IteratorHelper::next(&start_, &stop_, stop_hint_, &dist_);
-      primeGenerator = new PrimeGenerator(start_, stop_);
-      primeGenerator_ = primeGenerator;
-      if (!primesVector_)
-        primesVector_ = new pod_vector<uint64_t>();
+      IteratorHelper::next(&start_, &memory.stop, stop_hint_, &memory.dist);
+      memory.primeGenerator = new PrimeGenerator(start_, memory.stop, memory.preSieve);
     }
 
-    auto& primes = getPrimes(this);
-    primeGenerator->fillNextPrimes(primes, &size);
+    memory.primeGenerator->fillNextPrimes(primes, &size);
 
     // There are 3 different cases here:
     // 1) The primes array contains a few primes (<= 512).
@@ -182,7 +161,6 @@ void iterator::generate_next_primes()
       deletePrimeGenerator(this);
   }
 
-  auto& primes = getPrimes(this);
   i_ = 0;
   last_idx_ = size - 1;
   primes_ = &primes[0];
@@ -190,14 +168,15 @@ void iterator::generate_next_primes()
 
 void iterator::generate_prev_primes()
 {
-  if (!primesVector_)
-    primesVector_ = new pod_vector<uint64_t>();
+  if (!memory_)
+    memory_ = new IteratorMemory(start_);
 
-  auto& primes = getPrimes(this);
+  auto& memory = *(IteratorMemory*) memory_;
+  auto& primes = memory.primes;
 
   // Special case if generate_next_primes() has
   // been used before generate_prev_primes().
-  if_unlikely(primeGenerator_)
+  if_unlikely(memory.primeGenerator)
   {
     assert(!primes.empty());
     start_ = primes.front();
@@ -208,8 +187,8 @@ void iterator::generate_prev_primes()
 
   while (!size)
   {
-    IteratorHelper::prev(&start_, &stop_, stop_hint_, &dist_);
-    PrimeGenerator primeGenerator(start_, stop_);
+    IteratorHelper::prev(&start_, &memory.stop, stop_hint_, &memory.dist);
+    PrimeGenerator primeGenerator(start_, memory.stop, memory.preSieve);
     primeGenerator.fillPrevPrimes(primes, &size);
   }
 

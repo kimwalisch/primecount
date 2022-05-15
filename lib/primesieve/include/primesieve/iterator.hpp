@@ -91,12 +91,9 @@ struct iterator
   std::size_t i_;
   std::size_t last_idx_;
   uint64_t start_;
-  uint64_t stop_;
   uint64_t stop_hint_;
-  uint64_t dist_;
   uint64_t* primes_;
-  void* primesVector_;
-  void* primeGenerator_;
+  void* memory_;
 };
 
 } // namespace
