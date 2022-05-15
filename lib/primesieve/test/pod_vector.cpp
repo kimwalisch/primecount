@@ -48,20 +48,22 @@ int main()
     check(capacity1 == capacity2);
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(10000, 20000);
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(10000, 20000);
 
-  int size = dist(gen);
-  pod_vector<int> vect(size);
-  std::fill_n(&vect[0], size, 123);
-  
-  // Test if resize does not default initilize
-  vect.resize(0);
-  vect.resize(size);
-  int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
-  std::cout << "Vect sum after resize: " << sum;
-  check(sum == 123 * size);
+    int size = dist(gen);
+    pod_vector<int> vect(size);
+    std::fill_n(&vect[0], size, 123);
+
+    // Test if resize does not default initilize
+    vect.resize(0);
+    vect.resize(size);
+    int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
+    std::cout << "Vect sum after resize: " << sum;
+    check(sum == 123 * size);
+  }
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
