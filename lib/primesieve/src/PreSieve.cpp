@@ -28,12 +28,12 @@
 
 #include <primesieve/PreSieve.hpp>
 #include <primesieve/EratSmall.hpp>
-#include <primesieve/pmath.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <vector>
 
 using std::copy_n;
@@ -199,16 +199,24 @@ void PreSieve::init(uint64_t start,
   if (!buffers_[0].empty())
     return;
 
-  // The pre-sieve buffers should be at least 20
-  // times smaller than the sieving distance
-  // in order to reduce initialization overhead.
+  // To reduce the initialization overhead, we only enable
+  // pre-sieving if the sieving distance is at least 20x
+  // larger than the distance (size) of the pre-sieve buffers.
   uint64_t dist = stop - start;
-  uint64_t threshold = std::max(dist, isqrt(stop));
+  uint64_t sqrtStop = (uint64_t) std::sqrt(stop);
+  dist = std::max(dist, sqrtStop);
+
+  // When sieving backwards using primesieve::iterator.prev_prime()
+  // the sieving distance is subdivided into smaller chunks. By
+  // keeping track of the total sieving distance here, we can
+  // figure out if the total sieving distance is large and if it
+  // is worth enabling pre-sieving.
+  totalDist_ += dist;
 
   // For small intervals we pre-sieve using the
   // static buffer_7_11_13 lookup table. In this
   // case no initialization is required.
-  if (threshold < buffersDist * 20)
+  if (totalDist_ < buffersDist * 20)
     return;
 
   initBuffers();
