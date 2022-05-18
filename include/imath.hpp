@@ -61,7 +61,8 @@ inline T next_power_of_2(T x)
     return 1;
 
   x--;
-  T bits = std::numeric_limits<T>::digits;
+  using UT = typename std::make_unsigned<T>::type;
+  T bits = std::numeric_limits<UT>::digits;
 
   for (T i = 1; i < bits; i += i)
     x |= (x >> i);
@@ -94,8 +95,9 @@ inline T ilog2(T x)
   return (T) ((bits - 1) - __builtin_clzll(x));
 
 #else
+  using UT = typename std::make_unsigned<T>::type;
+  T bits = std::numeric_limits<UT>::digits;
   T log2 = 0;
-  T bits = std::numeric_limits<T>::digits;
 
   for (T i = bits / 2; i > 0; i /= 2)
   {
