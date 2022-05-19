@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,10 +16,10 @@
 #include <stdint.h>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 #if __cplusplus >= 202002L
   #include <bit>
-  #include <type_traits>
 #endif
 
 #if !defined(__has_builtin)
