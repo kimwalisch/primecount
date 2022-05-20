@@ -5,11 +5,18 @@ more complete list [search for primecount on OEIS.org](https://oeis.org/search?q
 There is also a [mersenneforum thread](https://www.mersenneforum.org/showthread.php?t=20473)
 where we have announced important records as well as details about these computations.
 If you have used primecount to compute an important new record please let me know
-and I will add your record to this page. Please note that most of these records
-have been computed using the
-[primecount version with backup support](https://github.com/kimwalisch/primecount/tree/backup3#primecount-backup)
-as these record computations often take weeks or months to complete and power
-outage(s) may occur in such time frames.
+and I will add your record to this page.
+
+Most of these records have been computed using the
+[primecount app with backup support](https://github.com/kimwalisch/primecount/tree/v6.4-backup)
+(which I stopped maintaining due to lack of time) as these record computations often take weeks or months to
+complete and power outages may occur in such time frames. Since the latest primecount-7.x is significantly
+faster than the last [primecount-backup-6.4](https://github.com/kimwalisch/primecount/tree/v6.4-backup)
+(especially on servers with > 100 CPU cores), I suggest using the latest primecount version without backup
+support if you have a good uninterruptible power supply (UPS) which prevents most power outages of your
+PC/server. You can use the primecount app together with the
+[Unix ```tee``` command](https://en.wikipedia.org/wiki/Tee_(command)) to store intermediate results in a
+log file.
 
 ## [A006880](https://oeis.org/A006880) records
 
