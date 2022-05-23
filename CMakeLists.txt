@@ -309,7 +309,7 @@ if(BUILD_PRIMECOUNT)
     endif()
 endif()
 
-# Use jemalloc allocator (better scaling) ############################
+# Use jemalloc allocator #############################################
 
 if(WITH_JEMALLOC)
     find_package(PkgConfig REQUIRED)
