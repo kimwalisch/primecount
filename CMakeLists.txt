@@ -120,10 +120,7 @@ set(LIB_SRC src/api.cpp
 # Required includes ##################################################
 
 include(GNUInstallDirs)
-include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
-include(CheckCXXSourceRuns)
-include(CMakePushCheckState)
 
 # Use 32-bit integer division ########################################
 
@@ -137,113 +134,12 @@ endif()
 
 # Check if int128_t is supported #####################################
 
-# GCC & Clang support 128-bit integers on 64-bit CPUs. However
-# support for 128-bit integers in the C++ standard library is
-# currently (2021) only enabled if the GNU extensions are enabled.
-# The GNU extensions are usually enabled by default but will be
-# disabled if the user compiles with the -std=c++* option. You
-# should use -std=gnu++* instead of -std=c++* if you want to enable
-# 128-bit integer support in primecount (or simply omit both
-# -std=c++* and -std=gnu++*).
-
-cmake_push_check_state()
-set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-check_cxx_source_compiles("
-    #include <int128_t.hpp>
-    #include <limits>
-    #include <type_traits>
-    int main() {
-        using namespace primecount;
-        static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
-        static_assert(std::is_integral<int128_t>::value, \"\");
-        static_assert(std::is_integral<uint128_t>::value, \"\");
-        static_assert(std::is_signed<int128_t>::value, \"\");
-        static_assert(std::is_unsigned<uint128_t>::value, \"\");
-        static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
-        return 0;
-    }" int128)
-
-if(NOT int128)
-    # Let's try it again with C++11, this usually works for old
-    # GCC/Clang versions that use C++03 by default. We add the
-    # -std=gnu++11 option before the user's CXXFLAGS to ensure
-    # we don't overwrite any of the user's flags.
-    if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-    elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-    endif()
-
-    check_cxx_source_compiles("
-        #include <int128_t.hpp>
-        #include <limits>
-        #include <type_traits>
-        int main() {
-            using namespace primecount;
-            static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
-            static_assert(std::is_integral<int128_t>::value, \"\");
-            static_assert(std::is_integral<uint128_t>::value, \"\");
-            static_assert(std::is_signed<int128_t>::value, \"\");
-            static_assert(std::is_unsigned<uint128_t>::value, \"\");
-            static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
-            return 0;
-        }" int128_with_cpp11)
-
-    if(NOT int128_with_cpp11)
-        set(DISABLE_INT128 "DISABLE_INT128")
-
-        # Print a warning message if the user has specified the -std=c++*
-        # option and 128-bit integers are disabled because this of this
-        # option. We try to overwrite -std=c++* by -std=gnu++11 and check
-        # if this would enable 128-bit integers.
-        if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION AND "${CMAKE_CXX_FLAGS}" MATCHES "-std=c\\+\\+[0-9]+")
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
-            set(CMAKE_REQUIRED_QUIET TRUE)
-
-            check_cxx_source_compiles("
-                #include <int128_t.hpp>
-                #include <limits>
-                #include <type_traits>
-                int main() {
-                    using namespace primecount;
-                    static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
-                    static_assert(std::is_integral<int128_t>::value, \"\");
-                    static_assert(std::is_integral<uint128_t>::value, \"\");
-                    static_assert(std::is_signed<int128_t>::value, \"\");
-                    static_assert(std::is_unsigned<uint128_t>::value, \"\");
-                    static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
-                    return 0;
-                }" int128_with_gnu11)
-
-            if(int128_with_gnu11)
-                message(WARNING "Your usage of -std=c++* disables 128-bit integer support in "
-                                "primecount, primecount will only support numbers <= 2^63. "
-                                "Use -std=gnu++* instead to enable 128-bit integer support "
-                                "(or omit both -std=c++* and -std=gnu++*).")
-            endif()
-        endif()
-    endif()
-endif()
-
-cmake_pop_check_state()
+include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 # Check if libdivide.h compiles ######################################
 
 if(WITH_LIBDIVIDE)
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-    check_cxx_source_compiles("
-        #include <libdivide.h>
-        #include <stdint.h>
-        int main() {
-            libdivide::divider<uint64_t, libdivide::BRANCHFREE> d(3);
-            uint64_t n = 1000000000;
-            return (n / d == n / 3) ? 0 : 1;
-        }" libdivide_branchfree)
-
-    cmake_pop_check_state()
+    include("${PROJECT_SOURCE_DIR}/cmake/libdivide.cmake")
 endif()
 
 if(WITH_LIBDIVIDE AND libdivide_branchfree)
@@ -264,200 +160,13 @@ endif()
 # Check for OpenMP ###################################################
 
 if(WITH_OPENMP)
-    find_package(OpenMP QUIET)
-
-    if(NOT (OpenMP_FOUND OR OpenMP_CXX_FOUND))
-        message(STATUS "Performing Test OpenMP")
-        message(STATUS "Performing Test OpenMP - Failed")
-    endif()
-
-    # Check if libatomic is required (usually by Clang)
-    # to support 128-bit integers with OpenMP.
-    if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
-        cmake_push_check_state()
-        set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-        if(TARGET OpenMP::OpenMP_CXX)
-            set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
-        else()
-            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
-        endif()
-
-        if(DISABLE_INT128)
-            set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
-        endif()
-
-        # Check if compiles without libatomic
-        check_cxx_source_compiles("
-            #include <int128_t.hpp>
-            #include <omp.h>
-            #include <stdint.h>
-            #include <iostream>
-            int main(int, char** argv) {
-                using primecount::maxint_t;
-                uintptr_t n = (uintptr_t) argv;
-                maxint_t sum = (maxint_t) n;
-                int iters = (int) n;
-                #pragma omp parallel for reduction(+: sum)
-                for (int i = 0; i < iters; i++)
-                    sum += (i / 3) * omp_get_thread_num();
-                std::cout << (long) sum;
-                return 0;
-            }" OpenMP)
-
-        if(NOT OpenMP)
-            find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
-
-            if(LIB_ATOMIC)
-                set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
-                set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
-
-                # Check if compiles with libatomic
-                check_cxx_source_compiles("
-                    #include <int128_t.hpp>
-                    #include <omp.h>
-                    #include <stdint.h>
-                    #include <iostream>
-                    int main(int, char** argv) {
-                        using primecount::maxint_t;
-                        uintptr_t n = (uintptr_t) argv;
-                        maxint_t sum = (maxint_t) n;
-                        int iters = (int) n;
-                        #pragma omp parallel for reduction(+: sum)
-                        for (int i = 0; i < iters; i++)
-                            sum += (i / 3) * omp_get_thread_num();
-                        std::cout << (long) sum;
-                        return 0;
-                    }" OpenMP_with_libatomic)
-            endif()
-
-            if(NOT OpenMP_with_libatomic)
-                set(LIB_ATOMIC "")
-            endif()
-        endif()
-
-        cmake_pop_check_state()
-
-        # OpenMP has been tested successfully, enable it
-        if(OpenMP OR OpenMP_with_libatomic)
-            if(TARGET OpenMP::OpenMP_CXX)
-                set(LIB_OPENMP "OpenMP::OpenMP_CXX")
-            else()
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-            endif()
-
-            # Create list of OpenMP libs for pkg-config/pkgconf
-            foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
-                string(APPEND PKGCONFIG_LIBS_OPENMP "-l${X} ")
-            endforeach()
-        endif()
-    endif()
-
-    # OpenMP test has failed, print warning message
-    if(NOT OpenMP AND NOT OpenMP_with_libatomic)
-        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
-            message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            message(WARNING "Install the OpenMP library (libgomp) to enable multithreading in primecount!")
-        else()
-            message(WARNING "Install the OpenMP library to enable multithreading in primecount!")
-        endif()
-    endif()
+    include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 endif()
 
 # Check if x86 CPU supports POPCNT instruction #######################
 
 if(WITH_POPCNT)
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_FLAGS -Werror)
-    check_cxx_compiler_flag(-mpopcnt mpopcnt)
-    cmake_pop_check_state()
-
-    if(mpopcnt)
-        set(POPCNT_FLAG "-mpopcnt")
-    endif()
-
-    # Since the POPCNT instruction is very important for performance
-    # (up to 50% speedup), we will only disable POPCNT if we can
-    # prove (using 2 tests) that the CPU does not support it.
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    set(CMAKE_REQUIRED_QUIET TRUE)
-
-    if(NOT CMAKE_CROSSCOMPILING)
-        # GCC/Clang & x86 CPU
-        if(mpopcnt)
-            check_cxx_source_runs("
-                #include <popcnt.hpp>
-                #include <stdint.h>
-                #include <iostream>
-                int main(int, char** argv) {
-                    uintptr_t n = (uintptr_t) argv;
-                    std::cout << popcnt64((uint64_t) n);
-                    return 0;
-                }" popcnt64_without_mpopcnt)
-
-            if(popcnt64_without_mpopcnt)
-                set(CMAKE_REQUIRED_FLAGS "${POPCNT_FLAG}")
-                set(CMAKE_REQUIRED_QUIET FALSE)
-
-                check_cxx_source_runs("
-                    #include <popcnt.hpp>
-                    #include <stdint.h>
-                    #include <iostream>
-                    int main(int, char** argv) {
-                        uintptr_t n = (uintptr_t) argv;
-                        std::cout << popcnt64((uint64_t) n);
-                        return 0;
-                    }" cpu_supports_popcnt)
-
-                if(NOT cpu_supports_popcnt)
-                    set(POPCNT_FLAG "")
-                endif()
-            endif()
-        # MSVC compiler & x86 CPU
-        else()
-            set(CMAKE_REQUIRED_DEFINITIONS "-DDISABLE_POPCNT")
-            check_cxx_source_runs("
-                #include <popcnt.hpp>
-                #include <stdint.h>
-                #include <iostream>
-                int main(int, char** argv) {
-                    #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                        uintptr_t n = (uintptr_t) argv;
-                        std::cout << popcnt64((uint64_t) n);
-                        return 0;
-                    #else
-                        Error: not MSVC compiler
-                    #endif
-                }" MSVC_without_popcnt)
-
-            if(MSVC_without_popcnt)
-                set(CMAKE_REQUIRED_DEFINITIONS "")
-                set(CMAKE_REQUIRED_QUIET FALSE)
-
-                check_cxx_source_runs("
-                    #include <popcnt.hpp>
-                    #include <stdint.h>
-                    #include <iostream>
-                    int main(int, char** argv) {
-                        #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                            uintptr_t n = (uintptr_t) argv;
-                            std::cout << popcnt64((uint64_t) n);
-                            return 0;
-                        #else
-                            Error: not MSVC compiler
-                        #endif
-                    }" cpu_supports_popcnt)
-
-                if(NOT cpu_supports_popcnt)
-                    set(DISABLE_POPCNT "DISABLE_POPCNT")
-                endif()
-            endif()
-        endif()
-    endif()
-
-    cmake_pop_check_state()
+    include("${PROJECT_SOURCE_DIR}/cmake/popcnt.cmake")
 else()
     # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
     # POPCNT instruction and instead uses a portable integer popcount
