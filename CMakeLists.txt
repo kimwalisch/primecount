@@ -224,13 +224,6 @@ else()
     find_package(primesieve REQUIRED)
 endif()
 
-# Testing ############################################################
-
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
-
 # libprimecount ######################################################
 
 if(BUILD_SHARED_LIBS)
@@ -370,3 +363,10 @@ configure_file(primecount.pc.in primecount.pc @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/primecount.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+# Testing ############################################################
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
