@@ -1,8 +1,9 @@
-Changes in primecount-7.4, 2022-05-07
+Changes in primecount-7.4, 2022-05-24
 
 * Sieve.cpp: Reduce branch mispredictions.
 * isqrt.cpp: Improve code gen for 128-bit integers.
-* Update to latest libprimesieve-7.10.
+* CMakeLists.txt: Simplify, split up into multiple *.cmake files.
+* Update to latest libprimesieve-7.10 with AVX512 support.
 
 Changes in primecount-7.3, 2022-04-28
 
