@@ -62,14 +62,18 @@ T B_thread(T x,
   // All other iterations compute pi(x / prime)
   // using a prime sieve.
   primesieve::iterator it2(xp, high);
-  int64_t p = it2.next_prime();
+  it2.generate_next_primes();
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
   for (; prime > start; prime = it1.prev_prime())
   {
     xp = (int64_t)(x / prime);
-    for (; p <= xp; p = it2.next_prime())
-      pi_xp++;
+
+    for (; it2.primes_[it2.last_idx_] <= (uint64_t) xp; it2.generate_next_primes())
+      pi_xp += (it2.last_idx_ - it2.i_) + 1;
+    for (int64_t p = it2.primes_[it2.i_]; p <= xp; p = it2.next_prime())
+      pi_xp += 1;
+
     sum += pi_xp;
   }
 

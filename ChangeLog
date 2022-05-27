@@ -1,6 +1,8 @@
-Changes in primecount-7.4, 2022-05-24
+Changes in primecount-7.4, 2022-05-27
 
 * Sieve.cpp: Reduce branch mispredictions.
+* B.cpp: Faster counting of primes.
+* P2.cpp: Faster counting of primes.
 * isqrt.cpp: Improve code gen for 128-bit integers.
 * CMakeLists.txt: Simplify, split up into multiple *.cmake files.
 * Update to latest libprimesieve-8.0 with AVX512 support.
