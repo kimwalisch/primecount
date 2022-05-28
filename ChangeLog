@@ -1,5 +1,6 @@
-Changes in primecount-7.4, 2022-05-27
+Changes in primecount-7.4, 2022-05-28
 
+* CMakeLists.txt: primecount now requires libprimesieve-8.0 or later.
 * Sieve.cpp: Reduce branch mispredictions.
 * B.cpp: Faster counting of primes.
 * P2.cpp: Faster counting of primes.
