@@ -55,7 +55,7 @@ T P2_thread(T x,
   // The first iteration requires computing pi(x / prime)
   // using the prime counting function.
   int threads = 1;
-  int64_t xp = (int64_t)(x / prime);
+  uint64_t xp = (uint64_t)(x / prime);
   int64_t pi_xp = pi_noprint(xp, threads);
   T sum = pi_xp;
   prime = it1.prev_prime();
@@ -68,11 +68,11 @@ T P2_thread(T x,
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
   for (; prime > start; prime = it1.prev_prime())
   {
-    xp = (int64_t)(x / prime);
+    xp = (uint64_t)(x / prime);
 
-    for (; it2.primes_[it2.last_idx_] <= (uint64_t) xp; it2.generate_next_primes())
+    for (; it2.primes_[it2.last_idx_] <= xp; it2.generate_next_primes())
       pi_xp += (it2.last_idx_ - it2.i_) + 1;
-    for (int64_t p = it2.primes_[it2.i_]; p <= xp; p = it2.next_prime())
+    for (; it2.primes_[it2.i_] <= xp; it2.i_++)
       pi_xp += 1;
 
     sum += pi_xp;
