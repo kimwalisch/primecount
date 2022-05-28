@@ -222,8 +222,9 @@ if(BUILD_LIBPRIMESIEVE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()
     find_package(primesieve REQUIRED)
-    if(primesieve_VERSION_MAJOR LESS 8)
-        message(FATAL_ERROR "primecount requires libprimesive-8.0 or later!")
+
+    if(primesieve_VERSION VERSION_LESS 8.0)
+        message(FATAL_ERROR "Found libprimesive-${primesieve_VERSION}, but primecount requires libprimesive >= 8.0")
     endif()
 endif()
 
