@@ -31,8 +31,14 @@ public:
   std::size_t capacity() const { return vect_.capacity(); }
   T* data() { return (T*) vect_.data(); }
   const T* data() const { return (T*) vect_.data(); }
-  T& operator[](std::size_t pos) { return vect_[pos].val; }
-  const T& operator[](std::size_t pos) const { return vect_[pos].val; }
+
+  // Some Linux distributions (e.g. Fedora) compile primecount
+  // with -D_GLIBCXX_ASSERTIONS which enables std::vector
+  // bounds checks when using the operator[]. This deteriorates
+  // primecount's performance by up to 10%. Therefore, we avoid
+  // using std::vector's operator[].
+  T& operator[](std::size_t pos) { return (vect_.data() + pos)->val; }
+  const T& operator[](std::size_t pos) const { return (vect_.data() + pos)->val; }
 
 private:
   struct NoInitType
