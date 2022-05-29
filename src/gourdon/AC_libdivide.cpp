@@ -325,10 +325,10 @@ T AC_OpenMP(T x,
   LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // Initialize libdivide vector from primes vector
-  using libdivide64_t = libdivide::branchfree_divider<uint64_t>;
-  pod_vector<libdivide64_t> lprimes;
-  lprimes.resize(1);
-  lprimes.append(primes.begin() + 1, primes.end());
+  pod_vector<libdivide::branchfree_divider<uint64_t>> lprimes;
+  lprimes.resize(primes.size());
+  for (std::size_t i = 1; i < lprimes.size(); i++)
+    lprimes[i] = primes[i];
 
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than

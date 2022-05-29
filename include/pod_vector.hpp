@@ -31,7 +31,9 @@ template <typename T>
 class pod_vector
 {
 public:
-  using value_type = T;
+  static_assert(std::is_trivially_destructible<T>::value,
+                "pod_vector<T> only supports types with trivial destructors!");
+
   pod_vector() noexcept = default;
 
   pod_vector(std::size_t size)
@@ -44,7 +46,24 @@ public:
     delete [] array_;
   }
 
-  /// Copying is slow, we avoid it
+  /// Free all memory, the pod_vector
+  /// can be reused afterwards.
+  void free() noexcept
+  {
+    delete [] array_;
+    array_ = nullptr;
+    end_ = nullptr;
+    capacity_ = nullptr;
+  }
+
+  /// Reset the pod_vector, but do not free its
+  /// memory. Same as std::vector.clear().
+  void clear() noexcept
+  {
+    end_ = array_;
+  }
+
+  /// Copying is slow, we prevent it
   pod_vector(const pod_vector&) = delete;
   pod_vector& operator=(const pod_vector&) = delete;
 
@@ -63,19 +82,26 @@ public:
     return *this;
   }
 
+  void swap(pod_vector& other) noexcept
+  {
+    std::swap(array_, other.array_);
+    std::swap(end_, other.end_);
+    std::swap(capacity_, other.capacity_);
+  }
+
   bool empty() const noexcept
   {
     return array_ == end_;
   }
 
-  T& operator[] (std::size_t n) noexcept
+  T& operator[] (std::size_t pos) noexcept
   {
-    return array_[n];
+    return array_[pos];
   }
 
-  T& operator[] (std::size_t n) const noexcept
+  T& operator[] (std::size_t pos) const noexcept
   {
-    return array_[n];
+    return array_[pos];
   }
 
   T* data() noexcept
@@ -142,39 +168,32 @@ public:
     return *(end_ - 1);
   }
 
-  void swap(pod_vector& other) noexcept
-  {
-    std::swap(array_, other.array_);
-    std::swap(end_, other.end_);
-    std::swap(capacity_, other.capacity_);
-  }
-
-  ALWAYS_INLINE void push_back(const T& val)
+  ALWAYS_INLINE void push_back(const T& value)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = val;
+    *end_++ = value;
   }
 
-  ALWAYS_INLINE void push_back(T&& val)
+  ALWAYS_INLINE void push_back(T&& value)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = val;
+    *end_++ = value;
   }
 
-  ALWAYS_INLINE void emplace_back(const T& val)
+  ALWAYS_INLINE void emplace_back(const T& value)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = val;
+    *end_++ = value;
   }
 
-  ALWAYS_INLINE void emplace_back(T&& val)
+  ALWAYS_INLINE void emplace_back(T&& value)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = val;
+    *end_++ = value;
   }
 
   void reserve(std::size_t n)
@@ -183,52 +202,18 @@ public:
     {
       std::size_t old_size = size();
       resize(n);
-      end_ = &array_[old_size];
+      end_ = array_ + old_size;
     }
   }
 
-  template <class InputIt>
-  void append(InputIt first, InputIt last)
-  {
-    if (first < last)
-    {
-      std::size_t n = (std::size_t)(last - first);
-      std::size_t old_size = size();
-      std::size_t new_size = old_size + n;
-      resize(new_size);
-
-      // We cannot use memcpy here as the array type may
-      // be a C++ class with an assignment operator.
-      for (std::size_t i = old_size; i < new_size; i++)
-        array_[i] = *first++;
-    }
-  }
-
-  template <typename P>
-  ALWAYS_INLINE typename std::enable_if<std::is_destructible<P>::value>::type
-  destroy(P* p) { p->~P(); }
-
-  template <typename P>
-  ALWAYS_INLINE typename std::enable_if<!std::is_destructible<P>::value>::type
-  destroy(P*) { }
-
-  void clear() noexcept
-  {
-    for (std::size_t i = 0; i < size(); i++)
-      destroy(&array_[i]);
-    end_ = array_;
-  }
-
+  /// Resize without default initializing memory.
+  /// If the pod_vector is not empty the current content
+  /// will be copied into the new array.
+  ///
   void resize(std::size_t n)
   {
     if (n == size())
       return;
-    else if (n < size())
-    {
-      for (std::size_t i = n; i < size(); i++)
-        destroy(&array_[i]);
-      end_ = &array_[n];
-    }
     else if (n <= capacity())
     {
       assert(capacity() > 0);
@@ -249,6 +234,8 @@ public:
       capacity_ = end_;
     }
   }
+
+  using value_type = T;
 
 private:
   T* array_ = nullptr;
