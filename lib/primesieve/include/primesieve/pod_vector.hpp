@@ -208,6 +208,19 @@ public:
     }
   }
 
+  template <typename TT>
+  ALWAYS_INLINE typename std::enable_if<std::is_pod<TT>::value>::type
+  default_initialize_range(TT*, TT*)
+  { }
+
+  template <typename TT>
+  ALWAYS_INLINE typename std::enable_if<!std::is_pod<TT>::value>::type
+  default_initialize_range(TT* first, TT* last)
+  {
+    for (; first < last; first++)
+      *first = TT();
+  }
+
   /// Resize without default initializing memory.
   /// If the pod_vector is not empty the current content
   /// will be copied into the new array.
@@ -219,6 +232,12 @@ public:
     else if (n <= capacity())
     {
       assert(capacity() > 0);
+
+      // This will only be used for classes
+      // and structs with constructors.
+      if (n > size())
+        default_initialize_range(end_, array_ + n);
+
       end_ = array_ + n;
     }
     else
