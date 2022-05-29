@@ -213,7 +213,10 @@ public:
       end_ = &array_[n];
     }
     else if (n <= capacity())
+    {
+      assert(capacity() > 0);
       end_ = array_ + n;
+    }
     else
     {
       T* new_array = new T[n];
