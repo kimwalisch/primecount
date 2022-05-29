@@ -212,6 +212,8 @@ public:
         destroy(&array_[i]);
       end_ = &array_[n];
     }
+    else if (n <= capacity())
+      end_ = array_ + n;
     else
     {
       T* new_array = new T[n];
