@@ -25,7 +25,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,13 +42,12 @@
 #include <libdivide.h>
 #include <min.hpp>
 #include <imath.hpp>
+#include <pod_vector.hpp>
 #include <print.hpp>
 #include <RelaxedAtomic.hpp>
 
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using std::numeric_limits;
 using namespace primecount;
 
@@ -325,9 +324,11 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(threads, x13, thread_threshold);
   LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // Initialize libdivide vector using primes
-  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
-  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
+  // Initialize libdivide vector from primes vector
+  using libdivide64_t = libdivide::branchfree_divider<uint64_t>;
+  pod_vector<libdivide64_t> lprimes;
+  lprimes.resize(1);
+  lprimes.append(primes.begin() + 1, primes.end());
 
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than
