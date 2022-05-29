@@ -21,8 +21,10 @@
 namespace primecount {
 
 /// pod_vector is a dynamically growing array.
-/// It has the same API (though not complete) as std::vector but its'
-/// resize() method does not default initialize memory. It also prevents
+/// It has the same API (though not complete) as std::vector but its
+/// resize() method does not default initialize memory for built-in
+/// integer types. It does however default initialize classes and
+/// struct types if they have a constructor. It also prevents
 /// bounds checks which is important for primesieve's performance, e.g.
 /// the Fedora Linux distribution compiles with -D_GLIBCXX_ASSERTIONS
 /// which enables std::vector bounds checks.
