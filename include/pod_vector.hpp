@@ -197,8 +197,10 @@ public:
       std::size_t new_size = old_size + n;
       resize(new_size);
 
+      // We cannot use memcpy here as the array type may
+      // be a C++ class with an assignment operator.
       for (std::size_t i = old_size; i < new_size; i++)
-        array_[i] = T(*first++);
+        array_[i] = *first++;
     }
   }
 
