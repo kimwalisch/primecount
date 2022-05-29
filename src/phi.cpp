@@ -227,7 +227,10 @@ private:
         if (i - 1 <= PhiTiny::max_a())
           sieve_[i] = std::move(sieve_[i - 1]);
         else
-          sieve_[i] = sieve_[i - 1];
+        {
+          sieve_[i].resize(sieve_[i - 1].size());
+          std::copy(sieve_[i - 1].begin(), sieve_[i - 1].end(), sieve_[i].begin());
+        }
 
         // Remove prime[i] and its multiples
         uint64_t prime = primes_[i];
@@ -272,7 +275,7 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  vector<vector<sieve_t>> sieve_;
+  vector<pod_vector<sieve_t>> sieve_;
   const pod_vector<int32_t>& primes_;
   const PiTable& pi_;
 };
