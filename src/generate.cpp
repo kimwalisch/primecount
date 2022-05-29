@@ -1,7 +1,7 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -9,12 +9,12 @@
 
 #include <generate.hpp>
 #include <isqrt.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <limits>
 #include <vector>
 
-using std::vector;
 using std::numeric_limits;
 
 namespace primecount {
@@ -22,18 +22,20 @@ namespace primecount {
 /// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes
 ///
-vector<int32_t> generate_pi(int64_t max)
+pod_vector<int32_t> generate_pi(int64_t max)
 {
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
-  vector<char> sieve(size, 1);
+  pod_vector<char> sieve(size);
+  std::fill(sieve.begin(), sieve.end(), 1);
 
   for (int64_t i = 2; i <= sqrt; i++)
     if (sieve[i])
       for (int64_t j = i * i; j < size; j += i)
         sieve[j] = 0;
 
-  vector<int32_t> pi(size, 0);
+  pod_vector<int32_t> pi(size);
+  std::fill(pi.begin(), pi.end(), 0);
   int32_t pix = 0;
 
   for (int64_t i = 2; i < size; i++)
@@ -49,11 +51,12 @@ vector<int32_t> generate_pi(int64_t max)
 /// This implementation is based on code by Rick Sladkey:
 /// https://mathoverflow.net/q/99545
 ///
-vector<int32_t> generate_moebius(int64_t max)
+pod_vector<int32_t> generate_moebius(int64_t max)
 {
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
-  vector<int32_t> mu(size, 1);
+  pod_vector<int32_t> mu(size);
+  std::fill(mu.begin(), mu.end(), 1);
 
   for (int64_t i = 2; i <= sqrt; i++)
   {
@@ -85,11 +88,12 @@ vector<int32_t> generate_moebius(int64_t max)
 /// of the integers <= max.
 /// @Examples: lfp(2) = 2, lpf(15) = 3
 ///
-vector<int32_t> generate_lpf(int64_t max)
+pod_vector<int32_t> generate_lpf(int64_t max)
 {
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
-  vector<int32_t> lpf(size, 1);
+  pod_vector<int32_t> lpf(size);
+  std::fill(lpf.begin(), lpf.end(), 1);
 
   // By convention lfp(1) = +Infinity. Note that lpf(n) is
   // named pmin(n) in Tomás Oliveira e Silva's paper:
@@ -119,10 +123,11 @@ vector<int32_t> generate_lpf(int64_t max)
 /// of the integers <= max.
 /// @Examples: mfp(2) = 2, mpf(15) = 5
 ///
-vector<int32_t> generate_mpf(int64_t max)
+pod_vector<int32_t> generate_mpf(int64_t max)
 {
   int64_t size = max + 1;
-  vector<int32_t> mpf(size, 1);
+  pod_vector<int32_t> mpf(size);
+  std::fill(mpf.begin(), mpf.end(), 1);
 
   for (int64_t i = 2; i <= max; i++)
     if (mpf[i] == 1)

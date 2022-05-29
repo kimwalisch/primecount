@@ -54,8 +54,8 @@ int64_t S2_thread(int64_t x,
                   int64_t c,
                   const PiTable& pi,
                   const pod_vector<int32_t>& primes,
-                  const vector<int32_t>& lpf,
-                  const vector<int32_t>& mu,
+                  const pod_vector<int32_t>& lpf,
+                  const pod_vector<int32_t>& mu,
                   ThreadSettings& thread)
 {
   int64_t sum = 0;
@@ -171,8 +171,8 @@ int64_t S2(int64_t x,
            int64_t c,
            int64_t s2_approx,
            const pod_vector<int32_t>& primes,
-           const vector<int32_t>& lpf,
-           const vector<int32_t>& mu,
+           const pod_vector<int32_t>& lpf,
+           const pod_vector<int32_t>& mu,
            int threads,
            bool is_print)
 {

@@ -23,9 +23,7 @@
 #include <S.hpp>
 
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using namespace primecount;
 
 namespace {
@@ -40,13 +38,14 @@ int64_t S2(int64_t x,
            int64_t c,
            int64_t pi_y,
            const pod_vector<int32_t>& primes,
-           const vector<int32_t>& lpf,
-           const vector<int32_t>& mu)
+           const pod_vector<int32_t>& lpf,
+           const pod_vector<int32_t>& mu)
 {
   int64_t limit = x / y;
   int64_t s2 = 0;
   int64_t b = 1;
-  vector<char> sieve(limit, 1);
+  pod_vector<char> sieve(limit);
+  std::fill(sieve.begin(), sieve.end(), 1);
 
   // phi(y, b) nodes with b <= c do not contribute to S2, so
   // we sieve out the multiples of the first c primes

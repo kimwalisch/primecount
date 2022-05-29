@@ -14,7 +14,6 @@
 #include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
@@ -45,22 +44,22 @@ pod_vector<T> generate_n_primes(int64_t n)
 }
 
 /// Generate a vector with Möbius function values
-std::vector<int32_t> generate_moebius(int64_t max);
+pod_vector<int32_t> generate_moebius(int64_t max);
 
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> generate_lpf(int64_t max);
+pod_vector<int32_t> generate_lpf(int64_t max);
 
 /// Generate a vector with the largest prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> generate_mpf(int64_t max);
+pod_vector<int32_t> generate_mpf(int64_t max);
 
 /// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
-std::vector<int32_t> generate_pi(int64_t max);
+pod_vector<int32_t> generate_pi(int64_t max);
 
 } // namespace
 
