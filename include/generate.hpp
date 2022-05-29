@@ -11,6 +11,7 @@
 #define GENERATE_HPP
 
 #include <primesieve.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
 #include <vector>
@@ -21,9 +22,11 @@ namespace primecount {
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 ///
 template <typename T>
-std::vector<T> generate_primes(int64_t max)
+pod_vector<T> generate_primes(int64_t max)
 {
-  std::vector<T> primes = { 0 };
+  pod_vector<T> primes;
+  primes.resize(1);
+  primes[0] = 0;
   primesieve::generate_primes(max, &primes);
   return primes;
 }
@@ -32,9 +35,9 @@ std::vector<T> generate_primes(int64_t max)
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 //
 template <typename T>
-std::vector<T> generate_n_primes(int64_t n)
+pod_vector<T> generate_n_primes(int64_t n)
 {
-  std::vector<T> primes;
+  pod_vector<T> primes;
   primes.reserve(n + 1);
   primes.push_back(0);
   primesieve::generate_n_primes(n, &primes);

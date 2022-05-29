@@ -61,7 +61,7 @@ public:
   }
 
   template <typename T>
-  void pre_sieve(const std::vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  void pre_sieve(const pod_vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
     assert(c < primes.size());
     reset_sieve(low, high);

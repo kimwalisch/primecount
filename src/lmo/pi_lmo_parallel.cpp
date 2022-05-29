@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,6 +34,7 @@
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
+#include <pod_vector.hpp>
 #include <S.hpp>
 
 #include <stdint.h>
@@ -52,7 +53,7 @@ int64_t S2_thread(int64_t x,
                   int64_t z,
                   int64_t c,
                   const PiTable& pi,
-                  const vector<int32_t>& primes,
+                  const pod_vector<int32_t>& primes,
                   const vector<int32_t>& lpf,
                   const vector<int32_t>& mu,
                   ThreadSettings& thread)
@@ -169,7 +170,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            int64_t s2_approx,
-           const vector<int32_t>& primes,
+           const pod_vector<int32_t>& primes,
            const vector<int32_t>& lpf,
            const vector<int32_t>& mu,
            int threads,

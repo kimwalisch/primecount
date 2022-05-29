@@ -9,7 +9,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,6 +18,7 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <generate.hpp>
+#include <pod_vector.hpp>
 #include <PhiTiny.hpp>
 #include <S.hpp>
 
@@ -38,7 +39,7 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
            int64_t pi_y,
-           const vector<int32_t>& primes,
+           const pod_vector<int32_t>& primes,
            const vector<int32_t>& lpf,
            const vector<int32_t>& mu)
 {

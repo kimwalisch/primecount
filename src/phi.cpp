@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,6 +31,7 @@
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
+#include <pod_vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -49,7 +50,7 @@ class PhiCache : public BitSieve240
 public:
   PhiCache(uint64_t x,
            uint64_t a,
-           const vector<int32_t>& primes,
+           const pod_vector<int32_t>& primes,
            const PiTable& pi) :
     primes_(primes),
     pi_(pi)
@@ -272,7 +273,7 @@ private:
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
   vector<vector<sieve_t>> sieve_;
-  const vector<int32_t>& primes_;
+  const pod_vector<int32_t>& primes_;
   const PiTable& pi_;
 };
 
