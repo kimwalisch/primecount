@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,7 +41,6 @@
 
 #include <stdint.h>
 #include <cassert>
-#include <vector>
 
 namespace primecount {
 
@@ -121,7 +120,7 @@ private:
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
   pod_vector<uint8_t> sieve_;
-  std::vector<Wheel> wheel_;
+  pod_vector<Wheel> wheel_;
   Counter counter_;
 };
 
