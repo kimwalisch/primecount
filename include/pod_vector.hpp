@@ -198,7 +198,7 @@ public:
       resize(new_size);
 
       for (std::size_t i = old_size; i < new_size; i++)
-        array_[i] = std::move(T(*first++));
+        array_[i] = T(*first++);
     }
   }
 
