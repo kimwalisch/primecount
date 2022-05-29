@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <array>
 #include <limits>
-#include <vector>
 
 namespace primecount {
 
