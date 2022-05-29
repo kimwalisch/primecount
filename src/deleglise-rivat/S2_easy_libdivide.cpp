@@ -13,7 +13,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,6 +26,7 @@
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
+#include <pod_vector.hpp>
 #include <print.hpp>
 #include <RelaxedAtomic.hpp>
 #include <StatusS2.hpp>
@@ -33,9 +34,7 @@
 
 #include <libdivide.h>
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using std::numeric_limits;
 using namespace primecount;
 
@@ -158,9 +157,11 @@ T S2_easy_OpenMP(T x,
                  int threads,
                  bool is_print)
 {
-  // Initialize libdivide vector using primes
-  vector<libdivide::branchfree_divider<uint64_t>> lprimes(1);
-  lprimes.insert(lprimes.end(), primes.begin() + 1, primes.end());
+  // Initialize libdivide vector from primes vector
+  pod_vector<libdivide::branchfree_divider<uint64_t>> lprimes;
+  lprimes.resize(primes.size());
+  for (std::size_t i = 1; i < lprimes.size(); i++)
+    lprimes[i] = primes[i];
 
   T sum = 0;
   int64_t x13 = iroot<3>(x);

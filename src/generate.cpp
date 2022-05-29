@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 #include <limits>
-#include <vector>
 
 using std::numeric_limits;
 

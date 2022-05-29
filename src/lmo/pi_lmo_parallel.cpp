@@ -38,9 +38,7 @@
 #include <S.hpp>
 
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using namespace primecount;
 
 namespace {
