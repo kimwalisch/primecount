@@ -133,7 +133,7 @@ void PiTable::init_bits(uint64_t low,
   // Zero initialize pi vector
   uint64_t i = low / 240;
   uint64_t j = ceil_div(high, 240);
-  std::fill_n(&pi_[i], j - i, pi_t{0, 0});
+  std::fill(&pi_[i], &pi_[j], pi_t{0, 0});
 
   // Iterate over primes > 5
   low = max(low, 5);
