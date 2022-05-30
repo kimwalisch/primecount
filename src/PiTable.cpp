@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cstring>
 
 namespace primecount {
 
@@ -134,7 +133,7 @@ void PiTable::init_bits(uint64_t low,
   // Zero initialize pi vector
   uint64_t i = low / 240;
   uint64_t j = ceil_div(high, 240);
-  std::memset(&pi_[i], 0, (j - i) * sizeof(pi_t));
+  std::fill_n(&pi_[i], j - i, pi_t{0, 0});
 
   // Iterate over primes > 5
   low = max(low, 5);
