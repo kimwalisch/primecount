@@ -61,7 +61,7 @@ int main()
     // Test if resize does not default initilize
     vect.resize(0);
     vect.resize(size);
-    int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
+    int sum = std::accumulate(&vect[0], &vect[0] + vect.size(), 0);
     std::cout << "Vect sum after resize: " << sum;
     check(sum == 123 * size);
   }
