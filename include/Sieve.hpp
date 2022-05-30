@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,7 +41,6 @@
 
 #include <stdint.h>
 #include <cassert>
-#include <vector>
 
 namespace primecount {
 
@@ -61,7 +60,7 @@ public:
   }
 
   template <typename T>
-  void pre_sieve(const std::vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  void pre_sieve(const pod_vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
     assert(c < primes.size());
     reset_sieve(low, high);
@@ -82,14 +81,10 @@ private:
 
   struct Wheel
   {
-    uint32_t multiple;
-    uint32_t index;
+    uint32_t multiple = 0;
+    uint32_t index = 0;
 
-    Wheel()
-      : multiple(0),
-        index(0)
-    { }
-
+    Wheel() = default;
     Wheel(uint32_t m, uint32_t i)
       : multiple(m),
         index(i)
@@ -121,7 +116,7 @@ private:
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
   pod_vector<uint8_t> sieve_;
-  std::vector<Wheel> wheel_;
+  pod_vector<Wheel> wheel_;
   Counter counter_;
 };
 

@@ -11,9 +11,9 @@
 #define GENERATE_HPP
 
 #include <primesieve.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <vector>
 
 namespace primecount {
 
@@ -21,9 +21,11 @@ namespace primecount {
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 ///
 template <typename T>
-std::vector<T> generate_primes(int64_t max)
+pod_vector<T> generate_primes(int64_t max)
 {
-  std::vector<T> primes = { 0 };
+  pod_vector<T> primes;
+  primes.resize(1);
+  primes[0] = 0;
   primesieve::generate_primes(max, &primes);
   return primes;
 }
@@ -32,9 +34,9 @@ std::vector<T> generate_primes(int64_t max)
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 //
 template <typename T>
-std::vector<T> generate_n_primes(int64_t n)
+pod_vector<T> generate_n_primes(int64_t n)
 {
-  std::vector<T> primes;
+  pod_vector<T> primes;
   primes.reserve(n + 1);
   primes.push_back(0);
   primesieve::generate_n_primes(n, &primes);
@@ -42,22 +44,22 @@ std::vector<T> generate_n_primes(int64_t n)
 }
 
 /// Generate a vector with Möbius function values
-std::vector<int32_t> generate_moebius(int64_t max);
+pod_vector<int32_t> generate_moebius(int64_t max);
 
 /// Generate a vector with the least prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> generate_lpf(int64_t max);
+pod_vector<int32_t> generate_lpf(int64_t max);
 
 /// Generate a vector with the largest prime
 /// factors of the integers <= max.
 ///
-std::vector<int32_t> generate_mpf(int64_t max);
+pod_vector<int32_t> generate_mpf(int64_t max);
 
 /// Generate a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
-std::vector<int32_t> generate_pi(int64_t max);
+pod_vector<int32_t> generate_pi(int64_t max);
 
 } // namespace
 

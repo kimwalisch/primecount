@@ -17,7 +17,7 @@
 ///        disable ENABLE_DIV32 (using cmake -DWITH_DIV32=OFF) as this
 ///        avoids runtime checks for (64-bit / 32-bit) divisions.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,6 +25,8 @@
 
 #ifndef FAST_DIV_HPP
 #define FAST_DIV_HPP
+
+#include <macros.hpp>
 
 #include <cassert>
 #include <limits>
@@ -58,7 +60,7 @@ struct make_smaller
 
 /// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) == sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
   // Unsigned integer division is usually
@@ -70,7 +72,7 @@ fast_div(X x, Y y)
 /// Used for  (64-bit / 32-bit) =  64-bit.
 /// Used for (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
   using smaller_t = typename make_smaller<X>::type;
@@ -113,8 +115,8 @@ struct make_smaller
 /// Used for (64-bit / 32-bit) = 64-bit.
 /// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) >= sizeof(Y) &&
-                         sizeof(X) <= sizeof(uint64_t)), X>::type
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) >= sizeof(Y) &&
+                                       sizeof(X) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
   // Unsigned integer division is usually
@@ -125,8 +127,8 @@ fast_div(X x, Y y)
 
 /// Used for (128-bit / 64-bit) = 128-bit.
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) > sizeof(Y) &&
-                         sizeof(X) > sizeof(uint64_t)), X>::type
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(Y) &&
+                                       sizeof(X) > sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
   using smaller_t = typename make_smaller<X>::type;
@@ -150,8 +152,8 @@ fast_div(X x, Y y)
 /// that the result is < 2^64.
 ///
 template <typename X, typename Y>
-typename std::enable_if<(sizeof(X) == sizeof(uint64_t) * 2 &&
-                         sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) == sizeof(uint64_t) * 2 &&
+                                       sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
 fast_div64(X x, Y y)
 {
 #if defined(__x86_64__) && \
@@ -182,8 +184,8 @@ fast_div64(X x, Y y)
 /// Used for (64-bit / 32-bit) = 64-bit.
 /// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
-typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
-                          sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
+ALWAYS_INLINE typename std::enable_if<!(sizeof(X) == sizeof(uint64_t) * 2 &&
+                                        sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
 fast_div64(X x, Y y)
 {
   return (uint64_t) fast_div(x, y);

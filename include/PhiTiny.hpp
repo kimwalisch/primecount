@@ -9,7 +9,7 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -21,6 +21,7 @@
 #include <BitSieve240.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <pod_vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -28,7 +29,6 @@
 #include <cassert>
 #include <limits>
 #include <type_traits>
-#include <vector>
 
 namespace primecount {
 
@@ -155,8 +155,8 @@ private:
   #pragma pack(push, 1)
   struct sieve_t
   {
-    uint32_t count = 0;
-    uint64_t bits = ~0ull;
+    uint32_t count;
+    uint64_t bits;
   };
 
   #pragma pack(pop)
@@ -165,8 +165,8 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  std::array<std::vector<sieve_t>, 8> sieve_;
-  std::array<std::vector<uint8_t>, 4> phi_;
+  std::array<pod_vector<sieve_t>, 8> sieve_;
+  std::array<pod_vector<uint8_t>, 4> phi_;
 };
 
 extern const PhiTiny phiTiny;

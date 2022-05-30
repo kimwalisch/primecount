@@ -45,7 +45,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <vector>
 
 using std::fill_n;
 using std::sqrt;

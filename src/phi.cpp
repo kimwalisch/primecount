@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,9 +31,11 @@
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
+#include <pod_vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <utility>
@@ -49,7 +51,7 @@ class PhiCache : public BitSieve240
 public:
   PhiCache(uint64_t x,
            uint64_t a,
-           const vector<int32_t>& primes,
+           const pod_vector<int32_t>& primes,
            const PiTable& pi) :
     primes_(primes),
     pi_(pi)
@@ -219,14 +221,20 @@ private:
       // is not divisible by 2, 3 and 5. The 8 bits of each byte
       // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
       if (i == 3)
+      {
         sieve_[i].resize(max_x_size_);
+        std::fill(sieve_[i].begin(), sieve_[i].end(), sieve_t{0, ~0ull});
+      }
       else
       {
         // Initalize phi(x, i) with phi(x, i - 1)
         if (i - 1 <= PhiTiny::max_a())
           sieve_[i] = std::move(sieve_[i - 1]);
         else
-          sieve_[i] = sieve_[i - 1];
+        {
+          sieve_[i].resize(sieve_[i - 1].size());
+          std::copy(sieve_[i - 1].begin(), sieve_[i - 1].end(), sieve_[i].begin());
+        }
 
         // Remove prime[i] and its multiples
         uint64_t prime = primes_[i];
@@ -261,18 +269,17 @@ private:
   #pragma pack(push, 1)
   struct sieve_t
   {
-    uint32_t count = 0;
-    uint64_t bits = ~0ull;
+    uint32_t count;
+    uint64_t bits;
   };
-
   #pragma pack(pop)
 
   /// sieve[a] contains only numbers that are not divisible
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  vector<vector<sieve_t>> sieve_;
-  const vector<int32_t>& primes_;
+  vector<pod_vector<sieve_t>> sieve_;
+  const pod_vector<int32_t>& primes_;
   const PiTable& pi_;
 };
 

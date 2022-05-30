@@ -7,7 +7,7 @@
 ///        however in many newer papers the ordinary leaves are named
 ///        S0. In primecount the ordinary leaves are named S1.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,13 +18,12 @@
 #include <generate.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <pod_vector.hpp>
 #include <print.hpp>
 #include <S.hpp>
 
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using std::numeric_limits;
 using namespace primecount;
 
@@ -37,13 +36,13 @@ namespace {
 /// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March
 /// 2015.
 ///
-template <int MU, typename T, typename P>
+template <int MU, typename T, typename vect>
 T S1_thread(T x,
             int64_t y,
             uint64_t b,
             int64_t c,
             T square_free,
-            vector<P>& primes)
+            const vect& primes)
 {
   T s1 = 0;
 
