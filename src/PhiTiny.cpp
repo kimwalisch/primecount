@@ -9,7 +9,7 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,6 +20,7 @@
 #include <imath.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <array>
 #include <limits>
 
@@ -76,6 +77,7 @@ PhiTiny::PhiTiny()
       uint64_t pp = prime_products[a];
       uint64_t size = ceil_div(pp, 240);
       sieve_[a].resize(size);
+      std::fill_n(sieve_[a].begin(), size, sieve_t{0, ~0ull});
 
       for (uint64_t i = pi[7]; i <= a; i++)
         for (uint64_t n = primes[i]; n < pp; n += primes[i] * 2)

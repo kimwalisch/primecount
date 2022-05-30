@@ -155,8 +155,8 @@ private:
   #pragma pack(push, 1)
   struct sieve_t
   {
-    uint32_t count = 0;
-    uint64_t bits = ~0ull;
+    uint32_t count;
+    uint64_t bits;
   };
 
   #pragma pack(pop)
