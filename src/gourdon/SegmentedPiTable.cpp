@@ -31,6 +31,7 @@
 #include <min.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cassert>
 
 namespace primecount {
@@ -58,8 +59,10 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   high_ = high;
   uint64_t segment_size = high - low;
   uint64_t size = ceil_div(segment_size, 240);
+
   pi_.clear();
   pi_.resize(size);
+  std::fill(pi_.begin(), pi_.end(), pi_t{0, 0});
 
   init_bits();
   init_count(pi_low);

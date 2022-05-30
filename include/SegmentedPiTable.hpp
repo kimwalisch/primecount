@@ -91,8 +91,8 @@ private:
 
   struct pi_t
   {
-    uint64_t count = 0;
-    uint64_t bits = 0;
+    uint64_t count;
+    uint64_t bits;
   };
 
   pod_vector<pi_t> pi_;
