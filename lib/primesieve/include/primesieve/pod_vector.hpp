@@ -257,8 +257,8 @@ public:
 
 private:
   T* array_ = nullptr;
-  T* capacity_ = nullptr;
   T* end_ = nullptr;
+  T* capacity_ = nullptr;
 };
 
 } // namespace
