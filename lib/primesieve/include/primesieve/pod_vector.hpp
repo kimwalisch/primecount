@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <cstring>
 #include <type_traits>
 #include <utility>
 
@@ -244,7 +243,7 @@ public:
 
       if (array_)
       {
-        std::memcpy(new_array, array_, size() * sizeof(T));
+        std::copy(array_, end_, new_array);
         delete [] array_;
       }
 
