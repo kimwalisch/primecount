@@ -15,6 +15,7 @@
 #include <iostream>
 #include <random>
 #include <numeric>
+#include <utility>
 
 using std::size_t;
 using primesieve::pod_vector;
@@ -62,6 +63,23 @@ int main()
     vect.resize(size);
     int sum = std::accumulate(&vect[0], &vect[0] + size, 0);
     std::cout << "Vect sum after resize: " << sum;
+    check(sum == 123 * size);
+  }
+
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(10000, 20000);
+
+    int size = dist(gen);
+    pod_vector<int> vect(size);
+    std::fill_n(&vect[0], size, 123);
+
+    pod_vector<int> vect2 = std::move(vect);
+    std::cout << "Vect1 empty after std::move: " << vect.empty();
+    check(vect.empty() == true);
+    int sum = std::accumulate(vect2.begin(), vect2.end(), 0);
+    std::cout << "Vect2 sum after std::move: " << sum;
     check(sum == 123 * size);
   }
 
