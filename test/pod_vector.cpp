@@ -78,6 +78,8 @@ int main()
     // but it does initialize classes and structs with constructors.
     struct pod_t
     {
+      pod_t() = default;
+      pod_t(int i, int j) : a(i), b(j) { }
       int a = 100;
       int b = 200;
     };
@@ -91,6 +93,12 @@ int main()
       std::cout << "vect[i].b = " << vect[i].b;
       check(vect[i].b == 200);
     }
+
+    vect.emplace_back(7, 8);
+    std::cout << "vect.emplace_back(7, 8) = " << vect.back().a;
+    check(vect.back().a == 7);
+    std::cout << "vect.emplace_back(7, 8) = " << vect.back().b;
+    check(vect.back().b == 8);
   }
 
   {
