@@ -158,7 +158,7 @@ void Erat::initAlgorithms(uint64_t maxSieveSize,
     sieveSize = ceilDiv(sieveSize, sizeof(uint64_t)) * sizeof(uint64_t);
   }
 
-  assert(sieveSize_ % sizeof(uint64_t) == 0);
+  assert(sieveSize % sizeof(uint64_t) == 0);
   sieve_.resize(sieveSize);
 
   if (sqrtStop > maxPreSieve_)
