@@ -35,6 +35,7 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <utility>
@@ -220,7 +221,10 @@ private:
       // is not divisible by 2, 3 and 5. The 8 bits of each byte
       // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
       if (i == 3)
+      {
         sieve_[i].resize(max_x_size_);
+        std::fill(sieve_[i].begin(), sieve_[i].end(), sieve_t{0, ~0ull});
+      }
       else
       {
         // Initalize phi(x, i) with phi(x, i - 1)
@@ -265,10 +269,9 @@ private:
   #pragma pack(push, 1)
   struct sieve_t
   {
-    uint32_t count = 0;
-    uint64_t bits = ~0ull;
+    uint32_t count;
+    uint64_t bits;
   };
-
   #pragma pack(pop)
 
   /// sieve[a] contains only numbers that are not divisible
