@@ -52,6 +52,24 @@ int main()
   {
     std::random_device rd;
     std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> dist(100, 200);
+
+    std::size_t n = dist(gen);
+    pod_vector<size_t> vect;
+
+    for (size_t i = 0; i <= n; i++)
+      vect.push_back(i);
+
+    for (size_t i = 0; i <= n; i++)
+    {
+      std::cout << "vect.push_back(" << i << ") = " << i;
+      check(vect[i] == i);
+    }
+  }
+
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(10000, 20000);
 
     std::size_t n = dist(gen);
