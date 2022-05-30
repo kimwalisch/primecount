@@ -52,6 +52,23 @@ int main()
   {
     std::random_device rd;
     std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> dist(10000, 20000);
+
+    std::size_t n = dist(gen);
+    pod_vector<int> vect;
+    vect.reserve(n);
+
+    std::cout << "Vect size after reserve: " << vect.size();
+    check(vect.size() == 0);
+    std::cout << "Vect empty after reserve: " << vect.empty();
+    check(vect.empty() == true);
+    std::cout << "Vect capacity after reserve: " << vect.capacity();
+    check(vect.capacity() == n);
+  }
+
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(10000, 20000);
 
     int size = dist(gen);
