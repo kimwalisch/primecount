@@ -44,7 +44,7 @@ int64_t S2(int64_t x,
   int64_t limit = x / y;
   int64_t s2 = 0;
   int64_t b = 1;
-  pod_vector<char> sieve(limit);
+  pod_vector<bool> sieve(limit);
   std::fill(sieve.begin(), sieve.end(), 1);
 
   // phi(y, b) nodes with b <= c do not contribute to S2, so

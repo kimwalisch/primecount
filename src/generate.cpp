@@ -25,7 +25,7 @@ pod_vector<int32_t> generate_pi(int64_t max)
 {
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
-  pod_vector<char> sieve(size);
+  pod_vector<bool> sieve(size);
   std::fill(sieve.begin(), sieve.end(), 1);
 
   for (int64_t i = 2; i <= sqrt; i++)
