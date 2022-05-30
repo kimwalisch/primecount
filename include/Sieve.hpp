@@ -81,8 +81,8 @@ private:
 
   struct Wheel
   {
-    uint32_t multiple = 0;
-    uint32_t index = 0;
+    uint32_t multiple;
+    uint32_t index;
 
     Wheel() = default;
     Wheel(uint32_t m, uint32_t i)
