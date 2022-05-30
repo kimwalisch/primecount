@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
+#include <utility>
 
 namespace primecount {
 
@@ -25,7 +26,7 @@ namespace primecount {
 /// resize() method does not default initialize memory for built-in
 /// integer types. It does however default initialize classes and
 /// struct types if they have a constructor. It also prevents
-/// bounds checks which is important for primesieve's performance, e.g.
+/// bounds checks which is important for primecount's performance, e.g.
 /// the Fedora Linux distribution compiles with -D_GLIBCXX_ASSERTIONS
 /// which enables std::vector bounds checks.
 ///
@@ -184,18 +185,12 @@ public:
     *end_++ = value;
   }
 
-  ALWAYS_INLINE void emplace_back(const T& value)
+  template <class... Args>
+  ALWAYS_INLINE void emplace_back(Args&&... args)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = value;
-  }
-
-  ALWAYS_INLINE void emplace_back(T&& value)
-  {
-    if_unlikely(end_ >= capacity_)
-      reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = value;
+    *end_++ = T(std::forward<Args>(args)...);
   }
 
   void reserve(std::size_t n)

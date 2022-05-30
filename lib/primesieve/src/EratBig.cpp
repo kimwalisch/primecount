@@ -34,7 +34,6 @@
 #include <cassert>
 #include <algorithm>
 #include <array>
-#include <vector>
 
 namespace {
 
@@ -167,6 +166,8 @@ void EratBig::storeSievingPrime(uint64_t prime,
   {
     std::size_t size = buckets_.size();
     buckets_.resize(maxSize);
+    std::fill(buckets_.begin(), buckets_.end(), nullptr);
+
     for (std::size_t i = size; i < buckets_.size(); i++)
       memoryPool_->addBucket(buckets_[i]);
   }

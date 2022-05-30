@@ -236,7 +236,8 @@ void PreSieve::initBuffers()
 
     uint64_t start = product;
     uint64_t stop = start + product;
-    buffers_[i].resize(product / 30, 0xff);
+    buffers_[i].resize(product / 30);
+    std::fill(buffers_[i].begin(), buffers_[i].end(), 0xff);
     uint64_t maxPrime = bufferPrimes[i].back();
     assert(maxPrime == *std::max_element(bufferPrimes[i].begin(), bufferPrimes[i].end()));
     assert(start >= maxPrime * maxPrime);

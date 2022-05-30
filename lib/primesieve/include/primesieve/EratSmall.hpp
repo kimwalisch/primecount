@@ -12,10 +12,10 @@
 
 #include "Bucket.hpp"
 #include "macros.hpp"
+#include "pod_vector.hpp"
 #include "Wheel.hpp"
 
 #include <stdint.h>
-#include <vector>
 
 namespace primesieve {
 
@@ -32,7 +32,7 @@ public:
 private:
   uint64_t maxPrime_ = 0;
   uint64_t l1CacheSize_ = 0;
-  std::vector<SievingPrime> primes_;
+  pod_vector<SievingPrime> primes_;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
   NOINLINE void crossOff(uint8_t*, uint8_t*);
 };

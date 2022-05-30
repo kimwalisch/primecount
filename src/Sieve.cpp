@@ -298,7 +298,7 @@ void Sieve::add(uint64_t prime)
   // calculate wheel index of multiple
   uint32_t index = wheel_init[quotient % 30].index;
   index += wheel_offsets[prime % 30];
-  wheel_.emplace_back(Wheel{multiple32, index});
+  wheel_.emplace_back(multiple32, index);
 }
 
 /// Remove the i-th prime and the multiples of the i-th prime

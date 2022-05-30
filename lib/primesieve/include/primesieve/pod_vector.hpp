@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
+#include <utility>
 
 namespace primesieve {
 
@@ -184,18 +185,12 @@ public:
     *end_++ = value;
   }
 
-  ALWAYS_INLINE void emplace_back(const T& value)
+  template <class... Args>
+  ALWAYS_INLINE void emplace_back(Args&&... args)
   {
     if_unlikely(end_ >= capacity_)
       reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = value;
-  }
-
-  ALWAYS_INLINE void emplace_back(T&& value)
-  {
-    if_unlikely(end_ >= capacity_)
-      reserve((std::size_t)((size() + 1) * 1.5));
-    *end_++ = value;
+    *end_++ = T(std::forward<Args>(args)...);
   }
 
   void reserve(std::size_t n)

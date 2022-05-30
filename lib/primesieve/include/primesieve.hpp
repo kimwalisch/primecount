@@ -22,7 +22,6 @@
 #include <primesieve/StorePrimes.hpp>
 
 #include <stdint.h>
-#include <vector>
 #include <string>
 
 /// Contains primesieve's C++ functions and classes.
