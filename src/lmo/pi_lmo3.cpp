@@ -24,11 +24,9 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <vector>
 
 using std::min;
 using std::max;
-using std::vector;
 using namespace primecount;
 
 namespace {
@@ -49,9 +47,11 @@ int64_t S2(int64_t x,
   int64_t segment_size = isqrt(limit);
   int64_t s2 = 0;
 
-  vector<char> sieve(segment_size);
-  vector<int64_t> next(primes.begin(), primes.end());
-  vector<int64_t> phi(primes.size(), 0);
+  pod_vector<bool> sieve(segment_size);
+  pod_vector<int64_t> next(primes.size());
+  pod_vector<int64_t> phi(primes.size());
+  std::copy(primes.begin(), primes.end(), next.begin());
+  std::fill(phi.begin(), phi.end(), 0);
 
   // segmented sieve of Eratosthenes
   for (int64_t low = 1; low < limit; low += segment_size)

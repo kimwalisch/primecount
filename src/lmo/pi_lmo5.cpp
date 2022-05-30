@@ -34,9 +34,7 @@
 #include <S.hpp>
 
 #include <stdint.h>
-#include <vector>
 
-using std::vector;
 using namespace primecount;
 
 namespace {
@@ -63,7 +61,8 @@ int64_t S2(int64_t x,
 
   Sieve sieve(low, segment_size, primes.size());
   auto pi = generate_pi(y);
-  vector<int64_t> phi(primes.size(), 0);
+  pod_vector<int64_t> phi(primes.size());
+  std::fill(phi.begin(), phi.end(), 0);
 
   int64_t s2 = 0;
   int64_t pi_sqrty = pi[isqrt(y)];

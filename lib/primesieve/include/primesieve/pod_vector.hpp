@@ -242,6 +242,9 @@ public:
     }
     else
     {
+      // This default initializes memory of classes and
+      // structs with constructors. But it does not default
+      // initialize memory for POD types like int, long.
       T* new_array = new T[n];
 
       if (array_)
