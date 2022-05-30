@@ -1,5 +1,5 @@
 ///
-/// @file  pod_vector
+/// @file  pod_vector.hpp
 ///
 /// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
