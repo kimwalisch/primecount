@@ -70,6 +70,32 @@ int main()
   {
     std::random_device rd;
     std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> dist(100, 200);
+
+    std::size_t size = dist(gen);
+
+    // pod_vector does not default initialize POD types
+    // but it does initialize classes and structs with constructors.
+    struct pod_t
+    {
+      int a = 100;
+      int b = 200;
+    };
+
+    pod_vector<pod_t> vect(size);
+
+    for (size_t i = 0; i < size; i++)
+    {
+      std::cout << "vect[i].a = " << vect[i].a;
+      check(vect[i].a == 100);
+      std::cout << "vect[i].b = " << vect[i].b;
+      check(vect[i].b == 200);
+    }
+  }
+
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(10000, 20000);
 
     std::size_t n = dist(gen);
