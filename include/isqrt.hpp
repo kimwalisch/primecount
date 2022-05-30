@@ -11,6 +11,8 @@
 #ifndef ISQRT_HPP
 #define ISQRT_HPP
 
+#include <macros.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -86,7 +88,7 @@ constexpr T ct_sqrt(T x)
 #endif
 
 template <typename T>
-inline T isqrt(T x)
+ALWAYS_INLINE T isqrt(T x)
 {
   T s = (T) std::sqrt((double) x);
 
