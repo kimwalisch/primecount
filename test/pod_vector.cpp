@@ -81,6 +81,14 @@ int main()
     int sum = std::accumulate(&vect[0], &vect[0] + vect.size(), 0);
     std::cout << "Vect sum after resize: " << sum;
     check(sum == 123 * size);
+    std::cout << "Vect.end(): " << vect.end();
+    check(vect.end() == vect.begin() + vect.size());
+
+    // Test reallocation (old content must be copied into new vector)
+    vect.resize(vect.size() * 2);
+    sum = std::accumulate(&vect[0], &vect[0] + size, 0);
+    std::cout << "Vect sum after reallocation: " << sum;
+    check(sum == 123 * size);
   }
 
   {
