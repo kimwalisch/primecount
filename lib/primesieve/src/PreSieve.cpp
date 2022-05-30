@@ -249,18 +249,17 @@ void PreSieve::initBuffers()
     for (uint64_t prime : bufferPrimes[i])
       eratSmall.addSievingPrime(prime, start);
 
-    eratSmall.crossOff(buffers_[i].data(), buffers_[i].size());
+    eratSmall.crossOff(buffers_[i]);
   }
 }
 
-void PreSieve::preSieve(uint8_t* sieve,
-                        uint64_t sieveSize,
+void PreSieve::preSieve(pod_vector<uint8_t>& sieve,
                         uint64_t segmentLow) const
 {
   if (buffers_[0].empty())
-    preSieveSmall(sieve, sieveSize, segmentLow);
+    preSieveSmall(sieve, segmentLow);
   else
-    preSieveLarge(sieve, sieveSize, segmentLow);
+    preSieveLarge(sieve, segmentLow);
 
   // Pre-sieving removes the primes < 100. We
   // have to undo that work and reset these bits
@@ -284,8 +283,7 @@ void PreSieve::preSieve(uint8_t* sieve,
 }
 
 /// Pre-sieve with the primes <= 13
-void PreSieve::preSieveSmall(uint8_t* sieve,
-                             uint64_t sieveSize,
+void PreSieve::preSieveSmall(pod_vector<uint8_t>& sieve,
                              uint64_t segmentLow)
 {
   uint64_t size = buffer_7_11_13.size();
@@ -294,26 +292,25 @@ void PreSieve::preSieveSmall(uint8_t* sieve,
   uint64_t sizeLeft = size - i;
   auto buffer = buffer_7_11_13.data();
 
-  if (sieveSize <= sizeLeft)
-    copy_n(&buffer[i], sieveSize, sieve);
+  if (sieve.size() <= sizeLeft)
+    copy_n(&buffer[i], sieve.size(), sieve.begin());
   else
   {
     // Copy the last remaining bytes of buffer
     // to the beginning of the sieve array
-    copy_n(&buffer[i], sizeLeft, sieve);
+    copy_n(&buffer[i], sizeLeft, sieve.begin());
 
     // Restart copying at the beginning of buffer
-    for (i = sizeLeft; i + size < sieveSize; i += size)
+    for (i = sizeLeft; i + size < sieve.size(); i += size)
       copy_n(buffer, size, &sieve[i]);
 
     // Copy the last remaining bytes
-    copy_n(buffer, sieveSize - i, &sieve[i]);
+    copy_n(buffer, sieve.size() - i, &sieve[i]);
   }
 }
 
 /// Pre-sieve with the primes < 100
-void PreSieve::preSieveLarge(uint8_t* sieve,
-                             uint64_t sieveSize,
+void PreSieve::preSieveLarge(pod_vector<uint8_t>& sieve,
                              uint64_t segmentLow) const
 {
   uint64_t offset = 0;
@@ -322,8 +319,8 @@ void PreSieve::preSieveLarge(uint8_t* sieve,
   for (size_t i = 0; i < buffers_.size(); i++)
     pos[i] = (segmentLow % (buffers_[i].size() * 30)) / 30;
 
-  while (offset < sieveSize) {
-    uint64_t bytesToCopy = sieveSize - offset;
+  while (offset < sieve.size()) {
+    uint64_t bytesToCopy = sieve.size() - offset;
 
     for (size_t i = 0; i < buffers_.size(); i++) {
       uint64_t left = buffers_[i].size() - pos[i];

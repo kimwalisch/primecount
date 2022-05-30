@@ -29,7 +29,7 @@ class EratBig : public Wheel210_t
 {
 public:
   void init(uint64_t, uint64_t, uint64_t, MemoryPool&);
-  NOINLINE void crossOff(uint8_t*);
+  NOINLINE void crossOff(pod_vector<uint8_t>& sieve);
   bool hasSievingPrimes() const { return !buckets_.empty(); }
 private:
   uint64_t maxPrime_ = 0;
@@ -38,7 +38,7 @@ private:
   MemoryPool* memoryPool_ = nullptr;
   pod_vector<SievingPrime*> buckets_;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
-  NOINLINE void crossOff(uint8_t*, Bucket*);
+  NOINLINE void crossOff(uint8_t* sieve, Bucket*);
 };
 
 } // namespace

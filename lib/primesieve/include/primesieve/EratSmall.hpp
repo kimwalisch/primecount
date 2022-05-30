@@ -15,6 +15,7 @@
 #include "pod_vector.hpp"
 #include "Wheel.hpp"
 
+#include <cstddef>
 #include <stdint.h>
 
 namespace primesieve {
@@ -27,11 +28,11 @@ class EratSmall : public Wheel30_t
 {
 public:
   void init(uint64_t, uint64_t, uint64_t);
-  void crossOff(uint8_t*, uint64_t);
+  void crossOff(pod_vector<uint8_t>& sieve);
   bool hasSievingPrimes() const { return !primes_.empty(); }
 private:
   uint64_t maxPrime_ = 0;
-  uint64_t l1CacheSize_ = 0;
+  std::size_t l1CacheSize_ = 0;
   pod_vector<SievingPrime> primes_;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
   NOINLINE void crossOff(uint8_t*, uint8_t*);

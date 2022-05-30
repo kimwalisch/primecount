@@ -180,7 +180,7 @@ void EratBig::storeSievingPrime(uint64_t prime,
     memoryPool_->addBucket(buckets_[segment]);
 }
 
-void EratBig::crossOff(uint8_t* sieve)
+void EratBig::crossOff(pod_vector<uint8_t>& sieve)
 {
   while (true)
   {
@@ -203,7 +203,7 @@ void EratBig::crossOff(uint8_t* sieve)
     // to the current segment.
     while (bucket)
     {
-      crossOff(sieve, bucket);
+      crossOff(sieve.data(), bucket);
       Bucket* processed = bucket;
       bucket = bucket->next();
       memoryPool_->freeBucket(processed);
