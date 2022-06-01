@@ -96,13 +96,19 @@ public:
     return array_ == end_;
   }
 
-  T& operator[] (std::size_t pos) noexcept
+  T& operator[](std::size_t pos) noexcept
   {
+    // The C++ standard allows &array[size],
+    // see [sec 5.7], pointer one past the end.
+    assert(pos <= size());
     return array_[pos];
   }
 
-  T& operator[] (std::size_t pos) const noexcept
+  T& operator[](std::size_t pos) const noexcept
   {
+    // The C++ standard allows &array[size],
+    // see [sec 5.7], pointer one past the end.
+    assert(pos <= size());
     return array_[pos];
   }
 
