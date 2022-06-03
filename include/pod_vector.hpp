@@ -98,17 +98,13 @@ public:
 
   T& operator[](std::size_t pos) noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 
   T& operator[](std::size_t pos) const noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 
@@ -289,17 +285,13 @@ public:
 
   T& operator[](std::size_t pos) noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 
   const T& operator[](std::size_t pos) const noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 

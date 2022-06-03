@@ -79,7 +79,7 @@ PiTable::PiTable(uint64_t max_x, int threads) :
   uint64_t limit = max_x + 1;
   pi_.resize(ceil_div(limit, 240));
   std::size_t n = min(pi_cache_.size(), pi_.size());
-  std::copy_n(pi_cache_.begin(), n, &pi_[0]);
+  std::copy_n(&pi_cache_[0], n, &pi_[0]);
 
   uint64_t cache_limit = pi_cache_.size() * 240;
   if (limit > cache_limit)
@@ -134,7 +134,7 @@ void PiTable::init_bits(uint64_t low,
   // Zero initialize pi vector
   uint64_t i = low / 240;
   uint64_t j = ceil_div(high, 240);
-  std::fill(&pi_[i], &pi_[j], pi_t{0, 0});
+  std::fill_n(&pi_[i], j - i, pi_t{0, 0});
 
   // Iterate over primes > 5
   low = max(low, 5);
