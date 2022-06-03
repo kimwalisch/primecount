@@ -8,7 +8,7 @@
 ///        type, one array element (8 bytes) corresponds to an
 ///        interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,6 +17,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <pod_vector.hpp>
 #include <imath.hpp>
 #include <min.hpp>
 
@@ -35,7 +36,7 @@ namespace primecount {
 /// @bit_count: PrimePi(5) + count of 1-bits < current_index.
 /// @bits: 64-bit word whose 1-bits correspond to primes.
 ///
-const std::array<PiTable::pi_t, 64> PiTable::pi_cache_ =
+const pod_array<PiTable::pi_t, 64> PiTable::pi_cache_ =
 {{
   {    3, 0xF93DDBB67EEFDFFEull }, {   52, 0x9EEDA6EAF31E4FD5ull },
   {   92, 0xA559DD3BD3D30CE6ull }, {  128, 0x56A61E78BD92676Aull },
@@ -78,7 +79,7 @@ PiTable::PiTable(uint64_t max_x, int threads) :
   uint64_t limit = max_x + 1;
   pi_.resize(ceil_div(limit, 240));
   std::size_t n = min(pi_cache_.size(), pi_.size());
-  std::copy_n(pi_cache_.begin(), n, &pi_[0]);
+  std::copy_n(&pi_cache_[0], n, &pi_[0]);
 
   uint64_t cache_limit = pi_cache_.size() * 240;
   if (limit > cache_limit)
@@ -133,7 +134,7 @@ void PiTable::init_bits(uint64_t low,
   // Zero initialize pi vector
   uint64_t i = low / 240;
   uint64_t j = ceil_div(high, 240);
-  std::fill(&pi_[i], &pi_[j], pi_t{0, 0});
+  std::fill_n(&pi_[i], j - i, pi_t{0, 0});
 
   // Iterate over primes > 5
   low = max(low, 5);

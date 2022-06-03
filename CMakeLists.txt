@@ -120,7 +120,6 @@ set(LIB_SRC src/api.cpp
 # Required includes ##################################################
 
 include(GNUInstallDirs)
-include(CheckCXXSourceCompiles)
 
 # Use 32-bit integer division ########################################
 
@@ -167,30 +166,6 @@ endif()
 
 if(WITH_POPCNT)
     include("${PROJECT_SOURCE_DIR}/cmake/popcnt.cmake")
-else()
-    # On the x86/x64 CPU architectures WITH_POPCNT=OFF disables the
-    # POPCNT instruction and instead uses a portable integer popcount
-    # algorithm. This deteriorates performance by up to 50%.
-    # Disabling POPCNT on x86/x64 is necessary for old CPUs from
-    # before 2008. On other CPU architectures POPCNT is always used
-    # if it is available as this generally does not cause any issues.
-    # Hence WITH_POPCNT=OFF is ignored on non x86/x64 CPUs.
-
-    check_cxx_source_compiles("
-        int main() {
-            #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                return 0;
-            #else
-                Error: not MSVC compiler
-            #endif
-        }" MSVC_x86_or_x64)
-
-    # We only need to disable POPCNT for MSVC on x86/x64.
-    # For GCC/Clang __builtin_popcountll() will automatically
-    # be portable if we compile without the -mpopcnt flag.
-    if(MSVC_x86_or_x64)
-        set(DISABLE_POPCNT "DISABLE_POPCNT")
-    endif()
 endif()
 
 # libprimesieve ######################################################
@@ -235,7 +210,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -260,7 +235,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -297,7 +272,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
-    target_compile_definitions(primecount PRIVATE "${DISABLE_POPCNT}" "${DISABLE_INT128}" "${ENABLE_DIV32}")
+    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 

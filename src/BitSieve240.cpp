@@ -8,16 +8,16 @@
 ///        uses the uint64_t data type, one sieve array element
 ///        (8 bytes) corresponds to an interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <BitSieve240.hpp>
+#include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <array>
 
 namespace {
 
@@ -48,10 +48,10 @@ constexpr uint64_t unset_l(int n)
 namespace primecount {
 
 /// pi(x) for x < 6
-const std::array<uint64_t, 6> BitSieve240::pi_tiny_ = { 0, 0, 1, 2, 2, 3 };
+const pod_array<uint64_t, 6> BitSieve240::pi_tiny_ = { 0, 0, 1, 2, 2, 3 };
 
 /// Bitmasks needed to set a specific bit in the sieve array
-const std::array<uint64_t, 240> BitSieve240::set_bit_ =
+const pod_array<uint64_t, 240> BitSieve240::set_bit_ =
 {
   0ull, 1ull << 0, 0ull, 0ull, 0ull,
   0ull, 0ull, 1ull << 1, 0ull, 0ull,
@@ -104,7 +104,7 @@ const std::array<uint64_t, 240> BitSieve240::set_bit_ =
 };
 
 /// Bitmasks needed to unset a specific bit in the sieve array
-const std::array<uint64_t, 240> BitSieve240::unset_bit_ =
+const pod_array<uint64_t, 240> BitSieve240::unset_bit_ =
 {
   ~0ull, ~(1ull << 0), ~0ull, ~0ull, ~0ull,
   ~0ull, ~0ull, ~(1ull << 1), ~0ull, ~0ull,
@@ -157,7 +157,7 @@ const std::array<uint64_t, 240> BitSieve240::unset_bit_ =
 };
 
 /// Unset bits > stop
-const std::array<uint64_t, 240> BitSieve240::unset_larger_ =
+const pod_array<uint64_t, 240> BitSieve240::unset_larger_ =
 {
   unset_l(0), unset_l(1), unset_l(2), unset_l(3), unset_l(4),
   unset_l(5), unset_l(6), unset_l(7), unset_l(8), unset_l(9),

@@ -25,7 +25,6 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <cassert>
 #include <limits>
 #include <type_traits>
@@ -63,7 +62,6 @@ public:
   template <typename T>
   T phi(T x, uint64_t a) const
   {
-    assert(a < prime_products.size());
     auto pp = prime_products[a];
     auto remainder = (uint64_t)(x % pp);
     T xpp = x / pp;
@@ -80,8 +78,6 @@ public:
       // to an integer that is not divisible by 2, 3 and 5.
       // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-      assert(a < sieve_.size());
-      assert(remainder / 240 < sieve_[a].size());
       uint64_t count = sieve_[a][remainder / 240].count;
       uint64_t bits = sieve_[a][remainder / 240].bits;
       uint64_t bitmask = unset_larger_[remainder % 240];
@@ -112,7 +108,6 @@ public:
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
     assert(sieve_.size() - 1 == a);
-    assert(remainder / 240 < sieve_[a].size());
     uint64_t count = sieve_[a][remainder / 240].count;
     uint64_t bits = sieve_[a][remainder / 240].bits;
     uint64_t bitmask = unset_larger_[remainder % 240];
@@ -145,10 +140,10 @@ public:
   }
 
 private:
-  static const std::array<uint32_t, 8> primes;
-  static const std::array<uint32_t, 8> prime_products;
-  static const std::array<uint32_t, 8> totients;
-  static const std::array<uint8_t, 20> pi;
+  static const pod_array<uint32_t, 8> primes;
+  static const pod_array<uint32_t, 8> prime_products;
+  static const pod_array<uint32_t, 8> totients;
+  static const pod_array<uint8_t, 20> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
@@ -165,8 +160,8 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  std::array<pod_vector<sieve_t>, 8> sieve_;
-  std::array<pod_vector<uint8_t>, 4> phi_;
+  pod_array<pod_vector<sieve_t>, 8> sieve_;
+  pod_array<pod_vector<uint8_t>, 4> phi_;
 };
 
 extern const PhiTiny phiTiny;

@@ -4,7 +4,7 @@
 ///        These bits correspond to numbers that are either below
 ///        or above some threshold and hence need to be discarded.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,8 +13,8 @@
 #ifndef SIEVETABLES_HPP
 #define SIEVETABLES_HPP
 
+#include <pod_vector.hpp>
 #include <stdint.h>
-#include <array>
 
 namespace {
 
@@ -95,7 +95,7 @@ constexpr uint64_t unset_l(int n)
 #endif
 
 /// Unset bits < start
-const std::array<uint64_t, 240> unset_smaller =
+const primecount::pod_array<uint64_t, 240> unset_smaller =
 {
   unset_s(0), unset_s(1), unset_s(2), unset_s(3), unset_s(4),
   unset_s(5), unset_s(6), unset_s(7), unset_s(8), unset_s(9),
@@ -148,7 +148,7 @@ const std::array<uint64_t, 240> unset_smaller =
 };
 
 /// Unset bits > stop
-const std::array<uint64_t, 240> unset_larger =
+const primecount::pod_array<uint64_t, 240> unset_larger =
 {
   unset_l(0), unset_l(1), unset_l(2), unset_l(3), unset_l(4),
   unset_l(5), unset_l(6), unset_l(7), unset_l(8), unset_l(9),

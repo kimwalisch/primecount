@@ -16,26 +16,26 @@
 ///
 
 #include <PhiTiny.hpp>
+#include <pod_vector.hpp>
 #include <popcnt.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <array>
 #include <limits>
 
 namespace primecount {
 
-const std::array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
+const pod_array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
-const std::array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
+const pod_array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const std::array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
+const pod_array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes <= next_prime(primes.back())
-const std::array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
+const pod_array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
 
 // Singleton
 const PhiTiny phiTiny;
@@ -50,7 +50,11 @@ PhiTiny::PhiTiny()
   static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
   static_assert(totients.size() == primes.size(), "Invalid totients size!");
 
-  for (uint64_t a = 0; a < sieve_.size(); a++)
+  // a = 0
+  phi_[0].resize(1);
+  phi_[0][0] = 0;
+
+  for (uint64_t a = 1; a < sieve_.size(); a++)
   {
     // For prime[a] <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.

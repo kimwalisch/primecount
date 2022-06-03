@@ -98,17 +98,13 @@ public:
 
   T& operator[](std::size_t pos) noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 
   T& operator[](std::size_t pos) const noexcept
   {
-    // The C++ standard allows &array[size],
-    // see [sec 5.7], pointer one past the end.
-    assert(pos <= size());
+    assert(pos < size());
     return array_[pos];
   }
 
@@ -117,7 +113,7 @@ public:
     return array_;
   }
 
-  T* data() const noexcept
+  const T* data() const noexcept
   {
     return array_;
   }
@@ -139,7 +135,7 @@ public:
     return array_;
   }
 
-  T* begin() const noexcept
+  const T* begin() const noexcept
   {
     return array_;
   }
@@ -149,30 +145,32 @@ public:
     return end_;
   }
 
-  T* end() const noexcept
+  const T* end() const noexcept
   {
     return end_;
   }
 
   T& front() noexcept
   {
+    assert(!empty());
     return *array_;
   }
 
-  T& front() const noexcept
+  const T& front() const noexcept
   {
+    assert(!empty());
     return *array_;
   }
 
   T& back() noexcept
   {
-    assert(end_ != nullptr);
+    assert(!empty());
     return *(end_ - 1);
   }
 
-  T& back() const noexcept
+  const T& back() const noexcept
   {
-    assert(end_ != nullptr);
+    assert(!empty());
     return *(end_ - 1);
   }
 
@@ -277,6 +275,78 @@ private:
     // the amount of memory we need upfront.
     std::size_t new_capacity = (std::size_t)(capacity() * 1.5);
     return std::max(size, new_capacity);
+  }
+};
+
+template <typename T, std::size_t N>
+class pod_array
+{
+public:
+  using value_type = T;
+  T array_[N];
+
+  T& operator[](std::size_t pos) noexcept
+  {
+    assert(pos < size());
+    return array_[pos];
+  }
+
+  const T& operator[](std::size_t pos) const noexcept
+  {
+    assert(pos < size());
+    return array_[pos];
+  }
+
+  void fill(const T& value)
+  {
+    std::fill_n(begin(), size(), value);
+  }
+
+  T* data() noexcept
+  {
+    return array_;
+  }
+
+  const T* data() const noexcept
+  {
+    return array_;
+  }
+
+  T* begin() noexcept
+  {
+    return array_;
+  }
+
+  const T* begin() const noexcept
+  {
+    return array_;
+  }
+
+  T* end() noexcept
+  {
+    return array_ + N;
+  }
+
+  const T* end() const noexcept
+  {
+    return array_ + N;
+  }
+
+  T& back() noexcept
+  {
+    assert(N > 0);
+    return array_[N - 1];
+  }
+
+  const T& back() const noexcept
+  {
+    assert(N > 0);
+    return array_[N - 1];
+  }
+
+  constexpr std::size_t size() const noexcept
+  {
+    return N;
   }
 };
 

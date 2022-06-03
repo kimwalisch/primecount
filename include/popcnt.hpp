@@ -3,7 +3,7 @@
 /// @brief Functions to count the number of 1 bits inside
 ///        an array or a 64-bit word.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,7 +49,6 @@ inline uint64_t popcnt64(uint64_t x)
 } // namespace
 
 #elif defined(_MSC_VER) && \
-      !defined(DISABLE_POPCNT) && \
       defined(_M_X64) && \
       HAS_INCLUDE(<intrin.h>)
 
@@ -65,7 +64,6 @@ inline uint64_t popcnt64(uint64_t x)
 } // namespace
 
 #elif defined(_MSC_VER) && \
-      !defined(DISABLE_POPCNT) && \
       defined(_M_IX86) && \
       HAS_INCLUDE(<intrin.h>)
 
@@ -97,31 +95,6 @@ namespace {
 inline uint64_t popcnt64(uint64_t x)
 {
   return std::popcount(x);
-}
-
-} // namespace
-
-#elif defined(DISABLE_POPCNT)
-
-namespace {
-
-/// This uses fewer arithmetic operations than any other known
-/// implementation on machines with fast multiplication.
-/// It uses 12 arithmetic operations, one of which is a multiply.
-/// https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
-///
-inline uint64_t popcnt64(uint64_t x)
-{
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
-
-  x -= (x >> 1) & m1;
-  x = (x & m2) + ((x >> 2) & m2);
-  x = (x + (x >> 4)) & m4;
-
-  return (x * h01) >> 56;
 }
 
 } // namespace

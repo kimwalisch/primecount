@@ -19,14 +19,13 @@
 #include <primesieve/pmath.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <algorithm>
 #include <cassert>
 
 namespace {
 
 /// unset bits < start
-const std::array<uint8_t, 37> unsetSmaller =
+const primesieve::pod_array<uint8_t, 37> unsetSmaller =
 {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xfe, 0xfe, 0xfe, 0xfe, 0xfc, 0xfc, 0xf8, 0xf8,
@@ -36,7 +35,7 @@ const std::array<uint8_t, 37> unsetSmaller =
 };
 
 /// unset bits > stop
-const std::array<uint8_t, 37> unsetLarger =
+const primesieve::pod_array<uint8_t, 37> unsetLarger =
 {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
   0x01, 0x01, 0x01, 0x03, 0x03, 0x07, 0x07, 0x07,
@@ -209,9 +208,13 @@ void Erat::sieveLastSegment()
 
   // unset bits > stop
   sieve_.back() &= unsetLarger[rem];
+
   // unset bytes > stop
-  for (auto i = sieve_.size(); i % sizeof(uint64_t); i++)
-    sieve_[i] = 0;
+  auto* sieve = sieve_.data();
+  auto i = sieve_.size();
+  assert(sieve_.capacity() % sizeof(uint64_t) == 0);
+  for (; i % sizeof(uint64_t); i++)
+    sieve[i] = 0;
 
   segmentLow_ = stop_;
 }

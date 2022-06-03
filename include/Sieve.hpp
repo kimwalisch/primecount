@@ -38,9 +38,7 @@
 #define SIEVE_HPP
 
 #include <pod_vector.hpp>
-
 #include <stdint.h>
-#include <cassert>
 
 namespace primecount {
 
@@ -62,7 +60,6 @@ public:
   template <typename T>
   void pre_sieve(const pod_vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
-    assert(c < primes.size());
     reset_sieve(low, high);
 
     for (uint64_t i = 4; i <= c; i++)

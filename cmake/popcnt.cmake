@@ -49,45 +49,6 @@ if(NOT CMAKE_CROSSCOMPILING)
                 set(POPCNT_FLAG "")
             endif()
         endif()
-    # MSVC compiler & x86 CPU
-    else()
-        set(CMAKE_REQUIRED_DEFINITIONS "-DDISABLE_POPCNT")
-        check_cxx_source_runs("
-            #include <popcnt.hpp>
-            #include <stdint.h>
-            #include <iostream>
-            int main(int, char** argv) {
-                #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                    uintptr_t n = (uintptr_t) argv;
-                    std::cout << popcnt64((uint64_t) n);
-                    return 0;
-                #else
-                    Error: not MSVC compiler
-                #endif
-            }" MSVC_without_popcnt)
-
-        if(MSVC_without_popcnt)
-            set(CMAKE_REQUIRED_DEFINITIONS "")
-            set(CMAKE_REQUIRED_QUIET FALSE)
-
-            check_cxx_source_runs("
-                #include <popcnt.hpp>
-                #include <stdint.h>
-                #include <iostream>
-                int main(int, char** argv) {
-                    #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-                        uintptr_t n = (uintptr_t) argv;
-                        std::cout << popcnt64((uint64_t) n);
-                        return 0;
-                    #else
-                        Error: not MSVC compiler
-                    #endif
-                }" cpu_supports_popcnt)
-
-            if(NOT cpu_supports_popcnt)
-                set(DISABLE_POPCNT "DISABLE_POPCNT")
-            endif()
-        endif()
     endif()
 endif()
 

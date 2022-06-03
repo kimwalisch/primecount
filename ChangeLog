@@ -1,4 +1,4 @@
-Changes in primecount-7.4, 2022-05-29
+Changes in primecount-7.4, 2022-06-03
 
 * CMakeLists.txt: primecount now requires primesieve-8.0 or later.
 * CMakeLists.txt: Simplify, split up into multiple *.cmake files.
@@ -7,7 +7,6 @@ Changes in primecount-7.4, 2022-05-29
 * B.cpp: Faster counting of primes.
 * P2.cpp: Faster counting of primes.
 * isqrt.cpp: Improve code gen for 128-bit integers.
-* pod_vector.hpp: Avoid bounds checks.
 * Update to latest libprimesieve-8.0 with AVX512 support.
 
 Changes in primecount-7.3, 2022-04-28
