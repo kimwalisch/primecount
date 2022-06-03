@@ -50,7 +50,11 @@ PhiTiny::PhiTiny()
   static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
   static_assert(totients.size() == primes.size(), "Invalid totients size!");
 
-  for (uint64_t a = 0; a < sieve_.size(); a++)
+  // a = 0
+  phi_[0].resize(1);
+  phi_[0][0] = 0;
+
+  for (uint64_t a = 1; a < sieve_.size(); a++)
   {
     // For prime[a] <= 5 our phi(x % pp, a) lookup table
     // is a simple two dimensional array.
