@@ -39,15 +39,16 @@
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
+#include <pod_vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <array>
 #include <cassert>
 
 using std::fill_n;
 using std::sqrt;
+using primecount::pod_array;
 
 namespace {
 
@@ -60,7 +61,7 @@ struct WheelInit
 /// Categorize sieving primes according to their modulo 30
 /// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
 ///
-const std::array<uint8_t, 30> wheel_offsets =
+const pod_array<uint8_t, 30> wheel_offsets =
 {
   0, 8 * 0, 0, 0, 0, 0,
   0, 8 * 1, 0, 0, 0, 8 * 2,
@@ -72,7 +73,7 @@ const std::array<uint8_t, 30> wheel_offsets =
 /// Used to calculate the first multiple > start of a
 /// sieving prime that is coprime to 2, 3, 5.
 ///
-const std::array<WheelInit, 30> wheel_init
+const pod_array<WheelInit, 30> wheel_init
 {{
   {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
   {2,  1}, {1,  1}, {0,  1}, {3,  2}, {2,  2},

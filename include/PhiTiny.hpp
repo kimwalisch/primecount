@@ -25,7 +25,6 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
-#include <array>
 #include <cassert>
 #include <limits>
 #include <type_traits>
@@ -145,10 +144,10 @@ public:
   }
 
 private:
-  static const std::array<uint32_t, 8> primes;
-  static const std::array<uint32_t, 8> prime_products;
-  static const std::array<uint32_t, 8> totients;
-  static const std::array<uint8_t, 20> pi;
+  static const pod_array<uint32_t, 8> primes;
+  static const pod_array<uint32_t, 8> prime_products;
+  static const pod_array<uint32_t, 8> totients;
+  static const pod_array<uint8_t, 20> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
@@ -165,8 +164,8 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  std::array<pod_vector<sieve_t>, 8> sieve_;
-  std::array<pod_vector<uint8_t>, 4> phi_;
+  pod_array<pod_vector<sieve_t>, 8> sieve_;
+  pod_array<pod_vector<uint8_t>, 4> phi_;
 };
 
 extern const PhiTiny phiTiny;

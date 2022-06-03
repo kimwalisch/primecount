@@ -12,11 +12,11 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <PiTable.hpp>
+#include <pod_vector.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
 #include <string>
-#include <array>
 
 using namespace primecount;
 
@@ -26,7 +26,7 @@ namespace {
 constexpr int64_t max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
-const std::array<int16_t, 170> primes =
+const pod_array<int16_t, 170> primes =
 {
     0,   2,   3,   5,   7,  11,  13,  17,  19,  23, 
    29,  31,  37,  41,  43,  47,  53,  59,  61,  67, 
