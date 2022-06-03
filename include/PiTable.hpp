@@ -59,8 +59,6 @@ public:
   /// Get number of primes <= x
   static int64_t pi_cache(uint64_t x)
   {
-    assert(x < pi_cache_.size() * 240);
-
     if_unlikely(x < pi_tiny_.size())
       return pi_tiny_[x];
 
