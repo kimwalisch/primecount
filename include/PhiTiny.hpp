@@ -62,7 +62,6 @@ public:
   template <typename T>
   T phi(T x, uint64_t a) const
   {
-    assert(a < prime_products.size());
     auto pp = prime_products[a];
     auto remainder = (uint64_t)(x % pp);
     T xpp = x / pp;
@@ -79,8 +78,6 @@ public:
       // to an integer that is not divisible by 2, 3 and 5.
       // Hence the 8 bits of each byte correspond to the offsets
       // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-      assert(a < sieve_.size());
-      assert(remainder / 240 < sieve_[a].size());
       uint64_t count = sieve_[a][remainder / 240].count;
       uint64_t bits = sieve_[a][remainder / 240].bits;
       uint64_t bitmask = unset_larger_[remainder % 240];
@@ -111,7 +108,6 @@ public:
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
     assert(sieve_.size() - 1 == a);
-    assert(remainder / 240 < sieve_[a].size());
     uint64_t count = sieve_[a][remainder / 240].count;
     uint64_t bits = sieve_[a][remainder / 240].bits;
     uint64_t bitmask = unset_larger_[remainder % 240];

@@ -186,9 +186,6 @@ private:
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
-    assert(a < sieve_.size());
-    assert(x / 240 < sieve_[a].size());
-
     uint64_t count = sieve_[a][x / 240].count;
     uint64_t bits = sieve_[a][x / 240].bits;
     uint64_t bitmask = unset_larger_[x % 240];
