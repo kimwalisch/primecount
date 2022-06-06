@@ -291,10 +291,10 @@ your Linux distribution, then it is possible that the ```POPCNT``` instruction h
 disabled in order to ensure that primecount works on very old CPUs. Unfortunately this
 decreases performance by about 30%. On the other hand, if you compile primecount from
 source the ```POPCNT``` instruction will be enabled by default. The fastest primecount
-binary can be built using the Clang compiler and the ```-march=native``` option.
+binary can be built using the ```-march=native``` option.
 
 ```bash
-CXX=clang++ CXXFLAGS="-march=native" cmake .
+CXXFLAGS="-march=native" cmake .
 make -j
 ```
 
