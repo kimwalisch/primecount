@@ -29,13 +29,13 @@ class EratMedium : public Wheel30_t
 {
 public:
   void init(uint64_t, uint64_t, MemoryPool&);
-  bool hasSievingPrimes() const { return hasSievingPrimes_; }
+  bool hasSievingPrimes() const { return !buckets_.empty(); }
   NOINLINE void crossOff(pod_vector<uint8_t>& sieve);
 private:
-  bool hasSievingPrimes_ = false;
   uint64_t maxPrime_ = 0;
   MemoryPool* memoryPool_ = nullptr;
-  pod_array<SievingPrime*, 64> buckets_;
+  pod_vector<SievingPrime*> buckets_;
+  pod_vector<SievingPrime*> currentBuckets_;
   void storeSievingPrime(uint64_t, uint64_t, uint64_t);
   NOINLINE void crossOff_7(uint8_t*, uint8_t*, Bucket*);
   NOINLINE void crossOff_11(uint8_t*, uint8_t*, Bucket*);
