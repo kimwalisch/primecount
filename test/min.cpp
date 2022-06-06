@@ -2,17 +2,17 @@
 /// @file   min.cpp
 /// @brief  Test min() and max() functions.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>

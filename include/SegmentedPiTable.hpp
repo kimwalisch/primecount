@@ -28,13 +28,12 @@
 #define SEGMENTEDPITABLE_HPP
 
 #include <BitSieve240.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
 #include <popcnt.hpp>
-#include <macros.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 
 namespace primecount {
 
@@ -72,8 +71,8 @@ public:
   /// Get number of primes <= x
   ALWAYS_INLINE int64_t operator[](uint64_t x) const
   {
-    assert(x >= low_);
-    assert(x < high_);
+    ASSERT(x >= low_);
+    ASSERT(x < high_);
 
     if_unlikely(x < pi_tiny_.size())
       return pi_tiny_[x];

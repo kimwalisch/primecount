@@ -29,6 +29,7 @@
 #include <BitSieve240.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
@@ -37,7 +38,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 #include <utility>
 #include <vector>
 
@@ -92,7 +92,7 @@ public:
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array element.
-    assert(max_x_size_ > 0);
+    ASSERT(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
     sieve_.resize(max_a_ + 1);
@@ -128,7 +128,7 @@ public:
     else
     {
       c = c_cached;
-      assert(c_cached <= a);
+      ASSERT(c_cached <= a);
       sum = phi_cache(x, c) * SIGN;
     }
 

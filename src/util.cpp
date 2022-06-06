@@ -3,7 +3,7 @@
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,10 +14,10 @@
 #include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <to_string.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <limits>
@@ -168,7 +168,7 @@ double get_time()
   auto now = std::chrono::steady_clock::now();
   auto time = now.time_since_epoch();
   auto micro = std::chrono::duration_cast<std::chrono::microseconds>(time);
-  assert(micro.count() < (1ll << 52));
+  ASSERT(micro.count() < (1ll << 52));
   return (double) micro.count() / 1e6;
 }
 

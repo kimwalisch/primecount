@@ -28,7 +28,6 @@
 
 #include <macros.hpp>
 
-#include <cassert>
 #include <limits>
 #include <stdint.h>
 #include <type_traits>
@@ -162,7 +161,7 @@ fast_div64(X x, Y y)
   // primecount does not need signed division so 
   // we use the unsigned division instruction further
   // down as DIV is usually faster than IDIV.
-  assert(x >= 0 && y > 0);
+  ASSERT(x >= 0 && y > 0);
 
   uint64_t x0 = (uint64_t) x;
   uint64_t x1 = ((uint64_t*) &x)[1];

@@ -21,11 +21,11 @@
 #include <BitSieve240.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <limits>
 #include <type_traits>
 
@@ -50,7 +50,7 @@ public:
       return phi((UT) x, a);
     else
     {
-      assert(a == 8);
+      ASSERT(a == 8);
       // This code path will be executed most of the time.
       // In phi7(x) the variable a has been hardcoded to 7
       // which makes it run slightly faster than phi(x, a).
@@ -107,7 +107,7 @@ public:
     // to an integer that is not divisible by 2, 3 and 5.
     // Hence the 8 bits of each byte correspond to the offsets
     // [ 1, 7, 11, 13, 17, 19, 23, 29 ].
-    assert(sieve_.size() - 1 == a);
+    ASSERT(sieve_.size() - 1 == a);
     uint64_t count = sieve_[a][remainder / 240].count;
     uint64_t bits = sieve_[a][remainder / 240].bits;
     uint64_t bitmask = unset_larger_[remainder % 240];

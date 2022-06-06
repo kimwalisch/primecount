@@ -21,6 +21,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <LoadBalancerP2.hpp>
@@ -28,7 +29,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 
 using namespace primecount;
 
@@ -41,8 +41,8 @@ T P2_thread(T x,
            int64_t low,
            int64_t high)
 {
-  assert(low > 0);
-  assert(low < high);
+  ASSERT(low > 0);
+  ASSERT(low < high);
   int64_t sqrtx = isqrt(x);
   int64_t start = max(y, min(x / high, sqrtx));
   int64_t stop = min(x / low, sqrtx);

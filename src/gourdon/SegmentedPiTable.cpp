@@ -28,18 +28,18 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 
 namespace primecount {
 
 void SegmentedPiTable::init(uint64_t low, uint64_t high)
 {
-  assert(low < high);
-  assert(low % 240 == 0);
+  ASSERT(low < high);
+  ASSERT(low % 240 == 0);
   int threads = 1;
   uint64_t pi_low;
 

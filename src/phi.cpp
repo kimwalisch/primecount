@@ -27,6 +27,7 @@
 #include <generate.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
@@ -36,7 +37,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <utility>
 #include <vector>
@@ -94,7 +94,7 @@ public:
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array element.
-    assert(max_x_size_ > 0);
+    ASSERT(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
     sieve_.resize(max_a_ + 1);
@@ -130,7 +130,7 @@ public:
     else
     {
       c = c_cached;
-      assert(c_cached <= a);
+      ASSERT(c_cached <= a);
       sum = phi_cache(x, c) * SIGN;
     }
 
@@ -312,7 +312,7 @@ int64_t pix_upper(int64_t x)
   if (x <= PiTable::max_cached())
     return PiTable::pi_cache(x);
 
-  assert(x >= 10);
+  ASSERT(x >= 10);
   double pix = x / (std::log(x) - 1.1);
   return (int64_t) pix + 10;
 }

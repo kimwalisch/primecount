@@ -22,6 +22,18 @@
   #define __has_cpp_attribute(x) 0
 #endif
 
+/// Enable expensive debugging assertions.
+/// These assertions enable e.g. bounds checks for the
+/// pod_vector and pod_array types.
+///
+#if defined(ENABLE_ASSERT)
+  #undef NDEBUG
+  #include <cassert>
+  #define ASSERT(x) assert(x)
+#else
+  #define ASSERT(x) (static_cast<void>(0))
+#endif
+
 /// Unfortunately compilers cannot be trusted (especially GCC)
 /// to inline performance critical functions. We must ensure
 /// that e.g. pi[x] and segmentedPi[x] are inlined.

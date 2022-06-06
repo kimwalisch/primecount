@@ -19,6 +19,7 @@
 #include <primesieve.hpp>
 #include <pod_vector.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <min.hpp>
 
 #include <stdint.h>
@@ -91,7 +92,7 @@ void PiTable::init(uint64_t limit,
                    uint64_t cache_limit,
                    int threads)
 {
-  assert(cache_limit < limit);
+  ASSERT(cache_limit < limit);
   uint64_t dist = limit - cache_limit;
   uint64_t thread_threshold = (uint64_t) 1e7;
   threads = ideal_num_threads(threads, dist, thread_threshold);

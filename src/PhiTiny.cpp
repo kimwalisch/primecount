@@ -19,6 +19,7 @@
 #include <pod_vector.hpp>
 #include <popcnt.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -44,9 +45,9 @@ PhiTiny::PhiTiny()
 {
   // The pi[x] lookup table must contain the number
   // of primes <= next_prime(primes.back()).
-  assert(pi.back() == primes.size());
-  assert(phi_.size() - 1 == (uint64_t) pi[5]);
-  assert(sieve_.size() == primes.size());
+  ASSERT(pi.back() == primes.size());
+  ASSERT(phi_.size() - 1 == (uint64_t) pi[5]);
+  ASSERT(sieve_.size() == primes.size());
   static_assert(prime_products.size() == primes.size(), "Invalid prime_products size!");
   static_assert(totients.size() == primes.size(), "Invalid totients size!");
 
@@ -67,7 +68,7 @@ PhiTiny::PhiTiny()
       for (uint64_t x = 1; x < pp; x++)
       {
         uint64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
-        assert(phi_xa <= std::numeric_limits<uint8_t>::max());
+        ASSERT(phi_xa <= std::numeric_limits<uint8_t>::max());
         phi_[a][x] = (uint8_t) phi_xa;
       }
     }

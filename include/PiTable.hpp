@@ -23,7 +23,6 @@
 #include <pod_vector.hpp>
 
 #include <stdint.h>
-#include <cassert>
 
 namespace primecount {
 
@@ -45,7 +44,7 @@ public:
   /// Get number of primes <= x
   ALWAYS_INLINE int64_t operator[](uint64_t x) const
   {
-    assert(x <= max_x_);
+    ASSERT(x <= max_x_);
 
     if_unlikely(x < pi_tiny_.size())
       return pi_tiny_[x];

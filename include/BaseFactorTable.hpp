@@ -14,10 +14,10 @@
 #define BASEFACTORTABLE_HPP
 
 #include <imath.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <stdint.h>
 
 namespace primecount {
@@ -32,7 +32,7 @@ class BaseFactorTable
 public:
   static int64_t to_index(uint64_t number)
   {
-    assert(number > 0);
+    ASSERT(number > 0);
     uint64_t q = number / 2310;
     uint64_t r = number % 2310;
     return 480 * q + coprime_indexes_[r];

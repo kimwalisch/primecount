@@ -121,7 +121,7 @@ set(LIB_SRC src/api.cpp
 
 include(GNUInstallDirs)
 
-# Use 32-bit integer division ########################################
+# libprimecount compile definitions ##################################
 
 # Check at runtime if the dividend and divisor are < 2^32 and
 # if so use 32-bit integer division instead of 64-bit integer
@@ -129,6 +129,13 @@ include(GNUInstallDirs)
 # improves performance.
 if(WITH_DIV32)
     set(ENABLE_DIV32 "ENABLE_DIV32")
+endif()
+
+# Enable expensive debugging assertions.
+# These assertions enable e.g. bounds checks for the pod_vector
+# and pod_array types.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
 # Check if int128_t is supported #####################################
@@ -188,7 +195,6 @@ if(BUILD_LIBPRIMESIEVE)
     if(BUILD_SHARED_LIBS)
         target_compile_options(libprimesieve PRIVATE "${POPCNT_FLAG}")
     endif()
-
     if(BUILD_STATIC_LIBS)
         target_compile_options(libprimesieve-static PRIVATE "${POPCNT_FLAG}")
     endif()
@@ -210,8 +216,8 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_definitions(libprimecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
+    target_compile_definitions(libprimecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
@@ -235,8 +241,8 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
+    target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
@@ -272,7 +278,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
-    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}")
+    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 

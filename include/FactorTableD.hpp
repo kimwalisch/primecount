@@ -52,10 +52,10 @@
 #include <primesieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <pod_vector.hpp>
 
 #include <algorithm>
-#include <cassert>
 #include <limits>
 #include <stdint.h>
 
@@ -213,7 +213,7 @@ public:
       if (factor_[index] == 0)
         return 0;
     #else
-      assert(factor_[index] != 0);
+      ASSERT(factor_[index] != 0);
     #endif
 
     if (factor_[index] & 1)

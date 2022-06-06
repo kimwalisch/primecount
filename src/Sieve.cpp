@@ -44,7 +44,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cassert>
 
 using std::fill_n;
 using std::sqrt;
@@ -91,8 +90,8 @@ Sieve::Sieve(uint64_t low,
              uint64_t segment_size, 
              uint64_t wheel_size)
 {
-  assert(low % 30 == 0);
-  assert(segment_size % 240 == 0);
+  ASSERT(low % 30 == 0);
+  ASSERT(segment_size % 240 == 0);
 
   start_ = low;
   segment_size = get_segment_size(segment_size);
@@ -146,7 +145,7 @@ void Sieve::allocate_counter(uint64_t low)
   // only counts the number of unsieved elements (1 bits) in
   // an interval of size: sieve_limit^(1/4) * sqrt(240).
   // Hence the max(counter value) = 2^18.
-  assert(bytes * 8 <= std::numeric_limits<uint32_t>::max());
+  ASSERT(bytes * 8 <= std::numeric_limits<uint32_t>::max());
   uint64_t counter_size = ceil_div(sieve_.size(), bytes);
   counter_.counter.resize(counter_size);
   counter_.dist = bytes * 30;
@@ -224,7 +223,7 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
-  assert(stop >= prev_stop_);
+  ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
 
@@ -257,7 +256,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
-  assert(stop - start < segment_size());
+  ASSERT(stop - start < segment_size());
 
   uint64_t start_idx = start / 240;
   uint64_t stop_idx = stop / 240;
@@ -283,7 +282,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 ///
 void Sieve::add(uint64_t prime)
 {
-  assert(start_ % 30 == 0);
+  ASSERT(start_ % 30 == 0);
 
   // first multiple > start_
   uint64_t quotient = start_ / prime + 1;

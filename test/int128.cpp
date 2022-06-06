@@ -2,16 +2,16 @@
 /// @file   int128.cpp
 /// @brief  Test int128_t and uint128_t types.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <int128_t.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
-#include <cassert>
 #include <iostream>
 #include <limits>
 #include <type_traits>
