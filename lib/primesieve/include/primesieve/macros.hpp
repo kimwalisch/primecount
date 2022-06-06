@@ -22,6 +22,18 @@
   #define __has_cpp_attribute(x) 0
 #endif
 
+/// Enable expensive debugging assertions.
+/// These assertions enable e.g. bounds checks for the
+/// pod_vector and pod_array types.
+///
+#if defined(ENABLE_ASSERT)
+  #undef NDEBUG
+  #include <cassert>
+  #define ASSERT(x) assert(x)
+#else
+  #define ASSERT(x) (static_cast<void>(0))
+#endif
+
 #if __has_attribute(always_inline)
   #define ALWAYS_INLINE __attribute__((always_inline)) inline
 #elif defined(_MSC_VER)
