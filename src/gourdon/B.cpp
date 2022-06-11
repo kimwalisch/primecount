@@ -69,8 +69,8 @@ T B_thread(T x,
   {
     xp = (uint64_t)(x / prime);
 
-    for (; it2.primes_[it2.last_idx_] <= xp; it2.generate_next_primes())
-      pi_xp += (it2.last_idx_ - it2.i_) + 1;
+    for (; it2.primes_[it2.size_ - 1] <= xp; it2.generate_next_primes())
+      pi_xp += it2.size_ - it2.i_;
     for (; it2.primes_[it2.i_] <= xp; it2.i_++)
       pi_xp += 1;
 
