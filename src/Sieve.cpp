@@ -590,7 +590,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       std::size_t sieve_byte = sieve[m]; \
       std::size_t is_bit = (sieve_byte >> bit_index) & 1; \
       sieve_byte &= ~(1 << bit_index); \
-      counter[m >> counter_log2_dist] -= is_bit; \
+      counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
       total_count -= is_bit; \
       sieve[m] = (uint8_t) sieve_byte; \
     }
