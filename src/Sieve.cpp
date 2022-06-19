@@ -327,7 +327,23 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   {
     for (;;)
     {
-      case 0: CHECK_FINISHED(0); sieve[m] &= ~(1 << 0); m += prime * 6 + 0; FALLTHROUGH;
+      case 0: {
+                uint64_t max_offset = m + prime * 28;
+                uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                for (; m < limit; m += prime * 30 + 1)
+                {
+                  sieve[m + prime *  0] &= ~(1 << 0);
+                  sieve[m + prime *  6] &= ~(1 << 1);
+                  sieve[m + prime * 10] &= ~(1 << 2);
+                  sieve[m + prime * 12] &= ~(1 << 3);
+                  sieve[m + prime * 16] &= ~(1 << 4);
+                  sieve[m + prime * 18] &= ~(1 << 5);
+                  sieve[m + prime * 22] &= ~(1 << 6);
+                  sieve[m + prime * 28] &= ~(1 << 7);
+                }
+              }
+              CHECK_FINISHED(0); sieve[m] &= ~(1 << 0); m += prime * 6 + 0; FALLTHROUGH;
       case 1: CHECK_FINISHED(1); sieve[m] &= ~(1 << 1); m += prime * 4 + 0; FALLTHROUGH;
       case 2: CHECK_FINISHED(2); sieve[m] &= ~(1 << 2); m += prime * 2 + 0; FALLTHROUGH;
       case 3: CHECK_FINISHED(3); sieve[m] &= ~(1 << 3); m += prime * 4 + 0; FALLTHROUGH;
@@ -335,27 +351,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 5: CHECK_FINISHED(5); sieve[m] &= ~(1 << 5); m += prime * 4 + 0; FALLTHROUGH;
       case 6: CHECK_FINISHED(6); sieve[m] &= ~(1 << 6); m += prime * 6 + 0; FALLTHROUGH;
       case 7: CHECK_FINISHED(7); sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 1)
-        {
-          sieve[m + prime *  0] &= ~(1 << 0);
-          sieve[m + prime *  6] &= ~(1 << 1);
-          sieve[m + prime * 10] &= ~(1 << 2);
-          sieve[m + prime * 12] &= ~(1 << 3);
-          sieve[m + prime * 16] &= ~(1 << 4);
-          sieve[m + prime * 18] &= ~(1 << 5);
-          sieve[m + prime * 22] &= ~(1 << 6);
-          sieve[m + prime * 28] &= ~(1 << 7);
-        }
-      }
     }
 
     for (;;)
     {
-      case  8: CHECK_FINISHED( 8); sieve[m] &= ~(1 << 1); m += prime * 6 + 1; FALLTHROUGH;
+      case  8: {
+                 uint64_t max_offset = m + prime * 28 + 6;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 7)
+                 {
+                   sieve[m + prime *  0 + 0] &= ~(1 << 1);
+                   sieve[m + prime *  6 + 1] &= ~(1 << 5);
+                   sieve[m + prime * 10 + 2] &= ~(1 << 4);
+                   sieve[m + prime * 12 + 3] &= ~(1 << 0);
+                   sieve[m + prime * 16 + 3] &= ~(1 << 7);
+                   sieve[m + prime * 18 + 4] &= ~(1 << 3);
+                   sieve[m + prime * 22 + 5] &= ~(1 << 2);
+                   sieve[m + prime * 28 + 6] &= ~(1 << 6);
+                 }
+               }
+               CHECK_FINISHED( 8); sieve[m] &= ~(1 << 1); m += prime * 6 + 1; FALLTHROUGH;
       case  9: CHECK_FINISHED( 9); sieve[m] &= ~(1 << 5); m += prime * 4 + 1; FALLTHROUGH;
       case 10: CHECK_FINISHED(10); sieve[m] &= ~(1 << 4); m += prime * 2 + 1; FALLTHROUGH;
       case 11: CHECK_FINISHED(11); sieve[m] &= ~(1 << 0); m += prime * 4 + 0; FALLTHROUGH;
@@ -363,27 +379,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 13: CHECK_FINISHED(13); sieve[m] &= ~(1 << 3); m += prime * 4 + 1; FALLTHROUGH;
       case 14: CHECK_FINISHED(14); sieve[m] &= ~(1 << 2); m += prime * 6 + 1; FALLTHROUGH;
       case 15: CHECK_FINISHED(15); sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 6;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 7)
-        {
-          sieve[m + prime *  0 + 0] &= ~(1 << 1);
-          sieve[m + prime *  6 + 1] &= ~(1 << 5);
-          sieve[m + prime * 10 + 2] &= ~(1 << 4);
-          sieve[m + prime * 12 + 3] &= ~(1 << 0);
-          sieve[m + prime * 16 + 3] &= ~(1 << 7);
-          sieve[m + prime * 18 + 4] &= ~(1 << 3);
-          sieve[m + prime * 22 + 5] &= ~(1 << 2);
-          sieve[m + prime * 28 + 6] &= ~(1 << 6);
-        }
-      }
     }
 
     for (;;)
     {
-      case 16: CHECK_FINISHED(16); sieve[m] &= ~(1 << 2); m += prime * 6 + 2; FALLTHROUGH;
+      case 16: {
+                 uint64_t max_offset = m + prime * 28 + 10;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 11)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 2);
+                   sieve[m + prime *  6 +  2] &= ~(1 << 4);
+                   sieve[m + prime * 10 +  4] &= ~(1 << 0);
+                   sieve[m + prime * 12 +  4] &= ~(1 << 6);
+                   sieve[m + prime * 16 +  6] &= ~(1 << 1);
+                   sieve[m + prime * 18 +  6] &= ~(1 << 7);
+                   sieve[m + prime * 22 +  8] &= ~(1 << 3);
+                   sieve[m + prime * 28 + 10] &= ~(1 << 5);
+                 }
+               }
+               CHECK_FINISHED(16); sieve[m] &= ~(1 << 2); m += prime * 6 + 2; FALLTHROUGH;
       case 17: CHECK_FINISHED(17); sieve[m] &= ~(1 << 4); m += prime * 4 + 2; FALLTHROUGH;
       case 18: CHECK_FINISHED(18); sieve[m] &= ~(1 << 0); m += prime * 2 + 0; FALLTHROUGH;
       case 19: CHECK_FINISHED(19); sieve[m] &= ~(1 << 6); m += prime * 4 + 2; FALLTHROUGH;
@@ -391,27 +407,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 21: CHECK_FINISHED(21); sieve[m] &= ~(1 << 7); m += prime * 4 + 2; FALLTHROUGH;
       case 22: CHECK_FINISHED(22); sieve[m] &= ~(1 << 3); m += prime * 6 + 2; FALLTHROUGH;
       case 23: CHECK_FINISHED(23); sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 10;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 11)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 2);
-          sieve[m + prime *  6 +  2] &= ~(1 << 4);
-          sieve[m + prime * 10 +  4] &= ~(1 << 0);
-          sieve[m + prime * 12 +  4] &= ~(1 << 6);
-          sieve[m + prime * 16 +  6] &= ~(1 << 1);
-          sieve[m + prime * 18 +  6] &= ~(1 << 7);
-          sieve[m + prime * 22 +  8] &= ~(1 << 3);
-          sieve[m + prime * 28 + 10] &= ~(1 << 5);
-        }
-      }
     }
 
     for (;;)
     {
-      case 24: CHECK_FINISHED(24); sieve[m] &= ~(1 << 3); m += prime * 6 + 3; FALLTHROUGH;
+      case 24: {
+                 uint64_t max_offset = m + prime * 28 + 12;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 13)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 3);
+                   sieve[m + prime *  6 +  3] &= ~(1 << 0);
+                   sieve[m + prime * 10 +  4] &= ~(1 << 6);
+                   sieve[m + prime * 12 +  5] &= ~(1 << 5);
+                   sieve[m + prime * 16 +  7] &= ~(1 << 2);
+                   sieve[m + prime * 18 +  8] &= ~(1 << 1);
+                   sieve[m + prime * 22 +  9] &= ~(1 << 7);
+                   sieve[m + prime * 28 + 12] &= ~(1 << 4);
+                 }
+               }
+               CHECK_FINISHED(24); sieve[m] &= ~(1 << 3); m += prime * 6 + 3; FALLTHROUGH;
       case 25: CHECK_FINISHED(25); sieve[m] &= ~(1 << 0); m += prime * 4 + 1; FALLTHROUGH;
       case 26: CHECK_FINISHED(26); sieve[m] &= ~(1 << 6); m += prime * 2 + 1; FALLTHROUGH;
       case 27: CHECK_FINISHED(27); sieve[m] &= ~(1 << 5); m += prime * 4 + 2; FALLTHROUGH;
@@ -419,27 +435,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 29: CHECK_FINISHED(29); sieve[m] &= ~(1 << 1); m += prime * 4 + 1; FALLTHROUGH;
       case 30: CHECK_FINISHED(30); sieve[m] &= ~(1 << 7); m += prime * 6 + 3; FALLTHROUGH;
       case 31: CHECK_FINISHED(31); sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 12;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 13)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 3);
-          sieve[m + prime *  6 +  3] &= ~(1 << 0);
-          sieve[m + prime * 10 +  4] &= ~(1 << 6);
-          sieve[m + prime * 12 +  5] &= ~(1 << 5);
-          sieve[m + prime * 16 +  7] &= ~(1 << 2);
-          sieve[m + prime * 18 +  8] &= ~(1 << 1);
-          sieve[m + prime * 22 +  9] &= ~(1 << 7);
-          sieve[m + prime * 28 + 12] &= ~(1 << 4);
-        }
-      }
     }
 
     for (;;)
     {
-      case 32: CHECK_FINISHED(32); sieve[m] &= ~(1 << 4); m += prime * 6 + 3; FALLTHROUGH;
+      case 32: {
+                 uint64_t max_offset = m + prime * 28 + 16;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 17)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 4);
+                   sieve[m + prime *  6 +  3] &= ~(1 << 7);
+                   sieve[m + prime * 10 +  6] &= ~(1 << 1);
+                   sieve[m + prime * 12 +  7] &= ~(1 << 2);
+                   sieve[m + prime * 16 +  9] &= ~(1 << 5);
+                   sieve[m + prime * 18 + 10] &= ~(1 << 6);
+                   sieve[m + prime * 22 + 13] &= ~(1 << 0);
+                   sieve[m + prime * 28 + 16] &= ~(1 << 3);
+                 }
+               }
+               CHECK_FINISHED(32); sieve[m] &= ~(1 << 4); m += prime * 6 + 3; FALLTHROUGH;
       case 33: CHECK_FINISHED(33); sieve[m] &= ~(1 << 7); m += prime * 4 + 3; FALLTHROUGH;
       case 34: CHECK_FINISHED(34); sieve[m] &= ~(1 << 1); m += prime * 2 + 1; FALLTHROUGH;
       case 35: CHECK_FINISHED(35); sieve[m] &= ~(1 << 2); m += prime * 4 + 2; FALLTHROUGH;
@@ -447,27 +463,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 37: CHECK_FINISHED(37); sieve[m] &= ~(1 << 6); m += prime * 4 + 3; FALLTHROUGH;
       case 38: CHECK_FINISHED(38); sieve[m] &= ~(1 << 0); m += prime * 6 + 3; FALLTHROUGH;
       case 39: CHECK_FINISHED(39); sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 16;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 17)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 4);
-          sieve[m + prime *  6 +  3] &= ~(1 << 7);
-          sieve[m + prime * 10 +  6] &= ~(1 << 1);
-          sieve[m + prime * 12 +  7] &= ~(1 << 2);
-          sieve[m + prime * 16 +  9] &= ~(1 << 5);
-          sieve[m + prime * 18 + 10] &= ~(1 << 6);
-          sieve[m + prime * 22 + 13] &= ~(1 << 0);
-          sieve[m + prime * 28 + 16] &= ~(1 << 3);
-        }
-      }
     }
 
     for (;;)
     {
-      case 40: CHECK_FINISHED(40); sieve[m] &= ~(1 << 5); m += prime * 6 + 4; FALLTHROUGH;
+      case 40: {
+                 uint64_t max_offset = m + prime * 28 + 18;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 19)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 5);
+                   sieve[m + prime *  6 +  4] &= ~(1 << 3);
+                   sieve[m + prime * 10 +  6] &= ~(1 << 7);
+                   sieve[m + prime * 12 +  8] &= ~(1 << 1);
+                   sieve[m + prime * 16 + 10] &= ~(1 << 6);
+                   sieve[m + prime * 18 + 12] &= ~(1 << 0);
+                   sieve[m + prime * 22 + 14] &= ~(1 << 4);
+                   sieve[m + prime * 28 + 18] &= ~(1 << 2);
+                 }
+               }
+               CHECK_FINISHED(40); sieve[m] &= ~(1 << 5); m += prime * 6 + 4; FALLTHROUGH;
       case 41: CHECK_FINISHED(41); sieve[m] &= ~(1 << 3); m += prime * 4 + 2; FALLTHROUGH;
       case 42: CHECK_FINISHED(42); sieve[m] &= ~(1 << 7); m += prime * 2 + 2; FALLTHROUGH;
       case 43: CHECK_FINISHED(43); sieve[m] &= ~(1 << 1); m += prime * 4 + 2; FALLTHROUGH;
@@ -475,27 +491,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 45: CHECK_FINISHED(45); sieve[m] &= ~(1 << 0); m += prime * 4 + 2; FALLTHROUGH;
       case 46: CHECK_FINISHED(46); sieve[m] &= ~(1 << 4); m += prime * 6 + 4; FALLTHROUGH;
       case 47: CHECK_FINISHED(47); sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 18;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 19)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 5);
-          sieve[m + prime *  6 +  4] &= ~(1 << 3);
-          sieve[m + prime * 10 +  6] &= ~(1 << 7);
-          sieve[m + prime * 12 +  8] &= ~(1 << 1);
-          sieve[m + prime * 16 + 10] &= ~(1 << 6);
-          sieve[m + prime * 18 + 12] &= ~(1 << 0);
-          sieve[m + prime * 22 + 14] &= ~(1 << 4);
-          sieve[m + prime * 28 + 18] &= ~(1 << 2);
-        }
-      }
     }
 
     for (;;)
     {
-      case 48: CHECK_FINISHED(48); sieve[m] &= ~(1 << 6); m += prime * 6 + 5; FALLTHROUGH;
+      case 48: {
+                 uint64_t max_offset = m + prime * 28 + 22;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 23)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 6);
+                   sieve[m + prime *  6 +  5] &= ~(1 << 2);
+                   sieve[m + prime * 10 +  8] &= ~(1 << 3);
+                   sieve[m + prime * 12 +  9] &= ~(1 << 7);
+                   sieve[m + prime * 16 + 13] &= ~(1 << 0);
+                   sieve[m + prime * 18 + 14] &= ~(1 << 4);
+                   sieve[m + prime * 22 + 17] &= ~(1 << 5);
+                   sieve[m + prime * 28 + 22] &= ~(1 << 1);
+                 }
+               }
+               CHECK_FINISHED(48); sieve[m] &= ~(1 << 6); m += prime * 6 + 5; FALLTHROUGH;
       case 49: CHECK_FINISHED(49); sieve[m] &= ~(1 << 2); m += prime * 4 + 3; FALLTHROUGH;
       case 50: CHECK_FINISHED(50); sieve[m] &= ~(1 << 3); m += prime * 2 + 1; FALLTHROUGH;
       case 51: CHECK_FINISHED(51); sieve[m] &= ~(1 << 7); m += prime * 4 + 4; FALLTHROUGH;
@@ -503,27 +519,27 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 53: CHECK_FINISHED(53); sieve[m] &= ~(1 << 4); m += prime * 4 + 3; FALLTHROUGH;
       case 54: CHECK_FINISHED(54); sieve[m] &= ~(1 << 5); m += prime * 6 + 5; FALLTHROUGH;
       case 55: CHECK_FINISHED(55); sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 22;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 23)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 6);
-          sieve[m + prime *  6 +  5] &= ~(1 << 2);
-          sieve[m + prime * 10 +  8] &= ~(1 << 3);
-          sieve[m + prime * 12 +  9] &= ~(1 << 7);
-          sieve[m + prime * 16 + 13] &= ~(1 << 0);
-          sieve[m + prime * 18 + 14] &= ~(1 << 4);
-          sieve[m + prime * 22 + 17] &= ~(1 << 5);
-          sieve[m + prime * 28 + 22] &= ~(1 << 1);
-        }
-      }
     }
 
     for (;;)
     {
-      case 56: CHECK_FINISHED(56); sieve[m] &= ~(1 << 7); m += prime * 6 + 6; FALLTHROUGH;
+      case 56: {
+                 uint64_t max_offset = m + prime * 28 + 28;
+                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+
+                 for (; m < limit; m += prime * 30 + 29)
+                 {
+                   sieve[m + prime *  0 +  0] &= ~(1 << 7);
+                   sieve[m + prime *  6 +  6] &= ~(1 << 6);
+                   sieve[m + prime * 10 + 10] &= ~(1 << 5);
+                   sieve[m + prime * 12 + 12] &= ~(1 << 4);
+                   sieve[m + prime * 16 + 16] &= ~(1 << 3);
+                   sieve[m + prime * 18 + 18] &= ~(1 << 2);
+                   sieve[m + prime * 22 + 22] &= ~(1 << 1);
+                   sieve[m + prime * 28 + 28] &= ~(1 << 0);
+                 }
+               }
+               CHECK_FINISHED(56); sieve[m] &= ~(1 << 7); m += prime * 6 + 6; FALLTHROUGH;
       case 57: CHECK_FINISHED(57); sieve[m] &= ~(1 << 6); m += prime * 4 + 4; FALLTHROUGH;
       case 58: CHECK_FINISHED(58); sieve[m] &= ~(1 << 5); m += prime * 2 + 2; FALLTHROUGH;
       case 59: CHECK_FINISHED(59); sieve[m] &= ~(1 << 4); m += prime * 4 + 4; FALLTHROUGH;
@@ -531,22 +547,6 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       case 61: CHECK_FINISHED(61); sieve[m] &= ~(1 << 2); m += prime * 4 + 4; FALLTHROUGH;
       case 62: CHECK_FINISHED(62); sieve[m] &= ~(1 << 1); m += prime * 6 + 6; FALLTHROUGH;
       case 63: CHECK_FINISHED(63); sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
-      {
-        uint64_t max_loop_dist = m + prime * 28 + 28;
-        uint64_t limit = std::max(max_loop_dist, sieve_size) - max_loop_dist;
-
-        for (; m < limit; m += prime * 30 + 29)
-        {
-          sieve[m + prime *  0 +  0] &= ~(1 << 7);
-          sieve[m + prime *  6 +  6] &= ~(1 << 6);
-          sieve[m + prime * 10 + 10] &= ~(1 << 5);
-          sieve[m + prime * 12 + 12] &= ~(1 << 4);
-          sieve[m + prime * 16 + 16] &= ~(1 << 3);
-          sieve[m + prime * 18 + 18] &= ~(1 << 2);
-          sieve[m + prime * 22 + 22] &= ~(1 << 1);
-          sieve[m + prime * 28 + 28] &= ~(1 << 0);
-        }
-      }
     }
 
     default: UNREACHABLE;
