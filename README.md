@@ -73,7 +73,7 @@ sudo ldconfig
 ## Usage examples
 
 ```sh
-# Count the primes below 10^14
+# Count the primes ≤ 10^14
 primecount 1e14
 
 # Print progress and status information during computation
