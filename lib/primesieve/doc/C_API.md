@@ -246,6 +246,7 @@ int main()
 * [Build instructions](#compiling-and-linking)
 
 # Error handling
+## ```PRIMESIEVE_ERROR```
 
 If an error occurs, libprimesieve functions with a ```uint64_t``` return type return
 ```PRIMESIEVE_ERROR``` (which is defined as ```UINT64_MAX``` in ```<primesieve.h>```)
@@ -269,39 +270,71 @@ int main()
 }
 ```
 
-libprimesieve also sets the C ```errno``` variable to ```EDOM``` if an error
-occurs. This makes it possible to check if an error has occurred in libprimesieve
-functions with a ```void``` return type. ```errno``` is also useful for checking
-after a computation that no error has occurred, this way you don't have to
-check the return value of every single primesieve function call.
+## ```primesieve_iterator.is_error```
+
+For the ```primesieve_iterator```, you can check if the return value of ```primesieve_next_prime()```
+is ```PRIMESIEVE_ERROR``` to know if an error occured. However, ```primesieve_iterator``` also supports
+a 2nd option for error handling: by default ```primesieve_iterator.is_error``` is initialized to 0 in
+```primesieve_init()```, if any error occurs ```primesieve_iterator.is_error``` is set to 1.
+This is useful to check after a computation that no error has occurred, this way you don't have to
+check the return value of every single ```primesieve_next_prime()``` call.
 
 ```C
 #include <primesieve.h>
-#include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-int main()
+uint64_t get_prime_sum(uint64_t stop)
 {
-  /* Reset errno before computation */
-  errno = 0;
-
   primesieve_iterator it;
   primesieve_init(&it);
   uint64_t sum = 0;
   uint64_t prime = 0;
 
-  while ((prime = primesieve_next_prime(&it)) < 1000000000)
+  while ((prime = primesieve_next_prime(&it)) <= stop)
     sum += prime;
 
-  /* Check errno after computation */
-  if (errno != EDOM)
-    printf("Sum of the primes below 10^9 = %" PRIu64 "\n", sum);
-  else
+  if (it.is_error) {
     printf("Error in libprimesieve!\n");
+    primesieve_free_iterator(&it);
+    exit(EXIT_FAILURE);
+  }
+  else {
+    primesieve_free_iterator(&it);
+    return sum;
+  }
+}
+```
 
-  primesieve_free_iterator(&it);
-  return 0;
+## ```errno```
+
+libprimesieve C API functions also set the C ```errno``` variable to ```EDOM``` if any error
+occurs. This makes it possible to check if an error has occurred in libprimesieve
+functions with e.g. a ```void``` return type. ```errno``` is also useful to
+check after a computation that no error has occurred, this way you don't have to
+check the return value of every single primesieve function call.
+
+```C
+#include <primesieve.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int* get_primes(int n, int start)
+{
+  /* Reset errno before computation */
+  errno = 0;
+
+  int* primes = (int*) primesieve_generate_n_primes(n, start, INT_PRIMES);
+
+  /* Check errno after computation */
+  if (errno == EDOM) {
+    printf("Error in libprimesieve!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  return primes;
 }
 ```
 
