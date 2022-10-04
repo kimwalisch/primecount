@@ -40,6 +40,8 @@ struct IteratorMemory
   }
   uint64_t stop;
   uint64_t dist = 0;
+  // Generate primes >= start number
+  bool include_start_number = true;
   PrimeGenerator* primeGenerator = nullptr;
   pod_vector<uint64_t> primes;
   PreSieve preSieve;

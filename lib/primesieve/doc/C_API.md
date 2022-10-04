@@ -20,7 +20,7 @@ more detailed information.
 ## Contents
 
 * [```primesieve_next_prime()```](#primesieve_next_prime)
-* [```primesieve_skipto()```](#primesieve_skipto)
+* [```primesieve_jump_to()```](#primesieve_jump_to)
 * [```primesieve_prev_prime()```](#primesieve_prev_prime)
 * [```primesieve_generate_primes()```](#primesieve_generate_primes)
 * [```primesieve_generate_n_primes()```](#primesieve_generate_n_primes)
@@ -34,12 +34,12 @@ more detailed information.
 
 ## ```primesieve_next_prime()```
 
-By default ```primesieve_next_prime()``` generates primes > 0 i.e. 2, 3, 5, 7, ...
+By default ```primesieve_next_prime()``` generates primes ≥ 2 i.e. 2, 3, 5, 7, ...
 
-* If you have specified a non-default start number using the ```primesieve_skipto()```
+* If you have specified a non-default start number using the ```primesieve_jump_to()```
   function, then the first ```primesieve_next_prime()``` invocation returns the 1st
-  prime > start number. If want to generate primes ≥ start number you need to
-  use e.g. ```primesieve_skipto(start-1)```.
+  prime ≥ start number. If want to generate primes > start number you need to
+  use e.g. ```primesieve_jump_to(start+1)```.
 * Note that ```primesieve_iterator``` is not ideal if you are
   repeatedly iterating over the same primes in a loop, in this case it is better
   to [store the primes in an array](#primesieve_generate_primes) (provided your PC has
@@ -60,11 +60,11 @@ int main()
   uint64_t sum = 0;
   uint64_t prime = 0;
 
-  /* Iterate over the primes < 10^9 */
-  while ((prime = primesieve_next_prime(&it)) < 1000000000)
+  /* Iterate over the primes <= 10^9 */
+  while ((prime = primesieve_next_prime(&it)) <= 1000000000)
     sum += prime;
 
-  printf("Sum of the primes below 10^9 = %" PRIu64 "\n", sum);
+  printf("Sum of the primes <= 10^9: %" PRIu64 "\n", sum);
   primesieve_free_iterator(&it);
 
   return 0;
@@ -73,7 +73,7 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
-## ```primesieve_skipto()```
+## ```primesieve_jump_to()```
 
 This function changes the start number of the ```primesieve_iterator``` object. (By
 default the start number is initialized to 0). The ```stop_hint``` parameter is
@@ -90,11 +90,11 @@ int main()
   primesieve_iterator it;
   primesieve_init(&it);
 
-  /* primesieve_skipto(&it, start, stop_hint) */
-  primesieve_skipto(&it, 1000, 1100);
+  /* primesieve_jump_to(&it, start, stop_hint) */
+  primesieve_jump_to(&it, 1000, 1100);
   uint64_t prime;
 
-  /* Iterate over primes from ]1000, 1100] */
+  /* Iterate over primes from [1000, 1100] */
   while ((prime = primesieve_next_prime(&it)) <= 1100)
     printf("%" PRIu64 "\n", prime);
 
@@ -108,11 +108,11 @@ int main()
 ## ```primesieve_prev_prime()```
 
 Before using ```primesieve_prev_prime()``` you must first change the
-start number using the ```primesieve_skipto()``` function (as the start
+start number using the ```primesieve_jump_to()``` function (as the start
 number is initialized to 0 be default). Please note that the first
-```primesieve_prev_prime()``` invocation returns the 1st prime < start
-number. If want to generate primes ≤ start number you need to use e.g.
-```primesieve_skipto(start+1)```.
+```primesieve_prev_prime()``` invocation returns the 1st prime ≤ start
+number. If want to generate primes < start number you need to use e.g.
+```primesieve_jump_to(start-1)```.
 
 ```C
 #include <primesieve.h>
@@ -124,11 +124,11 @@ int main()
   primesieve_iterator it;
   primesieve_init(&it);
 
-  /* primesieve_skipto(&it, start, stop_hint) */
-  primesieve_skipto(&it, 2000, 1000);
+  /* primesieve_jump_to(&it, start, stop_hint) */
+  primesieve_jump_to(&it, 2000, 1000);
   uint64_t prime;
 
-  /* Iterate over primes from ]2000, 1000] */
+  /* Iterate over primes from [2000, 1000] */
   while ((prime = primesieve_prev_prime(&it)) >= 1000)
     printf("%" PRIu64 "\n", prime);
 
@@ -214,7 +214,7 @@ int main()
 {
   /* primesieve_count_primes(start, stop) */
   uint64_t count = primesieve_count_primes(0, 1000);
-  printf("Primes below 1000 = %" PRIu64 "\n", count);
+  printf("Primes <= 1000: %" PRIu64 "\n", count);
 
   return 0;
 }
@@ -262,7 +262,7 @@ int main()
   uint64_t count = primesieve_count_primes(0, 1000);
 
   if (count != PRIMESIEVE_ERROR)
-    printf("Primes below 1000 = %" PRIu64 "\n", count);
+    printf("Primes <= 1000: %" PRIu64 "\n", count);
   else
     printf("Error in libprimesieve!\n");
 
@@ -354,7 +354,7 @@ using ```primesieve_next_prime()``` which improves performance in most cases.
 [multi-threading](#libprimesieve-multi-threading) section for how to
 parallelize an algorithm using multiple ```primesieve_iterator``` objects.
 
-* The ```primesieve_skipto()``` function takes an optional ```stop_hint```
+* The ```primesieve_jump_to()``` function takes an optional ```stop_hint```
 parameter that can provide a significant speedup if the sieving distance
 is relatively small e.g.&nbsp;<&nbsp;sqrt(start). If ```stop_hint``` is set
 ```primesieve_iterator``` will only buffer primes up to this limit.
@@ -405,18 +405,19 @@ int main()
   #pragma omp parallel for reduction(+: sum)
   for (int i = 0; i < threads; i++)
   {
-    uint64_t start = i * thread_dist;
+    uint64_t start = i * thread_dist + 1;
     uint64_t stop = start + thread_dist < dist ? start + thread_dist : dist;
     primesieve_iterator it;
     primesieve_init(&it);
-    primesieve_skipto(&it, start, stop);
+    primesieve_jump_to(&it, start, stop);
     uint64_t prime = primesieve_next_prime(&it);
 
+    /* Sum primes inside [start, stop] */
     for (; prime <= stop; prime = primesieve_next_prime(&it))
       sum += prime;
   }
 
-  printf("Sum of the primes below 10^10 = %" PRIu64 "\n", sum);
+  printf("Sum of the primes <= 10^10: %" PRIu64 "\n", sum);
 
   return 0;
 }

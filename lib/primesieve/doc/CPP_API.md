@@ -20,7 +20,7 @@ more detailed information.
 ## Contents
 
 * [```primesieve::iterator::next_prime()```](#primesieveiteratornext_prime)
-* [```primesieve::iterator::skipto()```](#primesieveiteratorskipto)
+* [```primesieve::iterator::jump_to()```](#primesieveiteratorjump_to)
 * [```primesieve::iterator::prev_prime()```](#primesieveiteratorprev_prime)
 * [```primesieve::generate_primes()```](#primesievegenerate_primes)
 * [```primesieve::generate_n_primes()```](#primesievegenerate_n_primes)
@@ -34,12 +34,12 @@ more detailed information.
 
 ## ```primesieve::iterator::next_prime()```
 
-By default ```primesieve::iterator::next_prime()``` generates primes > 0 i.e. 2, 3, 5, 7, ...
+By default ```primesieve::iterator::next_prime()``` generates primes ≥ 2 i.e. 2, 3, 5, 7, ...
 
 * If you have specified a non-default start number in the ```primesieve::iterator```
-  constructor or in the ```skipto()``` method, then the first ```next_prime()``` invocation
-  returns the 1st prime > start number. If want to generate primes ≥ start number you need to
-  use e.g. ```skipto(start-1)```.
+  constructor or in the ```jump_to()``` method, then the first ```next_prime()``` invocation
+  returns the 1st prime ≥ start number. If want to generate primes > start number you need to
+  use e.g. ```jump_to(start+1)```.
 * Note that ```primesieve::iterator``` is not ideal if you are
   repeatedly iterating over the same primes in a loop, in this case it is better
   to [store the primes in a vector](#primesievegenerate_primes) (provided your PC has
@@ -57,11 +57,11 @@ int main()
   uint64_t prime = it.next_prime();
   uint64_t sum = 0;
 
-  // Iterate over the primes below 10^9
-  for (; prime < 1000000000; prime = it.next_prime())
+  // Iterate over the primes <= 10^9
+  for (; prime <= 1000000000; prime = it.next_prime())
     sum += prime;
 
-  std::cout << "Sum of the primes below 10^9 = " << sum << std::endl;
+  std::cout << "Sum of the primes <= 10^9: " << sum << std::endl;
 
   return 0;
 }
@@ -69,7 +69,7 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
-## ```primesieve::iterator::skipto()```
+## ```primesieve::iterator::jump_to()```
 
 This method changes the start number of the ```primesieve::iterator``` object. (By default
 the start number is initialized to 0). Note that you can also specify the start number in
@@ -83,11 +83,11 @@ int main()
 {
   primesieve::iterator it;
 
-  // Iterate over primes > 1000
-  it.skipto(1000);
+  // Iterate over primes >= 1000
+  it.jump_to(1000);
   uint64_t prime = it.next_prime();
 
-  // Iterate over primes from ]1000, 1100]
+  // Iterate over primes from [1000, 1100]
   for (; prime <= 1100; prime = it.next_prime())
     std::cout << prime << std::endl;
 
@@ -97,7 +97,7 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
-The ```primesieve::iterator::skipto()``` method (and the ```primesieve::iterator```
+The ```primesieve::iterator::jump_to()``` method (and the ```primesieve::iterator```
 constructor) take an optional ```stop_hint``` parameter for performance optimization.
 If ```stop_hint``` is set ```primesieve::iterator``` will only buffer primes up to
 this limit.
@@ -111,11 +111,11 @@ int main()
   uint64_t start = 1000;
   uint64_t stop_hint = 1100;
 
-  // Iterate over primes > start
+  // Iterate over primes >= start
   primesieve::iterator it(start, stop_hint);
   uint64_t prime = it.next_prime();
 
-  // Iterate over primes from ]1000, 1100]
+  // Iterate over primes from [1000, 1100]
   for (; prime <= 1100; prime = it.next_prime())
     std::cout << prime << std::endl;
 
@@ -128,10 +128,10 @@ int main()
 ## ```primesieve::iterator::prev_prime()```
 
 Before using ```primesieve::iterator::prev_prime()``` you must change the start number
-either in the constructor or using the ```skipto()``` method (as the start number is
+either in the constructor or using the ```jump_to()``` method (as the start number is
 initialized to 0 be default). Please note that the first ```prev_prime()``` invocation
-returns the 1st prime < start number. If want to generate primes ≤ start number you
-need to use e.g. ```skipto(start+1)```.
+returns the 1st prime ≤ start number. If want to generate primes < start number you
+need to use e.g. ```jump_to(start-1)```.
 
 ```C++
 #include <primesieve.hpp>
@@ -139,11 +139,11 @@ need to use e.g. ```skipto(start+1)```.
 
 int main()
 {
-  // Iterate over primes < 1000
+  // Iterate over primes <= 1000
   primesieve::iterator it(1000);
   uint64_t prime = it.prev_prime();
 
-  // Iterate over primes from ]1000, 0[
+  // Iterate over primes from [1000, 0[
   for (; prime > 0; prime = it.prev_prime())
     std::cout << prime << std::endl;
 
@@ -219,7 +219,7 @@ available CPU cores by default.
 int main()
 {
   uint64_t count = primesieve::count_primes(0, 1000);
-  std::cout << "Primes below 1000 = " << count << std::endl;
+  std::cout << "Primes <= 1000: " << count << std::endl;
 
   return 0;
 }
@@ -296,7 +296,7 @@ which improves performance in most cases.
 parallelize an algorithm using multiple ```primesieve::iterator``` objects.
 
 * The ```primesieve::iterator``` constructor and the
-```primesieve::iterator::skipto()``` method take an optional ```stop_hint```
+```primesieve::iterator::jump_to()``` method take an optional ```stop_hint```
 parameter that can provide a significant speedup if the sieving distance
 is relatively small e.g.&nbsp;<&nbsp;sqrt(start). If ```stop_hint``` is set
 ```primesieve::iterator``` will only buffer primes up to this limit.
@@ -346,16 +346,17 @@ int main()
   #pragma omp parallel for reduction(+: sum)
   for (int i = 0; i < threads; i++)
   {
-    uint64_t start = i * thread_dist;
+    uint64_t start = i * thread_dist + 1;
     uint64_t stop = std::min(start + thread_dist, dist);
     primesieve::iterator it(start, stop);
     uint64_t prime = it.next_prime();
 
+    // Sum primes inside [start, stop]
     for (; prime <= stop; prime = it.next_prime())
       sum += prime;
   }
 
-  std::cout << "Sum of the primes below " << dist << ": " << sum << std::endl;
+  std::cout << "Sum of the primes <= " << dist << ": " << sum << std::endl;
 
   return 0;
 }

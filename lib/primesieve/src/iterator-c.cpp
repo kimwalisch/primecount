@@ -44,9 +44,9 @@ void primesieve_init(primesieve_iterator* it)
   it->is_error = false;
 }
 
-void primesieve_skipto(primesieve_iterator* it,
-                       uint64_t start,
-                       uint64_t stop_hint)
+void primesieve_jump_to(primesieve_iterator* it,
+                        uint64_t start,
+                        uint64_t stop_hint)
 {
   it->i = 0;
   it->size = 0;
@@ -63,14 +63,40 @@ void primesieve_skipto(primesieve_iterator* it,
     auto* memory = (IteratorMemory*) it->memory;
     memory->stop = start;
     memory->dist = 0;
+    memory->include_start_number = true;
     memory->deletePrimeGenerator();
     memory->deletePrimes();
   }
 }
 
+/// Deprecated, use primesieve_jump_to() instead.
+/// primesieve_jump_to() includes the start number,
+/// whereas primesieve_skipto() excludes the start number.
+///
+void primesieve_skipto(primesieve_iterator* it,
+                       uint64_t start,
+                       uint64_t stop_hint)
+{
+  it->i = 0;
+  it->size = 0;
+  it->start = start;
+  it->stop_hint = stop_hint;
+  it->primes = nullptr;
+
+  if (!it->memory)
+    it->memory = new IteratorMemory(it->start);
+
+  auto* memory = (IteratorMemory*) it->memory;
+  memory->stop = start;
+  memory->dist = 0;
+  memory->include_start_number = false;
+  memory->deletePrimeGenerator();
+  memory->deletePrimes();
+}
+
 void primesieve_clear(primesieve_iterator* it)
 {
-  primesieve_skipto(it, 0, std::numeric_limits<uint64_t>::max());
+  primesieve_jump_to(it, 0, std::numeric_limits<uint64_t>::max());
 }
 
 /// C destructor
@@ -94,6 +120,15 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
 
     auto& memory = *(IteratorMemory*) it->memory;
     auto& primes = memory.primes;
+
+    // IteratorHelper::next() sets start=stop+1.
+    // However, for the first primesieve_generate_next_primes()
+    // call we want to generate primes >= stop, for all
+    // subsequent calls we want to generate primes > stop.
+    if (memory.include_start_number) {
+      memory.include_start_number = false;
+      memory.stop = checkedSub(memory.stop, 1);
+    }
 
     while (!it->size)
     {
@@ -154,6 +189,14 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
     {
       it->start = primes.front();
       memory.deletePrimeGenerator();
+    }
+    // IteratorHelper::prev() sets stop=start-1.
+    // However, for the first primesieve_generate_prev_primes()
+    // call we want to generate primes <= stop, for all
+    // subsequent calls we want to generate primes < stop.
+    else if (memory.include_start_number) {
+      memory.include_start_number = false;
+      it->start = checkedAdd(it->start, 1);
     }
 
     // When sieving backwards the sieving distance is subdivided

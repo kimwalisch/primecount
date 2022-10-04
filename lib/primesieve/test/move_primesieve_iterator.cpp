@@ -47,7 +47,7 @@ int main()
 
   // moved from objects can be reused
   // but they need to be reset
-  it.skipto(0);
+  it.jump_to(0);
   prime = it.next_prime();
   sum = 0;
 
@@ -73,11 +73,11 @@ int main()
   std::cout << "1st prime < 1000 = " << prime;
   check(prime == 997);
 
-  it2.skipto(5);
+  it2.jump_to(5);
   vect.emplace_back(std::move(it2));
   prime = vect.back().next_prime();
-  std::cout << "1st prime > 5 = " << prime;
-  check(prime == 7);
+  std::cout << "1st prime >= 5 = " << prime;
+  check(prime == 5);
 
   return 0;
 }

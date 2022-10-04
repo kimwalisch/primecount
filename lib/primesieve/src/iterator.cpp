@@ -93,7 +93,7 @@ iterator& iterator::operator=(iterator&& other) noexcept
   return *this;
 }
 
-void iterator::skipto(uint64_t start,
+void iterator::jump_to(uint64_t start,
                       uint64_t stop_hint) noexcept
 {
   i_ = 0;
@@ -111,6 +111,7 @@ void iterator::skipto(uint64_t start,
     auto* memory = (IteratorMemory*) memory_;
     memory->stop = start;
     memory->dist = 0;
+    memory->include_start_number = true;
     memory->deletePrimeGenerator();
     memory->deletePrimes();
   }
@@ -118,7 +119,7 @@ void iterator::skipto(uint64_t start,
 
 void iterator::clear() noexcept
 {
-  skipto(0);
+  jump_to(0);
 }
 
 iterator::~iterator()
@@ -134,6 +135,15 @@ void iterator::generate_next_primes()
   auto& memory = *(IteratorMemory*) memory_;
   auto& primes = memory.primes;
   size_ = 0;
+
+  // IteratorHelper::next() sets start=stop+1.
+  // However, for the first primesieve_generate_next_primes()
+  // call we want to generate primes >= stop, for all
+  // subsequent calls we want to generate primes > stop.
+  if (memory.include_start_number) {
+    memory.include_start_number = false;
+    memory.stop = checkedSub(memory.stop, 1);
+  }
 
   while (!size_)
   {
@@ -177,6 +187,14 @@ void iterator::generate_prev_primes()
   {
     start_ = primes.front();
     memory.deletePrimeGenerator();
+  }
+  // IteratorHelper::prev() sets stop=start-1.
+  // However, for the first generate_prev_primes() call
+  // we want to generate primes <= stop, for all
+  // subsequent calls we want to generate primes < stop.
+  else if (memory.include_start_number) {
+    memory.include_start_number = false;
+    start_ = checkedAdd(start_, 1);
   }
 
   // When sieving backwards the sieving distance is subdivided
