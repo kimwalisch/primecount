@@ -94,7 +94,7 @@ iterator& iterator::operator=(iterator&& other) noexcept
 }
 
 void iterator::jump_to(uint64_t start,
-                      uint64_t stop_hint) noexcept
+                       uint64_t stop_hint) noexcept
 {
   i_ = 0;
   size_ = 0;
@@ -137,9 +137,9 @@ void iterator::generate_next_primes()
   size_ = 0;
 
   // IteratorHelper::next() sets start=stop+1.
-  // However, for the first primesieve_generate_next_primes()
-  // call we want to generate primes >= stop, for all
-  // subsequent calls we want to generate primes > stop.
+  // However, for the first generate_next_primes() call we
+  // want to generate primes >= stop, for all subsequent
+  // calls we want to generate primes > stop.
   if (memory.include_start_number) {
     memory.include_start_number = false;
     memory.stop = checkedSub(memory.stop, 1);
