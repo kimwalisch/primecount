@@ -24,7 +24,6 @@
 #include <stdint.h>
 #include <string>
 
-/// Contains primesieve's C++ functions and classes.
 namespace primesieve {
 
 /// Appends the primes <= stop to the end of the primes vector.
