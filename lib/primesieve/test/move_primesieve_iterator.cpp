@@ -3,7 +3,7 @@
 /// @brief  Test the move constructor and move assignment operators
 ///         of the primesieve::iterator class.
 ///
-/// Copyright (C) 2018 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -37,10 +37,10 @@ int main()
   primesieve::iterator it2(std::move(it));
 
   // use 2nd iterator up to 1e9
-  for (; prime < 1000000000ull; prime = it2.next_prime())
+  for (; prime <= 1000000000ull; prime = it2.next_prime())
     sum += prime;
 
-  std::cout << "Sum of the primes below 10^9 = " << sum;
+  std::cout << "Sum of the primes <= 10^9: " << sum;
   check(sum == 24739512092254535ull);
 
   // test move assignment operator ///////////////////////////////////
@@ -59,10 +59,10 @@ int main()
   it2 = std::move(it);
 
   // use 2nd iterator up to 1e9
-  for (; prime < 1000000000ull; prime = it2.next_prime())
+  for (; prime <= 1000000000ull; prime = it2.next_prime())
     sum += prime;
 
-  std::cout << "Sum of the primes below 10^9 = " << sum;
+  std::cout << "Sum of the primes <= 10^9: " << sum;
   check(sum == 24739512092254535ull);
 
   // test std::vector ////////////////////////////////////////////////

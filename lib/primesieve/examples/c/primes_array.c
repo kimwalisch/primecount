@@ -1,5 +1,5 @@
-/** @example store_primes_in_array.c
- *  Store primes in a C array. */
+/** @example primes_array.c
+ *  Generate an array of primes. */
 
 #include <primesieve.h>
 #include <stdio.h>
@@ -11,7 +11,7 @@ int main()
   size_t i;
   size_t size;
 
-  /* store the primes below 1000 */
+  /* Get an array with the primes <= 1000 */
   int* primes = (int*) primesieve_generate_primes(start, stop, &size, INT_PRIMES);
 
   for (i = 0; i < size; i++)
@@ -20,7 +20,7 @@ int main()
   primesieve_free(primes);
   uint64_t n = 1000;
 
-  /* store the first 1000 primes */
+  /* Get an array with the first 1000 primes */
   primes = (int*) primesieve_generate_n_primes(n, start, INT_PRIMES);
 
   for (i = 0; i < n; i++)
