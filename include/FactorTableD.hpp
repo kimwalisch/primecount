@@ -157,7 +157,7 @@ public:
 
         if (y < high)
         {
-          it.skipto(y + 1, high);
+          it.jump_to(y + 1, high);
 
           // y < prime <= z
           while (true)
