@@ -38,7 +38,7 @@ By default ```primesieve::iterator::next_prime()``` generates primes ≥ 2 i.e. 
 
 * If you have specified a non-default start number in the ```primesieve::iterator```
   constructor or in the ```jump_to()``` method, then the first ```next_prime()``` invocation
-  returns the 1st prime ≥ start number. If want to generate primes > start number you need to
+  returns the first prime ≥ start number. If want to generate primes > start number you need to
   use e.g. ```jump_to(start+1)```.
 * Note that ```primesieve::iterator``` is not ideal if you are
   repeatedly iterating over the same primes in a loop, in this case it is better
@@ -128,10 +128,14 @@ int main()
 ## ```primesieve::iterator::prev_prime()```
 
 Before using ```primesieve::iterator::prev_prime()``` you must change the start number
-either in the constructor or using the ```jump_to()``` method (as the start number is
-initialized to 0 be default). Please note that the first ```prev_prime()``` invocation
-returns the 1st prime ≤ start number. If want to generate primes < start number you
-need to use e.g. ```jump_to(start-1)```.
+either in the constructor or using the ```jump_to()``` method (because the start number is
+initialized to 0 be default).
+
+* Please note that the first ```prev_prime()``` invocation returns the first prime ≤ start number.
+  If want to generate primes < start number you need to use e.g. ```jump_to(start-1)```.
+* As a special case, ```prev_prime()``` returns 0 after the prime 2 (i.e. when there are no more
+  primes). This makes it possible to conveniently iterate backwards over all primes > 0 as can be
+  seen in the example below.
 
 ```C++
 #include <primesieve.hpp>
