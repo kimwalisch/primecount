@@ -71,9 +71,9 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
 /// Each thread computes PrimePi [low, high[
 void SegmentedPiTable::init_bits()
 {
-  // Iterate over primes > 5
-  uint64_t low = max(low_, 5);
-  if (low + 1 >= high_)
+  // Iterate over primes >= 7
+  uint64_t low = max(low_, 7);
+  if (low >= high_)
     return;
 
   primesieve::iterator it(low, high_);

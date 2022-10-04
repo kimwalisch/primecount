@@ -137,8 +137,8 @@ void PiTable::init_bits(uint64_t low,
   uint64_t j = ceil_div(high, 240);
   std::fill_n(&pi_[i], j - i, pi_t{0, 0});
 
-  // Iterate over primes > 5
-  low = max(low, 5);
+  // Iterate over primes >= 7
+  low = max(low, 7);
   primesieve::iterator it(low, high);
   uint64_t count = 0;
   uint64_t prime = 0;

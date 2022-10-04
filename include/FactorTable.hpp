@@ -106,7 +106,7 @@ public:
         int64_t size = (to_index(high) + 1) - low_idx;
         std::fill_n(&factor_[low_idx], size, T_MAX);
 
-        int64_t start = first_coprime() - 1;
+        int64_t start = first_coprime();
         int64_t stop = high / first_coprime();
         primesieve::iterator it(start, stop);
 
