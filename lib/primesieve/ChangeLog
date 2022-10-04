@@ -1,7 +1,23 @@
-Changes in version 8.1, 02/10/2022
+Changes in version 9.0, 04/10/2022
 ==================================
 
+In primesieve-9.0 the primesieve_skipto() function has been marked as
+deprecated and primesieve_jump_to() has been added as a replacement.
+primesieve_jump_to(iter, start, stop) includes the start number, whereas
+primesieve_skipto(iter, start, stop) excludes the start number. The use of
+primesieve_jump_to() generally requires less start number corrections
+(e.g. start-1) compared to primesieve_skipto().
+
+The C API remains backwards compatible, but the C++ API is not backwards
+compatible. The C++ primesieve::iterator::skipto() method has been removed
+and replaced by the new primesieve::iterator::jump_to(). Since most
+libprimesieve users that I am aware of use the libprimesieve C API, this
+release should not cause any issue for them.
+
+* iterator.cpp: Add new primesieve::iterator::jump_to().
 * iterator.cpp: Fix use after free in primesieve::iterator::clear().
+* iterator-c.cpp: Add new primesieve_jump_to().
+* iterator-c.cpp: Mark primesieve_skipto() as deprecated.
 * iterator-c.cpp: Fix use after free in primesieve_iterator_clear().
 * api.cpp: Support non power of 2 sieve sizes.
 * PrimeSieve.cpp: Support non power of 2 sieve sizes.
