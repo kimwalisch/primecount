@@ -413,7 +413,7 @@ stream.
 int main()
 {
     int64_t pix = primecount_pi(1000);
-    printf("primes below 1000 = %ld\n", pix);
+    printf("primes <= 1000: %ld\n", pix);
 
     return 0;
 }
@@ -436,7 +436,7 @@ All functions that are part of primecount's C++ API throw a
 int main()
 {
     int64_t pix = primecount::pi(1000);
-    std::cout << "primes below 1000 = " << pix << std::endl;
+    std::cout << "primes <= 1000: " << pix << std::endl;
 
     return 0;
 }

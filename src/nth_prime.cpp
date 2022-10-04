@@ -112,7 +112,7 @@ int64_t nth_prime(int64_t n, int threads)
   // we simply iterate over the primes until we find it.
   if (count_approx < n)
   {
-    uint64_t start = prime_approx;
+    uint64_t start = prime_approx + 1;
     uint64_t stop = start + (n - count_approx) * avg_prime_gap;
     primesieve::iterator iter(start, stop);
     for (int64_t i = count_approx; i < n; i++)
@@ -120,7 +120,7 @@ int64_t nth_prime(int64_t n, int threads)
   }
   else // if (count_approx >= n)
   {
-    uint64_t start = prime_approx + 1;
+    uint64_t start = prime_approx;
     uint64_t stop = start - (count_approx - n) * avg_prime_gap;
     primesieve::iterator iter(start, stop);
     for (int64_t i = count_approx; i + 1 > n; i--)
