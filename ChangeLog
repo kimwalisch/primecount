@@ -1,4 +1,8 @@
-Changes in primecount-7.5, 2022-10-04
+Changes in primecount-7.5, 2022-10-05
+
+The API and ABI of primecount-7.5 are backwards compatible but
+primecount-7.5 now requires >= libprimesieve.so.11. The previous
+primecount-7.4 requried >= libprimesieve.so.10.
 
 * Update to the latest libprimesieve-9.0.
 * Use the new primesieve::iterator::jump_to() instead of
