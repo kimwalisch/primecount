@@ -20,12 +20,12 @@ namespace primesieve {
 
 // These objects can be reused by primesieve::iterator
 // and don't need to be reallocated frequently.
-struct IteratorMemory
+struct IteratorData
 {
-  IteratorMemory(uint64_t start) :
-    stop(start)
+  IteratorData(uint64_t stp) :
+    stop(stp)
   { }
-  ~IteratorMemory()
+  ~IteratorData()
   {
     delete primeGenerator;
   }
@@ -52,11 +52,11 @@ class IteratorHelper
 public:
   static void updateNext(uint64_t& start,
                          uint64_t stopHint,
-                         IteratorMemory& iter);
+                         IteratorData& iter);
 
   static void updatePrev(uint64_t& start,
                          uint64_t stopHint,
-                         IteratorMemory& iter);
+                         IteratorData& iter);
 };
 
 } // namespace

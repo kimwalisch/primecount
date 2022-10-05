@@ -26,8 +26,8 @@ using namespace primesieve;
 
 pod_vector<uint64_t>& getPrimes(primesieve_iterator* it)
 {
-  auto* memory = (IteratorMemory*) it->memory;
-  return memory->primes;
+  auto* iterData = (IteratorData*) it->memory;
+  return iterData->primes;
 }
 
 } // namespace
@@ -60,12 +60,12 @@ void primesieve_jump_to(primesieve_iterator* it,
   // The remaining memory uses at most 200 kilobytes.
   if (it->memory)
   {
-    auto* memory = (IteratorMemory*) it->memory;
-    memory->stop = start;
-    memory->dist = 0;
-    memory->include_start_number = true;
-    memory->deletePrimeGenerator();
-    memory->deletePrimes();
+    auto* iterData = (IteratorData*) it->memory;
+    iterData->stop = start;
+    iterData->dist = 0;
+    iterData->include_start_number = true;
+    iterData->deletePrimeGenerator();
+    iterData->deletePrimes();
   }
 }
 
@@ -84,14 +84,14 @@ void primesieve_skipto(primesieve_iterator* it,
   it->primes = nullptr;
 
   if (!it->memory)
-    it->memory = new IteratorMemory(it->start);
+    it->memory = new IteratorData(it->start);
 
-  auto* memory = (IteratorMemory*) it->memory;
-  memory->stop = start;
-  memory->dist = 0;
-  memory->include_start_number = false;
-  memory->deletePrimeGenerator();
-  memory->deletePrimes();
+  auto* iterData = (IteratorData*) it->memory;
+  iterData->stop = start;
+  iterData->dist = 0;
+  iterData->include_start_number = false;
+  iterData->deletePrimeGenerator();
+  iterData->deletePrimes();
 }
 
 void primesieve_clear(primesieve_iterator* it)
@@ -104,7 +104,7 @@ void primesieve_free_iterator(primesieve_iterator* it)
 {
   if (it && it->memory)
   {
-    delete (IteratorMemory*) it->memory;
+    delete (IteratorData*) it->memory;
     it->memory = nullptr;
   }
 }
@@ -114,20 +114,20 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
   try
   {
     if (!it->memory)
-      it->memory = new IteratorMemory(it->start);
+      it->memory = new IteratorData(it->start);
 
-    auto& memory = *(IteratorMemory*) it->memory;
-    auto& primes = memory.primes;
+    auto& iterData = *(IteratorData*) it->memory;
+    auto& primes = iterData.primes;
 
     while (true)
     {
-      if (!memory.primeGenerator)
+      if (!iterData.primeGenerator)
       {
-        IteratorHelper::updateNext(it->start, it->stop_hint, memory);
-        memory.primeGenerator = new PrimeGenerator(it->start, memory.stop, memory.preSieve);
+        IteratorHelper::updateNext(it->start, it->stop_hint, iterData);
+        iterData.primeGenerator = new PrimeGenerator(it->start, iterData.stop, iterData.preSieve);
       }
 
-      memory.primeGenerator->fillNextPrimes(primes, &it->size);
+      iterData.primeGenerator->fillNextPrimes(primes, &it->size);
 
       // There are 2 different cases here:
       // 1) The primes array is empty because the next prime > stop.
@@ -138,7 +138,7 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
       //    primes (<= 1024) or an error code (UINT64_MAX). The error
       //    code only occurs if the next prime > 2^64.
       if (it->size == 0)
-        memory.deletePrimeGenerator();
+        iterData.deletePrimeGenerator();
       else
         break;
     }
@@ -165,30 +165,30 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
   try
   {
     if (!it->memory)
-      it->memory = new IteratorMemory(it->start);
+      it->memory = new IteratorData(it->start);
 
-    auto& memory = *(IteratorMemory*) it->memory;
-    auto& primes = memory.primes;
+    auto& iterData = *(IteratorData*) it->memory;
+    auto& primes = iterData.primes;
 
     // Special case if generate_next_primes() has
     // been used before generate_prev_primes().
-    if_unlikely(memory.primeGenerator)
+    if_unlikely(iterData.primeGenerator)
     {
       it->start = primes.front();
-      memory.deletePrimeGenerator();
+      iterData.deletePrimeGenerator();
     }
 
     // When sieving backwards the sieving distance is subdivided
     // into smaller chunks. If we can prove that the total
     // sieving distance is large we enable pre-sieving.
-    if (memory.dist == 0 &&
+    if (iterData.dist == 0 &&
         it->stop_hint < it->start)
-      memory.preSieve.init(it->stop_hint, it->start);
+      iterData.preSieve.init(it->stop_hint, it->start);
 
     do
     {
-      IteratorHelper::updatePrev(it->start, it->stop_hint, memory);
-      PrimeGenerator primeGenerator(it->start, memory.stop, memory.preSieve);
+      IteratorHelper::updatePrev(it->start, it->stop_hint, iterData);
+      PrimeGenerator primeGenerator(it->start, iterData.stop, iterData.preSieve);
       primeGenerator.fillPrevPrimes(primes, &it->size);
     }
     while (!it->size);

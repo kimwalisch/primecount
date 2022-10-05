@@ -53,7 +53,7 @@ namespace primesieve {
 
 void IteratorHelper::updateNext(uint64_t& start,
                                 uint64_t stopHint,
-                                IteratorMemory& iter)
+                                IteratorData& iter)
 {
   if (iter.include_start_number)
     start = iter.stop;
@@ -85,7 +85,7 @@ void IteratorHelper::updateNext(uint64_t& start,
 
 void IteratorHelper::updatePrev(uint64_t& start,
                                 uint64_t stopHint,
-                                IteratorMemory& iter)
+                                IteratorData& iter)
 {
   if (iter.include_start_number)
     iter.stop = start;
