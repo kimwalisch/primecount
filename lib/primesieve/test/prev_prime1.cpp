@@ -55,6 +55,18 @@ int main()
   std::cout << "Sum of the primes <= 10^8: " << sum;
   check(sum == 279209790387276ull);
 
+  // Test iterating past the stop_hint
+  it.jump_to(100000000, 1000000);
+  prime = it.prev_prime();
+  sum = 0;
+
+  // iterate over the primes <= 10^8
+  for (; prime > 0; prime = it.prev_prime())
+    sum += prime;
+
+  std::cout << "Sum of the primes <= 10^8: " << sum;
+  check(sum == 279209790387276ull);
+
   for (uint64_t i = 0; i < 1000; i++)
   {
     prime = it.prev_prime();
