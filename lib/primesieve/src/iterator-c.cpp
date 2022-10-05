@@ -24,10 +24,14 @@ namespace {
 
 using namespace primesieve;
 
+IteratorData& getIterData(primesieve_iterator* it)
+{
+  return *(IteratorData*) it->memory;
+}
+
 pod_vector<uint64_t>& getPrimes(primesieve_iterator* it)
 {
-  auto* iterData = (IteratorData*) it->memory;
-  return iterData->primes;
+  return getIterData(it).primes;
 }
 
 } // namespace
@@ -60,12 +64,12 @@ void primesieve_jump_to(primesieve_iterator* it,
   // The remaining memory uses at most 200 kilobytes.
   if (it->memory)
   {
-    auto* iterData = (IteratorData*) it->memory;
-    iterData->stop = start;
-    iterData->dist = 0;
-    iterData->include_start_number = true;
-    iterData->deletePrimeGenerator();
-    iterData->deletePrimes();
+    auto& iterData = getIterData(it);
+    iterData.stop = start;
+    iterData.dist = 0;
+    iterData.include_start_number = true;
+    iterData.deletePrimeGenerator();
+    iterData.deletePrimes();
   }
 }
 
@@ -86,12 +90,12 @@ void primesieve_skipto(primesieve_iterator* it,
   if (!it->memory)
     it->memory = new IteratorData(it->start);
 
-  auto* iterData = (IteratorData*) it->memory;
-  iterData->stop = start;
-  iterData->dist = 0;
-  iterData->include_start_number = false;
-  iterData->deletePrimeGenerator();
-  iterData->deletePrimes();
+  auto& iterData = getIterData(it);
+  iterData.stop = start;
+  iterData.dist = 0;
+  iterData.include_start_number = false;
+  iterData.deletePrimeGenerator();
+  iterData.deletePrimes();
 }
 
 void primesieve_clear(primesieve_iterator* it)
@@ -116,7 +120,7 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
     if (!it->memory)
       it->memory = new IteratorData(it->start);
 
-    auto& iterData = *(IteratorData*) it->memory;
+    auto& iterData = getIterData(it);
     auto& primes = iterData.primes;
 
     while (true)
@@ -167,7 +171,7 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
     if (!it->memory)
       it->memory = new IteratorData(it->start);
 
-    auto& iterData = *(IteratorData*) it->memory;
+    auto& iterData = getIterData(it);
     auto& primes = iterData.primes;
 
     // Special case if generate_next_primes() has
