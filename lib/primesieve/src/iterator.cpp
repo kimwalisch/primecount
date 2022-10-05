@@ -108,12 +108,12 @@ void iterator::jump_to(uint64_t start,
   // The remaining memory uses at most 200 kilobytes.
   if (memory_)
   {
-    auto* iterData = (IteratorData*) memory_;
-    iterData->stop = start;
-    iterData->dist = 0;
-    iterData->include_start_number = true;
-    iterData->deletePrimeGenerator();
-    iterData->deletePrimes();
+    auto& iterData = *(IteratorData*) memory_;
+    iterData.stop = start;
+    iterData.dist = 0;
+    iterData.include_start_number = true;
+    iterData.deletePrimeGenerator();
+    iterData.deletePrimes();
   }
 }
 
