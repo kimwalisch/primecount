@@ -111,8 +111,6 @@ void primesieve_free_iterator(primesieve_iterator* it)
 
 void primesieve_generate_next_primes(primesieve_iterator* it)
 {
-  it->size = 0;
-
   try
   {
     if (!it->memory)
@@ -121,7 +119,7 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
     auto& memory = *(IteratorMemory*) it->memory;
     auto& primes = memory.primes;
 
-    while (!it->size)
+    while (true)
     {
       if (!memory.primeGenerator)
       {
@@ -131,18 +129,18 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
 
       memory.primeGenerator->fillNextPrimes(primes, &it->size);
 
-      // There are 3 different cases here:
-      // 1) The primes array contains a few primes (<= 1024).
-      //    In this case we return the primes to the user.
-      // 2) The primes array is empty because the next
-      //    prime > stop. In this case we reset the
-      //    primeGenerator object, increase the start & stop
-      //    numbers and sieve the next segment.
-      // 3) The next prime > 2^64. In this case the primes
-      //    array contains an error code (UINT64_MAX) which
-      //    is returned to the user.
+      // There are 2 different cases here:
+      // 1) The primes array is empty because the next prime > stop.
+      //    In this case we reset the primeGenerator object, increase
+      //    the start & stop numbers and sieve the next segment.
+      // 2) The primes array is not empty, in this case we return
+      //    it to the user. The primes array either contains a few
+      //    primes (<= 1024) or an error code (UINT64_MAX). The error
+      //    code only occurs if the next prime > 2^64.
       if (it->size == 0)
         memory.deletePrimeGenerator();
+      else
+        break;
     }
   }
   catch (const std::exception& e)
@@ -164,8 +162,6 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
 
 void primesieve_generate_prev_primes(primesieve_iterator* it)
 {
-  it->size = 0;
-
   try
   {
     if (!it->memory)
@@ -189,12 +185,13 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
         it->stop_hint < it->start)
       memory.preSieve.init(it->stop_hint, it->start);
 
-    while (!it->size)
+    do
     {
       IteratorHelper::updatePrev(it->start, it->stop_hint, memory);
       PrimeGenerator primeGenerator(it->start, memory.stop, memory.preSieve);
       primeGenerator.fillPrevPrimes(primes, &it->size);
     }
+    while (!it->size);
   }
   catch (const std::exception& e)
   {

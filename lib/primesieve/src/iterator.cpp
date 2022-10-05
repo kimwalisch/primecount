@@ -134,9 +134,8 @@ void iterator::generate_next_primes()
 
   auto& memory = *(IteratorMemory*) memory_;
   auto& primes = memory.primes;
-  size_ = 0;
 
-  while (!size_)
+  while (true)
   {
     if (!memory.primeGenerator)
     {
@@ -146,18 +145,18 @@ void iterator::generate_next_primes()
 
     memory.primeGenerator->fillNextPrimes(primes, &size_);
 
-    // There are 3 different cases here:
-    // 1) The primes array contains a few primes (<= 1024).
-    //    In this case we return the primes to the user.
-    // 2) The primes array is empty because the next
-    //    prime > stop. In this case we reset the
-    //    primeGenerator object, increase the start & stop
-    //    numbers and sieve the next segment.
-    // 3) The next prime > 2^64. In this case the primes
-    //    array contains an error code (UINT64_MAX) which
-    //    is returned to the user.
+    // There are 2 different cases here:
+    // 1) The primes array is empty because the next prime > stop.
+    //    In this case we reset the primeGenerator object, increase
+    //    the start & stop numbers and sieve the next segment.
+    // 2) The primes array is not empty, in this case we return
+    //    it to the user. The primes array either contains a few
+    //    primes (<= 1024) or an error code (UINT64_MAX). The error
+    //    code only occurs if the next prime > 2^64.
     if (size_ == 0)
       memory.deletePrimeGenerator();
+    else
+      break;
   }
 
   i_ = 0;
@@ -187,14 +186,13 @@ void iterator::generate_prev_primes()
       stop_hint_ < start_)
     memory.preSieve.init(stop_hint_, start_);
 
-  size_ = 0;
-
-  while (!size_)
+  do
   {
     IteratorHelper::updatePrev(start_, stop_hint_, memory);
     PrimeGenerator primeGenerator(start_, memory.stop, memory.preSieve);
     primeGenerator.fillPrevPrimes(primes, &size_);
   }
+  while (!size_);
 
   i_ = size_;
   primes_ = &primes[0];
