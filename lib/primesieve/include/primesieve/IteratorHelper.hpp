@@ -50,15 +50,13 @@ struct IteratorMemory
 class IteratorHelper
 {
 public:
-  static void next(uint64_t* start,
-                   uint64_t* stop,
-                   uint64_t stopHint,
-                   uint64_t* dist);
+  static void updateNext(uint64_t& start,
+                         uint64_t stopHint,
+                         IteratorMemory& iter);
 
-  static void prev(uint64_t* start,
-                   uint64_t* stop,
-                   uint64_t stopHint,
-                   uint64_t* dist);
+  static void updatePrev(uint64_t& start,
+                         uint64_t stopHint,
+                         IteratorMemory& iter);
 };
 
 } // namespace

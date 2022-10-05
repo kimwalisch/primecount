@@ -136,20 +136,11 @@ void iterator::generate_next_primes()
   auto& primes = memory.primes;
   size_ = 0;
 
-  // IteratorHelper::next() sets start=stop+1.
-  // However, for the first generate_next_primes() call we
-  // want to generate primes >= stop, for all subsequent
-  // calls we want to generate primes > stop.
-  if (memory.include_start_number) {
-    memory.include_start_number = false;
-    memory.stop = checkedSub(memory.stop, 1);
-  }
-
   while (!size_)
   {
     if (!memory.primeGenerator)
     {
-      IteratorHelper::next(&start_, &memory.stop, stop_hint_, &memory.dist);
+      IteratorHelper::updateNext(start_, stop_hint_, memory);
       memory.primeGenerator = new PrimeGenerator(start_, memory.stop, memory.preSieve);
     }
 
@@ -188,14 +179,6 @@ void iterator::generate_prev_primes()
     start_ = primes.front();
     memory.deletePrimeGenerator();
   }
-  // IteratorHelper::prev() sets stop=start-1.
-  // However, for the first generate_prev_primes() call
-  // we want to generate primes <= stop, for all
-  // subsequent calls we want to generate primes < stop.
-  else if (memory.include_start_number) {
-    memory.include_start_number = false;
-    start_ = checkedAdd(start_, 1);
-  }
 
   // When sieving backwards the sieving distance is subdivided
   // into smaller chunks. If we can prove that the total
@@ -208,7 +191,7 @@ void iterator::generate_prev_primes()
 
   while (!size_)
   {
-    IteratorHelper::prev(&start_, &memory.stop, stop_hint_, &memory.dist);
+    IteratorHelper::updatePrev(start_, stop_hint_, memory);
     PrimeGenerator primeGenerator(start_, memory.stop, memory.preSieve);
     primeGenerator.fillPrevPrimes(primes, &size_);
   }
