@@ -79,10 +79,6 @@ public:
   /// Move assignment operator
   pod_vector& operator=(pod_vector&& other) noexcept
   {
-    // https://en.cppreference.com/w/cpp/container/vector/operator%3D
-    static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_copy_assignment::value,
-                  "pod_vector<T> only supports allocators that don't need to be moved!");
-
     if (this != &other)
       swap(other);
 
@@ -104,6 +100,10 @@ public:
     other.end_ = tmp_end;
     other.capacity_ = tmp_capacity;
 
+    // The default std::allocator is stateless i.e.
+    // sizeof(std::allocator<T>()) == 1. This means that
+    // we don't need to swap the allocators.
+    // https://en.cppreference.com/w/cpp/memory/allocator
     // https://en.cppreference.com/w/cpp/container/vector/swap
     static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_swap::value,
                   "pod_vector<T> only supports allocators that don't need to be swapped!");
