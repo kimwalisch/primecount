@@ -293,7 +293,7 @@ private:
       static_assert(std::is_move_constructible<T>::value,
                     "pod_vector<T> only supports moveable types!");
 
-      std::move(old, old + old_size, array_);
+      std::uninitialized_move(old, old + old_size, array_);
       allocator_.deallocate(old, old_capacity);
     }
   }
