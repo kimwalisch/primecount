@@ -33,9 +33,6 @@ template <typename T>
 class pod_vector
 {
 public:
-  static_assert(std::is_move_constructible<T>::value,
-                "pod_vector<T> only supports moveable types!");
-
   using value_type = T;
   pod_vector() noexcept = default;
 
@@ -82,6 +79,10 @@ public:
   /// Move assignment operator
   pod_vector& operator=(pod_vector&& other) noexcept
   {
+    // https://en.cppreference.com/w/cpp/container/vector/operator%3D
+    static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_copy_assignment::value,
+                  "pod_vector<T> only supports allocators that don't need to be moved!");
+
     if (this != &other)
       swap(other);
 
@@ -103,8 +104,9 @@ public:
     other.end_ = tmp_end;
     other.capacity_ = tmp_capacity;
 
-    // This is a no-op
-    std::swap(allocator_, other.allocator_);
+    // https://en.cppreference.com/w/cpp/container/vector/swap
+    static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_swap::value,
+                  "pod_vector<T> only supports allocators that don't need to be swapped!");
   }
 
   bool empty() const noexcept
@@ -281,6 +283,9 @@ private:
 
     if (old)
     {
+      static_assert(std::is_move_constructible<T>::value,
+                    "pod_vector<T> only supports moveable types!");
+
       std::move(old, old + old_size, array_);
       allocator_.deallocate(old, old_capacity);
     }
