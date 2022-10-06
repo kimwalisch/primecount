@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -32,8 +33,8 @@ template <typename T>
 class pod_vector
 {
 public:
-  static_assert(std::is_trivially_destructible<T>::value,
-                "pod_vector<T> only supports types with trivial destructors!");
+  static_assert(std::is_move_constructible<T>::value,
+                "pod_vector<T> only supports moveable types!");
 
   using value_type = T;
   pod_vector() noexcept = default;
@@ -45,14 +46,16 @@ public:
 
   ~pod_vector()
   {
-    delete [] array_;
+    std::destroy(array_, end_);
+    allocator_.deallocate(array_, capacity());
   }
 
   /// Free all memory, the pod_vector
   /// can be reused afterwards.
   void free() noexcept
   {
-    delete [] array_;
+    ~pod_vector();
+
     array_ = nullptr;
     end_ = nullptr;
     capacity_ = nullptr;
@@ -62,6 +65,7 @@ public:
   /// memory. Same as std::vector.clear().
   void clear() noexcept
   {
+    std::destroy(array_, end_);
     end_ = array_;
   }
 
@@ -98,6 +102,9 @@ public:
     other.array_ = tmp_array;
     other.end_ = tmp_end;
     other.capacity_ = tmp_capacity;
+
+    // This is a no-op
+    std::swap(allocator_, other.allocator_);
   }
 
   bool empty() const noexcept
@@ -228,21 +235,26 @@ public:
       reserve_unchecked(n);
   }
 
-  /// Resize without default initializing memory.
-  /// If the pod_vector is not empty the current content
-  /// will be copied into the new array.
-  ///
   void resize(std::size_t n)
   {
     if (n > capacity())
-      reserve_unchecked(n);
-    else if (!std::is_trivial<T>::value && n > size())
     {
-      // This will only be used for classes
-      // and structs with constructors.
-      ASSERT(n <= capacity());
-      std::fill(end_, array_ + n, T());
+      reserve_unchecked(n);
+      // This default initializes memory of classes and structs
+      // with constructors (and with in-class initialization of
+      // non-static members. But it does not default initialize
+      // memory for POD types like int, long.
+      if (!std::is_trivial<T>::value)
+        std::uninitialized_default_construct(end_, array_ + n);
     }
+    else if (n > size() &&
+             !std::is_trivial<T>::value)
+    {
+      ASSERT(n <= capacity());
+      std::uninitialized_default_construct(end_, array_ + n);
+    }
+    else if (n < size())
+      std::destroy(array_ + n, end_);
 
     end_ = array_ + n;
   }
@@ -251,27 +263,26 @@ private:
   T* array_ = nullptr;
   T* end_ = nullptr;
   T* capacity_ = nullptr;
+  std::allocator<T> allocator_;
 
   void reserve_unchecked(std::size_t n)
   {
     ASSERT(n > capacity());
-    std::size_t new_capacity = get_new_capacity<T>(n);
     std::size_t old_size = size();
+    std::size_t old_capacity = capacity();
+    std::size_t new_capacity = get_new_capacity<T>(n);
     ASSERT(new_capacity >= n);
     ASSERT(new_capacity > old_size);
 
-    // This default initializes memory of classes and
-    // structs with constructors. But it does not default
-    // initialize memory for POD types like int, long.
     T* old = array_;
-    array_ = new T[new_capacity];
+    array_ = allocator_.allocate(new_capacity);
     end_ = array_ + old_size;
     capacity_ = array_ + new_capacity;
 
     if (old)
     {
-      std::copy_n(old, old_size, array_);
-      delete [] old;
+      std::move(old, old + old_size, array_);
+      allocator_.deallocate(old, old_capacity);
     }
   }
 

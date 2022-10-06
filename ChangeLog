@@ -1,9 +1,11 @@
-Changes in primecount-7.5, 2022-10-05
+Changes in primecount-7.5, 2022-10-06
 
 The API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
 primecount-7.4 requried >= libprimesieve.so.10.
 
+* CMakeLists.txt: the minimum CMake version has been increased from
+  3.4 to 3.8 (released in 2017, Ubuntu 18.04 has CMake 3.10).
 * Update to the latest libprimesieve-9.0.
 * Use the new primesieve::iterator::jump_to() instead of
   primesieve::iterator::skipto(). This reduces the number of required

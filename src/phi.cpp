@@ -39,9 +39,7 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
-#include <vector>
 
-using std::vector;
 using namespace primecount;
 
 namespace {
@@ -275,7 +273,7 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  vector<pod_vector<sieve_t>> sieve_;
+  pod_vector<pod_vector<sieve_t>> sieve_;
   const pod_vector<int32_t>& primes_;
   const PiTable& pi_;
 };
