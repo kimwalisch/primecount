@@ -244,7 +244,7 @@ public:
       reserve_unchecked(n);
       // This default initializes memory of classes and structs
       // with constructors (and with in-class initialization of
-      // non-static members. But it does not default initialize
+      // non-static members). But it does not default initialize
       // memory for POD types like int, long.
       if (!std::is_trivial<T>::value)
         std::uninitialized_default_construct(end_, array_ + n);
