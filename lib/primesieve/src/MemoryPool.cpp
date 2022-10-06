@@ -19,10 +19,10 @@
 #include <primesieve/MemoryPool.hpp>
 #include <primesieve/config.hpp>
 #include <primesieve/Bucket.hpp>
+#include <primesieve/pod_vector.hpp>
 #include <primesieve/primesieve_error.hpp>
 
 #include <algorithm>
-#include <vector>
 
 namespace primesieve {
 

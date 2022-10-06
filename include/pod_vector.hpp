@@ -51,8 +51,7 @@ public:
   /// can be reused afterwards.
   void free() noexcept
   {
-    ~pod_vector();
-
+    this->~pod_vector<T>();
     array_ = nullptr;
     end_ = nullptr;
     capacity_ = nullptr;

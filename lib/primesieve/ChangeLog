@@ -23,6 +23,7 @@ release should not cause any issues for them.
 * iterator-c.cpp: Add new primesieve_jump_to().
 * iterator-c.cpp: Mark primesieve_skipto() as deprecated.
 * iterator-c.cpp: Fix use after free in primesieve_iterator_clear().
+* pod_vector.hpp: Added support for types with destructors.
 * api.cpp: Support non power of 2 sieve sizes.
 * PrimeSieve.cpp: Support non power of 2 sieve sizes.
 * PreSieve.cpp: Use std::initializer_list instead of std::vector.

@@ -12,9 +12,9 @@
 
 #include "Bucket.hpp"
 #include "macros.hpp"
+#include "pod_vector.hpp"
 
 #include <memory>
-#include <vector>
 
 namespace primesieve {
 
@@ -33,7 +33,7 @@ private:
   /// Number of buckets to allocate
   std::size_t count_ = 0;
   /// Pointers of allocated buckets
-  std::vector<std::unique_ptr<char[]>> memory_;
+  pod_vector<std::unique_ptr<char[]>> memory_;
 };
 
 } // namespace

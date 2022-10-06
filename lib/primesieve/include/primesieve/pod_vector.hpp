@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -32,9 +33,6 @@ template <typename T>
 class pod_vector
 {
 public:
-  static_assert(std::is_trivially_destructible<T>::value,
-                "pod_vector<T> only supports types with trivial destructors!");
-
   using value_type = T;
   pod_vector() noexcept = default;
 
@@ -45,14 +43,15 @@ public:
 
   ~pod_vector()
   {
-    delete [] array_;
+    destroy(array_, end_);
+    allocator_.deallocate(array_, capacity());
   }
 
   /// Free all memory, the pod_vector
   /// can be reused afterwards.
   void free() noexcept
   {
-    delete [] array_;
+    this->~pod_vector<T>();
     array_ = nullptr;
     end_ = nullptr;
     capacity_ = nullptr;
@@ -62,6 +61,7 @@ public:
   /// memory. Same as std::vector.clear().
   void clear() noexcept
   {
+    destroy(array_, end_);
     end_ = array_;
   }
 
@@ -98,6 +98,14 @@ public:
     other.array_ = tmp_array;
     other.end_ = tmp_end;
     other.capacity_ = tmp_capacity;
+
+    // The default std::allocator is stateless i.e.
+    // sizeof(std::allocator<T>()) == 1. This means that
+    // we don't need to swap the allocators.
+    // https://en.cppreference.com/w/cpp/memory/allocator
+    // https://en.cppreference.com/w/cpp/container/vector/swap
+    static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_swap::value,
+                  "pod_vector<T> only supports allocators that don't need to be swapped!");
   }
 
   bool empty() const noexcept
@@ -187,14 +195,17 @@ public:
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = value;
+    // Placement new
+    new(end_++) T(value);
   }
 
   ALWAYS_INLINE void push_back(T&& value)
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = value;
+    // Without std::move() the copy constructor will
+    // be called instead of the move constructor.
+    new(end_++) T(std::move(value));
   }
 
   template <class... Args>
@@ -202,12 +213,16 @@ public:
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = T(std::forward<Args>(args)...);
+    // Placement new
+    new(end_++) T(std::forward<Args>(args)...);
   }
 
   template <class InputIt>
   void insert(T* const pos, InputIt first, InputIt last)
   {
+    static_assert(std::is_trivially_copyable<T>::value,
+                  "pod_vector<T>::insert() supports only trivially copyable types!");
+
     // We only support appending to the vector
     ASSERT(pos == end_);
     (void) pos;
@@ -228,21 +243,26 @@ public:
       reserve_unchecked(n);
   }
 
-  /// Resize without default initializing memory.
-  /// If the pod_vector is not empty the current content
-  /// will be copied into the new array.
-  ///
   void resize(std::size_t n)
   {
     if (n > capacity())
-      reserve_unchecked(n);
-    else if (!std::is_trivial<T>::value && n > size())
     {
-      // This will only be used for classes
-      // and structs with constructors.
-      ASSERT(n <= capacity());
-      std::fill(end_, array_ + n, T());
+      reserve_unchecked(n);
+      // This default initializes memory of classes and structs
+      // with constructors (and with in-class initialization of
+      // non-static members). But it does not default initialize
+      // memory for POD types like int, long.
+      if (!std::is_trivial<T>::value)
+        uninitialized_default_construct(end_, array_ + n);
     }
+    else if (n > size() &&
+             !std::is_trivial<T>::value)
+    {
+      ASSERT(n <= capacity());
+      uninitialized_default_construct(end_, array_ + n);
+    }
+    else if (n < size())
+      destroy(array_ + n, end_);
 
     end_ = array_ + n;
   }
@@ -251,27 +271,29 @@ private:
   T* array_ = nullptr;
   T* end_ = nullptr;
   T* capacity_ = nullptr;
+  std::allocator<T> allocator_;
 
   void reserve_unchecked(std::size_t n)
   {
     ASSERT(n > capacity());
-    std::size_t new_capacity = get_new_capacity<T>(n);
     std::size_t old_size = size();
+    std::size_t old_capacity = capacity();
+    std::size_t new_capacity = get_new_capacity<T>(n);
     ASSERT(new_capacity >= n);
     ASSERT(new_capacity > old_size);
 
-    // This default initializes memory of classes and
-    // structs with constructors. But it does not default
-    // initialize memory for POD types like int, long.
     T* old = array_;
-    array_ = new T[new_capacity];
+    array_ = allocator_.allocate(new_capacity);
     end_ = array_ + old_size;
     capacity_ = array_ + new_capacity;
 
     if (old)
     {
-      std::copy_n(old, old_size, array_);
-      delete [] old;
+      static_assert(std::is_move_constructible<T>::value,
+                    "pod_vector<T> only supports moveable types!");
+
+      uninitialized_move(old, old + old_size, array_);
+      allocator_.deallocate(old, old_capacity);
     }
   }
 
@@ -301,6 +323,44 @@ private:
     // the amount of memory we need upfront.
     std::size_t new_capacity = (std::size_t)(capacity() * 1.5);
     return std::max(size, new_capacity);
+  }
+
+  template <typename U>
+  ALWAYS_INLINE typename std::enable_if<std::is_trivially_copyable<U>::value, void>::type
+  uninitialized_move(U* first, U* last, U* d_first)
+  {
+    // We can use memcpy to move trivially copyable types.
+    // https://en.cppreference.com/w/cpp/language/classes#Trivially_copyable_class
+    // https://stackoverflow.com/questions/17625635/moving-an-object-in-memory-using-stdmemcpy
+    std::copy(first, last, d_first);
+  }
+
+  // Same as std::uninitialized_move() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/uninitialized_move
+  template <typename U>
+  ALWAYS_INLINE typename std::enable_if<!std::is_trivially_copyable<U>::value, void>::type
+  uninitialized_move(U* first, U* last, U* d_first)
+  {
+    for (; first != last; first++)
+      new (d_first++) T(std::move(*first));
+  }
+
+  // Same as std::uninitialized_default_construct() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/uninitialized_default_construct
+  ALWAYS_INLINE void uninitialized_default_construct(T* first, T* last)
+  {
+    // Default initialize array using placement new
+    for (; first != last; first++)
+      new (first) T();
+  }
+
+  // Same as std::destroy() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/destroy
+  ALWAYS_INLINE void destroy(T* first, T* last)
+  {
+    if (!std::is_trivially_destructible<T>::value)
+      for (; first != last; first++)
+        first->~T();
   }
 };
 
