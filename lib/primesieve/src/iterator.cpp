@@ -177,6 +177,7 @@ void iterator::generate_prev_primes()
   {
     start_ = primes.front();
     iterData.deletePrimeGenerator();
+    ASSERT(!iterData.include_start_number);
   }
 
   // When sieving backwards the sieving distance is subdivided

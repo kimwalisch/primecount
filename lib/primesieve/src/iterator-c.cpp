@@ -152,7 +152,7 @@ void primesieve_generate_next_primes(primesieve_iterator* it)
     std::cerr << "primesieve_iterator: " << e.what() << std::endl;
     primesieve_clear(it);
     auto& primes = getPrimes(it);
-    primes.clear();
+    ASSERT(primes.empty());
     primes.push_back(PRIMESIEVE_ERROR);
     it->size = primes.size();
     it->is_error = true;
@@ -180,6 +180,7 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
     {
       it->start = primes.front();
       iterData.deletePrimeGenerator();
+      ASSERT(!iterData.include_start_number);
     }
 
     // When sieving backwards the sieving distance is subdivided
@@ -202,7 +203,7 @@ void primesieve_generate_prev_primes(primesieve_iterator* it)
     std::cerr << "primesieve_iterator: " << e.what() << std::endl;
     primesieve_clear(it);
     auto& primes = getPrimes(it);
-    primes.clear();
+    ASSERT(primes.empty());
     primes.push_back(PRIMESIEVE_ERROR);
     it->size = primes.size();
     it->is_error = true;
