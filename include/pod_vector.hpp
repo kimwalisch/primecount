@@ -43,7 +43,7 @@ public:
 
   ~pod_vector()
   {
-    std::destroy(array_, end_);
+    destroy(array_, end_);
     allocator_.deallocate(array_, capacity());
   }
 
@@ -62,7 +62,7 @@ public:
   /// memory. Same as std::vector.clear().
   void clear() noexcept
   {
-    std::destroy(array_, end_);
+    destroy(array_, end_);
     end_ = array_;
   }
 
@@ -221,8 +221,8 @@ public:
   template <class InputIt>
   void insert(T* const pos, InputIt first, InputIt last)
   {
-    static_assert(std::is_trivial<T>::value,
-                  "pod_vector<T>::insert() only supports trivial (POD) types!");
+    static_assert(std::is_trivially_copyable<T>::value,
+                  "pod_vector<T>::insert() supports only trivially copyable types!");
 
     // We only support appending to the vector
     ASSERT(pos == end_);
@@ -254,16 +254,16 @@ public:
       // non-static members). But it does not default initialize
       // memory for POD types like int, long.
       if (!std::is_trivial<T>::value)
-        std::uninitialized_default_construct(end_, array_ + n);
+        uninitialized_default_construct(end_, array_ + n);
     }
     else if (n > size() &&
              !std::is_trivial<T>::value)
     {
       ASSERT(n <= capacity());
-      std::uninitialized_default_construct(end_, array_ + n);
+      uninitialized_default_construct(end_, array_ + n);
     }
     else if (n < size())
-      std::destroy(array_ + n, end_);
+      destroy(array_ + n, end_);
 
     end_ = array_ + n;
   }
@@ -293,7 +293,7 @@ private:
       static_assert(std::is_move_constructible<T>::value,
                     "pod_vector<T> only supports moveable types!");
 
-      std::uninitialized_move(old, old + old_size, array_);
+      uninitialized_move(old, old + old_size, array_);
       allocator_.deallocate(old, old_capacity);
     }
   }
@@ -324,6 +324,44 @@ private:
     // the amount of memory we need upfront.
     std::size_t new_capacity = (std::size_t)(capacity() * 1.5);
     return std::max(size, new_capacity);
+  }
+
+  template <typename U>
+  ALWAYS_INLINE typename std::enable_if<std::is_trivially_copyable<U>::value, void>::type
+  uninitialized_move(U* first, U* last, U* d_first)
+  {
+    // We can use memcpy to move trivially copyable types.
+    // https://en.cppreference.com/w/cpp/language/classes#Trivially_copyable_class
+    // https://stackoverflow.com/questions/17625635/moving-an-object-in-memory-using-stdmemcpy
+    std::copy(first, last, d_first);
+  }
+
+  // Same as std::uninitialized_move() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/uninitialized_move
+  template <typename U>
+  ALWAYS_INLINE typename std::enable_if<!std::is_trivially_copyable<U>::value, void>::type
+  uninitialized_move(U* first, U* last, U* d_first)
+  {
+    for (; first != last; first++)
+      new (d_first++) T(std::move(*first));
+  }
+
+  // Same as std::uninitialized_default_construct() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/uninitialized_default_construct
+  ALWAYS_INLINE void uninitialized_default_construct(T* first, T* last)
+  {
+    // Default initialize array using placement new
+    for (; first != last; first++)
+      new (first) T();
+  }
+
+  // Same as std::destroy() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/destroy
+  ALWAYS_INLINE void destroy(T* first, T* last)
+  {
+    if (!std::is_trivially_destructible<T>::value)
+      for (; first != last; first++)
+        first->~T();
   }
 };
 
