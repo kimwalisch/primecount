@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8...3.22)
+cmake_minimum_required(VERSION 3.4...3.22)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 7)
 set(PRIMECOUNT_VERSION_MINOR 5)
@@ -217,9 +217,14 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
-    target_compile_features(libprimecount PRIVATE cxx_std_17)
     target_compile_definitions(libprimecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
+
+    target_compile_features(libprimecount
+    PRIVATE
+        cxx_constexpr
+        cxx_lambdas
+        cxx_range_for)
 
     target_include_directories(libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -237,13 +242,18 @@ if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
-    target_compile_features(libprimecount-static PRIVATE cxx_std_17)
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
         set_target_properties(libprimecount-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
     endif()
+
+    target_compile_features(libprimecount-static
+    PRIVATE
+        cxx_constexpr
+        cxx_lambdas
+        cxx_range_for)
 
     target_include_directories(libprimecount-static PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
