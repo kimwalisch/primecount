@@ -196,14 +196,17 @@ public:
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = value;
+    // Placement new
+    new(end_++) T(value);
   }
 
   ALWAYS_INLINE void push_back(T&& value)
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = value;
+    // Without std::move() the copy constructor will
+    // be called instead of the move constructor.
+    new(end_++) T(std::move(value));
   }
 
   template <class... Args>
@@ -211,7 +214,8 @@ public:
   {
     if_unlikely(end_ == capacity_)
       reserve_unchecked(std::max((std::size_t) 1, capacity() * 2));
-    *end_++ = T(std::forward<Args>(args)...);
+    // Placement new
+    new(end_++) T(std::forward<Args>(args)...);
   }
 
   template <class InputIt>
