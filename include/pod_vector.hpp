@@ -217,6 +217,9 @@ public:
   template <class InputIt>
   void insert(T* const pos, InputIt first, InputIt last)
   {
+    static_assert(std::is_trivial<T>::value,
+                  "pod_vector<T>::insert() only supports trivial (POD) types!");
+
     // We only support appending to the vector
     ASSERT(pos == end_);
     (void) pos;
