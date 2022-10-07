@@ -245,21 +245,17 @@ public:
 
   void resize(std::size_t n)
   {
-    if (n > capacity())
+    if (n > size())
     {
-      reserve_unchecked(n);
+      if (n > capacity())
+        reserve_unchecked(n);
+
       // This default initializes memory of classes and structs
       // with constructors (and with in-class initialization of
       // non-static members). But it does not default initialize
       // memory for POD types like int, long.
       if (!std::is_trivial<T>::value)
         uninitialized_default_construct(end_, array_ + n);
-    }
-    else if (n > size() &&
-             !std::is_trivial<T>::value)
-    {
-      ASSERT(n <= capacity());
-      uninitialized_default_construct(end_, array_ + n);
     }
     else if (n < size())
       destroy(array_ + n, end_);
@@ -349,9 +345,11 @@ private:
   // https://en.cppreference.com/w/cpp/memory/uninitialized_default_construct
   ALWAYS_INLINE void uninitialized_default_construct(T* first, T* last)
   {
-    // Default initialize array using placement new
+    // Default initialize array using placement new.
+    // Note that `new (first) T();` zero initializes built-in integer types,
+    // whereas `new (first) T;` does not initialize built-in integer types.
     for (; first != last; first++)
-      new (first) T();
+      new (first) T;
   }
 
   // Same as std::destroy() from C++17.
