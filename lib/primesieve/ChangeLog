@@ -1,4 +1,4 @@
-Changes in version 9.0, 06/10/2022
+Changes in version 9.0, 07/10/2022
 ==================================
 
 In primesieve-9.0 the primesieve_skipto() function has been marked as
@@ -24,6 +24,7 @@ release should not cause any issues for them.
 * iterator-c.cpp: Mark primesieve_skipto() as deprecated.
 * iterator-c.cpp: Fix use after free in primesieve_iterator_clear().
 * pod_vector.hpp: Added support for types with destructors.
+* malloc_vector.hpp: Fix potential memory leak.
 * api.cpp: Support non power of 2 sieve sizes.
 * PrimeSieve.cpp: Support non power of 2 sieve sizes.
 * PreSieve.cpp: Use std::initializer_list instead of std::vector.
