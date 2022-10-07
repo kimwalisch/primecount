@@ -233,10 +233,9 @@ public:
 
     if (first < last)
     {
-      std::size_t old_size = size();
-      std::size_t new_size = old_size + (std::size_t) (last - first);
+      std::size_t new_size = size() + (std::size_t) (last - first);
       reserve(new_size);
-      std::uninitialized_copy_n(first, last, &array_[old_size]);
+      std::uninitialized_copy(first, last, end_);
       end_ = array_ + new_size;
     }
   }
