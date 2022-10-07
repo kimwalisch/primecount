@@ -333,10 +333,6 @@ private:
     return std::max(size, new_capacity);
   }
 
-  /// Unlike std::uninitialized_move_n() our implementation
-  /// uses __restrict pointers which improves the generated
-  /// assembly (using Clang). We can do this because we
-  /// only use this method for non-overlapping arrays.
   template <typename U>
   ALWAYS_INLINE typename std::enable_if<std::is_trivially_copyable<U>::value, void>::type
   uninitialized_move_n(U* __restrict first,
@@ -349,8 +345,13 @@ private:
     std::copy_n(first, count, d_first);
   }
 
-  // Same as std::uninitialized_move_n() from C++17.
-  // https://en.cppreference.com/w/cpp/memory/uninitialized_move_n
+  /// Same as std::uninitialized_move_n() from C++17.
+  /// https://en.cppreference.com/w/cpp/memory/uninitialized_move_n
+  ///
+  /// Unlike std::uninitialized_move_n() our implementation uses
+  /// __restrict pointers which improves the generated assembly
+  /// (using GCC & Clang). We can do this because we only use this
+  /// method for non-overlapping arrays.
   template <typename U>
   ALWAYS_INLINE typename std::enable_if<!std::is_trivially_copyable<U>::value, void>::type
   uninitialized_move_n(U* __restrict first,
@@ -361,8 +362,8 @@ private:
       new (d_first++) T(std::move(*first++));
   }
 
-  // Same as std::uninitialized_default_construct() from C++17.
-  // https://en.cppreference.com/w/cpp/memory/uninitialized_default_construct
+  /// Same as std::uninitialized_default_construct() from C++17.
+  /// https://en.cppreference.com/w/cpp/memory/uninitialized_default_construct
   ALWAYS_INLINE void uninitialized_default_construct(T* first, T* last)
   {
     // Default initialize array using placement new.
@@ -372,8 +373,8 @@ private:
       new (first) T;
   }
 
-  // Same as std::destroy() from C++17.
-  // https://en.cppreference.com/w/cpp/memory/destroy
+  /// Same as std::destroy() from C++17.
+  /// https://en.cppreference.com/w/cpp/memory/destroy
   ALWAYS_INLINE void destroy(T* first, T* last)
   {
     if (!std::is_trivially_destructible<T>::value)
