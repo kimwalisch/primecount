@@ -288,7 +288,7 @@ private:
       static_assert(std::is_move_constructible<T>::value,
                     "pod_vector<T> only supports moveable types!");
 
-      uninitialized_move(old, old + old_size, array_);
+      uninitialized_move_n(old, old_size, array_);
       allocator_.deallocate(old, old_capacity);
     }
   }
@@ -321,24 +321,31 @@ private:
     return std::max(size, new_capacity);
   }
 
+  /// Unlike std::uninitialized_move_n() our implementation uses __restrict
+  /// pointers which significantly improves the generated assembly. We can
+  /// do this because we only use this method for non-overlapping arrays.
   template <typename U>
   ALWAYS_INLINE typename std::enable_if<std::is_trivially_copyable<U>::value, void>::type
-  uninitialized_move(U* first, U* last, U* d_first)
+  uninitialized_move_n(U* __restrict first,
+                       std::size_t count,
+                       U* __restrict d_first)
   {
     // We can use memcpy to move trivially copyable types.
     // https://en.cppreference.com/w/cpp/language/classes#Trivially_copyable_class
     // https://stackoverflow.com/questions/17625635/moving-an-object-in-memory-using-stdmemcpy
-    std::copy(first, last, d_first);
+    std::copy_n(first, count, d_first);
   }
 
-  // Same as std::uninitialized_move() from C++17.
-  // https://en.cppreference.com/w/cpp/memory/uninitialized_move
+  // Same as std::uninitialized_move_n() from C++17.
+  // https://en.cppreference.com/w/cpp/memory/uninitialized_move_n
   template <typename U>
   ALWAYS_INLINE typename std::enable_if<!std::is_trivially_copyable<U>::value, void>::type
-  uninitialized_move(U* first, U* last, U* d_first)
+  uninitialized_move_n(U* __restrict first,
+                       std::size_t count,
+                       U* __restrict d_first)
   {
-    for (; first != last; first++)
-      new (d_first++) T(std::move(*first));
+    for (std::size_t i = 0; i < count; i++)
+      new (d_first++) T(std::move(*first++));
   }
 
   // Same as std::uninitialized_default_construct() from C++17.
