@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <stdint.h>
 #include <type_traits>
 #include <utility>
 
@@ -282,6 +283,14 @@ private:
     array_ = allocator_.allocate(new_capacity);
     end_ = array_ + old_size;
     capacity_ = array_ + new_capacity;
+
+    // Both primesieve & primecount require that byte arrays are
+    // aligned to at least a alignof(uint64_t) boundary. This is
+    // needed because our code casts byte arrays into uint64_t arrays
+    // in some places in order to improve performance. The default
+    // allocator guarantees that each memory allocation is at least
+    // aligned to the largest built-in type (usually 16 or 32).
+    ASSERT(((uintptr_t) (void*) array_) % sizeof(uint64_t) == 0);
 
     if (old)
     {
