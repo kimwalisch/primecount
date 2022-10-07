@@ -333,9 +333,10 @@ private:
     return std::max(size, new_capacity);
   }
 
-  /// Unlike std::uninitialized_move_n() our implementation uses __restrict
-  /// pointers which significantly improves the generated assembly. We can
-  /// do this because we only use this method for non-overlapping arrays.
+  /// Unlike std::uninitialized_move_n() our implementation
+  /// uses __restrict pointers which improves the generated
+  /// assembly (using Clang). We can do this because we
+  /// only use this method for non-overlapping arrays.
   template <typename U>
   ALWAYS_INLINE typename std::enable_if<std::is_trivially_copyable<U>::value, void>::type
   uninitialized_move_n(U* __restrict first,
