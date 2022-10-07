@@ -294,8 +294,8 @@ private:
 
     if (old)
     {
-      static_assert(std::is_move_constructible<T>::value,
-                    "pod_vector<T> only supports moveable types!");
+      static_assert(std::is_nothrow_move_constructible<T>::value,
+                    "pod_vector<T> only supports nothrow moveable types!");
 
       uninitialized_move_n(old, old_size, array_);
       allocator_.deallocate(old, old_capacity);
