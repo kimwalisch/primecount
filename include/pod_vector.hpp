@@ -236,8 +236,8 @@ public:
       std::size_t old_size = size();
       std::size_t new_size = old_size + (std::size_t) (last - first);
       reserve(new_size);
+      std::uninitialized_copy_n(first, last, &array_[old_size]);
       end_ = array_ + new_size;
-      std::copy(first, last, &array_[old_size]);
     }
   }
 
@@ -342,7 +342,7 @@ private:
     // We can use memcpy to move trivially copyable types.
     // https://en.cppreference.com/w/cpp/language/classes#Trivially_copyable_class
     // https://stackoverflow.com/questions/17625635/moving-an-object-in-memory-using-stdmemcpy
-    std::copy_n(first, count, d_first);
+    std::uninitialized_copy_n(first, count, d_first);
   }
 
   /// Same as std::uninitialized_move_n() from C++17.
