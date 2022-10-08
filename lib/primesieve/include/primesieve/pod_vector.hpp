@@ -34,11 +34,20 @@ template <typename T>
 class pod_vector
 {
 public:
-  // The default C++ std::allocator is stateless, we use this
+  // The default C++ std::allocator is stateless. We use this
   // allocator and do not support other custom statefull
-  // allocators which simplifies our implementation.
+  // allocators, which simplifies our implementation.
+  //
+  // "The default allocator is stateless, that is, all instances of
+  // the given allocator are interchangeable, compare equal and can
+  // deallocate memory allocated by any other instance of the same
+  // allocator type."
   // https://en.cppreference.com/w/cpp/memory/allocator
-  // https://en.cppreference.com/w/cpp/memory/allocator_traits
+  //
+  // "The member type is_always_equal of std::allocator_traits is
+  // intendedly used for determining whether an allocator type is
+  // stateless."
+  // https://en.cppreference.com/w/cpp/named_req/Allocator
   static_assert(std::allocator_traits<std::allocator<T>>::is_always_equal::value,
                 "pod_vector<T> only supports stateless allocators!");
 
