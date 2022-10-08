@@ -4,7 +4,6 @@
 version: 1.0.{build}
 
 image:
-- Ubuntu1604
 - Ubuntu
 - Ubuntu2004
 - macos-bigsur
@@ -22,48 +21,6 @@ configuration:
   - Release
 
 for:
-  - matrix:
-      only:
-        - image: Ubuntu1604
-          platform: x64
-          configuration: Debug
-    environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
-    build_script:
-      # Test using defaults + old gcc-5
-      - CXX=g++-5 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
-      - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
-      - make -j8 VERBOSE=1
-      - make install
-    test_script:
-      - ctest -j2
-      - ./primecount --test
-
-  - matrix:
-      only:
-        - image: Ubuntu1604
-          platform: x64
-          configuration: Release
-    environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-    build_script:
-      # POPCNT disabled + Release
-      - CXX=g++-5 cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
-      - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-      - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
-      - grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
-      - make -j8 VERBOSE=1
-      - make install
-    test_script:
-      - ctest -j2
-      - ./primecount --test
-
   - matrix:
       only:
         - image: Ubuntu
