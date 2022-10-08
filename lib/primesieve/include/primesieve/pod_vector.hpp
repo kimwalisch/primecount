@@ -34,6 +34,14 @@ template <typename T>
 class pod_vector
 {
 public:
+  // The default C++ std::allocator is stateless, we use this
+  // allocator and do not support other custom statefull
+  // allocators which simplifies our implementation.
+  // https://en.cppreference.com/w/cpp/memory/allocator
+  // https://en.cppreference.com/w/cpp/memory/allocator_traits
+  static_assert(std::allocator_traits<std::allocator<T>>::is_always_equal::value,
+                "pod_vector<T> only supports stateless allocators!");
+
   using value_type = T;
   pod_vector() noexcept = default;
 
@@ -45,7 +53,8 @@ public:
   ~pod_vector()
   {
     destroy(array_, end_);
-    allocator_.deallocate(array_, capacity());
+    std::allocator<T> alloc;
+    alloc.deallocate(array_, capacity());
   }
 
   /// Free all memory, the pod_vector
@@ -99,14 +108,6 @@ public:
     other.array_ = tmp_array;
     other.end_ = tmp_end;
     other.capacity_ = tmp_capacity;
-
-    // The default std::allocator is stateless i.e.
-    // sizeof(std::allocator<T>()) == 1. This means that
-    // we don't need to swap the allocators.
-    // https://en.cppreference.com/w/cpp/memory/allocator
-    // https://en.cppreference.com/w/cpp/container/vector/swap
-    static_assert(!std::allocator_traits<std::allocator<T>>::propagate_on_container_swap::value,
-                  "pod_vector<T> only supports allocators that don't need to be swapped!");
   }
 
   bool empty() const noexcept
@@ -270,7 +271,6 @@ private:
   T* array_ = nullptr;
   T* end_ = nullptr;
   T* capacity_ = nullptr;
-  std::allocator<T> allocator_;
 
   void reserve_unchecked(std::size_t n)
   {
@@ -282,7 +282,10 @@ private:
     ASSERT(new_capacity > old_size);
 
     T* old = array_;
-    array_ = allocator_.allocate(new_capacity);
+
+    std::allocator<T> alloc;
+    array_ = alloc.allocate(new_capacity);
+
     end_ = array_ + old_size;
     capacity_ = array_ + new_capacity;
 
@@ -300,7 +303,8 @@ private:
                     "pod_vector<T> only supports nothrow moveable types!");
 
       uninitialized_move_n(old, old_size, array_);
-      allocator_.deallocate(old, old_capacity);
+      std::allocator<T> alloc;
+      alloc.deallocate(old, old_capacity);
     }
   }
 
