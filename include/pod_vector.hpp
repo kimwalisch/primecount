@@ -63,8 +63,7 @@ public:
   ~pod_vector()
   {
     destroy(array_, end_);
-    Allocator alloc;
-    alloc.deallocate(array_, capacity());
+    Allocator().deallocate(array_, capacity());
   }
 
   /// Free all memory, the pod_vector
@@ -292,10 +291,7 @@ private:
     ASSERT(new_capacity > old_size);
 
     T* old = array_;
-
-    Allocator alloc;
-    array_ = alloc.allocate(new_capacity);
-
+    array_ = Allocator().allocate(new_capacity);
     end_ = array_ + old_size;
     capacity_ = array_ + new_capacity;
 
@@ -313,8 +309,7 @@ private:
                     "pod_vector<T> only supports nothrow moveable types!");
 
       uninitialized_move_n(old, old_size, array_);
-      Allocator alloc;
-      alloc.deallocate(old, old_capacity);
+      Allocator().deallocate(old, old_capacity);
     }
   }
 
