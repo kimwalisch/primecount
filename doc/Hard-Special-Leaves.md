@@ -10,6 +10,7 @@ Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/m
 which can be computed in O(1) using a ```PrimePi``` lookup table, the computation of
 the hard special leaves requires evaluating the partial sieve function phi(x, a) which
 generally cannot be computed in O(1).
+
 [primecount's implementation](https://github.com/kimwalisch/primecount/blob/master/src/deleglise-rivat/S2_hard.cpp)
 of the hard special leaves formula is different from the algorithms that have
 been described in any of the combinatorial prime counting papers so far. This document
@@ -17,7 +18,11 @@ describes the history of how primecount's implementation came to be and it descr
 an alternative counting method that I have devised in February 2020. This alternative
 counting method improves the balancing of sieve and count operations in the hard special
 leaf algorithm and thereby improves its runtime complexity by a factor of at least
-O(log log x).
+O(log log x). The alternative counting method uses a new tree-like data structure with
+fewer than O(log z) levels (depth) where each node has O(z^((levels - level) / levels))
+children. This data structure is used instead of the binary indexed tree (a.k.a. Fenwick
+tree) that has been used for counting in all previously published papers about the
+combinatorial type prime counting algorithms.
 
 Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
