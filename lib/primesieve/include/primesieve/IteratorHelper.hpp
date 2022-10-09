@@ -36,7 +36,7 @@ struct IteratorData
   }
   void deletePrimes()
   {
-    primes.free();
+    primes.deallocate();
   }
   uint64_t stop;
   uint64_t dist = 0;

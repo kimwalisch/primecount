@@ -30,25 +30,26 @@ namespace primecount {
 /// the Fedora Linux distribution compiles with -D_GLIBCXX_ASSERTIONS
 /// which enables std::vector bounds checks.
 ///
-template <typename T>
+template <typename T,
+          typename Allocator = std::allocator<T>>
 class pod_vector
 {
 public:
   // The default C++ std::allocator is stateless. We use this
-  // allocator and do not support other custom statefull
-  // allocators, which simplifies our implementation.
+  // allocator and do not support other statefull allocators,
+  // which simplifies our implementation.
   //
-  // "The default allocator is stateless, that is, all instances of
-  // the given allocator are interchangeable, compare equal and can
-  // deallocate memory allocated by any other instance of the same
-  // allocator type."
+  // "The default allocator is stateless, that is, all instances
+  // of the given allocator are interchangeable, compare equal
+  // and can deallocate memory allocated by any other instance
+  // of the same allocator type."
   // https://en.cppreference.com/w/cpp/memory/allocator
   //
-  // "The member type is_always_equal of std::allocator_traits is
-  // intendedly used for determining whether an allocator type is
-  // stateless."
+  // "The member type is_always_equal of std::allocator_traits
+  // is intendedly used for determining whether an allocator
+  // type is stateless."
   // https://en.cppreference.com/w/cpp/named_req/Allocator
-  static_assert(std::allocator_traits<std::allocator<T>>::is_always_equal::value,
+  static_assert(std::allocator_traits<Allocator>::is_always_equal::value,
                 "pod_vector<T> only supports stateless allocators!");
 
   using value_type = T;
@@ -62,13 +63,13 @@ public:
   ~pod_vector()
   {
     destroy(array_, end_);
-    std::allocator<T> alloc;
+    Allocator alloc;
     alloc.deallocate(array_, capacity());
   }
 
   /// Free all memory, the pod_vector
   /// can be reused afterwards.
-  void free() noexcept
+  void deallocate() noexcept
   {
     this->~pod_vector<T>();
     array_ = nullptr;
@@ -292,7 +293,7 @@ private:
 
     T* old = array_;
 
-    std::allocator<T> alloc;
+    Allocator alloc;
     array_ = alloc.allocate(new_capacity);
 
     end_ = array_ + old_size;
@@ -312,7 +313,7 @@ private:
                     "pod_vector<T> only supports nothrow moveable types!");
 
       uninitialized_move_n(old, old_size, array_);
-      std::allocator<T> alloc;
+      Allocator alloc;
       alloc.deallocate(old, old_capacity);
     }
   }
@@ -390,8 +391,13 @@ private:
   ALWAYS_INLINE void destroy(T* first, T* last)
   {
     if (!std::is_trivially_destructible<T>::value)
-      for (; first != last; first++)
-        first->~T();
+    {
+      // Theoretically deallocating in reverse order is more
+      // cache efficient. Clang's std::vector implementation
+      // also deallocates in reverse order.
+      while (first != last)
+        (--last)->~T();
+    }
   }
 };
 
