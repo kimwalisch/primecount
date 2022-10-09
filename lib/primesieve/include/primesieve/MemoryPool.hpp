@@ -14,8 +14,6 @@
 #include "macros.hpp"
 #include "pod_vector.hpp"
 
-#include <memory>
-
 namespace primesieve {
 
 class MemoryPool
@@ -27,13 +25,13 @@ public:
 private:
   void updateAllocCount();
   void allocateBuckets();
-  void initBuckets(void* memory);
+  void initBuckets(void* alignedPtr);
   /// List of empty buckets
   Bucket* stock_ = nullptr;
   /// Number of buckets to allocate
   std::size_t count_ = 0;
   /// Pointers of allocated buckets
-  pod_vector<std::unique_ptr<char[]>> memory_;
+  pod_vector<pod_vector<char>> memory_;
 };
 
 } // namespace

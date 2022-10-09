@@ -23,6 +23,7 @@
 #include <primesieve/primesieve_error.hpp>
 
 #include <algorithm>
+#include <memory>
 
 namespace primesieve {
 
@@ -71,9 +72,8 @@ void MemoryPool::allocateBuckets()
 
   // Allocate a large chunk of memory
   std::size_t bytes = count_ * sizeof(Bucket);
-  char* memory = new char[bytes];
-  memory_.emplace_back(memory);
-  void* ptr = memory;
+  memory_.emplace_back(bytes);
+  void* ptr = (void*) memory_.back().data();
 
   // Align pointer address to sizeof(Bucket)
   if (!std::align(sizeof(Bucket), sizeof(Bucket), ptr, bytes))
@@ -83,9 +83,9 @@ void MemoryPool::allocateBuckets()
   initBuckets(ptr);
 }
 
-void MemoryPool::initBuckets(void* memory)
+void MemoryPool::initBuckets(void* alignedPtr)
 {
-  Bucket* buckets = (Bucket*) memory;
+  Bucket* buckets = (Bucket*) alignedPtr;
 
   if ((std::size_t) buckets % sizeof(Bucket) != 0)
     throw primesieve_error("MemoryPool: failed to align memory!");
