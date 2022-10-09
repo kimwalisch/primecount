@@ -252,16 +252,25 @@ void Sieve::allocate_counter(uint64_t segment_low)
 
 ## Multiple levels of counters
 
-It is also possible to use multiple levels of counters. As an example, let's consider
-the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays.
-We only need to use 2 counter arrays because for the last level we will count the
-number of unsieved elements by iterating over the sieve array. For each level the size
-of the counter array can be calculated using segment_size^(level/levels) and the
-interval size of the counter array's elements can be calculated using
-segment_size^((levels - level) / levels). Hence our first counter array (1st level) is
-coarse-grained, its elements span over large intervals of size O(segment_size^(2/3)).
-This means that each element of the first counter array contains the current number of
-unsieved elements in the interval
+It is also possible to use multiple levels of counters, in this case the data
+structure becomes a tree where each node has O(segment_size^(1 / levels)) children
+and each node stores the current number of unsieved elements in an interval of
+size O(segment_size^((levels - level) / levels)) from the sieve array. The last
+level of this tree corresponds to the sieve array used in the algorithm. Just
+like in the original algorithm with the binary index tree (a.k.a Fenwick tree),
+we can count the number of unsieved elements ≤ n in the sieve array using the
+new tree-like data structure by traversing the tree from the root node to the
+bottom and summing the current number of unsieved elements stored in each node.
+
+As an example, let's consider the case of 3 counter levels for which we will need to
+use 3 - 1 = 2 counter arrays. We only need to use 2 counter arrays because for the
+last level we will count the number of unsieved elements by iterating over the sieve
+array. For each level the size of the counter array can be calculated using
+segment_size^(level/levels) and the interval size of the counter array's elements
+can be calculated using segment_size^((levels - level) / levels). Hence our first
+counter array (1st level) is coarse-grained, its elements span over large intervals
+of size O(segment_size^(2/3)). This means that each element of the first counter
+array contains the current number of unsieved elements in the interval
 [i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array (2nd
 level) is more fine-grained, its elements span over smaller intervals of size
 O(segment_size^(1/3)). Hence each element of the second counter array contains the
