@@ -13,6 +13,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <pod_vector.hpp>
 #include <print.hpp>
 #include <int128_t.hpp>
 
@@ -21,7 +22,6 @@
 #include <map>
 #include <string>
 #include <type_traits>
-#include <vector>
 #include <utility>
 
 namespace {
@@ -285,7 +285,7 @@ CmdOptions parseOptions(int argc, char* argv[])
   };
 
   CmdOptions opts;
-  std::vector<maxint_t> numbers;
+  pod_vector<maxint_t> numbers;
 
   for (int i = 1; i < argc; i++)
   {
