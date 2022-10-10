@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,7 +14,6 @@
 
 #include <iostream>
 #include <iomanip>
-#include <string>
 
 namespace {
 
@@ -64,20 +63,23 @@ void print_seconds(double seconds)
   std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
 }
 
-void print(const std::string& str)
+void print(const char* str)
 {
   std::cout << str << std::endl;
 }
 
-void print(const std::string& str, maxint_t res)
+void print(const char* str, maxint_t res)
 {
   std::cout << str << " = " << res << std::endl;
 }
 
-void print(const std::string& str, maxint_t res, double time)
+void print(const char* str, maxint_t res, double time)
 {
-  std::cout << "\r" << std::string(50,' ') << "\r";
-  std::cout << "Status: 100%" << std::endl;
+  // We overwrite the current text line,
+  // which could be e.g.:
+  // "Status: 99.9999999991%"
+  // "Segments; 123456789/123456789"
+  std::cout << "\rStatus: 100%                                 " << std::endl;
   std::cout << str << " = " << res << std::endl;
   print_seconds(get_time() - time);
 }
