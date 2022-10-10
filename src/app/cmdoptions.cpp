@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,11 +24,9 @@
 #include <vector>
 #include <utility>
 
-namespace primecount {
+namespace {
 
-void help(int exitCode);
-void version();
-void test();
+using namespace primecount;
 
 /// Some command-line options require an additional parameter.
 /// Examples: --threads THREADS, -a ALPHA, ...
@@ -37,66 +35,6 @@ enum IsParam
   NO_PARAM,
   REQUIRED_PARAM,
   OPTIONAL_PARAM
-};
-
-/// Command-line options
-std::map<std::string, std::pair<OptionID, IsParam>> optionMap =
-{
-  { "-a", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
-  { "--alpha", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
-  { "--alpha-y", std::make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
-  { "--alpha-z", std::make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
-  { "-d", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
-  { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
-  { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
-  { "--deleglise-rivat-128", std::make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
-  { "-g", std::make_pair(OPTION_GOURDON, NO_PARAM) },
-  { "--gourdon", std::make_pair(OPTION_GOURDON, NO_PARAM) },
-  { "--gourdon-64", std::make_pair(OPTION_GOURDON_64, NO_PARAM) },
-  { "--gourdon-128", std::make_pair(OPTION_GOURDON_128, NO_PARAM) },
-  { "-h", std::make_pair(OPTION_HELP, NO_PARAM) },
-  { "--help", std::make_pair(OPTION_HELP, NO_PARAM) },
-  { "-l", std::make_pair(OPTION_LEGENDRE, NO_PARAM) },
-  { "--legendre", std::make_pair(OPTION_LEGENDRE, NO_PARAM) },
-  { "--lehmer", std::make_pair(OPTION_LEHMER, NO_PARAM) },
-  { "--lmo", std::make_pair(OPTION_LMO, NO_PARAM) },
-  { "--lmo1", std::make_pair(OPTION_LMO1, NO_PARAM) },
-  { "--lmo2", std::make_pair(OPTION_LMO2, NO_PARAM) },
-  { "--lmo3", std::make_pair(OPTION_LMO3, NO_PARAM) },
-  { "--lmo4", std::make_pair(OPTION_LMO4, NO_PARAM) },
-  { "--lmo5", std::make_pair(OPTION_LMO5, NO_PARAM) },
-  { "-m", std::make_pair(OPTION_MEISSEL, NO_PARAM) },
-  { "--meissel", std::make_pair(OPTION_MEISSEL, NO_PARAM) },
-  { "-n", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
-  { "--nth-prime", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
-  { "--number", std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
-  { "-p", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
-  { "--primesieve", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
-  { "--Li", std::make_pair(OPTION_LI, NO_PARAM) },
-  { "--Li-inverse", std::make_pair(OPTION_LIINV, NO_PARAM) },
-  { "--Ri", std::make_pair(OPTION_RI, NO_PARAM) },
-  { "--Ri-inverse", std::make_pair(OPTION_RIINV, NO_PARAM) },
-  { "--phi", std::make_pair(OPTION_PHI, NO_PARAM) },
-  { "--P2", std::make_pair(OPTION_P2, NO_PARAM) },
-  { "--S1", std::make_pair(OPTION_S1, NO_PARAM) },
-  { "--S2-easy", std::make_pair(OPTION_S2_EASY, NO_PARAM) },
-  { "--S2-hard", std::make_pair(OPTION_S2_HARD, NO_PARAM) },
-  { "--S2-trivial", std::make_pair(OPTION_S2_TRIVIAL, NO_PARAM) },
-  { "--AC", std::make_pair(OPTION_AC, NO_PARAM) },
-  { "-B", std::make_pair(OPTION_B, NO_PARAM) },
-  { "--B", std::make_pair(OPTION_B, NO_PARAM) },
-  { "-D", std::make_pair(OPTION_D, NO_PARAM) },
-  { "--D", std::make_pair(OPTION_D, NO_PARAM) },
-  { "--Phi0", std::make_pair(OPTION_PHI0, NO_PARAM) },
-  { "--Sigma", std::make_pair(OPTION_SIGMA, NO_PARAM) },
-  { "-s", std::make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
-  { "--status", std::make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
-  { "--test", std::make_pair(OPTION_TEST, NO_PARAM) },
-  { "--time", std::make_pair(OPTION_TIME, NO_PARAM) },
-  { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-  { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-  { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
-  { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
 };
 
 /// Command-line option
@@ -164,7 +102,11 @@ void optionStatus(Option& opt,
 /// -> opt.opt = "--threads"
 /// -> opt.val = "8"
 ///
-Option parseOption(int argc, char* argv[], int& i)
+template <typename T>
+Option parseOption(int argc,
+                   char* argv[],
+                   int& i,
+                   const T& optionMap)
 {
   Option opt;
   opt.str = argv[i];
@@ -177,7 +119,7 @@ Option parseOption(int argc, char* argv[], int& i)
   if (optionMap.count(opt.str))
   {
     opt.opt = opt.str;
-    IsParam isParam = optionMap[opt.str].second;
+    IsParam isParam = optionMap.at(opt.str).second;
 
     if (isParam == REQUIRED_PARAM)
     {
@@ -244,7 +186,7 @@ Option parseOption(int argc, char* argv[], int& i)
 
       // Prevent '--option='
       if (opt.val.empty() &&
-          optionMap[opt.opt].second == REQUIRED_PARAM)
+          optionMap.at(opt.opt).second == REQUIRED_PARAM)
         throw primecount_error("missing value for option '" + opt.opt + "'");
     }
     else
@@ -268,19 +210,87 @@ Option parseOption(int argc, char* argv[], int& i)
   return opt;
 }
 
+} // namespace
+
+namespace primecount {
+
+void help(int exitCode);
+void version();
+void test();
+
 CmdOptions parseOptions(int argc, char* argv[])
 {
-  CmdOptions opts;
-  std::vector<maxint_t> numbers;
-
   // No command-line options provided
   if (argc <= 1)
     help(/* exitCode */ 1);
 
+  /// primecount command-line options
+  const std::map<std::string, std::pair<OptionID, IsParam>> optionMap =
+  {
+    { "-a", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
+    { "--alpha", std::make_pair(OPTION_ALPHA, REQUIRED_PARAM) },
+    { "--alpha-y", std::make_pair(OPTION_ALPHA_Y, REQUIRED_PARAM) },
+    { "--alpha-z", std::make_pair(OPTION_ALPHA_Z, REQUIRED_PARAM) },
+    { "-d", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
+    { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
+    { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
+    { "--deleglise-rivat-128", std::make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
+    { "-g", std::make_pair(OPTION_GOURDON, NO_PARAM) },
+    { "--gourdon", std::make_pair(OPTION_GOURDON, NO_PARAM) },
+    { "--gourdon-64", std::make_pair(OPTION_GOURDON_64, NO_PARAM) },
+    { "--gourdon-128", std::make_pair(OPTION_GOURDON_128, NO_PARAM) },
+    { "-h", std::make_pair(OPTION_HELP, NO_PARAM) },
+    { "--help", std::make_pair(OPTION_HELP, NO_PARAM) },
+    { "-l", std::make_pair(OPTION_LEGENDRE, NO_PARAM) },
+    { "--legendre", std::make_pair(OPTION_LEGENDRE, NO_PARAM) },
+    { "--lehmer", std::make_pair(OPTION_LEHMER, NO_PARAM) },
+    { "--lmo", std::make_pair(OPTION_LMO, NO_PARAM) },
+    { "--lmo1", std::make_pair(OPTION_LMO1, NO_PARAM) },
+    { "--lmo2", std::make_pair(OPTION_LMO2, NO_PARAM) },
+    { "--lmo3", std::make_pair(OPTION_LMO3, NO_PARAM) },
+    { "--lmo4", std::make_pair(OPTION_LMO4, NO_PARAM) },
+    { "--lmo5", std::make_pair(OPTION_LMO5, NO_PARAM) },
+    { "-m", std::make_pair(OPTION_MEISSEL, NO_PARAM) },
+    { "--meissel", std::make_pair(OPTION_MEISSEL, NO_PARAM) },
+    { "-n", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
+    { "--nth-prime", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
+    { "--number", std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
+    { "-p", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+    { "--primesieve", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
+    { "--Li", std::make_pair(OPTION_LI, NO_PARAM) },
+    { "--Li-inverse", std::make_pair(OPTION_LIINV, NO_PARAM) },
+    { "--Ri", std::make_pair(OPTION_RI, NO_PARAM) },
+    { "--Ri-inverse", std::make_pair(OPTION_RIINV, NO_PARAM) },
+    { "--phi", std::make_pair(OPTION_PHI, NO_PARAM) },
+    { "--P2", std::make_pair(OPTION_P2, NO_PARAM) },
+    { "--S1", std::make_pair(OPTION_S1, NO_PARAM) },
+    { "--S2-easy", std::make_pair(OPTION_S2_EASY, NO_PARAM) },
+    { "--S2-hard", std::make_pair(OPTION_S2_HARD, NO_PARAM) },
+    { "--S2-trivial", std::make_pair(OPTION_S2_TRIVIAL, NO_PARAM) },
+    { "--AC", std::make_pair(OPTION_AC, NO_PARAM) },
+    { "-B", std::make_pair(OPTION_B, NO_PARAM) },
+    { "--B", std::make_pair(OPTION_B, NO_PARAM) },
+    { "-D", std::make_pair(OPTION_D, NO_PARAM) },
+    { "--D", std::make_pair(OPTION_D, NO_PARAM) },
+    { "--Phi0", std::make_pair(OPTION_PHI0, NO_PARAM) },
+    { "--Sigma", std::make_pair(OPTION_SIGMA, NO_PARAM) },
+    { "-s", std::make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+    { "--status", std::make_pair(OPTION_STATUS, OPTIONAL_PARAM) },
+    { "--test", std::make_pair(OPTION_TEST, NO_PARAM) },
+    { "--time", std::make_pair(OPTION_TIME, NO_PARAM) },
+    { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+    { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+    { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
+    { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
+  };
+
+  CmdOptions opts;
+  std::vector<maxint_t> numbers;
+
   for (int i = 1; i < argc; i++)
   {
-    Option opt = parseOption(argc, argv, i);
-    OptionID optionID = optionMap[opt.opt].first;
+    Option opt = parseOption(argc, argv, i, optionMap);
+    OptionID optionID = optionMap.at(opt.opt).first;
 
     switch (optionID)
     {
