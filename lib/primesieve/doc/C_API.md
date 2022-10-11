@@ -73,12 +73,17 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
-## ```primesieve_jump_to()```
+## ```primesieve_jump_to()``` <sub><sup>*(since primesieve-9.0)*</sup></sub>
 
 This function changes the start number of the ```primesieve_iterator``` object. (By
 default the start number is initialized to 0). The ```stop_hint``` parameter is
 used for performance optimization, ```primesieve_iterator``` only buffers primes
 up to this limit.
+
+* Please note that the first ```primesieve_next_prime()``` invocation after
+  ```primesieve_jump_to()``` returns the first prime ≥ start number. If want to
+  generate primes > start number you need to use e.g.
+  ```primesieve_jump_to(iter, start+1, stop)```.
 
 ```C
 #include <primesieve.h>
@@ -95,6 +100,43 @@ int main()
   uint64_t prime;
 
   /* Iterate over primes from [1000, 1100] */
+  while ((prime = primesieve_next_prime(&it)) <= 1100)
+    printf("%" PRIu64 "\n", prime);
+
+  primesieve_free_iterator(&it);
+  return 0;
+}
+```
+
+* [Build instructions](#compiling-and-linking)
+
+## ```primesieve_skipto()``` <sub><sup>*(deprecated in primesieve-9.0)*</sup></sub>
+
+Similar to ```primesieve_jump_to()```, the ```primesieve_skipto()``` function changes
+the start number of the ```primesieve_iterator``` object. However, when calling
+```primesieve_next_prime()``` or ```primesieve_prev_prime()``` for the first time
+the start number will be excluded. Hence ```primesieve_next_prime()``` will generate
+primes > start and ```primesieve_prev_prime()``` will generate primes < start.
+```primesieve_skipto()``` has been deprecated in primesieve-9.0 in favor of
+```primesieve_jump_to()```, because the use of ```primesieve_skipto()``` requires to
+correct the start number most of the time using e.g.
+```primesieve_skipto(iter, start-1, stop)```.
+
+```C
+#include <primesieve.h>
+#include <inttypes.h>
+#include <stdio.h>
+
+int main()
+{
+  primesieve_iterator it;
+  primesieve_init(&it);
+
+  /* primesieve_skipto(&it, start, stop_hint) */
+  primesieve_skipto(&it, 1000, 1100);
+  uint64_t prime;
+
+  /* Iterate over primes from ]1000, 1100] */
   while ((prime = primesieve_next_prime(&it)) <= 1100)
     printf("%" PRIu64 "\n", prime);
 
