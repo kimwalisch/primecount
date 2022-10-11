@@ -129,6 +129,39 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
+## ```primesieve::iterator::skipto()``` <sub><sup>*(removed in primesieve-9.0)*</sup></sub>
+
+Similar to ```primesieve::iterator::jump_to()```, the ```primesieve::iterator::skipto()```
+method changes the start number of the ```primesieve::iterator``` object. However, when
+calling ```next_prime()``` or ```prev_prime()``` for the first time the start number will
+be excluded. Hence ```next_prime()``` will generate primes > start and ```prev_prime()```
+will generate primes < start. ```primesieve::iterator::skipto()``` has been replaced by
+```primesieve::iterator::jump_to()``` in primesieve-9.0, because the use of the
+```skipto()``` method required to correct the start number in most cases using e.g.
+```iter.skipto(start-1, stop)```.
+
+```C++
+#include <primesieve.hpp>
+#include <iostream>
+
+int main()
+{
+  primesieve::iterator it;
+
+  // Iterate over primes > 13
+  it.skipto(13);
+  uint64_t prime = it.next_prime();
+
+  // Iterate over primes from ]13, 1100]
+  for (; prime <= 1100; prime = it.next_prime())
+    std::cout << prime << std::endl;
+
+  return 0;
+}
+```
+
+* [Build instructions](#compiling-and-linking)
+
 ## ```primesieve::iterator::prev_prime()```
 
 Before using ```primesieve::iterator::prev_prime()``` you must change the start number
