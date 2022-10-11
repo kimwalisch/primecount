@@ -20,7 +20,7 @@ more detailed information.
 ## Contents
 
 * [```primesieve_next_prime()```](#primesieve_next_prime)
-* [```primesieve_jump_to()```](#primesieve_jump_to)
+* [```primesieve_jump_to()```](#primesieve_jump_to-since-primesieve-90)
 * [```primesieve_prev_prime()```](#primesieve_prev_prime)
 * [```primesieve_generate_primes()```](#primesieve_generate_primes)
 * [```primesieve_generate_n_primes()```](#primesieve_generate_n_primes)
