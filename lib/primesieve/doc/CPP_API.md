@@ -20,7 +20,7 @@ more detailed information.
 ## Contents
 
 * [```primesieve::iterator::next_prime()```](#primesieveiteratornext_prime)
-* [```primesieve::iterator::jump_to()```](#primesieveiteratorjump_to)
+* [```primesieve::iterator::jump_to()```](#primesieveiteratorjump_to-since-primesieve-90)
 * [```primesieve::iterator::prev_prime()```](#primesieveiteratorprev_prime)
 * [```primesieve::generate_primes()```](#primesievegenerate_primes)
 * [```primesieve::generate_n_primes()```](#primesievegenerate_n_primes)
