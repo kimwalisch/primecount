@@ -69,11 +69,15 @@ int main()
 
 * [Build instructions](#compiling-and-linking)
 
-## ```primesieve::iterator::jump_to()```
+## ```primesieve::iterator::jump_to()``` <sub><sup>*(since primesieve-9.0)*</sup></sub>
 
 This method changes the start number of the ```primesieve::iterator``` object. (By default
 the start number is initialized to 0). Note that you can also specify the start number in
 the constructor of the ```primesieve::iterator``` object.
+
+* The first ```next_prime()``` invocation after ```jump_to()``` returns the first
+  prime ≥ start number. If want to generate primes > start number you need to use e.g.
+  ```jump_to(start+1, stop)```.
 
 ```C++
 #include <primesieve.hpp>
