@@ -72,7 +72,7 @@ public:
                int64_t z,
                int threads)
   {
-    if (z > max())
+    if_unlikely(z > max())
       throw primecount_error("z must be <= FactorTable::max()");
 
     z = std::max<int64_t>(1, z);

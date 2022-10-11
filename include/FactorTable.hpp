@@ -68,7 +68,7 @@ public:
   /// Factor numbers <= y
   FactorTable(int64_t y, int threads)
   {
-    if (y > max())
+    if_unlikely(y > max())
       throw primecount_error("y must be <= FactorTable::max()");
 
     y = std::max<int64_t>(1, y);

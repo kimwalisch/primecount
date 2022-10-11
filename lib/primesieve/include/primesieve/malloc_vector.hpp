@@ -128,7 +128,7 @@ private:
     // https://en.cppreference.com/w/c/memory/realloc
     T* new_array = (T*) realloc((void*) array_, new_capacity * sizeof(T));
 
-    if (!new_array)
+    if_unlikely(!new_array)
       throw std::bad_alloc();
 
     array_ = new_array;

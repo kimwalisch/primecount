@@ -19,6 +19,7 @@
 #include <primesieve/MemoryPool.hpp>
 #include <primesieve/config.hpp>
 #include <primesieve/Bucket.hpp>
+#include <primesieve/macros.hpp>
 #include <primesieve/pod_vector.hpp>
 #include <primesieve/primesieve_error.hpp>
 
@@ -76,7 +77,7 @@ void MemoryPool::allocateBuckets()
   void* ptr = (void*) memory_.back().data();
 
   // Align pointer address to sizeof(Bucket)
-  if (!std::align(sizeof(Bucket), sizeof(Bucket), ptr, bytes))
+  if_unlikely(!std::align(sizeof(Bucket), sizeof(Bucket), ptr, bytes))
     throw primesieve_error("MemoryPool: failed to align memory!");
 
   count_ = bytes / sizeof(Bucket);
@@ -87,10 +88,9 @@ void MemoryPool::initBuckets(void* alignedPtr)
 {
   Bucket* buckets = (Bucket*) alignedPtr;
 
-  if ((std::size_t) buckets % sizeof(Bucket) != 0)
+  if_unlikely((std::size_t) buckets % sizeof(Bucket) != 0)
     throw primesieve_error("MemoryPool: failed to align memory!");
-
-  if (count_ < 10)
+  if_unlikely(count_ < 10)
     throw primesieve_error("MemoryPool: insufficient buckets allocated!");
 
   for (std::size_t i = 0; i < count_ - 1; i++)

@@ -9,7 +9,7 @@
 ///        Xavier Gourdon formula:
 ///        pi(x) = A - B + C + D + Phi0 + Sigma
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,6 +19,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
 #include <to_string.hpp>
@@ -99,7 +100,7 @@ int128_t pi_gourdon_128(int128_t x,
   double alpha_z = alpha.second;
   maxint_t limit = get_max_x(alpha_y);
 
-  if (x > limit)
+  if_unlikely(x > limit)
     throw primecount_error("pi(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);

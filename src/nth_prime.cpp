@@ -14,6 +14,7 @@
 #include <PiTable.hpp>
 #include <pod_vector.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -79,10 +80,9 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  if (n < 1)
+  if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
-
-  if (n > max_n)
+  if_unlikely(n > max_n)
     throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
   // For tiny n <= 169
