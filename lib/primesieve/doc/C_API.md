@@ -119,7 +119,7 @@ the start number will be excluded. Hence ```primesieve_next_prime()``` will gene
 primes > start and ```primesieve_prev_prime()``` will generate primes < start.
 ```primesieve_skipto()``` has been deprecated in primesieve-9.0 in favor of
 ```primesieve_jump_to()```, because the use of ```primesieve_skipto()``` requires to
-correct the start number most of the time using e.g.
+correct the start number in most cases using e.g.
 ```primesieve_skipto(iter, start-1, stop)```.
 
 ```C
