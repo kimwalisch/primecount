@@ -343,10 +343,10 @@ space. In 1870 E. D. F. Meissel improved Legendre's formula by setting $a=\pi(\s
 and by adding the correction term $\mathrm{P_2}(x,a)$ Meissel's formula has a running time
 of $O(x/\log^3{x})$ operations and uses $O(\sqrt{x}/\log{x})$ space. In 1959 D. H. Lehmer
 extended Meissel's formula and slightly improved the running time to $O(x/\log^4{x})$
-operations and $O(x^{3/8})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
+operations and $O(x^{\frac{3}{8}})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
 Odlyzko published a new algorithm based on Meissel's formula which has a lower runtime
-complexity of $O(x^{2/3}/\log{x})$ operations and which uses only $O(\sqrt[3]{x}\ \log^2{x})$
-space.
+complexity of $O(x^{\frac{2}{3}}/\log{x})$ operations and which uses only
+$O(\sqrt[3]{x}\ \log^2{x})$ space.
 
 primecount's Legendre, Meissel and Lehmer implementations are based
 on Hans Riesel's book <a href="doc/References.md">[5]</a>,
@@ -375,7 +375,7 @@ and then count the primes up to this guess using the prime counting function.
 Once this is done one starts sieving (e.g. using the segmented sieve of
 Eratosthenes) from there on until one finds the actual nth prime. The author
 has implemented ```primecount::nth_prime(n)``` this way
-(option: ```--nth-prime```), it finds the nth prime in $O(x^{2/3}/\log^2{x})$
+(option: ```--nth-prime```), it finds the nth prime in $O(x^{\frac{2}{3}}/\log^2{x})$
 operations using $O(\sqrt{x})$ space.
 
 ## C API
