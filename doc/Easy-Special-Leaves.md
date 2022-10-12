@@ -25,7 +25,7 @@ Here are links to primecount's [PiTable](https://github.com/kimwalisch/primecoun
 The ```SegmentedPrimePi[n]``` lookup table is accessed very frequently in the computation of the easy special leaves (about once for each
 easy special leaf) and these memory accesses are non sequential. It is therefore important that the ```SegmentedPrimePi[n]``` fits into
 the CPU's fast cache memory. While Xavier Gourdon's smaller segment size is already considerably smaller it is still too large for new
-record computations. For this reason I suggest using an **even smaller segment size of $\sqrt[4]{x}$** for the computation of the easy
+record computations. For this reason I suggest using an even smaller segment size of $\sqrt[4]{x}$ for the computation of the easy
 special leaves. With a segment size of $\sqrt[4]{x}$ the ```SegmentedPrimePi[n]``` lookup table fits into the CPU's cache even for record
 computations e.g. at $10^{30}$ the ```SegmentedPrimePi[n]``` is only about 2 MiB in primecount. A segment
 size of $\sqrt[4]{x}$ does not deteriorate the runtime complexity of the algorithm because the segmented sieve of Eratosthenes which is
@@ -57,8 +57,8 @@ scale well on current CPU architectures if they accomplish the 3 properties be
 * The work must be distributed evenly among all threads in order to avoid load imbalance.
 
 A segment size of $\sqrt[4]{x}$ already accomplishes the first property. So next we have to design our parallel algorithm in a way that
-all threads are independent from each other. Luckily Xavier Gourdon [[3]](#references) already devised an idea for how to do this: **at the start of
-each new segment [low, low + segment_size[ each thread computes ```PrimePi(low)``` using a prime counting function implementation**
+all threads are independent from each other. Luckily Xavier Gourdon [[3]](#references) already devised an idea for how to do this: at the start of
+each new segment [low, low + segment_size[ each thread computes ```PrimePi(low)``` using a prime counting function implementation
 in $O(low^{\frac{2}{3}})$ or less. The result of ```PrimePi(low)``` is required to initialize the ```SegmentedPrimePi[n]``` lookup table
 for the current segment [low, low + segment_size[. This algorithm has been implemented in primecount-7.0
 (see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp), [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp)), it improved performance
