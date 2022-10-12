@@ -334,33 +334,18 @@ sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
   </tr>
 </table>
 
-Up until the early 19th century the most efficient known method for
-counting primes was the sieve of Eratosthenes which has a running time of
-<img src="https://kimwalisch.github.io/primecount/formulas/Oxloglogx.svg" height="20" align="absmiddle"/>
-operations. The first improvement to this bound was Legendre's formula
-(1830) which uses the inclusion-exclusion principle to calculate the
-number of primes below x without enumerating the individual primes.
-Legendre's formula has a running time of
-<img src="https://kimwalisch.github.io/primecount/formulas/Ox.svg" height="20" align="absmiddle"/>
-operations and uses
-<img src="http://kimwalisch.github.io/primecount/formulas/Osqrtx.svg" height="20" align="absmiddle"/>
-space. In 1870 E. D. F. Meissel improved Legendre's formula by setting
-<img src="https://kimwalisch.github.io/primecount/formulas/apisqrt3x.svg" height="20" align="absmiddle"/>
-and by adding the correction term
-<img src="https://kimwalisch.github.io/primecount/formulas/P2xa.svg" height="20" align="absmiddle"/>.
-Meissel's formula has a running time of
-<img src="https://kimwalisch.github.io/primecount/formulas/Omeissel.svg" height="20" align="absmiddle"/>
-operations and uses
-<img src="https://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
-space. In 1959 D. H. Lehmer extended Meissel's formula and slightly improved the running time to
-<img src="https://kimwalisch.github.io/primecount/formulas/Olehmer.svg" height="20" align="absmiddle"/>
-operations and
-<img src="https://kimwalisch.github.io/primecount/formulas/Osqrtxlogx.svg" height="20" align="absmiddle"/>
-space. In 1985 J. C. Lagarias, V. S. Miller and A. M. Odlyzko published a new
-algorithm based on Meissel's formula which has a lower runtime complexity of
-<img src="https://kimwalisch.github.io/primecount/formulas/Oroot23xlogx.svg" height="20" align="absmiddle"/>
-operations and which uses only
-<img src="https://kimwalisch.github.io/primecount/formulas/Osqrt3xlog2x.svg" height="20" align="absmiddle"/>
+Up until the early 19th century the most efficient known method for counting primes was the
+sieve of Eratosthenes which has a running time of $O(x\log{\log{x}})$ operations. The first
+improvement to this bound was Legendre's formula (1830) which uses the inclusion-exclusion
+principle to calculate the number of primes below x without enumerating the individual
+primes. Legendre's formula has a running time of $O(x)$ operations and uses $O(\sqrt{x})$
+space. In 1870 E. D. F. Meissel improved Legendre's formula by setting $a=\pi(\sqrt[3]{x})$
+and by adding the correction term $\mathrm{P_2}(x,a)$ Meissel's formula has a running time
+of $O(x/\log^3{x})$ operations and uses $O(\sqrt{x}/\log{x})$ space. In 1959 D. H. Lehmer
+extended Meissel's formula and slightly improved the running time to $O(x/\log^4{x})$
+operations and $O(\sqrt{x}/\log{x})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
+Odlyzko published a new algorithm based on Meissel's formula which has a lower runtime
+complexity of $O(x^{2/3}/\log{x})$ operations and which uses only $O(\sqrt[3]{x}\ \log^2{x})$
 space.
 
 primecount's Legendre, Meissel and Lehmer implementations are based
@@ -393,11 +378,8 @@ and then count the primes up to this guess using the prime counting
 function. Once this is done one starts sieving (e.g. using the
 segmented sieve of Eratosthenes) from there on until one finds the
 actual nth prime. The author has implemented ```primecount::nth_prime(n)```
-this way (option: ```--nth-prime```), it finds the nth prime in
-<img src="https://kimwalisch.github.io/primecount/formulas/Oroot23xlog2x.svg" height="20" align="absmiddle"/>
-operations using
-<img src="https://kimwalisch.github.io/primecount/formulas/Opisqrtx.svg" height="20" align="absmiddle"/>
-space.
+this way (option: ```--nth-prime```), it finds the nth prime in $O(x^{2/3}/\log^2{x})$
+operations using $O(\sqrt{x})$ space.
 
 ## C API
 
