@@ -343,7 +343,7 @@ space. In 1870 E. D. F. Meissel improved Legendre's formula by setting $a=\pi(\s
 and by adding the correction term $\mathrm{P_2}(x,a)$ Meissel's formula has a running time
 of $O(x/\log^3{x})$ operations and uses $O(\sqrt{x}/\log{x})$ space. In 1959 D. H. Lehmer
 extended Meissel's formula and slightly improved the running time to $O(x/\log^4{x})$
-operations and $O(\sqrt{x}/\log{x})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
+operations and $O(x^{3/8})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
 Odlyzko published a new algorithm based on Meissel's formula which has a lower runtime
 complexity of $O(x^{2/3}/\log{x})$ operations and which uses only $O(\sqrt[3]{x}\ \log^2{x})$
 space.
