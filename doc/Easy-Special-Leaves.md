@@ -14,7 +14,7 @@ So instead of using a ```PrimePi[n]``` lookup table of size $\sqrt{x}$ we now 
 y which also returns the number of primes ≤ n but requires n to be within the current segment [low, low + y[. This approach was
 used in primecount up to version 6.4. However this segment size causes severe scaling issues for large computations > $10^{22}$ as the
 ```SegmentedPrimePi[n]``` lookup table becomes exceedingly large e.g. at $10^{30}$ its size was 137 GiB in primecount. For this reason
-Xavier Gourdon [[3]](#references) suggested using a smaller segment size of $\sqrt{\frac{x}{y}}$ which is orders of magnitude
+Xavier Gourdon [[3]](#references) suggested using a smaller segment size of $\sqrt{x/y\ }$ which is orders of magnitude
 smaller and generally a good practical improvement.
 
 Here are links to primecount's [PiTable](https://github.com/kimwalisch/primecount/blob/master/src/PiTable.cpp) and
