@@ -318,15 +318,15 @@ sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
 <table>
   <tr>
     <td>Legendre's Formula</td>
-    <td>$\pi(x)=\pi(\sqrt{x})+\mathrm{phi}(x,\pi(\sqrt{x}))-1$</td>
+    <td>$\pi(x)=\pi(\sqrt{x})+\phi(x,\pi(\sqrt{x}))-1$</td>
   </tr>
   <tr>
     <td>Meissel's Formula</td>
-    <td>$\pi(x)=\pi(\sqrt[3]{x})+\mathrm{phi}(x,\pi(\sqrt[3]{x}))-\mathrm{P_2}(x,\pi(\sqrt[3]{x}))-1$</td>
+    <td>$\pi(x)=\pi(\sqrt[3]{x})+\phi(x,\pi(\sqrt[3]{x}))-\mathrm{P_2}(x,\pi(\sqrt[3]{x}))-1$</td>
   </tr>
   <tr>
     <td>Lehmer's Formula</td>
-    <td>$\pi(x)=\pi(\sqrt[4]{x})+\mathrm{phi}(x,\pi(\sqrt[4]{x}))-\mathrm{P_2}(x,\pi(\sqrt[4]{x}))-\mathrm{P_3}(x,\pi(\sqrt[4]{x}))-1$</td>
+    <td>$\pi(x)=\pi(\sqrt[4]{x})+\phi(x,\pi(\sqrt[4]{x}))-\mathrm{P_2}(x,\pi(\sqrt[4]{x}))-\mathrm{P_3}(x,\pi(\sqrt[4]{x}))-1$</td>
   </tr>
   <tr>
     <td>LMO Formula</td>
