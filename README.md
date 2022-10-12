@@ -278,10 +278,10 @@ Advanced options for Xavier Gourdon's algorithm:
 
 The benchmarks above were run on an AMD 7R32 CPU (from 2020) with 16 cores/32 threads
 clocked at 3.30GHz. Note that Jan Büthe mentions in <a href="doc/References.md">[11]</a>
-that he computed pi(10<sup>25</sup>) in 40,000 CPU core hours using the analytic prime
+that he computed $\pi(10^{25})$ in 40,000 CPU core hours using the analytic prime
 counting function algorithm. Büthe also mentions that by using additional zeros of the
 zeta function the runtime could have potentially been reduced to 4,000 CPU core hours.
-However using primecount and Xavier Gourdon's algorithm pi(10<sup>25</sup>) can be computed
+However using primecount and Xavier Gourdon's algorithm $\pi(10^{25})$ can be computed
 in only 460 CPU core hours on an AMD Ryzen 3950X CPU!
 
 ## Performance tips
