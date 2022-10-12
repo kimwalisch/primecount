@@ -40,7 +40,7 @@ are computationally expensive using a segment size of $\sqrt[4]{x}$ in order to 
 the programmer it is best to sieve the interval $[0, \sqrt{x}[$ only once and compute all easy special leaf formulas within that sieve.
 
 Extra care needs to be used when segmenting the formulas that compute consecutive identical easy leaves more efficiently, sometimes these
-leaves are named clustered easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the W3 and W5 formulas compute clustered easy
+leaves are named clustered easy leaves [[4]](#references). In the Deleglise-Rivat algorithm the $W_3$ and $W_5$ formulas compute clustered easy
 leaves. These formulas need to access ```PrimePi[n]``` values with n ≤ y, but some of these memory accesses (i.e. those that compute how
 many consecutive leaves are identical) may be outside of the segment [low, low + segment_size[. For these memory accesses I suggest using
 a ```PrimePi[n]``` lookup table of size y instead of the ```SegmentedPrimePi[n]``` lookup table. Note that it is important for performance
