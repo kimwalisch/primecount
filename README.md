@@ -367,18 +367,15 @@ implementation also contain significant improvements.
 
 ## Fast nth prime calculation
 
-The most efficient known method for calculating the nth prime is a
-combination of the prime counting function and a prime sieve. The idea
-is to closely approximate the nth prime (e.g. using the inverse
-logarithmic integral
-<img src="https://kimwalisch.github.io/primecount/formulas/Li-1n.svg" height="20" align="absmiddle"/>
-or the inverse Riemann R function
-<img src="https://kimwalisch.github.io/primecount/formulas/RiemannR-1.svgz" height="20" align="absmiddle"/>)
-and then count the primes up to this guess using the prime counting
-function. Once this is done one starts sieving (e.g. using the
-segmented sieve of Eratosthenes) from there on until one finds the
-actual nth prime. The author has implemented ```primecount::nth_prime(n)```
-this way (option: ```--nth-prime```), it finds the nth prime in $O(x^{2/3}/\log^2{x})$
+The most efficient known method for calculating the nth prime is a combination
+of the prime counting function and a prime sieve. The idea is to closely
+approximate the nth prime e.g. using the inverse logarithmic integral
+$\mathrm{Li}^{-1}(n)$ or the inverse Riemann R function $\mathrm{R}^{-1}(n)$
+and then count the primes up to this guess using the prime counting function.
+Once this is done one starts sieving (e.g. using the segmented sieve of
+Eratosthenes) from there on until one finds the actual nth prime. The author
+has implemented ```primecount::nth_prime(n)``` this way
+(option: ```--nth-prime```), it finds the nth prime in $O(x^{2/3}/\log^2{x})$
 operations using $O(\sqrt{x})$ space.
 
 ## C API
