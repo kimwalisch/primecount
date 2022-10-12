@@ -4,7 +4,7 @@
 ///        These tests are also used (by the author) for
 ///        benchmarking code changes.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,7 +24,6 @@
 #include <exception>
 #include <random>
 #include <sstream>
-#include <string>
 
 using namespace primecount;
 
@@ -99,7 +98,7 @@ using namespace primecount;
 
 namespace {
 
-void check_equal(const std::string& f1,
+void check_equal(const char* f1,
                  int64_t x,
                  int64_t res1,
                  int64_t res2)

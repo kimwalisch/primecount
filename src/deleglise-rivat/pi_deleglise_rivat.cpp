@@ -13,7 +13,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,6 +24,7 @@
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <print.hpp>
 #include <S.hpp>
 #include <to_string.hpp>
@@ -112,7 +113,7 @@ int128_t pi_deleglise_rivat_128(int128_t x,
   double alpha = get_alpha_deleglise_rivat(x);
   maxint_t limit = get_max_x(alpha);
 
-  if (x > limit)
+  if_unlikely(x > limit)
     throw primecount_error("pi(x): x must be <= " + to_string(limit));
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);

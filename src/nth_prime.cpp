@@ -14,6 +14,7 @@
 #include <PiTable.hpp>
 #include <pod_vector.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -79,10 +80,9 @@ namespace primecount {
 ///
 int64_t nth_prime(int64_t n, int threads)
 {
-  if (n < 1)
+  if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
-
-  if (n > max_n)
+  if_unlikely(n > max_n)
     throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
   // For tiny n <= 169
@@ -112,7 +112,7 @@ int64_t nth_prime(int64_t n, int threads)
   // we simply iterate over the primes until we find it.
   if (count_approx < n)
   {
-    uint64_t start = prime_approx;
+    uint64_t start = prime_approx + 1;
     uint64_t stop = start + (n - count_approx) * avg_prime_gap;
     primesieve::iterator iter(start, stop);
     for (int64_t i = count_approx; i < n; i++)
@@ -120,7 +120,7 @@ int64_t nth_prime(int64_t n, int threads)
   }
   else // if (count_approx >= n)
   {
-    uint64_t start = prime_approx + 1;
+    uint64_t start = prime_approx;
     uint64_t stop = start - (count_approx - n) * avg_prime_gap;
     primesieve::iterator iter(start, stop);
     for (int64_t i = count_approx; i + 1 > n; i--)

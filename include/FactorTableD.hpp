@@ -72,7 +72,7 @@ public:
                int64_t z,
                int threads)
   {
-    if (z > max())
+    if_unlikely(z > max())
       throw primecount_error("z must be <= FactorTable::max()");
 
     z = std::max<int64_t>(1, z);
@@ -108,7 +108,7 @@ public:
         int64_t size = (to_index(high) + 1) - low_idx;
         std::fill_n(&factor_[low_idx], size, T_MAX);
 
-        int64_t start = first_coprime() - 1;
+        int64_t start = first_coprime();
         int64_t stop = high / first_coprime();
         int64_t min_m = first_coprime() * first_coprime();
         primesieve::iterator it(start, stop);
@@ -153,11 +153,11 @@ public:
           }
         }
 
-        start = std::max(start, y);
+        y = std::max(start, y);
 
-        if (start < high)
+        if (y < high)
         {
-          it.skipto(start, high);
+          it.jump_to(y + 1, high);
 
           // y < prime <= z
           while (true)

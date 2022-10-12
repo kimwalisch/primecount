@@ -10,6 +10,7 @@ Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/m
 which can be computed in O(1) using a ```PrimePi``` lookup table, the computation of
 the hard special leaves requires evaluating the partial sieve function phi(x, a) which
 generally cannot be computed in O(1).
+
 [primecount's implementation](https://github.com/kimwalisch/primecount/blob/master/src/deleglise-rivat/S2_hard.cpp)
 of the hard special leaves formula is different from the algorithms that have
 been described in any of the combinatorial prime counting papers so far. This document
@@ -17,7 +18,13 @@ describes the history of how primecount's implementation came to be and it descr
 an alternative counting method that I have devised in February 2020. This alternative
 counting method improves the balancing of sieve and count operations in the hard special
 leaf algorithm and thereby improves its runtime complexity by a factor of at least
-O(log log x).
+O(log log x). The alternative counting method uses a new tree-like data structure with
+fewer than O(log z) levels (tree depth) where each node has O(z^(1/levels)) children.
+This data structure is used instead of the binary indexed tree (a.k.a. Fenwick tree)
+that has been used for counting in all previously published papers about the
+combinatorial type prime counting algorithms.
+
+## Basic algorithm
 
 Implementing the hard special leaves formula requires use of a prime sieve. The algorithm
 is basically a modified version of the well known
@@ -245,16 +252,25 @@ void Sieve::allocate_counter(uint64_t segment_low)
 
 ## Multiple levels of counters
 
-It is also possible to use multiple levels of counters. As an example, let's consider
-the case of 3 counter levels for which we will need to use 3 - 1 = 2 counter arrays.
-We only need to use 2 counter arrays because for the last level we will count the
-number of unsieved elements by iterating over the sieve array. For each level the size
-of the counter array can be calculated using segment_size^(level/levels) and the
-interval size of the counter array's elements can be calculated using
-segment_size^((levels - level) / levels). Hence our first counter array (1st level) is
-coarse-grained, its elements span over large intervals of size O(segment_size^(2/3)).
-This means that each element of the first counter array contains the current number of
-unsieved elements in the interval
+It is also possible to use multiple levels of counters, in this case the data
+structure becomes a tree where each node has O(segment_size^(1 / levels)) children
+and each node stores the current number of unsieved elements in an interval of
+size O(segment_size^((levels - level) / levels)) from the sieve array. The last
+level of this tree corresponds to the sieve array used in the algorithm. Just
+like in the original algorithm with the binary index tree (a.k.a Fenwick tree),
+we can count the number of unsieved elements ≤ n in the sieve array using the
+new tree-like data structure by traversing the tree from the root node to the
+bottom and summing the current number of unsieved elements stored in each node.
+
+As an example, let's consider the case of 3 counter levels for which we will need to
+use 3 - 1 = 2 counter arrays. We only need to use 2 counter arrays because for the
+last level we will count the number of unsieved elements by iterating over the sieve
+array. For each level the size of the counter array can be calculated using
+segment_size^(level/levels) and the interval size of the counter array's elements
+can be calculated using segment_size^((levels - level) / levels). Hence our first
+counter array (1st level) is coarse-grained, its elements span over large intervals
+of size O(segment_size^(2/3)). This means that each element of the first counter
+array contains the current number of unsieved elements in the interval
 [i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array (2nd
 level) is more fine-grained, its elements span over smaller intervals of size
 O(segment_size^(1/3)). Hence each element of the second counter array contains the

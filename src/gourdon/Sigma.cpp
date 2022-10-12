@@ -66,7 +66,7 @@ T Sigma456(T x,
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrt_xy = isqrt(x / y);
-  primesieve::iterator it(x_star, x13);
+  primesieve::iterator it(x_star + 1, x13);
   int64_t prime = it.next_prime();
 
   // Sigma4: x_star < prime <= sqrt(x / y)

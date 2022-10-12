@@ -54,7 +54,7 @@ T S2_trivial(T x,
   if (start >= y)
     return 0;
 
-  primesieve::iterator it(start - 1, y);
+  primesieve::iterator it(start, y);
   T sum = 0;
   int64_t prime;
 

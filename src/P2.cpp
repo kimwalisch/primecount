@@ -46,7 +46,7 @@ T P2_thread(T x,
   int64_t sqrtx = isqrt(x);
   int64_t start = max(y, min(x / high, sqrtx));
   int64_t stop = min(x / low, sqrtx);
-  primesieve::iterator it1(stop + 1, start);
+  primesieve::iterator it1(stop, start);
   int64_t prime = it1.prev_prime();
 
   if (prime <= start)
@@ -62,7 +62,7 @@ T P2_thread(T x,
 
   // All other iterations compute pi(x / prime)
   // using a prime sieve.
-  primesieve::iterator it2(xp, high);
+  primesieve::iterator it2(xp + 1, high);
   it2.generate_next_primes();
 
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
