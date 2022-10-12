@@ -318,19 +318,19 @@ sudo bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
 <table>
   <tr>
     <td>Legendre's Formula</td>
-    <td><img src="https://kimwalisch.github.io/primecount/formulas/pi_legendre.svg" height="20" align="absmiddle"/></td>
+    <td>$\pi(x)=\pi(\sqrt{x})+\mathrm{phi}(x,\pi(\sqrt{x}))-1$</td>
   </tr>
   <tr>
     <td>Meissel's Formula</td>
-    <td><img src="https://kimwalisch.github.io/primecount/formulas/pi_meissel.svg" height="20" align="absmiddle"/></td>
+    <td>$\pi(x)=\pi(\sqrt[3]{x})+\mathrm{phi}(x,\pi(\sqrt[3]{x}))-\mathrm{P_2}(x,\pi(\sqrt[3]{x}))-1$</td>
   </tr>
   <tr>
     <td>Lehmer's Formula</td>
-    <td><img src="https://kimwalisch.github.io/primecount/formulas/pi_lehmer.svg" height="20" align="absmiddle"/></td>
+    <td>$\pi(x)=\pi(\sqrt[4]{x})+\mathrm{phi}(x,\pi(\sqrt[4]{x}))-\mathrm{P_2}(x,\pi(\sqrt[4]{x}))-\mathrm{P_3}(x,\pi(\sqrt[4]{x}))-1$</td>
   </tr>
   <tr>
     <td>LMO Formula</td>
-    <td><img src="https://kimwalisch.github.io/primecount/formulas/pi_lmo.svg" height="20" align="absmiddle"/></td>
+    <td>$\pi(x)=\pi(\sqrt[3]{x})+\mathrm{S_1}(x,\pi(\sqrt[3]{x}))+\mathrm{S_2}(x,\pi(\sqrt[3]{x}))-\mathrm{P_2}(x,\pi(\sqrt[3]{x}))-1$</td>
   </tr>
 </table>
 
