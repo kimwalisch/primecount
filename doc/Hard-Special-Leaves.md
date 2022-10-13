@@ -474,7 +474,7 @@ individual segments and I also don't know how much this would improve the runtim
   sieve array using the POPCNT instruction. The use of the POPCNT instruction allows counting
   many unsieved elements (1-bits) using a single instruction. In primecount each POPCNT
   instruction counts the number of unsieved elements within the next 8 bytes of the sieve array
-  and these 8 bytes correspond to an interval of size 8 * 30 = 240. When using multiple counter
+  and these 8 bytes correspond to an interval of size $8\times 30 = 240$. When using multiple counter
   levels, it is important for performance that on average the same number of count operations is
   executed on each level. However, using the POPCNT instruction dramatically reduces the number
   of count operations on the last level and hence causes a significant imbalance. To fix this
