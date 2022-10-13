@@ -130,7 +130,7 @@ of the algorithm.
 So now that we have identified the problem, we can think about whether it is possible
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: We add a
-**counter array** to our sieving algorithm. The counter array has a size of
+counter array to our sieving algorithm. The counter array has a size of
 $O(\sqrt{segment\ size})$, with $segment\ size = \sqrt{z}$. Each element of the counter array
 contains the current count of unsieved elements in the sieve array for the interval
 $[i\times \sqrt{segment\ size}, (i+1)\times \sqrt{segment\ size}[$. Similar to the algorithm with the
@@ -412,7 +412,7 @@ count operations per leaf becomes $O(l\times \sqrt[l]{z})$ which is smaller than
 $O(\log^{2}{x})$ since:
 
 $l\times \sqrt[l]{z} < \log^{2}{x}$  
-$\Leftrightarrow \log{z}\ /\log{\log{x}}\times z^{\log{\log{x}}\ /\log{z}} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}\ /\log{\log{x}}\times z^{\log{\log{x}}/\log{z}} < \log^{2}{x}$  
 $\Leftrightarrow \log{z}\ /\log{\log{x}}\times \sqrt[\log{z}]{z}^{\log{\log{x}}} < \log^{2}{x}$  
 $\Leftrightarrow \log{z}\ /\log{\log{x}}\times e^{\log{\log{x}}} < \log^{2}{x}$  
 $\Leftrightarrow \log{z}\ /\log{\log{x}}\times \log{x} < \log^{2}{x}$  
