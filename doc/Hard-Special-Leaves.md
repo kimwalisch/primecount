@@ -7,9 +7,9 @@ The combinatorial type prime counting algorithms
 consist of many formulas and the formula that usually takes longest to compute and
 is by far the most difficult to implement is the formula of the so-called hard special leaves.
 Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md),
-which can be computed in O(1) using a ```PrimePi``` lookup table, the computation of
-the hard special leaves requires evaluating the partial sieve function phi(x, a) which
-generally cannot be computed in O(1).
+which can be computed in $O(1)$ using a $\pi(x)$ lookup table, the computation of
+the hard special leaves requires evaluating the partial sieve function $\phi(x, a)$ which
+generally cannot be computed in $O(1)$.
 
 [primecount's implementation](https://github.com/kimwalisch/primecount/blob/master/src/deleglise-rivat/S2_hard.cpp)
 of the hard special leaves formula is different from the algorithms that have
@@ -18,8 +18,8 @@ describes the history of how primecount's implementation came to be and it descr
 an alternative counting method that I have devised in February 2020. This alternative
 counting method improves the balancing of sieve and count operations in the hard special
 leaf algorithm and thereby improves its runtime complexity by a factor of at least
-O(log log x). The alternative counting method uses a new tree-like data structure with
-fewer than O(log z) levels (tree depth) where each node has O(z^(1/levels)) children.
+$O(\log{\log{x}})$. The alternative counting method uses a new tree-like data structure with
+fewer than $O(\log{z})$ levels (tree depth) where each node has O(z^(1/levels)) children.
 This data structure is used instead of the binary indexed tree (a.k.a. Fenwick tree)
 that has been used for counting in all previously published papers about the
 combinatorial type prime counting algorithms.
@@ -41,9 +41,9 @@ unsieved elements in the sieve array Lagarias-Miller-Odlyzko [[1]](#References)
 have suggested using a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree)
 data structure (a.k.a. Fenwick tree) to speedup counting.
 For any number n the binary indexed tree allows to count the number of unsieved
-elements ≤ n using only O(log n) operations. However the binary indexed tree
+elements ≤ n using only $O(\log{n})$ operations. However the binary indexed tree
 must also be updated whilst sieving which slows down the sieving part of the
-algorithm by a factor of O(log n / log log n) operations. All more recent papers about
+algorithm by a factor of $O(\log{n}/\log{\log{n}})$ operations. All more recent papers about
 the combinatorial type prime counting algorithms that I am aware of have also suggested
 using the binary indexed tree data structure for counting the number of unsieved
 elements in the sieve array.
@@ -77,7 +77,7 @@ implemented any of the combinatorial prime counting algorithms
 [Kim Walisch 2014](https://github.com/kimwalisch/primecount)) have avoided using
 the binary indexed tree and implemented something else. The method that has turned
 out to perform best so far is to get rid of the binary indexed tree data structure,
-which speeds up the sieving part of the algorithm by a factor of O(log n / log log n)
+which speeds up the sieving part of the algorithm by a factor of $O(\log{n}/\log{\log{n}})$
 and count the number of unsieved elements by simply iterating over the sieve array.
 
 There are many known optimizations that can be used to speedup counting:
@@ -106,8 +106,8 @@ a single instruction improves the runtime complexity by a large constant factor,
 in primecount this constant factor is 240. OK, so despite the worse runtime
 complexity everything is great?! Unfortunately not, primecount's implementation of
 the hard special leaves formula which used the alternative method described above
-starts scaling badly above 10^23. For record computations this became a serious
-issue e.g. I had initially expected the computation of PrimePi(10^28) to take
+starts scaling badly above $10^{23}$. For record computations this became a serious
+issue e.g. I had initially expected the computation of $\pi(10^{28})$ to take
 about 8 months, however it ended up taking 2.5 years!
 
 ## Improved alternative counting method
@@ -119,10 +119,10 @@ the number of unsieved elements works great. However when there are very few
 consecutive leaves in the current segment our method becomes inefficient. In order
 to compute the special leaves we need to sieve up to some limit z. Since we are
 using a modified version of the segmented sieve of Eratosthenes the size of the
-sieve array will be O(sqrt(z)). This means that if e.g. there is a single leaf in the
-current segment we will use O(sqrt(z)) operations to count the number of unsieved
+sieve array will be $O(\sqrt{z})$. This means that if e.g. there is a single leaf in the
+current segment we will use $O(\sqrt{z})$ operations to count the number of unsieved
 elements in the sieve array whereas the binary indexed tree would have used only
-O(log z) operations. This is too much, this deteriorates the runtime complexity
+$O(\log{z})$ operations. This is too much, this deteriorates the runtime complexity
 of the algorithm.
 
 <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_2_counter_levels.svg">
@@ -131,7 +131,7 @@ So now that we have identified the problem, we can think about whether it is pos
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: We add a
 **counter array** to our sieving algorithm. The counter array has a size of
-O(segment_size^(1/2)), with segment_size = sqrt(z). Each element of the counter array
+O(segment_size^(1/2)), with segment_size = $\sqrt{z}$. Each element of the counter array
 contains the current count of unsieved elements in the sieve array for the interval
 [i * segment_size^(1/2), (i + 1) * segment_size^(1/2)[. Similar to the algorithm with the
 binary indexed tree data structure this counter array must be updated whilst sieving
@@ -139,7 +139,7 @@ i.e. whenever an element is crossed off for the first time in the sieve array we
 to decrement the corresponding counter element. However since we only need to decrement
 at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
-tree which deteriorates sieving by a factor of log z / log log z). I have to give credit
+tree which deteriorates sieving by a factor of $\log{z}/\log{\log{z}}$). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
 chose a counter array size of O(segment_size) with a constant interval size which does
 not improve the runtime complexity.
@@ -204,9 +204,9 @@ elements for many consecutive leaves improves the runtime complexity by more tha
 constant factor. When I implemented the above alternative counting method in
 primecount it completely fixed the severe scaling issue in the computation of the
 special leaves that had been present in primecount since the very beginning.
-Below 10^20 there are no performance improvements, however above 10^20, the higher
+Below $10^{20}$ there are no performance improvements, however above $10^{20}$, the higher
 you go the more efficient the new method becomes compared to primecount's old
-implementation. At 10^25 the new method is already 2x faster. Note that the new
+implementation. At $10^{25}$ the new method is already 2x faster. Note that the new
 method works best with the Deleglise-Rivat [[2]](#References) and
 Gourdon [[3]](#References) variants of the combinatorial prime counting algorithm as
 the average distance between consecutive special leaves is relatively large in those
@@ -292,11 +292,11 @@ unsieved elements for a single special leaf to O(3 * segment_size^(1/3)) but on 
 hand it slightly slows down sieving as we also need to update the two counter arrays
 whilst sieving. I have benchmarked using 3 counter levels vs. using 2 counter levels
 in primecount. When using 3 counter levels, the computation of the hard special leaves
-used 6.69% more instructions at 10^20, 6.55% more instructions at 10^21, 5.73% more
-instructions at 10^22 and 5.51% more instructions at 10^23. Hence for practical use,
+used 6.69% more instructions at $10^{20}$, 6.55% more instructions at $10^{21}$, 5.73% more
+instructions at $10^{22}$ and 5.51% more instructions at $10^{23}$. Hence for practical use,
 using 2 counter levels (i.e. a single counter array) in primecount both runs faster and
 uses fewer instructions. It is likely though that using 3 counter levels will use fewer
-instructions for huge input numbers > 10^27 since the difference of used instructions
+instructions for huge input numbers > $10^{27}$ since the difference of used instructions
 is slowly decreasing (for larger input values) in favor of 3 counter levels.
 
 Here is an example implementation of the counting method which supports multiple counter
@@ -345,13 +345,13 @@ uint64_t Sieve::count(uint64_t stop)
 
 Even though using more than 2 counter levels does not seem particularly useful from a
 practical point of view, it is very interesting from a theoretical point of view.
-If we used O(log z) counter levels, then the worst-case runtime complexity for counting
+If we used $O(\log{z})$ counter levels, then the worst-case runtime complexity for counting
 the number of unsieved elements for a single special leaf would be
-O(log z * segment_size^(1/log z)), which can be simplified to O(log(z) * e) and which is
+O(log z * segment_size^(1/log z)), which can be simplified to $O(\log{z}\times e)$ and which is
 the same number of operations as the original algorithm with the binary indexed tree which
-uses O(log z) operations. This means that using O(log z) counter levels our alternative
+uses $O(\log{z})$ operations. This means that using $O(\log{z})$ counter levels our alternative
 algorithm has the same runtime complexity as the original algorithm with the binary indexed
-tree. This leads to the following question: is it possible to use fewer than O(log z)
+tree. This leads to the following question: is it possible to use fewer than $O(\log{z})$
 counter levels and thereby improve the runtime complexity of the hard special leaf
 algorithm? See the [runtime complexity](#Runtime-complexity) section for more details.
 
@@ -377,12 +377,12 @@ complexity implications and I have also not been able to figure out by how much 
 the runtime complexity of the hard special leaf algorithm. The alternative counting methods
 that are presented in this document have batch counting built-in. When I turn off batch
 counting in primecount its performance deteriorates by more than 20x when computing the hard
-special leaves ≤ 10^17. So it is clear that batch counting is hugely important for performance.
+special leaves ≤ $10^{17}$. So it is clear that batch counting is hugely important for performance.
 It is likely that the use of batch counting enables using even fewer counter levels
 and thereby further improves the runtime complexity of the hard special leaf algorithm. I have
-run extensive benchmarks up 10^26 using primecount and I found that in practice using only
+run extensive benchmarks up $10^{26}$ using primecount and I found that in practice using only
 two counter levels provides the best performance. So my benchmarks seem to confirm that it is
-possible to use fewer than O(log z / log log x) levels of counters using batch counting,
+possible to use fewer than $O(\log{z}/\log{\log{x}})$ levels of counters using batch counting,
 though I assume that using a constant number of counter levels deteriorates the runtime
 complexity of the algorithm.
 
@@ -390,52 +390,51 @@ complexity of the algorithm.
 
 What's the runtime complexity of this alternative algorithm?
 
-When using O(log z) counter levels the runtime complexity of the alternative algorithm is
-O(z log z) operations which is the same runtime complexity as the original algorithm with
+When using $O(\log{z})$ counter levels the runtime complexity of the alternative algorithm is
+$O(z\log{z})$ operations which is the same runtime complexity as the original algorithm with
 the binary indexed tree, see [here](#multiple-levels-of-counters) for more information. The
-next interesting question is: is it possible to use fewer than O(log z) counter levels and
+next interesting question is: is it possible to use fewer than $O(\log{z})$ counter levels and
 thereby improve the runtime complexity of the hard special leaf algorithm?
 
 Tomás Oliveira e Silva's paper [[4]](#References) provides the following runtime
 complexities for the computation of the hard special leaves in the Deléglise-Rivat
-algorithm: sieving uses O(z log z) operations, the number of hard special leaves is
-O(z / (log x)^2 * log α) and for each leaf it takes O(log z) operations to count the number
+algorithm: sieving uses $O(z\log{z})$ operations, the number of hard special leaves is
+$O(z/\log^{2}{x}\ \log{\alpha})$ and for each leaf it takes $O(\log{z})$ operations to count the number
 of unsieved elements. This means that the original algorithm is not perfectly balanced,
 sieving is slightly more expensive than counting. Using the alternative algorithm, it is
-possible to achieve perfect balancing by using fewer than O(log z) levels of counters, if
+possible to achieve perfect balancing by using fewer than $O(\log{z})$ levels of counters, if
 the number of counter levels is decreased sieving becomes more efficient but on the other
 hand counting becomes more expensive. The maximum number of allowed counting operations per
 leaf that do not deteriorate the runtime complexity of the algorithm is slightly larger
-than O((log x)^2). This bound can be achieved by using O(log z / log log x) levels of
-counters, if we set the number of counter levels l = log z / log log x, then the number of
-count operations per leaf becomes O(l * z^(1/l)) which is smaller than O((log x)^2) since:
+than $O(\log^{2}{x})$. This bound can be achieved by using $O(\log{z}/\log{\log{x}})$ levels of
+counters, if we set the number of counter levels $l = \log{z}/\log{\log{x}}$, then the number of
+count operations per leaf becomes $O(l\times \sqrt[l]{z})$ which is smaller than
+$O(\log^{2}{x})$ since:
 
-```
-l * z^(1/l) < (log x)^2
-log(z) / log(log(x)) * z^(log(log(x))/log(z)) < log(x)^2
-log(z) / log(log(x)) * (z^(1/log(z)))^log(log(x)) < log(x)^2
-log(z) / log(log(x)) * e^log(log(x)) < log(x)^2
-log(z) / log(log(x)) * log(x) < log(x)^2
-```
+$l\times \sqrt[l]{z} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log{\log{x}}\times z^{\log{\log{x}}/\log{z}} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log{\log{x}}\times \sqrt[\log{z}]{z}^{\log{\log{x}}} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log{\log{x}}\times e^{\log{\log{x}}} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log{\log{x}}\times \log{x} < \log^{2}{x}$  
 
-Hence, by using O(log z / log log x) levels of counters we improve the balancing of sieve
+Hence, by using $O(\log{z}/\log{\log{x}})$ levels of counters we improve the balancing of sieve
 and count operations and reduce the runtime complexity of the hard special leaf algorithm
-by a factor of O(log log x) to O(z log z / log log x) operations. In the original
+by a factor of $O(\log{\log{x}})$ to $O(z\ \log{z}/\log{\log{x}})$ operations. In the original
 Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is indicated
-as O(PrimePi(x^(1/4)) * y), which is significantly smaller than in Tomás Oliveira's
+as $O(\pi(\sqrt[4]{x})\times y)$, which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
 it possible to use even fewer counter levels and further improve the runtime complexity of
-the algorithm, here we can use only O(log log z) counter levels which reduces the runtime
-complexity of the algorithm to O(z log log z) operations.
+the algorithm, here we can use only $O(\log{\log{z}})$ counter levels which reduces the runtime
+complexity of the algorithm to $O(z\log{\log{z}})$ operations.
 
 ## Open questions
 
 The alternative counting methods presented in this document have batch counting built-in, but
 as mentioned in the [Batch counting](#Batch-counting) paragraph I don't know whether the use
-of batch counting enables using fewer than O(log z / log log x) counter levels and thereby
+of batch counting enables using fewer than $O(\log{z}/\log{\log{x}})$ counter levels and thereby
 further improves the runtime complexity of the hard special leaf algorithm. Ideally, we want
-to use only O(log log z) counter levels in which case the runtime complexity of the hard special
-leaf algorithm would be O(z log log z) operations, provided that the use of O(log log z)
+to use only $O(\log{\log{z}})$ counter levels in which case the runtime complexity of the hard special
+leaf algorithm would be $O(z\log{\log{z}})$ operations, provided that the use of $O(\log{\log{z}})$
 counter levels does not deteriorate the runtime complexity of the algorithm.
 
 There is one last trick that I am aware of that would likely further improve the runtime
@@ -452,15 +451,15 @@ individual segments and I also don't know how much this would improve the runtim
 
 * In the original Deléglise-Rivat paper [[2]](#References) its authors indicate that the use
   of a binary indexed tree deteriorates the sieving part of the hard special leaf algorithm by
-  a factor of O(log z) to O(z * log z * log log z) operations. Tomás Oliveira e Silva in
+  a factor of $O(\log{z})$ to $O(z\times \log{z}\times \log{\log{z}})$ operations. Tomás Oliveira e Silva in
   [[4]](#References) rightfully points out that this is incorrect and that it only
-  deteriorates the sieving part of the algorithm by a factor of O(log z / log log z). This is
-  because we don't need to need to perform O(log z) binary indexed tree updates for each
-  elementary sieve operation, of which there are O(z log log z). But instead we only need to
-  perform O(log z) binary indexed tree updates whenever an element is crossed off for the first
+  deteriorates the sieving part of the algorithm by a factor of $O(\log{z}/\log{\log{z}})$. This is
+  because we don't need to need to perform $O(\log{z})$ binary indexed tree updates for each
+  elementary sieve operation, of which there are $O(z\log{\log{z}})$. But instead we only need to
+  perform $O(\log{z})$ binary indexed tree updates whenever an element is crossed off for the first
   time in the sieve array. When we sieve up to z, there are at most z elements that can be
   crossed off for the first time, therefore the runtime complexity of the sieving part of the
-  hard special leaf algorithm with a binary indexed tree is O(z log z) operations.
+  hard special leaf algorithm with a binary indexed tree is $O(z\log{z})$ operations.
   
   The new alternative algorithm also relies on the above subtlety to improve the runtime
   complexity. When using multiple counter levels, the related counter arrays should only be
@@ -481,8 +480,8 @@ individual segments and I also don't know how much this would improve the runtim
   of count operations on the last level and hence causes a significant imbalance. To fix this
   imbalance we can multiply the counter distance for each level by
   POPCNT_distance^(level/levels). In primecount the POPCNT distance is 240, if primecount used 3
-  counter levels we would multiply the counter distance of the 1st level by 240^(1/3) and the
-  counter distance of the 2nd level by 240^(2/3).
+  counter levels we would multiply the counter distance of the 1st level by $\sqrt[3]{240}$ and the
+  counter distance of the 2nd level by $240^{\frac{2}{3}}$).
 
 ## References
 
