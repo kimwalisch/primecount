@@ -225,8 +225,8 @@ start with a counter array whose elements span over small intervals and
 then gradually increase the interval size. We can update the counter size and distance
 e.g. at the start of each new segment as the counter needs to be reinitialized at the
 start of each new segment anyway. The ideal counter distance for the next segment is
-```sqrt(average_leaf_distance)```. In practice we can approximate the average leaf
-distance using ```sqrt(segment_low)```. My measurements using primecount indicate that
+$\sqrt{average\ leaf\ distance}$. In practice we can approximate the average leaf
+distance using $\sqrt{segment\ low}$. My measurements using primecount indicate that
 gradually increasing the counter distance further improves counting by a small factor.
 This optimization is primarily useful when using a very small number of counter levels
 e.g. 2.
@@ -254,7 +254,7 @@ void Sieve::allocate_counter(uint64_t segment_low)
 
 It is also possible to use multiple levels of counters, in this case the data
 structure becomes a tree where each node has $O(segment\ size^{\frac{1}{levels}})$ children
-($levels$ is the tree depth) and each node stores the current number of unsieved elements in an interval of
+(*levels* corresponds to the tree depth) and each node stores the current number of unsieved elements in an interval of
 size $O(segment\ size^{\frac{levels - level}{levels}})$ from the sieve array. The last
 level of this tree corresponds to the sieve array used in the algorithm. Just
 like in the original algorithm with the binary index tree (a.k.a Fenwick tree),
