@@ -19,7 +19,7 @@ an alternative counting method that I have devised in February 2020. This altern
 counting method improves the balancing of sieve and count operations in the hard special
 leaf algorithm and thereby improves its runtime complexity by a factor of at least
 $O(\log{\log{x}})$. The alternative counting method uses a new tree-like data structure with
-fewer than $O(\log{z})$ levels (tree depth) where each node has O(z^(1/levels)) children.
+fewer than $O(\log{z})$ levels (tree depth) where each node has $O(z^{\frac{1}{levels}})$ children.
 This data structure is used instead of the binary indexed tree (a.k.a. Fenwick tree)
 that has been used for counting in all previously published papers about the
 combinatorial type prime counting algorithms.
@@ -253,9 +253,9 @@ void Sieve::allocate_counter(uint64_t segment_low)
 ## Multiple levels of counters
 
 It is also possible to use multiple levels of counters, in this case the data
-structure becomes a tree where each node has O(segment_size^(1 / levels)) children
-and each node stores the current number of unsieved elements in an interval of
-size O(segment_size^((levels - level) / levels)) from the sieve array. The last
+structure becomes a tree where each node has $O(segment\ size^{\frac{1}{levels}})$ children
+($levels$ is the tree depth) and each node stores the current number of unsieved elements in an interval of
+size $O(segment\ size^{\frac{levels - level}{levels}})$ from the sieve array. The last
 level of this tree corresponds to the sieve array used in the algorithm. Just
 like in the original algorithm with the binary index tree (a.k.a Fenwick tree),
 we can count the number of unsieved elements ≤ n in the sieve array using the
@@ -266,8 +266,8 @@ As an example, let's consider the case of 3 counter levels for which we will nee
 use 3 - 1 = 2 counter arrays. We only need to use 2 counter arrays because for the
 last level we will count the number of unsieved elements by iterating over the sieve
 array. For each level the size of the counter array can be calculated using
-segment_size^(level/levels) and the interval size of the counter array's elements
-can be calculated using segment_size^((levels - level) / levels). Hence our first
+$segment\ size^{\frac{level}{levels}}$ and the interval size of the counter array's elements
+can be calculated using $segment\ size^{\frac{levels - level}{levels}}$. Hence our first
 counter array (1st level) is coarse-grained, its elements span over large intervals
 of size $O(segment\ size^{\frac{2}{3}})$. This means that each element of the first counter
 array contains the current number of unsieved elements in the interval
@@ -282,7 +282,7 @@ we switch to our second counter array and sum the counts of its elements until t
 remaining distance becomes < $segment\ size^{\frac{1}{3}}$. When this happens, we count the
 remaining unsieved elements ≤ n by simply iterating over the sieve array. Below is a
 graphical representation of 3 counter levels with a segment_size of 8 (last level).
-At each level we perform at most segment_size^(1/levels) count operations to find the
+At each level we perform at most $segment\ size^{\frac{1}{levels}}$ count operations to find the
 number of unsieved element ≤ n.
 
 <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg">
