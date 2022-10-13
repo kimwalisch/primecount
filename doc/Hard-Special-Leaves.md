@@ -107,7 +107,7 @@ in primecount this constant factor is 240. OK, so despite the worse runtime
 complexity everything is great?! Unfortunately not, primecount's implementation of
 the hard special leaves formula which used the alternative method described above
 starts scaling badly above $10^{23}$. For record computations this became a serious
-issue e.g. I had initially expected the computation of $\pi(10^{28})$ to take
+issue e.g. I had initially expected our computation of $\pi(10^{28})$ to take
 about 8 months, however it ended up taking 2.5 years!
 
 ## Improved alternative counting method
