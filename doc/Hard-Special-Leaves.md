@@ -40,8 +40,8 @@ Since there is a large number of leaves for which we have to count the number of
 unsieved elements in the sieve array Lagarias-Miller-Odlyzko [[1]](#References)
 have suggested using a [binary indexed tree](https://en.wikipedia.org/wiki/Fenwick_tree)
 data structure (a.k.a. Fenwick tree) to speedup counting.
-For any number n the binary indexed tree allows to count the number of unsieved
-elements ≤ n using only $O(\log{n})$ operations. However the binary indexed tree
+For any number $n$ the binary indexed tree allows to count the number of unsieved
+elements ≤ $n$ using only $O(\log{n})$ operations. However the binary indexed tree
 must also be updated whilst sieving which slows down the sieving part of the
 algorithm by a factor of $O(\log{n}\ /\log{\log{n}})$ operations. All more recent papers about
 the combinatorial type prime counting algorithms that I am aware of have also suggested
@@ -117,7 +117,7 @@ by simply iterating over the sieve array. When there are many consecutive leaves
 that are close to each other then simply iterating over the sieve array for counting
 the number of unsieved elements works great. However when there are very few
 consecutive leaves in the current segment our method becomes inefficient. In order
-to compute the special leaves we need to sieve up to some limit z. Since we are
+to compute the special leaves we need to sieve up to some limit $z$. Since we are
 using a modified version of the segmented sieve of Eratosthenes the size of the
 sieve array will be $O(\sqrt{z})$. This means that if e.g. there is a single leaf in the
 current segment we will use $O(\sqrt{z})$ operations to count the number of unsieved
@@ -258,7 +258,7 @@ structure becomes a tree where each node has $O(segment\ size^{\frac{1}{levels}}
 size $O(segment\ size^{\frac{levels - level}{levels}})$ from the sieve array. The last
 level of this tree corresponds to the sieve array used in the algorithm. Just
 like in the original algorithm with the binary index tree (a.k.a Fenwick tree),
-we can count the number of unsieved elements ≤ n in the sieve array using the
+we can count the number of unsieved elements ≤ $n$ in the sieve array using the
 new tree-like data structure by traversing the tree from the root node to the
 bottom and summing the current number of unsieved elements stored in each node.
 
@@ -276,14 +276,14 @@ level) is more fine-grained, its elements span over smaller intervals of size
 $O(segment\ size^{\frac{1}{3}})$. Hence each element of the second counter array contains the
 current number of unsieved elements in the interval
 $[i\times segment\ size^{\frac{1}{3}}, (i+1)\times segment\ size^{\frac{1}{3}}[$. Now when we need to count the
-number of unsieved elements ≤ n, we first iterate over the first counter array and
+number of unsieved elements ≤ $n$, we first iterate over the first counter array and
 sum the counts of its elements. Once the remaining distance becomes < $segment\ size^{\frac{2}{3}}$,
 we switch to our second counter array and sum the counts of its elements until the
 remaining distance becomes < $segment\ size^{\frac{1}{3}}$. When this happens, we count the
-remaining unsieved elements ≤ n by simply iterating over the sieve array. Below is a
+remaining unsieved elements ≤ $n$ by simply iterating over the sieve array. Below is a
 graphical representation of 3 counter levels with a segment_size of 8 (last level).
 At each level we perform at most $segment\ size^{\frac{1}{levels}}$ count operations to find the
-number of unsieved element ≤ n.
+number of unsieved element ≤ $n$.
 
 <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg">
 
@@ -457,7 +457,7 @@ individual segments and I also don't know how much this would improve the runtim
   because we don't need to need to perform $O(\log{z})$ binary indexed tree updates for each
   elementary sieve operation, of which there are $O(z\log{\log{z}})$. But instead we only need to
   perform $O(\log{z})$ binary indexed tree updates whenever an element is crossed off for the first
-  time in the sieve array. When we sieve up to z, there are at most z elements that can be
+  time in the sieve array. When we sieve up to $z$, there are at most $z$ elements that can be
   crossed off for the first time, therefore the runtime complexity of the sieving part of the
   hard special leaf algorithm with a binary indexed tree is $O(z\log{z})$ operations.
   
