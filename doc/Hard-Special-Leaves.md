@@ -192,7 +192,7 @@ uint64_t Sieve::count(uint64_t stop)
 }
 ```
 
-Initially when I found this improvement I thought it would fix my particular
+Initially, when I found this improvement, I thought it would fix my particular
 scaling issue only up to some large threshold above which the alternative method
 would become inefficient again due to its worse runtime complexity. I thought that
 the alternative counting method had a runtime complexity of about
@@ -211,16 +211,16 @@ method works best with the Deleglise-Rivat [[2]](#References) and
 Gourdon [[3]](#References) variants of the combinatorial prime counting algorithm as
 the average distance between consecutive special leaves is relatively large in those
 algorithms. In the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the average
-distance between consecutive special leaves is much smaller so there the new counting
+distance between consecutive special leaves is much smaller, so there the new counting
 method will not improve performance in practice.
 
 ## Gradually increase counter distance
 
 So far we have focused on improving counting for the case
 when there are very few leaves per segment which are far away from each other.
-Generally there is a very large number of leaves that are very close to each other
-at the beginning of the sieving algorithm and gradually as we sieve up the leaves
-become sparser and the distance between the leaves increases. So what we can do is
+Generally there is a very large number of leaves that are close to each other
+at the beginning of the sieving algorithm, and gradually as we sieve up the leaves
+become sparser and the distance between the leaves increases. So what we can do is,
 start with a counter array whose elements span over small intervals and
 then gradually increase the interval size. We can update the counter size and distance
 e.g. at the start of each new segment as the counter needs to be reinitialized at the
@@ -281,14 +281,14 @@ sum the counts of its elements. Once the remaining distance becomes < $segment\ 
 we switch to our second counter array and sum the counts of its elements until the
 remaining distance becomes < $segment\ size^{\frac{1}{3}}$. When this happens, we count the
 remaining unsieved elements ≤ $n$ by simply iterating over the sieve array. Below is a
-graphical representation of 3 counter levels with a segment_size of 8 (last level).
+graphical representation of 3 counter levels with a segment size of 8 (last level).
 At each level we perform at most $segment\ size^{\frac{1}{levels}}$ count operations to find the
 number of unsieved element ≤ $n$.
 
 <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg">
 
 Using 3 counter levels reduces the worst-case complexity for counting the number of
-unsieved elements for a single special leaf to $O(3\times segment\ size^{\frac{1}{3}})$ but on the other
+unsieved elements for a single special leaf to $O(3\times segment\ size^{\frac{1}{3}})$, but on the other
 hand it slightly slows down sieving as we also need to update the two counter arrays
 whilst sieving. I have benchmarked using 3 counter levels vs. using 2 counter levels
 in primecount. When using 3 counter levels, the computation of the hard special leaves
@@ -348,7 +348,7 @@ practical point of view, it is very interesting from a theoretical point of view
 If we used $O(\log{z})$ counter levels, then the worst-case runtime complexity for counting
 the number of unsieved elements for a single special leaf would be
 $O(\log{z}\times segment\ size^{\frac{1}{log z}})$, which can be simplified to $O(\log{z}\times e)$ and which is
-the same number of operations as the original algorithm with the binary indexed tree which
+the same number of operations as the original algorithm with the binary indexed tree, which
 uses $O(\log{z})$ operations. This means that using $O(\log{z})$ counter levels our alternative
 algorithm has the same runtime complexity as the original algorithm with the binary indexed
 tree. This leads to the following question: is it possible to use fewer than $O(\log{z})$
