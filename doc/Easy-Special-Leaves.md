@@ -65,7 +65,7 @@ for the current segment $[low, low + segment\ size[$. This algorithm has been im
 by more than 2x at $10^{23}$ on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
 required frequent synchronization of threads. It is important to ensure that the additional pre-computations do not deteriorate
 the runtime complexity of the algorithm. When sieving up to $\sqrt{x}$ using a segment size of $\sqrt[4]{x}$ there will by exactly $\sqrt[4]{x}$
-segments. For each segment we need to compute ```PrimePi(low)``` with low < $\sqrt{x}$. Hence in total the additional pre-computations
+segments. For each segment we need to compute $\pi(low)$ with low < $\sqrt{x}$. Hence in total the additional pre-computations
 have a runtime complexity of $O(\sqrt{x}^{\frac{2}{3}}\sqrt[4]{x}) = O(x^{\frac{7}{12}})$ which does not deteriorate the overall runtime complexity
 of the algorithm.
 
