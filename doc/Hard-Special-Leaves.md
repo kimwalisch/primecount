@@ -269,17 +269,17 @@ array. For each level the size of the counter array can be calculated using
 segment_size^(level/levels) and the interval size of the counter array's elements
 can be calculated using segment_size^((levels - level) / levels). Hence our first
 counter array (1st level) is coarse-grained, its elements span over large intervals
-of size O(segment_size^(2/3)). This means that each element of the first counter
+of size $O(segment\ size^{\frac{2}{3}})$. This means that each element of the first counter
 array contains the current number of unsieved elements in the interval
-[i * segment_size^(2/3), (i + 1) * segment_size^(2/3)[. Our second counter array (2nd
+$[i\times segment\ size^{\frac{2}{3}}, (i+1)\times segment\ size^{\frac{2}{3}}[$. Our second counter array (2nd
 level) is more fine-grained, its elements span over smaller intervals of size
-O(segment_size^(1/3)). Hence each element of the second counter array contains the
+$O(segment\ size^{\frac{1}{3}})$. Hence each element of the second counter array contains the
 current number of unsieved elements in the interval
-[i * segment_size^(1/3), (i + 1) * segment_size^(1/3)[. Now when we need to count the
+$[i\times segment\ size^{\frac{1}{3}}, (i+1)\times segment\ size^{\frac{1}{3}}[$. Now when we need to count the
 number of unsieved elements ≤ n, we first iterate over the first counter array and
-sum the counts of its elements. Once the remaining distance becomes < segment_size^(2/3),
+sum the counts of its elements. Once the remaining distance becomes < $segment\ size^{\frac{2}{3}}$,
 we switch to our second counter array and sum the counts of its elements until the
-remaining distance becomes < segment_size^(1/3). When this happens, we count the
+remaining distance becomes < $segment\ size^{\frac{1}{3}}$. When this happens, we count the
 remaining unsieved elements ≤ n by simply iterating over the sieve array. Below is a
 graphical representation of 3 counter levels with a segment_size of 8 (last level).
 At each level we perform at most segment_size^(1/levels) count operations to find the
@@ -288,7 +288,7 @@ number of unsieved element ≤ n.
 <img src="https://raw.githubusercontent.com/kimwalisch/primecount/gh-pages/images/tree_3_counter_levels.svg">
 
 Using 3 counter levels reduces the worst-case complexity for counting the number of
-unsieved elements for a single special leaf to O(3 * segment_size^(1/3)) but on the other
+unsieved elements for a single special leaf to $O(3\times segment\ size^{\frac{1}{3}})$ but on the other
 hand it slightly slows down sieving as we also need to update the two counter arrays
 whilst sieving. I have benchmarked using 3 counter levels vs. using 2 counter levels
 in primecount. When using 3 counter levels, the computation of the hard special leaves
@@ -347,7 +347,7 @@ Even though using more than 2 counter levels does not seem particularly useful f
 practical point of view, it is very interesting from a theoretical point of view.
 If we used $O(\log{z})$ counter levels, then the worst-case runtime complexity for counting
 the number of unsieved elements for a single special leaf would be
-O(log z * segment_size^(1/log z)), which can be simplified to $O(\log{z}\times e)$ and which is
+$O(\log{z}\times segment\ size^{\frac{1}{log z}})$, which can be simplified to $O(\log{z}\times e)$ and which is
 the same number of operations as the original algorithm with the binary indexed tree which
 uses $O(\log{z})$ operations. This means that using $O(\log{z})$ counter levels our alternative
 algorithm has the same runtime complexity as the original algorithm with the binary indexed
