@@ -131,9 +131,9 @@ So now that we have identified the problem, we can think about whether it is pos
 to further improve counting by more than a constant factor in our alternative algorithm.
 It turns out this is possible and even relatively simple to implement: We add a
 **counter array** to our sieving algorithm. The counter array has a size of
-O(segment_size^(1/2)), with segment_size = $\sqrt{z}$. Each element of the counter array
+$O(\sqrt{segment\ size})$, with $segment\ size = \sqrt{z}$. Each element of the counter array
 contains the current count of unsieved elements in the sieve array for the interval
-[i * segment_size^(1/2), (i + 1) * segment_size^(1/2)[. Similar to the algorithm with the
+$[i\times \sqrt{segment\ size}, (i+1)\times \sqrt{segment\ size}[$. Similar to the algorithm with the
 binary indexed tree data structure this counter array must be updated whilst sieving
 i.e. whenever an element is crossed off for the first time in the sieve array we need
 to decrement the corresponding counter element. However since we only need to decrement
@@ -141,7 +141,7 @@ at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
 tree which deteriorates sieving by a factor of $\log{z}/\log{\log{z}}$). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
-chose a counter array size of O(segment_size) with a constant interval size which does
+chose a counter array size of $O(segment\ size)$ with a constant interval size which does
 not improve the runtime complexity.
 
 ```C++
@@ -154,12 +154,12 @@ counter[i >> counter_log2_dist] -= is_bit;
 
 Now whenever we need to count the number of unsieved elements in the sieve array
 we can quickly iterate over the new counter array and sum the counts. We do this
-until we are close < O(segment_size^(1/2)) to the limit up to which we need to count.
+until we are close < $O(\sqrt{segment\ size})$ to the limit up to which we need to count.
 Once we are close we switch to our old counting method: we simply iterate
 over the sieve array and count the number of unsieved elements using the POPCNT
 instruction. With this modification we improve the runtime complexity for counting
-the number of unsieved elements for a single leaf from O(segment_size) to
-O(segment_size^(1/2)).
+the number of unsieved elements for a single leaf from $O(segment\ size)$ to
+$O(\sqrt{segment\ size})$.
 
 ```C++
 /// Count 1 bits inside [0, stop]
@@ -195,9 +195,9 @@ uint64_t Sieve::count(uint64_t stop)
 Initially when I found this improvement I thought it would fix my particular
 scaling issue only up to some large threshold above which the alternative method
 would become inefficient again due to its worse runtime complexity. I thought that
-the alternative counting method had a runtime complexity of about O(number of
-special leaves * segment_size^(1/2)) since counting the number of unsieved elements
-for a single leaf is O(segment_size^(1/2)). However when I measured the average
+the alternative counting method had a runtime complexity of about
+$O(number\ of\ special\ leaves\times \sqrt{segment\ size})$ since counting the number of unsieved elements
+for a single leaf is $O(\sqrt{segment\ size}$). However when I measured the average
 number of count operations per leaf the number was much lower than expected. It turns
 out that [batch counting](#Batch-counting) the number of unsieved
 elements for many consecutive leaves improves the runtime complexity by more than a
