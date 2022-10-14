@@ -44,7 +44,7 @@ via the ```--phi``` option, e.g. $\phi(1000, 10)$ can be computed using: ```prim
 
 # Recursive formula
 
-### phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1)
+### $\phi(x, a) = \phi(x, a - 1) - \phi(x / \mathrm{prime}_a, a - 1)$
 
 This is the main formula for the computation of the partial sieve function. As mentioned in the
 introduction this formula was first described by Legendre in his book "Théorie des nombres"
@@ -82,7 +82,7 @@ primecount.
 
 This formula allows computing $\phi(x, a)$ in $O(1)$ for small values of $a$ e.g. for $a$ ≤ 7.
 [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and $pp$
-denotes the product of the first $a$ primes: $pp = 2\times 3\times ...\times prime_a$. The use of this formula
+denotes the product of the first $a$ primes: $pp = 2\times 3\times ...\times \mathrm{prime}_a$. The use of this formula
 requires initializing a lookup table of $\phi(i, a)$ results for $i \in [0, pp[$, hence the lookup table has
 a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
 the first who used this formula for the computation of the number of primes below 1 billion at the end
@@ -93,32 +93,32 @@ primecount this formula is implemented in
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
 
-### if (x%pp ≤ pp/2) phi(x, a) = x/pp * φ(pp) + phi(x%pp, a)<br/>if (x%pp > pp/2) phi(x, a) = x/pp * φ(pp) + φ(pp) - phi(pp - 1 - x%pp, a)
+### $\mathrm{if}(x\bmod pp ≤ pp/2)\ \ \phi(x, a) = (x/pp)\times \varphi(pp) + \phi(x\bmod pp, a)$<br/>$\mathrm{if}(x\bmod pp > pp/2)\ \ \phi(x, a) = (x/pp)\times \varphi(pp) + \varphi(pp) - \phi(pp - 1 - x\bmod pp, a)$
 
-In the formulas above pp corresponds to the product of the first $a$ primes: pp = 2 * 3 * ... * prime[a]
+In the formulas above pp corresponds to the product of the first $a$ primes: $pp = 2\times 3\times ...\times \mathrm{prime}_a$
 and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
 When it is not possible to compute $\phi(x, a)$ in $O(1)$ using the formula from the first paragraph, these
 formulas can be used to avoid computing $\phi(x, a)$ where $x$ may be large, and instead compute
-phi(x%pp, a) or phi(pp - 1 - x%pp, a) where x%pp and pp - 1 - x%pp may be orders of magnitude smaller
-than x. I have tested these formulas in primecount, however they did not provide a general speedup.
+$\phi(x\bmod pp, a)$ or $\phi(pp - 1 - x\bmod pp, a)$ where $x\bmod pp$ and $pp - 1 - x\bmod pp$ may be orders of magnitude smaller
+than $x$. I have tested these formulas in primecount, however they did not provide a general speedup.
 The main issue with these formulas is that they are only useful for relatively large values of $x$ and
-they are limited to small values of a because they involve the product of the first a primes which
+they are limited to small values of $a$ because they involve the product of the first a primes which
 grows rather quickly. In computer programs that use 64-bit integers these formulas can be used for
-a ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]](#References).
+$a$ ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]](#References).
 
 ### Stop recursion at $c$ instead of 1
 
-Using the formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) it is possible to compute $\phi(x, c)$
+Using the formula $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$ it is possible to compute $\phi(x, c)$
 in $O(1)$ for small values of $c$ e.g. $c$ ≤ 7. Using this formula we can stop recursion at $c$ instead of 1 in
 the main [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum
 by $\phi(x, c)$.
 
-### Calculate all $\phi(x / prime_i, i-1) = 1$ upfront in $O(1)$
+### Calculate all $\phi(x / \mathrm{prime}_i, i-1) = 1$ upfront in $O(1)$
 
-Once $\phi(x / prime_i, i-1) = 1$ occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent $phi(x / primej, j-1)$
-computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / prime_i, i-1) = 1$ if
-$(x / prime_i ≤ prime_{i-1})$. Hence instead of computing $phi(x / prime_j, j-1)$ individually for all
+Once $\phi(x / \mathrm{prime}_i, i-1) = 1$ occurs in the main
+[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent $phi(x / \mathrm{prime}_j, j-1)$
+computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / \mathrm{prime}_i, i-1) = 1$ if
+$(x / \mathrm{prime}_i ≤ \mathrm{prime}_{i-1})$. Hence instead of computing $phi(x / \mathrm{prime}_j, j-1)$ individually for all
 $j \in ]i, a]$ we can simply increase the sum by $a - i$.
 
 ### $\mathrm{if}(a ≥ \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) - a + 1$
@@ -250,7 +250,7 @@ described in some more detail in Douglas Staple's paper [[8]](#References), howe
 is provided in both papers.
 
 Computing $\phi(x, i)$ individually for all $i \in [0, a]$ would be far too slow. However, by taking
-advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
+advantage of the recursive nature of the main formula $\phi(x, a) = \phi(x, a - 1) - \phi(x / \mathrm{prime}_a, a - 1)$,
 we can actually generate a lookup table of $\phi(x, i)$ results for $i \in [0, a]$ in the same
 amount of time it takes to compute $\phi(x, a)$. We first compute $\phi(x, 0)$, next we compute
 $\phi(x, 1)$ and reuse the $\phi(x, 0)$ result we have computed previously. Then we compute
