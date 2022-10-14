@@ -31,7 +31,7 @@ it describes a [new optimization](#new-optimization) that I have devised and tha
 implemented in primecount. It is a compressed cache of $\phi(i, j)$ results, for small to medium values
 of $i$ and $j$, that speeds up most $\phi(x, a)$ computations by more than an order of magnitude.
 
-# $\phi(x, a)$ in primecount
+# primecount's $\phi(x, a)$ implementation
 
 In primecount the partial sieve function is implemented in the file
 [phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) (and in
