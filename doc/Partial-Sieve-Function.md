@@ -122,9 +122,9 @@ by $\phi(x, c)$.
 ### Calculate all $\phi(x / \mathrm{prime}_i, i-1) = 1$ upfront in $O(1)$
 
 Once $\phi(x / \mathrm{prime}_i, i-1) = 1$ occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) all subsequent $phi(x / \mathrm{prime}_j, j-1)$
+[recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) all subsequent $\phi(x / \mathrm{prime}_j, j-1)$
 computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / \mathrm{prime}_i, i-1) = 1$ if
-$(x / \mathrm{prime}_i ≤ \mathrm{prime}\_{i-1})$. Hence instead of computing $phi(x / \mathrm{prime}_j, j-1)$ individually for all
+$(x / \mathrm{prime}_i ≤ \mathrm{prime}\_{i-1})$. Hence instead of computing $\phi(x / \mathrm{prime}_j, j-1)$ individually for all
 $j \in ]i, a]$ we can simply increase the sum by $a - i$.
 
 ### $\mathrm{if}(a ≥ \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) - a + 1$
