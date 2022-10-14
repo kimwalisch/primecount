@@ -78,7 +78,7 @@ loop:
 
 # Optimizations
 
-There are a large number of known optimizations, that can be used in conjunction with the recursive
+There are many known optimizations that can be used in conjunction with the recursive
 $\phi(x, a)$ formula and which, when combined, can speed up the computation by many orders for magnitude.
 I will now briefly describe all known optimizations, and then further down I will present a
 [new optimization](#new-optimization) that I have devised and that has first been implemented in
