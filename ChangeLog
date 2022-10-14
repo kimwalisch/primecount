@@ -1,4 +1,4 @@
-Changes in primecount-7.5, 2022-10-06
+Changes in primecount-7.5, 2022-10-14
 
 The API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
@@ -9,6 +9,9 @@ primecount-7.4 requried >= libprimesieve.so.10.
   primesieve::iterator::skipto(). This reduces the number of required
   start number corrections (e.g. skipto(start-1)) by 2x.
 * pod_vector.hpp: Added support for types with destructors.
+* Hard-Special-Leaves.md: Convert formulas to MathJax.
+* Easy-Special-Leaves.md: Convert formulas to MathJax.
+* Partial-Sieve-Function.md: Convert formulas to MathJax.
 
 Changes in primecount-7.4, 2022-06-03
 
