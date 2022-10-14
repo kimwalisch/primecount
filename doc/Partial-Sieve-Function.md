@@ -110,13 +110,13 @@ $a$ ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]]
 
 Using the formula $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$ it is possible to compute $\phi(x, c)$
 in $O(1)$ for small values of $c$ e.g. $c$ ≤ 7. Using this formula we can stop recursion at $c$ instead of 1 in
-the main [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum
+the main [recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) and simply increase the sum
 by $\phi(x, c)$.
 
 ### Calculate all $\phi(x / \mathrm{prime}_i, i-1) = 1$ upfront in $O(1)$
 
 Once $\phi(x / \mathrm{prime}_i, i-1) = 1$ occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent $phi(x / \mathrm{prime}_j, j-1)$
+[recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) all subsequent $phi(x / \mathrm{prime}_j, j-1)$
 computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / \mathrm{prime}_i, i-1) = 1$ if
 $(x / \mathrm{prime}_i ≤ \mathrm{prime}\_{i-1})$. Hence instead of computing $phi(x / \mathrm{prime}_j, j-1)$ individually for all
 $j \in ]i, a]$ we can simply increase the sum by $a - i$.
@@ -144,7 +144,7 @@ $\phi(x, a)$ computations.
 
 # New optimization
 
-Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1)
+Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1)
 the same values of $\phi(i, j)$ are calculated over and over again, this is especially true for small to
 medium values of $i$ and $j$. The formula $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$ can be used to
 avoid recursion, however it is limited to small values of $a$ ≤ $c$ with $c$ being a small constant e.g.
@@ -154,7 +154,7 @@ computing $\phi(x, a)$ for medium values of $a \in\ ]c, \pi(\sqrt{x})[$.
 
 The new optimization that I have devised is a $\phi(i, j)$ cache for small to medium
 values of $i$ and $j$ e.g. $i$ ≤ $\sqrt{x}$ and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
-calls occur in the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
+calls occur in the [main phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) and the faster
 it runs. However, on the other hand we are memory constrained, we cannot cache everything and
 ideally our $\phi(i, j)$ cache should fit into the CPU's fast cache memory. Hence the main goal for our
 cache is to store as many $\phi(i, j)$ results as possible using as little memory as possible.
@@ -186,7 +186,7 @@ int64_t phi_cache(uint64_t x, uint64_t a)
 Before being able to use the $\phi(x, a)$ cache it needs to be initialized. The cache can be initialized
 using a modified version of the [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes).
 In primecount the cache is lazily initialized during the execution of the
-[main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1). Whenever a new $\phi(x, i)$ computation
+[main phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1). Whenever a new $\phi(x, i)$ computation
 is started we first check whether that result is not yet present in the cache and if $x$ & $i$ meet the caching
 criteria. If these conditions apply the cache will be filled up to $x$ & $i$. In the first part of this algorithm
 we unset the bits that correspond to numbers that are divisible by the i-th prime. When sieving has
