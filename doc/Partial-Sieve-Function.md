@@ -161,7 +161,7 @@ computing $\phi(x, a)$ for medium values of $a \in\ ]c, \pi(\sqrt{x})[$.
 The new optimization that I have devised is a $\phi(i, j)$ cache for small to medium
 values of $i$ and $j$ e.g. $i$ ≤ $\sqrt{x}$ and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
 calls occur in the [main phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) and the faster
-it runs. However, on the other hand we are memory constrained, we cannot cache everything and
+the computation runs. However, on the other hand we are memory constrained, we cannot cache everything and
 ideally our $\phi(i, j)$ cache should fit into the CPU's fast cache memory. Hence the main goal for our
 cache is to store as many $\phi(i, j)$ results as possible using as little memory as possible.
 
@@ -189,7 +189,7 @@ int64_t phi_cache(uint64_t x, uint64_t a)
 }
 ```
 
-Before being able to use the $\phi(x, a)$ cache it needs to be initialized. The cache can be initialized
+Before the $\phi(i, j)$ cache can be used, it needs to be initialized. The cache can be initialized
 using a modified version of the [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes).
 In primecount the cache is lazily initialized during the execution of the
 [main phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1). Whenever a new $\phi(x, i)$ computation
