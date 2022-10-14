@@ -7,7 +7,7 @@ special leaves and hard special leaves. The contribution of each easy special le
 $\phi(x, a)$ and cannot be computed in $O(1)$.
 
 In the Deleglise-Rivat [[2]](#references) and Gourdon [[3]](#references) prime counting algorithms (which are based on the
-Lagarias-Miller-Odlyzko algorithm) the computation of the easy special leaves requires looking up the number of primes below $n$
+Lagarias-Miller-Odlyzko algorithm) the computation of the easy special leaves requires looking up the number of primes ≤ $n$
 with $n < \sqrt{x}$. Since a ```PrimePi[n]``` lookup table of size $\sqrt{x}$ is much too large to be practical, Deleglise-Rivat
 [[2]](#references) have suggested segmenting the Interval $[0,\sqrt{x}$[ using a segment size of $y\ (\sim \sqrt[3]{x}\ \log^{3}{x})$.
 Hence instead of using a ```PrimePi[n]``` lookup table of size $\sqrt{x}$, we now use a ```SegmentedPrimePi[n]``` lookup table of size
