@@ -34,13 +34,19 @@ of $i$ and $j$, that speeds up most $\phi(x, a)$ computations by more than an or
 # primecount's $\phi(x, a)$ implementation
 
 In primecount the partial sieve function is implemented in the file
-[phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) (and in
+[phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) and the files
 [PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) &
-[PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp)).
+[PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp) contain
+auxiliary functions for computing  $\phi(x, a)$ in constant time for tiny values of $a$.
 The partial sieve function $\phi(x, a)$ is also part of
 [primecount's C/C++ API](https://github.com/kimwalisch/primecount/blob/master/doc/libprimecount.md#c-api-reference)
-and it is available in the [primecount command-line application](https://github.com/kimwalisch/primecount#installation)
-via the ```--phi``` option, e.g. $\phi(1000, 10)$ can be computed using: ```primecount 1000 10 --phi```
+and it is available in the primecount command-line application via the ```--phi``` option.
+
+Compute $\phi(1000, 10)$ using the [primecount command-line application](https://github.com/kimwalisch/primecount#installation):
+
+```bash
+$ primecount 1000 10 --phi
+```
 
 # Recursive formula
 
