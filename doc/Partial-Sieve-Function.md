@@ -49,8 +49,8 @@ via the ```--phi``` option, e.g. $\phi(1000, 10)$ can be computed using: ```prim
 This is the main formula for the computation of the partial sieve function. As mentioned in the
 introduction this formula was first described by Legendre in his book "Théorie des nombres"
 [[1]](#References). When implemented in a computer program the above recursive
-phi(x, a) formula with a = pi(√x) allows computing Legendre's prime counting function
-pi(x) = pi(√x) + phi(x, pi(√x)) - 1 in O(x / log(x)) operations and using O(√x / log(x)) space.
+$\phi(x, a)$ formula with $a = \pi(\sqrt{x})$ allows computing Legendre's prime counting function
+$\pi(x)=\pi(\sqrt{x})+\phi(x,\pi(\sqrt{x}))-1$ in $O(x / \log{x})$ operations and using $O(\sqrt{x} / \log{x})$ space.
 Tomás Oliveira e Silva's paper [[6]](#References) contains a simple C implementation of this formula:
 
 ```C
@@ -73,7 +73,7 @@ loop:
 # Optimizations
 
 There are a large number of known optimizations, that can be used in conjunction with the recursive
-phi(x, a) formula and which, when combined, can speed up the computation by many orders for magnitude.
+$\phi(x, a)$ formula and which, when combined, can speed up the computation by many orders for magnitude.
 I will now briefly describe all known optimizations, and then further down I will present a
 [new optimization](#new-optimization) that I have devised and that has first been implemented in
 primecount.
@@ -121,7 +121,7 @@ computations with j ∈ ]i, a] will also be 1. Generally phi(x / prime[i], i - 1
 (x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
 j ∈ ]i, a] we can simply increase the sum by $a - i$.
 
-### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
+### $\mathrm{if}(a ≥ \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) - a + 1$
 
 This formula also allows computing $\phi(x, a)$ in $O(1)$ provided that $a$ is relatively large and $x$ is
 relatively small. If $a ≥ \pi(\sqrt{x})$ then $\phi(x, a)$ counts the number of primes ≤ $x$, minus the first
@@ -137,7 +137,7 @@ instead of a lookup table which uses much less memory.
 
 $\mathrm{P_2}(x, a)$ corresponds to the 2nd partial sieve function,
 it counts the numbers ≤ $x$ that have exactly 2 prime factors each exceeding the a-th prime.
-If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the $\mathrm{P_3}(x, a)$ term i.e.
+If $(\pi(\sqrt[4]{x}) ≤ a < \pi(\sqrt[3]{x}))$ then one needs to add the $\mathrm{P_3}(x, a)$ term i.e.
 $\phi(x, a) = \pi(x) + \mathrm{P_2}(x, a) + \mathrm{P_3}(x, a) - a + 1$. The formulas from this paragraph are not yet
 being used in primecount, even though I expect that their use could significantly speed up some
 $\phi(x, a)$ computations.
@@ -148,11 +148,11 @@ Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1-
 the same values of $\phi(i, j)$ are calculated over and over again, this is especially true for small to
 medium values of $i$ and $j$. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) can be used to
 avoid recursion, however it is limited to small values of $a$ ≤ $c$ with $c$ being a small constant e.g.
-$c$ = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute $\phi(x, a)$ in $O(1)$, however
+$c$ = 7. The formula $\phi(x, a) = \pi(x) - a + 1$ can also be used to compute $\phi(x, a)$ in $O(1)$, however
 it is limited to large values of $a$ ≥ $\pi(\sqrt{x})$. Hence there is currently no known optimization for
-computing $\phi(x, a)$ for medium values of a ∈ ]c, pi(√x)[.
+computing $\phi(x, a)$ for medium values of a ∈ $]c, \pi(\sqrt{x})[$.
 
-The new optimization that I have devised is a **phi(i, j) cache** for small to medium
+The new optimization that I have devised is a $\phi(i, j)$ cache for small to medium
 values of $i$ and $j$ e.g. $i$ ≤ √x and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
 calls occur in the  [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
 it runs. However, on the other hand we are memory constrained, we cannot cache everything and
