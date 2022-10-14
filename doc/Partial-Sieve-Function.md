@@ -21,7 +21,7 @@ that the threads have exclusive access to the CPU's resources and in order to pr
 has to wait idle for data from another thread. In 2002 Xavier Gourdon [[5]](#References)
 devised a modification to the hard special leaves algorithm so that the computation can be slit up into
 independent chunks. This modification relies on the partial sieve function for generating a lookup
-table of $\phi(x, i)$ results for i ∈ [0, a]. The
+table of $\phi(x, i)$ results for $i \in [0, a]$. The
 [Generate phi(x, i) lookup table](#generate-phix-i-lookup-table) paragraph contains more information.
 
 Hence now the partial sieve function's performance has become critical for parallel implementations
@@ -113,13 +113,13 @@ in $O(1)$ for small values of $c$ e.g. $c$ ≤ 7. Using this formula we can stop
 the main [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum
 by $\phi(x, c)$.
 
-### Calculate all phi(x / prime[i], i - 1) = 1 upfront in O(1)
+### Calculate all $\phi(x / prime_i, i-1) = 1$ upfront in $O(1)$
 
-Once phi(x / prime[i], i - 1) = 1 occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / prime[j], j - 1)
-computations with j ∈ ]i, a] will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
-(x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
-j ∈ ]i, a] we can simply increase the sum by $a - i$.
+Once $\phi(x / prime_i, i-1) = 1$ occurs in the main
+[recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent $phi(x / primej, j-1)$
+computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / prime_i, i-1) = 1$ if
+$(x / prime_i ≤ prime_{i-1})$. Hence instead of computing $phi(x / prime_j, j-1)$ individually for all
+$j \in ]i, a]$ we can simply increase the sum by $a - i$.
 
 ### $\mathrm{if}(a ≥ \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) - a + 1$
 
@@ -146,14 +146,14 @@ $\phi(x, a)$ computations.
 
 Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1)
 the same values of $\phi(i, j)$ are calculated over and over again, this is especially true for small to
-medium values of $i$ and $j$. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) can be used to
+medium values of $i$ and $j$. The formula $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$ can be used to
 avoid recursion, however it is limited to small values of $a$ ≤ $c$ with $c$ being a small constant e.g.
-$c$ = 7. The formula $\phi(x, a) = \pi(x) - a + 1$ can also be used to compute $\phi(x, a)$ in $O(1)$, however
+$c = 7$. The formula $\phi(x, a) = \pi(x) - a + 1$ can also be used to compute $\phi(x, a)$ in $O(1)$, however
 it is limited to large values of $a$ ≥ $\pi(\sqrt{x})$. Hence there is currently no known optimization for
-computing $\phi(x, a)$ for medium values of a ∈ $]c, \pi(\sqrt{x})[$.
+computing $\phi(x, a)$ for medium values of $a \in\ ]c, \pi(\sqrt{x})[$.
 
 The new optimization that I have devised is a $\phi(i, j)$ cache for small to medium
-values of $i$ and $j$ e.g. $i$ ≤ √x and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
+values of $i$ and $j$ e.g. $i$ ≤ $\sqrt{x}$ and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
 calls occur in the  [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
 it runs. However, on the other hand we are memory constrained, we cannot cache everything and
 ideally our $\phi(i, j)$ cache should fit into the CPU's fast cache memory. Hence the main goal for our
@@ -244,14 +244,14 @@ In 2002 Xavier Gourdon [[5]](#References) devised a modification to the hard spe
 algorithm so that the computation can be slit up into independent chunks. This modification is
 particularly useful for parallelizing the hard special leaves algorithm, since it avoids the
 need for frequent thread synchronization. This modification relies on the partial sieve
-function for generating a lookup table of $\phi(x, i)$ results for i ∈ [0, a]. The idea of the
+function for generating a lookup table of $\phi(x, i)$ results for $i \in [0, a]$. The idea of the
 algorithm is described very shortly in Gourdon's paper [[5]](#References) and it is also
 described in some more detail in Douglas Staple's paper [[8]](#References), however no pseudocode
 is provided in both papers.
 
-Computing $\phi(x, i)$ individually for all i ∈ [0, a] would be far too slow. However, by taking
+Computing $\phi(x, i)$ individually for all $i \in [0, a]$ would be far too slow. However, by taking
 advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
-we can actually generate a lookup table of $\phi(x, i)$ results for i ∈ [0, a] in the same
+we can actually generate a lookup table of $\phi(x, i)$ results for $i \in [0, a]$ in the same
 amount of time it takes to compute $\phi(x, a)$. We first compute $\phi(x, 0)$, next we compute
 $\phi(x, 1)$ and reuse the $\phi(x, 0)$ result we have computed previously. Then we compute
 $\phi(x, 2)$ and reuse our previous $\phi(x, 1)$ result and so forth. The code below shows how
