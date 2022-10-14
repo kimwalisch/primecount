@@ -57,7 +57,7 @@ scale well on current CPU architectures if they accomplish the following three
 * The work must be distributed evenly among all threads in order to avoid load imbalance.
 
 A segment size of $\sqrt[4]{x}$ already accomplishes the first property. So next we have to design our parallel algorithm in a way that
-all threads are independent from each other. We can reuse an idea from Xavier Gourdon [[3]](#references) for our purpose:
+all threads are independent from each other. We can reuse an idea from Xavier Gourdon [[3]](#references) for this purpose:
 each thread is assigned a different segment, which it processes exclusively. At the start of
 each new segment $[low, low + segment\ size[$ each thread computes $\pi(low)$ using a prime counting function implementation
 in $O(low^{\frac{2}{3}})$ or less. The result of $\pi(low)$ is required to initialize the ```SegmentedPrimePi[n]``` lookup table
