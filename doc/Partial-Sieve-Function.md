@@ -1,4 +1,4 @@
-# The partial sieve function 
+# The partial sieve function
 
 The partial sieve function $\phi(x, a)$ counts the numbers ≤ $x$ that are not divisible by any of the
 first $a$ primes. This function is sometimes also named "Legendre's sum" after the French mathematician
@@ -80,10 +80,10 @@ primecount.
 
 ### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
 
-This formula allows computing $\phi(x, a)$ in O(1) for small values of a e.g. for a ≤ 7.
+This formula allows computing $\phi(x, a)$ in $O(1)$ for small values of $a$ e.g. for $a$ ≤ 7.
 [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and pp
-denotes the product of the first a primes: pp = 2 * 3 * ... * prime[a]. The use of this formula
-requires initializing a lookup table of phi(i, a) results for i ∈ [0, pp[, hence the lookup table has
+denotes the product of the first $a$ primes: pp = 2 * 3 * ... * prime[a]. The use of this formula
+requires initializing a lookup table of $\phi(i, a)$ results for i ∈ [0, pp[, hence the lookup table has
 a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
 the first who used this formula for the computation of the number of primes below 1 billion at the end
 of the 19th century. This formula is also present in Lehmer's paper from 1959 [[2]](#References)
@@ -95,23 +95,23 @@ the initialization of the lookup table is implemented in
 
 ### if (x%pp ≤ pp/2) phi(x, a) = x/pp * φ(pp) + phi(x%pp, a)<br/>if (x%pp > pp/2) phi(x, a) = x/pp * φ(pp) + φ(pp) - phi(pp - 1 - x%pp, a)
 
-In the formulas above pp corresponds to the product of the first a primes: pp = 2 * 3 * ... * prime[a]
+In the formulas above pp corresponds to the product of the first $a$ primes: pp = 2 * 3 * ... * prime[a]
 and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
-When it is not possible to compute $\phi(x, a)$ in O(1) using the formula from the first paragraph, these
-formulas can be used to avoid computing $\phi(x, a)$ where x may be large, and instead compute
+When it is not possible to compute $\phi(x, a)$ in $O(1)$ using the formula from the first paragraph, these
+formulas can be used to avoid computing $\phi(x, a)$ where $x$ may be large, and instead compute
 phi(x%pp, a) or phi(pp - 1 - x%pp, a) where x%pp and pp - 1 - x%pp may be orders of magnitude smaller
 than x. I have tested these formulas in primecount, however they did not provide a general speedup.
-The main issue with these formulas is that they are only useful for relatively large values of x and
+The main issue with these formulas is that they are only useful for relatively large values of $x$ and
 they are limited to small values of a because they involve the product of the first a primes which
 grows rather quickly. In computer programs that use 64-bit integers these formulas can be used for
 a ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]](#References).
 
-### Stop recursion at c instead of 1
+### Stop recursion at $c$ instead of 1
 
-Using the formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) it is possible to compute phi(x, c)
-in O(1) for small values of c e.g. c ≤ 7. Using this formula we can stop recursion at c instead of 1 in
+Using the formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) it is possible to compute $\phi(x, c)$
+in $O(1)$ for small values of $c$ e.g. $c$ ≤ 7. Using this formula we can stop recursion at $c$ instead of 1 in
 the main [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) and simply increase the sum
-by phi(x, c).
+by $\phi(x, c)$.
 
 ### Calculate all phi(x / prime[i], i - 1) = 1 upfront in O(1)
 
@@ -119,55 +119,55 @@ Once phi(x / prime[i], i - 1) = 1 occurs in the main
 [recursive formula](#phix-a--phix-a---1---phix--primea-a---1) all subsequent phi(x / prime[j], j - 1)
 computations with j ∈ ]i, a] will also be 1. Generally phi(x / prime[i], i - 1) = 1 if
 (x / prime[i] ≤ prime[i-1]). Hence instead of computing phi(x / prime[j], j - 1) individually for all
-j ∈ ]i, a] we can simply increase the sum by a - i.
+j ∈ ]i, a] we can simply increase the sum by $a - i$.
 
 ### if (a ≥ pi(√x)) phi(x, a) = pi(x) - a + 1
 
-This formula also allows computing $\phi(x, a)$ in O(1) provided that a is relatively large and x is
-relatively small. If (a ≥ pi(√x)) then $\phi(x, a)$ counts the number of primes ≤ x, minus the first
-a primes, plus the number 1. The use of this formula requires using a pi(x) lookup table of size x.
-In order to reduce the memory usage it is best to use a compressed pi(x) lookup table such as
+This formula also allows computing $\phi(x, a)$ in $O(1)$ provided that $a$ is relatively large and $x$ is
+relatively small. If $a ≥ \pi(\sqrt{x})$ then $\phi(x, a)$ counts the number of primes ≤ $x$, minus the first
+$a$ primes, plus the number 1. The use of this formula requires using a $\pi(x)$ lookup table of size $x$.
+In order to reduce the memory usage it is best to use a compressed $\pi(x)$ lookup table such as
 primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PiTable.hpp).
 The use of a lookup table makes this formula unsuitable for computing $\phi(x, a)$ for large values
-of x due to its excessive memory requirement. However, for large values of x we can compute the
-pi(x) part of this formula using a prime counting function implementation in O(x^(2/3)) or less
+of $x$ due to its excessive memory requirement. However, for large values of $x$ we can compute the
+$\pi(x)$ part of this formula using a prime counting function implementation in $O(x^{\frac{2}{3}})$ or less
 instead of a lookup table which uses much less memory.
 
-### if (a ≥ pi(3√x) && a < pi(√x)) phi(x, a) = pi(x) + P2(x, a) - a + 1
+### $\mathrm{if}(\pi(\sqrt[3]{x}) ≤ a < \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) + \mathrm{P_2}(x, a) - a + 1$
 
-In the formula above 3√x denotes the 3rd root of x and P2(x, a) is the 2nd partial sieve function
-which counts the numbers ≤ x that have exactly 2 prime factors each exceeding the a-th prime.
-If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the P3(x, a) term i.e.
-phi(x, a) = pi(x) + P2(x, a) + P3(x, a) - a + 1. The formulas from this paragraph are not yet
+$\mathrm{P_2}(x, a)$ corresponds to the 2nd partial sieve function,
+it counts the numbers ≤ $x$ that have exactly 2 prime factors each exceeding the a-th prime.
+If (a ≥ pi(4√x) && a < pi(3√x)) then one needs to add the $\mathrm{P_3}(x, a)$ term i.e.
+$\phi(x, a) = \pi(x) + \mathrm{P_2}(x, a) + \mathrm{P_3}(x, a) - a + 1$. The formulas from this paragraph are not yet
 being used in primecount, even though I expect that their use could significantly speed up some
-phi(x, a) computations.
+$\phi(x, a)$ computations.
 
 # New optimization
 
 Due to the recursive nature of the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1)
-the same values of phi(i, j) are calculated over and over again, this is especially true for small to
-medium values of i and j. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) can be used to
-avoid recursion, however it is limited to small values of a ≤ c with c being a small constant e.g.
-c = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute $\phi(x, a)$ in O(1), however
-it is limited to large values of a ≥ pi(√x). Hence there is currently no known optimization for
+the same values of $\phi(i, j)$ are calculated over and over again, this is especially true for small to
+medium values of $i$ and $j$. The formula phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a) can be used to
+avoid recursion, however it is limited to small values of $a$ ≤ $c$ with $c$ being a small constant e.g.
+$c$ = 7. The formula phi(x, a) = pi(x) - a + 1 can also be used to compute $\phi(x, a)$ in $O(1)$, however
+it is limited to large values of $a$ ≥ $\pi(\sqrt{x})$. Hence there is currently no known optimization for
 computing $\phi(x, a)$ for medium values of a ∈ ]c, pi(√x)[.
 
 The new optimization that I have devised is a **phi(i, j) cache** for small to medium
-values of i and j e.g. i ≤ √x and j ≤ 100. The more phi(i, j) results are cached, the fewer recursive
+values of $i$ and $j$ e.g. $i$ ≤ √x and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
 calls occur in the  [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
 it runs. However, on the other hand we are memory constrained, we cannot cache everything and
-ideally our phi(i, j) cache should fit into the CPU's fast cache memory. Hence the main goal for our
-cache is to store as many phi(i, j) results as possible using as little memory as possible.
+ideally our $\phi(i, j)$ cache should fit into the CPU's fast cache memory. Hence the main goal for our
+cache is to store as many $\phi(i, j)$ results as possible using as little memory as possible.
 
-The densest data structure for storing the count of numbers ≤ n that are not divisible by any of the
-first a primes that I am aware of is a bit array. If a bit is set, this means the corresponding
-number is not divisible by any of the first a primes. The 8 bits of each byte correspond to the offsets
+The densest data structure for storing the count of numbers ≤ $n$ that are not divisible by any of the
+first $a$ primes that I am aware of is a bit array. If a bit is set, this means the corresponding
+number is not divisible by any of the first $a$ primes. The 8 bits of each byte correspond to the offsets
 [ 1, 7, 11, 13, 17, 19, 23, 29 ], hence each byte represents an interval of size 30. However to determine
-the count of numbers ≤ n that are not divisible by any of the first a primes, we need to iterate over
-the bit array and count all set bits that correspond to numbers ≤ n. This means the access time of
-our cache would be O(n) which is not great. Therefore we introduce a second array which contains the
+the count of numbers ≤ $n$ that are not divisible by any of the first $a$ primes, we need to iterate over
+the bit array and count all set bits that correspond to numbers ≤ $n$. This means the access time of
+our cache would be $O(n)$ which is not great. Therefore we introduce a second array which contains the
 count of set bits in the first array below the current index. Using these two arrays we can now count
-the numbers ≤ n that are not divisible by any of the first a primes in O(1) operations. Note that the
+the numbers ≤ $n$ that are not divisible by any of the first $a$ primes in $O(1)$ operations. Note that the
 two arrays may be interleaved which makes our cache slightly more memory efficient. Below is the
 corresponding code from primecount:
 
@@ -187,8 +187,8 @@ Before being able to use the $\phi(x, a)$ cache it needs to be initialized. The 
 using a modified version of the [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes).
 In primecount the cache is lazily initialized during the execution of the
 [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1). Whenever a new $\phi(x, i)$ computation
-is started we first check whether that result is not yet present in the cache and if x & i meet the caching
-criteria. If these conditions apply the cache will be filled up to x & i. In the first part of this algorithm
+is started we first check whether that result is not yet present in the cache and if $x$ & $i$ meet the caching
+criteria. If these conditions apply the cache will be filled up to $x$ & $i$. In the first part of this algorithm
 we unset the bits that correspond to numbers that are divisible by the i-th prime. When sieving has
 finished, we proceed to the second part of the algorithm where we count all set bits (below each index)
 in the first array and store that count in the second array. Below is the corresponding code from primecount:
@@ -233,7 +233,7 @@ void init_cache(uint64_t x, uint64_t a)
 
 According to my own benchmarks the cache, as implemented above, speeds up primecount's phi(x, a)
 implementation by more than 10x. Based on my empirical tests caching $\phi(x, a)$ results for
-a ≤ 100 provides the best performance, as mentioned earlier smaller values of x & a are
+a ≤ 100 provides the best performance, as mentioned earlier smaller values of $x$ & $a$ are
 accessed much more frequently than larger values. I also limit the size of the cache to about 16
 megabytes in primecount which is slightly larger than my CPU's L3 cache size. Using an even
 larger cache size deteriorates performance especially when using multi-threading.
@@ -252,9 +252,9 @@ is provided in both papers.
 Computing $\phi(x, i)$ individually for all i ∈ [0, a] would be far too slow. However, by taking
 advantage of the recursive nature of the main formula phi(x, a) = phi(x, a - 1) - phi(x / prime[a], a - 1),
 we can actually generate a lookup table of $\phi(x, i)$ results for i ∈ [0, a] in the same
-amount of time it takes to compute phi(x, a)! We first compute phi(x, 0), next we compute
-phi(x, 1) and reuse the phi(x, 0) result we have computed previously. Then we compute
-phi(x, 2) and reuse our previous phi(x, 1) result and so forth. The code below shows how
+amount of time it takes to compute $\phi(x, a)$. We first compute $\phi(x, 0)$, next we compute
+$\phi(x, 1)$ and reuse the $\phi(x, 0)$ result we have computed previously. Then we compute
+$\phi(x, 2)$ and reuse our previous $\phi(x, 1)$ result and so forth. The code below shows how
 this algorithm can be implemented using a simple for loop. The ```phi_recursive(x / primes[i], i - 1)```
 part needs to be computed using the recursive $\phi(x, a)$ formula in conjunction with the
 optimizations described in this document.
