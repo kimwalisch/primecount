@@ -53,15 +53,16 @@ how to parallelize the computation of the easy special leaves so that the algor
 scale well on current CPU architectures if they accomplish the following three properties:
 
 * Each thread only operates on its own tiny chunk of memory that fits into the cache of the corresponding CPU core.
-* All threads must be independent from each other (i.e. require no synchronization).
+* All threads must be independent of each other (i.e. require no synchronization).
 * The work must be distributed evenly among all threads in order to avoid load imbalance.
 
 A segment size of $\sqrt[4]{x}$ already accomplishes the first property. So next we have to design our parallel algorithm in a way that
-all threads are independent from each other. Luckily Xavier Gourdon [[3]](#references) already devised an idea for how to do this:
+all threads are independent from each other. We can reuse an idea from Xavier Gourdon [[3]](#references) for our purpose:
 each thread is assigned a different segment, which it processes exclusively. At the start of
 each new segment $[low, low + segment\ size[$ each thread computes $\pi(low)$ using a prime counting function implementation
 in $O(low^{\frac{2}{3}})$ or less. The result of $\pi(low)$ is required to initialize the ```SegmentedPrimePi[n]``` lookup table
-for the current segment $[low, low + segment\ size[$. This algorithm has been implemented in primecount-7.0
+for the current segment $[low, low + segment\ size[$. With the additional $\pi(low)$ initialization step we have now managed to
+make the threads independent of each other. This algorithm has been implemented in primecount-7.0
 (see [SegmentedPiTable.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/SegmentedPiTable.cpp), [AC.cpp](https://github.com/kimwalisch/primecount/blob/master/src/gourdon/AC.cpp)), it improved performance
 by more than 2x at $10^{23}$ on my dual-socket AMD EPYC server compared to primecount-6.4 which used a larger segment size and
 required frequent synchronization of threads. It is important to ensure that the additional pre-computations do not deteriorate
@@ -76,8 +77,8 @@ they become more and more sparse as they approach $\sqrt{x}$. Hence it is critic
 among all threads. Based on my benchmarks a small segment size of $\sqrt[4]{x}$ evenly distributes the work even on servers with a
 large number of CPU cores such as my dual-socket AMD EPYC server with 196 threads. Using a segment size larger than $\sqrt[4]{x}$ such
 as $\sqrt[3]{x}$ or $y$ causes significant load imbalance (i.e. some threads will be assigned much more work than others and keep on
-computing after most of the threads have already finished their computations) which severely deteriorates performance especially
-on PCs and servers with a large number of CPU cores. Above $y$ there are much fewer easy special leaves hence the segment size can
+computing after most of the threads have already finished their computations) which severely deteriorates performance, especially
+on PCs and servers with a large number of CPU cores. Above $y$ there are much fewer easy special leaves, hence the segment size can
 be increased by a small constant factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the
 new segment size still fits into the CPU's cache.
 
