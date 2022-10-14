@@ -28,8 +28,8 @@ Hence now the partial sieve function's performance has become critical for paral
 of the combinatorial prime counting algorithms. This document describes the many
 [known optimizations](#optimizations) that can be used to speed up the $\phi(x, a)$ computation and
 it describes a [new optimization](#new-optimization) that I have devised and that has first been
-implemented in primecount. It is a compressed cache of $\phi(x, a)$ results that speeds up most computations
-by more than 10x.
+implemented in primecount. It is a compressed cache of $\phi(i, j)$ results, for small to medium values
+of $i$ and $j$, that speeds up most $\phi(x, a)$ computations by more than an order of magnitude.
 
 # $\phi(x, a)$ in primecount
 
@@ -232,9 +232,9 @@ void init_cache(uint64_t x, uint64_t a)
 ```
 
 According to my benchmarks, the cache as implemented above speeds up primecount's $\phi(x, a)$
-implementation by more than 10x. Based on my empirical tests, caching $\phi(x, a)$ results for
-$a$ ≤ 100 provides the best performance. As mentioned earlier, smaller values of $x$ & $a$ are
-accessed much more frequently than larger values. I also limit the size of the cache to about 16
+implementation by more than an order of magnitude. Based on my empirical tests, caching $\phi(x, a)$
+results for $a$ ≤ 100 provides the best performance. As mentioned earlier, smaller values of $x$ & $a$
+are accessed much more frequently than larger values. I also limit the size of the cache to about 16
 megabytes in primecount which is slightly larger than my CPU's L3 cache size. Using an even
 larger cache size deteriorates performance especially when using multi-threading.
 
