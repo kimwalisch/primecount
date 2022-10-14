@@ -78,12 +78,12 @@ I will now briefly describe all known optimizations, and then further down I wil
 [new optimization](#new-optimization) that I have devised and that has first been implemented in
 primecount.
 
-### phi(x, a) = (x / pp) * φ(pp) + phi(x % pp, a)
+### $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$
 
 This formula allows computing $\phi(x, a)$ in $O(1)$ for small values of $a$ e.g. for $a$ ≤ 7.
-[φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and pp
-denotes the product of the first $a$ primes: pp = 2 * 3 * ... * prime[a]. The use of this formula
-requires initializing a lookup table of $\phi(i, a)$ results for i ∈ [0, pp[, hence the lookup table has
+[φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and $pp$
+denotes the product of the first $a$ primes: $pp = 2\times 3\times ...\times prime_a$. The use of this formula
+requires initializing a lookup table of $\phi(i, a)$ results for $i \in [0, pp[$, hence the lookup table has
 a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
 the first who used this formula for the computation of the number of primes below 1 billion at the end
 of the 19th century. This formula is also present in Lehmer's paper from 1959 [[2]](#References)
