@@ -231,9 +231,9 @@ void init_cache(uint64_t x, uint64_t a)
 }
 ```
 
-According to my own benchmarks the cache, as implemented above, speeds up primecount's phi(x, a)
+According to my own benchmarks the cache, as implemented above, speeds up primecount's $\phi(x, a)$
 implementation by more than 10x. Based on my empirical tests caching $\phi(x, a)$ results for
-a ≤ 100 provides the best performance, as mentioned earlier smaller values of $x$ & $a$ are
+$a$ ≤ 100 provides the best performance, as mentioned earlier smaller values of $x$ & $a$ are
 accessed much more frequently than larger values. I also limit the size of the cache to about 16
 megabytes in primecount which is slightly larger than my CPU's L3 cache size. Using an even
 larger cache size deteriorates performance especially when using multi-threading.
