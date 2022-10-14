@@ -116,13 +116,13 @@ $a$ ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]]
 
 Using the formula $\phi(x, a) = (x / pp)\times \varphi(pp) + \phi(x \bmod pp, a)$ it is possible to compute $\phi(x, c)$
 in $O(1)$ for small values of $c$ e.g. $c$ ≤ 7. Using this formula we can stop recursion at $c$ instead of 1 in
-the main [recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) and simply increase the sum
+the [main recursive phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) and simply increase the sum
 by $\phi(x, c)$.
 
 ### Calculate all $\phi(x / \mathrm{prime}_i, i-1) = 1$ upfront in $O(1)$
 
-Once $\phi(x / \mathrm{prime}_i, i-1) = 1$ occurs in the main
-[recursive formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) all subsequent $\phi(x / \mathrm{prime}_j, j-1)$
+Once $\phi(x / \mathrm{prime}_i, i-1) = 1$ occurs in the
+[main recursive phi(x, a) formula](#phix-a--phix-a---1---phix--mathrmprime_a-a---1) all subsequent $\phi(x / \mathrm{prime}_j, j-1)$
 computations with $j \in ]i, a]$ will also be 1. Generally $\phi(x / \mathrm{prime}_i, i-1) = 1$ if
 $(x / \mathrm{prime}_i ≤ \mathrm{prime}\_{i-1})$. Hence instead of computing $\phi(x / \mathrm{prime}_j, j-1)$ individually for all
 $j \in ]i, a]$ we can simply increase the sum by $a - i$.
