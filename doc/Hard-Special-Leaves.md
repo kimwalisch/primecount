@@ -96,7 +96,7 @@ There are many known optimizations that can be used to speedup counting:
   sieve index of the previous leaf.
 
 This alternative method with the 3 optimizations described above was used in
-primecount up to version 5.3 (January 2020). According to my own benchmarks
+primecount up to version 5.3 (January 2020). According to my benchmarks
 this method runs up to 3x faster than an implementation that uses the binary
 indexed tree data structure. But there is a problem: all of the alternative algorithms that avoid using the
 binary indexed tree data structure have a worse runtime complexity. But why are

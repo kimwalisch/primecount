@@ -28,7 +28,7 @@ Hence now the partial sieve function's performance has become critical for paral
 of the combinatorial prime counting algorithms. This document describes the many
 [known optimizations](#optimizations) that can be used to speed up the $\phi(x, a)$ computation and
 it describes a [new optimization](#new-optimization) that I have devised and that has first been
-implemented in primecount. It's a compressed cache of $\phi(x, a)$ results that speeds up most computations
+implemented in primecount. It is a compressed cache of $\phi(x, a)$ results that speeds up most computations
 by more than 10x.
 
 # $\phi(x, a)$ in primecount
@@ -50,7 +50,7 @@ This is the main formula for the computation of the partial sieve function. As m
 introduction this formula was first described by Legendre in his book "Théorie des nombres"
 [[1]](#References). When implemented in a computer program the above recursive
 $\phi(x, a)$ formula with $a = \pi(\sqrt{x})$ allows computing Legendre's prime counting function
-$\pi(x)=\pi(\sqrt{x})+\phi(x,\pi(\sqrt{x}))-1$ in $O(x / \log{x})$ operations and using $O(\sqrt{x} / \log{x})$ space.
+$\pi(x)=\pi(\sqrt{x})+\phi(x,\pi(\sqrt{x}))-1$ in $O(x)$ operations and using $O(\sqrt{x} / \log{x})$ space.
 Tomás Oliveira e Silva's paper [[6]](#References) contains a simple C implementation of this formula:
 
 ```C
@@ -84,7 +84,7 @@ This formula allows computing $\phi(x, a)$ in $O(1)$ for small values of $a$ e.g
 [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function and $pp$
 denotes the product of the first $a$ primes: $pp = 2\times 3\times ...\times \mathrm{prime}_a$. The use of this formula
 requires initializing a lookup table of $\phi(i, a)$ results for $i \in [0, pp[$, hence the lookup table has
-a size of pp. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
+a size of $pp$. The German astronomer [Ernst Meissel](https://de.wikipedia.org/wiki/Ernst_Meissel) was
 the first who used this formula for the computation of the number of primes below 1 billion at the end
 of the 19th century. This formula is also present in Lehmer's paper from 1959 [[2]](#References)
 and is described in more detail in most of the other combinatorial prime counting papers. In
@@ -95,14 +95,14 @@ the initialization of the lookup table is implemented in
 
 ### $\mathrm{if}(x\bmod pp ≤ pp/2)\ \ \phi(x, a) = (x/pp)\times \varphi(pp) + \phi(x\bmod pp, a)$<br/>$\mathrm{if}(x\bmod pp > pp/2)\ \ \phi(x, a) = (x/pp)\times \varphi(pp) + \varphi(pp) - \phi(pp - 1 - x\bmod pp, a)$
 
-In the formulas above pp corresponds to the product of the first $a$ primes: $pp = 2\times 3\times ...\times \mathrm{prime}_a$
+In the formulas above $pp$ corresponds to the product of the first $a$ primes: $pp = 2\times 3\times ...\times \mathrm{prime}_a$
 and [φ(n)](https://en.wikipedia.org/wiki/Euler%27s_totient_function) is Euler's totient function.
-When it is not possible to compute $\phi(x, a)$ in $O(1)$ using the formula from the first paragraph, these
+If it is not possible to compute $\phi(x, a)$ in $O(1)$ using the formula from the previous paragraph, these
 formulas can be used to avoid computing $\phi(x, a)$ where $x$ may be large, and instead compute
 $\phi(x\bmod pp, a)$ or $\phi(pp - 1 - x\bmod pp, a)$ where $x\bmod pp$ and $pp - 1 - x\bmod pp$ may be orders of magnitude smaller
 than $x$. I have tested these formulas in primecount, however they did not provide a general speedup.
 The main issue with these formulas is that they are only useful for relatively large values of $x$ and
-they are limited to small values of $a$ because they involve the product of the first a primes which
+they are limited to small values of $a$ because they involve the product of the first $a$ primes which
 grows rather quickly. In computer programs that use 64-bit integers these formulas can be used for
 $a$ ≤ 16. These formulas are partially described in R.P. Leopold's paper [[7]](#References).
 
@@ -136,7 +136,7 @@ instead of a lookup table which uses much less memory.
 ### $\mathrm{if}(\pi(\sqrt[3]{x}) ≤ a < \pi(\sqrt{x}))\ \ \phi(x, a) = \pi(x) + \mathrm{P_2}(x, a) - a + 1$
 
 $\mathrm{P_2}(x, a)$ corresponds to the 2nd partial sieve function,
-it counts the numbers ≤ $x$ that have exactly 2 prime factors each exceeding the a-th prime.
+it counts the numbers ≤ $x$ that have exactly two prime factors each exceeding the a-th prime.
 If $(\pi(\sqrt[4]{x}) ≤ a < \pi(\sqrt[3]{x}))$ then one needs to add the $\mathrm{P_3}(x, a)$ term i.e.
 $\phi(x, a) = \pi(x) + \mathrm{P_2}(x, a) + \mathrm{P_3}(x, a) - a + 1$. The formulas from this paragraph are not yet
 being used in primecount, even though I expect that their use could significantly speed up some
@@ -154,7 +154,7 @@ computing $\phi(x, a)$ for medium values of $a \in\ ]c, \pi(\sqrt{x})[$.
 
 The new optimization that I have devised is a $\phi(i, j)$ cache for small to medium
 values of $i$ and $j$ e.g. $i$ ≤ $\sqrt{x}$ and $j$ ≤ 100. The more $\phi(i, j)$ results are cached, the fewer recursive
-calls occur in the  [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
+calls occur in the [main phi(x, a) formula](#phix-a--phix-a---1---phix--primea-a---1) and the faster
 it runs. However, on the other hand we are memory constrained, we cannot cache everything and
 ideally our $\phi(i, j)$ cache should fit into the CPU's fast cache memory. Hence the main goal for our
 cache is to store as many $\phi(i, j)$ results as possible using as little memory as possible.
@@ -231,9 +231,9 @@ void init_cache(uint64_t x, uint64_t a)
 }
 ```
 
-According to my own benchmarks the cache, as implemented above, speeds up primecount's $\phi(x, a)$
-implementation by more than 10x. Based on my empirical tests caching $\phi(x, a)$ results for
-$a$ ≤ 100 provides the best performance, as mentioned earlier smaller values of $x$ & $a$ are
+According to my benchmarks, the cache as implemented above speeds up primecount's $\phi(x, a)$
+implementation by more than 10x. Based on my empirical tests, caching $\phi(x, a)$ results for
+$a$ ≤ 100 provides the best performance. As mentioned earlier, smaller values of $x$ & $a$ are
 accessed much more frequently than larger values. I also limit the size of the cache to about 16
 megabytes in primecount which is slightly larger than my CPU's L3 cache size. Using an even
 larger cache size deteriorates performance especially when using multi-threading.
