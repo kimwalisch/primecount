@@ -341,6 +341,9 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
   if (a > pix_upper(sqrtx))
     return phi_pix(x, a, threads);
 
+  // We use a large pi(x) lookup table of size sqrt(x) to speed up our
+  // phi(x, a) implementation. As a drawback this increases the memory
+  // usage of our phi(x, a) implementation from O(a) to O(sqrt(x)).
   PiTable pi(sqrtx, threads);
   int64_t pi_sqrtx = pi[sqrtx];
 
