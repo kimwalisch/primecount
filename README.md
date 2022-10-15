@@ -341,7 +341,7 @@ principle to calculate the number of primes below x without enumerating the indi
 primes. Legendre's formula has a running time of $O(x)$ operations and uses $O(\sqrt{x}/\log{x})$
 space. In 1870 E. D. F. Meissel improved Legendre's formula by setting $a=\pi(\sqrt[3]{x})$
 and by adding the correction term $\mathrm{P_2}(x,a)$, Meissel's formula has a running time
-of $O(x/\log^3{x})$ operations and uses $O(\sqrt{x}/\log{x})$ space. In 1959 D. H. Lehmer
+of $O(x/\log^3{x})$ operations and uses $O(\sqrt[3]{x})$ space. In 1959 D. H. Lehmer
 extended Meissel's formula and slightly improved the running time to $O(x/\log^4{x})$
 operations and $O(x^{\frac{3}{8}})$ space. In 1985 J. C. Lagarias, V. S. Miller and A. M.
 Odlyzko published a new algorithm based on Meissel's formula which has a lower runtime

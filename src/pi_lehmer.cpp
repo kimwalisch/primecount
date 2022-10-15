@@ -9,7 +9,18 @@
 ///        pi(x) = pi(y) + phi(x, a) - 1 - P2(x, a) - P3(x, a)
 ///        with y = x^1/4, a = pi(y)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+///        Please note that I think that Lehmer's algorithm uses
+///        O(x^(3/8)) memory instead of O(x^(1/3) / log(x)) found in
+///        many papers. The memory usage is dominated by the segment
+///        size (of the segmented sieve of Eratosthenes) in its P2
+///        formula, which is O(sqrt(x^(3/4))) = O(x^(3/8)).
+///
+///        However, our implementation uses O(x^(1/2)) memory instead
+///        of O(x^(3/8)) because our phi(x, a) implementation uses a
+///        large pi(x) lookup table of size x^(1/2) in order to
+///        improve performance.
+///
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

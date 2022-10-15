@@ -11,7 +11,13 @@
 ///        pi(x) = pi(y) + phi(x, pi(y)) - 1
 ///        with y = x^(1/2)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+///        Please note that our implementation of Legendre's algorithm
+///        uses O(x^(1/2)) memory instead of O(x^(1/2) / log(x)) found
+///        in most papers, because our phi(x, a) implementation uses a
+///        large pi(x) lookup table of size x^(1/2) in order to
+///        improve performance.
+///
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
