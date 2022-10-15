@@ -138,8 +138,9 @@ for:
           platform: x64
           configuration: Release
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CXXFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      LDFLAGS: "-L/usr/local/opt/libomp/lib"
     install:
       - brew install libomp
     build_script:
