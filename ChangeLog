@@ -1,10 +1,10 @@
-Changes in primecount-7.5, 2022-10-14
+Changes in primecount-7.5, 2022-10-16
 
-The API and ABI of primecount-7.5 are backwards compatible but
+The C/C++ API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
 primecount-7.4 requried >= libprimesieve.so.10.
 
-* Update to the latest libprimesieve-9.0.
+* Update to the latest libprimesieve-11.0.
 * Use the new primesieve::iterator::jump_to() instead of
   primesieve::iterator::skipto(). This reduces the number of required
   start number corrections (e.g. skipto(start-1)) by 2x.
