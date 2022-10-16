@@ -48,7 +48,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   int64_t dist = sieve_limit_ - low_;
   thread_dist_ = dist / (threads * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
-  threads_ = ideal_num_threads(threads, dist, thread_dist_);
+  threads_ = ideal_num_threads(dist, threads, thread_dist_);
 
   if (threads_ > 1)
     lock_.init();

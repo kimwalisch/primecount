@@ -48,13 +48,15 @@ int64_t S2(int64_t x,
            const pod_vector<int32_t>& mu,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2(x, y) ===");
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t limit = x / y;
   int64_t segment_size = Sieve::get_segment_size(isqrt(limit));
   int64_t low = 0;

@@ -84,7 +84,7 @@ public:
 
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = (int64_t) 1e7;
-    threads = ideal_num_threads(threads, y, thread_threshold);
+    threads = ideal_num_threads(y, threads, thread_threshold);
     int64_t thread_distance = ceil_div(y, threads);
     thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 

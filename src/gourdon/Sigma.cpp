@@ -104,14 +104,16 @@ int64_t Sigma(int64_t x,
               int threads,
               bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== Sigma(x, y) ===");
     print_gourdon_vars(x, y, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_pix_sigma4 = x / (x_star * y);
   int64_t max_pix_sigma5 = y;
@@ -143,11 +145,14 @@ int128_t Sigma(int128_t x,
                int threads,
                bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== Sigma(x, y) ===");
     print_gourdon_vars(x, y, threads);
+    time = get_time();
   }
 
   int128_t x_star = get_x_star_gourdon(x, y);
@@ -162,7 +167,6 @@ int128_t Sigma(int128_t x,
   int128_t c = pi[isqrt(x / y)];
   int128_t d = pi[x_star];
 
-  double time = get_time();
   int128_t sum = Sigma0(x, a, threads) +
                  Sigma1(a, b) +
                  Sigma2(a, b, c, d) +

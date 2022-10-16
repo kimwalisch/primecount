@@ -198,7 +198,7 @@ T S2_hard_OpenMP(T x,
                  bool is_print)
 {
   int64_t thread_threshold = 1 << 20;
-  threads = ideal_num_threads(threads, z, thread_threshold);
+  threads = ideal_num_threads(z, threads, thread_threshold);
   LoadBalancerS2 loadBalancer(x, z, s2_hard_approx, threads, is_print);
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime, threads);
@@ -237,14 +237,16 @@ int64_t S2_hard(int64_t x,
                 int threads,
                 bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_hard(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
   auto primes = generate_primes<int32_t>(max_prime);
@@ -266,14 +268,16 @@ int128_t S2_hard(int128_t x,
                  int threads,
                  bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_hard(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum;
 
   // uses less memory

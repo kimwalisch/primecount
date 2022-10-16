@@ -132,14 +132,16 @@ int64_t P2(int64_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== P2(x, y) ===");
     print_vars(x, y, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t sum = P2_OpenMP(x, y, threads, is_print);
 
   if (is_print)
@@ -155,14 +157,16 @@ int128_t P2(int128_t x,
             int threads,
             bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== P2(x, y) ===");
     print_vars(x, y, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum = P2_OpenMP(x, y, threads, is_print);
 
   if (is_print)

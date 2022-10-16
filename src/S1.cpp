@@ -67,7 +67,8 @@ X S1_OpenMP(X x,
             int64_t c,
             int threads)
 {
-  threads = ideal_num_threads(threads, y);
+  int64_t thread_threshold = (int64_t) 1e6;
+  threads = ideal_num_threads(y, threads, thread_threshold);
 
   auto primes = generate_primes<Y>(y);
   int64_t pi_y = primes.size() - 1;
@@ -93,14 +94,16 @@ int64_t S1(int64_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S1(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t s1 = S1_OpenMP(x, y, c, threads);
 
   if (is_print)
@@ -117,14 +120,16 @@ int128_t S1(int128_t x,
             int threads,
             bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S1(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t s1;
 
   // uses less memory

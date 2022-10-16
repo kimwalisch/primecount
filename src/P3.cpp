@@ -28,13 +28,15 @@ int64_t P3(int64_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== P3(x, y) ===");
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t sum = 0;
   int64_t x13 = iroot<3>(x);
 
@@ -47,7 +49,8 @@ int64_t P3(int64_t x,
     PiTable pi(max_pix, threads);
     int64_t pi_x13 = pi[x13];
 
-    threads = ideal_num_threads(threads, pi_x13, 100);
+    int64_t thread_threshold = 100;
+    threads = ideal_num_threads(pi_x13, threads, thread_threshold);
 
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
     for (int64_t i = a + 1; i <= pi_x13; i++)

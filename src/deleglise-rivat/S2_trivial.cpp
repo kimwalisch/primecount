@@ -99,14 +99,16 @@ int64_t S2_trivial(int64_t x,
                    int threads,
                    bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_trivial(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t sum = ::S2_trivial(x, y, z, c, threads);
 
   if (is_print)
@@ -124,14 +126,16 @@ int128_t S2_trivial(int128_t x,
                     int threads,
                     bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_trivial(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum = ::S2_trivial(x, y, z, c, threads);
 
   if (is_print)

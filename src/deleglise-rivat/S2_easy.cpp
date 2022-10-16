@@ -50,7 +50,7 @@ T S2_easy_OpenMP(T x,
   T sum = 0;
   int64_t x13 = iroot<3>(x);
   int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
+  threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x);
   PiTable pi(y, threads);
@@ -121,14 +121,16 @@ int64_t S2_easy(int64_t x,
                 int threads,
                 bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_easy(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   auto primes = generate_primes<uint32_t>(y);
   int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads, is_print);
 
@@ -147,14 +149,16 @@ int128_t S2_easy(int128_t x,
                  int threads,
                  bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2_easy(x, y) ===");
     print_vars(x, y, c, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum;
 
   // uses less memory

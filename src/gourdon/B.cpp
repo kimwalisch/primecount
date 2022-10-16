@@ -118,14 +118,16 @@ int64_t B(int64_t x,
           int threads,
           bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== B(x, y) ===");
     print_gourdon_vars(x, y, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t sum = B_OpenMP((uint64_t) x, y, threads, is_print);
 
   if (is_print)
@@ -141,14 +143,16 @@ int128_t B(int128_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== B(x, y) ===");
     print_gourdon_vars(x, y, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum = B_OpenMP((uint128_t) x, y, threads, is_print);
 
   if (is_print)

@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,7 @@
 
 #include <int128_t.hpp>
 #include <print.hpp>
+#include <imath.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -79,12 +80,15 @@ double get_alpha_deleglise_rivat(maxint_t x);
 std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
-int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold = 1000000);
 maxint_t to_maxint(const std::string& expr);
 double get_time();
 
+} // namespace primecount
+
+namespace {
+
 template <typename T1, typename T2, typename T3>
-inline T2 in_between(T1 min, T2 x, T3 max)
+T2 in_between(T1 min, T2 x, T3 max)
 {
   if (x < min || max < min)
     return (T2) min;
@@ -94,17 +98,24 @@ inline T2 in_between(T1 min, T2 x, T3 max)
   return x;
 }
 
+inline int ideal_num_threads(int64_t sieve_limit, int threads, int64_t thread_threshold)
+{
+  thread_threshold = std::max((int64_t) 1, thread_threshold);
+  int64_t max_threads = ceil_div(sieve_limit, thread_threshold);
+  return in_between(1, threads, max_threads);
+}
+
 template <typename T>
 double get_percent(T low, T limit)
 {
-  double percent = (100.0 * low) / std::max<T>(1, limit);
+  double percent = (100.0 * low) / std::max((T) 1, limit);
   return in_between(0, percent, 100);
 }
 
 template <typename T>
 T S2_approx(T x, int64_t pi_y, T p2, T s1)
 {
-  T pix = Li(x);
+  T pix = primecount::Li(x);
   T s2_approx = pix - s1 - pi_y + 1 + p2;
   s2_approx = std::max(s2_approx, (T) 0);
   return s2_approx;
@@ -113,7 +124,7 @@ T S2_approx(T x, int64_t pi_y, T p2, T s1)
 template <typename T>
 T D_approx(T x, T sigma, T phi0, T ac, T b)
 {
-  T pix = Li(x);
+  T pix = primecount::Li(x);
   T d_approx = pix - (ac - b + phi0 + sigma);
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;

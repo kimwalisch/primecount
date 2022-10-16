@@ -95,7 +95,7 @@ void PiTable::init(uint64_t limit,
   ASSERT(cache_limit < limit);
   uint64_t dist = limit - cache_limit;
   uint64_t thread_threshold = (uint64_t) 1e7;
-  threads = ideal_num_threads(threads, dist, thread_threshold);
+  threads = ideal_num_threads(dist, threads, thread_threshold);
   uint64_t thread_dist = dist / threads;
   thread_dist = max(thread_threshold, thread_dist);
   thread_dist += 240 - thread_dist % 240;

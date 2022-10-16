@@ -212,7 +212,7 @@ T AC_OpenMP(T x,
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
   int64_t thread_threshold = 1000;
-  threads = ideal_num_threads(threads, x13, thread_threshold);
+  threads = ideal_num_threads(x13, threads, thread_threshold);
   LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // PiTable's size = z because of the C1 formula.
@@ -305,14 +305,16 @@ int64_t AC(int64_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== AC(x, y) ===");
     print_gourdon_vars(x, y, z, k, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
@@ -336,14 +338,16 @@ int128_t AC(int128_t x,
             int threads,
             bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== AC(x, y) ===");
     print_gourdon_vars(x, y, z, k, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);

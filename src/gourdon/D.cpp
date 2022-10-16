@@ -193,7 +193,7 @@ T D_OpenMP(T x,
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
   int64_t thread_threshold = 1 << 20;
-  threads = ideal_num_threads(threads, xz, thread_threshold);
+  threads = ideal_num_threads(xz, threads, thread_threshold);
   LoadBalancerS2 loadBalancer(x, xz, d_approx, threads, is_print);
   PiTable pi(y, threads);
 
@@ -231,14 +231,16 @@ int64_t D(int64_t x,
           int threads,
           bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== D(x, y) ===");
     print_gourdon_vars(x, y, z, k, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   FactorTableD<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<int32_t>(y);
   int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
@@ -259,14 +261,16 @@ int128_t D(int128_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== D(x, y) ===");
     print_gourdon_vars(x, y, z, k, threads);
+    time = get_time();
   }
 
-  double time = get_time();
   int128_t sum;
 
   // uses less memory

@@ -174,15 +174,17 @@ int64_t S2(int64_t x,
            int threads,
            bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== S2(x, y) ===");
+    time = get_time();
   }
 
-  double time = get_time();
   int64_t thread_threshold = 1 << 20;
-  threads = ideal_num_threads(threads, z, thread_threshold);
+  threads = ideal_num_threads(z, threads, thread_threshold);
   LoadBalancerS2 loadBalancer(x, z, s2_approx, threads, is_print);
   PiTable pi(y, threads);
 

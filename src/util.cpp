@@ -131,13 +131,6 @@ maxint_t to_maxint(const std::string& expr)
   return calculator::eval<maxint_t>(expr);
 }
 
-int ideal_num_threads(int threads, int64_t sieve_limit, int64_t thread_threshold)
-{
-  thread_threshold = max((int64_t) 1, thread_threshold);
-  int64_t max_threads = ceil_div(sieve_limit, thread_threshold);
-  return in_between(1, threads, max_threads);
-}
-
 int get_status_precision(maxint_t x)
 {
   // use default precision when no command-line precision provided

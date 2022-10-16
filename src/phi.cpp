@@ -319,7 +319,7 @@ int64_t pix_upper(int64_t x)
 /// phi(x, a) counts the numbers <= x that are not divisible
 /// by any of the first a primes.
 ///
-int64_t phi_noprint(int64_t x, int64_t a, int threads)
+int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
 {
   if (x < 1) return 0;
   if (a < 1) return x;
@@ -359,7 +359,7 @@ int64_t phi_noprint(int64_t x, int64_t a, int threads)
   int64_t c = PhiTiny::get_c(sqrtx);
   int64_t sum = phi_tiny(x, c);
   int64_t thread_threshold = (int64_t) 1e10;
-  threads = ideal_num_threads(threads, x, thread_threshold);
+  threads = ideal_num_threads(x, threads, thread_threshold);
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
@@ -388,14 +388,16 @@ int64_t phi(int64_t x,
             int threads,
             bool is_print)
 {
+  double time;
+
   if (is_print)
   {
     print("");
     print("=== phi(x, a) ===");
+    time = get_time();
   }
 
-  double time = get_time();
-  int64_t sum = phi_noprint(x, a, threads);
+  int64_t sum = phi_OpenMP(x, a, threads);
 
   if (is_print)
     print("phi", sum, time);
