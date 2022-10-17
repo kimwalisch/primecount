@@ -121,6 +121,15 @@ set(LIB_SRC src/api.cpp
 
 include(GNUInstallDirs)
 
+# Use -Wno-uninitialized with GCC compiler ###########################
+
+# GCC's -Wuninitialized enabled with -Wall -pedantic causes
+# false postive warnings in libprimecount:
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107287
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(WNO_UNINITIALIZED "-Wno-uninitialized")
+endif()
+
 # libprimecount compile definitions ##################################
 
 # Check at runtime if the dividend and divisor are < 2^32 and
@@ -212,7 +221,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}")
+    target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -237,7 +246,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}")
+    target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount-static PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 

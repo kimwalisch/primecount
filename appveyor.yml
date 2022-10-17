@@ -28,7 +28,7 @@ for:
           configuration: Debug
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
     build_script:
       # POPCNT disabled + Debug
       - CXX=g++-7 cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
@@ -50,7 +50,7 @@ for:
           configuration: Release
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     build_script:
       # libdivide disabled + Release
       - CXX=g++-8 cmake . -DWITH_LIBDIVIDE=OFF -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
@@ -71,7 +71,7 @@ for:
           configuration: Debug
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
       # Test with GCC sanitizers
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
