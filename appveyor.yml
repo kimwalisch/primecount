@@ -118,8 +118,8 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -Wno-long-long"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -Wno-long-long"
     build_script:
       # This test should be without OpenMP
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
@@ -138,8 +138,8 @@ for:
           platform: x64
           configuration: Release
     environment:
-      CFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror"
-      CXXFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror"
+      CFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long"
+      CXXFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long"
       LDFLAGS: "-L/usr/local/opt/libomp/lib"
     install:
       - brew install libomp
