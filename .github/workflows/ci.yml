@@ -28,7 +28,6 @@ jobs:
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
             make -j2 VERBOSE=1
       # The current MinGW/GCC-12.1 version miscompiles primesieve/primecount,
       # many tests fail with an exception thrown.
@@ -54,7 +53,6 @@ jobs:
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
             make -j2 VERBOSE=1
       - name: CTest (unit tests)
         run: ctest -j2
@@ -90,7 +88,6 @@ jobs:
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
             make -j2 VERBOSE=1
       - name: CTest (unit tests)
         run: ctest -j2
@@ -107,7 +104,6 @@ jobs:
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-            grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
             make -j2
       - name: CTest (unit tests)
         run: ctest -j2

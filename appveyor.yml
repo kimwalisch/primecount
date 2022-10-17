@@ -35,7 +35,6 @@ for:
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
       - ctest -j2
@@ -79,7 +78,6 @@ for:
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
     test_script:
       - ctest -j2
@@ -105,7 +103,6 @@ for:
       - grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -125,7 +122,6 @@ for:
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -149,7 +145,6 @@ for:
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
-      - grep "^libdivide_branchfree:INTERNAL=1$" CMakeCache.txt
       - make -j8 VERBOSE=1
       - make install
     test_script:
@@ -167,7 +162,6 @@ for:
     build_script:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc /O1" -DCMAKE_BUILD_TYPE=%Configuration%
       - findstr /b /e OpenMP:INTERNAL=1 CMakeCache.txt
-      - findstr /b /e libdivide_branchfree:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
       - ctest -j 2 -C %Configuration%
@@ -185,7 +179,6 @@ for:
     build_script:
       - cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc" -DCMAKE_BUILD_TYPE=%Configuration%
       - findstr /b /e OpenMP:INTERNAL=1 CMakeCache.txt
-      - findstr /b /e libdivide_branchfree:INTERNAL=1 CMakeCache.txt
       - cmake --build . --config %Configuration% --target install
     test_script:
       - ctest -j 2 -C %Configuration%

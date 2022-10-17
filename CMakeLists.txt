@@ -142,13 +142,9 @@ endif()
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
-# Check if libdivide.h compiles ######################################
+# Use libdivide.h (fast integer divison) #############################
 
 if(WITH_LIBDIVIDE)
-    include("${PROJECT_SOURCE_DIR}/cmake/libdivide.cmake")
-endif()
-
-if(WITH_LIBDIVIDE AND libdivide_branchfree)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
 else()
