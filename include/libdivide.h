@@ -430,6 +430,9 @@ static uint64_t libdivide_128_div_64_to_64(uint64_t u1, uint64_t u0, uint64_t v,
 #endif
 }
 
+#if !(defined(HAS_INT128_T) && \
+      defined(HAS_INT128_DIV))
+
 // Bitshift a u128 in place, left (signed_shift > 0) or right (signed_shift < 0)
 static inline void libdivide_u128_shift(uint64_t *u1, uint64_t *u0, int32_t signed_shift) {
     if (signed_shift > 0) {
@@ -445,6 +448,8 @@ static inline void libdivide_u128_shift(uint64_t *u1, uint64_t *u0, int32_t sign
         *u1 >>= shift;
     }
 }
+
+#endif
 
 // Computes a 128 / 128 -> 64 bit division, with a 128 bit remainder.
 static uint64_t libdivide_128_div_128_to_64(uint64_t u_hi, uint64_t u_lo, uint64_t v_hi, uint64_t v_lo, uint64_t *r_hi, uint64_t *r_lo) {
