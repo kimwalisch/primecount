@@ -98,7 +98,7 @@ using namespace primecount;
 
 namespace {
 
-void check_equal(const char* f1,
+void check_equal(string_view_t f1,
                  int64_t x,
                  int64_t res1,
                  int64_t res2)

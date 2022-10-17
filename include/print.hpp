@@ -13,6 +13,16 @@
 #include <int128_t.hpp>
 #include <stdint.h>
 
+#if !defined(__has_include)
+  #define __has_include(x) 0
+#endif
+
+#if __cplusplus >= 201703L && __has_include(<string_view>)
+  using string_view_t = std::string_view;
+#else
+  using string_view_t = const char*;
+#endif
+
 namespace primecount {
 
 void set_print(bool print);
@@ -21,9 +31,9 @@ void set_print_variables(bool print_variables);
 bool is_print();
 bool is_print_combined_result();
 
-void print(const char* str);
-void print(const char* str, maxint_t res);
-void print(const char* str, maxint_t res, double time);
+void print(string_view_t str);
+void print(string_view_t str, maxint_t res);
+void print(string_view_t str, maxint_t res, double time);
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads);
 void print_vars(maxint_t x, int64_t y, int threads);
 void print_vars(maxint_t x, int64_t y, int64_t c, int threads);

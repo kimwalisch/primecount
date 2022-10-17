@@ -63,17 +63,17 @@ void print_seconds(double seconds)
   std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
 }
 
-void print(const char* str)
+void print(string_view_t str)
 {
   std::cout << str << std::endl;
 }
 
-void print(const char* str, maxint_t res)
+void print(string_view_t str, maxint_t res)
 {
   std::cout << str << " = " << res << std::endl;
 }
 
-void print(const char* str, maxint_t res, double time)
+void print(string_view_t str, maxint_t res, double time)
 {
   // We overwrite the current text line,
   // which could be e.g.:
