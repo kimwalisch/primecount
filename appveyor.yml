@@ -72,13 +72,10 @@ for:
           configuration: Debug
     environment:
       CFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-    install:
-      - sudo apt update
-      - sudo apt install g++-10 gcc-10
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
     build_script:
       # Test with GCC sanitizers
-      - CXX=g++-10 CC=gcc-10 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
