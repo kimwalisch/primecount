@@ -27,8 +27,8 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized -O1"
     build_script:
       # POPCNT disabled + Debug
       - CXX=g++-7 cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
@@ -50,8 +50,8 @@ for:
           platform: x64
           configuration: Release
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-uninitialized"
     build_script:
       # libdivide disabled + Release
       - CXX=g++-8 cmake . -DWITH_LIBDIVIDE=OFF -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
@@ -71,11 +71,14 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+    install:
+      - sudo apt update
+      - sudo apt install g++-10 gcc-10
     build_script:
       # Test with GCC sanitizers
-      - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+      - CXX=g++-10 CC=gcc-10 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
       - grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
       - grep "^int128.*:INTERNAL=1$" CMakeCache.txt
       - grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
@@ -94,8 +97,8 @@ for:
           platform: x64
           configuration: Release
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     install:
       - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
@@ -118,8 +121,8 @@ for:
           platform: x64
           configuration: Debug
     environment:
-      CFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
-      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces -O1"
+      CFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
+      CXXFLAGS: "-Wall -Wextra -pedantic -Werror -O1"
     build_script:
       # This test should be without OpenMP
       - cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
@@ -138,8 +141,8 @@ for:
           platform: x64
           configuration: Release
     environment:
-      CFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
-      CXXFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror -Wno-long-long -Wno-missing-braces"
+      CFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror"
+      CXXFLAGS: "-I/usr/local/opt/libomp/include -Wall -Wextra -pedantic -Werror"
       LDFLAGS: "-L/usr/local/opt/libomp/lib"
     install:
       - brew install libomp
