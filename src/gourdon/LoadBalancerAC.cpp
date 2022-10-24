@@ -47,8 +47,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   threads_(threads),
   is_print_(is_print)
 {
-  if (threads > 1)
-    lock_.init();
+  lock_.init(threads);
 
   // When a single thread is used (and printing is
   // disabled) we can use a segment size larger

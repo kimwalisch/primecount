@@ -51,8 +51,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   is_print_(is_print),
   status_(x)
 {
-  if (threads > 1)
-    lock_.init();
+  lock_.init(threads);
 
   // The best performance is usually achieved using
   // a sieve array size that matches your CPU's L1

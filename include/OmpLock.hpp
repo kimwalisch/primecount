@@ -41,20 +41,23 @@ namespace primecount {
 
 struct OmpLock
 {
-  // The init() function should only be called
-  // when using >= 2 threads.
-  void init()
+  void init(int threads)
   {
-    enabled_ = true;
-    omp_init_lock(&lock_);
+    ASSERT(threads > 0);
+    threads_ = threads;
+
+    if (threads_ > 1)
+      omp_init_lock(&lock_);
   }
   ~OmpLock()
   {
-    if (enabled_)
+    if (threads_ > 1)
       omp_destroy_lock(&lock_);
   }
 
-  bool enabled_ = false;
+  // 0 = uninitialized lock
+  int threads_ = 0;
+
   // Use padding to avoid CPU false sharing
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   omp_lock_t lock_;
@@ -66,7 +69,10 @@ class LockGuard
 public:
   LockGuard(OmpLock& lock)
   {
-    if (lock.enabled_)
+    // Detect use of uninitialized lock
+    ASSERT(lock.threads_ > 0);
+
+    if (lock.threads_ > 1)
     {
       lock_ = &lock.lock_;
       omp_set_lock(lock_);

@@ -50,8 +50,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   thread_dist_ = max(min_thread_dist_, thread_dist_);
   threads_ = ideal_num_threads(dist, threads, thread_dist_);
 
-  if (threads_ > 1)
-    lock_.init();
+  lock_.init(threads_);
 }
 
 int LoadBalancerP2::get_threads() const
