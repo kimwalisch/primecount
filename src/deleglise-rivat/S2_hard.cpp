@@ -65,7 +65,7 @@ T S2_hard_thread(T x,
                  const Primes& primes,
                  const PiTable& pi,
                  const FactorTable& factor,
-                 ThreadSettings& thread)
+                 ThreadData& thread)
 {
   T sum = 0;
 
@@ -205,7 +205,7 @@ T S2_hard_OpenMP(T x,
 
   #pragma omp parallel num_threads(threads)
   {
-    ThreadSettings thread;
+    ThreadData thread;
 
     while (loadBalancer.get_work(thread))
     {

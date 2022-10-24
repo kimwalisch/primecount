@@ -94,7 +94,7 @@ maxint_t LoadBalancerS2::get_sum() const
   return sum_;
 }
 
-bool LoadBalancerS2::get_work(ThreadSettings& thread)
+bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   LockGuard lockGuard(lock_);
   sum_ += thread.sum;
@@ -121,7 +121,7 @@ bool LoadBalancerS2::get_work(ThreadSettings& thread)
   return is_work;
 }
 
-void LoadBalancerS2::update_load_balancing(const ThreadSettings& thread)
+void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
 {
   if (thread.low > max_low_)
   {
@@ -158,7 +158,7 @@ void LoadBalancerS2::update_segment_size()
 /// Increase or decrease the number of segments per thread
 /// based on the remaining runtime.
 ///
-void LoadBalancerS2::update_number_of_segments(const ThreadSettings& thread)
+void LoadBalancerS2::update_number_of_segments(const ThreadData& thread)
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all

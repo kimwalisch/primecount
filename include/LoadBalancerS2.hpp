@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancerS2.hpp
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,6 +12,7 @@
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <OmpLock.hpp>
 #include <StatusS2.hpp>
 
@@ -19,7 +20,7 @@
 
 namespace primecount {
 
-struct ThreadSettings
+struct ThreadData
 {
   int64_t low = 0;
   int64_t segments = 0;
@@ -28,21 +29,38 @@ struct ThreadSettings
   double init_secs = 0;
   double secs = 0;
 
-  void start_time() { secs = get_time(); }
-  void stop_time() { secs = get_time() - secs; }
-  void init_finished() { init_secs = get_time() - secs; }
+  void start_time()
+  {
+    secs = get_time();
+  }
+
+  void init_finished()
+  {
+    // Ensure start_time() has been called
+    ASSERT(secs > 0);
+    init_secs = get_time() - secs;
+    ASSERT(init_secs >= 0);
+  }
+
+  void stop_time()
+  {
+    // Ensure start_time() has been called
+    ASSERT(secs > 0);
+    secs = get_time() - secs;
+    ASSERT(secs >= 0);
+  }
 };
 
 class LoadBalancerS2
 {
 public:
   LoadBalancerS2(maxint_t x, int64_t sieve_limit, maxint_t sum_approx, int threads, bool is_print);
-  bool get_work(ThreadSettings& thread);
+  bool get_work(ThreadData& thread);
   maxint_t get_sum() const;
 
 private:
-  void update_load_balancing(const ThreadSettings& thread);
-  void update_number_of_segments(const ThreadSettings& thread);
+  void update_load_balancing(const ThreadData& thread);
+  void update_number_of_segments(const ThreadData& thread);
   void update_segment_size();
   double remaining_secs() const;
 

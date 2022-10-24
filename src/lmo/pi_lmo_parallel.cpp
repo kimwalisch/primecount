@@ -54,7 +54,7 @@ int64_t S2_thread(int64_t x,
                   const pod_vector<int32_t>& primes,
                   const pod_vector<int32_t>& lpf,
                   const pod_vector<int32_t>& mu,
-                  ThreadSettings& thread)
+                  ThreadData& thread)
 {
   int64_t sum = 0;
   int64_t low = thread.low;
@@ -190,7 +190,7 @@ int64_t S2(int64_t x,
 
   #pragma omp parallel num_threads(threads)
   {
-    ThreadSettings thread;
+    ThreadData thread;
 
     while (loadBalancer.get_work(thread))
     {
