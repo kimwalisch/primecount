@@ -49,10 +49,16 @@ struct OmpLock
     if (threads_ > 1)
       omp_init_lock(&lock_);
   }
+
   ~OmpLock()
   {
     if (threads_ > 1)
       omp_destroy_lock(&lock_);
+  }
+
+  bool is_initialized() const
+  {
+    return threads_ > 0;
   }
 
   // 0 = uninitialized lock
@@ -69,8 +75,7 @@ class LockGuard
 public:
   LockGuard(OmpLock& lock)
   {
-    // Detect use of uninitialized lock
-    ASSERT(lock.threads_ > 0);
+    ASSERT(lock.is_initialized());
 
     if (lock.threads_ > 1)
     {
@@ -78,6 +83,7 @@ public:
       omp_set_lock(lock_);
     }
   }
+
   ~LockGuard()
   {
     if (lock_)
