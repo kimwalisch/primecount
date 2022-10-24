@@ -43,7 +43,9 @@ struct OmpLock
 {
   void init(int threads)
   {
+    ASSERT(!is_initialized());
     ASSERT(threads > 0);
+
     threads_ = threads;
 
     if (threads_ > 1)
@@ -62,7 +64,7 @@ struct OmpLock
   }
 
   // 0 = uninitialized lock
-  int threads_ = 0;
+  unsigned threads_ = 0;
 
   // Use padding to avoid CPU false sharing
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
