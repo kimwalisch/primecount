@@ -20,7 +20,7 @@ more detailed information.
 ## Contents
 
 * [```primesieve::iterator::next_prime()```](#primesieveiteratornext_prime)
-* [```primesieve::iterator::jump_to()```](#primesieveiteratorjump_to-since-primesieve-90)
+* [```primesieve::iterator::jump_to()```](#primesieveiteratorjump_to-since-primesieve-110)
 * [```primesieve::iterator::prev_prime()```](#primesieveiteratorprev_prime)
 * [```primesieve::generate_primes()```](#primesievegenerate_primes)
 * [```primesieve::generate_n_primes()```](#primesievegenerate_n_primes)
@@ -75,9 +75,13 @@ This method changes the start number of the ```primesieve::iterator``` object. (
 the start number is initialized to 0). Note that you can also specify the start number in
 the constructor of the ```primesieve::iterator``` object.
 
-* The first ```next_prime()``` invocation after ```jump_to()``` returns the first
+* The first ```next_prime()``` call after ```jump_to()``` returns the first
   prime ≥ start number. If want to generate primes > start number you need to use e.g.
-  ```jump_to(start+1, stop)```.
+  ```jump_to(start+1)```.
+* The first ```next_prime()``` call after ```jump_to()``` incurs an initialization
+  overhead of $O(\sqrt{start}\times \log{\log{\sqrt{start}}})$ operations. After that, any
+  additional ```next_prime()``` call executes in amortized
+  $O(\log{n}\times \log{\log{n}})$ operations.
 
 ```C++
 #include <primesieve.hpp>
@@ -138,7 +142,12 @@ be excluded. Hence ```next_prime()``` will generate primes > start and ```prev_p
 will generate primes < start. ```primesieve::iterator::skipto()``` has been replaced by
 ```primesieve::iterator::jump_to()``` in primesieve-11.0, because the use of the
 ```skipto()``` method required to correct the start number in most cases using e.g.
-```iter.skipto(start-1, stop)```.
+```iter.skipto(start-1)```.
+
+* The first ```next_prime()``` call after ```skipto()``` incurs an initialization
+  overhead of $O(\sqrt{start}\times \log{\log{\sqrt{start}}})$ operations. After that, any
+  additional ```next_prime()``` call executes in amortized
+  $O(\log{n}\times \log{\log{n}})$ operations.
 
 ```C++
 #include <primesieve.hpp>
