@@ -66,7 +66,6 @@ namespace primecount {
 std::string to_string(uint128_t n)
 {
   std::string str;
-  str.reserve(32);
 
   while (n > 0)
   {
