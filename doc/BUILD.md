@@ -50,7 +50,7 @@ Open a terminal, cd into the primecount directory and run:
 # Install CMake & the OpenMP library
 brew install cmake libomp
 
-cmake .
+CXXFLAGS="-I$(brew --prefix libomp)/include" LDFLAGS="-L$(brew --prefix libomp)/lib" cmake ..
 make -j
 sudo make install
 ```
