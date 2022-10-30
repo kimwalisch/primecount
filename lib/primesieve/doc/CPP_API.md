@@ -13,9 +13,11 @@ functionality of libprimesieve. Arguably the most useful feature provided by lib
 ```prev_prime()``` methods.
 
 The functions of libprimesieve's C++ API are defined in the [```<primesieve.hpp>```](../include/primesieve.hpp)
-and [```<primesieve/iterator.hpp>```](../include/primesieve/iterator.hpp) header files. You can
-also build libprimesieve's [Doxygen API documentation](BUILD.md#api-documentation) if you need
-more detailed information.
+and [```<primesieve/iterator.hpp>```](../include/primesieve/iterator.hpp) header files. If you
+need detailed information about libprimesieve's function signatures, e.g. because you want to
+write libprimesieve bindings for another programming language, then I suggest you read
+the libprimesieve header files which also contain additional documentation about the function
+parameters and return values.
 
 ## Contents
 
@@ -34,7 +36,7 @@ more detailed information.
 
 ## ```primesieve::iterator::next_prime()```
 
-By default ```primesieve::iterator::next_prime()``` generates primes ≥ 2 i.e. 2, 3, 5, 7, ...
+By default ```primesieve::iterator::next_prime()``` generates primes ≥ 0 i.e. 2, 3, 5, 7, ...
 
 * If you have specified a non-default start number in the ```primesieve::iterator```
   constructor or in the ```jump_to()``` method, then the first ```next_prime()``` invocation
