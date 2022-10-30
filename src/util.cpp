@@ -110,7 +110,7 @@ maxint_t to_maxint(const std::string& expr)
   if (expr.find_first_not_of("0123456789") == std::string::npos)
   {
     // Remove leading zeros
-    std::size_t pos = expr.find_first_not_of("0");
+    std::size_t pos = expr.find_first_not_of('0');
 
     if (pos != std::string::npos)
     {
