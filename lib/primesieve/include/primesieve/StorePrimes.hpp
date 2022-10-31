@@ -21,6 +21,16 @@
 #include <limits>
 #include <string>
 
+#if defined(min) || defined(max)
+  #undef min
+  #undef max
+  #if __cplusplus >= 202302L
+    #warning "Undefining min()/max() macros. Please define NOMINMAX before including <Windows.h>"
+  #elif defined(_MSC_VER) || defined(__GNUG__)
+    #pragma message("Undefining min()/max() macros. Please define NOMINMAX before including <Windows.h>")
+  #endif
+#endif
+
 namespace primesieve {
 
 /// primeCountApprox(x) >= pi(x)
@@ -32,7 +42,7 @@ inline std::size_t prime_count_approx(uint64_t start, uint64_t stop)
   // pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
   // Pierre Dusart, https://arxiv.org/abs/1002.0442 eq. 6.6.
   double x = (double) stop;
-  x = std::max<double>(100.0, x);
+  x = std::max(100.0, x);
   double pix = (stop - start) / (std::log(x) - 1.1) + 5;
 
   return (std::size_t) pix;
@@ -116,7 +126,7 @@ inline void store_n_primes(uint64_t n,
 
   // nthPrime < n(log n + log log n), for n >= 6.
   // https://en.wikipedia.org/wiki/Prime_number_theorem#Approximations_for_the_nth_prime_number
-  double x = std::max<double>({6.0, (double) n, (double) start});
+  double x = std::max({6.0, (double) n, (double) start});
   double logn = std::log(x);
   double loglogn = std::log(logn);
   uint64_t nthPrime = (uint64_t)(n * (logn + loglogn));
