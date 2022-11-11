@@ -14,7 +14,7 @@
 ///        schedule(monotonic:dynamic, 1) ourselves using relaxed
 ///        atomics.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,13 +24,11 @@
 #define RELAXEDATOMIC_HPP
 
 #include <macros.hpp>
+#include <primecount-config.hpp>
+
 #include <atomic>
 
-#ifndef MAX_CACHE_LINE_SIZE
-  #define MAX_CACHE_LINE_SIZE 512
-#endif
-
-namespace primecount {
+namespace {
 
 template <typename T>
 class RelaxedAtomic

@@ -13,10 +13,7 @@
 #define OMPLOCK_HPP
 
 #include <macros.hpp>
-
-#ifndef MAX_CACHE_LINE_SIZE
-  #define MAX_CACHE_LINE_SIZE 512
-#endif
+#include <primecount-config.hpp>
 
 #if defined(_OPENMP)
   #include <omp.h>

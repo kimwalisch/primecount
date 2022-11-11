@@ -29,6 +29,7 @@
 ///
 
 #include <LoadBalancerS2.hpp>
+#include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <StatusS2.hpp>
 #include <Sieve.hpp>
@@ -59,7 +60,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   // larger than your L1 cache size but smaller than
   // your L2 cache size (per core). Also, the
   // segment_size must be >= sqrt(sieve_limit).
-  int64_t sieve_bytes = 128 << 10;
+  int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
   int64_t numbers_per_byte = 30;
   int64_t sqrt_limit = isqrt(sieve_limit);
   max_size_ = max(sieve_bytes * numbers_per_byte, sqrt_limit);
