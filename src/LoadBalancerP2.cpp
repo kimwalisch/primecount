@@ -36,13 +36,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   // Using more chunks per thread improves load
   // balancing but also adds some overhead.
   int64_t chunks_per_thread = 8;
-
-  // Ensure that the thread initialization (i.e. the
-  // computation of PrimePi(low)) is at most 10%
-  // of the entire thread computation.
-  int64_t O_primepi = (int64_t) std::pow(sieve_limit, 2.0 / 3.0);
-  min_thread_dist_ = O_primepi * 10;
-  min_thread_dist_ = max(min_thread_dist_, 1 << 23);
+  min_thread_dist_ = 1 << 23;
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
@@ -79,10 +73,20 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   }
   else
   {
-    int64_t max_thread_dist = dist / threads_;
+    // Ensure that the thread initialization, i.e. the
+    // computation of PrimePi(low), uses at most 10%
+    // of the entire thread computation.
+    // Since PrimePi(low) uses O(low^(2/3)/log(low)^2) time,
+    // sieving a distance of n = low^(2/3) * 5 uses
+    // O(n log log n) time, which is more than 10x more.
+    double cbrt_low = std::cbrt(low_);
+    int64_t n = (int64_t) (cbrt_low * cbrt_low) * 5;
+    min_thread_dist_ = max(min_thread_dist_, n);
+    thread_dist_ = max(min_thread_dist_, thread_dist_);
 
     // Reduce the thread distance near to end to keep all
     // threads busy until the computation finishes.
+    int64_t max_thread_dist = dist / threads_;
     if (thread_dist_ > max_thread_dist)
       thread_dist_ = max(min_thread_dist_, max_thread_dist);
   }
