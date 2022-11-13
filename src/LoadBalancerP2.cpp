@@ -72,10 +72,9 @@ int LoadBalancerP2::get_threads() const
 ///
 int64_t LoadBalancerP2::get_min_thread_dist(int64_t low) const
 {
-  double low_13 = std::cbrt(low);
-  double low_23 = low_13 * low_13;
-  int64_t min_thread_dist = (int64_t) (low_23 * 5);
-  return std::max(min_thread_dist_, min_thread_dist);
+  double low13 = std::cbrt(low);
+  int64_t n = (int64_t) (low13 * low13 * 5);
+  return std::max(min_thread_dist_, n);
 }
 
 /// The thread needs to sieve [low, high[
