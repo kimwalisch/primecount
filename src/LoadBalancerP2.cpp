@@ -40,9 +40,18 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
-  thread_dist_ = dist / (threads * chunks_per_thread);
+  int64_t threads1 = ideal_num_threads(dist, threads, min_thread_dist_);
+
+  // This is a better approximation of the number of
+  // threads used by the get_work() method for large
+  // sieving distances. It depends on the sum of the
+  // minimum thread distances: low^(2/3) * 5.
+  int64_t threads2 = (int64_t) std::cbrt(dist / 5.0);
+
+  threads_ = std::min(threads1, threads2);
+  threads_ = in_between(1, threads_, threads);
+  thread_dist_ = dist / (threads_ * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
-  threads_ = ideal_num_threads(dist, threads, thread_dist_);
 
   lock_.init(threads_);
 }
