@@ -28,6 +28,7 @@ public:
   int get_threads() const;
 
 private:
+  int64_t get_min_thread_dist(int64_t low) const;
   void print_status();
 
   int64_t low_ = 0;

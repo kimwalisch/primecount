@@ -44,11 +44,13 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 
   // This is a better approximation of the number of
   // threads used by the get_work() method for large
-  // sieving distances. It depends on the sum of the
-  // minimum thread distances: low^(2/3) * 5.
-  int threads2 = (int) std::cbrt(dist / 5.0);
+  // sieving distances. This formula applies if each
+  // thread sieves a single segment of size
+  // get_min_thread_dist(thread_low) and most of
+  // these segments are > min_thread_dist_.
+  double threads2 = (sieve_limit_ * 3.0) / get_min_thread_dist(sieve_limit_);
 
-  threads_ = std::min(threads1, threads2);
+  threads_ = std::min(threads1, (int) threads2);
   threads_ = in_between(1, threads_, threads);
   thread_dist_ = dist / (threads_ * chunks_per_thread);
   thread_dist_ = max(min_thread_dist_, thread_dist_);
@@ -59,6 +61,21 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 int LoadBalancerP2::get_threads() const
 {
   return threads_;
+}
+
+/// Ensure that the thread initialization, i.e. the
+/// computation of PrimePi(low), uses at most 10%
+/// of the entire thread computation.
+/// Since PrimePi(low) uses O(low^(2/3)/log(low)^2) time,
+/// sieving a distance of n = low^(2/3) * 5 uses
+/// O(n log log n) time, which is more than 10x more.
+///
+int64_t LoadBalancerP2::get_min_thread_dist(int64_t low) const
+{
+  double low_13 = std::cbrt(low);
+  double low_23 = low_13 * low_13;
+  int64_t min_thread_dist = (int64_t) (low_23 * 5);
+  return std::max(min_thread_dist_, min_thread_dist);
 }
 
 /// The thread needs to sieve [low, high[
@@ -82,15 +99,7 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   }
   else
   {
-    // Ensure that the thread initialization, i.e. the
-    // computation of PrimePi(low), uses at most 10%
-    // of the entire thread computation.
-    // Since PrimePi(low) uses O(low^(2/3)/log(low)^2) time,
-    // sieving a distance of n = low^(2/3) * 5 uses
-    // O(n log log n) time, which is more than 10x more.
-    double cbrt_low = std::cbrt(low_);
-    int64_t n = (int64_t) (cbrt_low * cbrt_low) * 5;
-    min_thread_dist_ = max(min_thread_dist_, n);
+    min_thread_dist_ = get_min_thread_dist(low_);
     thread_dist_ = max(min_thread_dist_, thread_dist_);
 
     // Reduce the thread distance near to end to keep all
