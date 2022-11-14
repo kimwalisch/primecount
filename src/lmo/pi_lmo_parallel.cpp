@@ -184,7 +184,10 @@ int64_t S2(int64_t x,
   }
 
   int64_t thread_threshold = 1 << 20;
+  int max_threads = (int) std::sqrt(std::sqrt(z));
+  threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
+
   LoadBalancerS2 loadBalancer(x, z, s2_approx, threads, is_print);
   PiTable pi(y, threads);
 

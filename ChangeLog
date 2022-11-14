@@ -1,10 +1,16 @@
-Changes in primecount-7.5, 2022-11-12
+Changes in primecount-7.5, 2022-11-14
 
 The C/C++ API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
 primecount-7.4 requried >= libprimesieve.so.10.
 
-* LoadBalancerP2.cpp: Improve load balancing.
+* LoadBalancerP2.cpp: Improve load balancing for high CPU core count servers.
+* S2_hard.cpp: Improve load balancing for high CPU core count servers.
+* S2_easy.cpp: Improve load balancing for high CPU core count servers.
+* AC.cpp: Improve load balancing for high CPU core count servers.
+* D.cpp: Improve load balancing for high CPU core count servers.
+* phi.cpp: Improve load balancing for high CPU core count servers.
+* P3.cpp: Improve load balancing for high CPU core count servers.
 * Update to the latest libprimesieve-11.0.
 * Use the new primesieve::iterator::jump_to() instead of
   primesieve::iterator::skipto(). This reduces the number of required

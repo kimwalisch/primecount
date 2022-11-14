@@ -49,7 +49,10 @@ T S2_easy_OpenMP(T x,
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
+
   int64_t thread_threshold = 1000;
+  int max_threads = (int) std::sqrt(std::sqrt(z));
+  threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x);

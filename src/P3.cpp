@@ -3,7 +3,7 @@
 /// @brief P3(x, a) is the 3rd partial sieve function, it is used
 ///        in Lehmer's prime counting formula.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,7 +49,10 @@ int64_t P3(int64_t x,
     PiTable pi(max_pix, threads);
     int64_t pi_x13 = pi[x13];
 
+    // a = PrimePi(x^(1/4))
+    int max_threads = (int) a;
     int64_t thread_threshold = 100;
+    threads = std::min(threads, max_threads);
     threads = ideal_num_threads(pi_x13, threads, thread_threshold);
 
     #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)

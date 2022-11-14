@@ -68,6 +68,8 @@ X S1_OpenMP(X x,
             int threads)
 {
   int64_t thread_threshold = (int64_t) 1e6;
+  int max_threads = (int) std::cbrt(y);
+  threads = std::min(threads, max_threads);
   threads = ideal_num_threads(y, threads, thread_threshold);
 
   auto primes = generate_primes<Y>(y);

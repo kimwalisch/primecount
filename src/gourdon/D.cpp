@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -192,8 +192,12 @@ T D_OpenMP(T x,
 {
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
+
   int64_t thread_threshold = 1 << 20;
+  int max_threads = (int) std::sqrt(std::sqrt(xz));
+  threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xz, threads, thread_threshold);
+
   LoadBalancerS2 loadBalancer(x, xz, d_approx, threads, is_print);
   PiTable pi(y, threads);
 
