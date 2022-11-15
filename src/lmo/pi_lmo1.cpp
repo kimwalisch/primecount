@@ -38,29 +38,31 @@ int64_t pi_lmo1(int64_t x)
 
   int threads = 1;
   int64_t y = iroot<3>(x);
-  int64_t pi_y = pi_noprint(y, threads);
   int64_t c = PhiTiny::get_c(y);
-  int64_t S1 = 0;
-  int64_t S2 = 0;
+  int64_t s1 = 0;
+  int64_t s2 = 0;
 
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
   bool is_print = false;
 
+  int64_t pi_y = primes.size() - 1;
+  int64_t p2 = P2(x, y, pi_y, threads);
+
   // ordinary leaves
   for (int64_t n = 1; n <= y; n++)
     if (lpf[n] > primes[c])
-      S1 += mu[n] * phi(x / n, c, threads, is_print);
+      s1 += mu[n] * phi(x / n, c, threads, is_print);
 
   // special leaves
   for (int64_t b = c + 1; b < pi_y; b++)
     for (int64_t m = (y / primes[b]) + 1; m <= y; m++)
       if (lpf[m] > primes[b])
-        S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, threads, is_print);
+        s2 -= mu[m] * phi(x / (primes[b] * m), b - 1, threads, is_print);
 
-  int64_t phi = S1 + S2;
-  int64_t sum = phi + pi_y - 1 - P2(x, y, pi_y, threads);
+  int64_t phi = s1 + s2;
+  int64_t sum = phi + pi_y - 1 - p2;
 
   return sum;
 }
