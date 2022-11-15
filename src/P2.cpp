@@ -37,9 +37,9 @@ namespace {
 /// Thread sieves [low, high[
 template <typename T>
 T P2_thread(T x,
-           int64_t y,
-           int64_t low,
-           int64_t high)
+            int64_t y,
+            int64_t low,
+            int64_t high)
 {
   ASSERT(low > 0);
   ASSERT(low < high);

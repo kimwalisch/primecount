@@ -36,8 +36,10 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
 
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   min_thread_dist_ = 1 << 23;
-  int max_threads = (int) std::sqrt(std::sqrt(sieve_limit_));
+  int max_threads = (int) std::pow(sieve_limit_, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads_ = ideal_num_threads(dist, threads, min_thread_dist_);
   lock_.init(threads_);

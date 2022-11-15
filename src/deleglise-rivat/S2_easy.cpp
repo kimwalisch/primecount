@@ -50,8 +50,10 @@ T S2_easy_OpenMP(T x,
   T sum = 0;
   int64_t x13 = iroot<3>(x);
 
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1000;
-  int max_threads = (int) std::sqrt(std::sqrt(z));
+  int max_threads = (int) std::pow(z, 1 / 4.0);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
 

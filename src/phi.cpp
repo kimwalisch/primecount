@@ -359,6 +359,8 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
   int64_t c = PhiTiny::get_c(sqrtx);
   int64_t sum = phi_tiny(x, c);
 
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = (int64_t) 1e10;
   int max_threads = (int) std::sqrt(a);
   threads = std::min(threads, max_threads);

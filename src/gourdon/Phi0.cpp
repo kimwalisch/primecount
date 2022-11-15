@@ -74,6 +74,8 @@ X Phi0_OpenMP(X x,
               int64_t k,
               int threads)
 {
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = (int64_t) 1e6;
   int max_threads = (int) std::cbrt(y);
   threads = std::min(threads, max_threads);

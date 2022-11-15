@@ -49,13 +49,14 @@ int64_t P3(int64_t x,
     PiTable pi(max_pix, threads);
     int64_t pi_x13 = pi[x13];
 
-    // a = PrimePi(x^(1/4))
+    // These load balancing settings work well on my
+    // dual-socket AMD EPYC 7642 server with 192 CPU cores.
     int max_threads = (int) a;
     int64_t thread_threshold = 100;
     threads = std::min(threads, max_threads);
     threads = ideal_num_threads(pi_x13, threads, thread_threshold);
 
-    #pragma omp parallel for schedule(dynamic) num_threads(threads) reduction(+: sum)
+    #pragma omp parallel for schedule(dynamic, 16) num_threads(threads) reduction(+: sum)
     for (int64_t i = a + 1; i <= pi_x13; i++)
     {
       int64_t xi = x / primes[i];

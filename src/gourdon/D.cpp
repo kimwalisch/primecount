@@ -193,11 +193,12 @@ T D_OpenMP(T x,
   int64_t xz = x / z;
   int64_t x_star = get_x_star_gourdon(x, y);
 
+  // These load balancing settings work well on my
+  // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1 << 20;
-  int max_threads = (int) std::sqrt(std::sqrt(xz));
+  int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xz, threads, thread_threshold);
-
   LoadBalancerS2 loadBalancer(x, xz, d_approx, threads, is_print);
   PiTable pi(y, threads);
 
