@@ -46,7 +46,7 @@ int64_t pi_lmo5(int64_t x, bool print = is_print());
 int64_t pi_lmo_parallel(int64_t x, int threads, bool print = is_print());
 int64_t pi_meissel(int64_t x, int threads, bool print = is_print());
 int64_t phi(int64_t x, int64_t a, int threads, bool print = is_print());
-int64_t P2(int64_t x, int64_t y, int threads, bool print = is_print());
+int64_t P2(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 int64_t P3(int64_t x, int64_t y, int threads, bool print = is_print());
 
 int64_t Li(int64_t);
@@ -59,7 +59,7 @@ int64_t Ri_inverse(int64_t);
   int128_t pi(int128_t x, int threads);
   int128_t pi_deleglise_rivat(int128_t x, int threads);
   int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
-  int128_t P2(int128_t x, int64_t y, int threads, bool print = is_print());
+  int128_t P2(int128_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 
   int128_t Li(int128_t);
   int128_t Li_inverse(int128_t);

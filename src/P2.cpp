@@ -81,7 +81,7 @@ T P2_thread(T x,
   return sum;
 }
 
-/// P2(x, y) counts the numbers <= x that have exactly 2
+/// P2(x, a) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
 /// Run time: O(n log log n), with n = x / y
 /// Memory usage: O(n^(1/2))
@@ -89,6 +89,7 @@ T P2_thread(T x,
 template <typename T>
 T P2_OpenMP(T x,
             int64_t y,
+            int64_t a,
             int threads,
             bool is_print)
 {
@@ -99,11 +100,11 @@ T P2_OpenMP(T x,
     return 0;
 
   int64_t sqrtx = isqrt(x);
-  T a = pi_noprint(y, threads);
-  T b = pi_noprint(sqrtx, threads);
 
-  if (a >= b)
+  if (y >= sqrtx)
     return 0;
+
+  T b = pi_noprint(sqrtx, threads);
 
   // \sum_{i=a+1}^{b} -(i - 1)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
@@ -129,6 +130,7 @@ namespace primecount {
 
 int64_t P2(int64_t x,
            int64_t y,
+           int64_t a,
            int threads,
            bool is_print)
 {
@@ -137,12 +139,12 @@ int64_t P2(int64_t x,
   if (is_print)
   {
     print("");
-    print("=== P2(x, y) ===");
-    print_vars(x, y, threads);
+    print("=== P2(x, a) ===");
+    print_vars(x, a, threads);
     time = get_time();
   }
 
-  int64_t sum = P2_OpenMP(x, y, threads, is_print);
+  int64_t sum = P2_OpenMP(x, y, a, threads, is_print);
 
   if (is_print)
     print("P2", sum, time);
@@ -154,6 +156,7 @@ int64_t P2(int64_t x,
 
 int128_t P2(int128_t x,
             int64_t y,
+            int64_t a,
             int threads,
             bool is_print)
 {
@@ -162,12 +165,12 @@ int128_t P2(int128_t x,
   if (is_print)
   {
     print("");
-    print("=== P2(x, y) ===");
-    print_vars(x, y, threads);
+    print("=== P2(x, a) ===");
+    print_vars(x, a, threads);
     time = get_time();
   }
 
-  int128_t sum = P2_OpenMP(x, y, threads, is_print);
+  int128_t sum = P2_OpenMP(x, y, a, threads, is_print);
 
   if (is_print)
     print("P2", sum, time);

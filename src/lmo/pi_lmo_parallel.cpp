@@ -242,12 +242,12 @@ int64_t pi_lmo_parallel(int64_t x,
     print(x, y, z, c, threads);
   }
 
-  int64_t p2 = P2(x, y, threads, is_print);
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
+  int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
   int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
   int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads, is_print);

@@ -50,7 +50,7 @@ int main()
           p2++;
 
     std::cout << "P2(" << x << ", " << a << ") = " << p2;
-    check(p2 == P2(x, primes[a], threads));
+    check(p2 == P2(x, primes[a], a, threads));
   }
 
   std::cout << std::endl;

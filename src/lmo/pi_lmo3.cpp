@@ -130,18 +130,18 @@ int64_t pi_lmo3(int64_t x)
   if (x < 2)
     return 0;
 
-  bool threads = 1;
+  int threads = 1;
   double alpha = get_alpha_lmo(x);
   int64_t x13 = iroot<3>(x);
   int64_t y = (int64_t) (x13 * alpha);
   int64_t c = PhiTiny::get_c(y);
-  int64_t p2 = P2(x, y, threads);
 
   auto primes = generate_primes<int32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 
   int64_t pi_y = primes.size() - 1;
+  int64_t p2 = P2(x, y, pi_y, threads);
   int64_t s1 = S1(x, y, c, threads);
   int64_t s2 = S2(x, y, c, pi_y, primes, lpf, mu);
   int64_t phi = s1 + s2;

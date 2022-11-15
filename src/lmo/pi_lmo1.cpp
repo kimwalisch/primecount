@@ -11,7 +11,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -60,7 +60,7 @@ int64_t pi_lmo1(int64_t x)
         S2 -= mu[m] * phi(x / (primes[b] * m), b - 1, threads, is_print);
 
   int64_t phi = S1 + S2;
-  int64_t sum = phi + pi_y - 1 - P2(x, y, threads);
+  int64_t sum = phi + pi_y - 1 - P2(x, y, pi_y, threads);
 
   return sum;
 }

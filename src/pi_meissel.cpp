@@ -62,7 +62,7 @@ int64_t pi_meissel(int64_t x,
   }
 
   int64_t phi_xa = phi(x, a, threads, is_print);
-  int64_t p2 = P2(x, y, threads, is_print);
+  int64_t p2 = P2(x, y, a, threads, is_print);
   int64_t sum = phi_xa + a - 1 - p2;
 
   return sum;

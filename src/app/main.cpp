@@ -229,11 +229,12 @@ maxint_t P2(maxint_t x, int threads)
     set_print_variables(true);
 
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
+  int64_t a = pi_noprint(y, threads);
 
   if (x <= std::numeric_limits<int64_t>::max())
-    return P2((int64_t) x, y, threads);
+    return P2((int64_t) x, y, a, threads);
   else
-    return P2(x, y, threads);
+    return P2(x, y, a, threads);
 }
 
 maxint_t S1(maxint_t x, int threads)
