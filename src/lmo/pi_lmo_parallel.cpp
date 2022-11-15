@@ -70,8 +70,8 @@ int64_t S2_thread(int64_t x,
   if (min_b > max_b)
     return 0;
 
-  Sieve sieve(low, segment_size, max_b);
   auto phi = generate_phi(low, max_b, primes, pi);
+  Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
   // segmented sieve of Eratosthenes
