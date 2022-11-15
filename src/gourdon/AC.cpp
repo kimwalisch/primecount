@@ -252,6 +252,9 @@ T AC_OpenMP(T x,
     int64_t low, high;
 
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
+    // There are very few iterations in this loop,
+    // hence the use of an atomic loop counter (min_c1)
+    // won't cause any scaling issues.
     for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
     {
       int64_t prime = primes[b];
