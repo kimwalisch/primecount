@@ -4,7 +4,7 @@
 ///         that counts the numbers <= x that have exactly
 ///         3 prime factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -51,7 +51,7 @@ int main()
             p3++;
 
     std::cout << "P3(" << x << ", " << a << ") = " << p3;
-    check(p3 == P3(x, primes[a], threads));
+    check(p3 == P3(x, primes[a], a, threads));
   }
 
   std::cout << std::endl;

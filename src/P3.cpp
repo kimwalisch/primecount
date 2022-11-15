@@ -12,6 +12,7 @@
 #include <primecount-internal.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
+#include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 
@@ -25,15 +26,17 @@ namespace primecount {
 ///
 int64_t P3(int64_t x,
            int64_t y,
+           int64_t a,
            int threads,
            bool is_print)
 {
+  ASSERT(a == pi_noprint(y, threads));
   double time;
 
   if (is_print)
   {
     print("");
-    print("=== P3(x, y) ===");
+    print("=== P3(x, a) ===");
     time = get_time();
   }
 
@@ -42,7 +45,6 @@ int64_t P3(int64_t x,
 
   if (y <= x13)
   {
-    int64_t a = pi_noprint(y, threads);
     int64_t max_prime = std::max(x13, isqrt(x / y));
     int64_t max_pix = std::max(x13, x / (y * y));
     auto primes = generate_primes<int32_t>(max_prime);

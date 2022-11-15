@@ -47,7 +47,7 @@ int64_t pi_lmo_parallel(int64_t x, int threads, bool print = is_print());
 int64_t pi_meissel(int64_t x, int threads, bool print = is_print());
 int64_t phi(int64_t x, int64_t a, int threads, bool print = is_print());
 int64_t P2(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
-int64_t P3(int64_t x, int64_t y, int threads, bool print = is_print());
+int64_t P3(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 
 int64_t Li(int64_t);
 int64_t Li_inverse(int64_t);

@@ -83,7 +83,7 @@ T P2_thread(T x,
 
 /// P2(x, a) counts the numbers <= x that have exactly 2
 /// prime factors each exceeding the a-th prime.
-/// Run time: O(n log log n), with n = x / y
+/// Run time: O(n log log n), with n = x / prime[a]
 /// Memory usage: O(n^(1/2))
 ///
 template <typename T>
@@ -93,6 +93,7 @@ T P2_OpenMP(T x,
             int threads,
             bool is_print)
 {
+  ASSERT(a == pi_noprint(y, threads));
   static_assert(std::is_signed<T>::value,
                 "T must be signed integer type");
 
