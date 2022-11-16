@@ -139,8 +139,8 @@ int64_t P2(int64_t x,
   if (is_print)
   {
     print("");
-    print("=== P2(x, a) ===");
-    print_vars(x, a, threads);
+    print("=== P2(x, y) ===");
+    print_vars(x, y, threads);
     time = get_time();
   }
 
@@ -165,8 +165,8 @@ int128_t P2(int128_t x,
   if (is_print)
   {
     print("");
-    print("=== P2(x, a) ===");
-    print_vars(x, a, threads);
+    print("=== P2(x, y) ===");
+    print_vars(x, y, threads);
     time = get_time();
   }
 
