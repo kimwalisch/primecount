@@ -1,9 +1,10 @@
-Changes in primecount-7.5, 2022-11-14
+Changes in primecount-7.5, 2022-11-16
 
 The C/C++ API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
 primecount-7.4 requried >= libprimesieve.so.10.
 
+* pi_gourdon.cpp: Reduce context switches and cpu migrations by up to 2x.
 * LoadBalancerP2.cpp: Improve load balancing for high CPU core count servers.
 * S2_hard.cpp: Improve load balancing for high CPU core count servers.
 * S2_easy.cpp: Improve load balancing for high CPU core count servers.

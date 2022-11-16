@@ -70,10 +70,20 @@ int64_t pi_gourdon_64(int64_t x,
     print_gourdon(x, y, z, k, threads);
   }
 
+  // For very short computations (< 1 second) we achieve the best
+  // performance by executing the different algorithms in increasing
+  // order of their memory and power usage. This effect is mainly
+  // measurable on server CPUs with a large number of CPU cores. On
+  // my AMD EPYC 7642 server with 192 CPU cores I measured up to 2x
+  // less context switches and cpu migrations using this method. If
+  // we would start with the algorithm that puts the highest load on
+  // the CPU and memory (i.e. the B algorithm) we would overload
+  // both the CPU and operating system.
+
   int64_t sigma = Sigma(x, y, threads, is_print);
   int64_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int64_t b = B(x, y, threads, is_print);
   int64_t ac = AC(x, y, z, k, threads, is_print);
+  int64_t b = B(x, y, threads, is_print);
   int64_t d_approx = D_approx(x, sigma, phi0, ac, b);
   int64_t d = D(x, y, z, k, d_approx, threads, is_print);
   int64_t sum = ac - b + d + phi0 + sigma;
@@ -128,10 +138,20 @@ int128_t pi_gourdon_128(int128_t x,
     print_gourdon(x, y, z, k, threads);
   }
 
+  // For very short computations (< 1 second) we achieve the best
+  // performance by executing the different algorithms in increasing
+  // order of their memory and power usage. This effect is mainly
+  // measurable on server CPUs with a large number of CPU cores. On
+  // my AMD EPYC 7642 server with 192 CPU cores I measured up to 2x
+  // less context switches and cpu migrations using this method. If
+  // we would start with the algorithm that puts the highest load on
+  // the CPU and memory (i.e. the B algorithm) we would overload
+  // both the CPU and operating system.
+
   int128_t sigma = Sigma(x, y, threads, is_print);
   int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
-  int128_t b = B(x, y, threads, is_print);
   int128_t ac = AC(x, y, z, k, threads, is_print);
+  int128_t b = B(x, y, threads, is_print);
   int128_t d_approx = D_approx(x, sigma, phi0, ac, b);
   int128_t d = D(x, y, z, k, d_approx, threads, is_print);
   int128_t sum = ac - b + d + phi0 + sigma;
