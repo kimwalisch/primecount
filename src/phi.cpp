@@ -199,8 +199,6 @@ private:
   ///
   void init_cache(uint64_t x, uint64_t a)
   {
-    ASSERT(a >= 3);
-    ASSERT(max_a_ >= 3);
     a = min(a, max_a_);
 
     if (x > max_x_ ||
@@ -209,12 +207,14 @@ private:
 
     if (!max_a_cached_)
     {
+      ASSERT(max_a_ >= 3);
       sieve_.resize(max_a_ + 1);
       sieve_[3].resize(max_x_size_);
       std::fill(sieve_[3].begin(), sieve_[3].end(), sieve_t{0, ~0ull});
       max_a_cached_ = 3;
     }
 
+    ASSERT(a >= 3);
     uint64_t i = max_a_cached_ + 1;
     max_a_cached_ = a;
 
