@@ -95,7 +95,6 @@ public:
     ASSERT(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
-    sieve_.resize(max_a_ + 1);
   }
 
   /// Calculate phi(x, a) using the recursive formula:
@@ -200,55 +199,56 @@ private:
   ///
   void init_cache(uint64_t x, uint64_t a)
   {
+    ASSERT(a >= 3);
+    ASSERT(max_a_ >= 3);
     a = min(a, max_a_);
 
     if (x > max_x_ ||
         a <= max_a_cached_)
       return;
 
+    if (!max_a_cached_)
+    {
+      sieve_.resize(max_a_ + 1);
+      sieve_[3].resize(max_x_size_);
+      std::fill(sieve_[3].begin(), sieve_[3].end(), sieve_t{0, ~0ull});
+      max_a_cached_ = 3;
+    }
+
     uint64_t i = max_a_cached_ + 1;
     max_a_cached_ = a;
-    i = max(i, 3);
 
     for (; i <= a; i++)
     {
+      // Initalize phi(x, i) with phi(x, i - 1)
+      if (i - 1 <= PhiTiny::max_a())
+        sieve_[i] = std::move(sieve_[i - 1]);
+      else
+      {
+        sieve_[i].resize(sieve_[i - 1].size());
+        std::copy(sieve_[i - 1].begin(), sieve_[i - 1].end(), sieve_[i].begin());
+      }
+
+      // Remove prime[i] and its multiples.
       // Each bit in the sieve array corresponds to an integer that
       // is not divisible by 2, 3 and 5. The 8 bits of each byte
       // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-      if (i == 3)
-      {
-        sieve_[i].resize(max_x_size_);
-        std::fill(sieve_[i].begin(), sieve_[i].end(), sieve_t{0, ~0ull});
-      }
-      else
-      {
-        // Initalize phi(x, i) with phi(x, i - 1)
-        if (i - 1 <= PhiTiny::max_a())
-          sieve_[i] = std::move(sieve_[i - 1]);
-        else
-        {
-          sieve_[i].resize(sieve_[i - 1].size());
-          std::copy(sieve_[i - 1].begin(), sieve_[i - 1].end(), sieve_[i].begin());
-        }
+      uint64_t prime = primes_[i];
+      if (prime <= max_x_)
+        sieve_[i][prime / 240].bits &= unset_bit_[prime % 240];
+      for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
+        sieve_[i][n / 240].bits &= unset_bit_[n % 240];
 
-        // Remove prime[i] and its multiples
-        uint64_t prime = primes_[i];
-        if (prime <= max_x_)
-          sieve_[i][prime / 240].bits &= unset_bit_[prime % 240];
-        for (uint64_t n = prime * prime; n <= max_x_; n += prime * 2)
-          sieve_[i][n / 240].bits &= unset_bit_[n % 240];
-
-        if (i > PhiTiny::max_a())
+      if (i > PhiTiny::max_a())
+      {
+        // Fill an array with the cumulative 1 bit counts.
+        // sieve[i][j] contains the count of numbers < j * 240 that
+        // are not divisible by any of the first i primes.
+        uint64_t count = 0;
+        for (auto& sieve : sieve_[i])
         {
-          // Fill an array with the cumulative 1 bit counts.
-          // sieve[i][j] contains the count of numbers < j * 240 that
-          // are not divisible by any of the first i primes.
-          uint64_t count = 0;
-          for (auto& sieve : sieve_[i])
-          {
-            sieve.count = (uint32_t) count;
-            count += popcnt64(sieve.bits);
-          }
+          sieve.count = (uint32_t) count;
+          count += popcnt64(sieve.bits);
         }
       }
     }
