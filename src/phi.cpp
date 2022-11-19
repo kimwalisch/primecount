@@ -92,7 +92,6 @@ public:
 
     // Make sure that there are no uninitialized
     // bits in the last sieve array element.
-    ASSERT(max_x_size_ > 0);
     max_x_ = max_x_size_ * 240 - 1;
     max_a_ = max_a;
   }
@@ -214,7 +213,6 @@ private:
       max_a_cached_ = 3;
     }
 
-    ASSERT(a >= 3);
     uint64_t i = max_a_cached_ + 1;
     max_a_cached_ = a;
 
