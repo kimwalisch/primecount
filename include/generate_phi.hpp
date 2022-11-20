@@ -110,9 +110,15 @@ public:
     else if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
 
-    // Cache all small phi(x, i) results with:
-    // x <= max_x && i <= min(a, max_a)
-    init_cache(x, a);
+    // Cache small phi(x, i) results with:
+    // x <= max_x && i <= a
+    if ((uint64_t) x <= max_x_ &&
+        (uint64_t) a <= max_a_ &&
+        (uint64_t) a > max_a_cached_)
+    {
+      init_phi_cache(a);
+      return phi_cache(x, a) * SIGN;
+    }
 
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
@@ -187,7 +193,7 @@ private:
     return count + popcnt64(bits & bitmask);
   }
 
-  /// Cache phi(x, i) results with: x <= max_x && i <= min(a, max_a).
+  /// Cache phi(x, i) results with: x <= max_x && i <= a.
   /// Eratosthenes-like sieving algorithm that removes the first a primes
   /// and their multiples from the sieve array. Additionally this
   /// algorithm counts the numbers that are not divisible by any of the
@@ -195,13 +201,10 @@ private:
   /// counting has finished phi(x, a) results can be retrieved from the
   /// cache in O(1) using the phi_cache(x, a) method.
   ///
-  void init_cache(uint64_t x, uint64_t a)
+  void init_phi_cache(uint64_t a)
   {
-    a = min(a, max_a_);
-
-    if (x > max_x_ ||
-        a <= max_a_cached_)
-      return;
+    ASSERT(a > PhiTiny::max_a());
+    ASSERT(a <= max_a_);
 
     if (!max_a_cached_)
     {
@@ -212,9 +215,8 @@ private:
       max_a_cached_ = 3;
     }
 
-    ASSERT(a > PhiTiny::max_a());
-    ASSERT(a > max_a_cached_);
     uint64_t i = max_a_cached_ + 1;
+    ASSERT(a > max_a_cached_);
     max_a_cached_ = a;
 
     for (; i <= a; i++)
