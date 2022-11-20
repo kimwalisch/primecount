@@ -213,7 +213,7 @@ void init_cache(uint64_t x, uint64_t a)
   // Each bit in the sieve array corresponds to an integer that
   // is not divisible by 2, 3 and 5. The 8 bits of each byte
   // correspond to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
-  sieve_[3].resize(max_x_size_);
+  sieve_[3].resize(max_x_size_, sieve_t{0, ~0ull});
 
   for (uint64_t i = 4; i <= a; i++)
   {
