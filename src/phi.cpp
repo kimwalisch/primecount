@@ -182,12 +182,14 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
+    ASSERT(a > PhiTiny::max_a());
     return x <= max_x_ &&
            a <= max_a_cached_;
   }
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
   {
+    ASSERT(is_cached(x, a));
     uint64_t count = sieve_[a][x / 240].count;
     uint64_t bits = sieve_[a][x / 240].bits;
     uint64_t bitmask = unset_larger_[x % 240];
