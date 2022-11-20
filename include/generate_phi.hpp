@@ -212,6 +212,8 @@ private:
       max_a_cached_ = 3;
     }
 
+    ASSERT(a > PhiTiny::max_a());
+    ASSERT(a > max_a_cached_);
     uint64_t i = max_a_cached_ + 1;
     max_a_cached_ = a;
 
