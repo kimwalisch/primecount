@@ -128,9 +128,9 @@ public:
     larger_c = std::max(c, larger_c);
 
     // Usually our algorithm starts at c because phi(x, c) can be
-    // computed in O(1) using phi_tiny(x, c). However, if a larger
-    // value of c is cached, then we can start at that value because
-    // phi_cache(x, larger_c) also takes O(1) time.
+    // computed in O(1) time using phi_tiny(x, c). However, if a
+    // larger value of c is cached, then it is better to start at that
+    // value, since phi_cache(x, larger_c) also takes O(1) time.
     if (!is_cached(x, larger_c))
       sum = phi_tiny(x, c) * SIGN;
     else
