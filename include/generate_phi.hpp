@@ -120,18 +120,21 @@ public:
       return phi_cache(x, a) * SIGN;
     }
 
+    int64_t sum, i;
     int64_t sqrtx = isqrt(x);
     int64_t c = PhiTiny::get_c(sqrtx);
-    int64_t c_cached = min(a, max_a_cached_);
-    int64_t sum, i;
+    int64_t larger_c = min(a, max_a_cached_);
+    larger_c = std::max(c, larger_c);
 
-    if (c >= c_cached ||
-        !is_cached(x, c_cached))
+    // Usually our algorithm starts at c because phi(x, c) can be
+    // computed in O(1) using phi_tiny(x, c). However, if a larger
+    // value of c is cached, then we can start at that value because
+    // phi_cache(x, larger_c) also takes O(1) time.
+    if (!is_cached(x, larger_c))
       sum = phi_tiny(x, c) * SIGN;
     else
     {
-      c = c_cached;
-      ASSERT(c_cached <= a);
+      c = larger_c;
       sum = phi_cache(x, c) * SIGN;
     }
 
@@ -144,7 +147,7 @@ public:
       // This works because in this case there is no other prime
       // inside the interval ]prime[i-1], x / prime[i]].
       if (primes_[i] > sqrtx)
-        break;
+        goto finished;
       int64_t xp = fast_div(x, primes_[i]);
       if (is_pix(xp, i - 1))
         break;
@@ -154,14 +157,15 @@ public:
     for (; i <= a; i++)
     {
       if (primes_[i] > sqrtx)
-        break;
-      int64_t xp = fast_div(x, primes_[i]);
+        goto finished;
       // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
+      int64_t xp = fast_div(x, primes_[i]);
       sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
+    finished:
     // phi(xp, i - 1) = 1 for i in [i, a]
     sum += (a + 1 - i) * -SIGN;
     return sum;
@@ -181,9 +185,9 @@ private:
 
   bool is_cached(uint64_t x, uint64_t a) const
   {
-    ASSERT(a > PhiTiny::max_a());
     return x <= max_x_ &&
-           a <= max_a_cached_;
+           a <= max_a_cached_ &&
+           a > PhiTiny::max_a();
   }
 
   int64_t phi_cache(uint64_t x, uint64_t a) const
