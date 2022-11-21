@@ -148,7 +148,7 @@ public:
       // This works because in this case there is no other prime
       // inside the interval ]prime[i-1], x / prime[i]].
       if (primes_[i] > sqrtx)
-        goto finished;
+        goto end_loop;
       int64_t xp = fast_div(x, primes_[i]);
       if (is_pix(xp, i - 1))
         break;
@@ -158,7 +158,7 @@ public:
     for (; i <= a; i++)
     {
       if (primes_[i] > sqrtx)
-        goto finished;
+        goto end_loop;
       // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
@@ -166,7 +166,7 @@ public:
       sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
-    finished:
+    end_loop:
     // phi(xp, i - 1) = 1 for i in [i, a]
     sum += (a + 1 - i) * -SIGN;
     return sum;
