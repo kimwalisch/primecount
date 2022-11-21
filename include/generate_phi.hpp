@@ -208,7 +208,7 @@ private:
     ASSERT(a > PhiTiny::max_a());
     ASSERT(a <= max_a_);
 
-    if (!max_a_cached_)
+    if (sieve_.empty())
     {
       ASSERT(max_a_ >= 3);
       sieve_.resize(max_a_ + 1);
