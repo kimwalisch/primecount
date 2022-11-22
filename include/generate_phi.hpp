@@ -123,7 +123,7 @@ public:
     int64_t sum, i;
     int64_t sqrtx = isqrt(x);
     int64_t c = min(PhiTiny::max_a(), a);
-    int64_t larger_c = min(a, max_a_cached_);
+    int64_t larger_c = min(max_a_cached_, a);
     larger_c = std::max(c, larger_c);
 
     // Usually our algorithm starts at c because phi(x, c) can be
