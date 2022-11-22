@@ -122,7 +122,7 @@ public:
 
     int64_t sum, i;
     int64_t sqrtx = isqrt(x);
-    int64_t c = PhiTiny::get_c(sqrtx);
+    int64_t c = min(PhiTiny::max_a(), a);
     int64_t larger_c = min(a, max_a_cached_);
     larger_c = std::max(c, larger_c);
 

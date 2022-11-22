@@ -123,7 +123,7 @@ public:
 
     int64_t sum, i;
     int64_t sqrtx = isqrt(x);
-    int64_t c = PhiTiny::get_c(sqrtx);
+    int64_t c = min(PhiTiny::max_a(), a);
     int64_t larger_c = min(a, max_a_cached_);
     larger_c = std::max(c, larger_c);
 
@@ -364,7 +364,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
     return phi_pix(x, a, threads);
 
   auto primes = generate_n_primes<int32_t>(a);
-  int64_t c = PhiTiny::get_c(sqrtx);
+  int64_t c = min(PhiTiny::max_a(), a);
   int64_t sum = phi_tiny(x, c);
 
   // These load balancing settings work well on my
