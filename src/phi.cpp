@@ -108,18 +108,14 @@ public:
       return phi_tiny(x, a) * SIGN;
     else if (is_pix(x, a))
       return (pi_[x] - a + 1) * SIGN;
-    else if (is_cached(x, a))
-      return phi_cache(x, a) * SIGN;
 
-    // Cache small phi(x, i) results with:
-    // x <= max_x && i <= a
-    if ((uint64_t) x <= max_x_ &&
-        (uint64_t) a <= max_a_ &&
-        (uint64_t) a > max_a_cached_)
-    {
-      init_phi_cache(a);
+    // Cache small phi(x, i) results with i <= min(a, max_a_)
+    if (max_a_cached_ < min(a, max_a_) &&
+        (uint64_t) x <= max_x_)
+      init_phi_cache(min(a, max_a_));
+
+    if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
-    }
 
     int64_t sum, i;
     int64_t sqrtx = isqrt(x);
