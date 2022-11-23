@@ -169,7 +169,7 @@ public:
       // phi(xp, i - 1) = pi(xp) - i + 2
       int64_t xp = fast_div(x, primes_[i]);
       sum += (pi_[xp] - i + 2) * -SIGN;
-      ASSERT(primes_[i] >= isqrt(xp));
+      ASSERT(is_pix(xp, i - 1));
     }
 
     end_loop:
