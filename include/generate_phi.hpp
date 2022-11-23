@@ -144,21 +144,31 @@ public:
       // inside the interval ]prime[i-1], x / prime[i]].
       if (primes_[i] > sqrtx)
         goto end_loop;
+
       int64_t xp = fast_div(x, primes_[i]);
+
+      // All remaining loop iterations can be computed
+      // in O(1) time using the pi(x) lookup table.
       if (is_pix(xp, i - 1))
         break;
-      sum += phi<-SIGN>(xp, i - 1);
+
+      if (is_cached(xp, i - 1))
+        sum += phi_cache(xp, i - 1) * -SIGN;
+      else
+        sum += phi<-SIGN>(xp, i - 1);
     }
 
     for (; i <= a; i++)
     {
       if (primes_[i] > sqrtx)
         goto end_loop;
+
       // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
       int64_t xp = fast_div(x, primes_[i]);
       sum += (pi_[xp] - i + 2) * -SIGN;
+      ASSERT((int64_t) primes_[i] >= isqrt(xp));
     }
 
     end_loop:
