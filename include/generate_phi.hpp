@@ -116,23 +116,23 @@ public:
     if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
 
-    int64_t sum, i;
-    int64_t sqrtx = isqrt(x);
-    int64_t c = min(PhiTiny::max_a(), a);
+    int64_t sum;
+    int64_t c = PhiTiny::max_a();
     int64_t larger_c = min(max_a_cached_, a);
     larger_c = std::max(c, larger_c);
+    ASSERT(c < a);
 
     // Usually our algorithm starts at c because phi(x, c) can be
     // computed in O(1) time using phi_tiny(x, c). However, if a
     // larger value of c is cached, then it is better to start at that
     // value, since phi_cache(x, larger_c) also takes O(1) time.
-    if (!is_cached(x, larger_c))
-      sum = phi_tiny(x, c) * SIGN;
+    if (is_cached(x, larger_c))
+      sum = phi_cache(x, (c = larger_c)) * SIGN;
     else
-    {
-      c = larger_c;
-      sum = phi_cache(x, c) * SIGN;
-    }
+      sum = phi_tiny(x, c) * SIGN;
+
+    int64_t sqrtx = isqrt(x);
+    int64_t i;
 
     for (i = c + 1; i <= a; i++)
     {
