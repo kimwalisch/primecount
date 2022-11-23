@@ -111,7 +111,7 @@ public:
     // Cache small phi(x, i) results with i <= min(a, max_a_)
     if (max_a_cached_ < min(a, max_a_) &&
         (uint64_t) x <= max_x_)
-      init_phi_cache(min(a, max_a_));
+      init_cache(min(a, max_a_));
 
     if (is_cached(x, a))
       return phi_cache(x, a) * SIGN;
@@ -203,7 +203,7 @@ private:
   /// counting has finished phi(x, a) results can be retrieved from the
   /// cache in O(1) using the phi_cache(x, a) method.
   ///
-  void init_phi_cache(uint64_t a)
+  void init_cache(uint64_t a)
   {
     ASSERT(a > PhiTiny::max_a());
     ASSERT(a <= max_a_);
