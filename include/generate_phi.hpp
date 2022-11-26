@@ -142,7 +142,7 @@ public:
       // phi(x / prime[i], i - 1) = 1 even if x / prime[i] > prime[i-1].
       // This works because in this case there is no other prime
       // inside the interval ]prime[i-1], x / prime[i]].
-      if (primes_[i] > sqrtx)
+      if_unlikely(primes_[i] > sqrtx)
         goto end_loop;
 
       int64_t xp = fast_div(x, primes_[i]);
@@ -163,7 +163,7 @@ public:
 
     for (; i <= a; i++)
     {
-      if (primes_[i] > sqrtx)
+      if_unlikely(primes_[i] > sqrtx)
         goto end_loop;
 
       // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
