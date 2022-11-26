@@ -144,7 +144,7 @@ public:
       // This works because in this case there is no other prime
       // inside the interval ]prime[i-1], x / prime[i]].
       if_unlikely(primes_[i] > sqrtx)
-        goto end_loop;
+        goto phi_1;
 
       int64_t xp = fast_div(x, primes_[i]);
 
@@ -165,9 +165,9 @@ public:
     for (; i <= a; i++)
     {
       if_unlikely(primes_[i] > sqrtx)
-        goto end_loop;
+        goto phi_1;
 
-      // if a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
+      // If a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
       int64_t xp = fast_div(x, primes_[i]);
@@ -175,8 +175,10 @@ public:
       sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
-    end_loop:
-    // phi(xp, i - 1) = 1 for i in [i, a]
+    phi_1:
+
+    // For i in ]pi(sqrt(x)), a]:
+    // phi(x / prime[i], i - 1) = 1
     sum += (a + 1 - i) * -SIGN;
     return sum;
   }
