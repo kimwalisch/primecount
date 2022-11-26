@@ -151,7 +151,10 @@ public:
       // All remaining loop iterations can be computed
       // in O(1) time using the pi(x) lookup table.
       if (is_pix(xp, i - 1))
-        break;
+      {
+        sum += (pi_[xp] - i + 2) * -SIGN;
+        i += 1; break;
+      }
 
       if (is_cached(xp, i - 1))
         sum += phi_cache(xp, i - 1) * -SIGN;
@@ -168,8 +171,8 @@ public:
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
       int64_t xp = fast_div(x, primes_[i]);
-      sum += (pi_[xp] - i + 2) * -SIGN;
       ASSERT(is_pix(xp, i - 1));
+      sum += (pi_[xp] - i + 2) * -SIGN;
     }
 
     end_loop:
