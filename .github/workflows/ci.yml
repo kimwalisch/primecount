@@ -1,4 +1,4 @@
-name: primecount CI tests
+name: ci
 
 on:
   push:
