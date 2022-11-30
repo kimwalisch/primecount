@@ -14,16 +14,12 @@
 
 #include <stdint.h>
 
-#if defined(__has_include)
-  #define HAS_INCLUDE(header) __has_include(header)
-#else
-  // If the __has_include() macro does not exist
-  // we assume that the header file exists.
-  #define HAS_INCLUDE(header) 1
-#endif
-
 #if !defined(__has_builtin)
   #define __has_builtin(x) 0
+#endif
+
+#if !defined(__has_include)
+  #define __has_include(x) 0
 #endif
 
 // GCC & Clang
@@ -50,7 +46,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 #elif defined(_MSC_VER) && \
       defined(_M_X64) && \
-      HAS_INCLUDE(<intrin.h>)
+      __has_include(<intrin.h>)
 
 #include <intrin.h>
 
@@ -65,7 +61,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 #elif defined(_MSC_VER) && \
       defined(_M_IX86) && \
-      HAS_INCLUDE(<intrin.h>)
+      __has_include(<intrin.h>)
 
 #include <intrin.h>
 
