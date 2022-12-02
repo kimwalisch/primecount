@@ -153,11 +153,12 @@ public:
           }
         }
 
-        y = std::max(start, y);
+        // Iterate over primes from [y+1, high]
+        start = std::max(start, y + 1);
 
-        if (y < high)
+        if (start <= high)
         {
-          it.jump_to(y + 1, high);
+          it.jump_to(start, high);
 
           // y < prime <= z
           while (true)
