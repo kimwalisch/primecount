@@ -1,9 +1,10 @@
-Changes in primecount-7.5, 2022-11-28
+Changes in primecount-7.5, 2022-12-05
 
 The C/C++ API and ABI of primecount-7.5 are backwards compatible but
 primecount-7.5 now requires >= libprimesieve.so.11. The previous
 primecount-7.4 requried >= libprimesieve.so.10.
 
+* Update to the latest libprimesieve-11.0.
 * phi.cpp: 10% phi(x, a) speedup.
 * pi_gourdon.cpp: Reduce context switches and cpu migrations by up to 2x.
 * LoadBalancerP2.cpp: Improve load balancing for high CPU core count servers.
@@ -12,10 +13,7 @@ primecount-7.4 requried >= libprimesieve.so.10.
 * AC.cpp: Improve load balancing for high CPU core count servers.
 * D.cpp: Improve load balancing for high CPU core count servers.
 * P3.cpp: Improve load balancing for high CPU core count servers.
-* Update to the latest libprimesieve-11.0.
-* Use the new primesieve::iterator::jump_to() instead of
-  primesieve::iterator::skipto(). This reduces the number of required
-  start number corrections (e.g. skipto(start-1)) by 2x.
+* Sieve.cpp: Simplify COUNT_UNSET_BIT() macro.
 * pod_vector.hpp: Added support for types with destructors.
 * CMakeLists.txt: Use WITH_DIV32=OFF when using the Clang compiler.
 * Hard-Special-Leaves.md: Convert formulas to MathJax.

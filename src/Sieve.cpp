@@ -588,11 +588,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define COUNT_UNSET_BIT(bit_index) \
     { \
       std::size_t sieve_byte = sieve[m]; \
-      std::size_t bit = sieve_byte & (1 << bit_index); \
-      std::size_t is_bit = bit >> bit_index; \
-      sieve[m] = (uint8_t) (sieve_byte - bit); \
+      std::size_t is_bit = (sieve_byte >> bit_index) & 1; \
+      sieve[m] &= ~(1 << bit_index); \
       counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
-      total_count -= is_bit; \
+      total_count -= (uint64_t) is_bit; \
     }
 
   switch (wheel.index)
