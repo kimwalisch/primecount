@@ -1,8 +1,13 @@
 Changes in primecount-7.6, 2022-12-07
 
-There was a missing header include in print.hpp (in primecount-7.5) which
-may cause the build to fail when compiling with C++17 or later. This e.g.
-caused the Fedora i686 build to fail on Fedora 39 (rawhide).
+This is a bug fix release.
+
+There is a missing header include in primecount-7.5 (in print.hpp)
+which may cause the build to fail when compiling with C++17 or later.
+This e.g. caused the build of primecount-7.5 to fail on Fedora-39
+i686. This issue has been fixed in primecount-7.6, there are no other
+changes. The API and ABI of primecount-7.6 are backwards compatible
+with primecount-7.*
 
 * print.hpp: Add missing <string_view> header.
 
