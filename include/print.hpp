@@ -18,6 +18,7 @@
 #endif
 
 #if __cplusplus >= 201703L && __has_include(<string_view>)
+  #include <string_view>
   using string_view_t = std::string_view;
 #else
   using string_view_t = const char*;
