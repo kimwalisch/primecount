@@ -173,6 +173,7 @@ endif()
 
 # Enable __float128 support (requires libquadmath) ###################
 
+# As of 2022 only GCC supports libquadmath
 if(WITH_FLOAT128)
     include("${PROJECT_SOURCE_DIR}/cmake/float128.cmake")
     if(float128)
