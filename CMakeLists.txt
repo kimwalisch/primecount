@@ -17,7 +17,7 @@ option(WITH_POPCNT          "Use the POPCNT instruction"            ON)
 option(WITH_LIBDIVIDE       "Use libdivide.h"                       ON)
 option(WITH_OPENMP          "Enable OpenMP multi-threading"         ON)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
-option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
+option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" ON)
 option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
 
 # When using WITH_DIV32=ON primecount checks at runtime
@@ -174,8 +174,11 @@ endif()
 # Enable __float128 support (requires libquadmath) ###################
 
 if(WITH_FLOAT128)
-    set(LIB_QUADMATH "quadmath")
-    set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
+    include("${PROJECT_SOURCE_DIR}/cmake/float128.cmake")
+    if(float128)
+        set(LIB_QUADMATH "quadmath")
+        set_source_files_properties(src/RiemannR.cpp PROPERTIES COMPILE_DEFINITIONS HAVE_FLOAT128)
+    endif()
 endif()
 
 # Check for OpenMP ###################################################
