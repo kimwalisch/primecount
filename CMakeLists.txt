@@ -173,7 +173,16 @@ endif()
 
 # Enable __float128 support (requires libquadmath) ###################
 
-# As of 2022 only GCC supports libquadmath
+# As of 2022 only GCC supports libquadmath.
+
+# Note that GCC currently warns when compiling using -pedantic
+# because of the use of the non-standard Q suffix:
+# "warning: non-standard suffix on floating constant [-Wpedantic]".
+# And there is currently (2022) no way to suppress this warning,
+# see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92826.
+# Because of this issue this test will fail when compiling with
+# GCC and -pedantic -Werror (which is used e.g. in our CI tests).
+
 if(WITH_FLOAT128)
     include("${PROJECT_SOURCE_DIR}/cmake/float128.cmake")
     if(float128)
