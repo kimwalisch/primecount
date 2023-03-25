@@ -54,9 +54,11 @@ const pod_array<int16_t, 170> primes =
 ///
 int64_t binary_search_nth_prime(int64_t n)
 {
-  ASSERT(n >= 1);
   int64_t low = n * 2;
   int64_t hi = PiTable::max_cached();
+
+  ASSERT(n >= 1);
+  ASSERT(low < hi);
 
   while (low < hi)
   {
