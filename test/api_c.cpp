@@ -2,7 +2,7 @@
 /// @file   api_c.cpp
 /// @brief  Test primecount's C API.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -52,11 +52,23 @@ int main()
   std::cout << "primecount_nth_prime(" << n << ") = " << res;
   check(res == 9999999967);
 
+  // nth_prime(-1) is an error and should hence return -1
+  // which indicates an error in the libprimecount C API.
+  n = -1;
+  res = primecount_nth_prime(n);
+  std::cout << "primecount_nth_prime(" << n << ") = " << res;
+  check(res == -1);
+
   n = (int64_t) 1e12;
   int64_t a = 78498;
   res = primecount_phi(n, a);
   std::cout << "primecount_phi(" << n << ", " << a << ") = " << res;
   check(res == 37607833521);
+
+  n = -1;
+  res = primecount_phi(n, a);
+  std::cout << "primecount_phi(" << n << ", " << a << ") = " << res;
+  check(res == 0);
 
   const char* in = "1000000000000";
   primecount_pi_str(in, out, sizeof(out));
