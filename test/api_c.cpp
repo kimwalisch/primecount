@@ -2,7 +2,7 @@
 /// @file   api_c.cpp
 /// @brief  Test primecount's C API.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,8 +30,20 @@ int main()
   primecount_set_num_threads(3);
   std::cout << "new threads: " << primecount_get_num_threads() << std::endl;
 
-  int64_t n = (int64_t) 1e10;
+  // Test 64-bit pi(-1)
+  int64_t n = -1;
   int64_t res = primecount_pi(n);
+  std::cout << "primecount_pi(" << n << ") = " << res;
+  check(res == 0);
+
+  // Test 128-bit pi(-1)
+  char out[32];
+  primecount_pi_str("-1", out, sizeof(out));
+  std::cout << "primecount_pi_str(-1) = " << out;
+  check(std::string(out) == "0");
+
+  n = (int64_t) 1e10;
+  res = primecount_pi(n);
   std::cout << "primecount_pi(" << n << ") = " << res;
   check(res == 455052511);
 
@@ -47,8 +59,7 @@ int main()
   check(res == 37607833521);
 
   const char* in = "1000000000000";
-  char out[32];
-  primecount_pi_str(in, out, 32);
+  primecount_pi_str(in, out, sizeof(out));
   std::cout << "primecount_pi_str(" << in << ") = " << out;
   check(std::string(out) == "37607912018");
 

@@ -38,6 +38,9 @@ namespace primecount {
 
 int64_t pi_cache(int64_t x, bool is_print)
 {
+  if (x < 2)
+    return 0;
+
   if (is_print)
   {
     print("");

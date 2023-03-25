@@ -1,3 +1,12 @@
+Changes in primecount-7.7, 2023-03-25
+
+This is a bug fix release.
+
+* api.cpp: Fix pi(-1) crash #64. Now pi(-1) returns 0
+           without reporting any error.
+* test/api.cpp: Add pi(-1) test.
+* test/api_c.cpp: Add primecount_pi(-1) test.
+
 Changes in primecount-7.6, 2022-12-07
 
 This is a bug fix release.
