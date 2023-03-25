@@ -326,6 +326,7 @@ int64_t phi_pix(int64_t x, int64_t a, int threads)
 ///
 int64_t pix_upper(int64_t x)
 {
+  ASSERT(x >= 0);
   if (x <= PiTable::max_cached())
     return PiTable::pi_cache(x);
 
