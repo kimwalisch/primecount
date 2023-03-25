@@ -58,6 +58,7 @@ int64_t binary_search_nth_prime(int64_t n)
   int64_t hi = PiTable::max_cached();
 
   ASSERT(n >= 1);
+  ASSERT(n <= PiTable::pi_cache(hi));
   ASSERT(low < hi);
 
   while (low < hi)
