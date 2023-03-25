@@ -38,9 +38,6 @@ namespace primecount {
 
 int64_t pi_cache(int64_t x, bool is_print)
 {
-  if (x < 2)
-    return 0;
-
   if (is_print)
   {
     print("");
@@ -48,6 +45,9 @@ int64_t pi_cache(int64_t x, bool is_print)
     print("x", x);
     print("threads", 1);
   }
+
+  if (x < 2)
+    return 0;
 
   return PiTable::pi_cache(x);
 }
