@@ -27,7 +27,7 @@ void check(int OK)
   }
 }
 
-int main()
+int main(void)
 {
   printf("primecount version: %s\n", primecount_version());
   printf("threads: %d\n", primecount_get_num_threads());
