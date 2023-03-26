@@ -7,7 +7,7 @@
  *         standard error stream. libprimesieve also sets the C errno
  *         variable to EDOM if an error occurs.
  * 
- * Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+ * Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
  * 
  * This file is distributed under the BSD License.
  */
@@ -15,9 +15,9 @@
 #ifndef PRIMESIEVE_H
 #define PRIMESIEVE_H
 
-#define PRIMESIEVE_VERSION "11.0"
+#define PRIMESIEVE_VERSION "11.1"
 #define PRIMESIEVE_VERSION_MAJOR 11
-#define PRIMESIEVE_VERSION_MINOR 0
+#define PRIMESIEVE_VERSION_MINOR 1
 
 #include <primesieve/iterator.h>
 
@@ -209,13 +209,13 @@ void primesieve_print_sextuplets(uint64_t start, uint64_t stop);
  * Returns the largest valid stop number for primesieve.
  * @return 2^64-1 (UINT64_MAX).
  */
-uint64_t primesieve_get_max_stop();
+uint64_t primesieve_get_max_stop(void);
 
 /** Get the current set sieve size in KiB */
-int primesieve_get_sieve_size();
+int primesieve_get_sieve_size(void);
 
 /** Get the current set number of threads */
-int primesieve_get_num_threads();
+int primesieve_get_num_threads(void);
 
 /**
  * Set the sieve size in KiB (kibibyte).
@@ -240,7 +240,7 @@ void primesieve_set_num_threads(int num_threads);
 void primesieve_free(void* primes);
 
 /** Get the primesieve version number, in the form “i.j” */
-const char* primesieve_version();
+const char* primesieve_version(void);
 
 #ifdef __cplusplus
 } /* extern "C" */
