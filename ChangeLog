@@ -1,4 +1,4 @@
-Changes in primecount-7.7, 2023-03-25
+Changes in primecount-7.7, 2023-03-26
 
 This is a bug fix release.
 
@@ -6,6 +6,7 @@ This is a bug fix release.
            without reporting any error.
 * test/api.cpp: Add pi(-1) test.
 * test/api_c.cpp: Add primecount_pi(-1) test.
+* test/nth_prime.cpp: Add new test.
 
 Changes in primecount-7.6, 2022-12-07
 
