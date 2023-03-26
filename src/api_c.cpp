@@ -97,7 +97,7 @@ int64_t primecount_phi(int64_t x, int64_t a)
   }
 }
 
-int primecount_get_num_threads()
+int primecount_get_num_threads(void)
 {
   try
   {
@@ -122,7 +122,7 @@ void primecount_set_num_threads(int threads)
   }
 }
 
-const char* primecount_get_max_x()
+const char* primecount_get_max_x(void)
 {
 #ifdef HAVE_INT128_T
   // 10^31
@@ -133,7 +133,7 @@ const char* primecount_get_max_x()
 #endif
 }
 
-const char* primecount_version()
+const char* primecount_version(void)
 {
   return PRIMECOUNT_VERSION;
 }

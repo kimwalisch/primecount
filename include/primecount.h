@@ -80,16 +80,16 @@ int64_t primecount_nth_prime(int64_t n);
  * The return type is a char* as primecount_get_max_x() may be a
  * 128-bit integer which is not supported by some compilers.
  */
-const char* primecount_get_max_x();
+const char* primecount_get_max_x(void);
 
 /*  Get the currently set number of threads */
-int primecount_get_num_threads();
+int primecount_get_num_threads(void);
 
 /*  Set the number of threads */
 void primecount_set_num_threads(int num_threads);
 
 /* Get the primecount version number, in the form “i.j” */
-const char* primecount_version();
+const char* primecount_version(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -2,6 +2,7 @@ Changes in primecount-7.7, 2023-03-26
 
 This is a bug fix release.
 
+* primecount.h: Fix -Wstrict-prototypes warning.
 * api.cpp: Fix pi(-1) crash #64. Now pi(-1) returns 0
            without reporting any error.
 * test/api.cpp: Add pi(-1) test.
