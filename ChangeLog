@@ -8,6 +8,7 @@ This is a bug fix release.
 * test/api.cpp: Add pi(-1) test.
 * test/api_c.cpp: Add primecount_pi(-1) test.
 * test/nthprime.cpp: Add new test.
+* test/api_c.c: Convert api_c.cpp to api_c.c
 
 Changes in primecount-7.6, 2022-12-07
 
