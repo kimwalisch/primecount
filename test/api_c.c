@@ -35,16 +35,27 @@ int main(void)
   primecount_set_num_threads(3);
   printf("new threads: %d\n", primecount_get_num_threads());
 
-  // Test 64-bit pi(-1)
+  // Test 64-bit pi(-x)
   int64_t n = -1;
   int64_t res = primecount_pi(n);
   printf("primecount_pi(%"PRId64") = %"PRId64, n, res);
   check(res == 0);
 
-  // Test 128-bit pi(-1)
+  // Test 64-bit pi(-x)
+  n = -9223372036854775807;
+  res = primecount_pi(n);
+  printf("primecount_pi(%"PRId64") = %"PRId64, n, res);
+  check(res == 0);
+
+  // Test 128-bit pi(-x)
   char out[32];
   primecount_pi_str("-1", out, sizeof(out));
   printf("primecount_pi_str(-1) = %s", out);
+  check(strcmp(out, "0") == 0);
+
+  // Test 128-bit pi(-x)
+  primecount_pi_str("-1267650600228229401496703205373", out, sizeof(out));
+  printf("primecount_pi_str(-1267650600228229401496703205373) = %s", out);
   check(strcmp(out, "0") == 0);
 
   n = (int64_t) 1e10;

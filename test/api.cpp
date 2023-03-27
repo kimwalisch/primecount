@@ -32,15 +32,27 @@ int main()
   set_num_threads(3);
   std::cout << "new threads: " << get_num_threads() << std::endl;
 
-  // Test 64-bit pi(-1)
+  // Test 64-bit pi(-x)
   int64_t n = -1;
   int64_t res = pi(n);
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);
 
-  // Test 128-bit pi(-1)
+  // Test 64-bit pi(-x)
+  n = -9223372036854775807ll;
+  res = pi(n);
+  std::cout << "pi(" << n << ") = " << res;
+  check(res == 0);
+
+  // Test 128-bit pi(-x)
   std::string in = "-1";
   std::string out = pi(in);
+  std::cout << "pi(" << in << ") = " << out;
+  check(out == "0");
+
+  // Test 128-bit pi(-x)
+  in = "-1267650600228229401496703205373";
+  out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");
 

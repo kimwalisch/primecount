@@ -1,5 +1,5 @@
 ///
-/// @file   nthprime.cpp
+/// @file   nth_prime.cpp
 /// @brief  Test the nth_prime(n) function
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>

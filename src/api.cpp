@@ -2,7 +2,7 @@
 /// @file  api.cpp
 ///        primecount's C++ API.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,7 @@
 #include <primesieve.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 #include <to_string.hpp>
@@ -36,20 +37,16 @@ namespace {
 
 namespace primecount {
 
-int64_t pi_cache(int64_t x, bool is_print)
+std::string pi(const std::string& x)
 {
-  if (is_print)
-  {
-    print("");
-    print("=== pi_cache(x) ===");
-    print("x", x);
-    print("threads", 1);
-  }
+  return pi(x, get_num_threads());
+}
 
-  if (x < 2)
-    return 0;
-
-  return PiTable::pi_cache(x);
+std::string pi(const std::string& x, int threads)
+{
+  maxint_t n = to_maxint(x);
+  maxint_t res = pi(n, threads);
+  return to_string(res);
 }
 
 int64_t pi(int64_t x)
@@ -90,34 +87,21 @@ int64_t pi_noprint(int64_t x, int threads)
     return pi_gourdon_64(x, threads, is_print);
 }
 
-#ifdef HAVE_INT128_T
-
-int128_t pi(int128_t x)
+int64_t pi_cache(int64_t x, bool is_print)
 {
-  return pi(x, get_num_threads());
-}
+  if (x < 2)
+    return 0;
 
-int128_t pi(int128_t x, int threads)
-{
-  // use 64-bit if possible
-  if (x <= std::numeric_limits<int64_t>::max())
-    return pi((int64_t) x, threads);
+  if (is_print)
+  {
+    print("");
+    print("=== pi_cache(x) ===");
+    print("x", x);
+    print("threads", 1);
+  }
 
-  return pi_gourdon_128(x, threads);
-}
-
-#endif
-
-std::string pi(const std::string& x)
-{
-  return pi(x, get_num_threads());
-}
-
-std::string pi(const std::string& x, int threads)
-{
-  maxint_t n = to_maxint(x);
-  maxint_t res = pi(n, threads);
-  return to_string(res);
+  ASSERT(x >= 0);
+  return PiTable::pi_cache(x);
 }
 
 int64_t pi_deleglise_rivat(int64_t x, int threads)
@@ -132,9 +116,29 @@ int64_t pi_gourdon(int64_t x, int threads)
 
 #ifdef HAVE_INT128_T
 
+int128_t pi(int128_t x)
+{
+  return pi(x, get_num_threads());
+}
+
+int128_t pi(int128_t x, int threads)
+{
+  if (x < 0)
+    return 0;
+
+  // Use 64-bit if possible
+  if (x <= std::numeric_limits<int64_t>::max())
+    return pi((int64_t) x, threads);
+  else
+    return pi_gourdon_128(x, threads);
+}
+
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
-  // use 64-bit if possible
+  if (x < 0)
+    return 0;
+
+  // Use 64-bit if possible
   if (x <= std::numeric_limits<int64_t>::max())
     return pi_deleglise_rivat_64((int64_t) x, threads);
   else
@@ -143,7 +147,10 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
 
 int128_t pi_gourdon(int128_t x, int threads)
 {
-  // use 64-bit if possible
+  if (x < 0)
+    return 0;
+
+  // Use 64-bit if possible
   if (x <= std::numeric_limits<int64_t>::max())
     return pi_gourdon_64((int64_t) x, threads);
   else

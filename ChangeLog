@@ -1,3 +1,14 @@
+Changes in primecount-7.8, 2023-03-27
+
+I fixed the pi(-n) crash yesterday for 64-bit integers. Unfortunately
+I forgot to fix the same issue for 128-bit integers. Hence this
+release fixes the same issue for 128-bit integers.
+
+* api.cpp: Add missing check for negative numbers in pi(int128_t x),
+           pi_deleglise_rivat(int128_t x), pi_gourdon(int128_t x).
+* test/api.cpp: Add more pi(-n) tests.
+* test/api_c.cpp: Add more primecount_pi(-n) tests.
+
 Changes in primecount-7.7, 2023-03-26
 
 This is a bug fix release.
