@@ -51,10 +51,16 @@ int main()
 
 #ifdef HAVE_INT128_T
   // Test 128-bit pi(-x)
-  in = "-1267650600228229401496703205373";
+  in = "-1208925819614629174696176";
   out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");
+
+  // Test using INT128_MIN
+  in = "-170141183460469231731687303715884105728";
+  out = pi(in);
+  std::cout << "pi(" << in << ") = " << out;
+  check(out == "0");  
 #endif
 
   n = (int64_t) 1e10;

@@ -54,8 +54,13 @@ int main(void)
   if (strlen(primecount_get_max_x()) > 25)
   {
     // Test 128-bit pi(-x)
-    primecount_pi_str("-1267650600228229401496703205373", out, sizeof(out));
-    printf("primecount_pi_str(-1267650600228229401496703205373) = %s", out);
+    primecount_pi_str("-1208925819614629174696176", out, sizeof(out));
+    printf("primecount_pi_str(-1208925819614629174696176) = %s", out);
+    check(strcmp(out, "0") == 0);
+
+    // Test using INT128_MIN
+    primecount_pi_str("-170141183460469231731687303715884105728", out, sizeof(out));
+    printf("primecount_pi_str(-170141183460469231731687303715884105728) = %s", out);
     check(strcmp(out, "0") == 0);
   }
 
