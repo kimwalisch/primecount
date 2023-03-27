@@ -2,13 +2,14 @@
 /// @file   api.cpp
 /// @brief  Test primecount's C++ API.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -38,23 +39,23 @@ int main()
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);
 
-  // Test 64-bit pi(-x)
   n = -9223372036854775807ll;
   res = pi(n);
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);
 
-  // Test 128-bit pi(-x)
   std::string in = "-1";
   std::string out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");
 
+#ifdef HAVE_INT128_T
   // Test 128-bit pi(-x)
   in = "-1267650600228229401496703205373";
   out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");
+#endif
 
   n = (int64_t) 1e10;
   res = pi(n);

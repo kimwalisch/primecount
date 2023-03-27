@@ -41,22 +41,23 @@ int main(void)
   printf("primecount_pi(%"PRId64") = %"PRId64, n, res);
   check(res == 0);
 
-  // Test 64-bit pi(-x)
   n = -9223372036854775807;
   res = primecount_pi(n);
   printf("primecount_pi(%"PRId64") = %"PRId64, n, res);
   check(res == 0);
 
-  // Test 128-bit pi(-x)
   char out[32];
   primecount_pi_str("-1", out, sizeof(out));
   printf("primecount_pi_str(-1) = %s", out);
   check(strcmp(out, "0") == 0);
 
-  // Test 128-bit pi(-x)
-  primecount_pi_str("-1267650600228229401496703205373", out, sizeof(out));
-  printf("primecount_pi_str(-1267650600228229401496703205373) = %s", out);
-  check(strcmp(out, "0") == 0);
+  if (strlen(primecount_get_max_x()) > 25)
+  {
+    // Test 128-bit pi(-x)
+    primecount_pi_str("-1267650600228229401496703205373", out, sizeof(out));
+    printf("primecount_pi_str(-1267650600228229401496703205373) = %s", out);
+    check(strcmp(out, "0") == 0);
+  }
 
   n = (int64_t) 1e10;
   res = primecount_pi(n);
