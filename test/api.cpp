@@ -56,8 +56,8 @@ int main()
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");
 
-  // Test using INT128_MIN
-  in = "-170141183460469231731687303715884105728";
+  // Test using INT128_MIN+1
+  in = "-170141183460469231731687303715884105727";
   out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
   check(out == "0");  

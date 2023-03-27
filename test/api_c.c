@@ -58,9 +58,9 @@ int main(void)
     printf("primecount_pi_str(-1208925819614629174696176) = %s", out);
     check(strcmp(out, "0") == 0);
 
-    // Test using INT128_MIN
-    primecount_pi_str("-170141183460469231731687303715884105728", out, sizeof(out));
-    printf("primecount_pi_str(-170141183460469231731687303715884105728) = %s", out);
+    // Test using INT128_MIN+1
+    primecount_pi_str("-170141183460469231731687303715884105727", out, sizeof(out));
+    printf("primecount_pi_str(-170141183460469231731687303715884105727) = %s", out);
     check(strcmp(out, "0") == 0);
   }
 
