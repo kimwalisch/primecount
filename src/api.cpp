@@ -123,6 +123,8 @@ int128_t pi(int128_t x)
 
 int128_t pi(int128_t x, int threads)
 {
+  // Prevent 64-bit cast to random
+  // integer if x <= -2^63.
   if (x < 0)
     return 0;
 
@@ -135,6 +137,8 @@ int128_t pi(int128_t x, int threads)
 
 int128_t pi_deleglise_rivat(int128_t x, int threads)
 {
+  // Prevent 64-bit cast to random
+  // integer if x <= -2^63.
   if (x < 0)
     return 0;
 
@@ -147,6 +151,8 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
 
 int128_t pi_gourdon(int128_t x, int threads)
 {
+  // Prevent 64-bit cast to random
+  // integer if x <= -2^63.
   if (x < 0)
     return 0;
 
