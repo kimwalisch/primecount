@@ -199,8 +199,11 @@ endif()
 # (e.g. libprimesieve-dev) and link against that version.
 
 if(BUILD_LIBPRIMESIEVE)
+    set(COPY_BUILD_EXAMPLES "${BUILD_EXAMPLES}")
     set(COPY_BUILD_MANPAGE "${BUILD_MANPAGE}")
     set(COPY_BUILD_TESTS "${BUILD_TESTS}")
+
+    set(BUILD_EXAMPLES OFF CACHE BOOL "Build example programs" FORCE)
     set(BUILD_MANPAGE OFF CACHE BOOL "Build primesieve manpage" FORCE)
     set(BUILD_TESTS OFF CACHE BOOL "Build primesieve tests" FORCE)
     option(BUILD_PRIMESIEVE "Build primesieve binary" OFF)
@@ -214,6 +217,7 @@ if(BUILD_LIBPRIMESIEVE)
         target_compile_options(libprimesieve-static PRIVATE "${POPCNT_FLAG}")
     endif()
 
+    set(BUILD_EXAMPLES "${COPY_BUILD_EXAMPLES}" CACHE BOOL "Build example programs" FORCE)
     set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
 else()

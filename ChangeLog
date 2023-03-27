@@ -8,6 +8,7 @@ release fixes the same issue for 128-bit integers.
            pi_deleglise_rivat(int128_t x), pi_gourdon(int128_t x).
 * test/api.cpp: Add more pi(-n) tests.
 * test/api_c.cpp: Add more primecount_pi(-n) tests.
+* CMakeLists.txt: Disable building libprimesieve examples.
 
 Changes in primecount-7.7, 2023-03-26
 
