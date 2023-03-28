@@ -1,6 +1,6 @@
 ///
 /// @file   pi_deleglise_rivat.cpp
-/// @brief  Test the pi_deleglise_rivat_64(x) function.
+/// @brief  Test the pi_deleglise_rivat(x) function.
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -44,15 +44,15 @@ int main()
 
   {
     int64_t x = -1;
-    int64_t res = pi_deleglise_rivat_64(x, threads);
-    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res;
+    int64_t res = pi_deleglise_rivat(x, threads);
+    std::cout << "pi_deleglise_rivat(" << x << ") = " << res;
     check(res == 0);
   }
 
   for (int64_t x = 0; x < (int64_t) pix.size(); x++)
   {
-    int64_t res = pi_deleglise_rivat_64(x, threads);
-    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res;
+    int64_t res = pi_deleglise_rivat(x, threads);
+    std::cout << "pi_deleglise_rivat(" << x << ") = " << res;
     check(res == pix[x]);
   }
 
@@ -63,9 +63,9 @@ int main()
   for (int i = 0; i < 1000; i++)
   {
     int64_t x = dist(gen);
-    int64_t res1 = pi_deleglise_rivat_64(x, threads);
+    int64_t res1 = pi_deleglise_rivat(x, threads);
     int64_t res2 = pi_legendre(x, threads);
-    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res1;
+    std::cout << "pi_deleglise_rivat(" << x << ") = " << res1;
     check(res1 == res2);
   }
 

@@ -1,6 +1,6 @@
 ///
 /// @file   pi_gourdon.cpp
-/// @brief  Test the pi_gourdon_64(x) function.
+/// @brief  Test the pi_gourdon(x) function.
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -45,15 +45,15 @@ int main()
 
   {
     int64_t x = -1;
-    int64_t res = pi_gourdon_64(x, threads);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res;
+    int64_t res = pi_gourdon(x, threads);
+    std::cout << "pi_gourdon(" << x << ") = " << res;
     check(res == 0);
   }
 
   for (int64_t x = 0; x < (int64_t) pix.size(); x++)
   {
-    int64_t res = pi_gourdon_64(x, threads);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res;
+    int64_t res = pi_gourdon(x, threads);
+    std::cout << "pi_gourdon(" << x << ") = " << res;
     check(res == pix[x]);
   }
 
@@ -64,9 +64,9 @@ int main()
   for (int i = 0; i < 1000; i++)
   {
     int64_t x = dist(gen);
-    int64_t res1 = pi_gourdon_64(x, threads);
+    int64_t res1 = pi_gourdon(x, threads);
     int64_t res2 = pi_legendre(x, threads);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res1;
+    std::cout << "pi_gourdon(" << x << ") = " << res1;
     check(res1 == res2);
   }
 
