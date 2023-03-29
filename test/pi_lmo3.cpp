@@ -47,7 +47,7 @@ int main()
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, 1 << 22);
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 23);
 
   for (int i = 0; i < 1000; i++)
   {
