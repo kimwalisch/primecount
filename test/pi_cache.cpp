@@ -9,7 +9,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <PiTable.hpp>
 
 #include <stdint.h>
@@ -150,7 +149,7 @@ int main()
   for (int64_t x = PiTable::max_cached() - 1000; x <= PiTable::max_cached(); x++)
   {
     int64_t res1 = pi_cache(x);
-    int64_t res2 = primesieve::count_primes(0, x);
+    int64_t res2 = pi_primesieve(x);
     std::cout << "pi_cache(" << x << ") = " << res1;
     check(res1 == res2);
   }
