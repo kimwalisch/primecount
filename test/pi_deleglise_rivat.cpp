@@ -73,6 +73,12 @@ int main()
     int128_t res = pi_deleglise_rivat_128(x, threads);
     std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res;
     check(res == 0);
+
+    // Test if cast in pi_deleglise_rivat(x) supports x <= -2^64
+    int128_t x = -1 * (((int128_t) 1) << 100);
+    int128_t res = pi_deleglise_rivat(x, threads);
+    std::cout << "pi_deleglise_rivat(" << x << ") = " << res;
+    check(res == 0);
   }
 
   for (int128_t x = 0; x <= PiTable::max_cached(); x++)
