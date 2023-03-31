@@ -91,6 +91,11 @@ make -j
 ctest
 ```
 
+For developers hacking on primecount's source code the
+[test/README.md](../test/README.md) document contains more information
+about primecount testing such as testing in debug mode and testing
+using GCC/Clang sanitizers.
+
 ## CMake configure options
 
 By default the primecount binary, the static libprimecount and
