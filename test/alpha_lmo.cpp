@@ -1,6 +1,6 @@
 ///
 /// @file   alpha_lmo.cpp
-/// @brief  Test the lmo algorithm using the alpha tuning factor.
+/// @brief  Test the alpha tuning factor with the LMO algorithm.
 ///         y = alpha * x^(1/3)
 ///         By computing pi(x) using different alpha tuning
 ///         factors we can make sure that all array sizes
