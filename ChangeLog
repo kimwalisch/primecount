@@ -1,3 +1,14 @@
+Changes in primecount-7.9, 2023-03-31
+
+* test/README.md: Add debug mode + GCC/Clang sanitizers documentation.
+* doc/BUILD.md: Add link to detailed test information.
+* test/pi_*.cpp: Add large pi(x) computation test.
+* test/pi_deleglise_rivat.cpp: Add 128-bit tests.
+* test/pi_gourdon.cpp: Add 128-bit tests.
+* test/alpha_deleglise_rivat.cpp: Add 128-bit tests.
+* test/alpha_y_gourdon.cpp: Add 128-bit tests.
+* test/alpha_z_gourdon.cpp: Add 128-bit tests.
+
 Changes in primecount-7.8, 2023-03-27
 
 I fixed the pi(-n) crash yesterday for 64-bit integers. Unfortunately
