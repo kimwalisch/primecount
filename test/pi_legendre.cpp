@@ -30,6 +30,10 @@ int main()
 {
   int threads = get_num_threads();
 
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 20);
+
   {
     int64_t x = -1;
     int64_t res = pi_legendre(x, threads);
@@ -45,17 +49,21 @@ int main()
     check(res1 == res2);
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, PiTable::max_cached());
-
-  for (int i = 0; i < 1000; i++)
+  for (int i = 0; i < 100; i++)
   {
     int64_t x = dist(gen);
     int64_t res1 = pi_legendre(x, threads);
-    int64_t res2 = pi_cache(x);
+    int64_t res2 = pi_primesieve(x);
     std::cout << "pi_legendre(" << x << ") = " << res1;
     check(res1 == res2);
+  }
+
+  {
+    // Test one larger computation: pi(1e11)
+    int64_t x = 100000000000ll;
+    int64_t res = pi_legendre(x, threads);
+    std::cout << "pi_legendre(" << x << ") = " << res;
+    check(res == 4118054813ll);
   }
 
   std::cout << std::endl;

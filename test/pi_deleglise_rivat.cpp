@@ -1,6 +1,7 @@
 ///
 /// @file   pi_deleglise_rivat.cpp
-/// @brief  Test the pi_deleglise_rivat(x) function.
+/// @brief  Test the pi_deleglise_rivat_64(x) and
+///         pi_deleglise_rivat_128(x) functions.
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -30,33 +31,75 @@ int main()
 {
   int threads = get_num_threads();
 
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 28);
+
   {
     int64_t x = -1;
-    int64_t res = pi_deleglise_rivat(x, threads);
-    std::cout << "pi_deleglise_rivat(" << x << ") = " << res;
+    int64_t res = pi_deleglise_rivat_64(x, threads);
+    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res;
     check(res == 0);
   }
 
   for (int64_t x = 0; x <= PiTable::max_cached(); x++)
   {
-    int64_t res1 = pi_deleglise_rivat(x, threads);
+    int64_t res1 = pi_deleglise_rivat_64(x, threads);
     int64_t res2 = pi_cache(x);
-    std::cout << "pi_deleglise_rivat(" << x << ") = " << res1;
+    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res1;
     check(res1 == res2);
   }
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, 1 << 28);
 
   for (int i = 0; i < 1000; i++)
   {
     int64_t x = dist(gen);
-    int64_t res1 = pi_deleglise_rivat(x, threads);
-    int64_t res2 = pi_legendre(x, threads);
-    std::cout << "pi_deleglise_rivat(" << x << ") = " << res1;
+    int64_t res1 = pi_deleglise_rivat_64(x, threads);
+    int64_t res2 = pi_meissel(x, threads);
+    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res1;
     check(res1 == res2);
   }
+
+  {
+    // Test one larger computation: pi(1e11)
+    int64_t x = 100000000000ll;
+    int64_t res = pi_deleglise_rivat_64(x, threads);
+    std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res;
+    check(res == 4118054813ll);
+  }
+
+#ifdef HAVE_INT128_T
+  {
+    int128_t x = -1;
+    int128_t res = pi_deleglise_rivat_128(x, threads);
+    std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res;
+    check(res == 0);
+  }
+
+  for (int128_t x = 0; x <= PiTable::max_cached(); x++)
+  {
+    int128_t res1 = pi_deleglise_rivat_128(x, threads);
+    int128_t res2 = pi_cache(x);
+    std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  for (int i = 0; i < 1000; i++)
+  {
+    int128_t x = dist(gen);
+    int128_t res1 = pi_deleglise_rivat_128(x, threads);
+    int128_t res2 = pi_meissel((int64_t) x, threads);
+    std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test one larger computation: pi(1e11)
+    int128_t x = 100000000000ll;
+    int128_t res = pi_deleglise_rivat_128(x, threads);
+    std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res;
+    check(res == 4118054813ll);
+  }
+#endif
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

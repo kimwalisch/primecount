@@ -30,6 +30,10 @@ int main()
 {
   int threads = get_num_threads();
 
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 28);
+
   {
     int64_t x = -1;
     int64_t res = pi_lmo5(x);
@@ -45,17 +49,21 @@ int main()
     check(res1 == res2);
   }
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, 1 << 28);
-
   for (int i = 0; i < 1000; i++)
   {
     int64_t x = dist(gen);
     int64_t res1 = pi_lmo5(x);
-    int64_t res2 = pi_legendre(x, threads);
+    int64_t res2 = pi_meissel(x, threads);
     std::cout << "pi_lmo5(" << x << ") = " << res1;
     check(res1 == res2);
+  }
+
+  {
+    // Test one larger computation: pi(1e10)
+    int64_t x = 10000000000ll;
+    int64_t res = pi_lmo5(x, threads);
+    std::cout << "pi_lmo5(" << x << ") = " << res;
+    check(res == 455052511ll);
   }
 
   std::cout << std::endl;
