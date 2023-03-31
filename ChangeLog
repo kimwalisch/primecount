@@ -8,6 +8,7 @@ Changes in primecount-7.9, 2023-03-31
 * test/alpha_deleglise_rivat.cpp: Add 128-bit tests.
 * test/alpha_y_gourdon.cpp: Add 128-bit tests.
 * test/alpha_z_gourdon.cpp: Add 128-bit tests.
+* test/nth_prime.cpp: Add large nth_prime(n) tests.
 
 Changes in primecount-7.8, 2023-03-27
 

@@ -56,6 +56,16 @@ int main()
     check_equal(n, nth_prime(n), prime);
   }
 
+  // Test a few large nth prime computations
+  n = 10000000;
+  check_equal(n, nth_prime(n), 179424673ll);
+  n = 100000000;
+  check_equal(n, nth_prime(n), 2038074743ll);
+  n = 1000000000;
+  check_equal(n, nth_prime(n), 22801763489ll);
+  n = 10000000000;
+  check_equal(n, nth_prime(n), 252097800623ll);
+
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
