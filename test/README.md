@@ -1,6 +1,6 @@
 # primecount testing
 
-Run the commands below from the root primecount directory.
+Run the commands below from the primecount root directory.
 
 ```bash
 cmake . -DBUILD_TESTS=ON
@@ -17,6 +17,7 @@ the file name and line number where the error occurred will be printed to
 the screen. This helps to quickly identify newly introduced bugs.
 
 ```bash
+# Run commands from primecount root directory
 cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-O1 -Wall -Wextra -pedantic" -DCMAKE_C_FLAGS="-O1 -Wall -Wextra -pedantic"
 make -j
 ctest --output-on-failure
@@ -28,6 +29,7 @@ Running primecount's test suite with sanitizers enabled is also very useful
 as this helps find undefined behavior bugs and data races.
 
 ```bash
+# Run commands from primecount root directory
 cmake . -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -Wall -Wextra -pedantic" -DCMAKE_C_FLAGS="-g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -Wall -Wextra -pedantic"
 make -j
 ctest --output-on-failure
