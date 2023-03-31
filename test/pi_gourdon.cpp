@@ -75,8 +75,8 @@ int main()
     check(res == 0);
 
     // Test if cast in pi_gourdon(x) supports x <= -2^64
-    int128_t x = -1 * (((int128_t) 1) << 100);
-    int128_t res = pi_gourdon(x, threads);
+    x = -1 * (((int128_t) 1) << 100);
+    res = pi_gourdon(x, threads);
     std::cout << "pi_gourdon(" << x << ") = " << res;
     check(res == 0);
   }

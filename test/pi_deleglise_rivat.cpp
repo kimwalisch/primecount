@@ -75,8 +75,8 @@ int main()
     check(res == 0);
 
     // Test if cast in pi_deleglise_rivat(x) supports x <= -2^64
-    int128_t x = -1 * (((int128_t) 1) << 100);
-    int128_t res = pi_deleglise_rivat(x, threads);
+    x = -1 * (((int128_t) 1) << 100);
+    res = pi_deleglise_rivat(x, threads);
     std::cout << "pi_deleglise_rivat(" << x << ") = " << res;
     check(res == 0);
   }
