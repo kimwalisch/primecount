@@ -15,7 +15,7 @@ Changes in primecount-7.9, 2023-04-01
 * test/deleglise-rivat/S2_easy.cpp: Add large computation tests.
 * test/deleglise-rivat/S2_hard.cpp: Add large computation tests.
 * test/deleglise-rivat/alpha_deleglise_rivat.cpp: Add 128-bit tests.
-* test/nth_prime.cpp: Add large computation tests.
+* test/api/nth_prime.cpp: Add large computation tests.
 
 Changes in primecount-7.8, 2023-03-27
 
