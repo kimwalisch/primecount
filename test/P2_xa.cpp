@@ -57,7 +57,7 @@ int main()
   threads = get_num_threads();
 
   {
-    // Test B(1e13) and compare with known correct value
+    // Test P2(1e13) and compare with known correct value
     int64_t x = 10000000000000ll;
     int64_t y = 178815;
     int64_t a = 16229;
