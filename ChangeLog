@@ -1,14 +1,21 @@
-Changes in primecount-7.9, 2023-03-31
+Changes in primecount-7.9, 2023-04-01
 
 * test/README.md: Add debug mode + GCC/Clang sanitizers documentation.
 * doc/BUILD.md: Add link to detailed test information.
-* test/pi_*.cpp: Add large pi(x) computation test.
-* test/pi_deleglise_rivat.cpp: Add 128-bit tests.
-* test/pi_gourdon.cpp: Add 128-bit tests.
-* test/alpha_deleglise_rivat.cpp: Add 128-bit tests.
-* test/alpha_y_gourdon.cpp: Add 128-bit tests.
-* test/alpha_z_gourdon.cpp: Add 128-bit tests.
-* test/nth_prime.cpp: Add large nth_prime(n) tests.
+* test/pi_lehmer.cpp: Add new test.
+* test/pi_*.cpp: Add large pi(x) computation tests.
+* test/gourdon/AC.cpp: Add new test.
+* test/gourdon/B.cpp: Add new test.
+* test/gourdon/D.cpp: Add new test.
+* test/gourdon/Phi0.cpp: Add new test.
+* test/gourdon/Sigma.cpp: Add new test.
+* test/gourdon/alpha_y.cpp: Add 128-bit tests.
+* test/gourdon/alpha_z.cpp: Add 128-bit tests.
+* test/deleglise-rivat/S2_trivial.cpp: Add large computation tests.
+* test/deleglise-rivat/S2_easy.cpp: Add large computation tests.
+* test/deleglise-rivat/S2_hard.cpp: Add large computation tests.
+* test/deleglise-rivat/alpha_deleglise_rivat.cpp: Add 128-bit tests.
+* test/nth_prime.cpp: Add large computation tests.
 
 Changes in primecount-7.8, 2023-03-27
 
