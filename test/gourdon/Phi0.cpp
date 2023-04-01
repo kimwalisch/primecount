@@ -38,7 +38,7 @@ int main()
     int64_t res1 = Phi0(x, y, z, k, threads);
     int64_t res2 = 9230903137263ll;
 
-    std::cout << "Phi0(" << x << ", " << y << ") = " << res1;
+    std::cout << "Phi0(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
     check(res1 == res2);
   }
 
@@ -52,7 +52,7 @@ int main()
     int128_t res1 = Phi0(x, y, z, k, threads);
     int128_t res2 = 633772346752344505ll;
 
-    std::cout << "Phi0(" << x << ", " << y << ") = " << res1;
+    std::cout << "Phi0(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
     check(res1 == res2);
   }
 #endif
