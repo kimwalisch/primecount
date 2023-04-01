@@ -4,12 +4,13 @@
 ///         S1(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
+#include <primecount.hpp>
 #include <generate.hpp>
 #include <PhiTiny.hpp>
 #include <imath.hpp>
@@ -56,6 +57,34 @@ int main()
     std::cout << "S1(" << x << ", " << y << ") = " << s1;
     check(s1 == S1(x, y, c, threads));
   }
+
+  threads = get_num_threads();
+
+  {
+    // Test S1(1e15) and compare with known correct value
+    int64_t x = 1000000000000000ll;
+    int64_t y = 1378500;
+    int64_t c = 8;
+    int64_t res1 = S1(x, y, c, threads);
+    int64_t res2 = 714283960231ll;
+
+    std::cout << "S1(" << x << ", " << y << ", " << c << ") = " << res1;
+    check(res1 == res2);
+  }
+
+#ifdef HAVE_INT128_T
+  {
+    // Test S1(1e20) and compare with known correct value
+    int128_t x = ((int128_t) 10000000000) * ((int128_t) 10000000000);
+    int64_t y = 209809060;
+    int64_t c = 8;
+    int128_t res1 = S1(x, y, c, threads);
+    int128_t res2 = 2141872489903326ll;
+
+    std::cout << "S1(" << x << ", " << y << ", " << c << ") = " << res1;
+    check(res1 == res2);
+  }
+#endif
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
