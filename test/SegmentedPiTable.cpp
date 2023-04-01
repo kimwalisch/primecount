@@ -1,5 +1,5 @@
 ///
-/// @file   segmented_pi_table.cpp
+/// @file   SegmentedPiTable.cpp
 /// @brief  Test the SegmentedPiTable class
 ///
 /// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>

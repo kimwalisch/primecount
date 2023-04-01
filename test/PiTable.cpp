@@ -1,7 +1,6 @@
 ///
-/// @file   pi_table.cpp
+/// @file   PiTable.cpp
 /// @brief  Test the PiTable class
-/// @link   https://en.wikipedia.org/wiki/Prime-counting_function
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///

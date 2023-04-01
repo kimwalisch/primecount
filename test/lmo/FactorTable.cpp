@@ -1,5 +1,5 @@
 ///
-/// @file   factor_table.cpp
+/// @file   FactorTable.cpp
 /// @brief  FactorTable is a compressed lookup table of mu
 ///         (moebius) and lpf (least prime factor).
 ///
