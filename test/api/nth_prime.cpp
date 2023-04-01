@@ -1,6 +1,11 @@
 ///
 /// @file   nth_prime.cpp
-/// @brief  Test the nth_prime(n) function
+/// @brief  Test the nth_prime(n) function for large values of n.
+///         For large computations nth_prime(n) uses either
+///         pi_legendre(x), pi_meissel(x) or pi_gourdon(x) under the
+///         hood. This test has been moved to the test/api directory
+///         so that it is executed after the Legendre, Meissel and
+///         Gourdon algorithm tests.
 ///
 /// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -19,36 +24,37 @@
 
 using namespace primecount;
 
-void check_equal(int64_t x,
+void check_equal(int64_t n,
                  int64_t res1,
                  int64_t res2)
 {
   bool OK = (res1 == res2);
-  std::cout << "nth_prime(" << x << ") = " << res1 << "   " << (OK ? "OK" : "ERROR") << "\n";
+  std::cout << "nth_prime(" << n << ") = " << res1 << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
     std::exit(1);
 }
 
 int main()
 {
-  int64_t n = 1;
+  primesieve::iterator iter(PiTable::max_cached() + 1);
+  int64_t n = PiTable::pi_cache(PiTable::max_cached()) + 1;
+  int64_t limit_small = n + 100;
   int64_t prime = 0;
-  int64_t limit_small = PiTable::max_cached() + 100;
-  primesieve::iterator iter;
 
+  // Test first few n > pi(PiTable::max_cached())
   for (; n < limit_small; n++)
   {
     prime = iter.next_prime();
     check_equal(n, nth_prime(n), prime);
   }
 
+  n = limit_small - 1;
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(1, 100000);
-  n = limit_small - 1;
+  std::uniform_int_distribution<int64_t> dist(1, 10000);
 
-  // Test random increment
-  for (int64_t i = 0; i < 100; i++)
+  // Test random increment, goes up to ~ 5*10^6
+  for (int64_t i = 0; i < 1000; i++)
   {
     int64_t next = dist(gen);
     n += next;
@@ -56,15 +62,25 @@ int main()
     check_equal(n, nth_prime(n), prime);
   }
 
-  // Test a few large nth prime computations
-  n = 10000000;
+  // nth_prime(1e7)
+  n = 10000000ll;
   check_equal(n, nth_prime(n), 179424673ll);
-  n = 100000000;
+
+  // nth_prime(1e8)
+  n = 100000000ll;
   check_equal(n, nth_prime(n), 2038074743ll);
-  n = 1000000000;
+
+  // nth_prime(1e9)
+  n = 1000000000ll;
   check_equal(n, nth_prime(n), 22801763489ll);
-  n = 10000000000;
+
+  // nth_prime(1e10)
+  n = 10000000000ll;
   check_equal(n, nth_prime(n), 252097800623ll);
+
+  // nth_prime(1e11)
+  n = 100000000000ll;
+  check_equal(n, nth_prime(n), 2760727302517ll);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
