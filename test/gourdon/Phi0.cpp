@@ -30,6 +30,19 @@ int main()
   int threads = get_num_threads();
 
   {
+    // Test Phi0(8) and compare with known correct value
+    int64_t x = 8;
+    int64_t y = 1;
+    int64_t z = 1;
+    int64_t k = 0;
+    int64_t res1 = Phi0(x, y, z, k, threads);
+    int64_t res2 = 8;
+
+    std::cout << "Phi0(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
     // Test Phi0(1e2) and compare with known correct value
     int64_t x = 100;
     int64_t y = 5;
