@@ -1,5 +1,5 @@
 ///
-/// @file   S2_trivial_xy.cpp
+/// @file   S2_trivial.cpp
 /// @brief  Test the computation of the trivial special leaves
 ///         S2_trivial(x, y) used in the Deleglise-Rivat prime
 ///         counting algorithm.

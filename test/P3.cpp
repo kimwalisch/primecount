@@ -1,5 +1,5 @@
 ///
-/// @file   P3_xa.cpp
+/// @file   P3.cpp
 /// @brief  Test the 3rd partial sieve function P3(x, a)
 ///         that counts the numbers <= x that have exactly
 ///         3 prime factors each exceeding the a-th prime.

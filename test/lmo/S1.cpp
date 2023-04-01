@@ -1,5 +1,5 @@
 ///
-/// @file   S1_xy.cpp
+/// @file   S1.cpp
 /// @brief  Test the computation of the ordinary leaves
 ///         S1(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.

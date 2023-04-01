@@ -1,5 +1,5 @@
 ///
-/// @file   S2_easy_xy.cpp
+/// @file   S2_easy.cpp
 /// @brief  Test the computation of the easy special leaves
 ///         S2_easy(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.

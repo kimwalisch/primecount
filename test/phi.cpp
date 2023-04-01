@@ -1,5 +1,5 @@
 ///
-/// @file   phi_xa.cpp
+/// @file   phi.cpp
 /// @brief  Test the partial sieve function phi(x, a)
 ///         which counts the numbers <= x that are not divisible
 ///         by any of the first a primes.

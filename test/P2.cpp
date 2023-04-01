@@ -1,5 +1,5 @@
 ///
-/// @file   P2_xa.cpp
+/// @file   P2.cpp
 /// @brief  Test the 2nd partial sieve function P2(x, a)
 ///         that counts the numbers <= x that have exactly
 ///         2 prime factors each exceeding the a-th prime.
