@@ -30,6 +30,83 @@ int main()
   int threads = get_num_threads();
 
   {
+    // Test Sigma(5) and compare with known correct value
+    int64_t x = 5;
+    int64_t y = 1;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = -1;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(8) and compare with known correct value
+    int64_t x = 8;
+    int64_t y = 1;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = -2;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(9) and compare with known correct value
+    int64_t x = 9;
+    int64_t y = 2;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = 1;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(1e2) and compare with known correct value
+    int64_t x = 100;
+    int64_t y = 5;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = 5;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(1e3) and compare with known correct value
+    int64_t x = 1000;
+    int64_t y = 15;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = 41;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(1e5) and compare with known correct value
+    int64_t x = 100000;
+    int64_t y = 87;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = 1416;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
+    // Test Sigma(1e7) and compare with known correct value
+    int64_t x = 10000000;
+    int64_t y = 323;
+    int64_t res1 = Sigma(x, y, threads);
+    int64_t res2 = 78373;
+
+    std::cout << "Sigma(" << x << ", " << y << ") = " << res1;
+    check(res1 == res2);
+  }
+
+  {
     // Test Sigma(1e15) and compare with known correct value
     int64_t x = 1000000000000000ll;
     int64_t y = 737200;
