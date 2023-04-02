@@ -21,6 +21,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <vector>
 
 using namespace primecount;
 
@@ -71,7 +72,7 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int64_t> dist(min, max);
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50; i++)
     {
       int64_t x = dist(gen);
       int64_t res1 = pi_meissel(x, threads);
@@ -89,6 +90,27 @@ int main()
           check(res3 == res1);
         #endif
       }
+    }
+  }
+
+  // Test large x
+  {
+    int64_t x = 99999999907ll;
+    int64_t res1 = 4118054810ll;
+    std::vector<double> alphas = { 1, 1+1/3, 2, 10, (double) iroot<6>(x) };
+
+    for (double alpha : alphas)
+    {
+      set_alpha_y(alpha);
+      int64_t res2 = pi_gourdon_64(x, threads);
+      std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+      check(res2 == res1);
+
+      #ifdef HAVE_INT128_T
+        int128_t res3 = pi_gourdon_128(x, threads);
+        std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+        check(res3 == res1);
+      #endif
     }
   }
 
