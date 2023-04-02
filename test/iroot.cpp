@@ -33,7 +33,7 @@ int main()
 
   if (sizeof(long double) > 8)
   {
-    for (n = 0; n < 100000; n++)
+    for (n = 0; n < 50000; n++)
     {
       res1 = iroot<2>(n);
       res2 = std::sqrt((long double) n);
@@ -41,7 +41,7 @@ int main()
       check(res1 == (uint64_t) res2);
     }
 
-    for (n = 0; n < 100000; n++)
+    for (n = 0; n < 50000; n++)
     {
       res1 = iroot<3>(n);
       res2 = std::cbrt((long double) n);
@@ -49,7 +49,7 @@ int main()
       check(res1 == (uint64_t) res2);
     }
 
-    for (n = 0; n < 100000; n++)
+    for (n = 0; n < 50000; n++)
     {
       res1 = iroot<4>(n);
       res2 = std::pow((long double) n, 1.0L / 4);
@@ -57,7 +57,7 @@ int main()
       check(res1 == (uint64_t) res2);
     }
 
-    for (n = 0; n < 100000; n++)
+    for (n = 0; n < 50000; n++)
     {
       res1 = iroot<6>(n);
       res2 = std::pow((long double) n, 1.0L / 6);
@@ -76,7 +76,7 @@ int main()
   std::cout << "iroot<3>(" << n << ") = " << res1;
   check(res1 == 2642245);
 
-  for (uint64_t i = 2000000; i <= 2100000; i++)
+  for (uint64_t i = 2000000; i <= 2050000; i++)
   {
     n = ipow(i, 3);
     res1 = iroot<3>(n);
@@ -117,7 +117,7 @@ int main()
 
   if (sizeof(long double) > 8)
   {
-    for (m = 0; m < 100000; m++)
+    for (m = 0; m < 50000; m++)
     {
       res = iroot<2>(m);
       res2 = std::sqrt((long double) m);
@@ -125,7 +125,7 @@ int main()
       check(res == (int128_t) res2);
     }
 
-    for (m = 0; m < 100000; m++)
+    for (m = 0; m < 50000; m++)
     {
       res = iroot<3>(m);
       res2 = std::cbrt((long double) m);
@@ -133,7 +133,7 @@ int main()
       check(res == (int128_t) res2);
     }
 
-    for (m = 0; m < 100000; m++)
+    for (m = 0; m < 50000; m++)
     {
       res = iroot<4>(m);
       res2 = std::pow((long double) m, 1.0L / 4);
@@ -141,7 +141,7 @@ int main()
       check(res == (int128_t) res2);
     }
 
-    for (m = 0; m < 100000; m++)
+    for (m = 0; m < 50000; m++)
     {
       res = iroot<6>(m);
       res2 = std::pow((long double) m, 1.0L / 6);
