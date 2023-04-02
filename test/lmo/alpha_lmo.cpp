@@ -20,6 +20,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <vector>
 
 using namespace primecount;
 
