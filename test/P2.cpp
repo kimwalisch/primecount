@@ -66,7 +66,7 @@ int main()
     }
   }
 
-  // Test large x values
+  // Test medium x values
   {
     std::random_device rd;
     std::mt19937 gen(rd());
