@@ -32,7 +32,7 @@ void check(bool OK)
 
 int main()
 {
-  // Test small values of x
+  // Test small x
   {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -68,7 +68,7 @@ int main()
     }
   }
 
-  // Test medium values of x
+  // Test medium x
   {
     std::random_device rd;
     std::mt19937 gen(rd());
