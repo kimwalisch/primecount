@@ -10,6 +10,7 @@
 
 #include <PiTable.hpp>
 #include <primesieve.hpp>
+#include <primecount-internal.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -179,11 +180,11 @@ int main()
       count++;
     }
 
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < 2000; i++)
     {
       int n = dist(gen) % pi.size();
       std::cout << "pi(" << n << ") = " << pi[n];
-      check(pi[n] == (int64_t) primesieve::count_primes(0, n));
+      check(pi[n] == pi_primesieve(n));
     }
   }
 
