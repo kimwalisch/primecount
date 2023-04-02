@@ -49,28 +49,16 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_deleglise_rivat_64(x, threads);
-
         std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
         check(res1 == res2);
+
+        #ifdef HAVE_INT128_T
+          int128_t res3 = pi_deleglise_rivat_128(x, threads);
+          std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res3;
+          check(res1 == res3);
+        #endif
       }
     }
-
-  #ifdef HAVE_INT128_T
-    for (int i = 0; i < 100; i++)
-    {
-      int64_t x = dist(gen);
-      int64_t res1 = pi_cache(x);
-
-      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
-      {
-        set_alpha(alpha);
-        int64_t res2 = pi_deleglise_rivat_128(x, threads);
-
-        std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res2;
-        check(res1 == res2);
-      }
-    }
-  #endif
   }
 
   // Test medium values of x
@@ -91,28 +79,16 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_deleglise_rivat_64(x, threads);
-
         std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
         check(res1 == res2);
+
+        #ifdef HAVE_INT128_T
+          int128_t res3 = pi_deleglise_rivat_128(x, threads);
+          std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res3;
+          check(res1 == res3);
+        #endif
       }
     }
-
-  #ifdef HAVE_INT128_T
-    for (int i = 0; i < 100; i++)
-    {
-      int64_t x = dist(gen);
-      int64_t res1 = pi_meissel(x, threads);
-
-      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
-      {
-        set_alpha(alpha);
-        int64_t res2 = pi_deleglise_rivat_128(x, threads);
-
-        std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res2;
-        check(res1 == res2);
-      }
-    }
-  #endif
   }
 
   std::cout << std::endl;
