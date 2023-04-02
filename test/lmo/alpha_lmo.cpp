@@ -34,7 +34,7 @@ int main()
 {
   int threads = get_num_threads();
 
-  // Test small values of x
+  // Test small x
   {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -49,14 +49,13 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_lmo_parallel(x, threads);
-
         std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
-        check(res1 == res2);
+        check(res2 == res1);
       }
     }
   }
 
-  // Test medium values of x
+  // Test medium x
   {
     int64_t min = (int64_t) 1e3;
     int64_t max = (int64_t) 2e7;
@@ -74,10 +73,24 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_lmo_parallel(x, threads);
-
         std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
-        check(res1 == res2);
+        check(res2 == res1);
       }
+    }
+  }
+
+  // Test large x
+  {
+    int64_t x = 9999999929ll;
+    int64_t res1 = 455052509ll;
+    std::vector<double> alphas = { 1, 1+1/3, 2, 10, (double) iroot<6>(x) };
+
+    for (double alpha : alphas)
+    {
+      set_alpha(alpha);
+      int64_t res2 = pi_lmo_parallel(x, threads);
+      std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
+      check(res2 == res1);
     }
   }
 
