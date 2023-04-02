@@ -32,47 +32,88 @@ void check(bool OK)
 
 int main()
 {
-  int64_t min = (int64_t) 3e8;
-  int64_t max = min * 2;
   int threads = get_num_threads();
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(min, max);
-
-  for (int i = 0; i < 10; i++)
+  // Test small values of x
   {
-    int64_t x = dist(gen);
-    int64_t res1 = pi_meissel(x, threads);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int64_t> dist(100, 1000);
 
-    for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+    for (int i = 0; i < 100; i++)
     {
-      set_alpha(alpha);
-      int64_t res2 = pi_deleglise_rivat_64(x, threads);
+      int64_t x = dist(gen);
+      int64_t res1 = pi_cache(x);
 
-      std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
-      check(res1 == res2);
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+      {
+        set_alpha(alpha);
+        int64_t res2 = pi_deleglise_rivat_64(x, threads);
+
+        std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
+        check(res1 == res2);
+      }
     }
+
+  #ifdef HAVE_INT128_T
+    for (int i = 0; i < 100; i++)
+    {
+      int64_t x = dist(gen);
+      int64_t res1 = pi_cache(x);
+
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+      {
+        set_alpha(alpha);
+        int64_t res2 = pi_deleglise_rivat_128(x, threads);
+
+        std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res2;
+        check(res1 == res2);
+      }
+    }
+  #endif
   }
 
-#ifdef HAVE_INT128_T
-
-  for (int i = 0; i < 10; i++)
+  // Test medium values of x
   {
-    int64_t x = dist(gen);
-    int64_t res1 = pi_meissel(x, threads);
+    int64_t min = (int64_t) 1e8;
+    int64_t max = min * 2;
 
-    for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int64_t> dist(min, max);
+
+    for (int i = 0; i < 20; i++)
     {
-      set_alpha(alpha);
-      int64_t res2 = pi_deleglise_rivat_128(x, threads);
+      int64_t x = dist(gen);
+      int64_t res1 = pi_meissel(x, threads);
 
-      std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res2;
-      check(res1 == res2);
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+      {
+        set_alpha(alpha);
+        int64_t res2 = pi_deleglise_rivat_64(x, threads);
+
+        std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
+        check(res1 == res2);
+      }
     }
-  }
 
-#endif
+  #ifdef HAVE_INT128_T
+    for (int i = 0; i < 20; i++)
+    {
+      int64_t x = dist(gen);
+      int64_t res1 = pi_meissel(x, threads);
+
+      for (double alpha = 1; alpha <= iroot<6>(x); alpha++)
+      {
+        set_alpha(alpha);
+        int64_t res2 = pi_deleglise_rivat_128(x, threads);
+
+        std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res2;
+        check(res1 == res2);
+      }
+    }
+  #endif
+  }
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
