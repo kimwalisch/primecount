@@ -33,7 +33,7 @@ void check(bool OK)
 
 int main()
 {
-  int64_t min = (int64_t) 1e9;
+  int64_t min = (int64_t) 5e8;
   int64_t max = min * 2;
   int threads = get_num_threads();
 
