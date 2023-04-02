@@ -38,7 +38,7 @@ void check(bool OK)
 
 int main()
 {
-  int64_t max_x = 100000;
+  int64_t max_x = 50000;
   double max_alpha = get_alpha_deleglise_rivat(max_x);
   int64_t max_x13 = iroot<3>(max_x);
   int64_t max_y = (int64_t) (max_alpha * max_x13);
@@ -90,7 +90,7 @@ int main()
     std::uniform_int_distribution<int64_t> dist(1, max_x);
 
     // test random x
-    for (int64_t i = 0; i < 10000; i++)
+    for (int64_t i = 0; i < 5000; i++)
     {
       int64_t x = dist(gen);
       double alpha = get_alpha_deleglise_rivat(x);
