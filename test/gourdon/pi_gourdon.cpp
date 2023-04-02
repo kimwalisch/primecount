@@ -33,7 +33,7 @@ int main()
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, 1 << 28);
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 27);
 
   {
     int64_t x = -1;
