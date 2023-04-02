@@ -99,11 +99,11 @@ int main()
   }
 
   {
-    // Test one larger computation: pi(1e11)
-    int128_t x = 100000000000ll;
+    // Test one larger computation: pi(1e12)
+    int128_t x = 1000000000000ll;
     int128_t res = pi_deleglise_rivat_128(x, threads);
     std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res;
-    check(res == 4118054813ll);
+    check(res == 37607912018ll);
   }
 #endif
 
