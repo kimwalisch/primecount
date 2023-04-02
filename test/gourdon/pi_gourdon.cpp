@@ -31,40 +31,12 @@ int main()
 {
   int threads = get_num_threads();
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(0, 1 << 27);
-
+  // Test negative x
   {
     int64_t x = -1;
     int64_t res = pi_gourdon_64(x, threads);
     std::cout << "pi_gourdon_64(" << x << ") = " << res;
     check(res == 0);
-  }
-
-  for (int64_t x = 0; x <= PiTable::max_cached(); x++)
-  {
-    int64_t res1 = pi_gourdon_64(x, threads);
-    int64_t res2 = pi_cache(x);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  for (int i = 0; i < 1000; i++)
-  {
-    int64_t x = dist(gen);
-    int64_t res1 = pi_gourdon_64(x, threads);
-    int64_t res2 = pi_meissel(x, threads);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test one larger computation: pi(1e11)
-    int64_t x = 100000000000ll;
-    int64_t res = pi_gourdon_64(x, threads);
-    std::cout << "pi_gourdon_64(" << x << ") = " << res;
-    check(res == 4118054813ll);
   }
 
 #ifdef HAVE_INT128_T
@@ -80,26 +52,54 @@ int main()
     std::cout << "pi_gourdon(" << x << ") = " << res;
     check(res == 0);
   }
+#endif
 
-  for (int128_t x = 0; x <= PiTable::max_cached(); x++)
+  // Test small x
+  for (int64_t x = 0; x <= PiTable::max_cached(); x++)
   {
-    int128_t res1 = pi_gourdon_128(x, threads);
-    int128_t res2 = pi_cache(x);
-    std::cout << "pi_gourdon_128(" << x << ") = " << res1;
-    check(res1 == res2);
+    int64_t res1 = pi_cache(x);
+    int64_t res2 = pi_gourdon_64(x, threads);
+    std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+    check(res2 == res1);
+
+    #ifdef HAVE_INT128_T
+      int128_t res3 = pi_gourdon_128(x, threads);
+      std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+      check(res3 == res1);
+    #endif
   }
 
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int64_t> dist(0, 1 << 27);
+
+  // Test medium x
   for (int i = 0; i < 1000; i++)
   {
-    int128_t x = dist(gen);
-    int128_t res1 = pi_gourdon_128(x, threads);
-    int128_t res2 = pi_meissel((int64_t) x, threads);
-    std::cout << "pi_gourdon_128(" << x << ") = " << res1;
-    check(res1 == res2);
+    int64_t x = dist(gen);
+    int64_t res1 = pi_meissel(x, threads);
+    int64_t res2 = pi_gourdon_64(x, threads);
+    std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+    check(res2 == res1);
+
+    #ifdef HAVE_INT128_T
+      int128_t res3 = pi_gourdon_128(x, threads);
+      std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+      check(res3 == res1);
+    #endif
   }
 
   {
-    // Test one larger computation: pi(1e12)
+    // Test larger computation: pi(1e11)
+    int64_t x = 100000000000ll;
+    int64_t res = pi_gourdon_64(x, threads);
+    std::cout << "pi_gourdon_64(" << x << ") = " << res;
+    check(res == 4118054813ll);
+  }
+
+#ifdef HAVE_INT128_T
+  {
+    // Test larger computation: pi(1e12)
     int128_t x = 1000000000000ll;
     int128_t res = pi_gourdon_128(x, threads);
     std::cout << "pi_gourdon_128(" << x << ") = " << res;
