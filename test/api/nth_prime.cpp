@@ -39,16 +39,15 @@ int main()
   primesieve::iterator iter(PiTable::max_cached() + 1);
   int64_t n = PiTable::pi_cache(PiTable::max_cached()) + 1;
   int64_t limit_small = n + 100;
-  int64_t prime = 0;
+  int64_t prime = iter.next_prime();
 
   // Test first few n > pi(PiTable::max_cached())
   for (; n < limit_small; n++)
   {
-    prime = iter.next_prime();
     check_equal(n, nth_prime(n), prime);
+    prime = iter.next_prime();
   }
 
-  n = limit_small - 1;
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int64_t> dist(1, 10000);
@@ -56,9 +55,10 @@ int main()
   // Test random increment, goes up to ~ 5*10^6
   for (int64_t i = 0; i < 1000; i++)
   {
-    int64_t next = dist(gen);
-    n += next;
-    prime = primesieve::nth_prime(next, prime);
+    int64_t next_n = n + dist(gen);
+    for (; n < next_n; n++)
+      prime = iter.next_prime();
+
     check_equal(n, nth_prime(n), prime);
   }
 
