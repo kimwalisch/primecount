@@ -137,7 +137,7 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(1000000, 2000000);
+  std::uniform_int_distribution<int> dist(500000, 1000000);
   auto pi = generate_pi(dist(gen));
 
   for (size_t i = 0; i < pix.size(); i++)
