@@ -82,6 +82,14 @@ int main()
   n = 100000000000ll;
   check_equal(n, nth_prime(n), 2760727302517ll);
 
+  // nth_prime(1e12)
+  n = 1000000000000ll;
+  check_equal(n, nth_prime(n), 29996224275833ll);
+
+  // nth_prime(1e13)
+  n = 10000000000000ll;
+  check_equal(n, nth_prime(n), 323780508946331ll);
+
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
