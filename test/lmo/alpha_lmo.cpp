@@ -83,7 +83,7 @@ int main()
   {
     int64_t x = 9999999929ll;
     int64_t res1 = 455052509ll;
-    std::vector<double> alphas = { 1, 1+1/3, 2, 10, (double) iroot<6>(x) };
+    std::vector<double> alphas = { 1, 1+1/3.0, 2, 10, (double) iroot<6>(x) };
 
     for (double alpha : alphas)
     {
