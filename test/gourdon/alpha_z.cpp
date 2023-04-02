@@ -35,7 +35,7 @@ int main()
 {
   int threads = get_num_threads();
 
-  // Test small values of x
+  // Test small x
   {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -51,18 +51,18 @@ int main()
         set_alpha_z(alpha_z);
         int64_t res2 = pi_gourdon_64(x, threads);
         std::cout << "pi_gourdon_64(" << x << ") = " << res2;
-        check(res1 == res2);
+        check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
           std::cout << "pi_gourdon_128(" << x << ") = " << res3;
-          check(res1 == res3);
+          check(res3 == res1);
         #endif
       }
     }
   }
 
-  // Test medium values of x
+  // Test medium x
   {
     int64_t min = (int64_t) 1e3;
     int64_t max = (int64_t) 1e8;
@@ -81,12 +81,12 @@ int main()
         set_alpha_z(alpha_z);
         int64_t res2 = pi_gourdon_64(x, threads);
         std::cout << "pi_gourdon_64(" << x << ") = " << res2;
-        check(res1 == res2);
+        check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
           std::cout << "pi_gourdon_128(" << x << ") = " << res3;
-          check(res1 == res3);
+          check(res3 == res1);
         #endif
       }
     }
