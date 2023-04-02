@@ -4,7 +4,7 @@
 ///         that counts the numbers <= x that have exactly
 ///         2 prime factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -33,28 +33,73 @@ void check(bool OK)
 
 int main()
 {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(50000, 70000);
-
-  int threads = 1;
-  int64_t x = dist(gen);
-  auto primes = generate_primes<int64_t>(x);
-
-  for (int a = 1; primes[a] <= isqrt(x); a++)
+  // Test small x values
   {
-    int64_t p2 = 0;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(2, 1000);
 
-    for (size_t b = a + 1; b < primes.size(); b++)
-      for (size_t c = b; c < primes.size(); c++)
-        if (primes[b] * primes[c] <= x)
-          p2++;
+    for (int i = 0; i < 100; i++)
+    {
+      int threads = 1;
+      int64_t x = dist(gen);
+      auto primes = generate_primes<int64_t>(x);
 
-    std::cout << "P2(" << x << ", " << a << ") = " << p2;
-    check(p2 == P2(x, primes[a], a, threads));
+      for (int a = 1; primes[a] <= isqrt(x); a++)
+      {
+        int64_t p2 = 0;
+
+        for (size_t b = a + 1; b < primes.size(); b++)
+        {
+          for (size_t c = b; c < primes.size(); c++)
+          {
+            if (primes[b] * primes[c] <= x)
+              p2++;
+            else
+              break;
+          }
+        }
+
+        std::cout << "P2(" << x << ", " << a << ") = " << p2;
+        check(p2 == P2(x, primes[a], a, threads));
+      }
+    }
   }
 
-  threads = get_num_threads();
+  // Test large x values
+  {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(100000, 200000);
+
+    for (int i = 0; i < 100; i++)
+    {
+      int threads = 1;
+      int64_t x = dist(gen);
+      auto primes = generate_primes<int64_t>(x);
+
+      for (int a = 1; primes[a] <= isqrt(x); a++)
+      {
+        int64_t p2 = 0;
+
+        for (size_t b = a + 1; b < primes.size(); b++)
+        {
+          for (size_t c = b; c < primes.size(); c++)
+          {
+            if (primes[b] * primes[c] <= x)
+              p2++;
+            else
+              break;
+          }
+        }
+
+        std::cout << "P2(" << x << ", " << a << ") = " << p2;
+        check(p2 == P2(x, primes[a], a, threads));
+      }
+    }
+  }
+
+  int threads = get_num_threads();
 
   {
     // Test P2(1e13) and compare with known correct value
