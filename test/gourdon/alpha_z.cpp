@@ -51,12 +51,12 @@ int main()
       {
         set_alpha_z(alpha_z);
         int64_t res2 = pi_gourdon_64(x, threads);
-        std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
-          std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+          std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -81,12 +81,12 @@ int main()
       {
         set_alpha_z(alpha_z);
         int64_t res2 = pi_gourdon_64(x, threads);
-        std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_gourdon_128(x, threads);
-          std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+          std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -99,16 +99,16 @@ int main()
     int64_t res1 = 4118054810ll;
     std::vector<double> alphas = { 1, 1+1/3.0, 2, 10, (double) iroot<6>(x) };
 
-    for (double alpha : alphas)
+    for (double alpha_z : alphas)
     {
-      set_alpha_z(alpha);
+      set_alpha_z(alpha_z);
       int64_t res2 = pi_gourdon_64(x, threads);
-      std::cout << "pi_gourdon_64(" << x << ") = " << res2;
+      std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_64(" << x << ") = " << res2;
       check(res2 == res1);
 
       #ifdef HAVE_INT128_T
         int128_t res3 = pi_gourdon_128(x, threads);
-        std::cout << "pi_gourdon_128(" << x << ") = " << res3;
+        std::cout << "alpha_z = " << alpha_z << ", pi_gourdon_128(" << x << ") = " << res3;
         check(res3 == res1);
       #endif
     }

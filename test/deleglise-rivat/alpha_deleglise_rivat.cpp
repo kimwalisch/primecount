@@ -50,12 +50,12 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_deleglise_rivat_64(x, threads);
-        std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_deleglise_rivat_128(x, threads);
-          std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res3;
+          std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -80,12 +80,12 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_deleglise_rivat_64(x, threads);
-        std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_64(" << x << ") = " << res2;
         check(res2 == res1);
 
         #ifdef HAVE_INT128_T
           int128_t res3 = pi_deleglise_rivat_128(x, threads);
-          std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res3;
+          std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_128(" << x << ") = " << res3;
           check(res3 == res1);
         #endif
       }
@@ -102,12 +102,12 @@ int main()
     {
       set_alpha(alpha);
       int64_t res2 = pi_deleglise_rivat_64(x, threads);
-      std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res2;
+      std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_64(" << x << ") = " << res2;
       check(res2 == res1);
 
       #ifdef HAVE_INT128_T
         int128_t res3 = pi_deleglise_rivat_128(x, threads);
-        std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res3;
+        std::cout << "alpha = " << alpha << ", pi_deleglise_rivat_128(" << x << ") = " << res3;
         check(res3 == res1);
       #endif
     }

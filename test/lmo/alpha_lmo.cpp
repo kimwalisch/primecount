@@ -50,7 +50,7 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_lmo_parallel(x, threads);
-        std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
         check(res2 == res1);
       }
     }
@@ -74,7 +74,7 @@ int main()
       {
         set_alpha(alpha);
         int64_t res2 = pi_lmo_parallel(x, threads);
-        std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
+        std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
         check(res2 == res1);
       }
     }
@@ -90,7 +90,7 @@ int main()
     {
       set_alpha(alpha);
       int64_t res2 = pi_lmo_parallel(x, threads);
-      std::cout << "pi_lmo_parallel(" << x << ") = " << res2;
+      std::cout << "alpha = " << alpha << ", pi_lmo_parallel(" << x << ") = " << res2;
       check(res2 == res1);
     }
   }
