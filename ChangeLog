@@ -1,4 +1,9 @@
-Changes in primecount-7.9, 2023-04-01
+Changes in primecount-7.9, 2023-04-03
+
+The focus of this release has been to improve primecount's test suite.
+Before this release there were e.g. no unit tests for most of the
+algorithms used in the pi_gourdon(x) prime counting function. Now
+virtually everything is unit tested!
 
 * test/README.md: Add debug mode + GCC/Clang sanitizers documentation.
 * doc/BUILD.md: Add link to detailed test information.
@@ -15,6 +20,7 @@ Changes in primecount-7.9, 2023-04-01
 * test/deleglise-rivat/S2_easy.cpp: Add large computation tests.
 * test/deleglise-rivat/S2_hard.cpp: Add large computation tests.
 * test/deleglise-rivat/alpha_deleglise_rivat.cpp: Add 128-bit tests.
+* test/lmo/alpha.cpp: Add more tests.
 * test/api/nth_prime.cpp: Add large computation tests.
 
 Changes in primecount-7.8, 2023-03-27
