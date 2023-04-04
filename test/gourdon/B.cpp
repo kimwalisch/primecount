@@ -26,7 +26,7 @@ struct B_formula_params
 };
 
 /// Known correct results generated using: scripts/gen_tests_gourdon2.sh
-/// For each input x we test using:
+/// For each input x=10^n we test using:
 /// 1) The default alpha_y & alpha_z
 /// 2) The maximum alpha_y
 /// 3) The maximum alpha_z
