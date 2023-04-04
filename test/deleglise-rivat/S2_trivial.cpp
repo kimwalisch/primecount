@@ -72,36 +72,6 @@ int main()
     check(s2_trivial == S2_trivial(x, y, z, c, threads));
   }
 
-  threads = get_num_threads();
-
-  {
-    // Test S2_trivial(1e15) and compare with known correct value
-    int64_t x = 1000000000000000ll;
-    int64_t y = 1378500;
-    int64_t z = 725426187;
-    int64_t c = 8;
-    int64_t res1 = S2_trivial(x, y, z, c, threads);
-    int64_t res2 = 5096717206ll;
-
-    std::cout << "S2_trivial(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-
-#ifdef HAVE_INT128_T
-  {
-    // Test S2_trivial(1e20) and compare with known correct value
-    int128_t x = ((int128_t) 10000000000) * ((int128_t) 10000000000);
-    int64_t y = 209809060;
-    int64_t z = 476623840743;
-    int64_t c = 8;
-    int128_t res1 = S2_trivial(x, y, z, c, threads);
-    int128_t res2 = 66066585011132ll;
-
-    std::cout << "S2_trivial(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-#endif
-
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 

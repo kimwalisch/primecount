@@ -117,36 +117,6 @@ int main()
     }
   }
 
-  threads = get_num_threads();
-
-  {
-    // Test S2_easy(1e13) and compare with known correct value
-    int64_t x = 10000000000000ll;
-    int64_t y = 178815;
-    int64_t z = 55923720;
-    int64_t c = 8;
-    int64_t res1 = S2_easy(x, y, z, c, threads);
-    int64_t res2 = 60888055472ll;
-
-    std::cout << "S2_easy(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-
-#ifdef HAVE_INT128_T
-  {
-    // Test S2_easy(1e14) and compare with known correct value
-    int128_t x = 100000000000000ll;
-    int64_t y = 494134;
-    int64_t z = 202374254;
-    int64_t c = 8;
-    int128_t res1 = S2_easy(x, y, z, c, threads);
-    int128_t res2 = 617442826127ll;
-
-    std::cout << "S2_easy(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-#endif
-
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 

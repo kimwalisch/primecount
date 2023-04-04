@@ -1,0 +1,91 @@
+///
+/// @file   S2_easy_alpha.cpp
+/// @brief  Test the S2_easy function used in the
+///         Deleglise-Rivat algorithm.
+///
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+///
+/// This file is distributed under the BSD License. See the COPYING
+/// file in the top level directory.
+///
+
+#include <primecount.hpp>
+#include <S.hpp>
+
+#include <stdint.h>
+#include <iostream>
+#include <cstdlib>
+#include <array>
+
+using namespace primecount;
+
+struct formula_params
+{
+  int64_t x;
+  int64_t y;
+  int64_t z;
+  int64_t c;
+  int64_t res;
+};
+
+/// Known correct results generated using: scripts/gen_tests_dr.sh
+/// For each input x we test using:
+/// 1) The default alpha
+/// 2) The maximum alpha
+std::array<formula_params, 24> test_cases =
+{{
+  { 10LL, 2, 5, 1, 0LL },
+  { 10LL, 2, 5, 1, 0LL },
+  { 100LL, 5, 20, 3, 0LL },
+  { 100LL, 8, 12, 4, 0LL },
+  { 1000LL, 15, 66, 6, 0LL },
+  { 1000LL, 30, 33, 8, 0LL },
+  { 10000LL, 36, 277, 8, 0LL },
+  { 10000LL, 84, 119, 8, 0LL },
+  { 100000LL, 87, 1149, 8, 328LL },
+  { 100000LL, 276, 362, 8, 618LL },
+  { 1000000LL, 207, 4830, 8, 4330LL },
+  { 1000000LL, 1000, 1000, 8, 9895LL },
+  { 10000000LL, 485, 20618, 8, 36104LL },
+  { 10000000LL, 3010, 3322, 8, 116253LL },
+  { 100000000LL, 1131, 88417, 8, 320032LL },
+  { 100000000LL, 9744, 10262, 8, 1110900LL },
+  { 1000000000LL, 2619, 381825, 8, 2725380LL },
+  { 1000000000LL, 31000, 32258, 8, 10224606LL },
+  { 10000000000LL, 10621, 941530, 8, 69354279LL },
+  { 10000000000LL, 99084, 100924, 8, 93607845LL },
+  { 100000000000LL, 25766, 3881083, 8, 622734970LL },
+  { 100000000000LL, 315588, 316868, 8, 917197198LL },
+  { 10000000000000LL, 178815, 55923720, 8, 60888055472LL },
+  { 100000000000000LL, 494134, 202374254, 8, 617442826127LL }
+}};
+
+void check(bool OK)
+{
+  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
+  if (!OK)
+    std::exit(1);
+}
+
+int main()
+{
+  int threads = get_num_threads();
+
+  for (const formula_params& params : test_cases)
+  {
+    int64_t res = S2_easy(params.x, params.y, params.z, params.c, threads);
+    std::cout << "S2_easy_64bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.c << ") = " << res;
+    check(res == params.res);
+
+    #ifdef HAVE_INT128_T
+      int128_t res2 = S2_easy((int128_t) params.x, params.y, params.z, params.c, threads);
+      std::cout << "S2_easy_128bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.c << ") = " << res2;
+      check(res2 == params.res);
+    #endif
+  }
+
+  std::cout << std::endl;
+  std::cout << "All tests passed successfully!" << std::endl;
+
+  return 0;
+}

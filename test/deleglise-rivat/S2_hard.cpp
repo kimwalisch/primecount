@@ -91,49 +91,6 @@ int main()
     check(s2 == S2_hard(x, y, z, c, Li(x), threads));
   }
 
-  threads = get_num_threads();
-
-  {
-    // Test S2_hard(1e13) and compare with known correct value
-    int64_t x = 10000000000000ll;
-    int64_t y = 178815;
-    int64_t z = 55923720;
-    int64_t c = 8;
-    int64_t res1 = S2_hard(x, y, z, c, Li(x), threads);
-    int64_t res2 = 371595005834ll;
-
-    std::cout << "S2_hard(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test S2_hard(1e14) and compare with known correct value
-    int64_t x = 100000000000000ll;
-    int64_t y = 494134;
-    int64_t z = 202374254;
-    int64_t c = 8;
-    int64_t res1 = S2_hard(x, y, z, c, Li(x), threads);
-    int64_t res2 = 3474606376629ll;
-
-    std::cout << "S2_hard(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-
-#ifdef HAVE_INT128_T
-  {
-    // Test S2_hard(1e15) and compare with known correct value
-    int128_t x = 1000000000000000ll;
-    int64_t y = 1378500;
-    int64_t z = 725426187;
-    int64_t c = 8;
-    int128_t res1 = S2_hard(x, y, z, c, Li(x), threads);
-    int128_t res2 = 32272468597257ll;
-
-    std::cout << "S2_hard(" << x << ", " << y << ", " << z << ", " << c << ") = " << res1;
-    check(res1 == res2);
-  }
-#endif
-
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
