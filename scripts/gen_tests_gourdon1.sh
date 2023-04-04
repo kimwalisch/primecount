@@ -5,7 +5,7 @@ do
     echo "=== $formula ======================================================="
     echo ""
 
-    for i in {1..10};
+    for i in {1..11};
     do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')

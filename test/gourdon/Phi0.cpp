@@ -32,7 +32,7 @@ struct Phi0_formula_params
 /// 1) The default alpha_y & alpha_z
 /// 2) The maximum alpha_y
 /// 3) The maximum alpha_z
-std::array<Phi0_formula_params, 33> test_cases =
+std::array<Phi0_formula_params, 36> test_cases =
 {{
   { 10LL, 2, 2, 0, 5LL },
   { 10LL, 2, 2, 0, 5LL },
@@ -64,6 +64,9 @@ std::array<Phi0_formula_params, 33> test_cases =
   { 10000000000LL, 6029, 6029, 8, 186957171LL },
   { 10000000000LL, 99084, 99084, 8, 37685290LL },
   { 10000000000LL, 2155, 99130, 8, 709831674LL },
+  { 100000000000LL, 13825, 13825, 8, 1185193538LL },
+  { 100000000000LL, 315588, 315588, 8, 186320545LL },
+  { 100000000000LL, 4642, 315656, 8, 6788948344LL },
   { 10000000000000LL, 107720, 209946, 8, 119423210693LL },
   { 100000000000000LL, 282435, 564870, 8, 1045985238238LL },
   { 1000000000000000LL, 737200, 1474400, 8, 9230903137263LL }
