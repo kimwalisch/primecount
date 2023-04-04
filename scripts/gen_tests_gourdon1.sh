@@ -13,7 +13,14 @@ do
         z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i -g -s | grep "= $res\$")
+        if [[ "$formula" == "AC" ]]
+        then
+            formula_label="A + C"
+        else
+            formula_label=$formula
+        fi
+
+        verify=$(./primecount 1e$i -g -s | grep "$formula_label = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
@@ -29,7 +36,7 @@ do
         z=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula --alpha-y=10000000 -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha-y=10000000 -g -s | grep "= $res\$")
+        verify=$(./primecount 1e$i --alpha-y=10000000 -g -s | grep "$formula_label = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha-y=10000000)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
@@ -45,7 +52,7 @@ do
         z=$(./primecount 1e$i --$formula --alpha-z=10000000 -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula --alpha-z=10000000 -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha-z=10000000 -g -s | grep "= $res\$")
+        verify=$(./primecount 1e$i --alpha-z=10000000 -g -s | grep "$formula_label = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g --alpha-z=10000000)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
@@ -65,7 +72,7 @@ do
         z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i -g -s | grep "= $res\$")
+        verify=$(./primecount 1e$i -g -s | grep "$formula_label = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
