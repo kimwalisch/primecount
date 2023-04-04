@@ -5,6 +5,15 @@ do
     echo "=== $formula ======================================================="
     echo ""
 
+    # When using primecount x -g -s the result of the
+    # AC algorithm is printed as "A + C = res"  
+    if [[ "$formula" == "AC" ]]
+    then
+        formula_label="A + C"
+    else
+        formula_label=$formula
+    fi
+
     for i in {1..11};
     do
         res=$(./primecount 1e$i --$formula)
@@ -12,13 +21,6 @@ do
         y=$(./primecount 1e$i --$formula -s | grep '^y =' | cut -f3 -d' ')
         z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         k=$(./primecount 1e$i --$formula -s | grep '^k =' | cut -f3 -d' ')
-
-        if [[ "$formula" == "AC" ]]
-        then
-            formula_label="A + C"
-        else
-            formula_label=$formula
-        fi
 
         verify=$(./primecount 1e$i -g -s | grep "$formula_label = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -g)" != "$(./primecount 1e$i -m)" ]]
