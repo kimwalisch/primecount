@@ -14,9 +14,60 @@
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
-#include <random>
+#include <array>
 
 using namespace primecount;
+
+struct AC_formula_params
+{
+  int64_t x;
+  int64_t y;
+  int64_t z;
+  int64_t k;
+  int64_t res;
+};
+
+/// Known correct results generated using: scripts/gen_tests_gourdon1.sh
+/// For each input x we test using:
+/// 1) The default alpha_y & alpha_z
+/// 2) The maximum alpha_y
+/// 3) The maximum alpha_z
+std::array<AC_formula_params, 33> test_cases =
+{{
+  { 10LL, 2, 2, 0, 0LL },
+  { 10LL, 2, 2, 0, 0LL },
+  { 10LL, 2, 2, 0, 0LL },
+  { 100LL, 5, 5, 2, 0LL },
+  { 100LL, 8, 8, 2, 0LL },
+  { 100LL, 5, 9, 2, 0LL },
+  { 1000LL, 15, 15, 3, 10LL },
+  { 1000LL, 30, 30, 3, 10LL },
+  { 1000LL, 11, 30, 3, 3LL },
+  { 10000LL, 36, 36, 4, 170LL },
+  { 10000LL, 84, 84, 4, 258LL },
+  { 10000LL, 22, 88, 4, 64LL },
+  { 100000LL, 87, 87, 7, 1331LL },
+  { 100000LL, 276, 276, 7, 1886LL },
+  { 100000LL, 47, 282, 7, 507LL },
+  { 1000000LL, 207, 207, 8, 18065LL },
+  { 1000000LL, 999, 999, 8, 27607LL },
+  { 1000000LL, 101, 999, 8, 7197LL },
+  { 10000000LL, 485, 485, 8, 175136LL },
+  { 10000000LL, 3010, 3010, 8, 322447LL },
+  { 10000000LL, 216, 3024, 8, 64127LL },
+  { 100000000LL, 1131, 1131, 8, 1563000LL },
+  { 100000000LL, 9744, 9744, 8, 3077951LL },
+  { 100000000LL, 465, 9765, 8, 548239LL },
+  { 1000000000LL, 2619, 2619, 8, 13875464LL },
+  { 1000000000LL, 31000, 31000, 8, 28111648LL },
+  { 1000000000LL, 1001, 31031, 8, 4838942LL },
+  { 10000000000LL, 6029, 6029, 8, 124680594LL },
+  { 10000000000LL, 99084, 99084, 8, 257272174LL },
+  { 10000000000LL, 2155, 99130, 8, 45096604LL },
+  { 10000000000000LL, 107720, 209946, 8, 106430408717LL },
+  { 100000000000000LL, 282435, 564870, 8, 1008985328656LL },
+  { 1000000000000000LL, 737200, 1474400, 8, 9561261537251LL }
+}};
 
 void check(bool OK)
 {
@@ -29,124 +80,18 @@ int main()
 {
   int threads = get_num_threads();
 
+  for (const AC_formula_params& params : test_cases)
   {
-    // Test AC(63) and compare with known correct value
-    int64_t x = 63;
-    int64_t y = 4;
-    int64_t z = 4;
-    int64_t k = 1;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 0;
+    int64_t res = AC(params.x, params.y, params.z, params.k, threads);
+    std::cout << "AC_64bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.k << ") = " << res;
+    check(res == params.res);
 
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
+    #ifdef HAVE_INT128_T
+      int128_t res2 = AC((int128_t) params.x, params.y, params.z, params.k, threads);
+      std::cout << "AC_128bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.k << ") = " << res2;
+      check(res2 == params.res);
+    #endif
   }
-
-  {
-    // Test AC(64) and compare with known correct value
-    int64_t x = 64;
-    int64_t y = 5;
-    int64_t z = 7;
-    int64_t k = 1;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 2;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e2) and compare with known correct value
-    int64_t x = 100;
-    int64_t y = 5;
-    int64_t z = 5;
-    int64_t k = 2;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 0;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e3) and compare with known correct value
-    int64_t x = 1000;
-    int64_t y = 15;
-    int64_t z = 15;
-    int64_t k = 3;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 10;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e5) and compare with known correct value
-    int64_t x = 100000;
-    int64_t y = 87;
-    int64_t z = 87;
-    int64_t k = 7;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 1331;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e7) and compare with known correct value
-    int64_t x = 10000000;
-    int64_t y = 323;
-    int64_t z = 484;
-    int64_t k = 8;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 122675;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e13) and compare with known correct value
-    int64_t x = 10000000000000ll;
-    int64_t y = 107720;
-    int64_t z = 209946;
-    int64_t k = 8;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 106430408717ll;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-  {
-    // Test AC(1e14) and compare with known correct value
-    int64_t x = 100000000000000ll;
-    int64_t y = 282435;
-    int64_t z = 564870;
-    int64_t k = 8;
-    int64_t res1 = AC(x, y, z, k, threads);
-    int64_t res2 = 1008985328656ll;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-
-#ifdef HAVE_INT128_T
-  {
-    // Test AC(1e15) and compare with known correct value
-    int128_t x = 1000000000000000ll;
-    int64_t y = 737200;
-    int64_t z = 1474400;
-    int64_t k = 8;
-    int128_t res1 = AC(x, y, z, k, threads);
-    int128_t res2 = 9561261537251ll;
-
-    std::cout << "AC(" << x << ", " << y << ", " << z << ", " << k << ") = " << res1;
-    check(res1 == res2);
-  }
-#endif
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
