@@ -13,7 +13,7 @@ do
         z=$(./primecount 1e$i --$formula -s | grep '^z =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula -s | grep '^c =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i -d -s | grep "= $res\$")
+        verify=$(./primecount 1e$i -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
@@ -29,7 +29,7 @@ do
         z=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^z =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula --alpha=1 -s | grep '^c =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha=1 -d -s | grep "= $res\$")
+        verify=$(./primecount 1e$i --alpha=1 -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d --alpha=1)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
@@ -45,7 +45,7 @@ do
         z=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^z =' | cut -f3 -d' ')
         c=$(./primecount 1e$i --$formula --alpha=10000000 -s | grep '^c =' | cut -f3 -d' ')
 
-        verify=$(./primecount 1e$i --alpha=10000000 -d -s | grep "= $res\$")
+        verify=$(./primecount 1e$i --alpha=10000000 -d -s | grep "${formula//-/_} = $res\$")
         if [[ -z "$verify" ]] || [[ "$(./primecount 1e$i -d --alpha=10000000)" != "$(./primecount 1e$i -m)" ]]
         then
             echo ""
