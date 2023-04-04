@@ -9,7 +9,6 @@
 ///
 
 #include <primecount.hpp>
-#include <primecount-internal.hpp>
 #include <gourdon.hpp>
 
 #include <stdint.h>
