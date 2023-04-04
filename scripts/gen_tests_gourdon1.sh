@@ -14,7 +14,7 @@ do
         formula_label=$formula
     fi
 
-    for i in {1..11};
+    for i in {1..12};
     do
         res=$(./primecount 1e$i --$formula)
         x=$(./primecount 1e$i --$formula -s | grep '^x =' | cut -f3 -d' ')
