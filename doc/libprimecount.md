@@ -167,7 +167,7 @@ primecount also has support for the
 allows to easily compile C and C++ programs depending on libprimecount
 without having to care about the library and include paths:
 
-```
+```sh
 cc -O3 main.c -o main $(pkg-config --libs --cflags primecount)
 ```
 
