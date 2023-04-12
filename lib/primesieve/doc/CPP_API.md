@@ -32,6 +32,7 @@ parameters and return values.
 * [Performance tips](#performance-tips)
 * [libprimesieve multi-threading](#libprimesieve-multi-threading)
 * [Compiling and linking](#compiling-and-linking)
+* [pkgconf support](#pkgconf-support)
 * [CMake support](#cmake-support)
 
 ## ```primesieve::iterator::next_prime()```
@@ -454,6 +455,17 @@ export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 
 ```sh
 cl /O2 /EHsc /MD primes.cpp /I "path\to\primesieve\include" /link "path\to\primesieve.lib"
+```
+
+# pkgconf support
+
+primesieve also has support for the
+[pkgconf](https://github.com/pkgconf/pkgconf) program which
+allows to easily compile C and C++ programs depending on libprimesieve
+without having to care about the library and include paths:
+
+```sh
+c++ -O3 main.cpp -o main $(pkgconf --libs --cflags primesieve)
 ```
 
 # CMake support
