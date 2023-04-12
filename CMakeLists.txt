@@ -361,7 +361,7 @@ if(BUILD_PRIMECOUNT)
             DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
-# Install primecount.pc (pkg-config) #################################
+# Install primecount.pc (pkgconf) ####################################
 
 configure_file(primecount.pc.in primecount.pc @ONLY)
 

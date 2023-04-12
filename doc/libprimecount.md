@@ -160,15 +160,15 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/usr/local/include:$CPLUS_INCLUDE_PATH
 ```
 
-# pkg-config support
+# pkgconf support
 
 primecount also has support for the
-[pkg-config](https://en.wikipedia.org/wiki/Pkg-config) program which
+[pkgconf](https://github.com/pkgconf/pkgconf) program which
 allows to easily compile C and C++ programs depending on libprimecount
 without having to care about the library and include paths:
 
 ```sh
-cc -O3 main.c -o main $(pkg-config --libs --cflags primecount)
+cc -O3 main.c -o main $(pkgconf --libs --cflags primecount)
 ```
 
 # Build instructions
