@@ -29,10 +29,17 @@ The development of primecount has personally cost me a lot of money, as I
 frequently needed to run extensive benchmarks on a wide variety of high end
 cloud servers.
 
-# Installation
+# Contents
 
+* [C API reference](#c-api-reference)
+* [C example](#c-example)
+* [C++ API reference](#c-api-reference-1)
+* [C++ example](#c-example-1)
+* [pkgconf support](#pkgconf-support)
 * [Install libprimecount using package manager](https://github.com/kimwalisch/primecount#installation)
 * [Build libprimecount from source](#build-instructions)
+* [Maximum portability](#maximum-portability)
+* [CMake build options](#cmake-build-options)
 
 # C API reference
 
