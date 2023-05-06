@@ -46,10 +46,10 @@ git pull
 mkdir build-release-arm64
 cd build-release-arm64
 
-rm src/deleglise-rivat/S2_easy.cpp
-rm src/gourdon/AC.cpp
-clang++ -flto -static -O3 -DNDEBUG -D_WIN32_WINNT=0x0A00 -Wall -Wextra -pedantic -fopenmp -I include -I lib/primesieve/include lib/primesieve/src/*.cpp src/*.cpp src/lmo/*.cpp src/deleglise-rivat/*.cpp src/gourdon/*.cpp src/app/*.cpp -o primecount.exe -lPsapi
-git checkout .
+rm ../src/deleglise-rivat/S2_easy.cpp
+rm ../src/gourdon/AC.cpp
+clang++ -flto -static -O3 -DNDEBUG -D_WIN32_WINNT=0x0A00 -Wall -Wextra -pedantic -fopenmp -I ../include -I ../lib/primesieve/include ../lib/primesieve/src/*.cpp ../src/*.cpp ../src/lmo/*.cpp ../src/deleglise-rivat/*.cpp ../src/gourdon/*.cpp ../src/app/*.cpp -o primecount.exe -lPsapi
+git checkout ..
 
 strip primecount.exe
 
