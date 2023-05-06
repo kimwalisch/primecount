@@ -7,5 +7,5 @@
 
 # Optionally
 
-* Run ```scripts/build_mingw64.sh``` (on Windows using MSYS2/MinGW-w64) in the root directory of the primecount git repo to build primecount release binaries for Windows (readily packaged as ```.zip``` archives).
+* Run ```scripts/build_mingw64_x64.sh``` (on Windows using MSYS2/MinGW-w64) in the root directory of the primecount git repo to build primecount release binaries for Windows (readily packaged as ```.zip``` archives).
 * When doing the release on the GitHub website, add the new primecount-win64 zip archive as an artifact to the release.

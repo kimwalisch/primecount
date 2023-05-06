@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: scripts/build_mingw64.sh
+# Usage: scripts/build_mingw64_x64.sh
 # Builds a primecount release binary that is statically linked
 # and ready for distribution.
 
