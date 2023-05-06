@@ -8,7 +8,7 @@
 # 1) Install MSYS2 x64 (or arm64 if available)
 # 2) Open C:/msys64/clangarm64.exe
 # 3) pacman -Syu (exit then run it again)
-# 4) pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-openmp make cmake git 
+# 4) pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-openmp make cmake git unzip
 # 5) cd primecount
 # 6) scripts/build_mingw64_arm64.sh
 
