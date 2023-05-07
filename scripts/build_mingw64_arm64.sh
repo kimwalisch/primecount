@@ -4,14 +4,14 @@
 # Builds a primecount release binary that is statically linked
 # and ready for distribution.
 
-# Prerequisites:
+# === Prerequisites arm64 ===
 # 1) Install a trial version of both Parallels & Windows on a MacBook ARM64.
 # 2) No need to purchase/register Parallels & Windows, keep using the trial version.
 # 3) Install MSYS2 x64 (or arm64 if available)
 # 4) Open C:/msys64/clangarm64.exe
 # 5) pacman -Syu (exit then run it again)
-# 6) pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-openmp make cmake git zip unzip
-# 7) cd primecount
+# 6) pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-openmp make git zip unzip
+# 7) git clone https://github.com/kimwalisch/primecount.git
 # 8) scripts/build_mingw64_arm64.sh
 
 # Exit if any error occurs

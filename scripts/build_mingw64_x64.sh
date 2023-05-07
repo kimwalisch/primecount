@@ -4,6 +4,13 @@
 # Builds a primecount release binary that is statically linked
 # and ready for distribution.
 
+# === Prerequisites x64 ===
+# 1) Install MSYS2 x64
+# 2) pacman -Syu (exit then run it again)
+# 3) pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake zip unzip git
+# 4) git clone https://github.com/kimwalisch/primecount.git
+# 5) scripts/build_mingw64_x64.sh
+
 # Exit if any error occurs
 set -e
 
