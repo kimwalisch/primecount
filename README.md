@@ -63,8 +63,8 @@ support both OpenMP (multi-threading library) and 128-bit integers.
 
 ```sh
 cmake .
-make -j
-sudo make install
+cmake --build . --parallel
+sudo cmake --install .
 sudo ldconfig
 ```
 
@@ -295,7 +295,7 @@ binary can be built using the ```-march=native``` option.
 
 ```bash
 CXXFLAGS="-march=native" cmake .
-make -j
+cmake --build . --parallel
 ```
 
 By default primecount scales nicely up until 10<sup>23</sup> on current x64 CPUs.

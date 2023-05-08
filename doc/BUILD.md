@@ -33,8 +33,8 @@ Open a terminal, cd into the primecount directory and run:
 
 ```bash
 cmake .
-make -j
-sudo make install
+cmake --build . --parallel
+sudo cmake --install .
 sudo ldconfig
 ```
 
@@ -50,9 +50,9 @@ Open a terminal, cd into the primecount directory and run:
 # Install CMake & the OpenMP library
 brew install cmake libomp
 
-CXXFLAGS="-I$(brew --prefix libomp)/include" LDFLAGS="-L$(brew --prefix libomp)/lib" cmake ..
-make -j
-sudo make install
+CXXFLAGS="-I$(brew --prefix libomp)/include" LDFLAGS="-L$(brew --prefix libomp)/lib" cmake .
+cmake --build . --parallel
+sudo cmake --install .
 ```
 
 ## MinGW/MSYS2 (Windows)
@@ -61,8 +61,7 @@ Open a terminal, cd into the primecount directory and run:
 
 ```bash
 cmake -G "Unix Makefiles" .
-make -j
-sudo make install
+cmake --build . --parallel
 ```
 
 ## Microsoft Visual C++
@@ -78,7 +77,7 @@ cmake -G "Visual Studio 17 2022" .
 cmake --build . --config Release
 
 # Optionally install using Admin shell
-cmake --build . --config Release --target install
+cmake --install . --config Release
 ```
 
 ## Run the tests
@@ -87,7 +86,7 @@ Open a terminal, cd into the primecount directory and run:
 
 ```bash
 cmake . -DBUILD_TESTS=ON
-make -j
+cmake --build . --parallel
 ctest
 ```
 
