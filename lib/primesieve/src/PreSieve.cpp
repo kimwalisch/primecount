@@ -35,6 +35,14 @@
 #include <cmath>
 #include <initializer_list>
 
+/// All x64 CPUs support the SSE2 vector instruction set
+#if defined(__SSE2__) && \
+    __has_include(<emmintrin.h>)
+  #include <emmintrin.h>
+  #define HAS_SSE2
+#endif
+
+// All ARM64 CPUs support the NEON vector instruction set
 #if (defined(__ARM_NEON) || defined(__aarch64__)) && \
      __has_include(<arm_neon.h>)
   #include <arm_neon.h>
@@ -176,7 +184,52 @@ const uint64_t buffersDist =
        (79 * 97) * 30 +
        (83 * 89) * 30;
 
-#if defined(HAS_ARM_NEON)
+#if defined(HAS_SSE2)
+
+/// Since compiler auto-vectorization is not 100% reliable, we have
+/// manually vectorized the andBuffers() function for x64 CPUs.
+/// This algorithm is portable since all x64 CPUs support the SSE2
+/// instruction set.
+///
+void andBuffers(const uint8_t* __restrict buf0,
+                const uint8_t* __restrict buf1,
+                const uint8_t* __restrict buf2,
+                const uint8_t* __restrict buf3,
+                const uint8_t* __restrict buf4,
+                const uint8_t* __restrict buf5,
+                const uint8_t* __restrict buf6,
+                const uint8_t* __restrict buf7,
+                uint8_t* __restrict output,
+                std::size_t bytes)
+{
+  std::size_t i = 0;
+  std::size_t limit = bytes - bytes % sizeof(__m128i);
+
+  // Note that I also tried vectorizing this algorithm using AVX2
+  // which has double the vector width compared to SSE2, but this did
+  // not provide any speedup. On average, this loop processes only
+  // 2192 bytes, hence there aren't many vector loop iterations and
+  // by increasing the vector width this also increases the number of
+  // scalar loop iterations after the vector loop finishes which
+  // could potentially even become a bottleneck.
+  for (; i < limit; i += sizeof(__m128i))
+  {
+    _mm_storeu_si128((__m128i*) &output[i],
+        _mm_and_si128(
+            _mm_and_si128(
+                _mm_and_si128(_mm_loadu_si128((const __m128i*) &buf0[i]), _mm_loadu_si128((const __m128i*) &buf1[i])),
+                _mm_and_si128(_mm_loadu_si128((const __m128i*) &buf2[i]), _mm_loadu_si128((const __m128i*) &buf3[i]))),
+            _mm_and_si128(
+                _mm_and_si128(_mm_loadu_si128((const __m128i*) &buf4[i]), _mm_loadu_si128((const __m128i*) &buf5[i])),
+                _mm_and_si128(_mm_loadu_si128((const __m128i*) &buf6[i]), _mm_loadu_si128((const __m128i*) &buf7[i])))));
+  }
+
+  for (; i < bytes; i++)
+    output[i] = buf0[i] & buf1[i] & buf2[i] & buf3[i] &
+                buf4[i] & buf5[i] & buf6[i] & buf7[i];
+}
+
+#elif defined(HAS_ARM_NEON)
 
 /// Homebrew compiles its C/C++ packages on macOS using Clang -Os
 /// (instead of -O2 or -O3) which does not auto-vectorize our simple
