@@ -95,6 +95,7 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     install:
+      - sudo dpkg --force-architecture --remove-architecture i386
       - sudo apt-get update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
