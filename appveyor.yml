@@ -96,8 +96,8 @@ for:
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     install:
       - sudo dpkg --force-architecture --remove-architecture i386
-      - sudo apt-get update
-      - sudo apt install -y asciidoc libxml2-utils xmlto
+      - sudo apt update
+      - sudo apt install --fix-broken -y asciidoc libxml2-utils xmlto
     build_script:
       # Test using old clang-9 & build man page
       - CXX=clang++-9 cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_INSTALL_PREFIX=$(pwd)
