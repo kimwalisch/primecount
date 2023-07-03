@@ -95,7 +95,6 @@ for:
       CFLAGS: "-Wall -Wextra -pedantic -Werror"
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     install:
-      - sudo apt update
       - sudo apt install -y asciidoc libxml2-utils xmlto
     build_script:
       # Test using old clang-9 & build man page
