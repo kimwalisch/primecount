@@ -96,7 +96,7 @@ for:
       CXXFLAGS: "-Wall -Wextra -pedantic -Werror"
     install:
       - sudo dpkg --force-architecture --remove-architecture i386
-      - sudo apt update
+      - sudo apt-get --allow-releaseinfo-change update
       - sudo apt install --fix-broken -y asciidoc libxml2-utils xmlto
     build_script:
       # Test using old clang-9 & build man page
