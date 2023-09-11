@@ -212,6 +212,44 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  macos_clang:
+    strategy:
+      matrix:
+        platform: ['macos-latest']
+        config: ['Debug', 'Release']
+    runs-on: ${{ matrix.platform }}
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: brew install libomp
+      - name: Build primecount
+        # POPCNT disabled + Debug
+        run: |
+            cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
+            make -j2 VERBOSE=1
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primecount --test
+        run: ./primecount --test
+      - name: primecount 1e11 --legendre
+        run: ./primecount 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: ./primecount 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: ./primecount 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: ./primecount 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: ./primecount 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: ./primecount 1e14 --gourdon
+
   linux_128bit:
     runs-on: ubuntu-latest
     steps:
