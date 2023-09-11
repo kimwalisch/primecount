@@ -142,6 +142,36 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  linux_gcc_valgrind:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install valgrind
+      - name: Build primecount
+        run: |
+            cmake . -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -g"
+            make -j2 VERBOSE=1
+      - name: primecount 1e11 --legendre
+        run: valgrind ./primecount 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: valgrind ./primecount 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: valgrind ./primecount 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: valgrind ./primecount 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: valgrind ./primecount 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: valgrind ./primecount 1e14 --gourdon
+      - name: primecount 1e14 --status
+        run: valgrind ./primecount 1e14 --status
+
   linux_clang:
     strategy:
       matrix:
