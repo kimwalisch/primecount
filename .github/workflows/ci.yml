@@ -11,6 +11,7 @@ on:
       - gh-pages
 
 jobs:
+  # See documentation: https://www.msys2.org/docs/ci/
   windows_mingw64:
     runs-on: windows-latest
     defaults:
