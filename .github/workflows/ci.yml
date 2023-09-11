@@ -22,7 +22,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -56,7 +56,7 @@ jobs:
   windows_msvc2022:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build primecount
         run: |
             cmake . -G "Visual Studio 17 2022" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/W3 /WX /MP /EHsc"
@@ -88,7 +88,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build primecount
         # POPCNT disabled + Debug
         run: |
@@ -120,7 +120,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
@@ -141,6 +141,8 @@ jobs:
         run: ./primecount 1e13 --deleglise-rivat
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
+      - name: primecount 1e14 --status
+        run: ./primecount 1e14 --status
 
   linux_gcc_valgrind:
     runs-on: ubuntu-latest
@@ -148,7 +150,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
             sudo apt update
@@ -182,7 +184,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
             sudo apt update
@@ -222,7 +224,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: brew install libomp
       - name: Build primecount
@@ -253,7 +255,7 @@ jobs:
   linux_128bit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON
