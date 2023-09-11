@@ -1,3 +1,8 @@
+Changes in primecount-7.10, 2023-09-11
+
+* .github/workflows/ci.yml: Port AppVeyor CI tests to GitHub Actions.
+* Update to latest primesieve-11.2 library.
+
 Changes in primecount-7.9, 2023-04-03
 
 The focus of this release has been to improve primecount's test suite.
