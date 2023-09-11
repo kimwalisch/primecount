@@ -228,7 +228,7 @@ jobs:
       - name: Build primecount
         # POPCNT disabled + Debug
         run: |
-            CXXFLAGS="-I$(brew --prefix libomp)/include" LDFLAGS="-L$(brew --prefix libomp)/lib" cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            LDFLAGS="-L$(brew --prefix libomp)/lib" cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
