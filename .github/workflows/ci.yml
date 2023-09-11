@@ -17,7 +17,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -29,12 +29,10 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
             make -j2 VERBOSE=1
-      # The current MinGW/GCC-12.1 version miscompiles primesieve/primecount,
-      # many tests fail with an exception thrown.
-      #- name: CTest (unit tests)
-      #  run: ctest -j2
-      #- name: primecount --test option
-      #  run: ./primecount --test
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primecount --test option
+        run: ./primecount --test
 
   linux_gcc:
     runs-on: ubuntu-latest
@@ -42,7 +40,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install valgrind
         run: |
             sudo apt update
@@ -77,7 +75,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
             sudo apt update
@@ -97,7 +95,7 @@ jobs:
   linux_128bit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build primecount
         run: |
             cmake . -DBUILD_TESTS=ON
@@ -118,7 +116,7 @@ jobs:
       CC: gcc
       CXX: g++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # Fetch all commits & tags
           fetch-depth: 0
@@ -135,7 +133,7 @@ jobs:
       CC: clang
       CXX: clang++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # Fetch all commits & tags
           fetch-depth: 0
