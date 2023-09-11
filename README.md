@@ -1,6 +1,6 @@
 # primecount
 
-[![Build status](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml) [![Build Status](https://ci.appveyor.com/api/projects/status/github/kimwalisch/primecount?branch=master&svg=true)](https://ci.appveyor.com/project/kimwalisch/primecount)
+[![Build status](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml) [![Build status](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 
 primecount is a command-line program and [C/C++ library](doc/libprimecount.md)
