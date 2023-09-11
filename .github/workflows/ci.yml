@@ -29,7 +29,7 @@ jobs:
           install: base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake
       - name: Build primecount
         run: |
-            cmake . -G "Unix Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake . -G "Unix Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
@@ -87,13 +87,12 @@ jobs:
     env:
       CC: gcc
       CXX: g++
-      CONFIGURATION: ${{ matrix.config }}
     steps:
       - uses: actions/checkout@v3
       - name: Build primecount
         # POPCNT disabled + Debug
         run: |
-            cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION
+            cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}}
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
@@ -152,7 +151,6 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      CONFIGURATION: ${{ matrix.config }}
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
@@ -162,7 +160,7 @@ jobs:
       - name: Build primecount
         # POPCNT disabled + Debug
         run: |
-            cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             grep "^cpu_supports_popcnt:INTERNAL=1$" CMakeCache.txt
