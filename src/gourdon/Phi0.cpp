@@ -13,7 +13,7 @@
 ///        z < x^(1/2). Also the small constant is named k instead
 ///        of c.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,7 +26,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <print.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 
@@ -48,7 +48,7 @@ T Phi0_thread(T x,
               uint64_t b,
               int64_t k,
               T square_free,
-              const pod_vector<P>& primes)
+              const Vector<P>& primes)
 {
   T phi0 = 0;
 

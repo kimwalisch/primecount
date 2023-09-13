@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,7 +12,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <PiTable.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 
@@ -27,7 +27,7 @@ namespace {
 constexpr int64_t max_n = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
-const pod_array<int16_t, 170> primes =
+const Array<int16_t, 170> primes =
 {
     0,   2,   3,   5,   7,  11,  13,  17,  19,  23, 
    29,  31,  37,  41,  43,  47,  53,  59,  61,  67, 

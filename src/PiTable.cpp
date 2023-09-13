@@ -8,7 +8,7 @@
 ///        type, one array element (8 bytes) corresponds to an
 ///        interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,7 +17,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
@@ -37,7 +37,7 @@ namespace primecount {
 /// @bit_count: PrimePi(5) + count of 1-bits < current_index.
 /// @bits: 64-bit word whose 1-bits correspond to primes.
 ///
-const pod_array<PiTable::pi_t, 64> PiTable::pi_cache_ =
+const Array<PiTable::pi_t, 64> PiTable::pi_cache_ =
 {{
   {    3, 0xF93DDBB67EEFDFFEull }, {   52, 0x9EEDA6EAF31E4FD5ull },
   {   92, 0xA559DD3BD3D30CE6ull }, {  128, 0x56A61E78BD92676Aull },

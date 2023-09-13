@@ -37,7 +37,7 @@
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -53,7 +53,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 
 #include <algorithm>
 #include <limits>
@@ -230,7 +230,7 @@ public:
   }
 
 private:
-  pod_vector<T> factor_;
+  Vector<T> factor_;
 };
 
 } // namespace

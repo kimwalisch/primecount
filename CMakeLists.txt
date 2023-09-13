@@ -151,8 +151,8 @@ if(WITH_DIV32)
 endif()
 
 # Enable expensive debugging assertions.
-# These assertions enable e.g. bounds checks for the pod_vector
-# and pod_array types.
+# These assertions enable e.g. bounds checks
+# for the Vector and Array types.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()

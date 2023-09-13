@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -33,7 +33,7 @@
 #include <min.hpp>
 #include <PhiTiny.hpp>
 #include <PiTable.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -291,7 +291,7 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  pod_vector<pod_vector<sieve_t>> sieve_;
+  Vector<Vector<sieve_t>> sieve_;
   const Primes& primes_;
   const PiTable& pi_;
 };
@@ -302,14 +302,14 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-pod_vector<int64_t>
+Vector<int64_t>
 generate_phi(int64_t x,
              int64_t a,
              const Primes& primes,
              const PiTable& pi)
 {
   int64_t size = a + 1;
-  pod_vector<int64_t> phi(size);
+  Vector<int64_t> phi(size);
   phi[0] = 0;
 
   if (size > 1)

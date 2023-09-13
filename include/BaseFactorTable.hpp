@@ -4,7 +4,7 @@
 ///        FactorTable and FactorTableD classes.
 ///        See FactorTable.hpp for more information.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,7 +15,7 @@
 
 #include <imath.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 
 #include <algorithm>
 #include <stdint.h>
@@ -72,8 +72,8 @@ protected:
     return multiple;
   }
 
-  static const pod_array<uint16_t, 480> coprime_;
-  static const pod_array<int16_t, 2310> coprime_indexes_;
+  static const Array<uint16_t, 480> coprime_;
+  static const Array<int16_t, 2310> coprime_indexes_;
 };
 
 } // namespace 

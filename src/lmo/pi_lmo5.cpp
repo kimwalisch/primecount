@@ -17,7 +17,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,7 @@
 #include <imath.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <S.hpp>
 
 #include <stdint.h>
@@ -43,9 +43,9 @@ namespace {
 int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
-           const pod_vector<int32_t>& primes,
-           const pod_vector<int32_t>& lpf,
-           const pod_vector<int32_t>& mu,
+           const Vector<int32_t>& primes,
+           const Vector<int32_t>& lpf,
+           const Vector<int32_t>& mu,
            bool is_print)
 {
   double time;
@@ -63,7 +63,7 @@ int64_t S2(int64_t x,
 
   Sieve sieve(low, segment_size, primes.size());
   auto pi = generate_pi(y);
-  pod_vector<int64_t> phi(primes.size());
+  Vector<int64_t> phi(primes.size());
   std::fill(phi.begin(), phi.end(), 0);
 
   int64_t s2 = 0;

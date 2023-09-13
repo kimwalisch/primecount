@@ -9,14 +9,14 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <PhiTiny.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <popcnt.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -27,16 +27,16 @@
 
 namespace primecount {
 
-const pod_array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
+const Array<uint32_t, 8> PhiTiny::primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
-const pod_array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
+const Array<uint32_t, 8> PhiTiny::prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const pod_array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
+const Array<uint32_t, 8> PhiTiny::totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes <= next_prime(primes.back())
-const pod_array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
+const Array<uint8_t, 20> PhiTiny::pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };
 
 // Singleton
 const PhiTiny phiTiny;

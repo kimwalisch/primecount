@@ -3,7 +3,7 @@
 /// @brief  Parse command-line options for the primecount console
 ///         (terminal) application.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,7 +13,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <print.hpp>
 #include <int128_t.hpp>
 
@@ -285,7 +285,7 @@ CmdOptions parseOptions(int argc, char* argv[])
   };
 
   CmdOptions opts;
-  pod_vector<maxint_t> numbers;
+  Vector<maxint_t> numbers;
 
   for (int i = 1; i < argc; i++)
   {

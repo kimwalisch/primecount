@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -37,7 +37,7 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <stdint.h>
 
 namespace primecount {
@@ -58,7 +58,7 @@ public:
   }
 
   template <typename T>
-  void pre_sieve(const pod_vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
     reset_sieve(low, high);
 
@@ -95,7 +95,7 @@ private:
     uint64_t log2_dist = 0;
     uint64_t sum = 0;
     uint64_t i = 0;
-    pod_vector<uint32_t> counter;
+    Vector<uint32_t> counter;
 
     uint32_t& operator[](std::size_t pos)
     {
@@ -112,8 +112,8 @@ private:
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  pod_vector<uint8_t> sieve_;
-  pod_vector<Wheel> wheel_;
+  Vector<uint8_t> sieve_;
+  Vector<Wheel> wheel_;
   Counter counter_;
 };
 

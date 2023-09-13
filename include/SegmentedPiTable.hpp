@@ -18,7 +18,7 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -29,7 +29,7 @@
 
 #include <BitSieve240.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -94,7 +94,7 @@ private:
     uint64_t bits;
   };
 
-  pod_vector<pi_t> pi_;
+  Vector<pi_t> pi_;
   uint64_t low_ = 0;
   uint64_t high_ = 0;
 };

@@ -8,7 +8,7 @@
 ///        type, one array element (8 bytes) corresponds to an
 ///        interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,7 +20,7 @@
 #include <BitSieve240.hpp>
 #include <popcnt.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 
@@ -77,9 +77,9 @@ private:
   void init(uint64_t limit, uint64_t cache_limit, int threads);
   void init_bits(uint64_t low, uint64_t high, uint64_t thread_num);
   void init_count(uint64_t low, uint64_t high, uint64_t thread_num);
-  static const pod_array<pi_t, 64> pi_cache_;
-  pod_vector<pi_t> pi_;
-  pod_vector<uint64_t> counts_;
+  static const Array<pi_t, 64> pi_cache_;
+  Vector<pi_t> pi_;
+  Vector<uint64_t> counts_;
   uint64_t max_x_;
 };
 

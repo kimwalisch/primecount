@@ -9,7 +9,7 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,7 +22,7 @@
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
@@ -140,10 +140,10 @@ public:
   }
 
 private:
-  static const pod_array<uint32_t, 8> primes;
-  static const pod_array<uint32_t, 8> prime_products;
-  static const pod_array<uint32_t, 8> totients;
-  static const pod_array<uint8_t, 20> pi;
+  static const Array<uint32_t, 8> primes;
+  static const Array<uint32_t, 8> prime_products;
+  static const Array<uint32_t, 8> totients;
+  static const Array<uint8_t, 20> pi;
 
   /// Packing sieve_t increases the cache's capacity by 25%
   /// which improves performance by up to 10%.
@@ -160,8 +160,8 @@ private:
   /// by any of the the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
-  pod_array<pod_vector<sieve_t>, 8> sieve_;
-  pod_array<pod_vector<uint8_t>, 4> phi_;
+  Array<Vector<sieve_t>, 8> sieve_;
+  Array<Vector<uint8_t>, 4> phi_;
 };
 
 extern const PhiTiny phiTiny;

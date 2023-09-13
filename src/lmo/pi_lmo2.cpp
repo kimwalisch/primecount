@@ -9,7 +9,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,7 +18,7 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <generate.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <PhiTiny.hpp>
 #include <S.hpp>
 
@@ -37,14 +37,14 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
            int64_t pi_y,
-           const pod_vector<int32_t>& primes,
-           const pod_vector<int32_t>& lpf,
-           const pod_vector<int32_t>& mu)
+           const Vector<int32_t>& primes,
+           const Vector<int32_t>& lpf,
+           const Vector<int32_t>& mu)
 {
   int64_t limit = x / y;
   int64_t s2 = 0;
   int64_t b = 1;
-  pod_vector<bool> sieve(limit);
+  Vector<bool> sieve(limit);
   std::fill(sieve.begin(), sieve.end(), 1);
 
   // phi(y, b) nodes with b <= c do not contribute to S2, so

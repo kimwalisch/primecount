@@ -25,7 +25,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,7 +42,7 @@
 #include <libdivide.h>
 #include <min.hpp>
 #include <imath.hpp>
-#include <pod_vector.hpp>
+#include <Vector.hpp>
 #include <print.hpp>
 #include <RelaxedAtomic.hpp>
 
@@ -332,7 +332,7 @@ T AC_OpenMP(T x,
   LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // Initialize libdivide vector from primes vector
-  pod_vector<libdivide::branchfree_divider<uint64_t>> lprimes;
+  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
   lprimes.resize(primes.size());
   for (std::size_t i = 1; i < lprimes.size(); i++)
     lprimes[i] = primes[i];
