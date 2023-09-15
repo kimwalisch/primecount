@@ -2,21 +2,20 @@
 
 [![Build status](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml) [![Build status](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml)
 [![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
+[![C API Documentation](https://img.shields.io/badge/docs-C_API-blue)](doc/libprimecount.md)
+[![C++ API Documentation](https://img.shields.io/badge/docs-C++_API-blue)](doc/libprimecount.md)
 
-primecount is a command-line program and [C/C++ library](doc/libprimecount.md)
-that counts the number of primes&nbsp;≤&nbsp;x (maximum 10<sup>31</sup>) using
-**highly optimized** implementations of the combinatorial
+primecount is a command-line program and C/C++ library that counts the number of
+primes&nbsp;≤&nbsp;x (maximum 10<sup>31</sup>) using **highly optimized** implementations of the combinatorial
 [prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
 
-primecount includes implementations of all important combinatorial
-prime counting algorithms known up to this date all of which have
-been parallelized using [OpenMP](https://en.wikipedia.org/wiki/OpenMP).
-primecount contains the first ever open source implementations of
-the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
+primecount includes implementations of all important combinatorial prime counting algorithms
+known up to this date all of which have been parallelized using
+[OpenMP](https://en.wikipedia.org/wiki/OpenMP). primecount contains the first ever open
+source implementations of the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancerS2.cpp)
-that is shared amongst all implementations and that scales up to
-hundreds of CPU cores. primecount has already been used to compute
-several prime counting function [world records](doc/Records.md).
+that is shared amongst all implementations and that scales up to hundreds of CPU cores. primecount
+has already been used to compute several prime counting function [world records](doc/Records.md).
 
 ## Installation
 
