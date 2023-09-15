@@ -1,6 +1,8 @@
-Changes in primecount-7.10, 2023-09-11
+Changes in primecount-7.10, 2023-09-15
 
 * .github/workflows/ci.yml: Port AppVeyor CI tests to GitHub Actions.
+* Vector.hpp: Rename pod_vector to Vector and pod_array to Array.
+* README.md: Add C & C++ API badges.
 * Update to latest primesieve-11.2 library.
 
 Changes in primecount-7.9, 2023-04-03
