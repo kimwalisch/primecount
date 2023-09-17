@@ -525,30 +525,24 @@ int main(void)
   primesieve_init(&it);
   primesieve_generate_next_primes(&it);
 
-  uint64_t sum = 0;
   uint64_t limit = 10000000000;
+  __m512i sums = _mm512_setzero_si512();
 
   while (it.primes[it.size - 1] <= limit)
   {
-    size_t i = 0;
-    __m512i vsums = _mm512_setzero_si512();
-
     // Sum 64-bit primes using AVX512
-    for (; i + 8 < it.size; i += 8) {
-      __m512i primes = _mm512_loadu_si512((__m512i*) &it.primes[i]);
-      vsums = _mm512_add_epi64(vsums, primes);
+    for (size_t i = 0; i < it.size; i += 8) {
+      __mmask8 mask = (i + 8 < it.size) ? 0xff : 0xff >> (i + 8 - it.size);
+      __m512i primes = _mm512_maskz_loadu_epi64(mask, (__m512i*) &it.primes[i]);
+      sums = _mm512_add_epi64(sums, primes);
     }
-
-    // Sum 8 integers in the vsums vector
-    sum += _mm512_reduce_add_epi64(vsums);
-
-    // Process the remaining primes (at most 7)
-    for (; i < it.size; i++)
-      sum += it.primes[i];
 
     // Generate up to 2^10 new primes
     primesieve_generate_next_primes(&it);
   }
+
+  // Sum the 8 partial sums
+  uint64_t sum = _mm512_reduce_add_epi64(sums);
 
   // Process the remaining primes (at most 2^10)
   for (size_t i = 0; it.primes[i] <= limit; i++)
@@ -566,7 +560,7 @@ int main(void)
 
 ```bash
 # Unix-like OSes
-cc -O3 -mavx512f primesum.c -o primesum -lprimesieve
+cc -O3 -mavx512f -funroll-loops primesum.c -o primesum -lprimesieve
 time ./primesum
 ```
 
