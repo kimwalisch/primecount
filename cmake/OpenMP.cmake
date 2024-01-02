@@ -42,31 +42,39 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
             return 0;
         }" OpenMP)
 
+    # Our code requires libatomic to compile
     if(NOT OpenMP)
-        find_library(LIB_ATOMIC NAMES atomic libatomic.so.1)
+        find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
 
-        if(LIB_ATOMIC)
-            set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
-            set(CMAKE_REQUIRED_LIBRARIES "${LIB_ATOMIC}")
-
-            # Check if compiles with libatomic
-            check_cxx_source_compiles("
-                #include <int128_t.hpp>
-                #include <omp.h>
-                #include <stdint.h>
-                #include <iostream>
-                int main(int, char** argv) {
-                    using primecount::maxint_t;
-                    uintptr_t n = (uintptr_t) argv;
-                    maxint_t sum = (maxint_t) n;
-                    int iters = (int) n;
-                    #pragma omp parallel for reduction(+: sum)
-                    for (int i = 0; i < iters; i++)
-                        sum += (i / 3) * omp_get_thread_num();
-                    std::cout << (long) sum;
-                    return 0;
-                }" OpenMP_with_libatomic)
+        if(NOT LIB_ATOMIC)
+            # Some package managers like homebrew and macports store the compiler's
+            # libraries in a subdirectory of the library directory. E.g. GCC
+            # installed via homebrew stores libatomic at lib/gcc/13/libatomic.dylib
+            # instead of lib/libatomic.dylib. CMake's find_library() cannot easily
+            # be used to recursively find libraries. Therefore we use this workaround
+            # here (try adding -latomic to linker options) for this use case.
+            set(LIB_ATOMIC "-latomic")
         endif()
+
+        set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}" "${LIB_ATOMIC}")
+
+        # Check if compiles with libatomic
+        check_cxx_source_compiles("
+            #include <int128_t.hpp>
+            #include <omp.h>
+            #include <stdint.h>
+            #include <iostream>
+            int main(int, char** argv) {
+                using primecount::maxint_t;
+                uintptr_t n = (uintptr_t) argv;
+                maxint_t sum = (maxint_t) n;
+                int iters = (int) n;
+                #pragma omp parallel for reduction(+: sum)
+                for (int i = 0; i < iters; i++)
+                    sum += (i / 3) * omp_get_thread_num();
+                std::cout << (long) sum;
+                return 0;
+            }" OpenMP_with_libatomic)
 
         if(NOT OpenMP_with_libatomic)
             set(LIB_ATOMIC "")
