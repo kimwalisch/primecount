@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -128,7 +128,7 @@ int64_t nth_prime(int64_t n, int threads)
     uint64_t start = prime_approx;
     uint64_t stop = start - (count_approx - n) * avg_prime_gap;
     primesieve::iterator iter(start, stop);
-    for (int64_t i = count_approx; i + 1 > n; i--)
+    for (int64_t i = count_approx; i >= n; i--)
       prime = iter.prev_prime();
   }
 
