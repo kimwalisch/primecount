@@ -240,19 +240,31 @@ uint64_t Li(uint64_t x)
   return (uint64_t) ::Li((long double) x);
 }
 
-uint64_t Li_inverse(uint64_t x)
-{
-  return (uint64_t) ::Li_inverse((long double) x);
-}
-
 uint64_t Ri(uint64_t x)
 {
   return (uint64_t) ::Ri((long double) x);
 }
 
+uint64_t Li_inverse(uint64_t x)
+{
+  auto res = ::Li_inverse((long double) x);
+
+  // Prevent 64-bit integer overflow
+  if (res > (long double) std::numeric_limits<uint64_t>::max())
+    return std::numeric_limits<uint64_t>::max();
+
+  return (uint64_t) res;
+}
+
 uint64_t Ri_inverse(uint64_t x)
 {
-  return (uint64_t) ::Ri_inverse((long double) x);
+  auto res = ::Ri_inverse((long double) x);
+
+  // Prevent 64-bit integer overflow
+  if (res > (long double) std::numeric_limits<uint64_t>::max())
+    return std::numeric_limits<uint64_t>::max();
+
+  return (uint64_t) res;
 }
 
 uint64_t primePiApprox(uint64_t x)
