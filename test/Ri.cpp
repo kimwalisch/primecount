@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
+#include <limits>
 #include <vector>
 
 using std::max;
