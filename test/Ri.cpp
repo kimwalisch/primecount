@@ -2,13 +2,14 @@
 /// @file   Ri.cpp
 /// @brief  Test the Riemann R function.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount-internal.hpp>
+#include <int128_t.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>
@@ -125,6 +126,28 @@ int main()
       std::exit(1);
     }
   }
+
+  {
+    int64_t x = std::numeric_limits<int64_t>::max() / 10;
+    int64_t res = Ri_inverse(x);
+    if (res != std::numeric_limits<int64_t>::max())
+    {
+      std::cout << "Ri_inverse(" << x << ") != INT64_MAX, failed to prevent integer overflow!" << std::endl;
+      std::exit(1);
+    }
+  }
+
+#if defined(HAVE_INT128_T)
+  {
+    int128_t x = std::numeric_limits<int128_t>::max() / 10;
+    int128_t res = Ri_inverse(x);
+    if (res != std::numeric_limits<int128_t>::max())
+    {
+      std::cout << "Ri_inverse(" << x << ") != INT128_MAX, failed to prevent integer overflow!" << std::endl;
+      std::exit(1);
+    }
+  }
+#endif
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

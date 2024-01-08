@@ -375,16 +375,6 @@ int64_t Li(int64_t x)
   return (int64_t) ::Li((long double) x);
 }
 
-int64_t Li_inverse(int64_t x)
-{
-#if defined(HAVE_FLOAT128)
-  if (x > 1e14)
-    return (int64_t) ::Li_inverse((__float128) x);
-#endif
-
-  return (int64_t) ::Li_inverse((long double) x);
-}
-
 int64_t Ri(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
@@ -395,14 +385,46 @@ int64_t Ri(int64_t x)
   return (int64_t) ::Ri((long double) x);
 }
 
+int64_t Li_inverse(int64_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+  {
+    __float128 res = ::Li_inverse((__float128) x);
+    if (res > (__float128) std::numeric_limits<int64_t>::max())
+      return std::numeric_limits<int64_t>::max();
+    return (int64_t) res;
+  }
+#endif
+
+  long double res = ::Li_inverse((long double) x);
+
+  // Prevent integer overflow
+  if (res > (long double) std::numeric_limits<int64_t>::max())
+    return std::numeric_limits<int64_t>::max();
+
+  return (int64_t) res;
+}
+
 int64_t Ri_inverse(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
-    return (int64_t) ::Ri_inverse((__float128) x);
+  {
+    __float128 res = ::Ri_inverse((__float128) x);
+    if (res > (__float128) std::numeric_limits<int64_t>::max())
+      return std::numeric_limits<int64_t>::max();
+    return (int64_t) res;
+  }
 #endif
 
-  return (int64_t) ::Ri_inverse((long double) x);
+  long double res = ::Ri_inverse((long double) x);
+
+  // Prevent integer overflow
+  if (res > (long double) std::numeric_limits<int64_t>::max())
+    return std::numeric_limits<int64_t>::max();
+
+  return (int64_t) res;
 }
 
 #ifdef HAVE_INT128_T
@@ -417,16 +439,6 @@ int128_t Li(int128_t x)
   return (int128_t) ::Li((long double) x);
 }
 
-int128_t Li_inverse(int128_t x)
-{
-#if defined(HAVE_FLOAT128)
-  if (x > 1e14)
-    return (int128_t) ::Li_inverse((__float128) x);
-#endif
-
-  return (int128_t) ::Li_inverse((long double) x);
-}
-
 int128_t Ri(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
@@ -437,14 +449,46 @@ int128_t Ri(int128_t x)
   return (int128_t) ::Ri((long double) x);
 }
 
+int128_t Li_inverse(int128_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+  {
+    __float128 res = ::Li_inverse((__float128) x);
+    if (res > (__float128) std::numeric_limits<int128_t>::max())
+      return std::numeric_limits<int128_t>::max();
+    return (int128_t) res;
+  }
+#endif
+
+  long double res = ::Li_inverse((long double) x);
+
+  // Prevent integer overflow
+  if (res > (long double) std::numeric_limits<int128_t>::max())
+    return std::numeric_limits<int128_t>::max();
+
+  return (int128_t) res;
+}
+
 int128_t Ri_inverse(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
-    return (int128_t) ::Ri_inverse((__float128) x);
+  {
+    __float128 res = ::Ri_inverse((__float128) x);
+    if (res > (__float128) std::numeric_limits<int128_t>::max())
+      return std::numeric_limits<int128_t>::max();
+    return (int128_t) res;
+  }
 #endif
 
-  return (int128_t) ::Ri_inverse((long double) x);
+  long double res = ::Ri_inverse((long double) x);
+
+  // Prevent integer overflow
+  if (res > (long double) std::numeric_limits<int128_t>::max())
+    return std::numeric_limits<int128_t>::max();
+
+  return (int128_t) res;
 }
 
 #endif
