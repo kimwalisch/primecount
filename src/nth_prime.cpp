@@ -98,17 +98,10 @@ int64_t nth_prime(int64_t n, int threads)
   if (n <= PiTable::pi_cache(PiTable::max_cached()))
     return binary_search_nth_prime(n);
 
-  int64_t prime_approx;
-
-  // Li_inverse(x) is faster but less accurate than Ri_inverse(x).
-  // For small n speed is more important than accuracy.
-  if (n < 1e8)
-    prime_approx = Li_inverse(n);
-  else
-    prime_approx = Ri_inverse(n);
-
-  // For large n we use the prime counting function
-  // and the segmented sieve of Eratosthenes.
+  // Closely approximate the nth prime using the inverse
+  // Riemann R function and then count the primes up to this
+  // approximation using the prime counting function.
+  int64_t prime_approx = nth_prime_approx(n);
   int64_t count_approx = pi(prime_approx, threads);
   int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;

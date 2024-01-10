@@ -427,6 +427,21 @@ int64_t Ri_inverse(int64_t x)
   return (int64_t) res;
 }
 
+/// nth_prime_approx(n) is a very accurate approximation of the nth
+/// prime with |nth prime - nth_prime_approx(n)| < sqrt(nth prime).
+/// Please note that nth_prime_approx(n) may be smaller or larger than
+/// the actual nth prime.
+///
+int64_t nth_prime_approx(int64_t n)
+{
+  // Li_inverse(n) is faster but less accurate than Ri_inverse(n).
+  // For small n speed is more important than accuracy.
+  if (n < 1e8)
+    return Li_inverse(n);
+  else
+    return Ri_inverse(n);
+}
+
 #ifdef HAVE_INT128_T
 
 int128_t Li(int128_t x)
