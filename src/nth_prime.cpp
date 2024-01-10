@@ -110,7 +110,7 @@ int64_t nth_prime(int64_t n, int threads)
   // For large n we use the prime counting function
   // and the segmented sieve of Eratosthenes.
   int64_t count_approx = pi(prime_approx, threads);
-  int64_t avg_prime_gap =  ilog(prime_approx) + 2;
+  int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
