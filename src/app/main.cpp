@@ -351,15 +351,15 @@ int main (int argc, char* argv[])
 {
   try
   {
-    CmdOptions opt = parseOptions(argc, argv);
+    CmdOptions opts = parseOptions(argc, argv);
     double time = get_time();
 
-    auto x = opt.x;
-    auto a = opt.a;
+    auto x = opts.x;
+    auto a = opts.a;
     auto threads = get_num_threads();
     maxint_t res = 0;
 
-    switch (opt.option)
+    switch (opts.option)
     {
       case OPTION_DEFAULT:
         res = pi(x, threads); break;
@@ -439,7 +439,7 @@ int main (int argc, char* argv[])
 
       std::cout << res << std::endl;
 
-      if (opt.time)
+      if (opts.time)
         print_seconds(get_time() - time);
     }
   }
