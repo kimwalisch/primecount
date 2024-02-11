@@ -1,8 +1,21 @@
 ///
 /// @file   main.cpp
-/// @brief  primecount console application
+/// @brief  Command-line option handling for the primecount
+///         command-line application. The user's command-line options
+///         are first parsed in cmdoptions.cpp and stored in a
+///         CmdOptions object. Afterwards we execute the function
+///         corresponding to the user's command-line options in the
+///         main() function in main.cpp.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+///         How to add a new command-line option:
+///
+///         1) Add a new option enum in cmdoptions.h.
+///         2) Add your option to parseOptions() in cmdoptions.cpp.
+///         3) Add your option to main() in main.cpp.
+///         4) Document your option in help.cpp (--help option summary)
+///            and in doc/primecount.txt (manpage).
+///
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
