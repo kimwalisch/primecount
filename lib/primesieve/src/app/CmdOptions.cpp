@@ -1,16 +1,16 @@
 ///
-/// @file   cmdoptions.cpp
+/// @file   CmdOptions.cpp
 /// @brief  Command-line option handling for the primesieve
 ///         command-line application. The user's command-line options
-///         are first parsed in cmdoptions.cpp and stored in a
+///         are first parsed in CmdOptions.cpp and stored in a
 ///         CmdOptions object. Afterwards we execute the function
 ///         corresponding to the user's command-line options in the
 ///         main() function in main.cpp.
 ///
 ///         How to add a new command-line option:
 ///
-///         1) Add a new option enum in cmdoptions.h.
-///         2) Add your option to parseOptions() in cmdoptions.cpp.
+///         1) Add a new option enum in CmdOptions.h.
+///         2) Add your option to parseOptions() in CmdOptions.cpp.
 ///         3) Add your option to main() in main.cpp.
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primesieve.txt (manpage).
@@ -21,21 +21,20 @@
 /// file in the top level directory.
 ///
 
-#include "cmdoptions.hpp"
+#include "CmdOptions.hpp"
 
 #include <primesieve/calculator.hpp>
 #include <primesieve/PrimeSieve.hpp>
 #include <primesieve/primesieve_error.hpp>
 
 #include <cstddef>
+#include <cctype>
 #include <map>
 #include <stdint.h>
 #include <string>
 #include <utility>
 
 void help(int exitCode);
-void test();
-void version();
 
 using std::size_t;
 using namespace primesieve;
@@ -269,6 +268,47 @@ void optionDistance(Option& opt,
   numbers.push_back(start + val);
 }
 
+void optionStressTest(Option& opt,
+                      CmdOptions& opts)
+{
+  opts.option = OPTION_STRESS_TEST;
+  std::transform(opt.val.begin(), opt.val.end(), opt.val.begin(),
+                 [](unsigned char c){ return std::toupper(c); });
+
+  // If the stress test mode is not specified
+  // we use "CPU" by default.
+  if (opt.val.empty())
+    opts.stressTestMode = "CPU";
+  else if (opt.val == "CPU")
+    opts.stressTestMode = "CPU";
+  else if (opt.val == "RAM")
+    opts.stressTestMode = "RAM";
+  else
+    throw primesieve_error("invalid option '" + opt.str + "=" + opt.val + "'");
+}
+
+/// Stress test timeout
+void optionTimeout(Option& opt,
+                   CmdOptions& opts)
+{
+  std::transform(opt.val.begin(), opt.val.end(), opt.val.begin(),
+                 [](unsigned char c){ return std::tolower(c); });
+
+  // We support the same options as stress-ng.
+  // https://manpages.debian.org/unstable/stress-ng/stress-ng.1.en.html
+  switch (opt.val.back())
+  {
+    case 's': opt.val.pop_back(); opts.timeout = opt.getValue<int64_t>(); break;
+    case 'm': opt.val.pop_back(); opts.timeout = opt.getValue<int64_t>() * 60; break;
+    case 'h': opt.val.pop_back(); opts.timeout = opt.getValue<int64_t>() * 3600; break;
+    case 'd': opt.val.pop_back(); opts.timeout = opt.getValue<int64_t>() * 24 * 3600; break;
+    case 'y': opt.val.pop_back(); opts.timeout = opt.getValue<int64_t>() * 365 * 24 * 3600; break;
+
+    // By default assume seconds like stress-ng
+    default: opts.timeout = opt.getValue<int64_t>();
+  }
+}
+
 } // namespace
 
 CmdOptions parseOptions(int argc, char* argv[])
@@ -280,33 +320,36 @@ CmdOptions parseOptions(int argc, char* argv[])
   /// primesieve command-line options
   const std::map<std::string, std::pair<OptionID, IsParam>> optionMap =
   {
-    { "-c",          std::make_pair(OPTION_COUNT, OPTIONAL_PARAM) },
-    { "--count",     std::make_pair(OPTION_COUNT, OPTIONAL_PARAM) },
-    { "--cpu-info",  std::make_pair(OPTION_CPU_INFO, NO_PARAM) },
-    { "-h",          std::make_pair(OPTION_HELP, NO_PARAM) },
-    { "--help",      std::make_pair(OPTION_HELP, NO_PARAM) },
-    { "-n",          std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
-    { "--nthprime",  std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
-    { "--nth-prime", std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
-    { "--no-status", std::make_pair(OPTION_NO_STATUS, NO_PARAM) },
-    { "--number",    std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
-    { "-d",          std::make_pair(OPTION_DISTANCE, REQUIRED_PARAM) },
-    { "--dist",      std::make_pair(OPTION_DISTANCE, REQUIRED_PARAM) },
-    { "-p",          std::make_pair(OPTION_PRINT, OPTIONAL_PARAM) },
-    { "--print",     std::make_pair(OPTION_PRINT, OPTIONAL_PARAM) },
-    { "-q",          std::make_pair(OPTION_QUIET, NO_PARAM) },
-    { "--quiet",     std::make_pair(OPTION_QUIET, NO_PARAM) },
-    { "-R",          std::make_pair(OPTION_R, NO_PARAM) },
-    { "--RiemannR",  std::make_pair(OPTION_R, NO_PARAM) },
-    { "--R-inverse", std::make_pair(OPTION_R_INVERSE, NO_PARAM) },
-    { "-s",          std::make_pair(OPTION_SIZE, REQUIRED_PARAM) },
-    { "--size",      std::make_pair(OPTION_SIZE, REQUIRED_PARAM) },
-    { "--test",      std::make_pair(OPTION_TEST, NO_PARAM) },
-    { "-t",          std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-    { "--threads",   std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-    { "--time",      std::make_pair(OPTION_TIME, NO_PARAM) },
-    { "-v",          std::make_pair(OPTION_VERSION, NO_PARAM) },
-    { "--version",   std::make_pair(OPTION_VERSION, NO_PARAM) }
+    { "-c",            std::make_pair(OPTION_COUNT, OPTIONAL_PARAM) },
+    { "--count",       std::make_pair(OPTION_COUNT, OPTIONAL_PARAM) },
+    { "--cpu-info",    std::make_pair(OPTION_CPU_INFO, NO_PARAM) },
+    { "-h",            std::make_pair(OPTION_HELP, NO_PARAM) },
+    { "--help",        std::make_pair(OPTION_HELP, NO_PARAM) },
+    { "-n",            std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
+    { "--nthprime",    std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
+    { "--nth-prime",   std::make_pair(OPTION_NTH_PRIME, NO_PARAM) },
+    { "--no-status",   std::make_pair(OPTION_NO_STATUS, NO_PARAM) },
+    { "--number",      std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
+    { "-d",            std::make_pair(OPTION_DISTANCE, REQUIRED_PARAM) },
+    { "--dist",        std::make_pair(OPTION_DISTANCE, REQUIRED_PARAM) },
+    { "-p",            std::make_pair(OPTION_PRINT, OPTIONAL_PARAM) },
+    { "--print",       std::make_pair(OPTION_PRINT, OPTIONAL_PARAM) },
+    { "-q",            std::make_pair(OPTION_QUIET, NO_PARAM) },
+    { "--quiet",       std::make_pair(OPTION_QUIET, NO_PARAM) },
+    { "-R",            std::make_pair(OPTION_R, NO_PARAM) },
+    { "--RiemannR",    std::make_pair(OPTION_R, NO_PARAM) },
+    { "--R-inverse",   std::make_pair(OPTION_R_INVERSE, NO_PARAM) },
+    { "-s",            std::make_pair(OPTION_SIZE, REQUIRED_PARAM) },
+    { "--size",        std::make_pair(OPTION_SIZE, REQUIRED_PARAM) },
+    { "-S",            std::make_pair(OPTION_STRESS_TEST, OPTIONAL_PARAM) },
+    { "--stress-test", std::make_pair(OPTION_STRESS_TEST, OPTIONAL_PARAM) },
+    { "--test",        std::make_pair(OPTION_TEST, NO_PARAM) },
+    { "-t",            std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+    { "--threads",     std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+    { "--time",        std::make_pair(OPTION_TIME, NO_PARAM) },
+    { "--timeout",     std::make_pair(OPTION_TIMEOUT, REQUIRED_PARAM) },
+    { "-v",            std::make_pair(OPTION_VERSION, NO_PARAM) },
+    { "--version",     std::make_pair(OPTION_VERSION, NO_PARAM) }
   };
 
   CmdOptions opts;
@@ -318,19 +361,18 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionID)
     {
-      case OPTION_COUNT:     optionCount(opt, opts); break;
-      case OPTION_DISTANCE:  optionDistance(opt, opts); break;
-      case OPTION_PRINT:     optionPrint(opt, opts); break;
-      case OPTION_SIZE:      opts.sieveSize = opt.getValue<int>(); break;
-      case OPTION_THREADS:   opts.threads = opt.getValue<int>(); break;
-      case OPTION_QUIET:     opts.quiet = true; break;
-      case OPTION_NO_STATUS: opts.status = false; break;
-      case OPTION_TIME:      opts.time = true; break;
-      case OPTION_NUMBER:    opts.numbers.push_back(opt.getValue<uint64_t>()); break;
-      case OPTION_HELP:      help(/* exitCode */ 0); break;
-      case OPTION_TEST:      test(); break;
-      case OPTION_VERSION:   version(); break;
-      default:               opts.option = optionID;
+      case OPTION_COUNT:       optionCount(opt, opts); break;
+      case OPTION_DISTANCE:    optionDistance(opt, opts); break;
+      case OPTION_PRINT:       optionPrint(opt, opts); break;
+      case OPTION_STRESS_TEST: optionStressTest(opt, opts); break;
+      case OPTION_TIMEOUT:     optionTimeout(opt, opts); break;
+      case OPTION_SIZE:        opts.sieveSize = opt.getValue<int>(); break;
+      case OPTION_THREADS:     opts.threads = opt.getValue<int>(); break;
+      case OPTION_QUIET:       opts.quiet = true; break;
+      case OPTION_NO_STATUS:   opts.status = false; break;
+      case OPTION_TIME:        opts.time = true; break;
+      case OPTION_NUMBER:      opts.numbers.push_back(opt.getValue<uint64_t>()); break;
+      default:                 opts.option = optionID;
     }
   }
 

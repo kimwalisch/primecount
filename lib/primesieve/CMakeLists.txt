@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.27)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "11.3")
-set(PRIMESIEVE_SOVERSION "11.3.0")
+set(PRIMESIEVE_VERSION "12.0")
+set(PRIMESIEVE_SOVERSION "12.0.0")
 
 # Build options ######################################################
 
@@ -48,9 +48,10 @@ endif()
 
 # primesieve binary source files #####################################
 
-set(BIN_SRC src/app/cmdoptions.cpp
+set(BIN_SRC src/app/CmdOptions.cpp
             src/app/help.cpp
             src/app/main.cpp
+            src/app/stressTest.cpp
             src/app/test.cpp)
 
 # primesieve library source files ####################################

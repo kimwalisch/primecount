@@ -2,15 +2,15 @@
 /// @file   main.cpp
 /// @brief  Command-line option handling for the primesieve
 ///         command-line application. The user's command-line options
-///         are first parsed in cmdoptions.cpp and stored in a
+///         are first parsed in CmdOptions.cpp and stored in a
 ///         CmdOptions object. Afterwards we execute the function
 ///         corresponding to the user's command-line options in the
 ///         main() function in main.cpp.
 ///
 ///         How to add a new command-line option:
 ///
-///         1) Add a new option enum in cmdoptions.h.
-///         2) Add your option to parseOptions() in cmdoptions.cpp.
+///         1) Add a new option enum in CmdOptions.h.
+///         2) Add your option to parseOptions() in CmdOptions.cpp.
 ///         3) Add your option to main() in main.cpp.
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primesieve.txt (manpage).
@@ -26,7 +26,7 @@
 #include <primesieve/primesieve_error.hpp>
 #include <primesieve/RiemannR.hpp>
 #include <primesieve/Vector.hpp>
-#include "cmdoptions.hpp"
+#include "CmdOptions.hpp"
 
 #include <stdint.h>
 #include <exception>
@@ -34,6 +34,11 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+
+void help(int exitCode);
+void version();
+void stressTest(const CmdOptions& opts);
+void test();
 
 using primesieve::Array;
 using primesieve::ParallelSieve;
@@ -287,11 +292,15 @@ int main(int argc, char* argv[])
 
     switch (opts.option)
     {
-      case OPTION_CPU_INFO:  cpuInfo(); break;
-      case OPTION_NTH_PRIME: nthPrime(opts); break;
-      case OPTION_R:         RiemannR(opts); break;
-      case OPTION_R_INVERSE: RiemannR_inverse(opts); break;
-      default:               sieve(opts); break;
+      case OPTION_CPU_INFO:    cpuInfo(); break;
+      case OPTION_HELP:        help(/* exitCode */ 0); break;
+      case OPTION_NTH_PRIME:   nthPrime(opts); break;
+      case OPTION_R:           RiemannR(opts); break;
+      case OPTION_R_INVERSE:   RiemannR_inverse(opts); break;
+      case OPTION_STRESS_TEST: stressTest(opts); break;
+      case OPTION_TEST:        test(); break;
+      case OPTION_VERSION:     version(); break;
+      default:                 sieve(opts); break;
     }
   }
   catch (std::exception& e)
