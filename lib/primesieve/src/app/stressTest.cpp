@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <ctime>
 #include <exception>
 #include <iostream>
 #include <iomanip>
@@ -125,9 +126,9 @@ std::string getTimeElapsed(int64_t secs)
 
   for (std::size_t i = 0; i < time.size(); i++)
   {
-    if (secs >= time[i])
+    if (secs > time[i])
     {
-      timeStr += (timeStr.empty()) ? "" : " ";
+      timeStr += timeStr.empty() ? "" : " ";
       timeStr += std::to_string(secs / time[i]) + suffix[i];
       secs %= time[i];
     }
@@ -179,6 +180,39 @@ std::string getStartString(uint64_t start)
   }
 }
 
+/// Date time format: "[Jan 13 22:07] "
+std::string getDateTime()
+{
+#if 0
+  // Thread safe.
+  // Requires C23, but does not work yet with the
+  // MSVC 2022 and MinGW-w64 compilers.
+  std::tm result;
+  std::time_t currentTime = std::time(nullptr);
+  if (!localtime_r(&currentTime, &result))
+    return "";
+
+  std::ostringstream oss;
+  oss << std::put_time(&result, "[%b %d %H:%M] ");
+  return oss.str();
+#else
+  // Not thread safe.
+  // But we lock a mutex before calling getDateTime()
+  // hence this is not an issue for us.
+  #if defined(_MSC_VER)
+    #pragma warning(disable : 4996)
+  #endif
+  std::time_t currentTime = std::time(nullptr);
+  std::tm* currentDateTime = std::localtime(&currentTime);
+  if (!currentDateTime)
+    return "";
+
+  std::ostringstream oss;
+  oss << std::put_time(currentDateTime, "[%b %d %H:%M] ");
+  return oss.str();
+#endif
+}
+
 void printResult(int threadId,
                  int threads,
                  uint64_t i,
@@ -194,15 +228,17 @@ void printResult(int threadId,
 
   if (count == primeCounts[i])
   {
-    std::cout << "Thread: " << std::setw(threadIdPadding) << std::right << threadId
-              << ", secs: " << std::fixed << std::setprecision(3) << secsThread.count()
+    std::cout << getDateTime()
+              << "Thread " << std::setw(threadIdPadding) << std::right << threadId
+              << ", " << std::fixed << std::setprecision(2) << secsThread.count() << " secs"
               << ", PrimePi(" << startStr << std::setw(iPadding) << std::right << i-1 << "e11, "
               << startStr << std::setw(iPadding) << std::right << i << "e11) = " << count << "   OK" << std::endl;
   }
   else
   {
-    std::cerr << "Thread: " << std::setw(threadIdPadding) << std::right << threadId
-              << ", secs: " << std::fixed << std::setprecision(3) << secsThread.count()
+    std::cerr << getDateTime()
+              << "Thread " << std::setw(threadIdPadding) << std::right << threadId
+              << ", " << std::fixed << std::setprecision(2) << secsThread.count() << " secs"
               << ", PrimePi(" << startStr << std::setw(iPadding) << std::right << i-1 << "e11, "
               << startStr << std::setw(iPadding) << std::right << i << "e11) = " << count << "   ERROR" << std::endl;
 

@@ -10,7 +10,11 @@
 #ifndef CMDOPTIONS_HPP
 #define CMDOPTIONS_HPP
 
+#include <primesieve/calculator.hpp>
+#include <primesieve/primesieve_error.hpp>
 #include <primesieve/Vector.hpp>
+
+#include <exception>
 #include <stdint.h>
 #include <string>
 
@@ -36,10 +40,34 @@ enum OptionID
   OPTION_VERSION
 };
 
+/// Command-line option
+struct Option
+{
+  // Example:
+  // str = "--threads=32"
+  // opt = "--threads"
+  // val = "32"
+  std::string str;
+  std::string opt;
+  std::string val;
+
+  template <typename T>
+  T getValue() const
+  {
+    try {
+      return calculator::eval<T>(val);
+    }
+    catch (std::exception&) {
+      throw primesieve::primesieve_error("invalid option '" + opt + "=" + val + "'");
+    }
+  }
+};
+
 struct CmdOptions
 {
   primesieve::Vector<uint64_t> numbers;
   std::string stressTestMode;
+  std::string optionStr;
   int option = -1;
   int flags = 0;
   int sieveSize = 0;
@@ -50,6 +78,13 @@ struct CmdOptions
   bool quiet = false;
   bool status = true;
   bool time = false;
+
+  void setMainOption(OptionID optionID, const std::string& optStr);
+  void optionPrint(Option& opt);
+  void optionCount(Option& opt);
+  void optionDistance(Option& opt);
+  void optionStressTest(Option& opt);
+  void optionTimeout(Option& opt);
 };
 
 CmdOptions parseOptions(int, char**);
