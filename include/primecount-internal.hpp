@@ -53,7 +53,6 @@ int64_t Li(int64_t);
 int64_t Li_inverse(int64_t);
 int64_t RiemannR(int64_t);
 int64_t RiemannR_inverse(int64_t);
-int64_t nth_prime_approx(int64_t n);
 
 #ifdef HAVE_INT128_T
   int128_t pi(int128_t x);

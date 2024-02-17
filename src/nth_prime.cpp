@@ -101,7 +101,7 @@ int64_t nth_prime(int64_t n, int threads)
   // Closely approximate the nth prime using the inverse
   // Riemann R function and then count the primes up to this
   // approximation using the prime counting function.
-  int64_t prime_approx = nth_prime_approx(n);
+  int64_t prime_approx = RiemannR_inverse(n);
   int64_t count_approx = pi(prime_approx, threads);
   int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;
