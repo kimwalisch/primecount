@@ -238,7 +238,9 @@ int64_t Li_inverse(int64_t x)
   if (x > 1e10)
   {
     double logx = std::log(x);
-    if (std::log10((double) x * (logx * logx)) >= std::numeric_limits<long double>::digits10)
+    double n = (double) x * logx * logx * logx;
+
+    if (std::log10(n) >= std::numeric_limits<long double>::digits10)
     {
       __float128 res = ::Li_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -273,7 +275,9 @@ int128_t Li_inverse(int128_t x)
   if (x > 1e10)
   {
     double logx = std::log(x);
-    if (std::log10((double) x * (logx * logx)) >= std::numeric_limits<long double>::digits10)
+    double n = (double) x * logx * logx * logx;
+
+    if (std::log10(n) >= std::numeric_limits<long double>::digits10)
     {
       __float128 res = ::Li_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int128_t>::max())
