@@ -311,7 +311,7 @@ long double RiemannR_inverse(long double x)
 /// These values are calculated up to a precision of 128 bits.
 /// Mathematica: Table[NumberForm[SetPrecision[Zeta[k], 45], {40, 39}], {k, 0, 127}]
 ///
-const primecount::Array<__float128, 128> zeta =
+const primecount::Array<__float128, 128> zeta_f128 =
 {
  -0.500000000000000000000000000000000000000Q,
   HUGE_VALQ,
