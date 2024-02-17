@@ -395,10 +395,10 @@ int main (int argc, char* argv[])
         res = Li(x); break;
       case OPTION_LIINV:
         res = Li_inverse(x); break;
-      case OPTION_RI:
-        res = Ri(x); break;
-      case OPTION_RIINV:
-        res = Ri_inverse(x); break;
+      case OPTION_R:
+        res = RiemannR(x); break;
+      case OPTION_R_INVERSE:
+        res = RiemannR_inverse(x); break;
       case OPTION_NTHPRIME:
         res = nth_prime(to_int64(x), threads); break;
       case OPTION_PHI:

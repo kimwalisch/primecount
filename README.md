@@ -93,29 +93,29 @@ Count the number of primes less than or equal to x (<= 10^31).
 
 Options:
 
-  -d, --deleglise-rivat  Count primes using the Deleglise-Rivat algorithm
-  -g, --gourdon          Count primes using Xavier Gourdon's algorithm.
-                         This is the default algorithm.
-  -l, --legendre         Count primes using Legendre's formula
-      --lehmer           Count primes using Lehmer's formula
-      --lmo              Count primes using Lagarias-Miller-Odlyzko
-  -m, --meissel          Count primes using Meissel's formula
-      --Li               Approximate pi(x) using the logarithmic integral
-      --Li-inverse       Approximate the nth prime using Li^-1(x)
-  -n, --nth-prime        Calculate the nth prime
-  -p, --primesieve       Count primes using the sieve of Eratosthenes
-      --phi <X> <A>      phi(x, a) counts the numbers <= x that are not
-                         divisible by any of the first a primes
-      --Ri               Approximate pi(x) using Riemann R
-      --Ri-inverse       Approximate the nth prime using Ri^-1(x)
-  -s, --status[=NUM]     Show computation progress 1%, 2%, 3%, ...
-                         Set digits after decimal point: -s1 prints 99.9%
-      --test             Run various correctness tests and exit
-      --time             Print the time elapsed in seconds
-  -t, --threads=NUM      Set the number of threads, 1 <= NUM <= CPU cores.
-                         By default primecount uses all available CPU cores.
-  -v, --version          Print version and license information
-  -h, --help             Print this help menu
+  -d, --deleglise-rivat    Count primes using the Deleglise-Rivat algorithm
+  -g, --gourdon            Count primes using Xavier Gourdon's algorithm.
+                           This is the default algorithm.
+  -l, --legendre           Count primes using Legendre's formula
+      --lehmer             Count primes using Lehmer's formula
+      --lmo                Count primes using Lagarias-Miller-Odlyzko
+  -m, --meissel            Count primes using Meissel's formula
+      --Li                 Approximate pi(x) using the logarithmic integral
+      --Li-inverse         Approximate the nth prime using Li^-1(x)
+  -n, --nth-prime          Calculate the nth prime
+  -p, --primesieve         Count primes using the sieve of Eratosthenes
+      --phi <X> <A>        phi(x, a) counts the numbers <= x that are not
+                           divisible by any of the first a primes
+  -R, --RiemannR           Approximate pi(x) using the Riemann R function
+      --RiemannR-inverse   Approximate the nth prime using RiemannR^-1(x)
+  -s, --status[=NUM]       Show computation progress 1%, 2%, 3%, ...
+                           Set digits after decimal point: -s1 prints 99.9%
+      --test               Run various correctness tests and exit
+      --time               Print the time elapsed in seconds
+  -t, --threads=NUM        Set the number of threads, 1 <= NUM <= CPU cores.
+                           By default primecount uses all available CPU cores.
+  -v, --version            Print version and license information
+  -h, --help               Print this help menu
 ```
 
 <details>

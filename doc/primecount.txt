@@ -56,11 +56,11 @@ OPTIONS
 	phi(x, a) counts the numbers \<= x that are not divisible by
 	any of the first a primes.
 
-*--Ri*::
+*-R, --RiemannR*::
 	Approximate pi(x) using the Riemann R function.
 
-*--Ri-inverse*::
-	Approximate the nth prime using Ri^-1(x).
+*--RiemannR-inverse*::
+	Approximate the nth prime using RiemannR^-1(x).
 
 *-s, --status*[='NUM']::
 	Show the computation progress e.g. 1%, 2%, 3%, ... Show 'NUM' digits after the decimal point: *--status=1* prints 99.9%.
