@@ -1,16 +1,16 @@
 ///
-/// @file   cmdoptions.cpp
+/// @file   CmdOptions.cpp
 /// @brief  Command-line option handling for the primecount
 ///         command-line application. The user's command-line options
-///         are first parsed in cmdoptions.cpp and stored in a
+///         are first parsed in CmdOptions.cpp and stored in a
 ///         CmdOptions object. Afterwards we execute the function
 ///         corresponding to the user's command-line options in the
 ///         main() function in main.cpp.
 ///
 ///         How to add a new command-line option:
 ///
-///         1) Add a new option enum in cmdoptions.h.
-///         2) Add your option to parseOptions() in cmdoptions.cpp.
+///         1) Add a new option enum in CmdOptions.h.
+///         2) Add your option to parseOptions() in CmdOptions.cpp.
 ///         3) Add your option to main() in main.cpp.
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primecount.txt (manpage).
@@ -21,8 +21,7 @@
 /// file in the top level directory.
 ///
 
-#include "cmdoptions.hpp"
-
+#include "CmdOptions.hpp"
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <Vector.hpp>
@@ -33,7 +32,6 @@
 #include <cstddef>
 #include <map>
 #include <string>
-#include <type_traits>
 #include <utility>
 
 namespace {
@@ -47,32 +45,6 @@ enum IsParam
   NO_PARAM,
   REQUIRED_PARAM,
   OPTIONAL_PARAM
-};
-
-/// Command-line option
-struct Option
-{
-  // Example:
-  // str = "--threads=32"
-  // opt = "--threads"
-  // val = "32"
-  std::string str;
-  std::string opt;
-  std::string val;
-
-  template <typename T>
-  T to() const
-  {
-    try {
-      if (std::is_floating_point<T>::value)
-        return (T) std::stod(val);
-      else
-        return (T) to_maxint(val);
-    }
-    catch (std::exception&) {
-      throw primecount_error("invalid option '" + opt + "=" + val + "'");
-    }
-  }
 };
 
 /// Options start with "-" or "--", then
@@ -96,16 +68,6 @@ bool isOption(const std::string& str)
     return true;
 
   return false;
-}
-
-void optionStatus(Option& opt,
-                  CmdOptions& opts)
-{
-  set_print(true);
-  opts.time = true;
-
-  if (!opt.val.empty())
-    set_status_precision(opt.to<int>());
 }
 
 /// Parse the next command-line option.
@@ -230,6 +192,28 @@ void help(int exitCode);
 void version();
 void test();
 
+void CmdOptions::setMainOption(OptionID optionID,
+                               const std::string& optStr)
+{
+  // Multiple main options are not allowed
+  if (!optionStr.empty())
+    throw primecount_error("incompatible options: " + optionStr + " " + optStr);
+  else
+  {
+    optionStr = optStr;
+    option = optionID;
+  }
+}
+
+void CmdOptions::optionStatus(Option& opt)
+{
+  set_print(true);
+  time = true;
+
+  if (!opt.val.empty())
+    set_status_precision(opt.to<int>());
+}
+
 CmdOptions parseOptions(int argc, char* argv[])
 {
   // No command-line options provided
@@ -312,11 +296,11 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
       case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
       case OPTION_HELP:    help(/* exitCode */ 0); break;
-      case OPTION_STATUS:  optionStatus(opt, opts); break;
+      case OPTION_STATUS:  opts.optionStatus(opt); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
       case OPTION_VERSION: version(); break;
-      default:             opts.option = optionID;
+      default:             opts.setMainOption(optionID, opt.str);
     }
   }
 

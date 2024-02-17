@@ -80,7 +80,7 @@ endif()
 
 # primecount binary source files #####################################
 
-set(BIN_SRC src/app/cmdoptions.cpp
+set(BIN_SRC src/app/CmdOptions.cpp
             src/app/main.cpp
             src/app/help.cpp
             src/app/test.cpp)

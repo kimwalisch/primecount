@@ -1,17 +1,22 @@
 ///
-/// @file  cmdoptions.hpp
+/// @file  CmdOptions.hpp
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#ifndef CMDOPTIONS_HPP
-#define CMDOPTIONS_HPP
+#ifndef CmdOptions_HPP
+#define CmdOptions_HPP
 
+#include <primecount.hpp>
+#include <primecount-internal.hpp>
 #include <int128_t.hpp>
+
 #include <stdint.h>
+#include <string>
+#include <type_traits>
 
 namespace primecount {
 
@@ -62,12 +67,43 @@ enum OptionID
   OPTION_VERSION
 };
 
+/// Command-line option
+struct Option
+{
+  // Example:
+  // str = "--threads=32"
+  // opt = "--threads"
+  // val = "32"
+  std::string str;
+  std::string opt;
+  std::string val;
+
+  template <typename T>
+  T to() const
+  {
+    try {
+      if (std::is_floating_point<T>::value)
+        return (T) std::stod(val);
+      else
+        return (T) to_maxint(val);
+    }
+    catch (std::exception&) {
+      throw primecount_error("invalid option '" + opt + "=" + val + "'");
+    }
+  }
+};
+
 struct CmdOptions
 {
+  std::string stressTestMode;
+  std::string optionStr;
+  int option = OPTION_DEFAULT;
   maxint_t x = -1;
   int64_t a = -1;
-  int option = OPTION_DEFAULT;
   bool time = false;
+
+  void setMainOption(OptionID optionID, const std::string& optStr);
+  void optionStatus(Option& opt);
 };
 
 CmdOptions parseOptions(int, char**);

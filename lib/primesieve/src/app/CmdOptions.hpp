@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef CMDOPTIONS_HPP
-#define CMDOPTIONS_HPP
+#ifndef CmdOptions_HPP
+#define CmdOptions_HPP
 
 #include <primesieve/calculator.hpp>
 #include <primesieve/primesieve_error.hpp>
