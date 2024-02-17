@@ -8,12 +8,12 @@
 ///         double type has 64 bits (e.g. MSVC & macOS) then RiemannR(x)
 ///         is accurate up to 10^15.
 ///
-///        We also include implementations based on the non standard
-///        __float128 type and libquadmath that can be enabled using
-///        'cmake -DWITH_FLOAT128=ON'. Currently __float128 support is
-///        disabled by default because there are warnings during
-///        compilation (using -Wpedantic) although the code works
-///        perfectly fine.
+///         We also include implementations based on the non standard
+///         __float128 type and libquadmath that can be enabled using
+///         'cmake -DWITH_FLOAT128=ON'. Currently __float128 support is
+///         disabled by default because there are warnings during
+///         compilation (using -Wpedantic) although the code works
+///         perfectly fine.
 ///
 ///         More details about this Riemann R function implementation:
 ///         https://github.com/kimwalisch/primesieve/pull/144
@@ -550,7 +550,7 @@ namespace primecount {
 int64_t RiemannR(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10)
     return (int64_t) ::RiemannR((__float128) x);
 #endif
 
@@ -560,7 +560,8 @@ int64_t RiemannR(int64_t x)
 int64_t RiemannR_inverse(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  double safetyThreshold = 4;
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10 - safetyThreshold)
   {
     __float128 res = ::RiemannR_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -583,7 +584,7 @@ int64_t RiemannR_inverse(int64_t x)
 int128_t RiemannR(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10)
     return (int128_t) ::RiemannR((__float128) x);
 #endif
 
@@ -593,7 +594,8 @@ int128_t RiemannR(int128_t x)
 int128_t RiemannR_inverse(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  double safetyThreshold = 4;
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10 - safetyThreshold)
   {
     __float128 res = ::RiemannR_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int128_t>::max())

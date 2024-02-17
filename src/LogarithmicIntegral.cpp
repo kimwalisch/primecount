@@ -226,7 +226,7 @@ namespace primecount {
 int64_t Li(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10)
     return (int64_t) ::Li((__float128) x);
 #endif
 
@@ -236,7 +236,8 @@ int64_t Li(int64_t x)
 int64_t Li_inverse(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  double safetyThreshold = 4;
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10 - safetyThreshold)
   {
     __float128 res = ::Li_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -259,7 +260,7 @@ int64_t Li_inverse(int64_t x)
 int128_t Li(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10)
     return (int128_t) ::Li((__float128) x);
 #endif
 
@@ -269,7 +270,8 @@ int128_t Li(int128_t x)
 int128_t Li_inverse(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e14)
+  double safetyThreshold = 4;
+  if (x > 1 && std::log10(x) >= std::numeric_limits<long double>::digits10 - safetyThreshold)
   {
     __float128 res = ::Li_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int128_t>::max())
