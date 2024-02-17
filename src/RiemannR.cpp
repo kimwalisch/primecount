@@ -550,7 +550,7 @@ namespace primecount {
 int64_t RiemannR(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e10 && std::log10(x) >= std::numeric_limits<long double>::digits10)
+  if (x > 1e10 && std::log2(x) >= std::numeric_limits<long double>::digits)
     return (int64_t) ::RiemannR((__float128) x);
 #endif
   return (int64_t) ::RiemannR((long double) x);
@@ -564,7 +564,7 @@ int64_t RiemannR_inverse(int64_t x)
     double logx = std::log(x);
     double n = (double) x * logx * logx * logx;
 
-    if (std::log10(n) >= std::numeric_limits<long double>::digits10)
+    if (std::log2(n) >= std::numeric_limits<long double>::digits)
     {
       __float128 res = ::RiemannR_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -587,7 +587,7 @@ int64_t RiemannR_inverse(int64_t x)
 int128_t RiemannR(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e10 && std::log10(x) >= std::numeric_limits<long double>::digits10)
+  if (x > 1e10 && std::log2(x) >= std::numeric_limits<long double>::digits)
     return (int128_t) ::RiemannR((__float128) x);
 #endif
   return (int128_t) ::RiemannR((long double) x);
@@ -601,7 +601,7 @@ int128_t RiemannR_inverse(int128_t x)
     double logx = std::log(x);
     double n = (double) x * logx * logx * logx;
 
-    if (std::log10(n) >= std::numeric_limits<long double>::digits10)
+    if (std::log2(n) >= std::numeric_limits<long double>::digits)
     {
       __float128 res = ::RiemannR_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int128_t>::max())
