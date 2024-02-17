@@ -10,11 +10,12 @@
 
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
-#include <imath.hpp>
 
 #include <stdint.h>
 #include <iostream>
+#include <algorithm>
 #include <cstdlib>
+#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -22,22 +23,27 @@ using std::max;
 using std::size_t;
 using namespace primecount;
 
-std::vector<int64_t> Ri_table =
+std::vector<int64_t> RiemannR_table =
 {
-                4, // RiemannR(10^1)
-               25, // RiemannR(10^2)
-              168, // RiemannR(10^3)
-             1226, // RiemannR(10^4)
-             9587, // RiemannR(10^5)
-            78527, // RiemannR(10^6)
-           664667, // RiemannR(10^7)
-          5761551, // RiemannR(10^8)
-         50847455, // RiemannR(10^9)
-        455050683, // RiemannR(10^10)
-     4118052494ll, // RiemannR(10^11)
-    37607910542ll, // RiemannR(10^12)
-   346065531065ll, // RiemannR(10^13)
-  3204941731601ll  // RiemannR(10^14)
+                     4, // RiemannR(10^1)
+                    25, // RiemannR(10^2)
+                   168, // RiemannR(10^3)
+                  1226, // RiemannR(10^4)
+                  9587, // RiemannR(10^5)
+                 78527, // RiemannR(10^6)
+                664667, // RiemannR(10^7)
+               5761551, // RiemannR(10^8)
+              50847455, // RiemannR(10^9)
+             455050683, // RiemannR(10^10)
+          4118052494ll, // RiemannR(10^11)
+         37607910542ll, // RiemannR(10^12)
+        346065531065ll, // RiemannR(10^13)
+       3204941731601ll, // RiemannR(10^14)
+      29844570495886ll, // RiemannR(10^15)
+     279238341360977ll, // RiemannR(10^16)
+    2623557157055978ll, // RiemannR(10^17)
+   24739954284239494ll, // RiemannR(10^18)
+  234057667300228940ll  // RiemannR(10^19)
 };
 
 void check(bool OK)
@@ -49,24 +55,32 @@ void check(bool OK)
 
 int main()
 {
-  for (size_t i = 0; i < Ri_table.size(); i++)
+  int64_t x = 1;
+  for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
-    int p = (int) i + 1;
-    int64_t x = ipow(10ll, p);
+    // The accuracy of RiemannR(x) depends on
+    // the width of the long double type.
+    if (i >= std::numeric_limits<long double>::digits10)
+      break;
+
+    x *= 10;
     std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
-    check(RiemannR(x) == Ri_table[i]);
+    check(RiemannR(x) == RiemannR_table[i]);
   }
 
-  for (size_t i = 0; i < Ri_table.size(); i++)
+  x = 1;
+  for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
-    int p = (int) i + 1;
-    int64_t x = ipow(10ll, p);
-    std::cout << "RiemannR_inverse(" << Ri_table[i] << ") = " << RiemannR_inverse(Ri_table[i]);
-    check(RiemannR_inverse(Ri_table[i]) < x &&
-          RiemannR_inverse(Ri_table[i] + 1) >= x);
-  }
+    // The accuracy of RiemannR(x) depends on
+    // the width of the long double type.
+    if (i >= std::numeric_limits<long double>::digits10)
+      break;
 
-  int64_t x;
+    x *= 10;
+    std::cout << "RiemannR_inverse(" << RiemannR_table[i] << ") = " << RiemannR_inverse(RiemannR_table[i]);
+    check(RiemannR_inverse(RiemannR_table[i]) < x &&
+          RiemannR_inverse(RiemannR_table[i] + 1) >= x);
+  }
 
   // Sanity checks for tiny values of RiemannR(x)
   for (x = 0; x < 10000; x++)
