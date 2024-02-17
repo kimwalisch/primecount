@@ -41,10 +41,10 @@ OPTIONS
 	Count primes using Meissel's formula.
 
 *--Li*::
-	Approximate pi(x) using the Eulerian logarithmic integral Li(x), with Li(x) = li(x) - li(2).
+	Approximate pi(x) using the Eulerian logarithmic integral: Li(x), with Li(x) = li(x) - li(2).
 
 *--Li-inverse*::
-	Approximate the nth prime using the inverse Eulerian logarithmic integral Li^-1(x).
+	Approximate the nth prime using the inverse Eulerian logarithmic integral: Li^-1(x).
 
 *-n, --nth-prime*::
 	Calculate the nth prime.
@@ -57,10 +57,10 @@ OPTIONS
 	any of the first a primes.
 
 *-R, --RiemannR*::
-	Approximate pi(x) using the Riemann R function.
+	Approximate pi(x) using the Riemann R function: R(x).
 
 *--RiemannR-inverse*::
-	Approximate the nth prime using RiemannR^-1(x).
+	Approximate the nth prime using the inverse Riemann R function: R^-1(x).
 
 *-s, --status*[='NUM']::
 	Show the computation progress e.g. 1%, 2%, 3%, ... Show 'NUM' digits after the decimal point: *--status=1* prints 99.9%.

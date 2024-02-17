@@ -37,7 +37,7 @@ void help(int exitCode)
     "      --phi <X> <A>        phi(x, a) counts the numbers <= x that are not\n"
     "                           divisible by any of the first a primes\n"
     "  -R, --RiemannR           Approximate pi(x) using the Riemann R function\n"
-    "      --RiemannR-inverse   Approximate the nth prime using RiemannR^-1(x)\n"
+    "      --RiemannR-inverse   Approximate the nth prime using R^-1(x)\n"
     "  -s, --status[=NUM]       Show computation progress 1%, 2%, 3%, ...\n"
     "                           Set digits after decimal point: -s1 prints 99.9%\n"
     "      --test               Run various correctness tests and exit\n"

@@ -107,7 +107,7 @@ Options:
       --phi <X> <A>        phi(x, a) counts the numbers <= x that are not
                            divisible by any of the first a primes
   -R, --RiemannR           Approximate pi(x) using the Riemann R function
-      --RiemannR-inverse   Approximate the nth prime using RiemannR^-1(x)
+      --RiemannR-inverse   Approximate the nth prime using R^-1(x)
   -s, --status[=NUM]       Show computation progress 1%, 2%, 3%, ...
                            Set digits after decimal point: -s1 prints 99.9%
       --test               Run various correctness tests and exit
@@ -124,22 +124,22 @@ Options:
 ```
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha=NUM        Set tuning factor: y = x^(1/3) * alpha
-      --P2               Compute the 2nd partial sieve function
-      --S1               Compute the ordinary leaves
-      --S2-trivial       Compute the trivial special leaves
-      --S2-easy          Compute the easy special leaves
-      --S2-hard          Compute the hard special leaves
+  -a, --alpha=NUM          Set tuning factor: y = x^(1/3) * alpha
+      --P2                 Compute the 2nd partial sieve function
+      --S1                 Compute the ordinary leaves
+      --S2-trivial         Compute the trivial special leaves
+      --S2-easy            Compute the easy special leaves
+      --S2-hard            Compute the hard special leaves
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y=NUM      Set tuning factor: y = x^(1/3) * alpha_y
-      --alpha-z=NUM      Set tuning factor: z = y * alpha_z
-      --AC               Compute the A + C formulas
-      --B                Compute the B formula
-      --D                Compute the D formula
-      --Phi0             Compute the Phi0 formula
-      --Sigma            Compute the 7 Sigma formulas
+      --alpha-y=NUM        Set tuning factor: y = x^(1/3) * alpha_y
+      --alpha-z=NUM        Set tuning factor: z = y * alpha_z
+      --AC                 Compute the A + C formulas
+      --B                  Compute the B formula
+      --D                  Compute the D formula
+      --Phi0               Compute the Phi0 formula
+      --Sigma              Compute the 7 Sigma formulas
 ```
 
 </details>
