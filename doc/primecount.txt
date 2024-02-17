@@ -41,10 +41,10 @@ OPTIONS
 	Count primes using Meissel's formula.
 
 *--Li*::
-	Approximate pi(x) using the logarithmic integral.
+	Approximate pi(x) using the Eulerian logarithmic integral Li(x), with Li(x) = li(x) - li(2).
 
 *--Li-inverse*::
-	Approximate the nth prime using Li^-1(x).
+	Approximate the nth prime using the inverse Eulerian logarithmic integral Li^-1(x).
 
 *-n, --nth-prime*::
 	Calculate the nth prime.

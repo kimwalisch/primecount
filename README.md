@@ -100,7 +100,7 @@ Options:
       --lehmer             Count primes using Lehmer's formula
       --lmo                Count primes using Lagarias-Miller-Odlyzko
   -m, --meissel            Count primes using Meissel's formula
-      --Li                 Approximate pi(x) using the logarithmic integral
+      --Li                 Eulerian logarithmic integral function
       --Li-inverse         Approximate the nth prime using Li^-1(x)
   -n, --nth-prime          Calculate the nth prime
   -p, --primesieve         Count primes using the sieve of Eratosthenes

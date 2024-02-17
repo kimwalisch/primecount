@@ -1,6 +1,6 @@
 ///
 /// @file   Li.cpp
-/// @brief  Test the offset logarithmic integral function.
+/// @brief  Test the Eulerian logarithmic integral function.
 ///         Li(x) = li(x) - li(2)
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>

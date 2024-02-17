@@ -30,7 +30,7 @@ void help(int exitCode)
     "      --lehmer             Count primes using Lehmer's formula\n"
     "      --lmo                Count primes using Lagarias-Miller-Odlyzko\n"
     "  -m, --meissel            Count primes using Meissel's formula\n"
-    "      --Li                 Approximate pi(x) using the logarithmic integral\n"
+    "      --Li                 Eulerian logarithmic integral function\n"
     "      --Li-inverse         Approximate the nth prime using Li^-1(x)\n"
     "  -n, --nth-prime          Calculate the nth prime\n"
     "  -p, --primesieve         Count primes using the sieve of Eratosthenes\n"

@@ -73,7 +73,7 @@ long double li(long double x)
   return gamma + std::log(logx) + std::sqrt(x) * sum;
 }
 
-/// Calculate the offset logarithmic integral which is a very
+/// Calculate the Eulerian logarithmic integral which is a very
 /// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
@@ -87,7 +87,7 @@ long double Li(long double x)
     return li(x) - li2;
 }
 
-/// Calculate the inverse offset logarithmic integral which
+/// Calculate the inverse Eulerian logarithmic integral which
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
@@ -166,7 +166,7 @@ __float128 li(__float128 x)
   return gamma + logq(logx) + sqrtq(x) * sum;
 }
 
-/// Calculate the offset logarithmic integral which is a very
+/// Calculate the Eulerian logarithmic integral which is a very
 /// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
@@ -180,7 +180,7 @@ __float128 Li(__float128 x)
     return li(x) - li2;
 }
 
-/// Calculate the inverse offset logarithmic integral which
+/// Calculate the inverse Eulerian logarithmic integral which
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
