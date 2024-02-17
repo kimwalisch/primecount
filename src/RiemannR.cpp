@@ -550,7 +550,8 @@ namespace primecount {
 int64_t RiemannR(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e10 && std::log2(x) >= std::numeric_limits<long double>::digits)
+  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
+  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits - 3)
     return (int64_t) ::RiemannR((__float128) x);
 #endif
   return (int64_t) ::RiemannR((long double) x);
@@ -587,7 +588,8 @@ int64_t RiemannR_inverse(int64_t x)
 int128_t RiemannR(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  if (x > 1e10 && std::log2(x) >= std::numeric_limits<long double>::digits)
+  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
+  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits - 3)
     return (int128_t) ::RiemannR((__float128) x);
 #endif
   return (int128_t) ::RiemannR((long double) x);
