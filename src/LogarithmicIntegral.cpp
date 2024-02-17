@@ -240,8 +240,9 @@ int64_t Li_inverse(int64_t x)
   {
     double logx = std::log(x);
     double n = (double) x * logx * logx * logx;
+    double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
 
-    if (std::log2(n) >= std::numeric_limits<long double>::digits)
+    if (std::log2(n) >= long_double_mantissa_bits)
     {
       __float128 res = ::Li_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -278,8 +279,9 @@ int128_t Li_inverse(int128_t x)
   {
     double logx = std::log(x);
     double n = (double) x * logx * logx * logx;
+    double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
 
-    if (std::log2(n) >= std::numeric_limits<long double>::digits)
+    if (std::log2(n) >= long_double_mantissa_bits)
     {
       __float128 res = ::Li_inverse((__float128) x);
       if (res > (__float128) std::numeric_limits<int128_t>::max())
