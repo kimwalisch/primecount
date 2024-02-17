@@ -4,6 +4,7 @@ Changes in primecount-7.11, 2024-02-17
   https://github.com/kimwalisch/primesieve/pull/144
 * Renamed option --Ri to: -R or --RiemannR.
 * Renamed option --Ri-inverse to: --RiemannR-inverse.
+* CmdOptions.cpp: Detect incompatible options.
 * Updated to latest primesieve-12.0 library.
 
 Changes in primecount-7.10, 2024-01-08
