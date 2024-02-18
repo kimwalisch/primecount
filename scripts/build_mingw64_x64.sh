@@ -61,9 +61,9 @@ make
 strip primecount.exe
 
 # Create a release zip archive
-wget https://github.com/kimwalisch/primecount/releases/download/v6.1/primecount-6.1-win64.zip
-unzip primecount-6.1-win64.zip -d primecount-$VERSION-win-x64
-rm primecount-6.1-win64.zip
+wget https://github.com/kimwalisch/primecount/releases/download/v7.11/primecount-7.11-win64.zip
+unzip primecount-7.11-win64.zip -d primecount-$VERSION-win-x64
+rm primecount-7.11-win64.zip
 
 echo ""
 echo ""
