@@ -6,12 +6,12 @@
 ///        nth prime.
 ///
 ///        Note that these implementations are only accurate up to
-///        about 10^19 (if the long double type has 80 bits). We
-///        also include implementations based on the non standard
-///        __float128 type and libquadmath that can be enabled using
-///        'cmake -DWITH_FLOAT128=ON'. Currently __float128 support
-///        is disabled by default because there are warnings during
-///        compilation (using -Wpedantic) although the code
+///        10^18 (if the long double type has 80 bits). We also
+///        include implementations based on the non standard
+///        __float128 type and libquadmath that can be enabled
+///        using 'cmake -DWITH_FLOAT128=ON'. Currently __float128
+///        support is disabled by default because there are warnings
+///        during compilation (using -Wpedantic) although the code
 ///        works perfectly fine.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
