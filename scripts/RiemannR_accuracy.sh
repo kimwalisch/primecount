@@ -26,7 +26,7 @@ do
             n="${x}e$p-10703*$i"
             res128=$(./primecount "$n" -R);
             res=$(../build/./primecount "$n" -R);
-            if [ "$res" -ne "$res128" ]
+            if [ "$res" != "$res128" ]
             then
                 echo "$n: $res128 (float128) != $res (long double)";
                 break;
