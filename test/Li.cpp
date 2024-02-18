@@ -18,6 +18,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <limits>
+#include <sstream>
+#include <string>
 #include <vector>
 
 using std::max;
@@ -43,6 +45,26 @@ std::vector<int64_t> Li_table =
       29844571475286ll  // Li(10^15)
 };
 
+#if defined(HAVE_FLOAT128)
+
+std::vector<std::string> Li_f128 =
+{
+             "234057667376222381", // Li(10^19)
+            "2220819602783663482", // Li(20^20)
+           "21127269486616126181", // Li(20^21)
+          "201467286691248261497", // Li(20^22)
+         "1925320391614054155137", // Li(20^23)
+        "18435599767366347775143", // Li(20^24)
+       "176846309399198930392618", // Li(20^25)
+      "1699246750872593033005722", // Li(20^26)
+     "16352460426842189113085404", // Li(20^27)
+    "157589269275974838158399970", // Li(20^28)
+   "1520698109714276717287880526", // Li(20^29)
+  "14692398897720447639079087668"  // Li(20^30)
+};
+
+#endif
+
 void check(bool OK)
 {
   std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
@@ -59,6 +81,21 @@ int main()
     std::cout << "Li(" << x << ") = " << Li(x);
     check(Li(x) == Li_table[i]);
   }
+
+#if defined(HAVE_FLOAT128) && \
+    defined(HAVE_INT128_T)
+
+  for (size_t i = 0; i < Li_f128.size(); i++)
+  {
+    int p = 19 + (int) i;
+    int128_t x = ipow((int128_t) 10, p);
+    std::ostringstream oss;
+    oss << Li(x);
+    std::cout << "Li(" << x << ") = " << oss.str();
+    check(oss.str() == Li_f128[i]);
+  }
+
+#endif
 
   for (size_t i = 0; i < Li_table.size(); i++)
   {
