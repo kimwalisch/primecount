@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-using std::max;
 using std::size_t;
 using namespace primecount;
 
@@ -77,7 +76,6 @@ void check(bool OK)
 
 int main()
 {
-  int64_t x = 1;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -85,7 +83,7 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
-    x *= 10;
+    int64_t x = ipow(10ll, 1 + (int) i);
     std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
     check(RiemannR(x) == RiemannR_table[i]);
   }
@@ -93,19 +91,17 @@ int main()
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
-  int128_t x128 = ipow((int128_t) 10, 19);
   for (size_t i = 0; i < RiemannR_f128.size(); i++)
   {
+    int128_t x = ipow((int128_t) 10, 19 + (int) i);
     std::ostringstream oss;
-    oss << RiemannR(x128);
-    std::cout << "RiemannR(" << x128 << ") = " << oss.str();
+    oss << RiemannR(x);
+    std::cout << "RiemannR(" << x << ") = " << oss.str();
     check(oss.str() == RiemannR_f128[i]);
-    x128 *= 10;
   }
 
 #endif
 
-  x = 1;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -113,17 +109,18 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
-    x *= 10;
+    int64_t x = ipow(10ll, 1 + (int) i);
     std::cout << "RiemannR_inverse(" << RiemannR_table[i] << ") = " << RiemannR_inverse(RiemannR_table[i]);
     check(RiemannR_inverse(RiemannR_table[i]) < x &&
           RiemannR_inverse(RiemannR_table[i] + 1) >= x);
   }
 
   // Sanity checks for tiny values of RiemannR(x)
+  int64_t x;
   for (x = 0; x < 10000; x++)
   {
     int64_t rix = RiemannR(x);
-    double logx = std::log(max((double) x, 2.0));
+    double logx = std::log(std::max((double) x, 2.0));
 
     if (rix < 0 ||
         (x >= 20 && rix < x / logx) ||
@@ -138,7 +135,7 @@ int main()
   for (; x < 100000; x += 101)
   {
     int64_t rix = RiemannR(x);
-    double logx = std::log(max((double) x, 2.0));
+    double logx = std::log(std::max((double) x, 2.0));
 
     if (rix < 0 ||
         (x >= 20 && rix < x / logx) ||
