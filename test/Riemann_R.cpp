@@ -9,6 +9,7 @@
 ///
 
 #include <primecount-internal.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
@@ -17,6 +18,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <limits>
+#include <sstream>
+#include <string>
 #include <vector>
 
 using std::max;
@@ -42,9 +45,28 @@ std::vector<int64_t> RiemannR_table =
       29844570495886ll, // RiemannR(10^15)
      279238341360977ll, // RiemannR(10^16)
     2623557157055978ll, // RiemannR(10^17)
-   24739954284239494ll, // RiemannR(10^18)
-  234057667300228940ll  // RiemannR(10^19)
+   24739954284239494ll  // RiemannR(10^18)
 };
+
+#if defined(HAVE_FLOAT128)
+
+std::vector<std::string> RiemannR_f128 =
+{
+             "234057667300228940", // RiemannR(10^19)
+            "2220819602556027015", // RiemannR(10^20)
+           "21127269485932299723", // RiemannR(10^21)
+          "201467286689188773625", // RiemannR(10^22)
+         "1925320391607837268776", // RiemannR(10^23)
+        "18435599767347541878146", // RiemannR(10^24)
+       "176846309399141934626965", // RiemannR(10^25)
+      "1699246750872419991992147", // RiemannR(10^26)
+     "16352460426841662910939464", // RiemannR(10^27)
+    "157589269275973235652219770", // RiemannR(10^28)
+   "1520698109714271830281953370", // RiemannR(10^29)
+  "14692398897720432716641650390"  // RiemannR(10^30)
+};
+
+#endif
 
 void check(bool OK)
 {
@@ -55,7 +77,7 @@ void check(bool OK)
 
 int main()
 {
-  int64_t x = 1;
+  int64_t x = 10;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -63,12 +85,27 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
-    x *= 10;
     std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
     check(RiemannR(x) == RiemannR_table[i]);
+    x *= 10;
   }
 
-  x = 1;
+#if defined(HAVE_FLOAT128) && \
+    defined(HAVE_INT128_T)
+
+  int128_t x128 = ipow((int128_t) 10, 19);
+  for (size_t i = 0; i < RiemannR_f128.size(); i++)
+  {
+    std::ostringstream oss;
+    oss << RiemannR(x128);
+    std::cout << "RiemannR(" << x128 << ") = " << oss.str();
+    check(oss.str() == RiemannR_f128[i]);
+    x128 *= 10;
+  }
+
+#endif
+
+  x = 10;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -76,10 +113,10 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
-    x *= 10;
     std::cout << "RiemannR_inverse(" << RiemannR_table[i] << ") = " << RiemannR_inverse(RiemannR_table[i]);
     check(RiemannR_inverse(RiemannR_table[i]) < x &&
           RiemannR_inverse(RiemannR_table[i] + 1) >= x);
+    x *= 10;
   }
 
   // Sanity checks for tiny values of RiemannR(x)
