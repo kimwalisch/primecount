@@ -1,7 +1,7 @@
 ///
 /// @file  LogarithmicIntegral.cpp
-/// @brief The Logarithmic integral function is a very accurate
-///        approximation of PrimePi(x). The inverse Logarithmic
+/// @brief The logarithmic integral function is a very accurate
+///        approximation of PrimePi(x). The inverse logarithmic
 ///        integral function is a very accurate approximation of the
 ///        nth prime.
 ///
