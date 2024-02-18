@@ -77,7 +77,7 @@ void check(bool OK)
 
 int main()
 {
-  int64_t x = 10;
+  int64_t x = 1;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -85,9 +85,9 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
+    x *= 10;
     std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
     check(RiemannR(x) == RiemannR_table[i]);
-    x *= 10;
   }
 
 #if defined(HAVE_FLOAT128) && \
@@ -105,7 +105,7 @@ int main()
 
 #endif
 
-  x = 10;
+  x = 1;
   for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
     // The accuracy of RiemannR(x) depends on
@@ -113,10 +113,10 @@ int main()
     if (i >= std::numeric_limits<long double>::digits10)
       break;
 
+    x *= 10;
     std::cout << "RiemannR_inverse(" << RiemannR_table[i] << ") = " << RiemannR_inverse(RiemannR_table[i]);
     check(RiemannR_inverse(RiemannR_table[i]) < x &&
           RiemannR_inverse(RiemannR_table[i] + 1) >= x);
-    x *= 10;
   }
 
   // Sanity checks for tiny values of RiemannR(x)
