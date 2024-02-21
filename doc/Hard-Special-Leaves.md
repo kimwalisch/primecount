@@ -95,6 +95,20 @@ There are many known optimizations that can be used to speedup counting:
   the beginning of the sieve array for each leaf we resume counting from the last
   sieve index of the previous leaf.
 
+```C++
+/// Count the number of unsieved elements (1 bits) in
+/// the sieve array using the POPCNT instruction.
+uint64_t count(const uint64_t* sieve, uint64_t startIndex, uint64_t stopIndex)
+{
+  uint64_t cnt = 0;
+
+  for (uint64_t i = startIndex; i < stopIndex; i++)
+    cnt += __builtin_popcountll(sieve[i]);
+
+  return cnt;
+}
+```
+
 This alternative method with the 3 optimizations described above was used in
 primecount up to version 5.3 (January 2020). According to my benchmarks
 this method runs up to 3x faster than an implementation that uses the binary
