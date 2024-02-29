@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.27)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "12.0")
-set(PRIMESIEVE_SOVERSION "12.0.0")
+set(PRIMESIEVE_VERSION "12.1")
+set(PRIMESIEVE_SOVERSION "12.1.0")
 
 # Build options ######################################################
 
@@ -233,7 +233,7 @@ endif()
 
 if(BUILD_PRIMESIEVE)
     add_executable(primesieve ${BIN_SRC})
-    target_link_libraries(primesieve primesieve::primesieve)
+    target_link_libraries(primesieve primesieve::primesieve Threads::Threads)
     target_compile_features(primesieve PRIVATE cxx_auto_type)
     install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_BINDIR})
 
