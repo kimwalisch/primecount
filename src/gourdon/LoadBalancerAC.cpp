@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 namespace {
 
@@ -131,7 +132,9 @@ void LoadBalancerAC::print_status()
     if ((time - old) >= threshold)
     {
       time_ = time;
-      std::cout << "\rSegments: " << segment_nr_ << "/" << total_segments_ << std::flush;
+      std::ostringstream status;
+      status << "\rSegments: " << segment_nr_ << '/' << total_segments_;
+      std::cout << status.str() << std::flush;
     }
   }
 }
