@@ -5,6 +5,7 @@ Changes in primecount-7.11, 2024-02-29
 * Renamed option --Ri to: -R or --RiemannR.
 * Renamed option --Ri-inverse to: --RiemannR-inverse.
 * CmdOptions.cpp: Detect incompatible options.
+* PiTable.cpp: Increase cache size to 2 KiB.
 * Improve status output on Windows.
 * Updated to latest primesieve-12.0 library.
 
