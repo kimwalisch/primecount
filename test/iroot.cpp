@@ -2,7 +2,7 @@
 /// @file   iroot.cpp
 /// @brief  Test integer nth root function.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -60,7 +60,7 @@ int main()
     for (n = 0; n < 50000; n++)
     {
       res1 = iroot<6>(n);
-      res2 = std::pow((long double) n, 1.0L / 6);
+      res2 = std::sqrt(std::cbrt((long double) n));
       std::cout << "iroot<6>(" << n << ") = " << res1;
       check(res1 == (uint64_t) res2);
     }
@@ -144,7 +144,7 @@ int main()
     for (m = 0; m < 50000; m++)
     {
       res = iroot<6>(m);
-      res2 = std::pow((long double) m, 1.0L / 6);
+      res2 = std::sqrt(std::cbrt((long double) m));
       std::cout << "iroot<6>(" << m << ") = " << res;
       check(res == (int128_t) res2);
     }
