@@ -1,5 +1,6 @@
 Changes in primecount-7.11, 2024-03-09
 
+* test/iroot.cpp: Fix musl libc issue.
 * Faster RiemannR(x) and RiemannR_inverse(x) implementations.
   https://github.com/kimwalisch/primesieve/pull/144
 * Renamed option --Ri to: -R or --RiemannR.
