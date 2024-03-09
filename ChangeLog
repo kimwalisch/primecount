@@ -1,4 +1,4 @@
-Changes in primecount-7.11, 2024-02-29
+Changes in primecount-7.11, 2024-03-09
 
 * Faster RiemannR(x) and RiemannR_inverse(x) implementations.
   https://github.com/kimwalisch/primesieve/pull/144
@@ -7,7 +7,7 @@ Changes in primecount-7.11, 2024-02-29
 * CmdOptions.cpp: Detect incompatible options.
 * PiTable.cpp: Increase cache size to 2 KiB.
 * Improve status output on Windows.
-* Updated to latest primesieve-12.0 library.
+* Updated to latest primesieve-12.1 library.
 
 Changes in primecount-7.10, 2024-01-08
 
