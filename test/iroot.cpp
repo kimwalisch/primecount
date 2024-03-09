@@ -57,7 +57,10 @@ int main()
       check(res1 == (uint64_t) res2);
     }
 
-    for (n = 0; n < 50000; n++)
+    // For x^(1/6) the musl libc using -ffast-math is only accurate up to 4095.
+    // Note that our iroot<6>(x) implementation is always correct because
+    // we correct the result after the floating point computation.
+    for (n = 0; n < 4096; n++)
     {
       res1 = iroot<6>(n);
       res2 = std::sqrt(std::cbrt((long double) n));
@@ -141,7 +144,10 @@ int main()
       check(res == (int128_t) res2);
     }
 
-    for (m = 0; m < 50000; m++)
+    // For x^(1/6) the musl libc using -ffast-math is only accurate up to 4095.
+    // Note that our iroot<6>(x) implementation is always correct because
+    // we correct the result after the floating point computation.
+    for (m = 0; m < 4096; m++)
     {
       res = iroot<6>(m);
       res2 = std::sqrt(std::cbrt((long double) m));
