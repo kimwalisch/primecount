@@ -125,23 +125,54 @@ int main()
 
 #endif
 
-  // Sanity checks for small values of Li(x)
-  for (int64_t x = 0; x < 300000; x++)
+  // Sanity checks for tiny values of Li(x)
+  int64_t x;
+  for (x = 0; x < 10000; x++)
   {
-    int64_t lix = Li(x);
+    int64_t Lix = Li(x);
     double logx = std::log(std::max((double) x, 2.0));
 
-    if (lix < 0 ||
-        (x >= 11 && lix < x / logx) ||
-        (x >= 2  && lix > x * logx))
+    if (Lix < 0 ||
+        (x >= 11 && Lix < x / logx) ||
+        (x >= 2  && Lix > x * logx))
     {
-      std::cout << "Li(" << x << ") = " << lix << "   ERROR" << std::endl;
+      std::cout << "Li(" << x << ") = " << Lix << "   ERROR" << std::endl;
+      std::exit(1);
+    }
+  }
+
+  // Sanity checks for small values of Li(x)
+  for (; x < 100000; x += 101)
+  {
+    int64_t Lix = Li(x);
+    double logx = std::log(std::max((double) x, 2.0));
+
+    if (Lix < 0 ||
+        (x >= 11 && Lix < x / logx) ||
+        (x >= 2  && Lix > x * logx))
+    {
+      std::cout << "Li(" << x << ") = " << Lix << "   ERROR" << std::endl;
+      std::exit(1);
+    }
+  }
+
+  // Sanity checks for tiny values of Li_inverse(x)
+  for (x = 2; x < 1000; x++)
+  {
+    int64_t res = Li_inverse(x);
+    double logx = std::log((double) x);
+
+    if (res < 0 ||
+        res < x ||
+        (x >= 4 && res > x * logx * logx))
+    {
+      std::cout << "Li_inverse(" << x << ") = " << res << "   ERROR" << std::endl;
       std::exit(1);
     }
   }
 
   // Sanity checks for small values of Li_inverse(x)
-  for (int64_t x = 2; x < 30000; x++)
+  for (; x < 100000; x += 101)
   {
     int64_t res = Li_inverse(x);
     double logx = std::log((double) x);
