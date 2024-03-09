@@ -550,20 +550,29 @@ namespace primecount {
 int64_t RiemannR(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
-
-  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits / 1.35)
+  // The accuracy of our implementation depends on the precision (number
+  // of bits) of the long double type and the accuracy of the math
+  // functions from the libc. Since there are many different libc's with
+  // varying accuracy, it is impossible to know the exact threshold for
+  // when we should switch to __float128. But 1e14 seems to work well in
+  // practice.
+  if (x > 1e14)
     return (int64_t) ::RiemannR((__float128) x);
 #endif
+
   return (int64_t) ::RiemannR((long double) x);
 }
 
 int64_t RiemannR_inverse(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
-
-  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits / 1.35)
+  // The accuracy of our implementation depends on the precision (number
+  // of bits) of the long double type and the accuracy of the math
+  // functions from the libc. Since there are many different libc's with
+  // varying accuracy, it is impossible to know the exact threshold for
+  // when we should switch to __float128. But 1e14 seems to work well in
+  // practice.
+  if (x > 1e14)
   {
     __float128 res = ::RiemannR_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int64_t>::max())
@@ -574,6 +583,8 @@ int64_t RiemannR_inverse(int64_t x)
 #endif
 
   long double res = ::RiemannR_inverse((long double) x);
+
+  // Prevent integer overflow
   if (res > (long double) std::numeric_limits<int64_t>::max())
     return std::numeric_limits<int64_t>::max();
   else
@@ -585,20 +596,17 @@ int64_t RiemannR_inverse(int64_t x)
 int128_t RiemannR(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
-
-  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits / 1.35)
+  if (x > 1e14)
     return (int128_t) ::RiemannR((__float128) x);
 #endif
+
   return (int128_t) ::RiemannR((long double) x);
 }
 
 int128_t RiemannR_inverse(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
-  double long_double_mantissa_bits = std::numeric_limits<long double>::digits;
-
-  if (x > 1e10 && std::log2(x) >= long_double_mantissa_bits / 1.35)
+  if (x > 1e14)
   {
     __float128 res = ::RiemannR_inverse((__float128) x);
     if (res > (__float128) std::numeric_limits<int128_t>::max())
@@ -609,6 +617,8 @@ int128_t RiemannR_inverse(int128_t x)
 #endif
 
   long double res = ::RiemannR_inverse((long double) x);
+
+  // Prevent integer overflow
   if (res > (long double) std::numeric_limits<int128_t>::max())
     return std::numeric_limits<int128_t>::max();
   else
