@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <cmath>
 #include <cstdlib>
 
 using namespace primecount;
@@ -27,169 +26,160 @@ void check(bool OK)
 
 int main()
 {
-  uint64_t n;
-  uint64_t res1;
-  double res2;
-
-  if (sizeof(long double) > 8)
   {
-    for (n = 0; n < 50000; n++)
+    uint64_t n;
+    uint64_t res;
+    uint64_t root;
+
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res1 = iroot<2>(n);
-      res2 = std::sqrt((long double) n);
-      std::cout << "iroot<2>(" << n << ") = " << res1;
-      check(res1 == (uint64_t) res2);
+      res = iroot<2>(n);
+      if ((root+1) * (root+1) == n) root++;
+      std::cout << "iroot<2>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    for (n = 0; n < 50000; n++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res1 = iroot<3>(n);
-      res2 = std::cbrt((long double) n);
-      std::cout << "iroot<3>(" << n << ") = " << res1;
-      check(res1 == (uint64_t) res2);
+      res = iroot<3>(n);
+      if ((root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<3>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    for (n = 0; n < 50000; n++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res1 = iroot<4>(n);
-      res2 = std::pow((long double) n, 1.0L / 4);
-      std::cout << "iroot<4>(" << n << ") = " << res1;
-      check(res1 == (uint64_t) res2);
+      res = iroot<4>(n);
+      if ((root+1) * (root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<4>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    // For x^(1/6) the musl libc using -ffast-math is only accurate up to 4095.
-    // Note that our iroot<6>(x) implementation is always correct because
-    // we correct the result after the floating point computation.
-    for (n = 0; n < 4096; n++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res1 = iroot<6>(n);
-      res2 = std::sqrt(std::cbrt((long double) n));
-      std::cout << "iroot<6>(" << n << ") = " << res1;
-      check(res1 == (uint64_t) res2);
+      res = iroot<6>(n);
+      if ((root+1) * (root+1) * (root+1) * (root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<6>(" << n << ") = " << res;
+      check(res == root);
     }
-  }
 
-  n = 18446744073709551615ull;
-  res1 = iroot<2>(n);
-  std::cout << "iroot<2>(" << n << ") = " << res1;
-  check(res1 == 4294967295ull);
+    n = 18446744073709551615ull;
+    res = iroot<2>(n);
+    std::cout << "iroot<2>(" << n << ") = " << res;
+    check(res == 4294967295ull);
 
-  n = 18446744073709551615ull;
-  res1 = iroot<3>(n);
-  std::cout << "iroot<3>(" << n << ") = " << res1;
-  check(res1 == 2642245);
+    n = 18446744073709551615ull;
+    res = iroot<3>(n);
+    std::cout << "iroot<3>(" << n << ") = " << res;
+    check(res == 2642245);
 
-  for (uint64_t i = 2000000; i <= 2050000; i++)
-  {
-    n = ipow<3>(i);
-    res1 = iroot<3>(n);
-    std::cout << "iroot<3>(" << n << ") = " << res1;
-    check(res1 == i);
+    for (uint64_t i = 2000000; i <= 2050000; i++)
+    {
+      n = ipow<3>(i);
+      res = iroot<3>(n);
+      std::cout << "iroot<3>(" << n << ") = " << res;
+      check(res == i);
 
-    res1 = iroot<3>(n - 1);
-    std::cout << "iroot<3>(" << n - 1 << ") = " << res1;
-    check(res1 == i - 1);
-  }
+      res = iroot<3>(n - 1);
+      std::cout << "iroot<3>(" << n - 1 << ") = " << res;
+      check(res == i - 1);
+    }
 
-  n = 18446744073709551615ull;
-  res1 = iroot<4>(n);
-  std::cout << "iroot<4>(" << n << ") = " << res1;
-  check(res1 == 65535);
+    n = 18446744073709551615ull;
+    res = iroot<4>(n);
+    std::cout << "iroot<4>(" << n << ") = " << res;
+    check(res == 65535);
 
-  n = 18446744073709551615ull;
-  res1 = iroot<6>(n);
-  std::cout << "iroot<6>(" << n << ") = " << res1;
-  check(res1 == 1625);
+    n = 18446744073709551615ull;
+    res = iroot<6>(n);
+    std::cout << "iroot<6>(" << n << ") = " << res;
+    check(res == 1625);
 
-  for (uint64_t i = 1; i <= 1625; i++)
-  {
-    n = ipow<6>(i);
-    res1 = iroot<6>(n);
-    std::cout << "iroot<6>(" << n << ") = " << res1;
-    check(res1 == i);
+    for (uint64_t i = 1; i <= 1625; i++)
+    {
+      n = ipow<6>(i);
+      res = iroot<6>(n);
+      std::cout << "iroot<6>(" << n << ") = " << res;
+      check(res == i);
 
-    res1 = iroot<6>(n - 1);
-    std::cout << "iroot<6>(" << n - 1 << ") = " << res1;
-    check(res1 == i - 1);
+      res = iroot<6>(n - 1);
+      std::cout << "iroot<6>(" << n - 1 << ") = " << res;
+      check(res == i - 1);
+    }
   }
 
 #ifdef HAVE_INT128_T
-
-  int128_t m;
-  int128_t res;
-
-  if (sizeof(long double) > 8)
   {
-    for (m = 0; m < 50000; m++)
+    int128_t n;
+    int128_t res;
+    int128_t root;
+
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res = iroot<2>(m);
-      res2 = std::sqrt((long double) m);
-      std::cout << "iroot<2>(" << m << ") = " << res;
-      check(res == (int128_t) res2);
+      res = iroot<2>(n);
+      if ((root+1) * (root+1) == n) root++;
+      std::cout << "iroot<2>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    for (m = 0; m < 50000; m++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res = iroot<3>(m);
-      res2 = std::cbrt((long double) m);
-      std::cout << "iroot<3>(" << m << ") = " << res;
-      check(res == (int128_t) res2);
+      res = iroot<3>(n);
+      if ((root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<3>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    for (m = 0; m < 50000; m++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res = iroot<4>(m);
-      res2 = std::pow((long double) m, 1.0L / 4);
-      std::cout << "iroot<4>(" << m << ") = " << res;
-      check(res == (int128_t) res2);
+      res = iroot<4>(n);
+      if ((root+1) * (root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<4>(" << n << ") = " << res;
+      check(res == root);
     }
 
-    // For x^(1/6) the musl libc using -ffast-math is only accurate up to 4095.
-    // Note that our iroot<6>(x) implementation is always correct because
-    // we correct the result after the floating point computation.
-    for (m = 0; m < 4096; m++)
+    for (root = 0, n = 0; n < 50000; n++)
     {
-      res = iroot<6>(m);
-      res2 = std::sqrt(std::cbrt((long double) m));
-      std::cout << "iroot<6>(" << m << ") = " << res;
-      check(res == (int128_t) res2);
+      res = iroot<6>(n);
+      if ((root+1) * (root+1) * (root+1) * (root+1) * (root+1) * (root+1) == n) root++;
+      std::cout << "iroot<6>(" << n << ") = " << res;
+      check(res == root);
     }
+
+    n = ipow<30>((int128_t) 10);
+    res = iroot<2>(n);
+    std::cout << "iroot<2>(" << n << ") = " << res;
+    check(res == ipow<15>(10ll));
+
+    res = iroot<2>(n - 1);
+    std::cout << "iroot<2>(" << n - 1 << ") = " << res;
+    check(res == ipow<15>(10ll) - 1);
+
+    res = iroot<3>(n);
+    std::cout << "iroot<3>(" << n << ") = " << res;
+    check(res == ipow<10>(10ll));
+
+    res = iroot<3>(n - 1);
+    std::cout << "iroot<3>(" << n - 1 << ") = " << res;
+    check(res == ipow<10>(10ll) - 1);
+
+    res = iroot<6>(n);
+    std::cout << "iroot<6>(" << n << ") = " << res;
+    check(res == ipow<5>(10));
+
+    res = iroot<6>(n - 1);
+    std::cout << "iroot<6>(" << n - 1 << ") = " << res;
+    check(res == ipow<5>(10) - 1);
+
+    n = ipow<28>((int128_t) 10);
+    res = iroot<4>(n);
+    std::cout << "iroot<4>(" << n << ") = " << res;
+    check(res == ipow<7>(10ll));
+
+    res = iroot<4>(n - 1);
+    std::cout << "iroot<4>(" << n - 1 << ") = " << res;
+    check(res == ipow<7>(10ll) - 1);
   }
-
-  m = ipow<30>((int128_t) 10);
-  res = iroot<2>(m);
-  std::cout << "iroot<2>(" << m << ") = " << res;
-  check(res == ipow<15>(10ll));
-
-  res = iroot<2>(m - 1);
-  std::cout << "iroot<2>(" << m - 1 << ") = " << res;
-  check(res == ipow<15>(10ll) - 1);
-
-  res = iroot<3>(m);
-  std::cout << "iroot<3>(" << m << ") = " << res;
-  check(res == ipow<10>(10ll));
-
-  res = iroot<3>(m - 1);
-  std::cout << "iroot<3>(" << m - 1 << ") = " << res;
-  check(res == ipow<10>(10ll) - 1);
-
-  res = iroot<6>(m);
-  std::cout << "iroot<6>(" << m << ") = " << res;
-  check(res == ipow<5>(10));
-
-  res = iroot<6>(m - 1);
-  std::cout << "iroot<6>(" << m - 1 << ") = " << res;
-  check(res == ipow<5>(10) - 1);
-
-  m = ipow<28>((int128_t) 10);
-  res = iroot<4>(m);
-  std::cout << "iroot<4>(" << m << ") = " << res;
-  check(res == ipow<7>(10ll));
-
-  res = iroot<4>(m - 1);
-  std::cout << "iroot<4>(" << m - 1 << ") = " << res;
-  check(res == ipow<7>(10ll) - 1);
-
 #endif
 
   std::cout << std::endl;
