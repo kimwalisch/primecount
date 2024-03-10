@@ -226,7 +226,7 @@ public:
   static maxint_t max()
   {
     maxint_t T_MAX = std::numeric_limits<T>::max();
-    return ipow(T_MAX - 1, 2) - 1;
+    return ipow<2>(T_MAX - 1) - 1;
   }
 
 private:

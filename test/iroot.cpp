@@ -81,7 +81,7 @@ int main()
 
   for (uint64_t i = 2000000; i <= 2050000; i++)
   {
-    n = ipow(i, 3);
+    n = ipow<3>(i);
     res1 = iroot<3>(n);
     std::cout << "iroot<3>(" << n << ") = " << res1;
     check(res1 == i);
@@ -103,7 +103,7 @@ int main()
 
   for (uint64_t i = 1; i <= 1625; i++)
   {
-    n = ipow(i, 6);
+    n = ipow<6>(i);
     res1 = iroot<6>(n);
     std::cout << "iroot<6>(" << n << ") = " << res1;
     check(res1 == i);
@@ -156,39 +156,39 @@ int main()
     }
   }
 
-  m = ipow((int128_t) 10, 30);
+  m = ipow<30>((int128_t) 10);
   res = iroot<2>(m);
   std::cout << "iroot<2>(" << m << ") = " << res;
-  check(res == ipow(10ll, 15));
+  check(res == ipow<15>(10ll));
 
   res = iroot<2>(m - 1);
   std::cout << "iroot<2>(" << m - 1 << ") = " << res;
-  check(res == ipow(10ll, 15) - 1);
+  check(res == ipow<15>(10ll) - 1);
 
   res = iroot<3>(m);
   std::cout << "iroot<3>(" << m << ") = " << res;
-  check(res == ipow(10ll, 10));
+  check(res == ipow<10>(10ll));
 
   res = iroot<3>(m - 1);
   std::cout << "iroot<3>(" << m - 1 << ") = " << res;
-  check(res == ipow(10ll, 10) - 1);
+  check(res == ipow<10>(10ll) - 1);
 
   res = iroot<6>(m);
   std::cout << "iroot<6>(" << m << ") = " << res;
-  check(res == ipow(10, 5));
+  check(res == ipow<5>(10));
 
   res = iroot<6>(m - 1);
   std::cout << "iroot<6>(" << m - 1 << ") = " << res;
-  check(res == ipow(10, 5) - 1);
+  check(res == ipow<5>(10) - 1);
 
-  m = ipow((int128_t) 10, 28);
+  m = ipow<28>((int128_t) 10);
   res = iroot<4>(m);
   std::cout << "iroot<4>(" << m << ") = " << res;
-  check(res == ipow(10ll, 7));
+  check(res == ipow<7>(10ll));
 
   res = iroot<4>(m - 1);
   std::cout << "iroot<4>(" << m - 1 << ") = " << res;
-  check(res == ipow(10ll, 7) - 1);
+  check(res == ipow<7>(10ll) - 1);
 
 #endif
 

@@ -124,12 +124,12 @@ int main()
   std::cout << "isqrt(" << x << ") = " << res3;
   check(res3 == 1125899906842623ll);
 
-  x = ipow((int128_t) 10, 31);
+  x = ipow<31>((int128_t) 10);
   res3 = isqrt(x);
   std::cout << "isqrt(" << x << ") = " << res3;
   check(res3 == 3162277660168379ll);
 
-  x = ipow((int128_t) 10, 30);
+  x = ipow<30>((int128_t) 10);
   res3 = isqrt(x);
   std::cout << "isqrt(" << x << ") = " << res3;
   check(res3 == 1000000000000000ll);

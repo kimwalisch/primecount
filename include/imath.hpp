@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -113,14 +113,33 @@ inline T ilog2(T x)
 #endif
 }
 
-template <typename T>
-inline T ipow(T x, int n)
+/// Recursively multiply x using template metaprogramming.
+/// Using this technique we can compute exponentiations without
+/// a for loop (which should guarantee optimal code).
+/// e.g. ipow<4>(x) = x * x * x * x.
+///
+template <typename T, int EXP>
+struct ipow_helper
 {
-  T r = 1;
-  for (int i = 0; i < n; i++)
-    r *= x;
+  static T ipow(T x)
+  {
+    return ipow_helper<T, EXP - 1>::ipow(x) * x;
+  }
+};
 
-  return r;
+template <typename T>
+struct ipow_helper<T, 0>
+{
+  static T ipow(T)
+  {
+    return 1;
+  }
+};
+
+template <int EXP, typename T>
+inline T ipow(T base)
+{
+  return ipow_helper<T, EXP>::ipow(base);
 }
 
 /// Integer nth root
@@ -136,11 +155,11 @@ inline T iroot(T x)
 
   // fix root too large
   for (; r > 0; r--)
-    if (ipow(r, N - 1) <= x / r)
+    if (ipow<N - 1>(r) <= x / r)
       break;
 
   // fix root too small
-  while (ipow(r + 1, N - 1) <= x / (r + 1))
+  while (ipow<N - 1>(r + 1) <= x / (r + 1))
     r += 1;
 
   return r;

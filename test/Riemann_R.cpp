@@ -77,46 +77,58 @@ void check(bool OK)
 
 int main()
 {
-  for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
-    int64_t x = ipow(10ll, 1 + (int) i);
-    std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
-    check(RiemannR(x) == RiemannR_table[i]);
+    int64_t x = 10;
+    for (size_t i = 0; i < RiemannR_table.size(); i++)
+    {
+      std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
+      check(RiemannR(x) == RiemannR_table[i]);
+      x *= 10;
+    }
   }
 
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
-  for (size_t i = 0; i < RiemannR_f128.size(); i++)
   {
-    int128_t x = ipow((int128_t) 10, 15 + (int) i);
-    std::ostringstream oss;
-    oss << RiemannR(x);
-    std::cout << "RiemannR(" << x << ") = " << oss.str();
-    check(oss.str() == RiemannR_f128[i]);
+    int128_t x = ipow<15>(x);
+    for (size_t i = 0; i < RiemannR_f128.size(); i++)
+    {
+      std::ostringstream oss;
+      oss << RiemannR(x);
+      std::cout << "RiemannR(" << x << ") = " << oss.str();
+      check(oss.str() == RiemannR_f128[i]);
+      x *= 10;
+    }
   }
 
 #endif
 
-  for (size_t i = 0; i < RiemannR_table.size(); i++)
   {
-    int64_t x = ipow(10ll, 1 + (int) i);
-    int64_t y = RiemannR_table[i];
-    std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
-    check(RiemannR_inverse(y) < x &&
-          RiemannR_inverse(y + 1) >= x);
+    int64_t x = 10;
+    for (size_t i = 0; i < RiemannR_table.size(); i++)
+    {
+      int64_t y = RiemannR_table[i];
+      std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
+      check(RiemannR_inverse(y) < x &&
+            RiemannR_inverse(y + 1) >= x);
+      x *= 10;
+    }
   }
 
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
-  for (size_t i = 0; i < RiemannR_f128.size(); i++)
   {
-    int128_t x = ipow((int128_t) 10, 15 + (int) i);
-    int128_t y = calculator::eval<int128_t>(RiemannR_f128[i]);
-    std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
-    check(RiemannR_inverse(y) < x &&
-          RiemannR_inverse(y + 1) >= x);
+    int128_t x = ipow<15>(x);
+    for (size_t i = 0; i < RiemannR_f128.size(); i++)
+    {
+      int128_t y = calculator::eval<int128_t>(RiemannR_f128[i]);
+      std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
+      check(RiemannR_inverse(y) < x &&
+            RiemannR_inverse(y + 1) >= x);
+      x *= 10;
+    }
   }
 
 #endif

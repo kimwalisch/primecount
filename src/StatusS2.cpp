@@ -12,7 +12,6 @@
 
 #include <StatusS2.hpp>
 #include <primecount-internal.hpp>
-#include <imath.hpp>
 #include <int128_t.hpp>
 
 #include <iostream>
@@ -56,8 +55,9 @@ namespace primecount {
 StatusS2::StatusS2(maxint_t x)
 {
   precision_ = get_status_precision(x);
-  int q = ipow(10, precision_);
-  epsilon_ = 1.0 / q;
+  epsilon_ = 1.0;
+  for (int i = 0; i < precision_; i++)
+    epsilon_ /= 10.0;
 }
 
 /// This method is used by S2_hard() and D().

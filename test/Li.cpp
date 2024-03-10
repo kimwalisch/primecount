@@ -77,50 +77,58 @@ void check(bool OK)
 
 int main()
 {
-  for (size_t i = 0; i < Li_table.size(); i++)
   {
-    int p = (int) i + 1;
-    int64_t x = ipow(10ll, p);
-    std::cout << "Li(" << x << ") = " << Li(x);
-    check(Li(x) == Li_table[i]);
+    int64_t x = 10;
+    for (size_t i = 0; i < Li_table.size(); i++)
+    {
+      std::cout << "Li(" << x << ") = " << Li(x);
+      check(Li(x) == Li_table[i]);
+      x *= 10;
+    }
   }
 
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
-  for (size_t i = 0; i < Li_f128.size(); i++)
   {
-    int p = 15 + (int) i;
-    int128_t x = ipow((int128_t) 10, p);
-    std::ostringstream oss;
-    oss << Li(x);
-    std::cout << "Li(" << x << ") = " << oss.str();
-    check(oss.str() == Li_f128[i]);
+    int128_t x = ipow<15>(x);
+    for (size_t i = 0; i < Li_f128.size(); i++)
+    {
+      std::ostringstream oss;
+      oss << Li(x);
+      std::cout << "Li(" << x << ") = " << oss.str();
+      check(oss.str() == Li_f128[i]);
+      x *= 10;
+    }
   }
 
 #endif
 
-  for (size_t i = 0; i < Li_table.size(); i++)
   {
-    int p = (int) i + 1;
-    int64_t x = ipow(10ll, p);
-    int64_t y = Li_table[i];
-    std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
-    check(Li_inverse(y) < x &&
-          Li_inverse(y + 1) >= x);
+    int64_t x = 10;
+    for (size_t i = 0; i < Li_table.size(); i++)
+    {
+      int64_t y = Li_table[i];
+      std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
+      check(Li_inverse(y) < x &&
+            Li_inverse(y + 1) >= x);
+      x *= 10;
+    }
   }
 
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
-  for (size_t i = 0; i < Li_f128.size(); i++)
   {
-    int p = (int) i + 15;
-    int128_t x = ipow((int128_t) 10, p);
-    int128_t y = calculator::eval<int128_t>(Li_f128[i]);
-    std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
-    check(Li_inverse(y) < x &&
-          Li_inverse(y + 1) >= x);
+    int128_t x = ipow<15>(x);
+    for (size_t i = 0; i < Li_f128.size(); i++)
+    {
+      int128_t y = calculator::eval<int128_t>(Li_f128[i]);
+      std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
+      check(Li_inverse(y) < x &&
+            Li_inverse(y + 1) >= x);
+      x *= 10;
+    }
   }
 
 #endif
