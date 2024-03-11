@@ -449,7 +449,6 @@ const primecount::Array<__float128, 128> zeta_f128 =
 /// Calculate the derivative of the Riemann R function.
 /// RiemannR'(x) = 1/x * \sum_{k=1}^{∞} ln(x)^(k-1) / (zeta(k + 1) * k!)
 ///
-template <>
 __float128 RiemannR_prime(__float128 x)
 {
   if (x < 0.1)
@@ -487,7 +486,6 @@ __float128 RiemannR_prime(__float128 x)
 /// The calculation is done with the Gram series:
 /// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
 ///
-template <>
 __float128 RiemannR(__float128 x)
 {
   if (x < 0.1)
@@ -523,7 +521,6 @@ __float128 RiemannR(__float128 x)
 /// zn+1 = zn - (f(zn) / f'(zn)).
 /// zn+1 = zn - (RiemannR(zn) - x) / RiemannR'(zn)
 ///
-template <>
 __float128 RiemannR_inverse(__float128 x)
 {
   if (x < 2)

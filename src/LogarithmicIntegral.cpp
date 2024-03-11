@@ -133,7 +133,6 @@ T Li_inverse(T x)
 /// Ramanujan's formula:
 /// https://en.wikipedia.org/wiki/Logarithmic_integral_function#Series_representation
 ///
-template <>
 __float128 li(__float128 x)
 {
   if (x <= 1)
@@ -174,7 +173,6 @@ __float128 li(__float128 x)
 /// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
-template <>
 __float128 Li(__float128 x)
 {
   __float128 li2 = 1.045163780117492784844588889194613136Q;
@@ -199,7 +197,6 @@ __float128 Li(__float128 x)
 /// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
 /// zn+1 = zn - (Li(zn) - x) * log(zn)
 ///
-template <>
 __float128 Li_inverse(__float128 x)
 {
   if (x < 2)
