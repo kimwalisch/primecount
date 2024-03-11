@@ -150,6 +150,8 @@ inline T iroot(T x)
 
   if (N == 3)
     r = (T) std::cbrt((double) x);
+  else if (N == 4)
+    r = (T) std::sqrt(std::sqrt((double) x));
   else
     r = (T) std::pow((double) x, 1.0 / N);
 
