@@ -37,19 +37,20 @@ namespace {
 /// Ramanujan's formula:
 /// https://en.wikipedia.org/wiki/Logarithmic_integral_function#Series_representation
 ///
-long double li(long double x)
+template <typename T>
+T li(T x)
 {
   if (x <= 1)
     return 0;
 
-  long double gamma = 0.577215664901532860606512090082402431L;
-  long double sum = 0;
-  long double inner_sum = 0;
-  long double factorial = 1;
-  long double p = -1;
-  long double q = 0;
-  long double power2 = 1;
-  long double logx = std::log(x);
+  T gamma = (T) 0.577215664901532860606512090082402431L;
+  T sum = 0;
+  T inner_sum = 0;
+  T factorial = 1;
+  T p = -1;
+  T q = 0;
+  T power2 = 1;
+  T logx = std::log(x);
   int k = 0;
 
   for (int n = 1; true; n++)
@@ -60,13 +61,13 @@ long double li(long double x)
     power2 *= 2;
 
     for (; k <= (n - 1) / 2; k++)
-      inner_sum += 1.0L / (2 * k + 1);
+      inner_sum += T(1.0) / (2 * k + 1);
 
     auto old_sum = sum;
     sum += (p / q) * inner_sum;
 
     // Not converging anymore
-    if (std::abs(sum - old_sum) < std::numeric_limits<long double>::epsilon())
+    if (std::abs(sum - old_sum) < std::numeric_limits<T>::epsilon())
       break;
   }
 
@@ -77,9 +78,10 @@ long double li(long double x)
 /// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
-long double Li(long double x)
+template <typename T>
+T Li(T x)
 {
-  long double li2 = 1.045163780117492784844588889194613136L;
+  const T li2 = (T) 1.045163780117492784844588889194613136L;
 
   if (x <= li2)
     return 0;
@@ -101,17 +103,18 @@ long double Li(long double x)
 /// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
 /// zn+1 = zn - (Li(zn) - x) * log(zn)
 ///
-long double Li_inverse(long double x)
+template <typename T>
+T Li_inverse(T x)
 {
   if (x < 2)
     return 0;
 
-  long double t = x * std::log(x);
-  long double old_term = std::numeric_limits<long double>::infinity();
+  T t = x * std::log(x);
+  T old_term = std::numeric_limits<T>::infinity();
 
   while (true)
   {
-    long double term = (Li(t) - x) * std::log(t);
+    T term = (Li(t) - x) * std::log(t);
 
     // Not converging anymore
     if (std::abs(term) >= std::abs(old_term))
@@ -130,6 +133,7 @@ long double Li_inverse(long double x)
 /// Ramanujan's formula:
 /// https://en.wikipedia.org/wiki/Logarithmic_integral_function#Series_representation
 ///
+template <>
 __float128 li(__float128 x)
 {
   if (x <= 1)
@@ -170,6 +174,7 @@ __float128 li(__float128 x)
 /// accurate approximation of the number of primes <= x.
 /// Li(x) > pi(x) for 24 <= x <= ~ 10^316
 ///
+template <>
 __float128 Li(__float128 x)
 {
   __float128 li2 = 1.045163780117492784844588889194613136Q;
@@ -194,6 +199,7 @@ __float128 Li(__float128 x)
 /// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
 /// zn+1 = zn - (Li(zn) - x) * log(zn)
 ///
+template <>
 __float128 Li_inverse(__float128 x)
 {
   if (x < 2)
@@ -219,6 +225,18 @@ __float128 Li_inverse(__float128 x)
 
 #endif
 
+template <typename FLOAT, typename T>
+T Li_inverse_overflow_check(T x)
+{
+  FLOAT res = Li_inverse((FLOAT) x);
+
+  // Prevent integer overflow
+  if (res > (FLOAT) std::numeric_limits<T>::max())
+    return std::numeric_limits<T>::max();
+  else
+    return (T) res;
+}
+
 } // namespace
 
 namespace primecount {
@@ -228,7 +246,7 @@ int64_t Li(int64_t x)
 #if defined(HAVE_FLOAT128)
   // The accuracy of our implementation depends on the precision (number
   // of bits) of the long double type and the accuracy of the math
-  // functions from the libc. Since there are many different libc's with
+  // functions from the libc. Since there are many different libc with
   // varying accuracy, it is impossible to know the exact threshold for
   // when we should switch to __float128. But 1e14 seems to work well in
   // practice.
@@ -236,35 +254,23 @@ int64_t Li(int64_t x)
     return (int64_t) ::Li((__float128) x);
 #endif
 
-  return (int64_t) ::Li((long double) x);
+  if (x > 1e8)
+    return (int64_t) ::Li((long double) x);
+  else
+    return (int64_t) ::Li((double) x);
 }
 
 int64_t Li_inverse(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
-  // The accuracy of our implementation depends on the precision (number
-  // of bits) of the long double type and the accuracy of the math
-  // functions from the libc. Since there are many different libc's with
-  // varying accuracy, it is impossible to know the exact threshold for
-  // when we should switch to __float128. But 1e14 seems to work well in
-  // practice.
   if (x > 1e14)
-  {
-    __float128 res = ::Li_inverse((__float128) x);
-    if (res > (__float128) std::numeric_limits<int64_t>::max())
-      return std::numeric_limits<int64_t>::max();
-    else
-      return (int64_t) res;
-  }
+    return Li_inverse_overflow_check<__float128>(x);
 #endif
 
-  long double res = ::Li_inverse((long double) x);
-
-  // Prevent integer overflow
-  if (res > (long double) std::numeric_limits<int64_t>::max())
-    return std::numeric_limits<int64_t>::max();
+  if (x > 1e8)
+    return Li_inverse_overflow_check<long double>(x);
   else
-    return (int64_t) res;
+    return Li_inverse_overflow_check<double>(x);
 }
 
 #ifdef HAVE_INT128_T
@@ -276,29 +282,23 @@ int128_t Li(int128_t x)
     return (int128_t) ::Li((__float128) x);
 #endif
 
-  return (int128_t) ::Li((long double) x);
+  if (x > 1e8)
+    return (int128_t) ::Li((long double) x);
+  else
+    return (int128_t) ::Li((double) x);
 }
 
 int128_t Li_inverse(int128_t x)
 {
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
-  {
-    __float128 res = ::Li_inverse((__float128) x);
-    if (res > (__float128) std::numeric_limits<int128_t>::max())
-      return std::numeric_limits<int128_t>::max();
-    else
-      return (int128_t) res;
-  }
+    return Li_inverse_overflow_check<__float128>(x);
 #endif
 
-  long double res = ::Li_inverse((long double) x);
-
-  // Prevent integer overflow
-  if (res > (long double) std::numeric_limits<int128_t>::max())
-    return std::numeric_limits<int128_t>::max();
+  if (x > 1e8)
+    return Li_inverse_overflow_check<long double>(x);
   else
-    return (int128_t) res;
+    return Li_inverse_overflow_check<double>(x);
 }
 
 #endif

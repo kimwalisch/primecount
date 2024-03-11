@@ -91,7 +91,7 @@ int main()
     defined(HAVE_INT128_T)
 
   {
-    int128_t x = ipow<15>(x);
+    int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < Li_f128.size(); i++)
     {
       std::ostringstream oss;
@@ -120,7 +120,7 @@ int main()
     defined(HAVE_INT128_T)
 
   {
-    int128_t x = ipow<15>(x);
+    int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < Li_f128.size(); i++)
     {
       int128_t y = calculator::eval<int128_t>(Li_f128[i]);
@@ -132,6 +132,30 @@ int main()
   }
 
 #endif
+
+  {
+    // Li(9760) = 1219.000098
+    int64_t x = 9760;
+    int64_t y = 1219;
+    std::cout << "Li(" << x << ") = " << Li(x);
+    check(Li(x) == y);
+
+    std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
+    check(Li_inverse(y) < x &&
+          Li_inverse(y + 1) >= x);
+  }
+
+  {
+    // Li(9494) = 1189.9997
+    int64_t x = 9494;
+    int64_t y = 1189;
+    std::cout << "Li(" << x << ") = " << Li(x);
+    check(Li(x) == y);
+
+    std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
+    check(Li_inverse(y) < x &&
+          Li_inverse(y + 1) >= x);
+  }
 
   // Sanity checks for tiny values of Li(x)
   int64_t x;

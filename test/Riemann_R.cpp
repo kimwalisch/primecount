@@ -91,7 +91,7 @@ int main()
     defined(HAVE_INT128_T)
 
   {
-    int128_t x = ipow<15>(x);
+    int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < RiemannR_f128.size(); i++)
     {
       std::ostringstream oss;
@@ -120,7 +120,7 @@ int main()
     defined(HAVE_INT128_T)
 
   {
-    int128_t x = ipow<15>(x);
+    int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < RiemannR_f128.size(); i++)
     {
       int128_t y = calculator::eval<int128_t>(RiemannR_f128[i]);
@@ -132,6 +132,30 @@ int main()
   }
 
 #endif
+
+  {
+    // RiemannR(9382) = 1159.99994
+    int64_t x = 9382;
+    int64_t y = 1159;
+    std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
+    check(RiemannR(x) == y);
+
+    std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
+    check(RiemannR_inverse(y) < x &&
+          RiemannR_inverse(y + 1) >= x);
+  }
+
+  {
+    // RiemannR(9557) = 1178.99908
+    int64_t x = 9557;
+    int64_t y = 1178;
+    std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
+    check(RiemannR(x) == y);
+
+    std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
+    check(RiemannR_inverse(y) < x &&
+          RiemannR_inverse(y + 1) >= x);
+  }
 
   // Sanity checks for tiny values of RiemannR(x)
   int64_t x;
