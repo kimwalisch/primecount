@@ -1,5 +1,7 @@
-Changes in primecount-7.11, 2024-03-09
+Changes in primecount-7.11, 2024-03-11
 
+* CMakeLists.txt: Detect Apple Silicon CPUs and disable libdivide since
+  Apple Silicon CPUs have very fast integer division instructions.
 * test/iroot.cpp: Fix musl libc issue.
 * test/Li.cpp: Speed up test.
 * Faster RiemannR(x) and RiemannR_inverse(x) implementations.

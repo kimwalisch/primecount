@@ -13,12 +13,36 @@ option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
 option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"            ON)
-option(WITH_LIBDIVIDE       "Use libdivide.h"                       ON)
-option(WITH_OPENMP          "Enable OpenMP multi-threading"         ON)
+option(WITH_POPCNT          "Use the POPCNT instruction"           ON)
+option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
-option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
+option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
+
+# Enable/Disable libdivide ###########################################
+
+# Historically, integer division has been one of the slowest
+# instructions on most CPU architectures. Hence by default we
+# enable libdivide which replaces expensive integer division
+# instructions by a sequence of shift, add and multiply
+# instructions which is often much faster.
+
+set(DEFAULT_LIBDIVIDE ON)
+
+# Apple Silicon CPUs first released in 2020 have very fast integer
+# division instructions. For Apple Silicon CPUs on Apple OSes
+# we disable libdivide to get the best performance.
+
+if(NOT WITH_LIBDIVIDE)
+    include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
+    if(Apple_ARM64)
+        set(DEFAULT_LIBDIVIDE OFF)
+    endif()
+endif()
+
+option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+
+######################################################################
 
 # When using WITH_DIV32=ON primecount checks at runtime
 # if 32-bit division can be used instead of 64-bit
