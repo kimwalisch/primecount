@@ -134,9 +134,9 @@ int main()
 #endif
 
   {
-    // RiemannR(9382) = 1159.99994
-    int64_t x = 9382;
-    int64_t y = 1159;
+    // RiemannR(8013) = 1010.00064
+    int64_t x = 8013;
+    int64_t y = 1010;
     std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
     check(RiemannR(x) == y);
 
