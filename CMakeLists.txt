@@ -42,13 +42,14 @@ endif()
 
 option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
 
-######################################################################
+# Option WITH_DIV32 ##################################################
 
 # When using WITH_DIV32=ON primecount checks at runtime
 # if 32-bit division can be used instead of 64-bit
 # division which improves performance on old x64 CPUs
 # (<= 2020). However Clang performs this optimization by
 # itself, so we can disable WITH_DIV32.
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "LLVM")
     option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" OFF)
 else()
