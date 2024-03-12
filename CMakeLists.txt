@@ -33,7 +33,7 @@ set(DEFAULT_LIBDIVIDE ON)
 # division instructions. For Apple Silicon CPUs on Apple OSes
 # we disable libdivide to get the best performance.
 
-if(NOT WITH_LIBDIVIDE)
+if(APPLE)
     include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
     if(Apple_ARM64)
         set(DEFAULT_LIBDIVIDE OFF)
