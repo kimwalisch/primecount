@@ -115,7 +115,7 @@ jobs:
         run: ./primecount 1e14 --gourdon
 
   linux_gcc_sanitizers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc
       CXX: g++
