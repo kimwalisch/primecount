@@ -236,7 +236,7 @@ T RiemannR_prime(T x)
       sum += term;
 
     // Not converging anymore
-    if (std::abs(old_sum - sum) <= epsilon)
+    if (std::abs(sum - old_sum) <= epsilon)
       break;
   }
 
@@ -272,7 +272,7 @@ T RiemannR(T x)
       sum += term / k;
 
     // Not converging anymore
-    if (std::abs(old_sum - sum) <= epsilon)
+    if (std::abs(sum - old_sum) <= epsilon)
       break;
   }
 
@@ -482,7 +482,7 @@ __float128 RiemannR_prime(__float128 x)
       sum += term;
 
     // Not converging anymore
-    if (std::abs(old_sum - sum) <= FLT128_EPSILON)
+    if (std::abs(sum - old_sum) <= FLT128_EPSILON)
       break;
   }
 
@@ -516,7 +516,7 @@ __float128 RiemannR(__float128 x)
       sum += term / k;
 
     // Not converging anymore
-    if (std::abs(old_sum - sum) <= FLT128_EPSILON)
+    if (std::abs(sum - old_sum) <= FLT128_EPSILON)
       break;
   }
 
