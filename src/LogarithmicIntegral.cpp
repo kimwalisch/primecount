@@ -53,7 +53,7 @@ T li(T x)
   T logx = std::log(x);
   int k = 0;
 
-  for (int n = 1; true; n++)
+  for (int n = 1; n < 1000; n++)
   {
     p *= -logx;
     factorial *= n;
@@ -67,7 +67,7 @@ T li(T x)
     sum += (p / q) * inner_sum;
 
     // Not converging anymore
-    if (std::abs(sum - old_sum) < std::numeric_limits<T>::epsilon())
+    if (std::abs(sum - old_sum) <= std::numeric_limits<T>::epsilon())
       break;
   }
 
@@ -81,12 +81,9 @@ T li(T x)
 template <typename T>
 T Li(T x)
 {
-  const T li2 = (T) 1.045163780117492784844588889194613136L;
-
-  if (x <= li2)
-    return 0;
-  else
-    return li(x) - li2;
+  T li2 = (T) 1.045163780117492784844588889194613136L;
+  T lix = li(x);
+  return std::max(T(0), lix - li2);
 }
 
 /// Calculate the inverse Eulerian logarithmic integral which
@@ -110,9 +107,9 @@ T Li_inverse(T x)
     return 0;
 
   T t = x * std::log(x);
-  T old_term = std::numeric_limits<T>::infinity();
+  T old_term = std::numeric_limits<T>::max();
 
-  while (true)
+  for (int i = 0; i < 100; i++)
   {
     T term = (Li(t) - x) * std::log(t);
 
@@ -148,7 +145,7 @@ __float128 li(__float128 x)
   __float128 logx = logq(x);
   int k = 0;
 
-  for (int n = 1; true; n++)
+  for (int n = 1; n < 1000; n++)
   {
     p *= -logx;
     factorial *= n;
@@ -162,7 +159,7 @@ __float128 li(__float128 x)
     sum += (p / q) * inner_sum;
 
     // Not converging anymore
-    if (fabsq(sum - old_sum) < FLT128_EPSILON)
+    if (fabsq(sum - old_sum) <= FLT128_EPSILON)
       break;
   }
 
@@ -176,11 +173,8 @@ __float128 li(__float128 x)
 __float128 Li(__float128 x)
 {
   __float128 li2 = 1.045163780117492784844588889194613136Q;
-
-  if (x <= li2)
-    return 0;
-  else
-    return li(x) - li2;
+  __float128 lix = li(x);
+  return (lix < li2) ? 0 : lix - li2;
 }
 
 /// Calculate the inverse Eulerian logarithmic integral which
@@ -205,7 +199,7 @@ __float128 Li_inverse(__float128 x)
   __float128 t = x * logq(x);
   __float128 old_term = FLT128_MAX;
 
-  while (true)
+  for (int i = 0; i < 100; i++)
   {
     __float128 term = (Li(t) - x) * logq(t);
 
