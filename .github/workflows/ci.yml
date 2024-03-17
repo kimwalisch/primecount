@@ -126,7 +126,7 @@ jobs:
             cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
