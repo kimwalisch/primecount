@@ -181,17 +181,18 @@ const primecount::Array<long double, 128> zeta =
 /// Rendus Hebdomadaires des Séances de l'Académie des Sciences. 119: 848–849.
 /// https://en.wikipedia.org/wiki/Prime_number_theorem#Approximations_for_the_nth_prime_number
 ///
-double initialNthPrimeApprox(double x)
+template <typename T>
+T initialNthPrimeApprox(T x)
 {
   if (x < 2)
     return 0;
 
-  double logx = std::log(x);
-  double t = logx;
+  T logx = std::log(x);
+  T t = logx;
 
   if (x > /* e = */ 2.719)
   {
-    double loglogx = std::log(logx);
+    T loglogx = std::log(logx);
     t += 0.5 * loglogx;
 
     if (x > 1600)
@@ -201,6 +202,45 @@ double initialNthPrimeApprox(double x)
   }
 
   return x * t;
+}
+
+/// Calculate the Riemann R function which is a very accurate
+/// approximation of the number of primes below x.
+/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
+/// The calculation is done with the Gram series:
+/// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
+///
+template <typename T>
+T RiemannR(T x)
+{
+  if (x < 0.1)
+    return 0;
+
+  T epsilon = std::numeric_limits<T>::epsilon();
+  T sum = 1;
+  T term = 1;
+  T logx = std::log(x);
+
+  // The condition k < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
+  for (unsigned k = 1; k < 1000; k++)
+  {
+    term *= logx / k;
+    T old_sum = sum;
+
+    if (k + 1 < zeta.size())
+      sum += term / (T(zeta[k + 1]) * k);
+    else
+      // For k >= 127, approximate zeta(k + 1) by 1
+      sum += term / k;
+
+    // Not converging anymore
+    if (std::abs(sum - old_sum) <= epsilon)
+      break;
+  }
+
+  return sum;
 }
 
 /// Calculate the derivative of the Riemann R function.
@@ -246,45 +286,6 @@ T RiemannR_prime(T x)
   return sum / (x * logx);
 }
 
-/// Calculate the Riemann R function which is a very accurate
-/// approximation of the number of primes below x.
-/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
-/// The calculation is done with the Gram series:
-/// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
-///
-template <typename T>
-T RiemannR(T x)
-{
-  if (x < 0.1)
-    return 0;
-
-  T epsilon = std::numeric_limits<T>::epsilon();
-  T sum = 1;
-  T term = 1;
-  T logx = std::log(x);
-
-  // The condition k < ITERS is required in case the computation
-  // does not converge. This happened on Linux i386 where
-  // the precision of the libc math functions is very limited.
-  for (unsigned k = 1; k < 1000; k++)
-  {
-    term *= logx / k;
-    T old_sum = sum;
-
-    if (k + 1 < zeta.size())
-      sum += term / (T(zeta[k + 1]) * k);
-    else
-      // For k >= 127, approximate zeta(k + 1) by 1
-      sum += term / k;
-
-    // Not converging anymore
-    if (std::abs(sum - old_sum) <= epsilon)
-      break;
-  }
-
-  return sum;
-}
-
 /// Calculate the inverse Riemann R function which is a very
 /// accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) as the zero of the
@@ -301,7 +302,7 @@ T RiemannR_inverse(T x)
   if (x < 2)
     return 0;
 
-  T t = (T) initialNthPrimeApprox((double) x);
+  T t = initialNthPrimeApprox(x);
   T old_term = std::numeric_limits<T>::infinity();
 
   // The condition i < ITERS is required in case the computation
@@ -461,6 +462,70 @@ const primecount::Array<__float128, 128> zeta_f128 =
   1.000000000000000000000000000000000000006Q
 };
 
+/// Calculate an initial nth prime approximation using Cesàro's formula.
+/// Cesàro, Ernesto (1894). "Sur une formule empirique de M. Pervouchine". Comptes
+/// Rendus Hebdomadaires des Séances de l'Académie des Sciences. 119: 848–849.
+/// https://en.wikipedia.org/wiki/Prime_number_theorem#Approximations_for_the_nth_prime_number
+///
+__float128 initialNthPrimeApprox(__float128 x)
+{
+  if (x < 2)
+    return 0;
+
+  __float128 logx = logq(x);
+  __float128 t = logx;
+
+  if (x > /* e = */ 2.719)
+  {
+    __float128 loglogx = logq(logx);
+    t += 0.5 * loglogx;
+
+    if (x > 1600)
+      t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+    if (x > 1200000)
+      t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
+  }
+
+  return x * t;
+}
+
+/// Calculate the Riemann R function which is a very accurate
+/// approximation of the number of primes below x.
+/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
+/// The calculation is done with the Gram series:
+/// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
+///
+__float128 RiemannR(__float128 x)
+{
+  if (x < 0.1)
+    return 0;
+
+  __float128 sum = 1;
+  __float128 term = 1;
+  __float128 logx = logq(x);
+
+  // The condition k < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
+  for (unsigned k = 1; k < 1000; k++)
+  {
+    term *= logx / k;
+    __float128 old_sum = sum;
+
+    if (k + 1 < zeta_f128.size())
+      sum += term / (zeta_f128[k + 1] * k);
+    else
+      // For k >= 127, approximate zeta(k + 1) by 1
+      sum += term / k;
+
+    // Not converging anymore
+    if (std::abs(sum - old_sum) <= FLT128_EPSILON)
+      break;
+  }
+
+  return sum;
+}
+
 /// Calculate the derivative of the Riemann R function.
 /// RiemannR'(x) = 1/x * \sum_{k=1}^{∞} ln(x)^(k-1) / (zeta(k + 1) * k!)
 ///
@@ -501,43 +566,6 @@ __float128 RiemannR_prime(__float128 x)
   return sum / (x * logx);
 }
 
-/// Calculate the Riemann R function which is a very accurate
-/// approximation of the number of primes below x.
-/// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
-/// The calculation is done with the Gram series:
-/// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
-///
-__float128 RiemannR(__float128 x)
-{
-  if (x < 0.1)
-    return 0;
-
-  __float128 sum = 1;
-  __float128 term = 1;
-  __float128 logx = logq(x);
-
-  // The condition k < ITERS is required in case the computation
-  // does not converge. This happened on Linux i386 where
-  // the precision of the libc math functions is very limited.
-  for (unsigned k = 1; k < 1000; k++)
-  {
-    term *= logx / k;
-    __float128 old_sum = sum;
-
-    if (k + 1 < zeta_f128.size())
-      sum += term / (zeta_f128[k + 1] * k);
-    else
-      // For k >= 127, approximate zeta(k + 1) by 1
-      sum += term / k;
-
-    // Not converging anymore
-    if (std::abs(sum - old_sum) <= FLT128_EPSILON)
-      break;
-  }
-
-  return sum;
-}
-
 /// Calculate the inverse Riemann R function which is a very
 /// accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) as the zero of the
@@ -553,7 +581,7 @@ __float128 RiemannR_inverse(__float128 x)
   if (x < 2)
     return 0;
 
-  __float128 t = (__float128) initialNthPrimeApprox((double) x);
+  __float128 t = initialNthPrimeApprox(x);
   __float128 old_term = HUGE_VALQ;
 
   // The condition i < ITERS is required in case the computation
