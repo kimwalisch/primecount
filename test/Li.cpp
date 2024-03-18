@@ -94,12 +94,10 @@ void check(bool OK)
 
 int main()
 {
+  for (int64_t x = 0; x < (int64_t) Li_tiny.size(); x++)
   {
-    for (int64_t x = 0; x < (int64_t) Li_tiny.size(); x++)
-    {
-      std::cout << "Li(" << x << ") = " << Li(x);
-      check(Li(x) == Li_tiny[x]);
-    }
+    std::cout << "Li(" << x << ") = " << Li(x);
+    check(Li(x) == Li_tiny[x]);
   }
 
   {

@@ -94,12 +94,10 @@ void check(bool OK)
 
 int main()
 {
+  for (int64_t x = 0; x < (int64_t) RiemannR_tiny.size(); x++)
   {
-    for (int64_t x = 0; x < (int64_t) RiemannR_tiny.size(); x++)
-    {
-      std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
-      check(RiemannR(x) == RiemannR_tiny[x]);
-    }
+    std::cout << "RiemannR(" << x << ") = " << RiemannR(x);
+    check(RiemannR(x) == RiemannR_tiny[x]);
   }
 
   {
