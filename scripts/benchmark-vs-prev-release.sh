@@ -41,20 +41,20 @@ function benchmark_test_option {
         start=$(date +%s.%N)
         build-prev-release/./primecount -t4 --test >/dev/null
         end=$(date +%s.%N)
-        seconds1=$(echo "scale=3; ($end - $start) / 1" | bc -l)
-        echo "Seconds old code: $seconds1"
+        seconds_old=$(echo "scale=3; ($end - $start) / 1" | bc -l)
+        echo "Seconds old code: $seconds_old"
         sleep 1
 
         start=$(date +%s.%N)
         build-curr-release/./primecount -t4 --test >/dev/null
         end=$(date +%s.%N)
-        seconds2=$(echo "scale=3; ($end - $start) / 1" | bc -l)
-        echo "Seconds new code: $seconds2"
+        seconds_new=$(echo "scale=3; ($end - $start) / 1" | bc -l)
+        echo "Seconds new code: $seconds_new"
         sleep 1
 
-        limit=$(echo "scale=3; $seconds1 * $factor" | bc -l)
-        new_code_is_fast=$(echo $seconds2'<='$limit | bc -l)
-        new_code_percent=$(echo "scale=1; 100 * $seconds2 / $seconds1" | bc -l)
+        limit=$(echo "scale=3; $seconds_old * $factor" | bc -l)
+        new_code_is_fast=$(echo $seconds_new'<='$limit | bc -l)
+        new_code_percent=$(echo "scale=1; 100 * $seconds_new / $seconds_old" | bc -l)
 
         echo ""
         echo "Old code: 100.0%"
@@ -84,29 +84,47 @@ function benchmark_pi_1e17 {
         echo "=== Benchmark PrimePi(1e17) ===="
         echo ""
 
-        total_seconds1=0
-        total_seconds2=0
+        total_seconds_new=0
+        total_seconds_old=0
 
-        for i in {1..10}
+        for i in {1..7}
         do
-            seconds1=$(build-prev-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
-            echo "Seconds old code: $seconds1"
-            total_seconds1=$(echo "scale=3; ($total_seconds1 + $seconds1) / 1" | bc -l)
+            seconds_new=$(build-curr-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
+            echo "Seconds new code: $seconds_new"
+            total_seconds_new=$(echo "scale=3; ($total_seconds_new + $seconds_new) / 1" | bc -l)
             sleep 1
-            seconds2=$(build-curr-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
-            echo "Seconds new code: $seconds2"
+            seconds_old=$(build-prev-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
+            echo "Seconds old code: $seconds_old"
             echo ""
-            total_seconds2=$(echo "scale=3; ($total_seconds2 + $seconds2) / 1" | bc -l)
+            total_seconds_old=$(echo "scale=3; ($total_seconds_old + $seconds_old) / 1" | bc -l)
             sleep 1
         done
 
-        echo "Total seconds old code: $total_seconds1"
-        echo "Total seconds new code: $total_seconds2"
+        echo ""
+        echo "Now reverse the test order:"
+        echo "1st prev release - 2nd current release."
         echo ""
 
-        limit=$(echo "scale=3; $total_seconds1 * $factor" | bc -l)
-        new_code_is_fast=$(echo $total_seconds2'<='$limit | bc -l)
-        new_code_percent=$(echo "scale=1; 100 * $total_seconds2 / $total_seconds1" | bc -l)
+        for i in {1..7}
+        do
+            seconds_old=$(build-prev-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
+            echo "Seconds old code: $seconds_old"
+            total_seconds_old=$(echo "scale=3; ($total_seconds_old + $seconds_old) / 1" | bc -l)
+            sleep 1
+            seconds_new=$(build-curr-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
+            echo "Seconds new code: $seconds_new"
+            echo ""
+            total_seconds_new=$(echo "scale=3; ($total_seconds_new + $seconds_new) / 1" | bc -l)
+            sleep 1
+        done
+
+        echo "Total seconds old code: $total_seconds_old"
+        echo "Total seconds new code: $total_seconds_new"
+        echo ""
+
+        limit=$(echo "scale=3; $total_seconds_old * $factor" | bc -l)
+        new_code_is_fast=$(echo $total_seconds_new'<='$limit | bc -l)
+        new_code_percent=$(echo "scale=1; 100 * $total_seconds_new / $total_seconds_old" | bc -l)
 
         echo "Old code: 100.0%"
         echo "New code: $new_code_percent%"
