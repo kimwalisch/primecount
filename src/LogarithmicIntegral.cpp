@@ -53,6 +53,9 @@ T li(T x)
   T logx = std::log(x);
   int k = 0;
 
+  // The condition n < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
   for (int n = 1; n < 1000; n++)
   {
     p *= -logx;
@@ -109,6 +112,9 @@ T Li_inverse(T x)
   T t = x * std::log(x);
   T old_term = std::numeric_limits<T>::infinity();
 
+  // The condition i < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
     T term = (Li(t) - x) * std::log(t);
@@ -145,6 +151,9 @@ __float128 li(__float128 x)
   __float128 logx = logq(x);
   int k = 0;
 
+  // The condition n < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
   for (int n = 1; n < 1000; n++)
   {
     p *= -logx;
@@ -199,6 +208,9 @@ __float128 Li_inverse(__float128 x)
   __float128 t = x * logq(x);
   __float128 old_term = HUGE_VALQ;
 
+  // The condition i < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
     __float128 term = (Li(t) - x) * logq(t);
