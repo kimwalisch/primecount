@@ -296,7 +296,7 @@ T RiemannR_inverse(T x)
     return 0;
 
   T t = (T) initialNthPrimeApprox((double) x);
-  T old_term = std::numeric_limits<T>::max();
+  T old_term = std::numeric_limits<T>::infinity();
 
   for (int i = 0; i < 100; i++)
   {
@@ -539,7 +539,7 @@ __float128 RiemannR_inverse(__float128 x)
     return 0;
 
   __float128 t = (__float128) initialNthPrimeApprox((double) x);
-  __float128 old_term = FLT128_MAX;
+  __float128 old_term = HUGE_VALQ;
 
   for (int i = 0; i < 100; i++)
   {
