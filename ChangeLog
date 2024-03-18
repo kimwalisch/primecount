@@ -1,3 +1,8 @@
+Changes in primecount-7.12, 2024-03-18
+
+* LogarithmicIntegral.cpp: Fix infinite loop on Linux i386 #66.
+* RiemannR.cpp: Fix infinite loop on Linux i386 #66.
+
 Changes in primecount-7.11, 2024-03-11
 
 * CMakeLists.txt: Detect Apple Silicon CPUs and disable libdivide since
