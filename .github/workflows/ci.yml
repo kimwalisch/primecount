@@ -115,6 +115,8 @@ jobs:
         run: ./primecount 1e14 --gourdon
 
   linux_gcc_sanitizers:
+    # This test fails on Ubuntu 22.04 likely due to an Ubuntu or compiler bug.
+    # See discussion at: https://github.com/quantumlib/Stim/issues/717#issuecomment-2002623560
     runs-on: ubuntu-20.04
     env:
       CC: gcc
@@ -126,7 +128,7 @@ jobs:
             cmake . -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror -O1 -g -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest --output-on-failure
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
