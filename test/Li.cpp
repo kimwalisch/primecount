@@ -22,9 +22,26 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <array>
 
 using std::size_t;
 using namespace primecount;
+
+/// Generated using Mathematica:
+/// Table[IntegerPart[li[k]-li[2]], {k, 2, 99}]
+std::array<int64_t, 100> Li_tiny =
+{
+  0, 0, 0, 1, 1, 2, 3, 3, 4, 4,
+  5, 5, 5, 6, 6, 7, 7, 7, 8, 8,
+  8, 9, 9, 9, 10, 10, 10, 11, 11, 11,
+  11, 12, 12, 12, 13, 13, 13, 13, 14, 14,
+  14, 15, 15, 15, 15, 16, 16, 16, 16, 17,
+  17, 17, 17, 18, 18, 18, 18, 19, 19, 19,
+  19, 20, 20, 20, 20, 21, 21, 21, 21, 22,
+  22, 22, 22, 23, 23, 23, 23, 23, 24, 24,
+  24, 24, 25, 25, 25, 25, 25, 26, 26, 26,
+  26, 27, 27, 27, 27, 27, 28, 28, 28, 28
+};
 
 std::vector<int64_t> Li_table =
 {
@@ -77,6 +94,14 @@ void check(bool OK)
 
 int main()
 {
+  {
+    for (int64_t x = 0; x < (int64_t) Li_tiny.size(); x++)
+    {
+      std::cout << "Li(" << x << ") = " << Li(x);
+      check(Li(x) == Li_tiny[x]);
+    }
+  }
+
   {
     int64_t x = 10;
     for (size_t i = 0; i < Li_table.size(); i++)
