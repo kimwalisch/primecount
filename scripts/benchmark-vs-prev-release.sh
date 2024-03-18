@@ -87,6 +87,10 @@ function benchmark_pi_1e17 {
         total_seconds_new=0
         total_seconds_old=0
 
+        echo "The test order is:"
+        echo "1st current release - 2nd prev release."
+        echo ""
+
         for i in {1..7}
         do
             seconds_new=$(build-curr-release/./primecount 1e17 -t4 --time | grep Seconds | cut -d' ' -f2)
@@ -100,7 +104,6 @@ function benchmark_pi_1e17 {
             sleep 1
         done
 
-        echo ""
         echo "Now reverse the test order:"
         echo "1st prev release - 2nd current release."
         echo ""
