@@ -224,7 +224,7 @@ T RiemannR_prime(T x)
   T term = 1;
   T logx = std::log(x);
 
-  // The condition k < n is required in case the computation
+  // The condition k < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (unsigned k = 1; k < 1000; k++)
@@ -263,7 +263,7 @@ T RiemannR(T x)
   T term = 1;
   T logx = std::log(x);
 
-  // The condition k < n is required in case the computation
+  // The condition k < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (unsigned k = 1; k < 1000; k++)
@@ -304,7 +304,7 @@ T RiemannR_inverse(T x)
   T t = (T) initialNthPrimeApprox((double) x);
   T old_term = std::numeric_limits<T>::infinity();
 
-  // The condition i < n is required in case the computation
+  // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
@@ -479,7 +479,7 @@ __float128 RiemannR_prime(__float128 x)
   __float128 term = 1;
   __float128 logx = logq(x);
 
-  // The condition k < n is required in case the computation
+  // The condition k < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (unsigned k = 1; k < 1000; k++)
@@ -516,7 +516,7 @@ __float128 RiemannR(__float128 x)
   __float128 term = 1;
   __float128 logx = logq(x);
 
-  // The condition k < n is required in case the computation
+  // The condition k < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (unsigned k = 1; k < 1000; k++)
@@ -556,7 +556,7 @@ __float128 RiemannR_inverse(__float128 x)
   __float128 t = (__float128) initialNthPrimeApprox((double) x);
   __float128 old_term = HUGE_VALQ;
 
-  // The condition i < n is required in case the computation
+  // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
