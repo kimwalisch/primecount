@@ -310,7 +310,14 @@ T RiemannR_inverse(T x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
-    T term = (RiemannR(t) - x) / RiemannR_prime(t);
+    T term;
+
+    if (x < 1e10)
+      // Converges faster for small x
+      term = (RiemannR(t) - x) / RiemannR_prime(t);
+    else
+      // Converges faster for large x
+      term = (RiemannR(t) - x) / std::log(t);
 
     // Not converging anymore
     if (std::abs(term) >= std::abs(old_term))
@@ -589,7 +596,14 @@ __float128 RiemannR_inverse(__float128 x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
-    __float128 term = (RiemannR(t) - x) / RiemannR_prime(t);
+    __float128 term;
+
+    if (x < 1e10)
+      // Converges faster for small x
+      term = (RiemannR(t) - x) / RiemannR_prime(t);
+    else
+      // Converges faster for large x
+      term = (RiemannR(t) - x) / logq(t);
 
     // Not converging anymore
     if (fabsq(term) >= fabsq(old_term))
