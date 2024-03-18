@@ -85,8 +85,11 @@ template <typename T>
 T Li(T x)
 {
   T li2 = (T) 1.045163780117492784844588889194613136L;
-  T lix = li(x);
-  return std::max(T(0), lix - li2);
+
+  if (x <= 2)
+    return 0;
+  else
+    return li(x) - li2;
 }
 
 /// Calculate the inverse Eulerian logarithmic integral which
@@ -182,8 +185,11 @@ __float128 li(__float128 x)
 __float128 Li(__float128 x)
 {
   __float128 li2 = 1.045163780117492784844588889194613136Q;
-  __float128 lix = li(x);
-  return (lix < li2) ? 0 : lix - li2;
+
+  if (x <= 2)
+    return 0;
+  else
+    return li(x) - li2;
 }
 
 /// Calculate the inverse Eulerian logarithmic integral which
