@@ -2,6 +2,8 @@ Changes in primecount-7.12, 2024-03-18
 
 * LogarithmicIntegral.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Fix infinite loop on Linux i386 #66.
+* test/Li.cpp: Add more tests.
+* test/Riemann_R.cpp: Add more tests.
 
 Changes in primecount-7.11, 2024-03-11
 
