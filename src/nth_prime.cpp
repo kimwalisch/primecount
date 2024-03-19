@@ -94,7 +94,7 @@ int64_t nth_prime(int64_t n, int threads)
   if (n < (int64_t) primes.size())
     return primes[n];
 
-  // For small n <= 1794
+  // For small n <= 3314
   if (n <= PiTable::pi_cache(PiTable::max_cached()))
     return binary_search_nth_prime(n);
 
