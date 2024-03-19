@@ -33,6 +33,33 @@
 
 namespace {
 
+/// Calculate an initial nth prime approximation using Cesàro's formula.
+/// Cesàro, Ernesto (1894). "Sur une formule empirique de M. Pervouchine". Comptes
+/// Rendus Hebdomadaires des Séances de l'Académie des Sciences. 119: 848–849.
+/// https://en.wikipedia.org/wiki/Prime_number_theorem#Approximations_for_the_nth_prime_number
+///
+template <typename T>
+T initialNthPrimeApprox(T x)
+{
+  if (x < 1)
+    return 0;
+  else if (x >= 1 && x < 2)
+    return 2;
+  else if (x >= 2 && x < 3)
+    return 3;
+
+  T logx = std::log(x);
+  T loglogx = std::log(logx);
+  T t = logx + 0.5 * loglogx;
+
+  if (x > 1600)
+    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+  if (x > 1200000)
+    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
+
+  return x * t;
+}
+
 /// Calculate the logarithmic integral using
 /// Ramanujan's formula:
 /// https://en.wikipedia.org/wiki/Logarithmic_integral_function#Series_representation
@@ -109,11 +136,11 @@ T Li(T x)
 template <typename T>
 T Li_inverse(T x)
 {
-  if (x < 2)
-    return 0;
-
-  T t = x * std::log(x);
+  T t = initialNthPrimeApprox(x);
   T old_term = std::numeric_limits<T>::infinity();
+
+  if (x < 3)
+    return t;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -134,6 +161,32 @@ T Li_inverse(T x)
 }
 
 #if defined(HAVE_FLOAT128)
+
+/// Calculate an initial nth prime approximation using Cesàro's formula.
+/// Cesàro, Ernesto (1894). "Sur une formule empirique de M. Pervouchine". Comptes
+/// Rendus Hebdomadaires des Séances de l'Académie des Sciences. 119: 848–849.
+/// https://en.wikipedia.org/wiki/Prime_number_theorem#Approximations_for_the_nth_prime_number
+///
+__float128 initialNthPrimeApprox(__float128 x)
+{
+  if (x < 1)
+    return 0;
+  else if (x >= 1 && x < 2)
+    return 2;
+  else if (x >= 2 && x < 3)
+    return 3;
+
+  __float128 logx = logq(x);
+  __float128 loglogx = logq(logx);
+  __float128 t = logx + 0.5 * loglogx;
+
+  if (x > 1600)
+    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+  if (x > 1200000)
+    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
+
+  return x * t;
+}
 
 /// Calculate the logarithmic integral using
 /// Ramanujan's formula:
@@ -208,11 +261,11 @@ __float128 Li(__float128 x)
 ///
 __float128 Li_inverse(__float128 x)
 {
-  if (x < 2)
-    return 0;
-
-  __float128 t = x * logq(x);
+  __float128 t = initialNthPrimeApprox(x);
   __float128 old_term = HUGE_VALQ;
+
+  if (x < 3)
+    return t;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
