@@ -192,18 +192,13 @@ T initialNthPrimeApprox(T x)
     return 3;
 
   T logx = std::log(x);
-  T t = logx;
+  T loglogx = std::log(logx);
+  T t = logx + 0.5 * loglogx;
 
-  if (x > /* e = */ 2.719)
-  {
-    T loglogx = std::log(logx);
-    t += 0.5 * loglogx;
-
-    if (x > 1600)
-      t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
-    if (x > 1200000)
-      t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
-  }
+  if (x > 1600)
+    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+  if (x > 1200000)
+    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
 
   return x * t;
 }
@@ -438,18 +433,13 @@ __float128 initialNthPrimeApprox(__float128 x)
     return 3;
 
   __float128 logx = logq(x);
-  __float128 t = logx;
+  __float128 loglogx = logq(logx);
+  __float128 t = logx + 0.5 * loglogx;
 
-  if (x > /* e = */ 2.719)
-  {
-    __float128 loglogx = logq(logx);
-    t += 0.5 * loglogx;
-
-    if (x > 1600)
-      t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
-    if (x > 1200000)
-      t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
-  }
+  if (x > 1600)
+    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+  if (x > 1200000)
+    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
 
   return x * t;
 }
