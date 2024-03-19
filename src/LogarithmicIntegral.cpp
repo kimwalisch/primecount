@@ -126,7 +126,7 @@ T Li(T x)
 /// This implementation computes Li^-1(x) as the zero of the
 /// function f(z) = Li(z) - x using the Newton–Raphson method.
 /// Note that Li'(z) = 1 / log(z).
-/// https://math.stackexchange.com/a/853192
+/// https://en.wikipedia.org/wiki/Newton%27s_method
 ///
 /// Newton–Raphson method:
 /// zn+1 = zn - (f(zn) / f'(zn)).
@@ -252,7 +252,7 @@ __float128 Li(__float128 x)
 /// This implementation computes Li^-1(x) as the zero of the
 /// function f(z) = Li(z) - x using the Newton–Raphson method.
 /// Note that Li'(z) = 1 / log(z).
-/// https://math.stackexchange.com/a/853192
+/// https://en.wikipedia.org/wiki/Newton%27s_method
 ///
 /// Newton–Raphson method:
 /// zn+1 = zn - (f(zn) / f'(zn)).
