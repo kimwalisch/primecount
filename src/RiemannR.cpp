@@ -193,12 +193,12 @@ T initialNthPrimeApprox(T x)
 
   T logx = std::log(x);
   T loglogx = std::log(logx);
-  T t = logx + 0.5 * loglogx;
+  T t = logx + T(0.5) * loglogx;
 
   if (x > 1600)
-    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+    t += T(0.5) * loglogx - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
-    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
+    t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
   return x * t;
 }
@@ -212,7 +212,7 @@ T initialNthPrimeApprox(T x)
 template <typename T>
 T RiemannR(T x)
 {
-  if (x < 0.1)
+  if (x < T(0.1))
     return 0;
 
   T epsilon = std::numeric_limits<T>::epsilon();
@@ -437,9 +437,9 @@ __float128 initialNthPrimeApprox(__float128 x)
   __float128 t = logx + 0.5 * loglogx;
 
   if (x > 1600)
-    t += 0.5 * loglogx - 1.0 + (loglogx - 2.0) / logx;
+    t += 0.5 * loglogx - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
-    t -= (loglogx * loglogx - 6.0 * loglogx + 11.0) / (2.0 * logx * logx);
+    t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
   return x * t;
 }
