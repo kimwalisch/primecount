@@ -315,11 +315,12 @@ int64_t Li(int64_t x)
   if (x > 1e14)
     return (int64_t) ::Li((__float128) x);
 #endif
-
   if (x > 1e8)
     return (int64_t) ::Li((long double) x);
-  else
+  if (x > 100)
     return (int64_t) ::Li((double) x);
+  else
+    return (int64_t) ::Li((float) x);
 }
 
 int64_t Li_inverse(int64_t x)
@@ -328,11 +329,12 @@ int64_t Li_inverse(int64_t x)
   if (x > 1e14)
     return Li_inverse_overflow_check<__float128>(x);
 #endif
-
   if (x > 1e8)
     return Li_inverse_overflow_check<long double>(x);
-  else
+  if (x > 100)
     return Li_inverse_overflow_check<double>(x);
+  else
+    return Li_inverse_overflow_check<float>(x);
 }
 
 #ifdef HAVE_INT128_T
@@ -343,11 +345,12 @@ int128_t Li(int128_t x)
   if (x > 1e14)
     return (int128_t) ::Li((__float128) x);
 #endif
-
   if (x > 1e8)
     return (int128_t) ::Li((long double) x);
-  else
+  if (x > 100)
     return (int128_t) ::Li((double) x);
+  else
+    return (int128_t) ::Li((float) x);
 }
 
 int128_t Li_inverse(int128_t x)
@@ -356,11 +359,12 @@ int128_t Li_inverse(int128_t x)
   if (x > 1e14)
     return Li_inverse_overflow_check<__float128>(x);
 #endif
-
   if (x > 1e8)
     return Li_inverse_overflow_check<long double>(x);
-  else
+  if (x > 100)
     return Li_inverse_overflow_check<double>(x);
+  else
+    return Li_inverse_overflow_check<float>(x);
 }
 
 #endif
