@@ -123,15 +123,10 @@ T Li(T x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-/// This implementation computes Li^-1(x) as the zero of the
-/// function f(z) = Li(z) - x using the Newton–Raphson method.
-/// Note that Li'(z) = 1 / log(z).
-/// https://en.wikipedia.org/wiki/Newton%27s_method
-///
-/// Newton–Raphson method:
-/// zn+1 = zn - (f(zn) / f'(zn)).
-/// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
-/// zn+1 = zn - (Li(zn) - x) * log(zn)
+/// This implementation computes Li^-1(x) = t as the zero of
+/// the function f(t) = Li(t) - x using Halley's method.
+/// https://en.wikipedia.org/wiki/Halley%27s_method
+/// https://math.stackexchange.com/a/853192
 ///
 template <typename T>
 T Li_inverse(T x)
@@ -147,7 +142,14 @@ T Li_inverse(T x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
-    T term = (Li(t) - x) * std::log(t);
+    // xn+1 = xn - f(xn)/f'(xn) / [1 - f(xn)/f'(xn) * f''(xn)/2*f'(xn)]
+    // f(t) = Li(t) - x. When we solve f(t)=0, we get the result Li^-1(x) = t.
+    // f'(t) = (Li(t) - x)' = Li'(t) = 1 / log(t)
+    // f''(t) = Li''(t) = -1 / (t*log(t)^2)
+    // This simplifies to:
+    // xn+1 = xn - f(xn)*log(xn) / (1 + f(xn) / 2*xn)
+    T delta = Li(t) - x;
+    T term = delta * std::log(t) / (1 + delta / (2 * t));
 
     // Not converging anymore
     if (std::abs(term) >= std::abs(old_term))
@@ -249,15 +251,10 @@ __float128 Li(__float128 x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-/// This implementation computes Li^-1(x) as the zero of the
-/// function f(z) = Li(z) - x using the Newton–Raphson method.
-/// Note that Li'(z) = 1 / log(z).
-/// https://en.wikipedia.org/wiki/Newton%27s_method
-///
-/// Newton–Raphson method:
-/// zn+1 = zn - (f(zn) / f'(zn)).
-/// zn+1 = zn - (Li(zn) - x) / (1 / log(zn))
-/// zn+1 = zn - (Li(zn) - x) * log(zn)
+/// This implementation computes Li^-1(x) = t as the zero of
+/// the function f(t) = Li(t) - x using Halley's method.
+/// https://en.wikipedia.org/wiki/Halley%27s_method
+/// https://math.stackexchange.com/a/853192
 ///
 __float128 Li_inverse(__float128 x)
 {
@@ -272,7 +269,14 @@ __float128 Li_inverse(__float128 x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
-    __float128 term = (Li(t) - x) * logq(t);
+    // xn+1 = xn - f(xn)/f'(xn) / [1 - f(xn)/f'(xn) * f''(xn)/2*f'(xn)]
+    // f(t) = Li(t) - x. When we solve f(t)=0, we get the result Li^-1(x) = t.
+    // f'(t) = (Li(t) - x)' = Li'(t) = 1 / log(t)
+    // f''(t) = Li''(t) = -1 / (t*log(t)^2)
+    // This simplifies to:
+    // xn+1 = xn - f(xn)*log(xn) / (1 + f(xn) / 2*xn)
+    __float128 delta = Li(t) - x;
+    __float128 term = delta * logq(t) / (1 + delta / (2 * t));
 
     // Not converging anymore
     if (fabsq(term) >= fabsq(old_term))
