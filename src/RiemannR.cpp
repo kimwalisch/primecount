@@ -193,10 +193,10 @@ T initialNthPrimeApprox(T x)
 
   T logx = std::log(x);
   T loglogx = std::log(logx);
-  T t = logx + T(0.5) * loglogx;
+  T t = logx + (loglogx / 2);
 
   if (x > 1600)
-    t += T(0.5) * loglogx - 1 + (loglogx - 2) / logx;
+    t += (loglogx / 2) - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
     t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
@@ -264,7 +264,7 @@ T RiemannR_inverse(T x)
   {
     // term = f(t) / f'(t)
     // f(t) = RiemannR(t) - x
-    // RiemannR(t) ~ li(t), with li'(t) = 1 / log(t)
+    // RiemannR(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
     // term = (RiemannR(t) - x) / li'(t) = (RiemannR(t) - x) * log(t)
     T term = (RiemannR(t) - x) * std::log(t);
 
@@ -434,10 +434,10 @@ __float128 initialNthPrimeApprox(__float128 x)
 
   __float128 logx = logq(x);
   __float128 loglogx = logq(logx);
-  __float128 t = logx + 0.5 * loglogx;
+  __float128 t = logx + (loglogx / 2);
 
   if (x > 1600)
-    t += 0.5 * loglogx - 1 + (loglogx - 2) / logx;
+    t += (loglogx / 2) - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
     t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
@@ -502,7 +502,7 @@ __float128 RiemannR_inverse(__float128 x)
   {
     // term = f(t) / f'(t)
     // f(t) = RiemannR(t) - x
-    // RiemannR(t) ~ li(t), with li'(t) = 1 / log(t)
+    // RiemannR(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
     // term = (RiemannR(t) - x) / li'(t) = (RiemannR(t) - x) * log(t)
     __float128 term = (RiemannR(t) - x) * logq(t);
 

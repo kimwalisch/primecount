@@ -50,10 +50,10 @@ T initialNthPrimeApprox(T x)
 
   T logx = std::log(x);
   T loglogx = std::log(logx);
-  T t = logx + T(0.5) * loglogx;
+  T t = logx + (loglogx / 2);
 
   if (x > 1600)
-    t += T(0.5) * loglogx - 1 + (loglogx - 2) / logx;
+    t += (loglogx / 2) - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
     t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
@@ -123,11 +123,6 @@ T Li(T x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-/// This implementation computes Li^-1(x) = t as the zero of
-/// the function f(t) = Li(t) - x using Halley's method.
-/// https://en.wikipedia.org/wiki/Halley%27s_method
-/// https://math.stackexchange.com/a/853192
-///
 template <typename T>
 T Li_inverse(T x)
 {
@@ -142,6 +137,8 @@ T Li_inverse(T x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
+    // Halley's method (root-finding algorithm).
+    // https://en.wikipedia.org/wiki/Halley%27s_method
     // xn+1 = xn - f(xn)/f'(xn) / [1 - f(xn)/f'(xn) * f''(xn)/2*f'(xn)]
     // f(t) = Li(t) - x. When we solve f(t)=0, we get the result Li^-1(x) = t.
     // f'(t) = (Li(t) - x)' = Li'(t) = 1 / log(t)
@@ -180,10 +177,10 @@ __float128 initialNthPrimeApprox(__float128 x)
 
   __float128 logx = logq(x);
   __float128 loglogx = logq(logx);
-  __float128 t = logx + 0.5 * loglogx;
+  __float128 t = logx + (loglogx / 2);
 
   if (x > 1600)
-    t += 0.5 * loglogx - 1 + (loglogx - 2) / logx;
+    t += (loglogx / 2) - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
     t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
@@ -251,11 +248,6 @@ __float128 Li(__float128 x)
 /// is a very accurate approximation of the nth prime.
 /// Li^-1(x) < nth_prime(x) for 7 <= x <= 10^316
 ///
-/// This implementation computes Li^-1(x) = t as the zero of
-/// the function f(t) = Li(t) - x using Halley's method.
-/// https://en.wikipedia.org/wiki/Halley%27s_method
-/// https://math.stackexchange.com/a/853192
-///
 __float128 Li_inverse(__float128 x)
 {
   __float128 t = initialNthPrimeApprox(x);
@@ -269,6 +261,8 @@ __float128 Li_inverse(__float128 x)
   // the precision of the libc math functions is very limited.
   for (int i = 0; i < 100; i++)
   {
+    // Halley's method (root-finding algorithm).
+    // https://en.wikipedia.org/wiki/Halley%27s_method
     // xn+1 = xn - f(xn)/f'(xn) / [1 - f(xn)/f'(xn) * f''(xn)/2*f'(xn)]
     // f(t) = Li(t) - x. When we solve f(t)=0, we get the result Li^-1(x) = t.
     // f'(t) = (Li(t) - x)' = Li'(t) = 1 / log(t)
