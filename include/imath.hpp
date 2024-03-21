@@ -113,17 +113,23 @@ inline T ilog2(T x)
 #endif
 }
 
-/// Recursively multiply x using template metaprogramming.
-/// Using this technique we can compute exponentiations without
-/// a for loop (which should guarantee optimal code).
-/// e.g. ipow<4>(x) = x * x * x * x.
+/// Exponentiation by squaring using template metaprogramming.
+/// This code will generate optimal assembly that will be
+/// inlined in the calling function. E.g. ipow<16>(x) will
+/// generate log2(16) = 4 multiply instructions.
 ///
 template <typename T, int EXP>
 struct ipow_helper
 {
   static T ipow(T x)
   {
-    return ipow_helper<T, EXP - 1>::ipow(x) * x;
+    if (EXP % 2)
+      return ipow_helper<T, EXP - 1>::ipow(x) * x;
+    else
+    {
+      T res = ipow_helper<T, EXP / 2>::ipow(x);
+      return res * res;
+    }
   }
 };
 
