@@ -126,11 +126,11 @@ T Li(T x)
 template <typename T>
 T Li_inverse(T x)
 {
+  if (x < 1)
+    return 0;
+
   T t = initialNthPrimeApprox(x);
   T old_term = std::numeric_limits<T>::infinity();
-
-  if (x < 3)
-    return t;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -250,11 +250,11 @@ __float128 Li(__float128 x)
 ///
 __float128 Li_inverse(__float128 x)
 {
+  if (x < 1)
+    return 0;
+
   __float128 t = initialNthPrimeApprox(x);
   __float128 old_term = HUGE_VALQ;
-
-  if (x < 3)
-    return t;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
