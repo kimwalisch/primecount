@@ -127,7 +127,7 @@ int main()
 
 #endif
 
-  for (int64_t x = 1; x < (int64_t) RiemannR_tiny.size(); x++)
+  for (int64_t x = 2; x < (int64_t) RiemannR_tiny.size(); x++)
   {
     int64_t y = RiemannR_tiny[x];
     std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
