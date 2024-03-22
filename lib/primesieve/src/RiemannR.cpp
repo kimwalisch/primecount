@@ -182,10 +182,10 @@ T initialNthPrimeApprox(T x)
 
   T logx = std::log(x);
   T loglogx = std::log(logx);
-  T t = logx + T(0.5) * loglogx;
+  T t = logx + (loglogx / 2);
 
   if (x > 1600)
-    t += T(0.5) * loglogx - 1 + (loglogx - 2) / logx;
+    t += (loglogx / 2) - 1 + (loglogx - 2) / logx;
   if (x > 1200000)
     t -= (loglogx * loglogx - 6 * loglogx + 11) / (2 * logx * logx);
 
@@ -201,7 +201,7 @@ T initialNthPrimeApprox(T x)
 template <typename T>
 T RiemannR(T x)
 {
-  if (x < T(0.1))
+  if (x < T(1e-5))
     return 0;
 
   T epsilon = std::numeric_limits<T>::epsilon();
@@ -240,11 +240,11 @@ T RiemannR(T x)
 template <typename T>
 T RiemannR_inverse(T x)
 {
+  if (x < 1)
+    return 0;
+
   T t = initialNthPrimeApprox(x);
   T old_term = std::numeric_limits<T>::infinity();
-
-  if (x < 3)
-    return t;
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -253,7 +253,7 @@ T RiemannR_inverse(T x)
   {
     // term = f(t) / f'(t)
     // f(t) = RiemannR(t) - x
-    // RiemannR(t) ~ li(t), with li'(t) = 1 / log(t)
+    // RiemannR(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
     // term = (RiemannR(t) - x) / li'(t) = (RiemannR(t) - x) * log(t)
     T term = (RiemannR(t) - x) * std::log(t);
 
@@ -274,8 +274,6 @@ namespace primesieve {
 
 long double RiemannR(long double x)
 {
-  if (x <= 100)
-    return ::RiemannR((float) x);
   if (x <= 1e8)
     return ::RiemannR((double) x);
   else
@@ -284,8 +282,6 @@ long double RiemannR(long double x)
 
 long double RiemannR_inverse(long double x)
 {
-  if (x <= 100)
-    return ::RiemannR_inverse((float) x);
   if (x <= 1e8)
     return ::RiemannR_inverse((double) x);
   else
