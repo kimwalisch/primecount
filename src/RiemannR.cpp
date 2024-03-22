@@ -260,7 +260,7 @@ T RiemannR_inverse(T x)
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
   {
     // term = f(t) / f'(t)
     // f(t) = RiemannR(t) - x
@@ -498,7 +498,7 @@ __float128 RiemannR_inverse(__float128 x)
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
   {
     // term = f(t) / f'(t)
     // f(t) = RiemannR(t) - x
