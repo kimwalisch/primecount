@@ -127,6 +127,14 @@ int main()
 
 #endif
 
+  for (int64_t x = 1; x < (int64_t) RiemannR_tiny.size(); x++)
+  {
+    int64_t y = RiemannR_tiny[x];
+    std::cout << "RiemannR_inverse(" << y << ") = " << RiemannR_inverse(y);
+    check(RiemannR_inverse(y) < x &&
+          RiemannR_inverse(y + 1) >= x);
+  }
+
   {
     int64_t x = 10;
     for (size_t i = 0; i < RiemannR_table.size(); i++)

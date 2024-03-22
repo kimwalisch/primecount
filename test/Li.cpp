@@ -127,6 +127,14 @@ int main()
 
 #endif
 
+  for (int64_t x = 1; x < (int64_t) Li_tiny.size(); x++)
+  {
+    int64_t y = Li_tiny[x];
+    std::cout << "Li_inverse(" << y << ") = " << Li_inverse(y);
+    check(Li_inverse(y) < x &&
+          Li_inverse(y + 1) >= x);
+  }
+
   {
     int64_t x = 10;
     for (size_t i = 0; i < Li_table.size(); i++)
