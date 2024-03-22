@@ -549,10 +549,8 @@ int64_t RiemannR(int64_t x)
 #endif
   if (x > 1e8)
     return (int64_t) ::RiemannR((long double) x);
-  if (x > 100)
-    return (int64_t) ::RiemannR((double) x);
   else
-    return (int64_t) ::RiemannR((float) x);
+    return (int64_t) ::RiemannR((double) x);
 }
 
 int64_t RiemannR_inverse(int64_t x)
@@ -563,10 +561,8 @@ int64_t RiemannR_inverse(int64_t x)
 #endif
   if (x > 1e8)
     return RiemannR_inverse_overflow_check<long double>(x);
-  if (x > 100)
-    return RiemannR_inverse_overflow_check<double>(x);
   else
-    return RiemannR_inverse_overflow_check<float>(x);
+    return RiemannR_inverse_overflow_check<double>(x);
 }
 
 #ifdef HAVE_INT128_T
@@ -579,10 +575,8 @@ int128_t RiemannR(int128_t x)
 #endif
   if (x > 1e8)
     return (int128_t) ::RiemannR((long double) x);
-  if (x > 100)
-    return (int128_t) ::RiemannR((double) x);
   else
-    return (int128_t) ::RiemannR((float) x);
+    return (int128_t) ::RiemannR((double) x);
 }
 
 int128_t RiemannR_inverse(int128_t x)
@@ -593,10 +587,8 @@ int128_t RiemannR_inverse(int128_t x)
 #endif
   if (x > 1e8)
     return RiemannR_inverse_overflow_check<long double>(x);
-  if (x > 100)
-    return RiemannR_inverse_overflow_check<double>(x);
   else
-    return RiemannR_inverse_overflow_check<float>(x);
+    return RiemannR_inverse_overflow_check<double>(x);
 }
 
 #endif
