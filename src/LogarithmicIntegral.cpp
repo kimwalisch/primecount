@@ -135,7 +135,7 @@ T Li_inverse(T x)
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
   {
     // Halley's method (root-finding algorithm).
     // https://en.wikipedia.org/wiki/Halley%27s_method
@@ -259,7 +259,7 @@ __float128 Li_inverse(__float128 x)
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
   // the precision of the libc math functions is very limited.
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
   {
     // Halley's method (root-finding algorithm).
     // https://en.wikipedia.org/wiki/Halley%27s_method
