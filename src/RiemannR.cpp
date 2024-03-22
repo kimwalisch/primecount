@@ -474,7 +474,7 @@ __float128 RiemannR(__float128 x)
       sum += term / k;
 
     // Not converging anymore
-    if (std::abs(sum - old_sum) <= FLT128_EPSILON)
+    if (fabsq(sum - old_sum) <= FLT128_EPSILON)
       break;
   }
 
