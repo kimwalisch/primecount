@@ -212,7 +212,7 @@ T initialNthPrimeApprox(T x)
 template <typename T>
 T RiemannR(T x)
 {
-  if (x < T(0.1))
+  if (x < T(1e-5))
     return 0;
 
   T epsilon = std::numeric_limits<T>::epsilon();
@@ -452,7 +452,7 @@ __float128 initialNthPrimeApprox(__float128 x)
 ///
 __float128 RiemannR(__float128 x)
 {
-  if (x < 0.1)
+  if (x < 1e-5)
     return 0;
 
   __float128 sum = 1;
