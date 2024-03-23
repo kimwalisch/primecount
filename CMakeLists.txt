@@ -258,13 +258,8 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
+    target_compile_features(libprimecount PRIVATE cxx_relaxed_constexpr)
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
-
-    target_compile_features(libprimecount
-    PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
 
     target_include_directories(libprimecount PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -283,17 +278,12 @@ if(BUILD_STATIC_LIBS)
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
+    target_compile_features(libprimecount-static PRIVATE cxx_relaxed_constexpr)
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
         set_target_properties(libprimecount-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
     endif()
-
-    target_compile_features(libprimecount-static
-    PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
 
     target_include_directories(libprimecount-static PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -319,7 +309,7 @@ if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
     target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
-    target_compile_features(primecount PRIVATE cxx_auto_type)
+    target_compile_features(primecount PRIVATE cxx_relaxed_constexpr)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(WITH_MSVC_CRT_STATIC)
