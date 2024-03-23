@@ -135,83 +135,6 @@ fast_div(X x, Y y)
     return UX(x) / UY(y);
 }
 
-/// Used for (128-bit / 32-bit) = 64-bit.
-/// Use this function only when you know for sure
-/// that the result is < 2^64.
-///
-template <typename X, typename Y>
-ALWAYS_INLINE
-typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
-                         sizeof(Y) <= sizeof(uint32_t)), uint64_t>::type
-fast_div64(X x, Y y)
-{
-#if __cplusplus >= 201402L
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-#endif
-
-#if defined(__x86_64__) && \
-   (defined(__GNUC__) || defined(__clang__))
-
-  using UX = typename std::make_unsigned<X>::type;
-
-  if (UX(x) <= MAX_DOUBLE_INT)
-    return X((double) x / (double) y);
-  else
-  {
-    uint64_t x0 = (uint64_t) x;
-    uint64_t x1 = ((uint64_t*) &x)[1];
-    uint64_t d = y;
-
-    // (128-bit / 64-bit) = 64-bit.
-    // When we know the result fits into 64-bit (even
-    // though the numerator is 128-bit) we can use the divq
-    // instruction instead of doing a full 128-bit division.
-    __asm__("divq %[divider]"
-            : "+a"(x0), "+d"(x1) : [divider] "r"(d));
-
-    return x0;
-  }
-#else
-  return (uint64_t) fast_div(x, y);
-#endif
-}
-
-/// Used for (128-bit / 64-bit) = 64-bit.
-/// Use this function only when you know for sure
-/// that the result is < 2^64.
-///
-template <typename X, typename Y>
-ALWAYS_INLINE
-typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
-                         sizeof(Y) == sizeof(uint64_t)), uint64_t>::type
-fast_div64(X x, Y y)
-{
-#if __cplusplus >= 201402L
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-#endif
-
-#if defined(__x86_64__) && \
-   (defined(__GNUC__) || defined(__clang__))
-
-  uint64_t x0 = (uint64_t) x;
-  uint64_t x1 = ((uint64_t*) &x)[1];
-  uint64_t d = y;
-
-  // (128-bit / 64-bit) = 64-bit.
-  // When we know the result fits into 64-bit (even
-  // though the numerator is 128-bit) we can use the divq
-  // instruction instead of doing a full 128-bit division.
-  __asm__("divq %[divider]"
-          : "+a"(x0), "+d"(x1) : [divider] "r"(d));
-
-  return x0;
-#else
-  return (uint64_t) fast_div(x, y);
-#endif
-}
-
 #else
 
 /// If ENABLE_DOUBLE_INTEGER_DIVISION is not defined:
@@ -266,6 +189,8 @@ fast_div(X x, Y y)
     return UX(x) / UY(y);
 }
 
+#endif
+
 /// Used for (128-bit / 32-bit) = 64-bit.
 /// Used for (128-bit / 64-bit) = 64-bit.
 /// Use this function only when you know for sure
@@ -301,8 +226,6 @@ fast_div64(X x, Y y)
   return (uint64_t) fast_div(x, y);
 #endif
 }
-
-#endif
 
 /// Used for (64-bit / 32-bit) = 64-bit.
 /// Used for (64-bit / 64-bit) = 64-bit.
