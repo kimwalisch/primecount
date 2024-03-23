@@ -14,13 +14,12 @@ option(BUILD_MANPAGE                "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS                  "Build the test programs"               OFF)
 
 option(WITH_POPCNT                  "Use the POPCNT instruction"           ON)
-option(WITH_DOUBLE_INTEGER_DIVISION "Use double floating-point division instead of integer division" ON)
 option(WITH_OPENMP                  "Enable OpenMP multi-threading"        ON)
 option(WITH_MSVC_CRT_STATIC         "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128                "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 option(WITH_JEMALLOC                "Use jemalloc allocator"               OFF)
 
-# Enable/Disable libdivide ###########################################
+# Integer division settings ##########################################
 
 # Historically, integer division has been one of the slowest
 # instructions on most CPU architectures. Hence by default we
@@ -29,6 +28,7 @@ option(WITH_JEMALLOC                "Use jemalloc allocator"               OFF)
 # instructions which is often much faster.
 
 set(DEFAULT_LIBDIVIDE ON)
+set(DEFAULT_DOUBLE_INTEGER_DIVISION ON)
 
 # Apple Silicon CPUs first released in 2020 have very fast integer
 # division instructions. For Apple Silicon CPUs on Apple OSes
@@ -38,10 +38,12 @@ if(APPLE)
     include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
     if(Apple_ARM64)
         set(DEFAULT_LIBDIVIDE OFF)
+        set(DEFAULT_DOUBLE_INTEGER_DIVISION OFF)
     endif()
 endif()
 
 option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+option(WITH_DOUBLE_INTEGER_DIVISION "Use double floating-point division instead of integer division" ${DEFAULT_DOUBLE_INTEGER_DIVISION})
 
 # Option WITH_DOUBLE_INTEGER_DIVISION ################################
 
