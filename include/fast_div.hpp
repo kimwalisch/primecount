@@ -112,7 +112,8 @@ fast_div(X x, Y y)
   // Unsigned integer division is usually
   // faster than signed integer division.
   using UX = typename std::make_unsigned<X>::type;
-  return UX(x) / UX(y);
+  using UY = typename std::make_unsigned<Y>::type;
+  return UX(x) / UY(y);
 }
 
 #endif
@@ -125,6 +126,11 @@ typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
                          sizeof(X) == sizeof(Y)), X>::type
 fast_div(X x, Y y)
 {
+#if __cplusplus >= 201402L
+  ASSERT(x >= 0);
+  ASSERT(y > 0);
+#endif
+
   // Unsigned integer division is usually
   // faster than signed integer division.
   using UX = typename std::make_unsigned<X>::type;
