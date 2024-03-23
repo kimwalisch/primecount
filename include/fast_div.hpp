@@ -72,21 +72,6 @@ fast_div(X x, Y y)
   return X((double) x / (double) y);
 }
 
-/// Used for  (64-bit /  64-bit) =  64-bit.
-/// Used for (128-bit / 128-bit) = 128-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE constexpr
-typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
-                         sizeof(X) == sizeof(Y)), X>::type
-fast_div(X x, Y y)
-{
-  // Unsigned integer division is usually
-  // faster than signed integer division.
-  using UX = typename std::make_unsigned<X>::type;
-  using UY = typename std::make_unsigned<Y>::type;
-  return UX(x) / UY(y);
-}
-
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE constexpr
@@ -113,11 +98,10 @@ fast_div(X x, Y y)
 #elif !defined(ENABLE_DOUBLE_INTEGER_DIVISION)
 
 /// Used for (64-bit / 32-bit) = 64-bit.
-/// Used for (64-bit / 64-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE constexpr
 typename std::enable_if<(sizeof(X) <= sizeof(uint64_t) &&
-                         sizeof(Y) <= sizeof(X)), X>::type
+                         sizeof(Y) <= sizeof(uint32_t)), X>::type
 fast_div(X x, Y y)
 {
 #if __cplusplus >= 201402L
@@ -132,6 +116,21 @@ fast_div(X x, Y y)
 }
 
 #endif
+
+/// Used for  (64-bit /  64-bit) =  64-bit.
+/// Used for (128-bit / 128-bit) = 128-bit.
+template <typename X, typename Y>
+ALWAYS_INLINE constexpr
+typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
+                         sizeof(X) == sizeof(Y)), X>::type
+fast_div(X x, Y y)
+{
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UX = typename std::make_unsigned<X>::type;
+  using UY = typename std::make_unsigned<Y>::type;
+  return UX(x) / UY(y);
+}
 
 /// Used for (128-bit / 32-bit) = 128-bit.
 /// Used for (128-bit / 64-bit) = 128-bit.
