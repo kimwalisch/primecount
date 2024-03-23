@@ -47,16 +47,6 @@ struct make_smaller
                T>::type>::type;
 };
 
-/// If ENABLE_DIV32 is defined:
-///
-/// 1) We use 32-bit integer division for (64-bit / 32-bit)
-///    if the dividend is < 2^32.
-/// 2) We use 64-bit integer division for (64-bit / 64-bit).
-/// 3) We use 64-bit integer division for (128-bit / 64-bit)
-///    if the dividend is < 2^64.
-///
-#if defined(ENABLE_DIV32)
-
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE typename std::enable_if<(sizeof(X) == sizeof(uint64_t) &&
@@ -66,39 +56,24 @@ fast_div(X x, Y y)
   ASSERT(x >= 0);
   ASSERT(y > 0);
 
+#if defined(ENABLE_DIV32)
+
+  using UX = typename std::make_unsigned<X>::type;
+  using UY = typename std::make_unsigned<Y>::type;
   using smaller_t = typename make_smaller<X>::type;
 
   if (x <= std::numeric_limits<smaller_t>::max())
-    return (smaller_t) x / (smaller_t) y;
+    return smaller_t(x) / UY(y);
   else
-  {
-    // Unsigned integer division is usually
-    // faster than signed integer division.
-    using UX = typename std::make_unsigned<X>::type;
-    using UY = typename std::make_unsigned<Y>::type;
-    return (UX) x / (UY) y;
-  }
-}
-
-#elif !defined(ENABLE_DIV32)
-
-/// Used for (64-bit / 32-bit) = 64-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE typename std::enable_if<(sizeof(X) <= sizeof(uint64_t) &&
-                                       sizeof(Y) <= sizeof(uint32_t)), X>::type
-fast_div(X x, Y y)
-{
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-
+    return UX(x) / UY(y);
+#else
   // Unsigned integer division is usually
   // faster than signed integer division.
   using UX = typename std::make_unsigned<X>::type;
   using UY = typename std::make_unsigned<Y>::type;
   return UX(x) / UY(y);
-}
-
 #endif
+}
 
 /// Used for  (64-bit /  64-bit) =  64-bit.
 /// Used for (128-bit / 128-bit) = 128-bit.
@@ -107,10 +82,8 @@ ALWAYS_INLINE typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
                                        sizeof(Y) == sizeof(X)), X>::type
 fast_div(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
   // Unsigned integer division is usually
   // faster than signed integer division.
@@ -126,10 +99,8 @@ ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
                                        sizeof(Y) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
   // Unsigned integer division is usually
   // faster than signed integer division.
@@ -153,10 +124,8 @@ ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
                                        sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
 fast_div64(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
