@@ -246,9 +246,9 @@ fast_div64(X x, Y y)
 
     return x0;
   }
-  #else
-    return (uint64_t) fast_div(x, y);
-  #endif
+#else
+  return (uint64_t) fast_div(x, y);
+#endif
 }
 
 /// Used for (128-bit / 64-bit) = 64-bit.
@@ -290,9 +290,9 @@ fast_div64(X x, Y y)
 
     return x0;
   }
-  #else
-    return (uint64_t) fast_div(x, y);
-  #endif
+#else
+  return (uint64_t) fast_div(x, y);
+#endif
 }
 
 #else
