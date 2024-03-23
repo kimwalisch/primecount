@@ -123,7 +123,7 @@ fast_div(X x, Y y)
 template <typename X, typename Y>
 ALWAYS_INLINE constexpr
 typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
-                         sizeof(X) == sizeof(Y)), X>::type
+                         sizeof(Y) == sizeof(X)), X>::type
 fast_div(X x, Y y)
 {
 #if __cplusplus >= 201402L
