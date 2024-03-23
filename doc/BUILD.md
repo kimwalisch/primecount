@@ -102,20 +102,19 @@ libprimesieve will be built. The build options can be modified at
 the configure step using e.g. ```cmake . -DBUILD_TESTS=ON```.
 
 ```CMake
-option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
-option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
-option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
-option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
-option(BUILD_TESTS         "Build the test programs"               OFF)
+option(BUILD_PRIMECOUNT             "Build the primecount binary"           ON)
+option(BUILD_LIBPRIMESIEVE          "Build libprimesieve"                   ON)
+option(BUILD_SHARED_LIBS            "Build the shared libprimecount"        OFF)
+option(BUILD_STATIC_LIBS            "Build the static libprimecount"        ON)
+option(BUILD_MANPAGE                "Regenerate man page using a2x program" OFF)
+option(BUILD_TESTS                  "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"            ON)
-option(WITH_LIBDIVIDE       "Use libdivide.h"                       ON)
-option(WITH_OPENMP          "Enable OpenMP multi-threading"         ON)
-option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" ON)
-option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
-option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
-option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
+option(WITH_POPCNT                  "Use the POPCNT instruction"           ON)
+option(WITH_DOUBLE_INTEGER_DIVISION "Use double floating-point division instead of integer division" ON)
+option(WITH_OPENMP                  "Enable OpenMP multi-threading"        ON)
+option(WITH_MSVC_CRT_STATIC         "Link primecount.lib with /MT instead of the default /MD" OFF)
+option(WITH_FLOAT128                "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
+option(WITH_JEMALLOC                "Use jemalloc allocator"               OFF)
 ```
 
 ## Packaging primecount

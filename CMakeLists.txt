@@ -6,18 +6,19 @@ set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}"
 
 # Build options ######################################################
 
-option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
-option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
-option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
-option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
-option(BUILD_TESTS         "Build the test programs"               OFF)
+option(BUILD_PRIMECOUNT             "Build the primecount binary"           ON)
+option(BUILD_LIBPRIMESIEVE          "Build libprimesieve"                   ON)
+option(BUILD_SHARED_LIBS            "Build the shared libprimecount"        OFF)
+option(BUILD_STATIC_LIBS            "Build the static libprimecount"        ON)
+option(BUILD_MANPAGE                "Regenerate man page using a2x program" OFF)
+option(BUILD_TESTS                  "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"           ON)
-option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
-option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
-option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
-option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
+option(WITH_POPCNT                  "Use the POPCNT instruction"           ON)
+option(WITH_DOUBLE_INTEGER_DIVISION "Use double floating-point division instead of integer division" ON)
+option(WITH_OPENMP                  "Enable OpenMP multi-threading"        ON)
+option(WITH_MSVC_CRT_STATIC         "Link primecount.lib with /MT instead of the default /MD" OFF)
+option(WITH_FLOAT128                "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
+option(WITH_JEMALLOC                "Use jemalloc allocator"               OFF)
 
 # Enable/Disable libdivide ###########################################
 
@@ -42,18 +43,20 @@ endif()
 
 option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
 
-# Option WITH_DIV32 ##################################################
+# Option WITH_DOUBLE_INTEGER_DIVISION ################################
 
-# When using WITH_DIV32=ON primecount checks at runtime
-# if 32-bit division can be used instead of 64-bit
-# division which improves performance on old x64 CPUs
-# (<= 2020). However Clang performs this optimization by
-# itself, so we can disable WITH_DIV32.
+# Try if double floating-point division can be used instead of integer
+# division without loss of precision if the dividend & divisor <= 2^53.
+# Floating-point division if often much faster than integer division.
+# This should work on virtually all CPU architectures, since
+# virtually all CPU architectures use the IEEE 754 standard for
+# floating-point arithmetic.
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "LLVM")
-    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" OFF)
-else()
-    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" ON)
+if(WITH_DOUBLE_INTEGER_DIVISION)
+    include("${PROJECT_SOURCE_DIR}/cmake/double_integer_division.cmake")
+    if(double_integer_division)
+        set(ENABLE_DOUBLE_INTEGER_DIVISION "ENABLE_DOUBLE_INTEGER_DIVISION")
+    endif()
 endif()
 
 # Option sanity checks ###############################################
@@ -168,14 +171,6 @@ endif()
 
 # libprimecount compile definitions ##################################
 
-# Check at runtime if the dividend and divisor are < 2^32 and
-# if so use 32-bit integer division instead of 64-bit integer
-# division. On most CPUs before 2020 this significantly
-# improves performance.
-if(WITH_DIV32)
-    set(ENABLE_DIV32 "ENABLE_DIV32")
-endif()
-
 # Enable expensive debugging assertions.
 # These assertions enable e.g. bounds checks
 # for the Vector and Array types.
@@ -187,7 +182,7 @@ endif()
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
-# Use libdivide.h (fast integer divison) #############################
+# Use libdivide.h (fast integer division) #############################
 
 if(WITH_LIBDIVIDE)
     set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
@@ -262,7 +257,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
+    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
@@ -287,7 +282,7 @@ if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
+    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
@@ -323,7 +318,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
-    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
+    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DOUBLE_INTEGER_DIVISION}" "${ENABLE_ASSERT}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
