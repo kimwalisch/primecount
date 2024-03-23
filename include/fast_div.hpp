@@ -29,6 +29,15 @@
 #include <stdint.h>
 #include <type_traits>
 
+#if defined(ENABLE_DOUBLE_INTEGER_DIVISION)
+
+static_assert(std::numeric_limits<double>::radix == 2,
+  "double type radix != 2");
+static_assert(std::numeric_limits<double>::digits <= std::numeric_limits<unsigned long long>::digits,
+  "double mantissa bits > long long bits!");
+
+#endif
+
 namespace {
 
 /// Converts an 128-bit integer type to uint64_t, other smaller
@@ -47,31 +56,6 @@ struct make_smaller
                      uint64_t, T>::type>::type;
 };
 
-#if defined(ENABLE_DOUBLE_INTEGER_DIVISION)
-
-static_assert(std::numeric_limits<double>::radix == 2,
-  "double type radix != 2");
-static_assert(std::numeric_limits<double>::digits <= std::numeric_limits<unsigned long long>::digits,
-  "double mantissa bits > long long bits!");
-
-// Should be 2^53 on virtually all CPU architectures
-constexpr auto MAX_DOUBLE_INT = 1ull << std::numeric_limits<double>::digits;
-
-/// Used for (32-bit / 32-bit) = 32-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE constexpr
-typename std::enable_if<(sizeof(X) <= sizeof(uint32_t) &&
-                         sizeof(X) <= sizeof(uint32_t)), X>::type
-fast_div(X x, Y y)
-{
-#if __cplusplus >= 201402L
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-#endif
-
-  return X((double) x / (double) y);
-}
-
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE constexpr
@@ -79,44 +63,26 @@ typename std::enable_if<(sizeof(X) == sizeof(uint64_t) &&
                          sizeof(Y) <= sizeof(uint32_t)), X>::type
 fast_div(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
-  // Unsigned integer division is usually
-  // faster than signed integer division.
+#if defined(ENABLE_DOUBLE_INTEGER_DIVISION)
+
   using UX = typename std::make_unsigned<X>::type;
   using UY = typename std::make_unsigned<Y>::type;
 
-  if (UX(x) <= MAX_DOUBLE_INT)
+  if (UX(x) <= (1ull << std::numeric_limits<double>::digits))
     return X((double) x / (double) y);
   else
     return UX(x) / UY(y);
-}
-
-#elif !defined(ENABLE_DOUBLE_INTEGER_DIVISION)
-
-/// Used for (64-bit / 32-bit) = 64-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE constexpr
-typename std::enable_if<(sizeof(X) <= sizeof(uint64_t) &&
-                         sizeof(Y) <= sizeof(uint32_t)), X>::type
-fast_div(X x, Y y)
-{
-#if __cplusplus >= 201402L
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-#endif
-
+#else
   // Unsigned integer division is usually
   // faster than signed integer division.
   using UX = typename std::make_unsigned<X>::type;
   using UY = typename std::make_unsigned<Y>::type;
   return UX(x) / UY(y);
-}
-
 #endif
+}
 
 /// Used for  (64-bit /  64-bit) =  64-bit.
 /// Used for (128-bit / 128-bit) = 128-bit.
@@ -126,10 +92,8 @@ typename std::enable_if<(sizeof(X) >= sizeof(uint64_t) &&
                          sizeof(Y) == sizeof(X)), X>::type
 fast_div(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
   // Unsigned integer division is usually
   // faster than signed integer division.
@@ -146,10 +110,8 @@ typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
                          sizeof(Y) <= sizeof(uint64_t)), X>::type
 fast_div(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
   // Unsigned integer division is usually
   // faster than signed integer division.
@@ -174,10 +136,8 @@ typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
                          sizeof(Y) <= sizeof(uint64_t)), uint64_t>::type
 fast_div64(X x, Y y)
 {
-#if __cplusplus >= 201402L
   ASSERT(x >= 0);
   ASSERT(y > 0);
-#endif
 
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
