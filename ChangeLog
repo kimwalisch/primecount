@@ -1,10 +1,12 @@
-Changes in primecount-7.12, 2024-03-19
+Changes in primecount-7.12, 2024-03-23
 
 * LogarithmicIntegral.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Faster and simpler RiemannR_inverse(x).
 * test/Li.cpp: Add more tests.
 * test/Riemann_R.cpp: Add more tests.
+* CMakeLists.txt: Disable WITH_DIV32 by default, both GCC & Clang
+  have now learned to optimize integer division.
 
 Changes in primecount-7.11, 2024-03-11
 
