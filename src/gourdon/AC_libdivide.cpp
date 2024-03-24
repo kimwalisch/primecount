@@ -388,6 +388,13 @@ T AC_OpenMP(T x,
     {
       // Current segment [low, high[
       segmentedPi.init(low, high);
+
+      // We measure the thread computation time excluding the
+      // initialization of the segmentedPi lookup table.
+      // If the thread computation time is close to 0 then
+      // we increase the segment size in the loadBalancer
+      // which should improve performance.
+      thread_secs = get_time();
       T xlow = x / max(low, 1);
       T xhigh = x / high;
 

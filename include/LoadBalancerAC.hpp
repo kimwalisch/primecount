@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -32,14 +32,12 @@ private:
 
   int64_t low_ = 0;
   int64_t sqrtx_ = 0;
-  int64_t x14_ = 0;
   int64_t y_ = 0;
   int64_t segment_size_ = 0;
   int64_t max_segment_size_ = 0;
   int64_t segment_nr_ = 0;
   int64_t total_segments_ = 0;
   double time_ = 0;
-  int threads_ = 0;
   bool is_print_ = false;
   OmpLock lock_;
 };
