@@ -38,6 +38,7 @@ private:
   int64_t segment_nr_ = 0;
   int64_t total_segments_ = 0;
   double time_ = 0;
+  int threads_ = 0;
   bool is_print_ = false;
   OmpLock lock_;
 };
