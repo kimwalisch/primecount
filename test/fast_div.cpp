@@ -20,19 +20,6 @@
 
 using namespace primecount;
 
-static_assert(std::is_same<make_smaller<int32_t>::type, uint32_t>::value,
-              "make_smaller<int32_t>::type != uint32_t");
-
-static_assert(std::is_same<make_smaller<uint64_t>::type, uint32_t>::value,
-              "make_smaller<uint64_t>::type != uint32_t");
-
-#ifdef HAVE_INT128_T
-
-static_assert(std::is_same<make_smaller<int128_t>::type, uint64_t>::value,
-              "make_smaller<int128_t>::type != uint64_t");
-
-#endif
-
 void check(bool OK)
 {
   std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";

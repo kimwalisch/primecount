@@ -34,19 +34,6 @@
 
 namespace {
 
-/// Get the next smaller integer type
-/// and convert it to unsigned.
-/// make_smaller< uint64_t>::type -> uint32_t.
-/// make_smaller<uint128_t>::type -> uint64_t.
-///
-template <typename T>
-struct make_smaller
-{
-  using type = typename std::conditional<sizeof(T) / 2 <= sizeof(uint32_t), uint32_t,
-               typename std::conditional<sizeof(T) / 2 <= sizeof(uint64_t), uint64_t,
-               T>::type>::type;
-};
-
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE typename std::enable_if<(sizeof(X) == sizeof(uint64_t) &&
@@ -60,10 +47,9 @@ fast_div(X x, Y y)
 
   using UX = typename std::make_unsigned<X>::type;
   using UY = typename std::make_unsigned<Y>::type;
-  using smaller_t = typename make_smaller<X>::type;
 
-  if (x <= std::numeric_limits<smaller_t>::max())
-    return smaller_t(x) / UY(y);
+  if (x <= std::numeric_limits<uint32_t>::max())
+    return uint32_t(x) / UY(y);
   else
     return UX(x) / UY(y);
 #else
@@ -106,10 +92,9 @@ fast_div(X x, Y y)
   // faster than signed integer division.
   using UX = typename std::make_unsigned<X>::type;
   using UY = typename std::make_unsigned<Y>::type;
-  using smaller_t = typename make_smaller<X>::type;
 
-  if (x <= std::numeric_limits<smaller_t>::max())
-    return smaller_t(x) / UY(y);
+  if (x <= std::numeric_limits<uint64_t>::max())
+    return uint64_t(x) / UY(y);
   else
     return UX(x) / UY(y);
 }

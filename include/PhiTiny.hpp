@@ -9,7 +9,7 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,7 +19,6 @@
 #define PHITINY_HPP
 
 #include <BitSieve240.hpp>
-#include <fast_div.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
@@ -172,22 +171,20 @@ inline bool is_phi_tiny(uint64_t a)
 }
 
 template <typename T>
-typename std::enable_if<(sizeof(T) == sizeof(typename make_smaller<T>::type)), T>::type
+typename std::enable_if<(sizeof(T) <= sizeof(uint64_t)), T>::type
 phi_tiny(T x, uint64_t a)
 {
   return phiTiny.phi_recursive(x, a);
 }
 
 template <typename T>
-typename std::enable_if<(sizeof(T) > sizeof(typename make_smaller<T>::type)), T>::type
+typename std::enable_if<(sizeof(T) > sizeof(uint64_t)), T>::type
 phi_tiny(T x, uint64_t a)
 {
-  using smaller_t = typename make_smaller<T>::type;
-
   // If possible use smaller integer type
   // to speed up integer division.
-  if (x <= std::numeric_limits<smaller_t>::max())
-    return phiTiny.phi_recursive((smaller_t) x, a);
+  if (x <= std::numeric_limits<uint64_t>::max())
+    return phiTiny.phi_recursive((uint64_t) x, a);
   else
     return phiTiny.phi_recursive(x, a);
 }
