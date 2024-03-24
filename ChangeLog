@@ -1,5 +1,6 @@
 Changes in primecount-7.12, 2024-03-24
 
+* LoadBalancerAC.cpp: Improve thread load balancing.
 * LogarithmicIntegral.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Faster and simpler RiemannR_inverse(x).

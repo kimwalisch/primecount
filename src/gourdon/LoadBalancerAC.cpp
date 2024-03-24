@@ -18,7 +18,6 @@
 #include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
-#include <min.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -54,35 +53,43 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // than x^(1/4) because load balancing is only
   // useful for multi-threading.
   if (threads == 1 && !is_print)
+  {
     segment_size_ = std::max(x14_, l2_segment_size);
+    segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+    total_segments_ = ceil_div(sqrtx_, segment_size_);
+  }
   else
   {
     // The default segment size is x^(1/4). This
     // is tiny, will fit into the CPU's cache.
-    segment_size_ = x14_;
-
-    // Most special leaves are below y (~ x^(1/3) * log(x)).
-    // We make sure this interval is evenly distributed
-    // amongst all threads by using a small segment size.
-    // Above y we use a larger segment size but still ensure
-    // that it fits into the CPU's cache.
-    if (y_ < sqrtx_)
-    {
-      int64_t max_segment_size = (sqrtx_ - y_) / (threads_ * 8);
-      large_segment_size_ = segment_size_ * 16;
-      large_segment_size_ = min3(large_segment_size_, l2_segment_size, max_segment_size);
-      large_segment_size_ = std::max(segment_size_, large_segment_size_);
-    }
+    segment_size_ = SegmentedPiTable::get_segment_size(x14_);
+    total_segments_ = ceil_div(sqrtx_, segment_size_);
   }
 
-  validate_segment_sizes();
-  compute_total_segments();
+  // Most special leaves are below y (~ x^(1/3) * log(x)).
+  // We make sure this interval is evenly distributed
+  // amongst all threads by using a small segment size.
+  // Above y we use a larger segment size but still ensure
+  // that it fits into the CPU's cache.
+  if (y_ < sqrtx_)
+  {
+    max_segment_size_ = (sqrtx_ - y_) / (threads * 8);
+    max_segment_size_ = std::min(l2_segment_size, max_segment_size_);
+    max_segment_size_ = std::max(segment_size_, max_segment_size_);
+  }
+
   print_status();
 }
 
-bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
+bool LoadBalancerAC::get_work(int64_t& low,
+                              int64_t& high,
+                              double& thread_secs)
 {
+  if (thread_secs > 0)
+    thread_secs = get_time() - thread_secs;
+
   LockGuard lockGuard(lock_);
+  int64_t thread_segment_size = high - low;
 
   if (low_ >= sqrtx_)
     return false;
@@ -90,10 +97,17 @@ bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
   // Most special leaves are below y (~ x^(1/3) * log(x)).
   // We make sure this interval is evenly distributed
   // amongst all threads by using a small segment size.
-  // Above y we use a larger segment size but still ensure
-  // that it fits into the CPU's cache.
-  if (low_ > y_)
-    segment_size_ = large_segment_size_;
+  // Above y we increase the segment size by 2x if the
+  // thread runtime is close to 0.
+  if (low_ > y_ &&
+      thread_segment_size >= segment_size_ &&
+      thread_secs < 0.01)
+  {
+    int64_t increase_factor = 2;
+    segment_size_ = std::min(segment_size_ * increase_factor, max_segment_size_);
+    segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+    total_segments_ = segment_nr_ + ceil_div(sqrtx_ - low_, segment_size_);
+  }
 
   low = low_;
   high = low + segment_size_;
@@ -102,23 +116,8 @@ bool LoadBalancerAC::get_work(int64_t& low, int64_t& high)
   segment_nr_++;
   print_status();
 
+  thread_secs = get_time();
   return low < sqrtx_;
-}
-
-void LoadBalancerAC::validate_segment_sizes()
-{
-  segment_size_ = std::max(min_segment_size, segment_size_);
-  large_segment_size_ = std::max(segment_size_, large_segment_size_);
-  segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
-  large_segment_size_ = SegmentedPiTable::get_segment_size(large_segment_size_);
-}
-
-void LoadBalancerAC::compute_total_segments()
-{
-  int64_t small_segments = ceil_div(y_, segment_size_);
-  int64_t threshold = std::min(small_segments * segment_size_, sqrtx_);
-  int64_t large_segments = ceil_div(sqrtx_ - threshold, large_segment_size_);
-  total_segments_ = small_segments + large_segments;
 }
 
 void LoadBalancerAC::print_status()
@@ -133,7 +132,9 @@ void LoadBalancerAC::print_status()
     {
       time_ = time;
       std::ostringstream status;
-      status << "\rSegments: " << segment_nr_ << '/' << total_segments_;
+      // Clear line because total_segments_ may become smaller
+      status << "\r                                    "
+             << "\rSegments: " << segment_nr_ << '/' << total_segments_;
       std::cout << status.str() << std::flush;
     }
   }

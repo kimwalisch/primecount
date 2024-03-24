@@ -359,13 +359,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    // SegmentedPiTable is accessed very frequently.
-    // In order to get good performance it is important that
-    // SegmentedPiTable fits into the CPU's cache.
-    // Hence we use a small segment_size of x^(1/4).
-    SegmentedPiTable segmentedPi;
-    int64_t low, high;
-
     // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
     // There are very few iterations in this loop,
     // hence the use of an atomic loop counter (min_c1)
@@ -381,8 +374,17 @@ T AC_OpenMP(T x,
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
     }
 
+    // SegmentedPiTable is accessed very frequently.
+    // In order to get good performance it is important that
+    // SegmentedPiTable fits into the CPU's cache.
+    // Hence we use a small segment_size of x^(1/4).
+    SegmentedPiTable segmentedPi;
+    int64_t low = 0;
+    int64_t high = 0;
+    double thread_secs = 0;
+
     // for (low = 0; low < sqrt; low += segment_size)
-    while (loadBalancer.get_work(low, high))
+    while (loadBalancer.get_work(low, high, thread_secs))
     {
       // Current segment [low, high[
       segmentedPi.init(low, high);
