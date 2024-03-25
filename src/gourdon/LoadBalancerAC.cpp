@@ -90,7 +90,7 @@ bool LoadBalancerAC::get_work(int64_t& low,
     start_time_ = current_time;
 
   double total_secs = current_time - start_time_;
-  double increase_threshold = in_between(0.01, total_secs / 1000, 1.0);
+  double increase_threshold = in_between(0.01, total_secs / 100, 1.0);
   int64_t remaining_dist = sqrtx_ - low_;
   int64_t thread_segment_size = high - low;
 
