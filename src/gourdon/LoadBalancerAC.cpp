@@ -71,21 +71,26 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // that it fits into the CPU's cache.
   max_segment_size_ = std::max(l2_segment_size, segment_size_);
 
-  print_status();
+  if (is_print_)
+    print_status(get_time());
 }
 
 bool LoadBalancerAC::get_work(int64_t& low,
                               int64_t& high,
                               double& thread_secs)
 {
-  if (thread_secs > 0)
-    thread_secs = get_time() - thread_secs;
+  double current_time = get_time();
+  thread_secs = current_time - thread_secs;
 
   LockGuard lockGuard(lock_);
 
   if (low_ >= sqrtx_)
     return false;
+  if (low_ == 0)
+    start_time_ = current_time;
 
+  double total_secs = current_time - start_time_;
+  double increase_threshold = in_between(0.01, total_secs / 1000, 1.0);
   int64_t remaining_dist = sqrtx_ - low_;
   int64_t thread_segment_size = high - low;
 
@@ -95,8 +100,8 @@ bool LoadBalancerAC::get_work(int64_t& low,
   // Above y we increase the segment size by 2x if the
   // thread runtime is close to 0.
   if (low_ > y_ &&
-      thread_secs < 0.01 &&
-      thread_segment_size >= segment_size_ &&
+      thread_secs < increase_threshold &&
+      thread_segment_size == segment_size_ &&
       segment_size_ * (threads_ * 4) < remaining_dist)
   {
     int64_t increase_factor = 2;
@@ -105,33 +110,30 @@ bool LoadBalancerAC::get_work(int64_t& low,
     total_segments_ = segment_nr_ + ceil_div(remaining_dist, segment_size_);
   }
 
+  if (is_print_)
+    print_status(current_time);
+
   low = low_;
   high = low + segment_size_;
   high = std::min(high, sqrtx_);
   low_ = high;
   segment_nr_++;
-  print_status();
 
   return low < sqrtx_;
 }
 
-void LoadBalancerAC::print_status()
+void LoadBalancerAC::print_status(double current_time)
 {
-  if (is_print_)
-  {
-    double time = get_time();
-    double old = time_;
-    double threshold = 0.1;
+  double threshold = 0.1;
 
-    if ((time - old) >= threshold)
-    {
-      time_ = time;
-      std::ostringstream status;
-      // Clear line because total_segments_ may become smaller
-      status << "\r                                    "
-             << "\rSegments: " << segment_nr_ << '/' << total_segments_;
-      std::cout << status.str() << std::flush;
-    }
+  if (current_time - print_time_ >= threshold)
+  {
+    print_time_ = current_time;
+    std::ostringstream status;
+    // Clear line because total_segments_ may become smaller
+    status << "\r                                    "
+            << "\rSegments: " << segment_nr_ << '/' << total_segments_;
+    std::cout << status.str() << std::flush;
   }
 }
 
