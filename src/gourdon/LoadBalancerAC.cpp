@@ -106,7 +106,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
       thread.secs < increase_threshold &&
       thread.segments == segments_ &&
       thread.segment_size == segment_size_ &&
-      segments_ * segment_size_ * (threads_ * 8) < remaining_dist)
+      segments_ * segment_size_ * (threads_ * 4) < remaining_dist)
   {
     int64_t increase_factor = 2;
 
