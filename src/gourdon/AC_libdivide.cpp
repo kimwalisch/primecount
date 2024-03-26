@@ -25,7 +25,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -379,64 +379,71 @@ T AC_OpenMP(T x,
     // SegmentedPiTable fits into the CPU's cache.
     // Hence we use a small segment_size of x^(1/4).
     SegmentedPiTable segmentedPi;
-    int64_t low = 0;
-    int64_t high = 0;
-    double thread_secs = 0;
+    ThreadDataAC thread;
 
-    // for (low = 0; low < sqrt; low += segment_size)
-    while (loadBalancer.get_work(low, high, thread_secs))
+    while (loadBalancer.get_work(thread))
     {
-      // Current segment [low, high[
-      segmentedPi.init(low, high);
+      int64_t low = thread.low;
+      int64_t segments = thread.segments;
+      int64_t segment_size = thread.segment_size;
 
-      // We measure the thread computation time excluding the
-      // initialization of the segmentedPi lookup table.
-      // If the thread computation time is close to 0 then
-      // we increase the segment size in the loadBalancer
-      // which should improve performance.
-      thread_secs = get_time();
-      T xlow = x / max(low, 1);
-      T xhigh = x / high;
-
-      int64_t min_c2 = max(k, pi_root3_xy);
-      min_c2 = max(min_c2, pi_sqrtz);
-      min_c2 = max(min_c2, pi[isqrt(low)]);
-      min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-      min_c2 += 1;
-
-      int64_t min_a = min(xhigh / high, x13);
-      min_a = pi[max(x_star, min_a)] + 1;
-
-      // Upper bound of A & C2 formulas:
-      // x / (p * q) >= low
-      // p * next_prime(p) <= x / low
-      // p <= sqrt(x / low)
-      T sqrt_xlow = isqrt(xlow);
-      int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-      int64_t max_a = pi[min(sqrt_xlow, x13)];
-
-      // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-      for (int64_t b = min_c2; b <= max_c2; b++)
+      for (; segments-- && low < sqrtx; low += segment_size)
       {
-        int64_t prime = primes[b];
-        T xp = x / prime;
+        // Current segment [low, high[
+        int64_t high = low + segment_size;
+        high = std::min(high, sqrtx);
+        segmentedPi.init(low, high);
 
-        if (xp <= numeric_limits<uint64_t>::max())
-          sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
-        else
-          sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
-      }
+        // We measure the thread computation time excluding the
+        // first expensive initialization of the segmentedPi
+        // lookup table. If the thread computation time is close
+        // to 0, then we increase the number of segments in the
+        // loadBalancer which should improve performance.
+        if (low == thread.low)
+          thread.secs = get_time();
 
-      // A formula: pi[x_star] < b <= pi[x13]
-      for (int64_t b = min_a; b <= max_a; b++)
-      {
-        int64_t prime = primes[b];
-        T xp = x / prime;
+        T xlow = x / max(low, 1);
+        T xhigh = x / high;
+        int64_t min_c2 = max(k, pi_root3_xy);
+        min_c2 = max(min_c2, pi_sqrtz);
+        min_c2 = max(min_c2, pi[isqrt(low)]);
+        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
+        min_c2 += 1;
 
-        if (xp <= numeric_limits<uint64_t>::max())
-          sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
-        else
-          sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
+        int64_t min_a = min(xhigh / high, x13);
+        min_a = pi[max(x_star, min_a)] + 1;
+
+        // Upper bound of A & C2 formulas:
+        // x / (p * q) >= low
+        // p * next_prime(p) <= x / low
+        // p <= sqrt(x / low)
+        T sqrt_xlow = isqrt(xlow);
+        int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+        int64_t max_a = pi[min(sqrt_xlow, x13)];
+
+        // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+        for (int64_t b = min_c2; b <= max_c2; b++)
+        {
+          int64_t prime = primes[b];
+          T xp = x / prime;
+
+          if (xp <= numeric_limits<uint64_t>::max())
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
+          else
+            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+        }
+
+        // A formula: pi[x_star] < b <= pi[x13]
+        for (int64_t b = min_a; b <= max_a; b++)
+        {
+          int64_t prime = primes[b];
+          T xp = x / prime;
+
+          if (xp <= numeric_limits<uint64_t>::max())
+            sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
+          else
+            sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
+        }
       }
     }
   }
