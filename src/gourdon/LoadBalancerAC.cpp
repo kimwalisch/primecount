@@ -89,10 +89,10 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
 
   int64_t remaining_dist = sqrtx_ - low_;
   double total_secs = time - start_time_;
-  double increase_threshold = std::max(0.01, total_secs / 100);
+  double increase_threshold = std::max(0.01, total_secs / 1000);
 
   // Near the end of the computation we use a small
-  // increase_threshold < 1 second in order to make
+  // increase_threshold of 0.1 seconds in order to make
   // sure all threads finish nearly at same time.
   if (segment_size_ == max_segment_size_)
     increase_threshold = std::min(increase_threshold, 0.1);
@@ -106,7 +106,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
       thread.secs < increase_threshold &&
       thread.segments == segments_ &&
       thread.segment_size == segment_size_ &&
-      segments_ * segment_size_ * (threads_ * 4) < remaining_dist)
+      segments_ * segment_size_ * (threads_ * 8) < remaining_dist)
   {
     int64_t increase_factor = 2;
 
