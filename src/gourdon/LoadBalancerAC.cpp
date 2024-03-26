@@ -91,11 +91,11 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   double total_secs = time - start_time_;
   double increase_threshold = std::max(0.01, total_secs / 1000);
 
-  // Near the end of the computation we use a small
-  // increase_threshold of 0.1 seconds in order to make
-  // sure all threads finish nearly at same time.
+  // Near the end of the computation we use a smaller
+  // increase_threshold <= 1 second in order to make sure
+  // all threads finish nearly at same time.
   if (segment_size_ == max_segment_size_)
-    increase_threshold = std::min(increase_threshold, 0.1);
+    increase_threshold = std::min(increase_threshold, 1.0);
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
   // We make sure this interval is evenly distributed
