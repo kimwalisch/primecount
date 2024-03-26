@@ -18,7 +18,7 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,10 +43,11 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   int threads = 1;
   uint64_t pi_low;
 
-  // In order to make the threads completely independent
-  // from each other each thread needs compute PrimePi[low]
-  // at the start of each new segment. If only a single
-  // thread is used we can compute PrimePi[low] in O(1) by
+  // In order to make the threads completely independent from
+  // each other, each thread needs to compute PrimePi[low]
+  // at the start of each newly assigned segment from the
+  // LoadBalancer. However if a thread processes consecutive
+  // segments, then we can compute PrimePi[low] in O(1) by
   // getting that value from the previous segment.
   if (low <= 5)
     pi_low = pi_tiny_[5];
@@ -68,7 +69,7 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   init_count(pi_low);
 }
 
-/// Each thread computes PrimePi [low, high[
+/// Init pi[x] lookup table for [low, high[
 void SegmentedPiTable::init_bits()
 {
   // Iterate over primes >= 7
@@ -79,9 +80,8 @@ void SegmentedPiTable::init_bits()
   primesieve::iterator it(low, high_);
   uint64_t prime = 0;
 
-  // Each thread iterates over the primes
-  // inside [low, high[ and initializes
-  // the pi[x] lookup table.
+  // For each prime in [low, high[ set the
+  // corresponding bit in the pi[x] lookup table.
   while ((prime = it.next_prime()) < high_)
   {
     uint64_t p = prime - low_;
@@ -89,11 +89,11 @@ void SegmentedPiTable::init_bits()
   }
 }
 
-/// Each thread computes PrimePi [low, high[
 void SegmentedPiTable::init_count(uint64_t pi_low)
 {
   uint64_t j = ceil_div((high_ - low_), 240);
 
+  // Count 1 bits (primes) in pi[x] lookup table
   for (uint64_t i = 0; i < j; i++)
   {
     pi_[i].count = pi_low;
