@@ -24,17 +24,6 @@
 #include <iostream>
 #include <sstream>
 
-namespace {
-
-constexpr int64_t numbers_per_byte = primecount::SegmentedPiTable::numbers_per_byte();
-constexpr int64_t l2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
-
-// Minimum segment size = 512 bytes.
-// This size performs well on my AMD EPYC 2 near 1e16.
-constexpr int64_t min_segment_size = (1 << 9) * numbers_per_byte;
-
-} // namespace
-
 namespace primecount {
 
 LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
@@ -53,21 +42,24 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   int64_t x14 = isqrt(sqrtx);
   segment_size_ = x14;
 
-  // When a single thread is used (and printing is
-  // disabled) we can use a segment size larger
-  // than x^(1/4) because load balancing is only
-  // useful for multi-threading.
+  // Minimum segment size = 512 bytes.
+  // This size performs well near 1e16 on my AMD EPYC 2.
+  int64_t min_segment_size = (1 << 9) * SegmentedPiTable::numbers_per_byte();
+
+  // The maximum segment size matches the CPU's L2 cache
+  // size (unless x^(1/4) > L2 cache size). This way
+  // we ensure that most memory accesses will be cache
+  // hits and we get good performance.
+  int64_t l2_segment_size = L2_CACHE_SIZE * SegmentedPiTable::numbers_per_byte();
+
+  // When using a single thread (and printing is disabled)
+  // we can use a segment size larger than x^(1/4)
+  // because load balancing is only useful for multi-threading.
   if (threads == 1 && !is_print)
     segment_size_ = std::max(x14, l2_segment_size);
 
   segment_size_ = std::max(min_segment_size, segment_size_);
   segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
-
-  // Most special leaves are below y (~ x^(1/3) * log(x)).
-  // We make sure this interval is evenly distributed
-  // amongst all threads by using a small segment size.
-  // Above y we use a larger segment size but still ensure
-  // that it fits into the CPU's cache.
   max_segment_size_ = std::max(l2_segment_size, segment_size_);
   max_segment_size_ = SegmentedPiTable::get_segment_size(max_segment_size_);
 
