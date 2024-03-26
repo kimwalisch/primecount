@@ -21,16 +21,26 @@
 
 namespace primecount {
 
+struct ThreadDataAC
+{
+  int64_t low = 0;
+  int64_t segments = 0;
+  int64_t segment_size = 0;
+  double secs = 0;
+};
+
 class LoadBalancerAC
 {
 public:
   LoadBalancerAC(int64_t sqrtx, int64_t y, int threads, bool is_print);
-  bool get_work(int64_t& low, int64_t& high, double& thread_secs);
+  bool get_work(ThreadDataAC& thread);
+
 private:
   void print_status(double current_time);
   int64_t low_ = 0;
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
+  int64_t segments_ = 1;
   int64_t segment_size_ = 0;
   int64_t max_segment_size_ = 0;
   int64_t segment_nr_ = 0;

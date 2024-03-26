@@ -75,60 +75,72 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     print_status(get_time());
 }
 
-bool LoadBalancerAC::get_work(int64_t& low,
-                              int64_t& high,
-                              double& thread_secs)
+bool LoadBalancerAC::get_work(ThreadDataAC& thread)
 {
-  double current_time = get_time();
-  thread_secs = current_time - thread_secs;
+  double time = get_time();
+  thread.secs = time - thread.secs;
 
   LockGuard lockGuard(lock_);
 
   if (low_ >= sqrtx_)
     return false;
   if (low_ == 0)
-    start_time_ = current_time;
+    start_time_ = time;
 
-  double total_secs = current_time - start_time_;
-  double increase_threshold = in_between(0.01, total_secs / 100, 1.0);
+  double total_secs = time - start_time_;
+  double increase_threshold = std::max(0.01, total_secs / 100);
   int64_t remaining_dist = sqrtx_ - low_;
-  int64_t thread_segment_size = high - low;
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
   // We make sure this interval is evenly distributed
   // amongst all threads by using a small segment size.
-  // Above y we increase the segment size by 2x if the
-  // thread runtime is close to 0.
+  // Above y we increase the segment size (or the number of
+  // segments) by 2x if the thread runtime is close to 0.
   if (low_ > y_ &&
-      thread_secs < increase_threshold &&
-      thread_segment_size == segment_size_ &&
-      segment_size_ * (threads_ * 4) < remaining_dist)
+      thread.secs < increase_threshold &&
+      thread.segment_size == segment_size_ &&
+      segments_ * segment_size_ * (threads_ * 4) < remaining_dist)
   {
     int64_t increase_factor = 2;
-    segment_size_ = std::min(segment_size_ * increase_factor, max_segment_size_);
-    segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
-    total_segments_ = segment_nr_ + ceil_div(remaining_dist, segment_size_);
+
+    if (segment_size_ >= max_segment_size_)
+      segments_ *= increase_factor;
+    else
+    {
+      segment_size_ = segment_size_ * increase_factor;
+      segment_size_ = std::min(segment_size_, max_segment_size_);
+      segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+    }
+
+    int64_t thread_dist = segments_ * segment_size_;
+    total_segments_ = ceil_div(remaining_dist, thread_dist);
+    total_segments_ += segment_nr_;
   }
 
-  if (is_print_)
-    print_status(current_time);
+  // Update current time because the thread
+  // may have waited to aquire the lock.
+  time = get_time();
 
-  low = low_;
-  high = low + segment_size_;
-  high = std::min(high, sqrtx_);
-  low_ = high;
+  if (is_print_)
+    print_status(time);
+
+  thread.low = low_;
+  thread.segments = segments_;
+  thread.segment_size = segment_size_;
+  thread.secs = time;
+  low_ = std::min(low_ + segments_ * segment_size_, sqrtx_);
   segment_nr_++;
 
-  return low < sqrtx_;
+  return thread.low < sqrtx_;
 }
 
-void LoadBalancerAC::print_status(double current_time)
+void LoadBalancerAC::print_status(double time)
 {
   double threshold = 0.1;
 
-  if (current_time - print_time_ >= threshold)
+  if (time - print_time_ >= threshold)
   {
-    print_time_ = current_time;
+    print_time_ = time;
     std::ostringstream status;
     // Clear line because total_segments_ may become smaller
     status << "\r                                    "
