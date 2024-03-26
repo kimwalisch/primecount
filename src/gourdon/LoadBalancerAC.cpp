@@ -115,8 +115,8 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   if (is_print_)
     print_status(time);
 
-  // Update current time because the thread
-  // may have waited to aquire the lock.
+  // Update current time because the thread may
+  // have waited to acquire the lock.
   time = get_time();
 
   thread.low = low_;
