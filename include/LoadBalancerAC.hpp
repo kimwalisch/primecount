@@ -42,9 +42,8 @@ private:
   int64_t y_ = 0;
   int64_t segments_ = 1;
   int64_t segment_size_ = 0;
-  int64_t max_segment_size_ = 0;
   int64_t segment_nr_ = 0;
-  int64_t total_segments_ = 0;
+  int64_t max_segment_size_ = 0;
   double start_time_ = 0;
   double print_time_ = 0;
   int threads_ = 0;

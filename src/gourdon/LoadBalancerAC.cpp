@@ -62,7 +62,6 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
 
   segment_size_ = std::max(min_segment_size, segment_size_);
   segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
-  total_segments_ = ceil_div(sqrtx, segment_size_);
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
   // We make sure this interval is evenly distributed
@@ -88,7 +87,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
     start_time_ = time;
 
   double total_secs = time - start_time_;
-  double increase_threshold = std::max(0.01, total_secs / 100);
+  double increase_threshold = std::max(0.01, total_secs / 1000);
   int64_t remaining_dist = sqrtx_ - low_;
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
@@ -99,7 +98,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   if (low_ > y_ &&
       thread.secs < increase_threshold &&
       thread.segment_size == segment_size_ &&
-      segments_ * segment_size_ * (threads_ * 4) < remaining_dist)
+      segments_ * segment_size_ * (threads_ * 8) < remaining_dist)
   {
     int64_t increase_factor = 2;
 
@@ -111,18 +110,14 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
       segment_size_ = std::min(segment_size_, max_segment_size_);
       segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
     }
-
-    int64_t thread_dist = segments_ * segment_size_;
-    total_segments_ = ceil_div(remaining_dist, thread_dist);
-    total_segments_ += segment_nr_;
   }
+
+  if (is_print_)
+    print_status(time);
 
   // Update current time because the thread
   // may have waited to aquire the lock.
   time = get_time();
-
-  if (is_print_)
-    print_status(time);
 
   thread.low = low_;
   thread.segments = segments_;
@@ -141,10 +136,16 @@ void LoadBalancerAC::print_status(double time)
   if (time - print_time_ >= threshold)
   {
     print_time_ = time;
+
+    int64_t remaining_dist = sqrtx_ - low_;
+    int64_t thread_dist = segments_ * segment_size_;
+    int64_t total_segments = ceil_div(remaining_dist, thread_dist);
+    total_segments += segment_nr_;
+
     std::ostringstream status;
-    // Clear line because total_segments_ may become smaller
+    // Clear line because total_segments may become smaller
     status << "\r                                    "
-            << "\rSegments: " << segment_nr_ << '/' << total_segments_;
+            << "\rSegments: " << segment_nr_ << '/' << total_segments;
     std::cout << status.str() << std::flush;
   }
 }
