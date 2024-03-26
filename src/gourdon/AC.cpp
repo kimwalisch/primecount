@@ -278,9 +278,17 @@ T AC_OpenMP(T x,
         int64_t high = low + segment_size;
         high = std::min(high, sqrtx);
         segmentedPi.init(low, high);
+
+        // We measure the thread computation time excluding the
+        // first expensive initialization of the segmentedPi
+        // lookup table. If the thread computation time is close
+        // to 0, then we increase the number of segments in the
+        // loadBalancer which should improve performance.
+        if (low == thread.low)
+          thread.secs = get_time();
+
         T xlow = x / max(low, 1);
         T xhigh = x / high;
-
         int64_t min_c2 = max(k, pi_root3_xy);
         min_c2 = max(min_c2, pi_sqrtz);
         min_c2 = max(min_c2, pi[isqrt(low)]);

@@ -87,7 +87,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
     start_time_ = time;
 
   double total_secs = time - start_time_;
-  double increase_threshold = std::max(0.01, total_secs / 1000);
+  double increase_threshold = in_between(0.01, total_secs / 1000, 1.0);
   int64_t remaining_dist = sqrtx_ - low_;
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
@@ -97,6 +97,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   // segments) by 2x if the thread runtime is close to 0.
   if (low_ > y_ &&
       thread.secs < increase_threshold &&
+      thread.segments == segments_ &&
       thread.segment_size == segment_size_ &&
       segments_ * segment_size_ * (threads_ * 8) < remaining_dist)
   {
@@ -115,14 +116,9 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   if (is_print_)
     print_status(time);
 
-  // Update current time because the thread may
-  // have waited to acquire the lock.
-  time = get_time();
-
   thread.low = low_;
   thread.segments = segments_;
   thread.segment_size = segment_size_;
-  thread.secs = time;
   low_ = std::min(low_ + segments_ * segment_size_, sqrtx_);
   segment_nr_++;
 
