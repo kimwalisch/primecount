@@ -36,11 +36,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   is_print_(is_print)
 {
   lock_.init(threads);
-
-  // The default segment size is x^(1/4). This
-  // is tiny, will fit into the CPU's cache.
   int64_t x14 = isqrt(sqrtx);
-  segment_size_ = x14;
 
   // Minimum segment size = 512 bytes.
   // This size performs well near 1e16 on my AMD EPYC 2.
@@ -52,11 +48,23 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // hits and we get good performance.
   int64_t l2_segment_size = L2_CACHE_SIZE * SegmentedPiTable::numbers_per_byte();
 
-  // When using a single thread (and printing is disabled)
-  // we can use a segment size larger than x^(1/4)
-  // because load balancing is only useful for multi-threading.
   if (threads == 1 && !is_print)
+  {
+    // When using a single thread (and printing is disabled)
+    // we can use a segment size larger than x^(1/4)
+    // because load balancing is only needed for multi-threading.
     segment_size_ = std::max(x14, l2_segment_size);
+    segments_ = ceil_div(sqrtx, segment_size_);
+  }
+  else
+  {
+    // When using multi-threading we use a tiny segment size
+    // of x^(1/4). This segment fits into the CPU's cache
+    // and ensures good load balancing i.e. the work is evenly
+    // distributed amongst all CPU cores.
+    segment_size_ = x14;
+    segments_ = 1;
+  }
 
   segment_size_ = std::max(min_segment_size, segment_size_);
   segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
