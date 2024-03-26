@@ -69,6 +69,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // Above y we use a larger segment size but still ensure
   // that it fits into the CPU's cache.
   max_segment_size_ = std::max(l2_segment_size, segment_size_);
+  max_segment_size_ = SegmentedPiTable::get_segment_size(max_segment_size_);
 
   if (is_print_)
     print_status(get_time());
@@ -86,9 +87,15 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   if (low_ == 0)
     start_time_ = time;
 
-  double total_secs = time - start_time_;
-  double increase_threshold = in_between(0.01, total_secs / 1000, 1.0);
   int64_t remaining_dist = sqrtx_ - low_;
+  double total_secs = time - start_time_;
+  double increase_threshold = std::max(0.01, total_secs / 100);
+
+  // Near the end of the computation we use a small
+  // increase_threshold < 1 second in order to make
+  // sure all threads finish nearly at same time.
+  if (segment_size_ == max_segment_size_)
+    increase_threshold = std::min(increase_threshold, 0.1);
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
   // We make sure this interval is evenly distributed
