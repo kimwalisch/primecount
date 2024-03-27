@@ -71,7 +71,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // we can set segment_size to its maximum size as load
     // balancing is only useful for multi-threading.
     segment_size_ = max_size_;
-    // Currently our Sieve.cpp does not rebalance the counters
+    // Currently our Sieve.cpp does not rebalance its counters
     // data structure. However, if we process the computation
     // in chunks then the sieve gets recreated for each new
     // chunk which rebalances the counters. Therefore we limit
