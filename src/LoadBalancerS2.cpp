@@ -1,28 +1,28 @@
 ///
 /// @file  LoadBalancerS2.cpp
-/// @brief The LoadBalancerS2 assigns work to the individual threads
-///        in the computation of the special leaves in the
+/// @brief The LoadBalancerS2 assigns work to the individual
+///        threads in the computation of the special leaves in the
 ///        Lagarias-Miller-Odlyzko, Deleglise-Rivat and Gourdon
-///        prime counting algorithms. This load balancer is used
-///        by the S2_hard(x, y) and D(x, y) functions.
+///        prime counting algorithms. This load balancer is used by
+///        the S2_hard(x, y) and D(x, y) functions.
 ///
-///        Simply parallelizing the computation of the special
-///        leaves in the Lagarias-Miller-Odlyzko algorithm by
-///        subdividing the sieve interval by the number of threads
-///        into equally sized subintervals does not scale because
-///        the distribution of the special leaves is highly skewed
-///        and most special leaves are in the first few segments
-///        whereas later on there are very few special leaves.
+///        Simply parallelizing the computation of the special leaves
+///        in the Lagarias-Miller-Odlyzko algorithm by subdividing
+///        the sieve interval by the number of threads into equally
+///        sized subintervals does not scale because the distribution
+///        of the special leaves is highly skewed and most special
+///        leaves are in the first few segments whereas later on
+///        there are very few special leaves.
 ///
 ///        This LoadBalancerS2 gradually increases the number of
-///        segments to sieve as long the expected runtime of the
+///        segments to sieve as long as the expected runtime of the
 ///        sieve distance is smaller than the expected finish time
 ///        of the algorithm. Near the end the LoadBalancerS2 will
 ///        gradually decrease the number of segments to sieve in
-///        order to prevent that 1 thread will run much longer
-///        than all the other threads.
+///        order to prevent that 1 thread will run much longer than
+///        all the other threads.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,25 +54,28 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   lock_.init(threads);
 
-  // The best performance is usually achieved using
-  // a sieve array size that matches your CPU's L1
-  // data cache size (per core) or that is slightly
-  // larger than your L1 cache size but smaller than
-  // your L2 cache size (per core). Also, the
-  // segment_size must be >= sqrt(sieve_limit).
+  // The best performance is usually achieved using a sieve
+  // array size that matches your CPU's L1 data cache size
+  // (per core) or that is slightly larger than your L1 cache
+  // size but smaller than your L2 cache size (per core).
+  // Also, the segment_size must be >= sqrt(sieve_limit).
   int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
   int64_t numbers_per_byte = 30;
   int64_t sqrt_limit = isqrt(sieve_limit);
   max_size_ = max(sieve_bytes * numbers_per_byte, sqrt_limit);
 
-  // When a single thread is used (and printing
-  // is disabled) we can set segment_size to
-  // its maximum size as load balancing is only
-  // useful for multi-threading.
   if (threads == 1 &&
       !is_print)
   {
+    // When a single thread is used (and printing is disabled)
+    // we can set segment_size to its maximum size as load
+    // balancing is only useful for multi-threading.
     segment_size_ = max_size_;
+    // Currently our Sieve.cpp does not rebalance the counters
+    // data structure. However, if we process the workload in
+    // chunks then the sieve gets recreated for each new
+    // chunk which rebalances the counters. Therefore we limit
+    // the number of segments here.
     segments_ = 100;
   }
   else
