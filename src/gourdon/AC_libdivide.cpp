@@ -399,7 +399,7 @@ T AC_OpenMP(T x,
         // We measure the thread computation time excluding the
         // first expensive initialization of the segmentedPi
         // lookup table. If the thread computation time is close
-        // to 0, then we increase the number of segments in the
+        // to 0 then we increase the number of segments in the
         // loadBalancer which should improve performance.
         if (low == thread.low)
           thread.secs = get_time();
