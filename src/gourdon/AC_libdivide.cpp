@@ -381,13 +381,15 @@ T AC_OpenMP(T x,
     SegmentedPiTable segmentedPi;
     ThreadDataAC thread;
 
+    // for (low = 0; low < sqrt(x); low += segment_size)
     while (loadBalancer.get_work(thread))
     {
       int64_t low = thread.low;
-      int64_t segments = thread.segments;
       int64_t segment_size = thread.segment_size;
+      int64_t limit = low + thread.segments * segment_size;
+      limit = std::min(limit, sqrtx);
 
-      for (; segments-- && low < sqrtx; low += segment_size)
+      for (; low < limit; low += segment_size)
       {
         // Current segment [low, high[
         int64_t high = low + segment_size;

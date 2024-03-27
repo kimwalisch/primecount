@@ -40,7 +40,7 @@ private:
   int64_t low_ = 0;
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
-  int64_t segments_ = 1;
+  int64_t segments_ = 0;
   int64_t segment_size_ = 0;
   int64_t segment_nr_ = 0;
   int64_t max_segment_size_ = 0;
