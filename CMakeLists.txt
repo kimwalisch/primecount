@@ -18,7 +18,20 @@ option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
-option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" OFF)
+
+# Option WITH_DIV32 ##################################################
+
+# When using WITH_DIV32=ON primecount checks at runtime
+# if 32-bit division can be used instead of 64-bit
+# division which improves performance on old x64 CPUs
+# (<= 2020). However Clang performs this optimization by
+# itself, so we can disable WITH_DIV32.
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "LLVM")
+    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" OFF)
+else()
+    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" ON)
+endif()
 
 # Enable/Disable libdivide ###########################################
 
