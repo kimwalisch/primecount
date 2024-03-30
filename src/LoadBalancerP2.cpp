@@ -67,10 +67,9 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   low_ = min(low_, sieve_limit_);
   int64_t dist = sieve_limit_ - low_;
 
-  // When a single thread is used (and printing is
-  // disabled) we can set thread_dist to the entire
-  // sieving distance as load balancing is only
-  // useful for multi-threading.
+  // When a single thread is used (and printing is disabled) we can
+  // set thread_dist to the entire sieving distance as load balancing
+  // is only useful for multi-threading.
   if (threads_ == 1)
   {
     if (!is_print_)
@@ -78,15 +77,16 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   }
   else
   {
-    // Ensure that the thread initialization, i.e. the
-    // computation of PrimePi(low), uses at most 10%
-    // of the entire thread computation.
-    // Since PrimePi(low) uses O(low^(2/3)/log(low)^2) time,
-    // sieving a distance of n = low^(2/3) * 5 uses
-    // O(n log log n) time, which is more than 10x more.
+    // Ensure that the thread initialization i.e. the calculation of
+    // PrimePi(low) uses less time than the actual computation.
+    // Computing PrimePi(low) uses O(low^(2/3) / log(low)^2) time but
+    // sieving a distance of n = low^(2/3) uses O(n log log n) time,
+    // hence the sieving time is larger than the initialization time.
+    // Using these settings for x = 1e24 the sieving time is 4.7 times
+    // larger than the initializtation time on my AMD EPYC 7642 CPU.
     double low13 = std::cbrt(low_);
-    int64_t n = (int64_t) (low13 * low13 * 5);
-    min_thread_dist_ = std::max(min_thread_dist_, n);
+    int64_t low23 = (int64_t) (low13 * low13);
+    min_thread_dist_ = std::max(min_thread_dist_, low23);
     thread_dist_ = max(min_thread_dist_, thread_dist_);
 
     // Reduce the thread distance near to end to keep all
