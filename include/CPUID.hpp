@@ -17,11 +17,23 @@
     defined(_M_X64) || \
     defined(_M_IX86)
 
-// Check if CPUID POPCNT runtime check is needed
-#if !(defined(__POPCNT__) || \
-     (defined(_MSC_VER) && defined(__AVX__)))
+// Both GCC and Clang (even Clang on Windows) define the __POPCNT__
+// macro if the user compiles with -mpopcnt. The __POPCNT__
+// macro is even defined if the user compiles with other flags
+// such as -mavx or -march=native.
+#if defined(__POPCNT__)
+  #define HAS_POPCNT
+// The MSVC compiler does not support a POPCNT macro, but if the user
+// compiles with e.g. /arch:AVX or /arch:AVX512 then MSVC defines
+// the __AVX__ macro and POPCNT is also supported.
+#elif defined(_MSC_VER) && defined(__AVX__)
+  #define HAS_POPCNT
+#endif
 
+#if !defined(HAS_POPCNT)
 #define ENABLE_CPUID_POPCNT
+
+#include <cstddef>
 
 #if defined(_MSC_VER)
   #include <intrin.h>
@@ -77,7 +89,7 @@ const bool CPUID_POPCNT = run_CPUID_POPCNT();
 
 } // namespace
 
-#endif // __POPCNT__
-#endif // x86
+#endif // ENABLE_CPUID_POPCNT
+#endif // x86 CPU
 
 #endif

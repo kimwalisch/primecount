@@ -97,8 +97,7 @@ inline uint64_t popcnt64_bitwise(uint64_t x)
 
 inline uint64_t popcnt64(uint64_t x)
 {
-#if defined(__POPCNT__) || \
-    defined(__AVX__)
+#if defined(HAS_POPCNT)
   return __popcnt64(x);
 #elif defined(ENABLE_CPUID_POPCNT)
   if_likely(CPUID_POPCNT)
@@ -141,8 +140,7 @@ inline uint64_t popcnt64_bitwise(uint64_t x)
 
 inline uint64_t popcnt64(uint64_t x)
 {
-#if defined(__POPCNT__) || \
-    defined(__AVX__)
+#if defined(HAS_POPCNT)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
 #elif defined(ENABLE_CPUID_POPCNT)
