@@ -61,7 +61,7 @@ inline uint64_t popcnt64(uint64_t x)
 #if defined(__x86_64__)
 
   // On my AMD EPYC 7642 CPU using GCC 12 this runtime
-  // check incurs an overall overhead of 2.5%.
+  // check incurs an overall overhead of about 1%.
   if_likely(CPUID_POPCNT)
   {
     __asm__("popcnt %1, %0" : "=r"(x) : "r"(x));
