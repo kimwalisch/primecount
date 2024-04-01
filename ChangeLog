@@ -1,5 +1,7 @@
 Changes in primecount-7.12, 2024-04-01
 
+* CMakeLists.txt: Remove WITH_POPCNT=OFF option used to build a
+  portable primecount binary. primecount is now portable by default.
 * popcnt.hpp: On x86 & x64 CPUs enable CPUID POPCNT runtime
   check by default (unless user compiles with -mpopcnt).
 * LoadBalancerAC.cpp: New dynamic/adaptive load balancing #67.
