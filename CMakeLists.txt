@@ -13,7 +13,6 @@ option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
 option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"           ON)
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
@@ -210,12 +209,6 @@ if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 endif()
 
-# Check if x86 CPU supports POPCNT instruction #######################
-
-if(WITH_POPCNT)
-    include("${PROJECT_SOURCE_DIR}/cmake/popcnt.cmake")
-endif()
-
 # libprimesieve ######################################################
 
 # By default the libprimesieve dependency is built from source
@@ -236,13 +229,6 @@ if(BUILD_LIBPRIMESIEVE)
 
     add_subdirectory(lib/primesieve)
 
-    if(BUILD_SHARED_LIBS)
-        target_compile_options(libprimesieve PRIVATE "${POPCNT_FLAG}")
-    endif()
-    if(BUILD_STATIC_LIBS)
-        target_compile_options(libprimesieve-static PRIVATE "${POPCNT_FLAG}")
-    endif()
-
     set(BUILD_EXAMPLES "${COPY_BUILD_EXAMPLES}" CACHE BOOL "Build example programs" FORCE)
     set(BUILD_MANPAGE "${COPY_BUILD_MANPAGE}" CACHE BOOL "Regenerate man page using a2x" FORCE)
     set(BUILD_TESTS "${COPY_BUILD_TESTS}" CACHE BOOL "Build test programs" FORCE)
@@ -261,7 +247,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
-    target_compile_options(libprimecount PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
+    target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
@@ -286,7 +272,7 @@ endif()
 if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
-    target_compile_options(libprimecount-static PRIVATE "${POPCNT_FLAG}" "${WNO_UNINITIALIZED}")
+    target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 

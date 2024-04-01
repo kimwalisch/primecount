@@ -54,6 +54,16 @@
 #endif
 
 #if __cplusplus >= 202002L && \
+    __has_cpp_attribute(likely)
+  #define if_likely(x) if (x) [[likely]]
+#elif defined(__GNUC__) || \
+      __has_builtin(__builtin_expect)
+  #define if_likely(x) if (__builtin_expect(!!(x), 1))
+#else
+  #define if_likely(x) if (x)
+#endif
+
+#if __cplusplus >= 202002L && \
     __has_cpp_attribute(unlikely)
   #define if_unlikely(x) if (x) [[unlikely]]
 #elif defined(__GNUC__) || \

@@ -109,7 +109,6 @@ option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
 option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"            ON)
 option(WITH_LIBDIVIDE       "Use libdivide.h"                       ON)
 option(WITH_OPENMP          "Enable OpenMP multi-threading"         ON)
 option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" ON)
@@ -136,22 +135,6 @@ libraries. Hence you can build the primecount binary and the shared
 libprimecount using:
 
 * ```cmake . -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF```
-
-For performance reasons primecount uses the ```POPCNT``` instruction on all
-CPU architectures that support it. Enabling the ```POPCNT``` instruction
-usually improves primecount's performance by about 30%.
-
-On x86/x64 CPUs primecount will by default detect at build time if the host
-CPU supports the ```POPCNT``` instruction. If not, the ```POPCNT```
-instruction will be disabled and a portable alternative algorithm will be used.
-If you need to build a portable primecount binary package for x86/x64 CPUs that
-can be distributed to many different PCs, even very old ones without
-```POPCNT``` support (2008 or earlier), you need to disable the ```POPCNT```
-instruction at build time. Note that disabling ```POPCNT``` only has an effect
-on x86/x64, on other CPU architectures ```POPCNT``` is always used if it is
-available (as this generally does not cause any issues).
-
-* ```cmake . -DWITH_POPCNT=OFF```
 
 ## Man page regeneration
 

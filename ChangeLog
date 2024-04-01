@@ -1,5 +1,7 @@
-Changes in primecount-7.12, 2024-03-28
+Changes in primecount-7.12, 2024-04-01
 
+* popcnt.hpp: On x86 & x64 CPUs enable CPUID POPCNT runtime
+  check by default (unless user compiles with -mpopcnt).
 * LoadBalancerAC.cpp: New dynamic/adaptive load balancing #67.
 * LogarithmicIntegral.cpp: Fix infinite loop on Linux i386 #66.
 * RiemannR.cpp: Fix infinite loop on Linux i386 #66.

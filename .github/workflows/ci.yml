@@ -92,10 +92,9 @@ jobs:
       - name: Build primecount
         # POPCNT disabled + Debug
         run: |
-            cmake . -DWITH_POPCNT=OFF -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
-            grep "^WITH_POPCNT:BOOL=OFF$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
