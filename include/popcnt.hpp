@@ -12,7 +12,7 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
-#include <CpuID.hpp>
+#include <CPUID.hpp>
 #include <stdint.h>
 
 #if !defined(__has_builtin)
@@ -76,9 +76,38 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
+/// This uses fewer arithmetic operations than any other known
+/// implementation on machines with fast multiplication.
+/// It uses 12 arithmetic operations, one of which is a multiply.
+/// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
+///
+inline uint64_t popcnt64_bitwise(uint64_t x)
+{
+  uint64_t m1 = 0x5555555555555555ll;
+  uint64_t m2 = 0x3333333333333333ll;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
+  uint64_t h01 = 0x0101010101010101ll;
+
+  x -= (x >> 1) & m1;
+  x = (x & m2) + ((x >> 2) & m2);
+  x = (x + (x >> 4)) & m4;
+
+  return (x * h01) >> 56;
+}
+
 inline uint64_t popcnt64(uint64_t x)
 {
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
   return __popcnt64(x);
+#elif defined(HAS_CPUID_POPCNT)
+  if_likely(CPUID_POPCNT)
+    return __popcnt64(x);
+  else
+    return popcnt64_bitwise(x);
+#else
+  return popcnt64_bitwise(x);
+#endif
 }
 
 } // namespace
@@ -91,10 +120,40 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
+/// This uses fewer arithmetic operations than any other known
+/// implementation on machines with fast multiplication.
+/// It uses 12 arithmetic operations, one of which is a multiply.
+/// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
+///
+inline uint64_t popcnt64_bitwise(uint64_t x)
+{
+  uint64_t m1 = 0x5555555555555555ll;
+  uint64_t m2 = 0x3333333333333333ll;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
+  uint64_t h01 = 0x0101010101010101ll;
+
+  x -= (x >> 1) & m1;
+  x = (x & m2) + ((x >> 2) & m2);
+  x = (x + (x >> 4)) & m4;
+
+  return (x * h01) >> 56;
+}
+
 inline uint64_t popcnt64(uint64_t x)
 {
-  return __popcnt((uint32_t) x) +
-         __popcnt((uint32_t)(x >> 32));
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
+  return __popcnt(uint32_t(x)) +
+         __popcnt(uint32_t(x >> 32));
+#elif defined(HAS_CPUID_POPCNT)
+  if_likely(CPUID_POPCNT)
+    return __popcnt(uint32_t(x)) +
+           __popcnt(uint32_t(x >> 32));
+  else
+    return popcnt64_bitwise(x);
+#else
+  return popcnt64_bitwise(x);
+#endif
 }
 
 } // namespace

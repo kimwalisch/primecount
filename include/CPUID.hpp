@@ -1,5 +1,5 @@
 ///
-/// @file  CpuID.hpp
+/// @file  CPUID.hpp
 /// @brief POPCNT detection fo x86 and x86-64 CPUs.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
@@ -19,7 +19,7 @@
 
 // Check if CPUID POPCNT runtime check is needed
 #if !(defined(__POPCNT__) || \
-     (defined(_MSC_VER) && defined(__AVX2__)))
+     (defined(_MSC_VER) && defined(__AVX__)))
 
 #define HAS_CPUID_POPCNT
 
