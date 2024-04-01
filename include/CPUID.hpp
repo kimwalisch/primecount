@@ -21,7 +21,7 @@
 #if !(defined(__POPCNT__) || \
      (defined(_MSC_VER) && defined(__AVX__)))
 
-#define HAS_CPUID_POPCNT
+#define ENABLE_CPUID_POPCNT
 
 #if defined(_MSC_VER)
   #include <intrin.h>

@@ -33,7 +33,7 @@ inline uint64_t popcnt64(uint64_t x)
 {
 // CPUID is only enabled on x86 and x86-64 CPUs
 // if the user compiles without -mpopcnt.
-#if defined(HAS_CPUID_POPCNT)
+#if defined(ENABLE_CPUID_POPCNT)
 #if defined(__x86_64__)
   // On my AMD EPYC 7642 CPU using GCC 12 this runtime
   // check incurs an overall overhead of 2.5%.
@@ -100,7 +100,7 @@ inline uint64_t popcnt64(uint64_t x)
 #if defined(__POPCNT__) || \
     defined(__AVX__)
   return __popcnt64(x);
-#elif defined(HAS_CPUID_POPCNT)
+#elif defined(ENABLE_CPUID_POPCNT)
   if_likely(CPUID_POPCNT)
     return __popcnt64(x);
   else
@@ -145,7 +145,7 @@ inline uint64_t popcnt64(uint64_t x)
     defined(__AVX__)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
-#elif defined(HAS_CPUID_POPCNT)
+#elif defined(ENABLE_CPUID_POPCNT)
   if_likely(CPUID_POPCNT)
     return __popcnt(uint32_t(x)) +
            __popcnt(uint32_t(x >> 32));
