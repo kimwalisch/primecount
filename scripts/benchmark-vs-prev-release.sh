@@ -7,7 +7,7 @@
 #   Benchmarks the latest code vs the previous release.
 #   Computes PrimePi(1e17) 10 times with each binary and sum
 #   the elapsed seconds for each binary. The new code must
-#   not be more than 3% slower.
+#   not be more than 2% slower.
 
 # Exit if any error occurs
 set -e
@@ -30,9 +30,9 @@ function benchmark_test_option {
     # 3% slower than old code.
     factor=1.03
 
-    # Test failure must be observed 3 times,
+    # Test failure must be observed 4 times,
     # we try to avoid false negatives.
-    for j in {1..3}
+    for j in {1..4}
     do
         echo ""
         echo "=== Benchmark primecount --test ===="
@@ -73,8 +73,8 @@ function benchmark_test_option {
 
 function benchmark_pi_1e17 {
     # New code must not be more than 
-    # 3% slower than old code.
-    factor=1.03
+    # 2% slower than old code.
+    factor=1.02
 
     # Test failure must be observed 3 times,
     # we try to avoid false negatives.
