@@ -51,7 +51,33 @@ jobs:
         run: ./primecount 1e13 --deleglise-rivat
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
-  
+
+  windows_msvc2019:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build primecount
+        # Enable POPCNT using /arch:AVX
+        run: |
+            cmake . -G "Visual Studio 16 2019" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/arch:AVX /W3 /WX /MP /EHsc"
+            cmake --build . --config Release --target install
+      - name: CTest (unit tests)
+        run: ctest -j2 -C Release --output-on-failure
+      - name: primecount --test
+        run: Release\primecount.exe --test
+      - name: primecount 1e11 --legendre
+        run: Release\primecount.exe 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: Release\primecount.exe 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: Release\primecount.exe 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: Release\primecount.exe 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: Release\primecount.exe 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: Release\primecount.exe 1e14 --gourdon
+
   windows_msvc2022:
     runs-on: windows-2022
     steps:
@@ -89,9 +115,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build primecount
-        # POPCNT disabled + Debug
+        # Enable POPCNT using -mpopcnt
         run: |
-            cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-mpopcnt -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
@@ -190,7 +216,6 @@ jobs:
             sudo apt update
             sudo apt install libomp-dev asciidoc libxml2-utils xmlto
       - name: Build primecount
-        # POPCNT disabled + Debug
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
@@ -227,7 +252,6 @@ jobs:
       - name: Install dependencies
         run: brew install libomp
       - name: Build primecount
-        # POPCNT disabled + Debug
         run: |
             LDFLAGS="-L$(brew --prefix libomp)/lib" cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
