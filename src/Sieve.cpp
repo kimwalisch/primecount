@@ -45,6 +45,13 @@
 #include <stdint.h>
 #include <algorithm>
 
+#if defined(__AVX512F__) && \
+    defined(__AVX512VPOPCNTDQ__) && \
+    __has_include(<immintrin.h>)
+  #include <immintrin.h>
+  #define HAS_AVX512_VPOPCNT
+#endif
+
 using std::fill_n;
 using std::sqrt;
 using primecount::Array;
@@ -250,6 +257,47 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
+#if defined(HAS_AVX512_VPOPCNT)
+
+/// Count 1 bits inside [start, stop]
+uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+{
+  if (start > stop)
+    return 0;
+
+  ASSERT(stop - start < segment_size());
+
+  uint64_t start_idx = start / 240;
+  uint64_t stop_idx = stop / 240;
+  uint64_t m1 = unset_smaller[start % 240];
+  uint64_t m2 = unset_larger[stop % 240];
+  auto sieve64 = (uint64_t*) sieve_.data();
+
+  if (start_idx == stop_idx)
+    return popcnt64(sieve64[start_idx] & (m1 & m2));
+  else
+  {
+    uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
+    uint64_t i = start_idx + 1;
+    __m512i vcnt = _mm512_setzero_si512();
+
+    for (; i + 8 < stop_idx; i += 8)
+    {
+      __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
+      vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+    }
+
+    __mmask8 mask = 0xff >> (i + 8 - stop_idx);
+    __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
+    vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+    cnt += _mm512_reduce_add_epi64(vcnt);
+    cnt += popcnt64(sieve64[stop_idx] & m2);
+    return cnt;
+  }
+}
+
+#else
+
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
@@ -275,6 +323,8 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
     return cnt;
   }
 }
+
+#endif
 
 /// Add a sieving prime to the sieve.
 /// Calculates the first multiple > start of prime that
