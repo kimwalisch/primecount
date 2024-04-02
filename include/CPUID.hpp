@@ -85,7 +85,7 @@ bool run_CPUID_POPCNT()
 }
 
 /// Initialized at startup
-const bool CPUID_POPCNT = run_CPUID_POPCNT();
+const bool HAS_CPUID_POPCNT = run_CPUID_POPCNT();
 
 } // namespace
 

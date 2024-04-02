@@ -44,7 +44,7 @@ int main()
   #endif
 
   #if defined(ENABLE_CPUID_POPCNT)
-    std::cout << "CPU supports POPCNT: " << (CPUID_POPCNT ? "yes" : "no") << std::endl;
+    std::cout << "CPU supports POPCNT: " << (HAS_CPUID_POPCNT ? "yes" : "no") << std::endl;
   #endif
 
 #endif

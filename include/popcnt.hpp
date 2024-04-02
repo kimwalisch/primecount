@@ -62,7 +62,7 @@ inline uint64_t popcnt64(uint64_t x)
 
   // On my AMD EPYC 7642 CPU using GCC 12 this runtime
   // check incurs an overall overhead of about 1%.
-  if_likely(CPUID_POPCNT)
+  if_likely(HAS_CPUID_POPCNT)
   {
     __asm__("popcnt %1, %0" : "=r"(x) : "r"(x));
     return x;
@@ -77,7 +77,7 @@ inline uint64_t popcnt64(uint64_t x)
   }
 #elif defined(__i386__)
 
-  if_likely(CPUID_POPCNT)
+  if_likely(HAS_CPUID_POPCNT)
   {
     uint32_t x0 = uint32_t(x);
     uint32_t x1 = uint32_t(x >> 32);
@@ -129,7 +129,7 @@ inline uint64_t popcnt64(uint64_t x)
 #if defined(HAS_POPCNT)
   return __popcnt64(x);
 #elif defined(ENABLE_CPUID_POPCNT)
-  if_likely(CPUID_POPCNT)
+  if_likely(HAS_CPUID_POPCNT)
     return __popcnt64(x);
   else
     return popcnt64_bitwise(x);
@@ -154,7 +154,7 @@ inline uint64_t popcnt64(uint64_t x)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
 #elif defined(ENABLE_CPUID_POPCNT)
-  if_likely(CPUID_POPCNT)
+  if_likely(HAS_CPUID_POPCNT)
     return __popcnt(uint32_t(x)) +
            __popcnt(uint32_t(x >> 32));
   else
