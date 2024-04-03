@@ -293,26 +293,33 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
         cnt += popcnt64(sieve64[i]);
 
     #elif defined(HAS_ARM_SVE)
-      svuint64_t vcnt = svdup_u64(0);
-      for (; i < stop_idx; i += svcntd())
+      if (i < stop_idx)
       {
-          svbool_t pg = svwhilelt_b64(i, stop_idx);
-          svuint64_t vec = svld1_u64(pg, &sieve64[i]);
-          vcnt = svadd_u64_z(svptrue_b64(), vcnt, svcnt_u64_z(pg, vec));
+        svuint64_t vcnt = svdup_u64(0);
+        do
+        {
+            svbool_t pg = svwhilelt_b64(i, stop_idx);
+            svuint64_t vec = svld1_u64(pg, &sieve64[i]);
+            vcnt = svadd_u64_z(svptrue_b64(), vcnt, svcnt_u64_z(pg, vec));
+            i += svcntd();
+        }
+        while (i < stop_idx);
+        cnt += svaddv_u64(svptrue_b64(), vcnt);
       }
-      cnt += svaddv_u64(svptrue_b64(), vcnt);
-
     #elif defined(HAS_AVX512_VPOPCNT)
-      __m512i vcnt = _mm512_setzero_si512();
-      for (; i + 8 < stop_idx; i += 8)
+      if (i < stop_idx)
       {
-        __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
+        __m512i vcnt = _mm512_setzero_si512();
+        for (; i + 8 < stop_idx; i += 8)
+        {
+          __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
+          vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+        }
+        __mmask8 mask = 0xff >> (i + 8 - stop_idx);
+        __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
         vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+        cnt += _mm512_reduce_add_epi64(vcnt);
       }
-      __mmask8 mask = 0xff >> (i + 8 - stop_idx);
-      __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
-      vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
-      cnt += _mm512_reduce_add_epi64(vcnt);
     #endif
 
     cnt += popcnt64(sieve64[stop_idx] & m2);
