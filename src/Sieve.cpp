@@ -45,23 +45,6 @@
 #include <stdint.h>
 #include <algorithm>
 
-// x64 AVX512 vector popcount
-#if defined(__AVX512F__) && \
-    defined(__AVX512VPOPCNTDQ__) && \
-    __has_include(<immintrin.h>)
-  #include <immintrin.h>
-  #define HAS_AVX512_VPOPCNT
-
-// ARM SVE vector popcount
-#elif defined(__ARM_FEATURE_SVE) && \
-      __has_include(<arm_sve.h>)
-  #include <arm_sve.h>
-  #define HAS_ARM_SVE
-
-#else // Default portable popcount
-  #define DEFAULT_CPU_ARCH
-#endif
-
 using std::fill_n;
 using std::sqrt;
 using primecount::Array;
@@ -234,96 +217,6 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
     counter_[i] = (uint32_t) cnt;
     total_count_ += cnt;
     start += counter_.dist;
-  }
-}
-
-/// Count 1 bits inside [0, stop]
-uint64_t Sieve::count(uint64_t stop)
-{
-  ASSERT(stop >= prev_stop_);
-  uint64_t start = prev_stop_ + 1;
-  prev_stop_ = stop;
-
-  // Quickly count the number of unsieved elements (in
-  // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - start) < counter_.dist.
-  // We do this using the counter array, each element
-  // of the counter array contains the number of
-  // unsieved elements in the interval:
-  // [i * counter_.dist, (i + 1) * counter_.dist[.
-  while (counter_.stop <= stop)
-  {
-    start = counter_.stop;
-    counter_.stop += counter_.dist;
-    counter_.sum += counter_[counter_.i++];
-    count_ = counter_.sum;
-  }
-
-  // Here the remaining distance is relatively small i.e.
-  // (stop - start) < counter_.dist, hence we simply
-  // count the remaining number of unsieved elements by
-  // linearly iterating over the sieve array.
-  count_ += count(start, stop);
-  return count_;
-}
-
-/// Count 1 bits inside [start, stop]
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
-{
-  if (start > stop)
-    return 0;
-
-  ASSERT(stop - start < segment_size());
-
-  uint64_t start_idx = start / 240;
-  uint64_t stop_idx = stop / 240;
-  uint64_t m1 = unset_smaller[start % 240];
-  uint64_t m2 = unset_larger[stop % 240];
-  auto sieve64 = (uint64_t*) sieve_.data();
-
-  if (start_idx == stop_idx)
-    return popcnt64(sieve64[start_idx] & (m1 & m2));
-  else
-  {
-    uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
-    uint64_t i = start_idx + 1;
-
-    #if defined(DEFAULT_CPU_ARCH)
-      for (; i < stop_idx; i++)
-        cnt += popcnt64(sieve64[i]);
-
-    #elif defined(HAS_ARM_SVE)
-      if (i < stop_idx)
-      {
-        svuint64_t vcnt = svdup_u64(0);
-        do
-        {
-            svbool_t pg = svwhilelt_b64(i, stop_idx);
-            svuint64_t vec = svld1_u64(pg, &sieve64[i]);
-            vcnt = svadd_u64_z(svptrue_b64(), vcnt, svcnt_u64_z(pg, vec));
-            i += svcntd();
-        }
-        while (i < stop_idx);
-        cnt += svaddv_u64(svptrue_b64(), vcnt);
-      }
-    #elif defined(HAS_AVX512_VPOPCNT)
-      if (i < stop_idx)
-      {
-        __m512i vcnt = _mm512_setzero_si512();
-        for (; i + 8 < stop_idx; i += 8)
-        {
-          __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
-          vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
-        }
-        __mmask8 mask = 0xff >> (i + 8 - stop_idx);
-        __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
-        vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
-        cnt += _mm512_reduce_add_epi64(vcnt);
-      }
-    #endif
-
-    cnt += popcnt64(sieve64[stop_idx] & m2);
-    return cnt;
   }
 }
 
