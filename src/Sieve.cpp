@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -45,11 +45,21 @@
 #include <stdint.h>
 #include <algorithm>
 
+// x64 AVX512 vector popcount
 #if defined(__AVX512F__) && \
     defined(__AVX512VPOPCNTDQ__) && \
     __has_include(<immintrin.h>)
   #include <immintrin.h>
   #define HAS_AVX512_VPOPCNT
+
+// ARM SVE vector popcount
+#elif defined(__ARM_FEATURE_SVE) && \
+      __has_include(<arm_sve.h>)
+  #include <arm_sve.h>
+  #define HAS_ARM_SVE
+
+#else // Default portable popcount
+  #define DEFAULT_CPU_ARCH
 #endif
 
 using std::fill_n;
@@ -257,8 +267,6 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-#if defined(HAS_AVX512_VPOPCNT)
-
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
@@ -279,52 +287,38 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   {
     uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
     uint64_t i = start_idx + 1;
-    __m512i vcnt = _mm512_setzero_si512();
 
-    for (; i + 8 < stop_idx; i += 8)
-    {
-      __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
+    #if defined(DEFAULT_CPU_ARCH)
+      for (; i < stop_idx; i++)
+        cnt += popcnt64(sieve64[i]);
+
+    #elif defined(HAS_ARM_SVE)
+      svuint64_t vcnt = svdup_u64(0);
+      for (; i < stop_idx; i += svcntd())
+      {
+          svbool_t pg = svwhilelt_b64(i, stop_idx);
+          svuint64_t vec = svld1_u64(pg, &sieve64[i]);
+          vcnt = svadd_u64_z(svptrue_b64(), vcnt, svcnt_u64_z(pg, vec));
+      }
+      cnt += svaddv_u64(svptrue_b64(), vcnt);
+
+    #elif defined(HAS_AVX512_VPOPCNT)
+      __m512i vcnt = _mm512_setzero_si512();
+      for (; i + 8 < stop_idx; i += 8)
+      {
+        __m512i vec = _mm512_loadu_epi64(&sieve64[i]);
+        vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+      }
+      __mmask8 mask = 0xff >> (i + 8 - stop_idx);
+      __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
       vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
-    }
+      cnt += _mm512_reduce_add_epi64(vcnt);
+    #endif
 
-    __mmask8 mask = 0xff >> (i + 8 - stop_idx);
-    __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]);
-    vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
-    cnt += _mm512_reduce_add_epi64(vcnt);
     cnt += popcnt64(sieve64[stop_idx] & m2);
     return cnt;
   }
 }
-
-#else
-
-/// Count 1 bits inside [start, stop]
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
-{
-  if (start > stop)
-    return 0;
-
-  ASSERT(stop - start < segment_size());
-
-  uint64_t start_idx = start / 240;
-  uint64_t stop_idx = stop / 240;
-  uint64_t m1 = unset_smaller[start % 240];
-  uint64_t m2 = unset_larger[stop % 240];
-  auto sieve64 = (uint64_t*) sieve_.data();
-
-  if (start_idx == stop_idx)
-    return popcnt64(sieve64[start_idx] & (m1 & m2));
-  else
-  {
-    uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
-    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-      cnt += popcnt64(sieve64[i]);
-    cnt += popcnt64(sieve64[stop_idx] & m2);
-    return cnt;
-  }
-}
-
-#endif
 
 /// Add a sieving prime to the sieve.
 /// Calculates the first multiple > start of prime that
