@@ -21,9 +21,9 @@
 #include <stdint.h>
 
 // x64 AVX512 vector popcount
-#if defined(__AVX512F__) && \
-    defined(__AVX512VPOPCNTDQ__) && \
-    __has_include(<immintrin.h>)
+#if __has_include(<immintrin.h>) && \
+   (defined(__AVX512__) || (defined(__AVX512F__) && \
+                            defined(__AVX512VPOPCNTDQ__)))
   #include <immintrin.h>
   #define HAS_AVX512_VPOPCNT
 
