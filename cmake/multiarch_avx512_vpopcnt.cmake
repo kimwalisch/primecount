@@ -30,11 +30,13 @@ check_cxx_source_compiles("
         for (; i + 8 < stop_idx; i += 8)
         {
             __m512i vec = _mm512_loadu_epi64(&array[i]);
-            vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+            vec = _mm512_popcnt_epi64(vec);
+            vcnt = _mm512_add_epi64(vcnt, vec);
         }
         __mmask8 mask = 0xff >> (i + 8 - stop_idx);
         __m512i vec = _mm512_maskz_loadu_epi64(mask, &array[i]);
-        vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));
+        vec = _mm512_popcnt_epi64(vec);
+        vcnt = _mm512_add_epi64(vcnt, vec);
         return _mm512_reduce_add_epi64(vcnt);
     }
     int main()
