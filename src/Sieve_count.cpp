@@ -16,7 +16,6 @@
 #include <Sieve.hpp>
 #include <SieveTables.hpp>
 #include <macros.hpp>
-#include <Vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
