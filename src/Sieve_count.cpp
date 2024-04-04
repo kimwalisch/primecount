@@ -27,6 +27,11 @@
   #include <immintrin.h>
   #define HAS_AVX512_VPOPCNT
 
+// GCC/Clang function multiversioning
+#elif defined(MULTIARCH_AVX512_VPOPCNT) && \
+    __has_include(<immintrin.h>)
+  #include <immintrin.h>
+
 // ARM SVE vector popcount
 #elif defined(__ARM_FEATURE_SVE) && \
       __has_include(<arm_sve.h>)
