@@ -41,11 +41,12 @@
 #include <stdint.h>
 
 #if defined(MULTIARCH_AVX512_VPOPCNT)
-  // GCC/Clang function multiversioning for AVX512 is not needed
-  // if the user compiles with -mavx512f -mavx512vpopcntdq.
-  // GCC/Clang function multiversioning generally causes a minor
-  // overhead, hence we do not enable it if it is not needed.
-  #if defined(__AVX512F__) && defined(__AVX512VPOPCNTDQ__)
+  #if defined(__AVX512F__) && \
+      defined(__AVX512VPOPCNTDQ__)
+    // GCC/Clang function multiversioning for AVX512 is not needed
+    // if the user compiles with -mavx512f -mavx512vpopcntdq.
+    // GCC/Clang function multiversioning generally causes a minor
+    // overhead, hence we disable it if it is not needed.
     #undef MULTIARCH_AVX512_VPOPCNT
   #else
     #define MULTIARCH
