@@ -66,50 +66,44 @@
   }
 
 /// Default portable POPCNT kernel
-#define DEFAULT_POPCNT_KERNEL(sieve64, start_idx, stop_idx)    \
-  for (uint64_t i = start_idx + 1; i < stop_idx; i++)          \
+#define DEFAULT_POPCNT_KERNEL(sieve64, start_idx, stop_idx)  \
+  for (uint64_t i = start_idx + 1; i < stop_idx; i++)        \
     res += popcnt64(sieve64[i]);
 
 /// Compute the loop below using AVX512.
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
 ///
-#define AVX512_POPCNT_KERNEL(sieve64, start_idx, stop_idx)     \
-  uint64_t i = start_idx + 1;                                  \
-  if (i < stop_idx)                                            \
-  {                                                            \
-    __m512i vcnt = _mm512_setzero_si512();                     \
-    for (; i + 8 < stop_idx; i += 8)                           \
-    {                                                          \
-      __m512i vec = _mm512_loadu_epi64(&sieve64[i]);           \
-      vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec)); \
-    }                                                          \
-    __mmask8 mask = 0xff >> (i + 8 - stop_idx);                \
-    __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
-    vcnt = _mm512_add_epi64(vcnt, _mm512_popcnt_epi64(vec));   \
-    res += _mm512_reduce_add_epi64(vcnt);                      \
-  }
+#define AVX512_POPCNT_KERNEL(sieve64, start_idx, stop_idx)   \
+  uint64_t i = start_idx + 1;                                \
+  __m512i vcnt = _mm512_setzero_si512();                     \
+  for (; i + 8 < stop_idx; i += 8)                           \
+  {                                                          \
+    __m512i vec = _mm512_loadu_epi64(&sieve64[i]);           \
+    vec = _mm512_popcnt_epi64(vec);                          \
+    vcnt = _mm512_add_epi64(vcnt, vec);                      \
+  }                                                          \
+  __mmask8 mask = 0xff >> (i + 8 - stop_idx);                \
+  __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
+  vec = _mm512_popcnt_epi64(vec);                            \
+  vcnt = _mm512_add_epi64(vcnt, vec);                        \
+  res += _mm512_reduce_add_epi64(vcnt);
 
 /// Compute the loop below using ARM SVE.
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
 ///
-#define SVE_POPCNT_KERNEL(sieve64, start_idx, stop_idx)        \
-  uint64_t i = start_idx + 1;                                  \
-  if (i < stop_idx)                                            \
-  {                                                            \
-    svuint64_t vcnt = svdup_u64(0);                            \
-    do                                                         \
-    {                                                          \
-      svbool_t pg = svwhilelt_b64(i, stop_idx);                \
-      svuint64_t vec = svld1_u64(pg, &sieve64[i]);             \
-      vec = svcnt_u64_z(pg, vec);                              \
-      vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);            \
-      i += svcntd();                                           \
-    }                                                          \
-    while (i < stop_idx);                                      \
-    res += svaddv_u64(svptrue_b64(), vcnt);                    \
-  }
+#define SVE_POPCNT_KERNEL(sieve64, start_idx, stop_idx)      \
+  uint64_t i = start_idx + 1;                                \
+  svuint64_t vcnt = svdup_u64(0);                            \
+  for (; i < stop_idx; i += svcntd())                        \
+  {                                                          \
+    svbool_t pg = svwhilelt_b64(i, stop_idx);                \
+    svuint64_t vec = svld1_u64(pg, &sieve64[i]);             \
+    vec = svcnt_u64_z(pg, vec);                              \
+    vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);            \
+  }                                                          \
+  res += svaddv_u64(svptrue_b64(), vcnt);
 
 namespace primecount {
 
