@@ -1,7 +1,7 @@
 ///
 /// @file  print.hpp
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,11 +11,9 @@
 #define PRINT_HPP
 
 #include <int128_t.hpp>
-#include <stdint.h>
+#include <macros.hpp>
 
-#if !defined(__has_include)
-  #define __has_include(x) 0
-#endif
+#include <stdint.h>
 
 #if __cplusplus >= 201703L && __has_include(<string_view>)
   #include <string_view>

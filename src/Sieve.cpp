@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -217,62 +217,6 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
     counter_[i] = (uint32_t) cnt;
     total_count_ += cnt;
     start += counter_.dist;
-  }
-}
-
-/// Count 1 bits inside [0, stop]
-uint64_t Sieve::count(uint64_t stop)
-{
-  ASSERT(stop >= prev_stop_);
-  uint64_t start = prev_stop_ + 1;
-  prev_stop_ = stop;
-
-  // Quickly count the number of unsieved elements (in
-  // the sieve array) up to a value that is close to
-  // the stop number i.e. (stop - start) < counter_.dist.
-  // We do this using the counter array, each element
-  // of the counter array contains the number of
-  // unsieved elements in the interval:
-  // [i * counter_.dist, (i + 1) * counter_.dist[.
-  while (counter_.stop <= stop)
-  {
-    start = counter_.stop;
-    counter_.stop += counter_.dist;
-    counter_.sum += counter_[counter_.i++];
-    count_ = counter_.sum;
-  }
-
-  // Here the remaining distance is relatively small i.e.
-  // (stop - start) < counter_.dist, hence we simply
-  // count the remaining number of unsieved elements by
-  // linearly iterating over the sieve array.
-  count_ += count(start, stop);
-  return count_;
-}
-
-/// Count 1 bits inside [start, stop]
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
-{
-  if (start > stop)
-    return 0;
-
-  ASSERT(stop - start < segment_size());
-
-  uint64_t start_idx = start / 240;
-  uint64_t stop_idx = stop / 240;
-  uint64_t m1 = unset_smaller[start % 240];
-  uint64_t m2 = unset_larger[stop % 240];
-  auto sieve64 = (uint64_t*) sieve_.data();
-
-  if (start_idx == stop_idx)
-    return popcnt64(sieve64[start_idx] & (m1 & m2));
-  else
-  {
-    uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
-    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-      cnt += popcnt64(sieve64[i]);
-    cnt += popcnt64(sieve64[stop_idx] & m2);
-    return cnt;
   }
 }
 

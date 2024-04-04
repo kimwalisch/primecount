@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -40,6 +40,20 @@
 #include <Vector.hpp>
 #include <stdint.h>
 
+#if defined(MULTIARCH_AVX512_VPOPCNT)
+  // GCC/Clang function multiversioning for AVX512 is not needed
+  // if the user compiles with -mavx512f -mavx512vpopcntdq.
+  // GCC/Clang function multiversioning generally causes a minor
+  // overhead, hence we disable it if it is not needed.
+  #if defined(__AVX512__) || (defined(__AVX512F__) && \
+                              defined(__AVX512VPOPCNTDQ__))
+    #undef MULTIARCH_AVX512_VPOPCNT
+  #else
+    #define MULTIARCH_TARGET_DEFAULT
+    #define MULTIARCH_TARGET_AVX512
+  #endif
+#endif
+
 namespace primecount {
 
 class Sieve
@@ -49,8 +63,25 @@ public:
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
+
+#if !defined(MULTIARCH_TARGET_DEFAULT)
   uint64_t count(uint64_t start, uint64_t stop) const;
   uint64_t count(uint64_t stop);
+#endif
+
+#if defined(MULTIARCH_TARGET_DEFAULT)
+  __attribute__ ((target ("default")))
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  __attribute__ ((target ("default")))
+  uint64_t count(uint64_t stop);
+#endif
+
+#if defined(MULTIARCH_TARGET_AVX512)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+  uint64_t count(uint64_t stop);
+#endif
 
   uint64_t get_total_count() const
   {
@@ -101,7 +132,7 @@ private:
     {
       return counter[pos];
     }
-  
+
     uint32_t operator[](std::size_t pos) const
     {
       return counter[pos];
