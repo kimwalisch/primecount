@@ -49,10 +49,8 @@
     // overhead, hence we disable it if it is not needed.
     #undef MULTIARCH_AVX512_VPOPCNT
   #else
-    #define MULTIARCH_TARGET_DEFAULT \
-      __attribute__ ((target ("default")))
-    #define MULTIARCH_TARGET_AVX512_VPOPCNT \
-      __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+    #define MULTIARCH_TARGET_DEFAULT
+    #define MULTIARCH_TARGET_AVX512
   #endif
 #endif
 
@@ -72,16 +70,16 @@ public:
 #endif
 
 #if defined(MULTIARCH_TARGET_DEFAULT)
-  MULTIARCH_TARGET_DEFAULT
+  __attribute__ ((target ("default")))
   uint64_t count(uint64_t start, uint64_t stop) const;
-  MULTIARCH_TARGET_DEFAULT
+  __attribute__ ((target ("default")))
   uint64_t count(uint64_t stop);
 #endif
 
-#if defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
-  MULTIARCH_TARGET_AVX512_VPOPCNT
+#if defined(MULTIARCH_TARGET_AVX512)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
   uint64_t count(uint64_t start, uint64_t stop) const;
-  MULTIARCH_TARGET_AVX512_VPOPCNT
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
   uint64_t count(uint64_t stop);
 #endif
 

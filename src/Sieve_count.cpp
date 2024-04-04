@@ -28,7 +28,7 @@
   #define HAS_AVX512_VPOPCNT
 
 // GCC/Clang function multiversioning
-#elif defined(MULTIARCH_TARGET_AVX512_VPOPCNT) && \
+#elif defined(MULTIARCH_TARGET_AVX512) && \
     __has_include(<immintrin.h>)
   #include <immintrin.h>
 
@@ -70,6 +70,22 @@
   for (uint64_t i = start_idx + 1; i < stop_idx; i++)        \
     res += popcnt64(sieve64[i]);
 
+/// Compute the loop below using ARM SVE.
+/// for (i = start_idx + 1; i < stop_idx; i++)
+///   res += popcnt64(sieve64[i]);
+///
+#define SVE_POPCNT_KERNEL(sieve64, start_idx, stop_idx)      \
+  uint64_t i = start_idx + 1;                                \
+  svuint64_t vcnt = svdup_u64(0);                            \
+  for (; i < stop_idx; i += svcntd())                        \
+  {                                                          \
+    svbool_t pg = svwhilelt_b64(i, stop_idx);                \
+    svuint64_t vec = svld1_u64(pg, &sieve64[i]);             \
+    vec = svcnt_u64_z(pg, vec);                              \
+    vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);            \
+  }                                                          \
+  res += svaddv_u64(svptrue_b64(), vcnt);
+
 /// Compute the loop below using AVX512.
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
@@ -89,36 +105,18 @@
   vcnt = _mm512_add_epi64(vcnt, vec);                        \
   res += _mm512_reduce_add_epi64(vcnt);
 
-/// Compute the loop below using ARM SVE.
-/// for (i = start_idx + 1; i < stop_idx; i++)
-///   res += popcnt64(sieve64[i]);
-///
-#define SVE_POPCNT_KERNEL(sieve64, start_idx, stop_idx)      \
-  uint64_t i = start_idx + 1;                                \
-  svuint64_t vcnt = svdup_u64(0);                            \
-  for (; i < stop_idx; i += svcntd())                        \
-  {                                                          \
-    svbool_t pg = svwhilelt_b64(i, stop_idx);                \
-    svuint64_t vec = svld1_u64(pg, &sieve64[i]);             \
-    vec = svcnt_u64_z(pg, vec);                              \
-    vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);            \
-  }                                                          \
-  res += svaddv_u64(svptrue_b64(), vcnt);
-
 namespace primecount {
 
 #if defined(DEFAULT_CPU_ARCH) || \
     defined(MULTIARCH_TARGET_DEFAULT)
 
-// Disable GCC/Clang function multiversioning
-#if !defined(MULTIARCH_TARGET_DEFAULT)
-  #define MULTIARCH_TARGET_DEFAULT /* empty */
+#if defined(MULTIARCH_TARGET_DEFAULT)
+  __attribute__ ((target ("default")))
 #endif
-
-/// Count 1 bits inside [0, stop]
-MULTIARCH_TARGET_DEFAULT
 uint64_t Sieve::count(uint64_t stop)
 {
+  // Count 1 bits inside [0, stop] in the sieve array.
+  // The distance [0, stop] might be large > sqrt(segment_size).
   ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
@@ -148,10 +146,13 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-/// Count 1 bits inside [start, stop]
-MULTIARCH_TARGET_DEFAULT
+#if defined(MULTIARCH_TARGET_DEFAULT)
+  __attribute__ ((target ("default")))
+#endif
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
+  // Count 1 bits inside [start, stop] in the sieve array.
+  // The distance [start, stop] is small here < sqrt(segment_size).
   COUNT_1_BITS(start, stop, DEFAULT_POPCNT_KERNEL)
   return res;
 }
@@ -159,17 +160,15 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 #endif
 
 #if defined(HAS_AVX512_VPOPCNT) || \
-    defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
+    defined(MULTIARCH_TARGET_AVX512)
 
-// Disable GCC/Clang function multiversioning
-#if !defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
-  #define MULTIARCH_TARGET_AVX512_VPOPCNT /* empty */
+#if defined(MULTIARCH_TARGET_AVX512)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
 #endif
-
-/// Count 1 bits inside [0, stop]
-MULTIARCH_TARGET_AVX512_VPOPCNT
 uint64_t Sieve::count(uint64_t stop)
 {
+  // Count 1 bits inside [0, stop] in the sieve array.
+  // The distance [0, stop] might be large > sqrt(segment_size).
   ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
@@ -199,19 +198,23 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-/// Count 1 bits inside [start, stop]
-MULTIARCH_TARGET_AVX512_VPOPCNT
+#if defined(MULTIARCH_TARGET_AVX512)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#endif
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
+  // Count 1 bits inside [start, stop] in the sieve array.
+  // The distance [start, stop] is small here < sqrt(segment_size).
   COUNT_1_BITS(start, stop, AVX512_POPCNT_KERNEL)
   return res;
 }
 
 #elif defined(HAS_ARM_SVE)
 
-/// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
+  // Count 1 bits inside [0, stop] in the sieve array.
+  // The distance [0, stop] might be large > sqrt(segment_size).
   ASSERT(stop >= prev_stop_);
   uint64_t start = prev_stop_ + 1;
   prev_stop_ = stop;
@@ -241,9 +244,10 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-/// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
+  // Count 1 bits inside [start, stop] in the sieve array.
+  // The distance [start, stop] is small here < sqrt(segment_size).
   COUNT_1_BITS(start, stop, SVE_POPCNT_KERNEL)
   return res;
 }
