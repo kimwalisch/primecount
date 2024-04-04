@@ -63,13 +63,17 @@
 
 namespace primecount {
 
-#if defined(DEFAULT_CPU_ARCH)
+#if defined(DEFAULT_CPU_ARCH) || \
+    defined(MULTIARCH)
 
 /// Default portable POPCNT kernel
 #define DEFAULT_POPCNT_KERNEL(sieve64, start_idx, stop_idx) \
   for (uint64_t i = start_idx + 1; i < stop_idx; i++) \
     res += popcnt64(sieve64[i]);
 
+#if defined(MULTIARCH)
+  __attribute__ ((target ("default")))
+#endif
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
@@ -102,6 +106,9 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
+#if defined(MULTIARCH)
+  __attribute__ ((target ("default")))
+#endif
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
@@ -109,7 +116,9 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return res;
 }
 
-#elif defined(HAS_ARM_SVE)
+#endif
+
+#if defined(HAS_ARM_SVE)
 
 /// Compute the loop below using the ARM SVE instruction set.
 /// for (i = start_idx + 1; i < stop_idx; i++)
@@ -170,7 +179,8 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return res;
 }
 
-#elif defined(HAS_AVX512_VPOPCNT)
+#elif defined(HAS_AVX512_VPOPCNT) || \
+      defined(MULTIARCH_AVX512_VPOPCNT)
 
 /// Compute the loop below using the AVX512 instruction set.
 /// for (i = start_idx + 1; i < stop_idx; i++)
@@ -192,6 +202,9 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
     res += _mm512_reduce_add_epi64(vcnt);                      \
   }
 
+#if defined(MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#endif
 /// Count 1 bits inside [0, stop]
 uint64_t Sieve::count(uint64_t stop)
 {
@@ -224,6 +237,9 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
+#if defined(MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#endif
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {

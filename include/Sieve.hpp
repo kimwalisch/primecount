@@ -49,6 +49,24 @@ public:
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
+
+#if defined(MULTIARCH_AVX512_VPOPCNT)
+  #define MULTIARCH
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  __attribute__ ((target ("default")))
+  uint64_t count(uint64_t start, uint64_t stop) const;
+
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+  uint64_t count(uint64_t stop);
+  __attribute__ ((target ("default")))
+  uint64_t count(uint64_t stop);
+#else
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  uint64_t count(uint64_t stop);
+#endif
+
+  void fillNextPrimes(Vector<uint64_t>& primes, std::size_t* size);
   uint64_t count(uint64_t start, uint64_t stop) const;
   uint64_t count(uint64_t stop);
 
