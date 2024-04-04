@@ -116,9 +116,9 @@ namespace primecount {
 #if defined(DEFAULT_CPU_ARCH) || \
     defined(MULTIARCH_TARGET_DEFAULT)
 
-// Disable GCC/Clang function multiversioning (using empty macro)
+// Disable GCC/Clang function multiversioning
 #if !defined(MULTIARCH_TARGET_DEFAULT)
-  #define MULTIARCH_TARGET_DEFAULT
+  #define MULTIARCH_TARGET_DEFAULT /* empty */
 #endif
 
 /// Count 1 bits inside [0, stop]
@@ -167,9 +167,9 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 #if defined(HAS_AVX512_VPOPCNT) || \
     defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
 
-// Disable GCC/Clang function multiversioning (using empty macro)
+// Disable GCC/Clang function multiversioning
 #if !defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
-  #define MULTIARCH_TARGET_AVX512_VPOPCNT
+  #define MULTIARCH_TARGET_AVX512_VPOPCNT /* empty */
 #endif
 
 /// Count 1 bits inside [0, stop]
