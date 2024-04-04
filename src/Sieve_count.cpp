@@ -90,7 +90,7 @@
     res += _mm512_reduce_add_epi64(vcnt);                      \
   }
 
-/// Compute the loop below using the ARM SVE.
+/// Compute the loop below using ARM SVE.
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
 ///
