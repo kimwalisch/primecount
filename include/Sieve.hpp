@@ -132,7 +132,7 @@ private:
     {
       return counter[pos];
     }
-  
+
     uint32_t operator[](std::size_t pos) const
     {
       return counter[pos];
