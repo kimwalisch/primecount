@@ -28,7 +28,7 @@
   #define HAS_AVX512_VPOPCNT
 
 // GCC/Clang function multiversioning
-#elif defined(MULTIARCH_AVX512_VPOPCNT) && \
+#elif defined(MULTIARCH_TARGET_AVX512_VPOPCNT) && \
     __has_include(<immintrin.h>)
   #include <immintrin.h>
 
@@ -114,18 +114,15 @@
 namespace primecount {
 
 #if defined(DEFAULT_CPU_ARCH) || \
-    defined(MULTIARCH)
+    defined(MULTIARCH_TARGET_DEFAULT)
 
-// GCC/Clang function multiversioning
-#if defined(MULTIARCH)
-  #define ATTRIBUTE_DEFAULT \
-    __attribute__ ((target ("default")))
-#else
-  #define ATTRIBUTE_DEFAULT
+// Disable GCC/Clang function multiversioning (using empty macro)
+#if !defined(MULTIARCH_TARGET_DEFAULT)
+  #define MULTIARCH_TARGET_DEFAULT
 #endif
 
 /// Count 1 bits inside [0, stop]
-ATTRIBUTE_DEFAULT
+MULTIARCH_TARGET_DEFAULT
 uint64_t Sieve::count(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
@@ -158,7 +155,7 @@ uint64_t Sieve::count(uint64_t stop)
 }
 
 /// Count 1 bits inside [start, stop]
-ATTRIBUTE_DEFAULT
+MULTIARCH_TARGET_DEFAULT
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   COUNT_1_BITS(start, stop, DEFAULT_POPCNT_KERNEL)
@@ -168,18 +165,15 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 #endif
 
 #if defined(HAS_AVX512_VPOPCNT) || \
-    defined(MULTIARCH_AVX512_VPOPCNT)
+    defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
 
-// GCC/Clang function multiversioning
-#if defined(MULTIARCH)
-  #define ATTRIBUTE_AVX512 \
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
-#else
-  #define ATTRIBUTE_AVX512
+// Disable GCC/Clang function multiversioning (using empty macro)
+#if !defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
+  #define MULTIARCH_TARGET_AVX512_VPOPCNT
 #endif
 
 /// Count 1 bits inside [0, stop]
-ATTRIBUTE_AVX512
+MULTIARCH_TARGET_AVX512_VPOPCNT
 uint64_t Sieve::count(uint64_t stop)
 {
   ASSERT(stop >= prev_stop_);
@@ -212,7 +206,7 @@ uint64_t Sieve::count(uint64_t stop)
 }
 
 /// Count 1 bits inside [start, stop]
-ATTRIBUTE_AVX512
+MULTIARCH_TARGET_AVX512_VPOPCNT
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   COUNT_1_BITS(start, stop, AVX512_POPCNT_KERNEL)

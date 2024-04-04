@@ -49,7 +49,10 @@
     // overhead, hence we disable it if it is not needed.
     #undef MULTIARCH_AVX512_VPOPCNT
   #else
-    #define MULTIARCH
+    #define MULTIARCH_TARGET_DEFAULT \
+      __attribute__ ((target ("default")))
+    #define MULTIARCH_TARGET_AVX512_VPOPCNT \
+      __attribute__ ((target ("avx512f,avx512vpopcntdq")))
   #endif
 #endif
 
@@ -63,23 +66,23 @@ public:
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
 
-#if !defined(MULTIARCH)
+#if !defined(MULTIARCH_TARGET_DEFAULT)
   uint64_t count(uint64_t start, uint64_t stop) const;
   uint64_t count(uint64_t stop);
 #endif
 
-#if defined(MULTIARCH)
-  __attribute__ ((target ("default")))
+#if defined(MULTIARCH_TARGET_DEFAULT)
+  MULTIARCH_TARGET_DEFAULT
   uint64_t count(uint64_t start, uint64_t stop) const;
-  __attribute__ ((target ("default")))
+  MULTIARCH_TARGET_DEFAULT
   uint64_t count(uint64_t stop);
+#endif
 
-  #if defined(MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
-    uint64_t count(uint64_t start, uint64_t stop) const;
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
-    uint64_t count(uint64_t stop);
-  #endif
+#if defined(MULTIARCH_TARGET_AVX512_VPOPCNT)
+  MULTIARCH_TARGET_AVX512_VPOPCNT
+  uint64_t count(uint64_t start, uint64_t stop) const;
+  MULTIARCH_TARGET_AVX512_VPOPCNT
+  uint64_t count(uint64_t stop);
 #endif
 
   uint64_t get_total_count() const
