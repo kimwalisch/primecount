@@ -66,10 +66,6 @@ public:
   uint64_t count(uint64_t stop);
 #endif
 
-  void fillNextPrimes(Vector<uint64_t>& primes, std::size_t* size);
-  uint64_t count(uint64_t start, uint64_t stop) const;
-  uint64_t count(uint64_t stop);
-
   uint64_t get_total_count() const
   {
     return total_count_;
