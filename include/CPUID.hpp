@@ -30,9 +30,6 @@
   #define HAS_POPCNT
 #endif
 
-#if !defined(HAS_POPCNT)
-#define ENABLE_CPUID_POPCNT
-
 #if defined(_MSC_VER)
   #include <intrin.h>
 #endif
@@ -72,6 +69,9 @@ inline void run_CPUID(int eax, int ecx, int* abcd)
 #endif
 }
 
+#if !defined(HAS_POPCNT)
+#define ENABLE_CPUID_POPCNT
+
 inline bool run_CPUID_POPCNT()
 {
   // %ecx POPCNT bit flag
@@ -85,9 +85,10 @@ inline bool run_CPUID_POPCNT()
 /// Initialized at startup
 const bool HAS_CPUID_POPCNT = run_CPUID_POPCNT();
 
+#endif // ENABLE_CPUID_POPCNT
+
 } // namespace
 
-#endif // ENABLE_CPUID_POPCNT
 #endif // x86 CPU
 
 #endif
