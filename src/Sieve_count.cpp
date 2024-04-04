@@ -171,7 +171,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
     defined(MULTIARCH_AVX512_VPOPCNT)
 
 // GCC/Clang function multiversioning
-#if defined(MULTIARCH_AVX512_VPOPCNT)
+#if defined(MULTIARCH)
   #define ATTRIBUTE_AVX512 \
     __attribute__ ((target ("avx512f,avx512vpopcntdq")))
 #else
