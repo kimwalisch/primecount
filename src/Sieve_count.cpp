@@ -19,54 +19,60 @@
 #include <popcnt.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 
-// x64 AVX512 vector popcount
+// The CPU vector instruction sets are sorted from fastest (top) to
+// slowest (bottom) in the preprocessor checks below. We enable the
+// first vector instruction that is supported by the CPU and
+// compiler, which should provide the best performance.
+
 #if __has_include(<immintrin.h>) && \
    (defined(__AVX512__) || (defined(__AVX512F__) && \
                             defined(__AVX512VPOPCNTDQ__)))
   #include <immintrin.h>
   #define HAS_AVX512_VPOPCNT
 
-// GCC/Clang function multiversioning
 #elif defined(MULTIARCH_TARGET_AVX512) && \
     __has_include(<immintrin.h>)
   #include <immintrin.h>
 
-// ARM SVE vector popcount
 #elif defined(__ARM_FEATURE_SVE) && \
       __has_include(<arm_sve.h>)
   #include <arm_sve.h>
   #define HAS_ARM_SVE
 
-#else // Default portable popcount
+#else
   #define DEFAULT_CPU_ARCH
 #endif
 
-/// Count 1 bits inside [start, stop]
-#define COUNT_1_BITS(start, stop, POPCNT_KERNEL)      \
-  uint64_t res = 0;                                   \
-                                                      \
-  if (start <= stop)                                  \
-  {                                                   \
-    ASSERT(stop - start < segment_size());            \
-    uint64_t start_idx = start / 240;                 \
-    uint64_t stop_idx = stop / 240;                   \
-    uint64_t m1 = unset_smaller[start % 240];         \
-    uint64_t m2 = unset_larger[stop % 240];           \
-    uint64_t* sieve64 = (uint64_t*) sieve_.data();    \
-                                                      \
-    if (start_idx == stop_idx)                        \
-      res = popcnt64(sieve64[start_idx] & (m1 & m2)); \
-    else                                              \
-    {                                                 \
-      res = popcnt64(sieve64[start_idx] & m1);        \
-      POPCNT_KERNEL(sieve64, start_idx, stop_idx)     \
-      res += popcnt64(sieve64[stop_idx] & m2);        \
-    }                                                 \
+/// Count 1 bits inside [start, stop].
+/// Used for all CPU architectures, the POPCNT_LOOP parameter is
+/// a macro defining a highly optimized popcount algorithm.
+///
+#define COUNT_1_BITS(start, stop, POPCNT_LOOP)               \
+  uint64_t res = 0;                                          \
+                                                             \
+  if (start <= stop)                                         \
+  {                                                          \
+    ASSERT(stop - start < segment_size());                   \
+    uint64_t start_idx = start / 240;                        \
+    uint64_t stop_idx = stop / 240;                          \
+    uint64_t m1 = unset_smaller[start % 240];                \
+    uint64_t m2 = unset_larger[stop % 240];                  \
+    uint64_t* sieve64 = (uint64_t*) sieve_.data();           \
+                                                             \
+    if (start_idx == stop_idx)                               \
+      res = popcnt64(sieve64[start_idx] & (m1 & m2));        \
+    else                                                     \
+    {                                                        \
+      res = popcnt64(sieve64[start_idx] & m1);               \
+      POPCNT_LOOP(sieve64, start_idx, stop_idx)              \
+      res += popcnt64(sieve64[stop_idx] & m2);               \
+    }                                                        \
   }
 
-/// Default portable POPCNT kernel
-#define DEFAULT_POPCNT_KERNEL(sieve64, start_idx, stop_idx)  \
+/// Default portable POPCNT loop
+#define DEFAULT_POPCNT_LOOP(sieve64, start_idx, stop_idx)    \
   for (uint64_t i = start_idx + 1; i < stop_idx; i++)        \
     res += popcnt64(sieve64[i]);
 
@@ -74,7 +80,7 @@
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
 ///
-#define SVE_POPCNT_KERNEL(sieve64, start_idx, stop_idx)      \
+#define SVE_POPCNT_LOOP(sieve64, start_idx, stop_idx)        \
   uint64_t i = start_idx + 1;                                \
   svuint64_t vcnt = svdup_u64(0);                            \
   for (; i < stop_idx; i += svcntd())                        \
@@ -90,7 +96,7 @@
 /// for (i = start_idx + 1; i < stop_idx; i++)
 ///   res += popcnt64(sieve64[i]);
 ///
-#define AVX512_POPCNT_KERNEL(sieve64, start_idx, stop_idx)   \
+#define AVX512_POPCNT_LOOP(sieve64, start_idx, stop_idx)     \
   uint64_t i = start_idx + 1;                                \
   __m512i vcnt = _mm512_setzero_si512();                     \
   for (; i + 8 < stop_idx; i += 8)                           \
@@ -140,7 +146,7 @@ uint64_t Sieve::count(uint64_t stop)
   // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  COUNT_1_BITS(start, stop, DEFAULT_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, DEFAULT_POPCNT_LOOP)
   count_ += res;
 
   return count_;
@@ -153,7 +159,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
-  COUNT_1_BITS(start, stop, DEFAULT_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, DEFAULT_POPCNT_LOOP)
   return res;
 }
 
@@ -192,7 +198,7 @@ uint64_t Sieve::count(uint64_t stop)
   // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  COUNT_1_BITS(start, stop, AVX512_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, AVX512_POPCNT_LOOP)
   count_ += res;
 
   return count_;
@@ -205,7 +211,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
-  COUNT_1_BITS(start, stop, AVX512_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, AVX512_POPCNT_LOOP)
   return res;
 }
 
@@ -238,7 +244,7 @@ uint64_t Sieve::count(uint64_t stop)
   // (stop - start) < counter_.dist, hence we simply
   // count the remaining number of unsieved elements by
   // linearly iterating over the sieve array.
-  COUNT_1_BITS(start, stop, SVE_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, SVE_POPCNT_LOOP)
   count_ += res;
 
   return count_;
@@ -248,7 +254,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
-  COUNT_1_BITS(start, stop, SVE_POPCNT_KERNEL)
+  COUNT_1_BITS(start, stop, SVE_POPCNT_LOOP)
   return res;
 }
 
