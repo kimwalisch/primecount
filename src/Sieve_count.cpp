@@ -83,13 +83,16 @@
 #define SVE_POPCNT_LOOP(sieve64, start_idx, stop_idx)        \
   uint64_t i = start_idx + 1;                                \
   svuint64_t vcnt = svdup_u64(0);                            \
-  for (; i < stop_idx; i += svcntd())                        \
+  svbool_t pg = svwhilelt_b64(i, stop_idx);                  \
+  do                                                         \
   {                                                          \
-    svbool_t pg = svwhilelt_b64(i, stop_idx);                \
     svuint64_t vec = svld1_u64(pg, &sieve64[i]);             \
     vec = svcnt_u64_z(pg, vec);                              \
     vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);            \
+    i += svcntd();                                           \
+    pg = svwhilelt_b64(i, stop_idx);                         \
   }                                                          \
+  while (svptest_any(svptrue_b64(), pg));                    \
   res += svaddv_u64(svptrue_b64(), vcnt);
 
 /// Compute the loop below using AVX512.
