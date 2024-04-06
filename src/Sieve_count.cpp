@@ -4,6 +4,16 @@
 ///        bit counting is very important for primecount's performance
 ///        we use vector instructions to speed up the computation.
 ///
+///        Our main POPCNT loop performs very few iterations on
+///        average. Hence, it does not seem worthwhile to vectorize
+///        this loop. However, the latest vector instruction sets
+///        such as AVX512 (x64) and ARM SVE feature new masked load
+///        instructions that dramatically reduce the CPU branch
+///        mispredictions for loops that perform very few iterations.
+///        Hence, using the new masked load instructions together with
+///        vector POPCNT provides a significant speed up for the
+///        computation of the hard special leaves (--S2-hard & -D).
+///
 ///        In-depth description of our counting algorithms:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
