@@ -39,8 +39,15 @@
 #if defined(__AVX512F__) && \
     defined(__AVX512VPOPCNTDQ__) && \
     defined(__BMI2__) && \
-   !defined(__i386__) /* i386 misses _bzhi_u64() */
+   !defined(__i386__) /* misses _bzhi_u64() */ && \
     __has_include(<immintrin.h>)
+  #include <immintrin.h>
+  #define HAS_AVX512_BMI2
+
+#elif defined(_MSC_VER) && \
+      defined(__AVX512__) && \
+     !defined(_M_IX86) /* misses _bzhi_u64() */ && \
+      __has_include(<immintrin.h>)
   #include <immintrin.h>
   #define HAS_AVX512_BMI2
 
