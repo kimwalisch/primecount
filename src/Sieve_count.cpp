@@ -36,14 +36,16 @@
 // first vector instruction that is supported by the CPU and
 // compiler, which should provide the best performance.
 
-#if __has_include(<immintrin.h>) && \
-   (defined(__AVX512__) || (defined(__AVX512F__) && \
-                            defined(__AVX512VPOPCNTDQ__)))
-  #include <immintrin.h>
-  #define HAS_AVX512_VPOPCNT
-
-#elif defined(MULTIARCH_TARGET_AVX512) && \
+#if defined(__AVX512F__) && \
+    defined(__AVX512VPOPCNTDQ__) && \
+    defined(__BMI2__) && \
+   !defined(__i386__) /* i386 misses _bzhi_u64() */
     __has_include(<immintrin.h>)
+  #include <immintrin.h>
+  #define HAS_AVX512_BMI2
+
+#elif defined(MULTIARCH_TARGET_AVX512_BMI2) && \
+      __has_include(<immintrin.h>)
   #include <immintrin.h>
 
 #elif defined(__ARM_FEATURE_SVE) && \
@@ -118,7 +120,7 @@
     vec = _mm512_popcnt_epi64(vec);                          \
     vcnt = _mm512_add_epi64(vcnt, vec);                      \
   }                                                          \
-  __mmask8 mask = 0xff >> (i + 8 - stop_idx);                \
+  __mmask8 mask = (__mmask8) _bzhi_u64(0xff, stop_idx - i);  \
   __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
   vec = _mm512_popcnt_epi64(vec);                            \
   vcnt = _mm512_add_epi64(vcnt, vec);                        \
@@ -178,11 +180,11 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 
 #endif
 
-#if defined(HAS_AVX512_VPOPCNT) || \
-    defined(MULTIARCH_TARGET_AVX512)
+#if defined(HAS_AVX512_BMI2) || \
+    defined(MULTIARCH_TARGET_AVX512_BMI2)
 
-#if defined(MULTIARCH_TARGET_AVX512)
-  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#if defined(MULTIARCH_TARGET_AVX512_BMI2)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
 uint64_t Sieve::count(uint64_t stop)
 {
@@ -217,8 +219,8 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-#if defined(MULTIARCH_TARGET_AVX512)
-  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#if defined(MULTIARCH_TARGET_AVX512_BMI2)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
