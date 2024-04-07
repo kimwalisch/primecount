@@ -36,32 +36,32 @@
 // first vector instruction that is supported by the CPU and
 // compiler, which should provide the best performance.
 
-#if defined(__AVX512F__) && \
-    defined(__AVX512VPOPCNTDQ__) && \
-    defined(__BMI2__) && \
-   !defined(__i386__) /* misses _bzhi_u64() */ && \
+#if defined(ENABLE_MULTIARCH_AVX512_BMI2) && \
     __has_include(<immintrin.h>)
   #include <immintrin.h>
-  #define HAS_AVX512_BMI2
+
+#elif defined(__AVX512F__) && \
+      defined(__AVX512VPOPCNTDQ__) && \
+      defined(__BMI2__) && \
+     !defined(__i386__) /* misses _bzhi_u64() */ && \
+      __has_include(<immintrin.h>)
+  #include <immintrin.h>
+  #define ENABLE_AVX512_BMI2
 
 #elif defined(_MSC_VER) && \
       defined(__AVX512__) && \
      !defined(_M_IX86) /* misses _bzhi_u64() */ && \
       __has_include(<immintrin.h>)
   #include <immintrin.h>
-  #define HAS_AVX512_BMI2
-
-#elif defined(MULTIARCH_TARGET_AVX512_BMI2) && \
-      __has_include(<immintrin.h>)
-  #include <immintrin.h>
+  #define ENABLE_AVX512_BMI2
 
 #elif defined(__ARM_FEATURE_SVE) && \
       __has_include(<arm_sve.h>)
   #include <arm_sve.h>
-  #define HAS_ARM_SVE
+  #define ENABLE_ARM_SVE
 
 #else
-  #define DEFAULT_CPU_ARCH
+  #define ENABLE_DEFAULT
 #endif
 
 /// Count 1 bits inside [start, stop].
@@ -135,10 +135,10 @@
 
 namespace primecount {
 
-#if defined(DEFAULT_CPU_ARCH) || \
-    defined(MULTIARCH_TARGET_DEFAULT)
+#if defined(ENABLE_DEFAULT) || \
+    defined(ENABLE_MULTIARCH_DEFAULT)
 
-#if defined(MULTIARCH_TARGET_DEFAULT)
+#if defined(ENABLE_MULTIARCH_DEFAULT)
   __attribute__ ((target ("default")))
 #endif
 uint64_t Sieve::count(uint64_t stop)
@@ -174,7 +174,7 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-#if defined(MULTIARCH_TARGET_DEFAULT)
+#if defined(ENABLE_MULTIARCH_DEFAULT)
   __attribute__ ((target ("default")))
 #endif
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
@@ -187,10 +187,10 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 
 #endif
 
-#if defined(HAS_AVX512_BMI2) || \
-    defined(MULTIARCH_TARGET_AVX512_BMI2)
+#if defined(ENABLE_AVX512_BMI2) || \
+    defined(ENABLE_MULTIARCH_AVX512_BMI2)
 
-#if defined(MULTIARCH_TARGET_AVX512_BMI2)
+#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
 uint64_t Sieve::count(uint64_t stop)
@@ -226,7 +226,7 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-#if defined(MULTIARCH_TARGET_AVX512_BMI2)
+#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
@@ -237,7 +237,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   return res;
 }
 
-#elif defined(HAS_ARM_SVE)
+#elif defined(ENABLE_ARM_SVE)
 
 uint64_t Sieve::count(uint64_t stop)
 {

@@ -8,6 +8,17 @@ include(CheckCXXSourceCompiles)
 check_cxx_source_compiles("
     #include <immintrin.h>
     #include <stdint.h>
+
+    // GCC/Clang function multiversioning for AVX512 is not needed if
+    // the user compiles with -mavx512f -mavx512vpopcntdq -mbmi2.
+    // GCC/Clang function multiversioning generally causes a minor
+    // overhead, hence we disable it if it is not needed.
+    #if defined(__AVX512F__) && \
+        defined(__AVX512VPOPCNTDQ__) && \
+        defined(__BMI2__)
+      Error: AVX512 BMI2 multiarch not needed!
+    #endif
+
     class Sieve {
         public:
         __attribute__ ((target (\"default\")))
@@ -15,6 +26,7 @@ check_cxx_source_compiles("
         __attribute__ ((target (\"avx512f,avx512vpopcntdq,bmi2\")))
         uint64_t count(uint64_t* array, uint64_t stop_idx);
     };
+
     __attribute__ ((target (\"default\")))
     uint64_t Sieve::count(uint64_t* array, uint64_t stop_idx)
     {
@@ -23,6 +35,7 @@ check_cxx_source_compiles("
             res += array[i];
         return res;
     }
+
     __attribute__ ((target (\"avx512f,avx512vpopcntdq,bmi2\")))
     uint64_t Sieve::count(uint64_t* array, uint64_t stop_idx)
     {
@@ -40,6 +53,7 @@ check_cxx_source_compiles("
         vcnt = _mm512_add_epi64(vcnt, vec);
         return _mm512_reduce_add_epi64(vcnt);
     }
+
     int main()
     {
         uint64_t array[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };

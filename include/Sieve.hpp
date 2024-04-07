@@ -40,19 +40,6 @@
 #include <Vector.hpp>
 #include <stdint.h>
 
-#if defined(MULTIARCH_AVX512_VPOPCNT)
-  // GCC/Clang function multiversioning for AVX512 is not needed if
-  // the user compiles with -mavx512f -mavx512vpopcntdq -mbmi2.
-  // GCC/Clang function multiversioning generally causes a minor
-  // overhead, hence we disable it if it is not needed.
-  #if !(defined(__AVX512F__) && \
-        defined(__AVX512VPOPCNTDQ__) && \
-        defined(__BMI2__))
-    #define MULTIARCH_TARGET_DEFAULT
-    #define MULTIARCH_TARGET_AVX512_BMI2
-  #endif
-#endif
-
 namespace primecount {
 
 class Sieve
@@ -63,22 +50,23 @@ public:
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
 
-#if defined(MULTIARCH_TARGET_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-  uint64_t count(uint64_t stop);
-
-#if defined(MULTIARCH_TARGET_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-  uint64_t count(uint64_t start, uint64_t stop) const;
-
-#if defined(MULTIARCH_TARGET_AVX512_BMI2)
+#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
+  #define ENABLE_MULTIARCH_DEFAULT
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
   uint64_t count(uint64_t stop);
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
   uint64_t count(uint64_t start, uint64_t stop) const;
 #endif
+
+#if defined(ENABLE_MULTIARCH_DEFAULT)
+  __attribute__ ((target ("default")))
+#endif
+  uint64_t count(uint64_t stop);
+
+#if defined(ENABLE_MULTIARCH_DEFAULT)
+  __attribute__ ((target ("default")))
+#endif
+  uint64_t count(uint64_t start, uint64_t stop) const;
 
   uint64_t get_total_count() const
   {
