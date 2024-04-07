@@ -48,13 +48,6 @@
   #include <immintrin.h>
   #define ENABLE_AVX512_BMI2
 
-#elif defined(_MSC_VER) && \
-      defined(__AVX512__) && \
-     !defined(_M_IX86) /* misses _bzhi_u64() */ && \
-      __has_include(<immintrin.h>)
-  #include <immintrin.h>
-  #define ENABLE_AVX512_BMI2
-
 #elif defined(__ARM_FEATURE_SVE) && \
       __has_include(<arm_sve.h>)
   #include <arm_sve.h>
