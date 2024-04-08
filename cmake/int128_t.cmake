@@ -11,6 +11,22 @@ include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
 cmake_push_check_state()
+
+check_cxx_source_compiles("
+    int main() {
+        static_assert(true, \"\");
+        return 0;
+    }" static_assert_without_cxx11)
+
+# Enable C++11 if static_assert() fails to compile
+if(NOT static_assert_without_cxx11)
+    if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+    elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+    endif()
+endif()
+
 set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
 check_cxx_source_compiles("
@@ -19,7 +35,10 @@ check_cxx_source_compiles("
     #include <type_traits>
     int main() {
         using namespace primecount;
-        static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
+        static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
+        static_assert(std::numeric_limits<uint128_t>::max() == ~uint128_t(0), \"\");
+        static_assert(std::numeric_limits<int128_t>::digits == 127, \"\");
+        static_assert(std::numeric_limits<uint128_t>::digits == 128, \"\");
         static_assert(std::is_integral<int128_t>::value, \"\");
         static_assert(std::is_integral<uint128_t>::value, \"\");
         static_assert(std::is_signed<int128_t>::value, \"\");
@@ -29,15 +48,8 @@ check_cxx_source_compiles("
     }" int128)
 
 if(NOT int128)
-    # Let's try it again with C++11, this usually works for old
-    # GCC/Clang versions that use C++03 by default. We add the
-    # -std=gnu++11 option before the user's CXXFLAGS to ensure
-    # we don't overwrite any of the user's flags.
-    if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-    elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-    endif()
+    # Now let's try again if it works with our <int128_STL_patch.hpp> header
+    set(CMAKE_REQUIRED_DEFINITIONS "-DENABLE_INT128_STL_PATCH")
 
     check_cxx_source_compiles("
         #include <int128_t.hpp>
@@ -45,16 +57,20 @@ if(NOT int128)
         #include <type_traits>
         int main() {
             using namespace primecount;
-            static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
+            static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
+            static_assert(std::numeric_limits<uint128_t>::max() == ~uint128_t(0), \"\");
+            static_assert(std::numeric_limits<int128_t>::digits == 127, \"\");
+            static_assert(std::numeric_limits<uint128_t>::digits == 128, \"\");
             static_assert(std::is_integral<int128_t>::value, \"\");
             static_assert(std::is_integral<uint128_t>::value, \"\");
             static_assert(std::is_signed<int128_t>::value, \"\");
             static_assert(std::is_unsigned<uint128_t>::value, \"\");
             static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
             return 0;
-        }" int128_with_cpp11)
+        }" int128_STL_patch)
 
-    if(NOT int128_with_cpp11)
+    if(NOT int128_STL_patch)
+        set(CMAKE_REQUIRED_DEFINITIONS "")
         set(DISABLE_INT128 "DISABLE_INT128")
 
         # Print a warning message if the user has specified the -std=c++*
@@ -71,7 +87,10 @@ if(NOT int128)
                 #include <type_traits>
                 int main() {
                     using namespace primecount;
-                    static_assert(std::numeric_limits<uint128_t>::max() != 0, \"\");
+                    static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
+                    static_assert(std::numeric_limits<uint128_t>::max() == ~uint128_t(0), \"\");
+                    static_assert(std::numeric_limits<int128_t>::digits == 127, \"\");
+                    static_assert(std::numeric_limits<uint128_t>::digits == 128, \"\");
                     static_assert(std::is_integral<int128_t>::value, \"\");
                     static_assert(std::is_integral<uint128_t>::value, \"\");
                     static_assert(std::is_signed<int128_t>::value, \"\");
