@@ -221,9 +221,6 @@ endif()
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
-    if(OpenMP_int128_patch)
-        set(ENABLE_INT128_OPENMP_PATCH "ENABLE_INT128_OPENMP_PATCH")
-    endif()
 endif()
 
 # libprimesieve ######################################################

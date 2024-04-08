@@ -1,10 +1,12 @@
 ///
 /// @file   int128_OpenMP_patch.hpp
 /// @brief  Add missing int128_t support for OpenMP multi-threading.
-///         This is mainly required for LLVM/Clang on both Linux
-///         and Windows. Without these pragmas there will often be
-///         "unresolved external symbol" linker errors for symbols
-///         like e.g. __atomic_load, __atomic_compare_exchange.
+///         This is required if libatomic does not support 128-bit
+///         integers e.g. for LLVM/Clang on Windows. When including
+///         this header OpenMP will use critical sections instead of
+///         atomics for summing 128-bit integers. Critical sections
+///         are less performant than atomics, hence this should only
+///         be used as a last resort if nothing else works.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
