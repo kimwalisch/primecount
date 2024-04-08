@@ -75,4 +75,10 @@ typedef uint64_t maxuint_t;
   #include <int128_STL_patch.hpp>
 #endif
 
+#if defined(HAVE_INT128_T) && \
+    defined(_OPENMP) && \
+    defined(ENABLE_INT128_OPENMP_PATCH)
+  #include <int128_OpenMP_patch.hpp>
+#endif
+
 #endif
