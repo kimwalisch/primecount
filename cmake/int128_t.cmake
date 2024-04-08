@@ -73,7 +73,9 @@ if(NOT int128)
             return 0;
         }" int128_STL_patch)
 
-    if(NOT int128_STL_patch)
+    if(int128_STL_patch)
+        set(ENABLE_INT128_STL_PATCH "ENABLE_INT128_STL_PATCH")
+    else()
         set(DISABLE_INT128 "DISABLE_INT128")
 
         # Print a warning message if the user has specified the -std=c++*

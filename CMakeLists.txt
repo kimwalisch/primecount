@@ -33,29 +33,6 @@ else()
     option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" ON)
 endif()
 
-# Enable/Disable libdivide ###########################################
-
-# Historically, integer division has been one of the slowest
-# instructions on most CPU architectures. Hence by default we
-# enable libdivide which replaces expensive integer division
-# instructions by a sequence of shift, add and multiply
-# instructions which is often much faster.
-
-set(DEFAULT_LIBDIVIDE ON)
-
-# Apple Silicon CPUs first released in 2020 have very fast integer
-# division instructions. For Apple Silicon CPUs on Apple OSes
-# we disable libdivide to get the best performance.
-
-if(APPLE)
-    include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
-    if(Apple_ARM64)
-        set(DEFAULT_LIBDIVIDE OFF)
-    endif()
-endif()
-
-option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
-
 # Option sanity checks ###############################################
 
 # We don't yet support building libprimecount as a shared DLL
@@ -154,17 +131,44 @@ set(LIB_SRC src/api.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
 
-# Required includes ##################################################
+# Enable/Disable libdivide ###########################################
 
-include(GNUInstallDirs)
+# Historically, integer division has been one of the slowest
+# instructions on most CPU architectures. Hence by default we
+# enable libdivide which replaces expensive integer division
+# instructions by a sequence of shift, add and multiply
+# instructions which is often much faster.
 
-# Use -Wno-uninitialized with GCC compiler ###########################
+set(DEFAULT_LIBDIVIDE ON)
 
-# GCC's -Wuninitialized enabled with -Wall -pedantic causes
-# false postive warnings in libprimecount:
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107287
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(WNO_UNINITIALIZED "-Wno-uninitialized")
+# Apple Silicon CPUs first released in 2020 have very fast integer
+# division instructions. For Apple Silicon CPUs on Apple OSes
+# we disable libdivide to get the best performance.
+
+if(APPLE)
+    include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
+    if(Apple_ARM64)
+        set(DEFAULT_LIBDIVIDE OFF)
+    endif()
+endif()
+
+option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+
+# Use libdivide.h (fast integer divison) #############################
+
+if(WITH_LIBDIVIDE)
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
+else()
+    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
+    set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
+endif()
+
+# Enable __float128 support (requires libquadmath) ###################
+
+if(WITH_FLOAT128)
+    set(LIB_QUADMATH "quadmath")
+    set(HAVE_FLOAT128 "HAVE_FLOAT128")
 endif()
 
 # libprimecount compile definitions ##################################
@@ -184,37 +188,23 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
+# Use -Wno-uninitialized with GCC compiler ###########################
+
+# GCC's -Wuninitialized enabled with -Wall -pedantic causes
+# false postive warnings in libprimecount:
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107287
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(WNO_UNINITIALIZED "-Wno-uninitialized")
+endif()
+
 # Check if int128_t is supported #####################################
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
-if(int128_STL_patch)
-    set(ENABLE_INT128_STL_PATCH "ENABLE_INT128_STL_PATCH")
-endif()
 
 # Check if compiler supports x64 multiarch ###########################
 
 if(WITH_MULTIARCH)
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
-    if(multiarch_avx512_vpopcnt)
-        set(ENABLE_MULTIARCH_AVX512_BMI2 "ENABLE_MULTIARCH_AVX512_BMI2")
-    endif()
-endif()
-
-# Use libdivide.h (fast integer divison) #############################
-
-if(WITH_LIBDIVIDE)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
-else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
-endif()
-
-# Enable __float128 support (requires libquadmath) ###################
-
-if(WITH_FLOAT128)
-    set(LIB_QUADMATH "quadmath")
-    set(HAVE_FLOAT128 "HAVE_FLOAT128")
 endif()
 
 # Check for OpenMP ###################################################
@@ -222,6 +212,10 @@ endif()
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 endif()
+
+# Required includes ##################################################
+
+include(GNUInstallDirs)
 
 # libprimesieve ######################################################
 
