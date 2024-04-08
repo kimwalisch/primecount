@@ -62,7 +62,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
 
         set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}" "${LIB_ATOMIC}")
 
-        # Check if compiles with libatomic
+        # Check if OpenMP compiles with libatomic
         check_cxx_source_compiles("
             #include <int128_t.hpp>
             #include <omp.h>
