@@ -31,7 +31,7 @@ jobs:
         run: |
             cmake . -G "Unix Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -118,7 +118,7 @@ jobs:
         run: |
             cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -152,7 +152,7 @@ jobs:
         run: |
             cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-mpopcnt -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -252,7 +252,7 @@ jobs:
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -290,7 +290,7 @@ jobs:
         run: |
             cmake . -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-mpopcnt -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -326,7 +326,7 @@ jobs:
         run: |
             LDFLAGS="-L$(brew --prefix libomp)/lib" cmake . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-I$(brew --prefix libomp)/include -Wall -Wextra -pedantic -Werror"
             grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
@@ -353,7 +353,7 @@ jobs:
         run: |
             cmake . -DBUILD_TESTS=ON
             grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
-            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128_STL.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
         run: ctest -j2
