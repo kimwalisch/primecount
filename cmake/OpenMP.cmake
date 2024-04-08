@@ -108,7 +108,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
                     }" OpenMP_int128_patch)
 
                 if(OpenMP_int128_patch)
-                    set(ENABLE_INT128_STL_PATCH "ENABLE_INT128_STL_PATCH")
+                    set(ENABLE_INT128_OPENMP_PATCH "ENABLE_INT128_OPENMP_PATCH")
                 endif()
             endif()
         endif()
