@@ -44,8 +44,8 @@ template <typename T>
 inline T next_power_of_2(T x)
 {
 #if __cplusplus >= 202002L
-  auto ux = std::make_unsigned_t<T>(x);
-  return std::bit_ceil(ux);
+  using UT = typename std::make_unsigned<T>::type;
+  return std::bit_ceil((UT) x);
 
 #elif __has_builtin(__builtin_clzll)
   if (x == 0 || x == 1)
@@ -81,7 +81,8 @@ template <typename T>
 inline T ilog2(T x)
 {
 #if __cplusplus >= 202002L
-  auto ux = std::make_unsigned_t<T>(x);
+  using UT = typename std::make_unsigned<T>::type;
+  auto ux = (UT) x;
   ux = (ux > 0) ? ux : 1;
   return std::bit_width(ux) - 1;
 
