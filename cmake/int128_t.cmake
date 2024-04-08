@@ -36,6 +36,7 @@ check_cxx_source_compiles("
     #include <int128_t.hpp>
     #include <limits>
     #include <type_traits>
+
     int main() {
         using namespace primecount;
         static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
@@ -52,12 +53,12 @@ check_cxx_source_compiles("
 
 if(NOT int128)
     # Now let's try again if it works with our <int128_STL_patch.hpp> header
-    set(CMAKE_REQUIRED_DEFINITIONS "-DENABLE_INT128_STL_PATCH")
-
     check_cxx_source_compiles("
         #include <int128_t.hpp>
+        #include <int128_STL_patch.hpp>
         #include <limits>
         #include <type_traits>
+
         int main() {
             using namespace primecount;
             static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
@@ -73,7 +74,6 @@ if(NOT int128)
         }" int128_STL_patch)
 
     if(NOT int128_STL_patch)
-        set(CMAKE_REQUIRED_DEFINITIONS "")
         set(DISABLE_INT128 "DISABLE_INT128")
 
         # Print a warning message if the user has specified the -std=c++*
@@ -88,6 +88,7 @@ if(NOT int128)
                 #include <int128_t.hpp>
                 #include <limits>
                 #include <type_traits>
+
                 int main() {
                     using namespace primecount;
                     static_assert(std::numeric_limits<int128_t>::max() == int128_t((uint128_t(1) << 127) - 1), \"\");
