@@ -158,7 +158,7 @@ if(WITH_FLOAT128)
     set(HAVE_FLOAT128 "HAVE_FLOAT128")
 endif()
 
-# libprimecount compile definitions ##################################
+# Use 32-bit integer division ########################################
 
 # Check at runtime if the dividend and divisor are < 2^32 and
 # if so use 32-bit integer division instead of 64-bit integer
@@ -166,13 +166,6 @@ endif()
 # improves performance.
 if(WITH_DIV32)
     set(ENABLE_DIV32 "ENABLE_DIV32")
-endif()
-
-# Enable expensive debugging assertions.
-# These assertions enable e.g. bounds checks
-# for the Vector and Array types.
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
 # Use -Wno-uninitialized with GCC compiler ###########################
@@ -215,6 +208,10 @@ endif()
 if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
 # Required includes ##################################################
