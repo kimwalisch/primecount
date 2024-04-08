@@ -1,4 +1,4 @@
-REM After a new LLVM/Clang installation I should update the File
+REM After a new LLVM/Clang installation I should update the file
 REM C:\Program Files\LLVM\lib\clang\18\include\immintrin.h and unconditionally
 REM include all MMX, SSE, POPCNT, BMI, BMI2, AVX, AVX and AVX512 headers.
 
