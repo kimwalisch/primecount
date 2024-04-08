@@ -19,23 +19,27 @@
 
 namespace std {
 
-/// std::is_integral 128-bit
+/// std::is_integral
 template<> struct is_integral<primecount::int128_t> { static constexpr bool value = true; };
 template<> struct is_integral<primecount::uint128_t> { static constexpr bool value = true; };
 
-/// std::is_signed 128-bit
+/// std::is_floating_point
+template<> struct is_floating_point<primecount::int128_t> { static constexpr bool value = false; };
+template<> struct is_floating_point<primecount::uint128_t> { static constexpr bool value = false; };
+
+/// std::is_signed
 template<> struct is_signed<primecount::int128_t> { static constexpr bool value = true; };
 template<> struct is_signed<primecount::uint128_t> { static constexpr bool value = false; };
 
-/// std::is_unsigned 128-bit
+/// std::is_unsigned
 template<> struct is_unsigned<primecount::int128_t> { static constexpr bool value = false; };
 template<> struct is_unsigned<primecount::uint128_t> { static constexpr bool value = true; };
 
-/// std::make_unsigned 128-bit
+/// std::make_unsigned
 template<> struct make_unsigned<primecount::int128_t> { using type = primecount::uint128_t; };
 template<> struct make_unsigned<primecount::uint128_t> { using type = primecount::uint128_t; };
 
-/// std::numeric_limits 128-bit
+/// std::numeric_limits
 template<> struct numeric_limits<primecount::int128_t>
 {
   static constexpr primecount::int128_t min() { return primecount::int128_t(primecount::uint128_t(1) << 127); }
@@ -43,7 +47,7 @@ template<> struct numeric_limits<primecount::int128_t>
   static constexpr int digits = 127;
 };
 
-/// std::numeric_limits 128-bit
+/// std::numeric_limits
 template<> struct numeric_limits<primecount::uint128_t>
 {
   static constexpr primecount::uint128_t min() { return 0; }
