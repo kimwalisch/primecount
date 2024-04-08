@@ -62,3 +62,7 @@ check_cxx_source_compiles("
         return 0;
     }
 " multiarch_avx512_vpopcnt)
+
+if(multiarch_avx512_vpopcnt)
+    set(ENABLE_MULTIARCH_AVX512_BMI2 "ENABLE_MULTIARCH_AVX512_BMI2")
+endif()

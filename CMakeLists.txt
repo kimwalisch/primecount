@@ -90,19 +90,6 @@ if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
     endif()
 endif()
 
-# Set default build type to Release ##################################
-
-if(NOT CMAKE_VERSION VERSION_LESS 3.9)
-    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-elseif(CMAKE_CONFIGURATION_TYPES)
-    set(isMultiConfig TRUE)
-endif()
-
-if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif()
-
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/CmdOptions.cpp
@@ -154,49 +141,6 @@ set(LIB_SRC src/api.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
 
-# Required includes ##################################################
-
-include(GNUInstallDirs)
-
-# Use -Wno-uninitialized with GCC compiler ###########################
-
-# GCC's -Wuninitialized enabled with -Wall -pedantic causes
-# false postive warnings in libprimecount:
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107287
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(WNO_UNINITIALIZED "-Wno-uninitialized")
-endif()
-
-# libprimecount compile definitions ##################################
-
-# Check at runtime if the dividend and divisor are < 2^32 and
-# if so use 32-bit integer division instead of 64-bit integer
-# division. On most CPUs before 2020 this significantly
-# improves performance.
-if(WITH_DIV32)
-    set(ENABLE_DIV32 "ENABLE_DIV32")
-endif()
-
-# Enable expensive debugging assertions.
-# These assertions enable e.g. bounds checks
-# for the Vector and Array types.
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(ENABLE_ASSERT "ENABLE_ASSERT")
-endif()
-
-# Check if int128_t is supported #####################################
-
-include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
-
-# Check if compiler supports x64 multiarch ###########################
-
-if(WITH_MULTIARCH)
-    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
-    if(multiarch_avx512_vpopcnt)
-        set(ENABLE_MULTIARCH_AVX512_BMI2 "ENABLE_MULTIARCH_AVX512_BMI2")
-    endif()
-endif()
-
 # Use libdivide.h (fast integer divison) #############################
 
 if(WITH_LIBDIVIDE)
@@ -214,11 +158,65 @@ if(WITH_FLOAT128)
     set(HAVE_FLOAT128 "HAVE_FLOAT128")
 endif()
 
+# Use 32-bit integer division ########################################
+
+# Check at runtime if the dividend and divisor are < 2^32 and
+# if so use 32-bit integer division instead of 64-bit integer
+# division. On most CPUs before 2020 this significantly
+# improves performance.
+if(WITH_DIV32)
+    set(ENABLE_DIV32 "ENABLE_DIV32")
+endif()
+
+# Use -Wno-uninitialized with GCC compiler ###########################
+
+# GCC's -Wuninitialized enabled with -Wall -pedantic causes
+# false postive warnings in libprimecount:
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107287
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(WNO_UNINITIALIZED "-Wno-uninitialized")
+endif()
+
+# Check if int128_t is supported #####################################
+
+include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
+
+# Check if compiler supports x64 multiarch ###########################
+
+if(WITH_MULTIARCH)
+    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
+endif()
+
 # Check for OpenMP ###################################################
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 endif()
+
+# Set default build type to Release ##################################
+
+# We do this after the C++ compilation tests above (include *.cmake)
+# so that those tests are compiled without optimization flags
+# which should speed up the cmake configure step.
+
+if(NOT CMAKE_VERSION VERSION_LESS 3.9)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+elseif(CMAKE_CONFIGURATION_TYPES)
+    set(isMultiConfig TRUE)
+endif()
+
+if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_ASSERT "ENABLE_ASSERT")
+endif()
+
+# Required includes ##################################################
+
+include(GNUInstallDirs)
 
 # libprimesieve ######################################################
 
@@ -259,7 +257,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}")
+    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}" "${ENABLE_INT128_STL_PATCH}" "${ENABLE_INT128_OPENMP_PATCH}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
@@ -284,7 +282,7 @@ if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}")
+    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}" "${ENABLE_INT128_STL_PATCH}" "${ENABLE_INT128_OPENMP_PATCH}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
@@ -320,7 +318,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
-    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}")
+    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_INT128_STL_PATCH}" "${ENABLE_INT128_OPENMP_PATCH}")
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
