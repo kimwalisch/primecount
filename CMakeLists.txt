@@ -33,6 +33,29 @@ else()
     option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" ON)
 endif()
 
+# Enable/Disable libdivide ###########################################
+
+# Historically, integer division has been one of the slowest
+# instructions on most CPU architectures. Hence by default we
+# enable libdivide which replaces expensive integer division
+# instructions by a sequence of shift, add and multiply
+# instructions which is often much faster.
+
+set(DEFAULT_LIBDIVIDE ON)
+
+# Apple Silicon CPUs first released in 2020 have very fast integer
+# division instructions. For Apple Silicon CPUs on Apple OSes
+# we disable libdivide to get the best performance.
+
+if(APPLE)
+    include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
+    if(Apple_ARM64)
+        set(DEFAULT_LIBDIVIDE OFF)
+    endif()
+endif()
+
+option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
+
 # Option sanity checks ###############################################
 
 # We don't yet support building libprimecount as a shared DLL
@@ -130,29 +153,6 @@ set(LIB_SRC src/api.cpp
             src/gourdon/LoadBalancerAC.cpp
             src/gourdon/SegmentedPiTable.cpp
             src/gourdon/Sigma.cpp)
-
-# Enable/Disable libdivide ###########################################
-
-# Historically, integer division has been one of the slowest
-# instructions on most CPU architectures. Hence by default we
-# enable libdivide which replaces expensive integer division
-# instructions by a sequence of shift, add and multiply
-# instructions which is often much faster.
-
-set(DEFAULT_LIBDIVIDE ON)
-
-# Apple Silicon CPUs first released in 2020 have very fast integer
-# division instructions. For Apple Silicon CPUs on Apple OSes
-# we disable libdivide to get the best performance.
-
-if(APPLE)
-    include("${PROJECT_SOURCE_DIR}/cmake/Apple_ARM64.cmake")
-    if(Apple_ARM64)
-        set(DEFAULT_LIBDIVIDE OFF)
-    endif()
-endif()
-
-option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
 
 # Use libdivide.h (fast integer divison) #############################
 
