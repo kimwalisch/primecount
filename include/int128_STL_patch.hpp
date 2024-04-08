@@ -1,7 +1,9 @@
 ///
 /// @file   int128_STL_patch.hpp
-/// @brief  Add missing int128_t support to the C++ STL. This is
-///         mainly required on Windows when compiling with LLVM/Clang.
+/// @brief  Add missing int128_t support to the C++ STL.
+///         This is required using GCC/Clang if the user compiles with
+///         -std=c++11 instead of -std=gnu++11 and also for LLVM/Clang
+///         on Windows.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
