@@ -5,6 +5,7 @@ Changes in primecount-7.13, 2024-04-08
 * Sieve_count.cpp: New AVX512 popcount algorithm for x86 CPUs.
 * Sieve_count.cpp: New ARM SVE popcount algorithm.
 * int128.cmake: Improve int128_t support for Windows.
+* OpenMP.cmake: Improve LLVM/Clang OpenMP detection.
 
 Changes in primecount-7.12, 2024-04-01
 
