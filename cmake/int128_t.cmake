@@ -13,13 +13,16 @@ include(CMakePushCheckState)
 cmake_push_check_state()
 
 check_cxx_source_compiles("
+    #include <limits>
+    #include <type_traits>
     int main() {
-        static_assert(true, \"\");
+        static_assert(std::numeric_limits<unsigned int>::min() == 0, \"\");
+        static_assert(std::is_integral<int>::value, \"\");
         return 0;
-    }" static_assert_without_cxx11)
+    }" compiler_supports_cpp11)
 
 # Enable C++11 if static_assert() fails to compile
-if(NOT static_assert_without_cxx11)
+if(NOT compiler_supports_cpp11)
     if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
         set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
     elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
