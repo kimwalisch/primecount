@@ -50,6 +50,8 @@ if(int128)
         static_assert(std::numeric_limits<uint128_t>::digits == 128, \"\");
         static_assert(std::is_integral<int128_t>::value, \"\");
         static_assert(std::is_integral<uint128_t>::value, \"\");
+        static_assert(!std::is_floating_point<int128_t>::value, \"\");
+        static_assert(!std::is_floating_point<uint128_t>::value, \"\");
         static_assert(std::is_signed<int128_t>::value, \"\");
         static_assert(std::is_unsigned<uint128_t>::value, \"\");
         static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
@@ -82,6 +84,8 @@ if(int128)
             static_assert(std::numeric_limits<uint128_t>::digits == 128, \"\");
             static_assert(std::is_integral<int128_t>::value, \"\");
             static_assert(std::is_integral<uint128_t>::value, \"\");
+            static_assert(!std::is_floating_point<int128_t>::value, \"\");
+            static_assert(!std::is_floating_point<uint128_t>::value, \"\");
             static_assert(std::is_signed<int128_t>::value, \"\");
             static_assert(std::is_unsigned<uint128_t>::value, \"\");
             static_assert(std::is_unsigned<typename std::make_unsigned<int128_t>::type>::value, \"\");
