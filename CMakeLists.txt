@@ -90,19 +90,6 @@ if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
     endif()
 endif()
 
-# Set default build type to Release ##################################
-
-if(NOT CMAKE_VERSION VERSION_LESS 3.9)
-    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-elseif(CMAKE_CONFIGURATION_TYPES)
-    set(isMultiConfig TRUE)
-endif()
-
-if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif()
-
 # primecount binary source files #####################################
 
 set(BIN_SRC src/app/CmdOptions.cpp
@@ -211,6 +198,23 @@ endif()
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
+endif()
+
+# Set default build type to Release ##################################
+
+# We do this after the C++ compilation tests above (include *.cmake)
+# so that those tests are compiled without optimization flags
+# which should speed up the cmake configure step.
+
+if(NOT CMAKE_VERSION VERSION_LESS 3.9)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+elseif(CMAKE_CONFIGURATION_TYPES)
+    set(isMultiConfig TRUE)
+endif()
+
+if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 # Required includes ##################################################
