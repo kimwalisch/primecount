@@ -20,20 +20,20 @@
 namespace std {
 
 /// std::is_integral
-template<> struct is_integral<primecount::int128_t> { static constexpr bool value = true; };
-template<> struct is_integral<primecount::uint128_t> { static constexpr bool value = true; };
+template<> struct is_integral<primecount::int128_t> : std::true_type {};
+template<> struct is_integral<primecount::uint128_t> : std::true_type {};
 
 /// std::is_floating_point
-template<> struct is_floating_point<primecount::int128_t> { static constexpr bool value = false; };
-template<> struct is_floating_point<primecount::uint128_t> { static constexpr bool value = false; };
+template<> struct is_floating_point<primecount::int128_t> : std::false_type {};
+template<> struct is_floating_point<primecount::uint128_t> : std::false_type {};
 
 /// std::is_signed
-template<> struct is_signed<primecount::int128_t> { static constexpr bool value = true; };
-template<> struct is_signed<primecount::uint128_t> { static constexpr bool value = false; };
+template<> struct is_signed<primecount::int128_t> : std::true_type {};
+template<> struct is_signed<primecount::uint128_t> : std::false_type {};
 
 /// std::is_unsigned
-template<> struct is_unsigned<primecount::int128_t> { static constexpr bool value = false; };
-template<> struct is_unsigned<primecount::uint128_t> { static constexpr bool value = true; };
+template<> struct is_unsigned<primecount::int128_t> : std::false_type {};
+template<> struct is_unsigned<primecount::uint128_t> : std::true_type {};
 
 /// std::make_unsigned
 template<> struct make_unsigned<primecount::int128_t> { using type = primecount::uint128_t; };
