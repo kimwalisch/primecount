@@ -28,7 +28,7 @@ set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 check_cxx_source_compiles("
     #include <int128_t.hpp>
     int main() {
-        using primecount::int128_t;
+        using namespace primecount;
         int128_t x = int128_t(1) << 100;
         x /= 123;
         return (x > 0) ? 0 : 1;
