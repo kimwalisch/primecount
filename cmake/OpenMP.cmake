@@ -15,7 +15,6 @@ endif()
 # if OpenMP supports 128-bit integers.
 if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
     cmake_push_check_state()
-    set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
     if(TARGET OpenMP::OpenMP_CXX)
         set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
@@ -23,9 +22,20 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
         set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
     endif()
 
+    # Our <int128_t.hpp> requires C++11 or later
+    if(NOT compiler_supports_cpp11)
+        if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+        elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+        endif()
+    endif()
+
     if(DISABLE_INT128)
         set(CMAKE_REQUIRED_DEFINITIONS "-D${DISABLE_INT128}")
     endif()
+
+    set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
     # Check if OpenMP supports 128-bit integers
     check_cxx_source_compiles("
