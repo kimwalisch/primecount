@@ -33,6 +33,7 @@ int main()
   std::uniform_int_distribution<int32_t> dist_i32(1, port::numeric_limits<int32_t>::max());
   std::uniform_int_distribution<uint64_t> dist_u64(0, port::numeric_limits<uint64_t>::max());
 
+  // Test unsigned/signed
   for (int i = 0; i < 10000; i++)
   {
     uint64_t x = dist_i32(gen);
@@ -52,10 +53,12 @@ int main()
 
 #ifdef HAVE_INT128_T
 
-  std::uniform_int_distribution<int128_t> dist_i128(0, port::numeric_limits<int128_t>::max());
+  std::uniform_int_distribution<uint64_t> dist_u62(0, uint64_t(1ull << 62));
 
+  // Test signed/signed
   for (int i = 0; i < 10000; i++)
   {
+    // Test x < 2^64
     int128_t x = dist_u64(gen);
      int32_t y = dist_i32(gen);
     int128_t res = fast_div(x, y);
@@ -63,7 +66,10 @@ int main()
     std::cout << "fast_div(" << x << ", " << y << ") = " << res;
     check(res == x / y);
 
-    x = dist_i128(gen);
+    // Test x > 2^64
+    int128_t low = dist_u64(gen);
+    int128_t high = int128_t(dist_u62(gen)) << 64;
+    x = high | low;
     y = dist_i32(gen);
     res = fast_div(x, y);
 

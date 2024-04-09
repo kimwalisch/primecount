@@ -3,7 +3,7 @@
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,7 +15,6 @@
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
-#include <to_string.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -60,7 +59,7 @@ namespace primecount {
 /// standard int128_t type is missing in <stdint.h>. We need to
 /// define a few functions that are not supported by the C++ STL.
 ///
-#if defined(HAVE_NON_STANDARD__INT128_T)
+#if defined(ENABLE_INT128_TO_STRING)
 
 std::string to_string(uint128_t n)
 {

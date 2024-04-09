@@ -9,7 +9,7 @@
 ///        Xavier Gourdon formula:
 ///        pi(x) = A - B + C + D + Phi0 + Sigma
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,7 +22,6 @@
 #include <macros.hpp>
 #include <PhiTiny.hpp>
 #include <print.hpp>
-#include <to_string.hpp>
 
 #include <stdint.h>
 #include <algorithm>

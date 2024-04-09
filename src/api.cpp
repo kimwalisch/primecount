@@ -16,7 +16,6 @@
 #include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
-#include <to_string.hpp>
 
 #include <cmath>
 #include <string>
