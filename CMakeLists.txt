@@ -68,10 +68,6 @@ if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON!")
 endif()
 
-if(STATICALLY_LINK_LIBPRIMECOUNT AND NOT BUILD_STATIC_LIBS)
-    message(FATAL_ERROR "Using STATICALLY_LINK_LIBPRIMECOUNT=ON requires BUILD_STATIC_LIBS=ON!")
-endif()
-
 # Static vs. shared linking ##########################################
 
 # By default libprimecount is linked statically if only the static
@@ -88,6 +84,31 @@ if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
     if(BUILD_STATIC_LIBS AND NOT BUILD_SHARED_LIBS)
         set(STATICALLY_LINK_LIBPRIMECOUNT TRUE)
     endif()
+endif()
+
+if(STATICALLY_LINK_LIBPRIMECOUNT AND NOT BUILD_STATIC_LIBS)
+    message(FATAL_ERROR "Using STATICALLY_LINK_LIBPRIMECOUNT=ON requires BUILD_STATIC_LIBS=ON!")
+endif()
+
+# Set default build type to Release ##################################
+
+# We do this after the C++ compilation tests above (include *.cmake)
+# so that those tests are compiled without optimization flags
+# which should speed up the cmake configure step.
+
+if(NOT CMAKE_VERSION VERSION_LESS 3.9)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+elseif(CMAKE_CONFIGURATION_TYPES)
+    set(isMultiConfig TRUE)
+endif()
+
+if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
 # primecount binary source files #####################################
@@ -191,27 +212,6 @@ endif()
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
-endif()
-
-# Set default build type to Release ##################################
-
-# We do this after the C++ compilation tests above (include *.cmake)
-# so that those tests are compiled without optimization flags
-# which should speed up the cmake configure step.
-
-if(NOT CMAKE_VERSION VERSION_LESS 3.9)
-    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-elseif(CMAKE_CONFIGURATION_TYPES)
-    set(isMultiConfig TRUE)
-endif()
-
-if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(ENABLE_ASSERT "ENABLE_ASSERT")
 endif()
 
 # Required includes ##################################################
