@@ -92,10 +92,6 @@ endif()
 
 # Set default build type to Release ##################################
 
-# We do this after the C++ compilation tests above (include *.cmake)
-# so that those tests are compiled without optimization flags
-# which should speed up the cmake configure step.
-
 if(NOT CMAKE_VERSION VERSION_LESS 3.9)
     get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 elseif(CMAKE_CONFIGURATION_TYPES)
