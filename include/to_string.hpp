@@ -2,7 +2,7 @@
 /// @file   to_string.hpp
 /// @brief  to_string(n) implementation with 128-bit integer support.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -24,7 +24,7 @@ std::string to_string(uint128_t x);
 
 } // namespace
 
-#else // int128_t not supported
+#else
 
 namespace primecount {
 
