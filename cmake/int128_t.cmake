@@ -21,15 +21,27 @@ set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 check_cxx_source_compiles("
     #include <int128_t.hpp>
     #include <algorithm>
+
+    using namespace primecount;
+
     int main() {
-        using namespace primecount;
         int128_t x = int128_t(1) << 100;
         int128_t y = 1000;
-        x /= 123;
-        if (std::min(x, y) == y)
-            return 0;
-        else
+        unsigned divider = 123;
+        x = x / divider;
+        x /= y;
+        x = x + y;
+
+        if (std::min(x, y) != y)
             return 1;
+
+        long double z = ((long double) y) + 1.59867;
+        int128_t iz = (int128_t) z;
+
+        if (std::max(y, iz) != iz)
+            return 1;
+
+        return 0;
     }" int128)
 
 if(NOT int128)

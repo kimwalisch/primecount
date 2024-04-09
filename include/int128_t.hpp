@@ -14,6 +14,9 @@
 #define INT128_T_HPP
 
 #include <stdint.h>
+#include <string>
+#include <limits>
+#include <type_traits>
 
 /// If INT128_MAX is defined we know that int128_t and
 /// uint128_t are available in <stdint.h>.
@@ -27,6 +30,7 @@ namespace primecount {
 
 using maxint_t = int128_t ;
 using maxuint_t = uint128_t;
+using std::to_string;
 
 } // namespace
 
@@ -34,7 +38,7 @@ using maxuint_t = uint128_t;
      !defined(DISABLE_INT128)
 
 #define HAVE_INT128_T
-#define HAVE_NON_STANDARD__INT128_T
+#define ENABLE_INT128_TO_STRING
 
 #include <ostream>
 
@@ -45,8 +49,39 @@ using uint128_t = __uint128_t;
 using maxint_t = __int128_t ;
 using maxuint_t = __uint128_t;
 
-/// std::cout support for int128_t.
-/// These functions are defined in util.cpp.
+/// These functions are defined in util.cpp
+std::string to_string(int128_t x);
+std::string to_string(uint128_t x);
+
+std::ostream& operator<<(std::ostream& stream, int128_t n);
+std::ostream& operator<<(std::ostream& stream, uint128_t n);
+
+} // namespace
+
+#elif __has_include(<__msvc_int128.hpp>) && \
+     !defined(DISABLE_INT128)
+
+#define HAVE_INT128_T
+#define ENABLE_INT128_TO_STRING
+
+// Unofficial/undocumented MSVC int128_t support:
+// https://github.com/microsoft/STL/blob/main/stl/inc/__msvc_int128.hpp
+// https://developercommunity.visualstudio.com/t/support-for-128-bit-integer-type/879048
+// https://stackoverflow.com/a/76440171
+#include <__msvc_int128.hpp>
+#include <ostream>
+
+namespace primecount {
+
+using int128_t = std::_Signed128;
+using uint128_t = std::_Unsigned128;
+using maxint_t = std::_Signed128;
+using maxuint_t = std::_Unsigned128;
+
+/// These functions are defined in util.cpp
+std::string to_string(int128_t x);
+std::string to_string(uint128_t x);
+
 std::ostream& operator<<(std::ostream& stream, int128_t n);
 std::ostream& operator<<(std::ostream& stream, uint128_t n);
 
@@ -58,13 +93,11 @@ namespace primecount {
 
 typedef int64_t maxint_t;
 typedef uint64_t maxuint_t;
+using std::to_string;
 
 } // namespace
 
 #endif
-
-#include <limits>
-#include <type_traits>
 
 // Portable C++ type traits that support int128_t and uint128_t.
 // This is required for GCC/Clang if the user compiles with -std=c++*

@@ -16,7 +16,6 @@
 #include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
-#include <to_string.hpp>
 
 #include <cmath>
 #include <string>
@@ -189,7 +188,7 @@ maxint_t get_max_x(double alpha_y)
 {
 #ifdef HAVE_INT128_T
   double max_x = std::pow((1ull << 62) * alpha_y, 3.0 / 2.0);
-  return (int128_t) max_x; 
+  return (int128_t) max_x;
 #else
   unused_param(alpha_y); 
   return port::numeric_limits<int64_t>::max();
