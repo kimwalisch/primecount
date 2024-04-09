@@ -27,15 +27,15 @@ check_cxx_source_compiles("
     int main() {
         int128_t x = int128_t(1) << 100;
         int128_t y = 1000;
-        uint32_t div32 = 123;
-        x = x / div32;
+        unsigned divider = 123;
+        x = x / divider;
         x /= y;
         x = x + y;
 
         if (std::min(x, y) != y)
             return 1;
 
-        long double z = 1001.59867;
+        long double z = ((long double) y) + 1.59867;
         int128_t iz = (int128_t) z;
 
         if (std::max(y, iz) != iz)
