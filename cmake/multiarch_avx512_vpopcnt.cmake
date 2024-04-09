@@ -41,16 +41,15 @@ check_cxx_source_compiles("
     {
         uint64_t i = 0;
         __m512i vcnt = _mm512_setzero_si512();
-        for (; i + 8 < stop_idx; i += 8)
+        do
         {
-            __m512i vec = _mm512_loadu_epi64(&array[i]);
-            vec = _mm512_popcnt_epi64(vec);
-            vcnt = _mm512_add_epi64(vcnt, vec);
+          __mmask8 mask = (__mmask8) _bzhi_u64(0xff, stop_idx - i);
+          __m512i vec = _mm512_maskz_loadu_epi64(mask , &array[i]);
+          vec = _mm512_popcnt_epi64(vec);
+          vcnt = _mm512_add_epi64(vcnt, vec);
+          i += 8;
         }
-        __mmask8 mask = (__mmask8) _bzhi_u64(0xff, stop_idx - i);
-        __m512i vec = _mm512_maskz_loadu_epi64(mask, &array[i]);
-        vec = _mm512_popcnt_epi64(vec);
-        vcnt = _mm512_add_epi64(vcnt, vec);
+        while (i < stop_idx);
         return _mm512_reduce_add_epi64(vcnt);
     }
 
@@ -58,8 +57,8 @@ check_cxx_source_compiles("
     {
         uint64_t array[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         Sieve sieve;
-        sieve.count(&array[0], 10);
-        return 0;
+        uint64_t cnt = sieve.count(&array[0], 10);
+        return (cnt > 0) ? 0 : 1;
     }
 " multiarch_avx512_vpopcnt)
 
