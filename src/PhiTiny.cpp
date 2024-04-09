@@ -9,7 +9,7 @@
 ///        with pp = 2 * 3 * ... * prime[a]
 ///        φ(pp) = \prod_{i=1}^{a} (prime[i] - 1)
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,11 +19,11 @@
 #include <Vector.hpp>
 #include <popcnt.hpp>
 #include <imath.hpp>
+#include <int128_t.hpp>
 #include <macros.hpp>
 
 #include <stdint.h>
 #include <algorithm>
-#include <limits>
 
 namespace primecount {
 
@@ -68,7 +68,7 @@ PhiTiny::PhiTiny()
       for (uint64_t x = 1; x < pp; x++)
       {
         uint64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
-        ASSERT(phi_xa <= std::numeric_limits<uint8_t>::max());
+        ASSERT(phi_xa <= port::numeric_limits<uint8_t>::max());
         phi_[a][x] = (uint8_t) phi_xa;
       }
     }

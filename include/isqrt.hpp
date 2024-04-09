@@ -2,7 +2,7 @@
 /// @file  isqrt.hpp
 /// @brief Integer square root function
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,12 +12,11 @@
 #define ISQRT_HPP
 
 #include <macros.hpp>
+#include <int128_t.hpp>
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
 #include <stdint.h>
-#include <type_traits>
 
 namespace {
 
@@ -113,12 +112,12 @@ ALWAYS_INLINE T isqrt(T x)
   // time in all cases i.e. even if sqrt_max were declared
   // without constexpr.
   //
-  constexpr T sqrt_max = ct_sqrt(std::numeric_limits<T>::max());
+  constexpr T sqrt_max = ct_sqrt(port::numeric_limits<T>::max());
 
   // For 128-bit integers we use uint64_t as the
   // result type. For all other types we use the
   // same result type as the input type.
-  using R = typename std::conditional<sizeof(T) / 2 == sizeof(uint64_t), uint64_t, T>::type;
+  using R = typename port::conditional<sizeof(T) / 2 == sizeof(uint64_t), uint64_t, T>::type;
   R r = (R) std::min(s, sqrt_max);
 
   // In my tests the first corrections were needed above

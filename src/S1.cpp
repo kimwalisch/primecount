@@ -24,7 +24,6 @@
 
 #include <stdint.h>
 
-using std::numeric_limits;
 using namespace primecount;
 
 namespace {
@@ -135,7 +134,7 @@ int128_t S1(int128_t x,
   int128_t s1;
 
   // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
+  if (y <= port::numeric_limits<uint32_t>::max())
     s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
   else
     s1 = S1_OpenMP(x, y, c, threads);

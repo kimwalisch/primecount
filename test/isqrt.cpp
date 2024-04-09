@@ -18,7 +18,6 @@
 #include <cmath>
 #include <cstdlib>
 
-using std::numeric_limits;
 using namespace primecount;
 
 void check(bool OK)
@@ -64,42 +63,42 @@ int main()
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 1000000000);
 
-  n = numeric_limits<int8_t>::max();
+  n = port::numeric_limits<int8_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 11);
 
-  n = numeric_limits<uint8_t>::max();
+  n = port::numeric_limits<uint8_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 15);
 
-  n = numeric_limits<int16_t>::max();
+  n = port::numeric_limits<int16_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 181);
 
-  n = numeric_limits<uint16_t>::max();
+  n = port::numeric_limits<uint16_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 255);
 
-  n = numeric_limits<int32_t>::max();
+  n = port::numeric_limits<int32_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 46340);
 
-  n = numeric_limits<uint32_t>::max();
+  n = port::numeric_limits<uint32_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 65535);
 
-  n = numeric_limits<int64_t>::max();
+  n = port::numeric_limits<int64_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 3037000499ll);
 
-  n = numeric_limits<uint64_t>::max();
+  n = port::numeric_limits<uint64_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 4294967295ull);

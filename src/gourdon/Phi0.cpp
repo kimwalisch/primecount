@@ -13,7 +13,7 @@
 ///        z < x^(1/2). Also the small constant is named k instead
 ///        of c.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,6 @@
 
 #include <stdint.h>
 
-using std::numeric_limits;
 using namespace primecount;
 
 namespace {
@@ -144,7 +143,7 @@ int128_t Phi0(int128_t x,
   int128_t phi0;
 
   // uses less memory
-  if (y <= numeric_limits<uint32_t>::max())
+  if (y <= port::numeric_limits<uint32_t>::max())
     phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
   else
     phi0 = Phi0_OpenMP(x, y, z, k, threads);

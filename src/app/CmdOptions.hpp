@@ -16,7 +16,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <type_traits>
 
 namespace primecount {
 
@@ -82,7 +81,7 @@ struct Option
   T to() const
   {
     try {
-      if (std::is_floating_point<T>::value)
+      if (port::is_floating_point<T>::value)
         return (T) std::stod(val);
       else
         return (T) to_maxint(val);

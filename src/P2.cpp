@@ -107,7 +107,7 @@ T P2_OpenMP(T x,
 
   // \sum_{i=a+1}^{b} -(i - 1)
   T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
-  static_assert(std::is_signed<T>::value, "T must be signed integer type");
+  static_assert(port::is_signed<T>::value, "T must be signed integer type");
 
   int64_t xy = (int64_t)(x / max(y, 1));
   LoadBalancerP2 loadBalancer(x, xy, threads, is_print);

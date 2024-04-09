@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <limits>
 #include <string>
 #include <stdint.h>
 #include <utility>
@@ -115,7 +114,7 @@ maxint_t to_maxint(const std::string& expr)
     if (pos != std::string::npos)
     {
       std::string n = expr.substr(pos);
-      maxint_t limit = std::numeric_limits<maxint_t>::max();
+      maxint_t limit = port::numeric_limits<maxint_t>::max();
       std::string max_n = to_string(limit);
 
       if (n.size() > max_n.size() ||

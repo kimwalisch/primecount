@@ -35,7 +35,7 @@
 ///        * Old: if (mu[n] != 0 && prime < lpf[n])
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,7 +54,6 @@
 #include <Vector.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <stdint.h>
 
 namespace {
@@ -72,7 +71,7 @@ public:
       throw primecount_error("y must be <= FactorTable::max()");
 
     y = std::max<int64_t>(1, y);
-    T T_MAX = std::numeric_limits<T>::max();
+    T T_MAX = port::numeric_limits<T>::max();
     factor_.resize(to_index(y) + 1);
 
     // mu(1) = 1.
@@ -190,7 +189,7 @@ public:
 
   static maxint_t max()
   {
-    maxint_t T_MAX = std::numeric_limits<T>::max();
+    maxint_t T_MAX = port::numeric_limits<T>::max();
     return ipow<2>(T_MAX - 1) - 1;
   }
 

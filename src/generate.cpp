@@ -1,20 +1,18 @@
 ///
 /// @file  generate.cpp
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <generate.hpp>
+#include <int128_t.hpp>
 #include <isqrt.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
-#include <limits>
-
-using std::numeric_limits;
 
 namespace primecount {
 
@@ -103,7 +101,7 @@ Vector<int32_t> generate_lpf(int64_t max)
   // Deleglise-Rivat prime counting algorithms. And
   // lfp(1) = +Infinity allows to simplify that algorithm.
   if (lpf.size() > 1)
-    lpf[1] = numeric_limits<int32_t>::max();
+    lpf[1] = port::numeric_limits<int32_t>::max();
 
   for (int64_t i = 2; i <= sqrt; i++)
     if (lpf[i] == 1)

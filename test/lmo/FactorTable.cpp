@@ -3,7 +3,7 @@
 /// @brief  FactorTable is a compressed lookup table of mu
 ///         (moebius) and lpf (least prime factor).
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,6 +15,7 @@
 
 #include <FactorTable.hpp>
 #include <generate.hpp>
+#include <int128_t.hpp>
 
 #include <stdint.h>
 #include <iostream>
@@ -43,7 +44,7 @@ int main()
   auto mu = generate_moebius(max);
 
   FactorTable<uint16_t> factorTable(max, threads);
-  int64_t uint16_max = std::numeric_limits<uint16_t>::max();
+  int64_t uint16_max = port::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
   std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 

@@ -20,13 +20,12 @@
 
 #include <BitSieve240.hpp>
 #include <imath.hpp>
+#include <int128_t.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
 #include <popcnt.hpp>
 
 #include <stdint.h>
-#include <limits>
-#include <type_traits>
 
 namespace primecount {
 
@@ -43,7 +42,7 @@ public:
     // Unsigned integer division is usually
     // faster than signed integer division,
     // especially for int128_t.
-    using UT = typename std::make_unsigned<T>::type;
+    using UT = typename port::make_unsigned<T>::type;
 
     if (a < max_a())
       return phi((UT) x, a);
@@ -183,7 +182,7 @@ phi_tiny(T x, uint64_t a)
 {
   // If possible use smaller integer type
   // to speed up integer division.
-  if (x <= std::numeric_limits<uint64_t>::max())
+  if (x <= port::numeric_limits<uint64_t>::max())
     return phiTiny.phi_recursive((uint64_t) x, a);
   else
     return phiTiny.phi_recursive(x, a);

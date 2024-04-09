@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -210,7 +210,7 @@ T D_OpenMP(T x,
     {
       // Unsigned integer division is usually slightly
       // faster than signed integer division
-      using UT = typename std::make_unsigned<T>::type;
+      using UT = typename port::make_unsigned<T>::type;
 
       thread.start_time();
       UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);

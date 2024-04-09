@@ -40,7 +40,6 @@
 
 #include <stdint.h>
 
-using std::numeric_limits;
 using namespace primecount;
 
 namespace {
@@ -383,7 +382,7 @@ int128_t AC(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (max_prime <= numeric_limits<uint32_t>::max())
+  if (max_prime <= port::numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
     sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print);

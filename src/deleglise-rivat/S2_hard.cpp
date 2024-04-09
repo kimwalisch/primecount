@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -216,7 +216,7 @@ T S2_hard_OpenMP(T x,
     {
       // Unsigned integer division is usually slightly
       // faster than signed integer division
-      using UT = typename std::make_unsigned<T>::type;
+      using UT = typename port::make_unsigned<T>::type;
 
       thread.start_time();
       UT sum = S2_hard_thread((UT) x, y, z, c, primes, pi, factor, thread);

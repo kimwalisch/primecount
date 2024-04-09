@@ -2,7 +2,7 @@
 /// @file   int128.cpp
 /// @brief  Test int128_t and uint128_t types.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,8 +13,6 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <limits>
-#include <type_traits>
 
 using namespace primecount;
 
@@ -37,25 +35,25 @@ int main()
 {
 #if defined(HAVE_INT128_T)
 
-  static_assert(std::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
-                "std::numeric_limits<uint128_t>::max() is broken");
+  static_assert(port::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
+                "port::numeric_limits<uint128_t>::max() is broken");
 
-  static_assert(std::is_integral<int128_t>::value, 
+  static_assert(port::is_integral<int128_t>::value, 
                 "is_integral<int128_t> != true");
 
-  static_assert(std::is_integral<uint128_t>::value, 
+  static_assert(port::is_integral<uint128_t>::value, 
                 "is_integral<uint128_t> != true");
 
-  static_assert(std::is_signed<int128_t>::value, 
+  static_assert(port::is_signed<int128_t>::value, 
                 "is_signed<int128_t> != true");
 
-  static_assert(!std::is_signed<uint128_t>::value, 
+  static_assert(!port::is_signed<uint128_t>::value, 
                 "is_signed<uint128_t> != false");
 
-  static_assert(!std::is_unsigned<int128_t>::value, 
+  static_assert(!port::is_unsigned<int128_t>::value, 
                 "is_unsigned<int128_t> != false");
 
-  static_assert(std::is_unsigned<uint128_t>::value, 
+  static_assert(port::is_unsigned<uint128_t>::value, 
                 "is_unsigned<uint128_t> != true");
 
   {
@@ -67,21 +65,21 @@ int main()
 
   {
     std::ostringstream s;
-    s << std::numeric_limits<int128_t>::min() + 1;
+    s << port::numeric_limits<int128_t>::min() + 1;
     std::cout << "-2^127+1 = " << s.str();
     check(s.str() == "-170141183460469231731687303715884105727");
   }
 
   {
     std::ostringstream s;
-    s << std::numeric_limits<int128_t>::max();
+    s << port::numeric_limits<int128_t>::max();
     std::cout << "2^127-1 = " << s.str();
     check(s.str() == "170141183460469231731687303715884105727");
   }
 
   {
     std::ostringstream s;
-    s << std::numeric_limits<uint128_t>::max();
+    s << port::numeric_limits<uint128_t>::max();
     std::cout << "2^128-1 = " << s.str();
     check(s.str() == "340282366920938463463374607431768211455");
   }
