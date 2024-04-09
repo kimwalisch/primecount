@@ -27,7 +27,10 @@ check_cxx_source_compiles("
     int main() {
         int128_t x = int128_t(1) << 100;
         int128_t y = 1000;
-        x /= 123;
+        uint32_t div32 = 123;
+        x = x / div32;
+        x /= y;
+        x = x + y;
 
         if (std::min(x, y) != y)
             return 1;
