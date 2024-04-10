@@ -91,8 +91,8 @@ std::ostream& operator<<(std::ostream& stream, uint128_t n);
 
 namespace primecount {
 
-typedef int64_t maxint_t;
-typedef uint64_t maxuint_t;
+using maxint_t = int64_t ;
+using maxuint_t = uint64_t;
 using std::to_string;
 
 } // namespace
