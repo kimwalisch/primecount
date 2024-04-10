@@ -64,7 +64,7 @@ std::ostream& operator<<(std::ostream& stream, uint128_t n);
 #define HAVE_INT128_T
 #define ENABLE_INT128_TO_STRING
 
-// Unofficial/undocumented MSVC int128_t support:
+// Experimental MSVC int128_t support:
 // https://github.com/microsoft/STL/blob/main/stl/inc/__msvc_int128.hpp
 // https://developercommunity.visualstudio.com/t/support-for-128-bit-integer-type/879048
 // https://stackoverflow.com/a/76440171
