@@ -8,7 +8,7 @@
 /// file in the top level directory.
 ///
 
-#include <CPUID.hpp>
+#include <CPUID_POPCNT.hpp>
 #include <iostream>
 
 int main()
