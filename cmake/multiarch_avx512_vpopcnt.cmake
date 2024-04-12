@@ -5,6 +5,8 @@
 
 include(CheckCXXSourceCompiles)
 
+set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
+
 check_cxx_source_compiles("
     // GCC/Clang function multiversioning for AVX512 is not needed if
     // the user compiles with -mavx512f -mavx512vpopcntdq -mbmi2.
@@ -21,7 +23,7 @@ check_cxx_source_compiles("
     #include <stdint.h>
 
     class Sieve {
-        public:
+    public:
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
         __attribute__ ((target (\"avx512f,avx512vpopcntdq,bmi2\")))
         uint64_t count_avx512_bmi2(uint64_t* array, uint64_t stop_idx);
