@@ -45,7 +45,7 @@ inline int get_xcr0()
   return xcr0;
 }
 
-inline bool get_AVX512_BMI2()
+inline bool get_CPUID_AVX512_BMI2()
 {
   int abcd[4];
 
