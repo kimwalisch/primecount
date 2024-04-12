@@ -49,10 +49,7 @@ inline bool get_AVX512_BMI2()
 {
   int abcd[4];
 
-  run_CPUID(7, 0, abcd);
-
-  if ((abcd[1] & bit_BMI2) != bit_BMI2)
-    return false;
+  run_CPUID(1, 0, abcd);
 
   int osxsave_mask = (1 << 27);
 
@@ -71,6 +68,11 @@ inline bool get_AVX512_BMI2()
 
   // Check AVX512 OS support
   if ((xcr0 & zmm_mask) != zmm_mask)
+    return false;
+
+  run_CPUID(7, 0, abcd);
+
+  if ((abcd[1] & bit_BMI2) != bit_BMI2)
     return false;
 
   // AVX512F, AVX512VPOPCNTDQ
