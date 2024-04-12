@@ -40,6 +40,24 @@
 #include <Vector.hpp>
 #include <stdint.h>
 
+#if defined(__ARM_FEATURE_SVE) && \
+    __has_include(<arm_sve.h>)
+  #define ENABLE_ARM_SVE
+
+#elif defined(__AVX512F__) && \
+      defined(__AVX512VPOPCNTDQ__) && \
+      defined(__BMI2__) && \
+     !defined(__i386__) /* misses _bzhi_u64() */ && \
+      __has_include(<immintrin.h>)
+  #define ENABLE_AVX512_BMI2
+
+#elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+  #include <CPUID_AVX512_BMI2.hpp>
+  #define ENABLE_DEFAULT
+#else
+  #define ENABLE_DEFAULT
+#endif
+
 namespace primecount {
 
 class Sieve
@@ -50,23 +68,33 @@ public:
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
 
-#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
-  #define ENABLE_MULTIARCH_DEFAULT
-  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
-  uint64_t count(uint64_t stop);
-  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
-  uint64_t count(uint64_t start, uint64_t stop) const;
-#endif
+  /// Count 1 bits inside [0, stop]
+  uint64_t count(uint64_t stop)
+  {
+    #if defined(ENABLE_ARM_SVE)
+      return count_arm_sve(stop);
+    #elif defined(ENABLE_AVX512_BMI2)
+      return count_avx512_bmi2(stop);
+    #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+      return cpuid_AVX512_BMI2 ? count_avx512_bmi2(stop) : count_default(stop);
+    #else
+      return count_default(stop);
+    #endif
+  }
 
-#if defined(ENABLE_MULTIARCH_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-  uint64_t count(uint64_t stop);
-
-#if defined(ENABLE_MULTIARCH_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-  uint64_t count(uint64_t start, uint64_t stop) const;
+  /// Count 1 bits inside [start, stop]
+  uint64_t count(uint64_t start, uint64_t stop) const
+  {
+    #if defined(ENABLE_ARM_SVE)
+      return count_arm_sve(start, stop);
+    #elif defined(ENABLE_AVX512_BMI2)
+      return count_avx512_bmi2(start, stop);
+    #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+      return cpuid_AVX512_BMI2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
+    #else
+      return count_default(start, stop);
+    #endif
+  }
 
   uint64_t get_total_count() const
   {
@@ -85,6 +113,23 @@ public:
   }
 
 private:
+#if defined(ENABLE_DEFAULT)
+  uint64_t count_default(uint64_t stop);
+  uint64_t count_default(uint64_t start, uint64_t stop) const;
+#endif
+
+#if defined(ENABLE_ARM_SVE)
+  uint64_t count_avx512_bmi2(uint64_t stop);
+  uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
+#endif
+
+#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
+  uint64_t count_avx512_bmi2(uint64_t stop);
+  __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
+  uint64_t count_avx512_bmi2(uint64_t start, uint64_t stop) const;
+#endif
+
   void add(uint64_t prime);
   void allocate_counter(uint64_t low);
   void init_counter(uint64_t low, uint64_t high);

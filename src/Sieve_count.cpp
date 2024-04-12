@@ -31,30 +31,11 @@
 #include <stdint.h>
 #include <algorithm>
 
-// The CPU vector instruction sets are sorted from fastest (top) to
-// slowest (bottom) in the preprocessor checks below. We enable the
-// first vector instruction that is supported by the CPU and
-// compiler, which should provide the best performance.
-
-#if defined(ENABLE_MULTIARCH_AVX512_BMI2) && \
-    __has_include(<immintrin.h>)
+#if defined(ENABLE_AVX512_BMI2) || \
+    defined(ENABLE_MULTIARCH_AVX512_BMI2)
   #include <immintrin.h>
-
-#elif defined(__AVX512F__) && \
-      defined(__AVX512VPOPCNTDQ__) && \
-      defined(__BMI2__) && \
-     !defined(__i386__) /* misses _bzhi_u64() */ && \
-      __has_include(<immintrin.h>)
-  #include <immintrin.h>
-  #define ENABLE_AVX512_BMI2
-
-#elif defined(__ARM_FEATURE_SVE) && \
-      __has_include(<arm_sve.h>)
+#elif defined(ENABLE_ARM_SVE)
   #include <arm_sve.h>
-  #define ENABLE_ARM_SVE
-
-#else
-  #define ENABLE_DEFAULT
 #endif
 
 /// Count 1 bits inside [start, stop].
@@ -127,13 +108,9 @@
 
 namespace primecount {
 
-#if defined(ENABLE_DEFAULT) || \
-    defined(ENABLE_MULTIARCH_DEFAULT)
+#if defined(ENABLE_DEFAULT)
 
-#if defined(ENABLE_MULTIARCH_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-uint64_t Sieve::count(uint64_t stop)
+uint64_t Sieve::count_default(uint64_t stop)
 {
   // Count 1 bits inside [0, stop] in the sieve array.
   // The distance [0, stop] might be large > sqrt(segment_size).
@@ -166,10 +143,7 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-#if defined(ENABLE_MULTIARCH_DEFAULT)
-  __attribute__ ((target ("default")))
-#endif
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count_default(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
@@ -185,7 +159,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 #if defined(ENABLE_MULTIARCH_AVX512_BMI2)
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
-uint64_t Sieve::count(uint64_t stop)
+uint64_t Sieve::count_avx512_bmi2(uint64_t stop)
 {
   // Count 1 bits inside [0, stop] in the sieve array.
   // The distance [0, stop] might be large > sqrt(segment_size).
@@ -221,7 +195,7 @@ uint64_t Sieve::count(uint64_t stop)
 #if defined(ENABLE_MULTIARCH_AVX512_BMI2)
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
 #endif
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count_avx512_bmi2(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
@@ -231,7 +205,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 
 #elif defined(ENABLE_ARM_SVE)
 
-uint64_t Sieve::count(uint64_t stop)
+uint64_t Sieve::count_arm_sve(uint64_t stop)
 {
   // Count 1 bits inside [0, stop] in the sieve array.
   // The distance [0, stop] might be large > sqrt(segment_size).
@@ -264,7 +238,7 @@ uint64_t Sieve::count(uint64_t stop)
   return count_;
 }
 
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.
   // The distance [start, stop] is small here < sqrt(segment_size).
