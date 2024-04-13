@@ -69,7 +69,7 @@ public:
   static uint64_t get_segment_size(uint64_t size);
 
   /// Count 1 bits inside [0, stop]
-  uint64_t count(uint64_t stop)
+  ALWAYS_INLINE uint64_t count(uint64_t stop)
   {
     #if defined(ENABLE_ARM_SVE)
       return count_arm_sve(stop);
@@ -83,7 +83,7 @@ public:
   }
 
   /// Count 1 bits inside [start, stop]
-  uint64_t count(uint64_t start, uint64_t stop) const
+  ALWAYS_INLINE uint64_t count(uint64_t start, uint64_t stop) const
   {
     #if defined(ENABLE_ARM_SVE)
       return count_arm_sve(start, stop);
