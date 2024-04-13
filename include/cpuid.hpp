@@ -1,5 +1,5 @@
 ///
-/// @file  CPUID.hpp
+/// @file  cpuid.hpp
 /// @brief CPUID for x86 and x86-64 CPUs.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
@@ -17,7 +17,7 @@
 
 namespace {
 
-inline void run_CPUID(int eax, int ecx, int* abcd)
+inline void run_cpuid(int eax, int ecx, int* abcd)
 {
 #if defined(_MSC_VER)
   __cpuidex(abcd, eax, ecx);

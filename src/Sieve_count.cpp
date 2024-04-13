@@ -34,7 +34,8 @@
 #if defined(ENABLE_AVX512_BMI2) || \
     defined(ENABLE_MULTIARCH_AVX512_BMI2)
   #include <immintrin.h>
-#elif defined(ENABLE_ARM_SVE)
+#elif defined(ENABLE_ARM_SVE) || \
+      defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <arm_sve.h>
 #endif
 
@@ -203,8 +204,12 @@ uint64_t Sieve::count_avx512_bmi2(uint64_t start, uint64_t stop) const
   return res;
 }
 
-#elif defined(ENABLE_ARM_SVE)
+#elif defined(ENABLE_ARM_SVE) || \
+      defined(ENABLE_MULTIARCH_ARM_SVE)
 
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("arch=armv8-a+sve")))
+#endif
 uint64_t Sieve::count_arm_sve(uint64_t stop)
 {
   // Count 1 bits inside [0, stop] in the sieve array.
@@ -238,6 +243,9 @@ uint64_t Sieve::count_arm_sve(uint64_t stop)
   return count_;
 }
 
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("arch=armv8-a+sve")))
+#endif
 uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {
   // Count 1 bits inside [start, stop] in the sieve array.

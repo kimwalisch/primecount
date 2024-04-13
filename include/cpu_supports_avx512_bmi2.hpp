@@ -1,5 +1,5 @@
 ///
-/// @file  CPUID_AVX512_BMI2.hpp
+/// @file  cpu_supports_avx512_bmi2.hpp
 /// @brief Detect if the x86 CPU supports AVX512 and BMI2.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
@@ -8,10 +8,10 @@
 /// file in the top level directory.
 ///
 
-#ifndef CPUID_AVX512_BMI2_HPP
-#define CPUID_AVX512_BMI2_HPP
+#ifndef CPU_SUPPORTS_AVX512_BMI2_HPP
+#define CPU_SUPPORTS_AVX512_BMI2_HPP
 
-#include <CPUID.hpp>
+#include <cpuid.hpp>
 
 #if defined(_MSC_VER)
   #include <intrin.h>
@@ -45,11 +45,11 @@ inline int get_xcr0()
   return xcr0;
 }
 
-inline bool get_CPUID_AVX512_BMI2()
+inline bool run_cpuid_avx512_bmi2()
 {
   int abcd[4];
 
-  run_CPUID(1, 0, abcd);
+  run_cpuid(1, 0, abcd);
 
   int osxsave_mask = (1 << 27);
 
@@ -70,7 +70,7 @@ inline bool get_CPUID_AVX512_BMI2()
   if ((xcr0 & zmm_mask) != zmm_mask)
     return false;
 
-  run_CPUID(7, 0, abcd);
+  run_cpuid(7, 0, abcd);
 
   if ((abcd[1] & bit_BMI2) != bit_BMI2)
     return false;
@@ -81,7 +81,7 @@ inline bool get_CPUID_AVX512_BMI2()
 }
 
 /// Initialized at startup
-const bool cpuid_AVX512_BMI2 = get_CPUID_AVX512_BMI2();
+bool cpu_supports_avx512_bmi2 = run_cpuid_avx512_bmi2();
 
 } // namespace
 

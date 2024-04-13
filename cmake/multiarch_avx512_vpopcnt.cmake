@@ -18,7 +18,7 @@ check_cxx_source_compiles("
       Error: AVX512 BMI2 multiarch not needed!
     #endif
 
-    #include <CPUID_AVX512_BMI2.hpp>
+    #include <cpu_supports_avx512_bmi2.hpp>
     #include <immintrin.h>
     #include <stdint.h>
 
@@ -60,7 +60,7 @@ check_cxx_source_compiles("
         uint64_t cnt = 0;
         Sieve sieve;
 
-        if (cpuid_AVX512_BMI2)
+        if (cpu_supports_avx512_bmi2)
             cnt = sieve.count_avx512_bmi2(&array[0], 10);
         else
             cnt = sieve.count_default(&array[0], 10);
@@ -70,5 +70,5 @@ check_cxx_source_compiles("
 " multiarch_avx512_vpopcnt)
 
 if(multiarch_avx512_vpopcnt)
-    set(ENABLE_MULTIARCH_AVX512_BMI2 "ENABLE_MULTIARCH_AVX512_BMI2")
+    set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_AVX512_BMI2")
 endif()

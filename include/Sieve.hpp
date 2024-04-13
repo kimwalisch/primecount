@@ -51,8 +51,11 @@
       __has_include(<immintrin.h>)
   #define ENABLE_AVX512_BMI2
 
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include <cpu_supports_arm_sve.hpp>
+  #define ENABLE_DEFAULT
 #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
-  #include <CPUID_AVX512_BMI2.hpp>
+  #include <cpu_supports_avx512_bmi2.hpp>
   #define ENABLE_DEFAULT
 #else
   #define ENABLE_DEFAULT
@@ -75,8 +78,10 @@ public:
       return count_arm_sve(stop);
     #elif defined(ENABLE_AVX512_BMI2)
       return count_avx512_bmi2(stop);
+    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+      return cpu_supports_sve ? count_arm_sve(stop) : count_default(stop);
     #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
-      return cpuid_AVX512_BMI2 ? count_avx512_bmi2(stop) : count_default(stop);
+      return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(stop) : count_default(stop);
     #else
       return count_default(stop);
     #endif
@@ -89,8 +94,10 @@ public:
       return count_arm_sve(start, stop);
     #elif defined(ENABLE_AVX512_BMI2)
       return count_avx512_bmi2(start, stop);
+    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+      return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
     #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
-      return cpuid_AVX512_BMI2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
+      return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
     #else
       return count_default(start, stop);
     #endif
@@ -119,11 +126,19 @@ private:
 #endif
 
 #if defined(ENABLE_ARM_SVE)
-  uint64_t count_avx512_bmi2(uint64_t stop);
+  uint64_t count_arm_sve(uint64_t stop);
+  uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("arch=armv8-a+sve")))
+  uint64_t count_arm_sve(uint64_t stop);
+  __attribute__ ((target ("arch=armv8-a+sve")))
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
 #endif
 
-#if defined(ENABLE_MULTIARCH_AVX512_BMI2)
+#if defined(ENABLE_AVX512_BMI2)
+  uint64_t count_avx512_bmi2(uint64_t stop);
+  uint64_t count_avx512_bmi2(uint64_t start, uint64_t stop) const;
+#elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
   uint64_t count_avx512_bmi2(uint64_t stop);
   __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))

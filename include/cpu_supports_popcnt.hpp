@@ -1,5 +1,5 @@
 ///
-/// @file  CPUID_POPCNT.hpp
+/// @file  cpu_supports_popcnt.hpp
 /// @brief POPCNT detection fo x86 and x86-64 CPUs.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
@@ -8,8 +8,14 @@
 /// file in the top level directory.
 ///
 
-#ifndef CPUID_POPCNT_HPP
-#define CPUID_POPCNT_HPP
+#ifndef CPU_SUPPORTS_POPCNT_HPP
+#define CPU_SUPPORTS_POPCNT_HPP
+
+// Enable CPUID on x86 and x86-64 CPUs
+#if defined(__x86_64__) || \
+    defined(__i386__) || \
+    defined(_M_X64) || \
+    defined(_M_IX86)
 
 // Both GCC and Clang (even Clang on Windows) define the __POPCNT__
 // macro if the user compiles with -mpopcnt. The __POPCNT__
@@ -26,33 +32,27 @@
 
 #if !defined(HAS_POPCNT)
 
-// Enable CPUID on x86 and x86-64 CPUs
-#if defined(__x86_64__) || \
-    defined(__i386__) || \
-    defined(_M_X64) || \
-    defined(_M_IX86)
-
-#include <CPUID.hpp>
+#include <cpuid.hpp>
 #define ENABLE_CPUID_POPCNT
 
 namespace {
 
-inline bool get_CPUID_POPCNT()
+inline bool run_cpuid_supports_popcnt()
 {
+  int abcd[4];
+  run_cpuid(1, 0, abcd);
+
   // %ecx POPCNT bit flag
   int bit_POPCNT = 1 << 23;
-  int abcd[4];
-
-  run_CPUID(1, 0, abcd);
   return (abcd[2] & bit_POPCNT) == bit_POPCNT;
 }
 
 /// Initialized at startup
-const bool cpuid_POPCNT = get_CPUID_POPCNT();
+bool cpu_supports_popcnt = run_cpuid_supports_popcnt();
 
 } // namespace
 
-#endif // CPUID
 #endif // !defined(HAS_POPCNT)
+#endif // CPUID
 
 #endif
