@@ -35,6 +35,7 @@ bool cpu_supports_sve = __builtin_cpu_supports("sve");
 
 } // namespace
 
-#endif
+#endif // !defined(GCC_MISSING_OS_CHECK)
+#endif // __has_builtin(__builtin_cpu_supports)
 
 #endif
