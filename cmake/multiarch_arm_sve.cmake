@@ -44,7 +44,7 @@ check_cxx_source_compiles("
         svbool_t pg = svwhilelt_b64(i, stop_idx);
         do
         {
-            svuint64_t vec = svld1_u64(pg, &sieve64[i]);
+            svuint64_t vec = svld1_u64(pg, &array[i]);
             vec = svcnt_u64_z(pg, vec);
             vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);
             i += svcntd();
