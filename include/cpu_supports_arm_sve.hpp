@@ -13,20 +13,7 @@
 
 #include <macros.hpp>
 
-#if defined(__has_builtin) && \
-    __has_builtin(__builtin_cpu_supports)
-
-// GCC <= 8 had a bug where __builtin_cpu_supports("avx") would not
-// check if AVX was supported by the operating system. Hence we
-// only enable __builtin_cpu_supports() for GCC > 8.
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85100
-#if defined(__GNUC__)
-  #if __GNUC__ <= 8
-    #define GCC_MISSING_OS_CHECK
-  #endif
-#endif
-
-#if !defined(GCC_MISSING_OS_CHECK)
+#if __has_builtin(__builtin_cpu_supports)
 
 namespace {
 
@@ -35,7 +22,6 @@ bool cpu_supports_sve = __builtin_cpu_supports("sve");
 
 } // namespace
 
-#endif // !defined(GCC_MISSING_OS_CHECK)
-#endif // __has_builtin(__builtin_cpu_supports)
+#endif // __builtin_cpu_supports
 
 #endif
