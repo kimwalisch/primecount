@@ -40,9 +40,7 @@
 #include <algorithm>
 #include <utility>
 
-namespace {
-
-using namespace primecount;
+namespace primecount {
 
 template <typename Primes>
 class PhiCache : public BitSieve240
@@ -302,10 +300,10 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-NOINLINE Vector<int64_t> generate_phi(int64_t x,
-                                      int64_t a,
-                                      const Primes& primes,
-                                      const PiTable& pi)
+Vector<int64_t> generate_phi(int64_t x,
+                             int64_t a,
+                             const Primes& primes,
+                             const PiTable& pi)
 {
   int64_t size = a + 1;
   Vector<int64_t> phi(size);
