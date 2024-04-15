@@ -197,6 +197,7 @@ public:
   }
 
 private:
+
 #if defined(ENABLE_DEFAULT)
 
   uint64_t count_default(uint64_t stop)
