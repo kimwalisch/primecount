@@ -41,6 +41,20 @@
   #define ASSERT(x) (static_cast<void>(0))
 #endif
 
+/// Some functions in primecount use a large number of variables
+/// at the same time. If such functions are inlined then
+/// performance drops because not all variables fit into registers
+/// which causes register spilling. We annotate such functions
+/// with NOINLINE in order to avoid these issues.
+///
+#if __has_attribute(noinline)
+  #define NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+  #define NOINLINE __declspec(noinline)
+#else
+  #define NOINLINE
+#endif
+
 /// Unfortunately compilers cannot be trusted (especially GCC)
 /// to inline performance critical functions. We must ensure
 /// that e.g. pi[x] and segmentedPi[x] are inlined.
