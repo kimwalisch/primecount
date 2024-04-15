@@ -300,10 +300,10 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-Vector<int64_t> generate_phi(int64_t x,
-                             int64_t a,
-                             const Primes& primes,
-                             const PiTable& pi)
+NOINLINE Vector<int64_t> generate_phi(int64_t x,
+                                      int64_t a,
+                                      const Primes& primes,
+                                      const PiTable& pi)
 {
   int64_t size = a + 1;
   Vector<int64_t> phi(size);
