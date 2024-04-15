@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -40,9 +40,7 @@
 #include <algorithm>
 #include <utility>
 
-namespace {
-
-using namespace primecount;
+namespace primecount {
 
 template <typename Primes>
 class PhiCache : public BitSieve240
@@ -302,11 +300,10 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-Vector<int64_t>
-generate_phi(int64_t x,
-             int64_t a,
-             const Primes& primes,
-             const PiTable& pi)
+NOINLINE Vector<int64_t> generate_phi(int64_t x,
+                                      int64_t a,
+                                      const Primes& primes,
+                                      const PiTable& pi)
 {
   int64_t size = a + 1;
   Vector<int64_t> phi(size);

@@ -15,23 +15,10 @@ option(BUILD_TESTS         "Build the test programs"               OFF)
 
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
+option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" OFF)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
-
-# Option WITH_DIV32 ##################################################
-
-# When using WITH_DIV32=ON primecount checks at runtime
-# if 32-bit division can be used instead of 64-bit
-# division which improves performance on old x64 CPUs
-# (<= 2020). However Clang performs this optimization by
-# itself, so we can disable WITH_DIV32.
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "LLVM")
-    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" OFF)
-else()
-    option(WITH_DIV32 "Use 32-bit division instead of 64-bit division whenever possible" ON)
-endif()
 
 # Enable/Disable libdivide ###########################################
 
@@ -127,7 +114,6 @@ set(LIB_SRC src/api.cpp
             src/PiTable.cpp
             src/S1.cpp
             src/Sieve.cpp
-            src/Sieve_count.cpp
             src/LoadBalancerP2.cpp
             src/LoadBalancerS2.cpp
             src/LogarithmicIntegral.cpp
@@ -206,6 +192,9 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 if(WITH_MULTIARCH)
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
+    if(NOT multiarch_avx512_vpopcnt)
+        include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
+    endif()
 endif()
 
 # Check for OpenMP ###################################################
@@ -257,7 +246,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}" "${ENABLE_INT128_OPENMP_PATCH}")
+    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH}" "${ENABLE_INT128_OPENMP_PATCH}")
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
@@ -282,7 +271,7 @@ if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH_AVX512_BMI2}" "${ENABLE_INT128_OPENMP_PATCH}")
+    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH}" "${ENABLE_INT128_OPENMP_PATCH}")
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)

@@ -53,6 +53,14 @@
   #define ALWAYS_INLINE
 #endif
 
+#if __has_attribute(noinline)
+  #define NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+  #define NOINLINE __declspec(noinline)
+#else
+  #define NOINLINE
+#endif
+
 #if __cplusplus >= 202002L && \
     __has_cpp_attribute(likely)
   #define if_likely(x) if (x) [[likely]]

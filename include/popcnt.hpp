@@ -12,7 +12,7 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
-#include <CPUID.hpp>
+#include <cpu_supports_popcnt.hpp>
 #include <macros.hpp>
 
 #include <stdint.h>
@@ -47,7 +47,6 @@ inline uint64_t popcnt64_bitwise(uint64_t x)
 // CPUID is only enabled on x86 and x86-64 CPUs
 // if the user compiles without -mpopcnt.
 #if defined(ENABLE_CPUID_POPCNT)
-
 #if defined(__x86_64__)
 
 namespace {
@@ -56,7 +55,7 @@ inline uint64_t popcnt64(uint64_t x)
 {
   // On my AMD EPYC 7642 CPU using GCC 12 this runtime
   // check incurs an overall overhead of about 1%.
-  if_likely(HAS_CPUID_POPCNT)
+  if_likely(cpu_supports_popcnt)
   {
     __asm__("popcnt %1, %0" : "=r"(x) : "r"(x));
     return x;
@@ -79,7 +78,7 @@ namespace {
 
 inline uint64_t popcnt64(uint64_t x)
 {
-  if_likely(HAS_CPUID_POPCNT)
+  if_likely(cpu_supports_popcnt)
   {
     uint32_t x0 = uint32_t(x);
     uint32_t x1 = uint32_t(x >> 32);
@@ -136,7 +135,7 @@ inline uint64_t popcnt64(uint64_t x)
 #if defined(HAS_POPCNT)
   return __popcnt64(x);
 #elif defined(ENABLE_CPUID_POPCNT)
-  if_likely(HAS_CPUID_POPCNT)
+  if_likely(cpu_supports_popcnt)
     return __popcnt64(x);
   else
     return popcnt64_bitwise(x);
@@ -161,7 +160,7 @@ inline uint64_t popcnt64(uint64_t x)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
 #elif defined(ENABLE_CPUID_POPCNT)
-  if_likely(HAS_CPUID_POPCNT)
+  if_likely(cpu_supports_popcnt)
     return __popcnt(uint32_t(x)) +
            __popcnt(uint32_t(x >> 32));
   else

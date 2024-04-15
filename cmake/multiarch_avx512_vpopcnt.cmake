@@ -4,11 +4,12 @@
 # the default (portable) algorithm otherwise.
 
 include(CheckCXXSourceCompiles)
+include(CMakePushCheckState)
+
+cmake_push_check_state()
+set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
 check_cxx_source_compiles("
-    #include <immintrin.h>
-    #include <stdint.h>
-
     // GCC/Clang function multiversioning for AVX512 is not needed if
     // the user compiles with -mavx512f -mavx512vpopcntdq -mbmi2.
     // GCC/Clang function multiversioning generally causes a minor
@@ -19,16 +20,18 @@ check_cxx_source_compiles("
       Error: AVX512 BMI2 multiarch not needed!
     #endif
 
+    #include <cpu_supports_avx512_bmi2.hpp>
+    #include <immintrin.h>
+    #include <stdint.h>
+
     class Sieve {
-        public:
-        __attribute__ ((target (\"default\")))
-        uint64_t count(uint64_t* array, uint64_t stop_idx);
+    public:
+        uint64_t count_default(uint64_t* array, uint64_t stop_idx);
         __attribute__ ((target (\"avx512f,avx512vpopcntdq,bmi2\")))
-        uint64_t count(uint64_t* array, uint64_t stop_idx);
+        uint64_t count_avx512_bmi2(uint64_t* array, uint64_t stop_idx);
     };
 
-    __attribute__ ((target (\"default\")))
-    uint64_t Sieve::count(uint64_t* array, uint64_t stop_idx)
+    uint64_t Sieve::count_default(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t res = 0;
         for (uint64_t i = 0; i < stop_idx; i++)
@@ -37,7 +40,7 @@ check_cxx_source_compiles("
     }
 
     __attribute__ ((target (\"avx512f,avx512vpopcntdq,bmi2\")))
-    uint64_t Sieve::count(uint64_t* array, uint64_t stop_idx)
+    uint64_t Sieve::count_avx512_bmi2(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t i = 0;
         __m512i vcnt = _mm512_setzero_si512();
@@ -56,12 +59,20 @@ check_cxx_source_compiles("
     int main()
     {
         uint64_t array[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        uint64_t cnt = 0;
         Sieve sieve;
-        uint64_t cnt = sieve.count(&array[0], 10);
+
+        if (cpu_supports_avx512_bmi2)
+            cnt = sieve.count_avx512_bmi2(&array[0], 10);
+        else
+            cnt = sieve.count_default(&array[0], 10);
+
         return (cnt > 0) ? 0 : 1;
     }
 " multiarch_avx512_vpopcnt)
 
 if(multiarch_avx512_vpopcnt)
-    set(ENABLE_MULTIARCH_AVX512_BMI2 "ENABLE_MULTIARCH_AVX512_BMI2")
+    set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_AVX512_BMI2")
 endif()
+
+cmake_pop_check_state()
