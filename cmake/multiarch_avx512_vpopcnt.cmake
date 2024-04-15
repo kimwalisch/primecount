@@ -4,7 +4,9 @@
 # the default (portable) algorithm otherwise.
 
 include(CheckCXXSourceCompiles)
+include(CMakePushCheckState)
 
+cmake_push_check_state()
 set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
 check_cxx_source_compiles("
@@ -72,3 +74,5 @@ check_cxx_source_compiles("
 if(multiarch_avx512_vpopcnt)
     set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_AVX512_BMI2")
 endif()
+
+cmake_pop_check_state()

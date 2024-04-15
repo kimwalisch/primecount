@@ -4,7 +4,9 @@
 # (portable) algorithm otherwise.
 
 include(CheckCXXSourceCompiles)
+include(CMakePushCheckState)
 
+cmake_push_check_state()
 set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
 check_cxx_source_compiles("
@@ -72,3 +74,5 @@ check_cxx_source_compiles("
 if(multiarch_arm_sve)
     set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_ARM_SVE")
 endif()
+
+cmake_pop_check_state()
