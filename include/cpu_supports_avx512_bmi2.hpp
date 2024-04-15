@@ -14,7 +14,7 @@
 #include <cpuid.hpp>
 
 #if defined(_MSC_VER)
-  #include <intrin.h>
+  #include <immintrin.h>
 #endif
 
 // %ebx bit flags
