@@ -37,7 +37,6 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
-#include <SieveTables.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
 #include <Vector.hpp>
@@ -125,20 +124,19 @@ public:
     #endif
   }
 
-  uint64_t get_total_count() const
-  {
-    return total_count_;
-  }
-
   template <typename T>
   void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
     reset_sieve(low, high);
-
     for (uint64_t i = 4; i <= c; i++)
       cross_off(primes[i], i);
 
     init_counter(low, high);
+  }
+
+  uint64_t get_total_count() const
+  {
+    return total_count_;
   }
 
 private:
@@ -283,6 +281,8 @@ private:
   void reset_counter();
   void reset_sieve(uint64_t low, uint64_t high);
   uint64_t segment_size() const;
+  static const Array<uint64_t, 240> unset_smaller;
+  static const Array<uint64_t, 240> unset_larger;
 
   struct Wheel
   {
