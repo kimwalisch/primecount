@@ -209,7 +209,7 @@ private:
       // for (i = start_idx + 1; i < stop_idx; i++)
       //   cnt += popcnt64(sieve64[i]);
       do {
-        __mmask8 mask = (__mmask8) _bzhi_u64(0xff, stop_idx - i);
+        __mmask8 mask = (i + 8 < stop_idx) ? 0xff : (__mmask8) _bzhi_u64(0xff, stop_idx - i);
         __m512i vec = _mm512_maskz_loadu_epi64(mask , &sieve64[i]);
         vec = _mm512_popcnt_epi64(vec);
         vcnt = _mm512_add_epi64(vcnt, vec);
