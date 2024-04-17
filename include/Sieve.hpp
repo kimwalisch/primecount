@@ -79,7 +79,7 @@ public:
   static uint64_t get_segment_size(uint64_t size);
 
   /// Count 1 bits inside [0, stop]
-  uint64_t count(uint64_t stop)
+  ALWAYS_INLINE uint64_t count(uint64_t stop)
   {
     ASSERT(stop >= prev_stop_);
     uint64_t start = prev_stop_ + 1;
