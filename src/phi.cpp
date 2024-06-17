@@ -120,7 +120,7 @@ public:
     int64_t sum;
     int64_t c = PhiTiny::max_a();
     int64_t larger_c = min(max_a_cached_, a);
-    larger_c = std::max(c, larger_c);
+    larger_c = max(c, larger_c);
     ASSERT(c < a);
 
     // Usually our algorithm starts at c because phi(x, c) can be
@@ -383,7 +383,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = (int64_t) 1e10;
   int max_threads = (int) std::sqrt(a);
-  threads = std::min(threads, max_threads);
+  threads = min(threads, max_threads);
   threads = ideal_num_threads(x, threads, thread_threshold);
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)

@@ -326,7 +326,7 @@ T AC_OpenMP(T x,
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   int64_t thread_threshold = 1000;
   int max_threads = (int) std::pow(xz, 1 / 3.7);
-  threads = std::min(threads, max_threads);
+  threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
   LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
@@ -386,13 +386,13 @@ T AC_OpenMP(T x,
       int64_t low = thread.low;
       int64_t segment_size = thread.segment_size;
       int64_t limit = low + thread.segments * segment_size;
-      limit = std::min(limit, sqrtx);
+      limit = min(limit, sqrtx);
 
       for (; low < limit; low += segment_size)
       {
         // Current segment [low, high[
         int64_t high = low + segment_size;
-        high = std::min(high, sqrtx);
+        high = min(high, sqrtx);
         segmentedPi.init(low, high);
 
         // We measure the thread computation time excluding the
