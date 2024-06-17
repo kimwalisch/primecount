@@ -185,7 +185,7 @@ T S2_easy_OpenMP(T x,
     int64_t prime = primes[b];
     T xp = x / prime;
 
-    if (xp <= port::numeric_limits<uint64_t>::max())
+    if (xp <= pstd::numeric_limits<uint64_t>::max())
       sum += S2_easy_64(xp, y, z, b, prime, lprimes, pi);
     else
       sum += S2_easy_128(xp, y, z, b, prime, primes, pi);
@@ -250,7 +250,7 @@ int128_t S2_easy(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (y <= port::numeric_limits<uint32_t>::max())
+  if (y <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(y);
     sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads, is_print);

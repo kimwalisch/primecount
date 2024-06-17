@@ -127,7 +127,7 @@ int128_t pi(int128_t x, int threads)
     return 0;
 
   // Use 64-bit if possible
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return pi((int64_t) x, threads);
   else
     return pi_gourdon_128(x, threads);
@@ -141,7 +141,7 @@ int128_t pi_deleglise_rivat(int128_t x, int threads)
     return 0;
 
   // Use 64-bit if possible
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return pi_deleglise_rivat_64((int64_t) x, threads);
   else
     return pi_deleglise_rivat_128(x, threads);
@@ -155,7 +155,7 @@ int128_t pi_gourdon(int128_t x, int threads)
     return 0;
 
   // Use 64-bit if possible
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return pi_gourdon_64((int64_t) x, threads);
   else
     return pi_gourdon_128(x, threads);
@@ -191,7 +191,7 @@ maxint_t get_max_x(double alpha_y)
   return (int128_t) max_x;
 #else
   unused_param(alpha_y); 
-  return port::numeric_limits<int64_t>::max();
+  return pstd::numeric_limits<int64_t>::max();
 #endif
 }
 

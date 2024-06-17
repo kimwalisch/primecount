@@ -43,7 +43,7 @@ template <typename T>
 inline T next_power_of_2(T x)
 {
 #if __cplusplus >= 202002L
-  using UT = typename port::make_unsigned<T>::type;
+  using UT = typename pstd::make_unsigned<T>::type;
   return std::bit_ceil((UT) x);
 
 #elif __has_builtin(__builtin_clzll)
@@ -51,7 +51,7 @@ inline T next_power_of_2(T x)
     return 1;
 
   static_assert(sizeof(T) <= sizeof(unsigned long long), "Unsupported type, wider than long long!");
-  auto bits = port::numeric_limits<unsigned long long>::digits;
+  auto bits = pstd::numeric_limits<unsigned long long>::digits;
   auto shift = bits - __builtin_clzll(x - 1);
   return (T) (1ull << shift);
 
@@ -60,8 +60,8 @@ inline T next_power_of_2(T x)
     return 1;
 
   x--;
-  using UT = typename port::make_unsigned<T>::type;
-  T bits = port::numeric_limits<UT>::digits;
+  using UT = typename pstd::make_unsigned<T>::type;
+  T bits = pstd::numeric_limits<UT>::digits;
 
   for (T i = 1; i < bits; i += i)
     x |= (x >> i);
@@ -80,14 +80,14 @@ template <typename T>
 inline T ilog2(T x)
 {
 #if __cplusplus >= 202002L
-  using UT = typename port::make_unsigned<T>::type;
+  using UT = typename pstd::make_unsigned<T>::type;
   auto ux = (UT) x;
   ux = (ux > 0) ? ux : 1;
   return std::bit_width(ux) - 1;
 
 #elif __has_builtin(__builtin_clzll)
   static_assert(sizeof(T) <= sizeof(unsigned long long), "Unsupported type, wider than long long!");
-  auto bits = port::numeric_limits<unsigned long long>::digits;
+  auto bits = pstd::numeric_limits<unsigned long long>::digits;
 
   // Workaround to avoid undefined behavior,
   // __builtin_clz(0) is undefined.
@@ -95,8 +95,8 @@ inline T ilog2(T x)
   return (T) ((bits - 1) - __builtin_clzll(x));
 
 #else
-  using UT = typename port::make_unsigned<T>::type;
-  T bits = port::numeric_limits<UT>::digits;
+  using UT = typename pstd::make_unsigned<T>::type;
+  T bits = pstd::numeric_limits<UT>::digits;
   T log2 = 0;
 
   for (T i = bits / 2; i > 0; i /= 2)

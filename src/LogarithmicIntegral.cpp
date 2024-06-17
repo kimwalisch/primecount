@@ -96,7 +96,7 @@ T li(T x)
     sum += (p / q) * inner_sum;
 
     // Not converging anymore
-    if (std::abs(sum - old_sum) <= port::numeric_limits<T>::epsilon())
+    if (std::abs(sum - old_sum) <= pstd::numeric_limits<T>::epsilon())
       break;
   }
 
@@ -129,7 +129,7 @@ T Li_inverse(T x)
     return 0;
 
   T t = initialNthPrimeApprox(x);
-  T old_term = port::numeric_limits<T>::infinity();
+  T old_term = pstd::numeric_limits<T>::infinity();
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -290,8 +290,8 @@ T Li_inverse_overflow_check(T x)
   FLOAT res = Li_inverse((FLOAT) x);
 
   // Prevent integer overflow
-  if (res > (FLOAT) port::numeric_limits<T>::max())
-    return port::numeric_limits<T>::max();
+  if (res > (FLOAT) pstd::numeric_limits<T>::max())
+    return pstd::numeric_limits<T>::max();
   else
     return (T) res;
 }

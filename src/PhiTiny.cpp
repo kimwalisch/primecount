@@ -68,7 +68,7 @@ PhiTiny::PhiTiny()
       for (uint64_t x = 1; x < pp; x++)
       {
         uint64_t phi_xa = phi(x, a - 1) - phi(x / primes[a], a - 1);
-        ASSERT(phi_xa <= port::numeric_limits<uint8_t>::max());
+        ASSERT(phi_xa <= pstd::numeric_limits<uint8_t>::max());
         phi_[a][x] = (uint8_t) phi_xa;
       }
     }

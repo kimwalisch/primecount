@@ -210,7 +210,7 @@ T D_OpenMP(T x,
     {
       // Unsigned integer division is usually slightly
       // faster than signed integer division
-      using UT = typename port::make_unsigned<T>::type;
+      using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
       UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);

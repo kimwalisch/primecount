@@ -143,7 +143,7 @@ int128_t Phi0(int128_t x,
   int128_t phi0;
 
   // uses less memory
-  if (y <= port::numeric_limits<uint32_t>::max())
+  if (y <= pstd::numeric_limits<uint32_t>::max())
     phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
   else
     phi0 = Phi0_OpenMP(x, y, z, k, threads);

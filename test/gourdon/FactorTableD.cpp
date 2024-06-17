@@ -47,7 +47,7 @@ int main()
   auto mu = generate_moebius(z);
 
   FactorTableD<uint16_t> factorTable(y, z, threads);
-  int64_t uint16_max = port::numeric_limits<uint16_t>::max();
+  int64_t uint16_max = pstd::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
   std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 

@@ -30,8 +30,8 @@ int main()
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  std::uniform_int_distribution<int32_t> dist_i32(1, port::numeric_limits<int32_t>::max());
-  std::uniform_int_distribution<uint64_t> dist_u64(0, port::numeric_limits<uint64_t>::max());
+  std::uniform_int_distribution<int32_t> dist_i32(1, pstd::numeric_limits<int32_t>::max());
+  std::uniform_int_distribution<uint64_t> dist_u64(0, pstd::numeric_limits<uint64_t>::max());
 
   // Test unsigned/signed
   for (int i = 0; i < 10000; i++)

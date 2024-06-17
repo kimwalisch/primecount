@@ -112,12 +112,12 @@ ALWAYS_INLINE T isqrt(T x)
   // time in all cases i.e. even if sqrt_max were declared
   // without constexpr.
   //
-  constexpr T sqrt_max = ct_sqrt(port::numeric_limits<T>::max());
+  constexpr T sqrt_max = ct_sqrt(pstd::numeric_limits<T>::max());
 
   // For 128-bit integers we use uint64_t as the
   // result type. For all other types we use the
   // same result type as the input type.
-  using R = typename port::conditional<sizeof(T) / 2 == sizeof(uint64_t), uint64_t, T>::type;
+  using R = typename pstd::conditional<sizeof(T) / 2 == sizeof(uint64_t), uint64_t, T>::type;
   R r = (R) std::min(s, sqrt_max);
 
   // In my tests the first corrections were needed above

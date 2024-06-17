@@ -428,7 +428,7 @@ T AC_OpenMP(T x,
           int64_t prime = primes[b];
           T xp = x / prime;
 
-          if (xp <= port::numeric_limits<uint64_t>::max())
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
           else
             sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
@@ -440,7 +440,7 @@ T AC_OpenMP(T x,
           int64_t prime = primes[b];
           T xp = x / prime;
 
-          if (xp <= port::numeric_limits<uint64_t>::max())
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
           else
             sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
@@ -513,7 +513,7 @@ int128_t AC(int128_t x,
   int128_t sum;
 
   // uses less memory
-  if (max_prime <= port::numeric_limits<uint32_t>::max())
+  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
   {
     auto primes = generate_primes<uint32_t>(max_prime);
     sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, max_a_prime, primes, threads, is_print);

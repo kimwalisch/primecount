@@ -46,7 +46,7 @@ namespace {
 const primecount::Array<long double, 128> zeta =
 {
  -0.500000000000000000000000000000000000000L,
-  port::numeric_limits<long double>::infinity(),
+  pstd::numeric_limits<long double>::infinity(),
   1.644934066848226436472415166646025189219L,
   1.202056903159594285399738161511449990765L,
   1.082323233711138191516003696541167902775L,
@@ -214,7 +214,7 @@ T RiemannR(T x)
   if (x < T(1e-5))
     return 0;
 
-  T epsilon = port::numeric_limits<T>::epsilon();
+  T epsilon = pstd::numeric_limits<T>::epsilon();
   T sum = 1;
   T term = 1;
   T logx = std::log(x);
@@ -254,7 +254,7 @@ T RiemannR_inverse(T x)
     return 0;
 
   T t = initialNthPrimeApprox(x);
-  T old_term = port::numeric_limits<T>::infinity();
+  T old_term = pstd::numeric_limits<T>::infinity();
 
   // The condition i < ITERS is required in case the computation
   // does not converge. This happened on Linux i386 where
@@ -524,8 +524,8 @@ T RiemannR_inverse_overflow_check(T x)
   FLOAT res = RiemannR_inverse((FLOAT) x);
 
   // Prevent integer overflow
-  if (res > (FLOAT) port::numeric_limits<T>::max())
-    return port::numeric_limits<T>::max();
+  if (res > (FLOAT) pstd::numeric_limits<T>::max())
+    return pstd::numeric_limits<T>::max();
   else
     return (T) res;
 }

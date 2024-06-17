@@ -101,7 +101,7 @@ Vector<int32_t> generate_lpf(int64_t max)
   // Deleglise-Rivat prime counting algorithms. And
   // lfp(1) = +Infinity allows to simplify that algorithm.
   if (lpf.size() > 1)
-    lpf[1] = port::numeric_limits<int32_t>::max();
+    lpf[1] = pstd::numeric_limits<int32_t>::max();
 
   for (int64_t i = 2; i <= sqrt; i++)
     if (lpf[i] == 1)

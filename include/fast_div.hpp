@@ -44,18 +44,18 @@ fast_div(X x, Y y)
 
 #if defined(ENABLE_DIV32)
 
-  using UX = typename port::make_unsigned<X>::type;
-  using UY = typename port::make_unsigned<Y>::type;
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
 
-  if (x <= port::numeric_limits<uint32_t>::max())
+  if (x <= pstd::numeric_limits<uint32_t>::max())
     return uint32_t(x) / UY(y);
   else
     return UX(x) / UY(y);
 #else
   // Unsigned integer division is usually
   // faster than signed integer division.
-  using UX = typename port::make_unsigned<X>::type;
-  using UY = typename port::make_unsigned<Y>::type;
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
   return UX(x) / UY(y);
 #endif
 }
@@ -72,8 +72,8 @@ fast_div(X x, Y y)
 
   // Unsigned integer division is usually
   // faster than signed integer division.
-  using UX = typename port::make_unsigned<X>::type;
-  using UY = typename port::make_unsigned<Y>::type;
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
   return UX(x) / UY(y);
 }
 
@@ -89,10 +89,10 @@ fast_div(X x, Y y)
 
   // Unsigned integer division is usually
   // faster than signed integer division.
-  using UX = typename port::make_unsigned<X>::type;
-  using UY = typename port::make_unsigned<Y>::type;
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
 
-  if (x <= port::numeric_limits<uint64_t>::max())
+  if (x <= pstd::numeric_limits<uint64_t>::max())
     return uint64_t(x) / UY(y);
   else
     return UX(x) / UY(y);

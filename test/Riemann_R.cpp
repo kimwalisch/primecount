@@ -252,9 +252,9 @@ int main()
   }
 
   {
-    int64_t x = port::numeric_limits<int64_t>::max() / 10;
+    int64_t x = pstd::numeric_limits<int64_t>::max() / 10;
     int64_t res = RiemannR_inverse(x);
-    if (res != port::numeric_limits<int64_t>::max())
+    if (res != pstd::numeric_limits<int64_t>::max())
     {
       std::cout << "RiemannR_inverse(" << x << ") != INT64_MAX, failed to prevent integer overflow!" << std::endl;
       std::exit(1);
@@ -263,9 +263,9 @@ int main()
 
 #if defined(HAVE_INT128_T)
   {
-    int128_t x = port::numeric_limits<int128_t>::max() / 10;
+    int128_t x = pstd::numeric_limits<int128_t>::max() / 10;
     int128_t res = RiemannR_inverse(x);
-    if (res != port::numeric_limits<int128_t>::max())
+    if (res != pstd::numeric_limits<int128_t>::max())
     {
       std::cout << "RiemannR_inverse(" << x << ") != INT128_MAX, failed to prevent integer overflow!" << std::endl;
       std::exit(1);

@@ -71,7 +71,7 @@ public:
       throw primecount_error("y must be <= FactorTable::max()");
 
     y = std::max<int64_t>(1, y);
-    T T_MAX = port::numeric_limits<T>::max();
+    T T_MAX = pstd::numeric_limits<T>::max();
     factor_.resize(to_index(y) + 1);
 
     // mu(1) = 1.
@@ -189,7 +189,7 @@ public:
 
   static maxint_t max()
   {
-    maxint_t T_MAX = port::numeric_limits<T>::max();
+    maxint_t T_MAX = pstd::numeric_limits<T>::max();
     return ipow<2>(T_MAX - 1) - 1;
   }
 

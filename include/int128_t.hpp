@@ -103,18 +103,18 @@ using std::to_string;
 // This is required for GCC/Clang if the user compiles with -std=c++*
 // instead of -std=gnu++* and also for LLVM/Clang on Windows.
 namespace {
-namespace port {
+namespace pstd {
 
 using namespace primecount;
 
-// port::is_same
+// pstd::is_same
 template<class T, class U>
 struct is_same : std::false_type {};
 
 template<class T>
 struct is_same<T, T> : std::true_type {};
 
-// port::conditional
+// pstd::conditional
 template <bool Cond, class T, class F>
 struct conditional {
   using type = T;
@@ -125,7 +125,7 @@ struct conditional<false, T, F> {
   using type = F;
 };
 
-// port::is_integral
+// pstd::is_integral
 template<typename T> struct is_integral {
   static constexpr bool value = std::is_integral<T>::value;
 };
@@ -135,7 +135,7 @@ template<typename T> struct is_integral {
   template<> struct is_integral<uint128_t> : std::true_type {};
 #endif
 
-// port::is_floating_point
+// pstd::is_floating_point
 template<typename T> struct is_floating_point {
   static constexpr bool value = std::is_floating_point<T>::value;
 };
@@ -145,7 +145,7 @@ template<typename T> struct is_floating_point {
   template<> struct is_floating_point<uint128_t> : std::false_type {};
 #endif
 
-// port::is_signed
+// pstd::is_signed
 template<typename T> struct is_signed {
   static constexpr bool value = std::is_signed<T>::value;
 };
@@ -155,7 +155,7 @@ template<typename T> struct is_signed {
   template<> struct is_signed<uint128_t> : std::false_type {};
 #endif
 
-// port::is_unsigned
+// pstd::is_unsigned
 template<typename T> struct is_unsigned {
   static constexpr bool value = std::is_unsigned<T>::value;
 };
@@ -165,7 +165,7 @@ template<typename T> struct is_unsigned {
   template<> struct is_unsigned<uint128_t> : std::true_type {};
 #endif
 
-// port::make_unsigned
+// pstd::make_unsigned
 template<typename T> struct make_unsigned {
   using type = typename std::make_unsigned<T>::type;
 };
@@ -175,13 +175,13 @@ template<typename T> struct make_unsigned {
   template<> struct make_unsigned<uint128_t> { using type = uint128_t; };
 #endif
 
-// port::numeric_limits
+// pstd::numeric_limits
 template<typename T> struct numeric_limits {
-    static constexpr T min() { return std::numeric_limits<T>::min(); }
-    static constexpr T max() { return std::numeric_limits<T>::max(); }
-    static constexpr T infinity() { return std::numeric_limits<T>::infinity(); }
-    static constexpr T epsilon() { return std::numeric_limits<T>::epsilon(); }
-    static constexpr int digits = std::numeric_limits<T>::digits;
+  static constexpr T min() { return std::numeric_limits<T>::min(); }
+  static constexpr T max() { return std::numeric_limits<T>::max(); }
+  static constexpr T infinity() { return std::numeric_limits<T>::infinity(); }
+  static constexpr T epsilon() { return std::numeric_limits<T>::epsilon(); }
+  static constexpr int digits = std::numeric_limits<T>::digits;
 };
 
 #if defined(HAVE_INT128_T)
@@ -200,7 +200,7 @@ template<typename T> struct numeric_limits {
   };
 #endif
 
-} // namespace port
+} // namespace pstd
 } // namespace
 
 #if defined(HAVE_INT128_T) && \

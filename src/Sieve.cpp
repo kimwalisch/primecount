@@ -325,7 +325,7 @@ void Sieve::allocate_counter(uint64_t low)
   // only counts the number of unsieved elements (1 bits) in
   // an interval of size: sieve_limit^(1/4) * sqrt(240).
   // Hence the max(counter value) = 2^18.
-  ASSERT(bytes * 8 <= port::numeric_limits<uint32_t>::max());
+  ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
   uint64_t counter_size = ceil_div(sieve_.size(), bytes);
   counter_.counter.resize(counter_size);
   counter_.dist = bytes * 30;

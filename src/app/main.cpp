@@ -43,7 +43,7 @@ namespace primecount {
 
 int64_t to_int64(maxint_t x)
 {
-  if (x > port::numeric_limits<int64_t>::max())
+  if (x > pstd::numeric_limits<int64_t>::max())
     throw primecount_error("x must be < 2^63");
   return (int64_t) x;
 }
@@ -81,7 +81,7 @@ maxint_t AC(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return AC((int64_t) x, y, z, k, threads);
   else
     return AC(x, y, z, k, threads);
@@ -111,7 +111,7 @@ maxint_t B(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return B((int64_t) x, y, threads);
   else
     return B(x, y, threads);
@@ -150,7 +150,7 @@ maxint_t D(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return D((int64_t) x, y, z, k, (int64_t) Li(x), threads);
   else
     return D(x, y, z, k, Li(x), threads);
@@ -189,7 +189,7 @@ maxint_t Phi0(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return Phi0((int64_t) x, y, z, k, threads);
   else
     return Phi0(x, y, z, k, threads);
@@ -219,7 +219,7 @@ maxint_t Sigma(maxint_t x, int threads)
   if (is_print())
     set_print_variables(true);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return Sigma((int64_t) x, y, threads);
   else
     return Sigma(x, y, threads);
@@ -242,7 +242,7 @@ maxint_t P2(maxint_t x, int threads)
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t a = pi_noprint(y, threads);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return P2((int64_t) x, y, a, threads);
   else
     return P2(x, y, a, threads);
@@ -265,7 +265,7 @@ maxint_t S1(maxint_t x, int threads)
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return S1((int64_t) x, y, c, threads);
   else
     return S1(x, y, c, threads);
@@ -289,7 +289,7 @@ maxint_t S2_trivial(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_trivial((int64_t) x, y, z, c, threads);
   else
     return S2_trivial(x, y, z, c, threads);
@@ -313,7 +313,7 @@ maxint_t S2_easy(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_easy((int64_t) x, y, z, c, threads);
   else
     return S2_easy(x, y, z, c, threads);
@@ -337,7 +337,7 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t z = (int64_t) (x / y);
   int64_t c = PhiTiny::get_c(y);
 
-  if (x <= port::numeric_limits<int64_t>::max())
+  if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_hard((int64_t) x, y, z, c, (int64_t) Li(x), threads);
   else
     return S2_hard(x, y, z, c, Li(x), threads);

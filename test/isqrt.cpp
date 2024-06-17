@@ -63,42 +63,42 @@ int main()
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 1000000000);
 
-  n = port::numeric_limits<int8_t>::max();
+  n = pstd::numeric_limits<int8_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 11);
 
-  n = port::numeric_limits<uint8_t>::max();
+  n = pstd::numeric_limits<uint8_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 15);
 
-  n = port::numeric_limits<int16_t>::max();
+  n = pstd::numeric_limits<int16_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 181);
 
-  n = port::numeric_limits<uint16_t>::max();
+  n = pstd::numeric_limits<uint16_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 255);
 
-  n = port::numeric_limits<int32_t>::max();
+  n = pstd::numeric_limits<int32_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 46340);
 
-  n = port::numeric_limits<uint32_t>::max();
+  n = pstd::numeric_limits<uint32_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 65535);
 
-  n = port::numeric_limits<int64_t>::max();
+  n = pstd::numeric_limits<int64_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 3037000499ll);
 
-  n = port::numeric_limits<uint64_t>::max();
+  n = pstd::numeric_limits<uint64_t>::max();
   res1 = isqrt(n);
   std::cout << "isqrt(" << n << ") = " << res1;
   check(res1 == 4294967295ull);

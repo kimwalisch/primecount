@@ -113,7 +113,7 @@ maxint_t to_maxint(const std::string& expr)
     if (pos != std::string::npos)
     {
       std::string n = expr.substr(pos);
-      maxint_t limit = port::numeric_limits<maxint_t>::max();
+      maxint_t limit = pstd::numeric_limits<maxint_t>::max();
       std::string max_n = to_string(limit);
 
       if (n.size() > max_n.size() ||

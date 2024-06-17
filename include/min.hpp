@@ -22,9 +22,9 @@ template <typename A, typename B>
 struct is_comparable
 {
   enum {
-    value = port::is_same<A, B>::value || (
-            port::is_integral<A>::value &&
-            port::is_integral<B>::value &&
+    value = pstd::is_same<A, B>::value || (
+            pstd::is_integral<A>::value &&
+            pstd::is_integral<B>::value &&
             sizeof(A) >= sizeof(B))
   };
 };
@@ -33,9 +33,9 @@ template <typename A, typename B, typename C>
 struct is_comparable_3
 {
   enum {
-    value = port::is_integral<A>::value &&
-            port::is_integral<B>::value &&
-            port::is_integral<C>::value &&
+    value = pstd::is_integral<A>::value &&
+            pstd::is_integral<B>::value &&
+            pstd::is_integral<C>::value &&
             sizeof(A) >= sizeof(B) &&
             sizeof(B) >= sizeof(C)
   };
