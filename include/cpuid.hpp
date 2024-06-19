@@ -28,19 +28,23 @@ inline void run_cpuid(int eax, int ecx, int* abcd)
   #if defined(__i386__) && \
       defined(__PIC__)
     /* in case of PIC under 32-bit EBX cannot be clobbered */
-    __asm__ ("movl %%ebx, %%edi;"
-             "cpuid;"
-             "xchgl %%ebx, %%edi;"
-             : "=D" (ebx),
-               "+a" (eax),
-               "+c" (ecx),
-               "=d" (edx));
+    __asm__ __volatile__ (
+      "movl %%ebx, %%edi;"
+      "cpuid;"
+      "xchgl %%ebx, %%edi;"
+      : "=D" (ebx),
+        "+a" (eax),
+        "+c" (ecx),
+        "=d" (edx)
+      : "memory"
+    );
   #else
-    __asm__ ("cpuid;"
-             : "+b" (ebx),
-               "+a" (eax),
-               "+c" (ecx),
-               "=d" (edx));
+    __asm__ __volatile__ (
+        "cpuid"
+        : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+        : "0" (eax), "2" (ecx)
+        : "memory"
+    );
   #endif
 
   abcd[0] = eax;
