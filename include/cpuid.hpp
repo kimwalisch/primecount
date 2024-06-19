@@ -33,7 +33,7 @@ inline void run_cpuid(int* eax, int* ebx, int* ecx, int* edx)
       defined(__PIC__)
 
   // in case of PIC under 32-bit EBX cannot be clobbered
-  __asm__ __volatile__ (
+  __asm__ (
     "movl %%ebx, %%edi;"
     "cpuid;"
     "xchgl %%ebx, %%edi;"
@@ -45,12 +45,13 @@ inline void run_cpuid(int* eax, int* ebx, int* ecx, int* edx)
 
 #else
 
-  __asm__ __volatile__ (
+  __asm__ (
       "cpuid"
-      : "+a" (*eax),
-        "+b" (*ebx),
-        "+c" (*ecx),
+      : "=a" (*eax),
+        "=b" (*ebx),
+        "=c" (*ecx),
         "=d" (*edx)
+      : "a" (*eax), "c" (*ecx)
   );
 
 #endif
