@@ -42,7 +42,7 @@ inline int get_xcr0()
 #if defined(_MSC_VER)
   xcr0 = (int) _xgetbv(0);
 #else
-  __asm__ __volatile__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx" );
+  __asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx" );
 #endif
 
   return xcr0;
