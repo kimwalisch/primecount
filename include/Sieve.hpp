@@ -49,18 +49,19 @@
   #define ENABLE_ARM_SVE
 
 #elif defined(__AVX512F__) && \
-      defined(__AVX512VPOPCNTDQ__)
+      defined(__AVX512VPOPCNTDQ__) && \
+      defined(__BMI2__) && \
+     !defined(__i386__) /* misses _bzhi_u64() */ && \
       __has_include(<immintrin.h>)
   #include <immintrin.h>
-  #define ENABLE_AVX512_VPOPCNT
+  #define ENABLE_AVX512_BMI2
 
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
   #include <arm_sve.h>
   #define ENABLE_DEFAULT
-
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
+#elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+  #include <cpu_supports_avx512_bmi2.hpp>
   #include <immintrin.h>
   #define ENABLE_DEFAULT
 #else
@@ -112,12 +113,12 @@ public:
   {
     #if defined(ENABLE_ARM_SVE)
       return count_arm_sve(start, stop);
-    #elif defined(ENABLE_AVX512_VPOPCNT)
-      return count_avx512_vpopcnt(start, stop);
+    #elif defined(ENABLE_AVX512_BMI2)
+      return count_avx512_bmi2(start, stop);
     #elif defined(ENABLE_MULTIARCH_ARM_SVE)
       return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
-    #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-      return cpu_supports_avx512_vpopcnt ? count_avx512_vpopcnt(start, stop) : count_default(start, stop);
+    #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+      return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
     #else
       return count_default(start, stop);
     #endif
@@ -173,18 +174,18 @@ private:
 
 #endif
 
-#if defined(ENABLE_AVX512_VPOPCNT) || \
-    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#if defined(ENABLE_AVX512_BMI2) || \
+    defined(ENABLE_MULTIARCH_AVX512_BMI2)
 
   /// Count 1 bits inside [start, stop].
   /// The distance [start, stop] is small here < sqrt(segment_size),
   /// hence we simply count the number of unsieved elements
   /// by linearly iterating over the sieve array.
   ///
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+  #if defined(ENABLE_MULTIARCH_AVX512_BMI2)
+    __attribute__ ((target ("avx512f,avx512vpopcntdq,bmi2")))
   #endif
-  uint64_t count_avx512_vpopcnt(uint64_t start, uint64_t stop) const
+  uint64_t count_avx512_bmi2(uint64_t start, uint64_t stop) const
   {
     if (start > stop)
       return 0;
@@ -215,7 +216,7 @@ private:
         vcnt = _mm512_add_epi64(vcnt, vec);
       }
 
-      __mmask8 mask = 0xff >> (stop_idx - i);
+      __mmask8 mask = (__mmask8) _bzhi_u64(0xff, stop_idx - i);
       __m512i vec = _mm512_maskz_loadu_epi64(mask , &sieve64[i]);
       vec = _mm512_popcnt_epi64(vec);
       vcnt = _mm512_add_epi64(vcnt, vec);

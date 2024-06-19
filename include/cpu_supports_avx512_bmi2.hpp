@@ -1,6 +1,6 @@
 ///
-/// @file  cpu_supports_avx512_vpopcnt.hpp
-/// @brief Detect if the x86 CPU supports AVX512 VPOPCNT.
+/// @file  cpu_supports_avx512_bmi2.hpp
+/// @brief Detect if the x86 CPU supports AVX512 and BMI2.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -8,8 +8,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef CPU_SUPPORTS_AVX512_VPOPCNT_HPP
-#define CPU_SUPPORTS_AVX512_VPOPCNT_HPP
+#ifndef CPU_SUPPORTS_AVX512_BMI2_HPP
+#define CPU_SUPPORTS_AVX512_BMI2_HPP
 
 #include <cpuid.hpp>
 
@@ -18,6 +18,7 @@
 #endif
 
 // %ebx bit flags
+#define bit_BMI2    (1 << 8)
 #define bit_AVX512F (1 << 16)
 
 // %ecx bit flags
@@ -44,7 +45,7 @@ inline int get_xcr0()
   return xcr0;
 }
 
-inline bool run_cpuid_avx512_vpopcnt()
+inline bool run_cpuid_avx512_bmi2()
 {
   int abcd[4];
 
@@ -71,13 +72,16 @@ inline bool run_cpuid_avx512_vpopcnt()
 
   run_cpuid(7, 0, abcd);
 
+  if ((abcd[1] & bit_BMI2) != bit_BMI2)
+    return false;
+
   // AVX512F, AVX512VPOPCNTDQ
   return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
           (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
 }
 
 /// Initialized at startup
-bool cpu_supports_avx512_vpopcnt = run_cpuid_avx512_vpopcnt();
+bool cpu_supports_avx512_bmi2 = run_cpuid_avx512_bmi2();
 
 } // namespace
 
