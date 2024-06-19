@@ -17,9 +17,6 @@
   #include <immintrin.h>
 #endif
 
-// CPUID bits documentation:
-// https://en.wikipedia.org/wiki/CPUID
-
 // %ebx bit flags
 #define bit_BMI2    (1 << 8)
 #define bit_AVX512F (1 << 16)
@@ -42,7 +39,7 @@ inline int get_xcr0()
 #if defined(_MSC_VER)
   xcr0 = (int) _xgetbv(0);
 #else
-  __asm__ __volatile__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx" );
+  __asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx" );
 #endif
 
   return xcr0;
@@ -50,21 +47,19 @@ inline int get_xcr0()
 
 inline bool run_cpuid_avx512_bmi2()
 {
-  int eax = 1;
-  int ebx = 0;
-  int ecx = 0;
-  int edx = 0;
+  int abcd[4];
 
-  run_cpuid(&eax, &ebx, &ecx, &edx);
+  run_cpuid(1, 0, abcd);
 
   int osxsave_mask = (1 << 27);
 
   // Ensure OS supports extended processor state management
-  if ((ecx & osxsave_mask) != osxsave_mask)
+  if ((abcd[2] & osxsave_mask) != osxsave_mask)
     return false;
 
   int ymm_mask = XSTATE_SSE | XSTATE_YMM;
   int zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
+
   int xcr0 = get_xcr0();
 
   // Check AVX OS support
@@ -75,19 +70,14 @@ inline bool run_cpuid_avx512_bmi2()
   if ((xcr0 & zmm_mask) != zmm_mask)
     return false;
 
-  eax = 7;
-  ebx = 0;
-  ecx = 0;
-  edx = 0;
+  run_cpuid(7, 0, abcd);
 
-  run_cpuid(&eax, &ebx, &ecx, &edx);
-
-  if ((ebx & bit_BMI2) != bit_BMI2)
+  if ((abcd[1] & bit_BMI2) != bit_BMI2)
     return false;
 
   // AVX512F, AVX512VPOPCNTDQ
-  return ((ebx & bit_AVX512F) == bit_AVX512F &&
-          (ecx & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
+  return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
+          (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
 }
 
 /// Initialized at startup
