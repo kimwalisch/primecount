@@ -46,12 +46,12 @@ inline void run_cpuid(int* eax, int* ebx, int* ecx, int* edx)
 #else
 
   __asm__ (
-      "cpuid"
-      : "=a" (*eax),
-        "=b" (*ebx),
-        "=c" (*ecx),
-        "=d" (*edx)
-      : "a" (*eax), "c" (*ecx)
+    "cpuid"
+    : "=a" (*eax),
+      "=b" (*ebx),
+      "=c" (*ecx),
+      "=d" (*edx)
+    : "a" (*eax), "c" (*ecx)
   );
 
 #endif
