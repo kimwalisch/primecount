@@ -60,6 +60,7 @@
   #include <cpu_supports_arm_sve.hpp>
   #include <arm_sve.h>
   #define ENABLE_DEFAULT
+
 #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
   #include <cpu_supports_avx512_bmi2.hpp>
   #include <immintrin.h>
