@@ -1,7 +1,6 @@
 Changes in primecount-7.14, 2024-06-19
 
 * int128_t.hpp: Rename namespace port to pstd (portable std namespace).
-* cpuid.hpp: Prevent memory reordering.
 * Sieve.hpp: Tune AVX512 code.
 * multiarch_avx512_vpopcnt.cmake: Tune AVX512 code.
 
