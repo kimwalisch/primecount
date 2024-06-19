@@ -39,12 +39,16 @@ namespace {
 
 inline bool run_cpuid_supports_popcnt()
 {
-  int abcd[4];
-  run_cpuid(1, 0, abcd);
+  int eax = 1;
+  int ebx = 0;
+  int ecx = 0;
+  int edx = 0;
 
-  // %ecx POPCNT bit flag
+  run_cpuid(&eax, &ebx, &ecx, &edx);
+
+  // https://en.wikipedia.org/wiki/CPUID
   int bit_POPCNT = 1 << 23;
-  return (abcd[2] & bit_POPCNT) == bit_POPCNT;
+  return (ecx & bit_POPCNT) == bit_POPCNT;
 }
 
 /// Initialized at startup
