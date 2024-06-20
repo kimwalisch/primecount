@@ -12,10 +12,14 @@
 #define CPU_SUPPORTS_AVX512_BMI2_HPP
 
 #include <cpuid.hpp>
+#include <stdint.h>
 
 #if defined(_MSC_VER)
   #include <immintrin.h>
 #endif
+
+// CPUID bits documentation:
+// https://en.wikipedia.org/wiki/CPUID
 
 // %ebx bit flags
 #define bit_BMI2    (1 << 8)
@@ -32,17 +36,17 @@
 namespace {
 
 // Get Value of Extended Control Register
-inline int get_xcr0()
+inline uint64_t get_xcr0()
 {
-  int xcr0;
-
 #if defined(_MSC_VER)
-  xcr0 = (int) _xgetbv(0);
+  return _xgetbv(0);
 #else
-  __asm__ ("xgetbv" : "=a" (xcr0) : "c" (0) : "%edx" );
-#endif
+  uint32_t eax;
+  uint32_t edx;
 
-  return xcr0;
+  __asm__ ("xgetbv" : "=a"(eax), "=d"(edx) : "c"(0));
+  return eax | (uint64_t(edx) << 32);
+#endif
 }
 
 inline bool run_cpuid_avx512_bmi2()
@@ -57,10 +61,9 @@ inline bool run_cpuid_avx512_bmi2()
   if ((abcd[2] & osxsave_mask) != osxsave_mask)
     return false;
 
-  int ymm_mask = XSTATE_SSE | XSTATE_YMM;
-  int zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
-
-  int xcr0 = get_xcr0();
+  uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
+  uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
+  uint64_t xcr0 = get_xcr0();
 
   // Check AVX OS support
   if ((xcr0 & ymm_mask) != ymm_mask)

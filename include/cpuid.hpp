@@ -27,18 +27,18 @@ inline void run_cpuid(int eax, int ecx, int* abcd)
 
   #if defined(__i386__) && \
       defined(__PIC__)
-    /* in case of PIC under 32-bit EBX cannot be clobbered */
+    // In case of PIC under 32-bit EBX cannot be clobbered
     __asm__ ("movl %%ebx, %%edi;"
              "cpuid;"
              "xchgl %%ebx, %%edi;"
-             : "=D" (ebx),
-               "+a" (eax),
+             : "+a" (eax),
+               "=D" (ebx),
                "+c" (ecx),
                "=d" (edx));
   #else
-    __asm__ ("cpuid;"
-             : "+b" (ebx),
-               "+a" (eax),
+    __asm__ ("cpuid"
+             : "+a" (eax),
+               "+b" (ebx),
                "+c" (ecx),
                "=d" (edx));
   #endif

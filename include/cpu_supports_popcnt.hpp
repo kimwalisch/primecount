@@ -43,6 +43,7 @@ inline bool run_cpuid_supports_popcnt()
   run_cpuid(1, 0, abcd);
 
   // %ecx POPCNT bit flag
+  // https://en.wikipedia.org/wiki/CPUID
   int bit_POPCNT = 1 << 23;
   return (abcd[2] & bit_POPCNT) == bit_POPCNT;
 }
