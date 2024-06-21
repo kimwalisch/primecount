@@ -154,6 +154,14 @@ else()
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
 endif()
 
+# On x86 CPUs compile cpuid.cpp ######################################
+
+include("${PROJECT_SOURCE_DIR}/cmake/x86_cpuid.cmake")
+
+if(x86_cpuid)
+    set(LIB_SRC ${LIB_SRC} src/arch/x86/cpuid.cpp)
+endif()
+
 # Enable __float128 support (requires libquadmath) ###################
 
 if(WITH_FLOAT128)
