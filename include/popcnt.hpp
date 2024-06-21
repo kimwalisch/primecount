@@ -12,10 +12,12 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
-#include <cpu_supports_popcnt.hpp>
 #include <macros.hpp>
-
 #include <stdint.h>
+
+#if defined(ENABLE_MULTIARCH_x86_POPCNT)
+  #include <cpu_supports_popcnt.hpp>
+#endif
 
 namespace {
 

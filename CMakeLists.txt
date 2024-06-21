@@ -154,12 +154,27 @@ else()
     set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
 endif()
 
+# Check if compiler supports CPU multiarch ###########################
+
+if(WITH_MULTIARCH)
+    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_x86_popcnt.cmake")
+    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
+
+    if(multiarch_x86_popcnt OR multiarch_avx512_vpopcnt)
+        set(LIB_SRC ${LIB_SRC} src/x86/cpuid.cpp)
+    endif()
+
+    if(NOT multiarch_avx512_vpopcnt)
+        include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
+    endif()
+endif()
+
 # On x86 CPUs compile cpuid.cpp ######################################
 
 include("${PROJECT_SOURCE_DIR}/cmake/x86_cpuid.cmake")
 
 if(x86_cpuid)
-    set(LIB_SRC ${LIB_SRC} src/arch/x86/cpuid.cpp)
+    set(LIB_SRC ${LIB_SRC} src/x86/cpuid.cpp)
 endif()
 
 # Enable __float128 support (requires libquadmath) ###################
@@ -195,15 +210,6 @@ include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp11.cmake")
 # Check if int128_t is supported #####################################
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
-
-# Check if compiler supports x64 multiarch ###########################
-
-if(WITH_MULTIARCH)
-    include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
-    if(NOT multiarch_avx512_vpopcnt)
-        include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
-    endif()
-endif()
 
 # Check for OpenMP ###################################################
 

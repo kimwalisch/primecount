@@ -31,7 +31,7 @@
 #define XSTATE_YMM (1 << 2)
 #define XSTATE_ZMM (7 << 5)
 
-namespace primecount {
+namespace {
 
 void run_cpuid(int eax, int ecx, int* abcd)
 {
@@ -66,13 +66,6 @@ void run_cpuid(int eax, int ecx, int* abcd)
 #endif
 }
 
-bool has_cpuid_popcnt()
-{
-  int abcd[4];
-  run_cpuid(1, 0, abcd);
-  return (abcd[2] & bit_POPCNT) == bit_POPCNT;
-}
-
 // Get Value of Extended Control Register
 uint64_t get_xcr0()
 {
@@ -85,6 +78,17 @@ uint64_t get_xcr0()
   asm volatile("xgetbv" : "=a"(eax), "=d"(edx) : "c"(0));
   return eax | (uint64_t(edx) << 32);
 #endif
+}
+
+} // namespace
+
+namespace primecount {
+
+bool has_cpuid_popcnt()
+{
+  int abcd[4];
+  run_cpuid(1, 0, abcd);
+  return (abcd[2] & bit_POPCNT) == bit_POPCNT;
 }
 
 bool has_cpuid_avx512_bmi2()
