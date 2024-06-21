@@ -17,7 +17,7 @@ check_cxx_source_compiles("
         primecount::run_cpuid(1, 0, abcd);
         int ecx = abcd[2];
 
-        if (ecx & (1 << 23)) == (1 << 23))
+        if (ecx & (1 << 23) == (1 << 23))
             std::cout << \"CPU supports POPCNT!\" << std::endl;
         else
             std::cout << \"CPU does not support POPCNT!\" << std::endl;
