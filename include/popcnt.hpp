@@ -51,7 +51,7 @@ inline uint64_t popcnt64_bitwise(uint64_t x)
 
 namespace {
 
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
   // On my AMD EPYC 7642 CPU using GCC 12 this runtime
   // check incurs an overall overhead of about 1%.
@@ -76,7 +76,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
   if (cpu_supports_popcnt)
   {
@@ -104,7 +104,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
 #if __cplusplus >= 201703L
   if constexpr(sizeof(int) >= sizeof(uint64_t))
@@ -130,7 +130,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
 #if defined(HAS_POPCNT)
   return __popcnt64(x);
@@ -154,7 +154,7 @@ inline uint64_t popcnt64(uint64_t x)
 
 namespace {
 
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
 #if defined(HAS_POPCNT)
   return __popcnt(uint32_t(x)) +
@@ -181,7 +181,7 @@ namespace {
 /// We only use the C++ standard library as a fallback if there
 /// are no compiler intrinsics available for POPCNT.
 /// Compiler intrinsics often generate faster assembly.
-inline uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
   return std::popcount(x);
 }
