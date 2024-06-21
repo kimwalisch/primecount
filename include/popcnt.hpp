@@ -134,7 +134,7 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(HAS_POPCNT)
+#if defined(__AVX__)
   return __popcnt64(x);
 #elif defined(ENABLE_MULTIARCH_x86_POPCNT)
   if_likely(cpu_supports_popcnt)
@@ -158,7 +158,7 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(HAS_POPCNT)
+#if defined(__AVX__)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
 #elif defined(ENABLE_MULTIARCH_x86_POPCNT)
