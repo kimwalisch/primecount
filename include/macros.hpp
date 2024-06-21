@@ -50,7 +50,7 @@
 #elif defined(_MSC_VER)
   #define ALWAYS_INLINE __forceinline
 #else
-  #define ALWAYS_INLINE
+  #define ALWAYS_INLINE inline
 #endif
 
 #if __has_attribute(noinline)
