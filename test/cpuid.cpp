@@ -46,24 +46,24 @@ int main()
   #endif
 
   #if defined(HAS_POPCNT)
-    #if !defined(ENABLE_CPUID_POPCNT)
-      std::cout << "OK: HAS_POPCNT is defined but ENABLE_CPUID_POPCNT is not defined!" << std::endl;
+    #if !defined(ENABLE_MULTIARCH_x86_POPCNT)
+      std::cout << "OK: HAS_POPCNT is defined but ENABLE_MULTIARCH_x86_POPCNT is not defined!" << std::endl;
     #else
-      std::cerr << "Error: ENABLE_CPUID_POPCNT must not be defined if HAS_POPCNT is defined!" << std::endl;
+      std::cerr << "Error: ENABLE_MULTIARCH_x86_POPCNT must not be defined if HAS_POPCNT is defined!" << std::endl;
       return 1;
     #endif
   #endif
 
   #if !defined(HAS_POPCNT)
-    #if defined(ENABLE_CPUID_POPCNT)
-      std::cout << "OK: HAS_POPCNT is not defined but ENABLE_CPUID_POPCNT is defined!" << std::endl;
+    #if defined(ENABLE_MULTIARCH_x86_POPCNT)
+      std::cout << "OK: HAS_POPCNT is not defined but ENABLE_MULTIARCH_x86_POPCNT is defined!" << std::endl;
     #else
-      std::cerr << "Error: ENABLE_CPUID_POPCNT must be defined if HAS_POPCNT is not defined!" << std::endl;
+      std::cerr << "Error: ENABLE_MULTIARCH_x86_POPCNT must be defined if HAS_POPCNT is not defined!" << std::endl;
       return 1;
     #endif
   #endif
 
-  #if defined(ENABLE_CPUID_POPCNT)
+  #if defined(ENABLE_MULTIARCH_x86_POPCNT)
     std::cout << "CPU supports POPCNT: " << (cpu_supports_popcnt ? "yes" : "no") << std::endl;
   #endif
 

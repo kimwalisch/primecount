@@ -34,7 +34,7 @@
 #endif
 
 #if !defined(HAS_POPCNT)
-#define ENABLE_CPUID_POPCNT
+#define ENABLE_MULTIARCH_x86_POPCNT
 
 namespace primecount {
 
