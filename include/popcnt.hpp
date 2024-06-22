@@ -1,7 +1,7 @@
 ///
 /// @file  popcnt.hpp
 /// @brief Functions to count the number of 1 bits inside
-///        an array or a 64-bit word.
+///        a 64-bit variable.
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
