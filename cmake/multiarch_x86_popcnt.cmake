@@ -47,7 +47,7 @@ check_cxx_source_compiles("
 " multiarch_x86_popcnt)
 
 if(multiarch_x86_popcnt)
-    set(ENABLE_MULTIARCH "${ENABLE_MULTIARCH} ENABLE_MULTIARCH_x86_POPCNT")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_x86_POPCNT")
 endif()
 
 cmake_pop_check_state()

@@ -91,7 +91,7 @@ if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(ENABLE_ASSERT "ENABLE_ASSERT")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_ASSERT")
 endif()
 
 # primecount binary source files #####################################
@@ -173,7 +173,7 @@ endif()
 
 if(WITH_FLOAT128)
     set(LIB_QUADMATH "quadmath")
-    set(HAVE_FLOAT128 "HAVE_FLOAT128")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_FLOAT128")
 endif()
 
 # Use 32-bit integer division ########################################
@@ -183,7 +183,7 @@ endif()
 # division. On most CPUs before 2020 this significantly
 # improves performance.
 if(WITH_DIV32)
-    set(ENABLE_DIV32 "ENABLE_DIV32")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_DIV32")
 endif()
 
 # Use -Wno-uninitialized with GCC compiler ###########################
@@ -252,7 +252,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH}" "${ENABLE_INT128_OPENMP_PATCH}")
+    target_compile_definitions(libprimecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     target_compile_features(libprimecount
@@ -277,7 +277,7 @@ if(BUILD_STATIC_LIBS)
     add_library(libprimecount-static STATIC ${LIB_SRC})
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
-    target_compile_definitions(libprimecount-static PRIVATE "${HAVE_FLOAT128}" "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_MULTIARCH}" "${ENABLE_INT128_OPENMP_PATCH}")
+    target_compile_definitions(libprimecount-static PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
 
     if(WITH_MSVC_CRT_STATIC)
@@ -313,7 +313,7 @@ endif()
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
-    target_compile_definitions(primecount PRIVATE "${DISABLE_INT128}" "${ENABLE_DIV32}" "${ENABLE_ASSERT}" "${ENABLE_INT128_OPENMP_PATCH}")
+    target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 

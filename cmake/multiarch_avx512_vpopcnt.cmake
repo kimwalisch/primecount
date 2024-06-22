@@ -75,7 +75,7 @@ check_cxx_source_compiles("
 " multiarch_avx512_vpopcnt)
 
 if(multiarch_avx512_vpopcnt)
-    set(ENABLE_MULTIARCH "${ENABLE_MULTIARCH} ENABLE_MULTIARCH_AVX512_BMI2")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_AVX512_BMI2")
 endif()
 
 cmake_pop_check_state()
