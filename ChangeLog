@@ -1,9 +1,12 @@
-Changes in primecount-7.14, 2024-06-20
+Changes in primecount-7.14, 2024-06-22
 
+* Move x86 cpuid code from cpuid.hpp to src/x86/cpuid.cpp.
 * int128_t.hpp: Rename namespace port to pstd (portable std namespace).
-* popcnt.hpp: Improve GCC performance on x86 CPUs.
 * Sieve.hpp: Tune AVX512 code.
+* cpu_supports_popcnt.hpp: Simplify, move preprocessor checks to new multiarch_x86_popcnt.cmake.
 * multiarch_avx512_vpopcnt.cmake: Tune AVX512 code.
+* multiarch_x86_popcnt.cmake: Detect x86 POPCNT.
+* CMakeLists.txt: Use CMake list for all compile time definitions.
 
 Changes in primecount-7.13, 2024-04-15
 

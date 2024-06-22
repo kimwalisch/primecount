@@ -7,7 +7,7 @@ include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
 cmake_push_check_state()
-set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
+set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}")
 
 check_cxx_source_compiles("
     // GCC/Clang function multiversioning for AVX512 is not needed if
@@ -20,7 +20,7 @@ check_cxx_source_compiles("
       Error: AVX512 BMI2 multiarch not needed!
     #endif
 
-    #include <cpu_supports_avx512_bmi2.hpp>
+    #include <src/x86/cpuid.cpp>
     #include <immintrin.h>
     #include <stdint.h>
 
@@ -65,7 +65,7 @@ check_cxx_source_compiles("
         uint64_t cnt = 0;
         Sieve sieve;
 
-        if (cpu_supports_avx512_bmi2)
+        if (primecount::has_cpuid_avx512_bmi2())
             cnt = sieve.count_avx512_bmi2(&array[0], 10);
         else
             cnt = sieve.count_default(&array[0], 10);
@@ -75,7 +75,7 @@ check_cxx_source_compiles("
 " multiarch_avx512_vpopcnt)
 
 if(multiarch_avx512_vpopcnt)
-    set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_AVX512_BMI2")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_AVX512_BMI2")
 endif()
 
 cmake_pop_check_state()

@@ -12,10 +12,12 @@
 #ifndef POPCNT_HPP
 #define POPCNT_HPP
 
-#include <cpu_supports_popcnt.hpp>
 #include <macros.hpp>
-
 #include <stdint.h>
+
+#if defined(ENABLE_MULTIARCH_x86_POPCNT)
+  #include <cpu_supports_popcnt.hpp>
+#endif
 
 namespace {
 
@@ -46,7 +48,7 @@ inline uint64_t popcnt64_bitwise(uint64_t x)
 
 // CPUID is only enabled on x86 and x86-64 CPUs
 // if the user compiles without -mpopcnt.
-#if defined(ENABLE_CPUID_POPCNT)
+#if defined(ENABLE_MULTIARCH_x86_POPCNT)
 #if defined(__x86_64__)
 
 namespace {
@@ -132,13 +134,16 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(HAS_POPCNT)
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
   return __popcnt64(x);
-#elif defined(ENABLE_CPUID_POPCNT)
+
+#elif defined(ENABLE_MULTIARCH_x86_POPCNT)
   if_likely(cpu_supports_popcnt)
     return __popcnt64(x);
   else
     return popcnt64_bitwise(x);
+
 #else
   return popcnt64_bitwise(x);
 #endif
@@ -156,15 +161,18 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(HAS_POPCNT)
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
-#elif defined(ENABLE_CPUID_POPCNT)
+
+#elif defined(ENABLE_MULTIARCH_x86_POPCNT)
   if_likely(cpu_supports_popcnt)
     return __popcnt(uint32_t(x)) +
            __popcnt(uint32_t(x >> 32));
   else
     return popcnt64_bitwise(x);
+
 #else
   return popcnt64_bitwise(x);
 #endif

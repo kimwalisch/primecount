@@ -72,7 +72,7 @@ check_cxx_source_compiles("
 " multiarch_arm_sve)
 
 if(multiarch_arm_sve)
-    set(ENABLE_MULTIARCH "ENABLE_MULTIARCH_ARM_SVE")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_MULTIARCH_ARM_SVE")
 endif()
 
 cmake_pop_check_state()
