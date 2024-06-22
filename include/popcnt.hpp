@@ -134,13 +134,16 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(__AVX__)
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
   return __popcnt64(x);
+
 #elif defined(ENABLE_MULTIARCH_x86_POPCNT)
   if_likely(cpu_supports_popcnt)
     return __popcnt64(x);
   else
     return popcnt64_bitwise(x);
+
 #else
   return popcnt64_bitwise(x);
 #endif
@@ -158,15 +161,18 @@ namespace {
 
 ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-#if defined(__AVX__)
+#if defined(__POPCNT__) || \
+    defined(__AVX__)
   return __popcnt(uint32_t(x)) +
          __popcnt(uint32_t(x >> 32));
+
 #elif defined(ENABLE_MULTIARCH_x86_POPCNT)
   if_likely(cpu_supports_popcnt)
     return __popcnt(uint32_t(x)) +
            __popcnt(uint32_t(x >> 32));
   else
     return popcnt64_bitwise(x);
+
 #else
   return popcnt64_bitwise(x);
 #endif

@@ -25,7 +25,9 @@ int main()
     std::cerr << "Error: ENABLE_MULTIARCH_x86_POPCNT must not be defined if __POPCNT__ is defined!" << std::endl;
   #endif
 
-  #if defined(_MSC_VER)
+  #if defined(_MSC_VER) && \
+     !defined(__POPCNT__)
+
     #if defined(__AVX__) && defined(ENABLE_MULTIARCH_x86_POPCNT)
       std::cerr << "Error: ENABLE_MULTIARCH_x86_POPCNT must not be defined if __AVX__ is defined!" << std::endl;
     #endif
