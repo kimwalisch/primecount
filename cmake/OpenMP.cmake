@@ -90,10 +90,12 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
                 return 0;
             }" OpenMP_with_libatomic)
 
-        if(NOT OpenMP_with_libatomic)
+        if(OpenMP_with_libatomic)
+            list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
+        else()
             set(LIB_ATOMIC "")
 
-            if (NOT DISABLE_INT128)
+            if(NOT DISABLE_INT128)
                 # As a last resort check if OpenMP supports int128_t if
                 # we include our <int128_OpenMP_patch.hpp> header.
                 # In this case OpenMP will use critical sections instead
@@ -129,7 +131,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
     # OpenMP has been tested successfully, enable it
     if(OpenMP OR OpenMP_with_libatomic OR OpenMP_int128_patch)
         if(TARGET OpenMP::OpenMP_CXX)
-            set(LIB_OPENMP "OpenMP::OpenMP_CXX")
+            list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
         else()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         endif()

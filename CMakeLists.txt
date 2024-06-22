@@ -172,7 +172,7 @@ endif()
 # Enable __float128 support (requires libquadmath) ###################
 
 if(WITH_FLOAT128)
-    set(LIB_QUADMATH "quadmath")
+    list(APPEND PRIMECOUNT_LINK_LIBRARIES "quadmath")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_FLOAT128")
 endif()
 
@@ -253,7 +253,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
-    target_link_libraries(libprimecount PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
 
     target_compile_features(libprimecount
     PRIVATE
@@ -278,7 +278,7 @@ if(BUILD_STATIC_LIBS)
     set_target_properties(libprimecount-static PROPERTIES OUTPUT_NAME primecount)
     target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount-static PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
-    target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve "${LIB_OPENMP}" "${LIB_QUADMATH}" "${LIB_ATOMIC}")
+    target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
 
     if(WITH_MSVC_CRT_STATIC)
         set_target_properties(libprimecount-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
