@@ -79,6 +79,21 @@ public:
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t get_segment_size(uint64_t size);
 
+  uint64_t get_total_count() const
+  {
+    return total_count_;
+  }
+
+  template <typename T>
+  void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  {
+    reset_sieve(low, high);
+    for (uint64_t i = 4; i <= c; i++)
+      cross_off(primes[i], i);
+
+    init_counter(low, high);
+  }
+
   /// Count 1 bits inside [0, stop]
   ALWAYS_INLINE uint64_t count(uint64_t stop)
   {
@@ -123,21 +138,6 @@ public:
     #else
       return count_default(start, stop);
     #endif
-  }
-
-  template <typename T>
-  void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
-  {
-    reset_sieve(low, high);
-    for (uint64_t i = 4; i <= c; i++)
-      cross_off(primes[i], i);
-
-    init_counter(low, high);
-  }
-
-  uint64_t get_total_count() const
-  {
-    return total_count_;
   }
 
 private:
