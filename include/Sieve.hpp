@@ -266,7 +266,7 @@ private:
       do {
         svuint64_t vec = svld1_u64(pg, &sieve64[i]);
         vec = svcnt_u64_z(pg, vec);
-        vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);
+        vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
         i += svcntd();
         pg = svwhilelt_b64(i, stop_idx);
       }
