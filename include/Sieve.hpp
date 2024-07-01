@@ -130,17 +130,17 @@ public:
     if (start > stop)
       return 0;
 
-    #if defined(ENABLE_ARM_SVE)
-      return count_arm_sve(start, stop);
-    #elif defined(ENABLE_AVX512_BMI2)
-      return count_avx512_bmi2(start, stop);
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
-    #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
-      return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
-    #else
-      return count_default(start, stop);
-    #endif
+  #if defined(ENABLE_ARM_SVE)
+    return count_arm_sve(start, stop);
+  #elif defined(ENABLE_AVX512_BMI2)
+    return count_avx512_bmi2(start, stop);
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
+  #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+    return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
+  #else
+    return count_default(start, stop);
+  #endif
   }
 
 private:
