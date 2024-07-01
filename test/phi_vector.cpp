@@ -3,7 +3,7 @@
 /// @brief Test that phi_vector(x, a) and phi(x, a)
 ///        results are identical
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,7 @@
 
 #include <primecount.hpp>
 #include <generate.hpp>
+#include <imath.hpp>
 #include <phi_vector.hpp>
 #include <PiTable.hpp>
 
