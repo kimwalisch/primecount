@@ -127,6 +127,9 @@ public:
   /// Count 1 bits inside [start, stop]
   ALWAYS_INLINE uint64_t count(uint64_t start, uint64_t stop) const
   {
+    if (start > stop)
+      return 0;
+
     #if defined(ENABLE_ARM_SVE)
       return count_arm_sve(start, stop);
     #elif defined(ENABLE_AVX512_BMI2)
@@ -151,9 +154,7 @@ private:
   ///
   uint64_t count_default(uint64_t start, uint64_t stop) const
   {
-    if (start > stop)
-      return 0;
-
+    ASSERT(start <= stop);
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
@@ -188,9 +189,7 @@ private:
   #endif
   uint64_t count_avx512_bmi2(uint64_t start, uint64_t stop) const
   {
-    if (start > stop)
-      return 0;
-
+    ASSERT(start <= stop);
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
@@ -241,9 +240,7 @@ private:
   #endif
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const
   {
-    if (start > stop)
-      return 0;
-
+    ASSERT(start <= stop);
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
