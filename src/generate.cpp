@@ -8,9 +8,9 @@
 ///
 
 #include <generate.hpp>
-#include <primesieve.hpp>
 #include <int128_t.hpp>
 #include <isqrt.hpp>
+#include <primesieve.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
