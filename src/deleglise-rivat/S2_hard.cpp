@@ -30,7 +30,7 @@
 #include <Sieve.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <generate_phi.hpp>
+#include <phi_vector.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <LoadBalancerS2.hpp>
@@ -83,7 +83,7 @@ T S2_hard_thread(T x,
   if (min_b > max_b)
     return 0;
 
-  auto phi = generate_phi(low, max_b, primes, pi);
+  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
@@ -254,7 +254,7 @@ int64_t S2_hard(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
-  auto primes = generate_primes<int32_t>(max_prime);
+  auto primes = generate_primes<uint32_t>(max_prime);
   int64_t sum = S2_hard_OpenMP(x, y, z, c, s2_hard_approx, primes, factor, threads, is_print);
 
   if (is_print)

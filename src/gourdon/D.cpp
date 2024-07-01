@@ -28,7 +28,7 @@
 #include <LoadBalancerS2.hpp>
 #include <fast_div.hpp>
 #include <generate.hpp>
-#include <generate_phi.hpp>
+#include <phi_vector.hpp>
 #include <gourdon.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -72,7 +72,7 @@ T D_thread(T x,
   if (min_b > max_b)
     return 0;
 
-  auto phi = generate_phi(low, max_b, primes, pi);
+  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
@@ -247,7 +247,7 @@ int64_t D(int64_t x,
   }
 
   FactorTableD<uint16_t> factor(y, z, threads);
-  auto primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<uint32_t>(y);
   int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
 
   if (is_print)
