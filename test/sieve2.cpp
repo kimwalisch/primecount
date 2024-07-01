@@ -40,7 +40,7 @@ int main()
   int low = 0;
   int high = dist(gen);
 
-  auto primes = generate_primes<int>(isqrt(high));
+  auto primes = generate_primes<int32_t>(isqrt(high));
   auto segment_size = Sieve::get_segment_size(high - low);
 
   Sieve sieve(low, segment_size, primes.size());

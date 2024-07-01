@@ -34,7 +34,7 @@ int main()
 
   auto max = dist(gen);
   auto lpf = generate_lpf(max);
-  auto primes = generate_primes<int>(max);
+  auto primes = generate_primes<int32_t>(max);
 
   for (int i = 2; i <= max; i++)
   {
