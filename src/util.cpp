@@ -15,6 +15,7 @@
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
+#include <min.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -22,9 +23,6 @@
 #include <string>
 #include <stdint.h>
 #include <utility>
-
-using std::min;
-using std::max;
 
 namespace {
 
@@ -432,7 +430,7 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
   // numbers below 10^6.
   x_star = min(x_star, y);
   x_star = min(x_star, sqrt_xy);
-  x_star = max(x_star, (int64_t) 1);
+  x_star = max(x_star, 1);
 
   return x_star;
 }

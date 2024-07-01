@@ -4,7 +4,7 @@
 ///         S2_easy(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,6 +16,7 @@
 #include <PiTable.hpp>
 #include <generate.hpp>
 #include <imath.hpp>
+#include <min.hpp>
 #include <S.hpp>
 
 #include <stdint.h>
@@ -25,8 +26,6 @@
 #include <vector>
 #include <random>
 
-using std::min;
-using std::max;
 using namespace primecount;
 
 void check(bool OK)

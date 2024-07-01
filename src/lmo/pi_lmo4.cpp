@@ -11,15 +11,16 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount-internal.hpp>
-#include <imath.hpp>
 #include <generate.hpp>
+#include <imath.hpp>
+#include <min.hpp>
 #include <PhiTiny.hpp>
 #include <Vector.hpp>
 #include <BinaryIndexedTree.hpp>
@@ -28,8 +29,6 @@
 #include <stdint.h>
 #include <algorithm>
 
-using std::min;
-using std::max;
 using namespace primecount;
 
 namespace {
