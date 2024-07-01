@@ -121,6 +121,7 @@ set(LIB_SRC src/api.cpp
             src/generate.cpp
             src/nth_prime.cpp
             src/phi.cpp
+            src/phi_vector.cpp
             src/pi_legendre.cpp
             src/pi_lehmer.cpp
             src/pi_meissel.cpp

@@ -1,5 +1,5 @@
 ///
-/// @file  generate_phi.hpp
+/// @file  phi_vector.cpp
 /// @brief The PhiCache class calculates the partial sieve function
 ///        (a.k.a. Legendre-sum) using the recursive formula:
 ///        phi(x, a) = phi(x, a - 1) - phi(x / primes[a], a - 1).
@@ -22,9 +22,7 @@
 /// file in the top level directory.
 ///
 
-#ifndef GENERATE_PHI_HPP
-#define GENERATE_PHI_HPP
-
+#include <phi_vector.hpp>
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
 #include <fast_div.hpp>
@@ -40,7 +38,9 @@
 #include <algorithm>
 #include <utility>
 
-namespace primecount {
+namespace {
+
+using namespace primecount;
 
 template <typename Primes>
 class PhiCache : public BitSieve240
@@ -300,10 +300,10 @@ private:
 /// divisible by any of the first a primes.
 ///
 template <typename Primes>
-NOINLINE Vector<int64_t> generate_phi(int64_t x,
-                                      int64_t a,
-                                      const Primes& primes,
-                                      const PiTable& pi)
+Vector<int64_t> phi_vector(int64_t x,
+                           int64_t a,
+                           const Primes& primes,
+                           const PiTable& pi)
 {
   int64_t size = a + 1;
   Vector<int64_t> phi(size);
@@ -337,4 +337,32 @@ NOINLINE Vector<int64_t> generate_phi(int64_t x,
 
 } // namespace
 
-#endif
+namespace primecount {
+
+/// Returns a vector with phi(x, i - 1) values such that
+/// phi[i] = phi(x, i - 1) for 1 <= i <= a.
+/// phi(x, a) counts the numbers <= x that are not
+/// divisible by any of the first a primes.
+///
+Vector<int64_t> phi_vector(int64_t x,
+                           int64_t a,
+                           const Vector<uint32_t>& primes,
+                           const PiTable& pi)
+{
+  return ::phi_vector(x, a, primes, pi);
+}
+
+/// Returns a vector with phi(x, i - 1) values such that
+/// phi[i] = phi(x, i - 1) for 1 <= i <= a.
+/// phi(x, a) counts the numbers <= x that are not
+/// divisible by any of the first a primes.
+///
+Vector<int64_t> phi_vector(int64_t x,
+                           int64_t a,
+                           const Vector<int64_t>& primes,
+                           const PiTable& pi)
+{
+  return ::phi_vector(x, a, primes, pi);
+}
+
+} // namespace

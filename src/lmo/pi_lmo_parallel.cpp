@@ -27,7 +27,7 @@
 #include <primecount-internal.hpp>
 #include <Sieve.hpp>
 #include <generate.hpp>
-#include <generate_phi.hpp>
+#include <phi_vector.hpp>
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>
 #include <imath.hpp>
@@ -51,7 +51,7 @@ int64_t S2_thread(int64_t x,
                   int64_t z,
                   int64_t c,
                   const PiTable& pi,
-                  const Vector<int32_t>& primes,
+                  const Vector<uint32_t>& primes,
                   const Vector<int32_t>& lpf,
                   const Vector<int32_t>& mu,
                   ThreadData& thread)
@@ -70,7 +70,7 @@ int64_t S2_thread(int64_t x,
   if (min_b > max_b)
     return 0;
 
-  auto phi = generate_phi(low, max_b, primes, pi);
+  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
@@ -168,7 +168,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            int64_t s2_approx,
-           const Vector<int32_t>& primes,
+           const Vector<uint32_t>& primes,
            const Vector<int32_t>& lpf,
            const Vector<int32_t>& mu,
            int threads,
@@ -242,7 +242,7 @@ int64_t pi_lmo_parallel(int64_t x,
     print(x, y, z, c, threads);
   }
 
-  auto primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<uint32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 
