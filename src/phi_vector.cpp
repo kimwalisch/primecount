@@ -38,9 +38,9 @@
 #include <algorithm>
 #include <utility>
 
-namespace {
-
 using namespace primecount;
+
+namespace {
 
 template <typename Primes>
 class PhiCache : public BitSieve240
