@@ -10,13 +10,74 @@
 #include <generate.hpp>
 #include <int128_t.hpp>
 #include <isqrt.hpp>
+#include <primesieve.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
 
 namespace primecount {
 
-/// Generate a vector with the prime counts <= max
+/// Returns a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<int32_t> generate_primes_i32(int64_t max)
+{
+  Vector<int32_t> primes;
+  primes.resize(1);
+  primes[0] = 0;
+  primesieve::generate_primes(max, &primes);
+  return primes;
+}
+
+/// Returns a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<uint32_t> generate_primes_u32(int64_t max)
+{
+  Vector<uint32_t> primes;
+  primes.resize(1);
+  primes[0] = 0;
+  primesieve::generate_primes(max, &primes);
+  return primes;
+}
+
+/// Returns a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<int64_t> generate_primes_i64(int64_t max)
+{
+  Vector<int64_t> primes;
+  primes.resize(1);
+  primes[0] = 0;
+  primesieve::generate_primes(max, &primes);
+  return primes;
+}
+
+/// Returns a vector with the primes <= max.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<uint64_t> generate_primes_u64(int64_t max)
+{
+  Vector<uint64_t> primes;
+  primes.resize(1);
+  primes[0] = 0;
+  primesieve::generate_primes(max, &primes);
+  return primes;
+}
+
+/// Returns a vector with the first n primes.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+//
+Vector<int32_t> generate_n_primes_i32(int64_t n)
+{
+  Vector<int32_t> primes;
+  primes.reserve(n + 1);
+  primes.push_back(0);
+  primesieve::generate_n_primes(n, &primes);
+  return primes;
+}
+
+/// Returns a vector with the prime counts <= max
 /// using the sieve of Eratosthenes
 ///
 Vector<int32_t> generate_pi(int64_t max)
@@ -44,7 +105,7 @@ Vector<int32_t> generate_pi(int64_t max)
   return pi;
 }
 
-/// Generate a vector with Möbius function values.
+/// Returns a vector with Möbius function values.
 /// This implementation is based on code by Rick Sladkey:
 /// https://mathoverflow.net/q/99545
 ///
@@ -81,7 +142,7 @@ Vector<int32_t> generate_moebius(int64_t max)
   return mu;
 }
 
-/// Generate a vector with the least prime factors
+/// Returns a vector with the least prime factors
 /// of the integers <= max.
 /// @Examples: lfp(2) = 2, lpf(15) = 3
 ///
@@ -116,7 +177,7 @@ Vector<int32_t> generate_lpf(int64_t max)
   return lpf;
 }
 
-/// Generate a vector with the largest prime factors
+/// Returns a vector with the largest prime factors
 /// of the integers <= max.
 /// @Examples: mfp(2) = 2, mpf(15) = 5
 ///

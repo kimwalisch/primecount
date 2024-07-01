@@ -50,7 +50,7 @@ int main()
   int64_t size = dist(gen);
   int64_t x = size - 1;
 
-  auto primes = generate_n_primes<int>(max_a);
+  auto primes = generate_n_primes<int32_t>(max_a);
   std::vector<char> sieve(size, 1);
 
   for (int a = 1; a <= max_a; a++)

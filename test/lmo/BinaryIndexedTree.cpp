@@ -41,7 +41,7 @@ int main()
   int size = dist(gen);
   size = next_power_of_2(size);
 
-  auto primes = generate_primes<int>(isqrt(size));
+  auto primes = generate_primes<int32_t>(isqrt(size));
   std::vector<int> sieve(size, 1);
   BinaryIndexedTree tree;
 
