@@ -127,20 +127,17 @@ public:
   /// Count 1 bits inside [start, stop]
   ALWAYS_INLINE uint64_t count(uint64_t start, uint64_t stop) const
   {
-    if (start > stop)
-      return 0;
-
-  #if defined(ENABLE_ARM_SVE)
-    return count_arm_sve(start, stop);
-  #elif defined(ENABLE_AVX512_BMI2)
-    return count_avx512_bmi2(start, stop);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
-  #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
-    return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
-  #else
-    return count_default(start, stop);
-  #endif
+    #if defined(ENABLE_ARM_SVE)
+      return count_arm_sve(start, stop);
+    #elif defined(ENABLE_AVX512_BMI2)
+      return count_avx512_bmi2(start, stop);
+    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+      return cpu_supports_sve ? count_arm_sve(start, stop) : count_default(start, stop);
+    #elif defined(ENABLE_MULTIARCH_AVX512_BMI2)
+      return cpu_supports_avx512_bmi2 ? count_avx512_bmi2(start, stop) : count_default(start, stop);
+    #else
+      return count_default(start, stop);
+    #endif
   }
 
 private:
@@ -154,7 +151,9 @@ private:
   ///
   uint64_t count_default(uint64_t start, uint64_t stop) const
   {
-    ASSERT(start <= stop);
+    if (start > stop)
+      return 0;
+
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
@@ -189,7 +188,9 @@ private:
   #endif
   uint64_t count_avx512_bmi2(uint64_t start, uint64_t stop) const
   {
-    ASSERT(start <= stop);
+    if (start > stop)
+      return 0;
+
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
@@ -240,7 +241,9 @@ private:
   #endif
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const
   {
-    ASSERT(start <= stop);
+    if (start > stop)
+      return 0;
+
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
