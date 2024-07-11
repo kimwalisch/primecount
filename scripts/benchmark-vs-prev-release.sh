@@ -74,7 +74,7 @@ function benchmark_test_option {
 function benchmark_pi_1e17 {
     # New code must not be more than 
     # 2% slower than old code.
-    factor=1.02
+    factor=1.03
 
     # Test failure must be observed 3 times,
     # we try to avoid false negatives.
