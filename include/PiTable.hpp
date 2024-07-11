@@ -46,7 +46,7 @@ public:
   {
     ASSERT(x <= max_x_);
 
-    if_unlikely(x < pi_tiny_.size())
+    if (x < pi_tiny_.size())
       return pi_tiny_[x];
 
     uint64_t count = pi_[x / 240].count;
@@ -58,7 +58,7 @@ public:
   /// Get number of primes <= x
   static int64_t pi_cache(uint64_t x)
   {
-    if_unlikely(x < pi_tiny_.size())
+    if (x < pi_tiny_.size())
       return pi_tiny_[x];
 
     uint64_t count = pi_cache_[x / 240].count;

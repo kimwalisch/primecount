@@ -74,7 +74,7 @@ public:
     ASSERT(x >= low_);
     ASSERT(x < high_);
 
-    if_unlikely(x < pi_tiny_.size())
+    if (x < pi_tiny_.size())
       return pi_tiny_[x];
 
     x -= low_;
