@@ -20,7 +20,7 @@ bool has_cpuid_avx512_bmi2();
 namespace {
 
 /// Initialized at startup
-bool cpu_supports_avx512_bmi2 = primecount::has_cpuid_avx512_bmi2();
+const bool cpu_supports_avx512_bmi2 = primecount::has_cpuid_avx512_bmi2();
 
 } // namespace
 

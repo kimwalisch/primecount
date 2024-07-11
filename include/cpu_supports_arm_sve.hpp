@@ -18,7 +18,7 @@
 namespace {
 
 /// Initialized at startup
-bool cpu_supports_sve = __builtin_cpu_supports("sve");
+const bool cpu_supports_sve = __builtin_cpu_supports("sve");
 
 } // namespace
 
