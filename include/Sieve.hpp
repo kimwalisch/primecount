@@ -149,7 +149,7 @@ private:
   /// hence we simply count the number of unsieved elements
   /// by linearly iterating over the sieve array.
   ///
-  uint64_t count_default(uint64_t start, uint64_t stop) const
+  ALWAYS_INLINE uint64_t count_default(uint64_t start, uint64_t stop) const
   {
     if (start > stop)
       return 0;
