@@ -159,16 +159,20 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    uint64_t* sieve64 = (uint64_t*) sieve_.data();
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     if (start_idx == stop_idx)
-      return popcnt64(sieve64[start_idx] & (m1 & m2));
+      return popcnt64(sieve64[start_idx] & m1 & m2);
     else
     {
-      uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
+      uint64_t start_bits = sieve64[start_idx] & m1;
+      uint64_t stop_bits = sieve64[stop_idx] & m2;
+      uint64_t cnt = popcnt64(start_bits);
+      cnt += popcnt64(stop_bits);
+
       for (uint64_t i = start_idx + 1; i < stop_idx; i++)
         cnt += popcnt64(sieve64[i]);
-      cnt += popcnt64(sieve64[stop_idx] & m2);
+
       return cnt;
     }
   }
@@ -196,10 +200,10 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    uint64_t* sieve64 = (uint64_t*) sieve_.data();
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     if (start_idx == stop_idx)
-      return popcnt64(sieve64[start_idx] & (m1 & m2));
+      return popcnt64(sieve64[start_idx] & m1 & m2);
     else
     {
       uint64_t i = start_idx + 1;
@@ -248,14 +252,17 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    uint64_t* sieve64 = (uint64_t*) sieve_.data();
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     if (start_idx == stop_idx)
-      return popcnt64(sieve64[start_idx] & (m1 & m2));
+      return popcnt64(sieve64[start_idx] & m1 & m2);
     else
     {
       uint64_t i = start_idx + 1;
-      uint64_t cnt = popcnt64(sieve64[start_idx] & m1);
+      uint64_t start_bits = sieve64[start_idx] & m1;
+      uint64_t stop_bits = sieve64[stop_idx] & m2;
+      uint64_t cnt = popcnt64(start_bits);
+      cnt += popcnt64(stop_bits);
       svbool_t pg = svwhilelt_b64(i, stop_idx);
       svuint64_t vcnt = svdup_u64(0);
 
@@ -270,9 +277,8 @@ private:
         pg = svwhilelt_b64(i, stop_idx);
       }
       while (svptest_any(svptrue_b64(), pg));
-
       cnt += svaddv_u64(svptrue_b64(), vcnt);
-      cnt += popcnt64(sieve64[stop_idx] & m2);
+
       return cnt;
     }
   }
