@@ -263,20 +263,19 @@ private:
       uint64_t stop_bits = sieve64[stop_idx] & m2;
       uint64_t cnt = popcnt64(start_bits);
       cnt += popcnt64(stop_bits);
-      svbool_t pg = svwhilelt_b64(i, stop_idx);
       svuint64_t vcnt = svdup_u64(0);
 
       // Compute this for loop using ARM SVE.
       // for (i = start_idx + 1; i < stop_idx; i++)
       //   cnt += popcnt64(sieve64[i]);
       do {
+        svbool_t pg = svwhilelt_b64(i, stop_idx);
         svuint64_t vec = svld1_u64(pg, &sieve64[i]);
         vec = svcnt_u64_z(pg, vec);
         vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
         i += svcntd();
-        pg = svwhilelt_b64(i, stop_idx);
       }
-      while (svptest_any(svptrue_b64(), pg));
+      while (i < stop_idx);
       cnt += svaddv_u64(svptrue_b64(), vcnt);
 
       return cnt;
