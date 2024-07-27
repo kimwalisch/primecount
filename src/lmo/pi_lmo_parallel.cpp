@@ -26,7 +26,7 @@
 
 #include <primecount-internal.hpp>
 #include <Sieve.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <phi_vector.hpp>
 #include <LoadBalancerS2.hpp>
 #include <min.hpp>

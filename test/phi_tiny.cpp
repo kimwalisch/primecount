@@ -11,7 +11,7 @@
 ///
 
 #include <PhiTiny.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 
 #include <stdint.h>
 #include <iostream>

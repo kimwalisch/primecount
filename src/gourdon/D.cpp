@@ -27,7 +27,7 @@
 #include <Sieve.hpp>
 #include <LoadBalancerS2.hpp>
 #include <fast_div.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <phi_vector.hpp>
 #include <gourdon.hpp>
 #include <imath.hpp>

@@ -1,5 +1,5 @@
 ///
-/// @file  generate.hpp
+/// @file  generate_primes.hpp
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -7,8 +7,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef GENERATE_HPP
-#define GENERATE_HPP
+#ifndef GENERATE_PRIMES_HPP
+#define GENERATE_PRIMES_HPP
 
 #include <Vector.hpp>
 
@@ -17,7 +17,7 @@
 
 namespace primecount {
 
-/// defined in generate.cpp
+/// defined in generate_primes.cpp
 Vector<int32_t> generate_primes_i32(int64_t max);
 Vector<uint32_t> generate_primes_u32(int64_t max);
 Vector<int64_t> generate_primes_i64(int64_t max);

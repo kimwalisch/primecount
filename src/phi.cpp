@@ -24,7 +24,7 @@
 
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <macros.hpp>

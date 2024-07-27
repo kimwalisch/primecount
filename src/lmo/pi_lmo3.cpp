@@ -16,7 +16,7 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <min.hpp>
 #include <Vector.hpp>

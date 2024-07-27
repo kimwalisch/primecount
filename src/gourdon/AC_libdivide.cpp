@@ -36,7 +36,7 @@
 #include <primecount-internal.hpp>
 #include <LoadBalancerAC.hpp>
 #include <fast_div.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
 #include <libdivide.h>

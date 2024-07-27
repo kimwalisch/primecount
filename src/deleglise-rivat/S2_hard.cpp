@@ -29,7 +29,7 @@
 #include <FactorTable.hpp>
 #include <Sieve.hpp>
 #include <fast_div.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <phi_vector.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>

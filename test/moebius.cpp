@@ -9,7 +9,7 @@
 /// file in the top level directory.
 ///
 
-#include <generate.hpp>
+#include <generate_primes.hpp>
 
 #include <stdint.h>
 #include <iostream>

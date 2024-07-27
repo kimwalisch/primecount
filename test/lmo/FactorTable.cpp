@@ -14,7 +14,7 @@
 #define ENABLE_MU_0_TESTING
 
 #include <FactorTable.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>

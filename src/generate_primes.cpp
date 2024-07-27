@@ -1,5 +1,5 @@
 ///
-/// @file  generate.cpp
+/// @file  generate_primes.cpp
 ///
 /// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -7,7 +7,7 @@
 /// file in the top level directory.
 ///
 
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <isqrt.hpp>
 #include <primesieve.hpp>

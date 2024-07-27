@@ -25,7 +25,7 @@
 
 #include <primecount-internal.hpp>
 #include <Sieve.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>

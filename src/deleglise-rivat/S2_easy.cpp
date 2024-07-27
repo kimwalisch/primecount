@@ -18,7 +18,7 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>

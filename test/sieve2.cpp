@@ -12,7 +12,7 @@
 ///
 
 #include <Sieve.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <imath.hpp>
 
 #include <stdint.h>

@@ -17,7 +17,7 @@
 
 #include <primecount-internal.hpp>
 #include <imath.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <Vector.hpp>
 #include <PhiTiny.hpp>
 #include <S.hpp>

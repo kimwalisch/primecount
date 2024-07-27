@@ -118,7 +118,7 @@ set(LIB_SRC src/api.cpp
             src/LoadBalancerS2.cpp
             src/LogarithmicIntegral.cpp
             src/StatusS2.cpp
-            src/generate.cpp
+            src/generate_primes.cpp
             src/nth_prime.cpp
             src/phi.cpp
             src/phi_vector.cpp

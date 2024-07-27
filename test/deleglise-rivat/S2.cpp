@@ -13,7 +13,7 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
-#include <generate.hpp>
+#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <S.hpp>
 
