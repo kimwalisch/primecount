@@ -1,10 +1,11 @@
-Changes in primecount-7.14, 2024-07-01
+Changes in primecount-7.14, 2024-07-28
 
 * Move x86 cpuid code from cpuid.hpp to src/x86/cpuid.cpp.
-* Move generate.hpp code to src/generate.cpp.
+* Move generate.hpp code to src/generate_primes.cpp.
 * Move generate_phi.hpp code to src/phi_vector.cpp.
 * int128_t.hpp: Rename namespace port to pstd (portable std namespace).
 * Sieve.hpp: Tune AVX512 code.
+* Sieve.hpp: Branchfree bitmask calculation.
 * cpu_supports_popcnt.hpp: Simplify, move preprocessor checks to new multiarch_x86_popcnt.cmake.
 * multiarch_avx512_vpopcnt.cmake: Tune AVX512 code.
 * multiarch_x86_popcnt.cmake: Detect x86 POPCNT.

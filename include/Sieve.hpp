@@ -161,20 +161,21 @@ private:
     uint64_t m2 = unset_larger[stop % 240];
     const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
-    if (start_idx == stop_idx)
-      return popcnt64(sieve64[start_idx] & m1 & m2);
-    else
-    {
-      uint64_t start_bits = sieve64[start_idx] & m1;
-      uint64_t stop_bits = sieve64[stop_idx] & m2;
-      uint64_t cnt = popcnt64(start_bits);
-      cnt += popcnt64(stop_bits);
+    // Branchfree bitmask calculation:
+    // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
+    m1 = (m1 * (start_idx != stop_idx)) | ((m1 & m2) * (start_idx == stop_idx));
+    // m2 = (start_idx != stop_idx) ? m2 : 0;
+    m2 *= (start_idx != stop_idx);
 
-      for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-        cnt += popcnt64(sieve64[i]);
+    uint64_t start_bits = sieve64[start_idx] & m1;
+    uint64_t stop_bits = sieve64[stop_idx] & m2;
+    uint64_t cnt = popcnt64(start_bits);
+    cnt += popcnt64(stop_bits);
 
-      return cnt;
-    }
+    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
+      cnt += popcnt64(sieve64[i]);
+
+    return cnt;
   }
 
 #endif
