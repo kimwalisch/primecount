@@ -157,7 +157,6 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
@@ -165,6 +164,7 @@ private:
     // m2 = (start_idx != stop_idx) ? m2 : 0;
     m2 *= (start_idx != stop_idx);
 
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
     uint64_t stop_bits = sieve64[stop_idx] & m2;
     uint64_t cnt = popcnt64(start_bits);
@@ -199,7 +199,6 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
@@ -207,11 +206,12 @@ private:
     // m2 = (start_idx != stop_idx) ? m2 : 0;
     m2 *= (start_idx != stop_idx);
 
-    uint64_t i = start_idx + 1;
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
     uint64_t stop_bits = sieve64[stop_idx] & m2;
     __m512i vec = _mm512_set_epi64(0, 0, 0, 0, 0, 0, stop_bits, start_bits);
     __m512i vcnt = _mm512_popcnt_epi64(vec);
+    uint64_t i = start_idx + 1;
 
     // Compute this for loop using AVX512.
     // for (i = start_idx + 1; i < stop_idx; i++)
@@ -252,7 +252,6 @@ private:
     uint64_t stop_idx = stop / 240;
     uint64_t m1 = unset_smaller[start % 240];
     uint64_t m2 = unset_larger[stop % 240];
-    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
@@ -260,12 +259,13 @@ private:
     // m2 = (start_idx != stop_idx) ? m2 : 0;
     m2 *= (start_idx != stop_idx);
 
-    uint64_t i = start_idx + 1;
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
     uint64_t stop_bits = sieve64[stop_idx] & m2;
     uint64_t cnt = popcnt64(start_bits);
     cnt += popcnt64(stop_bits);
     svuint64_t vcnt = svdup_u64(0);
+    uint64_t i = start_idx + 1;
 
     // Compute this for loop using ARM SVE.
     // for (i = start_idx + 1; i < stop_idx; i++)
