@@ -19,7 +19,6 @@
 // https://en.wikipedia.org/wiki/CPUID
 
 // %ebx bit flags
-#define bit_BMI2    (1 << 8)
 #define bit_AVX512F (1 << 16)
 
 // %ecx bit flags
@@ -91,7 +90,7 @@ bool has_cpuid_popcnt()
   return (abcd[2] & bit_POPCNT) == bit_POPCNT;
 }
 
-bool has_cpuid_avx512_bmi2()
+bool has_cpuid_avx512_vpopcnt()
 {
   int abcd[4];
 
@@ -116,9 +115,6 @@ bool has_cpuid_avx512_bmi2()
     return false;
 
   run_cpuid(7, 0, abcd);
-
-  if ((abcd[1] & bit_BMI2) != bit_BMI2)
-    return false;
 
   // AVX512F, AVX512VPOPCNTDQ
   return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
