@@ -262,25 +262,26 @@ private:
     const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
     uint64_t stop_bits = sieve64[stop_idx] & m2;
-    uint64_t cnt = popcnt64(start_bits);
-    cnt += popcnt64(stop_bits);
-    svuint64_t vcnt = svdup_u64(0);
+    uint64_t bounds[2] = { start_bits, stop_bits };
+    ASSERT(svcntd() >= 2);
+    svbool_t pg = svwhilelt_b64(0, 2);
+    svuint64_t vec = svld1_u64(pg, &bounds[0]);
+    svuint64_t vcnt = svcnt_u64_z(pg, vec);
     uint64_t i = start_idx + 1;
 
     // Compute this for loop using ARM SVE.
     // for (i = start_idx + 1; i < stop_idx; i++)
     //   cnt += popcnt64(sieve64[i]);
     do {
-      svbool_t pg = svwhilelt_b64(i, stop_idx);
-      svuint64_t vec = svld1_u64(pg, &sieve64[i]);
+      pg = svwhilelt_b64(i, stop_idx);
+      vec = svld1_u64(pg, &sieve64[i]);
       vec = svcnt_u64_z(pg, vec);
       vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
       i += svcntd();
     }
     while (i < stop_idx);
-    cnt += svaddv_u64(svptrue_b64(), vcnt);
 
-    return cnt;
+    return svaddv_u64(svptrue_b64(), vcnt);
   }
 
 #endif
