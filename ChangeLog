@@ -1,5 +1,6 @@
-Changes in primecount-7.14, 2024-07-28
+Changes in primecount-7.14, 2024-07-30
 
+* Fix libdivide.h issue with GCC 15: #76.
 * Move x86 cpuid code from cpuid.hpp to src/x86/cpuid.cpp.
 * Move generate.hpp code to src/generate_primes.cpp.
 * Move generate_phi.hpp code to src/phi_vector.cpp.
