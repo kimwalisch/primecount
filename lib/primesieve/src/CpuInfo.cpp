@@ -201,6 +201,14 @@ void CpuInfo::init()
 
         if (cacheInfo.size() <= cpuCoreId)
           cacheInfo.resize((cpuCoreId + 1) * 2);
+
+        // If the CPU has multiple caches of the same level, then
+        // we are only interested in the first such cache since
+        // this is likely the fastest cache. Usually, all caches
+        // are ordered from fastest to slowest.
+        if (cacheInfo[cpuCoreId].cacheSizes[level] != 0)
+          continue;
+
         cacheInfo[cpuCoreId].cacheSizes[level] = cacheSize;
         cacheInfo[cpuCoreId].cacheSharing[level] = cacheSharing;
 
@@ -291,6 +299,14 @@ void CpuInfo::init()
          info[i].Cache.Type == CacheUnified))
     {
       auto level = info[i].Cache.Level;
+
+      // If the CPU has multiple caches of the same level, then
+      // we are only interested in the first such cache since
+      // this is likely the fastest cache. Usually, all caches
+      // are ordered from fastest to slowest.
+      if (cacheSizes_[level] != 0)
+        continue;
+
       cacheSizes_[level] = info[i].Cache.Size;
 
       // We assume the L1 and L2 caches are private
@@ -689,6 +705,13 @@ void CpuInfo::init()
       if (level >= 1 &&
           level <= 3)
       {
+        // If the CPU has multiple caches of the same level, then
+        // we are only interested in the first such cache since
+        // this is likely the fastest cache. Usually, all caches
+        // are ordered from fastest to slowest.
+        if (cacheSizes_[level] != 0)
+          continue;
+
         std::string type = path + "/type";
         std::string cacheType = getString(type);
 
