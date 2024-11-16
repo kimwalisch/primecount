@@ -202,10 +202,10 @@ void CpuInfo::init()
         if (cacheInfo.size() <= cpuCoreId)
           cacheInfo.resize((cpuCoreId + 1) * 2);
 
-        // If the CPU has multiple caches of the same level, then
-        // we are only interested in the first such cache since
-        // this is likely the fastest cache. Usually, all caches
-        // are ordered from fastest to slowest.
+        // If the CPU core has multiple caches of the same level,
+        // then we are only interested in the first such cache
+        // since this is likely the fastest cache. Usually, all
+        // caches are ordered from fastest to slowest.
         if (cacheInfo[cpuCoreId].cacheSizes[level] != 0)
           continue;
 
@@ -300,10 +300,10 @@ void CpuInfo::init()
     {
       auto level = info[i].Cache.Level;
 
-      // If the CPU has multiple caches of the same level, then
-      // we are only interested in the first such cache since
-      // this is likely the fastest cache. Usually, all caches
-      // are ordered from fastest to slowest.
+      // If the CPU core has multiple caches of the same level,
+      // then we are only interested in the first such cache
+      // since this is likely the fastest cache. Usually, all
+      // caches are ordered from fastest to slowest.
       if (cacheSizes_[level] != 0)
         continue;
 
@@ -639,6 +639,13 @@ void CpuInfo::init()
   std::vector<size_t> cpuIds;
   cpuIds.reserve(3);
 
+  // Based on my tests, for hybrid CPUs the Linux kernel always lists
+  // all performance CPU cores first and all efficiency CPU cores
+  // last, regardless of the actual physical CPU core layout on the
+  // die. I tested this using an Intel Arrow Lake 245K CPU where the
+  // physical CPU core layout (2 P-cores, 8 E-cores, 4 P-cores) on the
+  // die is different from what the Linux kernel reports.
+
   // Check 1st, last & middle CPU core
   cpuIds.push_back(0);
   if (logicalCpuCores_ >= 2)
@@ -705,10 +712,10 @@ void CpuInfo::init()
       if (level >= 1 &&
           level <= 3)
       {
-        // If the CPU has multiple caches of the same level, then
-        // we are only interested in the first such cache since
-        // this is likely the fastest cache. Usually, all caches
-        // are ordered from fastest to slowest.
+        // If the CPU core has multiple caches of the same level,
+        // then we are only interested in the first such cache
+        // since this is likely the fastest cache. Usually, all
+        // caches are ordered from fastest to slowest.
         if (cacheSizes_[level] != 0)
           continue;
 
