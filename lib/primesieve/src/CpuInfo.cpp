@@ -140,11 +140,11 @@ void CpuInfo::init()
       cacheSizes{0, 0, 0, 0},
       cacheSharing{0, 0, 0, 0}
     { }
-    Array<size_t, 4> cacheSizes;
-    Array<size_t, 4> cacheSharing;
+    Array<std::size_t, 4> cacheSizes;
+    Array<std::size_t, 4> cacheSharing;
   };
 
-  struct L1CacheStatistics
+  struct L1CacheInfo
   {
     long cpuCoreId = -1;
     std::size_t cpuCoreCount = 0;
@@ -152,12 +152,12 @@ void CpuInfo::init()
 
   using CacheSize_t = std::size_t;
   // Items must be sorted in ascending order
-  std::map<CacheSize_t, L1CacheStatistics> l1CacheStatistics;
-  std::vector<CpuCoreCacheInfo> cacheInfo;
+  std::map<CacheSize_t, L1CacheInfo> l1CacheSizes;
+  std::map<std::size_t, CpuCoreCacheInfo> cpuCores;
   std::size_t totalL1CpuCores = 0;
   SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX* info;
 
-  // Fill the cacheInfo vector with the L1, L2 & L3 cache
+  // Fill the cpuCores map with the L1, L2 & L3 cache
   // sizes and cache sharing of each CPU core.
   for (std::size_t i = 0; i < bytes; i += info->Size)
   {
@@ -199,43 +199,46 @@ void CpuInfo::init()
         // cpuCoreIds which is good enough for our usage.
         std::size_t cpuCoreId = processorGroup * maxCpusPerProcessorGroup + cpuCoreIndex;
 
-        if (cacheInfo.size() <= cpuCoreId)
-          cacheInfo.resize((cpuCoreId + 1) * 2);
-
         // If the CPU core has multiple caches of the same level,
-        // then we are only interested in the first such cache
-        // since this is likely the fastest cache. Usually, all
-        // caches are ordered from fastest to slowest.
-        if (cacheInfo[cpuCoreId].cacheSizes[level] != 0)
+        // then we are only interested in the smallest such
+        // cache since this is likely the fastest cache.
+        if (cpuCores[cpuCoreId].cacheSizes[level] > 0 &&
+            cpuCores[cpuCoreId].cacheSizes[level] <= cacheSize)
           continue;
 
-        cacheInfo[cpuCoreId].cacheSizes[level] = cacheSize;
-        cacheInfo[cpuCoreId].cacheSharing[level] = cacheSharing;
-
-        // Count the number of occurences of each type of L1 cache.
-        // If one of these L1 cache types is used predominantly
-        // we will use that cache as our default cache size.
-        if (level == 1)
-        {
-          auto& mapEntry = l1CacheStatistics[cacheSize];
-          totalL1CpuCores++;
-          mapEntry.cpuCoreCount++;
-          if (mapEntry.cpuCoreId == -1)
-            mapEntry.cpuCoreId = (long) cpuCoreId;
-        }
+        cpuCores[cpuCoreId].cacheSizes[level] = cacheSize;
+        cpuCores[cpuCoreId].cacheSharing[level] = cacheSharing;
       }
+    }
+  }
+
+  // Iterate over all CPU cores and create a map
+  // with the different L1 cache sizes.
+  for (const auto& cpuCore : cpuCores)
+  {
+    const auto& cpuCoreInfo = cpuCore.second;
+    std::size_t l1CacheSize = cpuCoreInfo.cacheSizes[1];
+    std::size_t cpuCoreId = cpuCore.first;
+
+    if (l1CacheSize > 0)
+    {
+      totalL1CpuCores++;
+      auto& mapEntry = l1CacheSizes[l1CacheSize];
+      mapEntry.cpuCoreCount++;
+      if (mapEntry.cpuCoreId == -1)
+        mapEntry.cpuCoreId = (long) cpuCoreId;
     }
   }
 
   // Check if one of the L1 cache types is used
   // by more than 80% of all CPU cores.
-  for (const auto& item : l1CacheStatistics)
+  for (const auto& l1CacheSize : l1CacheSizes)
   {
-    if (item.second.cpuCoreCount > totalL1CpuCores * 0.80)
+    if (l1CacheSize.second.cpuCoreCount > totalL1CpuCores * 0.80)
     {
-      long cpuCoreId = item.second.cpuCoreId;
-      cacheSizes_ = cacheInfo[cpuCoreId].cacheSizes;
-      cacheSharing_ = cacheInfo[cpuCoreId].cacheSharing;
+      long cpuCoreId = l1CacheSize.second.cpuCoreId;
+      cacheSizes_ = cpuCores[cpuCoreId].cacheSizes;
+      cacheSharing_ = cpuCores[cpuCoreId].cacheSharing;
       return;
     }
   }
@@ -243,13 +246,13 @@ void CpuInfo::init()
   // For hybrid CPUs with many different L1 cache types
   // we pick one from the middle that is hopefully
   // representative for the CPU's overall performance.
-  if (!l1CacheStatistics.empty())
+  if (!l1CacheSizes.empty())
   {
-    auto iter = l1CacheStatistics.begin();
-    std::advance(iter, (l1CacheStatistics.size() - 1) / 2);
+    auto iter = l1CacheSizes.begin();
+    std::advance(iter, (l1CacheSizes.size() - 1) / 2);
     long cpuCoreId = iter->second.cpuCoreId;
-    cacheSizes_ = cacheInfo[cpuCoreId].cacheSizes;
-    cacheSharing_ = cacheInfo[cpuCoreId].cacheSharing;
+    cacheSizes_ = cpuCores[cpuCoreId].cacheSizes;
+    cacheSharing_ = cpuCores[cpuCoreId].cacheSharing;
   }
 
 // Windows XP or later
@@ -299,15 +302,16 @@ void CpuInfo::init()
          info[i].Cache.Type == CacheUnified))
     {
       auto level = info[i].Cache.Level;
+      auto cacheSize = info[i].Cache.Size;
 
       // If the CPU core has multiple caches of the same level,
-      // then we are only interested in the first such cache
-      // since this is likely the fastest cache. Usually, all
-      // caches are ordered from fastest to slowest.
-      if (cacheSizes_[level] != 0)
+      // then we are only interested in the smallest such
+      // cache since this is likely the fastest cache.
+      if (cacheSizes_[level] > 0 &&
+          cacheSizes_[level] <= cacheSize)
         continue;
 
-      cacheSizes_[level] = info[i].Cache.Size;
+      cacheSizes_[level] = cacheSize;
 
       // We assume the L1 and L2 caches are private
       if (info[i].Cache.Level <= 2)
@@ -376,17 +380,17 @@ namespace primesieve {
 
 void CpuInfo::init()
 {
-  auto logicalCpuCores = getSysctl<size_t>("hw.logicalcpu");
+  auto logicalCpuCores = getSysctl<std::size_t>("hw.logicalcpu");
   if (!logicalCpuCores.empty())
     logicalCpuCores_ = logicalCpuCores[0];
 
   // https://developer.apple.com/library/content/releasenotes/Performance/RN-AffinityAPI/index.html
-  auto cacheSizes = getSysctl<size_t>("hw.cachesize");
+  auto cacheSizes = getSysctl<std::size_t>("hw.cachesize");
   for (std::size_t i = 1; i < std::min(cacheSizes.size(), cacheSizes_.size()); i++)
     cacheSizes_[i] = cacheSizes[i];
 
   // https://developer.apple.com/library/content/releasenotes/Performance/RN-AffinityAPI/index.html
-  auto cacheConfig = getSysctl<size_t>("hw.cacheconfig");
+  auto cacheConfig = getSysctl<std::size_t>("hw.cacheconfig");
   for (std::size_t i = 1; i < std::min(cacheConfig.size(), cacheSharing_.size()); i++)
     cacheSharing_[i] = cacheConfig[i];
 }
@@ -435,7 +439,7 @@ std::string getString(const std::string& filename)
     return {};
 }
 
-size_t getValue(const std::string& filename)
+std::size_t getValue(const std::string& filename)
 {
   std::string str = getString(filename);
   std::size_t val = 0;
@@ -446,7 +450,7 @@ size_t getValue(const std::string& filename)
   return val;
 }
 
-size_t getCacheSize(const std::string& filename)
+std::size_t getCacheSize(const std::string& filename)
 {
   std::string str = getString(filename);
   std::size_t val = 0;
@@ -558,7 +562,7 @@ std::vector<std::string> split(const std::string& str,
 /// Example: 0-8,18-26
 /// https://www.kernel.org/doc/Documentation/cputopology.txt
 ///
-size_t parseThreadList(const std::string& filename)
+std::size_t parseThreadList(const std::string& filename)
 {
   std::size_t threads = 0;
   auto threadList = getString(filename);
@@ -586,7 +590,7 @@ size_t parseThreadList(const std::string& filename)
 /// Example: 00000000,00000000,00000000,07fc01ff
 /// https://www.kernel.org/doc/Documentation/cputopology.txt
 ///
-size_t parseThreadMap(const std::string& filename)
+std::size_t parseThreadMap(const std::string& filename)
 {
   std::size_t threads = 0;
   std::string threadMap = getString(filename);
@@ -612,8 +616,8 @@ size_t parseThreadMap(const std::string& filename)
 /// But you cannot know in advance if any of these
 /// files exist, hence you need to try both.
 ///
-size_t getThreads(const std::string& threadList,
-                  const std::string& threadMap)
+std::size_t getThreads(const std::string& threadList,
+                       const std::string& threadMap)
 {
   std::size_t threads = parseThreadList(threadList);
 
@@ -631,12 +635,11 @@ void CpuInfo::init()
 {
   std::string cpusOnline = "/sys/devices/system/cpu/online";
   logicalCpuCores_ = parseThreadList(cpusOnline);
-  bool identicalL1CacheSizes = false;
 
   using CacheSize_t = std::size_t;
   // Items must be sorted in ascending order
-  std::map<CacheSize_t, std::size_t> l1CacheStatistics;
-  std::vector<size_t> cpuIds;
+  std::map<CacheSize_t, std::size_t> l1CacheSizes;
+  std::vector<std::size_t> cpuIds;
   cpuIds.reserve(3);
 
   // Based on my tests, for hybrid CPUs the Linux kernel always lists
@@ -673,34 +676,28 @@ void CpuInfo::init()
         if (cacheType == "Data" ||
             cacheType == "Unified")
         {
-          std::size_t cacheSize = getCacheSize(path + "/size");
+          std::string cacheSizePath = path + "/size";
+          std::size_t cacheSize = getCacheSize(cacheSizePath);
+
           if (cacheSize > 0)
           {
-            if (l1CacheStatistics.find(cacheSize) == l1CacheStatistics.end())
-              l1CacheStatistics[cacheSize] = cpuId;
-            else
-              identicalL1CacheSizes = true;
+            if (l1CacheSizes.find(cacheSize) == l1CacheSizes.end())
+              l1CacheSizes[cacheSize] = cpuId;
+            break;
           }
-          break;
         }
       }
     }
-
-    // We have found 2 identical CPU cores.
-    // In this case we assume all CPU cores
-    // have the same cache hierarchy.
-    if (identicalL1CacheSizes)
-      break;
   }
 
   // Retrieve the cache sizes of the CPU core with the middle
   // L1 data cache size. If there are only 2 different L1
   // cache sizes we retrieve the cache sizes of the CPU core
   // with the smaller L1 data cache size.
-  if (!l1CacheStatistics.empty())
+  if (!l1CacheSizes.empty())
   {
-    auto iter = l1CacheStatistics.begin();
-    std::advance(iter, (l1CacheStatistics.size() - 1) / 2);
+    auto iter = l1CacheSizes.begin();
+    std::advance(iter, (l1CacheSizes.size() - 1) / 2);
     std::size_t cpuId = iter->second;
 
     for (std::size_t i = 0; i <= 3; i++)
@@ -712,24 +709,27 @@ void CpuInfo::init()
       if (level >= 1 &&
           level <= 3)
       {
-        // If the CPU core has multiple caches of the same level,
-        // then we are only interested in the first such cache
-        // since this is likely the fastest cache. Usually, all
-        // caches are ordered from fastest to slowest.
-        if (cacheSizes_[level] != 0)
-          continue;
-
         std::string type = path + "/type";
         std::string cacheType = getString(type);
 
         if (cacheType == "Data" ||
             cacheType == "Unified")
         {
-          std::string cacheSize = path + "/size";
+          std::string cacheSizePath = path + "/size";
           std::string sharedCpuList = path + "/shared_cpu_list";
           std::string sharedCpuMap = path + "/shared_cpu_map";
-          cacheSizes_[level] = getCacheSize(cacheSize);
-          cacheSharing_[level] = getThreads(sharedCpuList, sharedCpuMap);
+          std::size_t cacheSize = getCacheSize(cacheSizePath);
+          std::size_t cacheSharing = getThreads(sharedCpuList, sharedCpuMap);
+
+          // If the CPU core has multiple caches of the same level,
+          // then we are only interested in the smallest such
+          // cache since this is likely the fastest cache.
+          if (cacheSizes_[level] > 0 &&
+              cacheSizes_[level] <= cacheSize)
+            continue;
+
+          cacheSizes_[level] = cacheSize;
+          cacheSharing_[level] = cacheSharing;
         }
       }
     }
@@ -781,37 +781,37 @@ std::string CpuInfo::cpuName() const
   }
 }
 
-size_t CpuInfo::logicalCpuCores() const
+std::size_t CpuInfo::logicalCpuCores() const
 {
   return logicalCpuCores_;
 }
 
-size_t CpuInfo::l1CacheBytes() const
+std::size_t CpuInfo::l1CacheBytes() const
 {
   return cacheSizes_[1];
 }
 
-size_t CpuInfo::l2CacheBytes() const
+std::size_t CpuInfo::l2CacheBytes() const
 {
   return cacheSizes_[2];
 }
 
-size_t CpuInfo::l3CacheBytes() const
+std::size_t CpuInfo::l3CacheBytes() const
 {
   return cacheSizes_[3];
 }
 
-size_t CpuInfo::l1Sharing() const
+std::size_t CpuInfo::l1Sharing() const
 {
   return cacheSharing_[1];
 }
 
-size_t CpuInfo::l2Sharing() const
+std::size_t CpuInfo::l2Sharing() const
 {
   return cacheSharing_[2];
 }
 
-size_t CpuInfo::l3Sharing() const
+std::size_t CpuInfo::l3Sharing() const
 {
   return cacheSharing_[3];
 }
