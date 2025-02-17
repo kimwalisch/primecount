@@ -190,6 +190,10 @@ primesieve natively supports C and C++ and has bindings available for:
         <td><a href="https://github.com/AaronChen0/cl-primesieve">cl-primesieve</a></td>
     </tr>
     <tr>
+        <td><b>Java:</b></td>
+        <td><a href="https://github.com/buildingnicesoftware/primesieve-java">primesieve-java</a></td>
+    </tr>
+    <tr>
         <td><b>Janet:</b></td>
         <td><a href="https://github.com/bunder/janet-primesieve">janet-primesieve</a></td>
     </tr>
@@ -232,3 +236,13 @@ primesieve natively supports C and C++ and has bindings available for:
 </table>
 
 Many thanks to the developers of these bindings!
+
+## Sponsors
+
+Thanks to all current and past [sponsors of primesieve](https://github.com/sponsors/kimwalisch)! Your donations help me purchase (or rent) the latest CPUs and ensure primesieve runs at maximum performance on them. Your donations also motivate me to continue maintaining primesieve.
+
+<a href="https://github.com/AndrewVSutherland"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/11425002?h=60&w=60&fit=cover&mask=circle"></img></a>
+<a href="https://github.com/wolframresearch"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/11549616?h=60&w=60&fit=cover&mask=circle"></img></a>
+<a href="https://github.com/sethtroisi"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/10172976?h=60&w=60&fit=cover&mask=circle"></img></a>
+<a href="https://github.com/entersoftone"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/80900902?h=60&w=60&fit=cover&mask=circle"></img></a>
+<a href="https://github.com/utmcontent"><img src="https://images.weserv.nl/?url=avatars.githubusercontent.com/u/4705133?h=60&w=60&fit=cover&mask=circle"></img></a>
