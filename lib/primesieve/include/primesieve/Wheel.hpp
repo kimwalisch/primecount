@@ -3,7 +3,7 @@
 /// @brief  Wheel factorization is used to skip multiles of
 ///         small primes in the sieve of Eratosthenes.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -73,8 +73,17 @@ public:
     if (nextMultiple > stop_ - multiple)
       return;
 
-    nextMultiple += multiple - segmentLow;
-    uint64_t multipleIndex = nextMultiple / 30;
+    multiple += nextMultiple;
+
+    #if defined(ENABLE_ASSERT)
+      if (MODULO >=    2) ASSERT(multiple %  2 != 0);
+      if (MODULO >=    6) ASSERT(multiple %  3 != 0);
+      if (MODULO >=   30) ASSERT(multiple %  5 != 0);
+      if (MODULO >=  210) ASSERT(multiple %  7 != 0);
+      if (MODULO >= 2310) ASSERT(multiple % 11 != 0);
+    #endif
+
+    uint64_t multipleIndex = (multiple - segmentLow) / 30;
     uint64_t wheelIndex = wheelOffsets_[prime % 30] + INIT[quotient % MODULO].wheelIndex;
     storeSievingPrime(prime, multipleIndex, wheelIndex);
   }
