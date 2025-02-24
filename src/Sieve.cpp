@@ -416,6 +416,11 @@ void Sieve::add(uint64_t prime)
   // is not divisible by 2, 3, 5
   uint64_t factor = wheel_init[quotient % 30].factor;
   multiple += prime * factor;
+
+  ASSERT(multiple % 2 != 0);
+  ASSERT(multiple % 3 != 0);
+  ASSERT(multiple % 5 != 0);
+
   multiple = (multiple - start_) / 30;
   uint32_t multiple32 = (uint32_t) multiple;
 
