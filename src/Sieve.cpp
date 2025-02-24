@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -447,6 +447,8 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
       return; \
     }
 
+  ASSERT(wheel.index <= 63);
+
   switch (wheel.index)
   {
     for (;;)
@@ -717,6 +719,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
       total_count -= (uint64_t) is_bit; \
     }
+
+  ASSERT(wheel.index <= 63);
 
   switch (wheel.index)
   {
