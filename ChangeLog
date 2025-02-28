@@ -1,12 +1,14 @@
-Changes in primecount-7.15, 2025-02-17
+Changes in primecount-7.15, 2025-02-28
 
+* multiarch_arm_sve.cmake: Improve ARM SVE detection.
+* src/arch/arm/sve.cpp: Detect ARM SVE instruction set.
 * Update to libprimesieve-12.7.
 * README.md: Add sponsors section.
 
 Changes in primecount-7.14, 2024-07-30
 
 * Fix libdivide.h issue with GCC 15: #76.
-* Move x86 cpuid code from cpuid.hpp to src/x86/cpuid.cpp.
+* Move x86 cpuid code from cpuid.hpp to src/arch/x86/cpuid.cpp.
 * Move generate.hpp code to src/generate_primes.cpp.
 * Move generate_phi.hpp code to src/phi_vector.cpp.
 * int128_t.hpp: Rename namespace port to pstd (portable std namespace).
