@@ -162,11 +162,12 @@ if(WITH_MULTIARCH)
     include("${PROJECT_SOURCE_DIR}/cmake/multiarch_avx512_vpopcnt.cmake")
 
     if(multiarch_x86_popcnt OR multiarch_avx512_vpopcnt)
-        set(LIB_SRC ${LIB_SRC} src/x86/cpuid.cpp)
-    endif()
-
-    if(NOT multiarch_avx512_vpopcnt)
+        set(LIB_SRC ${LIB_SRC} src/arch/x86/cpuid.cpp)
+    else()
         include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
+        if(multiarch_arm_sve)
+            set(LIB_SRC ${LIB_SRC} src/arch/arm/sve.cpp)
+        endif()
     endif()
 endif()
 

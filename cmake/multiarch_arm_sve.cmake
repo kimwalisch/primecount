@@ -7,7 +7,7 @@ include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
 cmake_push_check_state()
-set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
+set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}")
 
 check_cxx_source_compiles("
     // GCC/Clang function multiversioning for ARM SVE is not needed
@@ -19,7 +19,7 @@ check_cxx_source_compiles("
       Error: ARM SVE multiarch not needed!
     #endif
 
-    #include <cpu_supports_arm_sve.hpp>
+    #include <src/arch/arm/sve.cpp>
     #include <arm_sve.h>
     #include <stdint.h>
 
@@ -62,7 +62,7 @@ check_cxx_source_compiles("
         uint64_t cnt = 0;
         Sieve sieve;
 
-        if (cpu_supports_sve)
+        if (primecount::has_arm_sve())
             cnt = sieve.count_arm_sve(&array[0], 10);
         else
             cnt = sieve.count_default(&array[0], 10);
