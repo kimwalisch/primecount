@@ -32,22 +32,27 @@ namespace primecount {
 
 bool has_arm_sve()
 {
-#if defined(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE)
   return IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE);
-#else
-  return false;
-#endif
 }
 
 } // namespace
 
-#elif defined(__linux__) || \
-      defined(__gnu_linux__) || \
-      defined(__ANDROID__)
+#elif (defined(__linux__) || \
+       defined(__gnu_linux__) || \
+       defined(__ANDROID__)) && \
+       __has_include(<sys/auxv.h>)
 
 #include <sys/auxv.h>
-#include <asm/hwcap.h>
 #include <errno.h>
+
+// The Linux kernel header <asm/hwcap.h> is not installed by
+// default on some Linux distros. Hence we define HWCAP_SVE
+// for ARM64 CPUs to get rid of the <asm/hwcap.h> dependency.
+#if defined(__aarch64__)
+  #define HWCAP_SVE (1 << 22)
+#else
+  #include <asm/hwcap.h>
+#endif
 
 namespace primecount {
 
@@ -76,20 +81,13 @@ bool has_arm_sve()
 
 #else
 
-#ifndef __has_builtin
-  #define __has_builtin(x) 0
-#endif
-
-#if __has_builtin(__builtin_cpu_init) && \
-    __has_builtin(__builtin_cpu_supports)
-
 namespace primecount {
 
 bool has_arm_sve()
 {
   // Since __builtin_cpu_init() and __builtin_cpu_supports() are
   // currently (2025) not yet supported for ARM64 CPUs by both
-  // GCC and Clang, we only use them as a fallback option if
+  // GCC and Clang, we only try them as a fallback option if
   // none of the other more reliable methods work.
   __builtin_cpu_init();
   if (__builtin_cpu_supports("sve"))
@@ -99,7 +97,5 @@ bool has_arm_sve()
 }
 
 } // namespace
-
-#endif
 
 #endif
