@@ -41,17 +41,14 @@ check_cxx_source_compiles("
     __attribute__ ((target (\"arch=armv8-a+sve\")))
     uint64_t Sieve::count_arm_sve(uint64_t* array, uint64_t stop_idx)
     {
-        svuint64_t vec1 = svinsr_n_u64(svdup_u64(0), array[0]);
-        vec1 = svcnt_u64_x(svptrue_b64(), vec1);
-        svuint64_t vec2 = svinsr_n_u64(svdup_u64(0), array[1]);
-        vec2 = svcnt_u64_x(svptrue_b64(), vec2);
-        svuint64_t vcnt = svadd_u64_x(svptrue_b64(), vec1, vec2);
+        svuint64_t vec = svinsr_n_u64(svdup_u64(array[0]), array[1]);
+        svuint64_t vcnt = svcnt_u64_z(svwhilelt_b64(0, 2), vec);
 
         uint64_t i = 2;
         svbool_t pg = svwhilelt_b64(i, stop_idx);
         do
         {
-            svuint64_t vec = svld1_u64(pg, &array[i]);
+            vec = svld1_u64(pg, &array[i]);
             vec = svcnt_u64_z(pg, vec);
             vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);
             i += svcntd();
