@@ -216,7 +216,7 @@ private:
     // Compute this for loop using AVX512.
     // for (i = start_idx + 1; i < stop_idx; i++)
     //   cnt += popcnt64(sieve64[i]);
-    //
+
     for (; i + 8 < stop_idx; i += 8)
     {
       vec = _mm512_loadu_epi64(&sieve64[i]);
@@ -270,15 +270,18 @@ private:
     // Compute this for loop using ARM SVE.
     // for (i = start_idx + 1; i < stop_idx; i++)
     //   cnt += popcnt64(sieve64[i]);
-    do {
-      svbool_t pg = svwhilelt_b64(i, stop_idx);
-      vec = svld1_u64(pg, &sieve64[i]);
-      vec = svcnt_u64_z(pg, vec);
-      vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
-      i += svcntd();
-    }
-    while (i < stop_idx);
 
+    for (; i + svcntd() < stop_idx; i += svcntd())
+    {
+      vec = svld1_u64(svptrue_b64(), &sieve64[i]);
+      vec = svcnt_u64_x(svptrue_b64(), vec);
+      vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
+    }
+
+    svbool_t pg = svwhilelt_b64(i, stop_idx);
+    vec = svld1_u64(pg, &sieve64[i]);
+    vec = svcnt_u64_z(pg, vec);
+    vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
     return svaddv_u64(svptrue_b64(), vcnt);
   }
 
