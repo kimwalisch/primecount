@@ -1,9 +1,12 @@
 ///
 /// @file   sve.cpp
 /// @brief  Check if the CPU and OS support the SVE instruction set.
+///         Compiling and linking of sve.cpp is tested by the CMake
+///         build system using multiarch_sve_arm.cmake.
+///
 ///         In order to generate optimal code, we need to be able to
-///         check if the ARM CPU supports the SVE instruction set in
-///         a global initializer when the program is loaded.
+///         check if the ARM CPU supports the SVE instruction set
+///         in a global initializer when the program is loaded.
 ///
 ///         __builtin_cpu_supports() from Clang >= 19.0.0 does not
 ///         work when running in a global initializer. Usually the
@@ -21,27 +24,7 @@
 /// file in the top level directory.
 ///
 
-#ifndef __has_builtin
-  #define __has_builtin(x) 0
-#endif
-
-#if __has_builtin(__builtin_cpu_init) && \
-    __has_builtin(__builtin_cpu_supports)
-
-namespace primesieve {
-
-bool has_arm_sve()
-{
-  __builtin_cpu_init();
-  if (__builtin_cpu_supports("sve"))
-    return true;
-  else
-    return false;
-}
-
-} // namespace
-
-#elif defined(_WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
@@ -49,22 +32,27 @@ namespace primesieve {
 
 bool has_arm_sve()
 {
-#if defined(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE)
   return IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE);
-#else
-  return false;
-#endif
 }
 
 } // namespace
 
-#elif defined(__linux__) || \
-      defined(__gnu_linux__) || \
-      defined(__ANDROID__)
+#elif (defined(__linux__) || \
+       defined(__gnu_linux__) || \
+       defined(__ANDROID__)) && \
+       __has_include(<sys/auxv.h>)
 
 #include <sys/auxv.h>
-#include <asm/hwcap.h>
 #include <errno.h>
+
+// The Linux kernel header <asm/hwcap.h> is not installed by
+// default on some Linux distros. Hence we define HWCAP_SVE
+// for ARM64 CPUs to get rid of the <asm/hwcap.h> dependency.
+#if defined(__aarch64__)
+  #define HWCAP_SVE (1 << 22)
+#else
+  #include <asm/hwcap.h>
+#endif
 
 namespace primesieve {
 
@@ -84,6 +72,25 @@ bool has_arm_sve()
   // Check if the Linux kernel and the CPU support
   // the ARM SVE instruction set.
   if (hwcaps & HWCAP_SVE)
+    return true;
+  else
+    return false;
+}
+
+} // namespace
+
+#else
+
+namespace primesieve {
+
+bool has_arm_sve()
+{
+  // Since __builtin_cpu_init() and __builtin_cpu_supports() are
+  // currently (2025) not yet supported for ARM64 CPUs by both
+  // GCC and Clang, we only try them as a fallback option if
+  // none of the other more reliable methods work.
+  __builtin_cpu_init();
+  if (__builtin_cpu_supports("sve"))
     return true;
   else
     return false;
