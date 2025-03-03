@@ -43,18 +43,19 @@ check_cxx_source_compiles("
     {
         svuint64_t vec = svinsr_n_u64(svdup_u64(array[0]), array[1]);
         svuint64_t vcnt = svcnt_u64_z(svwhilelt_b64(0, 2), vec);
-
         uint64_t i = 2;
-        svbool_t pg = svwhilelt_b64(i, stop_idx);
-        do
+
+        for (; i + svcntd() < stop_idx; i += svcntd())
         {
-            vec = svld1_u64(pg, &array[i]);
-            vec = svcnt_u64_z(pg, vec);
-            vcnt = svadd_u64_z(svptrue_b64(), vcnt, vec);
-            i += svcntd();
-            pg = svwhilelt_b64(i, stop_idx);
+            vec = svld1_u64(svptrue_b64(), &array[i]);
+            vec = svcnt_u64_x(svptrue_b64(), vec);
+            vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
         }
-        while (svptest_any(svptrue_b64(), pg));
+
+        svbool_t pg = svwhilelt_b64(i, stop_idx);
+        vec = svld1_u64(pg, &array[i]);
+        vec = svcnt_u64_z(pg, vec);
+        vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec);
         return svaddv_u64(svptrue_b64(), vcnt);
     }
 
