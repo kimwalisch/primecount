@@ -147,9 +147,9 @@ public:
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-    m1 = (m1 * (start_idx != stop_idx)) | ((m1 & m2) * (start_idx == stop_idx));
+    m1 &= (-(start_idx != stop_idx) | m2);
     // m2 = (start_idx != stop_idx) ? m2 : 0;
-    m2 *= (start_idx != stop_idx);
+    m2 &= -(start_idx != stop_idx);
 
     const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
@@ -228,9 +228,9 @@ public:
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-    m1 = (m1 * (start_idx != stop_idx)) | ((m1 & m2) * (start_idx == stop_idx));
+    m1 &= (-(start_idx != stop_idx) | m2);
     // m2 = (start_idx != stop_idx) ? m2 : 0;
-    m2 *= (start_idx != stop_idx);
+    m2 &= -(start_idx != stop_idx);
 
     const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
@@ -307,9 +307,9 @@ private:
 
     // Branchfree bitmask calculation:
     // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-    m1 = (m1 * (start_idx != stop_idx)) | ((m1 & m2) * (start_idx == stop_idx));
+    m1 &= (-(start_idx != stop_idx) | m2);
     // m2 = (start_idx != stop_idx) ? m2 : 0;
-    m2 *= (start_idx != stop_idx);
+    m2 &= -(start_idx != stop_idx);
 
     const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
     uint64_t start_bits = sieve64[start_idx] & m1;
