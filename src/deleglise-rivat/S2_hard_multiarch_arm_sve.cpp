@@ -238,12 +238,12 @@ T S2_hard_OpenMP(T x,
 namespace primecount {
 
 int64_t S2_hard_multiarch_arm_sve(int64_t x,
-                        int64_t y,
-                        int64_t z,
-                        int64_t c,
-                        int64_t s2_hard_approx,
-                        int threads,
-                        bool is_print)
+                                  int64_t y,
+                                  int64_t z,
+                                  int64_t c,
+                                  int64_t s2_hard_approx,
+                                  int threads,
+                                  bool is_print)
 {
   double time;
 
@@ -270,12 +270,12 @@ int64_t S2_hard_multiarch_arm_sve(int64_t x,
 #ifdef HAVE_INT128_T
 
 int128_t S2_hard_multiarch_arm_sve(int128_t x,
-                         int64_t y,
-                         int64_t z,
-                         int64_t c,
-                         int128_t s2_hard_approx,
-                         int threads,
-                         bool is_print)
+                                   int64_t y,
+                                   int64_t z,
+                                   int64_t c,
+                                   int128_t s2_hard_approx,
+                                   int threads,
+                                   bool is_print)
 {
   double time;
 
