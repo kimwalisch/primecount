@@ -1,3 +1,21 @@
+Changes in primecount-7.16, 2025-03-07
+
+The if check for runtime dispatching to CPU vector instruction
+sets has been moved outside of the main loop. This improves
+performance of the D and S2_hard algorithms by up to 10% for
+x < 2^64. The important Sieve::count_*() method is now always
+inlined.
+
+* Sieve.cpp: Add multiarch count methods.
+* Sieve.hpp: New multiarch count methods.
+* D.cpp: Runtime dispatching changes.
+* D_multiarch_avx512.cpp: New file.
+* D_multiarch_arm_sve.cpp: New file.
+* S2_hard.cpp: Runtime dispatching changes.
+* S2_hard_multiarch_avx512.cpp: New file.
+* S2_hard_multiarch_arm_sve.cpp: New file.
+* CMakeLists.txt: Add new multiarch cpp files.
+
 Changes in primecount-7.15, 2025-03-01
 
 * Sieve.hpp: Improve ARM SVE bit counting algorithm.
