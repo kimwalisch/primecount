@@ -81,7 +81,7 @@ public:
   /// This method is safe to run on any CPU without runtime
   /// CPUID checks. In most cases (e.g. when compiled
   /// without -march=native) this will call the portable
-  /// but slow count_portable() method.
+  /// but slow count_popcnt64() method.
   ///
   ALWAYS_INLINE uint64_t count(uint64_t stop)
   {
@@ -91,8 +91,8 @@ public:
       #define SIEVE_COUNT_ALGO_NAME "sieve.count_avx512()"
       return count_avx512(stop);
     #else
-      #define SIEVE_COUNT_ALGO_NAME "sieve.count_portable()"
-      return count_portable(stop);
+      #define SIEVE_COUNT_ALGO_NAME "sieve.count_popcnt64()"
+      return count_popcnt64(stop);
     #endif
   }
 
@@ -266,10 +266,10 @@ private:
 #if defined(ENABLE_PORTABLE)
 
   /// Count 1 bits inside [start, stop]
-  uint64_t count_portable(uint64_t start, uint64_t stop) const;
+  uint64_t count_popcnt64(uint64_t start, uint64_t stop) const;
 
   /// Count 1 bits inside [0, stop]
-  ALWAYS_INLINE uint64_t count_portable(uint64_t stop)
+  ALWAYS_INLINE uint64_t count_popcnt64(uint64_t stop)
   {
     ASSERT(stop >= prev_stop_);
     uint64_t start = prev_stop_ + 1;

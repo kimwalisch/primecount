@@ -421,11 +421,11 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   #elif defined(ENABLE_AVX512_VPOPCNT)
     return count_avx512(start, stop);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve ? count_arm_sve(start, stop) : count_portable(start, stop);
+    return cpu_supports_sve ? count_arm_sve(start, stop) : count_popcnt64(start, stop);
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt ? count_avx512(start, stop) : count_portable(start, stop);
+    return cpu_supports_avx512_vpopcnt ? count_avx512(start, stop) : count_popcnt64(start, stop);
   #else
-    return count_portable(start, stop);
+    return count_popcnt64(start, stop);
   #endif
 }
 
@@ -436,7 +436,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 /// hence we simply count the number of unsieved elements
 /// by linearly iterating over the sieve array.
 ///
-uint64_t Sieve::count_portable(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count_popcnt64(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
     return 0;
