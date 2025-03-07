@@ -87,6 +87,7 @@ public:
   {
     #if defined(ENABLE_ARM_SVE)
       #define SIEVE_COUNT_ALGO_NAME "sieve.count_arm_sve()"
+      return count_arm_sve(stop);
     #elif defined(ENABLE_AVX512_VPOPCNT)
       #define SIEVE_COUNT_ALGO_NAME "sieve.count_avx512()"
       return count_avx512(stop);
