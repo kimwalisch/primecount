@@ -429,7 +429,7 @@ uint64_t Sieve::count(uint64_t start, uint64_t stop) const
   #endif
 }
 
-#if defined(ENABLE_PORTABLE)
+#if defined(ENABLE_PORTABLE_POPCNT64)
 
 /// Count 1 bits inside [start, stop].
 /// The distance [start, stop] is small here < sqrt(segment_size),

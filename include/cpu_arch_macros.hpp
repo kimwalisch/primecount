@@ -21,11 +21,11 @@
       __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VPOPCNT
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-  #define ENABLE_PORTABLE
+  #define ENABLE_PORTABLE_POPCNT64
 #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #define ENABLE_PORTABLE
+  #define ENABLE_PORTABLE_POPCNT64
 #else
-  #define ENABLE_PORTABLE
+  #define ENABLE_PORTABLE_POPCNT64
 #endif
 
 #endif

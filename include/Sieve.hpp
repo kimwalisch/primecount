@@ -263,7 +263,7 @@ public:
 
 private:
 
-#if defined(ENABLE_PORTABLE)
+#if defined(ENABLE_PORTABLE_POPCNT64)
 
   /// Count 1 bits inside [start, stop]
   uint64_t count_popcnt64(uint64_t start, uint64_t stop) const;

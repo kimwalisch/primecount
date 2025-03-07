@@ -25,9 +25,9 @@ int64_t AC(int64_t x, int64_t y, int64_t z, int64_t k, int threads, bool print =
 int64_t B(int64_t x, int64_t y, int threads, bool print = is_print());
 int64_t D(int64_t x, int64_t y, int64_t z, int64_t k, int64_t d_approx, int threads, bool print = is_print());
 
-#if defined(ENABLE_PORTABLE) || \
-    defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_AVX512_VPOPCNT)
+#if defined(ENABLE_PORTABLE_POPCNT64) || \
+    defined(ENABLE_AVX512_VPOPCNT) || \
+    defined(ENABLE_ARM_SVE)
   int64_t D_default(int64_t x, int64_t y, int64_t z, int64_t k, int64_t d_approx, int threads, bool print);
 #endif
 
@@ -49,9 +49,9 @@ int128_t AC(int128_t x, int64_t y, int64_t z, int64_t k, int threads, bool print
 int128_t B(int128_t x, int64_t y, int threads, bool print = is_print());
 int128_t D(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int threads, bool print = is_print());
 
-#if defined(ENABLE_PORTABLE) || \
-    defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_AVX512_VPOPCNT)
+#if defined(ENABLE_PORTABLE_POPCNT64) || \
+    defined(ENABLE_AVX512_VPOPCNT) || \
+    defined(ENABLE_ARM_SVE)
   int128_t D_default(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int threads, bool print);
 #endif
 
