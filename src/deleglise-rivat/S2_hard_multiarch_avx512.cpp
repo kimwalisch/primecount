@@ -1,5 +1,5 @@
 ///
-/// @file  S2_hard.cpp
+/// @file  S2_hard_multiarch_avx512.cpp
 /// @brief Calculate the contribution of the hard special leaves using
 ///        a prime sieve. This is a multi-threaded implementation
 ///        which uses compression (PiTable & FactorTable) to reduce
@@ -25,7 +25,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <cpu_arch_macros.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <Sieve.hpp>
@@ -40,12 +39,6 @@
 #include <S.hpp>
 
 #include <stdint.h>
-
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include <cpu_supports_arm_sve.hpp>
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
-#endif
 
 using namespace primecount;
 
@@ -65,6 +58,9 @@ namespace {
 /// segment size also decreases performance.
 ///
 template <typename T, typename Primes, typename FactorTable>
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+#endif
 T S2_hard_thread(T x,
                  int64_t y,
                  int64_t z,
@@ -131,7 +127,7 @@ T S2_hard_thread(T x,
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t stop = xpm - low;
-          int64_t phi_xpm = phi[b] + sieve.count(stop);
+          int64_t phi_xpm = phi[b] + sieve.count_avx512(stop);
           int64_t mu_m = factor.mu(m);
           sum -= mu_m * phi_xpm;
         }
@@ -161,7 +157,7 @@ T S2_hard_thread(T x,
       {
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
-        int64_t phi_xpq = phi[b] + sieve.count(stop);
+        int64_t phi_xpq = phi[b] + sieve.count_avx512(stop);
         sum += phi_xpq;
       }
 
@@ -241,13 +237,13 @@ T S2_hard_OpenMP(T x,
 
 namespace primecount {
 
-int64_t S2_hard_default(int64_t x,
-                        int64_t y,
-                        int64_t z,
-                        int64_t c,
-                        int64_t s2_hard_approx,
-                        int threads,
-                        bool is_print)
+int64_t S2_hard_multiarch_avx512(int64_t x,
+                                 int64_t y,
+                                 int64_t z,
+                                 int64_t c,
+                                 int64_t s2_hard_approx,
+                                 int threads,
+                                 bool is_print)
 {
   double time;
 
@@ -255,7 +251,7 @@ int64_t S2_hard_default(int64_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: sieve.count_avx512()");
     print_vars(x, y, c, threads);
     time = get_time();
   }
@@ -271,36 +267,15 @@ int64_t S2_hard_default(int64_t x,
   return sum;
 }
 
-int64_t S2_hard(int64_t x,
-                int64_t y,
-                int64_t z,
-                int64_t c,
-                int64_t s2_hard_approx,
-                int threads,
-                bool print)
-{
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  return cpu_supports_sve
-    ? S2_hard_multiarch_arm_sve(x, y, z, c, s2_hard_approx, threads, print)
-    : S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  return cpu_supports_avx512_vpopcnt
-    ? S2_hard_multiarch_avx512 (x, y, z, c, s2_hard_approx, threads, print)
-    : S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#else
-  return S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#endif
-}
-
 #ifdef HAVE_INT128_T
 
-int128_t S2_hard_default(int128_t x,
-                         int64_t y,
-                         int64_t z,
-                         int64_t c,
-                         int128_t s2_hard_approx,
-                         int threads,
-                         bool is_print)
+int128_t S2_hard_multiarch_avx512(int128_t x,
+                                  int64_t y,
+                                  int64_t z,
+                                  int64_t c,
+                                  int128_t s2_hard_approx,
+                                  int threads,
+                                  bool is_print)
 {
   double time;
 
@@ -308,7 +283,7 @@ int128_t S2_hard_default(int128_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: sieve.count_avx512()");
     print_vars(x, y, c, threads);
     time = get_time();
   }
@@ -335,27 +310,6 @@ int128_t S2_hard_default(int128_t x,
     print("S2_hard", sum, time);
 
   return sum;
-}
-
-int128_t S2_hard(int128_t x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 int128_t s2_hard_approx,
-                 int threads,
-                 bool print)
-{
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  return cpu_supports_sve
-    ? S2_hard_multiarch_arm_sve(x, y, z, c, s2_hard_approx, threads, print)
-    : S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  return cpu_supports_avx512_vpopcnt
-    ? S2_hard_multiarch_avx512 (x, y, z, c, s2_hard_approx, threads, print)
-    : S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#else
-  return S2_hard_default(x, y, z, c, s2_hard_approx, threads, print);
-#endif
 }
 
 #endif
