@@ -18,7 +18,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -180,6 +180,7 @@ int64_t S2(int64_t x,
   {
     print("");
     print("=== S2(x, y) ===");
+    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
     time = get_time();
   }
 

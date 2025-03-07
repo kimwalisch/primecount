@@ -1,5 +1,5 @@
 ///
-/// @file  D.cpp
+/// @file  D_multiarch_arm_sve.cpp
 /// @brief This is a highly optimized implementation of the D(x, y)
 ///        formula in Xavier Gourdon's prime counting algorithm. The D
 ///        formula is very similar to the formula of the hard special
@@ -37,12 +37,6 @@
 
 #include <stdint.h>
 
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include <cpu_supports_arm_sve.hpp>
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
-#endif
-
 using namespace primecount;
 
 namespace {
@@ -52,6 +46,9 @@ namespace {
 /// [low, low + segments * segment_size[.
 ///
 template <typename T, typename Primes, typename FactorTableD>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("arch=armv8-a+sve")))
+#endif
 T D_thread(T x,
            int64_t x_star,
            int64_t xz,
@@ -122,7 +119,7 @@ T D_thread(T x,
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t stop = xpm - low;
-          int64_t phi_xpm = phi[b] + sieve.count(stop);
+          int64_t phi_xpm = phi[b] + sieve.count_arm_sve(stop);
           int64_t mu_m = factor.mu(m);
           sum -= mu_m * phi_xpm;
         }
@@ -153,7 +150,7 @@ T D_thread(T x,
       {
         int64_t xpq = fast_div64(xp, primes[l]);
         int64_t stop = xpq - low;
-        int64_t phi_xpq = phi[b] + sieve.count(stop);
+        int64_t phi_xpq = phi[b] + sieve.count_arm_sve(stop);
         sum += phi_xpq;
       }
 
@@ -234,7 +231,7 @@ T D_OpenMP(T x,
 
 namespace primecount {
 
-int64_t D_default(int64_t x,
+int64_t D_multiarch_arm_sve(int64_t x,
                   int64_t y,
                   int64_t z,
                   int64_t k,
@@ -248,7 +245,7 @@ int64_t D_default(int64_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: sieve.count_arm_sve()");
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -263,30 +260,9 @@ int64_t D_default(int64_t x,
   return sum;
 }
 
-int64_t D(int64_t x,
-          int64_t y,
-          int64_t z,
-          int64_t k,
-          int64_t d_approx,
-          int threads,
-          bool print)
-{
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  return cpu_supports_sve
-    ? D_multiarch_arm_sve(x, y, z, k, d_approx, threads, print)
-    : D_default(x, y, z, k, d_approx, threads, print);
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  return cpu_supports_avx512_vpopcnt
-    ? D_multiarch_avx512 (x, y, z, k, d_approx, threads, print)
-    : D_default(x, y, z, k, d_approx, threads, print);
-#else
-  return D_default(x, y, z, k, d_approx, threads, print);
-#endif
-}
-
 #ifdef HAVE_INT128_T
 
-int128_t D_default(int128_t x,
+int128_t D_multiarch_arm_sve(int128_t x,
                    int64_t y,
                    int64_t z,
                    int64_t k,
@@ -300,7 +276,7 @@ int128_t D_default(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: sieve.count_arm_sve()");
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -325,27 +301,6 @@ int128_t D_default(int128_t x,
     print("D", sum, time);
 
   return sum;
-}
-
-int128_t D(int128_t x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           int128_t d_approx,
-           int threads,
-           bool print)
-{
-  #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? D_multiarch_arm_sve(x, y, z, k, d_approx, threads, print)
-      : D_default(x, y, z, k, d_approx, threads, print);
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    return cpu_supports_avx512_vpopcnt
-      ? D_multiarch_avx512 (x, y, z, k, d_approx, threads, print)
-      : D_default(x, y, z, k, d_approx, threads, print);
-  #else
-    return D_default(x, y, z, k, d_approx, threads, print);
-  #endif
 }
 
 #endif
