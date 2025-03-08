@@ -276,7 +276,7 @@ int128_t D_multiarch_arm_sve(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: sieve.count_arm_sve()");
+    print("Algorithm: ARM SVE bit counting");
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }

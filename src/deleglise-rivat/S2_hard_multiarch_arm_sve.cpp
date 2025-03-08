@@ -283,7 +283,7 @@ int128_t S2_hard_multiarch_arm_sve(int128_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: sieve.count_arm_sve()");
+    print("Algorithm: ARM SVE bit counting");
     print_vars(x, y, c, threads);
     time = get_time();
   }

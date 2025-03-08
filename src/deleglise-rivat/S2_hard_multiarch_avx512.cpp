@@ -251,7 +251,7 @@ int64_t S2_hard_multiarch_avx512(int64_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: sieve.count_avx512()");
+    print("Algorithm: AVX512 bit counting");
     print_vars(x, y, c, threads);
     time = get_time();
   }
