@@ -1,4 +1,4 @@
-Changes in primecount-7.16, 2025-03-07
+Changes in primecount-7.16, 2025-03-08
 
 The if check for runtime dispatching to CPU vector instruction
 sets has been moved outside of the main loop. This improves
@@ -15,6 +15,7 @@ inlined.
 * S2_hard_multiarch_avx512.cpp: New file.
 * S2_hard_multiarch_arm_sve.cpp: New file.
 * CMakeLists.txt: Add new multiarch cpp files.
+* CMakeLists.txt: Fix broken MSVC OpenMP detection.
 
 Changes in primecount-7.15, 2025-03-01
 

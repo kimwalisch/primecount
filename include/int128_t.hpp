@@ -4,7 +4,7 @@
 ///         functions for 128-bit integers that are missing
 ///         in the C++ standard library.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -48,35 +48,6 @@ using int128_t = __int128_t ;
 using uint128_t = __uint128_t;
 using maxint_t = __int128_t ;
 using maxuint_t = __uint128_t;
-
-/// These functions are defined in util.cpp
-std::string to_string(int128_t x);
-std::string to_string(uint128_t x);
-
-std::ostream& operator<<(std::ostream& stream, int128_t n);
-std::ostream& operator<<(std::ostream& stream, uint128_t n);
-
-} // namespace
-
-#elif __has_include(<__msvc_int128.hpp>) && \
-     !defined(DISABLE_INT128)
-
-#define HAVE_INT128_T
-#define ENABLE_INT128_TO_STRING
-
-// Experimental MSVC int128_t support:
-// https://github.com/microsoft/STL/blob/main/stl/inc/__msvc_int128.hpp
-// https://developercommunity.visualstudio.com/t/support-for-128-bit-integer-type/879048
-// https://stackoverflow.com/a/76440171
-#include <__msvc_int128.hpp>
-#include <ostream>
-
-namespace primecount {
-
-using int128_t = std::_Signed128;
-using uint128_t = std::_Unsigned128;
-using maxint_t = std::_Signed128;
-using maxuint_t = std::_Unsigned128;
 
 /// These functions are defined in util.cpp
 std::string to_string(int128_t x);
@@ -202,11 +173,5 @@ template<typename T> struct numeric_limits {
 
 } // namespace pstd
 } // namespace
-
-#if defined(HAVE_INT128_T) && \
-    defined(_OPENMP) && \
-    defined(ENABLE_INT128_OPENMP_PATCH)
-  #include <int128_OpenMP_patch.hpp>
-#endif
 
 #endif

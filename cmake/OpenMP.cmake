@@ -94,35 +94,6 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
         else()
             set(LIB_ATOMIC "")
-
-            if(NOT DISABLE_INT128)
-                # As a last resort check if OpenMP supports int128_t if
-                # we include our <int128_OpenMP_patch.hpp> header.
-                # In this case OpenMP will use critical sections instead
-                # of atomics for 128-bit integers which is slightly less
-                # efficient. (required for LLVM/Clang on Windows)
-                check_cxx_source_compiles("
-                    #include <int128_t.hpp>
-                    #include <int128_OpenMP_patch.hpp>
-                    #include <omp.h>
-                    #include <stdint.h>
-                    #include <iostream>
-                    int main(int, char** argv) {
-                        using primecount::maxint_t;
-                        uintptr_t n = (uintptr_t) argv;
-                        maxint_t sum = (maxint_t) n;
-                        int iters = (int) n;
-                        #pragma omp parallel for reduction(+: sum)
-                        for (int i = 0; i < iters; i++)
-                            sum += (i / 3) * omp_get_thread_num();
-                        std::cout << (long) sum;
-                        return 0;
-                    }" OpenMP_int128_patch)
-
-                if(OpenMP_int128_patch)
-                    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_INT128_OPENMP_PATCH")
-                endif()
-            endif()
         endif()
     endif()
 
