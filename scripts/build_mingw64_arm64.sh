@@ -49,7 +49,11 @@ mkdir build-release-arm64
 cd build-release-arm64
 
 rm ../src/deleglise-rivat/S2_easy.cpp
+rm ../src/deleglise-rivat/S2_hard_multiarch_arm_sve.cpp
+rm ../src/deleglise-rivat/S2_hard_multiarch_avx512.cpp
 rm ../src/gourdon/AC.cpp
+rm ../src/gourdon/D_multiarch_arm_sve.cpp
+rm ../src/gourdon/D_multiarch_avx512.cpp
 clang++ -flto -static -O3 -DNDEBUG -D_WIN32_WINNT=0x0A00 -Wall -Wextra -pedantic -fopenmp -I ../include -I ../lib/primesieve/include ../lib/primesieve/src/*.cpp ../src/*.cpp ../src/lmo/*.cpp ../src/deleglise-rivat/*.cpp ../src/gourdon/*.cpp ../src/app/*.cpp -o primecount.exe -lPsapi
 git checkout ..
 
