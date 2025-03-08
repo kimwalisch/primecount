@@ -276,7 +276,7 @@ int128_t D_multiarch_avx512(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: sieve.count_avx512()");
+    print("Algorithm: AVX512 bit counting");
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
