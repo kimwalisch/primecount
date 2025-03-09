@@ -45,7 +45,8 @@ check_cxx_source_compiles("
     }" int128)
 
 if(NOT int128)
-    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "DISABLE_INT128")
+    set(DISABLE_INT128 "DISABLE_INT128")
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "${DISABLE_INT128}")
 endif()
 
 cmake_pop_check_state()
