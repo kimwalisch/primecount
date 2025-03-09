@@ -100,7 +100,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
     cmake_pop_check_state()
 
     # OpenMP has been tested successfully, enable it
-    if(OpenMP OR OpenMP_with_libatomic OR OpenMP_int128_patch)
+    if(OpenMP OR OpenMP_with_libatomic)
         if(TARGET OpenMP::OpenMP_CXX)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
         else()
@@ -115,7 +115,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
 endif()
 
 # OpenMP test has failed, print warning message
-if(NOT OpenMP AND NOT OpenMP_with_libatomic AND NOT OpenMP_int128_patch)
+if(NOT OpenMP AND NOT OpenMP_with_libatomic)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
         message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
