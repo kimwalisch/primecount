@@ -99,8 +99,8 @@ int64_t S2(int64_t x,
         if (mu[m] != 0 && prime < lpf[m])
         {
           int64_t xpm = x / (prime * m);
-          int64_t stop = xpm - low;
-          int64_t phi_xpm = phi[b] + sieve.count(stop);
+          int64_t count = sieve.count(xpm - low);
+          int64_t phi_xpm = phi[b] + count;
           s2 -= mu[m] * phi_xpm;
         }
       }
@@ -125,8 +125,8 @@ int64_t S2(int64_t x,
       for (; primes[l] > min_m; l--)
       {
         int64_t xpq = x / (prime * primes[l]);
-        int64_t stop = xpq - low;
-        int64_t phi_xpq = phi[b] + sieve.count(stop);
+        int64_t count = sieve.count(xpq - low);
+        int64_t phi_xpq = phi[b] + count;
         s2 += phi_xpq;
       }
 

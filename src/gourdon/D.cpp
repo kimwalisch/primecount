@@ -121,8 +121,8 @@ T D_thread(T x,
         if (prime < factor.is_leaf(m))
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
-          int64_t stop = xpm - low;
-          int64_t phi_xpm = phi[b] + sieve.count(stop);
+          int64_t count = sieve.count(xpm - low);
+          int64_t phi_xpm = phi[b] + count;
           int64_t mu_m = factor.mu(m);
           sum -= mu_m * phi_xpm;
         }
@@ -152,8 +152,8 @@ T D_thread(T x,
       for (; primes[l] > min_m; l--)
       {
         int64_t xpq = fast_div64(xp, primes[l]);
-        int64_t stop = xpq - low;
-        int64_t phi_xpq = phi[b] + sieve.count(stop);
+        int64_t count = sieve.count(xpq - low);
+        int64_t phi_xpq = phi[b] + count;
         sum += phi_xpq;
       }
 
