@@ -1,19 +1,25 @@
 ///
 /// @file  D_multiarch_arm_sve.cpp
-/// @brief This is a highly optimized implementation of the D(x, y)
-///        formula in Xavier Gourdon's prime counting algorithm. The D
-///        formula is very similar to the formula of the hard special
-///        leaves in the Deleglise-Rivat algorithm. Hence this
-///        implementation is basically identical to S2_hard.cpp except
-///        that the bounds have been changed slightly.
+/// @brief This file is identical to D.cpp except that it uses the
+///        Sieve::count_arm_sve(stop) method instead of the default
+///        Sieve::count(stop) method used in D.cpp.
 ///
-///        This implementation uses multi-threading with advanced load
-///        balancing, it scales well up to a large number of CPU cores
-///        because the compute threads are completely independent from
-///        each other. This implementation also uses the highly
-///        optimized Sieve class and the FactorTableD class which is a
-///        compressed lookup table of moebius function values,
-///        least prime factors and max prime factors.
+///        Since the Sieve::count(stop) method is called very
+///        frequently and is crucial for performance we have
+///        vectorized its algorithm using ARM SVE SIMD instructions.
+///        There is an ARM SVE runtime check in D.cpp and if the CPU
+///        supports it, the code in this file will be executed.
+///
+///        In order to get optimal performance it is important to
+///        inline the Sieve::count(stop) method. Therefore we have
+///        annotated this method using the ALWAYS_INLINE macro.
+///        When Multiarch (runtime dispatching to SIMD algorithm)
+///        is enabled then Sieve::count_arm_sve(stop) is annotated
+///        using GCC's  __attribute__ ((target(...))). But this
+///        prevents inlining! As a workaround, we annotate both the
+///        D_thread() calling function and Sieve::count_arm_sve(stop)
+///        using the same __attribute__ ((target(...))). This way
+///        the compiler will inline Sieve::count_arm_sve(stop).
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
