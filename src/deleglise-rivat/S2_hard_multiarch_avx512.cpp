@@ -1,22 +1,25 @@
 ///
 /// @file  S2_hard_multiarch_avx512.cpp
-/// @brief Calculate the contribution of the hard special leaves using
-///        a prime sieve. This is a multi-threaded implementation
-///        which uses compression (PiTable & FactorTable) to reduce
-///        the memory usage by about 10x.
+/// @brief This file is identical to S2_hard.cpp except that it uses
+///        the Sieve::count_avx512(stop) method instead of the
+///        default Sieve::count(stop) method used in S2_hard.cpp.
 ///
-///        Usually the computation of the hard special leaves
-///        requires a binary indexed tree a.k.a. Fenwick tree to count
-///        the number of unsieved elements in O(log n) time. But it
-///        is actually much faster to simply count the number of
-///        unsieved elements directly from the sieve array using the
-///        POPCNT instruction. Hence this implementation does not use
-///        a binary indexed tree.
+///        Since the Sieve::count(stop) method is called very
+///        frequently and is crucial for performance we have
+///        vectorized its algorithm using AVX512 SIMD instructions.
+///        There is an AVX512 runtime check in S2_hard.cpp and if the
+///        CPU supports it, the code in this file will be executed.
 ///
-///        This implementation is based on the paper:
-///        Tomás Oliveira e Silva, Computing pi(x): the combinatorial
-///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
-///        pp. 759-768.
+///        In order to get optimal performance it is important to
+///        inline the Sieve::count(stop) method. Therefore we have
+///        annotated this method using the ALWAYS_INLINE macro.
+///        When Multiarch (runtime dispatching to SIMD algorithm)
+///        is enabled then Sieve::count_avx512(stop) is annotated
+///        using GCC's  __attribute__ ((target(...))). But this
+///        prevents inlining! As a workaround, we annotate both the
+///        S2_hard_thread() calling function and Sieve::count_avx512(stop)
+///        using the same __attribute__ ((target(...))). This way the
+///        compiler will inline Sieve::count_avx512(stop).
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
