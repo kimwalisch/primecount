@@ -295,24 +295,35 @@ Sieve::Sieve(uint64_t low,
   sieve_.resize(segment_size / 30);
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
-  allocate_counter(low);
+  allocate_counter();
 }
 
 /// Each element of the counter array contains the current
 /// number of unsieved elements in the interval:
 /// [i * counter_.dist, (i + 1) * counter_.dist[.
 /// Ideally each element of the counter array should
-/// represent an interval of size O(sqrt(average_leaf_dist)).
-/// Also the counter distance should be adjusted regularly
-/// whilst sieving as the distance between consecutive
-/// leaves is very small ~ log(x) at the beginning of the
-/// sieving algorithm but grows up to segment_size towards
-/// the end of the algorithm.
+/// represent an interval of size O(sqrt(segment_size)).
 ///
-void Sieve::allocate_counter(uint64_t low)
+void Sieve::allocate_counter()
 {
-  double average_leaf_dist = std::sqrt(low);
-  double counter_dist = std::sqrt(average_leaf_dist);
+  // Default Sieve::count_popcnt64() algorithm
+  uint64_t sizeof_count_algo = sizeof(uint64_t);
+
+#if defined(ENABLE_AVX512_VPOPCNT)
+  sizeof_count_algo = sizeof(__m512i);
+#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  if (cpu_supports_avx512_vpopcnt)
+    sizeof_count_algo = sizeof(__m512i);
+#elif defined(ENABLE_ARM_SVE)
+  sizeof_count_algo = svcntd() * sizeof(uint64_t);
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  if (cpu_supports_sve)
+    sizeof_count_algo = svcntd() * sizeof(uint64_t);
+#endif
+
+  // Each byte represents an interval of size 30
+  uint64_t segment_size = sieve_.size() * 30;
+  double counter_dist = std::sqrt(segment_size);
 
   // Here we balance counting with the counter array and
   // counting from the sieve array using the POPCNT
@@ -320,7 +331,9 @@ void Sieve::allocate_counter(uint64_t low)
   // count a distance of 240 using a single instruction we
   // slightly increase the counter distance and slightly
   // decrease the size of the counter array.
-  counter_.dist = uint64_t(counter_dist * std::sqrt(240));
+  ASSERT(sizeof_count_algo >= 1);
+  double tuning_factor = std::sqrt(sizeof_count_algo);
+  counter_.dist = uint64_t(counter_dist * tuning_factor);
 
   // Each byte represents an interval of size 30
   uint64_t bytes = counter_.dist / 30;
@@ -330,7 +343,7 @@ void Sieve::allocate_counter(uint64_t low)
   // the number of executed instructions. On newer CPUs
   // reducing the branch mispredictions is more important
   // than reducing the number of executed instructions.
-  bytes = max((uint64_t) sizeof(uint64_t) * 16, bytes);
+  bytes = max(sizeof_count_algo * 16, bytes);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.

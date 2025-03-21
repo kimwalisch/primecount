@@ -228,42 +228,6 @@ algorithms. In the Lagarias-Miller-Odlyzko [[1]](#References) algorithm the aver
 distance between consecutive special leaves is much smaller, so there the new counting
 method will not improve performance in practice.
 
-## Gradually increase counter distance
-
-So far we have focused on improving counting for the case
-when there are very few leaves per segment which are far away from each other.
-Generally there is a very large number of leaves that are close to each other
-at the beginning of the sieving algorithm, and gradually as we sieve up the leaves
-become sparser and the distance between the leaves increases. So what we can do is,
-start with a counter array whose elements span over small intervals and
-then gradually increase the interval size. We can update the counter size and distance
-e.g. at the start of each new segment as the counter needs to be reinitialized at the
-start of each new segment anyway. The ideal counter distance for the next segment is
-$\sqrt{average\ leaf\ distance}$. In practice we can approximate the average leaf
-distance using $\sqrt{segment\ low}$. My measurements using primecount indicate that
-gradually increasing the counter distance further improves counting by a small factor.
-This optimization is primarily useful when using a very small number of counter levels
-e.g. 2.
-
-```C++
-// Ideally each element of the counter array
-// should represent an interval of size:
-// min(sqrt(average_leaf_dist), sqrt(segment_size))
-// Also the counter distance should be regularly
-// adjusted whilst sieving.
-//
-void Sieve::allocate_counter(uint64_t segment_low)
-{
-  uint64_t average_leaf_dist = sqrt(segment_low);
-  counter_dist_ = sqrt(average_leaf_dist);
-  counter_dist_ = nearest_power_of_2(counter_dist_);
-  counter_log2_dist_ = log2(counter_dist_);
-
-  uint64_t counter_size = (sieve_size_ / counter_dist_) + 1;
-  counter_.resize(counter_size);
-}
-```
-
 ## Multiple levels of counters
 
 It is also possible to use multiple levels of counters, in this case the data
