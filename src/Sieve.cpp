@@ -306,7 +306,7 @@ Sieve::Sieve(uint64_t low,
 ///
 void Sieve::allocate_counter(uint64_t segment_size)
 {
-  // Default Sieve::count_popcnt64() algorithm
+  // Default count_popcnt64() algorithm
   uint64_t sizeof_count_algo = sizeof(uint64_t);
 
 #if defined(ENABLE_AVX512_VPOPCNT)
@@ -321,8 +321,6 @@ void Sieve::allocate_counter(uint64_t segment_size)
     sizeof_count_algo = svcntd() * sizeof(uint64_t);
 #endif
 
-  double counter_dist = std::sqrt(segment_size);
-
   // Here we balance counting with the counter array and counting from
   // the sieve array using the POPCNT instruction. Since the 64-bit
   // POPCNT instructions allows to count a distance of 240 using a
@@ -334,6 +332,7 @@ void Sieve::allocate_counter(uint64_t segment_size)
   // AVX512 but couldn't measure any speedup when further increasing
   // the tuning_factor (and hence the counter distance).
   double tuning_factor = 3.0;
+  double counter_dist = std::sqrt(segment_size);
   counter_.dist = uint64_t(counter_dist * tuning_factor);
   uint64_t bytes = counter_.dist / 30;
 
