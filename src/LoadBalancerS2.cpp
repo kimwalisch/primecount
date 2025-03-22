@@ -54,9 +54,9 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   lock_.init(threads);
 
-  // Using a single thread, the best performance is usually
-  // achieved using a sieve array size that matches your
-  // CPU's L1 data cache size (per core) or that is
+  // Using a single thread, the best performance is
+  // usually achieved using a sieve array size that matches
+  // your CPU's L1 data cache size (per core) or that is
   // slightly larger than your L1 cache size but smaller
   // than your L2 cache size (per core). Also, the
   // segment_size must be >= sqrt(sieve_limit).
