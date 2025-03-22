@@ -54,19 +54,21 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   lock_.init(threads);
 
+  // Using a single thread, the best performance is usually
+  // achieved using a sieve array size that matches your
+  // CPU's L1 data cache size (per core) or that is
+  // slightly larger than your L1 cache size but smaller
+  // than your L2 cache size (per core). Also, the
+  // segment_size must be >= sqrt(sieve_limit).
+  int64_t numbers_per_byte = 30;
+  int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
+  segment_size_ = sieve_bytes * numbers_per_byte;
+  segment_size_ = min(segment_size_, sieve_limit_);
+  max_size_ = max(segment_size_, isqrt(sieve_limit));
+
   if (threads == 1 &&
       !is_print)
   {
-    // Using a single thread, the best performance is
-    // usually achieved using a sieve array size that
-    // matches your CPU's L1 data cache size (per core) or
-    // that is slightly larger than your L1 cache size but
-    // smaller than your L2 cache size (per core). Also,
-    // the segment_size must be >= sqrt(sieve_limit).
-    int64_t numbers_per_byte = 30;
-    int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
-    segment_size_ = sieve_bytes * numbers_per_byte;
-
     // In the segmented sieve of Eratosthenes, the segment
     // size must be >= O(sqrt(x)) otherwise the runtime
     // complexity of the algorithm deteriorates. Since we
@@ -89,7 +91,6 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   int64_t min_size = 1 << 9;
   segment_size_ = max(min_size, segment_size_);
   segment_size_ = Sieve::get_segment_size(segment_size_);
-  max_size_ = max(segment_size_, isqrt(sieve_limit));
 }
 
 maxint_t LoadBalancerS2::get_sum() const
