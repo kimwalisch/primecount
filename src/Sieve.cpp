@@ -321,15 +321,19 @@ void Sieve::allocate_counter(uint64_t segment_size)
     sizeof_count_algo = svcntd() * sizeof(uint64_t);
 #endif
 
-  // Here we balance counting with the counter array and
-  // counting from the sieve array using the POPCNT
-  // instruction. Since the POPCNT instructions allows to
-  // count a distance of 240 using a single instruction we
-  // slightly increase the counter distance and slightly
-  // decrease the size of the counter array.
-  ASSERT(sizeof_count_algo >= 1);
-  double tuning_factor = std::sqrt(sizeof_count_algo);
   double counter_dist = std::sqrt(segment_size);
+
+  // Here we balance counting with the counter array and counting from
+  // the sieve array using the POPCNT instruction. Since the 64-bit
+  // POPCNT instructions allows to count a distance of 240 using a
+  // single instruction we slightly increase the counter distance and
+  // slightly decrease the size of the counter array. Note that
+  // increasing the counter distance theoretically reduces the number
+  // of operations used by the algorithm but also makes it less cache
+  // efficient. I also ran benchmarks using AMD and Intel CPUs with
+  // AVX512 but couldn't measure any speedup when further increasing
+  // the tuning_factor (and hence the counter distance).
+  double tuning_factor = 3.0;
   counter_.dist = uint64_t(counter_dist * tuning_factor);
 
   // Each byte represents an interval of size 30
@@ -340,6 +344,7 @@ void Sieve::allocate_counter(uint64_t segment_size)
   // the number of executed instructions. On newer CPUs
   // reducing the branch mispredictions is more important
   // than reducing the number of executed instructions.
+  ASSERT(sizeof_count_algo >= 1);
   bytes = max(sizeof_count_algo * 16, bytes);
   bytes = next_power_of_2(bytes);
 
