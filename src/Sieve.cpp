@@ -335,8 +335,6 @@ void Sieve::allocate_counter(uint64_t segment_size)
   // the tuning_factor (and hence the counter distance).
   double tuning_factor = 3.0;
   counter_.dist = uint64_t(counter_dist * tuning_factor);
-
-  // Each byte represents an interval of size 30
   uint64_t bytes = counter_.dist / 30;
 
   // Increasing the minimum counter distance decreases the
@@ -351,7 +349,7 @@ void Sieve::allocate_counter(uint64_t segment_size)
   // Make sure the counter (32-bit) doesn't overflow.
   // This can never happen since each counter array element
   // only counts the number of unsieved elements (1 bits) in
-  // an interval of size: sieve_limit^(1/4) * sqrt(240).
+  // an interval of size: sieve_limit^(1/4) * tuning_factor.
   // Hence the max(counter value) = 2^18.
   ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
   uint64_t counter_size = ceil_div(sieve_.size(), bytes);
