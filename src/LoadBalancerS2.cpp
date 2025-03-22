@@ -54,36 +54,34 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   lock_.init(threads);
 
-  // The best performance is usually achieved using a sieve
-  // array size that matches your CPU's L1 data cache size
-  // (per core) or that is slightly larger than your L1 cache
-  // size but smaller than your L2 cache size (per core).
-  // Also, the segment_size must be >= sqrt(sieve_limit).
-  int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
-  int64_t numbers_per_byte = 30;
-  int64_t sqrt_limit = isqrt(sieve_limit);
-  max_size_ = max(sieve_bytes * numbers_per_byte, sqrt_limit);
-
   if (threads == 1 &&
       !is_print)
   {
-    // When a single thread is used (and printing is disabled)
-    // we can set segment_size to its maximum size as load
-    // balancing is only useful for multi-threading.
-    segment_size_ = max_size_;
-    // Currently our Sieve.cpp does not rebalance its counters
-    // data structure. However, if we process the computation
-    // in chunks then the sieve gets recreated for each new
-    // chunk which rebalances the counters. Therefore we limit
-    // the number of segments here.
-    segments_ = 100;
+    // Using a single thread, the best performance is
+    // usually achieved using a sieve array size that
+    // matches your CPU's L1 data cache size (per core) or
+    // that is slightly larger than your L1 cache size but
+    // smaller than your L2 cache size (per core). Also,
+    // the segment_size must be >= sqrt(sieve_limit).
+    int64_t numbers_per_byte = 30;
+    int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
+    segment_size_ = sieve_bytes * numbers_per_byte;
+
+    // In the segmented sieve of Eratosthenes, the segment
+    // size must be >= O(sqrt(x)) otherwise the runtime
+    // complexity of the algorithm deteriorates. Since we
+    // are using a small constant segment size in this code
+    // path, we need to increase the segment size after
+    // sieving up to segment_size_^2.
+    segments_ = segment_size_;
   }
   else
   {
-    // Start with a tiny segment size of x^(1/4) as
-    // most special leaves are in the first few
-    // segments and as we need to ensure that all
-    // threads are assigned an equal amount of work.
+    // When using multi-threading, it is important to
+    // start with a tiny segment size of x^(1/4) as most
+    // special leaves are located in the first few segments
+    // and as we need to ensure that all threads are
+    // assigned an equal amount of work.
     segment_size_ = isqrt(isqrt(x));
     segments_ = 1;
   }
@@ -91,6 +89,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   int64_t min_size = 1 << 9;
   segment_size_ = max(min_size, segment_size_);
   segment_size_ = Sieve::get_segment_size(segment_size_);
+  max_size_ = max(segment_size_, isqrt(sieve_limit));
 }
 
 maxint_t LoadBalancerS2::get_sum() const
