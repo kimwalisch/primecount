@@ -327,7 +327,7 @@ private:
 #endif
 
   void add(uint64_t prime);
-  void allocate_counter();
+  void allocate_counter(uint64_t segment_size);
   void init_counter(uint64_t low, uint64_t high);
   void reset_counter();
   void reset_sieve(uint64_t low, uint64_t high);

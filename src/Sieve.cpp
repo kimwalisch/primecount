@@ -295,7 +295,7 @@ Sieve::Sieve(uint64_t low,
   sieve_.resize(segment_size / 30);
   wheel_.reserve(wheel_size);
   wheel_.resize(4);
-  allocate_counter();
+  allocate_counter(segment_size);
 }
 
 /// Each element of the counter array contains the current
@@ -304,7 +304,7 @@ Sieve::Sieve(uint64_t low,
 /// Ideally each element of the counter array should
 /// represent an interval of size O(sqrt(segment_size)).
 ///
-void Sieve::allocate_counter()
+void Sieve::allocate_counter(uint64_t segment_size)
 {
   // Default Sieve::count_popcnt64() algorithm
   uint64_t sizeof_count_algo = sizeof(uint64_t);
@@ -321,10 +321,6 @@ void Sieve::allocate_counter()
     sizeof_count_algo = svcntd() * sizeof(uint64_t);
 #endif
 
-  // Each byte represents an interval of size 30
-  uint64_t segment_size = sieve_.size() * 30;
-  double counter_dist = std::sqrt(segment_size);
-
   // Here we balance counting with the counter array and
   // counting from the sieve array using the POPCNT
   // instruction. Since the POPCNT instructions allows to
@@ -333,6 +329,7 @@ void Sieve::allocate_counter()
   // decrease the size of the counter array.
   ASSERT(sizeof_count_algo >= 1);
   double tuning_factor = std::sqrt(sizeof_count_algo);
+  double counter_dist = std::sqrt(segment_size);
   counter_.dist = uint64_t(counter_dist * tuning_factor);
 
   // Each byte represents an interval of size 30
