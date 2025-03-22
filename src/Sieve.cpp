@@ -345,7 +345,7 @@ void Sieve::allocate_counter(uint64_t segment_size)
   // reducing the branch mispredictions is more important
   // than reducing the number of executed instructions.
   ASSERT(sizeof_count_algo >= 1);
-  bytes = max(sizeof_count_algo * 16, bytes);
+  bytes = max(sizeof_count_algo * 8, bytes);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.
