@@ -22,7 +22,7 @@
 ///        order to prevent that 1 thread will run much longer than
 ///        all the other threads.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -54,43 +54,44 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 {
   lock_.init(threads);
 
-  // The best performance is usually achieved using a sieve
-  // array size that matches your CPU's L1 data cache size
-  // (per core) or that is slightly larger than your L1 cache
-  // size but smaller than your L2 cache size (per core).
-  // Also, the segment_size must be >= sqrt(sieve_limit).
-  int64_t sieve_bytes = L1D_CACHE_SIZE * 2;
   int64_t numbers_per_byte = 30;
-  int64_t sqrt_limit = isqrt(sieve_limit);
-  max_size_ = max(sieve_bytes * numbers_per_byte, sqrt_limit);
+  int64_t cache_bytes = L1D_CACHE_SIZE * 2;
+  int64_t cache_segment_size = cache_bytes * numbers_per_byte;
+  max_size_ = isqrt(sieve_limit);
+  max_size_ = max(max_size_, cache_segment_size);
 
   if (threads == 1 &&
       !is_print)
   {
-    // When a single thread is used (and printing is disabled)
-    // we can set segment_size to its maximum size as load
-    // balancing is only useful for multi-threading.
-    segment_size_ = max_size_;
-    // Currently our Sieve.cpp does not rebalance its counters
-    // data structure. However, if we process the computation
-    // in chunks then the sieve gets recreated for each new
-    // chunk which rebalances the counters. Therefore we limit
-    // the number of segments here.
+    // Using a single thread, the best performance is
+    // usually achieved using a sieve array size that matches
+    // your CPU's L1 data cache size (per core) or that is
+    // slightly larger than your L1 cache size but smaller
+    // than your L2 cache size (per core). Also, the
+    // segment_size must be >= sqrt(sieve_limit).
+    segment_size_ = cache_segment_size;
+    segment_size_ = min(segment_size_, sieve_limit);
+    segment_size_ = Sieve::get_segment_size(segment_size_);
+
+    // Currently our Sieve.cpp does not rebalance its
+    // counters data structure. However, if we process the
+    // computation in chunks then the sieve gets recreated
+    // for each new chunk which rebalances the counters.
+    // Therefore we limit the number of segments here.
     segments_ = 100;
   }
   else
   {
-    // Start with a tiny segment size of x^(1/4) as
-    // most special leaves are in the first few
-    // segments and as we need to ensure that all
-    // threads are assigned an equal amount of work.
+    // When using multi-threading, it is important to
+    // start with a tiny segment size of x^(1/4) as most
+    // special leaves are located in the first few segments
+    // and as we need to ensure that all threads are
+    // assigned an equal amount of work.
     segment_size_ = isqrt(isqrt(x));
+    segment_size_ = max(segment_size_, 1 << 9);
+    segment_size_ = Sieve::get_segment_size(segment_size_);
     segments_ = 1;
   }
-
-  int64_t min_size = 1 << 9;
-  segment_size_ = max(min_size, segment_size_);
-  segment_size_ = Sieve::get_segment_size(segment_size_);
 }
 
 maxint_t LoadBalancerS2::get_sum() const
