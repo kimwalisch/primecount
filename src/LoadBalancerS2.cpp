@@ -71,7 +71,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // segment_size must be >= sqrt(sieve_limit).
     segment_size_ = cache_segment_size;
     segment_size_ = min(segment_size_, sieve_limit);
-    segment_size_ = Sieve::get_segment_size(segment_size_);
+    segment_size_ = Sieve::align_segment_size(segment_size_);
 
     // Currently our Sieve.cpp does not rebalance its
     // counters data structure. However, if we process the
@@ -89,7 +89,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // assigned an equal amount of work.
     segment_size_ = isqrt(isqrt(x));
     segment_size_ = max(segment_size_, 1 << 9);
-    segment_size_ = Sieve::get_segment_size(segment_size_);
+    segment_size_ = Sieve::align_segment_size(segment_size_);
     segments_ = 1;
   }
 }
@@ -157,7 +157,7 @@ void LoadBalancerS2::update_segment_size()
 {
   segment_size_ += segment_size_ / 16;
   segment_size_ = min(segment_size_, max_size_);
-  segment_size_ = Sieve::get_segment_size(segment_size_);
+  segment_size_ = Sieve::align_segment_size(segment_size_);
 }
 
 /// Increase or decrease the number of segments per thread

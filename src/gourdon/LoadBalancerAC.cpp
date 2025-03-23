@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -67,9 +67,9 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   }
 
   segment_size_ = std::max(min_segment_size, segment_size_);
-  segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+  segment_size_ = SegmentedPiTable::align_segment_size(segment_size_);
   max_segment_size_ = std::max(l2_segment_size, segment_size_);
-  max_segment_size_ = SegmentedPiTable::get_segment_size(max_segment_size_);
+  max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   if (is_print_)
     print_status(get_time());
@@ -116,7 +116,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
     {
       segment_size_ = segment_size_ * increase_factor;
       segment_size_ = std::min(segment_size_, max_segment_size_);
-      segment_size_ = SegmentedPiTable::get_segment_size(segment_size_);
+      segment_size_ = SegmentedPiTable::align_segment_size(segment_size_);
     }
   }
 

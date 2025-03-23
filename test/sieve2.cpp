@@ -5,7 +5,7 @@
 ///         that have been crossed off for the first time in
 ///         the sieve array.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,10 +39,11 @@ int main()
 
   int low = 0;
   int high = dist(gen);
+  int sqrt_high = isqrt(high);
+  auto primes = generate_primes<int32_t>(sqrt_high);
 
-  auto primes = generate_primes<int32_t>(isqrt(high));
-  auto segment_size = Sieve::get_segment_size(high - low);
-
+  uint64_t segment_size = high - low;
+  segment_size = Sieve::align_segment_size(segment_size);
   Sieve sieve(low, segment_size, primes.size());
   std::vector<int> sieve2(high, 1);
   sieve2[0] = 0;

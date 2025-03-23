@@ -18,7 +18,7 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -58,7 +58,7 @@ public:
   }
 
   /// Make sure size % 240 == 0
-  static int64_t get_segment_size(uint64_t size)
+  static int64_t align_segment_size(uint64_t size)
   {
     size = std::max<uint64_t>(240, size);
 

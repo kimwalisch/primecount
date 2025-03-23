@@ -287,7 +287,7 @@ Sieve::Sieve(uint64_t low,
   ASSERT(segment_size % 240 == 0);
 
   start_ = low;
-  segment_size = get_segment_size(segment_size);
+  segment_size = align_segment_size(segment_size);
 
   // sieve_size = segment_size / 30 as each byte corresponds
   // to 30 numbers i.e. the 8 bits correspond to the
@@ -357,7 +357,7 @@ uint64_t Sieve::segment_size() const
 /// process 64-bit words (8 bytes) and each
 /// byte contains 30 numbers.
 ///
-uint64_t Sieve::get_segment_size(uint64_t size)
+uint64_t Sieve::align_segment_size(uint64_t size)
 {
   size = max(size, 240);
 
@@ -375,7 +375,7 @@ void Sieve::reset_sieve(uint64_t low, uint64_t high)
   if (size < segment_size())
   {
     uint64_t last = size - 1;
-    size = get_segment_size(size);
+    size = align_segment_size(size);
     sieve_.resize(size / 30);
     auto sieve64 = (uint64_t*) sieve_.data();
     sieve64[last / 240] &= unset_larger[last % 240];

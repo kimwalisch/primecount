@@ -58,9 +58,10 @@ int64_t S2(int64_t x,
     time = get_time();
   }
 
-  int64_t limit = x / y;
-  int64_t segment_size = Sieve::get_segment_size(isqrt(limit));
   int64_t low = 0;
+  int64_t limit = x / y;
+  int64_t segment_size = isqrt(limit);
+  segment_size = Sieve::align_segment_size(segment_size);
 
   Sieve sieve(low, segment_size, primes.size());
   auto pi = generate_pi(y);

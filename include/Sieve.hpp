@@ -60,7 +60,7 @@ public:
   uint64_t count(uint64_t start, uint64_t stop) const;
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
-  static uint64_t get_segment_size(uint64_t size);
+  static uint64_t align_segment_size(uint64_t size);
 
   uint64_t get_total_count() const
   {
