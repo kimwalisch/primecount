@@ -45,6 +45,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <cmath>
 
 #if defined(ENABLE_ARM_SVE)
   #include <arm_sve.h>
@@ -311,26 +312,45 @@ Sieve::Sieve(uint64_t low,
 ///
 void Sieve::allocate_counter(uint64_t low)
 {
+  // Default count_popcnt64() algorithm
+  uint64_t bytes_per_instruction = sizeof(uint64_t);
+
+#if defined(ENABLE_AVX512_VPOPCNT)
+  // count_avx512() algorithm
+  bytes_per_instruction = sizeof(__m512i);
+#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  // count_avx512() algorithm
+  if (cpu_supports_avx512_vpopcnt)
+    bytes_per_instruction = sizeof(__m512i);
+#elif defined(ENABLE_ARM_SVE)
+  // count_arm_sve() algorithm
+  bytes_per_instruction = svcntd() * sizeof(uint64_t);
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  // count_arm_sve() algorithm
+  if (cpu_supports_sve)
+    bytes_per_instruction = svcntd() * sizeof(uint64_t);
+#endif
+
   double average_leaf_dist = std::sqrt(low);
   double counter_dist = std::sqrt(average_leaf_dist);
 
   // Here we balance counting with the counter array and
-  // counting from the sieve array using the POPCNT
-  // instruction. Since the POPCNT instructions allows to
-  // count a distance of 240 using a single instruction we
-  // slightly increase the counter distance and slightly
-  // decrease the size of the counter array.
-  counter_.dist = uint64_t(counter_dist * std::sqrt(240));
-
-  // Each byte represents an interval of size 30
-  uint64_t bytes = counter_.dist / 30;
+  // counting from the sieve array using the 64-bit POPCNT
+  // instruction. Since the 64-bit POPCNT instructions
+  // allows to count a distance of 240 using a single
+  // instruction we slightly increase the counter distance
+  // and slightly decrease the size of the counter array.
+  ASSERT(bytes_per_instruction >= sizeof(uint64_t));
+  uint64_t dist_per_instruction = bytes_per_instruction * 30;
+  counter_.dist = uint64_t(counter_dist * std::sqrt(dist_per_instruction));
 
   // Increasing the minimum counter distance decreases the
-  // branch mispredictions but on the other hand increases
-  // the number of executed instructions. On newer CPUs
-  // reducing the branch mispredictions is more important
-  // than reducing the number of executed instructions.
-  bytes = max((uint64_t) sizeof(uint64_t) * 16, bytes);
+  // branch mispredictions (good) but on the other hand
+  // increases the number of executed instructions (bad).
+  // In my benchmarks setting the minimum amount of bytes to
+  // bytes_per_instruction * 8 (or 16) performed best.
+  uint64_t bytes = counter_.dist / 30;
+  bytes = max(bytes, bytes_per_instruction * 8);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.

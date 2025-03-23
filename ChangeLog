@@ -1,4 +1,4 @@
-Changes in primecount-7.16, 2025-03-08
+Changes in primecount-7.16, 2025-03-23
 
 The if check for runtime dispatching to CPU vector instruction
 sets has been moved outside of the main loop. This improves
@@ -6,6 +6,7 @@ performance of the D and S2_hard algorithms by up to 10% for
 x < 2^64. The important Sieve::count_*() method is now always
 inlined.
 
+* Sieve.cpp: Improve count balancing.
 * Sieve.cpp: Add multiarch count methods.
 * Sieve.hpp: New multiarch count methods.
 * D.cpp: Runtime dispatching changes.
