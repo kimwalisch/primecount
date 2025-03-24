@@ -106,7 +106,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
   if (is_print_)
   {
-    uint64_t dist = thread.segments * thread.segment_size;
+    uint64_t dist = thread.segment_size * thread.segments;
     uint64_t high = thread.low + dist;
     status_.print(high, sieve_limit_, sum_, sum_approx_);
   }
