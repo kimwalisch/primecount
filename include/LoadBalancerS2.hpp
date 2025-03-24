@@ -1,7 +1,7 @@
 ///
 /// @file  LoadBalancerS2.hpp
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -61,7 +61,6 @@ public:
 private:
   void update_load_balancing(const ThreadData& thread);
   void update_number_of_segments(const ThreadData& thread);
-  void update_segment_size();
   double remaining_secs() const;
 
   int64_t low_ = 0;
@@ -69,7 +68,7 @@ private:
   int64_t sieve_limit_ = 0;
   int64_t segments_ = 0;
   int64_t segment_size_ = 0;
-  int64_t max_size_ = 0;
+  int64_t cache_segment_size_ = 0;
   maxint_t sum_ = 0;
   maxint_t sum_approx_ = 0;
   double time_ = 0;
