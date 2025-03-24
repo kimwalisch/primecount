@@ -61,14 +61,13 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   // than your L2 cache size (per core).
   int64_t numbers_per_byte = 30;
   int64_t cache_bytes = L1D_CACHE_SIZE * 2;
-  int64_t cache_segment_size = cache_bytes * numbers_per_byte;
-  max_size_ = isqrt(sieve_limit);
-  max_size_ = max(max_size_, cache_segment_size);
+  cache_segment_size_ = cache_bytes * numbers_per_byte;
+  cache_segment_size_ = Sieve::align_segment_size(cache_segment_size_);
 
   if (threads == 1 &&
       !is_print)
   {
-    segment_size_ = cache_segment_size;
+    segment_size_ = cache_segment_size_;
     segment_size_ = min(segment_size_, sieve_limit);
     segment_size_ = Sieve::align_segment_size(segment_size_);
 
@@ -140,23 +139,34 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     if (sum_ == 0)
       return;
 
-    // Slowly increase the segment size until it reaches
-    // sqrt(sieve_limit). Most special leaves are located
-    // around y, hence we need to be careful to not assign too
-    // much work to a single thread in this region.
-    if (segment_size_ < max_size_)
-      update_segment_size();
-    else
+    if (segment_size_ >= cache_segment_size_)
       update_number_of_segments(thread);
-  }
-}
 
-/// Slowly increase segment_size until it reaches sqrt(sieve_limit)
-void LoadBalancerS2::update_segment_size()
-{
-  segment_size_ += segment_size_ / 16;
-  segment_size_ = min(segment_size_, max_size_);
-  segment_size_ = Sieve::align_segment_size(segment_size_);
+    // The segmented sieve of Eratosthenes traditionally
+    // requires using a segment size of O(sqrt(x)), using a
+    // smaller segment size deteriorates the runtime complexity.
+    // However, it is possible to use a smaller segment size
+    // of O(sqrt(high)) provided that it is dynamically
+    // increased after each sieved sieved segment. Using this
+    // smaller segment size of O(sqrt(high)) uses less memory
+    // and is hence more cache efficient.
+    int64_t high = low_ + segment_size_ * segments_;
+    high = min(high, sieve_limit_);
+    int64_t new_segment_size = isqrt(high);
+    new_segment_size = max(cache_segment_size_, new_segment_size);
+
+    // Slowly increase the segment size until it reaches
+    // sqrt(high). Most special leaves are located around y,
+    // hence we need to be careful to not assign too much work
+    // (i.e. use too large segment size) to a single thread
+    // in this region.
+    if (segment_size_ < new_segment_size)
+    {
+      segment_size_ += segment_size_ / 16;
+      segment_size_ = min(segment_size_, new_segment_size);
+      segment_size_ = Sieve::align_segment_size(segment_size_);
+    }
+  }
 }
 
 /// Increase or decrease the number of segments per thread
