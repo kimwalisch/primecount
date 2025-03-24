@@ -49,7 +49,7 @@ namespace {
 
 /// Compute the contribution of the hard special leaves using a
 /// segmented sieve. Each thread processes the interval
-/// [low, low + segments * segment_size[.
+/// [low, low + segment_size * segments[.
 ///
 template <typename T, typename Primes, typename FactorTableD>
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
@@ -73,7 +73,7 @@ T D_thread(T x,
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
   int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t limit = min(low + segments * segment_size, xz);
+  int64_t limit = min(low + segment_size * segments, xz);
   int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
   int64_t min_b = pi[min(xz / limit, x_star)];
   min_b = max(k, min_b) + 1;

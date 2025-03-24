@@ -53,7 +53,7 @@ namespace {
 
 /// Compute the contribution of the hard special leaves using a
 /// segmented sieve. Each thread processes the interval
-/// [low, low + segments * segment_size[.
+/// [low, low + segment_size * segments[.
 ///
 /// Note that in the Deleglise-Rivat paper it is suggested to use a
 /// segment size of y. In practice however this uses too much memory
@@ -80,7 +80,7 @@ T S2_hard_thread(T x,
   int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
-  int64_t limit = min(low + segments * segment_size, z);
+  int64_t limit = min(low + segment_size * segments, z);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t max_b = (limit <= y) ? pi_sqrty
       : pi[min3(isqrt(x / low1), isqrt(z), y)];

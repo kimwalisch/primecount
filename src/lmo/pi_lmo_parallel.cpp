@@ -44,7 +44,7 @@ using namespace primecount;
 namespace {
 
 /// Compute the S2 contribution of the interval
-/// [low, low + segments * segment_size[.
+/// [low, low + segment_size * segments[.
 ///
 int64_t S2_thread(int64_t x,
                   int64_t y,
@@ -62,7 +62,7 @@ int64_t S2_thread(int64_t x,
   int64_t segments = thread.segments;
   int64_t segment_size = thread.segment_size;
   int64_t pi_sqrty = pi[isqrt(y)];
-  int64_t limit = min(low + segments * segment_size, z + 1);
+  int64_t limit = min(low + segment_size * segments, z + 1);
   int64_t max_b = pi[min(isqrt(x / low1), y - 1)];
   int64_t min_b = pi[min(z / limit, primes[max_b])];
   min_b = max(c, min_b) + 1;
