@@ -158,9 +158,6 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
       segment_size_ = Sieve::align_segment_size(segment_size_);
     }
 
-    ASSERT(segment_size_ % 240);
-    ASSERT(cache_segment_size_ % 240);
-
     if (segment_size_ >= cache_segment_size_)
       update_number_of_segments(thread);
   }
