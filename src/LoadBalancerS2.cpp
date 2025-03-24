@@ -139,6 +139,9 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     if (sum_ == 0)
       return;
 
+    if (segment_size_ >= cache_segment_size_)
+      update_number_of_segments(thread);
+
     // The segmented sieve of Eratosthenes traditionally
     // requires using a segment size of O(sqrt(x)), using a
     // smaller segment size deteriorates the runtime complexity.
@@ -153,18 +156,16 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     new_segment_size = max(cache_segment_size_, new_segment_size);
 
     // Slowly increase the segment size until it reaches
-    // sqrt(sieve_limit). Most special leaves are located
-    // around y, hence we need to be careful to not assign too
-    // much work to a single thread in this region.
+    // sqrt(high). Most special leaves are located around y,
+    // hence we need to be careful to not assign too much work
+    // (i.e. too large segment size) to a single thread in
+    // this region.
     if (segment_size_ < new_segment_size)
     {
       segment_size_ += segment_size_ / 16;
       segment_size_ = min(segment_size_, new_segment_size);
       segment_size_ = Sieve::align_segment_size(segment_size_);
     }
-
-    if (segment_size_ >= cache_segment_size_)
-      update_number_of_segments(thread);
   }
 }
 
