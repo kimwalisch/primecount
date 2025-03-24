@@ -145,11 +145,11 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     // The segmented sieve of Eratosthenes traditionally
     // requires using a segment size of O(sqrt(x)), using a
     // smaller segment size deteriorates the runtime complexity.
-    // However, it is also possible to use a smaller segment
-    // size of O(sqrt(high)) that is dynamically increased
-    // after each sieved sieved segment. Using this smaller
-    // segment size of O(sqrt(high)) uses less memory and is
-    // hence more cache efficient.
+    // However, it is possible to use a smaller segment size
+    // of O(sqrt(high)) provided that it is dynamically
+    // increased after each sieved sieved segment. Using this
+    // smaller segment size of O(sqrt(high)) uses less memory
+    // and is hence more cache efficient.
     int64_t high = low_ + segment_size_ * segments_;
     high = min(high, sieve_limit_);
     int64_t new_segment_size = isqrt(high);
