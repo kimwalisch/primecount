@@ -106,7 +106,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
       thread.secs < increase_threshold &&
       thread.segments == segments_ &&
       thread.segment_size == segment_size_ &&
-      segments_ * segment_size_ * (threads_ * 8) < remaining_dist)
+      segment_size_ * segments_ * (threads_ * 8) < remaining_dist)
   {
     int64_t increase_factor = 2;
 
@@ -126,7 +126,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   thread.low = low_;
   thread.segments = segments_;
   thread.segment_size = segment_size_;
-  low_ = std::min(low_ + segments_ * segment_size_, sqrtx_);
+  low_ = std::min(low_ + segment_size_ * segments_, sqrtx_);
   segment_nr_++;
 
   return thread.low < sqrtx_;
@@ -141,7 +141,7 @@ void LoadBalancerAC::print_status(double time)
     print_time_ = time;
 
     int64_t remaining_dist = sqrtx_ - low_;
-    int64_t thread_dist = segments_ * segment_size_;
+    int64_t thread_dist = segment_size_ * segments_;
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);
     total_segments += segment_nr_;
 

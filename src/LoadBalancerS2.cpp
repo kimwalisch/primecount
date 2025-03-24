@@ -120,7 +120,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   thread.secs = 0;
   thread.init_secs = 0;
 
-  low_ += segments_ * segment_size_;
+  low_ += segment_size_ * segments_;
   bool is_work = thread.low < sieve_limit_;
 
   return is_work;
