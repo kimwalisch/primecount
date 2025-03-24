@@ -158,8 +158,8 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     // Slowly increase the segment size until it reaches
     // sqrt(high). Most special leaves are located around y,
     // hence we need to be careful to not assign too much work
-    // (i.e. too large segment size) to a single thread in
-    // this region.
+    // (i.e. use too large segment size) to a single thread
+    // in this region.
     if (segment_size_ < new_segment_size)
     {
       segment_size_ += segment_size_ / 16;
