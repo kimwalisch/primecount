@@ -46,14 +46,14 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // size (unless x^(1/4) > L2 cache size). This way
   // we ensure that most memory accesses will be cache
   // hits and we get good performance.
-  int64_t l2_segment_size = L2_CACHE_SIZE * SegmentedPiTable::numbers_per_byte();
+  int64_t L2_segment_size = L2_CACHE_SIZE * SegmentedPiTable::numbers_per_byte();
 
   if (threads == 1 && !is_print)
   {
     // When using a single thread (and printing is disabled)
     // we can use a segment size larger than x^(1/4)
     // because load balancing is only needed for multi-threading.
-    segment_size_ = std::max(x14, l2_segment_size);
+    segment_size_ = std::max(x14, L2_segment_size);
     segments_ = ceil_div(sqrtx, segment_size_);
   }
   else
@@ -68,7 +68,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
 
   segment_size_ = std::max(min_segment_size, segment_size_);
   segment_size_ = SegmentedPiTable::align_segment_size(segment_size_);
-  max_segment_size_ = std::max(l2_segment_size, segment_size_);
+  max_segment_size_ = std::max(L2_segment_size, segment_size_);
   max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   if (is_print_)
