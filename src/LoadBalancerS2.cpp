@@ -14,13 +14,16 @@
 ///        leaves are in the first few segments whereas later on
 ///        there are very few special leaves.
 ///
-///        This LoadBalancerS2 gradually increases the number of
-///        segments to sieve as long as the expected runtime of the
-///        sieve distance is smaller than the expected finish time
-///        of the algorithm. Near the end the LoadBalancerS2 will
-///        gradually decrease the number of segments to sieve in
-///        order to prevent that 1 thread will run much longer than
-///        all the other threads.
+///        This LoadBalancerS2 therefore starts with a tiny segment
+///        size of x^(1/4) and one segment per thread. Then the
+///        LoadBalancerS2 gradually increases the segment size until
+///        it reaches sqrt(limit). Afterwards the LoadBalancerS2
+///        gradually increases the number of segments per thread as
+///        long as the expected thread runtime is smaller than the
+///        expected finish time of the algorithm. Near the end the
+///        LoadBalancerS2 gradually decreases the number of segments
+///        per thread in order to prevent 1 thread from running much
+///        longer than all the other threads.
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -39,6 +42,20 @@
 
 #include <stdint.h>
 
+namespace {
+
+// For small PrimePi(x) computations with x ≤ 10^18 the
+// best performance is usually achieved using a sieve
+// array size that matches the CPU's L1 data cache size
+// (per core) or that is slightly larger than the L1 cache
+// size but smaller than the L2 cache size (per core).
+
+const int64_t numbers_per_byte = 30;
+const int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
+const int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
+
+} // namespace
+
 namespace primecount {
 
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
@@ -47,27 +64,19 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),
+  sqrt_limit_(isqrt(sieve_limit)),
   sum_approx_(sum_approx),
   time_(get_time()),
+  threads_(threads),
   is_print_(is_print),
   status_(x)
 {
   lock_.init(threads);
 
-  // Using a single thread, the best performance is
-  // usually achieved using a sieve array size that matches
-  // your CPU's L1 data cache size (per core) or that is
-  // slightly larger than your L1 cache size but smaller
-  // than your L2 cache size (per core).
-  int64_t numbers_per_byte = 30;
-  int64_t cache_bytes = L1D_CACHE_SIZE * 2;
-  cache_segment_size_ = cache_bytes * numbers_per_byte;
-  cache_segment_size_ = Sieve::align_segment_size(cache_segment_size_);
-
   if (threads == 1 &&
       !is_print)
   {
-    segment_size_ = cache_segment_size_;
+    segment_size_ = L1_segment_size;
     segment_size_ = min(segment_size_, sieve_limit);
     segment_size_ = Sieve::align_segment_size(segment_size_);
 
@@ -131,7 +140,7 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     max_low_ = thread.low;
     segments_ = thread.segments;
 
-    // We only start increasing the segment_size and segments
+    // We only start increasing the segment size and segments
     // per thread once the first special leaves have been
     // found. Near the start there is a very large number of
     // leaves and we don't want a single thread to compute
@@ -139,38 +148,51 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     if (sum_ == 0)
       return;
 
-    if (segment_size_ >= cache_segment_size_)
-      update_number_of_segments(thread);
-
-    // The segmented sieve of Eratosthenes traditionally
-    // requires using a segment size of O(sqrt(x)), using a
-    // smaller segment size deteriorates the runtime complexity.
-    // However, it is possible to use a smaller segment size
-    // of O(sqrt(high)) provided that it is dynamically
-    // increased after each sieved sieved segment. Using this
-    // smaller segment size of O(sqrt(high)) uses less memory
-    // and is hence more cache efficient.
-    int64_t high = low_ + segment_size_ * segments_;
-    high = min(high, sieve_limit_);
-    int64_t new_segment_size = isqrt(high);
-    new_segment_size = max(cache_segment_size_, new_segment_size);
-
-    // Slowly increase the segment size until it reaches
-    // sqrt(high). Most special leaves are located around y,
-    // hence we need to be careful to not assign too much work
-    // (i.e. use too large segment size) to a single thread
-    // in this region.
-    if (segment_size_ < new_segment_size)
+    // Always slowly increase the segment size until it
+    // reaches L1_segment_size (CPU L1 cache size).
+    if (segment_size_ < L1_segment_size)
     {
       segment_size_ += segment_size_ / 16;
-      segment_size_ = min(segment_size_, new_segment_size);
+      segment_size_ = min(segment_size_, L1_segment_size);
       segment_size_ = Sieve::align_segment_size(segment_size_);
+      return;
+    }
+
+    // If sqrt_limit_ > L1_segment_size then slowly increase
+    // the segment size until it reaches L2_segment_size.
+    if (segment_size_ < sqrt_limit_ &&
+        segment_size_ < L2_segment_size)
+    {
+      segment_size_ += segment_size_ / 16;
+      segment_size_ = min(segment_size_, L2_segment_size);
+      segment_size_ = Sieve::align_segment_size(segment_size_);
+      return;
+    }
+
+    update_number_of_segments(thread);
+
+    // If sqrt_limit_ > L2_segment_size then slowly increase
+    // the segment size until it reaches sqrt(high).
+    if (segment_size_ < sqrt_limit_ &&
+        segment_size_ >= L2_segment_size)
+    {
+      int64_t dist = (segment_size_ * segments_) * threads_;
+      int64_t high = min(low_ + dist, sieve_limit_);
+
+      if (segment_size_ < isqrt(high))
+      {
+        segment_size_ += segment_size_ / 16;
+        dist = (segment_size_ * segments_) * threads_;
+        high = min(low_ + dist, sieve_limit_);
+        segment_size_ = isqrt(high);
+        segment_size_ = Sieve::align_segment_size(segment_size_);
+      }
     }
   }
 }
 
-/// Increase or decrease the number of segments per thread
-/// based on the remaining runtime.
+/// Increase or decrease the number of segments per
+/// thread based on the remaining runtime.
 ///
 void LoadBalancerS2::update_number_of_segments(const ThreadData& thread)
 {

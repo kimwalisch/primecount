@@ -66,12 +66,13 @@ private:
   int64_t low_ = 0;
   int64_t max_low_ = 0;
   int64_t sieve_limit_ = 0;
+  int64_t sqrt_limit_ = 0;
   int64_t segments_ = 0;
   int64_t segment_size_ = 0;
-  int64_t cache_segment_size_ = 0;
   maxint_t sum_ = 0;
   maxint_t sum_approx_ = 0;
   double time_ = 0;
+  int threads_ = 0;
   bool is_print_ = false;
   StatusS2 status_;
   OmpLock lock_;

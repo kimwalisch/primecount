@@ -3,7 +3,13 @@
 /// @brief Default CPU cache sizes and maximum CPU cache line size
 ///        that will be used by primecount's algorithms.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+///        There are CPUs with small caches and CPUs with large
+///        caches. In order to compile a primecount binary that will
+///        perform well on a wide variety of CPUs, it is recommended
+///        to set L1_CACHE_SIZE and L2_CACHE_SIZE to values found in
+///        CPUs with small or medium sized caches.
+///
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,14 +18,14 @@
 #ifndef PRIMECOUNT_CONFIG_HPP
 #define PRIMECOUNT_CONFIG_HPP
 
-#ifndef L1D_CACHE_SIZE
-  /// Per CPU core L1 data cache size in bytes.
+#ifndef L1_CACHE_SIZE
+  /// L1 data cache size in bytes (per CPU core).
   /// For big.LITTLE CPUs pick the smallest L1 data cache.
-  #define L1D_CACHE_SIZE (64 << 10)
+  #define L1_CACHE_SIZE (64 << 10)
 #endif
 
 #ifndef L2_CACHE_SIZE
-  /// Per CPU core L2 cache size in bytes.
+  /// L2 cache size in bytes (per CPU core).
   /// For big.LITTLE CPUs pick the smallest L2 cache.
   /// If your CPU's L2 cache is shared by multiple physical CPU cores
   /// then L2_CACHE_SIZE should be set to (SHARED_L2_CACHE_SIZE /
