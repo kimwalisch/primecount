@@ -142,9 +142,9 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
 
     // We only start increasing the segment size and segments
     // per thread once the first special leaves have been
-    // found. Near the start there is a very large number of
-    // leaves and we don't want a single thread to compute
-    // them all by himself (which would cause scaling issues).
+    // found. Most special leaves are located near the start
+    // (around y). Hence, we assign tiny work chunks to the
+    // threads in this region to avoid load imbalance.
     if (sum_ == 0)
       return;
 
