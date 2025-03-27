@@ -148,8 +148,8 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     if (sum_ == 0)
       return;
 
-    // Always slowly increase the segment size until it
-    // reaches L1_segment_size (CPU L1 cache size).
+    // If segment_size < L1_segment_size then slowly increase
+    // the segment size until it reaches L1_segment_size.
     if (segment_size_ < L1_segment_size)
     {
       segment_size_ += segment_size_ / 16;
@@ -158,10 +158,12 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
       return;
     }
 
-    // If sqrt_limit_ > L1_segment_size then slowly increase
+    // If segment_size >= L1_segment_size then slowly increase
     // the segment size until it reaches L2_segment_size.
-    if (segment_size_ < sqrt_limit_ &&
-        segment_size_ < L2_segment_size)
+    if (segment_size_ >= L1_segment_size &&
+        segment_size_ < L2_segment_size &&
+        segment_size_ < sqrt_limit_)
+        
     {
       segment_size_ += segment_size_ / 16;
       segment_size_ = min(segment_size_, L2_segment_size);
@@ -171,10 +173,10 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
 
     update_number_of_segments(thread);
 
-    // If sqrt_limit_ > L2_segment_size then slowly increase
+    // If segment_size >= L2_segment_size then slowly increase
     // the segment size until it reaches sqrt(high).
-    if (segment_size_ < sqrt_limit_ &&
-        segment_size_ >= L2_segment_size)
+    if (segment_size_ >= L2_segment_size &&
+        segment_size_ < sqrt_limit_)
     {
       int64_t dist = (segment_size_ * segments_) * threads_;
       int64_t high = min(low_ + dist, sieve_limit_);
