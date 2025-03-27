@@ -163,7 +163,6 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     if (segment_size_ >= L1_segment_size &&
         segment_size_ < L2_segment_size &&
         segment_size_ < sqrt_limit_)
-        
     {
       segment_size_ += segment_size_ / 16;
       segment_size_ = min(segment_size_, L2_segment_size);
