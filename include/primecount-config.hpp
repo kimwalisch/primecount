@@ -21,7 +21,7 @@
 #ifndef L1_CACHE_SIZE
   /// L1 data cache size in bytes (per CPU core).
   /// For big.LITTLE CPUs pick the smallest L1 data cache.
-  #define L1_CACHE_SIZE (64 << 10)
+  #define L1_CACHE_SIZE (128 << 10)
 #endif
 
 #ifndef L2_CACHE_SIZE
@@ -30,7 +30,7 @@
   /// If your CPU's L2 cache is shared by multiple physical CPU cores
   /// then L2_CACHE_SIZE should be set to (SHARED_L2_CACHE_SIZE /
   /// number of physical CPU cores sharing the L2 cache).
-  #define L2_CACHE_SIZE (512 << 10)
+  #define L2_CACHE_SIZE (1024 << 10)
 #endif
 
 #ifndef MAX_CACHE_LINE_SIZE
