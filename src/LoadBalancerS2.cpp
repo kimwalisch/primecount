@@ -50,9 +50,9 @@ namespace {
 // (per core) or that is slightly larger than the L1 cache
 // size but smaller than the L2 cache size (per core).
 
-const int64_t numbers_per_byte = 30;
-const int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
-const int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
+constexpr int64_t numbers_per_byte = 30;
+constexpr int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
+constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
 
 } // namespace
 
