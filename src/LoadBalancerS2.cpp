@@ -140,16 +140,16 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     max_low_ = thread.low;
     segments_ = thread.segments;
 
-    // We only start increasing the segment size and segments
-    // per thread once the first special leaves have been
-    // found. Most special leaves are located near the start
-    // (around y). Hence, we assign tiny work chunks to the
-    // threads in this region to avoid load imbalance.
+    // We only start increasing the segment size and segments per
+    // thread once the first special leaves have been found. Most
+    // special leaves are located near the start (around y).
+    // Hence, we assign tiny work chunks to the threads in this
+    // region to avoid load imbalance.
     if (sum_ == 0)
       return;
 
-    // If segment_size < L1_segment_size then slowly increase
-    // the segment size until it reaches L1_segment_size.
+    // If segment_size < L1_segment_size then slowly increase the
+    // segment size until it reaches L1_segment_size.
     if (segment_size_ < L1_segment_size)
     {
       segment_size_ += segment_size_ / 16;
@@ -158,8 +158,8 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
       return;
     }
 
-    // If segment_size >= L1_segment_size then slowly increase
-    // the segment size until it reaches L2_segment_size.
+    // If segment_size >= L1_segment_size then slowly increase the
+    // segment size until it reaches L2_segment_size.
     if (segment_size_ >= L1_segment_size &&
         segment_size_ < L2_segment_size &&
         segment_size_ < sqrt_limit_)
@@ -172,8 +172,20 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
 
     update_number_of_segments(thread);
 
-    // If segment_size >= L2_segment_size then slowly increase
-    // the segment size until it reaches sqrt(high).
+    // The hard special leaves algorithm is basically a modified
+    // segmented sieve of Eratosthenes. Using the segmented sieve of
+    // Eratosthenes it is of utmost importance that sieve array fits
+    // into the CPU's cache, otherwise performance will deteriorate
+    // significantly and the algorithm will scale poorly.
+    //
+    // Deleglise-Rivat orignially suggested using a segment size of
+    // O(y). Xavier Gourdon realized this segment size was much too
+    // large for new record PrimePi(x) computations and hence
+    // suggested using a smaller segment size of O(sqrt(x/y)) which
+    // is the same as O(sqrt(sieve_limit)). However, for new record
+    // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
+    // is still too large. Hence, I use an even smaller segment size
+    // of O(sqrt(high)) in primecount.
     if (segment_size_ >= L2_segment_size &&
         segment_size_ < sqrt_limit_)
     {

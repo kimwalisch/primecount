@@ -51,15 +51,6 @@ namespace {
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segment_size * segments[.
 ///
-/// Note that in the Deleglise-Rivat paper it is suggested to use a
-/// segment size of y. In practice however this uses too much memory
-/// especially when using multi-threading. Hence we are using a
-/// segment size of sqrt(z) as suggested in Xavier Gourdon's paper.
-/// In primecount's implementation a segment size of sqrt(z) seems
-/// ideal since slightly increasing the segment size decreases
-/// performance because of cache misses and slightly decreasing the
-/// segment size also decreases performance.
-///
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("arch=armv8-a+sve")))
