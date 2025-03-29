@@ -97,6 +97,68 @@ public:
     #endif
   }
 
+ #if defined(ENABLE_PORTABLE_POPCNT64)
+
+  /// Count 1 bits inside [start, stop]
+  uint64_t count_popcnt64(uint64_t start, uint64_t stop) const;
+
+  /// Count 1 bits inside [0, stop]
+  ALWAYS_INLINE uint64_t count_popcnt64(uint64_t stop)
+  {
+    ASSERT(stop >= prev_stop_);
+    uint64_t start = prev_stop_ + 1;
+    prev_stop_ = stop;
+
+    if (start > stop)
+      return count_;
+
+    // Quickly count the number of unsieved elements (in
+    // the sieve array) up to a value that is close to
+    // the stop number i.e. (stop - start) < counter_.dist.
+    // We do this using the counter array, each element
+    // of the counter array contains the number of
+    // unsieved elements in the interval:
+    // [i * counter_.dist, (i + 1) * counter_.dist[.
+    while (counter_.stop <= stop)
+    {
+      start = counter_.stop;
+      counter_.stop += counter_.dist;
+      counter_.sum += counter_[counter_.i++];
+      count_ = counter_.sum;
+    }
+
+    // Here the remaining distance is relatively small i.e.
+    // (stop - start) < counter_.dist, hence we simply
+    // count the remaining number of unsieved elements by
+    // linearly iterating over the sieve array.
+    ASSERT(start <= stop);
+    ASSERT(stop - start < segment_size());
+    uint64_t start_idx = start / 240;
+    uint64_t stop_idx = stop / 240;
+    uint64_t m1 = unset_smaller[start % 240];
+    uint64_t m2 = unset_larger[stop % 240];
+
+    // Branchfree bitmask calculation:
+    // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
+    m1 &= (-(start_idx != stop_idx) | m2);
+    // m2 = (start_idx != stop_idx) ? m2 : 0;
+    m2 &= -(start_idx != stop_idx);
+
+    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
+    uint64_t start_bits = sieve64[start_idx] & m1;
+    uint64_t stop_bits = sieve64[stop_idx] & m2;
+    uint64_t cnt = popcnt64(start_bits);
+    cnt += popcnt64(stop_bits);
+
+    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
+      cnt += popcnt64(sieve64[i]);
+
+    count_ += cnt;
+    return count_;
+  }
+
+#endif
+
 #if defined(ENABLE_AVX512_VPOPCNT) || \
     defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
@@ -263,68 +325,6 @@ public:
 #endif
 
 private:
-
-#if defined(ENABLE_PORTABLE_POPCNT64)
-
-  /// Count 1 bits inside [start, stop]
-  uint64_t count_popcnt64(uint64_t start, uint64_t stop) const;
-
-  /// Count 1 bits inside [0, stop]
-  ALWAYS_INLINE uint64_t count_popcnt64(uint64_t stop)
-  {
-    ASSERT(stop >= prev_stop_);
-    uint64_t start = prev_stop_ + 1;
-    prev_stop_ = stop;
-
-    if (start > stop)
-      return count_;
-
-    // Quickly count the number of unsieved elements (in
-    // the sieve array) up to a value that is close to
-    // the stop number i.e. (stop - start) < counter_.dist.
-    // We do this using the counter array, each element
-    // of the counter array contains the number of
-    // unsieved elements in the interval:
-    // [i * counter_.dist, (i + 1) * counter_.dist[.
-    while (counter_.stop <= stop)
-    {
-      start = counter_.stop;
-      counter_.stop += counter_.dist;
-      counter_.sum += counter_[counter_.i++];
-      count_ = counter_.sum;
-    }
-
-    // Here the remaining distance is relatively small i.e.
-    // (stop - start) < counter_.dist, hence we simply
-    // count the remaining number of unsieved elements by
-    // linearly iterating over the sieve array.
-    ASSERT(start <= stop);
-    ASSERT(stop - start < segment_size());
-    uint64_t start_idx = start / 240;
-    uint64_t stop_idx = stop / 240;
-    uint64_t m1 = unset_smaller[start % 240];
-    uint64_t m2 = unset_larger[stop % 240];
-
-    // Branchfree bitmask calculation:
-    // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-    m1 &= (-(start_idx != stop_idx) | m2);
-    // m2 = (start_idx != stop_idx) ? m2 : 0;
-    m2 &= -(start_idx != stop_idx);
-
-    const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
-    uint64_t start_bits = sieve64[start_idx] & m1;
-    uint64_t stop_bits = sieve64[stop_idx] & m2;
-    uint64_t cnt = popcnt64(start_bits);
-    cnt += popcnt64(stop_bits);
-
-    for (uint64_t i = start_idx + 1; i < stop_idx; i++)
-      cnt += popcnt64(sieve64[i]);
-
-    count_ += cnt;
-    return count_;
-  }
-
-#endif
 
   void add(uint64_t prime);
   void allocate_counter(uint64_t low);
