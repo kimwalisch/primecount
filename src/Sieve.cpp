@@ -61,6 +61,39 @@
 
 namespace {
 
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+
+/// svcntd() requires -march=armv8-a+sve compiler option
+__attribute__ ((target ("arch=armv8-a+sve")))
+uint64_t bytes_per_count_instruction_arm_sve()
+{
+  return svcntd() * sizeof(uint64_t);
+}
+
+#endif
+
+uint64_t bytes_per_count_instruction()
+{
+  #if defined(ENABLE_AVX512_VPOPCNT)
+    // count_avx512() algorithm
+    return sizeof(__m512i);
+  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    // count_avx512() algorithm
+    if (cpu_supports_avx512_vpopcnt)
+      return sizeof(__m512i);
+  #elif defined(ENABLE_ARM_SVE)
+    // count_arm_sve() algorithm
+    return svcntd() * sizeof(uint64_t);
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    // count_arm_sve() algorithm
+    if (cpu_supports_sve)
+      return bytes_per_count_instruction_arm_sve();
+  #endif
+
+  // Default count_popcnt64() algorithm
+  return sizeof(uint64_t);
+}
+
 struct WheelInit
 {
   uint8_t factor;
