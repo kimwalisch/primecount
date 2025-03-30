@@ -78,9 +78,8 @@ among all threads. Based on my benchmarks a small segment size of $\sqrt[4]{x}$ 
 large number of CPU cores such as my dual-socket AMD EPYC server with 196 threads. Using a segment size larger than $\sqrt[4]{x}$ such
 as $\sqrt[3]{x}$ or $y$ causes significant load imbalance (i.e. some threads will be assigned much more work than others and keep on
 computing after most of the threads have already finished their computations) which severely deteriorates performance, especially
-on PCs and servers with a large number of CPU cores. Above $y$ there are much fewer easy special leaves, hence the segment size can
-be increased by a small constant factor (16 in primecount) in order to reduce the pre-computation overhead, provided that the
-new segment size still fits into the CPU's cache.
+on PCs and servers with a large number of CPU cores. Above $y$ there are much fewer easy special leaves, hence we can gradually
+increase the number of segments per thread in order to reduce the pre-computation overhead.
 
 # References
 
