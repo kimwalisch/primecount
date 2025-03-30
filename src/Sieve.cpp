@@ -307,18 +307,18 @@ void Sieve::allocate_counter(uint64_t low)
   // allows to count a distance of 240 using a single
   // instruction we slightly increase the counter distance
   // and slightly decrease the size of the counter array.
-  uint64_t count_instruction_bytes = bytes_per_count_instruction();
-  ASSERT(count_instruction_bytes >= sizeof(uint64_t));
-  uint64_t dist_per_instruction = count_instruction_bytes * 30;
+  uint64_t bytes_count_instruction = bytes_per_count_instruction();
+  ASSERT(bytes_count_instruction >= sizeof(uint64_t));
+  uint64_t dist_per_instruction = bytes_count_instruction * 30;
   counter_.dist = uint64_t(counter_dist * std::sqrt(dist_per_instruction));
 
   // Increasing the minimum counter distance decreases the
   // branch mispredictions (good) but on the other hand
   // increases the number of executed instructions (bad).
   // In my benchmarks setting the minimum amount of bytes to
-  // count_instruction_bytes * 8 (or 16) performed best.
+  // bytes_count_instruction * 8 (or 16) performed best.
   uint64_t bytes = counter_.dist / 30;
-  bytes = max(bytes, count_instruction_bytes * 8);
+  bytes = max(bytes, bytes_count_instruction * 8);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.
