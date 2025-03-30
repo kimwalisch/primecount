@@ -85,12 +85,12 @@ public:
   ///
   ALWAYS_INLINE uint64_t count(uint64_t stop)
   {
-    #if defined(ENABLE_ARM_SVE)
-      #define SIEVE_COUNT_ALGO_NAME "ARM SVE bit counting"
-      return count_arm_sve(stop);
-    #elif defined(ENABLE_AVX512_VPOPCNT)
+    #if defined(ENABLE_AVX512_VPOPCNT)
       #define SIEVE_COUNT_ALGO_NAME "AVX512 bit counting"
       return count_avx512(stop);
+    #elif defined(ENABLE_ARM_SVE)
+      #define SIEVE_COUNT_ALGO_NAME "ARM SVE bit counting"
+      return count_arm_sve(stop);
     #else
       #define SIEVE_COUNT_ALGO_NAME "POPCNT64 bit counting"
       return count_popcnt64(stop);
