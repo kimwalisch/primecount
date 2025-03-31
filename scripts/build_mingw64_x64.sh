@@ -51,7 +51,7 @@ rm primecount.exe
 # Remove unnecessary libraries for linking,
 # keep only GCC libraries + kernel32.
 sed -i 's/-lkernel32.*/-lkernel32/g' CMakeFiles/primecount.dir/linklibs.rsp
-sed -i 's/libgomp\.dll\.a/libgomp\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
+sed -i 's/\.dll\.a/\.a/g' CMakeFiles/primecount.dir/linklibs.rsp
 
 # Verify that sed has worked correctly,
 # last word should be -lkernel32.
