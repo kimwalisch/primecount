@@ -47,11 +47,11 @@ namespace {
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 
-/// svcntd() requires -march=armv8-a+sve compiler option
+/// svcntd() requires -march=armv8-a+sve compiler flag
 __attribute__ ((target ("arch=armv8-a+sve")))
-uint64_t bytes_per_count_instruction_arm_sve()
+uint64_t get_svcntd()
 {
-  return svcntd() * sizeof(uint64_t);
+  return svcntd();
 }
 
 #endif
@@ -71,7 +71,7 @@ uint64_t bytes_per_count_instruction()
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     // count_arm_sve() algorithm
     if (cpu_supports_sve)
-      return bytes_per_count_instruction_arm_sve();
+      return get_svcntd() * sizeof(uint64_t);
   #endif
 
   // Default count_popcnt64() algorithm
