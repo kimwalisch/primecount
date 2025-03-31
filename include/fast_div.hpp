@@ -122,7 +122,7 @@ fast_div64(X x, Y y)
   // When we know the result fits into 64-bit (even
   // though the numerator is 128-bit) we can use the divq
   // instruction instead of doing a full 128-bit division.
-  __asm__("divq %[divider]"
+  __asm__("div %[divider]"
           : "+a"(x0), "+d"(x1) : [divider] "r"(d));
 
   return x0;
