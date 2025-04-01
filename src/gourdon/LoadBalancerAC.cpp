@@ -146,10 +146,18 @@ void LoadBalancerAC::print_status(double time)
     total_segments += segment_nr_;
 
     std::ostringstream status;
-    // Clear line because total_segments may become smaller
-    status << "\r                                    "
-           << "\rSegments: " << segment_nr_ << '/' << total_segments;
-    std::cout << status.str() << std::flush;
+    status << "\rSegments: " << segment_nr_ << '/' << total_segments;
+
+    if (status.str().size() >= prev_status_size_)
+      std::cout << status.str() << std::flush;
+    else
+    {
+      std::ostringstream clear_status;
+      clear_status << "\r" << std::string(prev_status_size_, ' ') << status.str();
+      std::cout << clear_status.str() << std::flush;
+    }
+
+    prev_status_size_ = status.str().size();
   }
 }
 

@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,7 +17,9 @@
 #define LOADBALANCERAC_HPP
 
 #include <OmpLock.hpp>
+
 #include <stdint.h>
+#include <cstddef>
 
 namespace primecount {
 
@@ -44,6 +46,7 @@ private:
   int64_t segment_size_ = 0;
   int64_t segment_nr_ = 0;
   int64_t max_segment_size_ = 0;
+  std::size_t prev_status_size_ = 0;
   double start_time_ = 0;
   double print_time_ = 0;
   int threads_ = 0;
