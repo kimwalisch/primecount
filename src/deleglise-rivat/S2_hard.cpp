@@ -25,7 +25,6 @@
 ///
 
 #include <primecount-internal.hpp>
-#include <cpu_arch_macros.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <Sieve.hpp>
