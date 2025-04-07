@@ -6,7 +6,7 @@
 ///         returns the primes. When there are no more primes left in
 ///         the vector PrimeGenerator generates new primes.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,6 +16,7 @@
 #define PRIMEGENERATOR_HPP
 
 #include "Erat.hpp"
+#include "macros.hpp"
 #include "MemoryPool.hpp"
 #include "SievingPrimes.hpp"
 #include "Vector.hpp"
@@ -28,13 +29,11 @@
     defined(__AVX512VBMI2__) && \
     __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VBMI2
-
-#elif defined(ENABLE_MULTIARCH_AVX512_VBMI2) && \
-      __has_include(<immintrin.h>)
+#elif defined(ENABLE_MULTIARCH_AVX512_VBMI2)
   #include "cpu_supports_avx512_vbmi2.hpp"
-  #define ENABLE_DEFAULT
+  #define ENABLE_PRIMEGENERATOR_DEFAULT
 #else
-  #define ENABLE_DEFAULT
+  #define ENABLE_PRIMEGENERATOR_DEFAULT
 #endif
 
 namespace primesieve {
@@ -43,27 +42,45 @@ class PrimeGenerator : public Erat
 {
 public:
   PrimeGenerator(uint64_t start, uint64_t stop);
-  void fillPrevPrimes(Vector<uint64_t>& primes, std::size_t* size);
   static uint64_t maxCachedPrime();
 
   ALWAYS_INLINE void fillNextPrimes(Vector<uint64_t>& primes, std::size_t* size)
   {
     #if defined(ENABLE_AVX512_VBMI2)
-      fillNextPrimes_avx512(primes, size);
+      fillNextPrimes_x86_avx512(primes, size);
+
     #elif defined(ENABLE_MULTIARCH_AVX512_VBMI2)
       if (cpu_supports_avx512_vbmi2)
-        fillNextPrimes_avx512(primes, size);
+        fillNextPrimes_x86_avx512(primes, size);
       else
         fillNextPrimes_default(primes, size);
+
     #else
       fillNextPrimes_default(primes, size);
     #endif
   }
 
+  ALWAYS_INLINE void fillPrevPrimes(Vector<uint64_t>& primes, std::size_t* size)
+  {
+    #if defined(ENABLE_AVX512_VBMI2)
+      fillPrevPrimes_x86_avx512(primes, size);
+
+    #elif defined(ENABLE_MULTIARCH_AVX512_VBMI2)
+      if (cpu_supports_avx512_vbmi2)
+        fillPrevPrimes_x86_avx512(primes, size);
+      else
+        fillPrevPrimes_default(primes, size);
+
+    #else
+      fillPrevPrimes_default(primes, size);
+    #endif
+  }
+
 private:
 
-#if defined(ENABLE_DEFAULT)
+#if defined(ENABLE_PRIMEGENERATOR_DEFAULT)
   void fillNextPrimes_default(Vector<uint64_t>& primes, std::size_t* size);
+  void fillPrevPrimes_default(Vector<uint64_t>& primes, std::size_t* size);
 #endif
 
 #if defined(ENABLE_AVX512_VBMI2) || \
@@ -72,7 +89,12 @@ private:
   #if defined(ENABLE_MULTIARCH_AVX512_VBMI2)
     __attribute__ ((target ("avx512f,avx512vbmi,avx512vbmi2")))
   #endif
-  void fillNextPrimes_avx512(Vector<uint64_t>& primes, std::size_t* size);
+  void fillNextPrimes_x86_avx512(Vector<uint64_t>& primes, std::size_t* size);
+
+  #if defined(ENABLE_MULTIARCH_AVX512_VBMI2)
+    __attribute__ ((target ("avx512f,avx512vbmi,avx512vbmi2")))
+  #endif
+  void fillPrevPrimes_x86_avx512(Vector<uint64_t>& primes, std::size_t* size);
 
 #endif
 
