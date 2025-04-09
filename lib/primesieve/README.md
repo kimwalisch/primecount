@@ -15,7 +15,7 @@ up to 2<sup>64</sup>.
 primesieve generates primes using the segmented
 [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) with
 [wheel factorization](https://en.wikipedia.org/wiki/Wheel_factorization).
-This algorithm has a run time complexity of $O(n\log{\log{n}})$ operations and uses
+This algorithm has a run time complexity of $O(n\ \log\ \log\ n)$ operations and uses
 $O(\sqrt{n})$ memory. Furthermore primesieve uses the
 [bucket sieve](http://sweet.ua.pt/tos/software/prime_sieve.html)
 algorithm which improves the cache efficiency when generating primes > 2<sup>32</sup>.
@@ -131,29 +131,6 @@ sudo ldconfig
 
 * [Detailed build instructions](doc/BUILD.md)
 
-## C++ API
-
-Include the ```<primesieve.hpp>``` header to use libprimesieve's C++ API.
-
-```C++
-#include <primesieve.hpp>
-#include <iostream>
-
-int main()
-{
-  primesieve::iterator it;
-  uint64_t prime = it.next_prime();
-
-  // Iterate over the primes < 10^6
-  for (; prime < 1000000; prime = it.next_prime())
-    std::cout << prime << std::endl;
-
-  return 0;
-}
-```
-
-* [C++ API documentation](doc/CPP_API.md)
-
 ## C API
 
 Include the ```<primesieve.h>``` header to use libprimesieve's C API.
@@ -180,6 +157,29 @@ int main()
 
 * [C API documentation](doc/C_API.md)
 
+## C++ API
+
+Include the ```<primesieve.hpp>``` header to use libprimesieve's C++ API.
+
+```C++
+#include <primesieve.hpp>
+#include <iostream>
+
+int main()
+{
+  primesieve::iterator it;
+  uint64_t prime = it.next_prime();
+
+  // Iterate over the primes < 10^6
+  for (; prime < 1000000; prime = it.next_prime())
+    std::cout << prime << std::endl;
+
+  return 0;
+}
+```
+
+* [C++ API documentation](doc/CPP_API.md)
+
 ## Bindings for other languages
 
 primesieve natively supports C and C++ and has bindings available for:
@@ -200,6 +200,10 @@ primesieve natively supports C and C++ and has bindings available for:
     <tr>
         <td><b>Julia:</b></td>
         <td><a href="https://github.com/jlapeyre/PrimeSieve.jl">PrimeSieve.jl</a></td>
+    </tr>
+    <tr>
+        <td><b>Lua:</b></td>
+        <td><a href="https://github.com/kennypm/lua-primesieve">lua-primesieve</a></td>
     </tr>
     <tr>
         <td><b>Nim:</b></td>

@@ -5,7 +5,7 @@ and [prime k-tuplets](https://en.wikipedia.org/wiki/Prime_k-tuple) up to 2<sup>6
 libprimesieve generates primes using the segmented
 [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) with
 [wheel factorization](https://en.wikipedia.org/wiki/Wheel_factorization).
-This algorithm has a run time complexity of $O(n\log{\log{n}})$ operations and uses
+This algorithm has a run time complexity of $O(n\ \log\ \log\ n)$ operations and uses
 $O(\sqrt{n})$ memory. This page contains a selection of C code snippets that show how to use
 libprimesieve to generate prime numbers. These examples cover the most frequently used
 functionality of libprimesieve. Arguably the most useful feature provided by libprimesieve
@@ -88,9 +88,9 @@ up to this limit.
   prime ≥ start number. If want to generate primes > start number you need to use e.g.
   ```primesieve_jump_to(iter, start+1, stop)```.
 * The first ```primesieve_next_prime()``` call after ```primesieve_jump_to()``` incurs an initialization
-  overhead of $O(\sqrt{start}\times \log{\log{\sqrt{start}}})$ operations. After that, any
+  overhead of $O(\sqrt{start}\ \times\ \log\ \log\ \sqrt{start})$ operations. After that, any
   additional ```primesieve_next_prime()``` call executes in amortized
-  $O(\log{n}\times \log{\log{n}})$ operations.
+  $O(\log\ n\ \times\ \log\ \log\ n)$ operations.
 
 ```C
 #include <primesieve.h>
@@ -130,9 +130,9 @@ correct the start number in most cases using e.g.
 ```primesieve_skipto(iter, start-1, stop)```.
 
 * The first ```primesieve_next_prime()``` call after ```primesieve_skipto()``` incurs an initialization
-  overhead of $O(\sqrt{start}\times \log{\log{\sqrt{start}}})$ operations. After that, any
+  overhead of $O(\sqrt{start}\ \times\ \log\ \log\ \sqrt{start})$ operations. After that, any
   additional ```primesieve_next_prime()``` call executes in amortized
-  $O(\log{n}\times \log{\log{n}})$ operations.
+  $O(\log\ n\ \times\ \log\ \log\ n)$ operations.
 
 ```C
 #include <primesieve.h>
@@ -423,7 +423,7 @@ is relatively small e.g.&nbsp;<&nbsp;sqrt(start). If ```stop_hint``` is set
 ```primesieve_iterator``` will only buffer primes up to this limit.
 
 * Many of libprimesieve's functions e.g. ```primesieve_count_primes(start, stop)``` and
-```primesieve_nth_prime(n, start)``` incur an initialization overhead of O(sqrt(start))
+```primesieve_nth_prime(n, start)``` incur an initialization overhead of $O(\sqrt{start})$
 even if the total sieving distance is tiny. It is therefore not a good idea to
 call these functions repeatedly in a loop unless the sieving distance is
 sufficiently large e.g. >&nbsp;sqrt(start). If the sieving distance is mostly
