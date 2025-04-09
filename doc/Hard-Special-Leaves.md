@@ -426,10 +426,10 @@ count operations per leaf becomes $O(l\times \sqrt[l]{z})$ which is smaller than
 $O(\log^{2}{x})$ since:
 
 $l\times \sqrt[l]{z} < \log^{2}{x}$  
-$\Leftrightarrow \log{z}\ /\log{\log{x}}\times z^{\log{\log{x}}/\log{z}} < \log^{2}{x}$  
-$\Leftrightarrow \log{z}\ /\log{\log{x}}\times \sqrt[\log{z}]{z}^{\log{\log{x}}} < \log^{2}{x}$  
-$\Leftrightarrow \log{z}\ /\log{\log{x}}\times e^{\log{\log{x}}} < \log^{2}{x}$  
-$\Leftrightarrow \log{z}\ /\log{\log{x}}\times \log{x} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ z^{\log\ \log\ x/\log\ z} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ \sqrt[\log\ z]{z}^{\log\ \log\ x} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ e^{\log\ \log\ x} < \log^{2}{x}$  
+$\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ \log{x} < \log^{2}{x}$  
 
 Hence, by using $O(\log{z}\ /\log{\log{x}})$ levels of counters we improve the balancing of sieve
 and count operations and reduce the runtime complexity of the hard special leaf algorithm
