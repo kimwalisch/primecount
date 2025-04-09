@@ -1,3 +1,9 @@
+Changes in primecount-7.17, 2025-04-09
+
+* Update to primesieve-12.7 library.
+* README.md: Fix Markdown math formulas.
+* Hard-Special-Leaves.md: Fix Markdown math formulas.
+
 Changes in primecount-7.16, 2025-03-31
 
 The if check for runtime dispatching to CPU vector instruction
