@@ -396,7 +396,7 @@ It is likely that the use of batch counting enables using even fewer counter lev
 and thereby further improves the runtime complexity of the hard special leaf algorithm. I have
 run extensive benchmarks up $10^{26}$ using primecount and I found that in practice using only
 two counter levels provides the best performance. So my benchmarks seem to confirm that it is
-possible to use fewer than $O(\log{z}\ /\log\ \log\ x)$ levels of counters using batch counting,
+possible to use fewer than $O(\log\ z/\log\ \log\ x)$ levels of counters using batch counting,
 though I assume that using a constant number of counter levels deteriorates the runtime
 complexity of the algorithm.
 
@@ -420,8 +420,8 @@ possible to achieve perfect balancing by using fewer than $O(\log{z})$ levels of
 the number of counter levels is decreased sieving becomes more efficient but on the other
 hand counting becomes more expensive. The maximum number of allowed counting operations per
 leaf that do not deteriorate the runtime complexity of the algorithm is slightly larger
-than $O(\log^{2}{x})$. This bound can be achieved by using $O(\log{z}\ /\log\ \log\ x)$ levels of
-counters, if we set the number of counter levels $l = \log{z}\ /\log\ \log\ x$, then the number of
+than $O(\log^{2}{x})$. This bound can be achieved by using $O(\log\ z/\log\ \log\ x)$ levels of
+counters, if we set the number of counter levels $l = \log\ z/\log\ \log\ x$, then the number of
 count operations per leaf becomes $O(l\times \sqrt[l]{z})$ which is smaller than
 $O(\log^{2}{x})$ since:
 
@@ -431,9 +431,9 @@ $\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ \sqrt[\log\ z]{z}^{\log\ \log\ x
 $\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ e^{\log\ \log\ x} < \log^{2}{x}$  
 $\Leftrightarrow \log{z}/\log\ \log\ x\ \times\ \log{x} < \log^{2}{x}$  
 
-Hence, by using $O(\log{z}\ /\log\ \log\ x)$ levels of counters we improve the balancing of sieve
+Hence, by using $O(\log\ z/\log\ \log\ x)$ levels of counters we improve the balancing of sieve
 and count operations and reduce the runtime complexity of the hard special leaf algorithm
-by a factor of $O(\log\ \log\ x)$ to $O(z\ \log{z}\ /\log\ \log\ x)$ operations. In the original
+by a factor of $O(\log\ \log\ x)$ to $O(z\ \log\ z/\log\ \log\ x)$ operations. In the original
 Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is indicated
 as $O(\pi(\sqrt[4]{x})\times y)$, which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
@@ -445,7 +445,7 @@ complexity of the algorithm to $O(z\ \log\ \log\ z)$ operations.
 
 The alternative counting methods presented in this document have batch counting built-in, but
 as mentioned in the [Batch counting](#Batch-counting) paragraph I don't know whether the use
-of batch counting enables using fewer than $O(\log{z}\ /\log\ \log\ x)$ counter levels and thereby
+of batch counting enables using fewer than $O(\log\ z/\log\ \log\ x)$ counter levels and thereby
 further improves the runtime complexity of the hard special leaf algorithm. Ideally, we want
 to use only $O(\log\ \log\ z)$ counter levels in which case the runtime complexity of the hard special
 leaf algorithm would be $O(z\ \log\ \log\ z)$ operations, provided that the use of $O(\log\ \log\ z)$
@@ -465,9 +465,9 @@ individual segments and I also don't know how much this would improve the runtim
 
 * In the original Deléglise-Rivat paper [[2]](#References) its authors indicate that the use
   of a binary indexed tree deteriorates the sieving part of the hard special leaf algorithm by
-  a factor of $O(\log{z})$ to $O(z\times \log{z}\times \log{\log{z}})$ operations. Tomás Oliveira e Silva in
+  a factor of $O(\log{z})$ to $O(z\times \log{z}\times \log\ \log\ z)$ operations. Tomás Oliveira e Silva in
   [[4]](#References) rightfully points out that this is incorrect and that it only
-  deteriorates the sieving part of the algorithm by a factor of $O(\log{z}\ /\log{\log{z}})$. This is
+  deteriorates the sieving part of the algorithm by a factor of $O(\log\ z/\log\ \log\ z)$. This is
   because we don't need to need to perform $O(\log{z})$ binary indexed tree updates for each
   elementary sieve operation, of which there are $O(z\ \log\ \log\ z)$. But instead we only need to
   perform $O(\log{z})$ binary indexed tree updates whenever an element is crossed off for the first
