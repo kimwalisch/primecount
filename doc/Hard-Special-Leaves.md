@@ -153,7 +153,7 @@ i.e. whenever an element is crossed off for the first time in the sieve array we
 to decrement the corresponding counter element. However since we only need to decrement
 at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
-tree which deteriorates sieving by a factor of $\log{z}/\log\ \log\ z$). I have to give credit
+tree which deteriorates sieving by a factor of $\log\ z/\log\ \log\ z$). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
 chose a counter array size of $O(segment\ size)$ with a constant interval size which does
 not improve the runtime complexity.
