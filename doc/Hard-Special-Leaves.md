@@ -405,14 +405,14 @@ complexity of the algorithm.
 What's the runtime complexity of this alternative algorithm?
 
 When using $O(\log{z})$ counter levels the runtime complexity of the alternative algorithm is
-$O(z\log{z})$ operations which is the same runtime complexity as the original algorithm with
+$O(z\ \log\ z)$ operations which is the same runtime complexity as the original algorithm with
 the binary indexed tree, see [here](#multiple-levels-of-counters) for more information. The
 next interesting question is: is it possible to use fewer than $O(\log{z})$ counter levels and
 thereby improve the runtime complexity of the hard special leaf algorithm?
 
 Tomás Oliveira e Silva's paper [[4]](#References) provides the following runtime
 complexities for the computation of the hard special leaves in the Deléglise-Rivat
-algorithm: sieving uses $O(z\log{z})$ operations, the number of hard special leaves is
+algorithm: sieving uses $O(z\ \log\ z)$ operations, the number of hard special leaves is
 $O(z\ /\log^{2}{x}\ \log{\alpha})$ and for each leaf it takes $O(\log{z})$ operations to count the number
 of unsieved elements. This means that the original algorithm is not perfectly balanced,
 sieving is slightly more expensive than counting. Using the alternative algorithm, it is
@@ -473,7 +473,7 @@ individual segments and I also don't know how much this would improve the runtim
   perform $O(\log{z})$ binary indexed tree updates whenever an element is crossed off for the first
   time in the sieve array. When we sieve up to $z$, there are at most $z$ elements that can be
   crossed off for the first time, therefore the runtime complexity of the sieving part of the
-  hard special leaf algorithm with a binary indexed tree is $O(z\log{z})$ operations.
+  hard special leaf algorithm with a binary indexed tree is $O(z\ \log\ z)$ operations.
   
   The new alternative algorithm also relies on the above subtlety to improve the runtime
   complexity. When using multiple counter levels, the related counter arrays should only be
