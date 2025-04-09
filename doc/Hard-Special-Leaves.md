@@ -153,7 +153,7 @@ i.e. whenever an element is crossed off for the first time in the sieve array we
 to decrement the corresponding counter element. However since we only need to decrement
 at most 1 counter when crossing off an element in the sieve array this does not
 deteriorate the sieving runtime complexity of the algorithm (unlike the binary indexed
-tree which deteriorates sieving by a factor of $\log{z}\ /\log{\log{z}}$). I have to give credit
+tree which deteriorates sieving by a factor of $\log{z}/\log\ \log\ z$). I have to give credit
 to Christian Bau here who already used such a counter array back in 2003, however he
 chose a counter array size of $O(segment\ size)$ with a constant interval size which does
 not improve the runtime complexity.
@@ -413,7 +413,7 @@ thereby improve the runtime complexity of the hard special leaf algorithm?
 Tomás Oliveira e Silva's paper [[4]](#References) provides the following runtime
 complexities for the computation of the hard special leaves in the Deléglise-Rivat
 algorithm: sieving uses $O(z\ \log\ z)$ operations, the number of hard special leaves is
-$O(z\ /\log^{2}{x}\ \log{\alpha})$ and for each leaf it takes $O(\log{z})$ operations to count the number
+$O(z/\log^{2}{x}\ \log{\alpha})$ and for each leaf it takes $O(\log{z})$ operations to count the number
 of unsieved elements. This means that the original algorithm is not perfectly balanced,
 sieving is slightly more expensive than counting. Using the alternative algorithm, it is
 possible to achieve perfect balancing by using fewer than $O(\log{z})$ levels of counters, if
@@ -438,8 +438,8 @@ Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is i
 as $O(\pi(\sqrt[4]{x})\times y)$, which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes
 it possible to use even fewer counter levels and further improve the runtime complexity of
-the algorithm, here we can use only $O(\log{\log{z}})$ counter levels which reduces the runtime
-complexity of the algorithm to $O(z\log{\log{z}})$ operations.
+the algorithm, here we can use only $O(\log\ \log\ z)$ counter levels which reduces the runtime
+complexity of the algorithm to $O(z\ \log\ \log\ z)$ operations.
 
 ## Open questions
 
@@ -447,8 +447,8 @@ The alternative counting methods presented in this document have batch counting 
 as mentioned in the [Batch counting](#Batch-counting) paragraph I don't know whether the use
 of batch counting enables using fewer than $O(\log{z}\ /\log\ \log\ x)$ counter levels and thereby
 further improves the runtime complexity of the hard special leaf algorithm. Ideally, we want
-to use only $O(\log{\log{z}})$ counter levels in which case the runtime complexity of the hard special
-leaf algorithm would be $O(z\log{\log{z}})$ operations, provided that the use of $O(\log{\log{z}})$
+to use only $O(\log\ \log\ z)$ counter levels in which case the runtime complexity of the hard special
+leaf algorithm would be $O(z\ \log\ \log\ z)$ operations, provided that the use of $O(\log\ \log\ z)$
 counter levels does not deteriorate the runtime complexity of the algorithm.
 
 There is one last trick that I am aware of that would likely further improve the runtime
@@ -469,7 +469,7 @@ individual segments and I also don't know how much this would improve the runtim
   [[4]](#References) rightfully points out that this is incorrect and that it only
   deteriorates the sieving part of the algorithm by a factor of $O(\log{z}\ /\log{\log{z}})$. This is
   because we don't need to need to perform $O(\log{z})$ binary indexed tree updates for each
-  elementary sieve operation, of which there are $O(z\log{\log{z}})$. But instead we only need to
+  elementary sieve operation, of which there are $O(z\ \log\ \log\ z)$. But instead we only need to
   perform $O(\log{z})$ binary indexed tree updates whenever an element is crossed off for the first
   time in the sieve array. When we sieve up to $z$, there are at most $z$ elements that can be
   crossed off for the first time, therefore the runtime complexity of the sieving part of the
