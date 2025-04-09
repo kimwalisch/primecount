@@ -18,7 +18,7 @@ describes the history of how primecount's implementation came to be and it descr
 an alternative counting method that I have devised in February 2020. This alternative
 counting method improves the balancing of sieve and count operations in the hard special
 leaf algorithm and thereby improves its runtime complexity by a factor of at least
-$O(\log{\log{x}})$. The alternative counting method uses a new tree-like data structure with
+$O(\log\ \log\ x)$. The alternative counting method uses a new tree-like data structure with
 fewer than $O(\log{z})$ levels (tree depth) where each node has $O(z^{\frac{1}{levels}})$ children.
 This data structure is used instead of the binary indexed tree (a.k.a. Fenwick tree)
 that has been used for counting in all previously published papers about the
@@ -43,7 +43,7 @@ data structure (a.k.a. Fenwick tree) to speedup counting.
 For any number $n$ the binary indexed tree allows to count the number of unsieved
 elements ≤ $n$ using only $O(\log{n})$ operations. However the binary indexed tree
 must also be updated whilst sieving which slows down the sieving part of the
-algorithm by a factor of $O(\log{n}\ /\log{\log{n}})$ operations. All more recent papers about
+algorithm by a factor of $O(\log\ n\/\log\ \log\ n)$ operations. All more recent papers about
 the combinatorial type prime counting algorithms that I am aware of have also suggested
 using the binary indexed tree data structure for counting the number of unsieved
 elements in the sieve array.
@@ -77,7 +77,7 @@ programmers that have implemented any of the combinatorial prime counting algori
 [Kim Walisch 2014](https://github.com/kimwalisch/primecount)) have avoided using
 the binary indexed tree and implemented something else. The method that has turned
 out to perform best so far is to get rid of the binary indexed tree data structure,
-which speeds up the sieving part of the algorithm by a factor of $O(\log{n}\ /\log{\log{n}})$
+which speeds up the sieving part of the algorithm by a factor of $O(\log\ n\/\log\ \log\ n)$
 and count the number of unsieved elements by simply iterating over the sieve array.
 
 There are many known optimizations that can be used to speedup counting:
@@ -433,7 +433,7 @@ $\Leftrightarrow \log{z}\ /\log{\log{x}}\times \log{x} < \log^{2}{x}$
 
 Hence, by using $O(\log{z}\ /\log{\log{x}})$ levels of counters we improve the balancing of sieve
 and count operations and reduce the runtime complexity of the hard special leaf algorithm
-by a factor of $O(\log{\log{x}})$ to $O(z\ \log{z}\ /\log{\log{x}})$ operations. In the original
+by a factor of $O(\log\ \log\ x)$ to $O(z\ \log{z}\ /\log{\log{x}})$ operations. In the original
 Deléglise-Rivat paper [[2]](#References) the number of hard special leaves is indicated
 as $O(\pi(\sqrt[4]{x})\times y)$, which is significantly smaller than in Tomás Oliveira's
 version of the algorithm [[4]](#References). This lower number of hard special leaves makes

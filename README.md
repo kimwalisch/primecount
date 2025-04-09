@@ -305,7 +305,7 @@ in only 460 CPU core hours on an AMD Ryzen 3950X CPU!
 </table>
 
 Up until the early 19th century the most efficient known method for counting primes was the
-sieve of Eratosthenes which has a running time of $O(x\log{\log{x}})$ operations. The first
+sieve of Eratosthenes which has a running time of $O(x\ \log \log\ x)$ operations. The first
 improvement to this bound was Legendre's formula (1830) which uses the inclusion-exclusion
 principle to calculate the number of primes below x without enumerating the individual
 primes. Legendre's formula has a running time of $O(x)$ operations and uses $O(\sqrt{x}/\log{x})$
