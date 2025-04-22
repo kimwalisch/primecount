@@ -9,6 +9,9 @@
 /// file in the top level directory.
 ///
 
+#ifndef GOURDON_HPP
+#define GOURDON_HPP
+
 #include <cpu_arch_macros.hpp>
 #include <int128_t.hpp>
 #include <print.hpp>
@@ -66,3 +69,5 @@ int128_t D(int128_t x, int64_t y, int64_t z, int64_t k, int128_t d_approx, int t
 #endif
 
 } // namespace
+
+#endif
