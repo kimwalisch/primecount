@@ -114,6 +114,7 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
         return c2;
 
       const auto& pre_sieved = pre_sieved_arrays[i];
+      const uint8_t* ptr = &*pre_sieved.begin();
       uint64_t prime_product = pre_sieved.size() * 30;
       uint64_t pos = (low % prime_product) / 30;
       uint64_t offset = 0;
@@ -124,7 +125,6 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
         uint64_t bytes_to_copy2 = uint64_t(pre_sieved.size() - pos);
         bytes_to_copy = std::min(bytes_to_copy, bytes_to_copy2);
 
-        const uint8_t* ptr = &*pre_sieved.begin();
         pre_sieve2(&sieve_[offset], &ptr[pos], bytes_to_copy);
 
         offset += bytes_to_copy;
