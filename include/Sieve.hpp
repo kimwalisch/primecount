@@ -58,6 +58,7 @@ class Sieve
 public:
   Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
   uint64_t count(uint64_t start, uint64_t stop) const;
+  void init_counter(uint64_t low, uint64_t high);
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t align_segment_size(uint64_t size);
@@ -70,11 +71,11 @@ public:
   template <typename T>
   void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
-    reset_sieve(low, high);
-    for (uint64_t i = 4; i <= c; i++)
-      cross_off(primes[i], i);
+    uint64_t c2 = pre_sieve(c, low);
+    resize_sieve(low, high);
 
-    init_counter(low, high);
+    for (uint64_t i = c2 + 1; i <= c; i++)
+      cross_off(primes[i], i);
   }
 
   /// Count 1 bits inside [0, stop].
@@ -326,11 +327,11 @@ public:
 
 private:
 
-  void add(uint64_t prime);
+  void add(uint64_t prime, uint64_t i);
   void allocate_counter(uint64_t low);
-  void init_counter(uint64_t low, uint64_t high);
   void reset_counter();
-  void reset_sieve(uint64_t low, uint64_t high);
+  void resize_sieve(uint64_t low, uint64_t high);
+  uint64_t pre_sieve(uint64_t c, uint64_t low);
   uint64_t segment_size() const;
   static const Array<uint64_t, 240> unset_smaller;
   static const Array<uint64_t, 240> unset_larger;

@@ -84,6 +84,7 @@ int64_t S2_thread(int64_t x,
     // For b < min_b there are no special leaves:
     // low <= x / (primes[b] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
+    sieve.init_counter(low, high);
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty

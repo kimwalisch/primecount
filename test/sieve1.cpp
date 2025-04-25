@@ -4,7 +4,7 @@
 ///         of Eratosthenes implementation, specifically
 ///         Sieve::cross_off() and Sieve::count(low, high).
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -50,7 +50,10 @@ int main()
   for (size_t i = 1; i < primes.size(); i++)
   {
     if (primes[i] <= 5)
+    {
       sieve.pre_sieve(primes, i, low, high);
+      sieve.init_counter(low, high);
+    }
     else
       sieve.cross_off(primes[i], i);
 
