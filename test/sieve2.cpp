@@ -56,7 +56,10 @@ int main()
     uint64_t total2 = 0;
 
     if (primes[i] <= 5)
+    {
       sieve.pre_sieve(primes, i, low, high);
+      sieve.init_counter(low, high);
+    }
     else
     {
       uint64_t prev_count = sieve.get_total_count();

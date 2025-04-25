@@ -92,6 +92,7 @@ T D_thread(T x,
     // For b < min_b there are no special leaves:
     // low <= x / (primes[b] * m) < high
     sieve.pre_sieve(primes, min_b - 1, low, high);
+    sieve.init_counter(low, high);
     int64_t b = min_b;
 
     // For k + 1 <= b <= pi_sqrtz
