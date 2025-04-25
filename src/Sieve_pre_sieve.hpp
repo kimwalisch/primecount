@@ -34,13 +34,13 @@
 
 namespace {
 
-void pre_sieve1(primecount::Vector<uint8_t>& sieve,
-                uint64_t low)
+void pre_sieve1(primecount::Vector<uint8_t>& sieve, uint64_t low)
 {
-  uint64_t prime_product = pre_sieved_arrays[0].size() * 30;
+  const auto& pre_sieved = pre_sieved_arrays[0];
+  const uint8_t* ptr = &*pre_sieved.begin();
+  uint64_t prime_product = pre_sieved.size() * 30;
   uint64_t i = (low % prime_product) / 30;
-  uint64_t bytes_to_copy = pre_sieved_arrays[0].size() - i;
-  const uint8_t* ptr =   &*pre_sieved_arrays[0].begin();
+  uint64_t bytes_to_copy = pre_sieved.size() - i;
 
   if (sieve.size() <= bytes_to_copy)
     std::copy_n(&ptr[i], sieve.size(), &sieve[0]);
@@ -50,11 +50,11 @@ void pre_sieve1(primecount::Vector<uint8_t>& sieve,
     // beginning of the sieve array.
     std::copy_n(&ptr[i], bytes_to_copy, &sieve[0]);
 
-    // Restart copying at the beginning
+    // Restart copying from the beginning
     for (i = bytes_to_copy; 
-         i + pre_sieved_arrays[0].size() < sieve.size();
-         i += pre_sieved_arrays[0].size())
-      std::copy_n(ptr, pre_sieved_arrays[0].size(), &sieve[i]);
+         i + pre_sieved.size() < sieve.size();
+         i += pre_sieved.size())
+      std::copy_n(ptr, pre_sieved.size(), &sieve[i]);
 
     // Copy the last remaining bytes
     std::copy_n(ptr, sieve.size() - i, &sieve[i]);
@@ -68,7 +68,7 @@ void pre_sieve2(uint8_t* __restrict sieve,
   constexpr std::size_t word_size = sizeof(unsigned long long);
   std::size_t limit = bytes - bytes % word_size;
 
-  // Bitwise AND multiples bytes per loop iteration.
+  // Bitwise AND multiple bytes per loop iteration.
   //
   // std::memcpy() is optimized away by all C++
   // compilers that I tested. Using std::memcpy
