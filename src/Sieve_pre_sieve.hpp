@@ -13,7 +13,7 @@
 ///        Pre-sieving consists of bitwise AND'ing the values of
 ///        those 3 pre_sieved arrays and storing the result into the
 ///        the sieve array. Pre-sieving speeds up the S2_hard and
-///        D algorithms by up to 3%.
+///        D algorithms by up to 5%.
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
