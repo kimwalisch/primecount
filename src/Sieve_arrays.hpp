@@ -244,9 +244,9 @@ namespace {
 /// removed. Our Sieve::pre_sieve() method requires that each
 /// pre_sieve lookup table corresponds to exactly 3 small primes.
 ///
-/// pre_sieved[0] = {  7, 11, 13 }
-/// pre_sieved[1] = { 17, 19, 23 }
-/// pre_sieved[2] = { 29, 31, 37 }
+/// pre_sieved_arrays[0] = {  7, 11, 13 }
+/// pre_sieved_arrays[1] = { 17, 19, 23 }
+/// pre_sieved_arrays[2] = { 29, 31, 37 }
 ///
 const primecount::Array<std::initializer_list<uint8_t>, 3> pre_sieved_arrays =
 {{

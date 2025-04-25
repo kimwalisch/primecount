@@ -6,9 +6,9 @@
 ///        been removed upfront. Each pre_sieved array corresponds
 ///        to exactly three primes:
 ///
-///        pre_sieved[0] = {  7, 11, 13 }
-///        pre_sieved[1] = { 17, 19, 23 }
-///        pre_sieved[2] = { 29, 31, 37 }
+///        pre_sieved_arrays[0] = {  7, 11, 13 }
+///        pre_sieved_arrays[1] = { 17, 19, 23 }
+///        pre_sieved_arrays[2] = { 29, 31, 37 }
 ///
 ///        Pre-sieving consists of bitwise AND'ing the values of
 ///        those 3 pre_sieved arrays and storing the result into the
