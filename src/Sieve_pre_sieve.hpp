@@ -4,7 +4,7 @@
 ///        There are 3 static pre_sieved arrays in Sieve_arrays.hpp
 ///        from which the primes and multiples of primes have
 ///        been removed upfront. Each pre_sieved array corresponds
-///        to exactly three primes:
+///        to exactly three sieving primes:
 ///
 ///        pre_sieved_arrays[0] = {  7, 11, 13 }
 ///        pre_sieved_arrays[1] = { 17, 19, 23 }

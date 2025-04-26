@@ -242,7 +242,7 @@ namespace {
 
 /// Static arrays from which the multiples of small primes have been
 /// removed. Our Sieve::pre_sieve() method requires that each
-/// pre_sieve lookup table corresponds to exactly 3 small primes.
+/// pre_sieve lookup table corresponds to exactly 3 sieving primes.
 ///
 /// pre_sieved_arrays[0] = {  7, 11, 13 }
 /// pre_sieved_arrays[1] = { 17, 19, 23 }
