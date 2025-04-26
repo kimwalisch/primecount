@@ -34,6 +34,7 @@
 
 namespace {
 
+/// Initializes the sieve array 
 void pre_sieve1(primecount::Vector<uint8_t>& sieve, uint64_t low)
 {
   const auto& pre_sieved = pre_sieved_arrays[0];
