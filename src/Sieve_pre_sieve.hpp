@@ -68,13 +68,7 @@ void pre_sieve2(uint8_t* __restrict sieve,
   constexpr std::size_t word_size = sizeof(unsigned long long);
   std::size_t limit = bytes - bytes % word_size;
 
-  // Bitwise AND multiple bytes per loop iteration.
-  //
-  // std::memcpy() is optimized away by all C++
-  // compilers that I tested. Using std::memcpy
-  // instead of a reinterpret_cast also make this
-  // algorithm compatible with big-endian CPUs.
-  //
+  // Bitwise AND multiple bytes per iter
   for (std::size_t i = 0; i < limit; i += word_size)
   {
     unsigned long long a, b;
