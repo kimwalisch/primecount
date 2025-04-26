@@ -38,7 +38,7 @@ namespace {
 void pre_sieve1(primecount::Vector<uint8_t>& sieve, uint64_t low)
 {
   const auto& pre_sieved = pre_sieved_arrays[0];
-  const uint8_t* ptr = &*pre_sieved.begin();
+  const uint8_t* ptr = pre_sieved.begin();
   uint64_t prime_product = pre_sieved.size() * 30;
   uint64_t i = (low % prime_product) / 30;
   uint64_t bytes_to_copy = pre_sieved.size() - i;
@@ -109,7 +109,7 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
         return c2;
 
       const auto& pre_sieved = pre_sieved_arrays[i];
-      const uint8_t* ptr = &*pre_sieved.begin();
+      const uint8_t* ptr = pre_sieved.begin();
       uint64_t prime_product = pre_sieved.size() * 30;
       uint64_t pos = (low % prime_product) / 30;
       uint64_t offset = 0;
