@@ -108,9 +108,9 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
     std::fill_n(sieve_.data(), sieve_.size(), 0xff);
   else
   {
-    pre_sieve1(sieve_, low);
     // PrimePi(13) = 6
     primePi = 6;
+    pre_sieve1(sieve_, low);
 
     for (const auto& pre_sieved : pre_sieved_arrays)
     {
