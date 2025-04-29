@@ -1,6 +1,6 @@
-Changes in primecount-7.17, 2025-04-28
+Changes in primecount-7.17, 2025-04-29
 
-* Sieve_pre_sieve.hpp: Improved pre-sieving using primes ≤ 37.
+* Sieve_pre_sieve.hpp: Improved pre-sieving using primes ≤ 71.
   Speeds up S2_hard and D algorithms by up to 5%.
 * README.md: Fix Markdown math formulas.
 * Hard-Special-Leaves.md: Fix Markdown math formulas.

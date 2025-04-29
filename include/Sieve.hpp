@@ -71,10 +71,10 @@ public:
   template <typename T>
   void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
   {
-    uint64_t c2 = pre_sieve(c, low);
+    uint64_t primePi = pre_sieve(c, low);
     resize_sieve(low, high);
 
-    for (uint64_t i = c2 + 1; i <= c; i++)
+    for (uint64_t i = primePi + 1; i <= c; i++)
       cross_off(primes[i], i);
   }
 
