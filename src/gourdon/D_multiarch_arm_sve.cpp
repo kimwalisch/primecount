@@ -27,8 +27,9 @@
 /// file in the top level directory.
 ///
 
+#include "FactorTableD.hpp"
+
 #include <primecount-internal.hpp>
-#include <FactorTableD.hpp>
 #include <PiTable.hpp>
 #include <Sieve.hpp>
 #include <LoadBalancerS2.hpp>

@@ -13,8 +13,9 @@
 /// file in the top level directory.
 ///
 
-#include <LoadBalancerAC.hpp>
-#include <SegmentedPiTable.hpp>
+#include "LoadBalancerAC.hpp"
+#include "SegmentedPiTable.hpp"
+
 #include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <imath.hpp>
