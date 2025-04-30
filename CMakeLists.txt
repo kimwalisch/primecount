@@ -269,9 +269,15 @@ if(BUILD_SHARED_LIBS)
         cxx_lambdas
         cxx_range_for)
 
-    target_include_directories(libprimecount PUBLIC
+    target_include_directories(libprimecount
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/deleglise-rivat
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gourdon
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/lmo)
 
     install(TARGETS libprimecount
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -298,9 +304,15 @@ if(BUILD_STATIC_LIBS)
         cxx_lambdas
         cxx_range_for)
 
-    target_include_directories(libprimecount-static PUBLIC
+    target_include_directories(libprimecount-static
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/deleglise-rivat
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gourdon
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/lmo)
 
     install(TARGETS libprimecount-static
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -320,6 +332,14 @@ endif()
 
 if(BUILD_PRIMECOUNT)
     add_executable(primecount ${BIN_SRC})
+
+    target_include_directories(primecount
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/deleglise-rivat
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gourdon
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/lmo)
+
     target_link_libraries(primecount PRIVATE primecount::primecount primesieve::primesieve)
     target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_compile_features(primecount PRIVATE cxx_auto_type)
