@@ -35,7 +35,7 @@ of $i$ and $j$, that speeds up most $\phi(x, a)$ computations by more than an or
 
 In primecount the partial sieve function is implemented in the file
 [phi.cpp](https://github.com/kimwalisch/primecount/blob/master/src/phi.cpp) and the files
-[PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) &
+[PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.hpp) &
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp) contain
 auxiliary functions for computing  $\phi(x, a)$ in constant time for tiny values of $a$.
 The partial sieve function $\phi(x, a)$ is also part of
@@ -95,7 +95,7 @@ the first who used this formula for the computation of the number of primes belo
 of the 19th century. This formula is also present in Lehmer's paper from 1959 [[2]](#References)
 and is described in more detail in most of the other combinatorial prime counting papers. In
 primecount this formula is implemented in
-[PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PhiTiny.hpp) and
+[PhiTiny.hpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.hpp) and
 the initialization of the lookup table is implemented in
 [PhiTiny.cpp](https://github.com/kimwalisch/primecount/blob/master/src/PhiTiny.cpp).
 
@@ -133,7 +133,7 @@ This formula also allows computing $\phi(x, a)$ in $O(1)$ provided that $a$ is r
 relatively small. If $a ≥ \pi(\sqrt{x})$ then $\phi(x, a)$ counts the number of primes ≤ $x$, minus the first
 $a$ primes, plus the number 1. The use of this formula requires using a $\pi(x)$ lookup table of size $x$.
 In order to reduce the memory usage it is best to use a compressed $\pi(x)$ lookup table such as
-primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/include/PiTable.hpp).
+primecount's [PiTable.hpp](https://github.com/kimwalisch/primecount/blob/master/src/PiTable.hpp).
 The use of a lookup table makes this formula unsuitable for computing $\phi(x, a)$ for large values
 of $x$ due to its excessive memory requirement. However, for large values of $x$ we can compute the
 $\pi(x)$ part of this formula using a prime counting function implementation in $O(x^{\frac{2}{3}})$ or less
