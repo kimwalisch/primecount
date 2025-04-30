@@ -18,13 +18,14 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <SegmentedPiTable.hpp>
+#include "SegmentedPiTable.hpp"
+
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <imath.hpp>
