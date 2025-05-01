@@ -1,8 +1,9 @@
-Changes in primecount-7.18, 2025-04-30
+Changes in primecount-7.18, 2025-05-01
 
 * Move private header files from /include to /src.
 * src/CMakeLists.txt: Update for private header files in /src.
 * test/CMakeLists.txt: Update for private header files in /src.
+* Update to primesieve-12.9 library.
 
 Changes in primecount-7.17, 2025-04-29
 
