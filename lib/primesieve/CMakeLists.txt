@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.27)
 project(primesieve CXX)
-set(PRIMESIEVE_VERSION "12.8")
-set(PRIMESIEVE_SOVERSION "12.8.0")
+set(PRIMESIEVE_VERSION "12.9")
+set(PRIMESIEVE_SOVERSION "12.9.0")
 
 # Build options ######################################################
 
@@ -23,9 +23,8 @@ else()
     option(BUILD_SHARED_LIBS "Build shared libprimesieve" OFF)
 endif()
 
-option(WITH_AUTO_VECTORIZATION "Enable compiler auto-vectorization" ON)
-option(WITH_MULTIARCH          "Enable runtime dispatching to fastest supported CPU instruction set" ON)
-option(WITH_MSVC_CRT_STATIC    "Link primesieve.lib with /MT instead of the default /MD" OFF)
+option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
+option(WITH_MSVC_CRT_STATIC "Link primesieve.lib with /MT instead of the default /MD" OFF)
 
 # libprimesieve sanity check #########################################
 
@@ -78,7 +77,7 @@ set(LIB_SRC src/api-c.cpp
             src/ParallelSieve.cpp
             src/popcount.cpp
             src/PreSieve.cpp
-            src/PrimeSieve.cpp
+            src/PrimeSieveClass.cpp
             src/RiemannR.cpp
             src/SievingPrimes.cpp)
 
@@ -150,9 +149,12 @@ if(BUILD_SHARED_LIBS)
         cxx_uniform_initialization
         cxx_lambdas)
 
-    target_include_directories(libprimesieve PUBLIC
+    target_include_directories(libprimesieve
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     install(TARGETS libprimesieve
             EXPORT primesieveShared
@@ -185,9 +187,12 @@ if(BUILD_STATIC_LIBS)
         cxx_uniform_initialization
         cxx_lambdas)
 
-    target_include_directories(libprimesieve-static PUBLIC
+    target_include_directories(libprimesieve-static
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     install(TARGETS libprimesieve-static
             EXPORT primesieveStatic
@@ -222,6 +227,7 @@ endif()
 if(BUILD_PRIMESIEVE)
     add_executable(primesieve ${BIN_SRC})
     target_link_libraries(primesieve primesieve::primesieve Threads::Threads)
+    target_include_directories(primesieve PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_compile_definitions(primesieve PRIVATE ${PRIMESIEVE_COMPILE_DEFINITIONS})
     target_compile_features(primesieve PRIVATE cxx_auto_type)
     install(TARGETS primesieve DESTINATION ${CMAKE_INSTALL_BINDIR})
