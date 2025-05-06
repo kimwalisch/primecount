@@ -1,7 +1,7 @@
 ///
 /// @file  macros.hpp
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -46,9 +46,9 @@
 /// that e.g. pi[x] and segmentedPi[x] are inlined.
 ///
 #if __has_attribute(always_inline)
-  #define ALWAYS_INLINE __attribute__((always_inline)) inline
+  #define ALWAYS_INLINE inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
-  #define ALWAYS_INLINE __forceinline
+  #define ALWAYS_INLINE inline __forceinline
 #else
   #define ALWAYS_INLINE inline
 #endif

@@ -1,16 +1,17 @@
 ///
-/// @file  Sieve_count.hpp
-/// @brief Highly optimized functions used to count the number of
-///        1 bits in the sieve array in the special leaves algorithm
-///        (used in the combinatorial prime counting algorithms e.g.
-///         Lagarias-Miller-Odlyzko, Deleglise-Rivat, Gourdon).
+/// @file  Sieve_count_start_stop.hpp
+/// @brief Highly optimized methods to count the number of 1 bits
+///        in the sieve array in the special leaves algorithm
+///        (used in the combinatorial prime counting algorithms
+///        e.g. Lagarias-Miller-Odlyzko, Deleglise-Rivat, Gourdon).
 ///
-///        The functions defined in this file are only called from
-///        Sieve.cpp. Hence, "Sieve_count.hpp" is only included in
-///        Sieve.cpp. The count(start, stop) functions defined in this
-///        file are called much less frequently than the count(stop)
-///        functions. Hence the count(start, stop) functions have not
-///        been annotated using ALWAYS_INLINE.
+///        The methods defined in this file are only called from
+///        Sieve.cpp. Hence, "Sieve_count_start_stop.hpp" is only
+///        included in Sieve.cpp. The Sieve::count(start, stop)
+///        methods defined in this file are called much less
+///        frequently than the Sieve::count(stop) methods. Hence,
+///        the Sieve::count(start, stop) methods have not been
+///        annotated using ALWAYS_INLINE.
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
@@ -21,8 +22,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVE_COUNT_HPP
-#define SIEVE_COUNT_HPP
+#ifndef SIEVE_COUNT_START_STOP_HPP
+#define SIEVE_COUNT_START_STOP_HPP
 
 #include <Sieve.hpp>
 #include "Sieve_arrays.hpp"
