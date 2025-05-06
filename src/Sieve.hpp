@@ -42,14 +42,6 @@
 
 #include <stdint.h>
 
-#if defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include <arm_sve.h>
-#elif defined(ENABLE_AVX512_VPOPCNT) || \
-      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <immintrin.h>
-#endif
-
 namespace primecount {
 
 class Sieve
@@ -78,7 +70,7 @@ public:
       cross_off(primes[i], i);
   }
 
- #if defined(ENABLE_PORTABLE_POPCNT64)
+#if defined(ENABLE_PORTABLE_POPCNT64)
 
   /// Count 1 bits inside [0, stop]
   uint64_t count_popcnt64(uint64_t stop);
@@ -174,9 +166,9 @@ private:
 
 } // namespace
 
-#endif
-
 // These forced inline Sieve::count(stop) methods
 // must be defined in a header file that is
 // visible to all translation units that use them.
 #include "Sieve_count_stop.hpp"
+
+#endif
