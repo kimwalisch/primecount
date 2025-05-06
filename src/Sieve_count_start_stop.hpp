@@ -26,7 +26,6 @@
 #define SIEVE_COUNT_START_STOP_HPP
 
 #include <Sieve.hpp>
-#include "Sieve_arrays.hpp"
 #include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
