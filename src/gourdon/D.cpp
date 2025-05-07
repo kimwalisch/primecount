@@ -250,7 +250,7 @@ int64_t D_default(int64_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME);
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -302,7 +302,7 @@ int128_t D_default(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME);
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }

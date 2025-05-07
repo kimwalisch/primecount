@@ -246,7 +246,7 @@ int64_t S2_hard_default(int64_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME);
     print_vars(x, y, c, threads);
     time = get_time();
   }
@@ -299,7 +299,7 @@ int128_t S2_hard_default(int128_t x,
   {
     print("");
     print("=== S2_hard(x, y) ===");
-    print("Algorithm: " SIEVE_COUNT_ALGO_NAME);
+    print("Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME);
     print_vars(x, y, c, threads);
     time = get_time();
   }
