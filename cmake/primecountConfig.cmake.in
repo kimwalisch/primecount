@@ -1,0 +1,40 @@
+# ====================================================================
+# The primecount CMake configuration file
+#
+# Usage from an external project:
+#     In your CMakeLists.txt, add these lines:
+#
+#     find_package(primecount REQUIRED)
+#     target_link_libraries(your_program primecount::primecount)
+#
+#     To link against the static libprimecount use:
+#
+#     find_package(primecount REQUIRED static)
+#     target_link_libraries(your_program primecount::primecount)
+#
+# ====================================================================
+
+include(CMakeFindDependencyMacro)
+find_dependency(primesieve QUIET REQUIRED)
+find_dependency(OpenMP QUIET)
+
+if(@BUILD_STATIC_LIBS@ AND @BUILD_SHARED_LIBS@)
+    if(primecount_FIND_COMPONENTS)
+        string(TOLOWER "${primecount_FIND_COMPONENTS}" LOWER_COMPONENTS)
+        if(LOWER_COMPONENTS STREQUAL "static")
+            set(primecount_STATIC TRUE)
+        endif()
+    endif()
+elseif(@BUILD_STATIC_LIBS@)
+    set(primecount_STATIC TRUE)
+endif()
+
+if(primecount_STATIC)
+    include("${CMAKE_CURRENT_LIST_DIR}/primecountStatic.cmake")
+    add_library(primecount::primecount INTERFACE IMPORTED)
+    set_target_properties(primecount::primecount PROPERTIES INTERFACE_LINK_LIBRARIES "primecount::libprimecount-static")
+else()
+    include("${CMAKE_CURRENT_LIST_DIR}/primecountShared.cmake")
+    add_library(primecount::primecount INTERFACE IMPORTED)
+    set_target_properties(primecount::primecount PROPERTIES INTERFACE_LINK_LIBRARIES "primecount::libprimecount")
+endif()

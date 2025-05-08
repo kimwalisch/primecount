@@ -55,28 +55,6 @@ if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON!")
 endif()
 
-# Static vs. shared linking ##########################################
-
-# By default libprimecount is linked statically if only the static
-# libprimecount has been built. If libprimecount has been built as
-# both a static and shared library then the shared libprimecount will
-# be used for linking.
-
-# It is possible to force static linking by setting:
-# cmake -DSTATICALLY_LINK_LIBPRIMECOUNT=ON
-# This way libprimecount will be linked statically even if
-# libprimecount has been built as both a static and shared library.
-
-if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
-    if(BUILD_STATIC_LIBS AND NOT BUILD_SHARED_LIBS)
-        set(STATICALLY_LINK_LIBPRIMECOUNT TRUE)
-    endif()
-endif()
-
-if(STATICALLY_LINK_LIBPRIMECOUNT AND NOT BUILD_STATIC_LIBS)
-    message(FATAL_ERROR "Using STATICALLY_LINK_LIBPRIMECOUNT=ON requires BUILD_STATIC_LIBS=ON!")
-endif()
-
 # Set default build type to Release ##################################
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.9)
@@ -220,6 +198,7 @@ endif()
 # Required includes ##################################################
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 # libprimesieve ######################################################
 
@@ -277,6 +256,7 @@ if(BUILD_SHARED_LIBS)
         ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     install(TARGETS libprimecount
+            EXPORT primecountShared
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -309,12 +289,28 @@ if(BUILD_STATIC_LIBS)
         ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
     install(TARGETS libprimecount-static
+            EXPORT primecountStatic
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # Shared vs. static linking ##########################################
+
+# On Unix-like OSes we use shared linking against libprimecount by
+# default mainly because this is required by Linux distributions.
+# On Windows we use static linking by default because the library's
+# path is not encoded into the binary. This means that the binary
+# will only work if the DLL is in the same directory or a directory
+# that is in the PATH environment variable.
+
+if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
+    if(WIN32 AND TARGET libprimecount-static)
+        set(STATICALLY_LINK_LIBPRIMECOUNT ON)
+    elseif(NOT TARGET libprimecount)
+        set(STATICALLY_LINK_LIBPRIMECOUNT ON)
+    endif()
+endif()
 
 if(STATICALLY_LINK_LIBPRIMECOUNT)
     add_library(primecount::primecount ALIAS libprimecount-static)
@@ -364,6 +360,34 @@ install(FILES include/primecount.h
               include/primecount.hpp
         COMPONENT libprimecount-headers
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# CMake find_package(primecount) support #############################
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/primecountConfigVersion.cmake"
+    VERSION ${PRIMECOUNT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/primecountConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/primecountConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primecount")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/primecountConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/primecountConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primecount")
+
+if(TARGET libprimecount)
+    install(EXPORT primecountShared
+            NAMESPACE primecount::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primecount")
+endif()
+
+if(TARGET libprimecount-static)
+    install(EXPORT primecountStatic
+            NAMESPACE primecount::
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/primecount")
+endif()
 
 # Regenerate man page ################################################
 

@@ -36,6 +36,7 @@ cloud servers.
 * [C++ API reference](#c-api-reference-1)
 * [C++ example](#c-example-1)
 * [pkgconf support](#pkgconf-support)
+* [CMake: `find_package(primecount)`](#cmake-find_packageprimecount)
 * [Install libprimecount using package manager](https://github.com/kimwalisch/primecount#installation)
 * [Build libprimecount from source](#build-instructions)
 * [Maximum portability](#maximum-portability)
@@ -176,6 +177,21 @@ without having to care about the library and include paths:
 
 ```sh
 cc -O3 main.c -o main $(pkgconf --libs --cflags primecount)
+```
+
+# CMake: `find_package(primecount)`
+
+If you are using the CMake build system to compile your program and
+[libprimecount is installed](https://github.com/kimwalisch/primecount#installation) on your
+system, then you can use the following minimal ```CMakeLists.txt``` to link your
+program against libprimecount:
+
+```CMake
+# CMakeLists.txt
+project(<project_name> C CXX)
+find_package(primecount REQUIRED)
+add_executable(<program_name> main.c)
+target_link_libraries(<program_name> primecount::primecount)
 ```
 
 # Build instructions
