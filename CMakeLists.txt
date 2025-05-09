@@ -304,12 +304,10 @@ endif()
 # will only work if the DLL is in the same directory or a directory
 # that is in the PATH environment variable.
 
-if(NOT STATICALLY_LINK_LIBPRIMECOUNT)
-    if(WIN32 AND TARGET libprimecount-static)
-        set(STATICALLY_LINK_LIBPRIMECOUNT ON)
-    elseif(NOT TARGET libprimecount)
-        set(STATICALLY_LINK_LIBPRIMECOUNT ON)
-    endif()
+if(WIN32 AND TARGET libprimecount-static)
+    set(STATICALLY_LINK_LIBPRIMECOUNT ON)
+elseif(NOT TARGET libprimecount)
+    set(STATICALLY_LINK_LIBPRIMECOUNT ON)
 endif()
 
 if(STATICALLY_LINK_LIBPRIMECOUNT)
