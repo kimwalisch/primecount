@@ -1,5 +1,6 @@
-Changes in primecount-7.18, 2025-05-01
+Changes in primecount-7.18, 2025-05-09
 
+* Add CMake find_package(primecount) support.
 * Move private header files from /include to /src.
 * src/CMakeLists.txt: Update for private header files in /src.
 * test/CMakeLists.txt: Update for private header files in /src.
