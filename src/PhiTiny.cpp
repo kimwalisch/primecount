@@ -29,13 +29,13 @@
 namespace primecount {
 namespace PhiTiny {
 
-const Array<uint32_t, 8> primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
+const Array<uint64_t, 8> primes = { 0, 2, 3, 5, 7, 11, 13, 17 };
 
 // prime_products[n] = \prod_{i=1}^{n} primes[i]
-const Array<uint32_t, 8> prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
+const Array<uint64_t, 8> prime_products = { 1, 2, 6, 30, 210, 2310, 30030, 510510 };
 
 // totients[n] = \prod_{i=1}^{n} (primes[i] - 1)
-const Array<uint32_t, 8> totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
+const Array<uint64_t, 8> totients = { 1, 1, 2, 8, 48, 480, 5760, 92160 };
 
 // Number of primes <= next_prime(primes.back())
 const Array<uint8_t, 20> pi = { 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8 };

@@ -27,9 +27,9 @@
 namespace primecount {
 namespace PhiTiny {
 
-extern const Array<uint32_t, 8> primes;
-extern const Array<uint32_t, 8> prime_products;
-extern const Array<uint32_t, 8> totients;
+extern const Array<uint64_t, 8> primes;
+extern const Array<uint64_t, 8> prime_products;
+extern const Array<uint64_t, 8> totients;
 extern const Array<uint8_t, 20> pi;
 
 extern uint64_t phi_tiny(uint64_t x, uint64_t a);
