@@ -78,7 +78,7 @@ phi_tiny(T x, uint64_t a)
 #if defined(HAVE_INT128_T)
 
 template <typename T>
-typename std::enable_if<(sizeof(T) >= sizeof(uint128_t)), T>::type
+typename std::enable_if<(sizeof(T) > sizeof(uint64_t)), T>::type
 phi_tiny(T x, uint64_t a)
 {
   // If possible use smaller integer type
