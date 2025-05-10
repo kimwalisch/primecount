@@ -117,7 +117,7 @@ public:
   /// Uses at most one level of phi(x, a) recursion
   /// to ensure that the runtime is O(1).
   template <typename T>
-  T phi_recursive(T x, uint64_t a) const
+  T phi_tiny(T x, uint64_t a) const
   {
     if (a < PhiTiny::max_a())
       return phi(x, a);
@@ -220,14 +220,14 @@ namespace PhiTiny {
 
 uint64_t phi_tiny(uint64_t x, uint64_t a)
 {
-  return phiTinyImpl.phi_recursive(x, a);
+  return phiTinyImpl.phi_tiny(x, a);
 }
 
 #if defined(HAVE_INT128_T)
 
 uint128_t phi_tiny(uint128_t x, uint64_t a)
 {
-  return phiTinyImpl.phi_recursive(x, a);
+  return phiTinyImpl.phi_tiny(x, a);
 }
 
 #endif
