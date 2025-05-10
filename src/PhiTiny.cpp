@@ -117,7 +117,7 @@ public:
   /// Uses at most one level of phi(x, a) recursion
   /// to ensure that the runtime is O(1).
   template <typename T>
-  T phi_tiny(T x, uint64_t a) const
+  ALWAYS_INLINE T phi_tiny(T x, uint64_t a) const
   {
     if (a < PhiTiny::max_a())
       return phi(x, a);
@@ -135,7 +135,7 @@ public:
 private:
 
   template <typename T>
-  T phi(T x, uint64_t a) const
+  ALWAYS_INLINE T phi(T x, uint64_t a) const
   {
     auto pp = prime_products[a];
     auto remainder = (uint64_t)(x % pp);
@@ -168,7 +168,7 @@ private:
   /// faster than the phi(x, a) implementation above.
   ///
   template <typename T>
-  T phi7(T x) const
+  ALWAYS_INLINE T phi7(T x) const
   {
     constexpr uint32_t a = 7;
     constexpr uint32_t pp = 510510;
