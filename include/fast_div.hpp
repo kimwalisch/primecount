@@ -17,7 +17,7 @@
 ///        disable ENABLE_DIV32 (using cmake -DWITH_DIV32=OFF) as this
 ///        avoids runtime checks for (64-bit / 32-bit) divisions.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,6 +30,7 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
+#include <type_traits>
 
 namespace {
 

@@ -23,6 +23,7 @@
 #include <Vector.hpp>
 
 #include <stdint.h>
+#include <type_traits>
 
 namespace primecount {
 namespace PhiTiny {
