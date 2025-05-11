@@ -210,7 +210,7 @@ private:
   Array<Vector<uint8_t>, 4> phi_;
 };
 
-// Singleton
+// Initialized at startup
 const PhiTinyImpl phiTinyImpl;
 
 } // namespace
