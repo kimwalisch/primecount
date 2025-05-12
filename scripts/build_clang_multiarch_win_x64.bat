@@ -9,6 +9,27 @@ del /Q ..\src\deleglise-rivat\S2_easy.cpp
 del /Q ..\src\deleglise-rivat\S2_hard_multiarch_arm_sve.cpp
 del /Q ..\src\gourdon\AC.cpp
 del /Q ..\src\gourdon\D_multiarch_arm_sve.cpp
-clang++ -I../include -I../lib/primesieve/include -O3 -mpopcnt -fopenmp -Wall -Wextra -pedantic -DNDEBUG -DENABLE_MULTIARCH_AVX512_BW -DENABLE_MULTIARCH_AVX512_VBMI2 -DENABLE_MULTIARCH_AVX512_VPOPCNT ../lib/primesieve/src/*.cpp ../lib/primesieve/src/arch/x86/*.cpp ../src/*.cpp ../src/arch/x86/*.cpp ../src/lmo/*.cpp ../src/deleglise-rivat/*.cpp ../src/gourdon/*.cpp ../src/app/*.cpp -o primecount.exe "C:\Program Files\LLVM\lib\clang\18\lib\windows\clang_rt.builtins-x86_64.lib"
+
+mkdir primesieve
+cd primesieve
+clang++ -c -I../../lib/primesieve/include -I../../lib/primesieve/src ^
+  -O3 -mpopcnt -Wall -Wextra -pedantic ^
+  -DNDEBUG -DENABLE_MULTIARCH_AVX512_BW -DENABLE_MULTIARCH_AVX512_VBMI2 ^
+  ../../lib/primesieve/src\*.cpp ../../lib/primesieve/src/arch/x86\*.cpp
+
+cd ..
+mkdir primecount
+cd primecount
+clang++ -c -I../../include -I../../src -I../../lib/primesieve/include ^
+  -O3 -mpopcnt -fopenmp -Wall -Wextra -pedantic ^
+  -DNDEBUG -DENABLE_MULTIARCH_AVX512_VPOPCNT ^
+  ../../src\*.cpp ../../src/arch/x86\*.cpp ../../src/lmo\*.cpp ^
+  ../../src/deleglise-rivat\*.cpp ../../src/gourdon\*.cpp ../../src/app\*.cpp
+
+cd ..
+clang++ -O3 -mpopcnt -fopenmp ^
+  primesieve\*.o primecount\*.o ^
+  -o primecount.exe "C:\Program Files\LLVM\lib\clang\18\lib\windows\clang_rt.builtins-x86_64.lib"
+
 git checkout ..\src\deleglise-rivat
 git checkout ..\src\gourdon
