@@ -60,7 +60,7 @@ cd build_primesieve
 clang++ -c -I../../lib/primesieve/include -I../../lib/primesieve/src \
   -O3 -flto -static -Wall -Wextra -pedantic \
   -DNDEBUG -D_WIN32_WINNT=0x0A00 \
-  ../../lib/primesieve/src/*.cpp ../../lib/primesieve/src/arch/x86/*.cpp
+  ../../lib/primesieve/src/*.cpp
 
 cd ..
 mkdir build_primecount
@@ -68,8 +68,8 @@ cd build_primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
   -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
   -DNDEBUG -D_WIN32_WINNT=0x0A00 \
-  ../../src/*.cpp ../../src/arch/x86/*.cpp ../../src/lmo/*.cpp \
-  ../../src/deleglise-rivat/*.cpp ../../src/gourdon/*.cpp ../../src/app/*.cpp
+  ../../src/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
+  ../../src/gourdon/*.cpp ../../src/app/*.cpp
 
 cd ..
 clang++ -O3 -flto -fopenmp -static -Wall -Wextra -pedantic -DNDEBUG -D_WIN32_WINNT=0x0A00 \
