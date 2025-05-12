@@ -33,6 +33,7 @@
 #include <Vector.hpp>
 #include <S.hpp>
 
+#include <algorithm>
 #include <stdint.h>
 
 using namespace primecount;
