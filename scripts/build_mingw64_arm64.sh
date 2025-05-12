@@ -54,10 +54,29 @@ rm ../src/deleglise-rivat/S2_hard_multiarch_avx512.cpp
 rm ../src/gourdon/AC.cpp
 rm ../src/gourdon/D_multiarch_arm_sve.cpp
 rm ../src/gourdon/D_multiarch_avx512.cpp
-clang++ -flto -static -O3 -DNDEBUG -D_WIN32_WINNT=0x0A00 -Wall -Wextra -pedantic -fopenmp -I../include -I../src -I../lib/primesieve/include -I../lib/primesieve/src ../lib/primesieve/src/*.cpp ../src/*.cpp ../src/lmo/*.cpp ../src/deleglise-rivat/*.cpp ../src/gourdon/*.cpp ../src/app/*.cpp -o primecount.exe -lPsapi
-git checkout ..
+
+mkdir build_primesieve
+cd build_primesieve
+clang++ -c -I../../lib/primesieve/include -I../../lib/primesieve/src \
+  -O3 -flto -static -Wall -Wextra -pedantic \
+  -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+  ../../lib/primesieve/src/*.cpp ../../lib/primesieve/src/arch/x86/*.cpp
+
+cd ..
+mkdir build_primecount
+cd build_primecount
+clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
+  -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
+  -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+  ../../src/*.cpp ../../src/arch/x86/*.cpp ../../src/lmo/*.cpp \
+  ../../src/deleglise-rivat/*.cpp ../../src/gourdon/*.cpp ../../src/app/*.cpp
+
+cd ..
+clang++ -O3 -flto -fopenmp -static -Wall -Wextra -pedantic -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+  build_primesieve/*.o build_primecount/*.o -o primecount -lPsapi
 
 strip primecount.exe
+git checkout ..
 
 # Create a release zip archive
 wget https://github.com/kimwalisch/primecount/releases/download/v7.11/primecount-7.11-win-arm64.zip
