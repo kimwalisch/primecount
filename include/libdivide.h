@@ -11,15 +11,24 @@
 #ifndef LIBDIVIDE_H
 #define LIBDIVIDE_H
 
-#define LIBDIVIDE_VERSION "5.1"
+// *** Version numbers are auto generated - do not edit ***
+#define LIBDIVIDE_VERSION "5.2.0"
 #define LIBDIVIDE_VERSION_MAJOR 5
-#define LIBDIVIDE_VERSION_MINOR 1
+#define LIBDIVIDE_VERSION_MINOR 2
+#define LIBDIVIDE_VERSION_PATCH 0
 
 #include <stdint.h>
 
-#if !defined(__AVR__)
+#if !defined(__AVR__) && __STDC_HOSTED__ != 0
 #include <stdio.h>
 #include <stdlib.h>
+#endif
+
+#if defined(_MSC_VER) && (defined(__cplusplus) && (__cplusplus >= 202002L)) || \
+    (defined(_MSVC_LANG) && (_MSVC_LANG >= 202002L))
+#include <limits.h>
+#include <type_traits>
+#define LIBDIVIDE_VC_CXX20
 #endif
 
 #if defined(LIBDIVIDE_SSE2)
@@ -34,17 +43,24 @@
 #include <arm_neon.h>
 #endif
 
+// Clang-cl prior to Visual Studio 2022 doesn't include __umulh/__mulh intrinsics
+#if defined(_MSC_VER) && (!defined(__clang__) || _MSC_VER > 1930) && \
+    (defined(_M_X64) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC))
+#define LIBDIVIDE_MULH_INTRINSICS
+#endif
+
 #if defined(_MSC_VER)
+#if defined(LIBDIVIDE_MULH_INTRINSICS) || !defined(__clang__)
 #include <intrin.h>
+#endif
+#ifndef __clang__
 #pragma warning(push)
-// disable warning C4146: unary minus operator applied
-// to unsigned type, result still unsigned
+// 4146: unary minus operator applied to unsigned type, result still unsigned
 #pragma warning(disable : 4146)
-// disable warning C4204: nonstandard extension used : non-constant aggregate
-// initializer
-//
-// It's valid C99
+
+// 4204: nonstandard extension used : non-constant aggregate initializer
 #pragma warning(disable : 4204)
+#endif
 #define LIBDIVIDE_VC
 #endif
 
@@ -86,10 +102,14 @@
 #endif
 #endif
 #ifndef LIBDIVIDE_INLINE
+#ifdef _MSC_VER
+#define LIBDIVIDE_INLINE __forceinline
+#else
 #define LIBDIVIDE_INLINE inline
 #endif
+#endif
 
-#if defined(__AVR__)
+#if defined(__AVR__) || __STDC_HOSTED__ == 0
 #define LIBDIVIDE_ERROR(msg)
 #else
 #define LIBDIVIDE_ERROR(msg)                                                                     \
@@ -99,7 +119,7 @@
     } while (0)
 #endif
 
-#if defined(LIBDIVIDE_ASSERTIONS_ON) && !defined(__AVR__)
+#if defined(LIBDIVIDE_ASSERTIONS_ON) && !defined(__AVR__) && __STDC_HOSTED__ != 0
 #define LIBDIVIDE_ASSERT(x)                                                           \
     do {                                                                              \
         if (!(x)) {                                                                   \
@@ -113,8 +133,80 @@
 #endif
 
 #ifdef __cplusplus
+
+// For constexpr zero initialization, c++11 might handle things ok,
+// but just limit to at least c++14 to ensure we don't break anyone's code:
+
+// Use https://en.cppreference.com/w/cpp/feature_test#cpp_constexpr
+#if defined(__cpp_constexpr) && (__cpp_constexpr >= 201304L)
+#define LIBDIVIDE_CONSTEXPR constexpr LIBDIVIDE_INLINE
+
+// Supposedly, MSVC might not implement feature test macros right:
+// https://stackoverflow.com/questions/49316752/feature-test-macros-not-working-properly-in-visual-c
+// so check that _MSVC_LANG corresponds to at least c++14, and _MSC_VER corresponds to at least VS
+// 2017 15.0 (for extended constexpr support:
+// https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170)
+#elif (defined(_MSC_VER) && _MSC_VER >= 1910) && (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L)
+#define LIBDIVIDE_CONSTEXPR constexpr LIBDIVIDE_INLINE
+
+#else
+#define LIBDIVIDE_CONSTEXPR LIBDIVIDE_INLINE
+#endif
+
 namespace libdivide {
 #endif
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(LIBDIVIDE_VC_CXX20)
+static LIBDIVIDE_CONSTEXPR int __builtin_clz(unsigned x) {
+    if (std::is_constant_evaluated()) {
+        for (int i = 0; i < sizeof(x) * CHAR_BIT; ++i) {
+            if (x >> (sizeof(x) * CHAR_BIT - 1 - i)) return i;
+        }
+        return sizeof(x) * CHAR_BIT;
+    }
+#else
+static LIBDIVIDE_INLINE int __builtin_clz(unsigned x) {
+#endif
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC)
+    return (int)_CountLeadingZeros(x);
+#elif defined(__AVX2__) || defined(__LZCNT__)
+    return (int)_lzcnt_u32(x);
+#else
+    unsigned long r;
+    _BitScanReverse(&r, x);
+    return (int)(r ^ 31);
+#endif
+}
+
+#if defined(LIBDIVIDE_VC_CXX20)
+static LIBDIVIDE_CONSTEXPR int __builtin_clzll(unsigned long long x) {
+    if (std::is_constant_evaluated()) {
+        for (int i = 0; i < sizeof(x) * CHAR_BIT; ++i) {
+            if (x >> (sizeof(x) * CHAR_BIT - 1 - i)) return i;
+        }
+        return sizeof(x) * CHAR_BIT;
+    }
+#else
+static LIBDIVIDE_INLINE int __builtin_clzll(unsigned long long x) {
+#endif
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC)
+    return (int)_CountLeadingZeros64(x);
+#elif defined(_WIN64)
+#if defined(__AVX2__) || defined(__LZCNT__)
+    return (int)_lzcnt_u64(x);
+#else
+    unsigned long r;
+    _BitScanReverse64(&r, x);
+    return (int)(r ^ 63);
+#endif
+#else
+    int l = __builtin_clz((unsigned)x) + 32;
+    int h = __builtin_clz((unsigned)(x >> 32));
+    return !!((unsigned)(x >> 32)) ? h : l;
+#endif
+}
+#endif // defined(_MSC_VER) && !defined(__clang__)
 
 // pack divider structs to prevent compilers from padding.
 // This reduces memory usage by up to 43% when using a large
@@ -238,18 +330,28 @@ static LIBDIVIDE_INLINE struct libdivide_u32_branchfree_t libdivide_u32_branchfr
 static LIBDIVIDE_INLINE struct libdivide_s64_branchfree_t libdivide_s64_branchfree_gen(int64_t d);
 static LIBDIVIDE_INLINE struct libdivide_u64_branchfree_t libdivide_u64_branchfree_gen(uint64_t d);
 
-static LIBDIVIDE_INLINE int16_t libdivide_s16_do_raw(int16_t numer, int16_t magic, uint8_t more);
+static LIBDIVIDE_INLINE int16_t libdivide_s16_do_raw(
+    int16_t numer, int16_t magic, uint8_t more);
 static LIBDIVIDE_INLINE int16_t libdivide_s16_do(
     int16_t numer, const struct libdivide_s16_t *denom);
-static LIBDIVIDE_INLINE uint16_t libdivide_u16_do_raw(uint16_t numer, uint16_t magic, uint8_t more);
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_do_raw(
+    uint16_t numer, uint16_t magic, uint8_t more);
 static LIBDIVIDE_INLINE uint16_t libdivide_u16_do(
     uint16_t numer, const struct libdivide_u16_t *denom);
+static LIBDIVIDE_INLINE int32_t libdivide_s32_do_raw(
+    int32_t numer, int32_t magic, uint8_t more);
 static LIBDIVIDE_INLINE int32_t libdivide_s32_do(
     int32_t numer, const struct libdivide_s32_t *denom);
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_do_raw(
+    uint32_t numer, uint32_t magic, uint8_t more);
 static LIBDIVIDE_INLINE uint32_t libdivide_u32_do(
     uint32_t numer, const struct libdivide_u32_t *denom);
+static LIBDIVIDE_INLINE int64_t libdivide_s64_do_raw(
+    int64_t numer, int64_t magic, uint8_t more);
 static LIBDIVIDE_INLINE int64_t libdivide_s64_do(
     int64_t numer, const struct libdivide_s64_t *denom);
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_do_raw(
+    uint64_t numer, uint64_t magic, uint8_t more);
 static LIBDIVIDE_INLINE uint64_t libdivide_u64_do(
     uint64_t numer, const struct libdivide_u64_t *denom);
 
@@ -315,7 +417,7 @@ static LIBDIVIDE_INLINE int32_t libdivide_mullhi_s32(int32_t x, int32_t y) {
 }
 
 static LIBDIVIDE_INLINE uint64_t libdivide_mullhi_u64(uint64_t x, uint64_t y) {
-#if defined(LIBDIVIDE_VC) && defined(LIBDIVIDE_X86_64)
+#if defined(LIBDIVIDE_MULH_INTRINSICS)
     return __umulh(x, y);
 #elif defined(HAS_INT128_T)
     __uint128_t xl = x, yl = y;
@@ -341,7 +443,7 @@ static LIBDIVIDE_INLINE uint64_t libdivide_mullhi_u64(uint64_t x, uint64_t y) {
 }
 
 static LIBDIVIDE_INLINE int64_t libdivide_mullhi_s64(int64_t x, int64_t y) {
-#if defined(LIBDIVIDE_VC) && defined(LIBDIVIDE_X86_64)
+#if defined(LIBDIVIDE_MULH_INTRINSICS)
     return __mulh(x, y);
 #elif defined(HAS_INT128_T)
     __int128_t xl = x, yl = y;
@@ -367,15 +469,9 @@ static LIBDIVIDE_INLINE int16_t libdivide_count_leading_zeros16(uint16_t val) {
     // Fast way to count leading zeros
     // On the AVR 8-bit architecture __builtin_clz() works on a int16_t.
     return __builtin_clz(val);
-#elif defined(__GNUC__) || __has_builtin(__builtin_clz)
+#elif defined(__GNUC__) || __has_builtin(__builtin_clz) || defined(_MSC_VER)
     // Fast way to count leading zeros
-    return __builtin_clz(val) - 16;
-#elif defined(LIBDIVIDE_VC)
-    unsigned long result;
-    if (_BitScanReverse(&result, (unsigned long)val)) {
-        return (int16_t)(15 - result);
-    }
-    return 0;
+    return (int16_t)(__builtin_clz(val) - 16);
 #else
     if (val == 0) return 16;
     int16_t result = 4;
@@ -396,15 +492,9 @@ static LIBDIVIDE_INLINE int32_t libdivide_count_leading_zeros32(uint32_t val) {
 #if defined(__AVR__)
     // Fast way to count leading zeros
     return __builtin_clzl(val);
-#elif defined(__GNUC__) || __has_builtin(__builtin_clz)
+#elif defined(__GNUC__) || __has_builtin(__builtin_clz) || defined(_MSC_VER)
     // Fast way to count leading zeros
     return __builtin_clz(val);
-#elif defined(LIBDIVIDE_VC)
-    unsigned long result;
-    if (_BitScanReverse(&result, val)) {
-        return 31 - result;
-    }
-    return 0;
 #else
     if (val == 0) return 32;
     int32_t result = 8;
@@ -422,15 +512,9 @@ static LIBDIVIDE_INLINE int32_t libdivide_count_leading_zeros32(uint32_t val) {
 }
 
 static LIBDIVIDE_INLINE int32_t libdivide_count_leading_zeros64(uint64_t val) {
-#if defined(__GNUC__) || __has_builtin(__builtin_clzll)
+#if defined(__GNUC__) || __has_builtin(__builtin_clzll) || defined(_MSC_VER)
     // Fast way to count leading zeros
     return __builtin_clzll(val);
-#elif defined(LIBDIVIDE_VC) && defined(_WIN64)
-    unsigned long result;
-    if (_BitScanReverse64(&result, val)) {
-        return 63 - result;
-    }
-    return 0;
 #else
     uint32_t hi = val >> 32;
     uint32_t lo = val & 0xFFFFFFFF;
@@ -527,7 +611,7 @@ static LIBDIVIDE_INLINE uint64_t libdivide_128_div_64_to_64(
     shift = libdivide_count_leading_zeros64(den);
     den <<= shift;
     numhi <<= shift;
-    numhi |= (numlo >> (-shift & 63)) & (-(int64_t)shift >> 63);
+    numhi |= (numlo >> (-shift & 63)) & (uint64_t)(-(int64_t)shift >> 63);
     numlo <<= shift;
 
     // Extract the low digits of the numerator and both digits of the denominator.
@@ -736,11 +820,11 @@ static LIBDIVIDE_INLINE struct libdivide_u16_t libdivide_internal_u16_gen(
     return result;
 }
 
-struct libdivide_u16_t libdivide_u16_gen(uint16_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u16_t libdivide_u16_gen(uint16_t d) {
     return libdivide_internal_u16_gen(d, 0);
 }
 
-struct libdivide_u16_branchfree_t libdivide_u16_branchfree_gen(uint16_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u16_branchfree_t libdivide_u16_branchfree_gen(uint16_t d) {
     if (d == 1) {
         LIBDIVIDE_ERROR("branchfree divider must be != 1");
     }
@@ -753,11 +837,11 @@ struct libdivide_u16_branchfree_t libdivide_u16_branchfree_gen(uint16_t d) {
 // The original libdivide_u16_do takes a const pointer. However, this cannot be used
 // with a compile time constant libdivide_u16_t: it will generate a warning about
 // taking the address of a temporary. Hence this overload.
-uint16_t libdivide_u16_do_raw(uint16_t numer, uint16_t magic, uint8_t more) {
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_do_raw(uint16_t numer, uint16_t magic, uint8_t more) {
     if (!magic) {
         return numer >> more;
     } else {
-        uint16_t q = libdivide_mullhi_u16(magic, numer);
+        uint16_t q = libdivide_mullhi_u16(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             uint16_t t = ((numer - q) >> 1) + q;
             return t >> (more & LIBDIVIDE_16_SHIFT_MASK);
@@ -769,18 +853,18 @@ uint16_t libdivide_u16_do_raw(uint16_t numer, uint16_t magic, uint8_t more) {
     }
 }
 
-uint16_t libdivide_u16_do(uint16_t numer, const struct libdivide_u16_t *denom) {
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_do(uint16_t numer, const struct libdivide_u16_t *denom) {
     return libdivide_u16_do_raw(numer, denom->magic, denom->more);
 }
 
-uint16_t libdivide_u16_branchfree_do(
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_branchfree_do(
     uint16_t numer, const struct libdivide_u16_branchfree_t *denom) {
-    uint16_t q = libdivide_mullhi_u16(denom->magic, numer);
+    uint16_t q = libdivide_mullhi_u16(numer, denom->magic);
     uint16_t t = ((numer - q) >> 1) + q;
     return t >> denom->more;
 }
 
-uint16_t libdivide_u16_recover(const struct libdivide_u16_t *denom) {
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_recover(const struct libdivide_u16_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_16_SHIFT_MASK;
 
@@ -818,7 +902,7 @@ uint16_t libdivide_u16_recover(const struct libdivide_u16_t *denom) {
     }
 }
 
-uint16_t libdivide_u16_branchfree_recover(const struct libdivide_u16_branchfree_t *denom) {
+static LIBDIVIDE_INLINE uint16_t libdivide_u16_branchfree_recover(const struct libdivide_u16_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_16_SHIFT_MASK;
 
@@ -900,11 +984,11 @@ static LIBDIVIDE_INLINE struct libdivide_u32_t libdivide_internal_u32_gen(
     return result;
 }
 
-struct libdivide_u32_t libdivide_u32_gen(uint32_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u32_t libdivide_u32_gen(uint32_t d) {
     return libdivide_internal_u32_gen(d, 0);
 }
 
-struct libdivide_u32_branchfree_t libdivide_u32_branchfree_gen(uint32_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u32_branchfree_t libdivide_u32_branchfree_gen(uint32_t d) {
     if (d == 1) {
         LIBDIVIDE_ERROR("branchfree divider must be != 1");
     }
@@ -914,12 +998,11 @@ struct libdivide_u32_branchfree_t libdivide_u32_branchfree_gen(uint32_t d) {
     return ret;
 }
 
-uint32_t libdivide_u32_do(uint32_t numer, const struct libdivide_u32_t *denom) {
-    uint8_t more = denom->more;
-    if (!denom->magic) {
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_do_raw(uint32_t numer, uint32_t magic, uint8_t more) {
+    if (!magic) {
         return numer >> more;
     } else {
-        uint32_t q = libdivide_mullhi_u32(denom->magic, numer);
+        uint32_t q = libdivide_mullhi_u32(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             uint32_t t = ((numer - q) >> 1) + q;
             return t >> (more & LIBDIVIDE_32_SHIFT_MASK);
@@ -931,14 +1014,18 @@ uint32_t libdivide_u32_do(uint32_t numer, const struct libdivide_u32_t *denom) {
     }
 }
 
-uint32_t libdivide_u32_branchfree_do(
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_do(uint32_t numer, const struct libdivide_u32_t *denom) {
+    return libdivide_u32_do_raw(numer, denom->magic, denom->more);
+}
+
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_branchfree_do(
     uint32_t numer, const struct libdivide_u32_branchfree_t *denom) {
-    uint32_t q = libdivide_mullhi_u32(denom->magic, numer);
+    uint32_t q = libdivide_mullhi_u32(numer, denom->magic);
     uint32_t t = ((numer - q) >> 1) + q;
     return t >> denom->more;
 }
 
-uint32_t libdivide_u32_recover(const struct libdivide_u32_t *denom) {
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_recover(const struct libdivide_u32_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_32_SHIFT_MASK;
 
@@ -976,7 +1063,7 @@ uint32_t libdivide_u32_recover(const struct libdivide_u32_t *denom) {
     }
 }
 
-uint32_t libdivide_u32_branchfree_recover(const struct libdivide_u32_branchfree_t *denom) {
+static LIBDIVIDE_INLINE uint32_t libdivide_u32_branchfree_recover(const struct libdivide_u32_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_32_SHIFT_MASK;
 
@@ -1005,7 +1092,7 @@ uint32_t libdivide_u32_branchfree_recover(const struct libdivide_u32_branchfree_
     }
 }
 
-/////////// UINT64
+////////// UINT64
 
 static LIBDIVIDE_INLINE struct libdivide_u64_t libdivide_internal_u64_gen(
     uint64_t d, int branchfree) {
@@ -1060,11 +1147,11 @@ static LIBDIVIDE_INLINE struct libdivide_u64_t libdivide_internal_u64_gen(
     return result;
 }
 
-struct libdivide_u64_t libdivide_u64_gen(uint64_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u64_t libdivide_u64_gen(uint64_t d) {
     return libdivide_internal_u64_gen(d, 0);
 }
 
-struct libdivide_u64_branchfree_t libdivide_u64_branchfree_gen(uint64_t d) {
+static LIBDIVIDE_INLINE struct libdivide_u64_branchfree_t libdivide_u64_branchfree_gen(uint64_t d) {
     if (d == 1) {
         LIBDIVIDE_ERROR("branchfree divider must be != 1");
     }
@@ -1074,12 +1161,11 @@ struct libdivide_u64_branchfree_t libdivide_u64_branchfree_gen(uint64_t d) {
     return ret;
 }
 
-uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {
-    uint8_t more = denom->more;
-    if (!denom->magic) {
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_do_raw(uint64_t numer, uint64_t magic, uint8_t more) {
+   if (!magic) {
         return numer >> more;
     } else {
-        uint64_t q = libdivide_mullhi_u64(denom->magic, numer);
+        uint64_t q = libdivide_mullhi_u64(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             uint64_t t = ((numer - q) >> 1) + q;
             return t >> (more & LIBDIVIDE_64_SHIFT_MASK);
@@ -1091,14 +1177,18 @@ uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {
     }
 }
 
-uint64_t libdivide_u64_branchfree_do(
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_do(uint64_t numer, const struct libdivide_u64_t *denom) {
+    return libdivide_u64_do_raw(numer, denom->magic, denom->more);
+}
+
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_branchfree_do(
     uint64_t numer, const struct libdivide_u64_branchfree_t *denom) {
-    uint64_t q = libdivide_mullhi_u64(denom->magic, numer);
+    uint64_t q = libdivide_mullhi_u64(numer, denom->magic);
     uint64_t t = ((numer - q) >> 1) + q;
     return t >> denom->more;
 }
 
-uint64_t libdivide_u64_recover(const struct libdivide_u64_t *denom) {
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_recover(const struct libdivide_u64_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_64_SHIFT_MASK;
 
@@ -1142,7 +1232,7 @@ uint64_t libdivide_u64_recover(const struct libdivide_u64_t *denom) {
     }
 }
 
-uint64_t libdivide_u64_branchfree_recover(const struct libdivide_u64_branchfree_t *denom) {
+static LIBDIVIDE_INLINE uint64_t libdivide_u64_branchfree_recover(const struct libdivide_u64_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_64_SHIFT_MASK;
 
@@ -1177,7 +1267,7 @@ uint64_t libdivide_u64_branchfree_recover(const struct libdivide_u64_branchfree_
     }
 }
 
-/////////// SINT16
+////////// SINT16
 
 static LIBDIVIDE_INLINE struct libdivide_s16_t libdivide_internal_s16_gen(
     int16_t d, int branchfree) {
@@ -1245,11 +1335,11 @@ static LIBDIVIDE_INLINE struct libdivide_s16_t libdivide_internal_s16_gen(
     return result;
 }
 
-struct libdivide_s16_t libdivide_s16_gen(int16_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s16_t libdivide_s16_gen(int16_t d) {
     return libdivide_internal_s16_gen(d, 0);
 }
 
-struct libdivide_s16_branchfree_t libdivide_s16_branchfree_gen(int16_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s16_branchfree_t libdivide_s16_branchfree_gen(int16_t d) {
     struct libdivide_s16_t tmp = libdivide_internal_s16_gen(d, 1);
     struct libdivide_s16_branchfree_t result = {tmp.magic, tmp.more};
     return result;
@@ -1258,7 +1348,7 @@ struct libdivide_s16_branchfree_t libdivide_s16_branchfree_gen(int16_t d) {
 // The original libdivide_s16_do takes a const pointer. However, this cannot be used
 // with a compile time constant libdivide_s16_t: it will generate a warning about
 // taking the address of a temporary. Hence this overload.
-int16_t libdivide_s16_do_raw(int16_t numer, int16_t magic, uint8_t more) {
+static LIBDIVIDE_INLINE int16_t libdivide_s16_do_raw(int16_t numer, int16_t magic, uint8_t more) {
     uint8_t shift = more & LIBDIVIDE_16_SHIFT_MASK;
 
     if (!magic) {
@@ -1270,7 +1360,7 @@ int16_t libdivide_s16_do_raw(int16_t numer, int16_t magic, uint8_t more) {
         q = (q ^ sign) - sign;
         return q;
     } else {
-        uint16_t uq = (uint16_t)libdivide_mullhi_s16(magic, numer);
+        uint16_t uq = (uint16_t)libdivide_mullhi_s16(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             // must be arithmetic shift and then sign extend
             int16_t sign = (int8_t)more >> 7;
@@ -1285,17 +1375,17 @@ int16_t libdivide_s16_do_raw(int16_t numer, int16_t magic, uint8_t more) {
     }
 }
 
-int16_t libdivide_s16_do(int16_t numer, const struct libdivide_s16_t *denom) {
+static LIBDIVIDE_INLINE int16_t libdivide_s16_do(int16_t numer, const struct libdivide_s16_t *denom) {
     return libdivide_s16_do_raw(numer, denom->magic, denom->more);
 }
 
-int16_t libdivide_s16_branchfree_do(int16_t numer, const struct libdivide_s16_branchfree_t *denom) {
+static LIBDIVIDE_INLINE int16_t libdivide_s16_branchfree_do(int16_t numer, const struct libdivide_s16_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_16_SHIFT_MASK;
     // must be arithmetic shift and then sign extend
     int16_t sign = (int8_t)more >> 7;
     int16_t magic = denom->magic;
-    int16_t q = libdivide_mullhi_s16(magic, numer);
+    int16_t q = libdivide_mullhi_s16(numer, magic);
     q += numer;
 
     // If q is non-negative, we have nothing to do
@@ -1313,7 +1403,7 @@ int16_t libdivide_s16_branchfree_do(int16_t numer, const struct libdivide_s16_br
     return q;
 }
 
-int16_t libdivide_s16_recover(const struct libdivide_s16_t *denom) {
+static LIBDIVIDE_INLINE int16_t libdivide_s16_recover(const struct libdivide_s16_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_16_SHIFT_MASK;
     if (!denom->magic) {
@@ -1348,11 +1438,12 @@ int16_t libdivide_s16_recover(const struct libdivide_s16_t *denom) {
     }
 }
 
-int16_t libdivide_s16_branchfree_recover(const struct libdivide_s16_branchfree_t *denom) {
-    return libdivide_s16_recover((const struct libdivide_s16_t *)denom);
+static LIBDIVIDE_INLINE int16_t libdivide_s16_branchfree_recover(const struct libdivide_s16_branchfree_t *denom) {
+    const struct libdivide_s16_t den = {denom->magic, denom->more};
+    return libdivide_s16_recover(&den);
 }
 
-/////////// SINT32
+////////// SINT32
 
 static LIBDIVIDE_INLINE struct libdivide_s32_t libdivide_internal_s32_gen(
     int32_t d, int branchfree) {
@@ -1420,21 +1511,20 @@ static LIBDIVIDE_INLINE struct libdivide_s32_t libdivide_internal_s32_gen(
     return result;
 }
 
-struct libdivide_s32_t libdivide_s32_gen(int32_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s32_t libdivide_s32_gen(int32_t d) {
     return libdivide_internal_s32_gen(d, 0);
 }
 
-struct libdivide_s32_branchfree_t libdivide_s32_branchfree_gen(int32_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s32_branchfree_t libdivide_s32_branchfree_gen(int32_t d) {
     struct libdivide_s32_t tmp = libdivide_internal_s32_gen(d, 1);
     struct libdivide_s32_branchfree_t result = {tmp.magic, tmp.more};
     return result;
 }
 
-int32_t libdivide_s32_do(int32_t numer, const struct libdivide_s32_t *denom) {
-    uint8_t more = denom->more;
+static LIBDIVIDE_INLINE int32_t libdivide_s32_do_raw(int32_t numer, int32_t magic, uint8_t more) {
     uint8_t shift = more & LIBDIVIDE_32_SHIFT_MASK;
 
-    if (!denom->magic) {
+    if (!magic) {
         uint32_t sign = (int8_t)more >> 7;
         uint32_t mask = ((uint32_t)1 << shift) - 1;
         uint32_t uq = numer + ((numer >> 31) & mask);
@@ -1443,7 +1533,7 @@ int32_t libdivide_s32_do(int32_t numer, const struct libdivide_s32_t *denom) {
         q = (q ^ sign) - sign;
         return q;
     } else {
-        uint32_t uq = (uint32_t)libdivide_mullhi_s32(denom->magic, numer);
+        uint32_t uq = (uint32_t)libdivide_mullhi_s32(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             // must be arithmetic shift and then sign extend
             int32_t sign = (int8_t)more >> 7;
@@ -1458,13 +1548,17 @@ int32_t libdivide_s32_do(int32_t numer, const struct libdivide_s32_t *denom) {
     }
 }
 
-int32_t libdivide_s32_branchfree_do(int32_t numer, const struct libdivide_s32_branchfree_t *denom) {
+static LIBDIVIDE_INLINE int32_t libdivide_s32_do(int32_t numer, const struct libdivide_s32_t *denom) {
+    return libdivide_s32_do_raw(numer, denom->magic, denom->more);
+}
+
+static LIBDIVIDE_INLINE int32_t libdivide_s32_branchfree_do(int32_t numer, const struct libdivide_s32_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_32_SHIFT_MASK;
     // must be arithmetic shift and then sign extend
     int32_t sign = (int8_t)more >> 7;
     int32_t magic = denom->magic;
-    int32_t q = libdivide_mullhi_s32(magic, numer);
+    int32_t q = libdivide_mullhi_s32(numer, magic);
     q += numer;
 
     // If q is non-negative, we have nothing to do
@@ -1482,7 +1576,7 @@ int32_t libdivide_s32_branchfree_do(int32_t numer, const struct libdivide_s32_br
     return q;
 }
 
-int32_t libdivide_s32_recover(const struct libdivide_s32_t *denom) {
+static LIBDIVIDE_INLINE int32_t libdivide_s32_recover(const struct libdivide_s32_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_32_SHIFT_MASK;
     if (!denom->magic) {
@@ -1517,11 +1611,12 @@ int32_t libdivide_s32_recover(const struct libdivide_s32_t *denom) {
     }
 }
 
-int32_t libdivide_s32_branchfree_recover(const struct libdivide_s32_branchfree_t *denom) {
-    return libdivide_s32_recover((const struct libdivide_s32_t *)denom);
+static LIBDIVIDE_INLINE int32_t libdivide_s32_branchfree_recover(const struct libdivide_s32_branchfree_t *denom) {
+    const struct libdivide_s32_t den = {denom->magic, denom->more};
+    return libdivide_s32_recover(&den);
 }
 
-///////////// SINT64
+////////// SINT64
 
 static LIBDIVIDE_INLINE struct libdivide_s64_t libdivide_internal_s64_gen(
     int64_t d, int branchfree) {
@@ -1589,21 +1684,20 @@ static LIBDIVIDE_INLINE struct libdivide_s64_t libdivide_internal_s64_gen(
     return result;
 }
 
-struct libdivide_s64_t libdivide_s64_gen(int64_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s64_t libdivide_s64_gen(int64_t d) {
     return libdivide_internal_s64_gen(d, 0);
 }
 
-struct libdivide_s64_branchfree_t libdivide_s64_branchfree_gen(int64_t d) {
+static LIBDIVIDE_INLINE struct libdivide_s64_branchfree_t libdivide_s64_branchfree_gen(int64_t d) {
     struct libdivide_s64_t tmp = libdivide_internal_s64_gen(d, 1);
     struct libdivide_s64_branchfree_t ret = {tmp.magic, tmp.more};
     return ret;
 }
 
-int64_t libdivide_s64_do(int64_t numer, const struct libdivide_s64_t *denom) {
-    uint8_t more = denom->more;
+static LIBDIVIDE_INLINE int64_t libdivide_s64_do_raw(int64_t numer, int64_t magic, uint8_t more) {
     uint8_t shift = more & LIBDIVIDE_64_SHIFT_MASK;
 
-    if (!denom->magic) {  // shift path
+    if (!magic) {  // shift path
         uint64_t mask = ((uint64_t)1 << shift) - 1;
         uint64_t uq = numer + ((numer >> 63) & mask);
         int64_t q = (int64_t)uq;
@@ -1613,7 +1707,7 @@ int64_t libdivide_s64_do(int64_t numer, const struct libdivide_s64_t *denom) {
         q = (q ^ sign) - sign;
         return q;
     } else {
-        uint64_t uq = (uint64_t)libdivide_mullhi_s64(denom->magic, numer);
+        uint64_t uq = (uint64_t)libdivide_mullhi_s64(numer, magic);
         if (more & LIBDIVIDE_ADD_MARKER) {
             // must be arithmetic shift and then sign extend
             int64_t sign = (int8_t)more >> 7;
@@ -1628,13 +1722,17 @@ int64_t libdivide_s64_do(int64_t numer, const struct libdivide_s64_t *denom) {
     }
 }
 
-int64_t libdivide_s64_branchfree_do(int64_t numer, const struct libdivide_s64_branchfree_t *denom) {
+static LIBDIVIDE_INLINE int64_t libdivide_s64_do(int64_t numer, const struct libdivide_s64_t *denom) {
+    return libdivide_s64_do_raw(numer, denom->magic, denom->more);
+}
+
+static LIBDIVIDE_INLINE int64_t libdivide_s64_branchfree_do(int64_t numer, const struct libdivide_s64_branchfree_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_64_SHIFT_MASK;
     // must be arithmetic shift and then sign extend
     int64_t sign = (int8_t)more >> 7;
     int64_t magic = denom->magic;
-    int64_t q = libdivide_mullhi_s64(magic, numer);
+    int64_t q = libdivide_mullhi_s64(numer, magic);
     q += numer;
 
     // If q is non-negative, we have nothing to do.
@@ -1652,7 +1750,7 @@ int64_t libdivide_s64_branchfree_do(int64_t numer, const struct libdivide_s64_br
     return q;
 }
 
-int64_t libdivide_s64_recover(const struct libdivide_s64_t *denom) {
+static LIBDIVIDE_INLINE int64_t libdivide_s64_recover(const struct libdivide_s64_t *denom) {
     uint8_t more = denom->more;
     uint8_t shift = more & LIBDIVIDE_64_SHIFT_MASK;
     if (denom->magic == 0) {  // shift path
@@ -1678,8 +1776,9 @@ int64_t libdivide_s64_recover(const struct libdivide_s64_t *denom) {
     }
 }
 
-int64_t libdivide_s64_branchfree_recover(const struct libdivide_s64_branchfree_t *denom) {
-    return libdivide_s64_recover((const struct libdivide_s64_t *)denom);
+static LIBDIVIDE_INLINE int64_t libdivide_s64_branchfree_recover(const struct libdivide_s64_branchfree_t *denom) {
+    const struct libdivide_s64_t den = {denom->magic, denom->more};
+    return libdivide_s64_recover(&den);
 }
 
 // Simplest possible vector type division: treat the vector type as an array
@@ -2962,31 +3061,9 @@ __m128i libdivide_s64_branchfree_do_vec128(
 
 #endif
 
-/////////// C++ stuff
+////////// C++ stuff
 
 #ifdef __cplusplus
-
-//for constexpr zero initialization,
-//c++11 might handle things ok,
-//but just limit to at least c++14 to ensure
-//we don't break anyone's code:
-
-// for gcc and clang, use https://en.cppreference.com/w/cpp/feature_test#cpp_constexpr
-#if (defined(__GNUC__) || defined(__clang__)) && (__cpp_constexpr >= 201304L)
-#define LIBDIVIDE_CONSTEXPR constexpr
-
-// supposedly, MSVC might not implement feature test macros right (https://stackoverflow.com/questions/49316752/feature-test-macros-not-working-properly-in-visual-c)
-// so check that _MSVC_LANG corresponds to at least c++14, and _MSC_VER corresponds to at least VS 2017 15.0 (for extended constexpr support https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170)
-#elif defined(_MSC_VER) && _MSC_VER >= 1910 && defined(_MSVC_LANG) && _MSVC_LANG >=201402L
-#define LIBDIVIDE_CONSTEXPR constexpr
-
-// in case some other obscure compiler has the right __cpp_constexpr :
-#elif defined(__cpp_constexpr) && __cpp_constexpr >= 201304L
-#define LIBDIVIDE_CONSTEXPR constexpr
-
-#else
-#define LIBDIVIDE_CONSTEXPR LIBDIVIDE_INLINE
-#endif
 
 enum Branching {
     BRANCHFULL,  // use branching algorithms
@@ -3291,7 +3368,7 @@ using branchfree_divider = divider<T, BRANCHFREE>;
 
 #endif  // __cplusplus
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma warning(pop)
 #endif
 
