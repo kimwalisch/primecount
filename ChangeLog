@@ -1,6 +1,7 @@
-Changes in primecount-7.18, 2025-05-12
+Changes in primecount-7.18, 2025-05-13
 
 * Add CMake find_package(primecount) support.
+* libprimecount.md: Add CMake find_package(primecount) section.
 * PhiTiny.cpp: Reduce code bloat.
 * Move private header files from /include to /src.
 * src/CMakeLists.txt: Update for private header files in /src.
