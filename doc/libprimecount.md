@@ -188,10 +188,10 @@ program against libprimecount:
 
 ```CMake
 # CMakeLists.txt
-project(<project_name> C CXX)
+project(my_project C CXX)
 find_package(primecount REQUIRED)
-add_executable(<program_name> main.c)
-target_link_libraries(<program_name> primecount::primecount)
+add_executable(my_exec main.c)
+target_link_libraries(my_exec primecount::primecount)
 ```
 
 # Build instructions
