@@ -39,7 +39,6 @@ cloud servers.
 * [CMake: `find_package(primecount)`](#cmake-find_packageprimecount)
 * [Install libprimecount using package manager](https://github.com/kimwalisch/primecount#installation)
 * [Build libprimecount from source](#build-instructions)
-* [Maximum portability](#maximum-portability)
 * [CMake build options](#cmake-build-options)
 
 # C API reference
@@ -210,43 +209,22 @@ sudo ldconfig
 
 * [Detailed build instructions](BUILD.md#primecount-build-instructions)
 
-# Maximum portability
-
-For performance reasons primecount uses the ```POPCNT``` instruction on all
-CPU architectures that support it. Enabling the ```POPCNT``` instruction
-usually improves primecount's performance by about 30%.
-
-On x86/x64 CPUs primecount will by default detect at build time if the host
-CPU supports the ```POPCNT``` instruction. If not, the ```POPCNT```
-instruction will be disabled and a portable alternative algorithm will be used.
-If you need to build a portable primecount binary package for x86/x64 CPUs that
-can be distributed to many different PCs, even very old ones without
-```POPCNT``` support (2008 or earlier), you need to disable the ```POPCNT```
-instruction at build time. Note that disabling ```POPCNT``` only has an effect
-on x86/x64, on other CPU architectures ```POPCNT``` is always used if it is
-available (as this generally does not cause any issues).
-
-```
-cmake . -DWITH_POPCNT=OFF
-```
-
 # CMake build options
 
 Here are all available cmake configuration options:
 
 ```CMake
-option(BUILD_PRIMECOUNT    "Build the primecount binary"           ON)
-option(BUILD_LIBPRIMESIEVE "Build libprimesieve"                   ON)
-option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
-option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
-option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
-option(BUILD_TESTS         "Build the test programs"               OFF)
+option(BUILD_PRIMECOUNT     "Build the primecount binary"           ON)
+option(BUILD_LIBPRIMESIEVE  "Build libprimesieve"                   ON)
+option(BUILD_SHARED_LIBS    "Build the shared libprimecount"        OFF)
+option(BUILD_STATIC_LIBS    "Build the static libprimecount"        ON)
+option(BUILD_MANPAGE        "Regenerate man page using a2x program" OFF)
+option(BUILD_TESTS          "Build the test programs"               OFF)
 
-option(WITH_POPCNT          "Use the POPCNT instruction"            ON)
-option(WITH_LIBDIVIDE       "Use libdivide.h"                       ON)
-option(WITH_OPENMP          "Enable OpenMP multi-threading"         ON)
-option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" ON)
+option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
+option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
+option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" OFF)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
-option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
+option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
 ```
