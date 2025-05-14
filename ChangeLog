@@ -1,4 +1,4 @@
-Changes in primecount-7.18, 2025-05-13
+Changes in primecount-7.18, 2025-05-14
 
 * Add CMake find_package(primecount) support.
 * libprimecount.md: Add CMake find_package(primecount) section.
@@ -6,6 +6,7 @@ Changes in primecount-7.18, 2025-05-13
 * Move private header files from /include to /src.
 * src/CMakeLists.txt: Update for private header files in /src.
 * test/CMakeLists.txt: Update for private header files in /src.
+* Vector.hpp: Get rid of std::is_trivial which is deprecated in C++26.
 * Update to latest primesieve-12.9 library.
 * Update to latest libdivide-5.2.0 library.
 
