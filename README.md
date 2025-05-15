@@ -244,7 +244,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>24.40s</td>
-    <td>8.120s</td>
+    <td>8.12s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
