@@ -275,7 +275,7 @@ Advanced options for Xavier Gourdon's algorithm:
   </tr>
 </table>
 
-These benchmarks above were run on an AMD EPYC Zen4 CPU from 2023 with 32 CPU cores (no Hyper-Threading)
+The benchmarks above were run on an AMD EPYC Zen4 CPU from 2023 with 32 CPU cores (no Hyper-Threading)
 clocked at 3.7 GHz. Note that Jan Büthe mentions in <a href="doc/References.md">[11]</a>
 that he computed $\pi(10^{25})$ in 40,000 CPU core hours using the analytic prime
 counting function algorithm. Büthe also mentions that by using additional zeros of the
