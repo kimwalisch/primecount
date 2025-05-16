@@ -281,7 +281,7 @@ that he computed $\pi(10^{25})$ in 40,000 CPU core hours using the analytic prim
 counting function algorithm. Büthe also mentions that by using additional zeros of the
 zeta function the runtime could have potentially been reduced to 4,000 CPU core hours.
 However using primecount and Xavier Gourdon's algorithm $\pi(10^{25})$ can be computed
-in only 380 CPU core hours on the AMD EPYC Zen4 CPU (from 2023)!
+in only 357 CPU core hours on the AMD EPYC Zen4 CPU!
 
 ## Algorithms
 
