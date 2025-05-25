@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   if (argc < 3)
   {
     std::cerr << "Missing start/stop params!" << std::endl;
-    return 1;
+    return 0;
   }
 
   uint128_t start = calculator::eval<uint128_t>(argv[1]);
