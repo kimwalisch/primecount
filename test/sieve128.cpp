@@ -32,7 +32,7 @@ public:
       uint128_t q = (start / prime) + 1;
       uint128_t n = prime * q;
       n += prime * (n % 2 == 0);
-      ASSERT(n % 2 == 0);
+      ASSERT(n % 2 != 0);
 
       uint64_t i = (uint64_t) (n - start);
       uint64_t limit = (uint64_t) (stop - start);
