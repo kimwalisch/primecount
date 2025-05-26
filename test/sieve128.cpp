@@ -209,7 +209,7 @@ maxuint_t find_nth_prime_forward(uint64_t n, maxuint_t start)
     // Wait until all threads have finished
     // computing their current segment.
     #pragma omp barrier
-    #pragma omp master
+    #pragma omp single
     {
       while_iters++;
 
@@ -225,10 +225,6 @@ maxuint_t find_nth_prime_forward(uint64_t n, maxuint_t start)
         }
       }
     }
-
-    // Other threads must wait until master
-    // thread finishes single-threaded section.
-    #pragma omp barrier
   }
 
   return nth_prime;
@@ -280,7 +276,7 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
     // Wait until all threads have finished
     // computing their current segment.
     #pragma omp barrier
-    #pragma omp master
+    #pragma omp single
     {
       while_iters++;
 
@@ -296,10 +292,6 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
         }
       }
     }
-
-    // Other threads must wait until master
-    // thread finishes single-threaded section.
-    #pragma omp barrier
   }
 
   return nth_prime;
