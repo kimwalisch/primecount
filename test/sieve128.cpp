@@ -9,6 +9,7 @@
 #include <popcnt.hpp>
 #include <Vector.hpp>
 
+#include <algorithm>
 #include <iostream>
 #include <omp.h>
 
@@ -133,24 +134,14 @@ private:
   Vector<CacheLine> vect_;
 };
 
-} // namespace
-
-int main(int argc, char** argv)
+/// Find the nth prime >= start
+maxuint_t find_nth_prime(uint64_t n, maxuint_t start)
 {
-  if (argc < 3)
-  {
-    std::cerr << "Missing start/n params!" << std::endl;
-    return 0;
-  }
-
   maxuint_t nth_prime = 0;
-  maxuint_t start = to_maxint(argv[1]);
-  uint64_t n = (uint64_t) to_maxint(argv[2]);
+  uint64_t primes = 0;
+  uint64_t while_iters = 0;
   uint64_t avg_prime_gap = ilog(start) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
-  uint64_t while_iters = 0;
-  uint64_t primes = 0;
-
   uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
   uint64_t min_segment_size = (uint64_t) 1e7;
   segment_size = std::max(min_segment_size, segment_size);
@@ -198,6 +189,23 @@ int main(int argc, char** argv)
     // thread finishes single-threaded section.
     #pragma omp barrier
   }
+
+  return nth_prime;
+}
+
+} // namespace
+
+int main(int argc, char** argv)
+{
+  if (argc < 3)
+  {
+    std::cerr << "Missing start/n params!" << std::endl;
+    return 0;
+  }
+
+  maxuint_t start = to_maxint(argv[1]);
+  uint64_t n = (uint64_t) to_maxint(argv[2]);
+  maxuint_t nth_prime = find_nth_prime(n, start);
 
   std::cout << "start: " << start << std::endl;
   std::cout << "n: " << n << std::endl;
