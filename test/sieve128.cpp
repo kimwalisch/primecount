@@ -71,8 +71,8 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  maxint_t start = to_maxint(argv[1]);
-  maxint_t stop = to_maxint(argv[2]);
+  maxuint_t start = to_maxint(argv[1]);
+  maxuint_t stop = to_maxint(argv[2]);
 
   if (start <= pstd::numeric_limits<uint64_t>::max() &&
       stop <= pstd::numeric_limits<uint64_t>::max())
