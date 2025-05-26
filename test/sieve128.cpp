@@ -9,6 +9,7 @@
 #include <popcnt.hpp>
 #include <Vector.hpp>
 
+#include <atomic>
 #include <algorithm>
 #include <iostream>
 #include <omp.h>
@@ -250,6 +251,7 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<Sieve_128bit> sieves(threads);
+  std::atomic<bool> high_is_zero(false);
   bool finished = false;
 
   #pragma omp parallel num_threads(threads)
@@ -258,7 +260,9 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
     int thread_id = omp_get_thread_num();
     uint64_t i = while_iters * threads + thread_id;
 
-    if (start > i * segment_size)
+    if (start <= i * segment_size)
+      high_is_zero = true;
+    else
     {
       maxuint_t high = start - i * segment_size;
       maxuint_t low = 0;
@@ -280,6 +284,9 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
     {
       while_iters++;
 
+      if (high_is_zero.load())
+        finished = true;
+
       for (int j = 0; j < threads; j++)
       {
         if (primes + sieves[j].get_prime_count() < n)
@@ -293,6 +300,9 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
       }
     }
   }
+
+  if (!nth_prime)
+    throw primecount_error("n is too large, nth prime < 0!");
 
   return nth_prime;
 }
