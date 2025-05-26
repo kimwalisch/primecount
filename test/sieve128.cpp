@@ -1,3 +1,4 @@
+#include <ctz.hpp>
 #include <int128_t.hpp>
 #include <Vector.hpp>
 #include <BitSieve240.hpp>
@@ -46,7 +47,7 @@ public:
       uint64_t bits = sieve[i];
       for (; bits; bits &= bits - 1)
       {
-        auto bit_index = __builtin_ctzll(bits);
+        uint64_t bit_index = ctz64(bits);
         uint64_t bit_value = bit_values_[bit_index];
         uint128_t prime = start + i * 240 + bit_value;
         std::cout << prime << std::endl;
