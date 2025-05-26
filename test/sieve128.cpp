@@ -22,7 +22,7 @@ class Sieve_128bit : public BitSieve240
 public:
   uint64_t get_prime_count() const
   {
-    return primes_;
+    return count_;
   }
 
   /// Sieve interval [low, high]
@@ -39,7 +39,7 @@ public:
     uint64_t prime;
 
     low_ = low;
-    primes_ = 0;
+    count_ = 0;
     sieve_.resize(size);
 
     std::fill(sieve_.begin(), sieve_.end(), ~0ull);
@@ -65,26 +65,26 @@ public:
   
     // Count primes (1 bits)
     for (uint64_t bits : sieve_)
-      primes_ += popcnt64(bits);
+      count_ += popcnt64(bits);
   }
 
-  maxuint_t find_nth_prime(uint64_t n) const
+  maxuint_t find_nth_prime_forward(uint64_t n) const
   {
-    ASSERT(n <= primes_);
-    uint64_t primes = 0;
+    ASSERT(n <= count_);
+    uint64_t count = 0;
 
     for (std::size_t i = 0; i < sieve_.size(); i++)
     {
       uint64_t bits = sieve_[i];
       uint64_t count_bits = popcnt64(bits);
 
-      if (primes + count_bits < n)
-        primes += count_bits;
+      if (count + count_bits < n)
+        count += count_bits;
       else
       {
         for (; bits; bits &= bits - 1)
         {
-          if (++primes == n)
+          if (++count == n)
           {
             uint64_t bit_index = ctz64(bits);
             uint64_t bit_value = bit_values_[bit_index];
@@ -98,9 +98,43 @@ public:
     throw primecount_error("Failed to find nth prime!");
   }
 
+  maxuint_t find_nth_prime_backward(uint64_t n) const
+  {
+    ASSERT(n <= count_);
+    uint64_t count = 0;
+    int64_t size = (int64_t) sieve_.size();
+
+    for (int64_t i = size - 1; i >= 0; i--)
+    {
+      uint64_t bits = sieve_[i];
+      uint64_t count_bits = popcnt64(bits);
+
+      if (count + count_bits < n)
+        count += count_bits;
+      else
+      {
+        Vector<maxuint_t> primes;
+        primes.reserve(count_bits);
+
+        for (; bits; bits &= bits - 1)
+        {
+          uint64_t bit_index = ctz64(bits);
+          uint64_t bit_value = bit_values_[bit_index];
+          maxuint_t prime = low_ + i * 240 + bit_value;
+          primes.push_back(prime);
+        }
+
+        uint64_t j = n - count;
+        return primes[primes.size() - j];
+      }
+    }
+
+    throw primecount_error("Failed to find nth prime!");
+  }
+
 private:
   maxuint_t low_ = 0;
-  uint64_t primes_ = 0;
+  uint64_t count_ = 0;
   Vector<uint64_t> sieve_;
 };
 
@@ -134,8 +168,8 @@ private:
   Vector<CacheLine> vect_;
 };
 
-/// Find the nth prime >= start
-maxuint_t find_nth_prime(uint64_t n, maxuint_t start)
+/// Find the nth prime > start
+maxuint_t find_nth_prime_forward(uint64_t n, maxuint_t start)
 {
   maxuint_t nth_prime = 0;
   uint64_t primes = 0;
@@ -178,7 +212,66 @@ maxuint_t find_nth_prime(uint64_t n, maxuint_t start)
           primes += sieves[j].get_prime_count();
         else
         {
-          nth_prime = sieves[j].find_nth_prime(n - primes);
+          nth_prime = sieves[j].find_nth_prime_forward(n - primes);
+          found_nth_prime = true;
+          break;
+        }
+      }
+    }
+
+    // Other threads must wait until master
+    // thread finishes single-threaded section.
+    #pragma omp barrier
+  }
+
+  return nth_prime;
+}
+
+/// Find the nth prime <= start
+maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
+{
+  maxuint_t nth_prime = 0;
+  uint64_t primes = 0;
+  uint64_t while_iters = 0;
+  uint64_t avg_prime_gap = ilog(start) + 2;
+  uint64_t dist_approx = n * avg_prime_gap;
+  uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
+  uint64_t min_segment_size = (uint64_t) 1e7;
+  segment_size = std::max(min_segment_size, segment_size);
+
+  int threads = get_num_threads();
+  threads = ideal_num_threads(dist_approx, threads, segment_size);
+  aligned_vector<Sieve_128bit> sieves(threads);
+  bool found_nth_prime = false;
+
+  #pragma omp parallel num_threads(threads)
+  while (!found_nth_prime)
+  {
+    int thread_id = omp_get_thread_num();
+    uint64_t i = while_iters * threads + thread_id;
+    maxuint_t high = start - i * segment_size;
+    maxuint_t low = (high - segment_size) + 1;
+
+    if (low <= pstd::numeric_limits<uint64_t>::max() &&
+        high <= pstd::numeric_limits<uint64_t>::max())
+      sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
+    else
+      sieves[thread_id].sieve(low, high);
+
+    // Wait until all threads have finished
+    // computing their current segment.
+    #pragma omp barrier
+    #pragma omp master
+    {
+      while_iters++;
+
+      for (int j = 0; j < threads; j++)
+      {
+        if (primes + sieves[j].get_prime_count() < n)
+          primes += sieves[j].get_prime_count();
+        else
+        {
+          nth_prime = sieves[j].find_nth_prime_backward(n - primes);
           found_nth_prime = true;
           break;
         }
@@ -204,11 +297,19 @@ int main(int argc, char** argv)
   }
 
   maxuint_t start = to_maxint(argv[1]);
-  uint64_t n = (uint64_t) to_maxint(argv[2]);
-  maxuint_t nth_prime = find_nth_prime(n, start);
+  int64_t n = (int64_t) to_maxint(argv[2]);
+  maxuint_t nth_prime = 0;
 
-  std::cout << "start: " << start << std::endl;
   std::cout << "n: " << n << std::endl;
+  std::cout << "start: " << start << std::endl;
+
+  // Here we are very close to the nth prime < sqrt(nth_prime),
+  // we simply iterate over the primes until we find it.
+  if (n > 0)
+    nth_prime = find_nth_prime_forward(n, start);
+  else // if (n <= 0)
+    nth_prime = find_nth_prime_backward(-n, start);
+
   std::cout << "nth_prime: " << nth_prime << std::endl;
 
   return 0;
