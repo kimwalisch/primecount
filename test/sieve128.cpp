@@ -70,20 +70,20 @@ public:
   maxuint_t find_nth_prime(uint64_t n) const
   {
     ASSERT(n <= primes_);
-    uint64_t count = 0;
+    uint64_t primes = 0;
 
     for (std::size_t i = 0; i < sieve_.size(); i++)
     {
       uint64_t bits = sieve_[i];
       uint64_t count_bits = popcnt64(bits);
 
-      if (count + count_bits < n)
-        count += count_bits;
+      if (primes + count_bits < n)
+        primes += count_bits;
       else
       {
         for (; bits; bits &= bits - 1)
         {
-          if (++count == n)
+          if (++primes == n)
           {
             uint64_t bit_index = ctz64(bits);
             uint64_t bit_value = bit_values_[bit_index];
@@ -137,21 +137,26 @@ private:
 
 int main(int argc, char** argv)
 {
-  if (argc < 2)
+  if (argc < 3)
   {
-    std::cerr << "Missing start param!" << std::endl;
+    std::cerr << "Missing start/n params!" << std::endl;
     return 0;
   }
 
   maxuint_t nth_prime = 0;
   maxuint_t start = to_maxint(argv[1]);
-  maxuint_t prime_approx = start + isqrt(start);
-  uint64_t n = (uint64_t) ((prime_approx - start) / ilog(start));
-  uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
-  uint64_t count = 0;
+  uint64_t n = (uint64_t) to_maxint(argv[2]);
+  uint64_t avg_prime_gap = ilog(start) + 2;
+  uint64_t dist_approx = n * avg_prime_gap;
   uint64_t while_iters = 0;
+  uint64_t primes = 0;
 
-  int threads = 12;
+  uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
+  uint64_t min_segment_size = (uint64_t) 1e7;
+  segment_size = std::max(min_segment_size, segment_size);
+
+  int threads = get_num_threads();
+  threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<Sieve_128bit> sieves(threads);
   bool found_nth_prime = false;
 
@@ -178,11 +183,11 @@ int main(int argc, char** argv)
 
       for (int j = 0; j < threads; j++)
       {
-        if (count + sieves[j].get_prime_count() < n)
-          count += sieves[j].get_prime_count();
+        if (primes + sieves[j].get_prime_count() < n)
+          primes += sieves[j].get_prime_count();
         else
         {
-          nth_prime = sieves[j].find_nth_prime(n - count);
+          nth_prime = sieves[j].find_nth_prime(n - primes);
           found_nth_prime = true;
           break;
         }
