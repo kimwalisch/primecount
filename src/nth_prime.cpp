@@ -103,7 +103,54 @@ int64_t nth_prime(int64_t n, int threads)
   // approximation using the prime counting function.
   int64_t prime_approx = RiemannR_inverse(n);
   int64_t count_approx = pi(prime_approx, threads);
+  int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;
+
+  // Here we are very close to the nth prime < sqrt(nth_prime),
+  // we simply iterate over the primes until we find it.
+  if (count_approx < n)
+  {
+    uint64_t start = prime_approx + 1;
+    uint64_t stop = start + (n - count_approx) * avg_prime_gap;
+    primesieve::iterator iter(start, stop);
+    for (int64_t i = count_approx; i < n; i++)
+      prime = iter.next_prime();
+  }
+  else // if (count_approx >= n)
+  {
+    uint64_t start = prime_approx;
+    uint64_t stop = start - (count_approx - n) * avg_prime_gap;
+    primesieve::iterator iter(start, stop);
+    for (int64_t i = count_approx; i >= n; i--)
+      prime = iter.prev_prime();
+  }
+
+  return prime;
+}
+
+#if defined(HAVE_INT128_T)
+
+/// Find the nth prime using the prime counting function
+/// and the segmented sieve of Eratosthenes.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/2))
+///
+int128_t nth_prime(int128_t n, int threads)
+{
+  if (n < pstd::numeric_limits<int64_t>::max())
+    return nth_prime((int64_t) n, threads);
+
+  if_unlikely(n < 1)
+    throw primecount_error("nth_prime(n): n must be >= 1");
+  if_unlikely(n > max_n)
+    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
+
+  // Closely approximate the nth prime using the inverse
+  // Riemann R function and then count the primes up to this
+  // approximation using the prime counting function.
+  int128_t prime_approx = RiemannR_inverse(n);
+  int128_t count_approx = pi(prime_approx, threads);
+  int128_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we use a prime sieve to find the actual nth prime.
@@ -114,5 +161,7 @@ int64_t nth_prime(int64_t n, int threads)
 
   return prime;
 }
+
+#endif
 
 } // namespace

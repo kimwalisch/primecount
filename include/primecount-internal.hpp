@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -36,7 +36,6 @@ std::string pi(const std::string& x, int threads);
 int64_t pi(int64_t x, int threads);
 int64_t pi_noprint(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);
-
 int64_t nth_prime(int64_t n, int threads);
 maxuint_t nth_prime_sieve_forward(uint64_t n, maxuint_t start);
 maxuint_t nth_prime_sieve_backward(uint64_t n, maxuint_t start);
@@ -63,6 +62,7 @@ int64_t RiemannR_inverse(int64_t);
   int128_t pi_deleglise_rivat(int128_t x, int threads);
   int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
   int128_t P2(int128_t x, int64_t y, int64_t a, int threads, bool print = is_print());
+  int128_t nth_prime(int128_t n, int threads);
 
   int128_t Li(int128_t);
   int128_t Li_inverse(int128_t);

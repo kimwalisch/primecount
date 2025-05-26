@@ -15,7 +15,7 @@
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primecount.txt (manpage).
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -398,7 +398,7 @@ int main (int argc, char* argv[])
       case OPTION_R_INVERSE:
         res = RiemannR_inverse(x); break;
       case OPTION_NTHPRIME:
-        res = nth_prime(to_int64(x), threads); break;
+        res = nth_prime(x, threads); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_P2:
