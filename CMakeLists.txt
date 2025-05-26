@@ -98,6 +98,7 @@ set(LIB_SRC src/api.cpp
             src/StatusS2.cpp
             src/generate_primes.cpp
             src/nth_prime.cpp
+            src/nth_prime_sieve.cpp
             src/phi.cpp
             src/phi_vector.cpp
             src/pi_legendre.cpp

@@ -2,7 +2,7 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -103,27 +103,14 @@ int64_t nth_prime(int64_t n, int threads)
   // approximation using the prime counting function.
   int64_t prime_approx = RiemannR_inverse(n);
   int64_t count_approx = pi(prime_approx, threads);
-  int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
-  // we simply iterate over the primes until we find it.
+  // we use a prime sieve to find the actual nth prime.
   if (count_approx < n)
-  {
-    uint64_t start = prime_approx + 1;
-    uint64_t stop = start + (n - count_approx) * avg_prime_gap;
-    primesieve::iterator iter(start, stop);
-    for (int64_t i = count_approx; i < n; i++)
-      prime = iter.next_prime();
-  }
-  else // if (count_approx >= n)
-  {
-    uint64_t start = prime_approx;
-    uint64_t stop = start - (count_approx - n) * avg_prime_gap;
-    primesieve::iterator iter(start, stop);
-    for (int64_t i = count_approx; i >= n; i--)
-      prime = iter.prev_prime();
-  }
+    prime = nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+  else
+    prime = nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
 
   return prime;
 }

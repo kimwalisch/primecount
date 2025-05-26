@@ -36,7 +36,10 @@ std::string pi(const std::string& x, int threads);
 int64_t pi(int64_t x, int threads);
 int64_t pi_noprint(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);
+
 int64_t nth_prime(int64_t n, int threads);
+maxuint_t nth_prime_sieve_forward(uint64_t n, maxuint_t start);
+maxuint_t nth_prime_sieve_backward(uint64_t n, maxuint_t start);
 
 int64_t pi_cache(int64_t x, bool print = is_print());
 int64_t pi_deleglise_rivat_64(int64_t x, int threads, bool print = is_print());
