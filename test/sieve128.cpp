@@ -1,23 +1,28 @@
+#include <primecount-internal.hpp>
+#include <primesieve.hpp>
+#include <BitSieve240.hpp>
 #include <ctz.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 #include <Vector.hpp>
-#include <BitSieve240.hpp>
-#include <calculator.hpp>
-#include <primesieve.hpp>
-#include <imath.hpp>
+
 #include <iostream>
+
+namespace {
 
 using namespace primecount;
 
-class Sieve128bit : public BitSieve240 {
+class Sieve128bit : public BitSieve240
+{
 public:
-  static void sieve128(uint128_t start, uint128_t stop)
+  template <typename T>
+  static void sieve128(T start, T stop)
   {
-    uint128_t old_start = start;
+    T old_start = start;
     if (start % 240)
       start -= start % 240;
 
-    uint128_t dist = (stop - start) + 1;
+    T dist = (stop - start) + 1;
     std::size_t size = (std::size_t) ceil_div(dist, 240);
     uint64_t sqrt_stop = (uint64_t) isqrt(stop);
     Vector<uint64_t> sieve(size);
@@ -30,8 +35,8 @@ public:
 
     while ((prime = iter.next_prime()) <= sqrt_stop)
     {
-      uint128_t q = (start / prime) + 1;
-      uint128_t n = prime * q;
+      T q = (start / prime) + 1;
+      T n = prime * q;
       n += prime * (n % 2 == 0);
       ASSERT(n % 2 != 0);
 
@@ -49,12 +54,14 @@ public:
       {
         uint64_t bit_index = ctz64(bits);
         uint64_t bit_value = bit_values_[bit_index];
-        uint128_t prime = start + i * 240 + bit_value;
+        T prime = start + i * 240 + bit_value;
         std::cout << prime << std::endl;
       }
     }
   }
 };
+
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -64,9 +71,14 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  uint128_t start = calculator::eval<uint128_t>(argv[1]);
-  uint128_t stop = calculator::eval<uint128_t>(argv[2]);
-  Sieve128bit::sieve128(start, stop);
+  maxint_t start = to_maxint(argv[1]);
+  maxint_t stop = to_maxint(argv[2]);
+
+  if (start <= pstd::numeric_limits<uint64_t>::max() &&
+      stop <= pstd::numeric_limits<uint64_t>::max())
+    Sieve128bit::sieve128((uint64_t) start, (uint64_t) stop);
+  else
+    Sieve128bit::sieve128(start, stop);
 
   return 0;
 }
