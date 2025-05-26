@@ -1,4 +1,5 @@
 #include <primecount.hpp>
+#include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <BitSieve240.hpp>
@@ -9,6 +10,7 @@
 #include <Vector.hpp>
 
 #include <iostream>
+#include <omp.h>
 
 namespace {
 
@@ -17,12 +19,8 @@ using namespace primecount;
 class Sieve_128bit : public BitSieve240
 {
 public:
-  uint64_t count_primes()
+  uint64_t get_prime_count() const
   {
-    primes_ = 0;
-    for (uint64_t bits : sieve_)
-      primes_ += popcnt64(bits);
-
     return primes_;
   }
 
@@ -40,6 +38,7 @@ public:
     uint64_t prime;
 
     low_ = low;
+    primes_ = 0;
     sieve_.resize(size);
 
     std::fill(sieve_.begin(), sieve_.end(), ~0ull);
@@ -62,6 +61,10 @@ public:
       for (; i <= limit; i += prime * 2)
         sieve_[i / 240] &= unset_bit_[i % 240];
     }
+  
+    // Count primes (1 bits)
+    for (uint64_t bits : sieve_)
+      primes_ += popcnt64(bits);
   }
 
   maxuint_t find_nth_prime(uint64_t n) const
@@ -100,6 +103,36 @@ private:
   Vector<uint64_t> sieve_;
 };
 
+/// The aligned_vector class aligns each of its
+/// elements on a new cache line in order to avoid
+/// false sharing (cache trashing) when multiple
+/// threads write to adjacent elements.
+///
+template <typename T>
+class aligned_vector
+{
+  static_assert(sizeof(T) < MAX_CACHE_LINE_SIZE,
+                "sizeof(T) must be < MAX_CACHE_LINE_SIZE");
+
+public:
+  aligned_vector(std::size_t size) : vect_(size) { }
+  std::size_t size() const { return vect_.size(); }
+  T& operator[](std::size_t pos) { return vect_[pos].val; }
+
+private:
+  struct CacheLine {
+    T val;
+    // We cannot use alignas(MAX_CACHE_LINE_SIZE) for
+    // the CacheLine struct as GCC does not yet support
+    // alignas(n) with n > 128. Also alignas(n) for
+    // over-aligned data and dynamic memory allocation
+    // is only supported since C++17.
+    MAYBE_UNUSED char pad[MAX_CACHE_LINE_SIZE - sizeof(T)];
+  };
+
+  Vector<CacheLine> vect_;
+};
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -110,40 +143,60 @@ int main(int argc, char** argv)
     return 0;
   }
 
+  maxuint_t nth_prime = 0;
   maxuint_t start = to_maxint(argv[1]);
   maxuint_t prime_approx = start + isqrt(start);
   uint64_t n = (uint64_t) ((prime_approx - start) / ilog(start));
   uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
-  uint64_t count_segments = 0;
   uint64_t count = 0;
+  uint64_t while_iters = 0;
 
-  for (maxuint_t low = start; true; low += segment_size)
+  int threads = 12;
+  aligned_vector<Sieve_128bit> sieves(threads);
+  bool found_nth_prime = false;
+
+  #pragma omp parallel num_threads(threads)
+  while (!found_nth_prime)
   {
-    count_segments++;
+    int thread_id = omp_get_thread_num();
+    uint64_t i = while_iters * threads + thread_id;
+    maxuint_t low = start + i * segment_size;
     maxuint_t high = low + segment_size - 1;
-    Sieve_128bit sieve;
 
     if (low <= pstd::numeric_limits<uint64_t>::max() &&
         high <= pstd::numeric_limits<uint64_t>::max())
-      sieve.sieve((uint64_t) low, (uint64_t) high);
+      sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
     else
-      sieve.sieve(low, high);
+      sieves[thread_id].sieve(low, high);
 
-    uint64_t primes = sieve.count_primes();
-
-    if (count + primes < n)
-      count += primes;
-    else
+    // Wait until all threads have finished
+    // computing their current segment.
+    #pragma omp barrier
+    #pragma omp master
     {
-      maxuint_t nth_prime = sieve.find_nth_prime(n - count);
-      
-      std::cout << "start: " << start << std::endl;
-      std::cout << "segments: " << count_segments << std::endl;
-      std::cout << "n: " << n << std::endl;
-      std::cout << "nth_prime: " << nth_prime << std::endl;
-      return 0;
+      while_iters++;
+
+      for (int j = 0; j < threads; j++)
+      {
+        if (count + sieves[j].get_prime_count() < n)
+          count += sieves[j].get_prime_count();
+        else
+        {
+          nth_prime = sieves[j].find_nth_prime(n - count);
+          found_nth_prime = true;
+          break;
+        }
+      }
     }
+
+    // Other threads must wait until master
+    // thread finishes single-threaded section.
+    #pragma omp barrier
   }
+
+  std::cout << "start: " << start << std::endl;
+  std::cout << "n: " << n << std::endl;
+  std::cout << "nth_prime: " << nth_prime << std::endl;
 
   return 0;
 }
