@@ -9,7 +9,6 @@
 #include <popcnt.hpp>
 #include <Vector.hpp>
 
-#include <atomic>
 #include <algorithm>
 #include <iostream>
 #include <omp.h>
@@ -21,6 +20,11 @@ using namespace primecount;
 class Sieve_128bit : public BitSieve240
 {
 public:
+  uint64_t get_low() const
+  {
+    return low_;
+  }
+
   uint64_t get_prime_count() const
   {
     return count_;
@@ -98,7 +102,7 @@ public:
       }
     }
 
-    throw primecount_error("Failed to find nth prime!");
+    return 0;
   }
 
   maxuint_t find_nth_prime_backward(uint64_t n) const
@@ -134,7 +138,7 @@ public:
       }
     }
 
-    throw primecount_error("Failed to find nth prime!");
+    return 0;
   }
 
 private:
@@ -228,6 +232,9 @@ maxuint_t find_nth_prime_forward(uint64_t n, maxuint_t start)
     }
   }
 
+  if (!nth_prime)
+    throw primecount_error("Failed to find nth prime!");
+
   return nth_prime;
 }
 
@@ -251,7 +258,6 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<Sieve_128bit> sieves(threads);
-  std::atomic<bool> high_is_zero(false);
   bool finished = false;
 
   #pragma omp parallel num_threads(threads)
@@ -260,9 +266,7 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
     int thread_id = omp_get_thread_num();
     uint64_t i = while_iters * threads + thread_id;
 
-    if (start <= i * segment_size)
-      high_is_zero = true;
-    else
+    if (start > i * segment_size)
     {
       maxuint_t high = start - i * segment_size;
       maxuint_t low = 0;
@@ -284,9 +288,6 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
     {
       while_iters++;
 
-      if (high_is_zero.load())
-        finished = true;
-
       for (int j = 0; j < threads; j++)
       {
         if (primes + sieves[j].get_prime_count() < n)
@@ -297,12 +298,18 @@ maxuint_t find_nth_prime_backward(uint64_t n, maxuint_t start)
           finished = true;
           break;
         }
+
+        if (sieves[j].get_low() == 0)
+        {
+          finished = true;
+          break;
+        }
       }
     }
   }
 
   if (!nth_prime)
-    throw primecount_error("n is too large, nth prime < 0!");
+    throw primecount_error("Failed to find nth prime!");
 
   return nth_prime;
 }
