@@ -225,8 +225,7 @@ T nth_prime_sieve_forward(uint64_t n, T start)
   uint64_t dist_approx = n * avg_prime_gap;
 
   int threads = get_num_threads();
-  int thread_threshold = (int) 1e6;
-  threads = ideal_num_threads(dist_approx, threads, thread_threshold);
+  threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
@@ -297,8 +296,7 @@ T nth_prime_sieve_backward(uint64_t n, T start)
   dist_approx = min(start, dist_approx);
 
   int threads = get_num_threads();
-  int thread_threshold = (int) 1e6;
-  threads = ideal_num_threads(dist_approx, threads, thread_threshold);
+  threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
