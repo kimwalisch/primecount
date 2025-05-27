@@ -219,7 +219,7 @@ T nth_prime_sieve_forward(uint64_t n, T start)
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
   uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
-  segment_size = std::max(min_segment_size, segment_size);
+  segment_size = max(min_segment_size, segment_size);
 
   uint64_t avg_prime_gap = ilog(start) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
@@ -290,7 +290,7 @@ T nth_prime_sieve_backward(uint64_t n, T start)
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
   uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
-  segment_size = std::max(min_segment_size, segment_size);
+  segment_size = max(min_segment_size, segment_size);
 
   uint64_t avg_prime_gap = ilog(start) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
