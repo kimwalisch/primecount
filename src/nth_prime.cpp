@@ -24,7 +24,7 @@ using namespace primecount;
 namespace {
 
 // Number of primes < 2^63
-constexpr int64_t max_n = 216289611853439384ll;
+constexpr int64_t max_n_int64 = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
 const Array<int16_t, 170> primes =
@@ -87,8 +87,8 @@ int64_t nth_prime_64(int64_t n, int threads)
 {
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
-  if_unlikely(n > max_n)
-    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
+  if_unlikely(n > max_n_int64)
+    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n_int64));
 
   // For tiny n <= 169
   if (n < (int64_t) primes.size())
@@ -145,8 +145,6 @@ int128_t nth_prime_128(int128_t n, int threads)
 {
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
-  if_unlikely(n > max_n)
-    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
   // For tiny n <= 169
   if (n < (int64_t) primes.size())
@@ -155,11 +153,6 @@ int128_t nth_prime_128(int128_t n, int threads)
   // For small n <= 3314
   if (n <= PiTable::pi_cache(PiTable::max_cached()))
     return binary_search_nth_prime(n);
-
-  if_unlikely(n < 1)
-    throw primecount_error("nth_prime(n): n must be >= 1");
-  if_unlikely(n > max_n)
-    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
 
   // Closely approximate the nth prime using the inverse
   // Riemann R function and then count the primes up to this

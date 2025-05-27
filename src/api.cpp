@@ -112,9 +112,9 @@ int64_t pi_gourdon(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
-int64_t nth_prime(int64_t x, int threads)
+int64_t nth_prime(int64_t n, int threads)
 {
-  return nth_prime_64(x, threads);
+  return nth_prime_64(n, threads);
 }
 
 #ifdef HAVE_INT128_T
@@ -166,18 +166,16 @@ int128_t pi_gourdon(int128_t x, int threads)
     return pi_gourdon_128(x, threads);
 }
 
-int128_t nth_prime(int128_t x, int threads)
+int128_t nth_prime(int128_t n, int threads)
 {
-  // Prevent 64-bit cast to random
-  // integer if x <= -2^63.
-  if (x < 0)
-    return 0;
+  // Number of primes < 2^63
+  constexpr int64_t max_n_int64 = 216289611853439384ll;
 
   // Use 64-bit if possible
-  if (x <= pstd::numeric_limits<int64_t>::max())
-    return nth_prime_64((int64_t) x, threads);
+  if (n <= max_n_int64)
+    return nth_prime_64((int64_t) n, threads);
   else
-    return nth_prime_128(x, threads);
+    return nth_prime_128(n, threads);
 }
 
 #endif
