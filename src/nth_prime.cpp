@@ -111,7 +111,7 @@ int64_t nth_prime_64(int64_t n, int threads)
   // Use multi-threaded NthPrimeSieve for
   // large nth prime computations.
   if (threads > 1 &&
-      prime_approx > (int64_t) 1e15)
+      prime_approx > (int64_t) 1e16)
   {
     // Here we are very close to the nth prime < sqrt(nth_prime),
     // we use a prime sieve to find the actual nth prime.
