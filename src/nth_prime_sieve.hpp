@@ -88,7 +88,7 @@ public:
       // Calculate first multiple > low
       X q = (low / prime) + 1;
       X n = prime * q;
-      n += prime * (n % 2 == 0);
+      n += prime & -(q % 2 == 0);
       ASSERT(n % 2 != 0);
 
       uint64_t i = (uint64_t) (n - low);
