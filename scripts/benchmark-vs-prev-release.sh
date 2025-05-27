@@ -167,5 +167,12 @@ echo "=== New code ==="
 build-curr-release/./primecount --version
 
 # Execute benchmark functions
-benchmark_test_option
 benchmark_pi_1e17
+
+# I added 128-bit nth_prime() tests in 7.19 hence the --test 
+# option runs slower starting from version 7.19.
+current_version=$(build-curr-release/./primecount --version | sed -n 's/^primecount \([0-9.]*\).*/\1/p')
+if [[ "$current_version" != "7.19" ]]
+then
+    benchmark_test_option
+fi

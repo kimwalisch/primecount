@@ -2,7 +2,7 @@
 /// @file   api_c.c
 /// @brief  Test primecount's C API.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -80,6 +80,10 @@ int main(void)
   res = primecount_nth_prime(n);
   printf("primecount_nth_prime(%"PRId64") = %"PRId64, n, res);
   check(res == -1);
+
+  primecount_nth_prime_str("1e9", out, sizeof(out));
+  printf("primecount_nth_prime_str(1e9) = %s", out);
+  check(strcmp(out, "22801763489") == 0);
 
   n = (int64_t) 1e12;
   int64_t a = 78498;

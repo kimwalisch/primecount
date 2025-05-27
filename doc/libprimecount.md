@@ -58,6 +58,9 @@ int primecount_pi_str(const char* x, char* res, size_t len);
 // Find the nth prime e.g.: nth_prime(25) = 97
 int64_t primecount_nth_prime(int64_t n);
 
+// Find the nth prime (supports 128-bit)
+int primecount_nth_prime_str(const char* n, char* res, size_t len);
+
 // Count the numbers <= x that are not divisible by any of the first a primes
 int64_t primecount_phi(int64_t x, int64_t a);
 ```
@@ -120,6 +123,9 @@ std::string primecount::pi(const std::string& x);
 
 // Find the nth prime e.g.: nth_prime(25) = 97
 int64_t primecount::nth_prime(int64_t n);
+
+// Find the nth prime (supports 128-bit)
+std::string primecount::nth_prime(const std::string& n);
 
 // Count the numbers <= x that are not divisible by any of the first a primes
 int64_t primecount::phi(int64_t x, int64_t a);

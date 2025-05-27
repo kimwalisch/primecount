@@ -8,7 +8,7 @@
 ///        uses the uint64_t data type, one sieve array element
 ///        (8 bytes) corresponds to an interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,8 +26,10 @@ class BitSieve240
 {
 protected:
   static const Array<uint64_t, 6> pi_tiny_;
+  static const Array<uint64_t, 64> bit_values_;
   static const Array<uint64_t, 240> set_bit_;
   static const Array<uint64_t, 240> unset_bit_;
+  static const Array<uint64_t, 240> unset_smaller_;
   static const Array<uint64_t, 240> unset_larger_;
 };
 

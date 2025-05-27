@@ -2,16 +2,18 @@
 /// @file  nth_prime.cpp
 /// @brief Find the nth prime.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
+#include "nth_prime_sieve.hpp"
+#include "PiTable.hpp"
+
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <PiTable.hpp>
 #include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -19,12 +21,12 @@
 #include <stdint.h>
 #include <string>
 
-using namespace primecount;
-
 namespace {
 
+using namespace primecount;
+
 // Number of primes < 2^63
-constexpr int64_t max_n = 216289611853439384ll;
+constexpr int64_t max_n_int64 = 216289611853439384ll;
 
 // primes[1] = 2, primes[2] = 3, ...
 const Array<int16_t, 170> primes =
@@ -81,14 +83,14 @@ namespace primecount {
 /// Find the nth prime using the prime counting function
 /// and the segmented sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/2))
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-int64_t nth_prime(int64_t n, int threads)
+int64_t nth_prime_64(int64_t n, int threads)
 {
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
-  if_unlikely(n > max_n)
-    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
+  if_unlikely(n > max_n_int64)
+    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n_int64));
 
   // For tiny n <= 169
   if (n < (int64_t) primes.size())
@@ -105,6 +107,19 @@ int64_t nth_prime(int64_t n, int threads)
   int64_t count_approx = pi(prime_approx, threads);
   int64_t avg_prime_gap = ilog(prime_approx) + 2;
   int64_t prime = -1;
+
+  // Use multi-threaded NthPrimeSieve for
+  // large nth prime computations.
+  if (threads > 1 &&
+      prime_approx > (int64_t) 1e16)
+  {
+    // Here we are very close to the nth prime < sqrt(nth_prime),
+    // we use a prime sieve to find the actual nth prime.
+    if (count_approx < n)
+      return nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+    else
+      return nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
+  }
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we simply iterate over the primes until we find it.
@@ -127,5 +142,41 @@ int64_t nth_prime(int64_t n, int threads)
 
   return prime;
 }
+
+#if defined(HAVE_INT128_T)
+
+/// Find the nth prime using the prime counting function
+/// and the segmented sieve of Eratosthenes.
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
+///
+int128_t nth_prime_128(int128_t n, int threads)
+{
+  if_unlikely(n < 1)
+    throw primecount_error("nth_prime(n): n must be >= 1");
+
+  // For tiny n <= 169
+  if (n < (int64_t) primes.size())
+    return primes[n];
+
+  // For small n <= 3314
+  if (n <= PiTable::pi_cache(PiTable::max_cached()))
+    return binary_search_nth_prime(n);
+
+  // Closely approximate the nth prime using the inverse
+  // Riemann R function and then count the primes up to this
+  // approximation using the prime counting function.
+  int128_t prime_approx = RiemannR_inverse(n);
+  int128_t count_approx = pi(prime_approx, threads);
+
+  // Here we are very close to the nth prime < sqrt(nth_prime),
+  // we use a prime sieve to find the actual nth prime.
+  if (count_approx < n)
+    return nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+  else
+    return nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
+}
+
+#endif
 
 } // namespace

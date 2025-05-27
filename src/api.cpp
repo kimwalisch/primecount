@@ -2,7 +2,7 @@
 /// @file  api.cpp
 ///        primecount's C++ API.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -112,6 +112,28 @@ int64_t pi_gourdon(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
+std::string nth_prime(const std::string& x)
+{
+  return nth_prime(x, get_num_threads());
+}
+
+std::string nth_prime(const std::string& x, int threads)
+{
+  maxint_t n = to_maxint(x);
+  maxint_t res = nth_prime(n, threads);
+  return to_string(res);
+}
+
+int64_t nth_prime(int64_t n)
+{
+  return nth_prime(n, get_num_threads());
+}
+
+int64_t nth_prime(int64_t n, int threads)
+{
+  return nth_prime_64(n, threads);
+}
+
 #ifdef HAVE_INT128_T
 
 int128_t pi(int128_t x)
@@ -161,12 +183,19 @@ int128_t pi_gourdon(int128_t x, int threads)
     return pi_gourdon_128(x, threads);
 }
 
-#endif
-
-int64_t nth_prime(int64_t n)
+int128_t nth_prime(int128_t n, int threads)
 {
-  return nth_prime(n, get_num_threads());
+  // Number of primes < 2^63
+  constexpr int64_t max_n_int64 = 216289611853439384ll;
+
+  // Use 64-bit if possible
+  if (n <= max_n_int64)
+    return nth_prime_64((int64_t) n, threads);
+  else
+    return nth_prime_128(n, threads);
 }
+
+#endif
 
 int64_t phi(int64_t x, int64_t a)
 {

@@ -2,7 +2,7 @@
 /// @file   api.cpp
 /// @brief  Test primecount's C++ API.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -72,6 +72,11 @@ int main()
   res = nth_prime(n);
   std::cout << "nth_prime(" << n << ") = " << res;
   check(res == 9999999967);
+
+  in = "1e9";
+  out = nth_prime(in);
+  std::cout << "nth_prime(" << in << ") = " << out;
+  check(out == "22801763489");
 
   n = (int64_t) 1e12;
   int64_t a = 78498;

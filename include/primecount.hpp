@@ -5,7 +5,7 @@
 ///        optimized implementations of the combinatorial type
 ///        prime counting function algorithms.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License.
 ///
@@ -17,9 +17,9 @@
 #include <string>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "7.18"
+#define PRIMECOUNT_VERSION "7.19"
 #define PRIMECOUNT_VERSION_MAJOR 7
-#define PRIMECOUNT_VERSION_MINOR 18
+#define PRIMECOUNT_VERSION_MINOR 19
 
 namespace primecount {
 
@@ -67,9 +67,23 @@ int64_t phi(int64_t x, int64_t a);
 /// Throws a primecount_error if an error occurs.
 ///
 /// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/2))
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int64_t nth_prime(int64_t n);
+
+/// 128-bit nth prime function.
+/// Find the nth prime using a combination of the prime counting
+/// function and the sieve of Eratosthenes.
+///
+/// @param n Null-terminated string integer e.g. "12345".
+///          Note that n must be <= 10^29 on 64-bit systems
+///          and <= 216289611853439384 on 32-bit systems.
+/// Throws a primecount_error if an error occurs.
+///
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
+///
+std::string nth_prime(const std::string& x);
 
 /// Largest number supported by pi(const std::string& x).
 /// @return 64-bit CPUs: 10^31,

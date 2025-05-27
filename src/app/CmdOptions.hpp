@@ -1,7 +1,7 @@
 ///
 /// @file  CmdOptions.hpp
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,6 +42,8 @@ enum OptionID
   OPTION_LMO5,
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
+  OPTION_NTHPRIME_64,
+  OPTION_NTHPRIME_128,
   OPTION_NUMBER,
   OPTION_PRIMESIEVE,
   OPTION_LI,

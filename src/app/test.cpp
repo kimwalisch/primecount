@@ -4,7 +4,7 @@
 ///        These tests are also used (by the author) for
 ///        benchmarking code changes.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -96,6 +96,35 @@ using namespace primecount;
   std::cout << std::endl; \
 }
 
+#define TEST_NTH_PRIME(f1, tiny_iters, iters) \
+{ \
+  std::cout << "Testing " << #f1 "(x) " << std::flush; \
+ \
+  int64_t n = 1; \
+  int64_t prime = 0; \
+  int64_t next = 10000; \
+ \
+  std::random_device rd; \
+  std::mt19937 gen(rd()); \
+  std::uniform_int_distribution<int64_t> dist(1, 10000000); \
+  int threads = get_num_threads(); \
+ \
+  for (; n < tiny_iters; n++) \
+    check_equal(#f1, n, f1 (n, threads), primesieve::nth_prime(n)); \
+ \
+  for (int64_t i = 0; i < iters; i++) \
+  { \
+    prime = primesieve::nth_prime(next, prime); \
+    check_equal(#f1, n, f1 (n, threads), prime); \
+    double percent = 100.0 * (i + 1.0) / iters; \
+    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
+    next = dist(gen); \
+    n += next; \
+  } \
+ \
+  std::cout << std::endl; \
+}
+
 namespace {
 
 void check_equal(string_view_t f1,
@@ -120,35 +149,6 @@ void test_pi_cache()
     check_equal("pi_cache", x, pi_cache(x), pi_primesieve(x));
 
   std::cout << " 100%" << std::endl;
-}
-
-void test_nth_prime(int64_t iters)
-{
-  std::cout << "Testing nth_prime(x)" << std::flush;
-
-  int64_t n = 1;
-  int64_t prime = 0;
-  int64_t next = 10000;
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int64_t> dist(1, 10000000);
-
-  for (; n < next; n++)
-    check_equal("nth_prime", n, nth_prime(n), primesieve::nth_prime(n));
-
-  // test random increment
-  for (int64_t i = 0; i < iters; i++)
-  {
-    prime = primesieve::nth_prime(next, prime);
-    check_equal("nth_prime", n, nth_prime(n), prime);
-    double percent = 100.0 * (i + 1.0) / iters;
-    std::cout << "\rTesting nth_prime(x) " << (int) percent << "%" << std::flush;
-    next = dist(gen);
-    n += next;
-  }
-
-  std::cout << std::endl;
 }
 
 } // namespace
@@ -187,7 +187,10 @@ void test()
     TEST2(pi_gourdon_128,         pi_lmo_parallel, 1500);
 #endif
 
-    test_nth_prime(300);
+    TEST_NTH_PRIME(nth_prime_64,  10000, 300);
+#ifdef HAVE_INT128_T
+    TEST_NTH_PRIME(nth_prime_128, 10000, 300);
+#endif
   }
   catch (std::exception& e)
   {

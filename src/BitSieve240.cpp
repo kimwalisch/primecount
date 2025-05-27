@@ -8,7 +8,7 @@
 ///        uses the uint64_t data type, one sieve array element
 ///        (8 bytes) corresponds to an interval of size 30 * 8 = 240.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -20,6 +20,21 @@
 #include <stdint.h>
 
 namespace {
+
+/// The 8 bits in each byte of the sieve array correspond
+/// to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
+///
+constexpr int left_shift(int n)
+{
+  return   (n % 30 <= 1)  ? (n / 30 * 8) + 0
+         : (n % 30 <= 7)  ? (n / 30 * 8) + 1
+         : (n % 30 <= 11) ? (n / 30 * 8) + 2
+         : (n % 30 <= 13) ? (n / 30 * 8) + 3
+         : (n % 30 <= 17) ? (n / 30 * 8) + 4
+         : (n % 30 <= 19) ? (n / 30 * 8) + 5
+         : (n % 30 <= 23) ? (n / 30 * 8) + 6
+         : (n / 30 * 8) + 7;
+}
 
 /// The 8 bits in each byte of the sieve array correspond
 /// to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
@@ -37,6 +52,12 @@ constexpr int right_shift(int n)
          : 64 - (n / 30 * 8);
 }
 
+/// Bitmask to unset bits <= n
+constexpr uint64_t unset_s(int n)
+{
+  return ~0ull << left_shift(n);
+}
+
 /// Bitmask to unset bits >= n
 constexpr uint64_t unset_l(int n)
 {
@@ -49,6 +70,18 @@ namespace primecount {
 
 /// pi(x) for x < 6
 const Array<uint64_t, 6> BitSieve240::pi_tiny_ = { 0, 0, 1, 2, 2, 3 };
+
+const Array<uint64_t, 64> BitSieve240::bit_values_ =
+{
+    1,   7,  11,  13,  17,  19,  23,  29,
+   31,  37,  41,  43,  47,  49,  53,  59,
+   61,  67,  71,  73,  77,  79,  83,  89,
+   91,  97, 101, 103, 107, 109, 113, 119,
+  121, 127, 131, 133, 137, 139, 143, 149,
+  151, 157, 161, 163, 167, 169, 173, 179,
+  181, 187, 191, 193, 197, 199, 203, 209,
+  211, 217, 221, 223, 227, 229, 233, 239
+};
 
 /// Bitmasks needed to set a specific bit in the sieve array
 const Array<uint64_t, 240> BitSieve240::set_bit_ =
@@ -154,6 +187,59 @@ const Array<uint64_t, 240> BitSieve240::unset_bit_ =
   ~0ull, ~0ull, ~(1ull << 60), ~0ull, ~(1ull << 61),
   ~0ull, ~0ull, ~0ull, ~(1ull << 62), ~0ull,
   ~0ull, ~0ull, ~0ull, ~0ull, ~(1ull << 63)
+};
+
+/// Unset bits < start
+const Array<uint64_t, 240> BitSieve240::unset_smaller_ =
+{
+  unset_s(0), unset_s(1), unset_s(2), unset_s(3), unset_s(4),
+  unset_s(5), unset_s(6), unset_s(7), unset_s(8), unset_s(9),
+  unset_s(10), unset_s(11), unset_s(12), unset_s(13), unset_s(14),
+  unset_s(15), unset_s(16), unset_s(17), unset_s(18), unset_s(19),
+  unset_s(20), unset_s(21), unset_s(22), unset_s(23), unset_s(24),
+  unset_s(25), unset_s(26), unset_s(27), unset_s(28), unset_s(29),
+  unset_s(30), unset_s(31), unset_s(32), unset_s(33), unset_s(34),
+  unset_s(35), unset_s(36), unset_s(37), unset_s(38), unset_s(39),
+  unset_s(40), unset_s(41), unset_s(42), unset_s(43), unset_s(44),
+  unset_s(45), unset_s(46), unset_s(47), unset_s(48), unset_s(49),
+  unset_s(50), unset_s(51), unset_s(52), unset_s(53), unset_s(54),
+  unset_s(55), unset_s(56), unset_s(57), unset_s(58), unset_s(59),
+  unset_s(60), unset_s(61), unset_s(62), unset_s(63), unset_s(64),
+  unset_s(65), unset_s(66), unset_s(67), unset_s(68), unset_s(69),
+  unset_s(70), unset_s(71), unset_s(72), unset_s(73), unset_s(74),
+  unset_s(75), unset_s(76), unset_s(77), unset_s(78), unset_s(79),
+  unset_s(80), unset_s(81), unset_s(82), unset_s(83), unset_s(84),
+  unset_s(85), unset_s(86), unset_s(87), unset_s(88), unset_s(89),
+  unset_s(90), unset_s(91), unset_s(92), unset_s(93), unset_s(94),
+  unset_s(95), unset_s(96), unset_s(97), unset_s(98), unset_s(99),
+  unset_s(100), unset_s(101), unset_s(102), unset_s(103), unset_s(104),
+  unset_s(105), unset_s(106), unset_s(107), unset_s(108), unset_s(109),
+  unset_s(110), unset_s(111), unset_s(112), unset_s(113), unset_s(114),
+  unset_s(115), unset_s(116), unset_s(117), unset_s(118), unset_s(119),
+  unset_s(120), unset_s(121), unset_s(122), unset_s(123), unset_s(124),
+  unset_s(125), unset_s(126), unset_s(127), unset_s(128), unset_s(129),
+  unset_s(130), unset_s(131), unset_s(132), unset_s(133), unset_s(134),
+  unset_s(135), unset_s(136), unset_s(137), unset_s(138), unset_s(139),
+  unset_s(140), unset_s(141), unset_s(142), unset_s(143), unset_s(144),
+  unset_s(145), unset_s(146), unset_s(147), unset_s(148), unset_s(149),
+  unset_s(150), unset_s(151), unset_s(152), unset_s(153), unset_s(154),
+  unset_s(155), unset_s(156), unset_s(157), unset_s(158), unset_s(159),
+  unset_s(160), unset_s(161), unset_s(162), unset_s(163), unset_s(164),
+  unset_s(165), unset_s(166), unset_s(167), unset_s(168), unset_s(169),
+  unset_s(170), unset_s(171), unset_s(172), unset_s(173), unset_s(174),
+  unset_s(175), unset_s(176), unset_s(177), unset_s(178), unset_s(179),
+  unset_s(180), unset_s(181), unset_s(182), unset_s(183), unset_s(184),
+  unset_s(185), unset_s(186), unset_s(187), unset_s(188), unset_s(189),
+  unset_s(190), unset_s(191), unset_s(192), unset_s(193), unset_s(194),
+  unset_s(195), unset_s(196), unset_s(197), unset_s(198), unset_s(199),
+  unset_s(200), unset_s(201), unset_s(202), unset_s(203), unset_s(204),
+  unset_s(205), unset_s(206), unset_s(207), unset_s(208), unset_s(209),
+  unset_s(210), unset_s(211), unset_s(212), unset_s(213), unset_s(214),
+  unset_s(215), unset_s(216), unset_s(217), unset_s(218), unset_s(219),
+  unset_s(220), unset_s(221), unset_s(222), unset_s(223), unset_s(224),
+  unset_s(225), unset_s(226), unset_s(227), unset_s(228), unset_s(229),
+  unset_s(230), unset_s(231), unset_s(232), unset_s(233), unset_s(234),
+  unset_s(235), unset_s(236), unset_s(237), unset_s(238), unset_s(239)
 };
 
 /// Unset bits > stop
