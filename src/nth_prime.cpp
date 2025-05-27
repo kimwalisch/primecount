@@ -83,7 +83,7 @@ namespace primecount {
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/2))
 ///
-int64_t nth_prime(int64_t n, int threads)
+int64_t nth_prime_64(int64_t n, int threads)
 {
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
@@ -128,17 +128,33 @@ int64_t nth_prime(int64_t n, int threads)
   return prime;
 }
 
+} // namespace
+
 #if defined(HAVE_INT128_T)
+
+#include "nth_prime_sieve.hpp"
+
+namespace primecount {
 
 /// Find the nth prime using the prime counting function
 /// and the segmented sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/2))
 ///
-int128_t nth_prime(int128_t n, int threads)
+int128_t nth_prime_128(int128_t n, int threads)
 {
-  if (n < pstd::numeric_limits<int64_t>::max())
-    return nth_prime((int64_t) n, threads);
+  if_unlikely(n < 1)
+    throw primecount_error("nth_prime(n): n must be >= 1");
+  if_unlikely(n > max_n)
+    throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n));
+
+  // For tiny n <= 169
+  if (n < (int64_t) primes.size())
+    return primes[n];
+
+  // For small n <= 3314
+  if (n <= PiTable::pi_cache(PiTable::max_cached()))
+    return binary_search_nth_prime(n);
 
   if_unlikely(n < 1)
     throw primecount_error("nth_prime(n): n must be >= 1");
@@ -162,6 +178,6 @@ int128_t nth_prime(int128_t n, int threads)
   return prime;
 }
 
-#endif
-
 } // namespace
+
+#endif

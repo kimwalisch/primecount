@@ -399,6 +399,8 @@ int main (int argc, char* argv[])
         res = RiemannR_inverse(x); break;
       case OPTION_NTHPRIME:
         res = nth_prime(x, threads); break;
+      case OPTION_NTHPRIME_64:
+        res = nth_prime_64(x, threads); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_P2:
@@ -426,6 +428,8 @@ int main (int argc, char* argv[])
         res = pi_deleglise_rivat_128(x, threads); break;
       case OPTION_GOURDON_128:
         res = pi_gourdon_128(x, threads); break;
+      case OPTION_NTHPRIME_128:
+        res = nth_prime_128(x, threads); break;
 #endif
     }
 

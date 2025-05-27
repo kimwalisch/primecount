@@ -15,7 +15,7 @@
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primecount.txt (manpage).
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -250,6 +250,8 @@ CmdOptions parseOptions(int argc, char* argv[])
     { "--meissel", std::make_pair(OPTION_MEISSEL, NO_PARAM) },
     { "-n", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
     { "--nth-prime", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
+    { "--nth-prime-64", std::make_pair(OPTION_NTHPRIME_64, NO_PARAM) },
+    { "--nth-prime-128", std::make_pair(OPTION_NTHPRIME_128, NO_PARAM) },
     { "--number", std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
     { "-p", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
     { "--primesieve", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },

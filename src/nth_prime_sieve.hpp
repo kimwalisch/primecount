@@ -1,5 +1,5 @@
 ///
-/// @file  nth_prime_sieve.cpp
+/// @file  nth_prime_sieve.hpp
 /// @brief In the nth prime algorithm we first count the number of
 ///        primes up to an nth prime approximation. Next, we generate
 ///        primes using a special segmented sieve of Eratosthenes
@@ -102,7 +102,7 @@ public:
       count_ += popcnt64(bits);
   }
 
-  maxuint_t nth_prime_sieve_forward(uint64_t n) const
+  uint128_t nth_prime_sieve_forward(uint64_t n) const
   {
     ASSERT(n > 0);
     ASSERT(n <= count_);
@@ -124,7 +124,7 @@ public:
           {
             uint64_t bit_index = ctz64(bits);
             uint64_t bit_value = bit_values_[bit_index];
-            maxuint_t prime = low_ + i * 240 + bit_value;
+            uint128_t prime = low_ + i * 240 + bit_value;
             return prime;
           }
         }
@@ -134,7 +134,7 @@ public:
     return 0;
   }
 
-  maxuint_t nth_prime_sieve_backward(uint64_t n) const
+  uint128_t nth_prime_sieve_backward(uint64_t n) const
   {
     ASSERT(n > 0);
     ASSERT(n <= count_);
@@ -151,14 +151,14 @@ public:
         count += count_bits;
       else
       {
-        Vector<maxuint_t> primes;
+        Vector<uint128_t> primes;
         primes.reserve(count_bits);
 
         for (; bits; bits &= bits - 1)
         {
           uint64_t bit_index = ctz64(bits);
           uint64_t bit_value = bit_values_[bit_index];
-          maxuint_t prime = low_ + i * 240 + bit_value;
+          uint128_t prime = low_ + i * 240 + bit_value;
           primes.push_back(prime);
         }
 
@@ -171,7 +171,7 @@ public:
   }
 
 private:
-  maxuint_t low_ = 0;
+  uint128_t low_ = 0;
   uint64_t count_ = 0;
   Vector<uint64_t> sieve_;
 };
@@ -206,16 +206,12 @@ private:
   Vector<CacheLine> vect_;
 };
 
-} // namespace
-
-namespace primecount {
-
 /// Find the nth prime >= start
-maxuint_t nth_prime_sieve_forward(uint64_t n, maxuint_t start)
+uint128_t nth_prime_sieve_forward(uint64_t n, uint128_t start)
 {
   ASSERT(n > 0);
 
-  maxuint_t nth_prime = 0;
+  uint128_t nth_prime = 0;
   uint64_t primes = 0;
   uint64_t while_iters = 0;
   uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
@@ -240,8 +236,8 @@ maxuint_t nth_prime_sieve_forward(uint64_t n, maxuint_t start)
   #endif
 
     uint64_t i = while_iters * threads + thread_id;
-    maxuint_t low = start + i * segment_size;
-    maxuint_t high = low + segment_size - 1;
+    uint128_t low = start + i * segment_size;
+    uint128_t high = low + segment_size - 1;
 
     if (low <= pstd::numeric_limits<uint64_t>::max() &&
         high <= pstd::numeric_limits<uint64_t>::max())
@@ -277,11 +273,11 @@ maxuint_t nth_prime_sieve_forward(uint64_t n, maxuint_t start)
 }
 
 /// Find the nth prime <= start
-maxuint_t nth_prime_sieve_backward(uint64_t n, maxuint_t start)
+uint128_t nth_prime_sieve_backward(uint64_t n, uint128_t start)
 {
   ASSERT(n > 0);
 
-  maxuint_t nth_prime = 0;
+  uint128_t nth_prime = 0;
   uint64_t primes = 0;
   uint64_t while_iters = 0;
   uint64_t segment_size = (uint64_t) iroot<3>(start) * 30;
@@ -311,8 +307,8 @@ maxuint_t nth_prime_sieve_backward(uint64_t n, maxuint_t start)
 
     if (start > i * segment_size)
     {
-      maxuint_t high = start - i * segment_size;
-      maxuint_t low = 0;
+      uint128_t high = start - i * segment_size;
+      uint128_t low = 0;
 
       if (high >= segment_size)
         low = (high - segment_size) + 1;
