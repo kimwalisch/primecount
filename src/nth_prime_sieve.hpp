@@ -212,7 +212,8 @@ private:
 /// Find the nth prime >= nth_prime_approx
 template <typename T>
 T nth_prime_sieve_forward(uint64_t n,
-                          T nth_prime_approx)
+                          T nth_prime_approx,
+                          int threads)
 {
   ASSERT(n > 0);
 
@@ -227,7 +228,6 @@ T nth_prime_sieve_forward(uint64_t n,
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
 
-  int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool print_vars = is_print();
@@ -300,7 +300,8 @@ T nth_prime_sieve_forward(uint64_t n,
 /// Find the nth prime <= nth_prime_approx
 template <typename T>
 T nth_prime_sieve_backward(uint64_t n,
-                           T nth_prime_approx)
+                           T nth_prime_approx,
+                           int threads)
 {
   ASSERT(n > 0);
 
@@ -316,7 +317,6 @@ T nth_prime_sieve_backward(uint64_t n,
   uint64_t dist_approx = n * avg_prime_gap;
   dist_approx = min(nth_prime_approx, dist_approx);
 
-  int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool print_vars = is_print();

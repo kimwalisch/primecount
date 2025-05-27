@@ -116,9 +116,9 @@ int64_t nth_prime_64(int64_t n, int threads)
     // Here we are very close to the nth prime < sqrt(nth_prime),
     // we use a prime sieve to find the actual nth prime.
     if (count_approx < n)
-      return nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+      return nth_prime_sieve_forward(n - count_approx, prime_approx + 1, threads);
     else
-      return nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
+      return nth_prime_sieve_backward(1 + count_approx - n, prime_approx, threads);
   }
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
@@ -172,9 +172,9 @@ int128_t nth_prime_128(int128_t n, int threads)
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we use a prime sieve to find the actual nth prime.
   if (count_approx < n)
-    return nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+    return nth_prime_sieve_forward(n - count_approx, prime_approx + 1, threads);
   else
-    return nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
+    return nth_prime_sieve_backward(1 + count_approx - n, prime_approx, threads);
 }
 
 #endif
