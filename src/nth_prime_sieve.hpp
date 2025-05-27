@@ -33,6 +33,7 @@
 #include <ctz.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <min.hpp>
 #include <popcnt.hpp>
 #include <Vector.hpp>
 
@@ -224,7 +225,8 @@ T nth_prime_sieve_forward(uint64_t n, T start)
   uint64_t dist_approx = n * avg_prime_gap;
 
   int threads = get_num_threads();
-  threads = ideal_num_threads(dist_approx, threads, segment_size);
+  int thread_threshold = (int) 1e6;
+  threads = ideal_num_threads(dist_approx, threads, thread_threshold);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
@@ -292,11 +294,11 @@ T nth_prime_sieve_backward(uint64_t n, T start)
 
   uint64_t avg_prime_gap = ilog(start) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
-  if (dist_approx > start)
-    dist_approx = (uint64_t) start;
+  dist_approx = min(start, dist_approx);
 
   int threads = get_num_threads();
-  threads = ideal_num_threads(dist_approx, threads, segment_size);
+  int thread_threshold = (int) 1e6;
+  threads = ideal_num_threads(dist_approx, threads, thread_threshold);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
@@ -309,13 +311,13 @@ T nth_prime_sieve_backward(uint64_t n, T start)
     int thread_id = 0;
   #endif
 
+    // Unsigned integer division is usually
+    // faster than signed integer division.
+    using UT = typename pstd::make_unsigned<T>::type;
     uint64_t i = while_iters * threads + thread_id;
 
-    if (start > i * segment_size)
+    if ((UT) start > i * segment_size)
     {
-      // Unsigned integer division is usually
-      // faster than signed integer division.
-      using UT = typename pstd::make_unsigned<T>::type;
       UT high = start - i * segment_size;
       UT low = (high - std::min(high, (UT) segment_size)) + 1;
 
