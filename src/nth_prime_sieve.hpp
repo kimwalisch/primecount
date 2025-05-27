@@ -215,7 +215,7 @@ T nth_prime_sieve_forward(uint64_t n, T start)
   ASSERT(n > 0);
 
   T nth_prime = 0;
-  uint64_t primes = 0;
+  uint64_t count = 0;
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
   uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
@@ -261,11 +261,11 @@ T nth_prime_sieve_forward(uint64_t n, T start)
 
       for (int j = 0; j < threads; j++)
       {
-        if (primes + sieves[j].get_prime_count() < n)
-          primes += sieves[j].get_prime_count();
+        if (count + sieves[j].get_prime_count() < n)
+          count += sieves[j].get_prime_count();
         else
         {
-          nth_prime = sieves[j].nth_prime_sieve_forward(n - primes);
+          nth_prime = sieves[j].nth_prime_sieve_forward(n - count);
           finished = true;
           break;
         }
@@ -286,7 +286,7 @@ T nth_prime_sieve_backward(uint64_t n, T start)
   ASSERT(n > 0);
 
   T nth_prime = 0;
-  uint64_t primes = 0;
+  uint64_t count = 0;
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
   uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
@@ -337,11 +337,11 @@ T nth_prime_sieve_backward(uint64_t n, T start)
 
       for (int j = 0; j < threads; j++)
       {
-        if (primes + sieves[j].get_prime_count() < n)
-          primes += sieves[j].get_prime_count();
+        if (count + sieves[j].get_prime_count() < n)
+          count += sieves[j].get_prime_count();
         else
         {
-          nth_prime = sieves[j].nth_prime_sieve_backward(n - primes);
+          nth_prime = sieves[j].nth_prime_sieve_backward(n - count);
           finished = true;
           break;
         }
