@@ -159,16 +159,13 @@ int128_t nth_prime_128(int128_t n, int threads)
   // approximation using the prime counting function.
   int128_t prime_approx = RiemannR_inverse(n);
   int128_t count_approx = pi(prime_approx, threads);
-  int128_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we use a prime sieve to find the actual nth prime.
   if (count_approx < n)
-    prime = nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
+    return nth_prime_sieve_forward(n - count_approx, prime_approx + 1);
   else
-    prime = nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
-
-  return prime;
+    return nth_prime_sieve_backward(1 + count_approx - n, prime_approx);
 }
 
 } // namespace
