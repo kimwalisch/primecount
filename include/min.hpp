@@ -33,7 +33,7 @@ struct is_comparable_int
 
 template <typename A, typename B>
 ALWAYS_INLINE typename std::enable_if<
-    (!pstd::is_integral<A>::value || !pstd::is_integral<B>::value), B>
+    (pstd::is_same<A, B>::value || !is_comparable_int<A, B>::value), A>
   ::type min(A a, B b)
 {
   return std::min(a, b);
@@ -41,12 +41,17 @@ ALWAYS_INLINE typename std::enable_if<
 
 template <typename A, typename B>
 ALWAYS_INLINE typename std::enable_if<
-    (pstd::is_integral<A>::value && pstd::is_integral<B>::value), B>
+    (pstd::is_same<A, B>::value || !is_comparable_int<A, B>::value), A>
+  ::type max(A a, B b)
+{
+  return std::max(a, b);
+}
+
+template <typename A, typename B>
+ALWAYS_INLINE typename std::enable_if<
+    (!pstd::is_same<A, B>::value && is_comparable_int<A, B>::value), B>
   ::type min(A a, B b)
 {
-  static_assert(is_comparable_int<A, B>::value,
-                "min(A, B): Cannot compare types A and B");
-
 #if defined(ENABLE_ASSERT)
   if (pstd::is_unsigned<A>::value && pstd::is_signed<B>::value)
     ASSERT(b >= 0);
@@ -59,20 +64,9 @@ ALWAYS_INLINE typename std::enable_if<
 
 template <typename A, typename B>
 ALWAYS_INLINE typename std::enable_if<
-    (!pstd::is_integral<A>::value || !pstd::is_integral<B>::value), A>
+    (!pstd::is_same<A, B>::value && is_comparable_int<A, B>::value), A>
   ::type max(A a, B b)
 {
-  return std::max(a, b);
-}
-
-template <typename A, typename B>
-ALWAYS_INLINE typename std::enable_if<
-    (pstd::is_integral<A>::value && pstd::is_integral<B>::value), A>
-  ::type max(A a, B b)
-{
-  static_assert(is_comparable_int<A, B>::value,
-                "max(A, B): Cannot compare types A and B");
-
 #if defined(ENABLE_ASSERT)
   if (pstd::is_unsigned<A>::value && pstd::is_signed<B>::value)
     ASSERT(b >= 0);
