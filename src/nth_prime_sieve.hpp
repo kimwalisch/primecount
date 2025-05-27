@@ -319,7 +319,7 @@ T nth_prime_sieve_backward(uint64_t n, T start)
     if ((UT) start > i * segment_size)
     {
       UT high = start - i * segment_size;
-      UT low = (high - std::min(high, (UT) segment_size)) + 1;
+      UT low = (high - min(high, segment_size)) + 1;
 
       if ( low <= pstd::numeric_limits<uint64_t>::max() &&
           high <= pstd::numeric_limits<uint64_t>::max())
