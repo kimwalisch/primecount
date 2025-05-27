@@ -2,7 +2,7 @@
 /// @file  api.cpp
 ///        primecount's C++ API.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -112,6 +112,23 @@ int64_t pi_gourdon(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
+std::string nth_prime(const std::string& x)
+{
+  return nth_prime(x, get_num_threads());
+}
+
+std::string nth_prime(const std::string& x, int threads)
+{
+  maxint_t n = to_maxint(x);
+  maxint_t res = nth_prime(n, threads);
+  return to_string(res);
+}
+
+int64_t nth_prime(int64_t n)
+{
+  return nth_prime(n, get_num_threads());
+}
+
 int64_t nth_prime(int64_t n, int threads)
 {
   return nth_prime_64(n, threads);
@@ -179,11 +196,6 @@ int128_t nth_prime(int128_t n, int threads)
 }
 
 #endif
-
-int64_t nth_prime(int64_t n)
-{
-  return nth_prime(n, get_num_threads());
-}
 
 int64_t phi(int64_t x, int64_t a)
 {

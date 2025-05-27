@@ -36,7 +36,6 @@ std::string pi(const std::string& x, int threads);
 int64_t pi(int64_t x, int threads);
 int64_t pi_noprint(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);
-int64_t nth_prime(int64_t n, int threads);
 
 int64_t pi_cache(int64_t x, bool print = is_print());
 int64_t pi_deleglise_rivat_64(int64_t x, int threads, bool print = is_print());
@@ -48,6 +47,9 @@ int64_t pi_meissel(int64_t x, int threads, bool print = is_print());
 int64_t phi(int64_t x, int64_t a, int threads, bool print = is_print());
 int64_t P2(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 int64_t P3(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print());
+
+std::string nth_prime(const std::string& x, int threads);
+int64_t nth_prime(int64_t n, int threads);
 int64_t nth_prime_64(int64_t n, int threads);
 
 int64_t Li(int64_t);
@@ -61,6 +63,7 @@ int64_t RiemannR_inverse(int64_t);
   int128_t pi_deleglise_rivat(int128_t x, int threads);
   int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
   int128_t P2(int128_t x, int64_t y, int64_t a, int threads, bool print = is_print());
+
   int128_t nth_prime(int128_t n, int threads);
   int128_t nth_prime_128(int128_t n, int threads);
 

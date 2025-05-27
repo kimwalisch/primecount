@@ -83,7 +83,7 @@ namespace primecount {
 /// Find the nth prime using the prime counting function
 /// and the segmented sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/2))
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int64_t nth_prime_64(int64_t n, int threads)
 {
@@ -148,7 +148,7 @@ int64_t nth_prime_64(int64_t n, int threads)
 /// Find the nth prime using the prime counting function
 /// and the segmented sieve of Eratosthenes.
 /// Run time: O(x^(2/3) / (log x)^2)
-/// Memory usage: O(x^(1/2))
+/// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int128_t nth_prime_128(int128_t n, int threads)
 {

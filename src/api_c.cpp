@@ -2,7 +2,7 @@
 /// @file  api_c.cpp
 ///        primecount's C API.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -80,6 +80,45 @@ int64_t primecount_nth_prime(int64_t n)
   catch(const std::exception& e)
   {
     std::cerr << "primecount_nth_prime: " << e.what() << std::endl;
+    return -1;
+  }
+}
+
+int primecount_nth_prime_str(const char* n, char* res, size_t len)
+{
+  try
+  {
+    if (!n)
+      throw primecount::primecount_error("n must not be a NULL pointer");
+
+    if (!res)
+      throw primecount::primecount_error("res must not be a NULL pointer");
+
+    std::string str(n);
+    std::string nth_prime = primecount::nth_prime(str);
+
+    // +1 required to add null at the end of the string
+    if (len < nth_prime.length() + 1)
+    {
+      std::ostringstream oss;
+      oss << "res buffer too small, res.len = " << len << " < required = " << nth_prime.length() + 1;
+      throw primecount::primecount_error(oss.str());
+    }
+
+    nth_prime.copy(res, nth_prime.length());
+    // std::string::copy does not append a null character
+    // at the end of the copied content.
+    res[nth_prime.length()] = '\0';
+
+    return (int) nth_prime.length();
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << "primecount_nth_prime_str: " << e.what() << std::endl;
+
+    if (res && len > 0)
+      res[0] = '\0';
+
     return -1;
   }
 }
