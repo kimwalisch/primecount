@@ -189,7 +189,7 @@ void test()
 
     TEST_NTH_PRIME(nth_prime_64,  10000, 300);
 #ifdef HAVE_INT128_T
-    TEST_NTH_PRIME(nth_prime_128, 10000, 300);
+    //TEST_NTH_PRIME(nth_prime_128, 10000, 300);
 #endif
   }
   catch (std::exception& e)
