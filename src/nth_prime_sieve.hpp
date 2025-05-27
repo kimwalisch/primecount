@@ -25,6 +25,7 @@
 ///
 
 #include "BitSieve240.hpp"
+#include "print.hpp"
 
 #include <primecount.hpp>
 #include <primecount-config.hpp>
@@ -208,26 +209,38 @@ private:
   Vector<CacheLine> vect_;
 };
 
-/// Find the nth prime >= start
+/// Find the nth prime >= nth_prime_approx
 template <typename T>
-T nth_prime_sieve_forward(uint64_t n, T start)
+T nth_prime_sieve_forward(uint64_t n,
+                          T nth_prime_approx)
 {
   ASSERT(n > 0);
 
   T nth_prime = 0;
   uint64_t count = 0;
   uint64_t while_iters = 0;
-  uint64_t min_segment_size = 64 * 30;
-  uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
-  segment_size = max(min_segment_size, segment_size);
 
-  uint64_t avg_prime_gap = ilog(start) + 2;
+  T root3 = iroot<3>(nth_prime_approx);
+  uint64_t segment_size = (uint64_t) (root3 * 30);
+  uint64_t min_segment_size = 8 * 240;
+  segment_size = max(min_segment_size, segment_size);
+  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
 
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
+  bool print_vars = is_print();
   bool finished = false;
+  double time;
+
+  if (print_vars)
+  {
+    print("");
+    print("=== nth_prime_sieve_forward ===");
+    print_nth_prime_sieve(n, nth_prime_approx, dist_approx, segment_size, threads);
+    time = get_time();
+  }
 
   #pragma omp parallel num_threads(threads)
   while (!finished)
@@ -242,7 +255,7 @@ T nth_prime_sieve_forward(uint64_t n, T start)
     // faster than signed integer division.
     using UT = typename pstd::make_unsigned<T>::type;
     uint64_t i = while_iters * threads + thread_id;
-    UT low = start + i * segment_size;
+    UT low = nth_prime_approx + i * segment_size;
     UT high = low + segment_size - 1;
 
     if ( low <= pstd::numeric_limits<uint64_t>::max() &&
@@ -275,30 +288,48 @@ T nth_prime_sieve_forward(uint64_t n, T start)
   if (!nth_prime)
     throw primecount_error("Failed to find nth prime!");
 
+  if (print_vars)
+  {
+    print("Status: 100%");
+    print_seconds(get_time() - time);
+  }
+
   return nth_prime;
 }
 
-/// Find the nth prime <= start
+/// Find the nth prime <= nth_prime_approx
 template <typename T>
-T nth_prime_sieve_backward(uint64_t n, T start)
+T nth_prime_sieve_backward(uint64_t n,
+                           T nth_prime_approx)
 {
   ASSERT(n > 0);
 
   T nth_prime = 0;
   uint64_t count = 0;
   uint64_t while_iters = 0;
-  uint64_t min_segment_size = 64 * 30;
-  uint64_t segment_size = (uint64_t) (iroot<3>(start) * 30);
-  segment_size = max(min_segment_size, segment_size);
 
-  uint64_t avg_prime_gap = ilog(start) + 2;
+  T root3 = iroot<3>(nth_prime_approx);
+  uint64_t segment_size = (uint64_t) (root3 * 30);
+  uint64_t min_segment_size = 8 * 240;
+  segment_size = max(min_segment_size, segment_size);
+  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
-  dist_approx = min(start, dist_approx);
+  dist_approx = min(nth_prime_approx, dist_approx);
 
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
+  bool print_vars = is_print();
   bool finished = false;
+  double time;
+
+  if (print_vars)
+  {
+    print("");
+    print("=== nth_prime_sieve_backward ===");
+    print_nth_prime_sieve(n, nth_prime_approx, dist_approx, segment_size, threads);
+    time = get_time();
+  }
 
   #pragma omp parallel num_threads(threads)
   while (!finished)
@@ -313,10 +344,11 @@ T nth_prime_sieve_backward(uint64_t n, T start)
     // faster than signed integer division.
     using UT = typename pstd::make_unsigned<T>::type;
     uint64_t i = while_iters * threads + thread_id;
+    bool high_is_zero = (UT) nth_prime_approx <= i * segment_size;
 
-    if ((UT) start > i * segment_size)
+    if (!high_is_zero)
     {
-      UT high = start - i * segment_size;
+      UT high = nth_prime_approx - i * segment_size;
       UT low = (high - min(high, segment_size)) + 1;
 
       if ( low <= pstd::numeric_limits<uint64_t>::max() &&
@@ -355,6 +387,12 @@ T nth_prime_sieve_backward(uint64_t n, T start)
 
   if (!nth_prime)
     throw primecount_error("Failed to find nth prime!");
+
+  if (print_vars)
+  {
+    print("Status: 100%");
+    print_seconds(get_time() - time);
+  }
 
   return nth_prime;
 }

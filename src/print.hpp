@@ -1,7 +1,7 @@
 ///
 /// @file  print.hpp
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,6 +41,7 @@ void print_seconds(double seconds);
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int threads);
+void print_nth_prime_sieve(uint64_t n, maxint_t nth_prime_approx, uint64_t dist_approx, uint64_t segment_size, int threads);
 
 } // namespace
 
