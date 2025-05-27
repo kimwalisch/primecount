@@ -46,10 +46,11 @@ namespace {
 
 using namespace primecount;
 
-class Sieve_128bit : public BitSieve240
+template <typename T>
+class NthPrimeSieve : public BitSieve240
 {
 public:
-  uint64_t get_low() const
+  T get_low() const
   {
     return low_;
   }
@@ -60,14 +61,14 @@ public:
   }
 
   /// Sieve interval [low, high]
-  template <typename T>
-  void sieve(T low, T high)
+  template <typename X>
+  void sieve(X low, X high)
   {
-    T old_low = low;
+    X old_low = low;
     if (low % 240)
       low -= low % 240;
 
-    T dist = (high - low) + 1;
+    X dist = (high - low) + 1;
     uint64_t size = (uint64_t) ceil_div(dist, 240);
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     uint64_t prime;
@@ -84,8 +85,8 @@ public:
     while ((prime = iter.next_prime()) <= sqrt_high)
     {
       // Calculate first multiple > low
-      T q = (low / prime) + 1;
-      T n = prime * q;
+      X q = (low / prime) + 1;
+      X n = prime * q;
       n += prime * (n % 2 == 0);
       ASSERT(n % 2 != 0);
 
@@ -102,7 +103,7 @@ public:
       count_ += popcnt64(bits);
   }
 
-  uint128_t nth_prime_sieve_forward(uint64_t n) const
+  T nth_prime_sieve_forward(uint64_t n) const
   {
     ASSERT(n > 0);
     ASSERT(n <= count_);
@@ -124,7 +125,7 @@ public:
           {
             uint64_t bit_index = ctz64(bits);
             uint64_t bit_value = bit_values_[bit_index];
-            uint128_t prime = low_ + i * 240 + bit_value;
+            T prime = low_ + i * 240 + bit_value;
             return prime;
           }
         }
@@ -134,7 +135,7 @@ public:
     return 0;
   }
 
-  uint128_t nth_prime_sieve_backward(uint64_t n) const
+  T nth_prime_sieve_backward(uint64_t n) const
   {
     ASSERT(n > 0);
     ASSERT(n <= count_);
@@ -151,14 +152,14 @@ public:
         count += count_bits;
       else
       {
-        Vector<uint128_t> primes;
+        Vector<T> primes;
         primes.reserve(count_bits);
 
         for (; bits; bits &= bits - 1)
         {
           uint64_t bit_index = ctz64(bits);
           uint64_t bit_value = bit_values_[bit_index];
-          uint128_t prime = low_ + i * 240 + bit_value;
+          T prime = low_ + i * 240 + bit_value;
           primes.push_back(prime);
         }
 
@@ -171,7 +172,7 @@ public:
   }
 
 private:
-  uint128_t low_ = 0;
+  T low_ = 0;
   uint64_t count_ = 0;
   Vector<uint64_t> sieve_;
 };
@@ -207,11 +208,12 @@ private:
 };
 
 /// Find the nth prime >= start
-uint128_t nth_prime_sieve_forward(uint64_t n, uint128_t start)
+template <typename T>
+T nth_prime_sieve_forward(uint64_t n, T start)
 {
   ASSERT(n > 0);
 
-  uint128_t nth_prime = 0;
+  T nth_prime = 0;
   uint64_t primes = 0;
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
@@ -223,7 +225,7 @@ uint128_t nth_prime_sieve_forward(uint64_t n, uint128_t start)
 
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
-  aligned_vector<Sieve_128bit> sieves(threads);
+  aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
   #pragma omp parallel num_threads(threads)
@@ -235,11 +237,14 @@ uint128_t nth_prime_sieve_forward(uint64_t n, uint128_t start)
     int thread_id = 0;
   #endif
 
+    // Unsigned integer division is usually
+    // faster than signed integer division.
+    using UT = typename pstd::make_unsigned<T>::type;
     uint64_t i = while_iters * threads + thread_id;
-    uint128_t low = start + i * segment_size;
-    uint128_t high = low + segment_size - 1;
+    UT low = start + i * segment_size;
+    UT high = low + segment_size - 1;
 
-    if (low <= pstd::numeric_limits<uint64_t>::max() &&
+    if ( low <= pstd::numeric_limits<uint64_t>::max() &&
         high <= pstd::numeric_limits<uint64_t>::max())
       sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
     else
@@ -273,11 +278,12 @@ uint128_t nth_prime_sieve_forward(uint64_t n, uint128_t start)
 }
 
 /// Find the nth prime <= start
-uint128_t nth_prime_sieve_backward(uint64_t n, uint128_t start)
+template <typename T>
+T nth_prime_sieve_backward(uint64_t n, T start)
 {
   ASSERT(n > 0);
 
-  uint128_t nth_prime = 0;
+  T nth_prime = 0;
   uint64_t primes = 0;
   uint64_t while_iters = 0;
   uint64_t min_segment_size = 64 * 30;
@@ -291,7 +297,7 @@ uint128_t nth_prime_sieve_backward(uint64_t n, uint128_t start)
 
   int threads = get_num_threads();
   threads = ideal_num_threads(dist_approx, threads, segment_size);
-  aligned_vector<Sieve_128bit> sieves(threads);
+  aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool finished = false;
 
   #pragma omp parallel num_threads(threads)
@@ -307,13 +313,13 @@ uint128_t nth_prime_sieve_backward(uint64_t n, uint128_t start)
 
     if (start > i * segment_size)
     {
-      uint128_t high = start - i * segment_size;
-      uint128_t low = 0;
+      // Unsigned integer division is usually
+      // faster than signed integer division.
+      using UT = typename pstd::make_unsigned<T>::type;
+      UT high = start - i * segment_size;
+      UT low = (high - std::min(high, (UT) segment_size)) + 1;
 
-      if (high >= segment_size)
-        low = (high - segment_size) + 1;
-
-      if (low <= pstd::numeric_limits<uint64_t>::max() &&
+      if ( low <= pstd::numeric_limits<uint64_t>::max() &&
           high <= pstd::numeric_limits<uint64_t>::max())
         sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
       else
