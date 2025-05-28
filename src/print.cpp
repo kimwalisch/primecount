@@ -157,9 +157,15 @@ void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k, int threads
   }
 }
 
-void print_nth_prime_sieve(uint64_t n, maxint_t nth_prime_approx, uint64_t dist_approx, uint64_t segment_size, int threads)
+void print_nth_prime_sieve(uint64_t n,
+                           bool sieve_forward,
+                           maxint_t nth_prime_approx,
+                           uint64_t dist_approx,
+                           uint64_t segment_size,
+                           int threads)
 {
   std::cout << "n = " << n << std::endl;
+  std::cout << "sieve_forward = " << (sieve_forward ? "true" : "false") << std::endl;
   std::cout << "nth_prime_approx = " << nth_prime_approx << std::endl;
   std::cout << "dist_approx = " << dist_approx << std::endl;
   std::cout << "segment_size = " << segment_size << std::endl;

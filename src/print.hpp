@@ -41,7 +41,7 @@ void print_seconds(double seconds);
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int threads);
-void print_nth_prime_sieve(uint64_t n, maxint_t nth_prime_approx, uint64_t dist_approx, uint64_t segment_size, int threads);
+void print_nth_prime_sieve(uint64_t n, bool sieve_forward, maxint_t nth_prime_approx, uint64_t dist_approx, uint64_t segment_size, int threads);
 
 } // namespace
 

@@ -219,7 +219,7 @@ T nth_prime_sieve(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, nth_prime_approx, dist_approx, segment_size, threads);
+    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, segment_size, threads);
     time = get_time();
   }
 
