@@ -102,10 +102,13 @@ public:
       for (; i <= limit; i += prime * 2)
         sieve_[i / 240] &= unset_bit_[i % 240];
     }
-  
+
     // Count primes (1 bits)
+    uint64_t count = 0;
     for (uint64_t bits : sieve_)
-      count_ += popcnt64(bits);
+      count += popcnt64(bits);
+
+    count_ = count;
   }
 
   T find_nth_prime(uint64_t n) const
