@@ -102,7 +102,7 @@ using namespace primecount;
  \
   int64_t n = 1; \
   int64_t prime = 0; \
-  int64_t next = 10000; \
+  int64_t next = tiny_iters; \
  \
   std::random_device rd; \
   std::mt19937 gen(rd()); \
