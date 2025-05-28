@@ -125,7 +125,7 @@ pc_int128_t primecount::pi(pc_int128_t x);
 int64_t primecount::nth_prime(int64_t n);
 
 // Find the nth prime (supports 128-bit)
-pc_int128_t primecount::nth_prime128(pc_int128_t n);
+pc_int128_t primecount::nth_prime(pc_int128_t n);
 
 // Count the numbers <= x that are not divisible by any of the first a primes
 int64_t primecount::phi(int64_t x, int64_t a);
