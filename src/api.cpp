@@ -52,6 +52,37 @@ int64_t pi(int64_t x)
   return pi(x, get_num_threads());
 }
 
+pc_int128_t pi(pc_int128_t x)
+{
+  if (x.hi < 0)
+  {
+    pc_int128_t res;
+    res.lo = 0;
+    res.hi = 0;
+    return res;
+  }
+
+  if (x.hi == 0 &&
+      x.lo <= (uint64_t) pstd::numeric_limits<int64_t>::max())
+  {
+    pc_int128_t res;
+    res.lo = pi((int64_t) x.lo);
+    res.hi = 0;
+    return res;
+  }
+
+#if defined(HAVE_INT128_T)
+  int128_t x128 = (int128_t(x.hi) << 64) | x.lo;
+  int128_t r128 = pi(x128);
+  pc_int128_t res;
+  res.lo = (uint64_t) r128;
+  res.hi = (int64_t) (r128 >> 64);
+  return res;
+#endif
+
+  throw primecount_error("pi(x): x must be <= " + get_max_x());
+}
+
 int64_t pi(int64_t x, int threads)
 {
   // Compute pi(x) in O(1) for small values of x
@@ -132,6 +163,36 @@ int64_t nth_prime(int64_t n)
 int64_t nth_prime(int64_t n, int threads)
 {
   return nth_prime_64(n, threads);
+}
+
+pc_int128_t nth_prime(pc_int128_t n)
+{
+  // n < 1
+  if ((n.lo == 0 && n.hi == 0) || n.hi < 0)
+    throw primecount_error("nth_prime(n): n must be >= 1");
+
+  // Number of primes < 2^63
+  constexpr uint64_t max_n_int64 = 216289611853439384ull;
+
+  if (n.hi == 0 &&
+      n.lo <= max_n_int64)
+  {
+    pc_int128_t res;
+    res.lo = nth_prime((int64_t) n.lo);
+    res.hi = 0;
+    return res;
+  }
+
+#if defined(HAVE_INT128_T)
+  int128_t n128 = (int128_t(n.hi) << 64) | n.lo;
+  int128_t r128 = nth_prime(n128);
+  pc_int128_t res;
+  res.lo = (uint64_t) r128;
+  res.hi = (int64_t) (r128 >> 64);
+  return res;
+#else
+  throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n_int64));
+#endif
 }
 
 #ifdef HAVE_INT128_T

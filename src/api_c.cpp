@@ -32,6 +32,32 @@ int64_t primecount_pi(int64_t x)
   }
 }
 
+pc_int128_t primecount_pi128(pc_int128_t x)
+{
+  try
+  {
+    primecount::pc_int128_t n;
+    n.lo = x.lo;
+    n.hi = x.hi;
+
+    auto pix = primecount::pi(n);
+
+    pc_int128_t res;
+    res.lo = pix.lo;
+    res.hi = pix.hi;
+    return res;
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << "primecount_pi128: " << e.what() << std::endl;
+
+    pc_int128_t res;
+    res.lo = ~0ull;
+    res.hi = -1;
+    return res;
+  }
+}
+
 int primecount_pi_str(const char* x, char* res, size_t len)
 {
   try
@@ -84,42 +110,29 @@ int64_t primecount_nth_prime(int64_t n)
   }
 }
 
-int primecount_nth_prime_str(const char* n, char* res, size_t len)
+pc_int128_t primecount_nth_prime128(pc_int128_t n)
 {
   try
   {
-    if (!n)
-      throw primecount::primecount_error("n must not be a NULL pointer");
+    primecount::pc_int128_t x;
+    x.lo = n.lo;
+    x.hi = n.hi;
 
-    if (!res)
-      throw primecount::primecount_error("res must not be a NULL pointer");
+    auto nth_prime = primecount::nth_prime(x);
 
-    std::string str(n);
-    std::string nth_prime = primecount::nth_prime(str);
-
-    // +1 required to add null at the end of the string
-    if (len < nth_prime.length() + 1)
-    {
-      std::ostringstream oss;
-      oss << "res buffer too small, res.len = " << len << " < required = " << nth_prime.length() + 1;
-      throw primecount::primecount_error(oss.str());
-    }
-
-    nth_prime.copy(res, nth_prime.length());
-    // std::string::copy does not append a null character
-    // at the end of the copied content.
-    res[nth_prime.length()] = '\0';
-
-    return (int) nth_prime.length();
+    pc_int128_t res;
+    res.lo = nth_prime.lo;
+    res.hi = nth_prime.hi;
+    return res;
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount_nth_prime_str: " << e.what() << std::endl;
+    std::cerr << "primecount_nth_prime128: " << e.what() << std::endl;
 
-    if (res && len > 0)
-      res[0] = '\0';
-
-    return -1;
+    pc_int128_t res;
+    res.lo = ~0ull;
+    res.hi = -1;
+    return res;
   }
 }
 

@@ -31,6 +31,12 @@ public:
   { }
 };
 
+/// Portable int128_t type used by primecount's API
+typedef struct {
+  uint64_t lo;
+  int64_t hi;
+} pc_int128_t;
+
 /// Count the number of primes <= x using Xavier Gourdon's
 /// algorithm. Uses all CPU cores by default.
 /// Throws a primecount_error if an error occurs.
@@ -39,6 +45,16 @@ public:
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
 int64_t pi(int64_t x);
+
+/// 128-bit prime counting function.
+/// Count the number of primes <= x using Xavier Gourdon's
+/// algorithm. Uses all CPU cores by default.
+/// Throws a primecount_error if an error occurs.
+/// 
+/// Run time: O(x^(2/3) / (log x)^2)
+/// Memory usage: O(x^(1/3) * (log x)^3)
+///
+pc_int128_t pi(pc_int128_t x);
 
 /// 128-bit prime counting function.
 /// Count the number of primes <= x using Xavier Gourdon's
@@ -75,15 +91,14 @@ int64_t nth_prime(int64_t n);
 /// Find the nth prime using a combination of the prime counting
 /// function and the sieve of Eratosthenes.
 ///
-/// @param n Null-terminated string integer e.g. "12345".
-///          Note that n must be <= 10^29 on 64-bit systems
-///          and <= 216289611853439384 on 32-bit systems.
+/// @pre n <= 10^29 on 64-bit systems and
+///      n <= 216289611853439384 on 32-bit systems.
 /// Throws a primecount_error if an error occurs.
 ///
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
-std::string nth_prime(const std::string& x);
+pc_int128_t nth_prime(pc_int128_t n);
 
 /// Largest number supported by pi(const std::string& x).
 /// @return 64-bit CPUs: 10^31,

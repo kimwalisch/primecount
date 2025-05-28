@@ -1,7 +1,9 @@
-Changes in primecount-7.19, 2025-05-27
+Changes in primecount-7.19, 2025-05-28
 
 * nth_prime.cpp: Add 128-bit nth_prime function.
 * nth_prime_sieve.cpp: New sieving algo nth_prime(n).
+* primecount.h: Improved 128-bit C API using portable pc_int128_t struct.
+* primecount.hpp: Improved 128-bit C++ API using portable pc_int128_t struct.
 
 Changes in primecount-7.18, 2025-05-14
 

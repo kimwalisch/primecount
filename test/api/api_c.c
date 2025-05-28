@@ -81,9 +81,12 @@ int main(void)
   printf("primecount_nth_prime(%"PRId64") = %"PRId64, n, res);
   check(res == -1);
 
-  primecount_nth_prime_str("1e9", out, sizeof(out));
-  printf("primecount_nth_prime_str(1e9) = %s", out);
-  check(strcmp(out, "22801763489") == 0);
+  pc_int128_t n128;
+  n128.lo = (uint64_t) 1e9;
+  n128.hi = 0;
+  pc_int128_t res128 = primecount_nth_prime128(n128);
+  printf("primecount_nth_prime128(1e9) = %"PRId64, res128.lo);
+  check(res128.lo == 22801763489 && res128.hi == 0);
 
   n = (int64_t) 1e12;
   int64_t a = 78498;

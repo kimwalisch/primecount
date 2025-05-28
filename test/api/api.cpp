@@ -73,10 +73,12 @@ int main()
   std::cout << "nth_prime(" << n << ") = " << res;
   check(res == 9999999967);
 
-  in = "1e9";
-  out = nth_prime(in);
-  std::cout << "nth_prime(" << in << ") = " << out;
-  check(out == "22801763489");
+  pc_int128_t n128;
+  n128.lo = (uint64_t) 1e9;
+  n128.hi = 0;
+  pc_int128_t res128 = nth_prime(n128);
+  std::cout << "nth_prime(" << n128.lo << ") = " << res128.lo;
+  check(res128.lo == 22801763489 && res128.hi == 0);
 
   n = (int64_t) 1e12;
   int64_t a = 78498;
