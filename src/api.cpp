@@ -78,9 +78,9 @@ pc_int128_t pi(pc_int128_t x)
   res.lo = (uint64_t) r128;
   res.hi = (int64_t) (r128 >> 64);
   return res;
-#endif
-
+#else
   throw primecount_error("pi(x): x must be <= " + get_max_x());
+#endif
 }
 
 int64_t pi(int64_t x, int threads)
