@@ -63,8 +63,8 @@ public:
   }
 
   /// Sieve interval [low, high]
-  template <typename X>
-  void sieve(X low, X high)
+  template <typename UT>
+  void sieve(UT low, UT high)
   {
     if (high < 2)
       return;
@@ -76,11 +76,11 @@ public:
     if (low <= 5)
       throw primecount_error("NthPrimeSieve: low must > 5");
 
-    X old_low = low;
+    UT old_low = low;
     if (low % 240)
       low -= low % 240;
 
-    X dist = (high - low) + 1;
+    UT dist = (high - low) + 1;
     uint64_t size = (uint64_t) ceil_div(dist, 240);
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     uint64_t prime;
@@ -97,8 +97,8 @@ public:
     while ((prime = iter.next_prime()) <= sqrt_high)
     {
       // Calculate first multiple > low
-      X q = (low / prime) + 1;
-      X n = prime * q;
+      UT q = (low / prime) + 1;
+      UT n = prime * q;
       n += prime & -(q % 2 == 0);
       ASSERT(n % 2 != 0);
 
