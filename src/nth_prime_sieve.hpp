@@ -35,6 +35,7 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
+#include <macros.hpp>
 #include <popcnt.hpp>
 #include <Vector.hpp>
 
@@ -130,7 +131,7 @@ public:
       uint64_t bits = sieve_[i];
       uint64_t count_bits = popcnt64(bits);
 
-      if (count + count_bits < n)
+      if_likely(count + count_bits < n)
         count += count_bits;
       else
       {
