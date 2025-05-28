@@ -105,8 +105,9 @@ int64_t nth_prime_64(int64_t n, int threads)
   // approximation using the prime counting function.
   int64_t prime_approx = RiemannR_inverse(n);
   int64_t count_approx = pi(prime_approx, threads);
-  int64_t avg_prime_gap = ilog(prime_approx) + 2;
-  int64_t prime = -1;
+
+  constexpr bool forward = true;
+  constexpr bool backward = false;
 
   // Use multi-threaded NthPrimeSieve for
   // large nth prime computations.
@@ -116,10 +117,13 @@ int64_t nth_prime_64(int64_t n, int threads)
     // Here we are very close to the nth prime < sqrt(nth_prime),
     // we use a prime sieve to find the actual nth prime.
     if (count_approx < n)
-      return nth_prime_sieve_forward(n - count_approx, prime_approx + 1, threads);
+      return nth_prime_sieve<forward>(n - count_approx, prime_approx + 1, threads);
     else
-      return nth_prime_sieve_backward(1 + count_approx - n, prime_approx, threads);
+      return nth_prime_sieve<backward>(1 + count_approx - n, prime_approx, threads);
   }
+
+  int64_t avg_prime_gap = ilog(prime_approx) + 2;
+  int64_t prime = -1;
 
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we simply iterate over the primes until we find it.
@@ -169,12 +173,15 @@ int128_t nth_prime_128(int128_t n, int threads)
   int128_t prime_approx = RiemannR_inverse(n);
   int128_t count_approx = pi(prime_approx, threads);
 
+  constexpr bool forward = true;
+  constexpr bool backward = false;
+
   // Here we are very close to the nth prime < sqrt(nth_prime),
   // we use a prime sieve to find the actual nth prime.
   if (count_approx < n)
-    return nth_prime_sieve_forward(n - count_approx, prime_approx + 1, threads);
+    return nth_prime_sieve<forward>(n - count_approx, prime_approx + 1, threads);
   else
-    return nth_prime_sieve_backward(1 + count_approx - n, prime_approx, threads);
+    return nth_prime_sieve<backward>(1 + count_approx - n, prime_approx, threads);
 }
 
 #endif
