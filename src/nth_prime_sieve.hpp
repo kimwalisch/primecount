@@ -66,6 +66,9 @@ public:
   template <typename X>
   void sieve(X low, X high)
   {
+    if (high < 2)
+      return;
+
     X old_low = low;
     if (low % 240)
       low -= low % 240;
@@ -235,14 +238,14 @@ T nth_prime_sieve(uint64_t n,
       low = (high - min(high, segment_size)) + 1;
     }
 
-    if (high > 0)
-    {
-      if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-          high <= pstd::numeric_limits<uint64_t>::max())
-        sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
-      else
-        sieves[thread_id].sieve(low, high);
-    }
+    // Sieve the current segment [low, high].
+    // If possible use fast 64-bit bit integer division
+    // instead of slow 128-bit integer division.
+    if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+        high <= pstd::numeric_limits<uint64_t>::max())
+      sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
+    else
+      sieves[thread_id].sieve(low, high);
 
     // Wait until all threads have finished
     // computing their current segment.
@@ -259,6 +262,7 @@ T nth_prime_sieve(uint64_t n,
             count += sieves[j].get_count();
           else
           {
+            // Nth prime is in the current segment
             nth_prime = sieves[j].find_nth_prime(n - count);
             finished = true;
             break;
@@ -270,6 +274,7 @@ T nth_prime_sieve(uint64_t n,
 
           if (count >= n)
           {
+            // Nth prime is in the current segment
             nth_prime = sieves[j].find_nth_prime((count - n) + 1);
             finished = true;
             break;
