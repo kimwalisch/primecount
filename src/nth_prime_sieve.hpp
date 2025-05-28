@@ -69,6 +69,13 @@ public:
     if (high < 2)
       return;
 
+    // NthPrimeSieve cannot generate the primes 2, 3 and 5.
+    // In our bit sieve array the 8 bits of each byte correspond
+    // to the offsets: { 1, 7, 11, 13, 17, 19, 23, 29 }.
+    // Hence, our bit sieve array excludes 2, 3 and 5.
+    if (low <= 5)
+      throw primecount_error("NthPrimeSieve: low must > 5");
+
     X old_low = low;
     if (low % 240)
       low -= low % 240;
