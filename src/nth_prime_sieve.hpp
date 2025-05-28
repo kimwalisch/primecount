@@ -105,7 +105,7 @@ public:
       count_ += popcnt64(bits);
   }
 
-  T nth_prime_sieve_forward(uint64_t n) const
+  T find_nth_prime(uint64_t n) const
   {
     ASSERT(n > 0);
     ASSERT(n <= count_);
@@ -131,42 +131,6 @@ public:
             return prime;
           }
         }
-      }
-    }
-
-    return 0;
-  }
-
-  T nth_prime_sieve_backward(uint64_t n) const
-  {
-    ASSERT(n > 0);
-    ASSERT(n <= count_);
-
-    uint64_t count = 0;
-    int64_t size = (int64_t) sieve_.size();
-
-    for (int64_t i = size - 1; i >= 0; i--)
-    {
-      uint64_t bits = sieve_[i];
-      uint64_t count_bits = popcnt64(bits);
-
-      if (count + count_bits < n)
-        count += count_bits;
-      else
-      {
-        Vector<T> primes;
-        primes.reserve(count_bits);
-
-        for (; bits; bits &= bits - 1)
-        {
-          uint64_t bit_index = ctz64(bits);
-          uint64_t bit_value = bit_values_[bit_index];
-          T prime = low_ + i * 240 + bit_value;
-          primes.push_back(prime);
-        }
-
-        uint64_t j = n - count;
-        return primes[primes.size() - j];
       }
     }
 
@@ -277,7 +241,8 @@ T nth_prime_sieve_forward(uint64_t n,
           count += sieves[j].get_prime_count();
         else
         {
-          nth_prime = sieves[j].nth_prime_sieve_forward(n - count);
+          n = (n - count);
+          nth_prime = sieves[j].find_nth_prime(n);
           finished = true;
           break;
         }
@@ -367,11 +332,12 @@ T nth_prime_sieve_backward(uint64_t n,
 
       for (int j = 0; j < threads; j++)
       {
-        if (count + sieves[j].get_prime_count() < n)
-          count += sieves[j].get_prime_count();
-        else
+        count += sieves[j].get_prime_count();
+
+        if (count >= n)
         {
-          nth_prime = sieves[j].nth_prime_sieve_backward(n - count);
+          n = (count - n) + 1;
+          nth_prime = sieves[j].find_nth_prime(n);
           finished = true;
           break;
         }
