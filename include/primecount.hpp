@@ -41,10 +41,11 @@ public:
 /// x.lo = (uint64_t) n;
 /// x.hi = (int64_t) (n >> 64);
 ///
-typedef struct {
+struct pc_int128_t
+{
   uint64_t lo;
   int64_t hi;
-} pc_int128_t;
+};
 
 /// Count the number of primes <= x using Xavier Gourdon's
 /// algorithm. Uses all CPU cores by default.
