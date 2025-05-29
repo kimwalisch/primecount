@@ -72,7 +72,7 @@ pc_int128_t pi(pc_int128_t x)
   }
 
 #if defined(HAVE_INT128_T)
-  int128_t x128 = (int128_t(x.hi) << 64) | x.lo;
+  int128_t x128 = x.lo | (int128_t(x.hi) << 64);
   int128_t r128 = pi(x128);
   pc_int128_t res;
   res.lo = (uint64_t) r128;
@@ -184,7 +184,7 @@ pc_int128_t nth_prime(pc_int128_t n)
   }
 
 #if defined(HAVE_INT128_T)
-  int128_t n128 = (int128_t(n.hi) << 64) | n.lo;
+  int128_t n128 = n.lo | (int128_t(n.hi) << 64);
   int128_t r128 = nth_prime(n128);
   pc_int128_t res;
   res.lo = (uint64_t) r128;
