@@ -68,15 +68,21 @@ int main()
   std::cout << "pi(" << n << ") = " << res;
   check(res == 455052511);
 
+  pc_int128_t n128;
+  n128.lo = (uint64_t) 1e9;
+  n128.hi = 0;
+  pc_int128_t res128 = pi(n128);
+  std::cout << "pi(" << n128.lo << ") = " << res128.lo;
+  check(res128.lo == 50847534 && res128.hi == 0);
+
   n = 455052511;
   res = nth_prime(n);
   std::cout << "nth_prime(" << n << ") = " << res;
   check(res == 9999999967);
 
-  pc_int128_t n128;
   n128.lo = (uint64_t) 1e9;
   n128.hi = 0;
-  pc_int128_t res128 = nth_prime(n128);
+  res128 = nth_prime(n128);
   std::cout << "nth_prime(" << n128.lo << ") = " << res128.lo;
   check(res128.lo == 22801763489 && res128.hi == 0);
 

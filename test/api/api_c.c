@@ -69,6 +69,13 @@ int main(void)
   printf("primecount_pi(%"PRId64") = %"PRId64, n, res);
   check(res == 455052511);
 
+  pc_int128_t n128;
+  n128.lo = (uint64_t) 1e9;
+  n128.hi = 0;
+  pc_int128_t res128 = primecount_pi_128(n128);
+  printf("primecount_pi_128(1e9) = %"PRId64, res128.lo);
+  check(res128.lo == 50847534 && res128.hi == 0);
+
   n = 455052511;
   res = primecount_nth_prime(n);
   printf("primecount_nth_prime(%"PRId64") = %"PRId64, n, res);
@@ -81,10 +88,9 @@ int main(void)
   printf("primecount_nth_prime(%"PRId64") = %"PRId64, n, res);
   check(res == -1);
 
-  pc_int128_t n128;
   n128.lo = (uint64_t) 1e9;
   n128.hi = 0;
-  pc_int128_t res128 = primecount_nth_prime_128(n128);
+  res128 = primecount_nth_prime_128(n128);
   printf("primecount_nth_prime_128(1e9) = %"PRId64, res128.lo);
   check(res128.lo == 22801763489 && res128.hi == 0);
 
