@@ -98,9 +98,10 @@ public:
     while ((prime = iter.next_prime()) <= sqrt_high)
     {
       // Calculate first multiple > low
-      UT q = (low / prime) + 1;
-      UT n = prime * q;
-      n += prime & -(q % 2 == 0);
+      // that is not divisible by 2.
+      UT q = low / prime;
+      UT n = prime * (q + 1);
+      n += prime & -(q % 2 != 0);
       ASSERT(n % 2 != 0);
 
       uint64_t i = (uint64_t) (n - low);
