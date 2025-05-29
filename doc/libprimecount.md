@@ -65,7 +65,7 @@ int64_t primecount_phi(int64_t x, int64_t a);
 ```
 
 Please check [<primecount.h>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
-for more detailed function specifications.
+for detailed function specifications.
 
 # C example
 
@@ -130,7 +130,7 @@ int64_t primecount::phi(int64_t x, int64_t a);
 ```
 
 Please check [<primecount.hpp>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
-for more detailed function specifications.
+for detailed function specifications.
 
 # C++ example
 
