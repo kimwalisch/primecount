@@ -52,13 +52,13 @@ in case an error occurs and print the corresponding error message to the standar
 int64_t primecount_pi(int64_t x);
 
 // Count the number of primes <= x (supports 128-bit)
-pc_int128_t primecount_pi128(pc_int128_t x);
+pc_int128_t primecount_pi_128(pc_int128_t x);
 
 // Find the nth prime e.g.: nth_prime(25) = 97
 int64_t primecount_nth_prime(int64_t n);
 
 // Find the nth prime (supports 128-bit)
-pc_int128_t primecount_nth_prime128(pc_int128_t n);
+pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 
 // Count the numbers <= x that are not divisible by any of the first a primes
 int64_t primecount_phi(int64_t x, int64_t a);

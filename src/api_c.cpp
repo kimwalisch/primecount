@@ -32,7 +32,7 @@ int64_t primecount_pi(int64_t x)
   }
 }
 
-pc_int128_t primecount_pi128(pc_int128_t x)
+pc_int128_t primecount_pi_128(pc_int128_t x)
 {
   try
   {
@@ -49,7 +49,7 @@ pc_int128_t primecount_pi128(pc_int128_t x)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount_pi128: " << e.what() << std::endl;
+    std::cerr << "primecount_pi_128: " << e.what() << std::endl;
 
     pc_int128_t res;
     res.lo = ~0ull;
@@ -110,7 +110,7 @@ int64_t primecount_nth_prime(int64_t n)
   }
 }
 
-pc_int128_t primecount_nth_prime128(pc_int128_t n)
+pc_int128_t primecount_nth_prime_128(pc_int128_t n)
 {
   try
   {
@@ -127,7 +127,7 @@ pc_int128_t primecount_nth_prime128(pc_int128_t n)
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount_nth_prime128: " << e.what() << std::endl;
+    std::cerr << "primecount_nth_prime_128: " << e.what() << std::endl;
 
     pc_int128_t res;
     res.lo = ~0ull;

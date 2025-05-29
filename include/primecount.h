@@ -62,7 +62,7 @@ int64_t primecount_pi(int64_t x);
  * Run time: O(x^(2/3) / (log x)^2)
  * Memory usage: O(x^(1/3) * (log x)^3)
  */
-pc_int128_t primecount_pi128(pc_int128_t x);
+pc_int128_t primecount_pi_128(pc_int128_t x);
 
 /*
  * 128-bit prime counting function.
@@ -116,7 +116,7 @@ int64_t primecount_nth_prime(int64_t n);
  * Run time: O(x^(2/3) / (log x)^2)
  * Memory usage: O(x^(1/3) * (log x)^3)
  */
-pc_int128_t primecount_nth_prime128(pc_int128_t n);
+pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 
 /*
  * Largest number supported by primecount_pi_str(x).
