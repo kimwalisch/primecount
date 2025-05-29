@@ -43,10 +43,9 @@ cloud servers.
 
 # C API reference
 
-Include the ```<primecount.h>``` header to use primecount's C API.
-All functions that are part of primecount's C API return ```-1``` in case an
-error occurs and print the corresponding error message to the standard error
-stream.
+Include the [<primecount.h>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
+header to use primecount's C API. All functions that are part of primecount's C API return ```-1```
+in case an error occurs and print the corresponding error message to the standard error stream.
 
 ```C
 // Count the number of primes <= x
@@ -65,8 +64,8 @@ pc_int128_t primecount_nth_prime128(pc_int128_t n);
 int64_t primecount_phi(int64_t x, int64_t a);
 ```
 
-Please see [primecount.h](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
-for more information.
+Please check [<primecount.h>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.h)
+for more detailed function specifications.
 
 # C example
 
@@ -109,10 +108,9 @@ export C_INCLUDE_PATH=/usr/local/include:$C_INCLUDE_PATH
 
 # C++ API reference
 
-Include the ```<primecount.hpp>``` header to use primecount's C++ API.
-All functions that are part of primecount's C++ API throw a
-```primecount_error``` exception (which is derived from
-```std::exception```) in case an error occurs.
+Include the [<primecount.hpp>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
+header to use primecount's C++ API. All functions that are part of primecount's C++ API throw a
+```primecount_error``` exception (which is derived from ```std::exception```) in case an error occurs.
 
 ```C++
 // Count the number of primes <= x
@@ -131,8 +129,8 @@ pc_int128_t primecount::nth_prime(pc_int128_t n);
 int64_t primecount::phi(int64_t x, int64_t a);
 ```
 
-Please see [primecount.hpp](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
-for more information.
+Please check [<primecount.hpp>](https://github.com/kimwalisch/primecount/blob/master/include/primecount.hpp)
+for more detailed function specifications.
 
 # C++ example
 
