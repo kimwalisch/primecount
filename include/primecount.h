@@ -24,7 +24,17 @@
 extern "C" {
 #endif
 
-/** Portable int128_t type used by primecount's API */
+/*
+ * pc_int128_t is a portable int128_t type used by primecount's C API.
+ * 
+ * How to convert a pc_int128_t to an int128_t:
+ * int128_t n = x.lo | (((int128_t) x.hi) << 64);
+ * 
+ * How to convert an int128_t to a pc_int128_t:
+ * pc_int128_t x;
+ * x.lo = (uint64_t) n;
+ * x.hi = (int64_t) (n >> 64);
+ */
 typedef struct {
   uint64_t lo;
   int64_t hi;
