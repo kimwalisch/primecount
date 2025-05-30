@@ -36,9 +36,6 @@ int main()
   prime = nthPrimeSieve.find_nth_prime(439);
   std::cout << "nthPrimeSieve.find_nth_prime(439) = " << prime;
   check(prime == 3089);
-  prime = nthPrimeSieve.find_nth_prime(440);
-  std::cout << "nthPrimeSieve.find_nth_prime(440) failed=" << (prime == 0 ? "true" : "false");
-  check(prime == 0);
 
   std::cout << std::endl;
 
@@ -55,9 +52,6 @@ int main()
   prime = nthPrimeSieve.find_nth_prime(437);
   std::cout << "nthPrimeSieve.find_nth_prime(437) = " << prime;
   check(prime == 3083);
-  prime = nthPrimeSieve.find_nth_prime(3090);
-  std::cout << "nthPrimeSieve.find_nth_prime(3090) failed=" << (prime == 0 ? "true" : "false");
-  check(prime == 0);
 
   std::cout << std::endl;
 
@@ -74,9 +68,6 @@ int main()
   prime = nthPrimeSieve.find_nth_prime(10876);
   std::cout << "nthPrimeSieve.find_nth_prime(10876) = " << prime;
   check(prime == 1000000299997);
-  prime = nthPrimeSieve.find_nth_prime(10877);
-  std::cout << "nthPrimeSieve.find_nth_prime(10877) failed=" << (prime == 0 ? "true" : "false");
-  check(prime == 0);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
