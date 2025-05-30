@@ -210,7 +210,7 @@ private:
 };
 
 /// Find the nth prime using a prime sieve.
-/// @sieve_forward = true:  Find nth prime > nth_prime_approx.
+/// @sieve_forward = true:  Find nth prime >= nth_prime_approx.
 /// @sieve_forward = false: Find nth prime <= nth_prime_approx.
 ///
 template <bool sieve_forward, typename T>
