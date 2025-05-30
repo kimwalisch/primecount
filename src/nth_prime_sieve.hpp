@@ -95,22 +95,42 @@ public:
     sieve_.back() &= unset_larger_[high % 240];
     primesieve::iterator iter(7, sqrt_high);
 
-    while ((prime = iter.next_prime()) <= sqrt_high)
+    if (sqrt_high < low)
     {
-      // Calculate first multiple > low
-      // that is not divisible by 2.
-      UT q = low / prime;
-      UT n = prime * (q + 1 + (q & 1));
-      ASSERT(n % 2 != 0);
+      while ((prime = iter.next_prime()) <= sqrt_high)
+      {
+        // Calculate first multiple > low
+        // that is not divisible by 2.
+        UT q = low / prime;
+        UT n = prime * (q + 1 + (q & 1));
+        ASSERT(n > prime);
+        ASSERT(n % 2 != 0);
+        uint64_t i = (uint64_t) (n - low);
+        uint64_t limit = (uint64_t) (high - low);
 
-      // Ensure n > prime
-      n = max(n, UT(prime) * prime);
-      uint64_t i = (uint64_t) (n - low);
-      uint64_t limit = (uint64_t) (high - low);
+        // Cross-off multiples
+        for (; i <= limit; i += prime * 2)
+          sieve_[i / 240] &= unset_bit_[i % 240];
+      }
+    }
+    else
+    {
+      while ((prime = iter.next_prime()) <= sqrt_high)
+      {
+        // Calculate first multiple > low
+        // that is not divisible by 2.
+        UT q = low / prime;
+        UT n = prime * (q + 1 + (q & 1));
+        n = max(n, UT(prime) * prime);
+        ASSERT(n > prime);
+        ASSERT(n % 2 != 0);
+        uint64_t i = (uint64_t) (n - low);
+        uint64_t limit = (uint64_t) (high - low);
 
-      // Cross-off multiples
-      for (; i <= limit; i += prime * 2)
-        sieve_[i / 240] &= unset_bit_[i % 240];
+        // Cross-off multiples
+        for (; i <= limit; i += prime * 2)
+          sieve_[i / 240] &= unset_bit_[i % 240];
+      }
     }
 
     // Count primes (1 bits)
