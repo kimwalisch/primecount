@@ -346,7 +346,7 @@ Once this is done one starts sieving (e.g. using the segmented sieve of
 Eratosthenes) from there on until one finds the actual nth prime. The author
 has implemented ```primecount::nth_prime(n)``` this way
 (option: ```--nth-prime```), it finds the nth prime in $O(x^{\frac{2}{3}}/\log^2{x})$
-operations using $O(\sqrt{x})$ space.
+operations using $O(\sqrt[3]{x}\ \log^3{x})$ space.
 
 ## C API
 
