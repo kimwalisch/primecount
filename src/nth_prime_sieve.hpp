@@ -103,6 +103,7 @@ public:
       UT n = prime * (q + 1 + (q & 1));
       ASSERT(n % 2 != 0);
 
+      // Ensure n > prime
       n = max(n, UT(prime) * prime);
       uint64_t i = (uint64_t) (n - low);
       uint64_t limit = (uint64_t) (high - low);
