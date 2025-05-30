@@ -100,10 +100,10 @@ public:
       // Calculate first multiple > low
       // that is not divisible by 2.
       UT q = low / prime;
-      UT n = prime * (q + 1);
-      n += prime & -(q % 2 != 0);
+      UT n = prime * (q + 1 + (q & 1));
       ASSERT(n % 2 != 0);
 
+      n = max(n, UT(prime) * prime);
       uint64_t i = (uint64_t) (n - low);
       uint64_t limit = (uint64_t) (high - low);
 
