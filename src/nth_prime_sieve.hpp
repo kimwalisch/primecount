@@ -81,15 +81,13 @@ public:
     if (low % 240)
       low -= low % 240;
 
+    low_ = low;
     UT dist = (high - low) + 1;
     uint64_t size = (uint64_t) ceil_div(dist, 240);
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     uint64_t prime;
 
-    low_ = low;
-    count_ = 0;
     sieve_.resize(size);
-
     std::fill(sieve_.begin(), sieve_.end(), ~0ull);
     sieve_.front() &= unset_smaller_[old_low % 240];
     sieve_.back() &= unset_larger_[high % 240];
@@ -133,8 +131,9 @@ public:
       }
     }
 
-    // Count primes (1 bits)
     uint64_t count = 0;
+
+    // Count primes (1 bits)
     for (uint64_t bits : sieve_)
       count += popcnt64(bits);
 
