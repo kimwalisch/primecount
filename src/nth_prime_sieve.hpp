@@ -224,13 +224,13 @@ T nth_prime_sieve(uint64_t n,
   uint64_t while_iters = 0;
 
   T root3 = iroot<3>(nth_prime_approx);
-  uint64_t segment_size = (uint64_t) (root3 * 30);
-  uint64_t min_segment_size = 8 * 240;
-  segment_size = max(min_segment_size, segment_size);
+  uint64_t thread_dist = (uint64_t) (root3 * 30);
+  uint64_t min_thread_dist = 8 * 240;
+  thread_dist = max(min_thread_dist, thread_dist);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
 
-  threads = ideal_num_threads(dist_approx, threads, segment_size);
+  threads = ideal_num_threads(dist_approx, threads, thread_dist);
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool print_vars = is_print();
   bool finished = false;
@@ -240,7 +240,7 @@ T nth_prime_sieve(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, segment_size, threads);
+    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, thread_dist, threads);
     time = get_time();
   }
 
@@ -261,13 +261,13 @@ T nth_prime_sieve(uint64_t n,
 
     if (sieve_forward)
     {
-      low = nth_prime_approx + i * segment_size;
-      high = low + segment_size - 1;
+      low = nth_prime_approx + i * thread_dist;
+      high = low + thread_dist - 1;
     }
-    else if ((UT) nth_prime_approx > i * segment_size)
+    else if ((UT) nth_prime_approx > i * thread_dist)
     {
-      high = nth_prime_approx - i * segment_size;
-      low = (high - min(high, segment_size)) + 1;
+      high = nth_prime_approx - i * thread_dist;
+      low = (high - min(high, thread_dist)) + 1;
     }
 
     // Sieve the current segment [low, high].
