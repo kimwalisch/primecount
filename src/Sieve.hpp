@@ -124,12 +124,6 @@ private:
   {
     uint32_t multiple;
     uint32_t index;
-
-    Wheel() = default;
-    Wheel(uint32_t m, uint32_t i)
-      : multiple(m),
-        index(i)
-    { }
   };
 
   struct Counter
