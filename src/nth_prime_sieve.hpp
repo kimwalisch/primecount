@@ -104,10 +104,10 @@ public:
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
         uint64_t i = (uint64_t) (n - low);
-        uint64_t limit = (uint64_t) (high - low);
+        uint64_t i_max = (uint64_t) (high - low);
 
         // Cross-off multiples
-        for (; i <= limit; i += prime * 2)
+        for (; i <= i_max; i += prime * 2)
           sieve_[i / 240] &= unset_bit_[i % 240];
       }
     }
@@ -123,10 +123,10 @@ public:
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
         uint64_t i = (uint64_t) (n - low);
-        uint64_t limit = (uint64_t) (high - low);
+        uint64_t i_max = (uint64_t) (high - low);
 
         // Cross-off multiples
-        for (; i <= limit; i += prime * 2)
+        for (; i <= i_max; i += prime * 2)
           sieve_[i / 240] &= unset_bit_[i % 240];
       }
     }
