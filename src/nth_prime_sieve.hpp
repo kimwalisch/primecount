@@ -286,32 +286,32 @@ T nth_prime_sieve(uint64_t n,
     {
       while_iters++;
 
-      for (int j = 0; j < threads; j++)
+      for (int t = 0; t < threads; t++)
       {
         if (sieve_forward)
         {
-          if (count + sieves[j].get_count() < n)
-            count += sieves[j].get_count();
+          if (count + sieves[t].get_count() < n)
+            count += sieves[t].get_count();
           else
           {
             // Nth prime is in the current segment
-            nth_prime = sieves[j].find_nth_prime(n - count);
+            nth_prime = sieves[t].find_nth_prime(n - count);
             finished = true;
             break;
           }
         }
         else // Sieve backwards
         {
-          count += sieves[j].get_count();
+          count += sieves[t].get_count();
 
           if (count >= n)
           {
             // Nth prime is in the current segment
-            nth_prime = sieves[j].find_nth_prime((count - n) + 1);
+            nth_prime = sieves[t].find_nth_prime((count - n) + 1);
             finished = true;
             break;
           }
-          else if (sieves[j].get_low() == 0)
+          else if (sieves[t].get_low() == 0)
           {
             finished = true;
             break;
