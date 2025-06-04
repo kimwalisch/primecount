@@ -24,6 +24,9 @@
 /// file in the top level directory.
 ///
 
+#ifndef NTH_PRIME_SIEVE_HPP
+#define NTH_PRIME_SIEVE_HPP
+
 #include "BitSieve240.hpp"
 #include "print.hpp"
 
@@ -334,3 +337,5 @@ T nth_prime_sieve(uint64_t n,
 }
 
 } // namespace
+
+#endif
