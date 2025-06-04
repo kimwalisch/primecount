@@ -143,18 +143,6 @@ int64_t pi_gourdon(int64_t x, int threads)
   return pi_gourdon_64(x, threads);
 }
 
-std::string nth_prime(const std::string& x)
-{
-  return nth_prime(x, get_num_threads());
-}
-
-std::string nth_prime(const std::string& x, int threads)
-{
-  maxint_t n = to_maxint(x);
-  maxint_t res = nth_prime(n, threads);
-  return to_string(res);
-}
-
 int64_t nth_prime(int64_t n)
 {
   return nth_prime(n, get_num_threads());
