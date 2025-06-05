@@ -46,7 +46,7 @@ many consecutive leaves are identical) may be outside of the segment $[low, low 
 a ```PrimePi[n]``` lookup table of size $y$ instead of the ```SegmentedPrimePi[n]``` lookup table. Note that it is important for performance
 to segment the clustered easy leaves as there is a proportionally large number of these leaves and their computation is expensive.
 
- # Parallel computation and load-balancing
+# Parallel computation and load-balancing
 
 So far we have focused on improving the cache efficiency of the computation of the easy special leaves. Now we will have a look at
 how to parallelize the computation of the easy special leaves so that the algorithm scales well. Generally parallel algorithms
