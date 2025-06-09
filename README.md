@@ -331,9 +331,10 @@ for counting which is very cache inefficient primecount uses a linear
 counter array in combination with the POPCNT instruction which is more
 cache efficient and much faster. The
 [Hard-Special-Leaves.md](doc/Hard-Special-Leaves.md) document contains more
-information. primecount's [easy special leaf implementation](doc/Easy-Special-Leaves.pdf)
-and its [partial sieve function implementation](doc/Partial-Sieve-Function.pdf)
-also contain significant improvements.
+information. The novelties of primecount's easy special leaf implementation are
+described in the [Easy-Special-Leaves.pdf](doc/Easy-Special-Leaves.pdf)
+paper and its partial sieve function implementation is described in the
+[Partial-Sieve-Function.pdf](doc/Partial-Sieve-Function.pdf) paper.
 
 ## Fast nth prime calculation
 
