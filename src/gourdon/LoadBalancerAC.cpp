@@ -5,7 +5,7 @@
 ///        Xavier Gourdon's algorithm.
 ///
 ///        Load balancing is described in more detail at:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///

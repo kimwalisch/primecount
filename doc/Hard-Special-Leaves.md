@@ -6,7 +6,7 @@ The combinatorial type prime counting algorithms
 [Gourdon](http://numbers.computation.free.fr/Constants/Primes/Pix/piNalgorithm.ps))
 consist of many formulas and the formula that usually takes longest to compute and
 is by far the most difficult to implement is the formula of the so-called hard special leaves.
-Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md),
+Unlike the [easy special leaves](https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf),
 which can be computed in $O(1)$ using a $\pi(x)$ lookup table, the computation of
 the hard special leaves requires evaluating the partial sieve function $\phi(x, a)$ which
 generally cannot be computed in $O(1)$.

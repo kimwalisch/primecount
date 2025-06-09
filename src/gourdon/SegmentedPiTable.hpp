@@ -16,7 +16,7 @@
 ///
 ///        The algorithm of the easy special leaves and the usage of
 ///        the SegmentedPiTable are described in more detail in:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///

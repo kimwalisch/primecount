@@ -11,12 +11,12 @@
 ///        computation by several orders of magnitude.
 ///
 ///    [1] In-depth description of primecount's phi(x, a) implementation:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Partial-Sieve-Function.pdf
 ///    [2] Tomás Oliveira e Silva, Computing pi(x): the combinatorial
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

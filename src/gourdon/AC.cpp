@@ -17,7 +17,7 @@
 ///        improves scaling on systems with many CPU cores.
 ///
 ///        In-depth description of this algorithm:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///

@@ -9,7 +9,7 @@
 
 # Algorithms
 
-* [Partial-Sieve-Function.md](Partial-Sieve-Function.md)
-* [Easy-Special-Leaves.md](Easy-Special-Leaves.md)
+* [Partial-Sieve-Function.pdf](Partial-Sieve-Function.pdf)
+* [Easy-Special-Leaves.pdf](Easy-Special-Leaves.pdf)
 * [Hard-Special-Leaves.md](Hard-Special-Leaves.md)
 * [References.md](References.md)
