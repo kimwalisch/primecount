@@ -329,7 +329,7 @@ from the algorithms that have been described in any of the combinatorial
 prime counting papers so far. Instead of using a binary indexed tree
 for counting which is very cache inefficient primecount uses a linear
 counter array in combination with the POPCNT instruction which is more
-cache efficient and much faster. [Hard-Special-Leaves.md](doc/Hard-Special-Leaves.md).
+cache efficient and much faster. [Hard-Special-Leaves.md](doc/Hard-Special-Leaves.md)
 explains this algorithm in more detail. The novelties of primecount's easy special leaf
 implementation are described in [Easy-Special-Leaves.pdf](doc/Easy-Special-Leaves.pdf),
 and its partial sieve function implementation is described in
