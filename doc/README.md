@@ -11,5 +11,5 @@
 
 * [Partial-Sieve-Function.pdf](Partial-Sieve-Function.pdf)
 * [Easy-Special-Leaves.pdf](Easy-Special-Leaves.pdf)
-* [Hard-Special-Leaves.md](Hard-Special-Leaves.md)
+* [Hard-Special-Leaves.pdf](Hard-Special-Leaves.pdf)
 * [References.md](References.md)

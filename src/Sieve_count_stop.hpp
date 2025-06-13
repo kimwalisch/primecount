@@ -10,7 +10,7 @@
 ///        been annotated using ALWAYS_INLINE.
 ///
 ///        In-depth description of this algorithm:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.md
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
