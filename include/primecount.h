@@ -16,9 +16,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "7.19"
+#define PRIMECOUNT_VERSION "7.20"
 #define PRIMECOUNT_VERSION_MAJOR 7
-#define PRIMECOUNT_VERSION_MINOR 19
+#define PRIMECOUNT_VERSION_MINOR 20
 
 #ifdef __cplusplus
 extern "C" {
