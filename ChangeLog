@@ -1,3 +1,10 @@
+Changes in primecount-7.20, 2025-06-14
+
+* doc/Easy-Special-Leaves.pdf: Converted Markdown to LaTeX.
+* doc/Hard-Special-Leaves.pdf: Converted Markdown to LaTeX.
+* doc/Partial-Sieve-Function.pdf: Converted Markdown to LaTeX.
+* README.md: Updated Algorithms section.
+
 Changes in primecount-7.19, 2025-06-04
 
 * nth_prime.cpp: Add 128-bit nth_prime function.
