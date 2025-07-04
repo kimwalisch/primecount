@@ -46,8 +46,11 @@ option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
 # Option sanity checks ###############################################
 
 # We don't yet support building libprimecount as a shared DLL
-# library on Windows. If you need this let me know...
-if(WIN32)
+# library on Windows using the MSVC compiler. The MSVC compiler
+# by default does not allow accessing global variables that
+# are inside a DLL, unless all those variables are annotated
+# using __declspec(dllexport) and __declspec(dllimport).
+if(WIN32 AND NOT MINGW)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
@@ -325,6 +328,16 @@ if(BUILD_PRIMECOUNT)
     target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+    # Copy primesieve.dll into the same directory as primecount.exe.
+    # On Windows the DLLs must be in the same directory as the
+    # binaries that depend on them.
+    if (WIN32 AND NOT STATICALLY_LINK_LIBPRIMECOUNT)
+        add_custom_command(TARGET primecount POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:libprimesieve>
+                $<TARGET_FILE_DIR:primecount>)
+    endif()
 
     if(WITH_MSVC_CRT_STATIC)
         set_target_properties(primecount PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")

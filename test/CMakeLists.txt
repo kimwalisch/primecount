@@ -14,6 +14,21 @@ foreach(file ${files})
         ${CMAKE_SOURCE_DIR}/src/lmo)
 
     add_test(NAME ${binary_name} COMMAND ${binary_name})
+
+    # Copy primecount.dll and primesieve.dll to test directory.
+    # On Windows the DLLs must be in the same directory as the
+    # binaries that depend on them.
+    if (WIN32 AND NOT STATICALLY_LINK_LIBPRIMECOUNT)
+        add_custom_command(TARGET ${binary_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:libprimecount>
+                $<TARGET_FILE_DIR:${binary_name}>)
+
+        add_custom_command(TARGET ${binary_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:libprimesieve>
+                $<TARGET_FILE_DIR:${binary_name}>)
+    endif()
 endforeach()
 
 # The order here is important, we want simpler implementations
