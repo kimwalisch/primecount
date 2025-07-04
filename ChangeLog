@@ -1,6 +1,6 @@
 Changes in primecount-7.20, 2025-07-04
 
-* CMakeLists.txt: Support building primecount.dll using MinGW.
+* CMakeLists.txt: Support building libprimecount.dll using MinGW.
 * doc/Easy-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Hard-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Partial-Sieve-Function.pdf: Converted Markdown to LaTeX.
