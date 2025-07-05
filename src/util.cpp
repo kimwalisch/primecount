@@ -272,12 +272,12 @@ double get_alpha_lmo(maxint_t x)
     double logx = std::log((double) x);
     double logx2 = logx * logx;
     alpha = a * logx2 + b * logx + c;
-
-    // Recompute pi(x) with alternative alpha tuning
-    // factor(s) to verify the first result.
-    if (verify_computation_)
-      alpha *= 0.99;
   }
+
+  // Recompute pi(x) with alternative alpha tuning
+  // factor(s) to verify the first result.
+  if (verify_computation_)
+    alpha *= 0.99;
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
@@ -320,12 +320,12 @@ double get_alpha_deleglise_rivat(maxint_t x)
       double logx3 = logx * logx * logx;
       alpha = a * logx3 + b * logx2 + c * logx + d;
     }
-
-    // Recompute pi(x) with alternative alpha tuning
-    // factor(s) to verify the first result.
-    if (verify_computation_)
-      alpha *= 0.99;
   }
+
+  // Recompute pi(x) with alternative alpha tuning
+  // factor(s) to verify the first result.
+  if (verify_computation_)
+    alpha *= 0.99;
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
@@ -373,11 +373,6 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     alpha_yz = a * logx3 + b * logx2 + c * logx + d;
   }
 
-  // Recompute pi(x) with alternative alpha tuning
-  // factor(s) to verify the first result.
-  if (verify_computation_)
-    alpha_yz *= 0.99;
-
   // Use default alpha_z
   if (alpha_z < 1)
   {
@@ -405,12 +400,15 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // an alpha_z > 1 will likely improve performance.
     alpha_z = 2;
 
-    // --verify option for second pi(x) computation
-    if (verify_computation_)
-      alpha_z *= 0.99;
-
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
+  }
+
+  // --verify option for second pi(x) computation
+  if (verify_computation_)
+  {
+    alpha_z = max(1.0, alpha_z * 0.99);
+    alpha_yz = max(1.0, alpha_yz * 0.99);
   }
 
   // Use default alpha_y
