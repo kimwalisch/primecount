@@ -44,6 +44,8 @@ void help(int exitCode)
     "      --time               Print the time elapsed in seconds\n"
     "  -t, --threads=NUM        Set the number of threads, 1 <= NUM <= CPU cores.\n"
     "                           By default primecount uses all available CPU cores.\n"
+    "      --verify             Recompute pi(x) with alternative alpha tuning\n"
+    "                           factor(s) to verify the first result.\n"
     "  -v, --version            Print version and license information\n"
     "  -h, --help               Print this help menu\n"
     "\n"

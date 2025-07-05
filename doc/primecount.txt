@@ -74,6 +74,9 @@ OPTIONS
 *-t, --threads*='NUM'::
 	Set the number of threads, 1 \<= 'NUM' \<= CPU cores. By default primecount uses all available CPU cores.
 
+*--verify*::
+	Recompute pi(x) with alternative alpha tuning factor(s) to verify the first result. This redundancy helps guard against potential bugs in primecount: if an error exists, it is highly unlikely that both pi(x) computations would produce the same (incorrect) result.
+
 *-v, --version*::
 	Print version and license information.
 
@@ -101,10 +104,10 @@ Advanced options for the Deleglise-Rivat algorithm
 Tuning factor
 ~~~~~~~~~~~~~
 The alpha tuning factor mainly balances the computation of the S2_easy and
-S2_hard formulas. By increasing alpha the runtime of the S2_hard formula
-will usually decrease but the runtime of the S2_easy formula will increase.
-For large pi(x) computations with x >= 10^25 you can usually achieve a
-significant speedup by increasing alpha.
+S2_hard formulas. By increasing alpha, the runtime of the S2_hard formula
+usually decreases, while the runtime of the S2_easy formula increases.
+By default, primecount automatically selects an alpha tuning factor that
+is likely to provide the best performance for the user's input.
 
 The alpha tuning factor is also very useful for verifying pi(x) computations.
 You compute pi(x) twice but for the second computation you use a slightly
@@ -134,13 +137,12 @@ Advanced options for Xavier Gourdon's algorithm
 
 Tuning factors
 ~~~~~~~~~~~~~~
-The alpha_y and alpha_z tuning factors mainly balance the computation of
-the A, B, C and D formulas. When alpha_y is decreased but alpha_z is
-increased then the runtime of the B formula will increase but the runtime of
-the A, C and D formulas will decrease. For large pi(x) computations with
-x >= 10^25 you can usually achieve a significant speedup by decreasing alpha_y
-and increasing alpha_z. For convenience when you increase alpha_z using
-*--alpha-z*='NUM' then alpha_y is automatically decreased.
+The alpha_y and alpha_z tuning factors mainly balance the computation of the
+A, B, C and D formulas. When alpha_y is decreased and alpha_z is increased,
+the runtime of the B formula increases, while the runtime of the A, C and D
+formulas decrease. By default, primecount automatically selects alpha_y and
+alpha_z tuning factors that are likely to provide the best performance for
+the user's input.
 
 Both the alpha_y and alpha_z tuning factors are also very useful for
 verifying pi(x) computations. You compute pi(x) twice but for the second
@@ -153,6 +155,27 @@ successfully.
 
 *--alpha-z*='NUM'::
 	Set the alpha_z tuning factor: z = y * alpha_z, 1 \<= alpha_z \<= x^(1/6).
+
+Verifying pi(x) computations
+----------------------------
+
+For large pi(x) computations that run over several weeks or months, it is
+important to verify such computations to protect against miscalculations due
+to hardware errors and/or bugs in primecount.
+
+To verify a pi(x) computation, you compute pi(x) twice. But for the second
+run you use the *--verify* option. The *--verify* option enables the use of
+alternative alpha tuning factor(s), ensuring that all internal bounds in the
+second computation differ slightly from the first run. This redundancy helps
+guard against potential bugs in primecount: if an error exists, it is highly
+unlikely that both pi(x) computations would produce the same (incorrect)
+result.
+
+**primecount 1e20 --status**::
+	First pi(x) computation using default alpha tuning factor(s).
+
+**primecount 1e20 --status --verify**::
+	Second pi(x) computation using alternative alpha tuning factor(s).
 
 EXAMPLES
 --------

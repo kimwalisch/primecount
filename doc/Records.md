@@ -18,7 +18,29 @@ PC/server. You can use the primecount app together with the
 [Unix ```tee``` command](https://en.wikipedia.org/wiki/Tee_(command)) to store intermediate results in a
 log file.
 
-## [A006880](https://oeis.org/A006880) records
+# Verifying $\pi(x)$ computations
+
+For large $\pi(x)$ computations that run over several weeks or months, it is
+important to verify such computations to protect against miscalculations due
+to hardware errors and/or bugs in primecount.
+
+To verify a $\pi(x)$ computation, you compute $\pi(x)$ twice. But for the second
+run you use the `--verify` option. The `--verify` option enables the use of
+alternative alpha tuning factors, ensuring that all internal bounds in the
+second computation differ slightly from the first run. This redundancy helps
+guard against potential bugs in primecount: if an error exists, it is highly
+unlikely that both $\pi(x)$ computations would produce the same (incorrect)
+result.
+
+```bash
+# First pi(x) computation using default alpha tuning factors
+$ primecount 1e20 --status
+
+# Second pi(x) computation using alternative alpha tuning factors
+$ primecount 1e20 --status --verify
+```
+
+# [A006880](https://oeis.org/A006880) records
 
 <table>
   <tr align="center">
@@ -52,7 +74,7 @@ different alpha tuning parameters (configuration parameters).
 You can read our announcements of these results in our
 [mersenne forum thread](https://mersenneforum.org/showthread.php?t=20473&page=3).
 
-## [A006988](https://oeis.org/A006988) records
+# [A006988](https://oeis.org/A006988) records
 
 <table>
   <tr align="center">
@@ -81,7 +103,7 @@ You can read our announcements of these results in our
   </tr>
 </table>
 
-## [A007053](https://oeis.org/A007053) records
+# [A007053](https://oeis.org/A007053) records
 
 <table>
   <tr align="center">
@@ -128,7 +150,7 @@ You can read our announcements of these results in our
   </tr>
 </table>
 
-## [A040014](https://oeis.org/A040014) records
+# [A040014](https://oeis.org/A040014) records
 
 <table>
   <tr align="center">
@@ -229,7 +251,7 @@ You can read our announcements of these results in our
   </tr>
 </table>
 
-## [A122121](https://oeis.org/A122121) records
+# [A122121](https://oeis.org/A122121) records
 
 <table>
   <tr align="center">

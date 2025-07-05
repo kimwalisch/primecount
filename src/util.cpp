@@ -3,7 +3,7 @@
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -28,21 +28,29 @@ namespace {
 
 int status_precision_ = -1;
 
-// Tuning factor used in the Lagarias-Miller-Odlyzko
-// and Deleglise-Rivat algorithms.
+/// Tuning factor used in the Lagarias-Miller-Odlyzko
+/// and Deleglise-Rivat algorithms.
 double alpha_ = -1;
 
-// Tuning factor used in Xavier Gourdon's algorithm
+/// Tuning factor used in Xavier Gourdon's algorithm
 double alpha_y_ = -1;
 
-// Tuning factor used in Xavier Gourdon's algorithm
+/// Tuning factor used in Xavier Gourdon's algorithm
 double alpha_z_ = -1;
 
+/// Recompute pi(x) with alternative alpha tuning factor(s) to
+/// verify the first result. This redundancy helps guard
+/// against potential bugs in primecount: if an error exists,
+/// it is highly unlikely that both pi(x) computations would
+/// produce the same (incorrect) result.
+///
+bool verify_computation_ = false;
+
 /// Truncate a floating point number to 3 digits after the decimal
-/// point. This function is used limit the number of digits after the
-/// decimal point of the alpha tuning factor in order to make it more
-/// convenient for the user to e.g. type the alpha tuning factor as
-/// a command-line parameter.
+/// point. This function is used limit the number of digits after
+/// the decimal point of the alpha tuning factor in order to make
+/// it more convenient for the user to e.g. type the alpha tuning
+/// factor as a command-line parameter.
 ///
 double truncate3(double n)
 {
@@ -161,6 +169,11 @@ double get_time()
   return (double) micro.count() / 1e6;
 }
 
+void set_verify_computation(bool enable)
+{
+  verify_computation_ = enable;
+}
+
 void set_alpha(double alpha)
 {
   // If alpha < 1 then we compute a good
@@ -261,6 +274,11 @@ double get_alpha_lmo(maxint_t x)
     alpha = a * logx2 + b * logx + c;
   }
 
+  // Recompute pi(x) with alternative alpha tuning
+  // factor(s) to verify the first result.
+  if (verify_computation_)
+    alpha *= 0.99;
+
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
   alpha = truncate3(alpha);
@@ -303,6 +321,11 @@ double get_alpha_deleglise_rivat(maxint_t x)
       alpha = a * logx3 + b * logx2 + c * logx + d;
     }
   }
+
+  // Recompute pi(x) with alternative alpha tuning
+  // factor(s) to verify the first result.
+  if (verify_computation_)
+    alpha *= 0.99;
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
@@ -379,6 +402,13 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
 
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
+  }
+
+  // --verify option for second pi(x) computation
+  if (verify_computation_)
+  {
+    alpha_z = max(1.0, alpha_z * 0.99);
+    alpha_yz = max(1.0, alpha_yz * 0.99);
   }
 
   // Use default alpha_y
