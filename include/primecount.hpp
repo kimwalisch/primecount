@@ -124,6 +124,14 @@ int get_num_threads();
 /// Set the number of threads
 void set_num_threads(int num_threads);
 
+/// Recompute pi(x) with alternative alpha tuning factor(s) to
+/// to verify the first result. This redundancy helps guard
+/// against potential bugs in primecount: if an error exists,
+/// it is highly unlikely that both pi(x) computations would
+/// produce the same (incorrect) result.
+///
+void set_verify_computation(bool enable);
+
 /// Get the primecount version number, in the form “i.j”
 std::string primecount_version();
 

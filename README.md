@@ -15,7 +15,7 @@ known up to this date all of which have been parallelized using
 source implementations of the Deleglise-Rivat algorithm and Xavier Gourdon's algorithm (that works).
 primecount also features a [novel load balancer](https://github.com/kimwalisch/primecount/blob/master/src/LoadBalancerS2.cpp)
 that is shared amongst all implementations and that scales up to hundreds of CPU cores. primecount
-has already been used to compute several prime counting function [world records](doc/Records.md).
+has already been used to compute several prime counting function [world records](doc/Records.md)!
 
 ## Installation
 

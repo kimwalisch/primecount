@@ -279,6 +279,7 @@ CmdOptions parseOptions(int argc, char* argv[])
     { "--time", std::make_pair(OPTION_TIME, NO_PARAM) },
     { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
     { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
+    { "--verify", std::make_pair(OPTION_VERIFY, NO_PARAM) },
     { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
     { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
   };
@@ -302,6 +303,7 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_STATUS:  opts.optionStatus(opt); break;
       case OPTION_TIME:    opts.time = true; break;
       case OPTION_TEST:    test(); break;
+      case OPTION_VERIFY:  set_verify_computation(true); break;
       case OPTION_VERSION: version(); break;
       default:             opts.setMainOption(optionID, opt.str);
     }
