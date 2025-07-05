@@ -114,6 +114,8 @@ Options:
       --time               Print the time elapsed in seconds
   -t, --threads=NUM        Set the number of threads, 1 <= NUM <= CPU cores.
                            By default primecount uses all available CPU cores.
+      --verify             Recompute pi(x) with alternative alpha tuning
+                           factor(s) to verify the first result.
   -v, --version            Print version and license information
   -h, --help               Print this help menu
 ```
