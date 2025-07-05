@@ -39,7 +39,7 @@ double alpha_y_ = -1;
 double alpha_z_ = -1;
 
 /// Recompute pi(x) with alternative alpha tuning factor(s) to
-/// to verify the first result. This redundancy helps guard
+/// verify the first result. This redundancy helps guard
 /// against potential bugs in primecount: if an error exists,
 /// it is highly unlikely that both pi(x) computations would
 /// produce the same (incorrect) result.

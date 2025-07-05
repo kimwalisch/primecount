@@ -25,7 +25,7 @@ important to verify such computations to protect against miscalculations due
 to hardware errors and/or bugs in primecount.
 
 To verify a $\pi(x)$ computation, you compute $\pi(x)$ twice. But for the second
-run you use the `--verify` option. The `--verify` option enables using
+run you use the `--verify` option. The `--verify` option enables the use of
 alternative alpha tuning factors, ensuring that all internal bounds in the
 second computation differ slightly from the first run. This redundancy helps
 guard against potential bugs in primecount: if an error exists, it is highly

@@ -125,7 +125,7 @@ int get_num_threads();
 void set_num_threads(int num_threads);
 
 /// Recompute pi(x) with alternative alpha tuning factor(s) to
-/// to verify the first result. This redundancy helps guard
+/// verify the first result. This redundancy helps guard 
 /// against potential bugs in primecount: if an error exists,
 /// it is highly unlikely that both pi(x) computations would
 /// produce the same (incorrect) result.
