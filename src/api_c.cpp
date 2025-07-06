@@ -174,6 +174,18 @@ void primecount_set_num_threads(int threads)
   }
 }
 
+void primecount_set_verify_computation(bool enable)
+{
+  try
+  {
+    primecount::set_verify_computation(enable);
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << "primecount_set_verify_computation: " << e.what() << std::endl;
+  }
+}
+
 const char* primecount_get_max_x(void)
 {
 #ifdef HAVE_INT128_T
