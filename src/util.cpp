@@ -277,7 +277,7 @@ double get_alpha_lmo(maxint_t x)
   // Recompute pi(x) with alternative alpha tuning
   // factor(s) to verify the first result.
   if (verify_computation_)
-    alpha *= 0.99;
+    alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
@@ -325,7 +325,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
   // Recompute pi(x) with alternative alpha tuning
   // factor(s) to verify the first result.
   if (verify_computation_)
-    alpha *= 0.99;
+    alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
   alpha = in_between(1, alpha, x16);
@@ -407,8 +407,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   // --verify option for second pi(x) computation
   if (verify_computation_)
   {
-    alpha_z = max(1.0, alpha_z * 1.01);
-    alpha_yz = max(1.0, alpha_yz * 0.99);
+    alpha_z = max(1.0, alpha_z * 1.02);
+    alpha_yz = max(1.0, alpha_yz * 0.97);
   }
 
   // Use default alpha_y
