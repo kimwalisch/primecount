@@ -407,7 +407,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
   // --verify option for second pi(x) computation
   if (verify_computation_)
   {
-    alpha_z = max(1.0, alpha_z * 0.99);
+    alpha_z = max(1.0, alpha_z * 1.01);
     alpha_yz = max(1.0, alpha_yz * 0.99);
   }
 
