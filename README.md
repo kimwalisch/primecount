@@ -6,8 +6,8 @@
 [![C++ API Documentation](https://img.shields.io/badge/docs-C++_API-blue)](doc/libprimecount.md)
 
 primecount is a command-line program and C/C++ library that counts the number of
-primes&nbsp;≤&nbsp;x (maximum 10<sup>31</sup>) using **highly optimized** implementations of the combinatorial
-[prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
+primes&nbsp;≤&nbsp;x (maximum 10<sup>31</sup>) using **highly optimized** implementations of the
+[combinatorial prime counting algorithms](https://en.wikipedia.org/wiki/Prime-counting_function#Algorithms_for_evaluating_%CF%80(x)).
 
 primecount includes implementations of all important combinatorial prime counting algorithms
 known up to this date all of which have been parallelized using
