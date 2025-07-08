@@ -87,7 +87,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 maxint_t to_maxint(const std::string& expr);
-void verify_pix(string_view_t func_name, maxint_t x, maxint_t pix, maxint_t Lix);
+void verify_pix(string_view_t pix_function, maxint_t x, maxint_t pix, maxint_t Lix);
 
 } // namespace primecount
 

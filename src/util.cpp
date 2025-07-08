@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <stdint.h>
@@ -475,7 +477,7 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 /// mainly detect miscalculations due to hardware errors, such as
 /// malfunctioning RAM sticks or PC overclocking issues.
 ///
-void verify_pix(string_view_t func_name,
+void verify_pix(string_view_t pix_function,
                 maxint_t x,
                 maxint_t pix,
                 maxint_t Lix)
@@ -491,10 +493,13 @@ void verify_pix(string_view_t func_name,
   // 𝜃(𝑥) and 𝜓(𝑥). II", Math. Comp., v. 30, 1976.
   if (std::abs(double(pix - Lix)) >= (sqrtx * logx) / (8 * PI))
   {
-    std::ostringstream msg;
-    msg << func_name << "(" << x << ") = " << pix << std::endl
-        << "Incorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)" << std::endl;
-    throw primecount_error(msg.str());
+    std::ostringstream oss;
+    oss << "\rprimecount error: " << pix_function << "(" << x << ") = " << pix << std::endl
+        << "Li(x) = " << Lix << ", sqrt(x) = " << sqrtx << ", log(x) = " << logx << std::endl
+        << "Assertion failed: |pi(x) - Li(x)| < sqrt(x) * log(x) / (8 * PI)" << std::endl
+        << "This error may have been caused by a hardware fault." << std::endl;
+    std::cerr << oss.str() << std::flush;
+    std::abort();
   }
 }
 
