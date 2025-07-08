@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <sstream>
 #include <string>
 #include <stdint.h>
 #include <utility>
@@ -482,9 +483,12 @@ void verify_pix(string_view_t func_name,
   constexpr double PI = 3.14159265358979323846;
 
   if (std::abs(double(pix - Lix)) >= (sqrtx * logx) / (8 * PI))
-    throw primecount_error(
-      std::string(func_name) + "(" + to_string(x) + ") = " + to_string(pix) +
-      "\nIncorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)\n");
+  {
+    std::ostringstream msg;
+    msg << func_name << "(" << x << ") = " << pix << std::endl
+        << "Incorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)" << std::endl;
+    throw primecount_error(msg.str());
+  }
 }
 
 } // namespace
