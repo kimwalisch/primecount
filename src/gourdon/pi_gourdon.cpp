@@ -84,7 +84,7 @@ int64_t pi_gourdon_64(int64_t x,
   int64_t phi0 = Phi0(x, y, z, k, threads, is_print);
   int64_t ac = AC(x, y, z, k, threads, is_print);
   int64_t b = B(x, y, threads, is_print);
-  int64_t d_approx = D_approx(x, lix, sigma, phi0, ac, b);
+  int64_t d_approx = D_approx(lix, sigma, phi0, ac, b);
   int64_t d = D(x, y, z, k, d_approx, threads, is_print);
   int64_t pix = ac - b + d + phi0 + sigma;
 
@@ -155,7 +155,7 @@ int128_t pi_gourdon_128(int128_t x,
   int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
   int128_t ac = AC(x, y, z, k, threads, is_print);
   int128_t b = B(x, y, threads, is_print);
-  int128_t d_approx = D_approx(x, lix, sigma, phi0, ac, b);
+  int128_t d_approx = D_approx(lix, sigma, phi0, ac, b);
   int128_t d = D(x, y, z, k, d_approx, threads, is_print);
   int128_t pix = ac - b + d + phi0 + sigma;
 
