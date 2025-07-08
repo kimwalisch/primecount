@@ -85,15 +85,15 @@ int64_t pi_deleglise_rivat_64(int64_t x,
     print(x, y, z, c, threads);
   }
 
-  int64_t lix = li(x);
+  int64_t Lix = Li(x);
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2_approx = S2_approx(lix, pi_y, p2, s1);
+  int64_t s2_approx = S2_approx(Lix, pi_y, p2, s1);
   int64_t s2 = S2(x, y, z, c, s2_approx, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 
-  verify_pix("pi_deleglise_rivat_64", x, pix, lix);
+  verify_pix("pi_deleglise_rivat_64", x, pix, Lix);
 
   return pix;
 }
@@ -131,15 +131,15 @@ int128_t pi_deleglise_rivat_128(int128_t x,
     print(x, y, z, c, threads);
   }
 
-  int128_t lix = li(x);
+  int128_t Lix = Li(x);
   int128_t p2 = P2(x, y, pi_y, threads, is_print);
   int128_t s1 = S1(x, y, c, threads, is_print);
-  int128_t s2_approx = S2_approx(lix, pi_y, p2, s1);
+  int128_t s2_approx = S2_approx(Lix, pi_y, p2, s1);
   int128_t s2 = S2(x, y, z, c, s2_approx, threads, is_print);
   int128_t phi = s1 + s2;
   int128_t pix = phi + pi_y - 1 - p2;
 
-  verify_pix("pi_deleglise_rivat_128", x, pix, lix);
+  verify_pix("pi_deleglise_rivat_128", x, pix, Lix);
 
   return pix;
 }

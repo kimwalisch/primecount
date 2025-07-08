@@ -472,17 +472,16 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 void verify_pix(string_view_t func_name,
                 maxint_t x,
                 maxint_t pix,
-                maxint_t lix)
+                maxint_t Lix)
 {
   if (x < 2657)
     return;
 
-  // Round up log(x) to add margin of safety
-  double logx = std::ceil(std::log(x));
+  double logx = std::log(x);
   double sqrtx = std::sqrt(x);
   constexpr double PI = 3.14159265358979323846;
 
-  if ((double) std::abs(pix - lix) >= (sqrtx * logx) / (8 * PI))
+  if ((double) std::abs(pix - Lix) >= (sqrtx * logx) / (8 * PI))
     throw primecount_error(
       std::string(func_name) + "(" + to_string(x) + ") = " + to_string(pix) +
       "\nIncorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)\n");
