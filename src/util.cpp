@@ -481,7 +481,7 @@ void verify_pix(string_view_t func_name,
   double sqrtx = std::sqrt(x);
   constexpr double PI = 3.14159265358979323846;
 
-  if ((double) std::abs(pix - Lix) >= (sqrtx * logx) / (8 * PI))
+  if (std::abs(double(pix - Lix)) >= (sqrtx * logx) / (8 * PI))
     throw primecount_error(
       std::string(func_name) + "(" + to_string(x) + ") = " + to_string(pix) +
       "\nIncorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)\n");
