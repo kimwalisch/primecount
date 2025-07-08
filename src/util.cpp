@@ -497,7 +497,7 @@ void verify_pix(string_view_t pix_function,
     oss << "\rprimecount error: " << pix_function << "(" << x << ") = " << pix << std::endl
         << "Li(x) = " << Lix << ", sqrt(x) = " << sqrtx << ", log(x) = " << logx << std::endl
         << "Assertion failed: |pi(x) - Li(x)| < sqrt(x) * log(x) / (8 * PI)" << std::endl
-        << "This error may have been caused by a hardware fault." << std::endl;
+        << std::endl;
     std::cerr << oss.str() << std::flush;
     std::abort();
   }
