@@ -465,4 +465,27 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
   return x_star;
 }
 
+/// Quickly verify a pi(x) result using the formula from:
+/// Lowell Schoenfeld, "Sharper bounds for the Chebyshev functions
+/// 𝜃(𝑥) and 𝜓(𝑥). II" Math. Comp., v. 30, 1976.
+///
+void verify_pix(string_view_t func_name,
+                maxint_t x,
+                maxint_t pix,
+                maxint_t lix)
+{
+  if (x < 2657)
+    return;
+
+  // Round up log(x) to add margin of safety
+  double logx = std::ceil(std::log(x));
+  double sqrtx = std::sqrt(x);
+  constexpr double PI = 3.14159265358979323846;
+
+  if ((double) std::abs(pix - lix) >= (sqrtx * logx) / (8 * PI))
+    throw primecount_error(
+      std::string(func_name) + "(" + to_string(x) + ") = " + to_string(pix) +
+      "\nIncorrect result detected: |pi(x) - li(x)| >= sqrt(x) * log(x) / (8 * PI)\n");
+}
+
 } // namespace

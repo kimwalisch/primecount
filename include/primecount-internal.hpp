@@ -51,10 +51,11 @@ int64_t P3(int64_t x, int64_t y, int64_t a, int threads, bool print = is_print()
 int64_t nth_prime(int64_t n, int threads);
 int64_t nth_prime_64(int64_t n, int threads);
 
-int64_t Li(int64_t);
-int64_t Li_inverse(int64_t);
-int64_t RiemannR(int64_t);
-int64_t RiemannR_inverse(int64_t);
+int64_t li(int64_t x);
+int64_t Li(int64_t x);
+int64_t Li_inverse(int64_t x);
+int64_t RiemannR(int64_t x);
+int64_t RiemannR_inverse(int64_t x);
 
 #ifdef HAVE_INT128_T
   int128_t pi(int128_t x);
@@ -66,17 +67,19 @@ int64_t RiemannR_inverse(int64_t);
   int128_t nth_prime(int128_t n, int threads);
   int128_t nth_prime_128(int128_t n, int threads);
 
+  int128_t li(int128_t);
   int128_t Li(int128_t);
   int128_t Li_inverse(int128_t);
   int128_t RiemannR(int128_t);
   int128_t RiemannR_inverse(int128_t);
 #endif
 
-void set_status_precision(int precision);
 int get_status_precision(maxint_t x);
+void set_status_precision(int precision);
 void set_alpha(double alpha);
 void set_alpha_y(double alpha_y);
 void set_alpha_z(double alpha_z);
+double get_time();
 double get_alpha(maxint_t x, int64_t y);
 double get_alpha_y(maxint_t x, int64_t y);
 double get_alpha_z(int64_t y, int64_t z);
@@ -86,7 +89,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 maxint_t to_maxint(const std::string& expr);
-double get_time();
+void verify_pix(string_view_t func_name, maxint_t x, maxint_t pix, maxint_t lix);
 
 } // namespace primecount
 
@@ -118,19 +121,17 @@ double get_percent(T low, T limit)
 }
 
 template <typename T>
-T S2_approx(T x, int64_t pi_y, T p2, T s1)
+T S2_approx(T x, T pix_approx, int64_t pi_y, T p2, T s1)
 {
-  T pix = primecount::Li(x);
-  T s2_approx = pix - s1 - pi_y + 1 + p2;
+  T s2_approx = pix_approx - s1 - pi_y + 1 + p2;
   s2_approx = std::max(s2_approx, (T) 0);
   return s2_approx;
 }
 
 template <typename T>
-T D_approx(T x, T sigma, T phi0, T ac, T b)
+T D_approx(T x, T pix_approx, T sigma, T phi0, T ac, T b)
 {
-  T pix = primecount::Li(x);
-  T d_approx = pix - (ac - b + phi0 + sigma);
+  T d_approx = pix_approx - (ac - b + phi0 + sigma);
   d_approx = std::max(d_approx, (T) 0);
   return d_approx;
 }

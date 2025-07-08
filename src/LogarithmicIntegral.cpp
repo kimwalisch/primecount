@@ -300,7 +300,7 @@ T Li_inverse_overflow_check(T x)
 
 namespace primecount {
 
-int64_t Li(int64_t x)
+int64_t li(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
   // The accuracy of our implementation depends on the precision (number
@@ -309,6 +309,18 @@ int64_t Li(int64_t x)
   // varying accuracy, it is impossible to know the exact threshold for
   // when we should switch to __float128. But 1e14 seems to work well in
   // practice.
+  if (x > 1e14)
+    return (int64_t) ::li((__float128) x);
+#endif
+  if (x > 1e8)
+    return (int64_t) ::li((long double) x);
+  else
+    return (int64_t) ::li((double) x);
+}
+
+int64_t Li(int64_t x)
+{
+#if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int64_t) ::Li((__float128) x);
 #endif
@@ -331,6 +343,18 @@ int64_t Li_inverse(int64_t x)
 }
 
 #ifdef HAVE_INT128_T
+
+int128_t li(int128_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+    return (int128_t) ::li((__float128) x);
+#endif
+  if (x > 1e8)
+    return (int128_t) ::li((long double) x);
+  else
+    return (int128_t) ::li((double) x);
+}
 
 int128_t Li(int128_t x)
 {
