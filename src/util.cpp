@@ -472,7 +472,7 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 /// Note that this check can only detect miscalculations if the
 /// pi(x) result if off by >= sqrt(x) * log(x) / 8π.
 ///
-/// Since we have an extensive test suite that likely finds all
+/// Since we have an extensive test suite that likely finds most
 /// implementation bugs, we expect this verification check to
 /// mainly detect miscalculations due to hardware errors, such as
 /// malfunctioning RAM sticks or PC overclocking issues.
