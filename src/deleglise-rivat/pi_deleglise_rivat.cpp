@@ -13,7 +13,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -85,14 +85,17 @@ int64_t pi_deleglise_rivat_64(int64_t x,
     print(x, y, z, c, threads);
   }
 
+  int64_t Lix = Li(x);
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2_approx = S2_approx(x, pi_y, p2, s1);
+  int64_t s2_approx = S2_approx(Lix, pi_y, p2, s1);
   int64_t s2 = S2(x, y, z, c, s2_approx, threads, is_print);
   int64_t phi = s1 + s2;
-  int64_t sum = phi + pi_y - 1 - p2;
+  int64_t pix = phi + pi_y - 1 - p2;
 
-  return sum;
+  verify_pix("pi_deleglise_rivat_64", x, pix, Lix);
+
+  return pix;
 }
 
 #if defined(HAVE_INT128_T)
@@ -128,14 +131,17 @@ int128_t pi_deleglise_rivat_128(int128_t x,
     print(x, y, z, c, threads);
   }
 
+  int128_t Lix = Li(x);
   int128_t p2 = P2(x, y, pi_y, threads, is_print);
   int128_t s1 = S1(x, y, c, threads, is_print);
-  int128_t s2_approx = S2_approx(x, pi_y, p2, s1);
+  int128_t s2_approx = S2_approx(Lix, pi_y, p2, s1);
   int128_t s2 = S2(x, y, z, c, s2_approx, threads, is_print);
   int128_t phi = s1 + s2;
-  int128_t sum = phi + pi_y - 1 - p2;
+  int128_t pix = phi + pi_y - 1 - p2;
 
-  return sum;
+  verify_pix("pi_deleglise_rivat_128", x, pix, Lix);
+
+  return pix;
 }
 
 #endif
