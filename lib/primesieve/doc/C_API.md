@@ -162,7 +162,7 @@ int main(void)
 ## ```primesieve_prev_prime()```
 
 Before using ```primesieve_prev_prime()``` you must first change the start number using the
-```primesieve_jump_to()``` function (because the start number is initialized to 0 be default).
+```primesieve_jump_to()``` function (because the start number is initialized to 0 by default).
 
 * Please note that the first ```primesieve_prev_prime()``` call returns the first prime ≤ start
   number. If want to generate primes < start number you need to use e.g. ```primesieve_jump_to(iter, start-1, stop)```.
@@ -330,7 +330,7 @@ int main(void)
 ## ```primesieve_iterator.is_error```
 
 For the ```primesieve_iterator```, you can check if the return value of ```primesieve_next_prime()```
-is ```PRIMESIEVE_ERROR``` to know if an error occured. However, ```primesieve_iterator``` also supports
+is ```PRIMESIEVE_ERROR``` to know if an error occurred. However, ```primesieve_iterator``` also supports
 a 2nd option for error handling: by default ```primesieve_iterator.is_error``` is initialized to 0 in
 ```primesieve_init()```, if any error occurs ```primesieve_iterator.is_error``` is set to 1.
 This is useful to check after a computation that no error has occurred, this way you don't have to
