@@ -1,6 +1,7 @@
-Changes in primecount-7.20, 2025-07-08
+Changes in primecount-7.20, 2025-10-27
 
 * CMakeLists.txt: Support building libprimecount.dll using MinGW.
+* ci.yml: Add WebAssembly/Emscripten test.
 * pi_gourdon.cpp: Quickly verify pi(x) results.
 * pi_deleglise_rivat.cpp: Quickly verify pi(x) results.
 * pi_lmo_parallel.cpp: Quickly verify pi(x) results.

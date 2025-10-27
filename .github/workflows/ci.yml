@@ -307,6 +307,36 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  linux_emscripten:
+    strategy:
+      matrix:
+        platform: ['ubuntu-latest']
+        config: ['Debug', 'Release']
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Emscripten SDK
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+          source ./emsdk_env.sh
+          echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
+      - name: Configure (CMake)
+        run: |
+          mkdir build
+          cd build
+          emcmake cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-O2 -Wall -Wextra -pedantic -Werror"
+      - name: Build (emmake make)
+        run: |
+          cd build
+          emmake make -j2
+      - name: primecount --test
+        run: |
+          cd build
+          node ./primecount.js --test
+
   macos_clang:
     strategy:
       matrix:
