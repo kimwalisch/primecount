@@ -311,7 +311,7 @@ jobs:
     strategy:
       matrix:
         platform: ['ubuntu-latest']
-        config: ['Debug', 'Release']
+        config: ['Release']
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -326,7 +326,7 @@ jobs:
           source $GITHUB_WORKSPACE/emsdk/emsdk_env.sh
           mkdir build
           cd build
-          emcmake cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-O2 -Wall -Wextra -pedantic -Werror"
+          emcmake cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
       - name: Build (emmake make)
         run: |
           source $GITHUB_WORKSPACE/emsdk/emsdk_env.sh
