@@ -321,19 +321,20 @@ jobs:
           cd emsdk
           ./emsdk install latest
           ./emsdk activate latest
-          source ./emsdk_env.sh
-          echo "source $(pwd)/emsdk_env.sh" >> $GITHUB_ENV
       - name: Configure (CMake)
         run: |
+          source $GITHUB_WORKSPACE/emsdk/emsdk_env.sh
           mkdir build
           cd build
           emcmake cmake .. -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-O2 -Wall -Wextra -pedantic -Werror"
       - name: Build (emmake make)
         run: |
+          source $GITHUB_WORKSPACE/emsdk/emsdk_env.sh
           cd build
           emmake make -j2
       - name: primecount --test
         run: |
+          source $GITHUB_WORKSPACE/emsdk/emsdk_env.sh
           cd build
           node ./primecount.js --test
 
