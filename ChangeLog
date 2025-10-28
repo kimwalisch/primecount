@@ -1,7 +1,6 @@
-Changes in primecount-7.20, 2025-10-27
+Changes in primecount-7.20, 2025-10-28
 
 * CMakeLists.txt: Support building libprimecount.dll using MinGW.
-* ci.yml: Add WebAssembly/Emscripten test.
 * pi_gourdon.cpp: Quickly verify pi(x) results.
 * pi_deleglise_rivat.cpp: Quickly verify pi(x) results.
 * pi_lmo_parallel.cpp: Quickly verify pi(x) results.
@@ -9,6 +8,8 @@ Changes in primecount-7.20, 2025-10-27
 * doc/Easy-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Hard-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Partial-Sieve-Function.pdf: Converted Markdown to LaTeX.
+* ci.yml: Add WebAssembly/Emscripten test.
+* BUILD.md: Add WebAssembly/Emscripten build instructions.
 * README.md: Updated Algorithms section.
 
 Changes in primecount-7.19, 2025-06-04
