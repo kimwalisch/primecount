@@ -1,6 +1,19 @@
 # primecount build instructions
 
-## Prerequisites
+# Contents
+
+* [Prerequisites](#prerequisites)
+* [Linux & Unix-like OSes](#linux--unix-like-oses)
+* [macOS](#macos)
+* [MinGW/MSYS2 (Windows)](#mingwmsys2-windows)
+* [Microsoft Visual C++](#microsoft-visual-c)
+* [Emscripten/WebAssembly](#emscriptenwebassembly)
+* [Run the tests](#run-the-tests)
+* [CMake configure options](#cmake-configure-options)
+* [Packaging primecount](#packaging-primecount)
+* [Man page regeneration](#man-page-regeneration)
+
+# Prerequisites
 
 You need to have installed a C++ compiler which supports C++11 (or later) and CMake ≥ 3.4.
 
@@ -27,7 +40,7 @@ You need to have installed a C++ compiler which supports C++11 (or later) and CM
     </tr>
 </table>
 
-## Linux & Unix-like OSes
+# Linux & Unix-like OSes
 
 Open a terminal, cd into the primecount directory and run:
 
@@ -38,7 +51,7 @@ sudo cmake --install .
 sudo ldconfig
 ```
 
-## macOS
+# macOS
 
 On macOS the default AppleClang C/C++ compiler can be installed using
 ```xcode-select --install```. If you have installed the [homebrew package
@@ -55,7 +68,7 @@ cmake --build . --parallel
 sudo cmake --install .
 ```
 
-## MinGW/MSYS2 (Windows)
+# MinGW/MSYS2 (Windows)
 
 Open a terminal, cd into the primecount directory and run:
 
@@ -64,7 +77,7 @@ cmake -G "Unix Makefiles" .
 cmake --build . --parallel
 ```
 
-## Microsoft Visual C++
+# Microsoft Visual C++
 
 First install [Visual Studio](https://visualstudio.microsoft.com/downloads/)
 (includes CMake) on your Windows PC. Then go to the start menu, select Visual
@@ -80,7 +93,29 @@ cmake --build . --config Release
 cmake --install . --config Release
 ```
 
-## Run the tests
+# Emscripten/WebAssembly
+
+Using the Emscripten compiler you can compile the primecount C/C++ library to WebAssembly:
+
+```bash
+# Install the Emscripten compiler
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source emsdk_env.sh
+
+# Compile primecount to WebAssembly
+git clone https://github.com/kimwalisch/primecount.git
+cd primecount
+emcmake cmake .
+emmake make -j4
+
+# Run the primecount WebAssembly binary
+node ./primecount.js 1e15 --status
+```
+
+# Run the tests
 
 Open a terminal, cd into the primecount directory and run:
 
@@ -95,7 +130,7 @@ For developers hacking on primecount's source code the
 about primecount testing such as testing in debug mode and testing
 using GCC/Clang sanitizers.
 
-## CMake configure options
+# CMake configure options
 
 By default the primecount binary, the static libprimecount and
 libprimesieve will be built. The build options can be modified at
@@ -117,7 +152,7 @@ option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases pr
 option(WITH_JEMALLOC        "Use jemalloc allocator"                OFF)
 ```
 
-## Packaging primecount
+# Packaging primecount
 
 When packaging primecount for e.g. a Linux distro it is best to change
 a few of the default options.
@@ -136,7 +171,7 @@ libprimecount using:
 
 * ```cmake . -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF```
 
-## Man page regeneration
+# Man page regeneration
 
 primecount includes an up to date man page at ```doc/primecount.1```.
 That man page has been generated from ```doc/primecount.txt``` using
