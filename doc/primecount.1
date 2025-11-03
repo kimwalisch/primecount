@@ -208,7 +208,7 @@ Compute the 7 Sigma formulas\&.
 .sp
 The alpha_y and alpha_z tuning factors mainly balance the computation of the A, B, C and D formulas\&. When alpha_y is decreased and alpha_z is increased, the runtime of the B formula increases, while the runtime of the A, C and D formulas decrease\&. By default, primecount automatically selects alpha_y and alpha_z tuning factors that are likely to provide the best performance for the user\(cqs input\&.
 .sp
-Both the alpha_y and alpha_z tuning factors are also very useful for double checking pi(x) computations\&. You compute pi(x) twice but for the second computation you use a slightly different alpha_y or alpha_z factor\&. If the results of both pi(x) computations match then pi(x) has been verified successfully\&.
+Both the alpha_y and alpha_z tuning factors are also very useful for double checking pi(x) computations\&. You compute pi(x) twice but for the second computation you use slightly different alpha_y and/or alpha_z tuning factors\&. If the results of both pi(x) computations match then pi(x) has been verified successfully\&.
 .PP
 \fB\-\-alpha\-y\fR=\fINUM\fR
 .RS 4

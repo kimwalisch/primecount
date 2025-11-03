@@ -146,7 +146,7 @@ the user's input.
 
 Both the alpha_y and alpha_z tuning factors are also very useful for double
 checking pi(x) computations. You compute pi(x) twice but for the second
-computation you use a slightly different alpha_y or alpha_z factor.
+computation you use slightly different alpha_y and/or alpha_z tuning factors.
 If the results of both pi(x) computations match then pi(x) has been verified
 successfully.
 
