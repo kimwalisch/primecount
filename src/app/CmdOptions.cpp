@@ -231,6 +231,7 @@ CmdOptions parseOptions(int argc, char* argv[])
     { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
     { "--deleglise-rivat-128", std::make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
+    { "--double-check", std::make_pair(OPTION_DOUBLE_CHECK, NO_PARAM) },
     { "-g", std::make_pair(OPTION_GOURDON, NO_PARAM) },
     { "--gourdon", std::make_pair(OPTION_GOURDON, NO_PARAM) },
     { "--gourdon-64", std::make_pair(OPTION_GOURDON_64, NO_PARAM) },
@@ -279,7 +280,6 @@ CmdOptions parseOptions(int argc, char* argv[])
     { "--time", std::make_pair(OPTION_TIME, NO_PARAM) },
     { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
     { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-    { "--double-check", std::make_pair(OPTION_DOUBLE_CHECK, NO_PARAM) },
     { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
     { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
   };
@@ -297,13 +297,13 @@ CmdOptions parseOptions(int argc, char* argv[])
       case OPTION_ALPHA:        set_alpha(opt.to<double>()); break;
       case OPTION_ALPHA_Y:      set_alpha_y(opt.to<double>()); break;
       case OPTION_ALPHA_Z:      set_alpha_z(opt.to<double>()); break;
-      case OPTION_NUMBER:       numbers.push_back(opt.to<maxint_t>()); break;
-      case OPTION_THREADS:      set_num_threads(opt.to<int>()); break;
-      case OPTION_HELP:         help(/* exitCode */ 0); break;
-      case OPTION_STATUS:       opts.optionStatus(opt); break;
-      case OPTION_TIME:         opts.time = true; break;
-      case OPTION_TEST:         test(); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
+      case OPTION_HELP:         help(/* exitCode */ 0); break;
+      case OPTION_NUMBER:       numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_STATUS:       opts.optionStatus(opt); break;
+      case OPTION_TEST:         test(); break;
+      case OPTION_THREADS:      set_num_threads(opt.to<int>()); break;
+      case OPTION_TIME:         opts.time = true; break;
       case OPTION_VERSION:      version(); break;
       default:                  opts.setMainOption(optionID, opt.str);
     }
