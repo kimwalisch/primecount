@@ -141,7 +141,7 @@ void primecount_set_num_threads(int num_threads);
  * it is highly unlikely that both pi(x) computations would
  * produce the same (incorrect) result.
  */
-void primecount_set_verify_computation(bool enable);
+void primecount_set_double_check(bool enable);
 
 /* Get the primecount version number, in the form “i.j” */
 const char* primecount_version(void);

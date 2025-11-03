@@ -130,7 +130,7 @@ void set_num_threads(int num_threads);
 /// it is highly unlikely that both pi(x) computations would
 /// produce the same (incorrect) result.
 ///
-void set_verify_computation(bool enable);
+void set_double_check(bool enable);
 
 /// Get the primecount version number, in the form “i.j”
 std::string primecount_version();
