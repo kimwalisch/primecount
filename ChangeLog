@@ -5,6 +5,7 @@ Changes in primecount-7.20, 2025-11-03
 * pi_deleglise_rivat.cpp: Quickly verify pi(x) results.
 * pi_lmo_parallel.cpp: Quickly verify pi(x) results.
 * CmdOptions.cpp: Add --double-check option.
+* build_mingw64_arm64.sh: Enable ARM SVE for Mingw-w64 on ARM64.
 * doc/Easy-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Hard-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Partial-Sieve-Function.pdf: Converted Markdown to LaTeX.
