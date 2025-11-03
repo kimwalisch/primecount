@@ -77,9 +77,9 @@ strip primecount.exe
 git checkout ..
 
 # Create a release zip archive
-wget https://github.com/kimwalisch/primecount/releases/download/v7.11/primecount-7.11-win-arm64.zip
-unzip primecount-7.11-win-arm64.zip -d primecount-$VERSION-win-arm64
-rm primecount-7.11-win-arm64.zip
+wget https://github.com/kimwalisch/primecount/releases/download/v7.20/primecount-7.20-win-arm64.zip
+unzip primecount-7.20-win-arm64.zip -d primecount-$VERSION-win-arm64
+rm primecount-7.20-win-arm64.zip
 
 echo ""
 echo ""
