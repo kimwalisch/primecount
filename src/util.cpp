@@ -47,7 +47,7 @@ double alpha_z_ = -1;
 /// it is highly unlikely that both pi(x) computations would
 /// produce the same (incorrect) result.
 ///
-bool verify_computation_ = false;
+bool double_check_ = false;
 
 /// Truncate a floating point number to 3 digits after the decimal
 /// point. This function is used limit the number of digits after
@@ -172,9 +172,9 @@ double get_time()
   return (double) micro.count() / 1e6;
 }
 
-void set_verify_computation(bool enable)
+void set_double_check(bool enable)
 {
-  verify_computation_ = enable;
+  double_check_ = enable;
 }
 
 void set_alpha(double alpha)
@@ -279,7 +279,7 @@ double get_alpha_lmo(maxint_t x)
 
   // Recompute pi(x) with alternative alpha tuning
   // factor(s) to verify the first result.
-  if (verify_computation_)
+  if (double_check_)
     alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
@@ -327,7 +327,7 @@ double get_alpha_deleglise_rivat(maxint_t x)
 
   // Recompute pi(x) with alternative alpha tuning
   // factor(s) to verify the first result.
-  if (verify_computation_)
+  if (double_check_)
     alpha *= 0.97;
 
   // Preserve 3 digits after decimal point
@@ -407,8 +407,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
   }
 
-  // --verify option for second pi(x) computation
-  if (verify_computation_)
+  // --double-check option for second pi(x) computation
+  if (double_check_)
   {
     alpha_z = max(1.0, alpha_z * 1.02);
     alpha_yz = max(1.0, alpha_yz * 0.97);

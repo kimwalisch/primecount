@@ -279,7 +279,7 @@ CmdOptions parseOptions(int argc, char* argv[])
     { "--time", std::make_pair(OPTION_TIME, NO_PARAM) },
     { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
     { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
-    { "--verify", std::make_pair(OPTION_VERIFY, NO_PARAM) },
+    { "--double-check", std::make_pair(OPTION_DOUBLE_CHECK, NO_PARAM) },
     { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
     { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
   };
@@ -294,18 +294,18 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionID)
     {
-      case OPTION_ALPHA:   set_alpha(opt.to<double>()); break;
-      case OPTION_ALPHA_Y: set_alpha_y(opt.to<double>()); break;
-      case OPTION_ALPHA_Z: set_alpha_z(opt.to<double>()); break;
-      case OPTION_NUMBER:  numbers.push_back(opt.to<maxint_t>()); break;
-      case OPTION_THREADS: set_num_threads(opt.to<int>()); break;
-      case OPTION_HELP:    help(/* exitCode */ 0); break;
-      case OPTION_STATUS:  opts.optionStatus(opt); break;
-      case OPTION_TIME:    opts.time = true; break;
-      case OPTION_TEST:    test(); break;
-      case OPTION_VERIFY:  set_verify_computation(true); break;
-      case OPTION_VERSION: version(); break;
-      default:             opts.setMainOption(optionID, opt.str);
+      case OPTION_ALPHA:        set_alpha(opt.to<double>()); break;
+      case OPTION_ALPHA_Y:      set_alpha_y(opt.to<double>()); break;
+      case OPTION_ALPHA_Z:      set_alpha_z(opt.to<double>()); break;
+      case OPTION_NUMBER:       numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_THREADS:      set_num_threads(opt.to<int>()); break;
+      case OPTION_HELP:         help(/* exitCode */ 0); break;
+      case OPTION_STATUS:       opts.optionStatus(opt); break;
+      case OPTION_TIME:         opts.time = true; break;
+      case OPTION_TEST:         test(); break;
+      case OPTION_DOUBLE_CHECK: set_double_check(true); break;
+      case OPTION_VERSION:      version(); break;
+      default:                  opts.setMainOption(optionID, opt.str);
     }
   }
 

@@ -25,7 +25,7 @@ important to verify such computations to protect against miscalculations due
 to hardware errors and/or bugs in primecount.
 
 To verify a $\pi(x)$ computation, you compute $\pi(x)$ twice. But for the second
-run you use the `--verify` option. The `--verify` option enables the use of
+run you use the `--double-check` option. The `--double-check` option enables the use of
 alternative alpha tuning factors, ensuring that all internal bounds in the
 second computation differ slightly from the first run. This redundancy helps
 guard against potential bugs in primecount: if an error exists, it is highly
@@ -37,7 +37,7 @@ result.
 $ primecount 1e20 --status
 
 # Second pi(x) computation using alternative alpha tuning factors
-$ primecount 1e20 --status --verify
+$ primecount 1e20 --status --double-check
 ```
 
 # [A006880](https://oeis.org/A006880) records

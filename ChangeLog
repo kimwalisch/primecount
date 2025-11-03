@@ -1,10 +1,10 @@
-Changes in primecount-7.20, 2025-10-28
+Changes in primecount-7.20, 2025-11-03
 
 * CMakeLists.txt: Support building libprimecount.dll using MinGW.
 * pi_gourdon.cpp: Quickly verify pi(x) results.
 * pi_deleglise_rivat.cpp: Quickly verify pi(x) results.
 * pi_lmo_parallel.cpp: Quickly verify pi(x) results.
-* CmdOptions.cpp: Add --verify option.
+* CmdOptions.cpp: Add --double-check option.
 * doc/Easy-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Hard-Special-Leaves.pdf: Converted Markdown to LaTeX.
 * doc/Partial-Sieve-Function.pdf: Converted Markdown to LaTeX.

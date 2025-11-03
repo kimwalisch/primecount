@@ -94,6 +94,8 @@ Count the number of primes less than or equal to x (<= 10^31).
 Options:
 
   -d, --deleglise-rivat    Count primes using the Deleglise-Rivat algorithm
+      --double-check       Recompute pi(x) with alternative alpha tuning
+                           factor(s) to verify the first result.
   -g, --gourdon            Count primes using Xavier Gourdon's algorithm.
                            This is the default algorithm.
   -l, --legendre           Count primes using Legendre's formula
@@ -114,8 +116,6 @@ Options:
       --time               Print the time elapsed in seconds
   -t, --threads=NUM        Set the number of threads, 1 <= NUM <= CPU cores.
                            By default primecount uses all available CPU cores.
-      --verify             Recompute pi(x) with alternative alpha tuning
-                           factor(s) to verify the first result.
   -v, --version            Print version and license information
   -h, --help               Print this help menu
 ```

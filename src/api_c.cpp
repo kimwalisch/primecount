@@ -174,15 +174,15 @@ void primecount_set_num_threads(int threads)
   }
 }
 
-void primecount_set_verify_computation(bool enable)
+void primecount_set_double_check(bool enable)
 {
   try
   {
-    primecount::set_verify_computation(enable);
+    primecount::set_double_check(enable);
   }
   catch(const std::exception& e)
   {
-    std::cerr << "primecount_set_verify_computation: " << e.what() << std::endl;
+    std::cerr << "primecount_set_double_check: " << e.what() << std::endl;
   }
 }
 
