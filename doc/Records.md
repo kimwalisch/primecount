@@ -18,16 +18,16 @@ PC/server. You can use the primecount app together with the
 [Unix ```tee``` command](https://en.wikipedia.org/wiki/Tee_(command)) to store intermediate results in a
 log file.
 
-# Verifying $\pi(x)$ computations
+# Double checking $\pi(x)$ computations
 
 For large $\pi(x)$ computations that run over several weeks or months, it is
 important to verify such computations to protect against miscalculations due
 to hardware errors and/or bugs in primecount.
 
 To verify a $\pi(x)$ computation, you compute $\pi(x)$ twice. But for the second
-run you use the `--double-check` option. The `--double-check` option enables the use of
-alternative alpha tuning factors, ensuring that all internal bounds in the
-second computation differ slightly from the first run. This redundancy helps
+run you use the `--double-check` option. The `--double-check` option enables the
+use of alternative alpha tuning factors, ensuring that all internal bounds in
+the second computation differ slightly from the first run. This redundancy helps
 guard against potential bugs in primecount: if an error exists, it is highly
 unlikely that both $\pi(x)$ computations would produce the same (incorrect)
 result.
