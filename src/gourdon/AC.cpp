@@ -150,7 +150,8 @@ T C2(T x,
      uint64_t b,
      const Primes& primes,
      const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
+     const SegmentedPiTable& segmentedPi,
+     uint64_t& clustered_loop_threshold)
 {
   T sum = 0;
 
@@ -165,20 +166,36 @@ T C2(T x,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // Find all clustered easy leaves where
-  // successive leaves are identical.
-  // pq = primes[b] * primes[i]
-  // Which satisfy: low <= x / pq < high && q <= y && pq > z
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  while (i > pi_min_clustered)
+  // The loop for computing clustered easy leaves (where
+  // successive leaves are identical) is only beneficial if
+  // many successive leaves are identical. If on average only
+  // few successive leaves are identical then this loop
+  // deteriorates performance due to poor instruction level
+  // parallelism and long instruction dependency chains.
+  if (clustered_loop_threshold >= 4 &&
+      i > pi_min_clustered)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    uint64_t pi_xpq = segmentedPi[xpq];
-    uint64_t phi_xpq = pi_xpq - b + 2;
-    uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
-    uint64_t imin = pi[max(xpq2, min_clustered)];
-    sum += phi_xpq * (i - imin);
-    i = imin;
+    uint64_t iters = i - pi_min_clustered;
+    uint64_t iters_clustered = 0;
+
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // pq = primes[b] * primes[i]
+    // Which satisfy: low <= x / pq < high && q <= y && pq > z
+    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+    while (i > pi_min_clustered)
+    {
+      uint64_t xpq = fast_div64(xp, primes[i]);
+      uint64_t pi_xpq = segmentedPi[xpq];
+      uint64_t phi_xpq = pi_xpq - b + 2;
+      uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
+      uint64_t imin = pi[max(xpq2, min_clustered)];
+      sum += phi_xpq * (i - imin);
+      iters_clustered += 1;
+      i = imin;
+    }
+
+    clustered_loop_threshold = iters / iters_clustered;
   }
 
   // Find all sparse easy leaves where
@@ -307,10 +324,11 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
+        uint64_t clustered_loop_threshold = pstd::numeric_limits<uint64_t>::max();
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
-          sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
+          sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi, clustered_loop_threshold);
 
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)

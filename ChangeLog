@@ -1,3 +1,8 @@
+Changes in primecount-7.21, 2025-11-20
+
+* AC.cpp: Improved instruction level parallelism.
+* AC_libdivide.cpp: Improved instruction level parallelism.
+
 Changes in primecount-7.20, 2025-11-03
 
 * CMakeLists.txt: Support building libprimecount.dll using MinGW.
