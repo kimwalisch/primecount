@@ -175,8 +175,8 @@ T C2(T x,
   if (clustered_loop_threshold >= 4 &&
       i > pi_min_clustered)
   {
-    uint64_t iters = 0;
-    uint64_t iters_clustered = 0;
+    uint64_t iters_ordinary = 0;
+    uint64_t iters_clustered = i - pi_min_clustered;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
@@ -191,12 +191,11 @@ T C2(T x,
       uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
       uint64_t imin = pi[max(xpq2, min_clustered)];
       sum += phi_xpq * (i - imin);
-      iters += i - imin;
-      iters_clustered += 1;
+      iters_ordinary += i - imin;
       i = imin;
     }
 
-    clustered_loop_threshold = iters / iters_clustered;
+    clustered_loop_threshold = iters_ordinary / iters_clustered;
   }
 
   // Find all sparse easy leaves where
