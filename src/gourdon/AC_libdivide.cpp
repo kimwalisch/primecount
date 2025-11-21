@@ -204,7 +204,7 @@ T C2_64(T xlow,
         const LibdividePrimes& primes,
         const PiTable& pi,
         const SegmentedPiTable& segmentedPi,
-        uint64_t& clustered_loop_threshold)
+        uint64_t& avg_clustered_leaves)
 {
   T sum = 0;
 
@@ -223,7 +223,7 @@ T C2_64(T xlow,
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
   // parallelism and long instruction dependency chains.
-  if (clustered_loop_threshold >= 4 &&
+  if (avg_clustered_leaves >= 4 &&
       i > pi_min_clustered)
   {
     uint64_t iters = i - pi_min_clustered;
@@ -246,7 +246,7 @@ T C2_64(T xlow,
       i = imin;
     }
 
-    clustered_loop_threshold = iters / iters_clustered;
+    avg_clustered_leaves = iters / iters_clustered;
   }
 
   // Find all sparse easy leaves where
@@ -278,7 +278,7 @@ T C2_128(T xlow,
          const Primes& primes,
          const PiTable& pi,
          const SegmentedPiTable& segmentedPi,
-         uint64_t& clustered_loop_threshold)
+         uint64_t& avg_clustered_leaves)
 {
   T sum = 0;
 
@@ -298,7 +298,7 @@ T C2_128(T xlow,
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
   // parallelism and long instruction dependency chains.
-  if (clustered_loop_threshold >= 4 &&
+  if (avg_clustered_leaves >= 4 &&
       i > pi_min_clustered)
   {
     uint64_t iters = i - pi_min_clustered;
@@ -321,7 +321,7 @@ T C2_128(T xlow,
       i = imin;
     }
 
-    clustered_loop_threshold = iters / iters_clustered;
+    avg_clustered_leaves = iters / iters_clustered;
   }
 
   // Find all sparse easy leaves where
@@ -456,7 +456,7 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        uint64_t clustered_loop_threshold = pstd::numeric_limits<uint64_t>::max();
+        uint64_t avg_clustered_leaves = pstd::numeric_limits<uint64_t>::max();
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
@@ -465,9 +465,9 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, clustered_loop_threshold);
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, avg_clustered_leaves);
           else
-            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, clustered_loop_threshold);
+            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]

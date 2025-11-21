@@ -151,7 +151,7 @@ T C2(T x,
      const Primes& primes,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi,
-     uint64_t& clustered_loop_threshold)
+     uint64_t& avg_clustered_leaves)
 {
   T sum = 0;
 
@@ -172,7 +172,7 @@ T C2(T x,
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
   // parallelism and long instruction dependency chains.
-  if (clustered_loop_threshold >= 4 &&
+  if (avg_clustered_leaves >= 4 &&
       i > pi_min_clustered)
   {
     uint64_t iters = i - pi_min_clustered;
@@ -195,7 +195,7 @@ T C2(T x,
       i = imin;
     }
 
-    clustered_loop_threshold = iters / iters_clustered;
+    avg_clustered_leaves = iters / iters_clustered;
   }
 
   // Find all sparse easy leaves where
@@ -324,11 +324,11 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        uint64_t clustered_loop_threshold = pstd::numeric_limits<uint64_t>::max();
+        uint64_t avg_clustered_leaves = pstd::numeric_limits<uint64_t>::max();
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
-          sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi, clustered_loop_threshold);
+          sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
 
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)
