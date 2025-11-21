@@ -175,8 +175,8 @@ T C2(T x,
   if (avg_clustered_leaves >= 4 &&
       i > pi_min_clustered)
   {
-    uint64_t iters = i - pi_min_clustered;
-    uint64_t iters_clustered = 0;
+    uint64_t iters = 0;
+    uint64_t start_i = i;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
@@ -189,13 +189,14 @@ T C2(T x,
       uint64_t pi_xpq = segmentedPi[xpq];
       uint64_t phi_xpq = pi_xpq - b + 2;
       uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
-      uint64_t imin = pi[max(xpq2, min_clustered)];
+      uint64_t imin = pi[max(xpq2, min_m)];
       sum += phi_xpq * (i - imin);
-      iters_clustered += 1;
+      iters += 1;
       i = imin;
     }
 
-    avg_clustered_leaves = iters / iters_clustered;
+    uint64_t dist = start_i - i;
+    avg_clustered_leaves = dist / iters;
   }
 
   // Find all sparse easy leaves where
