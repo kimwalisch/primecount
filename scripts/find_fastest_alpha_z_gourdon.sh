@@ -124,7 +124,7 @@ function minimum
 # $1: primecount args
 function get_primecount_alpha_z
 {
-    alpha_z=4
+    alpha_z=3
     echo $alpha_z
 }
 
