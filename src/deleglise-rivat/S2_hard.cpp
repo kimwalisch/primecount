@@ -55,14 +55,14 @@ namespace {
 /// [low, low + segment_size * segments[.
 ///
 template <typename T, typename Primes, typename FactorTable>
-NOINLINE T S2_hard_thread(T x,
-                          int64_t y,
-                          int64_t z,
-                          int64_t c,
-                          const Primes& primes,
-                          const PiTable& pi,
-                          const FactorTable& factor,
-                          ThreadData& thread)
+T S2_hard_thread(T x,
+                 int64_t y,
+                 int64_t z,
+                 int64_t c,
+                 const Primes& primes,
+                 const PiTable& pi,
+                 const FactorTable& factor,
+                 ThreadData& thread)
 {
   T sum = 0;
 
