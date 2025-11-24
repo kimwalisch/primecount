@@ -56,16 +56,16 @@ template <typename T, typename Primes, typename FactorTableD>
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   __attribute__ ((target ("avx512f,avx512vpopcntdq")))
 #endif
-T D_thread(T x,
-           int64_t x_star,
-           int64_t xz,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           const Primes& primes,
-           const PiTable& pi,
-           const FactorTableD& factor,
-           ThreadData& thread)
+NOINLINE T D_thread(T x,
+                    int64_t x_star,
+                    int64_t xz,
+                    int64_t y,
+                    int64_t z,
+                    int64_t k,
+                    const Primes& primes,
+                    const PiTable& pi,
+                    const FactorTableD& factor,
+                    ThreadData& thread)
 {
   T sum = 0;
 
