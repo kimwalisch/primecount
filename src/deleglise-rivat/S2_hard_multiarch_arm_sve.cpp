@@ -55,14 +55,14 @@ template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("arch=armv8-a+sve")))
 #endif
-T S2_hard_thread(T x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 const Primes& primes,
-                 const PiTable& pi,
-                 const FactorTable& factor,
-                 ThreadData& thread)
+NOINLINE T S2_hard_thread(T x,
+                          int64_t y,
+                          int64_t z,
+                          int64_t c,
+                          const Primes& primes,
+                          const PiTable& pi,
+                          const FactorTable& factor,
+                          ThreadData& thread)
 {
   T sum = 0;
 
