@@ -1,9 +1,7 @@
-Changes in primecount-7.21, 2025-11-24
+Changes in primecount-7.21, 2025-11-20
 
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.
-* Annotate D_thread() using NOLINE to improve -march=native perf.
-* Annotate S2_hard_thread() using NOLINE to improve -march=native perf.
 
 Changes in primecount-7.20, 2025-11-03
 
