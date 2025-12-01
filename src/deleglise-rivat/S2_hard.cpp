@@ -39,6 +39,7 @@
 #include <S.hpp>
 
 #include <stdint.h>
+#include <utility>
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
@@ -419,25 +420,18 @@ T S2_hard_thread_arm_sve(T x,
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
 ///
-template <typename T, typename Primes, typename FactorTable>
-T S2_hard_thread(T x,
-                 int64_t y,
-                 int64_t z,
-                 int64_t c,
-                 const Primes& primes,
-                 const PiTable& pi,
-                 const FactorTable& factor,
-                 ThreadData& thread)
+template <typename T, typename... Args>
+T S2_hard_thread(Args&&... args)
 {
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
-      return S2_hard_thread_avx512(x, y, z, c, primes, pi, factor, thread);
+      return S2_hard_thread_avx512<T>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      return S2_hard_thread_arm_sve(x, y, z, c, primes, pi, factor, thread);
+      return S2_hard_thread_arm_sve<T>(std::forward<Args>(args)...);
   #endif
 
-  return S2_hard_thread_default(x, y, z, c, primes, pi, factor, thread);
+  return S2_hard_thread_default<T>(std::forward<Args>(args)...);
 }
 
 /// Calculate the contribution of the hard special leaves.
@@ -491,7 +485,7 @@ T S2_hard_OpenMP(T x,
       using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = S2_hard_thread((UT) x, y, z, c, primes, pi, factor, thread);
+      UT sum = S2_hard_thread<UT>(x, y, z, c, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }

@@ -38,6 +38,7 @@
 #include <S.hpp>
 
 #include <stdint.h>
+#include <utility>
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
@@ -379,25 +380,18 @@ int64_t S2_thread_arm_sve(int64_t x,
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
 ///
-int64_t S2_thread(int64_t x,
-                  int64_t y,
-                  int64_t z,
-                  int64_t c,
-                  const PiTable& pi,
-                  const Vector<uint32_t>& primes,
-                  const Vector<int32_t>& lpf,
-                  const Vector<int32_t>& mu,
-                  ThreadData& thread)
+template <typename... Args>
+int64_t S2_thread(Args&&... args)
 {
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
-      return S2_thread_avx512(x, y, z, c, pi, primes, lpf, mu, thread);
+      return S2_thread_avx512(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      return S2_thread_arm_sve(x, y, z, c, pi, primes, lpf, mu, thread);
+      return S2_thread_arm_sve(std::forward<Args>(args)...);
   #endif
 
-  return S2_thread_default(x, y, z, c, pi, primes, lpf, mu, thread);
+  return S2_thread_default(std::forward<Args>(args)...);
 }
 
 /// Calculate the contribution of thes pecial leaves.

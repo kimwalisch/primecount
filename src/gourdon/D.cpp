@@ -37,6 +37,7 @@
 #include <print.hpp>
 
 #include <stdint.h>
+#include <utility>
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
@@ -432,27 +433,18 @@ T D_thread_arm_sve(T x,
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
 ///
-template <typename T, typename Primes, typename FactorTableD>
-T D_thread(T x,
-           int64_t x_star,
-           int64_t xz,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           const Primes& primes,
-           const PiTable& pi,
-           const FactorTableD& factor,
-           ThreadData& thread)
+template <typename T, typename... Args>
+T D_thread(Args&&... args)
 {
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
-      return D_thread_avx512(x, x_star, xz, y, z, k, primes, pi, factor, thread);
+      return D_thread_avx512<T>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      return D_thread_arm_sve(x, x_star, xz, y, z, k, primes, pi, factor, thread);
+      return D_thread_arm_sve<T>(std::forward<Args>(args)...);
   #endif
 
-  return D_thread_default(x, x_star, xz, y, z, k, primes, pi, factor, thread);
+  return D_thread_default<T>(std::forward<Args>(args)...);
 }
 
 /// Calculate the contribution of the hard special leaves.
@@ -507,7 +499,7 @@ T D_OpenMP(T x,
       using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);
+      UT sum = D_thread<UT>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }
