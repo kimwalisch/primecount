@@ -6,9 +6,7 @@
 :: include all MMX, SSE, POPCNT, BMI, BMI2, AVX, AVX and AVX512 headers.
 
 del /Q ..\src\deleglise-rivat\S2_easy.cpp
-del /Q ..\src\deleglise-rivat\S2_hard_multiarch_arm_sve.cpp
 del /Q ..\src\gourdon\AC.cpp
-del /Q ..\src\gourdon\D_multiarch_arm_sve.cpp
 
 mkdir primesieve
 cd primesieve

@@ -49,9 +49,7 @@ mkdir build-release-arm64
 cd build-release-arm64
 
 rm ../src/deleglise-rivat/S2_easy.cpp
-rm ../src/deleglise-rivat/S2_hard_multiarch_avx512.cpp
 rm ../src/gourdon/AC.cpp
-rm ../src/gourdon/D_multiarch_avx512.cpp
 
 mkdir build_primesieve
 cd build_primesieve
