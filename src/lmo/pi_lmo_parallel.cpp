@@ -366,6 +366,9 @@ int64_t S2_thread_arm_sve(int64_t x,
 
 #endif
 
+/// Runtime dispatch to highly optimized SIMD algorithm if the CPU
+/// supports the required instruction set.
+///
 int64_t S2_thread(int64_t x,
                   int64_t y,
                   int64_t z,

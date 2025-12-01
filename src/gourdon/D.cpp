@@ -419,6 +419,9 @@ T D_thread_arm_sve(T x,
 
 #endif
 
+/// Runtime dispatch to highly optimized SIMD algorithm if the CPU
+/// supports the required instruction set.
+///
 template <typename T, typename Primes, typename FactorTableD>
 T D_thread(T x,
            int64_t x_star,

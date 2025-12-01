@@ -406,6 +406,9 @@ T S2_hard_thread_arm_sve(T x,
 
 #endif
 
+/// Runtime dispatch to highly optimized SIMD algorithm if the CPU
+/// supports the required instruction set.
+///
 template <typename T, typename Primes, typename FactorTable>
 T S2_hard_thread(T x,
                  int64_t y,
