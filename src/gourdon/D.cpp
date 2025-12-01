@@ -434,17 +434,17 @@ T D_thread_arm_sve(T x,
 /// supports the required instruction set.
 ///
 template <typename T, typename... Args>
-T D_thread(Args&&... args)
+T D_thread(T x, Args&&... args)
 {
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
-      return D_thread_avx512<T>(std::forward<Args>(args)...);
+      return D_thread_avx512(x, std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+      return D_thread_arm_sve(x, std::forward<Args>(args)...);
   #endif
 
-  return D_thread_default<T>(std::forward<Args>(args)...);
+  return D_thread_default(x, std::forward<Args>(args)...);
 }
 
 /// Calculate the contribution of the hard special leaves.
@@ -499,7 +499,7 @@ T D_OpenMP(T x,
       using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = D_thread<UT>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
+      UT sum = D_thread((UT) x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.sum = (T) sum;
       thread.stop_time();
     }
