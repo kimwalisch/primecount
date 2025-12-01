@@ -297,7 +297,7 @@ T S2_hard_thread_avx512(T x,
 /// [low, low + segment_size * segments[.
 ///
 /// Both this function and the Sieve::count_arm_sve() function
-/// have been annotated using the same AVX512 attributes.
+/// have been annotated using the same ARM SVE attributes.
 /// This ensures that the compiler will inline
 /// Sieve::count_arm_sve(), which is important for performance.
 ///
