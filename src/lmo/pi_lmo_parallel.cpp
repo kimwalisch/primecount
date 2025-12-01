@@ -157,6 +157,11 @@ int64_t S2_thread_default(int64_t x,
 /// Compute the S2 contribution of the interval
 /// [low, low + segment_size * segments[.
 ///
+/// Both this function and the Sieve::count_avx512() function
+/// have been annotated using the same AVX512 attributes.
+/// This ensures that the compiler will inline
+/// Sieve::count_avx512(), which is important for performance.
+///
 __attribute__ ((target ("avx512f,avx512vpopcntdq")))
 int64_t S2_thread_avx512(int64_t x,
                          int64_t y,
@@ -262,6 +267,11 @@ int64_t S2_thread_avx512(int64_t x,
 
 /// Compute the S2 contribution of the interval
 /// [low, low + segment_size * segments[.
+///
+/// Both this function and the Sieve::count_arm_sve() function
+/// have been annotated using the same AVX512 attributes.
+/// This ensures that the compiler will inline
+/// Sieve::count_arm_sve(), which is important for performance.
 ///
 __attribute__ ((target ("arch=armv8-a+sve")))
 int64_t S2_thread_arm_sve(int64_t x,

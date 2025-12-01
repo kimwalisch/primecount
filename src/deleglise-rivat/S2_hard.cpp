@@ -172,6 +172,11 @@ T S2_hard_thread_default(T x,
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segment_size * segments[.
 ///
+/// Both this function and the Sieve::count_avx512() function
+/// have been annotated using the same AVX512 attributes.
+/// This ensures that the compiler will inline
+/// Sieve::count_avx512(), which is important for performance.
+///
 template <typename T, typename Primes, typename FactorTable>
 __attribute__ ((target ("avx512f,avx512vpopcntdq")))
 T S2_hard_thread_avx512(T x,
@@ -290,6 +295,11 @@ T S2_hard_thread_avx512(T x,
 /// Compute the contribution of the hard special leaves using a
 /// segmented sieve. Each thread processes the interval
 /// [low, low + segment_size * segments[.
+///
+/// Both this function and the Sieve::count_arm_sve() function
+/// have been annotated using the same AVX512 attributes.
+/// This ensures that the compiler will inline
+/// Sieve::count_arm_sve(), which is important for performance.
 ///
 template <typename T, typename Primes, typename FactorTable>
 __attribute__ ((target ("arch=armv8-a+sve")))
