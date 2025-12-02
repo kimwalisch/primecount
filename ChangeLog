@@ -1,4 +1,4 @@
-Changes in primecount-7.21, 2025-12-01
+Changes in primecount-7.21, 2025-12-02
 
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.
@@ -6,6 +6,8 @@ Changes in primecount-7.21, 2025-12-01
 * D.cpp: Refactor runtime dispatch to optimized SIMD algorithm.
 * S2_hard.cpp: Refactor runtime dispatch to optimized SIMD algorithm.
 * pi_lmo_parallel.cpp: Add support for runtime dispatch to optimized SIMD algorithm.
+* Move S2_easy_libdivide.cpp code into S2_easy.cpp.
+* Move AC_libdivide.cpp code into AC.cpp.
 
 Changes in primecount-7.20, 2025-11-03
 
