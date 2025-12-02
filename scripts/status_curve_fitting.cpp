@@ -26,11 +26,10 @@ int main()
 
   std::cout << std::endl;
   std::cout << std::endl;
- 
+
   for (double i = 0; i <= 100; i += 0.25)
     skewed_percent(i);
 
   std::cout << std::endl;
   return 0;
 }
-

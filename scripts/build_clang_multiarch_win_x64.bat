@@ -5,11 +5,6 @@
 :: C:\Program Files\LLVM\lib\clang\18\include\immintrin.h and unconditionally
 :: include all MMX, SSE, POPCNT, BMI, BMI2, AVX, AVX and AVX512 headers.
 
-del /Q ..\src\deleglise-rivat\S2_easy.cpp
-del /Q ..\src\deleglise-rivat\S2_hard_multiarch_arm_sve.cpp
-del /Q ..\src\gourdon\AC.cpp
-del /Q ..\src\gourdon\D_multiarch_arm_sve.cpp
-
 mkdir primesieve
 cd primesieve
 clang++ -c -I../../lib/primesieve/include -I../../lib/primesieve/src ^
@@ -22,7 +17,7 @@ mkdir primecount
 cd primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include ^
   -O3 -mpopcnt -fopenmp -Wall -Wextra -pedantic ^
-  -DNDEBUG -DENABLE_MULTIARCH_AVX512_VPOPCNT ^
+  -DNDEBUG -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_AVX512_VPOPCNT ^
   ../../src\*.cpp ../../src/arch/x86\*.cpp ../../src/lmo\*.cpp ^
   ../../src/deleglise-rivat\*.cpp ../../src/gourdon\*.cpp ../../src/app\*.cpp
 

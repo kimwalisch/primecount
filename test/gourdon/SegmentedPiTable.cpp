@@ -2,7 +2,7 @@
 /// @file   SegmentedPiTable.cpp
 /// @brief  Test the SegmentedPiTable class
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -44,7 +44,7 @@ int main()
   int64_t i = 0;
   int64_t low = 0;
   int64_t high = segment_size;
-  segmentedPi.init(low, high); 
+  segmentedPi.init(low, high);
 
   // Check small pi(x) values
   for (; i <= 1000; i++)

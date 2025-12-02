@@ -29,22 +29,22 @@ void check(bool OK)
 
 int main()
 {
-  static_assert(!is_comparable_int<int64_t, double>::value, 
+  static_assert(!is_comparable_int<int64_t, double>::value,
                 "is_comparable_int<int64_t, double> is broken");
 
-  static_assert(is_comparable_int<int64_t, int64_t>::value, 
+  static_assert(is_comparable_int<int64_t, int64_t>::value,
                 "is_comparable_int<int64_t, int64_t> is broken");
 
-  static_assert(is_comparable_int<uint64_t, int64_t>::value, 
+  static_assert(is_comparable_int<uint64_t, int64_t>::value,
                 "is_comparable_int<uint64_t, int64_t> is broken");
 
-  static_assert(is_comparable_int<int64_t, int8_t>::value, 
+  static_assert(is_comparable_int<int64_t, int8_t>::value,
                 "is_comparable_int<int64_t, int8_t> is broken");
 
-  static_assert(is_comparable_int<uint64_t, uint8_t>::value, 
+  static_assert(is_comparable_int<uint64_t, uint8_t>::value,
                 "is_comparable_int<uint64_t, uint8_t> is broken");
 
-  static_assert(!is_comparable_int<int8_t, int64_t>::value, 
+  static_assert(!is_comparable_int<int8_t, int64_t>::value,
                 "is_comparable_int<int8_t, int64_t> is broken");
 
   uint8_t u8_99 = 99;
@@ -80,22 +80,22 @@ int main()
 
 #if defined(HAVE_INT128_T)
 
-  static_assert(!is_comparable_int<uint128_t, double>::value, 
+  static_assert(!is_comparable_int<uint128_t, double>::value,
                 "is_comparable_int<uint128_t, double> is broken");
 
-  static_assert(is_comparable_int<int128_t, int128_t>::value, 
+  static_assert(is_comparable_int<int128_t, int128_t>::value,
                 "is_comparable_int<int128_t, int128_t> is broken");
 
-  static_assert(is_comparable_int<uint128_t, int128_t>::value, 
+  static_assert(is_comparable_int<uint128_t, int128_t>::value,
                 "is_comparable_int<uint128_t, int128_t> is broken");
 
-  static_assert(is_comparable_int<int128_t, int8_t>::value, 
+  static_assert(is_comparable_int<int128_t, int8_t>::value,
                 "is_comparable_int<int128_t, int8_t> is broken");
 
-  static_assert(is_comparable_int<uint128_t, uint8_t>::value, 
+  static_assert(is_comparable_int<uint128_t, uint8_t>::value,
                 "is_comparable_int<uint128_t, uint8_t> is broken");
 
-  static_assert(!is_comparable_int<int8_t, int128_t>::value, 
+  static_assert(!is_comparable_int<int8_t, int128_t>::value,
                 "is_comparable_int<int8_t, int128_t> is broken");
 
   int128_t i128_99 = 99;

@@ -57,7 +57,7 @@ void pre_sieve1(primecount::Vector<uint8_t>& sieve, uint64_t low)
     std::copy_n(&p[i], bytes_to_copy, &sieve[0]);
 
     // Restart copying from the beginning
-    for (i = bytes_to_copy; 
+    for (i = bytes_to_copy;
          i + pre_sieved_13.size() < sieve.size();
          i += pre_sieved_13.size())
       std::copy_n(p, pre_sieved_13.size(), &sieve[i]);
@@ -77,7 +77,7 @@ void pre_sieve2(uint8_t* __restrict sieve,
   // Bitwise AND multiple bytes per iter.
   // std::memcpy is required to avoid unaligned
   // memory accesses. All major C++ compilers
-  // will optimize away std::memcpy. 
+  // will optimize away std::memcpy.
   for (std::size_t i = 0; i < limit; i += word_size)
   {
     unsigned long long a, b;

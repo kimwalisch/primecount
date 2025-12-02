@@ -97,7 +97,7 @@ struct conditional<false, T, F> {
 };
 
 // pstd::is_integral
-template<typename T> struct is_integral {
+template <typename T> struct is_integral {
   static constexpr bool value = std::is_integral<T>::value;
 };
 
@@ -107,7 +107,7 @@ template<typename T> struct is_integral {
 #endif
 
 // pstd::is_floating_point
-template<typename T> struct is_floating_point {
+template <typename T> struct is_floating_point {
   static constexpr bool value = std::is_floating_point<T>::value;
 };
 
@@ -117,7 +117,7 @@ template<typename T> struct is_floating_point {
 #endif
 
 // pstd::is_signed
-template<typename T> struct is_signed {
+template <typename T> struct is_signed {
   static constexpr bool value = std::is_signed<T>::value;
 };
 
@@ -127,7 +127,7 @@ template<typename T> struct is_signed {
 #endif
 
 // pstd::is_unsigned
-template<typename T> struct is_unsigned {
+template <typename T> struct is_unsigned {
   static constexpr bool value = std::is_unsigned<T>::value;
 };
 
@@ -137,7 +137,7 @@ template<typename T> struct is_unsigned {
 #endif
 
 // pstd::make_unsigned
-template<typename T> struct make_unsigned {
+template <typename T> struct make_unsigned {
   using type = typename std::make_unsigned<T>::type;
 };
 
@@ -147,7 +147,7 @@ template<typename T> struct make_unsigned {
 #endif
 
 // pstd::numeric_limits
-template<typename T> struct numeric_limits {
+template <typename T> struct numeric_limits {
   static constexpr T min() { return std::numeric_limits<T>::min(); }
   static constexpr T max() { return std::numeric_limits<T>::max(); }
   static constexpr T infinity() { return std::numeric_limits<T>::infinity(); }

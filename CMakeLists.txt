@@ -115,11 +115,13 @@ set(LIB_SRC src/api.cpp
             src/lmo/pi_lmo4.cpp
             src/lmo/pi_lmo5.cpp
             src/lmo/pi_lmo_parallel.cpp
+            src/deleglise-rivat/S2_easy.cpp
             src/deleglise-rivat/S2_hard.cpp
             src/deleglise-rivat/S2_trivial.cpp
             src/deleglise-rivat/pi_deleglise_rivat.cpp
             src/gourdon/pi_gourdon.cpp
             src/gourdon/Phi0.cpp
+            src/gourdon/AC.cpp
             src/gourdon/B.cpp
             src/gourdon/D.cpp
             src/gourdon/LoadBalancerAC.cpp
@@ -129,11 +131,7 @@ set(LIB_SRC src/api.cpp
 # Use libdivide.h (fast integer divison) #############################
 
 if(WITH_LIBDIVIDE)
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy_libdivide.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/AC_libdivide.cpp)
-else()
-    set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_easy.cpp)
-    set(LIB_SRC ${LIB_SRC} src/gourdon/AC.cpp)
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_LIBDIVIDE")
 endif()
 
 # Check if compiler supports CPU multiarch ###########################
@@ -144,16 +142,10 @@ if(WITH_MULTIARCH)
 
     if(multiarch_x86_popcnt OR multiarch_avx512_vpopcnt)
         set(LIB_SRC ${LIB_SRC} src/arch/x86/cpuid.cpp)
-        if (multiarch_avx512_vpopcnt)
-            set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_hard_multiarch_avx512.cpp)
-            set(LIB_SRC ${LIB_SRC} src/gourdon/D_multiarch_avx512.cpp)
-        endif()
     else()
         include("${PROJECT_SOURCE_DIR}/cmake/multiarch_arm_sve.cmake")
         if(multiarch_arm_sve)
             set(LIB_SRC ${LIB_SRC} src/arch/arm/sve.cpp)
-            set(LIB_SRC ${LIB_SRC} src/deleglise-rivat/S2_hard_multiarch_arm_sve.cpp)
-            set(LIB_SRC ${LIB_SRC} src/gourdon/D_multiarch_arm_sve.cpp)
         endif()
     endif()
 endif()

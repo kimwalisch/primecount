@@ -60,7 +60,7 @@ int64_t pi(int64_t x);
 /// Count the number of primes <= x using Xavier Gourdon's
 /// algorithm. Uses all CPU cores by default.
 /// Throws a primecount_error if an error occurs.
-/// 
+///
 /// Run time: O(x^(2/3) / (log x)^2)
 /// Memory usage: O(x^(1/3) * (log x)^3)
 ///
@@ -125,7 +125,7 @@ int get_num_threads();
 void set_num_threads(int num_threads);
 
 /// Recompute pi(x) with alternative alpha tuning factor(s) to
-/// verify the first result. This redundancy helps guard 
+/// verify the first result. This redundancy helps guard
 /// against potential bugs in primecount: if an error exists,
 /// it is highly unlikely that both pi(x) computations would
 /// produce the same (incorrect) result.

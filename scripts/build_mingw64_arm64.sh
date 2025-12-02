@@ -48,11 +48,6 @@ git pull
 mkdir build-release-arm64
 cd build-release-arm64
 
-rm ../src/deleglise-rivat/S2_easy.cpp
-rm ../src/deleglise-rivat/S2_hard_multiarch_avx512.cpp
-rm ../src/gourdon/AC.cpp
-rm ../src/gourdon/D_multiarch_avx512.cpp
-
 mkdir build_primesieve
 cd build_primesieve
 clang++ -c -I../../lib/primesieve/include -I../../lib/primesieve/src \
@@ -65,7 +60,7 @@ mkdir build_primecount
 cd build_primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
   -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
-  -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+   -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
   ../../src/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
   ../../src/gourdon/*.cpp ../../src/arch/arm/sve.cpp ../../src/app/*.cpp
 

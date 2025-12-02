@@ -4,7 +4,7 @@
 ///        FactorTable and FactorTableD classes.
 ///        See FactorTable.hpp for more information.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -76,6 +76,6 @@ protected:
   static const Array<int16_t, 2310> coprime_indexes_;
 };
 
-} // namespace 
+} // namespace
 
 #endif

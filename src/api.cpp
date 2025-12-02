@@ -268,7 +268,7 @@ maxint_t get_max_x(double alpha_y)
   double max_x = std::pow((1ull << 62) * alpha_y, 3.0 / 2.0);
   return (int128_t) max_x;
 #else
-  unused_param(alpha_y); 
+  unused_param(alpha_y);
   return pstd::numeric_limits<int64_t>::max();
 #endif
 }

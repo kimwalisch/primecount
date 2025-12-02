@@ -2,7 +2,7 @@
 /// @file   int128.cpp
 /// @brief  Test int128_t and uint128_t types.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,25 +35,25 @@ int main()
 {
 #if defined(HAVE_INT128_T)
 
-  static_assert(pstd::numeric_limits<uint128_t>::max() == ~((uint128_t) 0), 
+  static_assert(pstd::numeric_limits<uint128_t>::max() == ~((uint128_t) 0),
                 "pstd::numeric_limits<uint128_t>::max() is broken");
 
-  static_assert(pstd::is_integral<int128_t>::value, 
+  static_assert(pstd::is_integral<int128_t>::value,
                 "is_integral<int128_t> != true");
 
-  static_assert(pstd::is_integral<uint128_t>::value, 
+  static_assert(pstd::is_integral<uint128_t>::value,
                 "is_integral<uint128_t> != true");
 
-  static_assert(pstd::is_signed<int128_t>::value, 
+  static_assert(pstd::is_signed<int128_t>::value,
                 "is_signed<int128_t> != true");
 
-  static_assert(!pstd::is_signed<uint128_t>::value, 
+  static_assert(!pstd::is_signed<uint128_t>::value,
                 "is_signed<uint128_t> != false");
 
-  static_assert(!pstd::is_unsigned<int128_t>::value, 
+  static_assert(!pstd::is_unsigned<int128_t>::value,
                 "is_unsigned<int128_t> != false");
 
-  static_assert(pstd::is_unsigned<uint128_t>::value, 
+  static_assert(pstd::is_unsigned<uint128_t>::value,
                 "is_unsigned<uint128_t> != true");
 
   {
