@@ -170,11 +170,11 @@ T S2_hard_thread_default(T x,
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
 /// The only difference between this function and
-/// S2_hard_thread_default() is that this function uses
-/// sieve.count_avx512() instead of sieve.count().
+/// S2_hard_thread_default() is that this function uses the
+/// faster sieve.count_avx512() instead of sieve.count().
 ///
 /// Both this function and the Sieve::count_avx512() function
-/// have been annotated using the same AVX512 attributes.
+/// have been annotated using the same AVX512 __attribute__.
 /// This ensures that the compiler will inline
 /// Sieve::count_avx512(), which is important for performance.
 ///
@@ -294,11 +294,11 @@ T S2_hard_thread_avx512(T x,
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
 
 /// The only difference between this function and
-/// S2_hard_thread_default() is that this function uses
-/// sieve.count_arm_sve() instead of sieve.count().
+/// S2_hard_thread_default() is that this function uses the
+/// faster sieve.count_arm_sve() instead of sieve.count().
 ///
 /// Both this function and the Sieve::count_arm_sve() function
-/// have been annotated using the same ARM SVE attributes.
+/// have been annotated using the same ARM SVE __attribute__.
 /// This ensures that the compiler will inline
 /// Sieve::count_arm_sve(), which is important for performance.
 ///
