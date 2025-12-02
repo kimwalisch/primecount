@@ -89,7 +89,7 @@ string_view_t Sieve::count_algo_name()
     if (cpu_supports_avx512_vpopcnt)
       return "Algorithm: AVX512 bit counting";
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    if (cpu_supports_avx512_vpopcnt)
+    if (cpu_supports_sve)
       return "Algorithm: ARM SVE bit counting";
   #endif
 
