@@ -29,7 +29,7 @@ int main()
 {
   std::cout << "primecount version: " << primecount_version() << std::endl;
   std::cout << "threads: " << get_num_threads() << std::endl;
-  
+
   set_num_threads(3);
   std::cout << "new threads: " << get_num_threads() << std::endl;
 
@@ -60,7 +60,7 @@ int main()
   in = "-170141183460469231731687303715884105727";
   out = pi(in);
   std::cout << "pi(" << in << ") = " << out;
-  check(out == "0");  
+  check(out == "0");
 #endif
 
   n = (int64_t) 1e10;

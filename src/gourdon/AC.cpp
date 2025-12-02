@@ -108,8 +108,8 @@ T A(T x,
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
 /// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
 ///
-template <int MU, 
-          typename T, 
+template <int MU,
+          typename T,
           typename Primes>
 T C1(T xp,
      uint64_t b,
@@ -324,7 +324,7 @@ T AC_OpenMP(T x,
 
         int64_t min_a = min(xhigh / high, x13);
         min_a = pi[max(x_star, min_a)] + 1;
-      
+
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
         // p * next_prime(p) <= x / low
@@ -455,8 +455,8 @@ T A_128(T xlow,
 /// section 2.2 of the paper: Douglas Staple, "The Combinatorial
 /// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
 ///
-template <int MU, 
-          typename T, 
+template <int MU,
+          typename T,
           typename Primes>
 T C1(T xp,
      uint64_t b,
@@ -496,7 +496,7 @@ T C1(T xp,
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, 
+template <typename T,
           typename LibdividePrimes>
 T C2_64(T xlow,
         T xhigh,

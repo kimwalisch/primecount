@@ -2,7 +2,7 @@
 /// @file   isqrt_constexpr.cpp
 /// @brief  Test compile time square root function.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -119,10 +119,10 @@ int main()
 
   // here std::sqrt((double) 443075998594972078030832658571409090) is 1 too small
   static_assert(ct_sqrt((((int128_t) 24019198012642651) << 64) | 15864680554123835074ull) == 665639541039271553ll, "ct_sqrt(443075998594972078030832658571409090) failed!");
-  
+
   // here std::sqrt((double) 443075998594972075382716071791084150) is 1 too large
   static_assert(ct_sqrt((((int128_t) 24019198012642651) << 64) | 13216563967343510134ull) == 665639541039271551ll, "ct_sqrt(443075998594972075382716071791084150) failed!");
-  
+
   // here std::sqrt((double) 443075998594971958032420320541208365) is 38 too small
   static_assert(ct_sqrt((((int128_t) 24019198012642645) << 64) | 6546732658350944045ull) == 665639541039271462ll, "ct_sqrt(443075998594971958032420320541208365) failed!");
 

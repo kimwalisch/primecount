@@ -118,7 +118,7 @@ T D_thread_default(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        // mu[m] != 0 && 
+        // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
@@ -247,7 +247,7 @@ T D_thread_avx512(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        // mu[m] != 0 && 
+        // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
@@ -376,7 +376,7 @@ T D_thread_arm_sve(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        // mu[m] != 0 && 
+        // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))

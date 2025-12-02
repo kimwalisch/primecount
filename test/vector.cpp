@@ -1,6 +1,6 @@
 ///
 /// @file   vector.cpp
-/// @brief  Plain old data vector, like std::vector but does not 
+/// @brief  Plain old data vector, like std::vector but does not
 ///         default initialize memory.
 ///
 /// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>

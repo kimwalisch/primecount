@@ -57,7 +57,7 @@
 namespace primecount {
 
 Sieve::Sieve(uint64_t low,
-             uint64_t segment_size, 
+             uint64_t segment_size,
              uint64_t wheel_size)
 {
   ASSERT(low % 30 == 0);

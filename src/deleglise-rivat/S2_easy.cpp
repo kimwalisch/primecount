@@ -253,7 +253,7 @@ T S2_easy_OpenMP(T x,
     lprimes[i] = primes[i];
 
   T sum = 0;
-  int64_t x13 = iroot<3>(x); 
+  int64_t x13 = iroot<3>(x);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
