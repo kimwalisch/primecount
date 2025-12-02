@@ -25,6 +25,3 @@ cd ..
 clang++ -O3 -mpopcnt -fopenmp ^
   primesieve\*.o primecount\*.o ^
   -o primecount.exe "C:\Program Files\LLVM\lib\clang\18\lib\windows\clang_rt.builtins-x86_64.lib"
-
-git checkout ..\src\deleglise-rivat
-git checkout ..\src\gourdon
