@@ -169,9 +169,9 @@ T S2_hard_thread_default(T x,
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
-/// Compute the contribution of the hard special leaves using a
-/// segmented sieve. Each thread processes the interval
-/// [low, low + segment_size * segments[.
+/// The only difference between this function and
+/// S2_hard_thread_default() is that this function uses
+/// sieve.count_avx512() instead of sieve.count().
 ///
 /// Both this function and the Sieve::count_avx512() function
 /// have been annotated using the same AVX512 attributes.
@@ -293,9 +293,9 @@ T S2_hard_thread_avx512(T x,
 
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
 
-/// Compute the contribution of the hard special leaves using a
-/// segmented sieve. Each thread processes the interval
-/// [low, low + segment_size * segments[.
+/// The only difference between this function and
+/// S2_hard_thread_default() is that this function uses
+/// sieve.count_arm_sve() instead of sieve.count().
 ///
 /// Both this function and the Sieve::count_arm_sve() function
 /// have been annotated using the same ARM SVE attributes.
