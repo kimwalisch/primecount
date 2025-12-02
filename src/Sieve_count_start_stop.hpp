@@ -83,6 +83,19 @@ uint64_t bytes_per_count_instruction()
 
 namespace primecount {
 
+string_view_t Sieve::count_algo_name()
+{
+  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    if (cpu_supports_avx512_vpopcnt)
+      return "Algorithm: AVX512 bit counting";
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_avx512_vpopcnt)
+      return "Algorithm: ARM SVE bit counting";
+  #endif
+
+  return "Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME;
+}
+
 /// Count 1 bits inside [start, stop]
 uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {

@@ -48,12 +48,6 @@
 #include <algorithm>
 #include <cmath>
 
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include <cpu_supports_arm_sve.hpp>
-#elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
-#endif
-
 namespace primecount {
 
 Sieve::Sieve(uint64_t low,
@@ -120,19 +114,6 @@ void Sieve::allocate_counter(uint64_t low)
   counter_.counter.resize(counter_size);
   counter_.dist = bytes * 30;
   counter_.log2_dist = ilog2(bytes);
-}
-
-string_view_t Sieve::count_algo_name()
-{
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    if (cpu_supports_avx512_vpopcnt)
-      return "Algorithm: AVX512 bit counting";
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    if (cpu_supports_avx512_vpopcnt)
-      return "Algorithm: ARM SVE bit counting";
-  #endif
-
-  return "Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME;
 }
 
 /// The segment size is sieve.size() * 30 as each
