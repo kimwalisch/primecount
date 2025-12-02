@@ -290,6 +290,15 @@ T S2_easy_OpenMP(T x,
 
 #endif
 
+void print_algo_name()
+{
+  #if defined(ENABLE_LIBDIVIDE)
+    print("Algorithm: libdivide");
+  #else
+    print("Algorithm: CPU div");
+  #endif
+}
+
 } // namespace
 
 namespace primecount {
@@ -307,6 +316,7 @@ int64_t S2_easy(int64_t x,
   {
     print("");
     print("=== S2_easy(x, y) ===");
+    print_algo_name();
     print_vars(x, y, c, threads);
     time = get_time();
   }
@@ -335,6 +345,7 @@ int128_t S2_easy(int128_t x,
   {
     print("");
     print("=== S2_easy(x, y) ===");
+    print_algo_name();
     print_vars(x, y, c, threads);
     time = get_time();
   }

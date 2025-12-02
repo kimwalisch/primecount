@@ -795,6 +795,15 @@ T AC_OpenMP(T x,
 
 #endif
 
+void print_algo_name()
+{
+  #if defined(ENABLE_LIBDIVIDE)
+    print("Algorithm: libdivide");
+  #else
+    print("Algorithm: CPU div");
+  #endif
+}
+
 } // namespace
 
 namespace primecount {
@@ -812,6 +821,7 @@ int64_t AC(int64_t x,
   {
     print("");
     print("=== AC(x, y) ===");
+    print_algo_name();
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -845,6 +855,7 @@ int128_t AC(int128_t x,
   {
     print("");
     print("=== AC(x, y) ===");
+    print_algo_name();
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
