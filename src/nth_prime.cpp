@@ -14,9 +14,10 @@
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
-#include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
+#include <print.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -104,6 +105,17 @@ int64_t nth_prime_64(int64_t n, int threads)
   // Riemann R function and then count the primes up to this
   // approximation using the prime counting function.
   int64_t prime_approx = RiemannR_inverse(n);
+
+  if (is_print())
+  {
+    print("");
+    print("=== nth_prime ===");
+    print("n", n);
+    print("RiemannR^-1(n)", prime_approx);
+  }
+
+  // Count the primes up to our estimated nth prime. This step
+  // will dominate the runtime of our nth prime algorithm.
   int64_t count_approx = pi(prime_approx, threads);
 
   constexpr bool forward = true;
@@ -171,6 +183,17 @@ int128_t nth_prime_128(int128_t n, int threads)
   // Riemann R function and then count the primes up to this
   // approximation using the prime counting function.
   int128_t prime_approx = RiemannR_inverse(n);
+
+  if (is_print())
+  {
+    print("");
+    print("=== nth_prime ===");
+    print("n", n);
+    print("RiemannR^-1(n)", prime_approx);
+  }
+
+  // Count the primes up to our estimated nth prime. This step
+  // will dominate the runtime of our nth prime algorithm.
   int128_t count_approx = pi(prime_approx, threads);
 
   constexpr bool forward = true;
