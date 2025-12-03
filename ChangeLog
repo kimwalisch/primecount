@@ -1,5 +1,7 @@
-Changes in primecount-7.21, 2025-12-02
+Changes in primecount-7.21, 2025-12-03
 
+* calculator.hpp: Add code to detect integer overflows.
+* nth_prime.cpp: Improve status output.
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.
 * CMakeLists.txt: Refactor runtime dispatch to optimized SIMD algorithm.
