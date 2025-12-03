@@ -76,12 +76,9 @@ namespace calculator
 class error : public std::runtime_error
 {
 public:
-  error(const std::string& message)
-    : std::runtime_error(message)
+  error(const std::string& msg)
+    : std::runtime_error(msg)
   { }
-#if __cplusplus < 201103L
-  ~error() throw() { }
-#endif
 };
 
 template <typename T>
