@@ -14,6 +14,7 @@
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 
+#include <exception>
 #include <stdint.h>
 #include <string>
 
@@ -83,14 +84,23 @@ struct Option
   template <typename T>
   T to() const
   {
-    try {
-      if (pstd::is_floating_point<T>::value)
+    if (pstd::is_floating_point<T>::value)
+    {
+      try {
         return (T) std::stod(val);
-      else
-        return (T) to_maxint(val);
+      }
+      catch (std::exception&) {
+        throw primecount_error("invalid option '" + opt + "=" + val);
+      }
     }
-    catch (std::exception&) {
-      throw primecount_error("invalid option '" + opt + "=" + val + "'");
+    else
+    {
+      try {
+        return (T) to_maxint(val);
+      }
+      catch (std::exception& e) {
+        throw primecount_error("invalid option '" + opt + "=" + val + "'\n" + e.what());
+      }
     }
   }
 };

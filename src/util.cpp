@@ -112,29 +112,20 @@ std::ostream& operator<<(std::ostream& stream, uint128_t n)
 
 maxint_t to_maxint(const std::string& expr)
 {
-  // Check if n <= max, if n is only
-  // composed of regular digits.
-  if (expr.find_first_not_of("0123456789") == std::string::npos)
+  try
   {
-    // Remove leading zeros
-    std::size_t pos = expr.find_first_not_of('0');
-
-    if (pos != std::string::npos)
-    {
-      std::string n = expr.substr(pos);
-      maxint_t limit = pstd::numeric_limits<maxint_t>::max();
-      std::string max_n = to_string(limit);
-
-      if (n.size() > max_n.size() ||
-        (n.size() == max_n.size() && n > max_n))
-      {
-        std::string msg = "number too large: " + n;
-        throw primecount_error(msg);
-      }
-    }
+    return calculator::eval<maxint_t>(expr);
   }
+  catch (std::exception& e)
+  {
+    std::string errorMsg(e.what());
 
-  return calculator::eval<maxint_t>(expr);
+    // Change "Error" to lower case
+    if (errorMsg.rfind("Error", 0) == 0)
+      errorMsg[0] = 'e';
+
+    throw primecount_error("to_maxint(str) " + errorMsg);
+  }
 }
 
 int get_status_precision(maxint_t x)
