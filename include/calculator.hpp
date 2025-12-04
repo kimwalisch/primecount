@@ -242,7 +242,7 @@ private:
   /// Same as std::numeric_limits<T>::min
   /// but also works with __uint128_t.
   template <typename TT = T>
-  static constexpr typename std::enable_if<is_unsigned(), TT>::type
+  static typename std::enable_if<is_unsigned(), TT>::type
   minValue()
   {
     return 0;
@@ -251,7 +251,7 @@ private:
   /// Same as std::numeric_limits<T>::min
   /// but also works with __int128_t.
   template <typename TT = T>
-  static constexpr typename std::enable_if<is_signed(), TT>::type
+  static typename std::enable_if<is_signed(), TT>::type
   minValue()
   {
     T halfMagnitude = T(1) << (numBits() - 2);
@@ -261,7 +261,7 @@ private:
   /// Same as std::numeric_limits<T>::max
   /// but also works with __uint128_t.
   template <typename TT = T>
-  static constexpr typename std::enable_if<is_unsigned(), TT>::type
+  static typename std::enable_if<is_unsigned(), TT>::type
   maxValue()
   {
     return ~T(0);
@@ -270,7 +270,7 @@ private:
   /// Same as std::numeric_limits<T>::max
   /// but also works with __int128_t.
   template <typename TT = T>
-  static constexpr typename std::enable_if<is_signed(), TT>::type
+  static typename std::enable_if<is_signed(), TT>::type
   maxValue()
   {
     T halfMagnitude = T(1) << (numBits() - 2);
