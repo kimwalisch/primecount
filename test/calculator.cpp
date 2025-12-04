@@ -53,7 +53,15 @@ std::string to_string(int128_t n)
   if (n >= 0)
     return to_string((uint128_t) n);
   else
-    return "-" + to_string((uint128_t) -n);
+  {
+    // -n causes undefined behavior for n = INT128_MIN.
+    // Hence we use the defined two's complement negation: ~n + 1.
+    // Casting ~n to unsigned ensures the result of the addition
+    // (2^127 for INT128_MIN) is safely stored in a uint128_t
+    // without signed overflow.
+    uint128_t abs_n = uint128_t(~n) + 1;
+    return "-" + to_string(abs_n);
+  }
 }
 
 std::ostream& operator<<(std::ostream& stream, int128_t n)
