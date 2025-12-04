@@ -16,8 +16,9 @@
 #include <cstdlib>
 #include <string>
 
-// If stdint.h defines the INT128_MAX macro we assume the int128_t
-// and uint128_t are well supported by the C++ library.
+// If stdint.h defines the INT128_MAX macro we assume the
+// int128_t and uint128_t types are well supported by
+// the C++ standard library.
 #include <stdint.h>
 
 // The compiler supports __int128_t but the C++ standard library
