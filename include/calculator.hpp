@@ -351,19 +351,31 @@ private:
     if (x == 0 || y == 0)
       return 0;
 
-    if (x > 0) {
+    if (x > 0)
+    {
       if (y > 0) {
         if (x > maxValue() / y)
           throw_integer_overflow_error();
-      } else { // y < 0
+      }
+      else { // x > 0 && y < 0
         if (y < minValue() / x)
           throw_integer_underflow_error();
       }
-    } else { // x < 0
+    }
+    else // x < 0
+    {
       if (y > 0) {
         if (x < minValue() / y)
           throw_integer_underflow_error();
-      } else { // y < 0
+      }
+      else // x < 0 && y < 0
+      {
+        // INT_MIN * -1 causes integer overflow
+        if (x == -1 && y == minValue())
+          throw_integer_overflow_error();
+        if (y == -1 && x == minValue())
+          throw_integer_overflow_error();
+
         if (x < maxValue() / y)
           throw_integer_overflow_error();
       }
