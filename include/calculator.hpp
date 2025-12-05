@@ -222,7 +222,9 @@ private:
   /// but also works with __uint128_t.
   static constexpr bool is_unsigned()
   {
-    return ~T(0) > 0;
+    // Second cast required for sizeof(T) < sizeof(int)
+    // due to C/C++ integer promotion rules.
+    return T(~T(0)) > 0;
   }
 
   /// Same as std::is_signed<T>::value
@@ -264,7 +266,7 @@ private:
   static typename std::enable_if<is_unsigned(), TT>::type
   maxValue()
   {
-    return ~T(0);
+    return T(~T(0));
   }
 
   /// Same as std::numeric_limits<T>::max
