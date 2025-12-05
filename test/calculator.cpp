@@ -11,9 +11,11 @@
 #include <calculator.hpp>
 
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <iomanip>
-#include <cstdlib>
+#include <limits>
+#include <random>
 #include <string>
 
 // If stdint.h defines the INT128_MAX macro we assume the
@@ -95,10 +97,6 @@ void compare(T result, const std::string& str)
 
 void signed_integer_tests()
 {
-  std::cout << std::endl;
-  std::cout << "=== Signed integer tests ===" << std::endl;
-  std::cout << std::endl;
-
   #define STR1(s) #s
   #define TOSTRING(s) STR1(s)
 
@@ -379,10 +377,6 @@ void signed_integer_tests()
 
 void unsigned_integer_tests()
 {
-  std::cout << std::endl;
-  std::cout << "=== Unsigned integer tests ===" << std::endl;
-  std::cout << std::endl;
-
   compare(calculator::eval<uint64_t>("300-200"), "100");
   compare(calculator::eval<uint64_t>("1e19"), "10000000000000000000");
   compare(calculator::eval<uint64_t>("11e18"), "11000000000000000000");
@@ -581,12 +575,162 @@ void unsigned_integer_tests()
 #endif
 }
 
+#define TEST_OP(TYPE, OP, OP_STR) \
+{ \
+  if (j == 0 && ( \
+      std::string(OP_STR) == "/" || \
+      std::string(OP_STR) == "%")) \
+    continue; \
+  if (i OP j >= std::numeric_limits<TYPE>::min() && \
+      i OP j <= std::numeric_limits<TYPE>::max()) \
+  { \
+    std::string expr = std::to_string(i) + OP_STR + std::to_string(j); \
+    int res = calculator::eval<TYPE>(expr); \
+    if (i OP j != res) \
+    { \
+      std::cerr << "Error: " << i << " " << OP_STR << " " << j << " = " << i OP j << " != " << res << std::endl; \
+      std::exit(1); \
+    } \
+  } \
+}
+
+// This test tests invalid arithmetic expressions that cause
+// e.g. integer overflow or underflow. If an arithmetic
+// expression is invalid, then our code must detect it and
+// throw a calculator::error exception.
+#define TEST_OP_OVERFLOW(TYPE, OP, OP_STR) \
+{ \
+  if (j == 0 && ( \
+      std::string(OP_STR) == "/" || \
+      std::string(OP_STR) == "%")) \
+    continue; \
+  std::string expr; \
+  int res; \
+  try { \
+    expr = std::to_string(i) + OP_STR + std::to_string(j); \
+    res = calculator::eval<TYPE>(expr); \
+  } \
+  catch (calculator::error& e) { \
+    count_exceptions += 1; \
+    if (count_exceptions > max_exceptions) break; \
+    res = std::numeric_limits<int>::min(); \
+  } \
+  if (i OP j >= std::numeric_limits<TYPE>::min() && \
+      i OP j <= std::numeric_limits<TYPE>::max()) \
+  { \
+    if (i OP j != res) \
+    { \
+      std::cerr << "Error: " << i << " " << OP_STR << " " << j << " = " << i OP j << " != " << res << std::endl; \
+      std::exit(1); \
+    } \
+  } \
+  else if (res != std::numeric_limits<int>::min()) \
+  { \
+      std::cerr << "Error: failed to detect invalid " << #TYPE << " expression: '" << expr << "'" << std::endl; \
+      std::exit(1); \
+  } \
+}
+
+void int8_tests()
+{
+  std::cout << "Starting int8_t tests..." << std::endl;
+  int int8_min = std::numeric_limits<int8_t>::min();
+  int int8_max = std::numeric_limits<int8_t>::max();
+
+  for (int i = int8_min + 1; i <= int8_max; i++)
+    for (int j = int8_min + 1; j <= int8_max; j++)
+    {
+      TEST_OP(int8_t, +, "+")
+      TEST_OP(int8_t, -, "-")
+      TEST_OP(int8_t, *, "*")
+      TEST_OP(int8_t, /, "/")
+      TEST_OP(int8_t, %, "%")
+    }
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(int8_min + 1, int8_max);
+
+  // C++ Exceptions are slow so we limit their number
+  int max_exceptions = 5000;
+  int count_exceptions = 0;
+
+  for (int t = 0; t < 50000; t++)
+  {
+    int i = dist(gen);
+    int j = dist(gen);
+
+    TEST_OP_OVERFLOW(int8_t, +, "+")
+    TEST_OP_OVERFLOW(int8_t, -, "-")
+    TEST_OP_OVERFLOW(int8_t, *, "*")
+    TEST_OP_OVERFLOW(int8_t, /, "/")
+    TEST_OP_OVERFLOW(int8_t, %, "%")
+  }
+
+  std::cout << "Successfully completed int8_t tests!" << std::endl;
+}
+
+void uint8_tests()
+{
+  std::cout << "Starting uint8_t tests..." << std::endl;
+  int uint8_min = std::numeric_limits<uint8_t>::min();
+  int uint8_max = std::numeric_limits<uint8_t>::max();
+
+  for (int i = uint8_min; i <= uint8_max; i++)
+    for (int j = uint8_min; j <= uint8_max; j++)
+    {
+      TEST_OP(uint8_t, +, "+")
+      TEST_OP(uint8_t, -, "-")
+      TEST_OP(uint8_t, *, "*")
+      TEST_OP(uint8_t, /, "/")
+      TEST_OP(uint8_t, %, "%")
+    }
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<int> dist(uint8_min, uint8_max);
+
+  // C++ Exceptions are slow so we limit their number
+  int max_exceptions = 5000;
+  int count_exceptions = 0;
+
+  for (int t = 0; t < 50000; t++)
+  {
+    int i = dist(gen);
+    int j = dist(gen);
+
+    TEST_OP_OVERFLOW(uint8_t, +, "+")
+    TEST_OP_OVERFLOW(uint8_t, -, "-")
+    TEST_OP_OVERFLOW(uint8_t, *, "*")
+    TEST_OP_OVERFLOW(uint8_t, /, "/")
+    TEST_OP_OVERFLOW(uint8_t, %, "%")
+  }
+
+  std::cout << "Successfully completed uint8_t tests!" << std::endl;
+}
+
 int main()
 {
   std::cout.setf(std::ios::left);
 
+  std::cout << std::endl;
+  std::cout << "=== Signed integer tests ===" << std::endl;
+  std::cout << std::endl;
+
   signed_integer_tests();
+
+  std::cout << std::endl;
+  std::cout << "=== Unsigned integer tests ===" << std::endl;
+  std::cout << std::endl;
+
   unsigned_integer_tests();
+
+  std::cout << std::endl;
+  std::cout << "=== 8-bit integer tests ===" << std::endl;
+  std::cout << std::endl;
+
+  int8_tests();
+  uint8_tests();
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
