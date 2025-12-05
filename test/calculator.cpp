@@ -610,7 +610,7 @@ void unsigned_integer_tests()
     expr = std::to_string(i) + OP_STR + std::to_string(j); \
     res = calculator::eval<TYPE>(expr); \
   } \
-  catch (calculator::error& e) { \
+  catch (calculator::error&) { \
     count_exceptions += 1; \
     if (count_exceptions > max_exceptions) break; \
     res = std::numeric_limits<int>::min(); \
