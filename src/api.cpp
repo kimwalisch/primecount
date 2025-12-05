@@ -35,18 +35,6 @@ namespace {
 
 namespace primecount {
 
-std::string pi(const std::string& x)
-{
-  return pi(x, get_num_threads());
-}
-
-std::string pi(const std::string& x, int threads)
-{
-  maxint_t n = to_maxint(x);
-  maxint_t res = pi(n, threads);
-  return to_string(res);
-}
-
 int64_t pi(int64_t x)
 {
   return pi(x, get_num_threads());
@@ -79,7 +67,7 @@ pc_int128_t pi(pc_int128_t x)
   res.hi = (int64_t) (r128 >> 64);
   return res;
 #else
-  throw primecount_error("pi(x): x must be <= " + get_max_x());
+  throw primecount_error("pi(x): x must be <= 2^63-1");
 #endif
 }
 
@@ -179,7 +167,7 @@ pc_int128_t nth_prime(pc_int128_t n)
   res.hi = (int64_t) (r128 >> 64);
   return res;
 #else
-  throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n_int64));
+  throw primecount_error("nth_prime(n): n must be <= 2^63-1");
 #endif
 }
 
@@ -232,6 +220,11 @@ int128_t pi_gourdon(int128_t x, int threads)
     return pi_gourdon_128(x, threads);
 }
 
+int128_t nth_prime(int128_t n)
+{
+  return nth_prime(n, get_num_threads());
+}
+
 int128_t nth_prime(int128_t n, int threads)
 {
   // Number of primes < 2^63
@@ -270,17 +263,6 @@ maxint_t get_max_x(double alpha_y)
 #else
   unused_param(alpha_y);
   return pstd::numeric_limits<int64_t>::max();
-#endif
-}
-
-std::string get_max_x()
-{
-#ifdef HAVE_INT128_T
-  // 10^31
-  return "10000000000000000000000000000000";
-#else
-  // 2^63-1
-  return "9223372036854775807";
 #endif
 }
 

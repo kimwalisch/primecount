@@ -1,5 +1,29 @@
-Changes in primecount-7.21, 2025-12-04
+Changes in primecount-7.21, 2025-12-05
 
+# Breaking C/C++ API changes:
+
+* primecount.hpp (C++ API): Remove std::string functions:
+    std::string pi(std::string x),
+    std::string get_max_x().
+
+* primecount.h (C API): Remove string functions:
+    primecount_pi_str(x),
+    primecount_get_max_x().
+
+We have a new 128-bit API without string arguments with
+better performance and improved error handling:
+
+## 128-bit C++ API:
+pc_int128_t pi(pc_int128_t x);
+pc_int128_t nth_prime(pc_int128_t n);
+
+## 128-bit C API:
+pc_int128_t primecount_pi_128(pc_int128_t x);
+pc_int128_t primecount_nth_prime_128(pc_int128_t n);
+
+Other changes:
+
+* api.cpp: Fix broken 128-bit nth prime function.
 * util.cpp: Fix undefined behavior in to_string().
 * calculator.hpp: Add code to detect integer overflows.
 * nth_prime.cpp: Improve status output.

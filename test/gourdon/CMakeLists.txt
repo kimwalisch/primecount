@@ -5,7 +5,7 @@ foreach(file ${files})
     add_executable(${binary_name} ${file})
     target_compile_definitions(${binary_name} PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(${binary_name} primecount::primecount primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
- 
+
     target_include_directories(${binary_name}
     PRIVATE
         ${CMAKE_SOURCE_DIR}/src

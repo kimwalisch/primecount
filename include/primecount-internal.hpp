@@ -63,6 +63,7 @@ int64_t RiemannR_inverse(int64_t x);
   int128_t pi_deleglise_rivat_128(int128_t x, int threads, bool print = is_print());
   int128_t P2(int128_t x, int64_t y, int64_t a, int threads, bool print = is_print());
 
+  int128_t nth_prime(int128_t n);
   int128_t nth_prime(int128_t n, int threads);
   int128_t nth_prime_128(int128_t n, int threads);
 
@@ -86,7 +87,6 @@ double get_alpha_deleglise_rivat(maxint_t x);
 std::pair<double, double> get_alpha_gourdon(maxint_t x);
 int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
-maxint_t to_maxint(const std::string& expr);
 void verify_pix(string_view_t pix_function, maxint_t x, maxint_t pix, maxint_t Lix);
 
 } // namespace primecount
