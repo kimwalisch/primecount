@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4...3.27)
+cmake_minimum_required(VERSION 3.9...3.30)
 project(primecount CXX)
 set(PRIMECOUNT_VERSION_MAJOR 8)
 set(PRIMECOUNT_VERSION_MINOR 0)
@@ -18,7 +18,6 @@ option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU
 option(WITH_DIV32           "Use 32-bit division instead of 64-bit division whenever possible" OFF)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
-option(WITH_JEMALLOC        "Use jemalloc allocator"               OFF)
 
 # Enable/Disable libdivide ###########################################
 
@@ -60,11 +59,7 @@ endif()
 
 # Set default build type to Release ##################################
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.9)
-    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-elseif(CMAKE_CONFIGURATION_TYPES)
-    set(isMultiConfig TRUE)
-endif()
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -333,27 +328,6 @@ if(BUILD_PRIMECOUNT)
 
     if(WITH_MSVC_CRT_STATIC)
         set_target_properties(primecount PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    endif()
-endif()
-
-# Use jemalloc allocator #############################################
-
-if(WITH_JEMALLOC)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(JEMALLOC jemalloc)
-    pkg_search_module(JEMALLOC REQUIRED jemalloc)
-
-    if(BUILD_PRIMECOUNT)
-        target_link_libraries(primecount PRIVATE ${JEMALLOC_LIBRARIES})
-        target_include_directories(primecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
-    endif()
-    if(BUILD_SHARED_LIBS)
-        target_link_libraries(libprimecount PRIVATE ${JEMALLOC_LIBRARIES})
-        target_include_directories(libprimecount PRIVATE ${JEMALLOC_INCLUDE_DIRS})
-    endif()
-    if(BUILD_STATIC_LIBS)
-        target_link_libraries(libprimecount-static PRIVATE ${JEMALLOC_LIBRARIES})
-        target_include_directories(libprimecount-static PRIVATE ${JEMALLOC_INCLUDE_DIRS})
     endif()
 endif()
 
