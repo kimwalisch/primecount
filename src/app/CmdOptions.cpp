@@ -22,16 +22,20 @@
 ///
 
 #include "CmdOptions.hpp"
+
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <calculator.hpp>
 #include <Vector.hpp>
 #include <print.hpp>
 #include <int128_t.hpp>
 
 #include <stdint.h>
 #include <cstddef>
+#include <exception>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace {
@@ -184,6 +188,32 @@ Option parseOption(int argc,
   return opt;
 }
 
+// Convert opt.val string to floating point value
+template <typename T>
+typename std::enable_if<pstd::is_floating_point<T>::value, T>::type
+getVal(const Option& opt)
+{
+  try {
+    return (T) std::stod(opt.val);
+  }
+  catch (std::exception&) {
+    throw primecount_error("invalid option '" + opt.opt + "=" + opt.val);
+  }
+}
+
+// Convert opt.val string to integer value
+template <typename T>
+typename std::enable_if<!pstd::is_floating_point<T>::value, T>::type
+getVal(const Option& opt)
+{
+  try {
+    return calculator::eval<T>(opt.val);
+  }
+  catch (std::exception& e) {
+    throw primecount_error("invalid option '" + opt.opt + "=" + opt.val + "'\n" + e.what());
+  }
+}
+
 } // namespace
 
 namespace primecount {
@@ -211,7 +241,7 @@ void CmdOptions::optionStatus(Option& opt)
   time = true;
 
   if (!opt.val.empty())
-    set_status_precision(opt.to<int>());
+    set_status_precision(getVal<int>(opt));
 }
 
 CmdOptions parseOptions(int argc, char* argv[])
@@ -294,15 +324,15 @@ CmdOptions parseOptions(int argc, char* argv[])
 
     switch (optionID)
     {
-      case OPTION_ALPHA:        set_alpha(opt.to<double>()); break;
-      case OPTION_ALPHA_Y:      set_alpha_y(opt.to<double>()); break;
-      case OPTION_ALPHA_Z:      set_alpha_z(opt.to<double>()); break;
+      case OPTION_ALPHA:        set_alpha(getVal<double>(opt)); break;
+      case OPTION_ALPHA_Y:      set_alpha_y(getVal<double>(opt)); break;
+      case OPTION_ALPHA_Z:      set_alpha_z(getVal<double>(opt)); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
       case OPTION_HELP:         help(/* exitCode */ 0); break;
-      case OPTION_NUMBER:       numbers.push_back(opt.to<maxint_t>()); break;
+      case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;
       case OPTION_STATUS:       opts.optionStatus(opt); break;
       case OPTION_TEST:         test(); break;
-      case OPTION_THREADS:      set_num_threads(opt.to<int>()); break;
+      case OPTION_THREADS:      set_num_threads(getVal<int>(opt)); break;
       case OPTION_TIME:         opts.time = true; break;
       case OPTION_VERSION:      version(); break;
       default:                  opts.setMainOption(optionID, opt.str);

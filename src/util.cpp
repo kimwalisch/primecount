@@ -11,7 +11,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <calculator.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -117,24 +116,6 @@ std::ostream& operator<<(std::ostream& stream, uint128_t n)
 }
 
 #endif
-
-maxint_t to_maxint(const std::string& expr)
-{
-  try
-  {
-    return calculator::eval<maxint_t>(expr);
-  }
-  catch (std::exception& e)
-  {
-    std::string errorMsg(e.what());
-
-    // Change "Error" to lower case
-    if (errorMsg.rfind("Error", 0) == 0)
-      errorMsg[0] = 'e';
-
-    throw primecount_error("to_maxint(str) " + errorMsg);
-  }
-}
 
 int get_status_precision(maxint_t x)
 {

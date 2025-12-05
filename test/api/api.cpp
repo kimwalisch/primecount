@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <string>
 #include <cstdlib>
 
 using namespace primecount;
@@ -44,25 +43,6 @@ int main()
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);
 
-  std::string in = "-1";
-  std::string out = pi(in);
-  std::cout << "pi(" << in << ") = " << out;
-  check(out == "0");
-
-#ifdef HAVE_INT128_T
-  // Test 128-bit pi(-x)
-  in = "-1208925819614629174696176";
-  out = pi(in);
-  std::cout << "pi(" << in << ") = " << out;
-  check(out == "0");
-
-  // Test using INT128_MIN+1
-  in = "-170141183460469231731687303715884105727";
-  out = pi(in);
-  std::cout << "pi(" << in << ") = " << out;
-  check(out == "0");
-#endif
-
   n = (int64_t) 1e10;
   res = pi(n);
   std::cout << "pi(" << n << ") = " << res;
@@ -91,11 +71,6 @@ int main()
   res = phi(n, a);
   std::cout << "phi(" << n << ", " << a << ") = " << res;
   check(res == 37607833521);
-
-  in = "1000000000000";
-  out = pi(in);
-  std::cout << "pi(" << in << ") = " << out;
-  check(out == "37607912018");
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

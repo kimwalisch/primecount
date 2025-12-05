@@ -7,14 +7,11 @@
 /// file in the top level directory.
 ///
 
-#ifndef CmdOptions_HPP
-#define CmdOptions_HPP
+#ifndef CMDOPTIONS_HPP
+#define CMDOPTIONS_HPP
 
-#include <primecount.hpp>
-#include <primecount-internal.hpp>
 #include <int128_t.hpp>
 
-#include <exception>
 #include <stdint.h>
 #include <string>
 
@@ -80,29 +77,6 @@ struct Option
   std::string str;
   std::string opt;
   std::string val;
-
-  template <typename T>
-  T to() const
-  {
-    if (pstd::is_floating_point<T>::value)
-    {
-      try {
-        return (T) std::stod(val);
-      }
-      catch (std::exception&) {
-        throw primecount_error("invalid option '" + opt + "=" + val);
-      }
-    }
-    else
-    {
-      try {
-        return (T) to_maxint(val);
-      }
-      catch (std::exception& e) {
-        throw primecount_error("invalid option '" + opt + "=" + val + "'\n" + e.what());
-      }
-    }
-  }
 };
 
 struct CmdOptions

@@ -13,9 +13,6 @@
 #include <int128_t.hpp>
 
 #include <stdint.h>
-#include <stddef.h>
-#include <sstream>
-#include <string>
 #include <exception>
 #include <iostream>
 
@@ -55,45 +52,6 @@ pc_int128_t primecount_pi_128(pc_int128_t x)
     res.lo = ~0ull;
     res.hi = -1;
     return res;
-  }
-}
-
-int primecount_pi_str(const char* x, char* res, size_t len)
-{
-  try
-  {
-    if (!x)
-      throw primecount::primecount_error("x must not be a NULL pointer");
-
-    if (!res)
-      throw primecount::primecount_error("res must not be a NULL pointer");
-
-    std::string str(x);
-    std::string pix = primecount::pi(str);
-
-    // +1 required to add null at the end of the string
-    if (len < pix.length() + 1)
-    {
-      std::ostringstream oss;
-      oss << "res buffer too small, res.len = " << len << " < required = " << pix.length() + 1;
-      throw primecount::primecount_error(oss.str());
-    }
-
-    pix.copy(res, pix.length());
-    // std::string::copy does not append a null character
-    // at the end of the copied content.
-    res[pix.length()] = '\0';
-
-    return (int) pix.length();
-  }
-  catch(const std::exception& e)
-  {
-    std::cerr << "primecount_pi_str: " << e.what() << std::endl;
-
-    if (res && len > 0)
-      res[0] = '\0';
-
-    return -1;
   }
 }
 
@@ -184,17 +142,6 @@ void primecount_set_double_check(bool enable)
   {
     std::cerr << "primecount_set_double_check: " << e.what() << std::endl;
   }
-}
-
-const char* primecount_get_max_x(void)
-{
-#ifdef HAVE_INT128_T
-  // 10^31
-  return "10000000000000000000000000000000";
-#else
-  // 2^63-1
-  return "9223372036854775807";
-#endif
 }
 
 const char* primecount_version(void)
