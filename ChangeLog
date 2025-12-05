@@ -1,16 +1,16 @@
 Changes in primecount-8.0, 2025-12-05
 
-# Breaking C/C++ API changes:
+# BREAKING C/C++ API CHANGES:
 
 * primecount.hpp (C++ API): Remove std::string functions:
-    std::string pi(std::string x),
-    std::string get_max_x().
+    std::string pi(std::string x);
+    std::string get_max_x();
 
 * primecount.h (C API): Remove string functions:
-    primecount_pi_str(x),
-    primecount_get_max_x().
+    const char* primecount_pi_str(x);
+    const char* primecount_get_max_x();
 
-We have a new 128-bit API without string arguments with
+We have a new 128-bit API without string arguments and with
 better performance and improved error handling:
 
 ## 128-bit C++ API:
@@ -21,7 +21,8 @@ pc_int128_t nth_prime(pc_int128_t n);
 pc_int128_t primecount_pi_128(pc_int128_t x);
 pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 
-Other changes:
+
+# OTHER NON-BREAKING CHANGES:
 
 * api.cpp: Fix broken 128-bit nth prime function.
 * util.cpp: Fix undefined behavior in to_string().
@@ -29,12 +30,12 @@ Other changes:
 * nth_prime.cpp: Improve status output.
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.
-* CMakeLists.txt: Refactor runtime dispatch to optimized SIMD algorithm.
 * D.cpp: Refactor runtime dispatch to optimized SIMD algorithm.
 * S2_hard.cpp: Refactor runtime dispatch to optimized SIMD algorithm.
 * pi_lmo_parallel.cpp: Add support for runtime dispatch to optimized SIMD algorithm.
 * Move S2_easy_libdivide.cpp code into S2_easy.cpp.
 * Move AC_libdivide.cpp code into AC.cpp.
+* CMakeLists.txt: Simplify code, drop Jemalloc support.
 
 Changes in primecount-7.20, 2025-11-03
 
