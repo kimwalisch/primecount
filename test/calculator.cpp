@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <iomanip>
 #include <limits>
 #include <random>
 #include <string>
@@ -22,6 +21,12 @@
 // int128_t and uint128_t types are well supported by
 // the C++ standard library.
 #include <stdint.h>
+
+template <typename T>
+std::string to_string(T n)
+{
+  return std::to_string(n);
+}
 
 // The compiler supports __int128_t but the C++ standard library
 // does not, at least for GCC <= 15 and Clang <= 21.
@@ -33,6 +38,7 @@
 using int128_t = __int128_t;
 using uint128_t = __uint128_t;
 
+template <>
 std::string to_string(uint128_t n)
 {
   std::string str;
@@ -51,6 +57,7 @@ std::string to_string(uint128_t n)
   return str;
 }
 
+template <>
 std::string to_string(int128_t n)
 {
   if (n >= 0)
@@ -66,39 +73,97 @@ std::string to_string(int128_t n)
     return "-" + to_string(abs_n);
   }
 }
-
-std::ostream& operator<<(std::ostream& stream, int128_t n)
-{
-  stream << to_string(n);
-  return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, uint128_t n)
-{
-  stream << to_string(n);
-  return stream;
-}
-
 #endif
 
 template <typename T>
-void compare(T result, const std::string& str)
+void check(const std::string& expr,
+           const std::string& expected)
 {
-  T r = calculator::eval<T>(str);
-  std::cout << (r == result ? "Correct: " : "Error: ");
-  std::cout << std::setw(50) << str << " = " << std::setw(10) << r;
-  if (r != result)
+  T n = calculator::eval<T>(expr);
+
+  std::string res = to_string(n);
+  std::cout << (res == expected ? "Correct: " : "Error: ");
+  std::cout << expr << " = " << res;
+
+  if (res != expected)
   {
-    std::cout << " != " << result << std::endl;
+    std::cerr << " != " << expected << std::endl;
     std::exit(1);
   }
+
   std::cout << std::endl;
 }
 
-void signed_integer_tests()
+template <typename T>
+void check_exception(const std::string& expr)
+{
+  try {
+    check<T>(expr, "error");
+  }
+  catch (calculator::error& e)
+  {
+    std::string errorMsg(e.what());
+    std::size_t pos = errorMsg.find(": ");
+
+    if (pos != std::string::npos)
+      errorMsg = errorMsg.substr(pos + 2);
+
+    std::cout << "Correct: " << errorMsg << std::endl;
+  }
+}
+
+void trivial_tests()
+{
+  check<int>("0", "0");
+  check<int>("1", "1");
+  check<int>("12", "12");
+  check<int>("123", "123");
+
+  check<int>("-0", "0");
+  check<int>("-1", "-1");
+  check<int>("-12", "-12");
+  check<int>("-123", "-123");
+
+  check<int>("0x0", "0");
+  check<int>("0x1", "1");
+  check<int>("0xa", "10");
+  check<int>("0xf", "15");
+  check<int>("0x10", "16");
+  check<int>("0xff", "255");
+
+  check<int>("-0x0", "0");
+  check<int>("-0x1", "-1");
+  check<int>("-0xa", "-10");
+  check<int>("-0xf", "-15");
+  check<int>("-0x10", "-16");
+  check<int>("-0xff", "-255");
+
+  check<int>("(1)", "1");
+  check<int>("2 * (-0xa + 17)", "14");
+  check<int>("10* -(3+2)", "-50");
+  check<int>("2^(2*5)", "1024");
+  check<int>(" (2*5)^2", "100");
+  check<int>("(((((1 )))+ 1))", "2");
+
+  std::cout << std::endl;
+
+  check_exception<int>("");
+  check_exception<int>("     ");
+  check_exception<int>("10 10");
+  check_exception<int>("10a10");
+  check_exception<int>("10.10");
+  check_exception<int>("10'10");
+  check_exception<int>("10\"10");
+  check_exception<int>("()");
+  check_exception<int>("10+(5-3");
+  check_exception<int>("10+)");
+  check_exception<int>("(((((10))))");
+}
+
+void arithmetic_expression_tests()
 {
   #define STR1(s) #s
-  #define TOSTRING(s) STR1(s)
+  #define STRINGIFY(s) STR1(s)
 
   /// Test expressions
   #define EXPR1 45345 + 0 + 0xdf234 - 1000 % 7
@@ -113,464 +178,116 @@ void signed_integer_tests()
   #define EXPRa ((12|13)<<8)>>((1|127) %10&(31+7))
   #define EXPRb ((((((((((5))))))  ))))- ((((((((( 6)))))))))
 
-  compare(EXPR1, TOSTRING(EXPR1));
-  compare(EXPR2, TOSTRING(EXPR2));
-  compare(EXPR3, TOSTRING(EXPR3));
-  compare(EXPR4, TOSTRING(EXPR4));
-  compare(EXPR5, TOSTRING(EXPR5));
-  compare(EXPR6, TOSTRING(EXPR6));
-  compare(EXPR7, TOSTRING(EXPR7));
-  compare(EXPR8, TOSTRING(EXPR8));
-  compare(EXPR9, TOSTRING(EXPR9));
-  compare(EXPRa, TOSTRING(EXPRa));
-  compare(EXPRb, TOSTRING(EXPRb));
+  check<int>(STRINGIFY(EXPR1), to_string(EXPR1));
+  check<int>(STRINGIFY(EXPR2), to_string(EXPR2));
+  check<int>(STRINGIFY(EXPR3), to_string(EXPR3));
+  check<int>(STRINGIFY(EXPR4), to_string(EXPR4));
+  check<int>(STRINGIFY(EXPR5), to_string(EXPR5));
+  check<int>(STRINGIFY(EXPR6), to_string(EXPR6));
+  check<int>(STRINGIFY(EXPR7), to_string(EXPR7));
+  check<int>(STRINGIFY(EXPR8), to_string(EXPR8));
+  check<int>(STRINGIFY(EXPR9), to_string(EXPR9));
+  check<int>(STRINGIFY(EXPRa), to_string(EXPRa));
+  check<int>(STRINGIFY(EXPRb), to_string(EXPRb));
+}
+
+void signed_integer_tests()
+{
+  check<int64_t>("300+(-200)", "100");
+  check<int64_t>("300-(-200)", "500");
+  check<int64_t>("1e18", "1000000000000000000");
+  check<int64_t>("3e18", "3000000000000000000");
+  check<int64_t>("10^0", "1");
+  check<int64_t>("10^1", "10");
+  check<int64_t>("37^2", "1369");
+  check<int64_t>("101^3", "1030301");
+  check<int64_t>("3^30", "205891132094649");
+  check<int64_t>("2^62-1", "4611686018427387903");
+  check<int64_t>("2^62-1+2^62", "9223372036854775807");
+  check<int64_t>("-(2^62)-(2^62)", "-9223372036854775808");
 
   std::cout << std::endl;
 
-  compare(calculator::eval<int64_t>("300+(-200)"), "100");
-  compare(calculator::eval<int64_t>("300-(-200)"), "500");
-  compare(calculator::eval<int64_t>("1e18"), "1000000000000000000");
-  compare(calculator::eval<int64_t>("3e18"), "3000000000000000000");
-  compare(calculator::eval<int64_t>("10^0"), "1");
-  compare(calculator::eval<int64_t>("10^1"), "10");
-  compare(calculator::eval<int64_t>("37^2"), "1369");
-  compare(calculator::eval<int64_t>("101^3"), "1030301");
-  compare(calculator::eval<int64_t>("3^30"), "205891132094649");
-  compare(calculator::eval<int64_t>("2^62-1"), "4611686018427387903");
-  compare(calculator::eval<int64_t>("2^62-1+2^62"), "9223372036854775807");
-  compare(calculator::eval<int64_t>("-(2^62)-(2^62)"), "-9223372036854775807-1");
-
-  std::cout << std::endl;
-
-  try {
-    compare(calculator::eval<int64_t>("0xfffffffffffffffffff"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("1000000000000000000000000000"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("10^20"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("123456789012345*1234567890"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("9223372036854775700+200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("-9223372036854775700+(-200)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("-9223372036854775700-200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("9223372036854775700-(-200)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int64_t>("-(-9223372036854775807-1)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
+  check_exception<int64_t>("0xfffffffffffffffffff");
+  check_exception<int64_t>("1000000000000000000000000000");
+  check_exception<int64_t>("10^20");
+  check_exception<int64_t>("123456789012345*1234567890");
+  check_exception<int64_t>("9223372036854775700+200");
+  check_exception<int64_t>("-9223372036854775700+(-200)");
+  check_exception<int64_t>("-9223372036854775700-200");
+  check_exception<int64_t>("9223372036854775700-(-200)");
+  check_exception<int64_t>("-(-9223372036854775807-1)");
 
 #if defined(__SIZEOF_INT128__) && \
    !defined(_MSC_VER)
 
   std::cout << std::endl;
 
-  compare(calculator::eval<int128_t>("1e25"), "10000000000000000000000000");
-  compare(calculator::eval<int128_t>("3e25"), "30000000000000000000000000");
-  compare(calculator::eval<int128_t>("5^50"), "88817841970012523233890533447265625");
-  compare(calculator::eval<int128_t>("2^120-1"), "1329227995784915872903807060280344575");
-  compare(calculator::eval<int128_t>("2^126-1+2^126"), "170141183460469231731687303715884105727");
-  compare(calculator::eval<int128_t>("-(2^126)-(2^126)"), "-170141183460469231731687303715884105727-1");
+  check<int128_t>("1e25", "10000000000000000000000000");
+  check<int128_t>("3e25", "30000000000000000000000000");
+  check<int128_t>("5^50", "88817841970012523233890533447265625");
+  check<int128_t>("2^120-1", "1329227995784915872903807060280344575");
+  check<int128_t>("2^126-1+2^126", "170141183460469231731687303715884105727");
+  check<int128_t>("-(2^126)-(2^126)", "-170141183460469231731687303715884105728");
 
   std::cout << std::endl;
 
-  try {
-    compare(calculator::eval<int128_t>("0xfffffffffffffffffffffffffffffffff"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("10000000000000000000000000000000000000000"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("10^40"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("170141183460469231731687303715884105700*2"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("170141183460469231731687303715884105700+200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("-170141183460469231731687303715884105700+(-200)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("-170141183460469231731687303715884105700-200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("170141183460469231731687303715884105700-(-200)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<int128_t>("-(-170141183460469231731687303715884105727-1)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
+  check_exception<int128_t>("0xfffffffffffffffffffffffffffffffff");
+  check_exception<int128_t>("10000000000000000000000000000000000000000");
+  check_exception<int128_t>("10^40");
+  check_exception<int128_t>("170141183460469231731687303715884105700*2");
+  check_exception<int128_t>("170141183460469231731687303715884105700+200");
+  check_exception<int128_t>("-170141183460469231731687303715884105700+(-200)");
+  check_exception<int128_t>("-170141183460469231731687303715884105700-200");
+  check_exception<int128_t>("170141183460469231731687303715884105700-(-200)");
+  check_exception<int128_t>("-(-170141183460469231731687303715884105727-1)");
 
 #endif
 }
 
 void unsigned_integer_tests()
 {
-  compare(calculator::eval<uint64_t>("300-200"), "100");
-  compare(calculator::eval<uint64_t>("1e19"), "10000000000000000000");
-  compare(calculator::eval<uint64_t>("11e18"), "11000000000000000000");
-  compare(calculator::eval<uint64_t>("10^0"), "1");
-  compare(calculator::eval<uint64_t>("10^1"), "10");
-  compare(calculator::eval<uint64_t>("37^2"), "1369");
-  compare(calculator::eval<uint64_t>("101^3"), "1030301");
-  compare(calculator::eval<uint64_t>("3^30"), "205891132094649");
-  compare(calculator::eval<uint64_t>("2^63-1"), "9223372036854775807");
-  compare(calculator::eval<uint64_t>("2^63-1+2^63"), "18446744073709551615");
-  compare(calculator::eval<uint64_t>("0"), "100-50-50");
+  check<uint64_t>("300-200", "100");
+  check<uint64_t>("1e19", "10000000000000000000");
+  check<uint64_t>("11e18", "11000000000000000000");
+  check<uint64_t>("10^0", "1");
+  check<uint64_t>("10^1", "10");
+  check<uint64_t>("37^2", "1369");
+  check<uint64_t>("101^3", "1030301");
+  check<uint64_t>("3^30", "205891132094649");
+  check<uint64_t>("2^63-1", "9223372036854775807");
+  check<uint64_t>("2^63-1+2^63", "18446744073709551615");
 
   std::cout << std::endl;
 
-  try {
-    compare(calculator::eval<uint64_t>("0xfffffffffffffffffff"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("1000000000000000000000000000"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("10^20"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("123456789012345*1234567890"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("18446744073709551516+200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("2-3"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint64_t>("-100+200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
+  check_exception<uint64_t>("0xfffffffffffffffffff");
+  check_exception<uint64_t>("1000000000000000000000000000");
+  check_exception<uint64_t>("10^20");
+  check_exception<uint64_t>("123456789012345*1234567890");
+  check_exception<uint64_t>("18446744073709551516+200");
+  check_exception<uint64_t>("2-3");
+  check_exception<uint64_t>("-100+200");
 
 #if defined(__SIZEOF_INT128__) && \
    !defined(_MSC_VER)
 
   std::cout << std::endl;
 
-  compare(calculator::eval<uint128_t>("1e25"), "10000000000000000000000000");
-  compare(calculator::eval<uint128_t>("3e25"), "30000000000000000000000000");
-  compare(calculator::eval<uint128_t>("5^50"), "88817841970012523233890533447265625");
-  compare(calculator::eval<uint128_t>("2^120-1"), "1329227995784915872903807060280344575");
-  compare(calculator::eval<uint128_t>("2^127-1+2^127"), "340282366920938463463374607431768211455");
+  check<uint128_t>("1e25", "10000000000000000000000000");
+  check<uint128_t>("3e25", "30000000000000000000000000");
+  check<uint128_t>("5^50", "88817841970012523233890533447265625");
+  check<uint128_t>("2^120-1", "1329227995784915872903807060280344575");
+  check<uint128_t>("2^127-1+2^127", "340282366920938463463374607431768211455");
 
   std::cout << std::endl;
 
-  try {
-    compare(calculator::eval<uint128_t>("0xfffffffffffffffffffffffffffffffff"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("10000000000000000000000000000000000000000"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("10^40"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("340282366920938463463374607431768211356*2"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("340282366920938463463374607431768211356+200"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("340282366920938463463374607431768211356-340282366920938463463374607431768211357"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
-
-  try {
-    compare(calculator::eval<uint128_t>("100-(-100)"), "0");
-  }
-  catch (calculator::error& e) {
-    std::string errorMsg(e.what());
-
-    if (errorMsg.rfind("Error: ", 0) == 0)
-      errorMsg = errorMsg.substr(7);
-
-    std::cout << "Correct: " << errorMsg << std::endl;
-  }
+  check_exception<uint128_t>("0xfffffffffffffffffffffffffffffffff");
+  check_exception<uint128_t>("10000000000000000000000000000000000000000");
+  check_exception<uint128_t>("10^40");
+  check_exception<uint128_t>("340282366920938463463374607431768211356*2");
+  check_exception<uint128_t>("340282366920938463463374607431768211356+200");
+  check_exception<uint128_t>("340282366920938463463374607431768211356-340282366920938463463374607431768211357");
+  check_exception<uint128_t>("100-(-100)");
 
 #endif
 }
@@ -711,7 +428,17 @@ void uint8_tests()
 
 int main()
 {
-  std::cout.setf(std::ios::left);
+  std::cout << std::endl;
+  std::cout << "=== Trivial tests ===" << std::endl;
+  std::cout << std::endl;
+
+  trivial_tests();
+
+  std::cout << std::endl;
+  std::cout << "=== Arithmetic expression tests ===" << std::endl;
+  std::cout << std::endl;
+
+  arithmetic_expression_tests();
 
   std::cout << std::endl;
   std::cout << "=== Signed integer tests ===" << std::endl;
