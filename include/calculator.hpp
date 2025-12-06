@@ -109,13 +109,6 @@ public:
     return result;
   }
 
-  /// Get the integer value of a character.
-  T eval(char c)
-  {
-    std::string expr(1, c);
-    return eval(expr);
-  }
-
 private:
   enum
   {
@@ -707,21 +700,9 @@ inline T eval(const std::string& expression)
   return parser.eval(expression);
 }
 
-template <typename T>
-inline T eval(char c)
-{
-  ExpressionParser<T> parser;
-  return parser.eval(c);
-}
-
 inline int eval(const std::string& expression)
 {
   return eval<int>(expression);
-}
-
-inline int eval(char c)
-{
-  return eval<int>(c);
 }
 
 } // namespace calculator
