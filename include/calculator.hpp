@@ -62,6 +62,7 @@
 #include <cctype>
 #include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <stack>
 #include <stdexcept>
@@ -87,13 +88,18 @@ class ExpressionParser
 {
 public:
   /// Evaluate an integer arithmetic expression and return its result.
-  /// @throw error if parsing fails.
+  /// @throw calculator::error if parsing fails.
   ///
   T eval(const std::string& expr)
   {
+    // Prevent denial of service attacks
+    if (expr.size() >= 10000)
+      throw calculator::error("Error: math expression string exceeds 10000 characters!");
+
     T result = 0;
     index_ = 0;
     expr_ = expr;
+
     try
     {
       result = parseExpr();
@@ -106,6 +112,7 @@ public:
         stack_.pop();
       throw;
     }
+
     return result;
   }
 
@@ -700,9 +707,9 @@ inline T eval(const std::string& expression)
   return parser.eval(expression);
 }
 
-inline int eval(const std::string& expression)
+inline std::int64_t eval(const std::string& expression)
 {
-  return eval<int>(expression);
+  return eval<std::int64_t>(expression);
 }
 
 } // namespace calculator

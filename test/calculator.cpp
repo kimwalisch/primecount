@@ -206,6 +206,15 @@ void signed_integer_tests()
   check<int64_t>("2^62-1+2^62", "9223372036854775807");
   check<int64_t>("-(2^62)-(2^62)", "-9223372036854775808");
 
+  check<int64_t>("1^60", "1");
+  check<int64_t>("(-1)^59", "-1");
+  check<int64_t>("(-1)^60", "1");
+  check<int64_t>("(-2)^3", "-8");
+  check<int64_t>("(-2)^4", "16");
+  check<int64_t>("3^3", "27");
+  check<int64_t>("(-3)^3", "-27");
+  check<int64_t>("(-3)^20", "3486784401");
+
   std::cout << std::endl;
 
   check_exception<int64_t>("0xfffffffffffffffffff");
