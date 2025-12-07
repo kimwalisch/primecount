@@ -17,14 +17,9 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <string>
 #include <utility>
 
 namespace primecount {
-
-template<class T>
-void unused_param(const T&)
-{ }
 
 int64_t pi_lmo1(int64_t x);
 int64_t pi_lmo2(int64_t x);
@@ -32,7 +27,6 @@ int64_t pi_lmo3(int64_t x);
 int64_t pi_lmo4(int64_t x);
 int64_t pi_primesieve(int64_t x);
 
-std::string pi(const std::string& x, int threads);
 int64_t pi(int64_t x, int threads);
 int64_t pi_noprint(int64_t x, int threads);
 int64_t pi_deleglise_rivat(int64_t x, int threads);

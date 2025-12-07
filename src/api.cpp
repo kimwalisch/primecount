@@ -27,8 +27,13 @@
 
 namespace {
 
-#ifdef _OPENMP
+#if defined(_OPENMP)
   int threads_ = 0;
+#endif
+
+#if !defined(HAVE_INT128_T)
+  template<class T>
+  void unused_param(const T&) { }
 #endif
 
 } // namespace
