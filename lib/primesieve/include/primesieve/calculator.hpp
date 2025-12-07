@@ -5,9 +5,9 @@
 ///            occurs a calculator::error exception is thrown.
 ///            <https://github.com/kimwalisch/calculator>
 /// @author    Kim Walisch, <kim.walisch@gmail.com>
-/// @copyright Copyright (C) 2013-2018 Kim Walisch
+/// @copyright Copyright (C) 2013-2025 Kim Walisch
 /// @license   BSD 2-Clause, https://opensource.org/licenses/BSD-2-Clause
-/// @version   1.4 patched: `^' is raise to power instead of XOR.
+/// @version   2.0
 ///
 /// == Supported operators ==
 ///
@@ -59,12 +59,15 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
-#include <stdexcept>
-#include <string>
+#include <cctype>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <stack>
-#include <cstddef>
-#include <cctype>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 
 namespace calculator
 {
@@ -75,19 +78,9 @@ namespace calculator
 class error : public std::runtime_error
 {
 public:
-  error(const std::string& expr, const std::string& message)
-    : std::runtime_error(message),
-      expr_(expr)
+  error(const std::string& msg)
+    : std::runtime_error(msg)
   { }
-#if __cplusplus < 201103L
-  ~error() throw() { }
-#endif
-  std::string expression() const
-  {
-    return expr_;
-  }
-private:
-  std::string expr_;
 };
 
 template <typename T>
@@ -95,33 +88,22 @@ class ExpressionParser
 {
 public:
   /// Evaluate an integer arithmetic expression and return its result.
-  /// @throw error if parsing fails.
+  /// @throw calculator::error if parsing fails.
   ///
   T eval(const std::string& expr)
   {
-    T result = 0;
-    index_ = 0;
-    expr_ = expr;
-    try
-    {
-      result = parseExpr();
-      if (!isEnd())
-        unexpected();
-    }
-    catch (const calculator::error&)
-    {
-      while(!stack_.empty())
-        stack_.pop();
-      throw;
-    }
-    return result;
-  }
+    // Prevent denial of service attacks
+    if (expr.size() >= 10000)
+      throw calculator::error("Error: math expression string exceeds 10000 characters!");
 
-  /// Get the integer value of a character.
-  T eval(char c)
-  {
-    std::string expr(1, c);
-    return eval(expr);
+    expr_ = expr;
+    index_ = 0;
+    T result = parseExpr();
+
+    if (!isEnd())
+      throw_unexpected();
+
+    return result;
   }
 
 private:
@@ -129,7 +111,6 @@ private:
   {
     OPERATOR_NULL,
     OPERATOR_BITWISE_OR,     /// |
-    OPERATOR_BITWISE_XOR,    /// ^
     OPERATOR_BITWISE_AND,    /// &
     OPERATOR_BITWISE_SHL,    /// <<
     OPERATOR_BITWISE_SHR,    /// >>
@@ -138,7 +119,7 @@ private:
     OPERATOR_MULTIPLICATION, /// *
     OPERATOR_DIVISION,       /// /
     OPERATOR_MODULO,         /// %
-    OPERATOR_POWER,          /// **
+    OPERATOR_POWER,          /// ^, **
     OPERATOR_EXPONENT        /// e, E
   };
 
@@ -183,42 +164,319 @@ private:
   /// top of the stack has lower precedence.
   std::stack<OperatorValue> stack_;
 
-  /// Exponentiation by squaring, x^n.
-  static T pow(T x, T n)
+  void throw_unexpected() const
   {
+    std::ostringstream msg;
+    msg << "Syntax error: unexpected token '"
+        << expr_.substr(index_, expr_.size() - index_)
+        << "' at index " << index_
+        << " of math expression '" << expr_ << "'";
+    throw calculator::error(msg.str());
+  }
+
+  void throw_integer_underflow_error() const
+  {
+    std::ostringstream msg;
+    msg << "Error: " << numBits() << "-bit "
+        << (is_signed() ? "signed" : "unsigned")
+        << " integer underflow detected ";
+
+    if (expr_.find_first_not_of("0123456789 \t\n\r\f\v") == std::string::npos)
+      msg << "in string to integer conversion of '" << expr_ << "'";
+    else
+      msg << "at index " << index_ << " of math expression '" << expr_ << "'";
+
+    throw calculator::error(msg.str());
+  }
+
+  void throw_integer_overflow_error() const
+  {
+    std::ostringstream msg;
+    msg << "Error: " << numBits() << "-bit "
+        << (is_signed() ? "signed" : "unsigned")
+        << " integer overflow detected ";
+
+    if (expr_.find_first_not_of("0123456789 \t\n\r\f\v") == std::string::npos)
+      msg << "in string to integer conversion of '" << expr_ << "'";
+    else
+      msg << "at index " << index_ << " of math expression '" << expr_ << "'";
+
+    throw calculator::error(msg.str());
+  }
+
+  void throw_division_by_0_error() const
+  {
+    std::ostringstream msg;
+    msg << "Error: division by 0 at index " << index_ << " of math expression '" << expr_ << "'";
+    throw calculator::error(msg.str());
+  }
+
+  void throw_modulo_by_0_error() const
+  {
+    std::ostringstream msg;
+    msg << "Error: modulo by 0 at index " << index_ << " of math expression '" << expr_ << "'";
+    throw calculator::error(msg.str());
+  }
+
+  /// Same as std::is_unsigned<T>::value
+  /// but also works with __uint128_t.
+  static constexpr bool is_unsigned()
+  {
+    // Second cast required for sizeof(T) < sizeof(int)
+    // due to C/C++ integer promotion rules.
+    return T(~T(0)) > 0;
+  }
+
+  /// Same as std::is_signed<T>::value
+  /// but also works with __int128_t.
+  static constexpr bool is_signed()
+  {
+    return !is_unsigned();
+  }
+
+  /// Same as std::numeric_limits<T>::digit
+  /// but also works with __int128_t.
+  static constexpr std::size_t numBits()
+  {
+    return sizeof(T) * CHAR_BIT;
+  }
+
+  /// Same as std::numeric_limits<T>::min
+  /// but also works with __uint128_t.
+  template <typename TT = T>
+  static typename std::enable_if<is_unsigned(), TT>::type
+  minValue()
+  {
+    return 0;
+  }
+
+  /// Same as std::numeric_limits<T>::min
+  /// but also works with __int128_t.
+  template <typename TT = T>
+  static typename std::enable_if<is_signed(), TT>::type
+  minValue()
+  {
+    T halfMagnitude = T(1) << (numBits() - 2);
+    return -halfMagnitude - halfMagnitude;
+  }
+
+  /// Same as std::numeric_limits<T>::max
+  /// but also works with __uint128_t.
+  template <typename TT = T>
+  static typename std::enable_if<is_unsigned(), TT>::type
+  maxValue()
+  {
+    return T(~T(0));
+  }
+
+  /// Same as std::numeric_limits<T>::max
+  /// but also works with __int128_t.
+  template <typename TT = T>
+  static typename std::enable_if<is_signed(), TT>::type
+  maxValue()
+  {
+    T halfMagnitude = T(1) << (numBits() - 2);
+    return halfMagnitude | (halfMagnitude - T(1));
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_unsigned(), TT>::type
+  checked_add(T x, T y) const
+  {
+    if (x > maxValue() - y)
+      throw_integer_overflow_error();
+
+    return x + y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_signed(), TT>::type
+  checked_add(T x, T y) const
+  {
+    if (x > 0 && y > 0) {
+      if (x > maxValue() - y)
+        throw_integer_overflow_error();
+    }
+    else if (x < 0 && y < 0) {
+      if (x < minValue() - y)
+        throw_integer_underflow_error();
+    }
+
+    return x + y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_unsigned(), TT>::type
+  checked_sub(T x, T y) const
+  {
+    if (x < y)
+      throw_integer_underflow_error();
+
+    return x - y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_signed(), TT>::type
+  checked_sub(T x, T y) const
+  {
+    if (x > 0 && y < 0) {
+      if (x > maxValue() + y)
+        throw_integer_overflow_error();
+    }
+    else if (x < 0 && y > 0) {
+      if (x < minValue() + y)
+        throw_integer_underflow_error();
+    }
+
+    return x - y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_unsigned(), TT>::type
+  checked_mul(T x, T y) const
+  {
+    // Prevent division by 0
+    if (y == 0)
+      return 0;
+
+    if (x > maxValue() / y)
+      throw_integer_overflow_error();
+
+    return x * y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_signed(), TT>::type
+  checked_mul(T x, T y) const
+  {
+    // Prevent division by 0
+    if (x == 0 || y == 0)
+      return 0;
+
+    if (x > 0)
+    {
+      if (y > 0) {
+        if (x > maxValue() / y)
+          throw_integer_overflow_error();
+      }
+      else { // x > 0 && y < 0
+        if (y < minValue() / x)
+          throw_integer_underflow_error();
+      }
+    }
+    else // x < 0
+    {
+      if (y > 0) {
+        if (x < minValue() / y)
+          throw_integer_underflow_error();
+      }
+      else // x < 0 && y < 0
+      {
+        // INT_MIN * -1 causes integer overflow
+        if (x == -1 && y == minValue())
+          throw_integer_overflow_error();
+        if (y == -1 && x == minValue())
+          throw_integer_overflow_error();
+
+        if (x < maxValue() / y)
+          throw_integer_overflow_error();
+      }
+    }
+
+    return x * y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_unsigned(), TT>::type
+  checked_div(T x, T y) const
+  {
+    if (y == 0)
+      throw_division_by_0_error();
+
+    return x / y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_signed(), TT>::type
+  checked_div(T x, T y) const
+  {
+    if (y == 0)
+      throw_division_by_0_error();
+
+    if (x == minValue() && y == -1)
+      throw_integer_overflow_error();
+
+    return x / y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_unsigned(), TT>::type
+  checked_modulo(T x, T y) const
+  {
+    if (y == 0)
+      throw_modulo_by_0_error();
+
+    return x % y;
+  }
+
+  template <typename TT = T>
+  typename std::enable_if<is_signed(), TT>::type
+  checked_modulo(T x, T y) const
+  {
+    if (y == 0)
+      throw_modulo_by_0_error();
+
+    if (x == minValue() && y == -1)
+      throw_integer_overflow_error();
+
+    return x % y;
+  }
+
+  /// Calculate x^n using an exponentiation by
+  /// squaring algorithm for integers.
+  ///
+  T ipow(T x, T n) const
+  {
+    // For 0^0 we use the same convention as
+    // std::pow(0, 0) which returns 1.
+    if (x == 1 || n == 0)
+      return 1;
+
+    if (x == 0)
+    {
+      if (n > 0)
+        return 0;
+      // 0^-n = 1/0^n = 1/0
+      if (is_signed() && n <= T(-1))
+        throw_division_by_0_error();
+    }
+
+    // Handle -1^n and x^-n
+    if (is_signed())
+    {
+      if (x == T(-1))
+        return (n % 2 == 0) ? 1 : T(-1);
+      // Here x != -1, 0, 1
+      if (n <= T(-1))
+        return 0;
+    }
+
     T res = 1;
 
     while (n > 0)
     {
       if (n % 2 != 0)
       {
-        res *= x;
+        res = checked_mul(res, x);
         n -= 1;
       }
       n /= 2;
 
       if (n > 0)
-        x *= x;
+        x = checked_mul(x, x);
     }
 
     return res;
-  }
-
-  T checkZero(T value) const
-  {
-    if (value == 0)
-    {
-      std::string divOperators("/%");
-      std::size_t division = expr_.find_last_of(divOperators, index_ - 2);
-      std::ostringstream msg;
-      msg << "Parser error: division by 0";
-      if (division != std::string::npos)
-        msg << " (error token is \""
-            << expr_.substr(division, expr_.size() - division)
-            << "\")";
-      throw calculator::error(expr_, msg.str());
-    }
-    return value;
   }
 
   T calculate(T v1, T v2, const Operator& op) const
@@ -226,17 +484,16 @@ private:
     switch (op.op)
     {
       case OPERATOR_BITWISE_OR:     return v1 | v2;
-      case OPERATOR_BITWISE_XOR:    return v1 ^ v2;
       case OPERATOR_BITWISE_AND:    return v1 & v2;
       case OPERATOR_BITWISE_SHL:    return v1 << v2;
       case OPERATOR_BITWISE_SHR:    return v1 >> v2;
-      case OPERATOR_ADDITION:       return v1 + v2;
-      case OPERATOR_SUBTRACTION:    return v1 - v2;
-      case OPERATOR_MULTIPLICATION: return v1 * v2;
-      case OPERATOR_DIVISION:       return v1 / checkZero(v2);
-      case OPERATOR_MODULO:         return v1 % checkZero(v2);
-      case OPERATOR_POWER:          return pow(v1, v2);
-      case OPERATOR_EXPONENT:       return v1 * pow(10, v2);
+      case OPERATOR_ADDITION:       return checked_add(v1, v2);
+      case OPERATOR_SUBTRACTION:    return checked_sub(v1, v2);
+      case OPERATOR_MULTIPLICATION: return checked_mul(v1, v2);
+      case OPERATOR_DIVISION:       return checked_div(v1, v2);
+      case OPERATOR_MODULO:         return checked_modulo(v1, v2);
+      case OPERATOR_POWER:          return ipow(v1, v2);
+      case OPERATOR_EXPONENT:       return checked_mul(v1, ipow(10, v2));
       default:                      return 0;
     }
   }
@@ -262,18 +519,8 @@ private:
   void expect(const std::string& str)
   {
     if (expr_.compare(index_, str.size(), str) != 0)
-      unexpected();
+      throw_unexpected();
     index_ += str.size();
-  }
-
-  void unexpected() const
-  {
-    std::ostringstream msg;
-    msg << "Syntax error: unexpected token \""
-        << expr_.substr(index_, expr_.size() - index_)
-        << "\" at index "
-        << index_;
-    throw calculator::error(expr_, msg.str());
   }
 
   /// Eat all white space characters at the
@@ -328,8 +575,13 @@ private:
   T parseDecimal()
   {
     T value = 0;
+
     for (T d; (d = getInteger()) <= 9; index_++)
-      value = value * 10 + d;
+    {
+      value = checked_mul(value, 10);
+      value = checked_add(value, d);
+    }
+
     return value;
   }
 
@@ -337,8 +589,13 @@ private:
   {
     index_ = index_ + 2;
     T value = 0;
+
     for (T h; (h = getInteger()) <= 0xf; index_++)
-      value = value * 0x10 + h;
+    {
+      value = checked_mul(value, 0x10);
+      value = checked_add(value, h);
+    }
+
     return value;
   }
 
@@ -378,17 +635,36 @@ private:
                 if (getCharacter() != ')')
                 {
                   if (!isEnd())
-                    unexpected();
-                  throw calculator::error(expr_, "Syntax error: `)' expected at end of expression");
+                    throw_unexpected();
+                  throw calculator::error("Syntax error: `)' expected at end of math expression '" + expr_ + "'");
                 }
                 index_++; break;
       case '~': index_++; val = ~parseValue(); break;
       case '+': index_++; val =  parseValue(); break;
-      case '-': index_++; val =  parseValue() * static_cast<T>(-1);
+      case '-': index_++;
+                // For e.g. uint64_t x = 100
+                // -x = 18446744073709551516
+                // If we would later use this value to e.g.
+                // calculate -100+200 we would trigger
+                // an integer overflow exception due to:
+                // 18446744073709551516 + 200 > 2^64-1
+                if (is_unsigned())
+                  throw_integer_underflow_error();
+
+                val =  parseValue();
+
+                // For e.g. val = min(int64_t):
+                // -min(int64_t) = -(-2^63) = 2^63
+                // but 2^63 > max(int64_t)
+                if (is_signed() && val == minValue())
+                  throw_integer_overflow_error();
+                else
+                   val *= T(-1);
+
                 break;
       default : if (!isEnd())
-                  unexpected();
-                throw calculator::error(expr_, "Syntax error: value expected at end of expression");
+                  throw_unexpected();
+                throw calculator::error("Syntax error: value expected at end of math expression '" + expr_ + "'");
     }
     return val;
   }
@@ -438,21 +714,9 @@ inline T eval(const std::string& expression)
   return parser.eval(expression);
 }
 
-template <typename T>
-inline T eval(char c)
+inline std::int64_t eval(const std::string& expression)
 {
-  ExpressionParser<T> parser;
-  return parser.eval(c);
-}
-
-inline int eval(const std::string& expression)
-{
-  return eval<int>(expression);
-}
-
-inline int eval(char c)
-{
-  return eval<int>(c);
+  return eval<std::int64_t>(expression);
 }
 
 } // namespace calculator

@@ -45,6 +45,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cstddef>
+#include <utility>
 
 #if defined(__ARM_FEATURE_SVE) && \
     __has_include(<arm_sve.h>)
@@ -91,51 +92,41 @@
 
 namespace {
 
-ALWAYS_INLINE void presieve1(const uint8_t* __restrict preSieved0,
-                             const uint8_t* __restrict preSieved1,
-                             const uint8_t* __restrict preSieved2,
-                             const uint8_t* __restrict preSieved3,
-                             uint8_t* __restrict sieve,
-                             std::size_t bytes)
+/// Runtime dispatch to optimized presieve1() SIMD algorithm
+template <typename... Args>
+void presieve1(Args&&... args)
 {
 #if defined(ENABLE_MULTIARCH_AVX512_BW)
   if (cpu_supports_avx512_bw)
-    presieve1_x86_avx512(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+    presieve1_x86_avx512(std::forward<Args>(args)...);
   else
-    presieve1_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
-
+    presieve1_default(std::forward<Args>(args)...);
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
   if (cpu_supports_sve)
-    presieve1_arm_sve(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+    presieve1_arm_sve(std::forward<Args>(args)...);
   else
-    presieve1_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
-
+    presieve1_default(std::forward<Args>(args)...);
 #else
-  presieve1_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+  presieve1_default(std::forward<Args>(args)...);
 #endif
 }
 
-ALWAYS_INLINE void presieve2(const uint8_t* __restrict preSieved0,
-                             const uint8_t* __restrict preSieved1,
-                             const uint8_t* __restrict preSieved2,
-                             const uint8_t* __restrict preSieved3,
-                             uint8_t* __restrict sieve,
-                             std::size_t bytes)
+/// Runtime dispatch to optimized presieve2() SIMD algorithm
+template <typename... Args>
+void presieve2(Args&&... args)
 {
 #if defined(ENABLE_MULTIARCH_AVX512_BW)
   if (cpu_supports_avx512_bw)
-    presieve2_x86_avx512(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+    presieve2_x86_avx512(std::forward<Args>(args)...);
   else
-    presieve2_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
-
+    presieve2_default(std::forward<Args>(args)...);
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
   if (cpu_supports_sve)
-    presieve2_arm_sve(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+    presieve2_arm_sve(std::forward<Args>(args)...);
   else
-    presieve2_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
-
+    presieve2_default(std::forward<Args>(args)...);
 #else
-  presieve2_default(preSieved0, preSieved1, preSieved2, preSieved3, sieve, bytes);
+  presieve2_default(std::forward<Args>(args)...);
 #endif
 }
 
@@ -153,7 +144,10 @@ void PreSieve::preSieve(Vector<uint8_t>& sieve, uint64_t segmentLow)
   pos2 = (segmentLow % (preSieveTables[2].size() * 30)) / 30;
   pos3 = (segmentLow % (preSieveTables[3].size() * 30)) / 30;
 
-  // PreSieve algo 1
+  // This loop performs the first pass.
+  // It performs a bitwise AND of the first four
+  // preSieveTables and stores the result in the
+  // sieve array, discarding its previous contents.
   while (offset < sieve.size())
   {
     uint64_t bytesToCopy = sieve.size() - offset;
@@ -163,10 +157,10 @@ void PreSieve::preSieve(Vector<uint8_t>& sieve, uint64_t segmentLow)
     bytesToCopy = std::min(bytesToCopy, uint64_t(preSieveTables[2].size() - pos2));
     bytesToCopy = std::min(bytesToCopy, uint64_t(preSieveTables[3].size() - pos3));
 
-    presieve1(&*(preSieveTables[0].begin() + pos0),
-              &*(preSieveTables[1].begin() + pos1),
-              &*(preSieveTables[2].begin() + pos2),
-              &*(preSieveTables[3].begin() + pos3),
+    presieve1(preSieveTables[0].begin() + pos0,
+              preSieveTables[1].begin() + pos1,
+              preSieveTables[2].begin() + pos2,
+              preSieveTables[3].begin() + pos3,
               &sieve[offset],
               bytesToCopy);
 
@@ -178,7 +172,9 @@ void PreSieve::preSieve(Vector<uint8_t>& sieve, uint64_t segmentLow)
     pos3 = (pos3 + bytesToCopy) * (pos3 < preSieveTables[3].size());
   }
 
-  // PreSieve algo 2
+  // This loop performs a bitwise AND of the
+  // sieve array and the preSieveTables, storing
+  // the result back into the sieve array.
   for (std::size_t i = 4; i < preSieveTables.size(); i += 4)
   {
     offset = 0;
@@ -197,10 +193,10 @@ void PreSieve::preSieve(Vector<uint8_t>& sieve, uint64_t segmentLow)
       bytesToCopy = std::min(bytesToCopy, uint64_t(preSieveTables[i+2].size() - pos2));
       bytesToCopy = std::min(bytesToCopy, uint64_t(preSieveTables[i+3].size() - pos3));
 
-      presieve2(&*(preSieveTables[i+0].begin() + pos0),
-                &*(preSieveTables[i+1].begin() + pos1),
-                &*(preSieveTables[i+2].begin() + pos2),
-                &*(preSieveTables[i+3].begin() + pos3),
+      presieve2(preSieveTables[i+0].begin() + pos0,
+                preSieveTables[i+1].begin() + pos1,
+                preSieveTables[i+2].begin() + pos2,
+                preSieveTables[i+3].begin() + pos3,
                 &sieve[offset],
                 bytesToCopy);
 
