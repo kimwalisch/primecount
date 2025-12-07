@@ -244,7 +244,7 @@ void CmdOptions::optionStatus(Option& opt)
     set_status_precision(getVal<int>(opt));
 }
 
-CmdOptions parseOptions(int argc, char* argv[])
+CmdOptions parseOptions(int argc, char** argv)
 {
   // No command-line options provided
   if (argc <= 1)
