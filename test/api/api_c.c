@@ -14,6 +14,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void check(int OK)
 {
@@ -28,12 +29,6 @@ void check(int OK)
 
 int main(void)
 {
-  printf("primecount version: %s\n", primecount_version());
-  printf("threads: %d\n", primecount_get_num_threads());
-
-  primecount_set_num_threads(3);
-  printf("new threads: %d\n", primecount_get_num_threads());
-
   // Test 64-bit pi(-x)
   int64_t n = -1;
   int64_t res = primecount_pi(n);
@@ -88,7 +83,7 @@ int main(void)
   n128.lo = 0;
   n128.hi = 1ull << 50;
   res128 = primecount_nth_prime_128(n128);
-  printf("primecount_nth_prime_128(1e9) = %"PRId64, res128.lo);
+  printf("primecount_nth_prime_128(2^114) = %"PRId64, res128.hi);
   check(res128.hi == -1 && ~res128.lo == 0);
 
   n = (int64_t) 1e12;
@@ -101,6 +96,25 @@ int main(void)
   res = primecount_phi(n, a);
   printf("primecount_phi(%"PRId64", %"PRId64") = %"PRId64, n , a, res);
   check(res == 0);
+
+
+  printf("primecount version: %s", primecount_version());
+  check(strcmp(primecount_version(), PRIMECOUNT_VERSION) == 0);
+
+  // If multi-threading is disabled setting the
+  // number of threads must have no effect.
+  if (primecount_get_num_threads() <= 1)
+  {
+    primecount_set_num_threads(2);
+    printf("new threads: %d", primecount_get_num_threads());
+    check(primecount_get_num_threads() == 1);
+  }
+  else
+  {
+    primecount_set_num_threads(2);
+    printf("new threads: %d", primecount_get_num_threads());
+    check(primecount_get_num_threads() == 2);
+  }
 
   printf("\n");
   printf("All tests passed successfully!\n");
