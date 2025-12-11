@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <iostream>
-#include <sstream>
+#include <string>
 
 namespace primecount {
 
@@ -146,19 +146,17 @@ void LoadBalancerAC::print_status(double time)
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);
     total_segments += segment_nr_;
 
-    std::ostringstream status;
-    status << "\rSegments: " << segment_nr_ << '/' << total_segments;
+    std::string status = "\rSegments: ";
+    status += std::to_string(segment_nr_) + "/";
+    status += std::to_string(total_segments);
+    std::size_t new_size = status.size();
 
-    if (status.str().size() >= prev_status_size_)
-      std::cout << status.str() << std::flush;
-    else
-    {
-      std::ostringstream clear_status;
-      clear_status << "\r" << std::string(prev_status_size_, ' ') << status.str();
-      std::cout << clear_status.str() << std::flush;
-    }
+    // Need to clear previous line?
+    if (status.size() < prev_status_size_)
+      status = "\r" + std::string(prev_status_size_, ' ') + status;
 
-    prev_status_size_ = status.str().size();
+    std::cout << status << std::flush;
+    prev_status_size_ = new_size;
   }
 }
 
