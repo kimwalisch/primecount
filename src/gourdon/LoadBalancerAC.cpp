@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <string>
 
