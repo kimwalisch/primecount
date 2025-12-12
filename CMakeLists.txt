@@ -19,6 +19,14 @@ option(WITH_DIV32           "Use 32-bit division instead of 64-bit division when
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 
+# Check if primecount is top level project ###########################
+
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(PRIMECOUNT_IS_TOP_PROJECT ON)
+else()
+    set(PRIMECOUNT_IS_TOP_PROJECT OFF)
+endif()
+
 # Enable/Disable libdivide ###########################################
 
 # Historically, integer division has been one of the slowest
@@ -59,15 +67,29 @@ endif()
 
 # Set default build type to Release ##################################
 
-get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(PRIMECOUNT_IS_TOP_PROJECT)
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
-if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    if(NOT isMultiConfig AND NOT CMAKE_BUILD_TYPE)
+        message(STATUS "Setting CMAKE_BUILD_TYPE = Release")
+        set(CMAKE_BUILD_TYPE Release CACHE STRING
+            "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    endif()
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_ASSERT")
+endif()
+
+# Hide symbols of inline functions ###################################
+# This reduces the size of the shared libprimecount by about 1%.
+
+if(PRIMECOUNT_IS_TOP_PROJECT)
+    if (NOT DEFINED CMAKE_VISIBILITY_INLINES_HIDDEN)
+        message(STATUS "Setting CMAKE_VISIBILITY_INLINES_HIDDEN = ON")
+        set(CMAKE_VISIBILITY_INLINES_HIDDEN ON CACHE BOOL
+            "Whether to add a compiler flag to hide symbols of inline functions")
+    endif ()
 endif()
 
 # primecount binary source files #####################################
