@@ -4,7 +4,7 @@
 ///        of the formulas related to special leaves. It is used by
 ///        the D, S2_easy and S2_hard formulas.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,11 +13,11 @@
 #include <StatusS2.hpp>
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
+#include <print.hpp>
 
 #include <iostream>
 #include <algorithm>
-#include <iomanip>
-#include <sstream>
+#include <string>
 
 using namespace primecount;
 
@@ -93,9 +93,10 @@ void StatusS2::print(double percent)
   if ((percent - old) >= epsilon_)
   {
     percent_ = percent;
-    std::ostringstream status;
-    status << "\rStatus: " << std::fixed << std::setprecision(precision_) << percent << '%';
-    std::cout << status.str() << std::flush;
+    std::string status = "\rStatus: ";
+    status += to_string(percent, precision_);
+    status += '%';
+    std::cout << status << std::flush;
   }
 }
 

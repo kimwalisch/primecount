@@ -16,13 +16,11 @@
 #include <macros.hpp>
 #include <min.hpp>
 
-#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-#include <string>
 #include <stdint.h>
 #include <utility>
 
@@ -62,60 +60,6 @@ double truncate3(double n)
 } // namespace
 
 namespace primecount {
-
-/// The compiler supports the non standard __int128_t type, but the
-/// standard int128_t type is missing in <stdint.h>. We need to
-/// define a few functions that are not supported by the C++ STL.
-///
-#if defined(ENABLE_INT128_TO_STRING)
-
-std::string to_string(uint128_t n)
-{
-  std::string str;
-
-  while (n > 0)
-  {
-    str += '0' + n % 10;
-    n /= 10;
-  }
-
-  if (str.empty())
-    str = "0";
-
-  std::reverse(str.begin(), str.end());
-
-  return str;
-}
-
-std::string to_string(int128_t n)
-{
-  if (n >= 0)
-    return to_string((uint128_t) n);
-  else
-  {
-    // -n causes undefined behavior for n = INT128_MIN.
-    // Hence we use the defined two's complement negation: ~n + 1.
-    // Casting ~n to unsigned ensures the result of the addition
-    // (2^127 for INT128_MIN) is safely stored in a uint128_t
-    // without signed overflow.
-    uint128_t abs_n = uint128_t(~n) + 1;
-    return "-" + to_string(abs_n);
-  }
-}
-
-std::ostream& operator<<(std::ostream& stream, int128_t n)
-{
-  stream << to_string(n);
-  return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, uint128_t n)
-{
-  stream << to_string(n);
-  return stream;
-}
-
-#endif
 
 int get_status_precision(maxint_t x)
 {
@@ -474,10 +418,9 @@ void verify_pix(string_view_t pix_function,
   if (std::abs(double(pix - Lix)) >= (sqrtx * logx) / (8 * PI))
   {
     std::ostringstream oss;
-    oss << "\rprimecount error: " << pix_function << "(" << x << ") = " << pix << std::endl
+    oss << "\rprimecount error: " << pix_function << "(" << x << ") = "  << pix  << std::endl
         << "Li(x) = " << Lix << ", sqrt(x) = " << sqrtx << ", log(x) = " << logx << std::endl
-        << "Assertion failed: |pi(x) - Li(x)| < sqrt(x) * log(x) / (8 * PI)" << std::endl
-        << std::endl;
+        << "Assertion failed: |pi(x) - Li(x)| < sqrt(x) * log(x) / (8 * PI)\n"   << std::endl;
     std::cerr << oss.str() << std::flush;
     std::abort();
   }

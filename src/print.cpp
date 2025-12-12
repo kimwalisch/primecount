@@ -12,6 +12,7 @@
 #include <int128_t.hpp>
 #include <stdint.h>
 
+#include <algorithm>
 #include <iostream>
 #include <iomanip>
 
@@ -30,9 +31,127 @@ void print_threads(int threads)
   std::cout << "threads = " << threads << std::endl;
 }
 
-} // naespace
+} // namespace
+
+#if __cplusplus >= 201703L && \
+    __has_include(<charconv>)
+
+#include <primecount.hpp>
+#include <Vector.hpp>
+#include <macros.hpp>
+
+#include <charconv>
+#include <cmath>
 
 namespace primecount {
+
+std::string to_string(double x, int precision)
+{
+  ASSERT(precision >= 0);
+  precision = std::min(precision, 10);
+
+  std::chars_format format = (std::abs(x) < 1e16)
+    ? std::chars_format::fixed
+    : std::chars_format::scientific;
+
+  // The double value 1e16-1 with the maximum
+  // precision 10 requires 27 characters.
+  Array<char, 32> buffer;
+
+  std::to_chars_result res = std::to_chars(
+    buffer.data(),
+    buffer.data() + buffer.size(),
+    x, format, precision
+  );
+
+  if (res.ec == std::errc{})
+    return std::string(buffer.data(), res.ptr);
+  else
+    throw primecount_error("to_string(double, int): conversion failed!");
+}
+
+} // namespace
+
+#else
+
+#include <sstream>
+
+namespace primecount {
+
+/// std::ostringstream has poor performance.
+/// Hence, we only use it if the compiler does
+/// not support std::to_chars() from C++17.
+///
+std::string to_string(double x, int precision)
+{
+  std::ostringstream oss;
+  oss << std::fixed;
+  oss.precision(precision);
+  oss << x;
+
+  return oss.str();
+}
+
+} // namespace
+
+#endif
+
+namespace primecount {
+
+/// The compiler supports the non standard __int128_t
+/// type, but the int128_t type is missing in <stdint.h>.
+/// Hence, we need to define a few int128_t functions
+/// that are not supported by the C++ STL.
+///
+#if defined(ENABLE_INT128_TO_STRING)
+
+std::string to_string(uint128_t n)
+{
+  std::string str;
+
+  while (n > 0)
+  {
+    str += '0' + n % 10;
+    n /= 10;
+  }
+
+  if (str.empty())
+    str = "0";
+
+  std::reverse(str.begin(), str.end());
+
+  return str;
+}
+
+std::string to_string(int128_t n)
+{
+  if (n >= 0)
+    return to_string((uint128_t) n);
+  else
+  {
+    // -n causes undefined behavior for n = INT128_MIN.
+    // Hence we use the defined two's complement negation: ~n + 1.
+    // Casting ~n to unsigned ensures the result of the addition
+    // (2^127 for INT128_MIN) is safely stored in a uint128_t
+    // without signed overflow.
+    uint128_t abs_n = uint128_t(~n) + 1;
+    return "-" + to_string(abs_n);
+  }
+}
+
+std::ostream& operator<<(std::ostream& stream, int128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, uint128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+#endif
 
 bool is_print()
 {

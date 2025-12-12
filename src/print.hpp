@@ -14,8 +14,10 @@
 #include <macros.hpp>
 
 #include <stdint.h>
+#include <string>
 
-#if __cplusplus >= 201703L && __has_include(<string_view>)
+#if __cplusplus >= 201703L && \
+    __has_include(<string_view>)
   #include <string_view>
   using string_view_t = std::string_view;
 #else
@@ -23,6 +25,8 @@
 #endif
 
 namespace primecount {
+
+std::string to_string(double x, int precision);
 
 void set_print(bool print);
 void set_print_variables(bool print_variables);
