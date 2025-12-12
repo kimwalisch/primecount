@@ -2,7 +2,7 @@
 /// @file   Riemann_R.cpp
 /// @brief  Test the Riemann R function.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <array>
@@ -116,10 +115,9 @@ int main()
     int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < RiemannR_f128.size(); i++)
     {
-      std::ostringstream oss;
-      oss << RiemannR(x);
-      std::cout << "RiemannR(" << x << ") = " << oss.str();
-      check(oss.str() == RiemannR_f128[i]);
+      std::string str = to_string(RiemannR(x));
+      std::cout << "RiemannR(" << x << ") = " << str;
+      check(str == RiemannR_f128[i]);
       x *= 10;
     }
   }
