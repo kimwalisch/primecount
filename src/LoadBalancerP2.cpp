@@ -4,7 +4,7 @@
 ///        computation of the 2nd partial sieve function.
 ///        It is used by the P2(x, a) and B(x, y) functions.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,13 +14,13 @@
 #include <primecount-internal.hpp>
 #include <imath.hpp>
 #include <min.hpp>
+#include <print.hpp>
 
 #include <stdint.h>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <iomanip>
-#include <sstream>
+#include <string>
 
 namespace primecount {
 
@@ -116,9 +116,10 @@ void LoadBalancerP2::print_status()
     {
       time_ = time;
       double percent = get_percent(low_, sieve_limit_);
-      std::ostringstream status;
-      status << "\rStatus: " << std::fixed << std::setprecision(precision_) << percent << '%';
-      std::cout << status.str() << std::flush;
+      std::string status = "\rStatus: ";
+      status += to_string(percent, precision_);
+      status += '%';
+      std::cout << status << std::flush;
     }
   }
 }

@@ -3,7 +3,7 @@
 /// @brief  Test the Eulerian logarithmic integral function.
 ///         Li(x) = li(x) - li(2)
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,7 +18,6 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <array>
@@ -116,10 +115,9 @@ int main()
     int128_t x = ipow<15>((int128_t) 10);
     for (size_t i = 0; i < Li_f128.size(); i++)
     {
-      std::ostringstream oss;
-      oss << Li(x);
-      std::cout << "Li(" << x << ") = " << oss.str();
-      check(oss.str() == Li_f128[i]);
+      std::string str = to_string(Li(x));
+      std::cout << "Li(" << x << ") = " << str;
+      check(str == Li_f128[i]);
       x *= 10;
     }
   }

@@ -49,7 +49,7 @@ using uint128_t = __uint128_t;
 using maxint_t = __int128_t ;
 using maxuint_t = __uint128_t;
 
-/// These functions are defined in util.cpp
+/// These functions are defined in print.cpp
 std::string to_string(int128_t x);
 std::string to_string(uint128_t x);
 

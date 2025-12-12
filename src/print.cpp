@@ -12,8 +12,8 @@
 #include <int128_t.hpp>
 #include <stdint.h>
 
+#include <algorithm>
 #include <iostream>
-#include <iomanip>
 
 namespace {
 
@@ -30,9 +30,127 @@ void print_threads(int threads)
   std::cout << "threads = " << threads << std::endl;
 }
 
-} // naespace
+} // namespace
+
+#if __cplusplus >= 201703L && \
+    __has_include(<charconv>)
+
+#include <primecount.hpp>
+#include <Vector.hpp>
+#include <macros.hpp>
+
+#include <charconv>
+#include <cmath>
 
 namespace primecount {
+
+std::string to_string(double x, int precision)
+{
+  ASSERT(precision >= 0);
+  precision = std::min(precision, 10);
+
+  std::chars_format format = (std::abs(x) < 1e16)
+    ? std::chars_format::fixed
+    : std::chars_format::scientific;
+
+  // The double value 1e16-1 with the maximum
+  // precision 10 requires 27 characters.
+  Array<char, 32> buffer;
+
+  std::to_chars_result res = std::to_chars(
+    buffer.data(),
+    buffer.data() + buffer.size(),
+    x, format, precision
+  );
+
+  if (res.ec == std::errc{})
+    return std::string(buffer.data(), res.ptr);
+  else
+    throw primecount_error("to_string(double, int): conversion failed!");
+}
+
+} // namespace
+
+#else
+
+#include <sstream>
+
+namespace primecount {
+
+/// std::ostringstream has poor performance.
+/// Hence, we only use it if the compiler does
+/// not support std::to_chars() from C++17.
+///
+std::string to_string(double x, int precision)
+{
+  std::ostringstream oss;
+  oss << std::fixed;
+  oss.precision(precision);
+  oss << x;
+
+  return oss.str();
+}
+
+} // namespace
+
+#endif
+
+namespace primecount {
+
+/// The compiler supports the non standard __int128_t
+/// type, but the int128_t type is missing in <stdint.h>.
+/// Hence, we need to define a few int128_t functions
+/// that are not supported by the C++ STL.
+///
+#if defined(ENABLE_INT128_TO_STRING)
+
+std::string to_string(uint128_t n)
+{
+  std::string str;
+
+  while (n > 0)
+  {
+    str += '0' + n % 10;
+    n /= 10;
+  }
+
+  if (str.empty())
+    str = "0";
+
+  std::reverse(str.begin(), str.end());
+
+  return str;
+}
+
+std::string to_string(int128_t n)
+{
+  if (n >= 0)
+    return to_string((uint128_t) n);
+  else
+  {
+    // -n causes undefined behavior for n = INT128_MIN.
+    // Hence we use the defined two's complement negation: ~n + 1.
+    // Casting ~n to unsigned ensures the result of the addition
+    // (2^127 for INT128_MIN) is safely stored in a uint128_t
+    // without signed overflow.
+    uint128_t abs_n = uint128_t(~n) + 1;
+    return "-" + to_string(abs_n);
+  }
+}
+
+std::ostream& operator<<(std::ostream& stream, int128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, uint128_t n)
+{
+  stream << to_string(n);
+  return stream;
+}
+
+#endif
 
 bool is_print()
 {
@@ -60,7 +178,7 @@ void set_print_variables(bool print_variables)
 
 void print_seconds(double seconds)
 {
-  std::cout << "Seconds: " << std::fixed << std::setprecision(3) << seconds << std::endl;
+  std::cout << "Seconds: " << to_string(seconds, 3) << std::endl;
 }
 
 void print(string_view_t str)
@@ -87,11 +205,12 @@ void print(string_view_t str, maxint_t res, double time)
 /// Used by pi_lmo(x), pi_deleglise_rivat(x)
 void print(maxint_t x, int64_t y, int64_t z, int64_t c, int threads)
 {
+  double alpha = get_alpha(x, y);
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
   std::cout << "z = " << z << std::endl;
   std::cout << "c = " << c << std::endl;
-  std::cout << "alpha = " << std::fixed << std::setprecision(3) << get_alpha(x, y) << std::endl;
+  std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
   print_threads(threads);
 }
 
@@ -101,10 +220,11 @@ void print_vars(maxint_t x, int64_t y, int threads)
   if (is_print_variables())
   {
     maxint_t z = x / y;
+    double alpha = get_alpha(x, y);
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
     std::cout << "z = " << z << std::endl;
-    std::cout << "alpha = " << std::fixed << std::setprecision(3) << get_alpha(x, y) << std::endl;
+    std::cout << "alpha = " << to_string(alpha, 3) << std::endl;
     print_threads(threads);
     std::cout << std::endl;
   }
@@ -124,13 +244,18 @@ void print_vars(maxint_t x, int64_t y, int64_t c, int threads)
 /// Used by pi_gourdon(x)
 void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads)
 {
+  int64_t x_star = get_x_star_gourdon(x, y);
+  double alpha_y = get_alpha_y(x, y);
+  double alpha_z = get_alpha_z(y, z);
+
   std::cout << "x = " << x << std::endl;
   std::cout << "y = " << y << std::endl;
   std::cout << "z = " << z << std::endl;
   std::cout << "k = " << k << std::endl;
-  std::cout << "x_star = " << get_x_star_gourdon(x, y) << std::endl;
-  std::cout << "alpha_y = " << std::fixed << std::setprecision(3) << get_alpha_y(x, y) << std::endl;
-  std::cout << "alpha_z = " << std::fixed << std::setprecision(3) << get_alpha_z(y, z) << std::endl;
+  std::cout << "x_star = " << x_star << std::endl;
+  std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
+  std::cout << "alpha_z = " << to_string(alpha_z, 3) << std::endl;
+
   print_threads(threads);
 }
 
@@ -139,9 +264,10 @@ void print_gourdon_vars(maxint_t x, int64_t y, int threads)
 {
   if (is_print_variables())
   {
+    double alpha_y = get_alpha_y(x, y);
     std::cout << "x = " << x << std::endl;
     std::cout << "y = " << y << std::endl;
-    std::cout << "alpha_y = " << std::fixed << std::setprecision(3) << get_alpha_y(x, y) << std::endl;
+    std::cout << "alpha_y = " << to_string(alpha_y, 3) << std::endl;
     print_threads(threads);
     std::cout << std::endl;
   }

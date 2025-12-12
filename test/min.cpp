@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
-#include <sstream>
 #include <string>
 
 using namespace primecount;
