@@ -29,6 +29,7 @@ pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 * calculator.hpp: Add code to detect integer overflows.
 * LoadBalancerP2.cpp: Faster critical section.
 * LoadBalancerS2.cpp: Faster critical section.
+* LoadBalancerAC.cpp: Faster critical section.
 * nth_prime.cpp: Improve status output.
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.

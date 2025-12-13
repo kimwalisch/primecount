@@ -74,67 +74,83 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   if (is_print_)
-    print_status(get_time());
+  {
+    double time = get_time();
+    std::string status = get_status(time);
+    if (!status.empty())
+      std::cout << status << std::flush;
+  }
 }
 
 bool LoadBalancerAC::get_work(ThreadDataAC& thread)
 {
   double time = get_time();
   thread.secs = time - thread.secs;
+  std::string status;
+  bool is_work;
 
-  LockGuard lockGuard(lock_);
-
-  if (low_ >= sqrtx_)
-    return false;
-  if (low_ == 0)
-    start_time_ = time;
-
-  int64_t remaining_dist = sqrtx_ - low_;
-  double total_secs = time - start_time_;
-  double increase_threshold = std::max(0.01, total_secs / 1000);
-
-  // Near the end of the computation we use a smaller
-  // increase_threshold <= 1 second in order to make sure
-  // all threads finish nearly at same time.
-  if (segment_size_ == max_segment_size_)
-    increase_threshold = std::min(increase_threshold, 1.0);
-
-  // Most special leaves are below y (~ x^(1/3) * log(x)).
-  // We make sure this interval is evenly distributed
-  // amongst all threads by using a small segment size.
-  // Above y we increase the segment size (or the number of
-  // segments) by 2x if the thread runtime is close to 0.
-  if (low_ > y_ &&
-      thread.secs < increase_threshold &&
-      thread.segments == segments_ &&
-      thread.segment_size == segment_size_ &&
-      segment_size_ * segments_ * (threads_ * 8) < remaining_dist)
   {
-    int64_t increase_factor = 2;
+    LockGuard lockGuard(lock_);
 
-    if (segment_size_ >= max_segment_size_)
-      segments_ *= increase_factor;
-    else
+    if (low_ >= sqrtx_)
+      return false;
+    if (low_ == 0)
+      start_time_ = time;
+
+    int64_t remaining_dist = sqrtx_ - low_;
+    double total_secs = time - start_time_;
+    double increase_threshold = std::max(0.01, total_secs / 1000);
+
+    // Near the end of the computation we use a smaller
+    // increase_threshold <= 1 second in order to make sure
+    // all threads finish nearly at same time.
+    if (segment_size_ == max_segment_size_)
+      increase_threshold = std::min(increase_threshold, 1.0);
+
+    // Most special leaves are below y (~ x^(1/3) * log(x)).
+    // We make sure this interval is evenly distributed
+    // amongst all threads by using a small segment size.
+    // Above y we increase the segment size (or the number of
+    // segments) by 2x if the thread runtime is close to 0.
+    if (low_ > y_ &&
+        thread.secs < increase_threshold &&
+        thread.segments == segments_ &&
+        thread.segment_size == segment_size_ &&
+        segment_size_ * segments_ * (threads_ * 8) < remaining_dist)
     {
-      segment_size_ = segment_size_ * increase_factor;
-      segment_size_ = std::min(segment_size_, max_segment_size_);
-      segment_size_ = SegmentedPiTable::align_segment_size(segment_size_);
+      int64_t increase_factor = 2;
+
+      if (segment_size_ >= max_segment_size_)
+        segments_ *= increase_factor;
+      else
+      {
+        segment_size_ = segment_size_ * increase_factor;
+        segment_size_ = std::min(segment_size_, max_segment_size_);
+        segment_size_ = SegmentedPiTable::align_segment_size(segment_size_);
+      }
     }
+
+    if (is_print_)
+      status = get_status(time);
+
+    thread.low = low_;
+    thread.segments = segments_;
+    thread.segment_size = segment_size_;
+    is_work = thread.low < sqrtx_;
+    low_ = std::min(low_ + segment_size_ * segments_, sqrtx_);
+    segment_nr_++;
   }
 
-  if (is_print_)
-    print_status(time);
+  // Printing to the terminal incurs a system call
+  // and may hence be slow. Therefore, we do it
+  // after having released the mutex.
+  if (!status.empty())
+    std::cout << status << std::flush;
 
-  thread.low = low_;
-  thread.segments = segments_;
-  thread.segment_size = segment_size_;
-  low_ = std::min(low_ + segment_size_ * segments_, sqrtx_);
-  segment_nr_++;
-
-  return thread.low < sqrtx_;
+  return is_work;
 }
 
-void LoadBalancerAC::print_status(double time)
+std::string LoadBalancerAC::get_status(double time)
 {
   double threshold = 0.1;
 
@@ -156,9 +172,11 @@ void LoadBalancerAC::print_status(double time)
     if (status.size() < prev_status_size_)
       status = "\r" + std::string(prev_status_size_, ' ') + status;
 
-    std::cout << status << std::flush;
     prev_status_size_ = new_size;
+    return status;
   }
+
+  return std::string();
 }
 
 } // namespace

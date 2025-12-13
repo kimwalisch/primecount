@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <cstddef>
+#include <string>
 
 namespace primecount {
 
@@ -38,7 +39,7 @@ public:
   bool get_work(ThreadDataAC& thread);
 
 private:
-  void print_status(double current_time);
+  std::string get_status(double current_time);
   int64_t low_ = 0;
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
