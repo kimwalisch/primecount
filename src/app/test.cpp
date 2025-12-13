@@ -15,6 +15,7 @@
 #include <primesieve.hpp>
 #include <gourdon.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <PiTable.hpp>
 #include <print.hpp>
 
@@ -23,7 +24,6 @@
 #include <cstdlib>
 #include <exception>
 #include <random>
-#include <sstream>
 
 using namespace primecount;
 
@@ -108,16 +108,11 @@ using namespace primecount;
 #define TEST_NTH_PRIME(f1, tiny_iters, iters) \
 { \
   std::cout << "Testing " << #f1 "(x) " << std::flush; \
- \
+  int threads = get_num_threads(); \
+  int old_percent = -1; \
   int64_t n = 1; \
   int64_t prime = 0; \
   int64_t next = tiny_iters; \
-  int old_percent = -1; \
- \
-  std::random_device rd; \
-  std::mt19937 gen(rd()); \
-  std::uniform_int_distribution<int64_t> dist(1, 10000000); \
-  int threads = get_num_threads(); \
  \
   for (; n < tiny_iters; n++) \
     check_equal(#f1, n, f1 (n, threads), primesieve::nth_prime(n)); \
@@ -139,17 +134,16 @@ using namespace primecount;
 
 namespace {
 
-void check_equal(string_view_t f1,
-                 int64_t x,
-                 int64_t res1,
-                 int64_t res2)
+NOINLINE void check_equal(string_view_t f1,
+                          int64_t x,
+                          int64_t res1,
+                          int64_t res2)
 {
   if (res1 != res2)
   {
-    std::ostringstream oss;
-    oss << f1 << "(" << x << ") = " << res1
-        << " is an error, the correct result is " << res2;
-    throw primecount_error(oss.str());
+    std::cerr << std::endl << f1 << "(" << x << ") = " << res1
+              << " is an error, the correct result is " << std::endl;
+    std::exit(1);
   }
 }
 
