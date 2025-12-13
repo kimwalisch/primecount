@@ -142,7 +142,8 @@ NOINLINE void check_equal(string_view_t f1,
   if (res1 != res2)
   {
     std::cerr << std::endl << f1 << "(" << x << ") = " << res1
-              << " is an error, the correct result is " << std::endl;
+              << " is an error, the correct result = " << res2
+              << std::endl;
     std::exit(1);
   }
 }
