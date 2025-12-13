@@ -38,6 +38,7 @@ pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 * pi_lmo_parallel.cpp: Add support for runtime dispatch to optimized SIMD algorithm.
 * Move S2_easy_libdivide.cpp code into S2_easy.cpp.
 * Move AC_libdivide.cpp code into AC.cpp.
+* src/app/test.cpp: Speed up tests.
 * CMakeLists.txt: Set CMAKE_VISIBILITY_INLINES_HIDDEN = ON by default.
 
 Changes in primecount-7.20, 2025-11-03

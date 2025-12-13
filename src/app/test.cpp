@@ -32,6 +32,7 @@ using namespace primecount;
 { \
   std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
+  int old_percent = -1; \
   int64_t x = 0; \
  \
   /* test small values */ \
@@ -42,8 +43,10 @@ using namespace primecount;
   for (int64_t i = 0; i < iters; i++) \
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
+    int percent = int(100.0 * (i + 1.0) / iters); \
+    if (percent > old_percent) \
+      std::cout << "\rTesting " << #f1 "(x) " << percent << "%" << std::flush; \
+    old_percent = percent; \
     x += dist(gen); \
   } \
  \
@@ -55,6 +58,7 @@ using namespace primecount;
 { \
   std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
+  int old_percent = -1; \
   int64_t x = 0; \
  \
   /* test small values */ \
@@ -65,8 +69,10 @@ using namespace primecount;
   for (int64_t i = 0; i < iters; i++) \
   { \
     check_equal(#f1, x, f1 (x), f2 (x, threads)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
+    int percent = int(100.0 * (i + 1.0) / iters); \
+    if (percent > old_percent) \
+      std::cout << "\rTesting " << #f1 "(x) " << percent << "%" << std::flush; \
+    old_percent = percent; \
     x += dist(gen); \
   } \
  \
@@ -78,6 +84,7 @@ using namespace primecount;
 { \
   std::cout << "Testing " << #f1 << "(x)" << std::flush; \
   int threads = get_num_threads(); \
+  int old_percent = -1; \
   int64_t x = 0; \
  \
   /* test small values */ \
@@ -88,8 +95,10 @@ using namespace primecount;
   for (int64_t i = 0; i < iters; i++) \
   { \
     check_equal(#f1, x, f1 (x, threads), f2 (x, threads)); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
+    int percent = int(100.0 * (i + 1.0) / iters); \
+    if (percent > old_percent) \
+      std::cout << "\rTesting " << #f1 "(x) " << percent << "%" << std::flush; \
+    old_percent = percent; \
     x += dist(gen); \
   } \
  \
@@ -103,6 +112,7 @@ using namespace primecount;
   int64_t n = 1; \
   int64_t prime = 0; \
   int64_t next = tiny_iters; \
+  int old_percent = -1; \
  \
   std::random_device rd; \
   std::mt19937 gen(rd()); \
@@ -116,8 +126,10 @@ using namespace primecount;
   { \
     prime = primesieve::nth_prime(next, prime); \
     check_equal(#f1, n, f1 (n, threads), prime); \
-    double percent = 100.0 * (i + 1.0) / iters; \
-    std::cout << "\rTesting " << #f1 "(x) " << (int) percent << "%" << std::flush; \
+    int percent = int(100.0 * (i + 1.0) / iters); \
+    if (percent > old_percent) \
+      std::cout << "\rTesting " << #f1 "(x) " << percent << "%" << std::flush; \
+    old_percent = percent; \
     next = dist(gen); \
     n += next; \
   } \
