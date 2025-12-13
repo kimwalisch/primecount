@@ -110,7 +110,7 @@ maxint_t LoadBalancerS2::get_sum() const
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   std::string status;
-  bool is_work;
+  bool has_work;
 
   {
     LockGuard lockGuard(lock_);
@@ -132,7 +132,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     thread.secs = 0;
     thread.init_secs = 0;
 
-    is_work = thread.low < sieve_limit_;
+    has_work = thread.low < sieve_limit_;
     low_ += segment_size_ * segments_;
   }
 
@@ -142,7 +142,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   if (!status.empty())
     std::cout << status << std::flush;
 
-  return is_work;
+  return has_work;
 }
 
 void LoadBalancerS2::update_load_balancing(const ThreadData& thread)

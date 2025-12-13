@@ -87,7 +87,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   double time = get_time();
   thread.secs = time - thread.secs;
   std::string status;
-  bool is_work;
+  bool has_work;
 
   {
     LockGuard lockGuard(lock_);
@@ -136,7 +136,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
     thread.low = low_;
     thread.segments = segments_;
     thread.segment_size = segment_size_;
-    is_work = thread.low < sqrtx_;
+    has_work = thread.low < sqrtx_;
     low_ = std::min(low_ + segment_size_ * segments_, sqrtx_);
     segment_nr_++;
   }
@@ -147,7 +147,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   if (!status.empty())
     std::cout << status << std::flush;
 
-  return is_work;
+  return has_work;
 }
 
 std::string LoadBalancerAC::get_status(double time)

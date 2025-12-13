@@ -61,7 +61,7 @@ int LoadBalancerP2::get_threads() const
 bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
   std::string status;
-  bool is_work;
+  bool has_work;
 
   {
     LockGuard lockGuard(lock_);
@@ -106,7 +106,7 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
     low_ += thread_dist_;
     low_ = min(low_, sieve_limit_);
     high = low_;
-    is_work = low < sieve_limit_;
+    has_work = low < sieve_limit_;
   }
 
   // Printing to the terminal incurs a system call
@@ -115,7 +115,7 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   if (!status.empty())
     std::cout << status << std::flush;
 
-  return is_work;
+  return has_work;
 }
 
 std::string LoadBalancerP2::get_status()
