@@ -60,68 +60,81 @@ int LoadBalancerP2::get_threads() const
 /// The thread needs to sieve [low, high[
 bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
-  LockGuard lockGuard(lock_);
-  print_status();
+  std::string status;
+  bool is_work;
 
-  // Calculate the remaining sieving distance
-  low_ = min(low_, sieve_limit_);
-  int64_t dist = sieve_limit_ - low_;
-
-  // When a single thread is used (and printing is disabled) we can
-  // set thread_dist to the entire sieving distance as load balancing
-  // is only useful for multi-threading.
-  if (threads_ == 1)
   {
-    if (!is_print_)
-      thread_dist_ = dist;
+    LockGuard lockGuard(lock_);
+
+    if (is_print_)
+      status = get_status();
+
+    // Calculate the remaining sieving distance
+    low_ = min(low_, sieve_limit_);
+    int64_t dist = sieve_limit_ - low_;
+
+    // When a single thread is used (and printing is disabled)
+    // we can set thread_dist to the entire sieving distance
+    // as load balancing is only useful for multi-threading.
+    if (threads_ == 1)
+    {
+      if (!is_print_)
+        thread_dist_ = dist;
+    }
+    else
+    {
+      // Ensure that the thread initialization i.e. the calculation
+      // of PrimePi(low) uses less time than the actual computation.
+      // Computing PrimePi(low) uses O(low^(2/3) / log(low)^2) time but
+      // sieving a distance of n = low^(2/3) uses O(n log log n) time,
+      // hence the sieving time is larger than the initialization time.
+      // Using these settings for low = 2e14 the sieving time is 5x
+      // larger than the initialization time on my AMD EPYC 7642 CPU.
+      double low13 = std::cbrt(low_);
+      int64_t low23 = (int64_t) (low13 * low13);
+      min_thread_dist_ = std::max(min_thread_dist_, low23);
+      thread_dist_ = max(min_thread_dist_, thread_dist_);
+
+      // Reduce the thread distance near to end to keep all
+      // threads busy until the computation finishes.
+      int64_t max_thread_dist = dist / threads_;
+      if (thread_dist_ > max_thread_dist)
+        thread_dist_ = max(min_thread_dist_, max_thread_dist);
+    }
+
+    low = low_;
+    low_ += thread_dist_;
+    low_ = min(low_, sieve_limit_);
+    high = low_;
+    is_work = low < sieve_limit_;
   }
-  else
-  {
-    // Ensure that the thread initialization i.e. the calculation
-    // of PrimePi(low) uses less time than the actual computation.
-    // Computing PrimePi(low) uses O(low^(2/3) / log(low)^2) time but
-    // sieving a distance of n = low^(2/3) uses O(n log log n) time,
-    // hence the sieving time is larger than the initialization time.
-    // Using these settings for low = 2e14 the sieving time is 5x
-    // larger than the initialization time on my AMD EPYC 7642 CPU.
-    double low13 = std::cbrt(low_);
-    int64_t low23 = (int64_t) (low13 * low13);
-    min_thread_dist_ = std::max(min_thread_dist_, low23);
-    thread_dist_ = max(min_thread_dist_, thread_dist_);
 
-    // Reduce the thread distance near to end to keep all
-    // threads busy until the computation finishes.
-    int64_t max_thread_dist = dist / threads_;
-    if (thread_dist_ > max_thread_dist)
-      thread_dist_ = max(min_thread_dist_, max_thread_dist);
-  }
+  // Printing to the terminal incurs a system call
+  // and may hence be slow. Therefore, we do it
+  // after having released the mutex.
+  if (!status.empty())
+    std::cout << status << std::flush;
 
-  low = low_;
-  low_ += thread_dist_;
-  low_ = min(low_, sieve_limit_);
-  high = low_;
-
-  return low < sieve_limit_;
+  return is_work;
 }
 
-void LoadBalancerP2::print_status()
+std::string LoadBalancerP2::get_status()
 {
-  if (is_print_)
-  {
-    double time = get_time();
-    double old = time_;
-    double threshold = 0.1;
+  double time = get_time();
+  double old = time_;
+  double threshold = 0.1;
 
-    if ((time - old) >= threshold)
-    {
-      time_ = time;
-      double percent = get_percent(low_, sieve_limit_);
-      std::string status = "\rStatus: ";
-      status += to_string(percent, precision_);
-      status += '%';
-      std::cout << status << std::flush;
-    }
+  if ((time - old) >= threshold)
+  {
+    time_ = time;
+    double percent = get_percent(low_, sieve_limit_);
+    std::string status = "\rStatus: ";
+    status += to_string(percent, precision_);
+    status += '%';
+    return status;
   }
+
+  return std::string();
 }
 
 } // namespace
