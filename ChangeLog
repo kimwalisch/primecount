@@ -1,4 +1,4 @@
-Changes in primecount-8.0, 2025-12-12
+Changes in primecount-8.0, 2025-12-13
 
 # BREAKING C/C++ API CHANGES:
 
@@ -27,6 +27,7 @@ pc_int128_t primecount_nth_prime_128(pc_int128_t n);
 * api.cpp: Fix broken 128-bit nth prime function.
 * util.cpp: Fix undefined behavior in to_string().
 * calculator.hpp: Add code to detect integer overflows.
+* LoadBalancerS2.cpp: Faster critical section.
 * nth_prime.cpp: Improve status output.
 * AC.cpp: Improved instruction level parallelism.
 * AC_libdivide.cpp: Improved instruction level parallelism.

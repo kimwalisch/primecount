@@ -1,7 +1,7 @@
 ///
 /// @file  StatusS2.hpp
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -11,6 +11,7 @@
 #define STATUSS2_HPP
 
 #include <int128_t.hpp>
+#include <string>
 
 namespace primecount {
 
@@ -19,10 +20,10 @@ class StatusS2
 public:
   StatusS2(maxint_t x);
   void print(int64_t b, int64_t max_b);
-  void print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
   static double getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
+  std::string getStatus(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx);
 private:
-  void print(double percent);
+  std::string getStatus(double percent);
   double epsilon_ = 0;
   double percent_ = -1;
   double time_ = 0;

@@ -86,7 +86,7 @@ double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
   return percent;
 }
 
-void StatusS2::print(double percent)
+std::string StatusS2::getStatus(double percent)
 {
   double old = percent_;
 
@@ -96,8 +96,10 @@ void StatusS2::print(double percent)
     std::string status = "\rStatus: ";
     status += to_string(percent, precision_);
     status += '%';
-    std::cout << status << std::flush;
+    return status;
   }
+
+  return std::string();
 }
 
 /// This method is used by S2_hard() and D().
@@ -106,7 +108,7 @@ void StatusS2::print(double percent)
 /// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-void StatusS2::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+std::string StatusS2::getStatus(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
   double old = time_;
@@ -115,13 +117,17 @@ void StatusS2::print(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_appr
   {
     time_ = time;
     double percent = getPercent(low, limit, sum, sum_approx);
-    print(percent);
+    return getStatus(percent);
   }
+
+  return std::string();
 }
 
-/// Used by S2_easy.
-/// The calling code has to ensure that only 1 thread at a
-/// time executes this method.
+/// This method is used by S2_easy().
+/// This method does not use a lock to synchronize threads
+/// as it is only used inside of a critical section inside
+/// S2_easy.cpp and hence it can never be accessed
+/// simultaneously from multiple threads.
 ///
 void StatusS2::print(int64_t b, int64_t max_b)
 {
@@ -132,7 +138,9 @@ void StatusS2::print(int64_t b, int64_t max_b)
   {
     time_ = time;
     double percent = skewed_percent(b, max_b);
-    print(percent);
+    auto status = getStatus(percent);
+    if (!status.empty())
+      std::cout << status << std::flush;
   }
 }
 

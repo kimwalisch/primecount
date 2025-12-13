@@ -41,6 +41,7 @@
 #include <min.hpp>
 
 #include <stdint.h>
+#include <iostream>
 
 namespace {
 
@@ -108,27 +109,38 @@ maxint_t LoadBalancerS2::get_sum() const
 
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
-  LockGuard lockGuard(lock_);
-  sum_ += thread.sum;
+  std::string status;
+  bool is_work;
 
-  if (is_print_)
   {
-    uint64_t dist = thread.segment_size * thread.segments;
-    uint64_t high = thread.low + dist;
-    status_.print(high, sieve_limit_, sum_, sum_approx_);
+    LockGuard lockGuard(lock_);
+    sum_ += thread.sum;
+
+    if (is_print_)
+    {
+      uint64_t dist = thread.segment_size * thread.segments;
+      uint64_t high = thread.low + dist;
+      status = status_.getStatus(high, sieve_limit_, sum_, sum_approx_);
+    }
+
+    update_load_balancing(thread);
+
+    thread.low = low_;
+    thread.segments = segments_;
+    thread.segment_size = segment_size_;
+    thread.sum = 0;
+    thread.secs = 0;
+    thread.init_secs = 0;
+
+    is_work = thread.low < sieve_limit_;
+    low_ += segment_size_ * segments_;
   }
 
-  update_load_balancing(thread);
-
-  thread.low = low_;
-  thread.segments = segments_;
-  thread.segment_size = segment_size_;
-  thread.sum = 0;
-  thread.secs = 0;
-  thread.init_secs = 0;
-
-  low_ += segment_size_ * segments_;
-  bool is_work = thread.low < sieve_limit_;
+  // Printing to the terminal incurs a system call
+  // and may hence be slow. Therefore, we do it
+  // after having released the mutex.
+  if (!status.empty())
+    std::cout << status << std::flush;
 
   return is_work;
 }
