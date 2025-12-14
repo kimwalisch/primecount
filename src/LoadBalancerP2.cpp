@@ -128,7 +128,13 @@ std::string LoadBalancerP2::get_status()
   {
     time_ = time;
     double percent = get_percent(low_, sieve_limit_);
-    std::string status = "\rStatus: ";
+
+    // Clear the previous status line since multiple
+    // threads may print the status out of order.
+    // Max status string size e.g.: "Status 100.00%"
+    std::size_t max_status_size = std::string("Status: 100%").size() + precision_ + 1;
+    std::string clear_line = '\r' + std::string(max_status_size, ' ') + '\r';
+    std::string status = clear_line + "Status: ";
     status += to_string(percent, precision_);
     status += '%';
     return status;

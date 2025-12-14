@@ -163,19 +163,16 @@ std::string LoadBalancerAC::get_status(double time)
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);
     total_segments += segment_nr_;
 
-    std::string label = "Segments: ";
-    std::string total_segs = std::to_string(total_segments);
-
     // Count characters in e.g. "Segments: 123/123"
-    std::size_t status_size = label.size() + total_segs.size() * 2 + 1;
+    std::string total_segs = std::to_string(total_segments);
+    std::size_t status_size = std::string("Segments: ").size() + total_segs.size() * 2 + 1;
     max_status_size_ = std::max(status_size, max_status_size_);
     std::string clear_line = '\r' + std::string(max_status_size_, ' ') + '\r';
 
-    // The first part of the status string clears
-    // the previous status line. This is necessary
-    // because near the end of the computation the
-    // status string becomes shorter.
-    std::string status = clear_line + label;
+    // Clear the previous status line since
+    // the status string becomes shorter
+    // towards the end of the computation.
+    std::string status = clear_line + "Segments: ";
     status += std::to_string(segment_nr_) + '/';
     status += total_segs;
 
