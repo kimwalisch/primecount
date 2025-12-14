@@ -196,7 +196,7 @@ void print(string_view_t str, maxint_t res, double time)
   // We overwrite the current text line,
   // which could be e.g.:
   // "Status: 99.9999999991%"
-  // "Segments; 123456789/123456789"
+  // "Segments: 123456789/123456789"
   std::cout << "\rStatus: 100%                                 " << std::endl;
   std::cout << str << " = " << res << std::endl;
   print_seconds(get_time() - time);
