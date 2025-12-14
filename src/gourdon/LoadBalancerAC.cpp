@@ -166,7 +166,7 @@ std::string LoadBalancerAC::get_status(double time)
     std::string label = "Segments: ";
     std::string total_segs = std::to_string(total_segments);
 
-    // Count characters in e.g. "Status: 1234/1234"
+    // Count characters in e.g. "Segments: 123/123"
     std::size_t status_size = label.size() + total_segs.size() * 2 + 1;
     max_status_size_ = std::max(status_size, max_status_size_);
     std::string clear_line = '\r' + std::string(max_status_size_, ' ') + '\r';
