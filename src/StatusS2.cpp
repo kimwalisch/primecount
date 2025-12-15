@@ -15,7 +15,6 @@
 #include <int128_t.hpp>
 #include <print.hpp>
 
-#include <iostream>
 #include <algorithm>
 #include <string>
 
@@ -93,15 +92,7 @@ std::string StatusS2::getStatus(double percent)
   if ((percent - old) >= epsilon_)
   {
     percent_ = percent;
-    std::string status;
-    status.reserve(40);
-
-    // Clear the previous status line since multiple
-    // threads may print the status out of order.
-    // Max status string size: "Status: 100.00000%",
-    // hence we clear using 18 space characters.
-
-    status = "\r                  \rStatus: ";
+    std::string status = "Status: ";
     status += to_string(percent, precision_);
     status += '%';
     return status;
@@ -148,7 +139,7 @@ void StatusS2::print(int64_t b, int64_t max_b)
     double percent = skewed_percent(b, max_b);
     auto status = getStatus(percent);
     if (!status.empty())
-      std::cout << status << std::flush;
+      print_status(status);
   }
 }
 

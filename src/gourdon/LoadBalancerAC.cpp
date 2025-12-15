@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <iostream>
 #include <string>
 
 namespace primecount {
@@ -77,7 +76,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
     double time = get_time();
     std::string status = get_status(time);
     if (!status.empty())
-      std::cout << status << std::flush;
+      print_status(status);
   }
 }
 
@@ -144,7 +143,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   // and may hence be slow. Therefore, we do it
   // after having released the mutex.
   if (!status.empty())
-    std::cout << status << std::flush;
+    print_status(status);
 
   return has_work;
 }
@@ -162,13 +161,7 @@ std::string LoadBalancerAC::get_status(double time)
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);
     total_segments += segment_nr_;
 
-    // Clear the previous status line since multiple
-    // threads may print the status out of order.
-    // Max status length: 12+ceil(log10(sqrt(10^31)))*2
-    // Hence, we clear using 44 space characters.
-    std::string status;
-    status.reserve(44 * 2);
-    status = "\r                                            \rSegments: ";
+    std::string status = "Segments: ";
     status += std::to_string(segment_nr_) + '/';
     status += std::to_string(total_segments);
     return status;

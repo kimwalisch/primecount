@@ -41,7 +41,6 @@
 #include <min.hpp>
 
 #include <stdint.h>
-#include <iostream>
 
 namespace {
 
@@ -140,7 +139,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   // and may hence be slow. Therefore, we do it
   // after having released the mutex.
   if (!status.empty())
-    std::cout << status << std::flush;
+    print_status(status);
 
   return has_work;
 }

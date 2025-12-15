@@ -181,6 +181,16 @@ void print_seconds(double seconds)
   std::cout << "Seconds: " << to_string(seconds, 3) << std::endl;
 }
 
+void print_status(const std::string& status)
+{
+  // Clear the previous status line since multiple
+  // threads may print the status out of order.
+  // Max status format: "Segments: 12345/12345"
+  // Max status length: 12+ceil(log10(sqrt(10^31)))*2
+  // Hence, we clear using 44 space characters.
+  std::cout << ("\r                                            \r" + status) << std::flush;
+}
+
 void print(string_view_t str)
 {
   std::cout << str << std::endl;

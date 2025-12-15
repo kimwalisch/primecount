@@ -19,7 +19,6 @@
 #include <stdint.h>
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <string>
 
 namespace primecount {
@@ -113,7 +112,7 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   // and may hence be slow. Therefore, we do it
   // after having released the mutex.
   if (!status.empty())
-    std::cout << status << std::flush;
+    print_status(status);
 
   return has_work;
 }
@@ -128,15 +127,7 @@ std::string LoadBalancerP2::get_status()
   {
     time_ = time;
     double percent = get_percent(low_, sieve_limit_);
-    std::string status;
-    status.reserve(40);
-
-    // Clear the previous status line since multiple
-    // threads may print the status out of order.
-    // Max status string size: "Status: 100.00000%",
-    // hence we clear using 18 space characters.
-
-    status = "\r                  \rStatus: ";
+    std::string status = "Status: ";
     status += to_string(percent, precision_);
     status += '%';
     return status;
