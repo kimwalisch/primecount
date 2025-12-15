@@ -93,13 +93,15 @@ std::string StatusS2::getStatus(double percent)
   if ((percent - old) >= epsilon_)
   {
     percent_ = percent;
+    std::string status;
+    status.reserve(40);
 
     // Clear the previous status line since multiple
     // threads may print the status out of order.
-    // Max status string size e.g.: "Status 100.00%"
-    std::size_t max_status_size = std::string("Status: 100%").size() + precision_ + 1;
-    std::string clear_line = '\r' + std::string(max_status_size, ' ') + '\r';
-    std::string status = clear_line + "Status: ";
+    // Max status string size: "Status: 100.12345%",
+    // hence we clear using 18 space characters.
+
+    status = "\r                  \rStatus: ";
     status += to_string(percent, precision_);
     status += '%';
     return status;
