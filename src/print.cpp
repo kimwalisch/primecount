@@ -193,9 +193,9 @@ void print(string_view_t str, maxint_t res)
 
 void print(string_view_t str, maxint_t res, double time)
 {
-  // We overwrite the current text line,
-  // which could be e.g.:
-  // "Status: 99.9999999991%"
+  // We overwrite the current status
+  // line, which could be e.g.:
+  // "Status: 100.00000%"
   // "Segments: 123456789/123456789"
   std::string status = "\rStatus: 100%                                 ";
   std::string result = std::string(str) + " = " + to_string(res);

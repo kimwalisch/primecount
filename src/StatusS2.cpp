@@ -98,7 +98,7 @@ std::string StatusS2::getStatus(double percent)
 
     // Clear the previous status line since multiple
     // threads may print the status out of order.
-    // Max status string size: "Status: 100.12345%",
+    // Max status string size: "Status: 100.00000%",
     // hence we clear using 18 space characters.
 
     status = "\r                  \rStatus: ";
