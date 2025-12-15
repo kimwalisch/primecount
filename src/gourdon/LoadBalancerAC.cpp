@@ -164,15 +164,13 @@ std::string LoadBalancerAC::get_status(double time)
 
     // Clear the previous status line since multiple
     // threads may print the status out of order.
-    // Max status length: 13+ceil(log10(sqrt(10^31)))*2
-    // Hence, we clear using 45 space characters.
+    // Max status length: 12+ceil(log10(sqrt(10^31)))*2
+    // Hence, we clear using 44 space characters.
     std::string status;
-    status.reserve(45 * 2);
-    status = "\r                                             \rSegments: ";
-
+    status.reserve(44 * 2);
+    status = "\r                                            \rSegments: ";
     status += std::to_string(segment_nr_) + '/';
     status += std::to_string(total_segments);
-    status += '%';
     return status;
   }
 

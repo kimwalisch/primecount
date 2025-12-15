@@ -197,7 +197,7 @@ void print(string_view_t str, maxint_t res, double time)
   // line, which could be e.g.:
   // "Status: 100.00000%"
   // "Segments: 123456789/123456789"
-  std::string status = "\rStatus: 100%                                 ";
+  std::string status = "\rStatus: 100%                                ";
   std::string result = std::string(str) + " = " + to_string(res);
   std::cout << (status + "\n" + result) << std::endl;
   print_seconds(get_time() - time);
