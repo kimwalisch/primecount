@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cstddef>
 #include <iostream>
 #include <string>
 
@@ -163,19 +162,17 @@ std::string LoadBalancerAC::get_status(double time)
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);
     total_segments += segment_nr_;
 
-    // Count characters in e.g. "Segments: 123/123"
-    std::string total_segs = std::to_string(total_segments);
-    std::size_t status_size = std::string("Segments: ").size() + total_segs.size() * 2 + 1;
-    max_status_size_ = std::max(status_size, max_status_size_);
-    std::string clear_line = '\r' + std::string(max_status_size_, ' ') + '\r';
+    // Clear the previous status line since multiple
+    // threads may print the status out of order.
+    // Max status length: 13+ceil(log10(sqrt(10^31)))*2
+    // Hence, we clear using 45 space characters.
+    std::string status;
+    status.reserve(45 * 2);
+    status = "\r                                             \rSegments: ";
 
-    // Clear the previous status line since
-    // the status string becomes shorter
-    // towards the end of the computation.
-    std::string status = clear_line + "Segments: ";
     status += std::to_string(segment_nr_) + '/';
-    status += total_segs;
-
+    status += std::to_string(total_segments);
+    status += '%';
     return status;
   }
 
