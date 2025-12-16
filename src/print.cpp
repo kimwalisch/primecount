@@ -183,12 +183,18 @@ void print_seconds(double seconds)
 
 void print_status(const std::string& status)
 {
-  // Clear the previous status line since multiple
-  // threads may print the status out of order.
-  // Max status format: "Segments: 12345/12345"
-  // Max status length: 12+ceil(log10(sqrt(10^31)))*2
-  // Hence, we clear using 44 space characters.
-  std::cout << ("\r                                            \r" + status) << std::flush;
+#if defined(_WIN32)
+  // Windows 10 does not support "\r\033[K"
+  // by default to clear the current terminal
+  // text line. But "\r  \r" works.
+  std::string clear_line = "\r                                            \r";
+  std::cout << (clear_line + status) << std::flush;
+#else
+  // Use an ANSI escape sequence to clear
+  // the current line since multiple threads
+  // may print the status out of order.
+  std::cout << ("\r\033[K" + status) << std::flush;
+#endif
 }
 
 void print(string_view_t str)
@@ -203,13 +209,8 @@ void print(string_view_t str, maxint_t res)
 
 void print(string_view_t str, maxint_t res, double time)
 {
-  // We overwrite the current status
-  // line, which could be e.g.:
-  // "Status: 100.00000%"
-  // "Segments: 123456789/123456789"
-  std::string status = "\rStatus: 100%                                ";
-  std::string result = std::string(str) + " = " + to_string(res);
-  std::cout << (status + "\n" + result) << std::endl;
+  print_status("Status: 100%\n");
+  std::cout << str << " = " << res << std::endl;
   print_seconds(get_time() - time);
 }
 
