@@ -30,27 +30,32 @@ echo "Old year: $old_year"
 echo "New year: $new_year"
 echo ""
 
+# 1. Update VERSION in CMakeLists.txt (Modern project() syntax)
+echo "Update version in CMakeLists.txt"
+sed "s/VERSION $old_version/VERSION $new_version/" CMakeLists.txt > CMakeLists.txt.tmp
+mv -f CMakeLists.txt.tmp CMakeLists.txt
+
 # Update version
 for i in $(echo include/primecount.h \
                 include/primecount.hpp)
 do
-    echo "Update version in $i"
+    echo "Update version string in $i"
     sed "s/$old_major\.$old_minor/$new_version/g" $i > $i.tmp
     mv -f $i.tmp $i
 done
 
-# Update version
-for i in $(echo CMakeLists.txt \
-                include/primecount.h \
+# 3. Update version macros in headers (MAJOR/MINOR)
+for i in $(echo include/primecount.h \
                 include/primecount.hpp)
 do
+    echo "Update version macros in $i"
     sed "s/PRIMECOUNT_VERSION_MAJOR $old_major/PRIMECOUNT_VERSION_MAJOR $new_major/g" $i > $i.tmp
     mv -f $i.tmp $i
     sed "s/PRIMECOUNT_VERSION_MINOR $old_minor/PRIMECOUNT_VERSION_MINOR $new_minor/g" $i > $i.tmp
     mv -f $i.tmp $i
 done
 
-# Update year
+# 4. Update copyright year
 for i in $(echo COPYING \
                 src/app/help.cpp)
 do

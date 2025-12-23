@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.9...3.30)
-project(primecount CXX)
-set(PRIMECOUNT_VERSION_MAJOR 8)
-set(PRIMECOUNT_VERSION_MINOR 0)
-set(PRIMECOUNT_VERSION "${PRIMECOUNT_VERSION_MAJOR}.${PRIMECOUNT_VERSION_MINOR}")
+
+project(primecount
+        VERSION 8.0
+        LANGUAGES CXX)
 
 # Build options ######################################################
 
@@ -248,8 +248,8 @@ endif()
 if(BUILD_SHARED_LIBS)
     add_library(libprimecount SHARED ${LIB_SRC})
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
-    set_target_properties(libprimecount PROPERTIES SOVERSION ${PRIMECOUNT_VERSION_MAJOR})
-    set_target_properties(libprimecount PROPERTIES VERSION ${PRIMECOUNT_VERSION})
+    set_target_properties(libprimecount PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+    set_target_properties(libprimecount PROPERTIES VERSION ${PROJECT_VERSION})
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
@@ -364,7 +364,7 @@ install(FILES include/primecount.h
 
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/primecountConfigVersion.cmake"
-    VERSION ${PRIMECOUNT_VERSION}
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion)
 
 configure_package_config_file(
