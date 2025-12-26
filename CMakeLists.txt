@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9...3.30)
 
 project(primecount
-        VERSION 8.0
+        VERSION 8.1
         LANGUAGES CXX)
 
 # Build options ######################################################
