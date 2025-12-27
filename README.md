@@ -419,7 +419,7 @@ primesieve natively supports C and C++ and has bindings available for:
     </tr>
     <tr>
         <td><b>Python:</b></td>
-        <td><a href="https://github.com/dimpase/primecountpy">primecountpy</a></td>
+        <td><a href="https://pypi.org/project/primecountpy">primecountpy</a></td>
     </tr>
     <tr>
         <td><b>Rust:</b></td>
