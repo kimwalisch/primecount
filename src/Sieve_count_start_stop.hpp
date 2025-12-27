@@ -131,10 +131,10 @@ uint64_t Sieve::count_popcnt64(uint64_t start, uint64_t stop) const
   uint64_t m2 = unset_larger[stop % 240];
 
   // Branchfree bitmask calculation:
-  // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-  m1 &= (-(start_idx != stop_idx) | m2);
-  // m2 = (start_idx != stop_idx) ? m2 : 0;
-  m2 &= -(start_idx != stop_idx);
+  // if (start_idx == stop_idx) m1 = m1 & m2;
+  // if (start_idx == stop_idx) m2 = 0;
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2);
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0);
 
   const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
   uint64_t start_bits = sieve64[start_idx] & m1;
@@ -173,10 +173,10 @@ uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
   uint64_t m2 = unset_larger[stop % 240];
 
   // Branchfree bitmask calculation:
-  // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-  m1 &= (-(start_idx != stop_idx) | m2);
-  // m2 = (start_idx != stop_idx) ? m2 : 0;
-  m2 &= -(start_idx != stop_idx);
+  // if (start_idx == stop_idx) m1 = m1 & m2;
+  // if (start_idx == stop_idx) m2 = 0;
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2);
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0);
 
   const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
   uint64_t start_bits = sieve64[start_idx] & m1;
@@ -226,10 +226,10 @@ uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
   uint64_t m2 = unset_larger[stop % 240];
 
   // Branchfree bitmask calculation:
-  // m1 = (start_idx != stop_idx) ? m1 : m1 & m2;
-  m1 &= (-(start_idx != stop_idx) | m2);
-  // m2 = (start_idx != stop_idx) ? m2 : 0;
-  m2 &= -(start_idx != stop_idx);
+  // if (start_idx == stop_idx) m1 = m1 & m2;
+  // if (start_idx == stop_idx) m2 = 0;
+  CONDITIONAL_MOVE(start_idx == stop_idx, m1, m1 & m2);
+  CONDITIONAL_MOVE(start_idx == stop_idx, m2, 0);
 
   const uint64_t* sieve64 = (const uint64_t*) sieve_.data();
   uint64_t start_bits = sieve64[start_idx] & m1;

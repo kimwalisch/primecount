@@ -125,4 +125,19 @@
   #define UNREACHABLE
 #endif
 
+#if defined(__GNUC__) || \
+    defined(__clang__)
+  // This produces good assembly using GGC and Clang.
+  // Branchfree conditional move instruction:
+  // if (cond == true) dest = val;
+  #define CONDITIONAL_MOVE(cond, dest, val) \
+    dest = (cond) * (val) | (1 - (cond)) * dest
+#else
+  // This produces good assembly using MSVC.
+  // Branchfree conditional move instruction:
+  // if (cond == true) dest = val;
+  #define CONDITIONAL_MOVE(cond, dest, val) \
+    dest = (-(cond) & (val)) | (-(1 - (cond)) & dest)
+#endif
+
 #endif

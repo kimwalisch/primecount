@@ -1,6 +1,7 @@
-Changes in primecount-8.1, 2025-12-26
+Changes in primecount-8.1, 2025-12-27
 
 * CMakeLists.txt: Fix CMAKE_PROJECT_VERSION not defined.
+* Sieve_count*.hpp: Improve GCC conditional move code gen.
 
 Changes in primecount-8.0, 2025-12-13
 
