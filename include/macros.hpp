@@ -125,19 +125,12 @@
   #define UNREACHABLE
 #endif
 
-#if defined(__GNUC__) || \
-    defined(__clang__)
-  // This produces good assembly using GGC and Clang.
-  // Branchfree conditional move instruction:
-  // if (cond == true) dest = src;
-  #define CONDITIONAL_MOVE(cond, dest, src) \
-    dest = (cond) * (src) | (1 - (cond)) * dest
-#else
-  // This produces good assembly using MSVC.
-  // Branchfree conditional move instruction:
-  // if (cond == true) dest = src;
-  #define CONDITIONAL_MOVE(cond, dest, src) \
-    dest = (-(cond) & (src)) | (-(1 - (cond)) & dest)
-#endif
+// Branchfree conditional move instruction:
+// if (cond == true) dest = src;
+// GCC, Clang and MSVC emit a CMOV instruction on x64
+// CPUs when compiled with: -O1, -O2, -O3, -Os, ...
+// On ARM64 the branchfree CSEL instruction is emitted.
+#define CONDITIONAL_MOVE(cond, dest, src) \
+  dest = (-(cond) & (src)) | (-!(cond) & dest)
 
 #endif
