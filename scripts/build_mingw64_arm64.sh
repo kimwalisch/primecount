@@ -38,8 +38,8 @@ handle_error() {
 
 # Build primecount binary ##########################################
 
-mkdir build-release-arm64
-cd build-release-arm64
+mkdir build-release
+cd build-release
 
 mkdir build_primesieve
 cd build_primesieve
