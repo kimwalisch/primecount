@@ -72,7 +72,7 @@ jobs:
       - name: Get Project Version
         shell: msys2 {0}
         run: |
-          VERSION=$(grep -m 1 "VERSION" CMakeLists.txt | grep -o "[0-9.]\+")
+          VERSION=$(grep 'PRIMECOUNT_VERSION' include/primecount.h | grep -oP '\d+\.\d+(\.\d+)?')
           echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build Windows ARM64 binary
