@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-x64-${{ github.sha }}
-          path: primecount-*-win-x64.zip
+          path: build-release\primecount-*-win-x64.zip
           retention-days: 7
 
   windows-arm64:
@@ -73,5 +73,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-arm64-${{ github.sha }}
-          path: primecount-*-win-arm64.zip
+          path: build-release-arm64\primecount-*-win-arm64.zip
           retention-days: 7
