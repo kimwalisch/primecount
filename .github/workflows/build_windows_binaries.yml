@@ -29,6 +29,12 @@ jobs:
             zip
             unzip
 
+      - name: Get Project Version
+        shell: msys2 {0}
+        run: |
+          VERSION=$(grep 'PRIMECOUNT_VERSION' include/primecount.h | grep -oP '\d+\.\d+(\.\d+)?')
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build Windows x64 binary
         shell: msys2 {0}
         run: |
@@ -38,8 +44,8 @@ jobs:
       - name: Upload Windows x64 CI artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-x64-${{ github.sha }}
-          path: build-release\primecount-*-win-x64.zip
+          name: primecount-${{ env.PROJECT_VERSION }}-win-x64.zip
+          path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-x64.zip
           retention-days: 7
 
   windows-arm64:
@@ -63,6 +69,12 @@ jobs:
             zip
             unzip
 
+      - name: Get Project Version
+        shell: msys2 {0}
+        run: |
+          VERSION=$(grep -m 1 "VERSION" CMakeLists.txt | grep -o "[0-9.]\+")
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+
       - name: Build Windows ARM64 binary
         shell: msys2 {0}
         run: |
@@ -72,6 +84,6 @@ jobs:
       - name: Upload Windows ARM64 CI artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-arm64-${{ github.sha }}
-          path: build-release-arm64\primecount-*-win-arm64.zip
+          name: primecount-${{ env.PROJECT_VERSION }}-win-arm64.zip
+          path: build-release-arm64/primecount-${{ env.PROJECT_VERSION }}-win-arm64.zip
           retention-days: 7
