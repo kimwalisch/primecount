@@ -36,15 +36,8 @@ handle_error() {
     exit 1
 }
 
-####################################################################
-
-# The repo must no have any uncommited changes as we
-# switch to another branch during the script.
-git diff --exit-code > /dev/null || handle_error "repo must not have any uncommitted changes"
-
 # Build primecount binary ##########################################
 
-git pull
 mkdir build-release-arm64
 cd build-release-arm64
 
