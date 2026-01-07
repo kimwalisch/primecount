@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-x64.zip
-          path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-x64.zip
+          path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-x64/*
           retention-days: 7
 
   windows-arm64:
@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-arm64.zip
-          path: build-release-arm64/primecount-${{ env.PROJECT_VERSION }}-win-arm64.zip
+          path: build-release-arm64/primecount-${{ env.PROJECT_VERSION }}-win-arm64/*
           retention-days: 7

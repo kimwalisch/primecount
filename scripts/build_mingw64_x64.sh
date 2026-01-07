@@ -77,7 +77,7 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 [ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || handle_error "failed updating COPYING"
 
 zip primecount-$VERSION-win-x64.zip primecount.exe README.txt COPYING
-cp primecount-$VERSION-win-x64.zip ..
+mv primecount-$VERSION-win-x64.zip ..
 
 ./primecount --test
 echo ""
