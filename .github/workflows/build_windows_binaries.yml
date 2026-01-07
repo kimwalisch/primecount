@@ -50,7 +50,7 @@ jobs:
 
   windows-arm64:
     name: Windows ARM64 (MSYS2 / Clang / ARM64)
-    runs-on: windows-2022-arm64
+    runs-on: windows-11-arm
 
     steps:
       - name: Checkout repository
