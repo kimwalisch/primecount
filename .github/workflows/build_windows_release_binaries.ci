@@ -1,0 +1,79 @@
+name: Build Windows binaries (x64 + ARM64)
+
+# Run ONLY when manually triggered from the GitHub Actions UI
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-x64:
+    name: Windows x64 (MSYS2 / MinGW-w64 / GCC)
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSYS2 (MINGW64)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            base-devel
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            git
+            zip
+            unzip
+
+      - name: Build Windows x64 binary
+        shell: msys2 {MINGW64}
+        run: |
+          set -e
+          chmod +x ./scripts/build_mingw64_x64.sh
+          ./scripts/build_mingw64_x64.sh
+
+      - name: Upload Windows x64 CI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-${{ github.sha }}
+          path: |
+            primecount-*-win-x64.zip
+          retention-days: 7
+
+  windows-arm64:
+    name: Windows ARM64 (MSYS2 / Clang / ARM64)
+    runs-on: windows-2022-arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSYS2 (CLANGARM64)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >-
+            mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-openmp
+            make
+            git
+            zip
+            unzip
+
+      - name: Build Windows ARM64 binary
+        shell: msys2 {CLANGARM64}
+        run: |
+          set -e
+          chmod +x ./scripts/build_mingw64_arm64.sh
+          ./scripts/build_mingw64_arm64.sh
+
+      - name: Upload Windows ARM64 CI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-arm64-${{ github.sha }}
+          path: |
+            primecount-*-win-arm64.zip
+          retention-days: 7
