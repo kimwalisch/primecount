@@ -66,18 +66,18 @@ git checkout ..
 
 # Create a release zip archive
 wget https://github.com/kimwalisch/primecount/releases/download/v7.20/primecount-7.20-win-arm64.zip
-unzip primecount-7.20-win-arm64.zip -d primecount-$VERSION-win-arm64
+unzip primecount-7.20-win-arm64.zip -d primecount-$VERSION-win-arm64-tmp
 rm primecount-7.20-win-arm64.zip
 
 echo ""
 echo ""
-echo "Old file size: $(ls -l --block-size=K primecount-$VERSION-win-arm64/primecount.exe)"
+echo "Old file size: $(ls -l --block-size=K primecount-$VERSION-win-arm64-tmp/primecount.exe)"
 echo "New file size: $(ls -l --block-size=K primecount.exe)"
 echo ""
 echo ""
 
-mv -f primecount.exe primecount-$VERSION-win-arm64
-cd primecount-$VERSION-win-arm64
+mv -f primecount.exe primecount-$VERSION-win-arm64-tmp
+cd primecount-$VERSION-win-arm64-tmp
 sed -i "1 s/.*/primecount $VERSION/" README.txt
 sed -i "2 s/.*/$FULL_DATE/" README.txt
 sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
@@ -87,15 +87,18 @@ sed -i "3 s/.*/Copyright \(c\) 2013 - $YEAR, Kim Walisch\./" COPYING
 [ "$(sed -n '2p' < README.txt)" = "$FULL_DATE" ] || handle_error "failed updating README.txt"
 [ "$(sed -n '3p' < COPYING)" = "Copyright (c) 2013 - $YEAR, Kim Walisch." ] || handle_error "failed updating COPYING"
 
-zip primecount-$VERSION-win-arm64.zip primecount.exe README.txt COPYING
-mv primecount-$VERSION-win-arm64.zip ..
-
 ./primecount --test
 echo ""
 echo ""
 ./primecount 1e18 -s
 
+# Build release zip archive ########################################
+
 cd ..
+mv primecount-$VERSION-win-arm64-tmp primecount-$VERSION-win-arm64
+cd primecount-$VERSION-win-arm64
+zip primecount-$VERSION-win-arm64.zip primecount.exe README.txt COPYING
+mv primecount-$VERSION-win-arm64.zip ..
 
 ####################################################################
 
