@@ -1,4 +1,4 @@
-name: Build Windows binaries (x64 + ARM64)
+name: Build Windows binaries
 
 # Run ONLY when manually triggered from the GitHub Actions UI
 on:
@@ -20,6 +20,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           update: true
+          msystem: MINGW64
           install: >-
             base-devel
             mingw-w64-x86_64-toolchain
@@ -29,7 +30,7 @@ jobs:
             unzip
 
       - name: Build Windows x64 binary
-        shell: msys2 {MINGW64}
+        shell: msys2 {0}
         run: |
           chmod +x ./scripts/build_mingw64_x64.sh
           ./scripts/build_mingw64_x64.sh
@@ -38,8 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-x64-${{ github.sha }}
-          path: |
-            primecount-*-win-x64.zip
+          path: primecount-*-win-x64.zip
           retention-days: 7
 
   windows-arm64:
@@ -54,6 +54,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           update: true
+          msystem: CLANGARM64
           install: >-
             mingw-w64-clang-aarch64-clang
             mingw-w64-clang-aarch64-openmp
@@ -63,7 +64,7 @@ jobs:
             unzip
 
       - name: Build Windows ARM64 binary
-        shell: msys2 {CLANGARM64}
+        shell: msys2 {0}
         run: |
           chmod +x ./scripts/build_mingw64_arm64.sh
           ./scripts/build_mingw64_arm64.sh
@@ -72,6 +73,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-arm64-${{ github.sha }}
-          path: |
-            primecount-*-win-arm64.zip
+          path: primecount-*-win-arm64.zip
           retention-days: 7
