@@ -1,7 +1,7 @@
 ///
 /// @file  help.cpp
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -73,7 +73,7 @@ void help(int exitCode)
 void version()
 {
   std::cout << "primecount " PRIMECOUNT_VERSION ", <https://github.com/kimwalisch/primecount>\n"
-               "Copyright (C) 2013 - 2025 Kim Walisch\n"
+               "Copyright (C) 2013 - 2026 Kim Walisch\n"
                "BSD 2-Clause License <https://opensource.org/licenses/BSD-2-Clause>"
             << std::endl;
   std::exit(0);
