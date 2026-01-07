@@ -31,7 +31,6 @@ jobs:
       - name: Build Windows x64 binary
         shell: msys2 {MINGW64}
         run: |
-          set -e
           chmod +x ./scripts/build_mingw64_x64.sh
           ./scripts/build_mingw64_x64.sh
 
@@ -66,7 +65,6 @@ jobs:
       - name: Build Windows ARM64 binary
         shell: msys2 {CLANGARM64}
         run: |
-          set -e
           chmod +x ./scripts/build_mingw64_arm64.sh
           ./scripts/build_mingw64_arm64.sh
 
