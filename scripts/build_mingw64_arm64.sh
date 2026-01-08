@@ -94,11 +94,10 @@ echo ""
 
 # Build release zip archive ########################################
 
-cd ..
-mv primecount-$VERSION-win-arm64-tmp primecount-$VERSION-win-arm64
-cd primecount-$VERSION-win-arm64
 zip primecount-$VERSION-win-arm64.zip primecount.exe README.txt COPYING
 mv primecount-$VERSION-win-arm64.zip ..
+cd ..
+mv primecount-$VERSION-win-arm64-tmp primecount-$VERSION-win-arm64
 
 ####################################################################
 
