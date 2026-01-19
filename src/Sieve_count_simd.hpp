@@ -15,8 +15,6 @@
 #ifndef SIEVE_COUNT_SIMD_HPP
 #define SIEVE_COUNT_SIMD_HPP
 
-#include <Sieve.hpp>
-#include <Sieve_arrays.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
 
