@@ -19,7 +19,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -84,6 +84,20 @@ T A(T x,
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq];
+  }
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 4 <= max_i2; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += segmentedPi[xpq0] * 2;
+    sum += segmentedPi[xpq1] * 2;
+    sum += segmentedPi[xpq2] * 2;
+    sum += segmentedPi[xpq3] * 2;
   }
 
   // pq = primes[b] * primes[i]
@@ -204,6 +218,20 @@ T C2(T x,
 
     uint64_t dist = start_i - i;
     avg_clustered_leaves = dist / iters;
+  }
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i >= pi_min_m + 4; i -= 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i-1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i-2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i-3]);
+
+    sum += segmentedPi[xpq0] - b + 2;
+    sum += segmentedPi[xpq1] - b + 2;
+    sum += segmentedPi[xpq2] - b + 2;
+    sum += segmentedPi[xpq3] - b + 2;
   }
 
   // Find all sparse easy leaves where
@@ -389,6 +417,20 @@ T A_64(T xlow,
     sum += segmentedPi[xpq];
   }
 
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 4 <= max_i2; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += segmentedPi[xpq0] * 2;
+    sum += segmentedPi[xpq1] * 2;
+    sum += segmentedPi[xpq2] * 2;
+    sum += segmentedPi[xpq3] * 2;
+  }
+
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
   for (; i <= max_i2; i++)
@@ -431,6 +473,20 @@ T A_128(T xlow,
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq];
+  }
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 4 <= max_i2; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += segmentedPi[xpq0] * 2;
+    sum += segmentedPi[xpq1] * 2;
+    sum += segmentedPi[xpq2] * 2;
+    sum += segmentedPi[xpq3] * 2;
   }
 
   // pq = primes[b] * primes[i]
@@ -553,6 +609,20 @@ T C2_64(T xlow,
     avg_clustered_leaves = dist / iters;
   }
 
+  // Unroll loop to increase instruction level parallelism
+  for (; i >= pi_min_m + 4; i -= 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i-1];
+    uint64_t xpq2 = xp / primes[i-2];
+    uint64_t xpq3 = xp / primes[i-3];
+
+    sum += segmentedPi[xpq0] - b + 2;
+    sum += segmentedPi[xpq1] - b + 2;
+    sum += segmentedPi[xpq2] - b + 2;
+    sum += segmentedPi[xpq3] - b + 2;
+  }
+
   // Find all sparse easy leaves where
   // successive leaves are different.
   // pq = primes[b] * primes[i]
@@ -627,6 +697,20 @@ T C2_128(T xlow,
 
     uint64_t dist = start_i - i;
     avg_clustered_leaves = dist / iters;
+  }
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i >= pi_min_m + 4; i -= 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i-1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i-2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i-3]);
+
+    sum += segmentedPi[xpq0] - b + 2;
+    sum += segmentedPi[xpq1] - b + 2;
+    sum += segmentedPi[xpq2] - b + 2;
+    sum += segmentedPi[xpq3] - b + 2;
   }
 
   // Find all sparse easy leaves where
