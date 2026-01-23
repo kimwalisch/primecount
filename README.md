@@ -228,7 +228,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>8.40s</td>
     <td>1.75s</td>
     <td>1.26s</td>
-    <td>0.49s</td>
+    <td>0.48s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
@@ -237,7 +237,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>75.44s</td>
     <td>8.04s</td>
     <td>5.29s</td>
-    <td>1.88s</td>
+    <td>1.77s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -246,7 +246,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>24.41s</td>
-    <td>7.49s</td>
+    <td>7.08s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -255,7 +255,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>113.75s</td>
-    <td>30.20s</td>
+    <td>28.55s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -264,7 +264,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>502.48s</td>
-    <td>123.69s</td>
+    <td>116.47s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -273,7 +273,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>2,206.47s</td>
-    <td>509.83s</td>
+    <td>477.90s</td>
   </tr>
 </table>
 
@@ -283,7 +283,7 @@ that he computed $\pi(10^{25})$ in 40,000 CPU core hours using the analytic prim
 counting function algorithm. Büthe also mentions that by using additional zeros of the
 zeta function the runtime could have potentially been reduced to 4,000 CPU core hours.
 However using primecount and Xavier Gourdon's algorithm $\pi(10^{25})$ can be computed
-in only 348 CPU core hours on the AMD EPYC Zen4 CPU!
+in only 330 CPU core hours on the AMD EPYC Zen4 CPU!
 
 ## Algorithms
 
