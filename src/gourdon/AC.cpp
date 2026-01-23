@@ -94,10 +94,10 @@ T A(T x,
     uint64_t xpq2 = fast_div64(xp, primes[i+2]);
     uint64_t xpq3 = fast_div64(xp, primes[i+3]);
 
-    sum += segmentedPi[xpq0] * 2;
-    sum += segmentedPi[xpq1] * 2;
-    sum += segmentedPi[xpq2] * 2;
-    sum += segmentedPi[xpq3] * 2;
+    sum += (segmentedPi[xpq0] * 2) +
+           (segmentedPi[xpq1] * 2) +
+           (segmentedPi[xpq2] * 2) +
+           (segmentedPi[xpq3] * 2);
   }
 
   // pq = primes[b] * primes[i]
@@ -228,10 +228,10 @@ T C2(T x,
     uint64_t xpq2 = fast_div64(xp, primes[i-2]);
     uint64_t xpq3 = fast_div64(xp, primes[i-3]);
 
-    sum += segmentedPi[xpq0] - b + 2;
-    sum += segmentedPi[xpq1] - b + 2;
-    sum += segmentedPi[xpq2] - b + 2;
-    sum += segmentedPi[xpq3] - b + 2;
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
   }
 
   // Find all sparse easy leaves where
@@ -425,10 +425,10 @@ T A_64(T xlow,
     uint64_t xpq2 = xp / primes[i+2];
     uint64_t xpq3 = xp / primes[i+3];
 
-    sum += segmentedPi[xpq0] * 2;
-    sum += segmentedPi[xpq1] * 2;
-    sum += segmentedPi[xpq2] * 2;
-    sum += segmentedPi[xpq3] * 2;
+    sum += (segmentedPi[xpq0] * 2) +
+           (segmentedPi[xpq1] * 2) +
+           (segmentedPi[xpq2] * 2) +
+           (segmentedPi[xpq3] * 2);
   }
 
   // pq = primes[b] * primes[i]
@@ -483,10 +483,10 @@ T A_128(T xlow,
     uint64_t xpq2 = fast_div64(xp, primes[i+2]);
     uint64_t xpq3 = fast_div64(xp, primes[i+3]);
 
-    sum += segmentedPi[xpq0] * 2;
-    sum += segmentedPi[xpq1] * 2;
-    sum += segmentedPi[xpq2] * 2;
-    sum += segmentedPi[xpq3] * 2;
+    sum += (segmentedPi[xpq0] * 2) +
+           (segmentedPi[xpq1] * 2) +
+           (segmentedPi[xpq2] * 2) +
+           (segmentedPi[xpq3] * 2);
   }
 
   // pq = primes[b] * primes[i]
@@ -617,10 +617,10 @@ T C2_64(T xlow,
     uint64_t xpq2 = xp / primes[i-2];
     uint64_t xpq3 = xp / primes[i-3];
 
-    sum += segmentedPi[xpq0] - b + 2;
-    sum += segmentedPi[xpq1] - b + 2;
-    sum += segmentedPi[xpq2] - b + 2;
-    sum += segmentedPi[xpq3] - b + 2;
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
   }
 
   // Find all sparse easy leaves where
@@ -707,10 +707,10 @@ T C2_128(T xlow,
     uint64_t xpq2 = fast_div64(xp, primes[i-2]);
     uint64_t xpq3 = fast_div64(xp, primes[i-3]);
 
-    sum += segmentedPi[xpq0] - b + 2;
-    sum += segmentedPi[xpq1] - b + 2;
-    sum += segmentedPi[xpq2] - b + 2;
-    sum += segmentedPi[xpq3] - b + 2;
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
   }
 
   // Find all sparse easy leaves where
