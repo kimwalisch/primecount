@@ -192,8 +192,8 @@ T C2(T x,
   // many successive leaves are identical. If on average only
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
-  // parallelism and long instruction dependency chains.
-  if (avg_clustered_leaves >= 4 &&
+  // parallelism and increased cache misses.
+  if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
     uint64_t iters = 0;
@@ -581,8 +581,8 @@ T C2_64(T xlow,
   // many successive leaves are identical. If on average only
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
-  // parallelism and long instruction dependency chains.
-  if (avg_clustered_leaves >= 4 &&
+  // parallelism and increased cache misses.
+  if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
     uint64_t iters = 0;
@@ -671,8 +671,8 @@ T C2_128(T xlow,
   // many successive leaves are identical. If on average only
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
-  // parallelism and long instruction dependency chains.
-  if (avg_clustered_leaves >= 4 &&
+  // parallelism and increased cache misses.
+  if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
     uint64_t iters = 0;
