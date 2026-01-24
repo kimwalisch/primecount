@@ -1,7 +1,7 @@
-Changes in primecount-8.1, 2026-01-21
+Changes in primecount-8.1, 2026-01-24
 
 * CMakeLists.txt: Fix CMAKE_PROJECT_VERSION not defined.
-* AC.cpp: Up to 10% faster due to improved instruction level parallelism.
+* AC.cpp: Up to 15% faster due to improved instruction level parallelism.
 * Sieve_count*.hpp: Improve GCC conditional move code gen.
 * Automated building Windows binaries using GitHub Actions CI.
 
