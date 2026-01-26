@@ -113,7 +113,11 @@ T S2_easy_OpenMP(T x,
       sum += pi[xpq] - b + 2;
     }
 
-    #pragma omp master
+    #if defined(_OPENMP) && _OPENMP >= 202011
+      #pragma omp masked
+    #else
+      #pragma omp master
+    #endif
     if (is_print)
       status.print(b, pi_x13);
   }
@@ -280,7 +284,11 @@ T S2_easy_OpenMP(T x,
     else
       sum += S2_easy_128(xp, y, z, b, prime, primes, pi);
 
-    #pragma omp master
+    #if defined(_OPENMP) && _OPENMP >= 202011
+      #pragma omp masked
+    #else
+      #pragma omp master
+    #endif
     if (is_print)
       status.print(b, pi_x13);
   }

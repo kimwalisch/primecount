@@ -1,7 +1,8 @@
-Changes in primecount-8.1, 2026-01-24
+Changes in primecount-8.1, 2026-01-26
 
 * CMakeLists.txt: Fix CMAKE_PROJECT_VERSION not defined.
 * AC.cpp: Up to 15% faster due to improved instruction level parallelism.
+* S2_easy.cpp: Fix "#pragma omp master" deprecated in OpenMP 5.1. 
 * Sieve_count*.hpp: Improve GCC conditional move code gen.
 * Automated building Windows binaries using GitHub Actions CI.
 
