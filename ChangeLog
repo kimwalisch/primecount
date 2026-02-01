@@ -1,6 +1,7 @@
 Changes in primecount-8.2, 2026-02-01
 
 * Fix missing version in .pc file #104.
+* AC.cpp: Improve loop condition.
 
 Changes in primecount-8.1, 2026-01-26
 
