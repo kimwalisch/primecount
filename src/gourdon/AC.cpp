@@ -221,7 +221,7 @@ T C2(T x,
   }
 
   // Unroll loop to increase instruction level parallelism
-  for (; i >= pi_min_m + 4; i -= 4)
+  for (; i > pi_min_m + 3; i -= 4)
   {
     uint64_t xpq0 = fast_div64(xp, primes[i]);
     uint64_t xpq1 = fast_div64(xp, primes[i-1]);
@@ -610,7 +610,7 @@ T C2_64(T xlow,
   }
 
   // Unroll loop to increase instruction level parallelism
-  for (; i >= pi_min_m + 4; i -= 4)
+  for (; i > pi_min_m + 3; i -= 4)
   {
     uint64_t xpq0 = xp / primes[i];
     uint64_t xpq1 = xp / primes[i-1];
@@ -700,7 +700,7 @@ T C2_128(T xlow,
   }
 
   // Unroll loop to increase instruction level parallelism
-  for (; i >= pi_min_m + 4; i -= 4)
+  for (; i > pi_min_m + 3; i -= 4)
   {
     uint64_t xpq0 = fast_div64(xp, primes[i]);
     uint64_t xpq1 = fast_div64(xp, primes[i-1]);
