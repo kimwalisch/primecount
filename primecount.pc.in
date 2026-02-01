@@ -5,7 +5,7 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 
 Name: primecount
 Description: Fast C/C++ prime counting function library
-Version: @PRIMECOUNT_VERSION@
+Version: @PROJECT_VERSION@
 Requires.private: primesieve >= 11.0
 Cflags: -I${includedir}
 Libs: -L${libdir} -lprimecount
