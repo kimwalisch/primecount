@@ -69,7 +69,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
     throw primecount::primecount_error("fast_div_128_to_64(x, den): 64-bit overflow detected in " +
-                           primecount::to_string(x) + " / " + std::to_string(y));
+                      primecount::to_string(x) + " / " + std::to_string(y));
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.
