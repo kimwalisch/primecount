@@ -103,6 +103,18 @@ fast_div(X x, Y y)
     return UX(x) / UY(y);
 }
 
+/// Used for (64-bit / 32-bit) = 64-bit.
+/// Used for (64-bit / 64-bit) = 64-bit.
+template <typename X, typename Y>
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) <= sizeof(uint64_t) &&
+                                       sizeof(Y) <= sizeof(X)), uint64_t>::type
+fast_div64(X x, Y y)
+{
+  return (uint64_t) fast_div(x, y);
+}
+
+#if defined(HAVE_INT128_T)
+
 /// Used for (128-bit / 32-bit) = 64-bit.
 /// Used for (128-bit / 64-bit) = 64-bit.
 /// Use this function only when you know for sure
@@ -116,27 +128,10 @@ fast_div64(X x, Y y)
   ASSERT(x >= 0);
   ASSERT(y > 0);
 
-#if defined(HAVE_INT128_T)
   return fast_div_128_to_64(x, y);
-#else
-  // Unsigned integer division is usually
-  // faster than signed integer division.
-  using UX = typename pstd::make_unsigned<X>::type;
-  using UY = typename pstd::make_unsigned<Y>::type;
+}
 
-  return UX(x) / UY(y);
 #endif
-}
-
-/// Used for (64-bit / 32-bit) = 64-bit.
-/// Used for (64-bit / 64-bit) = 64-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE typename std::enable_if<(sizeof(X) <= sizeof(uint64_t) &&
-                                       sizeof(Y) <= sizeof(X)), uint64_t>::type
-fast_div64(X x, Y y)
-{
-  return (uint64_t) fast_div(x, y);
-}
 
 } // namespace
 
