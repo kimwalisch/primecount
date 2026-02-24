@@ -75,7 +75,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
   // A uint32 holds a single digit. A uint64 holds two digits.
   // Our numerator is conceptually [num3, num2, num1, num0].
   // Our denominator is [den1, den0].
-  const uint64_t b = uint64_t(1) << 32;
+  constexpr uint64_t b = uint64_t(1) << 32;
 
   // The high and low digits of our computed quotient.
   uint32_t q1, q0;
