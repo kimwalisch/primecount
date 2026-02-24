@@ -1,8 +1,8 @@
 ///
 /// @file   ctz.hpp
-/// @brief  Count the number of trailing zeros.
+/// @brief  Count the number of leading and trailing zeros.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,6 +18,23 @@
     __has_builtin(__builtin_ctzl)
 
 namespace {
+
+inline int clz64(uint64_t x)
+{
+  // __builtin_clz(0) is undefined behavior
+  ASSERT(x != 0);
+
+#if __cplusplus >= 201703L
+  if constexpr(sizeof(int) >= sizeof(uint64_t))
+    return __builtin_clz(x);
+  else if constexpr(sizeof(long) >= sizeof(uint64_t))
+    return __builtin_clzl(x);
+  else if constexpr(sizeof(long long) >= sizeof(uint64_t))
+    return __builtin_clzll(x);
+#else
+    return __builtin_clzll(x);
+#endif
+}
 
 inline int ctz64(uint64_t x)
 {
@@ -45,6 +62,11 @@ inline int ctz64(uint64_t x)
 
 namespace {
 
+inline int clz64(uint64_t x)
+{
+  return std::countl_zero(x);
+}
+
 inline int ctz64(uint64_t x)
 {
   return std::countr_zero(x);
@@ -60,6 +82,16 @@ inline int ctz64(uint64_t x)
 
 namespace {
 
+inline int clz64(uint64_t x)
+{
+  // _BitScanReverse64(0) is undefined behavior
+  ASSERT(x != 0);
+
+  unsigned long r;
+  _BitScanReverse64(&r, x);
+  return int(r ^ 63);
+}
+
 inline int ctz64(uint64_t x)
 {
   // _BitScanForward64(0) is undefined behavior
@@ -73,9 +105,6 @@ inline int ctz64(uint64_t x)
 } // namespace
 
 #else
-
-// Portable pure integer count trailing zeros algorithm.
-// https://www.chessprogramming.org/BitScan#With_separated_LS1B
 
 namespace {
 
@@ -91,12 +120,30 @@ const int index64[64] =
   13, 18,  8, 12,  7,  6,  5, 63
 };
 
+// Portable pure integer count trailing zeros algorithm.
+// https://www.chessprogramming.org/BitScan#With_separated_LS1B
 inline int ctz64(uint64_t x)
 {
   // ctz64(0) is undefined behavior
   ASSERT(x != 0);
   constexpr uint64_t debruijn64 = 0x03f79d71b4cb0a89ull;
   return index64[((x ^ (x-1)) * debruijn64) >> 58];
+}
+
+// Portable pure integer count leading zeros algorithm.
+// https://www.chessprogramming.org/BitScan#De_Bruijn_Multiplication_2
+inline int clz64(uint64_t x)
+{
+  // clz64(0) is undefined behavior
+  ASSERT(x != 0);
+  constexpr uint64_t debruijn64 = 0x03f79d71b4cb0a89ull;
+  x |= x >> 1; 
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  x |= x >> 32;
+  return index64[(x * debruijn64) >> 58];
 }
 
 } // namespace

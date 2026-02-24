@@ -201,6 +201,10 @@ include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp11.cmake")
 
 include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
+if(int128)
+    set(LIB_SRC ${LIB_SRC} src/fast_div_128_64.cpp)
+endif()
+
 # Check for OpenMP ###################################################
 
 if(WITH_OPENMP)

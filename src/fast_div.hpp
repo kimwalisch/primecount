@@ -17,7 +17,7 @@
 ///        disable ENABLE_DIV32 (using cmake -DWITH_DIV32=OFF) as this
 ///        avoids runtime checks for (64-bit / 32-bit) divisions.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -31,6 +31,15 @@
 
 #include <stdint.h>
 #include <type_traits>
+
+#if defined(HAVE_INT128_T)
+
+namespace primecount {
+  /// Used for (128-bit / 64-bit) = 64-bit.
+  uint64_t fast_div_128_to_64(uint128_t x, uint64_t y);
+}
+
+#endif
 
 namespace {
 
@@ -127,6 +136,19 @@ fast_div64(X x, Y y)
           : "+a"(x0), "+d"(x1) : [divider] "r"(d));
 
   return x0;
+
+#elif defined(HAVE_INT128_T)
+
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
+
+  if (x <= pstd::numeric_limits<uint64_t>::max())
+    return uint64_t(x) / UY(y);
+  else
+    return primecount::fast_div_128_to_64(x, y);
+
 #else
   return (uint64_t) fast_div(x, y);
 #endif
