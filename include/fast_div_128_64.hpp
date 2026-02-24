@@ -1,5 +1,5 @@
 ///
-/// @file  fast_div_128_64.cpp
+/// @file  fast_div_128_64.hpp
 /// @brief This file contains the function fast_div_128_to_64() that
 ///        is a modified version of the libdivide_128_div_64_to_64()
 ///        function from the libdivide library,
@@ -13,7 +13,6 @@
 /// COPYING file in the top level directory.
 ///
 
-#include <fast_div.hpp>
 #include <ctz.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
@@ -22,27 +21,55 @@
 #include <stdint.h>
 #include <string>
 
-namespace primecount {
+namespace {
+
+using primecount::uint128_t;
 
 /// primecount's performance depends heavily on the speed of the
-/// 128-bit / 64-bit = 64-bit integer division. Since GCC's and
-/// Clang's 128-bit integer division implementations are not
-/// optimal for this use case (in 2026) we use a modified version
-/// of libdivide's libdivide_128_div_64_to_64() function which is
-/// much faster in practice.
-/// Note that on x64 CPUs this implementation is not used, on x64
-/// CPUs we simply use the divq instruction instead.
+/// 128-bit / 64-bit = 64-bit integer division. When using GCC's and
+/// Clang's 128-bit integer division implementations this usually
+/// emits a function call to __udivti3(a, b). According to my
+/// benchmarks this function call adds significant overhead and hence
+/// we can improve performance by using our own implementation
+/// that is guaranteed to be inlined.
 ///
-uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
+/// This algorithm is a modified version of libdivide's
+/// libdivide_128_div_64_to_64() function which is heavily optimized
+/// and very fast in practice.
+///
+ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
 {
-  uint64_t numhi = uint64_t(x >> 64);
-  uint64_t numlo = uint64_t(x);
+  ASSERT(y > 0);
+
+#if defined(__x86_64__) && \
+   (defined(__GNUC__) || defined(__clang__))
+
+  uint64_t numlo = (uint64_t) x;
+  uint64_t numhi = ((uint64_t*) &x)[1];
   uint64_t den = y;
+
+  // (128-bit / 64-bit) = 64-bit.
+  // When we know the result fits into 64-bit (even
+  // though the numerator is 128-bit) we can use the divq
+  // instruction instead of doing a full 128-bit division.
+  __asm__("div %[divider]"
+          : "+a"(numlo), "+d"(numhi) : [divider] "r"(den));
+
+  return numlo;
+
+#else
+  uint64_t numlo = uint64_t(x);
+  uint64_t numhi = uint64_t(x >> 64);
+  uint64_t den = y;
+
+  // Use 64-bit integer division if possible.
+  if (numhi == 0)
+    return numlo / den;
 
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
-    throw primecount_error("fast_div_128_to_64(x, den): 64-bit overflow detected in " +
-                           to_string(x) + " / " + std::to_string(y));
+    throw primecount::primecount_error("fast_div_128_to_64(x, den): 64-bit overflow detected in " +
+                           primecount::to_string(x) + " / " + std::to_string(y));
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.
@@ -119,6 +146,7 @@ uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
   ASSERT(q == x / y);
 
   return q;
+#endif
 }
 
 } // namespace

@@ -33,12 +33,7 @@
 #include <type_traits>
 
 #if defined(HAVE_INT128_T)
-
-namespace primecount {
-  /// Used for (128-bit / 64-bit) = 64-bit.
-  uint64_t fast_div_128_to_64(uint128_t x, uint64_t y);
-}
-
+  #include <fast_div_128_64.hpp>
 #endif
 
 namespace {
@@ -121,35 +116,15 @@ fast_div64(X x, Y y)
   ASSERT(x >= 0);
   ASSERT(y > 0);
 
-#if defined(__x86_64__) && \
-   (defined(__GNUC__) || defined(__clang__))
-
-  uint64_t x0 = (uint64_t) x;
-  uint64_t x1 = ((uint64_t*) &x)[1];
-  uint64_t d = y;
-
-  // (128-bit / 64-bit) = 64-bit.
-  // When we know the result fits into 64-bit (even
-  // though the numerator is 128-bit) we can use the divq
-  // instruction instead of doing a full 128-bit division.
-  __asm__("div %[divider]"
-          : "+a"(x0), "+d"(x1) : [divider] "r"(d));
-
-  return x0;
-
-#elif defined(HAVE_INT128_T)
-
+#if defined(HAVE_INT128_T)
+  return fast_div_128_to_64(x, y);
+#else
   // Unsigned integer division is usually
   // faster than signed integer division.
+  using UX = typename pstd::make_unsigned<X>::type;
   using UY = typename pstd::make_unsigned<Y>::type;
 
-  if (x <= pstd::numeric_limits<uint64_t>::max())
-    return uint64_t(x) / UY(y);
-  else
-    return primecount::fast_div_128_to_64(x, y);
-
-#else
-  return (uint64_t) fast_div(x, y);
+  return UX(x) / UY(y);
 #endif
 }
 
