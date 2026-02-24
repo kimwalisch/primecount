@@ -141,7 +141,6 @@ fast_div64(X x, Y y)
 
   // Unsigned integer division is usually
   // faster than signed integer division.
-  using UX = typename pstd::make_unsigned<X>::type;
   using UY = typename pstd::make_unsigned<Y>::type;
 
   if (x <= pstd::numeric_limits<uint64_t>::max())
