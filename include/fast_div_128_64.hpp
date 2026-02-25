@@ -109,9 +109,9 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
 
   // Extract the low digits of the numerator and both digits of the denominator.
   num1 = uint32_t(numlo >> 32);
-  num0 = uint32_t(numlo & 0xFFFFFFFFu);
+  num0 = uint32_t(numlo);
   den1 = uint32_t(den >> 32);
-  den0 = uint32_t(den & 0xFFFFFFFFu);
+  den0 = uint32_t(den);
 
   // We wish to compute q1 = [n3 n2 n1] / [d1 d0].
   // Estimate q1 as [n3 n2] / [d1], and then correct it.
