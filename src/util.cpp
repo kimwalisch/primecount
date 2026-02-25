@@ -429,16 +429,16 @@ void verify_pix(string_view_t pix_function,
 
 #if defined(HAVE_INT128_T)
 
-void error_fast_div_128_to_64(uint128_t x, uint64_t y)
+void error_fast_div_128_64(uint128_t x, uint64_t y)
 {
   std::ostringstream oss;
 
   if (y == 0)
     oss << "\rprimecount error: division by 0 detected in "
-        << "fast_div_128_to_64(" << x << ", " << y << ")" << std::endl;
+        << "fast_div_128_64(" << x << ", " << y << ")" << std::endl;
   else
     oss << "\rprimecount error: 64-bit overflow detected in "
-        << "fast_div_128_to_64(" << x << ", " << y << ")" << std::endl;
+        << "fast_div_128_64(" << x << ", " << y << ")" << std::endl;
 
   std::cerr << oss.str() << std::flush;
   std::abort();

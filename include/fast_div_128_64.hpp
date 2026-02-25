@@ -1,6 +1,6 @@
 ///
 /// @file  fast_div_128_64.hpp
-/// @brief This file contains the function fast_div_128_to_64() that
+/// @brief This file contains the function fast_div_128_64() that
 ///        is a modified version of the libdivide_128_div_64_to_64()
 ///        function from the libdivide library,
 ///        https://github.com/ridiculousfish/libdivide.
@@ -23,7 +23,7 @@ namespace primecount {
 
 /// Defined in util.cpp, prints an error
 /// message and calls std::abort().
-void error_fast_div_128_to_64(uint128_t x, uint64_t y);
+void error_fast_div_128_64(uint128_t x, uint64_t y);
 
 } // namespace
 
@@ -43,7 +43,7 @@ using primecount::uint128_t;
 /// libdivide_128_div_64_to_64() function which is heavily optimized
 /// and very fast in practice.
 ///
-ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
+ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
 {
   ASSERT(y > 0);
   uint64_t numlo = uint64_t(x);
@@ -67,7 +67,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
 
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
-    primecount::error_fast_div_128_to_64(x, den);
+    primecount::error_fast_div_128_64(x, den);
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.

@@ -62,7 +62,7 @@ fast_div(X x, Y y)
   uint64_t numhi = uint64_t(UX(x) >> 64);
 
   if (numhi < uint64_t(y))
-    return fast_div_128_to_64(x, y);
+    return fast_div_128_64(x, y);
   else
     return UX(x) / UY(y);
 }
@@ -101,7 +101,7 @@ fast_div64(X x, Y y)
   ASSERT(x >= 0);
   ASSERT(y > 0);
 
-  return fast_div_128_to_64(x, y);
+  return fast_div_128_64(x, y);
 }
 
 #endif

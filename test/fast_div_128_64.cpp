@@ -1,6 +1,6 @@
 ///
-/// @file  fast_div_128_to_64.cpp
-/// @brief Test fast_div_128_to_64(x, y) function
+/// @file  fast_div_128_64.cpp
+/// @brief Test fast_div_128_64(x, y) function
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -45,25 +45,25 @@ int main()
   {
     // Test numerator UINT64_MAX and denomiator 1
     uint128_t x = std::numeric_limits<uint64_t>::max();
-    uint64_t res = fast_div_128_to_64(x, 1);
-    std::cout << "fast_div_128_to_64(" << x << ", " << 1 << ") = " << res;
+    uint64_t res = fast_div_128_64(x, 1);
+    std::cout << "fast_div_128_64(" << x << ", " << 1 << ") = " << res;
     check(res == x / 1);
 
     // Test denomiator UINT64_MAX
     uint64_t u64_max = std::numeric_limits<uint64_t>::max();
     x = uint128_t(u64_max) * u64_max - 1;
-    res = fast_div_128_to_64(x, u64_max);
-    std::cout << "fast_div_128_to_64(" << x << ", " << u64_max << ") = " << res;
+    res = fast_div_128_64(x, u64_max);
+    std::cout << "fast_div_128_64(" << x << ", " << u64_max << ") = " << res;
     check(res == u64_max - 1);
 
     x = uint128_t(u64_max) * u64_max;
-    res = fast_div_128_to_64(x, u64_max);
-    std::cout << "fast_div_128_to_64(" << x << ", " << u64_max << ") = " << res;
+    res = fast_div_128_64(x, u64_max);
+    std::cout << "fast_div_128_64(" << x << ", " << u64_max << ") = " << res;
     check(res == u64_max);
 
     x = uint128_t(u64_max) * u64_max + (u64_max - 1);
-    res = fast_div_128_to_64(x, u64_max);
-    std::cout << "fast_div_128_to_64(" << x << ", " << u64_max << ") = " << res;
+    res = fast_div_128_64(x, u64_max);
+    std::cout << "fast_div_128_64(" << x << ", " << u64_max << ") = " << res;
     check(res == u64_max);
   }
 
@@ -82,8 +82,8 @@ int main()
       // Build numerator: x = q * den + r
       uint128_t x = uint128_t(q) * uint128_t(den) + uint128_t(r);
 
-      uint64_t res = fast_div_128_to_64(x, den);
-      std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+      uint64_t res = fast_div_128_64(x, den);
+      std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
       check(res == x / den);
     }
   }
@@ -103,8 +103,8 @@ int main()
       // Build numerator: x = q * den + r
       uint128_t x = uint128_t(q) * uint128_t(den) + uint128_t(r);
 
-      uint64_t res = fast_div_128_to_64(x, den);
-      std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+      uint64_t res = fast_div_128_64(x, den);
+      std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
       check(res == x / den);
     }
   }
@@ -124,8 +124,8 @@ int main()
       // Build numerator: x = q * den + r
       uint128_t x = uint128_t(q) * uint128_t(den) + uint128_t(r);
 
-      uint64_t res = fast_div_128_to_64(x, den);
-      std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+      uint64_t res = fast_div_128_64(x, den);
+      std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
       check(res == x / den);
     }
   }
@@ -134,9 +134,9 @@ int main()
   for (uint64_t x = 0; x < 5000; x++)
   {
     uint64_t den = dist_u64(gen) % 100 + 1;
-    uint64_t res = fast_div_128_to_64(x, den);
+    uint64_t res = fast_div_128_64(x, den);
 
-    std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+    std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
     check(res == x / den);
   }
 
@@ -157,8 +157,8 @@ int main()
       // Build numerator: x = q * den + r
       uint128_t x = uint128_t(q) * uint128_t(den) + uint128_t(r);
 
-      uint64_t res = fast_div_128_to_64(x, den);
-      std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+      uint64_t res = fast_div_128_64(x, den);
+      std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
       check(res == q);
     }
   }
@@ -168,9 +168,9 @@ int main()
   {
     uint64_t x = dist_u64_full(gen);
     uint64_t den = dist_u64(gen);
-    uint64_t res = fast_div_128_to_64(x, den);
+    uint64_t res = fast_div_128_64(x, den);
 
-    std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+    std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
     check(res == x / den);
   }
 
@@ -186,8 +186,8 @@ int main()
     // Build numerator: x = q * den + r
     uint128_t x = uint128_t(q) * uint128_t(den) + uint128_t(r);
 
-    uint64_t res = fast_div_128_to_64(x, den);
-    std::cout << "fast_div_128_to_64(" << x << ", " << den << ") = " << res;
+    uint64_t res = fast_div_128_64(x, den);
+    std::cout << "fast_div_128_64(" << x << ", " << den << ") = " << res;
     check(res == q);
   }
 #endif
