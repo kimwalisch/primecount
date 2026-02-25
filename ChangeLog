@@ -1,8 +1,13 @@
-Changes in primecount-8.3, 2026-02-24
+Changes in primecount-8.3, 2026-02-25
 
 * fast_div_128_to_64.hpp: New 128-bit / 64-bit = 64-bit
-  integer division algorithm. Used on all CPU architectures
-  except x64 (where we use the divq instruction).
+  integer division algorithm.
+* fast_div.hpp: Use new fast_div_128_to_64(x, y) algorithm.
+* test/fast_div_128_to_64.cpp: Extensive tests for new algorithm.
+* CMakeLists.txt: Removed WITH_DIV32 option since it has been
+  disabled by default for many years.
+* phi.cpp: Don't use fast_div() for 64-bit integers.
+* phi_vector.cpp: Don't use fast_div() for 64-bit integers.
 
 Changes in primecount-8.2, 2026-02-01
 

@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,7 +25,6 @@
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
 #include <generate_primes.hpp>
-#include <fast_div.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 #include <min.hpp>
@@ -146,7 +145,7 @@ public:
       if_unlikely(primes_[i] > sqrtx)
         goto phi_1;
 
-      int64_t xp = fast_div(x, primes_[i]);
+      int64_t xp = x / primes_[i];
 
       // All remaining loop iterations can be computed
       // in O(1) time using the pi(x) lookup table.
@@ -170,7 +169,7 @@ public:
       // If a >= pi(sqrt(x)): phi(x, a) = pi(x) - a + 1
       // phi(xp, i - 1) = pi(xp) - (i - 1) + 1
       // phi(xp, i - 1) = pi(xp) - i + 2
-      int64_t xp = fast_div(x, primes_[i]);
+      int64_t xp = x / primes_[i];
       ASSERT(is_pix(xp, i - 1));
       sum += (pi_[xp] - i + 2) * -SIGN;
     }

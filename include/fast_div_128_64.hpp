@@ -40,14 +40,12 @@ using primecount::uint128_t;
 ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
 {
   ASSERT(y > 0);
+  uint64_t numlo = uint64_t(x);
+  uint64_t numhi = uint64_t(x >> 64);
+  uint64_t den = y;
 
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
-
-  uint64_t numlo = (uint64_t) x;
-  uint64_t numhi = ((uint64_t*) &x)[1];
-  uint64_t den = y;
-
   // (128-bit / 64-bit) = 64-bit.
   // When we know the result fits into 64-bit (even
   // though the numerator is 128-bit) we can use the divq
@@ -56,12 +54,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
           : "+a"(numlo), "+d"(numhi) : [divider] "r"(den));
 
   return numlo;
-
 #else
-  uint64_t numlo = uint64_t(x);
-  uint64_t numhi = uint64_t(x >> 64);
-  uint64_t den = y;
-
   // Use 64-bit integer division if possible.
   if (numhi == 0)
     return numlo / den;
