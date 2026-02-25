@@ -10,7 +10,7 @@
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,6 +19,7 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <fast_div.hpp>
 #include <int128_t.hpp>
 #include <LoadBalancerP2.hpp>
 #include <macros.hpp>
@@ -54,7 +55,7 @@ T B_thread(T x,
   // The first iteration requires computing pi(x / prime)
   // using the prime counting function.
   int threads = 1;
-  uint64_t xp = (uint64_t)(x / prime);
+  uint64_t xp = fast_div64(x, prime);
   int64_t pi_xp = pi_noprint(xp, threads);
   T sum = pi_xp;
   prime = it1.prev_prime();
@@ -67,7 +68,7 @@ T B_thread(T x,
   // \sum_{i = pi[start]+1}^{pi[stop]} pi(x / primes[i])
   for (; prime > start; prime = it1.prev_prime())
   {
-    xp = (uint64_t)(x / prime);
+    xp = fast_div64(x, prime);
 
     for (; it2.primes_[it2.size_ - 1] <= xp; it2.generate_next_primes())
       pi_xp += it2.size_ - it2.i_;
