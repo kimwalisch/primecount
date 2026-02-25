@@ -30,7 +30,6 @@ void error_fast_div_128_to_64(uint128_t x, uint64_t y);
 namespace {
 
 using primecount::uint128_t;
-using primecount::error_fast_div_128_to_64;
 
 /// primecount's performance depends heavily on the speed of the
 /// 128-bit / 64-bit = 64-bit integer division. When using GCC's and
@@ -68,7 +67,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
 
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
-    error_fast_div_128_to_64(x, den);
+    primecount::error_fast_div_128_to_64(x, den);
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.
