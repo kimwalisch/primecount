@@ -13,7 +13,7 @@
 ///        z < x^(1/2). Also the small constant is named k instead
 ///        of c.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,6 +22,7 @@
 #include <gourdon.hpp>
 #include <primecount-internal.hpp>
 #include <PhiTiny.hpp>
+#include <fast_div.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -46,17 +47,18 @@ T Phi0_thread(T x,
               int64_t z,
               uint64_t b,
               int64_t k,
-              T square_free,
+              int64_t square_free,
               const Vector<P>& primes)
 {
   T phi0 = 0;
 
   for (b++; b < primes.size(); b++)
   {
-    T next = square_free * primes[b];
+    T next = T(square_free) * primes[b];
     if (next > z) break;
-    phi0 += MU * phi_tiny(x / next, k);
-    phi0 += Phi0_thread<-MU>(x, z, b, k, next, primes);
+    int64_t next_sqf = int64_t(next);
+    phi0 += MU * phi_tiny(fast_div(x, next_sqf), k);
+    phi0 += Phi0_thread<-MU>(x, z, b, k, next_sqf, primes);
   }
 
   return phi0;
@@ -86,7 +88,7 @@ X Phi0_OpenMP(X x,
   for (int64_t b = k + 1; b <= pi_y; b++)
   {
     phi0 -= phi_tiny(x / primes[b], k);
-    phi0 += Phi0_thread<1>(x, z, b, k, (X) primes[b], primes);
+    phi0 += Phi0_thread<1>(x, z, b, k, primes[b], primes);
   }
 
   return phi0;
