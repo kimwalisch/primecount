@@ -70,12 +70,12 @@ T A(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = fast_div(x, prime);
+  T xp = x / prime;
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
-  uint64_t min_2nd_prime = min(fast_div(xhigh, prime), sqrt_xp);
-  uint64_t max_2nd_prime = min(fast_div(xlow, prime), sqrt_xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
-  uint64_t max_i1 = pi[min(fast_div(xp, y), max_2nd_prime)];
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
   // pq = primes[b] * primes[i]
@@ -177,9 +177,9 @@ T C2(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = fast_div(x, prime);
-  uint64_t max_m = min3(fast_div(xlow, prime), fast_div(xp, prime), y);
-  T min_m128 = max3(fast_div(xhigh, prime), fast_div(xp, prime * prime), prime);
+  T xp = x / prime;
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -304,9 +304,9 @@ T AC_OpenMP(T x,
     for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
     {
       int64_t prime = primes[b];
-      T xp = fast_div(x, prime);
-      int64_t max_m = min(fast_div(xp, prime), z);
-      T min_m128 = max(fast_div(xp, prime * prime), z / prime);
+      T xp = x / prime;
+      int64_t max_m = min(xp / prime, z);
+      T min_m128 = max(xp / (prime * prime), z / prime);
       int64_t min_m = min(min_m128, max_m);
 
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
@@ -403,10 +403,10 @@ T A_64(T xlow,
   T sum = 0;
 
   uint64_t sqrt_xp = isqrt(xp);
-  uint64_t min_2nd_prime = min(fast_div(xhigh, prime), sqrt_xp);
-  uint64_t max_2nd_prime = min(fast_div(xlow, prime), sqrt_xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
-  uint64_t max_i1 = pi[min(fast_div(xp, y), max_2nd_prime)];
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
   // pq = primes[b] * primes[i]
@@ -461,10 +461,10 @@ T A_128(T xlow,
   T sum = 0;
 
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
-  uint64_t min_2nd_prime = min(fast_div(xhigh, prime), sqrt_xp);
-  uint64_t max_2nd_prime = min(fast_div(xlow, prime), sqrt_xp);
+  uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
+  uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
-  uint64_t max_i1 = pi[min(fast_div(xp, y), max_2nd_prime)];
+  uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
   // pq = primes[b] * primes[i]
@@ -567,8 +567,8 @@ T C2_64(T xlow,
 {
   T sum = 0;
 
-  uint64_t max_m = min3(fast_div(xlow, prime), fast_div(xp, prime), y);
-  T min_m128 = max3(fast_div(xhigh, prime), fast_div(xp, prime * prime), prime);
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -657,8 +657,8 @@ T C2_128(T xlow,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  uint64_t max_m = min3(fast_div(xlow, prime), fast_div(xp, prime), y);
-  T min_m128 = max3(fast_div(xhigh, prime), fast_div(xp, prime * prime), prime);
+  uint64_t max_m = min3(xlow / prime, xp / prime, y);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t i = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
@@ -789,9 +789,9 @@ T AC_OpenMP(T x,
     for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
     {
       int64_t prime = primes[b];
-      T xp = fast_div(x, prime);
-      int64_t max_m = min(fast_div(xp, prime), z);
-      T min_m128 = max(fast_div(xp, prime * prime), z / prime);
+      T xp = x / prime;
+      int64_t max_m = min(xp / prime, z);
+      T min_m128 = max(xp / (prime * prime), z / prime);
       int64_t min_m = min(min_m128, max_m);
 
       sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
@@ -851,7 +851,7 @@ T AC_OpenMP(T x,
         for (int64_t b = min_c2; b <= max_c2; b++)
         {
           int64_t prime = primes[b];
-          T xp = fast_div(x, prime);
+          T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, avg_clustered_leaves);
@@ -863,7 +863,7 @@ T AC_OpenMP(T x,
         for (int64_t b = min_a; b <= max_a; b++)
         {
           int64_t prime = primes[b];
-          T xp = fast_div(x, prime);
+          T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
