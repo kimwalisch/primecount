@@ -14,15 +14,12 @@
 #ifndef FAST_DIV_HPP
 #define FAST_DIV_HPP
 
-#include <macros.hpp>
+#include <fast_div_128_64.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
 #include <type_traits>
-
-#if defined(HAVE_INT128_T)
-  #include <fast_div_128_64.hpp>
-#endif
 
 namespace {
 

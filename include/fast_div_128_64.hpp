@@ -13,11 +13,16 @@
 /// COPYING file in the top level directory.
 ///
 
+#ifndef FAST_DIV_128_64_HPP
+#define FAST_DIV_128_64_HPP
+
 #include <ctz.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
 
 #include <stdint.h>
+
+#if defined(HAVE_INT128_T)
 
 namespace primecount {
 
@@ -148,3 +153,6 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
 }
 
 } // namespace
+
+#endif
+#endif
