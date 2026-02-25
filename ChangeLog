@@ -4,9 +4,8 @@ Changes in primecount-8.3, 2026-02-25
   integer division algorithm.
 * fast_div.hpp: Use new fast_div_128_64(x, y) algorithm.
 * test/fast_div_128_64.cpp: Extensive tests for new algorithm.
-* AC.cpp: Use fast_div() in more places.
+* B.cpp: Use fast_div64() function inside loop.
 * P2.cpp: Use fast_div64() function inside loop.
-* D.cpp: Use fast_div64() function inside loop.
 * Phi0.cpp: Use fast_div() function.
 * CMakeLists.txt: Removed WITH_DIV32 option since it has been
   disabled by default for many years.
