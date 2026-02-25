@@ -16,14 +16,21 @@
 #include <ctz.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
-#include <primecount.hpp>
 
 #include <stdint.h>
-#include <string>
+
+namespace primecount {
+
+/// Defined in util.cpp, prints an error
+/// message and calls std::abort().
+void error_fast_div_128_to_64(uint128_t x, uint64_t y);
+
+} // namespace
 
 namespace {
 
 using primecount::uint128_t;
+using primecount::error_fast_div_128_to_64;
 
 /// primecount's performance depends heavily on the speed of the
 /// 128-bit / 64-bit = 64-bit integer division. When using GCC's and
@@ -61,8 +68,7 @@ ALWAYS_INLINE uint64_t fast_div_128_to_64(uint128_t x, uint64_t y)
 
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
-    throw primecount::primecount_error("fast_div_128_to_64(x, den): 64-bit overflow detected in " +
-                      primecount::to_string(x) + " / " + std::to_string(y));
+    error_fast_div_128_to_64(x, den);
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.

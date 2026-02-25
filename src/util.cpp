@@ -11,6 +11,7 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
+#include <fast_div_128_64.hpp>
 #include <int128_t.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -425,5 +426,24 @@ void verify_pix(string_view_t pix_function,
     std::abort();
   }
 }
+
+#if defined(HAVE_INT128_T)
+
+void error_fast_div_128_to_64(uint128_t x, uint64_t y)
+{
+  std::ostringstream oss;
+
+  if (y == 0)
+    oss << "\rprimecount error: division by 0 detected in "
+        << "fast_div_128_to_64(" << x << ", " << y << ")" << std::endl;
+  else
+    oss << "\rprimecount error: 64-bit overflow detected in "
+        << "fast_div_128_to_64(" << x << ", " << y << ")" << std::endl;
+
+  std::cerr << oss.str() << std::flush;
+  std::abort();
+}
+
+#endif
 
 } // namespace
