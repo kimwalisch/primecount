@@ -26,9 +26,8 @@
 
 namespace primecount {
 
-/// Defined in util.cpp, prints an error
-/// message and calls std::abort().
-void error_fast_div_128_64(uint128_t x, uint64_t y);
+/// Prints an error message and calls std::abort()
+[[noreturn]] void error_abort_fast_div_128_64(uint128_t x, uint64_t y);
 
 } // namespace
 
@@ -72,7 +71,7 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
 
   // Check for overflow and divide by 0.
   if_unlikely(numhi >= den)
-    primecount::error_fast_div_128_64(x, den);
+    primecount::error_abort_fast_div_128_64(x, den);
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.

@@ -429,7 +429,7 @@ void verify_pix(string_view_t pix_function,
 
 #if defined(HAVE_INT128_T)
 
-void error_fast_div_128_64(uint128_t x, uint64_t y)
+[[noreturn]] void error_abort_fast_div_128_64(uint128_t x, uint64_t y)
 {
   std::ostringstream oss;
 
