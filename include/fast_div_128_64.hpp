@@ -19,7 +19,6 @@
 #include <ctz.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
-
 #include <stdint.h>
 
 #if defined(HAVE_INT128_T)
@@ -27,7 +26,7 @@
 namespace primecount {
 
 /// Prints an error message and calls std::abort()
-[[noreturn]] void error_abort_fast_div_128_64(uint128_t x, uint64_t y);
+[[noreturn]] void error_fast_div_128_64(uint128_t x, uint64_t y);
 
 } // namespace
 
@@ -69,9 +68,9 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
   if (numhi == 0)
     return numlo / den;
 
-  // Check for overflow and divide by 0.
+  // Check for 64-bit overflow of quotient.
   if_unlikely(numhi >= den)
-    primecount::error_abort_fast_div_128_64(x, den);
+    primecount::error_fast_div_128_64(x, den);
 
   // We work in base 2**32.
   // A uint32 holds a single digit. A uint64 holds two digits.
@@ -107,7 +106,8 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
   numhi |= (numlo >> (-shift & 63)) & uint64_t(-int64_t(shift) >> 63);
   numlo <<= shift;
 
-  // Extract the low digits of the numerator and both digits of the denominator.
+  // Extract the low digits of the numerator and
+  // both digits of the denominator.
   num1 = uint32_t(numlo >> 32);
   num0 = uint32_t(numlo);
   den1 = uint32_t(den >> 32);
@@ -120,11 +120,8 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
   rhat = numhi % den1;
   c1 = qhat * den0;
   c2 = rhat * b + num1;
-  // Branchfree code that computes:
-  // if (c1 > c2) qhat -= (c1 - c2 > den) ? 2 : 1;
-  int is_too_high = (c1 > c2);
-  int is_off_by_two = (c1 - c2 > den);
-  qhat -= is_too_high + (is_too_high & is_off_by_two);
+  if (c1 > c2)
+    qhat -= (c1 - c2 > den) + 1;
   q1 = uint32_t(qhat);
 
   // Compute the true (partial) remainder.
@@ -136,15 +133,11 @@ ALWAYS_INLINE uint64_t fast_div_128_64(uint128_t x, uint64_t y)
   rhat = rem % den1;
   c1 = qhat * den0;
   c2 = rhat * b + num0;
-  // Branchfree code that computes:
-  // if (c1 > c2) qhat -= (c1 - c2 > den) ? 2 : 1;
-  is_too_high = (c1 > c2);
-  is_off_by_two = (c1 - c2 > den);
-  qhat -= is_too_high + (is_too_high & is_off_by_two);
+  if (c1 > c2)
+    qhat -= (c1 - c2 > den) + 1;
   q0 = uint32_t(qhat);
 
   uint64_t q = (uint64_t(q1) << 32) | q0;
-  // Check our result against 128-bit compiler division
   ASSERT(q == x / y);
 
   return q;
