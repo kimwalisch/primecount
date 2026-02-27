@@ -1,8 +1,6 @@
 Changes in primecount-8.3, 2026-02-24
 
-* fast_div_128_to_64.hpp: New 128-bit / 64-bit = 64-bit
-  integer division algorithm. Used on all CPU architectures
-  except x64 (where we use the divq instruction).
+* fast_div.hpp: Improve x64 assembly.
 
 Changes in primecount-8.2, 2026-02-01
 
