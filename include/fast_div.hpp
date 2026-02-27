@@ -5,6 +5,12 @@
 ///        function tries to take advantage of this by casting x and y
 ///        to smaller types (if possible) before doing the division.
 ///
+///        On the x64 CPU architecture, if ENABLE_DIV32 is defined we
+///        check at runtime if we can divide using the divl
+///        instruction (64-bit / 32-bit = 32-bit) which is usually
+///        faster than a full 64-bit division. On most CPUs before
+///        2020 this significantly improves performance.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -36,7 +42,8 @@ fast_div(X x, Y y)
   using UX = typename pstd::make_unsigned<X>::type;
   using UY = typename pstd::make_unsigned<Y>::type;
 
-#if defined(__x86_64__) && \
+#if defined(ENABLE_DIV32) && \
+    defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
 
   uint32_t high = uint32_t(UX(x) >> 32);

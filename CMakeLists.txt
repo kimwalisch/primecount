@@ -15,6 +15,7 @@ option(BUILD_TESTS         "Build the test programs"               OFF)
 
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
+option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" ON)
 option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 
@@ -171,6 +172,18 @@ endif()
 if(WITH_FLOAT128)
     list(APPEND PRIMECOUNT_LINK_LIBRARIES "quadmath")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_FLOAT128")
+endif()
+
+# Use 32-bit integer division ########################################
+
+# If WITH_DIV32 is enabled on the x64 CPU architecture we
+# check at runtime if we can divide using the divl
+# instruction (64-bit / 32-bit = 32-bit) which is usually
+# faster than a full 64-bit division. On most CPUs before
+# 2020 this significantly improves performance.
+
+if(WITH_DIV32)
+    list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "ENABLE_DIV32")
 endif()
 
 # Use -Wno-uninitialized with GCC compiler ###########################
