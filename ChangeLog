@@ -1,6 +1,7 @@
 Changes in primecount-8.3, 2026-02-24
 
 * fast_div.hpp: Improve x64 assembly.
+* CMakeLists.txt: Remove legacy WITH_DIV32 option.
 
 Changes in primecount-8.2, 2026-02-01
 
