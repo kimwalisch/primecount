@@ -5,19 +5,7 @@
 ///        function tries to take advantage of this by casting x and y
 ///        to smaller types (if possible) before doing the division.
 ///
-///        If ENABLE_DIV32 is defined we check at runtime if the
-///        dividend and divisor are < 2^32 and if so we use 32-bit
-///        integer division instead of 64-bit integer division. On
-///        most CPUs before 2020 this significantly improves
-///        performance.
-///
-///        On some new CPUs (such as Intel Cannonlake) 64-bit integer
-///        division has been improved significantly and runs as fast
-///        as 32-bit integer division. For such CPUs it is best to
-///        disable ENABLE_DIV32 (using cmake -DWITH_DIV32=OFF) as this
-///        avoids runtime checks for (64-bit / 32-bit) divisions.
-///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,22 +31,77 @@ fast_div(X x, Y y)
   ASSERT(x >= 0);
   ASSERT(y > 0);
 
-#if defined(ENABLE_DIV32)
-
-  using UX = typename pstd::make_unsigned<X>::type;
-  using UY = typename pstd::make_unsigned<Y>::type;
-
-  if (x <= pstd::numeric_limits<uint32_t>::max())
-    return uint32_t(x) / UY(y);
-  else
-    return UX(x) / UY(y);
-#else
   // Unsigned integer division is usually
   // faster than signed integer division.
   using UX = typename pstd::make_unsigned<X>::type;
   using UY = typename pstd::make_unsigned<Y>::type;
-  return UX(x) / UY(y);
+
+#if defined(__x86_64__) && \
+   (defined(__GNUC__) || defined(__clang__))
+
+  uint32_t high = uint32_t(UX(x) >> 32);
+
+  if (high < UY(y))
+  {
+    uint32_t low = uint32_t(x);
+    uint32_t d = y;
+
+    // (64-bit / 32-bit) = 32-bit.
+    // When we know the result fits into 32-bit (even
+    // though the numerator is 64-bit) we can use the divl
+    // instruction instead of doing a full 64-bit division.
+    __asm__("divl %[divider]"
+            : "+a"(low), "+d"(high) : [divider] "r"(d));
+
+    return low;
+  }
 #endif
+
+  return UX(x) / UY(y);
+}
+
+/// Used for (128-bit / 32-bit) = 128-bit.
+/// Used for (128-bit / 64-bit) = 128-bit.
+template <typename X, typename Y>
+ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
+                                       sizeof(Y) <= sizeof(uint64_t)), X>::type
+fast_div(X x, Y y)
+{
+  ASSERT(x >= 0);
+  ASSERT(y > 0);
+
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UX = typename pstd::make_unsigned<X>::type;
+  using UY = typename pstd::make_unsigned<Y>::type;
+  uint64_t high = uint64_t(UX(x) >> 64);
+
+#if defined(__x86_64__) && \
+   (defined(__GNUC__) || defined(__clang__))
+
+  if (high < UY(y))
+  {
+    uint64_t low = uint64_t(x);
+    uint64_t d = y;
+
+    // (128-bit / 64-bit) = 64-bit.
+    // When we know the result fits into 64-bit (even
+    // though the numerator is 128-bit) we can use the divq
+    // instruction instead of doing a full 128-bit division.
+    __asm__("div %[divider]"
+            : "+a"(low), "+d"(high) : [divider] "r"(d));
+
+    return low;
+  }
+#else
+  // This optimization is very important on non x64 CPUs
+  // such as ARM64. On AWS Graviton 4 CPUs it e.g. improves
+  // performance by about 60% when computing AC(1e22).
+  if (high == 0)
+    return uint64_t(x) / UY(y);
+#endif
+
+  return UX(x) / UY(y);
 }
 
 /// Used for  (64-bit /  64-bit) =  64-bit.
@@ -78,27 +121,6 @@ fast_div(X x, Y y)
   return UX(x) / UY(y);
 }
 
-/// Used for (128-bit / 32-bit) = 128-bit.
-/// Used for (128-bit / 64-bit) = 128-bit.
-template <typename X, typename Y>
-ALWAYS_INLINE typename std::enable_if<(sizeof(X) > sizeof(uint64_t) &&
-                                       sizeof(Y) <= sizeof(uint64_t)), X>::type
-fast_div(X x, Y y)
-{
-  ASSERT(x >= 0);
-  ASSERT(y > 0);
-
-  // Unsigned integer division is usually
-  // faster than signed integer division.
-  using UX = typename pstd::make_unsigned<X>::type;
-  using UY = typename pstd::make_unsigned<Y>::type;
-
-  if (x <= pstd::numeric_limits<uint64_t>::max())
-    return uint64_t(x) / UY(y);
-  else
-    return UX(x) / UY(y);
-}
-
 /// Used for (128-bit / 32-bit) = 64-bit.
 /// Used for (128-bit / 64-bit) = 64-bit.
 /// Use this function only when you know for sure
@@ -115,8 +137,10 @@ fast_div64(X x, Y y)
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
 
-  uint64_t x0 = (uint64_t) x;
-  uint64_t x1 = ((uint64_t*) &x)[1];
+  using UX = typename pstd::make_unsigned<X>::type;
+
+  uint64_t low = uint64_t(x);
+  uint64_t high = uint64_t(UX(x) >> 64);
   uint64_t d = y;
 
   // (128-bit / 64-bit) = 64-bit.
@@ -124,9 +148,9 @@ fast_div64(X x, Y y)
   // though the numerator is 128-bit) we can use the divq
   // instruction instead of doing a full 128-bit division.
   __asm__("div %[divider]"
-          : "+a"(x0), "+d"(x1) : [divider] "r"(d));
+          : "+a"(low), "+d"(high) : [divider] "r"(d));
 
-  return x0;
+  return low;
 #else
   return (uint64_t) fast_div(x, y);
 #endif
