@@ -57,10 +57,11 @@ namespace {
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
+          typename XP,
           typename Primes>
-T A(T x,
-    T xlow,
+T A(T xlow,
     T xhigh,
+    XP xp,
     uint64_t y,
     uint64_t b,
     const Primes& primes,
@@ -70,7 +71,6 @@ T A(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = x / prime;
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
@@ -163,10 +163,11 @@ T C1(T xp,
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
+          typename XP,
           typename Primes>
-T C2(T x,
-     T xlow,
+T C2(T xlow,
      T xhigh,
+     XP xp,
      uint64_t y,
      uint64_t b,
      const Primes& primes,
@@ -177,7 +178,6 @@ T C2(T x,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  T xp = x / prime;
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
@@ -364,11 +364,25 @@ T AC_OpenMP(T x,
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
-          sum += C2(x, xlow, xhigh, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+        {
+          T xp = x / primes[b];
+          
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+          else
+            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+        }
 
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)
-          sum += A(x, xlow, xhigh, y, b, primes, pi, segmentedPi);
+        {
+          T xp = x / primes[b];
+
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
+            sum += A(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
+          else
+            sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+        }
       }
     }
   }
