@@ -1,7 +1,9 @@
-Changes in primecount-8.3, 2026-02-27
+Changes in primecount-8.3, 2026-03-01
 
 * fast_div.hpp: Improve x64 assembly.
 * AC.cpp: Cast to smaller type optimization.
+* SegmentedPiTable.hpp: Use faster lightweight compression.
+* SegmentedPiTable.cpp: Use faster lightweight compression.
 
 Changes in primecount-8.2, 2026-02-01
 
