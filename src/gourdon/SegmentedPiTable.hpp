@@ -68,7 +68,6 @@ public:
     return size;
   }
 
-
   /// Get number of primes <= x
   ALWAYS_INLINE int64_t operator[](uint64_t x) const
   {
