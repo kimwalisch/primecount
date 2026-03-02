@@ -51,7 +51,7 @@ namespace primecount {
 
 namespace {
 
-constexpr uint8_t wheel_gaps[8] = { 6, 4, 2, 4, 2, 4, 6, 2 };
+constexpr uint8_t wheel_factor[8] = { 6, 4, 2, 4, 2, 4, 6, 2 };
 
 constexpr uint8_t wheel_bits[8][8] = {
   { 0, 1, 2, 3, 4, 5, 6, 7 }, // p % 30 == 1
@@ -455,14 +455,14 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   uint64_t adv[8];
   uint8_t msk[8];
-  adv[0] = prime * wheel_gaps[0] + wheel_corr[r][0];
-  adv[1] = prime * wheel_gaps[1] + wheel_corr[r][1];
-  adv[2] = prime * wheel_gaps[2] + wheel_corr[r][2];
-  adv[3] = prime * wheel_gaps[3] + wheel_corr[r][3];
-  adv[4] = prime * wheel_gaps[4] + wheel_corr[r][4];
-  adv[5] = prime * wheel_gaps[5] + wheel_corr[r][5];
-  adv[6] = prime * wheel_gaps[6] + wheel_corr[r][6];
-  adv[7] = prime * wheel_gaps[7] + wheel_corr[r][7];
+  adv[0] = prime * wheel_factor[0] + wheel_corr[r][0];
+  adv[1] = prime * wheel_factor[1] + wheel_corr[r][1];
+  adv[2] = prime * wheel_factor[2] + wheel_corr[r][2];
+  adv[3] = prime * wheel_factor[3] + wheel_corr[r][3];
+  adv[4] = prime * wheel_factor[4] + wheel_corr[r][4];
+  adv[5] = prime * wheel_factor[5] + wheel_corr[r][5];
+  adv[6] = prime * wheel_factor[6] + wheel_corr[r][6];
+  adv[7] = prime * wheel_factor[7] + wheel_corr[r][7];
 
   msk[0] = (uint8_t) (1u << wheel_bits[r][0]);
   msk[1] = (uint8_t) (1u << wheel_bits[r][1]);
