@@ -473,6 +473,23 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   msk[6] = (uint8_t) (1u << wheel_bits[r][6]);
   msk[7] = (uint8_t) (1u << wheel_bits[r][7]);
 
+  #define CHECK_FINISHED(i) \
+    if_unlikely(m >= sieve_size) \
+    { \
+      wheel.index = (r << 3) + i; \
+      wheel.multiple = (uint32_t) (m - sieve_size); \
+      total_count_ = total_count; \
+      return; \
+    }
+
+  #define COUNT_UNSET_BIT(i) \
+    { \
+      std::size_t b = sieve[m]; \
+      total_count -= (b & msk[i]) != 0; \
+      sieve[m] = uint8_t(b & ~msk[i]); \
+      m += adv[i]; \
+    }
+
   while (s != 0)
   {
     if (m >= sieve_size)
@@ -491,69 +508,17 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     s = (s + 1) & 7;
   }
 
-  const uint64_t partial = adv[0] + adv[1] + adv[2] + adv[3] +
-                           adv[4] + adv[5] + adv[6];
-  if (sieve_size > partial)
+  for (;;)
   {
-    const uint64_t limit = sieve_size - partial;
-    while (m < limit)
-    {
-      std::size_t b0 = sieve[m];
-      total_count -= (uint64_t) ((b0 & msk[0]) != 0);
-      sieve[m] = (uint8_t) (b0 & ~msk[0]);
-      m += adv[0];
-
-      std::size_t b1 = sieve[m];
-      total_count -= (uint64_t) ((b1 & msk[1]) != 0);
-      sieve[m] = (uint8_t) (b1 & ~msk[1]);
-      m += adv[1];
-
-      std::size_t b2 = sieve[m];
-      total_count -= (uint64_t) ((b2 & msk[2]) != 0);
-      sieve[m] = (uint8_t) (b2 & ~msk[2]);
-      m += adv[2];
-
-      std::size_t b3 = sieve[m];
-      total_count -= (uint64_t) ((b3 & msk[3]) != 0);
-      sieve[m] = (uint8_t) (b3 & ~msk[3]);
-      m += adv[3];
-
-      std::size_t b4 = sieve[m];
-      total_count -= (uint64_t) ((b4 & msk[4]) != 0);
-      sieve[m] = (uint8_t) (b4 & ~msk[4]);
-      m += adv[4];
-
-      std::size_t b5 = sieve[m];
-      total_count -= (uint64_t) ((b5 & msk[5]) != 0);
-      sieve[m] = (uint8_t) (b5 & ~msk[5]);
-      m += adv[5];
-
-      std::size_t b6 = sieve[m];
-      total_count -= (uint64_t) ((b6 & msk[6]) != 0);
-      sieve[m] = (uint8_t) (b6 & ~msk[6]);
-      m += adv[6];
-
-      std::size_t b7 = sieve[m];
-      total_count -= (uint64_t) ((b7 & msk[7]) != 0);
-      sieve[m] = (uint8_t) (b7 & ~msk[7]);
-      m += adv[7];
-    }
+    CHECK_FINISHED(0); COUNT_UNSET_BIT(0);
+    CHECK_FINISHED(1); COUNT_UNSET_BIT(1);
+    CHECK_FINISHED(2); COUNT_UNSET_BIT(2);
+    CHECK_FINISHED(3); COUNT_UNSET_BIT(3);
+    CHECK_FINISHED(4); COUNT_UNSET_BIT(4);
+    CHECK_FINISHED(5); COUNT_UNSET_BIT(5);
+    CHECK_FINISHED(6); COUNT_UNSET_BIT(6);
+    CHECK_FINISHED(7); COUNT_UNSET_BIT(7);
   }
-
-  s = 0;
-  while (m < sieve_size)
-  {
-    std::size_t sieve_byte = sieve[m];
-    std::size_t is_bit = (sieve_byte & msk[s]) != 0;
-    sieve[m] = (uint8_t) (sieve_byte & ~msk[s]);
-    total_count -= (uint64_t) is_bit;
-    m += adv[s];
-    s = (s + 1) & 7;
-  }
-
-  wheel.index = (r << 3) + s;
-  wheel.multiple = (uint32_t) (m - sieve_size);
-  total_count_ = total_count;
 }
 
 } // namespace
