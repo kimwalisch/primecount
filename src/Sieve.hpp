@@ -114,8 +114,6 @@ public:
 
 private:
   void add(uint64_t prime, uint64_t i);
-  void allocate_counter(uint64_t low);
-  void reset_counter();
   void resize_sieve(uint64_t low, uint64_t high);
   uint64_t pre_sieve(uint64_t c, uint64_t low);
   uint64_t segment_size() const;
@@ -128,33 +126,12 @@ private:
     uint32_t index;
   };
 
-  struct Counter
-  {
-    uint64_t stop = 0;
-    uint64_t dist = 0;
-    uint64_t log2_dist = 0;
-    uint64_t sum = 0;
-    uint64_t i = 0;
-    Vector<uint32_t> counter;
-
-    uint32_t& operator[](std::size_t pos)
-    {
-      return counter[pos];
-    }
-
-    uint32_t operator[](std::size_t pos) const
-    {
-      return counter[pos];
-    }
-  };
-
   uint64_t start_ = 0;
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
   Vector<uint8_t> sieve_;
   Vector<Wheel> wheel_;
-  Counter counter_;
 };
 
 } // namespace

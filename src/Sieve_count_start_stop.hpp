@@ -119,6 +119,12 @@ uint64_t Sieve::count_popcnt64(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
+  uint64_t max_stop = segment_size() - 1;
+  if (start > max_stop)
+    return 0;
+  if (stop > max_stop)
+    stop = max_stop;
+
   SIEVE_COUNT_POPCNT64(start, stop);
   return cnt;
 }
@@ -141,6 +147,12 @@ uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
   if (start > stop)
     return 0;
 
+  uint64_t max_stop = segment_size() - 1;
+  if (start > max_stop)
+    return 0;
+  if (stop > max_stop)
+    stop = max_stop;
+
   SIEVE_COUNT_AVX512(start, stop);
   return cnt;
 }
@@ -160,6 +172,12 @@ uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {
   if (start > stop)
     return 0;
+
+  uint64_t max_stop = segment_size() - 1;
+  if (start > max_stop)
+    return 0;
+  if (stop > max_stop)
+    stop = max_stop;
 
   SIEVE_COUNT_ARM_SVE(start, stop);
   return cnt;

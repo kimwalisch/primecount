@@ -46,9 +46,36 @@
 
 #include <stdint.h>
 #include <algorithm>
-#include <cmath>
 
 namespace primecount {
+
+namespace {
+
+constexpr uint8_t wheel_gaps[8] = { 6, 4, 2, 4, 2, 4, 6, 2 };
+
+constexpr uint8_t wheel_bits[8][8] = {
+  { 0, 1, 2, 3, 4, 5, 6, 7 }, // p % 30 == 1
+  { 1, 5, 4, 0, 7, 3, 2, 6 }, // p % 30 == 7
+  { 2, 4, 0, 6, 1, 7, 3, 5 }, // p % 30 == 11
+  { 3, 0, 6, 5, 2, 1, 7, 4 }, // p % 30 == 13
+  { 4, 7, 1, 2, 5, 6, 0, 3 }, // p % 30 == 17
+  { 5, 3, 7, 1, 6, 0, 4, 2 }, // p % 30 == 19
+  { 6, 2, 3, 7, 0, 4, 5, 1 }, // p % 30 == 23
+  { 7, 6, 5, 4, 3, 2, 1, 0 }  // p % 30 == 29
+};
+
+constexpr uint8_t wheel_corr[8][8] = {
+  { 0, 0, 0, 0, 0, 0, 0, 1 }, // p % 30 == 1
+  { 1, 1, 1, 0, 1, 1, 1, 1 }, // p % 30 == 7
+  { 2, 2, 0, 2, 0, 2, 2, 1 }, // p % 30 == 11
+  { 3, 1, 1, 2, 1, 1, 3, 1 }, // p % 30 == 13
+  { 3, 3, 1, 2, 1, 3, 3, 1 }, // p % 30 == 17
+  { 4, 2, 2, 2, 2, 2, 4, 1 }, // p % 30 == 19
+  { 5, 3, 1, 4, 1, 3, 5, 1 }, // p % 30 == 23
+  { 6, 4, 2, 4, 2, 4, 6, 1 }  // p % 30 == 29
+};
+
+} // namespace
 
 Sieve::Sieve(uint64_t low,
              uint64_t segment_size,
@@ -65,55 +92,6 @@ Sieve::Sieve(uint64_t low,
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
   sieve_.resize(segment_size / 30);
   wheel_.reserve(wheel_size);
-  allocate_counter(low);
-}
-
-/// Each element of the counter array contains the current
-/// number of unsieved elements in the interval:
-/// [i * counter_.dist, (i + 1) * counter_.dist[.
-/// Ideally each element of the counter array should
-/// represent an interval of size O(sqrt(average_leaf_dist)).
-/// Also the counter distance should be adjusted regularly
-/// whilst sieving as the distance between consecutive
-/// leaves is very small ~ log(x) at the beginning of the
-/// sieving algorithm but grows up to segment_size towards
-/// the end of the algorithm.
-///
-void Sieve::allocate_counter(uint64_t low)
-{
-  double average_leaf_dist = std::sqrt(low);
-  double counter_dist = std::sqrt(average_leaf_dist);
-
-  // Here we balance counting with the counter array and
-  // counting from the sieve array using the 64-bit POPCNT
-  // instruction. Since the 64-bit POPCNT instructions
-  // allows to count a distance of 240 using a single
-  // instruction we slightly increase the counter distance
-  // and slightly decrease the size of the counter array.
-  uint64_t bytes_count_instruction = bytes_per_count_instruction();
-  ASSERT(bytes_count_instruction >= sizeof(uint64_t));
-  uint64_t dist_per_instruction = bytes_count_instruction * 30;
-  counter_.dist = uint64_t(counter_dist * std::sqrt(dist_per_instruction));
-
-  // Increasing the minimum counter distance decreases the
-  // branch mispredictions (good) but on the other hand
-  // increases the number of executed instructions (bad).
-  // In my benchmarks setting the minimum amount of bytes to
-  // bytes_count_instruction * 8 (or 16) performed best.
-  uint64_t bytes = counter_.dist / 30;
-  bytes = max(bytes, bytes_count_instruction * 8);
-  bytes = next_power_of_2(bytes);
-
-  // Make sure the counter (32-bit) doesn't overflow.
-  // This can never happen since each counter array element
-  // only counts the number of unsieved elements (1 bits) in
-  // an interval of size: sieve_limit^(1/4) * sqrt(240).
-  // Hence the max(counter value) = 2^18.
-  ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
-  uint64_t counter_size = ceil_div(sieve_.size(), bytes);
-  counter_.counter.resize(counter_size);
-  counter_.dist = bytes * 30;
-  counter_.log2_dist = ilog2(bytes);
 }
 
 /// The segment size is sieve.size() * 30 as each
@@ -153,35 +131,13 @@ void Sieve::resize_sieve(uint64_t low, uint64_t high)
   }
 }
 
-void Sieve::reset_counter()
-{
-  prev_stop_ = 0;
-  count_ = 0;
-  counter_.i = 0;
-  counter_.sum = 0;
-  counter_.stop = counter_.dist;
-}
-
 void Sieve::init_counter(uint64_t low, uint64_t high)
 {
-  reset_counter();
+  count_ = 0;
   total_count_ = 0;
 
-  uint64_t start = 0;
-  uint64_t max_stop = (high - 1) - low;
-
-  while (start <= max_stop)
-  {
-    uint64_t stop = start + counter_.dist - 1;
-    stop = min(stop, max_stop);
-    uint64_t cnt = count(start, stop);
-    uint64_t byte_index = start / 30;
-    uint64_t i = byte_index >> counter_.log2_dist;
-
-    counter_[i] = (uint32_t) cnt;
-    total_count_ += cnt;
-    start += counter_.dist;
-  }
+  if (high > low)
+    total_count_ = count(0, (high - 1) - low);
 }
 
 /// Add a sieving prime to the sieve.
@@ -482,137 +438,122 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (i >= wheel_.size())
     add(prime, i);
 
-  reset_counter();
+  prev_stop_ = 0;
+  count_ = 0;
   Wheel& wheel = wheel_[i];
   prime /= 30;
 
   uint64_t m = wheel.multiple;
+  uint32_t s = wheel.index & 7u;
+  uint32_t r = wheel.index >> 3;
   uint64_t total_count = total_count_;
-  uint64_t counter_log2_dist = counter_.log2_dist;
   uint64_t sieve_size = sieve_.size();
-  uint32_t* counter = &counter_[0];
   uint8_t* sieve = &sieve_[0];
 
-  #define CHECK_FINISHED(wheel_index) \
-    if_unlikely(m >= sieve_size) \
-    { \
-      wheel.index = wheel_index; \
-      wheel.multiple = (uint32_t) (m - sieve_size); \
-      total_count_ = total_count; \
-      return; \
-    }
-
-  #define COUNT_UNSET_BIT(bit_index) \
-    { \
-      std::size_t sieve_byte = sieve[m]; \
-      std::size_t is_bit = (sieve_byte >> bit_index) & 1; \
-      sieve[m] &= ~(1 << bit_index); \
-      counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
-      total_count -= (uint64_t) is_bit; \
-    }
-
   ASSERT(wheel.index <= 63);
+  ASSERT(r < 8);
 
-  switch (wheel.index)
+  uint64_t adv[8];
+  uint8_t msk[8];
+  adv[0] = prime * wheel_gaps[0] + wheel_corr[r][0];
+  adv[1] = prime * wheel_gaps[1] + wheel_corr[r][1];
+  adv[2] = prime * wheel_gaps[2] + wheel_corr[r][2];
+  adv[3] = prime * wheel_gaps[3] + wheel_corr[r][3];
+  adv[4] = prime * wheel_gaps[4] + wheel_corr[r][4];
+  adv[5] = prime * wheel_gaps[5] + wheel_corr[r][5];
+  adv[6] = prime * wheel_gaps[6] + wheel_corr[r][6];
+  adv[7] = prime * wheel_gaps[7] + wheel_corr[r][7];
+
+  msk[0] = (uint8_t) (1u << wheel_bits[r][0]);
+  msk[1] = (uint8_t) (1u << wheel_bits[r][1]);
+  msk[2] = (uint8_t) (1u << wheel_bits[r][2]);
+  msk[3] = (uint8_t) (1u << wheel_bits[r][3]);
+  msk[4] = (uint8_t) (1u << wheel_bits[r][4]);
+  msk[5] = (uint8_t) (1u << wheel_bits[r][5]);
+  msk[6] = (uint8_t) (1u << wheel_bits[r][6]);
+  msk[7] = (uint8_t) (1u << wheel_bits[r][7]);
+
+  while (s != 0)
   {
-    for (;;)
+    if (m >= sieve_size)
     {
-      case 0: CHECK_FINISHED(0); COUNT_UNSET_BIT(0); m += prime * 6 + 0; FALLTHROUGH;
-      case 1: CHECK_FINISHED(1); COUNT_UNSET_BIT(1); m += prime * 4 + 0; FALLTHROUGH;
-      case 2: CHECK_FINISHED(2); COUNT_UNSET_BIT(2); m += prime * 2 + 0; FALLTHROUGH;
-      case 3: CHECK_FINISHED(3); COUNT_UNSET_BIT(3); m += prime * 4 + 0; FALLTHROUGH;
-      case 4: CHECK_FINISHED(4); COUNT_UNSET_BIT(4); m += prime * 2 + 0; FALLTHROUGH;
-      case 5: CHECK_FINISHED(5); COUNT_UNSET_BIT(5); m += prime * 4 + 0; FALLTHROUGH;
-      case 6: CHECK_FINISHED(6); COUNT_UNSET_BIT(6); m += prime * 6 + 0; FALLTHROUGH;
-      case 7: CHECK_FINISHED(7); COUNT_UNSET_BIT(7); m += prime * 2 + 1;
+      wheel.index = (r << 3) + s;
+      wheel.multiple = (uint32_t) (m - sieve_size);
+      total_count_ = total_count;
+      return;
     }
 
-    for (;;)
-    {
-      case  8: CHECK_FINISHED( 8); COUNT_UNSET_BIT(1); m += prime * 6 + 1; FALLTHROUGH;
-      case  9: CHECK_FINISHED( 9); COUNT_UNSET_BIT(5); m += prime * 4 + 1; FALLTHROUGH;
-      case 10: CHECK_FINISHED(10); COUNT_UNSET_BIT(4); m += prime * 2 + 1; FALLTHROUGH;
-      case 11: CHECK_FINISHED(11); COUNT_UNSET_BIT(0); m += prime * 4 + 0; FALLTHROUGH;
-      case 12: CHECK_FINISHED(12); COUNT_UNSET_BIT(7); m += prime * 2 + 1; FALLTHROUGH;
-      case 13: CHECK_FINISHED(13); COUNT_UNSET_BIT(3); m += prime * 4 + 1; FALLTHROUGH;
-      case 14: CHECK_FINISHED(14); COUNT_UNSET_BIT(2); m += prime * 6 + 1; FALLTHROUGH;
-      case 15: CHECK_FINISHED(15); COUNT_UNSET_BIT(6); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 16: CHECK_FINISHED(16); COUNT_UNSET_BIT(2); m += prime * 6 + 2; FALLTHROUGH;
-      case 17: CHECK_FINISHED(17); COUNT_UNSET_BIT(4); m += prime * 4 + 2; FALLTHROUGH;
-      case 18: CHECK_FINISHED(18); COUNT_UNSET_BIT(0); m += prime * 2 + 0; FALLTHROUGH;
-      case 19: CHECK_FINISHED(19); COUNT_UNSET_BIT(6); m += prime * 4 + 2; FALLTHROUGH;
-      case 20: CHECK_FINISHED(20); COUNT_UNSET_BIT(1); m += prime * 2 + 0; FALLTHROUGH;
-      case 21: CHECK_FINISHED(21); COUNT_UNSET_BIT(7); m += prime * 4 + 2; FALLTHROUGH;
-      case 22: CHECK_FINISHED(22); COUNT_UNSET_BIT(3); m += prime * 6 + 2; FALLTHROUGH;
-      case 23: CHECK_FINISHED(23); COUNT_UNSET_BIT(5); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 24: CHECK_FINISHED(24); COUNT_UNSET_BIT(3); m += prime * 6 + 3; FALLTHROUGH;
-      case 25: CHECK_FINISHED(25); COUNT_UNSET_BIT(0); m += prime * 4 + 1; FALLTHROUGH;
-      case 26: CHECK_FINISHED(26); COUNT_UNSET_BIT(6); m += prime * 2 + 1; FALLTHROUGH;
-      case 27: CHECK_FINISHED(27); COUNT_UNSET_BIT(5); m += prime * 4 + 2; FALLTHROUGH;
-      case 28: CHECK_FINISHED(28); COUNT_UNSET_BIT(2); m += prime * 2 + 1; FALLTHROUGH;
-      case 29: CHECK_FINISHED(29); COUNT_UNSET_BIT(1); m += prime * 4 + 1; FALLTHROUGH;
-      case 30: CHECK_FINISHED(30); COUNT_UNSET_BIT(7); m += prime * 6 + 3; FALLTHROUGH;
-      case 31: CHECK_FINISHED(31); COUNT_UNSET_BIT(4); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 32: CHECK_FINISHED(32); COUNT_UNSET_BIT(4); m += prime * 6 + 3; FALLTHROUGH;
-      case 33: CHECK_FINISHED(33); COUNT_UNSET_BIT(7); m += prime * 4 + 3; FALLTHROUGH;
-      case 34: CHECK_FINISHED(34); COUNT_UNSET_BIT(1); m += prime * 2 + 1; FALLTHROUGH;
-      case 35: CHECK_FINISHED(35); COUNT_UNSET_BIT(2); m += prime * 4 + 2; FALLTHROUGH;
-      case 36: CHECK_FINISHED(36); COUNT_UNSET_BIT(5); m += prime * 2 + 1; FALLTHROUGH;
-      case 37: CHECK_FINISHED(37); COUNT_UNSET_BIT(6); m += prime * 4 + 3; FALLTHROUGH;
-      case 38: CHECK_FINISHED(38); COUNT_UNSET_BIT(0); m += prime * 6 + 3; FALLTHROUGH;
-      case 39: CHECK_FINISHED(39); COUNT_UNSET_BIT(3); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 40: CHECK_FINISHED(40); COUNT_UNSET_BIT(5); m += prime * 6 + 4; FALLTHROUGH;
-      case 41: CHECK_FINISHED(41); COUNT_UNSET_BIT(3); m += prime * 4 + 2; FALLTHROUGH;
-      case 42: CHECK_FINISHED(42); COUNT_UNSET_BIT(7); m += prime * 2 + 2; FALLTHROUGH;
-      case 43: CHECK_FINISHED(43); COUNT_UNSET_BIT(1); m += prime * 4 + 2; FALLTHROUGH;
-      case 44: CHECK_FINISHED(44); COUNT_UNSET_BIT(6); m += prime * 2 + 2; FALLTHROUGH;
-      case 45: CHECK_FINISHED(45); COUNT_UNSET_BIT(0); m += prime * 4 + 2; FALLTHROUGH;
-      case 46: CHECK_FINISHED(46); COUNT_UNSET_BIT(4); m += prime * 6 + 4; FALLTHROUGH;
-      case 47: CHECK_FINISHED(47); COUNT_UNSET_BIT(2); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 48: CHECK_FINISHED(48); COUNT_UNSET_BIT(6); m += prime * 6 + 5; FALLTHROUGH;
-      case 49: CHECK_FINISHED(49); COUNT_UNSET_BIT(2); m += prime * 4 + 3; FALLTHROUGH;
-      case 50: CHECK_FINISHED(50); COUNT_UNSET_BIT(3); m += prime * 2 + 1; FALLTHROUGH;
-      case 51: CHECK_FINISHED(51); COUNT_UNSET_BIT(7); m += prime * 4 + 4; FALLTHROUGH;
-      case 52: CHECK_FINISHED(52); COUNT_UNSET_BIT(0); m += prime * 2 + 1; FALLTHROUGH;
-      case 53: CHECK_FINISHED(53); COUNT_UNSET_BIT(4); m += prime * 4 + 3; FALLTHROUGH;
-      case 54: CHECK_FINISHED(54); COUNT_UNSET_BIT(5); m += prime * 6 + 5; FALLTHROUGH;
-      case 55: CHECK_FINISHED(55); COUNT_UNSET_BIT(1); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 56: CHECK_FINISHED(56); COUNT_UNSET_BIT(7); m += prime * 6 + 6; FALLTHROUGH;
-      case 57: CHECK_FINISHED(57); COUNT_UNSET_BIT(6); m += prime * 4 + 4; FALLTHROUGH;
-      case 58: CHECK_FINISHED(58); COUNT_UNSET_BIT(5); m += prime * 2 + 2; FALLTHROUGH;
-      case 59: CHECK_FINISHED(59); COUNT_UNSET_BIT(4); m += prime * 4 + 4; FALLTHROUGH;
-      case 60: CHECK_FINISHED(60); COUNT_UNSET_BIT(3); m += prime * 2 + 2; FALLTHROUGH;
-      case 61: CHECK_FINISHED(61); COUNT_UNSET_BIT(2); m += prime * 4 + 4; FALLTHROUGH;
-      case 62: CHECK_FINISHED(62); COUNT_UNSET_BIT(1); m += prime * 6 + 6; FALLTHROUGH;
-      case 63: CHECK_FINISHED(63); COUNT_UNSET_BIT(0); m += prime * 2 + 1;
-    }
-
-    default: UNREACHABLE;
+    std::size_t sieve_byte = sieve[m];
+    std::size_t is_bit = (sieve_byte & msk[s]) != 0;
+    sieve[m] = (uint8_t) (sieve_byte & ~msk[s]);
+    total_count -= (uint64_t) is_bit;
+    m += adv[s];
+    s = (s + 1) & 7;
   }
+
+  const uint64_t partial = adv[0] + adv[1] + adv[2] + adv[3] +
+                           adv[4] + adv[5] + adv[6];
+  if (sieve_size > partial)
+  {
+    const uint64_t limit = sieve_size - partial;
+    while (m < limit)
+    {
+      std::size_t b0 = sieve[m];
+      total_count -= (uint64_t) ((b0 & msk[0]) != 0);
+      sieve[m] = (uint8_t) (b0 & ~msk[0]);
+      m += adv[0];
+
+      std::size_t b1 = sieve[m];
+      total_count -= (uint64_t) ((b1 & msk[1]) != 0);
+      sieve[m] = (uint8_t) (b1 & ~msk[1]);
+      m += adv[1];
+
+      std::size_t b2 = sieve[m];
+      total_count -= (uint64_t) ((b2 & msk[2]) != 0);
+      sieve[m] = (uint8_t) (b2 & ~msk[2]);
+      m += adv[2];
+
+      std::size_t b3 = sieve[m];
+      total_count -= (uint64_t) ((b3 & msk[3]) != 0);
+      sieve[m] = (uint8_t) (b3 & ~msk[3]);
+      m += adv[3];
+
+      std::size_t b4 = sieve[m];
+      total_count -= (uint64_t) ((b4 & msk[4]) != 0);
+      sieve[m] = (uint8_t) (b4 & ~msk[4]);
+      m += adv[4];
+
+      std::size_t b5 = sieve[m];
+      total_count -= (uint64_t) ((b5 & msk[5]) != 0);
+      sieve[m] = (uint8_t) (b5 & ~msk[5]);
+      m += adv[5];
+
+      std::size_t b6 = sieve[m];
+      total_count -= (uint64_t) ((b6 & msk[6]) != 0);
+      sieve[m] = (uint8_t) (b6 & ~msk[6]);
+      m += adv[6];
+
+      std::size_t b7 = sieve[m];
+      total_count -= (uint64_t) ((b7 & msk[7]) != 0);
+      sieve[m] = (uint8_t) (b7 & ~msk[7]);
+      m += adv[7];
+    }
+  }
+
+  s = 0;
+  while (m < sieve_size)
+  {
+    std::size_t sieve_byte = sieve[m];
+    std::size_t is_bit = (sieve_byte & msk[s]) != 0;
+    sieve[m] = (uint8_t) (sieve_byte & ~msk[s]);
+    total_count -= (uint64_t) is_bit;
+    m += adv[s];
+    s = (s + 1) & 7;
+  }
+
+  wheel.index = (r << 3) + s;
+  wheel.multiple = (uint32_t) (m - sieve_size);
+  total_count_ = total_count;
 }
 
 } // namespace
