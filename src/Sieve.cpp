@@ -64,6 +64,55 @@ Sieve::Sieve(uint64_t low,
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
   sieve_.resize(segment_size / 30);
   primeState_.reserve(primes_size);
+  allocate_counter(low);
+}
+
+/// Each element of the counter array contains the current
+/// number of unsieved elements in the interval:
+/// [i * counter_.dist, (i + 1) * counter_.dist[.
+/// Ideally each element of the counter array should
+/// represent an interval of size O(sqrt(average_leaf_dist)).
+/// Also the counter distance should be adjusted regularly
+/// whilst sieving as the distance between consecutive
+/// leaves is very small ~ log(x) at the beginning of the
+/// sieving algorithm but grows up to segment_size towards
+/// the end of the algorithm.
+///
+void Sieve::allocate_counter(uint64_t low)
+{
+  double average_leaf_dist = std::sqrt(low);
+  double counter_dist = std::sqrt(average_leaf_dist);
+
+  // Here we balance counting with the counter array and
+  // counting from the sieve array using the 64-bit POPCNT
+  // instruction. Since the 64-bit POPCNT instructions
+  // allows to count a distance of 240 using a single
+  // instruction we slightly increase the counter distance
+  // and slightly decrease the size of the counter array.
+  uint64_t bytes_count_instruction = bytes_per_count_instruction();
+  ASSERT(bytes_count_instruction >= sizeof(uint64_t));
+  uint64_t dist_per_instruction = bytes_count_instruction * 30;
+  counter_.dist = uint64_t(counter_dist * std::sqrt(dist_per_instruction));
+
+  // Increasing the minimum counter distance decreases the
+  // branch mispredictions (good) but on the other hand
+  // increases the number of executed instructions (bad).
+  // In my benchmarks setting the minimum amount of bytes to
+  // bytes_count_instruction * 8 (or 16) performed best.
+  uint64_t bytes = counter_.dist / 30;
+  bytes = max(bytes, bytes_count_instruction * 8);
+  bytes = next_power_of_2(bytes);
+
+  // Make sure the counter (32-bit) doesn't overflow.
+  // This can never happen since each counter array element
+  // only counts the number of unsieved elements (1 bits) in
+  // an interval of size: sieve_limit^(1/4) * sqrt(240).
+  // Hence the max(counter value) = 2^18.
+  ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
+  uint64_t counter_size = ceil_div(sieve_.size(), bytes);
+  counter_.counter.resize(counter_size);
+  counter_.dist = bytes * 30;
+  counter_.log2_dist = ilog2(bytes);
 }
 
 /// The segment size is sieve.size() * 30 as each
@@ -107,15 +156,31 @@ void Sieve::reset_counter()
 {
   prev_stop_ = 0;
   count_ = 0;
+  counter_.i = 0;
+  counter_.sum = 0;
+  counter_.stop = counter_.dist;
 }
 
 void Sieve::init_counter(uint64_t low, uint64_t high)
 {
-  count_ = 0;
+  reset_counter();
   total_count_ = 0;
 
-  if (high > low)
-    total_count_ = count(0, (high - 1) - low);
+  uint64_t start = 0;
+  uint64_t max_stop = (high - 1) - low;
+
+  while (start <= max_stop)
+  {
+    uint64_t stop = start + counter_.dist - 1;
+    stop = min(stop, max_stop);
+    uint64_t cnt = count(start, stop);
+    uint64_t byte_index = start / 30;
+    uint64_t i = byte_index >> counter_.log2_dist;
+
+    counter_[i] = (uint32_t) cnt;
+    total_count_ += cnt;
+    start += counter_.dist;
+  }
 }
 
 /// Add a sieving prime to the sieve.
@@ -437,8 +502,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t m = primeState.multiple;
   uint32_t w = primeState.wheel_index & 7;
   uint64_t sieve_size = sieve_.size();
-  uint8_t* sieve = &sieve_[0];
   uint64_t total_count = total_count_;
+  uint64_t counter_log2_dist = counter_.log2_dist;
+  uint8_t* sieve = &sieve_[0];
+  uint32_t* counter = &counter_[0];
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
@@ -454,6 +521,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       std::size_t b = sieve[m]; \
       std::size_t is_bit = (b & bits[i]) != 0; \
       sieve[m] = uint8_t(b & ~bits[i]); \
+      counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
       total_count -= (uint64_t) is_bit; \
       m += adv[i]; \
     }

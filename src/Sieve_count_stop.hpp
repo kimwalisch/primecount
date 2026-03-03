@@ -63,8 +63,28 @@ ALWAYS_INLINE uint64_t Sieve::count_popcnt64(uint64_t stop)
   if (start > stop)
     return count_;
 
+  // Quickly count the number of unsieved elements (in
+  // the sieve array) up to a value that is close to
+  // the stop number i.e. (stop - start) < counter_.dist.
+  // We do this using the counter array, each element
+  // of the counter array contains the number of
+  // unsieved elements in the interval:
+  // [i * counter_.dist, (i + 1) * counter_.dist[.
+  while (counter_.stop <= stop)
+  {
+    start = counter_.stop;
+    counter_.stop += counter_.dist;
+    counter_.sum += counter_[counter_.i++];
+    count_ = counter_.sum;
+  }
+
+  // Here the remaining distance is relatively small i.e.
+  // (stop - start) < counter_.dist, hence we simply
+  // count the remaining number of unsieved elements by
+  // linearly iterating over the sieve array.
   SIEVE_COUNT_POPCNT64(start, stop);
   count_ += cnt;
+
   return count_;
 }
 
@@ -86,8 +106,28 @@ ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
   if (start > stop)
     return count_;
 
+  // Quickly count the number of unsieved elements (in
+  // the sieve array) up to a value that is close to
+  // the stop number i.e. (stop - start) < counter_.dist.
+  // We do this using the counter array, each element
+  // of the counter array contains the number of
+  // unsieved elements in the interval:
+  // [i * counter_.dist, (i + 1) * counter_.dist[.
+  while (counter_.stop <= stop)
+  {
+    start = counter_.stop;
+    counter_.stop += counter_.dist;
+    counter_.sum += counter_[counter_.i++];
+    count_ = counter_.sum;
+  }
+
+  // Here the remaining distance is relatively small i.e.
+  // (stop - start) < counter_.dist, hence we simply
+  // count the remaining number of unsieved elements by
+  // linearly iterating over the sieve array.
   SIEVE_COUNT_AVX512(start, stop);
   count_ += cnt;
+
   return count_;
 }
 
@@ -107,8 +147,28 @@ ALWAYS_INLINE uint64_t Sieve::count_arm_sve(uint64_t stop)
   if (start > stop)
     return count_;
 
+  // Quickly count the number of unsieved elements (in
+  // the sieve array) up to a value that is close to
+  // the stop number i.e. (stop - start) < counter_.dist.
+  // We do this using the counter array, each element
+  // of the counter array contains the number of
+  // unsieved elements in the interval:
+  // [i * counter_.dist, (i + 1) * counter_.dist[.
+  while (counter_.stop <= stop)
+  {
+    start = counter_.stop;
+    counter_.stop += counter_.dist;
+    counter_.sum += counter_[counter_.i++];
+    count_ = counter_.sum;
+  }
+
+  // Here the remaining distance is relatively small i.e.
+  // (stop - start) < counter_.dist, hence we simply
+  // count the remaining number of unsieved elements by
+  // linearly iterating over the sieve array.
   SIEVE_COUNT_ARM_SVE(start, stop);
   count_ += cnt;
+
   return count_;
 }
 
