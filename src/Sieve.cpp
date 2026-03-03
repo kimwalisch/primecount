@@ -453,25 +453,27 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   ASSERT(wheel.index <= 63);
   ASSERT(r < 8);
 
-  uint64_t adv[8];
-  uint8_t msk[8];
-  adv[0] = prime * wheel_factor[0] + wheel_corr[r][0];
-  adv[1] = prime * wheel_factor[1] + wheel_corr[r][1];
-  adv[2] = prime * wheel_factor[2] + wheel_corr[r][2];
-  adv[3] = prime * wheel_factor[3] + wheel_corr[r][3];
-  adv[4] = prime * wheel_factor[4] + wheel_corr[r][4];
-  adv[5] = prime * wheel_factor[5] + wheel_corr[r][5];
-  adv[6] = prime * wheel_factor[6] + wheel_corr[r][6];
-  adv[7] = prime * wheel_factor[7] + wheel_corr[r][7];
+  Array<uint64_t, 8> adv = {
+    prime * wheel_factor[0] + wheel_corr[r][0],
+    prime * wheel_factor[1] + wheel_corr[r][1],
+    prime * wheel_factor[2] + wheel_corr[r][2],
+    prime * wheel_factor[3] + wheel_corr[r][3],
+    prime * wheel_factor[4] + wheel_corr[r][4],
+    prime * wheel_factor[5] + wheel_corr[r][5],
+    prime * wheel_factor[6] + wheel_corr[r][6],
+    prime * wheel_factor[7] + wheel_corr[r][7],
+  };
 
-  msk[0] = (uint8_t) (1u << wheel_bits[r][0]);
-  msk[1] = (uint8_t) (1u << wheel_bits[r][1]);
-  msk[2] = (uint8_t) (1u << wheel_bits[r][2]);
-  msk[3] = (uint8_t) (1u << wheel_bits[r][3]);
-  msk[4] = (uint8_t) (1u << wheel_bits[r][4]);
-  msk[5] = (uint8_t) (1u << wheel_bits[r][5]);
-  msk[6] = (uint8_t) (1u << wheel_bits[r][6]);
-  msk[7] = (uint8_t) (1u << wheel_bits[r][7]);
+  Array<uint8_t, 8> msk = {
+    uint8_t(1u << wheel_bits[r][0]),
+    uint8_t(1u << wheel_bits[r][1]),
+    uint8_t(1u << wheel_bits[r][2]),
+    uint8_t(1u << wheel_bits[r][3]),
+    uint8_t(1u << wheel_bits[r][4]),
+    uint8_t(1u << wheel_bits[r][5]),
+    uint8_t(1u << wheel_bits[r][6]),
+    uint8_t(1u << wheel_bits[r][7]),
+  };
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
