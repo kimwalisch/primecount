@@ -2,7 +2,7 @@
 /// @file  Sieve_arrays.hpp
 /// @brief Static lookup tables needed by Sieve.cpp.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -55,19 +55,6 @@ const primecount::Array<uint8_t, 8> wheel_mul = {
   6, 4, 2, 4, 2, 4, 6, 2
 };
 
-/// Modulo 30 wheel bit indexes
-const uint8_t wheel_bits[8][8] =
-{
-  { 0, 1, 2, 3, 4, 5, 6, 7 }, // p % 30 == 1
-  { 1, 5, 4, 0, 7, 3, 2, 6 }, // p % 30 == 7
-  { 2, 4, 0, 6, 1, 7, 3, 5 }, // p % 30 == 11
-  { 3, 0, 6, 5, 2, 1, 7, 4 }, // p % 30 == 13
-  { 4, 7, 1, 2, 5, 6, 0, 3 }, // p % 30 == 17
-  { 5, 3, 7, 1, 6, 0, 4, 2 }, // p % 30 == 19
-  { 6, 2, 3, 7, 0, 4, 5, 1 }, // p % 30 == 23
-  { 7, 6, 5, 4, 3, 2, 1, 0 }  // p % 30 == 29
-};
-
 /// Modulo 30 wheel correction values
 const uint8_t wheel_corr[8][8] =
 {
@@ -79,6 +66,19 @@ const uint8_t wheel_corr[8][8] =
   { 4, 2, 2, 2, 2, 2, 4, 1 }, // p % 30 == 19
   { 5, 3, 1, 4, 1, 3, 5, 1 }, // p % 30 == 23
   { 6, 4, 2, 4, 2, 4, 6, 1 }  // p % 30 == 29
+};
+
+/// Modulo 30 wheel bits
+const uint8_t wheel_bits[8][8] =
+{
+  { 1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7 }, // p % 30 == 1
+  { 1 << 1, 1 << 5, 1 << 4, 1 << 0, 1 << 7, 1 << 3, 1 << 2, 1 << 6 }, // p % 30 == 7
+  { 1 << 2, 1 << 4, 1 << 0, 1 << 6, 1 << 1, 1 << 7, 1 << 3, 1 << 5 }, // p % 30 == 11
+  { 1 << 3, 1 << 0, 1 << 6, 1 << 5, 1 << 2, 1 << 1, 1 << 7, 1 << 4 }, // p % 30 == 13
+  { 1 << 4, 1 << 7, 1 << 1, 1 << 2, 1 << 5, 1 << 6, 1 << 0, 1 << 3 }, // p % 30 == 17
+  { 1 << 5, 1 << 3, 1 << 7, 1 << 1, 1 << 6, 1 << 0, 1 << 4, 1 << 2 }, // p % 30 == 19
+  { 1 << 6, 1 << 2, 1 << 3, 1 << 7, 1 << 0, 1 << 4, 1 << 5, 1 << 1 }, // p % 30 == 23
+  { 1 << 7, 1 << 6, 1 << 5, 1 << 4, 1 << 3, 1 << 2, 1 << 1, 1 << 0 }  // p % 30 == 29
 };
 
 /// The 8 bits in each byte of the sieve array correspond

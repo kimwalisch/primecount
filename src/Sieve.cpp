@@ -417,11 +417,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   reset_counter();
   PrimeState& primeState = primeState_[i];
-  ASSERT(primeState.wheel_index <= 63);
   uint32_t r = primeState.wheel_index >> 3;
+  ASSERT(primeState.wheel_index <= 63);
   prime /= 30;
 
-  const Array<uint64_t, 8> adv = {
+  const Array<uint64_t, 8> adv =
+  {
     prime * wheel_mul[0] + wheel_corr[r][0],
     prime * wheel_mul[1] + wheel_corr[r][1],
     prime * wheel_mul[2] + wheel_corr[r][2],
@@ -432,16 +433,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_mul[7] + wheel_corr[r][7]
   };
 
-  const Array<uint8_t, 8> bitmask = {
-    uint8_t(1u << wheel_bits[r][0]),
-    uint8_t(1u << wheel_bits[r][1]),
-    uint8_t(1u << wheel_bits[r][2]),
-    uint8_t(1u << wheel_bits[r][3]),
-    uint8_t(1u << wheel_bits[r][4]),
-    uint8_t(1u << wheel_bits[r][5]),
-    uint8_t(1u << wheel_bits[r][6]),
-    uint8_t(1u << wheel_bits[r][7])
-  };
+  const uint8_t* bits = wheel_bits[r];
+  uint64_t m = primeState.multiple;
+  uint32_t s = primeState.wheel_index & 7;
+  uint64_t sieve_size = sieve_.size();
+  uint8_t* sieve = &sieve_[0];
+  uint64_t total_count = total_count_;
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
@@ -455,17 +452,11 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define COUNT_UNSET_BIT(i) \
     { \
       std::size_t b = sieve[m]; \
-      std::size_t is_bit = (b & bitmask[i]) != 0; \
-      sieve[m] = uint8_t(b & ~bitmask[i]); \
+      std::size_t is_bit = (b & bits[i]) != 0; \
+      sieve[m] = uint8_t(b & ~bits[i]); \
       total_count -= (uint64_t) is_bit; \
       m += adv[i]; \
     }
-
-  uint64_t m = primeState.multiple;
-  uint32_t s = primeState.wheel_index & 7;
-  uint64_t sieve_size = sieve_.size();
-  uint8_t* sieve = &sieve_[0];
-  uint64_t total_count = total_count_;
 
   // Get ready for loop unrolling
   for (; s; s = (s + 1) & 7)
