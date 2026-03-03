@@ -249,8 +249,8 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      primeState.wheel_index = i; \
-      primeState.multiple = (uint32_t) (m - sieve_size); \
+      primeState.wheel_index = uint8_t(i); \
+      primeState.multiple = uint32_t(m - sieve_size); \
       return; \
     }
 
@@ -318,7 +318,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      primeState.wheel_index = i; \
+      primeState.wheel_index = uint8_t(i); \
       primeState.multiple = uint32_t(m - sieve_size); \
       total_count_ = total_count; \
       return; \
