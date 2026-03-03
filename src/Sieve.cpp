@@ -435,7 +435,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   const uint8_t* bits = wheel_bits[r];
   uint64_t m = primeState.multiple;
-  uint32_t s = primeState.wheel_index & 7;
+  uint32_t w = primeState.wheel_index & 7;
   uint64_t sieve_size = sieve_.size();
   uint8_t* sieve = &sieve_[0];
   uint64_t total_count = total_count_;
@@ -459,10 +459,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     }
 
   // Get ready for loop unrolling
-  for (; s; s = (s + 1) & 7)
+  for (; w; w = (w + 1) & 7)
   {
-    CHECK_FINISHED(s);
-    COUNT_UNSET_BIT(s);
+    CHECK_FINISHED(w);
+    COUNT_UNSET_BIT(w);
   }
 
   while (true)
