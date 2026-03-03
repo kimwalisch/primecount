@@ -49,34 +49,6 @@
 
 namespace primecount {
 
-namespace {
-
-constexpr uint8_t wheel_factor[8] = { 6, 4, 2, 4, 2, 4, 6, 2 };
-
-constexpr uint8_t wheel_bits[8][8] = {
-  { 0, 1, 2, 3, 4, 5, 6, 7 }, // p % 30 == 1
-  { 1, 5, 4, 0, 7, 3, 2, 6 }, // p % 30 == 7
-  { 2, 4, 0, 6, 1, 7, 3, 5 }, // p % 30 == 11
-  { 3, 0, 6, 5, 2, 1, 7, 4 }, // p % 30 == 13
-  { 4, 7, 1, 2, 5, 6, 0, 3 }, // p % 30 == 17
-  { 5, 3, 7, 1, 6, 0, 4, 2 }, // p % 30 == 19
-  { 6, 2, 3, 7, 0, 4, 5, 1 }, // p % 30 == 23
-  { 7, 6, 5, 4, 3, 2, 1, 0 }  // p % 30 == 29
-};
-
-constexpr uint8_t wheel_corr[8][8] = {
-  { 0, 0, 0, 0, 0, 0, 0, 1 }, // p % 30 == 1
-  { 1, 1, 1, 0, 1, 1, 1, 1 }, // p % 30 == 7
-  { 2, 2, 0, 2, 0, 2, 2, 1 }, // p % 30 == 11
-  { 3, 1, 1, 2, 1, 1, 3, 1 }, // p % 30 == 13
-  { 3, 3, 1, 2, 1, 3, 3, 1 }, // p % 30 == 17
-  { 4, 2, 2, 2, 2, 2, 4, 1 }, // p % 30 == 19
-  { 5, 3, 1, 4, 1, 3, 5, 1 }, // p % 30 == 23
-  { 6, 4, 2, 4, 2, 4, 6, 1 }  // p % 30 == 29
-};
-
-} // namespace
-
 Sieve::Sieve(uint64_t low,
              uint64_t segment_size,
              uint64_t primes_size)
@@ -450,14 +422,14 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   prime /= 30;
 
   const Array<uint64_t, 8> adv = {
-    prime * wheel_factor[0] + wheel_corr[r][0],
-    prime * wheel_factor[1] + wheel_corr[r][1],
-    prime * wheel_factor[2] + wheel_corr[r][2],
-    prime * wheel_factor[3] + wheel_corr[r][3],
-    prime * wheel_factor[4] + wheel_corr[r][4],
-    prime * wheel_factor[5] + wheel_corr[r][5],
-    prime * wheel_factor[6] + wheel_corr[r][6],
-    prime * wheel_factor[7] + wheel_corr[r][7]
+    prime * wheel_mul[0] + wheel_corr[r][0],
+    prime * wheel_mul[1] + wheel_corr[r][1],
+    prime * wheel_mul[2] + wheel_corr[r][2],
+    prime * wheel_mul[3] + wheel_corr[r][3],
+    prime * wheel_mul[4] + wheel_corr[r][4],
+    prime * wheel_mul[5] + wheel_corr[r][5],
+    prime * wheel_mul[6] + wheel_corr[r][6],
+    prime * wheel_mul[7] + wheel_corr[r][7]
   };
 
   const Array<uint8_t, 8> bitmask = {
