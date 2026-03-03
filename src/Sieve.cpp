@@ -444,7 +444,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   prime /= 30;
 
   uint64_t m = wheel.multiple;
-  uint32_t s = wheel.index & 7u;
+  uint32_t s = wheel.index & 7;
   uint32_t r = wheel.index >> 3;
   uint64_t total_count = total_count_;
   uint64_t sieve_size = sieve_.size();
@@ -461,7 +461,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_factor[4] + wheel_corr[r][4],
     prime * wheel_factor[5] + wheel_corr[r][5],
     prime * wheel_factor[6] + wheel_corr[r][6],
-    prime * wheel_factor[7] + wheel_corr[r][7],
+    prime * wheel_factor[7] + wheel_corr[r][7]
   };
 
   Array<uint8_t, 8> msk = {
@@ -472,7 +472,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     uint8_t(1u << wheel_bits[r][4]),
     uint8_t(1u << wheel_bits[r][5]),
     uint8_t(1u << wheel_bits[r][6]),
-    uint8_t(1u << wheel_bits[r][7]),
+    uint8_t(1u << wheel_bits[r][7])
   };
 
   #define CHECK_FINISHED(i) \
