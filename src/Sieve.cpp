@@ -445,17 +445,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t r = wheel.index >> 3;
   prime /= 30;
 
-  const Array<uint8_t, 8> bitmask = {
-    uint8_t(1u << wheel_bits[r][0]),
-    uint8_t(1u << wheel_bits[r][1]),
-    uint8_t(1u << wheel_bits[r][2]),
-    uint8_t(1u << wheel_bits[r][3]),
-    uint8_t(1u << wheel_bits[r][4]),
-    uint8_t(1u << wheel_bits[r][5]),
-    uint8_t(1u << wheel_bits[r][6]),
-    uint8_t(1u << wheel_bits[r][7])
-  };
-
   const Array<uint64_t, 8> adv = {
     prime * wheel_factor[0] + wheel_corr[r][0],
     prime * wheel_factor[1] + wheel_corr[r][1],
@@ -465,6 +454,17 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_factor[5] + wheel_corr[r][5],
     prime * wheel_factor[6] + wheel_corr[r][6],
     prime * wheel_factor[7] + wheel_corr[r][7]
+  };
+
+  const Array<uint8_t, 8> bitmask = {
+    uint8_t(1u << wheel_bits[r][0]),
+    uint8_t(1u << wheel_bits[r][1]),
+    uint8_t(1u << wheel_bits[r][2]),
+    uint8_t(1u << wheel_bits[r][3]),
+    uint8_t(1u << wheel_bits[r][4]),
+    uint8_t(1u << wheel_bits[r][5]),
+    uint8_t(1u << wheel_bits[r][6]),
+    uint8_t(1u << wheel_bits[r][7])
   };
 
   #define CHECK_FINISHED(i) \
