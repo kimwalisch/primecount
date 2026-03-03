@@ -499,7 +499,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_mul[7] + wheel_corr[r][7]
   };
 
-  const uint8_t* bits = wheel_bits[r];
+  const uint8_t* bitmasks = wheel_bitmasks[r];
   uint64_t m = primeState.multiple;
   uint32_t w = primeState.wheel_index & 7;
   uint64_t sieve_size = sieve_.size();
@@ -520,8 +520,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define COUNT_UNSET_BIT(i) \
     { \
       std::size_t b = sieve[m]; \
-      std::size_t is_bit = (b & bits[i]) != 0; \
-      sieve[m] = uint8_t(b & ~bits[i]); \
+      std::size_t is_bit = (b & bitmasks[i]) != b; \
+      sieve[m] = uint8_t(b & bitmasks[i]); \
       counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
       total_count -= (uint64_t) is_bit; \
       m += adv[i]; \
