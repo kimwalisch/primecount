@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -52,7 +52,7 @@ namespace primecount {
 
 Sieve::Sieve(uint64_t low,
              uint64_t segment_size,
-             uint64_t wheel_size)
+             uint64_t primes_size)
 {
   ASSERT(low % 30 == 0);
   ASSERT(segment_size % 240 == 0);
@@ -64,7 +64,7 @@ Sieve::Sieve(uint64_t low,
   // to 30 numbers i.e. the 8 bits correspond to the
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
   sieve_.resize(segment_size / 30);
-  wheel_.reserve(wheel_size);
+  primeState_.reserve(primes_size);
   allocate_counter(low);
 }
 
@@ -190,8 +190,8 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 ///
 void Sieve::add(uint64_t prime, uint64_t i)
 {
-  if_unlikely(i > wheel_.size())
-    wheel_.resize(i);
+  if_unlikely(i > primeState_.size())
+    primeState_.resize(i);
 
   // Find first multiple > start_
   ASSERT(start_ % 30 == 0);
@@ -200,8 +200,8 @@ void Sieve::add(uint64_t prime, uint64_t i)
 
   // Find next multiple of prime that
   // is not divisible by 2, 3, 5
-  uint64_t factor = wheel_init[quotient % 30].factor;
-  multiple += prime * factor;
+  uint64_t init_mul = wheel_init_mul[quotient % 30];
+  multiple += prime * init_mul;
 
   ASSERT(multiple % 2 != 0);
   ASSERT(multiple % 3 != 0);
@@ -209,11 +209,9 @@ void Sieve::add(uint64_t prime, uint64_t i)
 
   multiple = (multiple - start_) / 30;
   uint32_t multiple32 = (uint32_t) multiple;
-
-  // Calculate wheel index of multiple
-  uint32_t index = wheel_init[quotient % 30].index;
-  index += wheel_offsets[prime % 30];
-  wheel_.push_back({multiple32, index});
+  uint8_t wheel_index = wheel_indexes[quotient % 30];
+  uint8_t wheel_group = wheel_groups[prime % 30];
+  primeState_.push_back({multiple32, wheel_group, wheel_index});
 }
 
 /// Remove the i-th prime and the multiples of the i-th prime
@@ -221,252 +219,59 @@ void Sieve::add(uint64_t prime, uint64_t i)
 ///
 void Sieve::cross_off(uint64_t prime, uint64_t i)
 {
-  if (i >= wheel_.size())
+  if (i >= primeState_.size())
     add(prime, i);
 
+  PrimeState& primeState = primeState_[i];
+  uint64_t g = primeState.wheel_group;
+  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
-  Wheel& wheel = wheel_[i];
-  uint64_t m = wheel.multiple;
-  uint8_t* sieve = sieve_.data();
-  uint64_t sieve_size = sieve_.size();
 
-  #define CHECK_FINISHED(wheel_index) \
+  const Array<uint64_t, 8> adv =
+  {
+    prime * wheel_mul[0] + wheel_corr[g][0],
+    prime * wheel_mul[1] + wheel_corr[g][1],
+    prime * wheel_mul[2] + wheel_corr[g][2],
+    prime * wheel_mul[3] + wheel_corr[g][3],
+    prime * wheel_mul[4] + wheel_corr[g][4],
+    prime * wheel_mul[5] + wheel_corr[g][5],
+    prime * wheel_mul[6] + wheel_corr[g][6],
+    prime * wheel_mul[7] + wheel_corr[g][7]
+  };
+
+  const uint8_t* bitmasks = wheel_bitmasks[g];
+  uint64_t m = primeState.multiple;
+  uint64_t w = primeState.wheel_index;
+  ASSERT(primeState.wheel_index <= 7);
+  uint64_t sieve_size = sieve_.size();
+  uint8_t* sieve = &sieve_[0];
+
+  #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      wheel.index = wheel_index; \
-      wheel.multiple = (uint32_t) (m - sieve_size); \
+      primeState.wheel_index = uint8_t(i); \
+      primeState.multiple = uint32_t(m - sieve_size); \
       return; \
     }
 
-  ASSERT(wheel.index <= 63);
-
-  switch (wheel.index)
+  // Get ready for loop unrolling
+  for (; w; w = (w + 1) & 7)
   {
-    for (;;)
-    {
-      case 0: {
-                uint64_t max_offset = m + prime * 28;
-                uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
+    CHECK_FINISHED(w);
+    sieve[m] &= bitmasks[w];
+    m += adv[w];
+  }
 
-                for (; m < limit; m += prime * 30 + 1)
-                {
-                  sieve[m + prime *  0] &= ~(1 << 0);
-                  sieve[m + prime *  6] &= ~(1 << 1);
-                  sieve[m + prime * 10] &= ~(1 << 2);
-                  sieve[m + prime * 12] &= ~(1 << 3);
-                  sieve[m + prime * 16] &= ~(1 << 4);
-                  sieve[m + prime * 18] &= ~(1 << 5);
-                  sieve[m + prime * 22] &= ~(1 << 6);
-                  sieve[m + prime * 28] &= ~(1 << 7);
-                }
-              }
-              CHECK_FINISHED(0); sieve[m] &= ~(1 << 0); m += prime * 6 + 0; FALLTHROUGH;
-      case 1: CHECK_FINISHED(1); sieve[m] &= ~(1 << 1); m += prime * 4 + 0; FALLTHROUGH;
-      case 2: CHECK_FINISHED(2); sieve[m] &= ~(1 << 2); m += prime * 2 + 0; FALLTHROUGH;
-      case 3: CHECK_FINISHED(3); sieve[m] &= ~(1 << 3); m += prime * 4 + 0; FALLTHROUGH;
-      case 4: CHECK_FINISHED(4); sieve[m] &= ~(1 << 4); m += prime * 2 + 0; FALLTHROUGH;
-      case 5: CHECK_FINISHED(5); sieve[m] &= ~(1 << 5); m += prime * 4 + 0; FALLTHROUGH;
-      case 6: CHECK_FINISHED(6); sieve[m] &= ~(1 << 6); m += prime * 6 + 0; FALLTHROUGH;
-      case 7: CHECK_FINISHED(7); sieve[m] &= ~(1 << 7); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case  8: {
-                 uint64_t max_offset = m + prime * 28 + 6;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 7)
-                 {
-                   sieve[m + prime *  0 + 0] &= ~(1 << 1);
-                   sieve[m + prime *  6 + 1] &= ~(1 << 5);
-                   sieve[m + prime * 10 + 2] &= ~(1 << 4);
-                   sieve[m + prime * 12 + 3] &= ~(1 << 0);
-                   sieve[m + prime * 16 + 3] &= ~(1 << 7);
-                   sieve[m + prime * 18 + 4] &= ~(1 << 3);
-                   sieve[m + prime * 22 + 5] &= ~(1 << 2);
-                   sieve[m + prime * 28 + 6] &= ~(1 << 6);
-                 }
-               }
-               CHECK_FINISHED( 8); sieve[m] &= ~(1 << 1); m += prime * 6 + 1; FALLTHROUGH;
-      case  9: CHECK_FINISHED( 9); sieve[m] &= ~(1 << 5); m += prime * 4 + 1; FALLTHROUGH;
-      case 10: CHECK_FINISHED(10); sieve[m] &= ~(1 << 4); m += prime * 2 + 1; FALLTHROUGH;
-      case 11: CHECK_FINISHED(11); sieve[m] &= ~(1 << 0); m += prime * 4 + 0; FALLTHROUGH;
-      case 12: CHECK_FINISHED(12); sieve[m] &= ~(1 << 7); m += prime * 2 + 1; FALLTHROUGH;
-      case 13: CHECK_FINISHED(13); sieve[m] &= ~(1 << 3); m += prime * 4 + 1; FALLTHROUGH;
-      case 14: CHECK_FINISHED(14); sieve[m] &= ~(1 << 2); m += prime * 6 + 1; FALLTHROUGH;
-      case 15: CHECK_FINISHED(15); sieve[m] &= ~(1 << 6); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 16: {
-                 uint64_t max_offset = m + prime * 28 + 10;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 11)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 2);
-                   sieve[m + prime *  6 +  2] &= ~(1 << 4);
-                   sieve[m + prime * 10 +  4] &= ~(1 << 0);
-                   sieve[m + prime * 12 +  4] &= ~(1 << 6);
-                   sieve[m + prime * 16 +  6] &= ~(1 << 1);
-                   sieve[m + prime * 18 +  6] &= ~(1 << 7);
-                   sieve[m + prime * 22 +  8] &= ~(1 << 3);
-                   sieve[m + prime * 28 + 10] &= ~(1 << 5);
-                 }
-               }
-               CHECK_FINISHED(16); sieve[m] &= ~(1 << 2); m += prime * 6 + 2; FALLTHROUGH;
-      case 17: CHECK_FINISHED(17); sieve[m] &= ~(1 << 4); m += prime * 4 + 2; FALLTHROUGH;
-      case 18: CHECK_FINISHED(18); sieve[m] &= ~(1 << 0); m += prime * 2 + 0; FALLTHROUGH;
-      case 19: CHECK_FINISHED(19); sieve[m] &= ~(1 << 6); m += prime * 4 + 2; FALLTHROUGH;
-      case 20: CHECK_FINISHED(20); sieve[m] &= ~(1 << 1); m += prime * 2 + 0; FALLTHROUGH;
-      case 21: CHECK_FINISHED(21); sieve[m] &= ~(1 << 7); m += prime * 4 + 2; FALLTHROUGH;
-      case 22: CHECK_FINISHED(22); sieve[m] &= ~(1 << 3); m += prime * 6 + 2; FALLTHROUGH;
-      case 23: CHECK_FINISHED(23); sieve[m] &= ~(1 << 5); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 24: {
-                 uint64_t max_offset = m + prime * 28 + 12;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 13)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 3);
-                   sieve[m + prime *  6 +  3] &= ~(1 << 0);
-                   sieve[m + prime * 10 +  4] &= ~(1 << 6);
-                   sieve[m + prime * 12 +  5] &= ~(1 << 5);
-                   sieve[m + prime * 16 +  7] &= ~(1 << 2);
-                   sieve[m + prime * 18 +  8] &= ~(1 << 1);
-                   sieve[m + prime * 22 +  9] &= ~(1 << 7);
-                   sieve[m + prime * 28 + 12] &= ~(1 << 4);
-                 }
-               }
-               CHECK_FINISHED(24); sieve[m] &= ~(1 << 3); m += prime * 6 + 3; FALLTHROUGH;
-      case 25: CHECK_FINISHED(25); sieve[m] &= ~(1 << 0); m += prime * 4 + 1; FALLTHROUGH;
-      case 26: CHECK_FINISHED(26); sieve[m] &= ~(1 << 6); m += prime * 2 + 1; FALLTHROUGH;
-      case 27: CHECK_FINISHED(27); sieve[m] &= ~(1 << 5); m += prime * 4 + 2; FALLTHROUGH;
-      case 28: CHECK_FINISHED(28); sieve[m] &= ~(1 << 2); m += prime * 2 + 1; FALLTHROUGH;
-      case 29: CHECK_FINISHED(29); sieve[m] &= ~(1 << 1); m += prime * 4 + 1; FALLTHROUGH;
-      case 30: CHECK_FINISHED(30); sieve[m] &= ~(1 << 7); m += prime * 6 + 3; FALLTHROUGH;
-      case 31: CHECK_FINISHED(31); sieve[m] &= ~(1 << 4); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 32: {
-                 uint64_t max_offset = m + prime * 28 + 16;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 17)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 4);
-                   sieve[m + prime *  6 +  3] &= ~(1 << 7);
-                   sieve[m + prime * 10 +  6] &= ~(1 << 1);
-                   sieve[m + prime * 12 +  7] &= ~(1 << 2);
-                   sieve[m + prime * 16 +  9] &= ~(1 << 5);
-                   sieve[m + prime * 18 + 10] &= ~(1 << 6);
-                   sieve[m + prime * 22 + 13] &= ~(1 << 0);
-                   sieve[m + prime * 28 + 16] &= ~(1 << 3);
-                 }
-               }
-               CHECK_FINISHED(32); sieve[m] &= ~(1 << 4); m += prime * 6 + 3; FALLTHROUGH;
-      case 33: CHECK_FINISHED(33); sieve[m] &= ~(1 << 7); m += prime * 4 + 3; FALLTHROUGH;
-      case 34: CHECK_FINISHED(34); sieve[m] &= ~(1 << 1); m += prime * 2 + 1; FALLTHROUGH;
-      case 35: CHECK_FINISHED(35); sieve[m] &= ~(1 << 2); m += prime * 4 + 2; FALLTHROUGH;
-      case 36: CHECK_FINISHED(36); sieve[m] &= ~(1 << 5); m += prime * 2 + 1; FALLTHROUGH;
-      case 37: CHECK_FINISHED(37); sieve[m] &= ~(1 << 6); m += prime * 4 + 3; FALLTHROUGH;
-      case 38: CHECK_FINISHED(38); sieve[m] &= ~(1 << 0); m += prime * 6 + 3; FALLTHROUGH;
-      case 39: CHECK_FINISHED(39); sieve[m] &= ~(1 << 3); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 40: {
-                 uint64_t max_offset = m + prime * 28 + 18;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 19)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 5);
-                   sieve[m + prime *  6 +  4] &= ~(1 << 3);
-                   sieve[m + prime * 10 +  6] &= ~(1 << 7);
-                   sieve[m + prime * 12 +  8] &= ~(1 << 1);
-                   sieve[m + prime * 16 + 10] &= ~(1 << 6);
-                   sieve[m + prime * 18 + 12] &= ~(1 << 0);
-                   sieve[m + prime * 22 + 14] &= ~(1 << 4);
-                   sieve[m + prime * 28 + 18] &= ~(1 << 2);
-                 }
-               }
-               CHECK_FINISHED(40); sieve[m] &= ~(1 << 5); m += prime * 6 + 4; FALLTHROUGH;
-      case 41: CHECK_FINISHED(41); sieve[m] &= ~(1 << 3); m += prime * 4 + 2; FALLTHROUGH;
-      case 42: CHECK_FINISHED(42); sieve[m] &= ~(1 << 7); m += prime * 2 + 2; FALLTHROUGH;
-      case 43: CHECK_FINISHED(43); sieve[m] &= ~(1 << 1); m += prime * 4 + 2; FALLTHROUGH;
-      case 44: CHECK_FINISHED(44); sieve[m] &= ~(1 << 6); m += prime * 2 + 2; FALLTHROUGH;
-      case 45: CHECK_FINISHED(45); sieve[m] &= ~(1 << 0); m += prime * 4 + 2; FALLTHROUGH;
-      case 46: CHECK_FINISHED(46); sieve[m] &= ~(1 << 4); m += prime * 6 + 4; FALLTHROUGH;
-      case 47: CHECK_FINISHED(47); sieve[m] &= ~(1 << 2); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 48: {
-                 uint64_t max_offset = m + prime * 28 + 22;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 23)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 6);
-                   sieve[m + prime *  6 +  5] &= ~(1 << 2);
-                   sieve[m + prime * 10 +  8] &= ~(1 << 3);
-                   sieve[m + prime * 12 +  9] &= ~(1 << 7);
-                   sieve[m + prime * 16 + 13] &= ~(1 << 0);
-                   sieve[m + prime * 18 + 14] &= ~(1 << 4);
-                   sieve[m + prime * 22 + 17] &= ~(1 << 5);
-                   sieve[m + prime * 28 + 22] &= ~(1 << 1);
-                 }
-               }
-               CHECK_FINISHED(48); sieve[m] &= ~(1 << 6); m += prime * 6 + 5; FALLTHROUGH;
-      case 49: CHECK_FINISHED(49); sieve[m] &= ~(1 << 2); m += prime * 4 + 3; FALLTHROUGH;
-      case 50: CHECK_FINISHED(50); sieve[m] &= ~(1 << 3); m += prime * 2 + 1; FALLTHROUGH;
-      case 51: CHECK_FINISHED(51); sieve[m] &= ~(1 << 7); m += prime * 4 + 4; FALLTHROUGH;
-      case 52: CHECK_FINISHED(52); sieve[m] &= ~(1 << 0); m += prime * 2 + 1; FALLTHROUGH;
-      case 53: CHECK_FINISHED(53); sieve[m] &= ~(1 << 4); m += prime * 4 + 3; FALLTHROUGH;
-      case 54: CHECK_FINISHED(54); sieve[m] &= ~(1 << 5); m += prime * 6 + 5; FALLTHROUGH;
-      case 55: CHECK_FINISHED(55); sieve[m] &= ~(1 << 1); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 56: {
-                 uint64_t max_offset = m + prime * 28 + 28;
-                 uint64_t limit = std::max(max_offset, sieve_size) - max_offset;
-
-                 for (; m < limit; m += prime * 30 + 29)
-                 {
-                   sieve[m + prime *  0 +  0] &= ~(1 << 7);
-                   sieve[m + prime *  6 +  6] &= ~(1 << 6);
-                   sieve[m + prime * 10 + 10] &= ~(1 << 5);
-                   sieve[m + prime * 12 + 12] &= ~(1 << 4);
-                   sieve[m + prime * 16 + 16] &= ~(1 << 3);
-                   sieve[m + prime * 18 + 18] &= ~(1 << 2);
-                   sieve[m + prime * 22 + 22] &= ~(1 << 1);
-                   sieve[m + prime * 28 + 28] &= ~(1 << 0);
-                 }
-               }
-               CHECK_FINISHED(56); sieve[m] &= ~(1 << 7); m += prime * 6 + 6; FALLTHROUGH;
-      case 57: CHECK_FINISHED(57); sieve[m] &= ~(1 << 6); m += prime * 4 + 4; FALLTHROUGH;
-      case 58: CHECK_FINISHED(58); sieve[m] &= ~(1 << 5); m += prime * 2 + 2; FALLTHROUGH;
-      case 59: CHECK_FINISHED(59); sieve[m] &= ~(1 << 4); m += prime * 4 + 4; FALLTHROUGH;
-      case 60: CHECK_FINISHED(60); sieve[m] &= ~(1 << 3); m += prime * 2 + 2; FALLTHROUGH;
-      case 61: CHECK_FINISHED(61); sieve[m] &= ~(1 << 2); m += prime * 4 + 4; FALLTHROUGH;
-      case 62: CHECK_FINISHED(62); sieve[m] &= ~(1 << 1); m += prime * 6 + 6; FALLTHROUGH;
-      case 63: CHECK_FINISHED(63); sieve[m] &= ~(1 << 0); m += prime * 2 + 1;
-    }
-
-    default: UNREACHABLE;
+  while (true)
+  {
+    CHECK_FINISHED(0); sieve[m] &= bitmasks[0]; m += adv[0];
+    CHECK_FINISHED(1); sieve[m] &= bitmasks[1]; m += adv[1];
+    CHECK_FINISHED(2); sieve[m] &= bitmasks[2]; m += adv[2];
+    CHECK_FINISHED(3); sieve[m] &= bitmasks[3]; m += adv[3];
+    CHECK_FINISHED(4); sieve[m] &= bitmasks[4]; m += adv[4];
+    CHECK_FINISHED(5); sieve[m] &= bitmasks[5]; m += adv[5];
+    CHECK_FINISHED(6); sieve[m] &= bitmasks[6]; m += adv[6];
+    CHECK_FINISHED(7); sieve[m] &= bitmasks[7]; m += adv[7];
   }
 
   #undef CHECK_FINISHED
@@ -479,139 +284,73 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 ///
 void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 {
-  if (i >= wheel_.size())
+  if (i >= primeState_.size())
     add(prime, i);
 
   reset_counter();
-  Wheel& wheel = wheel_[i];
+  PrimeState& primeState = primeState_[i];
+  uint64_t g = primeState.wheel_group;
+  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
 
-  uint64_t m = wheel.multiple;
+  const Array<uint64_t, 8> adv =
+  {
+    prime * wheel_mul[0] + wheel_corr[g][0],
+    prime * wheel_mul[1] + wheel_corr[g][1],
+    prime * wheel_mul[2] + wheel_corr[g][2],
+    prime * wheel_mul[3] + wheel_corr[g][3],
+    prime * wheel_mul[4] + wheel_corr[g][4],
+    prime * wheel_mul[5] + wheel_corr[g][5],
+    prime * wheel_mul[6] + wheel_corr[g][6],
+    prime * wheel_mul[7] + wheel_corr[g][7]
+  };
+
+  const uint8_t* bitmasks = wheel_bitmasks[g];
+  uint64_t m = primeState.multiple;
+  uint64_t w = primeState.wheel_index;
+  ASSERT(primeState.wheel_index <= 7);
+  uint64_t sieve_size = sieve_.size();
   uint64_t total_count = total_count_;
   uint64_t counter_log2_dist = counter_.log2_dist;
-  uint64_t sieve_size = sieve_.size();
-  uint32_t* counter = &counter_[0];
   uint8_t* sieve = &sieve_[0];
+  uint32_t* counter = &counter_[0];
 
-  #define CHECK_FINISHED(wheel_index) \
+  #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      wheel.index = wheel_index; \
-      wheel.multiple = (uint32_t) (m - sieve_size); \
+      primeState.wheel_index = uint8_t(i); \
+      primeState.multiple = uint32_t(m - sieve_size); \
       total_count_ = total_count; \
       return; \
     }
 
-  #define COUNT_UNSET_BIT(bit_index) \
+  #define COUNT_UNSET_BIT(i) \
     { \
-      std::size_t sieve_byte = sieve[m]; \
-      std::size_t is_bit = (sieve_byte >> bit_index) & 1; \
-      sieve[m] &= ~(1 << bit_index); \
-      counter[m >> counter_log2_dist] -= (uint32_t) is_bit; \
-      total_count -= (uint64_t) is_bit; \
+      uint8_t b = sieve[m]; \
+      bool is_bit = (b & bitmasks[i]) != b; \
+      sieve[m] = uint8_t(b & bitmasks[i]); \
+      counter[m >> counter_log2_dist] -= is_bit; \
+      total_count -= is_bit; \
+      m += adv[i]; \
     }
 
-  ASSERT(wheel.index <= 63);
-
-  switch (wheel.index)
+  // Get ready for loop unrolling
+  for (; w; w = (w + 1) & 7)
   {
-    for (;;)
-    {
-      case 0: CHECK_FINISHED(0); COUNT_UNSET_BIT(0); m += prime * 6 + 0; FALLTHROUGH;
-      case 1: CHECK_FINISHED(1); COUNT_UNSET_BIT(1); m += prime * 4 + 0; FALLTHROUGH;
-      case 2: CHECK_FINISHED(2); COUNT_UNSET_BIT(2); m += prime * 2 + 0; FALLTHROUGH;
-      case 3: CHECK_FINISHED(3); COUNT_UNSET_BIT(3); m += prime * 4 + 0; FALLTHROUGH;
-      case 4: CHECK_FINISHED(4); COUNT_UNSET_BIT(4); m += prime * 2 + 0; FALLTHROUGH;
-      case 5: CHECK_FINISHED(5); COUNT_UNSET_BIT(5); m += prime * 4 + 0; FALLTHROUGH;
-      case 6: CHECK_FINISHED(6); COUNT_UNSET_BIT(6); m += prime * 6 + 0; FALLTHROUGH;
-      case 7: CHECK_FINISHED(7); COUNT_UNSET_BIT(7); m += prime * 2 + 1;
-    }
+    CHECK_FINISHED(w);
+    COUNT_UNSET_BIT(w);
+  }
 
-    for (;;)
-    {
-      case  8: CHECK_FINISHED( 8); COUNT_UNSET_BIT(1); m += prime * 6 + 1; FALLTHROUGH;
-      case  9: CHECK_FINISHED( 9); COUNT_UNSET_BIT(5); m += prime * 4 + 1; FALLTHROUGH;
-      case 10: CHECK_FINISHED(10); COUNT_UNSET_BIT(4); m += prime * 2 + 1; FALLTHROUGH;
-      case 11: CHECK_FINISHED(11); COUNT_UNSET_BIT(0); m += prime * 4 + 0; FALLTHROUGH;
-      case 12: CHECK_FINISHED(12); COUNT_UNSET_BIT(7); m += prime * 2 + 1; FALLTHROUGH;
-      case 13: CHECK_FINISHED(13); COUNT_UNSET_BIT(3); m += prime * 4 + 1; FALLTHROUGH;
-      case 14: CHECK_FINISHED(14); COUNT_UNSET_BIT(2); m += prime * 6 + 1; FALLTHROUGH;
-      case 15: CHECK_FINISHED(15); COUNT_UNSET_BIT(6); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 16: CHECK_FINISHED(16); COUNT_UNSET_BIT(2); m += prime * 6 + 2; FALLTHROUGH;
-      case 17: CHECK_FINISHED(17); COUNT_UNSET_BIT(4); m += prime * 4 + 2; FALLTHROUGH;
-      case 18: CHECK_FINISHED(18); COUNT_UNSET_BIT(0); m += prime * 2 + 0; FALLTHROUGH;
-      case 19: CHECK_FINISHED(19); COUNT_UNSET_BIT(6); m += prime * 4 + 2; FALLTHROUGH;
-      case 20: CHECK_FINISHED(20); COUNT_UNSET_BIT(1); m += prime * 2 + 0; FALLTHROUGH;
-      case 21: CHECK_FINISHED(21); COUNT_UNSET_BIT(7); m += prime * 4 + 2; FALLTHROUGH;
-      case 22: CHECK_FINISHED(22); COUNT_UNSET_BIT(3); m += prime * 6 + 2; FALLTHROUGH;
-      case 23: CHECK_FINISHED(23); COUNT_UNSET_BIT(5); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 24: CHECK_FINISHED(24); COUNT_UNSET_BIT(3); m += prime * 6 + 3; FALLTHROUGH;
-      case 25: CHECK_FINISHED(25); COUNT_UNSET_BIT(0); m += prime * 4 + 1; FALLTHROUGH;
-      case 26: CHECK_FINISHED(26); COUNT_UNSET_BIT(6); m += prime * 2 + 1; FALLTHROUGH;
-      case 27: CHECK_FINISHED(27); COUNT_UNSET_BIT(5); m += prime * 4 + 2; FALLTHROUGH;
-      case 28: CHECK_FINISHED(28); COUNT_UNSET_BIT(2); m += prime * 2 + 1; FALLTHROUGH;
-      case 29: CHECK_FINISHED(29); COUNT_UNSET_BIT(1); m += prime * 4 + 1; FALLTHROUGH;
-      case 30: CHECK_FINISHED(30); COUNT_UNSET_BIT(7); m += prime * 6 + 3; FALLTHROUGH;
-      case 31: CHECK_FINISHED(31); COUNT_UNSET_BIT(4); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 32: CHECK_FINISHED(32); COUNT_UNSET_BIT(4); m += prime * 6 + 3; FALLTHROUGH;
-      case 33: CHECK_FINISHED(33); COUNT_UNSET_BIT(7); m += prime * 4 + 3; FALLTHROUGH;
-      case 34: CHECK_FINISHED(34); COUNT_UNSET_BIT(1); m += prime * 2 + 1; FALLTHROUGH;
-      case 35: CHECK_FINISHED(35); COUNT_UNSET_BIT(2); m += prime * 4 + 2; FALLTHROUGH;
-      case 36: CHECK_FINISHED(36); COUNT_UNSET_BIT(5); m += prime * 2 + 1; FALLTHROUGH;
-      case 37: CHECK_FINISHED(37); COUNT_UNSET_BIT(6); m += prime * 4 + 3; FALLTHROUGH;
-      case 38: CHECK_FINISHED(38); COUNT_UNSET_BIT(0); m += prime * 6 + 3; FALLTHROUGH;
-      case 39: CHECK_FINISHED(39); COUNT_UNSET_BIT(3); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 40: CHECK_FINISHED(40); COUNT_UNSET_BIT(5); m += prime * 6 + 4; FALLTHROUGH;
-      case 41: CHECK_FINISHED(41); COUNT_UNSET_BIT(3); m += prime * 4 + 2; FALLTHROUGH;
-      case 42: CHECK_FINISHED(42); COUNT_UNSET_BIT(7); m += prime * 2 + 2; FALLTHROUGH;
-      case 43: CHECK_FINISHED(43); COUNT_UNSET_BIT(1); m += prime * 4 + 2; FALLTHROUGH;
-      case 44: CHECK_FINISHED(44); COUNT_UNSET_BIT(6); m += prime * 2 + 2; FALLTHROUGH;
-      case 45: CHECK_FINISHED(45); COUNT_UNSET_BIT(0); m += prime * 4 + 2; FALLTHROUGH;
-      case 46: CHECK_FINISHED(46); COUNT_UNSET_BIT(4); m += prime * 6 + 4; FALLTHROUGH;
-      case 47: CHECK_FINISHED(47); COUNT_UNSET_BIT(2); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 48: CHECK_FINISHED(48); COUNT_UNSET_BIT(6); m += prime * 6 + 5; FALLTHROUGH;
-      case 49: CHECK_FINISHED(49); COUNT_UNSET_BIT(2); m += prime * 4 + 3; FALLTHROUGH;
-      case 50: CHECK_FINISHED(50); COUNT_UNSET_BIT(3); m += prime * 2 + 1; FALLTHROUGH;
-      case 51: CHECK_FINISHED(51); COUNT_UNSET_BIT(7); m += prime * 4 + 4; FALLTHROUGH;
-      case 52: CHECK_FINISHED(52); COUNT_UNSET_BIT(0); m += prime * 2 + 1; FALLTHROUGH;
-      case 53: CHECK_FINISHED(53); COUNT_UNSET_BIT(4); m += prime * 4 + 3; FALLTHROUGH;
-      case 54: CHECK_FINISHED(54); COUNT_UNSET_BIT(5); m += prime * 6 + 5; FALLTHROUGH;
-      case 55: CHECK_FINISHED(55); COUNT_UNSET_BIT(1); m += prime * 2 + 1;
-    }
-
-    for (;;)
-    {
-      case 56: CHECK_FINISHED(56); COUNT_UNSET_BIT(7); m += prime * 6 + 6; FALLTHROUGH;
-      case 57: CHECK_FINISHED(57); COUNT_UNSET_BIT(6); m += prime * 4 + 4; FALLTHROUGH;
-      case 58: CHECK_FINISHED(58); COUNT_UNSET_BIT(5); m += prime * 2 + 2; FALLTHROUGH;
-      case 59: CHECK_FINISHED(59); COUNT_UNSET_BIT(4); m += prime * 4 + 4; FALLTHROUGH;
-      case 60: CHECK_FINISHED(60); COUNT_UNSET_BIT(3); m += prime * 2 + 2; FALLTHROUGH;
-      case 61: CHECK_FINISHED(61); COUNT_UNSET_BIT(2); m += prime * 4 + 4; FALLTHROUGH;
-      case 62: CHECK_FINISHED(62); COUNT_UNSET_BIT(1); m += prime * 6 + 6; FALLTHROUGH;
-      case 63: CHECK_FINISHED(63); COUNT_UNSET_BIT(0); m += prime * 2 + 1;
-    }
-
-    default: UNREACHABLE;
+  while (true)
+  {
+    CHECK_FINISHED(0); COUNT_UNSET_BIT(0);
+    CHECK_FINISHED(1); COUNT_UNSET_BIT(1);
+    CHECK_FINISHED(2); COUNT_UNSET_BIT(2);
+    CHECK_FINISHED(3); COUNT_UNSET_BIT(3);
+    CHECK_FINISHED(4); COUNT_UNSET_BIT(4);
+    CHECK_FINISHED(5); COUNT_UNSET_BIT(5);
+    CHECK_FINISHED(6); COUNT_UNSET_BIT(6);
+    CHECK_FINISHED(7); COUNT_UNSET_BIT(7);
   }
 }
 

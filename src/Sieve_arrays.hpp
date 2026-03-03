@@ -2,7 +2,7 @@
 /// @file  Sieve_arrays.hpp
 /// @brief Static lookup tables needed by Sieve.cpp.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,36 +19,69 @@
 
 namespace {
 
-struct WheelInit
+/// Used to calculate the first
+/// multiple > start of a sieving prime
+/// that is coprime to 2, 3, 5.
+///
+const primecount::Array<uint8_t, 30> wheel_init_mul =
 {
-  uint8_t factor;
-  uint8_t index;
+  1, 0, 5, 4, 3, 2, 1, 0, 3, 2,
+  1, 0, 1, 0, 3, 2, 1, 0, 1, 0,
+  3, 2, 1, 0, 5, 4, 3, 2, 1, 0
 };
 
-/// Categorize sieving primes according to their modulo 30
-/// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
+/// Categorize sieving primes according
+/// to their modulo 30 congruence class
+/// { 1, 7, 11, 13, 17, 19, 23, 29 }.
 ///
-const primecount::Array<uint8_t, 30> wheel_offsets =
+const primecount::Array<uint8_t, 30> wheel_groups =
 {
-  0, 8 * 0, 0, 0, 0, 0,
-  0, 8 * 1, 0, 0, 0, 8 * 2,
-  0, 8 * 3, 0, 0, 0, 8 * 4,
-  0, 8 * 5, 0, 0, 0, 8 * 6,
-  0, 0,     0, 0, 0, 8 * 7
+  0, 0, 0, 0, 0, 0,
+  0, 1, 0, 0, 0, 2,
+  0, 3, 0, 0, 0, 4,
+  0, 5, 0, 0, 0, 6,
+  0, 0, 0, 0, 0, 7
 };
 
-/// Used to calculate the first multiple > start of a
-/// sieving prime that is coprime to 2, 3, 5.
-///
-const primecount::Array<WheelInit, 30> wheel_init
-{{
-  {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
-  {2,  1}, {1,  1}, {0,  1}, {3,  2}, {2,  2},
-  {1,  2}, {0,  2}, {1,  3}, {0,  3}, {3,  4},
-  {2,  4}, {1,  4}, {0,  4}, {1,  5}, {0,  5},
-  {3,  6}, {2,  6}, {1,  6}, {0,  6}, {5,  7},
-  {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
-}};
+/// Modulo 30 wheel groups
+const primecount::Array<uint8_t, 30> wheel_indexes =
+{
+  0, 0, 1, 1, 1, 1, 1, 1, 2, 2,
+  2, 2, 3, 3, 4, 4, 4, 4, 5, 5,
+  6, 6, 6, 6, 7, 7, 7, 7, 7, 7
+};
+
+/// Modulo 30 wheel multiplication factors
+const primecount::Array<uint8_t, 8> wheel_mul = {
+  6, 4, 2, 4, 2, 4, 6, 2
+};
+
+/// Modulo 30 wheel correction values
+const uint8_t wheel_corr[8][8] =
+{
+  { 0, 0, 0, 0, 0, 0, 0, 1 }, // p % 30 == 1
+  { 1, 1, 1, 0, 1, 1, 1, 1 }, // p % 30 == 7
+  { 2, 2, 0, 2, 0, 2, 2, 1 }, // p % 30 == 11
+  { 3, 1, 1, 2, 1, 1, 3, 1 }, // p % 30 == 13
+  { 3, 3, 1, 2, 1, 3, 3, 1 }, // p % 30 == 17
+  { 4, 2, 2, 2, 2, 2, 4, 1 }, // p % 30 == 19
+  { 5, 3, 1, 4, 1, 3, 5, 1 }, // p % 30 == 23
+  { 6, 4, 2, 4, 2, 4, 6, 1 }  // p % 30 == 29
+};
+
+/// Modulo 30 wheel bitmasks unused to unset
+/// a bit in the sieve array.
+const uint8_t wheel_bitmasks[8][8] =
+{
+  { (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 7) },
+  { (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 6) },
+  { (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 5) },
+  { (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 4) },
+  { (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 3) },
+  { (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 2) },
+  { (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 1) },
+  { (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 0) }
+};
 
 /// The 8 bits in each byte of the sieve array correspond
 /// to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
