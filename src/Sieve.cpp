@@ -326,7 +326,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   #define COUNT_UNSET_BIT(i) \
     { \
-      std::size_t b = sieve[m]; \
+      uint8_t b = sieve[m]; \
       bool is_bit = (b & bitmasks[i]) != b; \
       sieve[m] = uint8_t(b & bitmasks[i]); \
       counter[m >> counter_log2_dist] -= is_bit; \
