@@ -453,7 +453,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   ASSERT(wheel.index <= 63);
   ASSERT(r < 8);
 
-  Array<uint64_t, 8> adv = {
+  const Array<uint64_t, 8> adv = {
     prime * wheel_factor[0] + wheel_corr[r][0],
     prime * wheel_factor[1] + wheel_corr[r][1],
     prime * wheel_factor[2] + wheel_corr[r][2],
@@ -464,7 +464,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_factor[7] + wheel_corr[r][7]
   };
 
-  Array<uint8_t, 8> msk = {
+  const Array<uint8_t, 8> msk = {
     uint8_t(1u << wheel_bits[r][0]),
     uint8_t(1u << wheel_bits[r][1]),
     uint8_t(1u << wheel_bits[r][2]),
