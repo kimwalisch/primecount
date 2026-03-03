@@ -4,8 +4,7 @@ Changes in primecount-8.3, 2026-03-03
 * AC.cpp: Cast to smaller type optimization.
 * SegmentedPiTable.hpp: Use faster lightweight compression.
 * SegmentedPiTable.cpp: Use faster lightweight compression.
-* Sieve.cpp: New algorithm for large sieving primes that reduces
-  CPU instruction cache misses.
+* Sieve.cpp: New sieving algorithm that reduces CPU instruction cache misses.
 
 Changes in primecount-8.2, 2026-02-01
 
