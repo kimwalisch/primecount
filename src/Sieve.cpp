@@ -500,7 +500,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     m += adv[s];
   }
 
-  for (;;)
+  while (true)
   {
     CHECK_FINISHED(0); COUNT_UNSET_BIT(0);
     CHECK_FINISHED(1); COUNT_UNSET_BIT(1);
