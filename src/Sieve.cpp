@@ -46,6 +46,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <cmath>
 
 namespace primecount {
 
