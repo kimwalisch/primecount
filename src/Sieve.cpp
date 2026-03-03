@@ -447,7 +447,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   reset_counter();
   Wheel& wheel = wheel_[i];
   ASSERT(wheel.index <= 63);
-  uint64_t r = wheel.index >> 3;
+  uint32_t r = wheel.index >> 3;
   prime /= 30;
 
   const Array<uint64_t, 8> adv = {
@@ -491,7 +491,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   }
 
   uint64_t m = wheel.multiple;
-  uint64_t s = wheel.index & 7;
+  uint32_t s = wheel.index & 7;
   uint64_t sieve_size = sieve_.size();
   uint8_t* sieve = &sieve_[0];
   uint64_t total_count = total_count_;
