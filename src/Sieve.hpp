@@ -115,6 +115,7 @@ public:
 private:
   void add(uint64_t prime, uint64_t i);
   void resize_sieve(uint64_t low, uint64_t high);
+  void reset_counter();
   uint64_t pre_sieve(uint64_t c, uint64_t low);
   uint64_t segment_size() const;
   static const Array<uint64_t, 240> unset_smaller;

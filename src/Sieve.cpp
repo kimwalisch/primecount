@@ -131,6 +131,12 @@ void Sieve::resize_sieve(uint64_t low, uint64_t high)
   }
 }
 
+void Sieve::reset_counter()
+{
+  prev_stop_ = 0;
+  count_ = 0;
+}
+
 void Sieve::init_counter(uint64_t low, uint64_t high)
 {
   count_ = 0;
@@ -438,8 +444,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (i >= wheel_.size())
     add(prime, i);
 
-  prev_stop_ = 0;
-  count_ = 0;
+  reset_counter();
   Wheel& wheel = wheel_[i];
   ASSERT(wheel.index <= 63);
   uint64_t r = wheel.index >> 3;
