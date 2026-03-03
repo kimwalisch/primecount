@@ -289,7 +289,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   reset_counter();
   PrimeState& primeState = primeState_[i];
-  uint32_t g = primeState.wheel_group;
+  uint64_t g = primeState.wheel_group;
   ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
 
@@ -307,7 +307,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   const uint8_t* bitmasks = wheel_bitmasks[g];
   uint64_t m = primeState.multiple;
-  uint32_t w = primeState.wheel_index;
+  uint64_t w = primeState.wheel_index;
   ASSERT(primeState.wheel_index <= 7);
   uint64_t sieve_size = sieve_.size();
   uint64_t total_count = total_count_;
