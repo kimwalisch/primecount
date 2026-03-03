@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -79,7 +79,7 @@ constexpr uint8_t wheel_corr[8][8] = {
 
 Sieve::Sieve(uint64_t low,
              uint64_t segment_size,
-             uint64_t wheel_size)
+             uint64_t primes_size)
 {
   ASSERT(low % 30 == 0);
   ASSERT(segment_size % 240 == 0);
@@ -91,7 +91,7 @@ Sieve::Sieve(uint64_t low,
   // to 30 numbers i.e. the 8 bits correspond to the
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
   sieve_.resize(segment_size / 30);
-  wheel_.reserve(wheel_size);
+  primeState_.reserve(primes_size);
 }
 
 /// The segment size is sieve.size() * 30 as each
@@ -152,8 +152,8 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 ///
 void Sieve::add(uint64_t prime, uint64_t i)
 {
-  if_unlikely(i > wheel_.size())
-    wheel_.resize(i);
+  if_unlikely(i > primeState_.size())
+    primeState_.resize(i);
 
   // Find first multiple > start_
   ASSERT(start_ % 30 == 0);
@@ -175,7 +175,7 @@ void Sieve::add(uint64_t prime, uint64_t i)
   // Calculate wheel index of multiple
   uint32_t index = wheel_init[quotient % 30].index;
   index += wheel_offsets[prime % 30];
-  wheel_.push_back({multiple32, index});
+  primeState_.push_back({multiple32, index});
 }
 
 /// Remove the i-th prime and the multiples of the i-th prime
@@ -183,26 +183,25 @@ void Sieve::add(uint64_t prime, uint64_t i)
 ///
 void Sieve::cross_off(uint64_t prime, uint64_t i)
 {
-  if (i >= wheel_.size())
+  if (i >= primeState_.size())
     add(prime, i);
 
   prime /= 30;
-  Wheel& wheel = wheel_[i];
-  uint64_t m = wheel.multiple;
+  PrimeState& primeState = primeState_[i];
+  uint64_t m = primeState.multiple;
   uint8_t* sieve = sieve_.data();
   uint64_t sieve_size = sieve_.size();
 
-  #define CHECK_FINISHED(wheel_index) \
+  #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      wheel.index = wheel_index; \
-      wheel.multiple = (uint32_t) (m - sieve_size); \
+      primeState.wheel_index = i; \
+      primeState.multiple = (uint32_t) (m - sieve_size); \
       return; \
     }
 
-  ASSERT(wheel.index <= 63);
-
-  switch (wheel.index)
+  ASSERT(primeState.wheel_index <= 63);
+  switch (primeState.wheel_index)
   {
     for (;;)
     {
@@ -441,13 +440,13 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 ///
 void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 {
-  if (i >= wheel_.size())
+  if (i >= primeState_.size())
     add(prime, i);
 
   reset_counter();
-  Wheel& wheel = wheel_[i];
-  ASSERT(wheel.index <= 63);
-  uint32_t r = wheel.index >> 3;
+  PrimeState& primeState = primeState_[i];
+  ASSERT(primeState.wheel_index <= 63);
+  uint32_t r = primeState.wheel_index >> 3;
   prime /= 30;
 
   const Array<uint64_t, 8> adv = {
@@ -473,25 +472,25 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   };
 
   #define CHECK_FINISHED(i) \
-  if_unlikely(m >= sieve_size) \
-  { \
-    wheel.index = (r << 3) + i; \
-    wheel.multiple = (uint32_t) (m - sieve_size); \
-    total_count_ = total_count; \
-    return; \
-  }
+    if_unlikely(m >= sieve_size) \
+    { \
+      primeState.wheel_index = (r << 3) + i; \
+      primeState.multiple = (uint32_t) (m - sieve_size); \
+      total_count_ = total_count; \
+      return; \
+    }
 
   #define COUNT_UNSET_BIT(i) \
-  { \
-    std::size_t b = sieve[m]; \
-    std::size_t is_bit = (b & bitmask[i]) != 0; \
-    sieve[m] = uint8_t(b & ~bitmask[i]); \
-    total_count -= (uint64_t) is_bit; \
-    m += adv[i]; \
-  }
+    { \
+      std::size_t b = sieve[m]; \
+      std::size_t is_bit = (b & bitmask[i]) != 0; \
+      sieve[m] = uint8_t(b & ~bitmask[i]); \
+      total_count -= (uint64_t) is_bit; \
+      m += adv[i]; \
+    }
 
-  uint64_t m = wheel.multiple;
-  uint32_t s = wheel.index & 7;
+  uint64_t m = primeState.multiple;
+  uint32_t s = primeState.wheel_index & 7;
   uint64_t sieve_size = sieve_.size();
   uint8_t* sieve = &sieve_[0];
   uint64_t total_count = total_count_;

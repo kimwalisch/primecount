@@ -28,7 +28,7 @@
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -48,7 +48,7 @@ namespace primecount {
 class Sieve
 {
 public:
-  Sieve(uint64_t low, uint64_t segment_size, uint64_t wheel_size);
+  Sieve(uint64_t low, uint64_t segment_size, uint64_t primes_size);
   uint64_t count(uint64_t stop);
   uint64_t count(uint64_t start, uint64_t stop) const;
   void init_counter(uint64_t low, uint64_t high);
@@ -121,10 +121,10 @@ private:
   static const Array<uint64_t, 240> unset_smaller;
   static const Array<uint64_t, 240> unset_larger;
 
-  struct Wheel
+  struct PrimeState
   {
     uint32_t multiple;
-    uint32_t index;
+    uint32_t wheel_index;
   };
 
   uint64_t start_ = 0;
@@ -132,7 +132,7 @@ private:
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
   Vector<uint8_t> sieve_;
-  Vector<Wheel> wheel_;
+  Vector<PrimeState> primeState_;
 };
 
 } // namespace
