@@ -18,7 +18,7 @@
 ///        of our sieving algorithm does not deteriorate the overall
 ///        runtime complexity of our nth prime algorithm.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,6 +35,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <ctz.hpp>
+#include <fast_div.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -102,7 +103,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = low / prime;
+        UT q = fast_div(low, prime);
         UT n = prime * (q + 1 + (q & 1));
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
@@ -120,7 +121,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = low / prime;
+        UT q = fast_div(low, prime);
         UT n = prime * (q + 1 + (q & 1));
         n = max(n, UT(prime) * prime);
         ASSERT(n > prime);
