@@ -200,8 +200,8 @@ void Sieve::add(uint64_t prime, uint64_t i)
 
   // Find next multiple of prime that
   // is not divisible by 2, 3, 5
-  uint64_t factor = wheel_init[quotient % 30].factor;
-  multiple += prime * factor;
+  uint64_t init_mul = wheel_init_mul[quotient % 30];
+  multiple += prime * init_mul;
 
   ASSERT(multiple % 2 != 0);
   ASSERT(multiple % 3 != 0);
@@ -209,11 +209,9 @@ void Sieve::add(uint64_t prime, uint64_t i)
 
   multiple = (multiple - start_) / 30;
   uint32_t multiple32 = (uint32_t) multiple;
-
-  // Calculate wheel index of multiple
-  uint32_t index = wheel_init[quotient % 30].index;
-  index += wheel_init_offsets[prime % 30];
-  primeState_.push_back({multiple32, index});
+  uint8_t wheel_index = wheel_indexes[quotient % 30];
+  uint8_t wheel_group = wheel_groups[prime % 30];
+  primeState_.push_back({multiple32, wheel_group, wheel_index});
 }
 
 /// Remove the i-th prime and the multiples of the i-th prime
@@ -225,32 +223,33 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
     add(prime, i);
 
   PrimeState& primeState = primeState_[i];
-  uint32_t r = primeState.wheel_index >> 3;
-  ASSERT(primeState.wheel_index <= 63);
+  uint64_t g = primeState.wheel_group;
+  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
 
   const Array<uint64_t, 8> adv =
   {
-    prime * wheel_mul[0] + wheel_corr[r][0],
-    prime * wheel_mul[1] + wheel_corr[r][1],
-    prime * wheel_mul[2] + wheel_corr[r][2],
-    prime * wheel_mul[3] + wheel_corr[r][3],
-    prime * wheel_mul[4] + wheel_corr[r][4],
-    prime * wheel_mul[5] + wheel_corr[r][5],
-    prime * wheel_mul[6] + wheel_corr[r][6],
-    prime * wheel_mul[7] + wheel_corr[r][7]
+    prime * wheel_mul[0] + wheel_corr[g][0],
+    prime * wheel_mul[1] + wheel_corr[g][1],
+    prime * wheel_mul[2] + wheel_corr[g][2],
+    prime * wheel_mul[3] + wheel_corr[g][3],
+    prime * wheel_mul[4] + wheel_corr[g][4],
+    prime * wheel_mul[5] + wheel_corr[g][5],
+    prime * wheel_mul[6] + wheel_corr[g][6],
+    prime * wheel_mul[7] + wheel_corr[g][7]
   };
 
-  const uint8_t* bitmasks = wheel_bitmasks[r];
+  const uint8_t* bitmasks = wheel_bitmasks[g];
   uint64_t m = primeState.multiple;
-  uint32_t w = primeState.wheel_index & 7;
+  uint64_t w = primeState.wheel_index;
+  ASSERT(primeState.wheel_index <= 7);
   uint64_t sieve_size = sieve_.size();
   uint8_t* sieve = &sieve_[0];
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      primeState.wheel_index = (r << 3) + i; \
+      primeState.wheel_index = i; \
       primeState.multiple = (uint32_t) (m - sieve_size); \
       return; \
     }
@@ -290,25 +289,26 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   reset_counter();
   PrimeState& primeState = primeState_[i];
-  uint32_t r = primeState.wheel_index >> 3;
-  ASSERT(primeState.wheel_index <= 63);
+  uint32_t g = primeState.wheel_group;
+  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
 
   const Array<uint64_t, 8> adv =
   {
-    prime * wheel_mul[0] + wheel_corr[r][0],
-    prime * wheel_mul[1] + wheel_corr[r][1],
-    prime * wheel_mul[2] + wheel_corr[r][2],
-    prime * wheel_mul[3] + wheel_corr[r][3],
-    prime * wheel_mul[4] + wheel_corr[r][4],
-    prime * wheel_mul[5] + wheel_corr[r][5],
-    prime * wheel_mul[6] + wheel_corr[r][6],
-    prime * wheel_mul[7] + wheel_corr[r][7]
+    prime * wheel_mul[0] + wheel_corr[g][0],
+    prime * wheel_mul[1] + wheel_corr[g][1],
+    prime * wheel_mul[2] + wheel_corr[g][2],
+    prime * wheel_mul[3] + wheel_corr[g][3],
+    prime * wheel_mul[4] + wheel_corr[g][4],
+    prime * wheel_mul[5] + wheel_corr[g][5],
+    prime * wheel_mul[6] + wheel_corr[g][6],
+    prime * wheel_mul[7] + wheel_corr[g][7]
   };
 
-  const uint8_t* bitmasks = wheel_bitmasks[r];
+  const uint8_t* bitmasks = wheel_bitmasks[g];
   uint64_t m = primeState.multiple;
-  uint32_t w = primeState.wheel_index & 7;
+  uint32_t w = primeState.wheel_index;
+  ASSERT(primeState.wheel_index <= 7);
   uint64_t sieve_size = sieve_.size();
   uint64_t total_count = total_count_;
   uint64_t counter_log2_dist = counter_.log2_dist;
@@ -318,7 +318,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
     { \
-      primeState.wheel_index = (r << 3) + i; \
+      primeState.wheel_index = i; \
       primeState.multiple = uint32_t(m - sieve_size); \
       total_count_ = total_count; \
       return; \
