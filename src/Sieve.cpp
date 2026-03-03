@@ -490,22 +490,14 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       m += adv[i]; \
     }
 
-  while (s != 0)
+  for (; s != 0; s = (s + 1) & 7)
   {
-    if (m >= sieve_size)
-    {
-      wheel.index = (r << 3) + s;
-      wheel.multiple = (uint32_t) (m - sieve_size);
-      total_count_ = total_count;
-      return;
-    }
-
+    CHECK_FINISHED(s);
     std::size_t sieve_byte = sieve[m];
     std::size_t is_bit = (sieve_byte & msk[s]) != 0;
     sieve[m] = (uint8_t) (sieve_byte & ~msk[s]);
     total_count -= (uint64_t) is_bit;
     m += adv[s];
-    s = (s + 1) & 7;
   }
 
   for (;;)
