@@ -479,8 +479,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   #define COUNT_UNSET_BIT(i) \
   { \
     std::size_t b = sieve[m]; \
-    total_count -= (b & bitmask[i]) != 0; \
+    std::size_t is_bit = (b & bitmask[i]) != 0; \
     sieve[m] = uint8_t(b & ~bitmask[i]); \
+    total_count -= (uint64_t) is_bit; \
     m += adv[i]; \
   }
 
@@ -490,14 +491,11 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint8_t* sieve = &sieve_[0];
   uint64_t total_count = total_count_;
 
-  for (; s != 0; s = (s + 1) & 7)
+  // Get ready for loop unrolling
+  for (; s; s = (s + 1) & 7)
   {
     CHECK_FINISHED(s);
-    std::size_t b = sieve[m];
-    std::size_t is_bit = (b & bitmask[s]) != 0;
-    sieve[m] = (uint8_t) (b & ~bitmask[s]);
-    total_count -= (uint64_t) is_bit;
-    m += adv[s];
+    COUNT_UNSET_BIT(s);
   }
 
   while (true)
