@@ -174,7 +174,7 @@ void Sieve::add(uint64_t prime, uint64_t i)
 
   // Calculate wheel index of multiple
   uint32_t index = wheel_init[quotient % 30].index;
-  index += wheel_offsets[prime % 30];
+  index += wheel_init_offsets[prime % 30];
   primeState_.push_back({multiple32, index});
 }
 

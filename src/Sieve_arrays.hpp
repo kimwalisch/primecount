@@ -25,18 +25,6 @@ struct WheelInit
   uint8_t index;
 };
 
-/// Categorize sieving primes according to their modulo 30
-/// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
-///
-const primecount::Array<uint8_t, 30> wheel_offsets =
-{
-  0, 8 * 0, 0, 0, 0, 0,
-  0, 8 * 1, 0, 0, 0, 8 * 2,
-  0, 8 * 3, 0, 0, 0, 8 * 4,
-  0, 8 * 5, 0, 0, 0, 8 * 6,
-  0, 0,     0, 0, 0, 8 * 7
-};
-
 /// Used to calculate the first multiple > start of a
 /// sieving prime that is coprime to 2, 3, 5.
 ///
@@ -49,6 +37,18 @@ const primecount::Array<WheelInit, 30> wheel_init
   {3,  6}, {2,  6}, {1,  6}, {0,  6}, {5,  7},
   {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
 }};
+
+/// Categorize sieving primes according to their modulo 30
+/// congruence class { 1, 7, 11, 13, 17, 19, 23, 29 }.
+///
+const primecount::Array<uint8_t, 30> wheel_init_offsets =
+{
+  0, 8 * 0, 0, 0, 0, 0,
+  0, 8 * 1, 0, 0, 0, 8 * 2,
+  0, 8 * 3, 0, 0, 0, 8 * 4,
+  0, 8 * 5, 0, 0, 0, 8 * 6,
+  0, 0,     0, 0, 0, 8 * 7
+};
 
 /// The 8 bits in each byte of the sieve array correspond
 /// to the offsets { 1, 7, 11, 13, 17, 19, 23, 29 }.
