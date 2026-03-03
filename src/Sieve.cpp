@@ -199,9 +199,8 @@ void Sieve::add(uint64_t prime, uint64_t i)
   uint64_t multiple = prime * quotient;
 
   // Find next multiple of prime that
-  // is not divisible by 2, 3, 5
-  uint64_t init_mul = wheel_init_mul[quotient % 30];
-  multiple += prime * init_mul;
+  // is not divisible by 2, 3, 5.
+  multiple += prime * wheel_init_mul[quotient % 30];
 
   ASSERT(multiple % 2 != 0);
   ASSERT(multiple % 3 != 0);
