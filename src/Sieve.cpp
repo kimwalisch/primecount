@@ -99,9 +99,9 @@ void Sieve::allocate_counter(uint64_t low)
   // branch mispredictions (good) but on the other hand
   // increases the number of executed instructions (bad).
   // In my benchmarks setting the minimum amount of bytes to
-  // bytes_count_instruction * 8 (or 16) performed best.
+  // bytes_count_instruction * 16 (or 32) performed best.
   uint64_t bytes = counter_.dist / 30;
-  bytes = max(bytes, bytes_count_instruction * 8);
+  bytes = max(bytes, bytes_count_instruction * 16);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.
