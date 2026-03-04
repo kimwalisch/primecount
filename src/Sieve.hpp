@@ -48,7 +48,7 @@ namespace primecount {
 class Sieve
 {
 public:
-  Sieve(uint64_t low, uint64_t segment_size, uint64_t primes_size);
+  Sieve(uint64_t low, uint64_t limit, uint64_t segment_size, uint64_t primes_size);
   uint64_t count(uint64_t stop);
   uint64_t count(uint64_t start, uint64_t stop) const;
   void init_counter(uint64_t low, uint64_t high);
@@ -114,7 +114,7 @@ public:
 
 private:
   void add(uint64_t prime, uint64_t i);
-  void allocate_counter(uint64_t low);
+  void allocate_counter(uint64_t low, uint64_t limit);
   void reset_counter();
   void resize_sieve(uint64_t low, uint64_t high);
   uint64_t pre_sieve(uint64_t c, uint64_t low);

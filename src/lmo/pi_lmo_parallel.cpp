@@ -78,7 +78,7 @@ int64_t S2_thread_default(int64_t x,
     return 0;
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
-  Sieve sieve(low, segment_size, max_b);
+  Sieve sieve(low, z, segment_size, max_b);
   thread.init_finished();
 
   // segmented sieve of Eratosthenes
@@ -190,7 +190,7 @@ int64_t S2_thread_avx512(int64_t x,
     return 0;
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
-  Sieve sieve(low, segment_size, max_b);
+  Sieve sieve(low, z, segment_size, max_b);
   thread.init_finished();
 
   // segmented sieve of Eratosthenes
@@ -302,7 +302,7 @@ int64_t S2_thread_arm_sve(int64_t x,
     return 0;
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
-  Sieve sieve(low, segment_size, max_b);
+  Sieve sieve(low, z, segment_size, max_b);
   thread.init_finished();
 
   // segmented sieve of Eratosthenes

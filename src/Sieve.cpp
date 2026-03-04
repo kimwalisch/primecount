@@ -38,6 +38,7 @@
 #include "Sieve_arrays.hpp"
 #include "Sieve_count_start_stop.hpp"
 #include "Sieve_pre_sieve.hpp"
+#include "primecount-internal.hpp"
 
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -51,6 +52,7 @@
 namespace primecount {
 
 Sieve::Sieve(uint64_t low,
+             uint64_t limit,
              uint64_t segment_size,
              uint64_t primes_size)
 {
@@ -65,7 +67,7 @@ Sieve::Sieve(uint64_t low,
   // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
   sieve_.resize(segment_size / 30);
   primeState_.reserve(primes_size);
-  allocate_counter(low);
+  allocate_counter(low, limit);
 }
 
 /// Each element of the counter array contains the current
@@ -79,7 +81,7 @@ Sieve::Sieve(uint64_t low,
 /// sieving algorithm but grows up to segment_size towards
 /// the end of the algorithm.
 ///
-void Sieve::allocate_counter(uint64_t low)
+void Sieve::allocate_counter(uint64_t low, uint64_t limit)
 {
   double average_leaf_dist = std::sqrt(low);
   double counter_dist = std::sqrt(average_leaf_dist);
@@ -95,13 +97,18 @@ void Sieve::allocate_counter(uint64_t low)
   uint64_t dist_per_instruction = bytes_count_instruction * 30;
   counter_.dist = uint64_t(counter_dist * std::sqrt(dist_per_instruction));
 
-  // Increasing the minimum counter distance decreases the
-  // branch mispredictions (good) but on the other hand
-  // increases the number of executed instructions (bad).
-  // In my benchmarks setting the minimum amount of bytes to
-  // bytes_count_instruction * 8 (or 16) performed best.
+  // Very short counter intervals cause many branch
+  // mispredictions in the counting phase and hurt
+  // performance. Longer intervals reduce mispredictions
+  // but increase counting work, so we choose a minimum
+  // interval size based on benchmark data. For smaller
+  // computations (x < 2^64) larger minimum intervals are
+  // usually faster; for larger computations (x > 2^64)
+  // smaller intervals tend to be faster.
+  double exp = 18.37347627 - 1.00913704 * std::log10(limit);
+  int min_bytes_factor = 1 << in_between(4, int(exp), 7);
   uint64_t bytes = counter_.dist / 30;
-  bytes = max(bytes, bytes_count_instruction * 8);
+  bytes = max(bytes, bytes_count_instruction * min_bytes_factor);
   bytes = next_power_of_2(bytes);
 
   // Make sure the counter (32-bit) doesn't overflow.

@@ -43,7 +43,7 @@ int main()
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
-  Sieve sieve(low, segment_size, primes.size());
+  Sieve sieve(low, high, segment_size, primes.size());
   std::vector<int> sieve2(high, 1);
   sieve2[0] = 0;
 

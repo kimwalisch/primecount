@@ -64,7 +64,7 @@ int64_t S2(int64_t x,
   int64_t segment_size = isqrt(limit);
   segment_size = Sieve::align_segment_size(segment_size);
 
-  Sieve sieve(low, segment_size, primes.size());
+  Sieve sieve(low, limit, segment_size, primes.size());
   auto pi = generate_pi(y);
   Vector<int64_t> phi(primes.size());
   std::fill(phi.begin(), phi.end(), 0);
