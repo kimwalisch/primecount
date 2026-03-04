@@ -221,10 +221,16 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   if (i >= primeState_.size())
     add(prime, i);
 
-  PrimeState& primeState = primeState_[i];
-  uint64_t g = primeState.wheel_group;
-  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
+  PrimeState& primeState = primeState_[i];
+  ASSERT(primeState.wheel_group <= 7);
+  ASSERT(primeState.wheel_index <= 7);
+  uint64_t m = primeState.multiple;
+  uint64_t g = primeState.wheel_group;
+  uint64_t w = primeState.wheel_index;
+  uint64_t sieve_size = sieve_.size();
+  uint8_t* sieve = &sieve_[0];
+  const uint8_t* bitmasks = wheel_bitmasks[g];
 
   const Array<uint64_t, 8> adv =
   {
@@ -237,13 +243,6 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
     prime * wheel_mul[6] + wheel_corr[g][6],
     prime * wheel_mul[7] + wheel_corr[g][7]
   };
-
-  const uint8_t* bitmasks = wheel_bitmasks[g];
-  uint64_t m = primeState.multiple;
-  uint64_t w = primeState.wheel_index;
-  ASSERT(primeState.wheel_index <= 7);
-  uint64_t sieve_size = sieve_.size();
-  uint8_t* sieve = &sieve_[0];
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
@@ -287,10 +286,20 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     add(prime, i);
 
   reset_counter();
-  PrimeState& primeState = primeState_[i];
-  uint64_t g = primeState.wheel_group;
-  ASSERT(primeState.wheel_group <= 7);
   prime /= 30;
+  PrimeState& primeState = primeState_[i];
+  ASSERT(primeState.wheel_group <= 7);
+  ASSERT(primeState.wheel_index <= 7);
+  uint64_t m = primeState.multiple;
+  uint64_t g = primeState.wheel_group;
+  uint64_t w = primeState.wheel_index;
+
+  uint64_t sieve_size = sieve_.size();
+  uint64_t total_count = total_count_;
+  uint64_t counter_log2_dist = counter_.log2_dist;
+  uint8_t* sieve = &sieve_[0];
+  uint32_t* counter = &counter_[0];
+  const uint8_t* bitmasks = wheel_bitmasks[g];
 
   const Array<uint64_t, 8> adv =
   {
@@ -303,16 +312,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     prime * wheel_mul[6] + wheel_corr[g][6],
     prime * wheel_mul[7] + wheel_corr[g][7]
   };
-
-  const uint8_t* bitmasks = wheel_bitmasks[g];
-  uint64_t m = primeState.multiple;
-  uint64_t w = primeState.wheel_index;
-  ASSERT(primeState.wheel_index <= 7);
-  uint64_t sieve_size = sieve_.size();
-  uint64_t total_count = total_count_;
-  uint64_t counter_log2_dist = counter_.log2_dist;
-  uint8_t* sieve = &sieve_[0];
-  uint32_t* counter = &counter_[0];
 
   #define CHECK_FINISHED(i) \
     if_unlikely(m >= sieve_size) \
