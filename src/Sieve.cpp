@@ -105,8 +105,12 @@ void Sieve::allocate_counter(uint64_t low, uint64_t limit)
   // computations (x < 2^64) larger minimum intervals are
   // usually faster; for larger computations (x > 2^64)
   // smaller intervals tend to be faster.
-  double exp = 18.37347627 - 1.00913704 * std::log10(limit);
-  int min_bytes_factor = 1 << in_between(4, int(exp), 7);
+  double log10_limit = std::log10(max(limit, 10));
+  double exponent = 17.75 - 0.94 * log10_limit;
+  int e = (int) std::round(exponent);
+  int min_bytes_factor = 1 << in_between(4, e, 7);
+  ASSERT(min_bytes_factor >= 16);
+  ASSERT(min_bytes_factor <= 128);
   uint64_t bytes = counter_.dist / 30;
   bytes = max(bytes, bytes_count_instruction * min_bytes_factor);
   bytes = next_power_of_2(bytes);
