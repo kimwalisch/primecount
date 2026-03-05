@@ -30,6 +30,15 @@ const primecount::Array<uint8_t, 30> wheel_init_mul =
   3, 2, 1, 0, 5, 4, 3, 2, 1, 0
 };
 
+/// Modulo 30 wheel indexes used to calculate the
+/// next multiple of the current sieving prime.
+const primecount::Array<uint8_t, 30> wheel_indexes =
+{
+  0, 0, 1, 1, 1, 1, 1, 1, 2, 2,
+  2, 2, 3, 3, 4, 4, 4, 4, 5, 5,
+  6, 6, 6, 6, 7, 7, 7, 7, 7, 7
+};
+
 /// Categorize sieving primes according
 /// to their modulo 30 congruence class
 /// { 1, 7, 11, 13, 17, 19, 23, 29 }.
@@ -41,14 +50,6 @@ const primecount::Array<uint8_t, 30> wheel_groups =
   0, 3, 0, 0, 0, 4,
   0, 5, 0, 0, 0, 6,
   0, 0, 0, 0, 0, 7
-};
-
-/// Modulo 30 wheel groups
-const primecount::Array<uint8_t, 30> wheel_indexes =
-{
-  0, 0, 1, 1, 1, 1, 1, 1, 2, 2,
-  2, 2, 3, 3, 4, 4, 4, 4, 5, 5,
-  6, 6, 6, 6, 7, 7, 7, 7, 7, 7
 };
 
 /// Modulo 30 wheel multiplication factors
@@ -73,14 +74,14 @@ const uint8_t wheel_corr[8][8] =
 /// a bit in the sieve array.
 const uint8_t wheel_bitmasks[8][8] =
 {
-  { (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 7) },
-  { (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 6) },
-  { (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 5) },
-  { (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 4) },
-  { (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 3) },
-  { (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 2) },
-  { (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 0), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 1) },
-  { (uint8_t) ~(1 << 7), (uint8_t) ~(1 << 6), (uint8_t) ~(1 << 5), (uint8_t) ~(1 << 4), (uint8_t) ~(1 << 3), (uint8_t) ~(1 << 2), (uint8_t) ~(1 << 1), (uint8_t) ~(1 << 0) }
+  { (1 << 0) ^ 0xff, (1 << 1) ^ 0xff, (1 << 2) ^ 0xff, (1 << 3) ^ 0xff, (1 << 4) ^ 0xff, (1 << 5) ^ 0xff, (1 << 6) ^ 0xff, (1 << 7) ^ 0xff },
+  { (1 << 1) ^ 0xff, (1 << 5) ^ 0xff, (1 << 4) ^ 0xff, (1 << 0) ^ 0xff, (1 << 7) ^ 0xff, (1 << 3) ^ 0xff, (1 << 2) ^ 0xff, (1 << 6) ^ 0xff },
+  { (1 << 2) ^ 0xff, (1 << 4) ^ 0xff, (1 << 0) ^ 0xff, (1 << 6) ^ 0xff, (1 << 1) ^ 0xff, (1 << 7) ^ 0xff, (1 << 3) ^ 0xff, (1 << 5) ^ 0xff },
+  { (1 << 3) ^ 0xff, (1 << 0) ^ 0xff, (1 << 6) ^ 0xff, (1 << 5) ^ 0xff, (1 << 2) ^ 0xff, (1 << 1) ^ 0xff, (1 << 7) ^ 0xff, (1 << 4) ^ 0xff },
+  { (1 << 4) ^ 0xff, (1 << 7) ^ 0xff, (1 << 1) ^ 0xff, (1 << 2) ^ 0xff, (1 << 5) ^ 0xff, (1 << 6) ^ 0xff, (1 << 0) ^ 0xff, (1 << 3) ^ 0xff },
+  { (1 << 5) ^ 0xff, (1 << 3) ^ 0xff, (1 << 7) ^ 0xff, (1 << 1) ^ 0xff, (1 << 6) ^ 0xff, (1 << 0) ^ 0xff, (1 << 4) ^ 0xff, (1 << 2) ^ 0xff },
+  { (1 << 6) ^ 0xff, (1 << 2) ^ 0xff, (1 << 3) ^ 0xff, (1 << 7) ^ 0xff, (1 << 0) ^ 0xff, (1 << 4) ^ 0xff, (1 << 5) ^ 0xff, (1 << 1) ^ 0xff },
+  { (1 << 7) ^ 0xff, (1 << 6) ^ 0xff, (1 << 5) ^ 0xff, (1 << 4) ^ 0xff, (1 << 3) ^ 0xff, (1 << 2) ^ 0xff, (1 << 1) ^ 0xff, (1 << 0) ^ 0xff }
 };
 
 /// The 8 bits in each byte of the sieve array correspond

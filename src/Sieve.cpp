@@ -210,11 +210,13 @@ void Sieve::add(uint64_t prime, uint64_t i)
   uint32_t multiple32 = (uint32_t) multiple;
   uint8_t wheel_index = wheel_indexes[quotient % 30];
   uint8_t wheel_group = wheel_groups[prime % 30];
+
   primeState_.push_back({multiple32, wheel_group, wheel_index});
 }
 
-/// Remove the i-th prime and the multiples of the i-th prime
-/// from the sieve array. Used for pre-sieving.
+/// Remove the i-th prime and the multiples
+/// of the i-th prime from the sieve array.
+/// Used for pre-sieving.
 ///
 void Sieve::cross_off(uint64_t prime, uint64_t i)
 {
