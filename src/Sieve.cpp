@@ -295,7 +295,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t m = primeState.multiple;
   uint64_t g = primeState.wheel_group;
   uint64_t w = primeState.wheel_index;
-
   uint64_t sieve_size = sieve_.size();
   uint64_t total_count = total_count_;
   uint64_t counter_log2_dist = counter_.log2_dist;
