@@ -236,14 +236,14 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
 
   const Array<uint64_t, 8> adv =
   {
-    prime * wheel_mul[0] + wheel_corr[g][0],
-    prime * wheel_mul[1] + wheel_corr[g][1],
-    prime * wheel_mul[2] + wheel_corr[g][2],
-    prime * wheel_mul[3] + wheel_corr[g][3],
-    prime * wheel_mul[4] + wheel_corr[g][4],
-    prime * wheel_mul[5] + wheel_corr[g][5],
-    prime * wheel_mul[6] + wheel_corr[g][6],
-    prime * wheel_mul[7] + wheel_corr[g][7]
+    prime * 6 + wheel_corr[g][0],
+    prime * 4 + wheel_corr[g][1],
+    prime * 2 + wheel_corr[g][2],
+    prime * 4 + wheel_corr[g][3],
+    prime * 2 + wheel_corr[g][4],
+    prime * 4 + wheel_corr[g][5],
+    prime * 6 + wheel_corr[g][6],
+    prime * 2 + wheel_corr[g][7]
   };
 
   #define CHECK_FINISHED(i) \
@@ -304,14 +304,14 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
   const Array<uint64_t, 8> adv =
   {
-    prime * wheel_mul[0] + wheel_corr[g][0],
-    prime * wheel_mul[1] + wheel_corr[g][1],
-    prime * wheel_mul[2] + wheel_corr[g][2],
-    prime * wheel_mul[3] + wheel_corr[g][3],
-    prime * wheel_mul[4] + wheel_corr[g][4],
-    prime * wheel_mul[5] + wheel_corr[g][5],
-    prime * wheel_mul[6] + wheel_corr[g][6],
-    prime * wheel_mul[7] + wheel_corr[g][7]
+    prime * 6 + wheel_corr[g][0],
+    prime * 4 + wheel_corr[g][1],
+    prime * 2 + wheel_corr[g][2],
+    prime * 4 + wheel_corr[g][3],
+    prime * 2 + wheel_corr[g][4],
+    prime * 4 + wheel_corr[g][5],
+    prime * 6 + wheel_corr[g][6],
+    prime * 2 + wheel_corr[g][7]
   };
 
   #define CHECK_FINISHED(i) \

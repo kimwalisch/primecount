@@ -52,11 +52,6 @@ const primecount::Array<uint8_t, 30> wheel_groups =
   0, 0, 0, 0, 0, 7
 };
 
-/// Modulo 30 wheel multiplication factors
-const primecount::Array<uint8_t, 8> wheel_mul = {
-  6, 4, 2, 4, 2, 4, 6, 2
-};
-
 /// Modulo 30 wheel correction values
 const uint8_t wheel_corr[8][8] =
 {
