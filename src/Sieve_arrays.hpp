@@ -19,37 +19,42 @@
 
 namespace {
 
+struct WheelInit
+{
+  uint8_t mul;
+  uint8_t wheel_index;
+};
+
 /// Used to calculate the first
 /// multiple > start of a sieving prime
 /// that is coprime to 2, 3, 5.
 ///
-const primecount::Array<uint8_t, 30> wheel_init_mul =
-{
-  1, 0, 5, 4, 3, 2, 1, 0, 3, 2,
-  1, 0, 1, 0, 3, 2, 1, 0, 1, 0,
-  3, 2, 1, 0, 5, 4, 3, 2, 1, 0
-};
-
-/// Modulo 30 wheel indexes used to calculate the
-/// next multiple of the current sieving prime.
-const primecount::Array<uint8_t, 30> wheel_indexes =
-{
-  0, 0, 1, 1, 1, 1, 1, 1, 2, 2,
-  2, 2, 3, 3, 4, 4, 4, 4, 5, 5,
-  6, 6, 6, 6, 7, 7, 7, 7, 7, 7
-};
+const primecount::Array<WheelInit, 30> wheel_init
+{{
+  {1,  0}, {0,  0}, {5,  1}, {4,  1}, {3,  1},
+  {2,  1}, {1,  1}, {0,  1}, {3,  2}, {2,  2},
+  {1,  2}, {0,  2}, {1,  3}, {0,  3}, {3,  4},
+  {2,  4}, {1,  4}, {0,  4}, {1,  5}, {0,  5},
+  {3,  6}, {2,  6}, {1,  6}, {0,  6}, {5,  7},
+  {4,  7}, {3,  7}, {2,  7}, {1,  7}, {0,  7}
+}};
 
 /// Categorize sieving primes according
 /// to their modulo 30 congruence class
 /// { 1, 7, 11, 13, 17, 19, 23, 29 }.
 ///
-const primecount::Array<uint8_t, 30> wheel_groups =
+const primecount::Array<uint8_t, 30> wheel_offsets =
 {
-  0, 0, 0, 0, 0, 0,
-  0, 1, 0, 0, 0, 2,
-  0, 3, 0, 0, 0, 4,
-  0, 5, 0, 0, 0, 6,
-  0, 0, 0, 0, 0, 7
+  0, 8 * 0, 0, 0, 0, 0,
+  0, 8 * 1, 0, 0, 0, 8 * 2,
+  0, 8 * 3, 0, 0, 0, 8 * 4,
+  0, 8 * 5, 0, 0, 0, 8 * 6,
+  0, 0,     0, 0, 0, 8 * 7
+};
+
+/// Modulo 30 prime residues
+const primecount::Array<uint8_t, 30> mod30_prime_residues = {
+  1, 7, 11, 13, 17, 19, 23, 29
 };
 
 /// Modulo 30 wheel correction values
@@ -63,20 +68,6 @@ const uint8_t wheel_corr[8][8] =
   { 4, 2, 2, 2, 2, 2, 4, 1 }, // p % 30 == 19
   { 5, 3, 1, 4, 1, 3, 5, 1 }, // p % 30 == 23
   { 6, 4, 2, 4, 2, 4, 6, 1 }  // p % 30 == 29
-};
-
-/// Modulo 30 wheel bitmasks unused to unset
-/// a bit in the sieve array.
-const uint8_t wheel_bitmasks[8][8] =
-{
-  { (1 << 0) ^ 0xff, (1 << 1) ^ 0xff, (1 << 2) ^ 0xff, (1 << 3) ^ 0xff, (1 << 4) ^ 0xff, (1 << 5) ^ 0xff, (1 << 6) ^ 0xff, (1 << 7) ^ 0xff },
-  { (1 << 1) ^ 0xff, (1 << 5) ^ 0xff, (1 << 4) ^ 0xff, (1 << 0) ^ 0xff, (1 << 7) ^ 0xff, (1 << 3) ^ 0xff, (1 << 2) ^ 0xff, (1 << 6) ^ 0xff },
-  { (1 << 2) ^ 0xff, (1 << 4) ^ 0xff, (1 << 0) ^ 0xff, (1 << 6) ^ 0xff, (1 << 1) ^ 0xff, (1 << 7) ^ 0xff, (1 << 3) ^ 0xff, (1 << 5) ^ 0xff },
-  { (1 << 3) ^ 0xff, (1 << 0) ^ 0xff, (1 << 6) ^ 0xff, (1 << 5) ^ 0xff, (1 << 2) ^ 0xff, (1 << 1) ^ 0xff, (1 << 7) ^ 0xff, (1 << 4) ^ 0xff },
-  { (1 << 4) ^ 0xff, (1 << 7) ^ 0xff, (1 << 1) ^ 0xff, (1 << 2) ^ 0xff, (1 << 5) ^ 0xff, (1 << 6) ^ 0xff, (1 << 0) ^ 0xff, (1 << 3) ^ 0xff },
-  { (1 << 5) ^ 0xff, (1 << 3) ^ 0xff, (1 << 7) ^ 0xff, (1 << 1) ^ 0xff, (1 << 6) ^ 0xff, (1 << 0) ^ 0xff, (1 << 4) ^ 0xff, (1 << 2) ^ 0xff },
-  { (1 << 6) ^ 0xff, (1 << 2) ^ 0xff, (1 << 3) ^ 0xff, (1 << 7) ^ 0xff, (1 << 0) ^ 0xff, (1 << 4) ^ 0xff, (1 << 5) ^ 0xff, (1 << 1) ^ 0xff },
-  { (1 << 7) ^ 0xff, (1 << 6) ^ 0xff, (1 << 5) ^ 0xff, (1 << 4) ^ 0xff, (1 << 3) ^ 0xff, (1 << 2) ^ 0xff, (1 << 1) ^ 0xff, (1 << 0) ^ 0xff }
 };
 
 /// The 8 bits in each byte of the sieve array correspond

@@ -125,7 +125,6 @@ private:
   struct PrimeState
   {
     uint32_t multiple;
-    uint8_t wheel_group;
     uint8_t wheel_index;
   };
 

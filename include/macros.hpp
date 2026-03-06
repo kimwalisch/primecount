@@ -109,6 +109,22 @@
   #endif
 #endif
 
+#if defined(__GNUC__) || \
+    __has_builtin(__builtin_unreachable)
+  #define UNREACHABLE __builtin_unreachable()
+#elif defined(_MSC_VER)
+  #define UNREACHABLE __assume(0)
+#elif __cplusplus >= 202301L && \
+      defined(__cpp_lib_unreachable)
+  // We prefer __builtin_unreachable() over std::unreachable()
+  // because GCC's std::unreachable() implementation uses
+  // __builtin_trap() instead of __builtin_unreachable() if
+  // _GLIBCXX_ASSERTIONS is defined.
+  #define UNREACHABLE std::unreachable()
+#else
+  #define UNREACHABLE
+#endif
+
 // Branchfree conditional move instruction:
 // if (cond == true) dest = src;
 // GCC, Clang and MSVC emit a CMOV instruction on x64
