@@ -226,13 +226,8 @@ T C2(T xlow,
       uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
       uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t i_lo_max = ihi;
-
-      if (pi_xpq_lo > 0)
-      {
-        uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-        i_lo_max = pi[min(xpq1_lo, max_m)];
-      }
+      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t i_lo_max = pi[min(xpq1_lo, max_m)];
 
       uint64_t run_hi_lo = min(i_lo_max, ihi);
       sum += phi_xpq_lo * (run_hi_lo - ilo + 1);
