@@ -193,7 +193,7 @@ T C2(T xlow,
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
   // parallelism and increased cache misses.
-  if (avg_clustered_leaves >= 0 &&
+  if (avg_clustered_leaves >= 5 &&
       i > pi_min_clustered)
   {
     uint64_t iters = 0;
