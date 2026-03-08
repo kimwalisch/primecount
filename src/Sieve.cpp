@@ -239,8 +239,7 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
         prime < high_)
     {
       uint64_t m = (prime - low_) / 30;
-      uint64_t bit = wheel_offsets[prime % 30] / 8;
-      sieve_[m] &= ~(1 << bit);
+      sieve_[m] &= bitmasks[prime % 30];
     }
     if (prime > sqrt_segment_high_)
       return;
@@ -483,10 +482,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         prime < high_)
     {
       uint64_t m = (prime - low_) / 30;
-      uint64_t bit = wheel_offsets[prime % 30] / 8;
-      std::size_t sieve_byte = sieve_[m];
-      std::size_t is_bit = (sieve_byte >> bit) & 1;
-      sieve_[m] &= ~(1 << bit);
+      std::size_t b = sieve_[m];
+      std::size_t is_bit = (b & bitmasks[prime % 30]) != b;
+      sieve_[m] &= bitmasks[prime % 30];
       counter_[m >> counter_.log2_dist] -= uint32_t(is_bit);
       total_count_ -= uint64_t(is_bit);
     }
