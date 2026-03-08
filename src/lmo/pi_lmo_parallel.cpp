@@ -90,8 +90,9 @@ int64_t S2_thread_default(int64_t x,
 
     // For b < min_b there are no special leaves:
     // low <= x / (primes[b] * m) < high
-    sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counter(low, high);
+    sieve.init_segment(low, high);
+    sieve.pre_sieve(primes, min_b - 1);
+    sieve.init_counter();
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
@@ -202,8 +203,9 @@ int64_t S2_thread_avx512(int64_t x,
 
     // For b < min_b there are no special leaves:
     // low <= x / (primes[b] * m) < high
-    sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counter(low, high);
+    sieve.init_segment(low, high);
+    sieve.pre_sieve(primes, min_b - 1);
+    sieve.init_counter();
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty
@@ -314,8 +316,9 @@ int64_t S2_thread_arm_sve(int64_t x,
 
     // For b < min_b there are no special leaves:
     // low <= x / (primes[b] * m) < high
-    sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counter(low, high);
+    sieve.init_segment(low, high);
+    sieve.pre_sieve(primes, min_b - 1);
+    sieve.init_counter();
     int64_t b = min_b;
 
     // For c + 1 <= b <= pi_sqrty

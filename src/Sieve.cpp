@@ -41,6 +41,7 @@
 
 #include <imath.hpp>
 #include <int128_t.hpp>
+#include <isqrt.hpp>
 #include <macros.hpp>
 #include <min.hpp>
 
@@ -138,10 +139,19 @@ uint64_t Sieve::align_segment_size(uint64_t size)
   return size;
 }
 
-/// Use shorter sieve size for last segment
-void Sieve::resize_sieve(uint64_t low, uint64_t high)
+/// Initialize the current segment [low, high[
+void Sieve::init_segment(uint64_t low, uint64_t high)
 {
-  uint64_t size = high - low;
+  ASSERT(low <= high);
+  low_ = low;
+  high_ = high;
+  sqrt_segment_high_ = isqrt(high - 1);
+}
+
+/// Use shorter sieve size for the last segment
+void Sieve::resize_last_segment()
+{
+  uint64_t size = high_ - low_;
 
   if (size < segment_size())
   {
@@ -162,13 +172,13 @@ void Sieve::reset_counter()
   counter_.stop = counter_.dist;
 }
 
-void Sieve::init_counter(uint64_t low, uint64_t high)
+void Sieve::init_counter()
 {
   reset_counter();
   total_count_ = 0;
 
   uint64_t start = 0;
-  uint64_t max_stop = (high - 1) - low;
+  uint64_t max_stop = (high_ - 1) - low_;
 
   while (start <= max_stop)
   {
@@ -185,7 +195,7 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 }
 
 /// Add a sieving prime to the sieve.
-/// Calculates the first multiple > start of prime that
+/// Calculates the first multiple > low_ and >= prime^2 of prime that
 /// is not divisible by 2, 3, 5 and its wheel index.
 ///
 void Sieve::add(uint64_t prime, uint64_t i)
@@ -193,9 +203,10 @@ void Sieve::add(uint64_t prime, uint64_t i)
   if_unlikely(i > primeState_.size())
     primeState_.resize(i);
 
-  // Find first multiple > start_
-  ASSERT(start_ % 30 == 0);
-  uint64_t quotient = start_ / prime + 1;
+  // Find first multiple > low_ and >= prime^2.
+  ASSERT(low_ % 30 == 0);
+  uint64_t quotient = low_ / prime + 1;
+  quotient = max(quotient, prime);
   uint64_t multiple = prime * quotient;
 
   // Find next multiple of prime that
@@ -206,7 +217,7 @@ void Sieve::add(uint64_t prime, uint64_t i)
   ASSERT(multiple % 3 != 0);
   ASSERT(multiple % 5 != 0);
 
-  multiple = (multiple - start_) / 30;
+  multiple = (multiple - low_) / 30;
   uint32_t multiple32 = (uint32_t) multiple;
   uint8_t wheel_index = wheel_init[quotient % 30].wheel_index;
   wheel_index += wheel_offsets[prime % 30];
@@ -221,8 +232,21 @@ void Sieve::add(uint64_t prime, uint64_t i)
 ///
 void Sieve::cross_off(uint64_t prime, uint64_t i)
 {
+  // Is new sieving prime?
   if (i >= primeState_.size())
+  {
+    if (prime >= low_ &&
+        prime < high_)
+    {
+      uint64_t m = (prime - low_) / 30;
+      uint64_t bit = wheel_offsets[prime % 30] / 8;
+      sieve_[m] &= ~(1 << bit);
+    }
+    if (prime > sqrt_segment_high_)
+      return;
+
     add(prime, i);
+  }
 
   prime /= 30;
   PrimeState& primeState = primeState_[i];
@@ -452,8 +476,25 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 {
   reset_counter();
 
+  // Is new sieving prime?
   if (i >= primeState_.size())
+  {
+    if (prime >= low_ &&
+        prime < high_)
+    {
+      uint64_t m = (prime - low_) / 30;
+      uint64_t bit = wheel_offsets[prime % 30] / 8;
+      std::size_t sieve_byte = sieve_[m];
+      std::size_t is_bit = (sieve_byte >> bit) & 1;
+      sieve_[m] &= ~(1 << bit);
+      counter_[m >> counter_.log2_dist] -= uint32_t(is_bit);
+      total_count_ -= uint64_t(is_bit);
+    }
+    if (prime > sqrt_segment_high_)
+      return;
+
     add(prime, i);
+  }
 
   prime /= 30;
   PrimeState& primeState = primeState_[i];

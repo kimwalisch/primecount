@@ -51,8 +51,9 @@ int main()
   {
     if (primes[i] <= 5)
     {
-      sieve.pre_sieve(primes, i, low, high);
-      sieve.init_counter(low, high);
+      sieve.init_segment(low, high);
+      sieve.pre_sieve(primes, i);
+      sieve.init_counter();
     }
     else
       sieve.cross_off(primes[i], i);

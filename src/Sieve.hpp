@@ -51,7 +51,8 @@ public:
   Sieve(uint64_t low, uint64_t segment_size, uint64_t primes_size);
   uint64_t count(uint64_t stop);
   uint64_t count(uint64_t start, uint64_t stop) const;
-  void init_counter(uint64_t low, uint64_t high);
+  void init_segment(uint64_t low, uint64_t high);
+  void init_counter();
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t align_segment_size(uint64_t size);
@@ -63,10 +64,10 @@ public:
   }
 
   template <typename T>
-  void pre_sieve(const Vector<T>& primes, uint64_t c, uint64_t low, uint64_t high)
+  void pre_sieve(const Vector<T>& primes, uint64_t c)
   {
-    uint64_t primePi = pre_sieve(c, low);
-    resize_sieve(low, high);
+    uint64_t primePi = pre_sieve(c);
+    resize_last_segment();
 
     for (uint64_t i = primePi + 1; i <= c; i++)
       cross_off(primes[i], i);
@@ -116,8 +117,8 @@ private:
   void add(uint64_t prime, uint64_t i);
   void allocate_counter(uint64_t low);
   void reset_counter();
-  void resize_sieve(uint64_t low, uint64_t high);
-  uint64_t pre_sieve(uint64_t c, uint64_t low);
+  void resize_last_segment();
+  uint64_t pre_sieve(uint64_t c);
   uint64_t segment_size() const;
   static const Array<uint64_t, 240> unset_smaller;
   static const Array<uint64_t, 240> unset_larger;
@@ -149,6 +150,9 @@ private:
   };
 
   uint64_t start_ = 0;
+  uint64_t low_ = 0;
+  uint64_t high_ = 0;
+  uint64_t sqrt_segment_high_ = 0;
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;

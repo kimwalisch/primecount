@@ -99,7 +99,7 @@ namespace primecount {
 /// Removes the (primes and) multiples of
 /// primes ≤ 71 from the sieve array.
 ///
-uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
+uint64_t Sieve::pre_sieve(uint64_t c)
 {
   // PrimePi(5) = 3
   uint64_t primePi = 3;
@@ -110,7 +110,7 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
   {
     // PrimePi(13) = 6
     primePi = 6;
-    pre_sieve1(sieve_, low);
+    pre_sieve1(sieve_, low_);
 
     for (const auto& pre_sieved : pre_sieved_arrays)
     {
@@ -123,7 +123,7 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
 
       const uint8_t* p = pre_sieved.begin();
       uint64_t prime_product = pre_sieved.size() * 30;
-      uint64_t pos = (low % prime_product) / 30;
+      uint64_t pos = (low_ % prime_product) / 30;
       uint64_t offset = 0;
 
       while (offset < sieve_.size())

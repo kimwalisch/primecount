@@ -80,8 +80,10 @@ int64_t S2(int64_t x,
     int64_t high = min(low + segment_size, limit);
     int64_t low1 = max(low, 1);
 
-    sieve.pre_sieve(primes, c, low, high);
-    sieve.init_counter(low, high);
+    sieve.init_segment(low, high);
+
+    sieve.pre_sieve(primes, c);
+    sieve.init_counter();
     int64_t b = c + 1;
 
     // For c + 1 <= b <= pi_sqrty
