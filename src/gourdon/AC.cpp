@@ -197,7 +197,7 @@ T C2(T xlow,
       i > pi_min_clustered)
   {
     uint64_t iters = 0;
-    uint64_t start_i = i;
+    uint64_t start_ihi = i;
     uint64_t ihi = i;
     uint64_t ilo = pi_min_clustered + 1;
 
@@ -214,8 +214,8 @@ T C2(T xlow,
       uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
       uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
       uint64_t ihi_min = pi[max(xpq2_hi, min_m)] + 1;
-      uint64_t run_lo_hi = max(ihi_min, ilo);
-      sum += phi_xpq_hi * (ihi - run_lo_hi + 1);
+      uint64_t hi_run_lo = max(ihi_min, ilo);
+      sum += phi_xpq_hi * (ihi - hi_run_lo + 1);
       iters += 1;
       ihi = ihi_min - 1;
 
@@ -227,19 +227,18 @@ T C2(T xlow,
       uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
       uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t i_lo_max = pi[min(xpq1_lo, max_m)];
-
-      uint64_t run_hi_lo = min(i_lo_max, ihi);
-      sum += phi_xpq_lo * (run_hi_lo - ilo + 1);
+      uint64_t ilo_max = pi[min(xpq1_lo, max_m)];
+      uint64_t lo_run_hi = min(ilo_max, ihi);
+      sum += phi_xpq_lo * (lo_run_hi - ilo + 1);
       iters += 1;
-      ilo = run_hi_lo + 1;
+      ilo = lo_run_hi + 1;
     }
 
     i = pi_min_clustered;
 
     if (iters > 0)
     {
-      uint64_t dist = start_i - i;
+      uint64_t dist = start_ihi - i;
       avg_clustered_leaves = dist / iters;
     }
   }
