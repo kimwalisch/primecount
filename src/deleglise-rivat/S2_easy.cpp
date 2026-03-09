@@ -9,7 +9,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -82,34 +82,65 @@ T S2_easy_OpenMP(T x,
     min_clustered = in_between(prime, min_clustered, y);
     min_sparse = in_between(prime, min_sparse, y);
 
-    int64_t l = pi[min_trivial];
+    int64_t i = pi[min_trivial];
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    // Find all clustered easy leaves where
-    // successive leaves are identical.
-    // pq = primes[b] * primes[l]
-    // Which satisfy: pq > z && x / pq <= y
-    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    while (l > pi_min_clustered)
+    if (i > pi_min_clustered)
     {
-      int64_t xpq = fast_div64(xp, primes[l]);
-      int64_t pi_xpq = pi[xpq];
-      int64_t phi_xpq = pi_xpq - b + 2;
-      int64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
-      int64_t lmin = pi[xpq2];
-      sum += phi_xpq * (l - lmin);
-      l = lmin;
+      int64_t ihi = i;
+      int64_t ilo = pi_min_clustered + 1;
+
+      // Find all clustered easy leaves where
+      // successive leaves are identical.
+      // pq = primes[b] * primes[i]
+      // Which satisfy: pq > z && x / pq <= y
+      // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+      //
+      // The clustered easy leaves algorithm has poor instruction
+      // level parallelism because of long instruction dependency
+      // chains. To mitigate this issue we process clustered
+      // easy leaves bidirectionally (high-end and low-end streams)
+      // which increases the number of independent instructions
+      // and improves performance on modern out-of-order CPUs.
+      //
+      while (ilo <= ihi)
+      {
+        // High-end stream (decreasing i)
+        int64_t xpq_hi = fast_div64(xp, primes[ihi]);
+        int64_t pi_xpq_hi = pi[xpq_hi];
+        int64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+        int64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
+        int64_t ihi_min = pi[xpq2_hi] + 1;
+        int64_t ihi_min_ilo = max(ihi_min, ilo);
+        sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+        ihi = ihi_min - 1;
+
+        if (ilo > ihi)
+          break;
+
+        // Low-end stream (increasing i)
+        int64_t xpq_lo = fast_div64(xp, primes[ilo]);
+        int64_t pi_xpq_lo = pi[xpq_lo];
+        int64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+        int64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
+        int64_t ilo_max = pi[xpq1_lo];
+        int64_t ilo_max_ihi = min(ilo_max, ihi);
+        sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
+        ilo = ilo_max_ihi + 1;
+      }
+
+      i = pi_min_clustered;
     }
 
     // Find all sparse easy leaves where
     // successive leaves are different.
-    // pq = primes[b] * primes[l]
+    // pq = primes[b] * primes[i]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    for (; l > pi_min_sparse; l--)
+    for (; i > pi_min_sparse; i--)
     {
-      int64_t xpq = fast_div64(xp, primes[l]);
+      int64_t xpq = fast_div64(xp, primes[i]);
       sum += pi[xpq] - b + 2;
     }
 
@@ -150,36 +181,67 @@ T S2_easy_64(T xp128,
   uint64_t min_sparse = z / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
-  uint64_t l = pi[min_trivial];
+  uint64_t i = pi[min_trivial];
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t pi_min_sparse = pi[min_sparse];
 
   T sum = 0;
 
-  // Find all clustered easy leaves where
-  // successive leaves are identical.
-  // pq = primes[b] * primes[l]
-  // Which satisfy: pq > z && x / pq <= y
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  while (l > pi_min_clustered)
+  if (i > pi_min_clustered)
   {
-    uint64_t xpq = xp / primes[l];
-    uint64_t pi_xpq = pi[xpq];
-    uint64_t phi_xpq = pi_xpq - b + 2;
-    uint64_t xpq2 = xp / primes[pi_xpq + 1];
-    uint64_t lmin = pi[xpq2];
-    sum += phi_xpq * (l - lmin);
-    l = lmin;
+    uint64_t ihi = i;
+    uint64_t ilo = pi_min_clustered + 1;
+
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // pq = primes[b] * primes[i]
+    // Which satisfy: pq > z && x / pq <= y
+    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+    //
+    // The clustered easy leaves algorithm has poor instruction
+    // level parallelism because of long instruction dependency
+    // chains. To mitigate this issue we process clustered
+    // easy leaves bidirectionally (high-end and low-end streams)
+    // which increases the number of independent instructions
+    // and improves performance on modern out-of-order CPUs.
+    //
+    while (ilo <= ihi)
+    {
+      // High-end stream (decreasing i)
+      uint64_t xpq_hi = xp / primes[ihi];
+      uint64_t pi_xpq_hi = pi[xpq_hi];
+      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+      uint64_t xpq2_hi = xp / primes[pi_xpq_hi + 1];
+      uint64_t ihi_min = pi[xpq2_hi] + 1;
+      uint64_t ihi_min_ilo = max(ihi_min, ilo);
+      sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+      ihi = ihi_min - 1;
+
+      if (ilo > ihi)
+        break;
+
+      // Low-end stream (increasing i)
+      uint64_t xpq_lo = xp / primes[ilo];
+      uint64_t pi_xpq_lo = pi[xpq_lo];
+      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+      uint64_t xpq1_lo = xp / primes[pi_xpq_lo];
+      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t ilo_max_ihi = min(ilo_max, ihi);
+      sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
+      ilo = ilo_max_ihi + 1;
+    }
+
+    i = pi_min_clustered;
   }
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // pq = primes[b] * primes[l]
+  // pq = primes[b] * primes[i]
   // Which satisfy: pq > z && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; l > pi_min_sparse; l--)
+  for (; i > pi_min_sparse; i--)
   {
-    uint64_t xpq = xp / primes[l];
+    uint64_t xpq = xp / primes[i];
     sum += pi[xpq] - b + 2;
   }
 
@@ -202,35 +264,67 @@ T S2_easy_128(T xp,
   uint64_t min_sparse = z / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
-  uint64_t l = pi[min_trivial];
+  uint64_t i = pi[min_trivial];
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t pi_min_sparse = pi[min_sparse];
 
   T sum = 0;
 
-  // Find all clustered easy leaves where
-  // successive leaves are identical.
-  // pq = primes[b] * primes[l]
-  // Which satisfy: pq > z && x / pq <= y
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  while (l > pi_min_clustered)
+  if (i > pi_min_clustered)
   {
-    uint64_t xpq = fast_div64(xp, primes[l]);
-    uint64_t phi_xpq = pi[xpq] - b + 2;
-    uint64_t xpq2 = fast_div64(xp, primes[b + phi_xpq - 1]);
-    uint64_t lmin = pi[xpq2];
-    sum += phi_xpq * (l - lmin);
-    l = lmin;
+    uint64_t ihi = i;
+    uint64_t ilo = pi_min_clustered + 1;
+
+    // Find all clustered easy leaves where
+    // successive leaves are identical.
+    // pq = primes[b] * primes[i]
+    // Which satisfy: pq > z && x / pq <= y
+    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+    //
+    // The clustered easy leaves algorithm has poor instruction
+    // level parallelism because of long instruction dependency
+    // chains. To mitigate this issue we process clustered
+    // easy leaves bidirectionally (high-end and low-end streams)
+    // which increases the number of independent instructions
+    // and improves performance on modern out-of-order CPUs.
+    //
+    while (ilo <= ihi)
+    {
+      // High-end stream (decreasing i)
+      uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
+      uint64_t pi_xpq_hi = pi[xpq_hi];
+      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+      uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
+      uint64_t ihi_min = pi[xpq2_hi] + 1;
+      uint64_t ihi_min_ilo = max(ihi_min, ilo);
+      sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+      ihi = ihi_min - 1;
+
+      if (ilo > ihi)
+        break;
+
+      // Low-end stream (increasing i)
+      uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
+      uint64_t pi_xpq_lo = pi[xpq_lo];
+      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t ilo_max_ihi = min(ilo_max, ihi);
+      sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
+      ilo = ilo_max_ihi + 1;
+    }
+
+    i = pi_min_clustered;
   }
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // pq = primes[b] * primes[l]
+  // pq = primes[b] * primes[i]
   // Which satisfy: pq > z && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; l > pi_min_sparse; l--)
+  for (; i > pi_min_sparse; i--)
   {
-    uint64_t xpq = fast_div64(xp, primes[l]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += pi[xpq] - b + 2;
   }
 
