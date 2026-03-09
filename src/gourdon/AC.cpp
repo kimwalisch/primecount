@@ -193,7 +193,7 @@ T C2(T xlow,
   // few successive leaves are identical then this loop
   // deteriorates performance due to poor instruction level
   // parallelism and increased cache misses.
-  if (avg_clustered_leaves >= 5 &&
+  if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
     uint64_t ihi = i;
@@ -205,6 +205,14 @@ T C2(T xlow,
     // pq = primes[b] * primes[i]
     // Which satisfy: low <= x / pq < high && q <= y && pq > z
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
+    //
+    // The clustered easy leaves algorithm has poor instruction
+    // level parallelism because of long instruction dependency
+    // chains. To mitigate this issue we process clustered
+    // easy leaves bidirectionally (high-end and low-end streams)
+    // which increases the number of independent instructions
+    // and improves performance on modern out-of-order CPUs.
+    //
     for (; ilo <= ihi; iters++)
     {
       // High-end stream (decreasing i)
