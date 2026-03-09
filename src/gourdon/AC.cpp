@@ -196,17 +196,16 @@ T C2(T xlow,
   if (avg_clustered_leaves >= 5 &&
       i > pi_min_clustered)
   {
-    uint64_t iters = 0;
-    uint64_t start_ihi = i;
     uint64_t ihi = i;
     uint64_t ilo = pi_min_clustered + 1;
+    uint64_t iters = 0;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
     // pq = primes[b] * primes[i]
     // Which satisfy: low <= x / pq < high && q <= y && pq > z
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    while (ilo <= ihi)
+    for (; ilo <= ihi; iters++)
     {
       // High-end stream (decreasing i)
       uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
@@ -216,7 +215,6 @@ T C2(T xlow,
       uint64_t ihi_min = pi[max(xpq2_hi, min_m)] + 1;
       uint64_t hi_run_lo = max(ihi_min, ilo);
       sum += phi_xpq_hi * (ihi - hi_run_lo + 1);
-      iters += 1;
       ihi = ihi_min - 1;
 
       if (ilo > ihi)
@@ -230,17 +228,12 @@ T C2(T xlow,
       uint64_t ilo_max = pi[min(xpq1_lo, max_m)];
       uint64_t lo_run_hi = min(ilo_max, ihi);
       sum += phi_xpq_lo * (lo_run_hi - ilo + 1);
-      iters += 1;
       ilo = lo_run_hi + 1;
     }
 
+    uint64_t dist = i - pi_min_clustered;
+    avg_clustered_leaves = dist / (iters * 2 + 1);
     i = pi_min_clustered;
-
-    if (iters > 0)
-    {
-      uint64_t dist = start_ihi - i;
-      avg_clustered_leaves = dist / iters;
-    }
   }
 
   // Unroll loop to increase instruction level parallelism
