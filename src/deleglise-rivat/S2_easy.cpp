@@ -82,18 +82,18 @@ T S2_easy_OpenMP(T x,
     min_clustered = in_between(prime, min_clustered, y);
     min_sparse = in_between(prime, min_sparse, y);
 
-    int64_t l = pi[min_trivial];
+    int64_t i = pi[min_trivial];
     int64_t pi_min_clustered = pi[min_clustered];
     int64_t pi_min_sparse = pi[min_sparse];
 
-    if (l > pi_min_clustered)
+    if (i > pi_min_clustered)
     {
-      int64_t ihi = l;
+      int64_t ihi = i;
       int64_t ilo = pi_min_clustered + 1;
 
       // Find all clustered easy leaves where
       // successive leaves are identical.
-      // pq = primes[b] * primes[l]
+      // pq = primes[b] * primes[i]
       // Which satisfy: pq > z && x / pq <= y
       // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
       //
@@ -130,17 +130,17 @@ T S2_easy_OpenMP(T x,
         ilo = ilo_max_ihi + 1;
       }
 
-      l = pi_min_clustered;
+      i = pi_min_clustered;
     }
 
     // Find all sparse easy leaves where
     // successive leaves are different.
-    // pq = primes[b] * primes[l]
+    // pq = primes[b] * primes[i]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    for (; l > pi_min_sparse; l--)
+    for (; i > pi_min_sparse; i--)
     {
-      int64_t xpq = fast_div64(xp, primes[l]);
+      int64_t xpq = fast_div64(xp, primes[i]);
       sum += pi[xpq] - b + 2;
     }
 
@@ -181,20 +181,20 @@ T S2_easy_64(T xp128,
   uint64_t min_sparse = z / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
-  uint64_t l = pi[min_trivial];
+  uint64_t i = pi[min_trivial];
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t pi_min_sparse = pi[min_sparse];
 
   T sum = 0;
 
-  if (l > pi_min_clustered)
+  if (i > pi_min_clustered)
   {
-    uint64_t ihi = l;
+    uint64_t ihi = i;
     uint64_t ilo = pi_min_clustered + 1;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
-    // pq = primes[b] * primes[l]
+    // pq = primes[b] * primes[i]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
@@ -231,17 +231,17 @@ T S2_easy_64(T xp128,
       ilo = ilo_max_ihi + 1;
     }
 
-    l = pi_min_clustered;
+    i = pi_min_clustered;
   }
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // pq = primes[b] * primes[l]
+  // pq = primes[b] * primes[i]
   // Which satisfy: pq > z && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; l > pi_min_sparse; l--)
+  for (; i > pi_min_sparse; i--)
   {
-    uint64_t xpq = xp / primes[l];
+    uint64_t xpq = xp / primes[i];
     sum += pi[xpq] - b + 2;
   }
 
@@ -264,20 +264,20 @@ T S2_easy_128(T xp,
   uint64_t min_sparse = z / prime;
   min_clustered = in_between(prime, min_clustered, y);
   min_sparse = in_between(prime, min_sparse, y);
-  uint64_t l = pi[min_trivial];
+  uint64_t i = pi[min_trivial];
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t pi_min_sparse = pi[min_sparse];
 
   T sum = 0;
 
-  if (l > pi_min_clustered)
+  if (i > pi_min_clustered)
   {
-    uint64_t ihi = l;
+    uint64_t ihi = i;
     uint64_t ilo = pi_min_clustered + 1;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
-    // pq = primes[b] * primes[l]
+    // pq = primes[b] * primes[i]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
@@ -314,17 +314,17 @@ T S2_easy_128(T xp,
       ilo = ilo_max_ihi + 1;
     }
 
-    l = pi_min_clustered;
+    i = pi_min_clustered;
   }
 
   // Find all sparse easy leaves where
   // successive leaves are different.
-  // pq = primes[b] * primes[l]
+  // pq = primes[b] * primes[i]
   // Which satisfy: pq > z && x / pq <= y
   // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; l > pi_min_sparse; l--)
+  for (; i > pi_min_sparse; i--)
   {
-    uint64_t xpq = fast_div64(xp, primes[l]);
+    uint64_t xpq = fast_div64(xp, primes[i]);
     sum += pi[xpq] - b + 2;
   }
 
