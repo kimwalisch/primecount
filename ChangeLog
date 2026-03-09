@@ -1,6 +1,8 @@
-Changes in primecount-8.3, 2026-03-06
+Changes in primecount-8.3, 2026-03-09
 
 * fast_div.hpp: Improve x64 assembly.
+* S2_easy.cpp: Bidirectional clustered easy leaves optimization.
+* AC.cpp: Bidirectional clustered easy leaves optimization.
 * AC.cpp: Cast to smaller type optimization.
 * SegmentedPiTable.hpp: Use faster lightweight compression.
 * SegmentedPiTable.cpp: Use faster lightweight compression.
