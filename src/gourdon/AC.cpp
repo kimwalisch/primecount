@@ -623,28 +623,52 @@ T C2_64(T xlow,
   if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
+    uint64_t ihi = i;
+    uint64_t ilo = pi_min_clustered + 1;
     uint64_t iters = 0;
-    uint64_t start_i = i;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
     // pq = primes[b] * primes[i]
     // Which satisfy: low <= x / pq < high && q <= y && pq > z
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    while (i > pi_min_clustered)
+    //
+    // The clustered easy leaves algorithm has poor instruction
+    // level parallelism because of long instruction dependency
+    // chains. To mitigate this issue we process clustered
+    // easy leaves bidirectionally (high-end and low-end streams)
+    // which increases the number of independent instructions
+    // and improves performance on modern out-of-order CPUs.
+    //
+    for (; ilo <= ihi; iters++)
     {
-      uint64_t xpq = xp / primes[i];
-      uint64_t pi_xpq = segmentedPi[xpq];
-      uint64_t phi_xpq = pi_xpq - b + 2;
-      uint64_t xpq2 = xp / primes[pi_xpq + 1];
-      uint64_t imin = pi[max(xpq2, min_m)];
-      sum += phi_xpq * (i - imin);
-      iters += 1;
-      i = imin;
+      // High-end stream (decreasing i)
+      uint64_t xpq_hi = xp / primes[ihi];
+      uint64_t pi_xpq_hi = segmentedPi[xpq_hi];
+      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+      uint64_t xpq2_hi = xp / primes[pi_xpq_hi + 1];
+      uint64_t ihi_min = pi[max(xpq2_hi, min_m)] + 1;
+      uint64_t hi_run_lo = max(ihi_min, ilo);
+      sum += phi_xpq_hi * (ihi - hi_run_lo + 1);
+      ihi = ihi_min - 1;
+
+      if (ilo > ihi)
+        break;
+
+      // Low-end stream (increasing i)
+      uint64_t xpq_lo = xp / primes[ilo];
+      uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
+      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+      uint64_t xpq1_lo = xp / primes[pi_xpq_lo];
+      uint64_t ilo_max = pi[min(xpq1_lo, max_m)];
+      uint64_t lo_run_hi = min(ilo_max, ihi);
+      sum += phi_xpq_lo * (lo_run_hi - ilo + 1);
+      ilo = lo_run_hi + 1;
     }
 
-    uint64_t dist = start_i - i;
-    avg_clustered_leaves = dist / iters;
+    uint64_t dist = i - pi_min_clustered;
+    avg_clustered_leaves = dist / (iters * 2 + 1);
+    i = pi_min_clustered;
   }
 
   // Unroll loop to increase instruction level parallelism
@@ -713,28 +737,52 @@ T C2_128(T xlow,
   if (avg_clustered_leaves >= 6 &&
       i > pi_min_clustered)
   {
+    uint64_t ihi = i;
+    uint64_t ilo = pi_min_clustered + 1;
     uint64_t iters = 0;
-    uint64_t start_i = i;
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
     // pq = primes[b] * primes[i]
     // Which satisfy: low <= x / pq < high && q <= y && pq > z
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    while (i > pi_min_clustered)
+    //
+    // The clustered easy leaves algorithm has poor instruction
+    // level parallelism because of long instruction dependency
+    // chains. To mitigate this issue we process clustered
+    // easy leaves bidirectionally (high-end and low-end streams)
+    // which increases the number of independent instructions
+    // and improves performance on modern out-of-order CPUs.
+    //
+    for (; ilo <= ihi; iters++)
     {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      uint64_t pi_xpq = segmentedPi[xpq];
-      uint64_t phi_xpq = pi_xpq - b + 2;
-      uint64_t xpq2 = fast_div64(xp, primes[pi_xpq + 1]);
-      uint64_t imin = pi[max(xpq2, min_m)];
-      sum += phi_xpq * (i - imin);
-      iters += 1;
-      i = imin;
+      // High-end stream (decreasing i)
+      uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
+      uint64_t pi_xpq_hi = segmentedPi[xpq_hi];
+      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
+      uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
+      uint64_t ihi_min = pi[max(xpq2_hi, min_m)] + 1;
+      uint64_t hi_run_lo = max(ihi_min, ilo);
+      sum += phi_xpq_hi * (ihi - hi_run_lo + 1);
+      ihi = ihi_min - 1;
+
+      if (ilo > ihi)
+        break;
+
+      // Low-end stream (increasing i)
+      uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
+      uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
+      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
+      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t ilo_max = pi[min(xpq1_lo, max_m)];
+      uint64_t lo_run_hi = min(ilo_max, ihi);
+      sum += phi_xpq_lo * (lo_run_hi - ilo + 1);
+      ilo = lo_run_hi + 1;
     }
 
-    uint64_t dist = start_i - i;
-    avg_clustered_leaves = dist / iters;
+    uint64_t dist = i - pi_min_clustered;
+    avg_clustered_leaves = dist / (iters * 2 + 1);
+    i = pi_min_clustered;
   }
 
   // Unroll loop to increase instruction level parallelism
