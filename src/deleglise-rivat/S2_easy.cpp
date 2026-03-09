@@ -93,7 +93,7 @@ T S2_easy_OpenMP(T x,
 
       // Find all clustered easy leaves where
       // successive leaves are identical.
-      // pq = primes[b] * primes[i]
+      // pq = primes[b] * primes[l]
       // Which satisfy: pq > z && x / pq <= y
       // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
       //
@@ -194,7 +194,7 @@ T S2_easy_64(T xp128,
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
-    // pq = primes[b] * primes[i]
+    // pq = primes[b] * primes[l]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
@@ -277,7 +277,7 @@ T S2_easy_128(T xp,
 
     // Find all clustered easy leaves where
     // successive leaves are identical.
-    // pq = primes[b] * primes[i]
+    // pq = primes[b] * primes[l]
     // Which satisfy: pq > z && x / pq <= y
     // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
     //
