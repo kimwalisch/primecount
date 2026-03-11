@@ -50,6 +50,31 @@ using namespace primecount;
 
 namespace {
 
+/// If we detect an average number of identical successive
+/// leaves < 6 twice in a row, we disable the clustered
+/// easy leaves algorithm as it becomes inefficient if few
+/// successive leaves are identical.
+///
+struct ClusteredLeavesStats
+{
+  uint64_t count_below_threshold = 0;
+
+  bool use_clustered() const
+  {
+    return count_below_threshold < 2;
+  }
+
+  void update(uint64_t dist, uint64_t iters)
+  {
+    uint64_t threshold = 6;
+    uint64_t avg_clustered_leaves = dist / iters;
+
+    count_below_threshold++;
+    if (avg_clustered_leaves >= threshold)
+      count_below_threshold = 0;
+  }
+};
+
 #if !defined(ENABLE_LIBDIVIDE)
 
 /// Compute the A formula.
@@ -173,7 +198,7 @@ T C2(T xlow,
      const Primes& primes,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi,
-     uint64_t& avg_clustered_leaves)
+     ClusteredLeavesStats& clusteredLeavesStats)
 {
   T sum = 0;
 
@@ -187,13 +212,12 @@ T C2(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The loop for computing clustered easy leaves (where
-  // successive leaves are identical) is only beneficial if
-  // many successive leaves are identical. If on average only
-  // few successive leaves are identical then this loop
+  // Only use the clustered easy leaves algorithm if many
+  // successive leaves are identical. If on average only few
+  // successive leaves are identical then this algorithm
   // deteriorates performance due to poor instruction level
   // parallelism and increased cache misses.
-  if (avg_clustered_leaves >= 6 &&
+  if (clusteredLeavesStats.use_clustered() &&
       i > pi_min_clustered)
   {
     uint64_t ihi = i;
@@ -213,7 +237,7 @@ T C2(T xlow,
     // which increases the number of independent instructions
     // and improves performance on modern out-of-order CPUs.
     //
-    for (; ilo <= ihi; iters++)
+    while (ilo <= ihi)
     {
       // High-end stream (decreasing i)
       uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
@@ -224,6 +248,7 @@ T C2(T xlow,
       uint64_t ihi_min_ilo = max(ihi_min, ilo);
       sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
       ihi = ihi_min - 1;
+      iters++;
 
       if (ilo > ihi)
         break;
@@ -237,10 +262,11 @@ T C2(T xlow,
       uint64_t ilo_max_ihi = min(ilo_max, ihi);
       sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
       ilo = ilo_max_ihi + 1;
+      iters++;
     }
 
     uint64_t dist = i - pi_min_clustered;
-    avg_clustered_leaves = dist / (iters * 2 + 1);
+    clusteredLeavesStats.update(dist, iters);
     i = pi_min_clustered;
   }
 
@@ -384,7 +410,7 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        uint64_t avg_clustered_leaves = pstd::numeric_limits<uint64_t>::max();
+        ClusteredLeavesStats clusteredLeavesStats;
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
@@ -392,9 +418,9 @@ T AC_OpenMP(T x,
           T xp = x / primes[b];
           
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi, clusteredLeavesStats);
           else
-            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, clusteredLeavesStats);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
@@ -601,7 +627,7 @@ T C2_64(T xlow,
         const LibdividePrimes& primes,
         const PiTable& pi,
         const SegmentedPiTable& segmentedPi,
-        uint64_t& avg_clustered_leaves)
+        ClusteredLeavesStats& clusteredLeavesStats)
 {
   T sum = 0;
 
@@ -614,13 +640,12 @@ T C2_64(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The loop for computing clustered easy leaves (where
-  // successive leaves are identical) is only beneficial if
-  // many successive leaves are identical. If on average only
-  // few successive leaves are identical then this loop
+  // Only use the clustered easy leaves algorithm if many
+  // successive leaves are identical. If on average only few
+  // successive leaves are identical then this algorithm
   // deteriorates performance due to poor instruction level
   // parallelism and increased cache misses.
-  if (avg_clustered_leaves >= 6 &&
+  if (clusteredLeavesStats.use_clustered() &&
       i > pi_min_clustered)
   {
     uint64_t ihi = i;
@@ -640,7 +665,7 @@ T C2_64(T xlow,
     // which increases the number of independent instructions
     // and improves performance on modern out-of-order CPUs.
     //
-    for (; ilo <= ihi; iters++)
+    while (ilo <= ihi)
     {
       // High-end stream (decreasing i)
       uint64_t xpq_hi = xp / primes[ihi];
@@ -651,6 +676,7 @@ T C2_64(T xlow,
       uint64_t ihi_min_ilo = max(ihi_min, ilo);
       sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
       ihi = ihi_min - 1;
+      iters++;
 
       if (ilo > ihi)
         break;
@@ -664,10 +690,11 @@ T C2_64(T xlow,
       uint64_t ilo_max_ihi = min(ilo_max, ihi);
       sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
       ilo = ilo_max_ihi + 1;
+      iters++;
     }
 
     uint64_t dist = i - pi_min_clustered;
-    avg_clustered_leaves = dist / (iters * 2 + 1);
+    clusteredLeavesStats.update(dist, iters);
     i = pi_min_clustered;
   }
 
@@ -714,7 +741,7 @@ T C2_128(T xlow,
          const Primes& primes,
          const PiTable& pi,
          const SegmentedPiTable& segmentedPi,
-         uint64_t& avg_clustered_leaves)
+         ClusteredLeavesStats& clusteredLeavesStats)
 {
   T sum = 0;
 
@@ -728,13 +755,12 @@ T C2_128(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The loop for computing clustered easy leaves (where
-  // successive leaves are identical) is only beneficial if
-  // many successive leaves are identical. If on average only
-  // few successive leaves are identical then this loop
+  // Only use the clustered easy leaves algorithm if many
+  // successive leaves are identical. If on average only few
+  // successive leaves are identical then this algorithm
   // deteriorates performance due to poor instruction level
   // parallelism and increased cache misses.
-  if (avg_clustered_leaves >= 6 &&
+  if (clusteredLeavesStats.use_clustered() &&
       i > pi_min_clustered)
   {
     uint64_t ihi = i;
@@ -754,7 +780,7 @@ T C2_128(T xlow,
     // which increases the number of independent instructions
     // and improves performance on modern out-of-order CPUs.
     //
-    for (; ilo <= ihi; iters++)
+    while (ilo <= ihi)
     {
       // High-end stream (decreasing i)
       uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
@@ -765,6 +791,7 @@ T C2_128(T xlow,
       uint64_t ihi_min_ilo = max(ihi_min, ilo);
       sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
       ihi = ihi_min - 1;
+      iters++;
 
       if (ilo > ihi)
         break;
@@ -778,10 +805,11 @@ T C2_128(T xlow,
       uint64_t ilo_max_ihi = min(ilo_max, ihi);
       sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
       ilo = ilo_max_ihi + 1;
+      iters++;
     }
 
     uint64_t dist = i - pi_min_clustered;
-    avg_clustered_leaves = dist / (iters * 2 + 1);
+    clusteredLeavesStats.update(dist, iters);
     i = pi_min_clustered;
   }
 
@@ -931,7 +959,7 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        uint64_t avg_clustered_leaves = pstd::numeric_limits<uint64_t>::max();
+        ClusteredLeavesStats clusteredLeavesStats;
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
@@ -940,9 +968,9 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, avg_clustered_leaves);
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, clusteredLeavesStats);
           else
-            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, avg_clustered_leaves);
+            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, clusteredLeavesStats);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
