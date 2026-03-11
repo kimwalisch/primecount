@@ -112,8 +112,8 @@ T S2_easy_OpenMP(T x,
         int64_t phi_xpq_hi = pi_xpq_hi - b + 2;
         int64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
         int64_t ihi_min = pi[xpq2_hi] + 1;
-        int64_t ihi_min_ilo = max(ihi_min, ilo);
-        sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+        ASSERT(ihi_min >= ilo);
+        sum += phi_xpq_hi * (ihi - ihi_min + 1);
         ihi = ihi_min - 1;
 
         if (ilo > ihi)
@@ -125,9 +125,9 @@ T S2_easy_OpenMP(T x,
         int64_t phi_xpq_lo = pi_xpq_lo - b + 2;
         int64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
         int64_t ilo_max = pi[xpq1_lo];
-        int64_t ilo_max_ihi = min(ilo_max, ihi);
-        sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
-        ilo = ilo_max_ihi + 1;
+        ASSERT(ilo_max <= ihi);
+        sum += phi_xpq_lo * (ilo_max - ilo + 1);
+        ilo = ilo_max + 1;
       }
 
       i = pi_min_clustered;
@@ -213,8 +213,8 @@ T S2_easy_64(T xp128,
       uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
       uint64_t xpq2_hi = xp / primes[pi_xpq_hi + 1];
       uint64_t ihi_min = pi[xpq2_hi] + 1;
-      uint64_t ihi_min_ilo = max(ihi_min, ilo);
-      sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+      ASSERT(ihi_min >= ilo);
+      sum += phi_xpq_hi * (ihi - ihi_min + 1);
       ihi = ihi_min - 1;
 
       if (ilo > ihi)
@@ -226,9 +226,9 @@ T S2_easy_64(T xp128,
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
       uint64_t xpq1_lo = xp / primes[pi_xpq_lo];
       uint64_t ilo_max = pi[xpq1_lo];
-      uint64_t ilo_max_ihi = min(ilo_max, ihi);
-      sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
-      ilo = ilo_max_ihi + 1;
+      ASSERT(ilo_max <= ihi);
+      sum += phi_xpq_lo * (ilo_max - ilo + 1);
+      ilo = ilo_max + 1;
     }
 
     i = pi_min_clustered;
@@ -296,8 +296,8 @@ T S2_easy_128(T xp,
       uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
       uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
       uint64_t ihi_min = pi[xpq2_hi] + 1;
-      uint64_t ihi_min_ilo = max(ihi_min, ilo);
-      sum += phi_xpq_hi * (ihi - ihi_min_ilo + 1);
+      ASSERT(ihi_min >= ilo);
+      sum += phi_xpq_hi * (ihi - ihi_min + 1);
       ihi = ihi_min - 1;
 
       if (ilo > ihi)
@@ -309,9 +309,9 @@ T S2_easy_128(T xp,
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
       uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
       uint64_t ilo_max = pi[xpq1_lo];
-      uint64_t ilo_max_ihi = min(ilo_max, ihi);
-      sum += phi_xpq_lo * (ilo_max_ihi - ilo + 1);
-      ilo = ilo_max_ihi + 1;
+      ASSERT(ilo_max <= ihi);
+      sum += phi_xpq_lo * (ilo_max - ilo + 1);
+      ilo = ilo_max + 1;
     }
 
     i = pi_min_clustered;
