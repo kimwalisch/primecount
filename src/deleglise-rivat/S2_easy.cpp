@@ -123,8 +123,8 @@ T S2_easy_OpenMP(T x,
         int64_t xpq_lo = fast_div64(xp, primes[ilo]);
         int64_t pi_xpq_lo = pi[xpq_lo];
         int64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-        int64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-        int64_t ilo_max = pi[xpq1_lo];
+        int64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
+        int64_t ilo_max = pi[xpq2_lo];
         ASSERT(ilo_max <= ihi);
         sum += phi_xpq_lo * (ilo_max - ilo + 1);
         ilo = ilo_max + 1;
@@ -224,8 +224,8 @@ T S2_easy_64(T xp128,
       uint64_t xpq_lo = xp / primes[ilo];
       uint64_t pi_xpq_lo = pi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq1_lo = xp / primes[pi_xpq_lo];
-      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t xpq2_lo = xp / primes[pi_xpq_lo];
+      uint64_t ilo_max = pi[xpq2_lo];
       ASSERT(ilo_max <= ihi);
       sum += phi_xpq_lo * (ilo_max - ilo + 1);
       ilo = ilo_max + 1;
@@ -307,8 +307,8 @@ T S2_easy_128(T xp,
       uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
       uint64_t pi_xpq_lo = pi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t ilo_max = pi[xpq2_lo];
       ASSERT(ilo_max <= ihi);
       sum += phi_xpq_lo * (ilo_max - ilo + 1);
       ilo = ilo_max + 1;

@@ -257,8 +257,8 @@ T C2(T xlow,
       uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
       uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t ilo_max = pi[xpq2_lo];
       ASSERT(ilo_max <= ihi);
       sum += phi_xpq_lo * (ilo_max - ilo + 1);
       ilo = ilo_max + 1;
@@ -685,8 +685,8 @@ T C2_64(T xlow,
       uint64_t xpq_lo = xp / primes[ilo];
       uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq1_lo = xp / primes[pi_xpq_lo];
-      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t xpq2_lo = xp / primes[pi_xpq_lo];
+      uint64_t ilo_max = pi[xpq2_lo];
       ASSERT(ilo_max <= ihi);
       sum += phi_xpq_lo * (ilo_max - ilo + 1);
       ilo = ilo_max + 1;
@@ -800,8 +800,8 @@ T C2_128(T xlow,
       uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
       uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
       uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq1_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t ilo_max = pi[xpq1_lo];
+      uint64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
+      uint64_t ilo_max = pi[xpq2_lo];
       ASSERT(ilo_max <= ihi);
       sum += phi_xpq_lo * (ilo_max - ilo + 1);
       ilo = ilo_max + 1;
