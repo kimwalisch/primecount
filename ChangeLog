@@ -1,4 +1,4 @@
-Changes in primecount-8.3, 2026-03-09
+Changes in primecount-8.3, 2026-03-12
 
 * fast_div.hpp: Improve x64 assembly.
 * S2_easy.cpp: Bidirectional clustered easy leaves optimization.
@@ -9,6 +9,7 @@ Changes in primecount-8.3, 2026-03-09
 * Sieve.cpp: Optimize cross_off() and cross_off_count().
 * Sieve.cpp: Tune minimum counter distance.
 * nth_prime_sieve.hpp: Optimize 128-bit division on x64 CPUs.
+* README.md: Update benchmark timings.
 
 Changes in primecount-8.2, 2026-02-01
 
