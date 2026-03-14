@@ -3,7 +3,7 @@
 ///        This file contains helper functions and global variables
 ///        that are initialized with default settings.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -325,7 +325,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // synchronization. The larger alpha_z, the less work there will
     // be in the C1 algorithm. Hence for computations >= 10^23 using
     // an alpha_z > 1 will likely improve performance.
-    alpha_z = 2;
+    alpha_z = 1.5;
 
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);

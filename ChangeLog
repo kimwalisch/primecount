@@ -10,6 +10,7 @@ Changes in primecount-8.3, 2026-03-14
 * Sieve.cpp: Optimize cross_off() and cross_off_count().
 * Sieve.cpp: Tune minimum counter distance.
 * nth_prime_sieve.hpp: Optimize 128-bit division on x64 CPUs.
+* util.hpp: Tune alpha_z for new AC algorithm.
 * README.md: Update benchmark timings.
 
 Changes in primecount-8.2, 2026-02-01
