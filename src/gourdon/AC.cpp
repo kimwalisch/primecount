@@ -272,7 +272,10 @@ T C2(T xlow,
 
   if (i > pi_min_m)
   {
+    // Add the constant (-b + 2) contribution from
+    // pi(x / pq) - b + 2 for all iterations.
     uint64_t iters = i - pi_min_m;
+    sum -= T(b - 2) * iters;
 
     // Unroll loop to increase instruction level parallelism
     for (; i > pi_min_m + 3; i -= 4)
@@ -298,10 +301,6 @@ T C2(T xlow,
       uint64_t xpq = fast_div64(xp, primes[i]);
       sum += segmentedPi[xpq];
     }
-
-    // Add the constant (-b + 2) contribution from
-    // pi(x / pq) - b + 2 for all iterations.
-    sum -= T(b - 2) * iters;
   }
 
   return sum;
@@ -709,7 +708,10 @@ T C2_64(T xlow,
 
   if (i > pi_min_m)
   {
+    // Add the constant (-b + 2) contribution from
+    // pi(x / pq) - b + 2 for all iterations.
     uint64_t iters = i - pi_min_m;
+    sum -= T(b - 2) * iters;
 
     // Unroll loop to increase instruction level parallelism
     for (; i > pi_min_m + 3; i -= 4)
@@ -735,10 +737,6 @@ T C2_64(T xlow,
       uint64_t xpq = xp / primes[i];
       sum += segmentedPi[xpq];
     }
-
-    // Add the constant (-b + 2) contribution from
-    // pi(x / pq) - b + 2 for all iterations.
-    sum -= T(b - 2) * iters;
   }
 
   return sum;
@@ -833,7 +831,10 @@ T C2_128(T xlow,
 
   if (i > pi_min_m)
   {
+    // Add the constant (-b + 2) contribution from
+    // pi(x / pq) - b + 2 for all iterations.
     uint64_t iters = i - pi_min_m;
+    sum -= T(b - 2) * iters;
 
     // Unroll loop to increase instruction level parallelism
     for (; i > pi_min_m + 3; i -= 4)
@@ -859,10 +860,6 @@ T C2_128(T xlow,
       uint64_t xpq = fast_div64(xp, primes[i]);
       sum += segmentedPi[xpq];
     }
-
-    // Add the constant (-b + 2) contribution from
-    // pi(x / pq) - b + 2 for all iterations.
-    sum -= T(b - 2) * iters;
   }
 
   return sum;
