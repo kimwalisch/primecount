@@ -54,7 +54,7 @@ public:
 
   static constexpr int64_t numbers_per_byte()
   {
-    return 128 / sizeof(pi_t);
+    return 128 / (sizeof(uint64_t) * 2);
   }
 
   /// Make sure size % 128 == 0
@@ -80,24 +80,19 @@ public:
       return 0;
 
     x -= low_;
-    uint64_t count = pi_[x / 128].count;
-    uint64_t bits = pi_[x / 128].bits;
+    uint64_t bits = bits_[x / 128];
     uint64_t bitmask = unset_larger_[x % 128];
-    return count + popcnt64(bits & bitmask);
+    uint64_t count_bits = popcnt64(bits & bitmask);
+    return pi_[x / 128] + count_bits;
   }
 
 private:
   void init_bits();
   void init_count(uint64_t pi_low);
 
-  struct pi_t
-  {
-    uint64_t count;
-    uint64_t bits;
-  };
-
   static const Array<uint64_t, 128> unset_larger_;
-  Vector<pi_t> pi_;
+  Vector<uint64_t> bits_;
+  Vector<uint64_t> pi_;
   uint64_t low_ = 0;
   uint64_t high_ = 0;
 };

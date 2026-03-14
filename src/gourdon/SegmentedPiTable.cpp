@@ -110,10 +110,9 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   high_ = high;
   uint64_t segment_size = high - low;
   uint64_t size = ceil_div(segment_size, 128);
-
-  pi_.clear();
+  bits_.resize(size);
   pi_.resize(size);
-  std::fill(pi_.begin(), pi_.end(), pi_t{0, 0});
+  std::fill_n(&bits_[0], size, 0);
 
   init_bits();
   init_count(pi_low);
@@ -131,12 +130,11 @@ void SegmentedPiTable::init_bits()
   uint64_t prime = 0;
 
   // For each prime in [low, high[ set the
-  // corresponding bit in the pi[x] lookup table.
+  // corresponding bit in the bits[i] lookup table.
   while ((prime = it.next_prime()) < high_)
   {
     uint64_t i = (prime - low_) / 128;
-    uint64_t prime_bit = 1ull << (prime % 128 / 2);
-    pi_[i].bits |= prime_bit;
+    bits_[i] |= 1ull << (prime % 128 / 2);
   }
 }
 
@@ -152,8 +150,8 @@ void SegmentedPiTable::init_count(uint64_t pi_low)
   // Count 1 bits (primes) in pi[x] lookup table
   for (uint64_t i = 0; i < j; i++)
   {
-    pi_[i].count = pi_low;
-    pi_low += popcnt64(pi_[i].bits);
+    pi_[i] = pi_low;
+    pi_low += popcnt64(bits_[i]);
   }
 }
 

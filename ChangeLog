@@ -1,4 +1,4 @@
-Changes in primecount-8.3, 2026-03-12
+Changes in primecount-8.3, 2026-03-14
 
 * fast_div.hpp: Improve x64 assembly.
 * S2_easy.cpp: Bidirectional clustered easy leaves optimization.
@@ -6,6 +6,7 @@ Changes in primecount-8.3, 2026-03-12
 * AC.cpp: Cast to smaller type optimization.
 * SegmentedPiTable.hpp: Use faster lightweight compression.
 * SegmentedPiTable.cpp: Use faster lightweight compression.
+* SegmentedPiTable.cpp: Do not interleave pi and bits lookup tables.
 * Sieve.cpp: Optimize cross_off() and cross_off_count().
 * Sieve.cpp: Tune minimum counter distance.
 * nth_prime_sieve.hpp: Optimize 128-bit division on x64 CPUs.
