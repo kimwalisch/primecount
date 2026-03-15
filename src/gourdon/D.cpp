@@ -115,15 +115,16 @@ T D_thread_default(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      auto number = factor.number_cursor(max_m);
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = max_m; m > min_m; m--, number.prev())
       {
         // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
         {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = fast_div64(xp, number.value());
           int64_t count = sieve.count(xpm - low);
           int64_t phi_xpm = phi[b] + count;
           int64_t mu_m = factor.mu(m);
@@ -244,15 +245,16 @@ T D_thread_avx512(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      auto number = factor.number_cursor(max_m);
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = max_m; m > min_m; m--, number.prev())
       {
         // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
         {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = fast_div64(xp, number.value());
           int64_t count = sieve.count_avx512(xpm - low);
           int64_t phi_xpm = phi[b] + count;
           int64_t mu_m = factor.mu(m);
@@ -373,15 +375,16 @@ T D_thread_arm_sve(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      auto number = factor.number_cursor(max_m);
 
-      for (int64_t m = max_m; m > min_m; m--)
+      for (int64_t m = max_m; m > min_m; m--, number.prev())
       {
         // mu[m] != 0 &&
         // lpf[m] > prime &&
         // mpf[m] <= y
         if (prime < factor.is_leaf(m))
         {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = fast_div64(xp, number.value());
           int64_t count = sieve.count_arm_sve(xpm - low);
           int64_t phi_xpm = phi[b] + count;
           int64_t mu_m = factor.mu(m);

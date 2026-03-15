@@ -30,6 +30,35 @@ namespace primecount {
 class BaseFactorTable
 {
 public:
+  /// NumberCursor tracks the number corresponding to a FactorTable
+  /// index and can move to the previous number represented by the
+  /// FactorTable using only lookup tables and a subtraction.
+  class NumberCursor
+  {
+  public:
+    explicit NumberCursor(uint64_t index)
+      : number_(BaseFactorTable::to_number(index)),
+        coprime_index_(index % 480)
+    { }
+
+    int64_t value() const
+    {
+      return number_;
+    }
+
+    void prev()
+    {
+      number_ -= BaseFactorTable::prev_coprime_gaps_[coprime_index_];
+      coprime_index_--;
+      if (coprime_index_ == -1)
+        coprime_index_ = 479;
+    }
+
+  private:
+    int64_t number_;
+    int64_t coprime_index_;
+  };
+
   static int64_t to_index(uint64_t number)
   {
     ASSERT(number > 0);
@@ -53,6 +82,11 @@ public:
     return to_number(1);
   }
 
+  NumberCursor number_cursor(uint64_t index) const
+  {
+    return NumberCursor(index);
+  }
+
 protected:
   /// Find the first multiple (of prime) >= low which
   /// is not divisible by any prime <= 11.
@@ -73,6 +107,7 @@ protected:
   }
 
   static const Array<uint16_t, 480> coprime_;
+  static const Array<uint8_t, 480> prev_coprime_gaps_;
   static const Array<int16_t, 2310> coprime_indexes_;
 };
 
