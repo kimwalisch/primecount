@@ -13,6 +13,7 @@
 #include <imath.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <iostream>
 #include <cstdlib>
 #include <random>
@@ -54,6 +55,7 @@ int main()
     {
       low = high;
       high = low + segment_size;
+      high = std::min(high, limit);
       if (++init_count % 10 == 0)
         segmentedPi = SegmentedPiTable();
       segmentedPi.init(low, high, limit);
@@ -70,6 +72,7 @@ int main()
     {
       low = high;
       high = low + segment_size;
+      high = std::min(high, limit);
       if (++init_count % 10 == 0)
         segmentedPi = SegmentedPiTable();
       segmentedPi.init(low, high, limit);
@@ -83,6 +86,7 @@ int main()
   {
     low = high;
     high = low + segment_size;
+    high = std::min(high, limit);
     segmentedPi.init(low, high, limit);
   }
 
