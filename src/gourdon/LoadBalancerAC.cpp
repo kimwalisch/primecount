@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -48,20 +48,28 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // hits and we get good performance.
   int64_t L1_segment_size = L1_CACHE_SIZE * SegmentedPiTable::numbers_per_byte();
 
-  if (threads == 1 && !is_print)
+  if (threads == 1)
   {
-    // When using a single thread (and printing is disabled)
-    // we can use a segment size larger than x^(1/4)
-    // because load balancing is only needed for multi-threading.
+    // When using a single thread we can use a segment
+    // size larger than x^(1/4) because load balancing
+    // is only needed for multi-threading.
     segment_size_ = std::max(x14, L1_segment_size);
-    segments_ = ceil_div(sqrtx, segment_size_);
+
+    // When status printing is enabled (and threads = 1)
+    // we start with a single segment and then gradually
+    // increase the number of segments. This way we can
+    // regularly print status updates.
+    if (is_print)
+      segments_ = 1;
+    else
+      segments_ = ceil_div(sqrtx, segment_size_);
   }
   else
   {
-    // When using multi-threading we use a tiny segment size
-    // of x^(1/4). This segment fits into the CPU's cache
-    // and ensures good load balancing i.e. the work is evenly
-    // distributed amongst all CPU cores.
+    // When using multi-threading we use a tiny segment
+    // size of x^(1/4). This segment fits into the CPU's
+    // cache and ensures good load balancing i.e. the
+    // work is evenly distributed amongst all CPU cores.
     segment_size_ = x14;
     segments_ = 1;
   }

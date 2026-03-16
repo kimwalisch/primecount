@@ -9,6 +9,7 @@ Changes in primecount-8.3, 2026-03-16
 * SegmentedPiTable.cpp: Do not interleave pi and bits lookup tables.
 * SegmentedPiTable.cpp: Reuse primesieve::iterator object when
   initializing multiple segments.
+* LoadBalancerAC.cpp: Tune single thread performance.
 * Sieve.cpp: Optimize cross_off() and cross_off_count().
 * Sieve.cpp: Tune minimum counter distance.
 * nth_prime_sieve.hpp: Optimize 128-bit division on x64 CPUs.
