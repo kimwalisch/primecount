@@ -36,7 +36,6 @@
 #include <stdint.h>
 #include <algorithm>
 
-
 namespace {
 
 constexpr uint64_t bitmask(uint64_t n)
@@ -85,11 +84,13 @@ const Array<uint64_t, 128> SegmentedPiTable::unset_larger_ =
   bitmask(124), bitmask(125), bitmask(126), bitmask(127)
 };
 
-void SegmentedPiTable::init(uint64_t low, uint64_t high)
+void SegmentedPiTable::init(uint64_t low,
+                            uint64_t high,
+                            uint64_t limit)
 {
-  ASSERT(low < high);
   ASSERT(low % 128 == 0);
-  int threads = 1;
+  ASSERT(low < high);
+  ASSERT(high <= limit);
   uint64_t pi_low = 0;
 
   // In order to make the threads completely independent from
@@ -98,43 +99,53 @@ void SegmentedPiTable::init(uint64_t low, uint64_t high)
   // LoadBalancer. However if a thread processes consecutive
   // segments, then we can compute PrimePi[low] in O(1) by
   // getting that value from the previous segment.
-  if (low >= 2)
+  if (low > 0)
   {
     if (low == high_)
       pi_low = operator[](low - 1);
     else
+    {
+      int threads = 1;
       pi_low = pi_noprint(low - 1, threads);
+      next_prime_ = 0;
+    }
   }
 
   low_ = low;
   high_ = high;
+
   uint64_t segment_size = high - low;
   uint64_t size = ceil_div(segment_size, 128);
   bits_.resize(size);
   pi_.resize(size);
   std::fill_n(&bits_[0], size, 0);
 
-  init_bits();
+  init_bits(limit);
   init_count(pi_low);
 }
 
 /// Init pi[x] lookup table for [low, high[
-void SegmentedPiTable::init_bits()
+void SegmentedPiTable::init_bits(uint64_t limit)
 {
   // Iterate over primes >= 3
   uint64_t low = max(low_, 3);
+
   if (low >= high_)
     return;
 
-  primesieve::iterator it(low, high_);
-  uint64_t prime = 0;
+  if (!next_prime_)
+  {
+    iterator_.jump_to(low, limit);
+    next_prime_ = iterator_.next_prime();
+  }
 
   // For each prime in [low, high[ set the
   // corresponding bit in the bits[i] lookup table.
-  while ((prime = it.next_prime()) < high_)
+  while (next_prime_ < high_)
   {
-    uint64_t i = (prime - low_) / 128;
-    bits_[i] |= 1ull << (prime % 128 / 2);
+    uint64_t i = (next_prime_ - low_) / 128;
+    bits_[i] |= 1ull << (next_prime_ % 128 / 2);
+    next_prime_ = iterator_.next_prime();
   }
 }
 

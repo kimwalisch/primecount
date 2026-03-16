@@ -382,7 +382,7 @@ T AC_OpenMP(T x,
         // Current segment [low, high[
         int64_t high = low + segment_size;
         high = min(high, sqrtx);
-        segmentedPi.init(low, high);
+        segmentedPi.init(low, high, limit);
 
         // We measure the thread computation time excluding the
         // first expensive initialization of the segmentedPi
@@ -931,7 +931,7 @@ T AC_OpenMP(T x,
         // Current segment [low, high[
         int64_t high = low + segment_size;
         high = min(high, sqrtx);
-        segmentedPi.init(low, high);
+        segmentedPi.init(low, high, limit);
 
         // We measure the thread computation time excluding the
         // first expensive initialization of the segmentedPi

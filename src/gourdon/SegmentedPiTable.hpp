@@ -28,6 +28,7 @@
 #ifndef SEGMENTEDPITABLE_HPP
 #define SEGMENTEDPITABLE_HPP
 
+#include <primesieve.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
 #include <popcnt.hpp>
@@ -40,7 +41,7 @@ namespace primecount {
 class SegmentedPiTable
 {
 public:
-  void init(uint64_t low, uint64_t high);
+  void init(uint64_t low, uint64_t high, uint64_t limit);
 
   int64_t low() const
   {
@@ -87,7 +88,7 @@ public:
   }
 
 private:
-  void init_bits();
+  void init_bits(uint64_t limit);
   void init_count(uint64_t pi_low);
 
   static const Array<uint64_t, 128> unset_larger_;
@@ -95,6 +96,8 @@ private:
   Vector<uint64_t> pi_;
   uint64_t low_ = 0;
   uint64_t high_ = 0;
+  uint64_t next_prime_ = 0;
+  primesieve::iterator iterator_;
 };
 
 } // namespace

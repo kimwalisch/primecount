@@ -44,7 +44,8 @@ int main()
   int64_t i = 0;
   int64_t low = 0;
   int64_t high = segment_size;
-  segmentedPi.init(low, high);
+  int init_count = 1;
+  segmentedPi.init(low, high, limit);
 
   // Check small pi(x) values
   for (; i <= 1000; i++)
@@ -53,7 +54,9 @@ int main()
     {
       low = high;
       high = low + segment_size;
-      segmentedPi.init(low, high);
+      if (++init_count % 10 == 0)
+        segmentedPi = SegmentedPiTable();
+      segmentedPi.init(low, high, limit);
     }
 
     std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
@@ -67,7 +70,9 @@ int main()
     {
       low = high;
       high = low + segment_size;
-      segmentedPi.init(low, high);
+      if (++init_count % 10 == 0)
+        segmentedPi = SegmentedPiTable();
+      segmentedPi.init(low, high, limit);
     }
 
     std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
@@ -78,7 +83,7 @@ int main()
   {
     low = high;
     high = low + segment_size;
-    segmentedPi.init(low, high);
+    segmentedPi.init(low, high, limit);
   }
 
   // Check max pi(x) value.
