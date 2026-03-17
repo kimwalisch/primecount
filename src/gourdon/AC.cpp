@@ -416,7 +416,7 @@ T AC_OpenMP(T x,
         for (int64_t b = min_c2; b <= max_c2; b++)
         {
           T xp = x / primes[b];
-          
+
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi, clusteredLeavesStats);
           else
