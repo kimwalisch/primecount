@@ -17,6 +17,8 @@
     __has_include(<arm_sve.h>)
   #define ENABLE_ARM_SVE
 #elif defined(__AVX512F__) && \
+      defined(__AVX512BW__) && \
+      defined(__AVX512VL__) && \
       defined(__AVX512VPOPCNTDQ__) && \
       __has_include(<immintrin.h>)
   #define ENABLE_AVX512_VPOPCNT

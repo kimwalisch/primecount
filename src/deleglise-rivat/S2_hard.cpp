@@ -179,7 +179,7 @@ T S2_hard_thread_default(T x,
 /// Sieve::count_avx512(), which is important for performance.
 ///
 template <typename T, typename Primes, typename FactorTable>
-__attribute__ ((target ("avx512f,avx512vpopcntdq")))
+__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
 T S2_hard_thread_avx512(T x,
                         int64_t y,
                         int64_t z,

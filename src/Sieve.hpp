@@ -85,13 +85,13 @@ public:
 
   /// Count 1 bits inside [0, stop]
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
   #endif
   uint64_t count_avx512(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
   #endif
   uint64_t count_avx512(uint64_t start, uint64_t stop) const;
 

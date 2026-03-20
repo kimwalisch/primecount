@@ -42,12 +42,85 @@
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
 #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #include <immintrin.h>
   #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
 using namespace primecount;
 
 namespace {
+
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi32_avx512(const uint16_t* factor_data,
+                                 __m512i reverse32)
+{
+  __m256i vec = _mm256_loadu_si256((const __m256i*) factor_data);
+  return _mm512_permutexvar_epi32(reverse32, _mm512_cvtepu16_epi32(vec));
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi32_avx512(const uint32_t* factor_data,
+                                 __m512i reverse32)
+{
+  __m512i vec = _mm512_loadu_si512((const void*) factor_data);
+  return _mm512_permutexvar_epi32(reverse32, vec);
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi32_avx512(const uint16_t* factor_data,
+                                 __mmask16 load_mask,
+                                 __m512i reverse32)
+{
+  __m256i vec = _mm256_maskz_loadu_epi16(load_mask, factor_data);
+  return _mm512_permutexvar_epi32(reverse32, _mm512_cvtepu16_epi32(vec));
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi32_avx512(const uint32_t* factor_data,
+                                 __mmask16 load_mask,
+                                 __m512i reverse32)
+{
+  __m512i vec = _mm512_maskz_loadu_epi32(load_mask, factor_data);
+  return _mm512_permutexvar_epi32(reverse32, vec);
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi64_avx512(const uint16_t* factor_data,
+                                 __m512i reverse64)
+{
+  __m128i vec = _mm_loadu_si128((const __m128i*) factor_data);
+  return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu16_epi64(vec));
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi64_avx512(const uint32_t* factor_data,
+                                 __m512i reverse64)
+{
+  __m256i vec = _mm256_loadu_si256((const __m256i*) factor_data);
+  return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu32_epi64(vec));
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi64_avx512(const uint16_t* factor_data,
+                                 __mmask8 load_mask,
+                                 __m512i reverse64)
+{
+  __m128i vec = _mm_maskz_loadu_epi16(load_mask, factor_data);
+  return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu16_epi64(vec));
+}
+
+ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+__m512i load_factor_epi64_avx512(const uint32_t* factor_data,
+                                 __mmask8 load_mask,
+                                 __m512i reverse64)
+{
+  __m256i vec = _mm256_maskz_loadu_epi32(load_mask, factor_data);
+  return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu32_epi64(vec));
+}
+
+#endif
 
 /// Compute the contribution of the hard special leaves using a
 /// segmented sieve. Each thread processes the interval
@@ -172,17 +245,18 @@ T D_thread_default(T x,
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
-/// The only difference between this function and
-/// D_thread_default() is that this function uses the faster
-/// sieve.count_avx512() instead of sieve.count().
+/// This algorithm computes the hard special leaves in the Gourdon
+/// prime counting algorithm. This algorithm is identical to
+/// D_thread_default() except that parts of the algorithm have
+/// been vectorized using AVX512.
 ///
-/// Both this function and the Sieve::count_avx512() function
-/// have been annotated using the same AVX512 __attribute__.
-/// This ensures that the compiler will inline
-/// Sieve::count_avx512(), which is important for performance.
+/// For performance it is important that all AVX512 helper functions
+/// are inlined by the compiler. We achieve this by annotating all
+/// AVX512 helper functions using the same AVX512 __attribute__ and
+/// the ALWAYS_INLINE macro.
 ///
 template <typename T, typename Primes, typename FactorTableD>
-__attribute__ ((target ("avx512f,avx512vpopcntdq")))
+__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
 T D_thread_avx512(T x,
                   int64_t x_star,
                   int64_t xz,
@@ -194,8 +268,6 @@ T D_thread_avx512(T x,
                   const FactorTableD& factor,
                   ThreadData& thread)
 {
-  T sum = 0;
-
   int64_t low = thread.low;
   int64_t low1 = max(low, 1);
   int64_t segments = thread.segments;
@@ -212,6 +284,17 @@ T D_thread_avx512(T x,
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
+
+  Array<uint32_t, 256> m_indexes32;
+  Array< int64_t, 128> m_indexes64;
+  const auto* factor_data = factor.factor_data();
+
+  __m512i reverse32 = _mm512_setr_epi32(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+  __m512i reverse64 = _mm512_setr_epi64(7, 6, 5, 4, 3, 2, 1, 0);
+  __m512i m_offsets32 = _mm512_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  __m512i m_offsets64 = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
+
+  T sum = 0;
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -244,19 +327,138 @@ T D_thread_avx512(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      std::size_t m_count = 0;
+      int64_t m = max_m;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      if (FactorTableD::max() <= UINT32_MAX ||
+          max_m <= UINT32_MAX)
       {
-        // mu[m] != 0 &&
-        // lpf[m] > prime &&
-        // mpf[m] <= y
-        if (prime < factor.is_leaf(m))
+        __m512i prime_vec = _mm512_set1_epi32(uint32_t(prime));
+        constexpr std::size_t max_m_count = m_indexes32.size() - 31;
+
+        for (; m > min_m + 15; m -= 16)
         {
+          if (m_count > max_m_count)
+          {
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = m_indexes32[i];
+              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t count = sieve.count_avx512(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m) * phi_xpm;
+            }
+            m_count = 0;
+          }
+
+          // Filter out square free m values using AVX512
+          // that satisfy: prime < factor.is_leaf(m)
+          __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
+          __m512i factor_vec = load_factor_epi32_avx512(&factor_data[m - 15], reverse32);
+          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
+          _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
+          m_count += popcnt64_native(mask);
+        }
+
+        if (m > min_m)
+        {
+          if_likely(m >= 15)
+          {
+            // Filter out last 7 square free m values
+            __mmask16 load_mask = (__mmask16) (0xffff0000 >> uint64_t(m - min_m));
+            __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
+            __m512i factor_vec = load_factor_epi32_avx512(&factor_data[m - 15], load_mask, reverse32);
+            __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
+            _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
+            m_count += popcnt64_native(mask);
+          }
+          else
+          {
+            // This only occurs for x < 10^10
+            for (; m > min_m; m--)
+            {
+              m_indexes32[m_count] = uint32_t(m);
+              m_count += (prime < factor_data[m]);
+            }
+          }
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = m_indexes32[i];
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t count = sieve.count_avx512(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          int64_t mu_m = factor.mu(m);
-          sum -= mu_m * phi_xpm;
+          sum -= factor.mu(m) * phi_xpm;
+        }
+      }
+      else
+      {
+        __m512i prime_vec = _mm512_set1_epi64(prime);
+        constexpr std::size_t max_m_count = m_indexes64.size() - 15;
+
+        for (; m > min_m + 7; m -= 8)
+        {
+          if (m_count > max_m_count)
+          {
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = m_indexes64[i];
+              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t count = sieve.count_avx512(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m) * phi_xpm;
+            }
+            m_count = 0;
+          }
+
+          // Filter out square free m values using AVX512
+          // that satisfy: prime < factor.is_leaf(m)
+          __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
+          __m512i factor_vec = load_factor_epi64_avx512(&factor_data[m - 7], reverse64);
+          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
+          _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
+          m_count += popcnt64_native(mask);
+        }
+
+        if (m > min_m)
+        {
+          if_likely(m >= 7)
+          {
+            // Filter out last 7 square free m values
+            __mmask8 load_mask = (__mmask8) (0xff00 >> uint64_t(m - min_m));
+            __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
+            __m512i factor_vec = load_factor_epi64_avx512(&factor_data[m - 7], load_mask, reverse64);
+            __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
+            _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
+            m_count += popcnt64_native(mask);
+          }
+          else
+          {
+            // This only occurs for x < 10^8
+            for (; m > min_m; m--)
+            {
+              m_indexes64[m_count] = m;
+              m_count += (prime < factor_data[m]);
+            }
+          }
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = m_indexes64[i];
+          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t count = sieve.count_avx512(xpm - low);
+          int64_t phi_xpm = phi[b] + count;
+          sum -= factor.mu(m) * phi_xpm;
         }
       }
 

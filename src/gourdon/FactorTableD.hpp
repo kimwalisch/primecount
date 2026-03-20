@@ -37,7 +37,7 @@
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (prime < factor[n])
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -66,6 +66,8 @@ template <typename T>
 class FactorTableD : public BaseFactorTable
 {
 public:
+  using value_type = T;
+
   /// Factor numbers <= z
   FactorTableD(int64_t y,
                int64_t z,
@@ -197,6 +199,11 @@ public:
     return factor_[index];
   }
 
+  const T* factor_data() const
+  {
+    return factor_.data();
+  }
+
   /// Get the Möbius function value of the number
   /// n = to_number(index).
   ///
@@ -222,11 +229,29 @@ public:
       return 1;
   }
 
-  static maxint_t max()
+#if __cplusplus >= 201402L
+
+  static constexpr int64_t max()
   {
-    maxint_t T_MAX = pstd::numeric_limits<T>::max();
-    return ipow<2>(T_MAX - 1) - 1;
+    static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
+    constexpr uint64_t MAX_T = pstd::numeric_limits<T>::max();
+    constexpr uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
+    constexpr uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
+    return (int64_t) std::min(MAX_M, MAX_INT64_T);
   }
+
+#else
+
+  static int64_t max()
+  {
+    static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
+    uint64_t MAX_T = pstd::numeric_limits<T>::max();
+    uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
+    uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
+    return (int64_t) std::min(MAX_M, MAX_INT64_T);
+  }
+
+#endif
 
 private:
   Vector<T> factor_;

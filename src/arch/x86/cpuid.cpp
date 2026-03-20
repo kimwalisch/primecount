@@ -20,6 +20,8 @@
 
 // %ebx bit flags
 #define bit_AVX512F (1 << 16)
+#define bit_AVX512_BW (1 << 30)
+#define bit_AVX512_VL (1u << 31)
 
 // %ecx bit flags
 #define bit_AVX512_VPOPCNTDQ (1 << 14)
@@ -116,8 +118,10 @@ bool has_cpuid_avx512_vpopcnt()
 
   run_cpuid(7, 0, abcd);
 
-  // AVX512F, AVX512VPOPCNTDQ
+  // AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ
   return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
+          (abcd[1] & bit_AVX512_BW) == bit_AVX512_BW &&
+          (abcd[1] & bit_AVX512_VL) == bit_AVX512_VL &&
           (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
 }
 
