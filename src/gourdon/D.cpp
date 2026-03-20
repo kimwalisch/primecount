@@ -380,7 +380,7 @@ T D_thread_avx512(T x,
         {
           // Filter out the last few square free m
           int count = int(m - min_m);
-          __mmask16 load_mask = (__mmask16) ((1u << count) - 1);
+          __mmask16 load_mask = __mmask16((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
           __m512i factor_vec = load_factor_tail_epi32_avx512(&factor_data[min_m + 1], load_mask, count, m_offsets32);
           __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
@@ -435,7 +435,7 @@ T D_thread_avx512(T x,
         {
           // Filter out the last few square free m
           int count = int(m - min_m);
-          __mmask8 load_mask = (__mmask8) ((1u << count) - 1);
+          __mmask8 load_mask = __mmask8((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
           __m512i factor_vec = load_factor_tail_epi64_avx512(&factor_data[min_m + 1], load_mask, count, m_offsets64);
           __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
