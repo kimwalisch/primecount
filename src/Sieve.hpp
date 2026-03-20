@@ -38,7 +38,6 @@
 #define SIEVE_HPP
 
 #include <cpu_arch_macros.hpp>
-#include <print.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -55,7 +54,6 @@ public:
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t align_segment_size(uint64_t size);
-  static string_view_t count_algo_name();
 
   uint64_t get_total_count() const
   {

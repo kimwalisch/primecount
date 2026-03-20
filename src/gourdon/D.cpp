@@ -206,6 +206,25 @@ T D_thread(Args&&... args)
   #endif
 }
 
+string_view_t D_algo_name()
+{
+  #if defined(ENABLE_AVX512_VPOPCNT)
+    return "Algorithm: AVX512";
+  #elif defined(ENABLE_ARM_SVE)
+    return "Algorithm: ARM SVE";
+  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    return cpu_supports_avx512_vpopcnt
+      ? "Algorithm: AVX512"
+      : "Algorithm: POPCNT64";
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    return cpu_supports_sve
+      ? "Algorithm: ARM SVE"
+      : "Algorithm: POPCNT64";
+  #else
+    return "Algorithm: POPCNT64";
+  #endif
+}
+
 /// Calculate the contribution of the hard special leaves.
 ///
 /// This is a parallel D(x, y) implementation with advanced load
@@ -287,7 +306,7 @@ int64_t D(int64_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print(Sieve::count_algo_name());
+    print(D_algo_name());
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -318,7 +337,7 @@ int128_t D(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print(Sieve::count_algo_name());
+    print(D_algo_name());
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
