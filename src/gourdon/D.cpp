@@ -129,7 +129,9 @@ __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_data,
 {
   __m256i vec = _mm256_maskz_loadu_epi32(load_mask, factor_data);
   __m512i reverse64 = _mm512_sub_epi64(_mm512_set1_epi64(count - 1), m_offsets64);
-  return _mm512_maskz_permutexvar_epi64(load_mask, reverse64, _mm512_cvtepu32_epi64(vec));
+  return _mm512_maskz_permutexvar_epi64(load_mask,
+                                        reverse64,
+                                        _mm512_cvtepu32_epi64(vec));
 }
 
 #endif
