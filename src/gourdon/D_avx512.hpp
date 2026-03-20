@@ -1,7 +1,15 @@
 ///
 /// @file  D_avx512.hpp
-/// @brief AVX-512 implementation of the D(x, y) thread routine used
-///        in Xavier Gourdon's prime counting algorithm.
+/// @brief AVX512 implementation of the D formula (hard special
+///        leaves) in Xavier Gourdon's prime counting algorithm. This
+///        algorithm is identical to D_thread_default() in D.cpp
+///        except that this algorithm has been partially vectorized
+///        using AVX512.
+///
+///        For performance it is important that all AVX512 helper
+///        functions are inlined by the compiler. We achieve this
+///        by annotating all AVX512 helper functions using the same
+///        AVX512 __attribute__ and the ALWAYS_INLINE macro.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -18,27 +26,33 @@ namespace {
 
 using namespace primecount;
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_epi32_avx512(const uint16_t* factor_data,
-                                 __m512i reverse32)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint16_t* factor_data,
+                                               __m512i reverse32)
 {
   __m256i vec = _mm256_loadu_si256((const __m256i*) factor_data);
   return _mm512_permutexvar_epi32(reverse32, _mm512_cvtepu16_epi32(vec));
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_epi32_avx512(const uint32_t* factor_data,
-                                 __m512i reverse32)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_epi32_avx512(const uint32_t* factor_data,
+                                               __m512i reverse32)
 {
   __m512i vec = _mm512_loadu_si512((const void*) factor_data);
   return _mm512_permutexvar_epi32(reverse32, vec);
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_tail_epi32_avx512(const uint16_t* factor_data,
-                                      __mmask16 load_mask,
-                                      int count,
-                                      __m512i m_offsets32)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_data,
+                                                    __mmask16 load_mask,
+                                                    int count,
+                                                    __m512i m_offsets32)
 {
   __m256i vec = _mm256_maskz_loadu_epi16(load_mask, factor_data);
   __m512i reverse32 = _mm512_sub_epi32(_mm512_set1_epi32(count - 1), m_offsets32);
@@ -47,38 +61,46 @@ __m512i load_factor_tail_epi32_avx512(const uint16_t* factor_data,
                                         _mm512_cvtepu16_epi32(vec));
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_tail_epi32_avx512(const uint32_t* factor_data,
-                                      __mmask16 load_mask,
-                                      int count,
-                                      __m512i m_offsets32)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_tail_epi32_avx512(const uint32_t* factor_data,
+                                                    __mmask16 load_mask,
+                                                    int count,
+                                                    __m512i m_offsets32)
 {
   __m512i vec = _mm512_maskz_loadu_epi32(load_mask, factor_data);
   __m512i reverse32 = _mm512_sub_epi32(_mm512_set1_epi32(count - 1), m_offsets32);
   return _mm512_maskz_permutexvar_epi32(load_mask, reverse32, vec);
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_epi64_avx512(const uint16_t* factor_data,
-                                 __m512i reverse64)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint16_t* factor_data,
+                                               __m512i reverse64)
 {
   __m128i vec = _mm_loadu_si128((const __m128i*) factor_data);
   return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu16_epi64(vec));
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_epi64_avx512(const uint32_t* factor_data,
-                                 __m512i reverse64)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_epi64_avx512(const uint32_t* factor_data,
+                                               __m512i reverse64)
 {
   __m256i vec = _mm256_loadu_si256((const __m256i*) factor_data);
   return _mm512_permutexvar_epi64(reverse64, _mm512_cvtepu32_epi64(vec));
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_tail_epi64_avx512(const uint16_t* factor_data,
-                                      __mmask8 load_mask,
-                                      int count,
-                                      __m512i m_offsets64)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_data,
+                                                    __mmask8 load_mask,
+                                                    int count,
+                                                    __m512i m_offsets64)
 {
   __m128i vec = _mm_maskz_loadu_epi16(load_mask, factor_data);
   __m512i reverse64 = _mm512_sub_epi64(_mm512_set1_epi64(count - 1), m_offsets64);
@@ -87,11 +109,13 @@ __m512i load_factor_tail_epi64_avx512(const uint16_t* factor_data,
                                         _mm512_cvtepu16_epi64(vec));
 }
 
-ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
-__m512i load_factor_tail_epi64_avx512(const uint32_t* factor_data,
-                                      __mmask8 load_mask,
-                                      int count,
-                                      __m512i m_offsets64)
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
+ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_data,
+                                                    __mmask8 load_mask,
+                                                    int count,
+                                                    __m512i m_offsets64)
 {
   __m256i vec = _mm256_maskz_loadu_epi32(load_mask, factor_data);
   __m512i reverse64 = _mm512_sub_epi64(_mm512_set1_epi64(count - 1), m_offsets64);
@@ -100,18 +124,10 @@ __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_data,
                                         _mm512_cvtepu32_epi64(vec));
 }
 
-/// This algorithm computes the hard special leaves in the Gourdon
-/// prime counting algorithm. This algorithm is identical to
-/// D_thread_default() except that parts of the algorithm have
-/// been vectorized using AVX512.
-///
-/// For performance it is important that all AVX512 helper functions
-/// are inlined by the compiler. We achieve this by annotating all
-/// AVX512 helper functions using the same AVX512 __attribute__ and
-/// the ALWAYS_INLINE macro.
-///
 template <typename T, typename Primes, typename FactorTableD>
-__attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
+#endif
 T D_thread_avx512(T x,
                   int64_t x_star,
                   int64_t xz,

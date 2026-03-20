@@ -1,7 +1,15 @@
 ///
 /// @file  D_arm_sve.hpp
-/// @brief ARM SVE implementation of the D(x, y) thread routine used
-///        in Xavier Gourdon's prime counting algorithm.
+/// @brief ARM SVE implementation of the D formula (hard special
+///        leaves) in Xavier Gourdon's prime counting algorithm. This
+///        algorithm is identical to D_thread_default() in D.cpp
+///        except that this algorithm has been partially vectorized
+///        using ARM SVE.
+///
+///        For performance it is important that all ARM SVE helper
+///        functions are inlined by the compiler. We achieve this
+///        by annotating all ARM SVE helper functions using the same
+///        ARM SVE __attribute__ and the ALWAYS_INLINE macro.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -16,17 +24,10 @@ namespace {
 
 using namespace primecount;
 
-/// The only difference between this function and
-/// D_thread_default() is that this function uses the faster
-/// sieve.count_arm_sve() instead of sieve.count().
-///
-/// Both this function and the Sieve::count_arm_sve() function
-/// have been annotated using the same ARM SVE __attribute__.
-/// This ensures that the compiler will inline
-/// Sieve::count_arm_sve(), which is important for performance.
-///
 template <typename T, typename Primes, typename FactorTableD>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
 __attribute__ ((target ("arch=armv8-a+sve")))
+#endif
 T D_thread_arm_sve(T x,
                    int64_t x_star,
                    int64_t xz,
