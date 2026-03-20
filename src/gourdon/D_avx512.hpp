@@ -12,7 +12,11 @@
 #ifndef D_AVX512_HPP
 #define D_AVX512_HPP
 
-#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#include <immintrin.h>
+
+namespace {
+
+using namespace primecount;
 
 ALWAYS_INLINE __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
 __m512i load_factor_epi32_avx512(const uint16_t* factor_data,
@@ -332,6 +336,6 @@ T D_thread_avx512(T x,
   return sum;
 }
 
-#endif
+} // namespace
 
 #endif

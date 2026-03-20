@@ -12,7 +12,9 @@
 #ifndef D_ARM_SVE_HPP
 #define D_ARM_SVE_HPP
 
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
+namespace {
+
+using namespace primecount;
 
 /// The only difference between this function and
 /// D_thread_default() is that this function uses the faster
@@ -141,6 +143,6 @@ T D_thread_arm_sve(T x,
   return sum;
 }
 
-#endif
+} // namespace
 
 #endif

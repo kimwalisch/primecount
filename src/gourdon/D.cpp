@@ -15,7 +15,7 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,16 +42,26 @@
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   #include <cpu_supports_arm_sve.hpp>
 #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <immintrin.h>
   #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
-using namespace primecount;
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include "D_arm_sve.hpp"
+#elif defined(ENABLE_AVX512_VPOPCNT) || \
+      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #include "D_avx512.hpp"
+#endif
 
 namespace {
 
-/// Compute the contribution of the hard special leaves using a
-/// segmented sieve. Each thread processes the interval
+using namespace primecount;
+
+#if !defined(ENABLE_AVX512_VPOPCNT) && \
+    !defined(ENABLE_ARM_SVE)
+
+/// Compute the contribution of the hard special leaves using
+/// a segmented sieve. Each thread processes the interval
 /// [low, low + segment_size * segments[.
 ///
 template <typename T, typename Primes, typename FactorTableD>
@@ -171,8 +181,7 @@ T D_thread_default(T x,
   return sum;
 }
 
-#include "D_avx512.hpp"
-#include "D_arm_sve.hpp"
+#endif
 
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
@@ -180,15 +189,21 @@ T D_thread_default(T x,
 template <typename T, typename... Args>
 T D_thread(Args&&... args)
 {
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    if (cpu_supports_avx512_vpopcnt)
-      return D_thread_avx512<T>(std::forward<Args>(args)...);
+  #if defined(ENABLE_AVX512_VPOPCNT)
+    return D_thread_avx512<T>(std::forward<Args>(args)...);
+  #elif defined(ENABLE_ARM_SVE)
+    return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    return cpu_supports_avx512_vpopcnt
+      ? D_thread_avx512<T>(std::forward<Args>(args)...)
+      : D_thread_default<T>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    if (cpu_supports_sve)
-      return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+    return cpu_supports_sve
+      ? D_thread_arm_sve<T>(std::forward<Args>(args)...)
+      : D_thread_default<T>(std::forward<Args>(args)...);
+  #else
+    return D_thread_default<T>(std::forward<Args>(args)...);
   #endif
-
-  return D_thread_default<T>(std::forward<Args>(args)...);
 }
 
 /// Calculate the contribution of the hard special leaves.
