@@ -138,6 +138,7 @@ T D_thread_arm_sve(T x,
           max_m <= UINT32_MAX)
       {
         int64_t lanes32 = svcntw();
+        ASSERT(svcntw() <= m_indexes32.size());
         std::size_t max_m_count = m_indexes32.size() - lanes32;
         svbool_t all32 = svptrue_b32();
         svuint32_t m_offsets32 = svindex_u32(0, 1);
@@ -192,6 +193,7 @@ T D_thread_arm_sve(T x,
       else
       {
         int64_t lanes64 = svcntd();
+        ASSERT(svcntd() <= m_indexes64.size());
         std::size_t max_m_count = m_indexes64.size() - lanes64;
         svbool_t all64 = svptrue_b64();
         svuint64_t m_offsets64 = svindex_u64(0, 1);
