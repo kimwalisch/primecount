@@ -40,13 +40,10 @@ namespace primecount {
 ALWAYS_INLINE uint64_t Sieve::count(uint64_t stop)
 {
   #if defined(ENABLE_AVX512_VPOPCNT)
-    #define DEFAULT_SIEVE_COUNT_ALGO_NAME "AVX512 bit counting"
     return count_avx512(stop);
   #elif defined(ENABLE_ARM_SVE)
-    #define DEFAULT_SIEVE_COUNT_ALGO_NAME "ARM SVE bit counting"
     return count_arm_sve(stop);
   #else
-    #define DEFAULT_SIEVE_COUNT_ALGO_NAME "POPCNT64 bit counting"
     return count_popcnt64(stop);
   #endif
 }

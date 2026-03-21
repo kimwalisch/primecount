@@ -55,7 +55,6 @@ int64_t S2(int64_t x,
   {
     print("");
     print("=== S2(x, y) ===");
-    print("Algorithm: " DEFAULT_SIEVE_COUNT_ALGO_NAME);
     time = get_time();
   }
 
