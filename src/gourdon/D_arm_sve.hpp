@@ -157,7 +157,7 @@ T D_thread_arm_sve(T x,
           int64_t matches = svcntp_b32(store_pg, mask);
           svuint32_t compact = svcompact_u32(mask, m_vec);
           svbool_t compact_pg = svwhilelt_b32(int64_t(0), matches);
-          svst1_u32(compact_pg, m_indexes32.data() + m_count, compact);
+          svst1_u32(compact_pg, &m_indexes32[m_count], compact);
 
           m_count += matches;
           m -= lane_count;
@@ -211,7 +211,7 @@ T D_thread_arm_sve(T x,
           int64_t matches = svcntp_b64(store_pg, mask);
           svint64_t compact = svreinterpret_s64_u64(svcompact_u64(mask, m_vec));
           svbool_t compact_pg = svwhilelt_b64(int64_t(0), matches);
-          svst1_s64(compact_pg, m_indexes64.data() + m_count, compact);
+          svst1_s64(compact_pg, &m_indexes64[m_count], compact);
 
           m_count += matches;
           m -= lane_count;
