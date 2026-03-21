@@ -210,6 +210,14 @@ T D_thread_avx512(T x,
         // AVX512: 16-lane 32-bit
         for (; m > min_m + 15; m -= 16)
         {
+          // Filter out square free m values using AVX512
+          // that satisfy: prime < factor.is_leaf(m)
+          __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
+          __m512i factor_vec = load_factor_epi32_avx512(&factor_data[m - 15], reverse32);
+          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
+          _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
+          m_count += popcnt64_native(mask);
+
           if (m_count > max_m_count)
           {
             // Process the next few special leaves that are
@@ -225,14 +233,6 @@ T D_thread_avx512(T x,
             }
             m_count = 0;
           }
-
-          // Filter out square free m values using AVX512
-          // that satisfy: prime < factor.is_leaf(m)
-          __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
-          __m512i factor_vec = load_factor_epi32_avx512(&factor_data[m - 15], reverse32);
-          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
-          _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
         }
 
         if (m > min_m)
@@ -265,6 +265,14 @@ T D_thread_avx512(T x,
         // AVX512: 8-lane 64-bit
         for (; m > min_m + 7; m -= 8)
         {
+          // Filter out square free m values using AVX512
+          // that satisfy: prime < factor.is_leaf(m)
+          __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
+          __m512i factor_vec = load_factor_epi64_avx512(&factor_data[m - 7], reverse64);
+          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
+          _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
+          m_count += popcnt64_native(mask);
+
           if (m_count > max_m_count)
           {
             // Process the next few special leaves that are
@@ -280,14 +288,6 @@ T D_thread_avx512(T x,
             }
             m_count = 0;
           }
-
-          // Filter out square free m values using AVX512
-          // that satisfy: prime < factor.is_leaf(m)
-          __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
-          __m512i factor_vec = load_factor_epi64_avx512(&factor_data[m - 7], reverse64);
-          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
-          _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
-          m_count += popcnt64_native(mask);
         }
 
         if (m > min_m)
