@@ -1,9 +1,13 @@
 ///
 /// @file  popcnt.hpp
-/// @brief Functions to count the number of 1 bits inside
-///        a 64-bit variable.
+/// @brief Functions to count the number of 1 bits in a 64-bit
+///        variable. On x86 CPUs popcnt64_native(x) uses the POPCNT
+///        instruction directly, without runtime check if the CPU
+///        supports it. popcnt64(x) on the other hand does a runtime
+///        check and falls back to a portable algorithm if the CPU
+///        does not support the POPCNT instruction.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -200,7 +204,7 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 /// It uses 12 arithmetic operations, one of which is a multiply.
 /// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
 ///
-ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
   uint64_t m1 = 0x5555555555555555ull;
   uint64_t m2 = 0x3333333333333333ull;
@@ -214,9 +218,9 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
   return (x * h01) >> 56;
 }
 
-ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-  return popcnt64(x);
+  return popcnt64_native(x);
 }
 
 #endif
@@ -287,7 +291,7 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 /// It uses 12 arithmetic operations, one of which is a multiply.
 /// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
 ///
-ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
   uint64_t m1 = 0x5555555555555555ull;
   uint64_t m2 = 0x3333333333333333ull;
@@ -301,9 +305,9 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
   return (x * h01) >> 56;
 }
 
-ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-  return popcnt64(x);
+  return popcnt64_native(x);
 }
 
 #endif
@@ -320,14 +324,14 @@ namespace {
 /// We only use the C++ standard library as a fallback if there
 /// are no compiler intrinsics available for POPCNT.
 /// Compiler intrinsics often generate faster assembly.
-ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
   return std::popcount(x);
 }
 
-ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-  return popcnt64(x);
+  return popcnt64_native(x);
 }
 
 } // namespace
@@ -341,7 +345,7 @@ namespace {
 /// It uses 12 arithmetic operations, one of which is a multiply.
 /// http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
 ///
-ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
   uint64_t m1 = 0x5555555555555555ull;
   uint64_t m2 = 0x3333333333333333ull;
@@ -355,9 +359,9 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
   return (x * h01) >> 56;
 }
 
-ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
+ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 {
-  return popcnt64(x);
+  return popcnt64_native(x);
 }
 
 } // namespace
