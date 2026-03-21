@@ -2,7 +2,7 @@
 /// @file  cpuid.cpp
 /// @brief CPUID for x86 and x86-64 CPUs.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -19,9 +19,9 @@
 // https://en.wikipedia.org/wiki/CPUID
 
 // %ebx bit flags
-#define bit_AVX512F (1 << 16)
-#define bit_AVX512_BW (1 << 30)
-#define bit_AVX512_VL (1u << 31)
+#define bit_AVX512F  (1u << 16)
+#define bit_AVX512BW (1u << 30)
+#define bit_AVX512VL (1u << 31)
 
 // %ecx bit flags
 #define bit_AVX512_VPOPCNTDQ (1 << 14)
@@ -92,6 +92,9 @@ bool has_cpuid_popcnt()
   return (abcd[2] & bit_POPCNT) == bit_POPCNT;
 }
 
+/// Check if CPU supports: 
+/// AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ
+///
 bool has_cpuid_avx512_vpopcnt()
 {
   int abcd[4];
@@ -118,10 +121,9 @@ bool has_cpuid_avx512_vpopcnt()
 
   run_cpuid(7, 0, abcd);
 
-  // AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ
-  return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
-          (abcd[1] & bit_AVX512_BW) == bit_AVX512_BW &&
-          (abcd[1] & bit_AVX512_VL) == bit_AVX512_VL &&
+  return ((abcd[1] & bit_AVX512F ) == bit_AVX512F  &&
+          (abcd[1] & bit_AVX512BW) == bit_AVX512BW &&
+          (abcd[1] & bit_AVX512VL) == bit_AVX512VL &&
           (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
 }
 
