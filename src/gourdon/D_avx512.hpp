@@ -205,7 +205,7 @@ T D_thread_avx512(T x,
           max_m <= UINT32_MAX)
       {
         __m512i prime_vec = _mm512_set1_epi32(uint32_t(prime));
-        constexpr std::size_t max_m_count = m_indexes32.size() - 31;
+        constexpr std::size_t max_m_count = m_indexes32.size() - 16;
 
         // AVX512: 16-lane 32-bit
         for (; m > min_m + 15; m -= 16)
@@ -260,7 +260,7 @@ T D_thread_avx512(T x,
       else
       {
         __m512i prime_vec = _mm512_set1_epi64(prime);
-        constexpr std::size_t max_m_count = m_indexes64.size() - 15;
+        constexpr std::size_t max_m_count = m_indexes64.size() - 8;
 
         // AVX512: 8-lane 64-bit
         for (; m > min_m + 7; m -= 8)
