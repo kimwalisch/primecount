@@ -1,3 +1,28 @@
+Changes in primecount-8.4, 2026-03-21
+
+This release adds a new branchfree implementation of Gourdon's
+D formula with AVX512, ARM SVE and portable integer code.
+
+* D_avx512.hpp: Implement new branchfree AVX512 algorithm.
+* D_arm_sve.hpp: Implement new branchfree ARM SVE algorithm.
+* D.cpp: Implement new branchfree portable D algorithm.
+* FactorTableD.hpp: Add direct factor_data() access and improve
+  32-bit/64-bit support for the new D algorithms.
+* popcnt.hpp: Add popcnt64_native() to bypass POPCNT runtime checks.
+* multiarch_avx512_vpopcnt.cmake: Require AVX512BW and AVX512VL.
+* cpu_arch_macros.hpp: Require AVX512BW and AVX512VL.
+* cpu_supports_avx512_vpopcnt.hpp: Detect AVX512BW and AVX512VL.
+* cpuid.cpp: Detect AVX512BW and AVX512VL.
+* multiarch_arm_sve.cmake: Improve ARM SVE compile test for svcompact().
+* sve.cpp: Clarify ARM SVE detection requirements.
+* Sieve.hpp: Update AVX512 attributes to use AVX512BW and AVX512VL.
+* Sieve_count_start_stop.hpp: Remove count_algo_name() and update
+  AVX512 attributes.
+* Sieve_count_stop.hpp: Simplify count() algorithm selection.
+* S2_hard.cpp: Remove obsolete SIMD-specialized thread code.
+* pi_lmo_parallel.cpp: Remove obsolete SIMD-specialized thread code.
+* pi_lmo5.cpp: Remove bit counting algorithm status output.
+
 Changes in primecount-8.3, 2026-03-16
 
 * fast_div.hpp: Improve x64 assembly.
