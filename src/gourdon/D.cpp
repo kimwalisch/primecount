@@ -95,6 +95,10 @@ T D_thread_default(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
+  Array<uint32_t, 256> m_indexes32;
+  Array< int64_t, 128> m_indexes64;
+  const auto* factor_data = factor.factor_data();
+
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
@@ -126,19 +130,110 @@ T D_thread_default(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      std::size_t m_count = 0;
+      int64_t m = max_m;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      if (FactorTableD::max() <= UINT32_MAX ||
+          max_m <= UINT32_MAX)
       {
-        // mu[m] != 0 &&
-        // lpf[m] > prime &&
-        // mpf[m] <= y
-        if (prime < factor.is_leaf(m))
+        constexpr std::size_t max_m_count = m_indexes32.size() - 4;
+
+        // Filter out square free m values branchlessly
+        // that satisfy: prime < factor.is_leaf(m)
+        for (; m > min_m + 3; m -= 4)
         {
+          m_indexes32[m_count] = uint32_t(m);
+          m_count += (prime < factor_data[m]);
+          m_indexes32[m_count] = uint32_t(m - 1);
+          m_count += (prime < factor_data[m - 1]);
+          m_indexes32[m_count] = uint32_t(m - 2);
+          m_count += (prime < factor_data[m - 2]);
+          m_indexes32[m_count] = uint32_t(m - 3);
+          m_count += (prime < factor_data[m - 3]);
+
+          if (m_count > max_m_count)
+          {
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = m_indexes32[i];
+              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t count = sieve.count(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m) * phi_xpm;
+            }
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes32[m_count] = uint32_t(m);
+          m_count += (prime < factor_data[m]);
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = m_indexes32[i];
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t count = sieve.count(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          int64_t mu_m = factor.mu(m);
-          sum -= mu_m * phi_xpm;
+          sum -= factor.mu(m) * phi_xpm;
+        }
+      }
+      else
+      {
+        constexpr std::size_t max_m_count = m_indexes64.size() - 4;
+
+        // Filter out square free m values branchlessly
+        // that satisfy: prime < factor.is_leaf(m)
+        for (; m > min_m + 3; m -= 4)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (prime < factor_data[m]);
+          m_indexes64[m_count] = m - 1;
+          m_count += (prime < factor_data[m - 1]);
+          m_indexes64[m_count] = m - 2;
+          m_count += (prime < factor_data[m - 2]);
+          m_indexes64[m_count] = m - 3;
+          m_count += (prime < factor_data[m - 3]);
+
+          if (m_count > max_m_count)
+          {
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = m_indexes64[i];
+              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t count = sieve.count(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m) * phi_xpm;
+            }
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (prime < factor_data[m]);
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = m_indexes64[i];
+          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t count = sieve.count(xpm - low);
+          int64_t phi_xpm = phi[b] + count;
+          sum -= factor.mu(m) * phi_xpm;
         }
       }
 
