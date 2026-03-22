@@ -95,8 +95,9 @@ T D_thread_default(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
-  Array<uint32_t, 256> m_indexes32;
+  Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
+  Array< int64_t, 128> xpm_cache;
   const auto* factor_data = factor.factor_data();
 
   // Segmented sieve of Eratosthenes
@@ -133,6 +134,7 @@ T D_thread_default(T x,
       std::size_t m_count = 0;
       int64_t m = max_m;
 
+      // 32-bit code path
       if (FactorTableD::max() <= UINT32_MAX ||
           max_m <= UINT32_MAX)
       {
@@ -153,17 +155,24 @@ T D_thread_default(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes32[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes32[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
         }
@@ -175,17 +184,23 @@ T D_thread_default(T x,
           m_count += (prime < factor_data[m]);
         }
 
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes32[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes32[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
       }
-      else
+      else // 64-bit code path
       {
         constexpr std::size_t max_m_count = m_indexes64.size() - 4;
 
@@ -204,17 +219,24 @@ T D_thread_default(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes64[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes64[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
         }
@@ -226,14 +248,20 @@ T D_thread_default(T x,
           m_count += (prime < factor_data[m]);
         }
 
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes64[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes64[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }
       }
 
