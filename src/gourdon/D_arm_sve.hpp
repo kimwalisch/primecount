@@ -96,8 +96,9 @@ T D_thread_arm_sve(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
-  Array<uint32_t, 256> m_indexes32;
+  Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
+  Array< int64_t, 128> xpm_cache;
   const auto* factor_data = factor.factor_data();
 
   // Segmented sieve of Eratosthenes
@@ -134,6 +135,7 @@ T D_thread_arm_sve(T x,
       std::size_t m_count = 0;
       int64_t m = max_m;
 
+      // ARM SVE 32-bit
       if (FactorTableD::max() <= UINT32_MAX ||
           max_m <= UINT32_MAX)
       {
@@ -143,7 +145,6 @@ T D_thread_arm_sve(T x,
         svbool_t all32 = svptrue_b32();
         svuint32_t m_offsets32 = svindex_u32(0, 1);
 
-        // ARM SVE 32-bit loop
         while (m > min_m)
         {
           // Filter out square free m values using ARM SVE
@@ -165,32 +166,45 @@ T D_thread_arm_sve(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes32[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes32[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count_arm_sve(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
+        }
+
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes32[i]);
+          xpm_cache[i] = fast_div64(xp, m);
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes32[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count_arm_sve(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
       }
-      else
+      else // ARM SVE 64-bit
       {
         int64_t lanes64 = svcntd();
         ASSERT(svcntd() <= m_indexes64.size());
@@ -198,7 +212,6 @@ T D_thread_arm_sve(T x,
         svbool_t all64 = svptrue_b64();
         svuint64_t m_offsets64 = svindex_u64(0, 1);
 
-        // ARM SVE 64-bit loop
         while (m > min_m)
         {
           // Filter out square free m values using ARM SVE
@@ -220,29 +233,42 @@ T D_thread_arm_sve(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes64[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes64[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count_arm_sve(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
+        }
+
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes64[i]);
+          xpm_cache[i] = fast_div64(xp, m);
         }
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes64[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count_arm_sve(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }
       }
 
