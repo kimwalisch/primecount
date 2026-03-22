@@ -4,8 +4,9 @@
 ///        formula in Xavier Gourdon's prime counting algorithm. The D
 ///        formula is very similar to the formula of the hard special
 ///        leaves in the Deleglise-Rivat algorithm. Hence this
-///        implementation is basically identical to S2_hard.cpp except
-///        that the bounds have been changed slightly.
+///        algorithm is very similar to S2_hard.cpp, expect that in
+///        this implementation the square free leaves have been more
+///        heavily optimized (branchfree + CPU pipelining).
 ///
 ///        This implementation uses multi-threading with advanced load
 ///        balancing, it scales well up to a large number of CPU cores
@@ -14,6 +15,9 @@
 ///        optimized Sieve class and the FactorTableD class which is a
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
+///
+///        In-depth description of this algorithm:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
