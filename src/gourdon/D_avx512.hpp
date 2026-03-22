@@ -156,8 +156,9 @@ T D_thread_avx512(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
-  Array<uint32_t, 256> m_indexes32;
+  Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
+  Array< int64_t, 128> xpm_cache;
   const auto* factor_data = factor.factor_data();
 
   __m512i reverse32 = _mm512_setr_epi32(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -201,13 +202,13 @@ T D_thread_avx512(T x,
       std::size_t m_count = 0;
       int64_t m = max_m;
 
+      // AVX512: 16-lane 32-bit
       if (FactorTableD::max() <= UINT32_MAX ||
           max_m <= UINT32_MAX)
       {
         __m512i prime_vec = _mm512_set1_epi32(uint32_t(prime));
         constexpr std::size_t max_m_count = m_indexes32.size() - 16;
 
-        // AVX512: 16-lane 32-bit
         for (; m > min_m + 15; m -= 16)
         {
           // Filter out square free m values using AVX512
@@ -220,17 +221,24 @@ T D_thread_avx512(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes32[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes32[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count_avx512(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes32[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
         }
@@ -247,22 +255,27 @@ T D_thread_avx512(T x,
           m_count += popcnt64_native(mask);
         }
 
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes32[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes32[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count_avx512(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes32[i]) * phi_xpm;
         }
       }
-      else
+      else // AVX512: 8-lane 64-bit
       {
         __m512i prime_vec = _mm512_set1_epi64(prime);
         constexpr std::size_t max_m_count = m_indexes64.size() - 8;
 
-        // AVX512: 8-lane 64-bit
         for (; m > min_m + 7; m -= 8)
         {
           // Filter out square free m values using AVX512
@@ -275,17 +288,24 @@ T D_thread_avx512(T x,
 
           if (m_count > max_m_count)
           {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes64[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
             // low <= x / (primes[b] * m) < high
             for (std::size_t i = 0; i < m_count; i++)
             {
-              int64_t m = m_indexes64[i];
-              int64_t xpm = fast_div64(xp, factor.to_number(m));
+              int64_t xpm = xpm_cache[i];
               int64_t count = sieve.count_avx512(xpm - low);
               int64_t phi_xpm = phi[b] + count;
-              sum -= factor.mu(m) * phi_xpm;
+              sum -= factor.mu(m_indexes64[i]) * phi_xpm;
             }
+
             m_count = 0;
           }
         }
@@ -302,14 +322,20 @@ T D_thread_avx512(T x,
           m_count += popcnt64_native(mask);
         }
 
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes64[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
         {
-          int64_t m = m_indexes64[i];
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count_avx512(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          sum -= factor.mu(m) * phi_xpm;
+          sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }
       }
 
