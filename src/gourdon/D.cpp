@@ -43,26 +43,23 @@
 #include <stdint.h>
 #include <utility>
 
+#if defined(ENABLE_ARM_SVE)
+  #include "D_arm_sve.hpp"
+#elif defined(ENABLE_AVX512_VPOPCNT)
+  #include "D_avx512.hpp"
+#else
+
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include "D_arm_sve.hpp"
   #include <cpu_supports_arm_sve.hpp>
 #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-  #include <cpu_supports_avx512_vpopcnt.hpp>
-#endif
-
-#if defined(ENABLE_ARM_SVE) || \
-    defined(ENABLE_MULTIARCH_ARM_SVE)
-  #include "D_arm_sve.hpp"
-#elif defined(ENABLE_AVX512_VPOPCNT) || \
-      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   #include "D_avx512.hpp"
+  #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
 namespace {
 
 using namespace primecount;
-
-#if !defined(ENABLE_AVX512_VPOPCNT) && \
-    !defined(ENABLE_ARM_SVE)
 
 /// Compute the contribution of the hard special leaves using
 /// a segmented sieve. Each thread processes the interval
@@ -308,7 +305,13 @@ T D_thread_default(T x,
   return sum;
 }
 
+} // namespace
+
 #endif
+
+namespace {
+
+using namespace primecount;
 
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
 /// supports the required instruction set.
