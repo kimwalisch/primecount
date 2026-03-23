@@ -115,8 +115,9 @@
   uint64_t start_bits = sieve64[start_idx] & m1; \
   uint64_t stop_bits = sieve64[stop_idx] & m2; \
   ASSERT(svcntd() >= 2); \
-  svuint64_t vec = svinsr_n_u64(svdup_u64(start_bits), stop_bits); \
-  svuint64_t vcnt = svcnt_u64_z(svwhilelt_b64(0, 2), vec); \
+  svuint64_t bounds = svinsr_n_u64(svdup_u64(start_bits), stop_bits); \
+  bounds = svcnt_u64_z(svwhilelt_b64(0, 2), bounds); \
+  svuint64_t vcnt = svdup_u64(0); \
   uint64_t i = start_idx + 1; \
   \
   /* Compute this for loop using ARM SVE. */ \
@@ -124,14 +125,15 @@
   /*   cnt += popcnt64(sieve64[i]); */ \
   for (; i + svcntd() < stop_idx; i += svcntd()) \
   { \
-    vec = svld1_u64(svptrue_b64(), &sieve64[i]); \
+    svuint64_t vec = svld1_u64(svptrue_b64(), &sieve64[i]); \
     vec = svcnt_u64_x(svptrue_b64(), vec); \
     vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec); \
   } \
   svbool_t pg = svwhilelt_b64(i, stop_idx); \
-  vec = svld1_u64(pg, &sieve64[i]); \
+  svuint64_t vec = svld1_u64(pg, &sieve64[i]); \
   vec = svcnt_u64_z(pg, vec); \
   vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec); \
+  vcnt = svadd_u64_x(svptrue_b64(), vcnt, bounds); \
   uint64_t cnt = svaddv_u64(svptrue_b64(), vcnt);
 
 #endif
