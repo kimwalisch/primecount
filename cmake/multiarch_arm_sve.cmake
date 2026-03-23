@@ -28,6 +28,8 @@ check_cxx_source_compiles("
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
         __attribute__ ((target (\"arch=armv8-a+sve\")))
         uint64_t count_arm_sve(uint64_t* array, uint64_t stop_idx);
+        __attribute__ ((target (\"arch=armv8-a+sve\")))
+        uint64_t filter_arm_sve(uint64_t* array, uint64_t stop_idx);
     };
 
     uint64_t Sieve::count_default(uint64_t* array, uint64_t stop_idx)
@@ -59,6 +61,19 @@ check_cxx_source_compiles("
         return svaddv_u64(svptrue_b64(), vcnt);
     }
 
+    __attribute__ ((target (\"arch=armv8-a+sve\")))
+    uint64_t Sieve::filter_arm_sve(uint64_t* array, uint64_t stop_idx)
+    {
+        uint64_t filtered[32] = {};
+        svbool_t pg = svwhilelt_b64((uint64_t) 0, stop_idx);
+        svuint64_t vec = svld1_u64(pg, array);
+        svbool_t mask = svcmpgt_n_u64(pg, vec, 0);
+        uint64_t count = svcntp_b64(pg, mask);
+        vec = svcompact_u64(mask, vec);
+        svst1_u64(svwhilelt_b64((uint64_t) 0, count), filtered, vec);
+        return filtered[0];
+    }
+
     int main()
     {
         uint64_t array[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -66,7 +81,7 @@ check_cxx_source_compiles("
         Sieve sieve;
 
         if (primecount::has_arm_sve())
-            cnt = sieve.count_arm_sve(&array[0], 10);
+            cnt = sieve.count_arm_sve(&array[0], 10) + sieve.filter_arm_sve(&array[0], 10);
         else
             cnt = sieve.count_default(&array[0], 10);
 

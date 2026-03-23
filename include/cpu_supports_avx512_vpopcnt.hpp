@@ -1,8 +1,9 @@
 ///
 /// @file  cpu_supports_avx512_vpopcnt.hpp
-/// @brief Detect if the x86 CPU supports AVX512 and BMI2.
+/// @brief Detect if the x86 CPU supports AVX512F, AVX512BW, AVX512VL
+///        and AVX512VPOPCNTDQ.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

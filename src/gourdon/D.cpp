@@ -4,8 +4,9 @@
 ///        formula in Xavier Gourdon's prime counting algorithm. The D
 ///        formula is very similar to the formula of the hard special
 ///        leaves in the Deleglise-Rivat algorithm. Hence this
-///        implementation is basically identical to S2_hard.cpp except
-///        that the bounds have been changed slightly.
+///        algorithm is very similar to S2_hard.cpp, expect that in
+///        this implementation the square free leaves have been more
+///        heavily optimized (branchfree + CPU pipelining).
 ///
 ///        This implementation uses multi-threading with advanced load
 ///        balancing, it scales well up to a large number of CPU cores
@@ -15,7 +16,10 @@
 ///        compressed lookup table of moebius function values,
 ///        least prime factors and max prime factors.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+///        In-depth description of this algorithm:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
+///
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -45,12 +49,23 @@
   #include <cpu_supports_avx512_vpopcnt.hpp>
 #endif
 
-using namespace primecount;
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include "D_arm_sve.hpp"
+#elif defined(ENABLE_AVX512_VPOPCNT) || \
+      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #include "D_avx512.hpp"
+#endif
 
 namespace {
 
-/// Compute the contribution of the hard special leaves using a
-/// segmented sieve. Each thread processes the interval
+using namespace primecount;
+
+#if !defined(ENABLE_AVX512_VPOPCNT) && \
+    !defined(ENABLE_ARM_SVE)
+
+/// Compute the contribution of the hard special leaves using
+/// a segmented sieve. Each thread processes the interval
 /// [low, low + segment_size * segments[.
 ///
 template <typename T, typename Primes, typename FactorTableD>
@@ -84,6 +99,11 @@ T D_thread_default(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_finished();
 
+  Array<uint32_t, 128> m_indexes32;
+  Array< int64_t, 128> m_indexes64;
+  Array< int64_t, 128> xpm_cache;
+  const auto* factor_data = factor.factor_data();
+
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
   {
@@ -115,19 +135,137 @@ T D_thread_default(T x,
 
       min_m = factor.to_index(min_m);
       max_m = factor.to_index(max_m);
+      std::size_t m_count = 0;
+      int64_t m = max_m;
 
-      for (int64_t m = max_m; m > min_m; m--)
+      // 32-bit code path
+      if (FactorTableD::max() <= UINT32_MAX ||
+          max_m <= UINT32_MAX)
       {
-        // mu[m] != 0 &&
-        // lpf[m] > prime &&
-        // mpf[m] <= y
-        if (prime < factor.is_leaf(m))
+        constexpr std::size_t max_m_count = m_indexes32.size() - 4;
+
+        // Filter out square free m values branchlessly
+        // that satisfy: prime < factor.is_leaf(m)
+        for (; m > min_m + 3; m -= 4)
         {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
+          m_indexes32[m_count] = uint32_t(m);
+          m_count += (prime < factor_data[m]);
+          m_indexes32[m_count] = uint32_t(m - 1);
+          m_count += (prime < factor_data[m - 1]);
+          m_indexes32[m_count] = uint32_t(m - 2);
+          m_count += (prime < factor_data[m - 2]);
+          m_indexes32[m_count] = uint32_t(m - 3);
+          m_count += (prime < factor_data[m - 3]);
+
+          if (m_count > max_m_count)
+          {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes32[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t xpm = xpm_cache[i];
+              int64_t count = sieve.count(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m_indexes32[i]) * phi_xpm;
+            }
+
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes32[m_count] = uint32_t(m);
+          m_count += (prime < factor_data[m]);
+        }
+
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes32[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t xpm = xpm_cache[i];
           int64_t count = sieve.count(xpm - low);
           int64_t phi_xpm = phi[b] + count;
-          int64_t mu_m = factor.mu(m);
-          sum -= mu_m * phi_xpm;
+          sum -= factor.mu(m_indexes32[i]) * phi_xpm;
+        }
+      }
+      else // 64-bit code path
+      {
+        constexpr std::size_t max_m_count = m_indexes64.size() - 4;
+
+        // Filter out square free m values branchlessly
+        // that satisfy: prime < factor.is_leaf(m)
+        for (; m > min_m + 3; m -= 4)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (prime < factor_data[m]);
+          m_indexes64[m_count] = m - 1;
+          m_count += (prime < factor_data[m - 1]);
+          m_indexes64[m_count] = m - 2;
+          m_count += (prime < factor_data[m - 2]);
+          m_indexes64[m_count] = m - 3;
+          m_count += (prime < factor_data[m - 3]);
+
+          if (m_count > max_m_count)
+          {
+            // Batch calculate xp/m to improve CPU pipelining
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t m = factor.to_number(m_indexes64[i]);
+              xpm_cache[i] = fast_div64(xp, m);
+            }
+
+            // Process the next few special leaves that are
+            // composed of a prime and a square free number:
+            // low <= x / (primes[b] * m) < high
+            for (std::size_t i = 0; i < m_count; i++)
+            {
+              int64_t xpm = xpm_cache[i];
+              int64_t count = sieve.count(xpm - low);
+              int64_t phi_xpm = phi[b] + count;
+              sum -= factor.mu(m_indexes64[i]) * phi_xpm;
+            }
+
+            m_count = 0;
+          }
+        }
+
+        // Filter out the last few square free m
+        for (; m > min_m; m--)
+        {
+          m_indexes64[m_count] = m;
+          m_count += (prime < factor_data[m]);
+        }
+
+        // Batch calculate xp/m to improve CPU pipelining
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t m = factor.to_number(m_indexes64[i]);
+          xpm_cache[i] = fast_div64(xp, m);
+        }
+
+        // Process the last few m values
+        for (std::size_t i = 0; i < m_count; i++)
+        {
+          int64_t xpm = xpm_cache[i];
+          int64_t count = sieve.count(xpm - low);
+          int64_t phi_xpm = phi[b] + count;
+          sum -= factor.mu(m_indexes64[i]) * phi_xpm;
         }
       }
 
@@ -170,264 +308,6 @@ T D_thread_default(T x,
   return sum;
 }
 
-#if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-
-/// The only difference between this function and
-/// D_thread_default() is that this function uses the faster
-/// sieve.count_avx512() instead of sieve.count().
-///
-/// Both this function and the Sieve::count_avx512() function
-/// have been annotated using the same AVX512 __attribute__.
-/// This ensures that the compiler will inline
-/// Sieve::count_avx512(), which is important for performance.
-///
-template <typename T, typename Primes, typename FactorTableD>
-__attribute__ ((target ("avx512f,avx512vpopcntdq")))
-T D_thread_avx512(T x,
-                  int64_t x_star,
-                  int64_t xz,
-                  int64_t y,
-                  int64_t z,
-                  int64_t k,
-                  const Primes& primes,
-                  const PiTable& pi,
-                  const FactorTableD& factor,
-                  ThreadData& thread)
-{
-  T sum = 0;
-
-  int64_t low = thread.low;
-  int64_t low1 = max(low, 1);
-  int64_t segments = thread.segments;
-  int64_t segment_size = thread.segment_size;
-  int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t limit = min(low + segment_size * segments, xz);
-  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
-  int64_t min_b = pi[min(xz / limit, x_star)];
-  min_b = max(k, min_b) + 1;
-
-  if (min_b > max_b)
-    return 0;
-
-  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
-  Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
-
-  // Segmented sieve of Eratosthenes
-  for (; low < limit; low += segment_size)
-  {
-    // current segment [low, high[
-    int64_t high = min(low + segment_size, limit);
-    low1 = max(low, 1);
-
-    // For b < min_b there are no special leaves:
-    // low <= x / (primes[b] * m) < high
-    sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counter(low, high);
-    int64_t b = min_b;
-
-    // For k + 1 <= b <= pi_sqrtz
-    // Find all special leaves in the current segment that are
-    // composed of a prime and a square free number:
-    // low <= x / (primes[b] * m) < high
-    for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), z);
-      int64_t xp_high = min(fast_div(xp, high), z);
-      int64_t min_m = max(xp_high, z / prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
-
-      if (prime >= max_m)
-        goto next_segment;
-
-      min_m = factor.to_index(min_m);
-      max_m = factor.to_index(max_m);
-
-      for (int64_t m = max_m; m > min_m; m--)
-      {
-        // mu[m] != 0 &&
-        // lpf[m] > prime &&
-        // mpf[m] <= y
-        if (prime < factor.is_leaf(m))
-        {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
-          int64_t count = sieve.count_avx512(xpm - low);
-          int64_t phi_xpm = phi[b] + count;
-          int64_t mu_m = factor.mu(m);
-          sum -= mu_m * phi_xpm;
-        }
-      }
-
-      phi[b] += sieve.get_total_count();
-      sieve.cross_off_count(prime, b);
-    }
-
-    // For pi_sqrtz < b <= pi_x_star
-    // Find all special leaves in the current segment
-    // that are composed of 2 primes:
-    // low <= x / (primes[b] * primes[l]) < high
-    for (; b <= max_b; b++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
-      int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
-      int64_t l = pi[max_m];
-
-      if (prime >= primes[l])
-        goto next_segment;
-
-      for (; primes[l] > min_m; l--)
-      {
-        int64_t xpq = fast_div64(xp, primes[l]);
-        int64_t count = sieve.count_avx512(xpq - low);
-        int64_t phi_xpq = phi[b] + count;
-        sum += phi_xpq;
-      }
-
-      phi[b] += sieve.get_total_count();
-      sieve.cross_off_count(prime, b);
-    }
-
-    next_segment:;
-  }
-
-  return sum;
-}
-
-#elif defined(ENABLE_MULTIARCH_ARM_SVE)
-
-/// The only difference between this function and
-/// D_thread_default() is that this function uses the faster
-/// sieve.count_arm_sve() instead of sieve.count().
-///
-/// Both this function and the Sieve::count_arm_sve() function
-/// have been annotated using the same ARM SVE __attribute__.
-/// This ensures that the compiler will inline
-/// Sieve::count_arm_sve(), which is important for performance.
-///
-template <typename T, typename Primes, typename FactorTableD>
-__attribute__ ((target ("arch=armv8-a+sve")))
-T D_thread_arm_sve(T x,
-                   int64_t x_star,
-                   int64_t xz,
-                   int64_t y,
-                   int64_t z,
-                   int64_t k,
-                   const Primes& primes,
-                   const PiTable& pi,
-                   const FactorTableD& factor,
-                   ThreadData& thread)
-{
-  T sum = 0;
-
-  int64_t low = thread.low;
-  int64_t low1 = max(low, 1);
-  int64_t segments = thread.segments;
-  int64_t segment_size = thread.segment_size;
-  int64_t pi_sqrtz = pi[isqrt(z)];
-  int64_t limit = min(low + segment_size * segments, xz);
-  int64_t max_b = pi[min3(isqrt(x / low1), isqrt(limit), x_star)];
-  int64_t min_b = pi[min(xz / limit, x_star)];
-  min_b = max(k, min_b) + 1;
-
-  if (min_b > max_b)
-    return 0;
-
-  Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
-  Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
-
-  // Segmented sieve of Eratosthenes
-  for (; low < limit; low += segment_size)
-  {
-    // current segment [low, high[
-    int64_t high = min(low + segment_size, limit);
-    low1 = max(low, 1);
-
-    // For b < min_b there are no special leaves:
-    // low <= x / (primes[b] * m) < high
-    sieve.pre_sieve(primes, min_b - 1, low, high);
-    sieve.init_counter(low, high);
-    int64_t b = min_b;
-
-    // For k + 1 <= b <= pi_sqrtz
-    // Find all special leaves in the current segment that are
-    // composed of a prime and a square free number:
-    // low <= x / (primes[b] * m) < high
-    for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), z);
-      int64_t xp_high = min(fast_div(xp, high), z);
-      int64_t min_m = max(xp_high, z / prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
-
-      if (prime >= max_m)
-        goto next_segment;
-
-      min_m = factor.to_index(min_m);
-      max_m = factor.to_index(max_m);
-
-      for (int64_t m = max_m; m > min_m; m--)
-      {
-        // mu[m] != 0 &&
-        // lpf[m] > prime &&
-        // mpf[m] <= y
-        if (prime < factor.is_leaf(m))
-        {
-          int64_t xpm = fast_div64(xp, factor.to_number(m));
-          int64_t count = sieve.count_arm_sve(xpm - low);
-          int64_t phi_xpm = phi[b] + count;
-          int64_t mu_m = factor.mu(m);
-          sum -= mu_m * phi_xpm;
-        }
-      }
-
-      phi[b] += sieve.get_total_count();
-      sieve.cross_off_count(prime, b);
-    }
-
-    // For pi_sqrtz < b <= pi_x_star
-    // Find all special leaves in the current segment
-    // that are composed of 2 primes:
-    // low <= x / (primes[b] * primes[l]) < high
-    for (; b <= max_b; b++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t xp_low = min(fast_div(xp, low1), y);
-      int64_t xp_high = min(fast_div(xp, high), y);
-      int64_t min_m = max(xp_high, prime);
-      int64_t max_m = min(fast_div(xp, prime * prime), xp_low);
-      int64_t l = pi[max_m];
-
-      if (prime >= primes[l])
-        goto next_segment;
-
-      for (; primes[l] > min_m; l--)
-      {
-        int64_t xpq = fast_div64(xp, primes[l]);
-        int64_t count = sieve.count_arm_sve(xpq - low);
-        int64_t phi_xpq = phi[b] + count;
-        sum += phi_xpq;
-      }
-
-      phi[b] += sieve.get_total_count();
-      sieve.cross_off_count(prime, b);
-    }
-
-    next_segment:;
-  }
-
-  return sum;
-}
-
 #endif
 
 /// Runtime dispatch to highly optimized SIMD algorithm if the CPU
@@ -436,15 +316,40 @@ T D_thread_arm_sve(T x,
 template <typename T, typename... Args>
 T D_thread(Args&&... args)
 {
-  #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    if (cpu_supports_avx512_vpopcnt)
-      return D_thread_avx512<T>(std::forward<Args>(args)...);
+  #if defined(ENABLE_AVX512_VPOPCNT)
+    return D_thread_avx512<T>(std::forward<Args>(args)...);
+  #elif defined(ENABLE_ARM_SVE)
+    return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    return cpu_supports_avx512_vpopcnt
+      ? D_thread_avx512<T>(std::forward<Args>(args)...)
+      : D_thread_default<T>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    if (cpu_supports_sve)
-      return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+    return cpu_supports_sve
+      ? D_thread_arm_sve<T>(std::forward<Args>(args)...)
+      : D_thread_default<T>(std::forward<Args>(args)...);
+  #else
+    return D_thread_default<T>(std::forward<Args>(args)...);
   #endif
+}
 
-  return D_thread_default<T>(std::forward<Args>(args)...);
+string_view_t D_algo_name()
+{
+  #if defined(ENABLE_AVX512_VPOPCNT)
+    return "Algorithm: AVX512";
+  #elif defined(ENABLE_ARM_SVE)
+    return "Algorithm: ARM SVE";
+  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+    return cpu_supports_avx512_vpopcnt
+      ? "Algorithm: AVX512"
+      : "Algorithm: POPCNT64";
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    return cpu_supports_sve
+      ? "Algorithm: ARM SVE"
+      : "Algorithm: POPCNT64";
+  #else
+    return "Algorithm: POPCNT64";
+  #endif
 }
 
 /// Calculate the contribution of the hard special leaves.
@@ -528,7 +433,7 @@ int64_t D(int64_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print(Sieve::count_algo_name());
+    print(D_algo_name());
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }
@@ -559,7 +464,7 @@ int128_t D(int128_t x,
   {
     print("");
     print("=== D(x, y) ===");
-    print(Sieve::count_algo_name());
+    print(D_algo_name());
     print_gourdon_vars(x, y, z, k, threads);
     time = get_time();
   }

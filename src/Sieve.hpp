@@ -38,7 +38,6 @@
 #define SIEVE_HPP
 
 #include <cpu_arch_macros.hpp>
-#include <print.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -55,7 +54,6 @@ public:
   void cross_off(uint64_t prime, uint64_t i);
   void cross_off_count(uint64_t prime, uint64_t i);
   static uint64_t align_segment_size(uint64_t size);
-  static string_view_t count_algo_name();
 
   uint64_t get_total_count() const
   {
@@ -85,13 +83,13 @@ public:
 
   /// Count 1 bits inside [0, stop]
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
   #endif
   uint64_t count_avx512(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
   #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    __attribute__ ((target ("avx512f,avx512vpopcntdq")))
+    __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
   #endif
   uint64_t count_avx512(uint64_t start, uint64_t stop) const;
 

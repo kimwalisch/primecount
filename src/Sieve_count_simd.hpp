@@ -74,8 +74,9 @@
   const uint64_t* sieve64 = (const uint64_t*) sieve_.data(); \
   uint64_t start_bits = sieve64[start_idx] & m1; \
   uint64_t stop_bits = sieve64[stop_idx] & m2; \
-  __m512i vec = _mm512_set_epi64(0, 0, 0, 0, 0, 0, stop_bits, start_bits); \
-  __m512i vcnt = _mm512_popcnt_epi64(vec); \
+  uint64_t cnt = popcnt64_native(start_bits); \
+  cnt += popcnt64_native(stop_bits); \
+  __m512i vcnt = _mm512_setzero_si512(); \
   uint64_t i = start_idx + 1; \
   \
   /* Compute this for loop using AVX512. */ \
@@ -83,15 +84,15 @@
   /*   cnt += popcnt64(sieve64[i]); */ \
   for (; i + 8 < stop_idx; i += 8) \
   { \
-    vec = _mm512_loadu_epi64(&sieve64[i]); \
+    __m512i vec = _mm512_loadu_epi64(&sieve64[i]); \
     vec = _mm512_popcnt_epi64(vec); \
     vcnt = _mm512_add_epi64(vcnt, vec); \
   } \
   __mmask8 mask = (__mmask8) (0xff >> (i + 8 - stop_idx)); \
-  vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
+  __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
   vec = _mm512_popcnt_epi64(vec); \
   vcnt = _mm512_add_epi64(vcnt, vec); \
-  uint64_t cnt = _mm512_reduce_add_epi64(vcnt);
+  cnt += _mm512_reduce_add_epi64(vcnt);
 
 /// ARM SVE //////////////////////////////////////////////////////////
 
@@ -114,8 +115,9 @@
   uint64_t start_bits = sieve64[start_idx] & m1; \
   uint64_t stop_bits = sieve64[stop_idx] & m2; \
   ASSERT(svcntd() >= 2); \
-  svuint64_t vec = svinsr_n_u64(svdup_u64(start_bits), stop_bits); \
-  svuint64_t vcnt = svcnt_u64_z(svwhilelt_b64(0, 2), vec); \
+  svuint64_t bounds = svinsr_n_u64(svdup_u64(start_bits), stop_bits); \
+  bounds = svcnt_u64_z(svwhilelt_b64(0, 2), bounds); \
+  svuint64_t vcnt = svdup_u64(0); \
   uint64_t i = start_idx + 1; \
   \
   /* Compute this for loop using ARM SVE. */ \
@@ -123,14 +125,15 @@
   /*   cnt += popcnt64(sieve64[i]); */ \
   for (; i + svcntd() < stop_idx; i += svcntd()) \
   { \
-    vec = svld1_u64(svptrue_b64(), &sieve64[i]); \
+    svuint64_t vec = svld1_u64(svptrue_b64(), &sieve64[i]); \
     vec = svcnt_u64_x(svptrue_b64(), vec); \
     vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec); \
   } \
   svbool_t pg = svwhilelt_b64(i, stop_idx); \
-  vec = svld1_u64(pg, &sieve64[i]); \
+  svuint64_t vec = svld1_u64(pg, &sieve64[i]); \
   vec = svcnt_u64_z(pg, vec); \
   vcnt = svadd_u64_x(svptrue_b64(), vcnt, vec); \
+  vcnt = svadd_u64_x(svptrue_b64(), vcnt, bounds); \
   uint64_t cnt = svaddv_u64(svptrue_b64(), vcnt);
 
 #endif
