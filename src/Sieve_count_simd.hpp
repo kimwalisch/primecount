@@ -74,8 +74,9 @@
   const uint64_t* sieve64 = (const uint64_t*) sieve_.data(); \
   uint64_t start_bits = sieve64[start_idx] & m1; \
   uint64_t stop_bits = sieve64[stop_idx] & m2; \
-  __m512i vec = _mm512_set_epi64(0, 0, 0, 0, 0, 0, stop_bits, start_bits); \
-  __m512i vcnt = _mm512_popcnt_epi64(vec); \
+  uint64_t cnt = popcnt64_native(start_bits); \
+  cnt += popcnt64_native(stop_bits); \
+  __m512i vcnt = _mm512_setzero_si512(); \
   uint64_t i = start_idx + 1; \
   \
   /* Compute this for loop using AVX512. */ \
@@ -83,15 +84,15 @@
   /*   cnt += popcnt64(sieve64[i]); */ \
   for (; i + 8 < stop_idx; i += 8) \
   { \
-    vec = _mm512_loadu_epi64(&sieve64[i]); \
+    __m512i vec = _mm512_loadu_epi64(&sieve64[i]); \
     vec = _mm512_popcnt_epi64(vec); \
     vcnt = _mm512_add_epi64(vcnt, vec); \
   } \
   __mmask8 mask = (__mmask8) (0xff >> (i + 8 - stop_idx)); \
-  vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
+  __m512i vec = _mm512_maskz_loadu_epi64(mask, &sieve64[i]); \
   vec = _mm512_popcnt_epi64(vec); \
   vcnt = _mm512_add_epi64(vcnt, vec); \
-  uint64_t cnt = _mm512_reduce_add_epi64(vcnt);
+  cnt += _mm512_reduce_add_epi64(vcnt);
 
 /// ARM SVE //////////////////////////////////////////////////////////
 
