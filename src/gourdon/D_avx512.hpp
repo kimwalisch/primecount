@@ -243,9 +243,9 @@ T D_thread_avx512(T x,
           }
         }
 
+        // Filter out last few square free m
         if (m > min_m)
         {
-          // Filter out the last few square free m
           int count = int(m - min_m);
           __mmask16 load_mask = __mmask16((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
@@ -310,9 +310,9 @@ T D_thread_avx512(T x,
           }
         }
 
+        // Filter out last few square free m
         if (m > min_m)
         {
-          // Filter out the last few square free m
           int count = int(m - min_m);
           __mmask8 load_mask = __mmask8((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
