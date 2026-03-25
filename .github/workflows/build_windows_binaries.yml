@@ -64,6 +64,7 @@ jobs:
           msystem: CLANGARM64
           install: >-
             mingw-w64-clang-aarch64-clang
+            mingw-w64-clang-aarch64-llvm-openmp
             make
             git
             zip
