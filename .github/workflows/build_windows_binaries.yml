@@ -42,7 +42,7 @@ jobs:
           ./scripts/build_mingw64_x64.sh
 
       - name: Upload Windows x64 CI artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-x64
           path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-x64/*
@@ -83,7 +83,7 @@ jobs:
           ./scripts/build_mingw64_arm64.sh
 
       - name: Upload Windows ARM64 CI artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-arm64
           path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-arm64/*
