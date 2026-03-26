@@ -99,7 +99,7 @@ T D_thread_default(T x,
   Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
   Array< int64_t, 128> xpm_cache;
-  const auto* factor_data = factor.factor_data();
+  const auto* factor_table = factor.data();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -146,13 +146,13 @@ T D_thread_default(T x,
         for (; m > min_m + 3; m -= 4)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (prime < factor_data[m]);
+          m_count += (prime < factor_table[m]);
           m_indexes32[m_count] = uint32_t(m - 1);
-          m_count += (prime < factor_data[m - 1]);
+          m_count += (prime < factor_table[m - 1]);
           m_indexes32[m_count] = uint32_t(m - 2);
-          m_count += (prime < factor_data[m - 2]);
+          m_count += (prime < factor_table[m - 2]);
           m_indexes32[m_count] = uint32_t(m - 3);
-          m_count += (prime < factor_data[m - 3]);
+          m_count += (prime < factor_table[m - 3]);
 
           if (m_count > max_m_count)
           {
@@ -182,7 +182,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (prime < factor_data[m]);
+          m_count += (prime < factor_table[m]);
         }
 
         // Batch calculate xp/m to improve CPU pipelining
@@ -210,13 +210,13 @@ T D_thread_default(T x,
         for (; m > min_m + 3; m -= 4)
         {
           m_indexes64[m_count] = m;
-          m_count += (prime < factor_data[m]);
+          m_count += (prime < factor_table[m]);
           m_indexes64[m_count] = m - 1;
-          m_count += (prime < factor_data[m - 1]);
+          m_count += (prime < factor_table[m - 1]);
           m_indexes64[m_count] = m - 2;
-          m_count += (prime < factor_data[m - 2]);
+          m_count += (prime < factor_table[m - 2]);
           m_indexes64[m_count] = m - 3;
-          m_count += (prime < factor_data[m - 3]);
+          m_count += (prime < factor_table[m - 3]);
 
           if (m_count > max_m_count)
           {
@@ -246,7 +246,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes64[m_count] = m;
-          m_count += (prime < factor_data[m]);
+          m_count += (prime < factor_table[m]);
         }
 
         // Batch calculate xp/m to improve CPU pipelining

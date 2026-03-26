@@ -1,4 +1,4 @@
-Changes in primecount-8.4, 2026-03-23
+Changes in primecount-8.4, 2026-03-26
 
 This release adds a new branchfree implementation of Gourdon's
 D formula with AVX512, ARM SVE and portable integer code.
@@ -7,7 +7,7 @@ D formula with AVX512, ARM SVE and portable integer code.
 * D_avx512.hpp: Implement new branchfree AVX512 algorithm.
 * D_arm_sve.hpp: Implement new branchfree ARM SVE algorithm.
 * D.cpp: Implement new branchfree portable D algorithm.
-* FactorTableD.hpp: Add direct factor_data() access and improve
+* FactorTableD.hpp: Add direct data() access and improve
   32-bit/64-bit support for the new D algorithms.
 * popcnt.hpp: Add popcnt64_native() to bypass POPCNT runtime checks.
 * multiarch_avx512_vpopcnt.cmake: Require AVX512BW and AVX512VL.

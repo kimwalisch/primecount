@@ -199,7 +199,7 @@ public:
     return factor_[index];
   }
 
-  const T* factor_data() const
+  const T* data() const
   {
     return factor_.data();
   }

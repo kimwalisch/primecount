@@ -30,36 +30,36 @@ using namespace primecount;
 __attribute__ ((target ("arch=armv8-a+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
-                                                 const uint16_t* factor_data)
+                                                 const uint16_t* factor_table)
 {
-  return svrev_u32(svld1uh_u32(pg, factor_data));
+  return svrev_u32(svld1uh_u32(pg, factor_table));
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 __attribute__ ((target ("arch=armv8-a+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
-                                                 const uint32_t* factor_data)
+                                                 const uint32_t* factor_table)
 {
-  return svrev_u32(svld1_u32(pg, factor_data));
+  return svrev_u32(svld1_u32(pg, factor_table));
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 __attribute__ ((target ("arch=armv8-a+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
-                                                 const uint16_t* factor_data)
+                                                 const uint16_t* factor_table)
 {
-  return svrev_u64(svld1uh_u64(pg, factor_data));
+  return svrev_u64(svld1uh_u64(pg, factor_table));
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 __attribute__ ((target ("arch=armv8-a+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
-                                                 const uint32_t* factor_data)
+                                                 const uint32_t* factor_table)
 {
-  return svrev_u64(svld1uw_u64(pg, factor_data));
+  return svrev_u64(svld1uw_u64(pg, factor_table));
 }
 
 template <typename T, typename Primes, typename FactorTableD>
@@ -99,7 +99,7 @@ T D_thread_arm_sve(T x,
   Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
   Array< int64_t, 128> xpm_cache;
-  const auto* factor_data = factor.factor_data();
+  const auto* factor_table = factor.data();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -150,7 +150,7 @@ T D_thread_arm_sve(T x,
           // Filter out square free m values using ARM SVE
           // that satisfy: prime < factor.is_leaf(m)
           svuint32_t m_vec = svsub_u32_x(all32, svdup_n_u32(uint32_t(m)), m_offsets32);
-          svuint32_t factor_vec = load_factor_u32_arm_sve(all32, &factor_data[m + 1 - lanes32]);
+          svuint32_t factor_vec = load_factor_u32_arm_sve(all32, &factor_table[m + 1 - lanes32]);
           svbool_t mask = svcmpgt_n_u32(all32, factor_vec, uint32_t(prime));
           int64_t matches = svcntp_b32(all32, mask);
           svuint32_t compact = svcompact_u32(mask, m_vec);
@@ -189,7 +189,7 @@ T D_thread_arm_sve(T x,
           svbool_t store_pg = svrev_b32(load_pg);
           uint32_t base = uint32_t(m + lanes32 - lane_count);
           svuint32_t m_vec = svsub_u32_x(all32, svdup_n_u32(base), m_offsets32);
-          svuint32_t factor_vec = load_factor_u32_arm_sve(load_pg, &factor_data[m + 1 - lane_count]);
+          svuint32_t factor_vec = load_factor_u32_arm_sve(load_pg, &factor_table[m + 1 - lane_count]);
           svbool_t mask = svcmpgt_n_u32(store_pg, factor_vec, uint32_t(prime));
           int64_t matches = svcntp_b32(store_pg, mask);
           svuint32_t compact = svcompact_u32(mask, m_vec);
@@ -227,7 +227,7 @@ T D_thread_arm_sve(T x,
           // Filter out square free m values using ARM SVE
           // that satisfy: prime < factor.is_leaf(m)
           svuint64_t m_vec = svsub_u64_x(all64, svdup_n_u64(uint64_t(m)), m_offsets64);
-          svuint64_t factor_vec = load_factor_u64_arm_sve(all64, &factor_data[m + 1 - lanes64]);
+          svuint64_t factor_vec = load_factor_u64_arm_sve(all64, &factor_table[m + 1 - lanes64]);
           svbool_t mask = svcmpgt_n_u64(all64, factor_vec, uint64_t(prime));
           int64_t matches = svcntp_b64(all64, mask);
           svint64_t compact = svreinterpret_s64_u64(svcompact_u64(mask, m_vec));
@@ -266,7 +266,7 @@ T D_thread_arm_sve(T x,
           svbool_t store_pg = svrev_b64(load_pg);
           uint64_t base = uint64_t(m + lanes64 - lane_count);
           svuint64_t m_vec = svsub_u64_x(all64, svdup_n_u64(base), m_offsets64);
-          svuint64_t factor_vec = load_factor_u64_arm_sve(load_pg, &factor_data[m + 1 - lane_count]);
+          svuint64_t factor_vec = load_factor_u64_arm_sve(load_pg, &factor_table[m + 1 - lane_count]);
           svbool_t mask = svcmpgt_n_u64(store_pg, factor_vec, uint64_t(prime));
           int64_t matches = svcntp_b64(store_pg, mask);
           svint64_t compact = svreinterpret_s64_u64(svcompact_u64(mask, m_vec));
