@@ -209,7 +209,7 @@ T D_thread_avx512(T x,
         __m512i prime_vec = _mm512_set1_epi32(uint32_t(prime));
         constexpr std::size_t max_m_count = m_indexes32.size() - 16;
 
-        for (; m > min_m + 15; m -= 16)
+        for (; m >= min_m + 16; m -= 16)
         {
           // Filter out square free m values using AVX512
           // that satisfy: prime < factor.is_leaf(m)
@@ -276,7 +276,7 @@ T D_thread_avx512(T x,
         __m512i prime_vec = _mm512_set1_epi64(prime);
         constexpr std::size_t max_m_count = m_indexes64.size() - 8;
 
-        for (; m > min_m + 7; m -= 8)
+        for (; m >= min_m + 8; m -= 8)
         {
           // Filter out square free m values using AVX512
           // that satisfy: prime < factor.is_leaf(m)
