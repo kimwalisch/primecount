@@ -11,7 +11,7 @@
 ///        pi(x) = pi(y) + S1(x, a) + S2(x, a) - 1 - P2(x, a)
 ///        with y = x^(1/3), a = pi(y)
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -108,14 +108,14 @@ int64_t S2(int64_t x,
       int64_t max_m = min(x / (prime * low), y);
 
       // Obviously if (prime >= max_m) then (prime >= lpf[max_m])
-      // hence (prime < lpf[m]) will always evaluate to
+      // hence (lpf[m] > prime) will always evaluate to
       // false and no special leaves are possible.
       if (prime >= max_m)
         break;
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (mu[m] != 0 && prime < lpf[m])
+        if (mu[m] != 0 && lpf[m] > prime)
         {
           // We have found a special leaf. Compute it's contribution
           // phi(x / (primes[b] * m), b - 1) by counting the number

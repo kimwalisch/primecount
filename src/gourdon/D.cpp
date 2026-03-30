@@ -142,17 +142,17 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes32.size() - 4;
 
         // Filter out square free m values branchlessly
-        // that satisfy: prime < factor.is_leaf(m)
+        // that satisfy: factor_table[m] > prime
         for (; m >= min_m + 4; m -= 4)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (prime < factor_table[m]);
+          m_count += (factor_table[m] > prime);
           m_indexes32[m_count] = uint32_t(m - 1);
-          m_count += (prime < factor_table[m - 1]);
+          m_count += (factor_table[m - 1] > prime);
           m_indexes32[m_count] = uint32_t(m - 2);
-          m_count += (prime < factor_table[m - 2]);
+          m_count += (factor_table[m - 2] > prime);
           m_indexes32[m_count] = uint32_t(m - 3);
-          m_count += (prime < factor_table[m - 3]);
+          m_count += (factor_table[m - 3] > prime);
 
           if (m_count > max_m_count)
           {
@@ -182,7 +182,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (prime < factor_table[m]);
+          m_count += (factor_table[m] > prime);
         }
 
         // Batch calculate xp/m to improve CPU pipelining
@@ -206,17 +206,17 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes64.size() - 4;
 
         // Filter out square free m values branchlessly
-        // that satisfy: prime < factor.is_leaf(m)
+        // that satisfy: factor_table[m] > prime
         for (; m >= min_m + 4; m -= 4)
         {
           m_indexes64[m_count] = m;
-          m_count += (prime < factor_table[m]);
+          m_count += (factor_table[m] > prime);
           m_indexes64[m_count] = m - 1;
-          m_count += (prime < factor_table[m - 1]);
+          m_count += (factor_table[m - 1] > prime);
           m_indexes64[m_count] = m - 2;
-          m_count += (prime < factor_table[m - 2]);
+          m_count += (factor_table[m - 2] > prime);
           m_indexes64[m_count] = m - 3;
-          m_count += (prime < factor_table[m - 3]);
+          m_count += (factor_table[m - 3] > prime);
 
           if (m_count > max_m_count)
           {
@@ -246,7 +246,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes64[m_count] = m;
-          m_count += (prime < factor_table[m]);
+          m_count += (factor_table[m] > prime);
         }
 
         // Batch calculate xp/m to improve CPU pipelining

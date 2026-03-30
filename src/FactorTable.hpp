@@ -32,10 +32,10 @@
 ///        below used in the S1(x, a) and S2(x, a) formulas by the
 ///        2nd new if statement which is obviously faster.
 ///
-///        * Old: if (mu[n] != 0 && prime < lpf[n])
-///        * New: if (prime < factor[n])
+///        * Old: if (mu[n] != 0 && lpf[n] > prime)
+///        * New: if (factor[n] > prime)
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

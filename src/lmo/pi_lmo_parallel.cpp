@@ -102,7 +102,7 @@ int64_t S2_thread(int64_t x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        if (mu[m] != 0 && prime < lpf[m])
+        if (mu[m] != 0 && lpf[m] > prime)
         {
           int64_t xpm = x / (prime * m);
           int64_t count = sieve.count(xpm - low);

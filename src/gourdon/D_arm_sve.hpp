@@ -148,7 +148,7 @@ T D_thread_arm_sve(T x,
         for (; m >= min_m + lanes32; m -= lanes32)
         {
           // Filter out square free m values using ARM SVE
-          // that satisfy: prime < factor.is_leaf(m)
+          // that satisfy: factor_table[m] > prime
           svuint32_t m_vec = svsub_u32_x(all32, svdup_n_u32(uint32_t(m)), m_offsets32);
           svuint32_t factor_vec = load_factor_u32_arm_sve(all32, &factor_table[m + 1 - lanes32]);
           svbool_t mask = svcmpgt_n_u32(all32, factor_vec, uint32_t(prime));
@@ -225,7 +225,7 @@ T D_thread_arm_sve(T x,
         for (; m >= min_m + lanes64; m -= lanes64)
         {
           // Filter out square free m values using ARM SVE
-          // that satisfy: prime < factor.is_leaf(m)
+          // that satisfy: factor_table[m] > prime
           svuint64_t m_vec = svsub_u64_x(all64, svdup_n_u64(uint64_t(m)), m_offsets64);
           svuint64_t factor_vec = load_factor_u64_arm_sve(all64, &factor_table[m + 1 - lanes64]);
           svbool_t mask = svcmpgt_n_u64(all64, factor_vec, uint64_t(prime));

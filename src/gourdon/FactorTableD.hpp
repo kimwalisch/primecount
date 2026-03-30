@@ -35,7 +35,7 @@
 ///        statement which is obviously faster.
 ///
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
-///        * New: if (prime < factor[n])
+///        * New: if (factor[n] > prime)
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///

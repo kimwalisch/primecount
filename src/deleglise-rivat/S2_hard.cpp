@@ -111,8 +111,8 @@ T S2_hard_thread(T x,
 
       for (int64_t m = max_m; m > min_m; m--)
       {
-        // mu(m) != 0 && prime < lpf(m)
-        if (prime < factor.mu_lpf(m))
+        // mu(m) != 0 && lpf(m) > prime
+        if (factor.mu_lpf(m) > prime)
         {
           int64_t xpm = fast_div64(xp, factor.to_number(m));
           int64_t count = sieve.count(xpm - low);

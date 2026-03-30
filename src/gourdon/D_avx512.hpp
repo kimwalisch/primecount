@@ -212,7 +212,7 @@ T D_thread_avx512(T x,
         for (; m >= min_m + 16; m -= 16)
         {
           // Filter out square free m values using AVX512
-          // that satisfy: prime < factor.is_leaf(m)
+          // that satisfy: factor_table[m] > prime
           __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
           __m512i factor_vec = load_factor_epi32_avx512(&factor_table[m - 15], reverse32);
           __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
@@ -279,7 +279,7 @@ T D_thread_avx512(T x,
         for (; m >= min_m + 8; m -= 8)
         {
           // Filter out square free m values using AVX512
-          // that satisfy: prime < factor.is_leaf(m)
+          // that satisfy: factor_table[m] > prime
           __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
           __m512i factor_vec = load_factor_epi64_avx512(&factor_table[m - 7], reverse64);
           __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
