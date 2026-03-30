@@ -143,7 +143,7 @@ T D_thread_default(T x,
 
         // Filter out square free m values branchlessly
         // that satisfy: prime < factor.is_leaf(m)
-        for (; m > min_m + 3; m -= 4)
+        for (; m >= min_m + 4; m -= 4)
         {
           m_indexes32[m_count] = uint32_t(m);
           m_count += (prime < factor_table[m]);
@@ -207,7 +207,7 @@ T D_thread_default(T x,
 
         // Filter out square free m values branchlessly
         // that satisfy: prime < factor.is_leaf(m)
-        for (; m > min_m + 3; m -= 4)
+        for (; m >= min_m + 4; m -= 4)
         {
           m_indexes64[m_count] = m;
           m_count += (prime < factor_table[m]);
