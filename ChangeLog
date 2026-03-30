@@ -1,8 +1,9 @@
-Changes in primecount-8.4, 2026-03-26
+Changes in primecount-8.4, 2026-03-30
 
 This release adds a new branchfree implementation of Gourdon's
 D formula with AVX512, ARM SVE and portable integer code.
 
+* Vector.hpp: Fix potential double free issue.
 * Sieve_count_simd.hpp: Tune AVX512 and ARM SVE kernels.
 * D_avx512.hpp: Implement new branchfree AVX512 algorithm.
 * D_arm_sve.hpp: Implement new branchfree ARM SVE algorithm.
