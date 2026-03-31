@@ -18,6 +18,7 @@
 ///
 ///        In-depth description of this algorithm:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///

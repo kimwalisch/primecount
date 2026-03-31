@@ -11,6 +11,10 @@
 ///        by annotating all ARM SVE helper functions using the same
 ///        ARM SVE __attribute__ and the ALWAYS_INLINE macro.
 ///
+///        In-depth description of this algorithm:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves.pdf
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING

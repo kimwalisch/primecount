@@ -1,8 +1,10 @@
-Changes in primecount-8.4, 2026-03-30
+Changes in primecount-8.4, 2026-03-31
 
 This release adds a new branchfree implementation of Gourdon's
 D formula with AVX512, ARM SVE and portable integer code.
 
+* doc/Hard-Special-Leaves-SIMD-Filtering.pdf: New math paper
+  about the branchfree SIMD hard special leaves algorithm.
 * Vector.hpp: Fix potential double free issue.
 * Sieve_count_simd.hpp: Tune AVX512 and ARM SVE kernels.
 * D_avx512.hpp: Implement new branchfree AVX512 algorithm.
