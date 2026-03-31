@@ -1,8 +1,12 @@
 ///
 /// @file  FactorTable.cpp
-/// @see   FactorTable.hpp for documentation
+///        Static lookup tables used by the FactorTable
+///        and FactorTableD classes.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+///        In-depth description of the factor table data structure:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
+///
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

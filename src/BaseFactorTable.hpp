@@ -1,10 +1,13 @@
 ///
 /// @file  BaseFactorTable.hpp
-///        Static lookup tables and functions used by the
-///        FactorTable and FactorTableD classes.
-///        See FactorTable.hpp for more information.
+///        BaseFactorTable contains methods to convert an integer
+///        to a factor table index and a factor table index
+///        back to an integer.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+///        In-depth description of the factor table data structure:
+///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
+///
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
