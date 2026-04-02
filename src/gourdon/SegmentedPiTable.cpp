@@ -116,6 +116,8 @@ void SegmentedPiTable::init(uint64_t low,
 
   uint64_t segment_size = high - low;
   uint64_t size = ceil_div(segment_size, 128);
+  bits_.clear();
+  pi_.clear();
   bits_.resize(size);
   pi_.resize(size);
   std::fill_n(&bits_[0], size, 0);
