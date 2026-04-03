@@ -12,18 +12,25 @@ endif()
 
 set(PRIMECOUNT_CODEGEN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(PRIMECOUNT_CODEGEN_SRC "${CMAKE_CURRENT_SOURCE_DIR}/conditional_move.cpp")
+set(PRIMECOUNT_CODEGEN_CHECKER
+    "${CMAKE_CURRENT_SOURCE_DIR}/check_conditional.cmake")
+get_filename_component(PRIMECOUNT_CODEGEN_SRC_NAME
+    "${PRIMECOUNT_CODEGEN_SRC}" NAME_WE)
+get_filename_component(PRIMECOUNT_CODEGEN_CHECK_NAME
+    "${PRIMECOUNT_CODEGEN_CHECKER}" NAME_WE)
 set(PRIMECOUNT_CODEGEN_HEADERS
     "${PROJECT_SOURCE_DIR}/include/macros.hpp"
     "${PROJECT_SOURCE_DIR}/include/popcnt.hpp")
-set(PRIMECOUNT_CODEGEN_OBJ "${PRIMECOUNT_CODEGEN_DIR}/conditional_move.obj")
-set(PRIMECOUNT_CODEGEN_ASM "${PRIMECOUNT_CODEGEN_DIR}/conditional_move.s")
+set(PRIMECOUNT_CODEGEN_OBJ
+    "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_SRC_NAME}.obj")
+set(PRIMECOUNT_CODEGEN_ASM
+    "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_SRC_NAME}.s")
 set(PRIMECOUNT_CODEGEN_FLAGS "${CMAKE_CXX_FLAGS}")
-set(PRIMECOUNT_CODEGEN_CHECKER
-    "${CMAKE_CURRENT_SOURCE_DIR}/check_conditional.cmake")
 separate_arguments(PRIMECOUNT_CODEGEN_FLAGS NATIVE_COMMAND "${PRIMECOUNT_CODEGEN_FLAGS}")
 
 if(MSVC)
-    set(PRIMECOUNT_CODEGEN_ASM "${PRIMECOUNT_CODEGEN_DIR}/conditional_move.asm")
+    set(PRIMECOUNT_CODEGEN_ASM
+        "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_SRC_NAME}.asm")
     add_custom_command(
         OUTPUT "${PRIMECOUNT_CODEGEN_ASM}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${PRIMECOUNT_CODEGEN_DIR}"
@@ -39,7 +46,7 @@ if(MSVC)
                 "/Fa${PRIMECOUNT_CODEGEN_ASM}"
                 "${PRIMECOUNT_CODEGEN_SRC}"
         DEPENDS "${PRIMECOUNT_CODEGEN_SRC}" ${PRIMECOUNT_CODEGEN_HEADERS}
-        COMMENT "Generating assembly for check_conditional_move_codegen"
+        COMMENT "Generating assembly for ${PRIMECOUNT_CODEGEN_SRC_NAME}"
         VERBATIM)
 else()
     add_custom_command(
@@ -56,23 +63,23 @@ else()
                 "${PRIMECOUNT_CODEGEN_ASM}"
                 "${PRIMECOUNT_CODEGEN_SRC}"
         DEPENDS "${PRIMECOUNT_CODEGEN_SRC}" ${PRIMECOUNT_CODEGEN_HEADERS}
-        COMMENT "Generating assembly for check_conditional_move_codegen"
+        COMMENT "Generating assembly for ${PRIMECOUNT_CODEGEN_SRC_NAME}"
         VERBATIM)
 endif()
 
-add_custom_target(build_conditional_move_codegen ALL
+add_custom_target(${PRIMECOUNT_CODEGEN_SRC_NAME} ALL
     DEPENDS "${PRIMECOUNT_CODEGEN_ASM}")
 
-add_custom_target(check_conditional_move_codegen
+add_custom_target(${PRIMECOUNT_CODEGEN_CHECK_NAME}
     COMMAND ${CMAKE_COMMAND}
             "-DASM_FILE=${PRIMECOUNT_CODEGEN_ASM}"
             -P "${PRIMECOUNT_CODEGEN_CHECKER}"
-    DEPENDS build_conditional_move_codegen
+    DEPENDS ${PRIMECOUNT_CODEGEN_SRC_NAME}
             "${PRIMECOUNT_CODEGEN_CHECKER}"
     VERBATIM)
 
 add_test(
-    NAME check_conditional_move_codegen
+    NAME ${PRIMECOUNT_CODEGEN_CHECK_NAME}
     COMMAND ${CMAKE_COMMAND}
             "-DASM_FILE=${PRIMECOUNT_CODEGEN_ASM}"
             -P "${PRIMECOUNT_CODEGEN_CHECKER}")

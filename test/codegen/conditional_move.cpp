@@ -2,9 +2,8 @@
 /// @file  conditional_move.cpp
 /// @brief CI-only codegen test for CONDITIONAL_MOVE on x64.
 ///
-/// This file is compiled to assembly by the
-/// check_conditional_move_codegen target and is run via CTest when
-/// BUILD_CODEGEN_TESTS=ON.
+/// This file is compiled to assembly during the codegen build and is
+/// checked via CTest when BUILD_CODEGEN_TESTS=ON.
 ///
 
 #include <macros.hpp>
