@@ -36,7 +36,7 @@ if(MSVC)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${PRIMECOUNT_CODEGEN_DIR}"
         COMMAND "${CMAKE_CXX_COMPILER}"
                 /nologo
-                /arch:AVX2
+                /arch:AVX
                 /O2
                 /FAs
                 /c
