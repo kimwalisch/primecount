@@ -11,9 +11,15 @@ endif()
 file(READ "${ASM_FILE}" primecount_conditional_move_asm)
 string(TOLOWER "${primecount_conditional_move_asm}" primecount_conditional_move_asm)
 
-if(NOT primecount_conditional_move_asm MATCHES "(^|[\r\n])[ \t]*cmov[a-z0-9]+([ \t]|$)")
+string(REGEX MATCHALL "(^|[\r\n])[ \t]*cmov[a-z0-9]+([ \t]|$)"
+       primecount_cmov_matches
+       "${primecount_conditional_move_asm}")
+list(LENGTH primecount_cmov_matches primecount_cmov_count)
+
+if(NOT primecount_cmov_count EQUAL 2)
     message(FATAL_ERROR
-            "Expected at least one cmov* instruction in ${ASM_FILE}, but none was found.")
+            "Expected exactly 2 cmov* instructions in ${ASM_FILE}, "
+            "but found ${primecount_cmov_count}.")
 endif()
 
-message(STATUS "Found a cmov* instruction in ${ASM_FILE}")
+message(STATUS "Found exactly 2 cmov* instructions in ${ASM_FILE}")
