@@ -29,7 +29,7 @@ if(MSVC)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${PRIMECOUNT_CODEGEN_DIR}"
         COMMAND "${CMAKE_CXX_COMPILER}"
                 /nologo
-                /std:c++17
+                /arch:AVX2
                 /O2
                 /FAs
                 /c
@@ -60,17 +60,19 @@ else()
         VERBATIM)
 endif()
 
+add_custom_target(build_conditional_move_codegen ALL
+    DEPENDS "${PRIMECOUNT_CODEGEN_ASM}")
+
 add_custom_target(check_conditional_move_codegen
     COMMAND ${CMAKE_COMMAND}
             "-DASM_FILE=${PRIMECOUNT_CODEGEN_ASM}"
             -P "${PRIMECOUNT_CODEGEN_CHECKER}"
-    DEPENDS "${PRIMECOUNT_CODEGEN_ASM}"
+    DEPENDS build_conditional_move_codegen
             "${PRIMECOUNT_CODEGEN_CHECKER}"
     VERBATIM)
 
 add_test(
     NAME check_conditional_move_codegen
     COMMAND ${CMAKE_COMMAND}
-            --build "${PROJECT_BINARY_DIR}"
-            --target check_conditional_move_codegen
-            --config "$<CONFIG>")
+            "-DASM_FILE=${PRIMECOUNT_CODEGEN_ASM}"
+            -P "${PRIMECOUNT_CODEGEN_CHECKER}")

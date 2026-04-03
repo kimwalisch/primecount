@@ -427,16 +427,14 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/primecount.pc
 
 # Testing ############################################################
 
-if(BUILD_TESTS OR (PRIMECOUNT_IS_TOP_PROJECT AND BUILD_CODEGEN_TESTS))
+if(BUILD_TESTS OR BUILD_CODEGEN_TESTS)
     enable_testing()
-endif()
-
-# Codegen tests ######################################################
-
-if(PRIMECOUNT_IS_TOP_PROJECT AND BUILD_CODEGEN_TESTS)
-    add_subdirectory(test/codegen)
 endif()
 
 if(BUILD_TESTS)
     add_subdirectory(test)
+endif()
+
+if(BUILD_CODEGEN_TESTS)
+    add_subdirectory(test/codegen)
 endif()
