@@ -12,6 +12,7 @@ option(BUILD_SHARED_LIBS   "Build the shared libprimecount"        OFF)
 option(BUILD_STATIC_LIBS   "Build the static libprimecount"        ON)
 option(BUILD_MANPAGE       "Regenerate man page using a2x program" OFF)
 option(BUILD_TESTS         "Build the test programs"               OFF)
+option(BUILD_CODEGEN_TESTS "Build the codegen tests"               OFF)
 
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
@@ -426,7 +427,16 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/primecount.pc
 
 # Testing ############################################################
 
-if(BUILD_TESTS)
+if(BUILD_TESTS OR (PRIMECOUNT_IS_TOP_PROJECT AND BUILD_CODEGEN_TESTS))
     enable_testing()
+endif()
+
+# Codegen tests ######################################################
+
+if(PRIMECOUNT_IS_TOP_PROJECT AND BUILD_CODEGEN_TESTS)
+    add_subdirectory(test/codegen)
+endif()
+
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()

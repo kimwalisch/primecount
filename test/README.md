@@ -8,6 +8,12 @@ cmake --build . --parallel
 ctest
 ```
 
+To include the optional x64 codegen tests in `ctest`, enable:
+
+```bash
+cmake . -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON
+```
+
 # Test in debug mode
 
 When hacking on primecount's source code, it is best to run its test suite
