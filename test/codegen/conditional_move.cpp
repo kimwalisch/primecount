@@ -15,7 +15,7 @@
 extern const uint64_t unset_smaller[240];
 extern const uint64_t unset_larger[240];
 
-NOINLINE uint64_t get_val(uint64_t start, uint64_t stop, const uint64_t* sieve64)
+uint64_t sieve_count(uint64_t start, uint64_t stop, const uint64_t* sieve64)
 {
   uint64_t start_idx = start / 240;
   uint64_t stop_idx = stop / 240;
