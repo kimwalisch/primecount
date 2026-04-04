@@ -25,9 +25,6 @@ if(DEFINED PRIMECOUNT_CONFIGURE_CODEGEN_TEST)
         "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_TEST_NAME}.obj")
     set(PRIMECOUNT_CODEGEN_ASM
         "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_TEST_NAME}.s")
-    set(PRIMECOUNT_CODEGEN_FLAGS "${CMAKE_CXX_FLAGS}")
-    separate_arguments(PRIMECOUNT_CODEGEN_FLAGS NATIVE_COMMAND "${PRIMECOUNT_CODEGEN_FLAGS}")
-
     if(MSVC)
         set(PRIMECOUNT_CODEGEN_ASM
             "${PRIMECOUNT_CODEGEN_DIR}/${PRIMECOUNT_CODEGEN_TEST_NAME}.asm")
@@ -40,7 +37,6 @@ if(DEFINED PRIMECOUNT_CONFIGURE_CODEGEN_TEST)
                     /O2
                     /FAs
                     /c
-                    ${PRIMECOUNT_CODEGEN_FLAGS}
                     "/I${PROJECT_SOURCE_DIR}/include"
                     "/Fo${PRIMECOUNT_CODEGEN_OBJ}"
                     "/Fa${PRIMECOUNT_CODEGEN_ASM}"
@@ -56,7 +52,6 @@ if(DEFINED PRIMECOUNT_CONFIGURE_CODEGEN_TEST)
                     -mpopcnt
                     -O2
                     -S
-                    ${PRIMECOUNT_CODEGEN_FLAGS}
                     "-I${PROJECT_SOURCE_DIR}/include"
                     -o
                     "${PRIMECOUNT_CODEGEN_ASM}"
