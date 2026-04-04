@@ -8,11 +8,16 @@ cmake --build . --parallel
 ctest
 ```
 
-To include the optional x64 codegen tests in `ctest`, enable:
+To enable the optional architecture-specific assembly codegen tests use:
 
 ```bash
-cmake . -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON
+cmake . -DBUILD_CODEGEN_TESTS=ON
 ```
+
+Please note that these assembly codegen tests should not be enabled when
+packaging primecount for Linux distros. The purpose of these assembly
+codegen tests is to debug performance issues, not corretness issues. These
+tests are run as part of primecount's GitHub Actions CI. 
 
 # Test in debug mode
 
