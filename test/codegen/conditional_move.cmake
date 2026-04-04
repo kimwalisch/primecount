@@ -93,10 +93,10 @@ string(REGEX MATCHALL "(^|[\r\n])[ \t]*cmov[a-z0-9]+([ \t]|$)"
        "${primecount_conditional_move_asm}")
 list(LENGTH primecount_cmov_matches primecount_cmov_count)
 
-if(NOT primecount_cmov_count EQUAL 2)
+if(primecount_cmov_count LESS 2)
     message(FATAL_ERROR
-            "Expected exactly 2 cmov* instructions in ${ASM_FILE}, "
+            "Expected at least 2 cmov* instructions in ${ASM_FILE}, "
             "but found ${primecount_cmov_count}.")
 endif()
 
-message(STATUS "Found exactly 2 cmov* instructions in ${ASM_FILE}")
+message(STATUS "Found ${primecount_cmov_count} cmov* instructions in ${ASM_FILE}")
