@@ -53,7 +53,6 @@ if(DEFINED PRIMECOUNT_CONFIGURE_CODEGEN_TEST)
                     -mpopcnt
                     -O2
                     -S
-                    -c
                     ${PRIMECOUNT_CODEGEN_FLAGS}
                     "-I${PROJECT_SOURCE_DIR}/include"
                     -o
