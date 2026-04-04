@@ -84,7 +84,7 @@ jobs:
       - name: Build primecount
         # Enable POPCNT using /arch:AVX
         run: |
-            cmake . -G "Visual Studio 17 2022" -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="/arch:AVX /W3 /WX /MP /EHsc"
+            cmake . -G "Visual Studio 17 2022" -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON -DCMAKE_CXX_FLAGS="/arch:AVX /W3 /WX /MP /EHsc"
             cmake --build . --config Release --target install
       - name: CTest (unit tests)
         run: ctest -j2 -C Release --output-on-failure
