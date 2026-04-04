@@ -34,7 +34,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test option
         run: ./primecount --test
       - name: primecount --test
@@ -121,7 +121,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
@@ -155,7 +155,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
@@ -253,7 +253,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
@@ -291,7 +291,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
@@ -358,7 +358,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: primecount --test
         run: ./primecount --test
       - name: primecount 1e11 --legendre
@@ -385,7 +385,7 @@ jobs:
             grep "^int128.*:INTERNAL=1$" CMakeCache.txt
             cmake --build . --parallel --verbose
       - name: CTest (unit tests)
-        run: ctest -j2
+        run: ctest -j2 --output-on-failure
       - name: PrimePi(1e20) 128-bit test
         run: |
             ./primecount 1e20 -s | tee primecount-1e20.log
