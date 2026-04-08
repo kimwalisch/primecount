@@ -83,25 +83,23 @@ public:
   }
 
   template <typename UT>
-  void sieve_parallel(UT low, UT high, int max_threads)
+  void sieve_taskgroup(UT low, UT high, int max_threads)
   {
     use_atomic_ = true;
     init(low, high);
     int active_threads = get_active_threads(max_threads);
 
-    // The encountering outer thread becomes the primary thread
-    // of a nested team that only works on this segment.
-    #pragma omp parallel num_threads(active_threads) if(active_threads > 1)
+    // Let the current segment task process one partition itself
+    // and spawn only the remaining helper tasks.
+    #pragma omp taskgroup
     {
-    #ifdef _OPENMP
-      int thread_id = omp_get_thread_num();
-      int threads = omp_get_num_threads();
-    #else
-      int thread_id = 0;
-      int threads = 1;
-    #endif
+      for (int thread_id = 1; thread_id < active_threads; thread_id++)
+      {
+        #pragma omp task firstprivate(thread_id, active_threads)
+        cross_off_prime_range(thread_id, active_threads);
+      }
 
-      cross_off_prime_range(thread_id, threads);
+      cross_off_prime_range(0, active_threads);
     }
 
     count_primes();
@@ -408,8 +406,6 @@ T nth_prime_sieve(uint64_t n,
 
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
   int thread_group_size = 1;
-  int old_max_active_levels = 1;
-  int old_dynamic = 0;
 
 #ifdef _OPENMP
   {
@@ -419,19 +415,6 @@ T nth_prime_sieve(uint64_t n,
     thread_group_size = (int) (sqrt_n / min_sieving_prime_dist);
     thread_group_size = in_between(1, thread_group_size, max_thread_group_size);
     thread_group_size = std::min(thread_group_size, thread_budget);
-
-    if (thread_group_size > 1)
-    {
-      old_max_active_levels = omp_get_max_active_levels();
-      old_dynamic = omp_get_dynamic();
-
-      if (old_max_active_levels < 2)
-        omp_set_max_active_levels(2);
-
-      // Keep the requested team sizes stable for the nested teams.
-      if (old_dynamic)
-        omp_set_dynamic(0);
-    }
   }
 #endif
 
@@ -454,57 +437,57 @@ T nth_prime_sieve(uint64_t n,
     time = get_time();
   }
 
-  #pragma omp parallel num_threads(threads)
-  while (!finished)
+  #pragma omp parallel num_threads(total_threads)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
+    #pragma omp single nowait
+    while (!finished)
+    {
+      uint64_t current_iter = while_iters++;
 
-    // Unsigned integer division is usually
-    // faster than signed integer division.
-    using UT = typename pstd::make_unsigned<T>::type;
-    uint64_t i = while_iters * threads + thread_id;
-    UT low = 0, high = 0;
+      #pragma omp taskgroup
+      {
+        for (int t = 0; t < threads; t++)
+        {
+          // Unsigned integer division is usually
+          // faster than signed integer division.
+          using UT = typename pstd::make_unsigned<T>::type;
+          uint64_t i = current_iter * threads + t;
+          UT low = 0, high = 0;
 
-    if (sieve_forward)
-    {
-      low = nth_prime_approx + i * thread_dist;
-      high = low + thread_dist - 1;
-    }
-    else if ((UT) nth_prime_approx > i * thread_dist)
-    {
-      high = nth_prime_approx - i * thread_dist;
-      low = (high - min(high, thread_dist)) + 1;
-    }
+          if (sieve_forward)
+          {
+            low = nth_prime_approx + i * thread_dist;
+            high = low + thread_dist - 1;
+          }
+          else if ((UT) nth_prime_approx > i * thread_dist)
+          {
+            high = nth_prime_approx - i * thread_dist;
+            low = (high - min(high, thread_dist)) + 1;
+          }
 
-    // Sieve the current segment [low, high].
-    // If possible use fast 64-bit bit integer division
-    // instead of slow 128-bit integer division.
-    if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-        high <= pstd::numeric_limits<uint64_t>::max())
-    {
-      if (thread_group_size == 1)
-        sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
-      else
-        sieves[thread_id].sieve_parallel((uint64_t) low, (uint64_t) high, thread_group_size);
-    }
-    else
-    {
-      if (thread_group_size == 1)
-        sieves[thread_id].sieve(low, high);
-      else
-        sieves[thread_id].sieve_parallel(low, high, thread_group_size);
-    }
-
-    // Wait until all threads have finished
-    // computing their current segment.
-    #pragma omp barrier
-    #pragma omp single
-    {
-      while_iters++;
+          #pragma omp task firstprivate(t, low, high, thread_group_size) shared(sieves)
+          {
+            // Sieve the current segment [low, high].
+            // If possible use fast 64-bit bit integer division
+            // instead of slow 128-bit integer division.
+            if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+                high <= pstd::numeric_limits<uint64_t>::max())
+            {
+              if (thread_group_size == 1)
+                sieves[t].sieve((uint64_t) low, (uint64_t) high);
+              else
+                sieves[t].sieve_taskgroup((uint64_t) low, (uint64_t) high, thread_group_size);
+            }
+            else
+            {
+              if (thread_group_size == 1)
+                sieves[t].sieve(low, high);
+              else
+                sieves[t].sieve_taskgroup(low, high, thread_group_size);
+            }
+          }
+        }
+      }
 
       for (int t = 0; t < threads; t++)
       {
@@ -540,17 +523,6 @@ T nth_prime_sieve(uint64_t n,
       }
     }
   }
-
-#ifdef _OPENMP
-  if (thread_group_size > 1)
-  {
-    if (old_dynamic)
-      omp_set_dynamic(old_dynamic);
-
-    if (old_max_active_levels < 2)
-      omp_set_max_active_levels(old_max_active_levels);
-  }
-#endif
 
   if (!nth_prime)
     throw primecount_error("Failed to find nth prime!");
