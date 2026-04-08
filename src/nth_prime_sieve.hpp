@@ -237,10 +237,10 @@ private:
     first_word &= unset_smaller_[old_low % 240];
     last_word &= unset_larger_[high % 240];
 
-    if (size_ > sieve_size_)
+    if (size_ > sieve_capacity_)
     {
       sieve_.reset(new std::atomic<uint64_t>[size_]);
-      sieve_size_ = size_;
+      sieve_capacity_ = size_;
     }
 
     auto* sieve = sieve_.get();
@@ -270,7 +270,7 @@ private:
   uint64_t i_max_ = 0;
   bool use_prime_squares_ = false;
   std::unique_ptr<std::atomic<uint64_t>[]> sieve_;
-  uint64_t sieve_size_ = 0;
+  uint64_t sieve_capacity_ = 0;
 };
 
 /// The aligned_vector class aligns each of its
