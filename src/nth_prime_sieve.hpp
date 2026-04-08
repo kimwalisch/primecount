@@ -382,7 +382,7 @@ T nth_prime_sieve(uint64_t n,
             low = (high - min(high, thread_dist)) + 1;
           }
 
-          #pragma omp task firstprivate(t, low, high, thread_group_size) shared(sieves)
+          #pragma omp task firstprivate(t, low, high, thread_group_size)
           {
             // Sieve the current segment [low, high].
             // If possible use fast 64-bit bit integer division
