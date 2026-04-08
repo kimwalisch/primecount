@@ -84,7 +84,7 @@ public:
     {
       for (int thread_id = 1; thread_id < active_threads; thread_id++)
       {
-        #pragma omp task firstprivate(thread_id, active_threads)
+        #pragma omp task
         cross_off_prime_range(thread_id, active_threads);
       }
 
@@ -382,7 +382,7 @@ T nth_prime_sieve(uint64_t n,
             low = (high - min(high, thread_dist)) + 1;
           }
 
-          #pragma omp task firstprivate(t, low, high, thread_group_size)
+          #pragma omp task
           {
             // Sieve the current segment [low, high].
             // If possible use fast 64-bit bit integer division
