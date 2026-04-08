@@ -72,20 +72,9 @@ public:
     return count_;
   }
 
-  /// Sieve interval [low, high]
   template <typename UT>
-  void sieve(UT low, UT high)
+  void sieve_parallel(UT low, UT high, int max_threads)
   {
-    use_atomic_ = false;
-    init(low, high);
-    cross_off_prime_range(0, 1);
-    count_primes();
-  }
-
-  template <typename UT>
-  void sieve_taskgroup(UT low, UT high, int max_threads)
-  {
-    use_atomic_ = true;
     init(low, high);
     int active_threads = get_active_threads(max_threads);
 
@@ -120,90 +109,45 @@ public:
     if (prime_start > prime_stop)
       return;
 
-    if (use_atomic_)
+    primesieve::iterator iter(prime_start, prime_stop);
+    uint64_t prime;
+    UT low = (UT) low_;
+
+    if (use_prime_squares_)
     {
-      primesieve::iterator iter(prime_start, prime_stop);
-      uint64_t prime;
-      UT low = (UT) low_;
-
-      if (use_prime_squares_)
+      while ((prime = iter.next_prime()) <= prime_stop)
       {
-        while ((prime = iter.next_prime()) <= prime_stop)
-        {
-          // Calculate first multiple > low
-          // that is not divisible by 2.
-          UT q = fast_div(low, prime);
-          UT n = prime * (q + 1 + (q & 1));
-          n = max(n, UT(prime) * prime);
-          ASSERT(n > prime);
-          ASSERT(n % 2 != 0);
-          uint64_t i = (uint64_t) (n - low);
+        // Calculate first multiple > low
+        // that is not divisible by 2.
+        UT q = fast_div(low, prime);
+        UT n = prime * (q + 1 + (q & 1));
+        n = max(n, UT(prime) * prime);
+        ASSERT(n > prime);
+        ASSERT(n % 2 != 0);
+        uint64_t i = (uint64_t) (n - low);
 
-          // Cross-off multiples
-          for (; i <= i_max_; i += prime * 2)
-            atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
-                                             std::memory_order_relaxed);
-        }
-      }
-      else
-      {
-        while ((prime = iter.next_prime()) <= prime_stop)
-        {
-          // Calculate first multiple > low
-          // that is not divisible by 2.
-          UT q = fast_div(low, prime);
-          UT n = prime * (q + 1 + (q & 1));
-          ASSERT(n > prime);
-          ASSERT(n % 2 != 0);
-          uint64_t i = (uint64_t) (n - low);
-
-          // Cross-off multiples
-          for (; i <= i_max_; i += prime * 2)
-            atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
-                                             std::memory_order_relaxed);
-        }
+        // Cross-off multiples
+        for (; i <= i_max_; i += prime * 2)
+          atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
+                                           std::memory_order_relaxed);
       }
     }
     else
     {
-      primesieve::iterator iter(prime_start, prime_stop);
-      uint64_t prime;
-      UT low = (UT) low_;
-
-      if (use_prime_squares_)
+      while ((prime = iter.next_prime()) <= prime_stop)
       {
-        while ((prime = iter.next_prime()) <= prime_stop)
-        {
-          // Calculate first multiple > low
-          // that is not divisible by 2.
-          UT q = fast_div(low, prime);
-          UT n = prime * (q + 1 + (q & 1));
-          n = max(n, UT(prime) * prime);
-          ASSERT(n > prime);
-          ASSERT(n % 2 != 0);
-          uint64_t i = (uint64_t) (n - low);
+        // Calculate first multiple > low
+        // that is not divisible by 2.
+        UT q = fast_div(low, prime);
+        UT n = prime * (q + 1 + (q & 1));
+        ASSERT(n > prime);
+        ASSERT(n % 2 != 0);
+        uint64_t i = (uint64_t) (n - low);
 
-          // Cross-off multiples
-          for (; i <= i_max_; i += prime * 2)
-            sieve_[i / 240] &= unset_bit_[i % 240];
-        }
-      }
-      else
-      {
-        while ((prime = iter.next_prime()) <= prime_stop)
-        {
-          // Calculate first multiple > low
-          // that is not divisible by 2.
-          UT q = fast_div(low, prime);
-          UT n = prime * (q + 1 + (q & 1));
-          ASSERT(n > prime);
-          ASSERT(n % 2 != 0);
-          uint64_t i = (uint64_t) (n - low);
-
-          // Cross-off multiples
-          for (; i <= i_max_; i += prime * 2)
-            sieve_[i / 240] &= unset_bit_[i % 240];
-        }
+        // Cross-off multiples
+        for (; i <= i_max_; i += prime * 2)
+          atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
+                                           std::memory_order_relaxed);
       }
     }
   }
@@ -289,33 +233,10 @@ private:
     sqrt_high_ = (uint64_t) isqrt(high);
     use_prime_squares_ = sqrt_high_ >= low;
     count_ = 0;
-    init_sieve(old_low, high);
-  }
-
-  template <typename UT>
-  void init_sieve(UT old_low, UT high)
-  {
     uint64_t first_word = ~0ull;
     first_word &= unset_smaller_[(uint64_t) (old_low % 240)];
     uint64_t last_word = ~0ull;
     last_word &= unset_larger_[(uint64_t) (high % 240)];
-
-    if (use_atomic_)
-      init_atomic_sieve(first_word, last_word);
-    else
-      init_plain_sieve(first_word, last_word);
-  }
-
-  void init_plain_sieve(uint64_t first_word, uint64_t last_word)
-  {
-    sieve_.resize(size_);
-    std::fill_n(sieve_.begin(), size_, ~0ull);
-    sieve_.front() &= first_word;
-    sieve_.back() &= last_word;
-  }
-
-  void init_atomic_sieve(uint64_t first_word, uint64_t last_word)
-  {
     if (size_ > atomic_capacity_)
     {
       atomic_sieve_.reset(new std::atomic<uint64_t>[size_]);
@@ -338,10 +259,7 @@ private:
 
   ALWAYS_INLINE uint64_t load_word(uint64_t i) const
   {
-    if (use_atomic_)
-      return atomic_sieve_[i].load(std::memory_order_relaxed);
-
-    return sieve_[i];
+    return atomic_sieve_[i].load(std::memory_order_relaxed);
   }
 
   T low_ = 0;
@@ -349,9 +267,7 @@ private:
   uint64_t size_ = 0;
   uint64_t sqrt_high_ = 0;
   uint64_t i_max_ = 0;
-  bool use_atomic_ = false;
   bool use_prime_squares_ = false;
-  Vector<uint64_t> sieve_;
   std::unique_ptr<std::atomic<uint64_t>[]> atomic_sieve_;
   uint64_t atomic_capacity_ = 0;
 };
@@ -472,19 +388,9 @@ T nth_prime_sieve(uint64_t n,
             // instead of slow 128-bit integer division.
             if ( low <= pstd::numeric_limits<uint64_t>::max() &&
                 high <= pstd::numeric_limits<uint64_t>::max())
-            {
-              if (thread_group_size == 1)
-                sieves[t].sieve((uint64_t) low, (uint64_t) high);
-              else
-                sieves[t].sieve_taskgroup((uint64_t) low, (uint64_t) high, thread_group_size);
-            }
+              sieves[t].sieve_parallel((uint64_t) low, (uint64_t) high, thread_group_size);
             else
-            {
-              if (thread_group_size == 1)
-                sieves[t].sieve(low, high);
-              else
-                sieves[t].sieve_taskgroup(low, high, thread_group_size);
-            }
+              sieves[t].sieve_parallel(low, high, thread_group_size);
           }
         }
       }
