@@ -44,6 +44,8 @@
 #include <Vector.hpp>
 
 #include <algorithm>
+#include <atomic>
+#include <memory>
 
 #ifdef _OPENMP
   #include <omp.h>
@@ -52,6 +54,9 @@
 namespace {
 
 using namespace primecount;
+
+constexpr uint64_t min_sieving_prime_dist = UINT64_C(100000000);
+constexpr int max_thread_group_size = 8;
 
 template <typename T>
 class NthPrimeSieve : public BitSieve240
@@ -71,75 +76,135 @@ public:
   template <typename UT>
   void sieve(UT low, UT high)
   {
-    if (high < 2)
+    use_atomic_ = false;
+    init(low, high);
+    cross_off_prime_range(0, 1);
+    count_primes();
+  }
+
+  template <typename UT>
+  void init_atomic(UT low, UT high)
+  {
+    use_atomic_ = true;
+    init(low, high);
+  }
+
+  void cross_off_prime_range(int thread_id, int threads)
+  {
+    using UT = typename pstd::make_unsigned<T>::type;
+
+    if (!size_)
       return;
 
-    // NthPrimeSieve cannot generate the primes 2, 3 and 5.
-    // In our bit sieve array the 8 bits of each byte correspond
-    // to the offsets: { 1, 7, 11, 13, 17, 19, 23, 29 }.
-    // Hence, our bit sieve array excludes 2, 3 and 5.
-    if (low <= 5)
-      throw primecount_error("NthPrimeSieve: low must > 5");
+    uint64_t prime_start = sqrt_high_ * thread_id / threads;
+    uint64_t prime_stop = sqrt_high_ * (thread_id + 1) / threads;
+    prime_start += (thread_id > 0);
+    prime_start = max(prime_start, UINT64_C(7));
 
-    UT old_low = low;
-    if (low % 240)
-      low -= low % 240;
+    if (prime_start > prime_stop)
+      return;
 
-    low_ = low;
-    UT dist = (high - low) + 1;
-    uint64_t size = (uint64_t) ceil_div(dist, 240);
-    uint64_t sqrt_high = (uint64_t) isqrt(high);
-    uint64_t prime;
-
-    sieve_.resize(size);
-    std::fill(sieve_.begin(), sieve_.end(), ~0ull);
-    sieve_.front() &= unset_smaller_[old_low % 240];
-    sieve_.back() &= unset_larger_[high % 240];
-    primesieve::iterator iter(7, sqrt_high);
-
-    if (sqrt_high < low)
+    if (use_atomic_)
     {
-      while ((prime = iter.next_prime()) <= sqrt_high)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = (uint64_t) (n - low);
-        uint64_t i_max = (uint64_t) (high - low);
+      primesieve::iterator iter(prime_start, prime_stop);
+      uint64_t prime;
+      UT low = (UT) low_;
 
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve_[i / 240] &= unset_bit_[i % 240];
+      if (use_prime_squares_)
+      {
+        while ((prime = iter.next_prime()) <= prime_stop)
+        {
+          // Calculate first multiple > low
+          // that is not divisible by 2.
+          UT q = fast_div(low, prime);
+          UT n = prime * (q + 1 + (q & 1));
+          n = max(n, UT(prime) * prime);
+          ASSERT(n > prime);
+          ASSERT(n % 2 != 0);
+          uint64_t i = (uint64_t) (n - low);
+
+          // Cross-off multiples
+          for (; i <= i_max_; i += prime * 2)
+            atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
+                                             std::memory_order_relaxed);
+        }
+      }
+      else
+      {
+        while ((prime = iter.next_prime()) <= prime_stop)
+        {
+          // Calculate first multiple > low
+          // that is not divisible by 2.
+          UT q = fast_div(low, prime);
+          UT n = prime * (q + 1 + (q & 1));
+          ASSERT(n > prime);
+          ASSERT(n % 2 != 0);
+          uint64_t i = (uint64_t) (n - low);
+
+          // Cross-off multiples
+          for (; i <= i_max_; i += prime * 2)
+            atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
+                                             std::memory_order_relaxed);
+        }
       }
     }
     else
     {
-      while ((prime = iter.next_prime()) <= sqrt_high)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        n = max(n, UT(prime) * prime);
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = (uint64_t) (n - low);
-        uint64_t i_max = (uint64_t) (high - low);
+      primesieve::iterator iter(prime_start, prime_stop);
+      uint64_t prime;
+      UT low = (UT) low_;
 
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve_[i / 240] &= unset_bit_[i % 240];
+      if (use_prime_squares_)
+      {
+        while ((prime = iter.next_prime()) <= prime_stop)
+        {
+          // Calculate first multiple > low
+          // that is not divisible by 2.
+          UT q = fast_div(low, prime);
+          UT n = prime * (q + 1 + (q & 1));
+          n = max(n, UT(prime) * prime);
+          ASSERT(n > prime);
+          ASSERT(n % 2 != 0);
+          uint64_t i = (uint64_t) (n - low);
+
+          // Cross-off multiples
+          for (; i <= i_max_; i += prime * 2)
+            sieve_[i / 240] &= unset_bit_[i % 240];
+        }
+      }
+      else
+      {
+        while ((prime = iter.next_prime()) <= prime_stop)
+        {
+          // Calculate first multiple > low
+          // that is not divisible by 2.
+          UT q = fast_div(low, prime);
+          UT n = prime * (q + 1 + (q & 1));
+          ASSERT(n > prime);
+          ASSERT(n % 2 != 0);
+          uint64_t i = (uint64_t) (n - low);
+
+          // Cross-off multiples
+          for (; i <= i_max_; i += prime * 2)
+            sieve_[i / 240] &= unset_bit_[i % 240];
+        }
       }
     }
+  }
 
+  int get_active_threads(int max_threads) const
+  {
+    int threads = (int) (sqrt_high_ / min_sieving_prime_dist);
+    return in_between(1, threads, max_threads);
+  }
+
+  void count_primes()
+  {
     uint64_t count = 0;
 
     // Count primes (1 bits)
-    for (uint64_t bits : sieve_)
-      count += popcnt64(bits);
+    for (uint64_t i = 0; i < size_; i++)
+      count += popcnt64(load_word(i));
 
     count_ = count;
   }
@@ -151,9 +216,9 @@ public:
 
     uint64_t count = 0;
 
-    for (std::size_t i = 0; i < sieve_.size(); i++)
+    for (uint64_t i = 0; i < size_; i++)
     {
-      uint64_t bits = sieve_[i];
+      uint64_t bits = load_word(i);
       uint64_t count_bits = popcnt64(bits);
 
       if_likely(count + count_bits < n)
@@ -177,9 +242,102 @@ public:
   }
 
 private:
+  template <typename UT>
+  void init(UT low, UT high)
+  {
+    if (high < 2)
+    {
+      low_ = 0;
+      count_ = 0;
+      size_ = 0;
+      sqrt_high_ = 0;
+      i_max_ = 0;
+      use_prime_squares_ = false;
+      return;
+    }
+
+    // NthPrimeSieve cannot generate the primes 2, 3 and 5.
+    // In our bit sieve array the 8 bits of each byte correspond
+    // to the offsets: { 1, 7, 11, 13, 17, 19, 23, 29 }.
+    // Hence, our bit sieve array excludes 2, 3 and 5.
+    if (low <= 5)
+      throw primecount_error("NthPrimeSieve: low must > 5");
+
+    UT old_low = low;
+    if (low % 240)
+      low -= low % 240;
+
+    low_ = low;
+    i_max_ = (uint64_t) (high - low);
+    size_ = (uint64_t) ceil_div(i_max_ + 1, 240);
+    sqrt_high_ = (uint64_t) isqrt(high);
+    use_prime_squares_ = sqrt_high_ >= low;
+    count_ = 0;
+    init_sieve(old_low, high);
+  }
+
+  template <typename UT>
+  void init_sieve(UT old_low, UT high)
+  {
+    uint64_t first_word = ~0ull;
+    first_word &= unset_smaller_[(uint64_t) (old_low % 240)];
+    uint64_t last_word = ~0ull;
+    last_word &= unset_larger_[(uint64_t) (high % 240)];
+
+    if (use_atomic_)
+      init_atomic_sieve(first_word, last_word);
+    else
+      init_plain_sieve(first_word, last_word);
+  }
+
+  void init_plain_sieve(uint64_t first_word, uint64_t last_word)
+  {
+    sieve_.resize(size_);
+    std::fill_n(sieve_.begin(), size_, ~0ull);
+    sieve_.front() &= first_word;
+    sieve_.back() &= last_word;
+  }
+
+  void init_atomic_sieve(uint64_t first_word, uint64_t last_word)
+  {
+    if (size_ > atomic_capacity_)
+    {
+      atomic_sieve_.reset(new std::atomic<uint64_t>[size_]);
+      atomic_capacity_ = size_;
+    }
+
+    uint64_t word = first_word;
+    if (size_ == 1)
+      word &= last_word;
+
+    atomic_sieve_[0].store(word, std::memory_order_relaxed);
+
+    for (uint64_t i = 1; i + 1 < size_; i++)
+      atomic_sieve_[i].store(~0ull, std::memory_order_relaxed);
+
+    if (size_ > 1)
+      atomic_sieve_[size_ - 1].store(~0ull & last_word,
+                                     std::memory_order_relaxed);
+  }
+
+  ALWAYS_INLINE uint64_t load_word(uint64_t i) const
+  {
+    if (use_atomic_)
+      return atomic_sieve_[i].load(std::memory_order_relaxed);
+
+    return sieve_[i];
+  }
+
   T low_ = 0;
   uint64_t count_ = 0;
+  uint64_t size_ = 0;
+  uint64_t sqrt_high_ = 0;
+  uint64_t i_max_ = 0;
+  bool use_atomic_ = false;
+  bool use_prime_squares_ = false;
   Vector<uint64_t> sieve_;
+  std::unique_ptr<std::atomic<uint64_t>[]> atomic_sieve_;
+  uint64_t atomic_capacity_ = 0;
 };
 
 /// The aligned_vector class aligns each of its
@@ -190,9 +348,6 @@ private:
 template <typename T>
 class aligned_vector
 {
-  static_assert(sizeof(T) < MAX_CACHE_LINE_SIZE,
-                "sizeof(T) must be < MAX_CACHE_LINE_SIZE");
-
 public:
   aligned_vector(std::size_t size) : vect_(size) { }
   std::size_t size() const { return vect_.size(); }
@@ -201,12 +356,10 @@ public:
 private:
   struct CacheLine {
     T val;
-    // We cannot use alignas(MAX_CACHE_LINE_SIZE) for
-    // the CacheLine struct as GCC does not yet support
-    // alignas(n) with n > 128. Also alignas(n) for
-    // over-aligned data and dynamic memory allocation
-    // is only supported since C++17.
-    MAYBE_UNUSED char pad[MAX_CACHE_LINE_SIZE - sizeof(T)];
+    // Round up the size of each element to a cache line
+    // multiple so adjacent elements do not share cache lines.
+    MAYBE_UNUSED char pad[MAX_CACHE_LINE_SIZE -
+                          (sizeof(T) % MAX_CACHE_LINE_SIZE)];
   };
 
   Vector<CacheLine> vect_;
@@ -233,8 +386,23 @@ T nth_prime_sieve(uint64_t n,
   thread_dist = max(min_thread_dist, thread_dist);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
+  int max_threads = threads;
 
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
+  int thread_group_size = 1;
+
+#ifdef _OPENMP
+  {
+    using UT = typename pstd::make_unsigned<T>::type;
+    uint64_t sqrt_n = (uint64_t) isqrt((UT) nth_prime_approx);
+    int thread_budget = max(1, max_threads / threads);
+    thread_group_size = (int) (sqrt_n / min_sieving_prime_dist);
+    thread_group_size = in_between(1, thread_group_size, max_thread_group_size);
+    thread_group_size = std::min(thread_group_size, thread_budget);
+  }
+#endif
+
+  int total_threads = threads * thread_group_size;
   aligned_vector<NthPrimeSieve<T>> sieves(threads);
   bool print_vars = is_print();
   bool finished = false;
@@ -244,81 +412,187 @@ T nth_prime_sieve(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, thread_dist, threads);
+    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, thread_dist, total_threads);
+    if (thread_group_size > 1)
+    {
+      print("segment_threads", threads);
+      print("thread_group_size", thread_group_size);
+    }
     time = get_time();
   }
 
-  #pragma omp parallel num_threads(threads)
-  while (!finished)
+  if (thread_group_size == 1)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // Unsigned integer division is usually
-    // faster than signed integer division.
-    using UT = typename pstd::make_unsigned<T>::type;
-    uint64_t i = while_iters * threads + thread_id;
-    UT low = 0, high = 0;
-
-    if (sieve_forward)
+    #pragma omp parallel num_threads(threads)
+    while (!finished)
     {
-      low = nth_prime_approx + i * thread_dist;
-      high = low + thread_dist - 1;
-    }
-    else if ((UT) nth_prime_approx > i * thread_dist)
-    {
-      high = nth_prime_approx - i * thread_dist;
-      low = (high - min(high, thread_dist)) + 1;
-    }
+    #ifdef _OPENMP
+      int thread_id = omp_get_thread_num();
+    #else
+      int thread_id = 0;
+    #endif
 
-    // Sieve the current segment [low, high].
-    // If possible use fast 64-bit bit integer division
-    // instead of slow 128-bit integer division.
-    if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-        high <= pstd::numeric_limits<uint64_t>::max())
-      sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
-    else
-      sieves[thread_id].sieve(low, high);
+      // Unsigned integer division is usually
+      // faster than signed integer division.
+      using UT = typename pstd::make_unsigned<T>::type;
+      uint64_t i = while_iters * threads + thread_id;
+      UT low = 0, high = 0;
 
-    // Wait until all threads have finished
-    // computing their current segment.
-    #pragma omp barrier
-    #pragma omp single
-    {
-      while_iters++;
-
-      for (int t = 0; t < threads; t++)
+      if (sieve_forward)
       {
-        if (sieve_forward)
+        low = nth_prime_approx + i * thread_dist;
+        high = low + thread_dist - 1;
+      }
+      else if ((UT) nth_prime_approx > i * thread_dist)
+      {
+        high = nth_prime_approx - i * thread_dist;
+        low = (high - min(high, thread_dist)) + 1;
+      }
+
+      // Sieve the current segment [low, high].
+      // If possible use fast 64-bit bit integer division
+      // instead of slow 128-bit integer division.
+      if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+          high <= pstd::numeric_limits<uint64_t>::max())
+        sieves[thread_id].sieve((uint64_t) low, (uint64_t) high);
+      else
+        sieves[thread_id].sieve(low, high);
+
+      // Wait until all threads have finished
+      // computing their current segment.
+      #pragma omp barrier
+      #pragma omp single
+      {
+        while_iters++;
+
+        for (int t = 0; t < threads; t++)
         {
-          if (count + sieves[t].get_count() < n)
-            count += sieves[t].get_count();
-          else
+          if (sieve_forward)
           {
-            // Nth prime is in the current segment
-            nth_prime = sieves[t].find_nth_prime(n - count);
-            finished = true;
-            break;
+            if (count + sieves[t].get_count() < n)
+              count += sieves[t].get_count();
+            else
+            {
+              // Nth prime is in the current segment
+              nth_prime = sieves[t].find_nth_prime(n - count);
+              finished = true;
+              break;
+            }
+          }
+          else // Sieve backwards
+          {
+            count += sieves[t].get_count();
+
+            if (count >= n)
+            {
+              // Nth prime is in the current segment
+              nth_prime = sieves[t].find_nth_prime((count - n) + 1);
+              finished = true;
+              break;
+            }
+            else if (sieves[t].get_low() == 0)
+            {
+              finished = true;
+              break;
+            }
           }
         }
-        else // Sieve backwards
-        {
-          count += sieves[t].get_count();
+      }
+    }
+  }
+  else
+  {
+    #pragma omp parallel num_threads(total_threads)
+    while (!finished)
+    {
+    #ifdef _OPENMP
+      int thread_id = omp_get_thread_num();
+    #else
+      int thread_id = 0;
+    #endif
 
-          if (count >= n)
+      // Each segment is shared by a small thread group.
+      int group_id = thread_id / thread_group_size;
+      int group_thread_id = thread_id % thread_group_size;
+
+      // Unsigned integer division is usually
+      // faster than signed integer division.
+      using UT = typename pstd::make_unsigned<T>::type;
+      uint64_t i = while_iters * threads + group_id;
+      UT low = 0, high = 0;
+
+      if (sieve_forward)
+      {
+        low = nth_prime_approx + i * thread_dist;
+        high = low + thread_dist - 1;
+      }
+      else if ((UT) nth_prime_approx > i * thread_dist)
+      {
+        high = nth_prime_approx - i * thread_dist;
+        low = (high - min(high, thread_dist)) + 1;
+      }
+
+      if (group_thread_id == 0)
+      {
+        // Sieve the current segment [low, high].
+        // If possible use fast 64-bit bit integer division
+        // instead of slow 128-bit integer division.
+        if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+            high <= pstd::numeric_limits<uint64_t>::max())
+          sieves[group_id].init_atomic((uint64_t) low, (uint64_t) high);
+        else
+          sieves[group_id].init_atomic(low, high);
+      }
+
+      #pragma omp barrier
+
+      int active_threads = sieves[group_id].get_active_threads(thread_group_size);
+
+      if (group_thread_id < active_threads)
+        sieves[group_id].cross_off_prime_range(group_thread_id, active_threads);
+
+      #pragma omp barrier
+
+      if (group_thread_id == 0)
+        sieves[group_id].count_primes();
+
+      // Wait until all thread groups have finished
+      // computing their current segment.
+      #pragma omp barrier
+      #pragma omp single
+      {
+        while_iters++;
+
+        for (int t = 0; t < threads; t++)
+        {
+          if (sieve_forward)
           {
-            // Nth prime is in the current segment
-            nth_prime = sieves[t].find_nth_prime((count - n) + 1);
-            finished = true;
-            break;
+            if (count + sieves[t].get_count() < n)
+              count += sieves[t].get_count();
+            else
+            {
+              // Nth prime is in the current segment
+              nth_prime = sieves[t].find_nth_prime(n - count);
+              finished = true;
+              break;
+            }
           }
-          else if (sieves[t].get_low() == 0)
+          else // Sieve backwards
           {
-            finished = true;
-            break;
+            count += sieves[t].get_count();
+
+            if (count >= n)
+            {
+              // Nth prime is in the current segment
+              nth_prime = sieves[t].find_nth_prime((count - n) + 1);
+              finished = true;
+              break;
+            }
+            else if (sieves[t].get_low() == 0)
+            {
+              finished = true;
+              break;
+            }
           }
         }
       }
