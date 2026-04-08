@@ -112,6 +112,7 @@ public:
     primesieve::iterator iter(prime_start, prime_stop);
     uint64_t prime;
     UT low = (UT) low_;
+    auto* sieve = sieve_.get();
 
     if (use_prime_squares_)
     {
@@ -128,8 +129,7 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max_; i += prime * 2)
-          atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
-                                           std::memory_order_relaxed);
+          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
     else
@@ -146,8 +146,7 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max_; i += prime * 2)
-          atomic_sieve_[i / 240].fetch_and(unset_bit_[i % 240],
-                                           std::memory_order_relaxed);
+          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
   }
@@ -237,29 +236,31 @@ private:
     first_word &= unset_smaller_[(uint64_t) (old_low % 240)];
     uint64_t last_word = ~0ull;
     last_word &= unset_larger_[(uint64_t) (high % 240)];
+
     if (size_ > atomic_capacity_)
     {
-      atomic_sieve_.reset(new std::atomic<uint64_t>[size_]);
+      sieve_.reset(new std::atomic<uint64_t>[size_]);
       atomic_capacity_ = size_;
     }
 
+    auto* sieve = sieve_.get();
     uint64_t word = first_word;
+
     if (size_ == 1)
       word &= last_word;
 
-    atomic_sieve_[0].store(word, std::memory_order_relaxed);
+    sieve[0].store(word, std::memory_order_relaxed);
 
     for (uint64_t i = 1; i + 1 < size_; i++)
-      atomic_sieve_[i].store(~0ull, std::memory_order_relaxed);
+      sieve[i].store(~0ull, std::memory_order_relaxed);
 
     if (size_ > 1)
-      atomic_sieve_[size_ - 1].store(~0ull & last_word,
-                                     std::memory_order_relaxed);
+      sieve[size_ - 1].store(~0ull & last_word, std::memory_order_relaxed);
   }
 
   ALWAYS_INLINE uint64_t load_word(uint64_t i) const
   {
-    return atomic_sieve_[i].load(std::memory_order_relaxed);
+    return sieve_[i].load(std::memory_order_relaxed);
   }
 
   T low_ = 0;
@@ -268,7 +269,7 @@ private:
   uint64_t sqrt_high_ = 0;
   uint64_t i_max_ = 0;
   bool use_prime_squares_ = false;
-  std::unique_ptr<std::atomic<uint64_t>[]> atomic_sieve_;
+  std::unique_ptr<std::atomic<uint64_t>[]> sieve_;
   uint64_t atomic_capacity_ = 0;
 };
 
