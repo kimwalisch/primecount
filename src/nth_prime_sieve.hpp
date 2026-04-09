@@ -295,14 +295,14 @@ T nth_prime_sieve_impl(uint64_t n,
   uint64_t thread_dist = (uint64_t) (root3 * 30);
   uint64_t min_thread_dist = 8 * 240;
   thread_dist = max(min_thread_dist, thread_dist);
+  uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
-  uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int max_threads_per_segment = in_between(1, max_threads / main_threads, 32);
+  int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
   int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
-  int total_threads = main_threads * threads_per_segment;
+  int total_threads = in_between(1, main_threads * threads_per_segment, max_threads);
 
   aligned_vector<NthPrimeSieve<T>> sieves(main_threads);
   bool print_vars = is_print();
