@@ -25,7 +25,7 @@ int main()
   NthPrimeSieve<int64_t> nthPrimeSieve;
   uint64_t low = 7;
   uint64_t high = 3089;
-  nthPrimeSieve.sieve(low, high);
+  nthPrimeSieve.sieve(low, high, 1);
   std::cout << "nthPrimeSieve.sieve(" << low << ", " << high << ")" << std::endl;
   uint64_t prime = nthPrimeSieve.find_nth_prime(1);
   std::cout << "nthPrimeSieve.find_nth_prime(1) = " << prime;
@@ -41,7 +41,7 @@ int main()
 
   low = 8;
   high = 3088;
-  nthPrimeSieve.sieve(low, high);
+  nthPrimeSieve.sieve(low, high, 1);
   std::cout << "nthPrimeSieve.sieve(" << low << ", " << high << ")" << std::endl;
   prime = nthPrimeSieve.find_nth_prime(1);
   std::cout << "nthPrimeSieve.find_nth_prime(1) = " << prime;
@@ -57,7 +57,7 @@ int main()
 
   low = uint64_t(1e12);
   high = uint64_t(1e12) + (10000 * 30);
-  nthPrimeSieve.sieve(low, high);
+  nthPrimeSieve.sieve(low, high, 1);
   std::cout << "nthPrimeSieve.sieve(" << low << ", " << high << ")" << std::endl;
   prime = nthPrimeSieve.find_nth_prime(1);
   std::cout << "nthPrimeSieve.find_nth_prime(1) = " << prime;
