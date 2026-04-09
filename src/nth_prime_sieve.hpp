@@ -303,8 +303,8 @@ T nth_prime_sieve_impl(uint64_t n,
   int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
   int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
   int total_threads = in_between(1, main_threads * threads_per_segment, max_threads);
-
   aligned_vector<NthPrimeSieve<T>> sieves(main_threads);
+
   bool print_vars = is_print();
   bool finished = false;
   double time;
@@ -346,7 +346,7 @@ T nth_prime_sieve_impl(uint64_t n,
             low = (high - min(high, thread_dist)) + 1;
           }
 
-          #pragma omp task
+          #pragma omp task shared(sieves)
           {
             // Sieve the current segment [low, high].
             // If possible use fast 64-bit bit integer division
