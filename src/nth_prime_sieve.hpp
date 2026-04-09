@@ -287,10 +287,6 @@ T nth_prime_sieve_impl(uint64_t n,
 {
   ASSERT(n > 0);
 
-  T nth_prime = 0;
-  uint64_t count = 0;
-  uint64_t while_iters = 0;
-
   T root3 = iroot<3>(nth_prime_approx);
   uint64_t thread_dist = (uint64_t) (root3 * 30);
   uint64_t min_thread_dist = 8 * 240;
@@ -305,6 +301,9 @@ T nth_prime_sieve_impl(uint64_t n,
   int total_threads = in_between(1, main_threads * threads_per_segment, max_threads);
   aligned_vector<NthPrimeSieve<T>> sieves(main_threads);
 
+  T nth_prime = 0;
+  uint64_t count = 0;
+  uint64_t while_iters = 0;
   bool print_vars = is_print();
   bool finished = false;
   double time;
