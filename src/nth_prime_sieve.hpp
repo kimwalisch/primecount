@@ -92,12 +92,12 @@ public:
 
     low_ = low;
     uint64_t dist = uint64_t((high - low) + 1);
-    uint64_t size = ceil_div(dist, 240);
+    sieve_size_ = ceil_div(dist, 240);
 
-    if (size > sieve_size_)
+    if (sieve_size_ > sieve_capacity_)
     {
-      sieve_size_ = size;
       sieve_.reset(new std::atomic<uint64_t>[sieve_size_]);
+      sieve_capacity_ = sieve_size_;
     }
 
     // Initialize sieve array, set all bits to 1
@@ -222,6 +222,7 @@ private:
   T low_ = 0;
   uint64_t count_ = 0;
   uint64_t sieve_size_ = 0;
+  uint64_t sieve_capacity_ = 0;
   std::unique_ptr<std::atomic<uint64_t>[]> sieve_;
 };
 
