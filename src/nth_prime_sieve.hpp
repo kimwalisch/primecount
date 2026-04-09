@@ -107,24 +107,23 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
+    // Spawn worker threads that cross off
+    // multiples in the sieve array.
     #pragma omp taskgroup
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
       threads = ideal_num_threads(sqrt_high, threads, min_iter_dist);
-      uint64_t thread_dist = ceil_div(sqrt_high, threads);
+      uint64_t chunks_per_thread = (threads > 1) ? 4 : 1;
+      uint64_t chunk_count = threads * chunks_per_thread;
+      uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
 
       for (int t = 1; t < threads; t++)
       {
-        UT iter_start = thread_dist * t + 1;
-        UT iter_stop = thread_dist * (t + 1);
-        iter_start = max(iter_start, 7);
-        iter_stop = min(iter_stop, sqrt_high);
-
-        #pragma omp task
-        cross_off(low, high, iter_start, iter_stop);
+        #pragma omp task firstprivate(t)
+        cross_off_chunks(low, high, sqrt_high, chunk_count, chunk_dist, t, threads);
       }
 
-      cross_off(low, high, 7, thread_dist);
+      cross_off_chunks(low, high, sqrt_high, chunk_count, chunk_dist, 0, threads);
     }
 
     uint64_t count = 0;
@@ -134,6 +133,31 @@ public:
       count += popcnt64(sieve[i].load(std::memory_order_relaxed));
 
     count_ = count;
+  }
+
+  /// Sieve interval [low, high]
+  template <typename UT>
+  void cross_off_chunks(UT low,
+                        UT high,
+                        uint64_t sqrt_high,
+                        uint64_t chunk_count,
+                        uint64_t chunk_dist,
+                        uint64_t chunk_start,
+                        uint64_t chunk_stride)
+  {
+    // Use a static round-robin schedule over more chunks
+    // than workers so the expensive small sieving primes
+    // are spread across threads.
+    for (uint64_t chunk = chunk_start; chunk < chunk_count; chunk += chunk_stride)
+    {
+      uint64_t iter_start = chunk_dist * chunk + 1;
+      uint64_t iter_stop = chunk_dist * (chunk + 1);
+      iter_start = max(iter_start, uint64_t(7));
+      iter_stop = min(iter_stop, sqrt_high);
+
+      if (iter_start <= iter_stop)
+        cross_off(low, high, iter_start, iter_stop);
+    }
   }
 
   /// Sieve interval [low, high]
@@ -162,15 +186,7 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-        {
-          // Since multiple threads write to the sieve array
-          // simultaneously, we can reduce cache trashing by
-          // only updating the sieve array if the bit has not
-          // already been unset previously.
-          uint64_t bit = set_bit_[i % 240];
-          if (sieve[i / 240].load(std::memory_order_relaxed) & bit)
-            sieve[i / 240].fetch_and(~bit, std::memory_order_relaxed);
-        }
+          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
     else
@@ -188,15 +204,7 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-        {
-          // Since multiple threads write to the sieve array
-          // simultaneously, we can reduce cache trashing by
-          // only updating the sieve array if the bit has not
-          // already been unset previously.
-          uint64_t bit = set_bit_[i % 240];
-          if (sieve[i / 240].load(std::memory_order_relaxed) & bit)
-            sieve[i / 240].fetch_and(~bit, std::memory_order_relaxed);
-        }
+          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
   }
