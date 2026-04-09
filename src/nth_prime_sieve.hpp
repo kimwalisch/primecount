@@ -162,7 +162,15 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
+        {
+          // Since multiple threads write to the sieve array
+          // simultaneously, we can reduce cache trashing by
+          // only updating the sieve array if the bit has not
+          // already been unset previously.
+          uint64_t bit = set_bit_[i % 240];
+          if (sieve[i / 240].load(std::memory_order_relaxed) & bit)
+            sieve[i / 240].fetch_and(~bit, std::memory_order_relaxed);
+        }
       }
     }
     else
@@ -180,7 +188,15 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
+        {
+          // Since multiple threads write to the sieve array
+          // simultaneously, we can reduce cache trashing by
+          // only updating the sieve array if the bit has not
+          // already been unset previously.
+          uint64_t bit = set_bit_[i % 240];
+          if (sieve[i / 240].load(std::memory_order_relaxed) & bit)
+            sieve[i / 240].fetch_and(~bit, std::memory_order_relaxed);
+        }
       }
     }
   }
@@ -275,7 +291,7 @@ T nth_prime_sieve(uint64_t n,
   uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int max_threads_per_segment = in_between(1, max_threads / main_threads, 16);
+  int max_threads_per_segment = in_between(1, max_threads / main_threads, 64);
   int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
   int total_threads = main_threads * threads_per_segment;
 
