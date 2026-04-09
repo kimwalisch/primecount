@@ -55,8 +55,7 @@ namespace {
 
 using namespace primecount;
 
-constexpr uint64_t min_sieving_prime_dist = UINT64_C(100000000);
-constexpr int max_thread_group_size = 8;
+constexpr uint64_t min_iter_dist = uint64_t(1e8);
 
 template <typename T>
 class NthPrimeSieve : public BitSieve240
@@ -110,7 +109,7 @@ public:
     #pragma omp taskgroup
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
-      threads = ideal_num_threads(sqrt_high, threads, min_sieving_prime_dist);
+      threads = ideal_num_threads(sqrt_high, threads, min_iter_dist);
       uint64_t thread_dist = ceil_div(sqrt_high, threads);
 
       for (int t = 1; t < threads; t++)
@@ -257,7 +256,7 @@ private:
 template <bool sieve_forward, typename T>
 T nth_prime_sieve(uint64_t n,
                   T nth_prime_approx,
-                  int threads)
+                  int max_threads)
 {
   ASSERT(n > 0);
 
@@ -271,24 +270,17 @@ T nth_prime_sieve(uint64_t n,
   thread_dist = max(min_thread_dist, thread_dist);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
-  int max_threads = threads;
 
-  threads = ideal_num_threads(dist_approx, threads, thread_dist);
-  int thread_group_size = 1;
+  int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
+  int threads_per_segment = 1;
 
-#ifdef _OPENMP
-  {
-    using UT = typename pstd::make_unsigned<T>::type;
-    uint64_t sqrt_n = (uint64_t) isqrt((UT) nth_prime_approx);
-    int thread_budget = max(1, max_threads / threads);
-    thread_group_size = (int) (sqrt_n / min_sieving_prime_dist);
-    thread_group_size = in_between(1, thread_group_size, max_thread_group_size);
-    thread_group_size = std::min(thread_group_size, thread_budget);
-  }
+#if defined(_OPENMP)
+  uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
+  int max_threads_per_segment = in_between(1, max_threads / main_threads, 16);
+  threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
 #endif
 
-  int total_threads = threads * thread_group_size;
-  aligned_vector<NthPrimeSieve<T>> sieves(threads);
+  aligned_vector<NthPrimeSieve<T>> sieves(main_threads);
   bool print_vars = is_print();
   bool finished = false;
   double time;
@@ -297,30 +289,27 @@ T nth_prime_sieve(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx, thread_dist, total_threads);
-    if (thread_group_size > 1)
-    {
-      print("segment_threads", threads);
-      print("thread_group_size", thread_group_size);
-    }
+    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx,
+        thread_dist, main_threads, threads_per_segment);
     time = get_time();
   }
 
+  int total_threads = main_threads * threads_per_segment;
   #pragma omp parallel num_threads(total_threads)
+  #pragma omp single
   {
-    #pragma omp single nowait
     while (!finished)
     {
       uint64_t current_iter = while_iters++;
 
       #pragma omp taskgroup
       {
-        for (int t = 0; t < threads; t++)
+        for (int t = 0; t < main_threads; t++)
         {
           // Unsigned integer division is usually
           // faster than signed integer division.
           using UT = typename pstd::make_unsigned<T>::type;
-          uint64_t i = current_iter * threads + t;
+          uint64_t i = current_iter * main_threads + t;
           UT low = 0, high = 0;
 
           if (sieve_forward)
@@ -341,14 +330,14 @@ T nth_prime_sieve(uint64_t n,
             // instead of slow 128-bit integer division.
             if ( low <= pstd::numeric_limits<uint64_t>::max() &&
                 high <= pstd::numeric_limits<uint64_t>::max())
-              sieves[t].sieve((uint64_t) low, (uint64_t) high, thread_group_size);
+              sieves[t].sieve((uint64_t) low, (uint64_t) high, threads_per_segment);
             else
-              sieves[t].sieve(low, high, thread_group_size);
+              sieves[t].sieve(low, high, threads_per_segment);
           }
         }
       }
 
-      for (int t = 0; t < threads; t++)
+      for (int t = 0; t < main_threads; t++)
       {
         if (sieve_forward)
         {

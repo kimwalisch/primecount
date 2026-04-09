@@ -1,7 +1,7 @@
 ///
 /// @file  print.cpp
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -300,14 +300,16 @@ void print_nth_prime_sieve(uint64_t n,
                            maxint_t nth_prime_approx,
                            uint64_t dist_approx,
                            uint64_t thread_dist,
-                           int threads)
+                           int main_threads,
+                           int threads_per_segment)
 {
   std::cout << "n = " << n << std::endl;
   std::cout << "sieve_forward = " << (sieve_forward ? "true" : "false") << std::endl;
   std::cout << "nth_prime_approx = " << nth_prime_approx << std::endl;
   std::cout << "dist_approx = " << dist_approx << std::endl;
   std::cout << "thread_dist = " << thread_dist << std::endl;
-  std::cout << "threads = " << threads << std::endl;
+  std::cout << "main_threads = " << main_threads << std::endl;
+  std::cout << "threads_per_segment = " << threads_per_segment << std::endl;
 }
 
 } // namespace
