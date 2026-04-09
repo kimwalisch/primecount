@@ -271,15 +271,12 @@ T nth_prime_sieve(uint64_t n,
   thread_dist = max(min_thread_dist, thread_dist);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
   uint64_t dist_approx = n * avg_prime_gap;
+  uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int threads_per_segment = 1;
-
-#if defined(_OPENMP)
-  uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
   int max_threads_per_segment = in_between(1, max_threads / main_threads, 16);
-  threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
-#endif
+  int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
+  int total_threads = main_threads * threads_per_segment;
 
   aligned_vector<NthPrimeSieve<T>> sieves(main_threads);
   bool print_vars = is_print();
@@ -295,7 +292,6 @@ T nth_prime_sieve(uint64_t n,
     time = get_time();
   }
 
-  int total_threads = main_threads * threads_per_segment;
   #pragma omp parallel num_threads(total_threads)
   #pragma omp single
   {
