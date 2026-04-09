@@ -100,6 +100,7 @@ public:
       sieve_.reset(new std::atomic<uint64_t>[sieve_size_]);
     }
 
+    // Initialize sieve array, set all bits to 1
     auto* sieve = sieve_.get();
     for (uint64_t i = 0; i < sieve_size_; i++)
       sieve[i].store(~0ull, std::memory_order_relaxed);
