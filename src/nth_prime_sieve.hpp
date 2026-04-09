@@ -136,7 +136,7 @@ public:
       }
 
       // After having started the worker threads the main
-      // thread also starts crossing off multiples.
+      // thread acts as an additional worker thread.
       for (uint64_t chunk = next_chunk++; chunk < chunk_count; chunk = next_chunk++)
       {
         uint64_t iter_start = chunk_dist * chunk + 1;
@@ -168,6 +168,7 @@ public:
     primesieve::iterator iter(iter_start, iter_stop);
     uint64_t i_max = uint64_t(high - low);
     uint64_t prime;
+
     auto* sieve = sieve_.get();
 
     if (isqrt(high) < low)
