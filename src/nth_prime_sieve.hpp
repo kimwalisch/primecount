@@ -129,7 +129,7 @@ public:
         {
           uint64_t iter_start = chunk_dist * chunk + 1;
           uint64_t iter_stop = chunk_dist * (chunk + 1);
-          iter_start = max(iter_start, uint64_t(7));
+          iter_start = max(iter_start, 7);
           iter_stop = min(iter_stop, sqrt_high);
 
           if (iter_start <= iter_stop)
@@ -143,7 +143,7 @@ public:
       {
         uint64_t iter_start = chunk_dist * chunk + 1;
         uint64_t iter_stop = chunk_dist * (chunk + 1);
-        iter_start = max(iter_start, uint64_t(7));
+        iter_start = max(iter_start, 7);
         iter_stop = min(iter_stop, sqrt_high);
 
         if (iter_start <= iter_stop)
