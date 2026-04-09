@@ -298,7 +298,7 @@ T nth_prime_sieve(uint64_t n,
   uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int max_threads_per_segment = in_between(1, max_threads / main_threads, 64);
+  int max_threads_per_segment = in_between(1, max_threads / main_threads, 32);
   int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
   int total_threads = main_threads * threads_per_segment;
 
