@@ -145,8 +145,9 @@ public:
                  uint64_t iter_stop)
   {
     primesieve::iterator iter(iter_start, iter_stop);
-    auto* sieve = sieve_.get();
+    uint64_t i_max = uint64_t(high - low);
     uint64_t prime;
+    auto* sieve = sieve_.get();
 
     if (isqrt(high) < low)
     {
@@ -158,8 +159,7 @@ public:
         UT n = prime * (q + 1 + (q & 1));
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
-        uint64_t i = (uint64_t) (n - low);
-        uint64_t i_max = (uint64_t) (high - low);
+        uint64_t i = uint64_t(n - low);
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
@@ -177,8 +177,7 @@ public:
         n = max(n, UT(prime) * prime);
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
-        uint64_t i = (uint64_t) (n - low);
-        uint64_t i_max = (uint64_t) (high - low);
+        uint64_t i = uint64_t(n - low);
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
