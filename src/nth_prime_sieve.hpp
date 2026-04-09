@@ -48,10 +48,6 @@
 #include <atomic>
 #include <memory>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 namespace {
 
 using namespace primecount;
