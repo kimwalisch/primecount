@@ -56,7 +56,13 @@ namespace {
 
 using namespace primecount;
 
-constexpr uint64_t min_iter_dist = uint64_t(1e8);
+/// This thread threshold provides the best performance for
+/// "./primecount 1e15 --nth-prime -s" on my dual-socket
+/// AMD EPYC 7642 server with 192 threads.
+/// Using a smaller threshold causes our implementation to
+/// use more threads, but their work chunks become too small
+/// and the extra scheduling overhead hurts performance.
+constexpr uint64_t min_iter_dist = uint64_t(2e7);
 
 template <typename T>
 class NthPrimeSieve : public BitSieve240
