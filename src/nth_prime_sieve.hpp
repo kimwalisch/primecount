@@ -74,7 +74,7 @@ public:
 
   /// Sieve interval [low, high]
   template <typename UT>
-  void sieve(UT low, UT high, int max_threads)
+  void sieve(UT low, UT high, int threads)
   {
     if (high < 2)
       return;
@@ -110,8 +110,7 @@ public:
     #pragma omp taskgroup
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
-      int threads = int(sqrt_high / min_sieving_prime_dist);
-      threads = in_between(1, threads, max_threads);
+      threads = ideal_num_threads(sqrt_high, threads, min_sieving_prime_dist);
       uint64_t thread_dist = ceil_div(sqrt_high, threads);
 
       for (int t = 1; t < threads; t++)
