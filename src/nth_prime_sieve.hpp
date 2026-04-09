@@ -41,6 +41,7 @@
 #include <min.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
+#include <RelaxedAtomic.hpp>
 #include <Vector.hpp>
 
 #include <algorithm>
@@ -116,14 +117,36 @@ public:
       uint64_t chunks_per_thread = (threads > 1) ? 4 : 1;
       uint64_t chunk_count = threads * chunks_per_thread;
       uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
+      RelaxedAtomic<uint64_t> next_chunk(0);
 
+      // The main thread starts the worker threads
       for (int t = 1; t < threads; t++)
       {
-        #pragma omp task firstprivate(t)
-        cross_off_chunks(low, high, sqrt_high, chunk_count, chunk_dist, t, threads);
+        #pragma omp task shared(next_chunk)
+        for (uint64_t chunk = next_chunk++; chunk < chunk_count; chunk = next_chunk++)
+        {
+          uint64_t iter_start = chunk_dist * chunk + 1;
+          uint64_t iter_stop = chunk_dist * (chunk + 1);
+          iter_start = max(iter_start, uint64_t(7));
+          iter_stop = min(iter_stop, sqrt_high);
+
+          if (iter_start <= iter_stop)
+            cross_off(low, high, iter_start, iter_stop);
+        }
       }
 
-      cross_off_chunks(low, high, sqrt_high, chunk_count, chunk_dist, 0, threads);
+      // After having started the worker threads the main
+      // thread also starts crossing off multiples.
+      for (uint64_t chunk = next_chunk++; chunk < chunk_count; chunk = next_chunk++)
+      {
+        uint64_t iter_start = chunk_dist * chunk + 1;
+        uint64_t iter_stop = chunk_dist * (chunk + 1);
+        iter_start = max(iter_start, uint64_t(7));
+        iter_stop = min(iter_stop, sqrt_high);
+
+        if (iter_start <= iter_stop)
+          cross_off(low, high, iter_start, iter_stop);
+      }
     }
 
     uint64_t count = 0;
@@ -133,31 +156,6 @@ public:
       count += popcnt64(sieve[i].load(std::memory_order_relaxed));
 
     count_ = count;
-  }
-
-  /// Sieve interval [low, high]
-  template <typename UT>
-  void cross_off_chunks(UT low,
-                        UT high,
-                        uint64_t sqrt_high,
-                        uint64_t chunk_count,
-                        uint64_t chunk_dist,
-                        uint64_t chunk_start,
-                        uint64_t chunk_stride)
-  {
-    // Use a static round-robin schedule over more chunks
-    // than workers so the expensive small sieving primes
-    // are spread across threads.
-    for (uint64_t chunk = chunk_start; chunk < chunk_count; chunk += chunk_stride)
-    {
-      uint64_t iter_start = chunk_dist * chunk + 1;
-      uint64_t iter_stop = chunk_dist * (chunk + 1);
-      iter_start = max(iter_start, uint64_t(7));
-      iter_stop = min(iter_stop, sqrt_high);
-
-      if (iter_start <= iter_stop)
-        cross_off(low, high, iter_start, iter_stop);
-    }
   }
 
   /// Sieve interval [low, high]
