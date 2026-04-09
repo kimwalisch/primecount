@@ -281,9 +281,9 @@ private:
 /// @sieve_forward = false: Find nth prime <= nth_prime_approx.
 ///
 template <bool sieve_forward, typename T>
-T nth_prime_sieve(uint64_t n,
-                  T nth_prime_approx,
-                  int max_threads)
+T nth_prime_sieve_impl(uint64_t n,
+                       T nth_prime_approx,
+                       int max_threads)
 {
   ASSERT(n > 0);
 
@@ -405,6 +405,22 @@ T nth_prime_sieve(uint64_t n,
   }
 
   return nth_prime;
+}
+
+template <typename T>
+T nth_prime_sieve(T n,
+                  T nth_prime_approx,
+                  T count_approx,
+                  int max_threads)
+{
+  if (count_approx < n)
+    return nth_prime_sieve_impl<true>((uint64_t) (n - count_approx),
+                                      nth_prime_approx + 1,
+                                      max_threads);
+  else
+    return nth_prime_sieve_impl<false>((uint64_t) (1 + count_approx - n),
+                                       nth_prime_approx,
+                                       max_threads);
 }
 
 } // namespace
