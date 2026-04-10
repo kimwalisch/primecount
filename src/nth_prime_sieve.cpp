@@ -487,7 +487,7 @@ public:
     }
     else
     {
-      while ((prime = iter.next_prime()) <= sqrt_high)
+      while ((prime = iter.next_prime()) <= iter_stop)
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
