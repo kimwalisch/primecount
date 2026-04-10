@@ -27,7 +27,6 @@
 #ifndef NTH_PRIME_SIEVE_HPP
 #define NTH_PRIME_SIEVE_HPP
 
-
 #include <int128_t.hpp>
 
 namespace primecount {
@@ -37,10 +36,14 @@ int64_t nth_prime_sieve(int64_t n,
                         int64_t count_approx,
                         int threads);
 
+#if defined(HAVE_INT128_T)
+
 int128_t nth_prime_sieve(int128_t n,
                          int128_t nth_prime_approx,
                          int128_t count_approx,
                          int threads);
+
+#endif
 
 } // namespace
 

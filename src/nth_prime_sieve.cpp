@@ -733,6 +733,8 @@ int64_t nth_prime_sieve(int64_t n,
   return ::nth_prime_sieve(n, nth_prime_approx, count_approx, threads);
 }
 
+#if defined(HAVE_INT128_T)
+
 int128_t nth_prime_sieve(int128_t n,
                          int128_t nth_prime_approx,
                          int128_t count_approx,
@@ -740,5 +742,7 @@ int128_t nth_prime_sieve(int128_t n,
 {
   return ::nth_prime_sieve(n, nth_prime_approx, count_approx, threads);
 }
+
+#endif
 
 } // namespace
