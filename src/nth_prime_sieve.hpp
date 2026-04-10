@@ -3,12 +3,12 @@
 /// @brief In the nth prime algorithm we first count the number of
 ///        primes up to an nth prime approximation. Next, we generate
 ///        primes using a special segmented sieve of Eratosthenes
-///        algorithm with low memmory usage to find the actual nth
+///        algorithm with low memory usage to find the actual nth
 ///        prime (which is close to the nth prime approximation).
 ///
 ///        Since we need to generate prime numbers close to the nth
 ///        prime which could potentially be as large as 10^30, we
-///        cannot use the traditoinal segmented sieve of Eratosthenes
+///        cannot use the traditional segmented sieve of Eratosthenes
 ///        due to its O(n^(1/2)) memory usage. Therefore our
 ///        implementation uses a segment size of O(n^(1/3)) which
 ///        slightly deteriorates the runtime complexity of our

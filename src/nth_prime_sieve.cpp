@@ -3,12 +3,12 @@
 /// @brief In the nth prime algorithm we first count the number of
 ///        primes up to an nth prime approximation. Next, we generate
 ///        primes using a special segmented sieve of Eratosthenes
-///        algorithm with low memmory usage to find the actual nth
+///        algorithm with low memory usage to find the actual nth
 ///        prime (which is close to the nth prime approximation).
 ///
 ///        Since we need to generate prime numbers close to the nth
 ///        prime which could potentially be as large as 10^30, we
-///        cannot use the traditoinal segmented sieve of Eratosthenes
+///        cannot use the traditional segmented sieve of Eratosthenes
 ///        due to its O(n^(1/2)) memory usage. Therefore our
 ///        implementation uses a segment size of O(n^(1/3)) which
 ///        slightly deteriorates the runtime complexity of our
@@ -186,7 +186,7 @@ private:
 
 /// The aligned_vector class aligns each of its
 /// elements on a new cache line in order to avoid
-/// false sharing (cache trashing) when multiple
+/// false sharing (cache thrashing) when multiple
 /// threads write to adjacent elements.
 ///
 template <typename T>
@@ -272,7 +272,7 @@ T nth_prime_sieve1(uint64_t n,
     }
 
     // Sieve the current segment [low, high].
-    // If possible use fast 64-bit bit integer division
+    // If possible use fast 64-bit integer division
     // instead of slow 128-bit integer division.
     if ( low <= pstd::numeric_limits<uint64_t>::max() &&
         high <= pstd::numeric_limits<uint64_t>::max())
@@ -566,7 +566,7 @@ T nth_prime_sieve2(uint64_t n,
   uint64_t dist_approx = n * avg_prime_gap;
 
   // Increasing the number of threads which simultaneously
-  // process the same segment increases CPU cache trashing
+  // process the same segment increases CPU cache thrashing
   // which hurts performance. Therefore, we limit the number
   // of threads per segment to 32 (maximum).
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
@@ -628,7 +628,7 @@ T nth_prime_sieve2(uint64_t n,
         #pragma omp task shared(sieves)
         {
           // Sieve the current segment [low, high].
-          // If possible use fast 64-bit bit integer division
+          // If possible use fast 64-bit integer division
           // instead of slow 128-bit integer division.
           if ( low <= pstd::numeric_limits<uint64_t>::max() &&
               high <= pstd::numeric_limits<uint64_t>::max())
