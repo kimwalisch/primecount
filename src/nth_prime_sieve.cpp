@@ -101,40 +101,19 @@ public:
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     primesieve::iterator iter(7, sqrt_high);
 
-    if (sqrt_high < low)
+    while ((prime = iter.next_prime()) <= sqrt_high)
     {
-      while ((prime = iter.next_prime()) <= sqrt_high)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = uint64_t(n - low);
+      // Calculate first multiple > low
+      // that is not divisible by 2.
+      UT q = fast_div(low, prime);
+      UT n = prime * (q + 1 + (q & 1));
+      ASSERT(n > prime);
+      ASSERT(n % 2 != 0);
+      uint64_t i = uint64_t(n - low);
 
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve_[i / 240] &= unset_bit_[i % 240];
-      }
-    }
-    else
-    {
-      while ((prime = iter.next_prime()) <= sqrt_high)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        n = max(n, UT(prime) * prime);
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = uint64_t(n - low);
-
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve_[i / 240] &= unset_bit_[i % 240];
-      }
+      // Cross-off multiples
+      for (; i <= i_max; i += prime * 2)
+        sieve_[i / 240] &= unset_bit_[i % 240];
     }
 
     uint64_t count = 0;
@@ -421,11 +400,8 @@ public:
         #pragma omp task shared(next_chunk)
         for (uint64_t i = next_chunk++; i < chunk_count; i = next_chunk++)
         {
-          // Alternate chunks from head and tail
-          // to reduce CPU cache thrashing.
-          uint64_t chunk = (i % 2) ? chunk_count - 1 - (i / 2) : i / 2;
-          uint64_t iter_start = chunk_dist * chunk + 1;
-          uint64_t iter_stop = chunk_dist * (chunk + 1);
+          uint64_t iter_start = chunk_dist * i + 1;
+          uint64_t iter_stop = chunk_dist * (i + 1);
           iter_start = max(iter_start, 7);
           iter_stop = min(iter_stop, sqrt_high);
 
@@ -438,11 +414,8 @@ public:
       // thread acts as an additional worker thread.
       for (uint64_t i = next_chunk++; i < chunk_count; i = next_chunk++)
       {
-        // Alternate chunks from head and tail
-        // to reduce CPU cache thrashing.
-        uint64_t chunk = (i % 2) ? chunk_count - 1 - (i / 2) : i / 2;
-        uint64_t iter_start = chunk_dist * chunk + 1;
-        uint64_t iter_stop = chunk_dist * (chunk + 1);
+        uint64_t iter_start = chunk_dist * i + 1;
+        uint64_t iter_stop = chunk_dist * (i + 1);
         iter_start = max(iter_start, 7);
         iter_stop = min(iter_stop, sqrt_high);
 
@@ -473,40 +446,19 @@ public:
 
     auto* sieve = sieve_.get();
 
-    if (isqrt(high) < low)
+    while ((prime = iter.next_prime()) <= iter_stop)
     {
-      while ((prime = iter.next_prime()) <= iter_stop)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = uint64_t(n - low);
+      // Calculate first multiple > low
+      // that is not divisible by 2.
+      UT q = fast_div(low, prime);
+      UT n = prime * (q + 1 + (q & 1));
+      ASSERT(n > prime);
+      ASSERT(n % 2 != 0);
+      uint64_t i = uint64_t(n - low);
 
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
-      }
-    }
-    else
-    {
-      while ((prime = iter.next_prime()) <= iter_stop)
-      {
-        // Calculate first multiple > low
-        // that is not divisible by 2.
-        UT q = fast_div(low, prime);
-        UT n = prime * (q + 1 + (q & 1));
-        n = max(n, UT(prime) * prime);
-        ASSERT(n > prime);
-        ASSERT(n % 2 != 0);
-        uint64_t i = uint64_t(n - low);
-
-        // Cross-off multiples
-        for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
-      }
+      // Cross-off multiples
+      for (; i <= i_max; i += prime * 2)
+        sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
     }
   }
 
