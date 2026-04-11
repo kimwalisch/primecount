@@ -427,11 +427,11 @@ public:
         chunk_count = in_between(1u, chunk_count, max_chunk_count);
       }
 
+      RelaxedAtomic<uint64_t> next_chunk(0);
       uint64_t chunk_dist = sqrt_high / chunk_count;
       chunk_dist = max(min_chunk_dist, chunk_dist);
       chunk_count = ceil_div(sqrt_high, chunk_dist);
       threads = (int) min(chunk_count, threads);
-      RelaxedAtomic<uint64_t> next_chunk(0);
 
       // The main thread starts the worker threads
       for (int t = 1; t < threads; t++)
