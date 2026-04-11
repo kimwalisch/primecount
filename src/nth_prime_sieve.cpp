@@ -410,7 +410,8 @@ public:
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
       threads = ideal_num_threads(sqrt_high, threads, min_iter_dist);
-      uint64_t chunks_per_thread = (threads > 1) ? 4 : 1;
+      uint64_t chunks_per_thread = in_between(4, sqrt_high / uint64_t(1e8), 100);
+      chunks_per_thread = (threads > 1) ? chunks_per_thread : 1;
       uint64_t chunk_count = threads * chunks_per_thread;
       uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
       RelaxedAtomic<uint64_t> next_chunk(0);
