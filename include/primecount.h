@@ -16,9 +16,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define PRIMECOUNT_VERSION "8.4"
+#define PRIMECOUNT_VERSION "8.5"
 #define PRIMECOUNT_VERSION_MAJOR 8
-#define PRIMECOUNT_VERSION_MINOR 4
+#define PRIMECOUNT_VERSION_MINOR 5
 
 #ifdef __cplusplus
 extern "C" {
