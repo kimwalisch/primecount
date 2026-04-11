@@ -44,6 +44,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <memory>
 
 #ifdef _OPENMP
@@ -411,7 +412,10 @@ public:
       uint64_t sqrt_high = (uint64_t) isqrt(high);
       threads = ideal_num_threads(sqrt_high, threads, thread_threshold);
       uint64_t chunk_count = ceil_div(sqrt_high, uint64_t(1e6));
-      chunk_count = min(chunk_count, threads * 100);
+      double log10_chunk_count = std::log10(max(chunk_count, 10));
+      double pow2_log10_chunk_count = log10_chunk_count * log10_chunk_count;
+      uint64_t max_chunk_count = threads * int(pow2_log10_chunk_count);
+      chunk_count = min(chunk_count, max_chunk_count);
       chunk_count = (threads > 1) ? chunk_count : 1;
       threads = (int) min(chunk_count, threads);
       uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
