@@ -344,7 +344,7 @@ T nth_prime_sieve1(uint64_t n,
 /// chunks become too small and the extra scheduling overhead
 /// hurts performance.
 ///
-constexpr uint64_t min_iter_dist = uint64_t(2e7);
+constexpr uint64_t thread_threshold = uint64_t(1e7);
 
 /// NthPrimeSieve2 is virtually identical to NthPrimeSieve1
 /// except that NthPrimeSieve2 uses multiple threads per segment
@@ -409,10 +409,9 @@ public:
     #pragma omp taskgroup
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
-      threads = ideal_num_threads(sqrt_high, threads, min_iter_dist);
-      uint64_t chunks_per_thread = in_between(4, sqrt_high / uint64_t(1e8), 100);
-      chunks_per_thread = (threads > 1) ? chunks_per_thread : 1;
-      uint64_t chunk_count = threads * chunks_per_thread;
+      threads = ideal_num_threads(sqrt_high, threads, thread_threshold);
+      uint64_t chunk_count = in_between(4, sqrt_high / uint64_t(1e6), threads * 100);
+      chunk_count = (threads > 1) ? chunk_count : 1;
       uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
       RelaxedAtomic<uint64_t> next_chunk(0);
 
@@ -572,7 +571,7 @@ T nth_prime_sieve2(uint64_t n,
   // of threads per segment to 32 (maximum).
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
-  int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, min_iter_dist);
+  int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, thread_threshold);
   int total_threads = in_between(1, main_threads * threads_per_segment, max_threads);
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
