@@ -344,7 +344,7 @@ T nth_prime_sieve1(uint64_t n,
 /// chunks become too small and the extra scheduling overhead
 /// hurts performance.
 ///
-constexpr uint64_t thread_threshold = uint64_t(1e7);
+constexpr uint64_t thread_threshold = uint64_t(2e7);
 
 /// NthPrimeSieve2 is virtually identical to NthPrimeSieve1
 /// except that NthPrimeSieve2 uses multiple threads per segment
@@ -410,8 +410,10 @@ public:
     {
       uint64_t sqrt_high = (uint64_t) isqrt(high);
       threads = ideal_num_threads(sqrt_high, threads, thread_threshold);
-      uint64_t chunk_count = in_between(4, sqrt_high / uint64_t(1e6), threads * 100);
+      uint64_t chunk_count = ceil_div(sqrt_high, uint64_t(1e6));
+      chunk_count = min(chunk_count, threads * 100);
       chunk_count = (threads > 1) ? chunk_count : 1;
+      threads = (int) min(chunk_count, threads);
       uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
       RelaxedAtomic<uint64_t> next_chunk(0);
 
