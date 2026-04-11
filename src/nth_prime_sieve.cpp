@@ -422,8 +422,8 @@ public:
       {
         chunk_count = sqrt_high / min_chunk_dist;
         double log10_chunk_count = std::log10(max(chunk_count, 10));
-        double pow2_log10 = log10_chunk_count * log10_chunk_count;
-        uint64_t max_chunk_count = threads * int(pow2_log10);
+        double thread_chunks = std::pow(log10_chunk_count, 3);
+        uint64_t max_chunk_count = int(thread_chunks) * threads;
         chunk_count = in_between(1u, chunk_count, max_chunk_count);
       }
 
