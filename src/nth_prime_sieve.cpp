@@ -337,12 +337,12 @@ T nth_prime_sieve1(uint64_t n,
 /// nth_prime_sieve2() requires OpenMP 4.0 or later
 #if _OPENMP >= 201307
 
-/// This thread threshold provides the best performance for
-/// './primecount 1e15 --nth-prime -s' on my dual-socket AMD EPYC
-/// 7642 server with 192 threads. Using a smaller threshold
-/// causes our implementation to use more threads, but their work
-/// chunks become too small and the extra scheduling overhead
-/// hurts performance.
+/// This thread threshold is used to calculate the number of
+/// threads used in NthPrimeSieve2. Using a smaller thread
+/// threshold typically increases the number of threads. For
+/// small computations < 10^12 for which only a single thread
+/// would be used by NthPrimeSieve2, we switch to the faster
+/// NthPrimeSieve1 without atomic memory accesses.
 ///
 constexpr uint64_t thread_threshold = uint64_t(2e7);
 
