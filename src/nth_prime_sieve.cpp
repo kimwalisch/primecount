@@ -405,25 +405,32 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
-    // Spawn worker threads that cross off
-    // multiples in the sieve array.
     #pragma omp taskgroup
     {
+      // Calculate the number of threads, the thread chunk
+      // size and the total number of thread chunks. These
+      // values are important for load balancing, the 
+      // number of chunks should be larger than the number
+      // of threads to prevent load imbalance.
       uint64_t chunk_count = 1;
       uint64_t sqrt_high = (uint64_t) isqrt(high);
+      uint64_t high_14 = isqrt(sqrt_high);
+      uint64_t min_chunk_dist = max(high_14, uint64_t(1e6));
       threads = ideal_num_threads(sqrt_high, threads, thread_threshold);
 
       if (threads > 1)
       {
-        chunk_count = sqrt_high / uint64_t(1e6);
+        chunk_count = sqrt_high / min_chunk_dist;
         double log10_chunk_count = std::log10(max(chunk_count, 10));
-        double pow2_log10_chunk_count = log10_chunk_count * log10_chunk_count;
-        uint64_t max_chunk_count = threads * int(pow2_log10_chunk_count);
+        double pow2_log10 = log10_chunk_count * log10_chunk_count;
+        uint64_t max_chunk_count = threads * int(pow2_log10);
         chunk_count = in_between(1u, chunk_count, max_chunk_count);
-        threads = (int) min(chunk_count, threads);
       }
 
-      uint64_t chunk_dist = ceil_div(sqrt_high, chunk_count);
+      uint64_t chunk_dist = sqrt_high / chunk_count;
+      chunk_dist = max(min_chunk_dist, chunk_dist);
+      chunk_count = ceil_div(sqrt_high, chunk_dist);
+      threads = (int) min(chunk_count, threads);
       RelaxedAtomic<uint64_t> next_chunk(0);
 
       // The main thread starts the worker threads
