@@ -1,3 +1,9 @@
+Changes in primecount-8.5, 2026-04-11
+
+* nth_prime.cpp: Tune nth_prime_sieve() threshold.
+* nth_prime_sieve.cpp: Improved multi-threading.
+* test/nth_prime_sieve.cpp: Update nth_prime_sieve() test.
+
 Changes in primecount-8.4, 2026-04-04
 
 This release adds a new branchfree implementation of Gourdon's

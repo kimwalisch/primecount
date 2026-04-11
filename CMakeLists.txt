@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9...4.2)
 
 project(primecount
-        VERSION 8.4
+        VERSION 8.5
         LANGUAGES CXX)
 
 # Build options ######################################################
@@ -119,6 +119,7 @@ set(LIB_SRC src/api.cpp
             src/StatusS2.cpp
             src/generate_primes.cpp
             src/nth_prime.cpp
+            src/nth_prime_sieve.cpp
             src/phi.cpp
             src/phi_vector.cpp
             src/pi_legendre.cpp
