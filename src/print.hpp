@@ -47,20 +47,22 @@ void print_gourdon(maxint_t x, int64_t y, int64_t z, int64_t k, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int threads);
 void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int threads);
 
-void print_nth_prime_sieve1(uint64_t n, bool sieve_forward,
-                            maxint_t nth_prime_approx,
-                            uint64_t dist_approx,
-                            uint64_t thread_dist,
-                            int threads);
+void print_nth_prime_sieve(uint64_t n,
+                           bool sieve_forward,
+                           maxint_t nth_prime_approx,
+                           uint64_t dist_approx,
+                           uint64_t thread_dist,
+                           int threads);
 
 #if _OPENMP >= 201307
 
-void print_nth_prime_sieve2(uint64_t n, bool sieve_forward,
-                            maxint_t nth_prime_approx,
-                            uint64_t dist_approx,
-                            uint64_t thread_dist,
-                            int main_threads,
-                            int threads_per_segment);
+void print_nth_prime_sieve(uint64_t n,
+                           bool sieve_forward,
+                           maxint_t nth_prime_approx,
+                           uint64_t dist_approx,
+                           uint64_t thread_dist,
+                           int main_threads,
+                           int threads_per_segment);
 
 #endif
 
