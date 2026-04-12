@@ -338,6 +338,21 @@ T nth_prime_sieve1(uint64_t n,
 /// nth_prime_sieve2() requires OpenMP 4.0 or later
 #if _OPENMP >= 201307
 
+/// Modulo 30 wheel array in which multiples of 2,
+/// 3 and 5 have been set to 1 (true).
+///
+const Array<bool, 240> is_multiple_2_3_5 =
+{
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0,
+  1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0
+};
+
 /// This thread threshold is used to calculate the number of
 /// threads used in NthPrimeSieve2. Using a smaller thread
 /// threshold typically increases the number of threads. For
@@ -500,7 +515,8 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
+          if (!is_multiple_2_3_5[i % 240])
+            sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
     else
@@ -518,7 +534,8 @@ public:
 
         // Cross-off multiples
         for (; i <= i_max; i += prime * 2)
-          sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
+          if (!is_multiple_2_3_5[i % 240])
+            sieve[i / 240].fetch_and(unset_bit_[i % 240], std::memory_order_relaxed);
       }
     }
   }
