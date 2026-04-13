@@ -293,8 +293,8 @@ T RiemannR_psi_impl(T x)
     return RiemannR(psi);
 }
 
-/// Calculate the inverse Riemann R function which is a very
-/// accurate approximation of the nth prime.
+/// Calculate the inverse Riemann R function which is a
+/// very accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) = t as the zero of the
 /// function f(t) = RiemannR(t) - x using the Newton–Raphson method.
 /// https://en.wikipedia.org/wiki/Newton%27s_method
@@ -581,8 +581,8 @@ __float128 RiemannR_psi_impl(__float128 x)
     return RiemannR(psi);
 }
 
-/// Calculate the inverse Riemann R function which is a very
-/// accurate approximation of the nth prime.
+/// Calculate the inverse Riemann R function which is a
+/// very accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) = t as the zero of the
 /// function f(t) = RiemannR(t) - x using the Newton–Raphson method.
 /// https://en.wikipedia.org/wiki/Newton%27s_method
