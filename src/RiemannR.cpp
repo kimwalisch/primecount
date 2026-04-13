@@ -252,24 +252,23 @@ T chebyshevPsiApprox(T x)
   if (x <= 1)
     return x;
 
-  const T log_2pi = (T) 1.837877066409345483560659472811235L;
   T logx = std::log(x);
   T sqrtx = std::sqrt(x);
   T sum = 0;
 
-  for (long double gamma_ : riemann_psi_zeros)
+  for (long double gamma : riemann_psi_zeros)
   {
-    T gamma = (T) gamma_;
-    T angle = gamma * logx;
-    T denom = (T) 0.25 + gamma * gamma;
-    sum += (((T) 0.5 * std::cos(angle)) + gamma * std::sin(angle)) / denom;
+    T angle = T(gamma) * logx;
+    T denom = 0.25 + T(gamma) * T(gamma);
+    sum += ((0.5 * std::cos(angle)) + T(gamma) * std::sin(angle)) / denom;
   }
 
-  T psi = x - ((T) 2 * sqrtx * sum) - log_2pi;
+  T log_2pi = (T) 1.837877066409345483560659472811235L;
+  T psi = x - (2 * sqrtx * sum) - log_2pi;
   T xx = x * x;
 
-  if (xx > 1)
-    psi -= ((T) 0.5 * std::log((T) 1 - ((T) 1 / xx)));
+  if (xx > 1.0)
+    psi -= 0.5 * std::log(1.0 - (1.0 / xx));
 
   return psi;
 }
