@@ -256,19 +256,20 @@ T chebyshevPsiApprox(T x)
   T sqrtx = std::sqrt(x);
   T sum = 0;
 
-  for (long double gamma : riemann_psi_zeros)
+  for (long double gamma_ : riemann_psi_zeros)
   {
-    T angle = T(gamma) * logx;
-    T denom = 0.25 + T(gamma) * T(gamma);
-    sum += ((0.5 * std::cos(angle)) + T(gamma) * std::sin(angle)) / denom;
+    T gamma = T(gamma_);
+    T angle = gamma * logx;
+    T denom = 0.25 + gamma * gamma;
+    sum += ((0.5 * std::cos(angle)) + gamma * std::sin(angle)) / denom;
   }
 
   T log_2pi = (T) 1.837877066409345483560659472811235L;
   T psi = x - (2 * sqrtx * sum) - log_2pi;
   T xx = x * x;
 
-  if (xx > 1.0)
-    psi -= 0.5 * std::log(1.0 - (1.0 / xx));
+  if (xx > 1)
+    psi -= 0.5 * std::log(1 - (1 / xx));
 
   return psi;
 }
@@ -535,7 +536,6 @@ __float128 chebyshevPsiApprox(__float128 x)
   if (x <= 1)
     return x;
 
-  const __float128 log_2pi = 1.837877066409345483560659472811235Q;
   __float128 logx = logq(x);
   __float128 sqrtx = sqrtq(x);
   __float128 sum = 0;
@@ -544,15 +544,16 @@ __float128 chebyshevPsiApprox(__float128 x)
   {
     __float128 gamma = (__float128) gamma_;
     __float128 angle = gamma * logx;
-    __float128 denom = 0.25Q + gamma * gamma;
-    sum += ((0.5Q * cosq(angle)) + gamma * sinq(angle)) / denom;
+    __float128 denom = 0.25 + gamma * gamma;
+    sum += ((0.5 * cosq(angle)) + gamma * sinq(angle)) / denom;
   }
 
+  __float128 log_2pi = 1.837877066409345483560659472811235Q;
   __float128 psi = x - (2 * sqrtx * sum) - log_2pi;
   __float128 xx = x * x;
 
   if (xx > 1)
-    psi -= 0.5Q * logq(1 - (1 / xx));
+    psi -= 0.5 * logq(1 - (1 / xx));
 
   return psi;
 }
