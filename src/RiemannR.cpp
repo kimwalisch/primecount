@@ -28,6 +28,7 @@
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
 #include <Vector.hpp>
+#include "RiemannPsiZeros.hpp"
 
 #include <stdint.h>
 #include <cmath>
@@ -37,6 +38,12 @@
 #endif
 
 namespace {
+
+template <typename T>
+T log_2pi()
+{
+  return (T) 1.837877066409345483560659472811235L;
+}
 
 /// Precomputed values of the Riemann Zeta function.
 /// Used in the calculation of the Riemann R function and its derivative.
@@ -239,6 +246,53 @@ T RiemannR(T x)
   }
 
   return sum;
+}
+
+/// Approximate Chebyshev's psi(x) using the first 512 pairs of
+/// non-trivial zeta zeros and Riemann's explicit formula. Evaluating
+/// RiemannR(psi(x)) follows the staircase of pi(x) much better than the
+/// smooth RiemannR(x) alone over a wide practical range.
+template <typename T>
+T chebyshevPsiApprox(T x)
+{
+  if (x <= 1)
+    return x;
+
+  T logx = std::log(x);
+  T sqrtx = std::sqrt(x);
+  T sum = 0;
+
+  for (long double gamma_ : riemann_psi_zeros)
+  {
+    T gamma = (T) gamma_;
+    T angle = gamma * logx;
+    T denom = (T) 0.25 + gamma * gamma;
+    sum += (((T) 0.5 * std::cos(angle)) + gamma * std::sin(angle)) / denom;
+  }
+
+  T psi = x - ((T) 2 * sqrtx * sum) - log_2pi<T>();
+  T xx = x * x;
+
+  if (xx > 1)
+    psi -= ((T) 0.5 * std::log((T) 1 - ((T) 1 / xx)));
+
+  return psi;
+}
+
+template <typename T>
+T RiemannR_psi_impl(T x)
+{
+  if (x < (T) 1e4)
+    return RiemannR(x);
+
+  T psi = chebyshevPsiApprox(x);
+
+  // Outside the practical range of the finite zero table or if the psi
+  // correction drifts too low, fall back to the smooth approximation.
+  if (psi <= 2)
+    return RiemannR(x);
+
+  return RiemannR(psi);
 }
 
 /// Calculate the inverse Riemann R function which is a very
@@ -480,6 +534,47 @@ __float128 RiemannR(__float128 x)
   return sum;
 }
 
+/// Approximate Chebyshev's psi(x) using the first 512 pairs of
+/// non-trivial zeta zeros and Riemann's explicit formula.
+__float128 chebyshevPsiApprox(__float128 x)
+{
+  if (x <= 1)
+    return x;
+
+  __float128 logx = logq(x);
+  __float128 sqrtx = sqrtq(x);
+  __float128 sum = 0;
+
+  for (long double gamma_ : riemann_psi_zeros)
+  {
+    __float128 gamma = (__float128) gamma_;
+    __float128 angle = gamma * logx;
+    __float128 denom = 0.25Q + gamma * gamma;
+    sum += ((0.5Q * cosq(angle)) + gamma * sinq(angle)) / denom;
+  }
+
+  __float128 psi = x - (2 * sqrtx * sum) - log_2pi<__float128>();
+  __float128 xx = x * x;
+
+  if (xx > 1)
+    psi -= 0.5Q * logq(1 - (1 / xx));
+
+  return psi;
+}
+
+__float128 RiemannR_psi_impl(__float128 x)
+{
+  if (x < 1e4)
+    return RiemannR(x);
+
+  __float128 psi = chebyshevPsiApprox(x);
+
+  if (psi <= 2)
+    return RiemannR(x);
+
+  return RiemannR(psi);
+}
+
 /// Calculate the inverse Riemann R function which is a very
 /// accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) = t as the zero of the
@@ -564,6 +659,18 @@ int64_t RiemannR_inverse(int64_t x)
     return RiemannR_inverse_overflow_check<double>(x);
 }
 
+int64_t RiemannR_psi(int64_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+    return (int64_t) ::RiemannR_psi_impl((__float128) x);
+#endif
+  if (x > 1e8)
+    return (int64_t) ::RiemannR_psi_impl((long double) x);
+  else
+    return (int64_t) ::RiemannR_psi_impl((double) x);
+}
+
 #ifdef HAVE_INT128_T
 
 int128_t RiemannR(int128_t x)
@@ -588,6 +695,21 @@ int128_t RiemannR_inverse(int128_t x)
     return RiemannR_inverse_overflow_check<long double>(x);
   else
     return RiemannR_inverse_overflow_check<double>(x);
+}
+
+int128_t RiemannR_psi(int128_t x)
+{
+  if (x >= ipow<30>((int128_t) 10))
+    return RiemannR(x);
+
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+    return (int128_t) ::RiemannR_psi_impl((__float128) x);
+#endif
+  if (x > 1e8)
+    return (int128_t) ::RiemannR_psi_impl((long double) x);
+  else
+    return (int128_t) ::RiemannR_psi_impl((double) x);
 }
 
 #endif

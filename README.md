@@ -109,6 +109,7 @@ Options:
       --phi <X> <A>        phi(x, a) counts the numbers <= x that are not
                            divisible by any of the first a primes
   -R, --RiemannR           Approximate pi(x) using the Riemann R function
+      --RiemannR-psi       Approximate pi(x) using R(psi(x)) and 512 zeta zeros
       --RiemannR-inverse   Approximate the nth prime using R^-1(x)
   -s, --status[=NUM]       Show computation progress 1%, 2%, 3%, ...
                            Set digits after decimal point: -s1 prints 99.9%

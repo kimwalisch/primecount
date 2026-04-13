@@ -290,6 +290,7 @@ CmdOptions parseOptions(int argc, char** argv)
     { "--Li-inverse", std::make_pair(OPTION_LIINV, NO_PARAM) },
     { "-R", std::make_pair(OPTION_R, NO_PARAM) },
     { "--RiemannR", std::make_pair(OPTION_R, NO_PARAM) },
+    { "--RiemannR-psi", std::make_pair(OPTION_R_PSI, NO_PARAM) },
     { "--RiemannR-inverse", std::make_pair(OPTION_R_INVERSE, NO_PARAM) },
     { "--phi", std::make_pair(OPTION_PHI, NO_PARAM) },
     { "--P2", std::make_pair(OPTION_P2, NO_PARAM) },

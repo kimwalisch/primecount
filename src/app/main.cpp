@@ -395,6 +395,8 @@ int main (int argc, char* argv[])
         res = Li_inverse(x); break;
       case OPTION_R:
         res = RiemannR(x); break;
+      case OPTION_R_PSI:
+        res = RiemannR_psi(x); break;
       case OPTION_R_INVERSE:
         res = RiemannR_inverse(x); break;
       case OPTION_NTHPRIME:
