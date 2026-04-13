@@ -203,8 +203,8 @@ T initialNthPrimeApprox(T x)
   return x * t;
 }
 
-/// Calculate the Riemann R function which is a very accurate
-/// approximation of the number of primes below x.
+/// Calculate the Riemann R function which is a very
+/// accurate approximation of the number of primes <= x.
 /// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
 /// The calculation is done with the Gram series:
 /// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
@@ -242,10 +242,12 @@ T RiemannR(T x)
   return sum;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 pairs of
-/// non-trivial zeta zeros and Riemann's explicit formula. Evaluating
-/// RiemannR(psi(x)) follows the staircase of pi(x) much better than the
-/// smooth RiemannR(x) alone over a wide practical range.
+/// Approximate Chebyshev's psi(x) using the first 512 pairs
+/// of non-trivial zeta zeros and Riemann's explicit formula.
+/// Evaluating RiemannR(psi(x)) follows the staircase of
+/// pi(x) much better than the smooth RiemannR(x) alone over
+/// a wide practical range.
+/// 
 template <typename T>
 T chebyshevPsiApprox(T x)
 {
@@ -282,12 +284,13 @@ T RiemannR_psi_impl(T x)
 
   T psi = chebyshevPsiApprox(x);
 
-  // Outside the practical range of the finite zero table or if the psi
-  // correction drifts too low, fall back to the smooth approximation.
+  // Outside the practical range of the finite zero
+  // table or if the psi correction drifts too low,
+  // fall back to the smooth approximation.
   if (psi <= 2)
     return RiemannR(x);
-
-  return RiemannR(psi);
+  else
+    return RiemannR(psi);
 }
 
 /// Calculate the inverse Riemann R function which is a very
@@ -492,8 +495,8 @@ __float128 initialNthPrimeApprox(__float128 x)
   return x * t;
 }
 
-/// Calculate the Riemann R function which is a very accurate
-/// approximation of the number of primes below x.
+/// Calculate the Riemann R function which is a very
+/// accurate approximation of the number of primes <= x.
 /// http://mathworld.wolfram.com/RiemannPrimeCountingFunction.html
 /// The calculation is done with the Gram series:
 /// RiemannR(x) = 1 + \sum_{k=1}^{∞} ln(x)^k / (zeta(k + 1) * k * k!)
@@ -529,8 +532,12 @@ __float128 RiemannR(__float128 x)
   return sum;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 pairs of
-/// non-trivial zeta zeros and Riemann's explicit formula.
+/// Approximate Chebyshev's psi(x) using the first 512 pairs
+/// of non-trivial zeta zeros and Riemann's explicit formula.
+/// Evaluating RiemannR(psi(x)) follows the staircase of
+/// pi(x) much better than the smooth RiemannR(x) alone over
+/// a wide practical range.
+/// 
 __float128 chebyshevPsiApprox(__float128 x)
 {
   if (x <= 1)
@@ -565,10 +572,13 @@ __float128 RiemannR_psi_impl(__float128 x)
 
   __float128 psi = chebyshevPsiApprox(x);
 
+  // Outside the practical range of the finite zero
+  // table or if the psi correction drifts too low,
+  // fall back to the smooth approximation.
   if (psi <= 2)
     return RiemannR(x);
-
-  return RiemannR(psi);
+  else
+    return RiemannR(psi);
 }
 
 /// Calculate the inverse Riemann R function which is a very
