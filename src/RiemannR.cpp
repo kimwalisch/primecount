@@ -277,7 +277,7 @@ T ChebyshevPsiApprox(T x)
 }
 
 template <typename T>
-T RiemannR_psi_impl(T x)
+T RiemannR_psi(T x)
 {
   if (x < (T) 1e4)
     return RiemannR(x);
@@ -565,7 +565,7 @@ __float128 ChebyshevPsiApprox(__float128 x)
   return psi;
 }
 
-__float128 RiemannR_psi_impl(__float128 x)
+__float128 RiemannR_psi(__float128 x)
 {
   if (x < 1e4)
     return RiemannR(x);
@@ -669,12 +669,12 @@ int64_t RiemannR_psi(int64_t x)
 {
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
-    return (int64_t) ::RiemannR_psi_impl((__float128) x);
+    return (int64_t) ::RiemannR_psi((__float128) x);
 #endif
   if (x > 1e8)
-    return (int64_t) ::RiemannR_psi_impl((long double) x);
+    return (int64_t) ::RiemannR_psi((long double) x);
   else
-    return (int64_t) ::RiemannR_psi_impl((double) x);
+    return (int64_t) ::RiemannR_psi((double) x);
 }
 
 #ifdef HAVE_INT128_T
@@ -710,12 +710,12 @@ int128_t RiemannR_psi(int128_t x)
 
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
-    return (int128_t) ::RiemannR_psi_impl((__float128) x);
+    return (int128_t) ::RiemannR_psi((__float128) x);
 #endif
   if (x > 1e8)
-    return (int128_t) ::RiemannR_psi_impl((long double) x);
+    return (int128_t) ::RiemannR_psi((long double) x);
   else
-    return (int128_t) ::RiemannR_psi_impl((double) x);
+    return (int128_t) ::RiemannR_psi((double) x);
 }
 
 #endif
