@@ -249,7 +249,7 @@ T RiemannR(T x)
 /// a wide practical range.
 /// 
 template <typename T>
-T chebyshevPsiApprox(T x)
+T ChebyshevPsiApprox(T x)
 {
   if (x <= 1)
     return x;
@@ -282,7 +282,7 @@ T RiemannR_psi_impl(T x)
   if (x < (T) 1e4)
     return RiemannR(x);
 
-  T psi = chebyshevPsiApprox(x);
+  T psi = ChebyshevPsiApprox(x);
 
   // Outside the practical range of the finite zero
   // table or if the psi correction drifts too low,
@@ -538,7 +538,7 @@ __float128 RiemannR(__float128 x)
 /// pi(x) much better than the smooth RiemannR(x) alone over
 /// a wide practical range.
 /// 
-__float128 chebyshevPsiApprox(__float128 x)
+__float128 ChebyshevPsiApprox(__float128 x)
 {
   if (x <= 1)
     return x;
@@ -570,7 +570,7 @@ __float128 RiemannR_psi_impl(__float128 x)
   if (x < 1e4)
     return RiemannR(x);
 
-  __float128 psi = chebyshevPsiApprox(x);
+  __float128 psi = ChebyshevPsiApprox(x);
 
   // Outside the practical range of the finite zero
   // table or if the psi correction drifts too low,
