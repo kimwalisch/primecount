@@ -39,12 +39,6 @@
 
 namespace {
 
-template <typename T>
-T log_2pi()
-{
-  return (T) 1.837877066409345483560659472811235L;
-}
-
 /// Precomputed values of the Riemann Zeta function.
 /// Used in the calculation of the Riemann R function and its derivative.
 /// These values are calculated up to a precision of 128 bits.
@@ -258,6 +252,7 @@ T chebyshevPsiApprox(T x)
   if (x <= 1)
     return x;
 
+  const T log_2pi = (T) 1.837877066409345483560659472811235L;
   T logx = std::log(x);
   T sqrtx = std::sqrt(x);
   T sum = 0;
@@ -270,7 +265,7 @@ T chebyshevPsiApprox(T x)
     sum += (((T) 0.5 * std::cos(angle)) + gamma * std::sin(angle)) / denom;
   }
 
-  T psi = x - ((T) 2 * sqrtx * sum) - log_2pi<T>();
+  T psi = x - ((T) 2 * sqrtx * sum) - log_2pi;
   T xx = x * x;
 
   if (xx > 1)
@@ -541,6 +536,7 @@ __float128 chebyshevPsiApprox(__float128 x)
   if (x <= 1)
     return x;
 
+  const __float128 log_2pi = 1.837877066409345483560659472811235Q;
   __float128 logx = logq(x);
   __float128 sqrtx = sqrtq(x);
   __float128 sum = 0;
@@ -553,7 +549,7 @@ __float128 chebyshevPsiApprox(__float128 x)
     sum += ((0.5Q * cosq(angle)) + gamma * sinq(angle)) / denom;
   }
 
-  __float128 psi = x - (2 * sqrtx * sum) - log_2pi<__float128>();
+  __float128 psi = x - (2 * sqrtx * sum) - log_2pi;
   __float128 xx = x * x;
 
   if (xx > 1)
