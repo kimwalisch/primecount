@@ -513,8 +513,8 @@ T RiemannR_psi(T x)
     return RiemannR(psi);
 }
 
-/// Calculate the inverse of RiemannR(psi(x)) which is a
-/// very accurate approximation of the nth prime.
+/// Calculate the inverse of RiemannR(psi(x)) which is
+/// a very accurate approximation of the nth prime.
 /// This implementation uses the Newton–Raphson method.
 /// https://en.wikipedia.org/wiki/Newton%27s_method
 ///
@@ -839,8 +839,8 @@ __float128 RiemannR_psi(__float128 x)
     return RiemannR(psi);
 }
 
-/// Calculate the inverse of RiemannR(psi(x)) which is a
-/// very accurate approximation of the nth prime.
+/// Calculate the inverse of RiemannR(psi(x)) which is
+/// a very accurate approximation of the nth prime.
 /// This implementation uses the Newton–Raphson method.
 /// https://en.wikipedia.org/wiki/Newton%27s_method
 ///
