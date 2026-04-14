@@ -49,6 +49,8 @@ int64_t Li(int64_t x);
 int64_t Li_inverse(int64_t x);
 int64_t RiemannR(int64_t x);
 int64_t RiemannR_inverse(int64_t x);
+int64_t RiemannR_psi(int64_t x);
+int64_t RiemannR_psi_inverse(int64_t x);
 
 #ifdef HAVE_INT128_T
   int128_t pi(int128_t x);
@@ -65,6 +67,8 @@ int64_t RiemannR_inverse(int64_t x);
   int128_t Li_inverse(int128_t);
   int128_t RiemannR(int128_t);
   int128_t RiemannR_inverse(int128_t);
+  int128_t RiemannR_psi(int128_t);
+  int128_t RiemannR_psi_inverse(int128_t);
 #endif
 
 int get_status_precision(maxint_t x);

@@ -77,6 +77,18 @@ int64_t binary_search_nth_prime(int64_t n)
   return low;
 }
 
+/// Very accurate approximation of the nth prime
+template <typename T>
+T nth_prime_approx(T n)
+{
+  if (n < (T) 1e5)
+    return Li_inverse(n);
+  else if (n < (T) 1e9)
+    return RiemannR_inverse(n);
+  else
+    return RiemannR_psi_inverse(n);
+}
+
 } // namespace
 
 namespace primecount {
@@ -101,17 +113,15 @@ int64_t nth_prime_64(int64_t n, int threads)
   if (n <= PiTable::pi_cache(PiTable::max_cached()))
     return binary_search_nth_prime(n);
 
-  // Closely approximate the nth prime using the inverse
-  // Riemann R function and then count the primes up to this
-  // approximation using the prime counting function.
-  int64_t prime_approx = RiemannR_inverse(n);
+  // Closely approximate the nth prime
+  int64_t prime_approx = nth_prime_approx(n);
 
   if (is_print())
   {
     print("");
     print("=== nth_prime ===");
     print("n", n);
-    print("RiemannR^-1(n)", prime_approx);
+    print("nth_prime_approx", prime_approx);
   }
 
   // Count the primes up to our estimated nth prime. This step
@@ -173,17 +183,15 @@ int128_t nth_prime_128(int128_t n, int threads)
   if (n <= PiTable::pi_cache(PiTable::max_cached()))
     return binary_search_nth_prime(n);
 
-  // Closely approximate the nth prime using the inverse
-  // Riemann R function and then count the primes up to this
-  // approximation using the prime counting function.
-  int128_t prime_approx = RiemannR_inverse(n);
+  // Closely approximate the nth prime
+  int128_t prime_approx = nth_prime_approx(n);
 
   if (is_print())
   {
     print("");
     print("=== nth_prime ===");
     print("n", n);
-    print("RiemannR^-1(n)", prime_approx);
+    print("nth_prime_approx", prime_approx);
   }
 
   // Count the primes up to our estimated nth prime. This step

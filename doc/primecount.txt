@@ -65,6 +65,12 @@ OPTIONS
 *--RiemannR-inverse*::
 	Approximate the nth prime using the inverse Riemann R function: R^-1(x).
 
+*--RiemannR-psi*::
+	Approximate pi(x) using R(psi(x)) and 512 zeta zeros.
+
+*--RiemannR-psi-inverse*::
+	Approximate the nth prime using the inverse of R(psi(x)).
+
 *-s, --status*[='NUM']::
 	Show the computation progress e.g. 1%, 2%, 3%, ... Show 'NUM' digits after the decimal point: *--status=1* prints 99.9%.
 
