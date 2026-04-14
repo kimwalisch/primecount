@@ -1,8 +1,8 @@
 ///
-/// @file   Riemann_R.cpp
+/// @file   RiemannR.cpp
 /// @brief  Test the Riemann R function.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
