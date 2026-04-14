@@ -943,7 +943,7 @@ int64_t RiemannR_psi(int64_t x)
   if (x > 1e18)
     return (int64_t) ::RiemannR_psi((__float128) x);
 #endif
-  if (x > 1e8)
+  if (x > 1e14)
     return (int64_t) ::RiemannR_psi((long double) x);
   else
     return (int64_t) ::RiemannR_psi((double) x);
@@ -955,7 +955,7 @@ int64_t RiemannR_psi_inverse(int64_t x)
   if (x > 1e18)
     return RiemannR_psi_inverse_overflow_check<__float128>(x);
 #endif
-  if (x > 1e8)
+  if (x > 1e14)
     return RiemannR_psi_inverse_overflow_check<long double>(x);
   else
     return RiemannR_psi_inverse_overflow_check<double>(x);
@@ -993,7 +993,7 @@ int128_t RiemannR_psi(int128_t x)
   if (x > 1e18)
     return (int128_t) ::RiemannR_psi((__float128) x);
 #endif
-  if (x > 1e8)
+  if (x > 1e14)
     return (int128_t) ::RiemannR_psi((long double) x);
   else
     return (int128_t) ::RiemannR_psi((double) x);
@@ -1005,7 +1005,7 @@ int128_t RiemannR_psi_inverse(int128_t x)
   if (x > 1e18)
     return RiemannR_psi_inverse_overflow_check<__float128>(x);
 #endif
-  if (x > 1e8)
+  if (x > 1e14)
     return RiemannR_psi_inverse_overflow_check<long double>(x);
   else
     return RiemannR_psi_inverse_overflow_check<double>(x);
