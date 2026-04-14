@@ -502,16 +502,8 @@ T RiemannR_psi(T x)
 {
   if (x < (T) 1e4)
     return RiemannR(x);
-
-  T psi = ChebyshevPsiApprox(x);
-
-  // Outside the practical range of the finite zero
-  // table or if the psi correction drifts too low,
-  // fall back to the smooth approximation.
-  if (psi <= 2)
-    return RiemannR(x);
   else
-    return RiemannR(psi);
+    return RiemannR(ChebyshevPsiApprox(x));
 }
 
 /// Calculate the inverse of RiemannR(psi(x)) which is
@@ -830,16 +822,8 @@ __float128 RiemannR_psi(__float128 x)
 {
   if (x < 1e4)
     return RiemannR(x);
-
-  __float128 psi = ChebyshevPsiApprox(x);
-
-  // Outside the practical range of the finite zero
-  // table or if the psi correction drifts too low,
-  // fall back to the smooth approximation.
-  if (psi <= 2)
-    return RiemannR(x);
   else
-    return RiemannR(psi);
+    return RiemannR(ChebyshevPsiApprox(x));
 }
 
 /// Calculate the inverse of RiemannR(psi(x)) which is
