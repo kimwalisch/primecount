@@ -111,7 +111,7 @@ Options:
   -R, --RiemannR               Approximate pi(x) using the Riemann R function
       --RiemannR-inverse       Approximate the nth prime using R^-1(x)
       --RiemannR-psi           Approximate pi(x) using R(psi(x)) and 512 zeta zeros
-      --RiemannR-psi-inverse   Approximate the nth prime using the inverse of R(psi(x))
+      --RiemannR-psi-inverse   Approximate nth prime using inverse of R(psi(x))
   -s, --status[=NUM]           Show computation progress 1%, 2%, 3%, ...
                                Set digits after decimal point: -s1 prints 99.9%
       --test                   Run various correctness tests and exit
@@ -128,22 +128,22 @@ Options:
 ```
 Advanced options for the Deleglise-Rivat algorithm:
 
-  -a, --alpha=NUM          Set tuning factor: y = x^(1/3) * alpha
-      --P2                 Compute the 2nd partial sieve function
-      --S1                 Compute the ordinary leaves
-      --S2-trivial         Compute the trivial special leaves
-      --S2-easy            Compute the easy special leaves
-      --S2-hard            Compute the hard special leaves
+  -a, --alpha=NUM              Set tuning factor: y = x^(1/3) * alpha
+      --P2                     Compute the 2nd partial sieve function
+      --S1                     Compute the ordinary leaves
+      --S2-trivial             Compute the trivial special leaves
+      --S2-easy                Compute the easy special leaves
+      --S2-hard                Compute the hard special leaves
 
 Advanced options for Xavier Gourdon's algorithm:
 
-      --alpha-y=NUM        Set tuning factor: y = x^(1/3) * alpha_y
-      --alpha-z=NUM        Set tuning factor: z = y * alpha_z
-      --AC                 Compute the A + C formulas
-      --B                  Compute the B formula
-      --D                  Compute the D formula
-      --Phi0               Compute the Phi0 formula
-      --Sigma              Compute the 7 Sigma formulas
+      --alpha-y=NUM            Set tuning factor: y = x^(1/3) * alpha_y
+      --alpha-z=NUM            Set tuning factor: z = y * alpha_z
+      --AC                     Compute the A + C formulas
+      --B                      Compute the B formula
+      --D                      Compute the D formula
+      --Phi0                   Compute the Phi0 formula
+      --Sigma                  Compute the 7 Sigma formulas
 ```
 
 </details>
