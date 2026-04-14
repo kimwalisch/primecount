@@ -464,7 +464,7 @@ T RiemannR_inverse(T x)
 /// Evaluating RiemannR(psi(x)) follows the staircase of
 /// pi(x) much better than the smooth RiemannR(x) alone over
 /// a wide practical range.
-/// 
+///
 template <typename T>
 T ChebyshevPsiApprox(T x)
 {
@@ -495,6 +495,8 @@ T ChebyshevPsiApprox(T x)
 
 /// RiemannR(psi(x)) is even more accurate than RiemannR(x)
 /// for estimating the number of primes <= x.
+/// Planat, M., & Solé, P. (2014). "Improving Riemann prime counting."
+/// arXiv. https://doi.org/10.48550/arXiv.1410.1083.
 ///
 template <typename T>
 T RiemannR_psi(T x)
@@ -792,7 +794,7 @@ __float128 RiemannR_inverse(__float128 x)
 /// Evaluating RiemannR(psi(x)) follows the staircase of
 /// pi(x) much better than the smooth RiemannR(x) alone over
 /// a wide practical range.
-/// 
+///
 __float128 ChebyshevPsiApprox(__float128 x)
 {
   if (x <= 1)
@@ -822,6 +824,8 @@ __float128 ChebyshevPsiApprox(__float128 x)
 
 /// RiemannR(psi(x)) is even more accurate than RiemannR(x)
 /// for estimating the number of primes <= x.
+/// Planat, M., & Solé, P. (2014). "Improving Riemann prime counting."
+/// arXiv. https://doi.org/10.48550/arXiv.1410.1083.
 ///
 __float128 RiemannR_psi(__float128 x)
 {
