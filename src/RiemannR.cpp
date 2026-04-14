@@ -242,6 +242,43 @@ T RiemannR(T x)
   return sum;
 }
 
+/// Calculate the inverse Riemann R function which is a
+/// very accurate approximation of the nth prime.
+/// This implementation computes RiemannR^-1(x) = t as the zero of the
+/// function f(t) = RiemannR(t) - x using the Newton–Raphson method.
+/// https://en.wikipedia.org/wiki/Newton%27s_method
+///
+template <typename T>
+T RiemannR_inverse(T x)
+{
+  if (x < 1)
+    return 0;
+
+  T t = initialNthPrimeApprox(x);
+  T old_term = pstd::numeric_limits<T>::infinity();
+
+  // The condition i < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
+  for (int i = 0; i < 10; i++)
+  {
+    // term = f(t) / f'(t)
+    // f(t) = RiemannR(t) - x
+    // RiemannR(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
+    // term = (RiemannR(t) - x) / li'(t) = (RiemannR(t) - x) * log(t)
+    T term = (RiemannR(t) - x) * std::log(t);
+
+    // Not converging anymore
+    if (std::abs(term) >= std::abs(old_term))
+      break;
+
+    t -= term;
+    old_term = term;
+  }
+
+  return t;
+}
+
 /// Approximate Chebyshev's psi(x) using the first 512 pairs
 /// of non-trivial zeta zeros and Riemann's explicit formula.
 /// Evaluating RiemannR(psi(x)) follows the staircase of
@@ -276,6 +313,9 @@ T ChebyshevPsiApprox(T x)
   return psi;
 }
 
+/// RiemannR(psi(x)) is even more accurate than RiemannR(x)
+/// for estimating the number of primes <= x.
+///
 template <typename T>
 T RiemannR_psi(T x)
 {
@@ -293,14 +333,13 @@ T RiemannR_psi(T x)
     return RiemannR(psi);
 }
 
-/// Calculate the inverse Riemann R function which is a
+/// Calculate the inverse of RiemannR(psi(x)) which is a
 /// very accurate approximation of the nth prime.
-/// This implementation computes RiemannR^-1(x) = t as the zero of the
-/// function f(t) = RiemannR(t) - x using the Newton–Raphson method.
+/// This implementation uses the Newton–Raphson method.
 /// https://en.wikipedia.org/wiki/Newton%27s_method
 ///
 template <typename T>
-T RiemannR_inverse(T x)
+T RiemannR_psi_inverse(T x)
 {
   if (x < 1)
     return 0;
@@ -314,10 +353,10 @@ T RiemannR_inverse(T x)
   for (int i = 0; i < 10; i++)
   {
     // term = f(t) / f'(t)
-    // f(t) = RiemannR(t) - x
-    // RiemannR(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
-    // term = (RiemannR(t) - x) / li'(t) = (RiemannR(t) - x) * log(t)
-    T term = (RiemannR(t) - x) * std::log(t);
+    // f(t) = RiemannR_psi(t) - x
+    // RiemannR_psi(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
+    // term = (RiemannR_psi(t) - x) / li'(t) = (RiemannR_psi(t) - x) * log(t)
+    T term = (RiemannR_psi(t) - x) * std::log(t);
 
     // Not converging anymore
     if (std::abs(term) >= std::abs(old_term))
@@ -532,55 +571,6 @@ __float128 RiemannR(__float128 x)
   return sum;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 pairs
-/// of non-trivial zeta zeros and Riemann's explicit formula.
-/// Evaluating RiemannR(psi(x)) follows the staircase of
-/// pi(x) much better than the smooth RiemannR(x) alone over
-/// a wide practical range.
-/// 
-__float128 ChebyshevPsiApprox(__float128 x)
-{
-  if (x <= 1)
-    return x;
-
-  __float128 logx = logq(x);
-  __float128 sqrtx = sqrtq(x);
-  __float128 sum = 0;
-
-  for (long double gamma_ : riemann_psi_zeros)
-  {
-    __float128 gamma = (__float128) gamma_;
-    __float128 angle = gamma * logx;
-    __float128 denom = 0.25 + gamma * gamma;
-    sum += ((0.5 * cosq(angle)) + gamma * sinq(angle)) / denom;
-  }
-
-  __float128 log_2pi = 1.837877066409345483560659472811235Q;
-  __float128 psi = x - (2 * sqrtx * sum) - log_2pi;
-  __float128 xx = x * x;
-
-  if (xx > 1)
-    psi -= 0.5 * logq(1 - (1 / xx));
-
-  return psi;
-}
-
-__float128 RiemannR_psi(__float128 x)
-{
-  if (x < 1e4)
-    return RiemannR(x);
-
-  __float128 psi = ChebyshevPsiApprox(x);
-
-  // Outside the practical range of the finite zero
-  // table or if the psi correction drifts too low,
-  // fall back to the smooth approximation.
-  if (psi <= 2)
-    return RiemannR(x);
-  else
-    return RiemannR(psi);
-}
-
 /// Calculate the inverse Riemann R function which is a
 /// very accurate approximation of the nth prime.
 /// This implementation computes RiemannR^-1(x) = t as the zero of the
@@ -617,12 +607,111 @@ __float128 RiemannR_inverse(__float128 x)
   return t;
 }
 
+/// Approximate Chebyshev's psi(x) using the first 512 pairs
+/// of non-trivial zeta zeros and Riemann's explicit formula.
+/// Evaluating RiemannR(psi(x)) follows the staircase of
+/// pi(x) much better than the smooth RiemannR(x) alone over
+/// a wide practical range.
+/// 
+__float128 ChebyshevPsiApprox(__float128 x)
+{
+  if (x <= 1)
+    return x;
+
+  __float128 logx = logq(x);
+  __float128 sqrtx = sqrtq(x);
+  __float128 sum = 0;
+
+  for (long double gamma_ : riemann_psi_zeros)
+  {
+    __float128 gamma = (__float128) gamma_;
+    __float128 angle = gamma * logx;
+    __float128 denom = 0.25 + gamma * gamma;
+    sum += ((0.5 * cosq(angle)) + gamma * sinq(angle)) / denom;
+  }
+
+  __float128 log_2pi = 1.837877066409345483560659472811235Q;
+  __float128 psi = x - (2 * sqrtx * sum) - log_2pi;
+  __float128 xx = x * x;
+
+  if (xx > 1)
+    psi -= 0.5 * logq(1 - (1 / xx));
+
+  return psi;
+}
+
+/// RiemannR(psi(x)) is even more accurate than RiemannR(x)
+/// for estimating the number of primes <= x.
+///
+__float128 RiemannR_psi(__float128 x)
+{
+  if (x < 1e4)
+    return RiemannR(x);
+
+  __float128 psi = ChebyshevPsiApprox(x);
+
+  // Outside the practical range of the finite zero
+  // table or if the psi correction drifts too low,
+  // fall back to the smooth approximation.
+  if (psi <= 2)
+    return RiemannR(x);
+  else
+    return RiemannR(psi);
+}
+
+/// Calculate the inverse of RiemannR(psi(x)) which is a
+/// very accurate approximation of the nth prime.
+/// This implementation uses the Newton–Raphson method.
+/// https://en.wikipedia.org/wiki/Newton%27s_method
+///
+__float128 RiemannR_psi_inverse(__float128 x)
+{
+  if (x < 1)
+    return 0;
+
+  __float128 t = initialNthPrimeApprox(x);
+  __float128 old_term = HUGE_VALQ;
+
+  // The condition i < ITERS is required in case the computation
+  // does not converge. This happened on Linux i386 where
+  // the precision of the libc math functions is very limited.
+  for (int i = 0; i < 10; i++)
+  {
+    // term = f(t) / f'(t)
+    // f(t) = RiemannR_psi(t) - x
+    // RiemannR_psi(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
+    // term = (RiemannR_psi(t) - x) / li'(t) = (RiemannR_psi(t) - x) * log(t)
+    __float128 term = (RiemannR_psi(t) - x) * logq(t);
+
+    // Not converging anymore
+    if (fabsq(term) >= fabsq(old_term))
+      break;
+
+    t -= term;
+    old_term = term;
+  }
+
+  return t;
+}
+
 #endif
 
 template <typename FLOAT, typename T>
 T RiemannR_inverse_overflow_check(T x)
 {
   FLOAT res = RiemannR_inverse((FLOAT) x);
+
+  // Prevent integer overflow
+  if (res > (FLOAT) pstd::numeric_limits<T>::max())
+    return pstd::numeric_limits<T>::max();
+  else
+    return (T) res;
+}
+
+template <typename FLOAT, typename T>
+T RiemannR_psi_inverse_overflow_check(T x)
+{
+  FLOAT res = RiemannR_psi_inverse((FLOAT) x);
 
   // Prevent integer overflow
   if (res > (FLOAT) pstd::numeric_limits<T>::max())
@@ -677,6 +766,18 @@ int64_t RiemannR_psi(int64_t x)
     return (int64_t) ::RiemannR_psi((double) x);
 }
 
+int64_t RiemannR_psi_inverse(int64_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+    return RiemannR_psi_inverse_overflow_check<__float128>(x);
+#endif
+  if (x > 1e8)
+    return RiemannR_psi_inverse_overflow_check<long double>(x);
+  else
+    return RiemannR_psi_inverse_overflow_check<double>(x);
+}
+
 #ifdef HAVE_INT128_T
 
 int128_t RiemannR(int128_t x)
@@ -716,6 +817,18 @@ int128_t RiemannR_psi(int128_t x)
     return (int128_t) ::RiemannR_psi((long double) x);
   else
     return (int128_t) ::RiemannR_psi((double) x);
+}
+
+int128_t RiemannR_psi_inverse(int128_t x)
+{
+#if defined(HAVE_FLOAT128)
+  if (x > 1e14)
+    return RiemannR_psi_inverse_overflow_check<__float128>(x);
+#endif
+  if (x > 1e8)
+    return RiemannR_psi_inverse_overflow_check<long double>(x);
+  else
+    return RiemannR_psi_inverse_overflow_check<double>(x);
 }
 
 #endif
