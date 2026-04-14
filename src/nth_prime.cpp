@@ -191,7 +191,7 @@ int128_t nth_prime_128(int128_t n, int threads)
     print("");
     print("=== nth_prime ===");
     print("n", n);
-    print("RiemannR^-1(n)", prime_approx);
+    print("nth_prime_approx", prime_approx);
   }
 
   // Count the primes up to our estimated nth prime. This step
