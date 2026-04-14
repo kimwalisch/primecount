@@ -5,6 +5,8 @@ Changes in primecount-8.5, 2026-04-14
 * RiemannR.cpp: Add RiemannR(psi(x)) implementation.
 * CmdOptions.cpp: Add --RiemannR-psi & --RiemannR-psi-inverse.
 * README.md: Document --RiemannR-psi & --RiemannR-psi-inverse.
+* doc/primecount.txt: Add --RiemannR-psi & --RiemannR-psi-inverse.
+* doc/primecount.1: Add --RiemannR-psi & --RiemannR-psi-inverse.
 * test/nth_prime_sieve.cpp: Update nth_prime_sieve() test.
 * test/RiemannR_psi.cpp: New test for RiemannR(psi(x)) implementation.
 
