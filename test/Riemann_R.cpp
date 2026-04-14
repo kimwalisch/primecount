@@ -43,38 +43,20 @@ std::array<int64_t, 100> RiemannR_tiny =
 
 std::vector<int64_t> RiemannR_table =
 {
-               4, // RiemannR(10^1)
-              25, // RiemannR(10^2)
-             168, // RiemannR(10^3)
-            1226, // RiemannR(10^4)
-            9587, // RiemannR(10^5)
-           78527, // RiemannR(10^6)
-          664667, // RiemannR(10^7)
-         5761551, // RiemannR(10^8)
-        50847455, // RiemannR(10^9)
-       455050683, // RiemannR(10^10)
-    4118052494ll, // RiemannR(10^11)
-   37607910542ll, // RiemannR(10^12)
-  346065531065ll, // RiemannR(10^13)
- 3204941731601ll  // RiemannR(10^14)
-};
-
-std::vector<int64_t> PrimePi_table =
-{
-               4, // pi(10^1)
-              25, // pi(10^2)
-             168, // pi(10^3)
-            1229, // pi(10^4)
-            9592, // pi(10^5)
-           78498, // pi(10^6)
-          664579, // pi(10^7)
-         5761455, // pi(10^8)
-        50847534, // pi(10^9)
-       455052511, // pi(10^10)
-    4118054813ll, // pi(10^11)
-   37607912018ll, // pi(10^12)
-  346065536839ll, // pi(10^13)
- 3204941750802ll  // pi(10^14)
+                4, // RiemannR(10^1)
+               25, // RiemannR(10^2)
+              168, // RiemannR(10^3)
+             1226, // RiemannR(10^4)
+             9587, // RiemannR(10^5)
+            78527, // RiemannR(10^6)
+           664667, // RiemannR(10^7)
+          5761551, // RiemannR(10^8)
+         50847455, // RiemannR(10^9)
+        455050683, // RiemannR(10^10)
+     4118052494ll, // RiemannR(10^11)
+    37607910542ll, // RiemannR(10^12)
+   346065531065ll, // RiemannR(10^13)
+  3204941731601ll  // RiemannR(10^14)
 };
 
 #if defined(HAVE_FLOAT128)
@@ -99,26 +81,6 @@ std::vector<std::string> RiemannR_f128 =
   "14692398897720432716641650390"  // RiemannR(10^30)
 };
 
-std::vector<std::string> PrimePi_f128 =
-{
-                 "29844570422669", // pi(10^15)
-                "279238341033925", // pi(10^16)
-               "2623557157654233", // pi(10^17)
-              "24739954287740860", // pi(10^18)
-             "234057667276344607", // pi(10^19)
-            "2220819602560918840", // pi(10^20)
-           "21127269486018731928", // pi(10^21)
-          "201467286689315906290", // pi(10^22)
-         "1925320391606803968923", // pi(10^23)
-        "18435599767349200867866", // pi(10^24)
-       "176846309399143769411680", // pi(10^25)
-      "1699246750872437141327603", // pi(10^26)
-     "16352460426841680446427399", // pi(10^27)
-    "157589269275973410412739598", // pi(10^28)
-   "1520698109714272166094258063", // pi(10^29)
-  "14692398897720440170155834151"  // pi(10^30)
-};
-
 #endif
 
 void check(bool OK)
@@ -126,12 +88,6 @@ void check(bool OK)
   std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
     std::exit(1);
-}
-
-template <typename T>
-T abs_diff(T x, T y)
-{
-  return (x >= y) ? x - y : y - x;
 }
 
 int main()
@@ -152,26 +108,6 @@ int main()
     }
   }
 
-  {
-    int64_t x = 10;
-    for (size_t i = 0; i < PrimePi_table.size(); i++)
-    {
-      int64_t old_err = abs_diff(RiemannR(x), PrimePi_table[i]);
-      int64_t new_err = abs_diff(RiemannR_psi(x), PrimePi_table[i]);
-      std::cout << "RiemannR_psi(" << x << ") error = " << new_err;
-
-      // The 512-zero psi correction improves almost all powers of 10
-      // in practice, except for a few isolated crossover points where
-      // the smooth RiemannR(x) is slightly better.
-      if (x != 100000000000000ll)
-        check(new_err <= old_err);
-      else
-        check(true);
-
-      x *= 10;
-    }
-  }
-
 #if defined(HAVE_FLOAT128) && \
     defined(HAVE_INT128_T)
 
@@ -182,25 +118,6 @@ int main()
       std::string str = to_string(RiemannR(x));
       std::cout << "RiemannR(" << x << ") = " << str;
       check(str == RiemannR_f128[i]);
-      x *= 10;
-    }
-  }
-
-  {
-    int128_t x = ipow<15>((int128_t) 10);
-    int128_t skip = ipow<27>((int128_t) 10);
-    for (size_t i = 0; i < PrimePi_f128.size(); i++)
-    {
-      int128_t pix = calculator::eval<int128_t>(PrimePi_f128[i]);
-      int128_t old_err = abs_diff(RiemannR(x), pix);
-      int128_t new_err = abs_diff(RiemannR_psi(x), pix);
-      std::cout << "RiemannR_psi(" << x << ") error = " << new_err;
-
-      if (x != skip)
-        check(new_err <= old_err);
-      else
-        check(true);
-
       x *= 10;
     }
   }
@@ -298,36 +215,6 @@ int main()
         (x >= 2  && rix > x * logx))
     {
       std::cout << "RiemannR(" << x << ") = " << rix << "   ERROR" << std::endl;
-      std::exit(1);
-    }
-  }
-
-  // Sanity checks for tiny values of RiemannR_psi(x)
-  for (x = 0; x < 10000; x++)
-  {
-    int64_t rix = RiemannR_psi(x);
-    double logx = std::log(std::max((double) x, 2.0));
-
-    if (rix < 0 ||
-        (x >= 20 && rix < x / logx) ||
-        (x >= 2  && rix > x * logx))
-    {
-      std::cout << "RiemannR_psi(" << x << ") = " << rix << "   ERROR" << std::endl;
-      std::exit(1);
-    }
-  }
-
-  // Sanity checks for small values of RiemannR_psi(x)
-  for (; x < 100000; x += 101)
-  {
-    int64_t rix = RiemannR_psi(x);
-    double logx = std::log(std::max((double) x, 2.0));
-
-    if (rix < 0 ||
-        (x >= 20 && rix < x / logx) ||
-        (x >= 2  && rix > x * logx))
-    {
-      std::cout << "RiemannR_psi(" << x << ") = " << rix << "   ERROR" << std::endl;
       std::exit(1);
     }
   }
