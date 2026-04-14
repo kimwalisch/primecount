@@ -109,12 +109,14 @@ Approximate the nth prime using the inverse Riemann R function: R^\-1(x)\&.
 .PP
 \fB\-\-RiemannR\-psi\fR
 .RS 4
-Approximate pi(x) using R(psi(x)) and 512 zeta zeros\&.
+Approximate pi(x) using a refined Riemann R approximation based on R(psi(x))\&. Compared to
+\fB\-\-RiemannR\fR, this option first approximates Chebyshev\(cqs psi(x) using Riemann\(cqs explicit formula with the first 512 zeta zero gammas and then evaluates R(psi(x))\&. In practice this is usually more accurate than plain R(x), but it is slightly slower\&.
 .RE
 .PP
 \fB\-\-RiemannR\-psi\-inverse\fR
 .RS 4
-Approximate the nth prime using the inverse of R(psi(x))\&.
+Approximate the nth prime using the inverse of the refined R(psi(x)) approximation\&. Compared to
+\fB\-\-RiemannR\-inverse\fR, this option inverts the psi\-corrected approximation instead of plain R(x)\&. In practice this is usually more accurate, but it is slightly slower\&.
 .RE
 .PP
 \fB\-s, \-\-status\fR[=\fINUM\fR]
