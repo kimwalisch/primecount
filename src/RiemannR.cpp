@@ -986,9 +986,6 @@ int128_t RiemannR_inverse(int128_t x)
 
 int128_t RiemannR_psi(int128_t x)
 {
-  if (x >= ipow<30>((int128_t) 10))
-    return RiemannR(x);
-
 #if defined(HAVE_FLOAT128)
   if (x > 1e14)
     return (int128_t) ::RiemannR_psi((__float128) x);

@@ -248,23 +248,6 @@ int main()
     }
   }
 
-  // RiemannR_psi(x) falls back to RiemannR(x) for int128_t x >= 10^30
-#if defined(HAVE_INT128_T)
-  {
-    int128_t x = ipow<30>((int128_t) 10);
-    std::cout << "RiemannR_psi(" << x << ") = " << RiemannR_psi(x);
-    check(RiemannR_psi(x) == RiemannR(x));
-
-    x += 123456789;
-    std::cout << "RiemannR_psi(" << x << ") = " << RiemannR_psi(x);
-    check(RiemannR_psi(x) == RiemannR(x));
-
-    x = ipow<31>((int128_t) 10);
-    std::cout << "RiemannR_psi(" << x << ") = " << RiemannR_psi(x);
-    check(RiemannR_psi(x) == RiemannR(x));
-  }
-#endif
-
   {
     int64_t x = pstd::numeric_limits<int64_t>::max() / 10;
     int64_t res = RiemannR_psi_inverse(x);
