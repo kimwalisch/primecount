@@ -476,7 +476,7 @@ T ChebyshevPsiApprox(T x)
 
   for (long double gamma_ : zeta_zero_gammas)
   {
-    T gamma = T(gamma_);
+    T gamma = (T) gamma_;
     T angle = gamma * logx;
     T denom = 0.25 + gamma * gamma;
     sum += ((0.5 * std::cos(angle)) + gamma * std::sin(angle)) / denom;
@@ -486,8 +486,7 @@ T ChebyshevPsiApprox(T x)
   T psi = x - (2 * sqrtx * sum) - log_2pi;
   T xx = x * x;
 
-  if (xx > 1)
-    psi -= 0.5 * std::log(1 - (1 / xx));
+  psi -= 0.5 * std::log(1 - (1 / xx));
 
   return psi;
 }
@@ -807,8 +806,7 @@ __float128 ChebyshevPsiApprox(__float128 x)
   __float128 psi = x - (2 * sqrtx * sum) - log_2pi;
   __float128 xx = x * x;
 
-  if (xx > 1)
-    psi -= 0.5 * logq(1 - (1 / xx));
+  psi -= 0.5 * logq(1 - (1 / xx));
 
   return psi;
 }
