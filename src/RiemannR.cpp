@@ -533,9 +533,9 @@ T RiemannR_psi_inverse(T x)
   for (int i = 0; i < 10; i++)
   {
     // term = f(t) / f'(t)
-    // f(t) = RiemannR_psi(t) - x
-    // RiemannR_psi(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
-    // term = (RiemannR_psi(t) - x) / li'(t) = (RiemannR_psi(t) - x) * log(t)
+    // f(t) = RiemannR(psi(t)) - x
+    // RiemannR(psi(t)) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
+    // term = (RiemannR(psi(t)) - x) / li'(t) = (RiemannR(psi(t)) - x) * log(t)
     T term = (RiemannR_psi(t) - x) * std::log(t);
 
     // Not converging anymore
@@ -858,9 +858,9 @@ __float128 RiemannR_psi_inverse(__float128 x)
   for (int i = 0; i < 10; i++)
   {
     // term = f(t) / f'(t)
-    // f(t) = RiemannR_psi(t) - x
-    // RiemannR_psi(t) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
-    // term = (RiemannR_psi(t) - x) / li'(t) = (RiemannR_psi(t) - x) * log(t)
+    // f(t) = RiemannR(psi(t)) - x
+    // RiemannR(psi(t)) ~ li(t), hence f'(t) = li'(t) = 1 / log(t)
+    // term = (RiemannR(psi(t)) - x) / li'(t) = (RiemannR(psi(t)) - x) * log(t)
     __float128 term = (RiemannR_psi(t) - x) * logq(t);
 
     // Not converging anymore
