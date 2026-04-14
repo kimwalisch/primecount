@@ -1,8 +1,12 @@
-Changes in primecount-8.5, 2026-04-11
+Changes in primecount-8.5, 2026-04-14
 
-* nth_prime.cpp: Tune nth_prime_sieve() threshold.
+* nth_prime.cpp: Use new nth_prime_sieve() implementation.
 * nth_prime_sieve.cpp: Improved multi-threading.
+* RiemannR.cpp: Add RiemannR(psi(x)) implementation.
+* CmdOptions.cpp: Add --RiemannR-psi & --RiemannR-psi-inverse.
+* README.md: Document --RiemannR-psi & --RiemannR-psi-inverse.
 * test/nth_prime_sieve.cpp: Update nth_prime_sieve() test.
+* test/RiemannR_psi.cpp: New test for RiemannR(psi(x)) implementation.
 
 Changes in primecount-8.4, 2026-04-04
 
