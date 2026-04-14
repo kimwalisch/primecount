@@ -175,13 +175,12 @@ const primecount::Array<long double, 128> zeta =
   1.000000000000000000000000000000000000006L
 };
 
-/// First 512 imaginary parts of the non-trivial zeros of the
-/// Riemann zeta function. Generated using mpmath.zetazero()
-/// at high precision and cross-checked against Andrew Odlyzko's
-/// zeros2 table for the first 100 entries before rounding to
-/// long double literals.
+/// First 512 positive imaginary parts gamma of the non-trivial
+/// Riemann zeta zeros rho = 1/2 +/- i*gamma. Generated using
+/// mpmath.zetazero() at high precision and cross-checked against
+/// Andrew Odlyzko's zeros2 table for the first 100 entries.
 ///
-const primecount::Array<long double, 512> riemann_psi_zeros =
+const primecount::Array<long double, 512> zeta_zero_gammas =
 {
   14.1347251417346937905L,  21.0220396387715549926L, 25.0108575801456887632L,
   30.4248761258595132103L,  32.9350615877391896907L, 37.5861781588256712572L,
@@ -459,11 +458,11 @@ T RiemannR_inverse(T x)
   return t;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 pairs
-/// of non-trivial zeta zeros and Riemann's explicit formula.
-/// Evaluating RiemannR(psi(x)) follows the staircase of
-/// pi(x) much better than the smooth RiemannR(x) alone over
-/// a wide practical range.
+/// Approximate Chebyshev's psi(x) using the first 512 positive
+/// imaginary parts gamma of the non-trivial zeta zeros and
+/// Riemann's explicit formula. Evaluating RiemannR(psi(x))
+/// follows the staircase of pi(x) much better than the smooth
+/// RiemannR(x) alone over a wide practical range.
 ///
 template <typename T>
 T ChebyshevPsiApprox(T x)
@@ -475,7 +474,7 @@ T ChebyshevPsiApprox(T x)
   T sqrtx = std::sqrt(x);
   T sum = 0;
 
-  for (long double gamma_ : riemann_psi_zeros)
+  for (long double gamma_ : zeta_zero_gammas)
   {
     T gamma = T(gamma_);
     T angle = gamma * logx;
@@ -789,11 +788,11 @@ __float128 RiemannR_inverse(__float128 x)
   return t;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 pairs
-/// of non-trivial zeta zeros and Riemann's explicit formula.
-/// Evaluating RiemannR(psi(x)) follows the staircase of
-/// pi(x) much better than the smooth RiemannR(x) alone over
-/// a wide practical range.
+/// Approximate Chebyshev's psi(x) using the first 512 positive
+/// imaginary parts gamma of the non-trivial zeta zeros and
+/// Riemann's explicit formula. Evaluating RiemannR(psi(x))
+/// follows the staircase of pi(x) much better than the smooth
+/// RiemannR(x) alone over a wide practical range.
 ///
 __float128 ChebyshevPsiApprox(__float128 x)
 {
@@ -804,7 +803,7 @@ __float128 ChebyshevPsiApprox(__float128 x)
   __float128 sqrtx = sqrtq(x);
   __float128 sum = 0;
 
-  for (long double gamma_ : riemann_psi_zeros)
+  for (long double gamma_ : zeta_zero_gammas)
   {
     __float128 gamma = (__float128) gamma_;
     __float128 angle = gamma * logx;
