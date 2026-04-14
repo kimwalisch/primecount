@@ -170,8 +170,8 @@ int main()
 
   {
     int64_t n = 10000000ll;
-    int128_t old_err_sum = 0;
-    int128_t new_err_sum = 0;
+    int64_t old_err_sum = 0;
+    int64_t new_err_sum = 0;
     for (size_t i = 0; i < NthPrime_table.size(); i++)
     {
       int64_t old_err = abs_diff(RiemannR_inverse(n), NthPrime_table[i]);
