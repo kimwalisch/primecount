@@ -13,7 +13,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <primesieve.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 #include <print.hpp>
@@ -128,39 +127,9 @@ int64_t nth_prime_64(int64_t n, int threads)
   // will dominate the runtime of our nth prime algorithm.
   int64_t count_approx = pi(prime_approx, threads);
 
-  // Use multi-threaded NthPrimeSieve for
-  // large nth prime computations.
-  if (threads > 1 &&
-      prime_approx > (int64_t) 1e13)
-  {
-    // Here we are very close to the nth prime < sqrt(nth_prime),
-    // we use a prime sieve to find the actual nth prime.
-    return nth_prime_sieve(n, prime_approx, count_approx, threads);
-  }
-
-  int64_t avg_prime_gap = ilog(prime_approx) + 2;
-  int64_t prime = -1;
-
   // Here we are very close to the nth prime < sqrt(nth_prime),
-  // we simply iterate over the primes until we find it.
-  if (count_approx < n)
-  {
-    uint64_t start = prime_approx + 1;
-    uint64_t stop = start + (n - count_approx) * avg_prime_gap;
-    primesieve::iterator iter(start, stop);
-    for (int64_t i = count_approx; i < n; i++)
-      prime = iter.next_prime();
-  }
-  else // if (count_approx >= n)
-  {
-    uint64_t start = prime_approx;
-    uint64_t stop = start - (count_approx - n) * avg_prime_gap;
-    primesieve::iterator iter(start, stop);
-    for (int64_t i = count_approx; i >= n; i--)
-      prime = iter.prev_prime();
-  }
-
-  return prime;
+  // we use a prime sieve to find the actual nth prime.
+  return nth_prime_sieve(n, prime_approx, count_approx, threads);
 }
 
 #if defined(HAVE_INT128_T)
