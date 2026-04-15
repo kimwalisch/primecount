@@ -220,21 +220,15 @@ T nth_prime_sieve1(uint64_t n,
                    int threads)
 {
   ASSERT(n > 0);
+  ASSERT(nth_prime_approx > 2);
 
-  T nth_prime = 0;
-  uint64_t count = 0;
-  uint64_t while_iters = 0;
-
-  T root3 = iroot<3>(nth_prime_approx);
-  uint64_t thread_dist = uint64_t(root3 * 30);
-  uint64_t min_thread_dist = 8 * 240;
-  thread_dist = max(min_thread_dist, thread_dist);
   uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap;
-
+  uint64_t dist_approx = n * avg_prime_gap + (avg_prime_gap * avg_prime_gap);
+  T root3 = iroot<3>(nth_prime_approx);
+  uint64_t max_thread_dist = uint64_t(root3 * 30);
+  uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
   aligned_vector<NthPrimeSieve1<T>> sieves(threads);
-  bool finished = false;
   double time;
 
   if (is_print())
@@ -245,6 +239,11 @@ T nth_prime_sieve1(uint64_t n,
         dist_approx, thread_dist, threads);
     time = get_time();
   }
+
+  T nth_prime = 0;
+  uint64_t count = 0;
+  uint64_t while_iters = 0;
+  bool finished = false;
 
   #pragma omp parallel num_threads(threads)
   while (!finished)
@@ -582,19 +581,15 @@ T nth_prime_sieve2(uint64_t n,
                    int max_threads)
 {
   ASSERT(n > 0);
+  ASSERT(nth_prime_approx > 2);
 
+  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
+  uint64_t dist_approx = n * avg_prime_gap + (avg_prime_gap * avg_prime_gap);
   T root3 = iroot<3>(nth_prime_approx);
   uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
-  uint64_t thread_dist = uint64_t(root3 * 30);
-  uint64_t min_thread_dist = 8 * 240;
-  thread_dist = max(min_thread_dist, thread_dist);
-  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap;
+  uint64_t max_thread_dist = uint64_t(root3 * 30);
+  uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
 
-  // Increasing the number of threads which simultaneously
-  // process the same segment increases CPU cache thrashing
-  // which hurts performance. Therefore, we limit the number
-  // of threads per segment to 32 (maximum).
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
   int threads_per_segment = ideal_num_threads(sqrt_n, max_threads_per_segment, thread_threshold);
