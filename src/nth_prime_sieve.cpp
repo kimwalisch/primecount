@@ -448,13 +448,13 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
+    uint64_t chunk_dist, chunk_count;
+    uint64_t sqrt_high = (uint64_t) isqrt(high);
+    threads = get_threads_per_segment(high, threads, &chunk_dist, &chunk_count);
+    RelaxedAtomic<uint64_t> next_chunk(0);
+
     #pragma omp taskgroup
     {
-      uint64_t chunk_dist, chunk_count;
-      uint64_t sqrt_high = (uint64_t) isqrt(high);
-      threads = get_threads_per_segment(high, threads, &chunk_dist, &chunk_count);
-      RelaxedAtomic<uint64_t> next_chunk(0);
-
       // The main thread starts the worker threads
       for (int t = 1; t < threads; t++)
       {
