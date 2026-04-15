@@ -371,8 +371,8 @@ int get_threads_per_segment(T x,
 
   if (threads > 1)
   {
-    chunk_count_ = sqrtx / min_chunk_dist;
     double exp = (x <= 1e19) ? 3 : 4;
+    chunk_count_ = sqrtx / min_chunk_dist;
     double log10_chunk_count = std::log10(max(chunk_count_, 10));
     double thread_chunks = std::pow(log10_chunk_count, exp);
     int64_t max_chunk_count = int64_t(thread_chunks) * threads;
