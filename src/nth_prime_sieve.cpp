@@ -345,14 +345,52 @@ T nth_prime_sieve1(uint64_t n,
 /// nth_prime_sieve2() requires OpenMP 4.0 or later
 #if _OPENMP >= 201307
 
-/// This thread threshold is used to calculate the number of
-/// threads used in NthPrimeSieve2. Using a smaller thread
-/// threshold typically increases the number of threads. For
-/// small computations < 10^12 for which only a single thread
-/// would be used by NthPrimeSieve2, we switch to the faster
-/// NthPrimeSieve1 without atomic memory accesses.
+/// Calculate the number of threads per segment, the thread
+/// chunk distance and the number of thread chunks. These values
+/// are important for thread load balancing.
 ///
-constexpr uint64_t thread_threshold = uint64_t(2e7);
+/// Increasing the number of threads which simultaneously
+/// process the same segment increases CPU cache thrashing which
+/// hurts performance, especially for small computations. Hence
+/// the maximum number of threads per segment increases with the
+/// computation size.
+///
+template <typename T>
+int get_threads_per_segment(T x,
+                            int max_threads,
+                            uint64_t* chunk_dist = nullptr,
+                            uint64_t* chunk_count = nullptr)
+{
+  int64_t chunk_count_ = 1;
+  int64_t min_chunk_dist = (int64_t) 1e6;
+  int64_t thread_threshold = (int64_t) 2e7;
+  int64_t sqrtx = (int64_t) isqrt(x);
+
+  min_chunk_dist = max(min_chunk_dist, isqrt(sqrtx));
+  int threads = ideal_num_threads(sqrtx, max_threads, thread_threshold);
+
+  if (threads > 1)
+  {
+    chunk_count_ = sqrtx / min_chunk_dist;
+    double exp = (x <= 1e19) ? 3 : 4;
+    double log10_chunk_count = std::log10(max(chunk_count_, 10));
+    double thread_chunks = std::pow(log10_chunk_count, exp);
+    int64_t max_chunk_count = int64_t(thread_chunks) * threads;
+    chunk_count_ = in_between(1, chunk_count_, max_chunk_count);
+  }
+
+  int64_t chunk_dist_ = sqrtx / chunk_count_;
+  chunk_dist_ = max(min_chunk_dist, chunk_dist_);
+  chunk_count_ = ceil_div(sqrtx, chunk_dist_);
+  threads = (int) in_between(1, chunk_count_, threads);
+
+  if (chunk_count)
+    *chunk_count = chunk_count_;
+  if (chunk_dist)
+    *chunk_dist = chunk_dist_;
+
+  return threads;
+}
 
 /// NthPrimeSieve2 is virtually identical to NthPrimeSieve1
 /// except that NthPrimeSieve2 uses multiple threads per segment
@@ -414,31 +452,10 @@ public:
 
     #pragma omp taskgroup
     {
-      // Calculate the number of threads, the thread chunk
-      // size and the total number of thread chunks. These
-      // values are important for load balancing, the 
-      // number of chunks should be larger than the number
-      // of threads to prevent load imbalance.
-      uint64_t chunk_count = 1;
+      uint64_t chunk_dist, chunk_count;
       uint64_t sqrt_high = (uint64_t) isqrt(high);
-      uint64_t high_14 = isqrt(sqrt_high);
-      uint64_t min_chunk_dist = max(high_14, uint64_t(1e6));
-      threads = ideal_num_threads(sqrt_high, threads, thread_threshold);
-
-      if (threads > 1)
-      {
-        chunk_count = sqrt_high / min_chunk_dist;
-        double log10_chunk_count = std::log10(max(chunk_count, 10));
-        double thread_chunks = std::pow(log10_chunk_count, 3);
-        uint64_t max_chunk_count = int(thread_chunks) * threads;
-        chunk_count = in_between(1u, chunk_count, max_chunk_count);
-      }
-
+      threads = get_threads_per_segment(high, threads, &chunk_dist, &chunk_count);
       RelaxedAtomic<uint64_t> next_chunk(0);
-      uint64_t chunk_dist = sqrt_high / chunk_count;
-      chunk_dist = max(min_chunk_dist, chunk_dist);
-      chunk_count = ceil_div(sqrt_high, chunk_dist);
-      threads = (int) min(chunk_count, threads);
 
       // The main thread starts the worker threads
       for (int t = 1; t < threads; t++)
@@ -598,15 +615,13 @@ T nth_prime_sieve2(uint64_t n,
   uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
   dist_approx += uint64_t(logx * logx * log10_n);
 
-  uint64_t root2 = (uint64_t) iroot<2>(nth_prime_approx);
   uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
-  int threads_per_segment = ideal_num_threads(root2, max_threads_per_segment, thread_threshold);
-  int total_threads = in_between(1, main_threads * threads_per_segment, max_threads);
+  int threads_per_segment = get_threads_per_segment(nth_prime_approx, max_threads);
+  int total_threads = min(main_threads * threads_per_segment, max_threads);
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
   // multiple threads process the same segment simultaneously.
