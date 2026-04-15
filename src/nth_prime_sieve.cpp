@@ -363,20 +363,18 @@ int get_threads_per_segment(T x,
 {
   int64_t chunk_count_ = 1;
   int64_t min_chunk_dist = (int64_t) 1e6;
-  int64_t thread_threshold = (int64_t) 2e7;
   int64_t sqrtx = (int64_t) isqrt(x);
 
   min_chunk_dist = max(min_chunk_dist, isqrt(sqrtx));
-  int threads = ideal_num_threads(sqrtx, max_threads, thread_threshold);
+  int threads = ideal_num_threads(sqrtx, max_threads, min_chunk_dist);
 
   if (threads > 1)
   {
-    double exp = (x <= 1e19) ? 3 : 4;
     chunk_count_ = sqrtx / min_chunk_dist;
-    double log10_chunk_count = std::log10(max(chunk_count_, 10));
-    double thread_chunks = std::pow(log10_chunk_count, exp);
-    int64_t max_chunk_count = int64_t(thread_chunks) * threads;
-    chunk_count_ = in_between(1, chunk_count_, max_chunk_count);
+    double exp = (x <= 1e16) ? 2 : ((x <= 1e18) ? 3 : 4);
+    double log10_chunk_count = std::log10(max(chunk_count_, 1));
+    double thread_chunks = std::pow(log10_chunk_count + 1, exp);
+    chunk_count_ = in_between(1, chunk_count_, (int64_t) thread_chunks);
   }
 
   int64_t chunk_dist_ = sqrtx / chunk_count_;
@@ -620,7 +618,8 @@ T nth_prime_sieve2(uint64_t n,
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
 
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
-  int threads_per_segment = get_threads_per_segment(nth_prime_approx, max_threads);
+  int max_threads_per_segment = ceil_div(max_threads, main_threads);
+  int threads_per_segment = get_threads_per_segment(nth_prime_approx, max_threads_per_segment);
   int total_threads = min(main_threads * threads_per_segment, max_threads);
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
