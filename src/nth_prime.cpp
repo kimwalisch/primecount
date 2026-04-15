@@ -13,7 +13,6 @@
 
 #include <primecount.hpp>
 #include <primecount-internal.hpp>
-#include <imath.hpp>
 #include <macros.hpp>
 #include <print.hpp>
 #include <Vector.hpp>
