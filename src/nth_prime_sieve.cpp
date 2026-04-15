@@ -228,24 +228,14 @@ T nth_prime_sieve1(uint64_t n,
   ASSERT(n > 0);
   ASSERT(nth_prime_approx > 0);
 
+  // Calculate dist_approx such that:
+  // nth_prime < nth_prime_approx + dist_approx
+  double logx = std::log((double) nth_prime_approx);
+  double log10_n = std::log10(max(n, 10));
+  uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
+  dist_approx += uint64_t(logx * logx * log10_n);
+
   uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
-  uint64_t root4 = (uint64_t) iroot<4>(nth_prime_approx);
-  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap;
-
-  // For very short intervals calculate the maximum number
-  // of possible primes in [low, low + n * ln(low)] using
-  // the Brun–Titchmarsh theorem.
-  // https://en.wikipedia.org/wiki/Brun%E2%80%93Titchmarsh_theorem
-  if (dist_approx < root4)
-  {
-    double low = (double) nth_prime_approx;
-    double log_low = std::log(max(low, 3.0));
-    double h = max(n * log_low, 10.0);
-    double max_primes = 2 * h / std::log(h);
-    dist_approx = uint64_t(max_primes * log_low);
-  }
-
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
@@ -601,27 +591,18 @@ T nth_prime_sieve2(uint64_t n,
   ASSERT(n > 0);
   ASSERT(nth_prime_approx > 0);
 
+  // Calculate dist_approx such that:
+  // nth_prime < nth_prime_approx + dist_approx
+  double logx = std::log((double) nth_prime_approx);
+  double log10_n = std::log10(max(n, 10));
+  uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
+  dist_approx += uint64_t(logx * logx * log10_n);
+
   uint64_t root2 = (uint64_t) iroot<2>(nth_prime_approx);
   uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
-  uint64_t root4 = (uint64_t) iroot<4>(nth_prime_approx);
-  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap;
-
-  // For very short intervals calculate the maximum number
-  // of possible primes in [low, low + n * ln(low)] using
-  // the Brun–Titchmarsh theorem.
-  // https://en.wikipedia.org/wiki/Brun%E2%80%93Titchmarsh_theorem
-  if (dist_approx < root4)
-  {
-    double low = (double) nth_prime_approx;
-    double log_low = std::log(max(low, 3.0));
-    double h = max(n * log_low, 10.0);
-    double max_primes = 2 * h / std::log(h);
-    dist_approx = uint64_t(max_primes * log_low);
-  }
-
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
+
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   int max_threads_per_segment = in_between(1, ceil_div(max_threads, main_threads), 32);
   int threads_per_segment = ideal_num_threads(root2, max_threads_per_segment, thread_threshold);
