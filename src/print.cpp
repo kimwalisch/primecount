@@ -306,10 +306,7 @@ void print_nth_prime_sieve(uint64_t n,
   std::cout << "sieve_forward = " << (sieve_forward ? "true" : "false") << std::endl;
   std::cout << "nth_prime_approx = " << nth_prime_approx << std::endl;
   std::cout << "dist_approx = " << dist_approx << std::endl;
-
-  if (threads > 1)
-    std::cout << "thread_dist = " << thread_dist << std::endl;
-
+  if (threads > 1) std::cout << "thread_dist = " << thread_dist << std::endl;
   std::cout << "threads = " << threads << std::endl;
 }
 
@@ -327,7 +324,7 @@ void print_nth_prime_sieve(uint64_t n,
   std::cout << "sieve_forward = " << (sieve_forward ? "true" : "false") << std::endl;
   std::cout << "nth_prime_approx = " << nth_prime_approx << std::endl;
   std::cout << "dist_approx = " << dist_approx << std::endl;
-  std::cout << "thread_dist = " << thread_dist << std::endl;
+  if (main_threads > 1) std::cout << "thread_dist = " << thread_dist << std::endl;
   std::cout << "main_threads = " << main_threads << std::endl;
   std::cout << "threads_per_segment = " << threads_per_segment << std::endl;
 }
