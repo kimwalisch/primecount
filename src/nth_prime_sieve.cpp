@@ -222,9 +222,10 @@ T nth_prime_sieve1(uint64_t n,
   ASSERT(n > 0);
   ASSERT(nth_prime_approx > 2);
 
-  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap + (avg_prime_gap * avg_prime_gap);
   T root3 = iroot<3>(nth_prime_approx);
+  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
+  uint64_t dist_approx = max(n, 10) * avg_prime_gap;
+  dist_approx += avg_prime_gap * avg_prime_gap;
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
@@ -583,9 +584,10 @@ T nth_prime_sieve2(uint64_t n,
   ASSERT(n > 0);
   ASSERT(nth_prime_approx > 2);
 
-  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
-  uint64_t dist_approx = n * avg_prime_gap + (avg_prime_gap * avg_prime_gap);
   T root3 = iroot<3>(nth_prime_approx);
+  uint64_t avg_prime_gap = ilog(nth_prime_approx) + 2;
+  uint64_t dist_approx = max(n, 10) * avg_prime_gap;
+  dist_approx += avg_prime_gap * avg_prime_gap;
   uint64_t sqrt_n = (uint64_t) isqrt(nth_prime_approx);
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
