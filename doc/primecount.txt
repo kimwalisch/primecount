@@ -69,14 +69,14 @@ OPTIONS
 	Approximate pi(x) using a refined Riemann R approximation based on R(psi(x)).
 	Compared to *--RiemannR*, this option first approximates Chebyshev's psi(x)
 	using Riemann's explicit formula with the first 512 zeta zero gammas and
-	then evaluates R(psi(x)). In practice this is usually more accurate than
-	plain R(x), but it is slightly slower.
+	then evaluates R(psi(x)). In practice this usually estimates pi(x) more
+	accurately than plain R(x).
 
 *--RiemannR-psi-inverse*::
 	Approximate the nth prime using the inverse of the refined R(psi(x))
 	approximation. Compared to *--RiemannR-inverse*, this option inverts the
-	psi-corrected approximation instead of plain R(x). In practice this is
-	usually more accurate, but it is slightly slower.
+	psi-corrected approximation instead of plain R(x). In practice this
+	usually estimates the nth prime more accurately than R^-1(x).
 
 *-s, --status*[='NUM']::
 	Show the computation progress e.g. 1%, 2%, 3%, ... Show 'NUM' digits after the decimal point: *--status=1* prints 99.9%.
