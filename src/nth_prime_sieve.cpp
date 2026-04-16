@@ -231,12 +231,12 @@ T nth_prime_sieve1(uint64_t n,
   // Calculate dist_approx such that:
   // nth_prime < nth_prime_approx + dist_approx
   double logx = std::log((double) nth_prime_approx);
+  double x13 = std::cbrt((double) nth_prime_approx);
   double log10_n = std::log10(max(n, 10));
   uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
   dist_approx += uint64_t(logx * logx * log10_n);
 
-  uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
-  uint64_t max_thread_dist = uint64_t(root3 * 30);
+  uint64_t max_thread_dist = uint64_t(x13 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
   thread_dist = max(ceil_div(dist_approx, threads), 240);
@@ -614,12 +614,12 @@ T nth_prime_sieve2(uint64_t n,
   // Calculate dist_approx such that:
   // nth_prime < nth_prime_approx + dist_approx
   double logx = std::log((double) nth_prime_approx);
+  double x13 = std::cbrt((double) nth_prime_approx);
   double log10_n = std::log10(max(n, 10));
   uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
   dist_approx += uint64_t(logx * logx * log10_n);
-  uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
 
-  uint64_t max_thread_dist = uint64_t(root3 * 30);
+  uint64_t max_thread_dist = uint64_t(x13 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   thread_dist = max(ceil_div(dist_approx, main_threads), 240);
