@@ -345,6 +345,13 @@ T nth_prime_sieve1(uint64_t n,
 /// nth_prime_sieve2() requires OpenMP 4.0 or later
 #if _OPENMP >= 201307
 
+struct SegmentConfig
+{
+  uint64_t chunk_dist;
+  uint64_t chunk_count;
+  int threads;
+};
+
 /// Calculate the number of threads per segment, the thread
 /// chunk distance and the number of thread chunks. These values
 /// are important for thread load balancing.
@@ -356,38 +363,34 @@ T nth_prime_sieve1(uint64_t n,
 /// computation size.
 ///
 template <typename T>
-int get_threads_per_segment(T x,
-                            int max_threads,
-                            uint64_t* chunk_dist = nullptr,
-                            uint64_t* chunk_count = nullptr)
+SegmentConfig get_segment_config(T x, int threads)
 {
-  int64_t chunk_count_ = 1;
+  int64_t chunk_count = 1;
   int64_t min_chunk_dist = (int64_t) 1e6;
   int64_t sqrtx = (int64_t) isqrt(x);
-
   min_chunk_dist = max(min_chunk_dist, isqrt(sqrtx));
-  int threads = ideal_num_threads(sqrtx, max_threads, min_chunk_dist);
+  threads = ideal_num_threads(sqrtx, threads, min_chunk_dist);
 
   if (threads > 1)
   {
-    chunk_count_ = sqrtx / min_chunk_dist;
+    chunk_count = ceil_div(sqrtx, min_chunk_dist);
     double exp = (x <= 1e16) ? 2 : ((x <= 1e18) ? 3 : 4);
-    double log10_chunk_count = std::log10(max(chunk_count_, 1));
-    double thread_chunks = std::pow(log10_chunk_count + 1, exp);
-    chunk_count_ = in_between(1, chunk_count_, (int64_t) thread_chunks);
+    double log10_chunk_count = std::log10(chunk_count);
+    double max_chunks = std::pow(log10_chunk_count + 1, exp);
+    chunk_count = in_between(1, chunk_count, (int64_t) max_chunks);
   }
 
-  int64_t chunk_dist_ = sqrtx / chunk_count_;
-  chunk_dist_ = max(min_chunk_dist, chunk_dist_);
-  chunk_count_ = ceil_div(sqrtx, chunk_dist_);
-  threads = (int) in_between(1, chunk_count_, threads);
+  int64_t chunk_dist = sqrtx / chunk_count;
+  chunk_dist = max(min_chunk_dist, chunk_dist);
+  chunk_count = ceil_div(sqrtx, chunk_dist);
+  threads = (int) in_between(1, chunk_count, threads);
 
-  if (chunk_count)
-    *chunk_count = chunk_count_;
-  if (chunk_dist)
-    *chunk_dist = chunk_dist_;
+  SegmentConfig segment;
+  segment.chunk_dist = chunk_dist;
+  segment.chunk_count = chunk_count;
+  segment.threads = threads;
 
-  return threads;
+  return segment;
 }
 
 /// NthPrimeSieve2 is virtually identical to NthPrimeSieve1
@@ -448,21 +451,20 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
-    uint64_t chunk_dist, chunk_count;
     uint64_t sqrt_high = (uint64_t) isqrt(high);
-    threads = get_threads_per_segment(high, threads, &chunk_dist, &chunk_count);
+    auto segment = get_segment_config(high, threads);
     RelaxedAtomic<uint64_t> next_chunk(0);
 
     #pragma omp taskgroup
     {
       // The main thread starts the worker threads
-      for (int t = 1; t < threads; t++)
+      for (int t = 1; t < segment.threads; t++)
       {
         #pragma omp task shared(next_chunk)
-        for (uint64_t i = next_chunk++; i < chunk_count; i = next_chunk++)
+        for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
         {
-          uint64_t iter_start = chunk_dist * i + 1;
-          uint64_t iter_stop = chunk_dist * (i + 1);
+          uint64_t iter_start = segment.chunk_dist * i + 1;
+          uint64_t iter_stop = segment.chunk_dist * (i + 1);
           iter_start = max(iter_start, 7);
           iter_stop = min(iter_stop, sqrt_high);
 
@@ -473,10 +475,10 @@ public:
 
       // After having started the worker threads the main
       // thread acts as an additional worker thread.
-      for (uint64_t i = next_chunk++; i < chunk_count; i = next_chunk++)
+      for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
       {
-        uint64_t iter_start = chunk_dist * i + 1;
-        uint64_t iter_stop = chunk_dist * (i + 1);
+        uint64_t iter_start = segment.chunk_dist * i + 1;
+        uint64_t iter_stop = segment.chunk_dist * (i + 1);
         iter_start = max(iter_start, 7);
         iter_stop = min(iter_stop, sqrt_high);
 
@@ -612,21 +614,20 @@ T nth_prime_sieve2(uint64_t n,
   double log10_n = std::log10(max(n, 10));
   uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
   dist_approx += uint64_t(logx * logx * log10_n);
-
   uint64_t root3 = (uint64_t) iroot<3>(nth_prime_approx);
+
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
-
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
   int max_threads_per_segment = ceil_div(max_threads, main_threads);
-  int threads_per_segment = get_threads_per_segment(nth_prime_approx, max_threads_per_segment);
-  int total_threads = min(main_threads * threads_per_segment, max_threads);
+  auto segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
+  int total_threads = min(main_threads * segment.threads, max_threads);
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
   // multiple threads process the same segment simultaneously.
   // When using a single thread per segment, we use the faster
   // nth_prime_sieve1 without atomic memory accesses.
-  if (threads_per_segment == 1)
+  if (segment.threads == 1)
     return nth_prime_sieve1<sieve_forward>(n, nth_prime_approx, max_threads);
 
   aligned_vector<NthPrimeSieve2<T>> sieves(main_threads);
@@ -642,7 +643,7 @@ T nth_prime_sieve2(uint64_t n,
     print("");
     print("=== nth_prime_sieve ===");
     print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx,
-        thread_dist, main_threads, threads_per_segment);
+        thread_dist, main_threads, segment.threads);
     time = get_time();
   }
 
@@ -680,9 +681,9 @@ T nth_prime_sieve2(uint64_t n,
           // instead of slow 128-bit integer division.
           if ( low <= pstd::numeric_limits<uint64_t>::max() &&
               high <= pstd::numeric_limits<uint64_t>::max())
-            sieves[t].sieve(uint64_t(low), uint64_t(high), threads_per_segment);
+            sieves[t].sieve(uint64_t(low), uint64_t(high), max_threads_per_segment);
           else
-            sieves[t].sieve(low, high, threads_per_segment);
+            sieves[t].sieve(low, high, max_threads_per_segment);
         }
       }
     }
