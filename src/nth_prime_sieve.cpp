@@ -239,6 +239,7 @@ T nth_prime_sieve1(uint64_t n,
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   threads = ideal_num_threads(dist_approx, threads, thread_dist);
+  thread_dist = max(ceil_div(dist_approx, threads), 240);
   aligned_vector<NthPrimeSieve1<T>> sieves(threads);
   double time;
 
@@ -273,11 +274,13 @@ T nth_prime_sieve1(uint64_t n,
 
     if (sieve_forward)
     {
+      ASSERT(thread_dist >= 240);
       low = nth_prime_approx + i * thread_dist;
       high = low + thread_dist - 1;
     }
     else if ((UT) nth_prime_approx > i * thread_dist)
     {
+      ASSERT(thread_dist >= 240);
       high = nth_prime_approx - i * thread_dist;
       low = (high - min(high, thread_dist)) + 1;
     }
@@ -619,6 +622,7 @@ T nth_prime_sieve2(uint64_t n,
   uint64_t max_thread_dist = uint64_t(root3 * 30);
   uint64_t thread_dist = in_between(240u, dist_approx, max_thread_dist);
   int main_threads = ideal_num_threads(dist_approx, max_threads, thread_dist);
+  thread_dist = max(ceil_div(dist_approx, main_threads), 240);
   int max_threads_per_segment = ceil_div(max_threads, main_threads);
   auto segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
   int total_threads = min(main_threads * segment.threads, max_threads);
@@ -665,11 +669,13 @@ T nth_prime_sieve2(uint64_t n,
 
         if (sieve_forward)
         {
+          ASSERT(thread_dist >= 240);
           low = nth_prime_approx + i * thread_dist;
           high = low + thread_dist - 1;
         }
         else if ((UT) nth_prime_approx > i * thread_dist)
         {
+          ASSERT(thread_dist >= 240);
           high = nth_prime_approx - i * thread_dist;
           low = (high - min(high, thread_dist)) + 1;
         }
