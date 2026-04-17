@@ -371,10 +371,8 @@ SegmentConfig get_segment_config(T x, int threads)
   int64_t chunk_count = 1;
   int64_t min_chunk_dist = (int64_t) 1e6;
   int64_t sqrtx = (int64_t) isqrt(x);
-  double logx = std::log((double) x);
-  double x14 = std::sqrt(sqrtx);
-  int64_t x14_logx = int64_t(x14 * logx);
-  min_chunk_dist = max(min_chunk_dist, x14_logx);
+  int64_t x13 = (int64_t) std::cbrt(double(x));
+  min_chunk_dist = max(min_chunk_dist, x13);
 
   threads = ideal_num_threads(sqrtx, threads, min_chunk_dist);
 
