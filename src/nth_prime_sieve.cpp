@@ -753,18 +753,23 @@ T nth_prime_sieve(T n,
 {
 #if _OPENMP >= 201307
 
+  bool is_lock_free = false;
+
   // Use nth_prime_sieve2() if the CPU supports fast,
   // lock-free 64-bit atomics. Otherwise, fall back
   // to nth_prime_sieve1() to prevent the performance
   // penalties of software-emulated atomic accesses.
   #if __cplusplus >= 201703L
-    constexpr bool atomic_uint64_lock_free = std::atomic<uint64_t>::is_always_lock_free;
-  #else
-    std::atomic<uint64_t> atomic_uint64(0);
-    bool atomic_uint64_lock_free = atomic_uint64.is_lock_free();
+    is_lock_free = std::atomic<uint64_t>::is_always_lock_free;
   #endif
 
-  if (atomic_uint64_lock_free && threads > 1)
+  if (!is_lock_free)
+  {
+    std::atomic<uint64_t> x;
+    is_lock_free = x.is_lock_free();
+  }
+
+  if (is_lock_free && threads > 1)
   {
     if (count_approx < n)
       return nth_prime_sieve2<true>(uint64_t(n - count_approx),
