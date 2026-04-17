@@ -371,21 +371,29 @@ SegmentConfig get_segment_config(T x, int threads)
   int64_t chunk_count = 1;
   int64_t min_chunk_dist = (int64_t) 1e6;
   int64_t sqrtx = (int64_t) isqrt(x);
-  min_chunk_dist = max(min_chunk_dist, isqrt(sqrtx));
+  double logx = std::log((double) x);
+  double x14 = std::sqrt(sqrtx);
+  int64_t x14_logx = int64_t(x14 * logx);
+  min_chunk_dist = max(min_chunk_dist, x14_logx);
+
   threads = ideal_num_threads(sqrtx, threads, min_chunk_dist);
 
   if (threads > 1)
   {
     chunk_count = ceil_div(sqrtx, min_chunk_dist);
-    double exp = (x <= 1e16) ? 2 : ((x <= 1e18) ? 3 : 4);
-    double log10_chunk_count = std::log10(chunk_count);
-    double max_chunks = std::pow(log10_chunk_count + 1, exp);
-    chunk_count = in_between(1, chunk_count, (int64_t) max_chunks);
+    double exp = (x < 1e16) ? 2 : (x < 1e18) ? 3 : 4;
+    double log10_cc = std::log10(chunk_count);
+    int chunks = (int) std::pow(log10_cc + 1, exp);
+    threads = in_between(1, threads, chunks);
+    threads = (int) in_between(1, chunk_count, threads);
+    int64_t max_chunks = max(chunks, threads * 8);
+    chunk_count = min(chunk_count, max_chunks);
   }
 
-  int64_t chunk_dist = sqrtx / chunk_count;
+  int64_t chunk_dist = ceil_div(sqrtx, chunk_count);
   chunk_dist = max(min_chunk_dist, chunk_dist);
   chunk_count = ceil_div(sqrtx, chunk_dist);
+  chunk_dist = ceil_div(sqrtx, chunk_count);
   threads = (int) in_between(1, chunk_count, threads);
 
   SegmentConfig segment;
