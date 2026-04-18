@@ -254,7 +254,7 @@ T nth_prime_sieve1(uint64_t n,
 
   T nth_prime = 0;
   uint64_t count = 0;
-  uint64_t while_iters = 0;
+  uint64_t iter = 0;
   bool finished = false;
 
   #pragma omp parallel num_threads(threads)
@@ -269,7 +269,7 @@ T nth_prime_sieve1(uint64_t n,
     // Unsigned integer division is usually
     // faster than signed integer division.
     using UT = typename pstd::make_unsigned<T>::type;
-    uint64_t i = while_iters * threads + thread_id;
+    uint64_t i = iter * threads + thread_id;
     UT low = 0, high = 0;
 
     if (sieve_forward)
@@ -299,7 +299,7 @@ T nth_prime_sieve1(uint64_t n,
     #pragma omp barrier
     #pragma omp single
     {
-      while_iters++;
+      iter++;
 
       for (int t = 0; t < threads; t++)
       {
@@ -629,7 +629,6 @@ T nth_prime_sieve2(uint64_t n,
 
   T nth_prime = 0;
   uint64_t count = 0;
-  uint64_t while_iters = 0;
   bool finished = false;
   double time;
 
@@ -644,46 +643,43 @@ T nth_prime_sieve2(uint64_t n,
 
   #pragma omp parallel num_threads(total_threads)
   #pragma omp single nowait
-  while (!finished)
+  for (uint64_t iter = 0; !finished; iter++)
   {
-    uint64_t current_iter = while_iters++;
-
-    #pragma omp taskgroup
+    for (int t = 0; t < main_threads; t++)
     {
-      for (int t = 0; t < main_threads; t++)
+      // Unsigned integer division is usually
+      // faster than signed integer division.
+      using UT = typename pstd::make_unsigned<T>::type;
+      uint64_t i = iter * main_threads + t;
+      UT low = 0, high = 0;
+
+      if (sieve_forward)
       {
-        // Unsigned integer division is usually
-        // faster than signed integer division.
-        using UT = typename pstd::make_unsigned<T>::type;
-        uint64_t i = current_iter * main_threads + t;
-        UT low = 0, high = 0;
+        ASSERT(thread_dist >= 240);
+        low = nth_prime_approx + i * thread_dist;
+        high = low + thread_dist - 1;
+      }
+      else if ((UT) nth_prime_approx > i * thread_dist)
+      {
+        ASSERT(thread_dist >= 240);
+        high = nth_prime_approx - i * thread_dist;
+        low = (high - min(high, thread_dist)) + 1;
+      }
 
-        if (sieve_forward)
-        {
-          ASSERT(thread_dist >= 240);
-          low = nth_prime_approx + i * thread_dist;
-          high = low + thread_dist - 1;
-        }
-        else if ((UT) nth_prime_approx > i * thread_dist)
-        {
-          ASSERT(thread_dist >= 240);
-          high = nth_prime_approx - i * thread_dist;
-          low = (high - min(high, thread_dist)) + 1;
-        }
-
-        #pragma omp task shared(sieves)
-        {
-          // Sieve the current segment [low, high].
-          // If possible use fast 64-bit integer division
-          // instead of slow 128-bit integer division.
-          if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-              high <= pstd::numeric_limits<uint64_t>::max())
-            sieves[t].sieve(uint64_t(low), uint64_t(high), max_threads_per_segment);
-          else
-            sieves[t].sieve(low, high, max_threads_per_segment);
-        }
+      #pragma omp task shared(sieves)
+      {
+        // Sieve the current segment [low, high].
+        // If possible use fast 64-bit integer division
+        // instead of slow 128-bit integer division.
+        if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+            high <= pstd::numeric_limits<uint64_t>::max())
+          sieves[t].sieve(uint64_t(low), uint64_t(high), max_threads_per_segment);
+        else
+          sieves[t].sieve(low, high, max_threads_per_segment);
       }
     }
+
+    #pragma omp taskwait
 
     for (int t = 0; t < main_threads; t++)
     {
