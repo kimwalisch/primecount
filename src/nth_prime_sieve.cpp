@@ -33,7 +33,6 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <ctz.hpp>
-#include <fast_div.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
@@ -114,7 +113,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = fast_div(low, prime);
+        UT q = low / prime;
         UT n = prime * (q + 1 + (q & 1));
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
@@ -131,7 +130,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = fast_div(low, prime);
+        UT q = low / prime;
         UT n = prime * (q + 1 + (q & 1));
         n = max(n, UT(prime) * prime);
         ASSERT(n > prime);
@@ -492,10 +491,10 @@ public:
 
   /// Sieve interval [low, high]
   template <typename UT>
-  void cross_off(UT low,
-                 UT high,
-                 uint64_t iter_start,
-                 uint64_t iter_stop)
+  NOINLINE void cross_off(UT low,
+                          UT high,
+                          uint64_t iter_start,
+                          uint64_t iter_stop)
   {
     primesieve::iterator iter(iter_start, iter_stop);
     uint64_t sqrt_high = (uint64_t) isqrt(high);
@@ -510,7 +509,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = fast_div(low, prime);
+        UT q = low / prime;
         UT n = prime * (q + 1 + (q & 1));
         ASSERT(n > prime);
         ASSERT(n % 2 != 0);
@@ -531,7 +530,7 @@ public:
       {
         // Calculate first multiple > low
         // that is not divisible by 2.
-        UT q = fast_div(low, prime);
+        UT q = low / prime;
         UT n = prime * (q + 1 + (q & 1));
         n = max(n, UT(prime) * prime);
         ASSERT(n > prime);
