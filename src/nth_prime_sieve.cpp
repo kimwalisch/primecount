@@ -460,30 +460,15 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
+    uint64_t count = 0;
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     auto segment = get_segment_config(high, threads);
     RelaxedAtomic<uint64_t> next_chunk(0);
 
-    #pragma omp taskgroup
+    // The main thread starts the worker threads
+    for (int t = 0; t < segment.threads; t++)
     {
-      // The main thread starts the worker threads
-      for (int t = 1; t < segment.threads; t++)
-      {
-        #pragma omp task shared(next_chunk)
-        for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
-        {
-          uint64_t iter_start = segment.chunk_dist * i + 1;
-          uint64_t iter_stop = segment.chunk_dist * (i + 1);
-          iter_start = max(iter_start, 7);
-          iter_stop = min(iter_stop, sqrt_high);
-
-          if (iter_start <= iter_stop)
-            cross_off(low, high, iter_start, iter_stop);
-        }
-      }
-
-      // After having started the worker threads the main
-      // thread acts as an additional worker thread.
+      #pragma omp task shared(next_chunk)
       for (uint64_t i = next_chunk++; i < segment.chunk_count; i = next_chunk++)
       {
         uint64_t iter_start = segment.chunk_dist * i + 1;
@@ -496,7 +481,7 @@ public:
       }
     }
 
-    uint64_t count = 0;
+    #pragma omp taskwait
 
     // Count primes (1 bits)
     for (uint64_t i = 0; i < sieve_size_; i++)
