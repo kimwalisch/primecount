@@ -438,7 +438,9 @@ public:
     if (low <= 5)
       throw primecount_error("NthPrimeSieve2: low must > 5");
 
+    count_ = 0;
     UT old_low = low;
+
     if (low % 240)
       low -= low % 240;
 
