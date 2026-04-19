@@ -209,7 +209,7 @@ private:
     // Round up the size of each element to a cache line
     // multiple so adjacent elements do not share cache lines.
     MAYBE_UNUSED char pad[MAX_CACHE_LINE_SIZE -
-                          (sizeof(T) % MAX_CACHE_LINE_SIZE)];
+             (sizeof(T) % MAX_CACHE_LINE_SIZE)];
   };
 
   Vector<CacheLine> vect_;
