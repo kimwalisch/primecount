@@ -459,7 +459,6 @@ public:
     sieve[0].fetch_and(unset_smaller_[old_low % 240], std::memory_order_relaxed);
     sieve[sieve_size_ - 1].fetch_and(unset_larger_[high % 240], std::memory_order_relaxed);
 
-    uint64_t count = 0;
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     auto segment = get_segment_config(high, threads);
     RelaxedAtomic<uint64_t> next_chunk(0);
@@ -484,9 +483,7 @@ public:
 
     // Count primes (1 bits)
     for (uint64_t i = 0; i < sieve_size_; i++)
-      count += popcnt64(sieve[i].load(std::memory_order_relaxed));
-
-    count_ = count;
+      count_ += popcnt64(sieve[i].load(std::memory_order_relaxed));
   }
 
   /// Sieve interval [low, high]
