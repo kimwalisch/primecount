@@ -642,13 +642,6 @@ T nth_prime_sieve2(uint64_t n,
     total_threads = min(main_threads * segment.threads, max_threads);
   }
 
-  // Our nth_prime_sieve2 uses atomic memory accesses because
-  // multiple threads process the same segment simultaneously.
-  // When using a single thread per segment, we use the faster
-  // nth_prime_sieve1 without atomic memory accesses.
-  if (segment.threads == 1)
-    return nth_prime_sieve1<sieve_forward>(n, nth_prime_approx, max_threads);
-
   aligned_vector<NthPrimeSieve2<T>> sieves(main_threads);
 
   T nth_prime = 0;
