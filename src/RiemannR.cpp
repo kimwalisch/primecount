@@ -415,11 +415,10 @@ T RiemannR_inverse(T x)
   return t;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 positive
-/// imaginary parts gamma of the non-trivial zeta zeros and
-/// Riemann's explicit formula. Evaluating RiemannR(psi(x))
-/// follows the staircase of pi(x) much better than the smooth
-/// RiemannR(x) alone over a wide practical range.
+/// Approximate Chebyshev's psi(x) using a truncated form of
+/// the Riemann-von Mangoldt explicit formula for psi(x)
+/// with the first 512 positive imaginary parts gamma of the
+/// non-trivial zeta zeros.
 ///
 template <typename T>
 T ChebyshevPsiApprox(T x)
@@ -873,11 +872,10 @@ __float128 RiemannR_inverse(__float128 x)
   return t;
 }
 
-/// Approximate Chebyshev's psi(x) using the first 512 positive
-/// imaginary parts gamma of the non-trivial zeta zeros and
-/// Riemann's explicit formula. Evaluating RiemannR(psi(x))
-/// follows the staircase of pi(x) much better than the smooth
-/// RiemannR(x) alone over a wide practical range.
+/// Approximate Chebyshev's psi(x) using a truncated form of
+/// the Riemann-von Mangoldt explicit formula for psi(x)
+/// with the first 512 positive imaginary parts gamma of the
+/// non-trivial zeta zeros.
 ///
 __float128 ChebyshevPsiApprox(__float128 x)
 {
