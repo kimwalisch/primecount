@@ -378,7 +378,7 @@ SegmentConfig get_segment_config(T x, int threads)
   if (threads > 1)
   {
     chunk_count = ceil_div(sqrtx, min_chunk_dist);
-    double exp = (x < 1e16) ? 2 : (x < 1e18) ? 3 : 4;
+    double exp = (x < 5e14) ? 2 : (x < 1e18) ? 3 : 4;
     double log10_cc = std::log10(chunk_count);
     int chunks = (int) std::pow(log10_cc + 1, exp);
     threads = in_between(1, threads, chunks);
