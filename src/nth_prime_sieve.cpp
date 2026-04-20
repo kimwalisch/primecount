@@ -605,6 +605,7 @@ T nth_prime_sieve2(uint64_t n,
   double logx = std::log((double) nth_prime_approx);
   double x13 = std::cbrt((double) nth_prime_approx);
   double log10_n = std::log10(max(n, 10));
+  uint64_t sqrtx = isqrt(nth_prime_approx);
   uint64_t dist_approx = (uint64_t) std::ceil(n * (logx + 1));
   dist_approx += uint64_t(logx * logx * log10_n);
 
@@ -615,6 +616,31 @@ T nth_prime_sieve2(uint64_t n,
   int max_threads_per_segment = ceil_div(max_threads, main_threads);
   auto segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
   int total_threads = min(main_threads * segment.threads, max_threads);
+
+  // Our nth_prime_sieve2 uses atomic memory accesses because
+  // multiple threads process the same segment simultaneously.
+  // When using a single thread per segment, we use the faster
+  // nth_prime_sieve1 without atomic memory accesses.
+  if (segment.threads == 1)
+    return nth_prime_sieve1<sieve_forward>(n, nth_prime_approx, max_threads);
+
+  // This balances the work of the sieving primes generation
+  // and the actual prime sieving. On many-core systems it
+  // increases the number of main threads while reducing the
+  // number of threads per segment. This also reduces CPU
+  // cache trashing since fewer threads are sieving the same
+  // segment simultaneously.
+  while (thread_dist > 240 &&
+         thread_dist > sqrtx / segment.threads)
+  {
+    main_threads += 1;
+    uint64_t old_main_threads = main_threads - 1;
+    max_threads_per_segment = int(max_threads_per_segment * old_main_threads / main_threads);
+    max_threads_per_segment = max(max_threads_per_segment, 1);
+    thread_dist = max(ceil_div(dist_approx, main_threads), 240);
+    segment = get_segment_config(nth_prime_approx, max_threads_per_segment);
+    total_threads = min(main_threads * segment.threads, max_threads);
+  }
 
   // Our nth_prime_sieve2 uses atomic memory accesses because
   // multiple threads process the same segment simultaneously.
