@@ -630,7 +630,7 @@ T nth_prime_sieve2(uint64_t n,
   // number of threads per segment. This also reduces CPU
   // cache trashing since fewer threads are sieving the same
   // segment simultaneously.
-  while (max_threads_per_segment > 1 &&
+  while (segment.threads > 1 &&
          thread_dist > sqrtx / segment.threads &&
          thread_dist > 240)
   {
