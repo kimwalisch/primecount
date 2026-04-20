@@ -246,7 +246,7 @@ T nth_prime_sieve1(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx,
+    print_nth_prime_sieve(n, sieve_forward,
         dist_approx, thread_dist, threads);
     time = get_time();
   }
@@ -660,7 +660,7 @@ T nth_prime_sieve2(uint64_t n,
   {
     print("");
     print("=== nth_prime_sieve ===");
-    print_nth_prime_sieve(n, sieve_forward, nth_prime_approx, dist_approx,
+    print_nth_prime_sieve(n, sieve_forward, dist_approx,
         thread_dist, main_threads, segment.threads);
     time = get_time();
   }

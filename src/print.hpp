@@ -49,7 +49,6 @@ void print_gourdon_vars(maxint_t x, int64_t y, int64_t z, int64_t k,  int thread
 
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,
-                           maxint_t nth_prime_approx,
                            uint64_t dist_approx,
                            uint64_t thread_dist,
                            int threads);
@@ -58,7 +57,6 @@ void print_nth_prime_sieve(uint64_t n,
 
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,
-                           maxint_t nth_prime_approx,
                            uint64_t dist_approx,
                            uint64_t thread_dist,
                            int main_threads,
