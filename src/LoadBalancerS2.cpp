@@ -108,14 +108,15 @@ maxint_t LoadBalancerS2::get_sum() const
 
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
-  std::string status;
   bool has_work;
+  double status = 0;
 
   {
     LockGuard lockGuard(lock_);
     sum_ += thread.sum;
 
-    if (is_print_)
+    if (is_print_ &&
+        thread.low > max_low_)
     {
       uint64_t dist = thread.segment_size * thread.segments;
       uint64_t high = thread.low + dist;
@@ -138,8 +139,8 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   // Printing to the terminal incurs a system call
   // and may hence be slow. Therefore, we do it
   // after having released the mutex.
-  if (!status.empty())
-    print_status(status);
+  if (status != 0)
+    status_.print(status);
 
   return has_work;
 }

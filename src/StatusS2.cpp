@@ -4,7 +4,7 @@
 ///        of the formulas related to special leaves. It is used by
 ///        the D, S2_easy and S2_hard formulas.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -85,29 +85,13 @@ double StatusS2::getPercent(int64_t low, int64_t limit, maxint_t sum, maxint_t s
   return percent;
 }
 
-std::string StatusS2::getStatus(double percent)
-{
-  double old = percent_;
-
-  if ((percent - old) >= epsilon_)
-  {
-    percent_ = percent;
-    std::string status = "Status: ";
-    status += to_string(percent, precision_);
-    status += '%';
-    return status;
-  }
-
-  return std::string();
-}
-
 /// This method is used by S2_hard() and D().
 /// This method does not use a lock to synchronize threads
 /// as it is only used inside of a critical section inside
 /// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-std::string StatusS2::getStatus(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
+double StatusS2::getStatus(int64_t low, int64_t limit, maxint_t sum, maxint_t sum_approx)
 {
   double time = get_time();
   double old = time_;
@@ -115,11 +99,21 @@ std::string StatusS2::getStatus(int64_t low, int64_t limit, maxint_t sum, maxint
   if ((time - old) >= threshold_)
   {
     time_ = time;
+    double old = percent_;
     double percent = getPercent(low, limit, sum, sum_approx);
-    return getStatus(percent);
+    if ((percent - old) >= epsilon_)
+      return percent;
   }
 
-  return std::string();
+  return 0;
+}
+
+void StatusS2::print(double percent) const
+{
+  std::string status = "Status: ";
+  status += to_string(percent, precision_);
+  status += '%';
+  print_status(status);
 }
 
 /// This method is used by S2_easy().
@@ -136,10 +130,10 @@ void StatusS2::print(int64_t b, int64_t max_b)
   if ((time - old) >= threshold_)
   {
     time_ = time;
+    double old = percent_;
     double percent = skewed_percent(b, max_b);
-    auto status = getStatus(percent);
-    if (!status.empty())
-      print_status(status);
+    if ((percent - old) >= epsilon_)
+      print(percent);
   }
 }
 
