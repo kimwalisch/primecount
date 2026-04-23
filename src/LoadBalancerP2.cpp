@@ -130,7 +130,7 @@ void LoadBalancerP2::print_P2_status(int64_t low)
 
   if (guard.owns_lock())
   {
-    next_print_time_ = time + 0.1;
+    next_print_time_.store(time + 0.1, std::memory_order_relaxed);
     double percent = get_percent(low, sieve_limit_);
 
     if (percent > percent_)
