@@ -15,14 +15,7 @@
 #include <atomic>
 
 namespace {
- 
-/// For printing the status it is OK to use a non-blocking
-/// userspace lock because printing the status is a non
-/// essential operation and hence even if the OS preempts
-/// the thread holding the lock it won't cause any deadlocks
-/// or performance issues, it will only delay the status
-/// output.
-///
+
 struct TryLockGuard
 {
   public:
