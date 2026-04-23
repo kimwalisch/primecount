@@ -15,6 +15,7 @@
 #include <imath.hpp>
 #include <min.hpp>
 #include <print.hpp>
+#include <TryLockGuard.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -125,38 +126,9 @@ void LoadBalancerP2::print_P2_status(int64_t low)
     return;
 #endif
 
-  // For printing the status it is OK to use a non-blocking
-  // userspace lock because printing the status is a non
-  // essential operation and hence even if the OS preempts
-  // the thread holding the lock it won't cause any deadlocks
-  // or performance issues, it will only delay the status
-  // output.
-  struct LockGuard
-  {
-  public:
-    LockGuard(std::atomic<bool>& lock)
-      : lock_(&lock)
-    {
-      bool expected = false;
-      is_locked_ = lock.compare_exchange_weak(expected, true, std::memory_order_acquire);
-    }
-    ~LockGuard()
-    {
-      if (is_locked_)
-        lock_->store(false, std::memory_order_release);
-    }
-    bool owns_lock() const
-    {
-      return is_locked_;
-    }
-  private:
-    std::atomic<bool>* lock_ = nullptr;
-    bool is_locked_ = false;
-  };
+  TryLockGuard guard(print_lock_);
 
-  LockGuard lockGuard(print_lock_);
-
-  if (lockGuard.owns_lock())
+  if (guard.owns_lock())
   {
     next_print_time_ = time + 0.1;
     double percent = get_percent(low, sieve_limit_);
