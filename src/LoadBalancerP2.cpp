@@ -37,7 +37,7 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
   int64_t low = isqrt(x);
   low = min(low, sieve_limit_);
   int64_t dist = sieve_limit_ - low;
-  atomic_low_ = low;
+  atomic_low_.store(low, std::memory_order_relaxed);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
