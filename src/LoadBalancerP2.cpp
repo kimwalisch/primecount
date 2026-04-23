@@ -115,6 +115,16 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 
 void LoadBalancerP2::print_P2_status(int64_t low)
 {
+  double time = get_time();
+
+#if __cplusplus >= 201703L
+  // Prevent lock contention on many-core systems,
+  // print status only every 0.1 seconds.
+  if (std::atomic<double>::is_always_lock_free &&
+      time <= next_print_time_.load(std::memory_order_relaxed))
+    return;
+#endif
+
   // For printing the status it is OK to use a non-blocking
   // userspace lock because printing the status is a non
   // essential operation and hence even if the OS preempts
@@ -148,23 +158,16 @@ void LoadBalancerP2::print_P2_status(int64_t low)
 
   if (lockGuard.owns_lock())
   {
-    double time = get_time();
-    double old = time_;
-    double threshold = 0.1;
+    next_print_time_ = time + 0.1;
+    double percent = get_percent(low, sieve_limit_);
 
-    if ((time - old) >= threshold)
+    if (percent > percent_)
     {
-      double percent = get_percent(low, sieve_limit_);
-
-      if (percent > percent_)
-      {
-        time_ = time;
-        percent_ = percent;
-        std::string status = "Status: ";
-        status += to_string(percent, precision_);
-        status += '%';
-        print_status(status);
-      }
+      percent_ = percent;
+      std::string status = "Status: ";
+      status += to_string(percent, precision_);
+      status += '%';
+      print_status(status);
     }
   }
 }

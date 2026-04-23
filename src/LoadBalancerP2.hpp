@@ -35,7 +35,6 @@ private:
   int64_t sieve_limit_ = 0;
   int64_t min_thread_dist_ = 0;
   int64_t thread_dist_ = 0;
-  double time_ = 0;
   double percent_ = -1;
   int threads_ = 0;
   int precision_ = 0;
@@ -43,6 +42,7 @@ private:
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   std::atomic<int64_t> atomic_low_;
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
+  std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};
   MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
 };
