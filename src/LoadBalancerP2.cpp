@@ -136,6 +136,16 @@ void LoadBalancerP2::print_P2_status(int64_t low)
 
   if (guard.owns_lock())
   {
+  #if __cplusplus >= 201703L
+    // It is theoretically possible that multiple threads
+    // enter this critical sections within 0.1 seconds.
+    // This additional condition prevents it.
+    if (std::atomic<double>::is_always_lock_free &&
+        time <= next_print_time_.load(std::memory_order_relaxed))
+      return;
+  #endif
+
+    // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
     double percent = get_percent(low, sieve_limit_);
 
