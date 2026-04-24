@@ -209,7 +209,6 @@ void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread,
     // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
 
-    segment_nr += 1;
     int64_t remaining_dist = sqrtx_ - thread.low;
     int64_t thread_dist = thread.segment_size * thread.segments;
     int64_t total_segments = ceil_div(remaining_dist, thread_dist);

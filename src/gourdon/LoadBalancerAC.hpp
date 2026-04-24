@@ -53,7 +53,7 @@ private:
   std::atomic<int64_t> low_{0};
   std::atomic<uint64_t> segment_data_{0};
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
-  std::atomic<int64_t> segment_nr_{-1};
+  std::atomic<int64_t> segment_nr_{0};
   MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
   std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};
