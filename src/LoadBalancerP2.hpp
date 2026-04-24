@@ -17,8 +17,8 @@
 #include <int128_t.hpp>
 #include <macros.hpp>
 
-#include <atomic>
 #include <stdint.h>
+#include <atomic>
 
 namespace primecount {
 
@@ -39,8 +39,9 @@ private:
   int threads_ = 0;
   int precision_ = 0;
   bool is_print_ = false;
+
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
-  std::atomic<int64_t> atomic_low_;
+  std::atomic<int64_t> low_{0};
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
   std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};

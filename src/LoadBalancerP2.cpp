@@ -18,7 +18,6 @@
 #include <TryLockGuard.hpp>
 
 #include <stdint.h>
-#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <string>
@@ -36,14 +35,14 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
 {
   int64_t low = isqrt(x);
   low = min(low, sieve_limit_);
+  low_.store(low, std::memory_order_relaxed);
   int64_t dist = sieve_limit_ - low;
-  atomic_low_.store(low, std::memory_order_relaxed);
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   min_thread_dist_ = 1 << 23;
   double max_threads = std::pow(sieve_limit_, 1 / 3.7);
-  threads = std::min(threads, (int) max_threads);
+  threads = min(threads, (int) max_threads);
   threads_ = ideal_num_threads(dist, threads, min_thread_dist_);
 
   // Using more chunks per thread improves load
@@ -61,12 +60,11 @@ int LoadBalancerP2::get_threads() const
 /// Assign new [low, high[ workload to thread.
 /// Multiple threads may call get_work() simultaneously, since
 /// this function is not protected by a mutex, it must not
-/// modify any shared member variables, except atomic_low_.
+/// modify any shared member variables, except the atomic low_.
 ///
 bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
-  // Calculate the remaining sieving distance
-  low = atomic_low_.load(std::memory_order_relaxed);
+  low = low_.load(std::memory_order_relaxed);
   low = min(low, sieve_limit_);
   int64_t dist = sieve_limit_ - low;
   int64_t thread_dist = thread_dist_;
@@ -90,28 +88,27 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
     // 5x larger than the initialization time on my AMD EPYC 7642 CPU.
     double low13 = std::cbrt(low);
     int64_t low23 = (int64_t) (low13 * low13);
-    int64_t min_thread_dist = std::max(min_thread_dist_, low23);
+    int64_t min_thread_dist = max(min_thread_dist_, low23);
     thread_dist = max(min_thread_dist, thread_dist);
 
-    // Reduce the thread distance near to end to keep all
+    // Reduce thread distance near the end to keep all
     // threads busy until the computation finishes.
     int64_t max_thread_dist = dist / threads_;
     if (thread_dist > max_thread_dist)
       thread_dist = max(min_thread_dist, max_thread_dist);
   }
 
-  low = atomic_low_.fetch_add(thread_dist, std::memory_order_relaxed);
+  low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
   high = low + thread_dist;
   high = min(high, sieve_limit_);
-  bool has_work = low < sieve_limit_;
 
-  // The lockfree critical section above should complete as
-  // fast as possible. Hence, printing should be done
+  // The lockfree critical section above should complete
+  // as fast as possible. Hence, printing should be done
   // afterwards since it may incur a system call.
   if (is_print_)
     print_P2_status(low);
 
-  return has_work;
+  return low < sieve_limit_;
 }
 
 void LoadBalancerP2::print_P2_status(int64_t low)
