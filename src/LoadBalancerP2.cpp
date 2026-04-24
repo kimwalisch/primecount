@@ -101,6 +101,9 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
       thread_dist = max(min_thread_dist, max_thread_dist);
   }
 
+  // The earlier loads are used for heuristic chunk
+  // sizing, it is OK if they are slightly outdated. This
+  // fetch_add() reserves unique work for this thread.
   low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
   high = low + thread_dist;
   high = min(high, sieve_limit_);

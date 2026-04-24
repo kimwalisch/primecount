@@ -157,6 +157,9 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
     store_packed(segment_size, segments);
   }
 
+  // The earlier loads are used for heuristic chunk
+  // sizing, it is OK if they are slightly outdated. This
+  // fetch_add() reserves unique work for this thread.
   int64_t thread_dist = segment_size * segments;
   low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
 
