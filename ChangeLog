@@ -1,5 +1,6 @@
-Changes in primecount-8.5, 2026-04-23
+Changes in primecount-8.5, 2026-04-24
 
+* LoadBalancerAC.cpp: Use lockfree implementation, get rid of mutex.
 * LoadBalancerP2.cpp: Use lockfree implementation, get rid of mutex.
 * nth_prime.cpp: Use new nth_prime_sieve() implementation.
 * nth_prime_sieve.cpp: Improved multi-threading.
