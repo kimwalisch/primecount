@@ -65,7 +65,10 @@ int LoadBalancerP2::get_threads() const
 bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
   low = low_.load(std::memory_order_relaxed);
-  low = min(low, sieve_limit_);
+
+  if (low >= sieve_limit_)
+    return false;
+
   int64_t dist = sieve_limit_ - low;
   int64_t thread_dist = thread_dist_;
 
@@ -101,14 +104,15 @@ bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
   low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
   high = low + thread_dist;
   high = min(high, sieve_limit_);
+  bool has_work = low < sieve_limit_;
 
   // The lockfree critical section above should complete
   // as fast as possible. Hence, printing should be done
   // afterwards since it may incur a system call.
-  if (is_print_)
+  if (is_print_ && has_work)
     print_P2_status(low);
 
-  return low < sieve_limit_;
+  return has_work;
 }
 
 void LoadBalancerP2::print_P2_status(int64_t low)
