@@ -71,8 +71,6 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // Limit to 2^31-1 to allow bit packing into uint64_t
   segments = min(segments, INT32_MAX);
   segment_size = min(segment_size, INT32_MAX);
-  max_segment_size_ = min(max_segment_size_, INT32_MAX);
-
   segment_size = max(min_segment_size, segment_size);
   segment_size = SegmentedPiTable::align_segment_size(segment_size);
   max_segment_size_ = max(L1_segment_size, segment_size);
