@@ -4,7 +4,7 @@
 ///        computation of the 2nd partial sieve function.
 ///        It is used by the P2(x, a) and B(x, y) functions.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -15,9 +15,10 @@
 #include <imath.hpp>
 #include <min.hpp>
 #include <print.hpp>
+#include <TryLockGuard.hpp>
 
 #include <stdint.h>
-#include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <string>
 
@@ -28,21 +29,21 @@ LoadBalancerP2::LoadBalancerP2(maxint_t x,
                                int64_t sieve_limit,
                                int threads,
                                bool is_print) :
-  low_(isqrt(x)),
   sieve_limit_(sieve_limit),
   precision_(get_status_precision(x)),
   is_print_(is_print)
 {
-  low_ = min(low_, sieve_limit_);
-  int64_t dist = sieve_limit_ - low_;
+  int64_t low = isqrt(x);
+  low = min(low, sieve_limit_);
+  low_.store(low, std::memory_order_relaxed);
+  int64_t dist = sieve_limit_ - low;
 
   // These load balancing settings work well on my
   // dual-socket AMD EPYC 7642 server with 192 CPU cores.
   min_thread_dist_ = 1 << 23;
-  int max_threads = (int) std::pow(sieve_limit_, 1 / 3.7);
-  threads = std::min(threads, max_threads);
+  double max_threads = std::pow(sieve_limit_, 1 / 3.7);
+  threads = min(threads, (int) max_threads);
   threads_ = ideal_num_threads(dist, threads, min_thread_dist_);
-  lock_.init(threads_);
 
   // Using more chunks per thread improves load
   // balancing but also adds some overhead.
@@ -56,84 +57,111 @@ int LoadBalancerP2::get_threads() const
   return threads_;
 }
 
-/// The thread needs to sieve [low, high[
+/// Assign new [low, high[ workload to thread.
+/// Multiple threads may call get_work() simultaneously, since
+/// this function is not protected by a mutex, it must not
+/// modify any shared member variables, except the atomic low_.
+///
 bool LoadBalancerP2::get_work(int64_t& low, int64_t& high)
 {
-  std::string status;
-  bool has_work;
+  low = low_.load(std::memory_order_relaxed);
 
+  if (low >= sieve_limit_)
+    return false;
+
+  int64_t dist = sieve_limit_ - low;
+  int64_t thread_dist = thread_dist_;
+
+  if (threads_ == 1)
   {
-    LockGuard lockGuard(lock_);
+    // When using a single thread (and printing is disabled) we
+    // can set thread_dist to the entire sieving distance since
+    // load balancing is only useful for multi-threading.
+    if (!is_print_)
+      thread_dist = dist;
+  }
+  else
+  {
+    // Ensure that the thread initialization i.e. the calculation of
+    // PrimePi(low) uses less time than the actual computation.
+    // Computing PrimePi(low) uses O(low^(2/3) / log(low)^2) time
+    // whereas sieving a distance of n = low^(2/3) uses O(n log log n)
+    // time. Hence, the sieving time is larger than the initialization
+    // time. Using these settings for low = 2e14 the sieving time is
+    // 5x larger than the initialization time on my AMD EPYC 7642 CPU.
+    double low13 = std::cbrt(low);
+    int64_t low23 = (int64_t) (low13 * low13);
+    int64_t min_thread_dist = max(min_thread_dist_, low23);
+    thread_dist = max(min_thread_dist, thread_dist);
 
-    if (is_print_)
-      status = get_status();
-
-    // Calculate the remaining sieving distance
-    low_ = min(low_, sieve_limit_);
-    int64_t dist = sieve_limit_ - low_;
-
-    // When a single thread is used (and printing is disabled)
-    // we can set thread_dist to the entire sieving distance
-    // as load balancing is only useful for multi-threading.
-    if (threads_ == 1)
-    {
-      if (!is_print_)
-        thread_dist_ = dist;
-    }
-    else
-    {
-      // Ensure that the thread initialization i.e. the calculation
-      // of PrimePi(low) uses less time than the actual computation.
-      // Computing PrimePi(low) uses O(low^(2/3) / log(low)^2) time but
-      // sieving a distance of n = low^(2/3) uses O(n log log n) time,
-      // hence the sieving time is larger than the initialization time.
-      // Using these settings for low = 2e14 the sieving time is 5x
-      // larger than the initialization time on my AMD EPYC 7642 CPU.
-      double low13 = std::cbrt(low_);
-      int64_t low23 = (int64_t) (low13 * low13);
-      min_thread_dist_ = std::max(min_thread_dist_, low23);
-      thread_dist_ = max(min_thread_dist_, thread_dist_);
-
-      // Reduce the thread distance near to end to keep all
-      // threads busy until the computation finishes.
-      int64_t max_thread_dist = dist / threads_;
-      if (thread_dist_ > max_thread_dist)
-        thread_dist_ = max(min_thread_dist_, max_thread_dist);
-    }
-
-    low = low_;
-    low_ += thread_dist_;
-    low_ = min(low_, sieve_limit_);
-    high = low_;
-    has_work = low < sieve_limit_;
+    // Reduce thread distance near the end to keep all
+    // threads busy until the computation finishes.
+    int64_t max_thread_dist = dist / threads_;
+    if (thread_dist > max_thread_dist)
+      thread_dist = max(min_thread_dist, max_thread_dist);
   }
 
-  // Printing to the terminal incurs a system call
-  // and may hence be slow. Therefore, we do it
-  // after having released the mutex.
-  if (!status.empty())
-    print_status(status);
+  // The earlier loads are used for heuristic chunk
+  // sizing, it is OK if they are slightly outdated. This
+  // fetch_add() reserves unique work for this thread.
+  low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
+  high = low + thread_dist;
+  high = min(high, sieve_limit_);
+  bool has_work = low < sieve_limit_;
+
+  // The lockfree critical section above should complete
+  // as fast as possible. Hence, printing should be done
+  // afterwards since it may incur a system call.
+  if (is_print_ && has_work)
+    print_P2_status(low);
 
   return has_work;
 }
 
-std::string LoadBalancerP2::get_status()
+void LoadBalancerP2::print_P2_status(int64_t low)
 {
   double time = get_time();
-  double old = time_;
-  double threshold = 0.1;
 
-  if ((time - old) >= threshold)
+#if __cplusplus >= 201703L
+  // Prevent lock contention on many-core systems,
+  // print status only every 0.1 seconds.
+  if (std::atomic<double>::is_always_lock_free &&
+      time <= next_print_time_.load(std::memory_order_relaxed))
+    return;
+#endif
+
+  // For printing the status it is OK to use a non-blocking
+  // userspace lock because printing the status is a non
+  // essential operation and hence even if the OS preempts
+  // the thread holding the lock it won't cause any deadlocks
+  // or performance issues, it will only delay the status
+  // output.
+  TryLockGuard guard(print_lock_);
+
+  if (guard.owns_lock())
   {
-    time_ = time;
-    double percent = get_percent(low_, sieve_limit_);
-    std::string status = "Status: ";
-    status += to_string(percent, precision_);
-    status += '%';
-    return status;
-  }
+  #if __cplusplus >= 201703L
+    // It is theoretically possible that multiple threads
+    // enter this critical sections within 0.1 seconds.
+    // This additional condition prevents it.
+    if (std::atomic<double>::is_always_lock_free &&
+        time <= next_print_time_.load(std::memory_order_relaxed))
+      return;
+  #endif
 
-  return std::string();
+    // The next thread can print again in 0.1 seconds
+    next_print_time_.store(time + 0.1, std::memory_order_relaxed);
+    double percent = get_percent(low, sieve_limit_);
+
+    if (percent > percent_)
+    {
+      percent_ = percent;
+      std::string status = "Status: ";
+      status += to_string(percent, precision_);
+      status += '%';
+      print_status(status);
+    }
+  }
 }
 
 } // namespace

@@ -7,7 +7,7 @@
 ///        Load balancing is described in more detail at:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,10 +16,11 @@
 #ifndef LOADBALANCERAC_HPP
 #define LOADBALANCERAC_HPP
 
-#include <OmpLock.hpp>
+#include <primecount-config.hpp>
+#include <macros.hpp>
 
 #include <stdint.h>
-#include <string>
+#include <atomic>
 
 namespace primecount {
 
@@ -38,19 +39,25 @@ public:
   bool get_work(ThreadDataAC& thread);
 
 private:
-  std::string get_status(double current_time);
-  int64_t low_ = 0;
+  void store_packed(int64_t segment_size, int64_t segments);
+  void print_AC_status(const ThreadDataAC& thread, double time);
+
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
-  int64_t segments_ = 0;
-  int64_t segment_size_ = 0;
-  int64_t segment_nr_ = 0;
   int64_t max_segment_size_ = 0;
   double start_time_ = 0;
-  double print_time_ = 0;
   int threads_ = 0;
   bool is_print_ = false;
-  OmpLock lock_;
+
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
+  std::atomic<int64_t> low_{0};
+  std::atomic<uint64_t> segment_data_{0};
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
+  std::atomic<int64_t> segment_nr_{0};
+  MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
+  std::atomic<double> next_print_time_{0};
+  std::atomic<bool> print_lock_{false};
+  MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
 };
 
 } // namespace
