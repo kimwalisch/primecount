@@ -3,7 +3,7 @@
 /// @brief  The ParallelSieve class provides an easy API for
 ///         multi-threaded prime sieving.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,9 @@
 #define PARALLELSIEVE_HPP
 
 #include "PrimeSieveClass.hpp"
+
+#include <primesieve/config.hpp>
+#include <primesieve/macros.hpp>
 
 #include <stdint.h>
 #include <mutex>
@@ -33,10 +36,13 @@ public:
   virtual void sieve();
 
 private:
-  std::mutex mutex_;
-  int numThreads_ = 0;
   uint64_t getThreadDistance(int) const;
   uint64_t align(uint64_t) const;
+
+  int numThreads_ = 0;
+  MAYBE_UNUSED char pad1[config::MAX_CACHE_LINE_SIZE];
+  std::mutex mutex_;
+  MAYBE_UNUSED char pad2[config::MAX_CACHE_LINE_SIZE];
 };
 
 } // namespace
