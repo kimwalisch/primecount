@@ -79,10 +79,16 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   store_packed(segment_size, segments);
-  ThreadDataAC thread{ 0, segment_size, segments, 0 };
 
   if (is_print_)
+  {
+    ThreadDataAC thread;
+    thread.low = 0;
+    thread.segment_size = segment_size;
+    thread.segments = segments;
+    thread.secs = 0;
     print_AC_status(thread, start_time_);
+  }
 }
 
 /// Pack segment_size & segments into a uint64_t,
