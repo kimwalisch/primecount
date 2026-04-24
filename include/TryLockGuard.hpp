@@ -18,23 +18,23 @@ namespace {
 
 struct TryLockGuard
 {
-  public:
+public:
   TryLockGuard(std::atomic<bool>& lock)
-      : lock_(&lock)
+    : lock_(&lock)
   {
-      bool expected = false;
-      is_locked_ = lock.compare_exchange_weak(expected, true, std::memory_order_acquire);
+    bool expected = false;
+    is_locked_ = lock.compare_exchange_weak(expected, true, std::memory_order_acquire);
   }
   ~TryLockGuard()
   {
-      if (is_locked_)
+    if (is_locked_)
       lock_->store(false, std::memory_order_release);
   }
   bool owns_lock() const
   {
-      return is_locked_;
+    return is_locked_;
   }
-  private:
+private:
   std::atomic<bool>* lock_ = nullptr;
   bool is_locked_ = false;
 };
