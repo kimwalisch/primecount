@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
 #include <string>
 
 using namespace primecount;
@@ -60,11 +59,6 @@ double linear_ratio(int64_t low, int64_t limit)
   return percent / 100.0;
 }
 
-double power_percent(double r, double exponent)
-{
-  return curve01(100.0 * std::pow(r, exponent));
-}
-
 double log_percent(double r, double factor)
 {
   return curve01(100.0 * std::log1p(factor * r) / std::log1p(factor));
@@ -81,22 +75,10 @@ double smoothstep(double x)
   return x * x * (3.0 - 2.0 * x);
 }
 
-double delayed(double percent, double r, double delay, double cutoff)
-{
-  double w = smoothstep(r / cutoff);
-  return curve01(percent - delay * (1.0 - w));
-}
-
 double early_floor(double percent, double r, double scale, double cap)
 {
   double floor = std::min(scale * r, cap);
   return std::max(percent, curve01(floor));
-}
-
-double percent_power(double percent, double exponent)
-{
-  double r = curve01(percent) / 100.0;
-  return power_percent(r, exponent);
 }
 
 double capped_log_boost_percent(double r,
@@ -144,23 +126,6 @@ double tuned_log_percent(double r,
   return blend(small, large, x_tune);
 }
 
-/// Select one of several experimental no-sum progress curves.
-/// This is intentionally controlled through an environment variable
-/// so different candidates can be tested without rebuilding.
-int get_status_s2_method()
-{
-  static int method = []()
-  {
-    const char* env = std::getenv("PRIMECOUNT_S2_STATUS_METHOD");
-    if (!env)
-      return 0;
-
-    return in_between(0, std::atoi(env), 14);
-  }();
-
-  return method;
-}
-
 } // namespace
 
 namespace primecount {
@@ -184,34 +149,10 @@ StatusS2::StatusS2(maxint_t x)
 double StatusS2::getPercent(int64_t low, int64_t limit) const
 {
   double r = linear_ratio(low, limit);
-  double legacy = skewed_percent(low, limit);
 
-  switch (get_status_s2_method())
-  {
-    case  0: return tuned_log_percent(r, x_tune_,
-                                      2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036,
-                                      25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
-    case  1: return tuned_log_percent(r, x_tune_,
-                                      3071.222874, 18.992829, 18.456959, 57.874339, 0.000425254,
-                                      30338.257157, 15.752385, 44.494719, 52.798611, 0.000413516);
-    case  2: return tuned_log_percent(r, x_tune_,
-                                      2171.215935, 14.132140, 10.683080, 52.926555, 0.001359935,
-                                      23855.906060, 13.437586, 53.480088, 50.950426, 0.000395379);
-    case  3: return capped_log_boost_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
-    case  4: return capped_log_boost_percent(r, 25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
-    case  5: return early_floor(delayed(log_percent(r, 2000.0), r, 8.0, 0.006), r, 500.0, 0.5);
-    case  6: return early_floor(delayed(log_percent(r, 2000.0), r, 6.0, 0.006), r, 300.0, 0.5);
-    case  7: return early_floor(delayed(log_percent(r, 2000.0), r, 7.0, 0.006), r, 300.0, 0.5);
-    case  8: return early_floor(delayed(log_percent(r, 2000.0), r, 8.0, 0.006), r, 500.0, 0.5);
-    case  9: return log_percent(r, 500.0);
-    case 10: return log_percent(r, 1000.0);
-    case 11: return log_percent(r, 2000.0);
-    case 12: return percent_power(legacy, 0.35);
-    case 13: return capped_log_boost_percent(r, 3071.222874, 18.992829, 18.456959, 57.874339, 0.000425254);
-    case 14: return capped_log_boost_percent(r, 30338.257157, 15.752385, 44.494719, 52.798611, 0.000413516);
-    default:
-      return legacy;
-  }
+  return tuned_log_percent(r, x_tune_,
+                           2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036,
+                           25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
 }
 
 /// This method is used by S2_hard() and D().
