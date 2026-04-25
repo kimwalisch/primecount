@@ -23,7 +23,9 @@ public:
     : lock_(&lock)
   {
     bool expected = false;
-    is_locked_ = lock.compare_exchange_weak(expected, true, std::memory_order_acquire);
+    is_locked_ = lock.compare_exchange_strong(expected, true,
+                                              std::memory_order_acquire,
+                                              std::memory_order_relaxed);
   }
   ~TryLockGuard()
   {
