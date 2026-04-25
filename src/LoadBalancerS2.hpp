@@ -70,7 +70,6 @@ private:
   int64_t segments_ = 0;
   int64_t segment_size_ = 0;
   maxint_t sum_ = 0;
-  maxint_t sum_approx_ = 0;
   double time_ = 0;
   int threads_ = 0;
   bool is_print_ = false;
