@@ -49,7 +49,7 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
 
   // Minimum segment size = 512 bytes.
   // This size performs well near 1e16 on my AMD EPYC 2.
-  int64_t min_segment_size = (1 << 9) * SegmentedPiTable::numbers_per_byte();
+  min_segment_size_ = (1 << 9) * SegmentedPiTable::numbers_per_byte();
 
   // The maximum segment size matches the CPU's L1 cache
   // size (unless x^(1/4) > L1 cache size). This way
@@ -71,22 +71,17 @@ LoadBalancerAC::LoadBalancerAC(int64_t sqrtx,
   // Limit to 2^31-1 to allow bit packing into uint64_t
   segments = min(segments, INT32_MAX);
   segment_size = min(segment_size, INT32_MAX);
-  segment_size = max(min_segment_size, segment_size);
+  segment_size = max(min_segment_size_, segment_size);
   segment_size = SegmentedPiTable::align_segment_size(segment_size);
+
+  min_segment_size_ = segment_size;
   max_segment_size_ = max(L1_segment_size, segment_size);
   max_segment_size_ = SegmentedPiTable::align_segment_size(max_segment_size_);
 
   store_packed(segment_size, segments);
 
   if (is_print_)
-  {
-    ThreadDataAC thread;
-    thread.low = 0;
-    thread.segment_size = segment_size;
-    thread.segments = segments;
-    thread.secs = 0;
-    print_AC_status(thread, start_time_);
-  }
+    print_AC_status(0, start_time_);
 }
 
 /// Pack segment_size & segments into a uint64_t,
@@ -172,16 +167,14 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   // as fast as possible. Hence, printing should be done
   // afterwards since it may incur a system call.
   if (is_print_ && has_work)
-    print_AC_status(thread, time);
+    print_AC_status(low, time);
 
   return has_work;
 }
 
-void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread,
+void LoadBalancerAC::print_AC_status(int64_t low,
                                      double time)
 {
-  int64_t segment_nr = segment_nr_.fetch_add(1, std::memory_order_relaxed);
-
 #if __cplusplus >= 201703L
   // Prevent lock contention on many-core systems,
   // print status only every 0.1 seconds.
@@ -212,14 +205,12 @@ void LoadBalancerAC::print_AC_status(const ThreadDataAC& thread,
     // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
 
-    int64_t remaining_dist = sqrtx_ - thread.low;
-    int64_t thread_dist = thread.segment_size * thread.segments;
-    int64_t total_segments = ceil_div(remaining_dist, thread_dist);
-    total_segments += segment_nr;
-
+    int64_t segment_nr = low / min_segment_size_;
+    int64_t total_segments = ceil_div(sqrtx_, min_segment_size_);
     std::string status = "Segments: ";
     status += std::to_string(segment_nr) + '/';
     status += std::to_string(total_segments);
+
     print_status(status);
   }
 }

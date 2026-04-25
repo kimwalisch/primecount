@@ -40,10 +40,11 @@ public:
 
 private:
   void store_packed(int64_t segment_size, int64_t segments);
-  void print_AC_status(const ThreadDataAC& thread, double time);
+  void print_AC_status(int64_t low, double time);
 
   int64_t sqrtx_ = 0;
   int64_t y_ = 0;
+  int64_t min_segment_size_ = 0;
   int64_t max_segment_size_ = 0;
   double start_time_ = 0;
   int threads_ = 0;
@@ -53,11 +54,9 @@ private:
   std::atomic<int64_t> low_{0};
   std::atomic<uint64_t> segment_data_{0};
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
-  std::atomic<int64_t> segment_nr_{0};
-  MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
   std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};
-  MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
+  MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
 };
 
 } // namespace

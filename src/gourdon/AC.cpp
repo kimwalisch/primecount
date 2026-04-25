@@ -866,6 +866,7 @@ T AC_OpenMP(T x,
   int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
+  LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
@@ -884,7 +885,6 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
   RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
-  LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
