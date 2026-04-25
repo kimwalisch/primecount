@@ -81,34 +81,6 @@ double smoothstep(double x)
   return x * x * (3.0 - 2.0 * x);
 }
 
-double adaptive_log_percent(double r,
-                            double early_factor,
-                            double late_factor,
-                            double start,
-                            double finish)
-{
-  double w = smoothstep((r - start) / (finish - start));
-  double early = log_percent(r, early_factor);
-  double late = log_percent(r, late_factor);
-
-  return blend(early, late, w);
-}
-
-double triple_log_percent(double r,
-                          double early_factor,
-                          double mid_factor,
-                          double late_factor,
-                          double start1,
-                          double finish1,
-                          double start2,
-                          double finish2)
-{
-  if (r < finish1)
-    return adaptive_log_percent(r, early_factor, mid_factor, start1, finish1);
-  else
-    return adaptive_log_percent(r, mid_factor, late_factor, start2, finish2);
-}
-
 double delayed(double percent, double r, double delay, double cutoff)
 {
   double w = smoothstep(r / cutoff);
@@ -127,23 +99,47 @@ double percent_power(double percent, double exponent)
   return power_percent(r, exponent);
 }
 
+double capped_log_boost_percent(double r,
+                                double early_factor,
+                                double base_factor,
+                                double delay,
+                                double cap,
+                                double cutoff)
+{
+  double base = log_percent(r, base_factor);
+  double boost = log_percent(r, early_factor);
+  boost -= delay * (1.0 - smoothstep(r / cutoff));
+  boost = curve01(std::min(boost, cap));
+  double percent = std::max(base, boost);
+
+  return early_floor(percent, r, 500.0, 0.5);
+}
+
 double tuned_log_percent(double r,
                          double x_tune,
-                         double small_early,
-                         double small_mid,
+                         double small_early_factor,
+                         double small_base_factor,
                          double small_delay,
-                         double large_early,
-                         double large_mid,
-                         double large_late,
-                         double large_delay)
+                         double small_cap,
+                         double small_cutoff,
+                         double large_early_factor,
+                         double large_base_factor,
+                         double large_delay,
+                         double large_cap,
+                         double large_cutoff)
 {
-  double small = adaptive_log_percent(r, small_early, small_mid, 0.001, 0.006);
-  small = delayed(small, r, small_delay, 0.001);
-  small = early_floor(small, r, 500.0, 0.5);
-
-  double large = triple_log_percent(r, large_early, large_mid, large_late, 0.001, 0.006, 0.05, 0.20);
-  large = delayed(large, r, large_delay, 0.0005);
-  large = early_floor(large, r, 500.0, 0.5);
+  double small = capped_log_boost_percent(r,
+                                          small_early_factor,
+                                          small_base_factor,
+                                          small_delay,
+                                          small_cap,
+                                          small_cutoff);
+  double large = capped_log_boost_percent(r,
+                                          large_early_factor,
+                                          large_base_factor,
+                                          large_delay,
+                                          large_cap,
+                                          large_cutoff);
 
   return blend(small, large, x_tune);
 }
@@ -192,21 +188,27 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
 
   switch (get_status_s2_method())
   {
-    case  0: return tuned_log_percent(r, x_tune_, 10000.0, 600.0, 6.0, 50000.0, 600.0, 80.0, 30.0);
-    case  1: return tuned_log_percent(r, x_tune_, 20000.0, 600.0, 8.0, 30000.0, 600.0, 100.0, 25.0);
-    case  2: return tuned_log_percent(r, x_tune_, 20000.0, 300.0, 7.0, 80000.0, 500.0, 70.0, 35.0);
-    case  3: return early_floor(delayed(adaptive_log_percent(r, 1800.0, 400.0, 0.02, 0.20), r, 7.0, 0.006), r, 500.0, 0.5);
-    case  4: return early_floor(delayed(adaptive_log_percent(r, 1800.0, 400.0, 0.02, 0.20), r, 7.0, 0.006), r, 350.0, 0.5);
-    case  5: return early_floor(delayed(adaptive_log_percent(r, 2500.0, 300.0, 0.02, 0.22), r, 9.0, 0.006), r, 500.0, 0.5);
-    case  6: return early_floor(delayed(adaptive_log_percent(r, 2000.0, 300.0, 0.02, 0.20), r, 6.0, 0.006), r, 300.0, 0.5);
-    case  7: return early_floor(delayed(adaptive_log_percent(r, 2000.0, 300.0, 0.02, 0.20), r, 7.0, 0.006), r, 300.0, 0.5);
+    case  0: return tuned_log_percent(r, x_tune_,
+                                      2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036,
+                                      25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
+    case  1: return tuned_log_percent(r, x_tune_,
+                                      3071.222874, 18.992829, 18.456959, 57.874339, 0.000425254,
+                                      30338.257157, 15.752385, 44.494719, 52.798611, 0.000413516);
+    case  2: return tuned_log_percent(r, x_tune_,
+                                      2171.215935, 14.132140, 10.683080, 52.926555, 0.001359935,
+                                      23855.906060, 13.437586, 53.480088, 50.950426, 0.000395379);
+    case  3: return capped_log_boost_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
+    case  4: return capped_log_boost_percent(r, 25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
+    case  5: return early_floor(delayed(log_percent(r, 2000.0), r, 8.0, 0.006), r, 500.0, 0.5);
+    case  6: return early_floor(delayed(log_percent(r, 2000.0), r, 6.0, 0.006), r, 300.0, 0.5);
+    case  7: return early_floor(delayed(log_percent(r, 2000.0), r, 7.0, 0.006), r, 300.0, 0.5);
     case  8: return early_floor(delayed(log_percent(r, 2000.0), r, 8.0, 0.006), r, 500.0, 0.5);
     case  9: return log_percent(r, 500.0);
     case 10: return log_percent(r, 1000.0);
     case 11: return log_percent(r, 2000.0);
     case 12: return percent_power(legacy, 0.35);
-    case 13: return early_floor(delayed(adaptive_log_percent(r, 1800.0, 400.0, 0.02, 0.20), r, 7.0, 0.006), r, 700.0, 0.5);
-    case 14: return early_floor(delayed(adaptive_log_percent(r, 1000.0, 300.0, 0.02, 0.20), r, 5.0, 0.006), r, 500.0, 0.5);
+    case 13: return capped_log_boost_percent(r, 3071.222874, 18.992829, 18.456959, 57.874339, 0.000425254);
+    case 14: return capped_log_boost_percent(r, 30338.257157, 15.752385, 44.494719, 52.798611, 0.000413516);
     default:
       return legacy;
   }
