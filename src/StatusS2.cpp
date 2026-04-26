@@ -90,10 +90,12 @@ namespace primecount {
 
 StatusS2::StatusS2(maxint_t x, int64_t y)
 {
-  y_log_y_ = int64_t(y * std::log(y));
+  double log_y = std::log(y);
+  double log10_x = std::log10(double(x));
+  y_log_y_ = int64_t(y * log_y);
+  x_tune_ = in_between(0.0, (log10_x - 20.0) / 2.0, 1.0);
+
   precision_ = get_status_precision(x);
-  x_tune_ = std::log10((double) std::max(x, (maxint_t) 1));
-  x_tune_ = in_between(0.0, (x_tune_ - 20.0) / 2.0, 1.0);
   epsilon_ = 1.0;
   for (int i = 0; i < precision_; i++)
     epsilon_ /= 10.0;
@@ -107,15 +109,26 @@ StatusS2::StatusS2(maxint_t x, int64_t y)
 ///
 double StatusS2::getPercent(int64_t low, int64_t limit) const
 {
-  double percent1 = get_percent(low, y_log_y_);
-  percent1 = std::min(percent1, 20.0);
+  // Works best for >= 90%
+  double percent1 = get_percent(low, limit);
 
-  double r = get_percent(low, limit) / 100;
+  // Works well for <= 20%
+  int64_t limit2 = (y_log_y_ * 2) / 3;
+  double percent2 = get_percent(low, limit2);
+  percent2 = std::min(percent2, 20.0);
+
+  // Works well for >= 20%
+  double r = percent1 / 100;
   double small = capped_log_boost_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
   double large = capped_log_boost_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
-  double percent2 = blend(small, large, x_tune_);
+  double percent3 = blend(small, large, x_tune_);
 
-  return std::max(percent1, percent2);
+  double percent23 = std::max(percent2, percent3);
+
+  if (percent23 < 90)
+    return percent23;
+  else
+    return std::min(percent1, percent23);
 }
 
 /// This method is used by S2_hard() and D().
