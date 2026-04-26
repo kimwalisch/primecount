@@ -199,7 +199,9 @@ T S2_hard_OpenMP(T x,
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime, threads);
 
-  #pragma omp parallel num_threads(threads)
+  T sum = 0;
+
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
     ThreadData thread;
 
@@ -210,13 +212,11 @@ T S2_hard_OpenMP(T x,
       using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = S2_hard_thread<UT>(x, y, z, c, primes, pi, factor, thread);
-      thread.sum = (T) sum;
+      thread.sum = (T) S2_hard_thread<UT>(x, y, z, c, primes, pi, factor, thread);
       thread.stop_time();
+      sum += thread.sum;
     }
   }
-
-  T sum = (T) loadBalancer.get_sum();
 
   return sum;
 }

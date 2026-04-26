@@ -100,11 +100,6 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   }
 }
 
-maxint_t LoadBalancerS2::get_sum() const
-{
-  return sum_;
-}
-
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   bool has_work;
@@ -112,7 +107,9 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
   {
     LockGuard lockGuard(lock_);
-    sum_ += thread.sum;
+
+    if (thread.sum != 0)
+      found_first_leaf_ = true;
 
     if (is_print_ &&
         thread.low > max_low_)
@@ -156,7 +153,7 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     // special leaves are located near the start (around y).
     // Hence, we assign tiny work chunks to the threads in this
     // region to avoid load imbalance.
-    if (sum_ == 0)
+    if (!found_first_leaf_)
       return;
 
     // If segment_size < L1_segment_size then slowly increase the

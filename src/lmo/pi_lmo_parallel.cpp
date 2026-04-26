@@ -191,8 +191,9 @@ int64_t S2(int64_t x,
   threads = ideal_num_threads(z, threads, thread_threshold);
   LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
   PiTable pi(y, threads);
+  int64_t sum = 0;
 
-  #pragma omp parallel num_threads(threads)
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
     ThreadData thread;
 
@@ -201,10 +202,9 @@ int64_t S2(int64_t x,
       thread.start_time();
       thread.sum = S2_thread(x, y, z, c, pi, primes, lpf, mu, thread);
       thread.stop_time();
+      sum += thread.sum;
     }
   }
-
-  int64_t sum = (int64_t) loadBalancer.get_sum();
 
   if (is_print)
     print("S2", sum, time);

@@ -56,7 +56,6 @@ class LoadBalancerS2
 public:
   LoadBalancerS2(maxint_t x, int64_t y, int64_t sieve_limit, int threads, bool is_print);
   bool get_work(ThreadData& thread);
-  maxint_t get_sum() const;
 
 private:
   void update_load_balancing(const ThreadData& thread);
@@ -69,9 +68,9 @@ private:
   int64_t sqrt_limit_ = 0;
   int64_t segments_ = 0;
   int64_t segment_size_ = 0;
-  maxint_t sum_ = 0;
   double time_ = 0;
   int threads_ = 0;
+  bool found_first_leaf_ = false;
   bool is_print_ = false;
   StatusS2 status_;
   OmpLock lock_;

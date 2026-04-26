@@ -395,8 +395,9 @@ T D_OpenMP(T x,
   threads = ideal_num_threads(xz, threads, thread_threshold);
   LoadBalancerS2 loadBalancer(x, y, xz, threads, is_print);
   PiTable pi(y, threads);
+  T sum = 0;
 
-  #pragma omp parallel num_threads(threads)
+  #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
     ThreadData thread;
 
@@ -407,13 +408,11 @@ T D_OpenMP(T x,
       using UT = typename pstd::make_unsigned<T>::type;
 
       thread.start_time();
-      UT sum = D_thread<UT>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
-      thread.sum = (T) sum;
+      thread.sum = (T) D_thread<UT>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.stop_time();
+      sum += thread.sum;
     }
   }
-
-  T sum = (T) loadBalancer.get_sum();
 
   return sum;
 }
