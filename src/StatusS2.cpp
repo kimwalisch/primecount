@@ -83,12 +83,7 @@ StatusS2::StatusS2(maxint_t x,
   }
 }
 
-/// This method is used by S2_hard() and D().
-/// This method does not use a lock to synchronize threads
-/// as it is only used inside of a critical section inside
-/// LoadBalancerS2.cpp and hence it can never be accessed
-/// simultaneously from multiple threads.
-///
+/// This method is used by S2_hard() and D()
 double StatusS2::getPercent(int64_t low, int64_t limit) const
 {
   // Works best for >= 90%
