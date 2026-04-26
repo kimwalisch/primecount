@@ -394,7 +394,7 @@ T D_OpenMP(T x,
   int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xz, threads, thread_threshold);
-  LoadBalancerS2 loadBalancer(x, z, xz, d_approx, threads, is_print);
+  LoadBalancerS2 loadBalancer(x, y, xz, d_approx, threads, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)

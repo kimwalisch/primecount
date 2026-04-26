@@ -89,12 +89,11 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   // Works best for >= 90%
   double percent1 = get_percent(low, limit);
 
-  // Works well for <= 20%
-  int64_t limit2 = (y_log_y_ * 2) / 3;
-  double percent2 = get_percent(low, limit2);
+  // Works best for <= 20%
+  double percent2 = get_percent(low, y_log_y_);
   percent2 = std::min(percent2, 20.0);
 
-  // Works well for >= 20%
+  // Works best for >= 20% && < 90%
   double r = percent1 / 100;
   double small = log_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
   double large = log_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
