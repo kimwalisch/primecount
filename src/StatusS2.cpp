@@ -75,12 +75,6 @@ double smoothstep(double x)
   return x * x * (3.0 - 2.0 * x);
 }
 
-double early_floor(double percent, double r, double scale, double cap)
-{
-  double floor = std::min(scale * r, cap);
-  return std::max(percent, curve01(floor));
-}
-
 double capped_log_boost_percent(double r,
                                 double early_factor,
                                 double base_factor,
@@ -93,37 +87,9 @@ double capped_log_boost_percent(double r,
   boost -= delay * (1.0 - smoothstep(r / cutoff));
   boost = curve01(std::min(boost, cap));
   double percent = std::max(base, boost);
+  double floor = std::min(500.0 * r, 0.5);
 
-  return early_floor(percent, r, 500.0, 0.5);
-}
-
-double tuned_log_percent(double r,
-                         double x_tune,
-                         double small_early_factor,
-                         double small_base_factor,
-                         double small_delay,
-                         double small_cap,
-                         double small_cutoff,
-                         double large_early_factor,
-                         double large_base_factor,
-                         double large_delay,
-                         double large_cap,
-                         double large_cutoff)
-{
-  double small = capped_log_boost_percent(r,
-                                          small_early_factor,
-                                          small_base_factor,
-                                          small_delay,
-                                          small_cap,
-                                          small_cutoff);
-  double large = capped_log_boost_percent(r,
-                                          large_early_factor,
-                                          large_base_factor,
-                                          large_delay,
-                                          large_cap,
-                                          large_cutoff);
-
-  return blend(small, large, x_tune);
+  return std::max(percent, curve01(floor));
 }
 
 } // namespace
@@ -153,9 +119,9 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   percent1 = std::min(percent1, 20.0);
 
   double r = linear_ratio(low, limit);
-  double percent2 = tuned_log_percent(r, x_tune_,
-                           2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036,
-                           25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
+  double small = capped_log_boost_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
+  double large = capped_log_boost_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
+  double percent2 = blend(small, large, x_tune_);
 
   return std::max(percent1, percent2);
 }
