@@ -379,7 +379,6 @@ T D_OpenMP(T x,
            int64_t y,
            int64_t z,
            int64_t k,
-           T d_approx,
            const Primes& primes,
            const FactorTableD& factor,
            int threads,
@@ -394,7 +393,7 @@ T D_OpenMP(T x,
   int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(xz, threads, thread_threshold);
-  LoadBalancerS2 loadBalancer(x, y, xz, d_approx, threads, is_print);
+  LoadBalancerS2 loadBalancer(x, y, xz, threads, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
@@ -427,7 +426,6 @@ int64_t D(int64_t x,
           int64_t y,
           int64_t z,
           int64_t k,
-          int64_t d_approx,
           int threads,
           bool is_print)
 {
@@ -444,7 +442,7 @@ int64_t D(int64_t x,
 
   FactorTableD<uint16_t> factor(y, z, threads);
   auto primes = generate_primes<uint32_t>(y);
-  int64_t sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
+  int64_t sum = D_OpenMP(x, y, z, k, primes, factor, threads, is_print);
 
   if (is_print)
     print("D", sum, time);
@@ -458,7 +456,6 @@ int128_t D(int128_t x,
                    int64_t y,
                    int64_t z,
                    int64_t k,
-                   int128_t d_approx,
                    int threads,
                    bool is_print)
 {
@@ -480,13 +477,13 @@ int128_t D(int128_t x,
   {
     FactorTableD<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
+    sum = D_OpenMP(x, y, z, k, primes, factor, threads, is_print);
   }
   else
   {
     FactorTableD<uint32_t> factor(y, z, threads);
     auto primes = generate_primes<int64_t>(y);
-    sum = D_OpenMP(x, y, z, k, d_approx, primes, factor, threads, is_print);
+    sum = D_OpenMP(x, y, z, k, primes, factor, threads, is_print);
   }
 
   if (is_print)

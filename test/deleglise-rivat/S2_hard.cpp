@@ -8,7 +8,7 @@
 ///         trivial and no easy special leaves which allows
 ///         us to test only the hard special leaves.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -64,7 +64,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Li(x), threads));
+    check(s2 == S2_hard(x, y, z, c, threads));
   }
 
   // test random x
@@ -88,7 +88,7 @@ int main()
           s2 -= mu[m] * phi(x / (primes[b] * m), b - 1);
 
     std::cout << "S2_hard(" << x << ", " << y << ") = " << s2;
-    check(s2 == S2_hard(x, y, z, c, Li(x), threads));
+    check(s2 == S2_hard(x, y, z, c, threads));
   }
 
   std::cout << std::endl;

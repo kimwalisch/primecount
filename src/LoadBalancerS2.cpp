@@ -25,7 +25,7 @@
 ///        per thread in order to prevent 1 thread from running much
 ///        longer than all the other threads.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -61,7 +61,6 @@ namespace primecount {
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int64_t y,
                                int64_t sieve_limit,
-                               maxint_t,
                                int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),

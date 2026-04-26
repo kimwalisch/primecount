@@ -3,14 +3,13 @@
 /// @brief  Test the S2_hard function used in the
 ///         Deleglise-Rivat algorithm.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount.hpp>
-#include <primecount-internal.hpp>
 #include <S.hpp>
 
 #include <stdint.h>
@@ -86,12 +85,12 @@ int main()
 
   for (const formula_params& params : test_cases)
   {
-    int64_t res = S2_hard(params.x, params.y, params.z, params.c, Li(params.x), threads);
+    int64_t res = S2_hard(params.x, params.y, params.z, params.c, threads);
     std::cout << "S2_hard_64bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.c << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = S2_hard((int128_t) params.x, params.y, params.z, params.c, (int128_t) Li(params.x), threads);
+      int128_t res2 = S2_hard((int128_t) params.x, params.y, params.z, params.c, threads);
       std::cout << "S2_hard_128bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.c << ") = " << res2;
       check(res2 == params.res);
     #endif

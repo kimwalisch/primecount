@@ -168,7 +168,6 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
            int64_t c,
-           int64_t s2_approx,
            const Vector<uint32_t>& primes,
            const Vector<int32_t>& lpf,
            const Vector<int32_t>& mu,
@@ -190,7 +189,7 @@ int64_t S2(int64_t x,
   int max_threads = (int) std::pow(z, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
-  LoadBalancerS2 loadBalancer(x, y, z, s2_approx, threads, is_print);
+  LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
@@ -251,8 +250,7 @@ int64_t pi_lmo_parallel(int64_t x,
   int64_t pi_y = primes.size() - 1;
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2_approx = S2_approx(Lix, pi_y, p2, s1);
-  int64_t s2 = S2(x, y, z, c, s2_approx, primes, lpf, mu, threads, is_print);
+  int64_t s2 = S2(x, y, z, c, primes, lpf, mu, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 
