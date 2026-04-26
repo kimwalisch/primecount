@@ -207,12 +207,8 @@ T S2_hard_OpenMP(T x,
 
     while (loadBalancer.get_work(thread))
     {
-      // Unsigned integer division is usually slightly
-      // faster than signed integer division
-      using UT = typename pstd::make_unsigned<T>::type;
-
       thread.start_time();
-      thread.sum = (T) S2_hard_thread<UT>(x, y, z, c, primes, pi, factor, thread);
+      thread.sum = S2_hard_thread<T>(x, y, z, c, primes, pi, factor, thread);
       thread.stop_time();
       sum += thread.sum;
     }

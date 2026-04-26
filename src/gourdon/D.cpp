@@ -321,19 +321,19 @@ template <typename T, typename... Args>
 T D_thread(Args&&... args)
 {
   #if defined(ENABLE_AVX512_VPOPCNT)
-    return D_thread_avx512<T>(std::forward<Args>(args)...);
+    return D_thread_avx512(std::forward<Args>(args)...);
   #elif defined(ENABLE_ARM_SVE)
-    return D_thread_arm_sve<T>(std::forward<Args>(args)...);
+    return D_thread_arm_sve(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     return cpu_supports_avx512_vpopcnt
-      ? D_thread_avx512<T>(std::forward<Args>(args)...)
-      : D_thread_default<T>(std::forward<Args>(args)...);
+      ? D_thread_avx512(std::forward<Args>(args)...)
+      : D_thread_default(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     return cpu_supports_sve
-      ? D_thread_arm_sve<T>(std::forward<Args>(args)...)
-      : D_thread_default<T>(std::forward<Args>(args)...);
+      ? D_thread_arm_sve(std::forward<Args>(args)...)
+      : D_thread_default(std::forward<Args>(args)...);
   #else
-    return D_thread_default<T>(std::forward<Args>(args)...);
+    return D_thread_default(std::forward<Args>(args)...);
   #endif
 }
 
@@ -403,12 +403,8 @@ T D_OpenMP(T x,
 
     while (loadBalancer.get_work(thread))
     {
-      // Unsigned integer division is usually slightly
-      // faster than signed integer division
-      using UT = typename pstd::make_unsigned<T>::type;
-
       thread.start_time();
-      thread.sum = (T) D_thread<UT>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
+      thread.sum = D_thread<T>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
       thread.stop_time();
       sum += thread.sum;
     }
@@ -452,11 +448,11 @@ int64_t D(int64_t x,
 #ifdef HAVE_INT128_T
 
 int128_t D(int128_t x,
-                   int64_t y,
-                   int64_t z,
-                   int64_t k,
-                   int threads,
-                   bool is_print)
+           int64_t y,
+           int64_t z,
+           int64_t k,
+           int threads,
+           bool is_print)
 {
   double time;
 
