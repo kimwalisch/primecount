@@ -23,7 +23,7 @@ public:
   double getPercent(int64_t low, int64_t limit) const;
   double getStatus(int64_t low, int64_t limit);
 private:
-  int64_t y_log_y_ = 0; 
+  int64_t y_log_y_ = 0;
   double epsilon_ = 0;
   double percent_ = -1;
   double x_tune_ = 0;
