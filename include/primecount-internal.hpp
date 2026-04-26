@@ -2,7 +2,7 @@
 /// @file  primecount-internal.hpp
 /// @brief primecount internal functions
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -114,22 +114,6 @@ double get_percent(T low, T limit)
 {
   double percent = (100.0 * low) / std::max((T) 1, limit);
   return in_between(0, percent, 100);
-}
-
-template <typename T>
-T S2_approx(T pix_approx, int64_t pi_y, T p2, T s1)
-{
-  T s2_approx = pix_approx - s1 - pi_y + 1 + p2;
-  s2_approx = std::max(s2_approx, (T) 0);
-  return s2_approx;
-}
-
-template <typename T>
-T D_approx(T pix_approx, T sigma, T phi0, T ac, T b)
-{
-  T d_approx = pix_approx - (ac - b + phi0 + sigma);
-  d_approx = std::max(d_approx, (T) 0);
-  return d_approx;
 }
 
 } // namespace

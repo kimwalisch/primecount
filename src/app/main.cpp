@@ -15,7 +15,7 @@
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primecount.txt (manpage).
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -151,9 +151,9 @@ maxint_t D(maxint_t x, int threads)
     set_print_variables(true);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return D((int64_t) x, y, z, k, (int64_t) Li(x), threads);
+    return D((int64_t) x, y, z, k, threads);
   else
-    return D(x, y, z, k, Li(x), threads);
+    return D(x, y, z, k, threads);
 }
 
 maxint_t Phi0(maxint_t x, int threads)
@@ -338,9 +338,9 @@ maxint_t S2_hard(maxint_t x, int threads)
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
-    return S2_hard((int64_t) x, y, z, c, (int64_t) Li(x), threads);
+    return S2_hard((int64_t) x, y, z, c, threads);
   else
-    return S2_hard(x, y, z, c, Li(x), threads);
+    return S2_hard(x, y, z, c, threads);
 }
 
 } // namespace

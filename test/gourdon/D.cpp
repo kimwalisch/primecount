@@ -2,14 +2,13 @@
 /// @file   D.cpp
 /// @brief  Test the D function used in Gourdon's algorithm.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount.hpp>
-#include <primecount-internal.hpp>
 #include <gourdon.hpp>
 
 #include <stdint.h>
@@ -102,12 +101,12 @@ int main()
 
   for (const D_formula_params& params : test_cases)
   {
-    int64_t res = D(params.x, params.y, params.z, params.k, Li(params.x), threads);
+    int64_t res = D(params.x, params.y, params.z, params.k, threads);
     std::cout << "D_64bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.k << ") = " << res;
     check(res == params.res);
 
     #ifdef HAVE_INT128_T
-      int128_t res2 = D((int128_t) params.x, params.y, params.z, params.k, (int128_t) Li(params.x), threads);
+      int128_t res2 = D((int128_t) params.x, params.y, params.z, params.k, threads);
       std::cout << "D_128bit(" << params.x << ", " << params.y << ", " << params.z << ", " << params.k << ") = " << res2;
       check(res2 == params.res);
     #endif

@@ -4,7 +4,7 @@
 ///         S2(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2020 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -64,7 +64,7 @@ int main()
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, Li(x), threads));
+                S2_hard(x, y, z, c, threads));
   }
 
   // test random x
@@ -92,7 +92,7 @@ int main()
 
     check(s2 == S2_trivial(x, y, z, c, threads) +
                 S2_easy(x, y, z, c, threads) +
-                S2_hard(x, y, z, c, Li(x), threads));
+                S2_hard(x, y, z, c, threads));
   }
 
   std::cout << std::endl;

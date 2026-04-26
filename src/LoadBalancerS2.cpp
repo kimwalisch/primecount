@@ -25,7 +25,7 @@
 ///        per thread in order to prevent 1 thread from running much
 ///        longer than all the other threads.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -59,17 +59,16 @@ constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
 namespace primecount {
 
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
+                               int64_t y,
                                int64_t sieve_limit,
-                               maxint_t sum_approx,
                                int threads,
                                bool is_print) :
   sieve_limit_(sieve_limit),
   sqrt_limit_(isqrt(sieve_limit)),
-  sum_approx_(sum_approx),
   time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x)
+  status_(x, y, is_print)
 {
   lock_.init(threads);
 
@@ -101,26 +100,23 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   }
 }
 
-maxint_t LoadBalancerS2::get_sum() const
-{
-  return sum_;
-}
-
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   bool has_work;
-  double status = 0;
+  double status = -1;
 
   {
     LockGuard lockGuard(lock_);
-    sum_ += thread.sum;
+
+    if (thread.sum != 0)
+      found_first_leaf_ = true;
 
     if (is_print_ &&
         thread.low > max_low_)
     {
       uint64_t dist = thread.segment_size * thread.segments;
       uint64_t high = thread.low + dist;
-      status = status_.getStatus(high, sieve_limit_, sum_, sum_approx_);
+      status = status_.getStatus(high, sieve_limit_);
     }
 
     update_load_balancing(thread);
@@ -139,7 +135,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   // Printing to the terminal incurs a system call
   // and may hence be slow. Therefore, we do it
   // after having released the mutex.
-  if (status != 0)
+  if (status >= 0)
     status_.print(status);
 
   return has_work;
@@ -157,7 +153,7 @@ void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
     // special leaves are located near the start (around y).
     // Hence, we assign tiny work chunks to the threads in this
     // region to avoid load imbalance.
-    if (sum_ == 0)
+    if (!found_first_leaf_)
       return;
 
     // If segment_size < L1_segment_size then slowly increase the
@@ -299,7 +295,7 @@ void LoadBalancerS2::update_number_of_segments(const ThreadData& thread)
 /// Remaining seconds till finished
 double LoadBalancerS2::remaining_secs() const
 {
-  double percent = status_.getPercent(low_, sieve_limit_, sum_, sum_approx_);
+  double percent = status_.getPercent(low_, sieve_limit_);
   percent = in_between(10, percent, 100);
   double total_secs = get_time() - time_;
   double secs = total_secs * (100 / percent) - total_secs;

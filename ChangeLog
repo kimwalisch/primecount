@@ -1,6 +1,7 @@
-Changes in primecount-8.5, 2026-04-24
+Changes in primecount-8.5, 2026-04-26
 
 * Update to libprimesieve-12.14.
+* StatusS2.cpp: Support use in lockfree code.
 * LoadBalancerAC.cpp: Use lockfree implementation, get rid of mutex.
 * LoadBalancerP2.cpp: Use lockfree implementation, get rid of mutex.
 * nth_prime.cpp: Use new nth_prime_sieve() implementation.
