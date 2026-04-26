@@ -23,31 +23,6 @@ using namespace primecount;
 
 namespace {
 
-/// Since the distribution of the special leaves is highly skewed
-/// we cannot simply calculate the percentage of the current
-/// computation using the standard linear formula. Hence we use
-/// a polynomial formula that grows faster when the value is
-/// small and slower towards the end (100%).
-/// @see scripts/status_curve_fitting.cpp
-///
-template <typename T>
-double skewed_percent(T x, T y)
-{
-  double p1 = get_percent(x, y);
-  double p2 = p1 * p1;
-  double p3 = p1 * p2;
-  double p4 = p2 * p2;
-
-  double c1 = 3.70559815037356886459;
-  double c2 = 0.07330455122609925077;
-  double c3 = 0.00067895345810494585;
-  double c4 = 0.00000216467760881310;
-
-  double percent = -c4*p4 + c3*p3 - c2*p2 + c1*p1;
-  percent = in_between(0, percent, 100);
-  return percent;
-}
-
 double log_percent(double r, double factor)
 {
   double percent = 100.0 * std::log1p(factor * r) / std::log1p(factor);
@@ -179,9 +154,19 @@ void StatusS2::print(int64_t b, int64_t max_b)
   if ((time - old) >= threshold_)
   {
     time_ = time;
-    double old = percent_;
-    double percent = skewed_percent(b, max_b);
-    if ((percent - old) >= epsilon_)
+
+    double p1 = get_percent(b, max_b);
+    double p2 = p1 * p1;
+    double p3 = p1 * p2;
+    double p4 = p2 * p2;
+    double c1 = 3.70559815037356886459;
+    double c2 = 0.07330455122609925077;
+    double c3 = 0.00067895345810494585;
+    double c4 = 0.00000216467760881310;
+    double percent = -c4*p4 + c3*p3 - c2*p2 + c1*p1;
+    percent = in_between(0, percent, 100);
+
+    if ((percent - percent_) >= epsilon_)
     {
       percent_ = percent;
       print(percent);
