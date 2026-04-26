@@ -13,6 +13,7 @@
 #include <StatusS2.hpp>
 #include <primecount-internal.hpp>
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <print.hpp>
 
 #include <algorithm>
@@ -25,6 +26,10 @@ namespace {
 
 double log_percent(double r, double factor)
 {
+  ASSERT(r >= 0);
+  ASSERT(r <= 1);
+  ASSERT(factor > 0);
+
   double percent = 100.0 * std::log1p(factor * r) / std::log1p(factor);
   return in_between(0.0, percent, 100.0);
 }
@@ -68,6 +73,9 @@ StatusS2::StatusS2(maxint_t x,
                    int64_t y,
                    bool is_print)
 {
+  ASSERT(x >= 1);
+  ASSERT(y >= 1);
+
   double log_y = std::log(y);
   double log10_x = std::log10(double(x));
   y_log_y_ = int64_t(y * log_y);
