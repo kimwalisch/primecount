@@ -130,8 +130,9 @@ double tuned_log_percent(double r,
 
 namespace primecount {
 
-StatusS2::StatusS2(maxint_t x)
+StatusS2::StatusS2(maxint_t x, int64_t y)
 {
+  y_log_y_ = int64_t(y * std::log(y));
   precision_ = get_status_precision(x);
   x_tune_ = std::log10((double) std::max(x, (maxint_t) 1));
   x_tune_ = in_between(0.0, (x_tune_ - 20.0) / 2.0, 1.0);
@@ -148,11 +149,15 @@ StatusS2::StatusS2(maxint_t x)
 ///
 double StatusS2::getPercent(int64_t low, int64_t limit) const
 {
-  double r = linear_ratio(low, limit);
+  double percent1 = get_percent(low, y_log_y_);
+  percent1 = std::min(percent1, 20.0);
 
-  return tuned_log_percent(r, x_tune_,
+  double r = linear_ratio(low, limit);
+  double percent2 = tuned_log_percent(r, x_tune_,
                            2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036,
                            25589.451080, 15.357592, 42.898382, 54.704957, 0.000411627);
+
+  return std::max(percent1, percent2);
 }
 
 /// This method is used by S2_hard() and D().

@@ -196,7 +196,7 @@ T S2_hard_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
 
-  LoadBalancerS2 loadBalancer(x, z, s2_hard_approx, threads, is_print);
+  LoadBalancerS2 loadBalancer(x, y, z, s2_hard_approx, threads, is_print);
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime, threads);
 

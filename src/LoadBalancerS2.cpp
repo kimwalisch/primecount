@@ -59,6 +59,7 @@ constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
 namespace primecount {
 
 LoadBalancerS2::LoadBalancerS2(maxint_t x,
+                               int64_t y,
                                int64_t sieve_limit,
                                maxint_t,
                                int threads,
@@ -68,7 +69,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x)
+  status_(x, y)
 {
   lock_.init(threads);
 

@@ -190,7 +190,7 @@ int64_t S2(int64_t x,
   int max_threads = (int) std::pow(z, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
-  LoadBalancerS2 loadBalancer(x, z, s2_approx, threads, is_print);
+  LoadBalancerS2 loadBalancer(x, y, z, s2_approx, threads, is_print);
   PiTable pi(y, threads);
 
   #pragma omp parallel num_threads(threads)
