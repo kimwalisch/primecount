@@ -10,8 +10,10 @@
 ///
 
 #include <nth_prime_sieve.hpp>
+#include <primecount.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 
@@ -1045,9 +1047,10 @@ const TestCase test_cases[] =
 void check_nth_prime_sieve(int64_t n,
                            int64_t nth_prime_approx,
                            int64_t count_approx,
-                           int64_t nth_prime)
+                           int64_t nth_prime,
+                           int threads)
 {
-  int64_t res = nth_prime_sieve(n, nth_prime_approx, count_approx, 4);
+  int64_t res = nth_prime_sieve(n, nth_prime_approx, count_approx, threads);
   std::cout << "nth_prime_sieve(" << n << ", "
             << nth_prime_approx << ", "
             << count_approx << ") = " << res;
@@ -1056,11 +1059,15 @@ void check_nth_prime_sieve(int64_t n,
 
 int main()
 {
+  int threads = get_num_threads();
+  threads = std::min(threads, 4);
+
   for (const TestCase& test : test_cases)
     check_nth_prime_sieve(test.n,
                           test.nth_prime_approx,
                           test.count_approx,
-                          test.nth_prime);
+                          test.nth_prime,
+                          threads);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
@@ -1117,7 +1124,9 @@ int64_t nth_prime_from_iterator(int64_t n,
 
 int main()
 {
-  constexpr int threads = 4;
+  int threads = get_num_threads();
+  threads = std::min(threads, 4);
+
   std::vector<TestCase> cases;
   std::set<int64_t> seen_n;
 
