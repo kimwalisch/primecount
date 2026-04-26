@@ -107,12 +107,14 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   double large = log_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
   double percent3 = blend(small, large, x_tune_);
 
+  // Near the end of the computation we don't want to
+  // rely on our estimated percentage progress. There
+  // we use (low * 100 / limit), if this reaches 100%
+  // the computation is guaranteed finished.
+  double late_cap = 90.0;
   double percent23 = std::max(percent2, percent3);
+  return std::max(percent1, std::min(percent23, late_cap));
 
-  if (percent23 < 90)
-    return percent23;
-  else
-    return std::min(percent1, percent23);
 }
 
 /// This method is used by S2_hard() and D().
