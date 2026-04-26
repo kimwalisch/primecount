@@ -69,7 +69,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   time_(get_time()),
   threads_(threads),
   is_print_(is_print),
-  status_(x, y)
+  status_(x, y, is_print)
 {
   lock_.init(threads);
 

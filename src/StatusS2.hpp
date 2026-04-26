@@ -17,11 +17,12 @@ namespace primecount {
 class StatusS2
 {
 public:
-  StatusS2(maxint_t x, int64_t y);
+  StatusS2(maxint_t x, int64_t y, bool is_print);
   void print(double percent) const;
   void print(int64_t b, int64_t max_b);
   double getPercent(int64_t low, int64_t limit) const;
   double getStatus(int64_t low, int64_t limit);
+
 private:
   int64_t y_log_y_ = 0;
   double epsilon_ = 0;

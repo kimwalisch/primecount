@@ -63,17 +63,23 @@ double capped_log_boost_percent(double r,
 
 namespace primecount {
 
-StatusS2::StatusS2(maxint_t x, int64_t y)
+StatusS2::StatusS2(maxint_t x,
+                   int64_t y,
+                   bool is_print)
 {
   double log_y = std::log(y);
   double log10_x = std::log10(double(x));
   y_log_y_ = int64_t(y * log_y);
   x_tune_ = in_between(0.0, (log10_x - 20.0) / 2.0, 1.0);
 
-  precision_ = get_status_precision(x);
-  epsilon_ = 1.0;
-  for (int i = 0; i < precision_; i++)
-    epsilon_ /= 10.0;
+  if (is_print)
+  {
+    epsilon_ = 1.0;
+    precision_ = get_status_precision(x);
+
+    for (int i = 0; i < precision_; i++)
+      epsilon_ /= 10.0;
+  }
 }
 
 /// This method is used by S2_hard() and D().
