@@ -54,8 +54,11 @@ namespace {
 // size but smaller than the L2 cache size (per core).
 
 constexpr int64_t numbers_per_byte = 30;
+constexpr int64_t segment_size_alignment = 240;
 constexpr int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
 constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
+constexpr int64_t max_packed_segment_size =
+    INT32_MAX - (INT32_MAX % segment_size_alignment);
 
 } // namespace
 
@@ -73,19 +76,23 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   is_print_(is_print),
   status_(x, y, is_print)
 {
+  int64_t segment_size;
+  int64_t segments;
+
   if (threads == 1 &&
       !is_print)
   {
-    segment_size_ = L1_segment_size;
-    segment_size_ = min(segment_size_, sieve_limit);
-    segment_size_ = Sieve::align_segment_size(segment_size_);
+    segment_size = L1_segment_size;
+    segment_size = min(segment_size, sieve_limit);
+    segment_size = min(segment_size, max_packed_segment_size);
+    segment_size = Sieve::align_segment_size(segment_size);
 
     // Currently our Sieve.cpp does not rebalance its
     // counters data structure. However, if we process the
     // computation in chunks then the sieve gets recreated
     // for each new chunk which rebalances the counters.
     // Therefore we limit the number of segments here.
-    segments_ = 100;
+    segments = 100;
   }
   else
   {
@@ -94,11 +101,15 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // special leaves are located in the first few segments
     // and as we need to ensure that all threads are
     // assigned an equal amount of work.
-    segment_size_ = isqrt(isqrt(x));
-    segment_size_ = max(segment_size_, 1 << 9);
-    segment_size_ = Sieve::align_segment_size(segment_size_);
-    segments_ = 1;
+    maxint_t x14 = isqrt(isqrt(x));
+    segment_size = (x14 > max_packed_segment_size) ?
+        max_packed_segment_size : (int64_t) x14;
+    segment_size = max(segment_size, (int64_t) 1 << 9);
+    segment_size = Sieve::align_segment_size(segment_size);
+    segments = 1;
   }
+
+  store_packed(segment_size, segments);
 }
 
 /// Pack segment_size & segments into a uint64_t,
@@ -109,8 +120,23 @@ void LoadBalancerS2::store_packed(int64_t segment_size,
 {
   ASSERT(segments <= INT32_MAX);
   ASSERT(segment_size <= INT32_MAX);
-  uint64_t packed = segment_size | (segments << 32);
+  uint64_t packed = (uint64_t) segment_size | ((uint64_t) segments << 32);
   segment_data_.store(packed, std::memory_order_relaxed);
+}
+
+bool LoadBalancerS2::update_max_low(int64_t low)
+{
+  int64_t max_low = max_low_.load(std::memory_order_relaxed);
+
+  while (low > max_low)
+  {
+    if (max_low_.compare_exchange_weak(max_low, low,
+                                       std::memory_order_relaxed,
+                                       std::memory_order_relaxed))
+      return true;
+  }
+
+  return false;
 }
 
 /// Remaining seconds till finished
@@ -127,6 +153,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   int64_t prev_thread_high = 0;
   bool found_first_leaf = found_first_leaf_.load(std::memory_order_relaxed);
+  bool updated_segment_data = false;
 
   if (thread.sum && !found_first_leaf)
   {
@@ -134,7 +161,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     found_first_leaf_.store(true, std::memory_order_relaxed);
   }
 
-  if (thread.low > max_low_)
+  if (update_max_low(thread.low))
   {
     if (is_print_)
     {
@@ -148,13 +175,26 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     // Hence, we assign tiny work chunks to the threads in this
     // region to avoid load imbalance.
     if (found_first_leaf)
+    {
       update_load_balancing(thread);
+      updated_segment_data = true;
+    }
   }
-  else
+
+  if (!updated_segment_data)
   {
     uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
     thread.segment_size = segment_data & 0xffffffffu;
     thread.segments = segment_data >> 32;
+  }
+
+  int64_t low = low_.load(std::memory_order_relaxed);
+  if (low >= sieve_limit_)
+  {
+    if (prev_thread_high)
+      print_S2_status(prev_thread_high);
+
+    return false;
   }
 
   int64_t thread_dist = thread.segment_size * thread.segments;
@@ -165,28 +205,15 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
   // Printing to the terminal incurs a system call
   // and may hence be slow. Therefore, we do it
-  // after having released the mutex.
+  // after the lockfree work assignment.
   if (prev_thread_high)
-  {
-    double percent = status_.getStatus(prev_thread_high, sieve_limit_);
-    if (percent != 0)
-    {
-      TryLockGuard guard(print_lock_);
-      if (guard.owns_lock())
-      {
-        double percent = status_.getStatus(prev_thread_high, sieve_limit_);
-        status_.print(percent);
-      }
-    }
-  }
+    print_S2_status(prev_thread_high);
 
   return thread.low < sieve_limit_;
 }
 
 void LoadBalancerS2::update_load_balancing(ThreadData& thread)
 {
-  max_low_ = thread.low;
-
   int64_t segments = thread.segments;
   int64_t segment_data = segment_data_.load(std::memory_order_relaxed);
   int64_t segment_size = segment_data & 0xffffffffu;
@@ -197,6 +224,7 @@ void LoadBalancerS2::update_load_balancing(ThreadData& thread)
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L1_segment_size);
+    segment_size = min(segment_size, max_packed_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
     store_packed(segment_size, segments);
@@ -213,6 +241,7 @@ void LoadBalancerS2::update_load_balancing(ThreadData& thread)
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L2_segment_size);
+    segment_size = min(segment_size, max_packed_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
     store_packed(segment_size, segments);
@@ -250,6 +279,7 @@ void LoadBalancerS2::update_load_balancing(ThreadData& thread)
       dist = (segment_size * segments) * threads_;
       high = min(low + dist, sieve_limit_);
       segment_size = isqrt(high);
+      segment_size = min(segment_size, max_packed_segment_size);
       segment_size = Sieve::align_segment_size(segment_size);
     }
   }
@@ -340,7 +370,48 @@ int64_t LoadBalancerS2::update_number_of_segments(int64_t segments,
     segments = max(segments, 1);
   }
 
+  segments = min(segments, (int64_t) INT32_MAX);
   return segments;
+}
+
+void LoadBalancerS2::print_S2_status(int64_t low)
+{
+  double time = get_time();
+
+#if __cplusplus >= 201703L
+  // Prevent lock contention on many-core systems,
+  // print status only every 0.1 seconds.
+  if (std::atomic<double>::is_always_lock_free &&
+      time <= next_print_time_.load(std::memory_order_relaxed))
+    return;
+#endif
+
+  // For printing the status it is OK to use a non-blocking
+  // userspace lock because printing the status is a non
+  // essential operation and hence even if the OS preempts
+  // the thread holding the lock it won't cause any deadlocks
+  // or performance issues, it will only delay the status
+  // output.
+  TryLockGuard guard(print_lock_);
+
+  if (guard.owns_lock())
+  {
+  #if __cplusplus >= 201703L
+    // It is theoretically possible that multiple threads
+    // enter this critical section within 0.1 seconds.
+    // This additional condition prevents it.
+    if (std::atomic<double>::is_always_lock_free &&
+        time <= next_print_time_.load(std::memory_order_relaxed))
+      return;
+  #endif
+
+    // The next thread can print again in 0.1 seconds.
+    next_print_time_.store(time + 0.1, std::memory_order_relaxed);
+
+    double percent = status_.getStatus(low, sieve_limit_);
+    if (percent >= 0)
+      status_.print(percent);
+  }
 }
 
 } // namespace

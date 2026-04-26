@@ -60,11 +60,12 @@ public:
 
 private:
   void store_packed(int64_t segment_size, int64_t segments);
+  bool update_max_low(int64_t low);
   void update_load_balancing(ThreadData& thread);
   int64_t update_number_of_segments(int64_t segments, int64_t low, const ThreadData& thread) const;
+  void print_S2_status(int64_t low);
   double remaining_secs(int64_t low) const;
 
-  int64_t max_low_ = 0;
   int64_t sieve_limit_ = 0;
   int64_t sqrt_limit_ = 0;
   double start_time_ = 0;
@@ -75,12 +76,14 @@ private:
   MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
   std::atomic<int64_t> low_{0};
   MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
-  std::atomic<uint64_t> segment_data_{0};
+  std::atomic<int64_t> max_low_{0};
   MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
+  std::atomic<uint64_t> segment_data_{0};
+  MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
   std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};
   std::atomic<bool> found_first_leaf_{false};
-  MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
+  MAYBE_UNUSED char pad5[MAX_CACHE_LINE_SIZE];
 };
 
 } // namespace
