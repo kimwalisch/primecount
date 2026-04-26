@@ -52,6 +52,7 @@ double capped_log_boost_percent(double r,
   double boost = log_percent(r, early_factor);
   boost -= delay * (1.0 - smoothstep(r / cutoff));
   boost = in_between(0.0, boost, cap);
+
   double percent = std::max(base, boost);
   double floor = std::min(500.0 * r, 0.5);
   floor = in_between(0.0, floor, 100.0);
