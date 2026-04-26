@@ -114,7 +114,6 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   double late_cap = 90.0;
   double percent23 = std::max(percent2, percent3);
   return std::max(percent1, std::min(percent23, late_cap));
-
 }
 
 /// This method is used by S2_hard() and D().
