@@ -48,12 +48,6 @@ double skewed_percent(T x, T y)
   return percent;
 }
 
-double linear_ratio(int64_t low, int64_t limit)
-{
-  double percent = get_percent(low, limit);
-  return percent / 100.0;
-}
-
 double log_percent(double r, double factor)
 {
   double percent = 100.0 * std::log1p(factor * r) / std::log1p(factor);
@@ -116,7 +110,7 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   double percent1 = get_percent(low, y_log_y_);
   percent1 = std::min(percent1, 20.0);
 
-  double r = linear_ratio(low, limit);
+  double r = get_percent(low, limit) / 100;
   double small = capped_log_boost_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
   double large = capped_log_boost_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
   double percent2 = blend(small, large, x_tune_);
