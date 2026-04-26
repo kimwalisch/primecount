@@ -11,12 +11,13 @@
 #define LOADBALANCERS2_HPP
 
 #include <primecount-internal.hpp>
+#include <primecount-config.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
-#include <OmpLock.hpp>
 #include <StatusS2.hpp>
 
 #include <stdint.h>
+#include <atomic>
 
 namespace primecount {
 
@@ -58,22 +59,28 @@ public:
   bool get_work(ThreadData& thread);
 
 private:
-  void update_load_balancing(const ThreadData& thread);
-  void update_number_of_segments(const ThreadData& thread);
-  double remaining_secs() const;
+  void store_packed(int64_t segment_size, int64_t segments);
+  void update_load_balancing(ThreadData& thread);
+  int64_t update_number_of_segments(int64_t segments, int64_t low, const ThreadData& thread) const;
+  double remaining_secs(int64_t low) const;
 
-  int64_t low_ = 0;
   int64_t max_low_ = 0;
   int64_t sieve_limit_ = 0;
   int64_t sqrt_limit_ = 0;
-  int64_t segments_ = 0;
-  int64_t segment_size_ = 0;
-  double time_ = 0;
+  double start_time_ = 0;
   int threads_ = 0;
-  bool found_first_leaf_ = false;
   bool is_print_ = false;
   StatusS2 status_;
-  OmpLock lock_;
+
+  MAYBE_UNUSED char pad1[MAX_CACHE_LINE_SIZE];
+  std::atomic<int64_t> low_{0};
+  MAYBE_UNUSED char pad2[MAX_CACHE_LINE_SIZE];
+  std::atomic<uint64_t> segment_data_{0};
+  MAYBE_UNUSED char pad3[MAX_CACHE_LINE_SIZE];
+  std::atomic<double> next_print_time_{0};
+  std::atomic<bool> print_lock_{false};
+  std::atomic<bool> found_first_leaf_{false};
+  MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
 };
 
 } // namespace

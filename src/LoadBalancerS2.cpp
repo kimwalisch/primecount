@@ -39,8 +39,11 @@
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
+#include <TryLockGuard.hpp>
 
 #include <stdint.h>
+#include <atomic>
+#include <cmath>
 
 namespace {
 
@@ -65,13 +68,11 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                bool is_print) :
   sieve_limit_(sieve_limit),
   sqrt_limit_(isqrt(sieve_limit)),
-  time_(get_time()),
+  start_time_(get_time()),
   threads_(threads),
   is_print_(is_print),
   status_(x, y, is_print)
 {
-  lock_.init(threads);
-
   if (threads == 1 &&
       !is_print)
   {
@@ -100,129 +101,177 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   }
 }
 
-bool LoadBalancerS2::get_work(ThreadData& thread)
+/// Pack segment_size & segments into a uint64_t,
+/// needed for lockfree atomic data access.
+///
+void LoadBalancerS2::store_packed(int64_t segment_size,
+                                  int64_t segments)
 {
-  bool has_work;
-  double status = -1;
-
-  {
-    LockGuard lockGuard(lock_);
-
-    if (thread.sum != 0)
-      found_first_leaf_ = true;
-
-    if (is_print_ &&
-        thread.low > max_low_)
-    {
-      uint64_t dist = thread.segment_size * thread.segments;
-      uint64_t high = thread.low + dist;
-      status = status_.getStatus(high, sieve_limit_);
-    }
-
-    update_load_balancing(thread);
-
-    thread.low = low_;
-    thread.segments = segments_;
-    thread.segment_size = segment_size_;
-    thread.sum = 0;
-    thread.secs = 0;
-    thread.init_secs = 0;
-
-    has_work = thread.low < sieve_limit_;
-    low_ += segment_size_ * segments_;
-  }
-
-  // Printing to the terminal incurs a system call
-  // and may hence be slow. Therefore, we do it
-  // after having released the mutex.
-  if (status >= 0)
-    status_.print(status);
-
-  return has_work;
+  ASSERT(segments <= INT32_MAX);
+  ASSERT(segment_size <= INT32_MAX);
+  uint64_t packed = segment_size | (segments << 32);
+  segment_data_.store(packed, std::memory_order_relaxed);
 }
 
-void LoadBalancerS2::update_load_balancing(const ThreadData& thread)
+/// Remaining seconds till finished
+double LoadBalancerS2::remaining_secs(int64_t low) const
 {
+  double percent = status_.getPercent(low, sieve_limit_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - start_time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
+}
+
+bool LoadBalancerS2::get_work(ThreadData& thread)
+{
+  int64_t prev_thread_high = 0;
+  bool found_first_leaf = found_first_leaf_.load(std::memory_order_relaxed);
+
+  if (thread.sum && !found_first_leaf)
+  {
+    found_first_leaf = true;
+    found_first_leaf_.store(true, std::memory_order_relaxed);
+  }
+
   if (thread.low > max_low_)
   {
-    max_low_ = thread.low;
-    segments_ = thread.segments;
+    if (is_print_)
+    {
+      int64_t dist = thread.segment_size * thread.segments;
+      prev_thread_high = thread.low + dist;
+    }
 
     // We only start increasing the segment size and segments per
     // thread once the first special leaves have been found. Most
     // special leaves are located near the start (around y).
     // Hence, we assign tiny work chunks to the threads in this
     // region to avoid load imbalance.
-    if (!found_first_leaf_)
-      return;
+    if (found_first_leaf)
+      update_load_balancing(thread);
+  }
+  else
+  {
+    uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
+    thread.segment_size = segment_data & 0xffffffffu;
+    thread.segments = segment_data >> 32;
+  }
 
-    // If segment_size < L1_segment_size then slowly increase the
-    // segment size until it reaches L1_segment_size.
-    if (segment_size_ < L1_segment_size)
+  int64_t thread_dist = thread.segment_size * thread.segments;
+  thread.low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
+  thread.sum = 0;
+  thread.secs = 0;
+  thread.init_secs = 0;
+
+  // Printing to the terminal incurs a system call
+  // and may hence be slow. Therefore, we do it
+  // after having released the mutex.
+  if (prev_thread_high)
+  {
+    double percent = status_.getStatus(prev_thread_high, sieve_limit_);
+    if (percent != 0)
     {
-      segment_size_ += segment_size_ / 16;
-      segment_size_ = min(segment_size_, L1_segment_size);
-      segment_size_ = Sieve::align_segment_size(segment_size_);
-      return;
-    }
-
-    // If segment_size >= L1_segment_size then slowly increase the
-    // segment size until it reaches L2_segment_size.
-    if (segment_size_ >= L1_segment_size &&
-        segment_size_ < L2_segment_size &&
-        segment_size_ < sqrt_limit_)
-    {
-      segment_size_ += segment_size_ / 16;
-      segment_size_ = min(segment_size_, L2_segment_size);
-      segment_size_ = Sieve::align_segment_size(segment_size_);
-      return;
-    }
-
-    update_number_of_segments(thread);
-
-    // The hard special leaves algorithm is basically a modified
-    // segmented sieve of Eratosthenes. Using the segmented sieve of
-    // Eratosthenes it is of utmost importance that sieve array fits
-    // into the CPU's cache, otherwise performance will deteriorate
-    // significantly and the algorithm will scale poorly.
-    //
-    // Deleglise-Rivat orignially suggested using a segment size of
-    // O(y). Xavier Gourdon realized this segment size was much too
-    // large for new record PrimePi(x) computations and hence
-    // suggested using a smaller segment size of O(sqrt(x/y)) which
-    // is the same as O(sqrt(sieve_limit)). However, for new record
-    // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
-    // is still too large. Hence, I use an even smaller segment size
-    // of O(sqrt(high)) in primecount.
-    if (segment_size_ >= L2_segment_size &&
-        segment_size_ < sqrt_limit_)
-    {
-      int64_t dist = (segment_size_ * segments_) * threads_;
-      int64_t high = min(low_ + dist, sieve_limit_);
-
-      if (segment_size_ < isqrt(high))
+      TryLockGuard guard(print_lock_);
+      if (guard.owns_lock())
       {
-        segment_size_ += segment_size_ / 16;
-        dist = (segment_size_ * segments_) * threads_;
-        high = min(low_ + dist, sieve_limit_);
-        segment_size_ = isqrt(high);
-        segment_size_ = Sieve::align_segment_size(segment_size_);
+        double percent = status_.getStatus(prev_thread_high, sieve_limit_);
+        status_.print(percent);
       }
     }
   }
+
+  return thread.low < sieve_limit_;
+}
+
+void LoadBalancerS2::update_load_balancing(ThreadData& thread)
+{
+  max_low_ = thread.low;
+
+  int64_t segments = thread.segments;
+  int64_t segment_data = segment_data_.load(std::memory_order_relaxed);
+  int64_t segment_size = segment_data & 0xffffffffu;
+
+  // If segment_size < L1_segment_size then slowly increase the
+  // segment size until it reaches L1_segment_size.
+  if (segment_size < L1_segment_size)
+  {
+    segment_size += segment_size / 16;
+    segment_size = min(segment_size, L1_segment_size);
+    segment_size = Sieve::align_segment_size(segment_size);
+
+    store_packed(segment_size, segments);
+    thread.segment_size = segment_size;
+    thread.segments = segments;
+    return;
+  }
+
+  // If segment_size >= L1_segment_size then slowly increase the
+  // segment size until it reaches L2_segment_size.
+  if (segment_size >= L1_segment_size &&
+      segment_size < L2_segment_size &&
+      segment_size < sqrt_limit_)
+  {
+    segment_size += segment_size / 16;
+    segment_size = min(segment_size, L2_segment_size);
+    segment_size = Sieve::align_segment_size(segment_size);
+
+    store_packed(segment_size, segments);
+    thread.segment_size = segment_size;
+    thread.segments = segments;
+    return;
+  }
+
+  int64_t low = low_.load(std::memory_order_relaxed);
+  segments = update_number_of_segments(segments, low, thread);
+
+  // The hard special leaves algorithm is basically a modified
+  // segmented sieve of Eratosthenes. Using the segmented sieve of
+  // Eratosthenes it is of utmost importance that sieve array fits
+  // into the CPU's cache, otherwise performance will deteriorate
+  // significantly and the algorithm will scale poorly.
+  //
+  // Deleglise-Rivat orignially suggested using a segment size of
+  // O(y). Xavier Gourdon realized this segment size was much too
+  // large for new record PrimePi(x) computations and hence
+  // suggested using a smaller segment size of O(sqrt(x/y)) which
+  // is the same as O(sqrt(sieve_limit)). However, for new record
+  // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
+  // is still too large. Hence, I use an even smaller segment size
+  // of O(sqrt(high)) in primecount.
+  if (segment_size >= L2_segment_size &&
+      segment_size < sqrt_limit_)
+  {
+    int64_t dist = (segment_size * segments) * threads_;
+    int64_t high = min(low + dist, sieve_limit_);
+
+    if (segment_size < isqrt(high))
+    {
+      segment_size += segment_size / 16;
+      dist = (segment_size * segments) * threads_;
+      high = min(low + dist, sieve_limit_);
+      segment_size = isqrt(high);
+      segment_size = Sieve::align_segment_size(segment_size);
+    }
+  }
+
+  store_packed(segment_size, segments);
+  thread.segment_size = segment_size;
+  thread.segments = segments;
 }
 
 /// Increase or decrease the number of segments per
 /// thread based on the remaining runtime.
 ///
-void LoadBalancerS2::update_number_of_segments(const ThreadData& thread)
+int64_t LoadBalancerS2::update_number_of_segments(int64_t segments,
+                                                  int64_t low,
+                                                  const ThreadData& thread) const
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
   // threads finish nearly at the same time. Since the
   // remaining time is just a rough estimation we want to be
   // very conservative so we divide the remaining time by 3.
-  double rem_secs = remaining_secs() / 3;
+  double rem_secs = remaining_secs(low) / 3;
 
   // If the previous thread runtime is larger than the
   // estimated remaining time the factor that we calculate
@@ -283,23 +332,15 @@ void LoadBalancerS2::update_number_of_segments(const ThreadData& thread)
   double next_runtime = thread.secs * factor;
 
   if (next_runtime < min_secs)
-    segments_ *= 2;
+    segments *= 2;
   else
   {
-    double new_segments = std::round(segments_ * factor);
-    segments_ = (int64_t) new_segments;
-    segments_ = max(segments_, 1);
+    double new_segments = std::round(segments * factor);
+    segments = (int64_t) new_segments;
+    segments = max(segments, 1);
   }
-}
 
-/// Remaining seconds till finished
-double LoadBalancerS2::remaining_secs() const
-{
-  double percent = status_.getPercent(low_, sieve_limit_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
+  return segments;
 }
 
 } // namespace
