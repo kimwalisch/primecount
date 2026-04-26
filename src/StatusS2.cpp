@@ -48,11 +48,6 @@ double skewed_percent(T x, T y)
   return percent;
 }
 
-double curve01(double percent)
-{
-  return in_between(0.0, percent, 100.0);
-}
-
 double linear_ratio(int64_t low, int64_t limit)
 {
   double percent = get_percent(low, limit);
@@ -61,12 +56,14 @@ double linear_ratio(int64_t low, int64_t limit)
 
 double log_percent(double r, double factor)
 {
-  return curve01(100.0 * std::log1p(factor * r) / std::log1p(factor));
+  double percent = 100.0 * std::log1p(factor * r) / std::log1p(factor);
+  return in_between(0.0, percent, 100.0);
 }
 
 double blend(double a, double b, double weight_b)
 {
-  return curve01(a * (1.0 - weight_b) + b * weight_b);
+  double percent = a * (1.0 - weight_b) + b * weight_b;
+  return in_between(0.0, percent, 100.0);
 }
 
 double smoothstep(double x)
@@ -85,11 +82,12 @@ double capped_log_boost_percent(double r,
   double base = log_percent(r, base_factor);
   double boost = log_percent(r, early_factor);
   boost -= delay * (1.0 - smoothstep(r / cutoff));
-  boost = curve01(std::min(boost, cap));
+  boost = in_between(0.0, boost, cap);
   double percent = std::max(base, boost);
   double floor = std::min(500.0 * r, 0.5);
+  floor = in_between(0.0, floor, 100.0);
 
-  return std::max(percent, curve01(floor));
+  return std::max(percent, floor);
 }
 
 } // namespace
