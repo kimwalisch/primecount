@@ -200,8 +200,6 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 void LoadBalancerS2::run_load_balancing(ThreadData& thread,
                                         int64_t segment_size)
 {
-  int64_t segments = thread.segments;
-
   // If segment_size < L1_segment_size then slowly increase
   // the segment size until it reaches L1_segment_size.
   if (segment_size < L1_segment_size)
@@ -211,9 +209,8 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
     segment_size = min(segment_size, max_packed_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
-    store_packed(segment_size, segments);
+    store_packed(segment_size, thread.segments);
     thread.segment_size = segment_size;
-    thread.segments = segments;
     return;
   }
 
@@ -228,14 +225,13 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
     segment_size = min(segment_size, max_packed_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
-    store_packed(segment_size, segments);
+    store_packed(segment_size, thread.segments);
     thread.segment_size = segment_size;
-    thread.segments = segments;
     return;
   }
 
   int64_t low = low_.load(std::memory_order_relaxed);
-  segments = update_number_of_segments(segments, low, thread);
+  int64_t segments = get_segments(thread, low);
 
   // The hard special leaves algorithm is basically a modified
   // segmented sieve of Eratosthenes. Using the segmented sieve of
@@ -275,9 +271,8 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
 /// Increase or decrease the number of segments per
 /// thread based on the remaining runtime.
 ///
-int64_t LoadBalancerS2::update_number_of_segments(int64_t segments,
-                                                  int64_t low,
-                                                  const ThreadData& thread) const
+int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
+                                     int64_t low) const
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
@@ -343,6 +338,7 @@ int64_t LoadBalancerS2::update_number_of_segments(int64_t segments,
   // identical.
   factor = in_between(0.5, factor, 2.0);
   double next_runtime = thread.secs * factor;
+  int64_t segments = thread.segments;
 
   if (next_runtime < min_secs)
     segments *= 2;
