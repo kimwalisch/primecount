@@ -124,12 +124,12 @@ double LoadBalancerS2::remaining_secs(int64_t low) const
 /// Pack segment_size & segments into a uint64_t,
 /// needed for lockfree atomic data access.
 ///
-void LoadBalancerS2::store_packed(int64_t segment_size,
-                                  int64_t segments)
+void LoadBalancerS2::store_packed(uint64_t segment_size,
+                                  uint64_t segments)
 {
-  ASSERT(segments <= max_packed_segment_size);
-  ASSERT(segment_size <= max_packed_segment_size);
-  uint64_t packed = uint64_t(segment_size) | (uint64_t(segments) << 32);
+  ASSERT(segments <= UINT32_MAX);
+  ASSERT(segment_size <= UINT32_MAX);
+  uint64_t packed = segment_size | (segments << 32);
   segment_data_.store(packed, std::memory_order_relaxed);
 }
 
