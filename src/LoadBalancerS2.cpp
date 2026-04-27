@@ -54,11 +54,9 @@ namespace {
 // size but smaller than the L2 cache size (per core).
 
 constexpr int64_t numbers_per_byte = 30;
-constexpr int64_t segment_size_alignment = 240;
 constexpr int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
 constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
-constexpr int64_t max_packed_segment_size =
-    UINT32_MAX - (UINT32_MAX % segment_size_alignment);
+constexpr int64_t max_segment_size = UINT32_MAX - 240;
 
 } // namespace
 
@@ -84,7 +82,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   {
     segment_size = L1_segment_size;
     segment_size = min(segment_size, sieve_limit);
-    segment_size = min(segment_size, max_packed_segment_size);
+    segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
     // Currently our Sieve.cpp does not rebalance its
@@ -103,7 +101,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // assigned an equal amount of work.
     segment_size = isqrt(isqrt(x));
     segment_size = max(segment_size, 1 << 9);
-    segment_size = min(segment_size, max_packed_segment_size);
+    segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
     segments = 1;
   }
@@ -217,7 +215,7 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L1_segment_size);
-    segment_size = min(segment_size, max_packed_segment_size);
+    segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
     store_packed(segment_size, thread.segments);
@@ -233,7 +231,7 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L2_segment_size);
-    segment_size = min(segment_size, max_packed_segment_size);
+    segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
 
     store_packed(segment_size, thread.segments);
