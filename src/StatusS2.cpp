@@ -122,32 +122,19 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
 /// LoadBalancerS2.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-double StatusS2::getStatus(int64_t low, int64_t limit)
+void StatusS2::print_S2_hard(int64_t low, int64_t limit)
 {
-  double time = get_time();
-  double old = time_;
+  double old = percent_;
+  double percent = getPercent(low, limit);
 
-  if ((time - old) >= threshold_)
+  if ((percent - old) >= epsilon_)
   {
-    time_ = time;
-    double old = percent_;
-    double percent = getPercent(low, limit);
-    if ((percent - old) >= epsilon_)
-    {
-      percent_ = percent;
-      return percent;
-    }
+    percent_ = percent;
+    std::string status = "Status: ";
+    status += to_string(percent, precision_);
+    status += '%';
+    print_status(status);
   }
-
-  return -1;
-}
-
-void StatusS2::print(double percent) const
-{
-  std::string status = "Status: ";
-  status += to_string(percent, precision_);
-  status += '%';
-  print_status(status);
 }
 
 /// This method is used by S2_easy().
@@ -156,7 +143,7 @@ void StatusS2::print(double percent) const
 /// S2_easy.cpp and hence it can never be accessed
 /// simultaneously from multiple threads.
 ///
-void StatusS2::print(int64_t b, int64_t max_b)
+void StatusS2::print_S2_easy(int64_t b, int64_t max_b)
 {
   double time = get_time();
   double old = time_;
@@ -179,7 +166,10 @@ void StatusS2::print(int64_t b, int64_t max_b)
     if ((percent - percent_) >= epsilon_)
     {
       percent_ = percent;
-      print(percent);
+      std::string status = "Status: ";
+      status += to_string(percent, precision_);
+      status += '%';
+      print_status(status);
     }
   }
 }
