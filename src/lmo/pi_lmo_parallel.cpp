@@ -72,7 +72,7 @@ int64_t S2_thread(int64_t x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
+  thread.init_time = get_time();
 
   // segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -199,9 +199,9 @@ int64_t S2(int64_t x,
 
     while (loadBalancer.get_work(thread))
     {
-      thread.start_time();
+      thread.start_time = get_time();
       thread.sum = S2_thread(x, y, z, c, pi, primes, lpf, mu, thread);
-      thread.stop_time();
+      thread.stop_time = get_time();
       sum += thread.sum;
     }
   }

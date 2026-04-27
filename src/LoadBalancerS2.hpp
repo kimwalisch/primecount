@@ -17,6 +17,7 @@
 #include <StatusS2.hpp>
 
 #include <stdint.h>
+#include <algorithm>
 #include <atomic>
 
 namespace primecount {
@@ -27,28 +28,28 @@ struct ThreadData
   int64_t segments = 0;
   int64_t segment_size = 0;
   maxint_t sum = 0;
-  double init_secs = 0;
-  double secs = 0;
+  double start_time = 0;
+  double init_time = 0;
+  double stop_time = 0;
 
-  void start_time()
+  double init_secs() const
   {
-    secs = get_time();
+    double sec = init_time - start_time;
+    return std::max(sec, 0.0);
   }
 
-  void init_finished()
+  double secs() const
   {
-    // Ensure start_time() has been called
-    ASSERT(secs > 0);
-    init_secs = get_time() - secs;
-    ASSERT(init_secs >= 0);
+    double sec = stop_time - start_time;
+    return std::max(sec, 0.0);
   }
 
-  void stop_time()
+  double latest_time() const
   {
-    // Ensure start_time() has been called
-    ASSERT(secs > 0);
-    secs = get_time() - secs;
-    ASSERT(secs >= 0);
+    if (stop_time != 0)
+      return stop_time;
+    else
+      return get_time();
   }
 };
 
@@ -59,7 +60,7 @@ public:
   bool get_work(ThreadData& thread);
 
 private:
-  double remaining_secs(int64_t low) const;
+  double remaining_secs(const ThreadData& thread, int64_t low) const;
   void store_packed(uint64_t segment_size, uint64_t segments);
   void run_load_balancing(ThreadData& thread, int64_t segment_size);
   int64_t get_segments(const ThreadData& thread, int64_t low) const;

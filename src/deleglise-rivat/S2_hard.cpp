@@ -76,7 +76,7 @@ T S2_hard_thread(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
+  thread.init_time = get_time();
 
   // Segmented sieve of Eratosthenes
   for (; low < limit; low += segment_size)
@@ -207,9 +207,9 @@ T S2_hard_OpenMP(T x,
 
     while (loadBalancer.get_work(thread))
     {
-      thread.start_time();
+      thread.start_time = get_time();
       thread.sum = S2_hard_thread<T>(x, y, z, c, primes, pi, factor, thread);
-      thread.stop_time();
+      thread.stop_time = get_time();
       sum += thread.sum;
     }
   }

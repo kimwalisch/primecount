@@ -98,7 +98,7 @@ T D_thread_arm_sve(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
+  thread.init_time = get_time();
 
   Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;

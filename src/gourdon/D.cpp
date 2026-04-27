@@ -95,7 +95,7 @@ T D_thread_default(T x,
 
   Vector<int64_t> phi = phi_vector(low, max_b, primes, pi);
   Sieve sieve(low, segment_size, max_b);
-  thread.init_finished();
+  thread.init_time = get_time();
 
   Array<uint32_t, 128> m_indexes32;
   Array< int64_t, 128> m_indexes64;
@@ -403,9 +403,9 @@ T D_OpenMP(T x,
 
     while (loadBalancer.get_work(thread))
     {
-      thread.start_time();
+      thread.start_time = get_time();
       thread.sum = D_thread<T>(x, x_star, xz, y, z, k, primes, pi, factor, thread);
-      thread.stop_time();
+      thread.stop_time = get_time();
       sum += thread.sum;
     }
   }

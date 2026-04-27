@@ -110,11 +110,12 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 }
 
 /// Remaining seconds till finished
-double LoadBalancerS2::remaining_secs(int64_t low) const
+double LoadBalancerS2::remaining_secs(const ThreadData& thread,
+                                      int64_t low) const
 {
   double percent = status_.getPercent(low, sieve_limit_);
   percent = in_between(10, percent, 100);
-  double total_secs = get_time() - start_time_;
+  double total_secs = thread.latest_time() - start_time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
 }
@@ -195,8 +196,9 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   int64_t dist = thread.segment_size * thread.segments;
   thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
   thread.sum = 0;
-  thread.init_secs = 0;
-  thread.secs = 0;
+  thread.start_time = 0;
+  thread.init_time = 0;
+  thread.stop_time = 0;
 
   // The lockfree critical section above should complete
   // as fast as possible. Hence, printing should be done
@@ -289,7 +291,9 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // threads finish nearly at the same time. Since the
   // remaining time is just a rough estimation we want to be
   // very conservative so we divide the remaining time by 3.
-  double rem_secs = remaining_secs(low) / 3;
+  double rem_secs = remaining_secs(thread, low) / 3;
+  double thread_init_secs = thread.init_secs();
+  double thread_secs = thread.secs();
 
   // If the previous thread runtime is larger than the
   // estimated remaining time the factor that we calculate
@@ -297,7 +301,7 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // segments per thread. Otherwise if the factor > 1 we
   // will increase the number of segments per thread.
   double min_secs = 0.001;
-  double divider = max(min_secs, thread.secs);
+  double divider = max(min_secs, thread_secs);
   double factor = rem_secs / divider;
 
   // For small and medium computations the thread runtime
@@ -307,7 +311,7 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // backup frequency. If the thread runtime is > 6 hours
   // we reduce the thread runtime to about 200x the thread
   // initialization time.
-  double init_secs = max(min_secs, thread.init_secs);
+  double init_secs = max(min_secs, thread_init_secs);
   double init_factor = in_between(200, (3600 * 6) / init_secs, 5000);
 
   // Reduce the thread runtime if it is much larger than
@@ -315,12 +319,12 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // backups without deteriorating performance as we make
   // sure that the thread runtime is still much larger than
   // the thread initialization time.
-  if (thread.secs > min_secs &&
-      thread.secs > thread.init_secs * init_factor)
+  if (thread_secs > min_secs &&
+      thread_secs > thread_init_secs * init_factor)
   {
     double old = factor;
-    double next_runtime = thread.init_secs * init_factor;
-    factor = next_runtime / thread.secs;
+    double next_runtime = thread_init_secs * init_factor;
+    factor = next_runtime / thread_secs;
     factor = min(factor, old);
   }
 
@@ -330,11 +334,11 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // for performance. The condition below fixes this issue
   // and ensures that the thread runtime is always at
   // least 20x the thread initialization time.
-  if (thread.secs > 0 &&
-      thread.secs * factor < thread.init_secs * 20)
+  if (thread_secs > 0 &&
+      thread_secs * factor < thread_init_secs * 20)
   {
-    double next_runtime = thread.init_secs * 20;
-    double current_runtime = thread.secs;
+    double next_runtime = thread_init_secs * 20;
+    double current_runtime = thread_secs;
     factor = next_runtime / current_runtime;
   }
 
@@ -347,7 +351,7 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   // of magnitude more time even if the interval size is
   // identical.
   factor = in_between(0.5, factor, 2.0);
-  double next_runtime = thread.secs * factor;
+  double next_runtime = thread_secs * factor;
   int64_t segments = thread.segments;
 
   if (next_runtime < min_secs)
