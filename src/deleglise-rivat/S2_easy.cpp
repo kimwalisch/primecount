@@ -150,7 +150,7 @@ T S2_easy_OpenMP(T x,
       #pragma omp master
     #endif
     if (is_print)
-      status.print(b, pi_x13);
+      status.print_S2_easy(b, pi_x13);
   }
 
   return sum;
@@ -384,7 +384,7 @@ T S2_easy_OpenMP(T x,
       #pragma omp master
     #endif
     if (is_print)
-      status.print(b, pi_x13);
+      status.print_S2_easy(b, pi_x13);
   }
 
   return sum;

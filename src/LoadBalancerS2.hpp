@@ -59,12 +59,11 @@ public:
   bool get_work(ThreadData& thread);
 
 private:
-  void store_packed(int64_t segment_size, int64_t segments);
-  bool update_max_low(int64_t low);
-  void update_load_balancing(ThreadData& thread);
-  int64_t update_number_of_segments(int64_t segments, int64_t low, const ThreadData& thread) const;
-  void print_S2_status(int64_t low);
   double remaining_secs(int64_t low) const;
+  void store_packed(int64_t segment_size, int64_t segments);
+  void run_load_balancing(ThreadData& thread, int64_t segment_size);
+  int64_t update_number_of_segments(int64_t segments, int64_t low, const ThreadData& thread) const;
+  void print_S2_status(int64_t high);
 
   int64_t sieve_limit_ = 0;
   int64_t sqrt_limit_ = 0;

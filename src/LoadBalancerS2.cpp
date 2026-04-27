@@ -58,7 +58,7 @@ constexpr int64_t segment_size_alignment = 240;
 constexpr int64_t L1_segment_size = L1_CACHE_SIZE * numbers_per_byte;
 constexpr int64_t L2_segment_size = L2_CACHE_SIZE * numbers_per_byte;
 constexpr int64_t max_packed_segment_size =
-    INT32_MAX - (INT32_MAX % segment_size_alignment);
+    UINT32_MAX - (UINT32_MAX % segment_size_alignment);
 
 } // namespace
 
@@ -101,10 +101,9 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // special leaves are located in the first few segments
     // and as we need to ensure that all threads are
     // assigned an equal amount of work.
-    maxint_t x14 = isqrt(isqrt(x));
-    segment_size = (x14 > max_packed_segment_size) ?
-        max_packed_segment_size : (int64_t) x14;
-    segment_size = max(segment_size, (int64_t) 1 << 9);
+    segment_size = isqrt(isqrt(x));
+    segment_size = max(segment_size, 1 << 9);
+    segment_size = min(segment_size, max_packed_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
     segments = 1;
   }
@@ -118,25 +117,10 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 void LoadBalancerS2::store_packed(int64_t segment_size,
                                   int64_t segments)
 {
-  ASSERT(segments <= INT32_MAX);
-  ASSERT(segment_size <= INT32_MAX);
-  uint64_t packed = (uint64_t) segment_size | ((uint64_t) segments << 32);
+  ASSERT(segments <= max_packed_segment_size);
+  ASSERT(segment_size <= max_packed_segment_size);
+  uint64_t packed = uint64_t(segment_size) | (uint64_t(segments) << 32);
   segment_data_.store(packed, std::memory_order_relaxed);
-}
-
-bool LoadBalancerS2::update_max_low(int64_t low)
-{
-  int64_t max_low = max_low_.load(std::memory_order_relaxed);
-
-  while (low > max_low)
-  {
-    if (max_low_.compare_exchange_weak(max_low, low,
-                                       std::memory_order_relaxed,
-                                       std::memory_order_relaxed))
-      return true;
-  }
-
-  return false;
 }
 
 /// Remaining seconds till finished
@@ -151,22 +135,33 @@ double LoadBalancerS2::remaining_secs(int64_t low) const
 
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
-  int64_t prev_thread_high = 0;
+  int64_t max_low = max_low_.load(std::memory_order_relaxed);
   bool found_first_leaf = found_first_leaf_.load(std::memory_order_relaxed);
-  bool updated_segment_data = false;
+  uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
+  int64_t segment_size = segment_data & 0xffffffffu;
+  int64_t segments = segment_data >> 32;
+  int64_t print_high = 0;
 
   if (thread.sum && !found_first_leaf)
   {
-    found_first_leaf = true;
     found_first_leaf_.store(true, std::memory_order_relaxed);
+    found_first_leaf = true;
   }
 
-  if (update_max_low(thread.low))
+  if (thread.low <= max_low)
   {
+    // Use old values, don't run load balancing
+    thread.segment_size = segment_size;
+    thread.segments = segments;
+  }
+  else
+  {
+    max_low_.store(thread.low, std::memory_order_relaxed);
+
     if (is_print_)
     {
       int64_t dist = thread.segment_size * thread.segments;
-      prev_thread_high = thread.low + dist;
+      print_high = thread.low + dist;
     }
 
     // We only start increasing the segment size and segments per
@@ -175,30 +170,16 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     // Hence, we assign tiny work chunks to the threads in this
     // region to avoid load imbalance.
     if (found_first_leaf)
+      run_load_balancing(thread, segment_size);
+    else
     {
-      update_load_balancing(thread);
-      updated_segment_data = true;
+      thread.segment_size = segment_size;
+      thread.segments = segments;
     }
   }
 
-  if (!updated_segment_data)
-  {
-    uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
-    thread.segment_size = segment_data & 0xffffffffu;
-    thread.segments = segment_data >> 32;
-  }
-
-  int64_t low = low_.load(std::memory_order_relaxed);
-  if (low >= sieve_limit_)
-  {
-    if (prev_thread_high)
-      print_S2_status(prev_thread_high);
-
-    return false;
-  }
-
-  int64_t thread_dist = thread.segment_size * thread.segments;
-  thread.low = low_.fetch_add(thread_dist, std::memory_order_relaxed);
+  int64_t dist = thread.segment_size * thread.segments;
+  thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
   thread.sum = 0;
   thread.secs = 0;
   thread.init_secs = 0;
@@ -206,17 +187,16 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   // Printing to the terminal incurs a system call
   // and may hence be slow. Therefore, we do it
   // after the lockfree work assignment.
-  if (prev_thread_high)
-    print_S2_status(prev_thread_high);
+  if (print_high)
+    print_S2_status(print_high);
 
   return thread.low < sieve_limit_;
 }
 
-void LoadBalancerS2::update_load_balancing(ThreadData& thread)
+void LoadBalancerS2::run_load_balancing(ThreadData& thread,
+                                        int64_t segment_size)
 {
   int64_t segments = thread.segments;
-  int64_t segment_data = segment_data_.load(std::memory_order_relaxed);
-  int64_t segment_size = segment_data & 0xffffffffu;
 
   // If segment_size < L1_segment_size then slowly increase the
   // segment size until it reaches L1_segment_size.
@@ -279,7 +259,6 @@ void LoadBalancerS2::update_load_balancing(ThreadData& thread)
       dist = (segment_size * segments) * threads_;
       high = min(low + dist, sieve_limit_);
       segment_size = isqrt(high);
-      segment_size = min(segment_size, max_packed_segment_size);
       segment_size = Sieve::align_segment_size(segment_size);
     }
   }
@@ -370,11 +349,11 @@ int64_t LoadBalancerS2::update_number_of_segments(int64_t segments,
     segments = max(segments, 1);
   }
 
-  segments = min(segments, (int64_t) INT32_MAX);
+  segments = min(segments, UINT32_MAX);
   return segments;
 }
 
-void LoadBalancerS2::print_S2_status(int64_t low)
+void LoadBalancerS2::print_S2_status(int64_t high)
 {
   double time = get_time();
 
@@ -407,10 +386,7 @@ void LoadBalancerS2::print_S2_status(int64_t low)
 
     // The next thread can print again in 0.1 seconds.
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
-
-    double percent = status_.getStatus(low, sieve_limit_);
-    if (percent >= 0)
-      status_.print(percent);
+    status_.print_S2_hard(high, sieve_limit_);
   }
 }
 
