@@ -189,8 +189,8 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   int64_t dist = thread.segment_size * thread.segments;
   thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
   thread.sum = 0;
-  thread.secs = 0;
   thread.init_secs = 0;
+  thread.secs = 0;
 
   // The lockfree critical section above should complete
   // as fast as possible. Hence, printing should be done
