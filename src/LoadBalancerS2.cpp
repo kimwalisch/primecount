@@ -149,11 +149,11 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   if (thread.low > max_low)
   {
     // Try setting max_low_ = thread.low
-    has_run_load_balancing = max_low_.compare_exchange_strong(
+    bool updated_max_low = max_low_.compare_exchange_strong(
         max_low, thread.low, std::memory_order_relaxed,
         std::memory_order_relaxed);
 
-    if (has_run_load_balancing)
+    if (updated_max_low)
     {
       if (is_print_)
       {
@@ -176,9 +176,10 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       // Hence, we assign tiny work chunks to the threads in
       // this region to avoid load imbalance.
       if (found_first_leaf)
+      {
         run_load_balancing(thread, segment_size);
-      else
-        has_run_load_balancing = false;
+        has_run_load_balancing = true;
+      }
     }
   }
 
