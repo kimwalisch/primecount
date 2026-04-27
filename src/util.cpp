@@ -80,7 +80,7 @@ void set_status_precision(int precision)
   status_precision_ = in_between(0, precision, 5);
 }
 
-/// Get the time in seconds (with microsecond accuracy).
+/// Get the time in seconds.
 /// Note that according to the documentation of
 /// std::chrono::steady_clock: "This clock is not related to wall
 /// clock time (for example, it can be time since last reboot)".
@@ -89,11 +89,11 @@ void set_status_precision(int precision)
 ///
 double get_time()
 {
-  auto now = std::chrono::steady_clock::now();
-  auto time = now.time_since_epoch();
-  auto micro = std::chrono::duration_cast<std::chrono::microseconds>(time);
-  ASSERT(micro.count() < (1ll << 52));
-  return (double) micro.count() / 1e6;
+  auto time = std::chrono::steady_clock::now().time_since_epoch();
+  auto seconds = std::chrono::duration<double>(time).count();
+  // Ensure we have at least microsecond accuracy
+  ASSERT(seconds < (1ll << 52) / 1e6);
+  return seconds;
 }
 
 void set_double_check(bool enable)
