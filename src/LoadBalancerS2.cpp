@@ -141,44 +141,53 @@ void LoadBalancerS2::store_packed(uint64_t segment_size,
 ///
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
-  int64_t print_high = 0;
+  bool has_run_load_balancing = false;
   int64_t max_low = max_low_.load(std::memory_order_relaxed);
-  bool found_first_leaf = found_first_leaf_.load(std::memory_order_relaxed);
   uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
   int64_t segment_size = segment_data & 0xffffffffu;
   int64_t segments = segment_data >> 32;
+  int64_t print_high = 0;
 
-  if (thread.sum &&
-      !found_first_leaf)
+  if (thread.low > max_low)
   {
-    found_first_leaf_.store(true, std::memory_order_relaxed);
-    found_first_leaf = true;
+    // Try setting max_low_ = thread.low
+    has_run_load_balancing = max_low_.compare_exchange_strong(
+        max_low, thread.low, std::memory_order_relaxed,
+        std::memory_order_relaxed);
+
+    if (has_run_load_balancing)
+    {
+      if (is_print_)
+      {
+        int64_t dist = thread.segment_size * thread.segments;
+        print_high = thread.low + dist;
+      }
+
+      bool found_first_leaf = found_first_leaf_.load(
+          std::memory_order_relaxed);
+
+      if (thread.sum && !found_first_leaf)
+      {
+        found_first_leaf_.store(true, std::memory_order_relaxed);
+        found_first_leaf = true;
+      }
+
+      // We only start increasing the segment size and segments
+      // per thread once the first special leaf has been found.
+      // Most special leaves are located near the start (near y).
+      // Hence, we assign tiny work chunks to the threads in
+      // this region to avoid load imbalance.
+      if (found_first_leaf)
+        run_load_balancing(thread, segment_size);
+      else
+        has_run_load_balancing = false;
+    }
   }
 
-  if (thread.low <= max_low)
+  if (!has_run_load_balancing)
   {
     thread.segment_size = segment_size;
     thread.segments = segments;
-  }
-  else // thread.low > max_low
-  {
-    max_low_.store(thread.low, std::memory_order_relaxed);
-
-    if (is_print_)
-      print_high = thread.low + thread.segment_size * thread.segments;
-
-    // We only start increasing the segment size and segments
-    // per thread once the first special leaf has been found.
-    // Most special leaves are located near the start (near y).
-    // Hence, we assign tiny work chunks to the threads in
-    // this region to avoid load imbalance.
-    if (found_first_leaf)
-      run_load_balancing(thread, segment_size);
-    else
-    {
-      thread.segment_size = segment_size;
-      thread.segments = segments;
-    }
   }
 
   // The earlier loads are used for heuristic chunk
