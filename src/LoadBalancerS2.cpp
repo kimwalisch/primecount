@@ -133,6 +133,12 @@ double LoadBalancerS2::remaining_secs(int64_t low) const
   return secs;
 }
 
+/// Assign new [low, high[ workload to thread.
+/// Multiple threads may call get_work() simultaneously, since
+/// this function is not protected by a mutex, it must not
+/// modify any shared member variables, except the atomic low_
+/// max_low_, segment_data_, found_first_leaf_ variables.
+///
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   int64_t max_low = max_low_.load(std::memory_order_relaxed);
@@ -150,11 +156,10 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
   if (thread.low <= max_low)
   {
-    // Use old values, don't run load balancing
     thread.segment_size = segment_size;
     thread.segments = segments;
   }
-  else
+  else // thread.low > max_low
   {
     max_low_.store(thread.low, std::memory_order_relaxed);
 
@@ -164,11 +169,11 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       print_high = thread.low + dist;
     }
 
-    // We only start increasing the segment size and segments per
-    // thread once the first special leaves have been found. Most
-    // special leaves are located near the start (around y).
-    // Hence, we assign tiny work chunks to the threads in this
-    // region to avoid load imbalance.
+    // We only start increasing the segment size and segments
+    // per thread once the first special leaf has been found.
+    // Most special leaves are located near the start (near y).
+    // Hence, we assign tiny work chunks to the threads in
+    // this region to avoid load imbalance.
     if (found_first_leaf)
       run_load_balancing(thread, segment_size);
     else
@@ -178,15 +183,18 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     }
   }
 
+  // The earlier loads are used for heuristic chunk
+  // sizing, it is OK if they are slightly outdated. This
+  // fetch_add() reserves unique work for this thread.
   int64_t dist = thread.segment_size * thread.segments;
   thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
   thread.sum = 0;
   thread.secs = 0;
   thread.init_secs = 0;
 
-  // Printing to the terminal incurs a system call
-  // and may hence be slow. Therefore, we do it
-  // after the lockfree work assignment.
+  // The lockfree critical section above should complete
+  // as fast as possible. Hence, printing should be done
+  // afterwards since it may incur a system call.
   if (print_high)
     print_S2_status(print_high);
 
@@ -198,8 +206,8 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
 {
   int64_t segments = thread.segments;
 
-  // If segment_size < L1_segment_size then slowly increase the
-  // segment size until it reaches L1_segment_size.
+  // If segment_size < L1_segment_size then slowly increase
+  // the segment size until it reaches L1_segment_size.
   if (segment_size < L1_segment_size)
   {
     segment_size += segment_size / 16;
@@ -213,8 +221,8 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
     return;
   }
 
-  // If segment_size >= L1_segment_size then slowly increase the
-  // segment size until it reaches L2_segment_size.
+  // If segment_size >= L1_segment_size then slowly increase
+  // the segment size until it reaches L2_segment_size.
   if (segment_size >= L1_segment_size &&
       segment_size < L2_segment_size &&
       segment_size < sqrt_limit_)
