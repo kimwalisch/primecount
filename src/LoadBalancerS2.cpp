@@ -111,6 +111,16 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   store_packed(segment_size, segments);
 }
 
+/// Remaining seconds till finished
+double LoadBalancerS2::remaining_secs(int64_t low) const
+{
+  double percent = status_.getPercent(low, sieve_limit_);
+  percent = in_between(10, percent, 100);
+  double total_secs = get_time() - start_time_;
+  double secs = total_secs * (100 / percent) - total_secs;
+  return secs;
+}
+
 /// Pack segment_size & segments into a uint64_t,
 /// needed for lockfree atomic data access.
 ///
@@ -121,16 +131,6 @@ void LoadBalancerS2::store_packed(int64_t segment_size,
   ASSERT(segment_size <= max_packed_segment_size);
   uint64_t packed = uint64_t(segment_size) | (uint64_t(segments) << 32);
   segment_data_.store(packed, std::memory_order_relaxed);
-}
-
-/// Remaining seconds till finished
-double LoadBalancerS2::remaining_secs(int64_t low) const
-{
-  double percent = status_.getPercent(low, sieve_limit_);
-  percent = in_between(10, percent, 100);
-  double total_secs = get_time() - start_time_;
-  double secs = total_secs * (100 / percent) - total_secs;
-  return secs;
 }
 
 /// Assign new [low, high[ workload to thread.
