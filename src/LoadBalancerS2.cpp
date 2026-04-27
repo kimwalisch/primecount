@@ -148,13 +148,6 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   int64_t segment_size = segment_data & 0xffffffffu;
   int64_t segments = segment_data >> 32;
 
-  if (is_print_ &&
-      thread.low >= max_low)
-  {
-    int64_t dist = thread.segment_size * thread.segments;
-    print_high = thread.low + dist;
-  }
-
   if (thread.sum &&
       !found_first_leaf)
   {
@@ -162,21 +155,30 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     found_first_leaf = true;
   }
 
-  // We only start increasing the segment size and segments
-  // per thread once the first special leaf has been found.
-  // Most special leaves are located near the start (near y).
-  // Hence, we assign tiny work chunks to the threads in
-  // this region to avoid load imbalance.
-  if (thread.low <= max_low ||
-      !found_first_leaf)
+  if (thread.low <= max_low)
   {
     thread.segment_size = segment_size;
     thread.segments = segments;
   }
-  else
+  else // thread.low > max_low
   {
     max_low_.store(thread.low, std::memory_order_relaxed);
-    run_load_balancing(thread, segment_size);
+
+    if (is_print_)
+      print_high = thread.low + thread.segment_size * thread.segments;
+
+    // We only start increasing the segment size and segments
+    // per thread once the first special leaf has been found.
+    // Most special leaves are located near the start (near y).
+    // Hence, we assign tiny work chunks to the threads in
+    // this region to avoid load imbalance.
+    if (found_first_leaf)
+      run_load_balancing(thread, segment_size);
+    else
+    {
+      thread.segment_size = segment_size;
+      thread.segments = segments;
+    }
   }
 
   // The earlier loads are used for heuristic chunk
