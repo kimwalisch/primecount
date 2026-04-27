@@ -188,7 +188,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
     thread.segments = segments;
   }
 
-  // The earlier loads are used for heuristic chunk
+  // The earlier loads are only used for heuristic chunk
   // sizing, it is OK if they are slightly outdated. This
   // fetch_add() reserves unique work for this thread.
   int64_t dist = thread.segment_size * thread.segments;
