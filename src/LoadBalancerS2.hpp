@@ -44,12 +44,11 @@ struct ThreadData
     return std::max(sec, 0.0);
   }
 
-  double latest_time() const
+  double time()
   {
-    if (stop_time != 0)
-      return stop_time;
-    else
-      return get_time();
+    if (stop_time == 0)
+      stop_time = get_time();
+    return stop_time;
   }
 };
 
@@ -60,11 +59,11 @@ public:
   bool get_work(ThreadData& thread);
 
 private:
-  double remaining_secs(const ThreadData& thread, int64_t low) const;
+  double remaining_secs(ThreadData& thread, int64_t low) const;
   void store_packed(uint64_t segment_size, uint64_t segments);
   void run_load_balancing(ThreadData& thread, int64_t segment_size);
-  int64_t get_segments(const ThreadData& thread, int64_t low) const;
-  void print_S2_status(int64_t high);
+  int64_t get_segments(ThreadData& thread, int64_t low) const;
+  void print_S2_status(int64_t high, double time);
 
   int64_t sieve_limit_ = 0;
   int64_t sqrt_limit_ = 0;

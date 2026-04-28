@@ -110,12 +110,11 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
 }
 
 /// Remaining seconds till finished
-double LoadBalancerS2::remaining_secs(const ThreadData& thread,
-                                      int64_t low) const
+double LoadBalancerS2::remaining_secs(ThreadData& thread, int64_t low) const
 {
   double percent = status_.getPercent(low, sieve_limit_);
   percent = in_between(10, percent, 100);
-  double total_secs = thread.latest_time() - start_time_;
+  double total_secs = thread.time() - start_time_;
   double secs = total_secs * (100 / percent) - total_secs;
   return secs;
 }
@@ -123,8 +122,7 @@ double LoadBalancerS2::remaining_secs(const ThreadData& thread,
 /// Pack segment_size & segments into a uint64_t,
 /// needed for lockfree atomic data access.
 ///
-void LoadBalancerS2::store_packed(uint64_t segment_size,
-                                  uint64_t segments)
+void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
 {
   ASSERT(segments <= UINT32_MAX);
   ASSERT(segment_size <= UINT32_MAX);
@@ -196,21 +194,18 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   int64_t dist = thread.segment_size * thread.segments;
   thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
   thread.sum = 0;
-  thread.start_time = 0;
   thread.init_time = 0;
-  thread.stop_time = 0;
 
   // The lockfree critical section above should complete
   // as fast as possible. Hence, printing should be done
   // afterwards since it may incur a system call.
   if (print_high)
-    print_S2_status(print_high);
+    print_S2_status(print_high, thread.time());
 
   return thread.low < sieve_limit_;
 }
 
-void LoadBalancerS2::run_load_balancing(ThreadData& thread,
-                                        int64_t segment_size)
+void LoadBalancerS2::run_load_balancing(ThreadData& thread, int64_t segment_size)
 {
   // If segment_size < L1_segment_size then slowly increase
   // the segment size until it reaches L1_segment_size.
@@ -283,8 +278,7 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
 /// Increase or decrease the number of segments per
 /// thread based on the remaining runtime.
 ///
-int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
-                                     int64_t low) const
+int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
 {
   // Near the end it is important that threads run only for
   // a short amount of time in order to ensure that all
@@ -367,10 +361,9 @@ int64_t LoadBalancerS2::get_segments(const ThreadData& thread,
   return segments;
 }
 
-void LoadBalancerS2::print_S2_status(int64_t high)
+void LoadBalancerS2::print_S2_status(int64_t high,
+                                     double time)
 {
-  double time = get_time();
-
 #if __cplusplus >= 201703L
   // Prevent lock contention on many-core systems,
   // print status only every 0.1 seconds.
