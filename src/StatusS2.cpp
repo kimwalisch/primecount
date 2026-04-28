@@ -53,6 +53,10 @@ double log_percent(double r,
                    double cap,
                    double cutoff)
 {
+  ASSERT(cap >= 0);
+  ASSERT(cap < 100);
+  ASSERT(cutoff > 0);
+
   double base = log_percent(r, base_factor);
   double boost = log_percent(r, early_factor);
   boost -= delay * (1.0 - smoothstep(r / cutoff));
@@ -65,6 +69,7 @@ double log_percent(double r,
   if (boost > cap)
     boost = (boost + cap) / 2.0;
 
+  ASSERT(boost < 100);
   double percent = std::max(base, boost);
   double floor = std::min(500.0 * r, 0.5);
   floor = in_between(0.0, floor, 100.0);
@@ -101,26 +106,21 @@ StatusS2::StatusS2(maxint_t x,
 /// This method is used by S2_hard() and D()
 double StatusS2::getPercent(int64_t low, int64_t limit) const
 {
-  // Works best for >= 90%
+  // Works best for >= 99%
   double percent1 = get_percent(low, limit);
 
   // Works best for <= 20%
   double percent2 = get_percent(low, y_log_y_);
   percent2 = std::min(percent2, 30.0);
 
-  // Works best for >= 20% && < 90%
+  // Works best for >= 20% && < 99%
   double r = percent1 / 100;
   double small = log_percent(r, 2643.010656, 21.015052, 11.846115, 56.508811, 0.000203036);
   double large = log_percent(r, 25589.45108, 15.357592, 42.898382, 54.704957, 0.000411627);
   double percent3 = blend(small, large, x_tune_);
 
-  // Near the end of the computation we don't want to
-  // rely on our estimated percentage progress. There
-  // we use (low * 100 / limit), if this reaches 100%
-  // the computation is guaranteed finished.
-  double late_cap = 97.0;
   double percent23 = std::max(percent2, percent3);
-  return std::max(percent1, std::min(percent23, late_cap));
+  return std::max(percent1, percent23);
 }
 
 /// This method is used by S2_hard() and D().
