@@ -121,7 +121,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   // Near the end of the computation we use a smaller
   // increase_threshold <= 1 second in order to make sure
   // all threads finish nearly at same time.
-  if (segment_size == max_segment_size_)
+  if (segment_size >= max_segment_size_)
     increase_threshold = min(increase_threshold, 1.0);
 
   // Most special leaves are below y (~ x^(1/3) * log(x)).
