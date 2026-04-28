@@ -99,7 +99,7 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
 
   // Works best for <= 20%
   double percent2 = get_percent(low, y_log_y_);
-  percent2 = std::min(percent2, 20.0);
+  percent2 = std::min(percent2, 30.0);
 
   // Works best for >= 20% && < 90%
   double r = percent1 / 100;
@@ -111,7 +111,7 @@ double StatusS2::getPercent(int64_t low, int64_t limit) const
   // rely on our estimated percentage progress. There
   // we use (low * 100 / limit), if this reaches 100%
   // the computation is guaranteed finished.
-  double late_cap = 90.0;
+  double late_cap = 97.0;
   double percent23 = std::max(percent2, percent3);
   return std::max(percent1, std::min(percent23, late_cap));
 }
