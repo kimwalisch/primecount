@@ -56,7 +56,14 @@ double log_percent(double r,
   double base = log_percent(r, base_factor);
   double boost = log_percent(r, early_factor);
   boost -= delay * (1.0 - smoothstep(r / cutoff));
-  boost = in_between(0.0, boost, cap);
+  boost = in_between(0.0, boost, 100.0);
+
+  // Avoid a flat progress plateau once the
+  // early boost reaches its cap. We still dampen
+  // the excess to keep the estimate conservative
+  // towards the end of the computation.
+  if (boost > cap)
+    boost = (boost + cap) / 2.0;
 
   double percent = std::max(base, boost);
   double floor = std::min(500.0 * r, 0.5);
