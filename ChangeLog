@@ -1,4 +1,4 @@
-Changes in primecount-8.5, 2026-04-27
+Changes in primecount-8.5, 2026-04-29
 
 * Update to libprimesieve-12.14.
 * util.cpp: Improve get_time() precision.
@@ -13,6 +13,7 @@ Changes in primecount-8.5, 2026-04-27
 * README.md: Document --RiemannR-psi & --RiemannR-psi-inverse.
 * doc/primecount.txt: Add --RiemannR-psi & --RiemannR-psi-inverse.
 * doc/primecount.1: Add --RiemannR-psi & --RiemannR-psi-inverse.
+* CMakeLists.txt: Remove WITH_MSVC_CRT_STATIC option.
 * test/nth_prime_sieve.cpp: Update nth_prime_sieve() test.
 * test/RiemannR_psi.cpp: New test for RiemannR(psi(x)) implementation.
 

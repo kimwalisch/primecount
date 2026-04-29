@@ -17,7 +17,6 @@ option(BUILD_CODEGEN_TESTS "Build the assembly codegen tests"      OFF)
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
 option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" ON)
-option(WITH_MSVC_CRT_STATIC "Link primecount.lib with /MT instead of the default /MD" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 
 # Check if primecount is top level project ###########################
@@ -287,10 +286,6 @@ if(BUILD_STATIC_LIBS)
     target_compile_definitions(libprimecount-static PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
 
-    if(WITH_MSVC_CRT_STATIC)
-        set_target_properties(libprimecount-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    endif()
-
     target_compile_features(libprimecount-static
     PRIVATE
         cxx_constexpr
@@ -352,9 +347,6 @@ if(BUILD_PRIMECOUNT)
                 $<TARGET_FILE_DIR:primecount>)
     endif()
 
-    if(WITH_MSVC_CRT_STATIC)
-        set_target_properties(primecount PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    endif()
 endif()
 
 # Install header #####################################################
