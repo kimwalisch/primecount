@@ -34,6 +34,9 @@ void check(bool OK)
 
 int main()
 {
+  check(FactorTableD<uint16_t>::max() == 4294705155ll);
+  check(FactorTableD<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
+
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dist_y(50000, 60000);
