@@ -198,7 +198,7 @@ getVal(const Option& opt)
     return (T) std::stod(opt.val);
   }
   catch (std::exception&) {
-    throw primecount_error("invalid option '" + opt.opt + "=" + opt.val);
+    throw primecount_error("invalid option '" + opt.opt + "=" + opt.val + "'");
   }
 }
 
