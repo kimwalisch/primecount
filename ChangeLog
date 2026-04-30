@@ -2,6 +2,7 @@ Changes in primecount-8.5, 2026-04-30
 
 * Update to libprimesieve-12.14.
 * FactorTable.hpp: Fix 64-bit integer overflow.
+* CmdOptions.cpp: Validate alpha tuning factor command-line options.
 * calculator.hpp: Fix std::tolower() undefined behavior.
 * util.cpp: Improve get_time() precision.
 * StatusS2.cpp: Support use in lockfree code.

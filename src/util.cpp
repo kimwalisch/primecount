@@ -54,6 +54,7 @@ bool double_check_ = false;
 ///
 double truncate3(double n)
 {
+  ASSERT(n <= 1e15);
   return (int64_t)(n * 1000) / 1000.0;
 }
 

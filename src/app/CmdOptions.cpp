@@ -15,7 +15,7 @@
 ///         4) Document your option in help.cpp (--help option summary)
 ///            and in doc/primecount.txt (manpage).
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -32,6 +32,7 @@
 
 #include <stdint.h>
 #include <cstddef>
+#include <cmath>
 #include <exception>
 #include <map>
 #include <string>
@@ -214,6 +215,18 @@ getVal(const Option& opt)
   }
 }
 
+double getAlpha(const Option& opt)
+{
+  double alpha = getVal<double>(opt);
+
+  if (!std::isfinite(alpha) ||
+      alpha < 1 ||
+      alpha > 1e15)
+    throw primecount_error("invalid option '" + opt.opt + "=" + opt.val + "'");
+
+  return alpha;
+}
+
 } // namespace
 
 namespace primecount {
@@ -326,9 +339,9 @@ CmdOptions parseOptions(int argc, char** argv)
 
     switch (optionID)
     {
-      case OPTION_ALPHA:        set_alpha(getVal<double>(opt)); break;
-      case OPTION_ALPHA_Y:      set_alpha_y(getVal<double>(opt)); break;
-      case OPTION_ALPHA_Z:      set_alpha_z(getVal<double>(opt)); break;
+      case OPTION_ALPHA:        set_alpha(getAlpha(opt)); break;
+      case OPTION_ALPHA_Y:      set_alpha_y(getAlpha(opt)); break;
+      case OPTION_ALPHA_Z:      set_alpha_z(getAlpha(opt)); break;
       case OPTION_DOUBLE_CHECK: set_double_check(true); break;
       case OPTION_HELP:         help(/* exitCode */ 0); break;
       case OPTION_NUMBER:       numbers.push_back(getVal<maxint_t>(opt)); break;
