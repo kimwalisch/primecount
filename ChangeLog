@@ -1,6 +1,7 @@
 Changes in primecount-8.5, 2026-04-29
 
 * Update to libprimesieve-12.14.
+* calculator.hpp: Fix std::tolower() undefined behavior.
 * util.cpp: Improve get_time() precision.
 * StatusS2.cpp: Support use in lockfree code.
 * LoadBalancerS2.cpp: Use lockfree implementation, get rid of mutex.
