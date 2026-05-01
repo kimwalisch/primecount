@@ -2,7 +2,7 @@
 /// @file  imath.hpp
 /// @brief Integer math functions
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -68,12 +68,6 @@ inline T next_power_of_2(T x)
 
   return ++x;
 #endif
-}
-
-template <typename T>
-inline int ilog(T x)
-{
-  return (int) std::log((double) x);
 }
 
 template <typename T>
