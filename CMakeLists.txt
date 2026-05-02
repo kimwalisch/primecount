@@ -343,7 +343,6 @@ if(BUILD_PRIMECOUNT)
                 $<TARGET_FILE:libprimesieve>
                 $<TARGET_FILE_DIR:primecount>)
     endif()
-
 endif()
 
 # Install header #####################################################
