@@ -521,7 +521,7 @@ private:
   /// unnecessary performance overhead.
   template <typename TT = T>
   ALWAYS_INLINE typename std::enable_if<std::is_trivially_default_constructible<TT>::value, void>::type
-  uninitialized_default_construct(T*, T*)
+  uninitialized_default_construct(T* first, T* last)
   {
     // Start object lifetimes without initializing storage.
     // Will be optimized away be the compiler.
