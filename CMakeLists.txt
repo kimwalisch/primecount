@@ -56,6 +56,15 @@ if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON!")
 endif()
 
+if(WIN32 AND MSVC AND BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS AND
+   (BUILD_PRIMECOUNT OR BUILD_TESTS))
+    message(FATAL_ERROR
+        "On Windows with MSVC, BUILD_STATIC_LIBS must be ON when "
+        "BUILD_PRIMECOUNT or BUILD_TESTS is ON. "
+        "Either enable BUILD_STATIC_LIBS or disable BUILD_PRIMECOUNT and "
+        "BUILD_TESTS.")
+endif()
+
 # Set default build type to Release ##################################
 
 if(PRIMECOUNT_IS_TOP_PROJECT)
