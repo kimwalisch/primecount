@@ -1,6 +1,9 @@
-Changes in primecount-8.5, 2026-04-30
+Changes in primecount-8.5, 2026-05-02
 
 * Update to libprimesieve-12.14.
+* CMakeLists.txt: Add support for building primecount as a
+  shared library (primecount.dll) on Windows using MSVC.
+* CMakeLists.txt: Remove WITH_MSVC_CRT_STATIC option.
 * FactorTable.hpp: Fix 64-bit integer overflow.
 * CmdOptions.cpp: Validate alpha tuning factor command-line options.
 * calculator.hpp: Fix std::tolower() undefined behavior.
@@ -16,7 +19,6 @@ Changes in primecount-8.5, 2026-04-30
 * README.md: Document --RiemannR-psi & --RiemannR-psi-inverse.
 * doc/primecount.txt: Add --RiemannR-psi & --RiemannR-psi-inverse.
 * doc/primecount.1: Add --RiemannR-psi & --RiemannR-psi-inverse.
-* CMakeLists.txt: Remove WITH_MSVC_CRT_STATIC option.
 * test/nth_prime_sieve.cpp: Update nth_prime_sieve() test.
 * test/RiemannR_psi.cpp: New test for RiemannR(psi(x)) implementation.
 

@@ -52,15 +52,6 @@ option(WITH_LIBDIVIDE "Use libdivide.h" ${DEFAULT_LIBDIVIDE})
 
 # Option sanity checks ###############################################
 
-# We don't yet support building libprimecount as a shared DLL
-# library on Windows using the MSVC compiler. The MSVC compiler
-# by default does not allow accessing global variables that
-# are inside a DLL, unless all those variables are annotated
-# using __declspec(dllexport) and __declspec(dllimport).
-if(WIN32 AND NOT MINGW)
-    set(BUILD_SHARED_LIBS OFF)
-endif()
-
 if(NOT BUILD_SHARED_LIBS AND NOT BUILD_STATIC_LIBS)
     message(FATAL_ERROR "One or both of BUILD_SHARED_LIBS or BUILD_STATIC_LIBS must be set to ON!")
 endif()
@@ -253,6 +244,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(libprimecount PROPERTIES OUTPUT_NAME primecount)
     set_target_properties(libprimecount PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
     set_target_properties(libprimecount PROPERTIES VERSION ${PROJECT_VERSION})
+    set_target_properties(libprimecount PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
     target_compile_options(libprimecount PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
@@ -285,6 +277,11 @@ if(BUILD_STATIC_LIBS)
     target_compile_options(libprimecount-static PRIVATE "${WNO_UNINITIALIZED}")
     target_compile_definitions(libprimecount-static PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_link_libraries(libprimecount-static PRIVATE primesieve::primesieve ${PRIMECOUNT_LINK_LIBRARIES})
+
+    if(CMAKE_IMPORT_LIBRARY_SUFFIX AND
+       "${CMAKE_IMPORT_LIBRARY_SUFFIX}" STREQUAL "${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        set_target_properties(libprimecount-static PROPERTIES ARCHIVE_OUTPUT_NAME primecount_static)
+    endif()
 
     target_compile_features(libprimecount-static
     PRIVATE
