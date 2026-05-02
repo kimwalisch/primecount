@@ -10,7 +10,7 @@
 ///         doing any memory allocation as long as the MemoryPool's
 ///         stock is not empty.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -94,20 +94,12 @@ void MemoryPool::initBuckets(void* alignedPtr)
   if_unlikely(count_ < 10)
     throw primesieve_error("MemoryPool: insufficient buckets allocated!");
 
-#if __cplusplus >= 201703L
-  // Start lifetime of each Bucket object using placement new.
-  // * new (ptr) Bucket[count]{}; -> starts lifetime, zero-initializes members.
-  // * new (ptr) Bucket[count];   -> starts lifetime, members are left uninitialized.
-  // Hence, the compiler will optimize away this code.
-  buckets = new (buckets) Bucket[count_];
-#else
   // Start lifetime of each Bucket object using placement new.
   // * new (ptr) Bucket(); -> starts lifetime, zero-initializes members.
   // * new (ptr) Bucket;   -> starts lifetime, members are left uninitialized.
   // Hence, the compiler will optimize away this loop.
   for (std::size_t i = 0; i < count_; i++)
     new (&buckets[i]) Bucket;
-#endif
 
   for (std::size_t i = 0; i < count_ - 1; i++)
   {
