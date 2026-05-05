@@ -61,7 +61,7 @@ public:
 private:
   double remaining_secs(ThreadData& thread, int64_t low) const;
   void store_packed(uint64_t segment_size, uint64_t segments);
-  void update(int64_t& segment_size, int64_t& segments, ThreadData& thread);
+  void update(int64_t& segment_size, int64_t& segments, ThreadData& thread) const;
   int64_t get_segments(ThreadData& thread, int64_t low) const;
   void print_S2_status(int64_t high, double time);
 

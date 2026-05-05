@@ -203,7 +203,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
 void LoadBalancerS2::update(int64_t& segment_size,
                             int64_t& segments,
-                            ThreadData& thread)
+                            ThreadData& thread) const
 {
   // If segment_size < L1_segment_size then slowly increase
   // the segment size until it reaches L1_segment_size.
