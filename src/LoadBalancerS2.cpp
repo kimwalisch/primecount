@@ -165,8 +165,8 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 
       if (thread.sum && !found_first_leaf)
       {
-        found_first_leaf_.store(true, std::memory_order_relaxed);
         found_first_leaf = true;
+        found_first_leaf_.store(true, std::memory_order_relaxed);
       }
 
       // We only start increasing the segment size and segments
@@ -176,7 +176,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       // this region to avoid load imbalance.
       if (found_first_leaf)
       {
-        run_load_balancing(thread, segment_size);
+        run_load_balancing(thread, segment_size, segments);
         has_run_load_balancing = true;
       }
     }
@@ -205,7 +205,9 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   return thread.low < sieve_limit_;
 }
 
-void LoadBalancerS2::run_load_balancing(ThreadData& thread, int64_t segment_size)
+void LoadBalancerS2::run_load_balancing(ThreadData& thread,
+                                        int64_t segment_size,
+                                        int64_t segments)
 {
   // If segment_size < L1_segment_size then slowly increase
   // the segment size until it reaches L1_segment_size.
@@ -215,58 +217,53 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread, int64_t segment_size
     segment_size = min(segment_size, L1_segment_size);
     segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
-
-    store_packed(segment_size, thread.segments);
-    thread.segment_size = segment_size;
-    return;
   }
-
   // If segment_size >= L1_segment_size then slowly increase
   // the segment size until it reaches L2_segment_size.
-  if (segment_size >= L1_segment_size &&
-      segment_size < L2_segment_size &&
-      segment_size < sqrt_limit_)
+  else if (segment_size >= L1_segment_size &&
+           segment_size < L2_segment_size &&
+           segment_size < sqrt_limit_)
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L2_segment_size);
     segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
-
-    store_packed(segment_size, thread.segments);
-    thread.segment_size = segment_size;
-    return;
   }
-
-  int64_t low = low_.load(std::memory_order_relaxed);
-  int64_t segments = get_segments(thread, low);
-
-  // The hard special leaves algorithm is basically a modified
-  // segmented sieve of Eratosthenes. Using the segmented sieve of
-  // Eratosthenes it is of utmost importance that sieve array fits
-  // into the CPU's cache, otherwise performance will deteriorate
-  // significantly and the algorithm will scale poorly.
-  //
-  // Deleglise-Rivat orignially suggested using a segment size of
-  // O(y). Xavier Gourdon realized this segment size was much too
-  // large for new record PrimePi(x) computations and hence
-  // suggested using a smaller segment size of O(sqrt(x/y)) which
-  // is the same as O(sqrt(sieve_limit)). However, for new record
-  // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
-  // is still too large. Hence, I use an even smaller segment size
-  // of O(sqrt(high)) in primecount.
-  if (segment_size >= L2_segment_size &&
-      segment_size < sqrt_limit_)
+  else
   {
-    int64_t dist = (segment_size * segments) * threads_;
-    int64_t high = min(low + dist, sieve_limit_);
+    // Once the segment_size >= L2_segment_size we slowly
+    // increase the number of segments per thread.
+    int64_t low = low_.load(std::memory_order_relaxed);
+    segments = get_segments(thread, low);
 
-    if (segment_size < isqrt(high))
+    // The hard special leaves algorithm is basically a modified
+    // segmented sieve of Eratosthenes. Using the segmented sieve of
+    // Eratosthenes it is of utmost importance that sieve array fits
+    // into the CPU's cache, otherwise performance will deteriorate
+    // significantly and the algorithm will scale poorly.
+    //
+    // Deleglise-Rivat orignially suggested using a segment size of
+    // O(y). Xavier Gourdon realized this segment size was much too
+    // large for new record PrimePi(x) computations and hence
+    // suggested using a smaller segment size of O(sqrt(x/y)) which
+    // is the same as O(sqrt(sieve_limit)). However, for new record
+    // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
+    // is still too large. Hence, I use an even smaller segment size
+    // of O(sqrt(high)) in primecount.
+    if (segment_size >= L2_segment_size &&
+        segment_size < sqrt_limit_)
     {
-      segment_size += segment_size / 16;
-      dist = (segment_size * segments) * threads_;
-      high = min(low + dist, sieve_limit_);
-      segment_size = isqrt(high);
-      segment_size = Sieve::align_segment_size(segment_size);
+      int64_t dist = (segment_size * segments) * threads_;
+      int64_t high = min(low + dist, sieve_limit_);
+
+      if (segment_size < isqrt(high))
+      {
+        segment_size += segment_size / 16;
+        dist = (segment_size * segments) * threads_;
+        high = min(low + dist, sieve_limit_);
+        segment_size = isqrt(high);
+        segment_size = Sieve::align_segment_size(segment_size);
+      }
     }
   }
 
@@ -289,6 +286,10 @@ int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
   double thread_init_secs = thread.init_secs();
   double thread_secs = thread.secs();
 
+  // For small and medium computations the thread runtime
+  // should be about 5000x the thread initialization time.
+  double init_factor = 5000;
+
   // If the previous thread runtime is larger than the
   // estimated remaining time the factor that we calculate
   // below will be < 1 and we will reduce the number of
@@ -297,16 +298,6 @@ int64_t LoadBalancerS2::get_segments(ThreadData& thread, int64_t low) const
   double min_secs = 0.001;
   double divider = max(min_secs, thread_secs);
   double factor = rem_secs / divider;
-
-  // For small and medium computations the thread runtime
-  // should be about 5000x the thread initialization time.
-  // However for very large computations we want to further
-  // reduce the thread runtimes in order to increase the
-  // backup frequency. If the thread runtime is > 6 hours
-  // we reduce the thread runtime to about 200x the thread
-  // initialization time.
-  double init_secs = max(min_secs, thread_init_secs);
-  double init_factor = in_between(200, (3600 * 6) / init_secs, 5000);
 
   // Reduce the thread runtime if it is much larger than
   // its initialization time. This increases the number of
