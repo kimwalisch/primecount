@@ -138,7 +138,6 @@ void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
 ///
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
-  bool has_run_load_balancing = false;
   int64_t max_low = max_low_.load(std::memory_order_relaxed);
   uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
   int64_t segment_size = segment_data & 0xffffffffu;
@@ -178,24 +177,19 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       // this region to avoid load imbalance.
       if (found_first_leaf)
       {
-        run_load_balancing(thread, segment_size, segments);
-        has_run_load_balancing = true;
+        update(segment_size, segments, thread);
+        store_packed(segment_size, segments);
       }
     }
-  }
-
-  if (!has_run_load_balancing)
-  {
-    thread.segment_size = segment_size;
-    thread.segments = segments;
   }
 
   // The earlier loads are only used for heuristic chunk
   // sizing, it is OK if they are slightly outdated. This
   // fetch_add() reserves unique work for this thread.
-  int64_t dist = thread.segment_size * thread.segments;
+  int64_t dist = segment_size * segments;
   thread.low = low_.fetch_add(dist, std::memory_order_relaxed);
-  thread.sum = 0;
+  thread.segment_size = segment_size;
+  thread.segments = segments;
   thread.init_time = 0;
 
   // The lockfree critical section above should complete
@@ -207,9 +201,9 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   return thread.low < sieve_limit_;
 }
 
-void LoadBalancerS2::run_load_balancing(ThreadData& thread,
-                                        int64_t segment_size,
-                                        int64_t segments)
+void LoadBalancerS2::update(int64_t& segment_size,
+                            int64_t& segments,
+                            ThreadData& thread)
 {
   // If segment_size < L1_segment_size then slowly increase
   // the segment size until it reaches L1_segment_size.
@@ -268,10 +262,6 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
       }
     }
   }
-
-  store_packed(segment_size, segments);
-  thread.segment_size = segment_size;
-  thread.segments = segments;
 }
 
 /// Increase or decrease the number of segments per
