@@ -231,8 +231,8 @@ void LoadBalancerS2::run_load_balancing(ThreadData& thread,
   }
   else
   {
-    // Once the segment_size >= L2_segment_size we slowly
-    // increase the number of segments per thread.
+    // Once the segment_size >= L2_segment_size we slowly increase
+    // (or decrease) the number of segments per thread.
     int64_t low = low_.load(std::memory_order_relaxed);
     segments = get_segments(thread, low);
 
