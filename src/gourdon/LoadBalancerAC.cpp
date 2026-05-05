@@ -161,15 +161,14 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   thread.low = low;
   thread.segments = segments;
   thread.segment_size = segment_size;
-  bool has_work = low < sqrtx_;
 
   // The lockfree critical section above should complete
   // as fast as possible. Hence, printing should be done
   // afterwards since it may incur a system call.
-  if (is_print_ && has_work)
+  if (is_print_)
     print_AC_status(low, time);
 
-  return has_work;
+  return low < sqrtx_;
 }
 
 void LoadBalancerAC::print_AC_status(int64_t low,
@@ -205,6 +204,7 @@ void LoadBalancerAC::print_AC_status(int64_t low,
     // The next thread can print again in 0.1 seconds
     next_print_time_.store(time + 0.1, std::memory_order_relaxed);
 
+    low = min(low, sqrtx_);
     int64_t segment_nr = low / min_segment_size_;
     int64_t total_segments = ceil_div(sqrtx_, min_segment_size_);
     std::string status = "Segments: ";
