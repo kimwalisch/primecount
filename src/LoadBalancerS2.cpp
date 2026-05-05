@@ -149,7 +149,8 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
   {
     // Try setting max_low_ = thread.low
     bool updated_max_low = max_low_.compare_exchange_strong(
-        max_low, thread.low, std::memory_order_relaxed,
+        max_low, thread.low,
+        std::memory_order_relaxed,
         std::memory_order_relaxed);
 
     if (updated_max_low)
@@ -166,7 +167,8 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
       if (thread.sum && !found_first_leaf)
       {
         found_first_leaf = true;
-        found_first_leaf_.store(true, std::memory_order_relaxed);
+        found_first_leaf_.store(true,
+            std::memory_order_relaxed);
       }
 
       // We only start increasing the segment size and segments
