@@ -1,6 +1,7 @@
-Changes in primecount-8.5, 2026-05-02
+Changes in primecount-8.5, 2026-05-06
 
 * Update to libprimesieve-12.14.
+* PiTable.cpp: Annotate OpenMP barrier with nowait.
 * CMakeLists.txt: Add support for building primecount as a
   shared library (primecount.dll) on Windows using MSVC.
 * CMakeLists.txt: Remove WITH_MSVC_CRT_STATIC option.
