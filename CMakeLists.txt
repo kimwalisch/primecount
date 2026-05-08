@@ -350,8 +350,10 @@ if(BUILD_PRIMECOUNT)
 
     # Workaround for LLVM OpenMP performance issue
     if(OpenMP_kmp_set_defaults)
-        target_link_libraries(primecount PRIVATE ${PRIMECOUNT_LINK_LIBRARIES})
         target_compile_definitions(primecount PRIVATE HAVE_OPENMP_KMP_SET_DEFAULTS)
+        if(TARGET OpenMP::OpenMP_CXX)
+            target_link_libraries(primecount PRIVATE OpenMP::OpenMP_CXX)
+        endif()
     endif()
 
     # Copy primesieve.dll into the same directory as primecount.exe.

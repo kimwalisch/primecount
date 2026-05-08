@@ -4,7 +4,10 @@ include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
 cmake_push_check_state()
-set(CMAKE_REQUIRED_LIBRARIES ${PRIMECOUNT_LINK_LIBRARIES})
+
+if(TARGET OpenMP::OpenMP_CXX)
+    set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
+endif()
 
 check_cxx_source_compiles("
     #include <omp.h>
