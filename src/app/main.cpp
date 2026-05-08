@@ -51,6 +51,7 @@ namespace {
 /// runtime. As a workaround for this LLVM OpenMP performance issue we
 /// set OMP_WAIT_POLICY=ACTIVE to keep worker threads ready at
 /// barriers when the user has not chosen a wait policy explicitly.
+/// https://github.com/llvm/llvm-project/issues/195239
 ///
 void init_LLVM_OpenMP(int argc, char* argv[])
 {
