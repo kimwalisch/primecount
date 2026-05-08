@@ -16,7 +16,7 @@ option(BUILD_CODEGEN_TESTS "Build the assembly codegen tests"      OFF)
 
 option(WITH_OPENMP          "Enable OpenMP multi-threading"        ON)
 option(WITH_MULTIARCH       "Enable runtime dispatching to fastest supported CPU instruction set" ON)
-option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" ON)
+option(WITH_DIV32           "Use 32-bit division instead of 64-bit division if possible" OFF)
 option(WITH_FLOAT128        "Use __float128 (requires libquadmath), increases precision of Li(x) & RiemannR" OFF)
 
 # Check if primecount is top level project ###########################

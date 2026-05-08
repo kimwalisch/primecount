@@ -4,6 +4,8 @@ Changes in primecount-8.5, 2026-05-08
 * PiTable.cpp: Annotate OpenMP barrier with nowait.
 * main.cpp: Set OMP_WAIT_POLICY=ACTIVE for LLVM OpenMP as a
   workaround for this performance issue: https://github.com/llvm/llvm-project/issues/195239
+* CMakeLists.txt: Set WITH_DIV32=OFF by default to fix Clang-22
+  performance regression in the D algorithm.
 * CMakeLists.txt: Add support for building primecount as a
   shared library (primecount.dll) on Windows using MSVC.
 * CMakeLists.txt: Remove WITH_MSVC_CRT_STATIC option.
