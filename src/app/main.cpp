@@ -51,8 +51,14 @@ namespace {
 /// As a workaround for this issue we set OMP_WAIT_POLICY=ACTIVE when
 /// using LLVM OpenMP.
 ///
-void init_LLVM_OpenMP()
+void init_LLVM_OpenMP(int argc, char* argv[])
 {
+  // When launching 1000s of tiny computations then
+  // the default OMP_WAIT_POLICY=PASSIVE performs better.
+  for (int i = 1; i < argc; i++)
+    if (std::string(argv[i]) == "--test")
+      return;
+
   if (!std::getenv("OMP_WAIT_POLICY"))
     kmp_set_defaults("OMP_WAIT_POLICY=ACTIVE");
 }
@@ -372,7 +378,7 @@ maxint_t S2_hard(maxint_t x, int threads)
 int main (int argc, char* argv[])
 {
 #if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
-  init_LLVM_OpenMP();
+  init_LLVM_OpenMP(argc, argv);
 #endif
 
   try
