@@ -44,12 +44,13 @@
 
 namespace {
 
-/// For primecount's performance it is important that threads spin for
-/// a short amount of time at barriers before being put to sleep.
-/// Currently there is a bug in LLVM OpenMP which causes it to ignore
-/// KMP_BLOCKTIME by default: https://github.com/llvm/llvm-project/issues/195239
-/// As a workaround for this issue we set OMP_WAIT_POLICY=ACTIVE when
-/// using LLVM OpenMP.
+/// By default LLVM OpenMP (in 2026) uses a sleepable fork/join
+/// barrier path under the default passive wait policy. For
+/// primecount's short, latency-sensitive command-line runs, the cost
+/// of suspending and later waking a large thread team can dominate
+/// runtime. As a workaround for this LLVM OpenMP performance issue we
+/// set OMP_WAIT_POLICY=ACTIVE to keep worker threads ready at
+/// barriers when the user has not chosen a wait policy explicitly.
 ///
 void init_LLVM_OpenMP(int argc, char* argv[])
 {
