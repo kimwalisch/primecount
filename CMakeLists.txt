@@ -208,6 +208,11 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
+
+    if((OpenMP OR OpenMP_with_libatomic) AND
+       NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        include("${PROJECT_SOURCE_DIR}/cmake/OpenMP_kmp_set_defaults.cmake")
+    endif()
 endif()
 
 # Required includes ##################################################
@@ -342,6 +347,14 @@ if(BUILD_PRIMECOUNT)
     target_compile_definitions(primecount PRIVATE ${PRIMECOUNT_COMPILE_DEFINITIONS})
     target_compile_features(primecount PRIVATE cxx_auto_type)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+    # Workaround for LLVM OpenMP performance issue
+    if(OpenMP_kmp_set_defaults)
+        target_compile_definitions(primecount PRIVATE HAVE_OPENMP_KMP_SET_DEFAULTS)
+        if(TARGET OpenMP::OpenMP_CXX)
+            target_link_libraries(primecount PRIVATE OpenMP::OpenMP_CXX)
+        endif()
+    endif()
 
     # Copy primesieve.dll into the same directory as primecount.exe.
     # On Windows the DLLs must be in the same directory as the

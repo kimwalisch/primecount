@@ -37,6 +37,38 @@
 #include <iostream>
 #include <string>
 
+#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+
+#include <cstdlib>
+#include <omp.h>
+
+namespace {
+
+/// By default LLVM OpenMP (in 2026) uses a sleepable fork/join
+/// barrier path under the default passive wait policy. For
+/// primecount's short, latency-sensitive command-line runs, the cost
+/// of suspending and later waking a large thread team can dominate
+/// runtime. As a workaround for this LLVM OpenMP performance issue we
+/// set OMP_WAIT_POLICY=ACTIVE to keep worker threads ready at
+/// barriers when the user has not chosen a wait policy explicitly.
+/// https://github.com/llvm/llvm-project/issues/195239
+///
+void init_LLVM_OpenMP(int argc, char* argv[])
+{
+  // When launching 1000s of tiny computations then
+  // the default OMP_WAIT_POLICY=PASSIVE performs better.
+  for (int i = 1; i < argc; i++)
+    if (std::string(argv[i]) == "--test")
+      return;
+
+  if (!std::getenv("OMP_WAIT_POLICY"))
+    kmp_set_defaults("OMP_WAIT_POLICY=ACTIVE");
+}
+
+} // namespace
+
+#endif
+
 using namespace primecount;
 
 namespace primecount {
@@ -347,6 +379,10 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
+#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+  init_LLVM_OpenMP(argc, argv);
+#endif
+
   try
   {
     CmdOptions opts = parseOptions(argc, argv);

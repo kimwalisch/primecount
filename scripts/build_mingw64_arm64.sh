@@ -53,7 +53,7 @@ mkdir build_primecount
 cd build_primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
   -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
-   -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_ARM_SVE -DNDEBUG -D_WIN32_WINNT=0x0A00 \
+  -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_ARM_SVE -DHAVE_OPENMP_KMP_SET_DEFAULTS -DNDEBUG -D_WIN32_WINNT=0x0A00 \
   ../../src/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
   ../../src/gourdon/*.cpp ../../src/arch/arm/sve.cpp ../../src/app/*.cpp
 
