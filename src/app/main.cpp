@@ -37,6 +37,30 @@
 #include <iostream>
 #include <string>
 
+#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+
+#include <cstdlib>
+#include <omp.h>
+
+namespace {
+
+/// For primecount's performance it is important that threads spin for
+/// a short amount of time at barriers before being put to sleep.
+/// Currently there is a bug in LLVM OpenMP which causes it to ignore
+/// KMP_BLOCKTIME by default: https://github.com/llvm/llvm-project/issues/195239
+/// As a workaround for this issue we set OMP_WAIT_POLICY=ACTIVE when
+/// using LLVM OpenMP.
+///
+void init_LLVM_OpenMP()
+{
+  if (!std::getenv("OMP_WAIT_POLICY"))
+    kmp_set_defaults("OMP_WAIT_POLICY=ACTIVE");
+}
+
+} // namespace
+
+#endif
+
 using namespace primecount;
 
 namespace primecount {
@@ -347,6 +371,10 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
+#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+  init_LLVM_OpenMP();
+#endif
+
   try
   {
     CmdOptions opts = parseOptions(argc, argv);
