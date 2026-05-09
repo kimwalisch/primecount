@@ -307,6 +307,33 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  freebsd_clang:
+    strategy:
+      matrix:
+        config: ['Debug', 'Release']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and test primecount
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          run: |
+              pkg update
+              pkg install -y cmake ninja asciidoc xmlto libxml2
+              CC=clang CXX=clang++ cmake . -G Ninja -DBUILD_TESTS=ON -DBUILD_MANPAGE=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+              grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
+              grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+              cmake --build . --parallel --verbose
+              ctest -j2 --output-on-failure
+              ./primecount --test
+              ./primecount 1e11 --legendre
+              ./primecount 1e12 --meissel
+              ./primecount 1e11 --lehmer
+              ./primecount 1e12 --lmo
+              ./primecount 1e13 --deleglise-rivat
+              ./primecount 1e14 --gourdon
+
   linux_emscripten:
     strategy:
       matrix:

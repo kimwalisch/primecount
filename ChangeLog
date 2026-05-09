@@ -1,8 +1,9 @@
-Changes in primecount-8.5, 2026-05-08
+Changes in primecount-8.5, 2026-05-09
 
 * Update to libprimesieve-12.14.
+* ci.yml: Add FreeBSD GitHub Actions CI tests.
 * PiTable.cpp: Annotate OpenMP barrier with nowait.
-* main.cpp: Set OMP_WAIT_POLICY=ACTIVE for LLVM OpenMP as a
+* main.cpp: Set LLVM OpenMP environment variables as a
   workaround for this performance issue: https://github.com/llvm/llvm-project/issues/195239
 * CMakeLists.txt: Set WITH_DIV32=OFF by default to fix Clang-22
   performance regression in the D algorithm.
