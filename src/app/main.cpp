@@ -39,6 +39,7 @@
 
 #if defined(INIT_LLVM_OPENMP)
 
+#include <cstdlib>
 #include <stdlib.h>
 
 namespace {
