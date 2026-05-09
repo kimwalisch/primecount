@@ -59,14 +59,17 @@ void set_env(const char* name, const char* value)
 /// command-line app often enters many short parallel regions with a
 /// large thread team, so the cost of OS scheduling, thread migration
 /// and repeatedly waking idle workers can dominate the actual work.
+/// https://github.com/llvm/llvm-project/issues/195239
 ///
 /// Use an active but finite barrier wait and bind the team to core
-/// places before LLVM OpenMP initializes. OMP_WAIT_POLICY=ACTIVE keeps
-/// workers responsive for short barriers, KMP_BLOCKTIME=30ms prevents
-/// long-running phases from spinning indefinitely, and
-/// OMP_PLACES=cores with OMP_PROC_BIND=spread distributes workers over
-/// physical cores instead of leaving placement to the OS scheduler.
-/// https://github.com/llvm/llvm-project/issues/195239
+/// places before LLVM OpenMP initializes. OMP_WAIT_POLICY=ACTIVE
+/// keeps workers responsive for short barriers, KMP_BLOCKTIME=30ms
+/// prevents long-running phases from spinning indefinitely, and
+/// OMP_PLACES=cores OMP_PROC_BIND=spread binds OpenMP workers to
+/// physical cores and distributes them across the available core
+/// places. This can improve memory bandwidth on multi-socket systems
+/// and avoids placing multiple workers on SMT siblings while unused
+/// physical cores are still available.
 ///
 void init_LLVM_OpenMP(int argc, char* argv[])
 {
