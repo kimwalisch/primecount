@@ -6,19 +6,16 @@ include(CMakePushCheckState)
 
 find_package(OpenMP QUIET)
 
-if(NOT (OpenMP_FOUND OR OpenMP_CXX_FOUND))
+if(NOT (TARGET OpenMP::OpenMP_CXX))
     message(STATUS "Performing Test OpenMP")
     message(STATUS "Performing Test OpenMP - Failed")
 endif()
 
 # CMake has found OpenMP, now we need to check
 # if OpenMP supports 128-bit integers.
-if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
+if(TARGET OpenMP::OpenMP_CXX)
     cmake_push_check_state()
-
-    if(TARGET OpenMP::OpenMP_CXX)
-        set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
-    endif()
+    set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
 
     # Our <int128_t.hpp> requires C++11 or later
     if(NOT compiler_supports_cpp11)
@@ -99,9 +96,7 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
 
     # OpenMP has been tested successfully, enable it
     if(OpenMP OR OpenMP_with_libatomic)
-        if(TARGET OpenMP::OpenMP_CXX)
-            list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
-        endif()
+        list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
 
         # Create list of OpenMP libs for pkg-config/pkgconf
         foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
@@ -114,12 +109,9 @@ endif()
 # supports setenv() to tune the LLVM OpenMP options.
 if(OpenMP OR OpenMP_with_libatomic)
     include(CheckCXXSymbolExists)
+
     cmake_push_check_state()
-
-    if(TARGET OpenMP::OpenMP_CXX)
-        set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
-    endif()
-
+    set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
     check_cxx_symbol_exists(KMP_VERSION_MAJOR "omp.h" LLVM_OpenMP)
     cmake_pop_check_state()
 
