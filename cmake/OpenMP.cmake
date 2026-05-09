@@ -18,16 +18,14 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
 
     if(TARGET OpenMP::OpenMP_CXX)
         set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
-    else()
-        set(CMAKE_REQUIRED_FLAGS "${OpenMP_CXX_FLAGS}")
     endif()
 
     # Our <int128_t.hpp> requires C++11 or later
     if(NOT compiler_supports_cpp11)
         if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
         elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
         endif()
     endif()
 
@@ -103,8 +101,6 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
     if(OpenMP OR OpenMP_with_libatomic)
         if(TARGET OpenMP::OpenMP_CXX)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
-        else()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         endif()
 
         # Create list of OpenMP libs for pkg-config/pkgconf
@@ -114,7 +110,25 @@ if(OpenMP_FOUND OR OpenMP_CXX_FOUND)
     endif()
 endif()
 
-# OpenMP test has failed, print warning message
+# If we are using LLVM OpenMP we check if the compiler
+# supports setenv() to tune the LLVM OpenMP options.
+if(OpenMP OR OpenMP_with_libatomic)
+    include(CheckCXXSymbolExists)
+    cmake_push_check_state()
+
+    if(TARGET OpenMP::OpenMP_CXX)
+        set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
+    endif()
+
+    check_cxx_symbol_exists(KMP_VERSION_MAJOR "omp.h" LLVM_OpenMP)
+    cmake_pop_check_state()
+
+    if(LLVM_OpenMP)
+        include("${PROJECT_SOURCE_DIR}/cmake/setenv.cmake")
+    endif()
+endif()
+
+# OpenMP is not supported, print warning message
 if(NOT OpenMP AND NOT OpenMP_with_libatomic)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
         message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")

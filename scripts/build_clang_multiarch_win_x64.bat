@@ -17,7 +17,7 @@ mkdir primecount
 cd primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include ^
   -O3 -mpopcnt -fopenmp -Wall -Wextra -pedantic ^
-  -DNDEBUG -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_AVX512_VPOPCNT -DHAVE_OPENMP_KMP_SET_DEFAULTS ^
+  -DNDEBUG -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_AVX512_VPOPCNT -DINIT_LLVM_OPENMP -DHAVE_PUTENV_S ^
   ../../src\*.cpp ../../src/arch/x86\*.cpp ../../src/lmo\*.cpp ^
   ../../src/deleglise-rivat\*.cpp ../../src/gourdon\*.cpp ../../src/app\*.cpp
 

@@ -37,20 +37,34 @@
 #include <iostream>
 #include <string>
 
-#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+#if defined(INIT_LLVM_OPENMP)
 
-#include <cstdlib>
-#include <omp.h>
+#include <stdlib.h>
 
 namespace {
 
-/// By default LLVM OpenMP (in 2026) uses a sleepable fork/join
-/// barrier path under the default passive wait policy. For
-/// primecount's short, latency-sensitive command-line runs, the cost
-/// of suspending and later waking a large thread team can dominate
-/// runtime. As a workaround for this LLVM OpenMP performance issue we
-/// set OMP_WAIT_POLICY=ACTIVE to keep worker threads ready at
-/// barriers when the user has not chosen a wait policy explicitly.
+void set_env(const char* name, const char* value)
+{
+#if defined(HAVE_PUTENV_S)
+  _putenv_s(name, value);
+#elif defined(HAVE_SETENV)
+  setenv(name, value, 0);
+#endif
+}
+
+/// LLVM OpenMP's default settings are tuned for throughput on shared
+/// systems: worker threads are not bound to CPU cores and may quickly
+/// sleep at fork/join barriers. On many-core systems primecount's
+/// command-line app often enters many short parallel regions with a
+/// large thread team, so the cost of OS scheduling, thread migration
+/// and repeatedly waking idle workers can dominate the actual work.
+///
+/// Use an active but finite barrier wait and bind the team to core
+/// places before LLVM OpenMP initializes. OMP_WAIT_POLICY=ACTIVE keeps
+/// workers responsive for short barriers, KMP_BLOCKTIME=30ms prevents
+/// long-running phases from spinning indefinitely, and
+/// OMP_PLACES=cores with OMP_PROC_BIND=spread distributes workers over
+/// physical cores instead of leaving placement to the OS scheduler.
 /// https://github.com/llvm/llvm-project/issues/195239
 ///
 void init_LLVM_OpenMP(int argc, char* argv[])
@@ -61,8 +75,23 @@ void init_LLVM_OpenMP(int argc, char* argv[])
     if (std::string(argv[i]) == "--test")
       return;
 
-  if (!std::getenv("OMP_WAIT_POLICY"))
-    kmp_set_defaults("OMP_WAIT_POLICY=ACTIVE");
+  if (!std::getenv("OMP_WAIT_POLICY") &&
+      !std::getenv("KMP_BLOCKTIME") &&
+      !std::getenv("OMP_PLACES") &&
+      !std::getenv("OMP_PROC_BIND"))
+  {
+    // These settings provide good performance on my dual-socket
+    // AMD EPYC 7642 with 96 CPU cores (192 threads) for:
+    // ./primecount 1e17 --time
+    // ./primecount 1e18 --time
+    // ./primecount 1e19 --time
+    // ./primecount 1e20 --time
+
+    set_env("OMP_WAIT_POLICY", "ACTIVE");
+    set_env("KMP_BLOCKTIME", "30ms");
+    set_env("OMP_PLACES", "cores");
+    set_env("OMP_PROC_BIND", "spread");
+  }
 }
 
 } // namespace
@@ -379,7 +408,7 @@ maxint_t S2_hard(maxint_t x, int threads)
 
 int main (int argc, char* argv[])
 {
-#if defined(HAVE_OPENMP_KMP_SET_DEFAULTS)
+#if defined(INIT_LLVM_OPENMP)
   init_LLVM_OpenMP(argc, argv);
 #endif
 

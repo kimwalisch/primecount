@@ -208,11 +208,6 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 if(WITH_OPENMP)
     include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
-
-    if((OpenMP OR OpenMP_with_libatomic) AND
-       NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        include("${PROJECT_SOURCE_DIR}/cmake/OpenMP_kmp_set_defaults.cmake")
-    endif()
 endif()
 
 # Required includes ##################################################
@@ -349,10 +344,12 @@ if(BUILD_PRIMECOUNT)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     # Workaround for LLVM OpenMP performance issue
-    if(OpenMP_kmp_set_defaults)
-        target_compile_definitions(primecount PRIVATE HAVE_OPENMP_KMP_SET_DEFAULTS)
-        if(TARGET OpenMP::OpenMP_CXX)
-            target_link_libraries(primecount PRIVATE OpenMP::OpenMP_CXX)
+    if(LLVM_OpenMP AND (WIN_putenv_s OR POSIX_setenv))
+        target_compile_definitions(primecount PRIVATE INIT_LLVM_OPENMP)
+        if(WIN_putenv_s)
+            target_compile_definitions(primecount PRIVATE HAVE_PUTENV_S)
+        elseif(POSIX_setenv)
+            target_compile_definitions(primecount PRIVATE HAVE_SETENV)
         endif()
     endif()
 
