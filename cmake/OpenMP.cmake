@@ -108,11 +108,14 @@ endif()
 # If we are using LLVM OpenMP we check if the compiler
 # supports setenv() to tune the LLVM OpenMP options.
 if(OpenMP OR OpenMP_with_libatomic)
-    include(CheckCXXSymbolExists)
-
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
-    check_cxx_symbol_exists(KMP_VERSION_MAJOR "omp.h" LLVM_OpenMP)
+    check_cxx_source_compiles("
+        #include <omp.h>
+        int main() {
+            kmp_set_blocktime(1);
+            return 0;
+        }" LLVM_OpenMP)
     cmake_pop_check_state()
 
     if(LLVM_OpenMP)
