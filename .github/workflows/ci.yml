@@ -52,6 +52,31 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  windows_clang:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build primecount
+        run: |
+            cmake . -G Ninja -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DCMAKE_C_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --parallel --verbose
+      - name: CTest (unit tests)
+        run: ctest -j2 --output-on-failure
+      - name: primecount --test
+        run: .\primecount.exe --test
+      - name: primecount 1e11 --legendre
+        run: .\primecount.exe 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: .\primecount.exe 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: .\primecount.exe 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: .\primecount.exe 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: .\primecount.exe 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: .\primecount.exe 1e14 --gourdon
+
   windows_msvc2022:
     runs-on: windows-2022
     steps:

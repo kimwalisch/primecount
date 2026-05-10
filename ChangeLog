@@ -1,6 +1,7 @@
-Changes in primecount-8.5, 2026-05-09
+Changes in primecount-8.5, 2026-05-10
 
 * Update to libprimesieve-12.14.
+* ci.yml: Add Windows/Clang GitHub Actions CI tests.
 * ci.yml: Add FreeBSD GitHub Actions CI tests.
 * PiTable.cpp: Annotate OpenMP barrier with nowait.
 * main.cpp: Set LLVM OpenMP environment variables as a
