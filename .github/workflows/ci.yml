@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: Build primecount
         run: |
-            cmake . -G Ninja -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_FLAGS="-O3 -Wall -Wextra -pedantic" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_C_FLAGS="-O3 -Wall -Wextra -pedantic" -DBUILD_TESTS=ON
+            cmake . -G Ninja -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_C_FLAGS="-O3 -Wall -Wextra -pedantic -Werror" -DBUILD_TESTS=ON
             cmake --build . --config Release --target install
       - name: CTest (unit tests)
         run: ctest -j2 -C Release --output-on-failure
