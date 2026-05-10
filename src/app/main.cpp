@@ -44,11 +44,22 @@
 
 namespace {
 
+bool get_env(const char* name)
+{
+#if defined(HAVE_GETENV_S)
+  std::size_t size = 0;
+  getenv_s(&size, nullptr, 0, name);
+  return size > 0;
+#else
+  return std::getenv(name) != nullptr;
+#endif
+}
+
 void set_env(const char* name, const char* value)
 {
 #if defined(HAVE_PUTENV_S)
   _putenv_s(name, value);
-#elif defined(HAVE_SETENV)
+#else
   setenv(name, value, 0);
 #endif
 }
@@ -79,26 +90,23 @@ void init_LLVM_OpenMP(int argc, char* argv[])
     if (std::string(argv[i]) == "--test")
       return;
 
-  // Avoid MSVC getenv() deprecation warning
-  #if !defined(_MSC_VER)
-  if (std::getenv("OMP_WAIT_POLICY") ||
-      std::getenv("KMP_BLOCKTIME") ||
-      std::getenv("OMP_PLACES") ||
-      std::getenv("OMP_PROC_BIND"))
-    return;
-  #endif
+  if (!get_env("OMP_WAIT_POLICY") &&
+      !get_env("KMP_BLOCKTIME") &&
+      !get_env("OMP_PLACES") &&
+      !get_env("OMP_PROC_BIND"))
+  {
+    // These settings provide good performance on my dual-socket
+    // AMD EPYC 7642 with 96 CPU cores (192 threads) for:
+    // ./primecount 1e17 --time
+    // ./primecount 1e18 --time
+    // ./primecount 1e19 --time
+    // ./primecount 1e20 --time
 
-  // These settings provide good performance on my dual-socket
-  // AMD EPYC 7642 with 96 CPU cores (192 threads) for:
-  // ./primecount 1e17 --time
-  // ./primecount 1e18 --time
-  // ./primecount 1e19 --time
-  // ./primecount 1e20 --time
-
-  set_env("OMP_WAIT_POLICY", "ACTIVE");
-  set_env("KMP_BLOCKTIME", "30ms");
-  set_env("OMP_PLACES", "cores");
-  set_env("OMP_PROC_BIND", "spread");
+    set_env("OMP_WAIT_POLICY", "ACTIVE");
+    set_env("KMP_BLOCKTIME", "30ms");
+    set_env("OMP_PLACES", "cores");
+    set_env("OMP_PROC_BIND", "spread");
+  }
 }
 
 } // namespace

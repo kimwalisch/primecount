@@ -344,12 +344,12 @@ if(BUILD_PRIMECOUNT)
     install(TARGETS primecount DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     # Workaround for LLVM OpenMP performance issue
-    if(LLVM_OpenMP AND (WIN_putenv_s OR POSIX_setenv))
+    if(LLVM_OpenMP AND 
+       (POSIX_setenv OR (WIN_getenv_s AND WIN_putenv_s)))
         target_compile_definitions(primecount PRIVATE INIT_LLVM_OPENMP)
-        if(WIN_putenv_s)
+        if(WIN_getenv_s AND WIN_putenv_s)
+            target_compile_definitions(primecount PRIVATE HAVE_GETENV_S)
             target_compile_definitions(primecount PRIVATE HAVE_PUTENV_S)
-        elseif(POSIX_setenv)
-            target_compile_definitions(primecount PRIVATE HAVE_SETENV)
         endif()
     endif()
 
