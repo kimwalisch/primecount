@@ -48,8 +48,8 @@ bool get_env(const char* name)
 {
 #if defined(HAVE_GETENV_S)
   std::size_t size = 0;
-  getenv_s(&size, nullptr, 0, name);
-  return size > 0;
+  auto errcode = getenv_s(&size, nullptr, 0, name);
+  return !errcode && (size > 0);
 #else
   return std::getenv(name) != nullptr;
 #endif
