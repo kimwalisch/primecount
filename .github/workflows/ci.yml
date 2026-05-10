@@ -63,19 +63,19 @@ jobs:
       - name: CTest (unit tests)
         run: ctest -j2 -C Release --output-on-failure
       - name: primecount --test
-        run: .\build\primecount.exe --test
+        run: Release\primecount.exe --test
       - name: primecount 1e11 --legendre
-        run: .\build\primecount.exe 1e11 --legendre
+        run: Release\primecount.exe 1e11 --legendre
       - name: primecount 1e12 --meissel
-        run: .\build\primecount.exe 1e12 --meissel
+        run: Release\primecount.exe 1e12 --meissel
       - name: primecount 1e11 --lehmer
-        run: .\build\primecount.exe 1e11 --lehmer
+        run: Release\primecount.exe 1e11 --lehmer
       - name: primecount 1e12 --lmo
-        run: .\build\primecount.exe 1e12 --lmo
+        run: Release\primecount.exe 1e12 --lmo
       - name: primecount 1e13 --deleglise-rivat
-        run: .\build\primecount.exe 1e13 --deleglise-rivat
+        run: Release\primecount.exe 1e13 --deleglise-rivat
       - name: primecount 1e14 --gourdon
-        run: .\build\primecount.exe 1e14 --gourdon
+        run: Release\primecount.exe 1e14 --gourdon
 
   windows_msvc2022:
     runs-on: windows-2022
