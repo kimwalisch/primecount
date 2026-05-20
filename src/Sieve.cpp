@@ -60,10 +60,11 @@ Sieve::Sieve(uint64_t low,
   start_ = low;
   segment_size = align_segment_size(segment_size);
 
-  // sieve_size = segment_size / 30 as each byte corresponds
-  // to 30 numbers i.e. the 8 bits correspond to the
-  // offsets = {1, 7, 11, 13, 17, 19, 23, 29}.
-  sieve_.resize(segment_size / 30);
+  // The 8 bits of each sieve vector byte correspond to the
+  // offsets = {1, 7, 11, 13, 17, 19, 23, 29}. The sieve
+  // vector uses the uint64_t type, and each uint64_t item
+  // corresponds to: 30 * sizeof(uint64_t) = 240 numbers.
+  sieve_.resize(segment_size / 240);
   primeState_.reserve(primes_size);
   allocate_counter(low);
 }
@@ -110,18 +111,20 @@ void Sieve::allocate_counter(uint64_t low)
   // an interval of size: sieve_limit^(1/4) * sqrt(240).
   // Hence the max(counter value) = 2^18.
   ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
-  uint64_t counter_size = ceil_div(sieve_.size(), bytes);
+  uint64_t sieve_bytes = sieve_.size() * 8;
+  uint64_t counter_size = ceil_div(sieve_bytes, bytes);
   counter_.counter.resize(counter_size);
   counter_.dist = bytes * 30;
   counter_.log2_dist = ilog2(bytes);
 }
 
-/// The segment size is sieve.size() * 30 as each
-/// byte corresponds to 30 numbers.
+/// The segment size is sieve.size() * 240 as each sieve
+/// vector byte corresponds to 30 numbers, and the sieve
+/// vector uses the uint64_t type (8 bytes).
 ///
 uint64_t Sieve::segment_size() const
 {
-  return sieve_.size() * 30;
+  return sieve_.size() * 240;
 }
 
 /// segment_size must be a multiple of 240 as we
@@ -147,9 +150,8 @@ void Sieve::resize_sieve(uint64_t low, uint64_t high)
   {
     uint64_t last = size - 1;
     size = align_segment_size(size);
-    sieve_.resize(size / 30);
-    auto sieve64 = (uint64_t*) sieve_.data();
-    sieve64[last / 240] &= unset_larger[last % 240];
+    sieve_.resize(size / 240);
+    sieve_.back() &= unset_larger[last % 240];
   }
 }
 
@@ -229,10 +231,10 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   uint64_t wheel_index = primeState.wheel_index;
   uint64_t g = wheel_index / 8;
   uint64_t m = primeState.multiple;
-  uint8_t* sieve = sieve_.data();
-  uint64_t sieve_size = sieve_.size();
+  uint8_t* sieve = (uint8_t*) &sieve_[0];
+  uint64_t sieve_bytes = sieve_.size() * 8;
   uint64_t max_unroll_index = prime * 28 + mod30_prime_residues[g] - 1;
-  uint64_t unroll_limit = max(sieve_size, max_unroll_index) - max_unroll_index;
+  uint64_t unroll_limit = max(sieve_bytes, max_unroll_index) - max_unroll_index;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
   uint64_t adv1 = prime * 4 + wheel_corr[g][1];
   uint64_t adv2 = prime * 2 + wheel_corr[g][2];
@@ -243,10 +245,10 @@ void Sieve::cross_off(uint64_t prime, uint64_t i)
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
 
   #define CHECK_FINISHED(w) \
-    if (m >= sieve_size) \
+    if (m >= sieve_bytes) \
     { \
       primeState.wheel_index = w; \
-      primeState.multiple = uint32_t(m - sieve_size); \
+      primeState.multiple = uint32_t(m - sieve_bytes); \
       return; \
     }
 
@@ -462,9 +464,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t m = primeState.multiple;
   uint64_t total_count = total_count_;
   uint64_t counter_log2_dist = counter_.log2_dist;
-  uint64_t sieve_size = sieve_.size();
   uint32_t* counter = &counter_[0];
-  uint8_t* sieve = &sieve_[0];
+  uint8_t* sieve = (uint8_t*) &sieve_[0];
+  uint64_t sieve_bytes = sieve_.size() * 8;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
   uint64_t adv1 = prime * 4 + wheel_corr[g][1];
   uint64_t adv2 = prime * 2 + wheel_corr[g][2];
@@ -475,10 +477,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
 
   #define CHECK_FINISHED(w) \
-    if_unlikely(m >= sieve_size) \
+    if_unlikely(m >= sieve_bytes) \
     { \
       primeState.wheel_index = w; \
-      primeState.multiple = uint32_t(m - sieve_size); \
+      primeState.multiple = uint32_t(m - sieve_bytes); \
       total_count_ = total_count; \
       return; \
     }

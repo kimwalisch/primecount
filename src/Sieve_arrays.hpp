@@ -510,7 +510,8 @@ int main()
     using namespace primecount;
     auto primes = generate_primes<int>(vect.back().back());
     Sieve sieve(prime_product * 30, prime_product * 30 * factor, primes.size());
-    std::fill_n(sieve.sieve_.data(), sieve.sieve_.size(), 0xff);
+    std::fill(sieve.sieve_.begin(), sieve.sieve_.end(), ~0ull);
+    uint8_t* sieve_array = (uint8_t*) sieve.sieve_.data();
 
     for (unsigned i = 0; i < v.size(); i++)
       sieve.cross_off(v[i], i + 4);
@@ -521,7 +522,7 @@ int main()
     {
       if (j != 0 && j % 20 == 0)
         std::cout << std::endl << "    ";
-      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int) sieve.sieve_[j];
+      std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int) sieve_array[j];
       if (j + 1 < bytes)
         std::cout << ((j+1) % 20 == 0 ? "," : ", ");
       else
