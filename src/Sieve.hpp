@@ -150,7 +150,7 @@ private:
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  Vector<uint8_t> sieve_;
+  Vector<uint64_t> sieve_;
   Vector<PrimeState> primeState_;
   Counter counter_;
 };

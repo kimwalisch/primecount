@@ -19,7 +19,7 @@
 ///        the sieve array. Pre-sieving speeds up the S2_hard and
 ///        D algorithms by up to 5%.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -41,29 +41,31 @@ namespace {
 /// Removes the (primes and) multiples of
 /// primes ≤ 13 from the sieve array.
 ///
-void pre_sieve1(primecount::Vector<uint8_t>& sieve, uint64_t low)
+void pre_sieve1(uint8_t* sieve,
+                std::size_t sieve_bytes,
+                uint64_t low)
 {
   uint64_t prime_product = pre_sieved_13.size() * 30;
   uint64_t i = (low % prime_product) / 30;
   uint64_t bytes_to_copy = pre_sieved_13.size() - i;
   const uint8_t* p = pre_sieved_13.begin();
 
-  if (sieve.size() <= bytes_to_copy)
-    std::copy_n(&p[i], sieve.size(), &sieve[0]);
+  if (sieve_bytes <= bytes_to_copy)
+    std::copy_n(&p[i], sieve_bytes, sieve);
   else
   {
     // Copy the last remaining bytes to the
     // beginning of the sieve array.
-    std::copy_n(&p[i], bytes_to_copy, &sieve[0]);
+    std::copy_n(&p[i], bytes_to_copy, sieve);
 
     // Restart copying from the beginning
     for (i = bytes_to_copy;
-         i + pre_sieved_13.size() < sieve.size();
+         i + pre_sieved_13.size() < sieve_bytes;
          i += pre_sieved_13.size())
       std::copy_n(p, pre_sieved_13.size(), &sieve[i]);
 
     // Copy the last remaining bytes
-    std::copy_n(p, sieve.size() - i, &sieve[i]);
+    std::copy_n(p, sieve_bytes - i, &sieve[i]);
   }
 }
 
@@ -105,12 +107,14 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
   uint64_t primePi = 3;
 
   if (c < 6)
-    std::fill_n(sieve_.data(), sieve_.size(), 0xff);
+    std::fill(sieve_.begin(), sieve_.end(), ~0ull);
   else
   {
     // PrimePi(13) = 6
     primePi = 6;
-    pre_sieve1(sieve_, low);
+    uint8_t* sieve = (uint8_t*) sieve_.data();
+    std::size_t sieve_bytes = sieve_.size() * 8;
+    pre_sieve1(sieve, sieve_bytes, low);
 
     for (const auto& pre_sieved : pre_sieved_arrays)
     {
@@ -126,13 +130,13 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
       uint64_t pos = (low % prime_product) / 30;
       uint64_t offset = 0;
 
-      while (offset < sieve_.size())
+      while (offset < sieve_bytes)
       {
-        uint64_t bytes_to_copy = sieve_.size() - offset;
+        uint64_t bytes_to_copy = sieve_bytes - offset;
         uint64_t bytes_to_copy2 = uint64_t(pre_sieved.size() - pos);
         bytes_to_copy = std::min(bytes_to_copy, bytes_to_copy2);
 
-        pre_sieve2(&sieve_[offset], &p[pos], bytes_to_copy);
+        pre_sieve2(&sieve[offset], &p[pos], bytes_to_copy);
 
         offset += bytes_to_copy;
         pos += bytes_to_copy;
