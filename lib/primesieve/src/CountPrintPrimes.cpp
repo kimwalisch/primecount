@@ -6,7 +6,7 @@
 ///         to reconstruct primes and prime k-tuplets from 1 bits of
 ///         the sieve array.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -18,9 +18,9 @@
 #include "SievingPrimes.hpp"
 
 #include <primesieve/forward.hpp>
-#include <primesieve/littleendian_cast.hpp>
 #include <primesieve/macros.hpp>
 #include <primesieve/pmath.hpp>
+#include <primesieve/util.hpp>
 
 #include <stdint.h>
 #include <algorithm>
@@ -147,7 +147,7 @@ void CountPrintPrimes::sieve()
     sieveSegment();
 
     if (ps_.isCountPrimes())
-      countPrimes();
+      counts_[0] += popcount(sieve_);
     if (ps_.isCountkTuplets())
       countkTuplets();
     if (ps_.isPrintPrimes())
@@ -155,15 +155,8 @@ void CountPrintPrimes::sieve()
     if (ps_.isPrintkTuplets())
       printkTuplets();
     if (ps_.isStatus())
-      ps_.updateStatus(sieve_.size() * 30);
+      ps_.updateStatus(sieve_.size() * 240);
   }
-}
-
-void CountPrintPrimes::countPrimes()
-{
-  ASSERT(sieve_.capacity() % sizeof(uint64_t) == 0);
-  uint64_t size = ceilDiv(sieve_.size(), 8);
-  counts_[0] += popcount((const uint64_t*) sieve_.data(), size);
 }
 
 void CountPrintPrimes::countkTuplets()
@@ -173,11 +166,11 @@ void CountPrintPrimes::countkTuplets()
   {
     if (ps_.isCount(i))
     {
-      ASSERT(sieve_.capacity() % 4 == 0);
-      auto* sieve = sieve_.data();
+      const uint8_t* sieve = (const uint8_t*) sieve_.data();
+      std::size_t sieveBytes = sieve_.size() * sizeof(uint64_t);
       uint64_t sum = 0;
 
-      for (std::size_t j = 0; j < sieve_.size(); j += 4)
+      for (std::size_t j = 0; j < sieveBytes; j += 4)
       {
         sum += kCounts_[i][sieve[j+0]];
         sum += kCounts_[i][sieve[j+1]];
@@ -199,12 +192,12 @@ void CountPrintPrimes::printPrimes()
   while (i < sieve_.size())
   {
     charBuffer_.clear();
-    std::size_t size = i + (1 << 16);
+    std::size_t size = i + (1 << 13);
     size = std::min(size, sieve_.size());
 
-    for (; i < size; i += 8)
+    for (; i < size; i++)
     {
-      uint64_t bits = littleendian_cast<uint64_t>(&sieve_[i]);
+      uint64_t bits = to_littleendian(sieve_[i]);
 
       for (; bits != 0; bits &= bits - 1)
       {
@@ -227,15 +220,17 @@ void CountPrintPrimes::printkTuplets()
   unsigned i = 1;
   uint64_t low = low_;
   charBuffer_.clear();
+  const uint8_t* sieve = (const uint8_t*) sieve_.data();
+  std::size_t sieveBytes = sieve_.size() * sizeof(uint64_t);
 
   while (!ps_.isPrint(i))
     i++;
 
-  for (std::size_t j = 0; j < sieve_.size(); j++, low += 30)
+  for (std::size_t j = 0; j < sieveBytes; j++, low += 30)
   {
-    for (auto* bitmask = bitmasks[i]; *bitmask <= sieve_[j]; bitmask++)
+    for (auto* bitmask = bitmasks[i]; *bitmask <= sieve[j]; bitmask++)
     {
-      if ((sieve_[j] & *bitmask) == *bitmask)
+      if ((sieve[j] & *bitmask) == *bitmask)
       {
         charBuffer_.push_back('(');
         uint64_t bits = *bitmask;

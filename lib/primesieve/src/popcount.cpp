@@ -2,14 +2,15 @@
 /// @file   popcount.cpp
 /// @brief  Quickly count the number of 1 bits in an array.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <primesieve/popcnt.hpp>
 #include <primesieve/forward.hpp>
+#include <primesieve/popcnt.hpp>
+#include <primesieve/Vector.hpp>
 
 #include <stdint.h>
 
@@ -25,18 +26,20 @@
 
 namespace primesieve {
 
-uint64_t popcount(const uint64_t* array, uint64_t size)
+uint64_t popcount(const Vector<uint64_t>& vect)
 {
-  uint64_t i;
+  const uint64_t* array = vect.data();
+  uint64_t size = vect.size();
   uint64_t limit = size - size % 4;
   uint64_t cnt = 0;
+  uint64_t i;
 
   for(i = 0; i < limit; i += 4)
   {
-    cnt += popcnt64(array[i+0]);
-    cnt += popcnt64(array[i+1]);
-    cnt += popcnt64(array[i+2]);
-    cnt += popcnt64(array[i+3]);
+    cnt += popcnt64(array[i + 0]);
+    cnt += popcnt64(array[i + 1]);
+    cnt += popcnt64(array[i + 2]);
+    cnt += popcnt64(array[i + 3]);
   }
   for(; i < size; i++)
     cnt += popcnt64(array[i]);
@@ -80,28 +83,30 @@ namespace primesieve {
 /// This implementation uses only 5.69 instructions per 64-bit word.
 /// @see Chapter 5 in "Hacker's Delight" 2nd edition.
 ///
-uint64_t popcount(const uint64_t* array, uint64_t size)
+uint64_t popcount(const Vector<uint64_t>& vect)
 {
+  const uint64_t* array = vect.data();
+  uint64_t size = vect.size();
+  uint64_t limit = size - size % 16;
   uint64_t total = 0;
   uint64_t ones = 0, twos = 0, fours = 0, eights = 0, sixteens = 0;
   uint64_t twosA, twosB, foursA, foursB, eightsA, eightsB;
-  uint64_t limit = size - size % 16;
-  uint64_t i = 0;
+  uint64_t i;
 
-  for(; i < limit; i += 16)
+  for(i = 0; i < limit; i += 16)
   {
-    CSA(twosA, ones, ones, array[i+0], array[i+1]);
-    CSA(twosB, ones, ones, array[i+2], array[i+3]);
+    CSA(twosA, ones, ones, array[i + 0], array[i + 1]);
+    CSA(twosB, ones, ones, array[i + 2], array[i + 3]);
     CSA(foursA, twos, twos, twosA, twosB);
-    CSA(twosA, ones, ones, array[i+4], array[i+5]);
-    CSA(twosB, ones, ones, array[i+6], array[i+7]);
+    CSA(twosA, ones, ones, array[i + 4], array[i + 5]);
+    CSA(twosB, ones, ones, array[i + 6], array[i + 7]);
     CSA(foursB, twos, twos, twosA, twosB);
     CSA(eightsA,fours, fours, foursA, foursB);
-    CSA(twosA, ones, ones, array[i+8], array[i+9]);
-    CSA(twosB, ones, ones, array[i+10], array[i+11]);
+    CSA(twosA, ones, ones, array[i + 8], array[i + 9]);
+    CSA(twosB, ones, ones, array[i + 10], array[i + 11]);
     CSA(foursA, twos, twos, twosA, twosB);
-    CSA(twosA, ones, ones, array[i+12], array[i+13]);
-    CSA(twosB, ones, ones, array[i+14], array[i+15]);
+    CSA(twosA, ones, ones, array[i + 12], array[i + 13]);
+    CSA(twosB, ones, ones, array[i + 14], array[i + 15]);
     CSA(foursB, twos, twos, twosA, twosB);
     CSA(eightsB, fours, fours, foursA, foursB);
     CSA(sixteens, eights, eights, eightsA, eightsB);
