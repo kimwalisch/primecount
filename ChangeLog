@@ -1,5 +1,6 @@
-Changes in primecount-8.6, 2026-05-20
+Changes in primecount-8.6, 2026-05-21
 
+* Update to libprimesieve 12.15.
 * Sieve_count_simd.hpp: Fix undefined behavior.
 * Sieve.hpp: Use Vector<uint64_t> sieve to fix undefined behavior.
 * Sieve.cpp: Changes due to new sieve vector type.
