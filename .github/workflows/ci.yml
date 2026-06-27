@@ -162,6 +162,89 @@ jobs:
       - name: primecount 1e14 --gourdon
         run: ./primecount 1e14 --gourdon
 
+  # AArch64 (arm64) Linux runners are free for public repositories and
+  # have CPUs with ARM SVE support, so this job actually runs our ARM
+  # SVE multiarch (runtime dispatch) code. Our ARM SVE runtime dispatch
+  # requires GCC >= 14, but Ubuntu 24.04 ships GCC 13 by default, hence
+  # we install GCC 14. Otherwise the ARM SVE code path would be disabled
+  # and only the default code path would be tested.
+  # Note: GitHub does not provide an "ubuntu-latest-arm" label yet, only
+  # versioned labels such as "ubuntu-24.04-arm". When this image is
+  # eventually deprecated the label below needs to be bumped.
+  linux_arm_gcc:
+    strategy:
+      matrix:
+        config: ['Debug', 'Release']
+    runs-on: ubuntu-24.04-arm
+    env:
+      CC: gcc-14
+      CXX: g++-14
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install GCC 14
+        run: |
+            sudo apt update
+            sudo apt install -y gcc-14 g++-14
+      - name: Build primecount
+        run: |
+            cmake . -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            grep "^OpenMP:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            cmake --build . --parallel --verbose
+      - name: CTest (unit tests)
+        run: ctest -j2 --output-on-failure
+      - name: primecount --test
+        run: ./primecount --test
+      - name: primecount 1e11 --legendre
+        run: ./primecount 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: ./primecount 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: ./primecount 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: ./primecount 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: ./primecount 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: ./primecount 1e14 --gourdon
+
+  # Same as linux_arm_gcc, but using the Clang compiler. We install
+  # Clang 19 (matching the linux_clang job); it supports our ARM SVE
+  # runtime dispatch code.
+  linux_arm_clang:
+    strategy:
+      matrix:
+        config: ['Debug', 'Release']
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install clang-19 libomp-19-dev
+      - name: Build primecount
+        run: |
+            CXX=clang++-19 CC=clang-19 cmake . -DBUILD_TESTS=ON -DBUILD_CODEGEN_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            grep "^OpenMP.*:INTERNAL=1$" CMakeCache.txt
+            grep "^int128.*:INTERNAL=1$" CMakeCache.txt
+            cmake --build . --parallel --verbose
+      - name: CTest (unit tests)
+        run: ctest -j2 --output-on-failure
+      - name: primecount --test
+        run: ./primecount --test
+      - name: primecount 1e11 --legendre
+        run: ./primecount 1e11 --legendre
+      - name: primecount 1e12 --meissel
+        run: ./primecount 1e12 --meissel
+      - name: primecount 1e11 --lehmer
+        run: ./primecount 1e11 --lehmer
+      - name: primecount 1e12 --lmo
+        run: ./primecount 1e12 --lmo
+      - name: primecount 1e13 --deleglise-rivat
+        run: ./primecount 1e13 --deleglise-rivat
+      - name: primecount 1e14 --gourdon
+        run: ./primecount 1e14 --gourdon
+
   linux_gcc_mpopcnt:
     strategy:
       matrix:
