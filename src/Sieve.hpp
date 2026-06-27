@@ -98,13 +98,13 @@ public:
 
   /// Count 1 bits inside [0, stop]
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("arch=armv8-a+sve")))
+    __attribute__ ((target ("+sve")))
   #endif
   uint64_t count_arm_sve(uint64_t stop);
 
   /// Count 1 bits inside [start, stop]
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    __attribute__ ((target ("arch=armv8-a+sve")))
+    __attribute__ ((target ("+sve")))
   #endif
   uint64_t count_arm_sve(uint64_t start, uint64_t stop) const;
 

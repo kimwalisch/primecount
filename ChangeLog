@@ -1,4 +1,4 @@
-Changes in primecount-8.6, 2026-05-21
+Changes in primecount-8.6, 2026-06-27
 
 * Update to libprimesieve 12.15.
 * Sieve_count_simd.hpp: Fix undefined behavior.
@@ -6,6 +6,12 @@ Changes in primecount-8.6, 2026-05-21
 * Sieve.cpp: Changes due to new sieve vector type.
 * Sieve_pre_sieve.hpp: Changes due to new sieve vector type.
 * Sieve_arrays.hpp: Changes due to new sieve vector type.
+* Sieve.hpp, Sieve_count_start_stop.hpp, Sieve_count_stop.hpp,
+  gourdon/D_arm_sve.hpp: Use __attribute__((target("+sve"))) instead of
+  target("arch=armv8-a+sve") for the ARM SVE multiarch runtime dispatch.
+  The latter reset the CPU architecture baseline to armv8-a.
+* multiarch_arm_sve.cmake: Update the ARM SVE compiler support check
+  to match.
 
 Changes in primecount-8.5, 2026-05-10
 

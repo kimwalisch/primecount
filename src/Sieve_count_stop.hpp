@@ -133,7 +133,7 @@ ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
 
 /// Count 1 bits inside [0, stop]
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("arch=armv8-a+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE uint64_t Sieve::count_arm_sve(uint64_t stop)
 {

@@ -43,8 +43,8 @@ namespace {
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 
-/// svcntd() requires -march=armv8-a+sve compiler flag
-__attribute__ ((target ("arch=armv8-a+sve")))
+/// svcntd() requires ARM SVE compiler flag
+__attribute__ ((target ("+sve")))
 uint64_t get_svcntd()
 {
   return svcntd();
@@ -141,7 +141,7 @@ uint64_t Sieve::count_avx512(uint64_t start, uint64_t stop) const
 /// by linearly iterating over the sieve array.
 ///
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("arch=armv8-a+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 uint64_t Sieve::count_arm_sve(uint64_t start, uint64_t stop) const
 {

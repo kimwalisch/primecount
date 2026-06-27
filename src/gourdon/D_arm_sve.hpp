@@ -31,7 +31,7 @@ namespace {
 using namespace primecount;
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("arch=armv8-a+sve")))
+__attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -40,7 +40,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("arch=armv8-a+sve")))
+__attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -49,7 +49,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("arch=armv8-a+sve")))
+__attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -58,7 +58,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("arch=armv8-a+sve")))
+__attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -68,7 +68,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 
 template <typename T, typename Primes, typename FactorTableD>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("arch=armv8-a+sve")))
+__attribute__ ((target ("+sve")))
 #endif
 T D_thread_arm_sve(T x,
                    int64_t x_star,

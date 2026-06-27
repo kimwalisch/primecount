@@ -26,9 +26,9 @@ check_cxx_source_compiles("
     class Sieve {
     public:
         uint64_t count_default(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"arch=armv8-a+sve\")))
+        __attribute__ ((target (\"+sve\")))
         uint64_t count_arm_sve(uint64_t* array, uint64_t stop_idx);
-        __attribute__ ((target (\"arch=armv8-a+sve\")))
+        __attribute__ ((target (\"+sve\")))
         uint64_t filter_arm_sve(uint64_t* array, uint64_t stop_idx);
     };
 
@@ -40,7 +40,7 @@ check_cxx_source_compiles("
         return res;
     }
 
-    __attribute__ ((target (\"arch=armv8-a+sve\")))
+    __attribute__ ((target (\"+sve\")))
     uint64_t Sieve::count_arm_sve(uint64_t* array, uint64_t stop_idx)
     {
         svuint64_t vec = svinsr_n_u64(svdup_u64(array[0]), array[1]);
@@ -61,7 +61,7 @@ check_cxx_source_compiles("
         return svaddv_u64(svptrue_b64(), vcnt);
     }
 
-    __attribute__ ((target (\"arch=armv8-a+sve\")))
+    __attribute__ ((target (\"+sve\")))
     uint64_t Sieve::filter_arm_sve(uint64_t* array, uint64_t stop_idx)
     {
         uint64_t filtered[32] = {};
