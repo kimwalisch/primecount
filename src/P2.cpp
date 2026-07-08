@@ -12,7 +12,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006,
 ///        pp. 759-768.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -110,7 +110,7 @@ T P2_OpenMP(T x,
   static_assert(pstd::is_signed<T>::value, "T must be signed integer type");
 
   int64_t xy = (int64_t)(x / max(y, 1));
-  LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
+  INDETERMINATE LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
   threads = loadBalancer.get_threads();
 
   // for (low = sqrt(x); low < x / y; low += dist)

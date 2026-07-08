@@ -160,9 +160,9 @@ T D_thread_avx512(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_time = get_time();
 
-  Array<uint32_t, 128> m_indexes32;
-  Array< int64_t, 128> m_indexes64;
-  Array< int64_t, 128> xpm_cache;
+  INDETERMINATE Array<uint32_t, 128> m_indexes32;
+  INDETERMINATE Array< int64_t, 128> m_indexes64;
+  INDETERMINATE Array< int64_t, 128> xpm_cache;
   const auto* factor_table = factor.data();
 
   __m512i reverse32 = _mm512_setr_epi32(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);

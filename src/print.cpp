@@ -55,7 +55,7 @@ std::string to_string(double x, int precision)
 
   // The double value 1e16-1 with the maximum
   // precision 10 requires 27 characters.
-  Array<char, 32> buffer;
+  INDETERMINATE Array<char, 32> buffer;
 
   std::to_chars_result res = std::to_chars(
     buffer.data(),

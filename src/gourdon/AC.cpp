@@ -30,6 +30,7 @@
 
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
+#include <macros.hpp>
 #include <fast_div.hpp>
 #include <generate_primes.hpp>
 #include <gourdon.hpp>
@@ -323,7 +324,7 @@ T AC_OpenMP(T x,
   int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
+  INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than
@@ -866,7 +867,7 @@ T AC_OpenMP(T x,
   int max_threads = (int) std::pow(xz, 1 / 3.7);
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
-  LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
+  INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
