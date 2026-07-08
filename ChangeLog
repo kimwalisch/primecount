@@ -1,6 +1,7 @@
-Changes in primecount-8.6, 2026-06-27
+Changes in primecount-8.6, 2026-07-08
 
 * Update to libprimesieve 12.15.
+* macros.hpp: Add INDETERMINATE macro to prevent memset zero initialization of large stack arrays.
 * Sieve_count_simd.hpp: Fix undefined behavior.
 * Sieve.hpp: Use Vector<uint64_t> sieve to fix undefined behavior.
 * Sieve.cpp: Changes due to new sieve vector type.

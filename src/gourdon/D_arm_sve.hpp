@@ -100,9 +100,9 @@ T D_thread_arm_sve(T x,
   Sieve sieve(low, segment_size, max_b);
   thread.init_time = get_time();
 
-  Array<uint32_t, 128> m_indexes32;
-  Array< int64_t, 128> m_indexes64;
-  Array< int64_t, 128> xpm_cache;
+  INDETERMINATE Array<uint32_t, 128> m_indexes32;
+  INDETERMINATE Array< int64_t, 128> m_indexes64;
+  INDETERMINATE Array< int64_t, 128> xpm_cache;
   const auto* factor_table = factor.data();
 
   // Segmented sieve of Eratosthenes

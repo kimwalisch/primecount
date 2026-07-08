@@ -10,7 +10,7 @@
 ///        B(x, y) formula:
 ///        \sum_{i=pi[y]+1}^{pi[x^(1/2)]} pi(x / primes[i])
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -95,7 +95,7 @@ T B_OpenMP(T x,
 
   T sum = 0;
   int64_t xy = (int64_t)(x / max(y, 1));
-  LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
+  INDETERMINATE LoadBalancerP2 loadBalancer(x, xy, threads, is_print);
   threads = loadBalancer.get_threads();
 
   // for (low = sqrt(x); low < x / y; low += dist)

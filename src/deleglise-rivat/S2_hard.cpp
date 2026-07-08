@@ -25,6 +25,7 @@
 ///
 
 #include <primecount-internal.hpp>
+#include <macros.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
 #include <Sieve.hpp>
@@ -195,7 +196,7 @@ T S2_hard_OpenMP(T x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
 
-  LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
+  INDETERMINATE LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
   int64_t max_prime = min(y, z / isqrt(y));
   PiTable pi(max_prime, threads);
 
