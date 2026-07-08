@@ -13,13 +13,17 @@ option(BUILD_MANPAGE     "Regenerate man page using a2x" OFF)
 option(BUILD_EXAMPLES    "Build example programs"        OFF)
 option(BUILD_TESTS       "Build test programs"           OFF)
 
-# By default we enable building the shared libprimesieve library.
-# However, the Emscripten WebAssembly compiler does not
-# support shared libraries, hence we disable building the
-# shared libprimesieve when using Emscripten.
+# By default we enable building the shared libprimesieve library, but
+# not when using Emscripten. Emscripten nowadays builds shared
+# libraries as WebAssembly side modules (and reports
+# TARGET_SUPPORTS_SHARED_LIBS=TRUE), but linking the primesieve binary
+# against such a side module requires Emscripten's dynamic linking
+# (-sMAIN_MODULE and -fPIC). For a self-contained WebAssembly binary we
+# want static linking, which is also what Emscripten recommends for
+# best performance.
 get_property(SHARED_LIBS_SUPPORTED GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
 
-if(SHARED_LIBS_SUPPORTED)
+if(SHARED_LIBS_SUPPORTED AND NOT EMSCRIPTEN)
     option(BUILD_SHARED_LIBS "Build shared libprimesieve" ON)
 else()
     option(BUILD_SHARED_LIBS "Build shared libprimesieve" OFF)

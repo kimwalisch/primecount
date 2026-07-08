@@ -125,6 +125,80 @@ jobs:
       - name: primesieve 1e10 -d1e8 -p6 | md5sum
         run: if [ "$(./primesieve 1e10 -d1e8 -p6 | md5sum | cut -f1 -d' ')" != "5a0bc83fdef0bb116d60f356adfde52f" ]; then exit 1; fi
 
+  # AArch64 (arm64) Linux runners are free for public repositories and
+  # have CPUs with ARM SVE support, so this job actually runs our ARM
+  # SVE multiarch (runtime dispatch) code. Our ARM SVE runtime dispatch
+  # requires GCC >= 14, but Ubuntu 24.04 ships GCC 13 by default, hence
+  # we install GCC 14. Otherwise the ARM SVE code path would be disabled
+  # and only the default code path would be tested.
+  # Note: GitHub does not provide an "ubuntu-latest-arm" label yet, only
+  # versioned labels such as "ubuntu-24.04-arm". When this image is
+  # eventually deprecated the label below needs to be bumped.
+  linux_arm_gcc:
+    strategy:
+      matrix:
+        config: ['Debug', 'Release']
+    runs-on: ubuntu-24.04-arm
+    env:
+      CC: gcc-14
+      CXX: g++-14
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install GCC 14
+        run: |
+            sudo apt update
+            sudo apt install -y gcc-14 g++-14
+      - name: Build primesieve
+        run: |
+            cmake . -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake --build . --parallel --verbose
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primesieve --test
+        run: ./primesieve --test
+      - name: primesieve --cpu-info
+        run: ./primesieve --cpu-info
+      - name: primesieve 1e10
+        run: ./primesieve 1e10
+      - name: primesieve 1e9 --nth-prime
+        run: ./primesieve 1e9 --nth-prime
+      - name: primesieve --dist=1e9 --size=32 --print=6
+        run: ./primesieve 1e13 --dist=1e9 --size=32 --print=6
+
+  # Same as linux_arm_gcc, but using the Clang compiler. Ubuntu 24.04
+  # ships Clang 18 which supports our ARM SVE runtime dispatch code, so
+  # no extra compiler installation is needed.
+  linux_arm_clang:
+    strategy:
+      matrix:
+        config: ['Debug', 'Release']
+    runs-on: ubuntu-24.04-arm
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        run: |
+            sudo apt update
+            sudo apt install libomp-dev
+      - name: Build primesieve
+        run: |
+            cmake . -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${{matrix.config}} -DCMAKE_C_FLAGS="-Wall -Wextra -pedantic -Werror" -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -Werror"
+            cmake --build . --parallel --verbose
+      - name: CTest (unit tests)
+        run: ctest -j2
+      - name: primesieve --test
+        run: ./primesieve --test
+      - name: primesieve --cpu-info
+        run: ./primesieve --cpu-info
+      - name: primesieve 1e10
+        run: ./primesieve 1e10
+      - name: primesieve 1e9 --nth-prime
+        run: ./primesieve 1e9 --nth-prime
+      - name: primesieve --dist=1e9 --size=32 --print=6
+        run: ./primesieve 1e13 --dist=1e9 --size=32 --print=6
+
   linux_emscripten:
     strategy:
       matrix:

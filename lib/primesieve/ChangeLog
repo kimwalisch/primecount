@@ -1,11 +1,21 @@
-Changes in version 12.15, 17/05/2026
+Changes in version 12.15, 27/06/2026
 ====================================
 
+* macros.hpp: Add INDETERMINATE macro to prevent memset zero initialization of large stack arrays.
 * nthPrime.cpp: Fix undefined behavior.
 * util.hpp: Fix undefined behavior in littleendian_cast<T>().
 * PrimeGenerator_x86_avx512.hpp: Fix undefined behavior.
 * CountPrintPrimes.cpp: Fix undefined behavior.
 * popcount.hpp: Fix undefined behavior.
+* PreSieve_arm_sve.hpp: Use __attribute__((target("+sve"))) instead of
+  target("arch=armv8-a+sve") for the ARM SVE multiarch runtime dispatch.
+  The latter reset the CPU architecture baseline to armv8-a.
+* multiarch_sve_arm.cmake: Update the ARM SVE compiler support check
+  to match.
+* CMakeLists.txt: Disable building the shared libprimesieve on
+  Emscripten (WebAssembly) so that the primesieve binary is linked
+  statically. Emscripten now builds shared libraries as side modules,
+  which broke static linking of the binary and the WebAssembly CI build.
 
 Changes in version 12.14, 08/05/2026
 ====================================

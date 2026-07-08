@@ -1,7 +1,7 @@
 ///
 /// @file PreSieve_arm_sve.hpp
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 /// Copyright (C) 2022 @zielaj, https://github.com/zielaj
 ///
 /// This file is distributed under the BSD License. See the COPYING
@@ -18,7 +18,7 @@
 namespace {
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("arch=armv8-a+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 void presieve1_arm_sve(const uint8_t* __restrict preSieved0,
                        const uint8_t* __restrict preSieved1,
@@ -39,7 +39,7 @@ void presieve1_arm_sve(const uint8_t* __restrict preSieved0,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("arch=armv8-a+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 void presieve2_arm_sve(const uint8_t* __restrict preSieved0,
                        const uint8_t* __restrict preSieved1,
