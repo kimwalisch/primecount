@@ -52,11 +52,6 @@ const primecount::Array<uint8_t, 30> wheel_offsets =
   0, 0,     0, 0, 0, 8 * 7
 };
 
-/// Modulo 30 prime residues
-const primecount::Array<uint8_t, 30> mod30_prime_residues = {
-  1, 7, 11, 13, 17, 19, 23, 29
-};
-
 /// Modulo 30 wheel correction values
 const uint8_t wheel_corr[8][8] =
 {
