@@ -26,18 +26,20 @@
 
 #include "CpuInfo.hpp"
 #include <primesieve/macros.hpp>
+#include <primesieve/Vector.hpp>
 
 #include <algorithm>
 #include <stdint.h>
 #include <cstddef>
 #include <exception>
 #include <string>
-#include <vector>
 
 #if defined(__APPLE__) && \
     __has_include(<sys/sysctl.h>)
   #define APPLE_SYSCTL
 #endif
+
+using primesieve::Vector;
 
 #if defined(_WIN32)
 
@@ -65,7 +67,7 @@ std::string getCpuName()
 
   int cpuInfo[4] = { 0, 0, 0, 0 };
   __cpuidex(cpuInfo, 0x80000000, 0);
-  std::vector<int> vect;
+  Vector<int> vect;
 
   // check if CPU name is supported
   if ((unsigned) cpuInfo[0] >= 0x80000004u)
@@ -129,9 +131,9 @@ void CpuInfo::init()
   if (!bytes)
     return;
 
-  std::vector<char> buffer(bytes);
+  Vector<char> buffer(bytes);
 
-  if (!glpiex(RelationCache, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer[0], &bytes))
+  if (!glpiex(RelationCache, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) buffer.data(), &bytes))
     return;
 
   struct CpuCoreCacheInfo
@@ -161,7 +163,7 @@ void CpuInfo::init()
   // sizes and cache sharing of each CPU core.
   for (std::size_t i = 0; i < bytes; i += info->Size)
   {
-    info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer[i];
+    info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) &buffer.at(i);
 
     if (info->Relationship == RelationCache &&
         info->Cache.Level >= 1 &&
@@ -273,9 +275,9 @@ void CpuInfo::init()
 
   std::size_t threadsPerCore = 0;
   std::size_t size = bytes / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
-  std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> info(size);
+  Vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> info(size);
 
-  if (!glpi(&info[0], &bytes))
+  if (!glpi(info.data(), &bytes))
     return;
 
   for (std::size_t i = 0; i < size; i++)
@@ -347,20 +349,20 @@ namespace {
 /// https://www.freebsd.org/cgi/man.cgi?sysctl(3)
 ///
 template <typename T>
-std::vector<T> getSysctl(const std::string& name)
+Vector<T> getSysctl(const std::string& name)
 {
-  std::vector<T> res;
+  Vector<T> buffer;
   std::size_t bytes = 0;
 
   if (!sysctlbyname(name.data(), 0, &bytes, 0, 0))
   {
     std::size_t size = ceilDiv(bytes, sizeof(T));
-    std::vector<T> buffer(size, 0);
-    if (!sysctlbyname(name.data(), buffer.data(), &bytes, 0, 0))
-      res = buffer;
+    buffer.resize(size);
+    if (sysctlbyname(name.data(), buffer.data(), &bytes, 0, 0))
+      buffer.clear();
   }
 
-  return res;
+  return buffer;
 }
 
 std::string getCpuName()
@@ -544,11 +546,11 @@ std::string getCpuName()
   return notFound;
 }
 
-std::vector<std::string> split(const std::string& str,
+Vector<std::string> split(const std::string& str,
                                char delimiter)
 {
   std::string token;
-  std::vector<std::string> tokens;
+  Vector<std::string> tokens;
   std::istringstream tokenStream(str);
 
   while (std::getline(tokenStream, token, delimiter))
@@ -639,7 +641,7 @@ void CpuInfo::init()
   using CacheSize_t = std::size_t;
   // Items must be sorted in ascending order
   std::map<CacheSize_t, std::size_t> l1CacheSizes;
-  std::vector<std::size_t> cpuIds;
+  Vector<std::size_t> cpuIds;
   cpuIds.reserve(3);
 
   // Based on my tests, for hybrid CPUs the Linux kernel always lists

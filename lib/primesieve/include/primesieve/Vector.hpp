@@ -17,6 +17,7 @@
 #include <memory>
 #include <stdint.h>
 #include <type_traits>
+#include <stdexcept>
 #include <utility>
 
 namespace primesieve {
@@ -187,6 +188,20 @@ public:
   const T& operator[](std::size_t pos) const noexcept
   {
     ASSERT(pos < size());
+    return begin_[pos];
+  }
+
+  T& at(std::size_t pos)
+  {
+    if_unlikely(pos >= size())
+      throw std::out_of_range("Vector: pos >= size() detected!");
+    return begin_[pos];
+  }
+
+  const T& at(std::size_t pos) const
+  {
+    if_unlikely(pos >= size())
+      throw std::out_of_range("Vector: pos >= size() detected!");
     return begin_[pos];
   }
 
