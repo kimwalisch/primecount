@@ -538,10 +538,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     uint64_t bucket_count = 0;
 
     #define CHECK_FINISHED(w) \
-      if_unlikely(m >= sieve_bytes) \
+      if (m >= sieve_bytes) \
       { \
         primeState.wheel_index = w; \
-        goto finished; \
+        goto finished1; \
       }
 
     #define UNSET_BIT(i) \
@@ -664,7 +664,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     #undef UNSET_BIT
     #undef CHECK_FINISHED
 
-    finished:;
+    finished1:;
 
     primeState.multiple = uint32_t(m - sieve_bytes);
     counter[cur_bucket] -= uint32_t(bucket_count);
@@ -675,12 +675,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   else
   {
     #define CHECK_FINISHED(w) \
-      if_unlikely(m >= sieve_bytes) \
+      if (m >= sieve_bytes) \
       { \
         primeState.wheel_index = w; \
-        primeState.multiple = uint32_t(m - sieve_bytes); \
-        total_count_ -= count; \
-        return; \
+        goto finished2; \
       }
 
     #define UNSET_BIT(i) \
@@ -793,6 +791,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
       default: UNREACHABLE;
     }
+
+    finished2:;
+
+    uint32_t m32 = uint32_t(m - sieve_bytes);
+    primeState.multiple = m32;
+    total_count_ -= count;
   }
 }
 
