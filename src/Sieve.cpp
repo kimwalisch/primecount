@@ -539,10 +539,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     #define CHECK_FINISHED(w) \
       if (m >= sieve_bytes) \
-      { \
-        primeState.wheel_index = w; \
-        goto finished1; \
-      }
+        goto finished1_ ## w;
 
     #define UNSET_BIT(i) \
       { \
@@ -664,6 +661,78 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     #undef UNSET_BIT
     #undef CHECK_FINISHED
 
+    finished1_0:;  primeState.wheel_index = 0;  goto finished1;
+    finished1_1:;  primeState.wheel_index = 1;  goto finished1;
+    finished1_2:;  primeState.wheel_index = 2;  goto finished1;
+    finished1_3:;  primeState.wheel_index = 3;  goto finished1;
+    finished1_4:;  primeState.wheel_index = 4;  goto finished1;
+    finished1_5:;  primeState.wheel_index = 5;  goto finished1;
+    finished1_6:;  primeState.wheel_index = 6;  goto finished1;
+    finished1_7:;  primeState.wheel_index = 7;  goto finished1;
+
+    finished1_8:;  primeState.wheel_index = 8;  goto finished1;
+    finished1_9:;  primeState.wheel_index = 9;  goto finished1;
+    finished1_10:; primeState.wheel_index = 10; goto finished1;
+    finished1_11:; primeState.wheel_index = 11; goto finished1;
+    finished1_12:; primeState.wheel_index = 12; goto finished1;
+    finished1_13:; primeState.wheel_index = 13; goto finished1;
+    finished1_14:; primeState.wheel_index = 14; goto finished1;
+    finished1_15:; primeState.wheel_index = 15; goto finished1;
+
+    finished1_16:; primeState.wheel_index = 16; goto finished1;
+    finished1_17:; primeState.wheel_index = 17; goto finished1;
+    finished1_18:; primeState.wheel_index = 18; goto finished1;
+    finished1_19:; primeState.wheel_index = 19; goto finished1;
+    finished1_20:; primeState.wheel_index = 20; goto finished1;
+    finished1_21:; primeState.wheel_index = 21; goto finished1;
+    finished1_22:; primeState.wheel_index = 22; goto finished1;
+    finished1_23:; primeState.wheel_index = 23; goto finished1;
+
+    finished1_24:; primeState.wheel_index = 24; goto finished1;
+    finished1_25:; primeState.wheel_index = 25; goto finished1;
+    finished1_26:; primeState.wheel_index = 26; goto finished1;
+    finished1_27:; primeState.wheel_index = 27; goto finished1;
+    finished1_28:; primeState.wheel_index = 28; goto finished1;
+    finished1_29:; primeState.wheel_index = 29; goto finished1;
+    finished1_30:; primeState.wheel_index = 30; goto finished1;
+    finished1_31:; primeState.wheel_index = 31; goto finished1;
+
+    finished1_32:; primeState.wheel_index = 32; goto finished1;
+    finished1_33:; primeState.wheel_index = 33; goto finished1;
+    finished1_34:; primeState.wheel_index = 34; goto finished1;
+    finished1_35:; primeState.wheel_index = 35; goto finished1;
+    finished1_36:; primeState.wheel_index = 36; goto finished1;
+    finished1_37:; primeState.wheel_index = 37; goto finished1;
+    finished1_38:; primeState.wheel_index = 38; goto finished1;
+    finished1_39:; primeState.wheel_index = 39; goto finished1;
+
+    finished1_40:; primeState.wheel_index = 40; goto finished1;
+    finished1_41:; primeState.wheel_index = 41; goto finished1;
+    finished1_42:; primeState.wheel_index = 42; goto finished1;
+    finished1_43:; primeState.wheel_index = 43; goto finished1;
+    finished1_44:; primeState.wheel_index = 44; goto finished1;
+    finished1_45:; primeState.wheel_index = 45; goto finished1;
+    finished1_46:; primeState.wheel_index = 46; goto finished1;
+    finished1_47:; primeState.wheel_index = 47; goto finished1;
+
+    finished1_48:; primeState.wheel_index = 48; goto finished1;
+    finished1_49:; primeState.wheel_index = 49; goto finished1;
+    finished1_50:; primeState.wheel_index = 50; goto finished1;
+    finished1_51:; primeState.wheel_index = 51; goto finished1;
+    finished1_52:; primeState.wheel_index = 52; goto finished1;
+    finished1_53:; primeState.wheel_index = 53; goto finished1;
+    finished1_54:; primeState.wheel_index = 54; goto finished1;
+    finished1_55:; primeState.wheel_index = 55; goto finished1;
+
+    finished1_56:; primeState.wheel_index = 56; goto finished1;
+    finished1_57:; primeState.wheel_index = 57; goto finished1;
+    finished1_58:; primeState.wheel_index = 58; goto finished1;
+    finished1_59:; primeState.wheel_index = 59; goto finished1;
+    finished1_60:; primeState.wheel_index = 60; goto finished1;
+    finished1_61:; primeState.wheel_index = 61; goto finished1;
+    finished1_62:; primeState.wheel_index = 62; goto finished1;
+    finished1_63:; primeState.wheel_index = 63; goto finished1;
+
     finished1:;
 
     primeState.multiple = uint32_t(m - sieve_bytes);
@@ -676,10 +745,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   {
     #define CHECK_FINISHED(w) \
       if (m >= sieve_bytes) \
-      { \
-        primeState.wheel_index = w; \
-        goto finished2; \
-      }
+        goto finished2_ ## w;
 
     #define UNSET_BIT(i) \
       { \
@@ -791,6 +857,78 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
       default: UNREACHABLE;
     }
+
+    finished2_0:;  primeState.wheel_index = 0;  goto finished2;
+    finished2_1:;  primeState.wheel_index = 1;  goto finished2;
+    finished2_2:;  primeState.wheel_index = 2;  goto finished2;
+    finished2_3:;  primeState.wheel_index = 3;  goto finished2;
+    finished2_4:;  primeState.wheel_index = 4;  goto finished2;
+    finished2_5:;  primeState.wheel_index = 5;  goto finished2;
+    finished2_6:;  primeState.wheel_index = 6;  goto finished2;
+    finished2_7:;  primeState.wheel_index = 7;  goto finished2;
+
+    finished2_8:;  primeState.wheel_index = 8;  goto finished2;
+    finished2_9:;  primeState.wheel_index = 9;  goto finished2;
+    finished2_10:; primeState.wheel_index = 10; goto finished2;
+    finished2_11:; primeState.wheel_index = 11; goto finished2;
+    finished2_12:; primeState.wheel_index = 12; goto finished2;
+    finished2_13:; primeState.wheel_index = 13; goto finished2;
+    finished2_14:; primeState.wheel_index = 14; goto finished2;
+    finished2_15:; primeState.wheel_index = 15; goto finished2;
+
+    finished2_16:; primeState.wheel_index = 16; goto finished2;
+    finished2_17:; primeState.wheel_index = 17; goto finished2;
+    finished2_18:; primeState.wheel_index = 18; goto finished2;
+    finished2_19:; primeState.wheel_index = 19; goto finished2;
+    finished2_20:; primeState.wheel_index = 20; goto finished2;
+    finished2_21:; primeState.wheel_index = 21; goto finished2;
+    finished2_22:; primeState.wheel_index = 22; goto finished2;
+    finished2_23:; primeState.wheel_index = 23; goto finished2;
+
+    finished2_24:; primeState.wheel_index = 24; goto finished2;
+    finished2_25:; primeState.wheel_index = 25; goto finished2;
+    finished2_26:; primeState.wheel_index = 26; goto finished2;
+    finished2_27:; primeState.wheel_index = 27; goto finished2;
+    finished2_28:; primeState.wheel_index = 28; goto finished2;
+    finished2_29:; primeState.wheel_index = 29; goto finished2;
+    finished2_30:; primeState.wheel_index = 30; goto finished2;
+    finished2_31:; primeState.wheel_index = 31; goto finished2;
+
+    finished2_32:; primeState.wheel_index = 32; goto finished2;
+    finished2_33:; primeState.wheel_index = 33; goto finished2;
+    finished2_34:; primeState.wheel_index = 34; goto finished2;
+    finished2_35:; primeState.wheel_index = 35; goto finished2;
+    finished2_36:; primeState.wheel_index = 36; goto finished2;
+    finished2_37:; primeState.wheel_index = 37; goto finished2;
+    finished2_38:; primeState.wheel_index = 38; goto finished2;
+    finished2_39:; primeState.wheel_index = 39; goto finished2;
+
+    finished2_40:; primeState.wheel_index = 40; goto finished2;
+    finished2_41:; primeState.wheel_index = 41; goto finished2;
+    finished2_42:; primeState.wheel_index = 42; goto finished2;
+    finished2_43:; primeState.wheel_index = 43; goto finished2;
+    finished2_44:; primeState.wheel_index = 44; goto finished2;
+    finished2_45:; primeState.wheel_index = 45; goto finished2;
+    finished2_46:; primeState.wheel_index = 46; goto finished2;
+    finished2_47:; primeState.wheel_index = 47; goto finished2;
+
+    finished2_48:; primeState.wheel_index = 48; goto finished2;
+    finished2_49:; primeState.wheel_index = 49; goto finished2;
+    finished2_50:; primeState.wheel_index = 50; goto finished2;
+    finished2_51:; primeState.wheel_index = 51; goto finished2;
+    finished2_52:; primeState.wheel_index = 52; goto finished2;
+    finished2_53:; primeState.wheel_index = 53; goto finished2;
+    finished2_54:; primeState.wheel_index = 54; goto finished2;
+    finished2_55:; primeState.wheel_index = 55; goto finished2;
+
+    finished2_56:; primeState.wheel_index = 56; goto finished2;
+    finished2_57:; primeState.wheel_index = 57; goto finished2;
+    finished2_58:; primeState.wheel_index = 58; goto finished2;
+    finished2_59:; primeState.wheel_index = 59; goto finished2;
+    finished2_60:; primeState.wheel_index = 60; goto finished2;
+    finished2_61:; primeState.wheel_index = 61; goto finished2;
+    finished2_62:; primeState.wheel_index = 62; goto finished2;
+    finished2_63:; primeState.wheel_index = 63; goto finished2;
 
     finished2:;
 
