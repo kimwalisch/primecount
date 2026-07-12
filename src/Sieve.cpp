@@ -168,7 +168,7 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 {
   reset_counter();
   total_count_ = 0;
-  many_hits_threshold_ = counter_.counter.size() * 8;
+  many_hits_threshold_ = counter_.counter.size() * 4;
   many_hits_per_bucket_ = true;
 
   uint64_t start = 0;
