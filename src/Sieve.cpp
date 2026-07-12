@@ -541,7 +541,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         std::size_t is_bit = (sieve_byte >> i) & 1; \
         sieve[m] &= ~(1 << i); \
         uint64_t bucket = m >> counter_log2_dist; \
-        if (bucket != cur_bucket) \
+        if (bucket > cur_bucket) \
         { \
           counter[cur_bucket] -= uint32_t(bucket_delta); \
           count += bucket_delta; \
