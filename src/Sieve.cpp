@@ -508,7 +508,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t wheel_index = primeState.wheel_index;
   uint64_t g = wheel_index / 8;
   uint64_t m = primeState.multiple;
-  uint64_t total_count = total_count_;
+  uint64_t count = 0;
   uint64_t counter_log2_dist = counter_.log2_dist;
   uint32_t* counter = &counter_[0];
   uint8_t* sieve = (uint8_t*) &sieve_[0];
@@ -527,12 +527,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   {
     uint64_t bucket_delta = 0;
     uint64_t cur_bucket = m >> counter_log2_dist;
-    uint64_t old_total_count = total_count;
 
     #define CHECK_FINISHED(w) \
       if_unlikely(m >= sieve_bytes) \
       { \
-        counter[cur_bucket] -= uint32_t(bucket_delta); \
         primeState.wheel_index = w; \
         goto finished; \
       }
@@ -546,7 +544,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         if (bucket != cur_bucket) \
         { \
           counter[cur_bucket] -= uint32_t(bucket_delta); \
-          total_count -= bucket_delta; \
+          count += bucket_delta; \
           bucket_delta = 0; \
           cur_bucket = bucket; \
         } \
@@ -659,10 +657,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     #undef CHECK_FINISHED
 
     finished:;
-    primeState.multiple = uint32_t(m - sieve_bytes); \
-    total_count -= bucket_delta; \
-    total_count_ = total_count; \
-    many_hits_per_bucket_ = (old_total_count - total_count) / 8 >= counter_.counter.size();
+
+    counter[cur_bucket] -= uint32_t(bucket_delta); \
+    primeState.multiple = uint32_t(m - sieve_bytes);
+    count += bucket_delta;
+    total_count_ -= count;
+    many_hits_per_bucket_ = count / 8 >= counter_.counter.size();
   }
   else
   {
@@ -671,7 +671,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       { \
         primeState.wheel_index = w; \
         primeState.multiple = uint32_t(m - sieve_bytes); \
-        total_count_ = total_count; \
+        total_count_ -= count; \
         return; \
       }
 
@@ -681,7 +681,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         std::size_t is_bit = (sieve_byte >> i) & 1; \
         sieve[m] &= ~(1 << i); \
         counter[m >> counter_log2_dist] -= uint32_t(is_bit); \
-        total_count -= uint64_t(is_bit); \
+        count += uint64_t(is_bit); \
       }
 
     ASSERT (wheel_index <= 63);
