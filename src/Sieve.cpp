@@ -660,9 +660,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     counter[cur_bucket] -= uint32_t(bucket_count);
     primeState.multiple = uint32_t(m - sieve_bytes);
-    many_hits_per_bucket_ = (count >= many_hits_threshold_);
     count += bucket_count;
     total_count_ -= count;
+    many_hits_per_bucket_ = (count >= many_hits_threshold_);
   }
   else
   {
