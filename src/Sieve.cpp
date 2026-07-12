@@ -168,8 +168,6 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 {
   reset_counter();
   total_count_ = 0;
-  many_hits_threshold_ = counter_.counter.size() * 2;
-  many_hits_per_bucket_ = true;
 
   uint64_t start = 0;
   uint64_t max_stop = (high - 1) - low;
@@ -518,6 +516,11 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     return;
   }
 
+  uint64_t count = 0;
+  uint32_t* counter = &counter_[0];
+  uint64_t counter_log2_dist = counter_.log2_dist;
+  bool is_small_prime = (prime <= (4ull << counter_log2_dist));
+
   prime /= 30;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
   uint64_t adv1 = prime * 4 + wheel_corr[g][1];
@@ -528,10 +531,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t adv6 = prime * 6 + wheel_corr[g][6];
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
 
-  uint64_t count = 0;
-  uint64_t counter_log2_dist = counter_.log2_dist;
-  uint32_t* counter = &counter_[0];
-
   // A small sieving prime hits the same counter array bucket
   // many times in a row. Decrementing counter[bucket] on each
   // hit is a read-modify-write to the same address, so on
@@ -540,7 +539,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   // alternative algorithm that avoids this by accumulating a
   // bucket's hits in a register, writing counter[bucket] back
   // only once per bucket.
-  if (many_hits_per_bucket_)
+  if (is_small_prime)
   {
     uint64_t cur_bucket = m >> counter_log2_dist;
     uint64_t bucket_count = 0;
@@ -747,7 +746,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     counter[cur_bucket] -= uint32_t(bucket_count);
     count += bucket_count;
     total_count_ -= count;
-    many_hits_per_bucket_ = (count >= many_hits_threshold_);
   }
   else
   {

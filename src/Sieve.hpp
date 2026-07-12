@@ -150,8 +150,6 @@ private:
   uint64_t prev_stop_ = 0;
   uint64_t count_ = 0;
   uint64_t total_count_ = 0;
-  uint64_t many_hits_threshold_ = 0;
-  bool many_hits_per_bucket_ = true;
   Vector<uint64_t> sieve_;
   Vector<PrimeState> primeState_;
   Counter counter_;
