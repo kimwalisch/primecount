@@ -532,6 +532,14 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t counter_log2_dist = counter_.log2_dist;
   uint32_t* counter = &counter_[0];
 
+  // A small sieving prime hits the same counter array bucket
+  // many times in a row. Decrementing counter[bucket] on each
+  // hit is a read-modify-write to the same address, so on
+  // out-of-order CPUs the hits serialize on store-to-load
+  // forwarding latency. Hence, for such small primes we use an
+  // alternative algorithm that avoids this by accumulating a
+  // bucket's hits in a register, writing counter[bucket] back
+  // only once per bucket.
   if (many_hits_per_bucket_)
   {
     uint64_t cur_bucket = m >> counter_log2_dist;
