@@ -504,17 +504,21 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (i >= primeState_.size())
     add(prime, i);
 
-  prime /= 30;
   PrimeState& primeState = primeState_[i];
   uint64_t wheel_index = primeState.wheel_index;
   uint64_t g = wheel_index / 8;
   uint64_t m = primeState.multiple;
-  uint64_t count = 0;
-  uint64_t counter_log2_dist = counter_.log2_dist;
-  uint32_t* counter = &counter_[0];
   uint8_t* sieve = (uint8_t*) &sieve_[0];
   uint64_t sieve_bytes = sieve_.size() * 8;
 
+  if (m >= sieve_bytes)
+  {
+    uint32_t m32 = uint32_t(m - sieve_bytes);
+    primeState.multiple = m32;
+    return;
+  }
+
+  prime /= 30;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
   uint64_t adv1 = prime * 4 + wheel_corr[g][1];
   uint64_t adv2 = prime * 2 + wheel_corr[g][2];
@@ -523,6 +527,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t adv5 = prime * 4 + wheel_corr[g][5];
   uint64_t adv6 = prime * 6 + wheel_corr[g][6];
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
+
+  uint64_t count = 0;
+  uint64_t counter_log2_dist = counter_.log2_dist;
+  uint32_t* counter = &counter_[0];
 
   if (many_hits_per_bucket_)
   {
@@ -658,8 +666,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     finished:;
 
-    counter[cur_bucket] -= uint32_t(bucket_count);
     primeState.multiple = uint32_t(m - sieve_bytes);
+    counter[cur_bucket] -= uint32_t(bucket_count);
     count += bucket_count;
     total_count_ -= count;
     many_hits_per_bucket_ = (count >= many_hits_threshold_);
