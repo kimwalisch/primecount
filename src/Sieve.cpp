@@ -168,6 +168,7 @@ void Sieve::init_counter(uint64_t low, uint64_t high)
 {
   reset_counter();
   total_count_ = 0;
+  many_hits_per_bucket_ = true;
 
   uint64_t start = 0;
   uint64_t max_stop = (high - 1) - low;
@@ -512,6 +513,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint32_t* counter = &counter_[0];
   uint8_t* sieve = (uint8_t*) &sieve_[0];
   uint64_t sieve_bytes = sieve_.size() * 8;
+
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
   uint64_t adv1 = prime * 4 + wheel_corr[g][1];
   uint64_t adv2 = prime * 2 + wheel_corr[g][2];
@@ -521,124 +523,268 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t adv6 = prime * 6 + wheel_corr[g][6];
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
 
-  #define CHECK_FINISHED(w) \
-    if_unlikely(m >= sieve_bytes) \
-    { \
-      primeState.wheel_index = w; \
-      primeState.multiple = uint32_t(m - sieve_bytes); \
-      total_count_ = total_count; \
-      return; \
-    }
-
-  #define UNSET_BIT(i) \
-    { \
-      std::size_t sieve_byte = sieve[m]; \
-      std::size_t is_bit = (sieve_byte >> i) & 1; \
-      sieve[m] &= ~(1 << i); \
-      counter[m >> counter_log2_dist] -= uint32_t(is_bit); \
-      total_count -= uint64_t(is_bit); \
-    }
-
-  ASSERT (wheel_index <= 63);
-  switch (wheel_index)
+  if (many_hits_per_bucket_)
   {
-    while (true)
+    uint64_t bucket_delta = 0;
+    uint64_t cur_bucket = m >> counter_log2_dist;
+    uint64_t old_total_count = total_count;
+
+    #define CHECK_FINISHED(w) \
+      if_unlikely(m >= sieve_bytes) \
+      { \
+        counter[cur_bucket] -= uint32_t(bucket_delta); \
+        primeState.wheel_index = w; \
+        goto finished; \
+      }
+
+    #define UNSET_BIT(i) \
+      { \
+        std::size_t sieve_byte = sieve[m]; \
+        std::size_t is_bit = (sieve_byte >> i) & 1; \
+        sieve[m] &= ~(1 << i); \
+        uint64_t bucket = m >> counter_log2_dist; \
+        if (bucket != cur_bucket) \
+        { \
+          counter[cur_bucket] -= uint32_t(bucket_delta); \
+          total_count -= bucket_delta; \
+          bucket_delta = 0; \
+          cur_bucket = bucket; \
+        } \
+        bucket_delta += is_bit; \
+      }
+
+    ASSERT (wheel_index <= 63);
+    switch (wheel_index)
     {
-      case 0: CHECK_FINISHED(0); UNSET_BIT(0); m += adv0; FALLTHROUGH;
-      case 1: CHECK_FINISHED(1); UNSET_BIT(1); m += adv1; FALLTHROUGH;
-      case 2: CHECK_FINISHED(2); UNSET_BIT(2); m += adv2; FALLTHROUGH;
-      case 3: CHECK_FINISHED(3); UNSET_BIT(3); m += adv3; FALLTHROUGH;
-      case 4: CHECK_FINISHED(4); UNSET_BIT(4); m += adv4; FALLTHROUGH;
-      case 5: CHECK_FINISHED(5); UNSET_BIT(5); m += adv5; FALLTHROUGH;
-      case 6: CHECK_FINISHED(6); UNSET_BIT(6); m += adv6; FALLTHROUGH;
-      case 7: CHECK_FINISHED(7); UNSET_BIT(7); m += adv7;
+      while (true)
+      {
+        case 0: CHECK_FINISHED(0); UNSET_BIT(0); m += adv0; FALLTHROUGH;
+        case 1: CHECK_FINISHED(1); UNSET_BIT(1); m += adv1; FALLTHROUGH;
+        case 2: CHECK_FINISHED(2); UNSET_BIT(2); m += adv2; FALLTHROUGH;
+        case 3: CHECK_FINISHED(3); UNSET_BIT(3); m += adv3; FALLTHROUGH;
+        case 4: CHECK_FINISHED(4); UNSET_BIT(4); m += adv4; FALLTHROUGH;
+        case 5: CHECK_FINISHED(5); UNSET_BIT(5); m += adv5; FALLTHROUGH;
+        case 6: CHECK_FINISHED(6); UNSET_BIT(6); m += adv6; FALLTHROUGH;
+        case 7: CHECK_FINISHED(7); UNSET_BIT(7); m += adv7;
+      }
+
+      while (true)
+      {
+        case  8: CHECK_FINISHED( 8); UNSET_BIT(1); m += adv0; FALLTHROUGH;
+        case  9: CHECK_FINISHED( 9); UNSET_BIT(5); m += adv1; FALLTHROUGH;
+        case 10: CHECK_FINISHED(10); UNSET_BIT(4); m += adv2; FALLTHROUGH;
+        case 11: CHECK_FINISHED(11); UNSET_BIT(0); m += adv3; FALLTHROUGH;
+        case 12: CHECK_FINISHED(12); UNSET_BIT(7); m += adv4; FALLTHROUGH;
+        case 13: CHECK_FINISHED(13); UNSET_BIT(3); m += adv5; FALLTHROUGH;
+        case 14: CHECK_FINISHED(14); UNSET_BIT(2); m += adv6; FALLTHROUGH;
+        case 15: CHECK_FINISHED(15); UNSET_BIT(6); m += adv7;
+      }
+
+      while (true)
+      {
+        case 16: CHECK_FINISHED(16); UNSET_BIT(2); m += adv0; FALLTHROUGH;
+        case 17: CHECK_FINISHED(17); UNSET_BIT(4); m += adv1; FALLTHROUGH;
+        case 18: CHECK_FINISHED(18); UNSET_BIT(0); m += adv2; FALLTHROUGH;
+        case 19: CHECK_FINISHED(19); UNSET_BIT(6); m += adv3; FALLTHROUGH;
+        case 20: CHECK_FINISHED(20); UNSET_BIT(1); m += adv4; FALLTHROUGH;
+        case 21: CHECK_FINISHED(21); UNSET_BIT(7); m += adv5; FALLTHROUGH;
+        case 22: CHECK_FINISHED(22); UNSET_BIT(3); m += adv6; FALLTHROUGH;
+        case 23: CHECK_FINISHED(23); UNSET_BIT(5); m += adv7;
+      }
+
+      while (true)
+      {
+        case 24: CHECK_FINISHED(24); UNSET_BIT(3); m += adv0; FALLTHROUGH;
+        case 25: CHECK_FINISHED(25); UNSET_BIT(0); m += adv1; FALLTHROUGH;
+        case 26: CHECK_FINISHED(26); UNSET_BIT(6); m += adv2; FALLTHROUGH;
+        case 27: CHECK_FINISHED(27); UNSET_BIT(5); m += adv3; FALLTHROUGH;
+        case 28: CHECK_FINISHED(28); UNSET_BIT(2); m += adv4; FALLTHROUGH;
+        case 29: CHECK_FINISHED(29); UNSET_BIT(1); m += adv5; FALLTHROUGH;
+        case 30: CHECK_FINISHED(30); UNSET_BIT(7); m += adv6; FALLTHROUGH;
+        case 31: CHECK_FINISHED(31); UNSET_BIT(4); m += adv7;
+      }
+
+      while (true)
+      {
+        case 32: CHECK_FINISHED(32); UNSET_BIT(4); m += adv0; FALLTHROUGH;
+        case 33: CHECK_FINISHED(33); UNSET_BIT(7); m += adv1; FALLTHROUGH;
+        case 34: CHECK_FINISHED(34); UNSET_BIT(1); m += adv2; FALLTHROUGH;
+        case 35: CHECK_FINISHED(35); UNSET_BIT(2); m += adv3; FALLTHROUGH;
+        case 36: CHECK_FINISHED(36); UNSET_BIT(5); m += adv4; FALLTHROUGH;
+        case 37: CHECK_FINISHED(37); UNSET_BIT(6); m += adv5; FALLTHROUGH;
+        case 38: CHECK_FINISHED(38); UNSET_BIT(0); m += adv6; FALLTHROUGH;
+        case 39: CHECK_FINISHED(39); UNSET_BIT(3); m += adv7;
+      }
+
+      while (true)
+      {
+        case 40: CHECK_FINISHED(40); UNSET_BIT(5); m += adv0; FALLTHROUGH;
+        case 41: CHECK_FINISHED(41); UNSET_BIT(3); m += adv1; FALLTHROUGH;
+        case 42: CHECK_FINISHED(42); UNSET_BIT(7); m += adv2; FALLTHROUGH;
+        case 43: CHECK_FINISHED(43); UNSET_BIT(1); m += adv3; FALLTHROUGH;
+        case 44: CHECK_FINISHED(44); UNSET_BIT(6); m += adv4; FALLTHROUGH;
+        case 45: CHECK_FINISHED(45); UNSET_BIT(0); m += adv5; FALLTHROUGH;
+        case 46: CHECK_FINISHED(46); UNSET_BIT(4); m += adv6; FALLTHROUGH;
+        case 47: CHECK_FINISHED(47); UNSET_BIT(2); m += adv7;
+      }
+
+      while (true)
+      {
+        case 48: CHECK_FINISHED(48); UNSET_BIT(6); m += adv0; FALLTHROUGH;
+        case 49: CHECK_FINISHED(49); UNSET_BIT(2); m += adv1; FALLTHROUGH;
+        case 50: CHECK_FINISHED(50); UNSET_BIT(3); m += adv2; FALLTHROUGH;
+        case 51: CHECK_FINISHED(51); UNSET_BIT(7); m += adv3; FALLTHROUGH;
+        case 52: CHECK_FINISHED(52); UNSET_BIT(0); m += adv4; FALLTHROUGH;
+        case 53: CHECK_FINISHED(53); UNSET_BIT(4); m += adv5; FALLTHROUGH;
+        case 54: CHECK_FINISHED(54); UNSET_BIT(5); m += adv6; FALLTHROUGH;
+        case 55: CHECK_FINISHED(55); UNSET_BIT(1); m += adv7;
+      }
+
+      while (true)
+      {
+        case 56: CHECK_FINISHED(56); UNSET_BIT(7); m += adv0; FALLTHROUGH;
+        case 57: CHECK_FINISHED(57); UNSET_BIT(6); m += adv1; FALLTHROUGH;
+        case 58: CHECK_FINISHED(58); UNSET_BIT(5); m += adv2; FALLTHROUGH;
+        case 59: CHECK_FINISHED(59); UNSET_BIT(4); m += adv3; FALLTHROUGH;
+        case 60: CHECK_FINISHED(60); UNSET_BIT(3); m += adv4; FALLTHROUGH;
+        case 61: CHECK_FINISHED(61); UNSET_BIT(2); m += adv5; FALLTHROUGH;
+        case 62: CHECK_FINISHED(62); UNSET_BIT(1); m += adv6; FALLTHROUGH;
+        case 63: CHECK_FINISHED(63); UNSET_BIT(0); m += adv7;
+      }
+
+      default: UNREACHABLE;
     }
 
-    while (true)
-    {
-      case  8: CHECK_FINISHED( 8); UNSET_BIT(1); m += adv0; FALLTHROUGH;
-      case  9: CHECK_FINISHED( 9); UNSET_BIT(5); m += adv1; FALLTHROUGH;
-      case 10: CHECK_FINISHED(10); UNSET_BIT(4); m += adv2; FALLTHROUGH;
-      case 11: CHECK_FINISHED(11); UNSET_BIT(0); m += adv3; FALLTHROUGH;
-      case 12: CHECK_FINISHED(12); UNSET_BIT(7); m += adv4; FALLTHROUGH;
-      case 13: CHECK_FINISHED(13); UNSET_BIT(3); m += adv5; FALLTHROUGH;
-      case 14: CHECK_FINISHED(14); UNSET_BIT(2); m += adv6; FALLTHROUGH;
-      case 15: CHECK_FINISHED(15); UNSET_BIT(6); m += adv7;
-    }
+    #undef UNSET_BIT
+    #undef CHECK_FINISHED
 
-    while (true)
-    {
-      case 16: CHECK_FINISHED(16); UNSET_BIT(2); m += adv0; FALLTHROUGH;
-      case 17: CHECK_FINISHED(17); UNSET_BIT(4); m += adv1; FALLTHROUGH;
-      case 18: CHECK_FINISHED(18); UNSET_BIT(0); m += adv2; FALLTHROUGH;
-      case 19: CHECK_FINISHED(19); UNSET_BIT(6); m += adv3; FALLTHROUGH;
-      case 20: CHECK_FINISHED(20); UNSET_BIT(1); m += adv4; FALLTHROUGH;
-      case 21: CHECK_FINISHED(21); UNSET_BIT(7); m += adv5; FALLTHROUGH;
-      case 22: CHECK_FINISHED(22); UNSET_BIT(3); m += adv6; FALLTHROUGH;
-      case 23: CHECK_FINISHED(23); UNSET_BIT(5); m += adv7;
-    }
+    finished:;
+    primeState.multiple = uint32_t(m - sieve_bytes); \
+    total_count -= bucket_delta; \
+    total_count_ = total_count; \
+    many_hits_per_bucket_ = (old_total_count - total_count) / 8 >= counter_.counter.size();
+  }
+  else
+  {
+    #define CHECK_FINISHED(w) \
+      if_unlikely(m >= sieve_bytes) \
+      { \
+        primeState.wheel_index = w; \
+        primeState.multiple = uint32_t(m - sieve_bytes); \
+        total_count_ = total_count; \
+        return; \
+      }
 
-    while (true)
-    {
-      case 24: CHECK_FINISHED(24); UNSET_BIT(3); m += adv0; FALLTHROUGH;
-      case 25: CHECK_FINISHED(25); UNSET_BIT(0); m += adv1; FALLTHROUGH;
-      case 26: CHECK_FINISHED(26); UNSET_BIT(6); m += adv2; FALLTHROUGH;
-      case 27: CHECK_FINISHED(27); UNSET_BIT(5); m += adv3; FALLTHROUGH;
-      case 28: CHECK_FINISHED(28); UNSET_BIT(2); m += adv4; FALLTHROUGH;
-      case 29: CHECK_FINISHED(29); UNSET_BIT(1); m += adv5; FALLTHROUGH;
-      case 30: CHECK_FINISHED(30); UNSET_BIT(7); m += adv6; FALLTHROUGH;
-      case 31: CHECK_FINISHED(31); UNSET_BIT(4); m += adv7;
-    }
+    #define UNSET_BIT(i) \
+      { \
+        std::size_t sieve_byte = sieve[m]; \
+        std::size_t is_bit = (sieve_byte >> i) & 1; \
+        sieve[m] &= ~(1 << i); \
+        counter[m >> counter_log2_dist] -= uint32_t(is_bit); \
+        total_count -= uint64_t(is_bit); \
+      }
 
-    while (true)
+    ASSERT (wheel_index <= 63);
+    switch (wheel_index)
     {
-      case 32: CHECK_FINISHED(32); UNSET_BIT(4); m += adv0; FALLTHROUGH;
-      case 33: CHECK_FINISHED(33); UNSET_BIT(7); m += adv1; FALLTHROUGH;
-      case 34: CHECK_FINISHED(34); UNSET_BIT(1); m += adv2; FALLTHROUGH;
-      case 35: CHECK_FINISHED(35); UNSET_BIT(2); m += adv3; FALLTHROUGH;
-      case 36: CHECK_FINISHED(36); UNSET_BIT(5); m += adv4; FALLTHROUGH;
-      case 37: CHECK_FINISHED(37); UNSET_BIT(6); m += adv5; FALLTHROUGH;
-      case 38: CHECK_FINISHED(38); UNSET_BIT(0); m += adv6; FALLTHROUGH;
-      case 39: CHECK_FINISHED(39); UNSET_BIT(3); m += adv7;
-    }
+      while (true)
+      {
+        case 0: CHECK_FINISHED(0); UNSET_BIT(0); m += adv0; FALLTHROUGH;
+        case 1: CHECK_FINISHED(1); UNSET_BIT(1); m += adv1; FALLTHROUGH;
+        case 2: CHECK_FINISHED(2); UNSET_BIT(2); m += adv2; FALLTHROUGH;
+        case 3: CHECK_FINISHED(3); UNSET_BIT(3); m += adv3; FALLTHROUGH;
+        case 4: CHECK_FINISHED(4); UNSET_BIT(4); m += adv4; FALLTHROUGH;
+        case 5: CHECK_FINISHED(5); UNSET_BIT(5); m += adv5; FALLTHROUGH;
+        case 6: CHECK_FINISHED(6); UNSET_BIT(6); m += adv6; FALLTHROUGH;
+        case 7: CHECK_FINISHED(7); UNSET_BIT(7); m += adv7;
+      }
 
-    while (true)
-    {
-      case 40: CHECK_FINISHED(40); UNSET_BIT(5); m += adv0; FALLTHROUGH;
-      case 41: CHECK_FINISHED(41); UNSET_BIT(3); m += adv1; FALLTHROUGH;
-      case 42: CHECK_FINISHED(42); UNSET_BIT(7); m += adv2; FALLTHROUGH;
-      case 43: CHECK_FINISHED(43); UNSET_BIT(1); m += adv3; FALLTHROUGH;
-      case 44: CHECK_FINISHED(44); UNSET_BIT(6); m += adv4; FALLTHROUGH;
-      case 45: CHECK_FINISHED(45); UNSET_BIT(0); m += adv5; FALLTHROUGH;
-      case 46: CHECK_FINISHED(46); UNSET_BIT(4); m += adv6; FALLTHROUGH;
-      case 47: CHECK_FINISHED(47); UNSET_BIT(2); m += adv7;
-    }
+      while (true)
+      {
+        case  8: CHECK_FINISHED( 8); UNSET_BIT(1); m += adv0; FALLTHROUGH;
+        case  9: CHECK_FINISHED( 9); UNSET_BIT(5); m += adv1; FALLTHROUGH;
+        case 10: CHECK_FINISHED(10); UNSET_BIT(4); m += adv2; FALLTHROUGH;
+        case 11: CHECK_FINISHED(11); UNSET_BIT(0); m += adv3; FALLTHROUGH;
+        case 12: CHECK_FINISHED(12); UNSET_BIT(7); m += adv4; FALLTHROUGH;
+        case 13: CHECK_FINISHED(13); UNSET_BIT(3); m += adv5; FALLTHROUGH;
+        case 14: CHECK_FINISHED(14); UNSET_BIT(2); m += adv6; FALLTHROUGH;
+        case 15: CHECK_FINISHED(15); UNSET_BIT(6); m += adv7;
+      }
 
-    while (true)
-    {
-      case 48: CHECK_FINISHED(48); UNSET_BIT(6); m += adv0; FALLTHROUGH;
-      case 49: CHECK_FINISHED(49); UNSET_BIT(2); m += adv1; FALLTHROUGH;
-      case 50: CHECK_FINISHED(50); UNSET_BIT(3); m += adv2; FALLTHROUGH;
-      case 51: CHECK_FINISHED(51); UNSET_BIT(7); m += adv3; FALLTHROUGH;
-      case 52: CHECK_FINISHED(52); UNSET_BIT(0); m += adv4; FALLTHROUGH;
-      case 53: CHECK_FINISHED(53); UNSET_BIT(4); m += adv5; FALLTHROUGH;
-      case 54: CHECK_FINISHED(54); UNSET_BIT(5); m += adv6; FALLTHROUGH;
-      case 55: CHECK_FINISHED(55); UNSET_BIT(1); m += adv7;
-    }
+      while (true)
+      {
+        case 16: CHECK_FINISHED(16); UNSET_BIT(2); m += adv0; FALLTHROUGH;
+        case 17: CHECK_FINISHED(17); UNSET_BIT(4); m += adv1; FALLTHROUGH;
+        case 18: CHECK_FINISHED(18); UNSET_BIT(0); m += adv2; FALLTHROUGH;
+        case 19: CHECK_FINISHED(19); UNSET_BIT(6); m += adv3; FALLTHROUGH;
+        case 20: CHECK_FINISHED(20); UNSET_BIT(1); m += adv4; FALLTHROUGH;
+        case 21: CHECK_FINISHED(21); UNSET_BIT(7); m += adv5; FALLTHROUGH;
+        case 22: CHECK_FINISHED(22); UNSET_BIT(3); m += adv6; FALLTHROUGH;
+        case 23: CHECK_FINISHED(23); UNSET_BIT(5); m += adv7;
+      }
 
-    while (true)
-    {
-      case 56: CHECK_FINISHED(56); UNSET_BIT(7); m += adv0; FALLTHROUGH;
-      case 57: CHECK_FINISHED(57); UNSET_BIT(6); m += adv1; FALLTHROUGH;
-      case 58: CHECK_FINISHED(58); UNSET_BIT(5); m += adv2; FALLTHROUGH;
-      case 59: CHECK_FINISHED(59); UNSET_BIT(4); m += adv3; FALLTHROUGH;
-      case 60: CHECK_FINISHED(60); UNSET_BIT(3); m += adv4; FALLTHROUGH;
-      case 61: CHECK_FINISHED(61); UNSET_BIT(2); m += adv5; FALLTHROUGH;
-      case 62: CHECK_FINISHED(62); UNSET_BIT(1); m += adv6; FALLTHROUGH;
-      case 63: CHECK_FINISHED(63); UNSET_BIT(0); m += adv7;
-    }
+      while (true)
+      {
+        case 24: CHECK_FINISHED(24); UNSET_BIT(3); m += adv0; FALLTHROUGH;
+        case 25: CHECK_FINISHED(25); UNSET_BIT(0); m += adv1; FALLTHROUGH;
+        case 26: CHECK_FINISHED(26); UNSET_BIT(6); m += adv2; FALLTHROUGH;
+        case 27: CHECK_FINISHED(27); UNSET_BIT(5); m += adv3; FALLTHROUGH;
+        case 28: CHECK_FINISHED(28); UNSET_BIT(2); m += adv4; FALLTHROUGH;
+        case 29: CHECK_FINISHED(29); UNSET_BIT(1); m += adv5; FALLTHROUGH;
+        case 30: CHECK_FINISHED(30); UNSET_BIT(7); m += adv6; FALLTHROUGH;
+        case 31: CHECK_FINISHED(31); UNSET_BIT(4); m += adv7;
+      }
 
-    default: UNREACHABLE;
+      while (true)
+      {
+        case 32: CHECK_FINISHED(32); UNSET_BIT(4); m += adv0; FALLTHROUGH;
+        case 33: CHECK_FINISHED(33); UNSET_BIT(7); m += adv1; FALLTHROUGH;
+        case 34: CHECK_FINISHED(34); UNSET_BIT(1); m += adv2; FALLTHROUGH;
+        case 35: CHECK_FINISHED(35); UNSET_BIT(2); m += adv3; FALLTHROUGH;
+        case 36: CHECK_FINISHED(36); UNSET_BIT(5); m += adv4; FALLTHROUGH;
+        case 37: CHECK_FINISHED(37); UNSET_BIT(6); m += adv5; FALLTHROUGH;
+        case 38: CHECK_FINISHED(38); UNSET_BIT(0); m += adv6; FALLTHROUGH;
+        case 39: CHECK_FINISHED(39); UNSET_BIT(3); m += adv7;
+      }
+
+      while (true)
+      {
+        case 40: CHECK_FINISHED(40); UNSET_BIT(5); m += adv0; FALLTHROUGH;
+        case 41: CHECK_FINISHED(41); UNSET_BIT(3); m += adv1; FALLTHROUGH;
+        case 42: CHECK_FINISHED(42); UNSET_BIT(7); m += adv2; FALLTHROUGH;
+        case 43: CHECK_FINISHED(43); UNSET_BIT(1); m += adv3; FALLTHROUGH;
+        case 44: CHECK_FINISHED(44); UNSET_BIT(6); m += adv4; FALLTHROUGH;
+        case 45: CHECK_FINISHED(45); UNSET_BIT(0); m += adv5; FALLTHROUGH;
+        case 46: CHECK_FINISHED(46); UNSET_BIT(4); m += adv6; FALLTHROUGH;
+        case 47: CHECK_FINISHED(47); UNSET_BIT(2); m += adv7;
+      }
+
+      while (true)
+      {
+        case 48: CHECK_FINISHED(48); UNSET_BIT(6); m += adv0; FALLTHROUGH;
+        case 49: CHECK_FINISHED(49); UNSET_BIT(2); m += adv1; FALLTHROUGH;
+        case 50: CHECK_FINISHED(50); UNSET_BIT(3); m += adv2; FALLTHROUGH;
+        case 51: CHECK_FINISHED(51); UNSET_BIT(7); m += adv3; FALLTHROUGH;
+        case 52: CHECK_FINISHED(52); UNSET_BIT(0); m += adv4; FALLTHROUGH;
+        case 53: CHECK_FINISHED(53); UNSET_BIT(4); m += adv5; FALLTHROUGH;
+        case 54: CHECK_FINISHED(54); UNSET_BIT(5); m += adv6; FALLTHROUGH;
+        case 55: CHECK_FINISHED(55); UNSET_BIT(1); m += adv7;
+      }
+
+      while (true)
+      {
+        case 56: CHECK_FINISHED(56); UNSET_BIT(7); m += adv0; FALLTHROUGH;
+        case 57: CHECK_FINISHED(57); UNSET_BIT(6); m += adv1; FALLTHROUGH;
+        case 58: CHECK_FINISHED(58); UNSET_BIT(5); m += adv2; FALLTHROUGH;
+        case 59: CHECK_FINISHED(59); UNSET_BIT(4); m += adv3; FALLTHROUGH;
+        case 60: CHECK_FINISHED(60); UNSET_BIT(3); m += adv4; FALLTHROUGH;
+        case 61: CHECK_FINISHED(61); UNSET_BIT(2); m += adv5; FALLTHROUGH;
+        case 62: CHECK_FINISHED(62); UNSET_BIT(1); m += adv6; FALLTHROUGH;
+        case 63: CHECK_FINISHED(63); UNSET_BIT(0); m += adv7;
+      }
+
+      default: UNREACHABLE;
+    }
   }
 }
 
