@@ -519,7 +519,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t count = 0;
   uint32_t* counter = &counter_[0];
   uint64_t counter_log2_dist = counter_.log2_dist;
-  bool is_small_prime = (prime <= (4ull << counter_log2_dist));
+  bool is_small_prime = (prime <= (2ull << counter_log2_dist));
 
   prime /= 30;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
