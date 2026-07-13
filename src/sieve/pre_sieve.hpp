@@ -233,7 +233,7 @@ const primecount::Array<uint8_t, 4004> pre_sieved_13 =
 #if 0
 
 /// C++ program that generates the pre_sieved arrays
-/// used in pre_sieve.hpp.
+/// used in pre_sieve.cpp.
 ///
 
 #include <sieve/Sieve.hpp>
