@@ -1,8 +1,8 @@
 Changes in primecount-8.6, 2026-07-13
 
 * Update to libprimesieve 12.15.
-* Sieve.cpp: New sieving algorithm for small primes. Up to 40% faster
-  on Apple M2 CPU and up to 10% faster on AMD Zen5 CPU.
+* Sieve.cpp: New sieving algorithm for small primes #122.
+  Up to 45% faster on Apple M2 CPU and up to 10% faster on AMD Zen5 CPU.
 * macros.hpp: Add INDETERMINATE macro to prevent memset zero initialization of large stack arrays.
 * Sieve_count_simd.hpp: Fix undefined behavior.
 * Sieve.hpp: Use Vector<uint64_t> sieve to fix undefined behavior.
