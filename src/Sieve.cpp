@@ -530,18 +530,19 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t adv6 = prime * 6 + wheel_corr[g][6];
   uint64_t adv7 = prime * 2 + wheel_corr[g][7];
 
-  // A small sieving prime hits the same counter array bucket
-  // many times in a row. Decrementing counter[bucket] on each
-  // hit is a read-modify-write to the same address, so on
+  // A small sieving prime hits the same counter array element
+  // many times in a row. Decrementing counter[c] on each hit
+  // is a read-modify-write to the same address, so on
   // out-of-order CPUs the hits serialize on store-to-load
   // forwarding latency. Hence, for such small primes we use an
-  // alternative algorithm that avoids this by accumulating a
-  // bucket's hits in a register, writing counter[bucket] back
-  // only once per bucket.
+  // alternative algorithm that avoids this by accumulating the
+  // count in a register, subtracting from counter[c] only
+  // once when the counter index c increases.
   if (is_small_prime)
   {
-    uint64_t bucket_threshold = ((m >> counter_log2_dist) + 1) << counter_log2_dist;
-    uint64_t bucket_count = 0;
+    uint64_t delta_count = 0;
+    uint64_t counter_threshold = 
+        ((m >> counter_log2_dist) + 1) << counter_log2_dist;
 
     #define CHECK_FINISHED(w) \
       if (m >= sieve_bytes) \
@@ -550,26 +551,19 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         goto finished1; \
       }
 
-    // bucket_threshold is the byte offset where the current bucket
-    // ends. Comparing m against it avoids recomputing the bucket index
-    // (m >> counter_log2_dist) on every hit. We deliberately carry only
-    // this single loop variable and recompute cur_bucket from it in the
-    // rarely taken branch below: carrying both cur_bucket and
-    // bucket_threshold adds an extra live value that makes GCC 16 spill
-    // in the inner loop (worst with -march=znver5), which is up to 10%
-    // slower on AMD Zen5 CPUs.
     #define UNSET_BIT(i) \
       { \
         auto is_bit = (sieve[m] >> i) & 1; \
         sieve[m] &= ~(1 << i); \
-        if (m >= bucket_threshold) \
+        if (m >= counter_threshold) \
         { \
-          counter[(bucket_threshold >> counter_log2_dist) - 1] -= uint32_t(bucket_count); \
-          bucket_threshold = ((m >> counter_log2_dist) + 1) << counter_log2_dist; \
-          count += bucket_count; \
-          bucket_count = 0; \
+          auto c = (counter_threshold >> counter_log2_dist) - 1; \
+          counter[c] -= uint32_t(delta_count); \
+          counter_threshold = ((m >> counter_log2_dist) + 1) << counter_log2_dist; \
+          count += delta_count; \
+          delta_count = 0; \
         } \
-        bucket_count += is_bit; \
+        delta_count += is_bit; \
       }
 
     ASSERT (wheel_index <= 63);
@@ -679,12 +673,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     finished1:;
 
-    uint64_t cur_bucket = (bucket_threshold >> counter_log2_dist) - 1;
-    if (cur_bucket < counter_size_)
-      counter[cur_bucket] -= uint32_t(bucket_count);
+    uint64_t c = (counter_threshold >> counter_log2_dist) - 1;
+    if (c < counter_size_)
+      counter[c] -= uint32_t(delta_count);
 
     primeState.multiple = uint32_t(m - sieve_bytes);
-    count += bucket_count;
+    count += delta_count;
     total_count_ -= count;
   }
   else
