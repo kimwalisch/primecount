@@ -28,7 +28,7 @@
 #include <macros.hpp>
 #include <PiTable.hpp>
 #include <FactorTable.hpp>
-#include <Sieve.hpp>
+#include <sieve/Sieve.hpp>
 #include <fast_div.hpp>
 #include <generate_primes.hpp>
 #include <phi_vector.hpp>

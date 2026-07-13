@@ -35,9 +35,8 @@
 ///
 
 #include "Sieve.hpp"
-#include "Sieve_arrays.hpp"
-#include "Sieve_count_start_stop.hpp"
-#include "Sieve_pre_sieve.hpp"
+#include "lookup_tables.hpp"
+#include "count_start_stop.hpp"
 
 #include <imath.hpp>
 #include <int128_t.hpp>

@@ -1,7 +1,7 @@
 ///
-/// @file  Sieve_pre_sieve.hpp
+/// @file  pre_sieve.cpp
 /// @brief Pre-sieve the (primes and) multiples of primes ≤ 71.
-///        There are 7 static pre_sieved arrays in Sieve_arrays.hpp
+///        There are 7 static pre_sieved arrays in pre_sieve.hpp
 ///        from which the primes and multiples of primes have
 ///        been removed upfront. Each pre_sieved array corresponds
 ///        to exactly two sieving primes:
@@ -25,11 +25,9 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVE_PRE_SIEVE_HPP
-#define SIEVE_PRE_SIEVE_HPP
+#include "Sieve.hpp"
+#include "pre_sieve.hpp"
 
-#include <Sieve.hpp>
-#include "Sieve_arrays.hpp"
 #include <Vector.hpp>
 
 #include <stdint.h>
@@ -149,5 +147,3 @@ uint64_t Sieve::pre_sieve(uint64_t c, uint64_t low)
 }
 
 } // namespace
-
-#endif

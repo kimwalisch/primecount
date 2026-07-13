@@ -111,7 +111,8 @@ set(LIB_SRC src/api.cpp
             src/PhiTiny.cpp
             src/PiTable.cpp
             src/S1.cpp
-            src/Sieve.cpp
+            src/sieve/Sieve.cpp
+            src/sieve/pre_sieve.cpp
             src/LoadBalancerP2.cpp
             src/LoadBalancerS2.cpp
             src/LogarithmicIntegral.cpp

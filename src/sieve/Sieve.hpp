@@ -161,6 +161,6 @@ private:
 // These forced inline Sieve::count(stop) methods
 // must be defined in a header file that is
 // visible to all translation units that use them.
-#include "Sieve_count_stop.hpp"
+#include "count_stop.hpp"
 
 #endif

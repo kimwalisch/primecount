@@ -5,13 +5,13 @@
 ///         that have been crossed off for the first time in
 ///         the sieve array.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
-#include <Sieve.hpp>
+#include <sieve/Sieve.hpp>
 #include <generate_primes.hpp>
 #include <imath.hpp>
 

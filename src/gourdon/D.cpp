@@ -31,7 +31,7 @@
 #include <primecount-internal.hpp>
 #include <macros.hpp>
 #include <PiTable.hpp>
-#include <Sieve.hpp>
+#include <sieve/Sieve.hpp>
 #include <LoadBalancerS2.hpp>
 #include <fast_div.hpp>
 #include <generate_primes.hpp>
