@@ -54,7 +54,7 @@ cd build_primecount
 clang++ -c -I../../include -I../../src -I../../lib/primesieve/include \
   -O3 -flto -fopenmp -static -Wall -Wextra -pedantic \
   -DENABLE_LIBDIVIDE -DENABLE_MULTIARCH_ARM_SVE -DINIT_LLVM_OPENMP -DHAVE_GETENV_S -DHAVE_PUTENV_S -DNDEBUG -D_WIN32_WINNT=0x0A00 \
-  ../../src/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
+  ../../src/*.cpp ../../src/sieve/*.cpp ../../src/lmo/*.cpp ../../src/deleglise-rivat/*.cpp \
   ../../src/gourdon/*.cpp ../../src/arch/arm/sve.cpp ../../src/app/*.cpp
 
 cd ..

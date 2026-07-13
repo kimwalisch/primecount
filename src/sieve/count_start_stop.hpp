@@ -1,12 +1,12 @@
 ///
-/// @file  Sieve_count_start_stop.hpp
+/// @file  count_start_stop.hpp
 /// @brief Highly optimized methods to count the number of 1 bits
 ///        in the sieve array in the special leaves algorithm
 ///        (used in the combinatorial prime counting algorithms
 ///        e.g. Lagarias-Miller-Odlyzko, Deleglise-Rivat, Gourdon).
 ///
 ///        The methods defined in this file are only called from
-///        Sieve.cpp. Hence, "Sieve_count_start_stop.hpp" is only
+///        Sieve.cpp. Hence, "count_start_stop.hpp" is only
 ///        included in Sieve.cpp. The Sieve::count(start, stop)
 ///        methods defined in this file are called much less
 ///        frequently than the Sieve::count(stop) methods. Hence,
@@ -22,11 +22,12 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVE_COUNT_START_STOP_HPP
-#define SIEVE_COUNT_START_STOP_HPP
+#ifndef COUNT_START_STOP_HPP
+#define COUNT_START_STOP_HPP
 
-#include <Sieve.hpp>
-#include <Sieve_count_simd.hpp>
+#include "Sieve.hpp"
+#include "count_simd.hpp"
+
 #include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>

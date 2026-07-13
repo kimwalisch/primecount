@@ -35,7 +35,7 @@
 #include <primecount-config.hpp>
 #include <primecount-internal.hpp>
 #include <StatusS2.hpp>
-#include <Sieve.hpp>
+#include <sieve/Sieve.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>

@@ -1,5 +1,5 @@
 ///
-/// @file  Sieve_count_stop.hpp
+/// @file  count_stop.hpp
 /// @brief Highly optimized methods to count the number of 1 bits
 ///        in the sieve array in the special leaves algorithm
 ///        (used in the combinatorial prime counting algorithms
@@ -18,11 +18,12 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVE_COUNT_STOP_HPP
-#define SIEVE_COUNT_STOP_HPP
+#ifndef COUNT_STOP_HPP
+#define COUNT_STOP_HPP
 
-#include <Sieve.hpp>
-#include <Sieve_count_simd.hpp>
+#include "Sieve.hpp"
+#include "count_simd.hpp"
+
 #include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>

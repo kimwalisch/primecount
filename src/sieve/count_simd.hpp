@@ -1,5 +1,5 @@
 ///
-/// @file  Sieve_count_simd.hpp
+/// @file  count_simd.hpp
 /// @brief Highly optimized code to count the number of 1 bits in
 ///        the sieve array using SIMD instructions.
 ///
@@ -12,8 +12,8 @@
 /// file in the top level directory.
 ///
 
-#ifndef SIEVE_COUNT_SIMD_HPP
-#define SIEVE_COUNT_SIMD_HPP
+#ifndef COUNT_SIMD_HPP
+#define COUNT_SIMD_HPP
 
 #include <macros.hpp>
 #include <popcnt.hpp>
