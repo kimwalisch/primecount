@@ -544,7 +544,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     uint64_t bucket_count = 0;
 
     #define CHECK_FINISHED(w) \
-      if_unlikely(m >= sieve_bytes) \
+      if (m >= sieve_bytes) \
       { \
         primeState.wheel_index = w; \
         goto finished1; \
@@ -682,7 +682,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   else
   {
     #define CHECK_FINISHED(w) \
-      if_unlikely(m >= sieve_bytes) \
+      if (m >= sieve_bytes) \
       { \
         primeState.wheel_index = w; \
         goto finished2; \
