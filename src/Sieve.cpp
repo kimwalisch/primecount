@@ -505,6 +505,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   uint64_t count = 0;
   uint32_t* counter = &counter_[0];
   uint64_t counter_log2_dist = counter_.log2_dist;
+
+  // The factor 2 here is a tuning parameter that selects
+  // which primes use the algorithm optimized for small primes.
+  // It was fastest (or nearly so) on every CPU I benchmarked:
+  // best on Intel Arrow Lake and AMD Zen5, while the Apple M2
+  // was 2% faster with a factor of 4.
   bool is_small_prime = (prime <= (2ull << counter_log2_dist));
 
   PrimeState& primeState = primeState_[i];
