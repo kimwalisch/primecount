@@ -112,8 +112,8 @@ void Sieve::allocate_counter(uint64_t low)
   // Hence the max(counter value) = 2^18.
   ASSERT(bytes * 8 <= pstd::numeric_limits<uint32_t>::max());
   uint64_t sieve_bytes = sieve_.size() * 8;
-  uint64_t counter_size = ceil_div(sieve_bytes, bytes);
-  counter_.counter.resize(counter_size);
+  counter_size_ = ceil_div(sieve_bytes, bytes);
+  counter_.counter.resize(counter_size_);
   counter_.dist = bytes * 30;
   counter_.log2_dist = ilog2(bytes);
 }
@@ -502,24 +502,17 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (i >= primeState_.size())
     add(prime, i);
 
+  uint64_t count = 0;
+  uint32_t* counter = &counter_[0];
+  uint64_t counter_log2_dist = counter_.log2_dist;
+  bool is_small_prime = (prime <= (2ull << counter_log2_dist));
+
   PrimeState& primeState = primeState_[i];
   uint64_t wheel_index = primeState.wheel_index;
   uint64_t g = wheel_index / 8;
   uint64_t m = primeState.multiple;
   uint8_t* sieve = (uint8_t*) &sieve_[0];
   uint64_t sieve_bytes = sieve_.size() * 8;
-
-  if (m >= sieve_bytes)
-  {
-    uint32_t m32 = uint32_t(m - sieve_bytes);
-    primeState.multiple = m32;
-    return;
-  }
-
-  uint64_t count = 0;
-  uint32_t* counter = &counter_[0];
-  uint64_t counter_log2_dist = counter_.log2_dist;
-  bool is_small_prime = (prime <= (2ull << counter_log2_dist));
 
   prime /= 30;
   uint64_t adv0 = prime * 6 + wheel_corr[g][0];
@@ -673,8 +666,10 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     finished1:;
 
+    if (cur_bucket < counter_size_)
+      counter[cur_bucket] -= uint32_t(bucket_count);
+
     primeState.multiple = uint32_t(m - sieve_bytes);
-    counter[cur_bucket] -= uint32_t(bucket_count);
     count += bucket_count;
     total_count_ -= count;
   }
