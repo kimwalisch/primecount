@@ -27,6 +27,17 @@
 
 namespace primecount {
 
+template <typename T1, typename T2, typename T3>
+T2 in_between(T1 min, T2 x, T3 max)
+{
+  if (x < min || max < min)
+    return (T2) min;
+  if (x > max)
+    return (T2) max;
+
+  return x;
+}
+
 template <typename A, typename B>
 inline A ceil_div(A a, B b)
 {
@@ -35,7 +46,7 @@ inline A ceil_div(A a, B b)
 
 /// Next power of 2 >= x
 template <typename T>
-inline T next_power_of_2(T x)
+T next_power_of_2(T x)
 {
 #if __cplusplus >= 202002L
   using UT = typename pstd::make_unsigned<T>::type;
@@ -66,7 +77,7 @@ inline T next_power_of_2(T x)
 }
 
 template <typename T>
-inline T ilog2(T x)
+T ilog2(T x)
 {
 #if __cplusplus >= 202002L
   using UT = typename pstd::make_unsigned<T>::type;
@@ -132,14 +143,14 @@ struct ipow_helper<T, 0>
 };
 
 template <int EXP, typename T>
-inline T ipow(T base)
+T ipow(T base)
 {
   return ipow_helper<T, EXP>::ipow(base);
 }
 
 /// Integer nth root
 template <int N, typename T>
-inline T iroot(T x)
+T iroot(T x)
 {
   T r;
 
