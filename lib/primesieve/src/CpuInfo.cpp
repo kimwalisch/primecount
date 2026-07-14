@@ -34,12 +34,12 @@
 #include <exception>
 #include <string>
 
+using namespace primesieve;
+
 #if defined(__APPLE__) && \
     __has_include(<sys/sysctl.h>)
   #define APPLE_SYSCTL
 #endif
-
-using primesieve::Vector;
 
 #if defined(_WIN32)
 
@@ -409,8 +409,6 @@ void CpuInfo::init()
 #include <map>
 #include <set>
 #include <sstream>
-
-using namespace primesieve;
 
 namespace {
 

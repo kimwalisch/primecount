@@ -2,7 +2,7 @@
 /// @file   isqrt_constexpr.cpp
 /// @brief  Test compile time square root function.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -56,6 +56,8 @@ static_assert(bad_isqrt(100000000) == 10000, "bad_isqrt(10^8) failed!");
 
 int main()
 {
+  using primesieve::ctSqrt;
+
   static_assert(ctSqrt(0) == 0, "ctSqrt(0) failed!");
   static_assert(ctSqrt(1) == 1, "ctSqrt(1) failed!");
   static_assert(ctSqrt(2) == 1, "ctSqrt(2) failed!");

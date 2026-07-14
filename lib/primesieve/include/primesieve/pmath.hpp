@@ -2,7 +2,7 @@
 /// @file   pmath.hpp
 /// @brief  Auxiliary math functions for primesieve.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -26,12 +26,25 @@
   #define __has_builtin(x) 0
 #endif
 
-namespace {
+namespace primesieve {
 
 template <typename X, typename Y>
-inline X ceilDiv(X x, Y y)
+X ceilDiv(X x, Y y)
 {
   return (X) ((x + y - 1) / y);
+}
+
+template <typename A, typename B, typename C>
+B inBetween(A min, B x, C max)
+{
+  using T = typename std::common_type<A, B, C>::type;
+
+  if ((T) x < (T) min)
+    return (B) min;
+  if ((T) x > (T) max)
+    return (B) max;
+
+  return x;
 }
 
 template <typename T>
@@ -49,7 +62,7 @@ constexpr T numberOfBits()
 }
 
 template <typename T>
-inline T floorPow2(T x)
+T floorPow2(T x)
 {
 #if __cplusplus >= 202002L
   if (x == 0)
@@ -73,7 +86,7 @@ inline T floorPow2(T x)
 }
 
 template <typename T>
-inline T ilog2(T x)
+T ilog2(T x)
 {
 #if __cplusplus >= 202002L
   auto ux = std::make_unsigned_t<T>(x);
@@ -107,70 +120,9 @@ inline T ilog2(T x)
 #endif
 }
 
-/// Returns 2^64-1 if (x + y) > 2^64-1
-inline uint64_t checkedAdd(uint64_t x, uint64_t y)
-{
-  if (x >= std::numeric_limits<uint64_t>::max() - y)
-    return std::numeric_limits<uint64_t>::max();
-  else
-    return x + y;
-}
-
-/// Returns 0 if (x - y) < 0
-inline uint64_t checkedSub(uint64_t x, uint64_t y)
-{
-  if (x > y)
-    return x - y;
-  else
-    return 0;
-}
-
-template <typename A, typename B, typename C>
-inline B inBetween(A min, B x, C max)
-{
-  using T = typename std::common_type<A, B, C>::type;
-
-  if ((T) x < (T) min)
-    return (B) min;
-  if ((T) x > (T) max)
-    return (B) max;
-
-  return x;
-}
-
-/// primeCountUpper(x) >= pi(x).
-/// In order to prevent having to resize vectors with prime numbers
-/// (which would incur additional overhead) it is important that
-/// primeCountUpper(x) >= pi(x). Also for our purpose, it is
-/// actually beneficial if primeCountUpper(x) is a few percent
-/// larger (e.g. 3%) than pi(x), this reduces the number of memory
-/// allocations in PrimeGenerator::fillPrevPrimes().
-///
-inline std::size_t primeCountUpper(uint64_t start, uint64_t stop)
-{
-  if (start > stop)
-    return 0;
-
-  // pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
-  // Pierre Dusart, https://arxiv.org/abs/1002.0442 eq. 6.6.
-  double x = std::max(100.0, (double) stop);
-  double pix = (stop - start) / (std::log(x) - 1.1) + 5;
-
-  // This can only happen on 32-bit OSes
-  if (pix > (double) std::numeric_limits<std::size_t>::max())
-    return std::numeric_limits<std::size_t>::max();
-
-  return (std::size_t) pix;
-}
-
-inline std::size_t primeCountUpper(uint64_t stop)
-{
-  return primeCountUpper(0, stop);
-}
-
 /// Approximation of the maximum prime gap near n
 template <typename T>
-inline T maxPrimeGap(T n)
+T maxPrimeGap(T n)
 {
   double x = (double) n;
   x = std::max(8.0, x);
@@ -247,7 +199,7 @@ constexpr T ctSqrt(T x)
 #endif
 
 template <typename T>
-inline T isqrt(T x)
+T isqrt(T x)
 {
   T s = (T) std::sqrt((double) x);
 
@@ -293,6 +245,58 @@ inline T isqrt(T x)
   }
 
   return r;
+}
+
+} // namespace
+
+namespace {
+
+/// Returns 2^64-1 if (x + y) > 2^64-1
+inline uint64_t checkedAdd(uint64_t x, uint64_t y)
+{
+  if (x >= std::numeric_limits<uint64_t>::max() - y)
+    return std::numeric_limits<uint64_t>::max();
+  else
+    return x + y;
+}
+
+/// Returns 0 if (x - y) < 0
+inline uint64_t checkedSub(uint64_t x, uint64_t y)
+{
+  if (x > y)
+    return x - y;
+  else
+    return 0;
+}
+
+/// primeCountUpper(x) >= pi(x).
+/// In order to prevent having to resize vectors with prime numbers
+/// (which would incur additional overhead) it is important that
+/// primeCountUpper(x) >= pi(x). Also for our purpose, it is
+/// actually beneficial if primeCountUpper(x) is a few percent
+/// larger (e.g. 3%) than pi(x), this reduces the number of memory
+/// allocations in PrimeGenerator::fillPrevPrimes().
+///
+inline std::size_t primeCountUpper(uint64_t start, uint64_t stop)
+{
+  if (start > stop)
+    return 0;
+
+  // pi(x) <= x / (log(x) - 1.1) + 5, for x >= 4.
+  // Pierre Dusart, https://arxiv.org/abs/1002.0442 eq. 6.6.
+  double x = std::max(100.0, (double) stop);
+  double pix = (stop - start) / (std::log(x) - 1.1) + 5;
+
+  // This can only happen on 32-bit OSes
+  if (pix > (double) std::numeric_limits<std::size_t>::max())
+    return std::numeric_limits<std::size_t>::max();
+
+  return (std::size_t) pix;
+}
+
+inline std::size_t primeCountUpper(uint64_t stop)
+{
+  return primeCountUpper(0, stop);
 }
 
 } // namespace

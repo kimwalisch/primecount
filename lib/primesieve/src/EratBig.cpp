@@ -61,7 +61,7 @@ struct WheelElement
 // this variable is properly aligned to a 4-byte boundary and
 // sizeof(WheelElement) is a power of 2. This improves
 // performance by up to 15%.
-static_assert(isPow2(sizeof(WheelElement)),
+static_assert(primesieve::isPow2(sizeof(WheelElement)),
               "sizeof(WheelElement) must be a power of 2!");
 
 /// Used to skip multiples of 2, 3, 5 and 7

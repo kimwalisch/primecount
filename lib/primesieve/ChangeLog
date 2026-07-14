@@ -1,6 +1,7 @@
-Changes in version 12.15, 09/07/2026
+Changes in version 12.15, 17/07/2026
 ====================================
 
+* Fix LLVM/Clang -Wunused-template warning.
 * CpuInfo.cpp: Use primesieve::Vector instead of std::vector.
 * macros.hpp: Add INDETERMINATE macro to prevent memset zero initialization of large stack arrays.
 * nthPrime.cpp: Fix undefined behavior.

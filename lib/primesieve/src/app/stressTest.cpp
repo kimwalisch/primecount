@@ -290,6 +290,7 @@ uint64_t countPrimes(uint64_t threadIndex,
 
 void stressTest(const CmdOptions& opts)
 {
+  using primesieve::inBetween;
   int maxThreads = std::thread::hardware_concurrency();
   int threads = (opts.threads > 0) ? opts.threads : maxThreads;
   threads = inBetween(1, threads, maxThreads);

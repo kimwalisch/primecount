@@ -10,7 +10,6 @@
 
 #include "ParallelSieve.hpp"
 #include "PrimeSieveClass.hpp"
-#include "RelaxedAtomic.hpp"
 
 #include <primesieve/config.hpp>
 #include <primesieve/forward.hpp>
@@ -36,6 +35,23 @@ counts_t& operator+=(counts_t& v1, const counts_t& v2)
     v1[i] += v2[i];
   return v1;
 }
+
+template <typename T>
+class RelaxedAtomic
+{
+public:
+  RelaxedAtomic(T n) : atomic_(n) { }
+  // Postfix Increment
+  T operator++(int)
+  {
+    return atomic_.fetch_add(1, std::memory_order_relaxed);
+  }
+private:
+  // Use padding to avoid CPU false sharing
+  MAYBE_UNUSED char pad1[config::MAX_CACHE_LINE_SIZE];
+  std::atomic<T> atomic_;
+  MAYBE_UNUSED char pad2[config::MAX_CACHE_LINE_SIZE];
+};
 
 } // namespace
 
@@ -149,7 +165,7 @@ void ParallelSieve::sieve()
     uint64_t threadDist = getThreadDistance(threads);
     uint64_t iters = ((dist - 1) / threadDist) + 1;
     threads = inBetween(1, threads, iters);
-    RelaxedAtomic<uint64_t> a(0);
+    INDETERMINATE RelaxedAtomic<uint64_t> a(0);
 
     // Each thread executes 1 task
     auto task = [&]()

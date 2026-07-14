@@ -17,6 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 
+using primesieve::ilog2;
+
 void check(bool OK)
 {
   std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";

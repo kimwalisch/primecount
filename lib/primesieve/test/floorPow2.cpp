@@ -2,7 +2,7 @@
 /// @file   floorPow2.cpp
 /// @brief  Round down to nearest power of 2.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -14,6 +14,8 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+
+using primesieve::floorPow2;
 
 void check(bool OK)
 {
