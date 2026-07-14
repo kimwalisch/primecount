@@ -544,11 +544,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         ((m >> counter_log2_dist) + 1) << counter_log2_dist;
 
     #define CHECK_FINISHED(w) \
-      if (m >= sieve_bytes) \
-      { \
-        primeState.wheel_index = w; \
-        goto finished1; \
-      }
+      if_unlikely(m >= sieve_bytes) \
+        goto finished1_ ## w;
 
     #define UNSET_BIT(i) \
       { \
@@ -667,8 +664,28 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
       default: UNREACHABLE;
     }
 
+    #define GOTO_LABELS(w1, w2, w3, w4, w5, w6, w7, w8) \
+      finished1_ ## w1: primeState.wheel_index = w1; goto finished1; \
+      finished1_ ## w2: primeState.wheel_index = w2; goto finished1; \
+      finished1_ ## w3: primeState.wheel_index = w3; goto finished1; \
+      finished1_ ## w4: primeState.wheel_index = w4; goto finished1; \
+      finished1_ ## w5: primeState.wheel_index = w5; goto finished1; \
+      finished1_ ## w6: primeState.wheel_index = w6; goto finished1; \
+      finished1_ ## w7: primeState.wheel_index = w7; goto finished1; \
+      finished1_ ## w8: primeState.wheel_index = w8; goto finished1;
+
+    GOTO_LABELS(0, 1, 2, 3, 4, 5, 6, 7)
+    GOTO_LABELS(8, 9, 10, 11, 12, 13, 14, 15)
+    GOTO_LABELS(16, 17, 18, 19, 20, 21, 22, 23)
+    GOTO_LABELS(24, 25, 26, 27, 28, 29, 30, 31)
+    GOTO_LABELS(32, 33, 34, 35, 36, 37, 38, 39)
+    GOTO_LABELS(40, 41, 42, 43, 44, 45, 46, 47)
+    GOTO_LABELS(48, 49, 50, 51, 52, 53, 54, 55)
+    GOTO_LABELS(56, 57, 58, 59, 60, 61, 62, 63)
+
     #undef UNSET_BIT
     #undef CHECK_FINISHED
+    #undef GOTO_LABELS
 
     finished1:;
 
@@ -683,11 +700,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   else
   {
     #define CHECK_FINISHED(w) \
-      if (m >= sieve_bytes) \
-      { \
-        primeState.wheel_index = w; \
-        goto finished2; \
-      }
+      if_unlikely(m >= sieve_bytes) \
+        goto finished2_ ## w;
 
     #define UNSET_BIT(i) \
       { \
@@ -799,6 +813,29 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
       default: UNREACHABLE;
     }
+
+    #define GOTO_LABELS(w1, w2, w3, w4, w5, w6, w7, w8) \
+      finished2_ ## w1: primeState.wheel_index = w1; goto finished2; \
+      finished2_ ## w2: primeState.wheel_index = w2; goto finished2; \
+      finished2_ ## w3: primeState.wheel_index = w3; goto finished2; \
+      finished2_ ## w4: primeState.wheel_index = w4; goto finished2; \
+      finished2_ ## w5: primeState.wheel_index = w5; goto finished2; \
+      finished2_ ## w6: primeState.wheel_index = w6; goto finished2; \
+      finished2_ ## w7: primeState.wheel_index = w7; goto finished2; \
+      finished2_ ## w8: primeState.wheel_index = w8; goto finished2;
+
+    GOTO_LABELS(0, 1, 2, 3, 4, 5, 6, 7)
+    GOTO_LABELS(8, 9, 10, 11, 12, 13, 14, 15)
+    GOTO_LABELS(16, 17, 18, 19, 20, 21, 22, 23)
+    GOTO_LABELS(24, 25, 26, 27, 28, 29, 30, 31)
+    GOTO_LABELS(32, 33, 34, 35, 36, 37, 38, 39)
+    GOTO_LABELS(40, 41, 42, 43, 44, 45, 46, 47)
+    GOTO_LABELS(48, 49, 50, 51, 52, 53, 54, 55)
+    GOTO_LABELS(56, 57, 58, 59, 60, 61, 62, 63)
+
+    #undef UNSET_BIT
+    #undef CHECK_FINISHED
+    #undef GOTO_LABELS
 
     finished2:;
 
