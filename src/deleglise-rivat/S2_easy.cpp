@@ -67,7 +67,7 @@ T S2_easy_OpenMP(T x,
   PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -364,7 +364,7 @@ T S2_easy_OpenMP(T x,
   PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
-  RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
 
   // for (b = pi[sqrty] + 1; b <= pi_x13; b++)
   #pragma omp parallel num_threads(threads) reduction(+: sum)
