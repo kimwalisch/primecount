@@ -463,7 +463,7 @@ public:
 
     uint64_t sqrt_high = (uint64_t) isqrt(high);
     auto segment = get_segment_config(high, threads);
-    RelaxedAtomic<uint64_t> next_chunk(0);
+    INDETERMINATE RelaxedAtomic<uint64_t> next_chunk(0);
 
     // The main thread starts the worker threads
     for (int t = 0; t < segment.threads; t++)

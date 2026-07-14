@@ -2,7 +2,7 @@
 /// @file  api.cpp
 ///        primecount's C++ API.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -12,6 +12,7 @@
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
 #include <gourdon.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
 #include <PiTable.hpp>

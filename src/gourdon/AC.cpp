@@ -336,7 +336,7 @@ T AC_OpenMP(T x,
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -885,7 +885,7 @@ T AC_OpenMP(T x,
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
+  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the

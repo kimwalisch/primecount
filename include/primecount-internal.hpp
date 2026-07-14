@@ -87,33 +87,24 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y);
 maxint_t get_max_x(double alpha_y);
 void verify_pix(string_view_t pix_function, maxint_t x, maxint_t pix, maxint_t Lix);
 
-} // namespace primecount
+template <typename T>
+double get_percent(T low, T limit)
+{
+  double percent = (100.0 * low) / std::max((T) 1, limit);
+  return in_between(0, percent, 100);
+}
+
+} // namespace
 
 namespace {
 
-template <typename T1, typename T2, typename T3>
-T2 in_between(T1 min, T2 x, T3 max)
-{
-  if (x < min || max < min)
-    return (T2) min;
-  if (x > max)
-    return (T2) max;
-
-  return x;
-}
+using namespace primecount;
 
 inline int ideal_num_threads(int64_t sieve_limit, int threads, int64_t thread_threshold)
 {
   thread_threshold = std::max((int64_t) 1, thread_threshold);
   int64_t max_threads = ceil_div(sieve_limit, thread_threshold);
   return in_between(1, threads, max_threads);
-}
-
-template <typename T>
-double get_percent(T low, T limit)
-{
-  double percent = (100.0 * low) / std::max((T) 1, limit);
-  return in_between(0, percent, 100);
 }
 
 } // namespace

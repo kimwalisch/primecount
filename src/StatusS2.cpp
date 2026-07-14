@@ -12,6 +12,7 @@
 
 #include <StatusS2.hpp>
 #include <primecount-internal.hpp>
+#include <imath.hpp>
 #include <int128_t.hpp>
 #include <macros.hpp>
 #include <print.hpp>

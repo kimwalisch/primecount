@@ -10,6 +10,7 @@ Changes in primecount-8.6, 2026-07-13
 * Sieve_pre_sieve.hpp: Changes due to new sieve vector type.
 * Sieve_arrays.hpp: Changes due to new sieve vector type.
 * Move the sieve source files into the new src/sieve directory and drop the Sieve_ file name prefix.
+* Fix LLVM/Clang -Wunused-template warning.
 * Sieve.hpp, Sieve_count_start_stop.hpp, Sieve_count_stop.hpp,
   gourdon/D_arm_sve.hpp: Use __attribute__((target("+sve"))) instead of
   target("arch=armv8-a+sve") for the ARM SVE multiarch runtime dispatch.

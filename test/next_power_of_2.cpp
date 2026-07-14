@@ -2,7 +2,7 @@
 /// @file   next_power_of_2.cpp
 /// @brief  Round up to nearest power of 2.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
+
+using primecount::next_power_of_2;
 
 void check(bool OK)
 {
