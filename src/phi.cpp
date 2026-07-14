@@ -16,7 +16,7 @@
 ///        method, Revista do DETUA, vol. 4, no. 6, March 2006, p. 761.
 ///        http://sweet.ua.pt/tos/bib/5.4.pdf
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -192,7 +192,7 @@ private:
   bool is_pix(uint64_t x, uint64_t a) const
   {
     return x < pi_.size() &&
-           x < isquare(primes_[a + 1]);
+           x < uint64_t(primes_[a + 1]) * primes_[a + 1];
   }
 
   bool is_cached(uint64_t x, uint64_t a) const

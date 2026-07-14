@@ -4,7 +4,7 @@
 ///         Note that the log2(x) function from <cmath> is not
 ///         accurate enough near 2^64.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,6 +16,8 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+
+using primecount::ilog2;
 
 void check(bool OK)
 {

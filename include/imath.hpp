@@ -25,12 +25,7 @@
   #define __has_builtin(x) 0
 #endif
 
-namespace {
-
-inline uint64_t isquare(uint64_t x)
-{
-  return x * x;
-}
+namespace primecount {
 
 template <typename A, typename B>
 inline A ceil_div(A a, B b)

@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <type_traits>
 
-namespace {
+namespace primecount {
 
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>

@@ -4,7 +4,7 @@
 ///         functions for 128-bit integers that are missing
 ///         in the C++ standard library.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -73,7 +73,6 @@ using std::to_string;
 // Portable C++ type traits that support int128_t and uint128_t.
 // This is required for GCC/Clang if the user compiles with -std=c++*
 // instead of -std=gnu++* and also for LLVM/Clang on Windows.
-namespace {
 namespace pstd {
 
 using namespace primecount;
@@ -171,7 +170,6 @@ template <typename T> struct numeric_limits {
   };
 #endif
 
-} // namespace pstd
 } // namespace
 
 #endif
