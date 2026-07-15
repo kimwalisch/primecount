@@ -2,7 +2,7 @@
 /// @file   ctz.hpp
 /// @brief  Count the number of trailing zeros.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -17,9 +17,9 @@
 #if defined(__GNUC__) || \
     __has_builtin(__builtin_ctzl)
 
-namespace {
+namespace primecount {
 
-inline int ctz64(uint64_t x)
+ALWAYS_INLINE int ctz64(uint64_t x)
 {
   // __builtin_ctz(0) is undefined behavior
   ASSERT(x != 0);
@@ -43,9 +43,9 @@ inline int ctz64(uint64_t x)
 
 #include <bit>
 
-namespace {
+namespace primecount {
 
-inline int ctz64(uint64_t x)
+ALWAYS_INLINE int ctz64(uint64_t x)
 {
   return std::countr_zero(x);
 }
@@ -58,9 +58,9 @@ inline int ctz64(uint64_t x)
 
 #include <intrin.h>
 
-namespace {
+namespace primecount {
 
-inline int ctz64(uint64_t x)
+ALWAYS_INLINE int ctz64(uint64_t x)
 {
   // _BitScanForward64(0) is undefined behavior
   ASSERT(x != 0);
@@ -68,35 +68,6 @@ inline int ctz64(uint64_t x)
   unsigned long r;
   _BitScanForward64(&r, x);
   return (int) r;
-}
-
-} // namespace
-
-#else
-
-// Portable pure integer count trailing zeros algorithm.
-// https://www.chessprogramming.org/BitScan#With_separated_LS1B
-
-namespace {
-
-const int index64[64] =
-{
-  0, 47,  1, 56, 48, 27,  2, 60,
-  57, 49, 41, 37, 28, 16,  3, 61,
-  54, 58, 35, 52, 50, 42, 21, 44,
-  38, 32, 29, 23, 17, 11,  4, 62,
-  46, 55, 26, 59, 40, 36, 15, 53,
-  34, 51, 20, 43, 31, 22, 10, 45,
-  25, 39, 14, 33, 19, 30,  9, 24,
-  13, 18,  8, 12,  7,  6,  5, 63
-};
-
-inline int ctz64(uint64_t x)
-{
-  // ctz64(0) is undefined behavior
-  ASSERT(x != 0);
-  constexpr uint64_t debruijn64 = 0x03f79d71b4cb0a89ull;
-  return index64[((x ^ (x-1)) * debruijn64) >> 58];
 }
 
 } // namespace
