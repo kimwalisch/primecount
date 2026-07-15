@@ -239,7 +239,7 @@ private:
 
     for (; i <= a; i++)
     {
-      // Initalize phi(x, i) with phi(x, i - 1)
+      // Initialize phi(x, i) with phi(x, i - 1)
       if (i - 1 <= PhiTiny::max_a())
         sieve_[i] = std::move(sieve_[i - 1]);
       else
