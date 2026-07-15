@@ -79,9 +79,11 @@ bool has_arm_sve()
       return false;
 
     // Check if the Linux kernel and the CPU support
-    // the ARM SVE instruction set required by our
-    // vectorized implementations.
-    return ((hwcaps & HWCAP_SVE) == HWCAP_SVE);
+    // the ARM SVE instruction set.
+    if (hwcaps & HWCAP_SVE)
+      return true;
+    else
+      return false;
   }();
 
   return cached;
