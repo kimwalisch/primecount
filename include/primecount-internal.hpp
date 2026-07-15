@@ -12,6 +12,7 @@
 #define PRIMECOUNT_INTERNAL_HPP
 
 #include <int128_t.hpp>
+#include <macros.hpp>
 #include <print.hpp>
 #include <imath.hpp>
 
@@ -94,13 +95,7 @@ double get_percent(T low, T limit)
   return in_between(0, percent, 100);
 }
 
-} // namespace
-
-namespace {
-
-using namespace primecount;
-
-inline int ideal_num_threads(int64_t sieve_limit, int threads, int64_t thread_threshold)
+ALWAYS_INLINE int ideal_num_threads(int64_t sieve_limit, int threads, int64_t thread_threshold)
 {
   thread_threshold = std::max((int64_t) 1, thread_threshold);
   int64_t max_threads = ceil_div(sieve_limit, thread_threshold);
