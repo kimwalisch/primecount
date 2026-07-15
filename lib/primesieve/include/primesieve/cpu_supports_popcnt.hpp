@@ -1,6 +1,6 @@
 ///
 /// @file  cpu_supports_popcnt.hpp
-/// @brief POPCNT detection fo x86 and x86-64 CPUs.
+/// @brief POPCNT detection for x86 and x86-64 CPUs.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
