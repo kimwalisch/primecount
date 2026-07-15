@@ -80,7 +80,7 @@ ALWAYS_INLINE uint64_t bytes_per_count_instruction()
 namespace primecount {
 
 /// Count 1 bits inside [start, stop]
-ALWAYS_INLINE uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   #if defined(ENABLE_ARM_SVE)
     return count_arm_sve(start, stop);
