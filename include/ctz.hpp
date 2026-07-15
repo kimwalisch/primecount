@@ -72,6 +72,29 @@ ALWAYS_INLINE int ctz64(uint64_t x)
 
 } // namespace
 
+#elif defined(_MSC_VER) && \
+      (defined(_M_IX86) || defined(_M_ARM)) && \
+      __has_include(<intrin.h>)
+
+#include <intrin.h>
+
+namespace primecount {
+
+ALWAYS_INLINE int ctz64(uint64_t x)
+{
+  // _BitScanForward(0) is undefined behavior
+  ASSERT(x != 0);
+
+  unsigned long r;
+  if (_BitScanForward(&r, (unsigned long) x))
+    return (int) r;
+
+  _BitScanForward(&r, (unsigned long) (x >> 32));
+  return (int) r + 32;
+}
+
+} // namespace
+
 #endif
 
 #endif // CTZ_HPP
