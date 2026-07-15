@@ -28,6 +28,18 @@
   #include <immintrin.h>
 #endif
 
+/// The for loop in these SIMD count kernels executes very
+/// few iterations on average and therefore loop unrolling
+/// tends to deteriorate performance due to increased branch
+/// mispredictions. Hence, we disable loop unrolling.
+#if defined(__clang__)
+  #define NOUNROLL_LOOP _Pragma("nounroll")
+#elif defined(__GNUC__) && __GNUC__ >= 8
+  #define NOUNROLL_LOOP _Pragma("GCC unroll 0")
+#else
+  #define NOUNROLL_LOOP
+#endif
+
 /// POPCNT64 /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using POPCNT64
@@ -51,6 +63,7 @@
   uint64_t cnt = popcnt64(start_bits); \
   cnt += popcnt64(stop_bits); \
   \
+  NOUNROLL_LOOP \
   for (uint64_t i = start_idx + 1; i < stop_idx; i++) \
     cnt += popcnt64(sieve[i]);
 
@@ -82,6 +95,7 @@
   /* Compute this for loop using AVX512. */ \
   /* for (i = start_idx + 1; i < stop_idx; i++) */ \
   /*   cnt += popcnt64(sieve[i]); */ \
+  NOUNROLL_LOOP \
   for (; i + 8 < stop_idx; i += 8) \
   { \
     __m512i vec = _mm512_loadu_epi64(&sieve[i]); \
@@ -123,6 +137,7 @@
   /* Compute this for loop using ARM SVE. */ \
   /* for (i = start_idx + 1; i < stop_idx; i++) */ \
   /*   cnt += popcnt64(sieve[i]); */ \
+  NOUNROLL_LOOP \
   for (; i + svcntd() < stop_idx; i += svcntd()) \
   { \
     svuint64_t vec = svld1_u64(svptrue_b64(), &sieve[i]); \
