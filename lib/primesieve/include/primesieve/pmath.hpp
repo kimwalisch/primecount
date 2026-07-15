@@ -247,10 +247,6 @@ T isqrt(T x)
   return r;
 }
 
-} // namespace
-
-namespace {
-
 /// Returns 2^64-1 if (x + y) > 2^64-1
 inline uint64_t checkedAdd(uint64_t x, uint64_t y)
 {

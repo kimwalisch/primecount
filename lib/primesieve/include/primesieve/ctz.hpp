@@ -2,7 +2,7 @@
 /// @file   ctz.hpp
 /// @brief  Count the number of trailing zeros.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,9 +35,9 @@
 #define HAS_CTZ64
 #define CTZ64_SUPPORTS_ZERO
 
-namespace {
+namespace primesieve {
 
-inline uint64_t ctz64(uint64_t x)
+ALWAYS_INLINE uint64_t ctz64(uint64_t x)
 {
 #if defined(HAS_TZCNT)
   // No undefined behavior, TZCNT(0) = 64
@@ -74,9 +74,9 @@ inline uint64_t ctz64(uint64_t x)
 #define HAS_CTZ64
 #define CTZ64_SUPPORTS_ZERO
 
-namespace {
+namespace primesieve {
 
-inline uint64_t ctz64(uint64_t x)
+ALWAYS_INLINE uint64_t ctz64(uint64_t x)
 {
   // No undefined behavior, CTZ(0) = 64.
   // ARM64 has no CTZ instruction, we have to emulate it.
@@ -113,9 +113,9 @@ inline uint64_t ctz64(uint64_t x)
 #define CTZ64_SUPPORTS_ZERO
 #define HAS_CTZ64
 
-namespace {
+namespace primesieve {
 
-inline int ctz64(uint64_t x)
+ALWAYS_INLINE int ctz64(uint64_t x)
 {
   // In 2022 std::countr_zero(x) generates good assembly for
   // most compilers & CPU architectures, except for:
@@ -133,9 +133,9 @@ inline int ctz64(uint64_t x)
 
 #define HAS_CTZ64
 
-namespace {
+namespace primesieve {
 
-inline int ctz64(uint64_t x)
+ALWAYS_INLINE int ctz64(uint64_t x)
 {
   // __builtin_ctz(0) is undefined behavior,
   // we don't define CTZ64_SUPPORTS_ZERO.

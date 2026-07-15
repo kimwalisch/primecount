@@ -75,7 +75,7 @@ private:
 /// returns a random 64-bit integer. It is up to the caller
 /// to handle this use case correctly.
 ///
-inline uint64_t Erat::nextPrime(uint64_t bits, uint64_t low)
+ALWAYS_INLINE uint64_t Erat::nextPrime(uint64_t bits, uint64_t low)
 {
 // CTZ64_SUPPORTS_ZERO is defined if (ctz64(0) <= 64),
 // in this case we use the optimal code path.
@@ -98,14 +98,14 @@ inline uint64_t Erat::nextPrime(uint64_t bits, uint64_t low)
   return prime;
 }
 
-inline void Erat::addSievingPrime(uint64_t prime)
+ALWAYS_INLINE void Erat::addSievingPrime(uint64_t prime)
 {
        if (prime > maxEratMedium_)   eratBig_.addSievingPrime(prime, segmentLow_);
   else if (prime > maxEratSmall_) eratMedium_.addSievingPrime(prime, segmentLow_);
   else /* (prime > maxPreSieve) */ eratSmall_.addSievingPrime(prime, segmentLow_);
 }
 
-inline uint64_t Erat::getStop() const
+ALWAYS_INLINE uint64_t Erat::getStop() const
 {
   return stop_;
 }
