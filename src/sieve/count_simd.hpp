@@ -28,18 +28,6 @@
   #include <immintrin.h>
 #endif
 
-/// The for loop in these SIMD count kernels executes very
-/// few iterations on average and therefore loop unrolling
-/// tends to deteriorate performance due to increased branch
-/// mispredictions. Hence, we disable loop unrolling.
-#if defined(__clang__)
-  #define NOUNROLL_LOOP _Pragma("nounroll")
-#elif defined(__GNUC__) && __GNUC__ >= 8
-  #define NOUNROLL_LOOP _Pragma("GCC unroll 0")
-#else
-  #define NOUNROLL_LOOP
-#endif
-
 /// POPCNT64 /////////////////////////////////////////////////////////
 
 /// Count 1 bits inside [start, stop] using POPCNT64

@@ -68,6 +68,7 @@ ALWAYS_INLINE uint64_t Sieve::count_popcnt64(uint64_t stop)
   // of the counter array contains the number of
   // unsieved elements in the interval:
   // [i * counter_.dist, (i + 1) * counter_.dist[.
+  NOUNROLL_LOOP
   while (counter_.stop <= stop)
   {
     start = counter_.stop;
@@ -111,6 +112,7 @@ ALWAYS_INLINE uint64_t Sieve::count_avx512(uint64_t stop)
   // of the counter array contains the number of
   // unsieved elements in the interval:
   // [i * counter_.dist, (i + 1) * counter_.dist[.
+  NOUNROLL_LOOP
   while (counter_.stop <= stop)
   {
     start = counter_.stop;
@@ -152,6 +154,7 @@ ALWAYS_INLINE uint64_t Sieve::count_arm_sve(uint64_t stop)
   // of the counter array contains the number of
   // unsieved elements in the interval:
   // [i * counter_.dist, (i + 1) * counter_.dist[.
+  NOUNROLL_LOOP
   while (counter_.stop <= stop)
   {
     start = counter_.stop;
