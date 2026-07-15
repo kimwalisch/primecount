@@ -14,7 +14,7 @@
 #include "macros.hpp"
 #include <stdint.h>
 
-namespace {
+namespace primesieve {
 
 ALWAYS_INLINE uint64_t to_littleendian(uint64_t x)
 {
