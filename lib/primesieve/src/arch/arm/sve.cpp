@@ -18,7 +18,7 @@
 ///         TODO: Add macOS support once Apple ARM CPUs support the
 ///               SVE instruction yet.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -32,7 +32,12 @@ namespace primesieve {
 
 bool has_arm_sve()
 {
-  return IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE);
+  static const bool cached = []() -> bool
+  {
+    return IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE);
+  }();
+
+  return cached;
 }
 
 } // namespace
@@ -58,23 +63,28 @@ namespace primesieve {
 
 bool has_arm_sve()
 {
-  errno = 0;
+  static const bool cached = []() -> bool
+  {
+    errno = 0;
 
-  // getauxval() is supported by glibc >= 2.16 (since 2012),
-  // musl libc >= 1.1.0 (2014) and Android's bionic libc (2010).
-  // We check using CMake (multiarch_sve_arm.cmake) if
-  // sve.cpp (and getauxval()) compiles and links correctly.
-  unsigned long hwcaps = getauxval(AT_HWCAP);
+    // getauxval() is supported by glibc >= 2.16 (since 2012),
+    // musl libc >= 1.1.0 (2014) and Android's bionic libc (2010).
+    // We check using CMake (multiarch_sve_arm.cmake) if
+    // sve.cpp (and getauxval()) compiles and links correctly.
+    unsigned long hwcaps = getauxval(AT_HWCAP);
 
-  if (errno != 0)
-    return false;
+    if (errno != 0)
+      return false;
 
-  // Check if the Linux kernel and the CPU support
-  // the ARM SVE instruction set.
-  if (hwcaps & HWCAP_SVE)
-    return true;
-  else
-    return false;
+    // Check if the Linux kernel and the CPU support
+    // the ARM SVE instruction set.
+    if (hwcaps & HWCAP_SVE)
+      return true;
+    else
+      return false;
+  }();
+
+  return cached;
 }
 
 } // namespace
@@ -85,15 +95,17 @@ namespace primesieve {
 
 bool has_arm_sve()
 {
-  // Since __builtin_cpu_init() and __builtin_cpu_supports() are
-  // currently (2025) not yet supported for ARM64 CPUs by both
-  // GCC and Clang, we only try them as a fallback option if
-  // none of the other more reliable methods work.
-  __builtin_cpu_init();
-  if (__builtin_cpu_supports("sve"))
-    return true;
-  else
-    return false;
+  static const bool cached = []() -> bool
+  {
+    // Since __builtin_cpu_init() and __builtin_cpu_supports() are
+    // currently (2025) not yet supported for ARM64 CPUs by both
+    // GCC and Clang, we only try them as a fallback option if
+    // none of the other more reliable methods work.
+    __builtin_cpu_init();
+    return (__builtin_cpu_supports("sve") > 0);
+  }();
+
+  return cached;
 }
 
 } // namespace

@@ -37,7 +37,7 @@ check_cxx_source_compiles("
 
     int main()
     {
-        if (primesieve::has_cpuid_popcnt())
+        if (primesieve::has_popcnt())
             std::cout << \"CPU supports POPCNT!\" << std::endl;
         else
             std::cout << \"CPU does not support POPCNT!\" << std::endl;

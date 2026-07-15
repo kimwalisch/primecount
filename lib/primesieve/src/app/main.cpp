@@ -51,7 +51,7 @@ bool has_arm_sve();
 
 namespace primesieve {
 
-bool has_cpuid_avx512_bw();
+bool has_avx512_bw();
 
 } // namespace
 
@@ -61,7 +61,7 @@ bool has_cpuid_avx512_bw();
 
 namespace primesieve {
 
-bool has_cpuid_avx512_vbmi2();
+bool has_avx512_vbmi2();
 
 } // namespace
 
@@ -263,14 +263,14 @@ void cpuInfo()
   #endif
 
   #if defined(ENABLE_MULTIARCH_AVX512_BW)
-    if (primesieve::has_cpuid_avx512_bw())
+    if (primesieve::has_avx512_bw())
       std::cout << "Has AVX512 BW: yes" << std::endl;
     else
       std::cout << "Has AVX512 BW: no" << std::endl;
   #endif
 
   #if defined(ENABLE_MULTIARCH_AVX512_VBMI2)
-    if (primesieve::has_cpuid_avx512_vbmi2())
+    if (primesieve::has_avx512_vbmi2())
       std::cout << "Has AVX512 VBMI2: yes" << std::endl;
     else
       std::cout << "Has AVX512 VBMI2: no" << std::endl;

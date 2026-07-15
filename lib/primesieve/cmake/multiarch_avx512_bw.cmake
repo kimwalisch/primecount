@@ -64,7 +64,7 @@ check_cxx_source_compiles("
         uint8_t PreSieveTable1[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         uint8_t PreSieveTable2[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-        if (primesieve::has_cpuid_avx512_bw())
+        if (primesieve::has_avx512_bw())
             presieve1_x86_avx512(&PreSieveTable1[0], &PreSieveTable2[1], &sieve[0], 10);
         else
             presieve1_default(&PreSieveTable1[0], &PreSieveTable2[1], &sieve[0], 10);

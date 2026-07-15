@@ -2,7 +2,7 @@
 /// @file  cpuid.cpp
 /// @brief CPUID for x86 and x86-64 CPUs.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -85,73 +85,84 @@ uint64_t get_xcr0()
 
 namespace primesieve {
 
-bool has_cpuid_popcnt()
+bool has_popcnt()
 {
-  int abcd[4];
-  run_cpuid(1, 0, abcd);
-  return (abcd[2] & bit_POPCNT) == bit_POPCNT;
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    return (abcd[2] & bit_POPCNT) == bit_POPCNT;
+  }();
+
+  return cached;
 }
 
-bool has_cpuid_avx512_bw()
+bool has_avx512_bw()
 {
-  int abcd[4];
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    int osxsave_mask = (1 << 27);
 
-  run_cpuid(1, 0, abcd);
+    // Ensure OS supports extended processor state management
+    if ((abcd[2] & osxsave_mask) != osxsave_mask)
+      return false;
 
-  int osxsave_mask = (1 << 27);
+    uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
+    uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
+    uint64_t xcr0 = get_xcr0();
 
-  // Ensure OS supports extended processor state management
-  if ((abcd[2] & osxsave_mask) != osxsave_mask)
-    return false;
+    // Check AVX OS support
+    if ((xcr0 & ymm_mask) != ymm_mask)
+      return false;
 
-  uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
-  uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
-  uint64_t xcr0 = get_xcr0();
+    // Check AVX512 OS support
+    if ((xcr0 & zmm_mask) != zmm_mask)
+      return false;
 
-  // Check AVX OS support
-  if ((xcr0 & ymm_mask) != ymm_mask)
-    return false;
+    run_cpuid(7, 0, abcd);
 
-  // Check AVX512 OS support
-  if ((xcr0 & zmm_mask) != zmm_mask)
-    return false;
+    // presieve1_x86_avx512() requires AVX512F, AVX512BW
+    return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
+            (abcd[1] & bit_AVX512BW) == bit_AVX512BW);
+  }();
 
-  run_cpuid(7, 0, abcd);
-
-  // presieve1_x86_avx512() requires AVX512F, AVX512BW
-  return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
-          (abcd[1] & bit_AVX512BW) == bit_AVX512BW);
+  return cached;
 }
 
-bool has_cpuid_avx512_vbmi2()
+bool has_avx512_vbmi2()
 {
-  int abcd[4];
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    int osxsave_mask = (1 << 27);
 
-  run_cpuid(1, 0, abcd);
+    // Ensure OS supports extended processor state management
+    if ((abcd[2] & osxsave_mask) != osxsave_mask)
+      return false;
 
-  int osxsave_mask = (1 << 27);
+    uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
+    uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
+    uint64_t xcr0 = get_xcr0();
 
-  // Ensure OS supports extended processor state management
-  if ((abcd[2] & osxsave_mask) != osxsave_mask)
-    return false;
+    // Check AVX OS support
+    if ((xcr0 & ymm_mask) != ymm_mask)
+      return false;
 
-  uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
-  uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
-  uint64_t xcr0 = get_xcr0();
+    // Check AVX512 OS support
+    if ((xcr0 & zmm_mask) != zmm_mask)
+      return false;
 
-  // Check AVX OS support
-  if ((xcr0 & ymm_mask) != ymm_mask)
-    return false;
+    run_cpuid(7, 0, abcd);
 
-  // Check AVX512 OS support
-  if ((xcr0 & zmm_mask) != zmm_mask)
-    return false;
+    // fillNextPrimes_x86_avx512() requires AVX512F, AVX512VBMI & AVX512VBMI2
+    return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
+            (abcd[2] & (bit_AVX512VBMI | bit_AVX512VBMI2)) == (bit_AVX512VBMI | bit_AVX512VBMI2));
+  }();
 
-  run_cpuid(7, 0, abcd);
-
-  // fillNextPrimes_x86_avx512() requires AVX512F, AVX512VBMI & AVX512VBMI2
-  return ((abcd[1] & bit_AVX512F) == bit_AVX512F &&
-          (abcd[2] & (bit_AVX512VBMI | bit_AVX512VBMI2)) == (bit_AVX512VBMI | bit_AVX512VBMI2));
+  return cached;
 }
 
 } // namespace

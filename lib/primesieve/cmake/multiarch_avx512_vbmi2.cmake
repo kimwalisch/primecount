@@ -31,7 +31,7 @@ check_cxx_source_compiles("
         void fillNextPrimes_default(uint64_t* primes64);
         void fillNextPrimes(uint64_t* primes64)
         {
-            if (primesieve::has_cpuid_avx512_vbmi2())
+            if (primesieve::has_avx512_vbmi2())
                 fillNextPrimes_x86_avx512(primes64);
             else
                 fillNextPrimes_default(primes64);
