@@ -85,46 +85,53 @@ uint64_t get_xcr0()
 
 namespace primecount {
 
-bool has_cpuid_popcnt()
+bool has_popcnt()
 {
-  int abcd[4];
-  run_cpuid(1, 0, abcd);
-  return (abcd[2] & bit_POPCNT) == bit_POPCNT;
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    return ((abcd[2] & bit_POPCNT) == bit_POPCNT);
+  }();
+
+  return cached;
 }
 
 /// Check if CPU supports: 
 /// AVX512F, AVX512BW, AVX512VL, AVX512VPOPCNTDQ
 ///
-bool has_cpuid_avx512_vpopcnt()
+bool has_avx512_vpopcnt()
 {
-  int abcd[4];
+  static const bool cached = []() -> bool
+  {
+    int abcd[4];
+    run_cpuid(1, 0, abcd);
+    int osxsave_mask = (1 << 27);
 
-  run_cpuid(1, 0, abcd);
+    // Ensure OS supports extended processor state management
+    if ((abcd[2] & osxsave_mask) != osxsave_mask)
+      return false;
 
-  int osxsave_mask = (1 << 27);
+    uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
+    uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
+    uint64_t xcr0 = get_xcr0();
 
-  // Ensure OS supports extended processor state management
-  if ((abcd[2] & osxsave_mask) != osxsave_mask)
-    return false;
+    // Check AVX OS support
+    if ((xcr0 & ymm_mask) != ymm_mask)
+      return false;
 
-  uint64_t ymm_mask = XSTATE_SSE | XSTATE_YMM;
-  uint64_t zmm_mask = XSTATE_SSE | XSTATE_YMM | XSTATE_ZMM;
-  uint64_t xcr0 = get_xcr0();
+    // Check AVX512 OS support
+    if ((xcr0 & zmm_mask) != zmm_mask)
+      return false;
 
-  // Check AVX OS support
-  if ((xcr0 & ymm_mask) != ymm_mask)
-    return false;
+    run_cpuid(7, 0, abcd);
+    return ((abcd[1] & bit_AVX512F ) == bit_AVX512F  &&
+            (abcd[1] & bit_AVX512BW) == bit_AVX512BW &&
+            (abcd[1] & bit_AVX512VL) == bit_AVX512VL &&
+            (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
+  }();
 
-  // Check AVX512 OS support
-  if ((xcr0 & zmm_mask) != zmm_mask)
-    return false;
-
-  run_cpuid(7, 0, abcd);
-
-  return ((abcd[1] & bit_AVX512F ) == bit_AVX512F  &&
-          (abcd[1] & bit_AVX512BW) == bit_AVX512BW &&
-          (abcd[1] & bit_AVX512VL) == bit_AVX512VL &&
-          (abcd[2] & bit_AVX512_VPOPCNTDQ) == bit_AVX512_VPOPCNTDQ);
+  return cached;
 }
 
 } // namespace

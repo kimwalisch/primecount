@@ -13,14 +13,14 @@
 
 namespace primecount {
 
-bool has_cpuid_popcnt();
+bool has_popcnt();
 
 } // namespace
 
 namespace {
 
 /// Initialized at startup
-const bool cpu_supports_popcnt = primecount::has_cpuid_popcnt();
+const bool cpu_supports_popcnt = primecount::has_popcnt();
 
 } // namespace
 

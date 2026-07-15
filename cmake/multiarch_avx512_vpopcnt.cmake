@@ -66,7 +66,7 @@ check_cxx_source_compiles("
         uint64_t cnt = 0;
         Sieve sieve;
 
-        if (primecount::has_cpuid_avx512_vpopcnt())
+        if (primecount::has_avx512_vpopcnt())
             cnt = sieve.count_avx512(&array[0], 10);
         else
             cnt = sieve.count_default(&array[0], 10);

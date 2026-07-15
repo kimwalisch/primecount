@@ -14,14 +14,14 @@
 
 namespace primecount {
 
-bool has_cpuid_avx512_vpopcnt();
+bool has_avx512_vpopcnt();
 
 } // namespace
 
 namespace {
 
 /// Initialized at startup
-const bool cpu_supports_avx512_vpopcnt = primecount::has_cpuid_avx512_vpopcnt();
+const bool cpu_supports_avx512_vpopcnt = primecount::has_avx512_vpopcnt();
 
 } // namespace
 
