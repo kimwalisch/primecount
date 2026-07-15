@@ -155,6 +155,28 @@ ALWAYS_INLINE int ctz64(uint64_t x)
 
 } // namespace
 
+#elif defined(_MSC_VER) && \
+      defined(_WIN64) && \
+      __has_include(<intrin.h>)
+
+#include <intrin.h>
+
+#define HAS_CTZ64
+
+namespace primesieve {
+
+ALWAYS_INLINE int ctz64(uint64_t x)
+{
+  // _BitScanForward64(0) is undefined behavior
+  ASSERT(x != 0);
+
+  unsigned long r;
+  _BitScanForward64(&r, x);
+  return (int) r;
+}
+
+} // namespace
+
 #endif
 
 #endif // CTZ_HPP
