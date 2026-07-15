@@ -53,7 +53,7 @@ uint64_t get_svcntd()
 
 #endif
 
-uint64_t bytes_per_count_instruction()
+ALWAYS_INLINE uint64_t bytes_per_count_instruction()
 {
   #if defined(ENABLE_AVX512_VPOPCNT)
     // count_avx512() algorithm
@@ -80,7 +80,7 @@ uint64_t bytes_per_count_instruction()
 namespace primecount {
 
 /// Count 1 bits inside [start, stop]
-uint64_t Sieve::count(uint64_t start, uint64_t stop) const
+ALWAYS_INLINE uint64_t Sieve::count(uint64_t start, uint64_t stop) const
 {
   #if defined(ENABLE_ARM_SVE)
     return count_arm_sve(start, stop);
