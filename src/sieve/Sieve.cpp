@@ -540,7 +540,7 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   if (is_small_prime)
   {
     uint64_t delta_count = 0;
-    uint64_t counter_threshold = 
+    uint64_t counter_threshold =
         ((m >> counter_log2_dist) + 1) << counter_log2_dist;
 
     #define CHECK_FINISHED(w) \
