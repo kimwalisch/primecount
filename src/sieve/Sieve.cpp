@@ -692,7 +692,8 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
     if (c < counter_size_)
       counter[c] -= uint32_t(count);
 
-    primeState.multiple = uint32_t(m - sieve_bytes);
+    uint32_t m32 = uint32_t(m - sieve_bytes);
+    primeState.multiple = m32;
     total_count_ -= count;
   }
   else
