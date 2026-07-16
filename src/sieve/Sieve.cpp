@@ -539,7 +539,6 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
   // once when the counter index c increases.
   if (is_small_prime)
   {
-    uint64_t delta_count = 0;
     uint64_t counter_threshold =
         ((m >> counter_log2_dist) + 1) << counter_log2_dist;
 
@@ -554,12 +553,12 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
         if (m >= counter_threshold) \
         { \
           auto c = (counter_threshold >> counter_log2_dist) - 1; \
-          counter[c] -= uint32_t(delta_count); \
+          counter[c] -= uint32_t(count); \
           counter_threshold = ((m >> counter_log2_dist) + 1) << counter_log2_dist; \
-          count += delta_count; \
-          delta_count = 0; \
+          total_count_ -= count; \
+          count = 0; \
         } \
-        delta_count += is_bit; \
+        count += is_bit; \
       }
 
     ASSERT (wheel_index <= 63);
@@ -691,10 +690,9 @@ void Sieve::cross_off_count(uint64_t prime, uint64_t i)
 
     uint64_t c = (counter_threshold >> counter_log2_dist) - 1;
     if (c < counter_size_)
-      counter[c] -= uint32_t(delta_count);
+      counter[c] -= uint32_t(count);
 
     primeState.multiple = uint32_t(m - sieve_bytes);
-    count += delta_count;
     total_count_ -= count;
   }
   else
