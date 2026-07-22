@@ -194,13 +194,13 @@ T C2(T xlow,
   // band using Gourdon's inversion equality, which rewrites the
   // sum over q as a sum over the conjugate range (with t = x / p):
   //
-  //   sum_{sc < q <= U} pi(t / q) =
-  //     pi(q_lo) * pi(U) - pi(q_hi) * pi(sc) + sum_{q_lo < q <= q_hi} pi(t / q)
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where sc = min_clustered, U = max_m,
-  //         q_lo = t / U, q_hi = t / (sc + 1).
+  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
   //
-  // The conjugate arguments t / q lie in (sqrt(t), U] <= y <= z
+  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
   // and are read from the (large) pi table instead of segmentedPi.
   // Clustering is only active when min_clustered < max_m, which
   // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
@@ -232,7 +232,7 @@ T C2(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m] = pi(U), pi_min_clustered = pi(sc)
+    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
     sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
     sum -= (T) (b - 2) * (i - pi_min_clustered);
 
@@ -614,13 +614,13 @@ T C2_64(T xlow,
   // band using Gourdon's inversion equality, which rewrites the
   // sum over q as a sum over the conjugate range (with t = x / p):
   //
-  //   sum_{sc < q <= U} pi(t / q) =
-  //     pi(q_lo) * pi(U) - pi(q_hi) * pi(sc) + sum_{q_lo < q <= q_hi} pi(t / q)
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where sc = min_clustered, U = max_m,
-  //         q_lo = t / U, q_hi = t / (sc + 1).
+  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
   //
-  // The conjugate arguments t / q lie in (sqrt(t), U] <= y <= z
+  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
   // and are read from the (large) pi table instead of segmentedPi.
   // Clustering is only active when min_clustered < max_m, which
   // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
@@ -652,7 +652,7 @@ T C2_64(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m] = pi(U), pi_min_clustered = pi(sc)
+    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
     sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
     sum -= (T) (b - 2) * (i - pi_min_clustered);
 
@@ -722,13 +722,13 @@ T C2_128(T xlow,
   // band using Gourdon's inversion equality, which rewrites the
   // sum over q as a sum over the conjugate range (with t = x / p):
   //
-  //   sum_{sc < q <= U} pi(t / q) =
-  //     pi(q_lo) * pi(U) - pi(q_hi) * pi(sc) + sum_{q_lo < q <= q_hi} pi(t / q)
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where sc = min_clustered, U = max_m,
-  //         q_lo = t / U, q_hi = t / (sc + 1).
+  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
   //
-  // The conjugate arguments t / q lie in (sqrt(t), U] <= y <= z
+  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
   // and are read from the (large) pi table instead of segmentedPi.
   // Clustering is only active when min_clustered < max_m, which
   // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
@@ -760,7 +760,7 @@ T C2_128(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m] = pi(U), pi_min_clustered = pi(sc)
+    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
     sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
     sum -= (T) (b - 2) * (i - pi_min_clustered);
 
