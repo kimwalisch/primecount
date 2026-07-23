@@ -1,3 +1,7 @@
+Changes in primecount-8.7, 2026-07-23
+
+* AC.cpp: Simplify clustered easy leaves algorithm using Gourdon's inversion equality.
+
 Changes in primecount-8.6, 2026-07-15
 
 * Update to libprimesieve 12.15.
