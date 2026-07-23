@@ -1,7 +1,6 @@
 # primecount
 
 [![Build status](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/ci.yml) [![Build status](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml/badge.svg)](https://github.com/kimwalisch/primecount/actions/workflows/benchmark.yml)
-[![Github Releases](https://img.shields.io/github/release/kimwalisch/primecount.svg)](https://github.com/kimwalisch/primecount/releases)
 [![C API Documentation](https://img.shields.io/badge/docs-C_API-blue)](doc/libprimecount.md)
 [![C++ API Documentation](https://img.shields.io/badge/docs-C++_API-blue)](doc/libprimecount.md)
 
