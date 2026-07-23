@@ -51,31 +51,6 @@ using namespace primecount;
 
 namespace {
 
-/// If we detect an average number of identical successive
-/// leaves < 6 twice in a row, we disable the clustered
-/// easy leaves algorithm as it becomes inefficient if few
-/// successive leaves are identical.
-///
-struct ClusteredLeavesStats
-{
-  uint64_t count_below_threshold = 0;
-
-  bool use_clustered() const
-  {
-    return count_below_threshold < 2;
-  }
-
-  void update(uint64_t dist, uint64_t iters)
-  {
-    uint64_t threshold = 6;
-    uint64_t avg_clustered_leaves = dist / iters;
-
-    count_below_threshold++;
-    if (avg_clustered_leaves >= threshold)
-      count_below_threshold = 0;
-  }
-};
-
 #if !defined(ENABLE_LIBDIVIDE)
 
 /// Compute the A formula.
@@ -185,6 +160,8 @@ T C1(T xp,
 }
 
 /// Compute the 2nd part of the C formula.
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -198,8 +175,7 @@ T C2(T xlow,
      uint64_t b,
      const Primes& primes,
      const PiTable& pi,
-     const SegmentedPiTable& segmentedPi,
-     ClusteredLeavesStats& clusteredLeavesStats)
+     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -213,61 +189,49 @@ T C2(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // Only use the clustered easy leaves algorithm if many
-  // successive leaves are identical. If on average only few
-  // successive leaves are identical then this algorithm
-  // deteriorates performance due to poor instruction level
-  // parallelism and increased cache misses.
-  if (clusteredLeavesStats.use_clustered() &&
-      i > pi_min_clustered)
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
+  //
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
+  //
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
+  if (i > pi_min_clustered)
   {
-    uint64_t ihi = i;
-    uint64_t ilo = pi_min_clustered + 1;
-    uint64_t iters = 0;
+    uint64_t q_lo = fast_div64(xp, max_m);
+    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t j = pi_q_hi;
 
-    // Find all clustered easy leaves where
-    // successive leaves are identical.
-    // pq = primes[b] * primes[i]
-    // Which satisfy: low <= x / pq < high && q <= y && pq > z
-    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    //
-    // The clustered easy leaves algorithm has poor instruction
-    // level parallelism because of long instruction dependency
-    // chains. To mitigate this issue we process clustered
-    // easy leaves bidirectionally (high-end and low-end streams)
-    // which increases the number of independent instructions
-    // and improves performance on modern out-of-order CPUs.
-    //
-    while (ilo <= ihi)
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
+    for (; j > pi_q_lo + 3; j -= 4)
     {
-      // High-end stream (decreasing i)
-      uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
-      uint64_t pi_xpq_hi = segmentedPi[xpq_hi];
-      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
-      uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
-      uint64_t ihi_min = pi[max(xpq2_hi, min_clustered)];
-      ASSERT(ihi_min + 1 >= ilo);
-      sum += phi_xpq_hi * (ihi - ihi_min);
-      ihi = ihi_min;
-      iters++;
+      uint64_t xpq0 = fast_div64(xp, primes[j]);
+      uint64_t xpq1 = fast_div64(xp, primes[j-1]);
+      uint64_t xpq2 = fast_div64(xp, primes[j-2]);
+      uint64_t xpq3 = fast_div64(xp, primes[j-3]);
 
-      if (ilo > ihi)
-        break;
-
-      // Low-end stream (increasing i)
-      uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
-      uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
-      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t ilo_max = pi[xpq2_lo] + 1;
-      ASSERT(ilo_max - 1 <= ihi);
-      sum += phi_xpq_lo * (ilo_max - ilo);
-      ilo = ilo_max;
-      iters++;
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
-    uint64_t dist = i - pi_min_clustered;
-    clusteredLeavesStats.update(dist, iters);
+    for (; j > pi_q_lo; j--)
+    {
+      uint64_t xpq = fast_div64(xp, primes[j]);
+      conj_sum += pi[xpq];
+    }
+
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
+
     i = pi_min_clustered;
   }
 
@@ -411,7 +375,6 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        ClusteredLeavesStats clusteredLeavesStats;
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
@@ -419,9 +382,9 @@ T AC_OpenMP(T x,
           T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi, clusteredLeavesStats);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
           else
-            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, clusteredLeavesStats);
+            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
@@ -613,7 +576,8 @@ T C1(T xp,
 }
 
 /// Compute the 2nd part of the C formula.
-/// 64-bit function: xp < 2^64
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -627,8 +591,7 @@ T C2_64(T xlow,
         uint64_t prime,
         const LibdividePrimes& primes,
         const PiTable& pi,
-        const SegmentedPiTable& segmentedPi,
-        ClusteredLeavesStats& clusteredLeavesStats)
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -641,61 +604,49 @@ T C2_64(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // Only use the clustered easy leaves algorithm if many
-  // successive leaves are identical. If on average only few
-  // successive leaves are identical then this algorithm
-  // deteriorates performance due to poor instruction level
-  // parallelism and increased cache misses.
-  if (clusteredLeavesStats.use_clustered() &&
-      i > pi_min_clustered)
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
+  //
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
+  //
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
+  if (i > pi_min_clustered)
   {
-    uint64_t ihi = i;
-    uint64_t ilo = pi_min_clustered + 1;
-    uint64_t iters = 0;
+    uint64_t q_lo = fast_div64(xp, max_m);
+    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t j = pi_q_hi;
 
-    // Find all clustered easy leaves where
-    // successive leaves are identical.
-    // pq = primes[b] * primes[i]
-    // Which satisfy: low <= x / pq < high && q <= y && pq > z
-    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    //
-    // The clustered easy leaves algorithm has poor instruction
-    // level parallelism because of long instruction dependency
-    // chains. To mitigate this issue we process clustered
-    // easy leaves bidirectionally (high-end and low-end streams)
-    // which increases the number of independent instructions
-    // and improves performance on modern out-of-order CPUs.
-    //
-    while (ilo <= ihi)
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
+    for (; j > pi_q_lo + 3; j -= 4)
     {
-      // High-end stream (decreasing i)
-      uint64_t xpq_hi = xp / primes[ihi];
-      uint64_t pi_xpq_hi = segmentedPi[xpq_hi];
-      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
-      uint64_t xpq2_hi = xp / primes[pi_xpq_hi + 1];
-      uint64_t ihi_min = pi[max(xpq2_hi, min_clustered)];
-      ASSERT(ihi_min + 1 >= ilo);
-      sum += phi_xpq_hi * (ihi - ihi_min);
-      ihi = ihi_min;
-      iters++;
+      uint64_t xpq0 = xp / primes[j];
+      uint64_t xpq1 = xp / primes[j-1];
+      uint64_t xpq2 = xp / primes[j-2];
+      uint64_t xpq3 = xp / primes[j-3];
 
-      if (ilo > ihi)
-        break;
-
-      // Low-end stream (increasing i)
-      uint64_t xpq_lo = xp / primes[ilo];
-      uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
-      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq2_lo = xp / primes[pi_xpq_lo];
-      uint64_t ilo_max = pi[xpq2_lo] + 1;
-      ASSERT(ilo_max - 1 <= ihi);
-      sum += phi_xpq_lo * (ilo_max - ilo);
-      ilo = ilo_max;
-      iters++;
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
-    uint64_t dist = i - pi_min_clustered;
-    clusteredLeavesStats.update(dist, iters);
+    for (; j > pi_q_lo; j--)
+    {
+      uint64_t xpq = xp / primes[j];
+      conj_sum += pi[xpq];
+    }
+
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
+
     i = pi_min_clustered;
   }
 
@@ -728,7 +679,8 @@ T C2_64(T xlow,
 }
 
 /// Compute the 2nd part of the C formula.
-/// 128-bit function: xp >= 2^64
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -741,8 +693,7 @@ T C2_128(T xlow,
          uint64_t b,
          const Primes& primes,
          const PiTable& pi,
-         const SegmentedPiTable& segmentedPi,
-         ClusteredLeavesStats& clusteredLeavesStats)
+         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -756,61 +707,49 @@ T C2_128(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // Only use the clustered easy leaves algorithm if many
-  // successive leaves are identical. If on average only few
-  // successive leaves are identical then this algorithm
-  // deteriorates performance due to poor instruction level
-  // parallelism and increased cache misses.
-  if (clusteredLeavesStats.use_clustered() &&
-      i > pi_min_clustered)
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
+  //
+  //   sum_{min_clustered < q <= max_m} pi(t / q) =
+  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
+  //     + sum_{q_lo < q <= q_hi} pi(t / q)
+  //
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
+  if (i > pi_min_clustered)
   {
-    uint64_t ihi = i;
-    uint64_t ilo = pi_min_clustered + 1;
-    uint64_t iters = 0;
+    uint64_t q_lo = fast_div64(xp, max_m);
+    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t j = pi_q_hi;
 
-    // Find all clustered easy leaves where
-    // successive leaves are identical.
-    // pq = primes[b] * primes[i]
-    // Which satisfy: low <= x / pq < high && q <= y && pq > z
-    // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-    //
-    // The clustered easy leaves algorithm has poor instruction
-    // level parallelism because of long instruction dependency
-    // chains. To mitigate this issue we process clustered
-    // easy leaves bidirectionally (high-end and low-end streams)
-    // which increases the number of independent instructions
-    // and improves performance on modern out-of-order CPUs.
-    //
-    while (ilo <= ihi)
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
+    for (; j > pi_q_lo + 3; j -= 4)
     {
-      // High-end stream (decreasing i)
-      uint64_t xpq_hi = fast_div64(xp, primes[ihi]);
-      uint64_t pi_xpq_hi = segmentedPi[xpq_hi];
-      uint64_t phi_xpq_hi = pi_xpq_hi - b + 2;
-      uint64_t xpq2_hi = fast_div64(xp, primes[pi_xpq_hi + 1]);
-      uint64_t ihi_min = pi[max(xpq2_hi, min_clustered)];
-      ASSERT(ihi_min + 1 >= ilo);
-      sum += phi_xpq_hi * (ihi - ihi_min);
-      ihi = ihi_min;
-      iters++;
+      uint64_t xpq0 = fast_div64(xp, primes[j]);
+      uint64_t xpq1 = fast_div64(xp, primes[j-1]);
+      uint64_t xpq2 = fast_div64(xp, primes[j-2]);
+      uint64_t xpq3 = fast_div64(xp, primes[j-3]);
 
-      if (ilo > ihi)
-        break;
-
-      // Low-end stream (increasing i)
-      uint64_t xpq_lo = fast_div64(xp, primes[ilo]);
-      uint64_t pi_xpq_lo = segmentedPi[xpq_lo];
-      uint64_t phi_xpq_lo = pi_xpq_lo - b + 2;
-      uint64_t xpq2_lo = fast_div64(xp, primes[pi_xpq_lo]);
-      uint64_t ilo_max = pi[xpq2_lo] + 1;
-      ASSERT(ilo_max - 1 <= ihi);
-      sum += phi_xpq_lo * (ilo_max - ilo);
-      ilo = ilo_max;
-      iters++;
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
-    uint64_t dist = i - pi_min_clustered;
-    clusteredLeavesStats.update(dist, iters);
+    for (; j > pi_q_lo; j--)
+    {
+      uint64_t xpq = fast_div64(xp, primes[j]);
+      conj_sum += pi[xpq];
+    }
+
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
+
     i = pi_min_clustered;
   }
 
@@ -960,7 +899,6 @@ T AC_OpenMP(T x,
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         int64_t max_a = pi[min(sqrt_xlow, x13)];
-        ClusteredLeavesStats clusteredLeavesStats;
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2; b++)
@@ -969,9 +907,9 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi, clusteredLeavesStats);
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
           else
-            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi, clusteredLeavesStats);
+            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
