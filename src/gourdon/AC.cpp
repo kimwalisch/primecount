@@ -160,6 +160,8 @@ T C1(T xp,
 }
 
 /// Compute the 2nd part of the C formula.
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -187,35 +189,27 @@ T C2(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The upper band q in (min_clustered, max_m] (i.e. x / (p*q)
-  // below sqrt(x / p)) holds the clustered easy leaves; the
-  // remaining sparse easy leaves q in (min_m, min_clustered] are
-  // computed by the loops further down. We compute the clustered
-  // band using Gourdon's inversion equality, which rewrites the
-  // sum over q as a sum over the conjugate range (with t = x / p):
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
   //
   //   sum_{min_clustered < q <= max_m} pi(t / q) =
   //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
   //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
-  //
-  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
-  // and are read from the (large) pi table instead of segmentedPi.
-  // Clustering is only active when min_clustered < max_m, which
-  // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
   if (i > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_m);
     uint64_t q_hi = fast_div64(xp, min_clustered + 1);
     uint64_t pi_q_lo = pi[q_lo];
     uint64_t pi_q_hi = pi[q_hi];
-
-    // Conjugate sum: sum over primes q in (q_lo, q_hi] of pi(t / q).
-    // Unrolled to increase instruction level parallelism.
-    T conj_sum = 0;
     uint64_t j = pi_q_hi;
 
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
     for (; j > pi_q_lo + 3; j -= 4)
     {
       uint64_t xpq0 = fast_div64(xp, primes[j]);
@@ -223,7 +217,10 @@ T C2(T xlow,
       uint64_t xpq2 = fast_div64(xp, primes[j-2]);
       uint64_t xpq3 = fast_div64(xp, primes[j-3]);
 
-      conj_sum += pi[xpq0] + pi[xpq1] + pi[xpq2] + pi[xpq3];
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
     for (; j > pi_q_lo; j--)
@@ -232,9 +229,8 @@ T C2(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
-    sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
-    sum -= (T) (b - 2) * (i - pi_min_clustered);
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
 
     i = pi_min_clustered;
   }
@@ -580,7 +576,8 @@ T C1(T xp,
 }
 
 /// Compute the 2nd part of the C formula.
-/// 64-bit function: xp < 2^64
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -607,35 +604,27 @@ T C2_64(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The upper band q in (min_clustered, max_m] (i.e. x / (p*q)
-  // below sqrt(x / p)) holds the clustered easy leaves; the
-  // remaining sparse easy leaves q in (min_m, min_clustered] are
-  // computed by the loops further down. We compute the clustered
-  // band using Gourdon's inversion equality, which rewrites the
-  // sum over q as a sum over the conjugate range (with t = x / p):
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
   //
   //   sum_{min_clustered < q <= max_m} pi(t / q) =
   //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
   //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
-  //
-  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
-  // and are read from the (large) pi table instead of segmentedPi.
-  // Clustering is only active when min_clustered < max_m, which
-  // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
   if (i > pi_min_clustered)
   {
-    uint64_t q_lo = xp / max_m;
-    uint64_t q_hi = xp / (min_clustered + 1);
+    uint64_t q_lo = fast_div64(xp, max_m);
+    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
     uint64_t pi_q_lo = pi[q_lo];
     uint64_t pi_q_hi = pi[q_hi];
-
-    // Conjugate sum: sum over primes q in (q_lo, q_hi] of pi(t / q).
-    // Unrolled to increase instruction level parallelism.
-    T conj_sum = 0;
     uint64_t j = pi_q_hi;
 
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
     for (; j > pi_q_lo + 3; j -= 4)
     {
       uint64_t xpq0 = xp / primes[j];
@@ -643,7 +632,10 @@ T C2_64(T xlow,
       uint64_t xpq2 = xp / primes[j-2];
       uint64_t xpq3 = xp / primes[j-3];
 
-      conj_sum += pi[xpq0] + pi[xpq1] + pi[xpq2] + pi[xpq3];
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
     for (; j > pi_q_lo; j--)
@@ -652,9 +644,8 @@ T C2_64(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
-    sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
-    sum -= (T) (b - 2) * (i - pi_min_clustered);
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
 
     i = pi_min_clustered;
   }
@@ -688,7 +679,8 @@ T C2_64(T xlow,
 }
 
 /// Compute the 2nd part of the C formula.
-/// 128-bit function: xp >= 2^64
+/// C2() computes the clustered and sparse easy leaves of the C
+/// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -715,35 +707,27 @@ T C2_128(T xlow,
   min_clustered = in_between(min_m, min_clustered, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
 
-  // The upper band q in (min_clustered, max_m] (i.e. x / (p*q)
-  // below sqrt(x / p)) holds the clustered easy leaves; the
-  // remaining sparse easy leaves q in (min_m, min_clustered] are
-  // computed by the loops further down. We compute the clustered
-  // band using Gourdon's inversion equality, which rewrites the
-  // sum over q as a sum over the conjugate range (with t = x / p):
+  // Clustered easy leaves: q in ]min_clustered, max_m], where
+  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
+  // band into a sum over the conjugate range (t = x / p):
   //
   //   sum_{min_clustered < q <= max_m} pi(t / q) =
   //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
   //     + sum_{q_lo < q <= q_hi} pi(t / q)
   //
-  //   where q_lo = t / max_m, q_hi = t / (min_clustered + 1).
-  //
-  // The conjugate arguments t / q lie in (sqrt(t), max_m] <= y <= z
-  // and are read from the (large) pi table instead of segmentedPi.
-  // Clustering is only active when min_clustered < max_m, which
-  // implies sqrt(x / p) < y, hence every pi lookup here is <= z.
+  // The conjugate arguments t / q are <= y, hence they are read
+  // from the pi table instead of segmentedPi.
   if (i > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_m);
     uint64_t q_hi = fast_div64(xp, min_clustered + 1);
     uint64_t pi_q_lo = pi[q_lo];
     uint64_t pi_q_hi = pi[q_hi];
-
-    // Conjugate sum: sum over primes q in (q_lo, q_hi] of pi(t / q).
-    // Unrolled to increase instruction level parallelism.
-    T conj_sum = 0;
     uint64_t j = pi_q_hi;
 
+    T conj_sum = 0;
+
+    // Unroll loop to increase instruction level parallelism
     for (; j > pi_q_lo + 3; j -= 4)
     {
       uint64_t xpq0 = fast_div64(xp, primes[j]);
@@ -751,7 +735,10 @@ T C2_128(T xlow,
       uint64_t xpq2 = fast_div64(xp, primes[j-2]);
       uint64_t xpq3 = fast_div64(xp, primes[j-3]);
 
-      conj_sum += pi[xpq0] + pi[xpq1] + pi[xpq2] + pi[xpq3];
+      conj_sum += pi[xpq0] +
+                  pi[xpq1] +
+                  pi[xpq2] +
+                  pi[xpq3];
     }
 
     for (; j > pi_q_lo; j--)
@@ -760,9 +747,8 @@ T C2_128(T xlow,
       conj_sum += pi[xpq];
     }
 
-    // i = pi[max_m], pi_min_clustered = pi[min_clustered]
-    sum += (T) pi_q_lo * i - (T) pi_q_hi * pi_min_clustered + conj_sum;
-    sum -= (T) (b - 2) * (i - pi_min_clustered);
+    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
+    sum -= T(b - 2) * (i - pi_min_clustered);
 
     i = pi_min_clustered;
   }
