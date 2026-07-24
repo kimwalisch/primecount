@@ -219,16 +219,9 @@ T C2(T xlow,
 
   uint64_t segment_low = (uint64_t) segmentedPi.low();
   uint64_t segment_high = (uint64_t) segmentedPi.high();
-  bool all_conjugate =
-      has_clustered &&
+  if (has_clustered &&
       segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global;
-  bool overlaps_conjugate =
-      has_clustered &&
-      segment_high > min_clustered_global + 1 &&
-      segment_low < max_clustered_global;
-
-  if (all_conjugate)
+      segment_high <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -237,7 +230,9 @@ T C2(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!overlaps_conjugate)
+  else if (!has_clustered ||
+           segment_high <= min_clustered_global + 1 ||
+           segment_low >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
@@ -654,16 +649,9 @@ T C2_64(T xlow,
 
   uint64_t segment_low = (uint64_t) segmentedPi.low();
   uint64_t segment_high = (uint64_t) segmentedPi.high();
-  bool all_conjugate =
-      has_clustered &&
+  if (has_clustered &&
       segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global;
-  bool overlaps_conjugate =
-      has_clustered &&
-      segment_high > min_clustered_global + 1 &&
-      segment_low < max_clustered_global;
-
-  if (all_conjugate)
+      segment_high <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -672,7 +660,9 @@ T C2_64(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!overlaps_conjugate)
+  else if (!has_clustered ||
+           segment_high <= min_clustered_global + 1 ||
+           segment_low >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
@@ -776,16 +766,9 @@ T C2_128(T xlow,
 
   uint64_t segment_low = (uint64_t) segmentedPi.low();
   uint64_t segment_high = (uint64_t) segmentedPi.high();
-  bool all_conjugate =
-      has_clustered &&
+  if (has_clustered &&
       segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global;
-  bool overlaps_conjugate =
-      has_clustered &&
-      segment_high > min_clustered_global + 1 &&
-      segment_low < max_clustered_global;
-
-  if (all_conjugate)
+      segment_high <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -794,7 +777,9 @@ T C2_128(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!overlaps_conjugate)
+  else if (!has_clustered ||
+           segment_high <= min_clustered_global + 1 ||
+           segment_low >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
