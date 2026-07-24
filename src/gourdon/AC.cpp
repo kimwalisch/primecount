@@ -174,7 +174,7 @@ T C2(T xlow,
      uint64_t y,
      uint64_t b,
      uint64_t pi_y,
-     uint64_t max_y_prime,
+     uint64_t max_clustered_global,
      const Primes& primes,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi)
@@ -190,9 +190,8 @@ T C2(T xlow,
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  XP min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
-  uint64_t min_clustered_global = min(min_clustered128, y);
-  uint64_t max_clustered_global = max_y_prime;
+  uint64_t min_clustered_global = min(
+      max3(xp / (prime * prime), prime, sqrt_xp), y);
   bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
@@ -205,10 +204,8 @@ T C2(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo = fast_div64(xp, max_clustered_global);
-      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-      uint64_t pi_q_lo = pi[q_lo];
-      uint64_t pi_q_hi = pi[q_hi];
+      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
       uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
@@ -254,10 +251,11 @@ T C2(T xlow,
     // Only segments crossing a clustered endpoint reach this path.
     // Since xp / primes[i] increases as i decreases, the reflected
     // leaves form one contiguous prime-index interval.
-    uint64_t q_lo = fast_div64(xp, max_clustered_global);
-    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
-    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+    uint64_t pi_conjugate_lo = max(
+        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
+    uint64_t pi_conjugate_hi = max(
+        pi[fast_div64(xp, min_clustered_global + 1)],
+        pi_conjugate_lo);
 
     // Sparse leaves before the reflected interval.
     for (; i > pi_conjugate_hi; i--)
@@ -318,7 +316,7 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime), threads);
 
   uint64_t pi_y = pi[y];
-  uint64_t max_y_prime = pi_y ? primes[pi_y] : 0;
+  uint64_t max_clustered_global = pi_y ? primes[pi_y] : 0;
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -404,9 +402,9 @@ T AC_OpenMP(T x,
           T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_y_prime, primes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
-            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_y_prime, primes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
@@ -611,7 +609,7 @@ T C2_64(T xlow,
         uint64_t y,
         uint64_t b,
         uint64_t pi_y,
-        uint64_t max_y_prime,
+        uint64_t max_clustered_global,
         uint64_t prime,
         const LibdividePrimes& primes,
         const PiTable& pi,
@@ -627,9 +625,8 @@ T C2_64(T xlow,
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  uint64_t min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
-  uint64_t min_clustered_global = min(min_clustered128, y);
-  uint64_t max_clustered_global = max_y_prime;
+  uint64_t min_clustered_global = min(
+      max3(xp / (prime * prime), prime, sqrt_xp), y);
   bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
@@ -642,10 +639,8 @@ T C2_64(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo = fast_div64(xp, max_clustered_global);
-      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-      uint64_t pi_q_lo = pi[q_lo];
-      uint64_t pi_q_hi = pi[q_hi];
+      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
       uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
@@ -691,10 +686,11 @@ T C2_64(T xlow,
     // Only segments crossing a clustered endpoint reach this path.
     // Since xp / primes[i] increases as i decreases, the reflected
     // leaves form one contiguous prime-index interval.
-    uint64_t q_lo = fast_div64(xp, max_clustered_global);
-    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
-    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+    uint64_t pi_conjugate_lo = max(
+        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
+    uint64_t pi_conjugate_hi = max(
+        pi[fast_div64(xp, min_clustered_global + 1)],
+        pi_conjugate_lo);
 
     // Sparse leaves before the reflected interval.
     for (; i > pi_conjugate_hi; i--)
@@ -735,7 +731,7 @@ T C2_128(T xlow,
          uint64_t y,
          uint64_t b,
          uint64_t pi_y,
-         uint64_t max_y_prime,
+         uint64_t max_clustered_global,
          const Primes& primes,
          const PiTable& pi,
          const SegmentedPiTable& segmentedPi)
@@ -751,9 +747,8 @@ T C2_128(T xlow,
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  T min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
-  uint64_t min_clustered_global = min(min_clustered128, y);
-  uint64_t max_clustered_global = max_y_prime;
+  uint64_t min_clustered_global = min(
+      max3(xp / (prime * prime), prime, sqrt_xp), y);
   bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
@@ -766,10 +761,8 @@ T C2_128(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo = fast_div64(xp, max_clustered_global);
-      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-      uint64_t pi_q_lo = pi[q_lo];
-      uint64_t pi_q_hi = pi[q_hi];
+      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
       uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
@@ -815,10 +808,11 @@ T C2_128(T xlow,
     // Only segments crossing a clustered endpoint reach this path.
     // Since xp / primes[i] increases as i decreases, the reflected
     // leaves form one contiguous prime-index interval.
-    uint64_t q_lo = fast_div64(xp, max_clustered_global);
-    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
-    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+    uint64_t pi_conjugate_lo = max(
+        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
+    uint64_t pi_conjugate_hi = max(
+        pi[fast_div64(xp, min_clustered_global + 1)],
+        pi_conjugate_lo);
 
     // Sparse leaves before the reflected interval.
     for (; i > pi_conjugate_hi; i--)
@@ -885,7 +879,7 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime), threads);
 
   uint64_t pi_y = pi[y];
-  uint64_t max_y_prime = pi_y ? primes[pi_y] : 0;
+  uint64_t max_clustered_global = pi_y ? primes[pi_y] : 0;
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -972,9 +966,9 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_y_prime, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
-            sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_y_prime, primes, pi, segmentedPi);
+            sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
