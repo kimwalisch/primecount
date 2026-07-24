@@ -192,7 +192,6 @@ T C2(T xlow,
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = min(
       max3(xp / (prime * prime), prime, sqrt_xp), y);
-  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -200,25 +199,22 @@ T C2(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered)
+  if (i > pi_min_clustered &&
+      i == pi_y)
   {
-    if (has_clustered && i == pi_y)
-    {
-      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-      sum += T(pi_q_lo) * pi_y
-           - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) *
-             (pi_y - pi_min_clustered_global);
-    }
-
-    i = pi_min_clustered;
+    sum += T(pi_q_lo) * pi_y
+         - T(pi_q_hi) * pi_min_clustered_global;
+    sum -= T(b - 2) *
+           (pi_y - pi_min_clustered_global);
   }
 
-  if (has_clustered &&
-      segmentedPi.low() > min_clustered_global &&
+  i = pi_min_clustered;
+
+  if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
@@ -228,7 +224,7 @@ T C2(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!has_clustered ||
+  else if (max_clustered_global <= min_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
@@ -620,7 +616,6 @@ T C2_64(T xlow,
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = min(
       max3(xp / (prime * prime), prime, sqrt_xp), y);
-  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -628,25 +623,22 @@ T C2_64(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered)
+  if (i > pi_min_clustered &&
+      i == pi_y)
   {
-    if (has_clustered && i == pi_y)
-    {
-      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-      sum += T(pi_q_lo) * pi_y
-           - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) *
-             (pi_y - pi_min_clustered_global);
-    }
-
-    i = pi_min_clustered;
+    sum += T(pi_q_lo) * pi_y
+         - T(pi_q_hi) * pi_min_clustered_global;
+    sum -= T(b - 2) *
+           (pi_y - pi_min_clustered_global);
   }
 
-  if (has_clustered &&
-      segmentedPi.low() > min_clustered_global &&
+  i = pi_min_clustered;
+
+  if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
@@ -656,7 +648,7 @@ T C2_64(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!has_clustered ||
+  else if (max_clustered_global <= min_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
@@ -735,7 +727,6 @@ T C2_128(T xlow,
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = min(
       max3(xp / (prime * prime), prime, sqrt_xp), y);
-  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -743,25 +734,22 @@ T C2_128(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered)
+  if (i > pi_min_clustered &&
+      i == pi_y)
   {
-    if (has_clustered && i == pi_y)
-    {
-      uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-      uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
+    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-      sum += T(pi_q_lo) * pi_y
-           - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) *
-             (pi_y - pi_min_clustered_global);
-    }
-
-    i = pi_min_clustered;
+    sum += T(pi_q_lo) * pi_y
+         - T(pi_q_hi) * pi_min_clustered_global;
+    sum -= T(b - 2) *
+           (pi_y - pi_min_clustered_global);
   }
 
-  if (has_clustered &&
-      segmentedPi.low() > min_clustered_global &&
+  i = pi_min_clustered;
+
+  if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
@@ -771,7 +759,7 @@ T C2_128(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (!has_clustered ||
+  else if (max_clustered_global <= min_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
