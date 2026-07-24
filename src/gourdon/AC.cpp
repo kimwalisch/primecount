@@ -234,19 +234,6 @@ T C2(T xlow,
   if (all_conjugate)
   {
     // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-
-      sum += (segmentedPi[xpq0] * 2 - b + 2) +
-             (segmentedPi[xpq1] * 2 - b + 2) +
-             (segmentedPi[xpq2] * 2 - b + 2) +
-             (segmentedPi[xpq3] * 2 - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
@@ -256,19 +243,6 @@ T C2(T xlow,
   else if (!overlaps_conjugate)
   {
     // This segment has no reflected terms.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-
-      sum += (segmentedPi[xpq0] - b + 2) +
-             (segmentedPi[xpq1] - b + 2) +
-             (segmentedPi[xpq2] - b + 2) +
-             (segmentedPi[xpq3] - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
@@ -277,46 +251,33 @@ T C2(T xlow,
   }
   else
   {
-    // Only segments crossing a clustered endpoint need range tests.
-    for (; i > pi_min_m + 3; i -= 4)
+    // Only segments crossing a clustered endpoint reach this path.
+    // Since xp / primes[i] increases as i decreases, the reflected
+    // leaves form one contiguous prime-index interval.
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
+    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+
+    // Sparse leaves before the reflected interval.
+    for (; i > pi_conjugate_hi; i--)
     {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-      T pix0 = segmentedPi[xpq0];
-      T pix1 = segmentedPi[xpq1];
-      T pix2 = segmentedPi[xpq2];
-      T pix3 = segmentedPi[xpq3];
-
-      sum += (pix0 - b + 2) +
-             (pix1 - b + 2) +
-             (pix2 - b + 2) +
-             (pix3 - b + 2);
-
-      if (min_clustered_global < xpq0 &&
-          xpq0 < max_clustered_global)
-        sum += pix0;
-      if (min_clustered_global < xpq1 &&
-          xpq1 < max_clustered_global)
-        sum += pix1;
-      if (min_clustered_global < xpq2 &&
-          xpq2 < max_clustered_global)
-        sum += pix2;
-      if (min_clustered_global < xpq3 &&
-          xpq3 < max_clustered_global)
-        sum += pix3;
+      uint64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] - b + 2;
     }
 
+    // Every leaf in this interval is also reflected.
+    for (; i > pi_conjugate_lo; i--)
+    {
+      uint64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] * 2 - b + 2;
+    }
+
+    // Sparse leaves after the reflected interval.
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
-      T pix = segmentedPi[xpq];
-      sum += pix - b + 2;
-
-      if (min_clustered_global < xpq &&
-          xpq < max_clustered_global)
-        sum += pix;
+      sum += segmentedPi[xpq] - b + 2;
     }
   }
 
@@ -710,19 +671,6 @@ T C2_64(T xlow,
   if (all_conjugate)
   {
     // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = xp / primes[i];
-      uint64_t xpq1 = xp / primes[i-1];
-      uint64_t xpq2 = xp / primes[i-2];
-      uint64_t xpq3 = xp / primes[i-3];
-
-      sum += (segmentedPi[xpq0] * 2 - b + 2) +
-             (segmentedPi[xpq1] * 2 - b + 2) +
-             (segmentedPi[xpq2] * 2 - b + 2) +
-             (segmentedPi[xpq3] * 2 - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = xp / primes[i];
@@ -732,19 +680,6 @@ T C2_64(T xlow,
   else if (!overlaps_conjugate)
   {
     // This segment has no reflected terms.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = xp / primes[i];
-      uint64_t xpq1 = xp / primes[i-1];
-      uint64_t xpq2 = xp / primes[i-2];
-      uint64_t xpq3 = xp / primes[i-3];
-
-      sum += (segmentedPi[xpq0] - b + 2) +
-             (segmentedPi[xpq1] - b + 2) +
-             (segmentedPi[xpq2] - b + 2) +
-             (segmentedPi[xpq3] - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = xp / primes[i];
@@ -753,46 +688,33 @@ T C2_64(T xlow,
   }
   else
   {
-    // Only segments crossing a clustered endpoint need range tests.
-    for (; i > pi_min_m + 3; i -= 4)
+    // Only segments crossing a clustered endpoint reach this path.
+    // Since xp / primes[i] increases as i decreases, the reflected
+    // leaves form one contiguous prime-index interval.
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
+    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+
+    // Sparse leaves before the reflected interval.
+    for (; i > pi_conjugate_hi; i--)
     {
-      uint64_t xpq0 = xp / primes[i];
-      uint64_t xpq1 = xp / primes[i-1];
-      uint64_t xpq2 = xp / primes[i-2];
-      uint64_t xpq3 = xp / primes[i-3];
-      T pix0 = segmentedPi[xpq0];
-      T pix1 = segmentedPi[xpq1];
-      T pix2 = segmentedPi[xpq2];
-      T pix3 = segmentedPi[xpq3];
-
-      sum += (pix0 - b + 2) +
-             (pix1 - b + 2) +
-             (pix2 - b + 2) +
-             (pix3 - b + 2);
-
-      if (min_clustered_global < xpq0 &&
-          xpq0 < max_clustered_global)
-        sum += pix0;
-      if (min_clustered_global < xpq1 &&
-          xpq1 < max_clustered_global)
-        sum += pix1;
-      if (min_clustered_global < xpq2 &&
-          xpq2 < max_clustered_global)
-        sum += pix2;
-      if (min_clustered_global < xpq3 &&
-          xpq3 < max_clustered_global)
-        sum += pix3;
+      uint64_t xpq = xp / primes[i];
+      sum += segmentedPi[xpq] - b + 2;
     }
 
+    // Every leaf in this interval is also reflected.
+    for (; i > pi_conjugate_lo; i--)
+    {
+      uint64_t xpq = xp / primes[i];
+      sum += segmentedPi[xpq] * 2 - b + 2;
+    }
+
+    // Sparse leaves after the reflected interval.
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = xp / primes[i];
-      T pix = segmentedPi[xpq];
-      sum += pix - b + 2;
-
-      if (min_clustered_global < xpq &&
-          xpq < max_clustered_global)
-        sum += pix;
+      sum += segmentedPi[xpq] - b + 2;
     }
   }
 
@@ -873,19 +795,6 @@ T C2_128(T xlow,
   if (all_conjugate)
   {
     // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-
-      sum += (segmentedPi[xpq0] * 2 - b + 2) +
-             (segmentedPi[xpq1] * 2 - b + 2) +
-             (segmentedPi[xpq2] * 2 - b + 2) +
-             (segmentedPi[xpq3] * 2 - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
@@ -895,19 +804,6 @@ T C2_128(T xlow,
   else if (!overlaps_conjugate)
   {
     // This segment has no reflected terms.
-    for (; i > pi_min_m + 3; i -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-
-      sum += (segmentedPi[xpq0] - b + 2) +
-             (segmentedPi[xpq1] - b + 2) +
-             (segmentedPi[xpq2] - b + 2) +
-             (segmentedPi[xpq3] - b + 2);
-    }
-
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
@@ -916,46 +812,33 @@ T C2_128(T xlow,
   }
   else
   {
-    // Only segments crossing a clustered endpoint need range tests.
-    for (; i > pi_min_m + 3; i -= 4)
+    // Only segments crossing a clustered endpoint reach this path.
+    // Since xp / primes[i] increases as i decreases, the reflected
+    // leaves form one contiguous prime-index interval.
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_conjugate_lo = max(pi[q_lo], pi_min_m);
+    uint64_t pi_conjugate_hi = max(pi[q_hi], pi_conjugate_lo);
+
+    // Sparse leaves before the reflected interval.
+    for (; i > pi_conjugate_hi; i--)
     {
-      uint64_t xpq0 = fast_div64(xp, primes[i]);
-      uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[i-3]);
-      T pix0 = segmentedPi[xpq0];
-      T pix1 = segmentedPi[xpq1];
-      T pix2 = segmentedPi[xpq2];
-      T pix3 = segmentedPi[xpq3];
-
-      sum += (pix0 - b + 2) +
-             (pix1 - b + 2) +
-             (pix2 - b + 2) +
-             (pix3 - b + 2);
-
-      if (min_clustered_global < xpq0 &&
-          xpq0 < max_clustered_global)
-        sum += pix0;
-      if (min_clustered_global < xpq1 &&
-          xpq1 < max_clustered_global)
-        sum += pix1;
-      if (min_clustered_global < xpq2 &&
-          xpq2 < max_clustered_global)
-        sum += pix2;
-      if (min_clustered_global < xpq3 &&
-          xpq3 < max_clustered_global)
-        sum += pix3;
+      uint64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] - b + 2;
     }
 
+    // Every leaf in this interval is also reflected.
+    for (; i > pi_conjugate_lo; i--)
+    {
+      uint64_t xpq = fast_div64(xp, primes[i]);
+      sum += segmentedPi[xpq] * 2 - b + 2;
+    }
+
+    // Sparse leaves after the reflected interval.
     for (; i > pi_min_m; i--)
     {
       uint64_t xpq = fast_div64(xp, primes[i]);
-      T pix = segmentedPi[xpq];
-      sum += pix - b + 2;
-
-      if (min_clustered_global < xpq &&
-          xpq < max_clustered_global)
-        sum += pix;
+      sum += segmentedPi[xpq] - b + 2;
     }
   }
 
