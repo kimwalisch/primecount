@@ -185,7 +185,7 @@ T C2(T xlow,
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -199,8 +199,8 @@ T C2(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered &&
-      i == pi_y)
+  if (pi_max_m > pi_min_clustered &&
+      pi_max_m == pi_y)
   {
     uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
     uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
@@ -212,7 +212,7 @@ T C2(T xlow,
            (pi_y - pi_min_clustered_global);
   }
 
-  i = pi_min_clustered;
+  uint64_t i = pi_min_clustered;
 
   if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
@@ -609,7 +609,7 @@ T C2_64(T xlow,
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -623,8 +623,8 @@ T C2_64(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered &&
-      i == pi_y)
+  if (pi_max_m > pi_min_clustered &&
+      pi_max_m == pi_y)
   {
     uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
     uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
@@ -636,7 +636,7 @@ T C2_64(T xlow,
            (pi_y - pi_min_clustered_global);
   }
 
-  i = pi_min_clustered;
+  uint64_t i = pi_min_clustered;
 
   if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
@@ -720,7 +720,7 @@ T C2_128(T xlow,
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -734,8 +734,8 @@ T C2_128(T xlow,
   // The reflected terms are accumulated by the sparse loops below,
   // possibly in other segments. All contributions use the existing
   // OpenMP reduction, hence no synchronization is needed.
-  if (i > pi_min_clustered &&
-      i == pi_y)
+  if (pi_max_m > pi_min_clustered &&
+      pi_max_m == pi_y)
   {
     uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
     uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
@@ -747,7 +747,7 @@ T C2_128(T xlow,
            (pi_y - pi_min_clustered_global);
   }
 
-  i = pi_min_clustered;
+  uint64_t i = pi_min_clustered;
 
   if (segmentedPi.low() > min_clustered_global &&
       segmentedPi.high() <= max_clustered_global)
