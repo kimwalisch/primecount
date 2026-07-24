@@ -183,89 +183,69 @@ T C2(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
-  uint64_t min_m = min(min_m128, max_m);
+  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
-  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
-  uint64_t pi_min_clustered = pi[min_clustered];
-  uint64_t min_clustered_global = min(
-      max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
+  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is
-  // the complete clustered interval. Emit its boundary correction
-  // once, in the unique segment containing max_clustered_global.
-  // The reflected terms are accumulated by the sparse loops below,
-  // possibly in other segments. All contributions use the existing
-  // OpenMP reduction, hence no synchronization is needed.
-  if (pi_max_m > pi_min_clustered &&
-      pi_max_m == pi_y)
+  uint64_t i = pi_min_clustered;
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+
+  // For fixed p, ]min_clustered_global, max_clustered_global] is the
+  // complete clustered interval. Gourdon's inversion equality replaces
+  // its whole contribution by a one-time boundary correction plus a sum
+  // of reflected leaves pi(xp / r). The boundary correction is emitted
+  // once, in the unique segment containing max_clustered_global. The
+  // reflected leaves are the sparse leaves whose xpq lies in the
+  // clustered interval; they are counted a second time by the sparse
+  // loops below, here and in the other segments overlapping the
+  // interval. All contributions enter the existing OpenMP reduction.
+  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
+  bool overlap = min_clustered_global < max_clustered_global &&
+                 segmentedPi.low() < max_clustered_global &&
+                 segmentedPi.high() > min_clustered_global + 1;
+
+  if (emit || overlap)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
 
-    sum += T(pi[q_lo]) * pi_y
-         - T(pi[q_hi]) * pi_min_clustered_global;
-    sum -= T(b - 2) *
-           (pi_y - pi_min_clustered_global);
+    if (emit)
+    {
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
+      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+    }
+
+    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+    pi_conj_lo = max(pi_q_lo, pi_min_m);
+    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  uint64_t i = pi_min_clustered;
-
-  if (segmentedPi.low() > min_clustered_global &&
-      segmentedPi.high() <= max_clustered_global)
+  // Sparse leaves above the reflected sub-range.
+  for (; i > pi_conj_hi; i--)
   {
-    // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
   }
-  else if (min_clustered_global >= max_clustered_global ||
-           segmentedPi.high() <= min_clustered_global + 1 ||
-           segmentedPi.low() >= max_clustered_global)
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  for (; i > pi_conj_lo; i--)
   {
-    // This segment has no reflected terms.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] * 2 - b + 2;
   }
-  else
+
+  // Sparse leaves below the reflected sub-range.
+  for (; i > pi_min_m; i--)
   {
-    // Only segments crossing a clustered endpoint reach this path.
-    // Since xp / primes[i] increases as i decreases, the reflected
-    // leaves form one contiguous prime-index interval.
-    uint64_t pi_conjugate_lo = max(
-        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
-    uint64_t pi_conjugate_hi = max(
-        pi[fast_div64(xp, min_clustered_global + 1)],
-        pi_conjugate_lo);
-
-    // Sparse leaves before the reflected interval.
-    for (; i > pi_conjugate_hi; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
-
-    // Every leaf in this interval is also reflected.
-    for (; i > pi_conjugate_lo; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
-
-    // Sparse leaves after the reflected interval.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
   }
 
   return sum;
@@ -607,89 +587,69 @@ T C2_64(T xlow,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
-  uint64_t min_m = min(min_m128, max_m);
+  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
-  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
-  uint64_t pi_min_clustered = pi[min_clustered];
-  uint64_t min_clustered_global = min(
-      max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
+  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is
-  // the complete clustered interval. Emit its boundary correction
-  // once, in the unique segment containing max_clustered_global.
-  // The reflected terms are accumulated by the sparse loops below,
-  // possibly in other segments. All contributions use the existing
-  // OpenMP reduction, hence no synchronization is needed.
-  if (pi_max_m > pi_min_clustered &&
-      pi_max_m == pi_y)
+  uint64_t i = pi_min_clustered;
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+
+  // For fixed p, ]min_clustered_global, max_clustered_global] is the
+  // complete clustered interval. Gourdon's inversion equality replaces
+  // its whole contribution by a one-time boundary correction plus a sum
+  // of reflected leaves pi(xp / r). The boundary correction is emitted
+  // once, in the unique segment containing max_clustered_global. The
+  // reflected leaves are the sparse leaves whose xpq lies in the
+  // clustered interval; they are counted a second time by the sparse
+  // loops below, here and in the other segments overlapping the
+  // interval. All contributions enter the existing OpenMP reduction.
+  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
+  bool overlap = min_clustered_global < max_clustered_global &&
+                 segmentedPi.low() < max_clustered_global &&
+                 segmentedPi.high() > min_clustered_global + 1;
+
+  if (emit || overlap)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
 
-    sum += T(pi[q_lo]) * pi_y
-         - T(pi[q_hi]) * pi_min_clustered_global;
-    sum -= T(b - 2) *
-           (pi_y - pi_min_clustered_global);
+    if (emit)
+    {
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
+      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+    }
+
+    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+    pi_conj_lo = max(pi_q_lo, pi_min_m);
+    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  uint64_t i = pi_min_clustered;
-
-  if (segmentedPi.low() > min_clustered_global &&
-      segmentedPi.high() <= max_clustered_global)
+  // Sparse leaves above the reflected sub-range.
+  for (; i > pi_conj_hi; i--)
   {
-    // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = xp / primes[i];
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] - b + 2;
   }
-  else if (min_clustered_global >= max_clustered_global ||
-           segmentedPi.high() <= min_clustered_global + 1 ||
-           segmentedPi.low() >= max_clustered_global)
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  for (; i > pi_conj_lo; i--)
   {
-    // This segment has no reflected terms.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = xp / primes[i];
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] * 2 - b + 2;
   }
-  else
+
+  // Sparse leaves below the reflected sub-range.
+  for (; i > pi_min_m; i--)
   {
-    // Only segments crossing a clustered endpoint reach this path.
-    // Since xp / primes[i] increases as i decreases, the reflected
-    // leaves form one contiguous prime-index interval.
-    uint64_t pi_conjugate_lo = max(
-        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
-    uint64_t pi_conjugate_hi = max(
-        pi[fast_div64(xp, min_clustered_global + 1)],
-        pi_conjugate_lo);
-
-    // Sparse leaves before the reflected interval.
-    for (; i > pi_conjugate_hi; i--)
-    {
-      uint64_t xpq = xp / primes[i];
-      sum += segmentedPi[xpq] - b + 2;
-    }
-
-    // Every leaf in this interval is also reflected.
-    for (; i > pi_conjugate_lo; i--)
-    {
-      uint64_t xpq = xp / primes[i];
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
-
-    // Sparse leaves after the reflected interval.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = xp / primes[i];
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] - b + 2;
   }
 
   return sum;
@@ -718,89 +678,69 @@ T C2_128(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
-  uint64_t min_m = min(min_m128, max_m);
+  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
-  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
-  uint64_t pi_min_clustered = pi[min_clustered];
-  uint64_t min_clustered_global = min(
-      max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
+  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is
-  // the complete clustered interval. Emit its boundary correction
-  // once, in the unique segment containing max_clustered_global.
-  // The reflected terms are accumulated by the sparse loops below,
-  // possibly in other segments. All contributions use the existing
-  // OpenMP reduction, hence no synchronization is needed.
-  if (pi_max_m > pi_min_clustered &&
-      pi_max_m == pi_y)
+  uint64_t i = pi_min_clustered;
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+
+  // For fixed p, ]min_clustered_global, max_clustered_global] is the
+  // complete clustered interval. Gourdon's inversion equality replaces
+  // its whole contribution by a one-time boundary correction plus a sum
+  // of reflected leaves pi(xp / r). The boundary correction is emitted
+  // once, in the unique segment containing max_clustered_global. The
+  // reflected leaves are the sparse leaves whose xpq lies in the
+  // clustered interval; they are counted a second time by the sparse
+  // loops below, here and in the other segments overlapping the
+  // interval. All contributions enter the existing OpenMP reduction.
+  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
+  bool overlap = min_clustered_global < max_clustered_global &&
+                 segmentedPi.low() < max_clustered_global &&
+                 segmentedPi.high() > min_clustered_global + 1;
+
+  if (emit || overlap)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    uint64_t pi_q_lo = pi[q_lo];
+    uint64_t pi_q_hi = pi[q_hi];
 
-    sum += T(pi[q_lo]) * pi_y
-         - T(pi[q_hi]) * pi_min_clustered_global;
-    sum -= T(b - 2) *
-           (pi_y - pi_min_clustered_global);
+    if (emit)
+    {
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
+      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
+      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+    }
+
+    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+    pi_conj_lo = max(pi_q_lo, pi_min_m);
+    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  uint64_t i = pi_min_clustered;
-
-  if (segmentedPi.low() > min_clustered_global &&
-      segmentedPi.high() <= max_clustered_global)
+  // Sparse leaves above the reflected sub-range.
+  for (; i > pi_conj_hi; i--)
   {
-    // Every sparse leaf in this segment is also reflected.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
   }
-  else if (min_clustered_global >= max_clustered_global ||
-           segmentedPi.high() <= min_clustered_global + 1 ||
-           segmentedPi.low() >= max_clustered_global)
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  for (; i > pi_conj_lo; i--)
   {
-    // This segment has no reflected terms.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] * 2 - b + 2;
   }
-  else
+
+  // Sparse leaves below the reflected sub-range.
+  for (; i > pi_min_m; i--)
   {
-    // Only segments crossing a clustered endpoint reach this path.
-    // Since xp / primes[i] increases as i decreases, the reflected
-    // leaves form one contiguous prime-index interval.
-    uint64_t pi_conjugate_lo = max(
-        pi[fast_div64(xp, max_clustered_global)], pi_min_m);
-    uint64_t pi_conjugate_hi = max(
-        pi[fast_div64(xp, min_clustered_global + 1)],
-        pi_conjugate_lo);
-
-    // Sparse leaves before the reflected interval.
-    for (; i > pi_conjugate_hi; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
-
-    // Every leaf in this interval is also reflected.
-    for (; i > pi_conjugate_lo; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] * 2 - b + 2;
-    }
-
-    // Sparse leaves after the reflected interval.
-    for (; i > pi_min_m; i--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[i]);
-      sum += segmentedPi[xpq] - b + 2;
-    }
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
   }
 
   return sum;
