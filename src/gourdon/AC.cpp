@@ -217,11 +217,9 @@ T C2(T xlow,
     i = pi_min_clustered;
   }
 
-  uint64_t segment_low = (uint64_t) segmentedPi.low();
-  uint64_t segment_high = (uint64_t) segmentedPi.high();
   if (has_clustered &&
-      segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global)
+      segmentedPi.low() > min_clustered_global &&
+      segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -231,8 +229,8 @@ T C2(T xlow,
     }
   }
   else if (!has_clustered ||
-           segment_high <= min_clustered_global + 1 ||
-           segment_low >= max_clustered_global)
+           segmentedPi.high() <= min_clustered_global + 1 ||
+           segmentedPi.low() >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
@@ -647,11 +645,9 @@ T C2_64(T xlow,
     i = pi_min_clustered;
   }
 
-  uint64_t segment_low = (uint64_t) segmentedPi.low();
-  uint64_t segment_high = (uint64_t) segmentedPi.high();
   if (has_clustered &&
-      segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global)
+      segmentedPi.low() > min_clustered_global &&
+      segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -661,8 +657,8 @@ T C2_64(T xlow,
     }
   }
   else if (!has_clustered ||
-           segment_high <= min_clustered_global + 1 ||
-           segment_low >= max_clustered_global)
+           segmentedPi.high() <= min_clustered_global + 1 ||
+           segmentedPi.low() >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
@@ -764,11 +760,9 @@ T C2_128(T xlow,
     i = pi_min_clustered;
   }
 
-  uint64_t segment_low = (uint64_t) segmentedPi.low();
-  uint64_t segment_high = (uint64_t) segmentedPi.high();
   if (has_clustered &&
-      segment_low > min_clustered_global &&
-      segment_high <= max_clustered_global)
+      segmentedPi.low() > min_clustered_global &&
+      segmentedPi.high() <= max_clustered_global)
   {
     // Every sparse leaf in this segment is also reflected.
     for (; i > pi_min_m; i--)
@@ -778,8 +772,8 @@ T C2_128(T xlow,
     }
   }
   else if (!has_clustered ||
-           segment_high <= min_clustered_global + 1 ||
-           segment_low >= max_clustered_global)
+           segmentedPi.high() <= min_clustered_global + 1 ||
+           segmentedPi.low() >= max_clustered_global)
   {
     // This segment has no reflected terms.
     for (; i > pi_min_m; i--)
