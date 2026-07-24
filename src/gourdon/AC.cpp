@@ -202,12 +202,12 @@ T C2(T xlow,
   if (pi_max_m > pi_min_clustered &&
       pi_max_m == pi_y)
   {
-    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
     uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-    sum += T(pi_q_lo) * pi_y
-         - T(pi_q_hi) * pi_min_clustered_global;
+    sum += T(pi[q_lo]) * pi_y
+         - T(pi[q_hi]) * pi_min_clustered_global;
     sum -= T(b - 2) *
            (pi_y - pi_min_clustered_global);
   }
@@ -626,12 +626,12 @@ T C2_64(T xlow,
   if (pi_max_m > pi_min_clustered &&
       pi_max_m == pi_y)
   {
-    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
     uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-    sum += T(pi_q_lo) * pi_y
-         - T(pi_q_hi) * pi_min_clustered_global;
+    sum += T(pi[q_lo]) * pi_y
+         - T(pi[q_hi]) * pi_min_clustered_global;
     sum -= T(b - 2) *
            (pi_y - pi_min_clustered_global);
   }
@@ -737,12 +737,12 @@ T C2_128(T xlow,
   if (pi_max_m > pi_min_clustered &&
       pi_max_m == pi_y)
   {
-    uint64_t pi_q_lo = pi[fast_div64(xp, max_clustered_global)];
-    uint64_t pi_q_hi = pi[fast_div64(xp, min_clustered_global + 1)];
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
     uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
-    sum += T(pi_q_lo) * pi_y
-         - T(pi_q_hi) * pi_min_clustered_global;
+    sum += T(pi[q_lo]) * pi_y
+         - T(pi[q_hi]) * pi_min_clustered_global;
     sum -= T(b - 2) *
            (pi_y - pi_min_clustered_global);
   }
