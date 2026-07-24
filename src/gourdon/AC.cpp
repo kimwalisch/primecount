@@ -190,13 +190,10 @@ T C2(T xlow,
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  XP min_clustered128 =
-      max3(xp / (prime * prime), (XP) prime, (XP) sqrt_xp);
-  uint64_t min_clustered_global =
-      (uint64_t) min(min_clustered128, (XP) y);
+  XP min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
+  uint64_t min_clustered_global = min(min_clustered128, y);
   uint64_t max_clustered_global = max_y_prime;
-  bool has_clustered =
-      max_clustered_global > min_clustered_global;
+  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -208,14 +205,11 @@ T C2(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo =
-          fast_div64(xp, max_clustered_global);
-      uint64_t q_hi =
-          fast_div64(xp, min_clustered_global + 1);
+      uint64_t q_lo = fast_div64(xp, max_clustered_global);
+      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
       uint64_t pi_q_lo = pi[q_lo];
       uint64_t pi_q_hi = pi[q_hi];
-      uint64_t pi_min_clustered_global =
-          pi[min_clustered_global];
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
            - T(pi_q_hi) * pi_min_clustered_global;
@@ -672,13 +666,10 @@ T C2_64(T xlow,
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  uint64_t min_clustered128 =
-      max3(xp / (prime * prime), prime, sqrt_xp);
-  uint64_t min_clustered_global =
-      min(min_clustered128, y);
+  uint64_t min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
+  uint64_t min_clustered_global = min(min_clustered128, y);
   uint64_t max_clustered_global = max_y_prime;
-  bool has_clustered =
-      max_clustered_global > min_clustered_global;
+  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -690,14 +681,11 @@ T C2_64(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo =
-          fast_div64(xp, max_clustered_global);
-      uint64_t q_hi =
-          fast_div64(xp, min_clustered_global + 1);
+      uint64_t q_lo = fast_div64(xp, max_clustered_global);
+      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
       uint64_t pi_q_lo = pi[q_lo];
       uint64_t pi_q_hi = pi[q_hi];
-      uint64_t pi_min_clustered_global =
-          pi[min_clustered_global];
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
            - T(pi_q_hi) * pi_min_clustered_global;
@@ -841,13 +829,10 @@ T C2_128(T xlow,
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
-  T min_clustered128 =
-      max3(xp / (prime * prime), (T) prime, (T) sqrt_xp);
-  uint64_t min_clustered_global =
-      (uint64_t) min(min_clustered128, (T) y);
+  T min_clustered128 = max3(xp / (prime * prime), prime, sqrt_xp);
+  uint64_t min_clustered_global = min(min_clustered128, y);
   uint64_t max_clustered_global = max_y_prime;
-  bool has_clustered =
-      max_clustered_global > min_clustered_global;
+  bool has_clustered = max_clustered_global > min_clustered_global;
 
   // For fixed p, ]min_clustered_global, max_clustered_global] is
   // the complete clustered interval. Emit its boundary correction
@@ -859,14 +844,11 @@ T C2_128(T xlow,
   {
     if (has_clustered && i == pi_y)
     {
-      uint64_t q_lo =
-          fast_div64(xp, max_clustered_global);
-      uint64_t q_hi =
-          fast_div64(xp, min_clustered_global + 1);
+      uint64_t q_lo = fast_div64(xp, max_clustered_global);
+      uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
       uint64_t pi_q_lo = pi[q_lo];
       uint64_t pi_q_hi = pi[q_hi];
-      uint64_t pi_min_clustered_global =
-          pi[min_clustered_global];
+      uint64_t pi_min_clustered_global = pi[min_clustered_global];
 
       sum += T(pi_q_lo) * pi_y
            - T(pi_q_hi) * pi_min_clustered_global;
