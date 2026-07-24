@@ -224,7 +224,7 @@ T C2(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (max_clustered_global <= min_clustered_global ||
+  else if (min_clustered_global >= max_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
@@ -648,7 +648,7 @@ T C2_64(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (max_clustered_global <= min_clustered_global ||
+  else if (min_clustered_global >= max_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
@@ -759,7 +759,7 @@ T C2_128(T xlow,
       sum += segmentedPi[xpq] * 2 - b + 2;
     }
   }
-  else if (max_clustered_global <= min_clustered_global ||
+  else if (min_clustered_global >= max_clustered_global ||
            segmentedPi.high() <= min_clustered_global + 1 ||
            segmentedPi.low() >= max_clustered_global)
   {
