@@ -183,16 +183,16 @@ T C2(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
-
-  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
   // Emit the boundary correction once, in the unique
   // segment containing max_clustered_global.
@@ -578,16 +578,16 @@ T C2_64(T xlow,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
-
-  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
   // Emit the boundary correction once, in the unique
   // segment containing max_clustered_global.
@@ -660,16 +660,16 @@ T C2_128(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t min_m = min(max3(xhigh / prime, xp / (prime * prime), prime), max_m);
+  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
-
-  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
   // Emit the boundary correction once, in the unique
   // segment containing max_clustered_global.
