@@ -194,37 +194,28 @@ T C2(T xlow,
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is the
-  // complete clustered interval. Gourdon's inversion equality replaces
-  // its whole contribution by a one-time boundary correction plus a sum
-  // of reflected leaves pi(xp / r). The boundary correction is emitted
-  // once, in the unique segment containing max_clustered_global. The
-  // reflected leaves are the sparse leaves whose xpq lies in the
-  // clustered interval; they are counted a second time by the sparse
-  // loops below, here and in the other segments overlapping the
-  // interval. All contributions enter the existing OpenMP reduction.
-  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
-  bool overlap = min_clustered_global < max_clustered_global &&
-                 segmentedPi.low() < max_clustered_global &&
-                 segmentedPi.high() > min_clustered_global + 1;
-
-  if (emit || overlap)
+  // Emit the boundary correction once, in the unique
+  // segment containing max_clustered_global.
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+  }
 
-    if (emit)
-    {
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
-      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
-    }
-
-    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
-    pi_conj_lo = max(pi_q_lo, pi_min_m);
-    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
+  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
   // Sparse leaves below the reflected sub-range.
@@ -598,37 +589,28 @@ T C2_64(T xlow,
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is the
-  // complete clustered interval. Gourdon's inversion equality replaces
-  // its whole contribution by a one-time boundary correction plus a sum
-  // of reflected leaves pi(xp / r). The boundary correction is emitted
-  // once, in the unique segment containing max_clustered_global. The
-  // reflected leaves are the sparse leaves whose xpq lies in the
-  // clustered interval; they are counted a second time by the sparse
-  // loops below, here and in the other segments overlapping the
-  // interval. All contributions enter the existing OpenMP reduction.
-  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
-  bool overlap = min_clustered_global < max_clustered_global &&
-                 segmentedPi.low() < max_clustered_global &&
-                 segmentedPi.high() > min_clustered_global + 1;
-
-  if (emit || overlap)
+  // Emit the boundary correction once, in the unique
+  // segment containing max_clustered_global.
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+  }
 
-    if (emit)
-    {
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
-      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
-    }
-
-    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
-    pi_conj_lo = max(pi_q_lo, pi_min_m);
-    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
+  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
   // Sparse leaves below the reflected sub-range.
@@ -689,37 +671,28 @@ T C2_128(T xlow,
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
-  // For fixed p, ]min_clustered_global, max_clustered_global] is the
-  // complete clustered interval. Gourdon's inversion equality replaces
-  // its whole contribution by a one-time boundary correction plus a sum
-  // of reflected leaves pi(xp / r). The boundary correction is emitted
-  // once, in the unique segment containing max_clustered_global. The
-  // reflected leaves are the sparse leaves whose xpq lies in the
-  // clustered interval; they are counted a second time by the sparse
-  // loops below, here and in the other segments overlapping the
-  // interval. All contributions enter the existing OpenMP reduction.
-  bool emit = pi_max_m == pi_y && pi_max_m > pi_min_clustered;
-  bool overlap = min_clustered_global < max_clustered_global &&
-                 segmentedPi.low() < max_clustered_global &&
-                 segmentedPi.high() > min_clustered_global + 1;
-
-  if (emit || overlap)
+  // Emit the boundary correction once, in the unique
+  // segment containing max_clustered_global.
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
+  }
 
-    if (emit)
-    {
-      uint64_t pi_min_clustered_global = pi[min_clustered_global];
-      sum += T(pi_q_lo) * pi_y - T(pi_q_hi) * pi_min_clustered_global;
-      sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
-    }
-
-    // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
-    pi_conj_lo = max(pi_q_lo, pi_min_m);
-    pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
+  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi].
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
   // Sparse leaves below the reflected sub-range.
