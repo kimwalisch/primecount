@@ -81,6 +81,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -103,6 +104,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -221,20 +223,51 @@ T C2(T xlow,
   }
 
   // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
-  // Reflected leaves: counted once as a sparse leaf, once as a conjugate
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected range
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -421,6 +454,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -443,6 +477,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -479,6 +514,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -501,6 +537,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -618,20 +655,51 @@ T C2_64(T xlow,
   }
 
   // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
   }
 
-  // Reflected leaves: counted once as a sparse leaf, once as a conjugate
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected range
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -702,20 +770,51 @@ T C2_128(T xlow,
   }
 
   // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
-  // Reflected leaves: counted once as a sparse leaf, once as a conjugate
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected range
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] - b + 2) +
+           (segmentedPi[xpq1] - b + 2) +
+           (segmentedPi[xpq2] - b + 2) +
+           (segmentedPi[xpq3] - b + 2);
+  }
+
+  NOUNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
