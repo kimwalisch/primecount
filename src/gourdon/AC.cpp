@@ -190,7 +190,7 @@ T C2(T xlow,
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  uint64_t i = pi_min_clustered;
+  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
@@ -227,22 +227,22 @@ T C2(T xlow,
     pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  // Sparse leaves above the reflected sub-range.
-  for (; i > pi_conj_hi; i--)
+  // Sparse leaves below the reflected sub-range.
+  for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  for (; i > pi_conj_lo; i--)
+  for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves below the reflected sub-range.
-  for (; i > pi_min_m; i--)
+  // Sparse leaves above the reflected sub-range.
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
@@ -594,7 +594,7 @@ T C2_64(T xlow,
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  uint64_t i = pi_min_clustered;
+  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
@@ -631,22 +631,22 @@ T C2_64(T xlow,
     pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  // Sparse leaves above the reflected sub-range.
-  for (; i > pi_conj_hi; i--)
+  // Sparse leaves below the reflected sub-range.
+  for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
   }
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  for (; i > pi_conj_lo; i--)
+  for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves below the reflected sub-range.
-  for (; i > pi_min_m; i--)
+  // Sparse leaves above the reflected sub-range.
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
@@ -685,7 +685,7 @@ T C2_128(T xlow,
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
   uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
 
-  uint64_t i = pi_min_clustered;
+  uint64_t i = pi_min_m + 1;
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
 
@@ -722,22 +722,22 @@ T C2_128(T xlow,
     pi_conj_hi = max(min(pi_q_hi, pi_min_clustered), pi_conj_lo);
   }
 
-  // Sparse leaves above the reflected sub-range.
-  for (; i > pi_conj_hi; i--)
+  // Sparse leaves below the reflected sub-range.
+  for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
   }
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  for (; i > pi_conj_lo; i--)
+  for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves below the reflected sub-range.
-  for (; i > pi_min_m; i--)
+  // Sparse leaves above the reflected sub-range.
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
