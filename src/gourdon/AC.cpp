@@ -278,7 +278,7 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime), threads);
 
   uint64_t pi_y = pi[y];
-  uint64_t max_clustered_global = pi_y ? primes[pi_y] : 0;
+  uint64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -765,7 +765,7 @@ T AC_OpenMP(T x,
   PiTable pi(max(z, max_a_prime), threads);
 
   uint64_t pi_y = pi[y];
-  uint64_t max_clustered_global = pi_y ? primes[pi_y] : 0;
+  uint64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
