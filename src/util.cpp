@@ -326,7 +326,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // synchronization. The larger alpha_z, the less work there will
     // be in the C1 algorithm. Hence for computations >= 10^23 using
     // an alpha_z > 1 will likely improve performance.
-    alpha_z = 1.5;
+    alpha_z = 1.2;
 
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
