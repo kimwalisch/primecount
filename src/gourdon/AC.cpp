@@ -197,8 +197,7 @@ T C2(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
-  // Emit the boundary correction once, in the unique
-  // segment containing max_clustered_global.
+  // Compute the boundary correction once
   if (pi_max_m == pi_y &&
       pi_max_m > pi_min_clustered)
   {
@@ -209,7 +208,7 @@ T C2(T xlow,
     sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi]
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
   if (min_clustered_global < max_clustered_global &&
       segmentedPi.low() < max_clustered_global &&
       segmentedPi.high() > min_clustered_global + 1)
@@ -221,7 +220,7 @@ T C2(T xlow,
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
-  // Sparse leaves below the reflected sub-range
+  // Sparse leaves below the reflected range
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -235,7 +234,7 @@ T C2(T xlow,
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected sub-range
+  // Sparse leaves above the reflected range
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -595,8 +594,7 @@ T C2_64(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
-  // Emit the boundary correction once, in the unique
-  // segment containing max_clustered_global.
+  // Compute the boundary correction once
   if (pi_max_m == pi_y &&
       pi_max_m > pi_min_clustered)
   {
@@ -607,7 +605,7 @@ T C2_64(T xlow,
     sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi]
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
   if (min_clustered_global < max_clustered_global &&
       segmentedPi.low() < max_clustered_global &&
       segmentedPi.high() > min_clustered_global + 1)
@@ -619,7 +617,7 @@ T C2_64(T xlow,
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
-  // Sparse leaves below the reflected sub-range
+  // Sparse leaves below the reflected range
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -633,7 +631,7 @@ T C2_64(T xlow,
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected sub-range
+  // Sparse leaves above the reflected range
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -680,8 +678,7 @@ T C2_128(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
-  // Emit the boundary correction once, in the unique
-  // segment containing max_clustered_global.
+  // Compute the boundary correction once
   if (pi_max_m == pi_y &&
       pi_max_m > pi_min_clustered)
   {
@@ -692,7 +689,7 @@ T C2_128(T xlow,
     sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Reflected leaves occupy the contiguous ]pi_conj_lo, pi_conj_hi]
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
   if (min_clustered_global < max_clustered_global &&
       segmentedPi.low() < max_clustered_global &&
       segmentedPi.high() > min_clustered_global + 1)
@@ -704,7 +701,7 @@ T C2_128(T xlow,
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
-  // Sparse leaves below the reflected sub-range
+  // Sparse leaves below the reflected range
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -718,7 +715,7 @@ T C2_128(T xlow,
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
-  // Sparse leaves above the reflected sub-range
+  // Sparse leaves above the reflected range
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
