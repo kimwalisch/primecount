@@ -183,13 +183,14 @@ T C2(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  XP x_div_prime3 = xp / (prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
-  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t min_clustered_global = min(max3(x_div_prime3, prime, sqrt_xp), y);
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
@@ -578,13 +579,14 @@ T C2_64(T xlow,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t x_div_prime3 = xp / (prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
-  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t min_clustered_global = min(max3(x_div_prime3, prime, sqrt_xp), y);
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
@@ -660,13 +662,14 @@ T C2_128(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  T x_div_prime3 = xp / (prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
   uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t pi_min_clustered = pi[in_between(min_m, sqrt_xp, max_m)];
-  uint64_t min_clustered_global = min(max3(xp / (prime * prime), prime, sqrt_xp), y);
+  uint64_t min_clustered_global = min(max3(x_div_prime3, prime, sqrt_xp), y);
   uint64_t pi_conj_lo = pi_min_m;
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
