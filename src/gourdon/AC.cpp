@@ -81,6 +81,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -103,6 +104,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -173,6 +175,8 @@ T C2(T xlow,
      XP xp,
      uint64_t y,
      uint64_t b,
+     uint64_t pi_y,
+     uint64_t max_clustered_global,
      const Primes& primes,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi)
@@ -181,67 +185,81 @@ T C2(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
-  uint64_t min_clustered = (uint64_t) isqrt(xp);
-  min_clustered = in_between(min_m, min_clustered, max_m);
+  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
+  min_clustered_global = min(min_clustered_global, y);
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
-  // Clustered easy leaves: q in ]min_clustered, max_m], where
-  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
-  // band into a sum over the conjugate range (t = x / p):
-  //
-  //   sum_{min_clustered < q <= max_m} pi(t / q) =
-  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
-  //     + sum_{q_lo < q <= q_hi} pi(t / q)
-  //
-  // The conjugate arguments t / q are <= y, hence they are read
-  // from the pi table instead of segmentedPi.
-  if (i > pi_min_clustered)
+  // Compute the boundary correction once
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
-    uint64_t q_lo = fast_div64(xp, max_m);
-    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
-    uint64_t j = pi_q_hi;
-
-    T conj_sum = 0;
-
-    // Unroll loop to increase instruction level parallelism
-    for (; j > pi_q_lo + 3; j -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[j]);
-      uint64_t xpq1 = fast_div64(xp, primes[j-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[j-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[j-3]);
-
-      conj_sum += pi[xpq0] +
-                  pi[xpq1] +
-                  pi[xpq2] +
-                  pi[xpq3];
-    }
-
-    for (; j > pi_q_lo; j--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[j]);
-      conj_sum += pi[xpq];
-    }
-
-    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
-    sum -= T(b - 2) * (i - pi_min_clustered);
-
-    i = pi_min_clustered;
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Unroll loop to increase instruction level parallelism
-  for (; i > pi_min_m + 3; i -= 4)
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
+  }
+
+  // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_lo; i++)
+  {
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
+  }
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
   {
     uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i-3]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_hi; i++)
+  {
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] * 2 - b + 2;
+  }
+
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
 
     sum += (segmentedPi[xpq0] - b + 2) +
            (segmentedPi[xpq1] - b + 2) +
@@ -249,12 +267,8 @@ T C2(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  // Find all sparse easy leaves where
-  // successive leaves are different.
-  // pq = primes[b] * primes[i]
-  // Which satisfy: low <= x / pq < high && q <= y && pq > z
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; i > pi_min_m; i--)
+  NOUNROLL_LOOP
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
@@ -296,7 +310,8 @@ T AC_OpenMP(T x,
   // is fairly large and does not fit into the CPU's cache.
   PiTable pi(max(z, max_a_prime), threads);
 
-  int64_t pi_y = pi[y];
+  uint64_t pi_y = pi[y];
+  uint64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -382,9 +397,9 @@ T AC_OpenMP(T x,
           T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
-            sum += C2(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
@@ -439,6 +454,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -461,6 +477,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -497,6 +514,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -519,6 +537,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
+  NOUNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -588,6 +607,8 @@ T C2_64(T xlow,
         uint64_t xp,
         uint64_t y,
         uint64_t b,
+        uint64_t pi_y,
+        uint64_t max_clustered_global,
         uint64_t prime,
         const LibdividePrimes& primes,
         const PiTable& pi,
@@ -596,67 +617,81 @@ T C2_64(T xlow,
   T sum = 0;
 
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t x_div_prime3 = xp / (prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
-  uint64_t min_clustered = isqrt(xp);
-  min_clustered = in_between(min_m, min_clustered, max_m);
+  uint64_t sqrt_xp = isqrt(xp);
+  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
+  min_clustered_global = min(min_clustered_global, y);
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
-  // Clustered easy leaves: q in ]min_clustered, max_m], where
-  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
-  // band into a sum over the conjugate range (t = x / p):
-  //
-  //   sum_{min_clustered < q <= max_m} pi(t / q) =
-  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
-  //     + sum_{q_lo < q <= q_hi} pi(t / q)
-  //
-  // The conjugate arguments t / q are <= y, hence they are read
-  // from the pi table instead of segmentedPi.
-  if (i > pi_min_clustered)
+  // Compute the boundary correction once
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
-    uint64_t q_lo = fast_div64(xp, max_m);
-    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
-    uint64_t j = pi_q_hi;
-
-    T conj_sum = 0;
-
-    // Unroll loop to increase instruction level parallelism
-    for (; j > pi_q_lo + 3; j -= 4)
-    {
-      uint64_t xpq0 = xp / primes[j];
-      uint64_t xpq1 = xp / primes[j-1];
-      uint64_t xpq2 = xp / primes[j-2];
-      uint64_t xpq3 = xp / primes[j-3];
-
-      conj_sum += pi[xpq0] +
-                  pi[xpq1] +
-                  pi[xpq2] +
-                  pi[xpq3];
-    }
-
-    for (; j > pi_q_lo; j--)
-    {
-      uint64_t xpq = xp / primes[j];
-      conj_sum += pi[xpq];
-    }
-
-    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
-    sum -= T(b - 2) * (i - pi_min_clustered);
-
-    i = pi_min_clustered;
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Unroll loop to increase instruction level parallelism
-  for (; i > pi_min_m + 3; i -= 4)
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
+  }
+
+  // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_lo; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] - b + 2;
+  }
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
   {
     uint64_t xpq0 = xp / primes[i];
-    uint64_t xpq1 = xp / primes[i-1];
-    uint64_t xpq2 = xp / primes[i-2];
-    uint64_t xpq3 = xp / primes[i-3];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_hi; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq] * 2 - b + 2;
+  }
+
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
 
     sum += (segmentedPi[xpq0] - b + 2) +
            (segmentedPi[xpq1] - b + 2) +
@@ -664,12 +699,8 @@ T C2_64(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  // Find all sparse easy leaves where
-  // successive leaves are different.
-  // pq = primes[b] * primes[i]
-  // Which satisfy: low <= x / pq < high && q <= y && pq > z
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; i > pi_min_m; i--)
+  NOUNROLL_LOOP
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
@@ -691,6 +722,8 @@ T C2_128(T xlow,
          T xp,
          uint64_t y,
          uint64_t b,
+         uint64_t pi_y,
+         uint64_t max_clustered_global,
          const Primes& primes,
          const PiTable& pi,
          const SegmentedPiTable& segmentedPi)
@@ -699,67 +732,81 @@ T C2_128(T xlow,
 
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  T min_m128 = max3(xhigh / prime, xp / (prime * prime), prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t i = pi[max_m];
+  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
-  uint64_t min_clustered = (uint64_t) isqrt(xp);
-  min_clustered = in_between(min_m, min_clustered, max_m);
+  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
+  uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
+  min_clustered_global = min(min_clustered_global, y);
+  uint64_t pi_conj_lo = pi_min_m;
+  uint64_t pi_conj_hi = pi_min_m;
+  uint64_t i = pi_min_m + 1;
 
-  // Clustered easy leaves: q in ]min_clustered, max_m], where
-  // x / (p*q) < √(x / p). Gourdon's inversion equality turns this
-  // band into a sum over the conjugate range (t = x / p):
-  //
-  //   sum_{min_clustered < q <= max_m} pi(t / q) =
-  //     pi(q_lo) * pi(max_m) - pi(q_hi) * pi(min_clustered)
-  //     + sum_{q_lo < q <= q_hi} pi(t / q)
-  //
-  // The conjugate arguments t / q are <= y, hence they are read
-  // from the pi table instead of segmentedPi.
-  if (i > pi_min_clustered)
+  // Compute the boundary correction once
+  if (pi_max_m == pi_y &&
+      pi_max_m > pi_min_clustered)
   {
-    uint64_t q_lo = fast_div64(xp, max_m);
-    uint64_t q_hi = fast_div64(xp, min_clustered + 1);
-    uint64_t pi_q_lo = pi[q_lo];
-    uint64_t pi_q_hi = pi[q_hi];
-    uint64_t j = pi_q_hi;
-
-    T conj_sum = 0;
-
-    // Unroll loop to increase instruction level parallelism
-    for (; j > pi_q_lo + 3; j -= 4)
-    {
-      uint64_t xpq0 = fast_div64(xp, primes[j]);
-      uint64_t xpq1 = fast_div64(xp, primes[j-1]);
-      uint64_t xpq2 = fast_div64(xp, primes[j-2]);
-      uint64_t xpq3 = fast_div64(xp, primes[j-3]);
-
-      conj_sum += pi[xpq0] +
-                  pi[xpq1] +
-                  pi[xpq2] +
-                  pi[xpq3];
-    }
-
-    for (; j > pi_q_lo; j--)
-    {
-      uint64_t xpq = fast_div64(xp, primes[j]);
-      conj_sum += pi[xpq];
-    }
-
-    sum += T(pi_q_lo) * i - T(pi_q_hi) * pi_min_clustered + conj_sum;
-    sum -= T(b - 2) * (i - pi_min_clustered);
-
-    i = pi_min_clustered;
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    uint64_t pi_min_clustered_global = pi[min_clustered_global];
+    sum += T(pi[q_lo]) * pi_y - T(pi[q_hi]) * pi_min_clustered_global;
+    sum -= T(b - 2) * (pi_y - pi_min_clustered_global);
   }
 
-  // Unroll loop to increase instruction level parallelism
-  for (; i > pi_min_m + 3; i -= 4)
+  // Reflected range: ]pi_conj_lo, pi_conj_hi]
+  if (min_clustered_global < max_clustered_global &&
+      segmentedPi.low() < max_clustered_global &&
+      segmentedPi.high() > min_clustered_global + 1)
+  {
+    uint64_t q_lo = fast_div64(xp, max_clustered_global);
+    uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
+    pi_conj_lo = max(pi[q_lo], pi_min_m);
+    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
+  }
+
+  // Sparse leaves below the reflected range
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_lo; i++)
+  {
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] - b + 2;
+  }
+
+  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_conj_hi; i += 4)
   {
     uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i-1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i-2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i-3]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += (segmentedPi[xpq0] * 2 - b + 2) +
+           (segmentedPi[xpq1] * 2 - b + 2) +
+           (segmentedPi[xpq2] * 2 - b + 2) +
+           (segmentedPi[xpq3] * 2 - b + 2);
+  }
+
+  NOUNROLL_LOOP
+  for (; i <= pi_conj_hi; i++)
+  {
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq] * 2 - b + 2;
+  }
+
+  // Sparse leaves above the reflected range.
+  // Unroll loop to increase instruction level parallelism.
+  for (; i + 3 <= pi_min_clustered; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
 
     sum += (segmentedPi[xpq0] - b + 2) +
            (segmentedPi[xpq1] - b + 2) +
@@ -767,12 +814,8 @@ T C2_128(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  // Find all sparse easy leaves where
-  // successive leaves are different.
-  // pq = primes[b] * primes[i]
-  // Which satisfy: low <= x / pq < high && q <= y && pq > z
-  // where phi(x / pq, b - 1) = pi(x / pq) - b + 2
-  for (; i > pi_min_m; i--)
+  NOUNROLL_LOOP
+  for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
     sum += segmentedPi[xpq] - b + 2;
@@ -820,7 +863,8 @@ T AC_OpenMP(T x,
   // is fairly large and does not fit into the CPU's cache.
   PiTable pi(max(z, max_a_prime), threads);
 
-  int64_t pi_y = pi[y];
+  uint64_t pi_y = pi[y];
+  uint64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -907,9 +951,9 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
-            sum += C2_128(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+            sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]

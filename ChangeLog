@@ -1,6 +1,8 @@
-Changes in primecount-8.7, 2026-07-23
+Changes in primecount-8.7, 2026-07-25
 
-* AC.cpp: Simplify clustered easy leaves algorithm using Gourdon's inversion equality.
+* AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
+* SegmentedPiTable.hpp: Switch return types to uint64_t for new AC.cpp code.
+* util.cpp: Tune alpha_z=1.2 for new AC algorithm.
 
 Changes in primecount-8.6, 2026-07-15
 

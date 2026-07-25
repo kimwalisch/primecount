@@ -43,23 +43,23 @@ class SegmentedPiTable
 public:
   void init(uint64_t low, uint64_t high, uint64_t limit);
 
-  int64_t low() const
+  uint64_t low() const
   {
     return low_;
   }
 
-  int64_t high() const
+  uint64_t high() const
   {
     return high_;
   }
 
-  static constexpr int64_t numbers_per_byte()
+  static constexpr uint64_t numbers_per_byte()
   {
     return 128 / (sizeof(uint64_t) * 2);
   }
 
   /// Make sure size % 128 == 0
-  static int64_t align_segment_size(uint64_t size)
+  static uint64_t align_segment_size(uint64_t size)
   {
     size = std::max<uint64_t>(128, size);
 
@@ -70,7 +70,7 @@ public:
   }
 
   /// Get number of primes <= x
-  ALWAYS_INLINE int64_t operator[](uint64_t x) const
+  ALWAYS_INLINE uint64_t operator[](uint64_t x) const
   {
     ASSERT(x >= low_);
     ASSERT(x < high_);

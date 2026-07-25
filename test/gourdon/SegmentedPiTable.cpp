@@ -62,7 +62,7 @@ int main()
     }
 
     std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
-    check(segmentedPi[i] == pi[i]);
+    check(segmentedPi[i] == (uint64_t) pi[i]);
   }
 
   // Check large pi(x) values
@@ -79,7 +79,7 @@ int main()
     }
 
     std::cout << "segmentedPi(" << i << ") = " << segmentedPi[i];
-    check(segmentedPi[i] == pi[i]);
+    check(segmentedPi[i] == (uint64_t) pi[i]);
   }
 
   while (high < limit)
@@ -94,7 +94,7 @@ int main()
   // PiTable can lookup numbers <= limit.
   // SegmentedPiTable can lookup numbers < limit.
   std::cout << "segmentedPi(" << limit-1 << ") = " << segmentedPi[limit-1];
-  check(segmentedPi[limit-1] == pi[limit-1]);
+  check(segmentedPi[limit-1] == (uint64_t) pi[limit-1]);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
