@@ -43,6 +43,10 @@
 
 #include <stdint.h>
 
+#if defined(_OPENMP)
+  #include <omp.h>
+#endif
+
 #if defined(ENABLE_LIBDIVIDE)
   #include <libdivide.h>
 #endif
@@ -327,19 +331,29 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    // There are very few iterations in this loop,
-    // hence the use of an atomic loop counter (min_c1)
-    // won't cause any scaling issues.
-    for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t max_m = min(xp / prime, z);
-      T min_m128 = max(xp / (prime * prime), z / prime);
-      int64_t min_m = min(min_m128, max_m);
+  #ifdef _OPENMP
+    int thread_id = omp_get_thread_num();
+  #else
+    int thread_id = 0;
+  #endif
 
-      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+    // C1 performs random accesses into the large PiTable and
+    // scales poorly once memory bandwidth is saturated. Use
+    // fewer threads for C1 while the remaining threads start
+    // the cache-efficient segmented A and C2 computations.
+    if (thread_id % 4 == 0)
+    {
+      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
+      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
+      {
+        int64_t prime = primes[b];
+        T xp = x / prime;
+        int64_t max_m = min(xp / prime, z);
+        T min_m128 = max(xp / (prime * prime), z / prime);
+        int64_t min_m = min(min_m128, max_m);
+
+        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+      }
     }
 
     // SegmentedPiTable is accessed very frequently.
@@ -880,19 +894,29 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-    // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-    // There are very few iterations in this loop,
-    // hence the use of an atomic loop counter (min_c1)
-    // won't cause any scaling issues.
-    for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-    {
-      int64_t prime = primes[b];
-      T xp = x / prime;
-      int64_t max_m = min(xp / prime, z);
-      T min_m128 = max(xp / (prime * prime), z / prime);
-      int64_t min_m = min(min_m128, max_m);
+  #ifdef _OPENMP
+    int thread_id = omp_get_thread_num();
+  #else
+    int thread_id = 0;
+  #endif
 
-      sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+    // C1 performs random accesses into the large PiTable and
+    // scales poorly once memory bandwidth is saturated. Use
+    // fewer threads for C1 while the remaining threads start
+    // the cache-efficient segmented A and C2 computations.
+    if (thread_id % 4 == 0)
+    {
+      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
+      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
+      {
+        int64_t prime = primes[b];
+        T xp = x / prime;
+        int64_t max_m = min(xp / prime, z);
+        T min_m128 = max(xp / (prime * prime), z / prime);
+        int64_t min_m = min(min_m128, max_m);
+
+        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+      }
     }
 
     // SegmentedPiTable is accessed very frequently.
