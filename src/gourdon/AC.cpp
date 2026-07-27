@@ -314,8 +314,8 @@ T AC_OpenMP(T x,
   // is fairly large and does not fit into the CPU's cache.
   PiTable pi(max(z, max_a_prime), threads);
 
-  uint64_t pi_y = pi[y];
-  uint64_t max_clustered_global = primes[pi_y];
+  int64_t pi_y = pi[y];
+  int64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
@@ -865,24 +865,32 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // Initialize libdivide vector from primes vector
-  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
-  lprimes.resize(primes.size());
-  for (std::size_t i = 1; i < lprimes.size(); i++)
-    lprimes[i] = primes[i];
-
   // PiTable's size = z because of the C1 formula.
   // PiTable is accessed much less frequently than
   // SegmentedPiTable, hence it is OK that PiTable's size
   // is fairly large and does not fit into the CPU's cache.
   PiTable pi(max(z, max_a_prime), threads);
 
-  uint64_t pi_y = pi[y];
-  uint64_t max_clustered_global = primes[pi_y];
+  int64_t pi_y = pi[y];
+  int64_t max_clustered_global = primes[pi_y];
   int64_t pi_sqrtz = pi[isqrt(z)];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
   INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
+
+  // The C2 algorithm only uses primes <= sqrt(x / p).
+  // Initialize libdivide primes up to the largest
+  // divisor used by the 64-bit A and C2 functions.
+  int64_t max_lprime = max_a_prime;
+  int64_t min_c2_global = max3(k, pi_root3_xy, pi_sqrtz) + 1;
+  if (min_c2_global <= pi[x_star])
+    max_lprime = max(max_a_prime, min(
+      isqrt(x / primes[min_c2_global]), y));
+
+  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
+  lprimes.resize(pi[max_lprime] + 1);
+  for (std::size_t i = 1; i < lprimes.size(); i++)
+    lprimes[i] = primes[i];
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
