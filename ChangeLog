@@ -1,4 +1,4 @@
-Changes in primecount-8.7, 2026-07-26
+Changes in primecount-8.7, 2026-07-27
 
 * AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
 * AC.cpp: Limit C1 to 25% of threads to improve scaling.
