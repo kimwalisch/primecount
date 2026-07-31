@@ -394,7 +394,8 @@ T AC_OpenMP(T x,
         min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
         min_c2 += 1;
 
-        int64_t min_a = min(xhigh / high, x13);
+        int64_t xhigh2 = fast_div64(xhigh, high);
+        int64_t min_a = min(xhigh2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
@@ -403,10 +404,24 @@ T AC_OpenMP(T x,
         // p <= sqrt(x / low)
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
+        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-        for (int64_t b = min_c2; b <= max_c2; b++)
+        for (int64_t b = min_c2; b <= max_c2_clustered; b++)
+        {
+          T xp = x / primes[b];
+
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
+            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+          else
+            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+        }
+
+        // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+        for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
           T xp = x / primes[b];
 
@@ -965,7 +980,8 @@ T AC_OpenMP(T x,
         min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
         min_c2 += 1;
 
-        int64_t min_a = min(xhigh / high, x13);
+        int64_t xhigh2 = fast_div64(xhigh, high);
+        int64_t min_a = min(xhigh2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
@@ -974,10 +990,25 @@ T AC_OpenMP(T x,
         // p <= sqrt(x / low)
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
+        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
+        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-        for (int64_t b = min_c2; b <= max_c2; b++)
+        for (int64_t b = min_c2; b <= max_c2_clustered; b++)
+        {
+          int64_t prime = primes[b];
+          T xp = x / prime;
+
+          if (xp <= pstd::numeric_limits<uint64_t>::max())
+            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+          else
+            sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+        }
+
+        // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
+        for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
           int64_t prime = primes[b];
           T xp = x / prime;
