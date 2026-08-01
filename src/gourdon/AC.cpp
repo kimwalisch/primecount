@@ -1037,13 +1037,9 @@ T AC_OpenMP(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
 
-  // The C1 algorithm uses prime divisors <= y.
-  // Initialize libdivide primes up to the largest divisor
-  // used by the 64-bit A, C1 and C2 functions.
-  int64_t max_lprime = max(y, max_a_prime);
-
+  // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
-  lprimes.resize(pi[max_lprime] + 1);
+  lprimes.resize(primes.size());
   for (std::size_t i = 1; i < lprimes.size(); i++)
     lprimes[i] = primes[i];
 
