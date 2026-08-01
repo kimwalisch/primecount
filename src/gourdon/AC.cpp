@@ -118,8 +118,9 @@ T A(T xlow,
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
 ///
-/// m may be a prime <= y or a square free number <= z which is
-/// coprime to the first b primes and whose largest prime factor <= y.
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
@@ -142,7 +143,6 @@ T C1(T xlow,
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
-  min_m = min(min_m, max_m);
 
   if (min_m >= max_m)
     return 0;
@@ -152,7 +152,7 @@ T C1(T xlow,
 
   if (min_m < max_prime)
   {
-    uint64_t min_i = max(b, pi[min_m]) + 1;
+    uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
 
     for (uint64_t i = min_i; i <= max_i; i++)
@@ -605,8 +605,9 @@ T A_128(T xlow,
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
 ///
-/// m may be a prime <= y or a square free number <= z which is
-/// coprime to the first b primes and whose largest prime factor <= y.
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
@@ -630,7 +631,6 @@ T C1_64(T xlow,
   uint64_t x_div_prime3 = xp / (prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
-  min_m = min(min_m, max_m);
 
   if (min_m >= max_m)
     return 0;
@@ -640,7 +640,7 @@ T C1_64(T xlow,
 
   if (min_m < max_prime)
   {
-    uint64_t min_i = max(b, pi[min_m]) + 1;
+    uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
 
     for (uint64_t i = min_i; i <= max_i; i++)
@@ -689,8 +689,9 @@ T C1_64(T xlow,
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
 ///
-/// m may be a prime <= y or a square free number <= z which is
-/// coprime to the first b primes and whose largest prime factor <= y.
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
@@ -712,7 +713,6 @@ T C1_128(T xlow,
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
-  min_m = min(min_m, max_m);
 
   if (min_m >= max_m)
     return 0;
@@ -722,7 +722,7 @@ T C1_128(T xlow,
 
   if (min_m < max_prime)
   {
-    uint64_t min_i = max(b, pi[min_m]) + 1;
+    uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
 
     for (uint64_t i = min_i; i <= max_i; i++)
