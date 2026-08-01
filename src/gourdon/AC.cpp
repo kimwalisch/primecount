@@ -124,19 +124,15 @@ T A(T xlow,
 ///
 /// m may be a prime <= y or a square free number <= z which is
 /// coprime to the first b primes and whose largest prime factor <= y.
-/// This algorithm recursively iterates over the square free numbers
-/// coprime to the first b primes. This algorithm is described in
-/// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
+/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// m cannot contain more than 2 prime factors.
 ///
 template <int MU,
           typename T,
           typename Primes>
 T C1(T xp,
      uint64_t b,
-     uint64_t i,
-     uint64_t pi_y,
-     uint64_t m,
+     uint64_t y,
      uint64_t min_m,
      uint64_t max_m,
      const Primes& primes,
@@ -144,22 +140,42 @@ T C1(T xp,
 {
   T sum = 0;
 
-  for (i++; i <= pi_y; i++)
+  // m = primes[i]
+  uint64_t min_i = max(b, (uint64_t) pi[min_m]) + 1;
+  uint64_t max_i = pi[min(y, max_m)];
+
+  for (uint64_t i = min_i; i <= max_i; i++)
   {
-    // Calculate next m
-    T m128 = (T) m * primes[i];
-    if (m128 > max_m)
-      return sum;
+    uint64_t m = primes[i];
+    uint64_t xpm = fast_div64(xp, m);
+    T phi_xpm = pi[xpm] - b + 2;
+    sum += phi_xpm * MU;
+  }
 
-    uint64_t m64 = (uint64_t) m128;
+  // m = primes[i] * primes[j]
+  uint64_t max_q = min(y, isqrt(max_m));
+  uint64_t min_q_i = max(b, (uint64_t) pi[min_m / y]) + 1;
+  uint64_t max_q_i = pi[max_q];
 
-    if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
+  for (uint64_t i = min_q_i; i <= max_q_i; i++)
+  {
+    uint64_t q = primes[i];
+    uint64_t min_r = max(q, min_m / q);
+    uint64_t max_r = min(y, max_m / q);
+
+    if (min_r >= max_r)
+      continue;
+
+    uint64_t min_j = pi[min_r] + 1;
+    uint64_t max_j = pi[max_r];
+
+    for (uint64_t j = min_j; j <= max_j; j++)
+    {
+      uint64_t m = q * primes[j];
+      uint64_t xpm = fast_div64(xp, m);
       T phi_xpm = pi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= phi_xpm * MU;
     }
-
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -352,7 +368,7 @@ T AC_OpenMP(T x,
         T min_m128 = max(xp / (prime * prime), z / prime);
         int64_t min_m = min(min_m128, max_m);
 
-        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+        sum -= C1<-1>(xp, b, y, min_m, max_m, primes, pi);
       }
     }
 
@@ -582,19 +598,15 @@ T A_128(T xlow,
 ///
 /// m may be a prime <= y or a square free number <= z which is
 /// coprime to the first b primes and whose largest prime factor <= y.
-/// This algorithm recursively iterates over the square free numbers
-/// coprime to the first b primes. This algorithm is described in
-/// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
+/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// m cannot contain more than 2 prime factors.
 ///
 template <int MU,
           typename T,
           typename Primes>
 T C1(T xp,
      uint64_t b,
-     uint64_t i,
-     uint64_t pi_y,
-     uint64_t m,
+     uint64_t y,
      uint64_t min_m,
      uint64_t max_m,
      const Primes& primes,
@@ -602,22 +614,42 @@ T C1(T xp,
 {
   T sum = 0;
 
-  for (i++; i <= pi_y; i++)
+  // m = primes[i]
+  uint64_t min_i = max(b, (uint64_t) pi[min_m]) + 1;
+  uint64_t max_i = pi[min(y, max_m)];
+
+  for (uint64_t i = min_i; i <= max_i; i++)
   {
-    // Calculate next m
-    T m128 = (T) m * primes[i];
-    if (m128 > max_m)
-      return sum;
+    uint64_t m = primes[i];
+    uint64_t xpm = fast_div64(xp, m);
+    T phi_xpm = pi[xpm] - b + 2;
+    sum += phi_xpm * MU;
+  }
 
-    uint64_t m64 = (uint64_t) m128;
+  // m = primes[i] * primes[j]
+  uint64_t max_q = min(y, isqrt(max_m));
+  uint64_t min_q_i = max(b, (uint64_t) pi[min_m / y]) + 1;
+  uint64_t max_q_i = pi[max_q];
 
-    if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
+  for (uint64_t i = min_q_i; i <= max_q_i; i++)
+  {
+    uint64_t q = primes[i];
+    uint64_t min_r = max(q, min_m / q);
+    uint64_t max_r = min(y, max_m / q);
+
+    if (min_r >= max_r)
+      continue;
+
+    uint64_t min_j = pi[min_r] + 1;
+    uint64_t max_j = pi[max_r];
+
+    for (uint64_t j = min_j; j <= max_j; j++)
+    {
+      uint64_t m = q * primes[j];
+      uint64_t xpm = fast_div64(xp, m);
       T phi_xpm = pi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= phi_xpm * MU;
     }
-
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
   }
 
   return sum;
@@ -938,7 +970,7 @@ T AC_OpenMP(T x,
         T min_m128 = max(xp / (prime * prime), z / prime);
         int64_t min_m = min(min_m128, max_m);
 
-        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
+        sum -= C1<-1>(xp, b, y, min_m, max_m, primes, pi);
       }
     }
 
