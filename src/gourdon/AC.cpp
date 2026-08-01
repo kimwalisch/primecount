@@ -413,22 +413,22 @@ T AC_OpenMP(T x,
           }
         }
 
-        int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max3(min_c2, pi_sqrtz, pi_sqrt_low);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]) + 1;
-        int64_t xhigh2 = fast_div64(xhigh, high);
-        int64_t min_a = min(xhigh2, x13);
+        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrtz);
+        int64_t min_c2_prime = min(xhigh / y, x_star);
+        min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
+        int64_t x_div_high2 = fast_div64(xhigh, high);
+        int64_t min_a = min(x_div_high2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
         // p * next_prime(p) <= x / low
         // p <= sqrt(x / low)
-        T sqrt_xlow = isqrt(xlow);
+        int64_t sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         T max_c2_prime = xlow / max(max_clustered_global, 1);
         int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
-        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
@@ -1103,22 +1103,22 @@ T AC_OpenMP(T x,
           }
         }
 
-        int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max3(min_c2, pi_sqrtz, pi_sqrt_low);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]) + 1;
-        int64_t xhigh2 = fast_div64(xhigh, high);
-        int64_t min_a = min(xhigh2, x13);
+        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrtz);
+        int64_t min_c2_prime = min(xhigh / y, x_star);
+        min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
+        int64_t x_div_high2 = fast_div64(xhigh, high);
+        int64_t min_a = min(x_div_high2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
         // p * next_prime(p) <= x / low
         // p <= sqrt(x / low)
-        T sqrt_xlow = isqrt(xlow);
+        int64_t sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
         T max_c2_prime = xlow / max(max_clustered_global, 1);
         int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
-        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
