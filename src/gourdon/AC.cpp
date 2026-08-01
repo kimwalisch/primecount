@@ -391,15 +391,15 @@ T AC_OpenMP(T x,
         if (low == thread.low)
           thread.secs = get_time();
 
+        int64_t pi_sqrt_low = pi[isqrt(low)];
         T xlow = x / max(low, 1);
         T xhigh = x / high;
 
         if (low < z)
         {
           int64_t min_c1 = max(k, pi_root3_xz);
-          min_c1 = max(min_c1, pi[isqrt(low)]);
           int64_t min_c1_prime = min(xz / high, sqrtz);
-          min_c1 = max(min_c1, pi[min_c1_prime]) + 1;
+          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
 
           // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
@@ -414,11 +414,8 @@ T AC_OpenMP(T x,
         }
 
         int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max(min_c2, pi_sqrtz);
-        min_c2 = max(min_c2, pi[isqrt(low)]);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-        min_c2 += 1;
-
+        min_c2 = max3(min_c2, pi_sqrtz, pi_sqrt_low);
+        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]) + 1;
         int64_t xhigh2 = fast_div64(xhigh, high);
         int64_t min_a = min(xhigh2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
@@ -429,7 +426,8 @@ T AC_OpenMP(T x,
         // p <= sqrt(x / low)
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
+        T max_c2_prime = xlow / max(max_clustered_global, 1);
+        int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
         int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
@@ -1083,15 +1081,15 @@ T AC_OpenMP(T x,
         if (low == thread.low)
           thread.secs = get_time();
 
+        int64_t pi_sqrt_low = pi[isqrt(low)];
         T xlow = x / max(low, 1);
         T xhigh = x / high;
 
         if (low < z)
         {
           int64_t min_c1 = max(k, pi_root3_xz);
-          min_c1 = max(min_c1, pi[isqrt(low)]);
           int64_t min_c1_prime = min(xz / high, sqrtz);
-          min_c1 = max(min_c1, pi[min_c1_prime]) + 1;
+          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
 
           // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
@@ -1099,18 +1097,15 @@ T AC_OpenMP(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_64(xlow, xhigh, (uint64_t) xp, b, y, z, lprimes, primes, pi, segmentedPi);
+              sum -= C1_64(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
             else
               sum -= C1_128(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
         }
 
         int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max(min_c2, pi_sqrtz);
-        min_c2 = max(min_c2, pi[isqrt(low)]);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-        min_c2 += 1;
-
+        min_c2 = max3(min_c2, pi_sqrtz, pi_sqrt_low);
+        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]) + 1;
         int64_t xhigh2 = fast_div64(xhigh, high);
         int64_t min_a = min(xhigh2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
@@ -1121,7 +1116,8 @@ T AC_OpenMP(T x,
         // p <= sqrt(x / low)
         T sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
+        T max_c2_prime = xlow / max(max_clustered_global, 1);
+        int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
         int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
@@ -1133,7 +1129,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -1145,7 +1141,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -1157,7 +1153,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
+            sum += A_64(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
         }
