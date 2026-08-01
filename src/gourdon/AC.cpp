@@ -123,12 +123,12 @@ T A(T xlow,
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
-template <int MU,
-          typename T,
+template <typename T,
+          typename XP,
           typename Primes>
 T C1(T xlow,
      T xhigh,
-     T xp,
+     XP xp,
      uint64_t b,
      uint64_t y,
      uint64_t z,
@@ -161,7 +161,7 @@ T C1(T xlow,
       uint64_t m = primes[i];
       uint64_t xpm = fast_div64(xp, m);
       T phi_xpm = segmentedPi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= phi_xpm;
     }
   }
 
@@ -190,7 +190,7 @@ T C1(T xlow,
         uint64_t m = q * primes[j];
         uint64_t xpm = fast_div64(xp, m);
         T phi_xpm = segmentedPi[xpm] - b + 2;
-        sum -= phi_xpm * MU;
+        sum += phi_xpm;
       }
     }
   }
@@ -407,8 +407,13 @@ T AC_OpenMP(T x,
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
           {
             T xp = x / primes[b];
-            sum -= C1<-1>(xlow, xhigh, xp, b, y, z,
-                           primes, pi, segmentedPi);
+
+            if (xp <= pstd::numeric_limits<uint64_t>::max())
+              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z,
+                        primes, pi, segmentedPi);
+            else
+              sum -= C1(xlow, xhigh, xp, b, y, z,
+                        primes, pi, segmentedPi);
           }
         }
 
@@ -610,8 +615,7 @@ T A_128(T xlow,
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
-template <int MU,
-          typename T,
+template <typename T,
           typename Primes>
 T C1(T xlow,
      T xhigh,
@@ -648,7 +652,7 @@ T C1(T xlow,
       uint64_t m = primes[i];
       uint64_t xpm = fast_div64(xp, m);
       T phi_xpm = segmentedPi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= phi_xpm;
     }
   }
 
@@ -677,7 +681,7 @@ T C1(T xlow,
         uint64_t m = q * primes[j];
         uint64_t xpm = fast_div64(xp, m);
         T phi_xpm = segmentedPi[xpm] - b + 2;
-        sum -= phi_xpm * MU;
+        sum += phi_xpm;
       }
     }
   }
@@ -1022,8 +1026,8 @@ T AC_OpenMP(T x,
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
           {
             T xp = x / primes[b];
-            sum -= C1<-1>(xlow, xhigh, xp, b, y, z,
-                           primes, pi, segmentedPi);
+            sum -= C1(xlow, xhigh, xp, b, y, z,
+                      primes, pi, segmentedPi);
           }
         }
 
