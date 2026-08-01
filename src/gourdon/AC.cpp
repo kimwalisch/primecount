@@ -139,8 +139,6 @@ T C1(T xlow,
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-
-  // Both quotients are < z and fit in 64 bits.
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
@@ -151,6 +149,7 @@ T C1(T xlow,
 
   // m = primes[i]
   uint64_t max_prime = min(y, max_m);
+
   if (min_m < max_prime)
   {
     uint64_t min_i = max(b, pi[min_m]) + 1;
@@ -167,6 +166,7 @@ T C1(T xlow,
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
   uint64_t min_q = min_m / y;
+
   if (min_q < max_q)
   {
     uint64_t min_q_i = max(b, pi[min_q]) + 1;
@@ -407,11 +407,9 @@ T AC_OpenMP(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z,
-                        primes, pi, segmentedPi);
+              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
             else
-              sum -= C1(xlow, xhigh, xp, b, y, z,
-                        primes, pi, segmentedPi);
+              sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
         }
 
@@ -623,16 +621,14 @@ T C1_64(T xlow,
         uint64_t b,
         uint64_t y,
         uint64_t z,
-        uint64_t prime,
         const LibdividePrimes& lprimes,
         const Primes& primes,
         const PiTable& pi,
         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-
-  // Both quotients are < z and fit in 64 bits.
   uint64_t x_div_prime3 = xp / (prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
@@ -643,6 +639,7 @@ T C1_64(T xlow,
 
   // m = primes[i]
   uint64_t max_prime = min(y, max_m);
+
   if (min_m < max_prime)
   {
     uint64_t min_i = max(b, pi[min_m]) + 1;
@@ -658,6 +655,7 @@ T C1_64(T xlow,
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
   uint64_t min_q = min_m / y;
+
   if (min_q < max_q)
   {
     uint64_t min_q_i = max(b, pi[min_q]) + 1;
@@ -713,8 +711,6 @@ T C1_128(T xlow,
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-
-  // Both quotients are < z and fit in 64 bits.
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
@@ -725,6 +721,7 @@ T C1_128(T xlow,
 
   // m = primes[i]
   uint64_t max_prime = min(y, max_m);
+
   if (min_m < max_prime)
   {
     uint64_t min_i = max(b, pi[min_m]) + 1;
@@ -741,6 +738,7 @@ T C1_128(T xlow,
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
   uint64_t min_q = min_m / y;
+
   if (min_q < max_q)
   {
     uint64_t min_q_i = max(b, pi[min_q]) + 1;
@@ -1102,15 +1100,12 @@ T AC_OpenMP(T x,
           // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
           {
-            int64_t prime = primes[b];
-            T xp = x / prime;
+            T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_64(xlow, xhigh, (uint64_t) xp, b, y, z,
-                           prime, lprimes, primes, pi, segmentedPi);
+              sum -= C1_64(xlow, xhigh, (uint64_t) xp, b, y, z, lprimes, primes, pi, segmentedPi);
             else
-              sum -= C1_128(xlow, xhigh, xp, b, y, z,
-                            primes, pi, segmentedPi);
+              sum -= C1_128(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
         }
 
