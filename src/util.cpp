@@ -309,7 +309,8 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     //
     // alpha_y should grow like O(log(x)^3) just like in the
     // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
-    // factor usually within [1, 4]. The alpha_y and alpha_z tuning
+    // factor usually within [1, 4]. alpha_z corresponds to the c
+    // constant in Gourdon's paper. The alpha_y and alpha_z tuning
     // factors are used to balance the work between the A, B, C and
     // D formulas. The algorithm is theoretically most efficient
     // (i.e. uses the fewest instructions) if y == z, hence if
@@ -317,7 +318,7 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     // alpha_z automatically decreases alpha_y. This speeds up the
     // A, C and D formulas at the expense of a longer running B
     // formula.
-    alpha_z = 1.2;
+    alpha_z = 1.0;
 
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);
