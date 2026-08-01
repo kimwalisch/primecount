@@ -38,14 +38,9 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <RelaxedAtomic.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
-
-#if defined(_OPENMP)
-  #include <omp.h>
-#endif
 
 #if defined(ENABLE_LIBDIVIDE)
   #include <libdivide.h>
@@ -121,6 +116,7 @@ T A(T xlow,
 /// Compute the 1st part of the C formula.
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
+/// low <= x / (primes[b] * m) < high
 ///
 /// m may be a prime <= y or a square free number <= z which is
 /// coprime to the first b primes and whose largest prime factor <= y.
@@ -130,51 +126,72 @@ T A(T xlow,
 template <int MU,
           typename T,
           typename Primes>
-T C1(T xp,
+T C1(T xlow,
+     T xhigh,
+     T xp,
      uint64_t b,
      uint64_t y,
-     uint64_t min_m,
-     uint64_t max_m,
+     uint64_t z,
      const Primes& primes,
-     const PiTable& pi)
+     const PiTable& pi,
+     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t prime = primes[b];
+  uint64_t max_m = min(xlow / prime, z);
+
+  // Both quotients are < z and fit in 64 bits.
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t min_m = fast_div64(xhigh, prime);
+  min_m = max3(min_m, x_div_prime3, z / prime);
+  min_m = min(min_m, max_m);
+
+  if (min_m >= max_m)
+    return 0;
 
   // m = primes[i]
-  uint64_t min_i = max(b, (uint64_t) pi[min_m]) + 1;
-  uint64_t max_i = pi[min(y, max_m)];
-
-  for (uint64_t i = min_i; i <= max_i; i++)
+  uint64_t max_prime = min(y, max_m);
+  if (min_m < max_prime)
   {
-    uint64_t m = primes[i];
-    uint64_t xpm = fast_div64(xp, m);
-    T phi_xpm = pi[xpm] - b + 2;
-    sum += phi_xpm * MU;
+    uint64_t min_i = max(b, pi[min_m]) + 1;
+    uint64_t max_i = pi[max_prime];
+
+    for (uint64_t i = min_i; i <= max_i; i++)
+    {
+      uint64_t m = primes[i];
+      uint64_t xpm = fast_div64(xp, m);
+      T phi_xpm = segmentedPi[xpm] - b + 2;
+      sum += phi_xpm * MU;
+    }
   }
 
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q_i = max(b, (uint64_t) pi[min_m / y]) + 1;
-  uint64_t max_q_i = pi[max_q];
-
-  for (uint64_t i = min_q_i; i <= max_q_i; i++)
+  uint64_t min_q = min_m / y;
+  if (min_q < max_q)
   {
-    uint64_t q = primes[i];
-    uint64_t min_r = max(q, min_m / q);
-    uint64_t max_r = min(y, max_m / q);
+    uint64_t min_q_i = max(b, pi[min_q]) + 1;
+    uint64_t max_q_i = pi[max_q];
 
-    if (min_r >= max_r)
-      continue;
-
-    uint64_t min_j = pi[min_r] + 1;
-    uint64_t max_j = pi[max_r];
-
-    for (uint64_t j = min_j; j <= max_j; j++)
+    for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
-      uint64_t m = q * primes[j];
-      uint64_t xpm = fast_div64(xp, m);
-      T phi_xpm = pi[xpm] - b + 2;
-      sum -= phi_xpm * MU;
+      uint64_t q = primes[i];
+      uint64_t min_r = max(q, min_m / q);
+      uint64_t max_r = min(y, max_m / q);
+
+      if (min_r >= max_r)
+        continue;
+
+      uint64_t min_j = pi[min_r] + 1;
+      uint64_t max_j = pi[max_r];
+
+      for (uint64_t j = min_j; j <= max_j; j++)
+      {
+        uint64_t m = q * primes[j];
+        uint64_t xpm = fast_div64(xp, m);
+        T phi_xpm = segmentedPi[xpm] - b + 2;
+        sum -= phi_xpm * MU;
+      }
     }
   }
 
@@ -324,18 +341,17 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // PiTable's size = z because of the C1 formula.
-  // PiTable is accessed much less frequently than
-  // SegmentedPiTable, hence it is OK that PiTable's size
-  // is fairly large and does not fit into the CPU's cache.
-  PiTable pi(max(z, max_a_prime), threads);
+  // C1 uses PiTable only to calculate prime indexes <= y.
+  // Its frequently accessed pi[x] values are stored in
+  // SegmentedPiTable which fits into the CPU's cache.
+  PiTable pi(max(y, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t pi_sqrtz = pi[isqrt(z)];
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -347,31 +363,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // C1 performs random accesses into the large PiTable and
-    // scales poorly once memory bandwidth is saturated. Use
-    // fewer threads for C1 while the remaining threads start
-    // the cache-efficient segmented A and C2 computations.
-    if (thread_id % 4 == 0)
-    {
-      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-      {
-        int64_t prime = primes[b];
-        T xp = x / prime;
-        int64_t max_m = min(xp / prime, z);
-        T min_m128 = max(xp / (prime * prime), z / prime);
-        int64_t min_m = min(min_m128, max_m);
-
-        sum -= C1<-1>(xp, b, y, min_m, max_m, primes, pi);
-      }
-    }
-
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -404,6 +395,23 @@ T AC_OpenMP(T x,
 
         T xlow = x / max(low, 1);
         T xhigh = x / high;
+
+        if (low < z)
+        {
+          int64_t min_c1 = max(k, pi_root3_xz);
+          min_c1 = max(min_c1, pi[isqrt(low)]);
+          int64_t min_c1_prime = min(xz / high, sqrtz);
+          min_c1 = max(min_c1, pi[min_c1_prime]) + 1;
+
+          // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
+          for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+          {
+            T xp = x / primes[b];
+            sum -= C1<-1>(xlow, xhigh, xp, b, y, z,
+                           primes, pi, segmentedPi);
+          }
+        }
+
         int64_t min_c2 = max(k, pi_root3_xy);
         min_c2 = max(min_c2, pi_sqrtz);
         min_c2 = max(min_c2, pi[isqrt(low)]);
@@ -595,6 +603,7 @@ T A_128(T xlow,
 /// Compute the 1st part of the C formula.
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
+/// low <= x / (primes[b] * m) < high
 ///
 /// m may be a prime <= y or a square free number <= z which is
 /// coprime to the first b primes and whose largest prime factor <= y.
@@ -604,51 +613,72 @@ T A_128(T xlow,
 template <int MU,
           typename T,
           typename Primes>
-T C1(T xp,
+T C1(T xlow,
+     T xhigh,
+     T xp,
      uint64_t b,
      uint64_t y,
-     uint64_t min_m,
-     uint64_t max_m,
+     uint64_t z,
      const Primes& primes,
-     const PiTable& pi)
+     const PiTable& pi,
+     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t prime = primes[b];
+  uint64_t max_m = min(xlow / prime, z);
+
+  // Both quotients are < z and fit in 64 bits.
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t min_m = fast_div64(xhigh, prime);
+  min_m = max3(min_m, x_div_prime3, z / prime);
+  min_m = min(min_m, max_m);
+
+  if (min_m >= max_m)
+    return 0;
 
   // m = primes[i]
-  uint64_t min_i = max(b, (uint64_t) pi[min_m]) + 1;
-  uint64_t max_i = pi[min(y, max_m)];
-
-  for (uint64_t i = min_i; i <= max_i; i++)
+  uint64_t max_prime = min(y, max_m);
+  if (min_m < max_prime)
   {
-    uint64_t m = primes[i];
-    uint64_t xpm = fast_div64(xp, m);
-    T phi_xpm = pi[xpm] - b + 2;
-    sum += phi_xpm * MU;
+    uint64_t min_i = max(b, pi[min_m]) + 1;
+    uint64_t max_i = pi[max_prime];
+
+    for (uint64_t i = min_i; i <= max_i; i++)
+    {
+      uint64_t m = primes[i];
+      uint64_t xpm = fast_div64(xp, m);
+      T phi_xpm = segmentedPi[xpm] - b + 2;
+      sum += phi_xpm * MU;
+    }
   }
 
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q_i = max(b, (uint64_t) pi[min_m / y]) + 1;
-  uint64_t max_q_i = pi[max_q];
-
-  for (uint64_t i = min_q_i; i <= max_q_i; i++)
+  uint64_t min_q = min_m / y;
+  if (min_q < max_q)
   {
-    uint64_t q = primes[i];
-    uint64_t min_r = max(q, min_m / q);
-    uint64_t max_r = min(y, max_m / q);
+    uint64_t min_q_i = max(b, pi[min_q]) + 1;
+    uint64_t max_q_i = pi[max_q];
 
-    if (min_r >= max_r)
-      continue;
-
-    uint64_t min_j = pi[min_r] + 1;
-    uint64_t max_j = pi[max_r];
-
-    for (uint64_t j = min_j; j <= max_j; j++)
+    for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
-      uint64_t m = q * primes[j];
-      uint64_t xpm = fast_div64(xp, m);
-      T phi_xpm = pi[xpm] - b + 2;
-      sum -= phi_xpm * MU;
+      uint64_t q = primes[i];
+      uint64_t min_r = max(q, min_m / q);
+      uint64_t max_r = min(y, max_m / q);
+
+      if (min_r >= max_r)
+        continue;
+
+      uint64_t min_j = pi[min_r] + 1;
+      uint64_t max_j = pi[max_r];
+
+      for (uint64_t j = min_j; j <= max_j; j++)
+      {
+        uint64_t m = q * primes[j];
+        uint64_t xpm = fast_div64(xp, m);
+        T phi_xpm = segmentedPi[xpm] - b + 2;
+        sum -= phi_xpm * MU;
+      }
     }
   }
 
@@ -912,18 +942,17 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // PiTable's size = z because of the C1 formula.
-  // PiTable is accessed much less frequently than
-  // SegmentedPiTable, hence it is OK that PiTable's size
-  // is fairly large and does not fit into the CPU's cache.
-  PiTable pi(max(z, max_a_prime), threads);
+  // C1 uses PiTable only to calculate prime indexes <= y.
+  // Its frequently accessed pi[x] values are stored in
+  // SegmentedPiTable which fits into the CPU's cache.
+  PiTable pi(max(y, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t pi_sqrtz = pi[isqrt(z)];
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // The C2 algorithm only uses primes <= sqrt(x / p).
   // Initialize libdivide primes up to the largest
@@ -949,31 +978,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // C1 performs random accesses into the large PiTable and
-    // scales poorly once memory bandwidth is saturated. Use
-    // fewer threads for C1 while the remaining threads start
-    // the cache-efficient segmented A and C2 computations.
-    if (thread_id % 4 == 0)
-    {
-      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-      {
-        int64_t prime = primes[b];
-        T xp = x / prime;
-        int64_t max_m = min(xp / prime, z);
-        T min_m128 = max(xp / (prime * prime), z / prime);
-        int64_t min_m = min(min_m128, max_m);
-
-        sum -= C1<-1>(xp, b, y, min_m, max_m, primes, pi);
-      }
-    }
-
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -1006,6 +1010,23 @@ T AC_OpenMP(T x,
 
         T xlow = x / max(low, 1);
         T xhigh = x / high;
+
+        if (low < z)
+        {
+          int64_t min_c1 = max(k, pi_root3_xz);
+          min_c1 = max(min_c1, pi[isqrt(low)]);
+          int64_t min_c1_prime = min(xz / high, sqrtz);
+          min_c1 = max(min_c1, pi[min_c1_prime]) + 1;
+
+          // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
+          for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+          {
+            T xp = x / primes[b];
+            sum -= C1<-1>(xlow, xhigh, xp, b, y, z,
+                           primes, pi, segmentedPi);
+          }
+        }
+
         int64_t min_c2 = max(k, pi_root3_xy);
         min_c2 = max(min_c2, pi_sqrtz);
         min_c2 = max(min_c2, pi[isqrt(low)]);
