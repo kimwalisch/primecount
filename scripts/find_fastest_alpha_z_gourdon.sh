@@ -172,8 +172,8 @@ do
 
             while [[ $(is_smaller_equal $new_alpha_z $max_alpha_z) -eq 1 ]]
             do
-                seconds=$(get_primecount_seconds "1e$i -t$threads --alpha-z=$new_alpha_z")
-                echo "1e$i --threads=$threads --alpha-z=$new_alpha_z, seconds: $seconds"
+                seconds=$(get_primecount_seconds "1e$i --gourdon -t$threads --alpha-z=$new_alpha_z")
+                echo "1e$i --gourdon --threads=$threads --alpha-z=$new_alpha_z, seconds: $seconds"
                 iter_count=$(($iter_count + 1))
 
                 if [[ $iter_count -eq 2 ]]

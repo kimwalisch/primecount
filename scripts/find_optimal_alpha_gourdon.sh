@@ -172,7 +172,7 @@ do
             while [[ $(is_smaller_equal $new_alpha_y $max_alpha_y) -eq 1 ]]
             do
                 iter_count=$(($iter_count + 1))
-                test_case="1e$i --threads=$threads --alpha-z=1 --alpha-y=$new_alpha_y"
+                test_case="1e$i --gourdon --threads=$threads --alpha-z=1 --alpha-y=$new_alpha_y"
                 instructions=""
     
                 if [[ -f "bench.txt" ]]
