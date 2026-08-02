@@ -254,7 +254,6 @@ T C2(T xlow,
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -266,8 +265,8 @@ T C2(T xlow,
   uint64_t i = pi_min_m + 1;
 
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
@@ -871,7 +870,6 @@ T C2_64(T xlow,
   uint64_t x_div_prime3 = xp / (prime * prime);
   T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -883,8 +881,8 @@ T C2_64(T xlow,
   uint64_t i = pi_min_m + 1;
 
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
@@ -986,7 +984,6 @@ T C2_128(T xlow,
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
   uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -998,8 +995,8 @@ T C2_128(T xlow,
   uint64_t i = pi_min_m + 1;
 
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
