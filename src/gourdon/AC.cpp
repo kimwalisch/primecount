@@ -154,11 +154,26 @@ T C1(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
 
-    for (uint64_t i = min_i; i <= max_i; i++)
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
     {
-      uint64_t m = primes[i];
-      uint64_t xpm = fast_div64(xp, m);
+      uint64_t xpm0 = fast_div64(xp, primes[i]);
+      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
+      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
+      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
+
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
+    }
+
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
+    {
+      uint64_t xpm = fast_div64(xp, primes[i]);
       sum -= segmentedPi[xpm] - b + 2;
     }
   }
@@ -183,11 +198,27 @@ T C1(T xlow,
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
+      uint64_t j = min_j;
+      XP xpq = fast_div(xp, q);
 
-      for (uint64_t j = min_j; j <= max_j; j++)
+      // Unroll loop to increase instruction level parallelism
+      for (; j + 3 <= max_j; j += 4)
       {
-        uint64_t m = q * primes[j];
-        uint64_t xpm = fast_div64(xp, m);
+        uint64_t xpm0 = fast_div64(xpq, primes[j]);
+        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
+        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
+        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
+
+        sum += (segmentedPi[xpm0] - b + 2) +
+               (segmentedPi[xpm1] - b + 2) +
+               (segmentedPi[xpm2] - b + 2) +
+               (segmentedPi[xpm3] - b + 2);
+      }
+
+      NOUNROLL_LOOP
+      for (; j <= max_j; j++)
+      {
+        uint64_t xpm = fast_div64(xpq, primes[j]);
         sum += segmentedPi[xpm] - b + 2;
       }
     }
@@ -642,8 +673,24 @@ T C1_64(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
 
-    for (uint64_t i = min_i; i <= max_i; i++)
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
+    {
+      uint64_t xpm0 = xp / lprimes[i];
+      uint64_t xpm1 = xp / lprimes[i+1];
+      uint64_t xpm2 = xp / lprimes[i+2];
+      uint64_t xpm3 = xp / lprimes[i+3];
+
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
+    }
+
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
     {
       uint64_t xpm = xp / lprimes[i];
       sum -= segmentedPi[xpm] - b + 2;
@@ -662,19 +709,19 @@ T C1_64(T xlow,
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
       uint64_t q = primes[i];
-      uint64_t min_r = max(q, min_m / q);
-      uint64_t max_r = min(y, max_m / q);
+      uint64_t min_r = max(q, min_m / lprimes[i]);
+      uint64_t max_r = min(y, max_m / lprimes[i]);
 
       if (min_r >= max_r)
         continue;
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
+      uint64_t xpq = xp / lprimes[i];
 
       for (uint64_t j = min_j; j <= max_j; j++)
       {
-        uint64_t m = q * primes[j];
-        uint64_t xpm = fast_div64(xp, m);
+        uint64_t xpm = xpq / lprimes[j];
         sum += segmentedPi[xpm] - b + 2;
       }
     }
@@ -724,11 +771,26 @@ T C1_128(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
 
-    for (uint64_t i = min_i; i <= max_i; i++)
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
     {
-      uint64_t m = primes[i];
-      uint64_t xpm = fast_div64(xp, m);
+      uint64_t xpm0 = fast_div64(xp, primes[i]);
+      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
+      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
+      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
+
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
+    }
+
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
+    {
+      uint64_t xpm = fast_div64(xp, primes[i]);
       sum -= segmentedPi[xpm] - b + 2;
     }
   }
@@ -753,11 +815,27 @@ T C1_128(T xlow,
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
+      uint64_t j = min_j;
+      T xpq = fast_div(xp, q);
 
-      for (uint64_t j = min_j; j <= max_j; j++)
+      // Unroll loop to increase instruction level parallelism
+      for (; j + 3 <= max_j; j += 4)
       {
-        uint64_t m = q * primes[j];
-        uint64_t xpm = fast_div64(xp, m);
+        uint64_t xpm0 = fast_div64(xpq, primes[j]);
+        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
+        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
+        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
+
+        sum += (segmentedPi[xpm0] - b + 2) +
+               (segmentedPi[xpm1] - b + 2) +
+               (segmentedPi[xpm2] - b + 2) +
+               (segmentedPi[xpm3] - b + 2);
+      }
+
+      NOUNROLL_LOOP
+      for (; j <= max_j; j++)
+      {
+        uint64_t xpm = fast_div64(xpq, primes[j]);
         sum += segmentedPi[xpm] - b + 2;
       }
     }
