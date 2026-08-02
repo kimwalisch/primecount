@@ -1,9 +1,7 @@
-Changes in primecount-8.7, 2026-08-01
+Changes in primecount-8.7, 2026-08-02
 
 * AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
 * AC.cpp: Implement segmented C1 algorithm to improve cache efficiency.
-* AC.cpp: Limit C1 to 25% of threads to improve scaling.
-* AC.cpp: Reduce memory usage of libdivide vector.
 * SegmentedPiTable.hpp: Switch return types to uint64_t for new AC.cpp code.
 * util.cpp: Tune alpha_z=1.0 for new AC algorithm.
 * test.cpp: Improve test coverage using alternate alpha_z values.
