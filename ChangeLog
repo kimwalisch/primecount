@@ -6,6 +6,9 @@ Changes in primecount-8.7, 2026-08-02
 * util.cpp: Tune alpha_z=1.0 for new AC algorithm.
 * test.cpp: Improve test coverage using alternate alpha_z values.
 * doc/Easy-Special-Leaves.pdf: Add description of new C algorithm.
+* find_optimal_alpha_gourdon.sh: Always benchmark Gourdon's algorithm.
+* find_fastest_alpha_y_gourdon.sh: Always benchmark Gourdon's algorithm.
+* find_fastest_alpha_z_gourdon.sh: Always benchmark Gourdon's algorithm.
 
 Changes in primecount-8.6, 2026-07-15
 
