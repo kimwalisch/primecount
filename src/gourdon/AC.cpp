@@ -180,11 +180,11 @@ T C1(T xlow,
 
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q = min_m / y;
+  uint64_t min_q = max(prime, min_m / y);
 
   if (min_q < max_q)
   {
-    uint64_t min_q_i = max(b, pi[min_q]) + 1;
+    uint64_t min_q_i = pi[min_q] + 1;
     uint64_t max_q_i = pi[max_q];
 
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
@@ -699,11 +699,11 @@ T C1_64(T xlow,
 
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q = min_m / y;
+  uint64_t min_q = max(prime, min_m / y);
 
   if (min_q < max_q)
   {
-    uint64_t min_q_i = max(b, pi[min_q]) + 1;
+    uint64_t min_q_i = pi[min_q] + 1;
     uint64_t max_q_i = pi[max_q];
 
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
@@ -798,11 +798,11 @@ T C1_128(T xlow,
 
   // m = primes[i] * primes[j]
   uint64_t max_q = min(y, isqrt(max_m));
-  uint64_t min_q = min_m / y;
+  uint64_t min_q = max(prime, min_m / y);
 
   if (min_q < max_q)
   {
-    uint64_t min_q_i = max(b, pi[min_q]) + 1;
+    uint64_t min_q_i = pi[min_q] + 1;
     uint64_t max_q_i = pi[max_q];
 
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
