@@ -719,6 +719,7 @@ T C1_64(T xlow,
       uint64_t max_j = pi[max_r];
       uint64_t xpq = xp / lprimes[i];
 
+      NOUNROLL_LOOP
       for (uint64_t j = min_j; j <= max_j; j++)
       {
         uint64_t xpm = xpq / lprimes[j];
