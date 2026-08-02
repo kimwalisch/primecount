@@ -4,7 +4,7 @@
 ///        These tests are also used (by the author) for
 ///        benchmarking code changes.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -190,12 +190,21 @@ void test()
 #endif
 
     TEST2(pi_gourdon_64,          pi_lmo_parallel, 1500);
+
+    // Alternate between the default alpha_z and
+    // alpha_z = 1.5 to test both y == z and y < z
+    // in the Gourdon algorithm.
+    set_alpha_z(1.5);
+
 #ifdef HAVE_INT128_T
     TEST2(pi_gourdon_128,         pi_lmo_parallel, 1500);
+    set_alpha_z(-1);
 #endif
 
     TEST_NTH_PRIME(nth_prime_64,  10000, 300);
+
 #ifdef HAVE_INT128_T
+    set_alpha_z(1.5);
     TEST_NTH_PRIME(nth_prime_128, 10000, 300);
 #endif
   }

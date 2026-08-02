@@ -309,24 +309,16 @@ std::pair<double, double> get_alpha_gourdon(maxint_t x)
     //
     // alpha_y should grow like O(log(x)^3) just like in the
     // Deleglise-Rivat algorithm whereas alpha_z is a small tuning
-    // factor usually within [1, 4]. In my opinion the algorithm is
-    // theoretically most efficient (i.e. uses the fewest number of
-    // instructions) if (y == z), hence if alpha_z = 1. Because when
-    // setting y to a value smaller than z this will decrease the
-    // number of sparse easy leaves (which can be computed more
-    // efficiently than other types of leaves) and increase the
-    // number of other types of leaves.
-    //
-    // By setting alpha_z to a value > 1 this will cause y to be set
-    // to a value < z which will generally improve the cache
-    // efficiency of the algorithm but as a drawback also increase
-    // the number of instructions used by the algorithm. The C1
-    // algorithm (in AC.cpp) has severe scaling issues above 10^23
-    // as it is not segmented and requires frequent thread
-    // synchronization. The larger alpha_z, the less work there will
-    // be in the C1 algorithm. Hence for computations >= 10^23 using
-    // an alpha_z > 1 will likely improve performance.
-    alpha_z = 1.2;
+    // factor usually within [1, 4]. alpha_z corresponds to the c
+    // constant in Gourdon's paper. The alpha_y and alpha_z tuning
+    // factors are used to balance the work between the A, B, C and
+    // D formulas. The algorithm is theoretically most efficient
+    // (i.e. uses the fewest instructions) if y == z, hence if
+    // alpha_z = 1. When using the default alpha_y, increasing
+    // alpha_z automatically decreases alpha_y. This speeds up the
+    // A, C and D formulas at the expense of a longer running B
+    // formula.
+    alpha_z = 1.0;
 
     // alpha_z should be significantly smaller than alpha_y
     alpha_z = in_between(1, alpha_yz / 5, alpha_z);

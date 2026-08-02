@@ -38,14 +38,9 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <print.hpp>
-#include <RelaxedAtomic.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
-
-#if defined(_OPENMP)
-  #include <omp.h>
-#endif
 
 #if defined(ENABLE_LIBDIVIDE)
   #include <libdivide.h>
@@ -121,45 +116,112 @@ T A(T xlow,
 /// Compute the 1st part of the C formula.
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
+/// low <= x / (primes[b] * m) < high
 ///
-/// m may be a prime <= y or a square free number <= z which is
-/// coprime to the first b primes and whose largest prime factor <= y.
-/// This algorithm recursively iterates over the square free numbers
-/// coprime to the first b primes. This algorithm is described in
-/// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
+/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// m cannot contain more than 2 prime factors.
 ///
-template <int MU,
-          typename T,
+template <typename T,
+          typename XP,
           typename Primes>
-T C1(T xp,
+T C1(T xlow,
+     T xhigh,
+     XP xp,
      uint64_t b,
-     uint64_t i,
-     uint64_t pi_y,
-     uint64_t m,
-     uint64_t min_m,
-     uint64_t max_m,
+     uint64_t y,
+     uint64_t z,
      const Primes& primes,
-     const PiTable& pi)
+     const PiTable& pi,
+     const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t prime = primes[b];
+  uint64_t max_m = min(xlow / prime, z);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t min_m = fast_div64(xhigh, prime);
+  min_m = max3(min_m, x_div_prime3, z / prime);
 
-  for (i++; i <= pi_y; i++)
+  if (min_m >= max_m)
+    return 0;
+
+  // m = primes[i]
+  uint64_t max_prime = min(y, max_m);
+
+  if (min_m < max_prime)
   {
-    // Calculate next m
-    T m128 = (T) m * primes[i];
-    if (m128 > max_m)
-      return sum;
+    uint64_t min_i = pi[min_m] + 1;
+    uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
 
-    uint64_t m64 = (uint64_t) m128;
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
+    {
+      uint64_t xpm0 = fast_div64(xp, primes[i]);
+      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
+      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
+      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
 
-    if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
-      T phi_xpm = pi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
+    {
+      uint64_t xpm = fast_div64(xp, primes[i]);
+      sum -= segmentedPi[xpm] - b + 2;
+    }
+  }
+
+  // m = primes[i] * primes[j]
+  uint64_t max_q = min(y, isqrt(max_m));
+  uint64_t min_q = max(prime, min_m / y);
+
+  if (min_q < max_q)
+  {
+    uint64_t min_q_i = pi[min_q] + 1;
+    uint64_t max_q_i = pi[max_q];
+
+    for (uint64_t i = min_q_i; i <= max_q_i; i++)
+    {
+      uint64_t q = primes[i];
+      uint64_t min_r = max(q, min_m / q);
+      uint64_t max_r = min(y, max_m / q);
+
+      if (min_r >= max_r)
+        continue;
+
+      uint64_t min_j = pi[min_r] + 1;
+      uint64_t max_j = pi[max_r];
+      uint64_t j = min_j;
+      XP xpq = fast_div(xp, q);
+
+      // Unroll loop to increase instruction level parallelism
+      for (; j + 3 <= max_j; j += 4)
+      {
+        uint64_t xpm0 = fast_div64(xpq, primes[j]);
+        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
+        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
+        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
+
+        sum += (segmentedPi[xpm0] - b + 2) +
+               (segmentedPi[xpm1] - b + 2) +
+               (segmentedPi[xpm2] - b + 2) +
+               (segmentedPi[xpm3] - b + 2);
+      }
+
+      NOUNROLL_LOOP
+      for (; j <= max_j; j++)
+      {
+        uint64_t xpm = fast_div64(xpq, primes[j]);
+        sum += segmentedPi[xpm] - b + 2;
+      }
+    }
   }
 
   return sum;
@@ -185,14 +247,15 @@ T C2(T xlow,
      const PiTable& pi,
      const SegmentedPiTable& segmentedPi)
 {
-  T sum = 0;
-
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
-  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
-  uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
+  uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
+  uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
+
+  if (min_m >= max_m)
+    return 0;
+
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -203,9 +266,11 @@ T C2(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
+  T sum = 0;
+
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
@@ -308,18 +373,17 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // PiTable's size = z because of the C1 formula.
-  // PiTable is accessed much less frequently than
-  // SegmentedPiTable, hence it is OK that PiTable's size
-  // is fairly large and does not fit into the CPU's cache.
-  PiTable pi(max(z, max_a_prime), threads);
+  // C1 uses PiTable only to calculate prime indexes <= y.
+  // Its frequently accessed pi[x] values are stored in
+  // SegmentedPiTable which fits into the CPU's cache.
+  PiTable pi(max(y, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t pi_sqrtz = pi[isqrt(z)];
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -331,31 +395,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // C1 performs random accesses into the large PiTable and
-    // scales poorly once memory bandwidth is saturated. Use
-    // fewer threads for C1 while the remaining threads start
-    // the cache-efficient segmented A and C2 computations.
-    if (thread_id % 4 == 0)
-    {
-      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-      {
-        int64_t prime = primes[b];
-        T xp = x / prime;
-        int64_t max_m = min(xp / prime, z);
-        T min_m128 = max(xp / (prime * prime), z / prime);
-        int64_t min_m = min(min_m128, max_m);
-
-        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
-      }
-    }
-
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -386,26 +425,44 @@ T AC_OpenMP(T x,
         if (low == thread.low)
           thread.secs = get_time();
 
+        int64_t pi_sqrt_low = pi[isqrt(low)];
         T xlow = x / max(low, 1);
         T xhigh = x / high;
-        int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max(min_c2, pi_sqrtz);
-        min_c2 = max(min_c2, pi[isqrt(low)]);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-        min_c2 += 1;
 
-        int64_t xhigh2 = fast_div64(xhigh, high);
-        int64_t min_a = min(xhigh2, x13);
+        if (low < z)
+        {
+          int64_t min_c1 = max(k, pi_root3_xz);
+          int64_t min_c1_prime = min(xz / high, sqrtz);
+          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
+
+          // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
+          for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+          {
+            T xp = x / primes[b];
+
+            if (xp <= pstd::numeric_limits<uint64_t>::max())
+              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
+            else
+              sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
+          }
+        }
+
+        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrtz);
+        int64_t min_c2_prime = min(xhigh / y, x_star);
+        min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
+        int64_t x_div_high2 = fast_div64(xhigh, high);
+        int64_t min_a = min(x_div_high2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
         // p * next_prime(p) <= x / low
         // p <= sqrt(x / low)
-        T sqrt_xlow = isqrt(xlow);
+        int64_t sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
-        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        T max_c2_prime = xlow / max(max_clustered_global, 1);
+        int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
+        int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
@@ -576,48 +633,216 @@ T A_128(T xlow,
   return sum;
 }
 
-/// Compute the 1st part of the C formula.
+/// Compute the 1st part of the C formula using libdivide.
+/// 64-bit function: xp < 2^64
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
+/// low <= x / (primes[b] * m) < high
 ///
-/// m may be a prime <= y or a square free number <= z which is
-/// coprime to the first b primes and whose largest prime factor <= y.
-/// This algorithm recursively iterates over the square free numbers
-/// coprime to the first b primes. This algorithm is described in
-/// section 2.2 of the paper: Douglas Staple, "The Combinatorial
-/// Algorithm For Computing pi(x)", arXiv:1503.01839, 6 March 2015.
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
+/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// m cannot contain more than 2 prime factors.
 ///
-template <int MU,
-          typename T,
+template <typename T,
+          typename LibdividePrimes,
           typename Primes>
-T C1(T xp,
-     uint64_t b,
-     uint64_t i,
-     uint64_t pi_y,
-     uint64_t m,
-     uint64_t min_m,
-     uint64_t max_m,
-     const Primes& primes,
-     const PiTable& pi)
+T C1_64(T xlow,
+        T xhigh,
+        uint64_t xp,
+        uint64_t b,
+        uint64_t y,
+        uint64_t z,
+        const LibdividePrimes& lprimes,
+        const Primes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
+  uint64_t prime = primes[b];
+  uint64_t max_m = min(xlow / prime, z);
+  uint64_t x_div_prime3 = xp / (prime * prime);
+  uint64_t min_m = fast_div64(xhigh, prime);
+  min_m = max3(min_m, x_div_prime3, z / prime);
 
-  for (i++; i <= pi_y; i++)
+  if (min_m >= max_m)
+    return 0;
+
+  // m = primes[i]
+  uint64_t max_prime = min(y, max_m);
+
+  if (min_m < max_prime)
   {
-    // Calculate next m
-    T m128 = (T) m * primes[i];
-    if (m128 > max_m)
-      return sum;
+    uint64_t min_i = pi[min_m] + 1;
+    uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
 
-    uint64_t m64 = (uint64_t) m128;
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
+    {
+      uint64_t xpm0 = xp / lprimes[i];
+      uint64_t xpm1 = xp / lprimes[i+1];
+      uint64_t xpm2 = xp / lprimes[i+2];
+      uint64_t xpm3 = xp / lprimes[i+3];
 
-    if (m64 > min_m) {
-      uint64_t xpm = fast_div64(xp, m64);
-      T phi_xpm = pi[xpm] - b + 2;
-      sum += phi_xpm * MU;
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
     }
 
-    sum += C1<-MU>(xp, b, i, pi_y, m64, min_m, max_m, primes, pi);
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
+    {
+      uint64_t xpm = xp / lprimes[i];
+      sum -= segmentedPi[xpm] - b + 2;
+    }
+  }
+
+  // m = primes[i] * primes[j]
+  uint64_t max_q = min(y, isqrt(max_m));
+  uint64_t min_q = max(prime, min_m / y);
+
+  if (min_q < max_q)
+  {
+    uint64_t min_q_i = pi[min_q] + 1;
+    uint64_t max_q_i = pi[max_q];
+
+    for (uint64_t i = min_q_i; i <= max_q_i; i++)
+    {
+      uint64_t q = primes[i];
+      uint64_t min_r = max(q, min_m / lprimes[i]);
+      uint64_t max_r = min(y, max_m / lprimes[i]);
+
+      if (min_r >= max_r)
+        continue;
+
+      uint64_t min_j = pi[min_r] + 1;
+      uint64_t max_j = pi[max_r];
+      uint64_t xpq = xp / lprimes[i];
+
+      NOUNROLL_LOOP
+      for (uint64_t j = min_j; j <= max_j; j++)
+      {
+        uint64_t xpm = xpq / lprimes[j];
+        sum += segmentedPi[xpm] - b + 2;
+      }
+    }
+  }
+
+  return sum;
+}
+
+/// Compute the 1st part of the C formula.
+/// 128-bit function: xp >= 2^64
+/// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
+/// x / (primes[b] * m) <= z
+/// low <= x / (primes[b] * m) < high
+///
+/// m is either a prime <= y or a product of 2 distinct primes.
+/// In both cases m is coprime to the first b primes, m <= z,
+/// and its largest prime factor is <= y.
+/// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
+/// m cannot contain more than 2 prime factors.
+///
+template <typename T,
+          typename Primes>
+T C1_128(T xlow,
+         T xhigh,
+         T xp,
+         uint64_t b,
+         uint64_t y,
+         uint64_t z,
+         const Primes& primes,
+         const PiTable& pi,
+         const SegmentedPiTable& segmentedPi)
+{
+  T sum = 0;
+  uint64_t prime = primes[b];
+  uint64_t max_m = min(xlow / prime, z);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t min_m = fast_div64(xhigh, prime);
+  min_m = max3(min_m, x_div_prime3, z / prime);
+
+  if (min_m >= max_m)
+    return 0;
+
+  // m = primes[i]
+  uint64_t max_prime = min(y, max_m);
+
+  if (min_m < max_prime)
+  {
+    uint64_t min_i = pi[min_m] + 1;
+    uint64_t max_i = pi[max_prime];
+    uint64_t i = min_i;
+
+    // Unroll loop to increase instruction level parallelism
+    for (; i + 3 <= max_i; i += 4)
+    {
+      uint64_t xpm0 = fast_div64(xp, primes[i]);
+      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
+      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
+      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
+
+      sum -= (segmentedPi[xpm0] - b + 2) +
+             (segmentedPi[xpm1] - b + 2) +
+             (segmentedPi[xpm2] - b + 2) +
+             (segmentedPi[xpm3] - b + 2);
+    }
+
+    NOUNROLL_LOOP
+    for (; i <= max_i; i++)
+    {
+      uint64_t xpm = fast_div64(xp, primes[i]);
+      sum -= segmentedPi[xpm] - b + 2;
+    }
+  }
+
+  // m = primes[i] * primes[j]
+  uint64_t max_q = min(y, isqrt(max_m));
+  uint64_t min_q = max(prime, min_m / y);
+
+  if (min_q < max_q)
+  {
+    uint64_t min_q_i = pi[min_q] + 1;
+    uint64_t max_q_i = pi[max_q];
+
+    for (uint64_t i = min_q_i; i <= max_q_i; i++)
+    {
+      uint64_t q = primes[i];
+      uint64_t min_r = max(q, min_m / q);
+      uint64_t max_r = min(y, max_m / q);
+
+      if (min_r >= max_r)
+        continue;
+
+      uint64_t min_j = pi[min_r] + 1;
+      uint64_t max_j = pi[max_r];
+      uint64_t j = min_j;
+      T xpq = fast_div(xp, q);
+
+      // Unroll loop to increase instruction level parallelism
+      for (; j + 3 <= max_j; j += 4)
+      {
+        uint64_t xpm0 = fast_div64(xpq, primes[j]);
+        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
+        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
+        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
+
+        sum += (segmentedPi[xpm0] - b + 2) +
+               (segmentedPi[xpm1] - b + 2) +
+               (segmentedPi[xpm2] - b + 2) +
+               (segmentedPi[xpm3] - b + 2);
+      }
+
+      NOUNROLL_LOOP
+      for (; j <= max_j; j++)
+      {
+        uint64_t xpm = fast_div64(xpq, primes[j]);
+        sum += segmentedPi[xpm] - b + 2;
+      }
+    }
   }
 
   return sum;
@@ -643,13 +868,14 @@ T C2_64(T xlow,
         const PiTable& pi,
         const SegmentedPiTable& segmentedPi)
 {
-  T sum = 0;
-
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = xp / (prime * prime);
-  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
-  uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
+  uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
+  uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
+
+  if (min_m >= max_m)
+    return 0;
+
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -660,9 +886,11 @@ T C2_64(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
+  T sum = 0;
+
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
@@ -757,14 +985,15 @@ T C2_128(T xlow,
          const PiTable& pi,
          const SegmentedPiTable& segmentedPi)
 {
-  T sum = 0;
-
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
-  T min_m128 = max3(xhigh / prime, x_div_prime3, prime);
-  uint64_t min_m = min(min_m128, max_m);
-  uint64_t pi_max_m = pi[max_m];
+  uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
+  uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
+
+  if (min_m >= max_m)
+    return 0;
+
   uint64_t pi_min_m = pi[min_m];
   uint64_t sqrt_xp = (uint64_t) isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
@@ -775,9 +1004,11 @@ T C2_128(T xlow,
   uint64_t pi_conj_hi = pi_min_m;
   uint64_t i = pi_min_m + 1;
 
+  T sum = 0;
+
   // Compute the boundary correction once
-  if (pi_max_m == pi_y &&
-      pi_max_m > pi_min_clustered)
+  if (max_m >= max_clustered_global &&
+      pi_y > pi_min_clustered)
   {
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
@@ -880,30 +1111,21 @@ T AC_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
 
-  // PiTable's size = z because of the C1 formula.
-  // PiTable is accessed much less frequently than
-  // SegmentedPiTable, hence it is OK that PiTable's size
-  // is fairly large and does not fit into the CPU's cache.
-  PiTable pi(max(z, max_a_prime), threads);
+  // C1 uses PiTable only to calculate prime indexes <= y.
+  // Its frequently accessed pi[x] values are stored in
+  // SegmentedPiTable which fits into the CPU's cache.
+  PiTable pi(max(y, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
-  int64_t pi_sqrtz = pi[isqrt(z)];
+  int64_t sqrtz = isqrt(z);
+  int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
-  INDETERMINATE RelaxedAtomic<int64_t> min_c1(max(k, pi_root3_xz) + 1);
 
-  // The C2 algorithm only uses primes <= sqrt(x / p).
-  // Initialize libdivide primes up to the largest
-  // divisor used by the 64-bit A and C2 functions.
-  int64_t max_lprime = max_a_prime;
-  int64_t min_c2_global = max3(k, pi_root3_xy, pi_sqrtz) + 1;
-  if (min_c2_global <= pi[x_star])
-    max_lprime = max(max_a_prime, min(
-      isqrt(x / primes[min_c2_global]), y));
-
+  // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
-  lprimes.resize(pi[max_lprime] + 1);
+  lprimes.resize(primes.size());
   for (std::size_t i = 1; i < lprimes.size(); i++)
     lprimes[i] = primes[i];
 
@@ -917,31 +1139,6 @@ T AC_OpenMP(T x,
   //
   #pragma omp parallel num_threads(threads) reduction(+: sum)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // C1 performs random accesses into the large PiTable and
-    // scales poorly once memory bandwidth is saturated. Use
-    // fewer threads for C1 while the remaining threads start
-    // the cache-efficient segmented A and C2 computations.
-    if (thread_id % 4 == 0)
-    {
-      // C1 formula: pi[(x/z)^(1/3)] < b <= pi[pi_sqrtz]
-      for (int64_t b = min_c1++; b <= pi_sqrtz; b = min_c1++)
-      {
-        int64_t prime = primes[b];
-        T xp = x / prime;
-        int64_t max_m = min(xp / prime, z);
-        T min_m128 = max(xp / (prime * prime), z / prime);
-        int64_t min_m = min(min_m128, max_m);
-
-        sum -= C1<-1>(xp, b, b, pi_y, 1, min_m, max_m, primes, pi);
-      }
-    }
-
     // SegmentedPiTable is accessed very frequently.
     // In order to get good performance it is important that
     // SegmentedPiTable fits into the CPU's cache.
@@ -972,26 +1169,44 @@ T AC_OpenMP(T x,
         if (low == thread.low)
           thread.secs = get_time();
 
+        int64_t pi_sqrt_low = pi[isqrt(low)];
         T xlow = x / max(low, 1);
         T xhigh = x / high;
-        int64_t min_c2 = max(k, pi_root3_xy);
-        min_c2 = max(min_c2, pi_sqrtz);
-        min_c2 = max(min_c2, pi[isqrt(low)]);
-        min_c2 = max(min_c2, pi[min(xhigh / y, x_star)]);
-        min_c2 += 1;
 
-        int64_t xhigh2 = fast_div64(xhigh, high);
-        int64_t min_a = min(xhigh2, x13);
+        if (low < z)
+        {
+          int64_t min_c1 = max(k, pi_root3_xz);
+          int64_t min_c1_prime = min(xz / high, sqrtz);
+          min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
+
+          // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
+          for (int64_t b = min_c1; b <= pi_sqrtz; b++)
+          {
+            T xp = x / primes[b];
+
+            if (xp <= pstd::numeric_limits<uint64_t>::max())
+              sum -= C1_64(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
+            else
+              sum -= C1_128(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
+          }
+        }
+
+        int64_t min_c2 = max3(k, pi_root3_xy, pi_sqrtz);
+        int64_t min_c2_prime = min(xhigh / y, x_star);
+        min_c2 = max3(min_c2, pi_sqrt_low, pi[min_c2_prime]) + 1;
+        int64_t x_div_high2 = fast_div64(xhigh, high);
+        int64_t min_a = min(x_div_high2, x13);
         min_a = pi[max(x_star, min_a)] + 1;
 
         // Upper bound of A & C2 formulas:
         // x / (p * q) >= low
         // p * next_prime(p) <= x / low
         // p <= sqrt(x / low)
-        T sqrt_xlow = isqrt(xlow);
+        int64_t sqrt_xlow = isqrt(xlow);
         int64_t max_c2 = pi[min(sqrt_xlow, x_star)];
-        int64_t max_c2_clustered = pi[min3(xlow / max(max_clustered_global, 1), sqrt_xlow, x_star)];
-        int64_t min_c2_sparse = pi[min(xhigh2, x_star)] + 1;
+        T max_c2_prime = xlow / max(max_clustered_global, 1);
+        int64_t max_c2_clustered = pi[min3(max_c2_prime, sqrt_xlow, x_star)];
+        int64_t min_c2_sparse = pi[min(x_div_high2, x_star)] + 1;
         min_c2_sparse = max3(min_c2, min_c2_sparse, max_c2_clustered + 1);
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
@@ -1002,7 +1217,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -1014,7 +1229,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, (uint64_t) xp, y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2_128(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -1026,7 +1241,7 @@ T AC_OpenMP(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_64(xlow, xhigh, (uint64_t) xp, y, prime, lprimes, pi, segmentedPi);
+            sum += A_64(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A_128(xlow, xhigh, xp, y, prime, primes, pi, segmentedPi);
         }
