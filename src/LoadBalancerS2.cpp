@@ -15,7 +15,7 @@
 ///        there are very few special leaves.
 ///
 ///        This LoadBalancerS2 therefore starts with a tiny segment
-///        size of x^(1/4) and one segment per thread. Then the
+///        size of x^(1/5) and one segment per thread. Then the
 ///        LoadBalancerS2 gradually increases the segment size until
 ///        it reaches sqrt(limit). Afterwards the LoadBalancerS2
 ///        gradually increases the number of segments per thread as
@@ -96,12 +96,12 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
   else
   {
     // When using multi-threading, it is important to
-    // start with a tiny segment size of x^(1/4) as most
+    // start with a tiny segment size of x^(1/5) as most
     // special leaves are located in the first few segments
     // and as we need to ensure that all threads are
     // assigned an equal amount of work.
-    segment_size = isqrt(isqrt(x));
-    segment_size = max(segment_size, 1 << 9);
+    double x15 = std::cbrt(std::sqrt(double(x)));
+    segment_size = max(int64_t(x15), 1 << 10);
     segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
     segments = 1;
