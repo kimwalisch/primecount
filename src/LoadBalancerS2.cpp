@@ -67,6 +67,7 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
                                int64_t sieve_limit,
                                int threads,
                                bool is_print) :
+  y_(y),
   sieve_limit_(sieve_limit),
   sqrt_limit_(isqrt(sieve_limit)),
   start_time_(get_time()),
@@ -134,7 +135,7 @@ void LoadBalancerS2::store_packed(uint64_t segment_size, uint64_t segments)
 /// Multiple threads may call get_work() simultaneously, since
 /// this function is not protected by a mutex, it must not
 /// modify any shared member variables, except the atomic low_
-/// max_low_, segment_data_, found_first_leaf_ variables.
+/// max_low_, segment_data_ variables.
 ///
 bool LoadBalancerS2::get_work(ThreadData& thread)
 {
@@ -160,22 +161,13 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
         print_high = thread.low + dist;
       }
 
-      bool found_first_leaf = found_first_leaf_.load(
-          std::memory_order_relaxed);
-
-      if (thread.sum && !found_first_leaf)
-      {
-        found_first_leaf = true;
-        found_first_leaf_.store(true,
-            std::memory_order_relaxed);
-      }
-
       // We only start increasing the segment size and segments
       // per thread once the first special leaf has been found.
       // Most special leaves are located near the start (near y).
       // Hence, we assign tiny work chunks to the threads in
       // this region to avoid load imbalance.
-      if (found_first_leaf)
+      if (thread.sum ||
+          thread.low > y_)
       {
         update(segment_size, segments, thread);
         store_packed(segment_size, segments);
@@ -213,53 +205,61 @@ void LoadBalancerS2::update(int64_t& segment_size,
     segment_size = min(segment_size, L1_segment_size);
     segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
+    return;
   }
+
+  int64_t low = low_.load(std::memory_order_relaxed);
+
+  // Increasing the thread work chunks too quickly near
+  // the start (<= y) may cause severe load imbalance
+  // which can cause some long running threads to finish
+  // late. This condition prevents it.
+  if (low <= y_)
+    return;
+
   // If segment_size >= L1_segment_size then slowly increase
   // the segment size until it reaches L2_segment_size.
-  else if (segment_size >= L1_segment_size &&
-           segment_size < L2_segment_size &&
-           segment_size < sqrt_limit_)
+  if (segment_size < L2_segment_size &&
+      segment_size < sqrt_limit_)
   {
     segment_size += segment_size / 16;
     segment_size = min(segment_size, L2_segment_size);
     segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
+    return;
   }
-  else
+
+  // Once the segment_size >= L2_segment_size we slowly increase
+  // (or decrease) the number of segments per thread.
+  segments = get_segments(thread, low);
+
+  // The hard special leaves algorithm is basically a modified
+  // segmented sieve of Eratosthenes. Using the segmented sieve of
+  // Eratosthenes it is of utmost importance that sieve array fits
+  // into the CPU's cache, otherwise performance will deteriorate
+  // significantly and the algorithm will scale poorly.
+  //
+  // Deleglise-Rivat orignially suggested using a segment size of
+  // O(y). Xavier Gourdon realized this segment size was much too
+  // large for new record PrimePi(x) computations and hence
+  // suggested using a smaller segment size of O(sqrt(x/y)) which
+  // is the same as O(sqrt(sieve_limit)). However, for new record
+  // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
+  // is still too large. Hence, I use an even smaller segment size
+  // of O(sqrt(high)) in primecount.
+  if (segment_size >= L2_segment_size &&
+      segment_size < sqrt_limit_)
   {
-    // Once the segment_size >= L2_segment_size we slowly increase
-    // (or decrease) the number of segments per thread.
-    int64_t low = low_.load(std::memory_order_relaxed);
-    segments = get_segments(thread, low);
+    int64_t dist = (segment_size * segments) * threads_;
+    int64_t high = min(low + dist, sieve_limit_);
 
-    // The hard special leaves algorithm is basically a modified
-    // segmented sieve of Eratosthenes. Using the segmented sieve of
-    // Eratosthenes it is of utmost importance that sieve array fits
-    // into the CPU's cache, otherwise performance will deteriorate
-    // significantly and the algorithm will scale poorly.
-    //
-    // Deleglise-Rivat orignially suggested using a segment size of
-    // O(y). Xavier Gourdon realized this segment size was much too
-    // large for new record PrimePi(x) computations and hence
-    // suggested using a smaller segment size of O(sqrt(x/y)) which
-    // is the same as O(sqrt(sieve_limit)). However, for new record
-    // PrimePi(x) computations a segment size O(sqrt(sieve_limit))
-    // is still too large. Hence, I use an even smaller segment size
-    // of O(sqrt(high)) in primecount.
-    if (segment_size >= L2_segment_size &&
-        segment_size < sqrt_limit_)
+    if (segment_size < isqrt(high))
     {
-      int64_t dist = (segment_size * segments) * threads_;
-      int64_t high = min(low + dist, sieve_limit_);
-
-      if (segment_size < isqrt(high))
-      {
-        segment_size += segment_size / 16;
-        dist = (segment_size * segments) * threads_;
-        high = min(low + dist, sieve_limit_);
-        segment_size = isqrt(high);
-        segment_size = Sieve::align_segment_size(segment_size);
-      }
+      segment_size += segment_size / 16;
+      dist = (segment_size * segments) * threads_;
+      high = min(low + dist, sieve_limit_);
+      segment_size = isqrt(high);
+      segment_size = Sieve::align_segment_size(segment_size);
     }
   }
 }

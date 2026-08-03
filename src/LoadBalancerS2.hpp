@@ -65,6 +65,7 @@ private:
   int64_t get_segments(ThreadData& thread, int64_t low) const;
   void print_S2_status(int64_t high, double time);
 
+  int64_t y_ = 0;
   int64_t sieve_limit_ = 0;
   int64_t sqrt_limit_ = 0;
   double start_time_ = 0;
@@ -81,7 +82,6 @@ private:
   MAYBE_UNUSED char pad4[MAX_CACHE_LINE_SIZE];
   std::atomic<double> next_print_time_{0};
   std::atomic<bool> print_lock_{false};
-  std::atomic<bool> found_first_leaf_{false};
   MAYBE_UNUSED char pad5[MAX_CACHE_LINE_SIZE];
 };
 
