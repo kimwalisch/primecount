@@ -102,7 +102,6 @@ LoadBalancerS2::LoadBalancerS2(maxint_t x,
     // assigned an equal amount of work.
     double x15 = std::cbrt(std::sqrt(double(x)));
     segment_size = max(int64_t(x15), 1 << 10);
-    segment_size = min(segment_size, max_segment_size);
     segment_size = Sieve::align_segment_size(segment_size);
     segments = 1;
   }
