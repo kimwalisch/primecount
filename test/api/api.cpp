@@ -78,6 +78,20 @@ int main()
   std::cout << "nth_prime(" << n128.lo << ") = " << res128.lo;
   check(res128.lo == 22801763489 && res128.hi == 0);
 
+#ifdef HAVE_INT128_T
+  try {
+    int128_t negative_n = -(int128_t(1) << 64) + 1;
+    std::cout << "nth_prime(-2^64 + 1) throws primecount_error: ";
+    negative_n = nth_prime(negative_n);
+    std::cout << "  ERROR" << std::endl;
+    return 1;
+  }
+  catch(primecount_error&)
+  {
+    std::cout << "  OK" << std::endl;
+  }
+#endif
+
   // Check n >= primecount max n of ~ 10^29.
   // primecount must detect issue and throw an exception.
   try {

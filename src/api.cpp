@@ -233,6 +233,9 @@ int128_t nth_prime(int128_t n)
 
 int128_t nth_prime(int128_t n, int threads)
 {
+  if_unlikely(n < 1)
+    throw primecount_error("nth_prime(n): n must be >= 1");
+
   // Number of primes < 2^63
   constexpr int64_t max_n_int64 = 216289611853439384ll;
 
