@@ -2,7 +2,7 @@
 /// @file   api_c.c
 /// @brief  Test primecount's C API.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -49,7 +49,7 @@ int main(void)
   n128.lo = (uint64_t) 1e9;
   n128.hi = 0;
   pc_int128_t res128 = primecount_pi_128(n128);
-  printf("primecount_pi_128(1e9) = %"PRId64, res128.lo);
+  printf("primecount_pi_128(1e9) = %"PRIu64, res128.lo);
   check(res128.lo == 50847534 && res128.hi == 0);
 
   // Check x >= primecount max x of 10^31.
@@ -57,7 +57,7 @@ int main(void)
   n128.lo = 0;
   n128.hi = 1ull << 50;
   res128 = primecount_pi_128(n128);
-  printf("primecount_pi_128(2^114) = %"PRId64, res128.lo);
+  printf("primecount_pi_128(2^114) = %"PRIu64, res128.lo);
   check(res128.hi == -1 && ~res128.lo == 0);
 
   n = 455052511;
@@ -75,7 +75,7 @@ int main(void)
   n128.lo = (uint64_t) 1e9;
   n128.hi = 0;
   res128 = primecount_nth_prime_128(n128);
-  printf("primecount_nth_prime_128(1e9) = %"PRId64, res128.lo);
+  printf("primecount_nth_prime_128(1e9) = %"PRIu64, res128.lo);
   check(res128.lo == 22801763489 && res128.hi == 0);
 
   // Check n >= primecount max n of ~ 10^29.
