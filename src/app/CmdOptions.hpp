@@ -1,7 +1,7 @@
 ///
 /// @file  CmdOptions.hpp
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -25,11 +25,9 @@ enum OptionID
   OPTION_DEFAULT,
   OPTION_DELEGLISE_RIVAT,
   OPTION_DELEGLISE_RIVAT_64,
-  OPTION_DELEGLISE_RIVAT_128,
   OPTION_DOUBLE_CHECK,
   OPTION_GOURDON,
   OPTION_GOURDON_64,
-  OPTION_GOURDON_128,
   OPTION_HELP,
   OPTION_LEGENDRE,
   OPTION_LEHMER,
@@ -42,7 +40,6 @@ enum OptionID
   OPTION_MEISSEL,
   OPTION_NTHPRIME,
   OPTION_NTHPRIME_64,
-  OPTION_NTHPRIME_128,
   OPTION_NUMBER,
   OPTION_PRIMESIEVE,
   OPTION_LI,
@@ -66,7 +63,12 @@ enum OptionID
   OPTION_TEST,
   OPTION_TIME,
   OPTION_THREADS,
-  OPTION_VERSION
+  OPTION_VERSION,
+#if defined(HAVE_INT128_T)
+  OPTION_DELEGLISE_RIVAT_128,
+  OPTION_GOURDON_128,
+  OPTION_NTHPRIME_128,
+#endif
 };
 
 /// Command-line option

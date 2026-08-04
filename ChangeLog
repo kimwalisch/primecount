@@ -3,6 +3,7 @@ Changes in primecount-8.7, 2026-08-04
 * P2.cpp: Fix potential 64-bit integer overflow.
 * api.cpp: Fix 128-bit nth_prime() for negative inputs.
 * main.cpp: Validate 128-bit to 64-bit integer conversions.
+* app: Disable 128-bit CLI options in 64-bit mode.
 * LoadBalancerS2.cpp: Fix Clang scaling issue.
 * AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
 * AC.cpp: Implement segmented C1 algorithm to improve cache efficiency.

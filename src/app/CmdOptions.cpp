@@ -273,12 +273,10 @@ CmdOptions parseOptions(int argc, char** argv)
     { "-d", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat", std::make_pair(OPTION_DELEGLISE_RIVAT, NO_PARAM) },
     { "--deleglise-rivat-64", std::make_pair(OPTION_DELEGLISE_RIVAT_64, NO_PARAM) },
-    { "--deleglise-rivat-128", std::make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
     { "--double-check", std::make_pair(OPTION_DOUBLE_CHECK, NO_PARAM) },
     { "-g", std::make_pair(OPTION_GOURDON, NO_PARAM) },
     { "--gourdon", std::make_pair(OPTION_GOURDON, NO_PARAM) },
     { "--gourdon-64", std::make_pair(OPTION_GOURDON_64, NO_PARAM) },
-    { "--gourdon-128", std::make_pair(OPTION_GOURDON_128, NO_PARAM) },
     { "-h", std::make_pair(OPTION_HELP, NO_PARAM) },
     { "--help", std::make_pair(OPTION_HELP, NO_PARAM) },
     { "-l", std::make_pair(OPTION_LEGENDRE, NO_PARAM) },
@@ -295,7 +293,6 @@ CmdOptions parseOptions(int argc, char** argv)
     { "-n", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
     { "--nth-prime", std::make_pair(OPTION_NTHPRIME, NO_PARAM) },
     { "--nth-prime-64", std::make_pair(OPTION_NTHPRIME_64, NO_PARAM) },
-    { "--nth-prime-128", std::make_pair(OPTION_NTHPRIME_128, NO_PARAM) },
     { "--number", std::make_pair(OPTION_NUMBER, REQUIRED_PARAM) },
     { "-p", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
     { "--primesieve", std::make_pair(OPTION_PRIMESIEVE, NO_PARAM) },
@@ -326,7 +323,12 @@ CmdOptions parseOptions(int argc, char** argv)
     { "-t", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
     { "--threads", std::make_pair(OPTION_THREADS, REQUIRED_PARAM) },
     { "-v", std::make_pair(OPTION_VERSION, NO_PARAM) },
-    { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) }
+    { "--version", std::make_pair(OPTION_VERSION, NO_PARAM) },
+#if defined(HAVE_INT128_T)
+    { "--deleglise-rivat-128", std::make_pair(OPTION_DELEGLISE_RIVAT_128, NO_PARAM) },
+    { "--gourdon-128", std::make_pair(OPTION_GOURDON_128, NO_PARAM) },
+    { "--nth-prime-128", std::make_pair(OPTION_NTHPRIME_128, NO_PARAM) },
+#endif
   };
 
   CmdOptions opts;
