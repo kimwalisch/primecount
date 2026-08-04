@@ -173,7 +173,7 @@ pc_int128_t nth_prime(pc_int128_t n)
   res.hi = (int64_t) (r128 >> 64);
   return res;
 #else
-  throw primecount_error("nth_prime(n): n must be <= 2^63-1");
+  throw primecount_error("nth_prime(n): n must be <= " + std::to_string(max_n_int64));
 #endif
 }
 
