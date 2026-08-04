@@ -358,13 +358,17 @@ CmdOptions parseOptions(int argc, char** argv)
 
   if (opts.option == OPTION_PHI)
   {
-    if (numbers.size() < 2)
+    if (numbers.size() != 2)
       throw primecount_error("option --phi requires 2 numbers");
     opts.a = numbers[1];
   }
-
-  if (numbers.empty())
-    throw primecount_error("missing x number");
+  else
+  {
+    if (numbers.empty())
+      throw primecount_error("missing x number");
+    if (numbers.size() > 1)
+      throw primecount_error("expected 1 input number, but found " + std::to_string(numbers.size()));
+  }
 
   opts.x = numbers[0];
 

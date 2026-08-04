@@ -1,5 +1,6 @@
 Changes in primecount-8.7, 2026-08-04
 
+* CmdOptions.cpp: Detect too many input numbers.
 * P2.cpp: Fix potential 64-bit integer overflow.
 * api.cpp: Fix nth_prime() error message.
 * api.cpp: Fix 128-bit nth_prime() for negative inputs.
