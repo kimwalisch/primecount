@@ -106,7 +106,7 @@ T P2_OpenMP(T x,
   T b = pi_noprint(sqrtx, threads);
 
   // \sum_{i=a+1}^{b} -(i - 1)
-  T sum = (a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
+  T sum = T(a - 2) * (a + 1) / 2 - (b - 2) * (b + 1) / 2;
   static_assert(pstd::is_signed<T>::value, "T must be signed integer type");
 
   int64_t xy = (int64_t)(x / max(y, 1));
