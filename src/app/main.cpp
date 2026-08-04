@@ -119,8 +119,9 @@ namespace primecount {
 
 int64_t to_int64(maxint_t x)
 {
-  if (x > pstd::numeric_limits<int64_t>::max())
-    throw primecount_error("x must be < 2^63");
+  if (x < pstd::numeric_limits<int64_t>::min() ||
+      x > pstd::numeric_limits<int64_t>::max())
+    throw primecount_error("the selected algorithm requires -2^63 <= x < 2^63");
   return (int64_t) x;
 }
 
