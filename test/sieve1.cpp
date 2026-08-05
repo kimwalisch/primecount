@@ -39,7 +39,7 @@ int main()
   int low = 0;
   int high = dist(gen);
   int sqrt_high = isqrt(high);
-  auto primes = generate_primes<int32_t>(sqrt_high);
+  auto primes = generate_primes<uint32_t>(sqrt_high);
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
@@ -49,18 +49,20 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    if (primes[i] <= 5)
+    int prime = (int) primes[i];
+
+    if (prime <= 5)
     {
       sieve.pre_sieve(primes, i, low, high);
       sieve.init_counter(low, high);
     }
     else
-      sieve.cross_off(primes[i], i);
+      sieve.cross_off(prime, i);
 
-    for (int j = primes[i]; j < high; j += primes[i])
+    for (int j = prime; j < high; j += prime)
       sieve2[j] = 0;
 
-    if (primes[i] >= 5)
+    if (prime >= 5)
     {
       int start = dist(gen) % high;
       int stop  = dist(gen) % high;

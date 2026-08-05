@@ -34,15 +34,15 @@ int main()
 
   auto max = dist(gen);
   auto lpf = generate_lpf(max);
-  auto primes = generate_primes<int32_t>(max);
+  auto primes = generate_primes<uint32_t>(max);
 
-  for (int i = 2; i <= max; i++)
+  for (int64_t i = 2; i <= max; i++)
   {
-    int factor = i;
-    int sqrt = isqrt(i);
+    int64_t factor = i;
+    int64_t sqrt = isqrt(i);
 
     // find smallest prime factor
-    for (int j = 1; primes[j] <= sqrt; j++)
+    for (int64_t j = 1; (int64_t) primes[j] <= sqrt; j++)
     {
       if (i % primes[j] == 0)
       {
@@ -52,7 +52,7 @@ int main()
     }
 
     std::cout << "lpf(" << i << ") = " << lpf[i];
-    check(lpf[i] == factor);
+    check((int64_t) lpf[i] == factor);
   }
 
   std::cout << std::endl;

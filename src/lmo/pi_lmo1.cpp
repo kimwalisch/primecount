@@ -42,7 +42,7 @@ int64_t pi_lmo1(int64_t x)
   int64_t s1 = 0;
   int64_t s2 = 0;
 
-  auto primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<uint32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
   bool is_print = false;

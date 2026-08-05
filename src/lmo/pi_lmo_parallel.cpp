@@ -53,7 +53,7 @@ int64_t S2_thread(int64_t x,
                   int64_t c,
                   const PiTable& pi,
                   const Vector<uint32_t>& primes,
-                  const Vector<int32_t>& lpf,
+                  const Vector<uint32_t>& lpf,
                   const Vector<int32_t>& mu,
                   ThreadData& thread)
 {
@@ -170,7 +170,7 @@ int64_t S2(int64_t x,
            int64_t z,
            int64_t c,
            const Vector<uint32_t>& primes,
-           const Vector<int32_t>& lpf,
+           const Vector<uint32_t>& lpf,
            const Vector<int32_t>& mu,
            int threads,
            bool is_print)

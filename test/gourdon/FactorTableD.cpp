@@ -57,7 +57,7 @@ int main()
   for (int n = 1; n <= z; n++)
   {
     int64_t i = factorTable.to_index(n);
-    bool is_prime = (lpf[n] == n);
+    bool is_prime = ((int64_t) lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)
@@ -70,7 +70,7 @@ int main()
 
     // primes > y and square free numbers with a prime factor > y
     // have been removed from the FactorTableD.
-    if (mpf[n] > y)
+    if ((int64_t) mpf[n] > y)
     {
       std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable.is_leaf(i) == 0);
       check(factorTable.is_leaf(i) == 0);

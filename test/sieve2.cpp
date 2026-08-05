@@ -40,7 +40,7 @@ int main()
   int low = 0;
   int high = dist(gen);
   int sqrt_high = isqrt(high);
-  auto primes = generate_primes<int32_t>(sqrt_high);
+  auto primes = generate_primes<uint32_t>(sqrt_high);
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
@@ -54,8 +54,9 @@ int main()
     uint64_t cnt2 = 0;
     uint64_t total1 = 0;
     uint64_t total2 = 0;
+    int prime = (int) primes[i];
 
-    if (primes[i] <= 5)
+    if (prime <= 5)
     {
       sieve.pre_sieve(primes, i, low, high);
       sieve.init_counter(low, high);
@@ -63,12 +64,12 @@ int main()
     else
     {
       uint64_t prev_count = sieve.get_total_count();
-      sieve.cross_off_count(primes[i], i);
+      sieve.cross_off_count(prime, i);
       cnt1 = prev_count - sieve.get_total_count();
       total1 = sieve.count(high - 1);
     }
 
-    for (int j = primes[i]; j < high; j += primes[i])
+    for (int j = prime; j < high; j += prime)
     {
       cnt2 += sieve2[j];
       sieve2[j] = 0;
@@ -77,9 +78,9 @@ int main()
     for (int j = 0; j < high; j++)
       total2 += sieve2[j];
 
-    if (primes[i] > 5)
+    if (prime > 5)
     {
-      std::cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
+      std::cout << "sieve.cross_off_count(" << i << ", " << prime << ") = " << cnt1;
       check(cnt1 == cnt2);
 
       std::cout << "sieve.count(" << high - 1 << ") = " << total1;

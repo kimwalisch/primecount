@@ -18,22 +18,10 @@
 namespace primecount {
 
 /// defined in generate_primes.cpp
-Vector<int32_t> generate_primes_i32(int64_t max);
 Vector<uint32_t> generate_primes_u32(int64_t max);
 Vector<int64_t> generate_primes_i64(int64_t max);
 Vector<uint64_t> generate_primes_u64(int64_t max);
-Vector<int32_t> generate_n_primes_i32(int64_t n);
 Vector<uint32_t> generate_n_primes_u32(int64_t n);
-
-/// Returns a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-///
-template <typename T>
-typename std::enable_if<std::is_same<T, int32_t>::value, Vector<int32_t>>::type
-generate_primes(int64_t max)
-{
-  return generate_primes_i32(max);
-}
 
 /// Returns a vector with the primes <= max.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
@@ -69,16 +57,6 @@ generate_primes(int64_t max)
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
 //
 template <typename T>
-typename std::enable_if<std::is_same<T, int32_t>::value, Vector<int32_t>>::type
-generate_n_primes(int64_t n)
-{
-  return generate_n_primes_i32(n);
-}
-
-/// Returns a vector with the first n primes.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-template <typename T>
 typename std::enable_if<std::is_same<T, uint32_t>::value, Vector<uint32_t>>::type
 generate_n_primes(int64_t n)
 {
@@ -91,17 +69,17 @@ Vector<int32_t> generate_moebius(int64_t max);
 /// Returns a vector with the least prime
 /// factors of the integers <= max.
 ///
-Vector<int32_t> generate_lpf(int64_t max);
+Vector<uint32_t> generate_lpf(int64_t max);
 
 /// Returns a vector with the largest prime
 /// factors of the integers <= max.
 ///
-Vector<int32_t> generate_mpf(int64_t max);
+Vector<uint32_t> generate_mpf(int64_t max);
 
 /// Returns a vector with the prime counts <= max
 /// using the sieve of Eratosthenes.
 ///
-Vector<int32_t> generate_pi(int64_t max);
+Vector<uint32_t> generate_pi(int64_t max);
 
 } // namespace
 

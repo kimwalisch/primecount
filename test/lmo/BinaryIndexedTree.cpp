@@ -41,20 +41,22 @@ int main()
   int size = dist(gen);
   size = next_power_of_2(size);
 
-  auto primes = generate_primes<int32_t>(isqrt(size));
+  auto primes = generate_primes<uint32_t>(isqrt(size));
   std::vector<int> sieve(size, 1);
   BinaryIndexedTree tree;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    for (int j = primes[i] - low; j < size; j += primes[i])
+    int prime = (int) primes[i];
+
+    for (int j = prime - low; j < size; j += prime)
     {
-      if (sieve[j] && primes[i] > pre_sieve)
+      if (sieve[j] && prime > pre_sieve)
         tree.update(j);
       sieve[j] = 0;
     }
 
-    if (primes[i] <= pre_sieve)
+    if (prime <= pre_sieve)
       tree.init(sieve);
 
     int rand = dist(gen) % size;

@@ -4,6 +4,14 @@ Changes in primecount-8.7, 2026-08-05
 * P2.cpp: Fix potential 64-bit integer overflow.
 * phi.cpp: Fix phi(x, a) for x >= 4611686065672028281 which requires primes > INT32_MAX.
 * generate_primes.hpp: Add generate_n_primes<uint32_t>() used by the phi.cpp fix.
+* generate_primes.cpp: Switch generate_lpf(), generate_mpf() and generate_pi() to uint32_t,
+  the old int32_t type overflowed for max > INT32_MAX.
+* generate_primes.cpp: Fix generate_moebius() integer overflow for max > INT32_MAX.
+* lmo: Use uint32_t primes vectors, LMO allows y up to sqrt(x) i.e. y > INT32_MAX.
+* P3.cpp: Use uint32_t primes vector, max_prime can be > INT32_MAX.
+* generate_primes.hpp: Remove generate_primes<int32_t>() and generate_n_primes<int32_t>(),
+  the uint32_t versions are used everywhere instead.
+* generate_primes.cpp: Throw primecount_error in the 32-bit functions if max >= 2^32.
 * api.cpp: Fix nth_prime() error message.
 * api.cpp: Fix 128-bit nth_prime() for negative inputs.
 * main.cpp: Validate 128-bit to 64-bit integer conversions.

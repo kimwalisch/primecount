@@ -38,8 +38,8 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t c,
            int64_t pi_y,
-           const Vector<int32_t>& primes,
-           const Vector<int32_t>& lpf,
+           const Vector<uint32_t>& primes,
+           const Vector<uint32_t>& lpf,
            const Vector<int32_t>& mu)
 {
   int64_t limit = x / y;
@@ -107,7 +107,7 @@ int64_t pi_lmo2(int64_t x)
   int64_t y = (int64_t) (x13 * alpha);
   int64_t c = PhiTiny::get_c(y);
 
-  auto primes = generate_primes<int32_t>(y);
+  auto primes = generate_primes<uint32_t>(y);
   auto lpf = generate_lpf(y);
   auto mu = generate_moebius(y);
 

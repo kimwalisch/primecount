@@ -50,13 +50,13 @@ int main()
   int64_t size = dist(gen);
   int64_t x = size - 1;
 
-  auto primes = generate_n_primes<int32_t>(max_a);
+  auto primes = generate_n_primes<uint32_t>(max_a);
   std::vector<char> sieve(size, 1);
 
-  for (int a = 1; a <= max_a; a++)
+  for (int64_t a = 1; a <= max_a; a++)
   {
     // remove primes[a] and its multiples
-    for (int j = primes[a]; j <= x; j += primes[a])
+    for (int64_t j = primes[a]; j <= x; j += primes[a])
       sieve[j] = 0;
 
     std::cout << "phi_tiny(" << x << ", " << a << ") = " << phi_tiny(x, a);

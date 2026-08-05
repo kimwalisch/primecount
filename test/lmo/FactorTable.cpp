@@ -54,7 +54,7 @@ int main()
   for (int n = 1; n <= max; n++)
   {
     int64_t i = factorTable.to_index(n);
-    bool is_prime = (lpf[n] == n);
+    bool is_prime = ((int64_t) lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)
