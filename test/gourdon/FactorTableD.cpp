@@ -39,8 +39,8 @@ int main()
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist_y(50000, 60000);
-  std::uniform_int_distribution<int> dist_z(1200000, 1500000);
+  std::uniform_int_distribution<int64_t> dist_y(50000, 60000);
+  std::uniform_int_distribution<int64_t> dist_z(1200000, 1500000);
 
   auto y = dist_y(gen);
   auto z = dist_z(gen);
