@@ -47,9 +47,9 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int prime = (int) primes[i];
+    int64_t prime = primes[i];
 
-    for (int j = prime - low; j < size; j += prime)
+    for (int64_t j = prime - low; j < size; j += prime)
     {
       if (sieve[j] && prime > pre_sieve)
         tree.update(j);

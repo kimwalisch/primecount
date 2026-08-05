@@ -162,7 +162,7 @@ int main()
   {
     int n = dist(gen) % pi.size();
     std::cout << "pi(" << n << ") = " << pi[n];
-    check(pi[n] == (uint32_t) primesieve::count_primes(0, n));
+    check(pi[n] == primesieve::count_primes(0, n));
   }
 
   std::cout << std::endl;

@@ -49,7 +49,7 @@ int main()
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int prime = (int) primes[i];
+    int64_t prime = primes[i];
 
     if (prime <= 5)
     {
@@ -59,7 +59,7 @@ int main()
     else
       sieve.cross_off(prime, i);
 
-    for (int j = prime; j < high; j += prime)
+    for (int64_t j = prime; j < high; j += prime)
       sieve2[j] = 0;
 
     if (prime >= 5)

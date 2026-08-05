@@ -54,7 +54,7 @@ int main()
     uint64_t cnt2 = 0;
     uint64_t total1 = 0;
     uint64_t total2 = 0;
-    int prime = (int) primes[i];
+    int64_t prime = primes[i];
 
     if (prime <= 5)
     {
@@ -69,7 +69,7 @@ int main()
       total1 = sieve.count(high - 1);
     }
 
-    for (int j = prime; j < high; j += prime)
+    for (int64_t j = prime; j < high; j += prime)
     {
       cnt2 += sieve2[j];
       sieve2[j] = 0;

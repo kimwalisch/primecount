@@ -51,10 +51,10 @@ int main()
   int64_t limit = factorTable.first_coprime();
   std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
-  for (int n = 1; n <= max; n++)
+  for (int64_t n = 1; n <= max; n++)
   {
     int64_t i = factorTable.to_index(n);
-    bool is_prime = ((int64_t) lpf[n] == n);
+    bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)

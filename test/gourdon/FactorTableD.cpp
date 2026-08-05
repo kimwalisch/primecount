@@ -42,8 +42,8 @@ int main()
   std::uniform_int_distribution<int> dist_y(50000, 60000);
   std::uniform_int_distribution<int> dist_z(1200000, 1500000);
 
-  auto y = dist_y(gen);
-  auto z = dist_z(gen);
+  int64_t y = dist_y(gen);
+  int64_t z = dist_z(gen);
   auto threads = get_num_threads();
   auto lpf = generate_lpf(z);
   auto mpf = generate_mpf(z);
@@ -54,10 +54,10 @@ int main()
   int64_t limit = factorTable.first_coprime();
   std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
-  for (int n = 1; n <= z; n++)
+  for (int64_t n = 1; n <= z; n++)
   {
     int64_t i = factorTable.to_index(n);
-    bool is_prime = ((int64_t) lpf[n] == n);
+    bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
     for (int p : small_primes)
@@ -70,7 +70,7 @@ int main()
 
     // primes > y and square free numbers with a prime factor > y
     // have been removed from the FactorTableD.
-    if ((int64_t) mpf[n] > y)
+    if (mpf[n] > y)
     {
       std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable.is_leaf(i) == 0);
       check(factorTable.is_leaf(i) == 0);

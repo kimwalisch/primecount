@@ -42,7 +42,7 @@ int main()
     int64_t sqrt = isqrt(i);
 
     // find smallest prime factor
-    for (int64_t j = 1; (int64_t) primes[j] <= sqrt; j++)
+    for (int64_t j = 1; primes[j] <= sqrt; j++)
     {
       if (i % primes[j] == 0)
       {
@@ -52,7 +52,7 @@ int main()
     }
 
     std::cout << "lpf(" << i << ") = " << lpf[i];
-    check((int64_t) lpf[i] == factor);
+    check(lpf[i] == factor);
   }
 
   std::cout << std::endl;
