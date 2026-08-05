@@ -3,7 +3,7 @@
 /// @brief  Test the generate_pi(n) function
 /// @link   https://en.wikipedia.org/wiki/Prime-counting_function
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -22,7 +22,7 @@ using std::size_t;
 using namespace primecount;
 
 /// pi(x) lookup table for x < 2000
-std::array<int64_t, 2000> pix =
+std::array<uint64_t, 2000> pix =
 {
   0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8,
   8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 11, 11, 11, 11, 11, 11, 12, 12, 12,
@@ -137,7 +137,7 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(500000, 1000000);
+  std::uniform_int_distribution<uint64_t> dist(500000, 1000000);
   auto pi = generate_pi(dist(gen));
 
   for (size_t i = 0; i < pix.size(); i++)
@@ -148,7 +148,7 @@ int main()
 
   primesieve::iterator it;
   uint64_t prime = it.next_prime();
-  uint32_t count = 1;
+  uint64_t count = 1;
 
   while (prime < pi.size())
   {
@@ -158,9 +158,9 @@ int main()
     count++;
   }
 
-  for (int i = 0; i < 10000; i++)
+  for (uint64_t i = 0; i < 10000; i++)
   {
-    int n = dist(gen) % pi.size();
+    uint64_t n = dist(gen) % pi.size();
     std::cout << "pi(" << n << ") = " << pi[n];
     check(pi[n] == primesieve::count_primes(0, n));
   }

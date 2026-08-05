@@ -34,45 +34,43 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(1000000, 2000000);
+  std::uniform_int_distribution<uint64_t> dist(1000000, 2000000);
 
-  int low = 0;
-  int high = dist(gen);
-  int sqrt_high = isqrt(high);
+  uint64_t low = 0;
+  uint64_t high = dist(gen);
+  uint64_t sqrt_high = isqrt(high);
   auto primes = generate_primes<uint32_t>(sqrt_high);
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
   Sieve sieve(low, segment_size, primes.size());
-  std::vector<int> sieve2(high, 1);
-  sieve2[0] = 0;
+  std::vector<bool> sieve2(high, true);
+  sieve2[0] = false;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    int64_t prime = primes[i];
-
-    if (prime <= 5)
+    if (primes[i] <= 5)
     {
       sieve.pre_sieve(primes, i, low, high);
       sieve.init_counter(low, high);
     }
     else
-      sieve.cross_off(prime, i);
+      sieve.cross_off(primes[i], i);
 
-    for (int64_t j = prime; j < high; j += prime)
-      sieve2[j] = 0;
+    for (uint64_t j = primes[i]; j < high; j += primes[i])
+      sieve2[j] = false;
 
-    if (prime >= 5)
+    if (primes[i] >= 5)
     {
-      int start = dist(gen) % high;
-      int stop  = dist(gen) % high;
+      uint64_t start = dist(gen) % high;
+      uint64_t stop  = dist(gen) % high;
 
       if (start > stop)
         std::swap(start, stop);
 
       uint64_t count = 0;
 
-      for (int j = start; j <= stop; j++)
+      for (uint64_t j = start; j <= stop; j++)
         count += sieve2[j];
 
       std::cout << "sieve.count(" << start << ", " << stop << ") = " << sieve.count(start, stop);

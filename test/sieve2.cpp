@@ -35,18 +35,18 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(1000000, 2000000);
+  std::uniform_int_distribution<uint64_t> dist(1000000, 2000000);
 
-  int low = 0;
-  int high = dist(gen);
-  int sqrt_high = isqrt(high);
+  uint64_t low = 0;
+  uint64_t high = dist(gen);
+  uint64_t sqrt_high = isqrt(high);
   auto primes = generate_primes<uint32_t>(sqrt_high);
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
   Sieve sieve(low, segment_size, primes.size());
-  std::vector<int> sieve2(high, 1);
-  sieve2[0] = 0;
+  std::vector<bool> sieve2(high, true);
+  sieve2[0] = false;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
@@ -54,9 +54,8 @@ int main()
     uint64_t cnt2 = 0;
     uint64_t total1 = 0;
     uint64_t total2 = 0;
-    int64_t prime = primes[i];
 
-    if (prime <= 5)
+    if (primes[i] <= 5)
     {
       sieve.pre_sieve(primes, i, low, high);
       sieve.init_counter(low, high);
@@ -64,23 +63,23 @@ int main()
     else
     {
       uint64_t prev_count = sieve.get_total_count();
-      sieve.cross_off_count(prime, i);
+      sieve.cross_off_count(primes[i], i);
       cnt1 = prev_count - sieve.get_total_count();
       total1 = sieve.count(high - 1);
     }
 
-    for (int64_t j = prime; j < high; j += prime)
+    for (uint64_t j = primes[i]; j < high; j += primes[i])
     {
       cnt2 += sieve2[j];
-      sieve2[j] = 0;
+      sieve2[j] = false;
     }
 
-    for (int j = 0; j < high; j++)
+    for (uint64_t j = 0; j < high; j++)
       total2 += sieve2[j];
 
-    if (prime > 5)
+    if (primes[i] > 5)
     {
-      std::cout << "sieve.cross_off_count(" << i << ", " << prime << ") = " << cnt1;
+      std::cout << "sieve.cross_off_count(" << i << ", " << primes[i] << ") = " << cnt1;
       check(cnt1 == cnt2);
 
       std::cout << "sieve.count(" << high - 1 << ") = " << total1;

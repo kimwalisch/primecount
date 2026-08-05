@@ -2,7 +2,7 @@
 /// @file   generate_lpf.cpp
 /// @brief  Test least prime factor function
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,7 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(200000, 300000);
+  std::uniform_int_distribution<int64_t> dist(200000, 300000);
 
   auto max = dist(gen);
   auto lpf = generate_lpf(max);
