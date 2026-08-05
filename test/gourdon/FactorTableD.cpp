@@ -3,7 +3,7 @@
 /// @brief  FactorTableD is a compressed lookup table of mu (moebius),
 ///         lpf (least prime factor) and mpf (max prime factor).
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -42,8 +42,8 @@ int main()
   std::uniform_int_distribution<int> dist_y(50000, 60000);
   std::uniform_int_distribution<int> dist_z(1200000, 1500000);
 
-  int64_t y = dist_y(gen);
-  int64_t z = dist_z(gen);
+  auto y = dist_y(gen);
+  auto z = dist_z(gen);
   auto threads = get_num_threads();
   auto lpf = generate_lpf(z);
   auto mpf = generate_mpf(z);
