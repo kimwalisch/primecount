@@ -49,7 +49,7 @@ class PhiCache : public BitSieve240
 public:
   PhiCache(uint64_t x,
            uint64_t a,
-           const Vector<int32_t>& primes,
+           const Vector<uint32_t>& primes,
            const PiTable& pi) :
     primes_(primes),
     pi_(pi)
@@ -102,7 +102,7 @@ public:
   template <int SIGN>
   int64_t phi(int64_t x, int64_t a)
   {
-    if (x <= primes_[a])
+    if (x <= (int64_t) primes_[a])
       return SIGN;
     else if (is_phi_tiny(a))
       return phi_tiny(x, a) * SIGN;
@@ -293,7 +293,7 @@ private:
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
   Vector<Vector<sieve_t>> sieve_;
-  const Vector<int32_t>& primes_;
+  const Vector<uint32_t>& primes_;
   const PiTable& pi_;
 };
 
@@ -375,7 +375,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
   if (a > pi_sqrtx)
     return phi_pix(x, a, threads);
 
-  auto primes = generate_n_primes<int32_t>(a);
+  auto primes = generate_n_primes<uint32_t>(a);
   int64_t c = min(PhiTiny::max_a(), a);
   int64_t sum = phi_tiny(x, c);
 

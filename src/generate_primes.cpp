@@ -1,7 +1,7 @@
 ///
 /// @file  generate_primes.cpp
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -71,6 +71,18 @@ Vector<uint64_t> generate_primes_u64(int64_t max)
 Vector<int32_t> generate_n_primes_i32(int64_t n)
 {
   Vector<int32_t> primes;
+  primes.reserve(n + 1);
+  primes.push_back(0);
+  primesieve::generate_n_primes(n, &primes);
+  return primes;
+}
+
+/// Returns a vector with the first n primes.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+//
+Vector<uint32_t> generate_n_primes_u32(int64_t n)
+{
+  Vector<uint32_t> primes;
   primes.reserve(n + 1);
   primes.push_back(0);
   primesieve::generate_n_primes(n, &primes);

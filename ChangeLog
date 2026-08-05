@@ -1,7 +1,9 @@
-Changes in primecount-8.7, 2026-08-04
+Changes in primecount-8.7, 2026-08-05
 
 * CmdOptions.cpp: Detect too many input numbers.
 * P2.cpp: Fix potential 64-bit integer overflow.
+* phi.cpp: Fix phi(x, a) for x >= 4611686065672028281 which requires primes > INT32_MAX.
+* generate_primes.hpp: Add generate_n_primes<uint32_t>() used by the phi.cpp fix.
 * api.cpp: Fix nth_prime() error message.
 * api.cpp: Fix 128-bit nth_prime() for negative inputs.
 * main.cpp: Validate 128-bit to 64-bit integer conversions.
