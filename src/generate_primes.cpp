@@ -152,13 +152,13 @@ Vector<uint32_t> generate_lpf(int64_t max,
 
   for (std::size_t i = 1; i < primes.size(); i++)
   {
-    int64_t prime = primes[i];
-    if (prime > sqrt)
+    if (primes[i] > sqrt)
       break;
 
-    for (int64_t j = prime * prime; j < size; j += prime)
+    int64_t prime_sqaured = primes[i] * primes[i];
+    for (int64_t j = prime_sqaured; j < size; j += primes[i])
       if (lpf[j] == 1)
-        lpf[j] = prime;
+        lpf[j] = primes[i];
   }
 
   for (std::size_t i = 1; i < primes.size(); i++)
