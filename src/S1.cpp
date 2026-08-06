@@ -7,7 +7,7 @@
 ///        however in many newer papers the ordinary leaves are named
 ///        S0. In primecount the ordinary leaves are named S1.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -105,7 +105,7 @@ int64_t S1(int64_t x,
     time = get_time();
   }
 
-  int64_t s1 = S1_OpenMP(x, y, c, threads);
+  int64_t s1 = S1_OpenMP(x, (uint32_t) y, c, threads);
 
   if (is_print)
     print("S1", s1, time);

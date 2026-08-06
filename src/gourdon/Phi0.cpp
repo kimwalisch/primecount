@@ -13,7 +13,7 @@
 ///        z < x^(1/2). Also the small constant is named k instead
 ///        of c.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -113,7 +113,7 @@ int64_t Phi0(int64_t x,
     time = get_time();
   }
 
-  int64_t phi0 = Phi0_OpenMP(x, y, z, k, threads);
+  int64_t phi0 = Phi0_OpenMP(x, (uint32_t) y, z, k, threads);
 
   if (is_print)
     print("Phi0", phi0, time);
