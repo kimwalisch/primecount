@@ -51,8 +51,8 @@ int main()
     int64_t s2 = 0;
 
     auto primes = generate_primes<uint32_t>(y);
-    auto lpf = generate_lpf(y);
-    auto mu = generate_moebius(y);
+    auto lpf = generate_lpf(y, primes);
+    auto mu = generate_moebius(y, primes);
 
     // special leaves
     for (int64_t b = c + 1; b < pi_y; b++)
@@ -79,8 +79,8 @@ int main()
     int64_t s2 = 0;
 
     auto primes = generate_primes<uint32_t>(y);
-    auto lpf = generate_lpf(y);
-    auto mu = generate_moebius(y);
+    auto lpf = generate_lpf(y, primes);
+    auto mu = generate_moebius(y, primes);
 
     // special leaves
     for (int64_t b = c + 1; b < pi_y; b++)

@@ -45,9 +45,9 @@ int main()
     int64_t c = PhiTiny::get_c(y);
     int64_t s1 = 0;
 
-    auto primes = generate_n_primes<uint32_t>(c);
-    auto lpf = generate_lpf(y);
-    auto mu = generate_moebius(y);
+    auto primes = generate_primes<uint32_t>(y);
+    auto lpf = generate_lpf(y, primes);
+    auto mu = generate_moebius(y, primes);
 
     // ordinary leaves
     for (int64_t n = 1; n <= y; n++)

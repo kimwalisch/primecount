@@ -29,6 +29,7 @@
 #include <min.hpp>
 #include <imath.hpp>
 #include <PhiTiny.hpp>
+#include <PiTable.hpp>
 #include <print.hpp>
 #include <Vector.hpp>
 #include <S.hpp>
@@ -46,7 +47,7 @@ int64_t S2(int64_t x,
            int64_t c,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
-           const Vector<int32_t>& mu,
+           const Vector<int8_t>& mu,
            bool is_print)
 {
   double time;
@@ -64,7 +65,7 @@ int64_t S2(int64_t x,
   segment_size = Sieve::align_segment_size(segment_size);
 
   Sieve sieve(low, segment_size, primes.size());
-  auto pi = generate_pi(y);
+  PiTable pi(y, /* threads = */ 1);
   Vector<int64_t> phi(primes.size());
   std::fill(phi.begin(), phi.end(), 0);
 
@@ -175,8 +176,8 @@ int64_t pi_lmo5(int64_t x, bool is_print)
   }
 
   auto primes = generate_primes<uint32_t>(y);
-  auto lpf = generate_lpf(y);
-  auto mu = generate_moebius(y);
+  auto lpf = generate_lpf(y, primes);
+  auto mu = generate_moebius(y, primes);
 
   int64_t pi_y = primes.size() - 1;
   int64_t p2 = P2(x, y, pi_y, threads);

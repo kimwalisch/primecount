@@ -54,7 +54,7 @@ int64_t S2_thread(int64_t x,
                   const PiTable& pi,
                   const Vector<uint32_t>& primes,
                   const Vector<uint32_t>& lpf,
-                  const Vector<int32_t>& mu,
+                  const Vector<int8_t>& mu,
                   ThreadData& thread)
 {
   int64_t sum = 0;
@@ -171,7 +171,7 @@ int64_t S2(int64_t x,
            int64_t c,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
-           const Vector<int32_t>& mu,
+           const Vector<int8_t>& mu,
            int threads,
            bool is_print)
 {
@@ -244,8 +244,8 @@ int64_t pi_lmo_parallel(int64_t x,
   }
 
   auto primes = generate_primes<uint32_t>(y);
-  auto lpf = generate_lpf(y);
-  auto mu = generate_moebius(y);
+  auto lpf = generate_lpf(y, primes);
+  auto mu = generate_moebius(y, primes);
 
   int64_t Lix = Li(x);
   int64_t pi_y = primes.size() - 1;

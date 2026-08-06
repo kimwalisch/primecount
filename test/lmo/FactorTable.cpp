@@ -43,13 +43,13 @@ int main()
 
   auto max = dist(gen);
   auto threads = max % 4;
-  auto lpf = generate_lpf(max);
-  auto mu = generate_moebius(max);
+  auto primes = generate_primes<uint32_t>(max);
+  auto lpf = generate_lpf(max, primes);
+  auto mu = generate_moebius(max, primes);
 
   FactorTable<uint16_t> factorTable(max, threads);
   int64_t uint16_max = pstd::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
-  std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
   for (int64_t n = 1; n <= max; n++)
   {
@@ -57,11 +57,11 @@ int main()
     bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
-    for (int p : small_primes)
+    for (int64_t j = 1; primes[j] <= 19; j++)
     {
-      if (p >= limit)
+      if (primes[j] >= limit)
         break;
-      if (n % p == 0)
+      if (n % primes[j] == 0)
         goto not_coprime;
     }
 

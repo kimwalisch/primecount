@@ -33,8 +33,8 @@ int main()
   std::uniform_int_distribution<int64_t> dist(200000, 300000);
 
   auto max = dist(gen);
-  auto lpf = generate_lpf(max);
   auto primes = generate_primes<uint32_t>(max);
+  auto lpf = generate_lpf(max, primes);
 
   for (int64_t i = 2; i <= max; i++)
   {
