@@ -16,6 +16,7 @@
 #include <primesieve.hpp>
 #include <Vector.hpp>
 
+#include <algorithm>
 #include <stdint.h>
 
 namespace primecount {
