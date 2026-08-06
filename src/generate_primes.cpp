@@ -77,7 +77,7 @@ Vector<uint32_t> generate_n_primes_u32(int64_t n)
 Vector<int8_t> generate_moebius(int64_t max,
                                 const Vector<uint32_t>& primes)
 {
-  ASSERT(pi_noprint(max, 1) == int64_t(primes.size() - 1));
+  ASSERT(int64_t(primes.size()) - 1 == pi_noprint(max, 1));
 
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
@@ -109,7 +109,7 @@ Vector<uint32_t> generate_mpf(int64_t max,
   if_unlikely(max > pstd::numeric_limits<uint32_t>::max())
     throw primecount_error("generate_mpf(max): max must be < 2^32");
 
-  ASSERT(pi_noprint(max, 1) == int64_t(primes.size() - 1));
+  ASSERT(int64_t(primes.size()) - 1 == pi_noprint(max, 1));
 
   int64_t size = max + 1;
   Vector<uint32_t> mpf(size);
@@ -132,8 +132,7 @@ Vector<uint32_t> generate_lpf(int64_t max,
   if_unlikely(max > pstd::numeric_limits<uint32_t>::max())
     throw primecount_error("generate_lpf(max): max must be < 2^32");
 
-  ASSERT((max <= 1 && primes.size() <= 1) ||
-         isqrt(max) < primes.back());
+  ASSERT(int64_t(primes.size()) - 1 == pi_noprint(max, 1));
 
   int64_t sqrt = isqrt(max);
   int64_t size = max + 1;
