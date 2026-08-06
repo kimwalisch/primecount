@@ -60,13 +60,9 @@ int main()
     bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
-    for (int64_t j = 1; primes[j] <= 19; j++)
-    {
-      if (primes[j] >= limit)
-        break;
+    for (int64_t j = 1; primes[j] < limit; j++)
       if (n % primes[j] == 0)
         goto not_coprime;
-    }
 
     // primes > y and square free numbers with a prime factor > y
     // have been removed from the FactorTableD.
