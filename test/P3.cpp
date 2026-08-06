@@ -4,7 +4,7 @@
 ///         that counts the numbers <= x that have exactly
 ///         3 prime factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
