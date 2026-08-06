@@ -4,7 +4,7 @@
 ///         S1(x, y) used in the Lagarias-Miller-Odlyzko
 ///         and Deleglise-Rivat prime counting algorithms.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -35,19 +35,19 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(0, 10000000);
+  std::uniform_int_distribution<int64_t> dist(0, 10000000);
   int threads = 1;
 
-  for (int i = 0; i < 1000; i++)
+  for (int64_t i = 0; i < 1000; i++)
   {
     int64_t x = dist(gen);
     int64_t y = iroot<3>(x);
     int64_t c = PhiTiny::get_c(y);
     int64_t s1 = 0;
 
-    auto primes = generate_n_primes<int32_t>(c);
-    auto lpf = generate_lpf(y);
-    auto mu = generate_moebius(y);
+    auto primes = generate_primes<uint32_t>(y);
+    auto lpf = generate_lpf(y, primes);
+    auto mu = generate_moebius(y, primes);
 
     // ordinary leaves
     for (int64_t n = 1; n <= y; n++)

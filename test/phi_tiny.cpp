@@ -4,7 +4,7 @@
 ///         which counts the numbers <= x that are not divisible
 ///         by any of the first a primes with a <= 8.
 ///
-/// Copyright (C) 2021 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,9 +30,9 @@ void check(bool OK)
 }
 
 // Count the number of unsieved elements
-int count(std::vector<char>& sieve)
+uint64_t count(std::vector<char>& sieve)
 {
-  int cnt = 0;
+  uint64_t cnt = 0;
 
   for (size_t i = 1; i < sieve.size(); i++)
     cnt += sieve[i];
@@ -44,19 +44,19 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(10000000, 20000000);
+  std::uniform_int_distribution<uint64_t> dist(10000000, 20000000);
 
-  int64_t max_a = PhiTiny::max_a();
-  int64_t size = dist(gen);
-  int64_t x = size - 1;
+  uint64_t max_a = PhiTiny::max_a();
+  uint64_t size = dist(gen);
+  uint64_t x = size - 1;
 
-  auto primes = generate_n_primes<int32_t>(max_a);
+  auto primes = generate_n_primes<uint32_t>(max_a);
   std::vector<char> sieve(size, 1);
 
-  for (int a = 1; a <= max_a; a++)
+  for (uint64_t a = 1; a <= max_a; a++)
   {
     // remove primes[a] and its multiples
-    for (int j = primes[a]; j <= x; j += primes[a])
+    for (uint64_t j = primes[a]; j <= x; j += primes[a])
       sieve[j] = 0;
 
     std::cout << "phi_tiny(" << x << ", " << a << ") = " << phi_tiny(x, a);

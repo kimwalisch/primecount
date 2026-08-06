@@ -3,7 +3,7 @@
 /// @brief  Test the generate_moebius(n) function
 /// @link   https://en.wikipedia.org/wiki/Moebius_function
 ///
-/// Copyright (C) 2019 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -16,7 +16,6 @@
 #include <cstdlib>
 #include <vector>
 
-using std::size_t;
 using namespace primecount;
 
 /// Values of mu(n) for the first 1000 integers
@@ -84,11 +83,13 @@ void check(bool OK)
 
 int main()
 {
-  auto mu = generate_moebius(moebius.size() - 1);
+  int64_t max = moebius.size() - 1;
+  auto primes = generate_primes<uint32_t>(max);
+  auto mu = generate_moebius(max, primes);
 
-  for (size_t i = 1; i < mu.size(); i++)
+  for (std::size_t i = 1; i < mu.size(); i++)
   {
-    std::cout << "mu(" << i << ") = " << mu[i];
+    std::cout << "mu(" << i << ") = " << (int) mu[i];
     check(mu[i] == moebius[i]);
   }
 

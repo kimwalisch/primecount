@@ -35,18 +35,18 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(1000000, 2000000);
+  std::uniform_int_distribution<uint64_t> dist(1000000, 2000000);
 
-  int low = 0;
-  int high = dist(gen);
-  int sqrt_high = isqrt(high);
-  auto primes = generate_primes<int32_t>(sqrt_high);
+  uint64_t low = 0;
+  uint64_t high = dist(gen);
+  uint64_t sqrt_high = isqrt(high);
+  auto primes = generate_primes<uint32_t>(sqrt_high);
 
   uint64_t segment_size = high - low;
   segment_size = Sieve::align_segment_size(segment_size);
   Sieve sieve(low, segment_size, primes.size());
-  std::vector<int> sieve2(high, 1);
-  sieve2[0] = 0;
+  std::vector<bool> sieve2(high, true);
+  sieve2[0] = false;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
@@ -68,13 +68,13 @@ int main()
       total1 = sieve.count(high - 1);
     }
 
-    for (int j = primes[i]; j < high; j += primes[i])
+    for (uint64_t j = primes[i]; j < high; j += primes[i])
     {
       cnt2 += sieve2[j];
-      sieve2[j] = 0;
+      sieve2[j] = false;
     }
 
-    for (int j = 0; j < high; j++)
+    for (uint64_t j = 0; j < high; j++)
       total2 += sieve2[j];
 
     if (primes[i] > 5)

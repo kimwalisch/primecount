@@ -4,7 +4,7 @@
 ///         the number of unsieved elements in the sieve
 ///         array using only O(log n) operations.
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -34,33 +34,33 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(1000000, 2000000);
+  std::uniform_int_distribution<int64_t> dist(1000000, 2000000);
 
-  int pre_sieve = 13;
-  int low = 1;
-  int size = dist(gen);
+  int64_t pre_sieve = 13;
+  int64_t low = 1;
+  int64_t size = dist(gen);
   size = next_power_of_2(size);
 
-  auto primes = generate_primes<int32_t>(isqrt(size));
-  std::vector<int> sieve(size, 1);
+  auto primes = generate_primes<uint32_t>(isqrt(size));
+  std::vector<bool> sieve(size, true);
   BinaryIndexedTree tree;
 
   for (size_t i = 1; i < primes.size(); i++)
   {
-    for (int j = primes[i] - low; j < size; j += primes[i])
+    for (int64_t j = primes[i] - low; j < size; j += primes[i])
     {
       if (sieve[j] && primes[i] > pre_sieve)
         tree.update(j);
-      sieve[j] = 0;
+      sieve[j] = false;
     }
 
     if (primes[i] <= pre_sieve)
       tree.init(sieve);
 
-    int rand = dist(gen) % size;
-    int count = 0;
+    int64_t rand = dist(gen) % size;
+    int64_t count = 0;
 
-    for (int j = 0; j <= rand; j++)
+    for (int64_t j = 0; j <= rand; j++)
       count += sieve[j];
 
     std::cout << "tree.count(" << rand << ") = " << tree.count(0, rand);

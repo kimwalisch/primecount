@@ -1,22 +1,17 @@
-Changes in primecount-8.7, 2026-08-05
+Changes in primecount-8.7, 2026-08-06
 
 * CmdOptions.cpp: Detect too many input numbers.
 * P2.cpp: Fix potential 64-bit integer overflow.
 * phi.cpp: Fix phi(x, a) for x >= 4611686065672028281 which requires primes > INT32_MAX.
-* generate_primes.hpp: Add generate_n_primes<uint32_t>() used by the phi.cpp fix.
+* lmo/*.cpp: Fix int32_t primes overflow.
 * api.cpp: Fix nth_prime() error message.
 * api.cpp: Fix 128-bit nth_prime() for negative inputs.
 * main.cpp: Validate 128-bit to 64-bit integer conversions.
-* app: Disable 128-bit CLI options in 64-bit mode.
 * LoadBalancerS2.cpp: Fix Clang scaling issue.
 * AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
 * AC.cpp: Implement segmented C1 algorithm to improve cache efficiency.
-* SegmentedPiTable.hpp: Switch return types to uint64_t for new AC.cpp code.
 * util.cpp: Retune Gourdon alpha factors due to improved C algorithm.
 * test.cpp: Improve test coverage using alternate alpha_z values.
-* find_optimal_alpha_gourdon.sh: Always benchmark Gourdon's algorithm.
-* find_fastest_alpha_y_gourdon.sh: Always benchmark Gourdon's algorithm.
-* find_fastest_alpha_z_gourdon.sh: Always benchmark Gourdon's algorithm.
 * doc/Easy-Special-Leaves.pdf: Add description of new C algorithm.
 * doc/alpha-factor-gourdon.pdf: Retune Gourdon alpha factors.
 

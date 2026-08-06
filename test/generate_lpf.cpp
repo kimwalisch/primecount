@@ -2,7 +2,7 @@
 /// @file   generate_lpf.cpp
 /// @brief  Test least prime factor function
 ///
-/// Copyright (C) 2017 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,19 +30,19 @@ int main()
 {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(200000, 300000);
+  std::uniform_int_distribution<int64_t> dist(200000, 300000);
 
   auto max = dist(gen);
-  auto lpf = generate_lpf(max);
-  auto primes = generate_primes<int32_t>(max);
+  auto primes = generate_primes<uint32_t>(max);
+  auto lpf = generate_lpf(max, primes);
 
-  for (int i = 2; i <= max; i++)
+  for (int64_t i = 2; i <= max; i++)
   {
-    int factor = i;
-    int sqrt = isqrt(i);
+    int64_t factor = i;
+    int64_t sqrt = isqrt(i);
 
     // find smallest prime factor
-    for (int j = 1; primes[j] <= sqrt; j++)
+    for (int64_t j = 1; primes[j] <= sqrt; j++)
     {
       if (i % primes[j] == 0)
       {

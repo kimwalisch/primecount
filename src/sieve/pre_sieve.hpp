@@ -270,7 +270,7 @@ int main()
     long bytes = prime_product * factor;
 
     using namespace primecount;
-    auto primes = generate_primes<int>(vect.back().back());
+    auto primes = generate_primes<uint32_t>(vect.back().back());
     Sieve sieve(prime_product * 30, prime_product * 30 * factor, primes.size());
     std::fill(sieve.sieve_.begin(), sieve.sieve_.end(), ~0ull);
     uint8_t* sieve_array = (uint8_t*) sieve.sieve_.data();

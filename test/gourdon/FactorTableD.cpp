@@ -3,7 +3,7 @@
 /// @brief  FactorTableD is a compressed lookup table of mu (moebius),
 ///         lpf (least prime factor) and mpf (max prime factor).
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -39,34 +39,30 @@ int main()
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist_y(50000, 60000);
-  std::uniform_int_distribution<int> dist_z(1200000, 1500000);
+  std::uniform_int_distribution<int64_t> dist_y(50000, 60000);
+  std::uniform_int_distribution<int64_t> dist_z(1200000, 1500000);
 
   auto y = dist_y(gen);
   auto z = dist_z(gen);
   auto threads = get_num_threads();
-  auto lpf = generate_lpf(z);
-  auto mpf = generate_mpf(z);
-  auto mu = generate_moebius(z);
+  auto primes = generate_primes<uint32_t>(z);
+  auto lpf = generate_lpf(z, primes);
+  auto mpf = generate_mpf(z, primes);
+  auto mu = generate_moebius(z, primes);
 
   FactorTableD<uint16_t> factorTable(y, z, threads);
   int64_t uint16_max = pstd::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
-  std::vector<int> small_primes = { 2, 3, 5, 7, 11, 13, 17, 19 };
 
-  for (int n = 1; n <= z; n++)
+  for (int64_t n = 1; n <= z; n++)
   {
     int64_t i = factorTable.to_index(n);
     bool is_prime = (lpf[n] == n);
 
     // Check if n is coprime to the primes < limit
-    for (int p : small_primes)
-    {
-      if (p >= limit)
-        break;
-      if (n % p == 0)
+    for (int64_t j = 1; primes[j] < limit; j++)
+      if (n % primes[j] == 0)
         goto not_coprime;
-    }
 
     // primes > y and square free numbers with a prime factor > y
     // have been removed from the FactorTableD.
