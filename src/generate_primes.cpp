@@ -161,9 +161,8 @@ Vector<uint32_t> generate_lpf(int64_t max,
         lpf[j] = prime;
   }
 
-  for (int64_t i = 2; i < size; i++)
-    if (lpf[i] == 1)
-      lpf[i] = uint32_t(i);
+  for (std::size_t i = 1; i < primes.size(); i++)
+    lpf[primes[i]] = primes[i];
 
   return lpf;
 }
