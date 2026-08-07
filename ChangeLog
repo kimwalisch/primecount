@@ -1,5 +1,6 @@
-Changes in primecount-8.7, 2026-08-06
+Changes in primecount-8.7, 2026-08-07
 
+* Fix get_max_x() for x > 10^31.
 * CmdOptions.cpp: Detect too many input numbers.
 * P2.cpp: Fix potential 64-bit integer overflow.
 * phi.cpp: Fix phi(x, a) for x >= 4611686065672028281 which requires primes > INT32_MAX.

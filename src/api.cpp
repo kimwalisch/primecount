@@ -18,7 +18,7 @@
 #include <PiTable.hpp>
 #include <print.hpp>
 
-#include <cmath>
+#include <algorithm>
 #include <string>
 #include <stdint.h>
 
@@ -30,11 +30,6 @@ namespace {
 
 #if defined(_OPENMP)
   int threads_ = 0;
-#endif
-
-#if !defined(HAVE_INT128_T)
-  template<class T>
-  void unused_param(const T&) { }
 #endif
 
 } // namespace
@@ -256,23 +251,6 @@ int64_t phi(int64_t x, int64_t a)
 std::string primecount_version()
 {
   return PRIMECOUNT_VERSION;
-}
-
-/// Returns the largest x supported by pi(x).
-/// The S2_hard, P2, B and D functions are limited by:
-/// x / y <= 2^62, with y = x^(1/3) * alpha_y
-/// Hence x^(2/3) / alpha_y <= 2^62
-/// x <= (2^62 * alpha_y)^(3/2)
-///
-maxint_t get_max_x(double alpha_y)
-{
-#ifdef HAVE_INT128_T
-  double max_x = std::pow((1ull << 62) * alpha_y, 3.0 / 2.0);
-  return (int128_t) max_x;
-#else
-  unused_param(alpha_y);
-  return pstd::numeric_limits<int64_t>::max();
-#endif
 }
 
 int get_num_threads()

@@ -110,12 +110,14 @@ int128_t pi_deleglise_rivat_128(int128_t x,
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
-
-  if_unlikely(x > limit)
-    throw primecount_error("pi(x): x must be <= " + to_string(limit));
-
   int64_t y = (int64_t) (iroot<3>(x) * alpha);
+
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if_unlikely(x > (int128_t(y) << 62))
+    throw primecount_error("pi_deleglise_rivat_128(x): x is too large");
+
   int64_t z = (int64_t) (x / y);
   int64_t pi_y = pi_noprint(y, threads);
   int64_t c = PhiTiny::get_c(y);

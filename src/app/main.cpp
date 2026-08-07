@@ -133,10 +133,6 @@ maxint_t AC(maxint_t x, int threads)
   auto alpha = get_alpha_gourdon(x);
   double alpha_y = alpha.first;
   double alpha_z = alpha.second;
-  maxint_t limit = get_max_x(alpha_y);
-
-  if (x > limit)
-    throw primecount_error("AC(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -146,6 +142,14 @@ maxint_t AC(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("AC(x): x is too large");
+#endif
 
   int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
@@ -171,10 +175,6 @@ maxint_t B(maxint_t x, int threads)
 
   auto alpha = get_alpha_gourdon(x);
   double alpha_y = alpha.first;
-  maxint_t limit = get_max_x(alpha_y);
-
-  if (x > limit)
-    throw primecount_error("B(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -184,6 +184,14 @@ maxint_t B(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("B(x): x is too large");
+#endif
 
   if (is_print())
     set_print_variables(true);
@@ -202,10 +210,6 @@ maxint_t D(maxint_t x, int threads)
   auto alpha = get_alpha_gourdon(x);
   double alpha_y = alpha.first;
   double alpha_z = alpha.second;
-  maxint_t limit = get_max_x(alpha_y);
-
-  if (x > limit)
-    throw primecount_error("D(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -215,6 +219,14 @@ maxint_t D(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("D(x): x is too large");
+#endif
 
   int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
@@ -241,10 +253,6 @@ maxint_t Phi0(maxint_t x, int threads)
   auto alpha = get_alpha_gourdon(x);
   double alpha_y = alpha.first;
   double alpha_z = alpha.second;
-  maxint_t limit = get_max_x(alpha_y);
-
-  if (x > limit)
-    throw primecount_error("Phi0(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -254,6 +262,14 @@ maxint_t Phi0(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("Phi0(x): x is too large");
+#endif
 
   int64_t k = PhiTiny::get_k(x);
   int64_t z = (int64_t)(y * alpha_z);
@@ -279,10 +295,6 @@ maxint_t Sigma(maxint_t x, int threads)
 
   auto alpha = get_alpha_gourdon(x);
   double alpha_y = alpha.first;
-  maxint_t limit = get_max_x(alpha_y);
-
-  if (x > limit)
-    throw primecount_error("Sigma(x): x must be <= " + to_string(limit));
 
   int64_t x13 = iroot<3>(x);
   int64_t sqrtx = isqrt(x);
@@ -292,6 +304,14 @@ maxint_t Sigma(maxint_t x, int threads)
   y = std::max(y, x13 + 1);
   y = std::min(y, sqrtx - 1);
   y = std::max(y, (int64_t) 1);
+
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("Sigma(x): x is too large");
+#endif
 
   if (is_print())
     set_print_variables(true);
@@ -308,15 +328,19 @@ maxint_t P2(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x > limit)
-    throw primecount_error("P2(x): x must be <= " + to_string(limit));
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("P2(x): x is too large");
+#endif
 
   if (is_print())
     set_print_variables(true);
 
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t a = pi_noprint(y, threads);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
@@ -331,15 +355,19 @@ maxint_t S1(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x > limit)
-    throw primecount_error("S1(x): x must be <= " + to_string(limit));
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("S1(x): x is too large");
+#endif
 
   if (is_print())
     set_print_variables(true);
 
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
   int64_t c = PhiTiny::get_c(y);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
@@ -354,17 +382,21 @@ maxint_t S2_trivial(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x > limit)
-    throw primecount_error("S2_trivial(x): x must be <= " + to_string(limit));
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("S2_trivial(x): x is too large");
+#endif
+
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_trivial((int64_t) x, y, z, c, threads);
@@ -378,17 +410,21 @@ maxint_t S2_easy(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x > limit)
-    throw primecount_error("S2_easy(x): x must be <= " + to_string(limit));
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("S2_easy(x): x is too large");
+#endif
+
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_easy((int64_t) x, y, z, c, threads);
@@ -402,17 +438,21 @@ maxint_t S2_hard(maxint_t x, int threads)
     return 0;
 
   double alpha = get_alpha_deleglise_rivat(x);
-  maxint_t limit = get_max_x(alpha);
+  int64_t y = (int64_t) (iroot<3>(x) * alpha);
 
-  if (x > limit)
-    throw primecount_error("S2_hard(x): x must be <= " + to_string(limit));
+#ifdef HAVE_INT128_T
+  // x / y is stored in int64_t variables, hence x / y must be
+  // <= 2^63-1. We use 2^62 as a safety buffer to protect
+  // against overflows in calculations derived from x / y.
+  if (x > (int128_t(y) << 62))
+    throw primecount_error("S2_hard(x): x is too large");
+#endif
+
+  int64_t z = (int64_t) (x / y);
+  int64_t c = PhiTiny::get_c(y);
 
   if (is_print())
     set_print_variables(true);
-
-  int64_t y = (int64_t) (iroot<3>(x) * alpha);
-  int64_t z = (int64_t) (x / y);
-  int64_t c = PhiTiny::get_c(y);
 
   if (x <= pstd::numeric_limits<int64_t>::max())
     return S2_hard((int64_t) x, y, z, c, threads);
