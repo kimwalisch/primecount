@@ -17,6 +17,23 @@ if(TARGET OpenMP::OpenMP_CXX)
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
 
+    set(OpenMP_TEST_SOURCE "
+        #include <int128_t.hpp>
+        #include <omp.h>
+        #include <stdint.h>
+        #include <iostream>
+        int main(int, char** argv) {
+            using primecount::maxint_t;
+            uintptr_t n = (uintptr_t) argv;
+            maxint_t sum = (maxint_t) n;
+            int iters = (int) n;
+            #pragma omp parallel for reduction(+: sum)
+            for (int i = 0; i < iters; i++)
+                sum += (i / 3) * omp_get_thread_num();
+            std::cout << (long) sum;
+            return 0;
+        }")
+
     # Our <int128_t.hpp> requires C++11 or later
     if(NOT compiler_supports_cpp11)
         if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
@@ -33,81 +50,57 @@ if(TARGET OpenMP::OpenMP_CXX)
     set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include")
 
     # Check if OpenMP supports 128-bit integers
-    check_cxx_source_compiles("
-        #include <int128_t.hpp>
-        #include <omp.h>
-        #include <stdint.h>
-        #include <iostream>
-        int main(int, char** argv) {
-            using primecount::maxint_t;
-            uintptr_t n = (uintptr_t) argv;
-            maxint_t sum = (maxint_t) n;
-            int iters = (int) n;
-            #pragma omp parallel for reduction(+: sum)
-            for (int i = 0; i < iters; i++)
-                sum += (i / 3) * omp_get_thread_num();
-            std::cout << (long) sum;
-            return 0;
-        }" OpenMP)
+    check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP)
 
     if(NOT OpenMP)
         # Try if OpenMP works if we link against libatomic.
         # This is sometimes required for LLVM/Clang.
-        find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
+        # First try -latomic as the compiler may find libraries
+        # in directories which CMake does not search.
+        set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "-latomic")
+        check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_latomic)
 
-        if(NOT LIB_ATOMIC)
-            # Some package managers like homebrew and macports store the compiler's
-            # libraries in a subdirectory of the library directory. E.g. GCC
-            # installed via homebrew stores libatomic at lib/gcc/13/libatomic.dylib
-            # instead of lib/libatomic.dylib. CMake's find_library() cannot easily
-            # be used to recursively find libraries. Therefore we use this workaround
-            # here (try adding -latomic to linker options) for this use case.
+        if(OpenMP_with_latomic)
             set(LIB_ATOMIC "-latomic")
+        else()
+            find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
+
+            if(LIB_ATOMIC)
+                set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "${LIB_ATOMIC}")
+                check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_libatomic_path)
+            endif()
         endif()
 
-        set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES}" "${LIB_ATOMIC}")
-
-        # Check if OpenMP compiles with libatomic
-        check_cxx_source_compiles("
-            #include <int128_t.hpp>
-            #include <omp.h>
-            #include <stdint.h>
-            #include <iostream>
-            int main(int, char** argv) {
-                using primecount::maxint_t;
-                uintptr_t n = (uintptr_t) argv;
-                maxint_t sum = (maxint_t) n;
-                int iters = (int) n;
-                #pragma omp parallel for reduction(+: sum)
-                for (int i = 0; i < iters; i++)
-                    sum += (i / 3) * omp_get_thread_num();
-                std::cout << (long) sum;
-                return 0;
-            }" OpenMP_with_libatomic)
-
-        if(OpenMP_with_libatomic)
+        if(OpenMP_with_latomic OR
+           OpenMP_with_libatomic_path)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
-        else()
-            set(LIB_ATOMIC "")
         endif()
     endif()
 
     cmake_pop_check_state()
 
     # OpenMP has been tested successfully, enable it
-    if(OpenMP OR OpenMP_with_libatomic)
+    if(OpenMP OR
+       OpenMP_with_latomic OR
+       OpenMP_with_libatomic_path)
         list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
 
-        # Create list of OpenMP libs for pkg-config/pkgconf
+        # Create list of private libs for pkg-config/pkgconf
         foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
-            string(APPEND PKGCONFIG_LIBS_OPENMP "-l${X} ")
+            string(APPEND PKGCONFIG_LIBS_PRIVATE "-l${X} ")
         endforeach()
+
+        if(OpenMP_with_latomic)
+            string(APPEND PKGCONFIG_LIBS_PRIVATE "-latomic ")
+        endif()
     endif()
 endif()
 
 # If we are using LLVM OpenMP we check if the compiler
 # supports setenv() to tune the LLVM OpenMP options.
-if(OpenMP OR OpenMP_with_libatomic)
+if(OpenMP OR
+   OpenMP_with_latomic OR
+   OpenMP_with_libatomic_path)
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
     check_cxx_source_compiles("
@@ -124,7 +117,9 @@ if(OpenMP OR OpenMP_with_libatomic)
 endif()
 
 # OpenMP is not supported, print warning message
-if(NOT OpenMP AND NOT OpenMP_with_libatomic)
+if(NOT OpenMP AND
+   NOT OpenMP_with_latomic AND
+   NOT OpenMP_with_libatomic_path)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
         message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
