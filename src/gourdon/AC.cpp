@@ -80,7 +80,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -103,7 +103,7 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -170,7 +170,7 @@ T C1(T xlow,
              (segmentedPi[xpm3] - b + 2);
     }
 
-    NOUNROLL_LOOP
+    NO_UNROLL_LOOP
     for (; i <= max_i; i++)
     {
       uint64_t xpm = fast_div64(xp, primes[i]);
@@ -215,7 +215,7 @@ T C1(T xlow,
                (segmentedPi[xpm3] - b + 2);
       }
 
-      NOUNROLL_LOOP
+      NO_UNROLL_LOOP
       for (; j <= max_j; j++)
       {
         uint64_t xpm = fast_div64(xpq, primes[j]);
@@ -292,7 +292,7 @@ T C2(T xlow,
   }
 
   // Sparse leaves below the reflected range
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -314,7 +314,7 @@ T C2(T xlow,
            (segmentedPi[xpq3] * 2 - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -336,7 +336,7 @@ T C2(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -540,7 +540,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -563,7 +563,7 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -600,7 +600,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i1; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -623,7 +623,7 @@ T A_128(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= max_i2; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -692,7 +692,7 @@ T C1_64(T xlow,
              (segmentedPi[xpm3] - b + 2);
     }
 
-    NOUNROLL_LOOP
+    NO_UNROLL_LOOP
     for (; i <= max_i; i++)
     {
       uint64_t xpm = xp / lprimes[i];
@@ -722,7 +722,7 @@ T C1_64(T xlow,
       uint64_t max_j = pi[max_r];
       uint64_t xpq = xp / lprimes[i];
 
-      NOUNROLL_LOOP
+      NO_UNROLL_LOOP
       for (uint64_t j = min_j; j <= max_j; j++)
       {
         uint64_t xpm = xpq / lprimes[j];
@@ -791,7 +791,7 @@ T C1_128(T xlow,
              (segmentedPi[xpm3] - b + 2);
     }
 
-    NOUNROLL_LOOP
+    NO_UNROLL_LOOP
     for (; i <= max_i; i++)
     {
       uint64_t xpm = fast_div64(xp, primes[i]);
@@ -836,7 +836,7 @@ T C1_128(T xlow,
                (segmentedPi[xpm3] - b + 2);
       }
 
-      NOUNROLL_LOOP
+      NO_UNROLL_LOOP
       for (; j <= max_j; j++)
       {
         uint64_t xpm = fast_div64(xpq, primes[j]);
@@ -912,7 +912,7 @@ T C2_64(T xlow,
   }
 
   // Sparse leaves below the reflected range
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -934,7 +934,7 @@ T C2_64(T xlow,
            (segmentedPi[xpq3] * 2 - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -956,7 +956,7 @@ T C2_64(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = xp / primes[i];
@@ -1030,7 +1030,7 @@ T C2_128(T xlow,
   }
 
   // Sparse leaves below the reflected range
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -1052,7 +1052,7 @@ T C2_128(T xlow,
            (segmentedPi[xpq3] * 2 - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
@@ -1074,7 +1074,7 @@ T C2_128(T xlow,
            (segmentedPi[xpq3] - b + 2);
   }
 
-  NOUNROLL_LOOP
+  NO_UNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
     uint64_t xpq = fast_div64(xp, primes[i]);
