@@ -197,9 +197,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(WNO_UNINITIALIZED "-Wno-uninitialized")
 endif()
 
-# Check if compiler supports C++14 or later ##########################
+# Check if compiler supports C++11 or later ##########################
 
-include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp14.cmake")
+include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp11.cmake")
 
 # Check if int128_t is supported #####################################
 
