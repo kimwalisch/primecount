@@ -147,7 +147,7 @@ T D_thread_default(T x,
         // that contains an int128_t type (GCC <= 16). As
         // workaround we create the batch_div32 lambda without
         // 128-bit code that GCC is able to vectorize.
-        auto batch_div32 = [&](auto xp)
+        auto batch_div32 = [&](auto xp, std::size_t m_count)
         {
           for (std::size_t i = 0; i < m_count; i++)
           {
@@ -173,9 +173,9 @@ T D_thread_default(T x,
           {
             // Batch calculate xp/m to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div32(uint64_t(xp));
+              batch_div32(uint64_t(xp), m_count);
             else
-              batch_div32(xp);
+              batch_div32(xp, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -201,9 +201,9 @@ T D_thread_default(T x,
 
         // Batch calculate xp/m to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div32(uint64_t(xp));
+          batch_div32(uint64_t(xp), m_count);
         else
-          batch_div32(xp);
+          batch_div32(xp, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
@@ -222,7 +222,7 @@ T D_thread_default(T x,
         // that contains an int128_t type (GCC <= 16). As
         // workaround we create the batch_div64 lambda without
         // 128-bit code that GCC is able to vectorize.
-        auto batch_div64 = [&](auto xp)
+        auto batch_div64 = [&](auto xp, std::size_t m_count)
         {
           for (std::size_t i = 0; i < m_count; i++)
           {
@@ -248,9 +248,9 @@ T D_thread_default(T x,
           {
             // Batch calculate xp/m to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div64(uint64_t(xp));
+              batch_div64(uint64_t(xp), m_count);
             else
-              batch_div64(xp);
+              batch_div64(xp, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -276,9 +276,9 @@ T D_thread_default(T x,
 
         // Batch calculate xp/m to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div64(uint64_t(xp));
+          batch_div64(uint64_t(xp), m_count);
         else
-          batch_div64(xp);
+          batch_div64(xp, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
