@@ -321,20 +321,24 @@ using namespace primecount;
 template <typename T, typename... Args>
 T D_thread(Args&&... args)
 {
+  // Unsigned integer division is usually
+  // faster than signed integer division.
+  using UT = typename pstd::make_unsigned<T>::type;
+
   #if defined(ENABLE_AVX512_VPOPCNT)
-    return D_thread_avx512(std::forward<Args>(args)...);
+    return D_thread_avx512<UT>(std::forward<Args>(args)...);
   #elif defined(ENABLE_ARM_SVE)
-    return D_thread_arm_sve(std::forward<Args>(args)...);
+    return D_thread_arm_sve<UT>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     return cpu_supports_avx512_vpopcnt
-      ? D_thread_avx512(std::forward<Args>(args)...)
-      : D_thread_default(std::forward<Args>(args)...);
+      ? D_thread_avx512<UT>(std::forward<Args>(args)...)
+      : D_thread_default<UT>(std::forward<Args>(args)...);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     return cpu_supports_sve
-      ? D_thread_arm_sve(std::forward<Args>(args)...)
-      : D_thread_default(std::forward<Args>(args)...);
+      ? D_thread_arm_sve<UT>(std::forward<Args>(args)...)
+      : D_thread_default<UT>(std::forward<Args>(args)...);
   #else
-    return D_thread_default(std::forward<Args>(args)...);
+    return D_thread_default<UT>(std::forward<Args>(args)...);
   #endif
 }
 
