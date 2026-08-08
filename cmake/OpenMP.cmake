@@ -58,9 +58,9 @@ if(TARGET OpenMP::OpenMP_CXX)
         # First try -latomic as the compiler may find libraries
         # in directories which CMake does not search.
         set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "-latomic")
-        check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_libatomic)
+        check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_latomic)
 
-        if(OpenMP_with_libatomic)
+        if(OpenMP_with_latomic)
             set(LIB_ATOMIC "-latomic")
         else()
             find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
@@ -71,7 +71,7 @@ if(TARGET OpenMP::OpenMP_CXX)
             endif()
         endif()
 
-        if(OpenMP_with_libatomic OR
+        if(OpenMP_with_latomic OR
            OpenMP_with_libatomic_path)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
         endif()
@@ -81,7 +81,7 @@ if(TARGET OpenMP::OpenMP_CXX)
 
     # OpenMP has been tested successfully, enable it
     if(OpenMP OR
-       OpenMP_with_libatomic OR
+       OpenMP_with_latomic OR
        OpenMP_with_libatomic_path)
         list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
 
@@ -90,7 +90,7 @@ if(TARGET OpenMP::OpenMP_CXX)
             string(APPEND PKGCONFIG_LIBS_PRIVATE "-l${X} ")
         endforeach()
 
-        if(OpenMP_with_libatomic)
+        if(OpenMP_with_latomic)
             string(APPEND PKGCONFIG_LIBS_PRIVATE "-latomic ")
         endif()
     endif()
@@ -99,7 +99,7 @@ endif()
 # If we are using LLVM OpenMP we check if the compiler
 # supports setenv() to tune the LLVM OpenMP options.
 if(OpenMP OR
-   OpenMP_with_libatomic OR
+   OpenMP_with_latomic OR
    OpenMP_with_libatomic_path)
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
@@ -118,7 +118,7 @@ endif()
 
 # OpenMP is not supported, print warning message
 if(NOT OpenMP AND
-   NOT OpenMP_with_libatomic AND
+   NOT OpenMP_with_latomic AND
    NOT OpenMP_with_libatomic_path)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
         message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
