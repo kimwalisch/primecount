@@ -149,6 +149,19 @@ T D_thread_arm_sve(T x,
         svbool_t all32 = svptrue_b32();
         svuint32_t m_offsets32 = svindex_u32(0, 1);
 
+        // GCC's auto-vectorizer refuses to vectorize any loop
+        // that contains an int128_t type (GCC <= 16). As a
+        // workaround we create the batch_div32 lambda without
+        // 128-bit code that GCC is able to vectorize.
+        auto batch_div32 = [&](auto xp, std::size_t m_count)
+        {
+          for (std::size_t i = 0; i < m_count; i++)
+          {
+            int64_t m = factor.to_number(m_indexes32[i]);
+            xpm_cache[i] = int64_t(xp / m);
+          }
+        };
+
         for (; m >= min_m + lanes32; m -= lanes32)
         {
           // Filter out square free m values using ARM SVE
@@ -164,11 +177,10 @@ T D_thread_arm_sve(T x,
           if (m_count > max_m_count)
           {
             // Batch calculate xp/m to improve CPU pipelining
-            for (std::size_t i = 0; i < m_count; i++)
-            {
-              int64_t m = factor.to_number(m_indexes32[i]);
-              xpm_cache[i] = fast_div64(xp, m);
-            }
+            if (xp <= UINT64_MAX)
+              batch_div32(uint64_t(xp), m_count);
+            else
+              batch_div32(xp, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -203,11 +215,10 @@ T D_thread_arm_sve(T x,
         }
 
         // Batch calculate xp/m to improve CPU pipelining
-        for (std::size_t i = 0; i < m_count; i++)
-        {
-          int64_t m = factor.to_number(m_indexes32[i]);
-          xpm_cache[i] = fast_div64(xp, m);
-        }
+        if (xp <= UINT64_MAX)
+          batch_div32(uint64_t(xp), m_count);
+        else
+          batch_div32(xp, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
@@ -226,6 +237,19 @@ T D_thread_arm_sve(T x,
         svbool_t all64 = svptrue_b64();
         svuint64_t m_offsets64 = svindex_u64(0, 1);
 
+        // GCC's auto-vectorizer refuses to vectorize any loop
+        // that contains an int128_t type (GCC <= 16). As a
+        // workaround we create the batch_div64 lambda without
+        // 128-bit code that GCC is able to vectorize.
+        auto batch_div64 = [&](auto xp, std::size_t m_count)
+        {
+          for (std::size_t i = 0; i < m_count; i++)
+          {
+            int64_t m = factor.to_number(m_indexes64[i]);
+            xpm_cache[i] = int64_t(xp / m);
+          }
+        };
+
         for (; m >= min_m + lanes64; m -= lanes64)
         {
           // Filter out square free m values using ARM SVE
@@ -241,11 +265,10 @@ T D_thread_arm_sve(T x,
           if (m_count > max_m_count)
           {
             // Batch calculate xp/m to improve CPU pipelining
-            for (std::size_t i = 0; i < m_count; i++)
-            {
-              int64_t m = factor.to_number(m_indexes64[i]);
-              xpm_cache[i] = fast_div64(xp, m);
-            }
+            if (xp <= UINT64_MAX)
+              batch_div64(uint64_t(xp), m_count);
+            else
+              batch_div64(xp, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -280,11 +303,10 @@ T D_thread_arm_sve(T x,
         }
 
         // Batch calculate xp/m to improve CPU pipelining
-        for (std::size_t i = 0; i < m_count; i++)
-        {
-          int64_t m = factor.to_number(m_indexes64[i]);
-          xpm_cache[i] = fast_div64(xp, m);
-        }
+        if (xp <= UINT64_MAX)
+          batch_div64(uint64_t(xp), m_count);
+        else
+          batch_div64(xp, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)

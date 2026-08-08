@@ -261,9 +261,7 @@ if(BUILD_SHARED_LIBS)
 
     target_compile_features(libprimecount
     PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimecount
     PUBLIC
@@ -295,9 +293,7 @@ if(BUILD_STATIC_LIBS)
 
     target_compile_features(libprimecount-static
     PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimecount-static
     PUBLIC
