@@ -156,7 +156,7 @@
 /// that execute very few iterations on average.
 #if defined(__clang__)
   #define NO_VECTORIZE_LOOP _Pragma("clang loop vectorize(disable)")
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && __GNUC__ >= 14
   #define NO_VECTORIZE_LOOP _Pragma("GCC novector")
 #elif defined(_MSC_VER)
   #define NO_VECTORIZE_LOOP __pragma(loop(no_vector))
