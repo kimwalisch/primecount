@@ -1,5 +1,7 @@
-Changes in primecount-8.7, 2026-08-07
+Changes in primecount-8.7, 2026-08-08
 
+* primecount now requires a C++14 compiler (up from C++11).
+* D_arm_sve.hpp: Fix GCC ARM SVE failed auto-vectorization.
 * Fix get_max_x() for x > 10^31.
 * CmdOptions.cpp: Detect too many input numbers.
 * P2.cpp: Fix potential 64-bit integer overflow.

@@ -3,12 +3,12 @@ include(CMakePushCheckState)
 
 cmake_push_check_state()
 
-# Our <int128_t.hpp> requires C++11 or later
-if(NOT compiler_supports_cpp11)
-    if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
-    elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+# Our <int128_t.hpp> requires C++14 or later
+if(NOT compiler_supports_cpp14)
+    if(CMAKE_CXX14_EXTENSION_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX14_EXTENSION_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
+    elseif(CMAKE_CXX14_STANDARD_COMPILE_OPTION)
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX14_STANDARD_COMPILE_OPTION} ${CMAKE_CXX_FLAGS}")
     endif()
 endif()
 

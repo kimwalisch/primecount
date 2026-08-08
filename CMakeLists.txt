@@ -197,9 +197,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(WNO_UNINITIALIZED "-Wno-uninitialized")
 endif()
 
-# Check if compiler supports C++11 or later ##########################
+# Check if compiler supports C++14 or later ##########################
 
-include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp11.cmake")
+include("${PROJECT_SOURCE_DIR}/cmake/compiler_supports_cpp14.cmake")
 
 # Check if int128_t is supported #####################################
 
@@ -261,9 +261,7 @@ if(BUILD_SHARED_LIBS)
 
     target_compile_features(libprimecount
     PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimecount
     PUBLIC
@@ -295,9 +293,7 @@ if(BUILD_STATIC_LIBS)
 
     target_compile_features(libprimecount-static
     PRIVATE
-        cxx_constexpr
-        cxx_lambdas
-        cxx_range_for)
+        cxx_generic_lambdas)
 
     target_include_directories(libprimecount-static
     PUBLIC

@@ -17,12 +17,12 @@ if(TARGET OpenMP::OpenMP_CXX)
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
 
-    # Our <int128_t.hpp> requires C++11 or later
-    if(NOT compiler_supports_cpp11)
-        if(CMAKE_CXX11_EXTENSION_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_EXTENSION_COMPILE_OPTION}")
-        elseif(CMAKE_CXX11_STANDARD_COMPILE_OPTION)
-            set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+    # Our <int128_t.hpp> requires C++14 or later
+    if(NOT compiler_supports_cpp14)
+        if(CMAKE_CXX14_EXTENSION_COMPILE_OPTION)
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX14_EXTENSION_COMPILE_OPTION}")
+        elseif(CMAKE_CXX14_STANDARD_COMPILE_OPTION)
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX14_STANDARD_COMPILE_OPTION}")
         endif()
     endif()
 
