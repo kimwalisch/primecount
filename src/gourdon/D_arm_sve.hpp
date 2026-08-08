@@ -150,7 +150,7 @@ T D_thread_arm_sve(T x,
         svuint32_t m_offsets32 = svindex_u32(0, 1);
 
         // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As
+        // that contains an int128_t type (GCC <= 16). As a
         // workaround we create the batch_div32 lambda without
         // 128-bit code that GCC is able to vectorize.
         auto batch_div32 = [&](auto xp, std::size_t m_count)
@@ -238,7 +238,7 @@ T D_thread_arm_sve(T x,
         svuint64_t m_offsets64 = svindex_u64(0, 1);
 
         // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As
+        // that contains an int128_t type (GCC <= 16). As a
         // workaround we create the batch_div64 lambda without
         // 128-bit code that GCC is able to vectorize.
         auto batch_div64 = [&](auto xp, std::size_t m_count)

@@ -144,7 +144,7 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes32.size() - 4;
 
         // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As
+        // that contains an int128_t type (GCC <= 16). As a
         // workaround we create the batch_div32 lambda without
         // 128-bit code that GCC is able to vectorize.
         auto batch_div32 = [&](auto xp, std::size_t m_count)
@@ -219,7 +219,7 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes64.size() - 4;
 
         // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As
+        // that contains an int128_t type (GCC <= 16). As a
         // workaround we create the batch_div64 lambda without
         // 128-bit code that GCC is able to vectorize.
         auto batch_div64 = [&](auto xp, std::size_t m_count)
