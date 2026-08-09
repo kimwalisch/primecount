@@ -67,19 +67,18 @@ if(TARGET OpenMP::OpenMP_CXX)
         check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_latomic)
 
         if(OpenMP_with_latomic)
-            set(LIB_ATOMIC "-latomic")
+            list(APPEND PRIMECOUNT_LINK_LIBRARIES "-latomic")
         else()
             find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
 
             if(LIB_ATOMIC)
                 set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX" "${LIB_ATOMIC}")
                 check_cxx_source_compiles("${OpenMP_TEST_SOURCE}" OpenMP_with_libatomic_path)
-            endif()
-        endif()
 
-        if(OpenMP_with_latomic OR
-           OpenMP_with_libatomic_path)
-            list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
+                if(OpenMP_with_libatomic_path)
+                    list(APPEND PRIMECOUNT_LINK_LIBRARIES "${LIB_ATOMIC}")
+                endif()
+            endif()
         endif()
     endif()
 
