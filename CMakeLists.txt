@@ -174,7 +174,7 @@ endif()
 if(WITH_FLOAT128)
     list(APPEND PRIMECOUNT_LINK_LIBRARIES "quadmath")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_FLOAT128")
-    string(APPEND PKGCONFIG_LIBS_PRIVATE "-lquadmath ")
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-lquadmath ")
 endif()
 
 # Use 32-bit integer division ########################################

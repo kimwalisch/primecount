@@ -9,4 +9,4 @@ Version: @PROJECT_VERSION@
 Requires.private: primesieve >= 11.0
 Cflags: -I${includedir}
 Libs: -L${libdir} -lprimecount
-Libs.private: @PKGCONFIG_LIBS_PRIVATE@
+Libs.private: @PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE@

@@ -87,11 +87,11 @@ if(TARGET OpenMP::OpenMP_CXX)
 
         # Create list of private libs for pkg-config/pkgconf
         foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
-            string(APPEND PKGCONFIG_LIBS_PRIVATE "-l${X} ")
+            string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${X} ")
         endforeach()
 
         if(OpenMP_with_latomic)
-            string(APPEND PKGCONFIG_LIBS_PRIVATE "-latomic ")
+            string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-latomic ")
         endif()
     endif()
 endif()
