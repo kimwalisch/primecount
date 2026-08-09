@@ -68,6 +68,7 @@ if(TARGET OpenMP::OpenMP_CXX)
 
         if(OpenMP_with_latomic)
             list(APPEND PRIMECOUNT_LINK_LIBRARIES "-latomic")
+            string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-latomic ")
         else()
             find_library(LIB_ATOMIC NAMES atomic atomic.so.1 libatomic.so.1)
 
@@ -95,10 +96,6 @@ if(TARGET OpenMP::OpenMP_CXX)
         foreach(X IN LISTS OpenMP_CXX_LIB_NAMES)
             string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-l${X} ")
         endforeach()
-
-        if(OpenMP_with_latomic)
-            string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-latomic ")
-        endif()
     endif()
 endif()
 
