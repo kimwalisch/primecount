@@ -8,7 +8,8 @@
 ///        lookup table uses up to 28 times less memory than the
 ///        lpf[n], mpf[n] and mu[n] lookup tables! factor[n] uses only
 ///        2 bytes per entry for 32-bit numbers and 4 bytes per entry
-///        for 64-bit numbers.
+///        for 64-bit numbers. The 16-bit ordinal format additionally
+///        uses one Möbius bit per entry (about 2.125 bytes per entry).
 ///
 ///        The factor table concept was devised and implemented by
 ///        Christian Bau in 2003. Note that Tomás Oliveira e Silva
@@ -18,7 +19,8 @@
 ///        slightly more efficient (uses fewer instructions) than the
 ///        data structure proposed by Tomás Oliveira e Silva.
 ///
-///        What we store in the factor[n] lookup table:
+///        By default we store the numerical least prime factor and
+///        the Möbius sign in the factor[n] lookup table:
 ///
 ///        1) INT_MAX - 1  if n = 1
 ///        2) INT_MAX      if n is a prime
@@ -36,6 +38,13 @@
 ///
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
 ///        * New: if (factor[n] > prime)
+///
+///        FactorTableD<T, true> instead stores the ordinal of the
+///        least prime factor. Its Möbius sign is stored in a separate
+///        bitmap. This format allows a 16-bit factor table to be used
+///        for much larger z values. In this mode the filter becomes:
+///
+///        * Ordinal: if (factor[n] > pi(prime))
 ///
 ///        In-depth description of the factor table data structure:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
@@ -65,7 +74,7 @@ namespace {
 
 using namespace primecount;
 
-template <typename T>
+template <typename T, bool store_ordinal = false>
 class FactorTableD : public BaseFactorTable
 {
 public:
@@ -85,16 +94,32 @@ public:
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
-    // number of prime factors. We use the least
-    // significant bit to indicate whether the number
-    // has an even or odd number of prime factors.
+    // number of prime factors. The numerical encoding uses the
+    // least significant factor bit, the ordinal encoding uses its
+    // separate Möbius bitmap.
     factor_[0] = T_MAX ^ 1;
 
     int64_t sqrtz = isqrt(z);
     int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(z, threads, thread_threshold);
     int64_t thread_distance = ceil_div(z, threads);
-    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
+    int64_t thread_alignment = coprime_indexes_.size();
+
+    // In ordinal mode each thread must write to disjoint Möbius
+    // bitmap words. Two wheel intervals contain 960 factor table
+    // entries, which is divisible by 64.
+    if (store_ordinal)
+      thread_alignment *= 2;
+
+    thread_distance += thread_alignment - thread_distance % thread_alignment;
+
+    if (store_ordinal)
+    {
+      std::size_t words = (factor_.size() + 63) / 64;
+      moebius_.resize(words);
+      std::fill(moebius_.begin(), moebius_.end(), UINT64_MAX);
+      moebius_[0] &= ~uint64_t(1);
+    }
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
@@ -110,6 +135,10 @@ public:
         // Default initialize memory to all bits set
         int64_t low_idx = to_index(low);
         int64_t size = (to_index(high) + 1) - low_idx;
+
+        if (store_ordinal && t > 0)
+          ASSERT(low_idx % 64 == 0);
+
         std::fill_n(&factor_[low_idx], size, T_MAX);
 
         int64_t start = first_coprime();
@@ -119,11 +148,15 @@ public:
 
         if (min_m <= high)
         {
+          // pi(11) = 5, the first iterator prime is 13.
+          int64_t prime_index = 5;
+
           while (true)
           {
             // Find multiples > prime
             int64_t i = 1;
             int64_t prime = it.next_prime();
+            prime_index++;
             int64_t multiple = next_multiple(prime, low, &i);
             min_m = prime * first_coprime();
 
@@ -135,12 +168,11 @@ public:
               int64_t mi = to_index(multiple);
               // prime is the smallest factor of multiple
               if (factor_[mi] == T_MAX)
-                factor_[mi] = (T) prime;
-              // the least significant bit indicates
-              // whether multiple has an even (0) or odd (1)
-              // number of prime factors
+                factor_[mi] = encode_factor(prime, prime_index);
+              // Toggle whether multiple has an even or odd number
+              // of distinct prime factors.
               else if (factor_[mi] != 0)
-                factor_[mi] ^= 1;
+                toggle_moebius(mi);
             }
 
             if (prime <= sqrtz)
@@ -197,6 +229,9 @@ public:
   /// 5) lpf - 1      if moebius(n) = 1
   /// 6) lpf          if moebius(n) = -1
   ///
+  /// In ordinal mode composite leaves instead store pi(lpf),
+  /// while the two sentinel values and zero keep the same meaning.
+  ///
   int64_t is_leaf(int64_t index) const
   {
     return factor_[index];
@@ -205,6 +240,14 @@ public:
   const T* data() const
   {
     return factor_.data();
+  }
+
+  /// Convert the current prime into the value used by the hot
+  /// factor_table[m] > filter comparison.
+  int64_t get_filter_value(int64_t prime,
+                           int64_t prime_index) const
+  {
+    return store_ordinal ? prime_index : prime;
   }
 
   /// Get the Möbius function value of the number
@@ -226,7 +269,13 @@ public:
       ASSERT(factor_[index] != 0);
     #endif
 
-    if (factor_[index] & 1)
+    if (store_ordinal)
+    {
+      std::size_t word = (std::size_t) index / 64;
+      uint64_t bit = uint64_t(1) << (index % 64);
+      return (moebius_[word] & bit) ? -1 : 1;
+    }
+    else if (factor_[index] & 1)
       return -1;
     else
       return 1;
@@ -237,9 +286,21 @@ public:
   static constexpr int64_t max()
   {
     static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
+    static_assert(!store_ordinal ||
+                  sizeof(T) <= sizeof(uint16_t),
+                  "Ordinal FactorTableD only supports 8-bit and 16-bit values!");
     constexpr uint64_t MAX_T = pstd::numeric_limits<T>::max();
     constexpr uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
-    constexpr uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
+    constexpr uint64_t MAX_M_NUMERIC = (MAX_T - 1) * (MAX_T - 1) - 1;
+
+    // Codes T_MAX - 1 and T_MAX are reserved for n = 1 and primes.
+    // p(254) = 1609 and p(65534) = 821573 are therefore the first
+    // unencodable least prime factors for 8-bit and 16-bit ordinals.
+    constexpr uint64_t FIRST_UNENCODABLE_PRIME =
+      sizeof(T) == sizeof(uint8_t) ? 1609 : 821573;
+    constexpr uint64_t MAX_M_ORDINAL =
+      FIRST_UNENCODABLE_PRIME * FIRST_UNENCODABLE_PRIME - 1;
+    constexpr uint64_t MAX_M = store_ordinal ? MAX_M_ORDINAL : MAX_M_NUMERIC;
     return (int64_t) std::min(MAX_M, MAX_INT64_T);
   }
 
@@ -248,17 +309,53 @@ public:
   static int64_t max()
   {
     static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
+    static_assert(!store_ordinal ||
+                  sizeof(T) <= sizeof(uint16_t),
+                  "Ordinal FactorTableD only supports 8-bit and 16-bit values!");
     uint64_t MAX_T = pstd::numeric_limits<T>::max();
     uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
-    uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
+    uint64_t MAX_M_NUMERIC = (MAX_T - 1) * (MAX_T - 1) - 1;
+    uint64_t FIRST_UNENCODABLE_PRIME =
+      sizeof(T) == sizeof(uint8_t) ? 1609 : 821573;
+    uint64_t MAX_M_ORDINAL =
+      FIRST_UNENCODABLE_PRIME * FIRST_UNENCODABLE_PRIME - 1;
+    uint64_t MAX_M = store_ordinal ? MAX_M_ORDINAL : MAX_M_NUMERIC;
     return (int64_t) std::min(MAX_M, MAX_INT64_T);
   }
 
 #endif
 
 private:
+  static T encode_factor(int64_t prime,
+                         int64_t prime_index)
+  {
+    if (store_ordinal)
+    {
+      ASSERT(prime_index <= (int64_t) pstd::numeric_limits<T>::max() - 2);
+      return (T) prime_index;
+    }
+    else
+      return (T) prime;
+  }
+
+  void toggle_moebius(int64_t index)
+  {
+    if (store_ordinal)
+    {
+      std::size_t word = (std::size_t) index / 64;
+      uint64_t bit = uint64_t(1) << (index % 64);
+      moebius_[word] ^= bit;
+    }
+    else
+      factor_[index] ^= 1;
+  }
+
   Vector<T> factor_;
+  Vector<uint64_t> moebius_;
 };
+
+template <typename T>
+using FactorTableDOrdinal = FactorTableD<T, true>;
 
 } // namespace
 

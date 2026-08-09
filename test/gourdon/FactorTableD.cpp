@@ -36,6 +36,8 @@ int main()
 {
   check(FactorTableD<uint16_t>::max() == 4294705155ll);
   check(FactorTableD<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
+  check(FactorTableDOrdinal<uint8_t>::max() == 2588880ll);
+  check(FactorTableDOrdinal<uint16_t>::max() == 674982194328ll);
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -49,10 +51,16 @@ int main()
   auto lpf = generate_lpf(z, primes);
   auto mpf = generate_mpf(z, primes);
   auto mu = generate_moebius(z, primes);
+  Vector<uint32_t> prime_indexes(z + 1);
+
+  for (std::size_t i = 1; i < primes.size(); i++)
+    prime_indexes[primes[i]] = (uint32_t) i;
 
   FactorTableD<uint16_t> factorTable(y, z, threads);
+  FactorTableDOrdinal<uint16_t> ordinalTable(y, z, threads);
   int64_t uint16_max = pstd::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
+  std::vector<int> filter_primes = { 13, 17, 101, 9973 };
 
   for (int64_t n = 1; n <= z; n++)
   {
@@ -70,11 +78,13 @@ int main()
     {
       std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable.is_leaf(i) == 0);
       check(factorTable.is_leaf(i) == 0);
+      check(ordinalTable.is_leaf(i) == 0);
       continue;
     }
 
     std::cout << "mu(" << n << ") = " << factorTable.mu(i);
     check(mu[n] == factorTable.mu(i));
+    check(mu[n] == ordinalTable.mu(i));
 
     std::cout << "lpf(" << n << ") = " << lpf[n];
 
@@ -90,15 +100,77 @@ int main()
     // 6) lpf          if moebius(n) = -1
 
     if (n == 1)
+    {
       check(factorTable.is_leaf(i) == uint16_max - 1);
+      check(ordinalTable.is_leaf(i) == uint16_max - 1);
+    }
     else if (is_prime)
+    {
       check(factorTable.is_leaf(i) == uint16_max);
+      check(ordinalTable.is_leaf(i) == uint16_max);
+    }
     else if (mu[n] == 0)
+    {
       check(factorTable.is_leaf(i) == 0);
+      check(ordinalTable.is_leaf(i) == 0);
+    }
     else
+    {
       check(lpf[n] == factorTable.is_leaf(i) + (factorTable.mu(i) == 1));
+      check(prime_indexes[lpf[n]] == ordinalTable.is_leaf(i));
+    }
+
+    // The numerical and ordinal encodings must make the same
+    // filtering decision for every prime threshold used by D.
+    if (n != 1)
+    {
+      for (int prime : filter_primes)
+      {
+        int64_t prime_index = prime_indexes[prime];
+        bool numerical = factorTable.is_leaf(i) > factorTable.get_filter_value(prime, prime_index);
+        bool ordinal = ordinalTable.is_leaf(i) > ordinalTable.get_filter_value(prime, prime_index);
+        check(numerical == ordinal);
+      }
+    }
 
     not_coprime:;
+  }
+
+  // Forced small-width boundary test. Codes 254 and 255 are
+  // reserved for n = 1 and primes, hence ordinal 253 is the largest
+  // least-prime ordinal that fits into uint8_t.
+  {
+    int64_t p253 = primesieve::nth_prime(253);
+    int64_t p254 = primesieve::nth_prime(254);
+    int64_t n = p253 * p254;
+    FactorTableDOrdinal<uint8_t> smallOrdinalTable(FactorTableDOrdinal<uint8_t>::max(),
+                                                   FactorTableDOrdinal<uint8_t>::max(),
+                                                   threads);
+    int64_t i = smallOrdinalTable.to_index(n);
+    check(smallOrdinalTable.is_leaf(i) == 253);
+    check(smallOrdinalTable.mu(i) == 1);
+  }
+
+  // Compare single-threaded and parallel construction. The larger z
+  // crosses FactorTableD's threading threshold and exercises bitmap
+  // word-aligned thread boundaries.
+  {
+    int64_t parallel_y = 1000000;
+    int64_t parallel_z = 10000001;
+    FactorTableDOrdinal<uint16_t> singleThread(parallel_y, parallel_z, 1);
+    FactorTableDOrdinal<uint16_t> multiThread(parallel_y, parallel_z, 2);
+    int64_t size = singleThread.to_index(parallel_z) + 1;
+    bool equal = true;
+
+    for (int64_t i = 0; equal && i < size; i++)
+    {
+      equal = singleThread.is_leaf(i) == multiThread.is_leaf(i);
+
+      if (equal && singleThread.is_leaf(i) != 0)
+        equal = singleThread.mu(i) == multiThread.mu(i);
+    }
+
+    check(equal);
   }
 
   std::cout << std::endl;

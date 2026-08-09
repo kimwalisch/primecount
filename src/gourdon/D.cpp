@@ -123,6 +123,7 @@ T D_thread_default(T x,
     for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
     {
       int64_t prime = primes[b];
+      int64_t factor_value = factor.get_filter_value(prime, b);
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), z);
       int64_t xp_high = min(fast_div(xp, high), z);
@@ -144,17 +145,17 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes32.size() - 4;
 
         // Filter out square free m values branchlessly
-        // that satisfy: factor_table[m] > prime
+        // that satisfy: factor_table[m] > factor_value
         for (; m >= min_m + 4; m -= 4)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (factor_table[m] > prime);
+          m_count += (factor_table[m] > factor_value);
           m_indexes32[m_count] = uint32_t(m - 1);
-          m_count += (factor_table[m - 1] > prime);
+          m_count += (factor_table[m - 1] > factor_value);
           m_indexes32[m_count] = uint32_t(m - 2);
-          m_count += (factor_table[m - 2] > prime);
+          m_count += (factor_table[m - 2] > factor_value);
           m_indexes32[m_count] = uint32_t(m - 3);
-          m_count += (factor_table[m - 3] > prime);
+          m_count += (factor_table[m - 3] > factor_value);
 
           if (m_count > max_m_count)
           {
@@ -184,7 +185,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes32[m_count] = uint32_t(m);
-          m_count += (factor_table[m] > prime);
+          m_count += (factor_table[m] > factor_value);
         }
 
         // Batch calculate xp/m to improve CPU pipelining
@@ -208,17 +209,17 @@ T D_thread_default(T x,
         constexpr std::size_t max_m_count = m_indexes64.size() - 4;
 
         // Filter out square free m values branchlessly
-        // that satisfy: factor_table[m] > prime
+        // that satisfy: factor_table[m] > factor_value
         for (; m >= min_m + 4; m -= 4)
         {
           m_indexes64[m_count] = m;
-          m_count += (factor_table[m] > prime);
+          m_count += (factor_table[m] > factor_value);
           m_indexes64[m_count] = m - 1;
-          m_count += (factor_table[m - 1] > prime);
+          m_count += (factor_table[m - 1] > factor_value);
           m_indexes64[m_count] = m - 2;
-          m_count += (factor_table[m - 2] > prime);
+          m_count += (factor_table[m - 2] > factor_value);
           m_indexes64[m_count] = m - 3;
-          m_count += (factor_table[m - 3] > prime);
+          m_count += (factor_table[m - 3] > factor_value);
 
           if (m_count > max_m_count)
           {
@@ -248,7 +249,7 @@ T D_thread_default(T x,
         for (; m > min_m; m--)
         {
           m_indexes64[m_count] = m;
-          m_count += (factor_table[m] > prime);
+          m_count += (factor_table[m] > factor_value);
         }
 
         // Batch calculate xp/m to improve CPU pipelining
@@ -477,6 +478,12 @@ int128_t D(int128_t x,
   {
     FactorTableD<uint16_t> factor(y, z, threads);
     auto primes = generate_primes<uint32_t>(y);
+    sum = D_OpenMP(x, y, z, k, primes, factor, threads, is_print);
+  }
+  else if (z <= FactorTableDOrdinal<uint16_t>::max())
+  {
+    FactorTableDOrdinal<uint16_t> factor(y, z, threads);
+    auto primes = generate_primes<int64_t>(y);
     sum = D_OpenMP(x, y, z, k, primes, factor, threads, is_print);
   }
   else

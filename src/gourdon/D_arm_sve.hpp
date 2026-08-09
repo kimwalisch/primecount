@@ -125,6 +125,7 @@ T D_thread_arm_sve(T x,
     for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
     {
       int64_t prime = primes[b];
+      int64_t factor_value = factor.get_filter_value(prime, b);
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), z);
       int64_t xp_high = min(fast_div(xp, high), z);
@@ -165,10 +166,10 @@ T D_thread_arm_sve(T x,
         for (; m >= min_m + lanes32; m -= lanes32)
         {
           // Filter out square free m values using ARM SVE
-          // that satisfy: factor_table[m] > prime
+          // that satisfy: factor_table[m] > factor_value
           svuint32_t m_vec = svsub_u32_x(all32, svdup_n_u32(uint32_t(m)), m_offsets32);
           svuint32_t factor_vec = load_factor_u32_arm_sve(all32, &factor_table[m + 1 - lanes32]);
-          svbool_t mask = svcmpgt_n_u32(all32, factor_vec, uint32_t(prime));
+          svbool_t mask = svcmpgt_n_u32(all32, factor_vec, uint32_t(factor_value));
           int64_t matches = svcntp_b32(all32, mask);
           svuint32_t compact = svcompact_u32(mask, m_vec);
           svst1_u32(all32, &m_indexes32[m_count], compact);
@@ -206,7 +207,7 @@ T D_thread_arm_sve(T x,
           uint32_t base = uint32_t(m + lanes32 - lane_count);
           svuint32_t m_vec = svsub_u32_x(all32, svdup_n_u32(base), m_offsets32);
           svuint32_t factor_vec = load_factor_u32_arm_sve(load_pg, &factor_table[m + 1 - lane_count]);
-          svbool_t mask = svcmpgt_n_u32(store_pg, factor_vec, uint32_t(prime));
+          svbool_t mask = svcmpgt_n_u32(store_pg, factor_vec, uint32_t(factor_value));
           int64_t matches = svcntp_b32(store_pg, mask);
           svuint32_t compact = svcompact_u32(mask, m_vec);
           svbool_t compact_pg = svwhilelt_b32(int64_t(0), matches);
@@ -253,10 +254,10 @@ T D_thread_arm_sve(T x,
         for (; m >= min_m + lanes64; m -= lanes64)
         {
           // Filter out square free m values using ARM SVE
-          // that satisfy: factor_table[m] > prime
+          // that satisfy: factor_table[m] > factor_value
           svuint64_t m_vec = svsub_u64_x(all64, svdup_n_u64(uint64_t(m)), m_offsets64);
           svuint64_t factor_vec = load_factor_u64_arm_sve(all64, &factor_table[m + 1 - lanes64]);
-          svbool_t mask = svcmpgt_n_u64(all64, factor_vec, uint64_t(prime));
+          svbool_t mask = svcmpgt_n_u64(all64, factor_vec, uint64_t(factor_value));
           int64_t matches = svcntp_b64(all64, mask);
           svint64_t compact = svreinterpret_s64_u64(svcompact_u64(mask, m_vec));
           svst1_s64(all64, &m_indexes64[m_count], compact);
@@ -294,7 +295,7 @@ T D_thread_arm_sve(T x,
           uint64_t base = uint64_t(m + lanes64 - lane_count);
           svuint64_t m_vec = svsub_u64_x(all64, svdup_n_u64(base), m_offsets64);
           svuint64_t factor_vec = load_factor_u64_arm_sve(load_pg, &factor_table[m + 1 - lane_count]);
-          svbool_t mask = svcmpgt_n_u64(store_pg, factor_vec, uint64_t(prime));
+          svbool_t mask = svcmpgt_n_u64(store_pg, factor_vec, uint64_t(factor_value));
           int64_t matches = svcntp_b64(store_pg, mask);
           svint64_t compact = svreinterpret_s64_u64(svcompact_u64(mask, m_vec));
           svbool_t compact_pg = svwhilelt_b64(int64_t(0), matches);
