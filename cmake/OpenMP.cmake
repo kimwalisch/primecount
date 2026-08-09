@@ -1,6 +1,12 @@
 # Check if OpenMP supports 128-bit integers out of the box
 # or if we have to link against libatomic.
 
+set(PRIMECOUNT_WITH_OPENMP OFF)
+
+if(NOT WITH_OPENMP)
+    return()
+endif()
+
 include(CheckCXXSourceCompiles)
 include(CMakePushCheckState)
 
@@ -83,6 +89,7 @@ if(TARGET OpenMP::OpenMP_CXX)
     if(OpenMP OR
        OpenMP_with_latomic OR
        OpenMP_with_libatomic_path)
+        set(PRIMECOUNT_WITH_OPENMP ON)
         list(APPEND PRIMECOUNT_LINK_LIBRARIES "OpenMP::OpenMP_CXX")
 
         # Create list of private libs for pkg-config/pkgconf
@@ -98,9 +105,7 @@ endif()
 
 # If we are using LLVM OpenMP we check if the compiler
 # supports setenv() to tune the LLVM OpenMP options.
-if(OpenMP OR
-   OpenMP_with_latomic OR
-   OpenMP_with_libatomic_path)
+if(PRIMECOUNT_WITH_OPENMP)
     cmake_push_check_state()
     set(CMAKE_REQUIRED_LIBRARIES "OpenMP::OpenMP_CXX")
     check_cxx_source_compiles("
@@ -117,9 +122,7 @@ if(OpenMP OR
 endif()
 
 # OpenMP is not supported, print warning message
-if(NOT OpenMP AND
-   NOT OpenMP_with_latomic AND
-   NOT OpenMP_with_libatomic_path)
+if(NOT PRIMECOUNT_WITH_OPENMP)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|LLVM")
         message(WARNING "Install the OpenMP library (libomp) to enable multithreading in primecount!")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

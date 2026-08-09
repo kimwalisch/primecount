@@ -208,9 +208,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 # Check for OpenMP ###################################################
 
-if(WITH_OPENMP)
-    include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
-endif()
+include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 
 # Required includes ##################################################
 
