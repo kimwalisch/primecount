@@ -128,7 +128,7 @@ ALWAYS_INLINE __m512i load_factor_tail_epi64_avx512(const uint32_t* factor_table
                                         _mm512_cvtepu32_epi64(vec));
 }
 
-template <typename T, typename Primes, typename FactorTableD>
+template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
 #endif
@@ -140,7 +140,7 @@ T D_thread_avx512(T x,
                   int64_t k,
                   const Primes& primes,
                   const PiTable& pi,
-                  const FactorTableD& factor,
+                  const FactorTable& factor,
                   ThreadData& thread)
 {
   int64_t low = thread.low;
@@ -192,7 +192,6 @@ T D_thread_avx512(T x,
     for (int64_t last = min(pi_sqrtz, max_b); b <= last; b++)
     {
       int64_t prime = primes[b];
-      int64_t factor_value = factor.get_filter_value(prime, b);
       T xp = x / prime;
       int64_t xp_low = min(fast_div(xp, low1), z);
       int64_t xp_high = min(fast_div(xp, high), z);
@@ -202,25 +201,26 @@ T D_thread_avx512(T x,
       if (prime >= max_m)
         goto next_segment;
 
-      min_m = factor.to_index(min_m);
-      max_m = factor.to_index(max_m);
-      std::size_t m_count = 0;
+      min_m = FactorTable::to_index(min_m);
+      max_m = FactorTable::to_index(max_m);
+      int64_t encoded_prime = FactorTable::encode(b);
       int64_t m = max_m;
+      std::size_t m_count = 0;
 
       // AVX512: 16-lane 32-bit
-      if (FactorTableD::max() <= UINT32_MAX ||
-          max_m <= UINT32_MAX)
+      if (max_m <= UINT32_MAX ||
+          sizeof(T) <= sizeof(uint64_t))
       {
-        __m512i prime_vec = _mm512_set1_epi32(uint32_t(factor_value));
+        __m512i encoded_prime_vec = _mm512_set1_epi32(uint32_t(encoded_prime));
         constexpr std::size_t max_m_count = m_indexes32.size() - 16;
 
         for (; m >= min_m + 16; m -= 16)
         {
           // Filter out square free m values using AVX512
-          // that satisfy: factor_table[m] > factor_value
+          // that satisfy: factor_table[m] > encoded_prime
           __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
           __m512i factor_vec = load_factor_epi32_avx512(&factor_table[m - 15], reverse32);
-          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
+          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
           m_count += popcnt64_native(mask);
 
@@ -255,7 +255,7 @@ T D_thread_avx512(T x,
           __mmask16 load_mask = __mmask16((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi32(_mm512_set1_epi32(uint32_t(m)), m_offsets32);
           __m512i factor_vec = load_factor_tail_epi32_avx512(&factor_table[min_m + 1], load_mask, count, m_offsets32);
-          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, prime_vec);
+          __mmask16 mask = _mm512_cmpgt_epu32_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi32(&m_indexes32[m_count], mask, m_vec);
           m_count += popcnt64_native(mask);
         }
@@ -278,16 +278,16 @@ T D_thread_avx512(T x,
       }
       else // AVX512: 8-lane 64-bit
       {
-        __m512i prime_vec = _mm512_set1_epi64(factor_value);
+        __m512i encoded_prime_vec = _mm512_set1_epi64(encoded_prime);
         constexpr std::size_t max_m_count = m_indexes64.size() - 8;
 
         for (; m >= min_m + 8; m -= 8)
         {
           // Filter out square free m values using AVX512
-          // that satisfy: factor_table[m] > factor_value
+          // that satisfy: factor_table[m] > encoded_prime
           __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
           __m512i factor_vec = load_factor_epi64_avx512(&factor_table[m - 7], reverse64);
-          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
+          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
           m_count += popcnt64_native(mask);
 
@@ -322,7 +322,7 @@ T D_thread_avx512(T x,
           __mmask8 load_mask = __mmask8((1u << count) - 1);
           __m512i m_vec = _mm512_sub_epi64(_mm512_set1_epi64(m), m_offsets64);
           __m512i factor_vec = load_factor_tail_epi64_avx512(&factor_table[min_m + 1], load_mask, count, m_offsets64);
-          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, prime_vec);
+          __mmask8 mask = _mm512_cmpgt_epi64_mask(factor_vec, encoded_prime_vec);
           _mm512_mask_compressstoreu_epi64(&m_indexes64[m_count], mask, m_vec);
           m_count += popcnt64_native(mask);
         }

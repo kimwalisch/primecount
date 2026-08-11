@@ -34,10 +34,10 @@ void check(bool OK)
 
 int main()
 {
-  check(FactorTableD<uint16_t>::max() == 4294705155ll);
+  check(FactorTableD<uint16_t>::max() == 149060082888ll);
   check(FactorTableD<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
-  check(FactorTableDOrdinal<uint8_t>::max() == 2588880ll);
-  check(FactorTableDOrdinal<uint16_t>::max() == 674982194328ll);
+  check(FactorTableD<uint16_t>::to_index(
+          FactorTableD<uint16_t>::max()) > UINT32_MAX);
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -57,10 +57,9 @@ int main()
     prime_indexes[primes[i]] = (uint32_t) i;
 
   FactorTableD<uint16_t> factorTable(y, z, threads);
-  FactorTableDOrdinal<uint16_t> ordinalTable(y, z, threads);
   int64_t uint16_max = pstd::numeric_limits<uint16_t>::max();
   int64_t limit = factorTable.first_coprime();
-  std::vector<int> filter_primes = { 13, 17, 101, 9973 };
+  std::vector<uint32_t> filter_primes = { 13, 17, 101, 9973 };
 
   for (int64_t n = 1; n <= z; n++)
   {
@@ -76,97 +75,75 @@ int main()
     // have been removed from the FactorTableD.
     if (mpf[n] > y)
     {
-      std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable.is_leaf(i) == 0);
-      check(factorTable.is_leaf(i) == 0);
-      check(ordinalTable.is_leaf(i) == 0);
+      std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable[i] == 0);
+      check(factorTable[i] == 0);
       continue;
     }
 
     std::cout << "mu(" << n << ") = " << factorTable.mu(i);
     check(mu[n] == factorTable.mu(i));
-    check(mu[n] == ordinalTable.mu(i));
 
     std::cout << "lpf(" << n << ") = " << lpf[n];
 
-    // is_leaf(n) is a combination of the mu(n) (Möbius function),
-    // lpf(n) (least prime factor) and mpf(n) (max prime factor)
-    // functions. is_leaf(n) returns (with n = to_number(index)):
+    // factorTable[index] is a combination of the mu(n) (Möbius
+    // function), lpf(n) (least prime factor) and mpf(n) (max prime
+    // factor) functions. It returns (with n = to_number(index)):
     //
-    // 1) INT_MAX - 1  if n = 1
-    // 2) INT_MAX      if n is a prime
-    // 3) 0            if n has a prime factor > y
-    // 4) 0            if moebius(n) = 0
-    // 5) lpf - 1      if moebius(n) = 1
-    // 6) lpf          if moebius(n) = -1
+    // 1) INT_MAX - 1    if n = 1
+    // 2) INT_MAX        if n is a prime
+    // 3) 0              if n has a prime factor > y
+    // 4) 0              if moebius(n) = 0
+    // 5) 2*pi(lpf)      if moebius(n) = 1
+    // 6) 2*pi(lpf) + 1  if moebius(n) = -1
 
     if (n == 1)
-    {
-      check(factorTable.is_leaf(i) == uint16_max - 1);
-      check(ordinalTable.is_leaf(i) == uint16_max - 1);
-    }
+      check(factorTable[i] == uint16_max - 1);
     else if (is_prime)
-    {
-      check(factorTable.is_leaf(i) == uint16_max);
-      check(ordinalTable.is_leaf(i) == uint16_max);
-    }
+      check(factorTable[i] == uint16_max);
     else if (mu[n] == 0)
-    {
-      check(factorTable.is_leaf(i) == 0);
-      check(ordinalTable.is_leaf(i) == 0);
-    }
+      check(factorTable[i] == 0);
     else
     {
-      check(lpf[n] == factorTable.is_leaf(i) + (factorTable.mu(i) == 1));
-      check(prime_indexes[lpf[n]] == ordinalTable.is_leaf(i));
+      int64_t expected = prime_indexes[lpf[n]] * 2 + (mu[n] == -1);
+      check(factorTable[i] == expected);
     }
 
-    // The numerical and ordinal encodings must make the same
-    // filtering decision for every prime threshold used by D.
+    // Check that "factor[n] > encode(PrimePi(prime))" is equivalent
+    // to "mu[n] != 0 && lpf[n] > prime" for a few prime thresholds.
+    // (Numbers with mpf[n] > y have already been skipped above).
     if (n != 1)
     {
-      for (int prime : filter_primes)
+      for (uint32_t prime : filter_primes)
       {
-        int64_t prime_index = prime_indexes[prime];
-        bool numerical = factorTable.is_leaf(i) > factorTable.get_filter_value(prime, prime_index);
-        bool ordinal = ordinalTable.is_leaf(i) > ordinalTable.get_filter_value(prime, prime_index);
-        check(numerical == ordinal);
+        if (prime < n)
+        {
+          int64_t prime_index = prime_indexes[prime];
+          bool expected = mu[n] != 0 && lpf[n] > prime;
+          bool actual = factorTable[i] >
+                        FactorTableD<uint16_t>::encode(prime_index);
+          check(actual == expected);
+        }
       }
     }
 
     not_coprime:;
   }
 
-  // Forced small-width boundary test. Codes 254 and 255 are
-  // reserved for n = 1 and primes, hence ordinal 253 is the largest
-  // least-prime ordinal that fits into uint8_t.
-  {
-    int64_t p253 = primesieve::nth_prime(253);
-    int64_t p254 = primesieve::nth_prime(254);
-    int64_t n = p253 * p254;
-    FactorTableDOrdinal<uint8_t> smallOrdinalTable(FactorTableDOrdinal<uint8_t>::max(),
-                                                   FactorTableDOrdinal<uint8_t>::max(),
-                                                   threads);
-    int64_t i = smallOrdinalTable.to_index(n);
-    check(smallOrdinalTable.is_leaf(i) == 253);
-    check(smallOrdinalTable.mu(i) == 1);
-  }
-
   // Compare single-threaded and parallel construction. The larger z
-  // crosses FactorTableD's threading threshold and exercises bitmap
-  // word-aligned thread boundaries.
+  // crosses FactorTableD's threading threshold.
   {
     int64_t parallel_y = 1000000;
     int64_t parallel_z = 10000001;
-    FactorTableDOrdinal<uint16_t> singleThread(parallel_y, parallel_z, 1);
-    FactorTableDOrdinal<uint16_t> multiThread(parallel_y, parallel_z, 2);
+    FactorTableD<uint16_t> singleThread(parallel_y, parallel_z, 1);
+    FactorTableD<uint16_t> multiThread(parallel_y, parallel_z, 2);
     int64_t size = singleThread.to_index(parallel_z) + 1;
     bool equal = true;
 
     for (int64_t i = 0; equal && i < size; i++)
     {
-      equal = singleThread.is_leaf(i) == multiThread.is_leaf(i);
+      equal = singleThread[i] == multiThread[i];
 
-      if (equal && singleThread.is_leaf(i) != 0)
+      if (equal && singleThread[i] != 0)
         equal = singleThread.mu(i) == multiThread.mu(i);
     }
 
