@@ -1126,8 +1126,19 @@ T AC_OpenMP(T x,
   // Initialize libdivide vector from primes vector
   Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
   lprimes.resize(primes.size());
-  for (std::size_t i = 1; i < lprimes.size(); i++)
-    lprimes[i] = primes[i];
+
+  int64_t min_thread_size = (int64_t) 1e6;
+  int64_t primes_size = lprimes.size();
+  int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
+  int64_t thread_distance = ceil_div(primes_size, init_threads);
+
+  #pragma omp parallel for num_threads(init_threads)
+  for (int64_t low = 1; low < primes_size; low += thread_distance)
+  {
+    int64_t high = min(low + thread_distance, primes_size);
+    for (int64_t i = low; i < high; i++)
+      lprimes[i] = primes[i];
+  }
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the

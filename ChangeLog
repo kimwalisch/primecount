@@ -17,6 +17,7 @@ Changes in primecount-8.7, 2026-08-11
 * LoadBalancerS2.cpp: Fix Clang scaling issue.
 * AC.cpp: Improve clustered easy leaves algorithm using Gourdon's inversion equality.
 * AC.cpp: Implement segmented C1 algorithm to improve cache efficiency.
+* AC.cpp: Use multi-threading to initialize the libdivide vector.
 * util.cpp: Retune Gourdon alpha factors due to improved C algorithm.
 * test.cpp: Improve test coverage using alternate alpha_z values.
 * doc/Easy-Special-Leaves.pdf: Add description of new C algorithm.
