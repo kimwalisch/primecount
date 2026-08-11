@@ -525,7 +525,7 @@ int main (int argc, char* argv[])
       case OPTION_NTHPRIME:
         res = nth_prime(x, threads); break;
       case OPTION_NTHPRIME_64:
-        res = nth_prime_64(x, threads); break;
+        res = nth_prime_64(to_int64(x), threads); break;
       case OPTION_PHI:
         res = phi(to_int64(x), a, threads); break;
       case OPTION_P2:

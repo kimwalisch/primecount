@@ -174,6 +174,7 @@ endif()
 if(WITH_FLOAT128)
     list(APPEND PRIMECOUNT_LINK_LIBRARIES "quadmath")
     list(APPEND PRIMECOUNT_COMPILE_DEFINITIONS "HAVE_FLOAT128")
+    string(APPEND PRIMECOUNT_PKGCONFIG_LIBS_PRIVATE "-lquadmath ")
 endif()
 
 # Use 32-bit integer division ########################################
@@ -207,9 +208,7 @@ include("${PROJECT_SOURCE_DIR}/cmake/int128_t.cmake")
 
 # Check for OpenMP ###################################################
 
-if(WITH_OPENMP)
-    include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
-endif()
+include("${PROJECT_SOURCE_DIR}/cmake/OpenMP.cmake")
 
 # Required includes ##################################################
 

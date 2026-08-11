@@ -12,6 +12,9 @@
 #     find_package(primecount REQUIRED static)
 #     target_link_libraries(your_program primecount::primecount)
 #
+#     Using the command above, if the static libprimecount is not
+#     available then the shared libprimecount is used as a fallback.
+#
 # ====================================================================
 
 @PACKAGE_INIT@
@@ -22,10 +25,6 @@ if(TARGET primecount::primecount)
     return()
 endif()
 
-include(CMakeFindDependencyMacro)
-find_dependency(primesieve QUIET REQUIRED)
-find_dependency(OpenMP QUIET)
-
 if(@BUILD_STATIC_LIBS@ AND @BUILD_SHARED_LIBS@)
     if(primecount_FIND_COMPONENTS)
         string(TOLOWER "${primecount_FIND_COMPONENTS}" LOWER_COMPONENTS)
@@ -35,6 +34,13 @@ if(@BUILD_STATIC_LIBS@ AND @BUILD_SHARED_LIBS@)
     endif()
 elseif(@BUILD_STATIC_LIBS@)
     set(primecount_STATIC TRUE)
+endif()
+
+include(CMakeFindDependencyMacro)
+find_dependency(primesieve QUIET REQUIRED)
+
+if(primecount_STATIC AND "@PRIMECOUNT_WITH_OPENMP@")
+    find_dependency(OpenMP QUIET)
 endif()
 
 if(primecount_STATIC)
