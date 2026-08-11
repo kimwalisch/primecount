@@ -96,9 +96,7 @@ public:
     int64_t thread_threshold = (int64_t) 1e7;
     threads = ideal_num_threads(z, threads, thread_threshold);
     int64_t thread_distance = ceil_div(z, threads);
-    int64_t thread_alignment = coprime_indexes_.size();
-
-    thread_distance += thread_alignment - thread_distance % thread_alignment;
+    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 
     #pragma omp parallel for num_threads(threads)
     for (int t = 0; t < threads; t++)
@@ -114,7 +112,6 @@ public:
         // Default initialize memory to all bits set
         int64_t low_idx = to_index(low);
         int64_t size = (to_index(high) + 1) - low_idx;
-
         std::fill_n(&factor_[low_idx], size, T_MAX);
 
         int64_t start = first_coprime();
