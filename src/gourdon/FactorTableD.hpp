@@ -7,8 +7,7 @@
 ///        which are not divisible by 2, 3, 5, 7 and 11. The factor[n]
 ///        lookup table uses up to 28 times less memory than the
 ///        lpf[n], mpf[n] and mu[n] lookup tables! factor[n] uses only
-///        2 bytes per entry for 32-bit numbers and 4 bytes per entry
-///        for 64-bit numbers.
+///        2 or 4 bytes per entry.
 ///
 ///        The factor table concept was devised and implemented by
 ///        Christian Bau in 2003. Note that Tomás Oliveira e Silva
@@ -18,14 +17,16 @@
 ///        slightly more efficient (uses fewer instructions) than the
 ///        data structure proposed by Tomás Oliveira e Silva.
 ///
-///        What we store in the factor[n] lookup table:
+///        factor[n] stores the index pi(lpf) of the least prime
+///        factor and the Möbius sign. As pi(lpf) is far smaller
+///        than lpf this allows 2 byte entries up to a much larger n:
 ///
-///        1) INT_MAX - 1  if n = 1
-///        2) INT_MAX      if n is a prime
-///        3) 0            if n has a prime factor > y
-///        4) 0            if moebius(n) = 0
-///        5) lpf - 1      if moebius(n) = 1
-///        6) lpf          if moebius(n) = -1
+///        1) INT_MAX - 1    if n = 1
+///        2) INT_MAX        if n is a prime
+///        3) 0              if n has a prime factor > y
+///        4) 0              if moebius(n) = 0
+///        5) 2*pi(lpf)      if moebius(n) = 1
+///        6) 2*pi(lpf) + 1  if moebius(n) = -1
 ///
 ///        factor[1] = (INT_MAX - 1) because 1 contributes to the
 ///        sum of the ordinary leaves S1(x, a) in the
@@ -35,7 +36,7 @@
 ///        statement which is obviously faster.
 ///
 ///        * Old: if (mu[n] != 0 && lpf[n] > prime && mpf[n] <= y)
-///        * New: if (factor[n] > prime)
+///        * New: if (factor[n] > 2*pi(prime) + 1)
 ///
 ///        In-depth description of the factor table data structure:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Hard-Special-Leaves-SIMD-Filtering.pdf
@@ -69,7 +70,9 @@ template <typename T>
 class FactorTableD : public BaseFactorTable
 {
 public:
-  using value_type = T;
+  static_assert(sizeof(T) == sizeof(uint16_t) ||
+                sizeof(T) == sizeof(uint32_t),
+                "FactorTableD: T must be uint16_t or uint32_t!");
 
   /// Factor numbers <= z
   FactorTableD(int64_t y,
@@ -77,7 +80,7 @@ public:
                int threads)
   {
     if_unlikely(z > max())
-      throw primecount_error("z must be <= FactorTable::max()");
+      throw primecount_error("z must be <= FactorTableD::max()");
 
     z = std::max<int64_t>(1, z);
     T T_MAX = pstd::numeric_limits<T>::max();
@@ -85,9 +88,8 @@ public:
 
     // mu(1) = 1.
     // 1 has zero prime factors, hence 1 has an even
-    // number of prime factors. We use the least
-    // significant bit to indicate whether the number
-    // has an even or odd number of prime factors.
+    // number of prime factors. The least significant bit
+    // of factor[n] stores the Möbius sign.
     factor_[0] = T_MAX ^ 1;
 
     int64_t sqrtz = isqrt(z);
@@ -119,7 +121,11 @@ public:
 
         if (min_m <= high)
         {
-          while (true)
+          // PrimePi(13) = 6
+          ASSERT(first_coprime() == 13);
+          int64_t prime_index = 6;
+
+          for (; true; prime_index++)
           {
             // Find multiples > prime
             int64_t i = 1;
@@ -135,10 +141,12 @@ public:
               int64_t mi = to_index(multiple);
               // prime is the smallest factor of multiple
               if (factor_[mi] == T_MAX)
-                factor_[mi] = (T) prime;
-              // the least significant bit indicates
-              // whether multiple has an even (0) or odd (1)
-              // number of prime factors
+              {
+                ASSERT(encode(prime_index) <= T_MAX - 2);
+                factor_[mi] = (T) encode(prime_index);
+              }
+              // Toggle whether multiple has an even or odd number
+              // of distinct prime factors.
               else if (factor_[mi] != 0)
                 factor_[mi] ^= 1;
             }
@@ -184,20 +192,19 @@ public:
     }
   }
 
-  /// Returns true if n (with n = to_number(index)) is a
-  /// hard special leaf in the D formula of Xavier
-  /// Gourdon's prime counting algorithm.
+  /// Returns the factor table entry for the number
+  /// n = to_number(index).
   ///
   /// Return value:
   ///
-  /// 1) INT_MAX - 1  if n = 1
-  /// 2) INT_MAX      if n is a prime
-  /// 3) 0            if n has a prime factor > y
-  /// 4) 0            if moebius(n) = 0
-  /// 5) lpf - 1      if moebius(n) = 1
-  /// 6) lpf          if moebius(n) = -1
+  /// 1) INT_MAX - 1    if n = 1
+  /// 2) INT_MAX        if n is a prime
+  /// 3) 0              if n has a prime factor > y
+  /// 4) 0              if moebius(n) = 0
+  /// 5) 2*pi(lpf)      if moebius(n) = 1
+  /// 6) 2*pi(lpf) + 1  if moebius(n) = -1
   ///
-  int64_t is_leaf(int64_t index) const
+  int64_t operator[](int64_t index) const
   {
     return factor_[index];
   }
@@ -205,6 +212,12 @@ public:
   const T* data() const
   {
     return factor_.data();
+  }
+
+  /// Encode prime index for use in the factor table
+  static int64_t encode(int64_t prime_index)
+  {
+    return prime_index * 2 + 1;
   }
 
   /// Get the Möbius function value of the number
@@ -232,29 +245,15 @@ public:
       return 1;
   }
 
-#if __cplusplus >= 201402L
-
   static constexpr int64_t max()
   {
-    static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
-    constexpr uint64_t MAX_T = pstd::numeric_limits<T>::max();
-    constexpr uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
-    constexpr uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
-    return (int64_t) std::min(MAX_M, MAX_INT64_T);
+    // The least prime factor is <= sqrt(z) and with 16-bit
+    // entries p(32767) = 386083 is the first prime whose
+    // index cannot be encoded, hence z < 386083^2.
+    return sizeof(T) == sizeof(uint16_t)
+      ? 386083ll * 386083 - 1
+      : pstd::numeric_limits<int64_t>::max();
   }
-
-#else
-
-  static int64_t max()
-  {
-    static_assert(sizeof(T) * 2 <= sizeof(uint64_t), "FactorTableD: sizeof(T) is too large!");
-    uint64_t MAX_T = pstd::numeric_limits<T>::max();
-    uint64_t MAX_INT64_T = pstd::numeric_limits<int64_t>::max();
-    uint64_t MAX_M = (MAX_T - 1) * (MAX_T - 1) - 1;
-    return (int64_t) std::min(MAX_M, MAX_INT64_T);
-  }
-
-#endif
 
 private:
   Vector<T> factor_;

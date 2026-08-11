@@ -1,6 +1,7 @@
-Changes in primecount-8.7, 2026-08-09
+Changes in primecount-8.7, 2026-08-11
 
 * primecount now requires a C++14 compiler (up from C++11).
+* FactorTableD.hpp: Reduce Gourdon D memory using 16-bit prime factor ordinals #133.
 * primecount.pc.in: Add missing libatomic and libquadmath dependencies.
 * primecountConfig.cmake.in: Only find OpenMP when required.
 * ci.yml: Add pkg-config and CMake find_package() CI tests.
