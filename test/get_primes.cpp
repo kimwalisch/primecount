@@ -112,10 +112,10 @@ int main()
     check(equals_tiny(first_n, n));
   }
 
-  // Each limit >= 4 * PiTable's thread threshold, hence all requested
+  // Each limit > 3 * PiTable's thread threshold, hence all requested
   // threads below are used by get_primes(). The limits use different
   // remainders modulo 240 in order to vary the bitmask that unsets the
-  // bits >= limit in the last 64-bit word of each thread's interval.
+  // bits > limit in the final thread's last 64-bit word.
   uint64_t boundary = max - max % 240;
   const std::array<uint64_t, 5> limits =
   {
