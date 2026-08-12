@@ -87,15 +87,15 @@ public:
     int64_t sqrty = isqrt(y);
     int64_t thread_threshold = (int64_t) 5e6;
     threads = ideal_num_threads(y, threads, thread_threshold);
-    int64_t thread_distance = ceil_div(y, threads);
-    thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
+    int64_t thread_dist = ceil_div(y, threads);
+    thread_dist += coprime_indexes_.size() - thread_dist % coprime_indexes_.size();
 
     #pragma omp parallel for num_threads(threads) schedule(static, 1)
     for (int t = 0; t < threads; t++)
     {
       // Thread processes interval [low, high]
-      int64_t low = thread_distance * t;
-      int64_t high = low + thread_distance;
+      int64_t low = thread_dist * t;
+      int64_t high = low + thread_dist;
       int64_t min_m = first_coprime() * first_coprime();
       low = std::max(first_coprime(), low + 1);
       high = std::min(high, y);
