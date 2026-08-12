@@ -1119,12 +1119,12 @@ T AC_OpenMP(T x,
   int64_t min_thread_size = (int64_t) 1e6;
   int64_t primes_size = lprimes.size();
   int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
-  int64_t thread_distance = ceil_div(primes_size, init_threads);
+  int64_t thread_dist = ceil_div(primes_size, init_threads);
 
   #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
-  for (int64_t low = 1; low < primes_size; low += thread_distance)
+  for (int64_t low = 1; low < primes_size; low += thread_dist)
   {
-    int64_t high = min(low + thread_distance, primes_size);
+    int64_t high = min(low + thread_dist, primes_size);
     for (int64_t i = low; i < high; i++)
       lprimes[i] = primes[i];
   }
