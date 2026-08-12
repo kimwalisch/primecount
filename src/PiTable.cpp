@@ -260,12 +260,12 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
 
           for (uint64_t j = low / 240; j < max_j; j++)
             for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
-              primes[i++] = j * 240 + bit_values_[ctz64(bits)];
+              primes[i++] = uint32_t(j * 240 + bit_values_[ctz64(bits)]);
 
           // Process last 64 bits, unset bits >= high
           uint64_t bitmask = unset_larger_[(high - 1) % 240];
           for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
-            primes[i++] = max_j * 240 + bit_values_[ctz64(bits)];
+            primes[i++] = uint32_t(max_j * 240 + bit_values_[ctz64(bits)]);
         }
       }
     }
@@ -369,11 +369,14 @@ Vector<uint32_t> PiTable::get_n_primes_u32(uint64_t n) const
       // PrimePi(7) = 4
       uint64_t i = 4;
 
-      for (uint64_t j = 0; j < pi_.size(); j++)
+      for (std::size_t j = 0; j < pi_.size(); j++)
       {
         for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
         {
-          primes[i++] = j * 240 + bit_values_[ctz64(bits)];
+          uint64_t bit_value = bit_values_[ctz64(bits)];
+          uint64_t prime = j * 240 + bit_value;
+          primes[i++] = uint32_t(prime);
+
           if (i == size)
             goto finished;
         }
