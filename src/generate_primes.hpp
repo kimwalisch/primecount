@@ -20,8 +20,6 @@ namespace primecount {
 /// defined in generate_primes.cpp
 Vector<uint32_t> generate_primes_u32(int64_t max);
 Vector<int64_t> generate_primes_i64(int64_t max);
-Vector<uint64_t> generate_primes_u64(int64_t max);
-Vector<uint32_t> generate_n_primes_u32(int64_t n);
 
 /// Returns a vector with the primes <= max.
 /// The primes vector uses 1-indexing i.e. primes[1] = 2.
@@ -41,26 +39,6 @@ typename std::enable_if<std::is_same<T, int64_t>::value, Vector<int64_t>>::type
 generate_primes(int64_t max)
 {
   return generate_primes_i64(max);
-}
-
-/// Returns a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-///
-template <typename T>
-typename std::enable_if<std::is_same<T, uint64_t>::value, Vector<uint64_t>>::type
-generate_primes(int64_t max)
-{
-  return generate_primes_u64(max);
-}
-
-/// Returns a vector with the first n primes.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-template <typename T>
-typename std::enable_if<std::is_same<T, uint32_t>::value, Vector<uint32_t>>::type
-generate_n_primes(int64_t n)
-{
-  return generate_n_primes_u32(n);
 }
 
 /// Returns a vector with Möbius function values

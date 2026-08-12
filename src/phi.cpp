@@ -24,7 +24,6 @@
 
 #include <primecount-internal.hpp>
 #include <BitSieve240.hpp>
-#include <generate_primes.hpp>
 #include <fast_div.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -375,7 +374,7 @@ int64_t phi_OpenMP(int64_t x, int64_t a, int threads)
   if (a > pi_sqrtx)
     return phi_pix(x, a, threads);
 
-  auto primes = generate_n_primes<uint32_t>(a);
+  auto primes = pi.get_n_primes<uint32_t>(a);
   int64_t c = min(PhiTiny::max_a(), a);
   int64_t sum = phi_tiny(x, c);
 

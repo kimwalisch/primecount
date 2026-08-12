@@ -18,7 +18,6 @@
 #include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <fast_div.hpp>
-#include <generate_primes.hpp>
 #include <int128_t.hpp>
 #include <min.hpp>
 #include <imath.hpp>
@@ -340,6 +339,7 @@ T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
+                 const PiTable& pi,
                  const Primes& primes,
                  int threads,
                  bool is_print)
@@ -361,7 +361,6 @@ T S2_easy_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x, y, is_print);
-  PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);
@@ -423,8 +422,9 @@ int64_t S2_easy(int64_t x,
     time = get_time();
   }
 
-  auto primes = generate_primes<uint32_t>(y);
-  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, primes, threads, is_print);
+  PiTable pi(y, threads);
+  auto primes = pi.get_primes<uint32_t>(y, threads);
+  int64_t sum = S2_easy_OpenMP((uint64_t) x, y, z, c, pi, primes, threads, is_print);
 
   if (is_print)
     print("S2_easy", sum, time);
@@ -452,18 +452,19 @@ int128_t S2_easy(int128_t x,
     time = get_time();
   }
 
+  PiTable pi(y, threads);
   int128_t sum;
 
   // uses less memory
   if (y <= pstd::numeric_limits<uint32_t>::max())
   {
-    auto primes = generate_primes<uint32_t>(y);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads, is_print);
+    auto primes = pi.get_primes<uint32_t>(y, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, pi, primes, threads, is_print);
   }
   else
   {
-    auto primes = generate_primes<int64_t>(y);
-    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, primes, threads, is_print);
+    auto primes = pi.get_primes<int64_t>(y, threads);
+    sum = S2_easy_OpenMP((uint128_t) x, y, z, c, pi, primes, threads, is_print);
   }
 
   if (is_print)

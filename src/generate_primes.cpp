@@ -45,30 +45,6 @@ Vector<int64_t> generate_primes_i64(int64_t max)
   return primes;
 }
 
-/// Returns a vector with the primes <= max.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-///
-Vector<uint64_t> generate_primes_u64(int64_t max)
-{
-  Vector<uint64_t> primes;
-  primes.resize(1);
-  primes[0] = 0;
-  primesieve::generate_primes(max, &primes);
-  return primes;
-}
-
-/// Returns a vector with the first n primes.
-/// The primes vector uses 1-indexing i.e. primes[1] = 2.
-//
-Vector<uint32_t> generate_n_primes_u32(int64_t n)
-{
-  Vector<uint32_t> primes;
-  primes.reserve(n + 1);
-  primes.push_back(0);
-  primesieve::generate_n_primes(n, &primes);
-  return primes;
-}
-
 /// Returns a vector with Möbius function values.
 /// For each prime p <= max we flip the sign of the multiples
 /// of p and set the multiples of p^2 to 0. Hence at the end

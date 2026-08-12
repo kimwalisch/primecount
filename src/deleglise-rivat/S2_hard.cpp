@@ -30,7 +30,6 @@
 #include <FactorTable.hpp>
 #include <sieve/Sieve.hpp>
 #include <fast_div.hpp>
-#include <generate_primes.hpp>
 #include <phi_vector.hpp>
 #include <imath.hpp>
 #include <int128_t.hpp>
@@ -184,6 +183,7 @@ T S2_hard_OpenMP(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
+                 const PiTable& pi,
                  const Primes& primes,
                  const FactorTable& factor,
                  int threads,
@@ -195,11 +195,7 @@ T S2_hard_OpenMP(T x,
   int max_threads = (int) std::pow(z, 1 / 3.7);
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
-
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
-  int64_t max_prime = min(y, z / isqrt(y));
-  PiTable pi(max_prime, threads);
-
   T sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -241,8 +237,9 @@ int64_t S2_hard(int64_t x,
 
   FactorTable<uint16_t> factor(y, threads);
   int64_t max_prime = min(y, z / isqrt(y));
-  auto primes = generate_primes<uint32_t>(max_prime);
-  int64_t sum = S2_hard_OpenMP(x, y, z, c, primes, factor, threads, is_print);
+  PiTable pi(max_prime, threads);
+  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+  int64_t sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
 
   if (is_print)
     print("S2_hard", sum, time);
@@ -276,15 +273,17 @@ int128_t S2_hard(int128_t x,
   {
     FactorTable<uint16_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
-    auto primes = generate_primes<uint32_t>(max_prime);
-    sum = S2_hard_OpenMP(x, y, z, c, primes, factor, threads, is_print);
+    PiTable pi(max_prime, threads);
+    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
+    sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
   }
   else
   {
     FactorTable<uint32_t> factor(y, threads);
     int64_t max_prime = min(y, z / isqrt(y));
-    auto primes = generate_primes<int64_t>(max_prime);
-    sum = S2_hard_OpenMP(x, y, z, c, primes, factor, threads, is_print);
+    PiTable pi(max_prime, threads);
+    auto primes = pi.get_primes<int64_t>(max_prime, threads);
+    sum = S2_hard_OpenMP(x, y, z, c, pi, primes, factor, threads, is_print);
   }
 
   if (is_print)

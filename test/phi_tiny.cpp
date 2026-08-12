@@ -12,11 +12,11 @@
 
 #include <PhiTiny.hpp>
 #include <generate_primes.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
 #include <cstdlib>
-#include <vector>
 #include <random>
 
 using std::size_t;
@@ -30,7 +30,7 @@ void check(bool OK)
 }
 
 // Count the number of unsieved elements
-uint64_t count(std::vector<char>& sieve)
+uint64_t count(const Vector<char>& sieve)
 {
   uint64_t cnt = 0;
 
@@ -50,8 +50,10 @@ int main()
   uint64_t size = dist(gen);
   uint64_t x = size - 1;
 
-  auto primes = generate_n_primes<uint32_t>(max_a);
-  std::vector<char> sieve(size, 1);
+  const Array<uint32_t, 9> primes = { 0, 2, 3, 5, 7, 11, 13, 17, 19 };
+  ASSERT(max_a < primes.size());
+  Vector<char> sieve(size);
+  std::fill(sieve.begin(), sieve.end(), 1);
 
   for (uint64_t a = 1; a <= max_a; a++)
   {
