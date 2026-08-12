@@ -239,7 +239,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
       primes.resize(size);
     else
     {
-      uint64_t thread_threshold = (uint64_t) 1e6;
+      uint64_t thread_threshold = (uint64_t) 1e7;
       threads = ideal_num_threads(x, threads, thread_threshold);
       uint64_t thread_dist = ceil_div(x, threads);
       thread_dist += 240 - thread_dist % 240;
@@ -301,7 +301,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
       primes.resize(size);
     else
     {
-      uint64_t thread_threshold = (uint64_t) 1e6;
+      uint64_t thread_threshold = (uint64_t) 1e7;
       threads = ideal_num_threads(x, threads, thread_threshold);
       uint64_t thread_dist = ceil_div(x, threads);
       thread_dist += 240 - thread_dist % 240;
