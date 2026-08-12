@@ -48,6 +48,7 @@ T S2_easy_OpenMP(T x,
                  int64_t y,
                  int64_t z,
                  int64_t c,
+                 const PiTable& pi,
                  const Primes& primes,
                  int threads,
                  bool is_print)
@@ -63,7 +64,6 @@ T S2_easy_OpenMP(T x,
   threads = ideal_num_threads(x13, threads, thread_threshold);
 
   StatusS2 status(x, y, is_print);
-  PiTable pi(y, threads);
   int64_t pi_sqrty = pi[isqrt(y)];
   int64_t pi_x13 = pi[x13];
   INDETERMINATE RelaxedAtomic<int64_t> min_b(max(c, pi_sqrty) + 1);

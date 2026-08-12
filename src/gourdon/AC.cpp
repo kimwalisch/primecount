@@ -353,7 +353,7 @@ T AC_OpenMP(T x,
             int64_t z,
             int64_t k,
             int64_t x_star,
-            int64_t max_a_prime,
+            const PiTable& pi,
             const Primes& primes,
             int threads,
             bool is_print)
@@ -371,11 +371,6 @@ T AC_OpenMP(T x,
   threads = min(threads, max_threads);
   threads = ideal_num_threads(x13, threads, thread_threshold);
   INDETERMINATE LoadBalancerAC loadBalancer(sqrtx, y, threads, is_print);
-
-  // C1 uses PiTable only to calculate prime indexes <= y.
-  // Its frequently accessed pi[x] values are stored in
-  // SegmentedPiTable which fits into the CPU's cache.
-  PiTable pi(max(y, max_a_prime), threads);
 
   int64_t pi_y = pi[y];
   int64_t max_clustered_global = primes[pi_y];
@@ -1295,7 +1290,12 @@ int64_t AC(int64_t x,
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
 
+  // The A and C algorithms use the large PiTable only
+  // for initialization. The inner-most loops of those
+  // algorithms use the small SegmentedPiTable instead
+  // which fits into the CPU's cache.
   PiTable pi(max_prime, threads);
+
   auto primes = pi.get_primes<uint32_t>(max_prime, threads);
   int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, pi, primes, threads, is_print);
 
@@ -1329,6 +1329,11 @@ int128_t AC(int128_t x,
   int64_t max_c_prime = y;
   int64_t max_a_prime = (int64_t) isqrt(x / x_star);
   int64_t max_prime = max(max_a_prime, max_c_prime);
+
+  // The A and C algorithms use the large PiTable only
+  // for initialization. The inner-most loops of those
+  // algorithms use the small SegmentedPiTable instead
+  // which fits into the CPU's cache.
   PiTable pi(max_prime, threads);
   int128_t sum;
 
