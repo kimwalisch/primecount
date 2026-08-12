@@ -220,23 +220,23 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
     primes.push_back(0);
   else
   {
-    if (x >= size())
+    if (x > max_x_)
       throw primecount_error("PiTable::get_primes_u32(): x >= size");
 
     if (x > pstd::numeric_limits<uint32_t>::max())
       throw primecount_error("PiTable::get_primes_u32(): x > UINT32_MAX");
 
     // +1 needed for primes[0] = 0
-    uint64_t pix = operator[](x) + 1;
+    uint64_t size = operator[](x) + 1;
+    primes.resize(max(size, 4));
 
-    primes.resize(max(pix, 4));
     primes[0] = 0;
     primes[1] = 2;
     primes[2] = 3;
     primes[3] = 5;
 
     if (x < 7)
-      primes.resize(pix);
+      primes.resize(size);
     else
     {
       uint64_t thread_threshold = (uint64_t) 1e6;
@@ -285,20 +285,20 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
     primes.push_back(0);
   else
   {
-    if (x >= size())
+    if (x > max_x_)
       throw primecount_error("PiTable::get_primes_i64(): x >= size");
 
     // +1 needed for primes[0] = 0
-    uint64_t pix = operator[](x) + 1;
+    uint64_t size = operator[](x) + 1;
+    primes.resize(max(size, 4));
 
-    primes.resize(max(pix, 4));
     primes[0] = 0;
     primes[1] = 2;
     primes[2] = 3;
     primes[3] = 5;
 
     if (x < 7)
-      primes.resize(pix);
+      primes.resize(size);
     else
     {
       uint64_t thread_threshold = (uint64_t) 1e6;
@@ -347,32 +347,34 @@ Vector<uint32_t> PiTable::get_n_primes_u32(uint64_t n) const
     primes.push_back(0);
   else
   {
-    if (int64_t(n) > operator[](max_x_))
+    if (n > (uint64_t) operator[](max_x_))
       throw primecount_error("PiTable::get_n_primes_u32(): n > pi[max_x]");
 
     if (n > /* PrimePi(2^32) = */ 203280221)
       throw primecount_error("PiTable::get_n_primes_u32(): primes[n] > UINT32_MAX");
 
     // +1 needed for primes[0] = 0
-    n += 1;
+    uint64_t size = n + 1;
+    primes.resize(max(size, 4));
 
-    primes.resize(max(n, 4));
     primes[0] = 0;
     primes[1] = 2;
     primes[2] = 3;
     primes[3] = 5;
 
-    if (n < 4)
-      primes.resize(n);
+    if (size <= 4)
+      primes.resize(size);
     else
     {
-      // i = PrimePi(7) = 4
-      for (uint64_t i = 4, j = 0; true; j++)
+      // PrimePi(7) = 4
+      uint64_t i = 4;
+
+      for (uint64_t j = 0; j < pi_.size(); j++)
       {
         for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
         {
           primes[i++] = j * 240 + bit_values_[ctz64(bits)];
-          if (i == n)
+          if (i == size)
             goto finished;
         }
       }
