@@ -245,7 +245,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads)
+      #pragma omp parallel for num_threads(threads) schedule(static, 1)
       for (int t = 0; t < threads; t++)
       {
         // Each thread processes [low, high[
@@ -307,7 +307,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
       thread_dist += 240 - thread_dist % 240;
       uint64_t limit = x + 1;
 
-      #pragma omp parallel for num_threads(threads)
+      #pragma omp parallel for num_threads(threads) schedule(static, 1)
       for (int t = 0; t < threads; t++)
       {
         // Each thread processes [low, high[

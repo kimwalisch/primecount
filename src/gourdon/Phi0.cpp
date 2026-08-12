@@ -82,7 +82,7 @@ X Phi0_OpenMP(X x,
   int64_t pi_y = primes.size() - 1;
   X phi0 = phi_tiny(x, k);
 
-  #pragma omp parallel for schedule(static, 1) num_threads(threads) reduction (+: phi0)
+  #pragma omp parallel for num_threads(threads) schedule(static, 1) reduction (+: phi0)
   for (int64_t b = k + 1; b <= pi_y; b++)
   {
     phi0 -= phi_tiny(x / primes[b], k);

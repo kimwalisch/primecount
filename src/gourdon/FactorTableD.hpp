@@ -98,7 +98,7 @@ public:
     int64_t thread_distance = ceil_div(z, threads);
     thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
 
-    #pragma omp parallel for num_threads(threads)
+    #pragma omp parallel for num_threads(threads) schedule(static, 1)
     for (int t = 0; t < threads; t++)
     {
       // Thread processes interval [low, high]

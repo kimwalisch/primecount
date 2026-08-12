@@ -56,7 +56,7 @@ int64_t P3(int64_t x,
     int64_t thread_threshold = 100;
     threads = ideal_num_threads(pi_x13, threads, thread_threshold);
 
-    #pragma omp parallel for schedule(dynamic, 16) num_threads(threads) reduction(+: sum)
+    #pragma omp parallel for num_threads(threads) schedule(dynamic, 16) reduction(+: sum)
     for (int64_t i = a + 1; i <= pi_x13; i++)
     {
       int64_t xi = x / primes[i];
