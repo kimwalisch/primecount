@@ -15,8 +15,10 @@
 ///
 
 #include <PiTable.hpp>
+#include <primecount.hpp>
 #include <primecount-internal.hpp>
 #include <primesieve.hpp>
+#include <ctz.hpp>
 #include <Vector.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
@@ -205,6 +207,186 @@ void PiTable::init_count(uint64_t low,
     pi_[i].count = count;
     count += popcnt64(pi_[i].bits);
   }
+}
+
+/// Returns a vector with the primes <= x.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
+{
+  Vector<uint32_t> primes;
+
+  if (x < 2)
+    primes.push_back(0);
+  else
+  {
+    if (x > max_x_)
+      throw primecount_error("PiTable::get_primes_u32(): x > max_x");
+
+    if (x > pstd::numeric_limits<uint32_t>::max())
+      throw primecount_error("PiTable::get_primes_u32(): x > UINT32_MAX");
+
+    // +1 needed for primes[0] = 0
+    uint64_t size = operator[](x) + 1;
+    primes.resize(max(size, 4));
+
+    primes[0] = 0;
+    primes[1] = 2;
+    primes[2] = 3;
+    primes[3] = 5;
+
+    if (x < 7)
+      primes.resize(size);
+    else
+    {
+      uint64_t thread_threshold = (uint64_t) 1e7;
+      threads = ideal_num_threads(x, threads, thread_threshold);
+      uint64_t thread_dist = ceil_div(x, threads);
+      thread_dist += 240 - thread_dist % 240;
+      uint64_t limit = x + 1;
+
+      #pragma omp parallel for num_threads(threads)
+      for (int t = 0; t < threads; t++)
+      {
+        // Each thread processes [low, high[
+        uint64_t low = thread_dist * t;
+        uint64_t high = min(low + thread_dist, limit);
+
+        if (low < high)
+        {
+          uint64_t max_j = (high - 1) / 240;
+          uint64_t i = operator[](low) + 1;
+          i = max(i, 4);
+
+          for (uint64_t j = low / 240; j < max_j; j++)
+            for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
+              primes[i++] = uint32_t(j * 240 + bit_values_[ctz64(bits)]);
+
+          // Process last 64 bits, unset bits >= high
+          uint64_t bitmask = unset_larger_[(high - 1) % 240];
+          for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
+            primes[i++] = uint32_t(max_j * 240 + bit_values_[ctz64(bits)]);
+        }
+      }
+    }
+  }
+
+  return primes;
+}
+
+/// Returns a vector with the primes <= x.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
+{
+  Vector<int64_t> primes;
+
+  if (x < 2)
+    primes.push_back(0);
+  else
+  {
+    if (x > max_x_)
+      throw primecount_error("PiTable::get_primes_i64(): x > max_x");
+
+    // +1 needed for primes[0] = 0
+    uint64_t size = operator[](x) + 1;
+    primes.resize(max(size, 4));
+
+    primes[0] = 0;
+    primes[1] = 2;
+    primes[2] = 3;
+    primes[3] = 5;
+
+    if (x < 7)
+      primes.resize(size);
+    else
+    {
+      uint64_t thread_threshold = (uint64_t) 1e7;
+      threads = ideal_num_threads(x, threads, thread_threshold);
+      uint64_t thread_dist = ceil_div(x, threads);
+      thread_dist += 240 - thread_dist % 240;
+      uint64_t limit = x + 1;
+
+      #pragma omp parallel for num_threads(threads)
+      for (int t = 0; t < threads; t++)
+      {
+        // Each thread processes [low, high[
+        uint64_t low = thread_dist * t;
+        uint64_t high = min(low + thread_dist, limit);
+
+        if (low < high)
+        {
+          uint64_t max_j = (high - 1) / 240;
+          uint64_t i = operator[](low) + 1;
+          i = max(i, 4);
+
+          for (uint64_t j = low / 240; j < max_j; j++)
+            for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
+              primes[i++] = j * 240 + bit_values_[ctz64(bits)];
+
+          // Process last 64 bits, unset bits >= high
+          uint64_t bitmask = unset_larger_[(high - 1) % 240];
+          for (uint64_t bits = pi_[max_j].bits & bitmask; bits; bits &= bits - 1)
+            primes[i++] = max_j * 240 + bit_values_[ctz64(bits)];
+        }
+      }
+    }
+  }
+
+  return primes;
+}
+
+/// Returns a vector with the first n primes.
+/// The primes vector uses 1-indexing i.e. primes[1] = 2.
+///
+Vector<uint32_t> PiTable::get_n_primes_u32(uint64_t n) const
+{
+  Vector<uint32_t> primes;
+
+  if (n == 0)
+    primes.push_back(0);
+  else
+  {
+    if (n > (uint64_t) operator[](max_x_))
+      throw primecount_error("PiTable::get_n_primes_u32(): n > pi[max_x]");
+
+    if (n > /* PrimePi(2^32) = */ 203280221)
+      throw primecount_error("PiTable::get_n_primes_u32(): primes[n] > UINT32_MAX");
+
+    // +1 needed for primes[0] = 0
+    uint64_t size = n + 1;
+    primes.resize(max(size, 4));
+
+    primes[0] = 0;
+    primes[1] = 2;
+    primes[2] = 3;
+    primes[3] = 5;
+
+    if (size <= 4)
+      primes.resize(size);
+    else
+    {
+      // PrimePi(7) = 4
+      uint64_t i = 4;
+
+      for (std::size_t j = 0; j < pi_.size(); j++)
+      {
+        for (uint64_t bits = pi_[j].bits; bits; bits &= bits - 1)
+        {
+          uint64_t bit_value = bit_values_[ctz64(bits)];
+          uint64_t prime = j * 240 + bit_value;
+          primes[i++] = uint32_t(prime);
+
+          if (i == size)
+            goto finished;
+        }
+      }
+
+      finished:;
+    }
+  }
+
+  return primes;
 }
 
 } // namespace

@@ -169,6 +169,7 @@ int64_t S2(int64_t x,
            int64_t y,
            int64_t z,
            int64_t c,
+           const PiTable& pi,
            const Vector<uint32_t>& primes,
            const Vector<uint32_t>& lpf,
            const Vector<int8_t>& mu,
@@ -191,7 +192,6 @@ int64_t S2(int64_t x,
   threads = std::min(threads, max_threads);
   threads = ideal_num_threads(z, threads, thread_threshold);
   INDETERMINATE LoadBalancerS2 loadBalancer(x, y, z, threads, is_print);
-  PiTable pi(y, threads);
   int64_t sum = 0;
 
   #pragma omp parallel num_threads(threads) reduction(+: sum)
@@ -243,15 +243,16 @@ int64_t pi_lmo_parallel(int64_t x,
     print(x, y, z, c, threads);
   }
 
-  auto primes = generate_primes<uint32_t>(y);
+  PiTable pi(y, threads);
+  auto primes = pi.get_primes<uint32_t>(y, threads);
   auto lpf = generate_lpf(y, primes);
   auto mu = generate_moebius(y, primes);
 
   int64_t Lix = Li(x);
-  int64_t pi_y = primes.size() - 1;
+  int64_t pi_y = pi[y];
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
-  int64_t s2 = S2(x, y, z, c, primes, lpf, mu, threads, is_print);
+  int64_t s2 = S2(x, y, z, c, pi, primes, lpf, mu, threads, is_print);
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 

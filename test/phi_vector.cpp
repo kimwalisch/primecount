@@ -3,22 +3,21 @@
 /// @brief Test that phi_vector(x, a) and phi(x, a)
 ///        results are identical
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
 ///
 
 #include <primecount.hpp>
-#include <generate_primes.hpp>
 #include <imath.hpp>
 #include <phi_vector.hpp>
 #include <PiTable.hpp>
+#include <Vector.hpp>
 
 #include <stdint.h>
 #include <iostream>
 #include <random>
-#include <vector>
 
 using std::size_t;
 using namespace primecount;
@@ -38,7 +37,7 @@ int main()
     PiTable pi(y, threads);
     int64_t a = pi[y];
 
-    auto primes = generate_primes<int64_t>(y);
+    auto primes = pi.get_primes<int64_t>(y, threads);
     auto phi_vect = phi_vector(x, a, primes, pi);
 
     for (size_t i = 1; i < phi_vect.size(); i++)

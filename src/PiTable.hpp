@@ -23,6 +23,7 @@
 #include <Vector.hpp>
 
 #include <stdint.h>
+#include <type_traits>
 
 namespace primecount {
 
@@ -67,6 +68,36 @@ public:
     return count + popcnt64(bits & bitmask);
   }
 
+  /// Returns a vector with the primes <= x.
+  /// The primes vector uses 1-indexing i.e. primes[1] = 2.
+  ///
+  template <typename T>
+  typename std::enable_if<std::is_same<T, uint32_t>::value, Vector<uint32_t>>::type
+  get_primes(uint64_t x, int threads) const
+  {
+    return get_primes_u32(x, threads);
+  }
+
+  /// Returns a vector with the primes <= x.
+  /// The primes vector uses 1-indexing i.e. primes[1] = 2.
+  ///
+  template <typename T>
+  typename std::enable_if<std::is_same<T, int64_t>::value, Vector<int64_t>>::type
+  get_primes(uint64_t x, int threads) const
+  {
+    return get_primes_i64(x, threads);
+  }
+
+  /// Returns a vector with the first n primes.
+  /// The primes vector uses 1-indexing i.e. primes[1] = 2.
+  ///
+  template <typename T>
+  typename std::enable_if<std::is_same<T, uint32_t>::value, Vector<uint32_t>>::type
+  get_n_primes(uint64_t n) const
+  {
+    return get_n_primes_u32(n);
+  }
+
 private:
   struct pi_t
   {
@@ -77,6 +108,9 @@ private:
   void init(uint64_t limit, uint64_t cache_limit, int threads);
   void init_bits(uint64_t low, uint64_t high, uint64_t thread_num);
   void init_count(uint64_t low, uint64_t high, uint64_t thread_num);
+  Vector<uint32_t> get_primes_u32(uint64_t x, int threads) const;
+  Vector<int64_t> get_primes_i64(uint64_t x, int threads) const;
+  Vector<uint32_t> get_n_primes_u32(uint64_t n) const;
   static const Array<pi_t, 128> pi_cache_;
   Vector<pi_t> pi_;
   Vector<uint64_t> counts_;
