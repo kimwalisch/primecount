@@ -221,7 +221,7 @@ Vector<uint32_t> PiTable::get_primes_u32(uint64_t x, int threads) const
   else
   {
     if (x > max_x_)
-      throw primecount_error("PiTable::get_primes_u32(): x >= size");
+      throw primecount_error("PiTable::get_primes_u32(): x > max_x");
 
     if (x > pstd::numeric_limits<uint32_t>::max())
       throw primecount_error("PiTable::get_primes_u32(): x > UINT32_MAX");
@@ -286,7 +286,7 @@ Vector<int64_t> PiTable::get_primes_i64(uint64_t x, int threads) const
   else
   {
     if (x > max_x_)
-      throw primecount_error("PiTable::get_primes_i64(): x >= size");
+      throw primecount_error("PiTable::get_primes_i64(): x > max_x");
 
     // +1 needed for primes[0] = 0
     uint64_t size = operator[](x) + 1;

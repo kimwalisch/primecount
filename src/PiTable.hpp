@@ -88,7 +88,7 @@ public:
     return get_primes_i64(x, threads);
   }
 
-  /// Returns a vector with the first n prime.
+  /// Returns a vector with the first n primes.
   /// The primes vector uses 1-indexing i.e. primes[1] = 2.
   ///
   template <typename T>
