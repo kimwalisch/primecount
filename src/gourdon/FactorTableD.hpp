@@ -93,7 +93,7 @@ public:
     factor_[0] = T_MAX ^ 1;
 
     int64_t sqrtz = isqrt(z);
-    int64_t thread_threshold = (int64_t) 1e7;
+    int64_t thread_threshold = (int64_t) 5e6;
     threads = ideal_num_threads(z, threads, thread_threshold);
     int64_t thread_distance = ceil_div(z, threads);
     thread_distance += coprime_indexes_.size() - thread_distance % coprime_indexes_.size();
