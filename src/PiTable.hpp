@@ -108,8 +108,8 @@ private:
   void init(uint64_t limit, uint64_t cache_limit, int threads);
   void init_bits(uint64_t low, uint64_t high, uint64_t thread_num);
   void init_count(uint64_t low, uint64_t high, uint64_t thread_num);
-  Vector<uint32_t> get_primes_u32(uint64_t max, int threads) const;
-  Vector<int64_t> get_primes_i64(uint64_t max, int threads) const;
+  Vector<uint32_t> get_primes_u32(uint64_t x, int threads) const;
+  Vector<int64_t> get_primes_i64(uint64_t x, int threads) const;
   Vector<uint32_t> get_n_primes_u32(uint64_t n) const;
   static const Array<pi_t, 128> pi_cache_;
   Vector<pi_t> pi_;
