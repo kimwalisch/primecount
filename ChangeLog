@@ -1,6 +1,7 @@
-Changes in primecount-8.7, 2026-08-12
+Changes in primecount-8.7, 2026-08-13
 
 * primecount now requires a C++14 compiler (up from C++11).
+* nth_prime_sieve.cpp: Fix rare OpenMP multi-threading bug.
 * PiTable.cpp: Add multi-threaded primes vector initialization.
 * FactorTableD.hpp: Reduce Gourdon D memory using 16-bit prime factor ordinals #133.
 * primecount.pc.in: Add missing libatomic and libquadmath dependencies.

@@ -46,10 +46,6 @@
 #include <cmath>
 #include <memory>
 
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-
 namespace {
 
 using namespace primecount;
@@ -259,43 +255,38 @@ T nth_prime_sieve1(uint64_t n,
   #pragma omp parallel num_threads(threads)
   while (!finished)
   {
-  #ifdef _OPENMP
-    int thread_id = omp_get_thread_num();
-  #else
-    int thread_id = 0;
-  #endif
-
-    // Unsigned integer division is usually
-    // faster than signed integer division.
-    using UT = typename pstd::make_unsigned<T>::type;
-    uint64_t i = iter * threads + thread_id;
-    UT low = 0, high = 0;
-
-    if (sieve_forward)
+    #pragma omp for schedule(static, 1)
+    for (int t = 0; t < threads; t++)
     {
-      ASSERT(thread_dist >= 240);
-      low = nth_prime_approx + i * thread_dist;
-      high = low + thread_dist - 1;
-    }
-    else if ((UT) nth_prime_approx > i * thread_dist)
-    {
-      ASSERT(thread_dist >= 240);
-      high = nth_prime_approx - i * thread_dist;
-      low = (high - min(high, thread_dist)) + 1;
+      // Unsigned integer division is usually
+      // faster than signed integer division.
+      using UT = typename pstd::make_unsigned<T>::type;
+      uint64_t i = iter * threads + t;
+      UT low = 0, high = 0;
+
+      if (sieve_forward)
+      {
+        ASSERT(thread_dist >= 240);
+        low = nth_prime_approx + i * thread_dist;
+        high = low + thread_dist - 1;
+      }
+      else if ((UT) nth_prime_approx > i * thread_dist)
+      {
+        ASSERT(thread_dist >= 240);
+        high = nth_prime_approx - i * thread_dist;
+        low = (high - min(high, thread_dist)) + 1;
+      }
+
+      // Sieve the current segment [low, high].
+      // If possible use fast 64-bit integer division
+      // instead of slow 128-bit integer division.
+      if ( low <= pstd::numeric_limits<uint64_t>::max() &&
+          high <= pstd::numeric_limits<uint64_t>::max())
+        sieves[t].sieve(uint64_t(low), uint64_t(high));
+      else
+        sieves[t].sieve(low, high);
     }
 
-    // Sieve the current segment [low, high].
-    // If possible use fast 64-bit integer division
-    // instead of slow 128-bit integer division.
-    if ( low <= pstd::numeric_limits<uint64_t>::max() &&
-        high <= pstd::numeric_limits<uint64_t>::max())
-      sieves[thread_id].sieve(uint64_t(low), uint64_t(high));
-    else
-      sieves[thread_id].sieve(low, high);
-
-    // Wait until all threads have finished
-    // computing their current segment.
-    #pragma omp barrier
     #pragma omp single
     {
       iter++;
