@@ -336,7 +336,8 @@ T nth_prime_sieve1(uint64_t n,
 }
 
 /// nth_prime_sieve2() requires OpenMP 4.0 or later
-#if _OPENMP >= 201307
+#if defined(_OPENMP) && \
+    _OPENMP >= 201307
 
 struct SegmentConfig
 {
@@ -741,7 +742,8 @@ T nth_prime_sieve(T n,
                   T count_approx,
                   int threads)
 {
-#if _OPENMP >= 201307
+#if defined(_OPENMP) && \
+    _OPENMP >= 201307
 
   bool is_lock_free = false;
 

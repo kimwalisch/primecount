@@ -308,7 +308,8 @@ void print_nth_prime_sieve(uint64_t n,
   std::cout << "threads = " << threads << std::endl;
 }
 
-#if _OPENMP >= 201307
+#if defined(_OPENMP) && \
+    _OPENMP >= 201307
 
 void print_nth_prime_sieve(uint64_t n,
                            bool sieve_forward,
