@@ -137,7 +137,7 @@ void PiTable::init(uint64_t limit,
 
   #pragma omp parallel num_threads(threads)
   {
-    #pragma omp for
+    #pragma omp for schedule(static, 1)
     for (int t = 0; t < threads; t++)
     {
       uint64_t low = cache_limit + thread_dist * t;
@@ -148,7 +148,7 @@ void PiTable::init(uint64_t limit,
         init_bits(low, high, t);
     }
 
-    #pragma omp for nowait
+    #pragma omp for nowait schedule(static, 1)
     for (int t = 0; t < threads; t++)
     {
       uint64_t low = cache_limit + thread_dist * t;
