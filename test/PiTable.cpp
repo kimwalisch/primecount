@@ -2,7 +2,7 @@
 /// @file   PiTable.cpp
 /// @brief  Test the PiTable class
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -128,9 +128,11 @@ std::array<int64_t, 2000> pix =
 
 void check(bool OK)
 {
-  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
+  {
+    std::cout << "   ERROR\n";
     std::exit(1);
+  }
 }
 
 int main()
@@ -148,8 +150,12 @@ int main()
         count++;
         prime = it.next_prime();
       }
-      std::cout << "pi_cache(" << i << ") = " << PiTable::pi_cache(i);
-      check(PiTable::pi_cache(i) == count);
+      bool OK = (PiTable::pi_cache(i) == count);
+
+      if (!OK)
+        std::cout << "pi_cache(" << i << ") = " << PiTable::pi_cache(i);
+
+      check(OK);
     }
   }
 
@@ -164,8 +170,12 @@ int main()
 
     for (size_t i = 0; i < pix.size(); i++)
     {
-      std::cout << "pi(" << i << ") = " << pi[i];
-      check(pi[i] == pix[i]);
+      bool OK = (pi[i] == pix[i]);
+
+      if (!OK)
+        std::cout << "pi(" << i << ") = " << pi[i];
+
+      check(OK);
     }
 
     primesieve::iterator it;
@@ -174,8 +184,12 @@ int main()
 
     while (prime < pi.size())
     {
-      std::cout << "pi(" << prime << ") = " << pi[prime];
-      check(pi[prime] == count);
+      bool OK = (pi[prime] == count);
+
+      if (!OK)
+        std::cout << "pi(" << prime << ") = " << pi[prime];
+
+      check(OK);
       prime = it.next_prime();
       count++;
     }
@@ -183,12 +197,15 @@ int main()
     for (int i = 0; i < 2000; i++)
     {
       int n = dist(gen) % pi.size();
-      std::cout << "pi(" << n << ") = " << pi[n];
-      check(pi[n] == pi_primesieve(n));
+      bool OK = (pi[n] == pi_primesieve(n));
+
+      if (!OK)
+        std::cout << "pi(" << n << ") = " << pi[n];
+
+      check(OK);
     }
   }
 
-  std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;

@@ -21,9 +21,11 @@ using namespace primecount;
 
 void check(bool OK)
 {
-  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
+  {
+    std::cout << "   ERROR\n";
     std::exit(1);
+  }
 }
 
 int main()
@@ -51,11 +53,14 @@ int main()
       }
     }
 
-    std::cout << "lpf(" << i << ") = " << lpf[i];
-    check(lpf[i] == factor);
+    bool OK = (lpf[i] == factor);
+
+    if (!OK)
+      std::cout << "lpf(" << i << ") = " << lpf[i];
+
+    check(OK);
   }
 
-  std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;

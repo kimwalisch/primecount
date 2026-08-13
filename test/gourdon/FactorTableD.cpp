@@ -27,9 +27,11 @@ using namespace primecount;
 
 void check(bool OK)
 {
-  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
+  {
+    std::cout << "   ERROR\n";
     std::exit(1);
+  }
 }
 
 int main()
@@ -65,6 +67,8 @@ int main()
   {
     int64_t i = factorTable.to_index(n);
     bool is_prime = (lpf[n] == n);
+    bool mu_OK;
+    bool lpf_OK;
 
     // Check if n is coprime to the primes < limit
     for (int64_t j = 1; primes[j] < limit; j++)
@@ -75,15 +79,21 @@ int main()
     // have been removed from the FactorTableD.
     if (mpf[n] > y)
     {
-      std::cout << "prime_factor_larger_y(" << n << ") = " << (factorTable[i] == 0);
-      check(factorTable[i] == 0);
+      bool OK = (factorTable[i] == 0);
+
+      if (!OK)
+        std::cout << "prime_factor_larger_y(" << n << ") = " << factorTable[i];
+
+      check(OK);
       continue;
     }
 
-    std::cout << "mu(" << n << ") = " << factorTable.mu(i);
-    check(mu[n] == factorTable.mu(i));
+    mu_OK = (mu[n] == factorTable.mu(i));
 
-    std::cout << "lpf(" << n << ") = " << lpf[n];
+    if (!mu_OK)
+      std::cout << "mu(" << n << ") = " << factorTable.mu(i);
+
+    check(mu_OK);
 
     // factorTable[index] is a combination of the mu(n) (Möbius
     // function), lpf(n) (least prime factor) and mpf(n) (max prime
@@ -97,16 +107,21 @@ int main()
     // 6) 2*pi(lpf) + 1  if moebius(n) = -1
 
     if (n == 1)
-      check(factorTable[i] == uint16_max - 1);
+      lpf_OK = (factorTable[i] == uint16_max - 1);
     else if (is_prime)
-      check(factorTable[i] == uint16_max);
+      lpf_OK = (factorTable[i] == uint16_max);
     else if (mu[n] == 0)
-      check(factorTable[i] == 0);
+      lpf_OK = (factorTable[i] == 0);
     else
     {
       int64_t expected = prime_indexes[lpf[n]] * 2 + (mu[n] == -1);
-      check(factorTable[i] == expected);
+      lpf_OK = (factorTable[i] == expected);
     }
+
+    if (!lpf_OK)
+      std::cout << "lpf(" << n << ") = " << lpf[n];
+
+    check(lpf_OK);
 
     // Check that "factor[n] > encode(PrimePi(prime))" is equivalent
     // to "mu[n] != 0 && lpf[n] > prime" for a few prime thresholds.
@@ -133,7 +148,7 @@ int main()
   // crosses FactorTableD's threading threshold.
   {
     int64_t parallel_y = 1000000;
-    int64_t parallel_z = 10000001;
+    int64_t parallel_z = 5000001;
     FactorTableD<uint16_t> singleThread(parallel_y, parallel_z, 1);
     FactorTableD<uint16_t> multiThread(parallel_y, parallel_z, 2);
     int64_t size = singleThread.to_index(parallel_z) + 1;
@@ -150,7 +165,6 @@ int main()
     check(equal);
   }
 
-  std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;

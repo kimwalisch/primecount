@@ -27,9 +27,11 @@ using namespace primecount;
 
 void check(bool OK)
 {
-  std::cout << "   " << (OK ? "OK" : "ERROR") << "\n";
   if (!OK)
+  {
+    std::cout << "   ERROR\n";
     std::exit(1);
+  }
 }
 
 int main()
@@ -55,16 +57,20 @@ int main()
   {
     int64_t i = factorTable.to_index(n);
     bool is_prime = (lpf[n] == n);
+    bool mu_OK;
+    bool lpf_OK;
 
     // Check if n is coprime to the primes < limit
     for (int64_t j = 1; primes[j] < limit; j++)
       if (n % primes[j] == 0)
         goto not_coprime;
 
-    std::cout << "mu(" << n << ") = " << factorTable.mu(i);
-    check(mu[n] == factorTable.mu(i));
+    mu_OK = (mu[n] == factorTable.mu(i));
 
-    std::cout << "lpf(" << n << ") = " << lpf[n];
+    if (!mu_OK)
+      std::cout << "mu(" << n << ") = " << factorTable.mu(i);
+
+    check(mu_OK);
 
     // mu_lpf(n) is a combination of the mu(n) (Möbius function)
     // and lpf(n) (least prime factor) functions.
@@ -77,18 +83,22 @@ int main()
     // 5) lpf          if moebius(n) = -1
 
     if (n == 1)
-      check(factorTable.mu_lpf(i) == uint16_max - 1);
+      lpf_OK = (factorTable.mu_lpf(i) == uint16_max - 1);
     else if (is_prime)
-      check(factorTable.mu_lpf(i) == uint16_max);
+      lpf_OK = (factorTable.mu_lpf(i) == uint16_max);
     else if (mu[n] == 0)
-      check(factorTable.mu_lpf(i) == 0);
+      lpf_OK = (factorTable.mu_lpf(i) == 0);
     else
-      check(lpf[n] == factorTable.mu_lpf(i) + (factorTable.mu(i) == 1));
+      lpf_OK = (lpf[n] == factorTable.mu_lpf(i) + (factorTable.mu(i) == 1));
+
+    if (!lpf_OK)
+      std::cout << "lpf(" << n << ") = " << lpf[n];
+
+    check(lpf_OK);
 
     not_coprime:;
   }
 
-  std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;
 
   return 0;
