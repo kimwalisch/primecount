@@ -396,12 +396,12 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 ///
 void verify_pix(string_view_t pix_function,
                 maxint_t x,
-                maxint_t pix,
-                maxint_t Lix)
+                maxint_t pix)
 {
   if (x < 2657)
     return;
 
+  maxint_t Lix = Li(x);
   double logx = std::log(x);
   double sqrtx = std::sqrt(x);
   constexpr double PI = 3.14159265358979323846;

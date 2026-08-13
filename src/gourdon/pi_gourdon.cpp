@@ -79,7 +79,6 @@ int64_t pi_gourdon_64(int64_t x,
   // the CPU and memory (i.e. the B algorithm) we would overload
   // both the CPU and operating system.
 
-  int64_t Lix = Li(x);
   int64_t sigma = Sigma(x, y, threads, is_print);
   int64_t phi0 = Phi0(x, y, z, k, threads, is_print);
   int64_t ac = AC(x, y, z, k, threads, is_print);
@@ -87,7 +86,7 @@ int64_t pi_gourdon_64(int64_t x,
   int64_t d = D(x, y, z, k, threads, is_print);
   int64_t pix = ac - b + d + phi0 + sigma;
 
-  verify_pix("pi_gourdon_64", x, pix, Lix);
+  verify_pix("pi_gourdon_64", x, pix);
 
   return pix;
 }
@@ -151,7 +150,6 @@ int128_t pi_gourdon_128(int128_t x,
   // the CPU and memory (i.e. the B algorithm) we would overload
   // both the CPU and operating system.
 
-  int128_t Lix = Li(x);
   int128_t sigma = Sigma(x, y, threads, is_print);
   int128_t phi0 = Phi0(x, y, z, k, threads, is_print);
   int128_t ac = AC(x, y, z, k, threads, is_print);
@@ -159,7 +157,7 @@ int128_t pi_gourdon_128(int128_t x,
   int128_t d = D(x, y, z, k, threads, is_print);
   int128_t pix = ac - b + d + phi0 + sigma;
 
-  verify_pix("pi_gourdon_128", x, pix, Lix);
+  verify_pix("pi_gourdon_128", x, pix);
 
   return pix;
 }

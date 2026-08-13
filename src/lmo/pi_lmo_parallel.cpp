@@ -248,7 +248,6 @@ int64_t pi_lmo_parallel(int64_t x,
   auto lpf = generate_lpf(y, primes);
   auto mu = generate_moebius(y, primes);
 
-  int64_t Lix = Li(x);
   int64_t pi_y = pi[y];
   int64_t p2 = P2(x, y, pi_y, threads, is_print);
   int64_t s1 = S1(x, y, c, threads, is_print);
@@ -256,7 +255,7 @@ int64_t pi_lmo_parallel(int64_t x,
   int64_t phi = s1 + s2;
   int64_t pix = phi + pi_y - 1 - p2;
 
-  verify_pix("pi_lmo_parallel", x, pix, Lix);
+  verify_pix("pi_lmo_parallel", x, pix);
 
   return pix;
 }
