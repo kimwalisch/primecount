@@ -283,8 +283,8 @@ The benchmarks above were run on an AMD EPYC Zen5 CPU from 2025 with 32 CPU core
 Deleglise-Rivat and Gourdon implementations should not be interpreted solely as an
 advantage of Gourdon's original algorithm. primecount's Deleglise-Rivat implementation
 follows the published algorithm closely, whereas its Gourdon implementation incorporates
-several newer algorithmic improvements to the combinatorial prime counting developed by
-the author of primecount; see the [Algorithms](#algorithms) section for more details.
+several newer algorithmic improvements developed by the author of primecount; see the
+[Algorithms](#algorithms) section for more details.
 
 ## Algorithms
 
