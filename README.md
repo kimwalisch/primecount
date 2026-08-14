@@ -181,7 +181,7 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>10<sup>12</sup></td>
     <td>37,607,912,018</td>
     <td>0.01s</td>
-    <td>0.01s</td>
+    <td>0.00s</td>
     <td>0.00s</td>
     <td>0.00s</td>
     <td>0.00s</td>
@@ -189,8 +189,8 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>13</sup></td>
     <td>346,065,536,839</td>
-    <td>0.03s</td>
     <td>0.02s</td>
+    <td>0.01s</td>
     <td>0.01s</td>
     <td>0.01s</td>
     <td>0.01s</td>
@@ -198,47 +198,47 @@ Advanced options for Xavier Gourdon's algorithm:
   <tr align="right">
     <td>10<sup>14</sup></td>
     <td>3,204,941,750,802</td>
-    <td>0.09s</td>
-    <td>0.05s</td>
+    <td>0.07s</td>
+    <td>0.03s</td>
     <td>0.02s</td>
     <td>0.02s</td>
-    <td>0.02s</td>
+    <td>0.01s</td>
   </tr>
   <tr align="right">
     <td>10<sup>15</sup></td>
     <td>29,844,570,422,669</td>
-    <td>0.53s</td>
-    <td>0.28s</td>
-    <td>0.09s</td>
+    <td>0.42s</td>
+    <td>0.21s</td>
     <td>0.06s</td>
-    <td>0.04s</td>
+    <td>0.05s</td>
+    <td>0.03s</td>
   </tr>
   <tr align="right">
     <td>10<sup>16</sup></td>
     <td>279,238,341,033,925</td>
-    <td>2.96s</td>
-    <td>1.04s</td>
-    <td>0.37s</td>
-    <td>0.22s</td>
-    <td>0.12s</td>
+    <td>2.41s</td>
+    <td>0.84s</td>
+    <td>0.27s</td>
+    <td>0.19s</td>
+    <td>0.08s</td>
   </tr>
   <tr align="right">
     <td>10<sup>17</sup></td>
     <td>2,623,557,157,654,233</td>
-    <td>24.02s</td>
-    <td>8.29s</td>
-    <td>1.68s</td>
-    <td>0.89s</td>
-    <td>0.42s</td>
+    <td>19.72s</td>
+    <td>6.81s</td>
+    <td>1.21s</td>
+    <td>0.76s</td>
+    <td>0.27s</td>
   </tr>
   <tr align="right">
     <td>10<sup>18</sup></td>
     <td>24,739,954,287,740,860</td>
-    <td>203.82s</td>
-    <td>72.15s</td>
-    <td>7.66s</td>
-    <td>3.72s</td>
-    <td>1.58s</td>
+    <td>167.25s</td>
+    <td>60.03s</td>
+    <td>5.61s</td>
+    <td>3.15s</td>
+    <td>0.98s</td>
   </tr>
   <tr align="right">
     <td>10<sup>19</sup></td>
@@ -246,8 +246,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>18.09s</td>
-    <td>6.58s</td>
+    <td>15.61s</td>
+    <td>3.97s</td>
   </tr>
   <tr align="right">
     <td>10<sup>20</sup></td>
@@ -255,8 +255,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>85.45s</td>
-    <td>26.44s</td>
+    <td>78.64s</td>
+    <td>15.74s</td>
   </tr>
   <tr align="right">
     <td>10<sup>21</sup></td>
@@ -264,8 +264,8 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>381.82s</td>
-    <td>106.98s</td>
+    <td>352.86s</td>
+    <td>62.69s</td>
   </tr>
   <tr align="right">
     <td>10<sup>22</sup></td>
@@ -273,18 +273,18 @@ Advanced options for Xavier Gourdon's algorithm:
     <td>NaN</td>
     <td>NaN</td>
     <td>NaN</td>
-    <td>1,690.78s</td>
-    <td>436.77s</td>
+    <td>1,611.81s</td>
+    <td>261.64s</td>
   </tr>
 </table>
 
-The benchmarks above were run on an AMD EPYC Zen4 CPU from 2023 with 32 CPU cores (no Hyper-Threading)
-clocked at 3.7 GHz. Note that Jan Büthe mentions in <a href="doc/References.md">[11]</a>
-that he computed $\pi(10^{25})$ in 40,000 CPU core hours using the analytic prime
-counting function algorithm. Büthe also mentions that by using additional zeros of the
-zeta function the runtime could have potentially been reduced to 4,000 CPU core hours.
-However using primecount and Xavier Gourdon's algorithm $\pi(10^{25})$ can be computed
-in only 285 CPU core hours on the AMD EPYC Zen4 CPU!
+The benchmarks above were run on an AMD EPYC Zen5 CPU from 2025 with 32 CPU cores
+(no Hyper-Threading) clocked at 4.5 GHz. The performance difference between the
+Deleglise-Rivat and Gourdon implementations should not be interpreted solely as an
+advantage of Gourdon's original algorithm. primecount's Deleglise-Rivat implementation
+follows the published algorithm closely, whereas its Gourdon implementation incorporates
+several newer algorithmic improvements to the combinatorial prime counting developed by
+the author of primecount; see the [Algorithms](#algorithms) section for more details.
 
 ## Algorithms
 
