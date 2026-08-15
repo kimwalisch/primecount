@@ -1,9 +1,11 @@
 ///
 /// @file   sieve2.cpp
-/// @brief  Test the return value of Sieve::cross_off(prime)
-///         which returns the number of multiples of prime
-///         that have been crossed off for the first time in
-///         the sieve array.
+/// @brief  Test Sieve::cross_off_count() which removes the
+///         multiples of a prime from the sieve array and updates
+///         the total count of unsieved elements by the number of
+///         multiples that have been crossed off for the first
+///         time. Also tests Sieve::count(stop) and
+///         Sieve::get_total_count().
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
