@@ -130,7 +130,7 @@ ALWAYS_INLINE T isqrt(T x)
     do { r--; }
     while (r * (T) r > x);
   }
-  // Same as (r + 1)^2 < x but overflow safe
+  // Same as (r + 1)^2 <= x but overflow safe
   else if ((T) (r * 2) < x - r * (T) r)
   {
     do { r++; }
