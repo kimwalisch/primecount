@@ -5,7 +5,7 @@
 ///        function) lookup tables into a single factor[n] lookup
 ///        table which furthermore only contains entries for numbers
 ///        which are not divisible by 2, 3, 5, 7 and 11. The factor[n]
-///        lookup table uses up to 28 times less memory than the
+///        lookup table uses up to 21 times less memory than the
 ///        lpf[n], mpf[n] and mu[n] lookup tables! factor[n] uses only
 ///        2 or 4 bytes per entry.
 ///

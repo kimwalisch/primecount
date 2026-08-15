@@ -4,7 +4,7 @@
 ///        factor) and mu[n] (Möbius function) lookup tables into a
 ///        single factor[n] table which furthermore only contains
 ///        entries for numbers which are not divisible by 2, 3, 5, 7
-///        and 11. The factor[n] lookup table uses up to 19.25
+///        and 11. The factor[n] lookup table uses up to 12.03
 ///        times less memory than the lpf[n] & mu[n] lookup tables!
 ///        factor[n] uses only 2 bytes per entry for 32-bit numbers
 ///        and 4 bytes per entry for 64-bit numbers.
