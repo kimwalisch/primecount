@@ -191,7 +191,7 @@ private:
     return sum;
   }
 
-  /// Packing sieve_t increases the cache's capacity by 25%
+  /// Packing sieve_t increases the cache's capacity by 33%
   /// which improves performance by up to 10%.
   #pragma pack(push, 1)
   struct sieve_t
