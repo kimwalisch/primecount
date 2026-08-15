@@ -22,7 +22,7 @@ namespace primecount {
 /// This lookup table contains the first 480 numbers
 /// that are not divisible by 2, 3, 5, 7 and 11. The
 /// size of the table was obtained using the formula:
-/// \prod_{i=1}^{5} primes[i] - 1.
+/// \prod_{i=1}^{5} (primes[i] - 1).
 ///
 const Array<uint16_t, 480> BaseFactorTable::coprime_ =
 {
