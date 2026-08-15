@@ -87,7 +87,7 @@ int64_t S2(int64_t x,
       {
         if (mu[m] != 0 && lpf[m] > prime)
         {
-          // We have found a special leaf. Compute it's contribution
+          // We have found a special leaf. Compute its contribution
           // phi(x / (primes[b] * m), b - 1) by counting the number
           // of unsieved elements <= x / (primes[b] * m) after having
           // removed the multiples of the first b - 1 primes.

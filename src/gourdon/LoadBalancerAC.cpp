@@ -194,7 +194,7 @@ void LoadBalancerAC::print_AC_status(int64_t low,
   {
   #if __cplusplus >= 201703L
     // It is theoretically possible that multiple threads
-    // enter this critical sections within 0.1 seconds.
+    // enter this critical section within 0.1 seconds.
     // This additional condition prevents it.
     if (std::atomic<double>::is_always_lock_free &&
         time <= next_print_time_.load(std::memory_order_relaxed))

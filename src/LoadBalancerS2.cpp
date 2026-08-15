@@ -238,7 +238,7 @@ void LoadBalancerS2::update(int64_t& segment_size,
   // into the CPU's cache, otherwise performance will deteriorate
   // significantly and the algorithm will scale poorly.
   //
-  // Deleglise-Rivat orignially suggested using a segment size of
+  // Deleglise-Rivat originally suggested using a segment size of
   // O(y). Xavier Gourdon realized this segment size was much too
   // large for new record PrimePi(x) computations and hence
   // suggested using a smaller segment size of O(sqrt(x/y)) which

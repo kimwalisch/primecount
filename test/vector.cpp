@@ -33,7 +33,7 @@ int main()
 {
   // For performance reasons we want Vector::resize() not
   // to free memory when resizing to a smaller size.
-  // So this tests verifies this behavior.
+  // So this test verifies this behavior.
 
   // Allocate from 1 KiB to 128 MiB
   for (size_t i = 10; i <= 27; i++)
@@ -171,7 +171,7 @@ int main()
     Vector<int> vect(size);
     std::fill_n(&vect[0], size, 123);
 
-    // Test if resize does not default initilize
+    // Test if resize does not default initialize
     vect.resize(0);
     vect.resize(size);
     int sum = std::accumulate(&vect[0], &vect[0] + vect.size(), 0);

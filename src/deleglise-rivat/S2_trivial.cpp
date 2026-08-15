@@ -32,7 +32,7 @@ using namespace primecount;
 namespace {
 
 /// Find all trivial leaves: n = primes[b] * primes[l]
-/// which satisfy phi(x / n), b - 1) = 1.
+/// which satisfy phi(x / n, b - 1) = 1.
 /// Hence we only need to calculate their number!
 ///
 template <typename T>

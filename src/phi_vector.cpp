@@ -286,7 +286,7 @@ private:
   #pragma pack(pop)
 
   /// sieve[a] contains only numbers that are not divisible
-  /// by any of the the first a primes. sieve[a][i].count
+  /// by any of the first a primes. sieve[a][i].count
   /// contains the count of numbers < i * 240 that are not
   /// divisible by any of the first a primes.
   Vector<Vector<sieve_t>> sieve_;

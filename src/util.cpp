@@ -47,7 +47,7 @@ double alpha_z_ = -1;
 bool double_check_ = false;
 
 /// Truncate a floating point number to 3 digits after the decimal
-/// point. This function is used limit the number of digits after
+/// point. This function is used to limit the number of digits after
 /// the decimal point of the alpha tuning factor in order to make
 /// it more convenient for the user to e.g. type the alpha tuning
 /// factor as a command-line parameter.
@@ -387,7 +387,7 @@ int64_t get_x_star_gourdon(maxint_t x, int64_t y)
 
 /// Quickly verify a pi(x) result.
 /// Note that this check can only detect miscalculations if the
-/// pi(x) result if off by >= sqrt(x) * log(x) / 8π.
+/// pi(x) result is off by >= sqrt(x) * log(x) / 8π.
 ///
 /// Since we have an extensive test suite that likely finds most
 /// implementation bugs, we expect this verification check to

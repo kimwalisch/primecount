@@ -147,7 +147,7 @@ int64_t S2_thread(int64_t x,
   return sum;
 }
 
-/// Calculate the contribution of thes pecial leaves.
+/// Calculate the contribution of the special leaves.
 ///
 /// This is a parallel S2(x, y) implementation with advanced load
 /// balancing. As most special leaves tend to be in the first segments

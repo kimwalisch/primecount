@@ -114,7 +114,7 @@ Option parseOption(int argc,
 
     // If the option takes an optional argument we
     // assume the next value is an optional argument
-    // if the value is not a vaild option.
+    // if the value is not a valid option.
     if (isParam == OPTIONAL_PARAM &&
         i + 1 < argc &&
         !std::string(argv[i + 1]).empty() &&

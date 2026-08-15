@@ -620,7 +620,7 @@ T nth_prime_sieve2(uint64_t n,
   // and the actual prime sieving. On many-core systems it
   // increases the number of main threads while reducing the
   // number of threads per segment. This also reduces CPU
-  // cache trashing since fewer threads are sieving the same
+  // cache thrashing since fewer threads are sieving the same
   // segment simultaneously.
   while (segment.threads > 1 &&
          thread_dist > sqrtx / segment.threads &&

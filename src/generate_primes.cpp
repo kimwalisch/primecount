@@ -77,7 +77,7 @@ Vector<int8_t> generate_moebius(int64_t max,
 
 /// Returns a vector with the largest prime factors
 /// of the integers <= max.
-/// @Examples: mfp(2) = 2, mpf(15) = 5
+/// @Examples: mpf(2) = 2, mpf(15) = 5
 ///
 Vector<uint32_t> generate_mpf(int64_t max,
                               const Vector<uint32_t>& primes)
@@ -100,7 +100,7 @@ Vector<uint32_t> generate_mpf(int64_t max,
 
 /// Returns a vector with the least prime factors
 /// of the integers <= max.
-/// @Examples: lfp(2) = 2, lpf(15) = 3
+/// @Examples: lpf(2) = 2, lpf(15) = 3
 ///
 Vector<uint32_t> generate_lpf(int64_t max,
                               const Vector<uint32_t>& primes)
@@ -115,14 +115,14 @@ Vector<uint32_t> generate_lpf(int64_t max,
   Vector<uint32_t> lpf(size);
   std::fill(lpf.begin(), lpf.end(), 1);
 
-  // By convention lfp(1) = +Infinity. Note that lpf(n) is
+  // By convention lpf(1) = +Infinity. Note that lpf(n) is
   // named pmin(n) in Tomás Oliveira e Silva's paper:
   // "Computing π(x): the combinatorial method".
-  // The reason why lfp(1) is defined to be +Infinity is
+  // The reason why lpf(1) is defined to be +Infinity is
   // that phi(x / 1, c) contributes to the ordinary leaves
   // (S1) in the Lagarias-Miller-Odlyzko and
   // Deleglise-Rivat prime counting algorithms. And
-  // lfp(1) = +Infinity allows to simplify that algorithm.
+  // lpf(1) = +Infinity allows to simplify that algorithm.
   if (lpf.size() > 1)
     lpf[1] = pstd::numeric_limits<uint32_t>::max();
 
@@ -131,8 +131,8 @@ Vector<uint32_t> generate_lpf(int64_t max,
     if (primes[i] > sqrt)
       break;
 
-    int64_t prime_sqaured = primes[i] * primes[i];
-    for (int64_t j = prime_sqaured; j < size; j += primes[i])
+    int64_t prime_squared = primes[i] * primes[i];
+    for (int64_t j = prime_squared; j < size; j += primes[i])
       if (lpf[j] == 1)
         lpf[j] = primes[i];
   }

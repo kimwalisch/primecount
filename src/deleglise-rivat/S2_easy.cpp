@@ -158,7 +158,7 @@ T S2_easy_OpenMP(T x,
 #elif defined(ENABLE_LIBDIVIDE)
 
 /// This is an optimized version of S2_easy(x, y) using libdivide.
-/// libdivide allows to replace expensive integer divsion
+/// libdivide allows to replace expensive integer division
 /// instructions by a sequence of shift, add and multiply
 /// instructions that will calculate the integer division much
 /// faster, especially on older CPUs.
