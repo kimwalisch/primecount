@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9...4.2)
 
 project(primesieve
-        VERSION 12.15
+        VERSION 12.16
         LANGUAGES CXX)
 
 # Build options ######################################################
@@ -133,6 +133,10 @@ include("${PROJECT_SOURCE_DIR}/cmake/libatomic.cmake")
 # libprimesieve (shared library) #####################################
 
 find_package(Threads REQUIRED QUIET)
+
+if(CMAKE_THREAD_LIBS_INIT)
+    string(APPEND PRIMESIEVE_PKGCONFIG_LIBS_PRIVATE "${CMAKE_THREAD_LIBS_INIT} ")
+endif()
 
 if(BUILD_SHARED_LIBS)
     add_library(libprimesieve SHARED ${LIB_SRC})

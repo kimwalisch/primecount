@@ -3,7 +3,7 @@
 /// @brief  primesieve::iterator allows to easily iterate (forwards
 ///         and backwards) over prime numbers.
 ///
-/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -52,7 +52,7 @@ struct iterator
 {
   /// Create a new iterator object.
   /// Generate primes >= 0. The start number is default initialized to
-  /// 0 and the stop_hint is default initialized UINT64_MAX.
+  /// 0 and the stop_hint is default initialized to UINT64_MAX.
   ///
   iterator() noexcept;
 

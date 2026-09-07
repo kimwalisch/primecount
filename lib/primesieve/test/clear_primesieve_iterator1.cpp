@@ -1,8 +1,8 @@
 ///
 /// @file   clear_primesieve_iterator1.cpp
-/// @brief  Test next_prime() of primesieve::iterator.
+/// @brief  Test clear() of primesieve::iterator.
 ///
-/// Copyright (C) 2022 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.

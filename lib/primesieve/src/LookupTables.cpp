@@ -1,8 +1,8 @@
 ///
 /// @file   LookupTables.cpp
-/// @brief  Static gobal arrays.
+/// @brief  Static global arrays.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -30,7 +30,7 @@ namespace primesieve {
 /// the operand size (number of bits) if the input is zero. Hence
 /// the maximum index is 64 for e.g. TZCNT(0) (on x64 CPUs)
 /// therefore we add an additional 0 at the end of the array to
-/// prevent out of bounds acceses.
+/// prevent out of bounds accesses.
 ///
 const Array<uint64_t, 65> bitValues =
 {
