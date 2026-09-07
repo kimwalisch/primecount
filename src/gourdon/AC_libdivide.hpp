@@ -1,23 +1,8 @@
 ///
-/// @file  AC.cpp
-/// @brief Implementation of the A + C formulas in Xavier Gourdon's
-///        prime counting algorithm. In this implementation the memory
-///        usage of the pi[x] lookup table has been reduced from
-///        O(x^(1/2)) to O(x^(1/4)) by using a segmented pi[x] lookup
-///        table. In each segment we process the leaves that satisfy:
-///        low <= x / (prime * m) < high.
-///
-///        The A & C formulas roughly correspond to the easy special
-///        leaves in the Deleglise-Rivat algorithm. Since both
-///        formulas use a very similar segmented algorithm that goes
-///        up to x^(1/2) it makes sense to merge the A & C formulas
-///        hence reducing the runtime complexity by a factor of
-///        O(x^(1/2) * ln ln x^(1/2)) and avoiding initializing some
-///        data structures twice. Merging the A & C formulas also
-///        improves scaling on systems with many CPU cores.
-///
-///        In-depth description of this algorithm:
-///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.pdf
+/// @file  AC_libdivide.hpp
+/// @brief Scalar libdivide implementation of the A + C formulas in
+///        Xavier Gourdon's prime counting algorithm. Wide numerators
+///        use the shared scalar helpers in AC.cpp.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -25,48 +10,76 @@
 /// file in the top level directory.
 ///
 
-#include "LoadBalancerAC.hpp"
-#include "SegmentedPiTable.hpp"
+#ifndef AC_LIBDIVIDE_HPP
+#define AC_LIBDIVIDE_HPP
 
-#include <PiTable.hpp>
-#include <primecount-internal.hpp>
-#include <macros.hpp>
-#include <cpu_arch_macros.hpp>
-#include <fast_div.hpp>
-#include <gourdon.hpp>
-#include <int128_t.hpp>
-#include <min.hpp>
-#include <imath.hpp>
-#include <print.hpp>
-#include <Vector.hpp>
-
-#include <stdint.h>
-#include <utility>
-
-using namespace primecount;
+#include <libdivide.h>
 
 namespace {
 
-/// Compute the A formula.
+using namespace primecount;
+
+/// SIMD dividers use separate arrays for contiguous masked loads.
+/// Only these two arrays are allocated, without a libdivide vector.
+struct LibdividePrimes
+{
+  Vector<uint64_t> magic;
+  Vector<uint8_t> shift;
+
+  template <typename Primes>
+  LibdividePrimes(const Primes& primes, int threads)
+  {
+    magic.resize(primes.size());
+    shift.resize(primes.size());
+
+    int64_t min_thread_size = (int64_t) 1e6;
+    int64_t primes_size = primes.size();
+    int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
+    int64_t thread_dist = ceil_div(primes_size, init_threads);
+
+    #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
+    for (int64_t low = 1; low < primes_size; low += thread_dist)
+    {
+      int64_t high = min(low + thread_dist, primes_size);
+
+      NO_UNROLL_LOOP
+      for (int64_t i = low; i < high; i++)
+      {
+        auto divider = libdivide::libdivide_u64_branchfree_gen(primes[i]);
+        magic[i] = divider.magic;
+        shift[i] = divider.more;
+      }
+    }
+  }
+
+  ALWAYS_INLINE uint64_t divide(uint64_t xp, uint64_t i) const
+  {
+    libdivide::libdivide_u64_branchfree_t divider = { magic[i], shift[i] };
+    return libdivide::libdivide_u64_branchfree_do(xp, &divider);
+  }
+};
+
+#if !defined(ENABLE_AVX512_VPOPCNT) && !defined(ENABLE_ARM_SVE)
+
+/// Compute the A formula using libdivide.
+/// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename XP,
-          typename Primes>
-T A(T xlow,
-    T xhigh,
-    XP xp,
-    uint64_t y,
-    uint64_t b,
-    const Primes& primes,
-    const PiTable& pi,
-    const SegmentedPiTable& segmentedPi)
+          typename LibdividePrimes>
+T A_64(T xlow,
+       T xhigh,
+       uint64_t xp,
+       uint64_t y,
+       uint64_t prime,
+       const LibdividePrimes& primes,
+       const PiTable& pi,
+       const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
-  uint64_t prime = primes[b];
-  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
@@ -78,17 +91,17 @@ T A(T xlow,
   NO_UNROLL_LOOP
   for (; i <= max_i1; i++)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq];
   }
 
   // Unroll loop to increase instruction level parallelism
   for (; i + 3 <= max_i2; i += 4)
   {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
 
     sum += (segmentedPi[xpq0] * 2) +
            (segmentedPi[xpq1] * 2) +
@@ -101,14 +114,15 @@ T A(T xlow,
   NO_UNROLL_LOOP
   for (; i <= max_i2; i++)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2;
   }
 
   return sum;
 }
 
-/// Compute the 1st part of the C formula.
+/// Compute the 1st part of the C formula using libdivide.
+/// 64-bit function: xp < 2^64
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
@@ -120,22 +134,23 @@ T A(T xlow,
 /// m cannot contain more than 2 prime factors.
 ///
 template <typename T,
-          typename XP,
+          typename LibdividePrimes,
           typename Primes>
-T C1(T xlow,
-     T xhigh,
-     XP xp,
-     uint64_t b,
-     uint64_t y,
-     uint64_t z,
-     const Primes& primes,
-     const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
+T C1_64(T xlow,
+        T xhigh,
+        uint64_t xp,
+        uint64_t b,
+        uint64_t y,
+        uint64_t z,
+        const LibdividePrimes& lprimes,
+        const Primes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t x_div_prime3 = xp / (prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
 
@@ -154,10 +169,10 @@ T C1(T xlow,
     // Unroll loop to increase instruction level parallelism
     for (; i + 3 <= max_i; i += 4)
     {
-      uint64_t xpm0 = fast_div64(xp, primes[i]);
-      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
-      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
-      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
+      uint64_t xpm0 = xp / lprimes[i];
+      uint64_t xpm1 = xp / lprimes[i+1];
+      uint64_t xpm2 = xp / lprimes[i+2];
+      uint64_t xpm3 = xp / lprimes[i+3];
 
       sum -= (segmentedPi[xpm0] - b + 2) +
              (segmentedPi[xpm1] - b + 2) +
@@ -168,7 +183,7 @@ T C1(T xlow,
     NO_UNROLL_LOOP
     for (; i <= max_i; i++)
     {
-      uint64_t xpm = fast_div64(xp, primes[i]);
+      uint64_t xpm = xp / lprimes[i];
       sum -= segmentedPi[xpm] - b + 2;
     }
   }
@@ -185,35 +200,20 @@ T C1(T xlow,
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
       uint64_t q = primes[i];
-      uint64_t min_r = max(q, min_m / q);
-      uint64_t max_r = min(y, max_m / q);
+      uint64_t min_r = max(q, min_m / lprimes[i]);
+      uint64_t max_r = min(y, max_m / lprimes[i]);
 
       if (min_r >= max_r)
         continue;
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      uint64_t j = min_j;
-      XP xpq = fast_div(xp, q);
-
-      // Unroll loop to increase instruction level parallelism
-      for (; j + 3 <= max_j; j += 4)
-      {
-        uint64_t xpm0 = fast_div64(xpq, primes[j]);
-        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
-        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
-        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
-
-        sum += (segmentedPi[xpm0] - b + 2) +
-               (segmentedPi[xpm1] - b + 2) +
-               (segmentedPi[xpm2] - b + 2) +
-               (segmentedPi[xpm3] - b + 2);
-      }
+      uint64_t xpq = xp / lprimes[i];
 
       NO_UNROLL_LOOP
-      for (; j <= max_j; j++)
+      for (uint64_t j = min_j; j <= max_j; j++)
       {
-        uint64_t xpm = fast_div64(xpq, primes[j]);
+        uint64_t xpm = xpq / lprimes[j];
         sum += segmentedPi[xpm] - b + 2;
       }
     }
@@ -229,22 +229,21 @@ T C1(T xlow,
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
 template <typename T,
-          typename XP,
-          typename Primes>
-T C2(T xlow,
-     T xhigh,
-     XP xp,
-     uint64_t y,
-     uint64_t b,
-     uint64_t pi_y,
-     uint64_t max_clustered_global,
-     const Primes& primes,
-     const PiTable& pi,
-     const SegmentedPiTable& segmentedPi)
+          typename LibdividePrimes>
+T C2_64(T xlow,
+        T xhigh,
+        uint64_t xp,
+        uint64_t y,
+        uint64_t b,
+        uint64_t pi_y,
+        uint64_t max_clustered_global,
+        uint64_t prime,
+        const LibdividePrimes& primes,
+        const PiTable& pi,
+        const SegmentedPiTable& segmentedPi)
 {
-  uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
+  uint64_t x_div_prime3 = xp / (prime * prime);
   uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
   uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
 
@@ -252,7 +251,7 @@ T C2(T xlow,
     return 0;
 
   uint64_t pi_min_m = pi[min_m];
-  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
@@ -290,7 +289,7 @@ T C2(T xlow,
   NO_UNROLL_LOOP
   for (; i <= pi_conj_lo; i++)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
   }
 
@@ -298,10 +297,10 @@ T C2(T xlow,
   // Unroll loop to increase instruction level parallelism.
   for (; i + 3 <= pi_conj_hi; i += 4)
   {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
 
     sum += (segmentedPi[xpq0] * 2 - b + 2) +
            (segmentedPi[xpq1] * 2 - b + 2) +
@@ -312,7 +311,7 @@ T C2(T xlow,
   NO_UNROLL_LOOP
   for (; i <= pi_conj_hi; i++)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] * 2 - b + 2;
   }
 
@@ -320,10 +319,10 @@ T C2(T xlow,
   // Unroll loop to increase instruction level parallelism.
   for (; i + 3 <= pi_min_clustered; i += 4)
   {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
 
     sum += (segmentedPi[xpq0] - b + 2) +
            (segmentedPi[xpq1] - b + 2) +
@@ -334,27 +333,25 @@ T C2(T xlow,
   NO_UNROLL_LOOP
   for (; i <= pi_min_clustered; i++)
   {
-    uint64_t xpq = fast_div64(xp, primes[i]);
+    uint64_t xpq = xp / primes[i];
     sum += segmentedPi[xpq] - b + 2;
   }
 
   return sum;
 }
 
-#if !defined(ENABLE_LIBDIVIDE) && !defined(ENABLE_ARM_SVE)
-
 /// Compute A + C
 template <typename T,
           typename Primes>
-T AC_OpenMP_default(T x,
-                    int64_t y,
-                    int64_t z,
-                    int64_t k,
-                    int64_t x_star,
-                    const PiTable& pi,
-                    const Primes& primes,
-                    int threads,
-                    bool is_print)
+T AC_OpenMP_libdivide(T x,
+                      int64_t y,
+                      int64_t z,
+                      int64_t k,
+                      int64_t x_star,
+                      const PiTable& pi,
+                      const Primes& primes,
+                      int threads,
+                      bool is_print)
 {
   T sum = 0;
   int64_t x13 = iroot<3>(x);
@@ -376,6 +373,23 @@ T AC_OpenMP_default(T x,
   int64_t pi_sqrtz = pi[sqrtz];
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
+
+  // Initialize libdivide vector from primes vector
+  Vector<libdivide::branchfree_divider<uint64_t>> lprimes;
+  lprimes.resize(primes.size());
+
+  int64_t min_thread_size = (int64_t) 1e6;
+  int64_t primes_size = lprimes.size();
+  int init_threads = ideal_num_threads(primes_size, threads, min_thread_size);
+  int64_t thread_dist = ceil_div(primes_size, init_threads);
+
+  #pragma omp parallel for num_threads(init_threads) schedule(static, 1)
+  for (int64_t low = 1; low < primes_size; low += thread_dist)
+  {
+    int64_t high = min(low + thread_dist, primes_size);
+    for (int64_t i = low; i < high; i++)
+      lprimes[i] = primes[i];
+  }
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -433,7 +447,7 @@ T AC_OpenMP_default(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
+              sum -= C1_64(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
             else
               sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
@@ -461,10 +475,11 @@ T AC_OpenMP_default(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2_clustered; b++)
         {
-          T xp = x / primes[b];
+          int64_t prime = primes[b];
+          T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -472,10 +487,11 @@ T AC_OpenMP_default(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
-          T xp = x / primes[b];
+          int64_t prime = primes[b];
+          T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -483,10 +499,11 @@ T AC_OpenMP_default(T x,
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)
         {
-          T xp = x / primes[b];
+          int64_t prime = primes[b];
+          T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
+            sum += A_64(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
@@ -501,187 +518,4 @@ T AC_OpenMP_default(T x,
 
 } // namespace
 
-#if defined(ENABLE_LIBDIVIDE)
-  #include "AC_libdivide.hpp"
-
-  #if defined(ENABLE_ARM_SVE)
-    #include "AC_libdivide_arm_sve.hpp"
-  #elif defined(ENABLE_AVX512_VPOPCNT)
-    #include "AC_libdivide_avx512.hpp"
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    #include "AC_libdivide_arm_sve.hpp"
-    #include <cpu_supports_arm_sve.hpp>
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    #include "AC_libdivide_avx512.hpp"
-    #include <cpu_supports_avx512_vpopcnt.hpp>
-  #endif
-#else
-  #if defined(ENABLE_ARM_SVE)
-    #include "AC_arm_sve.hpp"
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    #include "AC_arm_sve.hpp"
-    #include <cpu_supports_arm_sve.hpp>
-  #endif
 #endif
-
-namespace {
-
-/// Runtime dispatch before initializing dividers and starting OpenMP.
-template <typename T, typename... Args>
-T AC_OpenMP(T x, Args&&... args)
-{
-  #if defined(ENABLE_LIBDIVIDE)
-    #if defined(ENABLE_ARM_SVE)
-      return AC_OpenMP_libdivide_arm_sve(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_AVX512_VPOPCNT)
-      return AC_OpenMP_libdivide_avx512(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? AC_OpenMP_libdivide_arm_sve(x, std::forward<Args>(args)...)
-        : AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-      return cpu_supports_avx512_vpopcnt
-        ? AC_OpenMP_libdivide_avx512(x, std::forward<Args>(args)...)
-        : AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #else
-      return AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #endif
-  #else
-    #if defined(ENABLE_ARM_SVE)
-      return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? AC_OpenMP_arm_sve(x, std::forward<Args>(args)...)
-        : AC_OpenMP_default(x, std::forward<Args>(args)...);
-    #else
-      return AC_OpenMP_default(x, std::forward<Args>(args)...);
-    #endif
-  #endif
-}
-
-string_view_t AC_algo_name()
-{
-  #if defined(ENABLE_LIBDIVIDE)
-    #if defined(ENABLE_ARM_SVE)
-      return "Algorithm: libdivide + ARM SVE";
-    #elif defined(ENABLE_AVX512_VPOPCNT)
-      return "Algorithm: libdivide + AVX512";
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? "Algorithm: libdivide + ARM SVE"
-        : "Algorithm: libdivide";
-    #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-      return cpu_supports_avx512_vpopcnt
-        ? "Algorithm: libdivide + AVX512"
-        : "Algorithm: libdivide";
-    #else
-      return "Algorithm: libdivide";
-    #endif
-  #else
-    #if defined(ENABLE_ARM_SVE)
-      return "Algorithm: ARM SVE";
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? "Algorithm: ARM SVE"
-        : "Algorithm: CPU div";
-    #else
-      return "Algorithm: CPU div";
-    #endif
-  #endif
-}
-
-} // namespace
-
-namespace primecount {
-
-int64_t AC(int64_t x,
-           int64_t y,
-           int64_t z,
-           int64_t k,
-           int threads,
-           bool is_print)
-{
-  double time;
-
-  if (is_print)
-  {
-    print("");
-    print("=== AC(x, y) ===");
-    print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
-    time = get_time();
-  }
-
-  int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
-
-  auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-  int64_t sum = AC_OpenMP((uint64_t) x, y, z, k, x_star, pi, primes, threads, is_print);
-
-  if (is_print)
-    print("A + C", sum, time);
-
-  return sum;
-}
-
-#ifdef HAVE_INT128_T
-
-int128_t AC(int128_t x,
-            int64_t y,
-            int64_t z,
-            int64_t k,
-            int threads,
-            bool is_print)
-{
-  double time;
-
-  if (is_print)
-  {
-    print("");
-    print("=== AC(x, y) ===");
-    print(AC_algo_name());
-    print_gourdon_vars(x, y, z, k, threads);
-    time = get_time();
-  }
-
-  int64_t x_star = get_x_star_gourdon(x, y);
-  int64_t max_c_prime = y;
-  int64_t max_a_prime = (int64_t) isqrt(x / x_star);
-  int64_t max_prime = max(max_a_prime, max_c_prime);
-
-  // The A and C algorithms use the large PiTable only
-  // for initialization. The inner-most loops of those
-  // algorithms use the small SegmentedPiTable instead
-  // which fits into the CPU's cache.
-  PiTable pi(max_prime, threads);
-  int128_t sum;
-
-  // uses less memory
-  if (max_prime <= pstd::numeric_limits<uint32_t>::max())
-  {
-    auto primes = pi.get_primes<uint32_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
-  }
-  else
-  {
-    auto primes = pi.get_primes<int64_t>(max_prime, threads);
-    sum = AC_OpenMP((uint128_t) x, y, z, k, x_star, pi, primes, threads, is_print);
-  }
-
-  if (is_print)
-    print("A + C", sum, time);
-
-  return sum;
-}
-
-#endif
-
-} // namespace
