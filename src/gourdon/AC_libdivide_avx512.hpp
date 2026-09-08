@@ -59,7 +59,7 @@ ALWAYS_INLINE T sum_pi_libdivide_avx512(uint64_t xp,
                                         uint64_t i,
                                         uint64_t last,
                                         uint64_t b,
-                                        const LibdividePrimes& dividers,
+                                        const LibdividePrimes& lprimes,
                                         const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
@@ -72,7 +72,7 @@ ALWAYS_INLINE T sum_pi_libdivide_avx512(uint64_t xp,
   {
     uint64_t count = min(lanes, last - i + 1);
     __mmask8 mask = (__mmask8) (0xff >> (lanes - count));
-    __m512i q = divide_libdivide_avx512(numer, mask, &dividers.magic[i], &dividers.shift[i]);
+    __m512i q = divide_libdivide_avx512(numer, mask, &lprimes.magic[i], &lprimes.shift[i]);
     _mm512_mask_storeu_epi64(quotients.data(), mask, q);
 
     NO_UNROLL_LOOP
@@ -97,7 +97,7 @@ T A_libdivide_avx512(T xlow,
                      uint64_t xp,
                      uint64_t y,
                      uint64_t prime,
-                     const LibdividePrimes& dividers,
+                     const LibdividePrimes& lprimes,
                      const PiTable& pi,
                      const SegmentedPiTable& segmentedPi)
 {
@@ -112,11 +112,11 @@ T A_libdivide_avx512(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, max_i1, 2, dividers, segmentedPi);
+  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, max_i1, 2, lprimes, segmentedPi);
   i = max(i, max_i1 + 1);
 
   // x / pq < y && low <= x / pq < high
-  sum += sum_pi_libdivide_avx512<T, 2>(xp, i, max_i2, 2, dividers, segmentedPi);
+  sum += sum_pi_libdivide_avx512<T, 2>(xp, i, max_i2, 2, lprimes, segmentedPi);
 
   return sum;
 }
@@ -143,7 +143,7 @@ T C1_libdivide_avx512(T xlow,
                       uint64_t b,
                       uint64_t y,
                       uint64_t z,
-                      const LibdividePrimes& dividers,
+                      const LibdividePrimes& lprimes,
                       const Primes& primes,
                       const PiTable& pi,
                       const SegmentedPiTable& segmentedPi)
@@ -165,7 +165,7 @@ T C1_libdivide_avx512(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
-    sum -= sum_pi_libdivide_avx512<T, 1>(xp, min_i, max_i, b, dividers, segmentedPi);
+    sum -= sum_pi_libdivide_avx512<T, 1>(xp, min_i, max_i, b, lprimes, segmentedPi);
   }
 
   // m = primes[i] * primes[j]
@@ -181,17 +181,17 @@ T C1_libdivide_avx512(T xlow,
     for (uint64_t i = min_q_i; i <= max_q_i; i++)
     {
       uint64_t q = primes[i];
-      uint64_t min_r = max(q, dividers.divide(min_m, i));
-      uint64_t max_r = min(y, dividers.divide(max_m, i));
+      uint64_t min_r = max(q, lprimes.divide(min_m, i));
+      uint64_t max_r = min(y, lprimes.divide(max_m, i));
 
       if (min_r >= max_r)
         continue;
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      uint64_t xpq = dividers.divide(xp, i);
+      uint64_t xpq = lprimes.divide(xp, i);
 
-      sum += sum_pi_libdivide_avx512<T, 1>(xpq, min_j, max_j, b, dividers, segmentedPi);
+      sum += sum_pi_libdivide_avx512<T, 1>(xpq, min_j, max_j, b, lprimes, segmentedPi);
     }
   }
 
@@ -216,7 +216,7 @@ T C2_libdivide_avx512(T xlow,
                       uint64_t pi_y,
                       uint64_t max_clustered_global,
                       uint64_t prime,
-                      const LibdividePrimes& dividers,
+                      const LibdividePrimes& lprimes,
                       const PiTable& pi,
                       const SegmentedPiTable& segmentedPi)
 {
@@ -264,15 +264,15 @@ T C2_libdivide_avx512(T xlow,
   }
 
   // Sparse leaves below the reflected range
-  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, pi_conj_lo, b, dividers, segmentedPi);
+  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, pi_conj_lo, b, lprimes, segmentedPi);
   i = pi_conj_lo + 1;
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  sum += sum_pi_libdivide_avx512<T, 2>(xp, i, pi_conj_hi, b, dividers, segmentedPi);
+  sum += sum_pi_libdivide_avx512<T, 2>(xp, i, pi_conj_hi, b, lprimes, segmentedPi);
   i = pi_conj_hi + 1;
 
   // Sparse leaves above the reflected range
-  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, pi_min_clustered, b, dividers, segmentedPi);
+  sum += sum_pi_libdivide_avx512<T, 1>(xp, i, pi_min_clustered, b, lprimes, segmentedPi);
 
   return sum;
 }
@@ -314,7 +314,7 @@ T AC_OpenMP_libdivide_avx512(T x,
   int64_t pi_root3_xy = pi[iroot<3>(xy)];
   int64_t pi_root3_xz = pi[iroot<3>(xz)];
 
-  LibdividePrimes dividers(primes, threads);
+  LibdividePrimes lprimes(primes, threads);
 
   // In order to reduce the thread creation & destruction
   // overhead we reuse the same threads throughout the
@@ -374,7 +374,7 @@ T AC_OpenMP_libdivide_avx512(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_libdivide_avx512(xlow, xhigh, uint64_t(xp), b, y, z, dividers, primes, pi, segmentedPi);
+              sum -= C1_libdivide_avx512(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
             else
               sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
@@ -407,7 +407,7 @@ T AC_OpenMP_libdivide_avx512(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, dividers, pi, segmentedPi);
+            sum += C2_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -420,7 +420,7 @@ T AC_OpenMP_libdivide_avx512(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, dividers, pi, segmentedPi);
+            sum += C2_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -433,7 +433,7 @@ T AC_OpenMP_libdivide_avx512(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, prime, dividers, pi, segmentedPi);
+            sum += A_libdivide_avx512(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }

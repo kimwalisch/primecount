@@ -65,7 +65,7 @@ MAYBE_UNUSED void check(bool ok)
 #endif
 void check_vector(uint64_t xp,
                   const Vector<uint64_t>& primes,
-                  const LibdividePrimes& dividers)
+                  const LibdividePrimes& lprimes)
 {
   for (uint64_t i = 1; i < primes.size(); i += 8)
   {
@@ -74,7 +74,7 @@ void check_vector(uint64_t xp,
     Array<uint64_t, 8> quotients;
     quotients.fill(UINT64_MAX);
     __m512i numer = _mm512_set1_epi64(xp);
-    __m512i q = divide_libdivide_avx512(numer, mask, &dividers.magic[i], &dividers.shift[i]);
+    __m512i q = divide_libdivide_avx512(numer, mask, &lprimes.magic[i], &lprimes.shift[i]);
     _mm512_mask_storeu_epi64(quotients.data(), mask, q);
 
     for (uint64_t j = 0; j < count; j++)
@@ -92,7 +92,7 @@ void check_vector(uint64_t xp,
 #endif
 void check_vector(uint64_t xp,
                   const Vector<uint64_t>& primes,
-                  const LibdividePrimes& dividers)
+                  const LibdividePrimes& lprimes)
 {
   uint64_t lanes = svcntd();
   for (uint64_t i = 1; i < primes.size(); i += lanes)
@@ -102,7 +102,7 @@ void check_vector(uint64_t xp,
     Array<uint64_t, 32> quotients;
     quotients.fill(UINT64_MAX);
     svuint64_t numer = svdup_n_u64(xp);
-    svuint64_t q = divide_libdivide_arm_sve(pg, numer, &dividers.magic[i], &dividers.shift[i]);
+    svuint64_t q = divide_libdivide_arm_sve(pg, numer, &lprimes.magic[i], &lprimes.shift[i]);
     svst1_u64(pg, quotients.data(), q);
 
     for (uint64_t j = 0; j < count; j++)
@@ -117,21 +117,21 @@ void check_vector(uint64_t xp,
 
 void check_division(uint64_t xp,
                     const Vector<uint64_t>& primes,
-                    const LibdividePrimes& dividers)
+                    const LibdividePrimes& lprimes)
 {
   for (uint64_t i = 1; i < primes.size(); i++)
-    check(dividers.divide(xp, i) == xp / primes[i]);
+    check(lprimes.divide(xp, i) == xp / primes[i]);
 
   #if defined(ENABLE_AVX512_VPOPCNT)
-    check_vector(xp, primes, dividers);
+    check_vector(xp, primes, lprimes);
   #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     if (cpu_supports_avx512_vpopcnt)
-      check_vector(xp, primes, dividers);
+      check_vector(xp, primes, lprimes);
   #elif defined(ENABLE_ARM_SVE)
-    check_vector(xp, primes, dividers);
+    check_vector(xp, primes, lprimes);
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
     if (cpu_supports_sve)
-      check_vector(xp, primes, dividers);
+      check_vector(xp, primes, lprimes);
   #endif
 }
 
@@ -161,17 +161,17 @@ void check_dividers()
     if (size > 3)
       primes[4] = 3;
 
-    LibdividePrimes dividers(primes, 2);
-    check_division(0, primes, dividers);
-    check_division(UINT64_MAX, primes, dividers);
-    check_division(random, primes, dividers);
+    LibdividePrimes lprimes(primes, 2);
+    check_division(0, primes, lprimes);
+    check_division(UINT64_MAX, primes, lprimes);
+    check_division(random, primes, lprimes);
 
     for (int bit = 1; bit < 64; bit++)
     {
       uint64_t xp = uint64_t(1) << bit;
-      check_division(xp - 1, primes, dividers);
-      check_division(xp, primes, dividers);
-      check_division(xp + 1, primes, dividers);
+      check_division(xp - 1, primes, lprimes);
+      check_division(xp, primes, lprimes);
+      check_division(xp + 1, primes, lprimes);
     }
   }
 }
@@ -195,7 +195,7 @@ void check_pi_libdivide_avx512(uint64_t xp)
     for (uint64_t i = 1; i <= size; i++)
       primes[i] = xp / (128 + i);
 
-    LibdividePrimes dividers(primes, 1);
+    LibdividePrimes lprimes(primes, 1);
 
     for (uint64_t start = 1; start <= size + 1; start++)
     {
@@ -208,11 +208,11 @@ void check_pi_libdivide_avx512(uint64_t xp)
         expected2 += count * 2 - 7 + 2;
       }
 
-      check(sum_pi_libdivide_avx512<uint64_t, 1>(xp, start, size, 2, dividers, segmentedPi) == expected1);
-      check(sum_pi_libdivide_avx512<uint64_t, 2>(xp, start, size, 7, dividers, segmentedPi) == expected2);
+      check(sum_pi_libdivide_avx512<uint64_t, 1>(xp, start, size, 2, lprimes, segmentedPi) == expected1);
+      check(sum_pi_libdivide_avx512<uint64_t, 2>(xp, start, size, 7, lprimes, segmentedPi) == expected2);
       #ifdef HAVE_INT128_T
-        check(sum_pi_libdivide_avx512<uint128_t, 1>(xp, start, size, 2, dividers, segmentedPi) == expected1);
-        check(sum_pi_libdivide_avx512<uint128_t, 2>(xp, start, size, 7, dividers, segmentedPi) == expected2);
+        check(sum_pi_libdivide_avx512<uint128_t, 1>(xp, start, size, 2, lprimes, segmentedPi) == expected1);
+        check(sum_pi_libdivide_avx512<uint128_t, 2>(xp, start, size, 7, lprimes, segmentedPi) == expected2);
       #endif
     }
   }
@@ -237,7 +237,7 @@ void check_pi_libdivide_arm_sve(uint64_t xp)
     for (uint64_t i = 1; i <= size; i++)
       primes[i] = xp / (128 + i);
 
-    LibdividePrimes dividers(primes, 1);
+    LibdividePrimes lprimes(primes, 1);
 
     for (uint64_t start = 1; start <= size + 1; start++)
     {
@@ -250,11 +250,11 @@ void check_pi_libdivide_arm_sve(uint64_t xp)
         expected2 += count * 2 - 7 + 2;
       }
 
-      check(sum_pi_libdivide_arm_sve<uint64_t, 1>(xp, start, size, 2, dividers, segmentedPi) == expected1);
-      check(sum_pi_libdivide_arm_sve<uint64_t, 2>(xp, start, size, 7, dividers, segmentedPi) == expected2);
+      check(sum_pi_libdivide_arm_sve<uint64_t, 1>(xp, start, size, 2, lprimes, segmentedPi) == expected1);
+      check(sum_pi_libdivide_arm_sve<uint64_t, 2>(xp, start, size, 7, lprimes, segmentedPi) == expected2);
       #ifdef HAVE_INT128_T
-        check(sum_pi_libdivide_arm_sve<uint128_t, 1>(xp, start, size, 2, dividers, segmentedPi) == expected1);
-        check(sum_pi_libdivide_arm_sve<uint128_t, 2>(xp, start, size, 7, dividers, segmentedPi) == expected2);
+        check(sum_pi_libdivide_arm_sve<uint128_t, 1>(xp, start, size, 2, lprimes, segmentedPi) == expected1);
+        check(sum_pi_libdivide_arm_sve<uint128_t, 2>(xp, start, size, 7, lprimes, segmentedPi) == expected2);
       #endif
     }
   }
