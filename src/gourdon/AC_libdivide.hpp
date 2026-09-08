@@ -42,7 +42,6 @@ struct LibdividePrimes
     {
       int64_t high = min(low + thread_dist, primes_size);
 
-      NO_UNROLL_LOOP
       for (int64_t i = low; i < high; i++)
       {
         auto divider = libdivide::libdivide_u64_branchfree_gen(primes[i]);
