@@ -341,7 +341,8 @@ T C2(T xlow,
   return sum;
 }
 
-#if !defined(ENABLE_LIBDIVIDE) && !defined(ENABLE_ARM_SVE)
+#if !defined(ENABLE_LIBDIVIDE) && \
+    !defined(ENABLE_ARM_SVE)
 
 /// Compute A + C
 template <typename T,

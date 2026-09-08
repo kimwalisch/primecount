@@ -58,7 +58,8 @@ struct LibdividePrimes
   }
 };
 
-#if !defined(ENABLE_AVX512_VPOPCNT) && !defined(ENABLE_ARM_SVE)
+#if !defined(ENABLE_AVX512_VPOPCNT) && \
+    !defined(ENABLE_ARM_SVE)
 
 /// Compute the A formula using libdivide.
 /// 64-bit function: xp < 2^64

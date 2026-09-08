@@ -25,18 +25,21 @@
 
 #if defined(ENABLE_LIBDIVIDE)
   #include "AC_libdivide.hpp"
-  #if defined(ENABLE_AVX512_VPOPCNT) || defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+  #if defined(ENABLE_AVX512_VPOPCNT) || \
+      defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
     #include "AC_libdivide_avx512.hpp"
     #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
       #include <cpu_supports_avx512_vpopcnt.hpp>
     #endif
-  #elif defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE)
+  #elif defined(ENABLE_ARM_SVE) || \
+        defined(ENABLE_MULTIARCH_ARM_SVE)
     #include "AC_libdivide_arm_sve.hpp"
     #if defined(ENABLE_MULTIARCH_ARM_SVE)
       #include <cpu_supports_arm_sve.hpp>
     #endif
   #endif
-#elif defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE)
+#elif defined(ENABLE_ARM_SVE) || \
+      defined(ENABLE_MULTIARCH_ARM_SVE)
   #include "AC_arm_sve.hpp"
   #if defined(ENABLE_MULTIARCH_ARM_SVE)
     #include <cpu_supports_arm_sve.hpp>
@@ -58,7 +61,8 @@ MAYBE_UNUSED void check(bool ok)
 
 #if defined(ENABLE_LIBDIVIDE)
 
-#if defined(ENABLE_AVX512_VPOPCNT) || defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
+#if defined(ENABLE_AVX512_VPOPCNT) || \
+    defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
@@ -85,7 +89,8 @@ void check_vector(uint64_t xp,
   }
 }
 
-#elif defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE)
+#elif defined(ENABLE_ARM_SVE) || \
+      defined(ENABLE_MULTIARCH_ARM_SVE)
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -178,7 +183,9 @@ void check_dividers()
 
 #endif
 
-#if defined(ENABLE_LIBDIVIDE) && (defined(ENABLE_AVX512_VPOPCNT) || defined(ENABLE_MULTIARCH_AVX512_VPOPCNT))
+#if defined(ENABLE_LIBDIVIDE) && \
+    (defined(ENABLE_AVX512_VPOPCNT) || \
+     defined(ENABLE_MULTIARCH_AVX512_VPOPCNT))
 
 #if defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
   __attribute__ ((target ("avx512f,avx512bw,avx512vl,avx512vpopcntdq")))
@@ -220,7 +227,9 @@ void check_pi_libdivide_avx512(uint64_t xp)
 
 #endif
 
-#if defined(ENABLE_LIBDIVIDE) && (defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE))
+#if defined(ENABLE_LIBDIVIDE) && \
+    (defined(ENABLE_ARM_SVE) || \
+     defined(ENABLE_MULTIARCH_ARM_SVE))
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -262,7 +271,9 @@ void check_pi_libdivide_arm_sve(uint64_t xp)
 
 #endif
 
-#if !defined(ENABLE_LIBDIVIDE) && (defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE))
+#if !defined(ENABLE_LIBDIVIDE) && \
+    (defined(ENABLE_ARM_SVE) || \
+     defined(ENABLE_MULTIARCH_ARM_SVE))
 
 template <typename Prime>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -312,7 +323,9 @@ int main()
     std::cout << "Decomposed libdivide parameters passed." << std::endl;
   #endif
 
-  #if defined(ENABLE_LIBDIVIDE) && (defined(ENABLE_AVX512_VPOPCNT) || defined(ENABLE_MULTIARCH_AVX512_VPOPCNT))
+  #if defined(ENABLE_LIBDIVIDE) && \
+      (defined(ENABLE_AVX512_VPOPCNT) || \
+       defined(ENABLE_MULTIARCH_AVX512_VPOPCNT))
     #if !defined(ENABLE_AVX512_VPOPCNT)
       if (cpu_supports_avx512_vpopcnt)
     #endif
@@ -321,7 +334,8 @@ int main()
       std::cout << "AVX512 division and masked pi lookups passed." << std::endl;
       return 0;
     }
-  #elif defined(ENABLE_ARM_SVE) || defined(ENABLE_MULTIARCH_ARM_SVE)
+  #elif defined(ENABLE_ARM_SVE) || \
+        defined(ENABLE_MULTIARCH_ARM_SVE)
     #if !defined(ENABLE_ARM_SVE)
       if (cpu_supports_sve)
     #endif
