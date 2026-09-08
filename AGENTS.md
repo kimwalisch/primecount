@@ -48,6 +48,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 
 - Do not break a variable initialization immediately after `=` except in rare cases, such as a complex boolean initializer with many conditions.
 - Prefer a multi-line `if` condition over introducing a boolean variable used only for that condition.
+- Split compound preprocessor conditions in `#if` and `#elif` directives across multiple lines, with one condition per line. Use `\` line continuations and align the continued conditions.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
 
 ## Integer types and casts
