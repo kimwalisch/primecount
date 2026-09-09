@@ -504,90 +504,44 @@ T AC_OpenMP_default(T x,
 
 #if defined(ENABLE_LIBDIVIDE)
   #include "AC_libdivide.hpp"
-
-  #if defined(ENABLE_ARM_SVE)
-    #include "AC_libdivide_arm_sve.hpp"
-  #elif defined(ENABLE_AVX512_VPOPCNT)
-    #include "AC_libdivide_avx512.hpp"
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    #include "AC_libdivide_arm_sve.hpp"
-    #include <cpu_supports_arm_sve.hpp>
-  #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-    #include "AC_libdivide_avx512.hpp"
-    #include <cpu_supports_avx512_vpopcnt.hpp>
-  #endif
-#else
-  #if defined(ENABLE_ARM_SVE)
-    #include "AC_arm_sve.hpp"
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    #include "AC_arm_sve.hpp"
-    #include <cpu_supports_arm_sve.hpp>
-  #endif
+#elif defined(ENABLE_ARM_SVE)
+  #include "AC_arm_sve.hpp"
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include "AC_arm_sve.hpp"
+  #include <cpu_supports_arm_sve.hpp>
 #endif
 
 namespace {
 
-/// Runtime dispatch before initializing dividers and starting OpenMP.
+/// Runtime dispatch before starting OpenMP.
 template <typename T, typename... Args>
 T AC_OpenMP(T x, Args&&... args)
 {
   #if defined(ENABLE_LIBDIVIDE)
-    #if defined(ENABLE_ARM_SVE)
-      return AC_OpenMP_libdivide_arm_sve(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_AVX512_VPOPCNT)
-      return AC_OpenMP_libdivide_avx512(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? AC_OpenMP_libdivide_arm_sve(x, std::forward<Args>(args)...)
-        : AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-      return cpu_supports_avx512_vpopcnt
-        ? AC_OpenMP_libdivide_avx512(x, std::forward<Args>(args)...)
-        : AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #else
-      return AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-    #endif
+    return AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
+  #elif defined(ENABLE_ARM_SVE)
+    return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    return cpu_supports_sve
+      ? AC_OpenMP_arm_sve(x, std::forward<Args>(args)...)
+      : AC_OpenMP_default(x, std::forward<Args>(args)...);
   #else
-    #if defined(ENABLE_ARM_SVE)
-      return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? AC_OpenMP_arm_sve(x, std::forward<Args>(args)...)
-        : AC_OpenMP_default(x, std::forward<Args>(args)...);
-    #else
-      return AC_OpenMP_default(x, std::forward<Args>(args)...);
-    #endif
+    return AC_OpenMP_default(x, std::forward<Args>(args)...);
   #endif
 }
 
 string_view_t AC_algo_name()
 {
   #if defined(ENABLE_LIBDIVIDE)
-    #if defined(ENABLE_ARM_SVE)
-      return "Algorithm: libdivide + ARM SVE";
-    #elif defined(ENABLE_AVX512_VPOPCNT)
-      return "Algorithm: libdivide + AVX512";
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? "Algorithm: libdivide + ARM SVE"
-        : "Algorithm: libdivide";
-    #elif defined(ENABLE_MULTIARCH_AVX512_VPOPCNT)
-      return cpu_supports_avx512_vpopcnt
-        ? "Algorithm: libdivide + AVX512"
-        : "Algorithm: libdivide";
-    #else
-      return "Algorithm: libdivide";
-    #endif
+    return "Algorithm: libdivide";
+  #elif defined(ENABLE_ARM_SVE)
+    return "Algorithm: ARM SVE";
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    return cpu_supports_sve
+      ? "Algorithm: ARM SVE"
+      : "Algorithm: CPU div";
   #else
-    #if defined(ENABLE_ARM_SVE)
-      return "Algorithm: ARM SVE";
-    #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-      return cpu_supports_sve
-        ? "Algorithm: ARM SVE"
-        : "Algorithm: CPU div";
-    #else
-      return "Algorithm: CPU div";
-    #endif
+    return "Algorithm: CPU div";
   #endif
 }
 

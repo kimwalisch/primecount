@@ -19,48 +19,6 @@ namespace {
 
 using namespace primecount;
 
-/// SIMD dividers use separate arrays for contiguous masked loads.
-/// Only these two arrays are allocated, without a libdivide vector.
-struct LibdividePrimes
-{
-  Vector<uint64_t> magic;
-  Vector<uint8_t> shift;
-
-  template <typename Primes>
-  LibdividePrimes(const Primes& primes, int threads)
-  {
-    magic.resize(primes.size());
-    shift.resize(primes.size());
-
-    int64_t min_thread_size = (int64_t) 1e6;
-    int64_t primes_size = primes.size();
-    threads = ideal_num_threads(primes_size, threads, min_thread_size);
-    int64_t thread_dist = ceil_div(primes_size, threads);
-
-    #pragma omp parallel for num_threads(threads) schedule(static, 1)
-    for (int64_t low = 1; low < primes_size; low += thread_dist)
-    {
-      int64_t high = min(low + thread_dist, primes_size);
-
-      for (int64_t i = low; i < high; i++)
-      {
-        auto divider = libdivide::libdivide_u64_branchfree_gen(primes[i]);
-        magic[i] = divider.magic;
-        shift[i] = divider.more;
-      }
-    }
-  }
-
-  ALWAYS_INLINE uint64_t divide(uint64_t xp, uint64_t i) const
-  {
-    libdivide::libdivide_u64_branchfree_t divider = { magic[i], shift[i] };
-    return libdivide::libdivide_u64_branchfree_do(xp, &divider);
-  }
-};
-
-#if !defined(ENABLE_AVX512_VPOPCNT) && \
-    !defined(ENABLE_ARM_SVE)
-
 /// Compute the A formula using libdivide.
 /// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
@@ -513,8 +471,6 @@ T AC_OpenMP_libdivide(T x,
 
   return sum;
 }
-
-#endif
 
 } // namespace
 
