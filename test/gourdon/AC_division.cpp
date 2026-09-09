@@ -101,6 +101,7 @@ int main()
     {
       check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
       check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
+      check_pi_arm_sve<int64_t>(UINT64_MAX);
       std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
       return 0;
     }

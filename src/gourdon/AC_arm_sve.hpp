@@ -49,28 +49,47 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
                                const Primes& primes,
                                const SegmentedPiTable& segmentedPi)
 {
+  if (i > last)
+    return 0;
+
+  uint64_t size = last - i + 1;
   T sum = 0;
   uint64_t lanes = svcntd();
   svuint64_t numer = svdup_n_u64(xp);
-  // SVE supports at most 2048 bits per vector.
-  INDETERMINATE Array<uint64_t, 32> quotients;
-  ASSERT(lanes <= quotients.size());
+  svbool_t all = svptrue_b64();
+  svbool_t first = svptrue_pat_b64(SV_VL1);
+  svbool_t second = svptrue_pat_b64(SV_VL2);
 
   NO_UNROLL_LOOP
-  for (; i <= last; i += lanes)
+  for (; i + lanes <= last + 1; i += lanes)
   {
-    uint64_t count = min(lanes, last - i + 1);
-    svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
-    svuint64_t q = svdiv_u64_x(pg, numer, p);
-    svst1_u64(pg, quotients.data(), q);
+    svuint64_t p = load_primes_arm_sve(all, &primes[i]);
+    svuint64_t q = svdiv_u64_x(all, numer, p);
+    // For x <= 10^31, each vector subtotal is below 2^57.
+    uint64_t batch = 0;
 
+    // SVE has an even number of 64-bit lanes. Extract pairs
+    // and rotate the vector to avoid storing the quotients.
     NO_UNROLL_LOOP
-    for (uint64_t j = 0; j < count; j++)
-      sum += segmentedPi[quotients[j]] * MULTIPLIER - b + 2;
+    for (uint64_t j = 0; j < lanes; j += 2)
+    {
+      uint64_t q0 = svlastb_u64(first, q);
+      uint64_t q1 = svlastb_u64(second, q);
+
+      batch += segmentedPi[q0] + segmentedPi[q1];
+      q = svext_u64(q, q, 2);
+    }
+
+    sum += batch;
   }
 
-  return sum;
+  // Keep scalar lookups from becoming SVE gathers.
+  NO_VECTORIZE_LOOP
+  NO_UNROLL_LOOP
+  for (; i <= last; i++)
+    sum += segmentedPi[xp / primes[i]];
+
+  return sum * MULTIPLIER + T(size) * 2 - T(size) * b;
 }
 
 /// Compute the A formula using ARM SVE.
