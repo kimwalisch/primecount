@@ -502,46 +502,55 @@ T AC_OpenMP_default(T x,
 
 } // namespace
 
-#if defined(ENABLE_LIBDIVIDE)
-  #include "AC_libdivide.hpp"
-#elif defined(ENABLE_ARM_SVE)
+#if defined(ENABLE_ARM_SVE)
   #include "AC_arm_sve.hpp"
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
   #include "AC_arm_sve.hpp"
   #include <cpu_supports_arm_sve.hpp>
 #endif
 
+#if defined(ENABLE_LIBDIVIDE) && \
+    !defined(ENABLE_ARM_SVE)
+  #include "AC_libdivide.hpp"
+#endif
+
 namespace {
 
-/// Runtime dispatch before starting OpenMP.
+/// Runtime dispatch to highly optimized SIMD algorithm if
+/// the CPU supports the required instruction set.
+///
 template <typename T, typename... Args>
 T AC_OpenMP(T x, Args&&... args)
 {
-  #if defined(ENABLE_LIBDIVIDE)
-    return AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
-  #elif defined(ENABLE_ARM_SVE)
+  #if defined(ENABLE_ARM_SVE)
     return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? AC_OpenMP_arm_sve(x, std::forward<Args>(args)...)
-      : AC_OpenMP_default(x, std::forward<Args>(args)...);
   #else
-    return AC_OpenMP_default(x, std::forward<Args>(args)...);
+    #if defined(ENABLE_MULTIARCH_ARM_SVE)
+      if (cpu_supports_sve)
+        return AC_OpenMP_arm_sve(x, std::forward<Args>(args)...);
+    #endif
+    #if defined(ENABLE_LIBDIVIDE)
+      return AC_OpenMP_libdivide(x, std::forward<Args>(args)...);
+    #else
+      return AC_OpenMP_default(x, std::forward<Args>(args)...);
+    #endif
   #endif
 }
 
 string_view_t AC_algo_name()
 {
-  #if defined(ENABLE_LIBDIVIDE)
-    return "Algorithm: libdivide";
-  #elif defined(ENABLE_ARM_SVE)
+  #if defined(ENABLE_ARM_SVE)
     return "Algorithm: ARM SVE";
-  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
-    return cpu_supports_sve
-      ? "Algorithm: ARM SVE"
-      : "Algorithm: CPU div";
   #else
-    return "Algorithm: CPU div";
+    #if defined(ENABLE_MULTIARCH_ARM_SVE)
+      if (cpu_supports_sve)
+        return "Algorithm: ARM SVE";
+    #endif
+    #if defined(ENABLE_LIBDIVIDE)
+      return "Algorithm: libdivide";
+    #else
+      return "Algorithm: CPU div";
+    #endif
   #endif
 }
 
