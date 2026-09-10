@@ -98,7 +98,6 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     uint64_t sum64 = 0;
 
     NO_UNROLL_LOOP
-    NO_VECTORIZE_LOOP
     for (uint64_t j = 0; j < active; j++)
     {
       uint64_t quotient = svlastb_u64(first, q);
