@@ -109,7 +109,7 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     sum += sum64;
   }
 
-  return sum * MULTIPLIER + T(size) * 2 - T(size) * b;
+  return sum * MULTIPLIER + size * 2 - size * T(b);
 }
 
 /// Compute the A formula using ARM SVE.
