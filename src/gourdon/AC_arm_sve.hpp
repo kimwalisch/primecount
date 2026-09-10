@@ -52,13 +52,12 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
   if (i > last)
     return 0;
 
-  uint64_t size = last - i + 1;
   T sum = 0;
+  uint64_t size = last - i + 1;
   uint64_t lanes = svcntd();
   svuint64_t numer = svdup_n_u64(xp);
-  svbool_t all = svptrue_b64();
   svbool_t first = svptrue_pat_b64(SV_VL1);
-  svbool_t second = svptrue_pat_b64(SV_VL2);
+  svbool_t all = svptrue_b64();
 
   NO_UNROLL_LOOP
   for (; i + lanes * 2 <= last + 1; i += lanes * 2)
@@ -67,54 +66,48 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
     svuint64_t q0 = svdiv_u64_x(all, numer, p0);
     svuint64_t q1 = svdiv_u64_x(all, numer, p1);
-    // For x <= 10^31, each vector subtotal is below 2^58.
-    uint64_t batch = 0;
+    uint64_t sum64 = 0;
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
     {
       uint64_t q00 = svlastb_u64(first, q0);
-      uint64_t q01 = svlastb_u64(second, q0);
+      uint64_t q01 = svlasta_u64(first, q0);
       uint64_t q10 = svlastb_u64(first, q1);
-      uint64_t q11 = svlastb_u64(second, q1);
+      uint64_t q11 = svlasta_u64(first, q1);
 
-      batch += segmentedPi[q00] + segmentedPi[q01] +
-               segmentedPi[q10] + segmentedPi[q11];
+      sum64 += segmentedPi[q00] + 
+               segmentedPi[q01] +
+               segmentedPi[q10] +
+               segmentedPi[q11];
+
       q0 = svext_u64(q0, q0, 2);
       q1 = svext_u64(q1, q1, 2);
     }
 
-    sum += batch;
+    sum += sum64;
   }
 
-  if (i + lanes <= last + 1)
+  NO_UNROLL_LOOP
+  for (; i <= last; i += lanes)
   {
-    svuint64_t p = load_primes_arm_sve(all, &primes[i]);
-    svuint64_t q = svdiv_u64_x(all, numer, p);
-    // For x <= 10^31, each vector subtotal is below 2^57.
-    uint64_t batch = 0;
+    svbool_t pg = svwhilelt_b64(i, last + 1);
+    svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
+    svuint64_t q = svdiv_u64_x(pg, numer, p);
+    uint64_t active = svcntp_b64(pg, pg);
+    uint64_t sum64 = 0;
 
-    // SVE has an even number of 64-bit lanes. Extract pairs
-    // and rotate the vector to avoid storing the quotients.
+    NO_VECTORIZE_LOOP
     NO_UNROLL_LOOP
-    for (uint64_t j = 0; j < lanes; j += 2)
+    for (uint64_t j = 0; j < active; j++)
     {
-      uint64_t q0 = svlastb_u64(first, q);
-      uint64_t q1 = svlastb_u64(second, q);
-
-      batch += segmentedPi[q0] + segmentedPi[q1];
-      q = svext_u64(q, q, 2);
+      uint64_t quotient = svlastb_u64(first, q);
+      sum64 += segmentedPi[quotient];
+      q = svext_u64(q, q, 1);
     }
 
-    sum += batch;
-    i += lanes;
+    sum += sum64;
   }
-
-  // Keep scalar lookups from becoming SVE gathers.
-  NO_VECTORIZE_LOOP
-  NO_UNROLL_LOOP
-  for (; i <= last; i++)
-    sum += segmentedPi[xp / primes[i]];
 
   return sum * MULTIPLIER + T(size) * 2 - T(size) * b;
 }
