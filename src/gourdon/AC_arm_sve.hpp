@@ -61,7 +61,33 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
   svbool_t second = svptrue_pat_b64(SV_VL2);
 
   NO_UNROLL_LOOP
-  for (; i + lanes <= last + 1; i += lanes)
+  for (; i + lanes * 2 <= last + 1; i += lanes * 2)
+  {
+    svuint64_t p0 = load_primes_arm_sve(all, &primes[i]);
+    svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
+    svuint64_t q0 = svdiv_u64_x(all, numer, p0);
+    svuint64_t q1 = svdiv_u64_x(all, numer, p1);
+    // For x <= 10^31, each vector subtotal is below 2^58.
+    uint64_t batch = 0;
+
+    NO_UNROLL_LOOP
+    for (uint64_t j = 0; j < lanes; j += 2)
+    {
+      uint64_t q00 = svlastb_u64(first, q0);
+      uint64_t q01 = svlastb_u64(second, q0);
+      uint64_t q10 = svlastb_u64(first, q1);
+      uint64_t q11 = svlastb_u64(second, q1);
+
+      batch += segmentedPi[q00] + segmentedPi[q01] +
+               segmentedPi[q10] + segmentedPi[q11];
+      q0 = svext_u64(q0, q0, 2);
+      q1 = svext_u64(q1, q1, 2);
+    }
+
+    sum += batch;
+  }
+
+  if (i + lanes <= last + 1)
   {
     svuint64_t p = load_primes_arm_sve(all, &primes[i]);
     svuint64_t q = svdiv_u64_x(all, numer, p);
@@ -81,6 +107,7 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     }
 
     sum += batch;
+    i += lanes;
   }
 
   // Keep scalar lookups from becoming SVE gathers.
