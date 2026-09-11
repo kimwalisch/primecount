@@ -20,6 +20,7 @@
 #ifndef FAST_DIV_HPP
 #define FAST_DIV_HPP
 
+#include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <int128_t.hpp>
 

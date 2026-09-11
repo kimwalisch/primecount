@@ -50,6 +50,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - Prefer a multi-line `if` condition over introducing a boolean variable used only for that condition.
 - Split compound preprocessor conditions in `#if` and `#elif` directives across multiple lines, with one condition per line. Use `\` line continuations and align the continued conditions.
 - For SIMD instruction sets that have both `ENABLE_<ISA>` and `ENABLE_MULTIARCH_<ISA>` macros, the native `ENABLE_<ISA>` case takes precedence when both are defined. Native builds such as `-march=native` should use the SIMD implementation directly without runtime CPU-feature checks; the `ENABLE_MULTIARCH_<ISA>` case is for portable builds that require runtime dispatch. Structure the preprocessor logic with the native case first and the multiarch case in `#elif`.
+- All source files that use a `ENABLE_<ISA>` macro must include the `<cpu_arch_macros.hpp>` header.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
 
 ## Integer types and casts

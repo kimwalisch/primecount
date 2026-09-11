@@ -29,6 +29,7 @@
 #include "FactorTableD.hpp"
 
 #include <primecount-internal.hpp>
+#include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <PiTable.hpp>
 #include <sieve/Sieve.hpp>

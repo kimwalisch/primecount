@@ -8,6 +8,7 @@
 /// file in the top level directory.
 ///
 
+#include <cpu_arch_macros.hpp>
 #include <fast_div.hpp>
 #include <int128_t.hpp>
 
