@@ -66,7 +66,6 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
     svuint64_t q0 = svdiv_u64_x(all, numer, p0);
     svuint64_t q1 = svdiv_u64_x(all, numer, p1);
-    uint64_t sum64 = 0;
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
@@ -76,16 +75,14 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
       uint64_t q10 = svlastb_u64(first, q1);
       uint64_t q11 = svlasta_u64(first, q1);
 
-      sum64 += segmentedPi[q00] + 
-               segmentedPi[q01] +
-               segmentedPi[q10] +
-               segmentedPi[q11];
+      sum += segmentedPi[q00] + 
+             segmentedPi[q01] +
+             segmentedPi[q10] +
+             segmentedPi[q11];
 
       q0 = svext_u64(q0, q0, 2);
       q1 = svext_u64(q1, q1, 2);
     }
-
-    sum += sum64;
   }
 
   NO_UNROLL_LOOP
@@ -95,17 +92,14 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
     svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
     svuint64_t q = svdiv_u64_x(pg, numer, p);
     uint64_t active = svcntp_b64(pg, pg);
-    uint64_t sum64 = 0;
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < active; j++)
     {
       uint64_t quotient = svlastb_u64(first, q);
-      sum64 += segmentedPi[quotient];
+      sum += segmentedPi[quotient];
       q = svext_u64(q, q, 1);
     }
-
-    sum += sum64;
   }
 
   return sum * MULTIPLIER + size * 2 - size * T(b);
