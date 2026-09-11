@@ -118,6 +118,7 @@ T A_arm_sve(T xlow,
             T xhigh,
             uint64_t xp,
             uint64_t y,
+            uint64_t b,
             const Primes& primes,
             const PiTable& pi,
             const SegmentedPiTable& segmentedPi)
@@ -444,7 +445,7 @@ T AC_OpenMP_arm_sve(T x,
           T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, primes, pi, segmentedPi);
+            sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
