@@ -73,7 +73,7 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
       uint64_t q10 = svlastb_u64(first, q1);
       uint64_t q11 = svlasta_u64(first, q1);
 
-      sum += segmentedPi[q00] + 
+      sum += segmentedPi[q00] +
              segmentedPi[q01] +
              segmentedPi[q10] +
              segmentedPi[q11];
