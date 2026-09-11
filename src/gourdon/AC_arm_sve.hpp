@@ -419,7 +419,6 @@ T AC_OpenMP_arm_sve(T x,
         int64_t max_a = pi[min(sqrt_xlow, x13)];
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-        NO_UNROLL_LOOP
         for (int64_t b = min_c2; b <= max_c2_clustered; b++)
         {
           int64_t prime = primes[b];
@@ -432,7 +431,6 @@ T AC_OpenMP_arm_sve(T x,
         }
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
-        NO_UNROLL_LOOP
         for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
           int64_t prime = primes[b];
@@ -445,7 +443,6 @@ T AC_OpenMP_arm_sve(T x,
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
-        NO_UNROLL_LOOP
         for (int64_t b = min_a; b <= max_a; b++)
         {
           int64_t prime = primes[b];
