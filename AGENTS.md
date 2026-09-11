@@ -52,6 +52,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - For SIMD instruction sets that have both `ENABLE_<ISA>` and `ENABLE_MULTIARCH_<ISA>` macros, the native `ENABLE_<ISA>` case takes precedence when both are defined. Native builds such as `-march=native` should use the SIMD implementation directly without runtime CPU-feature checks; the `ENABLE_MULTIARCH_<ISA>` case is for portable builds that require runtime dispatch. Structure the preprocessor logic with the native case first and the multiarch case in `#elif`.
 - All source files that use a `ENABLE_<ISA>` macro must include the `<cpu_arch_macros.hpp>` header.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
+- When defining 64-bit integer constants don't use `UINT64_C(1234)`, instead use `1234ull` or (`1234ll` for signed 64-bit constants.
 
 ## Integer types and casts
 
