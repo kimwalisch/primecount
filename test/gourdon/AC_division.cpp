@@ -46,21 +46,21 @@ MAYBE_UNUSED void check(bool ok)
 #if defined(ENABLE_ARM_SVE) || \
     defined(ENABLE_MULTIARCH_ARM_SVE)
 
-template <typename Prime>
+template <typename PRIME, typename XP>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
-void check_pi_arm_sve(uint64_t xp)
+void check_pi_arm_sve(XP xp)
 {
   SegmentedPiTable segmentedPi;
   segmentedPi.init(128, 256, 256);
 
   for (uint64_t size = 1; size <= 65; size++)
   {
-    Vector<Prime> primes(size + 1);
+    Vector<PRIME> primes(size + 1);
     primes[0] = 0;
     for (uint64_t i = 1; i <= size; i++)
-      primes[i] = xp / (128 + i);
+      primes[i] = (PRIME) (xp / (128 + i));
 
     for (uint64_t start = 1; start <= size + 1; start++)
     {
@@ -68,7 +68,8 @@ void check_pi_arm_sve(uint64_t xp)
       uint64_t expected2 = 0;
       for (uint64_t i = start; i <= size; i++)
       {
-        uint64_t count = segmentedPi[xp / primes[i]];
+        uint64_t quotient = uint64_t(xp / primes[i]);
+        uint64_t count = segmentedPi[quotient];
         expected1 += count;
         expected2 += count * 2 - 7 + 2;
       }
@@ -93,6 +94,11 @@ int main()
     check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
     check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
     check_pi_arm_sve<int64_t>(UINT64_MAX);
+
+    #if defined(HAVE_INT128_T)
+      check_pi_arm_sve<int64_t>(uint128_t(1) << 68);
+    #endif
+
     std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
 
   #elif defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -101,6 +107,11 @@ int main()
       check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
       check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
       check_pi_arm_sve<int64_t>(UINT64_MAX);
+
+      #if defined(HAVE_INT128_T)
+        check_pi_arm_sve<int64_t>(uint128_t(1) << 68);
+      #endif
+
       std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
     }
   #else
