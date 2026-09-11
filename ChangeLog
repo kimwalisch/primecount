@@ -1,7 +1,8 @@
-Changes in primecount-8.8, 2026-09-09
+Changes in primecount-8.8, 2026-09-11
 
-* AC_arm_sve.hpp: Optimize scalar pi lookups for all SVE vector lengths.
-* AC.cpp: Add ARM SVE runtime dispatch for 64-bit division.
+* AC_arm_sve.hpp: Add ARM SVE implementation of AC algorithm.
+* AC.cpp: Add ARM SVE runtime dispatch.
+* test/fast_div.cpp: Add ARM SVE tests.
 * Add AGENTS.md file for AI agents.
 * Update to libprimesieve 12.16.
 

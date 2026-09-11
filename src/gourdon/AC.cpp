@@ -43,9 +43,11 @@
 #include <stdint.h>
 #include <utility>
 
+namespace {
+
 using namespace primecount;
 
-namespace {
+#if !defined(ENABLE_ARM_SVE)
 
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
@@ -341,8 +343,10 @@ T C2(T xlow,
   return sum;
 }
 
-#if !defined(ENABLE_LIBDIVIDE) && \
-    !defined(ENABLE_ARM_SVE)
+#endif
+
+#if !defined(ENABLE_ARM_SVE) && \
+    !defined(ENABLE_LIBDIVIDE)
 
 /// Compute A + C
 template <typename T,
@@ -502,16 +506,16 @@ T AC_OpenMP_default(T x,
 
 } // namespace
 
+#if defined(ENABLE_LIBDIVIDE) && \
+    !defined(ENABLE_ARM_SVE)
+  #include "AC_libdivide.hpp"
+#endif
+
 #if defined(ENABLE_ARM_SVE)
   #include "AC_arm_sve.hpp"
 #elif defined(ENABLE_MULTIARCH_ARM_SVE)
   #include "AC_arm_sve.hpp"
   #include <cpu_supports_arm_sve.hpp>
-#endif
-
-#if defined(ENABLE_LIBDIVIDE) && \
-    !defined(ENABLE_ARM_SVE)
-  #include "AC_libdivide.hpp"
 #endif
 
 namespace {

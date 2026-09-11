@@ -1,9 +1,7 @@
 ///
 /// @file  AC_arm_sve.hpp
-/// @brief ARM SVE hardware division implementation of the A + C
+/// @brief ARM SVE vector division implementation of the A + C
 ///        formulas in Xavier Gourdon's prime counting algorithm.
-///        Only 64-bit numerators are vectorized; wider numerators use
-///        the shared scalar helpers in AC.cpp.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -105,18 +103,87 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
   return sum * MULTIPLIER + size * 2 - size * T(b);
 }
 
+#ifdef HAVE_INT128_T
+
+template <typename T, int MULTIPLIER, typename Primes>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+T sum_pi_arm_sve(uint128_t xp,
+                 uint64_t i,
+                 uint64_t last,
+                 uint64_t b,
+                 const Primes& primes,
+                 const SegmentedPiTable& segmentedPi)
+{
+  if (i > last)
+    return 0;
+
+  T sum = 0;
+  uint64_t size = last - i + 1;
+  uint64_t lanes = svcntd();
+  svbool_t first = svptrue_pat_b64(SV_VL1);
+  svbool_t all = svptrue_b64();
+
+  NO_UNROLL_LOOP
+  for (; i + lanes * 2 <= last + 1; i += lanes * 2)
+  {
+    svuint64_t p0 = load_primes_arm_sve(all, &primes[i]);
+    svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
+    svuint64_t q0 = fast_div64(all, xp, p0);
+    svuint64_t q1 = fast_div64(all, xp, p1);
+
+    NO_UNROLL_LOOP
+    for (uint64_t j = 0; j < lanes; j += 2)
+    {
+      uint64_t q00 = svlastb_u64(first, q0);
+      uint64_t q01 = svlasta_u64(first, q0);
+      uint64_t q10 = svlastb_u64(first, q1);
+      uint64_t q11 = svlasta_u64(first, q1);
+
+      sum += segmentedPi[q00] +
+             segmentedPi[q01] +
+             segmentedPi[q10] +
+             segmentedPi[q11];
+
+      q0 = svext_u64(q0, q0, 2);
+      q1 = svext_u64(q1, q1, 2);
+    }
+  }
+
+  NO_UNROLL_LOOP
+  for (; i <= last; i += lanes)
+  {
+    svbool_t pg = svwhilelt_b64(i, last + 1);
+    svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
+    svuint64_t q = fast_div64(pg, xp, p);
+    uint64_t active = svcntp_b64(pg, pg);
+
+    NO_UNROLL_LOOP
+    for (uint64_t j = 0; j < active; j++)
+    {
+      uint64_t quotient = svlastb_u64(first, q);
+      sum += segmentedPi[quotient];
+      q = svext_u64(q, q, 1);
+    }
+  }
+
+  return sum * MULTIPLIER + size * 2 - size * T(b);
+}
+
+#endif
+
 /// Compute the A formula using ARM SVE.
-/// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T, typename XP, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
 T A_arm_sve(T xlow,
             T xhigh,
-            uint64_t xp,
+            XP xp,
             uint64_t y,
             uint64_t b,
             const Primes& primes,
@@ -145,7 +212,6 @@ T A_arm_sve(T xlow,
 }
 
 /// Compute the 1st part of the C formula using ARM SVE.
-/// 64-bit function: xp < 2^64
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
@@ -156,13 +222,13 @@ T A_arm_sve(T xlow,
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
-template <typename T, typename Primes>
+template <typename T, typename XP, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
 T C1_arm_sve(T xlow,
              T xhigh,
-             uint64_t xp,
+             XP xp,
              uint64_t b,
              uint64_t y,
              uint64_t z,
@@ -173,7 +239,7 @@ T C1_arm_sve(T xlow,
   T sum = 0;
   uint64_t prime = primes[b];
   uint64_t max_m = min(xlow / prime, z);
-  uint64_t x_div_prime3 = xp / (prime * prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t min_m = fast_div64(xhigh, prime);
   min_m = max3(min_m, x_div_prime3, z / prime);
 
@@ -211,9 +277,12 @@ T C1_arm_sve(T xlow,
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      uint64_t xpq = xp / q;
+      XP xpq = fast_div(xp, q);
 
-      sum += sum_pi_arm_sve<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
+      if (xpq <= pstd::numeric_limits<uint64_t>::max())
+        sum += sum_pi_arm_sve<T, 1>(uint64_t(xpq), min_j, max_j, b, primes, segmentedPi);
+      else
+        sum += sum_pi_arm_sve<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
     }
   }
 
@@ -226,13 +295,13 @@ T C1_arm_sve(T xlow,
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename Primes>
+template <typename T, typename XP, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
 T C2_arm_sve(T xlow,
              T xhigh,
-             uint64_t xp,
+             XP xp,
              uint64_t y,
              uint64_t b,
              uint64_t pi_y,
@@ -243,7 +312,7 @@ T C2_arm_sve(T xlow,
 {
   uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
-  uint64_t x_div_prime3 = xp / (prime * prime);
+  uint64_t x_div_prime3 = fast_div64(xp, prime * prime);
   uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
   uint64_t min_m = max3(xhigh_div_prime, x_div_prime3, prime);
 
@@ -394,7 +463,7 @@ T AC_OpenMP_arm_sve(T x,
             if (xp <= pstd::numeric_limits<uint64_t>::max())
               sum -= C1_arm_sve(xlow, xhigh, uint64_t(xp), b, y, z, primes, pi, segmentedPi);
             else
-              sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
+              sum -= C1_arm_sve(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
         }
 
@@ -425,7 +494,7 @@ T AC_OpenMP_arm_sve(T x,
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
-            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+            sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
@@ -436,7 +505,7 @@ T AC_OpenMP_arm_sve(T x,
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
-            sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
+            sum += C2_arm_sve(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
 
         // A formula: pi[x_star] < b <= pi[x13]
@@ -447,7 +516,7 @@ T AC_OpenMP_arm_sve(T x,
           if (xp <= pstd::numeric_limits<uint64_t>::max())
             sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, b, primes, pi, segmentedPi);
           else
-            sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
+            sum += A_arm_sve(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
       }
     }

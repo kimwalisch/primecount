@@ -26,6 +26,12 @@
 #include <stdint.h>
 #include <type_traits>
 
+#if defined(HAVE_INT128_T) && \
+   (defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE))
+  #include <arm_sve.h>
+#endif
+
 namespace primecount {
 
 /// Used for (64-bit / 32-bit) = 64-bit.
@@ -172,6 +178,84 @@ fast_div64(X x, Y y)
 {
   return (uint64_t) fast_div(x, y);
 }
+
+#if defined(HAVE_INT128_T) && \
+   (defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE))
+
+/// Narrowing unsigned division: uint128_t / uint64_t -> uint64_t.
+/// The quotient must fit into 64 bits, i.e. (numer >> 64) < divisor.
+///
+/// This is the branchless correction variant of Knuth Algorithm D used by
+/// libdivide's divllu() implementation, vectorized across the divisors.
+/// The numerator is common to all lanes while each lane has its own divisor.
+/// https://github.com/ridiculousfish/libdivide/blob/master/doc/divlu.c
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t fast_div64(svbool_t pg,
+                                    uint128_t numer,
+                                    svuint64_t divisor)
+{
+  const uint64_t numer_lo = uint64_t(numer);
+  const uint64_t numer_hi = uint64_t(numer >> 64);
+
+  svuint64_t shift = svclz_u64_x(pg, divisor);
+  svuint64_t den = svlsl_u64_x(pg, divisor, shift);
+
+  svuint64_t lo = svdup_n_u64(numer_lo);
+  svuint64_t hi = svdup_n_u64(numer_hi);
+  svuint64_t inv_shift = svsub_u64_x(pg, svdup_n_u64(64), shift);
+
+  // Normalize the 128-bit numerator. SVE shifts use the full shift count,
+  // hence shifting right by 64 when shift == 0 yields zero as required.
+  svuint64_t numhi = svlsl_u64_x(pg, hi, shift);
+  numhi = svorr_u64_x(pg, numhi, svlsr_u64_x(pg, lo, inv_shift));
+  svuint64_t numlo = svlsl_u64_x(pg, lo, shift);
+
+  svuint64_t den1 = svlsr_n_u64_x(pg, den, 32);
+  svuint64_t den0 = svand_n_u64_x(pg, den, 0xffffffffu);
+  svuint64_t num1 = svlsr_n_u64_x(pg, numlo, 32);
+  svuint64_t num0 = svand_n_u64_x(pg, numlo, 0xffffffffu);
+
+  // Estimate and correct the high 32 quotient bits.
+  svuint64_t q1 = svdiv_u64_x(pg, numhi, den1);
+  svuint64_t rhat = svmls_u64_x(pg, numhi, q1, den1);
+  svuint64_t c1 = svmul_u64_x(pg, q1, den0);
+  svuint64_t c2 = svlsl_n_u64_x(pg, rhat, 32);
+  c2 = svadd_u64_x(pg, c2, num1);
+
+  svbool_t corr1 = svcmpgt_u64(pg, c1, c2);
+  svuint64_t delta = svsub_u64_x(pg, c1, c2);
+  svbool_t corr2 = svcmpgt_u64(corr1, delta, den);
+  q1 = svsub_n_u64_m(corr1, q1, 1);
+  q1 = svsub_n_u64_m(corr2, q1, 1);
+
+  // True partial remainder needed to estimate the low 32 quotient bits.
+  // From numhi = qhat * den1 + rhat:
+  // rem = c2 - c1 + correction * den.
+  // Reuse the correction predicates, avoiding q1 * den multiply.
+  svuint64_t rem = svsub_u64_x(pg, c2, c1);
+  rem = svadd_u64_m(corr1, rem, den);
+  rem = svadd_u64_m(corr2, rem, den);
+
+  // Estimate and correct the low 32 quotient bits.
+  svuint64_t q0 = svdiv_u64_x(pg, rem, den1);
+  rhat = svmls_u64_x(pg, rem, q0, den1);
+  c1 = svmul_u64_x(pg, q0, den0);
+  c2 = svlsl_n_u64_x(pg, rhat, 32);
+  c2 = svadd_u64_x(pg, c2, num0);
+
+  corr1 = svcmpgt_u64(pg, c1, c2);
+  delta = svsub_u64_x(pg, c1, c2);
+  corr2 = svcmpgt_u64(corr1, delta, den);
+  q0 = svsub_n_u64_m(corr1, q0, 1);
+  q0 = svsub_n_u64_m(corr2, q0, 1);
+
+  return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
+}
+
+#endif
 
 } // namespace
 
