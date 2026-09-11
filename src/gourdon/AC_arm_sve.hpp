@@ -360,7 +360,6 @@ T AC_OpenMP_arm_sve(T x,
       int64_t limit = low + thread.segments * segment_size;
       limit = min(limit, sqrtx);
 
-      NO_UNROLL_LOOP
       for (; low < limit; low += segment_size)
       {
         // Current segment [low, high[
@@ -387,7 +386,6 @@ T AC_OpenMP_arm_sve(T x,
           min_c1 = max3(min_c1, pi_sqrt_low, pi[min_c1_prime]) + 1;
 
           // C1 formula: pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
-          NO_UNROLL_LOOP
           for (int64_t b = min_c1; b <= pi_sqrtz; b++)
           {
             T xp = x / primes[b];
