@@ -40,7 +40,7 @@ Preserve existing user changes, including staged changes. Do not revert, overwri
 
 Keep primecount's implementation compatible with C++14 and preserve existing platform support. C++14 is only a requirement for building primecount itself: applications using its public C++ headers and linking against the library must continue to work with C++11 or later. Keep public headers compatible with C++11 and avoid propagating a C++14 requirement to library consumers through build or package metadata. Do not introduce newer language requirements, dependencies, or public API changes unless the task calls for them.
 
-## Coding style
+## Coding conventions
 
 primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect a few other source files to determine how to format it.
 
@@ -49,6 +49,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - Do not break a variable initialization immediately after `=` except in rare cases, such as a complex boolean initializer with many conditions.
 - Prefer a multi-line `if` condition over introducing a boolean variable used only for that condition.
 - Split compound preprocessor conditions in `#if` and `#elif` directives across multiple lines, with one condition per line. Use `\` line continuations and align the continued conditions.
+- For SIMD instruction sets that have both `ENABLE_<ISA>` and `ENABLE_MULTIARCH_<ISA>` macros, the native `ENABLE_<ISA>` case takes precedence when both are defined. Native builds such as `-march=native` should use the SIMD implementation directly without runtime CPU-feature checks; the `ENABLE_MULTIARCH_<ISA>` case is for portable builds that require runtime dispatch. Structure the preprocessor logic with the native case first and the multiarch case in `#elif`.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
 
 ## Integer types and casts
