@@ -118,13 +118,13 @@ T A_arm_sve(T xlow,
             T xhigh,
             uint64_t xp,
             uint64_t y,
-            uint64_t prime,
             const Primes& primes,
             const PiTable& pi,
             const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
+  uint64_t prime = primes[b];
   uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
@@ -236,11 +236,11 @@ T C2_arm_sve(T xlow,
              uint64_t b,
              uint64_t pi_y,
              uint64_t max_clustered_global,
-             uint64_t prime,
              const Primes& primes,
              const PiTable& pi,
              const SegmentedPiTable& segmentedPi)
 {
+  uint64_t prime = primes[b];
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = xp / (prime * prime);
   uint64_t xhigh_div_prime = fast_div64(xhigh, prime);
@@ -419,11 +419,10 @@ T AC_OpenMP_arm_sve(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2; b <= max_c2_clustered; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, primes, pi, segmentedPi);
+            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -431,11 +430,10 @@ T AC_OpenMP_arm_sve(T x,
         // C2 formula: pi[sqrt(z)] < b <= pi[x_star]
         for (int64_t b = min_c2_sparse; b <= max_c2; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, primes, pi, segmentedPi);
+            sum += C2_arm_sve(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -443,11 +441,10 @@ T AC_OpenMP_arm_sve(T x,
         // A formula: pi[x_star] < b <= pi[x13]
         for (int64_t b = min_a; b <= max_a; b++)
         {
-          int64_t prime = primes[b];
-          T xp = x / prime;
+          T xp = x / primes[b];
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, prime, primes, pi, segmentedPi);
+            sum += A_arm_sve(xlow, xhigh, uint64_t(xp), y, primes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
