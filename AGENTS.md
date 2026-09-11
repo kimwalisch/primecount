@@ -16,7 +16,7 @@ These algorithms combine many formulas. Two of the most important contributions 
 
 | Component | Implementation files | Required papers |
 | --- | --- | --- |
-| Easy special leaves | `src/deleglise-rivat/S2_easy.cpp`, `src/gourdon/AC.cpp` | `doc/Easy-Special-Leaves.pdf` |
+| Easy special leaves | `src/deleglise-rivat/S2_easy.cpp`, `src/gourdon/AC.cpp`, `src/gourdon/AC_*.hpp` | `doc/Easy-Special-Leaves.pdf` |
 | Hard special leaves | `src/deleglise-rivat/S2_hard.cpp`, `src/gourdon/D.cpp`, `src/gourdon/D_*.hpp` | `doc/Hard-Special-Leaves.pdf`, `doc/Hard-Special-Leaves-SIMD-Filtering.pdf` |
 | Partial sieve function | `src/phi.cpp`, `src/phi_vector.hpp`, `src/phi_vector.cpp` | `doc/Partial-Sieve-Function.pdf` |
 
