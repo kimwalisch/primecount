@@ -44,6 +44,8 @@ Keep primecount's implementation compatible with C++14 and preserve existing pla
 
 primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect a few other source files to determine how to format it.
 
+When generating or modifying more than 30 lines of code in a task, inspect at least 5 similar source files before writing the change. Count both newly added lines and modified existing lines toward this threshold. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
+
 Keep changes limited to the requested task. Avoid unrelated refactoring, renaming, formatting, or whitespace changes. Preserve the existing file encoding and line endings.
 
 - Do not break a variable initialization immediately after `=` except in rare cases, such as a complex boolean initializer with many conditions.
