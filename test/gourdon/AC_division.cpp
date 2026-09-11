@@ -8,28 +8,26 @@
 /// file in the top level directory.
 ///
 
-#include <LoadBalancerAC.hpp>
-#include <SegmentedPiTable.hpp>
-#include <PiTable.hpp>
 #include <primecount-internal.hpp>
 #include <cpu_arch_macros.hpp>
 #include <fast_div.hpp>
-#include <gourdon.hpp>
+#include <int128_t.hpp>
 #include <imath.hpp>
 #include <min.hpp>
+#include <LoadBalancerAC.hpp>
+#include <PiTable.hpp>
+#include <SegmentedPiTable.hpp>
 #include <Vector.hpp>
 
 #include <stdint.h>
 #include <cstdlib>
 #include <iostream>
 
-#if !defined(ENABLE_LIBDIVIDE) && \
-    (defined(ENABLE_ARM_SVE) || \
-     defined(ENABLE_MULTIARCH_ARM_SVE))
+#if defined(ENABLE_ARM_SVE)
   #include "AC_arm_sve.hpp"
-  #if defined(ENABLE_MULTIARCH_ARM_SVE)
-    #include <cpu_supports_arm_sve.hpp>
-  #endif
+#elif defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include "AC_arm_sve.hpp"
+  #include <cpu_supports_arm_sve.hpp>
 #endif
 
 using namespace primecount;
@@ -45,9 +43,8 @@ MAYBE_UNUSED void check(bool ok)
   }
 }
 
-#if !defined(ENABLE_LIBDIVIDE) && \
-    (defined(ENABLE_ARM_SVE) || \
-     defined(ENABLE_MULTIARCH_ARM_SVE))
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
 
 template <typename Prime>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -92,21 +89,23 @@ void check_pi_arm_sve(uint64_t xp)
 
 int main()
 {
-  #if !defined(ENABLE_LIBDIVIDE) && \
-      (defined(ENABLE_ARM_SVE) || \
-       defined(ENABLE_MULTIARCH_ARM_SVE))
-    #if !defined(ENABLE_ARM_SVE)
-      if (cpu_supports_sve)
-    #endif
+  #if defined(ENABLE_ARM_SVE)
+    check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
+    check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
+    check_pi_arm_sve<int64_t>(UINT64_MAX);
+    std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
+
+  #elif defined(ENABLE_MULTIARCH_ARM_SVE)
+    if (cpu_supports_sve)
     {
       check_pi_arm_sve<uint32_t>(uint64_t(1) << 20);
       check_pi_arm_sve<int64_t>(uint64_t(1) << 40);
       check_pi_arm_sve<int64_t>(UINT64_MAX);
       std::cout << "ARM SVE division and masked pi lookups passed." << std::endl;
-      return 0;
     }
+  #else
+    std::cout << "SIMD execution skipped: no supported AC SIMD backend on this CPU/build." << std::endl;
   #endif
 
-  std::cout << "SIMD execution skipped: no supported AC SIMD backend on this CPU/build." << std::endl;
   return 0;
 }
