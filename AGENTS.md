@@ -59,7 +59,7 @@ When choosing between 64-bit and 128-bit integer arithmetic, establish the mathe
 
 Generally keep signedness consistent within a function: use signed or unsigned integers as appropriate and avoid unnecessary mixing of the two. Mixing 64-bit and 128-bit widths is common and does not require mixing signedness.
 
-Avoid unnecessary explicit casts. When a cast is necessary, use the project's C-style cast convention, for example `(uint8_t*) sieve_.data()`, rather than C++-style casts.
+Avoid unnecessary explicit casts. When a cast is necessary, follow the convention used in the surrounding function or file. Do not introduce named C++ casts such as `static_cast<uint64_t>(x)`, `reinterpret_cast`, or similar forms. primecount uses both function-style casts such as `uint64_t(x)` and C-style casts such as `(uint64_t) x`; in C++ code, prefer `uint64_t(x)` when there is no nearby precedent. Function-style casts such as `uint64_t(x)` are C++-only, so in C files use C-style casts such as `(uint64_t) x`. Preserve nearby pointer-cast style as well, for example `(uint8_t*) sieve_.data()` when that matches the surrounding code.
 
 ## Internal utilities and the C++ standard library
 
