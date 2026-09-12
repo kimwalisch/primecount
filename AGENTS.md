@@ -52,17 +52,7 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - For SIMD instruction sets that have both `ENABLE_<ISA>` and `ENABLE_MULTIARCH_<ISA>` macros, the native `ENABLE_<ISA>` case takes precedence when both are defined. Native builds such as `-march=native` should use the SIMD implementation directly without runtime CPU-feature checks; the `ENABLE_MULTIARCH_<ISA>` case is for portable builds that require runtime dispatch. Structure the preprocessor logic with the native case first and the multiarch case in `#elif`.
 - All source files that use a `ENABLE_<ISA>` macro must include the `<cpu_arch_macros.hpp>` header.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
-- When defining 64-bit integer constants don't use `UINT64_C(1234)`, instead use `1234ull` for 64-bit unsigned integer constants or `1234ll` for signed 64-bit constants.
-
-## Refactoring
-
-After a significant code change, perform a dedicated refactoring and cleanup pass on the newly added or modified code before considering the task complete. A change is considered significant if the total number of newly added and modified existing lines is at least 30.
-
-During this pass, inspect a few closely related source files, up to a maximum of 5, and analyze their coding conventions. Prefer the most relevant nearby or analogous implementations. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
-
-Do not refactor code outside the newly added or modified code unless it is necessary for the requested change. Do not refactor merely to satisfy this requirement. If the implementation is already simple and consistent with the surrounding code, leave it unchanged. Avoid unrelated cleanup outside the scope of the task.
-
-When working on performance-critical core algorithms, avoid refactoring that could deteriorate performance merely to reduce code duplication or the number of lines of code. In hot inner loops, prefer keeping performance-critical code inline rather than extracting it into functions or abstractions that the compiler might fail to inline. Performance takes precedence over reducing code size or duplication in such cases.
+- Do not use `UINT64_C(...)` or similar integer-constant macros.
 
 ## Integer types and casts
 
@@ -70,7 +60,11 @@ When choosing between 64-bit and 128-bit integer arithmetic, establish the mathe
 
 Generally keep signedness consistent within a function: use signed or unsigned integers as appropriate and avoid unnecessary mixing of the two. Mixing 64-bit and 128-bit widths is common and does not require mixing signedness.
 
-Avoid unnecessary explicit casts. When a cast is necessary, follow the convention used in the surrounding function or file. Do not introduce named C++ casts such as `static_cast<uint64_t>(x)`, `reinterpret_cast`, or similar forms. primecount uses both function-style casts such as `uint64_t(x)` and C-style casts such as `(uint64_t) x`; in C++ code, prefer `uint64_t(x)` when there is no nearby precedent. Function-style casts such as `uint64_t(x)` are C++-only, so in C files use C-style casts such as `(uint64_t) x`. Preserve nearby pointer-cast style as well, for example `(uint8_t*) sieve_.data()` when that matches the surrounding code.
+Avoid unnecessary explicit casts and integer literal suffixes. Rely on implicit conversions and the usual arithmetic conversions when the surrounding expression already establishes the desired integer type and the conversion is safe and unambiguous. For example, prefer `65537 + j * 2` when `j` is a `uint64_t`, and prefer `svwhilelt_b64(0, active)` when the intended overload is unambiguous.
+
+Use an explicit cast or integer literal suffix only when it affects the semantics, prevents an unsafe conversion, or is needed to select the intended overload. For example, use `1ull << 63` when the literal itself must be 64-bit before the shift, and cast before an operation when widening must occur before that operation, as in `(uint128_t(12345) << 64) | 987654321`.
+
+When a cast is necessary, follow the convention used in the surrounding function or file. Do not introduce named C++ casts such as `static_cast<uint64_t>(x)`, `reinterpret_cast`, or similar forms. primecount uses both function-style casts such as `uint64_t(x)` and C-style casts such as `(uint64_t) x`; in C++ code, prefer `uint64_t(x)` when there is no nearby precedent. Function-style casts such as `uint64_t(x)` are C++-only, so in C files use C-style casts such as `(uint64_t) x`. Preserve nearby pointer-cast style as well, for example `(uint8_t*) sieve_.data()` when that matches the surrounding code.
 
 ## Internal utilities and the C++ standard library
 
@@ -91,6 +85,16 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - Keep comments short and compact. There is no fixed line count; use nearby comments as a guide to the expected length, especially when there are many examples nearby.
 - All `*.cpp`, `*.c`, `*.hpp`, and `*.h` files contain a top-level comment describing the file and providing license and copyright information. Whenever updating one of these files, update the copyright year in that comment to the current year. If the copyright uses a year range, preserve the starting year and update the ending year.
 - When creating a new `*.cpp`, `*.c`, `*.hpp`, or `*.h` file, add the standard top-level file description, license, and copyright comment using existing project files as a template and the current copyright year. This standard header is required regardless of the preference for sparse comments.
+
+## Refactoring
+
+After a significant code change, perform a dedicated refactoring and cleanup pass on the newly added or modified code before considering the task complete. A change is considered significant if the total number of newly added and modified existing lines is at least 30.
+
+During this pass, inspect a few closely related source files, up to a maximum of 5, and analyze their coding conventions. Prefer the most relevant nearby or analogous implementations. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
+
+Do not refactor code outside the newly added or modified code unless it is necessary for the requested change. Do not refactor merely to satisfy this requirement. If the implementation is already simple and consistent with the surrounding code, leave it unchanged. Avoid unrelated cleanup outside the scope of the task.
+
+When working on performance-critical core algorithms, avoid refactoring that could deteriorate performance merely to reduce code duplication or the number of lines of code. In hot inner loops, prefer keeping performance-critical code inline rather than extracting it into functions or abstractions that the compiler might fail to inline. Performance takes precedence over reducing code size or duplication in such cases.
 
 ## ChangeLog
 
