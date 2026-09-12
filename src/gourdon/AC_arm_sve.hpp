@@ -85,7 +85,13 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
 
 #ifdef HAVE_INT128_T
 
-/// Used for 128-bit / (32-bit|64-bit) = 64-bit
+/// Used for 128-bit / (32-bit|64-bit) = 64-bit.
+/// This 128-bit sum_pi_arm_sve() function is not annotated with
+/// ALWAYS_INLINE, unlike the 64-bit sum_pi_arm_sve() function.
+/// This is because this function calls the 128-bit sve_div64()
+/// function which is defined as ALWAYS_INLINE and which uses a
+/// significant number of instructions.
+///
 template <typename T, int MULTIPLIER, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
