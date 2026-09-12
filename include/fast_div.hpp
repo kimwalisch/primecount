@@ -266,9 +266,9 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
   {
     uint64_t numer_lo = uint64_t(numer);
     uint64_t numer_hi = uint64_t(numer >> 64);
+
     svuint64_t shift = svclz_u64_x(pg, divisor);
     svuint64_t den = svlsl_u64_x(pg, divisor, shift);
-
     svuint64_t lo = svdup_n_u64(numer_lo);
     svuint64_t hi = svdup_n_u64(numer_hi);
     svuint64_t inv_shift = svsub_u64_x(pg, svdup_n_u64(64), shift);
