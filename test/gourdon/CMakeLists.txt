@@ -1,5 +1,13 @@
 file(GLOB files "*.cpp")
 
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" PRIMECOUNT_SYSTEM_PROCESSOR_LOWER)
+string(TOLOWER "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" PRIMECOUNT_COMPILER_ARCH_LOWER)
+
+if(NOT PRIMECOUNT_SYSTEM_PROCESSOR_LOWER MATCHES "^(aarch64|arm64)$" AND
+   NOT PRIMECOUNT_COMPILER_ARCH_LOWER MATCHES "^(aarch64|arm64)$")
+    list(REMOVE_ITEM files "${CMAKE_CURRENT_SOURCE_DIR}/AC_arm_sve.cpp")
+endif()
+
 foreach(file ${files})
     get_filename_component(binary_name ${file} NAME_WE)
     add_executable(${binary_name} ${file})

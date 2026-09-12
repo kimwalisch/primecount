@@ -1,5 +1,5 @@
 ///
-/// @file  AC_division.cpp
+/// @file  AC_arm_sve.cpp
 /// @brief Test AC ARM SVE division, masked tails, and pi accumulation.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
