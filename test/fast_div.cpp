@@ -35,47 +35,107 @@ void check(bool OK)
    (defined(ENABLE_ARM_SVE) || \
     defined(ENABLE_MULTIARCH_ARM_SVE))
 
+constexpr uint64_t max_sve_lanes = 32;
+
+template <typename Divisor>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
-bool test_fast_div64_arm_sve(std::mt19937& gen)
+bool check_sve_div64(svbool_t pg,
+                     uint64_t numer,
+                     const Divisor* divisors)
+{
+  uint64_t results[max_sve_lanes];
+  svuint64_t x = svdup_n_u64(numer);
+  svuint64_t quot = sve_div64(pg, x, divisors);
+  svst1_u64(pg, results, quot);
+
+  uint64_t active = svcntp_b64(pg, pg);
+  for (uint64_t j = 0; j < active; j++)
+    if (results[j] != numer / uint64_t(divisors[j]))
+      return false;
+
+  return true;
+}
+
+template <typename Divisor>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+bool check_sve_div64(svbool_t pg,
+                     uint128_t numer,
+                     const Divisor* divisors)
+{
+  uint64_t results[max_sve_lanes];
+  svuint64_t quot = sve_div64(pg, numer, divisors);
+  svst1_u64(pg, results, quot);
+
+  uint64_t active = svcntp_b64(pg, pg);
+  for (uint64_t j = 0; j < active; j++)
+    if (results[j] != uint64_t(numer / uint64_t(divisors[j])))
+      return false;
+
+  return true;
+}
+
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+bool test_sve_div64_arm_sve(std::mt19937& gen)
 {
   // ARM SVE supports at most 2048-bit vectors = 32 uint64_t lanes.
-  constexpr uint64_t max_lanes = 32;
-  uint64_t divisors[max_lanes] = {};
-  uint64_t results[max_lanes] = {};
+  uint32_t divisors32[max_sve_lanes];
+  int64_t divisors64[max_sve_lanes];
   uint64_t lanes = svcntd();
 
-  if (lanes > max_lanes)
+  if (lanes > max_sve_lanes)
     return false;
 
   svbool_t all = svptrue_b64();
 
-  // Test quotient boundary cases. The numerator is chosen as
-  // divisor * UINT64_MAX + divisor - 1, hence the quotient is
-  // exactly UINT64_MAX while still satisfying numer_hi < divisor.
-  const uint64_t edge_divisors[] = {
+  // Test quotient boundary cases for uint32_t divisors. The numerator
+  // is chosen such that the quotient is exactly UINT64_MAX while still
+  // satisfying numer_hi < divisor.
+  const uint32_t edge_divisors32[] = {
     1, 2,
-    uint64_t(1) << 31,
-    uint64_t(1) << 32,
-    (uint64_t(1) << 32) + 1,
-    uint64_t(1) << 63,
-    pstd::numeric_limits<uint64_t>::max()
+    uint32_t(1) << 31,
+    pstd::numeric_limits<uint32_t>::max()
   };
 
-  for (uint64_t divisor : edge_divisors)
+  for (uint32_t divisor : edge_divisors32)
   {
+    for (uint64_t j = 0; j < lanes; j++)
+      divisors32[j] = divisor;
+
     uint128_t numer = uint128_t(divisor) * pstd::numeric_limits<uint64_t>::max();
     numer += divisor - 1;
 
-    svuint64_t den = svdup_n_u64(divisor);
-    svuint64_t quot = fast_div64(all, numer, den);
-    svst1_u64(all, results, quot);
+    if (!check_sve_div64(all, numer, divisors32))
+      return false;
+  }
 
-    uint64_t expected = uint64_t(numer / divisor);
+  // Test quotient boundary cases for int64_t divisors, including values
+  // on both sides of the 2^32 boundary.
+  const int64_t edge_divisors64[] = {
+    1, 2,
+    int64_t(1) << 31,
+    pstd::numeric_limits<uint32_t>::max(),
+    int64_t(1) << 32,
+    (int64_t(1) << 32) + 1,
+    int64_t(1) << 62,
+    pstd::numeric_limits<int64_t>::max()
+  };
+
+  for (int64_t divisor : edge_divisors64)
+  {
     for (uint64_t j = 0; j < lanes; j++)
-      if (results[j] != expected)
-        return false;
+      divisors64[j] = divisor;
+
+    uint128_t numer = uint128_t(divisor) * pstd::numeric_limits<uint64_t>::max();
+    numer += divisor - 1;
+
+    if (!check_sve_div64(all, numer, divisors64))
+      return false;
   }
 
   // Cases that exercise both 1-step and 2-step quotient corrections
@@ -84,32 +144,30 @@ bool test_fast_div64_arm_sve(std::mt19937& gen)
   {
     uint64_t hi;
     uint64_t lo;
-    uint64_t divisor;
+    int64_t divisor;
   };
 
   const TestCase correction_cases[] = {
     // q1: one correction.
-    { 1663239473288121450ull, 8491104977468830630ull, 2789495100195680658ull },
+    { 1663239473288121450ull, 8491104977468830630ull, 2789495100195680658ll },
     // q1 and q0: one correction each.
-    { 5901740277908440862ull, 7753795759061867340ull, 15764240356045080578ull },
+    { 9223372036854775806ull, UINT64_MAX, 9223372036854775807ll },
     // q1 and q0: two corrections each.
-    { 5351022020821579747ull, 10990235090364358412ull, 9277324617043713967ull }
+    { 4611686022722355198ull, UINT64_MAX, 4611686022722355199ll }
   };
 
   for (const TestCase& test : correction_cases)
   {
-    uint128_t numer = (uint128_t(test.hi) << 64) | test.lo;
-    svuint64_t den = svdup_n_u64(test.divisor);
-    svuint64_t quot = fast_div64(all, numer, den);
-    svst1_u64(all, results, quot);
-
-    uint64_t expected = uint64_t(numer / test.divisor);
     for (uint64_t j = 0; j < lanes; j++)
-      if (results[j] != expected)
-        return false;
+      divisors64[j] = test.divisor;
+
+    uint128_t numer = (uint128_t(test.hi) << 64) | test.lo;
+
+    if (!check_sve_div64(all, numer, divisors64))
+      return false;
   }
 
-  // Test random divisors with many different normalization shifts.
+  // Test all four sve_div64() overload combinations using random divisors.
   // Every other iteration uses a true 128-bit numerator. In these
   // iterations high < 2^15 and divisor >= 2^16, which guarantees
   // that the quotient fits into uint64_t.
@@ -121,43 +179,50 @@ bool test_fast_div64_arm_sve(std::mt19937& gen)
     bool wide = i & 1;
     uint64_t high = wide ? 1 + (dist_u64(gen) & 0x7fff) : 0;
     uint64_t low = dist_u64(gen);
-    uint128_t numer = (uint128_t(high) << 64) | low;
+    uint128_t numer128 = (uint128_t(high) << 64) | low;
+    uint64_t numer64 = dist_u64(gen);
 
     for (uint64_t j = 0; j < lanes; j++)
     {
-      // For wide numerators use bit widths 17..64. For 64-bit
-      // numerators use 1..64, thereby exercising clz values 0..63.
-      uint64_t bits = wide
-        ? 17 + ((i + j) % 48)
-        :  1 + ((i + j) % 64);
-      uint64_t top_bit = uint64_t(1) << (bits - 1);
-      divisors[j] = top_bit | (dist_u64(gen) & (top_bit - 1));
+      uint64_t bits32 = wide
+        ? 17 + ((i + j) % 16)
+        :  1 + ((i + j) % 32);
+      uint64_t top_bit32 = uint64_t(1) << (bits32 - 1);
+      divisors32[j] = uint32_t(top_bit32 |
+          (dist_u64(gen) & (top_bit32 - 1)));
+
+      uint64_t bits64 = wide
+        ? 17 + ((i + j) % 47)
+        :  1 + ((i + j) % 63);
+      uint64_t top_bit64 = uint64_t(1) << (bits64 - 1);
+      divisors64[j] = int64_t(top_bit64 |
+          (dist_u64(gen) & (top_bit64 - 1)));
     }
 
-    svuint64_t den = svld1_u64(all, divisors);
-    svuint64_t quot = fast_div64(all, numer, den);
-    svst1_u64(all, results, quot);
-
-    for (uint64_t j = 0; j < lanes; j++)
-      if (results[j] != uint64_t(numer / divisors[j]))
-        return false;
+    if (!check_sve_div64(all, numer64, divisors32) ||
+        !check_sve_div64(all, numer64, divisors64) ||
+        !check_sve_div64(all, numer128, divisors32) ||
+        !check_sve_div64(all, numer128, divisors64))
+      return false;
   }
 
   // Test predication as used by the tail loop in AC_arm_sve.hpp.
   uint64_t active = lanes - 1;
   svbool_t pg = svwhilelt_b64(uint64_t(0), active);
-  uint128_t numer = (uint128_t(12345) << 64) | 987654321;
+  uint128_t numer128 = (uint128_t(12345) << 64) | 987654321;
+  uint64_t numer64 = pstd::numeric_limits<uint64_t>::max();
 
   for (uint64_t j = 0; j < lanes; j++)
-    divisors[j] = 65537 + j * 2;
+  {
+    divisors32[j] = 65537 + uint32_t(j * 2);
+    divisors64[j] = (int64_t(1) << 32) + 1 + int64_t(j * 2);
+  }
 
-  svuint64_t den = svld1_u64(pg, divisors);
-  svuint64_t quot = fast_div64(pg, numer, den);
-  svst1_u64(pg, results, quot);
-
-  for (uint64_t j = 0; j < active; j++)
-    if (results[j] != uint64_t(numer / divisors[j]))
-      return false;
+  if (!check_sve_div64(pg, numer64, divisors32) ||
+      !check_sve_div64(pg, numer64, divisors64) ||
+      !check_sve_div64(pg, numer128, divisors32) ||
+      !check_sve_div64(pg, numer128, divisors64))
+    return false;
 
   return true;
 }
@@ -221,16 +286,16 @@ int main()
 #if defined(HAVE_INT128_T) && \
     defined(ENABLE_ARM_SVE)
 
-  std::cout << "fast_div64(ARM SVE)";
-  check(test_fast_div64_arm_sve(gen));
+  std::cout << "sve_div64(ARM SVE)";
+  check(test_sve_div64_arm_sve(gen));
 
 #elif defined(HAVE_INT128_T) && \
       defined(ENABLE_MULTIARCH_ARM_SVE)
 
   if (cpu_supports_sve)
   {
-    std::cout << "fast_div64(ARM SVE)";
-    check(test_fast_div64_arm_sve(gen));
+    std::cout << "sve_div64(ARM SVE)";
+    check(test_sve_div64_arm_sve(gen));
   }
 
 #endif
