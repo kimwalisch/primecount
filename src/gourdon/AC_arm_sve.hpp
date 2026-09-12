@@ -277,7 +277,7 @@ T C1_arm_sve(T xlow,
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      XP xpq = fast_div(xp, q);
+      XP xpq = xp / q;
 
       if (xpq <= pstd::numeric_limits<uint64_t>::max())
         sum += sum_pi_arm_sve<T, 1>(uint64_t(xpq), min_j, max_j, b, primes, segmentedPi);
