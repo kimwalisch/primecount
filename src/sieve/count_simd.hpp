@@ -15,6 +15,7 @@
 #ifndef COUNT_SIMD_HPP
 #define COUNT_SIMD_HPP
 
+#include <cpu_arch_macros.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
 

@@ -16,7 +16,7 @@ These algorithms combine many formulas. Two of the most important contributions 
 
 | Component | Implementation files | Required papers |
 | --- | --- | --- |
-| Easy special leaves | `src/deleglise-rivat/S2_easy.cpp`, `src/gourdon/AC.cpp` | `doc/Easy-Special-Leaves.pdf` |
+| Easy special leaves | `src/deleglise-rivat/S2_easy.cpp`, `src/gourdon/AC.cpp`, `src/gourdon/AC_*.hpp` | `doc/Easy-Special-Leaves.pdf` |
 | Hard special leaves | `src/deleglise-rivat/S2_hard.cpp`, `src/gourdon/D.cpp`, `src/gourdon/D_*.hpp` | `doc/Hard-Special-Leaves.pdf`, `doc/Hard-Special-Leaves-SIMD-Filtering.pdf` |
 | Partial sieve function | `src/phi.cpp`, `src/phi_vector.hpp`, `src/phi_vector.cpp` | `doc/Partial-Sieve-Function.pdf` |
 
@@ -40,16 +40,19 @@ Preserve existing user changes, including staged changes. Do not revert, overwri
 
 Keep primecount's implementation compatible with C++14 and preserve existing platform support. C++14 is only a requirement for building primecount itself: applications using its public C++ headers and linking against the library must continue to work with C++11 or later. Keep public headers compatible with C++11 and avoid propagating a C++14 requirement to library consumers through build or package metadata. Do not introduce newer language requirements, dependencies, or public API changes unless the task calls for them.
 
-## Coding style
+## Coding conventions
 
-primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect a few other source files to determine how to format it.
+primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect one or two other source files to determine how to format it.
 
 Keep changes limited to the requested task. Avoid unrelated refactoring, renaming, formatting, or whitespace changes. Preserve the existing file encoding and line endings.
 
 - Do not break a variable initialization immediately after `=` except in rare cases, such as a complex boolean initializer with many conditions.
 - Prefer a multi-line `if` condition over introducing a boolean variable used only for that condition.
 - Split compound preprocessor conditions in `#if` and `#elif` directives across multiple lines, with one condition per line. Use `\` line continuations and align the continued conditions.
+- For SIMD instruction sets that have both `ENABLE_<ISA>` and `ENABLE_MULTIARCH_<ISA>` macros, the native `ENABLE_<ISA>` case takes precedence when both are defined. Native builds such as `-march=native` should use the SIMD implementation directly without runtime CPU-feature checks; the `ENABLE_MULTIARCH_<ISA>` case is for portable builds that require runtime dispatch. Structure the preprocessor logic with the native case first and the multiarch case in `#elif`.
+- Source files that use `ENABLE_<ISA>` macros must include `<cpu_arch_macros.hpp>`. This is not required for files that use only `ENABLE_MULTIARCH_<ISA>`, since those macros are defined by the build system.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
+- Do not use `UINT64_C(...)` or similar integer-constant macros.
 
 ## Integer types and casts
 
@@ -57,7 +60,11 @@ When choosing between 64-bit and 128-bit integer arithmetic, establish the mathe
 
 Generally keep signedness consistent within a function: use signed or unsigned integers as appropriate and avoid unnecessary mixing of the two. Mixing 64-bit and 128-bit widths is common and does not require mixing signedness.
 
-Avoid unnecessary explicit casts. When a cast is necessary, use the project's C-style cast convention, for example `(uint8_t*) sieve_.data()`, rather than C++-style casts.
+Avoid unnecessary explicit casts and integer literal suffixes. Rely on implicit conversions and the usual arithmetic conversions when the surrounding expression already establishes the desired integer type and the conversion is safe and unambiguous. For example, prefer `65537 + j * 2` when `j` is a `uint64_t`. For overloaded functions, retain an explicit cast when it is needed to select the intended overload, for example `svwhilelt_b64(uint64_t(0), active)` when `active` is a `uint64_t`.
+
+Use an explicit cast or integer literal suffix only when it affects the semantics, prevents an unsafe conversion, or is needed to select the intended overload. For example, use `1ull << 63` when the literal itself must be 64-bit before the shift, and cast before an operation when widening must occur before that operation, as in `(uint128_t(12345) << 64) | 987654321`.
+
+When a cast is necessary, follow the convention used in the surrounding function or file. Do not introduce named C++ casts such as `static_cast<uint64_t>(x)`, `reinterpret_cast`, or similar forms. primecount uses both function-style casts such as `uint64_t(x)` and C-style casts such as `(uint64_t) x`; in C++ code, prefer `uint64_t(x)` when there is no nearby precedent. Function-style casts such as `uint64_t(x)` are C++-only, so in C files use C-style casts such as `(uint64_t) x`. Preserve nearby pointer-cast style as well, for example `(uint8_t*) sieve_.data()` when that matches the surrounding code.
 
 ## Internal utilities and the C++ standard library
 
@@ -78,6 +85,16 @@ Prefer primecount's internal utilities over C++ standard library equivalents. Ch
 - Keep comments short and compact. There is no fixed line count; use nearby comments as a guide to the expected length, especially when there are many examples nearby.
 - All `*.cpp`, `*.c`, `*.hpp`, and `*.h` files contain a top-level comment describing the file and providing license and copyright information. Whenever updating one of these files, update the copyright year in that comment to the current year. If the copyright uses a year range, preserve the starting year and update the ending year.
 - When creating a new `*.cpp`, `*.c`, `*.hpp`, or `*.h` file, add the standard top-level file description, license, and copyright comment using existing project files as a template and the current copyright year. This standard header is required regardless of the preference for sparse comments.
+
+## Refactoring
+
+After a significant code change, perform a dedicated refactoring and cleanup pass on the newly added or modified code before considering the task complete. A change is considered significant if the total number of newly added and modified existing lines is at least 30.
+
+During this pass, inspect a few closely related source files, up to a maximum of 5, and analyze their coding conventions. Prefer the most relevant nearby or analogous implementations. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
+
+Do not refactor code outside the newly added or modified code unless it is necessary for the requested change. Do not refactor merely to satisfy this requirement. If the implementation is already simple and consistent with the surrounding code, leave it unchanged. Avoid unrelated cleanup outside the scope of the task.
+
+When working on performance-critical core algorithms, avoid refactoring that could deteriorate performance merely to reduce code duplication or the number of lines of code. In hot inner loops, prefer keeping performance-critical code inline rather than extracting it into functions or abstractions that the compiler might fail to inline. Performance takes precedence over reducing code size or duplication in such cases.
 
 ## ChangeLog
 

@@ -1,5 +1,8 @@
-Changes in primecount-8.8, 2026-09-07
+Changes in primecount-8.8, 2026-09-11
 
+* AC_arm_sve.hpp: Add ARM SVE implementation of AC algorithm.
+* AC.cpp: Add ARM SVE runtime dispatch.
+* test/fast_div.cpp: Add ARM SVE tests.
 * Add AGENTS.md file for AI agents.
 * Update to libprimesieve 12.16.
 
