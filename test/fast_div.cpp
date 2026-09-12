@@ -145,7 +145,7 @@ bool test_fast_div64_arm_sve(std::mt19937& gen)
 
   // Test predication as used by the tail loop in AC_arm_sve.hpp.
   uint64_t active = lanes - 1;
-  svbool_t pg = svwhilelt_b64(0, active);
+  svbool_t pg = svwhilelt_b64(uint64_t(0), active);
   uint128_t numer = (uint128_t(12345) << 64) | 987654321;
 
   for (uint64_t j = 0; j < lanes; j++)

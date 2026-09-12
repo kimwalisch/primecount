@@ -60,7 +60,7 @@ When choosing between 64-bit and 128-bit integer arithmetic, establish the mathe
 
 Generally keep signedness consistent within a function: use signed or unsigned integers as appropriate and avoid unnecessary mixing of the two. Mixing 64-bit and 128-bit widths is common and does not require mixing signedness.
 
-Avoid unnecessary explicit casts and integer literal suffixes. Rely on implicit conversions and the usual arithmetic conversions when the surrounding expression already establishes the desired integer type and the conversion is safe and unambiguous. For example, prefer `65537 + j * 2` when `j` is a `uint64_t`, and prefer `svwhilelt_b64(0, active)` when the intended overload is unambiguous.
+Avoid unnecessary explicit casts and integer literal suffixes. Rely on implicit conversions and the usual arithmetic conversions when the surrounding expression already establishes the desired integer type and the conversion is safe and unambiguous. For example, prefer `65537 + j * 2` when `j` is a `uint64_t`. For overloaded functions, retain an explicit cast when it is needed to select the intended overload, for example `svwhilelt_b64(uint64_t(0), active)` when `active` is a `uint64_t`.
 
 Use an explicit cast or integer literal suffix only when it affects the semantics, prevents an unsafe conversion, or is needed to select the intended overload. For example, use `1ull << 63` when the literal itself must be 64-bit before the shift, and cast before an operation when widening must occur before that operation, as in `(uint128_t(12345) << 64) | 987654321`.
 
