@@ -184,20 +184,66 @@ fast_div64(X x, Y y)
    (defined(ENABLE_ARM_SVE) || \
     defined(ENABLE_MULTIARCH_ARM_SVE))
 
-/// Narrowing unsigned division: uint128_t / uint64_t -> uint64_t.
-/// The quotient must fit into 64 bits, i.e. (numer >> 64) < divisor.
-///
+/// Used for (64-bit / 32-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   svuint64_t x,
+                                   const uint32_t* divisors)
+{
+  svuint64_t div = svld1uw_u64(pg, divisors);
+  return svdiv_u64_x(pg, x, div);
+}
+
+/// Used for (64-bit / 64-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   svuint64_t x,
+                                   const int64_t* divisors)
+{
+  svuint64_t div = svreinterpret_u64_s64(svld1_s64(pg, divisors));
+  return svdiv_u64_x(pg, x, div);
+}
+
+/// Used for (128-bit / 32-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint128_t numer,
+                                   const uint32_t* divisors)
+{
+  uint64_t num1 = uint64_t(numer >> 32);
+  uint64_t num0 = uint32_t(numer);
+
+  svuint64_t divisor = svld1uw_u64(pg, divisors);
+  svuint64_t dividend = svdup_n_u64(num1);
+  svuint64_t q1 = svdiv_u64_x(pg, dividend, divisor);
+  svuint64_t rem = svmls_u64_x(pg, dividend, q1, divisor);
+  dividend = svlsl_n_u64_x(pg, rem, 32);
+  dividend = svorr_n_u64_x(pg, dividend, num0);
+  svuint64_t q0 = svdiv_u64_x(pg, dividend, divisor);
+
+  return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
+}
+
+/// Used for (128-bit / 64-bit) = 64-bit.
 /// This is the branchless correction variant of Knuth Algorithm D used by
 /// libdivide's divllu() implementation, vectorized across the divisors.
 /// The numerator is common to all lanes while each lane has its own divisor.
 /// https://github.com/ridiculousfish/libdivide/blob/master/doc/divlu.c
+///
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
-ALWAYS_INLINE svuint64_t fast_div64(svbool_t pg,
-                                    uint128_t numer,
-                                    svuint64_t divisor)
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint128_t numer,
+                                   const int64_t* divisors)
 {
+  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
   svbool_t all_divisors_64bit = svcmpgt_n_u64(pg, divisor, UINT32_MAX);
 
   // Use simpler base-2^32 long division
@@ -206,12 +252,14 @@ ALWAYS_INLINE svuint64_t fast_div64(svbool_t pg,
   {
     uint64_t num1 = uint64_t(numer >> 32);
     uint64_t num0 = uint32_t(numer);
+
     svuint64_t dividend = svdup_n_u64(num1);
     svuint64_t q1 = svdiv_u64_x(pg, dividend, divisor);
     svuint64_t rem = svmls_u64_x(pg, dividend, q1, divisor);
     dividend = svlsl_n_u64_x(pg, rem, 32);
     dividend = svorr_n_u64_x(pg, dividend, num0);
     svuint64_t q0 = svdiv_u64_x(pg, dividend, divisor);
+
     return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
   }
   else

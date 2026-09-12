@@ -18,24 +18,7 @@ namespace {
 
 using namespace primecount;
 
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE svuint64_t load_primes_arm_sve(svbool_t pg,
-                                             const uint32_t* primes)
-{
-  return svld1uw_u64(pg, primes);
-}
-
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE svuint64_t load_primes_arm_sve(svbool_t pg,
-                                             const int64_t* primes)
-{
-  return svreinterpret_u64_s64(svld1_s64(pg, primes));
-}
-
+/// Used for 64-bit / (32-bit|64-bit) = 64-bit
 template <typename T, int MULTIPLIER, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -60,10 +43,8 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
   NO_UNROLL_LOOP
   for (; i + lanes * 2 <= last + 1; i += lanes * 2)
   {
-    svuint64_t p0 = load_primes_arm_sve(all, &primes[i]);
-    svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
-    svuint64_t q0 = svdiv_u64_x(all, numer, p0);
-    svuint64_t q1 = svdiv_u64_x(all, numer, p1);
+    svuint64_t q0 = sve_div64(all, numer, &primes[i]);
+    svuint64_t q1 = sve_div64(all, numer, &primes[i + lanes]);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
@@ -87,8 +68,7 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
   for (; i <= last; i += lanes)
   {
     svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
-    svuint64_t q = svdiv_u64_x(pg, numer, p);
+    svuint64_t q = sve_div64(pg, numer, &primes[i]);
     uint64_t active = svcntp_b64(pg, pg);
 
     NO_UNROLL_LOOP
@@ -105,6 +85,7 @@ ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
 
 #ifdef HAVE_INT128_T
 
+/// Used for 128-bit / (32-bit|64-bit) = 64-bit
 template <typename T, int MULTIPLIER, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -128,10 +109,8 @@ T sum_pi_arm_sve(uint128_t xp,
   NO_UNROLL_LOOP
   for (; i + lanes * 2 <= last + 1; i += lanes * 2)
   {
-    svuint64_t p0 = load_primes_arm_sve(all, &primes[i]);
-    svuint64_t p1 = load_primes_arm_sve(all, &primes[i + lanes]);
-    svuint64_t q0 = fast_div64(all, xp, p0);
-    svuint64_t q1 = fast_div64(all, xp, p1);
+    svuint64_t q0 = sve_div64(all, xp, &primes[i]);
+    svuint64_t q1 = sve_div64(all, xp, &primes[i + lanes]);
 
     NO_UNROLL_LOOP
     for (uint64_t j = 0; j < lanes; j += 2)
@@ -155,8 +134,7 @@ T sum_pi_arm_sve(uint128_t xp,
   for (; i <= last; i += lanes)
   {
     svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t p = load_primes_arm_sve(pg, &primes[i]);
-    svuint64_t q = fast_div64(pg, xp, p);
+    svuint64_t q = sve_div64(pg, xp, &primes[i]);
     uint64_t active = svcntp_b64(pg, pg);
 
     NO_UNROLL_LOOP
