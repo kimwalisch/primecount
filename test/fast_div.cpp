@@ -88,8 +88,11 @@ bool test_fast_div64_arm_sve(std::mt19937& gen)
   };
 
   const TestCase correction_cases[] = {
+    // q1: one correction.
     { 1663239473288121450ull, 8491104977468830630ull, 2789495100195680658ull },
+    // q1 and q0: one correction each.
     { 5901740277908440862ull, 7753795759061867340ull, 15764240356045080578ull },
+    // q1 and q0: two corrections each.
     { 5351022020821579747ull, 10990235090364358412ull, 9277324617043713967ull }
   };
 
