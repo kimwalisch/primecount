@@ -206,6 +206,35 @@ bool test_sve_div64_arm_sve(std::mt19937& gen)
       return false;
   }
 
+  // Cover all normalization shifts, mixed divisor widths and large
+  // numerators, including quotients near UINT64_MAX.
+  for (uint64_t i = 0; i < 4096; i++)
+  {
+    uint64_t min_divisor = INT64_MAX;
+    for (uint64_t j = 0; j < lanes; j++)
+    {
+      uint64_t top = 1ull << ((i + j) % 63);
+      uint64_t divisor = top | (dist_u64(gen) & (top - 1));
+      if (j == 0)
+        divisor |= 1ull << 62;
+      divisors64[j] = divisor;
+      if (divisor < min_divisor)
+        min_divisor = divisor;
+    }
+
+    uint64_t high = dist_u64(gen) % min_divisor;
+    if (i & 1)
+      high = min_divisor - 1;
+
+    uint128_t numer = (uint128_t(high) << 64) | dist_u64(gen);
+    uint64_t active = i % (lanes + 1);
+    svbool_t pg = svwhilelt_b64(uint64_t(0), active);
+
+    if (!check_sve_div64(all, numer, divisors64) ||
+        !check_sve_div64(pg, numer, divisors64))
+      return false;
+  }
+
   // Test predication as used by the tail loop in AC_arm_sve.hpp.
   uint64_t active = lanes - 1;
   svbool_t pg = svwhilelt_b64(uint64_t(0), active);

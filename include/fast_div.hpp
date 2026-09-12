@@ -281,15 +281,18 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
     svuint64_t den1 = svlsr_n_u64_x(pg, den, 32);
     svuint64_t den0 = svand_n_u64_x(pg, den, 0xffffffffu);
+    svuint64_t denhi = svlsl_n_u64_x(pg, den1, 32);
     svuint64_t num1 = svlsr_n_u64_x(pg, numlo, 32);
     svuint64_t num0 = svand_n_u64_x(pg, numlo, 0xffffffffu);
 
     // Estimate and correct the high 32 quotient bits.
+    // Form c2 = (numhi - q1 * den1) * 2^32 + num1 modulo 2^64.
+    // Shift and add before MLS so they do not depend on the quotient.
     svuint64_t q1 = svdiv_u64_x(pg, numhi, den1);
-    svuint64_t rhat = svmls_u64_x(pg, numhi, q1, den1);
     svuint64_t c1 = svmul_u64_x(pg, q1, den0);
-    svuint64_t c2 = svlsl_n_u64_x(pg, rhat, 32);
+    svuint64_t c2 = svlsl_n_u64_x(pg, numhi, 32);
     c2 = svadd_u64_x(pg, c2, num1);
+    c2 = svmls_u64_x(pg, c2, q1, denhi);
 
     svbool_t corr1 = svcmpgt_u64(pg, c1, c2);
     svuint64_t delta = svsub_u64_x(pg, c1, c2);
@@ -298,7 +301,6 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
     q1 = svsub_n_u64_m(corr2, q1, 1);
 
     // True partial remainder needed to estimate the low 32 quotient bits.
-    // From numhi = qhat * den1 + rhat:
     // rem = c2 - c1 + correction * den.
     // Reuse the correction predicates, avoiding q1 * den multiply.
     svuint64_t rem = svsub_u64_x(pg, c2, c1);
@@ -307,10 +309,10 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
     // Estimate and correct the low 32 quotient bits.
     svuint64_t q0 = svdiv_u64_x(pg, rem, den1);
-    rhat = svmls_u64_x(pg, rem, q0, den1);
     c1 = svmul_u64_x(pg, q0, den0);
-    c2 = svlsl_n_u64_x(pg, rhat, 32);
+    c2 = svlsl_n_u64_x(pg, rem, 32);
     c2 = svadd_u64_x(pg, c2, num0);
+    c2 = svmls_u64_x(pg, c2, q0, denhi);
 
     corr1 = svcmpgt_u64(pg, c1, c2);
     delta = svsub_u64_x(pg, c1, c2);
