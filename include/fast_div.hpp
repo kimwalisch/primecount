@@ -217,14 +217,14 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    const uint32_t* divisors)
 {
   uint64_t num1 = uint64_t(numer >> 32);
-  uint64_t num0 = uint32_t(numer);
+  uint64_t num0 = uint64_t(numer);
 
   svuint64_t divisor = svld1uw_u64(pg, divisors);
+  svuint64_t denhi = svlsl_n_u64_x(pg, divisor, 32);
   svuint64_t dividend = svdup_n_u64(num1);
   svuint64_t q1 = svdiv_u64_x(pg, dividend, divisor);
-  svuint64_t rem = svmls_u64_x(pg, dividend, q1, divisor);
-  dividend = svlsl_n_u64_x(pg, rem, 32);
-  dividend = svorr_n_u64_x(pg, dividend, num0);
+  dividend = svdup_n_u64(num0);
+  dividend = svmls_u64_x(pg, dividend, q1, denhi);
   svuint64_t q0 = svdiv_u64_x(pg, dividend, divisor);
 
   return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
@@ -251,13 +251,13 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
   if (!svptest_any(pg, all_divisors_64bit))
   {
     uint64_t num1 = uint64_t(numer >> 32);
-    uint64_t num0 = uint32_t(numer);
+    uint64_t num0 = uint64_t(numer);
 
+    svuint64_t denhi = svlsl_n_u64_x(pg, divisor, 32);
     svuint64_t dividend = svdup_n_u64(num1);
     svuint64_t q1 = svdiv_u64_x(pg, dividend, divisor);
-    svuint64_t rem = svmls_u64_x(pg, dividend, q1, divisor);
-    dividend = svlsl_n_u64_x(pg, rem, 32);
-    dividend = svorr_n_u64_x(pg, dividend, num0);
+    dividend = svdup_n_u64(num0);
+    dividend = svmls_u64_x(pg, dividend, q1, denhi);
     svuint64_t q0 = svdiv_u64_x(pg, dividend, divisor);
 
     return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
