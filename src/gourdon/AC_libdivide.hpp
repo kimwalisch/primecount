@@ -4,6 +4,11 @@
 ///        Xavier Gourdon's prime counting algorithm. Wide numerators
 ///        use the shared scalar helpers in AC.cpp.
 ///
+///        The libdivide C/C++ library allows to replace expensive
+///        integer division instructions by a sequence of shift, add
+///        and multiply instructions that will calculate the integer
+///        division much faster, especially on older CPUs.
+///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
