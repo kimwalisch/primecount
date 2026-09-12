@@ -281,7 +281,7 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
     svuint64_t den1 = svlsr_n_u64_x(pg, den, 32);
     svuint64_t den0 = svand_n_u64_x(pg, den, 0xffffffffu);
-    svuint64_t denhi = svlsl_n_u64_x(pg, den1, 32);
+    svuint64_t denhi = svand_n_u64_x(pg, den, 0xffffffff00000000ull);
     svuint64_t num1 = svlsr_n_u64_x(pg, numlo, 32);
     svuint64_t num0 = svand_n_u64_x(pg, numlo, 0xffffffffu);
 
