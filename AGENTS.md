@@ -42,9 +42,7 @@ Keep primecount's implementation compatible with C++14 and preserve existing pla
 
 ## Coding conventions
 
-primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect a few other source files to determine how to format it.
-
-When generating or modifying more than 30 lines of code in a task, inspect at least 5 similar source files before writing the change. Count both newly added lines and modified existing lines toward this threshold. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
+primecount has no official coding style guide that can be enforced by a tool. Infer the coding style from the file being edited and follow its existing formatting. If the file is too small or lacks examples of the code construct being written, inspect one or two other source files to determine how to format it.
 
 Keep changes limited to the requested task. Avoid unrelated refactoring, renaming, formatting, or whitespace changes. Preserve the existing file encoding and line endings.
 
@@ -55,6 +53,16 @@ Keep changes limited to the requested task. Avoid unrelated refactoring, renamin
 - All source files that use a `ENABLE_<ISA>` macro must include the `<cpu_arch_macros.hpp>` header.
 - Split overly complicated expressions, especially nested `min()`/`max()` calls combined with table lookups, into simpler intermediate calculations.
 - When defining 64-bit integer constants don't use `UINT64_C(1234)`, instead use `1234ull` for 64-bit unsigned integer constants or `1234ll` for signed 64-bit constants.
+
+## Refactoring
+
+After a significant code change, perform a dedicated refactoring and cleanup pass on the newly added or modified code before considering the task complete. A change is considered significant if the total number of newly added and modified existing lines is at least 30.
+
+During this pass, inspect a few closely related source files, up to a maximum of 5, and analyze their coding conventions. Prefer the most relevant nearby or analogous implementations. Use those files to match the project's existing coding style, formatting, naming, comments, and code structure as closely as possible.
+
+Do not refactor code outside the newly added or modified code unless it is necessary for the requested change. Do not refactor merely to satisfy this requirement. If the implementation is already simple and consistent with the surrounding code, leave it unchanged. Avoid unrelated cleanup outside the scope of the task.
+
+When working on performance-critical core algorithms, avoid refactoring that could deteriorate performance merely to reduce code duplication or the number of lines of code. In hot inner loops, prefer keeping performance-critical code inline rather than extracting it into functions or abstractions that the compiler might fail to inline. Performance takes precedence over reducing code size or duplication in such cases.
 
 ## Integer types and casts
 
