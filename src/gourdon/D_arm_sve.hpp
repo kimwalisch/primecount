@@ -32,7 +32,7 @@ namespace {
 using namespace primecount;
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -41,7 +41,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -50,7 +50,7 @@ ALWAYS_INLINE svuint32_t load_factor_u32_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint16_t* factor_table)
@@ -59,7 +59,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 }
 
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
                                                  const uint32_t* factor_table)
@@ -69,7 +69,7 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 
 template <typename Index, std::size_t N, std::size_t M>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
                                      const Array<Index, N>& indexes,
@@ -96,7 +96,7 @@ ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
 /// to reduce register pressure in the 64-bit path.
 template <typename Index, std::size_t N, std::size_t M>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
                                      const Array<Index, N>& indexes,
@@ -120,7 +120,7 @@ ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
-__attribute__ ((target ("+sve")))
+  __attribute__ ((target ("+sve")))
 #endif
 T D_thread_arm_sve(T x,
                    int64_t x_star,
