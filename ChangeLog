@@ -1,7 +1,9 @@
-Changes in primecount-8.8, 2026-09-11
+Changes in primecount-8.8, 2026-09-13
 
+* D_arm_sve.hpp: Use manual ARM SVE vectorization instead of relying on auto-vectorization.
 * AC_arm_sve.hpp: Add ARM SVE implementation of AC algorithm.
 * AC.cpp: Add ARM SVE runtime dispatch.
+* fast_div.hpp: Add ARM SVE integer division functions.
 * test/fast_div.cpp: Add ARM SVE tests.
 * Add AGENTS.md file for AI agents.
 * Update to libprimesieve 12.16.
