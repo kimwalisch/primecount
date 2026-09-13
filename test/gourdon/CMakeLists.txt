@@ -5,7 +5,9 @@ string(TOLOWER "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" PRIMECOUNT_COMPILER_ARCH_
 
 if(NOT PRIMECOUNT_SYSTEM_PROCESSOR_LOWER MATCHES "^(aarch64|arm64)$" AND
    NOT PRIMECOUNT_COMPILER_ARCH_LOWER MATCHES "^(aarch64|arm64)$")
-    list(REMOVE_ITEM files "${CMAKE_CURRENT_SOURCE_DIR}/AC_arm_sve.cpp")
+    list(REMOVE_ITEM files
+        "${CMAKE_CURRENT_SOURCE_DIR}/AC_arm_sve.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/D_arm_sve.cpp")
 endif()
 
 foreach(file ${files})

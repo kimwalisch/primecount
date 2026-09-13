@@ -241,9 +241,8 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
                                    uint128_t numer,
-                                   const int64_t* divisors)
+                                   svuint64_t divisor)
 {
-  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
   svbool_t all_divisors_64bit = svcmpgt_n_u64(pg, divisor, UINT32_MAX);
 
   // Use simpler base-2^32 long division
@@ -322,6 +321,18 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
 
     return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
   }
+}
+
+/// Used for (128-bit / 64-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint128_t numer,
+                                   const int64_t* divisors)
+{
+  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
+  return sve_div64(pg, numer, divisor);
 }
 
 #endif

@@ -16,12 +16,18 @@
 #ifndef BASEFACTORTABLE_HPP
 #define BASEFACTORTABLE_HPP
 
+#include <cpu_arch_macros.hpp>
 #include <imath.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
 
 #include <algorithm>
 #include <stdint.h>
+
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+  #include <arm_sve.h>
+#endif
 
 namespace primecount {
 
@@ -47,6 +53,40 @@ public:
     uint64_t r = index % 480;
     return 2310 * q + coprime_[r];
   }
+
+#if defined(ENABLE_ARM_SVE) || \
+    defined(ENABLE_MULTIARCH_ARM_SVE)
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    __attribute__ ((target ("+sve")))
+  #endif
+  ALWAYS_INLINE static svuint64_t to_number_arm_sve(svbool_t pg,
+                                                    const uint32_t* indexes)
+  {
+    svuint64_t index = svld1uw_u64(pg, indexes);
+    // ceil(2^64 / 480) gives exact quotients for 32-bit indexes.
+    svuint64_t q = svmulh_n_u64_x(pg, index, 0x88888888888889);
+    svuint64_t r = svmls_n_u64_x(pg, index, q, 480);
+    svuint64_t coprime = svld1uh_gather_u64index_u64(pg, coprime_.data(), r);
+    return svmla_n_u64_x(pg, coprime, q, 2310);
+  }
+
+  #if defined(ENABLE_MULTIARCH_ARM_SVE)
+    __attribute__ ((target ("+sve")))
+  #endif
+  ALWAYS_INLINE static svuint64_t to_number_arm_sve(svbool_t pg,
+                                                    const int64_t* indexes)
+  {
+    svuint64_t index = svreinterpret_u64_s64(svld1_s64(pg, indexes));
+    // Multiply by ceil(2^72 / 480), then shift by 8.
+    svuint64_t q = svmulh_n_u64_x(pg, index, 0x8888888888888889);
+    q = svlsr_n_u64_x(pg, q, 8);
+    svuint64_t r = svmls_n_u64_x(pg, index, q, 480);
+    svuint64_t coprime = svld1uh_gather_u64index_u64(pg, coprime_.data(), r);
+    return svmla_n_u64_x(pg, coprime, q, 2310);
+  }
+
+#endif
 
   /// Returns the 1st number > 1 that is not divisible
   /// by 2, 3, 5, 7 and 11. Hence 13 is returned.

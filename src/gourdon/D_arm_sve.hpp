@@ -6,9 +6,9 @@
 ///        except that this algorithm has been partially vectorized
 ///        using ARM SVE.
 ///
-///        For performance it is important that all ARM SVE helper
+///        For performance it is important that small ARM SVE helper
 ///        functions are inlined by the compiler. We achieve this
-///        by annotating all ARM SVE helper functions using the same
+///        by annotating small ARM SVE helper functions using the same
 ///        ARM SVE __attribute__ and the ALWAYS_INLINE macro.
 ///
 ///        In-depth description of this algorithm:
@@ -24,6 +24,7 @@
 #ifndef D_ARM_SVE_HPP
 #define D_ARM_SVE_HPP
 
+#include <fast_div.hpp>
 #include <arm_sve.h>
 
 namespace {
@@ -65,6 +66,81 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
 {
   return svrev_u64(svld1uw_u64(pg, factor_table));
 }
+
+template <typename Index, std::size_t N, std::size_t M>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+__attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
+                                     const Array<Index, N>& indexes,
+                                     Array<int64_t, M>& xpm_cache,
+                                     std::size_t m_count)
+{
+  std::size_t lanes = svcntd();
+  std::size_t i = 0;
+  svbool_t all = svptrue_b64();
+  svuint64_t numer = svdup_n_u64(xp);
+
+  NO_UNROLL_LOOP
+  for (; i + lanes * 2 <= m_count; i += lanes * 2)
+  {
+    svuint64_t m0 = BaseFactorTable::to_number_arm_sve(all, &indexes[i]);
+    svuint64_t m1 = BaseFactorTable::to_number_arm_sve(all, &indexes[i + lanes]);
+    svuint64_t q0 = svdiv_u64_x(all, numer, m0);
+    svuint64_t q1 = svdiv_u64_x(all, numer, m1);
+    svst1_s64(all, &xpm_cache[i], svreinterpret_s64_u64(q0));
+    svst1_s64(all, &xpm_cache[i + lanes], svreinterpret_s64_u64(q1));
+  }
+
+  NO_UNROLL_LOOP
+  for (; i < m_count; i += lanes)
+  {
+    svbool_t pg = svwhilelt_b64(i, m_count);
+    svuint64_t m = BaseFactorTable::to_number_arm_sve(pg, &indexes[i]);
+    svuint64_t q = svdiv_u64_x(pg, numer, m);
+    svst1_s64(pg, &xpm_cache[i], svreinterpret_s64_u64(q));
+  }
+}
+
+#ifdef HAVE_INT128_T
+
+/// Keep the large 128-bit division code out of D_thread_arm_sve()
+/// to reduce register pressure in the 64-bit path.
+template <typename Index, std::size_t N, std::size_t M>
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+__attribute__ ((target ("+sve")))
+#endif
+NOINLINE void batch_div_arm_sve(uint128_t xp,
+                                const Array<Index, N>& indexes,
+                                Array<int64_t, M>& xpm_cache,
+                                std::size_t m_count)
+{
+  std::size_t lanes = svcntd();
+  std::size_t i = 0;
+  svbool_t all = svptrue_b64();
+
+  NO_UNROLL_LOOP
+  for (; i + lanes * 2 <= m_count; i += lanes * 2)
+  {
+    svuint64_t m0 = BaseFactorTable::to_number_arm_sve(all, &indexes[i]);
+    svuint64_t m1 = BaseFactorTable::to_number_arm_sve(all, &indexes[i + lanes]);
+    svuint64_t q0 = sve_div64(all, xp, m0);
+    svuint64_t q1 = sve_div64(all, xp, m1);
+    svst1_s64(all, &xpm_cache[i], svreinterpret_s64_u64(q0));
+    svst1_s64(all, &xpm_cache[i + lanes], svreinterpret_s64_u64(q1));
+  }
+
+  NO_UNROLL_LOOP
+  for (; i < m_count; i += lanes)
+  {
+    svbool_t pg = svwhilelt_b64(i, m_count);
+    svuint64_t m = BaseFactorTable::to_number_arm_sve(pg, &indexes[i]);
+    svuint64_t q = sve_div64(pg, xp, m);
+    svst1_s64(pg, &xpm_cache[i], svreinterpret_s64_u64(q));
+  }
+}
+
+#endif
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
@@ -150,19 +226,6 @@ T D_thread_arm_sve(T x,
         svbool_t all32 = svptrue_b32();
         svuint32_t m_offsets32 = svindex_u32(0, 1);
 
-        // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As a
-        // workaround we create the batch_div32 lambda without
-        // 128-bit code that GCC is able to vectorize.
-        auto batch_div32 = [&](auto xp, std::size_t m_count)
-        {
-          for (std::size_t i = 0; i < m_count; i++)
-          {
-            int64_t m = factor.to_number(m_indexes32[i]);
-            xpm_cache[i] = int64_t(xp / m);
-          }
-        };
-
         for (; m >= min_m + lanes32; m -= lanes32)
         {
           // Filter out square free m values using ARM SVE
@@ -179,9 +242,9 @@ T D_thread_arm_sve(T x,
           {
             // Batch calculate xp/m to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div32(uint64_t(xp), m_count);
+              batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_cache, m_count);
             else
-              batch_div32(xp, m_count);
+              batch_div_arm_sve(xp, m_indexes32, xpm_cache, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -217,9 +280,9 @@ T D_thread_arm_sve(T x,
 
         // Batch calculate xp/m to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div32(uint64_t(xp), m_count);
+          batch_div_arm_sve(uint64_t(xp), m_indexes32, xpm_cache, m_count);
         else
-          batch_div32(xp, m_count);
+          batch_div_arm_sve(xp, m_indexes32, xpm_cache, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
@@ -238,19 +301,6 @@ T D_thread_arm_sve(T x,
         svbool_t all64 = svptrue_b64();
         svuint64_t m_offsets64 = svindex_u64(0, 1);
 
-        // GCC's auto-vectorizer refuses to vectorize any loop
-        // that contains an int128_t type (GCC <= 16). As a
-        // workaround we create the batch_div64 lambda without
-        // 128-bit code that GCC is able to vectorize.
-        auto batch_div64 = [&](auto xp, std::size_t m_count)
-        {
-          for (std::size_t i = 0; i < m_count; i++)
-          {
-            int64_t m = factor.to_number(m_indexes64[i]);
-            xpm_cache[i] = int64_t(xp / m);
-          }
-        };
-
         for (; m >= min_m + lanes64; m -= lanes64)
         {
           // Filter out square free m values using ARM SVE
@@ -267,9 +317,9 @@ T D_thread_arm_sve(T x,
           {
             // Batch calculate xp/m to improve CPU pipelining
             if (xp <= UINT64_MAX)
-              batch_div64(uint64_t(xp), m_count);
+              batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_cache, m_count);
             else
-              batch_div64(xp, m_count);
+              batch_div_arm_sve(xp, m_indexes64, xpm_cache, m_count);
 
             // Process the next few special leaves that are
             // composed of a prime and a square free number:
@@ -305,9 +355,9 @@ T D_thread_arm_sve(T x,
 
         // Batch calculate xp/m to improve CPU pipelining
         if (xp <= UINT64_MAX)
-          batch_div64(uint64_t(xp), m_count);
+          batch_div_arm_sve(uint64_t(xp), m_indexes64, xpm_cache, m_count);
         else
-          batch_div64(xp, m_count);
+          batch_div_arm_sve(xp, m_indexes64, xpm_cache, m_count);
 
         // Process the last few m values
         for (std::size_t i = 0; i < m_count; i++)
