@@ -76,21 +76,10 @@ ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
                                      Array<int64_t, M>& xpm_cache,
                                      std::size_t m_count)
 {
-  std::size_t lanes = svcntd();
   std::size_t i = 0;
+  std::size_t lanes = svcntd();
   svbool_t all = svptrue_b64();
   svuint64_t numer = svdup_n_u64(xp);
-
-  NO_UNROLL_LOOP
-  for (; i + lanes * 2 <= m_count; i += lanes * 2)
-  {
-    svuint64_t m0 = BaseFactorTable::to_number_arm_sve(all, &indexes[i]);
-    svuint64_t m1 = BaseFactorTable::to_number_arm_sve(all, &indexes[i + lanes]);
-    svuint64_t q0 = svdiv_u64_x(all, numer, m0);
-    svuint64_t q1 = svdiv_u64_x(all, numer, m1);
-    svst1_s64(all, &xpm_cache[i], svreinterpret_s64_u64(q0));
-    svst1_s64(all, &xpm_cache[i + lanes], svreinterpret_s64_u64(q1));
-  }
 
   NO_UNROLL_LOOP
   for (; i < m_count; i += lanes)
@@ -110,25 +99,14 @@ template <typename Index, std::size_t N, std::size_t M>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
 __attribute__ ((target ("+sve")))
 #endif
-NOINLINE void batch_div_arm_sve(uint128_t xp,
-                                const Array<Index, N>& indexes,
-                                Array<int64_t, M>& xpm_cache,
-                                std::size_t m_count)
+ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
+                                     const Array<Index, N>& indexes,
+                                     Array<int64_t, M>& xpm_cache,
+                                     std::size_t m_count)
 {
-  std::size_t lanes = svcntd();
   std::size_t i = 0;
+  std::size_t lanes = svcntd();
   svbool_t all = svptrue_b64();
-
-  NO_UNROLL_LOOP
-  for (; i + lanes * 2 <= m_count; i += lanes * 2)
-  {
-    svuint64_t m0 = BaseFactorTable::to_number_arm_sve(all, &indexes[i]);
-    svuint64_t m1 = BaseFactorTable::to_number_arm_sve(all, &indexes[i + lanes]);
-    svuint64_t q0 = sve_div64(all, xp, m0);
-    svuint64_t q1 = sve_div64(all, xp, m1);
-    svst1_s64(all, &xpm_cache[i], svreinterpret_s64_u64(q0));
-    svst1_s64(all, &xpm_cache[i + lanes], svreinterpret_s64_u64(q1));
-  }
 
   NO_UNROLL_LOOP
   for (; i < m_count; i += lanes)
