@@ -78,7 +78,6 @@ ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
 {
   std::size_t i = 0;
   std::size_t lanes = svcntd();
-  svbool_t all = svptrue_b64();
   svuint64_t numer = svdup_n_u64(xp);
 
   NO_UNROLL_LOOP
@@ -106,7 +105,6 @@ ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
 {
   std::size_t i = 0;
   std::size_t lanes = svcntd();
-  svbool_t all = svptrue_b64();
 
   NO_UNROLL_LOOP
   for (; i < m_count; i += lanes)
