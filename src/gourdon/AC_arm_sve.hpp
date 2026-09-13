@@ -18,90 +18,16 @@ namespace {
 
 using namespace primecount;
 
-/// Used for 64-bit / (32-bit|64-bit) = 64-bit
-template <typename T, int MULTIPLIER, typename Primes>
+template <typename T, int MULTIPLIER, typename XP, typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
-ALWAYS_INLINE T sum_pi_arm_sve(uint64_t xp,
+ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
                                uint64_t i,
                                uint64_t last,
                                uint64_t b,
                                const Primes& primes,
                                const SegmentedPiTable& segmentedPi)
-{
-  if (i > last)
-    return 0;
-
-  T sum = 0;
-  uint64_t size = last - i + 1;
-  uint64_t lanes = svcntd();
-  svuint64_t numer = svdup_n_u64(xp);
-  svbool_t first = svptrue_pat_b64(SV_VL1);
-  svbool_t all = svptrue_b64();
-
-  NO_UNROLL_LOOP
-  for (; i + lanes * 2 <= last + 1; i += lanes * 2)
-  {
-    svuint64_t q0 = sve_div64(all, numer, &primes[i]);
-    svuint64_t q1 = sve_div64(all, numer, &primes[i + lanes]);
-
-    NO_UNROLL_LOOP
-    for (uint64_t j = 0; j < lanes; j += 2)
-    {
-      uint64_t q00 = svlastb_u64(first, q0);
-      uint64_t q01 = svlasta_u64(first, q0);
-      uint64_t q10 = svlastb_u64(first, q1);
-      uint64_t q11 = svlasta_u64(first, q1);
-
-      sum += segmentedPi[q00] +
-             segmentedPi[q01] +
-             segmentedPi[q10] +
-             segmentedPi[q11];
-
-      q0 = svext_u64(q0, q0, 2);
-      q1 = svext_u64(q1, q1, 2);
-    }
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= last; i += lanes)
-  {
-    svbool_t pg = svwhilelt_b64(i, last + 1);
-    svuint64_t q = sve_div64(pg, numer, &primes[i]);
-    uint64_t active = svcntp_b64(pg, pg);
-
-    NO_UNROLL_LOOP
-    for (uint64_t j = 0; j < active; j++)
-    {
-      uint64_t quotient = svlastb_u64(first, q);
-      sum += segmentedPi[quotient];
-      q = svext_u64(q, q, 1);
-    }
-  }
-
-  return sum * MULTIPLIER + size * 2 - size * T(b);
-}
-
-#ifdef HAVE_INT128_T
-
-/// Used for 128-bit / (32-bit|64-bit) = 64-bit.
-/// This 128-bit sum_pi_arm_sve() function is not annotated with
-/// ALWAYS_INLINE, unlike the 64-bit sum_pi_arm_sve() function.
-/// This is because this function calls the 128-bit sve_div64()
-/// function which is defined as ALWAYS_INLINE and which uses a
-/// significant number of instructions.
-///
-template <typename T, int MULTIPLIER, typename Primes>
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-T sum_pi_arm_sve(uint128_t xp,
-                 uint64_t i,
-                 uint64_t last,
-                 uint64_t b,
-                 const Primes& primes,
-                 const SegmentedPiTable& segmentedPi)
 {
   if (i > last)
     return 0;
@@ -154,8 +80,6 @@ T sum_pi_arm_sve(uint128_t xp,
 
   return sum * MULTIPLIER + size * 2 - size * T(b);
 }
-
-#endif
 
 /// Compute the A formula using ARM SVE.
 /// pi[x_star] < b <= pi[x^(1/3)]

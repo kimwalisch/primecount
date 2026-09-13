@@ -46,8 +46,7 @@ bool check_sve_div64(svbool_t pg,
                      const Divisor* divisors)
 {
   uint64_t results[max_sve_lanes];
-  svuint64_t x = svdup_n_u64(numer);
-  svuint64_t quot = sve_div64(pg, x, divisors);
+  svuint64_t quot = sve_div64(pg, numer, divisors);
   svst1_u64(pg, results, quot);
 
   uint64_t active = svcntp_b64(pg, pg);

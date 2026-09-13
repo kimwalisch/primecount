@@ -277,6 +277,19 @@ ALWAYS_INLINE svuint64_t sve_div_128_by_64_to_64(svbool_t pg,
   return svorr_u64_x(pg, svlsl_n_u64_x(pg, q1, 32), q0);
 }
 
+// -------------------------------------------------------------------
+
+/// Used for (64-bit / 64-bit) = 64-bit
+#if defined(ENABLE_MULTIARCH_ARM_SVE)
+  __attribute__ ((target ("+sve")))
+#endif
+ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
+                                   uint64_t numer,
+                                   svuint64_t divisor)
+{
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
+}
+
 /// Used for (128-bit / 64-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
@@ -295,16 +308,18 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
     return sve_div_128_by_64_to_64(pg, numer, divisor);
 }
 
+// -------------------------------------------------------------------
+
 /// Used for (64-bit / 32-bit) = 64-bit
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
-                                   svuint64_t x,
+                                   uint64_t numer,
                                    const uint32_t* divisors)
 {
-  svuint64_t div = svld1uw_u64(pg, divisors);
-  return svdiv_u64_x(pg, x, div);
+  svuint64_t divisor = svld1uw_u64(pg, divisors);
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
 }
 
 /// Used for (64-bit / 64-bit) = 64-bit
@@ -312,11 +327,11 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
   __attribute__ ((target ("+sve")))
 #endif
 ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
-                                   svuint64_t x,
+                                   uint64_t numer,
                                    const int64_t* divisors)
 {
-  svuint64_t div = svreinterpret_u64_s64(svld1_s64(pg, divisors));
-  return svdiv_u64_x(pg, x, div);
+  svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
+  return svdiv_u64_x(pg, svdup_n_u64(numer), divisor);
 }
 
 /// Used for (128-bit / 32-bit) = 64-bit
@@ -342,6 +357,8 @@ ALWAYS_INLINE svuint64_t sve_div64(svbool_t pg,
   svuint64_t divisor = svreinterpret_u64_s64(svld1_s64(pg, divisors));
   return sve_div64(pg, numer, divisor);
 }
+
+// -------------------------------------------------------------------
 
 #endif
 

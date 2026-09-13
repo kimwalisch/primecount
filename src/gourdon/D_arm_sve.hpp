@@ -67,38 +67,11 @@ ALWAYS_INLINE svuint64_t load_factor_u64_arm_sve(svbool_t pg,
   return svrev_u64(svld1uw_u64(pg, factor_table));
 }
 
-template <typename Index, std::size_t N, std::size_t M>
+template <typename XP, typename Index, std::size_t N, std::size_t M>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
-ALWAYS_INLINE void batch_div_arm_sve(uint64_t xp,
-                                     const Array<Index, N>& indexes,
-                                     Array<int64_t, M>& xpm_cache,
-                                     std::size_t m_count)
-{
-  std::size_t i = 0;
-  std::size_t lanes = svcntd();
-  svuint64_t numer = svdup_n_u64(xp);
-
-  NO_UNROLL_LOOP
-  for (; i < m_count; i += lanes)
-  {
-    svbool_t pg = svwhilelt_b64(i, m_count);
-    svuint64_t m = BaseFactorTable::to_number_arm_sve(pg, &indexes[i]);
-    svuint64_t q = svdiv_u64_x(pg, numer, m);
-    svst1_s64(pg, &xpm_cache[i], svreinterpret_s64_u64(q));
-  }
-}
-
-#ifdef HAVE_INT128_T
-
-/// Keep the large 128-bit division code out of D_thread_arm_sve()
-/// to reduce register pressure in the 64-bit path.
-template <typename Index, std::size_t N, std::size_t M>
-#if defined(ENABLE_MULTIARCH_ARM_SVE)
-  __attribute__ ((target ("+sve")))
-#endif
-ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
+ALWAYS_INLINE void batch_div_arm_sve(XP xp,
                                      const Array<Index, N>& indexes,
                                      Array<int64_t, M>& xpm_cache,
                                      std::size_t m_count)
@@ -115,8 +88,6 @@ ALWAYS_INLINE void batch_div_arm_sve(uint128_t xp,
     svst1_s64(pg, &xpm_cache[i], svreinterpret_s64_u64(q));
   }
 }
-
-#endif
 
 template <typename T, typename Primes, typename FactorTable>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
