@@ -184,7 +184,13 @@ fast_div64(X x, Y y)
    (defined(ENABLE_ARM_SVE) || \
     defined(ENABLE_MULTIARCH_ARM_SVE))
 
-/// Used for (128-bit / 32-bit) = 64-bit
+/// Used for (128-bit / 32-bit) = 64-bit.
+/// This is Knuth's short division by a single-precision integer,
+/// specialized to base 2^32 and a quotient that fits into 64 bits.
+/// The remainder update is rearranged to shorten the SVE dependency chain.
+/// See The Art of Computer Programming, Volume 2, Section 4.3.1,
+/// Exercise 16.
+///
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
