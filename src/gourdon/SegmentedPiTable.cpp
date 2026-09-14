@@ -40,7 +40,7 @@ namespace {
 
 constexpr uint64_t bitmask(uint64_t n)
 {
-  return ((n + 1) / 2 == 64) ? 0xffffffffffffffffull
+  return ((n + 1) / 2 == 64) ? 0xffffffffffffffff
          : (1ull << ((n + 1) / 2)) - 1;
 }
 

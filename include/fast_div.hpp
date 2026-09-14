@@ -240,10 +240,10 @@ ALWAYS_INLINE svuint64_t sve_div_128_by_64_to_64(svbool_t pg,
   svuint64_t numlo = svlsl_u64_x(pg, lo, shift);
 
   svuint64_t den1 = svlsr_n_u64_x(pg, den, 32);
-  svuint64_t den0 = svand_n_u64_x(pg, den, 0xffffffffu);
-  svuint64_t denhi = svand_n_u64_x(pg, den, 0xffffffff00000000ull);
+  svuint64_t den0 = svand_n_u64_x(pg, den, 0xffffffff);
+  svuint64_t denhi = svand_n_u64_x(pg, den, 0xffffffff00000000);
   svuint64_t num1 = svlsr_n_u64_x(pg, numlo, 32);
-  svuint64_t num0 = svand_n_u64_x(pg, numlo, 0xffffffffu);
+  svuint64_t num0 = svand_n_u64_x(pg, numlo, 0xffffffff);
 
   // Estimate and correct the high 32 quotient bits.
   // Form c2 = (numhi - q1 * den1) * 2^32 + num1 modulo 2^64.

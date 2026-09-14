@@ -114,7 +114,7 @@ bool LoadBalancerAC::get_work(ThreadDataAC& thread)
   double total_secs = time - start_time_;
   double increase_threshold = max(0.01, total_secs / 1000);
   uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
-  int64_t segment_size = segment_data & 0xffffffffu;
+  int64_t segment_size = segment_data & 0xffffffff;
   int64_t segments = segment_data >> 32;
   int64_t remaining_dist = sqrtx_ - low;
 
