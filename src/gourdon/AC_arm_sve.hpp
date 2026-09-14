@@ -18,7 +18,10 @@ namespace {
 
 using namespace primecount;
 
-template <typename T, int MULTIPLIER, typename XP, typename Primes>
+template <typename T,
+          int MULTIPLIER,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -85,7 +88,9 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -130,7 +135,9 @@ T A_arm_sve(T xlow,
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -197,13 +204,15 @@ T C1_arm_sve(T xlow,
   return sum;
 }
 
-/// Compute the 2nd part of the C formula.
-/// C2() computes the clustered and sparse easy leaves of the C
+/// Compute the 2nd part of the C formula using ARM SVE.
+/// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif

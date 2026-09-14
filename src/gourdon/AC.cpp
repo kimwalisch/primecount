@@ -109,7 +109,7 @@ T A(T xlow,
   T sum = 0;
 
   uint64_t prime = primes[b];
-  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_2nd_prime = min(xhigh / prime, sqrt_xp);
   uint64_t max_2nd_prime = min(xlow / prime, sqrt_xp);
   uint64_t i = pi[max(prime, min_2nd_prime)] + 1;
@@ -200,7 +200,7 @@ T C1(T xlow,
 }
 
 /// Compute the 2nd part of the C formula.
-/// C2() computes the clustered and sparse easy leaves of the C
+/// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
@@ -229,7 +229,7 @@ T C2(T xlow,
     return 0;
 
   uint64_t pi_min_m = pi[min_m];
-  uint64_t sqrt_xp = (uint64_t) isqrt(xp);
+  uint64_t sqrt_xp = isqrt(xp);
   uint64_t min_clustered = in_between(min_m, sqrt_xp, max_m);
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);

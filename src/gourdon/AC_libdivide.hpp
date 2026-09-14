@@ -65,7 +65,7 @@ ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
 }
 
 /// Compute the A formula using libdivide.
-/// 64-bit function: xp < 2^64
+/// 64-bit numerator: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
@@ -101,7 +101,7 @@ T A_libdivide(T xlow,
 }
 
 /// Compute the 1st part of the C formula using libdivide.
-/// 64-bit function: xp < 2^64
+/// 64-bit numerator: xp < 2^64
 /// pi[(x/z)^(1/3)] < b <= pi[sqrt(z)]
 /// x / (primes[b] * m) <= z
 /// low <= x / (primes[b] * m) < high
@@ -174,9 +174,10 @@ T C1_libdivide(T xlow,
   return sum;
 }
 
-/// Compute the 2nd part of the C formula.
-/// C2() computes the clustered and sparse easy leaves of the C
+/// Compute the 2nd part of the C formula using libdivide.
+/// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
+/// 64-bit numerator: xp < 2^64
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
