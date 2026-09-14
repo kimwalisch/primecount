@@ -1,6 +1,6 @@
 Changes in primecount-8.8, 2026-09-14
 
-* AC.cpp, AC_arm_sve.hpp: Factor out inner-loop arithmetic and merge C2 loop ranges.
+* AC.cpp: Factor out inner-loop arithmetic using sum_pi().
 * Remove unnecessary integer literal suffixes.
 * D_arm_sve.hpp: Use manual ARM SVE vectorization instead of relying on auto-vectorization.
 * AC_arm_sve.hpp: Add ARM SVE implementation of AC algorithm.
