@@ -26,11 +26,14 @@ Read each relevant paper once per Codex session/chat, when work on the correspon
 
 Use the papers to understand the mathematics, but do not blindly copy their notation into variable names. Choose names that make the source code readable and fit existing naming conventions. Prefer shorter names when they remain clear.
 
-## Vendored primesieve library
+## Vendored libraries
 
-primecount uses the primesieve C++ library, vendored in `lib/primesieve`. Exclude this directory from project-wide changes, including requests to change all occurrences of a pattern. Do not make code changes there as part of such work.
+Exclude these vendored libraries from changes to the primecount codebase, including requests to change all occurrences of a pattern:
 
-Fixes to primesieve belong in the upstream primesieve repository. Afterwards, update the vendored copy in primecount using `scripts/update_libprimesieve.sh`. The user usually performs this update manually; leave it to them unless they ask you to perform it.
+- primesieve: `lib/primesieve`
+- libdivide: `include/libdivide.h`
+
+Fixes to these libraries belong in their upstream repositories. For primesieve, update the vendored copy afterwards using `scripts/update_libprimesieve.sh`. The user usually performs this update manually; leave it to them unless they ask you to perform it.
 
 ## Preserve user changes
 
@@ -60,9 +63,11 @@ When choosing between 64-bit and 128-bit integer arithmetic, establish the mathe
 
 Generally keep signedness consistent within a function: use signed or unsigned integers as appropriate and avoid unnecessary mixing of the two. Mixing 64-bit and 128-bit widths is common and does not require mixing signedness.
 
-Avoid unnecessary explicit casts and integer literal suffixes. Rely on implicit conversions and the usual arithmetic conversions when the surrounding expression already establishes the desired integer type and the conversion is safe and unambiguous. For example, prefer `65537 + j * 2` when `j` is a `uint64_t`. For overloaded functions, retain an explicit cast when it is needed to select the intended overload, for example `svwhilelt_b64(uint64_t(0), active)` when `active` is a `uint64_t`.
+Prefer suffixless integer literals and implicit conversions when they preserve behavior and compile without warnings on supported compilers, including in typed initializers and hexadecimal mask arguments. Retain casts or suffixes needed for overload/template selection, signedness, or intermediate arithmetic width, e.g. `1ull << 32` and `ipow<15>(10ll)`. A wider destination does not widen earlier operations.
 
-Use an explicit cast or integer literal suffix only when it affects the semantics, prevents an unsafe conversion, or is needed to select the intended overload. For example, use `1ull << 63` when the literal itself must be 64-bit before the shift, and cast before an operation when widening must occur before that operation, as in `(uint128_t(12345) << 64) | 987654321`.
+Prefer `1ull << 32` over `uint64_t(1) << 32`. For 128-bit constants, use casts such as `uint128_t(1) << 100`; there is no portable standard 128-bit integer literal suffix.
+
+Keep `~0ull` for the unsigned 64-bit all-ones value (`0xffffffffffffffff`); `~0` computes a signed `int` complement. Also keep unsigned suffixes on decimal constants above the signed 64-bit maximum and `L` in `__cplusplus` version checks. Preserve numeric and comment alignment in tables after removing suffixes.
 
 When a cast is necessary, follow the convention used in the surrounding function or file. Do not introduce named C++ casts such as `static_cast<uint64_t>(x)`, `reinterpret_cast`, or similar forms. primecount uses both function-style casts such as `uint64_t(x)` and C-style casts such as `(uint64_t) x`; in C++ code, prefer `uint64_t(x)` when there is no nearby precedent. Function-style casts such as `uint64_t(x)` are C++-only, so in C files use C-style casts such as `(uint64_t) x`. Preserve nearby pointer-cast style as well, for example `(uint8_t*) sieve_.data()` when that matches the surrounding code.
 

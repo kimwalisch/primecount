@@ -148,11 +148,11 @@ bool test_sve_div64_arm_sve(std::mt19937& gen)
 
   const TestCase correction_cases[] = {
     // q1: one correction.
-    { 1663239473288121450ull, 8491104977468830630ull, 2789495100195680658ll },
+    { 1663239473288121450, 8491104977468830630, 2789495100195680658 },
     // q1 and q0: one correction each.
-    { 9223372036854775806ull, UINT64_MAX, 9223372036854775807ll },
+    { 9223372036854775806, UINT64_MAX, 9223372036854775807 },
     // q1 and q0: two corrections each.
-    { 4611686022722355198ull, UINT64_MAX, 4611686022722355199ll }
+    { 4611686022722355198, UINT64_MAX, 4611686022722355199 }
   };
 
   for (const TestCase& test : correction_cases)

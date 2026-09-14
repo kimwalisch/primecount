@@ -2,7 +2,7 @@
 /// @file   api.cpp
 /// @brief  Test primecount's C++ API.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -33,7 +33,7 @@ int main()
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);
 
-  n = -9223372036854775807ll;
+  n = -9223372036854775807;
   res = pi(n);
   std::cout << "pi(" << n << ") = " << res;
   check(res == 0);

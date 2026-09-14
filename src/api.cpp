@@ -149,7 +149,7 @@ pc_int128_t nth_prime(pc_int128_t n)
     throw primecount_error("nth_prime(n): n must be >= 1");
 
   // Number of primes < 2^63
-  constexpr uint64_t max_n_int64 = 216289611853439384ull;
+  constexpr uint64_t max_n_int64 = 216289611853439384;
 
   if (n.hi == 0 &&
       n.lo <= max_n_int64)
@@ -232,7 +232,7 @@ int128_t nth_prime(int128_t n, int threads)
     throw primecount_error("nth_prime(n): n must be >= 1");
 
   // Number of primes < 2^63
-  constexpr int64_t max_n_int64 = 216289611853439384ll;
+  constexpr int64_t max_n_int64 = 216289611853439384;
 
   // Use 64-bit if possible
   if (n <= max_n_int64)

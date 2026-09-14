@@ -26,41 +26,41 @@ using namespace primecount;
 
 std::array<int64_t, 14> PrimePi_table =
 {
-                4, // pi(10^1)
-               25, // pi(10^2)
-              168, // pi(10^3)
-             1229, // pi(10^4)
-             9592, // pi(10^5)
-            78498, // pi(10^6)
-           664579, // pi(10^7)
-          5761455, // pi(10^8)
-         50847534, // pi(10^9)
-        455052511, // pi(10^10)
-     4118054813ll, // pi(10^11)
-    37607912018ll, // pi(10^12)
-   346065536839ll, // pi(10^13)
-  3204941750802ll  // pi(10^14)
+              4, // pi(10^1)
+             25, // pi(10^2)
+            168, // pi(10^3)
+           1229, // pi(10^4)
+           9592, // pi(10^5)
+          78498, // pi(10^6)
+         664579, // pi(10^7)
+        5761455, // pi(10^8)
+       50847534, // pi(10^9)
+      455052511, // pi(10^10)
+     4118054813, // pi(10^11)
+    37607912018, // pi(10^12)
+   346065536839, // pi(10^13)
+  3204941750802  // pi(10^14)
 };
 
 std::array<int64_t, 7> NthPrime_table =
 {
-        179424673ll, // nth_prime(10^7)
-       2038074743ll, // nth_prime(10^8)
-      22801763489ll, // nth_prime(10^9)
-     252097800623ll, // nth_prime(10^10)
-    2760727302517ll, // nth_prime(10^11)
-   29996224275833ll, // nth_prime(10^12)
-  323780508946331ll  // nth_prime(10^13)
+        179424673, // nth_prime(10^7)
+       2038074743, // nth_prime(10^8)
+      22801763489, // nth_prime(10^9)
+     252097800623, // nth_prime(10^10)
+    2760727302517, // nth_prime(10^11)
+   29996224275833, // nth_prime(10^12)
+  323780508946331  // nth_prime(10^13)
 };
 
 std::array<int64_t, 6> InverseSamplePoints =
 {
-          10000ll,
-          12345ll,
-          99991ll,
-        1234567ll,
-        9999991ll,
-  1234567890123ll
+          10000,
+          12345,
+          99991,
+        1234567,
+        9999991,
+  1234567890123
 };
 
 #if defined(HAVE_FLOAT128)
@@ -112,7 +112,7 @@ int main()
       // The 512-zero psi correction improves almost all powers of 10
       // in practice, except for a few isolated crossover points where
       // the smooth RiemannR(x) is slightly better.
-      if (x != 100000000000000ll)
+      if (x != 100000000000000)
         check(new_err <= old_err);
       else
         check(true);
@@ -169,7 +169,7 @@ int main()
   }
 
   {
-    int64_t n = 10000000ll;
+    int64_t n = 10000000;
     int64_t old_err_sum = 0;
     int64_t new_err_sum = 0;
     for (size_t i = 0; i < NthPrime_table.size(); i++)

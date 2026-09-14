@@ -7,7 +7,7 @@
 ///         so that it is executed after the Legendre, Meissel and
 ///         Gourdon algorithm tests.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -63,32 +63,32 @@ int main()
   }
 
   // nth_prime(1e7)
-  n = 10000000ll;
-  check_equal(n, nth_prime(n), 179424673ll);
+  n = 10000000;
+  check_equal(n, nth_prime(n), 179424673);
 
   // nth_prime(1e8)
-  n = 100000000ll;
-  check_equal(n, nth_prime(n), 2038074743ll);
+  n = 100000000;
+  check_equal(n, nth_prime(n), 2038074743);
 
   // nth_prime(1e9)
-  n = 1000000000ll;
-  check_equal(n, nth_prime(n), 22801763489ll);
+  n = 1000000000;
+  check_equal(n, nth_prime(n), 22801763489);
 
   // nth_prime(1e10)
-  n = 10000000000ll;
-  check_equal(n, nth_prime(n), 252097800623ll);
+  n = 10000000000;
+  check_equal(n, nth_prime(n), 252097800623);
 
   // nth_prime(1e11)
-  n = 100000000000ll;
-  check_equal(n, nth_prime(n), 2760727302517ll);
+  n = 100000000000;
+  check_equal(n, nth_prime(n), 2760727302517);
 
   // nth_prime(1e12)
-  n = 1000000000000ll;
-  check_equal(n, nth_prime(n), 29996224275833ll);
+  n = 1000000000000;
+  check_equal(n, nth_prime(n), 29996224275833);
 
   // nth_prime(1e13)
-  n = 10000000000000ll;
-  check_equal(n, nth_prime(n), 323780508946331ll);
+  n = 10000000000000;
+  check_equal(n, nth_prime(n), 323780508946331);
 
   std::cout << std::endl;
   std::cout << "All tests passed successfully!" << std::endl;

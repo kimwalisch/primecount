@@ -36,7 +36,7 @@ void check(bool OK)
 
 int main()
 {
-  check(FactorTable<uint16_t>::max() == 4294705155ll);
+  check(FactorTable<uint16_t>::max() == 4294705155);
   check(FactorTable<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
 
   std::random_device rd;

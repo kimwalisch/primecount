@@ -2,7 +2,7 @@
 /// @file   isqrt_constexpr.cpp
 /// @brief  Test compile time square root function.
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -109,8 +109,8 @@ int main()
   static_assert(ct_sqrt(pstd::numeric_limits<uint16_t>::max()) == 255, "ct_sqrt(2^16-1) failed!");
   static_assert(ct_sqrt(pstd::numeric_limits<int32_t>::max()) == 46340, "ct_sqrt(2^31-1) failed!");
   static_assert(ct_sqrt(pstd::numeric_limits<uint32_t>::max()) == 65535, "ct_sqrt(2^32-1) failed!");
-  static_assert(ct_sqrt(pstd::numeric_limits<int64_t>::max()) == 3037000499ll, "ct_sqrt(2^63-1) failed!");
-  static_assert(ct_sqrt(pstd::numeric_limits<uint64_t>::max()) == 4294967295ull, "ct_sqrt(2^64-1) failed!");
+  static_assert(ct_sqrt(pstd::numeric_limits<int64_t>::max()) == 3037000499, "ct_sqrt(2^63-1) failed!");
+  static_assert(ct_sqrt(pstd::numeric_limits<uint64_t>::max()) == 4294967295, "ct_sqrt(2^64-1) failed!");
 
 #if defined(HAVE_INT128_T)
 

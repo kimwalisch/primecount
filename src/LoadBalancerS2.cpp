@@ -140,7 +140,7 @@ bool LoadBalancerS2::get_work(ThreadData& thread)
 {
   int64_t max_low = max_low_.load(std::memory_order_relaxed);
   uint64_t segment_data = segment_data_.load(std::memory_order_relaxed);
-  int64_t segment_size = segment_data & 0xffffffffu;
+  int64_t segment_size = segment_data & 0xffffffff;
   int64_t segments = segment_data >> 32;
   int64_t print_high = 0;
 

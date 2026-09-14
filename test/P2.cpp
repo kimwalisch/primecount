@@ -4,7 +4,7 @@
 ///         that counts the numbers <= x that have exactly
 ///         2 prime factors each exceeding the a-th prime.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -103,11 +103,11 @@ int main()
 
   {
     // Test P2(1e13) and compare with known correct value
-    int64_t x = 10000000000000ll;
+    int64_t x = 10000000000000;
     int64_t y = 178815;
     int64_t a = 16229;
     int64_t res1 = P2(x, y, a, threads);
-    int64_t res2 = 113111712222ll;
+    int64_t res2 = 113111712222;
 
     std::cout << "P2(" << x << ", " << y << ", " << a << ") = " << res1;
     check(res1 == res2);
@@ -116,11 +116,11 @@ int main()
 #ifdef HAVE_INT128_T
   {
     // Test P2(1e14) and compare with known correct value
-    int128_t x = 100000000000000ll;
+    int128_t x = 100000000000000;
     int64_t y = 494134;
     int64_t a = 41080;
     int128_t res1 = P2(x, y, a, threads);
-    int128_t res2 = 1026583290763ll;
+    int128_t res2 = 1026583290763;
 
     std::cout << "P2(" << x << ", " << y << ", " << a << ") = " << res1;
     check(res1 == res2);

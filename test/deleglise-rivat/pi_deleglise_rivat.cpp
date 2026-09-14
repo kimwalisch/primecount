@@ -3,7 +3,7 @@
 /// @brief  Test the pi_deleglise_rivat_64(x) and
 ///         pi_deleglise_rivat_128(x) functions.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -91,19 +91,19 @@ int main()
 
   {
     // Test larger computation: pi(1e11)
-    int64_t x = 100000000000ll;
+    int64_t x = 100000000000;
     int64_t res = pi_deleglise_rivat_64(x, threads);
     std::cout << "pi_deleglise_rivat_64(" << x << ") = " << res;
-    check(res == 4118054813ll);
+    check(res == 4118054813);
   }
 
 #ifdef HAVE_INT128_T
   {
     // Test larger computation: pi(1e12)
-    int128_t x = 1000000000000ll;
+    int128_t x = 1000000000000;
     int128_t res = pi_deleglise_rivat_128(x, threads);
     std::cout << "pi_deleglise_rivat_128(" << x << ") = " << res;
-    check(res == 37607912018ll);
+    check(res == 37607912018);
   }
 #endif
 

@@ -2,7 +2,7 @@
 /// @file   pi_lmo5.cpp
 /// @brief  Test the pi_lmo5(x) function.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -60,10 +60,10 @@ int main()
 
   {
     // Test one larger computation: pi(1e10)
-    int64_t x = 10000000000ll;
+    int64_t x = 10000000000;
     int64_t res = pi_lmo5(x, threads);
     std::cout << "pi_lmo5(" << x << ") = " << res;
-    check(res == 455052511ll);
+    check(res == 455052511);
   }
 
   std::cout << std::endl;
