@@ -41,10 +41,10 @@ namespace {
 ///
 NOINLINE uint64_t popcnt64_bitwise_noinline(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -82,10 +82,10 @@ namespace {
 ///
 NOINLINE uint64_t popcnt64_bitwise_noinline(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -172,10 +172,10 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 ///
 NOINLINE uint64_t popcnt64_bitwise_noinline(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -206,10 +206,10 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 ///
 ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -258,10 +258,10 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 ///
 NOINLINE uint64_t popcnt64_bitwise_noinline(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -293,10 +293,10 @@ ALWAYS_INLINE uint64_t popcnt64(uint64_t x)
 ///
 ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);
@@ -347,10 +347,10 @@ namespace {
 ///
 ALWAYS_INLINE uint64_t popcnt64_native(uint64_t x)
 {
-  uint64_t m1 = 0x5555555555555555ull;
-  uint64_t m2 = 0x3333333333333333ull;
-  uint64_t m4 = 0x0F0F0F0F0F0F0F0Full;
-  uint64_t h01 = 0x0101010101010101ull;
+  uint64_t m1 = 0x5555555555555555;
+  uint64_t m2 = 0x3333333333333333;
+  uint64_t m4 = 0x0F0F0F0F0F0F0F0F;
+  uint64_t h01 = 0x0101010101010101;
 
   x -= (x >> 1) & m1;
   x = (x & m2) + ((x >> 2) & m2);

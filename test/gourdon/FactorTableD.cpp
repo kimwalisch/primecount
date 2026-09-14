@@ -36,7 +36,7 @@ void check(bool OK)
 
 int main()
 {
-  check(FactorTableD<uint16_t>::max() == 149060082888ll);
+  check(FactorTableD<uint16_t>::max() == 149060082888);
   check(FactorTableD<uint32_t>::max() == pstd::numeric_limits<int64_t>::max());
   check(FactorTableD<uint16_t>::to_index(
           FactorTableD<uint16_t>::max()) > UINT32_MAX);

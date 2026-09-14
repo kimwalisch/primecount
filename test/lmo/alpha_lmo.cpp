@@ -6,7 +6,7 @@
 ///         factors we can make sure that all array sizes
 ///         (and other bounds) are accurate.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -82,8 +82,8 @@ int main()
 
   // Test large x
   {
-    int64_t x = 9999999929ll;
-    int64_t res1 = 455052509ll;
+    int64_t x = 9999999929;
+    int64_t res1 = 455052509;
     std::vector<double> alphas = { 1, 1+1/3.0, 2, 10, (double) iroot<6>(x) };
 
     for (double alpha : alphas)

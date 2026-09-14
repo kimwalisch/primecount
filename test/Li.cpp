@@ -3,7 +3,7 @@
 /// @brief  Test the Eulerian logarithmic integral function.
 ///         Li(x) = li(x) - li(2)
 ///
-/// Copyright (C) 2025 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -43,20 +43,20 @@ std::array<int64_t, 100> Li_tiny =
 
 std::vector<int64_t> Li_table =
 {
-               5, // Li(10^1)
-              29, // Li(10^2)
-             176, // Li(10^3)
-            1245, // Li(10^4)
-            9628, // Li(10^5)
-           78626, // Li(10^6)
-          664917, // Li(10^7)
-         5762208, // Li(10^8)
-        50849233, // Li(10^9)
-       455055613, // Li(10^10)
-    4118066399ll, // Li(10^11)
-   37607950279ll, // Li(10^12)
-  346065645809ll, // Li(10^13)
- 3204942065690ll  // Li(10^14)
+              5, // Li(10^1)
+             29, // Li(10^2)
+            176, // Li(10^3)
+           1245, // Li(10^4)
+           9628, // Li(10^5)
+          78626, // Li(10^6)
+         664917, // Li(10^7)
+        5762208, // Li(10^8)
+       50849233, // Li(10^9)
+      455055613, // Li(10^10)
+     4118066399, // Li(10^11)
+    37607950279, // Li(10^12)
+   346065645809, // Li(10^13)
+  3204942065690  // Li(10^14)
 };
 
 #if defined(HAVE_FLOAT128)

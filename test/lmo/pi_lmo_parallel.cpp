@@ -2,7 +2,7 @@
 /// @file   pi_lmo_parallel.cpp
 /// @brief  Test the pi_lmo_parallel(x) function.
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -60,10 +60,10 @@ int main()
 
   {
     // Test one larger computation: pi(1e11)
-    int64_t x = 100000000000ll;
+    int64_t x = 100000000000;
     int64_t res = pi_lmo_parallel(x, threads);
     std::cout << "pi_lmo_parallel(" << x << ") = " << res;
-    check(res == 4118054813ll);
+    check(res == 4118054813);
   }
 
   std::cout << std::endl;

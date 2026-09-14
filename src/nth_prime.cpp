@@ -25,7 +25,7 @@ namespace {
 using namespace primecount;
 
 // Number of primes < 2^63
-constexpr int64_t max_n_int64 = 216289611853439384ll;
+constexpr int64_t max_n_int64 = 216289611853439384;
 
 // primes[1] = 2, primes[2] = 3, ...
 const Array<int16_t, 170> primes =

@@ -1168,7 +1168,7 @@ int main()
   for (int64_t n : { 4, 5, 6, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 7500, 10000 })
     add_forward_threshold(n);
 
-  std::mt19937_64 gen(0x7072696d65636f75ull);
+  std::mt19937_64 gen(0x7072696d65636f75);
   std::uniform_int_distribution<int64_t> tiny_dist(4, 10000);
 
   while (cases.size() < 150)
@@ -1184,9 +1184,14 @@ int main()
     add_case(n, nth_prime_approx, count_approx);
   };
 
-  for (int64_t n : { 3315ll, 4000ll, 5000ll, 10000ll, 100000ll, 1000000ll,
-                    10000000ll, 100000000ll, 1000000000ll, 10000000000ll,
-                    100000000000ll, 1000000000000ll })
+  const int64_t riemann_cases[] =
+  {
+    3315, 4000, 5000, 10000, 100000, 1000000,
+    10000000, 100000000, 1000000000, 10000000000,
+    100000000000, 1000000000000
+  };
+
+  for (int64_t n : riemann_cases)
     add_riemann_case(n);
 
   auto log_uniform = [&](long double min, long double max)
