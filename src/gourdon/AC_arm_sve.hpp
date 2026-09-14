@@ -233,8 +233,7 @@ T C2_arm_sve(T xlow,
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
   min_clustered_global = min(min_clustered_global, y);
-  uint64_t pi_conj_lo = pi_min_m;
-  uint64_t pi_conj_hi = pi_min_m;
+  uint64_t pi_conj_lo = pi_min_clustered;
   uint64_t i = pi_min_m + 1;
 
   T sum = 0;
@@ -258,8 +257,14 @@ T C2_arm_sve(T xlow,
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
     pi_conj_lo = max(pi[q_lo], pi_min_m);
-    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    uint64_t pi_conj_hi = min(pi[q_hi], pi_min_clustered);
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
+
+    // Extend the reflected range to pi_min_clustered. The only
+    // possible extra prime is sqrt_xp, with pi[xp / sqrt_xp] =
+    // pi_min_clustered. Remove its extra contribution once.
+    if (pi_conj_hi < pi_min_clustered)
+      sum -= pi_min_clustered;
   }
 
   // Sparse leaves below the reflected range
@@ -267,11 +272,7 @@ T C2_arm_sve(T xlow,
   i = pi_conj_lo + 1;
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  sum += sum_pi_arm_sve<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
-  i = pi_conj_hi + 1;
-
-  // Sparse leaves above the reflected range
-  sum += sum_pi_arm_sve<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
+  sum += sum_pi_arm_sve<T, 2>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
 }

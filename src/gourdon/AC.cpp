@@ -49,6 +49,47 @@ using namespace primecount;
 
 #if !defined(ENABLE_ARM_SVE)
 
+template <typename T,
+          int MULTIPLIER,
+          typename XP,
+          typename Primes>
+ALWAYS_INLINE T sum_pi(XP xp,
+                       uint64_t i,
+                       uint64_t last,
+                       uint64_t b,
+                       const Primes& primes,
+                       const SegmentedPiTable& segmentedPi)
+{
+  if (i > last)
+    return 0;
+
+  T sum = 0;
+  uint64_t size = last - i + 1;
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 3 <= last; i += 4)
+  {
+    uint64_t xpq0 = fast_div64(xp, primes[i]);
+    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
+    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
+    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
+
+    sum += segmentedPi[xpq0] +
+           segmentedPi[xpq1] +
+           segmentedPi[xpq2] +
+           segmentedPi[xpq3];
+  }
+
+  NO_UNROLL_LOOP
+  for (; i <= last; i++)
+  {
+    uint64_t xpq = fast_div64(xp, primes[i]);
+    sum += segmentedPi[xpq];
+  }
+
+  return sum * MULTIPLIER + size * 2 - size * T(b);
+}
+
 /// Compute the A formula.
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
@@ -77,35 +118,11 @@ T A(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  NO_UNROLL_LOOP
-  for (; i <= max_i1; i++)
-  {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    sum += segmentedPi[xpq];
-  }
+  sum += sum_pi<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
+  i = max(i, max_i1 + 1);
 
-  // Unroll loop to increase instruction level parallelism
-  for (; i + 3 <= max_i2; i += 4)
-  {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
-
-    sum += (segmentedPi[xpq0] * 2) +
-           (segmentedPi[xpq1] * 2) +
-           (segmentedPi[xpq2] * 2) +
-           (segmentedPi[xpq3] * 2);
-  }
-
-  // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
-  NO_UNROLL_LOOP
-  for (; i <= max_i2; i++)
-  {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    sum += segmentedPi[xpq] * 2;
-  }
+  sum += sum_pi<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
 }
@@ -151,28 +168,7 @@ T C1(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
-    uint64_t i = min_i;
-
-    // Unroll loop to increase instruction level parallelism
-    for (; i + 3 <= max_i; i += 4)
-    {
-      uint64_t xpm0 = fast_div64(xp, primes[i]);
-      uint64_t xpm1 = fast_div64(xp, primes[i+1]);
-      uint64_t xpm2 = fast_div64(xp, primes[i+2]);
-      uint64_t xpm3 = fast_div64(xp, primes[i+3]);
-
-      sum -= (segmentedPi[xpm0] - b + 2) +
-             (segmentedPi[xpm1] - b + 2) +
-             (segmentedPi[xpm2] - b + 2) +
-             (segmentedPi[xpm3] - b + 2);
-    }
-
-    NO_UNROLL_LOOP
-    for (; i <= max_i; i++)
-    {
-      uint64_t xpm = fast_div64(xp, primes[i]);
-      sum -= segmentedPi[xpm] - b + 2;
-    }
+    sum -= sum_pi<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
   }
 
   // m = primes[i] * primes[j]
@@ -195,29 +191,8 @@ T C1(T xlow,
 
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
-      uint64_t j = min_j;
       XP xpq = fast_div(xp, q);
-
-      // Unroll loop to increase instruction level parallelism
-      for (; j + 3 <= max_j; j += 4)
-      {
-        uint64_t xpm0 = fast_div64(xpq, primes[j]);
-        uint64_t xpm1 = fast_div64(xpq, primes[j+1]);
-        uint64_t xpm2 = fast_div64(xpq, primes[j+2]);
-        uint64_t xpm3 = fast_div64(xpq, primes[j+3]);
-
-        sum += (segmentedPi[xpm0] - b + 2) +
-               (segmentedPi[xpm1] - b + 2) +
-               (segmentedPi[xpm2] - b + 2) +
-               (segmentedPi[xpm3] - b + 2);
-      }
-
-      NO_UNROLL_LOOP
-      for (; j <= max_j; j++)
-      {
-        uint64_t xpm = fast_div64(xpq, primes[j]);
-        sum += segmentedPi[xpm] - b + 2;
-      }
+      sum += sum_pi<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
     }
   }
 
@@ -259,8 +234,7 @@ T C2(T xlow,
   uint64_t pi_min_clustered = pi[min_clustered];
   uint64_t min_clustered_global = max3(x_div_prime3, sqrt_xp, prime);
   min_clustered_global = min(min_clustered_global, y);
-  uint64_t pi_conj_lo = pi_min_m;
-  uint64_t pi_conj_hi = pi_min_m;
+  uint64_t pi_conj_lo = pi_min_clustered;
   uint64_t i = pi_min_m + 1;
 
   T sum = 0;
@@ -284,61 +258,22 @@ T C2(T xlow,
     uint64_t q_lo = fast_div64(xp, max_clustered_global);
     uint64_t q_hi = fast_div64(xp, min_clustered_global + 1);
     pi_conj_lo = max(pi[q_lo], pi_min_m);
-    pi_conj_hi = min(pi[q_hi], pi_min_clustered);
+    uint64_t pi_conj_hi = min(pi[q_hi], pi_min_clustered);
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
+
+    // Extend the reflected range to pi_min_clustered. The only
+    // possible extra prime is sqrt_xp, with pi[xp / sqrt_xp] =
+    // pi_min_clustered. Remove its extra contribution once.
+    if (pi_conj_hi < pi_min_clustered)
+      sum -= pi_min_clustered;
   }
 
   // Sparse leaves below the reflected range
-  NO_UNROLL_LOOP
-  for (; i <= pi_conj_lo; i++)
-  {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    sum += segmentedPi[xpq] - b + 2;
-  }
+  sum += sum_pi<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
+  i = pi_conj_lo + 1;
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  // Unroll loop to increase instruction level parallelism.
-  for (; i + 3 <= pi_conj_hi; i += 4)
-  {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
-
-    sum += (segmentedPi[xpq0] * 2 - b + 2) +
-           (segmentedPi[xpq1] * 2 - b + 2) +
-           (segmentedPi[xpq2] * 2 - b + 2) +
-           (segmentedPi[xpq3] * 2 - b + 2);
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= pi_conj_hi; i++)
-  {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    sum += segmentedPi[xpq] * 2 - b + 2;
-  }
-
-  // Sparse leaves above the reflected range.
-  // Unroll loop to increase instruction level parallelism.
-  for (; i + 3 <= pi_min_clustered; i += 4)
-  {
-    uint64_t xpq0 = fast_div64(xp, primes[i]);
-    uint64_t xpq1 = fast_div64(xp, primes[i+1]);
-    uint64_t xpq2 = fast_div64(xp, primes[i+2]);
-    uint64_t xpq3 = fast_div64(xp, primes[i+3]);
-
-    sum += (segmentedPi[xpq0] - b + 2) +
-           (segmentedPi[xpq1] - b + 2) +
-           (segmentedPi[xpq2] - b + 2) +
-           (segmentedPi[xpq3] - b + 2);
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= pi_min_clustered; i++)
-  {
-    uint64_t xpq = fast_div64(xp, primes[i]);
-    sum += segmentedPi[xpq] - b + 2;
-  }
+  sum += sum_pi<T, 2>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
 }
