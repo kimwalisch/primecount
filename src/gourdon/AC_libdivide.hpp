@@ -24,6 +24,46 @@ namespace {
 
 using namespace primecount;
 
+template <typename T,
+          int MULTIPLIER,
+          typename LibdividePrimes>
+ALWAYS_INLINE T sum_pi_libdivide(uint64_t xp,
+                                 uint64_t i,
+                                 uint64_t last,
+                                 uint64_t b,
+                                 const LibdividePrimes& primes,
+                                 const SegmentedPiTable& segmentedPi)
+{
+  if (i > last)
+    return 0;
+
+  T sum = 0;
+  uint64_t size = last - i + 1;
+
+  // Unroll loop to increase instruction level parallelism
+  for (; i + 3 <= last; i += 4)
+  {
+    uint64_t xpq0 = xp / primes[i];
+    uint64_t xpq1 = xp / primes[i+1];
+    uint64_t xpq2 = xp / primes[i+2];
+    uint64_t xpq3 = xp / primes[i+3];
+
+    sum += segmentedPi[xpq0] +
+           segmentedPi[xpq1] +
+           segmentedPi[xpq2] +
+           segmentedPi[xpq3];
+  }
+
+  NO_UNROLL_LOOP
+  for (; i <= last; i++)
+  {
+    uint64_t xpq = xp / primes[i];
+    sum += segmentedPi[xpq];
+  }
+
+  return sum * MULTIPLIER + size * 2 - size * T(b);
+}
+
 /// Compute the A formula using libdivide.
 /// 64-bit function: xp < 2^64
 /// pi[x_star] < b <= pi[x^(1/3)]
@@ -31,14 +71,14 @@ using namespace primecount;
 ///
 template <typename T,
           typename LibdividePrimes>
-T A_64(T xlow,
-       T xhigh,
-       uint64_t xp,
-       uint64_t y,
-       uint64_t prime,
-       const LibdividePrimes& primes,
-       const PiTable& pi,
-       const SegmentedPiTable& segmentedPi)
+T A_libdivide(T xlow,
+              T xhigh,
+              uint64_t xp,
+              uint64_t y,
+              uint64_t prime,
+              const LibdividePrimes& primes,
+              const PiTable& pi,
+              const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
 
@@ -51,35 +91,11 @@ T A_64(T xlow,
 
   // pq = primes[b] * primes[i]
   // x / pq >= y && low <= x / pq < high
-  NO_UNROLL_LOOP
-  for (; i <= max_i1; i++)
-  {
-    uint64_t xpq = xp / primes[i];
-    sum += segmentedPi[xpq];
-  }
+  sum += sum_pi_libdivide<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
+  i = max(i, max_i1 + 1);
 
-  // Unroll loop to increase instruction level parallelism
-  for (; i + 3 <= max_i2; i += 4)
-  {
-    uint64_t xpq0 = xp / primes[i];
-    uint64_t xpq1 = xp / primes[i+1];
-    uint64_t xpq2 = xp / primes[i+2];
-    uint64_t xpq3 = xp / primes[i+3];
-
-    sum += (segmentedPi[xpq0] * 2) +
-           (segmentedPi[xpq1] * 2) +
-           (segmentedPi[xpq2] * 2) +
-           (segmentedPi[xpq3] * 2);
-  }
-
-  // pq = primes[b] * primes[i]
   // x / pq < y && low <= x / pq < high
-  NO_UNROLL_LOOP
-  for (; i <= max_i2; i++)
-  {
-    uint64_t xpq = xp / primes[i];
-    sum += segmentedPi[xpq] * 2;
-  }
+  sum += sum_pi_libdivide<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
 }
@@ -99,16 +115,16 @@ T A_64(T xlow,
 template <typename T,
           typename LibdividePrimes,
           typename Primes>
-T C1_64(T xlow,
-        T xhigh,
-        uint64_t xp,
-        uint64_t b,
-        uint64_t y,
-        uint64_t z,
-        const LibdividePrimes& lprimes,
-        const Primes& primes,
-        const PiTable& pi,
-        const SegmentedPiTable& segmentedPi)
+T C1_libdivide(T xlow,
+               T xhigh,
+               uint64_t xp,
+               uint64_t b,
+               uint64_t y,
+               uint64_t z,
+               const LibdividePrimes& lprimes,
+               const Primes& primes,
+               const PiTable& pi,
+               const SegmentedPiTable& segmentedPi)
 {
   T sum = 0;
   uint64_t prime = primes[b];
@@ -127,28 +143,7 @@ T C1_64(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
-    uint64_t i = min_i;
-
-    // Unroll loop to increase instruction level parallelism
-    for (; i + 3 <= max_i; i += 4)
-    {
-      uint64_t xpm0 = xp / lprimes[i];
-      uint64_t xpm1 = xp / lprimes[i+1];
-      uint64_t xpm2 = xp / lprimes[i+2];
-      uint64_t xpm3 = xp / lprimes[i+3];
-
-      sum -= (segmentedPi[xpm0] - b + 2) +
-             (segmentedPi[xpm1] - b + 2) +
-             (segmentedPi[xpm2] - b + 2) +
-             (segmentedPi[xpm3] - b + 2);
-    }
-
-    NO_UNROLL_LOOP
-    for (; i <= max_i; i++)
-    {
-      uint64_t xpm = xp / lprimes[i];
-      sum -= segmentedPi[xpm] - b + 2;
-    }
+    sum -= sum_pi_libdivide<T, 1>(xp, min_i, max_i, b, lprimes, segmentedPi);
   }
 
   // m = primes[i] * primes[j]
@@ -172,13 +167,7 @@ T C1_64(T xlow,
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
       uint64_t xpq = xp / lprimes[i];
-
-      NO_UNROLL_LOOP
-      for (uint64_t j = min_j; j <= max_j; j++)
-      {
-        uint64_t xpm = xpq / lprimes[j];
-        sum += segmentedPi[xpm] - b + 2;
-      }
+      sum += sum_pi_libdivide<T, 1>(xpq, min_j, max_j, b, lprimes, segmentedPi);
     }
   }
 
@@ -193,17 +182,17 @@ T C1_64(T xlow,
 ///
 template <typename T,
           typename LibdividePrimes>
-T C2_64(T xlow,
-        T xhigh,
-        uint64_t xp,
-        uint64_t y,
-        uint64_t b,
-        uint64_t pi_y,
-        uint64_t max_clustered_global,
-        uint64_t prime,
-        const LibdividePrimes& primes,
-        const PiTable& pi,
-        const SegmentedPiTable& segmentedPi)
+T C2_libdivide(T xlow,
+               T xhigh,
+               uint64_t xp,
+               uint64_t y,
+               uint64_t b,
+               uint64_t pi_y,
+               uint64_t max_clustered_global,
+               uint64_t prime,
+               const LibdividePrimes& primes,
+               const PiTable& pi,
+               const SegmentedPiTable& segmentedPi)
 {
   uint64_t max_m = min3(xlow / prime, xp / prime, y);
   uint64_t x_div_prime3 = xp / (prime * prime);
@@ -249,56 +238,15 @@ T C2_64(T xlow,
   }
 
   // Sparse leaves below the reflected range
-  NO_UNROLL_LOOP
-  for (; i <= pi_conj_lo; i++)
-  {
-    uint64_t xpq = xp / primes[i];
-    sum += segmentedPi[xpq] - b + 2;
-  }
+  sum += sum_pi_libdivide<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
+  i = pi_conj_lo + 1;
 
   // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
-  // Unroll loop to increase instruction level parallelism.
-  for (; i + 3 <= pi_conj_hi; i += 4)
-  {
-    uint64_t xpq0 = xp / primes[i];
-    uint64_t xpq1 = xp / primes[i+1];
-    uint64_t xpq2 = xp / primes[i+2];
-    uint64_t xpq3 = xp / primes[i+3];
+  sum += sum_pi_libdivide<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
+  i = pi_conj_hi + 1;
 
-    sum += (segmentedPi[xpq0] * 2 - b + 2) +
-           (segmentedPi[xpq1] * 2 - b + 2) +
-           (segmentedPi[xpq2] * 2 - b + 2) +
-           (segmentedPi[xpq3] * 2 - b + 2);
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= pi_conj_hi; i++)
-  {
-    uint64_t xpq = xp / primes[i];
-    sum += segmentedPi[xpq] * 2 - b + 2;
-  }
-
-  // Sparse leaves above the reflected range.
-  // Unroll loop to increase instruction level parallelism.
-  for (; i + 3 <= pi_min_clustered; i += 4)
-  {
-    uint64_t xpq0 = xp / primes[i];
-    uint64_t xpq1 = xp / primes[i+1];
-    uint64_t xpq2 = xp / primes[i+2];
-    uint64_t xpq3 = xp / primes[i+3];
-
-    sum += (segmentedPi[xpq0] - b + 2) +
-           (segmentedPi[xpq1] - b + 2) +
-           (segmentedPi[xpq2] - b + 2) +
-           (segmentedPi[xpq3] - b + 2);
-  }
-
-  NO_UNROLL_LOOP
-  for (; i <= pi_min_clustered; i++)
-  {
-    uint64_t xpq = xp / primes[i];
-    sum += segmentedPi[xpq] - b + 2;
-  }
+  // Sparse leaves above the reflected range
+  sum += sum_pi_libdivide<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
 }
@@ -410,7 +358,7 @@ T AC_OpenMP_libdivide(T x,
             T xp = x / primes[b];
 
             if (xp <= pstd::numeric_limits<uint64_t>::max())
-              sum -= C1_64(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
+              sum -= C1_libdivide(xlow, xhigh, uint64_t(xp), b, y, z, lprimes, primes, pi, segmentedPi);
             else
               sum -= C1(xlow, xhigh, xp, b, y, z, primes, pi, segmentedPi);
           }
@@ -442,7 +390,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -454,7 +402,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += C2_64(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
+            sum += C2_libdivide(xlow, xhigh, uint64_t(xp), y, b, pi_y, max_clustered_global, prime, lprimes, pi, segmentedPi);
           else
             sum += C2(xlow, xhigh, xp, y, b, pi_y, max_clustered_global, primes, pi, segmentedPi);
         }
@@ -466,7 +414,7 @@ T AC_OpenMP_libdivide(T x,
           T xp = x / prime;
 
           if (xp <= pstd::numeric_limits<uint64_t>::max())
-            sum += A_64(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
+            sum += A_libdivide(xlow, xhigh, uint64_t(xp), y, prime, lprimes, pi, segmentedPi);
           else
             sum += A(xlow, xhigh, xp, y, b, primes, pi, segmentedPi);
         }
