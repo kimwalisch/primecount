@@ -33,7 +33,7 @@ struct AC_formula_params
 /// 2) The minimum alpha_y=1 & alpha_z=1
 /// 3) The maximum alpha_y
 /// 4) The maximum alpha_z
-std::array<AC_formula_params, 51> test_cases =
+std::array<AC_formula_params, 55> test_cases =
 {{
   { 10, 2, 2, 0, 0 },
   { 10, 2, 2, 0, 0 },
@@ -85,7 +85,12 @@ std::array<AC_formula_params, 51> test_cases =
   { 1000000000000, 10001, 999999, 8, 3808940423 },
   { 10000000000000, 107720, 209946, 8, 106430408717 },
   { 100000000000000, 282435, 564870, 8, 1008985328656 },
-  { 1000000000000000, 737200, 1474400, 8, 9561261537251 }
+  { 1000000000000000, 737200, 1474400, 8, 9561261537251 },
+  // C2 reflected endpoint: x / 23 crosses 131^2 and 131 * 132.
+  { 394702, 149, 149, 8, 6475 },
+  { 394703, 149, 149, 8, 6476 },
+  { 397715, 149, 149, 8, 6570 },
+  { 397716, 149, 149, 8, 6570 }
 }};
 
 void check(bool OK)

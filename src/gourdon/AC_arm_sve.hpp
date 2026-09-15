@@ -18,7 +18,10 @@ namespace {
 
 using namespace primecount;
 
-template <typename T, int MULTIPLIER, typename XP, typename Primes>
+template <typename T,
+          int MULTIPLIER,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -85,7 +88,9 @@ ALWAYS_INLINE T sum_pi_arm_sve(XP xp,
 /// pi[x_star] < b <= pi[x^(1/3)]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -108,12 +113,13 @@ T A_arm_sve(T xlow,
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
-  // pq = primes[b] * primes[i]
-  // x / pq >= y && low <= x / pq < high
+  // for (; i <= max_i1; i++)
+  //   sum += segmentedPi[xp / primes[i]];
   sum += sum_pi_arm_sve<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
   i = max(i, max_i1 + 1);
 
-  // x / pq < y && low <= x / pq < high
+  // for (; i <= max_i2; i++)
+  //   sum += segmentedPi[xp / primes[i]] * 2;
   sum += sum_pi_arm_sve<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
@@ -130,7 +136,9 @@ T A_arm_sve(T xlow,
 /// Since each prime factor of m is > (x / z)^(1/3) and z < sqrt(x),
 /// m cannot contain more than 2 prime factors.
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -161,6 +169,9 @@ T C1_arm_sve(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
+
+    // for (i = min_i; i <= max_i; i++)
+    //   sum -= segmentedPi[xp / primes[i]] - b + 2;
     sum -= sum_pi_arm_sve<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
   }
 
@@ -187,6 +198,8 @@ T C1_arm_sve(T xlow,
       uint64_t max_j = pi[max_r];
       XP xpq = xp / q;
 
+      // for (j = min_j; j <= max_j; j++)
+      //   sum += segmentedPi[xpq / primes[j]] - b + 2;
       if (xpq <= pstd::numeric_limits<uint64_t>::max())
         sum += sum_pi_arm_sve<T, 1>(uint64_t(xpq), min_j, max_j, b, primes, segmentedPi);
       else
@@ -197,13 +210,15 @@ T C1_arm_sve(T xlow,
   return sum;
 }
 
-/// Compute the 2nd part of the C formula.
-/// C2() computes the clustered and sparse easy leaves of the C
+/// Compute the 2nd part of the C formula using ARM SVE.
+/// Computes the clustered and sparse easy leaves of the C
 /// formula for which the second factor is necessarily prime.
 /// pi[sqrt(z)] < b <= pi[x_star]
 /// x / (primes[b] * primes[i]) < x^(1/2)
 ///
-template <typename T, typename XP, typename Primes>
+template <typename T,
+          typename XP,
+          typename Primes>
 #if defined(ENABLE_MULTIARCH_ARM_SVE)
   __attribute__ ((target ("+sve")))
 #endif
@@ -262,15 +277,22 @@ T C2_arm_sve(T xlow,
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
-  // Sparse leaves below the reflected range
+  // Sparse leaves below the reflected range.
+  // for (; i <= pi_conj_lo; i++)
+  //   sum += segmentedPi[xp / primes[i]] - b + 2;
   sum += sum_pi_arm_sve<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
   i = pi_conj_lo + 1;
 
-  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Reflected leaves are counted once as a
+  // sparse leaf and once as a conjugate.
+  // for (; i <= pi_conj_hi; i++)
+  //   sum += segmentedPi[xp / primes[i]] * 2 - b + 2;
   sum += sum_pi_arm_sve<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
   i = pi_conj_hi + 1;
 
-  // Sparse leaves above the reflected range
+  // Sparse leaves above the reflected range.
+  // for (; i <= pi_min_clustered; i++)
+  //   sum += segmentedPi[xp / primes[i]] - b + 2;
   sum += sum_pi_arm_sve<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
