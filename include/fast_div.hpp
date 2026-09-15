@@ -253,7 +253,7 @@ fast_div64(X x, Y y)
 
   return lo;
 #else
-  return udiv_128_by_32_to_64(hi, lo, d);
+  return udiv_128_by_64_to_64(hi, lo, d);
 #endif
 }
 
