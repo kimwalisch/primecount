@@ -207,10 +207,12 @@ fast_div64(X x, Y y)
 
   uint64_t hi = uint64_t(uint128_t(x) >> 64);
   uint64_t lo = uint64_t(x);
-  uint32_t d = y;
 
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
+
+  uint64_t d = y;
+  ASSERT(hi < d);
 
   // (128-bit / 64-bit) = 64-bit.
   // When we know the result fits into 64-bit (even
@@ -221,7 +223,7 @@ fast_div64(X x, Y y)
 
   return lo;
 #else
-  return udiv_128_by_32_to_64(hi, lo, d);
+  return udiv_128_by_32_to_64(hi, lo, y);
 #endif
 }
 
@@ -240,6 +242,8 @@ fast_div64(X x, Y y)
   uint64_t hi = uint64_t(uint128_t(x) >> 64);
   uint64_t lo = uint64_t(x);
   uint64_t d = y;
+
+  ASSERT(hi < d);
 
 #if defined(__x86_64__) && \
    (defined(__GNUC__) || defined(__clang__))
