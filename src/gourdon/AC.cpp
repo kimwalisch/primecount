@@ -116,12 +116,13 @@ T A(T xlow,
   uint64_t max_i1 = pi[min(xp / y, max_2nd_prime)];
   uint64_t max_i2 = pi[max_2nd_prime];
 
-  // pq = primes[b] * primes[i]
-  // x / pq >= y && low <= x / pq < high
+  // for (; i <= max_i1; i++)
+  //   sum += segmentedPi[xp / primes[i]];
   sum += sum_pi<T, 1>(xp, i, max_i1, 2, primes, segmentedPi);
   i = max(i, max_i1 + 1);
 
-  // x / pq < y && low <= x / pq < high
+  // for (; i <= max_i2; i++)
+  //   sum += segmentedPi[xp / primes[i]] * 2;
   sum += sum_pi<T, 2>(xp, i, max_i2, 2, primes, segmentedPi);
 
   return sum;
@@ -168,6 +169,9 @@ T C1(T xlow,
   {
     uint64_t min_i = pi[min_m] + 1;
     uint64_t max_i = pi[max_prime];
+
+    // for (i = min_i; i <= max_i; i++)
+    //   sum -= segmentedPi[xp / primes[i]] - b + 2;
     sum -= sum_pi<T, 1>(xp, min_i, max_i, b, primes, segmentedPi);
   }
 
@@ -192,6 +196,9 @@ T C1(T xlow,
       uint64_t min_j = pi[min_r] + 1;
       uint64_t max_j = pi[max_r];
       XP xpq = fast_div(xp, q);
+
+      // for (j = min_j; j <= max_j; j++)
+      //   sum += segmentedPi[xpq / primes[j]] - b + 2;
       sum += sum_pi<T, 1>(xpq, min_j, max_j, b, primes, segmentedPi);
     }
   }
@@ -263,15 +270,22 @@ T C2(T xlow,
     pi_conj_hi = max(pi_conj_hi, pi_conj_lo);
   }
 
-  // Sparse leaves below the reflected range
+  // Sparse leaves below the reflected range.
+  // for (; i <= pi_conj_lo; i++)
+  //   sum += segmentedPi[xp / primes[i]] - b + 2;
   sum += sum_pi<T, 1>(xp, i, pi_conj_lo, b, primes, segmentedPi);
   i = pi_conj_lo + 1;
 
-  // Reflected leaves: counted once as a sparse leaf, once as a conjugate.
+  // Reflected leaves are counted once as a
+  // sparse leaf and once as a conjugate.
+  // for (; i <= pi_conj_hi; i++)
+  //   sum += segmentedPi[xp / primes[i]] * 2 - b + 2;
   sum += sum_pi<T, 2>(xp, i, pi_conj_hi, b, primes, segmentedPi);
   i = pi_conj_hi + 1;
 
-  // Sparse leaves above the reflected range
+  // Sparse leaves above the reflected range.
+  // for (; i <= pi_min_clustered; i++)
+  //   sum += segmentedPi[xp / primes[i]] - b + 2;
   sum += sum_pi<T, 1>(xp, i, pi_min_clustered, b, primes, segmentedPi);
 
   return sum;
