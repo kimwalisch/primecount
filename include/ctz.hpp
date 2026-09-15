@@ -1,6 +1,6 @@
 ///
 /// @file   ctz.hpp
-/// @brief  Count the number of trailing zeros.
+/// @brief  Count the number of leading and trailing zeros.
 ///
 /// Copyright (C) 2026 Kim Walisch, <kim.walisch@gmail.com>
 ///
@@ -12,6 +12,8 @@
 #define CTZ_HPP
 
 #include "macros.hpp"
+
+#include <climits>
 #include <stdint.h>
 
 #if defined(__GNUC__) || \
@@ -36,6 +38,23 @@ ALWAYS_INLINE int ctz64(uint64_t x)
 #endif
 }
 
+ALWAYS_INLINE int clz64(uint64_t x)
+{
+  // __builtin_clz(0) is undefined behavior
+  ASSERT(x != 0);
+
+#if __cplusplus >= 201703L
+  if constexpr(sizeof(int) >= sizeof(uint64_t))
+    return __builtin_clz(x) - int(sizeof(int) - sizeof(uint64_t)) * CHAR_BIT;
+  else if constexpr(sizeof(long) >= sizeof(uint64_t))
+    return __builtin_clzl(x) - int(sizeof(long) - sizeof(uint64_t)) * CHAR_BIT;
+  else if constexpr(sizeof(long long) >= sizeof(uint64_t))
+    return __builtin_clzll(x) - int(sizeof(long long) - sizeof(uint64_t)) * CHAR_BIT;
+#else
+  return __builtin_clzll(x) - int(sizeof(long long) - sizeof(uint64_t)) * CHAR_BIT;
+#endif
+}
+
 } // namespace
 
 #elif __cplusplus >= 202002L && \
@@ -48,6 +67,11 @@ namespace primecount {
 ALWAYS_INLINE int ctz64(uint64_t x)
 {
   return std::countr_zero(x);
+}
+
+ALWAYS_INLINE int clz64(uint64_t x)
+{
+  return std::countl_zero(x);
 }
 
 } // namespace
@@ -68,6 +92,16 @@ ALWAYS_INLINE int ctz64(uint64_t x)
   unsigned long r;
   _BitScanForward64(&r, x);
   return (int) r;
+}
+
+ALWAYS_INLINE int clz64(uint64_t x)
+{
+  // _BitScanReverse64(0) is undefined behavior
+  ASSERT(x != 0);
+
+  unsigned long r;
+  _BitScanReverse64(&r, x);
+  return 63 - (int) r;
 }
 
 } // namespace
@@ -91,6 +125,19 @@ ALWAYS_INLINE int ctz64(uint64_t x)
 
   _BitScanForward(&r, (unsigned long) (x >> 32));
   return (int) r + 32;
+}
+
+ALWAYS_INLINE int clz64(uint64_t x)
+{
+  // _BitScanReverse(0) is undefined behavior
+  ASSERT(x != 0);
+
+  unsigned long r;
+  if (_BitScanReverse(&r, (unsigned long) (x >> 32)))
+    return 31 - (int) r;
+
+  _BitScanReverse(&r, (unsigned long) x);
+  return 63 - (int) r;
 }
 
 } // namespace

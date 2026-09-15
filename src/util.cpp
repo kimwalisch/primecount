@@ -24,6 +24,10 @@
 #include <stdint.h>
 #include <utility>
 
+#if defined(HAVE_INT128_T)
+  #include "udiv128.hpp"
+#endif
+
 namespace {
 
 int status_precision_ = -1;
