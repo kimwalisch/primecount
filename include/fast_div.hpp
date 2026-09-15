@@ -157,6 +157,8 @@ fast_div64(X x, Y y)
   uint64_t high = uint64_t(UX(x) >> 64);
   uint64_t d = y;
 
+  ASSERT(high < d);
+
   // (128-bit / 64-bit) = 64-bit.
   // When we know the result fits into 64-bit (even
   // though the numerator is 128-bit) we can use the divq
