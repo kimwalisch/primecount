@@ -432,14 +432,16 @@ void verify_pix(string_view_t pix_function,
 /// infer that execution cannot continue after a failed assertion.
 ///
 [[noreturn]]
-void assertion_failed(const char* expression,
-                      const char* file,
-                      int line)
+void assert_failed(const char* expression,
+                   const char* file,
+                   const char* function,
+                   int line)
 {
   std::string msg("\n");
   msg += std::string(file) + ":" + std::to_string(line);
-  msg += ": assertion failed: ";
-  msg += expression + std::string("\n\n");
+  msg += ": " + std::string(function);
+  msg += ": Assertion failed: `";
+  msg += expression + std::string("'\n\n");
 
   std::cerr << msg;
 
