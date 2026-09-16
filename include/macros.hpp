@@ -26,25 +26,6 @@
   #define __has_include(x) 0
 #endif
 
-// Required for std::unreachable()
-#include <utility>
-
-/// Enable expensive debugging assertions.
-/// These assertions enable e.g. bounds checks for the
-/// Vector and Array types.
-///
-#if defined(ENABLE_ASSERT)
-  #undef NDEBUG
-  #include <cassert>
-  #define ASSERT(x) assert(x)
-#else
-  #define ASSERT(x) (static_cast<void>(0))
-#endif
-
-/// Unfortunately compilers cannot be trusted (especially GCC)
-/// to inline performance critical functions. We must ensure
-/// that e.g. pi[x] and segmentedPi[x] are inlined.
-///
 #if __has_attribute(always_inline)
   #define ALWAYS_INLINE inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
@@ -81,6 +62,27 @@
   #define if_unlikely(x) if (x)
 #endif
 
+/// Enable expensive debugging assertions.
+/// These assertions enable e.g. bounds checks for the
+/// Vector and Array types.
+///
+#if defined(ENABLE_ASSERT)
+  namespace primecount {
+  [[noreturn]]
+  void assertion_failed(const char* expression,
+                        const char* file,
+                        int line);
+  } // namespace
+
+  #define ASSERT(x) \
+    do { \
+      if_unlikely(!(x)) \
+        primecount::assertion_failed(#x, __FILE__, __LINE__); \
+    } while (0)
+#else
+  #define ASSERT(x) ((void) 0)
+#endif
+
 #if __cplusplus >= 201703L && \
     __has_cpp_attribute(fallthrough)
   #define FALLTHROUGH [[fallthrough]]
@@ -88,6 +90,23 @@
   #define FALLTHROUGH __attribute__((fallthrough))
 #else
   #define FALLTHROUGH
+#endif
+
+#if defined(__GNUC__) || \
+    __has_builtin(__builtin_unreachable)
+  #define UNREACHABLE __builtin_unreachable()
+#elif defined(_MSC_VER)
+  #define UNREACHABLE __assume(0)
+#elif __cplusplus >= 202301L && \
+      defined(__cpp_lib_unreachable)
+  // We prefer __builtin_unreachable() over std::unreachable()
+  // because GCC's std::unreachable() implementation uses
+  // __builtin_trap() instead of __builtin_unreachable() if
+  // _GLIBCXX_ASSERTIONS is defined.
+  #include <utility>
+  #define UNREACHABLE std::unreachable()
+#else
+  #define UNREACHABLE
 #endif
 
 #if __cplusplus >= 201703L && \
@@ -109,27 +128,11 @@
   #endif
 #endif
 
-#if defined(__GNUC__) || \
-    __has_builtin(__builtin_unreachable)
-  #define UNREACHABLE __builtin_unreachable()
-#elif defined(_MSC_VER)
-  #define UNREACHABLE __assume(0)
-#elif __cplusplus >= 202301L && \
-      defined(__cpp_lib_unreachable)
-  // We prefer __builtin_unreachable() over std::unreachable()
-  // because GCC's std::unreachable() implementation uses
-  // __builtin_trap() instead of __builtin_unreachable() if
-  // _GLIBCXX_ASSERTIONS is defined.
-  #define UNREACHABLE std::unreachable()
-#else
-  #define UNREACHABLE
-#endif
-
 /// By default C++26 (and GCC/Clang's -ftrivial-auto-var-init) zero
 /// initializes variables with automatic storage duration. In primecount
 /// we place INDETERMINATE in front of large stack variable declarations
-/// whose memory is initialized later, in order to prevent this and avoid
-/// the unnecessary memset performance overhead.
+/// whose memory is initialized later, in order to prevent this and
+/// avoid the unnecessary memset performance overhead.
 ///
 #if __has_attribute(uninitialized)
   #define INDETERMINATE __attribute__((uninitialized))

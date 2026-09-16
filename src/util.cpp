@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <stdint.h>
 #include <utility>
 
@@ -414,9 +415,37 @@ void verify_pix(string_view_t pix_function,
     oss << "\rprimecount error: " << pix_function << "(" << x << ") = "  << pix  << std::endl
         << "Li(x) = " << Lix << ", sqrt(x) = " << sqrtx << ", log(x) = " << logx << std::endl
         << "Assertion failed: |pi(x) - Li(x)| < sqrt(x) * log(x) / (8 * PI)\n"   << std::endl;
-    std::cerr << oss.str() << std::flush;
+    std::cerr << oss.str();
     std::abort();
   }
 }
+
+#if defined(ENABLE_ASSERT)
+
+/// Custom assertion failure handler.
+/// On MinGW GCC 16, the standard assert() implementation no longer
+/// guarantees a non-returning failure path, which can cause false
+/// positive compiler warnings such as -Warray-bounds in debug builds.
+/// https://github.com/mingw-w64/mingw-w64/commit/ecf2328a328d11dec7044b40b2b5e93b5b2b9d9e
+///
+/// Using our own [[noreturn]] handler lets the compiler correctly
+/// infer that execution cannot continue after a failed assertion.
+///
+[[noreturn]]
+void assertion_failed(const char* expression,
+                      const char* file,
+                      int line)
+{
+  std::string msg = std::string(file) + ":" + std::to_string(line);
+  msg += ": assertion failed: ";
+  msg += expression;
+  msg += '\n';
+
+  std::cerr << msg;
+
+  std::abort();
+}
+
+#endif
 
 } // namespace
