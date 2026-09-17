@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup MSYS2 (MINGW64)
         uses: msys2/setup-msys2@v2
@@ -42,7 +42,7 @@ jobs:
           ./scripts/build_mingw64_x64.sh
 
       - name: Upload Windows x64 CI artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-x64
           path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-x64/*
@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup MSYS2 (CLANGARM64)
         uses: msys2/setup-msys2@v2
@@ -83,7 +83,7 @@ jobs:
           ./scripts/build_mingw64_arm64.sh
 
       - name: Upload Windows ARM64 CI artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: primecount-${{ env.PROJECT_VERSION }}-win-arm64
           path: build-release/primecount-${{ env.PROJECT_VERSION }}-win-arm64/*
